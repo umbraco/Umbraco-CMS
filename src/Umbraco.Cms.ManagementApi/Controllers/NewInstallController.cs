@@ -4,8 +4,10 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Install.Models;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Infrastructure.Install;
+using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.ManagementApi.Filters;
 using Umbraco.Cms.ManagementApi.ViewModels.Installer;
 using Umbraco.Extensions;
@@ -27,6 +29,7 @@ public class NewInstallController : Controller
     private readonly GlobalSettings _globalSettings;
     private readonly IHostingEnvironment _hostingEnvironment;
     private readonly InstallHelper _installHelper;
+    private readonly DatabaseBuilder _databaseBuilder;
 
     public NewInstallController(
         IUmbracoMapper mapper,
@@ -34,7 +37,8 @@ public class NewInstallController : Controller
         IInstallService installService,
         IOptions<GlobalSettings> globalSettings,
         IHostingEnvironment hostingEnvironment,
-        InstallHelper installHelper)
+        InstallHelper installHelper,
+        DatabaseBuilder databaseBuilder)
     {
         _mapper = mapper;
         _installSettingsFactory = installSettingsFactory;
@@ -42,6 +46,7 @@ public class NewInstallController : Controller
         _globalSettings = globalSettings.Value;
         _hostingEnvironment = hostingEnvironment;
         _installHelper = installHelper;
+        _databaseBuilder = databaseBuilder;
     }
 
     [HttpGet("settings")]
@@ -79,5 +84,50 @@ public class NewInstallController : Controller
 
         var backOfficePath = _globalSettings.GetBackOfficePath(_hostingEnvironment);
         return Created(backOfficePath, null);
+    }
+
+    [HttpPost("validateDatabase")]
+    [MapToApiVersion("1.0")]
+    [RequireRuntimeLevel(RuntimeLevel.Install)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> ValidateDatabase(DatabaseInstallViewModel viewModel)
+    {
+        if (ModelState.IsValid is false)
+        {
+            return BadRequest(ModelState);
+        }
+
+        DatabaseModel? databaseModel = _mapper.Map<DatabaseModel>(viewModel);
+
+        if (databaseModel is null)
+        {
+            var problemDetails = new ProblemDetails
+            {
+                Title = "Unable to bind model",
+                Detail = "Unable to bind the model, the is most likely due to a malformed request.",
+                Status = StatusCodes.Status400BadRequest,
+                Type = "Error",
+            };
+
+            return BadRequest(problemDetails);
+        }
+
+        var success = _databaseBuilder.ConfigureDatabaseConnection(databaseModel, true);
+
+        if (success)
+        {
+            return Ok();
+        }
+
+        var invalidModelProblem = new ProblemDetails
+        {
+            Title = "Invalid database configuration",
+            Detail = "The provided database configuration is invalid",
+            Status = StatusCodes.Status400BadRequest,
+            Type = "Error",
+        };
+
+        return BadRequest(invalidModelProblem);
     }
 }

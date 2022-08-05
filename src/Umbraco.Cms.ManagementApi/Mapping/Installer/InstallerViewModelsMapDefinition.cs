@@ -13,12 +13,26 @@ public class InstallerViewModelsMapDefinition : IMapDefinition
         mapper.Define<InstallViewModel, InstallData>((source, context) => new InstallData(), Map);
         mapper.Define<UserInstallViewModel, UserInstallData>((source, context) => new UserInstallData(), Map);
         mapper.Define<DatabaseInstallViewModel, DatabaseInstallData>((source, context) => new DatabaseInstallData(), Map);
+        mapper.Define<DatabaseInstallViewModel, DatabaseModel>((source, context) => new DatabaseModel(), Map);
         mapper.Define<DatabaseInstallData, DatabaseModel>((source, context) => new DatabaseModel(), Map);
         mapper.Define<InstallSettingsModel, InstallSettingsViewModel>((source, context) => new InstallSettingsViewModel(), Map);
         mapper.Define<UserSettingsModel, UserSettingsViewModel>((source, context) => new UserSettingsViewModel(), Map);
         mapper.Define<IDatabaseProviderMetadata, DatabaseSettingsModel>((source, context) => new DatabaseSettingsModel(), Map);
         mapper.Define<DatabaseSettingsModel, DatabaseSettingsViewModel>((source, context) => new DatabaseSettingsViewModel(), Map);
         mapper.Define<ConsentLevelModel, ConsentLevelViewModel>((source, context) => new ConsentLevelViewModel(), Map);
+    }
+
+    // Umbraco.Code.MapAll
+    private void Map(DatabaseInstallViewModel source, DatabaseModel target, MapperContext context)
+    {
+        target.ConnectionString = source.ConnectionString;
+        target.DatabaseName = source.Name ?? string.Empty;
+        target.DatabaseProviderMetadataId = source.Id;
+        target.IntegratedAuth = source.UseIntegratedAuthentication;
+        target.Login = source.Username;
+        target.Password = source.Password;
+        target.ProviderName = source.ProviderName;
+        target.Server = source.Server;
     }
 
     // Umbraco.Code.MapAll
