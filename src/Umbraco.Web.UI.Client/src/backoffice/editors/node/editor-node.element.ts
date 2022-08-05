@@ -1,19 +1,19 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { UmbContextConsumerMixin, UmbContextProviderMixin } from '../../core/context';
-import { UmbNodeStore } from '../../core/stores/node.store';
+import { UmbContextConsumerMixin, UmbContextProviderMixin } from '../../../core/context';
+import { UmbNodeStore } from '../../../core/stores/node.store';
 import { distinctUntilChanged, Subscription } from 'rxjs';
-import { NodeEntity } from '../../mocks/data/content.data';
-import { UmbNotificationService } from '../../core/services/notification.service';
-import { UmbNodeContext } from './node/node.context';
+import { NodeEntity } from '../../../mocks/data/content.data';
+import { UmbNotificationService } from '../../../core/services/notification.service';
+import { UmbNodeContext } from './node.context';
 
-import '../components/editor-entity.element';
+import '../../components/editor-entity.element';
 
 // Lazy load
 // TODO: Make this dynamic, use load-extensions method to loop over extensions for this node.
-import '../editor-views/editor-view-node-edit.element';
-import '../editor-views/editor-view-node-info.element';
+import '../../editor-views/editor-view-node-edit.element';
+import '../../editor-views/editor-view-node-info.element';
 
 @customElement('umb-editor-node')
 export class UmbEditorNodeElement extends UmbContextProviderMixin(UmbContextConsumerMixin(LitElement)) {
