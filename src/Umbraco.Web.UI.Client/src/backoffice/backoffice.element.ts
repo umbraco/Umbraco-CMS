@@ -11,7 +11,6 @@ import { UmbNodeStore } from '../core/stores/node.store';
 import './components/backoffice-header.element';
 import './components/backoffice-main.element';
 import './components/backoffice-notification-container.element';
-import './editors/shared/editor-layout.element';
 import './components/editor-property-layout.element';
 import './components/node-property.element';
 import './components/section-layout.element';

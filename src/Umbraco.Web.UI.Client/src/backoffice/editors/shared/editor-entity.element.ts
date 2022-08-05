@@ -6,6 +6,7 @@ import { UmbExtensionManifestEditorView, UmbExtensionRegistry } from '../../../c
 import { map, Subscription } from 'rxjs';
 import { IRoute, IRoutingInfo, RouterSlot } from 'router-slot';
 
+import './editor-layout.element';
 @customElement('umb-editor-entity')
 class UmbEditorEntity extends UmbContextConsumerMixin(LitElement) {
 	static styles = [
