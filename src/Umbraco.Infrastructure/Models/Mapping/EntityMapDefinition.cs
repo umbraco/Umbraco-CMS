@@ -94,13 +94,13 @@ namespace Umbraco.Cms.Core.Models.Mapping
         // Umbraco.Code.MapAll -Udi -Trashed
         private static void Map(IUser source, EntityBasic target, MapperContext context)
         {
-            target.Alias = source.Username;
+            target.Alias = source.Key.ToString();
             target.Icon = Constants.Icons.User;
             target.Id = source.Id;
             target.Key = source.Key;
             target.Name = source.Name;
             target.ParentId = -1;
-            target.Path = "";
+            target.Path = string.Empty;
         }
 
         // Umbraco.Code.MapAll -Trashed
