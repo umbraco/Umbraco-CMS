@@ -9,7 +9,7 @@ import { UmbDataTypeStore } from '../../../core/stores/data-type.store';
 import { DataTypeEntity } from '../../../mocks/data/data-type.data';
 import { UmbDataTypeContext } from './data-type.context';
 
-import '../../components/editor-entity.element';
+import '../shared/editor-entity.element';
 
 // Lazy load
 // TODO: Make this dynamic, use load-extensions method to loop over extensions for this node.

@@ -8,7 +8,7 @@ import { NodeEntity } from '../../../mocks/data/content.data';
 import { UmbNotificationService } from '../../../core/services/notification.service';
 import { UmbNodeContext } from './node.context';
 
-import '../../components/editor-entity.element';
+import '../shared/editor-entity.element';
 
 // Lazy load
 // TODO: Make this dynamic, use load-extensions method to loop over extensions for this node.
