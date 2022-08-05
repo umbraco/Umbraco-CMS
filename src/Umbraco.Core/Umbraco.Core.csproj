@@ -136,6 +136,7 @@
     <Compile Include="Collections\EventClearingObservableCollection.cs" />
     <Compile Include="Constants-Sql.cs" />
     <Compile Include="Constants-SqlTemplates.cs" />
+    <Compile Include="CryptoServiceProviderExtensions.cs" />
     <Compile Include="Events\UnattendedInstallEventArgs.cs" />
     <Compile Include="Help\HelpPageSettings.cs" />
     <Compile Include="Help\IHelpPageSettings.cs" />

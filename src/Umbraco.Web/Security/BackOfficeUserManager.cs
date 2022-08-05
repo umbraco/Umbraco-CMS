@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Security;
@@ -294,21 +295,22 @@ namespace Umbraco.Web.Security
                 passwordValidator.RequiredLength,
                 passwordValidator.RequireNonLetterOrDigit ? 2 : 0);
 
-            var random = new Random();
-
             var passwordChars = password.ToCharArray();
 
-            if (passwordValidator.RequireDigit && passwordChars.ContainsAny(Enumerable.Range(48, 58).Select(x => (char)x)))
-                password += Convert.ToChar(random.Next(48, 58));  // 0-9
+            using (var numberGenerator = new RNGCryptoServiceProvider())
+            {
+                if (passwordValidator.RequireDigit && passwordChars.ContainsAny(Enumerable.Range(48, 58).Select(x => (char)x)))
+                    password += Convert.ToChar(numberGenerator.GetInt32(48, 58));  // 0-9
 
-            if (passwordValidator.RequireLowercase && passwordChars.ContainsAny(Enumerable.Range(97, 123).Select(x => (char)x)))
-                password += Convert.ToChar(random.Next(97, 123));  // a-z
+                if (passwordValidator.RequireLowercase && passwordChars.ContainsAny(Enumerable.Range(97, 123).Select(x => (char)x)))
+                    password += Convert.ToChar(numberGenerator.GetInt32(97, 123));  // a-z
 
-            if (passwordValidator.RequireUppercase && passwordChars.ContainsAny(Enumerable.Range(65, 91).Select(x => (char)x)))
-                password += Convert.ToChar(random.Next(65, 91));  // A-Z
+                if (passwordValidator.RequireUppercase && passwordChars.ContainsAny(Enumerable.Range(65, 91).Select(x => (char)x)))
+                    password += Convert.ToChar(numberGenerator.GetInt32(65, 91));  // A-Z
 
-            if (passwordValidator.RequireNonLetterOrDigit && passwordChars.ContainsAny(Enumerable.Range(33, 48).Select(x => (char)x)))
-                password += Convert.ToChar(random.Next(33, 48));  // symbols !"#$%&'()*+,-./
+                if (passwordValidator.RequireNonLetterOrDigit && passwordChars.ContainsAny(Enumerable.Range(33, 48).Select(x => (char)x)))
+                    password += Convert.ToChar(numberGenerator.GetInt32(33, 48));  // symbols !"#$%&'()*+,-./
+            }
 
             return password;
         }
