@@ -79,7 +79,7 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
         IDictionary<string, string?>? items = auth.Properties?.Items;
         if (auth.Principal == null || items == null)
         {
-            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            if (Logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
             {
                 Logger.LogDebug(
                 auth.Failure ??
