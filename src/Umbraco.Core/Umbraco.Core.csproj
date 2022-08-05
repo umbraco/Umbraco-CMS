@@ -10,12 +10,6 @@
     <Product>Umbraco CMS</Product>
   </PropertyGroup>
 
-  <ItemGroup>
-    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
-      <_Parameter1>Umbraco.Cms.Core</_Parameter1>
-    </AssemblyAttribute>
-  </ItemGroup>
-
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <DocumentationFile>bin\Release\Umbraco.Core.xml</DocumentationFile>
   </PropertyGroup>
