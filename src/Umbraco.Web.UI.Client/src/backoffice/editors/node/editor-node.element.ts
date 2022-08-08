@@ -27,6 +27,22 @@ export class UmbEditorNodeElement extends UmbContextProviderMixin(UmbContextCons
 				height: 100%;
 			}
 
+			#popover {
+				display: block;
+			}
+
+			#dropdown {
+				overflow: hidden;
+				z-index: -1;
+				background-color: var(--uui-combobox-popover-background-color, var(--uui-color-surface));
+				border: 1px solid var(--uui-color-border);
+				border-radius: var(--uui-border-radius);
+				width: 100%;
+				height: 100%;
+				box-sizing: border-box;
+				box-shadow: var(--uui-shadow-depth-3);
+			}
+
 			uui-input {
 				width: 100%;
 			}
@@ -138,12 +154,39 @@ export class UmbEditorNodeElement extends UmbContextProviderMixin(UmbContextCons
 		}
 	}
 
+	private _toggleVariantSelector() {
+		this._variantSelectorIsOpen = !this._variantSelectorIsOpen;
+	}
+
+	@state()
+	private _variantSelectorIsOpen = false;
+
+	private _close() {
+		this._variantSelectorIsOpen = false;
+	}
+
 	render() {
 		return html`
 			<umb-editor-entity alias="Umb.Editor.Node">
 				<div slot="name">
-					<uui-input .value=${this._node?.name} @input="${this._handleInput}"></uui-input>
-					<!-- TODO: Implement variant selector -->
+					<uui-input .value=${this._node?.name} @input="${this._handleInput}">
+						<div slot="append">
+							<uui-button id="trigger" @click=${this._toggleVariantSelector}>
+								English (United States)
+								<uui-caret></uui-caret>
+							</uui-button>
+						</div>
+					</uui-input>
+					<!-- Implement Variant Selector -->
+					<uui-popover id="popover" .open=${this._variantSelectorIsOpen} @close=${this._close}>
+						<div id="dropdown" slot="popover">
+							<uui-scroll-container id="scroll-container">
+								<ul>
+									<li>Implement variants</li>
+								</ul>
+							</uui-scroll-container>
+						</div>
+					</uui-popover>
 				</div>
 
 				<div slot="footer">Breadcrumbs</div>
