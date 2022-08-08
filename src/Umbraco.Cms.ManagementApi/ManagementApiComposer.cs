@@ -29,7 +29,9 @@ public class ManagementApiComposer : IComposer
     {
         IServiceCollection services = builder.Services;
 
-        builder.AddNewInstaller();
+        builder
+            .AddNewInstaller()
+            .AddNewUpgrader();
 
         services.AddApiVersioning(options =>
         {

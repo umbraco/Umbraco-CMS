@@ -31,6 +31,15 @@ public static class InstallerBuilderExtensions
         return builder;
     }
 
+    internal static IUmbracoBuilder AddNewUpgrader(this IUmbracoBuilder builder)
+    {
+        IServiceCollection services = builder.Services;
+
+        services.AddTransient<IUpgradeSettingsFactory, UpgradeSettingsFactory>();
+
+        return builder;
+    }
+
     internal static IUmbracoBuilder AddInstallSteps(this IUmbracoBuilder builder)
     {
         builder.InstallSteps()
