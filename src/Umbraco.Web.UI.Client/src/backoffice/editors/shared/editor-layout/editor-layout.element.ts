@@ -34,7 +34,6 @@ export class UmbEditorLayout extends LitElement {
 				display: flex;
 				flex: 1;
 				flex-direction: column;
-				gap: 16px;
 			}
 
 			#footer {

@@ -49,6 +49,7 @@ export class UmbEditorExtensionsElement extends UmbContextConsumerMixin(LitEleme
 	render() {
 		return html`
 			<umb-editor-entity alias="Umb.Editor.Extensions">
+				<h3 slot="name">Extensions</h3>
 				<uui-box headline="Extensions">
 					<uui-table>
 						<uui-table-head>
