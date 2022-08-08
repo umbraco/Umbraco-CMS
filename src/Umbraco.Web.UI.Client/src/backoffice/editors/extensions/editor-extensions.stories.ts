@@ -4,8 +4,6 @@ import { html } from 'lit-html';
 import { UmbEditorExtensionsElement } from './editor-extensions.element';
 import './editor-extensions.element';
 
-import { data } from '../../../mocks/data/document-type.data';
-
 export default {
 	title: 'Editors/Extensions',
 	component: 'umb-editor-extensions',
