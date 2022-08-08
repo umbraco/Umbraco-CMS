@@ -11,8 +11,7 @@ import { html } from 'lit-html';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UmbContextConsumerMixin } from '../core/context';
 import { LitElement } from 'lit';
-import { UmbModalService } from '../core/services/modal/modal.service';
-import UmbModalHandler from '../core/services/modalHandler';
+import { UmbModalHandler, UmbModalService } from '../core/services/modal';
 
 export default {
 	title: 'API/Modals',
