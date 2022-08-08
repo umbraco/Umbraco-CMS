@@ -31,11 +31,13 @@ public static class InstallerBuilderExtensions
         return builder;
     }
 
-    internal static IUmbracoBuilder AddNewUpgrader(this IUmbracoBuilder builder)
+    internal static IUmbracoBuilder AddUpgrader(this IUmbracoBuilder builder)
     {
         IServiceCollection services = builder.Services;
 
         services.AddTransient<IUpgradeSettingsFactory, UpgradeSettingsFactory>();
+
+        builder.AddUpgradeSteps();
 
         return builder;
     }
@@ -58,4 +60,20 @@ public static class InstallerBuilderExtensions
 
     public static NewInstallStepCollectionBuilder InstallSteps(this IUmbracoBuilder builder)
         => builder.WithCollectionBuilder<NewInstallStepCollectionBuilder>();
+
+    internal static IUmbracoBuilder AddUpgradeSteps(this IUmbracoBuilder builder)
+    {
+        builder.UpgradeSteps()
+            .Append<FilePermissionsStep>()
+            .Append<TelemetryIdentifierStep>()
+            .Append<DatabaseInstallStep>()
+            .Append<DatabaseUpgradeStep>()
+            .Append<RegisterInstallCompleteStep>()
+            .Append<RestartRuntimeStep>();
+
+        return builder;
+    }
+
+    public static UpgradeStepCollectionBuilder UpgradeSteps(this IUmbracoBuilder builder)
+        => builder.WithCollectionBuilder<UpgradeStepCollectionBuilder>();
 }
