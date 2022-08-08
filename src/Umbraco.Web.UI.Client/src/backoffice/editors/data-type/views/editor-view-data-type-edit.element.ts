@@ -76,9 +76,6 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Li
 	render() {
 		return html`
 			<uui-box>
-				<h3>Property Editor (Model/Schema?)</h3>
-				Selector goes here ${this._dataType?.propertyEditorUIAlias}
-
 				<!-- TODO: temp property editor ui selector. Change when we have dialogs -->
 				<h3>Property Editor UI</h3>
 				<uui-combobox-list value="${ifDefined(this._dataType?.propertyEditorUIAlias)}" @change="${this._handleChange}">
@@ -92,10 +89,6 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Li
 							</uui-combobox-list-option>`
 					)}
 				</uui-combobox-list>
-
-				<hr style="margin-top: 20px;" />
-
-				<h3>Config/Prevalues</h3>
 			</uui-box>
 		`;
 	}
