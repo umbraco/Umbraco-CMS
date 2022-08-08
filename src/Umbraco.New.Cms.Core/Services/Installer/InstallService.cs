@@ -47,6 +47,7 @@ public class InstallService : IInstallService
 
             _logger.LogInformation("Running {StepName}", stepName);
             await step.ExecuteAsync(model);
+            _logger.LogInformation("Finished {StepName}", stepName);
         }
     }
 }

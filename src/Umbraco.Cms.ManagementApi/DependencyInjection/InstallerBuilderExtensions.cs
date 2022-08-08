@@ -36,8 +36,8 @@ public static class InstallerBuilderExtensions
         IServiceCollection services = builder.Services;
 
         services.AddTransient<IUpgradeSettingsFactory, UpgradeSettingsFactory>();
-
         builder.AddUpgradeSteps();
+        services.AddScoped<IUpgradeService, UpgradeService>();
 
         return builder;
     }
