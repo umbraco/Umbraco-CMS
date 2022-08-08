@@ -1,7 +1,8 @@
 import { html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { UmbContextConsumerMixin } from '../../core/context';
-import { UmbNotificationService } from '../../core/services/notification.service';
+import type { UmbNotificationDefaultData } from '../../core/services/notification/layouts/default';
+import type { UmbNotificationService } from '../../core/services/notification';
 import type { UmbPropertyAction } from './property-action/property-action.model';
 
 @customElement('umb-property-action-copy')
@@ -26,7 +27,8 @@ export default class UmbPropertyActionCopyElement extends UmbContextConsumerMixi
   }
 
   private _handleLabelClick () {
-    this._notificationService?.peek('Copied to clipboard');
+    const data: UmbNotificationDefaultData = { message: 'Copied to clipboard' };
+    this._notificationService?.peek('positive', { data });
     // TODO: how do we want to close the menu? Testing an event based approach
     this.dispatchEvent(new CustomEvent('close', { bubbles: true, composed: true }));
   }

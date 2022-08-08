@@ -4,7 +4,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { Subscription } from 'rxjs';
 import { UmbContextConsumerMixin } from '../../core/context';
-import { UmbNotificationService } from '../../core/services/notification.service';
+import type { UmbNotificationService, UmbNotificationHandler } from '../../core/services/notification';
 
 @customElement('umb-backoffice-notification-container')
 export class UmbBackofficeNotificationContainer extends UmbContextConsumerMixin(LitElement) {
@@ -24,7 +24,7 @@ export class UmbBackofficeNotificationContainer extends UmbContextConsumerMixin(
 	];
 
 	@state()
-	private _notifications: any[] = [];
+	private _notifications: UmbNotificationHandler[] = [];
 
 	private _notificationService?: UmbNotificationService;
 	private _notificationSubscription?: Subscription;
@@ -41,11 +41,13 @@ export class UmbBackofficeNotificationContainer extends UmbContextConsumerMixin(
 	private _useNotifications() {
 		this._notificationSubscription?.unsubscribe();
 
-		this._notificationService?.notifications.subscribe((notifications: Array<any>) => {
+		this._notificationService?.notifications.subscribe((notifications: Array<UmbNotificationHandler>) => {
 			this._notifications = notifications;
 		});
+	}
 
-		// TODO: listen to close event and remove notification from store.
+	private _closedNotificationHandler(notificationHandler: UmbNotificationHandler) {
+		notificationHandler.close();
 	}
 
 	disconnectedCallback(): void {
@@ -55,12 +57,15 @@ export class UmbBackofficeNotificationContainer extends UmbContextConsumerMixin(
 
 	render() {
 		return html`
-			<uui-toast-notification-container auto-close="7000" bottom-up id="notifications">
+			<uui-toast-notification-container bottom-up id="notifications">
 				${repeat(
 					this._notifications,
-					(notification) => notification.key,
-					(notification) => html` <uui-toast-notification color="positive">
-						<uui-toast-notification-layout .headline=${notification.headline}> </uui-toast-notification-layout>
+					(notification: UmbNotificationHandler) => notification.key,
+					(notification) => html`<uui-toast-notification
+						color="${notification.color}"
+						.autoClose="${notification.duration}"
+						@closed="${() => this._closedNotificationHandler(notification)}">
+						${notification.element}
 					</uui-toast-notification>`
 				)}
 			</uui-toast-notification-container>
