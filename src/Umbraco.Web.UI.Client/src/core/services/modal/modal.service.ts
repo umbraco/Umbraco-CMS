@@ -1,5 +1,5 @@
 import { BehaviorSubject, Observable } from 'rxjs';
-import UmbModalHandler from './modalHandler';
+import { UmbModalHandler } from './';
 
 export class UmbModalService {
 	private _modals: BehaviorSubject<Array<UmbModalHandler>> = new BehaviorSubject(<Array<UmbModalHandler>>[]);

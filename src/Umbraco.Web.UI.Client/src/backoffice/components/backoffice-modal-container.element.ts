@@ -4,7 +4,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { Subscription } from 'rxjs';
 import { UmbContextConsumerMixin } from '../../core/context';
-import { UmbModalService } from '../../core/services/modal.service';
+import { UmbModalService } from '../../core/services/modal/modal.service';
 
 @customElement('umb-backoffice-modal-container')
 export class UmbBackofficeModalContainer extends UmbContextConsumerMixin(LitElement) {

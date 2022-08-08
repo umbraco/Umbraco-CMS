@@ -1,7 +1,7 @@
 import { html, render } from 'lit';
 
 //TODO consider splitting this into two separate handlers
-export default class UmbModalHandler {
+export class UmbModalHandler {
 	private _closeResolver: any;
 	private _closePromise: any;
 
@@ -37,7 +37,6 @@ export default class UmbModalHandler {
 
 	public close(...args: any) {
 		this._closeResolver(...args);
-		this.modal.close();
 	}
 
 	public get onClose(): Promise<any> {

@@ -1,0 +1,31 @@
+# Modals
+
+A modal is a popup that darkens the background and has focus lock.
+
+**Dialog modals**
+Appears in the middle of the screen.
+
+**Sidebar modals**
+Slides in from the right.
+
+## Basic Usage
+
+### Consume UmbModalService from an element
+
+The UmbModal service can be used to open modals.
+
+```ts
+import { html, LitElement } from 'lit';
+import { UmbContextConsumerMixin } from './core/context';
+import { UmbModalService } from './core/services/modal.service';
+class MyElement extends UmbContextConsumerMixin(LitElement) {
+	private _modalService_?: UmbModalService;
+	constructor() {
+		super();
+		this.consumeContext('umbModalService', (modalService: UmbModalService) => {
+			this._modalService = modalService;
+			// modalService is now ready to be used.
+		});
+	}
+}
+```

@@ -7,7 +7,7 @@ import '@umbraco-ui/uui-modal-sidebar';
 import '@umbraco-ui/uui-modal-container';
 import '@umbraco-ui/uui-modal-dialog';
 import { UmbContextConsumerMixin } from '../../core/context';
-import { UmbModalService } from '../../core/services/modal.service';
+import { UmbModalService } from '../../core/services/modal/modal.service';
 
 import './modal-content-picker.element';
 
