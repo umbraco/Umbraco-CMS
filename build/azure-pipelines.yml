@@ -135,7 +135,7 @@ stages:
               }
             displayName: Install DocFX
           - powershell: |
-              docfx metadata "$(Build.SourcesDirectory)/build/csharp-docs/docfx.json" --repositoryRoot "$(Build.SourcesDirectory)"
+              docfx metadata "$(Build.SourcesDirectory)/build/csharp-docs/docfx.json"
               if ($LASTEXITCODE -ne 0){
                   throw ("Error generating metadata.")
               }
@@ -158,9 +158,9 @@ stages:
                 targetPath: $(Build.ArtifactStagingDirectory)/csharp-docs.zip
                 artifact: csharp-docs
 
-      # JS API Reference
+      # UI API Reference
       - job:
-        displayName: Build JS API Reference
+        displayName: Build UI API Reference
         pool:
           vmImage: 'ubuntu-latest'
         steps:
@@ -179,16 +179,16 @@ stages:
               echo "Base URL: $baseUrl"
 
               sed -i "s|baseUrl = .*|baseUrl = '$baseUrl',|" api/index.html
-            displayName: Generate JS Docs
+            displayName: Generate UI Docs
             workingDirectory:  $(Build.SourcesDirectory)/src/Umbraco.Web.UI.Docs
           - task: ArchiveFiles@2
-            displayName: Archive JS Docs
+            displayName: Archive UI Docs
             inputs:
                 rootFolderOrFile: $(Build.SourcesDirectory)/src/Umbraco.Web.UI.Docs/api
                 includeRootFolder: false
                 archiveFile: $(Build.ArtifactStagingDirectory)/ui-docs.zip
           - task: PublishPipelineArtifact@1
-            displayName: Publish JS Docs
+            displayName: Publish UI Docs
             inputs:
                 targetPath: $(Build.ArtifactStagingDirectory)/ui-docs.zip
                 artifact: ui-docs
