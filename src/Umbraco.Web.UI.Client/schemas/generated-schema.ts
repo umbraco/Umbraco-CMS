@@ -19,6 +19,12 @@ export interface paths {
   "/server/version": {
     get: operations["GetVersion"];
   };
+  "/upgrade/settings": {
+    get: operations["GetUpgradeSettings"];
+  };
+  "/upgrade/authorize": {
+    post: operations["PostUpgradeAuthorize"];
+  };
   "/user": {
     get: operations["GetUser"];
   };
@@ -106,6 +112,13 @@ export interface components {
     };
     VersionResponse: {
       version: string;
+    };
+    UpgradeSettingsResponse: {
+      currentState: string;
+      newState: string;
+      newVersion: string;
+      oldVersion: string;
+      reportUrl: string;
     };
     UserResponse: {
       username: string;
@@ -201,6 +214,35 @@ export interface operations {
       };
       /** default response */
       default: {
+        content: {
+          "application/json": components["schemas"]["ProblemDetails"];
+        };
+      };
+    };
+  };
+  GetUpgradeSettings: {
+    responses: {
+      /** 200 response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["UpgradeSettingsResponse"];
+        };
+      };
+      /** default response */
+      default: {
+        content: {
+          "application/json": components["schemas"]["ProblemDetails"];
+        };
+      };
+    };
+  };
+  PostUpgradeAuthorize: {
+    parameters: {};
+    responses: {
+      /** 201 response */
+      201: unknown;
+      /** 400 response */
+      400: {
         content: {
           "application/json": components["schemas"]["ProblemDetails"];
         };

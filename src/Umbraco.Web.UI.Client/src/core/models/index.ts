@@ -7,6 +7,7 @@ export type ProblemDetails = components['schemas']['ProblemDetails'];
 export type UserResponse = components['schemas']['UserResponse'];
 export type AllowedSectionsResponse = components['schemas']['AllowedSectionsResponse'];
 export type UmbracoInstaller = components['schemas']['InstallSettingsResponse'];
+export type UmbracoUpgrader = components['schemas']['UpgradeSettingsResponse'];
 
 // Models
 export type UmbracoPerformInstallDatabaseConfiguration = components['schemas']['InstallSetupDatabaseConfiguration'];

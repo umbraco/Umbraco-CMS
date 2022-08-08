@@ -2,6 +2,7 @@ import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import { Subscription } from 'rxjs';
+
 import { UmbContextConsumerMixin } from '../core/context';
 import { TelemetryModel } from '../core/models';
 import { UmbInstallerContext } from './installer-context';
@@ -48,10 +49,10 @@ export class UmbInstallerConsent extends UmbContextConsumerMixin(LitElement) {
 	private _telemetryLevels: TelemetryModel[] = [];
 
 	@state()
-	private _telemetryFormData!: TelemetryModel['level'];
+	private _telemetryFormData?: TelemetryModel['level'];
 
 	@state()
-	private _installerStore!: UmbInstallerContext;
+	private _installerStore?: UmbInstallerContext;
 
 	private storeDataSubscription?: Subscription;
 	private storeSettingsSubscription?: Subscription;
@@ -85,7 +86,7 @@ export class UmbInstallerConsent extends UmbContextConsumerMixin(LitElement) {
 
 		const value: { [key: string]: string } = {};
 		value[target.name] = this._telemetryLevels[parseInt(target.value) - 1].level;
-		this._installerStore.appendData(value);
+		this._installerStore?.appendData(value);
 	}
 
 	private _onNext() {
@@ -105,7 +106,7 @@ export class UmbInstallerConsent extends UmbContextConsumerMixin(LitElement) {
 	}
 
 	private _renderSlider() {
-		if (!this._telemetryLevels) return;
+		if (!this._telemetryLevels || this._telemetryLevels.length < 1) return;
 
 		return html`
 			<uui-slider
@@ -125,7 +126,7 @@ export class UmbInstallerConsent extends UmbContextConsumerMixin(LitElement) {
 	render() {
 		return html`
 			<div id="container" class="uui-text">
-				<h1>Consent Level</h1>
+				<h1>Consent for telemetry data</h1>
 				${this._renderSlider()}
 				<div id="buttons">
 					<uui-button label="Back" @click=${this._onBack} look="secondary"></uui-button>

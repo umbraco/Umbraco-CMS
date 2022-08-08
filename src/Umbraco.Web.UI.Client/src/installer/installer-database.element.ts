@@ -4,11 +4,7 @@ import { customElement, property, query, state } from 'lit/decorators.js';
 import { Subscription } from 'rxjs';
 
 import { UmbContextConsumerMixin } from '../core/context';
-import {
-	ProblemDetails,
-	UmbracoInstallerDatabaseModel,
-	UmbracoPerformInstallDatabaseConfiguration,
-} from '../core/models';
+import { ProblemDetails, UmbracoInstallerDatabaseModel, UmbracoPerformInstallDatabaseConfiguration } from '../core/models';
 import { UmbInstallerContext } from './installer-context';
 
 @customElement('umb-installer-database')
@@ -99,7 +95,7 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
 	private _preConfiguredDatabase?: UmbracoInstallerDatabaseModel;
 
 	@state()
-	private _installerStore!: UmbInstallerContext;
+	private _installerStore?: UmbInstallerContext;
 
 	private storeDataSubscription?: Subscription;
 	private storeSettingsSubscription?: Subscription;
@@ -142,9 +138,9 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
 		const value: { [key: string]: string | boolean } = {};
 		value[target.name] = target.checked ?? target.value; // handle boolean and text inputs
 
-		const database = { ...this._installerStore.getData().database, ...value };
+		const database = { ...this._installerStore?.getData().database, ...value };
 
-		this._installerStore.appendData({ database });
+		this._installerStore?.appendData({ database });
 	}
 
 	private _handleSubmit = (e: SubmitEvent) => {
@@ -167,7 +163,7 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
 			const useIntegratedAuthentication = formData.has('useIntegratedAuthentication');
 
 			const database = {
-				...this._installerStore.getData().database,
+				...this._installerStore?.getData().database,
 				id,
 				username,
 				password,
@@ -176,14 +172,15 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
 				useIntegratedAuthentication,
 			} as UmbracoPerformInstallDatabaseConfiguration;
 
-			this._installerStore.appendData({ database });
+			this._installerStore?.appendData({ database });
 		}
 
-		this._installerStore.requestInstall().then(this._handleFulfilled.bind(this), this._handleRejected.bind(this));
+		this._installerStore?.requestInstall().then(this._handleFulfilled.bind(this), this._handleRejected.bind(this));
 		this._installButton.state = 'waiting';
 	};
 	private _handleFulfilled() {
 		this.dispatchEvent(new CustomEvent('next', { bubbles: true, composed: true }));
+		this._installButton.state = undefined;
 	}
 	private _handleRejected(error: ProblemDetails) {
 		this._installButton.state = 'failed';
@@ -195,7 +192,7 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
 	}
 
 	private get selectedDatabase() {
-		const id = this._installerStore.getData().database?.id;
+		const id = this._installerStore?.getData().database?.id;
 		console.log('selected id', id, this._databases);
 		return this._databases.find((x) => x.id === id) ?? this._databases[0];
 	}
@@ -213,7 +210,7 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
 			result.push(this._renderServer());
 		}
 
-		result.push(this._renderDatabaseName());
+		result.push(this._renderDatabaseName(this.databaseFormData.name ?? this.selectedDatabase.defaultDatabaseName));
 
 		if (this.selectedDatabase.requiresCredentials) {
 			result.push(this._renderCredentials());
@@ -239,15 +236,15 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
 		</uui-form-layout-item>
 	`;
 
-	private _renderDatabaseName = () => html` <uui-form-layout-item>
+	private _renderDatabaseName = (value: string) => html` <uui-form-layout-item>
 		<uui-label for="database-name" slot="label" required>Database Name</uui-label>
 		<uui-input
 			type="text"
-			.value=${this.databaseFormData.name ?? ''}
+			.value=${value}
 			id="database-name"
 			name="name"
 			@input=${this._handleChange}
-			placeholder="umbraco-cms"
+			placeholder="umbraco"
 			required
 			required-message="Database name is required"></uui-input>
 	</uui-form-layout-item>`;

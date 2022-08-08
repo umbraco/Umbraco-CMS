@@ -1,32 +1,82 @@
-import { css, CSSResultGroup, html, LitElement } from 'lit';
+import '../installer/installer-layout.element';
+import './upgrader-view.element';
+
+import { html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
-import { UmbContextProviderMixin } from '../core/context';
+import { getUpgradeSettings, PostUpgradeAuthorize } from '../core/api/fetcher';
+import { UmbracoUpgrader } from '../core/models';
 
+/**
+ * @element umb-upgrader
+ */
 @customElement('umb-upgrader')
-export class UmbUpgrader extends UmbContextProviderMixin(LitElement) {
-	static styles: CSSResultGroup = [css``];
+export class UmbUpgrader extends LitElement {
+	@state()
+	private upgradeSettings?: UmbracoUpgrader;
 
 	@state()
-	step = 1;
+	private fetching = true;
 
-	connectedCallback(): void {
-		super.connectedCallback();
-		this.addEventListener('next', () => this._handleNext());
-		this.addEventListener('previous', () => this._goToPreviousStep());
-	}
+	@state()
+	private upgrading = false;
 
-	private _handleNext() {
-		this.step++;
-	}
+	@state()
+	private errorMessage = '';
 
-	private _goToPreviousStep() {
-		this.step--;
+	constructor() {
+		super();
+		this._setup();
 	}
 
 	render() {
-		return html`<h1>Please implement me</h1>`;
+		return html`<umb-installer-layout>
+			<umb-upgrader-view
+				.fetching=${this.fetching}
+				.upgrading=${this.upgrading}
+				.settings=${this.upgradeSettings}
+				.errorMessage=${this.errorMessage}
+				@onAuthorizeUpgrade=${this._handleSubmit}></umb-upgrader-view>
+		</umb-installer-layout>`;
 	}
+
+	private async _setup() {
+		this.fetching = true;
+
+		try {
+			const { data } = await getUpgradeSettings({});
+
+			this.upgradeSettings = data;
+		} catch (e) {
+			if (e instanceof getUpgradeSettings.Error) {
+				this.errorMessage = e.message;
+			}
+		}
+
+		this.fetching = false;
+	}
+
+	_handleSubmit = async (e: CustomEvent<SubmitEvent>) => {
+		e.stopPropagation();
+		this.errorMessage = '';
+		this.upgrading = true;
+
+		try {
+			await PostUpgradeAuthorize({});
+			history.pushState(null, '', '/');
+		} catch (e) {
+			if (e instanceof PostUpgradeAuthorize.Error) {
+				const error = e.getActualType();
+				if (error.status === 400) {
+					this.errorMessage = error.data.detail || 'Unknown error, please try again';
+				}
+			} else {
+				this.errorMessage = 'Unknown error, please try again';
+			}
+		}
+
+		this.upgrading = false;
+	};
 }
 
 export default UmbUpgrader;
