@@ -6,6 +6,7 @@ using Umbraco.Cms.ManagementApi.Filters;
 using Umbraco.Cms.ManagementApi.ViewModels.Installer;
 using Umbraco.New.Cms.Core.Factories;
 using Umbraco.New.Cms.Core.Models.Installer;
+using Umbraco.New.Cms.Core.Services.Installer;
 using Umbraco.New.Cms.Web.Common.Routing;
 
 namespace Umbraco.Cms.ManagementApi.Controllers;
@@ -16,14 +17,29 @@ namespace Umbraco.Cms.ManagementApi.Controllers;
 public class UpgradeController : Controller
 {
     private readonly IUpgradeSettingsFactory _upgradeSettingsFactory;
+    private readonly IUpgradeService _upgradeService;
     private readonly IUmbracoMapper _mapper;
 
     public UpgradeController(
         IUpgradeSettingsFactory upgradeSettingsFactory,
+        IUpgradeService upgradeService,
         IUmbracoMapper mapper)
     {
         _upgradeSettingsFactory = upgradeSettingsFactory;
+        _upgradeService = upgradeService;
         _mapper = mapper;
+    }
+
+    [HttpPost("authorize")]
+    [MapToApiVersion("1.0")]
+    [RequireRuntimeLevel(RuntimeLevel.Upgrade)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status428PreconditionRequired)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> Authorize()
+    {
+        await _upgradeService.Upgrade();
+        return Ok();
     }
 
     [HttpGet("settings")]
