@@ -4,5 +4,5 @@ namespace Umbraco.New.Cms.Core.Factories;
 
 public interface IUpgradeSettingsFactory
 {
-    public UpgradeSettingsModel GetUpgradeSettings();
+    UpgradeSettingsModel GetUpgradeSettings();
 }
