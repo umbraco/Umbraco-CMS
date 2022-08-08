@@ -4,6 +4,8 @@ import { Subscription } from 'rxjs';
 import { UmbContextConsumerMixin } from '../../../core/context';
 import { UmbExtensionManifest, UmbExtensionRegistry } from '../../../core/extension';
 
+import '../shared/editor-entity.element';
+
 @customElement('umb-editor-extensions')
 export class UmbEditorExtensionsElement extends UmbContextConsumerMixin(LitElement) {
 	@state()
@@ -46,25 +48,27 @@ export class UmbEditorExtensionsElement extends UmbContextConsumerMixin(LitEleme
 
 	render() {
 		return html`
-			<uui-box headline="Extensions">
-				<uui-table>
-					<uui-table-head>
-						<uui-table-head-cell>Type</uui-table-head-cell>
-						<uui-table-head-cell>Name</uui-table-head-cell>
-						<uui-table-head-cell>Alias</uui-table-head-cell>
-					</uui-table-head>
+			<umb-editor-entity alias="Umb.Editor.Extensions">
+				<uui-box headline="Extensions">
+					<uui-table>
+						<uui-table-head>
+							<uui-table-head-cell>Type</uui-table-head-cell>
+							<uui-table-head-cell>Name</uui-table-head-cell>
+							<uui-table-head-cell>Alias</uui-table-head-cell>
+						</uui-table-head>
 
-					${this._extensions.map(
-						(extension) => html`
-							<uui-table-row>
-								<uui-table-cell>${extension.type}</uui-table-cell>
-								<uui-table-cell>${extension.name}</uui-table-cell>
-								<uui-table-cell>${extension.alias}</uui-table-cell>
-							</uui-table-row>
-						`
-					)}
-				</uui-table>
-			</uui-box>
+						${this._extensions.map(
+							(extension) => html`
+								<uui-table-row>
+									<uui-table-cell>${extension.type}</uui-table-cell>
+									<uui-table-cell>${extension.name}</uui-table-cell>
+									<uui-table-cell>${extension.alias}</uui-table-cell>
+								</uui-table-row>
+							`
+						)}
+					</uui-table>
+				</uui-box>
+			</umb-editor-entity>
 		`;
 	}
 }

@@ -1,4 +1,4 @@
-import { css, html, LitElement } from 'lit';
+import { css, html, LitElement, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UmbContextConsumerMixin } from '../../../core/context';
@@ -22,6 +22,7 @@ class UmbEditorEntity extends UmbContextConsumerMixin(LitElement) {
 				display: flex;
 				gap: 16px;
 				align-items: center;
+				min-height: 60px;
 			}
 
 			#footer {
@@ -46,10 +47,6 @@ class UmbEditorEntity extends UmbContextConsumerMixin(LitElement) {
 				border-right: 1px solid var(--uui-color-border);
 				flex-wrap: nowrap;
 				height: 60px;
-			}
-
-			uui-tab {
-				font-size: 0.8rem;
 			}
 		`,
 	];
@@ -142,25 +139,35 @@ class UmbEditorEntity extends UmbContextConsumerMixin(LitElement) {
 		}
 	}
 
+	private _renderViews() {
+		return html`
+			${this._editorViews?.length > 0
+				? html`
+						<uui-tab-group slot="views">
+							${this._editorViews.map(
+								(view: UmbExtensionManifestEditorView) => html`
+									<uui-tab
+										.label="${view.name}"
+										href="${this._routerFolder}/view/${view.meta.pathname}"
+										?active="${this._currentView.includes(view.meta.pathname)}">
+										<uui-icon slot="icon" name="${view.meta.icon}"></uui-icon>
+										${view.name}
+									</uui-tab>
+								`
+							)}
+						</uui-tab-group>
+				  `
+				: nothing}
+		`;
+	}
+
 	render() {
 		return html`
 			<umb-editor-layout>
 				<div id="header" slot="header">
 					<slot id="icon" name="icon"></slot>
 					<uui-input .value="${this.name}"></uui-input>
-					<uui-tab-group slot="views">
-						${this._editorViews.map(
-							(view: UmbExtensionManifestEditorView) => html`
-								<uui-tab
-									.label="${view.name}"
-									href="${this._routerFolder}/view/${view.meta.pathname}"
-									?active="${this._currentView.includes(view.meta.pathname)}">
-									<uui-icon slot="icon" name="${view.meta.icon}"></uui-icon>
-									${view.name}
-								</uui-tab>
-							`
-						)}
-					</uui-tab-group>
+					${this._renderViews()}
 				</div>
 
 				<router-slot .routes="${this._routes}"></router-slot>
