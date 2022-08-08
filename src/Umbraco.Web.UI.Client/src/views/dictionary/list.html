@@ -51,7 +51,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr ng-repeat="item in vm.filtered = (vm.items | filter: { 'name': vm.filter.searchTerm } | orderBy:'name') track by $id(item)" style="cursor: pointer;">
+              <tr ng-repeat="item in vm.filtered = (vm.items | filter: { 'name': vm.filter.searchTerm }) track by $id(item)" style="cursor: pointer;">
                 <th>
                   <button type="button" ng-style="item.style" class="btn-reset bold" ng-click="vm.clickItem(item.id)">{{item.name}}</button>
                 </th>
