@@ -38,7 +38,7 @@ export class UmbEditorDocumentTypeElement extends UmbContextProviderMixin(UmbCon
 	@state()
 	private _saveButtonState?: UUIButtonState;
 
-	private _documentTypeContext = new UmbDocumentTypeContext();
+	private _documentTypeContext?: UmbDocumentTypeContext;
 	private _documentTypeContextSubscription?: Subscription;
 
 	private _documentTypeStore?: UmbDocumentTypeStore;
@@ -72,7 +72,12 @@ export class UmbEditorDocumentTypeElement extends UmbContextProviderMixin(UmbCon
 
 				this._documentTypeContextSubscription?.unsubscribe();
 
-				this._documentTypeContext?.update(documentType);
+				if (!this._documentTypeContext) {
+					this._documentTypeContext = new UmbDocumentTypeContext(documentType);
+					this.provideContext('umbDocumentTypeContext', this._documentTypeContext);
+				} else {
+					this._documentTypeContext.update(documentType);
+				}
 
 				this._documentTypeContextSubscription = this._documentTypeContext.data
 					.pipe(distinctUntilChanged())

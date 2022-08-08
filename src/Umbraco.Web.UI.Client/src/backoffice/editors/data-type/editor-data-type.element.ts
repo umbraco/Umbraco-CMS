@@ -38,7 +38,7 @@ export class UmbEditorDataTypeElement extends UmbContextProviderMixin(UmbContext
 	@state()
 	private _saveButtonState?: UUIButtonState;
 
-	private _dataTypeContext = new UmbDataTypeContext();
+	private _dataTypeContext?: UmbDataTypeContext;
 	private _dataTypeContextSubscription?: Subscription;
 
 	private _dataTypeStore?: UmbDataTypeStore;
@@ -70,7 +70,12 @@ export class UmbEditorDataTypeElement extends UmbContextProviderMixin(UmbContext
 
 			this._dataTypeContextSubscription?.unsubscribe();
 
-			this._dataTypeContext?.update(dataType);
+			if (!this._dataTypeContext) {
+				this._dataTypeContext = new UmbDataTypeContext(dataType);
+				this.provideContext('umbDataTypeContext', this._dataTypeContext);
+			} else {
+				this._dataTypeContext.update(dataType);
+			}
 
 			this._dataTypeContextSubscription = this._dataTypeContext.data.pipe(distinctUntilChanged()).subscribe((data) => {
 				this._dataType = data;

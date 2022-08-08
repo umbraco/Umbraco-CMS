@@ -33,7 +33,7 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Li
 			this._usePropertyEditorUIs();
 		});
 
-		this.consumeContext('umbDataType', (dataTypeContext) => {
+		this.consumeContext('umbDataTypeContext', (dataTypeContext) => {
 			this._dataTypeContext = dataTypeContext;
 			this._useDataType();
 		});

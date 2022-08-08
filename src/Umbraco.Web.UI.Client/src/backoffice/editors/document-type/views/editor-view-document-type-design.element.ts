@@ -23,7 +23,7 @@ export class UmbEditorViewDocumentTypeDesignElement extends UmbContextConsumerMi
 	constructor() {
 		super();
 
-		this.consumeContext('umbDocumentType', (documentTypeContext) => {
+		this.consumeContext('umbDocumentTypeContext', (documentTypeContext) => {
 			this._documentTypeContext = documentTypeContext;
 			this._useDocumentType();
 		});
@@ -45,7 +45,7 @@ export class UmbEditorViewDocumentTypeDesignElement extends UmbContextConsumerMi
 	}
 
 	render() {
-		return html`<div>Design ${this._documentType?.name}</div>`;
+		return html`<div>Design of ${this._documentType?.name}</div>`;
 	}
 }
 
