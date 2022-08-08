@@ -18,7 +18,10 @@
         }
       ],
       "dest": "api",
-      "filter": "docfx.filter.yml"
+      "filter": "docfx.filter.yml",
+      "properties": {
+        "DeterministicSourcePaths": false
+      }
     }
   ],
   "build": {

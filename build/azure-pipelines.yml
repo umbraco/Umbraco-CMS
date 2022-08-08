@@ -119,7 +119,8 @@ stages:
     displayName: Prepare API Documentation
     dependsOn: Build
     variables:
-      DOCFX_SOURCE_BRANCH_NAME: v$[ stageDependencies.Build.A.outputs['determineMajorVersion.majorVersion'] ]/contrib
+      umbracoMajorVersion: $[ stageDependencies.Build.A.outputs['determineMajorVersion.majorVersion'] ]
+      DOCFX_SOURCE_BRANCH_NAME: v$(umbracoMajorVersion)/contrib
     jobs:
       # C# API Reference
       - job:
@@ -127,33 +128,24 @@ stages:
         pool:
           vmImage: 'windows-latest'
         steps:
-          - task: PowerShell@2
+          - powershell: |
+              choco install docfx --version=2.59.3 -y
+              if ($LASTEXITCODE -ne 0){
+                  throw ("Error installing DocFX")
+              }
             displayName: Install DocFX
-            inputs:
-                targetType: inline
-                script: |
-                  choco install docfx --version=2.59.3 -y
-                  if ($lastexitcode -ne 0){
-                      throw ("Error installing DocFX")
-                  }
-          - task: PowerShell@2
+          - powershell: |
+              docfx metadata "$(Build.SourcesDirectory)/build/csharp-docs/docfx.json" --repositoryRoot "$(Build.SourcesDirectory)"
+              if ($LASTEXITCODE -ne 0){
+                  throw ("Error generating metadata.")
+              }
             displayName: Generate metadata
-            inputs:
-                targetType: inline
-                script: |
-                  docfx metadata "$(Build.SourcesDirectory)/build/csharp-docs/docfx.json"
-                  if ($lastexitcode -ne 0){
-                      throw ("Error generating metadata.")
-                  }
-          - task: PowerShell@2
+          - powershell: |
+              docfx build "$(Build.SourcesDirectory)/build/csharp-docs/docfx.json"
+              if ($LASTEXITCODE -ne 0){
+                    throw ("Error generating documentation.")
+              }
             displayName: Generate documentation
-            inputs:
-                targetType: inline
-                script: |
-                  docfx build "$(Build.SourcesDirectory)/build/csharp-docs/docfx.json"
-                  if ($lastexitcode -ne 0){
-                        throw ("Error generating documentation.")
-                  }
           - task: ArchiveFiles@2
             displayName: Archive C# Docs
             inputs:
@@ -166,9 +158,9 @@ stages:
                 targetPath: $(Build.ArtifactStagingDirectory)/csharp-docs.zip
                 artifact: csharp-docs
 
-      # js API Reference
+      # JS API Reference
       - job:
-        displayName: Build js API Reference
+        displayName: Build JS API Reference
         pool:
           vmImage: 'ubuntu-latest'
         steps:
@@ -181,22 +173,22 @@ stages:
               npx gulp docs
 
               major="$(umbracoMajorVersion)"
-              echo "major version: $major"
+              echo "Major version: $major"
 
               baseUrl="https://apidocs.umbraco.com/v$major/ui/"
-              echo "baseUrl: $baseUrl"
+              echo "Base URL: $baseUrl"
 
               sed -i "s|baseUrl = .*|baseUrl = '$baseUrl',|" api/index.html
-            displayName: Generate js Docs
+            displayName: Generate JS Docs
             workingDirectory:  $(Build.SourcesDirectory)/src/Umbraco.Web.UI.Docs
           - task: ArchiveFiles@2
-            displayName: Archive js Docs
+            displayName: Archive JS Docs
             inputs:
                 rootFolderOrFile: $(Build.SourcesDirectory)/src/Umbraco.Web.UI.Docs/api
                 includeRootFolder: false
                 archiveFile: $(Build.ArtifactStagingDirectory)/ui-docs.zip
           - task: PublishPipelineArtifact@1
-            displayName: Publish js Docs
+            displayName: Publish JS Docs
             inputs:
                 targetPath: $(Build.ArtifactStagingDirectory)/ui-docs.zip
                 artifact: ui-docs
@@ -518,7 +510,7 @@ stages:
     pool:
       vmImage: 'windows-latest' # Apparently AzureFileCopy is windows only :(
     variables:
-      umbracoMajorVersion:  $[ stageDependencies.Build.A.outputs['determineMajorVersion.majorVersion'] ]
+      umbracoMajorVersion: $[ stageDependencies.Build.A.outputs['determineMajorVersion.majorVersion'] ]
     displayName: Upload API Documention
     dependsOn:
       - Build
