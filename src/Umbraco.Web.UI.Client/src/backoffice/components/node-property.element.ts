@@ -1,8 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement, PropertyValueMap } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { EMPTY, of, Subscription, switchMap } from 'rxjs';
-
+import { distinctUntilChanged, EMPTY, of, Subscription, switchMap } from 'rxjs';
 import { UmbContextConsumerMixin } from '../../core/context';
 import { createExtensionElement, UmbExtensionManifest, UmbExtensionRegistry } from '../../core/extension';
 import { UmbDataTypeStore } from '../../core/stores/data-type.store';
@@ -78,13 +77,14 @@ class UmbNodeProperty extends UmbContextConsumerMixin(LitElement) {
 		this.addEventListener('property-editor-change', this._onPropertyEditorChange as any as EventListener);
 	}
 
-	// TODO: use subscribtion, rename to _useDataType:
 	private _useDataType() {
 		this._dataTypeSubscription?.unsubscribe();
+
 		if (this._property.dataTypeKey && this._extensionRegistry && this._dataTypeStore) {
 			this._dataTypeSubscription = this._dataTypeStore
 				.getByKey(this._property.dataTypeKey)
 				.pipe(
+					distinctUntilChanged(),
 					switchMap((dataTypeEntity) => {
 						if (!dataTypeEntity) {
 							return EMPTY;
