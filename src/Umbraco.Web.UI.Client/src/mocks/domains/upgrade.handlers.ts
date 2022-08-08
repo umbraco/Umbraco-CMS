@@ -1,9 +1,10 @@
 import { rest } from 'msw';
 
+import umbracoPath from '../../core/helpers/umbraco-path';
 import { PostInstallRequest, UmbracoUpgrader } from '../../core/models';
 
 export const handlers = [
-	rest.get('/umbraco/backoffice/upgrade/settings', (_req, res, ctx) => {
+	rest.get(umbracoPath('/upgrade/settings'), (_req, res, ctx) => {
 		return res(
 			// Respond with a 200 status code
 			ctx.status(200),
@@ -17,7 +18,7 @@ export const handlers = [
 		);
 	}),
 
-	rest.post<PostInstallRequest>('/umbraco/backoffice/upgrade/authorize', async (_req, res, ctx) => {
+	rest.post<PostInstallRequest>(umbracoPath('/upgrade/authorize'), async (_req, res, ctx) => {
 		await new Promise((resolve) => setTimeout(resolve, (Math.random() + 1) * 1000)); // simulate a delay of 1-2 seconds
 
 		return res(

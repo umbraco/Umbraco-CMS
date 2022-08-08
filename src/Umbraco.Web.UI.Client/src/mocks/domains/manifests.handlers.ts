@@ -3,6 +3,7 @@ import { rest } from 'msw';
 // TODO: set up schema
 export const handlers = [
 	rest.get('/umbraco/backoffice/manifests', (_req, res, ctx) => {
+		console.warn('Please move to schema');
 		return res(
 			// Respond with a 200 status code
 			ctx.status(200),

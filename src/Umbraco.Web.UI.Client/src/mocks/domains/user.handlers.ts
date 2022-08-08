@@ -1,11 +1,12 @@
 import { rest } from 'msw';
 
+import umbracoPath from '../../core/helpers/umbraco-path';
 import { AllowedSectionsResponse, UserResponse } from '../../core/models';
 
 let isAuthenticated = false;
 
 export const handlers = [
-	rest.post('/umbraco/backoffice/user/login', (_req, res, ctx) => {
+	rest.post(umbracoPath('/user/login'), (_req, res, ctx) => {
 		// Persist user's authentication in the session
 		isAuthenticated = true;
 		return res(
@@ -14,7 +15,7 @@ export const handlers = [
 		);
 	}),
 
-	rest.post('/umbraco/backoffice/user/logout', (_req, res, ctx) => {
+	rest.post(umbracoPath('/user/logout'), (_req, res, ctx) => {
 		// Persist user's authentication in the session
 		isAuthenticated = false;
 		return res(
@@ -23,7 +24,7 @@ export const handlers = [
 		);
 	}),
 
-	rest.get('/umbraco/backoffice/user', (_req, res, ctx) => {
+	rest.get(umbracoPath('/user'), (_req, res, ctx) => {
 		// Check if the user is authenticated in this session
 		if (!isAuthenticated) {
 			// If not authenticated, respond with a 403 error
@@ -44,7 +45,7 @@ export const handlers = [
 		);
 	}),
 
-	rest.get('/umbraco/backoffice/user/sections', (_req, res, ctx) => {
+	rest.get(umbracoPath('/user/sections'), (_req, res, ctx) => {
 		return res(
 			ctx.status(200),
 			ctx.json<AllowedSectionsResponse>({

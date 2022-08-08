@@ -1,9 +1,10 @@
 import { rest } from 'msw';
 
+import umbracoPath from '../../core/helpers/umbraco-path';
 import { PostInstallRequest, ProblemDetails, UmbracoInstaller } from '../../core/models';
 
 export const handlers = [
-	rest.get('/umbraco/backoffice/install/settings', (_req, res, ctx) => {
+	rest.get(umbracoPath('/install/settings'), (_req, res, ctx) => {
 		return res(
 			// Respond with a 200 status code
 			ctx.status(200),
@@ -72,7 +73,7 @@ export const handlers = [
 		);
 	}),
 
-	rest.post<PostInstallRequest>('/umbraco/backoffice/install/setup', async (req, res, ctx) => {
+	rest.post<PostInstallRequest>(umbracoPath('/install/settings'), async (req, res, ctx) => {
 		await new Promise((resolve) => setTimeout(resolve, (Math.random() + 1) * 1000)); // simulate a delay of 1-2 seconds
 
 		if (req.body.database?.name === 'fail') {

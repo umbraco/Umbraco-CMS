@@ -1,9 +1,10 @@
 import { rest } from 'msw';
 
+import umbracoPath from '../../core/helpers/umbraco-path';
 import { StatusResponse, VersionResponse } from '../../core/models';
 
 export const handlers = [
-	rest.get('/umbraco/backoffice/server/status', (_req, res, ctx) => {
+	rest.get(umbracoPath('/server/status'), (_req, res, ctx) => {
 		return res(
 			// Respond with a 200 status code
 			ctx.status(200),
@@ -12,7 +13,7 @@ export const handlers = [
 			})
 		);
 	}),
-	rest.get('/umbraco/backoffice/server/version', (_req, res, ctx) => {
+	rest.get(umbracoPath('/server/version'), (_req, res, ctx) => {
 		return res(
 			// Respond with a 200 status code
 			ctx.status(200),
