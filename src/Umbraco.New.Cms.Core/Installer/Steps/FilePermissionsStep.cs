@@ -1,12 +1,11 @@
 ﻿using Umbraco.Cms.Core.Install;
-using Umbraco.Cms.Core.Install.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 using Umbraco.New.Cms.Core.Models.Installer;
 
 namespace Umbraco.New.Cms.Core.Installer.Steps;
 
-public class FilePermissionsStep : IInstallStep
+public class FilePermissionsStep : IInstallStep, IUpgradeStep
 {
     private readonly IFilePermissionHelper _filePermissionHelper;
     private readonly ILocalizedTextService _localizedTextService;
@@ -19,7 +18,11 @@ public class FilePermissionsStep : IInstallStep
         _localizedTextService = localizedTextService;
     }
 
-    public Task ExecuteAsync(InstallData model)
+    public Task ExecuteAsync(InstallData _) => Execute();
+
+    public Task ExecuteAsync() => Execute();
+
+    private Task Execute()
     {
         // validate file permissions
         var permissionsOk =
@@ -36,5 +39,9 @@ public class FilePermissionsStep : IInstallStep
         return Task.CompletedTask;
     }
 
-    public Task<bool> RequiresExecutionAsync(InstallData model) => Task.FromResult(true);
+    public Task<bool> RequiresExecutionAsync(InstallData model) => ShouldExecute();
+
+    public Task<bool> RequiresExecutionAsync() => ShouldExecute();
+
+    private static Task<bool> ShouldExecute() => Task.FromResult(true);
 }
