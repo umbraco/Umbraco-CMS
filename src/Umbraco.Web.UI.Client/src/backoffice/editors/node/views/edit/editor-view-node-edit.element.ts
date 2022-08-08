@@ -1,13 +1,15 @@
 import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
-import { NodeProperty, NodePropertyData } from '../../../../mocks/data/content.data';
-import { UmbContextConsumerMixin } from '../../../../core/context';
-import { UmbNodeContext } from '../node.context';
+import { NodeProperty, NodePropertyData } from '../../../../../mocks/data/content.data';
+import { UmbContextConsumerMixin } from '../../../../../core/context';
+import { UmbNodeContext } from '../../node.context';
 import { Subscription, distinctUntilChanged } from 'rxjs';
 
+import '../../../../components/node-property.element';
+
 @customElement('umb-editor-view-node-edit')
-export class UmbEditorViewNodeEdit extends UmbContextConsumerMixin(LitElement) {
+export class UmbEditorViewNodeEditElement extends UmbContextConsumerMixin(LitElement) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -32,6 +34,7 @@ export class UmbEditorViewNodeEdit extends UmbContextConsumerMixin(LitElement) {
 
 		this.consumeContext('umbNodeContext', (nodeContext) => {
 			this._nodeContext = nodeContext;
+			console.log('GOT CONTEXT', nodeContext);
 			this._useNode();
 		});
 	}
@@ -66,10 +69,10 @@ export class UmbEditorViewNodeEdit extends UmbContextConsumerMixin(LitElement) {
 	}
 }
 
-export default UmbEditorViewNodeEdit;
+export default UmbEditorViewNodeEditElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-editor-view-node-edit': UmbEditorViewNodeEdit;
+		'umb-editor-view-node-edit': UmbEditorViewNodeEditElement;
 	}
 }

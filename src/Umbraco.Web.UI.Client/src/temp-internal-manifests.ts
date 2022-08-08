@@ -95,7 +95,7 @@ export const internalManifests: Array<UmbExtensionManifestCore> = [
 		alias: 'Umb.EditorView.ContentEdit',
 		name: 'Content',
 		elementName: 'umb-editor-view-node-edit',
-		js: () => import('./backoffice/editors/node/views/editor-view-node-edit.element'),
+		js: () => import('./backoffice/editors/node/views/edit/editor-view-node-edit.element'),
 		meta: {
 			// TODO: how do we want to filter where editor views are shown? https://our.umbraco.com/documentation/extending/Content-Apps/#setting-up-the-plugin
 			// this is a temp solution
@@ -110,7 +110,7 @@ export const internalManifests: Array<UmbExtensionManifestCore> = [
 		alias: 'Umb.EditorView.ContentInfo',
 		name: 'Info',
 		elementName: 'umb-editor-view-node-info',
-		js: () => import('./backoffice/editors/node/views/editor-view-node-info.element'),
+		js: () => import('./backoffice/editors/node/views/info/editor-view-node-info.element'),
 		meta: {
 			// TODO: how do we want to filter where editor views are shown? https://our.umbraco.com/documentation/extending/Content-Apps/#setting-up-the-plugin
 			// this is a temp solution
