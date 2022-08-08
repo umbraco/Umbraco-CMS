@@ -1,14 +1,14 @@
 import { css, html, LitElement, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
-import { UmbContextConsumerMixin } from '../../../core/context';
-import { UmbExtensionManifestEditorView, UmbExtensionRegistry } from '../../../core/extension';
+import { UmbContextConsumerMixin } from '../../../../core/context';
+import { UmbExtensionManifestEditorView, UmbExtensionRegistry } from '../../../../core/extension';
 import { map, Subscription } from 'rxjs';
 import { IRoute, IRoutingInfo, RouterSlot } from 'router-slot';
 
-import './editor-layout.element';
+import '../editor-layout/editor-layout.element';
 @customElement('umb-editor-entity')
-class UmbEditorEntity extends UmbContextConsumerMixin(LitElement) {
+export class UmbEditorEntity extends UmbContextConsumerMixin(LitElement) {
 	static styles = [
 		UUITextStyles,
 		css`

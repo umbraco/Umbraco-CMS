@@ -4,7 +4,7 @@ import { Subscription } from 'rxjs';
 import { UmbContextConsumerMixin } from '../../../core/context';
 import { UmbExtensionManifest, UmbExtensionRegistry } from '../../../core/extension';
 
-import '../shared/editor-entity.element';
+import '../shared/editor-entity/editor-entity.element';
 
 @customElement('umb-editor-extensions')
 export class UmbEditorExtensionsElement extends UmbContextConsumerMixin(LitElement) {

@@ -3,7 +3,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement } from 'lit/decorators.js';
 
 @customElement('umb-editor-layout')
-class UmbEditorLayout extends LitElement {
+export class UmbEditorLayout extends LitElement {
 	static styles = [
 		UUITextStyles,
 		css`
