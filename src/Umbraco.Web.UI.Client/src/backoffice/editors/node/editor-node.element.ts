@@ -2,7 +2,6 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
-import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '../../../core/context';
 import { UmbNodeStore } from '../../../core/stores/node.store';
 import { distinctUntilChanged, Subscription } from 'rxjs';
@@ -30,22 +29,6 @@ export class UmbEditorNodeElement extends UmbContextProviderMixin(UmbContextCons
 
 			uui-input {
 				width: 100%;
-				margin-left: 16px;
-			}
-
-			uui-tab-group {
-				--uui-tab-divider: var(--uui-color-border);
-				border-left: 1px solid var(--uui-color-border);
-				flex-wrap: nowrap;
-				height: 60px;
-			}
-
-			uui-tab {
-				font-size: 0.8rem;
-			}
-
-			uui-box hr {
-				margin-bottom: var(--uui-size-6);
 			}
 		`,
 	];
@@ -157,7 +140,12 @@ export class UmbEditorNodeElement extends UmbContextProviderMixin(UmbContextCons
 
 	render() {
 		return html`
-			<umb-editor-entity alias="Umb.Editor.Node" name="${ifDefined(this._node?.name)}" @input="${this._handleInput}">
+			<umb-editor-entity alias="Umb.Editor.Node">
+				<div slot="name">
+					<uui-input .value=${this._node?.name} @input="${this._handleInput}"></uui-input>
+					<!-- TODO: Implement variant selector -->
+				</div>
+
 				<div slot="footer">Breadcrumbs</div>
 
 				<div slot="actions">

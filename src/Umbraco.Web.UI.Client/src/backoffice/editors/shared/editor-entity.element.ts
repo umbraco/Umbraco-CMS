@@ -25,6 +25,11 @@ class UmbEditorEntity extends UmbContextConsumerMixin(LitElement) {
 				min-height: 60px;
 			}
 
+			#name {
+				display: block;
+				flex: 1 1 auto;
+			}
+
 			#footer {
 				display: flex;
 				height: 100%;
@@ -166,7 +171,7 @@ class UmbEditorEntity extends UmbContextConsumerMixin(LitElement) {
 			<umb-editor-layout>
 				<div id="header" slot="header">
 					<slot id="icon" name="icon"></slot>
-					<uui-input .value="${this.name}"></uui-input>
+					<slot id="name" name="name"></slot>
 					${this._renderViews()}
 				</div>
 

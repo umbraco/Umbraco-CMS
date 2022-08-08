@@ -1,7 +1,6 @@
 import { UUIButtonState, UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
-import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { distinctUntilChanged, Subscription } from 'rxjs';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '../../../core/context';
@@ -25,6 +24,14 @@ export class UmbEditorDocumentTypeElement extends UmbContextProviderMixin(UmbCon
 				display: block;
 				width: 100%;
 				height: 100%;
+			}
+
+			#name {
+				width: 100%;
+			}
+
+			#alias {
+				padding: 0 var(--uui-size-space-3);
 			}
 		`,
 	];
@@ -115,11 +122,14 @@ export class UmbEditorDocumentTypeElement extends UmbContextProviderMixin(UmbCon
 
 	render() {
 		return html`
-			<umb-editor-entity
-				alias="Umb.Editor.DocumentType"
-				name="${ifDefined(this._documentType?.name)}"
-				@input="${this._handleInput}">
+			<umb-editor-entity alias="Umb.Editor.DocumentType">
 				<div slot="icon">Icon</div>
+
+				<div slot="name">
+					<uui-input id="name" .value=${this._documentType?.name} @input="${this._handleInput}">
+						<div id="alias" slot="append">${this._documentType?.alias}</div>
+					</uui-input>
+				</div>
 
 				<div slot="footer">Keyboard Shortcuts</div>
 
