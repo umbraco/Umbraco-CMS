@@ -90,11 +90,9 @@ export class UmbEditorEntity extends UmbContextConsumerMixin(LitElement) {
 		this._routerFolder = window.location.pathname.split('/view')[0];
 	}
 
-	// TODO: simplify setting up editors with views. This code has to be duplicated in each editor.
 	private _useEditorViews() {
 		this._editorViewsSubscription?.unsubscribe();
 
-		// TODO: how do we know which editor to show the views for?
 		this._editorViewsSubscription = this._extensionRegistry
 			?.extensionsOfType('editorView')
 			.pipe(
