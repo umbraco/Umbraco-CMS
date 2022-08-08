@@ -35,7 +35,7 @@ export const handlers = [
 						displayName: 'SQLite',
 						defaultDatabaseName: 'Umbraco',
 						providerName: 'Microsoft.Data.SQLite',
-						isConfigured: import.meta.env.VITE_UMBRACO_INSTALL_PRECONFIGURED === 'true',
+						isConfigured: false,
 						requiresServer: false,
 						serverPlaceholder: null,
 						requiresCredentials: false,
