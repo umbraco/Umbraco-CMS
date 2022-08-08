@@ -3,7 +3,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 
 import { UmbContextProviderMixin } from '../core/context';
-import { UmbNotificationService } from '../core/services/notification.service';
+import { UmbNotificationService } from '../core/services/notification';
 import { UmbDataTypeStore } from '../core/stores/data-type.store';
 import { UmbDocumentTypeStore } from '../core/stores/document-type.store';
 import { UmbNodeStore } from '../core/stores/node.store';

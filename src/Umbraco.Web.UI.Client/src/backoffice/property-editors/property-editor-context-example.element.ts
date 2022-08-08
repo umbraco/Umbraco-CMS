@@ -1,7 +1,8 @@
 import { html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { UmbContextConsumerMixin } from '../../core/context';
-import { UmbNotificationService } from '../../core/services/notification.service';
+import type { UmbNotificationDefaultData } from '../../core/services/notification/layouts/default';
+import type { UmbNotificationService } from '../../core/services/notification';
 
 @customElement('umb-property-editor-context-example')
 export default class UmbPropertyEditorContextExample extends UmbContextConsumerMixin(LitElement) {
@@ -15,7 +16,8 @@ export default class UmbPropertyEditorContextExample extends UmbContextConsumerM
 		});
 	}
 	private _onClick = () => {
-		this._notificationService?.peek('Hello from property editor');
+		const data: UmbNotificationDefaultData = { message: 'Hello from property editor' };
+		this._notificationService?.peek('positive', { data });
 	};
 
 	render() {
