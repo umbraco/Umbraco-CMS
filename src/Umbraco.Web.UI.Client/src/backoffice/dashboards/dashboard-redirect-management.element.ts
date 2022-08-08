@@ -3,7 +3,7 @@ import { css, html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
 
 @customElement('umb-dashboard-redirect-management')
-export class UmbDashboardRedirectManagement extends LitElement {
+export class UmbDashboardRedirectManagementElement extends LitElement {
 	static styles = [UUITextStyles, css``];
 
 	render() {
@@ -17,6 +17,6 @@ export class UmbDashboardRedirectManagement extends LitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-dashboard-redirect-management': UmbDashboardRedirectManagement;
+		'umb-dashboard-redirect-management': UmbDashboardRedirectManagementElement;
 	}
 }
