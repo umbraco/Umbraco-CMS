@@ -18,6 +18,7 @@
 // Umbraco Components
 @import "components/umb-loader.less";
 @import "components/tooltip/umb-tooltip.less";
+@import "components/umb-range-slider.less";
 
 
 [ng\:cloak],
@@ -285,48 +286,3 @@ select {
   margin-bottom: 40px;
 }
 
-#consentSlider {
-  .noUi-target {
-    background: linear-gradient(to bottom, @grayLighter 0%, @grayLighter 100%);
-    box-shadow: none;
-    border-radius: 20px;
-    height: 8px;
-    border: 1px solid @inputBorder;
-
-    &:focus,
-    &:focus-within {
-      border-color: @inputBorderFocus;
-    }
-  }
-
-  .noUi-handle {
-    cursor: grab;
-    border-radius: 100px;
-    border: none;
-    box-shadow: none;
-    width: 20px !important;
-    height: 20px !important;
-    right: -10px !important; // half the handle width
-    top: -1px;
-    background-color: @blueExtraDark;
-  }
-
-  .noUi-handle::before {
-    display: none;
-  }
-
-  .noUi-handle::after {
-    display: none;
-  }
-
-  .noUi-value {
-    cursor: pointer;
-    &-active{
-      color: @black;
-    }
-  }
-
-  .noUi-pips-horizontal {
-    height: 40px;
-  }
-}

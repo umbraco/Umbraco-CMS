@@ -140,6 +140,7 @@ For extra details about options and events take a look here: https://refreshless
 
             setUpCallbacks();
             setUpActivePipsHandling();
+            addPipClickHandler();
 
             // Refresh the scope
             $scope.$applyAsync();
@@ -306,9 +307,21 @@ For extra details about options and events take a look here: https://refreshless
           if(activePip[handle]){
             activePip[handle].classList.remove("noUi-value-active");
           }
-          activePip[handle] = sliderInstance.querySelector('.noUi-value[data-value="' + parseInt(values[handle]) + '"]');
+          sliderInstance.querySelectorAll('.noUi-value').forEach(pip => {
+            if (Number(values[handle]) === Number(pip.getAttribute('data-value'))) {
+              activePip[handle] = pip;
+            }
+          });
           activePip[handle].classList.add("noUi-value-active");
         });
+      }
+      function addPipClickHandler(){
+          sliderInstance.querySelectorAll('.noUi-value').forEach(function(pip){
+            pip.addEventListener('click', function () {
+              const value = pip.getAttribute('data-value');
+              sliderInstance.noUiSlider.set(value);
+            });
+          });
       }
     }
 
