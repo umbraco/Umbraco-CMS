@@ -14,8 +14,10 @@ export default {
     `<html>
       <body>
         <script type="module" src="${testFramework}"></script>
-                <script type="module">
-          import 'element-internals-polyfill';
+        <script type="module">
+					import 'element-internals-polyfill';
+					import '@umbraco-ui/uui';
+					import 'router-slot';
         </script>
       </body>
     </html>`,
