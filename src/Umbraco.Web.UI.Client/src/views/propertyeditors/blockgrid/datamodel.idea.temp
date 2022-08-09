@@ -1,100 +1,88 @@
 
-//Pre-values:
+//Pre-values model:
+
 gridColumns: 12, 
+validationLimit: {
+    min: 1,
+    max: 14
+},
 blocks: [
     {
         contentElementTypeKey: 123,
-        columnSpanOptions: [4, 6, 12],
+        allowAtRoot: true,
+        rowMaxSpan: null,
+        columnSpanOptions: [
+            {columnSpan: 12},
+            ...
+        ],
+        areaGridColumns: null,
         areas: [
             {
                 key: "ABD1",
-                alias/class: "", // Some name to target through CSS, if empty it gets col-6 ?
+                alias: "",
                 columnSpan: 6,
-                // different spanning on different devices?
-                rowSpan: 1, // row spanning, also different on devices.
+                rowSpan: 1,
                 minAllowed: 1,
                 maxAllowed: 2,
-                allowAll: false,
-                allowedTypes: [{
-                        elementTypeKey: 345; //image
-                        max: 1,
-                        min: 1,
+                onlySpecifiedAllowance: true,
+                specifiedAllowance: [{
+                        elementTypeKey: 345;
+                        minAllowed: 1,
+                        maxAllowed: 4,
                     },
-                    .. ,..
+                    ...
                 ]
             },
-            {
-                key: "ABD2",
-                alias/class: "", // Some name to target through CSS, if empty it gets col-6 ?
-                columnSpan: 6,
-                allowedTypes: [.. ,.. ,..]
-            }
+            ...
         ]
     }
 ]
 
-// property value (model.value):
-// grid 12 column
+
+
+// property value model (model.value):
 layout: [
     {
-        contentUDI: 123,
+        contentUdi: "1234-1234-1234",
         columnSpan: 12,
         // grid 2 column
         // Section with area A B
         areas: [
             {
-                key: "ABD1"// Generated GUID
+                key: "1234-1234-1234"// Generated GUID
                 items: [
                     {
-                        contentUDI: 867587685, // Headline
-                    },
-                    {
-                        contentUDI: 3455434, // Button
-                    },
-                    {
-                        contentUDI: 324345, // gallery
+                        contentUdi: "1234-1234-1234",
                         columnSpan: 6,
+                        rowSpan: 1,
                         areas: [
                             {
+                                key: "1234-1234-1234"// Generated GUID
                                 items: [
-                                    {
-                                        contentUDI: 867587685, // Image A
-                                    },
-                                    {
-                                        contentUDI: 3455434, // Image B
-                                    },
+                                    ...
                                 ]
                             }
                         ]
-                    }
+                    },
+                    ...
                 ]
             },
-            {
-                key: "ABD2"// Generated GUID
-                items: [
-                    {
-                        contentUDI: 6575676, //Image
-                    }
-                ]
-            }
+            ...
         ]
     },
-    {
-        contentUDI: 4565, // Image
-        columnSpan: 6,
-    },
-    {
-        contentUDI: 123, // Text
-        columnSpan: 6,
-    },
-    {
-        contentUDI: 4566, // Footer
-        columnSpan: 12,
-    }
+    ...
 ],
-content: [
+contentData: [
    {
-        UID: 867587685
-        elementTypeKey; sdfds
-   }
-]
+        udi: "1234-1234-1234",
+        contentTypeKey: "element://1234-1234-1234"
+   },
+   ...
+],
+settingsData: [
+   {
+        udi: "1234-1234-1234",
+        contentTypeKey: "element://1234-1234-1234"
+   },
+   ...
+],
