@@ -16,6 +16,17 @@ export const internalManifests: Array<UmbExtensionManifestCore> = [
 	},
 	{
 		type: 'section',
+		alias: 'Umb.Section.Media',
+		name: 'Media',
+		elementName: 'umb-media-section',
+		js: () => import('./backoffice/sections/media/media-section.element'),
+		meta: {
+			pathname: 'media', // TODO: how to we want to support pretty urls?
+			weight: 50,
+		},
+	},
+	{
+		type: 'section',
 		alias: 'Umb.Section.Members',
 		name: 'Members',
 		elementName: 'umb-members-section',

@@ -5,7 +5,7 @@ import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '../../../core/context';
 import { UmbNodeStore } from '../../../core/stores/node.store';
 import { distinctUntilChanged, Subscription } from 'rxjs';
-import { NodeEntity } from '../../../mocks/data/content.data';
+import { NodeEntity } from '../../../mocks/data/node.data';
 import type { UmbNotificationService } from '../../../core/services/notification';
 import { UmbNodeContext } from './node.context';
 
@@ -52,6 +52,9 @@ export class UmbEditorNodeElement extends UmbContextProviderMixin(UmbContextCons
 
 	@property()
 	id!: string;
+
+	@property()
+	alias!: string;
 
 	@state()
 	_node?: NodeEntity;

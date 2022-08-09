@@ -1,7 +1,7 @@
 import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
-import { NodeProperty, NodePropertyData } from '../../../../../mocks/data/content.data';
+import { NodeProperty, NodePropertyData } from '../../../../../mocks/data/node.data';
 import { UmbContextConsumerMixin } from '../../../../../core/context';
 import { UmbNodeContext } from '../../node.context';
 import { Subscription, distinctUntilChanged } from 'rxjs';

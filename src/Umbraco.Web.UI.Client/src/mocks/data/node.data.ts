@@ -4,8 +4,8 @@ export interface NodeEntity {
 	id: number;
 	key: string;
 	name: string;
-	alias: string;
 	icon: string; // TODO: should come from the doc type?
+	type: string;
 	properties: Array<NodeProperty>;
 	data: Array<NodePropertyData>;
 	//layout?: any; // TODO: define layout type - make it non-optional
@@ -35,7 +35,7 @@ export const data: Array<NodeEntity> = [
 		id: 1,
 		key: '74e4008a-ea4f-4793-b924-15e02fd380d1',
 		name: 'Document 1',
-		alias: 'document1',
+		type: 'document',
 		icon: 'document',
 		properties: [
 			{
@@ -84,7 +84,7 @@ export const data: Array<NodeEntity> = [
 		id: 2,
 		key: '74e4008a-ea4f-4793-b924-15e02fd380d2',
 		name: 'Document 2',
-		alias: 'document2',
+		type: 'document',
 		icon: 'favorite',
 		properties: [
 			{
@@ -136,7 +136,7 @@ export const data: Array<NodeEntity> = [
 		id: 3,
 		key: 'cdd30288-2d1c-41b4-89a9-61647b4a10d5',
 		name: 'Document 3',
-		alias: 'document3',
+		type: 'document',
 		icon: 'document',
 		properties: [
 			{
@@ -153,13 +153,55 @@ export const data: Array<NodeEntity> = [
 			},
 		],
 	},
+	{
+		id: 2001,
+		key: 'f2f81a40-c989-4b6b-84e2-057cecd3adc1',
+		name: 'Media 1',
+		type: 'media',
+		icon: 'picture',
+		properties: [
+			{
+				alias: 'myMediaHeadline',
+				label: 'Media Headline',
+				description: 'Text string property',
+				dataTypeKey: 'dt-1',
+			},
+		],
+		data: [
+			{
+				alias: 'myMediaHeadline',
+				value: 'The daily life at Umbraco HQ',
+			},
+		],
+	},
+	{
+		id: 2002,
+		key: '69431027-8867-45bf-a93b-72bbdabfb177',
+		type: 'media',
+		name: 'Media 2',
+		icon: 'picture',
+		properties: [
+			{
+				alias: 'myMediaDescription',
+				label: 'Description',
+				description: 'Textarea property',
+				dataTypeKey: 'dt-2',
+			},
+		],
+		data: [
+			{
+				alias: 'myMediaDescription',
+				value: 'Every day, a rabbit in a military costume greets me at the front door',
+			},
+		],
+	},
 ];
 
 // Temp mocked database
-class UmbContentData extends UmbData<NodeEntity> {
+class UmbNodeData extends UmbData<NodeEntity> {
 	constructor() {
 		super(data);
 	}
 }
 
-export const umbContentData = new UmbContentData();
+export const umbNodeData = new UmbNodeData();

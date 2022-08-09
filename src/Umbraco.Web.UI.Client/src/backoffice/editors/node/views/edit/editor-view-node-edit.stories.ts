@@ -4,7 +4,7 @@ import { html } from 'lit-html';
 import { UmbNodeContext } from '../../node.context';
 import { UmbEditorViewNodeEditElement } from './editor-view-node-edit.element';
 import './editor-view-node-edit.element';
-import { data } from '../../../../../mocks/data/content.data';
+import { data } from '../../../../../mocks/data/node.data';
 
 export default {
 	title: 'Editors/Node/Views/Edit',
