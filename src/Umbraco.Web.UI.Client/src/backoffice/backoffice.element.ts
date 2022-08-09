@@ -4,7 +4,7 @@ import { css, html, LitElement } from 'lit';
 
 import { UmbContextProviderMixin } from '../core/context';
 import { UmbNotificationService } from '../core/services/notification';
-import { UmbModalService } from '../core/services/modal/modal.service';
+import { UmbModalService } from '../core/services/modal';
 import { UmbDataTypeStore } from '../core/stores/data-type.store';
 import { UmbNodeStore } from '../core/stores/node.store';
 

@@ -25,7 +25,7 @@ The UmbModal service can be used to open modals.
 ```ts
 import { html, LitElement } from 'lit';
 import { UmbContextConsumerMixin } from './core/context';
-import type { UmbModalService } from './core/services/modal.service';
+import type { UmbModalService } from './core/services/modal';
 class MyElement extends UmbContextConsumerMixin(LitElement) {
 	private _modalService_?: UmbModalService;
 	constructor() {

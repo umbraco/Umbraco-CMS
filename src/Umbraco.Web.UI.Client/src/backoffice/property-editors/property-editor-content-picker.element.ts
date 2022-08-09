@@ -1,4 +1,4 @@
-import { css, html, LitElement, nothing } from 'lit';
+import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 
@@ -7,7 +7,7 @@ import '@umbraco-ui/uui-modal-sidebar';
 import '@umbraco-ui/uui-modal-container';
 import '@umbraco-ui/uui-modal-dialog';
 import { UmbContextConsumerMixin } from '../../core/context';
-import { UmbModalService } from '../../core/services/modal/modal.service';
+import { UmbModalService } from '../../core/services/modal';
 
 import './modal-content-picker.element';
 
