@@ -33,13 +33,14 @@ jobs:
     - run: npm run build
     - run: sudo npx playwright install-deps
     - run: npm test
-    - name: Upload Code Coverage reports
-      uses: actions/upload-artifact@v2
-      if: always()
-      with:
-        name: code-coverage
-        path: coverage/
-        retention-days: 30
+    # Uncommented since the github-actions-report-lcov also generates a html report
+    # - name: Upload Code Coverage reports
+    #   uses: actions/upload-artifact@v2
+    #   if: always()
+    #   with:
+    #     name: code-coverage
+    #     path: coverage/
+    #     retention-days: 30
     - name: Report code coverage
       uses: zgosalvez/github-actions-report-lcov@v1
       with:
