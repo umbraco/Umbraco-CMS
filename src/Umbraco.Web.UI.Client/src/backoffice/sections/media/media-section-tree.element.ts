@@ -22,7 +22,7 @@ class UmbMediaSectionTree extends UmbContextConsumerMixin(LitElement) {
 
 	// simplified tree data for testing
 	@state()
-	_tree: Array<any> = data.filter((item) => item.type === 'media');
+	_tree: Array<any> = [];
 
 	@state()
 	_section?: string;
@@ -39,9 +39,9 @@ class UmbMediaSectionTree extends UmbContextConsumerMixin(LitElement) {
 
 			this._nodesSubscription = this._nodeStore
 				?.getAll()
-				.pipe(map((nodes) => nodes.filter((node) => node.type === 'document')))
-				.subscribe((documentNodes) => {
-					this._tree = documentNodes;
+				.pipe(map((nodes) => nodes.filter((node) => node.type === 'media')))
+				.subscribe((mediaNodes) => {
+					this._tree = mediaNodes;
 				});
 		});
 	}
