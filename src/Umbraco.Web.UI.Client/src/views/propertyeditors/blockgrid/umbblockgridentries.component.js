@@ -115,9 +115,6 @@
             // Borrowed concept from, its not identical as more has been implemented: https://github.com/SortableJS/angular-legacy-sortablejs/blob/master/angular-legacy-sortable.js
             function _sync(evt) {
 
-                console.log("_sync")
-
-
                 const oldIndex = evt.oldIndex,
                       newIndex = evt.newIndex;
 
