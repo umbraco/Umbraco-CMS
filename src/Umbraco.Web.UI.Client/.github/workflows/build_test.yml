@@ -36,13 +36,14 @@ jobs:
     - name: Report code coverage
       uses: zgosalvez/github-actions-report-lcov@v1
       with:
-        coverage-files: coverage/lcov.*.info
+        coverage-files: coverage/lcov.info
         minimum-coverage: 90
         artifact-name: code-coverage-report
         github-token: ${{ secrets.GITHUB_TOKEN }}
+        working-directory: ./src
     - uses: actions/upload-artifact@v2
       if: always()
       with:
-        name: coverage-report
+        name: coverage-report-html
         path: coverage/lcov-report/
         retention-days: 30
