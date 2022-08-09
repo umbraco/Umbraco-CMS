@@ -4,7 +4,7 @@
   <p>Enter your name, email and password to install Umbraco with its default settings, alternatively you can customize
     your installation</p>
 
-  <form name="myForm" class="form-horizontal" novalidate ng-submit="validateAndInstall();">
+  <form name="installerForm" class="form-horizontal" novalidate ng-submit="validateAndInstall();">
 
     <div class="row">
       <div class="span8">
@@ -66,17 +66,17 @@
             </div>
           </div>
 
-          <div class="control-group" ng-class="{disabled:myForm.$invalid}">
+          <div class="control-group" ng-class="{disabled:installerForm.$invalid}">
             <div class="controls">
-              <input ng-if="installer.current.model.quickInstallAvailable" type="submit" ng-disabled="myForm.$invalid"
+              <input ng-if="installer.current.model.quickInstallAvailable" type="submit" ng-disabled="installerForm.$invalid"
                 value="Install" class="btn btn-success" />
               <button
                 ng-if="installer.current.model.quickInstallAvailable && installer.current.model.customInstallAvailable"
-                class="btn btn-info control-customize" ng-disabled="myForm.$invalid"
+                class="btn btn-info control-customize" ng-disabled="installerForm.$invalid"
                 ng-click="validateAndForward()">Customize</button>
 
               <button ng-if="!installer.current.model.quickInstallAvailable" class="btn btn-primary control-customize"
-                ng-disabled="myForm.$invalid" ng-click="validateAndForward()">Next</button>
+                ng-disabled="installerForm.$invalid" ng-click="validateAndForward()">Next</button>
             </div>
           </div>
 
