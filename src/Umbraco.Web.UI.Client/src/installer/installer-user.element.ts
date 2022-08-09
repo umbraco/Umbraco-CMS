@@ -117,6 +117,7 @@ export class UmbInstallerUser extends UmbContextConsumerMixin(LitElement) {
 							id="name"
 							.value=${this._userFormData?.name}
 							name="name"
+							label="name"
 							required
 							required-message="Name is required"></uui-input>
 					</uui-form-layout-item>
@@ -128,6 +129,7 @@ export class UmbInstallerUser extends UmbContextConsumerMixin(LitElement) {
 							id="email"
 							.value=${this._userFormData?.email}
 							name="email"
+							label="email"
 							required
 							required-message="Email is required"></uui-input>
 					</uui-form-layout-item>
@@ -137,6 +139,7 @@ export class UmbInstallerUser extends UmbContextConsumerMixin(LitElement) {
 						<uui-input-password
 							id="password"
 							name="password"
+							label="password"
 							.value=${this._userFormData?.password}
 							required
 							required-message="Password is required"></uui-input-password>
