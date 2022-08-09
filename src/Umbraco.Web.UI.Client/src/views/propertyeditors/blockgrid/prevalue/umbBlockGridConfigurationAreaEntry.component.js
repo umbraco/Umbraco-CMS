@@ -68,8 +68,7 @@
             bindings: {
                 area: "=",
                 onEdit: "&",
-                onDelete: "&",
-                onClick: "&"
+                onDelete: "&"
             }
         }
     );
@@ -253,10 +252,6 @@
         vm.onDeleteClick = function($event) {
             $event.stopPropagation();
             vm.onDelete();
-        }
-
-        vm.onAreaClick = function() {
-            vm.onClick();
         }
 
     }   
