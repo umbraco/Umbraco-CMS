@@ -11,7 +11,7 @@ export default {
     playwrightLauncher({ product: 'webkit' }),
   ],
 	coverageConfig: {
-		reporters: ['lcov', 'text-summary'],
+		reporters: ['lcovonly', 'text-summary'],
 	},
   testRunnerHtml: (testFramework) =>
     `<html>
