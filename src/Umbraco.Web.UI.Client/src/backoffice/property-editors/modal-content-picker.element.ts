@@ -1,8 +1,7 @@
 import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
-import UmbModalHandler from '../../core/services/modalHandler';
-import { UmbPropertyEditorContentPicker } from './property-editor-content-picker.element';
+import { UmbModalHandler } from '../../core/services/modal';
 
 @customElement('umb-modal-content-picker')
 class UmbModalContentPicker extends LitElement {
@@ -95,7 +94,7 @@ class UmbModalContentPicker extends LitElement {
 					<hr />
 					<div id="content-list">
 						${this._tempContent.map(
-							(content, index) =>
+							(content) =>
 								// eslint-disable-next-line lit-a11y/click-events-have-key-events
 								html`<div
 									class=${`content-item ${this._selectedContent.includes(content) ? 'selected' : ''}`}
