@@ -42,7 +42,6 @@
 
         vm.$onInit = function() {
 
-            // TODO: Watch for vm.block.areaGridColumns
             // TODO: watch for column span options as fallback for areaGridColumns.
 
             assetsService.loadJs('lib/sortablejs/Sortable.min.js', $scope).then(onLoaded);
@@ -75,7 +74,13 @@
         }
 
         vm.deleteArea = function(area) {
-            console.log("delete", area);
+            console.log("deleteArea?")
+            const index = vm.model.findIndex(x => x.key === area.key);
+            if(index !== -1) {
+                console.log("performe delete")
+                vm.model.splice(index, 1);
+            }
+            setDirty();
         }
 
         vm.onNewAreaClick = function() {
