@@ -34,7 +34,6 @@ export class UmbEditorViewNodeEditElement extends UmbContextConsumerMixin(LitEle
 
 		this.consumeContext('umbNodeContext', (nodeContext) => {
 			this._nodeContext = nodeContext;
-			console.log('GOT CONTEXT', nodeContext);
 			this._useNode();
 		});
 	}

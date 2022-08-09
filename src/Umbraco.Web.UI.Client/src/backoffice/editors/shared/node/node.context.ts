@@ -23,6 +23,11 @@ export class UmbNodeContext {
 				value: '',
 			},
 		],
+		variants: [
+			{
+				name: '',
+			},
+		],
 	});
 	public readonly data: Observable<NodeEntity> = this._data.asObservable();
 

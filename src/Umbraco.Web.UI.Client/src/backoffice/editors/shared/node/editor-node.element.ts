@@ -1,5 +1,5 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html, LitElement } from 'lit';
+import { css, html, LitElement, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '../../../../core/context';
@@ -175,23 +175,33 @@ export class UmbEditorNodeElement extends UmbContextProviderMixin(UmbContextCons
 			<umb-editor-entity alias=${this.alias}>
 				<div slot="name">
 					<uui-input .value=${this._node?.name} @input="${this._handleInput}">
-						<div slot="append">
-							<uui-button id="trigger" @click=${this._toggleVariantSelector}>
-								English (United States)
-								<uui-caret></uui-caret>
-							</uui-button>
-						</div>
+						<!-- Implement Variant Selector -->
+						${this._node && this._node.variants.length > 0
+							? html`
+									<div slot="append">
+										<uui-button id="trigger" @click=${this._toggleVariantSelector}>
+											English (United States)
+											<uui-caret></uui-caret>
+										</uui-button>
+									</div>
+							  `
+							: nothing}
 					</uui-input>
+
 					<!-- Implement Variant Selector -->
-					<uui-popover id="popover" .open=${this._variantSelectorIsOpen} @close=${this._close}>
-						<div id="dropdown" slot="popover">
-							<uui-scroll-container id="scroll-container">
-								<ul>
-									<li>Implement variants</li>
-								</ul>
-							</uui-scroll-container>
-						</div>
-					</uui-popover>
+					${this._node && this._node.variants.length > 0
+						? html`
+								<uui-popover id="popover" .open=${this._variantSelectorIsOpen} @close=${this._close}>
+									<div id="dropdown" slot="popover">
+										<uui-scroll-container id="scroll-container">
+											<ul>
+												<li>Implement variants</li>
+											</ul>
+										</uui-scroll-container>
+									</div>
+								</uui-popover>
+						  `
+						: nothing}
 				</div>
 
 				<div slot="footer">Breadcrumbs</div>

@@ -8,6 +8,7 @@ export interface NodeEntity {
 	type: string;
 	properties: Array<NodeProperty>;
 	data: Array<NodePropertyData>;
+	variants: Array<any>; // TODO: define variant data
 	//layout?: any; // TODO: define layout type - make it non-optional
 }
 
@@ -61,6 +62,7 @@ export const data: Array<NodeEntity> = [
 				value: 'Every day, a rabbit in a military costume greets me at the front door',
 			},
 		],
+		variants: [{ name: 'fake data' }],
 		/*
     // Concept for node layout, separation of design from config and data.
     layout: [
@@ -131,6 +133,7 @@ export const data: Array<NodeEntity> = [
 				value: '',
 			},
 		],
+		variants: [{ name: 'Variant 1' }],
 	},
 	{
 		id: 3,
@@ -152,6 +155,7 @@ export const data: Array<NodeEntity> = [
 				value: 'Every day, a rabbit in a military costume greets me at the front door',
 			},
 		],
+		variants: [{ name: 'Variant 1' }],
 	},
 	{
 		id: 2001,
@@ -173,6 +177,7 @@ export const data: Array<NodeEntity> = [
 				value: 'The daily life at Umbraco HQ',
 			},
 		],
+		variants: [],
 	},
 	{
 		id: 2002,
@@ -194,6 +199,7 @@ export const data: Array<NodeEntity> = [
 				value: 'Every day, a rabbit in a military costume greets me at the front door',
 			},
 		],
+		variants: [],
 	},
 ];
 
