@@ -10,6 +10,7 @@ blocks: [
     {
         contentElementTypeKey: 123,
         allowAtRoot: true,
+        rowMinSpan: null,
         rowMaxSpan: null,
         columnSpanOptions: [
             {columnSpan: 12},
