@@ -172,7 +172,7 @@ export class UmbEditorNodeElement extends UmbContextProviderMixin(UmbContextCons
 
 	render() {
 		return html`
-			<umb-editor-entity alias="Umb.Editor.Node">
+			<umb-editor-entity alias=${this.alias}>
 				<div slot="name">
 					<uui-input .value=${this._node?.name} @input="${this._handleInput}">
 						<div slot="append">

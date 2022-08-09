@@ -110,7 +110,7 @@ export const internalManifests: Array<UmbExtensionManifestCore> = [
 		meta: {
 			// TODO: how do we want to filter where editor views are shown? https://our.umbraco.com/documentation/extending/Content-Apps/#setting-up-the-plugin
 			// this is a temp solution
-			editors: ['Umb.Editor.Node'],
+			editors: ['Umb.Editor.Content', 'Umb.Editor.Media'],
 			pathname: 'content',
 			weight: 100,
 			icon: 'document',
@@ -125,7 +125,7 @@ export const internalManifests: Array<UmbExtensionManifestCore> = [
 		meta: {
 			// TODO: how do we want to filter where editor views are shown? https://our.umbraco.com/documentation/extending/Content-Apps/#setting-up-the-plugin
 			// this is a temp solution
-			editors: ['Umb.Editor.Node'],
+			editors: ['Umb.Editor.Content', 'Umb.Editor.Media'],
 			pathname: 'info',
 			weight: 90,
 			icon: 'info',
