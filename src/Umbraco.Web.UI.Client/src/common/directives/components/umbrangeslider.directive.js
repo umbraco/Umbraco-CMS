@@ -139,6 +139,7 @@ For extra details about options and events take a look here: https://refreshless
             });
 
             setUpCallbacks();
+            setUpActivePipsHandling();
 
             // Refresh the scope
             $scope.$applyAsync();
@@ -299,7 +300,18 @@ For extra details about options and events take a look here: https://refreshless
                 });
             });
         }
-
+      function setUpActivePipsHandling() {
+        console.log("setUpActivePipsHandling");
+        const pips = sliderInstance.querySelectorAll('.noUi-value');
+        let activePip = [null, null];
+        sliderInstance.noUiSlider.on('update', function (values,handle) {
+          if(activePip[handle]){
+            activePip[handle].classList.remove("noUi-value-active");
+          }
+          activePip[handle] = pips[parseInt(values[handle])-1];
+          activePip[handle].classList.add("noUi-value-active");
+        });
+      }
     }
 
     angular.module('umbraco.directives').component('umbRangeSlider', umbRangeSlider);
