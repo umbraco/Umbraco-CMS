@@ -19,4 +19,10 @@ VITE_UMBRACO_INSTALL_STATUS=must-install
 
 ## Environments
 
+### Static website
+
 See the Main branch in action here as an [Azure Static Web App](https://ashy-bay-09f36a803.1.azurestaticapps.net/). The deploy runs automatically every time the `main` branch is updated. It uses mocked responses from the Umbraco API to simulate the site just like the local development environment.
+
+### Storybook
+
+Storybook is also being built and deployed automatically on the Main branch, including a preview URL on each pull request. See it in action on this [Azure Static Web App](https://ambitious-stone-0033b3603.1.azurestaticapps.net/).
