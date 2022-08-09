@@ -1,5 +1,5 @@
-import '../../src/backoffice/components/backoffice-modal-container.element';
-import '../../src/backoffice/property-editors/modal-content-picker.element';
+import '../../../backoffice/components/backoffice-modal-container.element';
+import '../../../backoffice/property-editors/modal-content-picker.element';
 
 import '@umbraco-ui/uui-modal';
 import '@umbraco-ui/uui-modal-container';
@@ -9,9 +9,9 @@ import '@umbraco-ui/uui-modal-dialog';
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit-html';
 import { customElement, property, state } from 'lit/decorators.js';
-import { UmbContextConsumerMixin } from '../core/context';
+import { UmbContextConsumerMixin } from '../../context';
 import { LitElement } from 'lit';
-import { UmbModalHandler, UmbModalService } from '../core/services/modal';
+import { UmbModalHandler, UmbModalService } from './';
 
 export default {
 	title: 'API/Modals',
