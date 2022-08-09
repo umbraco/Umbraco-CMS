@@ -54,9 +54,9 @@ public class InstallServiceTests
 
         var steps = new[]
         {
-            new TestInstallStep { ShouldRun = true, Id = 1 },
-            new TestInstallStep { ShouldRun = true, Id = 2 },
-            new TestInstallStep { ShouldRun = true, Id = 3 },
+            new TestInstallStep { Id = 1 },
+            new TestInstallStep { Id = 2 },
+            new TestInstallStep { Id = 3 },
         };
 
         // Add an method delegate that will add the step itself, that way we can know the executed order.
@@ -92,7 +92,7 @@ public class InstallServiceTests
     {
         public bool HasRun;
 
-        public bool ShouldRun;
+        public bool ShouldRun = true;
 
         public int Id;
 
