@@ -31,6 +31,7 @@
         vm.invalidAmount = false;
         vm.areaConfig = null;
         vm.locallyAvailableBlockTypes = 0;
+        vm.invalidBlockTypes = [];
 
         vm.$onInit = function () {
             initializeSortable();
@@ -53,11 +54,36 @@
 
                 var isMaxRequirementGood = vm.entries.length <= vm.areaConfig.maxAllowed;
                 vm.parentForm.areaMaxCount.$setValidity("areaMaxCount", isMaxRequirementGood);
-                
 
-                vm.invalidAmount = !isMinRequirementGood || !isMaxRequirementGood;
+
+                // TODO: Figure out if type requirements are good?
+                vm.areaConfig.specifiedAllowance.forEach(allowance => {
+
+                    vm.invalidBlockTypes = vm.invalidBlockTypes.filter(type => type.key !== allowance.elementTypeKey)
+                    const amount = vm.entries.filter(entry => entry.$block.data.contentTypeKey === allowance.elementTypeKey).length;
+                    const minAllowed = allowance.minAllowed || 0;
+                    const maxAllowed = allowance.maxAllowed || 0;
+                    
+                    if(amount < minAllowed || (maxAllowed > 0 && amount > maxAllowed)) {
+                        vm.invalidBlockTypes.push({
+                            'key': allowance.elementTypeKey,
+                            'name': vm.locallyAvailableBlockTypes.find(blockType => {console.log(blockType.elementTypeModel.name); return blockType.elementTypeModel.name}),
+                            'amount': amount,
+                            'minRequirement': minAllowed,
+                            'maxRequirement': maxAllowed
+                        });
+                    }
+                    
+                });
+                // Loop through all allowed type of this.
+                // set invalidBlockTypes with needed data, or remove..
+
+                var isTypeRequirementGood = false;
+                vm.parentForm.areaTypeRequirements.$setValidity("areaTypeRequirements", isTypeRequirementGood);
+
+
+                vm.invalidAmount = !isMinRequirementGood || !isMaxRequirementGood || !isTypeRequirementGood;
                 $element.toggleClass("--invalid", vm.invalidAmount);
-
             }
         }
 

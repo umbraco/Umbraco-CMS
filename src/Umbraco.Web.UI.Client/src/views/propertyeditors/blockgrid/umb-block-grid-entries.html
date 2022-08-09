@@ -59,6 +59,7 @@
 
 <input type="hidden" name="areaMinCount" ng-model="vm.entries" val-server="areaMinCount" />
 <input type="hidden" name="areaMaxCount" ng-model="vm.entries" val-server="areaMaxCount" />
+<input type="hidden" name="areaTypeRequirements" ng-model="vm.entries" val-server="areaTypeRequirements" />
 
 <div ng-if="vm.invalidAmount" class="umb-block-grid__entries-validation-message">
 
@@ -71,10 +72,21 @@
 
     <div ng-messages="vm.parentForm.areaMaxCount.$error">
         <div ng-message="areaMaxCount">
-            <localize key="validation_entriesShort" tokens="[vm.areaConfig.maxAllowed, vm.entries.length - vm.areaConfig.maxAllowed]" watch-tokens="true">Maximum %0% entries, <strong>%1%</strong> too many.</localize>
+            <localize key="validation_entriesExceed" tokens="[vm.areaConfig.maxAllowed, vm.entries.length - vm.areaConfig.maxAllowed]" watch-tokens="true">Maximum %0% entries, <strong>%1%</strong> too many.</localize>
         </div>
         <span ng-message="valServer" ng-bind-html="vm.parentForm.areaMaxCount.errorMsg"></span>
     </div>
-   
+
+    <div ng-messages="vm.parentForm.areaTypeRequirements.$error">
+        <div ng-message="areaTypeRequirements">
+            <localize 
+                ng-repeat="invalidBlockType in vm.invalidBlockTypes track by invalidBlockType.key" 
+                key="{{(vm.invalidBlockType.amount < vm.invalidBlockType.minRequirement) ? 'blockEditor_TODO_entriesShort' : 'blockEditor_TODO_entriesExceed'}}" 
+                tokens="[vm.invalidBlockType.name, vm.invalidBlockType.amount, vm.invalidBlockType.minRequirement, vm.invalidBlockType.maxRequirement]" 
+                watch-tokens="true"
+                >%0% must be present between %2% – %3% times.<br/></localize>
+        </div>
+        <span ng-message="valServer" ng-bind-html="vm.parentForm.areaTypeRequirements.errorMsg"></span>
+    </div>
 
 </div>
