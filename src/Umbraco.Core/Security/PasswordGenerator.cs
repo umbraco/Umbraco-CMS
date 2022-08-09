@@ -16,31 +16,38 @@ namespace Umbraco.Cms.Core.Security
     {
         private readonly IPasswordConfiguration _passwordConfiguration;
 
-        public PasswordGenerator(IPasswordConfiguration passwordConfiguration)
-        {
+        public PasswordGenerator(IPasswordConfiguration passwordConfiguration) =>
             _passwordConfiguration = passwordConfiguration;
-        }
+
         public string GeneratePassword()
         {
             var password = PasswordStore.GeneratePassword(
                 _passwordConfiguration.RequiredLength,
                 _passwordConfiguration.GetMinNonAlphaNumericChars());
 
-            var random = new Random();
-
             var passwordChars = password.ToCharArray();
 
+            using var numberGenerator = new RNGCryptoServiceProvider();
+
             if (_passwordConfiguration.RequireDigit && passwordChars.ContainsAny(Enumerable.Range(48, 58).Select(x => (char)x)))
-                password += Convert.ToChar(random.Next(48, 58));  // 0-9
+            {
+                password += Convert.ToChar(numberGenerator.GetInt32(48, 58));  // 0-9
+            }
 
             if (_passwordConfiguration.RequireLowercase && passwordChars.ContainsAny(Enumerable.Range(97, 123).Select(x => (char)x)))
-                password += Convert.ToChar(random.Next(97, 123));  // a-z
+            {
+                password += Convert.ToChar(numberGenerator.GetInt32(97, 123));  // a-z
+            }
 
             if (_passwordConfiguration.RequireUppercase && passwordChars.ContainsAny(Enumerable.Range(65, 91).Select(x => (char)x)))
-                password += Convert.ToChar(random.Next(65, 91));  // A-Z
+            {
+                password += Convert.ToChar(numberGenerator.GetInt32(65, 91));  // A-Z
+            }
 
             if (_passwordConfiguration.RequireNonLetterOrDigit && passwordChars.ContainsAny(Enumerable.Range(33, 48).Select(x => (char)x)))
-                password += Convert.ToChar(random.Next(33, 48));  // symbols !"#$%&'()*+,-./
+            {
+                password += Convert.ToChar(numberGenerator.GetInt32(33, 48));  // symbols !"#$%&'()*+,-./
+            }
 
             return password;
         }
