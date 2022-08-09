@@ -32,7 +32,7 @@
             }
         });
 
-    function BlockGridAreaController($scope, $element, assetsService, localizationService, editorService) {
+    function BlockGridAreaController($scope, $element, assetsService, localizationService, editorService, overlayService) {
 
         var unsubscribe = [];
 
@@ -73,6 +73,23 @@
             vm.openAreaOverlay(area);
         }
 
+        vm.requestDeleteArea = function (area) {
+            // TODO: Translations
+            localizationService.localizeMany(["general_delete", "blockEditor_confirmDeleteBlockAreaMessage", "blockEditor_confirmDeleteBlockAreaNotice"]).then(function (data) {
+                overlayService.confirmDelete({
+                    title: data[0],
+                    content: localizationService.tokenReplace(data[1], [area.alias]),
+                    confirmMessage: data[2],
+                    close: function () {
+                        overlayService.close();
+                    },
+                    submit: function () {
+                        vm.deleteArea(area);
+                        overlayService.close();
+                    }
+                });
+            });
+        }
         vm.deleteArea = function(area) {
             console.log("deleteArea?")
             const index = vm.model.findIndex(x => x.key === area.key);

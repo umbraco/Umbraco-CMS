@@ -68,7 +68,8 @@
             bindings: {
                 area: "=",
                 onEdit: "&",
-                onDelete: "&"
+                onDelete: "&",
+                onClick: "&"
             }
         }
     );
@@ -235,6 +236,7 @@
                     break;
             }
 
+            // Todo: Ensure value fit with configuration.
             vm.area.columnSpan = Math.max(vm.area.columnSpan + addCol, 1);
             vm.area.rowSpan = Math.max(vm.area.rowSpan + addRow, 1);
 
@@ -243,12 +245,18 @@
 
 
 
-        vm.onEditClick = function() {
+        vm.onEditClick = function($event) {
+            $event.stopPropagation();
             vm.onEdit();
         }
 
-        vm.onDeleteClick = function() {
+        vm.onDeleteClick = function($event) {
+            $event.stopPropagation();
             vm.onDelete();
+        }
+
+        vm.onAreaClick = function() {
+            vm.onClick();
         }
 
     }   
