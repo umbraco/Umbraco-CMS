@@ -7,6 +7,7 @@ export class UmbDocumentTypeContext {
 		id: -1,
 		key: '',
 		name: '',
+		alias: '',
 		properties: [],
 	});
 	public readonly data: Observable<DocumentTypeEntity> = this._data.asObservable();
