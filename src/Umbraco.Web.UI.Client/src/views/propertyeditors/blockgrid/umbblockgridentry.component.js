@@ -102,8 +102,10 @@
         vm.$onInit = function() {
             if(vm.layoutEntry.$block.config.areaGridColumns) {
                 vm.areaGridStyles['--umb-block-grid--area-grid-columns'] = vm.layoutEntry.$block.config.areaGridColumns.toString();
-                $scope.$evalAsync();
+            } else {
+                vm.areaGridStyles['--umb-block-grid--area-grid-columns'] = 'initial';
             }
+            $scope.$evalAsync();
         }
 
         // Block sizing functionality:
