@@ -4,7 +4,7 @@ import { html } from 'lit-html';
 import { UmbEditorNodeElement } from './editor-node.element';
 import './editor-node.element';
 
-import { data } from '../../../mocks/data/node.data';
+import { data } from '../../../../mocks/data/node.data';
 
 export default {
 	title: 'Editors/Node',

@@ -2,7 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
-import '../node/editor-node.element';
+import '../shared/node/editor-node.element';
 
 @customElement('umb-editor-content')
 export class UmbEditorContentElement extends LitElement {

@@ -1,5 +1,5 @@
 import { BehaviorSubject, Observable } from 'rxjs';
-import { NodeEntity } from '../../../mocks/data/node.data';
+import { NodeEntity } from '../../../../mocks/data/node.data';
 
 export class UmbNodeContext {
 	// TODO: figure out how fine grained we want to make our observables.
@@ -7,7 +7,7 @@ export class UmbNodeContext {
 		id: -1,
 		key: '',
 		name: '',
-		alias: '',
+		type: '',
 		icon: '',
 		properties: [
 			{
