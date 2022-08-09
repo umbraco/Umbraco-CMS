@@ -1,5 +1,5 @@
 import { BehaviorSubject, map, Observable } from 'rxjs';
-import { DataTypeEntity } from '../../mocks/data/data-type.data';
+import { DataTypeEntity, umbDataTypeData } from '../../mocks/data/data-type.data';
 
 export class UmbDataTypeStore {
 	private _dataTypes: BehaviorSubject<Array<DataTypeEntity>> = new BehaviorSubject(<Array<DataTypeEntity>>[]);
@@ -31,6 +31,13 @@ export class UmbDataTypeStore {
 		return this.dataTypes.pipe(
 			map((dataTypes: Array<DataTypeEntity>) => dataTypes.find((node: DataTypeEntity) => node.key === key) || null)
 		);
+	}
+
+	// TODO: temp solution until we know where to get tree data from
+	getAll(): Observable<Array<DataTypeEntity>> {
+		const documentTypes = umbDataTypeData.getAll();
+		this._dataTypes.next(documentTypes);
+		return this.dataTypes;
 	}
 
 	async save(dataTypes: Array<DataTypeEntity>) {

@@ -2,9 +2,12 @@ import { css, html, LitElement } from 'lit';
 import { customElement, state, property } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { data } from '../../../mocks/data/node.data';
+import { UmbContextConsumerMixin } from '../../../core/context';
+import { UmbNodeStore } from '../../../core/stores/node.store';
+import { map, Subscription } from 'rxjs';
 
 @customElement('umb-media-section-tree')
-class UmbMediaSectionTree extends LitElement {
+class UmbMediaSectionTree extends UmbContextConsumerMixin(LitElement) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -23,6 +26,30 @@ class UmbMediaSectionTree extends LitElement {
 
 	@state()
 	_section?: string;
+
+	private _nodeStore?: UmbNodeStore;
+	private _nodesSubscription?: Subscription;
+
+	constructor() {
+		super();
+
+		// TODO: temp solution until we know where to get tree data from
+		this.consumeContext('umbNodeStore', (store) => {
+			this._nodeStore = store;
+
+			this._nodesSubscription = this._nodeStore
+				?.getAll()
+				.pipe(map((nodes) => nodes.filter((node) => node.type === 'document')))
+				.subscribe((documentNodes) => {
+					this._tree = documentNodes;
+				});
+		});
+	}
+
+	disconnectedCallback(): void {
+		super.disconnectedCallback();
+		this._nodesSubscription?.unsubscribe();
+	}
 
 	render() {
 		return html`
