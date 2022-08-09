@@ -53,7 +53,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(basic => basic.Icon, expression => expression.UseValue("icon-user"))
                 .ForMember(basic => basic.Path, expression => expression.UseValue(""))
                 .ForMember(basic => basic.ParentId, expression => expression.UseValue(-1))
-                .ForMember(basic => basic.Alias, expression => expression.MapFrom(user => user.Username))
+                .ForMember(basic => basic.Alias, expression => expression.MapFrom(user => user.Key.ToString()))
                 .ForMember(dto => dto.Trashed, expression => expression.Ignore())
                 .ForMember(x => x.AdditionalData, expression => expression.Ignore());
 
