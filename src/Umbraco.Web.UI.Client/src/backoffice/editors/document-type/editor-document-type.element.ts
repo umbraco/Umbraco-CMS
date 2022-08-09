@@ -4,7 +4,7 @@ import { css, html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { distinctUntilChanged, Subscription } from 'rxjs';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '../../../core/context';
-import { UmbNotificationService } from '../../../core/services/notification.service';
+import { UmbNotificationService } from '../../../core/services/notification';
 import { UmbDocumentTypeStore } from '../../../core/stores/document-type.store';
 import { DocumentTypeEntity } from '../../../mocks/data/document-type.data';
 import { UmbDocumentTypeContext } from './document-type.context';
@@ -14,6 +14,7 @@ import '../shared/editor-entity/editor-entity.element';
 // Lazy load
 // TODO: Make this dynamic, use load-extensions method to loop over extensions for this node.
 import './views/editor-view-document-type-design.element';
+import { UmbNotificationDefaultData } from '../../../core/services/notification/layouts/default';
 
 @customElement('umb-editor-document-type')
 export class UmbEditorDocumentTypeElement extends UmbContextProviderMixin(UmbContextConsumerMixin(LitElement)) {
@@ -102,7 +103,8 @@ export class UmbEditorDocumentTypeElement extends UmbContextProviderMixin(UmbCon
 		try {
 			this._saveButtonState = 'waiting';
 			await this._documentTypeStore.save([this._documentType]);
-			this._notificationService?.peek('Data Type saved');
+			const data: UmbNotificationDefaultData = { message: 'Document Type Saved' };
+			this._notificationService?.peek('positive', { data });
 			this._saveButtonState = 'success';
 		} catch (error) {
 			this._saveButtonState = 'failed';
