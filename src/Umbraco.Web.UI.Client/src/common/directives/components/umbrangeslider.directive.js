@@ -301,13 +301,12 @@ For extra details about options and events take a look here: https://refreshless
             });
         }
       function setUpActivePipsHandling() {
-        const pips = sliderInstance.querySelectorAll('.noUi-value');
         let activePip = [null, null];
         sliderInstance.noUiSlider.on('update', function (values,handle) {
           if(activePip[handle]){
             activePip[handle].classList.remove("noUi-value-active");
           }
-          activePip[handle] = pips[parseInt(values[handle])-1];
+          activePip[handle] = sliderInstance.querySelector('.noUi-value[data-value="' + parseInt(values[handle]) + '"]');
           activePip[handle].classList.add("noUi-value-active");
         });
       }
