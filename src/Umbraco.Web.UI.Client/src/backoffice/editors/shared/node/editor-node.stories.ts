@@ -7,7 +7,7 @@ import './editor-node.element';
 import { data } from '../../../../mocks/data/node.data';
 
 export default {
-	title: 'Editors/Node',
+	title: 'Editors/Shared/Node',
 	component: 'umb-editor-node',
 	id: 'umb-editor-node',
 } as Meta;

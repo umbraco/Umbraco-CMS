@@ -7,7 +7,7 @@ import './editor-view-node-info.element';
 import { data } from '../../../../../../mocks/data/node.data';
 
 export default {
-	title: 'Editors/Node/Views/Info',
+	title: 'Editors/Shared/Node/Views/Info',
 	component: 'umb-editor-view-node-info',
 	id: 'umb-editor-view-node-info',
 	decorators: [
