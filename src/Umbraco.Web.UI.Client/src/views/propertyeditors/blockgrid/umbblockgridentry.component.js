@@ -127,7 +127,7 @@
             // Find nearest allowed Column:
             newColumnSpan = closestColumnSpanOption(newColumnSpan , vm.layoutEntry.$block.config.columnSpanOptions).columnSpan;
 
-            let newRowSpan = Math.round(Math.max(blockEndRow-blockStartRow, 1));
+            let newRowSpan = Math.round(Math.max(blockEndRow-blockStartRow, vm.layoutEntry.$block.config.rowMinSpan || 1));
             if(vm.layoutEntry.$block.config.rowMaxSpan != null) {
                 newRowSpan = Math.min(newRowSpan, vm.layoutEntry.$block.config.rowMaxSpan);
             }
@@ -301,7 +301,7 @@
             const newColumnSpan = Math.max(vm.layoutEntry.columnSpan + addCol, 1);
 
             vm.layoutEntry.columnSpan = closestColumnSpanOption(newColumnSpan, vm.layoutEntry.$block.config.columnSpanOptions).columnSpan;
-            let newRowSpan = Math.max(vm.layoutEntry.rowSpan + addRow, 1);
+            let newRowSpan = Math.max(vm.layoutEntry.rowSpan + addRow, vm.layoutEntry.$block.config.rowMinSpan || 1);
             if(vm.layoutEntry.$block.config.rowMaxSpan != null) {
                 newRowSpan = Math.min(newRowSpan, vm.layoutEntry.$block.config.rowMaxSpan);
             }

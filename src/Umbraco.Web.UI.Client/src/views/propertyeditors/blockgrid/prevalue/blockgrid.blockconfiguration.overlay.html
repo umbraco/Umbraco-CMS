@@ -126,19 +126,12 @@
                                 </div>
                             </div>
 
-                            <!-- Row span options -->
+                            <!-- min/max Row span options -->
                             <div class="control-group umb-control-group -no-border">
                                 <div class="umb-el-wrap">
-                                    <label class="control-label" for="label"><localize key="blockEditor_TODO">Maximum row span</localize></label>
+                                    <label class="control-label" for="label"><localize key="blockEditor_TODO">Row span</localize></label>
                                     <div class="controls">
-                                        <input 
-                                            type="number"
-                                            name="label"
-                                            ng-model="vm.block.rowMaxSpan"
-                                            placeholder="∞"
-                                            ng-min="1"
-                                            fix-number
-                                            style="width:80px"/>
+                                        <umb-property-editor name="rowMinMaxModel" model="vm.rowMinMaxModel" is-pre-value="true"></umb-property-editor>
                                     </div>
                                 </div>
                             </div>
@@ -160,55 +153,7 @@
                     
                     </div>
 
-                    <div class="umb-group-panel">
 
-                        <div class="umb-group-panel__header">
-                            <localize key="blockEditor_headlineDataModels">Data Models</localize>
-                        </div>
-
-                        <div class="umb-group-panel__content">
-
-                            <!-- Content Element Type -->
-                            <div class="control-group umb-control-group -no-border">
-                                <div class="umb-el-wrap">
-                                    <label class="control-label"><localize key="blockEditor_labelContentElementType">Content ElementType</localize></label>
-                                    <div class="controls">
-                                        <div class="__settings-input --hasValue" ng-if="vm.block.contentElementTypeKey !== null" >
-                                            <umb-node-preview icon="vm.contentPreview.icon" name="vm.contentPreview.name" alias="vm.contentPreview.alias"></umb-node-preview>
-                                            <div class="__control-actions">
-                                                <button type="button" class="btn-reset __control-actions-btn --open umb-outline" ng-click="vm.openElementType(vm.block.contentElementTypeKey)">
-                                                    <umb-icon icon="icon-edit" class="icon"></umb-icon>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Settings Element Type -->
-                            <div class="control-group umb-control-group -no-border">
-                                <div class="umb-el-wrap">
-                                    <label class="control-label"><localize key="blockEditor_labelSettingsElementType">Settings Element Type</localize></label>
-                                    <div class="controls">
-                                        <div class="__settings-input --hasValue" ng-if="vm.block.settingsElementTypeKey !== null">
-                                            <umb-node-preview icon="vm.settingsPreview.icon" name="vm.settingsPreview.name" alias="vm.settingsPreview.alias"></umb-node-preview>
-                                            <div class="__control-actions">
-                                                <button type="button" class="btn-reset __control-actions-btn --open umb-outline" ng-click="vm.openElementType(vm.block.settingsElementTypeKey)">
-                                                    <umb-icon icon="icon-edit" class="icon"></umb-icon>
-                                                </button>
-                                                <button type="button" class="btn-reset __control-actions-btn --remove umb-outline" ng-click="vm.requestRemoveSettingsForBlock(vm.block)">
-                                                    <umb-icon icon="icon-wrong" class="icon"></umb-icon>
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <button type="button" class="btn-reset __settings-input --noValue umb-outline" ng-if="vm.block.settingsElementTypeKey === null" ng-click="vm.addSettingsForBlock($event, vm.block)">
-                                            <localize key="blockEditor_addSettingsElementType">Add settings</localize>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
 
                     <div class="umb-group-panel">
 
@@ -271,6 +216,63 @@
 
                     </div>
 
+
+
+
+
+                    <div class="umb-group-panel">
+
+                        <div class="umb-group-panel__header">
+                            <localize key="blockEditor_headlineDataModels">Data Models</localize>
+                        </div>
+
+                        <div class="umb-group-panel__content">
+
+                            <!-- Content Element Type -->
+                            <div class="control-group umb-control-group -no-border">
+                                <div class="umb-el-wrap">
+                                    <label class="control-label"><localize key="blockEditor_labelContentElementType">Content ElementType</localize></label>
+                                    <div class="controls">
+                                        <div class="__settings-input --hasValue" ng-if="vm.block.contentElementTypeKey !== null" >
+                                            <umb-node-preview icon="vm.contentPreview.icon" name="vm.contentPreview.name" alias="vm.contentPreview.alias"></umb-node-preview>
+                                            <div class="__control-actions">
+                                                <button type="button" class="btn-reset __control-actions-btn --open umb-outline" ng-click="vm.openElementType(vm.block.contentElementTypeKey)">
+                                                    <umb-icon icon="icon-edit" class="icon"></umb-icon>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Settings Element Type -->
+                            <div class="control-group umb-control-group -no-border">
+                                <div class="umb-el-wrap">
+                                    <label class="control-label"><localize key="blockEditor_labelSettingsElementType">Settings Element Type</localize></label>
+                                    <div class="controls">
+                                        <div class="__settings-input --hasValue" ng-if="vm.block.settingsElementTypeKey !== null">
+                                            <umb-node-preview icon="vm.settingsPreview.icon" name="vm.settingsPreview.name" alias="vm.settingsPreview.alias"></umb-node-preview>
+                                            <div class="__control-actions">
+                                                <button type="button" class="btn-reset __control-actions-btn --open umb-outline" ng-click="vm.openElementType(vm.block.settingsElementTypeKey)">
+                                                    <umb-icon icon="icon-edit" class="icon"></umb-icon>
+                                                </button>
+                                                <button type="button" class="btn-reset __control-actions-btn --remove umb-outline" ng-click="vm.requestRemoveSettingsForBlock(vm.block)">
+                                                    <umb-icon icon="icon-wrong" class="icon"></umb-icon>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="btn-reset __settings-input --noValue umb-outline" ng-if="vm.block.settingsElementTypeKey === null" ng-click="vm.addSettingsForBlock($event, vm.block)">
+                                            <localize key="blockEditor_addSettingsElementType">Add settings</localize>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+
                     <div class="umb-group-panel umb-block-grid-block-configuration__umb-group-panel --span-two">
 
                         
@@ -284,8 +286,11 @@
                             <div class="control-group umb-control-group -no-border">
                                 <div class="umb-el-wrap">
                                     <label class="control-label" for="label"><localize key="blockEditor_TODO">Area layout columns</localize></label>
+                                    <umb-property-info-button button-title-key="blockEditor_TODO">
+                                        <localize key="blockEditor_TODO">Define a specific amount of columns for the grid that Areas of this Block will be using. If unset the Blocks current column span will be used.</localize>
+                                    </umb-property-info-button>
                                     <div class="controls">
-                                        <input type="text" name="label" ng-model="vm.block.areaGridColumns" style="width:100%"/>
+                                        <input type="text" name="label" ng-model="vm.block.areaGridColumns"/>
                                     </div>
                                 </div>
                             </div>
@@ -297,7 +302,7 @@
                                     <umb-property-info-button button-title-key="blockEditor_TODO">
                                         <localize key="blockEditor_TODO">Enable nesting Blocks inside this Block Type. Define one or more Areas for Blocks to be appended within.</localize>
                                     </umb-property-info-button>
-                                    <div class="controls"> 
+                                    <div class="controls">
                                         <umb-block-grid-area-editor model="vm.block.areas" block="vm.block" all-block-types="model.allBlockTypes" loaded-element-types="model.loadedElementTypes"></umb-block-grid-area-editor>
                                     </div>
                                 </div>

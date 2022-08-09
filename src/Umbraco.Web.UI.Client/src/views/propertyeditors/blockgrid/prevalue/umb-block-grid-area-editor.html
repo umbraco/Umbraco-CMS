@@ -2,7 +2,7 @@
 
     <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
 
-    <div ng-show="vm.loading !== true" class="umb-block-grid-area-editor__grid-wrapper" style="--umb-block-grid--block-grid-columns: {{vm.blockGridColumns}}">
+    <div ng-show="vm.loading !== true" class="umb-block-grid-area-editor__grid-wrapper" style="--umb-block-grid--block-grid-columns: {{vm.block.areaGridColumns || vm.rootLayoutColumns}}">
 
         <umb-block-grid-configuration-area-entry ng-repeat="area in vm.model track by area.key"
             class="umb-block-grid-area-editor__area"

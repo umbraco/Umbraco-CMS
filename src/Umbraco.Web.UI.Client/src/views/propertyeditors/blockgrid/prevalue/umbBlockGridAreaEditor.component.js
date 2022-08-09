@@ -38,15 +38,12 @@
 
         var vm = this;
         vm.loading = true;
-        vm.blockGridColumns = 0;
+        vm.rootLayoutColumns = 12;
 
         vm.$onInit = function() {
 
             // TODO: Watch for vm.block.areaGridColumns
             // TODO: watch for column span options as fallback for areaGridColumns.
-
-            vm.blockGridColumns = vm.block.areaGridColumns || 12;
-
 
             assetsService.loadJs('lib/sortablejs/Sortable.min.js', $scope).then(onLoaded);
         };
@@ -85,7 +82,7 @@
             const newArea = {
                 'key': String.CreateGuid(),
                 'alias': '',
-                'columnSpan': (vm.blockGridColumns),
+                'columnSpan': (vm.block.areaGridColumns || vm.rootLayoutColumns),
                 'rowSpan': 1,
                 'minAllowed': 0,
                 'maxAllowed': null,
