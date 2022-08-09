@@ -2,6 +2,7 @@ import '.';
 
 import { expect, fixture, html } from '@open-wc/testing';
 
+import { defaultA11yConfig } from '../core/helpers/chai';
 import { UmbInstallerConsent } from './installer-consent.element';
 import { UmbInstallerDatabase } from './installer-database.element';
 import { UmbInstallerInstalling } from './installer-installing.element';
@@ -21,7 +22,7 @@ describe('UmbInstaller', () => {
 	});
 
 	it('passes the a11y audit', async () => {
-		await expect(element).shadowDom.to.be.accessible();
+		await expect(element).to.be.accessible(defaultA11yConfig);
 	});
 });
 
@@ -37,7 +38,7 @@ describe('UmbInstallerLayout', () => {
 	});
 
 	it('passes the a11y audit', async () => {
-		await expect(element).shadowDom.to.be.accessible();
+		await expect(element).to.be.accessible(defaultA11yConfig);
 	});
 });
 
@@ -53,9 +54,7 @@ describe('UmbInstallerUser', () => {
 	});
 
 	it('passes the a11y audit', async () => {
-		await expect(element).to.be.accessible({
-			ignoredRules: ['color-contrast'],
-		});
+		await expect(element).to.be.accessible(defaultA11yConfig);
 	});
 });
 
@@ -71,7 +70,7 @@ describe('UmbInstallerConsent', () => {
 	});
 
 	it('passes the a11y audit', async () => {
-		await expect(element).shadowDom.to.be.accessible();
+		await expect(element).to.be.accessible(defaultA11yConfig);
 	});
 });
 
@@ -87,9 +86,7 @@ describe('UmbInstallerDatabase', () => {
 	});
 
 	it('passes the a11y audit', async () => {
-		await expect(element).to.be.accessible({
-			ignoredRules: ['color-contrast'],
-		});
+		await expect(element).to.be.accessible(defaultA11yConfig);
 	});
 });
 
@@ -105,6 +102,6 @@ describe('UmbInstallerInstalling', () => {
 	});
 
 	it('passes the a11y audit', async () => {
-		await expect(element).shadowDom.to.be.accessible();
+		await expect(element).to.be.accessible(defaultA11yConfig);
 	});
 });
