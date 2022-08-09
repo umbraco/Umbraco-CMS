@@ -301,7 +301,6 @@ For extra details about options and events take a look here: https://refreshless
             });
         }
       function setUpActivePipsHandling() {
-        console.log("setUpActivePipsHandling");
         const pips = sliderInstance.querySelectorAll('.noUi-value');
         let activePip = [null, null];
         sliderInstance.noUiSlider.on('update', function (values,handle) {
