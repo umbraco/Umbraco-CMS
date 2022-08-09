@@ -2,7 +2,7 @@ import { expect, fixture, html } from '@open-wc/testing';
 
 import { UmbUpgraderView } from './upgrader-view.element';
 
-describe('UmbUpgrader', () => {
+describe('UmbUpgraderView', () => {
 	let element: UmbUpgraderView;
 
 	beforeEach(async () => {
