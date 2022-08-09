@@ -37,6 +37,8 @@ export class UmbEditorLayout extends LitElement {
 			}
 
 			#footer {
+				display: flex;
+				align-items: center;
 				height: 70px;
 				width: 100%;
 				padding: 0 var(--uui-size-6);

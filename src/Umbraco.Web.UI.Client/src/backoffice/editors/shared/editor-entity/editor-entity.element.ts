@@ -35,6 +35,7 @@ export class UmbEditorEntity extends UmbContextConsumerMixin(LitElement) {
 				height: 100%;
 				align-items: center;
 				gap: 16px;
+				flex: 1 1 auto;
 			}
 
 			#actions {
@@ -50,8 +51,6 @@ export class UmbEditorEntity extends UmbContextConsumerMixin(LitElement) {
 				--uui-tab-divider: var(--uui-color-border);
 				border-left: 1px solid var(--uui-color-border);
 				border-right: 1px solid var(--uui-color-border);
-				flex-wrap: nowrap;
-				height: 60px;
 			}
 		`,
 	];
