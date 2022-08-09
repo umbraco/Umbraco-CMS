@@ -10,6 +10,9 @@ export default {
     playwrightLauncher({ product: 'firefox' }),
     playwrightLauncher({ product: 'webkit' }),
   ],
+	coverageConfig: {
+		reporters: ['lcov', 'text-summary'],
+	},
   testRunnerHtml: (testFramework) =>
     `<html>
       <body>
