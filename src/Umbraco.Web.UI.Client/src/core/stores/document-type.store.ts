@@ -46,7 +46,7 @@ export class UmbDocumentTypeStore {
 		const updated: DocumentTypeEntity[] = [...storedDocumentTypes];
 
 		fetchedDocumentTypes.forEach((fetchedDocumentType) => {
-			const index = storedDocumentTypes.map((storedNode) => storedNode.id).indexOf(fetchedDocumentTypes.id);
+			const index = storedDocumentTypes.map((storedNode) => storedNode.id).indexOf(fetchedDocumentType.id);
 
 			if (index !== -1) {
 				// If the data type is already in the store, update it
