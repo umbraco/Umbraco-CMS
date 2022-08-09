@@ -28,7 +28,7 @@
                                     <umb-icon icon="icon-documents" class="icon"></umb-icon>
                                     <span class="sr-only">{{vm.labels.copy_icon_title}}</span>
                                 </button>
-                                <button type="button" class="umb-nested-content__icon umb-nested-content__icon--delete" localize="title" title="general_delete" ng-class="{ 'umb-nested-content__icon--disabled': !vm.canDeleteNode($index) }" ng-click="vm.requestDeleteNode($index); $event.stopPropagation();">
+                                <button ng-if="vm.allowRemove" type="button" class="umb-nested-content__icon umb-nested-content__icon--delete" localize="title" title="general_delete" ng-class="{ 'umb-nested-content__icon--disabled': !vm.canDeleteNode($index) }" ng-click="vm.requestDeleteNode($index); $event.stopPropagation();">
                                     <umb-icon icon="icon-trash" class="icon"></umb-icon>
                                     <span class="sr-only">
                                         <localize key="general_delete">Delete</localize>
@@ -38,7 +38,11 @@
                         </div>
 
                         <div class="umb-nested-content__content" ng-if="vm.currentNode.key === node.key && !vm.sorting">
-                            <umb-nested-content-editor ng-model="node" tab-alias="ncTabAlias"></umb-nested-content-editor>
+                            <umb-nested-content-editor 
+                                ng-model="node" 
+                                tab-alias="ncTabAlias"
+                                ng-attr-readonly="{{ vm.readonly || undefined }}">
+                            </umb-nested-content-editor>
                         </div>
                     </div>
 
@@ -58,7 +62,8 @@
                 class="btn-reset umb-nested-content__add-content umb-focus"
                 ng-class="{ '--disabled': (!vm.scaffolds.length || vm.nodes.length >= vm.maxItems) }"
                 ng-click="vm.openNodeTypePicker($event)"
-                aria-disabled="{{!vm.scaffolds.length || vm.nodes.length >= vm.maxItems}}">
+                aria-disabled="{{!vm.scaffolds.length || vm.nodes.length >= vm.maxItems}}"
+                ng-disabled="!vm.allowAdd">
                 <localize key="grid_addElement">Add element</localize>
             </button>
         </div>

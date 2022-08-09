@@ -22,7 +22,6 @@ public abstract class ServerMessengerBase : IServerMessenger
     /// <summary>
     ///     Determines whether to make distributed calls when messaging a cache refresher.
     /// </summary>
-    /// <param name="servers">The registered servers.</param>
     /// <param name="refresher">The cache refresher.</param>
     /// <param name="messageType">The message type.</param>
     /// <returns>true if distributed calls are required; otherwise, false, all we have is the local server.</returns>

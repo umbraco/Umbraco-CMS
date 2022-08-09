@@ -106,6 +106,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             _imageUrlGenerator = imageUrlGenerator;
             _macroParameterParser = macroParameterParser;
             _editorConfigurationParser = editorConfigurationParser;
+            SupportsReadOnly = true;
         }
 
         public override IPropertyIndexValueFactory PropertyIndexValueFactory => new GridPropertyIndexValueFactory();

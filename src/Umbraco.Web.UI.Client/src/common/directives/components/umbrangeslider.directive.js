@@ -78,7 +78,7 @@ For extra details about options and events take a look here: https://refreshless
         }
     };
 
-    function UmbRangeSliderController($element, $timeout, $scope, assetsService) {
+    function UmbRangeSliderController($element, $timeout, $scope, assetsService, $attrs) {
 
         const ctrl = this;
         let sliderInstance = null;
@@ -95,6 +95,20 @@ For extra details about options and events take a look here: https://refreshless
             });
 
         };
+
+        $attrs.$observe('readonly', (value) => {
+            ctrl.readonly = value !== undefined;
+
+            if (!sliderInstance) {
+                return;
+            }
+
+            if (ctrl.readonly) {
+                sliderInstance.setAttribute('disabled', true);
+            } else {
+                sliderInstance.removeAttribute('disabled');
+            }
+        });
 
         function grabElementAndRun() {
             $timeout(function () {
@@ -131,6 +145,12 @@ For extra details about options and events take a look here: https://refreshless
             // If has ngModel set the date
             if (ctrl.ngModel) {
                 sliderInstance.noUiSlider.set(ctrl.ngModel);
+            }
+
+            if (ctrl.readonly) {
+                sliderInstance.setAttribute('disabled', true);
+            } else {
+                sliderInstance.removeAttribute('disabled');
             }
 
             // destroy the slider instance when the dom element is removed

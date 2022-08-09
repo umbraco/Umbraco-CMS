@@ -145,8 +145,7 @@ internal class UserRepository : EntityRepositoryBase<int, IUser>, IUserRepositor
     /// </summary>
     /// <param name="username"></param>
     /// <param name="includeSecurityData">
-    ///     Can be used for slightly faster user lookups if the result doesn't require security data (i.e. groups, apps & start
-    ///     nodes).
+    ///     Can be used for slightly faster user lookups if the result doesn't require security data (i.e. groups, apps & start nodes).
     ///     This is really only used for a shim in order to upgrade to 7.6.
     /// </param>
     /// <returns>
@@ -164,7 +163,7 @@ internal class UserRepository : EntityRepositoryBase<int, IUser>, IUserRepositor
     ///     for slightly faster user lookups if the result doesn't require security data (i.e. groups, apps & start nodes)
     /// </param>
     /// <returns>
-    ///     A non cached <see cref="IUser" /> instance
+    ///     A non cached <see cref="IUser"/> instance
     /// </returns>
     public IUser? Get(int? id, bool includeSecurityData) =>
         GetWith(sql => sql.Where<UserDto>(x => x.Id == id), includeSecurityData);
@@ -377,14 +376,30 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
         var groupIds = user2Groups.Select(x => x.UserGroupId).ToList();
 
         // get groups
+        // We wrap this in a try-catch, as this might throw errors when you try to login before having migrated your database
+        Dictionary<int, UserGroupDto> groups;
+        try
+        {
+            sql = SqlContext.Sql()
+                .Select<UserGroupDto>()
+                .From<UserGroupDto>()
+                .WhereIn<UserGroupDto>(x => x.Id, groupIds);
 
-        sql = SqlContext.Sql()
-            .Select<UserGroupDto>()
-            .From<UserGroupDto>()
-            .WhereIn<UserGroupDto>(x => x.Id, groupIds);
+            groups = Database.Fetch<UserGroupDto>(sql)
+                .ToDictionary(x => x.Id, x => x);
+        }
+        catch(Exception e)
+        {
+            Logger.LogDebug(e, "Couldn't get user groups. This should only happens doing the migration that add new columns to user groups");
 
-        var groups = Database.Fetch<UserGroupDto>(sql)
-            .ToDictionary(x => x.Id, x => x);
+            sql = SqlContext.Sql()
+                .Select<UserGroupDto>(x=>x.Id, x=>x.Alias, x=>x.StartContentId, x=>x.StartMediaId)
+                .From<UserGroupDto>()
+                .WhereIn<UserGroupDto>(x => x.Id, groupIds);
+
+            groups = Database.Fetch<UserGroupDto>(sql)
+                .ToDictionary(x => x.Id, x => x);
+        }
 
         // get groups2apps
 
@@ -405,6 +420,26 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
             .WhereIn<UserStartNodeDto>(x => x.UserId, userIds);
 
         List<UserStartNodeDto>? startNodes = Database.Fetch<UserStartNodeDto>(sql);
+
+        // get groups2languages
+
+        sql = SqlContext.Sql()
+            .Select<UserGroup2LanguageDto>()
+            .From<UserGroup2LanguageDto>()
+            .WhereIn<UserGroup2LanguageDto>(x => x.UserGroupId, groupIds);
+
+        Dictionary<int, IGrouping<int, UserGroup2LanguageDto>> groups2languages;
+        try
+        {
+            groups2languages = Database.Fetch<UserGroup2LanguageDto>(sql)
+                .GroupBy(x => x.UserGroupId)
+                .ToDictionary(x => x.Key, x => x);
+        }
+        catch
+        {
+            // If we get an error, the table has not been made in the database yet, set the list to an empty one
+            groups2languages = new Dictionary<int, IGrouping<int, UserGroup2LanguageDto>>();
+        }
 
         // map groups
 
@@ -432,6 +467,17 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
             if (groups2Apps.TryGetValue(group.Id, out IGrouping<int, UserGroup2AppDto>? list))
             {
                 group.UserGroup2AppDtos = list.ToList(); // groups2apps is distinct
+            }
+
+        }
+
+        // map languages
+
+        foreach (var group in groups.Values)
+        {
+            if (groups2languages.TryGetValue(group.Id, out var list))
+            {
+                group.UserGroup2LanguageDtos = list.ToList(); // groups2apps is distinct
             }
         }
     }
