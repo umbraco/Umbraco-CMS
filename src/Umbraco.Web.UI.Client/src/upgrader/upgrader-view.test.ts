@@ -14,6 +14,8 @@ describe('UmbUpgraderView', () => {
 	});
 
 	it('passes the a11y audit', async () => {
-		await expect(element).shadowDom.to.be.accessible();
+		await expect(element).to.be.accessible({
+			ignoredRules: ['color-contrast'],
+		});
 	});
 });
