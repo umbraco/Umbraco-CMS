@@ -4,6 +4,7 @@ module.exports = {
 	framework: '@storybook/web-components',
 	features: {
 		previewMdx2: true,
+		storyStoreV7: true
 	},
 	core: {
 		builder: '@storybook/builder-vite',
