@@ -49,11 +49,14 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         public Type GetModelType(Guid contentTypeKey)
         {
             var publishedContentType = GetContentType(contentTypeKey);
-            if (publishedContentType != null)
+            if (publishedContentType != null && publishedContentType.IsElement)
             {
-                var modelType = ModelType.For(publishedContentType.Alias);
-
-                return _publishedModelFactory.MapModelType(modelType);
+                // TODO Get the model type without having to construct a list
+                var listType = _publishedModelFactory.CreateModelList(publishedContentType.Alias).GetType();
+                if (listType.GenericTypeArguments.Length == 1)
+                {
+                    return listType.GenericTypeArguments[0];
+                }
             }
 
             return typeof(IPublishedElement);
