@@ -32,3 +32,6 @@ types
 /test-results/
 /playwright-report/
 /playwright/.cache/
+
+# storybook
+storybook-static/
