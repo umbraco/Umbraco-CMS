@@ -80,6 +80,17 @@ export const internalManifests: Array<UmbExtensionManifestCore> = [
 	},
 	{
 		type: 'propertyEditorUI',
+		alias: 'Umb.PropertyEditorUI.ContentPicker',
+		name: 'ContentPicker',
+		elementName: 'umb-property-editor-content-picker',
+		js: () => import('./backoffice/property-editors/property-editor-content-picker.element'),
+		meta: {
+			icon: 'document',
+			group: 'common',
+		},
+	},
+	{
+		type: 'propertyEditorUI',
 		alias: 'Umb.PropertyEditorUI.ContextExample',
 		name: 'Context Example',
 		js: () => import('./backoffice/property-editors/property-editor-context-example.element'),
@@ -112,24 +123,24 @@ export const internalManifests: Array<UmbExtensionManifestCore> = [
 			icon: 'info',
 		},
 	},
-  {
-    type: 'propertyAction',
-    alias: 'Umb.PropertyAction.Copy',
-    name: 'Copy',
-    elementName: 'umb-property-action-copy',
-    js: () => import('./backoffice/property-actions/property-action-copy.element'),
-    meta: {
-      propertyEditors: ['Umb.PropertyEditorUI.Text']
-    }
-  },
-  {
-    type: 'propertyAction',
-    alias: 'Umb.PropertyAction.Clear',
-    name: 'Clear',
-    elementName: 'umb-property-action-clear',
-    js: () => import('./backoffice/property-actions/property-action-clear.element'),
-    meta: {
-      propertyEditors: ['Umb.PropertyEditorUI.Text']
-    }
-  }
+	{
+		type: 'propertyAction',
+		alias: 'Umb.PropertyAction.Copy',
+		name: 'Copy',
+		elementName: 'umb-property-action-copy',
+		js: () => import('./backoffice/property-actions/property-action-copy.element'),
+		meta: {
+			propertyEditors: ['Umb.PropertyEditorUI.Text'],
+		},
+	},
+	{
+		type: 'propertyAction',
+		alias: 'Umb.PropertyAction.Clear',
+		name: 'Clear',
+		elementName: 'umb-property-action-clear',
+		js: () => import('./backoffice/property-actions/property-action-clear.element'),
+		meta: {
+			propertyEditors: ['Umb.PropertyEditorUI.Text'],
+		},
+	},
 ];
