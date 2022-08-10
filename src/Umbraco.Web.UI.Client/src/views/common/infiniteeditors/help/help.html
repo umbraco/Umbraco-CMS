@@ -1,12 +1,15 @@
-<div style="height: 100%" ng-controller="Umbraco.Drawers.Help as vm">
-    <umb-drawer-view>
+<div ng-controller="Umbraco.Editors.HelpController as vm">
+    <umb-editor-view data-element="overlay-help">
+      <umb-editor-header
+        name="vm.title"
+        name-locked="true"
+        description="vm.subtitle"
+        description-locked="true"
+        hide-alias="true"
+        hide-icon="true"
+      ></umb-editor-header>
 
-        <umb-drawer-header
-            title="{{vm.title}}"
-            description="{{vm.subtitle}}">
-        </umb-drawer-header>
-
-        <umb-drawer-content>
+        <umb-editor-container>
 
             <!-- Doctype Tours -->
             <div class="umb-help-section" ng-if="vm.showDocTypeTour" data-element="doctype-tour">
@@ -190,23 +193,21 @@
                 </div>
               </div>
           </div>
-        </umb-drawer-content>
+        </umb-editor-container>
 
-        <umb-drawer-footer>
+        <umb-editor-footer>
+          <umb-editor-footer-content-right>
+            <umb-button
+                alias="close"
+                type="button"
+                shortcut="esc"
+                button-style="link"
+                label-key="general_close"
+                action="vm.close()">
+            </umb-button>
+          </umb-editor-footer-content-right>
+        </umb-editor-footer>
 
-            <div class="flex justify-end">
-                <umb-button
-                    alias="close"
-                    type="button"
-                    shortcut="esc"
-                    button-style="link"
-                    label-key="general_close"
-                    action="vm.closeDrawer()">
-                </umb-button>
-            </div>
-
-        </umb-drawer-footer>
-
-    </umb-drawer-view>
+    </umb-editor-view>
 
 </div>

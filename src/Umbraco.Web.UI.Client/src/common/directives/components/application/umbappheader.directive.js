@@ -65,10 +65,15 @@
 
             // toggle the help dialog by raising the global app state to toggle the help drawer
             scope.helpClick = function () {
-                var showDrawer = appState.getDrawerState("showDrawer");
-                var drawer = { view: "help", show: !showDrawer };
-                appState.setDrawerState("view", drawer.view);
-                appState.setDrawerState("showDrawer", drawer.show);
+                const helpEditor = {
+                  size: "small",
+                  view: "views/common/infiniteeditors/help/help.html",
+                  close: function() {
+                    editorService.close();
+                  }
+                };
+
+                editorService.open(helpEditor);
             };
 
             scope.avatarClick = function () {

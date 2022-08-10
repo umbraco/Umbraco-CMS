@@ -2,7 +2,7 @@
 (function () {
     "use strict";
 
-    function HelpDrawerController($scope, $routeParams, $timeout, dashboardResource, localizationService, userService, eventsService, helpService, appState, tourService, $filter, editorState, notificationsService, currentUserResource, platformService) {
+    function HelpController($scope, $routeParams, $timeout, dashboardResource, localizationService, userService, eventsService, helpService, appState, tourService, $filter, editorState, notificationsService, currentUserResource, platformService) {
 
         var vm = this;
         var evts = [];
@@ -21,7 +21,7 @@
         vm.labels.copyErrorStatus = "";
 
 
-        vm.closeDrawer = closeDrawer;
+        vm.close = close;
         vm.startTour = startTour;
         vm.getTourGroupCompletedPercentage = getTourGroupCompletedPercentage;
         vm.showTourButton = showTourButton;
@@ -34,7 +34,7 @@
 
         function startTour(tour) {
             tourService.startTour(tour);
-            closeDrawer();
+            close();
         }
 
         function oninit() {
@@ -116,8 +116,10 @@
 
         }
 
-        function closeDrawer() {
-            appState.setDrawerState("showDrawer", false);
+        function close() {
+          if ($scope.model.close) {
+            $scope.model.close();
+          }
         }
 
         function handleSectionChange() {
@@ -277,6 +279,6 @@
         oninit();
     }
 
-    angular.module("umbraco").controller("Umbraco.Drawers.Help", HelpDrawerController);
+    angular.module("umbraco").controller("Umbraco.Editors.HelpController", HelpController);
 
 })();
