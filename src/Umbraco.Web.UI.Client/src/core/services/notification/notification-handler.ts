@@ -71,7 +71,7 @@ export class UmbNotificationHandler {
 	public close(...args: any) {
 		this._closeResolver(...args);
 		// TODO: make public close method on uui-toast-notification
-		this.element._makeClose();
+		this.element._makeClose?.();
 	}
 
 	/**
