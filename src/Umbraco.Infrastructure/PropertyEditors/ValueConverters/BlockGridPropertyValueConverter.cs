@@ -65,8 +65,8 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                     return BlockGridModel.Empty;
                 }
 
-                var blockListLayout = converted.Layout?.ToObject<IEnumerable<BlockListLayoutItem>>();
-                if (blockListLayout is null)
+                var blockGridLayout = converted.Layout?.ToObject<IEnumerable<BlockGridLayoutItem>>();
+                if (blockGridLayout is null)
                 {
                     return BlockGridModel.Empty;
                 }
@@ -108,19 +108,18 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                     settingsPublishedElements[element.Key] = element;
                 }
 
-                var layout = new List<BlockGridItem>();
-                foreach (var layoutItem in blockListLayout)
+                BlockGridItem? CreateItem(BlockGridLayoutItem layoutItem)
                 {
                     // Get the content reference
                     var contentGuidUdi = (GuidUdi?)layoutItem.ContentUdi;
                     if (contentGuidUdi is null || !contentPublishedElements.TryGetValue(contentGuidUdi.Guid, out var contentData))
                     {
-                        continue;
+                        return null;
                     }
 
                     if (!blockConfigMap.TryGetValue(contentData.ContentType.Key, out var blockConfig))
                     {
-                        continue;
+                        return null;
                     }
 
                     // Get the setting reference
@@ -142,17 +141,28 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                         : typeof(IPublishedElement);
 
                     // TODO: This should be optimized/cached, as calling Activator.CreateInstance is slow
-                    var layoutType = typeof(BlockGridItem<,>).MakeGenericType(contentData.GetType(), settingsType);
-                    var layoutRef = (BlockGridItem?)Activator.CreateInstance(layoutType, contentGuidUdi, contentData, settingGuidUdi, settingsData);
+                    var gridItemType = typeof(BlockGridItem<,>).MakeGenericType(contentData.GetType(), settingsType);
+                    var gridItem = (BlockGridItem?)Activator.CreateInstance(gridItemType, contentGuidUdi, contentData, settingGuidUdi, settingsData, layoutItem.RowSpan!, layoutItem.ColumnSpan!);
 
-                    layout.Add(layoutRef!);
+                    var blockConfigAreaMap = blockConfig.Areas.ToDictionary(area => area.Key, area => area.Alias!);
+                    gridItem!.Areas = layoutItem.Areas.Select(area =>
+                    {
+                        if (!blockConfigAreaMap.TryGetValue(area.Key, out var alias))
+                        {
+                            return null;
+                        }
+                        //var alias = "TODO";
+                        var items = area.Items.Select(CreateItem).WhereNotNull().ToList();
+                        return new BlockGridArea(items, alias);
+                    }).WhereNotNull().ToArray();
+
+                    return gridItem;
                 }
 
-                var model = new BlockGridModel(layout);
+                var items = blockGridLayout.Select(CreateItem).WhereNotNull().ToList();
+                var model = new BlockGridModel(items);
                 return model;
             }
         }
-
-
     }
 }

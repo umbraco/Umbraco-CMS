@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
@@ -37,7 +37,7 @@ namespace Umbraco.Cms.Core.Models.Blocks
     public class BlockGridLayoutAreaItem
     {
         [JsonProperty("key", NullValueHandling = NullValueHandling.Ignore)]
-        public string Key { get; set; } = string.Empty;
+        public Guid Key { get; set; } = Guid.Empty;
 
         [JsonProperty("items", NullValueHandling = NullValueHandling.Ignore)]
         public BlockGridLayoutItem[] Items { get; set; } = Array.Empty<BlockGridLayoutItem>();
