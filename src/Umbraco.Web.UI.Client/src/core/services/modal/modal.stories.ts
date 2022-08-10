@@ -1,5 +1,5 @@
 import '../../../backoffice/components/backoffice-modal-container.element';
-import '../../../backoffice/property-editors/modal-content-picker.element';
+import '../../../core/services/modal/layouts/content-picker/modal-layout-content-picker.element';
 
 import '@umbraco-ui/uui-modal';
 import '@umbraco-ui/uui-modal-container';
