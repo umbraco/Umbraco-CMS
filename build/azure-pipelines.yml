@@ -536,11 +536,17 @@ stages:
                       includePreviewVersions: true
                 - task: NuGetToolInstaller@1
                   displayName: Use NuGet Latest
-                - task: NuGetCommand@2
-                  displayName: Restore NuGet Packages
+                - task: DotNetCoreCLI@2
+                  displayName: dotnet restore
                   inputs:
-                      restoreSolution: 'umbraco.sln'
-                      feedsToUse: config
+                    command: restore
+                    projects: '**/umbraco.sln'
+                  # TODO: Use NuGetCommand instead of DotNetCoreCLI
+#                - task: NuGetCommand@2
+#                  displayName: Restore NuGet Packages
+#                  inputs:
+#                      restoreSolution: 'umbraco.sln'
+#                      feedsToUse: config
                 - task: PowerShell@1
                   displayName: Update Version and Artifact Name
                   inputs:
