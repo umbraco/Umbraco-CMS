@@ -88,6 +88,12 @@ namespace Umbraco.Cms.Core.Models.Blocks
         /// </summary>
         [DataMember(Name = "areas")]
         public IEnumerable<BlockGridArea> Areas { get; set; } = Array.Empty<BlockGridArea>();
+
+        /// <summary>
+        /// The number of columns available for the areas to span
+        /// </summary>
+        [DataMember(Name = "areaGridColumns")]
+        public int? AreaGridColumns { get; set; }
     }
 
     /// <summary>

@@ -25,6 +25,9 @@ namespace Umbraco.Cms.Core.Models.Blocks
         [JsonProperty("rowSpan", NullValueHandling = NullValueHandling.Ignore)]
         public int? RowSpan { get; set; }
 
+        [JsonProperty("areaGridColumns", NullValueHandling = NullValueHandling.Ignore)]
+        public int? AreaGridColumns { get; set; }
+
         [JsonProperty("areas", NullValueHandling = NullValueHandling.Ignore)]
         public BlockGridLayoutAreaItem[] Areas { get; set; } = Array.Empty<BlockGridLayoutAreaItem>();
 

@@ -143,24 +143,28 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                     // TODO: This should be optimized/cached, as calling Activator.CreateInstance is slow
                     var gridItemType = typeof(BlockGridItem<,>).MakeGenericType(contentData.GetType(), settingsType);
                     var gridItem = (BlockGridItem?)Activator.CreateInstance(gridItemType, contentGuidUdi, contentData, settingGuidUdi, settingsData, layoutItem.RowSpan!, layoutItem.ColumnSpan!);
-
-                    var blockConfigAreaMap = blockConfig.Areas.ToDictionary(area => area.Key, area => area.Alias!);
-                    gridItem!.Areas = layoutItem.Areas.Select(area =>
+                    if (gridItem == null)
                     {
-                        if (!blockConfigAreaMap.TryGetValue(area.Key, out var alias))
+                        return null;
+                    }
+
+                    var blockConfigAreaMap = blockConfig.Areas.ToDictionary(area => area.Key);
+                    gridItem.AreaGridColumns = layoutItem.AreaGridColumns;
+                    gridItem.Areas = layoutItem.Areas.Select(area =>
+                    {
+                        if (!blockConfigAreaMap.TryGetValue(area.Key, out var areaConfig))
                         {
                             return null;
                         }
-                        //var alias = "TODO";
                         var items = area.Items.Select(CreateItem).WhereNotNull().ToList();
-                        return new BlockGridArea(items, alias);
+                        return new BlockGridArea(items, areaConfig.Alias!, areaConfig.RowSpan!.Value, areaConfig.ColumnSpan!.Value);
                     }).WhereNotNull().ToArray();
 
                     return gridItem;
                 }
 
                 var items = blockGridLayout.Select(CreateItem).WhereNotNull().ToList();
-                var model = new BlockGridModel(items);
+                var model = new BlockGridModel(items, configuration.GridColumns);
                 return model;
             }
         }

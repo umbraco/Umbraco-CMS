@@ -11,13 +11,32 @@ public class BlockGridArea : ReadOnlyCollection<BlockGridItem>
     /// </summary>
     /// <param name="list">The list to wrap.</param>
     /// <param name="alias">The area alias</param>
-    public BlockGridArea(IList<BlockGridItem> list, string alias) : base(list) => Alias = alias;
+    /// <param name="rowSpan">The number of rows this area should span</param>
+    /// <param name="columnSpan">The number of columns this area should span</param>
+    public BlockGridArea(IList<BlockGridItem> list, string alias, int rowSpan, int columnSpan) : base(list)
+    {
+        Alias = alias;
+        RowSpan = rowSpan;
+        ColumnSpan = columnSpan;
+    }
 
     /// <summary>
     /// The area alias
     /// </summary>
     [DataMember(Name = "alias")]
     public string Alias { get; }
+
+    /// <summary>
+    /// The number of rows this area should span.
+    /// </summary>
+    [DataMember(Name = "rowSpan")]
+    public int RowSpan { get; }
+
+    /// <summary>
+    /// The number of columns this area should span.
+    /// </summary>
+    [DataMember(Name = "columnSpan")]
+    public int ColumnSpan { get; }
 
     /// <summary>
     /// Gets the <see cref="BlockGridItem" /> with the specified content key.
