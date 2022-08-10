@@ -24,7 +24,7 @@ export class UmbModalService {
 		return this.open('umb-modal-layout-confirm', { data, type: 'dialog' });
 	}
 
-	public contentPicker(data: UmbModalContentPickerData): UmbModalHandler {
+	public contentPicker(data?: UmbModalContentPickerData): UmbModalHandler {
 		return this.open('umb-modal-layout-content-picker', { data, type: 'sidebar', size: 'small' });
 	}
 
