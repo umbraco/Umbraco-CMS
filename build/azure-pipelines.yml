@@ -53,7 +53,7 @@ stages:
                   displayName: Use .Net 7.x
                   inputs:
                       version: 7.x
-                      includePreviewVersion: true
+                      includePreviewVersions: true
                 - task: DotNetCoreCLI@2
                   displayName: dotnet build
                   inputs:
@@ -74,7 +74,7 @@ stages:
                   displayName: Use .Net 7.x
                   inputs:
                       version: 7.x
-                      includePreviewVersion: true
+                      includePreviewVersions: true
                 - task: DotNetCoreCLI@2
                   displayName: dotnet build
                   inputs:
@@ -95,7 +95,7 @@ stages:
                   displayName: Use .Net 7.x
                   inputs:
                       version: 7.x
-                      includePreviewVersion: true
+                      includePreviewVersions: true
                 - task: DotNetCoreCLI@2
                   displayName: dotnet build
                   inputs:
@@ -123,7 +123,7 @@ stages:
                 displayName: Use .Net 7.x
                 inputs:
                     version: 7.x
-                    includePreviewVersion: true
+                    includePreviewVersions: true
               - task: DotNetCoreCLI@2
                 displayName: dotnet build
                 inputs:
@@ -151,7 +151,7 @@ stages:
               displayName: Use .Net 7.x
               inputs:
                 version: 7.x
-                includePreviewVersion: true
+                includePreviewVersions: true
             - task: DotNetCoreCLI@2
               displayName: dotnet build
               inputs:
@@ -178,7 +178,7 @@ stages:
                 displayName: Use .Net 7.x
                 inputs:
                     version: 7.x
-                    includePreviewVersion: true
+                    includePreviewVersions: true
               - task: DotNetCoreCLI@2
                 displayName: dotnet build
                 inputs:
@@ -204,7 +204,7 @@ stages:
                 displayName: Use .Net 7.x
                 inputs:
                     version: 7.x
-                    includePreviewVersion: true
+                    includePreviewVersions: true
               - powershell: sqllocaldb start mssqllocaldb
                 displayName: Start MSSQL LocalDb
               - task: DotNetCoreCLI@2
@@ -253,7 +253,7 @@ stages:
                   displayName: Use .Net 7.x
                   inputs:
                       version: 7.x
-                      includePreviewVersion: true
+                      includePreviewVersions: true
 
                 - powershell: sqllocaldb start mssqllocaldb
                   displayName: Start MSSQL LocalDb
@@ -349,7 +349,7 @@ stages:
                   displayName: Use .Net 7.x
                   inputs:
                       version: 7.x
-                      includePreviewVersion: true
+                      includePreviewVersions: true
                 - task: Bash@3
                   displayName: Create database
                   inputs:
@@ -453,7 +453,7 @@ stages:
                   displayName: Use .Net 7.x
                   inputs:
                       version: 7.x
-                      includePreviewVersion: true
+                      includePreviewVersions: true
                 - task: NodeTool@0
                   displayName: Use Node $(nodeVersion)
                   inputs:
@@ -533,7 +533,7 @@ stages:
                   displayName: Use .Net 7.x
                   inputs:
                       version: 7.x
-                      includePreviewVersion: true
+                      includePreviewVersions: true
                 - task: NuGetToolInstaller@1
                   displayName: Use NuGet Latest
                 - task: NuGetCommand@2
@@ -672,7 +672,7 @@ stages:
                   displayName: Use .Net 7.x
                   inputs:
                       version: 7.x
-                      includePreviewVersion: true
+                      includePreviewVersions: true
                 - task: PowerShell@2
                   displayName: 'Prep build tool -  C# Docs'
                   inputs:
