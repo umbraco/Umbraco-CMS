@@ -67,7 +67,7 @@
                     if(amount < minAllowed || (maxAllowed > 0 && amount > maxAllowed)) {
                         vm.invalidBlockTypes.push({
                             'key': allowance.elementTypeKey,
-                            'name': vm.locallyAvailableBlockTypes.find(blockType => {console.log(blockType.elementTypeModel.name); return blockType.elementTypeModel.name}),
+                            'name': vm.locallyAvailableBlockTypes.find(blockType => blockType.elementTypeModel.name),
                             'amount': amount,
                             'minRequirement': minAllowed,
                             'maxRequirement': maxAllowed
