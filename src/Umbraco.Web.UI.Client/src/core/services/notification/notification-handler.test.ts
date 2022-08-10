@@ -6,7 +6,7 @@ import { UmbNotificationHandler } from './notification-handler';
 import type { UmbNotificationDefaultData } from './layouts/default';
 import type { UmbNotificationOptions } from '.';
 
-describe('UCPNotificationHandler', () => {
+describe('UmbNotificationHandler', () => {
 	let notificationHandler: UmbNotificationHandler;
 
 	beforeEach(async () => {
