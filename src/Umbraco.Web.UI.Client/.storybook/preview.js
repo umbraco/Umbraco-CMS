@@ -1,5 +1,5 @@
+import '../src/css/custom-properties.css';
 import '@umbraco-ui/uui';
-import '@umbraco-ui/uui-css/dist/uui-css.css';
 
 import { initialize, mswDecorator } from 'msw-storybook-addon';
 
