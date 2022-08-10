@@ -15,7 +15,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Security
     public class MemberPasswordHasherTests
     {
         [Test]
-        [TestCase("Password123!", "AQAAAAEAACcQAAAAEGF/tTVoL6ef3bQPZFYfbgKFu1CDQIAMgyY1N4EDt9jqdG/hsOX93X1U6LNvlIQ3mw==", null,  ExpectedResult = PasswordVerificationResult.Success, Description = "AspNetCoreIdentityPasswordHash: Correct password")]
+        [TestCase("Password123!", "AQAAAAIAAYagAAAAEJBorDjt+UEvw55UJVsbgAS6T2IGao+2XpCBbO3EKZoAMzoN+CNOpPdu1c0qrFcJVw==", null,  ExpectedResult = PasswordVerificationResult.Success, Description = "AspNetCoreIdentityPasswordHash: Correct password")]
+        [TestCase("Password123!", "AQAAAAEAACcQAAAAEGF/tTVoL6ef3bQPZFYfbgKFu1CDQIAMgyY1N4EDt9jqdG/hsOX93X1U6LNvlIQ3mw==", null,  ExpectedResult = PasswordVerificationResult.SuccessRehashNeeded, Description = "GivenALegacyAspNetCoreIdentityPasswordHash: Correct password")]
         [TestCase("wrongPassword", "AQAAAAEAACcQAAAAEGF/tTVoL6ef3bQPZFYfbgKFu1CDQIAMgyY1N4EDt9jqdG/hsOX93X1U6LNvlIQ3mw==", null,  ExpectedResult = PasswordVerificationResult.Failed, Description = "AspNetCoreIdentityPasswordHash: Wrong password")]
         [TestCase("Password123!", "yDiU2YyuYZU4jz6F0fpErQ==BxNRHkXBVyJs9gwWF6ktWdfDwYf5bwm+rvV7tOcNNx8=", null,  ExpectedResult = PasswordVerificationResult.SuccessRehashNeeded, Description = "GivenALegacyPasswordHash: Correct password")]
         [TestCase("wrongPassword", "yDiU2YyuYZU4jz6F0fpErQ==BxNRHkXBVyJs9gwWF6ktWdfDwYf5bwm+rvV7tOcNNx8=", null,  ExpectedResult = PasswordVerificationResult.Failed, Description = "GivenALegacyPasswordHash: Wrong password")]
