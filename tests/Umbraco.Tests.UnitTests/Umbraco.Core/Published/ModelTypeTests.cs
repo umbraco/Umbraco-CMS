@@ -44,7 +44,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Published
             Assert.AreEqual("System.Int32[]", type.MakeArrayType().FullName);
 
             // Note the inner assembly qualified name
-            Assert.AreEqual("System.Collections.Generic.IEnumerable`1[[System.Int32[], System.Private.CoreLib, Version=6.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]", typeof(IEnumerable<>).MakeGenericType(type.MakeArrayType()).FullName);
+            Assert.AreEqual("System.Collections.Generic.IEnumerable`1[[System.Int32[], System.Private.CoreLib, Version=7.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]", typeof(IEnumerable<>).MakeGenericType(type.MakeArrayType()).FullName);
         }
 
         [Test]
