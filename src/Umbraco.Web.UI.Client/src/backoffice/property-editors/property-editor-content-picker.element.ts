@@ -2,14 +2,14 @@ import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 
+import { UmbContextConsumerMixin } from '../../core/context';
+import { UmbModalService } from '../../core/services/modal';
+
+// TODO: remove these imports when they are part of UUI
 import '@umbraco-ui/uui-modal';
 import '@umbraco-ui/uui-modal-sidebar';
 import '@umbraco-ui/uui-modal-container';
 import '@umbraco-ui/uui-modal-dialog';
-import { UmbContextConsumerMixin } from '../../core/context';
-import { UmbModalService } from '../../core/services/modal';
-
-import './modal-content-picker.element';
 
 @customElement('umb-property-editor-content-picker')
 export class UmbPropertyEditorContentPicker extends UmbContextConsumerMixin(LitElement) {
@@ -50,23 +50,34 @@ export class UmbPropertyEditorContentPicker extends UmbContextConsumerMixin(LitE
 	}
 
 	private _open() {
-		const modalHandler = this._modalService?.openSidebar('umb-modal-content-picker', { size: 'small' });
-		modalHandler?.onClose.then((result) => {
-			this._selectedContent = [...this._selectedContent, ...result];
+		const modalHandler = this._modalService?.contentPicker({ multiple: true });
+		modalHandler?.onClose.then(({ selection }: any) => {
+			this._selectedContent = [...this._selectedContent, ...selection];
 			this.requestUpdate('_selectedContent');
 		});
 	}
 
-	private _removeContent(index: number) {
-		this._selectedContent.splice(index, 1);
-		this.requestUpdate('_selectedContent');
+	private _removeContent(index: number, content: any) {
+		const modalHandler = this._modalService?.confirm({
+			color: 'danger',
+			headline: 'Remove',
+			confirmLabel: 'Remove',
+			content: html`Remove <strong>${content.name}</strong>?`,
+		});
+
+		modalHandler?.onClose.then(({ confirmed }) => {
+			if (confirmed) {
+				this._selectedContent.splice(index, 1);
+				this.requestUpdate('_selectedContent');
+			}
+		});
 	}
 
 	private _renderContent(content: any, index: number) {
 		return html`
 			<uui-ref-node name=${content.name} detail=${content.id}>
 				<uui-action-bar slot="actions">
-					<uui-button @click=${() => this._removeContent(index)}>Remove</uui-button>
+					<uui-button @click=${() => this._removeContent(index, content)}>Remove</uui-button>
 				</uui-action-bar>
 			</uui-ref-node>
 		`;

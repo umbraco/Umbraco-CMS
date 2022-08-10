@@ -1,10 +1,14 @@
 import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
-import { UmbModalHandler } from '../../core/services/modal';
+import { UmbModalHandler } from '../../../modal';
 
-@customElement('umb-modal-content-picker')
-class UmbModalContentPicker extends LitElement {
+export interface UmbModalContentPickerData {
+	multiple: boolean;
+}
+
+@customElement('umb-modal-layout-content-picker')
+export class UmbModalContentPickerElement extends LitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -78,7 +82,7 @@ class UmbModalContentPicker extends LitElement {
 	}
 
 	private _submit() {
-		this.modalHandler?.close(this._selectedContent);
+		this.modalHandler?.close({ selection: this._selectedContent });
 	}
 
 	private _close() {
@@ -115,6 +119,6 @@ class UmbModalContentPicker extends LitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-modal-content-picker': UmbModalContentPicker;
+		'umb-modal-layout-content-picker': UmbModalContentPickerElement;
 	}
 }

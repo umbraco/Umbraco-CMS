@@ -4,7 +4,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { Subscription } from 'rxjs';
 import { UmbContextConsumerMixin } from '../../core/context';
-import { UmbModalService } from '../../core/services/modal';
+import { UmbModalHandler, UmbModalService } from '../../core/services/modal';
 
 @customElement('umb-backoffice-modal-container')
 export class UmbBackofficeModalContainer extends UmbContextConsumerMixin(LitElement) {
@@ -18,7 +18,7 @@ export class UmbBackofficeModalContainer extends UmbContextConsumerMixin(LitElem
 	];
 
 	@state()
-	private _modals: any[] = [];
+	private _modals: UmbModalHandler[] = [];
 
 	private _modalService?: UmbModalService;
 	private _modalSubscription?: Subscription;
@@ -29,9 +29,8 @@ export class UmbBackofficeModalContainer extends UmbContextConsumerMixin(LitElem
 		this.consumeContext('umbModalService', (modalService: UmbModalService) => {
 			this._modalService = modalService;
 			this._modalSubscription?.unsubscribe();
-			this._modalService?.modals.subscribe((modals: Array<any>) => {
+			this._modalService?.modals.subscribe((modals: Array<UmbModalHandler>) => {
 				this._modals = modals;
-				console.log('modals', modals);
 			});
 		});
 	}
@@ -43,7 +42,9 @@ export class UmbBackofficeModalContainer extends UmbContextConsumerMixin(LitElem
 
 	render() {
 		return html`
-			<uui-modal-container> ${repeat(this._modals, (modal) => html`${modal.modal}`)} </uui-modal-container>
+			<uui-modal-container>
+				${repeat(this._modals, (modalHandler) => html`${modalHandler.element}`)})})}
+			</uui-modal-container>
 		`;
 	}
 }

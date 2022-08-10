@@ -1,42 +1,63 @@
-import { html, render } from 'lit';
+import { UUIDialogElement } from '@umbraco-ui/uui';
+import { UUIModalDialogElement } from '@umbraco-ui/uui-modal-dialog';
+import { UUIModalSidebarElement, UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
+import { v4 as uuidv4 } from 'uuid';
+import { UmbModalOptions } from './modal.service';
 
 //TODO consider splitting this into two separate handlers
 export class UmbModalHandler {
 	private _closeResolver: any;
 	private _closePromise: any;
 
-	public element?: any;
+	public element: UUIModalDialogElement | UUIModalSidebarElement;
 	public key: string;
-	public modal: any;
+	public type: string;
+	public size: UUIModalSidebarSize;
 
-	constructor(elementName: string, modalElementName: string, modalOptions?: any) {
-		this.key = Date.now().toString(); //TODO better key
-		this._createLayoutElement(elementName, modalElementName, modalOptions);
+	constructor(elementName: string, options: UmbModalOptions<unknown>) {
+		this.key = uuidv4();
+
+		this.type = options.type || 'dialog';
+		this.size = options.size || 'small';
+		this.element = this._createElement(elementName, options);
+
 		this._closePromise = new Promise((resolve) => {
 			this._closeResolver = resolve;
 		});
 	}
 
-	private _createLayoutElement(elementName: string, modalElementName: string, modalOptions?: any) {
-		this.modal = document.createElement(modalElementName);
-		this.modal.addEventListener('close-end', () => {
-			this._closeResolver();
-		});
+	private _createElement(elementName: string, options: UmbModalOptions<unknown>) {
+		const layoutElement = this._createLayoutElement(elementName, options);
+		return options.type === 'sidebar'
+			? this._createSidebarElement(layoutElement)
+			: this._createDialogElement(layoutElement);
+	}
 
-		if (modalOptions) {
-			// Apply modal options as attributes on the modal
-			Object.keys(modalOptions).forEach((option) => {
-				this.modal.setAttribute(option, modalOptions[option]);
-			});
-		}
+	private _createSidebarElement(layoutElement: HTMLElement) {
+		const sidebarElement = document.createElement('uui-modal-sidebar');
+		sidebarElement.appendChild(layoutElement);
+		sidebarElement.size = this.size;
+		return sidebarElement;
+	}
 
-		this.element = document.createElement(elementName);
-		this.modal.appendChild(this.element);
-		this.element.modalHandler = this;
+	private _createDialogElement(layoutElement: HTMLElement) {
+		const modalDialogElement = document.createElement('uui-modal-dialog');
+		const dialogElement: UUIDialogElement = document.createElement('uui-dialog');
+		modalDialogElement.appendChild(dialogElement);
+		dialogElement.appendChild(layoutElement);
+		return modalDialogElement;
+	}
+
+	private _createLayoutElement(elementName: string, options: UmbModalOptions<unknown>) {
+		const layoutElement: any = document.createElement(elementName);
+		layoutElement.data = options.data;
+		layoutElement.modalHandler = this;
+		return layoutElement;
 	}
 
 	public close(...args: any) {
 		this._closeResolver(...args);
+		this.element.close();
 	}
 
 	public get onClose(): Promise<any> {
