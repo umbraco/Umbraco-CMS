@@ -11,21 +11,21 @@ export interface UmbModalConfirmData {
 }
 
 @customElement('umb-modal-layout-confirm')
-export class UmbModelLayoutConfirmElement extends LitElement {
+export class UmbModalLayoutConfirmElement extends LitElement {
 	static styles = [UUITextStyles];
 
 	@property({ attribute: false })
-	modalHandler!: UmbModalHandler;
+	modalHandler?: UmbModalHandler;
 
 	@property({ type: Object })
-	data!: UmbModalConfirmData;
+	data?: UmbModalConfirmData;
 
 	private _handleConfirm() {
-		this.modalHandler.close({ confirmed: true });
+		this.modalHandler?.close({ confirmed: true });
 	}
 
 	private _handleCancel() {
-		this.modalHandler.close({ confirmed: false });
+		this.modalHandler?.close({ confirmed: false });
 	}
 
 	render() {
@@ -48,6 +48,6 @@ export class UmbModelLayoutConfirmElement extends LitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-modal-layout-confirm': UmbModelLayoutConfirmElement;
+		'umb-modal-layout-confirm': UmbModalLayoutConfirmElement;
 	}
 }

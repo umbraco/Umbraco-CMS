@@ -8,7 +8,7 @@ export interface UmbModalContentPickerData {
 }
 
 @customElement('umb-modal-layout-content-picker')
-export class UmbModalContentPickerElement extends LitElement {
+export class UmbModalLayoutContentPickerElement extends LitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -46,6 +46,9 @@ export class UmbModalContentPickerElement extends LitElement {
 
 	@property({ attribute: false })
 	modalHandler?: UmbModalHandler;
+
+	@property({ type: Object })
+	data?: UmbModalContentPickerData;
 
 	private _tempContent = [
 		{
@@ -119,6 +122,6 @@ export class UmbModalContentPickerElement extends LitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-modal-layout-content-picker': UmbModalContentPickerElement;
+		'umb-modal-layout-content-picker': UmbModalLayoutContentPickerElement;
 	}
 }

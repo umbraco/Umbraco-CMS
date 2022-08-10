@@ -13,7 +13,7 @@ export type UmbModelType = 'dialog' | 'sidebar';
 export interface UmbModalOptions<UmbModalData> {
 	type?: UmbModelType;
 	size?: UUIModalSidebarSize;
-	data: UmbModalData;
+	data?: UmbModalData;
 }
 
 export class UmbModalService {
@@ -28,7 +28,7 @@ export class UmbModalService {
 		return this.open('umb-modal-layout-content-picker', { data, type: 'sidebar', size: 'small' });
 	}
 
-	public open(elementName: string, options: UmbModalOptions<unknown>): UmbModalHandler {
+	public open(elementName: string, options?: UmbModalOptions<unknown>): UmbModalHandler {
 		const modalHandler = new UmbModalHandler(elementName, options);
 
 		modalHandler.element.addEventListener('close-end', () => this._handleCloseEnd(modalHandler));

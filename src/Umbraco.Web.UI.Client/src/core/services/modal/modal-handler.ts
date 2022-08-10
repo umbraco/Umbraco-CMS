@@ -14,11 +14,11 @@ export class UmbModalHandler {
 	public type: string;
 	public size: UUIModalSidebarSize;
 
-	constructor(elementName: string, options: UmbModalOptions<unknown>) {
+	constructor(elementName: string, options?: UmbModalOptions<unknown>) {
 		this.key = uuidv4();
 
-		this.type = options.type || 'dialog';
-		this.size = options.size || 'small';
+		this.type = options?.type || 'dialog';
+		this.size = options?.size || 'small';
 		this.element = this._createElement(elementName, options);
 
 		this._closePromise = new Promise((resolve) => {
@@ -26,9 +26,9 @@ export class UmbModalHandler {
 		});
 	}
 
-	private _createElement(elementName: string, options: UmbModalOptions<unknown>) {
-		const layoutElement = this._createLayoutElement(elementName, options);
-		return options.type === 'sidebar'
+	private _createElement(elementName: string, options?: UmbModalOptions<unknown>) {
+		const layoutElement = this._createLayoutElement(elementName, options?.data);
+		return this.type === 'sidebar'
 			? this._createSidebarElement(layoutElement)
 			: this._createDialogElement(layoutElement);
 	}
@@ -48,9 +48,9 @@ export class UmbModalHandler {
 		return modalDialogElement;
 	}
 
-	private _createLayoutElement(elementName: string, options: UmbModalOptions<unknown>) {
+	private _createLayoutElement(elementName: string, data: unknown) {
 		const layoutElement: any = document.createElement(elementName);
-		layoutElement.data = options.data;
+		layoutElement.data = data;
 		layoutElement.modalHandler = this;
 		return layoutElement;
 	}

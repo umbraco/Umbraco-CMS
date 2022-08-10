@@ -11,7 +11,7 @@ import { html } from 'lit-html';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UmbContextConsumerMixin } from '../../context';
 import { LitElement } from 'lit';
-import { UmbModalHandler, UmbModalService } from './';
+import { UmbModalHandler, UmbModalOptions, UmbModalService } from './';
 
 export default {
 	title: 'API/Modals',
@@ -105,7 +105,7 @@ class StoryModalServiceExampleElement extends UmbContextConsumerMixin(LitElement
 	modalType: 'dialog' | 'sidebar' = 'dialog';
 
 	@property()
-	modalOptions = { size: 'small' };
+	modalOptions: UmbModalOptions<unknown> = { type: 'sidebar', size: 'small' };
 
 	@state()
 	value = '';
@@ -120,10 +120,10 @@ class StoryModalServiceExampleElement extends UmbContextConsumerMixin(LitElement
 	private _open() {
 		let modalHandler = null;
 		if (this.modalType === 'dialog') {
-			modalHandler = this._modalService?.openDialog('story-modal-service-dialog-example');
+			modalHandler = this._modalService?.open('story-modal-service-dialog-example');
 		}
 		if (this.modalType === 'sidebar') {
-			modalHandler = this._modalService?.openSidebar('story-modal-service-sidebar-example', this.modalOptions);
+			modalHandler = this._modalService?.open('story-modal-service-sidebar-example', this.modalOptions);
 		}
 		modalHandler?.onClose.then((result) => {
 			this.value = result ?? this.value;
