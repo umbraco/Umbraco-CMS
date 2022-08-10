@@ -7,6 +7,7 @@ using System.Linq;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Serialization;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
@@ -16,14 +17,14 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
     {
         private readonly IProfilingLogger _proflog;
         private readonly BlockEditorConverter _blockConverter;
-        private readonly BlockListEditorDataConverter _blockListEditorDataConverter;
+        private readonly BlockGridEditorDataConverter _blockGridEditorDataConverter;
 
         // Niels, Change: I would love if this could be general, so we don't need a specific one for each block property editor....
-        public BlockGridPropertyValueConverter(IProfilingLogger proflog, BlockEditorConverter blockConverter)
+        public BlockGridPropertyValueConverter(IProfilingLogger proflog, BlockEditorConverter blockConverter, IJsonSerializer jsonSerializer)
         {
             _proflog = proflog;
             _blockConverter = blockConverter;
-            _blockListEditorDataConverter = new BlockListEditorDataConverter();
+            _blockGridEditorDataConverter = new BlockGridEditorDataConverter(jsonSerializer);
         }
 
         /// <inheritdoc />
@@ -58,7 +59,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                     return BlockListModel.Empty;
                 }
 
-                var converted = _blockListEditorDataConverter.Deserialize(value);
+                var converted = _blockGridEditorDataConverter.Deserialize(value);
                 if (converted.BlockValue.ContentData.Count == 0)
                 {
                     return BlockListModel.Empty;
@@ -71,7 +72,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                 }
 
                 // Get configuration
-                var configuration = propertyType.DataType.ConfigurationAs<BlockListConfiguration>();
+                var configuration = propertyType.DataType.ConfigurationAs<BlockGridConfiguration>();
                 if (configuration is null)
                 {
                     return null;
