@@ -1,0 +1,19 @@
+<style>
+    button {
+        display: block;
+        width: 100%;
+        height: 100%;
+        padding: 0;
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+        max-height: 400px;
+        pointer-events: none;
+        user-select: none;
+    }
+</style>
+
+<button ng-controller="Umbraco.PropertyEditors.BlockEditor.MediaBlockEditor as bc" type="button" ng-click="block.edit()" ng-focus="block.focus">
+    <img ng-if="bc.isImage" ng-src="{{bc.imageSource}}" alt="{{bc.mediaName}}" />
+</button>
+<slot name="areas" part="areas"></slot>
