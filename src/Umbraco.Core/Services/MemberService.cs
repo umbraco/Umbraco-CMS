@@ -180,10 +180,10 @@ namespace Umbraco.Cms.Core.Services
             => CreateMemberWithIdentity(username, email, string.Empty, string.Empty, memberTypeAlias, isApproved);
 
         public IMember CreateMemberWithIdentity(string username, string email, string name, string memberTypeAlias)
-            => CreateMemberWithIdentity(username, email, string.Empty, string.Empty, memberTypeAlias);
+            => CreateMemberWithIdentity(username, email, name, string.Empty, memberTypeAlias);
 
         public IMember CreateMemberWithIdentity(string username, string email, string name, string memberTypeAlias, bool isApproved)
-            => CreateMemberWithIdentity(username, string.Empty, name, string.Empty, memberTypeAlias, isApproved);
+            => CreateMemberWithIdentity(username, email, name, string.Empty, memberTypeAlias, isApproved);
 
         /// <summary>
         /// Creates and persists a Member
