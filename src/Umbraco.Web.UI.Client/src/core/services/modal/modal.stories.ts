@@ -51,14 +51,12 @@ class StoryModalServiceExampleElement extends UmbContextConsumerMixin(LitElement
 	}
 
 	private _open() {
-		let modalHandler: UmbModalHandler | undefined;
-
 		switch (this.modalLayout) {
 			case 'Content Picker':
-				modalHandler = this._modalService?.contentPicker();
+				this._modalService?.contentPicker();
 				break;
 			default:
-				modalHandler = this._modalService?.confirm({
+				this._modalService?.confirm({
 					headline: 'Headline',
 					content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
 				});
