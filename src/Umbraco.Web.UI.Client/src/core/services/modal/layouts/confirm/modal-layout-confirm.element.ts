@@ -1,7 +1,7 @@
-import { html, LitElement, TemplateResult } from 'lit';
+import { html, TemplateResult } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, property } from 'lit/decorators.js';
-import { UmbModalHandler } from '../../../modal';
+import { customElement } from 'lit/decorators.js';
+import { UmbModalLayoutElement } from '../modal-layout.element';
 
 export interface UmbModalConfirmData {
 	headline: string;
@@ -11,14 +11,8 @@ export interface UmbModalConfirmData {
 }
 
 @customElement('umb-modal-layout-confirm')
-export class UmbModalLayoutConfirmElement extends LitElement {
+export class UmbModalLayoutConfirmElement extends UmbModalLayoutElement<UmbModalConfirmData> {
 	static styles = [UUITextStyles];
-
-	@property({ attribute: false })
-	modalHandler?: UmbModalHandler;
-
-	@property({ type: Object })
-	data?: UmbModalConfirmData;
 
 	private _handleConfirm() {
 		this.modalHandler?.close({ confirmed: true });
@@ -30,7 +24,7 @@ export class UmbModalLayoutConfirmElement extends LitElement {
 
 	render() {
 		return html`
-			<uui-dialog-layout class="uui-text" .headline=${this.data?.headline}>
+			<uui-dialog-layout class="uui-text" .headline=${this.data?.headline || null}>
 				${this.data?.content}
 
 				<uui-button slot="actions" id="cancel" label="Cancel" @click="${this._handleCancel}">Cancel</uui-button>
