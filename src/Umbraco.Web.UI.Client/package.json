@@ -34,7 +34,7 @@
     "npm": ">=8.0.0 < 9"
   },
   "dependencies": {
-    "@umbraco-ui/uui": "^1.0.0-rc.1",
+    "@umbraco-ui/uui": "^1.0.0-rc.2",
     "element-internals-polyfill": "^1.1.6",
     "lit": "^2.2.8",
     "openapi-typescript-fetch": "^1.1.3",
