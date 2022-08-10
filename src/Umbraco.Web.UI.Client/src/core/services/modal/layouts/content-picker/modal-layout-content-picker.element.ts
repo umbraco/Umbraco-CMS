@@ -4,7 +4,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { UmbModalLayoutElement } from '../modal-layout.element';
 
 export interface UmbModalContentPickerData {
-	multiple: boolean;
+	multiple?: boolean;
 }
 
 @customElement('umb-modal-layout-content-picker')
