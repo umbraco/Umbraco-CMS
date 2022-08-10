@@ -15,6 +15,10 @@ export default {
 	},
   testRunnerHtml: (testFramework) =>
     `<html>
+			<head>
+				<link rel="stylesheet" href="/node_modules/@umbraco-ui/uui-css/dist/uui-css.css">
+				<link rel="stylesheet" href="/src/css/custom-properties.css">
+			</head>
       <body>
         <script type="module" src="${testFramework}"></script>
         <script type="module">
