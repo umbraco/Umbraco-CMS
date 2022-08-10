@@ -210,7 +210,7 @@ stages:
                     gulpFile: src\Umbraco.Web.UI.Client\gulpfile.js
                     targets: build
                     workingDirectory: src\Umbraco.Web.UI.Client
-                - powershell: Start-Process -FilePath "dotnet" -ArgumentList "run", "-p", "src\Umbraco.Web.UI\Umbraco.Web.UI.csproj"
+                - powershell: Start-Process -FilePath "dotnet" -ArgumentList "run", "-p", "src\Umbraco.Web.UI\Umbraco.Web.UI.csproj /Umbraco:CMS:Global:Id=0000000-0000-0000-0000-000000000042"
                   displayName: dotnet run
 #                - powershell: dotnet run --no-build -p .\src\Umbraco.Web.UI\Umbraco.Web.UI.csproj
 #                  displayName: dotnet run
@@ -313,7 +313,7 @@ stages:
                   displayName: dotnet run
                   inputs:
                     targetType: 'inline'
-                    script: 'nohup dotnet run --no-build -p ./src/Umbraco.Web.UI/ > $(Build.ArtifactStagingDirectory)/dotnet_run_log_linux.txt &'
+                    script: 'nohup dotnet run --no-build -p ./src/Umbraco.Web.UI/ /Umbraco:CMS:Global:Id=0000000-0000-0000-0000-000000000042 > $(Build.ArtifactStagingDirectory)/dotnet_run_log_linux.txt &'
                 - task: Bash@3
                   displayName: Generate Cypress.env.json
                   inputs:
