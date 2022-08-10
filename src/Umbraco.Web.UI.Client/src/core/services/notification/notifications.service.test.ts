@@ -1,5 +1,6 @@
 import { expect } from '@open-wc/testing';
-import { UmbNotificationService, UmbNotificationHandler } from './';
+
+import { UmbNotificationHandler, UmbNotificationService } from '.';
 
 describe('UCPNotificationService', () => {
 	let notificationService: UmbNotificationService;

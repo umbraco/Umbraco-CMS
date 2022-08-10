@@ -29,3 +29,6 @@ types
 
 # eslint
 .eslintcache
+
+# storybook
+storybook-static/
