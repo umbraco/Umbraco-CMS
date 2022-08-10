@@ -32,7 +32,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             => propertyType.EditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases.BlockGrid);
 
         /// <inheritdoc />
-        public override Type GetPropertyValueType(IPublishedPropertyType propertyType) => typeof(BlockListModel);
+        public override Type GetPropertyValueType(IPublishedPropertyType propertyType) => typeof(BlockGridModel);
 
         /// <inheritdoc />
         public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
@@ -56,19 +56,19 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                 // Short-circuit on empty values
                 if (string.IsNullOrWhiteSpace(value))
                 {
-                    return BlockListModel.Empty;
+                    return BlockGridModel.Empty;
                 }
 
                 var converted = _blockGridEditorDataConverter.Deserialize(value);
                 if (converted.BlockValue.ContentData.Count == 0)
                 {
-                    return BlockListModel.Empty;
+                    return BlockGridModel.Empty;
                 }
 
                 var blockListLayout = converted.Layout?.ToObject<IEnumerable<BlockListLayoutItem>>();
                 if (blockListLayout is null)
                 {
-                    return BlockListModel.Empty;
+                    return BlockGridModel.Empty;
                 }
 
                 // Get configuration
