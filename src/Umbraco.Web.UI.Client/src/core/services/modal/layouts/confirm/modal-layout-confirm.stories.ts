@@ -17,7 +17,10 @@ const positiveData: UmbModalConfirmData = {
 };
 
 export const Positive: Story<UmbModalLayoutConfirmElement> = () => html`
-	<umb-modal-layout-confirm .data=${positiveData}></umb-modal-layout-confirm>
+	<!-- TODO: figure out if generics are allowed for properties: 
+	https://github.com/runem/lit-analyzer/issues/149
+	https://github.com/runem/lit-analyzer/issues/163 -->
+	<umb-modal-layout-confirm .data=${positiveData as any}></umb-modal-layout-confirm>
 `;
 
 const dangerData: UmbModalConfirmData = {
@@ -28,5 +31,8 @@ const dangerData: UmbModalConfirmData = {
 };
 
 export const Danger: Story<UmbModalLayoutConfirmElement> = () => html`
-	<umb-modal-layout-confirm .data=${dangerData}></umb-modal-layout-confirm>
+	<!-- TODO: figure out if generics are allowed for properties: 
+	https://github.com/runem/lit-analyzer/issues/149
+	https://github.com/runem/lit-analyzer/issues/163 -->
+	<umb-modal-layout-confirm .data=${dangerData as any}></umb-modal-layout-confirm>
 `;

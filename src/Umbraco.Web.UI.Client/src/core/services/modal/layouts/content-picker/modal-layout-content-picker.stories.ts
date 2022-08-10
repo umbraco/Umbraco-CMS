@@ -13,6 +13,9 @@ export default {
 
 const data: UmbModalContentPickerData = {};
 
-export const Overview: Story<UmbModalLayoutConfirmElement> = () => html`
-	<umb-modal-layout-content-picker .data=${data}></umb-modal-layout-content-picker>
+export const Overview: Story<UmbModalLayoutContentPickerElement> = () => html`
+	<!-- TODO: figure out if generics are allowed for properties: 
+	https://github.com/runem/lit-analyzer/issues/149
+	https://github.com/runem/lit-analyzer/issues/163 -->
+	<umb-modal-layout-content-picker .data=${data as any}></umb-modal-layout-content-picker>
 `;
