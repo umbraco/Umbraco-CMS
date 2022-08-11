@@ -1,21 +1,15 @@
-export interface DocumentNode {
+import { UmbData } from './data';
+
+export interface NodeEntity {
 	id: number;
 	key: string;
 	name: string;
-	alias: string;
 	icon: string; // TODO: should come from the doc type?
+	type: string;
 	properties: Array<NodeProperty>;
 	data: Array<NodePropertyData>;
+	variants: Array<any>; // TODO: define variant data
 	//layout?: any; // TODO: define layout type - make it non-optional
-}
-
-export interface DataTypeEntity {
-	id: number;
-	key: string;
-	name: string;
-	//icon: string; // TODO: should come from the doc type?
-	//configUI: any; // this is the prevalues...
-	propertyEditorUIAlias: string;
 }
 
 export interface NodeProperty {
@@ -27,7 +21,7 @@ export interface NodeProperty {
 
 export interface NodePropertyData {
 	alias: string;
-	value: unknown;
+	value: any;
 }
 
 /* TODO:
@@ -37,12 +31,12 @@ We would like the tree items to stay up to date, without requesting the server a
 
 If we split entityData into its own object, then that could go in the entityStore and be merged with the nodeStore (we would have a subscription on both).
 */
-export const data: Array<DocumentNode> = [
+export const data: Array<NodeEntity> = [
 	{
 		id: 1,
 		key: '74e4008a-ea4f-4793-b924-15e02fd380d1',
 		name: 'Document 1',
-		alias: 'document1',
+		type: 'document',
 		icon: 'document',
 		properties: [
 			{
@@ -68,6 +62,7 @@ export const data: Array<DocumentNode> = [
 				value: 'Every day, a rabbit in a military costume greets me at the front door',
 			},
 		],
+		variants: [{ name: 'fake data' }],
 		/*
     // Concept for node layout, separation of design from config and data.
     layout: [
@@ -91,7 +86,7 @@ export const data: Array<DocumentNode> = [
 		id: 2,
 		key: '74e4008a-ea4f-4793-b924-15e02fd380d2',
 		name: 'Document 2',
-		alias: 'document2',
+		type: 'document',
 		icon: 'favorite',
 		properties: [
 			{
@@ -148,35 +143,81 @@ export const data: Array<DocumentNode> = [
 				value: '',
 			},
 		],
+		variants: [{ name: 'Variant 1' }],
+	},
+	{
+		id: 3,
+		key: 'cdd30288-2d1c-41b4-89a9-61647b4a10d5',
+		name: 'Document 3',
+		type: 'document',
+		icon: 'document',
+		properties: [
+			{
+				alias: 'myDescription',
+				label: 'Description',
+				description: 'Textarea property',
+				dataTypeKey: 'dt-2',
+			},
+		],
+		data: [
+			{
+				alias: 'myDescription',
+				value: 'Every day, a rabbit in a military costume greets me at the front door',
+			},
+		],
+		variants: [{ name: 'Variant 1' }],
+	},
+	{
+		id: 2001,
+		key: 'f2f81a40-c989-4b6b-84e2-057cecd3adc1',
+		name: 'Media 1',
+		type: 'media',
+		icon: 'picture',
+		properties: [
+			{
+				alias: 'myMediaHeadline',
+				label: 'Media Headline',
+				description: 'Text string property',
+				dataTypeKey: 'dt-1',
+			},
+		],
+		data: [
+			{
+				alias: 'myMediaHeadline',
+				value: 'The daily life at Umbraco HQ',
+			},
+		],
+		variants: [],
+	},
+	{
+		id: 2002,
+		key: '69431027-8867-45bf-a93b-72bbdabfb177',
+		type: 'media',
+		name: 'Media 2',
+		icon: 'picture',
+		properties: [
+			{
+				alias: 'myMediaDescription',
+				label: 'Description',
+				description: 'Textarea property',
+				dataTypeKey: 'dt-2',
+			},
+		],
+		data: [
+			{
+				alias: 'myMediaDescription',
+				value: 'Every day, a rabbit in a military costume greets me at the front door',
+			},
+		],
+		variants: [],
 	},
 ];
 
 // Temp mocked database
-class UmbContentData {
-	private _data: Array<DocumentNode> = [];
-
+class UmbNodeData extends UmbData<NodeEntity> {
 	constructor() {
-		this._data = data;
-	}
-
-	getById(id: number) {
-		return this._data.find((item) => item.id === id);
-	}
-
-	save(nodes: DocumentNode[]) {
-		nodes.forEach((node) => {
-			const foundIndex = this._data.findIndex((item) => item.id === node.id);
-			if (foundIndex !== -1) {
-				// replace
-				this._data[foundIndex] = node;
-			} else {
-				// new
-				this._data.push(node);
-			}
-		});
-		//console.log('save:', nodes);
-		return nodes;
+		super(data);
 	}
 }
 
-export const umbContentData = new UmbContentData();
+export const umbNodeData = new UmbNodeData();

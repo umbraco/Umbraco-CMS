@@ -3,7 +3,7 @@ import { css, html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
 
 @customElement('umb-dashboard-welcome')
-export class UmbDashboardWelcome extends LitElement {
+export class UmbDashboardWelcomeElement extends LitElement {
 	static styles = [UUITextStyles, css``];
 
 	render() {
@@ -18,6 +18,6 @@ export class UmbDashboardWelcome extends LitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-dashboard-welcome': UmbDashboardWelcome;
+		'umb-dashboard-welcome': UmbDashboardWelcomeElement;
 	}
 }

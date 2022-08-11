@@ -3,7 +3,7 @@ import { html } from 'lit';
 import { UmbModalLayoutContentPickerElement, UmbModalContentPickerData } from './modal-layout-content-picker.element';
 import './modal-layout-content-picker.element';
 
-import '../../../../../backoffice/components/editor-layout.element';
+import '../../../../../backoffice/editors/shared/editor-layout/editor-layout.element';
 
 export default {
 	title: 'API/Modals/Layouts/Content Picker',

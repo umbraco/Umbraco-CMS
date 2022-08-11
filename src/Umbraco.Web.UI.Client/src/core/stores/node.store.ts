@@ -1,11 +1,11 @@
 import { BehaviorSubject, map, Observable } from 'rxjs';
-import { DocumentNode } from '../../mocks/data/content.data';
+import { NodeEntity, umbNodeData } from '../../mocks/data/node.data';
 
 export class UmbNodeStore {
-	private _nodes: BehaviorSubject<Array<DocumentNode>> = new BehaviorSubject(<Array<DocumentNode>>[]);
-	public readonly nodes: Observable<Array<DocumentNode>> = this._nodes.asObservable();
+	private _nodes: BehaviorSubject<Array<NodeEntity>> = new BehaviorSubject(<Array<NodeEntity>>[]);
+	public readonly nodes: Observable<Array<NodeEntity>> = this._nodes.asObservable();
 
-	getById(id: number): Observable<DocumentNode | null> {
+	getById(id: number): Observable<NodeEntity | null> {
 		// fetch from server and update store
 		fetch(`/umbraco/backoffice/content/${id}`)
 			.then((res) => res.json())
@@ -13,14 +13,19 @@ export class UmbNodeStore {
 				this._updateStore(data);
 			});
 
-		return this.nodes.pipe(
-			map((nodes: Array<DocumentNode>) => nodes.find((node: DocumentNode) => node.id === id) || null)
-		);
+		return this.nodes.pipe(map((nodes: Array<NodeEntity>) => nodes.find((node: NodeEntity) => node.id === id) || null));
+	}
+
+	// TODO: temp solution until we know where to get tree data from
+	getAll(): Observable<Array<NodeEntity>> {
+		const nodes = umbNodeData.getAll();
+		this._nodes.next(nodes);
+		return this.nodes;
 	}
 
 	// TODO: Use Node type, to not be specific about Document.
 	// TODO: make sure UI somehow can follow the status of this action.
-	save(data: DocumentNode[]): Promise<void> {
+	save(data: NodeEntity[]): Promise<void> {
 		// fetch from server and update store
 		// TODO: use Fetcher API.
 		let body: string;
@@ -48,7 +53,7 @@ export class UmbNodeStore {
 
 	private _updateStore(fetchedNodes: Array<any>) {
 		const storedNodes = this._nodes.getValue();
-		const updated: DocumentNode[] = [...storedNodes];
+		const updated: NodeEntity[] = [...storedNodes];
 
 		fetchedNodes.forEach((fetchedNode) => {
 			const index = storedNodes.map((storedNode) => storedNode.id).indexOf(fetchedNode.id);
