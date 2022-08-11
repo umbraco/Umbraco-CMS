@@ -14,24 +14,13 @@
         animation: inherit;
     }
 
-    :host {
-        
-    }
-
     .blockelement-gridblock-editor {
         position: relative;
         border-radius: 3px;
         height: 100%;/* Add this to fill the cell fully */
         box-sizing: border-box;
-        border: 1px solid lightgrey;
+        border: 1px solid #BBBABF;
         background-color: white;
-    }
-    .blockelement-gridblock-editor:hover::after {
-        content: '';
-        position: absolute;
-        inset: 0;
-        border-radius: 3px;
-        pointer-events: none;
     }
     
     .blockelement-gridblock-editor > button {
@@ -41,13 +30,16 @@
         width: 100%;
         min-height: 48px;
         cursor: pointer;
-        color: @ui-action-discreet-type;
+        color: #1b264f;
         background-color: white;
         text-align: left;
         padding: 0 20px;
         user-select: none;
         border: none;
         transition: border-color 120ms, background-color 120ms;
+    }
+    .blockelement-gridblock-editor > button:hover {
+        color: #2152A3;
     }
     .blockelement-gridblock-editor .icon {
         font-size: 22px;
@@ -60,19 +52,6 @@
         display: inline-block;
         padding-top:2px;
         padding-bottom:2px;
-    }
-
-    .blockelement-gridblock-editor > button:hover {
-        color: @ui-action-discreet-type-hover;
-        background-color: @ui-action-hover;
-    }
-
-    .blockelement-gridblock-editor.--active  {
-        border-color: @ui-active;
-    }
-    .blockelement-gridblock-editor.--active > button {
-        color: @ui-active-type;
-        background-color: @ui-active;
     }
 </style>
 
