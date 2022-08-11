@@ -1,7 +1,7 @@
 import '../../../backoffice/components/backoffice-modal-container.element';
 import '../../../core/services/modal/layouts/content-picker/modal-layout-content-picker.element';
 import '../../context/context-provider.element';
-import '../../../backoffice/components/editor-layout.element';
+import '../../../backoffice/editors/shared/editor-layout/editor-layout.element';
 
 import '@umbraco-ui/uui-modal';
 import '@umbraco-ui/uui-modal-container';
@@ -13,7 +13,7 @@ import { html } from 'lit-html';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UmbContextConsumerMixin } from '../../context';
 import { LitElement } from 'lit';
-import { UmbModalHandler, UmbModalService } from './';
+import { UmbModalService } from './';
 
 export default {
 	title: 'API/Modals',
