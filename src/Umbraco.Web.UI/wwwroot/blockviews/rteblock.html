@@ -10,7 +10,7 @@
         overflow:hidden;
     }
     
-    button {
+    .edit {
         position: relative;
         display: block;
         cursor: pointer;
@@ -24,14 +24,9 @@
         height: 100%;
         transition: border-color 120ms, background-color 120ms;
     }
-    button:hover {
-        color: #2152A3;// TODO: Set right colors:
-        background-color: #F9F9FA;
-    }
 
 </style>
 
-<button type="button" ng-click="block.edit()" ng-focus="block.focus">
-    <h1>{{block.data.headline}}</h1>
-</button>
+<div class="edit" ng-click="block.edit()" ng-focus="block.focus" ng-bind-html="block.data.text">
+</div>
 <slot name="areas" part="areas"></slot>
