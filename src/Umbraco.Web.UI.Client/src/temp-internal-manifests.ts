@@ -1,5 +1,7 @@
 import { UmbExtensionManifestCore } from './core/extension';
 
+// TODO: consider moving weight from meta to the main part of the manifest. We need it for every extension.
+// TODO: consider adding a label property as part of the meta. It might make sense to have an "extension" name label where one is needed.
 export const internalManifests: Array<UmbExtensionManifestCore> = [
 	{
 		type: 'section',
@@ -9,6 +11,17 @@ export const internalManifests: Array<UmbExtensionManifestCore> = [
 		js: () => import('./backoffice/sections/content/content-section.element'),
 		meta: {
 			pathname: 'content', // TODO: how to we want to support pretty urls?
+			weight: 50,
+		},
+	},
+	{
+		type: 'section',
+		alias: 'Umb.Section.Media',
+		name: 'Media',
+		elementName: 'umb-media-section',
+		js: () => import('./backoffice/sections/media/media-section.element'),
+		meta: {
+			pathname: 'media', // TODO: how to we want to support pretty urls?
 			weight: 50,
 		},
 	},
@@ -63,7 +76,7 @@ export const internalManifests: Array<UmbExtensionManifestCore> = [
 		name: 'Text',
 		js: () => import('./backoffice/property-editors/property-editor-text.element'),
 		meta: {
-			icon: 'document',
+			icon: 'edit',
 			group: 'common',
 		},
 	},
@@ -74,7 +87,7 @@ export const internalManifests: Array<UmbExtensionManifestCore> = [
 		elementName: 'umb-property-editor-textarea',
 		js: () => import('./backoffice/property-editors/property-editor-textarea.element'),
 		meta: {
-			icon: 'document',
+			icon: 'edit',
 			group: 'common',
 		},
 	},
@@ -84,7 +97,7 @@ export const internalManifests: Array<UmbExtensionManifestCore> = [
 		name: 'Context Example',
 		js: () => import('./backoffice/property-editors/property-editor-context-example.element'),
 		meta: {
-			icon: 'document',
+			icon: 'favorite',
 			group: 'common',
 		},
 	},
@@ -93,8 +106,11 @@ export const internalManifests: Array<UmbExtensionManifestCore> = [
 		alias: 'Umb.EditorView.ContentEdit',
 		name: 'Content',
 		elementName: 'umb-editor-view-node-edit',
-		js: () => import('./backoffice/editor-views/editor-view-node-edit.element'),
+		js: () => import('./backoffice/editors/shared/node/views/edit/editor-view-node-edit.element'),
 		meta: {
+			// TODO: how do we want to filter where editor views are shown? https://our.umbraco.com/documentation/extending/Content-Apps/#setting-up-the-plugin
+			// this is a temp solution
+			editors: ['Umb.Editor.Content', 'Umb.Editor.Media'],
 			pathname: 'content',
 			weight: 100,
 			icon: 'document',
@@ -105,31 +121,75 @@ export const internalManifests: Array<UmbExtensionManifestCore> = [
 		alias: 'Umb.EditorView.ContentInfo',
 		name: 'Info',
 		elementName: 'umb-editor-view-node-info',
-		js: () => import('./backoffice/editor-views/editor-view-node-info.element'),
+		js: () => import('./backoffice/editors/shared/node/views/info/editor-view-node-info.element'),
 		meta: {
+			// TODO: how do we want to filter where editor views are shown? https://our.umbraco.com/documentation/extending/Content-Apps/#setting-up-the-plugin
+			// this is a temp solution
+			editors: ['Umb.Editor.Content', 'Umb.Editor.Media'],
 			pathname: 'info',
 			weight: 90,
 			icon: 'info',
 		},
 	},
-  {
-    type: 'propertyAction',
-    alias: 'Umb.PropertyAction.Copy',
-    name: 'Copy',
-    elementName: 'umb-property-action-copy',
-    js: () => import('./backoffice/property-actions/property-action-copy.element'),
-    meta: {
-      propertyEditors: ['Umb.PropertyEditorUI.Text']
-    }
-  },
-  {
-    type: 'propertyAction',
-    alias: 'Umb.PropertyAction.Clear',
-    name: 'Clear',
-    elementName: 'umb-property-action-clear',
-    js: () => import('./backoffice/property-actions/property-action-clear.element'),
-    meta: {
-      propertyEditors: ['Umb.PropertyEditorUI.Text']
-    }
-  }
+	{
+		type: 'editorView',
+		alias: 'Umb.EditorView.DataTypeEdit',
+		name: 'Edit',
+		elementName: 'umb-editor-view-data-type-edit',
+		js: () => import('./backoffice/editors/data-type/views/editor-view-data-type-edit.element'),
+		meta: {
+			// TODO: how do we want to filter where editor views are shown? https://our.umbraco.com/documentation/extending/Content-Apps/#setting-up-the-plugin
+			// this is a temp solution
+			editors: ['Umb.Editor.DataType'],
+			pathname: 'edit',
+			weight: 90,
+			icon: 'edit',
+		},
+	},
+	{
+		type: 'editorView',
+		alias: 'Umb.EditorView.DocumentTypeDesign',
+		name: 'Design',
+		elementName: 'umb-editor-view-document-type-design',
+		js: () => import('./backoffice/editors/document-type/views/editor-view-document-type-design.element'),
+		meta: {
+			// TODO: how do we want to filter where editor views are shown? https://our.umbraco.com/documentation/extending/Content-Apps/#setting-up-the-plugin
+			// this is a temp solution
+			editors: ['Umb.Editor.DocumentType'],
+			pathname: 'design',
+			weight: 90,
+			icon: 'edit',
+		},
+	},
+	{
+		type: 'propertyAction',
+		alias: 'Umb.PropertyAction.Copy',
+		name: 'Copy',
+		elementName: 'umb-property-action-copy',
+		js: () => import('./backoffice/property-actions/property-action-copy.element'),
+		meta: {
+			propertyEditors: ['Umb.PropertyEditorUI.Text'],
+		},
+	},
+	{
+		type: 'propertyAction',
+		alias: 'Umb.PropertyAction.Clear',
+		name: 'Clear',
+		elementName: 'umb-property-action-clear',
+		js: () => import('./backoffice/property-actions/property-action-clear.element'),
+		meta: {
+			propertyEditors: ['Umb.PropertyEditorUI.Text'],
+		},
+	},
+	{
+		type: 'propertyEditorUI',
+		alias: 'Umb.PropertyEditorUI.ContentPicker',
+		name: 'ContentPicker',
+		elementName: 'umb-property-editor-content-picker',
+		js: () => import('./backoffice/property-editors/property-editor-content-picker.element'),
+		meta: {
+			icon: 'document',
+			group: 'common',
+		},
+	},
 ];

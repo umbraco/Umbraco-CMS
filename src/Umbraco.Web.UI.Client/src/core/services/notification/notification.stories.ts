@@ -29,7 +29,6 @@ class StoryNotificationDefaultExampleElement extends UmbContextConsumerMixin(Lit
 
 		this.consumeContext('umbNotificationService', (notificationService) => {
 			this._notificationService = notificationService;
-			console.log('notification service ready');
 		});
 	}
 

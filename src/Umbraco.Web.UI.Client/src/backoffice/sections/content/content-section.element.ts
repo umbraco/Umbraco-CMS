@@ -30,7 +30,7 @@ export class UmbContentSection extends LitElement {
 		},
 		{
 			path: 'node/:nodeId',
-			component: () => import('../../components/node-editor.element'),
+			component: () => import('../../editors/content/editor-content.element'),
 			setup: (component: HTMLElement, info: IRoutingInfo) => {
 				this._currentNodeId = info.match.params.nodeId;
 				component.id = this._currentNodeId;

@@ -15,6 +15,10 @@ import { internalManifests } from './temp-internal-manifests';
 @customElement('umb-app')
 export class UmbApp extends UmbContextProviderMixin(LitElement) {
 	static styles = css`
+		:host {
+			overflow: hidden;
+		}
+
 		:host,
 		#router-slot {
 			display: block;

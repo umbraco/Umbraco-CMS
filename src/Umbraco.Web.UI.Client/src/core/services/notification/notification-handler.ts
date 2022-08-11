@@ -1,3 +1,4 @@
+import { UUIToastNotificationElement } from '@umbraco-ui/uui';
 import { v4 as uuidv4 } from 'uuid';
 import type { UmbNotificationOptions, UmbNotificationData, UmbNotificationColor } from './';
 
@@ -39,18 +40,28 @@ export class UmbNotificationHandler {
 			this._closeResolver = res;
 		});
 
-		this._createLayoutElement();
+		this._createElement();
 	}
 
 	/**
 	 * @private
 	 * @memberof UmbNotificationHandler
 	 */
-	private _createLayoutElement() {
+	private _createElement() {
 		if (!this._elementName) return;
-		this.element = document.createElement(this._elementName);
-		this.element.data = this._data;
-		this.element.notificationHandler = this;
+
+		const notification: UUIToastNotificationElement = document.createElement('uui-toast-notification');
+
+		notification.color = this.color;
+		notification.autoClose = this.duration;
+
+		const element: any = document.createElement(this._elementName);
+		element.data = this._data;
+		element.notificationHandler = this;
+
+		notification.appendChild(element);
+
+		this.element = notification;
 	}
 
 	/**
@@ -59,6 +70,7 @@ export class UmbNotificationHandler {
 	 */
 	public close(...args: any) {
 		this._closeResolver(...args);
+		this.element.open = false;
 	}
 
 	/**

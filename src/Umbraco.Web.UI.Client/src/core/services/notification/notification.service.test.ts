@@ -29,6 +29,7 @@ describe('UCPNotificationService', () => {
 
 	describe('peek', () => {
 		let peekNotificationHandler: UmbNotificationHandler | undefined = undefined;
+		let layoutElement: any;
 
 		beforeEach(async () => {
 			const peekOptions = {
@@ -36,6 +37,7 @@ describe('UCPNotificationService', () => {
 			};
 
 			peekNotificationHandler = notificationService.peek('positive', peekOptions);
+			layoutElement = peekNotificationHandler.element.querySelector('umb-notification-layout-default');
 		});
 
 		it('it sets notification color', () => {
@@ -43,7 +45,7 @@ describe('UCPNotificationService', () => {
 		});
 
 		it('should set peek data on the notification element', () => {
-			const data = peekNotificationHandler?.element.data;
+			const data = layoutElement.data;
 			expect(data.headline).to.equal('Peek notification headline');
 			expect(data.message).to.equal('Peek notification message');
 		});
@@ -55,6 +57,7 @@ describe('UCPNotificationService', () => {
 
 	describe('stay', () => {
 		let stayNotificationHandler: UmbNotificationHandler | undefined = undefined;
+		let layoutElement: any;
 
 		beforeEach(async () => {
 			const stayOptions = {
@@ -62,6 +65,7 @@ describe('UCPNotificationService', () => {
 			};
 
 			stayNotificationHandler = notificationService.stay('danger', stayOptions);
+			layoutElement = stayNotificationHandler.element.querySelector('umb-notification-layout-default');
 		});
 
 		it('it sets notification color', () => {
@@ -69,7 +73,7 @@ describe('UCPNotificationService', () => {
 		});
 
 		it('should set stay data on the notification element', () => {
-			const data = stayNotificationHandler?.element.data;
+			const data = layoutElement?.data;
 			expect(data.headline).to.equal('Stay notification headline');
 			expect(data.message).to.equal('Stay notification message');
 		});
