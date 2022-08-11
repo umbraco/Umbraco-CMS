@@ -73,12 +73,8 @@
                             'maxRequirement': maxAllowed
                         });
                     }
-                    
                 });
-                // Loop through all allowed type of this.
-                // set invalidBlockTypes with needed data, or remove..
-
-                var isTypeRequirementGood = false;
+                var isTypeRequirementGood = vm.invalidBlockTypes.length === 0;
                 vm.parentForm.areaTypeRequirements.$setValidity("areaTypeRequirements", isTypeRequirementGood);
 
 

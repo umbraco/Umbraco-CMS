@@ -51,7 +51,10 @@
             `
                 ${ model.stylesheet ? `
                     <style>
-                    @import "${model.stylesheet}"
+                        .umb-block-grid__block--view {
+                            display:content;
+                        }
+                        @import "${model.stylesheet}"
                     </style>`
                     : ''
                 }
