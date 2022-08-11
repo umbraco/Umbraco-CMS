@@ -80,7 +80,7 @@ export default class UmbLogin extends LitElement {
 					<uui-form>
 						<form id="LoginForm" name="login" @submit="${this._handleSubmit}">
 							<uui-form-layout-item>
-								<uui-label for="email" slot="label" required>Email</uui-label>
+								<uui-label id="emailLabel" for="email" slot="label" required>Email</uui-label>
 								<uui-input
 									type="email"
 									id="email"
@@ -91,7 +91,7 @@ export default class UmbLogin extends LitElement {
 							</uui-form-layout-item>
 
 							<uui-form-layout-item>
-								<uui-label for="password" slot="label" required>Password</uui-label>
+								<uui-label id="passwordLabel" for="password" slot="label" required>Password</uui-label>
 								<uui-input-password
 									id="password"
 									name="password"

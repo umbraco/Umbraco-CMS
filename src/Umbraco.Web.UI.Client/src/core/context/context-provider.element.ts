@@ -10,7 +10,7 @@ export class UmbContextProviderElement extends UmbContextProviderMixin(LitElemen
 	 * @required
 	 */
 	@property({ type: Object })
-	value!: unknown;
+	value: unknown;
 
 	/**
 	 * The key to provide to the context.

@@ -1,6 +1,6 @@
 import { rest } from 'msw';
 
-import { DocumentNode, umbContentData } from '../data/content.data';
+import { NodeEntity, umbNodeData } from '../data/node.data';
 
 // TODO: add schema
 export const handlers = [
@@ -10,17 +10,17 @@ export const handlers = [
 		if (!id) return;
 
 		const int = parseInt(id);
-		const document = umbContentData.getById(int);
+		const document = umbNodeData.getById(int);
 
 		return res(ctx.status(200), ctx.json([document]));
 	}),
 
-	rest.post<DocumentNode[]>('/umbraco/backoffice/content/save', (req, res, ctx) => {
+	rest.post<NodeEntity[]>('/umbraco/backoffice/content/save', (req, res, ctx) => {
 		console.warn('Please move to schema');
 		const data = req.body;
 		if (!data) return;
 
-		umbContentData.save(data);
+		umbNodeData.save(data);
 
 		return res(ctx.status(200), ctx.json(data));
 	}),

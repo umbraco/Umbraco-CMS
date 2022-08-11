@@ -1,4 +1,6 @@
 import { handlers as contentHandlers } from './domains/content.handlers';
+import { handlers as dataTypeHandlers } from './domains/data-type.handlers';
+import { handlers as documentTypeHandlers } from './domains/document-type.handlers';
 import { handlers as installHandlers } from './domains/install.handlers';
 import { handlers as manifestsHandlers } from './domains/manifests.handlers';
 import * as serverHandlers from './domains/server.handlers';
@@ -12,6 +14,8 @@ const handlers = [
 	...upgradeHandlers,
 	...manifestsHandlers,
 	...userHandlers,
+	...dataTypeHandlers,
+	...documentTypeHandlers,
 ];
 
 switch (import.meta.env.VITE_UMBRACO_INSTALL_STATUS) {

@@ -1,4 +1,8 @@
-import { html, fixture, expect } from '@open-wc/testing';
+import '.';
+
+import { expect, fixture, html } from '@open-wc/testing';
+
+import { defaultA11yConfig } from '../core/helpers/chai';
 import { UmbInstallerConsent } from './installer-consent.element';
 import { UmbInstallerDatabase } from './installer-database.element';
 import { UmbInstallerInstalling } from './installer-installing.element';
@@ -13,12 +17,12 @@ describe('UmbInstaller', () => {
 		element = await fixture(html`<umb-installer></umb-installer>`);
 	});
 
-	it('is defined with its own instance', async () => {
+	it('is defined with its own instance', () => {
 		expect(element).to.be.instanceOf(UmbInstaller);
 	});
 
 	it('passes the a11y audit', async () => {
-		expect(element).shadowDom.to.be.accessible();
+		await expect(element).to.be.accessible(defaultA11yConfig);
 	});
 });
 
@@ -29,12 +33,12 @@ describe('UmbInstallerLayout', () => {
 		element = await fixture(html`<umb-installer-layout></umb-installer-layout>`);
 	});
 
-	it('is defined with its own instance', async () => {
+	it('is defined with its own instance', () => {
 		expect(element).to.be.instanceOf(UmbInstallerLayout);
 	});
 
 	it('passes the a11y audit', async () => {
-		expect(element).shadowDom.to.be.accessible();
+		await expect(element).to.be.accessible(defaultA11yConfig);
 	});
 });
 
@@ -45,12 +49,12 @@ describe('UmbInstallerUser', () => {
 		element = await fixture(html`<umb-installer-user></umb-installer-user>`);
 	});
 
-	it('is defined with its own instance', async () => {
+	it('is defined with its own instance', () => {
 		expect(element).to.be.instanceOf(UmbInstallerUser);
 	});
 
 	it('passes the a11y audit', async () => {
-		expect(element).shadowDom.to.be.accessible();
+		await expect(element).to.be.accessible(defaultA11yConfig);
 	});
 });
 
@@ -61,12 +65,12 @@ describe('UmbInstallerConsent', () => {
 		element = await fixture(html`<umb-installer-consent></umb-installer-consent>`);
 	});
 
-	it('is defined with its own instance', async () => {
+	it('is defined with its own instance', () => {
 		expect(element).to.be.instanceOf(UmbInstallerConsent);
 	});
 
 	it('passes the a11y audit', async () => {
-		expect(element).shadowDom.to.be.accessible();
+		await expect(element).to.be.accessible(defaultA11yConfig);
 	});
 });
 
@@ -77,12 +81,12 @@ describe('UmbInstallerDatabase', () => {
 		element = await fixture(html`<umb-installer-database></umb-installer-database>`);
 	});
 
-	it('is defined with its own instance', async () => {
+	it('is defined with its own instance', () => {
 		expect(element).to.be.instanceOf(UmbInstallerDatabase);
 	});
 
 	it('passes the a11y audit', async () => {
-		expect(element).shadowDom.to.be.accessible();
+		await expect(element).to.be.accessible(defaultA11yConfig);
 	});
 });
 
@@ -93,11 +97,11 @@ describe('UmbInstallerInstalling', () => {
 		element = await fixture(html`<umb-installer-installing></umb-installer-installing>`);
 	});
 
-	it('is defined with its own instance', async () => {
+	it('is defined with its own instance', () => {
 		expect(element).to.be.instanceOf(UmbInstallerInstalling);
 	});
 
 	it('passes the a11y audit', async () => {
-		expect(element).shadowDom.to.be.accessible();
+		await expect(element).to.be.accessible(defaultA11yConfig);
 	});
 });

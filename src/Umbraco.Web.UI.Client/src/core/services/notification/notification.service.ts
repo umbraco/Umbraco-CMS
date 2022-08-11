@@ -31,7 +31,7 @@ export class UmbNotificationService {
 	 */
 	private _open(options: UmbNotificationOptions<UmbNotificationData>): UmbNotificationHandler {
 		const notificationHandler = new UmbNotificationHandler(options);
-		notificationHandler.onClose().then(() => this._close(notificationHandler.key));
+		notificationHandler.element.addEventListener('closed', () => this._handleClosed(notificationHandler));
 
 		this._notifications.next([...this._notifications.getValue(), notificationHandler]);
 
@@ -45,6 +45,16 @@ export class UmbNotificationService {
 	 */
 	private _close(key: string) {
 		this._notifications.next(this._notifications.getValue().filter((notification) => notification.key !== key));
+	}
+
+	/**
+	 * @private
+	 * @param {string} key
+	 * @memberof UmbNotificationService
+	 */
+	private _handleClosed(notificationHandler: UmbNotificationHandler) {
+		notificationHandler.element.removeEventListener('closed', () => this._handleClosed(notificationHandler));
+		this._close(notificationHandler.key);
 	}
 
 	/**

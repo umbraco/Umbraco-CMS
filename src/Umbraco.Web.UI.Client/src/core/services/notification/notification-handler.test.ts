@@ -1,10 +1,12 @@
 import { assert, expect } from '@open-wc/testing';
 import { validate as uuidValidate } from 'uuid';
-import { UmbNotificationHandler } from './notification-handler';
-import type { UmbNotificationDefaultData } from './layouts/default';
-import type { UmbNotificationOptions } from './';
 
-describe('UCPNotificationHandler', () => {
+import { UmbNotificationHandler } from './notification-handler';
+
+import type { UmbNotificationDefaultData } from './layouts/default';
+import type { UmbNotificationOptions } from '.';
+
+describe('UmbNotificationHandler', () => {
 	let notificationHandler: UmbNotificationHandler;
 
 	beforeEach(async () => {
@@ -67,6 +69,7 @@ describe('UCPNotificationHandler', () => {
 	describe('Layout', () => {
 		describe('Default Layout', () => {
 			let defaultLayoutNotification: UmbNotificationHandler;
+			let layoutElement: any;
 
 			beforeEach(async () => {
 				const options: UmbNotificationOptions<UmbNotificationDefaultData> = {
@@ -76,23 +79,25 @@ describe('UCPNotificationHandler', () => {
 					},
 				};
 				defaultLayoutNotification = new UmbNotificationHandler(options);
+				layoutElement = defaultLayoutNotification.element.querySelector('umb-notification-layout-default');
 			});
 
 			it('creates a default layout if a custom element name havnt been specified', () => {
-				expect(defaultLayoutNotification.element.tagName).to.equal('UMB-NOTIFICATION-LAYOUT-DEFAULT');
+				expect(layoutElement.tagName).to.equal('UMB-NOTIFICATION-LAYOUT-DEFAULT');
 			});
 
 			it('it sets notificationHandler on custom element', () => {
-				expect(defaultLayoutNotification.element.notificationHandler).to.equal(defaultLayoutNotification);
+				expect(layoutElement.notificationHandler).to.equal(defaultLayoutNotification);
 			});
 
 			it('it sets data on custom element', () => {
-				expect(defaultLayoutNotification.element.data.message).to.equal('Notification default layout message');
+				expect(layoutElement.data.message).to.equal('Notification default layout message');
 			});
 		});
 
 		describe('Custom Layout', () => {
 			let customLayoutNotification: UmbNotificationHandler;
+			let layoutElement: any;
 
 			beforeEach(async () => {
 				const options: UmbNotificationOptions<UmbNotificationDefaultData> = {
@@ -103,18 +108,19 @@ describe('UCPNotificationHandler', () => {
 					},
 				};
 				customLayoutNotification = new UmbNotificationHandler(options);
+				layoutElement = customLayoutNotification.element.querySelector('umb-notification-test-element');
 			});
 
 			it('creates a custom element', () => {
-				expect(customLayoutNotification.element.tagName).to.equal('UMB-NOTIFICATION-TEST-ELEMENT');
+				expect(layoutElement.tagName).to.equal('UMB-NOTIFICATION-TEST-ELEMENT');
 			});
 
 			it('it sets notificationHandler on custom element', () => {
-				expect(customLayoutNotification.element.notificationHandler).to.equal(customLayoutNotification);
+				expect(layoutElement.notificationHandler).to.equal(customLayoutNotification);
 			});
 
 			it('it sets data on custom element', () => {
-				expect(customLayoutNotification.element.data.message).to.equal('Notification custom layout message');
+				expect(layoutElement.data.message).to.equal('Notification custom layout message');
 			});
 		});
 	});

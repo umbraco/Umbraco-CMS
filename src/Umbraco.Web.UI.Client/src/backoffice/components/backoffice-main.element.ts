@@ -17,6 +17,7 @@ export class UmbBackofficeMain extends UmbContextConsumerMixin(LitElement) {
 				display: block;
 				width: 100%;
 				height: 100%;
+				overflow: hidden;
 			}
 		`,
 	];
