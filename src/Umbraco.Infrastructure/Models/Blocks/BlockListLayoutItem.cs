@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Core.Models.Blocks;
 /// <summary>
 ///     Used for deserializing the block list layout
 /// </summary>
-public class BlockListLayoutItem
+public class BlockListLayoutItem : IBlockLayoutItem
 {
     [JsonProperty("contentUdi", Required = Required.Always)]
     [JsonConverter(typeof(UdiJsonConverter))]

@@ -5,7 +5,6 @@ using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Serialization;
-using Umbraco.Cms.Infrastructure.PropertyEditors.ValueConverters;
 using Umbraco.Extensions;
 using static Umbraco.Cms.Core.PropertyEditors.BlockGridConfiguration;
 
@@ -27,14 +26,6 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         /// <inheritdoc />
         public override bool IsConverter(IPublishedPropertyType propertyType)
             => propertyType.EditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases.BlockGrid);
-
-        /// <inheritdoc />
-        public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
-            => PropertyCacheLevel.Element;
-
-        protected override BlockEditorDataConverter CreateBlockEditorDataConverter() => new BlockGridEditorDataConverter(_jsonSerializer);
-
-        protected override BlockItemActivator<BlockGridItem> CreateBlockItemActivator() => new BlockGridItemActivator(BlockEditorConverter);
 
         public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
         {
@@ -73,7 +64,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                     return blockItem;
                 }
 
-                var test = UnwrapBlockModel(
+                BlockGridModel blockModel = UnwrapBlockModel(
                     referenceCacheLevel,
                     inter,
                     preview,
@@ -83,9 +74,12 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                     EnrichBlockItem
                 );
 
-                return test;
+                return blockModel;
             }
         }
+        protected override BlockEditorDataConverter CreateBlockEditorDataConverter() => new BlockGridEditorDataConverter(_jsonSerializer);
+
+        protected override BlockItemActivator<BlockGridItem> CreateBlockItemActivator() => new BlockGridItemActivator(BlockEditorConverter);
 
         private class BlockGridItemActivator : BlockItemActivator<BlockGridItem>
         {

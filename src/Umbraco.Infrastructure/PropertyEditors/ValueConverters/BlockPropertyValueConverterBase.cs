@@ -1,12 +1,12 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System.Reflection;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Core.PropertyEditors;
-using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Infrastructure.PropertyEditors.ValueConverters;
+namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
 public abstract class BlockPropertyValueConverterBase<TBlockModel, TBlockItemModel, TBlockLayoutItem, TBlockConfiguration> : PropertyValueConverterBase
     where TBlockItemModel : class, IBlockReference<IPublishedElement>
@@ -64,6 +64,10 @@ public abstract class BlockPropertyValueConverterBase<TBlockModel, TBlockItemMod
 
     /// <inheritdoc />
     public override Type GetPropertyValueType(IPublishedPropertyType propertyType) => typeof(TBlockModel);
+
+    /// <inheritdoc />
+    public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
+        => PropertyCacheLevel.Element;
 
     protected TBlockModel UnwrapBlockModel(
               PropertyCacheLevel referenceCacheLevel,

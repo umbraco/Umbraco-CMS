@@ -23,7 +23,7 @@ public class BlockListConfiguration
     public string? MaxPropertyWidth { get; set; }
 
     [DataContract]
-    public class BlockConfiguration
+    public class BlockConfiguration : IBlockConfiguration
     {
         [DataMember(Name = "backgroundColor")]
         public string? BackgroundColor { get; set; }
