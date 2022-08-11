@@ -98,18 +98,13 @@ namespace Umbraco.Cms.Core.Security
                     throw new ArgumentNullException(nameof(user));
                 }
 
-                if (user.UserName is null || user.Email is null)
-                {
-                    throw new InvalidOperationException("UserName and Email is required");
-                }
-
                 using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
 
                 // create member
                 IMember memberEntity = _memberService.CreateMember(
-                    user.UserName,
-                    user.Email,
-                    user.Name.IsNullOrWhiteSpace() ? user.UserName : user.Name!,
+                    user.UserName!,
+                    user.Email!,
+                    user.Name.IsNullOrWhiteSpace() ? user.UserName! : user.Name!,
                     user.MemberTypeAlias.IsNullOrWhiteSpace() ? Constants.Security.DefaultMemberTypeAlias : user.MemberTypeAlias!);
 
                 UpdateMemberProperties(memberEntity, user);
