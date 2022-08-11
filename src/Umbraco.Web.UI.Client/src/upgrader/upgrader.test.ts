@@ -12,8 +12,4 @@ describe('UmbUpgrader', () => {
 	it('is defined with its own instance', () => {
 		expect(element).to.be.instanceOf(UmbUpgrader);
 	});
-
-	it('passes the a11y audit', () => {
-		expect(element).shadowDom.to.be.accessible();
-	});
 });

@@ -181,4 +181,15 @@ export const internalManifests: Array<UmbExtensionManifestCore> = [
 			propertyEditors: ['Umb.PropertyEditorUI.Text'],
 		},
 	},
+	{
+		type: 'propertyEditorUI',
+		alias: 'Umb.PropertyEditorUI.ContentPicker',
+		name: 'ContentPicker',
+		elementName: 'umb-property-editor-content-picker',
+		js: () => import('./backoffice/property-editors/property-editor-content-picker.element'),
+		meta: {
+			icon: 'document',
+			group: 'common',
+		},
+	},
 ];

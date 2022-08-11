@@ -4,6 +4,7 @@ import { css, html, LitElement } from 'lit';
 
 import { UmbContextProviderMixin } from '../core/context';
 import { UmbNotificationService } from '../core/services/notification';
+import { UmbModalService } from '../core/services/modal';
 import { UmbDataTypeStore } from '../core/stores/data-type.store';
 import { UmbDocumentTypeStore } from '../core/stores/document-type.store';
 import { UmbNodeStore } from '../core/stores/node.store';
@@ -11,6 +12,7 @@ import { UmbNodeStore } from '../core/stores/node.store';
 import './components/backoffice-header.element';
 import './components/backoffice-main.element';
 import './components/backoffice-notification-container.element';
+import './components/backoffice-modal-container.element';
 import './components/editor-property-layout.element';
 import './components/node-property.element';
 import './components/section-layout.element';
@@ -41,6 +43,7 @@ export default class UmbBackoffice extends UmbContextProviderMixin(LitElement) {
 		this.provideContext('umbDataTypeStore', new UmbDataTypeStore());
 		this.provideContext('umbDocumentTypeStore', new UmbDocumentTypeStore());
 		this.provideContext('umbNotificationService', new UmbNotificationService());
+		this.provideContext('umbModalService', new UmbModalService());
 	}
 
 	render() {
@@ -48,6 +51,7 @@ export default class UmbBackoffice extends UmbContextProviderMixin(LitElement) {
 			<umb-backoffice-header></umb-backoffice-header>
 			<umb-backoffice-main></umb-backoffice-main>
 			<umb-backoffice-notification-container></umb-backoffice-notification-container>
+			<umb-backoffice-modal-container></umb-backoffice-modal-container>
 		`;
 	}
 }

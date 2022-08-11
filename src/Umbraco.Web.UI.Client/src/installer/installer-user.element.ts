@@ -1,6 +1,7 @@
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { Subscription } from 'rxjs';
+
 import { UmbContextConsumerMixin } from '../core/context';
 import { UmbInstallerContext } from './installer-context';
 
@@ -111,32 +112,35 @@ export class UmbInstallerUser extends UmbContextConsumerMixin(LitElement) {
 			<uui-form>
 				<form id="LoginForm" name="login" @submit="${this._handleSubmit}">
 					<uui-form-layout-item>
-						<uui-label for="name" slot="label" required>Name</uui-label>
+						<uui-label id="nameLabel" for="name" slot="label" required>Name</uui-label>
 						<uui-input
 							type="text"
 							id="name"
 							.value=${this._userFormData?.name}
 							name="name"
+							label="name"
 							required
 							required-message="Name is required"></uui-input>
 					</uui-form-layout-item>
 
 					<uui-form-layout-item>
-						<uui-label for="email" slot="label" required>Email</uui-label>
+						<uui-label id="emailLabel" for="email" slot="label" required>Email</uui-label>
 						<uui-input
 							type="email"
 							id="email"
 							.value=${this._userFormData?.email}
 							name="email"
+							label="email"
 							required
 							required-message="Email is required"></uui-input>
 					</uui-form-layout-item>
 
 					<uui-form-layout-item>
-						<uui-label for="password" slot="label" required>Password</uui-label>
+						<uui-label id="passwordLabel" for="password" slot="label" required>Password</uui-label>
 						<uui-input-password
 							id="password"
 							name="password"
+							label="password"
 							.value=${this._userFormData?.password}
 							required
 							required-message="Password is required"></uui-input-password>
