@@ -1,7 +1,7 @@
-using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System.Collections.Generic;
 using Umbraco.Cms.Infrastructure.Serialization;
 
 namespace Umbraco.Cms.Core.Models.Blocks

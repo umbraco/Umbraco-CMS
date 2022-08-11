@@ -1,4 +1,6 @@
-using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Core.PropertyEditors

@@ -1,3 +1,6 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Models.PublishedContent;
 

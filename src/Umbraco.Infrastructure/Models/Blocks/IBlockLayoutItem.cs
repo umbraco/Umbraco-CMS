@@ -1,3 +1,6 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 namespace Umbraco.Cms.Core.Models.Blocks;
 
 public interface IBlockLayoutItem

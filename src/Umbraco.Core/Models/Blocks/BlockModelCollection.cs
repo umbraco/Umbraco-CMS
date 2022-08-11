@@ -1,3 +1,6 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System.Collections.ObjectModel;
 using Umbraco.Cms.Core.Models.PublishedContent;
 
