@@ -23,7 +23,7 @@
 		"test": "web-test-runner --coverage",
 		"test:watch": "web-test-runner --watch",
 		"test:e2e": "playwright test",
-		"lint": "eslint src/**/* e2e/**/* --cache",
+		"lint": "eslint --cache src e2e",
 		"lint:fix": "npm run lint -- --fix",
 		"format": "prettier 'src/**/*.ts'",
 		"format:fix": "npm run format -- --write",

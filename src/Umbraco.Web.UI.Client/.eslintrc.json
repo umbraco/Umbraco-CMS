@@ -1,50 +1,49 @@
 {
-  "ignorePatterns": [
-    "vite.*.ts"
-  ],
-  "root": true,
-  "parser": "@typescript-eslint/parser",
-  "parserOptions": {
-    "project": "./tsconfig.json",
-    "tsconfigRootDir": "./",
-    "ecmaVersion": "latest",
-    "sourceType": "module"
-  },
-  "plugins": [
-    "import",
-    "@typescript-eslint",
-    "lit",
-    "lit-a11y"
-  ],
-  "extends": [
-    "eslint:recommended",
-    "plugin:import/recommended",
-    "plugin:import/typescript",
-    "plugin:@typescript-eslint/recommended",
-    "plugin:lit/recommended",
-    "plugin:lit-a11y/recommended",
-		"plugin:storybook/recommended",
-    "prettier"
-  ],
-  "env": {
-    "browser": true,
-    "es2021": true
-  },
-  "rules": {
-    "no-var": "error",
-    "import/no-unresolved": "error"
-  },
-  "settings": {
-    "import/parsers": {
-      "@typescript-eslint/parser": [
-        ".ts"
-      ]
-    },
-    "import/resolver": {
-      "typescript": {
-        "alwaysTryTypes": true,
-        "project": "./tsconfig.json"
-      }
-    }
-  }
+	"ignorePatterns": ["vite.*.ts"],
+	"root": true,
+	"extends": ["eslint:recommended", "plugin:import/recommended", "prettier"],
+	"plugins": ["import"],
+	"overrides": [
+		{
+			"files": ["**/*.ts"],
+			"plugins": ["import", "@typescript-eslint", "lit", "lit-a11y"],
+			"extends": [
+				"eslint:recommended",
+				"plugin:import/recommended",
+				"plugin:import/typescript",
+				"plugin:@typescript-eslint/eslint-recommended",
+				"plugin:@typescript-eslint/recommended",
+				"plugin:lit/recommended",
+				"plugin:lit-a11y/recommended",
+				"plugin:storybook/recommended",
+				"prettier"
+			],
+			"parser": "@typescript-eslint/parser",
+			"parserOptions": {
+				"project": "./tsconfig.json",
+				"tsconfigRootDir": "./",
+				"ecmaVersion": "latest",
+				"sourceType": "module"
+			},
+			"env": {
+				"browser": true,
+				"es2021": true
+			},
+			"rules": {
+				"no-var": "error",
+				"import/no-unresolved": "error"
+			},
+			"settings": {
+				"import/parsers": {
+					"@typescript-eslint/parser": [".ts"]
+				},
+				"import/resolver": {
+					"typescript": {
+						"alwaysTryTypes": true,
+						"project": "./tsconfig.json"
+					}
+				}
+			}
+		}
+	]
 }
