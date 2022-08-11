@@ -41,7 +41,7 @@
             }
             
             vm.locallyAvailableBlockTypes = vm.blockEditorApi.internal.getAllowedTypesOf(vm.parentBlock, vm.areaKey);
-
+            
             $scope.$watch('vm.entries', onLocalAmountOfBlocksChanged, true);
         };
 
@@ -52,7 +52,7 @@
                 var isMinRequirementGood = vm.entries.length >= vm.areaConfig.minAllowed;
                 vm.parentForm.areaMinCount.$setValidity("areaMinCount", isMinRequirementGood);
 
-                var isMaxRequirementGood = vm.entries.length <= vm.areaConfig.maxAllowed;
+                var isMaxRequirementGood = vm.areaConfig.maxAllowed == null || vm.entries.length <= vm.areaConfig.maxAllowed;
                 vm.parentForm.areaMaxCount.$setValidity("areaMaxCount", isMaxRequirementGood);
 
 
