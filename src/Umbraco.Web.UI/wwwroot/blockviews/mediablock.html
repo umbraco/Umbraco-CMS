@@ -1,0 +1,32 @@
+<style>
+    
+    .umb-block-grid__block--view {
+        width:100%;/* Add this to fill the cell fully */
+        height:100%;/* Add this to fill the cell fully */
+    }
+
+    button {
+        display: block;
+        width: 100%;
+        height: 100%;
+        padding: 0;
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+        max-height: 400px;
+        user-select: none;
+    }
+    img {
+        pointer-events: none;
+    }
+    .icon {
+        font-size: 60px;
+    }
+</style>
+
+<button ng-controller="Umbraco.PropertyEditors.BlockEditor.MediaBlockEditor as bc" type="button" ng-click="block.edit()" ng-focus="block.focus">
+    <img ng-if="bc.isImage" ng-src="{{bc.imageSource}}" alt="{{bc.mediaName}}" />
+    <umb-icon ng-if="!bc.isImage" icon="{{bc.icon}}" class="icon"></umb-icon>
+    <span>{{bc.mediaName}}</span>
+</button>
+<slot name="areas" part="areas"></slot>

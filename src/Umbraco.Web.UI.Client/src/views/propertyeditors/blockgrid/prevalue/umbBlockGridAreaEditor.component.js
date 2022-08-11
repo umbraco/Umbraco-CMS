@@ -32,21 +32,17 @@
             }
         });
 
-    function BlockGridAreaController($scope, $element, assetsService, localizationService, editorService) {
+    function BlockGridAreaController($scope, $element, assetsService, localizationService, editorService, overlayService) {
 
         var unsubscribe = [];
 
         var vm = this;
         vm.loading = true;
-        vm.blockGridColumns = 0;
+        vm.rootLayoutColumns = 12;
 
         vm.$onInit = function() {
 
-            // TODO: Watch for vm.block.areaGridColumns
             // TODO: watch for column span options as fallback for areaGridColumns.
-
-            vm.blockGridColumns = vm.block.areaGridColumns || 12;
-
 
             assetsService.loadJs('lib/sortablejs/Sortable.min.js', $scope).then(onLoaded);
         };
@@ -77,15 +73,38 @@
             vm.openAreaOverlay(area);
         }
 
+        vm.requestDeleteArea = function (area) {
+            // TODO: Translations
+            localizationService.localizeMany(["general_delete", "blockEditor_confirmDeleteBlockAreaMessage", "blockEditor_confirmDeleteBlockAreaNotice"]).then(function (data) {
+                overlayService.confirmDelete({
+                    title: data[0],
+                    content: localizationService.tokenReplace(data[1], [area.alias]),
+                    confirmMessage: data[2],
+                    close: function () {
+                        overlayService.close();
+                    },
+                    submit: function () {
+                        vm.deleteArea(area);
+                        overlayService.close();
+                    }
+                });
+            });
+        }
         vm.deleteArea = function(area) {
-            console.log("delete", area);
+            console.log("deleteArea?")
+            const index = vm.model.findIndex(x => x.key === area.key);
+            if(index !== -1) {
+                console.log("performe delete")
+                vm.model.splice(index, 1);
+            }
+            setDirty();
         }
 
         vm.onNewAreaClick = function() {
             const newArea = {
                 'key': String.CreateGuid(),
                 'alias': '',
-                'columnSpan': (vm.blockGridColumns),
+                'columnSpan': (vm.block.areaGridColumns || vm.rootLayoutColumns),
                 'rowSpan': 1,
                 'minAllowed': 0,
                 'maxAllowed': null,

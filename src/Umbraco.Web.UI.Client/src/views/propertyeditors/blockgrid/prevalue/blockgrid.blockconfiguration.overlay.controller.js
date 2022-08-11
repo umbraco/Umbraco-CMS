@@ -23,6 +23,12 @@
             showAlpha: true
         };
 
+        vm.rowMinMaxModel = {
+            hideLabel: true,
+            view: "numberrange",
+            value: {min: vm.block.rowMinSpan || 1, max: vm.block.rowMaxSpan || 1}
+        }
+
         loadElementTypes();
 
         function loadElementTypes() {
@@ -293,6 +299,11 @@
 
         vm.submit = function() {
             if ($scope.model && $scope.model.submit) {
+
+                // Transfer minMaxModel to area:
+                vm.block.rowMinSpan = vm.rowMinMaxModel.value.min;
+                vm.block.rowMaxSpan = vm.rowMinMaxModel.value.max;
+
                 $scope.model.submit($scope.model);
             }
         };
