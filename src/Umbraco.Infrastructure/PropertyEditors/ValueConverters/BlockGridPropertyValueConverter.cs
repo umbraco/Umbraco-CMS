@@ -7,6 +7,7 @@ using System.Linq;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Serialization;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
@@ -16,14 +17,14 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
     {
         private readonly IProfilingLogger _proflog;
         private readonly BlockEditorConverter _blockConverter;
-        private readonly BlockListEditorDataConverter _blockListEditorDataConverter;
+        private readonly BlockGridEditorDataConverter _blockGridEditorDataConverter;
 
         // Niels, Change: I would love if this could be general, so we don't need a specific one for each block property editor....
-        public BlockGridPropertyValueConverter(IProfilingLogger proflog, BlockEditorConverter blockConverter)
+        public BlockGridPropertyValueConverter(IProfilingLogger proflog, BlockEditorConverter blockConverter, IJsonSerializer jsonSerializer)
         {
             _proflog = proflog;
             _blockConverter = blockConverter;
-            _blockListEditorDataConverter = new BlockListEditorDataConverter();
+            _blockGridEditorDataConverter = new BlockGridEditorDataConverter(jsonSerializer);
         }
 
         /// <inheritdoc />
@@ -31,7 +32,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             => propertyType.EditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases.BlockGrid);
 
         /// <inheritdoc />
-        public override Type GetPropertyValueType(IPublishedPropertyType propertyType) => typeof(BlockListModel);
+        public override Type GetPropertyValueType(IPublishedPropertyType propertyType) => typeof(BlockGridModel);
 
         /// <inheritdoc />
         public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
@@ -55,23 +56,23 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                 // Short-circuit on empty values
                 if (string.IsNullOrWhiteSpace(value))
                 {
-                    return BlockListModel.Empty;
+                    return BlockGridModel.Empty;
                 }
 
-                var converted = _blockListEditorDataConverter.Deserialize(value);
+                var converted = _blockGridEditorDataConverter.Deserialize(value);
                 if (converted.BlockValue.ContentData.Count == 0)
                 {
-                    return BlockListModel.Empty;
+                    return BlockGridModel.Empty;
                 }
 
-                var blockListLayout = converted.Layout?.ToObject<IEnumerable<BlockListLayoutItem>>();
-                if (blockListLayout is null)
+                var blockGridLayout = converted.Layout?.ToObject<IEnumerable<BlockGridLayoutItem>>();
+                if (blockGridLayout is null)
                 {
-                    return BlockListModel.Empty;
+                    return BlockGridModel.Empty;
                 }
 
                 // Get configuration
-                var configuration = propertyType.DataType.ConfigurationAs<BlockListConfiguration>();
+                var configuration = propertyType.DataType.ConfigurationAs<BlockGridConfiguration>();
                 if (configuration is null)
                 {
                     return null;
@@ -107,19 +108,18 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                     settingsPublishedElements[element.Key] = element;
                 }
 
-                var layout = new List<BlockGridItem>();
-                foreach (var layoutItem in blockListLayout)
+                BlockGridItem? CreateItem(BlockGridLayoutItem layoutItem)
                 {
                     // Get the content reference
                     var contentGuidUdi = (GuidUdi?)layoutItem.ContentUdi;
                     if (contentGuidUdi is null || !contentPublishedElements.TryGetValue(contentGuidUdi.Guid, out var contentData))
                     {
-                        continue;
+                        return null;
                     }
 
                     if (!blockConfigMap.TryGetValue(contentData.ContentType.Key, out var blockConfig))
                     {
-                        continue;
+                        return null;
                     }
 
                     // Get the setting reference
@@ -141,17 +141,32 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                         : typeof(IPublishedElement);
 
                     // TODO: This should be optimized/cached, as calling Activator.CreateInstance is slow
-                    var layoutType = typeof(BlockGridItem<,>).MakeGenericType(contentData.GetType(), settingsType);
-                    var layoutRef = (BlockGridItem?)Activator.CreateInstance(layoutType, contentGuidUdi, contentData, settingGuidUdi, settingsData);
+                    var gridItemType = typeof(BlockGridItem<,>).MakeGenericType(contentData.GetType(), settingsType);
+                    var gridItem = (BlockGridItem?)Activator.CreateInstance(gridItemType, contentGuidUdi, contentData, settingGuidUdi, settingsData, layoutItem.RowSpan!, layoutItem.ColumnSpan!);
+                    if (gridItem == null)
+                    {
+                        return null;
+                    }
 
-                    layout.Add(layoutRef!);
+                    var blockConfigAreaMap = blockConfig.Areas.ToDictionary(area => area.Key);
+                    gridItem.AreaGridColumns = layoutItem.AreaGridColumns;
+                    gridItem.Areas = layoutItem.Areas.Select(area =>
+                    {
+                        if (!blockConfigAreaMap.TryGetValue(area.Key, out var areaConfig))
+                        {
+                            return null;
+                        }
+                        var items = area.Items.Select(CreateItem).WhereNotNull().ToList();
+                        return new BlockGridArea(items, areaConfig.Alias!, areaConfig.RowSpan!.Value, areaConfig.ColumnSpan!.Value);
+                    }).WhereNotNull().ToArray();
+
+                    return gridItem;
                 }
 
-                var model = new BlockGridModel(layout);
+                var items = blockGridLayout.Select(CreateItem).WhereNotNull().ToList();
+                var model = new BlockGridModel(items, configuration.GridColumns);
                 return model;
             }
         }
-
-
     }
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
@@ -25,6 +25,9 @@ namespace Umbraco.Cms.Core.Models.Blocks
         [JsonProperty("rowSpan", NullValueHandling = NullValueHandling.Ignore)]
         public int? RowSpan { get; set; }
 
+        [JsonProperty("areaGridColumns", NullValueHandling = NullValueHandling.Ignore)]
+        public int? AreaGridColumns { get; set; }
+
         [JsonProperty("areas", NullValueHandling = NullValueHandling.Ignore)]
         public BlockGridLayoutAreaItem[] Areas { get; set; } = Array.Empty<BlockGridLayoutAreaItem>();
 
@@ -37,7 +40,7 @@ namespace Umbraco.Cms.Core.Models.Blocks
     public class BlockGridLayoutAreaItem
     {
         [JsonProperty("key", NullValueHandling = NullValueHandling.Ignore)]
-        public string Key { get; set; } = string.Empty;
+        public Guid Key { get; set; } = Guid.Empty;
 
         [JsonProperty("items", NullValueHandling = NullValueHandling.Ignore)]
         public BlockGridLayoutItem[] Items { get; set; } = Array.Empty<BlockGridLayoutItem>();

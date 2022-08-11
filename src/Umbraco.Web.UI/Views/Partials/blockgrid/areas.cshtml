@@ -1,0 +1,18 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem>
+@{
+    if (Model?.Areas.Any() != true) { return; }
+}
+
+<div class="umb-block-grid__block-area-container"
+     style="--umb-block-grid--area-grid-columns: @(Model.AreaGridColumns?.ToString() ?? "initial");">
+    @foreach (var area in Model.Areas)
+    {
+        <div class="umb-block-grid__block-area"
+         data-area-col-span="@area.ColumnSpan"
+         data-area-row-span="@area.RowSpan"
+         data-area-alias="@area.Alias"
+         style="--umb-block-grid--area-column-span: @area.ColumnSpan; --umb-block-grid--area-row-span: @area.RowSpan;">
+            @await Html.GetBlockGridItemsHtmlAsync(area)
+        </div>
+    }
+</div>

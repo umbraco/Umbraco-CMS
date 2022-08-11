@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -25,16 +25,16 @@ namespace Umbraco.Cms.Core.Models.Blocks
         /// Prevents a default instance of the <see cref="BlockGridModel" /> class from being created.
         /// </summary>
         private BlockGridModel()
-            : this(new List<BlockGridItem>())
+            : this(new List<BlockGridItem>(), null)
         { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BlockGridModel" /> class.
         /// </summary>
         /// <param name="list">The list to wrap.</param>
-        public BlockGridModel(IList<BlockGridItem> list)
-            : base(list)
-        { }
+        /// <param name="gridColumns">The number of columns in the grid</param>
+        public BlockGridModel(IList<BlockGridItem> list, int? gridColumns)
+            : base(list) => GridColumns = gridColumns;
 
         /// <summary>
         /// Gets the <see cref="BlockGridItem" /> with the specified content key.
@@ -59,5 +59,10 @@ namespace Umbraco.Cms.Core.Models.Blocks
         /// The <see cref="BlockGridItem" /> with the specified content UDI.
         /// </returns>
         public BlockGridItem? this[Udi contentUdi] => contentUdi is GuidUdi guidUdi ? this.FirstOrDefault(x => x.Content.Key == guidUdi.Guid) : null;
+
+        /// <summary>
+        /// The number of columns in the grid
+        /// </summary>
+        public int? GridColumns { get; }
     }
 }

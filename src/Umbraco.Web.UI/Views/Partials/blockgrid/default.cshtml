@@ -1,0 +1,9 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridModel>
+@{
+    if (Model?.Any() != true) { return; }
+}
+
+<div class="umb-block-grid__root-container"
+     style="--umb-block-grid--grid-columns: @(Model.GridColumns?.ToString() ?? "initial");">
+    @await Html.GetBlockGridItemsHtmlAsync(Model)
+</div>
