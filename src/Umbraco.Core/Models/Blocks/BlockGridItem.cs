@@ -25,14 +25,12 @@ namespace Umbraco.Cms.Core.Models.Blocks
         /// <exception cref="System.ArgumentNullException">contentUdi
         /// or
         /// content</exception>
-        public BlockGridItem(Udi contentUdi, IPublishedElement content, Udi settingsUdi, IPublishedElement settings, int rowSpan, int columnSpan)
+        public BlockGridItem(Udi contentUdi, IPublishedElement content, Udi settingsUdi, IPublishedElement settings)
         {
             ContentUdi = contentUdi ?? throw new ArgumentNullException(nameof(contentUdi));
             Content = content ?? throw new ArgumentNullException(nameof(content));
             SettingsUdi = settingsUdi;
             Settings = settings;
-            RowSpan = rowSpan;
-            ColumnSpan = columnSpan;
         }
 
         /// <summary>
@@ -75,13 +73,13 @@ namespace Umbraco.Cms.Core.Models.Blocks
         /// The number of rows this item should span
         /// </summary>
         [DataMember(Name = "rowSpan")]
-        public int RowSpan { get; }
+        public int RowSpan { get; set; }
 
         /// <summary>
         /// The number of columns this item should span
         /// </summary>
         [DataMember(Name = "columnSpan")]
-        public int ColumnSpan { get; }
+        public int ColumnSpan { get; set; }
 
         /// <summary>
         /// The grid areas within this item
@@ -113,8 +111,8 @@ namespace Umbraco.Cms.Core.Models.Blocks
         /// <param name="settings">The settings.</param>
         /// <param name="rowSpan">The number of rows to span</param>
         /// <param name="columnSpan">The number of columns to span</param>
-        public BlockGridItem(Udi contentUdi, T content, Udi settingsUdi, IPublishedElement settings, int rowSpan, int columnSpan)
-            : base(contentUdi, content, settingsUdi, settings, rowSpan, columnSpan)
+        public BlockGridItem(Udi contentUdi, T content, Udi settingsUdi, IPublishedElement settings)
+            : base(contentUdi, content, settingsUdi, settings)
         {
             Content = content;
         }
@@ -147,8 +145,8 @@ namespace Umbraco.Cms.Core.Models.Blocks
         /// <param name="settings">The settings.</param>
         /// <param name="rowSpan">The number of rows to span</param>
         /// <param name="columnSpan">The number of columns to span</param>
-        public BlockGridItem(Udi contentUdi, TContent content, Udi settingsUdi, TSettings settings, int rowSpan, int columnSpan)
-            : base(contentUdi, content, settingsUdi, settings, rowSpan, columnSpan)
+        public BlockGridItem(Udi contentUdi, TContent content, Udi settingsUdi, TSettings settings)
+            : base(contentUdi, content, settingsUdi, settings)
         {
             Settings = settings;
         }

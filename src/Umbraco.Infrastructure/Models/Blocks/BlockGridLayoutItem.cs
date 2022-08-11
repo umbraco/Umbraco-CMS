@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Core.Models.Blocks
     /// <summary>
     /// Used for deserializing the block grid layout
     /// </summary>
-    public class BlockGridLayoutItem
+    public class BlockGridLayoutItem : IBlockLayoutItem
     {
         [JsonProperty("contentUdi", Required = Required.Always)]
         [JsonConverter(typeof(UdiJsonConverter))]

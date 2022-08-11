@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Core.PropertyEditors
@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         public BlockGridBlockConfiguration[] Blocks { get; set; }  = null!;
 
         [DataContract]
-        public class BlockGridBlockConfiguration
+        public class BlockGridBlockConfiguration : IBlockConfiguration
         {
 
             [DataMember(Name ="columnSpanOptions")]
