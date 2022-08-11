@@ -1,12 +1,13 @@
 <style>
 
-    .blockelement-gridblock-editor {
+    :host {
         position: relative;
         border-radius: 3px;
         height: 100%;/* Add this to fill the cell fully */
         box-sizing: border-box;
         border: 1px solid #BBBABF;
-        background-color: white;
+
+        overflow:hidden;
     }
     
     button > * {
@@ -28,8 +29,6 @@
         border: none;
         transition: border-color 120ms, background-color 120ms;
         max-height: 400px;
-
-        overflow:hidden;
     }
     button:hover {
         color: #2152A3;// TODO: Set right colors:

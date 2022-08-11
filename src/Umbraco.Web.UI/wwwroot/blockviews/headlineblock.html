@@ -1,0 +1,46 @@
+<style>
+
+    :host {
+        position: relative;
+        border-radius: 3px;
+        height: 100%;/* Add this to fill the cell fully */
+        box-sizing: border-box;
+        border: 1px solid #BBBABF;
+
+        overflow:hidden;
+    }
+    
+    button {
+        position: relative;
+        display: flex;
+        cursor: pointer;
+        color: black;
+        background-color: transparent;
+        text-align: left;
+        user-select: none;
+        border: none;
+        padding: 2px 6px;
+        width: 100%;
+        height: 100%;
+        transition: border-color 120ms, background-color 120ms;
+    }
+    button:hover {
+        color: #2152A3;// TODO: Set right colors:
+        background-color: #F9F9FA;
+    }
+
+    :host(:focus-within) button, 
+    :host(:hover) button {
+        opacity: 1;
+    }
+
+    h1 {
+
+    }
+
+</style>
+
+<button type="button" ng-click="block.edit()" ng-focus="block.focus">
+    <h1>{{block.data.headline}}</h1>
+</button>
+<slot name="areas" part="areas"></slot>
