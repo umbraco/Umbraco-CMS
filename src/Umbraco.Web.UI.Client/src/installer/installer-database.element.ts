@@ -4,7 +4,11 @@ import { customElement, property, query, state } from 'lit/decorators.js';
 import { Subscription } from 'rxjs';
 
 import { UmbContextConsumerMixin } from '../core/context';
-import { ProblemDetails, UmbracoInstallerDatabaseModel, UmbracoPerformInstallDatabaseConfiguration } from '../core/models';
+import {
+	ProblemDetails,
+	UmbracoInstallerDatabaseModel,
+	UmbracoPerformInstallDatabaseConfiguration,
+} from '../core/models';
 import { UmbInstallerContext } from './installer-context';
 
 @customElement('umb-installer-database')

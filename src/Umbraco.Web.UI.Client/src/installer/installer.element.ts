@@ -1,5 +1,5 @@
-import './installer-database.element';
 import './installer-consent.element';
+import './installer-database.element';
 import './installer-installing.element';
 import './installer-layout.element';
 import './installer-user.element';
@@ -7,8 +7,8 @@ import './installer-user.element';
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
-import { UmbInstallerContext } from './installer-context';
 import { UmbContextProviderMixin } from '../core/context';
+import { UmbInstallerContext } from './installer-context';
 
 @customElement('umb-installer')
 export class UmbInstaller extends UmbContextProviderMixin(LitElement) {
@@ -51,7 +51,7 @@ export class UmbInstaller extends UmbContextProviderMixin(LitElement) {
 	}
 
 	render() {
-		return html`<umb-installer-layout>${this._renderSection()}</umb-installer-layout> `;
+		return html`<umb-installer-layout data-test="installer">${this._renderSection()}</umb-installer-layout> `;
 	}
 }
 

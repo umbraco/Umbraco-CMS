@@ -29,6 +29,9 @@ types
 
 # eslint
 .eslintcache
+/test-results/
+/playwright-report/
+/playwright/.cache/
 
 # storybook
 storybook-static/

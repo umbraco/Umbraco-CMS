@@ -43,7 +43,7 @@ export class UmbBackofficeModalContainer extends UmbContextConsumerMixin(LitElem
 	render() {
 		return html`
 			<uui-modal-container>
-				${repeat(this._modals, (modalHandler) => html`${modalHandler.element}`)})})}
+				${repeat(this._modals, (modalHandler) => html`${modalHandler.element}`)}
 			</uui-modal-container>
 		`;
 	}

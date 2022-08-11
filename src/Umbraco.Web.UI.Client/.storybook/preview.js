@@ -5,7 +5,7 @@ import { html } from 'lit-html';
 import { initialize, mswDecorator } from 'msw-storybook-addon';
 
 import { onUnhandledRequest } from '../src/mocks/browser';
-import { handlers } from '../src/mocks/handlers';
+import { handlers } from '../src/mocks/browser-handlers';
 
 import { UmbExtensionRegistry } from '../src/core/extension';
 import { internalManifests } from '../src/temp-internal-manifests';
