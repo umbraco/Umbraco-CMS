@@ -23,7 +23,7 @@
 		"test": "web-test-runner --coverage",
 		"test:watch": "web-test-runner --watch",
 		"test:e2e": "playwright test",
-		"lint": "eslint src/**/* e2e/**/* --cache",
+		"lint": "eslint --cache src e2e",
 		"lint:fix": "npm run lint -- --fix",
 		"format": "prettier 'src/**/*.ts'",
 		"format:fix": "npm run format -- --write",
@@ -36,7 +36,7 @@
 		"npm": ">=8.0.0 < 9"
 	},
 	"dependencies": {
-		"@umbraco-ui/uui": "^1.0.0-rc.1",
+		"@umbraco-ui/uui": "^1.0.0-rc.2",
 		"element-internals-polyfill": "^1.1.6",
 		"lit": "^2.2.8",
 		"openapi-typescript-fetch": "^1.1.3",

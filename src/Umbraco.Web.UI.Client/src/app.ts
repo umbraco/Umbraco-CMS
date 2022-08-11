@@ -1,4 +1,4 @@
-import '@umbraco-ui/uui-css/dist/uui-css.css';
+import './css/custom-properties.css';
 import 'router-slot';
 
 import { UUIIconRegistryEssential } from '@umbraco-ui/uui';

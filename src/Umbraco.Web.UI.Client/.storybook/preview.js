@@ -1,19 +1,17 @@
+import '../src/core/context/context-provider.element';
+import '../src/css/custom-properties.css';
 import '@umbraco-ui/uui';
-import '@umbraco-ui/uui-css/dist/uui-css.css';
-import { html } from 'lit-html';
 
+import { html } from 'lit-html';
 import { initialize, mswDecorator } from 'msw-storybook-addon';
 
-import { onUnhandledRequest } from '../src/mocks/browser';
-import { handlers } from '../src/mocks/browser-handlers';
-
 import { UmbExtensionRegistry } from '../src/core/extension';
-import { internalManifests } from '../src/temp-internal-manifests';
-
-import '../src/core/context/context-provider.element';
-import { UmbNodeStore } from '../src/core/stores/node.store';
 import { UmbDataTypeStore } from '../src/core/stores/data-type.store';
 import { UmbDocumentTypeStore } from '../src/core/stores/document-type.store';
+import { UmbNodeStore } from '../src/core/stores/node.store';
+import { onUnhandledRequest } from '../src/mocks/browser';
+import { handlers } from '../src/mocks/browser-handlers';
+import { internalManifests } from '../src/temp-internal-manifests';
 
 const extensionRegistry = new UmbExtensionRegistry();
 internalManifests.forEach((manifest) => extensionRegistry.register(manifest));

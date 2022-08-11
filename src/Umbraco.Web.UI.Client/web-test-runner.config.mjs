@@ -15,6 +15,9 @@ export default {
 	},
   testRunnerHtml: (testFramework) =>
     `<html>
+			<head>
+				<link rel="stylesheet" href="/src/css/custom-properties.css">
+			</head>
       <body>
         <script type="module" src="${testFramework}"></script>
         <script type="module">
