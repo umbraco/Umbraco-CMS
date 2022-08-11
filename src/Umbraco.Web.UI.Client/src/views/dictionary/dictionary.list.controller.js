@@ -10,7 +10,10 @@ function DictionaryListController($scope, $location, dictionaryResource, localiz
     var vm = this;
     vm.title = "Dictionary overview";
     vm.loading = false;
-    vm.items = [];   
+    vm.items = [];
+    vm.filter = {
+      searchTerm: ""
+    };
 
     function loadList() {
 
