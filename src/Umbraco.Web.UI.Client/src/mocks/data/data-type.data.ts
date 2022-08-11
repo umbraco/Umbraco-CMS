@@ -33,6 +33,12 @@ export const data: Array<DataTypeEntity> = [
 		name: 'Context Example',
 		propertyEditorUIAlias: 'Umb.PropertyEditorUI.ContextExample',
 	},
+	{
+		id: 1248,
+		key: 'dt-5',
+		name: 'Content Picker (DataType)',
+		propertyEditorUIAlias: 'Umb.PropertyEditorUI.ContentPicker',
+	},
 ];
 
 // Temp mocked database
