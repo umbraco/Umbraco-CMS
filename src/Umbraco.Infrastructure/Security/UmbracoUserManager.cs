@@ -134,8 +134,8 @@ namespace Umbraco.Cms.Core.Security
         /// <inheritdoc />
         public override async Task<bool> CheckPasswordAsync(TUser user, string? password)
         {
-            // we cannot proceed if the user passed in does not have an identity
-            if (user.HasIdentity == false)
+            // we cannot proceed if the user passed in does not have an identity, or if no password is provided.
+            if (user.HasIdentity == false || password is null)
             {
                 return false;
             }
@@ -155,10 +155,10 @@ namespace Umbraco.Cms.Core.Security
         /// We use this because in the back office the only way an admin can change another user's password without first knowing their password
         /// is to generate a token and reset it, however, when we do this we want to track a password change, not a password reset
         /// </remarks>
-        public virtual async Task<IdentityResult> ChangePasswordWithResetAsync(string userId, string token, string? newPassword)
+        public virtual async Task<IdentityResult> ChangePasswordWithResetAsync(string userId, string token, string newPassword)
         {
-            TUser user = await FindByIdAsync(userId);
-            if (user == null)
+            TUser? user = await FindByIdAsync(userId);
+            if (user is null)
             {
                 throw new InvalidOperationException("Could not find user");
             }
@@ -248,8 +248,8 @@ namespace Umbraco.Cms.Core.Security
         /// <inheritdoc/>
         public async Task<bool> ValidateCredentialsAsync(string username, string password)
         {
-            TUser user = await FindByNameAsync(username);
-            if (user == null)
+            TUser? user = await FindByNameAsync(username);
+            if (user is null)
             {
                 return false;
             }

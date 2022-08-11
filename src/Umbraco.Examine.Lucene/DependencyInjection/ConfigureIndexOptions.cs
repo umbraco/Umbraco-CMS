@@ -26,7 +26,7 @@ namespace Umbraco.Cms.Infrastructure.Examine.DependencyInjection
             _settings = settings.Value;
         }
 
-        public void Configure(string name, LuceneDirectoryIndexOptions options)
+        public void Configure(string? name, LuceneDirectoryIndexOptions options)
         {
             switch (name)
             {

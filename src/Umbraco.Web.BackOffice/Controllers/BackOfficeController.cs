@@ -484,8 +484,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             else if (result == SignInResult.TwoFactorRequired)
             {
 
-                var attemptedUser = await _userManager.FindByLoginAsync(loginInfo.LoginProvider, loginInfo.ProviderKey);
-                if (attemptedUser == null)
+                BackOfficeIdentityUser? attemptedUser = await _userManager.FindByLoginAsync(loginInfo.LoginProvider, loginInfo.ProviderKey);
+                if (attemptedUser?.UserName is null)
                 {
                     return new ValidationErrorResult($"No local user found for the login provider {loginInfo.LoginProvider} - {loginInfo.ProviderKey}");
                 }

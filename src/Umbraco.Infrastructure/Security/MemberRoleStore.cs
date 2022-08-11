@@ -137,7 +137,7 @@ namespace Umbraco.Cms.Core.Security
         }
 
         /// <inheritdoc />
-        public Task<string> GetRoleNameAsync(UmbracoIdentityRole role, CancellationToken cancellationToken = default)
+        public Task<string?> GetRoleNameAsync(UmbracoIdentityRole role, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -147,11 +147,11 @@ namespace Umbraco.Cms.Core.Security
                 throw new ArgumentNullException(nameof(role));
             }
 
-            return Task.FromResult(role.Name)!;
+            return Task.FromResult(role.Name);
         }
 
         /// <inheritdoc />
-        public Task SetRoleNameAsync(UmbracoIdentityRole role, string roleName, CancellationToken cancellationToken = default)
+        public Task SetRoleNameAsync(UmbracoIdentityRole role, string? roleName, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -159,20 +159,21 @@ namespace Umbraco.Cms.Core.Security
             {
                 throw new ArgumentNullException(nameof(role));
             }
+
             role.Name = roleName;
             return Task.CompletedTask;
         }
 
         /// <inheritdoc />
-        public Task<string> GetNormalizedRoleNameAsync(UmbracoIdentityRole role, CancellationToken cancellationToken = default)
+        public Task<string?> GetNormalizedRoleNameAsync(UmbracoIdentityRole role, CancellationToken cancellationToken = default)
             => GetRoleNameAsync(role, cancellationToken);
 
         /// <inheritdoc />
-        public Task SetNormalizedRoleNameAsync(UmbracoIdentityRole role, string normalizedName, CancellationToken cancellationToken = default)
+        public Task SetNormalizedRoleNameAsync(UmbracoIdentityRole role, string? normalizedName, CancellationToken cancellationToken = default)
             => SetRoleNameAsync(role, normalizedName, cancellationToken);
 
         /// <inheritdoc />
-        public Task<UmbracoIdentityRole> FindByIdAsync(string roleId, CancellationToken cancellationToken = default)
+        public Task<UmbracoIdentityRole?> FindByIdAsync(string roleId, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -185,27 +186,25 @@ namespace Umbraco.Cms.Core.Security
             IMemberGroup? memberGroup;
 
             // member group can be found by int or Guid, so try both
-            if (!int.TryParse(roleId, NumberStyles.Integer, CultureInfo.InvariantCulture, out int id))
+            if (!int.TryParse(roleId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var id))
             {
                 if (!Guid.TryParse(roleId, out Guid guid))
                 {
                     throw new ArgumentOutOfRangeException(nameof(roleId), $"{nameof(roleId)} is not a valid Guid");
                 }
-                else
-                {
-                    memberGroup = _memberGroupService.GetById(guid);
-                }
+
+                memberGroup = _memberGroupService.GetById(guid);
             }
             else
             {
                 memberGroup = _memberGroupService.GetById(id);
             }
 
-            return Task.FromResult(memberGroup == null ? null : MapFromMemberGroup(memberGroup))!;
+            return Task.FromResult(memberGroup == null ? null : MapFromMemberGroup(memberGroup));
         }
 
         /// <inheritdoc />
-        public Task<UmbracoIdentityRole> FindByNameAsync(string name, CancellationToken cancellationToken = default)
+        public Task<UmbracoIdentityRole?> FindByNameAsync(string name, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -214,6 +213,7 @@ namespace Umbraco.Cms.Core.Security
             {
                 throw new ArgumentNullException(nameof(name));
             }
+
             IMemberGroup? memberGroup = _memberGroupService.GetByName(name);
             return Task.FromResult(memberGroup == null ? null : MapFromMemberGroup(memberGroup))!;
         }

@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Core.Configuration.Models.Validation
         public HealthChecksSettingsValidator(ICronTabParser cronTabParser) => _cronTabParser = cronTabParser;
 
         /// <inheritdoc/>
-        public ValidateOptionsResult Validate(string name, HealthChecksSettings options)
+        public ValidateOptionsResult Validate(string? name, HealthChecksSettings options)
         {
             if (!ValidateNotificationFirstRunTime(options.Notification.FirstRunTime, out var message))
             {

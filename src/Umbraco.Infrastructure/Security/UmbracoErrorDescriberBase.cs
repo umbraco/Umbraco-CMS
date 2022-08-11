@@ -34,7 +34,7 @@ namespace Umbraco.Cms.Core.Security
             Description = _textService.Localize("validation", "duplicateUsername", new[] { userName })
         };
 
-        public override IdentityError InvalidEmail(string email) => new IdentityError
+        public override IdentityError InvalidEmail(string? email) => new IdentityError
         {
             Code = nameof(InvalidEmail),
             Description = _textService.Localize("validation", "invalidEmail")
@@ -46,7 +46,7 @@ namespace Umbraco.Cms.Core.Security
             Description = _textService.Localize("validation", "invalidToken")
         };
 
-        public override IdentityError InvalidUserName(string userName) => new IdentityError
+        public override IdentityError InvalidUserName(string? userName) => new IdentityError
         {
             Code = nameof(InvalidUserName),
             Description = _textService.Localize("validation", "invalidUsername")

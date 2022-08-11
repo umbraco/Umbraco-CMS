@@ -41,6 +41,12 @@ namespace Umbraco.Extensions
             {
                 var @char = section.GetValue<string>(nameof(CharItem.Char));
                 var replacement = section.GetValue<string>(nameof(CharItem.Replacement));
+
+                if (@char is null || replacement is null)
+                {
+                    continue;
+                }
+
                 replacements.Add(new CharItem { Char = @char, Replacement = replacement });
             }
 

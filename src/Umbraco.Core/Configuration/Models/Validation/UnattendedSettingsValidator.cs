@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Core.Configuration.Models.Validation
         : IValidateOptions<UnattendedSettings>
     {
         /// <inheritdoc/>
-        public ValidateOptionsResult Validate(string name, UnattendedSettings options)
+        public ValidateOptionsResult Validate(string? name, UnattendedSettings options)
         {
             if (options.InstallUnattended)
             {

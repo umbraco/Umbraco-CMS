@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Core.Security
             Description = _textService.Localize("validation", "duplicateUserGroupName", new[] { role })
         };
 
-        public override IdentityError InvalidRoleName(string role) => new IdentityError
+        public override IdentityError InvalidRoleName(string? role) => new IdentityError
         {
             Code = nameof(InvalidRoleName),
             Description = _textService.Localize("validation", "invalidUserGroupName")
@@ -70,7 +70,7 @@ namespace Umbraco.Cms.Core.Security
             Description = _textService.Localize("validation", "duplicateMemberGroupName", new[] { role })
         };
 
-        public override IdentityError InvalidRoleName(string role) => new IdentityError
+        public override IdentityError InvalidRoleName(string? role) => new IdentityError
         {
             Code = nameof(InvalidRoleName),
             Description = _textService.Localize("validation", "invalidMemberGroupName")

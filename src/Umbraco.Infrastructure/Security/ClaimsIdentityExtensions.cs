@@ -38,9 +38,9 @@ namespace Umbraco.Extensions
         {
             foreach (Microsoft.AspNetCore.Identity.IdentityUserClaim<string> claim in source.Claims
                 .Where(claim => !s_ignoredClaims.Contains(claim.ClaimType))
-                .Where(claim => !destination.HasClaim(claim.ClaimType, claim.ClaimValue)))
+                .Where(claim => !destination.HasClaim(claim.ClaimType!, claim.ClaimValue!)))
             {
-                destination.AddClaim(new Claim(claim.ClaimType, claim.ClaimValue));
+                destination.AddClaim(new Claim(claim.ClaimType!, claim.ClaimValue!));
             }
         }
     }

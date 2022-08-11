@@ -77,7 +77,7 @@ namespace Umbraco.Cms.Core.Security
         /// We use this because in the back office the only way an admin can change another user's password without first knowing their password
         /// is to generate a token and reset it, however, when we do this we want to track a password change, not a password reset
         /// </remarks>
-        Task<IdentityResult> ChangePasswordWithResetAsync(string userId, string token, string? newPassword);
+        Task<IdentityResult> ChangePasswordWithResetAsync(string userId, string token, string newPassword);
 
         /// <summary>
         /// Validates that an email confirmation token matches the specified <paramref name="user"/>.
