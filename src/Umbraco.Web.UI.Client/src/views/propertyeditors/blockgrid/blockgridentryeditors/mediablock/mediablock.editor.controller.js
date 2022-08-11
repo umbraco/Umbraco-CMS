@@ -26,9 +26,6 @@
                     bc.fileExtension = mediaHelper.getFileExtension(mediaPath);
                     bc.isImage = mediaHelper.detectIfImageByExtension(mediaPath);
                     bc.imageSource = mediaHelper.getThumbnailFromPath(mediaPath);
-                    console.log("Got Media");
-                    console.log(mediaEntity);
-                    console.log(bc);
                 });
             }
         }
