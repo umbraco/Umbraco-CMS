@@ -9,7 +9,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
 public abstract class BlockPropertyValueConverterBase<TBlockModel, TBlockItemModel, TBlockLayoutItem, TBlockConfiguration> : PropertyValueConverterBase
-    where TBlockItemModel : class, IBlockReference<IPublishedElement>
+    where TBlockItemModel : class, IBlockReference<IPublishedElement, IPublishedElement>
     where TBlockLayoutItem : IBlockLayoutItem
     where TBlockConfiguration : IBlockConfiguration
 {

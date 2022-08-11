@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Core.Models.Blocks
 
     // TODO: Change: Niels: this is also called block, be aware!
     [DataContract(Name = "block", Namespace = "")]
-    public class BlockGridItem : IBlockReference<IPublishedElement>
+    public class BlockGridItem : IBlockReference<IPublishedElement, IPublishedElement>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="BlockGridItem" /> class.

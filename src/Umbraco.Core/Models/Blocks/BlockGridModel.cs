@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Core.Models.Blocks
@@ -11,7 +8,7 @@ namespace Umbraco.Cms.Core.Models.Blocks
     /// </summary>
     /// <seealso cref="ReadOnlyCollection{BlockGridItem}" />
     [DataContract(Name = "blockgrid", Namespace = "")]
-    public class BlockGridModel : ReadOnlyCollection<BlockGridItem>
+    public class BlockGridModel : BlockModelCollection<BlockGridItem>
     {
         /// <summary>
         /// Gets the empty <see cref="BlockGridModel" />.
@@ -35,30 +32,6 @@ namespace Umbraco.Cms.Core.Models.Blocks
         /// <param name="gridColumns">The number of columns in the grid</param>
         public BlockGridModel(IList<BlockGridItem> list, int? gridColumns)
             : base(list) => GridColumns = gridColumns;
-
-        /// <summary>
-        /// Gets the <see cref="BlockGridItem" /> with the specified content key.
-        /// </summary>
-        /// <value>
-        /// The <see cref="BlockGridItem" />.
-        /// </value>
-        /// <param name="contentKey">The content key.</param>
-        /// <returns>
-        /// The <see cref="BlockGridItem" /> with the specified content key.
-        /// </returns>
-        public BlockGridItem? this[Guid contentKey] => this.FirstOrDefault(x => x.Content.Key == contentKey);
-
-        /// <summary>
-        /// Gets the <see cref="BlockGridItem" /> with the specified content UDI.
-        /// </summary>
-        /// <value>
-        /// The <see cref="BlockGridItem" />.
-        /// </value>
-        /// <param name="contentUdi">The content UDI.</param>
-        /// <returns>
-        /// The <see cref="BlockGridItem" /> with the specified content UDI.
-        /// </returns>
-        public BlockGridItem? this[Udi contentUdi] => contentUdi is GuidUdi guidUdi ? this.FirstOrDefault(x => x.Content.Key == guidUdi.Guid) : null;
 
         /// <summary>
         /// The number of columns in the grid

@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Core.Models.Blocks;
 /// </summary>
 /// <seealso cref="Umbraco.Core.Models.Blocks.IBlockReference{Umbraco.Core.Models.PublishedContent.IPublishedElement}" />
 [DataContract(Name = "block", Namespace = "")]
-public class BlockListItem : IBlockReference<IPublishedElement>
+public class BlockListItem : IBlockReference<IPublishedElement, IPublishedElement>
 {
     /// <summary>
     ///     Initializes a new instance of the <see cref="BlockListItem" /> class.
