@@ -12,10 +12,10 @@ namespace Umbraco.Cms.Core.Models
 
         [Required]
         [DataMember(Name = "password", IsRequired = true)]
-        public string Password { get; set; } = null!;
+        public required string Password { get; set; }
 
         [Required]
         [DataMember(Name = "resetCode", IsRequired = true)]
-        public string ResetCode { get; set; } = null!;
+        public required string ResetCode { get; set; }
     }
 }

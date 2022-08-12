@@ -7,10 +7,10 @@ namespace Umbraco.Cms.Core.Models
     {
         [Required]
         [DataMember(Name = "loginProvider", IsRequired = true)]
-        public string LoginProvider { get; set; } = null!;
+        public required string LoginProvider { get; set; }
 
         [Required]
         [DataMember(Name = "providerKey", IsRequired = true)]
-        public string ProviderKey { get; set; } = null!;
+        public required string ProviderKey { get; set; }
     }
 }

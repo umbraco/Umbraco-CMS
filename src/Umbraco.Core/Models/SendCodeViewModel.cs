@@ -11,11 +11,11 @@ namespace Umbraco.Cms.Core.Models
     {
         [Required]
         [DataMember(Name = "code", IsRequired = true)]
-        public string Code { get; set; } = null!;
+        public required string Code { get; set; }
 
         [Required]
         [DataMember(Name = "provider", IsRequired = true)]
-        public string Provider { get; set; } = null!;
+        public required string Provider { get; set; }
 
         /// <summary>
         /// Flag indicating whether the sign-in cookie should persist after the browser is closed.
