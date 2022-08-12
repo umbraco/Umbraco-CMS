@@ -7,8 +7,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{2849E9D4-3B4E-40A3-A309-F3CB4F0E125F}"
 	ProjectSection(SolutionItems) = preProject
 		build\azure-pipelines.yml = build\azure-pipelines.yml
-		build\build-bootstrap.ps1 = build\build-bootstrap.ps1
-		build\build.ps1 = build\build.ps1
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{B5BD12C1-A454-435E-8A46-FF4A364C0382}"
