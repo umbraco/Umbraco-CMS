@@ -88,7 +88,7 @@ namespace Umbraco.Cms.Web.Common.Security
             }
 
             // can we change to the new password?
-            IdentityResult changeResult = await userMgr.ChangePasswordAsync(identityUser, changingPasswordModel.OldPassword, changingPasswordModel.NewPassword);
+            IdentityResult changeResult = await userMgr.ChangePasswordAsync(identityUser, changingPasswordModel.OldPassword!, changingPasswordModel.NewPassword);
             if (changeResult.Succeeded == false)
             {
                 // no, fail with error messages for "password"
