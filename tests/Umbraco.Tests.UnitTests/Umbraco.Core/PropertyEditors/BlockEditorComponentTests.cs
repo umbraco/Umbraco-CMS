@@ -30,15 +30,15 @@ public class BlockEditorComponentTests
     private const string SubContentGuid2 = "a062c06d6b0b44ac892b35d90309c7f8";
     private const string SubSettingsGuid1 = "4d998d980ffa4eee8afdc23c4abd6d29";
 
-    private static readonly ILogger<BlockEditorPropertyHandler> s_logger =
-        Mock.Of<ILogger<BlockEditorPropertyHandler>>();
+    private static readonly ILogger<BlockListPropertyNotificationHandler> s_logger =
+        Mock.Of<ILogger<BlockListPropertyNotificationHandler>>();
 
     [Test]
     public void Cannot_Have_Null_Udi()
     {
-        var component = new BlockEditorPropertyHandler(s_logger);
+        var component = new BlockListPropertyNotificationHandler(s_logger);
         var json = GetBlockListJson(null, string.Empty);
-        Assert.Throws<FormatException>(() => component.ReplaceBlockListUdis(json));
+        Assert.Throws<FormatException>(() => component.ReplaceBlockEditorUdis(json));
     }
 
     [Test]
@@ -56,8 +56,8 @@ public class BlockEditorComponentTests
 
         var expected = ReplaceGuids(json, guids, ContentGuid1, ContentGuid2, SettingsGuid1);
 
-        var component = new BlockEditorPropertyHandler(s_logger);
-        var result = component.ReplaceBlockListUdis(json, GuidFactory);
+        var component = new BlockListPropertyNotificationHandler(s_logger);
+        var result = component.ReplaceBlockEditorUdis(json, GuidFactory);
 
         var expectedJson = JsonConvert.SerializeObject(JsonConvert.DeserializeObject(expected, _serializerSettings), _serializerSettings);
         var resultJson = JsonConvert.SerializeObject(JsonConvert.DeserializeObject(result, _serializerSettings), _serializerSettings);
@@ -87,8 +87,8 @@ public class BlockEditorComponentTests
         // get the json with the subFeatures as escaped
         var json = GetBlockListJson(innerJsonEscaped);
 
-        var component = new BlockEditorPropertyHandler(s_logger);
-        var result = component.ReplaceBlockListUdis(json, GuidFactory);
+        var component = new BlockListPropertyNotificationHandler(s_logger);
+        var result = component.ReplaceBlockEditorUdis(json, GuidFactory);
 
         // the expected result is that the subFeatures data is no longer escaped
         var expected = ReplaceGuids(
@@ -135,8 +135,8 @@ public class BlockEditorComponentTests
             SubContentGuid2,
             SubSettingsGuid1);
 
-        var component = new BlockEditorPropertyHandler(s_logger);
-        var result = component.ReplaceBlockListUdis(json, GuidFactory);
+        var component = new BlockListPropertyNotificationHandler(s_logger);
+        var result = component.ReplaceBlockEditorUdis(json, GuidFactory);
 
         var expectedJson = JsonConvert.SerializeObject(JsonConvert.DeserializeObject(expected, _serializerSettings), _serializerSettings);
         var resultJson = JsonConvert.SerializeObject(JsonConvert.DeserializeObject(result, _serializerSettings), _serializerSettings);
@@ -167,8 +167,8 @@ public class BlockEditorComponentTests
 
         var json = GetBlockListJson(complexEditorJsonEscaped);
 
-        var component = new BlockEditorPropertyHandler(s_logger);
-        var result = component.ReplaceBlockListUdis(json, GuidFactory);
+        var component = new BlockListPropertyNotificationHandler(s_logger);
+        var result = component.ReplaceBlockEditorUdis(json, GuidFactory);
 
         // the expected result is that the subFeatures data is no longer escaped
         var expected = ReplaceGuids(

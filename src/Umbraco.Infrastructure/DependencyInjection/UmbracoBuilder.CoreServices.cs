@@ -343,8 +343,8 @@ public static partial class UmbracoBuilderExtensions
 
         // add notification handlers for property editors
         builder
-            .AddNotificationHandler<ContentSavingNotification, BlockEditorPropertyHandler>()
-            .AddNotificationHandler<ContentCopyingNotification, BlockEditorPropertyHandler>()
+            .AddNotificationHandler<ContentSavingNotification, BlockListPropertyNotificationHandler>()
+            .AddNotificationHandler<ContentCopyingNotification, BlockListPropertyNotificationHandler>()
             .AddNotificationHandler<ContentSavingNotification, NestedContentPropertyHandler>()
             .AddNotificationHandler<ContentCopyingNotification, NestedContentPropertyHandler>()
             .AddNotificationHandler<ContentCopiedNotification, FileUploadPropertyEditor>()
