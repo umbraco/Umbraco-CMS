@@ -23,7 +23,7 @@ public class RecurringHostedServiceBaseTests
         var cronTabParser = new NCronTabParser();
         var logger = Mock.Of<ILogger>();
         var now = new DateTime(2020, 10, 31, 12, 0, 0);
-        var result = RecurringHostedServiceBase.GetNotificationDelay(firstRunTime, cronTabParser, logger, now, TimeSpan.Zero);
+        var result = RecurringHostedServiceBase.GetDelay(firstRunTime, cronTabParser, logger, now, TimeSpan.Zero);
         Assert.AreEqual(expectedDelayInMinutes, result.TotalMinutes);
     }
 
@@ -35,7 +35,7 @@ public class RecurringHostedServiceBaseTests
         var logger = Mock.Of<ILogger>();
         var now = new DateTime(2020, 10, 31, 12, 25, 0);
         var defaultDelay = TimeSpan.FromMinutes(10);
-        var result = RecurringHostedServiceBase.GetNotificationDelay(firstRunTime, cronTabParser, logger, now, defaultDelay);
+        var result = RecurringHostedServiceBase.GetDelay(firstRunTime, cronTabParser, logger, now, defaultDelay);
         Assert.AreEqual(defaultDelay.TotalMinutes, result.TotalMinutes);
     }
 
@@ -47,7 +47,7 @@ public class RecurringHostedServiceBaseTests
         var logger = new Mock<ILogger>();
         var now = new DateTime(2020, 10, 31, 12, 25, 0);
         var defaultDelay = TimeSpan.FromMinutes(10);
-        var result = RecurringHostedServiceBase.GetNotificationDelay(firstRunTime, cronTabParser, logger.Object, now, defaultDelay);
+        var result = RecurringHostedServiceBase.GetDelay(firstRunTime, cronTabParser, logger.Object, now, defaultDelay);
         Assert.AreEqual(defaultDelay, result);
 
         logger.Verify(

@@ -68,11 +68,11 @@ public abstract class RecurringHostedServiceBase : IHostedService, IDisposable
     /// <param name="logger">The logger.</param>
     /// <param name="defaultDelay">The default delay to use when a first run time is not configured.</param>
     /// <returns>The delay before first running the recurring task.</returns>
-    protected static TimeSpan GetNotificationDelay(
+    protected static TimeSpan GetDelay(
         string firstRunTime,
         ICronTabParser cronTabParser,
         ILogger logger,
-        TimeSpan defaultDelay) => GetNotificationDelay(firstRunTime, cronTabParser, logger, DateTime.Now, defaultDelay);
+        TimeSpan defaultDelay) => GetDelay(firstRunTime, cronTabParser, logger, DateTime.Now, defaultDelay);
 
     /// <summary>
     /// Determines the delay before the first run of a recurring task implemented as a hosted service when an optonal
@@ -85,7 +85,7 @@ public abstract class RecurringHostedServiceBase : IHostedService, IDisposable
     /// <param name="defaultDelay">The default delay to use when a first run time is not configured.</param>
     /// <returns>The delay before first running the recurring task.</returns>
     /// <remarks>Internal to expose for unit tests.</remarks>
-    internal static TimeSpan GetNotificationDelay(
+    internal static TimeSpan GetDelay(
         string firstRunTime,
         ICronTabParser cronTabParser,
         ILogger logger,
