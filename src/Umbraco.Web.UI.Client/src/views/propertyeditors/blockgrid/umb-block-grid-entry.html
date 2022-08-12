@@ -6,7 +6,8 @@
 <ng-form name="vm.blockRowForm" val-server-match="{ 'contains' : { 'valServerMatchContent': vm.layoutEntry.$block.content.key, 'valServerMatchSettings': vm.layoutEntry.$block.settings.key } }">
     <div class="umb-block-grid__block" ng-class="{'--active':vm.layoutEntry.$block.active, '--show-validation': vm.layoutEntry.$block.showValidation === true}">
 
-        <umb-block-grid-block stylesheet="{{::vm.layoutEntry.$block.stylesheet}}"
+        <umb-block-grid-block class="umb-block-grid__block--view"
+                              stylesheet="{{::vm.layoutEntry.$block.stylesheet}}"
                               view="{{::vm.layoutEntry.$block.view}}"
                               api="vm.blockEditorApi"
                               block="vm.layoutEntry.$block"
@@ -20,6 +21,7 @@
                     class="umb-block-grid__block-area"
                     data-area-col-span="{{areaEntry.$config.columnSpan}}"
                     data-area-row-span="{{areaEntry.$config.rowSpan}}"
+                    data-area-alias="{{areaEntry.$config.alias}}"
                     style="
                     --umb-block-grid--area-column-span: {{areaEntry.$config.columnSpan}};
                     --umb-block-grid--area-row-span: {{areaEntry.$config.rowSpan}};
@@ -34,6 +36,9 @@
             </div>
 
         </umb-block-grid-block>
+
+        <div class="umb-block-grid__block--validation-border"></div>
+        <div class="umb-block-grid__block--validation-badge">!</div>
 
         <div class="umb-block-grid__block--actions">
             <button type="button" class="btn-reset umb-outline action --settings" localize="title" title="actions_editSettings"
@@ -63,7 +68,7 @@
             </button>
         </div>
 
-        <button ng-if="vm.layoutEntry.$block.config.columnSpanOptions.length > 1 || vm.layoutEntry.$block.config.rowMaxSpan !== 1" type="button" class="umb-block-grid__scale-handler" ng-mousedown="vm.scaleHandlerMouseDown($event)" ng-keyup="vm.scaleHandlerKeyUp($event)">
+        <button ng-if="vm.layoutEntry.$block.config.columnSpanOptions.length > 1 || vm.layoutEntry.$block.config.rowMaxSpan !== vm.layoutEntry.$block.config.rowMinSpan" type="button" class="umb-block-grid__scale-handler" ng-mousedown="vm.scaleHandlerMouseDown($event)" ng-keyup="vm.scaleHandlerKeyUp($event)">
         </button>
 
     </div>

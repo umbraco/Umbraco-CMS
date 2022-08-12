@@ -14,34 +14,13 @@
         animation: inherit;
     }
 
-    :host {
-        
-    }
-
-    .umb-block-grid__block--view {
-        height:100%;/* Add this to fill the cell fully */
-    }
-
     .blockelement-gridblock-editor {
         position: relative;
         border-radius: 3px;
         height: 100%;/* Add this to fill the cell fully */
         box-sizing: border-box;
-        border: 1px solid lightgrey;
+        border: 1px solid #BBBABF;
         background-color: white;
-        --umb-block-grid--show-area-ui: 0;
-    }
-    .blockelement-gridblock-editor:hover::after {
-        content: '';
-        position: absolute;
-        inset: 0;
-        border-radius: 3px;
-        pointer-events: none;
-    }
-    .blockelement-gridblock-editor:focus,
-    .blockelement-gridblock-editor:focus-within,
-    .blockelement-gridblock-editor:hover {
-        --umb-block-grid--show-area-ui: 1;
     }
     
     .blockelement-gridblock-editor > button {
@@ -51,13 +30,16 @@
         width: 100%;
         min-height: 48px;
         cursor: pointer;
-        color: @ui-action-discreet-type;
+        color: #1b264f;
         background-color: white;
         text-align: left;
         padding: 0 20px;
         user-select: none;
         border: none;
         transition: border-color 120ms, background-color 120ms;
+    }
+    .blockelement-gridblock-editor > button:hover {
+        color: #2152A3;
     }
     .blockelement-gridblock-editor .icon {
         font-size: 22px;
@@ -71,70 +53,6 @@
         padding-top:2px;
         padding-bottom:2px;
     }
-
-    .blockelement-gridblock-editor > button:hover {
-        color: @ui-action-discreet-type-hover;
-        background-color: @ui-action-hover;
-    }
-
-    .blockelement-gridblock-editor.--active  {
-        border-color: @ui-active;
-    }
-    .blockelement-gridblock-editor.--active > button {
-        color: @ui-active-type;
-        background-color: @ui-active;
-    }
-
-    
-
-    /*
-    TODO: Show validation issues in a good way for all.
-        ng-form.ng-invalid-val-server-match-content > .umb-block-list__block > .umb-block-list__block--content > div > & {
-            color: @formErrorText;
-            .show-validation-type-warning & {
-                color: @formWarningText;
-            }
-        }
-        ng-form.ng-invalid-val-server-match-content > .umb-block-list__block:not(.--active) > .umb-block-list__block--content > div > & {
-            > span {
-                &::after {
-                    content: "!";
-                    text-align: center;
-                    position: absolute;
-                    top: -6px;
-                    right: -15px;
-                    min-width: 10px;
-                    color: @white;
-                    background-color: @ui-active-type;
-                    border: 2px solid @white;
-                    border-radius: 50%;
-                    font-size: 10px;
-                    font-weight: bold;
-                    padding: 2px;
-                    line-height: 10px;
-                    background-color: @formErrorText;
-                    .show-validation-type-warning & {
-                        background-color: @formWarningText;
-                    }
-                    font-weight: 900;
-
-                    animation-duration: 1.4s;
-                    animation-iteration-count: infinite;
-                    animation-name: blockelement-inlineblock-editor--badge-bounce;
-                    animation-timing-function: ease;
-                    @keyframes blockelement-inlineblock-editor--badge-bounce {
-                        0%   { transform: translateY(0); }
-                        20%  { transform: translateY(-4px); }
-                        40%  { transform: translateY(0); }
-                        55%  { transform: translateY(-2px); }
-                        70%  { transform: translateY(0); }
-                        100% { transform: translateY(0); }
-                    }
-                }
-            }
-        }
-    }
-    */
 </style>
 
 <div class="blockelement-gridblock-editor" ng-class="{ '--active': block.active, '--error': parentForm.$invalid && valFormManager.isShowingValidation() }">

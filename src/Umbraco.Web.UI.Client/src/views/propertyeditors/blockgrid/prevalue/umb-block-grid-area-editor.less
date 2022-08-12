@@ -36,6 +36,8 @@ Grid part:
     position: relative;
     background-color: @gray-11;
     box-sizing: border-box;
+    cursor: move;
+    
     &::after {
         content: '';
         position: absolute;
@@ -65,6 +67,14 @@ Grid part:
         border-color: @blueDark;
     }
 }
+.umb-block-grid-area-editor__area .__label {
+    margin-top: 15px;
+    margin-left: 20px;
+    opacity: 60%;
+    pointer-events: none;
+    user-select: none;
+}
+
 .umb-block-grid-area-editor__area-placeholder {
     background: transparent;
     border-radius: 3px;

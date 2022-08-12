@@ -51,11 +51,11 @@
             `
                 ${ model.stylesheet ? `
                     <style>
-                    @import "${model.stylesheet}"
+                        @import "${model.stylesheet}"
                     </style>`
                     : ''
                 }
-                <div class="umb-block-grid__block--view" ng-include="'${model.view}'"></div>
+                <div style="display:contents;" ng-include="'${model.view}'"></div>
             `;
             $compile(shadowRoot)($scope);
             

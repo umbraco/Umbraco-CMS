@@ -32,6 +32,61 @@
     position: relative;
 }
 
+.umb-block-grid__block--validation-border {
+    display:none;
+}
+ng-form.ng-invalid-val-server-match-content > .umb-block-grid__block:not(.--active) > .umb-block-grid__block--validation-border {
+    display: block;
+    position: absolute;
+    inset: 0;
+    border-radius: 3px;
+    border: 1px solid @formErrorText;
+    /* not working cause we are in a shadow DOM: */
+    .show-validation-type-warning & {
+        border-color: @formWarningText;
+    }
+    pointer-events: none;
+}
+
+.umb-block-grid__block--validation-badge {
+    display:none;
+}
+ng-form.ng-invalid-val-server-match-content > .umb-block-grid__block:not(.--active) > .umb-block-grid__block--validation-badge {
+    display:block;
+    text-align: center;
+    position: absolute;
+    top: -9px;
+    right: -9px;
+    min-width: 10px;
+    color: @white;
+    border: 2px solid @white;
+    border-radius: 50%;
+    font-size: 10px;
+    font-weight: bold;
+    padding: 2px;
+    line-height: 10px;
+    background-color: @formErrorText;
+    /* not working cause we are in a shadow DOM: */
+    .show-validation-type-warning & {
+        background-color: @formWarningText;
+    }
+    font-weight: 900;
+    pointer-events: none;
+
+    animation-duration: 1.4s;
+    animation-iteration-count: infinite;
+    animation-name: blockelement-inlineblock-editor--badge-bounce;
+    animation-timing-function: ease;
+    @keyframes blockelement-inlineblock-editor--badge-bounce {
+        0%   { transform: translateY(0); }
+        20%  { transform: translateY(-4px); }
+        40%  { transform: translateY(0); }
+        55%  { transform: translateY(-2px); }
+        70%  { transform: translateY(0); }
+        100% { transform: translateY(0); }
+    }
+}
+
 .umb-block-grid__block {
     position: relative;
     width: 100%;
@@ -125,6 +180,20 @@
 ng-form.ng-invalid-val-server-match-settings > .umb-block-grid__block > .umb-block-grid__block--actions {
     opacity: 1;
 }
+
+.umb-block-grid__block--view {
+    --umb-block-grid--show-area-ui: 0;
+    height: 100%;
+    width: 100%;
+    display: block;
+}
+.umb-block-grid__block--view:focus,
+.umb-block-grid__block--view:focus-within,
+.umb-block-grid__block--view:hover {
+    --umb-block-grid--show-area-ui: 1;
+}
+
+
 .umb-block-grid__block--actions {
     position: absolute;
     top: 10px;

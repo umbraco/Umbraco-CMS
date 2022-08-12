@@ -41,7 +41,7 @@
             }
             
             vm.locallyAvailableBlockTypes = vm.blockEditorApi.internal.getAllowedTypesOf(vm.parentBlock, vm.areaKey);
-
+            
             $scope.$watch('vm.entries', onLocalAmountOfBlocksChanged, true);
         };
 
@@ -52,7 +52,7 @@
                 var isMinRequirementGood = vm.entries.length >= vm.areaConfig.minAllowed;
                 vm.parentForm.areaMinCount.$setValidity("areaMinCount", isMinRequirementGood);
 
-                var isMaxRequirementGood = vm.entries.length <= vm.areaConfig.maxAllowed;
+                var isMaxRequirementGood = vm.areaConfig.maxAllowed == null || vm.entries.length <= vm.areaConfig.maxAllowed;
                 vm.parentForm.areaMaxCount.$setValidity("areaMaxCount", isMaxRequirementGood);
 
 
@@ -67,18 +67,14 @@
                     if(amount < minAllowed || (maxAllowed > 0 && amount > maxAllowed)) {
                         vm.invalidBlockTypes.push({
                             'key': allowance.elementTypeKey,
-                            'name': vm.locallyAvailableBlockTypes.find(blockType => {console.log(blockType.elementTypeModel.name); return blockType.elementTypeModel.name}),
+                            'name': vm.locallyAvailableBlockTypes.find(blockType => blockType.elementTypeModel.name),
                             'amount': amount,
                             'minRequirement': minAllowed,
                             'maxRequirement': maxAllowed
                         });
                     }
-                    
                 });
-                // Loop through all allowed type of this.
-                // set invalidBlockTypes with needed data, or remove..
-
-                var isTypeRequirementGood = false;
+                var isTypeRequirementGood = vm.invalidBlockTypes.length === 0;
                 vm.parentForm.areaTypeRequirements.$setValidity("areaTypeRequirements", isTypeRequirementGood);
 
 

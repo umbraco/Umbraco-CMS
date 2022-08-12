@@ -1,10 +1,37 @@
 
 
 
-.umb-block-grid-area-allowance-editor {
-    
+.umb-block-grid-area-allowance-editor > button {
+    width: 100%;
 }
 
-umb-block-grid-area-allowance-editor .__list.--disabled {
+.umb-block-grid-area-allowance-editor .__list.--disabled {
 
+}
+
+.umb-block-grid-area-allowance-editor__entry {
+    display:flex;
+    align-items: baseline;
+
+    select {
+        margin-right: 5px;
+    }
+}
+
+.umb-block-grid-area-allowance-editor__entry button {
+    border-radius: 3px;
+    color: @ui-action-type;
+
+    height: 32px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 32px;
+
+    margin-left: 5px;
+    align-self: normal;
+}
+.umb-block-grid-area-allowance-editor__entry button:hover {
+    background-color: @ui-action-hover;
+    color: @ui-action-type-hover;
 }
