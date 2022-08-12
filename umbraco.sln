@@ -11,19 +11,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{2849E9D4
 		build\build.ps1 = build\build.ps1
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{FD962632-184C-4005-A5F3-E705D92FC645}"
-	ProjectSection(SolutionItems) = preProject
-		.github\BUILD.md = .github\BUILD.md
-		.github\CLEAR.md = .github\CLEAR.md
-		.github\CONTRIBUTING.md = .github\CONTRIBUTING.md
-		.github\CONTRIBUTING_DETAILED.md = .github\CONTRIBUTING_DETAILED.md
-		.github\CONTRIBUTION_GUIDELINES.md = .github\CONTRIBUTION_GUIDELINES.md
-		.github\PULL_REQUEST_TEMPLATE.md = .github\PULL_REQUEST_TEMPLATE.md
-		.github\README.md = .github\README.md
-		.github\REVIEW_PROCESS.md = .github\REVIEW_PROCESS.md
-		.github\V8_GETTING_STARTED.md = .github\V8_GETTING_STARTED.md
-	EndProjectSection
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{B5BD12C1-A454-435E-8A46-FF4A364C0382}"
 EndProject
 Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Umbraco.Web.UI.Client", "http://localhost:3961", "{3819A550-DCEC-4153-91B4-8BA9F7F0B9B4}"
@@ -72,24 +59,7 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Umbraco.Tests.AcceptanceTes
 		StartServerOnDebug = "false"
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DocTools", "DocTools", "{53594E5B-64A2-4545-8367-E3627D266AE8}"
-	ProjectSection(SolutionItems) = preProject
-		src\ApiDocs\docfx.filter.yml = src\ApiDocs\docfx.filter.yml
-		src\ApiDocs\docfx.json = src\ApiDocs\docfx.json
-		src\ApiDocs\index.md = src\ApiDocs\index.md
-		src\ApiDocs\toc.yml = src\ApiDocs\toc.yml
-	EndProjectSection
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Tests.Benchmarks", "tests\Umbraco.Tests.Benchmarks\Umbraco.Tests.Benchmarks.csproj", "{3A33ADC9-C6C0-4DB1-A613-A9AF0210DF3D}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IssueTemplates", "IssueTemplates", "{C7311C00-2184-409B-B506-52A5FAEA8736}"
-	ProjectSection(SolutionItems) = preProject
-		.github\ISSUE_TEMPLATE\1_Bug.md = .github\ISSUE_TEMPLATE\1_Bug.md
-		.github\ISSUE_TEMPLATE\2_Feature_request.md = .github\ISSUE_TEMPLATE\2_Feature_request.md
-		.github\ISSUE_TEMPLATE\3_Support_question.md = .github\ISSUE_TEMPLATE\3_Support_question.md
-		.github\ISSUE_TEMPLATE\4_Documentation_issue.md = .github\ISSUE_TEMPLATE\4_Documentation_issue.md
-		.github\ISSUE_TEMPLATE\5_Security_issue.md = .github\ISSUE_TEMPLATE\5_Security_issue.md
-	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Core", "src\Umbraco.Core\Umbraco.Core.csproj", "{29AA69D9-B597-4395-8D42-43B1263C240A}"
 EndProject
@@ -255,9 +225,7 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{9E4C8A12-FBE0-4673-8CE2-DF99D5D57817} = {B5BD12C1-A454-435E-8A46-FF4A364C0382}
-		{53594E5B-64A2-4545-8367-E3627D266AE8} = {FD962632-184C-4005-A5F3-E705D92FC645}
 		{3A33ADC9-C6C0-4DB1-A613-A9AF0210DF3D} = {B5BD12C1-A454-435E-8A46-FF4A364C0382}
-		{C7311C00-2184-409B-B506-52A5FAEA8736} = {FD962632-184C-4005-A5F3-E705D92FC645}
 		{FB5676ED-7A69-492C-B802-E7B24144C0FC} = {B5BD12C1-A454-435E-8A46-FF4A364C0382}
 		{D6319409-777A-4BD0-93ED-B2DFD805B32C} = {B5BD12C1-A454-435E-8A46-FF4A364C0382}
 		{A499779C-1B3B-48A8-B551-458E582E6E96} = {B5BD12C1-A454-435E-8A46-FF4A364C0382}
