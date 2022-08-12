@@ -79,6 +79,7 @@
 
 
                 vm.invalidAmount = !isMinRequirementGood || !isMaxRequirementGood || !isTypeRequirementGood;
+
                 $element.toggleClass("--invalid", vm.invalidAmount);
             }
         }

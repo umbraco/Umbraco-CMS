@@ -4,7 +4,16 @@
 </uui-button-inline-create>
 
 <ng-form name="vm.blockRowForm" val-server-match="{ 'contains' : { 'valServerMatchContent': vm.layoutEntry.$block.content.key, 'valServerMatchSettings': vm.layoutEntry.$block.settings.key } }">
-    <div class="umb-block-grid__block" ng-class="{'--active':vm.layoutEntry.$block.active, '--show-validation': vm.layoutEntry.$block.showValidation === true}">
+    <div 
+        class="umb-block-grid__block" 
+        ng-mouseleave="vm.layoutEntry.$block.onMouseLeave()"
+        ng-mouseenter="vm.layoutEntry.$block.onMouseEnter()"
+        ng-class="{
+                    '--active':vm.layoutEntry.$block.active, 
+                    '--show-validation': vm.layoutEntry.$block.showValidation === true,
+                    '--has-content-in-areas': vm.layoutEntry.areas.length > 0,
+                    '--block-ui-visible': vm.layoutEntry.$block.blockUiVisibility === true
+                }">
 
         <umb-block-grid-block class="umb-block-grid__block--view"
                               stylesheet="{{::vm.layoutEntry.$block.stylesheet}}"
@@ -41,31 +50,70 @@
         <div class="umb-block-grid__block--validation-badge">!</div>
 
         <div class="umb-block-grid__block--actions">
-            <button type="button" class="btn-reset umb-outline action --settings" localize="title" title="actions_editSettings"
-                    ng-click="vm.blockEditorApi.openSettingsForBlock(vm.layoutEntry.$block, vm.index, vm.blockRowForm);"
-                    ng-class="{ '--error': vm.blockRowForm.$error.valServerMatchSettings && vm.valFormManager.isShowingValidation() }"
-                    ng-if="vm.layoutEntry.$block.showSettings === true">
-                <umb-icon icon="icon-settings" class="icon"></umb-icon>
-                <span class="sr-only">
-                    <localize key="general_settings">Settings</localize>
-                </span>
-                <div class="__error-badge">!</div>
-            </button>
-            <button type="button" class="btn-reset umb-outline action --copy" localize="title" title="actions_copy"
-                    ng-click="vm.blockEditorApi.copyBlock(vm.layoutEntry.$block);"
-                    ng-if="vm.layoutEntry.$block.showCopy === true">
-                <umb-icon icon="icon-documents" class="icon"></umb-icon>
-                <span class="sr-only">
-                    <localize key="general_copy">Copy</localize>
-                </span>
-            </button>
-            <button type="button" class="btn-reset umb-outline action --delete" localize="title" title="actions_delete"
-                    ng-click="vm.blockEditorApi.requestDeleteBlock(vm.layoutEntry.$block);">
-                <umb-icon icon="icon-trash" class="icon"></umb-icon>
-                <span class="sr-only">
-                    <localize key="general_delete">Delete</localize>
-                </span>
-            </button>
+
+            <div class="__parent-context" ng-if="vm.parentBlock">
+                <button 
+                    type="button"
+                    class="btn-reset umb-outline action --parent"
+                    localize="title"
+                    title="actions_editSettings"
+                    data-ng-click="vm.parentBlock.showBlockUI()"
+                    ng-class="{ '--error': false && vm.valFormManager.isShowingValidation() }"
+                >
+                    <umb-icon icon="icon-navigation-up" class="icon"></umb-icon>
+                    <span>
+                        {{vm.parentBlock.label}}
+                    </span>
+                    <span class="sr-only">
+                        <localize key="blockeditor_TODO">Focus parent block</localize>
+                    </span>
+                    <div class="__error-badge">!</div>
+                </button>
+            </div>
+
+            <div class="__local-context">
+                <div class="__label">
+                    <!--<umb-icon icon="{{vm.layoutEntry.$block.content.icon}}" class="icon"></umb-icon>-->
+                    <span>{{vm.layoutEntry.$block.label}}</span>
+                </div>
+
+                <button type="button" class="btn-reset umb-outline action --settings" localize="title" title="actions_editContent"
+                        ng-click="vm.blockEditorApi.editBlock(vm.layoutEntry.$block, false, vm.index, vm.blockRowForm);"
+                        ng-class="{ '--error': vm.blockRowForm.$error.valServerMatchSettings && vm.valFormManager.isShowingValidation() }"
+                        ng-if="vm.layoutEntry.$block.hideContentInOverlay !== true">
+                    <umb-icon icon="icon-edit" class="icon"></umb-icon>
+                    <span class="sr-only">
+                        <localize key="general_content">Content</localize>
+                    </span>
+                    <div class="__error-badge">!</div>
+                </button>
+                
+                <button type="button" class="btn-reset umb-outline action --settings" localize="title" title="actions_editSettings"
+                        ng-click="vm.blockEditorApi.openSettingsForBlock(vm.layoutEntry.$block, vm.index, vm.blockRowForm);"
+                        ng-class="{ '--error': vm.blockRowForm.$error.valServerMatchSettings && vm.valFormManager.isShowingValidation() }"
+                        ng-if="vm.layoutEntry.$block.showSettings === true">
+                    <umb-icon icon="icon-settings" class="icon"></umb-icon>
+                    <span class="sr-only">
+                        <localize key="general_settings">Settings</localize>
+                    </span>
+                    <div class="__error-badge">!</div>
+                </button>
+                <button type="button" class="btn-reset umb-outline action --copy" localize="title" title="actions_copy"
+                        ng-click="vm.blockEditorApi.copyBlock(vm.layoutEntry.$block);"
+                        ng-if="vm.layoutEntry.$block.showCopy === true">
+                    <umb-icon icon="icon-documents" class="icon"></umb-icon>
+                    <span class="sr-only">
+                        <localize key="general_copy">Copy</localize>
+                    </span>
+                </button>
+                <button type="button" class="btn-reset umb-outline action --delete" localize="title" title="actions_delete"
+                        ng-click="vm.blockEditorApi.requestDeleteBlock(vm.layoutEntry.$block);">
+                    <umb-icon icon="icon-trash" class="icon"></umb-icon>
+                    <span class="sr-only">
+                        <localize key="general_delete">Delete</localize>
+                    </span>
+                </button>
+            </div>
         </div>
 
         <button ng-if="vm.layoutEntry.$block.config.columnSpanOptions.length > 1 || vm.layoutEntry.$block.config.rowMaxSpan !== vm.layoutEntry.$block.config.rowMinSpan" type="button" class="umb-block-grid__scale-handler" ng-mousedown="vm.scaleHandlerMouseDown($event)" ng-keyup="vm.scaleHandlerKeyUp($event)">

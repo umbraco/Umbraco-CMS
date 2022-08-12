@@ -333,6 +333,22 @@
             // If we have content, otherwise it doesn't make sense to copy.
             block.showCopy = vm.supportCopy && block.config.contentElementTypeKey != null;
 
+            block.blockUiVisibility = false;
+            block.showBlockUI = function () {
+                delete block.__timeout;
+                block.blockUiVisibility = true;
+            };
+            block.onMouseLeave = function () {
+                block.__timeout = $timeout(() => {block.blockUiVisibility = false}, 500);
+            };
+            block.onMouseEnter = function () {
+                if (block.__timeout) {
+                    $timeout.cancel(block.__timeout);
+                    delete block.__timeout;
+                }
+            };
+
+
             // Index is set by umbblockgridblock component and kept up to date by it.
             block.index = 0;
             block.setParentForm = function (parentForm) {
