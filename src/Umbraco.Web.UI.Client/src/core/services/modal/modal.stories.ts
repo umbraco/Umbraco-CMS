@@ -29,7 +29,7 @@ export default {
 	],
 	id: 'installer-page',
 	argTypes: {
-		modalLayout: { control: 'select', options: ['Confirm', 'Content Picker'] },
+		modalLayout: { control: 'select', options: ['Confirm', 'Content Picker', 'Property Editor UI Picker'] },
 	},
 } as Meta;
 
@@ -54,6 +54,9 @@ class StoryModalServiceExampleElement extends UmbContextConsumerMixin(LitElement
 		switch (this.modalLayout) {
 			case 'Content Picker':
 				this._modalService?.contentPicker();
+				break;
+			case 'Property Editor UI Picker':
+				this._modalService?.propertyEditorUIPicker();
 				break;
 			default:
 				this._modalService?.confirm({
