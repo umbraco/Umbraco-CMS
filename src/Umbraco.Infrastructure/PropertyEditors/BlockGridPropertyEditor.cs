@@ -15,11 +15,11 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     ValueType = ValueTypes.Json,
     Group = Constants.PropertyEditors.Groups.Lists,
     Icon = "icon-thumbnail-list")]
-public class BlockGridPropertyEditorPropertyEditor : BlockGridPropertyEditorBase
+public class BlockGridPropertyEditor : BlockGridPropertyEditorBase
 {
     private readonly IIOHelper _ioHelper;
 
-    public BlockGridPropertyEditorPropertyEditor(
+    public BlockGridPropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory,
         IIOHelper ioHelper)
         : base(dataValueEditorFactory) =>
