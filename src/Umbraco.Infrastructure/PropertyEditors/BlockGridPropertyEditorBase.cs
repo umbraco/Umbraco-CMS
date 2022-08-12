@@ -9,6 +9,8 @@ using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Extensions;
+using BlockGridAreaConfiguration = Umbraco.Cms.Core.PropertyEditors.BlockGridConfiguration.BlockGridBlockConfiguration.BlockGridAreaConfiguration;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
@@ -46,25 +48,56 @@ public abstract class BlockGridPropertyEditorBase : DataEditor
             Validators.Add(new MinMaxValidator(BlockEditorValues, textService));
         }
 
-
-        /// <summary>
-        /// Validates the min/max of the block editor
-        /// </summary>
-        // TODO: implement this 
-        private class MinMaxValidator : IValueValidator
+        private class MinMaxValidator : BlockEditorMinMaxValidatorBase
         {
             private readonly BlockEditorValues _blockEditorValues;
-            private readonly ILocalizedTextService _textService;
 
             public MinMaxValidator(BlockEditorValues blockEditorValues, ILocalizedTextService textService)
-            {
+                : base(textService) =>
                 _blockEditorValues = blockEditorValues;
-                _textService = textService;
-            }
 
-            public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration)
+            public override IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration)
             {
-                yield break;
+                if (dataTypeConfiguration is not BlockGridConfiguration blockConfig)
+                {
+                    return Array.Empty<ValidationResult>();
+                }
+
+                BlockEditorData? blockEditorData = _blockEditorValues.DeserializeAndClean(value);
+
+                var validationResults = new List<ValidationResult>();
+                validationResults.AddRange(ValidateNumberOfBlocks(blockEditorData, blockConfig.ValidationLimit.Min, blockConfig.ValidationLimit.Max));
+
+                var areasConfigsByKey = blockConfig.Blocks.SelectMany(b => b.Areas).ToDictionary(a => a.Key);
+
+                IList<BlockGridLayoutAreaItem> ExtractLayoutAreaItems(BlockGridLayoutItem item)
+                {
+                    var areas = item.Areas.ToList();
+                    areas.AddRange(item.Areas.SelectMany(a => a.Items).SelectMany(ExtractLayoutAreaItems));
+                    return areas;
+                }
+
+                BlockGridLayoutAreaItem[]? areas = blockEditorData?.Layout?.ToObject<IEnumerable<BlockGridLayoutItem>>()?.SelectMany(ExtractLayoutAreaItems).ToArray();
+
+                if (areas?.Any() != true)
+                {
+                    return validationResults;
+                }
+
+                foreach (BlockGridLayoutAreaItem area in areas)
+                {
+                    if (!areasConfigsByKey.TryGetValue(area.Key, out BlockGridAreaConfiguration? areaConfig))
+                    {
+                        continue;
+                    }
+
+                    if ((areaConfig.MinAllowed.HasValue && area.Items.Length < areaConfig.MinAllowed) || (areaConfig.MaxAllowed.HasValue && area.Items.Length > areaConfig.MaxAllowed))
+                    {
+                        validationResults.Add(new ValidationResult(TextService.Localize("validation", "entriesAreasMismatch")));
+                    }
+                }
+
+                return validationResults;
             }
         }
     }

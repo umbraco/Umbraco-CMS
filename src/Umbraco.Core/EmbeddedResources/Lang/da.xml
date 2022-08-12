@@ -1962,6 +1962,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="customValidation">Selvvalgt validering</key>
     <key alias="entriesShort"><![CDATA[Minimum %0% element(er), tilføj <strong>%1%</strong> mere.]]></key>
     <key alias="entriesExceed"><![CDATA[Maksimum %0% element(er), <strong>%1%</strong> for mange.]]></key>
+    <key alias="entriesAreasMismatch">Ét eller flere områder lever ikke op til kravene for antal indholdselementer.</key>
   </area>
   <area alias="redirectUrls">
     <key alias="disableUrlTracker">Slå URL tracker fra</key>
