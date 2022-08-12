@@ -24,23 +24,14 @@ public class BlockGridEditorDataConverter : BlockEditorDataConverter
             return null;
         }
 
-        var result = new List<ContentAndSettingsReference>();
-
-        foreach (BlockGridLayoutItem blockGridLayoutItem in blockListLayouts)
+        IList<ContentAndSettingsReference> ExtractContentAndSettingsReferences(BlockGridLayoutItem item)
         {
-            AddToResult(blockGridLayoutItem, result);
+            var references = new List<ContentAndSettingsReference> { new(item.ContentUdi, item.SettingsUdi) };
+            references.AddRange(item.Areas.SelectMany(area => area.Items.SelectMany(ExtractContentAndSettingsReferences)));
+            return references;
         }
 
+        ContentAndSettingsReference[] result = blockListLayouts.SelectMany(ExtractContentAndSettingsReferences).ToArray();
         return result;
-    }
-
-    private void AddToResult(BlockGridLayoutItem layoutItem, List<ContentAndSettingsReference> result)
-    {
-        result.Add(new ContentAndSettingsReference(layoutItem.ContentUdi, layoutItem.SettingsUdi));
-
-        foreach (BlockGridLayoutItem areaLayoutItem in layoutItem.Areas.SelectMany(x => x.Items))
-        {
-            AddToResult(areaLayoutItem, result);
-        }
     }
 }
