@@ -59,7 +59,7 @@ public class HealthCheckNotifier : RecurringHostedServiceBase
         : base(
             logger,
             healthChecksSettings.CurrentValue.Notification.Period,
-            healthChecksSettings.CurrentValue.GetNotificationDelay(cronTabParser, DateTime.Now, DefaultDelay))
+            GetNotificationDelay(healthChecksSettings.CurrentValue.Notification.FirstRunTime, cronTabParser, logger, DateTime.Now, DefaultDelay))
     {
         _healthChecksSettings = healthChecksSettings.CurrentValue;
         _healthChecks = healthChecks;
