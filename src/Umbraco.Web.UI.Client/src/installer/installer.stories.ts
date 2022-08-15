@@ -11,7 +11,7 @@ import { rest } from 'msw';
 
 import { UmbInstallerContext } from './installer-context';
 
-import type { UmbInstallerUser } from '.';
+import type { UmbInstallerError, UmbInstallerUser } from '.';
 import type { UmbracoInstaller } from '../core/models';
 export default {
 	title: 'Components/Installer/Steps',
@@ -93,8 +93,24 @@ Step3DatabasePreconfigured.parameters = {
 export const Step4Installing: Story = () => html`<umb-installer-installing></umb-installer-installing>`;
 Step4Installing.storyName = 'Step 4: Installing';
 
-export const Step5Error: Story = () => html`<umb-installer-error></umb-installer-error>`;
+export const Step5Error: Story<UmbInstallerError> = ({ error }) =>
+	html`<umb-installer-error .error=${error}></umb-installer-error>`;
 Step5Error.storyName = 'Step 5: Error';
+Step5Error.args = {
+	error: {
+		type: 'validation',
+		status: 400,
+		detail: 'The form did not pass validation',
+		title: 'Validation error',
+		errors: {
+			'user.password': [
+				'The password must be at least 6 characters long',
+				'The password must contain at least one number',
+			],
+			databaseName: ['The database name is required'],
+		},
+	},
+};
 Step5Error.parameters = {
 	actions: {
 		handles: ['reset'],

@@ -1,4 +1,4 @@
-import { css, CSSResultGroup, html, LitElement } from 'lit';
+import { css, CSSResultGroup, html, LitElement, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
 import { ProblemDetails } from '../core/models';
@@ -32,15 +32,29 @@ export class UmbInstallerError extends LitElement {
 		this.dispatchEvent(new CustomEvent('reset', { bubbles: true, composed: true }));
 	}
 
+	private _renderError(error: ProblemDetails) {
+		return html`
+			<p id="error-message" data-test="error-message">${error.detail ?? 'Unknown error'}</p>
+			<hr />
+			${error.errors ? this._renderErrors(error.errors) : nothing}
+		`;
+	}
+
+	private _renderErrors(errors: Record<string, unknown>) {
+		return html`
+			<ul>
+				${Object.keys(errors).map((key) => html` <li>${key}: ${(errors[key] as string[]).join(', ')}</li> `)}
+			</ul>
+		`;
+	}
+
 	render() {
 		return html` <div id="container" class="uui-text" data-test="installer-error">
 			<uui-form>
 				<form id="installer-form" @submit="${this._handleSubmit}">
 					<h1 class="uui-h3">Installing Umbraco</h1>
 					<h2>Something went wrong</h2>
-					${this.error
-						? html`<p id="error-message" data-test="error-message">${this.error.detail ?? 'Unknown error'}</p>`
-						: html``}
+					${this.error ? this._renderError(this.error) : nothing}
 					<div id="buttons">
 						<uui-button
 							id="button-reset"
