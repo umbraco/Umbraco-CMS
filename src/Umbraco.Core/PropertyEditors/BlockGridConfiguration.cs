@@ -46,7 +46,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
                 [DataMember(Name ="alias")]
                 public string? Alias { get; set; }
-                
+
                 [DataMember(Name ="columnSpan")]
                 public int? ColumnSpan { get; set; }
 
@@ -55,8 +55,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
                 [DataMember(Name ="minAllowed")]
                 public int? MinAllowed { get; set; }
-                
-                [DataMember(Name ="maxAllowed")]
+                 [DataMember(Name ="maxAllowed")]
                 public int? MaxAllowed { get; set; }
 
                 [DataMember(Name ="onlySpecifiedAllowance")]
@@ -78,7 +77,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
                     [DataMember(Name ="minAllowed")]
                     public int? MinAllowed { get; set; }
-                    
+
                     [DataMember(Name ="maxAllowed")]
                     public int? MaxAllowed { get; set; }
 
