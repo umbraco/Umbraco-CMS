@@ -73,7 +73,7 @@ export const handlers = [
 		);
 	}),
 
-	rest.post<PostInstallRequest>(umbracoPath('/install/settings'), async (req, res, ctx) => {
+	rest.post<PostInstallRequest>(umbracoPath('/install/setup'), async (req, res, ctx) => {
 		await new Promise((resolve) => setTimeout(resolve, (Math.random() + 1) * 1000)); // simulate a delay of 1-2 seconds
 
 		if (req.body.database?.name === 'fail') {
