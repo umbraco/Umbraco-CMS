@@ -29,7 +29,6 @@ export class UmbInstallerError extends LitElement {
 
 	private _handleSubmit(e: SubmitEvent) {
 		e.preventDefault();
-		console.log('submit');
 		this.dispatchEvent(new CustomEvent('reset', { bubbles: true, composed: true }));
 	}
 

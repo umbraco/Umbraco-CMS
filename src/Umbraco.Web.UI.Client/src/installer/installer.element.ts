@@ -71,7 +71,6 @@ export class UmbInstaller extends UmbContextProviderMixin(LitElement) {
 	}
 
 	private _handleReset() {
-		console.log('reset');
 		this.step = 1;
 		this._error = undefined;
 	}
