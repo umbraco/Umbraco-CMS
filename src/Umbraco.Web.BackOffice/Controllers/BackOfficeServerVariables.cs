@@ -147,15 +147,37 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <returns></returns>
         internal async Task<Dictionary<string, object>> BareMinimumServerVariablesAsync()
         {
+            HttpContext? context = _httpContextAccessor.HttpContext;
+            var isBackofficeUser = context != null && (await context.AuthenticateBackOfficeAsync()).Succeeded;
+
             //this is the filter for the keys that we'll keep based on the full version of the server vars
+            var umbracoSettings = new List<string> {
+                "allowPasswordReset",
+                "imageFileTypes",
+                "loginBackgroundImage",
+                "loginLogoImage",
+                "canSendRequiredEmail",
+                "usernameIsEmail",
+                "hideBackofficeLogo",
+                "disableDeleteWhenReferenced",
+                "disableUnpublishWhenReferenced"
+            };
+
+            // add a few extras for authenticated backoffice users (server vars we don't want floating around for anonymous users)
+            if (isBackofficeUser)
+            {
+                umbracoSettings.AddRange(new[] { "maxFileSize", "minimumPasswordLength", "minimumPasswordNonAlphaNum" });
+            }
+
             var keepOnlyKeys = new Dictionary<string, string[]>
             {
                 {"umbracoUrls", new[] {"authenticationApiBaseUrl", "serverVarsJs", "externalLoginsUrl", "currentUserApiBaseUrl", "previewHubUrl", "iconApiBaseUrl"}},
-                {"umbracoSettings", new[] {"allowPasswordReset", "imageFileTypes", "maxFileSize", "loginBackgroundImage", "loginLogoImage", "canSendRequiredEmail", "usernameIsEmail", "minimumPasswordLength", "minimumPasswordNonAlphaNum", "hideBackofficeLogo", "disableDeleteWhenReferenced", "disableUnpublishWhenReferenced"}},
+                {"umbracoSettings", umbracoSettings.ToArray()},
                 {"application", new[] {"applicationPath", "cacheBuster"}},
                 {"isDebuggingEnabled", new string[] { }},
                 {"features", new [] {"disabledFeatures"}}
             };
+
             //now do the filtering...
             Dictionary<string, object> defaults = await GetServerVariablesAsync();
             foreach (var key in defaults.Keys.ToArray())
