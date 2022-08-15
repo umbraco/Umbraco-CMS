@@ -181,9 +181,9 @@ public class DataTypeTreeController : TreeController, ISearchableTree
                 menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
             }
 
-            menu.Items.Add<ActionMove>(LocalizedTextService, hasSeparator: true, opensDialog: true, useLegacyIcon: false);
-            menu.Items.Add<ActionCopy>(LocalizedTextService, hasSeparator: true, opensDialog: true, useLegacyIcon: false);
-        }
+                menu.Items.Add<ActionMove>(LocalizedTextService, hasSeparator: true, opensDialog: true, useLegacyIcon: false);
+                menu.Items.Add<ActionCopy>(LocalizedTextService, hasSeparator: true, opensDialog: true, useLegacyIcon: false);
+            }
 
         return menu;
     }
