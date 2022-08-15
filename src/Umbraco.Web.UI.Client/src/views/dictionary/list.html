@@ -23,6 +23,13 @@
               </umb-button>
             </umb-editor-sub-header-content-left>
 
+            <umb-editor-sub-header-content-right>
+              <umb-search-filter model="vm.filter.searchTerm"
+                                 label-key="placeholders_filter"
+                                 text="Type to filter...">
+              </umb-search-filter>
+            </umb-editor-sub-header-content-right>
+
           </umb-editor-sub-header>
 
           <umb-box ng-if="vm.items.length === 0">
@@ -44,7 +51,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr ng-repeat="item in vm.items track by item.id" style="cursor: pointer;">
+              <tr ng-repeat="item in vm.filtered = (vm.items | filter: { 'name': vm.filter.searchTerm }) track by $id(item)" style="cursor: pointer;">
                 <th>
                   <button type="button" ng-style="item.style" class="btn-reset bold" ng-click="vm.clickItem(item.id)">{{item.name}}</button>
                 </th>
@@ -62,6 +69,11 @@
               </tr>
             </tbody>
           </table>
+     
+          <umb-empty-state ng-if="vm.filtered.length === 0"
+                           position="center">
+            <localize key="dictionary_noItemsFound">There were no dictionary items found.</localize>
+          </umb-empty-state>
 
         </umb-editor-container>
     </umb-editor-view>
