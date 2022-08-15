@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             }
 
             [DataMember(Name ="rowMaxSpan")]
-            public int? rowMaxSpan { get; set; }  = null!;
+            public int? RowMaxSpan { get; set; }  = null!;
 
             [DataMember(Name ="allowAtRoot")]
             public bool? AllowAtRoot { get; set; } = true;

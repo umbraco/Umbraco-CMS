@@ -97,7 +97,7 @@ ng-form.ng-invalid-val-server-match-content > .umb-block-grid__block:not(.--acti
         position: absolute;
         pointer-events: none;
         inset: 0;
-        border: 1px solid transparent;
+        border: var(--umb-block-grid--block-ui-display, 1px solid transparent);
         border-radius: 3px;
     }
 
@@ -123,9 +123,32 @@ ng-form.ng-invalid-val-server-match-content > .umb-block-grid__block:not(.--acti
         }
     }
 
-    &:hover,
-    &:focus,
-    &:focus-within,
+    
+    /** make sure to hide child block ui: */
+    &.--has-content-in-areas:not(.--block-ui-visible) {
+        &::after {
+            border: none;
+        }
+        > .umb-block-grid__scale-handler {
+            display: none;
+        }
+        > .umb-block-grid__block--actions {
+            display: none;
+        }
+    }
+    &.--has-content-in-areas.--block-ui-visible {
+        .umb-block-grid__block-area-container {
+            --umb-block-grid--block-ui-display: none;
+        }
+    }
+    
+    &.--has-content-in-areas.--block-ui-visible:hover,
+    &.--has-content-in-areas.--block-ui-visible:focus,
+    &.--has-content-in-areas.--block-ui-visible:focus-within,
+
+    &:not(.--has-content-in-areas):hover,
+    &:not(.--has-content-in-areas):focus,
+    &:not(.--has-content-in-areas):focus-within,
     &.--active {
 
         > .umb-block-grid__block--actions {
@@ -133,6 +156,10 @@ ng-form.ng-invalid-val-server-match-content > .umb-block-grid__block:not(.--acti
         }
 
         > umb-block-grid-block > umb-block-grid-entries > .umb-block-grid__actions {
+            opacity: 1;
+        }
+
+        > .umb-block-grid__scale-handler {
             opacity: 1;
         }
     }
@@ -198,11 +225,59 @@ ng-form.ng-invalid-val-server-match-settings > .umb-block-grid__block > .umb-blo
     position: absolute;
     top: 10px;
     right: 10px;
-    font-size: 0;
-    background-color: rgba(255, 255, 255, .96);
-    border-radius: 16px;
-    padding-left: 5px;
-    padding-right: 5px;
+
+    /*
+    If child block, it can be hidden if a parents sets: --umb-block-grid--block-ui-display: none;
+    */
+    display: var(--umb-block-grid--block-ui-display, flex);
+    flex-direction: column;
+    opacity: 1;
+    align-items: end;
+    
+
+    .__parent-context, .__local-context {
+        font-size: 0;
+        background-color: rgba(255, 255, 255, .96);
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+    }
+
+    .__parent-context {
+        padding: 0 2px;
+        .action {
+            &.--parent {
+                .icon {
+                    height: 100%;
+                }
+                .__label-text {
+
+                }
+                font-size: 11px;
+                padding: 0 5px;
+            }
+        }
+    }
+
+    .__local-context {
+        padding: 0 5px;
+        margin-top:2px;
+    }
+
+    .__label {
+        display: inline-flex;
+        align-items: center;
+        padding: 5px;
+        font-size: 15px;
+        user-select: none;
+
+        .icon {
+            font-size: 22px;
+            margin-right: 5px;
+            display: inline-block;
+        }
+    }
+
     .action {
         position: relative;
         display: inline-block;
@@ -283,6 +358,7 @@ umb-block-grid-block {
 .umb-block-grid__scale-handler {
     cursor: nwse-resize;
     position: absolute;
+    display: var(--umb-block-grid--block-ui-display, block);
     Z-index:10;
     bottom: -4px;
     right: -4px;
@@ -294,22 +370,16 @@ umb-block-grid-block {
     opacity: 0;
     transition: opacity 120ms;
 }
-
+.umb-block-grid__scale-handler:focus {
+    opacity: 1;
+}
 .umb-block-grid__scale-handler::after {
     content: '';
     position: absolute;
     inset: -10px;
     background-color: rgba(0,0,0,0);
 }
-.umb-block-grid__block:focus-within, 
-.umb-block-grid__block:hover {
-    > .umb-block-grid__scale-handler {
-        opacity: 1;
-    }
-}
-.umb-block-grid__scale-handler:focus {
-    opacity: 1;
-}
+
 /* When inside scalebox its always visible: */
 .umb-block-grid__scalebox .umb-block-grid__scale-handler {
     opacity: 1;
@@ -330,8 +400,7 @@ umb-block-grid-block {
 
 
 .umb-block-grid__actions {
-    display: flex;
-
+    display:flex;
     border: 1px dashed @ui-action-discreet-border;
     border-radius: @baseBorderRadius;
     box-sizing: border-box;
@@ -512,6 +581,10 @@ umb-block-grid-block {
 }
 
 
+
+.umb-block-grid__layout-container {
+    min-height: 50px;
+}
 
 
 /** make sure block with areas stay on top, so they don't look like they are 'not-allowed'*/

@@ -17,6 +17,7 @@
     <key alias="createGroup">Create group</key>
     <key alias="delete">Delete</key>
     <key alias="disable">Disable</key>
+    <key alias="editContent">Edit content</key>
     <key alias="editSettings">Edit settings</key>
     <key alias="emptyrecyclebin">Empty recycle bin</key>
     <key alias="enable">Enable</key>

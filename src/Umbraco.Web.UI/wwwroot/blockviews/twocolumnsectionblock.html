@@ -5,11 +5,9 @@
         border-radius: 3px;
         height: 100%;/* Add this to fill the cell fully */
         box-sizing: border-box;
-        border: 1px solid #BBBABF;
-
-        overflow:hidden;
+        //border: 1px solid #BBBABF;
     }
-    
+    /*
     button {
         display: flex;
         align-items: center;
@@ -39,11 +37,14 @@
     :host(:hover) button {
         opacity: 1;
     }
+    */
 
 </style>
 <section ng-style="{'background-color': block.data.backgroundColor}">
+    <!--
     <button type="button" ng-click="block.edit()" ng-focus="block.focus">
         <span class="file-name">{{block.label}}</span>
     </button>
+    -->
     <slot name="areas" part="areas"></slot>
 </section>

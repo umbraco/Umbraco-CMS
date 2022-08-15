@@ -5,9 +5,7 @@
         border-radius: 3px;
         height: 100%;/* Add this to fill the cell fully */
         box-sizing: border-box;
-        border: 1px solid #BBBABF;
-
-        overflow:hidden;
+        //border: 1px solid #BBBABF;
     }
     
     button > * {
@@ -29,6 +27,8 @@
         border: none;
         transition: border-color 120ms, background-color 120ms;
         max-height: 400px;
+
+        overflow:hidden;
     }
     button:hover {
         color: #2152A3;// TODO: Set right colors:
@@ -65,8 +65,8 @@
         background-color: rgba(255, 255, 255, 8);
         padding: 3px 6px;
         position: absolute;
-        top: 0;
-        left: 0;
+        bottom: 0;
+        right: 0;
 
         opacity: 0;
         transition: opacity 120ms;
@@ -82,6 +82,6 @@
 <button ng-controller="Umbraco.PropertyEditors.BlockEditor.MediaBlockEditor as bc" type="button" ng-click="block.edit()" ng-focus="block.focus">
     <img ng-if="bc.isImage" ng-src="{{bc.imageSource}}" alt="{{bc.mediaName}}" />
     <umb-icon ng-if="!bc.isImage" icon="{{bc.icon}} color-black" class="icon"></umb-icon>
-    <span class="file-name">{{block.label}} ({{bc.mediaName}})</span>
+    <span class="file-name">{{bc.mediaName}}</span>
 </button>
 <slot name="areas" part="areas"></slot>
