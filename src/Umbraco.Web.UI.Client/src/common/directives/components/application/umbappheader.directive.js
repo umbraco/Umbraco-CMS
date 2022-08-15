@@ -63,7 +63,7 @@
                 appState.setSearchState("show", !showSearch);
             };
 
-            // toggle the help dialog by raising the global app state to toggle the help drawer
+            // toggle the help dialog by raising the global app state to toggle the help dialog
             scope.helpClick = function () {
                 const helpEditor = {
                   size: "small",

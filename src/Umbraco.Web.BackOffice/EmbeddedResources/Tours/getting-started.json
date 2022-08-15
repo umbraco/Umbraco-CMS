@@ -97,19 +97,19 @@
       {
         "element": "[data-element='global-help']",
         "title": "Help",
-        "content": "If you ever find yourself in trouble click here to open the Help drawer.",
+        "content": "If you ever find yourself in trouble click here to open the Help dialog.",
         "event": "click",
         "backdropOpacity": 0.6
       },
       {
-        "element": "[data-element='drawer']",
+        "element": "[data-element='overlay-help']",
         "elementPreventClick": true,
         "title": "Help",
         "content": "<p>In the help drawer you will find articles and videos related to the section you are using.</p><p>This is also where you will find the next tour on how to get started with Umbraco.</p>",
         "backdropOpacity": 0.6
       },
       {
-        "element": "[data-element='drawer'] [data-element='help-tours']",
+        "element": "[data-element='overlay-help'] [data-element='help-tours']",
         "title": "Tours",
         "content": "To continue your journey on getting started with Umbraco, you can find more tours right here."
       }

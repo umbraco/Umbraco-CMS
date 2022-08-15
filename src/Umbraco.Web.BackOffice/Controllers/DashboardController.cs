@@ -203,7 +203,7 @@ public class DashboardController : UmbracoApiController
 
         // This is used in place of the old feedproxy.config
         // Which was used to grab data from our.umbraco.com, umbraco.com or umbraco.tv
-        // for certain dashboards or the help drawer
+        // for certain dashboards or the help dialog
         var urlPrefix = string.Empty;
         switch (site.ToUpper())
         {

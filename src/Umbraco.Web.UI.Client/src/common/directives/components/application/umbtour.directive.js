@@ -6,14 +6,14 @@
 
 @description
 <b>Added in Umbraco 7.8</b>. The tour component is a global component and is already added to the umbraco markup.
-In the Umbraco UI the tours live in the "Help drawer" which opens when you click the Help-icon in the bottom left corner of Umbraco.
-You can easily add you own tours to the Help-drawer or show and start tours from
+In the Umbraco UI the tours live in the "Help dialog" which opens when you click the Help-icon in the bottom left corner of Umbraco.
+You can easily add you own tours to the Help-dialog or show and start tours from
 anywhere in the Umbraco backoffice. To see a real world example of a custom tour implementation, install <a href="https://our.umbraco.com/projects/starter-kits/the-starter-kit/">The Starter Kit</a> in Umbraco 7.8
 
-<h1><b>Extending the help drawer with custom tours</b></h1>
-The easiet way to add new tours to Umbraco is through the Help-drawer. All it requires is a my-tour.json file.
+<h1><b>Extending the help dialog with custom tours</b></h1>
+The easiet way to add new tours to Umbraco is through the Help-dialog. All it requires is a my-tour.json file.
 Place the file in <i>App_Plugins/{MyPackage}/backoffice/tours/{my-tour}.json</i> and it will automatically be
-picked up by Umbraco and shown in the Help-drawer.
+picked up by Umbraco and shown in the Help-dialog.
 
 <h3><b>The tour object</b></h3>
 The tour object consist of two parts - The overall tour configuration and a list of tour steps. We have split up the tour object for a better overview.
@@ -22,7 +22,7 @@ The tour object consist of two parts - The overall tour configuration and a list
 {
     "name": "My Custom Tour", // (required)
     "alias": "myCustomTour", // A unique tour alias (required)
-    "group": "My Custom Group" // Used to group tours in the help drawer
+    "group": "My Custom Group" // Used to group tours in the help dialog
     "groupOrder": 200 // Control the order of tour groups
     "allowDisable": // Adds a "Don't" show this tour again"-button to the intro step
     "culture" : // From v7.11+. Specifies the culture of the tour (eg. en-US), if set the tour will only be shown to users with this culture set on their profile. If omitted or left empty the tour will be visible to all users
