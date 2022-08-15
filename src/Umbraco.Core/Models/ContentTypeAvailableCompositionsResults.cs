@@ -1,26 +1,25 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+namespace Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Cms.Core.Models
+/// <summary>
+///     Used when determining available compositions for a given content type
+/// </summary>
+public class ContentTypeAvailableCompositionsResults
 {
-    /// <summary>
-    /// Used when determining available compositions for a given content type
-    /// </summary>
-    public class ContentTypeAvailableCompositionsResults
+    public ContentTypeAvailableCompositionsResults()
     {
-        public ContentTypeAvailableCompositionsResults()
-        {
-            Ancestors = Enumerable.Empty<IContentTypeComposition>();
-            Results = Enumerable.Empty<ContentTypeAvailableCompositionsResult>();
-        }
-
-        public ContentTypeAvailableCompositionsResults(IEnumerable<IContentTypeComposition> ancestors, IEnumerable<ContentTypeAvailableCompositionsResult> results)
-        {
-            Ancestors = ancestors;
-            Results = results;
-        }
-
-        public IEnumerable<IContentTypeComposition> Ancestors { get; private set; }
-        public IEnumerable<ContentTypeAvailableCompositionsResult> Results { get; private set; }
+        Ancestors = Enumerable.Empty<IContentTypeComposition>();
+        Results = Enumerable.Empty<ContentTypeAvailableCompositionsResult>();
     }
+
+    public ContentTypeAvailableCompositionsResults(
+        IEnumerable<IContentTypeComposition> ancestors,
+        IEnumerable<ContentTypeAvailableCompositionsResult> results)
+    {
+        Ancestors = ancestors;
+        Results = results;
+    }
+
+    public IEnumerable<IContentTypeComposition> Ancestors { get; }
+
+    public IEnumerable<ContentTypeAvailableCompositionsResult> Results { get; }
 }

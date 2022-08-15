@@ -17,7 +17,6 @@ label small, .guiDialogTiny {
 }
 
 label.control-label, .control-label {
-  padding: 0 10px 0 0 !important;
   font-weight: bold;
   color: @black;
   font-size: 14px;
@@ -148,15 +147,15 @@ legend {
   width: 100%;
   padding: 0;
   margin-bottom: @baseLineHeight;
-  font-size: @baseFontSize * 1.5;
-  line-height: @baseLineHeight * 2;
+  font-size: (@baseFontSize * 1.5);
+  line-height: (@baseLineHeight * 2);
   color: @grayDark;
   border: 0;
   border-bottom: 1px solid @gray-8;
 
   // Small
   small {
-    font-size: @baseLineHeight * .75;
+    font-size: (@baseLineHeight * .75);
     color: @gray-8;
   }
 }
@@ -208,7 +207,7 @@ input[type="color"],
   display: inline-block;
   height: @inputHeight;
   padding: 4px 6px;
-  margin-bottom: @baseLineHeight / 2;
+  margin-bottom: (@baseLineHeight / 2);
   font-size: @baseFontSize;
   line-height: @baseLineHeight;
   color: @gray-2;
@@ -548,7 +547,7 @@ input[type="checkbox"][readonly] {
 
 .help-block {
   display: block; // account for any element using help-block
-  margin-bottom: @baseLineHeight / 2;
+  margin-bottom: (@baseLineHeight / 2);
 }
 
 .help-inline {
@@ -574,7 +573,7 @@ table.domains .help-inline {
 .input-append,
 .input-prepend {
   display: inline-block;
-  margin-bottom: @baseLineHeight / 2;
+  margin-bottom: (@baseLineHeight / 2);
   vertical-align: middle;
   font-size: 0; // white space collapse hack
   white-space: nowrap; // Prevent span and input from separating
@@ -759,7 +758,7 @@ input.search-query {
 
 // Margin to space out fieldsets
 .control-group {
-  margin-bottom: @baseLineHeight / 2;
+  margin-bottom: (@baseLineHeight / 2) + 5px;
 }
 
 //modifier for control group
@@ -785,7 +784,7 @@ legend + .control-group {
   // Float the labels left
   .control-label {
     float: left;
-    width: @horizontalComponentOffset - 20;
+    width: (@horizontalComponentOffset - 20);
     padding-top: 5px;
     text-align: right;
   }
@@ -810,7 +809,7 @@ legend + .control-group {
   .input-prepend,
   .input-append {
     + .help-block {
-      margin-top: @baseLineHeight / 2;
+      margin-top: (@baseLineHeight / 2);
     }
   }
   // Move over buttons in .form-actions to align with .controls

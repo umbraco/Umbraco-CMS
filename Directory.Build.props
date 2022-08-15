@@ -1,13 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project>
-    <!-- Package references and additional files which are consumed by all projects -->
-    <ItemGroup>
-        <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="all" IsImplicitlyDefined="true" />
-        <AdditionalFiles Include="$(MSBuildThisFileDirectory)stylecop.json" Link="stylecop.json" />
-    </ItemGroup>
+  <!-- Package references and additional files which are consumed by all projects -->
+  <ItemGroup>
+    <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.406" PrivateAssets="all" IsImplicitlyDefined="true"/>
+  </ItemGroup>
 
-    <!-- Specify rule set for all projects -->
-    <PropertyGroup>
-        <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)codeanalysis.ruleset</CodeAnalysisRuleSet>
-    </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Nerdbank.GitVersioning" Condition="!Exists('packages.config')">
+      <PrivateAssets>all</PrivateAssets>
+      <Version>3.5.107</Version>
+    </PackageReference>
+
+    <PackageReference Include="Umbraco.GitVersioning.Extensions" Version="0.1.1">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
 </Project>

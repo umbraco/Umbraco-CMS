@@ -508,6 +508,37 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
 
         /**
          * @ngdoc method
+         * @name umbraco.services.contentEditingHelper#getPermissionsForContent
+         * @methodOf umbraco.services.contentEditingHelper
+         * @function
+         *
+         * @description
+         * Returns a object with permissions for user.
+         */
+        getPermissionsForContent: function () {
+
+            // Just ensure we do have an editorState
+            if (!editorState.current) return null;
+            
+            // Fetch current node allowed actions for the current user
+            // This is the current node & not each individual child node in the list
+            const currentUserPermissions = editorState.current.allowedActions || [];
+
+            // Create a nicer model rather than the funky & hard to remember permissions strings
+            const currentNodePermissions = {
+                canCopy: currentUserPermissions.includes('O'), //Magic Char = O
+                canCreate: currentUserPermissions.includes('C'), //Magic Char = C
+                canDelete: currentUserPermissions.includes('D'), //Magic Char = D
+                canMove: currentUserPermissions.includes('M'), //Magic Char = M
+                canPublish: currentUserPermissions.includes('U'), //Magic Char = U
+                canUnpublish: currentUserPermissions.includes('Z') //Magic Char = Z
+            };
+            
+            return currentNodePermissions;
+        },
+
+        /**
+         * @ngdoc method
          * @name umbraco.services.contentEditingHelper#reBindChangedProperties
          * @methodOf umbraco.services.contentEditingHelper
          * @function
@@ -624,24 +655,29 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
                     var origProp = allOrigProps[k];
                     var alias = origProp.alias;
                     var newProp = getNewProp(alias, allNewProps);
-                    if (newProp && !_.isEqual(origProp.value, newProp.value)) {
+                    if (newProp) {
+                        // Always update readonly state
+                        origProp.readonly = newProp.readonly;
 
-                        //they have changed so set the origContent prop to the new one
-                        var origVal = origProp.value;
+                        // Check whether the value has changed and update accordingly
+                        if (!_.isEqual(origProp.value, newProp.value)) {
 
-                        origProp.value = newProp.value;
+                            //they have changed so set the origContent prop to the new one
+                            var origVal = origProp.value;
 
-                        //instead of having a property editor $watch their expression to check if it has
-                        // been updated, instead we'll check for the existence of a special method on their model
-                        // and just call it.
-                        if (Utilities.isFunction(origProp.onValueChanged)) {
-                            //send the newVal + oldVal
-                            origProp.onValueChanged(origProp.value, origVal);
+                            origProp.value = newProp.value;
+
+                            //instead of having a property editor $watch their expression to check if it has
+                            // been updated, instead we'll check for the existence of a special method on their model
+                            // and just call it.
+                            if (Utilities.isFunction(origProp.onValueChanged)) {
+                                //send the newVal + oldVal
+                                origProp.onValueChanged(origProp.value, origVal);
+                            }
+
+                            changed.push(origProp);
                         }
-
-                        changed.push(origProp);
                     }
-
                 }
             }
 

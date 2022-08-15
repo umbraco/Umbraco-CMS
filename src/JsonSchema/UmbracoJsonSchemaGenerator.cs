@@ -43,14 +43,14 @@ namespace JsonSchema
 
             var result = await response.Content.ReadAsStringAsync();
 
-            return JsonConvert.DeserializeObject<JObject>(result);
+            return JsonConvert.DeserializeObject<JObject>(result)!;
         }
 
         private JObject GenerateUmbracoSchema()
         {
             NJsonSchema.JsonSchema schema = _innerGenerator.Generate(typeof(AppSettings));
 
-            return JsonConvert.DeserializeObject<JObject>(schema.ToJson());
+            return JsonConvert.DeserializeObject<JObject>(schema.ToJson())!;
         }
     }
 }

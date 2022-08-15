@@ -1,50 +1,46 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 
-namespace Umbraco.Cms.Core.Collections
+namespace Umbraco.Cms.Core.Collections;
+
+/// <summary>
+///     A custom collection similar to HashSet{T} which only contains unique items, however this collection keeps items in
+///     order
+///     and is customizable to keep the newest or oldest equatable item
+/// </summary>
+/// <typeparam name="T"></typeparam>
+public class OrderedHashSet<T> : KeyedCollection<T, T>
+    where T : notnull
 {
-    /// <summary>
-    /// A custom collection similar to HashSet{T} which only contains unique items, however this collection keeps items in order
-    /// and is customizable to keep the newest or oldest equatable item
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    public class OrderedHashSet<T> : KeyedCollection<T, T>
+    private readonly bool _keepOldest;
+
+    public OrderedHashSet(bool keepOldest = true) => _keepOldest = keepOldest;
+
+    protected override void InsertItem(int index, T item)
     {
-        private readonly bool _keepOldest;
-
-        public OrderedHashSet(bool keepOldest = true)
+        if (Dictionary == null)
         {
-            _keepOldest = keepOldest;
+            base.InsertItem(index, item);
         }
-
-        protected override void InsertItem(int index, T item)
+        else
         {
-            if (Dictionary == null)
+            var exists = Dictionary.ContainsKey(item);
+
+            // if we want to keep the newest, then we need to remove the old item and add the new one
+            if (exists == false)
             {
                 base.InsertItem(index, item);
             }
-            else
+            else if (_keepOldest == false)
             {
-                var exists = Dictionary.ContainsKey(item);
+                if (Remove(item))
+                {
+                    index--;
+                }
 
-                //if we want to keep the newest, then we need to remove the old item and add the new one
-                if (exists == false)
-                {
-                    base.InsertItem(index, item);
-                }
-                else if(_keepOldest == false)
-                {
-                    if (Remove(item))
-                    {
-                        index--;
-                    }
-                    base.InsertItem(index, item);
-                }
+                base.InsertItem(index, item);
             }
         }
-
-        protected override T GetKeyForItem(T item)
-        {
-            return item;
-        }
     }
+
+    protected override T GetKeyForItem(T item) => item;
 }

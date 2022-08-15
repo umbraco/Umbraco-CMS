@@ -1,14 +1,14 @@
 <div data-element="group-{{vm.group.name}}" class="umb-group-builder__group" ng-class="{'-inherited': vm.group.inherited, 'umb-group-builder__group-handle -sortable': vm.sorting && !vm.group.inherited}" tabindex="0" ng-focus="vm.whenFocus()">
     <div class="umb-group-builder__group-title-wrapper" ng-if="vm.allowName" data-element="{{vm.valTabAlias}}">
 
-        <ng-form name="groupNameForm" data-element="group-name">
+        <ng-form name="groupNameForm" data-element="group-name" class="flx-g1">
             <div class="umb-group-builder__group-title control-group -no-margin" ng-class="{'-inherited': vm.group.inherited}">
                 <umb-icon icon="icon-navigation"
                           class="umb-group-builder__group-title-icon"
                           ng-if="vm.sorting && !vm.group.inherited">
                 </umb-icon>
                 <input data-element="group-name-field"
-                        class="umb-group-builder__group-title-input"
+                        class="umb-group-builder__group-title-input w-100"
                         type="text"
                         localize="placeholder"
                         placeholder="@placeholders_entername"

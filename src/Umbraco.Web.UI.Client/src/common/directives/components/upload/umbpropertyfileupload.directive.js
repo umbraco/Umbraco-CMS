@@ -117,11 +117,10 @@
                 vm.files = _.map(files, function (file) {
                     var f = {
                         fileName: file,
+                        fileSrc: file,
                         isImage: mediaHelper.detectIfImageByExtension(file),
                         extension: getExtension(file)
                     };
-
-                    f.fileSrc = getThumbnail(f);
 
                     return f;
                 });
@@ -190,21 +189,6 @@
             }
         }
 
-        function getThumbnail(file) {
-
-            if (file.extension === 'svg') {
-                return file.fileName;
-            }
-
-            if (!file.isImage) {
-                return null;
-            }
-
-            var thumbnailUrl = mediaHelper.getThumbnailFromPath(file.fileName);
-
-            return thumbnailUrl;
-        }
-
         function getExtension(fileName) {
             var extension = fileName.substring(fileName.lastIndexOf(".") + 1, fileName.length);
             return extension.toLowerCase();
@@ -238,7 +222,8 @@
                     isImage: isImage,
                     extension: extension,
                     fileName: files[i].name,
-                    isClientSide: true
+                    isClientSide: true,
+                    fileData: files[i]
                 };
 
                 // Save the file object to the files collection
@@ -247,6 +232,7 @@
                 //special check for a comma in the name
                 newVal += files[i].name.split(',').join('-') + ",";
 
+                // TODO: I would love to remove this part. But I'm affright it would be breaking if removed. Its not used by File upload anymore as each preview handles the client-side data on their own.
                 if (isImage || extension === "svg") {
 
                     var deferred = $q.defer();

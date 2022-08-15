@@ -3,65 +3,71 @@
 
 using System;
 using NUnit.Framework;
-using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DistributedLocking;
+using Umbraco.Cms.Persistence.Sqlite.Services;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
-using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence;
+
+[TestFixture]
+[UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
+public class UnitOfWorkTests : UmbracoIntegrationTest
 {
-    [TestFixture]
-    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-    public class UnitOfWorkTests : UmbracoIntegrationTest
+    [Test]
+    public void ReadLockNonExisting()
     {
-        [Test]
-        public void ReadLockNonExisting()
+        var lockingMechanism = GetRequiredService<IDistributedLockingMechanismFactory>().DistributedLockingMechanism;
+        if (lockingMechanism is SqliteDistributedLockingMechanism)
         {
-            IScopeProvider provider = ScopeProvider;
-            Assert.Throws<ArgumentException>(() =>
-            {
-                using (IScope scope = provider.CreateScope())
-                {
-                    scope.EagerReadLock(-666);
-                    scope.Complete();
-                }
-            });
+            Assert.Ignore("SqliteDistributedLockingMechanism doesn't query the umbracoLock table for read locks.");
         }
 
-        [Test]
-        public void ReadLockExisting()
+        var provider = ScopeProvider;
+        Assert.Throws<ArgumentException>(() =>
         {
-            IScopeProvider provider = ScopeProvider;
-            using (IScope scope = provider.CreateScope())
+            using (var scope = provider.CreateScope())
             {
-                scope.EagerReadLock(Constants.Locks.Servers);
+                scope.EagerReadLock(-666);
                 scope.Complete();
             }
-        }
+        });
+    }
 
-        [Test]
-        public void WriteLockNonExisting()
+    [Test]
+    public void ReadLockExisting()
+    {
+        var provider = ScopeProvider;
+        using (var scope = provider.CreateScope())
         {
-            IScopeProvider provider = ScopeProvider;
-            Assert.Throws<ArgumentException>(() =>
-            {
-                using (IScope scope = provider.CreateScope())
-                {
-                    scope.EagerWriteLock(-666);
-                    scope.Complete();
-                }
-            });
+            scope.EagerReadLock(Constants.Locks.Servers);
+            scope.Complete();
         }
+    }
 
-        [Test]
-        public void WriteLockExisting()
+    [Test]
+    public void WriteLockNonExisting()
+    {
+        var provider = ScopeProvider;
+        Assert.Throws<ArgumentException>(() =>
         {
-            IScopeProvider provider = ScopeProvider;
-            using (IScope scope = provider.CreateScope())
+            using (var scope = provider.CreateScope())
             {
-                scope.EagerWriteLock(Constants.Locks.Servers);
+                scope.EagerWriteLock(-666);
                 scope.Complete();
             }
+        });
+    }
+
+    [Test]
+    public void WriteLockExisting()
+    {
+        var provider = ScopeProvider;
+        using (var scope = provider.CreateScope())
+        {
+            scope.EagerWriteLock(Constants.Locks.Servers);
+            scope.Complete();
         }
     }
 }

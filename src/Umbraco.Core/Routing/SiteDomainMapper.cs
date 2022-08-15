@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Routing
@@ -34,11 +30,11 @@ namespace Umbraco.Cms.Core.Routing
         #region Configure
 
         private readonly ReaderWriterLockSlim _configLock = new();
-        private Dictionary<string, Dictionary<string, string[]>> _qualifiedSites;
+        private Dictionary<string, Dictionary<string, string[]>>? _qualifiedSites;
         private bool _disposedValue;
 
-        internal Dictionary<string, string[]> Sites { get; private set; }
-        internal Dictionary<string, List<string>> Bindings { get; private set; }
+        internal Dictionary<string, string[]>? Sites { get; private set; }
+        internal Dictionary<string, List<string>>? Bindings { get; private set; }
 
         // these are for validation
         //private const string DomainValidationSource = @"^(\*|((?i:http[s]?://)?([-\w]+(\.[-\w]+)*)(:\d+)?(/[-\w]*)?))$";
@@ -196,7 +192,7 @@ namespace Umbraco.Cms.Core.Routing
             {
                 _configLock.EnterWriteLock();
 
-                foreach (var key in keys.Where(key => !Sites.ContainsKey(key)))
+                foreach (var key in keys.Where(key => !Sites?.ContainsKey(key) ?? false))
                 {
                     throw new ArgumentException($"Not an existing site key: {key}.", nameof(keys));
                 }
@@ -235,36 +231,34 @@ namespace Umbraco.Cms.Core.Routing
         #region Map domains
 
         /// <inheritdoc />
-        public virtual DomainAndUri MapDomain(IReadOnlyCollection<DomainAndUri> domainAndUris, Uri current,
-            string culture, string defaultCulture)
+        public virtual DomainAndUri? MapDomain(IReadOnlyCollection<DomainAndUri> domainAndUris, Uri current, string? culture, string? defaultCulture)
         {
             var currentAuthority = current.GetLeftPart(UriPartial.Authority);
-            Dictionary<string, string[]> qualifiedSites = GetQualifiedSites(current);
+            Dictionary<string, string[]>? qualifiedSites = GetQualifiedSites(current);
 
             return MapDomain(domainAndUris, qualifiedSites, currentAuthority, culture, defaultCulture);
         }
 
         /// <inheritdoc />
-        public virtual IEnumerable<DomainAndUri> MapDomains(IReadOnlyCollection<DomainAndUri> domainAndUris,
-            Uri current, bool excludeDefault, string culture, string defaultCulture)
+        public virtual IEnumerable<DomainAndUri> MapDomains(IReadOnlyCollection<DomainAndUri> domainAndUris, Uri current, bool excludeDefault, string? culture, string? defaultCulture)
         {
             // TODO: ignoring cultures entirely?
 
             var currentAuthority = current.GetLeftPart(UriPartial.Authority);
-            KeyValuePair<string, string[]>[] candidateSites = null;
+            KeyValuePair<string, string[]>[]? candidateSites = null;
             IEnumerable<DomainAndUri> ret = domainAndUris;
 
             try
             {
                 _configLock.EnterReadLock();
 
-                Dictionary<string, string[]> qualifiedSites = GetQualifiedSitesInsideLock(current);
+                Dictionary<string, string[]>? qualifiedSites = GetQualifiedSitesInsideLock(current);
 
                 if (excludeDefault)
                 {
                     // exclude the current one (avoid producing the absolute equivalent of what GetUrl returns)
                     Uri hintWithSlash = current.EndPathWithSlash();
-                    DomainAndUri hinted =
+                    DomainAndUri? hinted =
                         domainAndUris.FirstOrDefault(d => d.Uri.EndPathWithSlash().IsBaseOf(hintWithSlash));
                     if (hinted != null)
                     {
@@ -277,8 +271,7 @@ namespace Umbraco.Cms.Core.Routing
                     {
                         // it is illegal to call MapDomain if domainAndUris is empty
                         // also, domainAndUris should NOT contain current, hence the test on hinted
-                        DomainAndUri mainDomain = MapDomain(domainAndUris, qualifiedSites, currentAuthority, culture,
-                            defaultCulture); // what GetUrl would get
+                        DomainAndUri? mainDomain = MapDomain(domainAndUris, qualifiedSites, currentAuthority, culture, defaultCulture); // what GetUrl would get
                         ret = ret.Where(d => d != mainDomain);
                     }
                 }
@@ -327,7 +320,7 @@ namespace Umbraco.Cms.Core.Routing
                 });
         }
 
-        private Dictionary<string, string[]> GetQualifiedSites(Uri current)
+        private Dictionary<string, string[]>? GetQualifiedSites(Uri current)
         {
             try
             {
@@ -344,7 +337,7 @@ namespace Umbraco.Cms.Core.Routing
             }
         }
 
-        private Dictionary<string, string[]> GetQualifiedSitesInsideLock(Uri current)
+        private Dictionary<string, string[]>? GetQualifiedSitesInsideLock(Uri current)
         {
             // we do our best, but can't do the impossible
             if (Sites == null)
@@ -368,16 +361,19 @@ namespace Umbraco.Cms.Core.Routing
                     kvp => kvp.Value.Select(d =>
                             new Uri(UriUtilityCore.StartWithScheme(d, current.Scheme))
                                 .GetLeftPart(UriPartial.Authority))
-                        .ToArray()
-                );
+                        .ToArray());
 
             // .ToDictionary will evaluate and create the dictionary immediately
             // the new value is .ToArray so it will also be evaluated immediately
             // therefore it is safe to return and exit the configuration lock
         }
 
-        private DomainAndUri MapDomain(IReadOnlyCollection<DomainAndUri> domainAndUris,
-            Dictionary<string, string[]> qualifiedSites, string currentAuthority, string culture, string defaultCulture)
+        private DomainAndUri? MapDomain(
+            IReadOnlyCollection<DomainAndUri> domainAndUris,
+            Dictionary<string, string[]>? qualifiedSites,
+            string currentAuthority,
+            string? culture,
+            string? defaultCulture)
         {
             if (domainAndUris == null)
             {
@@ -402,7 +398,7 @@ namespace Umbraco.Cms.Core.Routing
 
             // if current belongs to a site - try to pick the first element
             // from domainAndUris that also belongs to that site
-            DomainAndUri ret = currentSite.Equals(default(KeyValuePair<string, string[]>))
+            DomainAndUri? ret = currentSite.Equals(default(KeyValuePair<string, string[]>))
                 ? null
                 : domainAndUris.FirstOrDefault(d =>
                     currentSite.Value.Contains(d.Uri.GetLeftPart(UriPartial.Authority)));

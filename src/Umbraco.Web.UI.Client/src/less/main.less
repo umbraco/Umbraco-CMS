@@ -14,6 +14,20 @@
 	box-shadow: 3px 0px 7px rgba(0,0,0,0.16);
 }
 
+img:not([src]):not([srcset]) {
+  visibility: hidden;
+}
+
+img.lazy {
+  -webkit-transition: opacity 1.2s cubic-bezier(0.16, 1.08, 0.38, 0.98);
+  transition: opacity 1.2s cubic-bezier(0.16, 1.08, 0.38, 0.98);
+  opacity: 0;
+}
+
+img.lazy.loaded {
+  opacity: 1;
+}
+
 .umb-scrollable, .umb-auto-overflow {
 	overflow: auto;
 }
@@ -202,6 +216,8 @@ umb-property:last-of-type .umb-control-group {
 .umb-control-group .control-header {
     
     .control-label {
+        white-space: break-spaces;
+        overflow-wrap: break-word;
         float: left;
     }
 
@@ -225,13 +241,13 @@ umb-property:last-of-type .umb-control-group {
 .form-horizontal .umb-control-group .control-header {
     float: left;
     width: 160px;
-    padding-top: 5px;
     padding-bottom: 0;
     text-align: left;
     margin-bottom: 5px;
 
     .control-label {
-        width: auto;
+        width: 100%;
+        box-sizing: border-box;
         padding-top: 0;
         text-align: left;
     }
@@ -245,6 +261,11 @@ umb-property:last-of-type .umb-control-group {
     .form-horizontal .umb-control-group .control-header {
         float: none;
         width: 100%;
+
+        .control-label {
+            width: auto;
+        }
+
         &::after {
             content: "";
             display: table;
@@ -263,6 +284,11 @@ umb-property:last-of-type .umb-control-group {
             clear: both;
         }
     }
+
+    & .control-label {
+        width: auto;
+    }
+
     & > .controls {
         margin-left: 0;
     }

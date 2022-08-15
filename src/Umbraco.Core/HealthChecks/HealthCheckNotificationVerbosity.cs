@@ -1,9 +1,7 @@
-﻿namespace Umbraco.Cms.Core.HealthChecks
-{
-    public enum HealthCheckNotificationVerbosity
-    {
+namespace Umbraco.Cms.Core.HealthChecks;
 
-        Summary,
-        Detailed
-    }
+public enum HealthCheckNotificationVerbosity
+{
+    Summary,
+    Detailed,
 }

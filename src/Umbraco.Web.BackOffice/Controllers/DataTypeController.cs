@@ -6,6 +6,7 @@ using System.Net.Mime;
 using System.Text;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -19,6 +20,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.BackOffice.Filters;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
@@ -47,11 +49,13 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly ILocalizedTextService _localizedTextService;
         private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
         private readonly IConfigurationEditorJsonSerializer _serializer;
+        private readonly IDataTypeUsageService _dataTypeUsageService;
 
+        [Obsolete("Use constructor that takes IDataTypeUsageService, scheduled for removal in V12")]
         public DataTypeController(
             PropertyEditorCollection propertyEditors,
             IDataTypeService dataTypeService,
-            IOptions<ContentSettings> contentSettings,
+            IOptionsSnapshot<ContentSettings> contentSettings,
             IUmbracoMapper umbracoMapper,
             PropertyEditorCollection propertyEditorCollection,
             IContentTypeService contentTypeService,
@@ -60,7 +64,37 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             ILocalizedTextService localizedTextService,
             IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
             IConfigurationEditorJsonSerializer serializer)
+        : this(
+            propertyEditors,
+            dataTypeService,
+            contentSettings,
+            umbracoMapper,
+            propertyEditorCollection,
+            contentTypeService,
+            mediaTypeService,
+            memberTypeService,
+            localizedTextService,
+            backOfficeSecurityAccessor,
+            serializer,
+            StaticServiceProvider.Instance.GetRequiredService<IDataTypeUsageService>())
          {
+         }
+
+        [ActivatorUtilitiesConstructor]
+        public DataTypeController(
+            PropertyEditorCollection propertyEditors,
+            IDataTypeService dataTypeService,
+            IOptionsSnapshot<ContentSettings> contentSettings,
+            IUmbracoMapper umbracoMapper,
+            PropertyEditorCollection propertyEditorCollection,
+            IContentTypeService contentTypeService,
+            IMediaTypeService mediaTypeService,
+            IMemberTypeService memberTypeService,
+            ILocalizedTextService localizedTextService,
+            IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+            IConfigurationEditorJsonSerializer serializer,
+            IDataTypeUsageService dataTypeUsageService)
+        {
             _propertyEditors = propertyEditors ?? throw new ArgumentNullException(nameof(propertyEditors));
             _dataTypeService = dataTypeService ?? throw new ArgumentNullException(nameof(dataTypeService));
             _contentSettings = contentSettings.Value ?? throw new ArgumentNullException(nameof(contentSettings));
@@ -72,14 +106,15 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _localizedTextService = localizedTextService ?? throw new ArgumentNullException(nameof(localizedTextService));
             _backOfficeSecurityAccessor = backOfficeSecurityAccessor ?? throw new ArgumentNullException(nameof(backOfficeSecurityAccessor));
             _serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
-         }
+            _dataTypeUsageService = dataTypeUsageService ?? throw new ArgumentNullException(nameof(dataTypeUsageService));
+        }
 
         /// <summary>
         /// Gets data type by name
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public DataTypeDisplay GetByName(string name)
+        public DataTypeDisplay? GetByName(string name)
         {
             var dataType = _dataTypeService.GetDataType(name);
             return dataType == null ? null : _umbracoMapper.Map<IDataType, DataTypeDisplay>(dataType);
@@ -90,7 +125,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public ActionResult<DataTypeDisplay> GetById(int id)
+        public ActionResult<DataTypeDisplay?> GetById(int id)
         {
             var dataType = _dataTypeService.GetDataType(id);
             if (dataType == null)
@@ -106,7 +141,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public ActionResult<DataTypeDisplay> GetById(Guid id)
+        public ActionResult<DataTypeDisplay?> GetById(Guid id)
         {
             var dataType = _dataTypeService.GetDataType(id);
             if (dataType == null)
@@ -122,7 +157,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public ActionResult<DataTypeDisplay> GetById(Udi id)
+        public ActionResult<DataTypeDisplay?> GetById(Udi id)
         {
             var guidUdi = id as GuidUdi;
             if (guidUdi == null)
@@ -151,13 +186,13 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             {
                 return NotFound();
             }
-            var currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
-            _dataTypeService.Delete(foundType, currentUser.Id);
+            var currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
+            _dataTypeService.Delete(foundType, currentUser?.Id ?? -1);
 
             return Ok();
         }
 
-        public DataTypeDisplay GetEmpty(int parentId)
+        public DataTypeDisplay? GetEmpty(int parentId)
         {
             // cannot create an "empty" data type, so use something by default.
             var editor = _propertyEditors[Constants.PropertyEditors.Aliases.Label];
@@ -170,7 +205,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="contentTypeAlias"></param>
         /// <returns>a DataTypeDisplay</returns>
-        public ActionResult<DataTypeDisplay> GetCustomListView(string contentTypeAlias)
+        public ActionResult<DataTypeDisplay?> GetCustomListView(string contentTypeAlias)
         {
             var dt = _dataTypeService.GetDataType(Constants.Conventions.DataTypes.ListViewPrefix + contentTypeAlias);
             if (dt == null)
@@ -186,7 +221,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="contentTypeAlias"></param>
         /// <returns></returns>
-        public DataTypeDisplay PostCreateCustomListView(string contentTypeAlias)
+        public DataTypeDisplay? PostCreateCustomListView(string contentTypeAlias)
         {
             var dt = _dataTypeService.GetDataType(Constants.Conventions.DataTypes.ListViewPrefix + contentTypeAlias);
 
@@ -218,7 +253,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             if (dataTypeId == -1)
             {
                 //this is a new data type, so just return the field editors with default values
-                return new ActionResult<IEnumerable<DataTypeConfigurationFieldDisplay>>(_umbracoMapper.Map<IDataEditor, IEnumerable<DataTypeConfigurationFieldDisplay>>(propEd));
+                return new ActionResult<IEnumerable<DataTypeConfigurationFieldDisplay>>(_umbracoMapper.Map<IDataEditor, IEnumerable<DataTypeConfigurationFieldDisplay>>(propEd) ?? Enumerable.Empty<DataTypeConfigurationFieldDisplay>());
             }
 
             //we have a data type associated
@@ -234,11 +269,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             if (dataType.EditorAlias == editorAlias)
             {
                 //this is the currently assigned pre-value editor, return with values.
-                return new ActionResult<IEnumerable<DataTypeConfigurationFieldDisplay>>(_umbracoMapper.Map<IDataType, IEnumerable<DataTypeConfigurationFieldDisplay>>(dataType));
+                return new ActionResult<IEnumerable<DataTypeConfigurationFieldDisplay>>(_umbracoMapper.Map<IDataType, IEnumerable<DataTypeConfigurationFieldDisplay>>(dataType) ?? Enumerable.Empty<DataTypeConfigurationFieldDisplay>());
             }
 
             //these are new pre-values, so just return the field editors with default values
-            return new ActionResult<IEnumerable<DataTypeConfigurationFieldDisplay>>(_umbracoMapper.Map<IDataEditor, IEnumerable<DataTypeConfigurationFieldDisplay>>(propEd));
+            return new ActionResult<IEnumerable<DataTypeConfigurationFieldDisplay>>(_umbracoMapper.Map<IDataEditor, IEnumerable<DataTypeConfigurationFieldDisplay>>(propEd) ?? Enumerable.Empty<DataTypeConfigurationFieldDisplay>());
         }
 
         /// <summary>
@@ -251,21 +286,21 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         public IActionResult DeleteContainer(int id)
         {
 
-            var currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
-            _dataTypeService.DeleteContainer(id, currentUser.Id);
+            var currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
+            _dataTypeService.DeleteContainer(id, currentUser?.Id ?? -1);
 
             return Ok();
         }
 
         public IActionResult PostCreateContainer(int parentId, string name)
         {
-            var currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
-            var result = _dataTypeService.CreateContainer(parentId, Guid.NewGuid(), name, currentUser.Id);
+            var currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
+            var result = _dataTypeService.CreateContainer(parentId, Guid.NewGuid(), name, currentUser?.Id ?? -1);
 
             if (result.Success)
                 return Ok(result.Result); //return the id
             else
-                return ValidationProblem(result.Exception.Message);
+                return ValidationProblem(result.Exception?.Message);
         }
 
         /// <summary>
@@ -274,7 +309,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <param name="dataType"></param>
         /// <returns></returns>
         [DataTypeValidate]
-        public ActionResult<DataTypeDisplay> PostSave(DataTypeSave dataType)
+        public ActionResult<DataTypeDisplay?> PostSave(DataTypeSave dataType)
         {
             //If we've made it here, then everything has been wired up and validated by the attribute
 
@@ -284,18 +319,23 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             // get the current configuration,
             // get the new configuration as a dictionary (this is how we get it from model)
             // and map to an actual configuration object
-            var currentConfiguration = dataType.PersistedDataType.Configuration;
-            var configurationDictionary = dataType.ConfigurationFields.ToDictionary(x => x.Key, x => x.Value);
-            var configuration = dataType.PropertyEditor.GetConfigurationEditor().FromConfigurationEditor(configurationDictionary, currentConfiguration);
+            var currentConfiguration = dataType.PersistedDataType?.Configuration;
+            var configurationDictionary = dataType.ConfigurationFields?.ToDictionary(x => x.Key, x => x.Value);
+            var configuration = dataType.PropertyEditor?.GetConfigurationEditor().FromConfigurationEditor(configurationDictionary, currentConfiguration);
 
-            dataType.PersistedDataType.Configuration = configuration;
+            if (dataType.PersistedDataType is not null)
+            {
+                dataType.PersistedDataType.Configuration = configuration;
+            }
 
-            var currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
+            var currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
             // save the data type
             try
             {
-
-                _dataTypeService.Save(dataType.PersistedDataType, currentUser.Id);
+                if (dataType.PersistedDataType is not null)
+                {
+                    _dataTypeService.Save(dataType.PersistedDataType, currentUser?.Id ?? -1);
+                }
             }
             catch (DuplicateNameException ex)
             {
@@ -305,7 +345,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             // map back to display model, and return
             var display = _umbracoMapper.Map<IDataType, DataTypeDisplay>(dataType.PersistedDataType);
-            display.AddSuccessNotification(_localizedTextService.Localize("speechBubbles", "dataTypeSaved"), "");
+            display?.AddSuccessNotification(_localizedTextService.Localize("speechBubbles", "dataTypeSaved"), "");
             return display;
         }
 
@@ -328,7 +368,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return Content(toMove.Path,MediaTypeNames.Text.Plain, Encoding.UTF8);
             }
 
-            switch (result.Result.Result)
+            switch (result.Result?.Result)
             {
                 case MoveOperationStatusType.FailedParentNotFound:
                     return NotFound();
@@ -372,13 +412,13 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
         public IActionResult PostRenameContainer(int id, string name)
         {
-            var currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
-            var result = _dataTypeService.RenameContainer(id, name, currentUser.Id);
+            var currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
+            var result = _dataTypeService.RenameContainer(id, name, currentUser?.Id ?? -1);
 
             if (result.Success)
                 return Ok(result.Result);
             else
-                return ValidationProblem(result.Exception.Message);
+                return ValidationProblem(result.Exception?.Message);
         }
 
         /// <summary>
@@ -405,6 +445,13 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
 
             return result;
+        }
+
+        [HttpGet]
+        public ActionResult<DataTypeHasValuesDisplay> HasValues(int id)
+        {
+            bool hasValue = _dataTypeUsageService.HasSavedValues(id);
+            return new DataTypeHasValuesDisplay(id, hasValue);
         }
 
         /// <summary>
@@ -444,11 +491,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// Permission is granted to this method if the user has access to any of these sections: Content, media, settings, developer, members
         /// </remarks>
         [Authorize(Policy = AuthorizationPolicies.SectionAccessForDataTypeReading)]
-        public IEnumerable<DataTypeBasic> GetAll()
+        public IEnumerable<DataTypeBasic>? GetAll()
         {
             return _dataTypeService
                      .GetAll()
-                     .Select(_umbracoMapper.Map<IDataType, DataTypeBasic>).Where(x => x.IsSystemDataType == false);
+                     .Select(_umbracoMapper.Map<IDataType, DataTypeBasic>).WhereNotNull().Where(x => x.IsSystemDataType == false);
         }
 
         /// <summary>
@@ -459,7 +506,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// Permission is granted to this method if the user has access to any of these sections: Content, media, settings, developer, members
         /// </remarks>
         [Authorize(Policy = AuthorizationPolicies.SectionAccessForDataTypeReading)]
-        public IDictionary<string, IEnumerable<DataTypeBasic>> GetGroupedDataTypes()
+        public IDictionary<string, IEnumerable<DataTypeBasic>>? GetGroupedDataTypes()
         {
             var dataTypes = _dataTypeService
                      .GetAll()
@@ -468,15 +515,20 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             var propertyEditors =_propertyEditorCollection.ToArray();
 
-            foreach (var dataType in dataTypes)
+            if (dataTypes is not null)
             {
-                var propertyEditor = propertyEditors.SingleOrDefault(x => x.Alias == dataType.Alias);
-                if (propertyEditor != null)
-                    dataType.HasPrevalues = propertyEditor.GetConfigurationEditor().Fields.Any();
+                foreach (var dataType in dataTypes)
+                {
+                    var propertyEditor = propertyEditors.SingleOrDefault(x => x.Alias == dataType?.Alias);
+                    if (propertyEditor != null && dataType is not null)
+                        dataType.HasPrevalues = propertyEditor.GetConfigurationEditor().Fields.Any();
+                }
+
+
             }
 
-            var grouped = dataTypes
-                .GroupBy(x => x.Group.IsNullOrWhiteSpace() ? "" : x.Group.ToLower())
+            var grouped = dataTypes?.WhereNotNull()
+                .GroupBy(x => x.Group.IsNullOrWhiteSpace() ? "" : x.Group!.ToLower())
                 .ToDictionary(group => group.Key, group => group.OrderBy(d => d.Name).AsEnumerable());
 
             return grouped;
@@ -501,12 +553,15 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             {
                 var hasPrevalues = propertyEditor.GetConfigurationEditor().Fields.Any();
                 var basic = _umbracoMapper.Map<DataTypeBasic>(propertyEditor);
-                basic.HasPrevalues = hasPrevalues;
-                datatypes.Add(basic);
+                if (basic is not null)
+                {
+                    basic.HasPrevalues = hasPrevalues;
+                    datatypes.Add(basic);
+                }
             }
 
             var grouped = Enumerable.ToDictionary(datatypes
-                    .GroupBy(x => x.Group.IsNullOrWhiteSpace() ? "" : x.Group.ToLower()), group => group.Key, group => group.OrderBy(d => d.Name).AsEnumerable());
+                    .GroupBy(x => x.Group.IsNullOrWhiteSpace() ? "" : x.Group!.ToLower()), group => group.Key, group => group.OrderBy(d => d.Name).AsEnumerable());
 
             return grouped;
         }
@@ -524,8 +579,9 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         {
             return _propertyEditorCollection
                 .OrderBy(x => x.Name)
-                .Select(_umbracoMapper.Map<PropertyEditorBasic>);
+                .Select(_umbracoMapper.Map<PropertyEditorBasic>).WhereNotNull();
         }
         #endregion
     }
 }
+

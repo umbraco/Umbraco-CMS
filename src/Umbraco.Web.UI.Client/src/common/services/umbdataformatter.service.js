@@ -154,7 +154,7 @@
             formatUserPostData: function (displayModel) {
 
                 //create the save model from the display model
-                var saveModel = _.pick(displayModel, 'id', 'parentId', 'name', 'username', 'culture', 'email', 'startContentIds', 'startMediaIds', 'userGroups', 'message');
+                var saveModel = _.pick(displayModel, 'id', 'parentId', 'name', 'username', 'culture', 'email', 'startContentIds', 'startMediaIds', 'userGroups', 'message', 'key');
 
                 //make sure the userGroups are just a string array
                 var currGroups = saveModel.userGroups;
@@ -269,41 +269,68 @@
 
             /** formats the display model used to display the member to the model used to save the member */
             formatMemberPostData: function (displayModel, action) {
-                //this is basically the same as for media but we need to explicitly add the username,email, password to the save model
+                //this is basically the same as for media but we need to explicitly add the username, email, password to the save model
 
                 var saveModel = this.formatMediaPostData(displayModel, action);
 
                 saveModel.key = displayModel.key;
 
-                var genericTab = _.find(displayModel.tabs, function (item) {
-                    return item.id === 0;
-                });
-
-                //map the member login, email, password and groups
-                var propLogin = _.find(genericTab.properties, function (item) {
-                    return item.alias === "_umb_login";
-                });
-                var propEmail = _.find(genericTab.properties, function (item) {
-                    return item.alias === "_umb_email";
-                });
-                var propPass = _.find(genericTab.properties, function (item) {
-                    return item.alias === "_umb_password";
-                });
-                var propGroups = _.find(genericTab.properties, function (item) {
-                    return item.alias === "_umb_membergroup";
-                });
-                saveModel.email = propEmail.value.trim();
-                saveModel.username = propLogin.value.trim();
-
-                saveModel.password = this.formatChangePasswordModel(propPass.value);
-
-                var selectedGroups = [];
-                for (var n in propGroups.value) {
-                    if (propGroups.value[n] === true) {
-                        selectedGroups.push(n);
+                // Map membership properties
+                _.each(displayModel.membershipProperties, prop => {
+                    switch (prop.alias) {
+                        case '_umb_login':
+                            saveModel.username = prop.value.trim();
+                            break;
+                        case '_umb_email':
+                            saveModel.email = prop.value.trim();
+                            break;
+                        case '_umb_password':
+                            saveModel.password = this.formatChangePasswordModel(prop.value);
+                            break;
+                        case '_umb_membergroup':
+                            saveModel.memberGroups = _.keys(_.pick(prop.value, value => value === true));
+                            break;
+                        case '_umb_approved':
+                            saveModel.isApproved = prop.value;
+                            break;
+                        case '_umb_lockedOut':
+                            saveModel.isLockedOut = prop.value;
+                            break;
                     }
-                }
-                saveModel.memberGroups = selectedGroups;
+                });
+
+                // saveModel.password = this.formatChangePasswordModel(propPass.value);
+                //
+                // var selectedGroups = [];
+                // for (var n in propGroups.value) {
+                //     if (propGroups.value[n] === true) {
+                //         selectedGroups.push(n);
+                //     }
+                // }
+                // saveModel.memberGroups = selectedGroups;
+
+                // Map custom member provider properties
+                var memberProviderPropAliases = _.pairs(displayModel.fieldConfig);
+                _.each(displayModel.tabs, tab => {
+                    _.each(tab.properties, prop => {
+                        var foundAlias = _.find(memberProviderPropAliases, item => prop.alias === item[1]);
+                        if (foundAlias) {
+                            // we know the current property matches an alias, now we need to determine which membership provider property it was for
+                            // by looking at the key
+                            switch (foundAlias[0]) {
+                                case "umbracoMemberLockedOut":
+                                    saveModel.isLockedOut = Object.toBoolean(prop.value);
+                                    break;
+                                case "umbracoMemberApproved":
+                                    saveModel.isApproved = Object.toBoolean(prop.value);
+                                    break;
+                                case "umbracoMemberComments":
+                                    saveModel.comments = prop.value;
+                                    break;
+                            }
+                        }
+                    });
+                });
 
                 return saveModel;
             },
@@ -440,6 +467,7 @@
                     alias: relationType.alias,
                     key: relationType.key,
                     isBidirectional: relationType.isBidirectional,
+                    isDependency: relationType.isDependency,
                     parentObjectType: relationType.parentObjectType,
                     childObjectType: relationType.childObjectType
                 };

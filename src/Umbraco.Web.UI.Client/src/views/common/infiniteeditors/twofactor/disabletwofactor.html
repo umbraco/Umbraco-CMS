@@ -1,0 +1,56 @@
+<div ng-controller="Umbraco.Editors.DisableTwoFactorController as vm">
+
+  <umb-editor-view>
+    <form name="vm.authForm" method="POST" ng-submit="vm.disableWithCode()">
+
+      <umb-editor-header name="vm.title" name-locked="true" hide-alias="true" hide-icon="true" hide-description="true">
+      </umb-editor-header>
+
+      <umb-editor-container>
+
+        <umb-box>
+
+          <umb-box-header title-key="actions_disable"></umb-box-header>
+
+          <umb-box-content>
+
+            <umb-control-group label-for="token" alias="2facode" label="@login_2faCodeInput"
+              description="@user_2faDisableText" required="true">
+
+              <input umb-auto-focus id="2facode" class="-full-width-input input-xlarge" type="text" name="token"
+                inputmode="numeric" autocomplete="one-time-code" ng-model="vm.code" localize="placeholder"
+                placeholder="@login_2faCodeInputHelp" aria-required="true" required no-dirty-check />
+
+              <div ng-messages="vm.authForm.token.$error" role="alert">
+                <span class="umb-validation-label" ng-message="token">
+                  <localize key="login_2faInvalidCode">Invalid code entered</localize>
+                </span>
+              </div>
+            </umb-control-group>
+
+          </umb-box-content>
+
+        </umb-box>
+
+      </umb-editor-container>
+
+      <umb-editor-footer>
+
+        <umb-editor-footer-content-right>
+
+          <umb-button type="button" button-style="link" label-key="general_close" shortcut="esc" action="vm.close()">
+          </umb-button>
+
+          <umb-button type="submit" button-style="warning" label="Disable" label-key="actions_disable" size="m"
+            disabled="vm.code.length === 0" state="vm.buttonState">
+          </umb-button>
+
+        </umb-editor-footer-content-right>
+
+      </umb-editor-footer>
+
+    </form>
+
+  </umb-editor-view>
+
+</div>

@@ -1,107 +1,87 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
 using System.ComponentModel;
 using Umbraco.Cms.Core.Configuration.UmbracoSettings;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Core.Configuration.Models
+namespace Umbraco.Cms.Core.Configuration.Models;
+
+/// <summary>
+///     Typed configuration options for request handler settings.
+/// </summary>
+[UmbracoOptions(Constants.Configuration.ConfigRequestHandler)]
+public class RequestHandlerSettings
 {
-    /// <summary>
-    /// Typed configuration options for request handler settings.
-    /// </summary>
-    [UmbracoOptions(Constants.Configuration.ConfigRequestHandler)]
-    public class RequestHandlerSettings
+    internal const bool StaticAddTrailingSlash = true;
+    internal const string StaticConvertUrlsToAscii = "try";
+    internal const bool StaticEnableDefaultCharReplacements = true;
+
+    internal static readonly CharItem[] DefaultCharCollection =
     {
-        internal const bool StaticAddTrailingSlash = true;
-        internal const string StaticConvertUrlsToAscii = "try";
+            new () { Char = " ", Replacement = "-" },
+            new () { Char = "\"", Replacement = string.Empty },
+            new () { Char = "'", Replacement = string.Empty },
+            new () { Char = "%", Replacement = string.Empty },
+            new () { Char = ".", Replacement = string.Empty },
+            new () { Char = ";", Replacement = string.Empty },
+            new () { Char = "/", Replacement = string.Empty },
+            new () { Char = "\\", Replacement = string.Empty },
+            new () { Char = ":", Replacement = string.Empty },
+            new () { Char = "#", Replacement = string.Empty },
+            new () { Char = "+", Replacement = "plus" },
+            new () { Char = "*", Replacement = "star" },
+            new () { Char = "&", Replacement = string.Empty },
+            new () { Char = "?", Replacement = string.Empty },
+            new () { Char = "æ", Replacement = "ae" },
+            new () { Char = "ä", Replacement = "ae" },
+            new () { Char = "ø", Replacement = "oe" },
+            new () { Char = "ö", Replacement = "oe" },
+            new () { Char = "å", Replacement = "aa" },
+            new () { Char = "ü", Replacement = "ue" },
+            new () { Char = "ß", Replacement = "ss" },
+            new () { Char = "|", Replacement = "-" },
+            new () { Char = "<", Replacement = string.Empty },
+            new () { Char = ">", Replacement = string.Empty },
+    };
 
-        internal static readonly CharItem[] DefaultCharCollection =
-        {
-            new CharItem { Char = " ", Replacement = "-" },
-            new CharItem { Char = "\"", Replacement = string.Empty },
-            new CharItem { Char = "'", Replacement = string.Empty },
-            new CharItem { Char = "%", Replacement = string.Empty },
-            new CharItem { Char = ".", Replacement = string.Empty },
-            new CharItem { Char = ";", Replacement = string.Empty },
-            new CharItem { Char = "/", Replacement = string.Empty },
-            new CharItem { Char = "\\", Replacement = string.Empty },
-            new CharItem { Char = ":", Replacement = string.Empty },
-            new CharItem { Char = "#", Replacement = string.Empty },
-            new CharItem { Char = "+", Replacement = "plus" },
-            new CharItem { Char = "*", Replacement = "star" },
-            new CharItem { Char = "&", Replacement = string.Empty },
-            new CharItem { Char = "?", Replacement = string.Empty },
-            new CharItem { Char = "æ", Replacement = "ae" },
-            new CharItem { Char = "ä", Replacement = "ae" },
-            new CharItem { Char = "ø", Replacement = "oe" },
-            new CharItem { Char = "ö", Replacement = "oe" },
-            new CharItem { Char = "å", Replacement = "aa" },
-            new CharItem { Char = "ü", Replacement = "ue" },
-            new CharItem { Char = "ß", Replacement = "ss" },
-            new CharItem { Char = "|", Replacement = "-" },
-            new CharItem { Char = "<", Replacement = string.Empty },
-            new CharItem { Char = ">", Replacement = string.Empty }
-        };
+    /// <summary>
+    ///     Gets or sets a value indicating whether to add a trailing slash to URLs.
+    /// </summary>
+    [DefaultValue(StaticAddTrailingSlash)]
+    public bool AddTrailingSlash { get; set; } = StaticAddTrailingSlash;
 
-        /// <summary>
-        /// Gets or sets a value indicating whether to add a trailing slash to URLs.
-        /// </summary>
-        [DefaultValue(StaticAddTrailingSlash)]
-        public bool AddTrailingSlash { get; set; } = StaticAddTrailingSlash;
+    /// <summary>
+    ///     Gets or sets a value indicating whether to convert URLs to ASCII (valid values: "true", "try" or "false").
+    /// </summary>
+    [DefaultValue(StaticConvertUrlsToAscii)]
+    public string ConvertUrlsToAscii { get; set; } = StaticConvertUrlsToAscii;
 
-        /// <summary>
-        /// Gets or sets a value indicating whether to convert URLs to ASCII (valid values: "true", "try" or "false").
-        /// </summary>
-        [DefaultValue(StaticConvertUrlsToAscii)]
-        public string ConvertUrlsToAscii { get; set; } = StaticConvertUrlsToAscii;
+    /// <summary>
+    ///     Gets a value indicating whether URLs should be converted to ASCII.
+    /// </summary>
+    public bool ShouldConvertUrlsToAscii => ConvertUrlsToAscii.InvariantEquals("true");
 
-        /// <summary>
-        /// Gets a value indicating whether URLs should be converted to ASCII.
-        /// </summary>
-        public bool ShouldConvertUrlsToAscii => ConvertUrlsToAscii.InvariantEquals("true");
+    /// <summary>
+    ///     Gets a value indicating whether URLs should be tried to be converted to ASCII.
+    /// </summary>
+    public bool ShouldTryConvertUrlsToAscii => ConvertUrlsToAscii.InvariantEquals("try");
 
-        /// <summary>
-        /// Gets a value indicating whether URLs should be tried to be converted to ASCII.
-        /// </summary>
-        public bool ShouldTryConvertUrlsToAscii => ConvertUrlsToAscii.InvariantEquals("try");
+    /// <summary>
+    ///     Disable all default character replacements
+    /// </summary>
+    [DefaultValue(StaticEnableDefaultCharReplacements)]
+    public bool EnableDefaultCharReplacements { get; set; } = StaticEnableDefaultCharReplacements;
 
-        // We need to special handle ":", as this character is special in keys
+    /// <summary>
+    ///     Add additional character replacements, or override defaults
+    /// </summary>
+    [Obsolete(
+        "Use the GetCharReplacements extension method in the Umbraco.Extensions namespace instead. Scheduled for removal in V11")]
+    public IEnumerable<IChar> CharCollection { get; set; } = DefaultCharCollection;
 
-        // TODO: implement from configuration
-
-        //// var collection = _configuration.GetSection(Prefix + "CharCollection").GetChildren()
-        ////    .Select(x => new CharItem()
-        ////    {
-        ////        Char = x.GetValue<string>("Char"),
-        ////        Replacement = x.GetValue<string>("Replacement"),
-        ////    }).ToArray();
-
-        //// if (collection.Any() || _configuration.GetSection("Prefix").GetChildren().Any(x =>
-        ////    x.Key.Equals("CharCollection", StringComparison.OrdinalIgnoreCase)))
-        //// {
-        ////    return collection;
-        //// }
-
-        //// return DefaultCharCollection;
-
-        /// <summary>
-        /// Gets or sets a value for the default character collection for replacements.
-        /// </summary>
-        /// WB-TODO
-        public IEnumerable<IChar> CharCollection { get; set; } = DefaultCharCollection;
-
-        /// <summary>
-        /// Defines a character replacement.
-        /// </summary>
-        public class CharItem : IChar
-        {
-            /// <inheritdoc/>
-            public string Char { get; set; }
-
-            /// <inheritdoc/>
-            public string Replacement { get; set; }
-        }
-    }
+    /// <summary>
+    ///     Add additional character replacements, or override defaults
+    /// </summary>
+    public IEnumerable<CharItem>? UserDefinedCharCollection { get; set; }
 }

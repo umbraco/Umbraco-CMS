@@ -1,0 +1,18 @@
+<div class="umb-file-preview">
+  <a
+    class="umb-file-preview--file"
+    ng-show="!vm.clientSide"
+    href="#"
+    ng-href="{{vm.source}}"
+    alt="{{vm.name}}"
+    target="_blank"
+    rel="noopener"
+  >
+    <umb-file-icon extension="{{vm.extension}}" size="m"> </umb-file-icon>
+    <div class="mt2">{{vm.name}}</div>
+  </a>
+  <div class="umb-file-preview--file" ng-show="vm.clientSide">
+    <umb-file-icon extension="{{vm.extension}}" size="m"> </umb-file-icon>
+    <div class="mt2">{{vm.name}}</div>
+  </div>
+</div>

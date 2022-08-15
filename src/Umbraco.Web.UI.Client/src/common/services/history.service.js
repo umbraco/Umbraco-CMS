@@ -130,7 +130,7 @@ angular.module('umbraco.services')
         getLastAccessedItemForSection: function (sectionAlias) {
             for (var i = 0, len = nArray.length; i < len; i++) {
                 var item = nArray[i];
-                if (item.link.indexOf(sectionAlias + "/") === 0) {
+                if (item.link === sectionAlias || item.link.indexOf(sectionAlias + "/") === 0) {
                     return item;
                 }
             }

@@ -7,28 +7,28 @@ function dataTypeResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
   return {
 
-    /**
-     * @ngdoc method
-     * @name umbraco.resources.dataTypeResource#getPreValues
-     * @methodOf umbraco.resources.dataTypeResource
-     *
-     * @description
-     * Retrieves available prevalues for a given data type + editor
-     *
-     * ##usage
-     * <pre>
-     * dataTypeResource.getPreValues("Umbraco.MediaPicker", 1234)
-     *    .then(function(prevalues) {
-     *        alert('its gone!');
-     *    });
-     * </pre>
-     *
-     * @param {String} editorAlias string alias of editor type to retrive prevalues configuration for
-     * @param {Int} id id of datatype to retrieve prevalues for
-     * @returns {Promise} resourcePromise object.
-     *
-     */
-    getPreValues: function (editorAlias, dataTypeId) {
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.dataTypeResource#getPreValues
+         * @methodOf umbraco.resources.dataTypeResource
+         *
+         * @description
+         * Retrieves available prevalues for a given data type + editor
+         *
+         * ##usage
+         * <pre>
+         * dataTypeResource.getPreValues("Umbraco.MediaPicker", 1234)
+         *    .then(function(prevalues) {
+         *        alert('its gone!');
+         *    });
+         * </pre>
+         *
+         * @param {String} editorAlias string alias of editor type to retrieve prevalues configuration for
+         * @param {Int} id id of datatype to retrieve prevalues for
+         * @returns {Promise} resourcePromise object.
+         *
+         */
+        getPreValues: function (editorAlias, dataTypeId) {
 
       if (!dataTypeId) {
         dataTypeId = -1;
@@ -426,16 +426,48 @@ function dataTypeResource($q, $http, umbDataFormatter, umbRequestHelper) {
         'Failed to create a folder under parent id ' + parentId);
     },
 
-    renameContainer: function (id, name) {
-      return umbRequestHelper.resourcePromise(
-        $http.post
-          (umbRequestHelper.getApiUrl(
-            "dataTypeApiBaseUrl",
-            "PostRenameContainer",
-            { id: id, name: encodeURIComponent(name) })),
-        "Failed to rename the folder with id " + id);
-    }
-  };
+        renameContainer: function (id, name) {
+            return umbRequestHelper.resourcePromise(
+                $http.post
+                    (umbRequestHelper.getApiUrl(
+                        "dataTypeApiBaseUrl",
+                        "PostRenameContainer",
+                        { id: id, name: encodeURIComponent(name) })),
+                "Failed to rename the folder with id " + id);
+        },
+
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.dataTypeResource#hasValues
+         * @methodOf umbraco.resources.dataTypeResource
+         *
+         * @description
+         * Checks for values stored for the data type
+         *
+         * ##usage
+         * <pre>
+         * dataTypeResource.hasValues(id)
+         *    .then(function(data) {
+         *        console.log(data.hasValues);
+         *    }, function(err) {
+         *      console.log("failed to check if data type has values", err);
+         *    });
+         * </pre> 
+         * 
+         * @param {Int} id id of data type
+         * @returns {Promise} resourcePromise object.
+         */
+        hasValues: function (id) {
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "dataTypeApiBaseUrl",
+                        "hasvalues",
+                        { id }
+                    )),
+                "Failed to check if the data type with " + id + " has values");
+        }
+    };
 }
 
 angular.module("umbraco.resources").factory("dataTypeResource", dataTypeResource);

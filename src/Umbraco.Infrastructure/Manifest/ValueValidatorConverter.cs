@@ -1,34 +1,31 @@
-﻿using System;
 using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Infrastructure.Serialization;
 
-namespace Umbraco.Cms.Core.Manifest
+namespace Umbraco.Cms.Core.Manifest;
+
+/// <summary>
+///     Implements a json read converter for <see cref="IValueValidator" />.
+/// </summary>
+internal class ValueValidatorConverter : JsonReadConverter<IValueValidator>
 {
+    private readonly ManifestValueValidatorCollection _validators;
+
     /// <summary>
-    /// Implements a json read converter for <see cref="IValueValidator"/>.
+    ///     Initializes a new instance of the <see cref="ValueValidatorConverter" /> class.
     /// </summary>
-    internal class ValueValidatorConverter : JsonReadConverter<IValueValidator>
+    public ValueValidatorConverter(ManifestValueValidatorCollection validators) => _validators = validators;
+
+    protected override IValueValidator Create(Type objectType, string path, JObject jObject)
     {
-        private readonly ManifestValueValidatorCollection _validators;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ValueValidatorConverter"/> class.
-        /// </summary>
-        public ValueValidatorConverter(ManifestValueValidatorCollection validators)
+        var type = jObject["type"]?.Value<string>();
+        if (string.IsNullOrWhiteSpace(type))
         {
-            _validators = validators;
+            throw new InvalidOperationException("Could not get the type of the validator.");
         }
 
-        protected override IValueValidator Create(Type objectType, string path, JObject jObject)
-        {
-            var type = jObject["type"].Value<string>();
-            if (string.IsNullOrWhiteSpace(type))
-                throw new InvalidOperationException("Could not get the type of the validator.");
+        return _validators.GetByName(type);
 
-            return _validators.GetByName(type);
-
-            // jObject["configuration"] is going to be deserialized in a Configuration property, if any
-        }
+        // jObject["configuration"] is going to be deserialized in a Configuration property, if any
     }
 }

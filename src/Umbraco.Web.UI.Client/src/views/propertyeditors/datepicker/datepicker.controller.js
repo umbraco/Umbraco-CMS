@@ -11,7 +11,6 @@ function dateTimePickerController($scope, angularHelper, dateHelper, validationM
 
         // setup the default config
         var config = {
-            pickDate: true,
             pickTime: true,
             useSeconds: true,
             format: "YYYY-MM-DD HH:mm:ss",
@@ -56,7 +55,7 @@ function dateTimePickerController($scope, angularHelper, dateHelper, validationM
 
         // Don't show calendar if date format has been set to only time
         const timeFormat = $scope.model.config.format.toLowerCase();
-        const timeFormatPattern = /^h{1,2}:m{1,2}:s{1,2}\s?a?$/gmi;
+        const timeFormatPattern = /^h{1,2}:m{1,2}(:s{1,2})?\s?a?$/gmi;
         if (timeFormat.match(timeFormatPattern)) {            
             $scope.datePickerConfig.enableTime = true;
             $scope.datePickerConfig.noCalendar = true;

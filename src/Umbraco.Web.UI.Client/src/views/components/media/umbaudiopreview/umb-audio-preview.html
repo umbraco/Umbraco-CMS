@@ -1,0 +1,8 @@
+<div class="umb-audio-preview" ng-controller="umbAudioPreviewController as controller">
+    <audio ng-if="vm.clientSide" name="{{vm.name}}" controls>
+        <source ng-init="previewUrl = controller.getClientSideUrl(vm.clientSideData)" ng-src="{{previewUrl}}">
+    </audio>
+    <audio ng-if="!vm.clientSide" name="{{vm.name}}" controls>
+        <source ng-src="{{vm.source}}">
+    </audio>
+</div>

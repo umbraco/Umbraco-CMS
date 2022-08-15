@@ -1,0 +1,48 @@
+@using Umbraco.Cms.Core
+@using Umbraco.Cms.Core.Models.PublishedContent
+@using Umbraco.Cms.Core.Routing
+@using Umbraco.Extensions
+@inherits Umbraco.Cms.Web.Common.Macros.PartialViewMacroPage
+@inject IPublishedValueFallback PublishedValueFallback
+@inject IPublishedUrlProvider PublishedUrlProvider
+@*
+    This snippet makes a list of links of all visible pages of the site, as nested unordered HTML lists.
+
+    How it works:
+    - It uses a local method called Traverse() to select and display the markup and links.
+*@
+
+@{ var selection = Model?.Content.Root(); }
+
+<div class="sitemap">
+    @* Render the sitemap by passing the root node to the traverse method, below *@
+    @{ Traverse(selection); }
+</div>
+
+@* Helper method to traverse through all descendants *@
+@{
+    void Traverse(IPublishedContent? node)
+    {
+        //Update the level to reflect how deep you want the sitemap to go
+        const int maxLevelForSitemap = 4;
+
+        @* Select visible children *@
+        var selection = node?.Children.Where(x => x.IsVisible(PublishedValueFallback) && x.Level <= maxLevelForSitemap).ToArray();
+
+        @* If any items are returned, render a list *@
+        if (selection?.Length > 0)
+        {
+            <ul>
+                @foreach (var item in selection)
+                {
+                    <li class="level-@item.Level">
+                        <a href="@item.Url(PublishedUrlProvider)">@item.Name</a>
+
+                        @* Run the traverse method again for any child pages *@
+                        @{ Traverse(item); }
+                    </li>
+                }
+            </ul>
+        }
+    }
+}

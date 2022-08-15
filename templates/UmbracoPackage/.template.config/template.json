@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json.schemastore.org/template.json",
+  "author": "Umbraco HQ",
+  "classifications": [
+    "Web",
+    "CMS",
+    "Umbraco",
+    "Package",
+    "Plugin"
+  ],
+  "name": "Umbraco Package",
+  "description": "An empty Umbraco package/plugin project ready to get started.",
+  "groupIdentity": "Umbraco.Templates.UmbracoPackage",
+  "identity": "Umbraco.Templates.UmbracoPackage.CSharp",
+  "shortName": "umbracopackage",
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
+  "sourceName": "UmbracoPackage",
+  "defaultName": "UmbracoPackage1",
+  "preferNameDirectory": true,
+  "symbols": {
+    "Framework": {
+      "displayName": "Framework",
+      "description": "The target framework for the project.",
+      "type": "parameter",
+      "datatype": "choice",
+      "choices": [
+        {
+          "displayName": ".NET 6.0",
+          "description": "Target net6.0",
+          "choice": "net6.0"
+        }
+      ],
+      "defaultValue": "net6.0",
+      "replaces": "net6.0"
+    },
+    "UmbracoVersion": {
+      "displayName": "Umbraco version",
+      "description": "The version of Umbraco.Cms to add as PackageReference.",
+      "type": "parameter",
+      "datatype": "string",
+      "defaultValue": "10.0.0-rc1",
+      "replaces": "UMBRACO_VERSION_FROM_TEMPLATE"
+    },
+    "Namespace": {
+      "type": "derived",
+      "valueSource": "name",
+      "valueTransform": "safe_namespace",
+      "fileRename": "UmbracoPackage",
+      "replaces": "UmbracoPackage"
+    },
+    "MsBuildName": {
+      "type": "generated",
+      "generator": "regex",
+      "dataType": "string",
+      "parameters": {
+        "source": "name",
+        "steps": [
+          {
+            "regex": "\\s",
+            "replacement": ""
+          },
+          {
+            "regex": "\\.",
+            "replacement": ""
+          },
+          {
+            "regex": "-",
+            "replacement": ""
+          },
+          {
+            "regex": "^[^a-zA-Z_]+",
+            "replacement": ""
+          }
+        ]
+      },
+      "replaces": "UmbracoPackageMsBuild"
+    }
+  },
+  "primaryOutputs": [
+    {
+      "path": "UmbracoPackage.csproj"
+    }
+  ]
+}

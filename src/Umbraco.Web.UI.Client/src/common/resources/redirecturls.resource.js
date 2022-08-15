@@ -27,7 +27,7 @@
          *    });
          * </pre>
          * @param {String} searchTerm Searh term
-         * @param {Int} pageIndex index of the page to retrive items from
+         * @param {Int} pageIndex index of the page to retrieve items from
          * @param {Int} pageSize The number of items on a page
          */
         function searchRedirectUrls(searchTerm, pageIndex, pageSize) {

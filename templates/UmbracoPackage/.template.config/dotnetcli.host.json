@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json.schemastore.org/dotnetcli.host.json",
+  "symbolInfo": {
+    "Framework": {
+      "longName": "Framework",
+      "shortName": "F"
+    },
+    "UmbracoVersion": {
+      "longName": "version",
+      "shortName": "v"
+    }
+  }
+}

@@ -1,0 +1,35 @@
+@using Umbraco.Cms.Core
+@using Umbraco.Cms.Core.Models.PublishedContent
+@using Umbraco.Cms.Core.Routing
+@using Umbraco.Extensions
+@inherits Umbraco.Cms.Web.Common.Macros.PartialViewMacroPage
+@inject IPublishedValueFallback PublishedValueFallback
+@inject IPublishedUrlProvider PublishedUrlProvider
+@*
+    Macro to list all child pages with a specific property, sorted by the value of that property.
+
+    How it works:
+        - Confirm the propertyAlias macro parameter has been passed in with a value
+        - Loop through all child pages that have the propertyAlias
+        - Display a list of link to those pages, sorted by the value of the propertyAlias
+
+    Macro Parameters To Create, for this macro to work:
+    Alias:propertyAlias     Name:Property Alias    Type:Textbox
+*@
+
+@{ var propertyAlias = Model?.MacroParameters["propertyAlias"]; }
+
+@if (propertyAlias != null)
+{
+    var selection = Model?.Content.Children.Where(x => x.IsVisible(PublishedValueFallback)).OrderBy(x => x.Value(PublishedValueFallback, propertyAlias.ToString())).ToArray();
+
+    if (selection?.Length > 0)
+    {
+        <ul>
+            @foreach (var item in selection)
+            {
+                <li><a href="@item.Url(PublishedUrlProvider)">@item.Name</a></li>
+            }
+        </ul>
+    }
+}

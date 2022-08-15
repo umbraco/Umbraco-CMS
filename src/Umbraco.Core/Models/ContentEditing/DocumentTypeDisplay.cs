@@ -1,34 +1,33 @@
-using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-namespace Umbraco.Cms.Core.Models.ContentEditing
+namespace Umbraco.Cms.Core.Models.ContentEditing;
+
+[DataContract(Name = "contentType", Namespace = "")]
+public class DocumentTypeDisplay : ContentTypeCompositionDisplay<PropertyTypeDisplay>
 {
-    [DataContract(Name = "contentType", Namespace = "")]
-    public class DocumentTypeDisplay : ContentTypeCompositionDisplay<PropertyTypeDisplay>
-    {
-        public DocumentTypeDisplay() =>
-            //initialize collections so at least their never null
-            AllowedTemplates = new List<EntityBasic>();
+    public DocumentTypeDisplay() =>
 
-        //name, alias, icon, thumb, desc, inherited from the content type
+        // initialize collections so at least their never null
+        AllowedTemplates = new List<EntityBasic>();
 
-        // Templates
-        [DataMember(Name = "allowedTemplates")]
-        public IEnumerable<EntityBasic> AllowedTemplates { get; set; }
+    // name, alias, icon, thumb, desc, inherited from the content type
 
-        [DataMember(Name = "defaultTemplate")]
-        public EntityBasic DefaultTemplate { get; set; }
+    // Templates
+    [DataMember(Name = "allowedTemplates")]
+    public IEnumerable<EntityBasic> AllowedTemplates { get; set; }
 
-        [DataMember(Name = "allowCultureVariant")]
-        public bool AllowCultureVariant { get; set; }
+    [DataMember(Name = "defaultTemplate")]
+    public EntityBasic? DefaultTemplate { get; set; }
 
-        [DataMember(Name = "allowSegmentVariant")]
-        public bool AllowSegmentVariant { get; set; }
+    [DataMember(Name = "allowCultureVariant")]
+    public bool AllowCultureVariant { get; set; }
 
-        [DataMember(Name = "apps")]
-        public IEnumerable<ContentApp> ContentApps { get; set; }
+    [DataMember(Name = "allowSegmentVariant")]
+    public bool AllowSegmentVariant { get; set; }
 
-        [DataMember(Name = "historyCleanup")]
-        public HistoryCleanupViewModel HistoryCleanup { get; set; }
-    }
+    [DataMember(Name = "apps")]
+    public IEnumerable<ContentApp>? ContentApps { get; set; }
+
+    [DataMember(Name = "historyCleanup")]
+    public HistoryCleanupViewModel? HistoryCleanup { get; set; }
 }

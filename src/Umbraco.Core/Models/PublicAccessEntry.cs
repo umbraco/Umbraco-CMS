@@ -1,156 +1,154 @@
-﻿using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Linq;
 using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.Models.Entities;
 
-namespace Umbraco.Cms.Core.Models
+namespace Umbraco.Cms.Core.Models;
+
+[Serializable]
+[DataContract(IsReference = true)]
+public class PublicAccessEntry : EntityBase
 {
-    [Serializable]
-    [DataContract(IsReference = true)]
-    public class PublicAccessEntry : EntityBase
+    private readonly List<Guid> _removedRules = new();
+    private readonly EventClearingObservableCollection<PublicAccessRule> _ruleCollection;
+    private int _loginNodeId;
+    private int _noAccessNodeId;
+    private int _protectedNodeId;
+
+    public PublicAccessEntry(IContent protectedNode, IContent loginNode, IContent noAccessNode, IEnumerable<PublicAccessRule> ruleCollection)
     {
-        private readonly EventClearingObservableCollection<PublicAccessRule> _ruleCollection;
-        private int _protectedNodeId;
-        private int _noAccessNodeId;
-        private int _loginNodeId;
-        private readonly List<Guid> _removedRules = new List<Guid>();
-
-        public PublicAccessEntry(IContent protectedNode, IContent loginNode, IContent noAccessNode, IEnumerable<PublicAccessRule> ruleCollection)
+        if (protectedNode == null)
         {
-            if (protectedNode == null) throw new ArgumentNullException(nameof(protectedNode));
-            if (loginNode == null) throw new ArgumentNullException(nameof(loginNode));
-            if (noAccessNode == null) throw new ArgumentNullException(nameof(noAccessNode));
-
-            LoginNodeId = loginNode.Id;
-            NoAccessNodeId = noAccessNode.Id;
-            _protectedNodeId = protectedNode.Id;
-
-            _ruleCollection = new EventClearingObservableCollection<PublicAccessRule>(ruleCollection);
-            _ruleCollection.CollectionChanged += _ruleCollection_CollectionChanged;
-
-            foreach (var rule in _ruleCollection)
-                rule.AccessEntryId = Key;
+            throw new ArgumentNullException(nameof(protectedNode));
         }
 
-        public PublicAccessEntry(Guid id, int protectedNodeId, int loginNodeId, int noAccessNodeId, IEnumerable<PublicAccessRule> ruleCollection)
+        if (loginNode == null)
         {
-            Key = id;
-            Id = Key.GetHashCode();
-
-            LoginNodeId = loginNodeId;
-            NoAccessNodeId = noAccessNodeId;
-            _protectedNodeId = protectedNodeId;
-
-            _ruleCollection = new EventClearingObservableCollection<PublicAccessRule>(ruleCollection);
-            _ruleCollection.CollectionChanged += _ruleCollection_CollectionChanged;
-
-            foreach (var rule in _ruleCollection)
-                rule.AccessEntryId = Key;
+            throw new ArgumentNullException(nameof(loginNode));
         }
 
-        void _ruleCollection_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        if (noAccessNode == null)
         {
-            OnPropertyChanged(nameof(Rules));
+            throw new ArgumentNullException(nameof(noAccessNode));
+        }
 
-            //if (e.Action == NotifyCollectionChangedAction.Add)
-            //{
-            //    var item = e.NewItems.Cast<PublicAccessRule>().First();
+        LoginNodeId = loginNode.Id;
+        NoAccessNodeId = noAccessNode.Id;
+        _protectedNodeId = protectedNode.Id;
 
-            //    if (_addedSections.Contains(item) == false)
-            //    {
-            //        _addedSections.Add(item);
-            //    }
-            //}
+        _ruleCollection = new EventClearingObservableCollection<PublicAccessRule>(ruleCollection);
+        _ruleCollection.CollectionChanged += RuleCollection_CollectionChanged;
 
-            if (e.Action == NotifyCollectionChangedAction.Remove)
+        foreach (PublicAccessRule rule in _ruleCollection)
+        {
+            rule.AccessEntryId = Key;
+        }
+    }
+
+    public PublicAccessEntry(Guid id, int protectedNodeId, int loginNodeId, int noAccessNodeId, IEnumerable<PublicAccessRule> ruleCollection)
+    {
+        Key = id;
+        Id = Key.GetHashCode();
+
+        LoginNodeId = loginNodeId;
+        NoAccessNodeId = noAccessNodeId;
+        _protectedNodeId = protectedNodeId;
+
+        _ruleCollection = new EventClearingObservableCollection<PublicAccessRule>(ruleCollection);
+        _ruleCollection.CollectionChanged += RuleCollection_CollectionChanged;
+
+        foreach (PublicAccessRule rule in _ruleCollection)
+        {
+            rule.AccessEntryId = Key;
+        }
+    }
+
+    public IEnumerable<Guid> RemovedRules => _removedRules;
+
+    public IEnumerable<PublicAccessRule> Rules => _ruleCollection;
+
+    [DataMember]
+    public int LoginNodeId
+    {
+        get => _loginNodeId;
+        set => SetPropertyValueAndDetectChanges(value, ref _loginNodeId, nameof(LoginNodeId));
+    }
+
+    [DataMember]
+    public int NoAccessNodeId
+    {
+        get => _noAccessNodeId;
+        set => SetPropertyValueAndDetectChanges(value, ref _noAccessNodeId, nameof(NoAccessNodeId));
+    }
+
+    [DataMember]
+    public int ProtectedNodeId
+    {
+        get => _protectedNodeId;
+        set => SetPropertyValueAndDetectChanges(value, ref _protectedNodeId, nameof(ProtectedNodeId));
+    }
+
+    public PublicAccessRule AddRule(string ruleValue, string ruleType)
+    {
+        var rule = new PublicAccessRule { AccessEntryId = Key, RuleValue = ruleValue, RuleType = ruleType };
+        _ruleCollection.Add(rule);
+        return rule;
+    }
+
+    private void RuleCollection_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        OnPropertyChanged(nameof(Rules));
+
+        // if (e.Action == NotifyCollectionChangedAction.Add)
+        // {
+        //    var item = e.NewItems.Cast<PublicAccessRule>().First();
+
+        // if (_addedSections.Contains(item) == false)
+        //    {
+        //        _addedSections.Add(item);
+        //    }
+        // }
+        if (e.Action == NotifyCollectionChangedAction.Remove)
+        {
+            PublicAccessRule? item = e.OldItems?.Cast<PublicAccessRule>().First();
+
+            if (item is not null)
             {
-                var item = e.OldItems.Cast<PublicAccessRule>().First();
-
                 if (_removedRules.Contains(item.Key) == false)
                 {
                     _removedRules.Add(item.Key);
                 }
-
             }
         }
+    }
 
-        public IEnumerable<Guid> RemovedRules => _removedRules;
+    public void RemoveRule(PublicAccessRule rule) => _ruleCollection.Remove(rule);
 
-        public IEnumerable<PublicAccessRule> Rules => _ruleCollection;
+    public void ClearRules() => _ruleCollection.Clear();
 
-        public PublicAccessRule AddRule(string ruleValue, string ruleType)
+    public override void ResetDirtyProperties(bool rememberDirty)
+    {
+        _removedRules.Clear();
+        base.ResetDirtyProperties(rememberDirty);
+        foreach (PublicAccessRule publicAccessRule in _ruleCollection)
         {
-            var rule = new PublicAccessRule
-            {
-                AccessEntryId = Key,
-                RuleValue = ruleValue,
-                RuleType = ruleType
-            };
-            _ruleCollection.Add(rule);
-            return rule;
+            publicAccessRule.ResetDirtyProperties(rememberDirty);
         }
+    }
 
-        public void RemoveRule(PublicAccessRule rule)
+    internal void ClearRemovedRules() => _removedRules.Clear();
+
+    protected override void PerformDeepClone(object clone)
+    {
+        base.PerformDeepClone(clone);
+
+        var cloneEntity = (PublicAccessEntry)clone;
+
+        if (cloneEntity._ruleCollection != null)
         {
-            _ruleCollection.Remove(rule);
-        }
-
-        public void ClearRules()
-        {
-            _ruleCollection.Clear();
-        }
-
-
-        internal void ClearRemovedRules()
-        {
-            _removedRules.Clear();
-        }
-
-        [DataMember]
-        public int LoginNodeId
-        {
-            get => _loginNodeId;
-            set => SetPropertyValueAndDetectChanges(value, ref _loginNodeId, nameof(LoginNodeId));
-        }
-
-        [DataMember]
-        public int NoAccessNodeId
-        {
-            get => _noAccessNodeId;
-            set => SetPropertyValueAndDetectChanges(value, ref _noAccessNodeId, nameof(NoAccessNodeId));
-        }
-
-        [DataMember]
-        public int ProtectedNodeId
-        {
-            get => _protectedNodeId;
-            set => SetPropertyValueAndDetectChanges(value, ref _protectedNodeId, nameof(ProtectedNodeId));
-        }
-
-        public override void ResetDirtyProperties(bool rememberDirty)
-        {
-            _removedRules.Clear();
-            base.ResetDirtyProperties(rememberDirty);
-            foreach (var publicAccessRule in _ruleCollection)
-            {
-                publicAccessRule.ResetDirtyProperties(rememberDirty);
-            }
-        }
-
-        protected override void PerformDeepClone(object clone)
-        {
-            base.PerformDeepClone(clone);
-
-            var cloneEntity = (PublicAccessEntry)clone;
-
-            if (cloneEntity._ruleCollection != null)
-            {
-                cloneEntity._ruleCollection.ClearCollectionChangedEvents();       //clear this event handler if any
-                cloneEntity._ruleCollection.CollectionChanged += cloneEntity._ruleCollection_CollectionChanged; //re-assign correct event handler
-            }
+            cloneEntity._ruleCollection.ClearCollectionChangedEvents(); // clear this event handler if any
+            cloneEntity._ruleCollection.CollectionChanged +=
+                cloneEntity.RuleCollection_CollectionChanged; // re-assign correct event handler
         }
     }
 }

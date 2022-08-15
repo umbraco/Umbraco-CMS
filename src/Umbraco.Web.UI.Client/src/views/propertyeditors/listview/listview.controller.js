@@ -1,4 +1,4 @@
-function listViewController($scope, $interpolate, $routeParams, $injector, $timeout, currentUserResource, notificationsService, iconHelper, editorState, localizationService, appState, $location, listViewHelper, navigationService, editorService, overlayService, languageResource, mediaHelper, eventsService) {
+function listViewController($scope, $interpolate, $routeParams, $injector, $timeout, currentUserResource, notificationsService, iconHelper, editorState, localizationService, appState, $location, contentEditingHelper, listViewHelper, navigationService, editorService, overlayService, languageResource, mediaHelper, eventsService) {
 
     //this is a quick check to see if we're in create mode, if so just exit - we cannot show children for content
     // that isn't created yet, if we continue this will use the parent id in the route params which isn't what
@@ -67,28 +67,8 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
     $scope.createAllowedButtonSingleWithBlueprints = false;
     $scope.createAllowedButtonMultiWithBlueprints = false;
 
-
     //when this is null, we don't check permissions
-    $scope.currentNodePermissions = null;
-
-    if ($scope.entityType === "content") {
-        //Just ensure we do have an editorState
-        if (editorState.current) {
-            //Fetch current node allowed actions for the current user
-            //This is the current node & not each individual child node in the list
-            var currentUserPermissions = editorState.current.allowedActions;
-
-            //Create a nicer model rather than the funky & hard to remember permissions strings
-            $scope.currentNodePermissions = {
-                "canCopy": _.contains(currentUserPermissions, 'O'), //Magic Char = O
-                "canCreate": _.contains(currentUserPermissions, 'C'), //Magic Char = C
-                "canDelete": _.contains(currentUserPermissions, 'D'), //Magic Char = D
-                "canMove": _.contains(currentUserPermissions, 'M'), //Magic Char = M
-                "canPublish": _.contains(currentUserPermissions, 'U'), //Magic Char = U
-                "canUnpublish": _.contains(currentUserPermissions, 'U') //Magic Char = Z (however UI says it can't be set, so if we can publish 'U' we can unpublish)
-            };
-        }
-    }
+    $scope.currentNodePermissions = $scope.entityType === "content" ? contentEditingHelper.getPermissionsForContent() : null;
 
     //when this is null, we don't check permissions
     $scope.buttonPermissions = null;
@@ -146,6 +126,7 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
     }
 
     var listParamsForCurrent = $routeParams.id == $routeParams.list;
+    
     $scope.options = {
         useInfiniteEditor: $scope.model.config.useInfiniteEditor === true,
         pageSize: $scope.model.config.pageSize ? $scope.model.config.pageSize : 10,
@@ -169,6 +150,7 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
         allowBulkDelete: $scope.model.config.bulkActionPermissions.allowBulkDelete,
         cultureName: $routeParams.cculture ? $routeParams.cculture : $routeParams.mculture
     };
+    
     _.each($scope.options.includeProperties, function (property) {
         property.nameExp = !!property.nameTemplate
             ? $interpolate(property.nameTemplate)
@@ -268,12 +250,13 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
 
     $scope.getContent = function (contentId) {
         $scope.reloadView($scope.contentId, true);
-    }
+    };
 
     $scope.reloadView = function (id, reloadActiveNode) {
         if (!id) {
             return;
         }
+        
         $scope.viewLoaded = false;
         $scope.folders = [];
 
@@ -327,7 +310,7 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
             $scope.options.pageNumber = 1;
             $scope.reloadView($scope.contentId);
         }
-    }
+    };
 
     $scope.onSearchStartTyping = function() {
         $scope.viewLoaded = false;
@@ -386,6 +369,7 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
             view: "views/propertyeditors/listview/overlays/delete.html",
             deletesVariants: selectionHasVariants(),
             isTrashed: $scope.isTrashed,
+            selection: $scope.selection,
             submitButtonLabelKey: "contentTypeEditor_yesDelete",
             submitButtonStyle: "danger",
             submit: function (model) {
@@ -495,8 +479,8 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
             view: "views/propertyeditors/listview/overlays/listviewunpublish.html",
             submitButtonLabelKey: "actions_unpublish",
             submitButtonStyle: "warning",
+            selection: $scope.selection,
             submit: function (model) {
-
                 // create a comma separated array of selected cultures
                 let selectedCultures = [];
                 if (model.languages && model.languages.length > 0) {
@@ -506,7 +490,6 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
                         }
                     });
                 }
-
                 performUnpublish(selectedCultures);
                 overlayService.close();
             },
@@ -708,13 +691,15 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
     }
 
     function initView() {
+        
         var id = $routeParams.id;
         if (id === undefined) {
             // no ID found in route params - don't list anything as we don't know for sure where we are
             return;
         }
-
-        $scope.contentId = id;
+        
+        // Get current id for node to load it's children
+        $scope.contentId = editorState.current ? editorState.current.id : id;
         $scope.isTrashed = editorState.current ? editorState.current.trashed : id === "-20" || id === "-21";
 
         $scope.options.allowBulkPublish = $scope.options.allowBulkPublish && !$scope.isTrashed;
