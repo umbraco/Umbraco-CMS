@@ -1,5 +1,5 @@
-import { css, CSSResultGroup, html, LitElement, PropertyValueMap } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
+import { css, CSSResultGroup, html, LitElement } from 'lit';
+import { customElement } from 'lit/decorators.js';
 
 @customElement('umb-installer-installing')
 export class UmbInstallerInstalling extends LitElement {
@@ -11,32 +11,10 @@ export class UmbInstallerInstalling extends LitElement {
 		`,
 	];
 
-	@state()
-	private _installProgress = 0;
-
-	protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
-		super.firstUpdated(_changedProperties);
-
-		this._updateProgress();
-	}
-
-	private async _updateProgress() {
-		this._installProgress = Math.min(this._installProgress + (Math.random() + 1) * 10, 100);
-		await new Promise((resolve) => setTimeout(resolve, (Math.random() + 1) * 1000));
-
-		if (this._installProgress >= 100) {
-			// Redirect to backoffice
-			history.replaceState(null, '', '/');
-			return;
-		}
-
-		this._updateProgress();
-	}
-
 	render() {
 		return html` <div class="uui-text" data-test="installer-installing">
 			<h1 class="uui-h3">Installing Umbraco</h1>
-			<uui-progress-bar progress=${this._installProgress}></uui-progress-bar>
+			<uui-loader-bar></uui-loader-bar>
 		</div>`;
 	}
 }

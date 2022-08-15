@@ -3,4 +3,5 @@ export * from './installer-database.element';
 export * from './installer-installing.element';
 export * from './installer-user.element';
 export * from './installer-layout.element';
+export * from './installer-error.element';
 export * from './installer.element';

@@ -4,7 +4,7 @@ import { customElement, property, query, state } from 'lit/decorators.js';
 import { Subscription } from 'rxjs';
 
 import { UmbContextConsumerMixin } from '../core/context';
-import { ProblemDetails, UmbracoInstallerDatabaseModel, UmbracoPerformInstallDatabaseConfiguration } from '../core/models';
+import { UmbracoInstallerDatabaseModel, UmbracoPerformInstallDatabaseConfiguration } from '../core/models';
 import { UmbInstallerContext } from './installer-context';
 
 @customElement('umb-installer-database')
@@ -69,18 +69,11 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
 				margin-left: auto;
 				min-width: 120px;
 			}
-
-			#error-message {
-				color: var(--uui-color-error, red);
-			}
 		`,
 	];
 
 	@query('#button-install')
 	private _installButton!: UUIButtonElement;
-
-	@state()
-	private _errorMessage = '';
 
 	@property({ attribute: false })
 	public databaseFormData!: UmbracoPerformInstallDatabaseConfiguration;
@@ -175,23 +168,10 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
 			this._installerStore?.appendData({ database });
 		}
 
-		this._installerStore
-			?.requestInstall()
-			.then(this._handleFulfilled.bind(this))
-			.catch(this._handleRejected.bind(this));
+		this.dispatchEvent(new CustomEvent('submit', { bubbles: true, composed: true }));
+
 		this._installButton.state = 'waiting';
 	};
-
-	private _handleFulfilled() {
-		sessionStorage.setItem('is-authenticated', 'true');
-		this.dispatchEvent(new CustomEvent('next', { bubbles: true, composed: true }));
-		this._installButton.state = undefined;
-	}
-
-	private _handleRejected(error: ProblemDetails) {
-		this._installButton.state = 'failed';
-		this._errorMessage = error.detail ?? 'Something went wrong';
-	}
 
 	private _onBack() {
 		this.dispatchEvent(new CustomEvent('previous', { bubbles: true, composed: true }));
@@ -199,7 +179,6 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
 
 	private get selectedDatabase() {
 		const id = this._installerStore?.getData().database?.id;
-		console.log('selected id', id, this._databases);
 		return this._databases.find((x) => x.id === id) ?? this._databases[0];
 	}
 
@@ -342,9 +321,6 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
 					${this._preConfiguredDatabase
 						? this._renderPreConfiguredDatabase(this._preConfiguredDatabase)
 						: this._renderDatabaseSelection()}
-
-					<!-- TODO: Apply error message to the fields that has errors -->
-					${this._errorMessage ? html` <p id="error-message">${this._errorMessage}</p>` : ''}
 
 					<div id="buttons">
 						<uui-button label="Back" @click=${this._onBack} look="secondary"></uui-button>
