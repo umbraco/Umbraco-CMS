@@ -221,12 +221,4 @@ public class DataType : TreeEntityBase, IDataType
             });
         }
     }
-
-    public IDataType DeepCloneWithResetIdentities()
-    {
-        var clone = (DataType)DeepClone();
-        clone.Key = Guid.Empty;
-        clone.ResetIdentity();
-        return clone;
-    }
 }
