@@ -107,7 +107,7 @@ export class UmbInstallerUser extends UmbContextConsumerMixin(LitElement) {
 	};
 
 	render() {
-		return html` <div id="container" class="uui-text">
+		return html` <div id="container" class="uui-text" data-test="installer-user">
 			<h1>Install Umbraco</h1>
 			<uui-form>
 				<form id="LoginForm" name="login" @submit="${this._handleSubmit}">

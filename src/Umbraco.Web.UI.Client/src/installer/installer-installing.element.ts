@@ -1,5 +1,6 @@
 import { css, CSSResultGroup, html, LitElement, PropertyValueMap } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
+
 @customElement('umb-installer-installing')
 export class UmbInstallerInstalling extends LitElement {
 	static styles: CSSResultGroup = [
@@ -33,7 +34,7 @@ export class UmbInstallerInstalling extends LitElement {
 	}
 
 	render() {
-		return html` <div class="uui-text">
+		return html` <div class="uui-text" data-test="installer-installing">
 			<h1 class="uui-h3">Installing Umbraco</h1>
 			<uui-progress-bar progress=${this._installProgress}></uui-progress-bar>
 		</div>`;

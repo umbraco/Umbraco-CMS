@@ -4,11 +4,7 @@ import { customElement, property, query, state } from 'lit/decorators.js';
 import { Subscription } from 'rxjs';
 
 import { UmbContextConsumerMixin } from '../core/context';
-import {
-	ProblemDetails,
-	UmbracoInstallerDatabaseModel,
-	UmbracoPerformInstallDatabaseConfiguration,
-} from '../core/models';
+import { ProblemDetails, UmbracoInstallerDatabaseModel, UmbracoPerformInstallDatabaseConfiguration } from '../core/models';
 import { UmbInstallerContext } from './installer-context';
 
 @customElement('umb-installer-database')
@@ -83,8 +79,8 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
 	@query('#button-install')
 	private _installButton!: UUIButtonElement;
 
-	@query('#error-message')
-	private _errorMessage!: HTMLElement;
+	@state()
+	private _errorMessage = '';
 
 	@property({ attribute: false })
 	public databaseFormData!: UmbracoPerformInstallDatabaseConfiguration;
@@ -179,16 +175,22 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
 			this._installerStore?.appendData({ database });
 		}
 
-		this._installerStore?.requestInstall().then(this._handleFulfilled.bind(this), this._handleRejected.bind(this));
+		this._installerStore
+			?.requestInstall()
+			.then(this._handleFulfilled.bind(this))
+			.catch(this._handleRejected.bind(this));
 		this._installButton.state = 'waiting';
 	};
+
 	private _handleFulfilled() {
+		sessionStorage.setItem('is-authenticated', 'true');
 		this.dispatchEvent(new CustomEvent('next', { bubbles: true, composed: true }));
 		this._installButton.state = undefined;
 	}
+
 	private _handleRejected(error: ProblemDetails) {
 		this._installButton.state = 'failed';
-		this._errorMessage.innerText = error.type;
+		this._errorMessage = error.detail ?? 'Something went wrong';
 	}
 
 	private _onBack() {
@@ -333,7 +335,7 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
 	`;
 
 	render() {
-		return html` <div id="container" class="uui-text">
+		return html` <div id="container" class="uui-text" data-test="installer-database">
 			<h1 class="uui-h3">Database Configuration</h1>
 			<uui-form>
 				<form id="database-form" name="database" @submit="${this._handleSubmit}">
@@ -342,7 +344,7 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
 						: this._renderDatabaseSelection()}
 
 					<!-- TODO: Apply error message to the fields that has errors -->
-					<p id="error-message"></p>
+					${this._errorMessage ? html` <p id="error-message">${this._errorMessage}</p>` : ''}
 
 					<div id="buttons">
 						<uui-button label="Back" @click=${this._onBack} look="secondary"></uui-button>

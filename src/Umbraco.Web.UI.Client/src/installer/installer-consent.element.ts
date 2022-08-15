@@ -125,7 +125,7 @@ export class UmbInstallerConsent extends UmbContextConsumerMixin(LitElement) {
 
 	render() {
 		return html`
-			<div id="container" class="uui-text">
+			<div id="container" class="uui-text" data-test="installer-telemetry">
 				<h1>Consent for telemetry data</h1>
 				${this._renderSlider()}
 				<div id="buttons">
