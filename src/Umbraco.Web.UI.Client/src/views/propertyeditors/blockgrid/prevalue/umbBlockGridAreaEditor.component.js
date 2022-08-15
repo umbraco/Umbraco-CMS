@@ -25,7 +25,8 @@
                 model: "=",
                 block: "<",
                 allBlockTypes: "<",
-                loadedElementTypes: "<"
+                loadedElementTypes: "<",
+                gridColumns: "<"
             },
             require: {
                 propertyForm: "^form"
@@ -42,7 +43,7 @@
 
         vm.$onInit = function() {
 
-            // TODO: watch for column span options as fallback for areaGridColumns.
+            vm.rootLayoutColumns = vm.gridColumns;
 
             assetsService.loadJs('lib/sortablejs/Sortable.min.js', $scope).then(onLoaded);
         };

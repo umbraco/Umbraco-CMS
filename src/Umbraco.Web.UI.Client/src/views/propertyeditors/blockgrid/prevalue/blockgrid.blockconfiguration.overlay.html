@@ -109,19 +109,7 @@
                                 <div class="umb-el-wrap">
                                     <label class="control-label" for="addNewColumnSpan"><localize key="blockEditor_TODO">Column span</localize></label>
                                     <div class="controls">
-                                        <input 
-                                            ng-repeat="columnSpanOption in vm.block.columnSpanOptions"
-                                            ng-model="columnSpanOption.columnSpan"
-                                            type="text"
-                                            name="label"
-                                            style="width:48px"/>
-                                        <umb-button
-                                            id="addNewColumnSpan"
-                                            size="xs"
-                                            button-style="action"
-                                            type="button"
-                                            action="vm.block.columnSpanOptions.push({columnSpan: 12})" 
-                                            label="Add option">
+                                        <umb-block-grid-column-editor model="vm.block.columnSpanOptions" block="vm.block" grid-columns="model.gridColumns"></umb-block-grid-column-editor>
                                     </div>
                                 </div>
                             </div>
@@ -303,7 +291,7 @@
                                         <localize key="blockEditor_TODO">Enable nesting Blocks inside this Block Type. Define one or more Areas for Blocks to be appended within.</localize>
                                     </umb-property-info-button>
                                     <div class="controls">
-                                        <umb-block-grid-area-editor model="vm.block.areas" block="vm.block" all-block-types="model.allBlockTypes" loaded-element-types="model.loadedElementTypes"></umb-block-grid-area-editor>
+                                        <umb-block-grid-area-editor model="vm.block.areas" block="vm.block" grid-columns="model.gridColumns" all-block-types="model.allBlockTypes" loaded-element-types="model.loadedElementTypes"></umb-block-grid-area-editor>
                                     </div>
                                 </div>
                             </div>

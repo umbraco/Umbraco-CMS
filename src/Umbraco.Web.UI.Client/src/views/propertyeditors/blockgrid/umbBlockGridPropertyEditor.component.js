@@ -41,6 +41,8 @@
         var inlineEditing = false;
         var liveEditing = true;
 
+        var shadowRoot;
+
         var vm = this;
 
         vm.layoutStylesheet = "assets/css/blockgridlayout.css";
@@ -268,6 +270,10 @@
 
             vm.loading = false;
 
+            window.requestAnimationFrame(() => {
+                shadowRoot = $element[0].querySelector('umb-block-grid-root').shadowRoot;
+            })
+
         }
         function updateAllBlockObjects() {
             // Update the blockObjects in our layout.
@@ -336,6 +342,7 @@
             block.blockUiVisibility = false;
             block.showBlockUI = function () {
                 delete block.__timeout;
+                shadowRoot.querySelector('*[data-element-udi="'+block.layout.contentUdi+'"] .umb-block-grid__block > .umb-block-grid__block--actions').scrollIntoView({block: "nearest", inline: "nearest", behavior: "smooth"});
                 block.blockUiVisibility = true;
             };
             block.onMouseLeave = function () {

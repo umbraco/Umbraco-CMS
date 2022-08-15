@@ -16,6 +16,8 @@
         }
     }
 
+    const DEFAULT_GRID_COLUMNS = 12;
+
     function BlockConfigurationController($scope, elementTypeResource, overlayService, localizationService, editorService, eventsService, udiService) {
 
         var unsubscribe = [];
@@ -25,6 +27,9 @@
 
         function onInit() {
 
+            // TODO: Can and should we do this smarter? parent parent is very dirty.
+            vm.gridColumnsPrevalue = $scope.$parent.$parent.$parent.$parent.$parent.model.preValues.find(x => x.alias === "gridColumns");
+
             if (!$scope.model.value) {
                 $scope.model.value = [];
             }
@@ -32,7 +37,7 @@
             // Ensure good values:
             $scope.model.value.forEach(block => {
                 block.columnSpanOptions = block.columnSpanOptions || [{
-                    "columnSpan": 12
+                    "columnSpan": vm.gridColumnsPrevalue.value || DEFAULT_GRID_COLUMNS
                 }];
             })
             $scope.model.value.forEach(block => {
@@ -177,7 +182,7 @@
 
             var blockType = {
                 "columnSpanOptions": [{
-                    "columnSpan": 12
+                    "columnSpan": vm.gridColumnsPrevalue.value || DEFAULT_GRID_COLUMNS
                 }],
                 "allowAtRoot": true,
                 "contentElementTypeKey": key,
@@ -217,6 +222,7 @@
                         block: clonedBlockData,
                         allBlockTypes: $scope.model.value,
                         loadedElementTypes: vm.elementTypes,
+                        gridColumns: vm.gridColumnsPrevalue.value || DEFAULT_GRID_COLUMNS,
                         title: data,
                         view: "views/propertyeditors/blockgrid/prevalue/blockgrid.blockconfiguration.overlay.html",
                         size: "large",
