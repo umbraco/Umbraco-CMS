@@ -588,6 +588,7 @@
     <key alias="parentDoesNotExists">Parent item does not exist.</key>
     <key alias="noItems">There are no dictionary items.</key>
     <key alias="noItemsInFile">There are no dictionary items in this file.</key>
+    <key alias="noItemsFound">There were no dictionary items found.</key>
     <key alias="createNew">Create dictionary item</key>
   </area>
   <area alias="dictionaryItem">
