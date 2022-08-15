@@ -76,8 +76,17 @@ test.describe('installer tests', () => {
 			);
 
 			await page.click('[aria-label="Install"]');
-			const errorTxt = page.locator('#error-message');
-			await expect(errorTxt).toHaveText('Something went wrong', { useInnerText: true });
+
+			await page.waitForSelector('[data-test="installer-error"]');
+
+			await expect(page.locator('[data-test="error-message"]')).toHaveText('Something went wrong', {
+				useInnerText: true,
+			});
+
+			// Click reset button
+			await page.click('#button-reset');
+
+			await expect(page.locator('[data-test="installer-user"]')).toBeVisible();
 		});
 	});
 });
