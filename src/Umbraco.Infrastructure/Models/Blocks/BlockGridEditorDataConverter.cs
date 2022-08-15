@@ -18,8 +18,8 @@ public class BlockGridEditorDataConverter : BlockEditorDataConverter
 
     protected override IEnumerable<ContentAndSettingsReference>? GetBlockReferences(JToken jsonLayout)
     {
-        IEnumerable<BlockGridLayoutItem>? blockListLayouts = jsonLayout.ToObject<IEnumerable<BlockGridLayoutItem>>();
-        if (blockListLayouts == null)
+        IEnumerable<BlockGridLayoutItem>? layouts = jsonLayout.ToObject<IEnumerable<BlockGridLayoutItem>>();
+        if (layouts == null)
         {
             return null;
         }
@@ -31,7 +31,7 @@ public class BlockGridEditorDataConverter : BlockEditorDataConverter
             return references;
         }
 
-        ContentAndSettingsReference[] result = blockListLayouts.SelectMany(ExtractContentAndSettingsReferences).ToArray();
+        ContentAndSettingsReference[] result = layouts.SelectMany(ExtractContentAndSettingsReferences).ToArray();
         return result;
     }
 }

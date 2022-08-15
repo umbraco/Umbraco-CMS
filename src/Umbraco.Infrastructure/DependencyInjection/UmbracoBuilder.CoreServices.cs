@@ -345,6 +345,8 @@ public static partial class UmbracoBuilderExtensions
         builder
             .AddNotificationHandler<ContentSavingNotification, BlockListPropertyNotificationHandler>()
             .AddNotificationHandler<ContentCopyingNotification, BlockListPropertyNotificationHandler>()
+            .AddNotificationHandler<ContentSavingNotification, BlockGridPropertyNotificationHandler>()
+            .AddNotificationHandler<ContentCopyingNotification, BlockGridPropertyNotificationHandler>()
             .AddNotificationHandler<ContentSavingNotification, NestedContentPropertyHandler>()
             .AddNotificationHandler<ContentCopyingNotification, NestedContentPropertyHandler>()
             .AddNotificationHandler<ContentCopiedNotification, FileUploadPropertyEditor>()

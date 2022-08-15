@@ -1,5 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
+﻿using System.Text.RegularExpressions;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Extensions;
@@ -9,41 +9,10 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 public abstract class BlockEditorPropertyNotificationHandlerBase<TBlockLayoutItem> : ComplexPropertyEditorContentNotificationHandler
     where TBlockLayoutItem : IBlockLayoutItem, new()
 {
-    protected BlockEditorDataConverter Converter { get; }
+    private readonly ILogger<BlockEditorPropertyNotificationHandlerBase<TBlockLayoutItem>> _logger;
+    private readonly List<string> _udisToReplace = new List<string>();
 
-    protected ILogger<BlockEditorPropertyNotificationHandlerBase<TBlockLayoutItem>> Logger { get; }
-
-    protected BlockEditorPropertyNotificationHandlerBase(
-        BlockEditorDataConverter converter,
-        ILogger<BlockEditorPropertyNotificationHandlerBase<TBlockLayoutItem>> logger)
-    {
-        Converter = converter;
-        Logger = logger;
-    }
-
-
-    // internal for tests
-    internal string ReplaceBlockEditorUdis(string rawJson, Func<Guid>? createGuid = null)
-    {
-        // used so we can test nicely
-        if (createGuid == null)
-        {
-            createGuid = () => Guid.NewGuid();
-        }
-
-        if (string.IsNullOrWhiteSpace(rawJson) || !rawJson.DetectIsJson())
-        {
-            return rawJson;
-        }
-
-        // Parse JSON
-        // This will throw a FormatException if there are null UDIs (expected)
-        BlockEditorData blockEditorData = Converter.Deserialize(rawJson);
-
-        UpdateBlocksRecursively(blockEditorData, createGuid);
-
-        return JsonConvert.SerializeObject(blockEditorData.BlockValue, Formatting.None);
-    }
+    protected BlockEditorPropertyNotificationHandlerBase(ILogger<BlockEditorPropertyNotificationHandlerBase<TBlockLayoutItem>> logger) => _logger = logger;
 
     protected override string FormatPropertyValue(string rawJson, bool onlyMissingKeys)
     {
@@ -56,167 +25,148 @@ public abstract class BlockEditorPropertyNotificationHandlerBase<TBlockLayoutIte
         return ReplaceBlockEditorUdis(rawJson);
     }
 
-    protected virtual void UpdateBlocksRecursively(BlockEditorData blockEditorData, Func<Guid> createGuid)
+    // internal for tests
+    // the purpose of this method is to replace the content and settings UDIs throughout the JSON structure of a block editor value.
+    // the challenge is nested block editor values, which must also have their UDIs replaced. this becomes particularly tricky because
+    // other nested property values could also contain UDIs, which should *not* be replaced (i.e. a content picker value).
+    internal string ReplaceBlockEditorUdis(string rawJson, Func<Guid, Guid>? createGuid = null)
     {
-        var oldToNew = new Dictionary<Udi, Udi>();
-        MapOldToNewUdis(oldToNew, blockEditorData.BlockValue.ContentData, createGuid);
-        MapOldToNewUdis(oldToNew, blockEditorData.BlockValue.SettingsData, createGuid);
+        // used so we can test nicely
+        createGuid ??= _ => Guid.NewGuid();
 
-        for (var i = 0; i < blockEditorData.References.Count; i++)
+        if (string.IsNullOrWhiteSpace(rawJson))
         {
-            ContentAndSettingsReference reference = blockEditorData.References[i];
-            var hasContentMap = oldToNew.TryGetValue(reference.ContentUdi, out Udi? contentMap);
-            Udi? settingsMap = null;
-            var hasSettingsMap = reference.SettingsUdi is not null && oldToNew.TryGetValue(reference.SettingsUdi, out settingsMap);
-
-            if (hasContentMap)
-            {
-                // replace the reference
-                blockEditorData.References.RemoveAt(i);
-                blockEditorData.References.Insert(i, new ContentAndSettingsReference(contentMap!, hasSettingsMap ? settingsMap : null));
-            }
+            return rawJson;
         }
 
-        // build the layout with the new UDIs
-        var layout = (JArray?)blockEditorData.Layout;
-        layout?.Clear();
-        foreach (ContentAndSettingsReference reference in blockEditorData.References)
+        JObject? jObject = ParseObject(rawJson);
+        if (jObject == null)
         {
-            layout?.Add(JObject.FromObject(new TBlockLayoutItem
-            {
-                ContentUdi = reference.ContentUdi,
-                SettingsUdi = reference.SettingsUdi,
-            }));
+            return rawJson;
         }
 
-        RecursePropertyValues(blockEditorData.BlockValue.ContentData, createGuid);
-        RecursePropertyValues(blockEditorData.BlockValue.SettingsData, createGuid);
+        TraverseObject(jObject);
+
+        var oldToNewKeys = new Dictionary<Guid, Guid>();
+
+        rawJson = Regex.Replace(
+            rawJson,
+            @"(umb:\/\/\w*\/)(\w*)",
+            match =>
+            {
+                if (_udisToReplace.Contains(match.Value) == false)
+                {
+                    return match.Value;
+                }
+
+                var oldKey = Guid.Parse(match.Groups[2].Value);
+                if (oldToNewKeys.ContainsKey(oldKey) == false)
+                {
+                    oldToNewKeys[oldKey] = createGuid(oldKey);
+                }
+
+                return $"{match.Groups[1]}{oldToNewKeys[oldKey].ToString("N")}";
+            });
+
+        return rawJson;
     }
 
-    private void RecursePropertyValues(IEnumerable<BlockItemData> blockData, Func<Guid> createGuid)
+    private void TraverseProperty(JProperty property)
     {
-        foreach (BlockItemData data in blockData)
+        if (property.Value is JArray jArray)
         {
-            // check if we need to recurse (make a copy of the dictionary since it will be modified)
-            foreach (KeyValuePair<string, object?> propertyAliasToBlockItemData in new Dictionary<string, object?>(data.RawPropertyValues))
+            foreach (JToken token in jArray)
             {
-                if (propertyAliasToBlockItemData.Value is JToken jtoken)
-                {
-                    if (ProcessJToken(jtoken, createGuid, out JToken result))
-                    {
-                        // need to re-save this back to the RawPropertyValues
-                        data.RawPropertyValues[propertyAliasToBlockItemData.Key] = result;
-                    }
-                }
-                else
-                {
-                    var asString = propertyAliasToBlockItemData.Value?.ToString();
-
-                    if (asString != null && asString.DetectIsJson())
-                    {
-                        // this gets a little ugly because there could be some other complex editor that contains another block editor
-                        // and since we would have no idea how to parse that, all we can do is try JSON Path to find another block editor
-                        // of our type
-                        JToken? json = null;
-                        try
-                        {
-                            json = JToken.Parse(asString);
-                        }
-                        catch (Exception)
-                        {
-                            // See issue https://github.com/umbraco/Umbraco-CMS/issues/10879
-                            // We are detecting JSON data by seeing if a string is surrounded by [] or {}
-                            // If people enter text like [PLACEHOLDER] JToken  parsing fails, it's safe to ignore though
-                            // Logging this just in case in the future we find values that are not safe to ignore
-                            Logger.LogWarning(
-                                "The property {PropertyAlias} on content type {ContentTypeKey} has a value of: {BlockItemValue} - this was recognized as JSON but could not be parsed",
-                                data.Key,
-                                propertyAliasToBlockItemData.Key,
-                                asString);
-                        }
-
-                        if (json != null && ProcessJToken(json, createGuid, out JToken result))
-                        {
-                            // need to re-save this back to the RawPropertyValues
-                            data.RawPropertyValues[propertyAliasToBlockItemData.Key] = result;
-                        }
-                    }
-                }
+                TraverseToken(token);
             }
+        }
+        else
+        {
+            TraverseToken(property.Value);
         }
     }
 
-    private bool ProcessJToken(JToken json, Func<Guid> createGuid, out JToken result)
+    private void TraverseToken(JToken token)
     {
-        var updated = false;
-        result = json;
-
-        // select all tokens (flatten)
-        var allProperties = json.SelectTokens("$..*").Select(x => x.Parent as JProperty).WhereNotNull().ToList();
-        foreach (JProperty prop in allProperties)
+        var obj = token as JObject;
+        if (obj == null && token is JValue { Value: string str })
         {
-            if (prop.Name == EditorAlias)
+            obj = ParseObject(str);
+        }
+
+        if (obj == null)
+        {
+            return;
+        }
+
+        TraverseObject(obj);
+    }
+
+    private void TraverseObject(JObject obj)
+    {
+        var contentData = obj.SelectToken("$.contentData") as JArray;
+        var settingsData = obj.SelectToken("$.settingsData") as JArray;
+
+        // we'll assume that the object is a data representation of a block based editor if it contains "contentData" and "settingsData".
+        if (contentData != null && settingsData != null)
+        {
+            ParseUdis(contentData, settingsData);
+            return;
+        }
+
+        foreach (JProperty property in obj.Properties())
+        {
+            TraverseProperty(property);
+        }
+    }
+
+    private void ParseUdis(JArray contentData, JArray settingsData)
+    {
+        // grab all UDIs from the objects of contentData and settingsData
+        var udis = contentData.Select(c => c.SelectToken("$.udi"))
+            .Union(settingsData.Select(s => s.SelectToken("$.udi")))
+            .Select(udiToken => udiToken?.Value<string>()?.NullOrWhiteSpaceAsNull())
+            .ToArray();
+
+        // the following is solely for avoiding functionality wise breakage. we should consider removing it eventually, but for the time being it's harmless.
+        foreach (var udiToReplace in udis)
+        {
+            if (UdiParser.TryParse(udiToReplace ?? string.Empty, out Udi? udi) == false || udi is not GuidUdi)
             {
-                // get it's parent 'layout' and it's parent's container
-                if (prop.Parent?.Parent is JProperty layout && layout.Parent is JObject layoutJson)
-                {
-                    // recurse
-                    BlockEditorData blockEditorData = Converter.ConvertFrom(layoutJson);
-                    UpdateBlocksRecursively(blockEditorData, createGuid);
-
-                    // set new value
-                    if (layoutJson.Parent != null)
-                    {
-                        // we can replace the object
-                        layoutJson.Replace(JObject.FromObject(blockEditorData.BlockValue));
-                        updated = true;
-                    }
-                    else
-                    {
-                        // if there is no parent it means that this json property was the root, in which case we just return
-                        result = JObject.FromObject(blockEditorData.BlockValue);
-                        return true;
-                    }
-                }
-            }
-            else if (prop.Name != "layout" && prop.Name != "contentData" && prop.Name != "settingsData" && prop.Name != "contentTypeKey")
-            {
-                // this is an arbitrary property that could contain a nested complex editor
-                var propVal = prop.Value.ToString();
-
-                // check if this might contain a nested Block Editor
-                if (!propVal.IsNullOrWhiteSpace() && propVal.DetectIsJson() && propVal.InvariantContains(EditorAlias))
-                {
-                    if (Converter.TryDeserialize(propVal, out BlockEditorData? nestedBlockData))
-                    {
-                        // recurse
-                        UpdateBlocksRecursively(nestedBlockData, createGuid);
-
-                        // set the value to the updated one
-                        prop.Value = JObject.FromObject(nestedBlockData.BlockValue);
-                        updated = true;
-                    }
-                }
+                throw new FormatException($"Could not parse a valid {nameof(GuidUdi)} from the string: \"{udiToReplace}\"");
             }
         }
 
-        return updated;
+        _udisToReplace.AddRange(udis.WhereNotNull());
+
+        foreach (JObject item in contentData.Union(settingsData).OfType<JObject>())
+        {
+            foreach (JProperty property in item.Properties().Where(p => p.Name != "contentTypeKey" && p.Name != "udi"))
+            {
+                TraverseProperty(property);
+            }
+        }
     }
 
-    private void MapOldToNewUdis(Dictionary<Udi, Udi> oldToNew, IEnumerable<BlockItemData> blockData, Func<Guid> createGuid)
+    private JObject? ParseObject(string json)
     {
-        foreach (BlockItemData data in blockData)
+        if (json.DetectIsJson() == false)
         {
-            // This should never happen since a FormatException will be thrown if one is empty but we'll keep this here
-            if (data.Udi is null)
-            {
-                throw new InvalidOperationException("Block data cannot contain a null UDI");
-            }
+            return null;
+        }
 
-            // replace the UDIs
-            var newUdi = Udi.Create(Constants.UdiEntityType.Element, createGuid());
-            oldToNew[data.Udi] = newUdi;
-            data.Udi = newUdi;
+        try
+        {
+            return JObject.Parse(json);
+        }
+        catch (Exception)
+        {
+            // See issue https://github.com/umbraco/Umbraco-CMS/issues/10879
+            // We are detecting JSON data by seeing if a string is surrounded by [] or {}
+            // If people enter text like [PLACEHOLDER] JToken  parsing fails, it's safe to ignore though
+            // Logging this just in case in the future we find values that are not safe to ignore
+            _logger.LogWarning("The following value was recognized as JSON but could not be parsed: {Json}", json);
+            return null;
         }
     }
 }

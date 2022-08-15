@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 public class BlockListPropertyNotificationHandler : BlockEditorPropertyNotificationHandlerBase<BlockListLayoutItem>
 {
     public BlockListPropertyNotificationHandler(ILogger<BlockListPropertyNotificationHandler> logger)
-        : base(new BlockListEditorDataConverter(), logger)
+        : base(logger)
     {
     }
 
