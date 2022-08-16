@@ -18,7 +18,8 @@
             bindings: {
                 columnSpanOption: "<",
                 column: "<",
-                onClickAdd: "&"
+                onClickAdd: "&",
+                onClickRemove: "&"
             }
         });
 

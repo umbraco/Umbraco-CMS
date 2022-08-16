@@ -1,6 +1,28 @@
-<div ng-if="vm.columnSpanOption">
-    {{vm.columnSpanOption.columnSpan}}
-</div>
-<div ng-if="!vm.columnSpanOption">
-    <button type="button" ng-click="vm.onClickAdd()">Add</button>
+<div class="__column" ng-class="{'--active': vm.columnSpanOption}">
+    <div ng-if="vm.columnSpanOption">
+
+        <span>
+            {{vm.columnSpanOption.columnSpan}}
+        </span>
+        <div class="__border"></div>
+        <button type="button" class="btn-reset" ng-click="vm.onClickRemove()">
+            <umb-icon icon="icon-remove" class="icon"></umb-icon>
+            <span class="sr-only">
+                <localize key="general_remove">Remove</localize>
+            </span>
+        </button>
+    </div>
+    <div ng-if="!vm.columnSpanOption">
+        <span>
+            {{vm.column}}
+        </span>
+        <div class="__border"></div>
+        <button type="button" class="btn-reset" ng-click="vm.onClickAdd()">
+            <umb-icon icon="icon-add" class="icon"></umb-icon>
+            <span class="sr-only">
+                <localize key="TODO spell out the action">Add</localize>
+                {{vm.columnSpanOption.columnSpan}}
+            </span>
+        </button>
+    </div>
 </div>

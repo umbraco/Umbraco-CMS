@@ -15,7 +15,7 @@
             <umb-editor-container>
                 <div class="form-vertical umb-block-grid-block-configuration-layout">
 
-                    <div class="umb-group-panel">
+                    <div class="umb-group-panel umb-block-grid-block-configuration__umb-group-panel">
 
                         <div class="umb-group-panel__header">
                             <localize key="blockEditor_headlineEditorAppearance">Editor appearance</localize>
@@ -96,7 +96,7 @@
 
                     </div>
 
-                    <div class="umb-group-panel">
+                    <div class="umb-group-panel umb-block-grid-block-configuration__umb-group-panel">
 
                         <div class="umb-group-panel__header">
                             <localize key="blockEditor_TODO">Layout options</localize>
@@ -107,7 +107,10 @@
                             <!-- Column span options -->
                             <div class="control-group umb-control-group -no-border">
                                 <div class="umb-el-wrap">
-                                    <label class="control-label" for="addNewColumnSpan"><localize key="blockEditor_TODO">Column span</localize></label>
+                                    <label class="control-label" for="addNewColumnSpan"><localize key="blockEditor_TODO">Width options</localize></label>
+                                    <umb-property-info-button button-title-key="blockEditor_TODO">
+                                        <localize key="blockEditor_TODO">Specify the available widths of this block.</localize>
+                                    </umb-property-info-button>
                                     <div class="controls">
                                         <umb-block-grid-column-editor model="vm.block.columnSpanOptions" block="vm.block" grid-columns="model.gridColumns"></umb-block-grid-column-editor>
                                     </div>
@@ -117,7 +120,10 @@
                             <!-- min/max Row span options -->
                             <div class="control-group umb-control-group -no-border">
                                 <div class="umb-el-wrap">
-                                    <label class="control-label" for="label"><localize key="blockEditor_TODO">Row span</localize></label>
+                                    <label class="control-label" for="label"><localize key="blockEditor_TODO">Row span range</localize></label>
+                                    <umb-property-info-button button-title-key="blockEditor_TODO">
+                                        <localize key="blockEditor_TODO">Specify the amount of rows this block can span across.</localize>
+                                    </umb-property-info-button>
                                     <div class="controls">
                                         <umb-property-editor name="rowMinMaxModel" model="vm.rowMinMaxModel" is-pre-value="true"></umb-property-editor>
                                     </div>
@@ -128,6 +134,9 @@
                             <div class="control-group umb-control-group -no-border">
                                 <div class="umb-el-wrap">
                                     <label class="control-label" for="allowAtRoot"><localize key="blockEditor_TODO">Allow in root</localize></label>
+                                    <umb-property-info-button button-title-key="blockEditor_TODO">
+                                        <localize key="blockEditor_TODO">Make this Block available in the root of the layout. If disabled it will only be available at specified locations.</localize>
+                                    </umb-property-info-button>
                                     <div class="controls">
                                         <umb-toggle
                                             input-id="allowAtRoot"
@@ -143,7 +152,7 @@
 
 
 
-                    <div class="umb-group-panel">
+                    <div class="umb-group-panel umb-block-grid-block-configuration__umb-group-panel">
 
                         <div class="umb-group-panel__header">
                             <localize key="blockEditor_headlineCatalogueAppearance">Catalogue appearance</localize>
@@ -208,7 +217,7 @@
 
 
 
-                    <div class="umb-group-panel">
+                    <div class="umb-group-panel umb-block-grid-block-configuration__umb-group-panel">
 
                         <div class="umb-group-panel__header">
                             <localize key="blockEditor_headlineDataModels">Data Models</localize>
@@ -299,7 +308,7 @@
                     
                     </div>
 
-                    <div class="umb-group-panel">
+                    <div class="umb-group-panel umb-block-grid-block-configuration__umb-group-panel">
 
                         <div class="umb-group-panel__header">
                             <localize key="blockEditor_headlineAdvanced">Advanced</localize>

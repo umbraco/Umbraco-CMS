@@ -37,15 +37,18 @@
 
             vm.block.columnSpanOptions = vm.block.columnSpanOptions.filter(
                 (value, index, self) => {
-                    return value.columnSpan <= vm.gridColumns;
-                    //TODO: Ensure that columnSpans are unique.
+                    return value.columnSpan <= vm.gridColumns &&
+                        self.findIndex(v => v.columnSpan === value.columnSpan) === index;
                 }
             );
         };
 
         vm.addSpanOption = function(colN) {
-            console.log("addSpanOption", colN);
             vm.block.columnSpanOptions.push({'columnSpan': colN});
+            setDirty();
+        }
+        vm.removeSpanOption = function(colN) {
+            vm.block.columnSpanOptions = vm.block.columnSpanOptions.filter(value => value.columnSpan !== colN);
             setDirty();
         }
 
