@@ -130,14 +130,18 @@ umb-block-card {
         right: 0;
         opacity: 0;
         transition: opacity 120ms;
+        margin-right: 10px;
+
         .__action {
-            display: inline-block;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
             border-radius: 50%;
             width: 28px;
             height: 28px;
-            margin-right: 10px;
             background-color: white;
             color:@ui-action-type;
+
             &:hover {
                 color: @ui-action-type-hover;
             }
