@@ -97,7 +97,7 @@ ng-form.ng-invalid-val-server-match-content > .umb-block-grid__block:not(.--acti
         position: absolute;
         pointer-events: none;
         inset: 0;
-        border: var(--umb-block-grid--block-ui-display, 1px solid);
+        border: var(--umb-block-grid--block-ui-display, 3px solid);
         border-radius: 3px;
         border-color: transparent;
         
@@ -149,6 +149,9 @@ ng-form.ng-invalid-val-server-match-content > .umb-block-grid__block:not(.--acti
     &.--has-content-in-areas.--block-ui-visible {
         .umb-block-grid__block-area-container {
             --umb-block-grid--block-ui-display: none;
+            .umb-block-grid__block {
+                pointer-events: none;
+            }
         }
     }
     
@@ -245,6 +248,7 @@ ng-form.ng-invalid-val-server-match-settings > .umb-block-grid__block > .umb-blo
     flex-direction: column;
     opacity: 1;
     align-items: end;
+    z-index:2;
     
 
     .__parent-context, .__local-context {
