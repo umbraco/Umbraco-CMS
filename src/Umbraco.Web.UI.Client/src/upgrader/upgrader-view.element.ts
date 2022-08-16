@@ -55,6 +55,7 @@ export class UmbUpgraderView extends LitElement {
 						? html`
 								<p>
 									<uui-button
+										data-test="view-report-button"
 										look="secondary"
 										href="${this.settings.reportUrl}"
 										target="_blank"
@@ -69,6 +70,7 @@ export class UmbUpgraderView extends LitElement {
 				<form id="authorizeUpgradeForm" @submit=${this._handleSubmit}>
 					<p>
 						<uui-button
+							data-test="continue-button"
 							id="authorizeUpgrade"
 							type="submit"
 							look="primary"
@@ -84,7 +86,9 @@ export class UmbUpgraderView extends LitElement {
 	}
 
 	private _renderError() {
-		return html` ${this.errorMessage ? html`<p class="error">${this.errorMessage}</p>` : ''} `;
+		return html`
+			${this.errorMessage ? html`<p class="error" data-test="error-message">${this.errorMessage}</p>` : ''}
+		`;
 	}
 
 	render() {
