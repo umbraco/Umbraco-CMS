@@ -38,7 +38,7 @@
             <p class="help-inline" ng-message="pickerError"><localize key="validation_invalidDate">Invalid date</localize></p>
         </div>
 
-        <p xng-if="model.config.offsetTime === '1' && serverTimeNeedsOffsetting && model.value" class="muted">
+        <p ng-if="model.config.offsetTime === '1' && serverTimeNeedsOffsetting && model.value" class="muted">
             <small><localize key="content_scheduledPublishServerTime">This translates to the following time on the server:</localize> {{serverTime}}</small><br />
             <small><localize key="content_scheduledPublishDocumentation">What does this mean?</localize></small>
         </p>
