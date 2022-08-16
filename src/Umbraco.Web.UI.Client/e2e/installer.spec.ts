@@ -30,25 +30,24 @@ test.describe('installer tests', () => {
 
 	test.describe('test success and failure', () => {
 		test.beforeEach(async ({ page }) => {
-			// User form
-			await expect(page.locator('[data-test="installer-user"]')).toBeVisible();
-			await page.type('input[name="name"]', 'Test');
-			await page.type('input[name="email"]', 'test@umbraco');
-			await page.type('input[name="password"]', 'test123456');
+			await page.waitForSelector('[data-test="installer-user"]');
+			await page.fill('[aria-label="name"]', 'Test');
+			await page.fill('[aria-label="email"]', 'test@umbraco');
+			await page.fill('[aria-label="password"]', 'test123456');
 			await page.click('[name="subscribeToNewsletter"]');
 
 			// Go to the next step
 			await page.click('[aria-label="Next"]');
 
 			// Set telemetry
-			await expect(page.locator('[data-test="installer-telemetry"]')).toBeVisible();
-			expect(page.locator('[name="telemetryLevel"]')).toHaveAttribute('value', '2');
+			await page.waitForSelector('[data-test="installer-telemetry"]');
+			await page.waitForSelector('uui-slider[name="telemetryLevel"]');
 
 			// Click [aria-label="Next"]
 			await page.click('[aria-label="Next"]');
 
 			// Database form
-			await expect(page.locator('[data-test="installer-database"]')).toBeVisible();
+			await page.waitForSelector('[data-test="installer-database"]');
 		});
 
 		test('installer completes successfully', async ({ page }) => {
@@ -86,7 +85,7 @@ test.describe('installer tests', () => {
 			// Click reset button
 			await page.click('#button-reset');
 
-			await expect(page.locator('[data-test="installer-user"]')).toBeVisible();
+			await page.waitForSelector('[data-test="installer-user"]');
 		});
 	});
 });
