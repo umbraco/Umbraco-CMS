@@ -151,7 +151,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             var keepOnlyKeys = new Dictionary<string, string[]>
             {
                 {"umbracoUrls", new[] {"authenticationApiBaseUrl", "serverVarsJs", "externalLoginsUrl", "currentUserApiBaseUrl", "previewHubUrl", "iconApiBaseUrl"}},
-                {"umbracoSettings", new[] {"allowPasswordReset", "imageFileTypes", "maxFileSize", "loginBackgroundImage", "loginLogoImage", "canSendRequiredEmail", "usernameIsEmail", "minimumPasswordLength", "minimumPasswordNonAlphaNum", "hideBackofficeLogo", "disableDeleteWhenReferenced", "disableUnpublishWhenReferenced"}},
+                {"umbracoSettings", new[] {"allowPasswordReset", "imageFileTypes", "loginBackgroundImage", "loginLogoImage", "canSendRequiredEmail", "usernameIsEmail", "hideBackofficeLogo", "disableDeleteWhenReferenced", "disableUnpublishWhenReferenced"}},
                 {"application", new[] {"applicationPath", "cacheBuster"}},
                 {"isDebuggingEnabled", new string[] { }},
                 {"features", new [] {"disabledFeatures"}}
