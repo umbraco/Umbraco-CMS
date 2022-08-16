@@ -44,8 +44,8 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
             return selected.id;
         };
         createEditUrlCallback = function (item) {
-            return "/" + $scope.entityType + "/" + $scope.entityType + "/edit/" + item.id 
-                + "?list=" + $routeParams.id + "&page=" + $scope.options.pageNumber + "&filter=" + $scope.options.filter 
+            return "/" + $scope.entityType + "/" + $scope.entityType + "/edit/" + item.id
+                + "?list=" + $routeParams.id + "&page=" + $scope.options.pageNumber + "&filter=" + $scope.options.filter
                 + "&orderBy=" + $scope.options.orderBy + "&orderDirection=" + $scope.options.orderDirection;
         };
     }
@@ -126,7 +126,7 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
     }
 
     var listParamsForCurrent = $routeParams.id == $routeParams.list;
-    
+
     $scope.options = {
         useInfiniteEditor: $scope.model.config.useInfiniteEditor === true,
         pageSize: $scope.model.config.pageSize ? $scope.model.config.pageSize : 10,
@@ -152,7 +152,7 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
         cultureName: $routeParams.cculture ? $routeParams.cculture : $routeParams.mculture,
         readonly: $scope.readonly
     };
-    
+
     _.each($scope.options.includeProperties, function (property) {
         property.nameExp = !!property.nameTemplate
             ? $interpolate(property.nameTemplate)
@@ -258,7 +258,7 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
         if (!id) {
             return;
         }
-        
+
         $scope.viewLoaded = false;
         $scope.folders = [];
 
@@ -292,7 +292,7 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
                 //reload!
                 $scope.reloadView(id, reloadActiveNode);
             }
-            // in the media section, the list view items are by default also shown in the tree, so we need 
+            // in the media section, the list view items are by default also shown in the tree, so we need
             // to refresh the current tree node when changing the folder contents (adding and removing)
             else if (reloadActiveNode && section === "media") {
                 var activeNode = appState.getTreeState("selectedNode");
@@ -304,6 +304,14 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
                     navigationService.reloadSection(section);
                 }
             }
+        }, function(error){
+          // if someone attempts to add mix listviews across sections (i.e. use a members list view on content types),
+          // a not-supported exception will be most likely be thrown, at least for the default list views - lets be
+          // helpful and show a meaningful error message directly in content/content type UI
+          if(error.data.ExceptionType && error.data.ExceptionType.indexOf("System.NotSupportedException") > -1) {
+            $scope.viewLoadedError = error.errorMsg + ": " + error.data.ExceptionMessage;
+          }
+          $scope.viewLoaded = true;
         });
     };
 
@@ -444,7 +452,7 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
             }
         };
 
-        // if any of the selected nodes has variants we want to 
+        // if any of the selected nodes has variants we want to
         // show a dialog where the languages can be chosen
         if (selectionHasVariants()) {
             languageResource.getAll()
@@ -500,7 +508,7 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
             }
         };
 
-        // if any of the selected nodes has variants we want to 
+        // if any of the selected nodes has variants we want to
         // show a dialog where the languages can be chosen
         if (selectionHasVariants()) {
             languageResource.getAll()
@@ -693,13 +701,13 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
     }
 
     function initView() {
-        
+
         var id = $routeParams.id;
         if (id === undefined) {
             // no ID found in route params - don't list anything as we don't know for sure where we are
             return;
         }
-        
+
         // Get current id for node to load it's children
         $scope.contentId = editorState.current ? editorState.current.id : id;
         $scope.isTrashed = editorState.current ? editorState.current.trashed : id === "-20" || id === "-21";
@@ -791,7 +799,7 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
 
     function createBlank(entityType, docTypeAlias) {
         if ($scope.options.useInfiniteEditor) {
-            
+
             var editorModel = {
                 create: true,
                 submit: function(model) {
