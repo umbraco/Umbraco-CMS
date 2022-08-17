@@ -152,7 +152,7 @@
 
                     // When an element is remove or become not focusable, but focus is on it,
                     // we need to ensure a now focus inside the trap, else the focus can escape the trap.
-                    if (focusableElements.filter(elm => elm == document.activeElement).length === 0) {
+                    if (focusableElements.indexOf(document.activeElement) === -1) {
                         setElementFocus();
                     }
                 }
