@@ -13,6 +13,7 @@ namespace Umbraco.Cms.ManagementApi.Controllers;
 
 [ApiController]
 [ApiVersion("1.0")]
+[RequireRuntimeLevel(RuntimeLevel.Upgrade)]
 [BackofficeRoute("api/v{version:apiVersion}/upgrade")]
 public class UpgradeController : Controller
 {
@@ -32,7 +33,6 @@ public class UpgradeController : Controller
 
     [HttpPost("authorize")]
     [MapToApiVersion("1.0")]
-    [RequireRuntimeLevel(RuntimeLevel.Upgrade)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status428PreconditionRequired)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
@@ -44,7 +44,6 @@ public class UpgradeController : Controller
 
     [HttpGet("settings")]
     [MapToApiVersion("1.0")]
-    [RequireRuntimeLevel(RuntimeLevel.Upgrade)]
     [ProducesResponseType(typeof(UpgradeSettingsViewModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status428PreconditionRequired)]
     public async Task<ActionResult<UpgradeSettingsViewModel>> Settings()

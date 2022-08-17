@@ -21,6 +21,7 @@ namespace Umbraco.Cms.ManagementApi.Controllers;
 [ApiController]
 [ApiVersion("1.0")]
 [BackofficeRoute("api/v{version:apiVersion}/install")]
+[RequireRuntimeLevel(RuntimeLevel.Install)]
 public class NewInstallController : Controller
 {
     private readonly IUmbracoMapper _mapper;
@@ -51,7 +52,6 @@ public class NewInstallController : Controller
 
     [HttpGet("settings")]
     [MapToApiVersion("1.0")]
-    [RequireRuntimeLevel(RuntimeLevel.Install)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status428PreconditionRequired)]
     [ProducesResponseType(typeof(InstallSettingsViewModel), StatusCodes.Status200OK)]
@@ -68,7 +68,6 @@ public class NewInstallController : Controller
 
     [HttpPost("setup")]
     [MapToApiVersion("1.0")]
-    [RequireRuntimeLevel(RuntimeLevel.Install)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status428PreconditionRequired)]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -88,7 +87,6 @@ public class NewInstallController : Controller
 
     [HttpPost("validateDatabase")]
     [MapToApiVersion("1.0")]
-    [RequireRuntimeLevel(RuntimeLevel.Install)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> ValidateDatabase(DatabaseInstallViewModel viewModel)
