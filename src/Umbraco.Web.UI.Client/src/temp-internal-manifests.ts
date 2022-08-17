@@ -77,6 +77,7 @@ export const internalManifests: Array<UmbExtensionManifestCore> = [
 		elementName: 'umb-dashboard-settings-about',
 		js: () => import('./backoffice/dashboards/settings-about/dashboard-settings-about.element'),
 		meta: {
+			label: 'About',
 			sections: ['Umb.Section.Settings'],
 			pathname: 'about', // TODO: how to we want to support pretty urls?
 			weight: 10,

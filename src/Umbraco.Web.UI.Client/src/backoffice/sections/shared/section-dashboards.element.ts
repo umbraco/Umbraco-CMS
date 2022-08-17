@@ -129,7 +129,7 @@ export class UmbSectionDashboards extends UmbContextConsumerMixin(LitElement) {
 					(dashboard: UmbExtensionManifestDashboard) => html`
 						<uui-tab
 							href="${`/section/${this._currentSectionPathname}/dashboard/${dashboard.meta.pathname}`}"
-							label=${dashboard.name}
+							label=${dashboard.meta.label || dashboard.name}
 							?active="${dashboard.meta.pathname === this._currentDashboardPathname}"></uui-tab>
 					`
 				)}
