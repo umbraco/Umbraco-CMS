@@ -1,5 +1,5 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html, LitElement } from 'lit';
+import { css, html, LitElement, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { IRoutingInfo } from 'router-slot';
 import { map, Subscription, first } from 'rxjs';
@@ -116,6 +116,25 @@ export class UmbSectionDashboards extends UmbContextConsumerMixin(LitElement) {
 		});
 	}
 
+	private _renderNavigation() {
+		return html`
+			${this._dashboards?.length > 1
+				? html`
+						<uui-tab-group id="tabs">
+							${this._dashboards.map(
+								(dashboard: UmbExtensionManifestDashboard) => html`
+									<uui-tab
+										href="${`/section/${this._currentSectionPathname}/dashboard/${dashboard.meta.pathname}`}"
+										label=${dashboard.meta.label || dashboard.name}
+										?active="${dashboard.meta.pathname === this._currentDashboardPathname}"></uui-tab>
+								`
+							)}
+						</uui-tab-group>
+				  `
+				: nothing}
+		`;
+	}
+
 	disconnectedCallback() {
 		super.disconnectedCallback();
 		this._dashboardsSubscription?.unsubscribe();
@@ -124,16 +143,7 @@ export class UmbSectionDashboards extends UmbContextConsumerMixin(LitElement) {
 
 	render() {
 		return html`
-			<uui-tab-group id="tabs">
-				${this._dashboards.map(
-					(dashboard: UmbExtensionManifestDashboard) => html`
-						<uui-tab
-							href="${`/section/${this._currentSectionPathname}/dashboard/${dashboard.meta.pathname}`}"
-							label=${dashboard.meta.label || dashboard.name}
-							?active="${dashboard.meta.pathname === this._currentDashboardPathname}"></uui-tab>
-					`
-				)}
-			</uui-tab-group>
+			${this._renderNavigation()}
 			<router-slot id="router-slot" .routes="${this._routes}"></router-slot>
 		`;
 	}
