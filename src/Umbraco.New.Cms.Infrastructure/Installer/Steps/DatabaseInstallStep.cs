@@ -24,10 +24,6 @@ public class DatabaseInstallStep : IInstallStep, IUpgradeStep
 
     private Task Execute()
     {
-        if (_runtime.Level == RuntimeLevel.Run)
-        {
-            throw new Exception("Umbraco is already configured!");
-        }
 
         if (_runtime.Reason == RuntimeLevelReason.InstallMissingDatabase)
         {
