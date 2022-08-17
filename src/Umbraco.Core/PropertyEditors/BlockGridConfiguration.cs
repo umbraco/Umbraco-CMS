@@ -137,5 +137,8 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
         [ConfigurationField("gridColumns", "Grid Columns", "number", Description = "Set the number of columns for the layout")]
         public int? GridColumns { get; set; }
+        
+        [ConfigurationField("layoutStylesheet", "Layout Stylesheet", "views/propertyeditors/blockgrid/prevalue/blockgrid.stylesheetpicker.html", Description = "Overwrite default stylesheet for layout.")]
+        public string? LayoutStylesheet { get; set; }
     }
 }

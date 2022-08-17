@@ -29,7 +29,7 @@
             }
         });
 
-    function BlockGridController($element, $scope, $timeout, $q, editorService, clipboardService, localizationService, overlayService, blockEditorService, udiService, serverValidationManager, angularHelper, eventsService, assetsService) {
+    function BlockGridController($element, $scope, $timeout, $q, editorService, clipboardService, localizationService, overlayService, blockEditorService, udiService, serverValidationManager, angularHelper, eventsService, assetsService, umbRequestHelper) {
 
         var unsubscribe = [];
         var modelObject;
@@ -44,8 +44,6 @@
         var shadowRoot;
 
         var vm = this;
-
-        vm.layoutStylesheet = "assets/css/blockgridlayout.css";
 
         vm.loading = true;
         vm.currentBlockInFocus = null;
@@ -105,6 +103,12 @@
 
             if (vm.model.config.maxPropertyWidth) {
                 vm.editorWrapperStyles['max-width'] = vm.model.config.maxPropertyWidth;
+            }
+
+            if (vm.model.config.layoutStylesheet) {
+                vm.layoutStylesheet = umbRequestHelper.convertVirtualToAbsolutePath(vm.model.config.layoutStylesheet);
+            } else {
+                vm.layoutStylesheet = "assets/css/blockgridlayout.css";
             }
 
             // We need to ensure that the property model value is an object, this is needed for modelObject to recive a reference and keep that updated.

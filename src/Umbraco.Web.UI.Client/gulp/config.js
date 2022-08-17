@@ -21,7 +21,7 @@ module.exports = {
     sources: {
         // css files used in backoffice
         css: {
-            blockgridlayout: { files: "./src/views/propertyeditors/blockgrid/blockgridlayout.css", watch: "./src/views/propertyeditors/blockgrid/blockgridlayout.css", out: "blockgridlayout.css" }
+            blockgridlayout: { files: "./src/views/propertyeditors/blockgrid/blockgridlayout.css", watch: "./src/views/propertyeditors/blockgrid/blockgridlayout.css", out: "blockgridlayout.css", dist: "/css" }
         },
 
         // less files used by backoffice and preview
@@ -91,6 +91,7 @@ module.exports = {
         js: "umbraco/js/",
         lib: "umbraco/lib/",
         views: "umbraco/views/",
+        less: "umbraco/assets/css/",
         css: "umbraco/assets/css/",
         assets: "umbraco/assets/"
     }
