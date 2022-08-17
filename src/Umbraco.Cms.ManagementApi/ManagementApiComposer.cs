@@ -67,7 +67,7 @@ public class ManagementApiComposer : IComposer
 
         services.AddControllers(options =>
         {
-            options.Conventions.Add(new UmbracoBackofficeToken(Constants.Web.AttributeRouting.BackofficeToken, backofficePath));
+            options.Conventions.Add(new UmbracoBackofficeToken(Constants.Web.AttributeRouting.BackOfficeToken, backofficePath));
         });
 
         builder.Services.Configure<UmbracoPipelineOptions>(options =>

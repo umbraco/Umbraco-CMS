@@ -65,7 +65,7 @@ public static partial class Constants
 
         public static class AttributeRouting
         {
-            public const string BackofficeToken = "umbracoBackoffice";
+            public const string BackOfficeToken = "umbracoBackOffice";
         }
 
         public static class EmailTypes

@@ -20,7 +20,7 @@ namespace Umbraco.Cms.ManagementApi.Controllers;
 
 [ApiController]
 [ApiVersion("1.0")]
-[BackofficeRoute("api/v{version:apiVersion}/install")]
+[BackOfficeRoute("api/v{version:apiVersion}/install")]
 [RequireRuntimeLevel(RuntimeLevel.Install)]
 public class NewInstallController : Controller
 {

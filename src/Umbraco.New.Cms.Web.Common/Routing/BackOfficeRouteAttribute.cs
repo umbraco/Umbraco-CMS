@@ -6,12 +6,12 @@ namespace Umbraco.New.Cms.Web.Common.Routing;
 /// <summary>
 /// Routes a controller within the backoffice area, I.E /umbraco
 /// </summary>
-public class BackofficeRouteAttribute : RouteAttribute
+public class BackOfficeRouteAttribute : RouteAttribute
 {
     // All this does is append [umbracoBackoffice]/ to the route,
     // this is then replaced with whatever is configures as UmbracoPath by the UmbracoBackofficeToken convention
-    public BackofficeRouteAttribute(string template)
-        : base($"[{Constants.Web.AttributeRouting.BackofficeToken}]/" + template.TrimStart('/'))
+    public BackOfficeRouteAttribute(string template)
+        : base($"[{Constants.Web.AttributeRouting.BackOfficeToken}]/" + template.TrimStart('/'))
     {
     }
 }

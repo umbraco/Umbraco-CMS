@@ -14,7 +14,7 @@ namespace Umbraco.Cms.ManagementApi.Controllers;
 [ApiController]
 [ApiVersion("1.0")]
 [RequireRuntimeLevel(RuntimeLevel.Upgrade)]
-[BackofficeRoute("api/v{version:apiVersion}/upgrade")]
+[BackOfficeRoute("api/v{version:apiVersion}/upgrade")]
 public class UpgradeController : Controller
 {
     private readonly IUpgradeSettingsFactory _upgradeSettingsFactory;
