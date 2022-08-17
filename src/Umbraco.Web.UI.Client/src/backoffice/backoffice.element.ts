@@ -8,7 +8,6 @@ import { UmbModalService } from '../core/services/modal';
 import { UmbDataTypeStore } from '../core/stores/data-type.store';
 import { UmbDocumentTypeStore } from '../core/stores/document-type.store';
 import { UmbNodeStore } from '../core/stores/node.store';
-import { UmbSectionContext } from './sections/section.context';
 import { UmbSectionStore } from '../core/stores/section.store';
 
 import './components/backoffice-header.element';
