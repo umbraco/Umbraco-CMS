@@ -2,7 +2,6 @@
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Install;
-using Umbraco.Cms.Core.Install.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Migrations.PostMigrations;
@@ -12,7 +11,7 @@ using Umbraco.New.Cms.Core.Models.Installer;
 
 namespace Umbraco.New.Cms.Infrastructure.Installer.Steps;
 
-public class DatabaseUpgradeStep : IInstallStep
+public class DatabaseUpgradeStep : IInstallStep, IUpgradeStep
 {
     private readonly DatabaseBuilder _databaseBuilder;
     private readonly IRuntimeState _runtime;
@@ -34,7 +33,11 @@ public class DatabaseUpgradeStep : IInstallStep
         _keyValueService = keyValueService;
     }
 
-    public Task ExecuteAsync(InstallData model)
+    public Task ExecuteAsync(InstallData _) => Execute();
+
+    public Task ExecuteAsync() => Execute();
+
+    private Task Execute()
     {
         _logger.LogInformation("Running 'Upgrade' service");
 
@@ -51,7 +54,11 @@ public class DatabaseUpgradeStep : IInstallStep
         return Task.CompletedTask;
     }
 
-    public Task<bool> RequiresExecutionAsync(InstallData model)
+    public Task<bool> RequiresExecutionAsync(InstallData model) => ShouldExecute();
+
+    public Task<bool> RequiresExecutionAsync() => ShouldExecute();
+
+    private Task<bool> ShouldExecute()
     {
         // Don't do anything if RunTimeLevel is not Install/Upgrade
         if (_runtime.Level == RuntimeLevel.Run)

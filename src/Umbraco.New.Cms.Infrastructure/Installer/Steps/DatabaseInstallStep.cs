@@ -1,6 +1,5 @@
 ﻿using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Install;
-using Umbraco.Cms.Core.Install.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.New.Cms.Core.Installer;
@@ -8,7 +7,7 @@ using Umbraco.New.Cms.Core.Models.Installer;
 
 namespace Umbraco.New.Cms.Infrastructure.Installer.Steps;
 
-public class DatabaseInstallStep : IInstallStep
+public class DatabaseInstallStep : IInstallStep, IUpgradeStep
 {
     private readonly IRuntimeState _runtime;
     private readonly DatabaseBuilder _databaseBuilder;
@@ -19,7 +18,11 @@ public class DatabaseInstallStep : IInstallStep
         _databaseBuilder = databaseBuilder;
     }
 
-    public Task ExecuteAsync(InstallData model)
+    public Task ExecuteAsync(InstallData _) => Execute();
+
+    public Task ExecuteAsync() => Execute();
+
+    private Task Execute()
     {
         if (_runtime.Level == RuntimeLevel.Run)
         {
@@ -41,5 +44,10 @@ public class DatabaseInstallStep : IInstallStep
         return Task.CompletedTask;
     }
 
-    public Task<bool> RequiresExecutionAsync(InstallData model) => Task.FromResult(true);
+    public Task<bool> RequiresExecutionAsync(InstallData _) => ShouldExecute();
+
+    public Task<bool> RequiresExecutionAsync() => ShouldExecute();
+
+    private Task<bool> ShouldExecute()
+        => Task.FromResult(true);
 }

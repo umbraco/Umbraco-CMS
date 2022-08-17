@@ -20,6 +20,16 @@ public class InstallerViewModelsMapDefinition : IMapDefinition
         mapper.Define<IDatabaseProviderMetadata, DatabaseSettingsModel>((source, context) => new DatabaseSettingsModel(), Map);
         mapper.Define<DatabaseSettingsModel, DatabaseSettingsViewModel>((source, context) => new DatabaseSettingsViewModel(), Map);
         mapper.Define<ConsentLevelModel, ConsentLevelViewModel>((source, context) => new ConsentLevelViewModel(), Map);
+        mapper.Define<UpgradeSettingsModel, UpgradeSettingsViewModel>((source, context) => new UpgradeSettingsViewModel(), Map);
+    }
+
+    // Umbraco.Code.MapAll
+    private void Map(UpgradeSettingsModel source, UpgradeSettingsViewModel target, MapperContext context)
+    {
+        target.CurrentState = source.CurrentState;
+        target.NewState = source.NewState;
+        target.NewVersion = source.NewVersion.ToString();
+        target.OldVersion = source.OldVersion.ToString();
     }
 
     // Umbraco.Code.MapAll
