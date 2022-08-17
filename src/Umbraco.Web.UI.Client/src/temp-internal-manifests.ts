@@ -51,7 +51,7 @@ export const internalManifests: Array<UmbExtensionManifestCore> = [
 		alias: 'Umb.Dashboard.Welcome',
 		name: 'Welcome',
 		elementName: 'umb-dashboard-welcome',
-		js: () => import('./backoffice/dashboards/dashboard-welcome.element'),
+		js: () => import('./backoffice/dashboards/welcome/dashboard-welcome.element'),
 		meta: {
 			sections: ['Umb.Section.Content'],
 			pathname: 'welcome', // TODO: how to we want to support pretty urls?
@@ -63,7 +63,7 @@ export const internalManifests: Array<UmbExtensionManifestCore> = [
 		alias: 'Umb.Dashboard.RedirectManagement',
 		name: 'Redirect Management',
 		elementName: 'umb-dashboard-redirect-management',
-		js: () => import('./backoffice/dashboards/dashboard-redirect-management.element'),
+		js: () => import('./backoffice/dashboards/redirect-management/dashboard-redirect-management.element'),
 		meta: {
 			sections: ['Umb.Section.Content'],
 			pathname: 'redirect-management', // TODO: how to we want to support pretty urls?
