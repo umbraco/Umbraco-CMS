@@ -580,14 +580,21 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
 
         IIdentityUserToken? token = user.LoginTokens.FirstOrDefault(x =>
             x.LoginProvider.InvariantEquals(loginProvider) && x.Name.InvariantEquals(name));
-        if (token == null)
+
+        // We have to remove token and then re-add to ensure that LoginTokens are dirty, which is required for them to save
+        // This is because we're using an observable collection, which only cares about added/removed items.
+        if (token is not null)
         {
-            user.LoginTokens.Add(new IdentityUserToken(loginProvider, name, value, user.Id));
+            // The token hasn't changed, so there's no reason for us to re-add it.
+            if (token.Value == value)
+            {
+                return Task.CompletedTask;
+            }
+
+            user.LoginTokens.Remove(token);
         }
-        else
-        {
-            token.Value = value;
-        }
+
+        user.LoginTokens.Add(new IdentityUserToken(loginProvider, name, value, user.Id));
 
         return Task.CompletedTask;
     }
