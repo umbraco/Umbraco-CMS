@@ -91,7 +91,7 @@ export class UmbSectionDashboards extends UmbContextConsumerMixin(LitElement) {
 				)
 			)
 			.subscribe((dashboards) => {
-				if (!dashboards) return;
+				if (dashboards?.length === 0) return;
 				this._dashboards = dashboards;
 				this._createRoutes();
 			});
