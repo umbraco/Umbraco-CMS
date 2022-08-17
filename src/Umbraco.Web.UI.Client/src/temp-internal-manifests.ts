@@ -108,6 +108,18 @@ export const internalManifests: Array<UmbExtensionManifestCore> = [
 		},
 	},
 	{
+		type: 'dashboard',
+		alias: 'Umb.Dashboard.MediaManagement',
+		name: 'Media',
+		elementName: 'umb-dashboard-media-management',
+		js: () => import('./backoffice/dashboards/media-management/dashboard-media-management.element'),
+		meta: {
+			sections: ['Umb.Section.Media'],
+			pathname: 'media-management', // TODO: how to we want to support pretty urls?
+			weight: 10,
+		},
+	},
+	{
 		type: 'propertyEditorUI',
 		alias: 'Umb.PropertyEditorUI.Text',
 		name: 'Text',
