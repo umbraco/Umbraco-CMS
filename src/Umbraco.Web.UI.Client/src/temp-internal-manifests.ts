@@ -71,6 +71,42 @@ export const internalManifests: Array<UmbExtensionManifestCore> = [
 		},
 	},
 	{
+		type: 'dashboard',
+		alias: 'Umb.Dashboard.SettingsAbout',
+		name: 'Settings About',
+		elementName: 'umb-dashboard-settings-about',
+		js: () => import('./backoffice/dashboards/settings-about/dashboard-settings-about.element'),
+		meta: {
+			sections: ['Umb.Section.Settings'],
+			pathname: 'about', // TODO: how to we want to support pretty urls?
+			weight: 10,
+		},
+	},
+	{
+		type: 'dashboard',
+		alias: 'Umb.Dashboard.ExamineManagement',
+		name: 'Examine Management',
+		elementName: 'umb-dashboard-examine-management',
+		js: () => import('./backoffice/dashboards/examine-management/dashboard-examine-management.element'),
+		meta: {
+			sections: ['Umb.Section.Settings'],
+			pathname: 'examine-management', // TODO: how to we want to support pretty urls?
+			weight: 10,
+		},
+	},
+	{
+		type: 'dashboard',
+		alias: 'Umb.Dashboard.ModelsBuilder',
+		name: 'Models Builder',
+		elementName: 'umb-dashboard-models-builder',
+		js: () => import('./backoffice/dashboards/models-builder/dashboard-models-builder.element'),
+		meta: {
+			sections: ['Umb.Section.Settings'],
+			pathname: 'models-builder', // TODO: how to we want to support pretty urls?
+			weight: 10,
+		},
+	},
+	{
 		type: 'propertyEditorUI',
 		alias: 'Umb.PropertyEditorUI.Text',
 		name: 'Text',
