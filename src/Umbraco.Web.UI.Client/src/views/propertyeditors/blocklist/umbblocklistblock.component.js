@@ -82,7 +82,9 @@
         $scope.index = index;
 
         // let the Block know about the current index:
-        $scope.block.index = $scope.block.interpolatableData.$index = index + 1;
+        if ($scope.block) {
+          $scope.block.index = $scope.block.interpolatableData.$index = index + 1;
+        }
       }
     };
   }
