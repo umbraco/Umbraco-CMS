@@ -44,10 +44,11 @@
   </PropertyGroup>
 
   <!-- Package Validation -->
-  <PropertyGroup>
-    <EnablePackageValidation>true</EnablePackageValidation>
-    <PackageValidationBaselineVersion>10.0.0</PackageValidationBaselineVersion>
-    <EnableStrictModeForCompatibleFrameworksInPackage>true</EnableStrictModeForCompatibleFrameworksInPackage>
-    <EnableStrictModeForCompatibleTfms>true</EnableStrictModeForCompatibleTfms>
-  </PropertyGroup>
+<!--  TODO - Introduce when v11 is shipped-->
+<!--  <PropertyGroup>-->
+<!--    <EnablePackageValidation>true</EnablePackageValidation>-->
+<!--    <PackageValidationBaselineVersion>11.0.0</PackageValidationBaselineVersion>-->
+<!--    <EnableStrictModeForCompatibleFrameworksInPackage>true</EnableStrictModeForCompatibleFrameworksInPackage>-->
+<!--    <EnableStrictModeForCompatibleTfms>true</EnableStrictModeForCompatibleTfms>-->
+<!--  </PropertyGroup>-->
 </Project>
