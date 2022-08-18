@@ -16,10 +16,11 @@ angular.module("umbraco.filters").filter("ncNodeName", function (editorState, en
             : firstNodeName + " (+" + (totalNodes - 1) + ")";
     }
 
-    return function (input) {
+    nodeNameFilter.$stateful = true;
+    function nodeNameFilter(input) {
 
         // Check we have a value at all
-        if (input === "" || input.toString() === "0") {
+        if (typeof input === 'undefined' || input === "" || input.toString() === "0" || input === null) {
             return "";
         }
 
@@ -35,16 +36,24 @@ angular.module("umbraco.filters").filter("ncNodeName", function (editorState, en
         // MNTP values are comma separated IDs. We'll only fetch the first one for the NC header.
         var ids = input.split(',');
         var lookupId = ids[0];
+        var serviceInvoked = false;
 
         // See if there is a value in the cache and use that
         if (ncNodeNameCache.keys[lookupId]) {
             return formatLabel(ncNodeNameCache.keys[lookupId], ids.length);
         }
 
-        // No value, so go fetch one 
-        // We'll put a temp value in the cache though so we don't 
+        // No value, so go fetch one
+        // We'll put a temp value in the cache though so we don't
         // make a load of requests while we wait for a response
         ncNodeNameCache.keys[lookupId] = "Loading...";
+
+        // If the service has already been invoked, don't do it again
+        if (serviceInvoked) {
+            return formatLabel(ncNodeNameCache.keys[lookupId], ids.length);
+        }
+
+        serviceInvoked = true;
 
         var type = lookupId.indexOf("umb://media/") === 0
             ? "Media"
@@ -54,13 +63,16 @@ angular.module("umbraco.filters").filter("ncNodeName", function (editorState, en
         entityResource.getById(lookupId, type)
             .then(
                 function (ent) {
-                    ncNodeNameCache.keys[lookupId] = ent.name;
+                  console.log('returned with response',ent.name, lookupId);
+                  ncNodeNameCache.keys[lookupId] = ent.name;
                 }
             );
 
         // Return the current value for now
         return formatLabel(ncNodeNameCache.keys[lookupId], ids.length);
-    };
+    }
+
+    return nodeNameFilter;
 
 }).filter("ncRichText", function () {
     return function(input) {
