@@ -1,6 +1,5 @@
 using System.Net.Http.Headers;
 using System.Text;
-using System.Text.Json;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.Cache;
@@ -33,27 +32,13 @@ namespace Umbraco.Cms.Infrastructure.OAuth
             _authorizedServiceSettings = authorizedServiceSettings.CurrentValue;
         }
 
-        public async Task<AuthorizationResult> AuthorizeServiceAsync(string serviceAlias) =>
-            await AuthorizeServiceAsync(serviceAlias, new Dictionary<string, string>());
-
-        public async Task<AuthorizationResult> AuthorizeServiceAsync(string serviceAlias, Dictionary<string, string> authorizationParameters)
+        public async Task<AuthorizationResult> AuthorizeServiceAsync(string serviceAlias, string authorizationCode, string redirectUri)
         {
             ServiceDetail serviceDetail = GetServiceDetail(serviceAlias);
 
-            var parameters = new StringBuilder();
-            parameters.Append("?client_id=").Append(Uri.EscapeDataString(serviceDetail.ClientId));
-            parameters.Append("&client_secret=").Append(Uri.EscapeDataString(serviceDetail.ClientSecret));
-            foreach (KeyValuePair<string, string> authorizationParameter in authorizationParameters)
-            {
-                parameters.Append("&").Append(authorizationParameter.Key).Append("=").Append(Uri.EscapeDataString(authorizationParameter.Value));
-            }
+            Dictionary<string, string> parameters = BuildAuthorizationParameters(serviceDetail, authorizationCode, redirectUri);
 
-            HttpClient httpClient = _httpClientFactory.CreateClient();
-            httpClient.DefaultRequestHeaders.Accept.Clear();
-            httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-            var url = serviceDetail.TokenHost + serviceDetail.RequestTokenPath + parameters.ToString();
-            HttpResponseMessage response = await httpClient.PostAsync(url, new StringContent(parameters.ToString()));
+            HttpResponseMessage response = await SendAuthorizationRequest(serviceDetail, parameters);
             if (response.IsSuccessStatusCode)
             {
                 var responseContent = await response.Content.ReadAsStringAsync();
@@ -80,9 +65,20 @@ namespace Umbraco.Cms.Infrastructure.OAuth
             }
             else
             {
-                throw new InvalidOperationException($"Error response from token request to '{serviceAlias}'");
+                var responseContent = await response.Content.ReadAsStringAsync();
+                throw new InvalidOperationException($"Error response from token request to '{serviceAlias}'. Response: {responseContent}");
             }
         }
+
+        private Dictionary<string, string> BuildAuthorizationParameters(ServiceDetail serviceDetail, string authorizationCode, string redirectUri) =>
+            new Dictionary<string, string>
+                {
+                    { "grant_type", "authorization_code" },
+                    { "client_id", serviceDetail.ClientId },
+                    { "client_secret", serviceDetail.ClientSecret },
+                    { "code", authorizationCode },
+                    { "redirect_uri", redirectUri }
+                };
 
         private ServiceDetail GetServiceDetail(string serviceAlias)
         {
@@ -95,11 +91,54 @@ namespace Umbraco.Cms.Infrastructure.OAuth
             return serviceDetail;
         }
 
+        private async Task<HttpResponseMessage> SendAuthorizationRequest(ServiceDetail serviceDetail, Dictionary<string, string> parameters)
+        {
+            HttpClient httpClient = CreateAuthorizationClient();
+
+            var url = serviceDetail.TokenHost + serviceDetail.RequestTokenPath;
+
+            HttpContent? content = null;
+            switch (serviceDetail.RequestTokenFormat)
+            {
+                case TokenRequestContentFormat.Querystring:
+                    url += BuildAuthorizationQuerystring(parameters);
+                    break;
+                case TokenRequestContentFormat.FormUrlEncoded:
+                    content = new FormUrlEncodedContent(parameters);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(serviceDetail.RequestTokenFormat));
+            }
+
+            return await httpClient.PostAsync(url, content);
+        }
+
+        private static string BuildAuthorizationQuerystring(Dictionary<string, string> parameters)
+        {
+            var qs = new StringBuilder();
+            var sep = "?";
+            foreach (KeyValuePair<string, string> parameter in parameters)
+            {
+                qs.Append(sep).Append(parameter.Key).Append("=").Append(parameter.Value);
+                sep = "&";
+            }
+
+            return qs.ToString();
+        }
+
+        private HttpClient CreateAuthorizationClient()
+        {
+            HttpClient httpClient = _httpClientFactory.CreateClient();
+            httpClient.DefaultRequestHeaders.Accept.Clear();
+            httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            return httpClient;
+        }
+
         public async Task<TResponse> SendRequestAsync<TResponse>(string serviceAlias, string path, HttpMethod httpMethod)
           => await SendRequestAsync<object, TResponse>(serviceAlias, path, httpMethod, null);
 
         public async Task<TResponse> SendRequestAsync<TRequest, TResponse>(string serviceAlias, string path, HttpMethod httpMethod, TRequest? requestContent = null)
-            where TRequest: class
+            where TRequest : class
         {
             ServiceDetail serviceDetail = GetServiceDetail(serviceAlias);
 
@@ -111,15 +150,7 @@ namespace Umbraco.Cms.Infrastructure.OAuth
 
             HttpClient httpClient = _httpClientFactory.CreateClient();
 
-            var requestMessage = new HttpRequestMessage
-            {
-                Method = httpMethod,
-                RequestUri = new Uri(serviceDetail.ApiHost + path),
-                Content = GetRequestContent(requestContent)
-            };
-
-            requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token.AccessToken);
-            requestMessage.Headers.UserAgent.Add(new ProductInfoHeaderValue("Umbraco", "10.0.0"));
+            HttpRequestMessage requestMessage = CreateRequestMessage(serviceDetail, path, httpMethod, token, requestContent);
 
             HttpResponseMessage response = await httpClient.SendAsync(requestMessage);
             if (response.IsSuccessStatusCode)
@@ -135,6 +166,21 @@ namespace Umbraco.Cms.Infrastructure.OAuth
             }
 
             throw new InvalidOperationException($"Error response from '{serviceAlias}'");
+        }
+
+        private HttpRequestMessage CreateRequestMessage<TRequest>(ServiceDetail serviceDetail, string path, HttpMethod httpMethod, Token token, TRequest? requestContent)
+            where TRequest : class
+        {
+            var requestMessage = new HttpRequestMessage
+            {
+                Method = httpMethod,
+                RequestUri = new Uri(serviceDetail.ApiHost + path),
+                Content = GetRequestContent(requestContent)
+            };
+
+            requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token.AccessToken);
+            requestMessage.Headers.UserAgent.Add(new ProductInfoHeaderValue("Umbraco", "10.0.0"));
+            return requestMessage;
         }
 
         private Token? GetAccessToken(string serviceAlias)
@@ -170,6 +216,5 @@ namespace Umbraco.Cms.Infrastructure.OAuth
             var serializedContent = _jsonSerializer.Serialize(requestContent);
             return new StringContent(serializedContent, Encoding.UTF8, "application/json");
         }
-
     }
 }

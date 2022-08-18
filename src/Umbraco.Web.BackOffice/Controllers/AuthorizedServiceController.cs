@@ -1,12 +1,13 @@
 using System.Text;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.OAuth;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers
@@ -53,14 +54,23 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             };
         }
 
-        private static string? BuildAuthorizationUrl(ServiceDetail serviceDetail)
+        private string BuildAuthorizationUrl(ServiceDetail serviceDetail)
         {
             var url = new StringBuilder();
-            url.Append(serviceDetail.TokenHost);
+            url.Append(serviceDetail.IdentityHost);
             url.Append(serviceDetail.RequestIdentityPath);
             url.Append("?client_id=").Append(serviceDetail.ClientId);
+
+            if (serviceDetail.RequestIdentityRequiresRedirectUri)
+            {
+                var redirectUri = HttpContext.GetAuthorizedServiceRedirectUri();
+                url.Append("&redirect_uri=").Append(redirectUri);
+            }
+
             url.Append("&scope=").Append(serviceDetail.Scopes);
+
             url.Append("&state=").Append(serviceDetail.Alias + "|" + State);
+
             return url.ToString();
         }
     }

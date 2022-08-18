@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.OAuth;
 using Umbraco.Cms.Web.Common.Controllers;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
@@ -23,8 +24,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
 
             var serviceAlias = stateParts[0];
-
-            AuthorizationResult result = await _authorizedServiceCaller.AuthorizeServiceAsync(serviceAlias, new Dictionary<string, string> { { "code", code } });
+            var redirectUri = HttpContext.GetAuthorizedServiceRedirectUri();
+            AuthorizationResult result = await _authorizedServiceCaller.AuthorizeServiceAsync(serviceAlias, code, redirectUri);
             if (result.Success)
             {
                 return Redirect($"/umbraco#/settings/AuthorizedServices/edit/{serviceAlias}");

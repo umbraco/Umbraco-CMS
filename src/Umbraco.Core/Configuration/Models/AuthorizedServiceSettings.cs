@@ -1,5 +1,11 @@
 namespace Umbraco.Cms.Core.Configuration.Models
 {
+    public enum TokenRequestContentFormat
+    {
+        Querystring,
+        FormUrlEncoded
+    }
+
     [UmbracoOptions(Constants.Configuration.ConfigAuthorizedServices)]
     public class AuthorizedServiceSettings
     {
@@ -18,11 +24,17 @@ namespace Umbraco.Cms.Core.Configuration.Models
 
         public string ApiHost { get; set; } = string.Empty;
 
+        public string IdentityHost { get; set; } = string.Empty;
+
         public string TokenHost { get; set; } = string.Empty;
 
         public string RequestIdentityPath { get; set; } = string.Empty;
 
+        public bool RequestIdentityRequiresRedirectUri { get; set; } = false;
+
         public string RequestTokenPath { get; set; } = string.Empty;
+
+        public TokenRequestContentFormat RequestTokenFormat { get; set; } = TokenRequestContentFormat.Querystring;
 
         public string ClientId { get; set; } = string.Empty;
 
