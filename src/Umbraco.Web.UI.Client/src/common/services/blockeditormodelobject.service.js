@@ -13,7 +13,7 @@
 (function () {
     'use strict';
 
-    function blockEditorModelObjectFactory($interpolate, $q, udiService, contentResource, localizationService, umbRequestHelper, clipboardService, notificationsService) {
+    function blockEditorModelObjectFactory($q, udiService, contentResource, localizationService, umbRequestHelper, clipboardService, notificationsService) {
 
         /**
          * Simple mapping from property model content entry to editing model,
@@ -98,37 +98,14 @@
         }
 
         /**
-         * Generate label for Block, uses either the labelInterpolator or falls back to the contentTypeName.
+         * Generate label for Block, uses either the configured label or falls back to the contentTypeName.
          * @param {Object} blockObject BlockObject to receive data values from.
          */
         function getBlockLabel(blockObject) {
-            if (blockObject.labelInterpolator !== undefined) {
-                // blockobject.content may be null if the block is no longer allowed,
-                // so try and fall back to the label in the config,
-                // if that too is null, there's not much we can do, so just default to empty string.
-                var contentTypeName;
-                if(blockObject.content != null){
-                  contentTypeName = blockObject.content.contentTypeName;
-                }
-                else if(blockObject.config != null && blockObject.config.label != null){
-                  contentTypeName = blockObject.config.label;
-                }
-                else {
-                  contentTypeName = "";
-                }
-
-                var labelVars = Object.assign({
-                  "$contentTypeName": contentTypeName,
-                  "$settings": blockObject.settingsData || {},
-                  "$layout": blockObject.layout || {},
-                  "$index": (blockObject.index || 0)+1
-                }, blockObject.data);
-                var label = blockObject.labelInterpolator(labelVars);
-                if (label) {
-                    return label;
-                }
-            }
-            return blockObject.content.contentTypeName;
+          if (blockObject.config.label !== null && blockObject.config.label.length) {
+            return blockObject.config.label;
+          }
+          return blockObject.content.contentTypeName;
         }
 
         /**
@@ -161,10 +138,6 @@
                     }
                 }
             }
-            if (blockObject.__watchers.length === 0) {
-                // If no watcher where created, it means we have no properties to watch. This means that nothing will activate our generate the label, since its only triggered by watchers.
-                blockObject.updateLabel();
-            }
         }
 
         /**
@@ -176,8 +149,6 @@
 
                     // sync data:
                     prop.value = blockObject.data[prop.alias];
-
-                    blockObject.updateLabel();
                 }
             }
         }
@@ -203,8 +174,6 @@
                     // sync data:
                     blockObject.data[prop.alias] = prop.value;
                 }
-
-                blockObject.updateLabel();
             }
         }
 
@@ -536,7 +505,6 @@
              * - settings {Object}: Settings model, the settings data in a ElementType model.
              * - config {Object}: A local deep copy of the block configuration model.
              * - label {string}: The label for this block.
-             * - updateLabel {Method}: Method to trigger an update of the label for this block.
              * - data {Object}: A reference to the content data object from your property editor model.
              * - settingsData {Object}: A reference to the settings data object from your property editor model.
              * - layout {Object}: A reference to the layout entry from your property editor model.
@@ -580,19 +548,10 @@
                 }
                 blockObject.key = String.CreateGuid().replace(/-/g, "");
                 blockObject.config = Utilities.copy(blockConfiguration);
-                if (blockObject.config.label && blockObject.config.label !== "") {
-                    blockObject.labelInterpolator = $interpolate(blockObject.config.label);
-                }
+                // if (blockObject.config.label && blockObject.config.label !== "") {
+                //     blockObject.labelInterpolator = $interpolate(blockObject.config.label);
+                // }
                 blockObject.__scope = this.isolatedScope;
-                blockObject.updateLabel = _.debounce(
-                    function () {
-                        // Check wether scope still exists, maybe object was destoyed in these seconds.
-                        if (this.__scope) {
-                            this.label = getBlockLabel(this);
-                            this.__scope.$evalAsync();
-                        }
-                    }.bind(blockObject)
-                    , 10);
 
                 // make basics from scaffold
                 if(contentScaffold !== null) {// We might not have contentScaffold
@@ -668,6 +627,14 @@
 
                 // first time instant update of label.
                 blockObject.label = getBlockLabel(blockObject);
+
+                blockObject.interpolatableData = {
+                  $contentTypeName: blockObject.content.contentTypeName,
+                  $settings: blockObject.settingsData || {},
+                  $layout: blockObject.layout || {},
+                  $index: 1,
+                  ...blockObject.data
+                };
 
                 // Add blockObject to our isolated scope to enable watching its values:
                 this.isolatedScope.blockObjects["_" + blockObject.key] = blockObject;
