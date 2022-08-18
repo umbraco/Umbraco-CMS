@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Core.Media.EmbedProviders;
 /// <summary>
 ///     Embed Provider for SlideShare for professional online content including presentations, infographics, documents, and videos.
 /// </summary>
-public class Slideshare : EmbedProviderBase
+public class Slideshare : OEmbedProviderBase
 {
     public Slideshare(IJsonSerializer jsonSerializer)
         : base(jsonSerializer)
