@@ -58,6 +58,19 @@ angular.module("umbraco.install").controller("Umbraco.Install.UserController", f
 
       const pips = consentSlider.querySelectorAll('.noUi-value');
 
+      let activePip = [null, null];
+      consentSlider.noUiSlider.on('update', function (values,handle) {
+        if(activePip[handle]){
+          activePip[handle].classList.remove("noUi-value-active");
+        }
+        consentSlider.querySelectorAll('.noUi-value').forEach(pip => {
+          if (Number(values[handle]) === Number(pip.getAttribute('data-value'))) {
+            activePip[handle] = pip;
+          }
+        });
+        activePip[handle].classList.add("noUi-value-active");
+      });
+
       $(consentSlider).on('$destroy', function () {
         consentSlider.noUiSlider.off();
       });
