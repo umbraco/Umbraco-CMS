@@ -6,7 +6,7 @@
             ng-focus="block.focus">
         <span class="caret"></span>
         <umb-icon icon="{{block.content.icon}}" class="icon"></umb-icon>
-        <span class="name">{{block.label}}</span>
+        <span class="name" block-html-compile="block.label" block-html-scope="block"></span>
     </button>
     <div class="blockelement-inlineblock-editor__inner" ng-class="{'--singleGroup':block.content.variants[0].tabs.length === 1}" ng-if="block.active === true">
         <umb-element-editor-content model="block.content"></umb-element-editor-content>
