@@ -22,6 +22,15 @@
     <RuntimeHostConfigurationOption Include="System.Globalization.AppLocalIcu" Value="68.2.0.9" Condition="$(RuntimeIdentifier.StartsWith('linux')) or $(RuntimeIdentifier.StartsWith('win')) or ('$(RuntimeIdentifier)' == '' and !$([MSBuild]::IsOSPlatform('osx')))" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="appsettings.*.json">
+      <DependentUpon>appsettings.json</DependentUpon>
+    </Content>
+    <Content Update="appsettings-schema.*.json">
+      <DependentUpon>appsettings-schema.json</DependentUpon>
+    </Content>
+  </ItemGroup>
+
   <PropertyGroup>
     <!-- Razor files are needed for the backoffice to work correctly -->
     <CopyRazorGenerateFilesToPublishDirectory>true</CopyRazorGenerateFilesToPublishDirectory>
@@ -33,21 +42,24 @@
     <RazorCompileOnPublish>false</RazorCompileOnPublish>
   </PropertyGroup>
 
+
   <PropertyGroup>
     <JsonSchemaPath>$(ProjectDir)appsettings-schema.json</JsonSchemaPath>
-    <JsonSchemaProjectPath>$(ProjectDir)../JsonSchema/JsonSchema.csproj</JsonSchemaProjectPath>
+    <JsonSchemaCmsPath>$(ProjectDir)appsettings-schema.umbraco.json</JsonSchemaCmsPath>
+    <JsonSchemaProjectPath>$(ProjectDir)../JsonSchema/</JsonSchemaProjectPath>
   </PropertyGroup>
 
   <Target Name="CheckPreconditions" BeforeTargets="Build">
     <Message Text="-CheckPreconditions-" Importance="high" />
     <Message Text="JsonSchemaPath:  $(JsonSchemaPath)" Importance="high" />
-    <CallTarget Targets="JsonSchemaBuild" Condition="!Exists('$(JsonSchemaPath)') and '$(UmbracoBuild)' == ''" />
+    <Message Text="JsonSchemaCmsPath: $(JsonSchemaCmsPath)" Importance="high" />
+    <CallTarget Targets="JsonSchemaBuild" Condition="!(Exists('$(JsonSchemaPath)') AND Exists('$(JsonSchemaCmsPath)')) and '$(UmbracoBuild)' == ''" />
     <CallTarget Targets="AppsettingsBuild" Condition="!Exists('appsettings.json')" />
     <CallTarget Targets="AppsettingsDevBuild" Condition="!Exists('appsettings.Development.json')" />
   </Target>
 
   <Target Name="JsonSchemaBuild">
-    <Exec Command="dotnet run -c Release --project $(JsonSchemaProjectPath) -o &quot;$(ProjectDir)appsettings-schema.json&quot;" />
+    <Exec Command="dotnet run -c Release --project $(JsonSchemaProjectPath) --mainOutputFile &quot;$(ProjectDir)appsettings-schema.json&quot; --cmsOutputFile &quot;$(ProjectDir)appsettings-schema.umbraco.json&quot;" />
   </Target>
 
   <Target Name="AppsettingsBuild">
