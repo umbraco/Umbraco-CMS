@@ -6,6 +6,7 @@ using System.Net.Mime;
 using System.Text;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -19,6 +20,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.BackOffice.Filters;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
@@ -47,7 +49,9 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly ILocalizedTextService _localizedTextService;
         private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
         private readonly IConfigurationEditorJsonSerializer _serializer;
+        private readonly IDataTypeUsageService _dataTypeUsageService;
 
+        [Obsolete("Use constructor that takes IDataTypeUsageService, scheduled for removal in V12")]
         public DataTypeController(
             PropertyEditorCollection propertyEditors,
             IDataTypeService dataTypeService,
@@ -60,7 +64,37 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             ILocalizedTextService localizedTextService,
             IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
             IConfigurationEditorJsonSerializer serializer)
+        : this(
+            propertyEditors,
+            dataTypeService,
+            contentSettings,
+            umbracoMapper,
+            propertyEditorCollection,
+            contentTypeService,
+            mediaTypeService,
+            memberTypeService,
+            localizedTextService,
+            backOfficeSecurityAccessor,
+            serializer,
+            StaticServiceProvider.Instance.GetRequiredService<IDataTypeUsageService>())
          {
+         }
+
+        [ActivatorUtilitiesConstructor]
+        public DataTypeController(
+            PropertyEditorCollection propertyEditors,
+            IDataTypeService dataTypeService,
+            IOptionsSnapshot<ContentSettings> contentSettings,
+            IUmbracoMapper umbracoMapper,
+            PropertyEditorCollection propertyEditorCollection,
+            IContentTypeService contentTypeService,
+            IMediaTypeService mediaTypeService,
+            IMemberTypeService memberTypeService,
+            ILocalizedTextService localizedTextService,
+            IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+            IConfigurationEditorJsonSerializer serializer,
+            IDataTypeUsageService dataTypeUsageService)
+        {
             _propertyEditors = propertyEditors ?? throw new ArgumentNullException(nameof(propertyEditors));
             _dataTypeService = dataTypeService ?? throw new ArgumentNullException(nameof(dataTypeService));
             _contentSettings = contentSettings.Value ?? throw new ArgumentNullException(nameof(contentSettings));
@@ -72,7 +106,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _localizedTextService = localizedTextService ?? throw new ArgumentNullException(nameof(localizedTextService));
             _backOfficeSecurityAccessor = backOfficeSecurityAccessor ?? throw new ArgumentNullException(nameof(backOfficeSecurityAccessor));
             _serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
-         }
+            _dataTypeUsageService = dataTypeUsageService ?? throw new ArgumentNullException(nameof(dataTypeUsageService));
+        }
 
         /// <summary>
         /// Gets data type by name
@@ -383,6 +418,13 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
 
             return result;
+        }
+
+        [HttpGet]
+        public ActionResult<DataTypeHasValuesDisplay> HasValues(int id)
+        {
+            bool hasValue = _dataTypeUsageService.HasSavedValues(id);
+            return new DataTypeHasValuesDisplay(id, hasValue);
         }
 
         /// <summary>

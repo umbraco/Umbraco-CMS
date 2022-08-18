@@ -1,14 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Data.Common;
 using System.IO;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
-using Microsoft.Extensions.Logging.Console;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using Serilog;
@@ -22,29 +19,29 @@ using Umbraco.Cms.Tests.Integration.Implementations;
 namespace Umbraco.Cms.Tests.Integration.Testing;
 
 /// <summary>
-/// Base class for all UmbracoIntegrationTests
+///     Base class for all UmbracoIntegrationTests
 /// </summary>
 [SingleThreaded]
 [NonParallelizable]
 public abstract class UmbracoIntegrationTestBase
 {
-    private static readonly object s_dbLocker = new ();
+    private static readonly object s_dbLocker = new();
     private static ITestDatabase s_dbInstance;
     private static TestDbMeta s_fixtureDbMeta;
     private static int s_testCount = 1;
+    private readonly List<Action> _fixtureTeardown = new();
+    private readonly Queue<Action> _testTeardown = new();
 
     private bool _firstTestInFixture = true;
-    private readonly Queue<Action> _testTeardown = new ();
-    private readonly List<Action> _fixtureTeardown = new ();
 
-    protected Dictionary<string, string> InMemoryConfiguration { get; } = new ();
+    protected Dictionary<string, string> InMemoryConfiguration { get; } = new();
 
     protected IConfiguration Configuration { get; set; }
 
     protected UmbracoTestAttribute TestOptions =>
         TestOptionAttributeBase.GetTestOptions<UmbracoTestAttribute>();
 
-    protected TestHelper TestHelper { get; } = new ();
+    protected TestHelper TestHelper { get; } = new();
 
     private void AddOnTestTearDown(Action tearDown) => _testTeardown.Enqueue(tearDown);
 
@@ -61,7 +58,7 @@ public abstract class UmbracoIntegrationTestBase
     [OneTimeTearDown]
     public void FixtureTearDown()
     {
-        foreach (Action a in _fixtureTeardown)
+        foreach (var a in _fixtureTeardown)
         {
             a();
         }
@@ -72,7 +69,7 @@ public abstract class UmbracoIntegrationTestBase
     {
         _firstTestInFixture = false;
 
-        while (_testTeardown.TryDequeue(out Action a))
+        while (_testTeardown.TryDequeue(out var a))
         {
             a();
         }
@@ -120,11 +117,11 @@ public abstract class UmbracoIntegrationTestBase
 
     protected void UseTestDatabase(IServiceProvider serviceProvider)
     {
-        IRuntimeState state = serviceProvider.GetRequiredService<IRuntimeState>();
-        TestUmbracoDatabaseFactoryProvider testDatabaseFactoryProvider = serviceProvider.GetRequiredService<TestUmbracoDatabaseFactoryProvider>();
-        IUmbracoDatabaseFactory databaseFactory = serviceProvider.GetRequiredService<IUmbracoDatabaseFactory>();
-        ILoggerFactory loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
-        IOptionsMonitor<ConnectionStrings> connectionStrings = serviceProvider.GetRequiredService<IOptionsMonitor<ConnectionStrings>>();
+        var state = serviceProvider.GetRequiredService<IRuntimeState>();
+        var testDatabaseFactoryProvider = serviceProvider.GetRequiredService<TestUmbracoDatabaseFactoryProvider>();
+        var databaseFactory = serviceProvider.GetRequiredService<IUmbracoDatabaseFactory>();
+        var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
+        var connectionStrings = serviceProvider.GetRequiredService<IOptionsMonitor<ConnectionStrings>>();
 
         // This will create a db, install the schema and ensure the app is configured to run
         SetupTestDatabase(testDatabaseFactoryProvider, connectionStrings, databaseFactory, loggerFactory, state);
@@ -146,87 +143,86 @@ public abstract class UmbracoIntegrationTestBase
     }
 
     private void SetupTestDatabase(
-            TestUmbracoDatabaseFactoryProvider testUmbracoDatabaseFactoryProvider,
-            IOptionsMonitor<ConnectionStrings> connectionStrings,
-            IUmbracoDatabaseFactory databaseFactory,
-            ILoggerFactory loggerFactory,
-            IRuntimeState runtimeState)
+        TestUmbracoDatabaseFactoryProvider testUmbracoDatabaseFactoryProvider,
+        IOptionsMonitor<ConnectionStrings> connectionStrings,
+        IUmbracoDatabaseFactory databaseFactory,
+        ILoggerFactory loggerFactory,
+        IRuntimeState runtimeState)
+    {
+        if (TestOptions.Database == UmbracoTestOptions.Database.None)
         {
-            if (TestOptions.Database == UmbracoTestOptions.Database.None)
-            {
-                return;
-            }
-
-            ITestDatabase db = GetOrCreateDatabase(loggerFactory, testUmbracoDatabaseFactoryProvider);
-
-            switch (TestOptions.Database)
-            {
-                case UmbracoTestOptions.Database.NewSchemaPerTest:
-
-                    // New DB + Schema
-                    TestDbMeta newSchemaDbMeta = db.AttachSchema();
-
-                    // Add teardown callback
-                    AddOnTestTearDown(() => db.Detach(newSchemaDbMeta));
-
-                    ConfigureTestDatabaseFactory(newSchemaDbMeta, databaseFactory, runtimeState, connectionStrings);
-
-                    Assert.AreEqual(RuntimeLevel.Run, runtimeState.Level);
-
-                    break;
-                case UmbracoTestOptions.Database.NewEmptyPerTest:
-                    TestDbMeta newEmptyDbMeta = db.AttachEmpty();
-
-                    // Add teardown callback
-                    AddOnTestTearDown(() => db.Detach(newEmptyDbMeta));
-
-                    ConfigureTestDatabaseFactory(newEmptyDbMeta, databaseFactory, runtimeState, connectionStrings);
-
-                    Assert.AreEqual(RuntimeLevel.Install, runtimeState.Level);
-
-                    break;
-                case UmbracoTestOptions.Database.NewSchemaPerFixture:
-                    // Only attach schema once per fixture
-                    // Doing it more than once will block the process since the old db hasn't been detached
-                    // and it would be the same as NewSchemaPerTest even if it didn't block
-                    if (_firstTestInFixture)
-                    {
-                        // New DB + Schema
-                        TestDbMeta newSchemaFixtureDbMeta = db.AttachSchema();
-                        s_fixtureDbMeta = newSchemaFixtureDbMeta;
-
-                        // Add teardown callback
-                        AddOnFixtureTearDown(() => db.Detach(newSchemaFixtureDbMeta));
-                    }
-
-                    ConfigureTestDatabaseFactory(s_fixtureDbMeta, databaseFactory, runtimeState, connectionStrings);
-
-                    break;
-                case UmbracoTestOptions.Database.NewEmptyPerFixture:
-                    // Only attach schema once per fixture
-                    // Doing it more than once will block the process since the old db hasn't been detached
-                    // and it would be the same as NewSchemaPerTest even if it didn't block
-                    if (_firstTestInFixture)
-                    {
-                        // New DB + Schema
-                        TestDbMeta newEmptyFixtureDbMeta = db.AttachEmpty();
-                        s_fixtureDbMeta = newEmptyFixtureDbMeta;
-
-                        // Add teardown callback
-                        AddOnFixtureTearDown(() => db.Detach(newEmptyFixtureDbMeta));
-                    }
-
-                    ConfigureTestDatabaseFactory(s_fixtureDbMeta, databaseFactory, runtimeState, connectionStrings);
-
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(TestOptions), TestOptions, null);
-            }
+            return;
         }
 
+        var db = GetOrCreateDatabase(loggerFactory, testUmbracoDatabaseFactoryProvider);
 
-    private ITestDatabase GetOrCreateDatabase(ILoggerFactory loggerFactory,
-        TestUmbracoDatabaseFactoryProvider dbFactory)
+        switch (TestOptions.Database)
+        {
+            case UmbracoTestOptions.Database.NewSchemaPerTest:
+
+                // New DB + Schema
+                var newSchemaDbMeta = db.AttachSchema();
+
+                // Add teardown callback
+                AddOnTestTearDown(() => db.Detach(newSchemaDbMeta));
+
+                ConfigureTestDatabaseFactory(newSchemaDbMeta, databaseFactory, runtimeState, connectionStrings);
+
+                Assert.AreEqual(RuntimeLevel.Run, runtimeState.Level);
+
+                break;
+            case UmbracoTestOptions.Database.NewEmptyPerTest:
+                var newEmptyDbMeta = db.AttachEmpty();
+
+                // Add teardown callback
+                AddOnTestTearDown(() => db.Detach(newEmptyDbMeta));
+
+                ConfigureTestDatabaseFactory(newEmptyDbMeta, databaseFactory, runtimeState, connectionStrings);
+
+                Assert.AreEqual(RuntimeLevel.Install, runtimeState.Level);
+
+                break;
+            case UmbracoTestOptions.Database.NewSchemaPerFixture:
+                // Only attach schema once per fixture
+                // Doing it more than once will block the process since the old db hasn't been detached
+                // and it would be the same as NewSchemaPerTest even if it didn't block
+                if (_firstTestInFixture)
+                {
+                    // New DB + Schema
+                    var newSchemaFixtureDbMeta = db.AttachSchema();
+                    s_fixtureDbMeta = newSchemaFixtureDbMeta;
+
+                    // Add teardown callback
+                    AddOnFixtureTearDown(() => db.Detach(newSchemaFixtureDbMeta));
+                }
+
+                ConfigureTestDatabaseFactory(s_fixtureDbMeta, databaseFactory, runtimeState, connectionStrings);
+
+                break;
+            case UmbracoTestOptions.Database.NewEmptyPerFixture:
+                // Only attach schema once per fixture
+                // Doing it more than once will block the process since the old db hasn't been detached
+                // and it would be the same as NewSchemaPerTest even if it didn't block
+                if (_firstTestInFixture)
+                {
+                    // New DB + Schema
+                    var newEmptyFixtureDbMeta = db.AttachEmpty();
+                    s_fixtureDbMeta = newEmptyFixtureDbMeta;
+
+                    // Add teardown callback
+                    AddOnFixtureTearDown(() => db.Detach(newEmptyFixtureDbMeta));
+                }
+
+                ConfigureTestDatabaseFactory(s_fixtureDbMeta, databaseFactory, runtimeState, connectionStrings);
+
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(TestOptions), TestOptions, null);
+        }
+    }
+
+
+    private ITestDatabase GetOrCreateDatabase(ILoggerFactory loggerFactory, TestUmbracoDatabaseFactoryProvider dbFactory)
     {
         lock (s_dbLocker)
         {
@@ -238,11 +234,13 @@ public abstract class UmbracoIntegrationTestBase
             var settings = new TestDatabaseSettings
             {
                 FilesPath = Path.Combine(TestHelper.WorkingDirectory, "databases"),
-                DatabaseType = Configuration.GetValue<TestDatabaseSettings.TestDatabaseType>("Tests:Database:DatabaseType"),
+                DatabaseType =
+                    Configuration.GetValue<TestDatabaseSettings.TestDatabaseType>("Tests:Database:DatabaseType"),
                 PrepareThreadCount = Configuration.GetValue<int>("Tests:Database:PrepareThreadCount"),
                 EmptyDatabasesCount = Configuration.GetValue<int>("Tests:Database:EmptyDatabasesCount"),
                 SchemaDatabaseCount = Configuration.GetValue<int>("Tests:Database:SchemaDatabaseCount"),
-                SQLServerMasterConnectionString = Configuration.GetValue<string>("Tests:Database:SQLServerMasterConnectionString"),
+                SQLServerMasterConnectionString =
+                    Configuration.GetValue<string>("Tests:Database:SQLServerMasterConnectionString")
             };
 
             Directory.CreateDirectory(settings.FilesPath);

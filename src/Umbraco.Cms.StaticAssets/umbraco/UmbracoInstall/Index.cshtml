@@ -11,6 +11,7 @@
 
     <title>Install Umbraco</title>
     <link rel="stylesheet" href="assets/css/installer.min.css" />
+    <link rel="stylesheet" href="lib/nouislider/nouislider.min.css" />
 </head>
 
 <body ng-class="{loading:installer.loading}" ng-controller="Umbraco.InstallerController" id="umbracoInstallPageBody">
@@ -25,12 +26,12 @@
 
     <div id="overlay" ng-cloak ng-animate="'fade'" ng-show="installer.done"></div>
 
-    <div id="installer" class="absolute-center clearfix"
+    <div id="installer"
          ng-cloak
          ng-animate="'fade'"
          ng-show="installer.configuring">
 
-        <div ng-if="installer.current" ng-switch on="installer.current.view">
+        <div id="contentwrapper" ng-if="installer.current" ng-switch on="installer.current.view">
             <div ng-switch-when="ysod">
                 <h1>A server error occurred</h1>
                 <p>This is most likely due to an error during application startup</p>

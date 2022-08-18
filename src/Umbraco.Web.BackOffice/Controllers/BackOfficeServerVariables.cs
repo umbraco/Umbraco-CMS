@@ -1,10 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.Serialization;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
@@ -26,9 +24,9 @@ using Umbraco.Cms.Web.BackOffice.Routing;
 using Umbraco.Cms.Web.BackOffice.Security;
 using Umbraco.Cms.Web.BackOffice.Trees;
 using Umbraco.Cms.Web.Common.Attributes;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Cms.Web.Common.Models;
 using Umbraco.Extensions;
-using Language = Umbraco.Cms.Core.Models.ContentEditing.Language;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
@@ -40,21 +38,24 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly LinkGenerator _linkGenerator;
         private readonly IRuntimeState _runtimeState;
         private readonly UmbracoFeatures _features;
-        private  GlobalSettings _globalSettings;
+        private GlobalSettings _globalSettings;
         private readonly IUmbracoVersion _umbracoVersion;
-        private  ContentSettings _contentSettings;
+        private ContentSettings _contentSettings;
         private readonly TreeCollection _treeCollection;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IHostingEnvironment _hostingEnvironment;
-        private  RuntimeSettings _runtimeSettings;
-        private  SecuritySettings _securitySettings;
+        private RuntimeSettings _runtimeSettings;
+        private SecuritySettings _securitySettings;
         private readonly IRuntimeMinifier _runtimeMinifier;
         private readonly IBackOfficeExternalLoginProviders _externalLogins;
         private readonly IImageUrlGenerator _imageUrlGenerator;
         private readonly PreviewRoutes _previewRoutes;
         private readonly IEmailSender _emailSender;
         private MemberPasswordConfigurationSettings _memberPasswordConfigurationSettings;
+        private DataTypesSettings _dataTypesSettings;
+        private readonly ITempDataDictionaryFactory _tempDataDictionaryFactory;
 
+        [Obsolete("Use constructor that takes IOptionsMontior<DataTypeSettings>, scheduled for removal in V12")]
         public BackOfficeServerVariables(
             LinkGenerator linkGenerator,
             IRuntimeState runtimeState,
@@ -73,6 +74,91 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             PreviewRoutes previewRoutes,
             IEmailSender emailSender,
             IOptionsMonitor<MemberPasswordConfigurationSettings> memberPasswordConfigurationSettings)
+        : this(
+            linkGenerator,
+            runtimeState,
+            features,
+            globalSettings,
+            umbracoVersion,
+            contentSettings,
+            httpContextAccessor,
+            treeCollection,
+            hostingEnvironment,
+            runtimeSettings,
+            securitySettings,
+            runtimeMinifier,
+            externalLogins,
+            imageUrlGenerator,
+            previewRoutes,
+            emailSender,
+            memberPasswordConfigurationSettings,
+            StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<DataTypesSettings>>())
+        {
+        }
+
+        [Obsolete("Use constructor that takes ITempDataDictionaryFactory, scheduled for removal in V12")]
+        public BackOfficeServerVariables(
+            LinkGenerator linkGenerator,
+            IRuntimeState runtimeState,
+            UmbracoFeatures features,
+            IOptionsMonitor<GlobalSettings> globalSettings,
+            IUmbracoVersion umbracoVersion,
+            IOptionsMonitor<ContentSettings> contentSettings,
+            IHttpContextAccessor httpContextAccessor,
+            TreeCollection treeCollection,
+            IHostingEnvironment hostingEnvironment,
+            IOptionsMonitor<RuntimeSettings> runtimeSettings,
+            IOptionsMonitor<SecuritySettings> securitySettings,
+            IRuntimeMinifier runtimeMinifier,
+            IBackOfficeExternalLoginProviders externalLogins,
+            IImageUrlGenerator imageUrlGenerator,
+            PreviewRoutes previewRoutes,
+            IEmailSender emailSender,
+            IOptionsMonitor<MemberPasswordConfigurationSettings> memberPasswordConfigurationSettings,
+            IOptionsMonitor<DataTypesSettings> dataTypesSettings)
+        : this(
+            linkGenerator,
+            runtimeState,
+            features,
+            globalSettings,
+            umbracoVersion,
+            contentSettings,
+            httpContextAccessor,
+            treeCollection,
+            hostingEnvironment,
+            runtimeSettings,
+            securitySettings,
+            runtimeMinifier,
+            externalLogins,
+            imageUrlGenerator,
+            previewRoutes,
+            emailSender,
+            memberPasswordConfigurationSettings,
+            dataTypesSettings,
+            StaticServiceProvider.Instance.GetRequiredService<ITempDataDictionaryFactory>())
+        {
+        }
+
+        public BackOfficeServerVariables(
+            LinkGenerator linkGenerator,
+            IRuntimeState runtimeState,
+            UmbracoFeatures features,
+            IOptionsMonitor<GlobalSettings> globalSettings,
+            IUmbracoVersion umbracoVersion,
+            IOptionsMonitor<ContentSettings> contentSettings,
+            IHttpContextAccessor httpContextAccessor,
+            TreeCollection treeCollection,
+            IHostingEnvironment hostingEnvironment,
+            IOptionsMonitor<RuntimeSettings> runtimeSettings,
+            IOptionsMonitor<SecuritySettings> securitySettings,
+            IRuntimeMinifier runtimeMinifier,
+            IBackOfficeExternalLoginProviders externalLogins,
+            IImageUrlGenerator imageUrlGenerator,
+            PreviewRoutes previewRoutes,
+            IEmailSender emailSender,
+            IOptionsMonitor<MemberPasswordConfigurationSettings> memberPasswordConfigurationSettings,
+            IOptionsMonitor<DataTypesSettings> dataTypesSettings,
+            ITempDataDictionaryFactory tempDataDictionaryFactory)
         {
             _linkGenerator = linkGenerator;
             _runtimeState = runtimeState;
@@ -90,12 +176,15 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _imageUrlGenerator = imageUrlGenerator;
             _previewRoutes = previewRoutes;
             _emailSender = emailSender;
+            _tempDataDictionaryFactory = tempDataDictionaryFactory;
             _memberPasswordConfigurationSettings = memberPasswordConfigurationSettings.CurrentValue;
+            _dataTypesSettings = dataTypesSettings.CurrentValue;
 
             globalSettings.OnChange(x => _globalSettings = x);
             contentSettings.OnChange(x => _contentSettings = x);
             runtimeSettings.OnChange(x => _runtimeSettings = x);
             securitySettings.OnChange(x => _securitySettings = x);
+            dataTypesSettings.OnChange(x => _dataTypesSettings = x);
             memberPasswordConfigurationSettings.OnChange(x => _memberPasswordConfigurationSettings = x);
         }
 
@@ -105,17 +194,54 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <returns></returns>
         internal async Task<Dictionary<string, object>> BareMinimumServerVariablesAsync()
         {
+            // figure out if we are executing in context of a backoffice user
+            HttpContext? context = _httpContextAccessor.HttpContext;
+            var isBackofficeUser = false;
+            if (context != null)
+            {
+                // first look for an authorized user (this covers both logged in and invited users)
+                isBackofficeUser = (await context.AuthenticateBackOfficeAsync()).Succeeded;
+                if (isBackofficeUser == false)
+                {
+                    // here's where things get a little ugly:
+                    // when a backoffice user is about to reset their password, TempData[ViewDataExtensions.TokenPasswordResetCode]
+                    // contains a JSON object with the current user ID and a password reset code - see ValidatePasswordResetCodeModel
+                    ITempDataDictionary tempData = _tempDataDictionaryFactory.GetTempData(context);
+                    var passwordResetCode = tempData[ViewDataExtensions.TokenPasswordResetCode];
+                    isBackofficeUser = passwordResetCode is string passwordResetCodeString && passwordResetCodeString.InvariantContains("userId");
+                }
+            }
+
             //this is the filter for the keys that we'll keep based on the full version of the server vars
+            var umbracoSettings = new List<string> {
+                "allowPasswordReset",
+                "imageFileTypes",
+                "loginBackgroundImage",
+                "loginLogoImage",
+                "canSendRequiredEmail",
+                "usernameIsEmail",
+                "hideBackofficeLogo",
+                "disableDeleteWhenReferenced",
+                "disableUnpublishWhenReferenced"
+            };
+
+            // add a few extras for backoffice users (server vars we don't want floating around for anonymous users)
+            if (isBackofficeUser)
+            {
+                umbracoSettings.AddRange(new[] { "maxFileSize", "minimumPasswordLength", "minimumPasswordNonAlphaNum" });
+            }
+
             var keepOnlyKeys = new Dictionary<string, string[]>
             {
                 {"umbracoUrls", new[] {"authenticationApiBaseUrl", "serverVarsJs", "externalLoginsUrl", "currentUserApiBaseUrl", "previewHubUrl", "iconApiBaseUrl"}},
-                {"umbracoSettings", new[] {"allowPasswordReset", "imageFileTypes", "maxFileSize", "loginBackgroundImage", "loginLogoImage", "canSendRequiredEmail", "usernameIsEmail", "minimumPasswordLength", "minimumPasswordNonAlphaNum", "hideBackofficeLogo", "disableDeleteWhenReferenced", "disableUnpublishWhenReferenced"}},
+                {"umbracoSettings", umbracoSettings.ToArray()},
                 {"application", new[] {"applicationPath", "cacheBuster"}},
                 {"isDebuggingEnabled", new string[] { }},
                 {"features", new [] {"disabledFeatures"}}
             };
+
             //now do the filtering...
-            var defaults = await GetServerVariablesAsync();
+            Dictionary<string, object> defaults = await GetServerVariablesAsync();
             foreach (var key in defaults.Keys.ToArray())
             {
                 if (keepOnlyKeys.ContainsKey(key) == false)
@@ -155,7 +281,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <returns></returns>
         internal async Task<Dictionary<string, object>> GetServerVariablesAsync()
         {
-            var globalSettings = _globalSettings;
+            GlobalSettings globalSettings = _globalSettings;
             var backOfficeControllerName = ControllerExtensions.GetControllerName<BackOfficeController>();
             var defaultVals = new Dictionary<string, object>
             {
@@ -186,7 +312,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         },
                         {
                             "embedApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<RteEmbedController>(
-                                controller => controller.GetEmbed("", 0, 0))
+                                controller => controller.GetEmbed(string.Empty, 0, 0))
                         },
                         {
                             "userApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<UsersController>(
@@ -214,7 +340,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         },
                         {
                             "imagesApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<ImagesController>(
-                                controller => controller.GetBigThumbnail(""))
+                                controller => controller.GetBigThumbnail(string.Empty))
                         },
                         {
                             "sectionApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<SectionController>(
@@ -322,7 +448,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         },
                         {
                             "tagsDataBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<TagsDataController>(
-                                controller => controller.GetTags("", "", null))
+                                controller => controller.GetTags(string.Empty, string.Empty, null))
                         },
                         {
                             "examineMgmtBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<ExamineManagementController>(
@@ -338,7 +464,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         },
                         {
                             "codeFileApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<CodeFileController>(
-                                controller => controller.GetByPath("", ""))
+                                controller => controller.GetByPath(string.Empty, string.Empty))
                         },
                         {
                             "publishedStatusBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<PublishedStatusController>(
@@ -354,7 +480,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         },
                         {
                             "helpApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<HelpController>(
-                                controller => controller.GetContextHelpForPage("","",""))
+                                controller => controller.GetContextHelpForPage(string.Empty,string.Empty,string.Empty))
                         },
                         {
                             "backOfficeAssetsApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<BackOfficeAssetsController>(
@@ -399,6 +525,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                             "analyticsApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<AnalyticsController>(
                                 controller => controller.GetConsentLevel())
                         },
+                        {
+                          "propertyTypeApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<PropertyTypeController>(
+                              controller => controller.HasValues(string.Empty))
+                        },
                     }
                 },
                 {
@@ -437,7 +567,9 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         {"showAllowSegmentationForDocumentTypes", false},
                         {"minimumPasswordLength", _memberPasswordConfigurationSettings.RequiredLength},
                         {"minimumPasswordNonAlphaNum", _memberPasswordConfigurationSettings.GetMinNonAlphaNumericChars()},
-                        {"sanitizeTinyMce", _globalSettings.SanitizeTinyMce}
+                        {"sanitizeTinyMce", _globalSettings.SanitizeTinyMce},
+                        {"dataTypesCanBeChanged", _dataTypesSettings.CanBeChanged.ToString()},
+                        {"allowEditInvariantFromNonDefault", _securitySettings.AllowEditInvariantFromNonDefault},
                     }
                 },
                 {
@@ -510,19 +642,23 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             // do this instead
             // inheriting from TreeControllerBase and marked with TreeAttribute
 
-            foreach (var tree in _treeCollection)
+            foreach (Tree tree in _treeCollection)
             {
-                var treeType = tree.TreeControllerType;
+                Type treeType = tree.TreeControllerType;
 
                 // exclude anything marked with CoreTreeAttribute
-                var coreTree = treeType.GetCustomAttribute<CoreTreeAttribute>(false);
+                CoreTreeAttribute? coreTree = treeType.GetCustomAttribute<CoreTreeAttribute>(false);
                 if (coreTree != null)
+                {
                     continue;
+                }
 
                 // exclude anything not marked with PluginControllerAttribute
-                var pluginController = treeType.GetCustomAttribute<PluginControllerAttribute>(false);
+                PluginControllerAttribute? pluginController = treeType.GetCustomAttribute<PluginControllerAttribute>(false);
                 if (pluginController == null)
+                {
                     continue;
+                }
 
                 yield return new PluginTree { Alias = tree.TreeAlias, PackageFolder = pluginController.AreaName };
             }
@@ -546,7 +682,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 { "assemblyVersion", _umbracoVersion.AssemblyVersion?.ToString() }
             };
 
-
+            app.Add("runtimeMode", _runtimeSettings.Mode.ToString());
 
             //the value is the hash of the version, cdf version and the configured state
             app.Add("cacheBuster", $"{version}.{_runtimeState.Level}.{_runtimeMinifier.CacheBuster}".GenerateHash());

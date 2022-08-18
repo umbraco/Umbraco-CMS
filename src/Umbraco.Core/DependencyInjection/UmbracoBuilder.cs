@@ -35,6 +35,7 @@ using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Snippets;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Telemetry;
 using Umbraco.Cms.Core.Templates;
@@ -186,9 +187,6 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
             Services.AddSingleton<InstallStatusTracker>();
 
-            // by default, register a noop factory
-            Services.AddUnique<IPublishedModelFactory, NoopPublishedModelFactory>();
-
             Services.AddUnique<ICultureDictionaryFactory, DefaultCultureDictionaryFactory>();
             Services.AddSingleton(f => f.GetRequiredService<ICultureDictionaryFactory>().CreateDictionary());
 
@@ -321,6 +319,11 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
             // Register a noop IHtmlSanitizer to be replaced
             Services.AddUnique<IHtmlSanitizer, NoopHtmlSanitizer>();
+
+            Services.AddUnique<IPropertyTypeUsageService, PropertyTypeUsageService>();
+            Services.AddUnique<IDataTypeUsageService, DataTypeUsageService>();
+
+            Services.AddUnique<ICultureImpactFactory, CultureImpactFactory>();
         }
     }
 }

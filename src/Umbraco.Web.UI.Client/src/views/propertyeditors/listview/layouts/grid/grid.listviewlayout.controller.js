@@ -105,14 +105,17 @@
         }
 
         function selectContentItem(item, $event, $index) {
+            if ($scope.options.readonly) return;
             listViewHelper.selectHandler(item, $index, $scope.items, $scope.selection, $event);
         }
 
         function selectItem(item, $event, $index) {
+            if ($scope.options.readonly) return;
             listViewHelper.selectHandler(item, $index, vm.itemsWithoutFolders, $scope.selection, $event);
         }
 
         function selectFolder(folder, $event, $index) {
+            if ($scope.options.readonly) return;
             listViewHelper.selectHandler(folder, $index, $scope.folders, $scope.selection, $event);
         }
 

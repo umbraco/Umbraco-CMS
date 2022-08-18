@@ -1,7 +1,6 @@
-using System;
+namespace Umbraco.Cms.Core.Notifications;
 
-namespace Umbraco.Cms.Core.Notifications
-{
+
     /// <summary>
     /// Notification that occurs when Umbraco is shutting down (after all <see cref="IComponent" />s are terminated).
     /// </summary>
@@ -14,7 +13,6 @@ namespace Umbraco.Cms.Core.Notifications
         /// <param name="isRestarting">Indicates whether Umbraco is restarting.</param>
         public UmbracoApplicationStoppingNotification(bool isRestarting) => IsRestarting = isRestarting;
 
-        /// <inheritdoc />
-        public bool IsRestarting { get; }
-    }
+    /// <inheritdoc />
+    public bool IsRestarting { get; }
 }

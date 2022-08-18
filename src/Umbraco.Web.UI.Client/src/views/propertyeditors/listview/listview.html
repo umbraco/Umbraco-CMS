@@ -10,7 +10,7 @@
 
            <umb-editor-sub-header-content-left>
 
-               <umb-editor-sub-header-section ng-if="(listViewAllowedTypes && listViewAllowedTypes.length > 0 && (selection.length == 0)) && (currentNodePermissions == null || currentNodePermissions.canCreate)">
+               <umb-editor-sub-header-section ng-if="(listViewAllowedTypes && listViewAllowedTypes.length > 0 && (selection.length == 0)) && (currentNodePermissions == null || currentNodePermissions.canCreate) && options.allowCreate">
 
                     <!-- Renders when it's only possible to create one specific document type for, which no blueprint exists-->
                    <div class="btn-group" ng-show="createAllowedButtonSingle">
@@ -50,16 +50,15 @@
                            <span class="caret" aria-hidden="true"></span>
                        </button>
 
-                       <umb-dropdown ng-if="page.createDropdownOpen" on-close="page.createDropdownOpen = false">
+                       <umb-dropdown class="umb-actions" ng-if="page.createDropdownOpen" on-close="page.createDropdownOpen = false">
                            <umb-dropdown-item ng-repeat="contentType in listViewAllowedTypes track by contentType.key | orderBy:'name':false">
                                <button type="button" ng-click="createBlank(entityType,contentType.alias)">
                                    <umb-icon icon="{{::contentType.icon}}"></umb-icon>
-                                   {{::contentType.name}} <span ng-show="contentType.blueprints" style="text-transform: lowercase;">(<localize key="blueprints_blankBlueprint">blank</localize>)</span>
+                                   <span class="menu-label">{{::contentType.name}}</span> <span ng-show="contentType.blueprints" style="text-transform: lowercase;">(<localize key="blueprints_blankBlueprint">blank</localize>)</span>
                                </button>
-
                                <button type="button" ng-repeat="blueprint in contentType.blueprints track by blueprint.id | orderBy:'name':false" ng-click="createFromBlueprint(entityType, contentType.alias, blueprint.id)">
-                                   &nbsp;&nbsp;<umb-icon icon="{{::contentType.icon}}"></umb-icon>
-                                   {{::blueprint.name}}
+                                   <umb-icon icon="{{::contentType.icon}}"></umb-icon>
+                                   <span class="menu-label">{{::blueprint.name}}</span>
                                </button>
                            </umb-dropdown-item>
                        </umb-dropdown>

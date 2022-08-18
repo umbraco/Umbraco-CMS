@@ -17,7 +17,6 @@ label small, .guiDialogTiny {
 }
 
 label.control-label, .control-label {
-  padding: 0 10px 0 0 !important;
   font-weight: bold;
   color: @black;
   font-size: 14px;
@@ -478,16 +477,27 @@ textarea[class*="span"],
 // Disabled and read-only inputs
 input[disabled],
 select[disabled],
-textarea[disabled],
-input[readonly],
-select[readonly],
-textarea[readonly] {
+textarea[disabled] {
   cursor: not-allowed;
   background-color: @inputDisabledBackground;
 }
+
 // Explicitly reset the colors here
-input[type="radio"][disabled],
-input[type="checkbox"][disabled],
+input[type="radio"][readonly],
+input[type="checkbox"][readonly] {
+  background-color: transparent;
+}
+
+// READONLY STATE
+// --------------
+
+// Disabled and read-only inputs
+input[readonly],
+select[readonly],
+textarea[readonly] {
+  border-color: @inputReadonlyBorderColor;
+}
+// Explicitly reset the colors here
 input[type="radio"][readonly],
 input[type="checkbox"][readonly] {
   background-color: transparent;
@@ -759,7 +769,7 @@ input.search-query {
 
 // Margin to space out fieldsets
 .control-group {
-  margin-bottom: (@baseLineHeight / 2);
+  margin-bottom: (@baseLineHeight / 2) + 5px;
 }
 
 //modifier for control group

@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.DependencyInjection;
 namespace Umbraco.Cms.Persistence.SqlServer;
 
 /// <summary>
-/// Automatically adds SQL Server support to Umbraco when this project is referenced.
+///     Automatically adds SQL Server support to Umbraco when this project is referenced.
 /// </summary>
 public class SqlServerComposer : IComposer
 {

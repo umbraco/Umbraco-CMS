@@ -21,8 +21,12 @@ public class SqlServerAddRetryPolicyInterceptor : SqlServerConnectionInterceptor
             return conn;
         }
 
-        RetryPolicy? connectionRetryPolicy = RetryPolicyFactory.GetDefaultSqlConnectionRetryPolicyByConnectionString(_connectionStrings.CurrentValue.ConnectionString);
-        RetryPolicy? commandRetryPolicy = RetryPolicyFactory.GetDefaultSqlCommandRetryPolicyByConnectionString(_connectionStrings.CurrentValue.ConnectionString);
+        RetryPolicy? connectionRetryPolicy =
+            RetryPolicyFactory.GetDefaultSqlConnectionRetryPolicyByConnectionString(_connectionStrings.CurrentValue
+                .ConnectionString);
+        RetryPolicy? commandRetryPolicy =
+            RetryPolicyFactory.GetDefaultSqlCommandRetryPolicyByConnectionString(_connectionStrings.CurrentValue
+                .ConnectionString);
 
         if (connectionRetryPolicy == null && commandRetryPolicy == null)
         {

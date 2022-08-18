@@ -40,7 +40,7 @@
                     <button type="button" aria-label="Edit media" ng-if="allowEditMedia && !media.trashed" class="umb-sortable-thumbnails__action btn-reset" data-element="action-edit" ng-click="vm.editItem(media)">
                         <umb-icon icon="icon-edit" class="icon"></umb-icon>
                     </button>
-                    <button type="button" aria-label="Remove" class="umb-sortable-thumbnails__action -red btn-reset" data-element="action-remove" ng-click="vm.remove($index)">
+                    <button ng-if="allowRemoveMedia" type="button" aria-label="Remove" class="umb-sortable-thumbnails__action -red btn-reset" data-element="action-remove" ng-click="vm.remove($index)">
                         <umb-icon icon="icon-delete" class="icon"></umb-icon>
                     </button>
                 </div>

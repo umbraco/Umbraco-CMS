@@ -1,5 +1,4 @@
 using System.Reflection;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration;
@@ -17,13 +16,13 @@ public static partial class UmbracoBuilderExtensions
     private static IUmbracoBuilder AddUmbracoOptions<TOptions>(this IUmbracoBuilder builder, Action<OptionsBuilder<TOptions>>? configure = null)
         where TOptions : class
     {
-        var umbracoOptionsAttribute = typeof(TOptions).GetCustomAttribute<UmbracoOptionsAttribute>();
+        UmbracoOptionsAttribute? umbracoOptionsAttribute = typeof(TOptions).GetCustomAttribute<UmbracoOptionsAttribute>();
         if (umbracoOptionsAttribute is null)
         {
             throw new ArgumentException($"{typeof(TOptions)} do not have the UmbracoOptionsAttribute.");
         }
 
-        var optionsBuilder = builder.Services.AddOptions<TOptions>()
+        OptionsBuilder<TOptions>? optionsBuilder = builder.Services.AddOptions<TOptions>()
             .Bind(
                 builder.Config.GetSection(umbracoOptionsAttribute.ConfigurationKey),
                 o => o.BindNonPublicProperties = umbracoOptionsAttribute.BindNonPublicProperties)
@@ -83,9 +82,12 @@ public static partial class UmbracoBuilderExtensions
             .AddUmbracoOptions<LegacyPasswordMigrationSettings>()
             .AddUmbracoOptions<PackageMigrationSettings>()
             .AddUmbracoOptions<ContentDashboardSettings>()
-            .AddUmbracoOptions<HelpPageSettings>();
+            .AddUmbracoOptions<HelpPageSettings>()
+            .AddUmbracoOptions<DataTypesSettings>();
 
+        // Configure connection string and ensure it's updated when the configuration changes
         builder.Services.AddSingleton<IConfigureOptions<ConnectionStrings>, ConfigureConnectionStrings>();
+        builder.Services.AddSingleton<IOptionsChangeTokenSource<ConnectionStrings>, ConfigurationChangeTokenSource<ConnectionStrings>>();
 
         builder.Services.Configure<InstallDefaultDataSettings>(
             Constants.Configuration.NamedOptions.InstallDefaultData.Languages,
