@@ -159,6 +159,8 @@ For extra details about options and events take a look here: https://refreshless
             });
 
             setUpCallbacks();
+            setUpActivePipsHandling();
+            addPipClickHandler();
 
             // Refresh the scope
             $scope.$applyAsync();
@@ -319,7 +321,28 @@ For extra details about options and events take a look here: https://refreshless
                 });
             });
         }
-
+      function setUpActivePipsHandling() {
+        let activePip = [null, null];
+        sliderInstance.noUiSlider.on('update', function (values,handle) {
+          if(activePip[handle]){
+            activePip[handle].classList.remove("noUi-value-active");
+          }
+          sliderInstance.querySelectorAll('.noUi-value').forEach(pip => {
+            if (Number(values[handle]) === Number(pip.getAttribute('data-value'))) {
+              activePip[handle] = pip;
+            }
+          });
+          activePip[handle].classList.add("noUi-value-active");
+        });
+      }
+      function addPipClickHandler(){
+          sliderInstance.querySelectorAll('.noUi-value').forEach(function(pip){
+            pip.addEventListener('click', function () {
+              const value = pip.getAttribute('data-value');
+              sliderInstance.noUiSlider.set(value);
+            });
+          });
+      }
     }
 
     angular.module('umbraco.directives').component('umbRangeSlider', umbRangeSlider);

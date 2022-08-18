@@ -311,11 +311,18 @@
         width: 100%;
         margin-bottom: 30px;
         margin-right: 0;
+        min-width: 300px;
     }
 
     .umb-package-details__sidebar {
         flex: 1 1 auto;
         width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .umb-package-details__main-content {
+        min-width: 0px;
     }
 }
 
@@ -396,6 +403,7 @@
   padding: 20px 20px;
   border-radius: 5px;
   margin: 20px 0 10px 0;
+  word-wrap: break-word;
 }
 
 /* Install instructions */

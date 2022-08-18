@@ -2,7 +2,7 @@
 
     <li ng-if="!tree.root.containsGroups">
         <div class="umb-tree-root" data-element="tree-root" ng-class="getNodeCssClass(tree.root)" ng-if="hideheader !== 'true'" on-right-click="altSelect(tree.root, $event)">
-            <h5>
+            <h1>
                 <a ng-href="#/{{section}}" ng-click="select(tree.root, $event)" class="umb-tree-root-link umb-outline" data-element="tree-root-link">
                     <umb-icon icon="icon-check"
                               class="umb-tree-icon"
@@ -11,7 +11,7 @@
                     </umb-icon>
                     {{tree.name}}
                 </a>
-            </h5>
+            </h1>
 
             <umb-button-ellipsis element="tree-item-options"
                                  action="options(tree.root, $event)"

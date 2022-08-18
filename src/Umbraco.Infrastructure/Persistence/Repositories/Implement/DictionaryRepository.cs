@@ -70,12 +70,17 @@ internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>
                 });
         };
 
-        IEnumerable<IEnumerable<IDictionaryItem>> childItems = parentId.HasValue == false
-            ? new[] { GetRootDictionaryItems() }
-            : getItemsFromParents(new[] { parentId.Value });
+        if (!parentId.HasValue)
+        {
+            Sql<ISqlContext> sql = GetBaseQuery(false)
+                .Where<DictionaryDto>(x => x.PrimaryKey > 0)
+                .OrderBy<DictionaryDto>(x => x.UniqueId);
+            return Database
+                .FetchOneToMany<DictionaryDto>(x => x.LanguageTextDtos, sql)
+                .Select(ConvertFromDto);
+        }
 
-        return childItems.SelectRecursive(items => getItemsFromParents(items.Select(x => x.Key).ToArray()))
-            .SelectMany(items => items);
+        return getItemsFromParents(new[] { parentId.Value }).SelectRecursive(items => getItemsFromParents(items.Select(x => x.Key).ToArray())).SelectMany(items => items);
     }
 
     protected override IRepositoryCachePolicy<IDictionaryItem, int> CreateCachePolicy()

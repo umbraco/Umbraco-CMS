@@ -3,8 +3,10 @@ using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Core.Media.EmbedProviders;
 
-// TODO(V10) : change base class to OEmbedProviderBase
-public class Ted : EmbedProviderBase
+/// <summary>
+///     Embed Provider for Ted that posts talks online for free distribution.
+/// </summary>
+public class Ted : OEmbedProviderBase
 {
     public Ted(IJsonSerializer jsonSerializer)
         : base(jsonSerializer)
