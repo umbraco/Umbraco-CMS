@@ -49,10 +49,10 @@
         <div class="umb-block-grid__block--validation-border"></div>
         <div class="umb-block-grid__block--validation-badge">!</div>
 
-        <div class="umb-block-grid__block--actions">
-
-            <div class="__parent-context" ng-if="vm.parentBlock">
+        <div class="umb-block-grid__block--context">
+            <div class="__context-bar">
                 <button 
+                    ng-if="vm.parentBlock"
                     type="button"
                     class="btn-reset umb-outline action --parent"
                     localize="title"
@@ -60,7 +60,7 @@
                     data-ng-click="vm.parentBlock.showBlockUI()"
                     ng-class="{ '--error': false && vm.valFormManager.isShowingValidation() }"
                 >
-                    <umb-icon icon="icon-navigation-up" class="icon"></umb-icon>
+                    <!--<umb-icon icon="icon-navigation-up" class="icon"></umb-icon>-->
                     <span>
                         {{vm.parentBlock.label}}
                     </span>
@@ -69,13 +69,18 @@
                     </span>
                     <div class="__error-badge">!</div>
                 </button>
-            </div>
-
-            <div class="__local-context">
+                <div class="__divider" ng-if="vm.parentBlock">/</div>
                 <div class="__label">
                     <!--<umb-icon icon="{{vm.layoutEntry.$block.content.icon}}" class="icon"></umb-icon>-->
                     <span>{{vm.layoutEntry.$block.label}}</span>
                 </div>
+            </div>
+        </div>
+
+        <div class="umb-block-grid__block--actions">
+
+            <div class="__local-context">
+                
 
                 <button type="button" class="btn-reset umb-outline action --settings" localize="title" title="actions_editContent"
                         ng-click="vm.blockEditorApi.editBlock(vm.layoutEntry.$block, false, vm.index, vm.blockRowForm);"

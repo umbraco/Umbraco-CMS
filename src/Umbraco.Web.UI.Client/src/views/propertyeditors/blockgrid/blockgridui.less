@@ -113,6 +113,14 @@ ng-form.ng-invalid-val-server-match-content > .umb-block-grid__block:not(.--acti
         opacity: 0;
         transition: opacity 120ms;
     }
+    > .umb-block-grid__block--context {
+        opacity: 0;
+        transition: opacity 120ms;
+    }
+    > umb-block-grid-block > umb-block-grid-entries > .umb-block-grid__block--context {
+        opacity: 0;
+        transition: opacity 120ms;
+    }
 
     &:hover,
     &:focus,
@@ -143,11 +151,17 @@ ng-form.ng-invalid-val-server-match-content > .umb-block-grid__block:not(.--acti
         > .umb-block-grid__scale-handler {
             display: none;
         }
+        > .umb-block-grid__block--context {
+            display: none;
+        }
         > .umb-block-grid__block--actions {
             display: none;
         }
     }
     &.--has-content-in-areas.--block-ui-visible {
+        > .umb-block-grid__block--context {
+            pointer-events: all;
+        }
         .umb-block-grid__block-area-container {
             --umb-block-grid--block-ui-display: none;
             .umb-block-grid__block {
@@ -165,6 +179,9 @@ ng-form.ng-invalid-val-server-match-content > .umb-block-grid__block:not(.--acti
     &:not(.--has-content-in-areas):focus-within,
     &.--active {
 
+        > .umb-block-grid__block--context {
+            opacity: 1;
+        }
         > .umb-block-grid__block--actions {
             opacity: 1;
         }
@@ -221,6 +238,9 @@ ng-form.ng-invalid-val-server-match-content > .umb-block-grid__block:not(.--acti
 ng-form.ng-invalid-val-server-match-settings > .umb-block-grid__block > .umb-block-grid__block--actions {
     opacity: 1;
 }
+ng-form.ng-invalid-val-server-match-settings > .umb-block-grid__block > .umb-block-grid__block--context {
+    opacity: 1;
+}
 
 .umb-block-grid__block--view {
     --umb-block-grid--show-area-ui: 0;
@@ -234,6 +254,49 @@ ng-form.ng-invalid-val-server-match-settings > .umb-block-grid__block > .umb-blo
     --umb-block-grid--show-area-ui: 1;
 }
 
+.umb-block-grid__block--context {
+    position: absolute;
+    top: -20px;
+    left: 0;
+    right: 0;
+    pointer-events: none;
+    font-size: 12px;
+    z-index: 2;
+    display: var(--umb-block-grid--block-ui-display, flex);
+    justify-content: end;
+
+    .__context-bar {
+        padding: 0 9px;
+        padding-top: 1px;
+        background-color: #3544B1;
+        color: white;
+        border-top-left-radius: 3px;
+        border-top-right-radius: 3px;
+        pointer-events: all;
+        display: inline-block;
+        .action {
+            color: white;
+            font-size: 12px;
+        }
+        .__divider {
+            display: inline-block;
+            margin: 0 6px;
+        }
+        .__label {
+            display: inline-flex;
+            align-items: center;
+            padding: 0;
+            font-weight: 700;
+            user-select: none;
+    
+            .icon {
+                font-size: 22px;
+                margin-right: 5px;
+                display: inline-block;
+            }
+        }
+    }
+}
 
 .umb-block-grid__block--actions {
     position: absolute;
@@ -251,8 +314,7 @@ ng-form.ng-invalid-val-server-match-settings > .umb-block-grid__block > .umb-blo
     align-items: end;
     z-index:2;
     
-
-    .__parent-context, .__local-context {
+    .__local-context {
         font-size: 0;
         background-color: rgba(255, 255, 255, .96);
         border-radius: 16px;
@@ -260,56 +322,33 @@ ng-form.ng-invalid-val-server-match-settings > .umb-block-grid__block > .umb-blo
         align-items: center;
     }
 
-    .__parent-context {
-        padding: 0 2px;
-        .action {
-            &.--parent {
-                .icon {
-                    height: 100%;
-                }
-                .__label-text {
-
-                }
-                font-size: 11px;
-                padding: 0 5px;
-            }
-        }
-    }
-
     .__local-context {
         padding: 0 5px;
         margin-top:2px;
     }
 
-    .__label {
-        display: inline-flex;
-        align-items: center;
-        padding: 5px;
-        font-size: 15px;
-        user-select: none;
-
-        .icon {
-            font-size: 22px;
-            margin-right: 5px;
-            display: inline-block;
-        }
-    }
-
     .action {
-        position: relative;
-        display: inline-block;
         color: @ui-action-discreet-type;
         font-size: 18px;
         padding: 5px;
         &:hover {
             color: @ui-action-discreet-type-hover;
         }
+    }
+
+}
+.umb-block-grid__block--context, .umb-block-grid__block--actions {
+    .action {
+        position: relative;
+        display: inline-block;
+ 
         &.--error {
             color: @errorBackground;
             .show-validation-type-warning & {
                 color: @warningBackground;
             }
         }
+
         > .__error-badge {
             position: absolute;
             top: -2px;
