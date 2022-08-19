@@ -781,8 +781,8 @@
     <key alias="databaseUpgradeDone"><![CDATA[Vaše databáze byla povýšená na konečnou verzi %0%.<br />Stiskněte <strong>Následující</strong> pro pokračování. ]]></key>
     <key alias="databaseUpToDate"><![CDATA[Vaše současná databáze je aktuální!. Klikněte na <strong>následující</strong>, pro pokračování konfiguračního průvodce]]></key>
     <key alias="defaultUserChangePass"><![CDATA[<strong>Heslo výchozího uživatele musí být změněno!</strong>]]></key>
-    <key alias="defaultUserDisabled"><![CDATA[<strong>Výchozí uživatel byl deaktivován, nebo nemá přístup k umbracu!</strong></p><p>Netřeba nic dalšího dělat. Klikněte na <b>Následující</b> pro pokračování.]]></key>
-    <key alias="defaultUserPassChanged"><![CDATA[<strong>Heslo výchozího uživatele bylo úspěšně změněno od doby instalace!</strong></p><p>Netřeba nic dalšího dělat. Klikněte na <b>Následující</b> pro pokračování.]]></key>
+    <key alias="defaultUserDisabled"><![CDATA[<strong>Výchozí uživatel byl deaktivován, nebo nemá přístup k umbracu!</strong></p><p>Netřeba nic dalšího dělat. Klikněte na <strong>Následující</strong> pro pokračování.]]></key>
+    <key alias="defaultUserPassChanged"><![CDATA[<strong>Heslo výchozího uživatele bylo úspěšně změněno od doby instalace!</strong></p><p>Netřeba nic dalšího dělat. Klikněte na <strong>Následující</strong> pro pokračování.]]></key>
     <key alias="defaultUserPasswordChanged">Heslo je změněno!</key>
     <key alias="greatStart">Mějte skvělý start, sledujte naše uváděcí videa</key>
     <key alias="None">Není nainstalováno.</key>
@@ -2132,7 +2132,7 @@
     <key alias="performanceProfiling">Profilování výkonu</key>
     <key alias="performanceProfilingDescription">
       <![CDATA[
-                <p> Umbraco aktuálně běží v režimu ladění. To znamená, že můžete použít vestavěný profiler výkonu k vyhodnocení výkonu při vykreslování stránek. </p> <p> Pokud chcete aktivovat profiler pro konkrétní vykreslení stránky, jednoduše při požadavku na stránku jednoduše přidejte <b>umbDebug=true</b> do URL.</p> <p> Pokud chcete, aby byl profiler ve výchozím nastavení aktivován pro všechna vykreslení stránky, můžete použít přepínač níže. Ve vašem prohlížeči nastaví soubor cookie, který automaticky aktivuje profiler. Jinými slovy, profiler bude ve výchozím nastavení aktivní pouze ve <i> vašem </i> prohlížeči, ne v ostatních. </p>
+                <p> Umbraco aktuálně běží v režimu ladění. To znamená, že můžete použít vestavěný profiler výkonu k vyhodnocení výkonu při vykreslování stránek. </p> <p> Pokud chcete aktivovat profiler pro konkrétní vykreslení stránky, jednoduše při požadavku na stránku jednoduše přidejte <strong>umbDebug=true</strong> do URL.</p> <p> Pokud chcete, aby byl profiler ve výchozím nastavení aktivován pro všechna vykreslení stránky, můžete použít přepínač níže. Ve vašem prohlížeči nastaví soubor cookie, který automaticky aktivuje profiler. Jinými slovy, profiler bude ve výchozím nastavení aktivní pouze ve <em> vašem </em> prohlížeči, ne v ostatních. </p>
         ]]>
     </key>
     <key alias="activateByDefault">Ve výchozím stavu aktivovat profiler</key>

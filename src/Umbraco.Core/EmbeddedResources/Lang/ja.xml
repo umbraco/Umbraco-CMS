@@ -481,7 +481,7 @@
       を押して続行してください。]]></key>
     <key alias="databaseUpToDate"><![CDATA[データベースを更新しました！ <strong>次へ</strong> をクリックして設定ウィザードを進めてください。]]></key>
     <key alias="defaultUserChangePass"><![CDATA[<strong>デフォルトユーザーのパスワードを変更する必要があります！</strong>]]></key>
-    <key alias="defaultUserDisabled"><![CDATA[<strong>デフォルトユーザーは無効化されているかUmbracoにアクセスできない状態になっています！</strong></p><p>これ以上のアクションは必要ありません。<b>次へ</b>をクリックして続行してください。]]></key>
+    <key alias="defaultUserDisabled"><![CDATA[<strong>デフォルトユーザーは無効化されているかUmbracoにアクセスできない状態になっています！</strong></p><p>これ以上のアクションは必要ありません。<strong>次へ</strong>をクリックして続行してください。]]></key>
     <key alias="defaultUserPassChanged"><![CDATA[<strong>インストール後にデフォルトユーザーのパスワードが変更されています！</strong></p><p>これ以上のアクションは必要ありません。<strong>次へ</strong>をクリックして続行してください。]]></key>
     <key alias="defaultUserPasswordChanged">パスワードは変更されました！</key>
     <key alias="greatStart">始めに、ビデオによる解説を見ましょう</key>
