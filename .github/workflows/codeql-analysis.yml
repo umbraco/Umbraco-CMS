@@ -27,11 +27,9 @@ jobs:
         config-file: ./.github/config/codeql-config.yml
 
     - name: Setup dotnet
-      uses: actions/setup-dotnet@v2
+      uses: actions/setup-dotnet@v1
       with:
         dotnet-version: '6.0.x'
-
-    - run: dotnet clean
 
     - name: dotnet build
       run: dotnet build umbraco.sln -c SkipTests
