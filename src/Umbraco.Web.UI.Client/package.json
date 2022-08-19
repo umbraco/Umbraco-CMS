@@ -76,7 +76,7 @@
 		"eslint-plugin-lit": "^1.6.1",
 		"eslint-plugin-lit-a11y": "^2.2.2",
 		"eslint-plugin-storybook": "^0.6.4",
-		"lit-html": "^2.3.0",
+		"lit-html": "^2.3.1",
 		"msw": "^0.44.2",
 		"msw-storybook-addon": "^1.6.3",
 		"playwright-msw": "^1.0.0",
