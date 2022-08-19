@@ -838,7 +838,7 @@
     <key alias="step3">Krok 3/5: Ověřování oprávnění k souborům</key>
     <key alias="step4">Krok 4/5: Kontrola zabezpečení umbraca</key>
     <key alias="step5">Krok 5/5: Umbraco je připraveno a můžete začít</key>
-    <key alias="thankYou">Děkujeme, že jeste si vybrali umbraco</key>
+    <key alias="thankYou">Děkujeme, že jeste si vybrali Umbraco</key>
     <key alias="theEndBrowseSite"><![CDATA[<h3>Prohlédněte si svůj nový web</h3>
     Nainstalovali jste Runway, tak proč se nepodívat, jak Váš nový web vypadá.]]></key>
     <key alias="theEndFurtherHelp"><![CDATA[<h3>Další pomoc a informace</h3>
@@ -1379,7 +1379,7 @@
     <key alias="insertMacroDesc">
       Makro je konfigurovatelná součást, která je skvělá pro opakovaně použitelné části návrhu, kde potřebujete předat parametry, jako jsou galerie, formuláře a seznamy.
     </key>
-    <key alias="insertPageField">Vložit pole stránky umbraco</key>
+    <key alias="insertPageField">Vložit pole stránky Umbraco</key>
     <key alias="insertPageFieldDesc">Zobrazuje hodnotu pojmenovaného pole z aktuální stránky s možnostmi upravit hodnotu nebo alternativní hodnoty.</key>
     <key alias="insertPartialView">Částečná šablona</key>
     <key alias="insertPartialViewDesc">
