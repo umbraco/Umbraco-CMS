@@ -32,8 +32,15 @@ jobs:
         languages: ${{ matrix.language }}
         config-file: ./.github/config/codeql-config.yml
 
-    - name: Autobuild
-      uses: github/codeql-action/autobuild@v2
+    - name: Setup dotnet
+      uses: actions/setup-dotnet@v2
+      if: ${{ matrix.language }} == 'csharp'
+      with:
+        dotnet-version: '6.0.x'
+
+    - name: dotnet build
+      if: ${{ matrix.language }} == 'csharp'
+      run: dotnet build umbraco.sln -c SkipTests
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v2
