@@ -31,6 +31,8 @@ jobs:
       with:
         dotnet-version: '6.0.x'
 
+    - run: dotnet clean
+
     - name: dotnet build
       run: dotnet build umbraco.sln -c SkipTests
 
