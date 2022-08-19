@@ -7,7 +7,7 @@ var ncNodeNameCache = {
   keys: {}
 };
 
-angular.module("umbraco.filters").filter("ncNodeName", function (editorState, entityResource) {
+angular.module("umbraco.filters").filter("ncNodeName", function (editorState, entityResource, udiParser) {
 
   function formatLabel(firstNodeName, totalNodes) {
     return totalNodes <= 1
@@ -55,17 +55,17 @@ angular.module("umbraco.filters").filter("ncNodeName", function (editorState, en
 
     serviceInvoked = true;
 
-    var type = lookupId.indexOf("umb://media/") === 0
-      ? "Media"
-      : lookupId.indexOf("umb://member/") === 0
-        ? "Member"
-        : "Document";
-    entityResource.getById(lookupId, type)
-      .then(
-        function (ent) {
-          ncNodeNameCache.keys[lookupId] = ent.name;
-        }
-      );
+    var udi = udiParser.parse(lookupId);
+
+    if (udi) {
+      entityResource.getById(udi.value, udi.entityType).then(function (ent) {
+        ncNodeNameCache.keys[lookupId] = ent.name;
+      }).catch(function () {
+        ncNodeNameCache.keys[lookupId] = "Error: Could not load";
+      });
+    } else {
+      ncNodeNameCache.keys[lookupId] = "Error: Not a UDI";
+    }
 
     // Return the current value for now
     return formatLabel(ncNodeNameCache.keys[lookupId], ids.length);
