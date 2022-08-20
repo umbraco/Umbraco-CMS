@@ -133,18 +133,20 @@ app.run(['$rootScope', '$route', '$location', '$cookies', 'urlHelper', 'appState
         //global state query strings without force re-loading views.
         //We can then detect if it's a location change that should force a route or not programatically.
         $rootScope.$on('$routeUpdate', function (event, next) {
+            let pathParamsKeys = Object.keys(next.pathParams);
+            let nextParams = Object.fromEntries(Object.entries(next.params).filter(([key, value]) => pathParamsKeys.includes(key)));
             if (!currentRouteParams || !currentRouteParams.params) {
                 //if there is no current route then always route which is done with reload
                 $route.reload();
             } else {
-                var toRetain = navigationService.retainQueryStrings(currentRouteParams.params, next.params);
+                var toRetain = navigationService.retainQueryStrings(currentRouteParams.params, nextParams);
                 //if toRetain is not null it means that there are missing query strings and we need to update the current params.
                 if (toRetain) {
                     $route.updateParams(toRetain);
                 }
                 //check if the location being changed is only due to global/state query strings which means the location change
                 //isn't actually going to cause a route change.
-                if (navigationService.isRouteChangingNavigation(currentRouteParams.pathParams, next.pathParams)) {
+                if (navigationService.isRouteChangingNavigation(currentRouteParams.pathParams, nextParams)) {
                     //The location change will cause a route change, continue the route if the query strings haven't been updated.
                     $route.reload();
                 } else {
@@ -152,7 +154,7 @@ app.run(['$rootScope', '$route', '$location', '$cookies', 'urlHelper', 'appState
                     if (toRetain) {
                         currentRouteParams.params = toRetain;
                     } else {
-                        currentRouteParams.params = Utilities.copy(next.params);
+                        currentRouteParams.params = Utilities.copy(nextParams);
                     }
                     //always clear the 'sr' query string (soft redirect) if it exists
                     if (currentRouteParams.params.sr) {
@@ -170,3 +172,4 @@ app.run(['$rootScope', '$route', '$location', '$cookies', 'urlHelper', 'appState
         appState.setGlobalState("touchDevice", touchDevice);
 
     }]);
+    
