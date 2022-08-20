@@ -30,7 +30,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
 
         public string RequestIdentityPath { get; set; } = string.Empty;
 
-        public bool RequestIdentityRequiresRedirectUri { get; set; } = false;
+        public bool AuthorizationRequestsRequireRedirectUri { get; set; } = false;
 
         public string RequestTokenPath { get; set; } = string.Empty;
 
@@ -45,6 +45,8 @@ namespace Umbraco.Cms.Core.Configuration.Models
         public string AccessTokenResponseKey { get; set; } = "access_token";
 
         public string RefreshTokenResponseKey { get; set; } = "refresh_token";
+
+        public string ExpiresInResponseKey { get; set; } = "expires_in";
 
         public string? SampleRequest { get; set; }
     }

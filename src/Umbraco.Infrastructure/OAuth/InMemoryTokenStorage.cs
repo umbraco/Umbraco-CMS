@@ -22,8 +22,12 @@ namespace Umbraco.Cms.Infrastructure.OAuth
             {
                 _tokens[serviceAlias] = token;
             }
-
-            _tokens.Add(serviceAlias, token);
+            else
+            {
+                _tokens.Add(serviceAlias, token);
+            }
         }
+
+        public void DeleteToken(string serviceAlias) => _tokens.Remove(serviceAlias);
     }
 }

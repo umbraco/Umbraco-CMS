@@ -5,5 +5,7 @@ namespace Umbraco.Cms.Core.OAuth
         Token? GetToken(string serviceAlias);
 
         void SaveToken(string serviceAlias, Token token);
+
+        void DeleteToken(string serviceAlias);
     }
 }

@@ -61,10 +61,9 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             url.Append(serviceDetail.RequestIdentityPath);
             url.Append("?client_id=").Append(serviceDetail.ClientId);
 
-            if (serviceDetail.RequestIdentityRequiresRedirectUri)
+            if (serviceDetail.AuthorizationRequestsRequireRedirectUri)
             {
-                var redirectUri = HttpContext.GetAuthorizedServiceRedirectUri();
-                url.Append("&redirect_uri=").Append(redirectUri);
+                url.Append("&redirect_uri=").Append(HttpContext.GetAuthorizedServiceRedirectUri());
             }
 
             url.Append("&scope=").Append(serviceDetail.Scopes);

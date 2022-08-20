@@ -1,5 +1,6 @@
 using System.Net.Http.Headers;
 using System.Text;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.Cache;
@@ -16,6 +17,7 @@ namespace Umbraco.Cms.Infrastructure.OAuth
         private readonly IJsonSerializer _jsonSerializer;
         private readonly AppCaches _appCaches;
         private readonly ITokenStorage _tokenStorage;
+        private readonly ILogger<AuthorizedServiceCaller> _logger;
         private readonly AuthorizedServiceSettings _authorizedServiceSettings;
 
         public AuthorizedServiceCaller(
@@ -23,12 +25,14 @@ namespace Umbraco.Cms.Infrastructure.OAuth
             IJsonSerializer jsonSerializer,
             AppCaches appCaches,
             ITokenStorage tokenStorage,
+            ILogger<AuthorizedServiceCaller> logger,
             IOptionsMonitor<AuthorizedServiceSettings> authorizedServiceSettings)
         {
             _httpClientFactory = httpClientFactory;
             _jsonSerializer = jsonSerializer;
             _appCaches = appCaches;
             _tokenStorage = tokenStorage;
+            _logger = logger;
             _authorizedServiceSettings = authorizedServiceSettings.CurrentValue;
         }
 
@@ -41,25 +45,9 @@ namespace Umbraco.Cms.Infrastructure.OAuth
             HttpResponseMessage response = await SendAuthorizationRequest(serviceDetail, parameters);
             if (response.IsSuccessStatusCode)
             {
-                var responseContent = await response.Content.ReadAsStringAsync();
-                var tokenResponse = JObject.Parse(responseContent);
+                Token token = await CreateTokenFromResponse(serviceAlias, serviceDetail, response);
 
-                // Create token from response.
-                var accessToken = tokenResponse[serviceDetail.AccessTokenResponseKey]?.ToString();
-                if (string.IsNullOrEmpty(accessToken))
-                {
-                    throw new InvalidOperationException($"Could not retrieve access token using key '{serviceDetail.AccessTokenResponseKey}' from the token response from '{serviceAlias}'");
-                }
-
-                var refreshToken = tokenResponse[serviceDetail.RefreshTokenResponseKey]?.ToString();
-                var token = new Token(accessToken, refreshToken);
-
-                // Add the access token details to the cache.
-                var cacheKey = GetTokenCacheKey(serviceAlias);
-                _appCaches.RuntimeCache.InsertCacheItem(cacheKey, () => token);
-
-                // Save the refresh token into the storage.
-                _tokenStorage.SaveToken(serviceAlias, token);
+                StoreToken(serviceAlias, token);
 
                 return AuthorizationResult.AsSuccess();
             }
@@ -68,6 +56,40 @@ namespace Umbraco.Cms.Infrastructure.OAuth
                 var responseContent = await response.Content.ReadAsStringAsync();
                 throw new InvalidOperationException($"Error response from token request to '{serviceAlias}'. Response: {responseContent}");
             }
+        }
+
+        private void StoreToken(string serviceAlias, Token token)
+        {
+            // Add the access token details to the cache.
+            var cacheKey = GetTokenCacheKey(serviceAlias);
+            _appCaches.RuntimeCache.InsertCacheItem(cacheKey, () => token);
+
+            // Save the refresh token into the storage.
+            _tokenStorage.SaveToken(serviceAlias, token);
+        }
+
+        private static async Task<Token> CreateTokenFromResponse(string serviceAlias, ServiceDetail serviceDetail, HttpResponseMessage response)
+        {
+            var responseContent = await response.Content.ReadAsStringAsync();
+            var tokenResponse = JObject.Parse(responseContent);
+
+            var accessToken = tokenResponse[serviceDetail.AccessTokenResponseKey]?.ToString();
+            if (string.IsNullOrEmpty(accessToken))
+            {
+                throw new InvalidOperationException($"Could not retrieve access token using key '{serviceDetail.AccessTokenResponseKey}' from the token response from '{serviceAlias}'");
+            }
+
+            var refreshToken = tokenResponse[serviceDetail.RefreshTokenResponseKey]?.ToString();
+
+            DateTime? expiresOn = null;
+            var expiresInValue = tokenResponse[serviceDetail.ExpiresInResponseKey]?.ToString();
+            if (!string.IsNullOrEmpty(expiresInValue))
+            {
+                var expiresInSeconds = int.Parse(expiresInValue);
+                expiresOn = DateTime.Now.AddSeconds(expiresInSeconds);
+            }
+
+            return new Token(accessToken, refreshToken, expiresOn);
         }
 
         private Dictionary<string, string> BuildAuthorizationParameters(ServiceDetail serviceDetail, string authorizationCode, string redirectUri) =>
@@ -148,6 +170,8 @@ namespace Umbraco.Cms.Infrastructure.OAuth
                 throw new InvalidOperationException($"Cannot request service '{serviceAlias}' as access has not yet been authorized.");
             }
 
+            token = await EnsureAccessToken(serviceAlias, token);
+
             HttpClient httpClient = _httpClientFactory.CreateClient();
 
             HttpRequestMessage requestMessage = CreateRequestMessage(serviceDetail, path, httpMethod, token, requestContent);
@@ -167,6 +191,60 @@ namespace Umbraco.Cms.Infrastructure.OAuth
 
             throw new InvalidOperationException($"Error response from '{serviceAlias}'");
         }
+
+        private async Task<Token> EnsureAccessToken(string serviceAlias, Token token)
+        {
+            if (token.HasOrIsAboutToExpire)
+            {
+                if (string.IsNullOrEmpty(token.RefreshToken))
+                {
+                    ClearAccessToken(serviceAlias);
+                    throw new InvalidOperationException($"Cannot request service '{serviceAlias}' as the access token has expired and no refresh token is available to use. The expired token has been deleted.");
+                }
+
+                Token? refreshedToken = await RefreshAccessToken(serviceAlias, token.RefreshToken);
+
+                if (refreshedToken == null)
+                {
+                    throw new InvalidOperationException($"Cannot request service '{serviceAlias}' as the access token has expired and the refresh token could not be used to obtain a new access token.");
+                }
+
+                return refreshedToken;
+            }
+
+            return token;
+        }
+
+        private async Task<Token?> RefreshAccessToken(string serviceAlias, string refreshToken)
+        {
+            ServiceDetail serviceDetail = GetServiceDetail(serviceAlias);
+
+            Dictionary<string, string> parameters = BuildRefreshTokenParameters(serviceDetail, refreshToken);
+
+            HttpResponseMessage response = await SendAuthorizationRequest(serviceDetail, parameters);
+            if (response.IsSuccessStatusCode)
+            {
+                Token token = await CreateTokenFromResponse(serviceAlias, serviceDetail, response);
+
+                StoreToken(serviceAlias, token);
+
+                return token;
+            }
+            else
+            {
+                var responseContent = await response.Content.ReadAsStringAsync();
+                throw new InvalidOperationException($"Error response from refresh token request to '{serviceAlias}'. Response: {responseContent}");
+            }
+        }
+
+        private Dictionary<string, string> BuildRefreshTokenParameters(ServiceDetail serviceDetail, string refreshToken) =>
+            new Dictionary<string, string>
+                {
+                    { "grant_type", "refresh_token" },
+                    { "client_id", serviceDetail.ClientId },
+                    { "client_secret", serviceDetail.ClientSecret },
+                    { "refresh_token", refreshToken }
+                };
 
         private HttpRequestMessage CreateRequestMessage<TRequest>(ServiceDetail serviceDetail, string path, HttpMethod httpMethod, Token token, TRequest? requestContent)
             where TRequest : class
@@ -202,6 +280,12 @@ namespace Umbraco.Cms.Infrastructure.OAuth
             }
 
             return null;
+        }
+
+        private void ClearAccessToken(string serviceAlias)
+        {
+            _appCaches.RuntimeCache.ClearByKey(GetTokenCacheKey(serviceAlias));
+            _tokenStorage.DeleteToken(serviceAlias);
         }
 
         private static string GetTokenCacheKey(string serviceAlias) => $"Umbraco_AuthorizedServiceToken_{serviceAlias}";
