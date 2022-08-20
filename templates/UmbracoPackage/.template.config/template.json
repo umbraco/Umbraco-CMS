@@ -41,7 +41,7 @@
       "description": "The version of Umbraco.Cms to add as PackageReference.",
       "type": "parameter",
       "datatype": "string",
-      "defaultValue": "10.0.0-rc1",
+      "defaultValue": "10.0.0",
       "replaces": "UMBRACO_VERSION_FROM_TEMPLATE"
     },
     "Namespace": {
@@ -50,33 +50,6 @@
       "valueTransform": "safe_namespace",
       "fileRename": "UmbracoPackage",
       "replaces": "UmbracoPackage"
-    },
-    "MsBuildName": {
-      "type": "generated",
-      "generator": "regex",
-      "dataType": "string",
-      "parameters": {
-        "source": "name",
-        "steps": [
-          {
-            "regex": "\\s",
-            "replacement": ""
-          },
-          {
-            "regex": "\\.",
-            "replacement": ""
-          },
-          {
-            "regex": "-",
-            "replacement": ""
-          },
-          {
-            "regex": "^[^a-zA-Z_]+",
-            "replacement": ""
-          }
-        ]
-      },
-      "replaces": "UmbracoPackageMsBuild"
     }
   },
   "primaryOutputs": [

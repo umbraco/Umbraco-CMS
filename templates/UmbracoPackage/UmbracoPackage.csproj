@@ -1,28 +1,28 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <ContentTargetFolders>.</ContentTargetFolders>
-    <Product>UmbracoPackage</Product>
-    <PackageId>UmbracoPackage</PackageId>
-    <Title>UmbracoPackage</Title>
-    <Description>...</Description>
-    <PackageTags>umbraco plugin package</PackageTags>
-    <RootNamespace Condition="'$(name)' != '$(name{-VALUE-FORMS-}safe_namespace)'">UmbracoPackage</RootNamespace>
-  </PropertyGroup>
+<Project Sdk="Microsoft.NET.Sdk.Razor">
 
-  <ItemGroup>
-    <PackageReference Include="Umbraco.Cms.Web.Website" Version="UMBRACO_VERSION_FROM_TEMPLATE" />
-    <PackageReference Include="Umbraco.Cms.Web.BackOffice" Version="UMBRACO_VERSION_FROM_TEMPLATE" />
-  </ItemGroup>
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <StaticWebAssetBasePath>App_Plugins/UmbracoPackage</StaticWebAssetBasePath>
+        <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+        <Product>UmbracoPackage</Product>
+        <PackageId>UmbracoPackage</PackageId>
+        <Title>UmbracoPackage</Title>
+        <Description>...</Description>
+        <PackageTags>umbraco plugin package</PackageTags>
+        <RootNamespace Condition="'$(name)' != '$(name{-VALUE-FORMS-}safe_namespace)'">UmbracoPackage</RootNamespace>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <Content Include="App_Plugins\UmbracoPackage\**">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
-    </Content>
-    <None Include="build\**">
-      <Pack>true</Pack>
-      <PackagePath>buildTransitive</PackagePath>
-    </None>
-  </ItemGroup>
+
+    <ItemGroup>
+        <SupportedPlatform Include="browser" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.8" />
+        <PackageReference Include="Umbraco.Cms.Web.Website" Version="UMBRACO_VERSION_FROM_TEMPLATE" />
+        <PackageReference Include="Umbraco.Cms.Web.BackOffice" Version="UMBRACO_VERSION_FROM_TEMPLATE" />
+    </ItemGroup>
+
 </Project>
