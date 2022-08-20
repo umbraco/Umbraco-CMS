@@ -1,0 +1,17 @@
+<div ng-controller="umbracoproject1DashboardController as vm">
+
+    <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
+
+    <div ng-if="!vm.loading">
+        <umb-box>
+            <umb-box-header title-key="UmbracoProject1_dashboardHeader"
+                            description-key="UmbracoProject1_dashboardDesc">
+            </umb-box-header>
+            <umb-box-content>
+                <h4>Server Time : {{vm.info | date:'medium'}}</h4>
+            </umb-box-content>
+
+        </umb-box>
+    </div>
+
+</div>

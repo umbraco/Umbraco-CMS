@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<language alias="en" intName="English (UK)" localName="English (UK)" lcid="" culture="en-GB">
+	<area alias="UmbracoPackage.1">
+		<key alias="contentAppHeader">UmbracoPackage.1 super content app</key>
+		<key alias="contentAppDesc">My super awesome content app</key>
+	</area>
+</language>

@@ -1,0 +1,17 @@
+{
+    "javascript": [
+    "~/App_Plugins/UmbracoPackage.1/ContentApp/contentapp.controller.js"
+  ],
+  "contentApps": [
+    {
+        "name": "My App", // required - the name that appears under the icon
+        "alias": "umbracopackage._1-contentapp", // required - unique alias for your app
+        "weight": 0, // optional, default is 0, use values between -99 and +99 to appear between the existing Content (-100) and Info (100) apps
+        "icon": "icon-cupcake", // required - the icon to use
+        "view": "~/App_Plugins/UmbracoPackage.1/ContentApp/contentapp.html", // required - the location of the view file
+		"show": [
+			"+content/*" // show app for all content types
+		]
+    }
+  ]
+}

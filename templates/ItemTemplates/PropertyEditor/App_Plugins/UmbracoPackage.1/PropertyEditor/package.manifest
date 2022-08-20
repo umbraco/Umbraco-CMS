@@ -1,0 +1,21 @@
+﻿{
+  "javascript": [
+    "~/App_Plugins/UmbracoPackage.1/PropertyEditor/editor.controller.js"
+  ],
+  "propertyEditors": [
+    {
+      /*this must be a unique alias*/
+      "alias": "umbracopackage._1-editor",
+      /*the name*/
+      "name": "My editor",
+      /*the icon*/
+      "icon": "icon-code",
+      /*grouping for "Select editor" dialog*/
+      "group": "Rich Content",
+      /*the HTML file we will load for the editor*/
+      "editor": {
+        "view": "~/App_Plugins/UmbracoPackage.1/PropertyEditor/editor.html"
+      }
+    }
+  ]
+}

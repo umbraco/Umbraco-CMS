@@ -1,0 +1,22 @@
+{
+    "$schema": "http://json.schemastore.org/template",
+    "author": "UmbracoPackageTeam",
+    "classifications": [
+        "Web",
+        "Umbraco",
+        "ContentApp"
+    ],
+    "tags": {
+        "language": "JavaScript",
+        "type": "item"
+    },
+
+    "identity": "Umbraco.Templates.Items.ContentApp",
+    "groupIdentity": "Umbraco.Templates.Items.ContentApp",
+
+    "name": "Umbraco Content App",
+    "shortName": "umbraco-contentapp",
+    "description": "Files to add a content app to an Umbraco v10 project",
+    
+    "sourceName": "UmbracoPackage.1"
+}

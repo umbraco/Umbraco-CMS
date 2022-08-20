@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "UmbracoPackageTeam",
+  "classifications": [
+    "Web",
+    "Umbraco",
+    "PropertyEditor"
+  ],
+  "tags": {
+    "language": "JavaScript",
+    "type": "item"
+  },
+
+  "identity": "Umbraco.Templates.Items.PropertyEditor",
+  "groupIdentity": "Umbraco.Templates.Items.PropertyEditor",
+
+  "name": "Umbraco Property Editor Item",
+  "shortName": "umbraco-property-editor",
+  "description": "Umbraco property editor files",
+
+  "sourceName": "UmbracoPackage.1"
+}

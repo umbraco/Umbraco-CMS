@@ -1,0 +1,15 @@
+{
+  "javascript": [
+    "~/App_Plugins/UmbracoPackage.1/dashboard/dashboard.service.js",
+    "~/App_Plugins/UmbracoPackage.1/dashboard/dashboard.controller.js"
+  ],
+  "dashboards": [
+    {
+      "alias": "umbracopackage._1-dashboard",
+      "sections": [
+        "content"
+      ],
+      "view": "~/App_Plugins/UmbracoPackage.1/dashboard/dashboard.html"
+    }
+  ]
+}
