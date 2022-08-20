@@ -785,7 +785,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
             member.SecurityStamp = identityUser.SecurityStamp;
         }
 
-        if (identityUser.IsPropertyDirty(nameof(MemberIdentityUser.Roles)))
+        if (identityUser.IsPropertyDirty(nameof(MemberIdentityUser.Roles)) && member.HasIdentity)
         {
             anythingChanged = true;
 
