@@ -160,7 +160,8 @@ ng-form.ng-invalid-val-server-match-content > .umb-block-grid__block:not(.--acti
     }
     &.--has-content-in-areas.--block-ui-visible {
         > .umb-block-grid__block--context {
-            pointer-events: all;
+            /* take full width to prevent interaction with elements behind.*/
+            left: 0;
         }
         .umb-block-grid__block-area-container {
             --umb-block-grid--block-ui-display: none;
@@ -257,9 +258,10 @@ ng-form.ng-invalid-val-server-match-settings > .umb-block-grid__block > .umb-blo
 .umb-block-grid__block--context {
     position: absolute;
     top: -20px;
-    left: 0;
     right: 0;
+    /*padding-bottom: 10px;*/
     pointer-events: none;
+    pointer-events: all;
     font-size: 12px;
     z-index: 2;
     display: var(--umb-block-grid--block-ui-display, flex);
@@ -280,7 +282,7 @@ ng-form.ng-invalid-val-server-match-settings > .umb-block-grid__block > .umb-blo
         }
         .__divider {
             display: inline-block;
-            margin: 0 6px;
+            margin: 0 3px;
         }
         .__label {
             display: inline-flex;
@@ -448,6 +450,10 @@ umb-block-grid-block {
 }
 .umb-block-grid__block--inline-create-button.__above {
     left: 0;
+}
+.umb-block-grid__block--inline-create-button.__above:hover + * > .umb-block-grid__block {
+    transform: translateY(20px);
+    transition: transform 120ms;
 }
 .umb-block-grid__block--inline-create-button.__after {
     right: 0;

@@ -350,7 +350,7 @@
                 block.blockUiVisibility = true;
             };
             block.onMouseLeave = function () {
-                block.__timeout = $timeout(() => {block.blockUiVisibility = false}, 500);
+                block.__timeout = $timeout(() => {block.blockUiVisibility = false}, 200);
             };
             block.onMouseEnter = function () {
                 if (block.__timeout) {

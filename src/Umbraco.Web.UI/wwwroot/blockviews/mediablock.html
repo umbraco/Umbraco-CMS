@@ -4,6 +4,7 @@
         position: relative;
         border-radius: 3px;
         height: 100%;/* Add this to fill the cell fully */
+        min-height: 160px;
         box-sizing: border-box;
         //border: 1px solid #BBBABF;
     }
@@ -17,7 +18,8 @@
         align-items: center;
         justify-content: center;
         width: 100%;
-        min-height: 160px;
+        height: 100%;
+        min-height: 100%;
         cursor: pointer;
         color: black;
         background-color: white;
@@ -26,8 +28,7 @@
         user-select: none;
         border: none;
         transition: border-color 120ms, background-color 120ms;
-        max-height: 400px;
-
+        max-height: 80vh;
         overflow:hidden;
     }
     button:hover {
@@ -36,7 +37,7 @@
     }
     img {
         pointer-events: none;
-        object-fit: contain;
+        object-fit: cover;
         height: 100%;
         width: 100%;
         flex-grow: 0;
@@ -62,8 +63,8 @@
     }
 
     .file-name {
-        background-color: rgba(27, 38, 79, 0.8);
-        color: white;
+        background-color: rgba(255, 255, 255, 0.8);
+        color: black;
         padding: 3px 6px;
         position: absolute;
         bottom: 0;
