@@ -51,6 +51,7 @@ export type UmbManifestPropertyActionMeta = {
 // Dashboard:
 export type UmbManifestDashboardMeta = {
 	sections: Array<string>;
+	label?: string;
 	pathname: string; // TODO: how to we want to support pretty urls?
 	weight: number;
 };
