@@ -68,6 +68,7 @@ stages:
             displayName: Use .Net 7.x
             inputs:
               version: 7.x
+              includePreviewVersions: true
           - task: DotNetCoreCLI@2
             displayName: Run dotnet build
             inputs:
