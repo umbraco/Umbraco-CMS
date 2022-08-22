@@ -64,6 +64,10 @@ stages:
               gulpFile: src/Umbraco.Web.UI.Client/gulpfile.js
               targets: coreBuild
               workingDirectory: src/Umbraco.Web.UI.Client
+          - task: UseDotNet@2
+            displayName: Use .Net 7.x
+            inputs:
+              version: 7.x
           - task: DotNetCoreCLI@2
             displayName: Run dotnet build
             inputs:
