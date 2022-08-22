@@ -797,7 +797,7 @@
     <key alias="permissionsMaybeAnIssue"><![CDATA[<strong>Vaše nastavení oprávnění může být problém!</strong>
       <br/><br />
       Můžete provozovat Umbraco bez potíží, ale nebudete smět vytvářet složky a instalovat balíčky, které jsou doporučené pro plné využívání všech možností umbraca.]]></key>
-    <key alias="permissionsNotReady"><![CDATA[<strong>Vaše nastavení oprívnění není připraveno pro umbraco!</strong>
+    <key alias="permissionsNotReady"><![CDATA[<strong>Vaše nastavení oprívnění není připraveno pro Umbraco!</strong>
           <br /><br />
           Abyste mohli Umbraco provozovat, budete muset aktualizovat Vaše nastavení oprávnění.]]></key>
     <key alias="permissionsPerfect"><![CDATA[<strong>Vaše nastavení oprávnění je dokonalé!</strong><br /><br />
