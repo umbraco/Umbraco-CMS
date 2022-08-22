@@ -233,7 +233,6 @@ stages:
               artifact: build_output
               path: $(Build.SourcesDirectory)
           - task: UseDotNet@2
-            condition: and(succeeded(), eq(variables['Agent.OS'], 'Darwin')) # net6 already on the other images
             displayName: Use net7
             inputs:
               version: 7.x
@@ -271,7 +270,6 @@ stages:
               path: $(Build.SourcesDirectory)
           - task: UseDotNet@2
             displayName: Use net7
-            condition: and(succeeded(), eq(variables['Agent.OS'], 'Darwin')) # net6 already on the other images
             inputs:
               version: 7.x
               includePreviewVersions: true
