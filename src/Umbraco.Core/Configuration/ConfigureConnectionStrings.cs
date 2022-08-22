@@ -6,14 +6,14 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Core.Configuration;
 
 /// <summary>
-/// Configures the <see cref="ConnectionStrings" /> named option.
+///     Configures the <see cref="ConnectionStrings" /> named option.
 /// </summary>
 public class ConfigureConnectionStrings : IConfigureNamedOptions<ConnectionStrings>
 {
     private readonly IConfiguration _configuration;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="ConfigureConnectionStrings" /> class.
+    ///     Initializes a new instance of the <see cref="ConfigureConnectionStrings" /> class.
     /// </summary>
     /// <param name="configuration">The configuration.</param>
     public ConfigureConnectionStrings(IConfiguration configuration)
@@ -43,6 +43,7 @@ public class ConfigureConnectionStrings : IConfigureNamedOptions<ConnectionStrin
 
         options.Name = name;
         options.ConnectionString = _configuration.GetUmbracoConnectionString(name, out string? providerName);
-        options.ProviderName = providerName ?? ConnectionStrings.DefaultProviderName;
+        options.ProviderName = providerName ??
+                               ConnectionStrings.DefaultProviderName;
     }
 }

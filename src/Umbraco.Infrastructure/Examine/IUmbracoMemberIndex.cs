@@ -1,9 +1,5 @@
-using Examine;
+namespace Umbraco.Cms.Infrastructure.Examine;
 
-namespace Umbraco.Cms.Infrastructure.Examine
+public interface IUmbracoMemberIndex : IUmbracoIndex
 {
-    public interface IUmbracoMemberIndex : IUmbracoIndex
-    {
-
-    }
 }

@@ -10,8 +10,8 @@
 
 namespace Umbraco.Cms.Infrastructure.WebAssets {
     using System;
-    
-    
+
+
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -23,15 +23,15 @@ namespace Umbraco.Cms.Infrastructure.WebAssets {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
-        
+
         private static global::System.Resources.ResourceManager resourceMan;
-        
+
         private static global::System.Globalization.CultureInfo resourceCulture;
-        
+
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
         internal Resources() {
         }
-        
+
         /// <summary>
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
@@ -45,7 +45,7 @@ namespace Umbraco.Cms.Infrastructure.WebAssets {
                 return resourceMan;
             }
         }
-        
+
         /// <summary>
         ///   Overrides the current thread's CurrentUICulture property for all
         ///   resource lookups using this strongly typed resource class.
@@ -59,10 +59,10 @@ namespace Umbraco.Cms.Infrastructure.WebAssets {
                 resourceCulture = value;
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to [
-        ///    
+        ///
         ///    &apos;lib/jquery/jquery.min.js&apos;,
         ///    &apos;lib/jquery-ui/jquery-ui.min.js&apos;,
         ///    &apos;lib/jquery-ui-touch-punch/jquery.ui.touch-punch.min.js&apos;,
@@ -86,7 +86,7 @@ namespace Umbraco.Cms.Infrastructure.WebAssets {
                 return ResourceManager.GetString("JsInitialize", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to LazyLoad.js(&quot;##JsInitialize##&quot;, function () {
         ///    //we need to set the legacy UmbClientMgr path
@@ -107,7 +107,7 @@ namespace Umbraco.Cms.Infrastructure.WebAssets {
                 return ResourceManager.GetString("Main", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to [
         ///    &apos;lib/jquery/jquery.min.js&apos;,
@@ -130,24 +130,24 @@ namespace Umbraco.Cms.Infrastructure.WebAssets {
                 return ResourceManager.GetString("PreviewInitialize", resourceCulture);
             }
         }
-        
+
         /// <summary>
-        ///   Looks up a localized string similar to // TODO: This would be nicer as an angular module so it can be injected into stuff... that&apos;d be heaps nicer, but
-        ///// how to do that when this is not a regular JS file, it is a server side JS file and RequireJS seems to only want
-        ///// to force load JS files ?
+        /// Looks up a localized string similar to // TODO: This would be nicer as an angular module so it can be injected into stuff... that&apos;d be heaps nicer, but
+        /// how to do that when this is not a regular JS file, it is a server side JS file and RequireJS seems to only want
+        /// to force load JS files ?
         ///
-        /////create the namespace (NOTE: This loads before any dependencies so we don&apos;t have a namespace mgr so we just create it manually)
-        ///var Umbraco = {};
-        ///Umbraco.Sys = {};
-        /////define a global static object
-        ///Umbraco.Sys.ServerVariables = ##Variables## ;.
+        /// create the namespace (NOTE: This loads before any dependencies so we don&apos;t have a namespace mgr so we just create it manually)
+        /// var Umbraco = {};
+        /// Umbraco.Sys = {};
+        /// define a global static object
+        /// Umbraco.Sys.ServerVariables = ##Variables## ;.
         /// </summary>
         internal static string ServerVariables {
             get {
                 return ResourceManager.GetString("ServerVariables", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to [
         ///    &apos;lib/tinymce/tinymce.min.js&apos;,

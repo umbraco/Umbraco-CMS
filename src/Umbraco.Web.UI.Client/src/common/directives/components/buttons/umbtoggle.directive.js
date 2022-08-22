@@ -69,7 +69,7 @@
 
     function ToggleDirective(localizationService, eventsService, $timeout) {
 
-        function link(scope, el, attr, ctrl) {
+        function link(scope, el, attrs, ctrl) {
 
             scope.displayLabelOn = "";
             scope.displayLabelOff = "";
@@ -114,12 +114,22 @@
 
             }
 
-            scope.click = function() {
+            scope.click = function($event) {
+                if (scope.readonly) {
+                    $event.preventDefault();
+                    $event.stopPropagation();
+                    return;
+                }
+
                 if (scope.onClick) {
                     eventsService.emit("toggleValue", { value: !scope.checked });
                     scope.onClick();
                 }
             };
+
+            attrs.$observe('readonly', (value) => {
+                scope.readonly = value !== undefined;
+            });
 
             onInit();
         }

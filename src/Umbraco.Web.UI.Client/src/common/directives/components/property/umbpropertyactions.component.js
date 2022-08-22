@@ -22,6 +22,7 @@
 
         vm.$onDestroy = onDestroy;
         vm.$onInit = onInit;
+        vm.$onChanges = onChanges;
 
         function initDropDown() {
             keyboardService.bind("esc", vm.close);
@@ -71,6 +72,25 @@
                 vm.labels.openText = values[0];
                 vm.labels.closeText = values[1];
             });
+        }
+
+        function onChanges(simpleChanges) {
+            if (simpleChanges.actions) {
+
+              let actions = simpleChanges.actions.currentValue || [];
+
+              Utilities.forEach(actions, action => {
+
+                if (action.labelKey) {
+                    localizationService.localize(action.labelKey, (action.labelTokens || []), action.label).then(data => {
+                      action.label = data;
+                    });
+                    
+                    action.useLegacyIcon = action.useLegacyIcon === false ? false : true;
+                    action.icon = (action.useLegacyIcon ? 'icon-' : '') + action.icon;
+                }
+              });
+            }
         }
     }
 

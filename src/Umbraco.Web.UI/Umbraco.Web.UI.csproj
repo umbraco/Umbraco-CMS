@@ -1,11 +1,11 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
-
+<Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
     <RootNamespace>Umbraco.Cms.Web.UI</RootNamespace>
+    <EnablePackageValidation>false</EnablePackageValidation>
   </PropertyGroup>
 
-  <Import Project="..\..\build\NuSpecs\buildTransitive\Umbraco.Cms.props" />
+  <Import Project="..\Umbraco.Cms\buildTransitive\Umbraco.Cms.props" />
 
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
     <DocumentationFile>bin/Release/Umbraco.Web.UI.xml</DocumentationFile>
@@ -15,27 +15,13 @@
     <CopyRazorGenerateFilesToPublishDirectory>true</CopyRazorGenerateFilesToPublishDirectory>
   </PropertyGroup>
 
+  <Import Project="..\Umbraco.Cms\buildTransitive\Umbraco.Cms.props" />
   <ItemGroup>
-    <ProjectReference Include="../Umbraco.PublishedCache.NuCache/Umbraco.PublishedCache.NuCache.csproj" />
-    <ProjectReference Include="../Umbraco.Web.BackOffice/Umbraco.Web.BackOffice.csproj" />
-    <ProjectReference Include="../Umbraco.Web.Common/Umbraco.Web.Common.csproj" />
-    <ProjectReference Include="../Umbraco.Web.Website/Umbraco.Web.Website.csproj" />
-    <ProjectReference Include="..\Umbraco.Cms.StaticAssets\Umbraco.Cms.StaticAssets.csproj" />
-    <ProjectReference Include="..\Umbraco.PublishedCache.NuCache\Umbraco.PublishedCache.NuCache.csproj" />
-    <ProjectReference Include="..\Umbraco.Web.BackOffice\Umbraco.Web.BackOffice.csproj" />
-    <ProjectReference Include="..\Umbraco.Web.Common\Umbraco.Web.Common.csproj" />
-    <ProjectReference Include="..\Umbraco.Web.Website\Umbraco.Web.Website.csproj" />
-    <ProjectReference Include="..\Umbraco.Cms.Persistence.Sqlite\Umbraco.Cms.Persistence.Sqlite.csproj" />
-    <ProjectReference Include="..\Umbraco.Cms.Persistence.SqlServer\Umbraco.Cms.Persistence.SqlServer.csproj" />
-    <ProjectReference Include="../Umbraco.PublishedCache.NuCache/Umbraco.PublishedCache.NuCache.csproj" />
-    <ProjectReference Include="../Umbraco.Web.BackOffice/Umbraco.Web.BackOffice.csproj" />
-    <ProjectReference Include="../Umbraco.Web.Common/Umbraco.Web.Common.csproj" />
-    <ProjectReference Include="../Umbraco.Web.Website/Umbraco.Web.Website.csproj" />
+    <ProjectReference Include="..\Umbraco.Cms\Umbraco.Cms.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.ICU.ICU4C.Runtime" Version="68.2.0.9" />
-    <RuntimeHostConfigurationOption Condition="$(RuntimeIdentifier.StartsWith('linux')) Or $(RuntimeIdentifier.StartsWith('win')) Or ('$(RuntimeIdentifier)' == '' And !$([MSBuild]::IsOSPlatform('osx')))" Include="System.Globalization.AppLocalIcu" Value="68.2.0.9" />
+    <PackageReference Include="Umbraco.Code" Version="2.0.0" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
@@ -47,25 +33,31 @@
     <PackageReference Include="Umbraco.Code" Version="2.0.0">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <!-- Opt-in to app-local ICU to ensure consistent globalization APIs across different platforms -->
+    <PackageReference Include="Microsoft.ICU.ICU4C.Runtime" Version="68.2.0.9" />
+    <RuntimeHostConfigurationOption Include="System.Globalization.AppLocalIcu" Value="68.2.0.9" Condition="$(RuntimeIdentifier.StartsWith('linux')) or $(RuntimeIdentifier.StartsWith('win')) or ('$(RuntimeIdentifier)' == '' and !$([MSBuild]::IsOSPlatform('osx')))" />
   </ItemGroup>
 
   <PropertyGroup>
-    <RazorCompileOnBuild>false</RazorCompileOnBuild>
-    <RazorCompileOnPublish>false</RazorCompileOnPublish>
-    <UseRazorSourceGenerator>false</UseRazorSourceGenerator> <!-- Disabling the Razor source generators in .NET 6 -->
+    <!-- Razor files are needed for the backoffice to work correctly -->
+    <CopyRazorGenerateFilesToPublishDirectory>true</CopyRazorGenerateFilesToPublishDirectory>
   </PropertyGroup>
 
   <PropertyGroup>
-    <JsonSchemaPath>$(ProjectDir)umbraco/config/appsettings-schema.json</JsonSchemaPath>
+    <!-- Remove RazorCompileOnBuild and RazorCompileOnPublish when not using ModelsMode InMemoryAuto -->
+    <RazorCompileOnBuild>false</RazorCompileOnBuild>
+    <RazorCompileOnPublish>false</RazorCompileOnPublish>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <JsonSchemaPath>$(ProjectDir)appsettings-schema.json</JsonSchemaPath>
+    <JsonSchemaProjectPath>$(ProjectDir)../JsonSchema/JsonSchema.csproj</JsonSchemaProjectPath>
   </PropertyGroup>
 
   <Target Name="CheckPreconditions" BeforeTargets="Build">
     <Message Text="-CheckPreconditions-" Importance="high" />
     <Message Text="JsonSchemaPath:  $(JsonSchemaPath)" Importance="high" />
-
     <CallTarget Targets="JsonSchemaBuild" Condition="!Exists('$(JsonSchemaPath)') and '$(UmbracoBuild)' == ''" />
-
-
     <CallTarget Targets="AppsettingsBuild" Condition="!Exists('appsettings.json')" />
     <CallTarget Targets="AppsettingsDevBuild" Condition="!Exists('appsettings.Development.json')" />
   </Target>
@@ -73,12 +65,12 @@
 
 
   <Target Name="JsonSchemaBuild">
-    <!-- <Exec WorkingDirectory="$(ProjectDir)/../../" Command="powershell -ExecutionPolicy RemoteSigned -Command '&amp;dotnet run &#45;&#45;project $pwd/src/JsonSchema/JsonSchema.csproj -c Release &#45;&#45; &#45;&#45;outputFile $pwd/src/Umbraco.Web.UI/$(JsonSchemaPath)'" /> -->
+    <Exec Command="dotnet run -c Release --project $(JsonSchemaProjectPath) -o &quot;$(ProjectDir)appsettings-schema.json&quot;" />
   </Target>
 
   <Target Name="AppsettingsBuild">
-     <Message Text="Generating appsettings.json because it doesnt exist" Importance="High" />
-     <Copy SourceFiles="$(Projectdir)/appsettings.template.json" DestinationFiles="$(ProjectDir)/appsettings.json" />
+    <Message Text="Generating appsettings.json because it doesnt exist" Importance="High" />
+    <Copy SourceFiles="$(Projectdir)/appsettings.template.json" DestinationFiles="$(ProjectDir)/appsettings.json" />
   </Target>
 
   <Target Name="AppsettingsDevBuild">

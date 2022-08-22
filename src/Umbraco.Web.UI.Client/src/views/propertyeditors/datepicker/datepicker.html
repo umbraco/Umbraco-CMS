@@ -18,12 +18,13 @@
                            ng-blur="inputChanged()"
                            ng-required="model.validation.mandatory"
                            val-server="value"
-                           class="datepickerinput" />
-                    <button type="button" class="btn-clear" ng-click="clearDate()" ng-show="hasDatetimePickerValue === true || datePickerForm.datepicker.$error.pickerError === true">
+                           class="datepickerinput"
+                           ng-readonly="readonly" />
+                    <button ng-if="!readonly" type="button" class="btn-clear" ng-click="clearDate()" ng-show="hasDatetimePickerValue === true || datePickerForm.datepicker.$error.pickerError === true">
                         <umb-icon icon="icon-delete"></umb-icon>
                         <span class="sr-only"><localize key="content_removeDate">Clear date</localize></span>
                     </button>
-                    <span class="add-on">
+                    <span ng-if="!readonly" class="add-on">
                         <umb-icon icon="icon-{{ datePickerConfig.noCalendar ? 'time' : 'calendar' }}"></umb-icon>
                     </span>
                 </div>

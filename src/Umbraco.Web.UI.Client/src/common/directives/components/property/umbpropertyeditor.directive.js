@@ -7,12 +7,14 @@
 **/
 
 //share property editor directive function
-function umbPropEditor(umbPropEditorHelper) {
+function umbPropEditor(umbPropEditorHelper, localizationService) {
         return {
             scope: {
                 model: "=",
                 isPreValue: "@",
-                preview: "<"
+                preview: "<",
+                allowUnlock: "<?",
+                onUnlock: "&?"
             },
             
             require: ["^^form", "?^umbProperty"],
@@ -20,6 +22,9 @@ function umbPropEditor(umbPropEditorHelper) {
             replace: true,      
             templateUrl: 'views/components/property/umb-property-editor.html',
             link: function (scope, element, attrs, ctrl) {
+
+                scope.readonly = false;
+                scope.labels = {};
 
                 //we need to copy the form controller val to our isolated scope so that
                 //it get's carried down to the child scopes of this!
@@ -33,11 +38,26 @@ function umbPropEditor(umbPropEditorHelper) {
                    scope.model.alias = Math.random().toString(36).slice(2);
                 }
 
+                localizationService.localize('languages_invariantPropertyUnlockHelp',  [scope.model.label])
+                    .then(function(value) {
+                        scope.labels.invariantPropertyUnlockHelp = value;
+                    });
+
                 var unbindWatcher = scope.$watch("model.view",
                     function() {
                         scope.propertyEditorView = umbPropEditorHelper.getViewPath(scope.model.view, scope.isPreValue);
                     }
                 );
+
+                scope.unlock = function () {
+                    if (scope.onUnlock) {
+                        scope.onUnlock();
+                    }
+                };
+
+                attrs.$observe('readonly', (value) => {
+                    scope.readonly = value !== undefined;
+                });
 
                 scope.$on("$destroy", function () {
                     unbindWatcher();

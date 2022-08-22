@@ -1,0 +1,21 @@
+{
+  "$schema": "https://raw.githubusercontent.com/dotnet/Nerdbank.GitVersioning/master/src/NerdBank.GitVersioning/version.schema.json",
+  "version": "11.0.0",
+  "assemblyVersion": {
+    "precision": "Build" // optional. Use when you want a more precise assembly version than the default major.minor.
+  },
+  "gitCommitIdShortFixedLength": 7,
+  "publicReleaseRefSpec": [
+    "^refs/heads/master$",
+    "^refs/heads/main$",
+    "^refs/heads/release/\\d+\\.\\d+\\.\\d+"
+  ],
+  "cloudBuild": {
+    "buildNumber": {
+      "enabled": true
+    }
+  },
+  "nugetPackageVersion": {
+    "semVer": 2
+  }
+}

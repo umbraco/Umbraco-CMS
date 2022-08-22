@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
@@ -28,8 +25,15 @@ namespace Umbraco.Cms.Core.Services
 
         #region Constructor
 
-        public MemberService(ICoreScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory, IMemberGroupService memberGroupService,
-            IMemberRepository memberRepository, IMemberTypeRepository memberTypeRepository, IMemberGroupRepository memberGroupRepository, IAuditRepository auditRepository)
+        public MemberService(
+            ICoreScopeProvider provider,
+            ILoggerFactory loggerFactory,
+            IEventMessagesFactory eventMessagesFactory,
+            IMemberGroupService memberGroupService,
+            IMemberRepository memberRepository,
+            IMemberTypeRepository memberTypeRepository,
+            IMemberGroupRepository memberGroupRepository,
+            IAuditRepository auditRepository)
             : base(provider, loggerFactory, eventMessagesFactory)
         {
             _memberRepository = memberRepository;
@@ -55,29 +59,27 @@ namespace Umbraco.Cms.Core.Services
         /// <returns><see cref="System.int"/> with number of Members for passed in type</returns>
         public int GetCount(MemberCountType countType)
         {
-            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            scope.ReadLock(Constants.Locks.MemberTree);
+
+            IQuery<IMember>? query;
+
+            switch (countType)
             {
-                scope.ReadLock(Constants.Locks.MemberTree);
-
-                IQuery<IMember>? query;
-
-                switch (countType)
-                {
-                    case MemberCountType.All:
-                        query = Query<IMember>();
-                        break;
-                    case MemberCountType.LockedOut:
-                        query = Query<IMember>()?.Where(x => x.IsLockedOut == true);
-                        break;
-                    case MemberCountType.Approved:
-                        query = Query<IMember>()?.Where(x => x.IsApproved == true);
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(countType));
-                }
-
-                return _memberRepository.GetCountByQuery(query);
+                case MemberCountType.All:
+                    query = Query<IMember>();
+                    break;
+                case MemberCountType.LockedOut:
+                    query = Query<IMember>()?.Where(x => x.IsLockedOut == true);
+                    break;
+                case MemberCountType.Approved:
+                    query = Query<IMember>()?.Where(x => x.IsApproved == true);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(countType));
             }
+
+            return _memberRepository.GetCountByQuery(query);
         }
 
         /// <summary>
@@ -88,11 +90,9 @@ namespace Umbraco.Cms.Core.Services
         /// <returns><see cref="System.int"/> with number of Members</returns>
         public int Count(string? memberTypeAlias = null)
         {
-            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-            {
-                scope.ReadLock(Constants.Locks.MemberTree);
-                return _memberRepository.Count(memberTypeAlias);
-            }
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            scope.ReadLock(Constants.Locks.MemberTree);
+            return _memberRepository.Count(memberTypeAlias);
         }
 
         #endregion
@@ -137,7 +137,10 @@ namespace Umbraco.Cms.Core.Services
         /// <returns><see cref="IMember"/></returns>
         public IMember CreateMember(string username, string email, string name, IMemberType memberType)
         {
-            if (memberType == null) throw new ArgumentNullException(nameof(memberType));
+            if (memberType == null)
+            {
+                throw new ArgumentNullException(nameof(memberType));
+            }
 
             var member = new Member(name, email.ToLower().Trim(), username, memberType, 0);
 
@@ -171,16 +174,16 @@ namespace Umbraco.Cms.Core.Services
             => CreateMemberWithIdentity(username, email, username, passwordValue, memberTypeAlias, isApproved);
 
         public IMember CreateMemberWithIdentity(string username, string email, string memberTypeAlias)
-            => CreateMemberWithIdentity(username, email, username, "", memberTypeAlias);
+            => CreateMemberWithIdentity(username, email, username, string.Empty, memberTypeAlias);
 
         public IMember CreateMemberWithIdentity(string username, string email, string memberTypeAlias, bool isApproved)
-            => CreateMemberWithIdentity(username, email, username, "", memberTypeAlias, isApproved);
+            => CreateMemberWithIdentity(username, email, string.Empty, string.Empty, memberTypeAlias, isApproved);
 
         public IMember CreateMemberWithIdentity(string username, string email, string name, string memberTypeAlias)
-            => CreateMemberWithIdentity(username, email, name, "", memberTypeAlias);
+            => CreateMemberWithIdentity(username, email, string.Empty, string.Empty, memberTypeAlias);
 
         public IMember CreateMemberWithIdentity(string username, string email, string name, string memberTypeAlias, bool isApproved)
-            => CreateMemberWithIdentity(username, email, name, "", memberTypeAlias, isApproved);
+            => CreateMemberWithIdentity(username, string.Empty, name, string.Empty, memberTypeAlias, isApproved);
 
         /// <summary>
         /// Creates and persists a Member
@@ -217,7 +220,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         public IMember CreateMemberWithIdentity(string username, string email, IMemberType memberType)
-            => CreateMemberWithIdentity(username, email, username, "", memberType);
+            => CreateMemberWithIdentity(username, email, username, string.Empty, memberType);
 
         /// <summary>
         /// Creates and persists a Member
@@ -229,10 +232,10 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="memberType">MemberType the Member should be based on</param>
         /// <returns><see cref="IMember"/></returns>
         public IMember CreateMemberWithIdentity(string username, string email, IMemberType memberType, bool isApproved)
-            => CreateMemberWithIdentity(username, email, username, "", memberType, isApproved);
+            => CreateMemberWithIdentity(username, email, username, string.Empty, memberType, isApproved);
 
         public IMember CreateMemberWithIdentity(string username, string email, string name, IMemberType memberType)
-            => CreateMemberWithIdentity(username, email, name, "", memberType);
+            => CreateMemberWithIdentity(username, email, name, string.Empty, memberType);
 
         /// <summary>
         /// Creates and persists a Member
@@ -245,7 +248,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="memberType">MemberType the Member should be based on</param>
         /// <returns><see cref="IMember"/></returns>
         public IMember CreateMemberWithIdentity(string username, string email, string name, IMemberType memberType, bool isApproved)
-            => CreateMemberWithIdentity(username, email, name, "", memberType, isApproved);
+            => CreateMemberWithIdentity(username, email, name, string.Empty, memberType, isApproved);
 
         /// <summary>
         /// Creates and persists a Member
@@ -260,29 +263,30 @@ namespace Umbraco.Cms.Core.Services
         /// <returns><see cref="IMember"/></returns>
         private IMember CreateMemberWithIdentity(string username, string email, string name, string passwordValue, IMemberType memberType, bool isApproved = true)
         {
-            if (memberType == null) throw new ArgumentNullException(nameof(memberType));
-
-            using (var scope = ScopeProvider.CreateCoreScope())
+            if (memberType == null)
             {
-                scope.WriteLock(Constants.Locks.MemberTree);
-
-                // ensure it all still make sense
-                // ensure it all still make sense
-                var vrfy = GetMemberType(scope, memberType.Alias); // + locks
-
-                if (vrfy == null || vrfy.Id != memberType.Id)
-                {
-                    throw new ArgumentException($"Member type with alias {memberType.Alias} does not exist or is a different member type."); // causes rollback
-                }
-
-                var member = new Member(name, email.ToLower().Trim(), username, passwordValue, memberType, isApproved, -1);
-
-                Save(member);
-
-                scope.Complete();
-
-                return member;
+                throw new ArgumentNullException(nameof(memberType));
             }
+
+            using ICoreScope scope = ScopeProvider.CreateCoreScope();
+            scope.WriteLock(Constants.Locks.MemberTree);
+
+            // ensure it all still make sense
+            // ensure it all still make sense
+            IMemberType? vrfy = GetMemberType(scope, memberType.Alias); // + locks
+
+            if (vrfy == null || vrfy.Id != memberType.Id)
+            {
+                throw new ArgumentException($"Member type with alias {memberType.Alias} does not exist or is a different member type."); // causes rollback
+            }
+
+            var member = new Member(name, email.ToLower().Trim(), username, passwordValue, memberType, isApproved, -1);
+
+            Save(member);
+
+            scope.Complete();
+
+            return member;
         }
 
         #endregion
@@ -296,11 +300,9 @@ namespace Umbraco.Cms.Core.Services
         /// <returns><see cref="IMember"/></returns>
         public IMember? GetById(int id)
         {
-            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-            {
-                scope.ReadLock(Constants.Locks.MemberTree);
-                return _memberRepository.Get(id);
-            }
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            scope.ReadLock(Constants.Locks.MemberTree);
+            return _memberRepository.Get(id);
         }
 
         /// <summary>
@@ -312,12 +314,10 @@ namespace Umbraco.Cms.Core.Services
         /// <returns><see cref="IMember"/></returns>
         public IMember? GetByKey(Guid id)
         {
-            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-            {
-                scope.ReadLock(Constants.Locks.MemberTree);
-                var query = Query<IMember>().Where(x => x.Key == id);
-                return _memberRepository.Get(query)?.FirstOrDefault();
-            }
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            scope.ReadLock(Constants.Locks.MemberTree);
+            IQuery<IMember> query = Query<IMember>().Where(x => x.Key == id);
+            return _memberRepository.Get(query)?.FirstOrDefault();
         }
 
         /// <summary>
@@ -329,29 +329,36 @@ namespace Umbraco.Cms.Core.Services
         /// <returns><see cref="IEnumerable{IMember}"/></returns>
         public IEnumerable<IMember> GetAll(long pageIndex, int pageSize, out long totalRecords)
         {
-            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-            {
-                scope.ReadLock(Constants.Locks.MemberTree);
-                return _memberRepository.GetPage(null, pageIndex, pageSize, out totalRecords, null, Ordering.By("LoginName"));
-            }
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            scope.ReadLock(Constants.Locks.MemberTree);
+            return _memberRepository.GetPage(null, pageIndex, pageSize, out totalRecords, null, Ordering.By("LoginName"));
         }
 
-        public IEnumerable<IMember> GetAll(long pageIndex, int pageSize, out long totalRecords,
-            string orderBy, Direction orderDirection, string? memberTypeAlias = null, string filter = "")
-        {
-            return GetAll(pageIndex, pageSize, out totalRecords, orderBy, orderDirection, true, memberTypeAlias, filter);
-        }
+        public IEnumerable<IMember> GetAll(
+            long pageIndex,
+            int pageSize,
+            out long totalRecords,
+            string orderBy,
+            Direction orderDirection,
+            string? memberTypeAlias = null,
+            string filter = "") =>
+            GetAll(pageIndex, pageSize, out totalRecords, orderBy, orderDirection, true, memberTypeAlias, filter);
 
-        public IEnumerable<IMember> GetAll(long pageIndex, int pageSize, out long totalRecords,
-            string orderBy, Direction orderDirection, bool orderBySystemField, string? memberTypeAlias, string filter)
+        public IEnumerable<IMember> GetAll(
+            long pageIndex,
+            int pageSize,
+            out long totalRecords,
+            string orderBy,
+            Direction orderDirection,
+            bool orderBySystemField,
+            string? memberTypeAlias,
+            string filter)
         {
-            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-            {
-                scope.ReadLock(Constants.Locks.MemberTree);
-                var query1 = memberTypeAlias == null ? null : Query<IMember>()?.Where(x => x.ContentTypeAlias == memberTypeAlias);
-                var query2 = filter == null ? null : Query<IMember>()?.Where(x => (x.Name != null && x.Name.Contains(filter)) || x.Username.Contains(filter) || x.Email.Contains(filter));
-                return _memberRepository.GetPage(query1, pageIndex, pageSize, out totalRecords, query2, Ordering.By(orderBy, orderDirection, isCustomField: !orderBySystemField));
-            }
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            scope.ReadLock(Constants.Locks.MemberTree);
+            IQuery<IMember>? query1 = memberTypeAlias == null ? null : Query<IMember>()?.Where(x => x.ContentTypeAlias == memberTypeAlias);
+            IQuery<IMember>? query2 = filter == null ? null : Query<IMember>()?.Where(x => (x.Name != null && x.Name.Contains(filter)) || x.Username.Contains(filter) || x.Email.Contains(filter));
+            return _memberRepository.GetPage(query1, pageIndex, pageSize, out totalRecords, query2, Ordering.By(orderBy, orderDirection, isCustomField: !orderBySystemField));
         }
 
         /// <summary>
@@ -361,13 +368,17 @@ namespace Umbraco.Cms.Core.Services
         /// <returns><see cref="IMember"/></returns>
         public IMember? GetByProviderKey(object id)
         {
-            var asGuid = id.TryConvertTo<Guid>();
+            Attempt<Guid> asGuid = id.TryConvertTo<Guid>();
             if (asGuid.Success)
+            {
                 return GetByKey(asGuid.Result);
+            }
 
-            var asInt = id.TryConvertTo<int>();
+            Attempt<int> asInt = id.TryConvertTo<int>();
             if (asInt.Success)
+            {
                 return GetById(asInt.Result);
+            }
 
             return null;
         }
@@ -379,12 +390,10 @@ namespace Umbraco.Cms.Core.Services
         /// <returns><see cref="IMember"/></returns>
         public IMember? GetByEmail(string email)
         {
-            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-            {
-                scope.ReadLock(Constants.Locks.MemberTree);
-                var query = Query<IMember>().Where(x => x.Email.Equals(email));
-                return _memberRepository.Get(query)?.FirstOrDefault();
-            }
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            scope.ReadLock(Constants.Locks.MemberTree);
+            IQuery<IMember> query = Query<IMember>().Where(x => x.Email.Equals(email));
+            return _memberRepository.Get(query)?.FirstOrDefault();
         }
 
         /// <summary>
@@ -394,11 +403,9 @@ namespace Umbraco.Cms.Core.Services
         /// <returns><see cref="IMember"/></returns>
         public IMember? GetByUsername(string? username)
         {
-            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-            {
-                scope.ReadLock(Constants.Locks.MemberTree);
-                return _memberRepository.GetByUsername(username);
-            }
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            scope.ReadLock(Constants.Locks.MemberTree);
+            return _memberRepository.GetByUsername(username);
         }
 
         /// <summary>
@@ -408,12 +415,10 @@ namespace Umbraco.Cms.Core.Services
         /// <returns><see cref="IEnumerable{IMember}"/></returns>
         public IEnumerable<IMember> GetMembersByMemberType(string memberTypeAlias)
         {
-            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-            {
-                scope.ReadLock(Constants.Locks.MemberTree);
-                var query = Query<IMember>().Where(x => x.ContentTypeAlias == memberTypeAlias);
-                return _memberRepository.Get(query);
-            }
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            scope.ReadLock(Constants.Locks.MemberTree);
+            IQuery<IMember> query = Query<IMember>().Where(x => x.ContentTypeAlias == memberTypeAlias);
+            return _memberRepository.Get(query);
         }
 
         /// <summary>
@@ -423,12 +428,10 @@ namespace Umbraco.Cms.Core.Services
         /// <returns><see cref="IEnumerable{IMember}"/></returns>
         public IEnumerable<IMember> GetMembersByMemberType(int memberTypeId)
         {
-            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-            {
-                scope.ReadLock(Constants.Locks.MemberTree);
-                var query = Query<IMember>().Where(x => x.ContentTypeId == memberTypeId);
-                return _memberRepository.Get(query);
-            }
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            scope.ReadLock(Constants.Locks.MemberTree);
+            IQuery<IMember> query = Query<IMember>().Where(x => x.ContentTypeId == memberTypeId);
+            return _memberRepository.Get(query);
         }
 
         /// <summary>
@@ -438,11 +441,9 @@ namespace Umbraco.Cms.Core.Services
         /// <returns><see cref="IEnumerable{IMember}"/></returns>
         public IEnumerable<IMember> GetMembersByGroup(string memberGroupName)
         {
-            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-            {
-                scope.ReadLock(Constants.Locks.MemberTree);
-                return _memberRepository.GetByMemberGroup(memberGroupName);
-            }
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            scope.ReadLock(Constants.Locks.MemberTree);
+            return _memberRepository.GetByMemberGroup(memberGroupName);
         }
 
         /// <summary>
@@ -453,11 +454,9 @@ namespace Umbraco.Cms.Core.Services
         /// <returns><see cref="IEnumerable{IMember}"/></returns>
         public IEnumerable<IMember> GetAllMembers(params int[] ids)
         {
-            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-            {
-                scope.ReadLock(Constants.Locks.MemberTree);
-                return _memberRepository.GetMany(ids);
-            }
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            scope.ReadLock(Constants.Locks.MemberTree);
+            return _memberRepository.GetMany(ids);
         }
 
         /// <summary>
@@ -471,34 +470,32 @@ namespace Umbraco.Cms.Core.Services
         /// <returns><see cref="IEnumerable{IMember}"/></returns>
         public IEnumerable<IMember> FindMembersByDisplayName(string displayNameToMatch, long pageIndex, int pageSize, out long totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
         {
-            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            scope.ReadLock(Constants.Locks.MemberTree);
+            IQuery<IMember>? query = Query<IMember>();
+
+            switch (matchType)
             {
-                scope.ReadLock(Constants.Locks.MemberTree);
-                var query = Query<IMember>();
-
-                switch (matchType)
-                {
-                    case StringPropertyMatchType.Exact:
-                        query?.Where(member => string.Equals(member.Name, displayNameToMatch));
-                        break;
-                    case StringPropertyMatchType.Contains:
-                        query?.Where(member => member.Name != null && member.Name.Contains(displayNameToMatch));
-                        break;
-                    case StringPropertyMatchType.StartsWith:
-                        query?.Where(member => member.Name != null && member.Name.StartsWith(displayNameToMatch));
-                        break;
-                    case StringPropertyMatchType.EndsWith:
-                        query?.Where(member => member.Name != null && member.Name.EndsWith(displayNameToMatch));
-                        break;
-                    case StringPropertyMatchType.Wildcard:
-                        query?.Where(member => member.Name != null && member.Name.SqlWildcard(displayNameToMatch, TextColumnType.NVarchar));
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(matchType)); // causes rollback // causes rollback
-                }
-
-                return _memberRepository.GetPage(query, pageIndex, pageSize, out totalRecords, null, Ordering.By("Name"));
+                case StringPropertyMatchType.Exact:
+                    query?.Where(member => string.Equals(member.Name, displayNameToMatch));
+                    break;
+                case StringPropertyMatchType.Contains:
+                    query?.Where(member => member.Name != null && member.Name.Contains(displayNameToMatch));
+                    break;
+                case StringPropertyMatchType.StartsWith:
+                    query?.Where(member => member.Name != null && member.Name.StartsWith(displayNameToMatch));
+                    break;
+                case StringPropertyMatchType.EndsWith:
+                    query?.Where(member => member.Name != null && member.Name.EndsWith(displayNameToMatch));
+                    break;
+                case StringPropertyMatchType.Wildcard:
+                    query?.Where(member => member.Name != null && member.Name.SqlWildcard(displayNameToMatch, TextColumnType.NVarchar));
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(matchType)); // causes rollback // causes rollback
             }
+
+            return _memberRepository.GetPage(query, pageIndex, pageSize, out totalRecords, null, Ordering.By("Name"));
         }
 
         /// <summary>
@@ -512,34 +509,32 @@ namespace Umbraco.Cms.Core.Services
         /// <returns><see cref="IEnumerable{IMember}"/></returns>
         public IEnumerable<IMember> FindByEmail(string emailStringToMatch, long pageIndex, int pageSize, out long totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
         {
-            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            scope.ReadLock(Constants.Locks.MemberTree);
+            IQuery<IMember>? query = Query<IMember>();
+
+            switch (matchType)
             {
-                scope.ReadLock(Constants.Locks.MemberTree);
-                var query = Query<IMember>();
-
-                switch (matchType)
-                {
-                    case StringPropertyMatchType.Exact:
-                        query?.Where(member => member.Email.Equals(emailStringToMatch));
-                        break;
-                    case StringPropertyMatchType.Contains:
-                        query?.Where(member => member.Email.Contains(emailStringToMatch));
-                        break;
-                    case StringPropertyMatchType.StartsWith:
-                        query?.Where(member => member.Email.StartsWith(emailStringToMatch));
-                        break;
-                    case StringPropertyMatchType.EndsWith:
-                        query?.Where(member => member.Email.EndsWith(emailStringToMatch));
-                        break;
-                    case StringPropertyMatchType.Wildcard:
-                        query?.Where(member => member.Email.SqlWildcard(emailStringToMatch, TextColumnType.NVarchar));
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(matchType));
-                }
-
-                return _memberRepository.GetPage(query, pageIndex, pageSize, out totalRecords, null, Ordering.By("Email"));
+                case StringPropertyMatchType.Exact:
+                    query?.Where(member => member.Email.Equals(emailStringToMatch));
+                    break;
+                case StringPropertyMatchType.Contains:
+                    query?.Where(member => member.Email.Contains(emailStringToMatch));
+                    break;
+                case StringPropertyMatchType.StartsWith:
+                    query?.Where(member => member.Email.StartsWith(emailStringToMatch));
+                    break;
+                case StringPropertyMatchType.EndsWith:
+                    query?.Where(member => member.Email.EndsWith(emailStringToMatch));
+                    break;
+                case StringPropertyMatchType.Wildcard:
+                    query?.Where(member => member.Email.SqlWildcard(emailStringToMatch, TextColumnType.NVarchar));
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(matchType));
             }
+
+            return _memberRepository.GetPage(query, pageIndex, pageSize, out totalRecords, null, Ordering.By("Email"));
         }
 
         /// <summary>
@@ -553,34 +548,32 @@ namespace Umbraco.Cms.Core.Services
         /// <returns><see cref="IEnumerable{IMember}"/></returns>
         public IEnumerable<IMember> FindByUsername(string login, long pageIndex, int pageSize, out long totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
         {
-            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            scope.ReadLock(Constants.Locks.MemberTree);
+            IQuery<IMember>? query = Query<IMember>();
+
+            switch (matchType)
             {
-                scope.ReadLock(Constants.Locks.MemberTree);
-                var query = Query<IMember>();
-
-                switch (matchType)
-                {
-                    case StringPropertyMatchType.Exact:
-                        query?.Where(member => member.Username.Equals(login));
-                        break;
-                    case StringPropertyMatchType.Contains:
-                        query?.Where(member => member.Username.Contains(login));
-                        break;
-                    case StringPropertyMatchType.StartsWith:
-                        query?.Where(member => member.Username.StartsWith(login));
-                        break;
-                    case StringPropertyMatchType.EndsWith:
-                        query?.Where(member => member.Username.EndsWith(login));
-                        break;
-                    case StringPropertyMatchType.Wildcard:
-                        query?.Where(member => member.Username.SqlWildcard(login, TextColumnType.NVarchar));
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(matchType));
-                }
-
-                return _memberRepository.GetPage(query, pageIndex, pageSize, out totalRecords, null, Ordering.By("LoginName"));
+                case StringPropertyMatchType.Exact:
+                    query?.Where(member => member.Username.Equals(login));
+                    break;
+                case StringPropertyMatchType.Contains:
+                    query?.Where(member => member.Username.Contains(login));
+                    break;
+                case StringPropertyMatchType.StartsWith:
+                    query?.Where(member => member.Username.StartsWith(login));
+                    break;
+                case StringPropertyMatchType.EndsWith:
+                    query?.Where(member => member.Username.EndsWith(login));
+                    break;
+                case StringPropertyMatchType.Wildcard:
+                    query?.Where(member => member.Username.SqlWildcard(login, TextColumnType.NVarchar));
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(matchType));
             }
+
+            return _memberRepository.GetPage(query, pageIndex, pageSize, out totalRecords, null, Ordering.By("LoginName"));
         }
 
         /// <summary>
@@ -592,31 +585,29 @@ namespace Umbraco.Cms.Core.Services
         /// <returns><see cref="IEnumerable{IMember}"/></returns>
         public IEnumerable<IMember>? GetMembersByPropertyValue(string propertyTypeAlias, string value, StringPropertyMatchType matchType = StringPropertyMatchType.Exact)
         {
-            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            scope.ReadLock(Constants.Locks.MemberTree);
+            IQuery<IMember> query;
+
+            switch (matchType)
             {
-                scope.ReadLock(Constants.Locks.MemberTree);
-                IQuery<IMember> query;
-
-                switch (matchType)
-                {
-                    case StringPropertyMatchType.Exact:
-                        query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && (((Member) x).LongStringPropertyValue!.SqlEquals(value, TextColumnType.NText) || ((Member) x).ShortStringPropertyValue!.SqlEquals(value, TextColumnType.NVarchar)));
-                        break;
-                    case StringPropertyMatchType.Contains:
-                        query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && (((Member) x).LongStringPropertyValue!.SqlContains(value, TextColumnType.NText) || ((Member) x).ShortStringPropertyValue!.SqlContains(value, TextColumnType.NVarchar)));
-                        break;
-                    case StringPropertyMatchType.StartsWith:
-                        query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && (((Member) x).LongStringPropertyValue.SqlStartsWith(value, TextColumnType.NText) || ((Member) x).ShortStringPropertyValue.SqlStartsWith(value, TextColumnType.NVarchar)));
-                        break;
-                    case StringPropertyMatchType.EndsWith:
-                        query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && (((Member) x).LongStringPropertyValue!.SqlEndsWith(value, TextColumnType.NText) || ((Member) x).ShortStringPropertyValue!.SqlEndsWith(value, TextColumnType.NVarchar)));
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(matchType));
-                }
-
-                return _memberRepository.Get(query);
+                case StringPropertyMatchType.Exact:
+                    query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && (((Member) x).LongStringPropertyValue!.SqlEquals(value, TextColumnType.NText) || ((Member) x).ShortStringPropertyValue!.SqlEquals(value, TextColumnType.NVarchar)));
+                    break;
+                case StringPropertyMatchType.Contains:
+                    query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && (((Member) x).LongStringPropertyValue!.SqlContains(value, TextColumnType.NText) || ((Member) x).ShortStringPropertyValue!.SqlContains(value, TextColumnType.NVarchar)));
+                    break;
+                case StringPropertyMatchType.StartsWith:
+                    query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && (((Member) x).LongStringPropertyValue.SqlStartsWith(value, TextColumnType.NText) || ((Member) x).ShortStringPropertyValue.SqlStartsWith(value, TextColumnType.NVarchar)));
+                    break;
+                case StringPropertyMatchType.EndsWith:
+                    query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && (((Member) x).LongStringPropertyValue!.SqlEndsWith(value, TextColumnType.NText) || ((Member) x).ShortStringPropertyValue!.SqlEndsWith(value, TextColumnType.NVarchar)));
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(matchType));
             }
+
+            return _memberRepository.Get(query);
         }
 
         /// <summary>
@@ -628,34 +619,32 @@ namespace Umbraco.Cms.Core.Services
         /// <returns><see cref="IEnumerable{IMember}"/></returns>
         public IEnumerable<IMember>? GetMembersByPropertyValue(string propertyTypeAlias, int value, ValuePropertyMatchType matchType = ValuePropertyMatchType.Exact)
         {
-            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            scope.ReadLock(Constants.Locks.MemberTree);
+            IQuery<IMember> query;
+
+            switch (matchType)
             {
-                scope.ReadLock(Constants.Locks.MemberTree);
-                IQuery<IMember> query;
-
-                switch (matchType)
-                {
-                    case ValuePropertyMatchType.Exact:
-                        query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && ((Member) x).IntegerPropertyValue == value);
-                        break;
-                    case ValuePropertyMatchType.GreaterThan:
-                        query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && ((Member) x).IntegerPropertyValue > value);
-                        break;
-                    case ValuePropertyMatchType.LessThan:
-                        query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && ((Member) x).IntegerPropertyValue < value);
-                        break;
-                    case ValuePropertyMatchType.GreaterThanOrEqualTo:
-                        query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && ((Member) x).IntegerPropertyValue >= value);
-                        break;
-                    case ValuePropertyMatchType.LessThanOrEqualTo:
-                        query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && ((Member) x).IntegerPropertyValue <= value);
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(matchType));
-                }
-
-                return _memberRepository.Get(query);
+                case ValuePropertyMatchType.Exact:
+                    query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && ((Member) x).IntegerPropertyValue == value);
+                    break;
+                case ValuePropertyMatchType.GreaterThan:
+                    query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && ((Member) x).IntegerPropertyValue > value);
+                    break;
+                case ValuePropertyMatchType.LessThan:
+                    query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && ((Member) x).IntegerPropertyValue < value);
+                    break;
+                case ValuePropertyMatchType.GreaterThanOrEqualTo:
+                    query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && ((Member) x).IntegerPropertyValue >= value);
+                    break;
+                case ValuePropertyMatchType.LessThanOrEqualTo:
+                    query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && ((Member) x).IntegerPropertyValue <= value);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(matchType));
             }
+
+            return _memberRepository.Get(query);
         }
 
         /// <summary>
@@ -666,13 +655,11 @@ namespace Umbraco.Cms.Core.Services
         /// <returns><see cref="IEnumerable{IMember}"/></returns>
         public IEnumerable<IMember>? GetMembersByPropertyValue(string propertyTypeAlias, bool value)
         {
-            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-            {
-                scope.ReadLock(Constants.Locks.MemberTree);
-                var query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && ((Member) x).BoolPropertyValue == value);
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            scope.ReadLock(Constants.Locks.MemberTree);
+            IQuery<IMember> query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && ((Member) x).BoolPropertyValue == value);
 
-                return _memberRepository.Get(query);
-            }
+            return _memberRepository.Get(query);
         }
 
         /// <summary>
@@ -684,35 +671,33 @@ namespace Umbraco.Cms.Core.Services
         /// <returns><see cref="IEnumerable{IMember}"/></returns>
         public IEnumerable<IMember>? GetMembersByPropertyValue(string propertyTypeAlias, DateTime value, ValuePropertyMatchType matchType = ValuePropertyMatchType.Exact)
         {
-            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            scope.ReadLock(Constants.Locks.MemberTree);
+            IQuery<IMember> query;
+
+            switch (matchType)
             {
-                scope.ReadLock(Constants.Locks.MemberTree);
-                IQuery<IMember> query;
-
-                switch (matchType)
-                {
-                    case ValuePropertyMatchType.Exact:
-                        query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && ((Member) x).DateTimePropertyValue == value);
-                        break;
-                    case ValuePropertyMatchType.GreaterThan:
-                        query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && ((Member) x).DateTimePropertyValue > value);
-                        break;
-                    case ValuePropertyMatchType.LessThan:
-                        query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && ((Member) x).DateTimePropertyValue < value);
-                        break;
-                    case ValuePropertyMatchType.GreaterThanOrEqualTo:
-                        query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && ((Member) x).DateTimePropertyValue >= value);
-                        break;
-                    case ValuePropertyMatchType.LessThanOrEqualTo:
-                        query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && ((Member) x).DateTimePropertyValue <= value);
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(matchType)); // causes rollback // causes rollback
-                }
-
-                // TODO: Since this is by property value, we need a GetByPropertyQuery on the repo!
-                return _memberRepository.Get(query);
+                case ValuePropertyMatchType.Exact:
+                    query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && ((Member) x).DateTimePropertyValue == value);
+                    break;
+                case ValuePropertyMatchType.GreaterThan:
+                    query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && ((Member) x).DateTimePropertyValue > value);
+                    break;
+                case ValuePropertyMatchType.LessThan:
+                    query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && ((Member) x).DateTimePropertyValue < value);
+                    break;
+                case ValuePropertyMatchType.GreaterThanOrEqualTo:
+                    query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && ((Member) x).DateTimePropertyValue >= value);
+                    break;
+                case ValuePropertyMatchType.LessThanOrEqualTo:
+                    query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && ((Member) x).DateTimePropertyValue <= value);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(matchType)); // causes rollback // causes rollback
             }
+
+            // TODO: Since this is by property value, we need a GetByPropertyQuery on the repo!
+            return _memberRepository.Get(query);
         }
 
         /// <summary>
@@ -722,11 +707,9 @@ namespace Umbraco.Cms.Core.Services
         /// <returns><c>True</c> if the Member exists otherwise <c>False</c></returns>
         public bool Exists(int id)
         {
-            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-            {
-                scope.ReadLock(Constants.Locks.MemberTree);
-                return _memberRepository.Exists(id);
-            }
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            scope.ReadLock(Constants.Locks.MemberTree);
+            return _memberRepository.Exists(id);
         }
 
         /// <summary>
@@ -736,16 +719,16 @@ namespace Umbraco.Cms.Core.Services
         /// <returns><c>True</c> if the Member exists otherwise <c>False</c></returns>
         public bool Exists(string username)
         {
-            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-            {
-                scope.ReadLock(Constants.Locks.MemberTree);
-                return _memberRepository.Exists(username);
-            }
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            scope.ReadLock(Constants.Locks.MemberTree);
+            return _memberRepository.Exists(username);
         }
 
         #endregion
 
         #region Save
+
+        public void SetLastLogin(string username, DateTime date) => throw new NotImplementedException();
 
         /// <inheritdoc />
         public void Save(IMember member)
@@ -754,67 +737,63 @@ namespace Umbraco.Cms.Core.Services
             member.Username = member.Username.Trim();
             member.Email = member.Email.Trim();
 
-            var evtMsgs = EventMessagesFactory.Get();
+            EventMessages evtMsgs = EventMessagesFactory.Get();
 
-            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+            using ICoreScope scope = ScopeProvider.CreateCoreScope();
+            var savingNotification = new MemberSavingNotification(member, evtMsgs);
+            if (scope.Notifications.PublishCancelable(savingNotification))
             {
-                var savingNotification = new MemberSavingNotification(member, evtMsgs);
-                if (scope.Notifications.PublishCancelable(savingNotification))
-                {
-                    scope.Complete();
-                    return;
-                }
-
-                if (string.IsNullOrWhiteSpace(member.Name))
-                {
-                    throw new ArgumentException("Cannot save member with empty name.");
-                }
-
-                scope.WriteLock(Constants.Locks.MemberTree);
-
-                _memberRepository.Save(member);
-
-                scope.Notifications.Publish(new MemberSavedNotification(member, evtMsgs).WithStateFrom(savingNotification));
-
-                Audit(AuditType.Save, 0, member.Id);
-
                 scope.Complete();
+                return;
             }
+
+            if (string.IsNullOrWhiteSpace(member.Name))
+            {
+                throw new ArgumentException("Cannot save member with empty name.");
+            }
+
+            scope.WriteLock(Constants.Locks.MemberTree);
+
+            _memberRepository.Save(member);
+
+            scope.Notifications.Publish(new MemberSavedNotification(member, evtMsgs).WithStateFrom(savingNotification));
+
+            Audit(AuditType.Save, 0, member.Id);
+
+            scope.Complete();
         }
 
         /// <inheritdoc />
         public void Save(IEnumerable<IMember> members)
         {
-            var membersA = members.ToArray();
+            IMember[] membersA = members.ToArray();
 
-            var evtMsgs = EventMessagesFactory.Get();
+            EventMessages evtMsgs = EventMessagesFactory.Get();
 
-            using (var scope = ScopeProvider.CreateCoreScope())
+            using ICoreScope scope = ScopeProvider.CreateCoreScope();
+            var savingNotification = new MemberSavingNotification(membersA, evtMsgs);
+            if (scope.Notifications.PublishCancelable(savingNotification))
             {
-                var savingNotification = new MemberSavingNotification(membersA, evtMsgs);
-                if (scope.Notifications.PublishCancelable(savingNotification))
-                {
-                    scope.Complete();
-                    return;
-                }
-
-                scope.WriteLock(Constants.Locks.MemberTree);
-
-                foreach (var member in membersA)
-                {
-                    //trimming username and email to make sure we have no trailing space
-                    member.Username = member.Username.Trim();
-                    member.Email = member.Email.Trim();
-
-                    _memberRepository.Save(member);
-                }
-
-                scope.Notifications.Publish(new MemberSavedNotification(membersA, evtMsgs).WithStateFrom(savingNotification));
-
-                Audit(AuditType.Save, 0, -1, "Save multiple Members");
-
                 scope.Complete();
+                return;
             }
+
+            scope.WriteLock(Constants.Locks.MemberTree);
+
+            foreach (IMember member in membersA)
+            {
+                //trimming username and email to make sure we have no trailing space
+                member.Username = member.Username.Trim();
+                member.Email = member.Email.Trim();
+
+                _memberRepository.Save(member);
+            }
+
+            scope.Notifications.Publish(new MemberSavedNotification(membersA, evtMsgs).WithStateFrom(savingNotification));
+
+            Audit(AuditType.Save, 0, -1, "Save multiple Members");
+
+            scope.Complete();
         }
 
         #endregion
@@ -827,23 +806,21 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="member"><see cref="IMember"/> to Delete</param>
         public void Delete(IMember member)
         {
-            var evtMsgs = EventMessagesFactory.Get();
+            EventMessages evtMsgs = EventMessagesFactory.Get();
 
-            using (var scope = ScopeProvider.CreateCoreScope())
+            using ICoreScope scope = ScopeProvider.CreateCoreScope();
+            var deletingNotification = new MemberDeletingNotification(member, evtMsgs);
+            if (scope.Notifications.PublishCancelable(deletingNotification))
             {
-                var deletingNotification = new MemberDeletingNotification(member, evtMsgs);
-                if (scope.Notifications.PublishCancelable(deletingNotification))
-                {
-                    scope.Complete();
-                    return;
-                }
-
-                scope.WriteLock(Constants.Locks.MemberTree);
-                DeleteLocked(scope, member, evtMsgs, deletingNotification.State);
-
-                Audit(AuditType.Delete, 0, member.Id);
                 scope.Complete();
+                return;
             }
+
+            scope.WriteLock(Constants.Locks.MemberTree);
+            DeleteLocked(scope, member, evtMsgs, deletingNotification.State);
+
+            Audit(AuditType.Delete, 0, member.Id);
+            scope.Complete();
         }
 
         private void DeleteLocked(ICoreScope scope, IMember member, EventMessages evtMsgs, IDictionary<string, object?>? notificationState = null)
@@ -861,12 +838,10 @@ namespace Umbraco.Cms.Core.Services
 
         public void AddRole(string roleName)
         {
-            using (var scope = ScopeProvider.CreateCoreScope())
-            {
-                scope.WriteLock(Constants.Locks.MemberTree);
-                _memberGroupRepository.CreateIfNotExists(roleName);
-                scope.Complete();
-            }
+            using ICoreScope scope = ScopeProvider.CreateCoreScope();
+            scope.WriteLock(Constants.Locks.MemberTree);
+            _memberGroupRepository.CreateIfNotExists(roleName);
+            scope.Complete();
         }
 
         /// <summary>
@@ -876,11 +851,9 @@ namespace Umbraco.Cms.Core.Services
 
         public IEnumerable<IMemberGroup> GetAllRoles()
         {
-            using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-            {
-                scope.ReadLock(Constants.Locks.MemberTree);
-                return _memberGroupRepository.GetMany().Distinct();
-            }
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            scope.ReadLock(Constants.Locks.MemberTree);
+            return _memberGroupRepository.GetMany().Distinct();
         }
 
         /// <summary>
@@ -890,178 +863,150 @@ namespace Umbraco.Cms.Core.Services
         /// <returns>A list of member roles</returns>
         public IEnumerable<string> GetAllRoles(int memberId)
         {
-            using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-            {
-                scope.ReadLock(Constants.Locks.MemberTree);
-                var result = _memberGroupRepository.GetMemberGroupsForMember(memberId);
-                return result.Select(x => x.Name).WhereNotNull().Distinct();
-            }
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            scope.ReadLock(Constants.Locks.MemberTree);
+            IEnumerable<IMemberGroup> result = _memberGroupRepository.GetMemberGroupsForMember(memberId);
+            return result.Select(x => x.Name).WhereNotNull().Distinct();
         }
 
         public IEnumerable<string> GetAllRoles(string username)
         {
-            using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-            {
-                scope.ReadLock(Constants.Locks.MemberTree);
-                IEnumerable<IMemberGroup> result = _memberGroupRepository.GetMemberGroupsForMember(username);
-                return result.Where(x => x.Name != null).Select(x => x.Name).Distinct()!;
-            }
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            scope.ReadLock(Constants.Locks.MemberTree);
+            IEnumerable<IMemberGroup> result = _memberGroupRepository.GetMemberGroupsForMember(username);
+            return result.Where(x => x.Name != null).Select(x => x.Name).Distinct()!;
         }
 
         public IEnumerable<int> GetAllRolesIds()
         {
-            using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-            {
-                scope.ReadLock(Constants.Locks.MemberTree);
-                return _memberGroupRepository.GetMany().Select(x => x.Id).Distinct();
-            }
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            scope.ReadLock(Constants.Locks.MemberTree);
+            return _memberGroupRepository.GetMany().Select(x => x.Id).Distinct();
         }
 
         public IEnumerable<int> GetAllRolesIds(int memberId)
         {
-            using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-            {
-                scope.ReadLock(Constants.Locks.MemberTree);
-                IEnumerable<IMemberGroup> result = _memberGroupRepository.GetMemberGroupsForMember(memberId);
-                return result.Select(x => x.Id).Distinct();
-            }
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            scope.ReadLock(Constants.Locks.MemberTree);
+            IEnumerable<IMemberGroup> result = _memberGroupRepository.GetMemberGroupsForMember(memberId);
+            return result.Select(x => x.Id).Distinct();
         }
 
         public IEnumerable<int> GetAllRolesIds(string username)
         {
-            using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-            {
-                scope.ReadLock(Constants.Locks.MemberTree);
-                IEnumerable<IMemberGroup> result = _memberGroupRepository.GetMemberGroupsForMember(username);
-                return result.Select(x => x.Id).Distinct();
-            }
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            scope.ReadLock(Constants.Locks.MemberTree);
+            IEnumerable<IMemberGroup> result = _memberGroupRepository.GetMemberGroupsForMember(username);
+            return result.Select(x => x.Id).Distinct();
         }
 
         public IEnumerable<IMember> GetMembersInRole(string roleName)
         {
-            using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-            {
-                scope.ReadLock(Constants.Locks.MemberTree);
-                return _memberRepository.GetByMemberGroup(roleName);
-            }
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            scope.ReadLock(Constants.Locks.MemberTree);
+            return _memberRepository.GetByMemberGroup(roleName);
         }
 
         public IEnumerable<IMember> FindMembersInRole(string roleName, string usernameToMatch, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
         {
-            using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-            {
-                scope.ReadLock(Constants.Locks.MemberTree);
-                return _memberRepository.FindMembersInRole(roleName, usernameToMatch, matchType);
-            }
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            scope.ReadLock(Constants.Locks.MemberTree);
+            return _memberRepository.FindMembersInRole(roleName, usernameToMatch, matchType);
         }
 
         public bool DeleteRole(string roleName, bool throwIfBeingUsed)
         {
-            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+            using ICoreScope scope = ScopeProvider.CreateCoreScope();
+            scope.WriteLock(Constants.Locks.MemberTree);
+
+            if (throwIfBeingUsed)
             {
-                scope.WriteLock(Constants.Locks.MemberTree);
-
-                if (throwIfBeingUsed)
+                // get members in role
+                IEnumerable<IMember> membersInRole = _memberRepository.GetByMemberGroup(roleName);
+                if (membersInRole.Any())
                 {
-                    // get members in role
-                    IEnumerable<IMember> membersInRole = _memberRepository.GetByMemberGroup(roleName);
-                    if (membersInRole.Any())
-                    {
-                        throw new InvalidOperationException("The role " + roleName + " is currently assigned to members");
-                    }
+                    throw new InvalidOperationException("The role " + roleName + " is currently assigned to members");
                 }
-
-                IQuery<IMemberGroup> query = Query<IMemberGroup>().Where(g => g.Name == roleName);
-                IMemberGroup[]? found = _memberGroupRepository.Get(query)?.ToArray();
-
-                if (found is not null)
-                {
-                    foreach (IMemberGroup memberGroup in found)
-                    {
-                        _memberGroupService.Delete(memberGroup);
-                    }
-                }
-
-                scope.Complete();
-                return found?.Length > 0;
             }
+
+            IQuery<IMemberGroup> query = Query<IMemberGroup>().Where(g => g.Name == roleName);
+            IMemberGroup[]? found = _memberGroupRepository.Get(query)?.ToArray();
+
+            if (found is not null)
+            {
+                foreach (IMemberGroup memberGroup in found)
+                {
+                    _memberGroupService.Delete(memberGroup);
+                }
+            }
+
+            scope.Complete();
+            return found?.Length > 0;
         }
 
         public void AssignRole(string username, string roleName) => AssignRoles(new[] { username }, new[] { roleName });
 
         public void AssignRoles(string[] usernames, string[] roleNames)
         {
-            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-            {
-                scope.WriteLock(Constants.Locks.MemberTree);
-                int[] ids = _memberRepository.GetMemberIds(usernames);
-                _memberGroupRepository.AssignRoles(ids, roleNames);
-                scope.Notifications.Publish(new AssignedMemberRolesNotification(ids, roleNames));
-                scope.Complete();
-            }
+            using ICoreScope scope = ScopeProvider.CreateCoreScope();
+            scope.WriteLock(Constants.Locks.MemberTree);
+            var ids = _memberRepository.GetMemberIds(usernames);
+            _memberGroupRepository.AssignRoles(ids, roleNames);
+            scope.Notifications.Publish(new AssignedMemberRolesNotification(ids, roleNames));
+            scope.Complete();
         }
 
         public void DissociateRole(string username, string roleName) => DissociateRoles(new[] { username }, new[] { roleName });
 
         public void DissociateRoles(string[] usernames, string[] roleNames)
         {
-            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-            {
-                scope.WriteLock(Constants.Locks.MemberTree);
-                int[] ids = _memberRepository.GetMemberIds(usernames);
-                _memberGroupRepository.DissociateRoles(ids, roleNames);
-                scope.Notifications.Publish(new RemovedMemberRolesNotification(ids, roleNames));
-                scope.Complete();
-            }
+            using ICoreScope scope = ScopeProvider.CreateCoreScope();
+            scope.WriteLock(Constants.Locks.MemberTree);
+            var ids = _memberRepository.GetMemberIds(usernames);
+            _memberGroupRepository.DissociateRoles(ids, roleNames);
+            scope.Notifications.Publish(new RemovedMemberRolesNotification(ids, roleNames));
+            scope.Complete();
         }
 
         public void AssignRole(int memberId, string roleName) => AssignRoles(new[] { memberId }, new[] { roleName });
 
         public void AssignRoles(int[] memberIds, string[] roleNames)
         {
-            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-            {
-                scope.WriteLock(Constants.Locks.MemberTree);
-                _memberGroupRepository.AssignRoles(memberIds, roleNames);
-                scope.Notifications.Publish(new AssignedMemberRolesNotification(memberIds, roleNames));
-                scope.Complete();
-            }
+            using ICoreScope scope = ScopeProvider.CreateCoreScope();
+            scope.WriteLock(Constants.Locks.MemberTree);
+            _memberGroupRepository.AssignRoles(memberIds, roleNames);
+            scope.Notifications.Publish(new AssignedMemberRolesNotification(memberIds, roleNames));
+            scope.Complete();
         }
 
         public void DissociateRole(int memberId, string roleName) => DissociateRoles(new[] { memberId }, new[] { roleName });
 
         public void DissociateRoles(int[] memberIds, string[] roleNames)
         {
-            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-            {
-                scope.WriteLock(Constants.Locks.MemberTree);
-                _memberGroupRepository.DissociateRoles(memberIds, roleNames);
-                scope.Notifications.Publish(new RemovedMemberRolesNotification(memberIds, roleNames));
-                scope.Complete();
-            }
+            using ICoreScope scope = ScopeProvider.CreateCoreScope();
+            scope.WriteLock(Constants.Locks.MemberTree);
+            _memberGroupRepository.DissociateRoles(memberIds, roleNames);
+            scope.Notifications.Publish(new RemovedMemberRolesNotification(memberIds, roleNames));
+            scope.Complete();
         }
 
         public void ReplaceRoles(string[] usernames, string[] roleNames)
         {
-            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-            {
-                scope.WriteLock(Constants.Locks.MemberTree);
-                int[] ids = _memberRepository.GetMemberIds(usernames);
-                _memberGroupRepository.ReplaceRoles(ids, roleNames);
-                scope.Notifications.Publish(new AssignedMemberRolesNotification(ids, roleNames));
-                scope.Complete();
-            }
+            using ICoreScope scope = ScopeProvider.CreateCoreScope();
+            scope.WriteLock(Constants.Locks.MemberTree);
+            int[] ids = _memberRepository.GetMemberIds(usernames);
+            _memberGroupRepository.ReplaceRoles(ids, roleNames);
+            scope.Notifications.Publish(new AssignedMemberRolesNotification(ids, roleNames));
+            scope.Complete();
         }
 
         public void ReplaceRoles(int[] memberIds, string[] roleNames)
         {
-            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-            {
-                scope.WriteLock(Constants.Locks.MemberTree);
-                _memberGroupRepository.ReplaceRoles(memberIds, roleNames);
-                scope.Notifications.Publish(new AssignedMemberRolesNotification(memberIds, roleNames));
-                scope.Complete();
-            }
+            using ICoreScope scope = ScopeProvider.CreateCoreScope();
+            scope.WriteLock(Constants.Locks.MemberTree);
+            _memberGroupRepository.ReplaceRoles(memberIds, roleNames);
+            scope.Notifications.Publish(new AssignedMemberRolesNotification(memberIds, roleNames));
+            scope.Complete();
         }
 
         #endregion
@@ -1084,34 +1029,32 @@ namespace Umbraco.Cms.Core.Services
         /// </remarks>
         public MemberExportModel? ExportMember(Guid key)
         {
-            using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            IQuery<IMember>? query = Query<IMember>().Where(x => x.Key == key);
+            IMember? member = _memberRepository.Get(query)?.FirstOrDefault();
+
+            if (member == null)
             {
-                IQuery<IMember>? query = Query<IMember>().Where(x => x.Key == key);
-                IMember? member = _memberRepository.Get(query)?.FirstOrDefault();
-
-                if (member == null)
-                {
-                    return null;
-                }
-
-                var model = new MemberExportModel
-                {
-                    Id = member.Id,
-                    Key = member.Key,
-                    Name = member.Name,
-                    Username = member.Username,
-                    Email = member.Email,
-                    Groups = GetAllRoles(member.Id).ToList(),
-                    ContentTypeAlias = member.ContentTypeAlias,
-                    CreateDate = member.CreateDate,
-                    UpdateDate = member.UpdateDate,
-                    Properties = new List<MemberExportProperty>(GetPropertyExportItems(member))
-                };
-
-                scope.Notifications.Publish(new ExportedMemberNotification(member, model));
-
-                return model;
+                return null;
             }
+
+            var model = new MemberExportModel
+            {
+                Id = member.Id,
+                Key = member.Key,
+                Name = member.Name,
+                Username = member.Username,
+                Email = member.Email,
+                Groups = GetAllRoles(member.Id).ToList(),
+                ContentTypeAlias = member.ContentTypeAlias,
+                CreateDate = member.CreateDate,
+                UpdateDate = member.UpdateDate,
+                Properties = new List<MemberExportProperty>(GetPropertyExportItems(member))
+            };
+
+            scope.Notifications.Publish(new ExportedMemberNotification(member, model));
+
+            return model;
         }
 
         private static IEnumerable<MemberExportProperty> GetPropertyExportItems(IMember member)
@@ -1150,38 +1093,36 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="memberTypeId">Id of the MemberType</param>
         public void DeleteMembersOfType(int memberTypeId)
         {
-            var evtMsgs = EventMessagesFactory.Get();
+            EventMessages evtMsgs = EventMessagesFactory.Get();
 
             // note: no tree to manage here
-            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+            using ICoreScope scope = ScopeProvider.CreateCoreScope();
+            scope.WriteLock(Constants.Locks.MemberTree);
+
+            // TODO: What about content that has the contenttype as part of its composition?
+            IQuery<IMember>? query = Query<IMember>().Where(x => x.ContentTypeId == memberTypeId);
+
+            IMember[]? members = _memberRepository.Get(query)?.ToArray();
+
+            if (members is null)
             {
-                scope.WriteLock(Constants.Locks.MemberTree);
-
-                // TODO: What about content that has the contenttype as part of its composition?
-                IQuery<IMember>? query = Query<IMember>().Where(x => x.ContentTypeId == memberTypeId);
-
-                IMember[]? members = _memberRepository.Get(query)?.ToArray();
-
-                if (members is null)
-                {
-                    return;
-                }
-
-                if (scope.Notifications.PublishCancelable(new MemberDeletingNotification(members, evtMsgs)))
-                {
-                    scope.Complete();
-                    return;
-                }
-
-                foreach (IMember member in members)
-                {
-                    // delete media
-                    // triggers the deleted event (and handles the files)
-                    DeleteLocked(scope, member, evtMsgs);
-                }
-
-                scope.Complete();
+                return;
             }
+
+            if (scope.Notifications.PublishCancelable(new MemberDeletingNotification(members, evtMsgs)))
+            {
+                scope.Complete();
+                return;
+            }
+
+            foreach (IMember member in members)
+            {
+                // delete media
+                // triggers the deleted event (and handles the files)
+                DeleteLocked(scope, member, evtMsgs);
+            }
+
+            scope.Complete();
         }
 
         private IMemberType GetMemberType(ICoreScope scope, string memberTypeAlias)
@@ -1220,10 +1161,8 @@ namespace Umbraco.Cms.Core.Services
                 throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(memberTypeAlias));
             }
 
-            using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-            {
-                return GetMemberType(scope, memberTypeAlias);
-            }
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            return GetMemberType(scope, memberTypeAlias);
         }
         #endregion
     }

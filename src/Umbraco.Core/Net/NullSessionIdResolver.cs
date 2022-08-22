@@ -1,7 +1,6 @@
-﻿namespace Umbraco.Cms.Core.Net
+namespace Umbraco.Cms.Core.Net;
+
+public class NullSessionIdResolver : ISessionIdResolver
 {
-    public class NullSessionIdResolver : ISessionIdResolver
-    {
-        public string? SessionId => null;
-    }
+    public string? SessionId => null;
 }

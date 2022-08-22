@@ -35,9 +35,8 @@ namespace JsonSchema
             /// </summary>
             public class CmsDefinition
             {
-                public ActiveDirectorySettings? ActiveDirectory { get; set; }
-
                 public ContentSettings? Content { get; set; }
+                public CoreDebugSettings? Debug { get; set; }
 
                 public ExceptionFilterSettings? ExceptionFilter { get; set; }
 
@@ -94,6 +93,8 @@ namespace JsonSchema
                 public HelpPageSettings? HelpPage { get; set; }
 
                 public InstallDefaultDataSettings? DefaultDataCreation { get; set; }
+
+                public DataTypesSettings? DataTypes { get; set; }
             }
 
             /// <summary>

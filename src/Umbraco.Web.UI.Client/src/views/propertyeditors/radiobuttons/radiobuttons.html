@@ -3,11 +3,13 @@
 
         <ul class="unstyled">
             <li ng-repeat="item in vm.viewItems track by item.key">
-                <umb-radiobutton name="{{model.alias}}_{{vm.uniqueId}}"
-                                 value="{{item.value}}"
-                                 model="model.value"
-                                 text="{{item.value}}"
-                                 required="model.validation.mandatory && model.value == ''">
+                <umb-radiobutton 
+                    name="{{model.alias}}_{{vm.uniqueId}}"
+                    value="{{item.value}}"
+                    model="model.value"
+                    text="{{item.value}}"
+                    required="model.validation.mandatory && model.value == ''"
+                    ng-attr-readonly="{{ readonly || undefined }}">
                 </umb-radiobutton>
             </li>
         </ul>

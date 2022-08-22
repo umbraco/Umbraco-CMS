@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Models.PublishedContent
@@ -30,7 +27,9 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
                 .ToList();
 
             if (ItemType == PublishedItemType.Member)
+            {
                 EnsureMemberProperties(propertyTypes, factory);
+            }
 
             _propertyTypes = propertyTypes.ToArray();
 
@@ -46,9 +45,12 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         public PublishedContentType(Guid key, int id, string alias, PublishedItemType itemType, IEnumerable<string> compositionAliases, IEnumerable<PublishedPropertyType> propertyTypes, ContentVariation variations, bool isElement = false)
             : this(key, id, alias, itemType, compositionAliases, variations, isElement)
         {
-            var propertyTypesA = propertyTypes.ToArray();
-            foreach (var propertyType in propertyTypesA)
+            PublishedPropertyType[] propertyTypesA = propertyTypes.ToArray();
+            foreach (PublishedPropertyType propertyType in propertyTypesA)
+            {
                 propertyType.ContentType = this;
+            }
+
             _propertyTypes = propertyTypesA;
 
             InitializeIndexes();
@@ -102,15 +104,19 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         {
             var aliases = new HashSet<string?>(propertyTypes.Select(x => x.Alias), StringComparer.OrdinalIgnoreCase);
 
-            foreach (var (alias, dataTypeId) in BuiltinMemberProperties)
+            foreach (var (alias, dataTypeId) in _builtinMemberProperties)
             {
-                if (aliases.Contains(alias)) continue;
+                if (aliases.Contains(alias))
+                {
+                    continue;
+                }
+
                 propertyTypes.Add(factory.CreateCorePropertyType(this, alias, dataTypeId, ContentVariation.Nothing));
             }
         }
 
         // TODO: this list somehow also exists in constants, see memberTypeRepository => remove duplicate!
-        private static readonly Dictionary<string, int> BuiltinMemberProperties = new Dictionary<string, int>
+        private static readonly Dictionary<string, int> _builtinMemberProperties = new Dictionary<string, int>
         {
             { nameof(IMember.Email), Constants.DataTypes.Textbox },
             { nameof(IMember.Username), Constants.DataTypes.Textbox },
@@ -153,8 +159,16 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         /// <inheritdoc />
         public int GetPropertyIndex(string alias)
         {
-            if (_indexes.TryGetValue(alias, out var index)) return index; // fastest
-            if (_indexes.TryGetValue(alias.ToLowerInvariant(), out index)) return index; // slower
+            if (_indexes.TryGetValue(alias, out var index))
+            {
+                return index; // fastest
+            }
+
+            if (_indexes.TryGetValue(alias.ToLowerInvariant(), out index))
+            {
+                return index; // slower
+            }
+
             return -1;
         }
 

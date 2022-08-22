@@ -8,7 +8,8 @@ function memberPickerController($scope, entityResource, iconHelper, editorServic
     }
 
     $scope.renderModel = [];
-    $scope.allowRemove = true;
+    $scope.allowRemove = !$scope.readonly;
+    $scope.allowAdd = !$scope.readonly;
 
     var dialogOptions = {
         multiPicker: false,
@@ -44,6 +45,7 @@ function memberPickerController($scope, entityResource, iconHelper, editorServic
     }
 
     $scope.openMemberPicker = function () {
+        if(!$scope.allowAdd) return;
 
         var memberPicker = dialogOptions;
 
@@ -64,11 +66,15 @@ function memberPickerController($scope, entityResource, iconHelper, editorServic
     };
 
     $scope.remove = function (index) {
+        if (!$scope.allowRemove) return;
+
         $scope.renderModel.splice(index, 1);
         setDirty();
     };
 
     $scope.add = function (item) {
+        if (!$scope.allowAdd) return; 
+
         var currIds = _.map($scope.renderModel, function (i) {
             if ($scope.model.config.idType === "udi") {
                 return i.udi;
@@ -88,6 +94,8 @@ function memberPickerController($scope, entityResource, iconHelper, editorServic
     };
 
     $scope.clear = function() {
+        if (!$scope.allowRemove) return;
+
         $scope.renderModel = [];
     };
 

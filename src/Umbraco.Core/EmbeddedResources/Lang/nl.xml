@@ -996,6 +996,14 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="resetPasswordEmailCopySubject">Umbraco: Wachtwoord Reset</key>
     <key alias="resetPasswordEmailCopyFormat">
       <![CDATA[<p>De gebruikersnaam om in te loggen bij jouw Umbraco omgeving is: <strong>%0%</strong></p><p>Klik <a href="%1%"><strong>hier</strong></a> om je wachtwoord te resetten of knip/plak deze URL in je browser:</p><p><em>%1%</em></p>]]></key>
+    <key alias="mfaSecurityCodeSubject">Umbraco: Beveiligingscode</key>
+    <key alias="mfaSecurityCodeMessage">Jouw beveiligingscode is: %0%</key>
+    <key alias="2faTitle">Laatste stap</key>
+    <key alias="2faText">Je hebt tweestapsverificatie ingeschakeld en moet je identiteit verifiëren.</key>
+    <key alias="2faMultipleText">Kies een tweestapsverificatie aanbieder</key>
+    <key alias="2faCodeInput">Verificatiecode</key>
+    <key alias="2faCodeInputHelp">Vul de verificatiecode in</key>
+    <key alias="2faInvalidCode">Ongeldige code ingevoerd</key>
   </area>
   <area alias="main">
     <key alias="dashboard">Dashboard</key>
@@ -1436,6 +1444,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="tabRules">Rich Text Editor</key>
   </area>
   <area alias="template">
+    <key alias="runtimeModeProduction"><![CDATA[Inhoud kan niet worden bewerkt in de runtime-modus <code>Production</code>.]]></key>
     <key alias="deleteByIdFailed">Kan sjabloon met ID %0% niet verwijderen</key>
     <key alias="edittemplate">Sjabloon aanpassen</key>
     <key alias="insertSections">Secties</key>
@@ -1934,6 +1943,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     </key>
     <key alias="userinviteAvatarMessage">Wijzig je foto zodat andere gebruikers je makkelijk kunnen herkennen.</key>
     <key alias="writer">Auteur</key>
+    <key alias="configureTwoFactor">Configureer tweestapsverificatie</key>
     <key alias="change">Wijzig</key>
     <key alias="yourProfile" version="7.0">Je profiel</key>
     <key alias="yourHistory" version="7.0">Je recente historie</key>
@@ -2287,6 +2297,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="labelUsedByMediaTypes">Gebruikt in Mediatypes</key>
     <key alias="labelUsedByMemberTypes">Gebruikt in Ledentypes</key>
     <key alias="usedByProperties">Gebruikt door</key>
+    <key alias="labelUsedByItems">Heeft verwijzingen vanuit de volgende items</key>
     <key alias="labelUsedByDocuments">Gebruikt in Documenten</key>
     <key alias="labelUsedByMembers">Gebruikt in Leden</key>
     <key alias="labelUsedByMedia">Gebruikt in Media</key>
@@ -2501,6 +2512,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="elementTypeDoesNotExistHeadline">Fout!</key>
     <key alias="elementTypeDoesNotExistDescription">Het Elementtype van dit blok bestaat niet meer</key>
     <key alias="addBlock">Inhoud toevoegen</key>
+    <key alias="addThis">Voeg %0% toe</key>
     <key alias="propertyEditorNotSupported">Eigenschap '%0%' gebruikt editor '%1%' die niet ondersteund wordt in
       blokken.
     </key>

@@ -39,21 +39,19 @@ public abstract class UmbracoViewPage<TModel> : RazorPage<TModel>
                 return _helper;
             }
 
+            _helper = Context.RequestServices.GetRequiredService<UmbracoHelper>();
+
             TModel model = ViewData.Model;
             var content = model as IPublishedContent;
+
             if (content is null && model is IContentModel contentModel)
             {
                 content = contentModel.Content;
             }
 
-            if (content is null)
-            {
-                content = UmbracoContext?.PublishedRequest?.PublishedContent;
-            }
+            content ??= UmbracoContext?.PublishedRequest?.PublishedContent;
 
-            _helper = Context.RequestServices.GetRequiredService<UmbracoHelper>();
-
-            if (!(content is null))
+            if (content is not null)
             {
                 _helper.AssignedContentItem = content;
             }
@@ -128,7 +126,7 @@ public abstract class UmbracoViewPage<TModel> : RazorPage<TModel>
     {
         // filter / add preview banner
         // ASP.NET default value is text/html
-        if (Context.Response.ContentType?.InvariantContains("text/html") ?? false)
+        if (Context.Response?.ContentType?.InvariantContains("text/html") ?? false)
         {
             if (((UmbracoContext?.IsDebug ?? false) || (UmbracoContext?.InPreviewMode ?? false))
                 && tagHelperOutput.TagName != null
