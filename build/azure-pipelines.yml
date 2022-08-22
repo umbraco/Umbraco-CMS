@@ -229,7 +229,7 @@ stages:
               path: $(Build.SourcesDirectory)
           - task: UseDotNet@2
             condition: and(succeeded(), eq(variables['Agent.OS'], 'Darwin')) # net6 already on the other images
-            displayName: Use net6
+            displayName: Use net7
             inputs:
               version: 7.x
               includePreviewVersions: true
@@ -265,7 +265,7 @@ stages:
               artifact: build_output
               path: $(Build.SourcesDirectory)
           - task: UseDotNet@2
-            displayName: Use net6
+            displayName: Use net7
             condition: and(succeeded(), eq(variables['Agent.OS'], 'Darwin')) # net6 already on the other images
             inputs:
               version: 7.x
@@ -484,14 +484,17 @@ stages:
             inputs:
               artifact: nupkg
               path: $(Build.ArtifactStagingDirectory)/nupkg
-          - task: NuGetCommand@2
-            displayName: Nuget push
+          - task: DotNetCoreCLI@2
+            displayName: dotnet restore
             inputs:
-              command: 'push'
-              packagesToPush: $(Build.ArtifactStagingDirectory)/**/*.nupkg
-              nuGetFeedType: 'external'
-              publishFeedCredentials: 'MyGet - Pre-releases'
-
+              command: restore
+              projects: '**/umbraco.sln'
+          # TODO: Use NuGetCommand instead of DotNetCoreCLI
+          #                - task: NuGetCommand@2
+          #                  displayName: Restore NuGet Packages
+          #                  inputs:
+          #                      restoreSolution: 'umbraco.sln'
+          #                      feedsToUse: config
   - stage: Deploy_NuGet
     displayName: NuGet release
     dependsOn:
