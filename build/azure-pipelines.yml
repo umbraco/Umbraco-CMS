@@ -232,7 +232,7 @@ stages:
             displayName: Use net6
             inputs:
               version: 7.x
-              includePreviewVersion: true
+              includePreviewVersions: true
           - task: DotNetCoreCLI@2
             displayName: Run dotnet test
             inputs:
@@ -269,7 +269,7 @@ stages:
             condition: and(succeeded(), eq(variables['Agent.OS'], 'Darwin')) # net6 already on the other images
             inputs:
               version: 7.x
-              includePreviewVersion: true
+              includePreviewVersions: true
           - task: DotNetCoreCLI@2
             displayName: Run dotnet test
             inputs:
