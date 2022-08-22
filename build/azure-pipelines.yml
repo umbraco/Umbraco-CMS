@@ -419,6 +419,11 @@ stages:
           # Windows containers take forever.
           # --no-launch-profile stops ASPNETCORE_ENVIRONMENT=Development which breaks the users.ts tests (smtp config = invite user button)
           # Urls matching docker setup.
+          - task: UseDotNet@2
+            displayName: Use .Net 7.x
+            inputs:
+              version: 7.x
+              includePreviewVersions: true
           - task: PowerShell@2
             condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
             displayName: Build & run app (Windows only)
