@@ -51,7 +51,7 @@ export const internalManifests: Array<UmbExtensionManifestCore> = [
 		alias: 'Umb.Dashboard.Welcome',
 		name: 'Welcome',
 		elementName: 'umb-dashboard-welcome',
-		js: () => import('./backoffice/dashboards/dashboard-welcome.element'),
+		js: () => import('./backoffice/dashboards/welcome/dashboard-welcome.element'),
 		meta: {
 			sections: ['Umb.Section.Content'],
 			pathname: 'welcome', // TODO: how to we want to support pretty urls?
@@ -63,10 +63,59 @@ export const internalManifests: Array<UmbExtensionManifestCore> = [
 		alias: 'Umb.Dashboard.RedirectManagement',
 		name: 'Redirect Management',
 		elementName: 'umb-dashboard-redirect-management',
-		js: () => import('./backoffice/dashboards/dashboard-redirect-management.element'),
+		js: () => import('./backoffice/dashboards/redirect-management/dashboard-redirect-management.element'),
 		meta: {
 			sections: ['Umb.Section.Content'],
 			pathname: 'redirect-management', // TODO: how to we want to support pretty urls?
+			weight: 10,
+		},
+	},
+	{
+		type: 'dashboard',
+		alias: 'Umb.Dashboard.SettingsAbout',
+		name: 'Settings About',
+		elementName: 'umb-dashboard-settings-about',
+		js: () => import('./backoffice/dashboards/settings-about/dashboard-settings-about.element'),
+		meta: {
+			label: 'About',
+			sections: ['Umb.Section.Settings'],
+			pathname: 'about', // TODO: how to we want to support pretty urls?
+			weight: 10,
+		},
+	},
+	{
+		type: 'dashboard',
+		alias: 'Umb.Dashboard.ExamineManagement',
+		name: 'Examine Management',
+		elementName: 'umb-dashboard-examine-management',
+		js: () => import('./backoffice/dashboards/examine-management/dashboard-examine-management.element'),
+		meta: {
+			sections: ['Umb.Section.Settings'],
+			pathname: 'examine-management', // TODO: how to we want to support pretty urls?
+			weight: 10,
+		},
+	},
+	{
+		type: 'dashboard',
+		alias: 'Umb.Dashboard.ModelsBuilder',
+		name: 'Models Builder',
+		elementName: 'umb-dashboard-models-builder',
+		js: () => import('./backoffice/dashboards/models-builder/dashboard-models-builder.element'),
+		meta: {
+			sections: ['Umb.Section.Settings'],
+			pathname: 'models-builder', // TODO: how to we want to support pretty urls?
+			weight: 10,
+		},
+	},
+	{
+		type: 'dashboard',
+		alias: 'Umb.Dashboard.MediaManagement',
+		name: 'Media',
+		elementName: 'umb-dashboard-media-management',
+		js: () => import('./backoffice/dashboards/media-management/dashboard-media-management.element'),
+		meta: {
+			sections: ['Umb.Section.Media'],
+			pathname: 'media-management', // TODO: how to we want to support pretty urls?
 			weight: 10,
 		},
 	},

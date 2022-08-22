@@ -3,14 +3,15 @@ import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { when } from 'lit/directives/when.js';
 import { isPathActive, path } from 'router-slot';
-import { map, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 
-import { getUserSections } from '../../core/api/fetcher';
-import { UmbContextConsumerMixin } from '../../core/context';
-import { UmbExtensionManifestSection, UmbExtensionRegistry } from '../../core/extension';
+import { UmbContextConsumerMixin, UmbContextProvider, UmbContextProviderMixin } from '../../core/context';
+import { UmbExtensionManifestSection } from '../../core/extension';
+import { UmbSectionStore } from '../../core/stores/section.store';
+import { UmbSectionContext } from '../sections/section.context';
 
 @customElement('umb-backoffice-header-sections')
-export class UmbBackofficeHeaderSections extends UmbContextConsumerMixin(LitElement) {
+export class UmbBackofficeHeaderSections extends UmbContextProviderMixin(UmbContextConsumerMixin(LitElement)) {
 	static styles: CSSResultGroup = [
 		UUITextStyles,
 		css`
@@ -41,9 +42,6 @@ export class UmbBackofficeHeaderSections extends UmbContextConsumerMixin(LitElem
 	private _open = false;
 
 	@state()
-	private _allowedSection: Array<string> = [];
-
-	@state()
 	private _sections: Array<UmbExtensionManifestSection> = [];
 
 	@state()
@@ -55,16 +53,18 @@ export class UmbBackofficeHeaderSections extends UmbContextConsumerMixin(LitElem
 	@state()
 	private _currentSectionAlias = '';
 
-	private _extensionRegistry?: UmbExtensionRegistry;
+	private _sectionStore?: UmbSectionStore;
 
 	private _sectionSubscription?: Subscription;
+	private _currentSectionSubscription?: Subscription;
 
 	constructor() {
 		super();
 
-		this.consumeContext('umbExtensionRegistry', (extensionRegistry: UmbExtensionRegistry) => {
-			this._extensionRegistry = extensionRegistry;
+		this.consumeContext('umbSectionStore', (sectionStore: UmbSectionStore) => {
+			this._sectionStore = sectionStore;
 			this._useSections();
+			this._useCurrentSection();
 		});
 	}
 
@@ -77,9 +77,11 @@ export class UmbBackofficeHeaderSections extends UmbContextConsumerMixin(LitElem
 		const tab = e.currentTarget as HTMLElement;
 
 		// TODO: we need to be able to prevent the tab from setting the active state
-		if (tab.id === 'moreTab') {
-			return;
-		}
+		if (tab.id === 'moreTab') return;
+
+		if (!tab.dataset.alias) return;
+
+		this._sectionStore?.setCurrent(tab.dataset.alias);
 	}
 
 	private _handleLabelClick() {
@@ -89,19 +91,21 @@ export class UmbBackofficeHeaderSections extends UmbContextConsumerMixin(LitElem
 		this._open = false;
 	}
 
-	private async _useSections() {
+	private _useSections() {
 		this._sectionSubscription?.unsubscribe();
 
-		const { data } = await getUserSections({});
-		this._allowedSection = data.sections;
+		this._sectionSubscription = this._sectionStore?.getAllowed().subscribe((allowedSections) => {
+			this._sections = allowedSections;
+			this._visibleSections = this._sections;
+		});
+	}
 
-		this._sectionSubscription = this._extensionRegistry
-			?.extensionsOfType('section')
-			.pipe(map((extensions) => extensions.sort((a, b) => b.meta.weight - a.meta.weight)))
-			.subscribe((sections) => {
-				this._sections = sections.filter((section) => this._allowedSection.includes(section.alias));
-				this._visibleSections = this._sections;
-			});
+	private _useCurrentSection() {
+		this._currentSectionSubscription?.unsubscribe();
+
+		this._currentSectionSubscription = this._sectionStore?.currentAlias.subscribe((currentSectionAlias) => {
+			this._currentSectionAlias = currentSectionAlias;
+		});
 	}
 
 	disconnectedCallback(): void {
@@ -109,15 +113,17 @@ export class UmbBackofficeHeaderSections extends UmbContextConsumerMixin(LitElem
 		this._sectionSubscription?.unsubscribe();
 	}
 
-	render() {
+	private _renderSections() {
 		return html`
 			<uui-tab-group id="tabs">
 				${this._visibleSections.map(
 					(section: UmbExtensionManifestSection) => html`
 						<uui-tab
-							?active="${isPathActive(`/section/${section.meta.pathname}`, path())}"
+							@click="${this._handleTabClick}"
+							?active="${this._currentSectionAlias === section.alias}"
 							href="${`/section/${section.meta.pathname}`}"
-							label="${section.name}"></uui-tab>
+							label="${section.name}"
+							data-alias="${section.alias}"></uui-tab>
 					`
 				)}
 				${this._renderExtraSections()}
@@ -149,6 +155,10 @@ export class UmbBackofficeHeaderSections extends UmbContextConsumerMixin(LitElem
 				</uui-tab>
 			`
 		);
+	}
+
+	render() {
+		return html` ${this._renderSections()} `;
 	}
 }
 
