@@ -511,13 +511,11 @@ stages:
             inputs:
               artifact: nupkg
               path: $(Build.ArtifactStagingDirectory)/nupkg
-          - task: NuGetCommand@2
-            displayName: Nuget push
+          - task: DotNetCoreCLI@2
+            displayName: dotnet restore
             inputs:
-              command: 'push'
-              packagesToPush: $(Build.ArtifactStagingDirectory)/**/*.nupkg
-              nuGetFeedType: 'external'
-              publishFeedCredentials: 'NuGet - Umbraco.*'
+              command: restore
+              projects: '**/umbraco.sln'
 
   - stage: Upload_API_Docs
     pool:
