@@ -188,7 +188,8 @@ public class BackOfficeSignInManager : UmbracoSignInManager<BackOfficeIdentityUs
             return SignInResult.Failed;
         }
 
-        var email = loginInfo.Principal.FindFirstValue(ClaimTypes.Email);
+        var email = loginInfo.Principal.FindFirstValue(ClaimTypes.Email) ?? 
+                    loginInfo.Principal.FindFirstValue("email");
 
         //we are allowing auto-linking/creating of local accounts
         if (email.IsNullOrWhiteSpace())
