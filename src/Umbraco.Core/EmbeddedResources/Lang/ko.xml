@@ -357,7 +357,7 @@
     <key alias="databaseUpgradeDone"><![CDATA[데이터베이스가 최신 버전 %0% 로 업그레이드 되었습니다.<br />계속 진행하시려면 <strong>다음</strong> 을 누르세요. ]]></key>
     <key alias="databaseUpToDate"><![CDATA[데이터베이스가 업데이트 되었습니다. <strong>다음</strong>을 클릭하시면 설정마법사를 계속 진행합니다.]]></key>
     <key alias="defaultUserChangePass"><![CDATA[<strong>기본 사용자의 암호가 변경되어야 합니다!</strong>]]></key>
-    <key alias="defaultUserDisabled"><![CDATA[<strong>기본 사용자가 비활성화되었거나 Umbraco에 접근할 수 없습니다!</strong></p><p>더 이상 과정이 필요없으시면 <b>다음</b>을 눌러주세요.]]></key>
+    <key alias="defaultUserDisabled"><![CDATA[<strong>기본 사용자가 비활성화되었거나 Umbraco에 접근할 수 없습니다!</strong></p><p>더 이상 과정이 필요없으시면 <strong>다음</strong>을 눌러주세요.]]></key>
     <key alias="defaultUserPassChanged"><![CDATA[<strong>설치후 기본사용자의 암호가 성공적으로 변경되었습니다!</strong></p><p>더 이상 과정이 필요없으시면 <strong>다음</strong>을 눌러주세요.]]></key>
     <key alias="defaultUserPasswordChanged">비밀번호가 변경되었습니다!</key>
     <key alias="greatStart">편리한 시작을 위해, 소개 Video를 시청하세요</key>
