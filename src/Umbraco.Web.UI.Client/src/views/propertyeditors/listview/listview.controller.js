@@ -304,11 +304,11 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
                     navigationService.reloadSection(section);
                 }
             }
-        }, function(error){
+        }).catch(function(error){
           // if someone attempts to add mix listviews across sections (i.e. use a members list view on content types),
           // a not-supported exception will be most likely be thrown, at least for the default list views - lets be
           // helpful and show a meaningful error message directly in content/content type UI
-          if(error.data.ExceptionType && error.data.ExceptionType.indexOf("System.NotSupportedException") > -1) {
+          if(error.data && error.data.ExceptionType && error.data.ExceptionType.indexOf("System.NotSupportedException") > -1) {
             $scope.viewLoadedError = error.errorMsg + ": " + error.data.ExceptionMessage;
           }
           $scope.viewLoaded = true;
