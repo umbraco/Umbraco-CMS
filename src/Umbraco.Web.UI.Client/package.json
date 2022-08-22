@@ -37,7 +37,7 @@
 	},
 	"dependencies": {
 		"@umbraco-ui/uui": "^1.0.0-rc.3",
-		"element-internals-polyfill": "^1.1.6",
+		"element-internals-polyfill": "^1.1.9",
 		"lit": "^2.3.1",
 		"openapi-typescript-fetch": "^1.1.3",
 		"router-slot": "^1.5.5",
