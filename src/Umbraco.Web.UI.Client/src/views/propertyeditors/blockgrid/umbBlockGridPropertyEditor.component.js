@@ -517,10 +517,18 @@
 
             const result = getLayoutEntryByContentID(vm.layout, block.layout.contentUdi);
             if (result === null) {
-                throw new Error("Could not find layout entry of block with udi: "+block.layout.contentUdi)
+                console.error("Could not find layout entry of block with udi: "+block.layout.contentUdi);
+                return;
             }
 
             setDirty();
+
+            result.entry.areas.forEach(area => {
+                area.items.forEach(areaEntry => {
+                    deleteBlock(areaEntry.$block);
+                });
+            });
+
             const layoutListIndex = result.layoutList.indexOf(result.entry);
             var removed = result.layoutList.splice(layoutListIndex, 1);
             removed.forEach(x => {
@@ -533,7 +541,6 @@
                 })
             });
 
-            // TODO: make sure that children is handled, either by this or by modelObject?..
             modelObject.removeDataAndDestroyModel(block);
         }
 
@@ -666,6 +673,7 @@
                 return;
             }
 
+
             options = options || {};
 
             const availableTypes = getAllowedTypesOf(parentBlock, areaKey);
@@ -673,11 +681,10 @@
             if (availableTypes.length === 0) {
                 return;
             }
-
+            
             var amountOfAvailableTypes = availableTypes.length;
-            var availableContentTypesAliases = modelObject.getAvailableAliasesOfElementTypeKeys(availableTypes);
-            // TODO: Filter clipboard items to only fit with availableContentTypesAliases, and ensure settings key as well?
-            var availableClipboardItems = vm.clipboardItems;//.filter(entry => console.log(entry.entryData.)
+            var availableContentTypesAliases = modelObject.getAvailableAliasesOfElementTypeKeys(availableTypes.map(x => x.blockConfigModel.contentElementTypeKey));
+            var availableClipboardItems = vm.clipboardItems.filter(entry => availableContentTypesAliases.indexOf(entry.alias) !== -1);
             
             var blockPickerModel = {
                 $parentScope: $scope, // pass in a $parentScope, this maintains the scope inheritance in infinite editing
@@ -789,6 +796,7 @@
                 var pasteEntry = {
                     type: clipboardService.TYPES.ELEMENT_TYPE,
                     date: entry.date,
+                    alias: entry.alias,
                     pasteData: entry.data,
                     elementTypeModel: {
                         name: entry.label,
@@ -801,14 +809,15 @@
                         pasteEntry.blockConfigModel = modelObject.getBlockConfiguration(scaffold.contentTypeKey);
                     }
                 }
-                blockPickerModel.clipboardItems.push(pasteEntry);
+                vm.clipboardItems.push(pasteEntry);
             });
 
             var entriesForPaste = clipboardService.retrieveEntriesOfType(clipboardService.TYPES.BLOCK, vm.availableContentTypesAliases);
             entriesForPaste.forEach(function (entry) {
                 var pasteEntry = {
                     type: clipboardService.TYPES.BLOCK,
-                    date: entry.date,
+                    date: entry.date,   
+                    alias: entry.alias,
                     pasteData: entry.data,
                     elementTypeModel: {
                         name: entry.label,
@@ -880,14 +889,44 @@
             });
         };
 
+        function gatherNestedBlocks(block) {
+            const nested = [];
+
+            block.layout.areas.forEach(area => {
+                area.items.forEach(item => {
+                    const itemData = {"layout": item.$block.layout, "data": item.$block.data, "settingsData":item.$block.settingsData, "areaKey": area.key};
+                    if(item.$block.layout.areas?.length > 0) {
+                        itemData.nested = gatherNestedBlocks(item.$block);
+                    }
+                    nested.push(itemData);
+                });
+            });
+
+            return nested;
+        }
         function copyBlock(block) {
-            clipboardService.copy(clipboardService.TYPES.BLOCK, block.content.contentTypeAlias, {"layout": block.layout, "data": block.data, "settingsData":block.settingsData}, block.label, block.content.icon, block.content.udi);
+
+            const clipboardData = {"layout": block.layout, "data": block.data, "settingsData":block.settingsData};
+
+            // If areas:
+            if(block.layout.areas.length > 0) {
+                clipboardData.nested = gatherNestedBlocks(block);
+            }
+
+            clipboardService.copy(clipboardService.TYPES.BLOCK, block.content.contentTypeAlias, clipboardData, block.label, block.content.icon, block.content.udi);
         }
 
-        function requestPasteFromClipboard(parentBlock,  areaKey, index, pasteEntry, pasteType) {
+        function revertPaste() {
+            nestedEntries.forEach(entry => {
+                // TODO: clean up..
+                deleteBlock(entry.$block);
+            })
+        }
+
+        function pasteClipboardEntry(parentBlock, areaKey, index, pasteEntry, pasteType) {
 
             if (pasteEntry === undefined) {
-                return false;
+                return null;
             }
 
             var layoutEntry;
@@ -897,21 +936,43 @@
                 layoutEntry = modelObject.createFromBlockData(pasteEntry);
             } else {
                 // Not a supported paste type.
-                return false;
+                return null;
             }
 
             if (layoutEntry === null) {
                 // Pasting did not go well.
-                return false;
+                return null;
             }
 
             initializeLayoutEntry(layoutEntry);
             
             if (layoutEntry.$block === null) {
                 // Initalization of the Block Object didnt go well, therefor we will fail the paste action.
-                return false;
+                return null;
             }
 
+            if(pasteEntry.nested && pasteEntry.nested.length) {
+                var nestedBlockFailed = false;
+
+                // Handle nested blocks:
+                pasteEntry.nested.forEach( nestedEntry => {
+                    if(nestedEntry.areaKey) {
+                        const entry = pasteClipboardEntry(layoutEntry.$block, nestedEntry.areaKey, null, nestedEntry, pasteType) === false
+                        if(entry === null || entry.failed === true) {
+                            console.error("Nested requestPasteFromClipboard failed.");
+                            nestedBlockFailed = true;
+                            // TODO: better fail message.
+                            // This can also happen if the specific block content element type isnt allowed at the given spot :-)
+
+                        }
+                    }
+                });
+
+                // If failed then ask if we should revert other blocks created..
+                if(nestedBlockFailed === true) {
+                    return {layoutEntry, failed: true};
+                }
+            }
 
             // insert layout entry at the decided location in layout.
             if(parentBlock != null) {
@@ -919,14 +980,59 @@
                 if (!area) {
                     console.error("Area could not be found...", parentBlock, areaKey)
                 }
-                area.items.splice(index, 0, layoutEntry);
+                if(index !== null) {
+                    area.items.splice(index, 0, layoutEntry);
+                } else {
+                    area.items.push(layoutEntry);
+                }
             } else {
-                vm.layout.splice(index, 0, layoutEntry);
+                if(index !== null) {
+                    console.log(" at index", index)
+                    vm.layout.splice(index, 0, layoutEntry);
+                } else {
+                    console.log("at the end", index)
+                    vm.layout.push(layoutEntry);
+                }
             }
 
-            vm.currentBlockInFocus = blockObject;
+            return {layoutEntry};
+        }
 
-            return true;
+        function requestPasteFromClipboard(parentBlock,  areaKey, index, pasteEntry, pasteType) {
+
+
+            const data = pasteClipboardEntry(parentBlock,  areaKey, index, pasteEntry, pasteType);
+            if(data) { 
+                if(data.failed) {
+                    // one or more of nested block creation failed.
+                    // Ask wether the user likes to continue:
+                    // TODO: test scenario:
+                    // TODO: Texts
+                    localizationService.localizeMany(["general_delete", "blockEditor_confirmDeleteBlockMessage", "paste_anyway", "revert"]).then(function (data) {
+                        const overlay = {
+                            title: data[0],
+                            content: localizationService.tokenReplace(data[1], [block.label]),
+                            submitButtonLabel: data[2],
+                            submitButtonLabel: data[3],
+                            close: function () {
+                                // revert: 
+                                deleteBlock(data.layoutEntry.$block);
+                                overlayService.close();
+                            },
+                            submit: function () {
+                                // continue: 
+                                overlayService.close();
+                            }
+                        };
+        
+                        overlayService.confirmDelete(overlay);
+                    });
+                } else {
+                    vm.currentBlockInFocus = data.layoutEntry.$block;
+                    return true;
+                }
+            }
+            return false;
         }
 
         function requestDeleteBlock(block) {
