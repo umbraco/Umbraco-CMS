@@ -11,6 +11,10 @@ jobs:
   CodeQL-Build:
 
     runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
 
     steps:
     - name: Checkout repository
@@ -20,12 +24,12 @@ jobs:
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v1
+      uses: github/codeql-action/init@v2
       with:
         config-file: ./.github/config/codeql-config.yml
 
     - name: Setup dotnet
-      uses: actions/setup-dotnet@v1
+      uses: actions/setup-dotnet@v2
       with:
         dotnet-version: '6.0.x'
 
@@ -33,4 +37,4 @@ jobs:
       run: dotnet build umbraco.sln -c SkipTests
 
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v1
+      uses: github/codeql-action/analyze@v2

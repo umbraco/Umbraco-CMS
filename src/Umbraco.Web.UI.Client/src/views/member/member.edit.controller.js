@@ -122,6 +122,8 @@ function MemberEditController($scope, $routeParams, $location, $http, $q, appSta
         editorState.set($scope.content);
 
         bindEvents();
+
+        $scope.contentForm.$dirty = false;
     }
 
     function bindEvents() {
