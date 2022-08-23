@@ -64,7 +64,7 @@
 		"@types/mocha": "^9.1.1",
 		"@types/uuid": "^8.3.4",
 		"@typescript-eslint/eslint-plugin": "^5.33.1",
-		"@typescript-eslint/parser": "^5.33.1",
+		"@typescript-eslint/parser": "^5.34.0",
 		"@web/dev-server-esbuild": "^0.3.1",
 		"@web/test-runner": "^0.14.0",
 		"@web/test-runner-playwright": "^0.8.9",
