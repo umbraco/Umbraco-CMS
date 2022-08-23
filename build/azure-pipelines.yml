@@ -365,6 +365,11 @@ stages:
         pool:
           vmImage: $(vmImage)
         steps:
+          - task: UseDotNet@2
+            displayName: Use .Net 7.x
+            inputs:
+              version: 7.x
+              includePreviewVersions: true
           - task: DownloadPipelineArtifact@2
             displayName: Download nupkg
             inputs:
@@ -403,11 +408,6 @@ stages:
             displayName: Create database (Windows only)
             condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
           # Linux containers smooth
-          - task: UseDotNet@2
-            displayName: Use .Net 7.x
-            inputs:
-              version: 7.x
-              includePreviewVersions: true
           - task: PowerShell@2
             condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
             displayName: Build & run container (Linux only)
