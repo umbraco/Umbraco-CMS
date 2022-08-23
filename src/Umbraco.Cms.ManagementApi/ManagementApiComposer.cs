@@ -33,9 +33,11 @@ public class ManagementApiComposer : IComposer
             .AddNewInstaller()
             .AddUpgrader();
 
+        var defaultApiVersion = new ApiVersion(1, 0);
+
         services.AddApiVersioning(options =>
         {
-            options.DefaultApiVersion = new ApiVersion(1, 0);
+            options.DefaultApiVersion = defaultApiVersion;
             options.ReportApiVersions = true;
             options.ApiVersionReader = new UrlSegmentApiVersionReader();
             options.AssumeDefaultVersionWhenUnspecified = true;
@@ -52,7 +54,7 @@ public class ManagementApiComposer : IComposer
 
         services.AddVersionedApiExplorer(options =>
         {
-            options.DefaultApiVersion = new ApiVersion(1, 0);
+            options.DefaultApiVersion = defaultApiVersion;
             options.GroupNameFormat = "'v'VVV";
             options.SubstituteApiVersionInUrl = true;
             options.AddApiVersionParametersWhenVersionNeutral = true;
@@ -105,7 +107,7 @@ public class ManagementApiComposer : IComposer
                     // serve documents (same as app.UseSwagger())
                     applicationBuilder.UseOpenApi(config =>
                     {
-                        config.Path = officePath + "/swagger/{documentName}/swagger.json";
+                        config.Path = $"{officePath}/swagger/{{documentName}}/swagger.json";
                     });
 
                     // Serve Swagger UI

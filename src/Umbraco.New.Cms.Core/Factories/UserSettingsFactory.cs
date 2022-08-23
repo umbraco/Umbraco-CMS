@@ -23,7 +23,8 @@ public class UserSettingsFactory : IUserSettingsFactory
     public UserSettingsModel GetUserSettings() =>
         new()
         {
-            PasswordSettings = CreatePasswordSettingsModel(), ConsentLevels = CreateConsentLevelModels(),
+            PasswordSettings = CreatePasswordSettingsModel(),
+            ConsentLevels = CreateConsentLevelModels(),
         };
 
     private PasswordSettingsModel CreatePasswordSettingsModel() =>
@@ -34,10 +35,13 @@ public class UserSettingsFactory : IUserSettingsFactory
         };
 
     private IEnumerable<ConsentLevelModel> CreateConsentLevelModels() =>
-        Enum.GetValues(typeof(TelemetryLevel))
-            .Cast<TelemetryLevel>()
+        Enum.GetValues<TelemetryLevel>()
             .ToList()
-            .Select(level => new ConsentLevelModel { Level = level, Description = GetTelemetryLevelDescription(level) });
+            .Select(level => new ConsentLevelModel
+            {
+                Level = level,
+                Description = GetTelemetryLevelDescription(level),
+            });
 
     private string GetTelemetryLevelDescription(TelemetryLevel telemetryLevel) => telemetryLevel switch
     {

@@ -11,6 +11,7 @@ using Umbraco.New.Cms.Web.Common.Routing;
 
 namespace Umbraco.Cms.ManagementApi.Controllers;
 
+// TODO: This needs to be an authorized controller.
 [ApiController]
 [ApiVersion("1.0")]
 [RequireRuntimeLevel(RuntimeLevel.Upgrade)]
@@ -48,6 +49,9 @@ public class UpgradeController : Controller
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status428PreconditionRequired)]
     public async Task<ActionResult<UpgradeSettingsViewModel>> Settings()
     {
+        // TODO: Async - We need to figure out what we want to do with async endpoints that doesn't do anything async
+        // We want these to be async for future use (Ideally we'll have more async things),
+        // But we need to figure out how we want to handle it in the meantime? use Task.FromResult or?
         UpgradeSettingsModel upgradeSettings = _upgradeSettingsFactory.GetUpgradeSettings();
         UpgradeSettingsViewModel viewModel = _mapper.Map<UpgradeSettingsViewModel>(upgradeSettings)!;
 

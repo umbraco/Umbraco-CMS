@@ -86,6 +86,9 @@ public class NewInstallController : Controller
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> ValidateDatabase(DatabaseInstallViewModel viewModel)
     {
+        // TODO: Async - We need to figure out what we want to do with async endpoints that doesn't do anything async
+        // We want these to be async for future use (Ideally we'll have more async things),
+        // But we need to figure out how we want to handle it in the meantime? use Task.FromResult or?
         DatabaseModel databaseModel = _mapper.Map<DatabaseModel>(viewModel)!;
 
         var success = _databaseBuilder.ConfigureDatabaseConnection(databaseModel, true);
