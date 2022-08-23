@@ -17,7 +17,7 @@ RUN dotnet publish --no-restore --configuration Release -o /dist
 ## Run
 ############################################
 
-FROM mcr.microsoft.com/dotnet/aspnet:6.0.5 AS run
+FROM mcr.microsoft.com/dotnet/nightly/aspnet:7.0 AS run
 
 WORKDIR /cypress
 COPY --from=build dist .
