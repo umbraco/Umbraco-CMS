@@ -2,7 +2,7 @@
 ## Build
 ############################################
 
-FROM mcr.microsoft.com/dotnet/sdk:6.0.300 AS build
+FROM mcr.microsoft.com/dotnet/sdk:7.0.0-preview.7-bullseye-slim-amd64 AS build
 
 WORKDIR /nupkg
 COPY nupkg .
