@@ -12,15 +12,11 @@ class UmbIconSelector extends UmbModalLayoutElement<UmbModalContentPickerData> {
 		css`
 			:host {
 				position: relative;
-				max-height: 100%;
-				height: 100vh;
-				box-sizing: border-box;
-				display: flex;
-				overflow-y: scroll;
 			}
 
 			#box {
-				margin: 10px 10px;
+				overflow-y: auto;
+				max-height: 100vh;
 			}
 
 			#box .header-icon {
@@ -79,6 +75,9 @@ class UmbIconSelector extends UmbModalLayoutElement<UmbModalContentPickerData> {
 				line-height: 0;
 				display: grid;
 				grid-template-columns: repeat(auto-fit, minmax(40px, auto));
+				overflow-y: scroll;
+				max-height: 100%;
+				min-height: 0;
 			}
 
 			#icon-selection .icon {
@@ -100,8 +99,9 @@ class UmbIconSelector extends UmbModalLayoutElement<UmbModalContentPickerData> {
 			}*/
 
 			#icon-selection .icon:focus,
-			#icon-selection .icon:hover {
-				background-color: rgba(0, 0, 0, 0.05);
+			#icon-selection .icon:hover,
+			#icon-selection .icon.selected {
+				background-color: rgba(0, 0, 0, 0.1);
 			}
 		`,
 	];
@@ -487,12 +487,16 @@ class UmbIconSelector extends UmbModalLayoutElement<UmbModalContentPickerData> {
 					slot="headline"
 					.name="${this._currentIcon}"
 					.style="${this._setColor(this._currentColor)}"></uui-icon>
+
 				${this.renderSearchbar()}
 				<hr />
+
 				<div id="palette">${this.renderPalette()}</div>
+
 				<hr />
 				<uui-scroll-container id="icon-selection">${this.renderIconSelection()}</uui-scroll-container>
 				<hr />
+
 				<uui-button look="secondary" label="close" @click="${this._close}">Close</uui-button>
 				<uui-button color="positive" look="primary" @click="${this._save}" label="save">Save</uui-button>
 			</uui-box>
@@ -510,32 +514,24 @@ class UmbIconSelector extends UmbModalLayoutElement<UmbModalContentPickerData> {
 	}
 
 	renderPalette() {
-		return html`${this.colorlist.map((color, index) => {
-			if (index === 0) {
-				return html`<label
-					@keyup="${this._changeIconColor}"
-					tabindex="0"
-					for="${color}"
-					class="colorspot"
-					.style="${this._setBackground(color)}">
-					<input type="radio" name="color" label="${color}" @click="${this._changeIconColor}" id="${color}" checked />
-					<span class="checkmark">
-						<uui-icon name="check"></uui-icon>
-					</span>
-				</label>`;
-			} else {
-				return html`<label
-					@keyup="${this._changeIconColor}"
-					tabindex="0"
-					for="${color}"
-					class="colorspot"
-					.style="${this._setBackground(color)}">
-					<input type="radio" name="color" label="${color}" @click="${this._changeIconColor}" id="${color}" />
-					<span class="checkmark">
-						<uui-icon name="check"></uui-icon>
-					</span>
-				</label>`;
-			}
+		return html`${this.colorlist.map((color) => {
+			return html`<label
+				@keyup="${this._changeIconColor}"
+				tabindex="0"
+				for="${color}"
+				class="colorspot"
+				.style="${this._setBackground(color)}">
+				<input
+					type="radio"
+					name="color"
+					label="${color}"
+					@click="${this._changeIconColor}"
+					id="${color}"
+					?checked="${color === this._currentColor ? true : false}" />
+				<span class="checkmark">
+					<uui-icon name="check"></uui-icon>
+				</span>
+			</label>`;
 		})}`;
 	}
 
@@ -545,7 +541,7 @@ class UmbIconSelector extends UmbModalLayoutElement<UmbModalContentPickerData> {
 				<uui-icon
 					tabindex="0"
 					.style="${this._setColor(this._currentColor)}"
-					class="icon"
+					class="icon ${icon === this._currentIcon ? 'selected' : ''}"
 					name="${icon}"
 					label="${icon}"
 					id="${icon}"
