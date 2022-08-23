@@ -25,6 +25,16 @@ export type UmbExtensionManifestSection = {
 	meta: UmbManifestSectionMeta;
 } & UmbExtensionManifestBase;
 
+//tree
+export type UmbManifestTreeMeta = {
+	weight: number;
+	sections: Array<string>;
+};
+export type UmbExtensionManifestTree = {
+	type: 'tree';
+	meta: UmbManifestTreeMeta;
+} & UmbExtensionManifestBase;
+
 // propertyEditor:
 export type UmbManifestPropertyEditorMeta = {
 	icon: string;
@@ -74,6 +84,7 @@ export type UmbExtensionManifestEditorView = {
 
 export type UmbExtensionManifestCore =
 	| UmbExtensionManifestSection
+	| UmbExtensionManifestTree
 	| UmbExtensionManifestDashboard
 	| UmbExtensionManifestPropertyEditorUI
 	| UmbExtensionManifestPropertyAction
@@ -115,6 +126,7 @@ export class UmbExtensionRegistry {
 
 	// Typings concept, need to put all core types to get a good array return type for the provided type...
 	extensionsOfType(type: 'section'): Observable<Array<UmbExtensionManifestSection>>;
+	extensionsOfType(type: 'tree'): Observable<Array<UmbExtensionManifestTree>>;
 	extensionsOfType(type: 'dashboard'): Observable<Array<UmbExtensionManifestDashboard>>;
 	extensionsOfType(type: 'editorView'): Observable<Array<UmbExtensionManifestEditorView>>;
 	extensionsOfType(type: 'propertyEditorUI'): Observable<Array<UmbExtensionManifestPropertyEditorUI>>;

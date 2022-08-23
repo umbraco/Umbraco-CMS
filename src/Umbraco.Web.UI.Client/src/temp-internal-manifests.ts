@@ -241,4 +241,37 @@ export const internalManifests: Array<UmbExtensionManifestCore> = [
 			group: 'common',
 		},
 	},
+	{
+		type: 'tree',
+		alias: 'Umb.Tree.Datatypes',
+		name: 'DataTypes',
+		elementName: 'umb-datatype-tree',
+		js: () => import('./backoffice/tree/datatypes-tree.element'),
+		meta: {
+			weight: -10,
+			sections: ['Umb.Section.Settings'],
+		},
+	},
+	{
+		type: 'tree',
+		alias: 'Umb.Tree.DocumentTypes',
+		name: 'DocumentTypes',
+		elementName: 'umb-document-type-tree',
+		js: () => import('./backoffice/tree/document-type-tree.element'),
+		meta: {
+			weight: -10,
+			sections: ['Umb.Section.Settings'],
+		},
+	},
+	{
+		type: 'tree',
+		alias: 'Umb.Tree.DocumentTypes',
+		name: 'DocumentTypes',
+		elementName: 'umb-document-type-tree',
+		js: () => import('./backoffice/tree/document-type-tree.element'),
+		meta: {
+			weight: -10,
+			sections: ['Umb.Section.Content'],
+		},
+	},
 ];

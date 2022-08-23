@@ -10,19 +10,35 @@ export class UmbTreeNavigator extends UmbContextProviderMixin(LitElement) {
 
 	private _treeService: UmbTreeService;
 
+	@state()
+	id = '2';
+
+	@state()
+	label = '';
+
+	@state()
+	hasChildren = false;
+
+	@state()
+	loading = true;
+
 	constructor() {
 		super();
 		this._treeService = new UmbTreeService();
 		this.provideContext('umbTreeService', this._treeService);
-	}
-
-	renderItems() {
-		return this._treeService.getRoot().map((item) => {
-			return html`<umb-tree-item .id=${item.id} .hasChildren=${item.hasChildren} .label=${item.name}></umb-tree-item>`;
+		this._treeService.getTreeItem(this.id).then((item) => {
+			this.label = item.name;
+			this.hasChildren = item.hasChildren;
+			this.loading = false;
 		});
 	}
+
 	render() {
-		return this.renderItems();
+		return html`<umb-tree-item
+			.id=${this.id}
+			.label=${this.label}
+			?hasChildren=${this.hasChildren}
+			.loading=${this.loading}></umb-tree-item> `;
 	}
 }
 

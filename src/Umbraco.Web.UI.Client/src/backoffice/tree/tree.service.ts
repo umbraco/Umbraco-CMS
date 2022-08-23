@@ -5,13 +5,18 @@ export class UmbTreeService {
 		return fakeApi.getTreeRoot();
 	}
 
+	public async getTreeItem(id: string) {
+		await new Promise((resolve) => setTimeout(resolve, Math.random() * 2000));
+		return fakeApi.getTreeItem(id);
+	}
+
 	public async getChildren(id: string) {
 		await new Promise((resolve) => setTimeout(resolve, Math.random() * 2000));
 		return fakeApi.getTreeChildren(id);
 	}
 }
 
-// EVERYTHING BELOW IS FAKE DATA
+// EVERYTHING BELOW IS FAKE MOCK DATA AND WILL BE REMOVED
 
 const fakeApi = {
 	//find nested child id of array
@@ -26,6 +31,16 @@ const fakeApi = {
 				hasChildren: item.children.length > 0,
 			};
 		});
+	},
+
+	getTreeItem: (id: string) => {
+		const item = recursive(treeData, id);
+		if (!item) return 'not found';
+
+		return {
+			...item,
+			hasChildren: item.children.length > 0,
+		};
 	},
 
 	getTreeRoot: () => {
@@ -79,20 +94,20 @@ const treeData = [
 	},
 	{
 		id: '2',
-		name: 'Templates',
+		name: 'DataTypes',
 		children: [
 			{
 				id: '2-1',
-				name: 'Templates-2-1',
+				name: 'DataTypes-2-1',
 				children: [],
 			},
 			{
 				id: '2-2',
-				name: 'Templates-2-2',
+				name: 'DataTypes-2-2',
 				children: [
 					{
 						id: '2-2-1',
-						name: 'Templates-2-2-1',
+						name: 'DataTypes-2-2-1',
 						children: [],
 					},
 				],
