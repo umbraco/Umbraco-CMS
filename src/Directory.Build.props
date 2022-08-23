@@ -7,7 +7,7 @@
     <AssemblyVersion>10.0.0</AssemblyVersion>
     <InformationalVersion>10.0.0-rc1</InformationalVersion>
     <FileVersion>10.0.0</FileVersion>
-    <LangVersion Condition="'$(LangVersion)' == ''">10.0</LangVersion>
+    <LangVersion Condition="'$(LangVersion)' == ''">preview</LangVersion>
     <NeutralLanguage>en-US</NeutralLanguage>
     <Company>Umbraco CMS</Company>
     <Copyright>Copyright © Umbraco 2021</Copyright>

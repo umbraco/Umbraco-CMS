@@ -64,6 +64,11 @@ stages:
               gulpFile: src/Umbraco.Web.UI.Client/gulpfile.js
               targets: coreBuild
               workingDirectory: src/Umbraco.Web.UI.Client
+          - task: UseDotNet@2
+            displayName: Use .Net 7.x
+            inputs:
+              version: 7.x
+              includePreviewVersions: true
           - task: DotNetCoreCLI@2
             displayName: Run dotnet build
             inputs:
@@ -130,41 +135,41 @@ stages:
           - task: PowerShell@2
             displayName: Install DocFX
             inputs:
-                targetType: inline
-                script: |
-                  choco install docfx --version=2.59.2 -y
-                  if ($lastexitcode -ne 0){
-                      throw ("Error installing DocFX")
-                  }
+              targetType: inline
+              script: |
+                choco install docfx --version=2.59.2 -y
+                if ($lastexitcode -ne 0){
+                    throw ("Error installing DocFX")
+                }
           - task: PowerShell@2
             displayName: Generate metadata
             inputs:
-                targetType: inline
-                script: |
-                  docfx metadata "$(Build.SourcesDirectory)/build/csharp-docs/docfx.json"
-                  if ($lastexitcode -ne 0){
-                      throw ("Error generating metadata.")
-                  }
+              targetType: inline
+              script: |
+                docfx metadata "$(Build.SourcesDirectory)/build/csharp-docs/docfx.json"
+                if ($lastexitcode -ne 0){
+                    throw ("Error generating metadata.")
+                }
           - task: PowerShell@2
             displayName: Generate documentation
             inputs:
-                targetType: inline
-                script: |
-                  docfx build "$(Build.SourcesDirectory)/build/csharp-docs/docfx.json"
-                  if ($lastexitcode -ne 0){
-                        throw ("Error generating documentation.")
-                  }
+              targetType: inline
+              script: |
+                docfx build "$(Build.SourcesDirectory)/build/csharp-docs/docfx.json"
+                if ($lastexitcode -ne 0){
+                      throw ("Error generating documentation.")
+                }
           - task: ArchiveFiles@2
             displayName: Archive C# Docs
             inputs:
-                rootFolderOrFile: $(Build.SourcesDirectory)/build/csharp-docs/_site
-                includeRootFolder: false
-                archiveFile: $(Build.ArtifactStagingDirectory)/csharp-docs.zip
+              rootFolderOrFile: $(Build.SourcesDirectory)/build/csharp-docs/_site
+              includeRootFolder: false
+              archiveFile: $(Build.ArtifactStagingDirectory)/csharp-docs.zip
           - task: PublishPipelineArtifact@1
             displayName: Publish C# Docs
             inputs:
-                targetPath: $(Build.ArtifactStagingDirectory)/csharp-docs.zip
-                artifact: csharp-docs
+              targetPath: $(Build.ArtifactStagingDirectory)/csharp-docs.zip
+              artifact: csharp-docs
 
       # js API Reference
       - job:
@@ -192,14 +197,14 @@ stages:
           - task: ArchiveFiles@2
             displayName: Archive js Docs
             inputs:
-                rootFolderOrFile: $(Build.SourcesDirectory)/src/Umbraco.Web.UI.Docs/api
-                includeRootFolder: false
-                archiveFile: $(Build.ArtifactStagingDirectory)/ui-docs.zip
+              rootFolderOrFile: $(Build.SourcesDirectory)/src/Umbraco.Web.UI.Docs/api
+              includeRootFolder: false
+              archiveFile: $(Build.ArtifactStagingDirectory)/ui-docs.zip
           - task: PublishPipelineArtifact@1
             displayName: Publish js Docs
             inputs:
-                targetPath: $(Build.ArtifactStagingDirectory)/ui-docs.zip
-                artifact: ui-docs
+              targetPath: $(Build.ArtifactStagingDirectory)/ui-docs.zip
+              artifact: ui-docs
 
   ###############################################
   ## Test
@@ -228,10 +233,10 @@ stages:
               artifact: build_output
               path: $(Build.SourcesDirectory)
           - task: UseDotNet@2
-            condition: and(succeeded(), eq(variables['Agent.OS'], 'Darwin')) # net6 already on the other images
-            displayName: Use net6
+            displayName: Use net7
             inputs:
-              version: 6.x
+              version: 7.x
+              includePreviewVersions: true
           - task: DotNetCoreCLI@2
             displayName: Run dotnet test
             inputs:
@@ -264,10 +269,10 @@ stages:
               artifact: build_output
               path: $(Build.SourcesDirectory)
           - task: UseDotNet@2
-            displayName: Use net6
-            condition: and(succeeded(), eq(variables['Agent.OS'], 'Darwin')) # net6 already on the other images
+            displayName: Use net7
             inputs:
-              version: 6.x
+              version: 7.x
+              includePreviewVersions: true
           - task: DotNetCoreCLI@2
             displayName: Run dotnet test
             inputs:
@@ -305,7 +310,7 @@ stages:
           - powershell: sqllocaldb start mssqllocaldb
             displayName: Start localdb (Windows only)
             condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
-          - powershell: docker run --name mssql -d -p 1433:1433 -e ACCEPT_EULA=Y -e SA_PASSWORD=$(SA_PASSWORD) -e MSSQL_PID=Developer mcr.microsoft.com/mssql/server:2019-latest 
+          - powershell: docker run --name mssql -d -p 1433:1433 -e ACCEPT_EULA=Y -e SA_PASSWORD=$(SA_PASSWORD) -e MSSQL_PID=Developer mcr.microsoft.com/mssql/server:2019-latest
             displayName: Start SQL Server (Linux only)
             condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
           - task: DotNetCoreCLI@2
@@ -327,7 +332,7 @@ stages:
     displayName: E2E Tests
     dependsOn: Build
     jobs:
-    # E2E Tests
+      # E2E Tests
       - job:
         displayName: E2E Tests
         variables:
@@ -358,7 +363,7 @@ stages:
             Windows:
               vmImage: 'windows-latest'
         pool:
-            vmImage: $(vmImage)
+          vmImage: $(vmImage)
         steps:
           - task: DownloadPipelineArtifact@2
             displayName: Download nupkg
@@ -397,7 +402,12 @@ stages:
           - powershell:  Invoke-Sqlcmd -Query "CREATE DATABASE $env:UmbracoDatabaseName" -ServerInstance $env:UmbracoDatabaseServer
             displayName: Create database (Windows only)
             condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
-           # Linux containers smooth
+          - task: UseDotNet@2
+            displayName: Use .Net 7.x
+            inputs:
+              version: 7.x
+              includePreviewVersions: true
+          # Linux containers smooth
           - task: PowerShell@2
             condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
             displayName: Build & run container (Linux only)
@@ -482,14 +492,17 @@ stages:
             inputs:
               artifact: nupkg
               path: $(Build.ArtifactStagingDirectory)/nupkg
-          - task: NuGetCommand@2
-            displayName: Nuget push
+          - task: DotNetCoreCLI@2
+            displayName: dotnet restore
             inputs:
-              command: 'push'
-              packagesToPush: $(Build.ArtifactStagingDirectory)/**/*.nupkg
-              nuGetFeedType: 'external'
-              publishFeedCredentials: 'MyGet - Pre-releases'
-
+              command: restore
+              projects: '**/umbraco.sln'
+          # TODO: Use NuGetCommand instead of DotNetCoreCLI
+          #                - task: NuGetCommand@2
+          #                  displayName: Restore NuGet Packages
+          #                  inputs:
+          #                      restoreSolution: 'umbraco.sln'
+          #                      feedsToUse: config
   - stage: Deploy_NuGet
     displayName: NuGet release
     dependsOn:
@@ -506,13 +519,11 @@ stages:
             inputs:
               artifact: nupkg
               path: $(Build.ArtifactStagingDirectory)/nupkg
-          - task: NuGetCommand@2
-            displayName: Nuget push
+          - task: DotNetCoreCLI@2
+            displayName: dotnet restore
             inputs:
-              command: 'push'
-              packagesToPush: $(Build.ArtifactStagingDirectory)/**/*.nupkg
-              nuGetFeedType: 'external'
-              publishFeedCredentials: 'NuGet - Umbraco.*'
+              command: restore
+              projects: '**/umbraco.sln'
 
   - stage: Upload_API_Docs
     pool:

@@ -3,7 +3,7 @@
   <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../src/'))" />
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <PackageType>Template</PackageType>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <ContentTargetFolders>.</ContentTargetFolders>

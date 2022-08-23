@@ -65,7 +65,11 @@ public class TwoFactorLoginController : UmbracoAuthorizedJsonController
     [HttpGet]
     public async Task<ActionResult<IEnumerable<UserTwoFactorProviderModel>>> Get2FAProvidersForUser(int userId)
     {
-        BackOfficeIdentityUser user = await _backOfficeUserManager.FindByIdAsync(userId.ToString(CultureInfo.InvariantCulture));
+        BackOfficeIdentityUser? user = await _backOfficeUserManager.FindByIdAsync(userId.ToString(CultureInfo.InvariantCulture));
+        if (user is null)
+        {
+            throw new InvalidOperationException("Could not find user");
+        }
 
         var enabledProviderNameHashSet =
             new HashSet<string>(await _twoFactorLoginService.GetEnabledTwoFactorProviderNamesAsync(user.Key));

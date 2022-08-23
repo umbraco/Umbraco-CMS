@@ -186,11 +186,13 @@ public class AuthenticationController : UmbracoApiControllerBase
     [ValidateAngularAntiForgeryToken]
     public async Task<IActionResult> PostUnLinkLogin(UnLinkLoginModel unlinkLoginModel)
     {
-        BackOfficeIdentityUser? user = await _userManager.FindByIdAsync(User.Identity?.GetUserId());
-        if (user == null)
+        var userId = User.Identity?.GetUserId();
+        if (userId is null)
         {
-            throw new InvalidOperationException("Could not find user");
+            throw new InvalidOperationException("Could not find userId");
         }
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null) throw new InvalidOperationException("Could not find user");
 
         AuthenticationScheme? authType = (await _signInManager.GetExternalAuthenticationSchemesAsync())
             .FirstOrDefault(x => x.Name == unlinkLoginModel.LoginProvider);
@@ -484,16 +486,19 @@ public class AuthenticationController : UmbracoApiControllerBase
             UmbracoUserExtensions.GetUserCulture(user.Culture, _textService, _globalSettings),
             new[] { code });
 
-        if (provider == "Email")
-        {
-            var mailMessage = new EmailMessage(from, user.Email, subject, message, true);
-
-            await _emailSender.SendAsync(mailMessage, Constants.Web.EmailTypes.TwoFactorAuth);
-        }
-        else if (provider == "Phone")
-        {
-            await _smsSender.SendSmsAsync(await _userManager.GetPhoneNumberAsync(user), message);
-        }
+            if (provider == "Email")
+            {
+                var mailMessage = new EmailMessage(from, user.Email, subject, message, true);
+                await _emailSender.SendAsync(mailMessage, Constants.Web.EmailTypes.TwoFactorAuth);
+            }
+            else if (provider == "Phone")
+            {
+                var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
+                if (phoneNumber is not null)
+                {
+                    await _smsSender.SendSmsAsync(phoneNumber, message);
+                }
+            }
 
         return Ok();
     }
@@ -544,6 +549,10 @@ public class AuthenticationController : UmbracoApiControllerBase
     {
         BackOfficeIdentityUser? identityUser =
             await _userManager.FindByIdAsync(model.UserId.ToString(CultureInfo.InvariantCulture));
+            if (identityUser is null)
+            {
+                return new ValidationErrorResult("Could not find user");
+            }
 
         IdentityResult result = await _userManager.ResetPasswordAsync(identityUser, model.ResetCode, model.Password);
         if (result.Succeeded)

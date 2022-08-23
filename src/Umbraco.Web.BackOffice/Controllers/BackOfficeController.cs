@@ -379,7 +379,7 @@ public class BackOfficeController : UmbracoController
     [HttpGet]
     public async Task<IActionResult> ExternalLinkLoginCallback()
     {
-        BackOfficeIdentityUser user = await _userManager.GetUserAsync(User);
+        BackOfficeIdentityUser? user = await _userManager.GetUserAsync(User);
         if (user == null)
         {
             // ... this should really not happen
@@ -497,9 +497,8 @@ public class BackOfficeController : UmbracoController
         }
         else if (result == SignInResult.TwoFactorRequired)
         {
-            BackOfficeIdentityUser? attemptedUser =
-                await _userManager.FindByLoginAsync(loginInfo.LoginProvider, loginInfo.ProviderKey);
-            if (attemptedUser == null)
+            BackOfficeIdentityUser? attemptedUser = await _userManager.FindByLoginAsync(loginInfo.LoginProvider, loginInfo.ProviderKey);
+                if (attemptedUser?.UserName is null)
             {
                 return new ValidationErrorResult(
                     $"No local user found for the login provider {loginInfo.LoginProvider} - {loginInfo.ProviderKey}");

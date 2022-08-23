@@ -28,9 +28,28 @@ public static class RequestHandlerSettingsExtension
             return RequestHandlerSettings.DefaultCharCollection;
         }
 
-        return MergeUnique(
-            requestHandlerSettings.UserDefinedCharCollection,
-            RequestHandlerSettings.DefaultCharCollection);
+        return MergeUnique(requestHandlerSettings.UserDefinedCharCollection, RequestHandlerSettings.DefaultCharCollection);
+    }
+
+    private static IEnumerable<CharItem> GetReplacements(IConfiguration configuration, string key)
+    {
+        var replacements = new List<CharItem>();
+        IEnumerable<IConfigurationSection> config = configuration.GetSection(key).GetChildren();
+
+        foreach (IConfigurationSection section in config)
+        {
+            var @char = section.GetValue<string>(nameof(CharItem.Char));
+            var replacement = section.GetValue<string>(nameof(CharItem.Replacement));
+
+            if (@char is null || replacement is null)
+            {
+                continue;
+            }
+
+            replacements.Add(new CharItem { Char = @char, Replacement = replacement });
+        }
+
+        return replacements;
     }
 
     /// <summary>

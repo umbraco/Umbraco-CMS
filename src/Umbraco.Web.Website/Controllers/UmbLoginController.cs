@@ -81,7 +81,7 @@ public class UmbLoginController : SurfaceController
 
         if (result.RequiresTwoFactor)
         {
-            MemberIdentityUser attemptedUser = await _memberManager.FindByNameAsync(model.Username);
+            MemberIdentityUser? attemptedUser = await _memberManager.FindByNameAsync(model.Username);
             if (attemptedUser == null!)
             {
                 return new ValidationErrorResult(
