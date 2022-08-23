@@ -69,6 +69,7 @@
             "args": [
                 "watch",
                 "run",
+                "--project",
                 "${workspaceFolder}/src/Umbraco.Web.UI/Umbraco.Web.UI.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
