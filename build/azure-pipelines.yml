@@ -365,11 +365,6 @@ stages:
         pool:
           vmImage: $(vmImage)
         steps:
-          - task: UseDotNet@2
-            displayName: Use .Net 7.x
-            inputs:
-              version: 7.x
-              includePreviewVersions: true
           - task: DownloadPipelineArtifact@2
             displayName: Download nupkg
             inputs:
