@@ -2,6 +2,7 @@ using System.Data;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions.Alter.Expressions;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common.Expressions;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.Expressions;
+using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 
@@ -21,7 +22,14 @@ public class AlterTableBuilder : ExpressionBuilderBase<AlterTableExpression, IAl
 
     public ForeignKeyDefinition CurrentForeignKey { get; set; } = null!;
 
-    public void Do() => Expression.Execute();
+    public void Do()
+    {
+        if (_context.Database.DatabaseType.IsSqlite())
+        {
+            throw new NotSupportedException($"SQLite do not support ALTER TABLE operations.Instead you will have to:{Environment.NewLine}1. Create a temp table.{Environment.NewLine}2. Copy data from existing table into temp table.{Environment.NewLine}3. Delete existing table.{Environment.NewLine}4. Create new table with existing name but new signature{Environment.NewLine}5. Copy data from temp table into the new table.{Environment.NewLine}6. Delete temp table.");
+        }
+        Expression.Execute();
+    }
 
     public IAlterTableColumnOptionBuilder WithDefault(SystemMethods method)
     {
