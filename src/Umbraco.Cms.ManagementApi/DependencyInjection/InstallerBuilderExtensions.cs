@@ -26,7 +26,7 @@ public static class InstallerBuilderExtensions
         services.AddTransient<IDatabaseSettingsFactory, DatabaseSettingsFactory>();
 
         builder.AddInstallSteps();
-        services.AddScoped<IInstallService, InstallService>();
+        services.AddTransient<IInstallService, InstallService>();
 
         return builder;
     }
@@ -37,7 +37,7 @@ public static class InstallerBuilderExtensions
 
         services.AddTransient<IUpgradeSettingsFactory, UpgradeSettingsFactory>();
         builder.AddUpgradeSteps();
-        services.AddScoped<IUpgradeService, UpgradeService>();
+        services.AddTransient<IUpgradeService, UpgradeService>();
 
         return builder;
     }
