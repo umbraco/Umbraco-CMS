@@ -28,9 +28,10 @@
 
                     </div>
 
-                    <div ng-if="vm.showInherit || vm.property.culture" class="umb-property-culture-label">
+                    <div ng-if="vm.showInherit || vm.property.culture || vm.property.segment" class="umb-property-culture-label">
                         <span ng-if="vm.showInherit"><localize key="general_shared"></localize></span>
-                        <span ng-if="!vm.showInherit">{{ vm.property.culture }}</span>
+                        <span ng-if="!vm.showInherit && vm.property.culture">{{ vm.property.culture }}</span>
+                        <span ng-if="!vm.showInherit && vm.property.segment">{{ vm.property.segment }}</span>
                     </div>
                 </div>
 
