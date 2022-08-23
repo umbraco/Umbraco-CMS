@@ -30,6 +30,11 @@ public class UpgradeService : IUpgradeService
                 $"Runtime level must be Upgrade to upgrade but was: {_runtimeState.Level}");
         }
 
+        await RunSteps();
+    }
+
+    private async Task RunSteps()
+    {
         foreach (IUpgradeStep step in _upgradeSteps)
         {
             var stepName = step.GetType().Name;
