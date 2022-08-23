@@ -26,6 +26,7 @@ services:
     # DotNetCore ENV Variables
     # https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-5.0#environment-variables
     environment:
+    - ConnectionStrings__umbracoDbDSN=Data Source=|DataDirectory|/Umbraco.sqlite.db;Cache=Shared;Foreign Keys=True;Pooling=True
     - ConnectionStrings__umbracoDbDSN_ProviderName=Microsoft.Data.Sqlite
     - Umbraco__CMS__Unattended__InstallUnattended=true
     - Umbraco__CMS__Unattended__UnattendedUserName=Admin
