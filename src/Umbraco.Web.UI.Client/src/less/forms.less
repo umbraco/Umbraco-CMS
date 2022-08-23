@@ -477,16 +477,27 @@ textarea[class*="span"],
 // Disabled and read-only inputs
 input[disabled],
 select[disabled],
-textarea[disabled],
-input[readonly],
-select[readonly],
-textarea[readonly] {
+textarea[disabled] {
   cursor: not-allowed;
   background-color: @inputDisabledBackground;
 }
+
 // Explicitly reset the colors here
-input[type="radio"][disabled],
-input[type="checkbox"][disabled],
+input[type="radio"][readonly],
+input[type="checkbox"][readonly] {
+  background-color: transparent;
+}
+
+// READONLY STATE
+// --------------
+
+// Disabled and read-only inputs
+input[readonly],
+select[readonly],
+textarea[readonly] {
+  border-color: @inputReadonlyBorderColor;
+}
+// Explicitly reset the colors here
 input[type="radio"][readonly],
 input[type="checkbox"][readonly] {
   background-color: transparent;

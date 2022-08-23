@@ -52,6 +52,7 @@ public class MediaPicker3PropertyEditor : DataEditor
     {
         _ioHelper = ioHelper;
         _editorConfigurationParser = editorConfigurationParser;
+        SupportsReadOnly = true;
     }
 
     /// <inheritdoc />

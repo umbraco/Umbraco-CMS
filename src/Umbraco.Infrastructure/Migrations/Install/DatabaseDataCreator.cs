@@ -1175,6 +1175,7 @@ internal class DatabaseDataCreator
                 CreateDate = DateTime.Now,
                 UpdateDate = DateTime.Now,
                 Icon = "icon-medal",
+                HasAccessToAllLanguages = true,
             });
         _database.Insert(Constants.DatabaseSchema.Tables.UserGroup, "id", false,
             new UserGroupDto
@@ -1188,6 +1189,7 @@ internal class DatabaseDataCreator
                 CreateDate = DateTime.Now,
                 UpdateDate = DateTime.Now,
                 Icon = "icon-edit",
+                HasAccessToAllLanguages = true,
             });
         _database.Insert(Constants.DatabaseSchema.Tables.UserGroup, "id", false,
             new UserGroupDto
@@ -1201,6 +1203,7 @@ internal class DatabaseDataCreator
                 CreateDate = DateTime.Now,
                 UpdateDate = DateTime.Now,
                 Icon = "icon-tools",
+                HasAccessToAllLanguages = true,
             });
         _database.Insert(Constants.DatabaseSchema.Tables.UserGroup, "id", false,
             new UserGroupDto
@@ -1214,19 +1217,19 @@ internal class DatabaseDataCreator
                 CreateDate = DateTime.Now,
                 UpdateDate = DateTime.Now,
                 Icon = "icon-globe",
+                HasAccessToAllLanguages = true,
             });
         _database.Insert(Constants.DatabaseSchema.Tables.UserGroup, "id", false,
             new UserGroupDto
             {
                 Id = 5,
-                StartMediaId = -1,
-                StartContentId = -1,
                 Alias = Constants.Security.SensitiveDataGroupAlias,
                 Name = "Sensitive data",
                 DefaultPermissions = string.Empty,
                 CreateDate = DateTime.Now,
                 UpdateDate = DateTime.Now,
                 Icon = "icon-lock",
+                HasAccessToAllLanguages = false,
             });
     }
 

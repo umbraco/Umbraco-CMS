@@ -436,6 +436,39 @@ namespace Umbraco.Cms.Core.Services.Implement
             return OperationResult.Attempt.Succeed(MoveOperationStatusType.Success, evtMsgs);
         }
 
+        public Attempt<OperationResult<MoveOperationStatusType, IDataType>?> Copy(IDataType copying, int containerId)
+        {
+            var evtMsgs = EventMessagesFactory.Get();
+
+            IDataType copy;
+            using (var scope = ScopeProvider.CreateCoreScope())
+            {
+                try
+                {
+                    if (containerId > 0)
+                    {
+                        var container = _dataTypeContainerRepository.Get(containerId);
+                        if (container is null)
+                        {
+                            throw new DataOperationException<MoveOperationStatusType>(MoveOperationStatusType.FailedParentNotFound); // causes rollback
+                        }
+                    }
+                    copy = copying.DeepCloneWithResetIdentities();
+
+                    copy.Name += " (copy)"; // might not be unique
+                    copy.ParentId = containerId;
+                    _dataTypeRepository.Save(copy);
+                    scope.Complete();
+                }
+                catch (DataOperationException<MoveOperationStatusType> ex)
+                {
+                    return OperationResult.Attempt.Fail<MoveOperationStatusType, IDataType>(ex.Operation, evtMsgs); // causes rollback
+                }
+            }
+
+            return OperationResult.Attempt.Succeed(MoveOperationStatusType.Success, evtMsgs, copy);
+        }
+
         /// <summary>
         /// Saves an <see cref="IDataType"/>
         /// </summary>

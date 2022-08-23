@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -265,7 +265,8 @@ public class ContentControllerTests
             Mock.Of<IJsonSerializer>(),
             Mock.Of<ICoreScopeProvider>(),
             Mock.Of<IAuthorizationService>(),
-            Mock.Of<IContentVersionService>());
+            Mock.Of<IContentVersionService>(),
+            Mock.Of<ICultureImpactFactory>());
 
         return controller;
     }

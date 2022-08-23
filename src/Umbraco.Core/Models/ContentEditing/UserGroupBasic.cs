@@ -8,8 +8,12 @@ public class UserGroupBasic : EntityBasic, INotificationModel
     public UserGroupBasic()
     {
         Notifications = new List<BackOfficeNotification>();
+        Languages = Enumerable.Empty<Language>();
         Sections = Enumerable.Empty<Section>();
     }
+
+    [DataMember(Name = "languages")]
+    public IEnumerable<Language> Languages { get; set; }
 
     [DataMember(Name = "sections")]
     public IEnumerable<Section> Sections { get; set; }
@@ -19,6 +23,9 @@ public class UserGroupBasic : EntityBasic, INotificationModel
 
     [DataMember(Name = "mediaStartNode")]
     public EntityBasic? MediaStartNode { get; set; }
+
+    [DataMember(Name = "hasAccessToAllLanguages")]
+    public bool HasAccessToAllLanguages { get; set; }
 
     /// <summary>
     ///     The number of users assigned to this group

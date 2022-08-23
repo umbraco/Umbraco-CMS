@@ -49,6 +49,7 @@ public class NestedContentPropertyEditor : DataEditor
     {
         _ioHelper = ioHelper;
         _editorConfigurationParser = editorConfigurationParser;
+        SupportsReadOnly = true;
     }
 
     #region Pre Value Editor

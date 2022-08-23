@@ -104,7 +104,7 @@ public static class HtmlHelperBackOfficeExtensions
     /// <param name="html"></param>
     /// <param name="val"></param>
     /// <returns></returns>
-    public static IHtmlContent AngularValueResetPasswordCodeInfoScript(this IHtmlHelper html, object val)
+    public static IHtmlContent AngularValueResetPasswordCodeInfoScript(this IHtmlHelper html, object? val)
     {
         var sb = new StringBuilder();
         sb.AppendLine();
@@ -116,6 +116,8 @@ public static class HtmlHelperBackOfficeExtensions
             {
                 sb.AppendFormat(@"errors.push(""{0}"");", error).AppendLine();
             }
+
+            val = null;
         }
 
         sb.AppendLine(@"app.value(""resetPasswordCodeInfo"", {");

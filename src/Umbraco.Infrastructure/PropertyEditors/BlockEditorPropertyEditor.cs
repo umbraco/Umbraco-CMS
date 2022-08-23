@@ -27,7 +27,10 @@ public abstract class BlockEditorPropertyEditor : DataEditor
         IDataValueEditorFactory dataValueEditorFactory,
         PropertyEditorCollection propertyEditors)
         : base(dataValueEditorFactory)
-        => PropertyEditors = propertyEditors;
+    {
+        PropertyEditors = propertyEditors;
+        SupportsReadOnly = true;
+    }
 
     private PropertyEditorCollection PropertyEditors { get; }
 
