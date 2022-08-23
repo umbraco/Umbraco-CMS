@@ -11,8 +11,10 @@ public class DatabaseModel
     [DataMember(Name = "providerName")]
     public string? ProviderName { get; set; }
 
+    // TODO: Make this nullable in V11
+    // Server can be null, for instance when installing a SQLite database.
     [DataMember(Name = "server")]
-    public string? Server { get; set; }
+    public string Server { get; set; } = null!;
 
     [DataMember(Name = "databaseName")]
     public string DatabaseName { get; set; } = null!;

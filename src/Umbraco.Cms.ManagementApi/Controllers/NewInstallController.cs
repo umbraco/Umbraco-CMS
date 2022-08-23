@@ -73,11 +73,6 @@ public class NewInstallController : Controller
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> Setup(InstallViewModel installData)
     {
-        if (ModelState.IsValid is false)
-        {
-            return BadRequest(ModelState);
-        }
-
         InstallData data = _mapper.Map<InstallData>(installData)!;
         await _installService.Install(data);
 
@@ -91,25 +86,7 @@ public class NewInstallController : Controller
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> ValidateDatabase(DatabaseInstallViewModel viewModel)
     {
-        if (ModelState.IsValid is false)
-        {
-            return BadRequest(ModelState);
-        }
-
-        DatabaseModel? databaseModel = _mapper.Map<DatabaseModel>(viewModel);
-
-        if (databaseModel is null)
-        {
-            var problemDetails = new ProblemDetails
-            {
-                Title = "Unable to bind model",
-                Detail = "Unable to bind the model, the is most likely due to a malformed request.",
-                Status = StatusCodes.Status400BadRequest,
-                Type = "Error",
-            };
-
-            return BadRequest(problemDetails);
-        }
+        DatabaseModel databaseModel = _mapper.Map<DatabaseModel>(viewModel)!;
 
         var success = _databaseBuilder.ConfigureDatabaseConnection(databaseModel, true);
 

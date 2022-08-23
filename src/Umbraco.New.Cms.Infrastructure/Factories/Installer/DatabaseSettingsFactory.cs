@@ -33,12 +33,6 @@ public class DatabaseSettingsFactory : IDatabaseSettingsFactory
         if (connectionString.IsConnectionStringConfigured())
         {
             var providerName = connectionString.ProviderName;
-            if (providerName is null)
-            {
-                throw new InvalidOperationException(
-                    "Database provider must be configured to use preconfigured connection string");
-            }
-
             IDatabaseProviderMetadata? providerMetaData = _databaseProviderMetadata
                 .FirstOrDefault(x => x.ProviderName?.Equals(providerName, StringComparison.InvariantCultureIgnoreCase) ?? false);
 

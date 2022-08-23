@@ -42,7 +42,7 @@ public class InstallerViewModelsMapDefinition : IMapDefinition
         target.Login = source.Username;
         target.Password = source.Password;
         target.ProviderName = source.ProviderName;
-        target.Server = source.Server;
+        target.Server = source.Server!;
     }
 
     // Umbraco.Code.MapAll
@@ -85,7 +85,7 @@ public class InstallerViewModelsMapDefinition : IMapDefinition
         target.Login = source.Username;
         target.Password = source.Password;
         target.ProviderName = source.ProviderName;
-        target.Server = source.Server;
+        target.Server = source.Server!;
     }
 
     // Umbraco.Code.MapAll

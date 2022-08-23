@@ -8,7 +8,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.BackOffice.Install;
 
-[Obsolete("Has been replaced with attribute routing in the new backoffice API")]
+[Obsolete("Will be replaced with attribute routing in the new backoffice API")]
 public class InstallAreaRoutes : IAreaRoutes
 {
     private readonly IHostingEnvironment _hostingEnvironment;
