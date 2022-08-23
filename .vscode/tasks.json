@@ -54,7 +54,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/src/umbraco.sln",
+                "${workspaceFolder}/umbraco.sln",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
