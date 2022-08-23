@@ -77,20 +77,17 @@ class UmbIconSelector extends UmbModalLayoutElement<UmbModalContentPickerData> {
 
 			#icon-selection {
 				line-height: 0;
-				position: relative;
-				max-height: 80%;
-				font-size: 20px;
-				display: flex;
-				flex-wrap: wrap;
-				justify-content: space-between;
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(40px, auto));
 			}
 
 			#icon-selection .icon {
-				margin: 1px;
 				display: inline-block;
-				border: 1px solid transparent;
 				border-radius: 2px;
-				padding: 10px;
+				width: 100%;
+				height: 100%;
+				padding: 8px;
+				box-sizing: border-box;
 			}
 
 			#icon-selection .icon-container {
