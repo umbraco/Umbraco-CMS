@@ -30,7 +30,15 @@ public class InstallService : IInstallService
             throw new InvalidOperationException($"Runtime level must be Install to install but was: {_runtimeState.Level}");
         }
 
-        await RunSteps(model);
+        try
+        {
+            await RunSteps(model);
+        }
+        catch (Exception exception)
+        {
+            _logger.LogError(exception, "Encountered an error when running the install steps");
+            throw;
+        }
     }
 
     private async Task RunSteps(InstallData model)

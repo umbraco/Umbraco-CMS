@@ -30,7 +30,15 @@ public class UpgradeService : IUpgradeService
                 $"Runtime level must be Upgrade to upgrade but was: {_runtimeState.Level}");
         }
 
-        await RunSteps();
+        try
+        {
+            await RunSteps();
+        }
+        catch (Exception exception)
+        {
+            _logger.LogError(exception, "Encountered an error when running the upgrade steps");
+            throw;
+        }
     }
 
     private async Task RunSteps()
