@@ -24,6 +24,7 @@ public class ManagementApiComposer : IComposer
     private const string ApiTitle = "Umbraco Backoffice API";
     private const string ApiAllName = "All";
 
+    private ApiVersion DefaultApiVersion => new(1, 0);
 
     public void Compose(IUmbracoBuilder builder)
     {
@@ -33,11 +34,9 @@ public class ManagementApiComposer : IComposer
             .AddNewInstaller()
             .AddUpgrader();
 
-        var defaultApiVersion = new ApiVersion(1, 0);
-
         services.AddApiVersioning(options =>
         {
-            options.DefaultApiVersion = defaultApiVersion;
+            options.DefaultApiVersion = DefaultApiVersion;
             options.ReportApiVersions = true;
             options.ApiVersionReader = new UrlSegmentApiVersionReader();
             options.AssumeDefaultVersionWhenUnspecified = true;
@@ -54,7 +53,7 @@ public class ManagementApiComposer : IComposer
 
         services.AddVersionedApiExplorer(options =>
         {
-            options.DefaultApiVersion = defaultApiVersion;
+            options.DefaultApiVersion = DefaultApiVersion;
             options.GroupNameFormat = "'v'VVV";
             options.SubstituteApiVersionInUrl = true;
             options.AddApiVersionParametersWhenVersionNeutral = true;

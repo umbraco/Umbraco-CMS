@@ -26,7 +26,7 @@ public class UpgradeSettingsFactory : IUpgradeSettingsFactory
             CurrentState = _runtimeState.CurrentMigrationState ?? string.Empty,
             NewState = _runtimeState.FinalMigrationState ?? string.Empty,
             NewVersion = _umbracoVersion.SemanticVersion,
-            OldVersion = new SemVersion(_umbracoVersion.SemanticVersion.Major),
+            OldVersion = new SemVersion(_umbracoVersion.SemanticVersion.Major), // TODO can we find the old version somehow? e.g. from current state
         };
 
         return model;

@@ -44,7 +44,7 @@ public class DatabaseConfigureStep : IInstallStep
 
     public Task<bool> RequiresExecutionAsync(InstallData model)
     {
-        // If the connection string is already present in config we don't need to show the settings page and we jump to installing/upgrading.
+        // If the connection string is already present in config we don't need to configure it again
         if (_connectionStrings.CurrentValue.IsConnectionStringConfigured())
         {
             try
