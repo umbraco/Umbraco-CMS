@@ -5,10 +5,7 @@ import { UmbPropertyActionMenuContext } from '../shared/property-action-menu/pro
 import { UmbPropertyAction } from '../shared/property-action/property-action.model';
 
 @customElement('umb-property-action-clear')
-export default class UmbPropertyActionClearElement
-	extends UmbContextConsumerMixin(LitElement)
-	implements UmbPropertyAction
-{
+export class UmbPropertyActionClearElement extends UmbContextConsumerMixin(LitElement) implements UmbPropertyAction {
 	@property()
 	value = '';
 
@@ -41,6 +38,8 @@ export default class UmbPropertyActionClearElement
 		</uui-menu-item>`;
 	}
 }
+
+export default UmbPropertyActionClearElement;
 
 declare global {
 	interface HTMLElementTagNameMap {

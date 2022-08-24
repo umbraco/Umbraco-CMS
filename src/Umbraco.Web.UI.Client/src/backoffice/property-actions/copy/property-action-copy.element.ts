@@ -6,10 +6,7 @@ import type { UmbNotificationService } from '../../../core/services/notification
 import type { UmbPropertyAction } from '../shared/property-action/property-action.model';
 
 @customElement('umb-property-action-copy')
-export default class UmbPropertyActionCopyElement
-	extends UmbContextConsumerMixin(LitElement)
-	implements UmbPropertyAction
-{
+export class UmbPropertyActionCopyElement extends UmbContextConsumerMixin(LitElement) implements UmbPropertyAction {
 	@property()
 	value = '';
 
@@ -41,6 +38,8 @@ export default class UmbPropertyActionCopyElement
 		</uui-menu-item>`;
 	}
 }
+
+export default UmbPropertyActionCopyElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
