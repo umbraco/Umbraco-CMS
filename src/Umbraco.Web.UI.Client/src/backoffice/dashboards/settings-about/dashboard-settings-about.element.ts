@@ -15,6 +15,7 @@ export class UmbDashboardSettingsAboutElement extends LitElement {
 	}
 }
 
+export default UmbDashboardSettingsAboutElement;
 declare global {
 	interface HTMLElementTagNameMap {
 		'umb-dashboard-settings-about': UmbDashboardSettingsAboutElement;
