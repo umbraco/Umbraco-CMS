@@ -15,6 +15,8 @@ export class UmbDashboardExamineManagementElement extends LitElement {
 	}
 }
 
+export default UmbDashboardExamineManagementElement;
+
 declare global {
 	interface HTMLElementTagNameMap {
 		'umb-dashboard-examine-management': UmbDashboardExamineManagementElement;
