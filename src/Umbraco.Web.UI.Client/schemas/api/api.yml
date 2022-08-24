@@ -57,6 +57,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
+  /manifests:
+    get:
+      operationId: Manifests
+      responses:
+        '200':
+          description: 200 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ManifestsResponse'
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
   /server/status:
     get:
       operationId: GetStatus
@@ -341,6 +357,99 @@ components:
       required:
         - user
         - telemetryLevel
+    ManifestStandardTypes:
+      type: string
+      enum:
+        - section
+        - propertyEditorUI
+        - dashboard
+    MetaSection:
+      type: object
+      properties:
+        pathname:
+          type: string
+        weight:
+          type: number
+          format: float
+      required:
+        - pathname
+        - weight
+    MetaPropertyEditorUI:
+      type: object
+      properties:
+        icon:
+          type: string
+        group:
+          type: string
+      required:
+        - icon
+        - group
+    MetaDashboard:
+      type: object
+      properties:
+        sections:
+          type: array
+          items:
+            type: string
+        pathname:
+          type: string
+        weight:
+          type: number
+          format: float
+      required:
+        - sections
+        - pathname
+        - weight
+    IManifestElement:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/ManifestStandardTypes'
+        alias:
+          type: string
+        name:
+          type: string
+        js:
+          type: string
+        elementName:
+          type: string
+        meta:
+          oneOf:
+            - $ref: '#/components/schemas/MetaSection'
+            - $ref: '#/components/schemas/MetaPropertyEditorUI'
+            - $ref: '#/components/schemas/MetaDashboard'
+      required:
+        - type
+        - alias
+        - name
+        - js
+        - elementName
+        - meta
+    IManifestEntrypoint:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - entrypoint
+        js:
+          type: string
+      required:
+        - type
+        - js
+    Manifest:
+      oneOf:
+        - $ref: '#/components/schemas/IManifestElement'
+        - $ref: '#/components/schemas/IManifestEntrypoint'
+    ManifestsResponse:
+      type: object
+      properties:
+        manifests:
+          type: array
+          items:
+            $ref: '#/components/schemas/Manifest'
+      required:
+        - manifests
     ServerStatus:
       type: string
       enum:
