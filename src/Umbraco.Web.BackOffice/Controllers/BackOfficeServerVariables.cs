@@ -1,5 +1,6 @@
 using System.Runtime.Serialization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -52,6 +53,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IEmailSender _emailSender;
         private MemberPasswordConfigurationSettings _memberPasswordConfigurationSettings;
         private DataTypesSettings _dataTypesSettings;
+        private readonly ITempDataDictionaryFactory _tempDataDictionaryFactory;
 
         [Obsolete("Use constructor that takes IOptionsMontior<DataTypeSettings>, scheduled for removal in V12")]
         public BackOfficeServerVariables(
@@ -94,6 +96,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         {
         }
 
+        [Obsolete("Use constructor that takes ITempDataDictionaryFactory, scheduled for removal in V12")]
         public BackOfficeServerVariables(
             LinkGenerator linkGenerator,
             IRuntimeState runtimeState,
@@ -113,6 +116,49 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             IEmailSender emailSender,
             IOptionsMonitor<MemberPasswordConfigurationSettings> memberPasswordConfigurationSettings,
             IOptionsMonitor<DataTypesSettings> dataTypesSettings)
+        : this(
+            linkGenerator,
+            runtimeState,
+            features,
+            globalSettings,
+            umbracoVersion,
+            contentSettings,
+            httpContextAccessor,
+            treeCollection,
+            hostingEnvironment,
+            runtimeSettings,
+            securitySettings,
+            runtimeMinifier,
+            externalLogins,
+            imageUrlGenerator,
+            previewRoutes,
+            emailSender,
+            memberPasswordConfigurationSettings,
+            dataTypesSettings,
+            StaticServiceProvider.Instance.GetRequiredService<ITempDataDictionaryFactory>())
+        {
+        }
+
+        public BackOfficeServerVariables(
+            LinkGenerator linkGenerator,
+            IRuntimeState runtimeState,
+            UmbracoFeatures features,
+            IOptionsMonitor<GlobalSettings> globalSettings,
+            IUmbracoVersion umbracoVersion,
+            IOptionsMonitor<ContentSettings> contentSettings,
+            IHttpContextAccessor httpContextAccessor,
+            TreeCollection treeCollection,
+            IHostingEnvironment hostingEnvironment,
+            IOptionsMonitor<RuntimeSettings> runtimeSettings,
+            IOptionsMonitor<SecuritySettings> securitySettings,
+            IRuntimeMinifier runtimeMinifier,
+            IBackOfficeExternalLoginProviders externalLogins,
+            IImageUrlGenerator imageUrlGenerator,
+            PreviewRoutes previewRoutes,
+            IEmailSender emailSender,
+            IOptionsMonitor<MemberPasswordConfigurationSettings> memberPasswordConfigurationSettings,
+            IOptionsMonitor<DataTypesSettings> dataTypesSettings,
+            ITempDataDictionaryFactory tempDataDictionaryFactory)
         {
             _linkGenerator = linkGenerator;
             _runtimeState = runtimeState;
@@ -130,6 +176,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _imageUrlGenerator = imageUrlGenerator;
             _previewRoutes = previewRoutes;
             _emailSender = emailSender;
+            _tempDataDictionaryFactory = tempDataDictionaryFactory;
             _memberPasswordConfigurationSettings = memberPasswordConfigurationSettings.CurrentValue;
             _dataTypesSettings = dataTypesSettings.CurrentValue;
 
@@ -147,15 +194,52 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <returns></returns>
         internal async Task<Dictionary<string, object>> BareMinimumServerVariablesAsync()
         {
+            // figure out if we are executing in context of a backoffice user
+            HttpContext? context = _httpContextAccessor.HttpContext;
+            var isBackofficeUser = false;
+            if (context != null)
+            {
+                // first look for an authorized user (this covers both logged in and invited users)
+                isBackofficeUser = (await context.AuthenticateBackOfficeAsync()).Succeeded;
+                if (isBackofficeUser == false)
+                {
+                    // here's where things get a little ugly:
+                    // when a backoffice user is about to reset their password, TempData[ViewDataExtensions.TokenPasswordResetCode]
+                    // contains a JSON object with the current user ID and a password reset code - see ValidatePasswordResetCodeModel
+                    ITempDataDictionary tempData = _tempDataDictionaryFactory.GetTempData(context);
+                    var passwordResetCode = tempData[ViewDataExtensions.TokenPasswordResetCode];
+                    isBackofficeUser = passwordResetCode is string passwordResetCodeString && passwordResetCodeString.InvariantContains("userId");
+                }
+            }
+
             //this is the filter for the keys that we'll keep based on the full version of the server vars
+            var umbracoSettings = new List<string> {
+                "allowPasswordReset",
+                "imageFileTypes",
+                "loginBackgroundImage",
+                "loginLogoImage",
+                "canSendRequiredEmail",
+                "usernameIsEmail",
+                "hideBackofficeLogo",
+                "disableDeleteWhenReferenced",
+                "disableUnpublishWhenReferenced"
+            };
+
+            // add a few extras for backoffice users (server vars we don't want floating around for anonymous users)
+            if (isBackofficeUser)
+            {
+                umbracoSettings.AddRange(new[] { "maxFileSize", "minimumPasswordLength", "minimumPasswordNonAlphaNum" });
+            }
+
             var keepOnlyKeys = new Dictionary<string, string[]>
             {
                 {"umbracoUrls", new[] {"authenticationApiBaseUrl", "serverVarsJs", "externalLoginsUrl", "currentUserApiBaseUrl", "previewHubUrl", "iconApiBaseUrl"}},
-                {"umbracoSettings", new[] {"allowPasswordReset", "imageFileTypes", "maxFileSize", "loginBackgroundImage", "loginLogoImage", "canSendRequiredEmail", "usernameIsEmail", "minimumPasswordLength", "minimumPasswordNonAlphaNum", "hideBackofficeLogo", "disableDeleteWhenReferenced", "disableUnpublishWhenReferenced"}},
+                {"umbracoSettings", umbracoSettings.ToArray()},
                 {"application", new[] {"applicationPath", "cacheBuster"}},
                 {"isDebuggingEnabled", new string[] { }},
                 {"features", new [] {"disabledFeatures"}}
             };
+
             //now do the filtering...
             Dictionary<string, object> defaults = await GetServerVariablesAsync();
             foreach (var key in defaults.Keys.ToArray())
@@ -484,7 +568,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         {"minimumPasswordLength", _memberPasswordConfigurationSettings.RequiredLength},
                         {"minimumPasswordNonAlphaNum", _memberPasswordConfigurationSettings.GetMinNonAlphaNumericChars()},
                         {"sanitizeTinyMce", _globalSettings.SanitizeTinyMce},
-                        {"dataTypesCanBeChanged", _dataTypesSettings.CanBeChanged.ToString()}
+                        {"dataTypesCanBeChanged", _dataTypesSettings.CanBeChanged.ToString()},
+                        {"allowEditInvariantFromNonDefault", _securitySettings.AllowEditInvariantFromNonDefault},
                     }
                 },
                 {
@@ -597,7 +682,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 { "assemblyVersion", _umbracoVersion.AssemblyVersion?.ToString() }
             };
 
-
+            app.Add("runtimeMode", _runtimeSettings.Mode.ToString());
 
             //the value is the hash of the version, cdf version and the configured state
             app.Add("cacheBuster", $"{version}.{_runtimeState.Level}.{_runtimeMinifier.CacheBuster}".GenerateHash());

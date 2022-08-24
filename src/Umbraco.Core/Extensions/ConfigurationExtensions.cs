@@ -1,10 +1,11 @@
 using Microsoft.Extensions.Configuration;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
 
 namespace Umbraco.Extensions;
 
 /// <summary>
-/// Extension methods for configuration.
+/// Extensions for <see cref="IConfiguration" />.
 /// </summary>
 public static class ConfigurationExtensions
 {
@@ -90,4 +91,14 @@ public static class ConfigurationExtensions
 
         return connectionString;
     }
+
+    /// <summary>
+    /// Gets the Umbraco runtime mode.
+    /// </summary>
+    /// <param name="configuration">The configuration.</param>
+    /// <returns>
+    /// The Umbraco runtime mode.
+    /// </returns>
+    public static RuntimeMode GetRuntimeMode(this IConfiguration configuration)
+        => configuration.GetValue<RuntimeMode>(Constants.Configuration.ConfigRuntimeMode);
 }

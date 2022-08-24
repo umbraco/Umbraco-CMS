@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
@@ -12,6 +12,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Semver;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Telemetry.Providers;
 
@@ -133,13 +134,12 @@ public class UserDataServiceTests
         return new SystemInformationTelemetryProvider(
             _umbracoVersion,
             localizationService,
-            Mock.Of<IOptionsMonitor<ModelsBuilderSettings>>(x =>
-                x.CurrentValue == new ModelsBuilderSettings { ModelsMode = modelsMode }),
+            Mock.Of<IOptionsMonitor<ModelsBuilderSettings>>(x => x.CurrentValue == new ModelsBuilderSettings { ModelsMode = modelsMode }),
             Mock.Of<IOptionsMonitor<HostingSettings>>(x => x.CurrentValue == new HostingSettings { Debug = isDebug }),
             Mock.Of<IOptionsMonitor<GlobalSettings>>(x => x.CurrentValue == new GlobalSettings()),
             Mock.Of<IHostEnvironment>(),
-            Mock.Of<IUmbracoDatabaseFactory>(x =>
-                x.CreateDatabase() == Mock.Of<IUmbracoDatabase>(y => y.DatabaseType == DatabaseType.SQLite)));
+            Mock.Of<IUmbracoDatabaseFactory>(x => x.CreateDatabase() == Mock.Of<IUmbracoDatabase>(y => y.DatabaseType == DatabaseType.SQLite)),
+            Mock.Of<IServerRoleAccessor>());
     }
 
     private ILocalizationService CreateILocalizationService(string culture)

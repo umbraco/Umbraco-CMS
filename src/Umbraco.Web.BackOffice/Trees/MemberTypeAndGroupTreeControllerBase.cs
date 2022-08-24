@@ -80,11 +80,11 @@ public abstract class MemberTypeAndGroupTreeControllerBase : TreeController
         IMemberType? memberType = _memberTypeService.Get(int.Parse(id));
         if (memberType != null)
         {
-            menu.Items.Add<ActionCopy>(LocalizedTextService, opensDialog: true);
+            menu.Items.Add<ActionCopy>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
         }
 
         // delete member type/group
-        menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true);
+        menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
 
         return menu;
     }

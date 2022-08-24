@@ -1,3 +1,4 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Exceptions;
@@ -11,6 +12,7 @@ using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
@@ -29,10 +31,39 @@ public class ContentService : RepositoryService, IContentService
     private readonly ILogger<ContentService> _logger;
     private readonly Lazy<IPropertyValidationService> _propertyValidationService;
     private readonly IShortStringHelper _shortStringHelper;
+    private readonly ICultureImpactFactory _cultureImpactFactory;
     private IQuery<IContent>? _queryNotTrashed;
 
     #region Constructors
 
+        public ContentService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IDocumentRepository documentRepository,
+        IEntityRepository entityRepository,
+        IAuditRepository auditRepository,
+        IContentTypeRepository contentTypeRepository,
+        IDocumentBlueprintRepository documentBlueprintRepository,
+        ILanguageRepository languageRepository,
+        Lazy<IPropertyValidationService> propertyValidationService,
+        IShortStringHelper shortStringHelper,
+        ICultureImpactFactory cultureImpactFactory)
+        : base(provider, loggerFactory, eventMessagesFactory)
+    {
+        _documentRepository = documentRepository;
+        _entityRepository = entityRepository;
+        _auditRepository = auditRepository;
+        _contentTypeRepository = contentTypeRepository;
+        _documentBlueprintRepository = documentBlueprintRepository;
+        _languageRepository = languageRepository;
+        _propertyValidationService = propertyValidationService;
+        _shortStringHelper = shortStringHelper;
+            _cultureImpactFactory = cultureImpactFactory;
+        _logger = loggerFactory.CreateLogger<ContentService>();
+    }
+
+    [Obsolete("Use constructor that takes ICultureImpactService as a parameter, scheduled for removal in V12")]
     public ContentService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -45,17 +76,20 @@ public class ContentService : RepositoryService, IContentService
         ILanguageRepository languageRepository,
         Lazy<IPropertyValidationService> propertyValidationService,
         IShortStringHelper shortStringHelper)
-        : base(provider, loggerFactory, eventMessagesFactory)
+        : this(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            documentRepository,
+            entityRepository,
+            auditRepository,
+            contentTypeRepository,
+            documentBlueprintRepository,
+            languageRepository,
+            propertyValidationService,
+            shortStringHelper,
+            StaticServiceProvider.Instance.GetRequiredService<ICultureImpactFactory>())
     {
-        _documentRepository = documentRepository;
-        _entityRepository = entityRepository;
-        _auditRepository = auditRepository;
-        _contentTypeRepository = contentTypeRepository;
-        _documentBlueprintRepository = documentBlueprintRepository;
-        _languageRepository = languageRepository;
-        _propertyValidationService = propertyValidationService;
-        _shortStringHelper = shortStringHelper;
-        _logger = loggerFactory.CreateLogger<ContentService>();
     }
 
     #endregion
@@ -1122,7 +1156,7 @@ public class ContentService : RepositoryService, IContentService
             // if culture is '*', then publish them all (including variants)
 
             // this will create the correct culture impact even if culture is * or null
-            var impact = CultureImpact.Create(culture, IsDefaultCulture(allLangs, culture), content);
+                var impact = _cultureImpactFactory.Create(culture, IsDefaultCulture(allLangs, culture), content);
 
             // publish the culture(s)
             // we don't care about the response here, this response will be rechecked below but we need to set the culture info values now.
@@ -1181,7 +1215,7 @@ public class ContentService : RepositoryService, IContentService
             }
 
             IEnumerable<CultureImpact> impacts =
-                cultures.Select(x => CultureImpact.Explicit(x, IsDefaultCulture(allLangs, x)));
+                    cultures.Select(x => _cultureImpactFactory.ImpactExplicit(x, IsDefaultCulture(allLangs, x)));
 
             // publish the culture(s)
             // we don't care about the response here, this response will be rechecked below but we need to set the culture info values now.
@@ -1809,7 +1843,7 @@ public class ContentService : RepositoryService, IContentService
 
                         // publish the culture values and validate the property values, if validation fails, log the invalid properties so the develeper has an idea of what has failed
                         IProperty[]? invalidProperties = null;
-                        var impact = CultureImpact.Explicit(culture, IsDefaultCulture(allLangs.Value, culture));
+                            var impact = _cultureImpactFactory.ImpactExplicit(culture, IsDefaultCulture(allLangs.Value, culture));
                         var tryPublish = d.PublishCulture(impact) &&
                                          _propertyValidationService.Value.IsPropertyDataValid(d, out invalidProperties, impact);
                         if (invalidProperties != null && invalidProperties.Length > 0)
@@ -1893,14 +1927,14 @@ public class ContentService : RepositoryService, IContentService
         {
             return culturesToPublish.All(culture =>
             {
-                var impact = CultureImpact.Create(culture, IsDefaultCulture(allLangs, culture), content);
+                    var impact = _cultureImpactFactory.Create(culture, IsDefaultCulture(allLangs, culture), content);
                 return content.PublishCulture(impact) &&
                        _propertyValidationService.Value.IsPropertyDataValid(content, out _, impact);
             });
         }
 
-        return content.PublishCulture(CultureImpact.Invariant)
-               && _propertyValidationService.Value.IsPropertyDataValid(content, out _, CultureImpact.Invariant);
+            return content.PublishCulture(_cultureImpactFactory.ImpactInvariant())
+                   && _propertyValidationService.Value.IsPropertyDataValid(content, out _, _cultureImpactFactory.ImpactInvariant());
     }
 
     // utility 'ShouldPublish' func used by SaveAndPublishBranch
@@ -3025,9 +3059,12 @@ public class ContentService : RepositoryService, IContentService
 
         // If it's null it's invariant
         CultureImpact[] impactsToPublish = culturesPublishing == null
-            ? new[] { CultureImpact.Invariant }
+                ? new[] { _cultureImpactFactory.ImpactInvariant() }
             : culturesPublishing.Select(x =>
-                CultureImpact.Explicit(x, allLangs.Any(lang => lang.IsoCode.InvariantEquals(x) && lang.IsMandatory))).ToArray();
+                _cultureImpactFactory.ImpactExplicit(
+                        x,
+                        allLangs.Any(lang => lang.IsoCode.InvariantEquals(x) && lang.IsMandatory)))
+                    .ToArray();
 
         // publish the culture(s)
         if (!impactsToPublish.All(content.PublishCulture))

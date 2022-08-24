@@ -490,8 +490,7 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
         GetBaseQuery(isCount ? QueryType.Count : QueryType.Single);
 
     protected override string GetBaseWhereClause() // TODO: can we kill / refactor this?
-        =>
-            "umbracoNode.id = @id";
+        => "umbracoNode.id = @id";
 
     // TODO: document/understand that one
     protected Sql<ISqlContext> GetNodeIdQueryWithPropertyData() =>
@@ -526,6 +525,8 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
             "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyData +
             " WHERE versionId IN (SELECT id FROM " + Constants.DatabaseSchema.Tables.ContentVersion +
             " WHERE nodeId = @id)",
+            $"DELETE FROM {Constants.DatabaseSchema.Tables.ExternalLoginToken} WHERE externalLoginId = (SELECT id FROM {Constants.DatabaseSchema.Tables.ExternalLogin} WHERE userOrMemberKey = (SELECT uniqueId from {Constants.DatabaseSchema.Tables.Node} where id = @id))",
+            $"DELETE FROM {Constants.DatabaseSchema.Tables.ExternalLogin} WHERE userOrMemberKey = (SELECT uniqueId from {Constants.DatabaseSchema.Tables.Node} where id = @id)",
             "DELETE FROM cmsMember2MemberGroup WHERE Member = @id",
             "DELETE FROM cmsMember WHERE nodeId = @id",
             "DELETE FROM " + Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id",
@@ -779,6 +780,11 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
             // check if we have a user config else use the default
             memberDto.PasswordConfig = entity.PasswordConfiguration ?? DefaultPasswordConfigJson;
             changedCols.Add("passwordConfig");
+        }
+
+        if (entity.IsPropertyDirty("EmailConfirmedDate"))
+        {
+            changedCols.Add("emailConfirmedDate");
         }
 
         // If userlogin or the email has changed then need to reset security stamp

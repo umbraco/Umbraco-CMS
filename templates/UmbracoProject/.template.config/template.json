@@ -162,7 +162,7 @@
         "cases": [
           {
             "condition": "(DevelopmentDatabaseType == 'SQLite')",
-            "value": "Microsoft.Data.SQLite"
+            "value": "Microsoft.Data.Sqlite"
           },
           {
             "condition": "(true)",

@@ -11,9 +11,8 @@ public class MemberPickerPropertyEditor : DataEditor
 {
     public MemberPickerPropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory)
-        : base(dataValueEditorFactory)
-    {
-    }
+        : base(dataValueEditorFactory) =>
+        SupportsReadOnly = true;
 
     protected override IConfigurationEditor CreateConfigurationEditor() => new MemberPickerConfiguration();
 }

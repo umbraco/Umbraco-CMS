@@ -11,8 +11,8 @@
         <ul class="umb-contextmenu">
             <li ng-repeat="action in vm.actions" role="menuitem" class="umb-contextmenu-item" ng-class="{'-opens-dialog': action.opensDialog}">
                 <button type="button" class="btn-reset umb-outline" ng-click="vm.executeAction(action)" ng-disabled="action.isDisabled === true">
-                    <umb-icon icon="icon-{{action.icon}}" class="icon"></umb-icon>
-                    <span class="menu-label"><localize key="{{::action.labelKey}}" tokens="action.labelTokens"></localize></span>
+                    <umb-icon icon="{{action.icon}}" class="icon"></umb-icon>
+                    <span class="menu-label">{{::action.label}}</span>
                 </button>
             </li>
         </ul>

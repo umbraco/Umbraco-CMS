@@ -140,16 +140,32 @@ public class DictionaryTreeController : TreeController
     {
         MenuItemCollection menu = _menuItemCollectionFactory.Create();
 
-        menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);
+        menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
 
         if (id != Constants.System.RootString)
         {
-            menu.Items.Add<ActionDelete>(LocalizedTextService, true, true);
-            menu.Items.Add<ActionMove>(LocalizedTextService, true, true);
+            menu.Items.Add<ActionMove>(LocalizedTextService, hasSeparator: true, opensDialog: true, useLegacyIcon: false);
+            menu.Items.Add(new MenuItem("export", LocalizedTextService)
+            {
+                Icon = "icon-download-alt",
+                SeparatorBefore = true,
+                OpensDialog = true,
+                UseLegacyIcon = false,
+            });
+            menu.Items.Add<ActionDelete>(LocalizedTextService, hasSeparator: true, opensDialog: true, useLegacyIcon: false);
+        }
+        else
+        {
+            menu.Items.Add(new MenuItem("import", LocalizedTextService)
+            {
+                Icon = "icon-page-up",
+                SeparatorBefore = true,
+                OpensDialog = true,
+                UseLegacyIcon = false,
+            });
         }
 
-
-        menu.Items.Add(new RefreshNode(LocalizedTextService, true));
+        menu.Items.Add(new RefreshNode(LocalizedTextService, separatorBefore: true));
 
         return menu;
     }

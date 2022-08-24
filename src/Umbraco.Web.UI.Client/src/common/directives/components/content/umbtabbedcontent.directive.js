@@ -15,6 +15,8 @@
 
             $scope.activeTabAlias = null;
             $scope.tabs = [];
+            $scope.allowUpdate = $scope.content.allowedActions.includes('A');
+            $scope.allowEditInvariantFromNonDefault = Umbraco.Sys.ServerVariables.umbracoSettings.allowEditInvariantFromNonDefault;
 
             $scope.$watchCollection('content.tabs', (newValue) => {
 
@@ -189,11 +191,13 @@
 
                 var contentLanguage = $scope.content.language;
 
+                var otherCreatedVariants = $scope.contentNodeModel.variants.filter(x => x.compositeId !== $scope.content.compositeId && (x.state !== "NotCreated" || x.name !== null)).length === 0;
+
                 var canEditCulture = !contentLanguage ||
                     // If the property culture equals the content culture it can be edited
                     property.culture === contentLanguage.culture ||
                     // A culture-invariant property can only be edited by the default language variant
-                    (property.culture == null && contentLanguage.isDefault);
+                    (otherCreatedVariants || $scope.allowEditInvariantFromNonDefault !== true && property.culture == null && contentLanguage.isDefault);
 
                 var canEditSegment = property.segment === $scope.content.segment;
 

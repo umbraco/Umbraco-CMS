@@ -76,6 +76,10 @@ public class DataEditor : IDataEditor
     public string Alias { get; set; }
 
     /// <inheritdoc />
+    [DataMember(Name = "supportsReadOnly", IsRequired = true)]
+    public bool SupportsReadOnly { get; set; }
+
+    /// <inheritdoc />
     [IgnoreDataMember]
     public EditorType Type { get; }
 

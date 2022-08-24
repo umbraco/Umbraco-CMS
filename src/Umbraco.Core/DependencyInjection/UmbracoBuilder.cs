@@ -187,9 +187,6 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
             Services.AddSingleton<InstallStatusTracker>();
 
-            // by default, register a noop factory
-            Services.AddUnique<IPublishedModelFactory, NoopPublishedModelFactory>();
-
             Services.AddUnique<ICultureDictionaryFactory, DefaultCultureDictionaryFactory>();
             Services.AddSingleton(f => f.GetRequiredService<ICultureDictionaryFactory>().CreateDictionary());
 
@@ -326,6 +323,8 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
             Services.AddUnique<IPropertyTypeUsageService, PropertyTypeUsageService>();
             Services.AddUnique<IDataTypeUsageService, DataTypeUsageService>();
+
+            Services.AddUnique<ICultureImpactFactory, CultureImpactFactory>();
         }
     }
 }

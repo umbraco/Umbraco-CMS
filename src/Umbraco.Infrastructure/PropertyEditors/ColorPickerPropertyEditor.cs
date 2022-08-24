@@ -41,6 +41,7 @@ public class ColorPickerPropertyEditor : DataEditor
         _ioHelper = ioHelper;
         _jsonSerializer = jsonSerializer;
         _editorConfigurationParser = editorConfigurationParser;
+        SupportsReadOnly = true;
     }
 
     /// <inheritdoc />

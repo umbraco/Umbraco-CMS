@@ -50,10 +50,10 @@ public class ModelsBuilderSettings
             }
 
             return _flagOutOfDateModels;
-            }
-
-            set =>_flagOutOfDateModels = value;
         }
+
+            set => _flagOutOfDateModels = value;
+    }
 
 
     /// <summary>

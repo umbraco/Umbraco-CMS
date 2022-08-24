@@ -47,6 +47,7 @@ public class CheckBoxListPropertyEditor : DataEditor
         _textService = textService;
         _ioHelper = ioHelper;
         _editorConfigurationParser = editorConfigurationParser;
+        SupportsReadOnly = true;
     }
 
     /// <inheritdoc />

@@ -24,6 +24,7 @@
           "min": 1,
           "max": 3
         },
+        behaviour: 'smooth-steps-tap',
         pips: {
           mode: 'values',
           density: 50,

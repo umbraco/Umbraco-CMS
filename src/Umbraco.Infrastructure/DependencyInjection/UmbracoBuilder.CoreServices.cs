@@ -51,6 +51,7 @@ using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0.DataTypes;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Infrastructure.Runtime;
+using Umbraco.Cms.Infrastructure.Runtime.RuntimeModeValidators;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Infrastructure.Search;
 using Umbraco.Cms.Infrastructure.Serialization;
@@ -63,7 +64,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection;
 public static partial class UmbracoBuilderExtensions
 {
     /// <summary>
-    ///     Adds all core Umbraco services required to run which may be replaced later in the pipeline
+    /// Adds all core Umbraco services required to run which may be replaced later in the pipeline.
     /// </summary>
     public static IUmbracoBuilder AddCoreInitialServices(this IUmbracoBuilder builder)
     {
@@ -82,6 +83,15 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<PendingPackageMigrations>();
         builder.AddNotificationAsyncHandler<RuntimeUnattendedInstallNotification, UnattendedInstaller>();
         builder.AddNotificationAsyncHandler<RuntimeUnattendedUpgradeNotification, UnattendedUpgrader>();
+
+        // Add runtime mode validation
+        builder.Services.AddSingleton<IRuntimeModeValidationService, RuntimeModeValidationService>();
+        builder.RuntimeModeValidators()
+            .Add<JITOptimizerValidator>()
+            .Add<UmbracoApplicationUrlValidator>()
+            .Add<UseHttpsValidator>()
+            .Add<RuntimeMinificationValidator>()
+            .Add<ModelsBuilderModeValidator>();
 
         // composers
         builder
@@ -102,9 +112,9 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IScopeProvider>(f => f.GetRequiredService<ScopeProvider>());
         builder.Services.AddSingleton<Core.Scoping.IScopeProvider>(f => f.GetRequiredService<ScopeProvider>());
 
-            builder.Services.AddSingleton<IAmbientScopeStack, AmbientScopeStack>();
+        builder.Services.AddSingleton<IAmbientScopeStack, AmbientScopeStack>();
         builder.Services.AddSingleton<IScopeAccessor>(f => f.GetRequiredService<IAmbientScopeStack>());
-            builder.Services.AddSingleton<IAmbientScopeContextStack, AmbientScopeContextStack>();
+        builder.Services.AddSingleton<IAmbientScopeContextStack, AmbientScopeContextStack>();
 
         builder.Services.AddScoped<IHttpScopeReference, HttpScopeReference>();
 
@@ -210,6 +220,8 @@ public static partial class UmbracoBuilderExtensions
 
         // Services required to run background jobs (with out the handler)
         builder.Services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
+
+        builder.Services.AddTransient<IFireAndForgetRunner, FireAndForgetRunner>();
         return builder;
     }
 
