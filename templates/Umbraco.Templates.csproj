@@ -16,6 +16,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+	<Compile Remove="ItemTemplates\**" />
     <Content Include="icon.png" Visible="false" />
 	<Content Include="ItemTemplates\**" Exclude="bin;obj" />
     <Content Include="UmbracoPackage\**" Exclude="bin;obj" />
