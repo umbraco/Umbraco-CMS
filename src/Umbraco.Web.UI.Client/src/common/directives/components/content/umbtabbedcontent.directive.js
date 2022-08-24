@@ -189,10 +189,6 @@
                     return false;
                 }
 
-                if (property.$propertyEditorDisabledCache) {
-                    return property.$propertyEditorDisabledCache;
-                }
-
                 var contentLanguage = $scope.content.language;
 
                 var otherCreatedVariants = $scope.contentNodeModel.variants.filter(x => x.compositeId !== $scope.content.compositeId && (x.state !== "NotCreated" || x.name !== null)).length === 0;
@@ -205,7 +201,7 @@
 
                 var canEditSegment = property.segment === $scope.content.segment;
 
-                return property.$propertyEditorDisabledCache = !canEditCulture || !canEditSegment;
+                return !canEditCulture || !canEditSegment;
             }
         }
 
