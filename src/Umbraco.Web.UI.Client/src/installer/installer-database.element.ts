@@ -57,7 +57,7 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
 				margin-bottom: var(--uui-size-layout-3);
 			}
 
-			h4 {
+			h2 {
 				margin: 0;
 			}
 
@@ -250,14 +250,15 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
 	}
 
 	private _renderServer = () => html`
-		<h4>Connection</h4>
+		<h2 class="uui-h4">Connection</h2>
 		<hr />
 		<uui-form-layout-item>
-			<uui-label for="server" slot="label" required>Server</uui-label>
+			<uui-label for="server" slot="label" required>Server address</uui-label>
 			<uui-input
 				type="text"
 				id="server"
 				name="server"
+				label="Server address"
 				@input=${this._handleChange}
 				.value=${this.databaseFormData.server ?? ''}
 				.placeholder=${this.selectedDatabase?.serverPlaceholder ?? ''}
@@ -273,6 +274,7 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
 			.value=${value}
 			id="database-name"
 			name="name"
+			label="Database name"
 			@input=${this._handleChange}
 			placeholder="umbraco"
 			required
@@ -280,16 +282,16 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
 	</uui-form-layout-item>`;
 
 	private _renderCredentials = () => html`
-		<h4>Credentials</h4>
+		<h2 class="uui-h4">Credentials</h2>
 		<hr />
 		<uui-form-layout-item>
 			<uui-checkbox
 				name="useIntegratedAuthentication"
-				label="use-integrated-authentication"
+				label="Use integrated authentication"
 				@change=${this._handleChange}
-				.checked=${this.databaseFormData.useIntegratedAuthentication || false}
-				>Use integrated authentication</uui-checkbox
-			>
+				.checked=${this.databaseFormData.useIntegratedAuthentication || false}>
+				Use integrated authentication
+			</uui-checkbox>
 		</uui-form-layout-item>
 
 		${!this.databaseFormData.useIntegratedAuthentication
@@ -300,6 +302,7 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
 							.value=${this.databaseFormData.username ?? ''}
 							id="username"
 							name="username"
+							label="Username"
 							@input=${this._handleChange}
 							required
 							required-message="Username is required"></uui-input>
@@ -312,6 +315,7 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
 							.value=${this.databaseFormData.password ?? ''}
 							id="password"
 							name="password"
+							label="Password"
 							@input=${this._handleChange}
 							autocomplete="new-password"
 							required
