@@ -1,7 +1,12 @@
 import { rest } from 'msw';
 
 import umbracoPath from '../../core/helpers/umbraco-path';
-import { PostInstallRequest, ProblemDetails, UmbracoInstaller } from '../../core/models';
+import {
+  PostInstallRequest,
+  ProblemDetails,
+  UmbracoInstaller,
+  UmbracoPerformInstallDatabaseConfiguration,
+} from '../../core/models';
 
 export const handlers = [
 	rest.get(umbracoPath('/install/settings'), (_req, res, ctx) => {
@@ -70,6 +75,26 @@ export const handlers = [
 					},
 				],
 			})
+		);
+	}),
+
+	rest.post(umbracoPath('/install/validateDatabase'), async (req, res, ctx) => {
+		const body = await req.json<UmbracoPerformInstallDatabaseConfiguration>();
+
+		if (body.name === 'validate') {
+			return res(
+				ctx.status(400),
+				ctx.json<ProblemDetails>({
+					type: 'connection',
+					status: 400,
+					detail: 'Database connection failed',
+				})
+			);
+		}
+
+		return res(
+			// Respond with a 200 status code
+			ctx.status(201)
 		);
 	}),
 

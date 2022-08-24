@@ -46,7 +46,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/InstallValidateDatabaseRequest'
+              $ref: '#/components/schemas/InstallSetupDatabaseConfiguration'
         required: true
       responses:
         '201':
@@ -341,13 +341,6 @@ components:
       required:
         - user
         - telemetryLevel
-    InstallValidateDatabaseRequest:
-      type: object
-      properties:
-        database:
-          $ref: '#/components/schemas/InstallSetupDatabaseConfiguration'
-      required:
-        - database
     ServerStatus:
       type: string
       enum:
