@@ -102,9 +102,6 @@ export interface components {
       telemetryLevel: components["schemas"]["ConsentLevel"];
       database?: components["schemas"]["InstallSetupDatabaseConfiguration"];
     };
-    InstallValidateDatabaseRequest: {
-      database: components["schemas"]["InstallSetupDatabaseConfiguration"];
-    };
     /** @enum {string} */
     ServerStatus: "running" | "must-install" | "must-upgrade";
     StatusResponse: {
@@ -184,7 +181,7 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "application/json": components["schemas"]["InstallValidateDatabaseRequest"];
+        "application/json": components["schemas"]["InstallSetupDatabaseConfiguration"];
       };
     };
   };

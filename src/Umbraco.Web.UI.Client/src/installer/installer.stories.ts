@@ -48,7 +48,7 @@ export const Step3Database: Story = () => html`<umb-installer-database></umb-ins
 Step3Database.storyName = 'Step 3: Database';
 Step3Database.parameters = {
 	actions: {
-		handles: ['previous', 'next'],
+		handles: ['previous', 'submit'],
 	},
 };
 
@@ -56,7 +56,7 @@ export const Step3DatabasePreconfigured: Story = () => html`<umb-installer-datab
 Step3DatabasePreconfigured.storyName = 'Step 3: Database (preconfigured)';
 Step3DatabasePreconfigured.parameters = {
 	actions: {
-		handles: ['previous', 'next'],
+		handles: ['previous', 'submit'],
 	},
 	msw: {
 		handlers: {

@@ -1,8 +1,9 @@
 import { UUIButtonElement } from '@umbraco-ui/uui';
-import { css, CSSResultGroup, html, LitElement } from 'lit';
+import { css, CSSResultGroup, html, LitElement, nothing } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { Subscription } from 'rxjs';
 
+import { postInstallSetup, postInstallValidateDatabase } from '../core/api/fetcher';
 import { UmbContextConsumerMixin } from '../core/context';
 import { UmbracoInstallerDatabaseModel, UmbracoPerformInstallDatabaseConfiguration } from '../core/models';
 import { UmbInstallerContext } from './installer-context';
@@ -69,6 +70,11 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
 				margin-left: auto;
 				min-width: 120px;
 			}
+
+			.error {
+				color: var(--uui-color-danger);
+				padding: var(--uui-size-space-2) 0;
+			}
 		`,
 	];
 
@@ -89,6 +95,9 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
 
 	@state()
 	private _installerStore?: UmbInstallerContext;
+
+	@state()
+	private _validationErrorMessage = '';
 
 	private storeDataSubscription?: Subscription;
 	private storeSettingsSubscription?: Subscription;
@@ -136,14 +145,18 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
 		this._installerStore?.appendData({ database });
 	}
 
-	private _handleSubmit = (e: SubmitEvent) => {
-		e.preventDefault();
+	private _handleSubmit = async (evt: SubmitEvent) => {
+		evt.preventDefault();
 
-		const form = e.target as HTMLFormElement;
+		const form = evt.target as HTMLFormElement;
 		if (!form) return;
 
 		const isValid = form.checkValidity();
 		if (!isValid) return;
+
+		if (!this._installerStore) return;
+
+		this._installButton.state = 'waiting';
 
 		// Only append the database if it's not pre-configured
 		if (!this._preConfiguredDatabase) {
@@ -154,6 +167,39 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
 			const server = formData.get('server') as string;
 			const name = formData.get('name') as string;
 			const useIntegratedAuthentication = formData.has('useIntegratedAuthentication');
+			const connectionString = formData.get('connectionString') as string;
+
+			// Validate connection
+			const selectedDatabase = this._databases.find((x) => x.id === id);
+			if (selectedDatabase?.requiresConnectionTest) {
+				try {
+					let databaseDetails: UmbracoPerformInstallDatabaseConfiguration = {};
+
+					if (connectionString) {
+						databaseDetails.connectionString = connectionString;
+					} else {
+						databaseDetails = {
+							id,
+							username,
+							password,
+							server,
+							useIntegratedAuthentication,
+							name,
+						};
+					}
+					await postInstallValidateDatabase(databaseDetails);
+				} catch (e) {
+					if (e instanceof postInstallSetup.Error) {
+						const error = e.getActualType();
+						console.warn('Database validation failed', error.data);
+						this._validationErrorMessage = error.data.detail ?? 'Could not verify database connection';
+					} else {
+						this._validationErrorMessage = 'A server error happened when trying to validate the database';
+					}
+					this._installButton.state = 'failed';
+					return;
+				}
+			}
 
 			const database = {
 				...this._installerStore?.getData().database,
@@ -163,14 +209,13 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
 				server,
 				name,
 				useIntegratedAuthentication,
+				connectionString,
 			} as UmbracoPerformInstallDatabaseConfiguration;
 
 			this._installerStore?.appendData({ database });
 		}
 
 		this.dispatchEvent(new CustomEvent('submit', { bubbles: true, composed: true }));
-
-		this._installButton.state = 'waiting';
 	};
 
 	private _onBack() {
@@ -321,6 +366,7 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
 					${this._preConfiguredDatabase
 						? this._renderPreConfiguredDatabase(this._preConfiguredDatabase)
 						: this._renderDatabaseSelection()}
+					${this._validationErrorMessage ? html` <div class="error">${this._validationErrorMessage}</div> ` : nothing}
 
 					<div id="buttons">
 						<uui-button label="Back" @click=${this._onBack} look="secondary"></uui-button>
