@@ -28,11 +28,31 @@
 
                     </div>
 
-                    <div ng-if="vm.showInherit || vm.property.culture || vm.property.segment" class="umb-property-culture-label">
-                        <span ng-if="vm.showInherit"><localize key="general_shared"></localize></span>
-                        <span ng-if="!vm.showInherit && vm.property.culture">{{ vm.property.culture }}</span>
-                        <span ng-if="!vm.showInherit && vm.property.segment">{{ vm.property.segment }}</span>
+                    <div class="umb-property-variant-label-container" ng-if="vm.showInherit && vm.property && vm.node">
+
+                        <span ng-if="vm.property.variations === 'Nothing'" class="umb-property-variant-label">
+                            <localize key="general_shared"></localize>
+                        </span>
+
+                        <span ng-if="vm.property.variations === 'Segment' && vm.node.documentType.variations === 'CultureAndSegment'" class="umb-property-variant-label">
+                            <localize key="languages_invariantLanguageProperty"></localize>
+                        </span>
+
+                        <span ng-if="vm.property.variations === 'Culture' || vm.property.variations === 'CultureAndSegment'" class="umb-property-variant-label">
+                            {{ vm.property.culture }}
+                        </span>
+                        
+                        <span ng-if="vm.property.variations === 'Culture' && vm.node.documentType.variations === 'CultureAndSegment'" class="umb-property-variant-label">
+                            <localize key="languages_invariantSegmentProperty"></localize>
+                        </span>
+                        
+                        <span ng-if="vm.property.variations === 'Segment' || vm.property.variations === 'CultureAndSegment'" class="umb-property-variant-label">
+                            <span>{{ vm.property.segment }}</span>
+                            <span ng-if="!vm.property.segment">Default</span>
+                        </span>
+
                     </div>
+
                 </div>
 
                 <div class="controls" ng-transclude>
