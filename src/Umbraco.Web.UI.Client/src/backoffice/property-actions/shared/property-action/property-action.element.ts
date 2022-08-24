@@ -1,7 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui';
 import { CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { createExtensionElement, UmbExtensionManifestPropertyAction } from '../../../core/extension';
+import { createExtensionElement, UmbExtensionManifestPropertyAction } from '../../../../core/extension';
 import type { UmbPropertyAction } from './property-action.model';
 
 @customElement('umb-property-action')

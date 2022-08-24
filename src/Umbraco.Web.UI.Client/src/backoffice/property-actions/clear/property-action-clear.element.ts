@@ -1,8 +1,8 @@
 import { html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { UmbContextConsumerMixin } from '../../../core/context';
-import { UmbPropertyActionMenuContext } from '../property-action-menu/property-action-menu.context';
-import { UmbPropertyAction } from '../property-action/property-action.model';
+import { UmbPropertyActionMenuContext } from '../shared/property-action-menu/property-action-menu.context';
+import { UmbPropertyAction } from '../shared/property-action/property-action.model';
 
 @customElement('umb-property-action-clear')
 export default class UmbPropertyActionClearElement

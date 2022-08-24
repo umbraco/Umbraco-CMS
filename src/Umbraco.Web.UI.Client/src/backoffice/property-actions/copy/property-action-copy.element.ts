@@ -3,7 +3,7 @@ import { customElement, property } from 'lit/decorators.js';
 import { UmbContextConsumerMixin } from '../../../core/context';
 import type { UmbNotificationDefaultData } from '../../../core/services/notification/layouts/default';
 import type { UmbNotificationService } from '../../../core/services/notification';
-import type { UmbPropertyAction } from '../property-action/property-action.model';
+import type { UmbPropertyAction } from '../shared/property-action/property-action.model';
 
 @customElement('umb-property-action-copy')
 export default class UmbPropertyActionCopyElement

@@ -7,7 +7,7 @@ import { createExtensionElement, UmbExtensionManifest, UmbExtensionRegistry } fr
 import { UmbDataTypeStore } from '../../core/stores/data-type.store';
 import { DataTypeEntity } from '../../mocks/data/data-type.data';
 
-import '../property-actions/property-action-menu/property-action-menu.element';
+import '../property-actions/shared/property-action-menu/property-action-menu.element';
 
 @customElement('umb-node-property')
 class UmbNodeProperty extends UmbContextConsumerMixin(LitElement) {
