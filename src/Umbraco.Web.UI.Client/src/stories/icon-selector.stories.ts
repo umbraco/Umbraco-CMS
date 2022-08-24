@@ -22,12 +22,16 @@ export default {
 	id: 'icon-selector',
 	decorators: [
 		(story) =>
-			html`<umb-context-provider
-				style="display: block; padding: 32px;"
-				key="umbModalService"
-				.value=${new UmbModalService()}>
-				${story()}
-			</umb-context-provider>`,
+			html`
+				<uui-icon-registry-essential>
+					<umb-context-provider
+						style="display: block; padding: 32px;"
+						key="umbModalService"
+						.value=${new UmbModalService()}>
+						${story()}
+					</umb-context-provider>
+				</uui-icon-registry-essential>
+			`,
 	],
 } as Meta;
 

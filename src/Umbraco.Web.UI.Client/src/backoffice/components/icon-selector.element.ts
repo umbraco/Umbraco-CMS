@@ -5,6 +5,8 @@ import { UmbModalService } from '../../core/services/modal';
 import { UmbModalLayoutElement } from '../../core/services/modal/layouts/modal-layout.element';
 import { UmbModalContentPickerData } from '../../core/services/modal/layouts/content-picker/modal-layout-content-picker.element';
 
+import '../editors/shared/editor-entity/editor-entity.element';
+
 @customElement('umb-icon-selector')
 class UmbIconSelector extends UmbModalLayoutElement<UmbModalContentPickerData> {
 	static styles = [
@@ -14,20 +16,20 @@ class UmbIconSelector extends UmbModalLayoutElement<UmbModalContentPickerData> {
 				position: relative;
 			}
 
-			#box {
-				overflow-y: auto;
-				max-height: 100vh;
+			#container {
+				display: flex;
+				flex-direction: column;
+				height: 100%;
+				background-color: white;
+				box-shadow: var(--uui-shadow-depth-1, 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24));
+				border-radius: var(--uui-border-radius);
+				padding: var(--uui-size-space-5);
+				box-sizing: border-box;
 			}
-
-			#box .header-icon {
-				font-size: 20px;
-				height: 1.3em;
-			}
-
-			#box hr {
+			#container hr {
 				height: 1px;
 				border: none;
-				background-color: #ccc;
+				background-color: var(--uui-color-divider);
 				margin: 20px 0;
 			}
 
@@ -480,27 +482,24 @@ class UmbIconSelector extends UmbModalLayoutElement<UmbModalContentPickerData> {
 	}
 
 	render() {
-		return html` <uui-icon-registry-essential>
-			<uui-box headline="Select icon" id="box">
-				<uui-icon
-					class="header-icon"
-					slot="headline"
-					.name="${this._currentIcon}"
-					.style="${this._setColor(this._currentColor)}"></uui-icon>
+		return html`
+			<umb-editor-entity>
+				<h4 slot="name">Select icon</h4>
+				<div id="container">
+					${this.renderSearchbar()}
+					<hr />
 
-				${this.renderSearchbar()}
-				<hr />
+					<div id="palette">${this.renderPalette()}</div>
 
-				<div id="palette">${this.renderPalette()}</div>
-
-				<hr />
-				<uui-scroll-container id="icon-selection">${this.renderIconSelection()}</uui-scroll-container>
-				<hr />
-
-				<uui-button look="secondary" label="close" @click="${this._close}">Close</uui-button>
-				<uui-button color="positive" look="primary" @click="${this._save}" label="save">Save</uui-button>
-			</uui-box>
-		</uui-icon-registry-essential>`;
+					<hr />
+					<uui-scroll-container id="icon-selection">${this.renderIconSelection()}</uui-scroll-container>
+				</div>
+				<uui-button slot="actions" look="secondary" label="close" @click="${this._close}">Close</uui-button>
+				<uui-button slot="actions" color="positive" look="primary" @click="${this._save}" label="save">
+					Save
+				</uui-button>
+			</umb-editor-entity>
+		`;
 	}
 
 	renderSearchbar() {
