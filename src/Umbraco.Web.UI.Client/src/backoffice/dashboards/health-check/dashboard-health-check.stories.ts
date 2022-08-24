@@ -7,7 +7,7 @@ import './dashboard-health-check.element';
 export default {
 	title: 'Dashboards/Health Check',
 	component: 'umb-dashboard-health-check',
-	id: 'umb-dashboard-health-',
+	id: 'umb-dashboard-health-check',
 } as Meta;
 
 export const AAAOverview: Story<UmbDashboardHealthCheckElement> = () =>
