@@ -120,8 +120,14 @@ namespace Umbraco.Core.Security
             ClaimTypes.NameIdentifier, //id
             ClaimTypes.Name,  //username
             ClaimTypes.GivenName,
-            Constants.Security.StartContentNodeIdClaimType,
-            Constants.Security.StartMediaNodeIdClaimType,
+
+            // Comment out the Startnodes due to this bug https://github.com/umbraco/Umbraco-CMS/issues/12809
+            // But also in Umbraco 9 and 10 theis properties outcomment.
+            // The properties can be null or not exiting in the claims and therefor
+            // the authization will not be successed.
+            //Constants.Security.StartContentNodeIdClaimType,
+            //Constants.Security.StartMediaNodeIdClaimType,
+
             ClaimTypes.Locality,
             Constants.Security.SessionIdClaimType,
             Microsoft.AspNet.Identity.Constants.DefaultSecurityStampClaimType
