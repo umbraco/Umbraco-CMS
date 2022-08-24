@@ -1,8 +1,15 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
+using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using NUnit.Framework;
+using SixLabors.ImageSharp.Web;
+using SixLabors.ImageSharp.Web.Commands;
+using SixLabors.ImageSharp.Web.Commands.Converters;
+using SixLabors.ImageSharp.Web.Middleware;
+using SixLabors.ImageSharp.Web.Processors;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Web.Common.Media;
 
@@ -15,7 +22,7 @@ public class ImageSharpImageUrlGeneratorTests
     private static readonly ImageUrlGenerationOptions.CropCoordinates _crop = new ImageUrlGenerationOptions.CropCoordinates(0.58729977382575338m, 0.055768992440203169m, 0m, 0.32457553600198386m);
     private static readonly ImageUrlGenerationOptions.FocalPointPosition _focus1 = new ImageUrlGenerationOptions.FocalPointPosition(0.96m, 0.80827067669172936m);
     private static readonly ImageUrlGenerationOptions.FocalPointPosition _focus2 = new ImageUrlGenerationOptions.FocalPointPosition(0.4275m, 0.41m);
-    private static readonly ImageSharpImageUrlGenerator _generator = new ImageSharpImageUrlGenerator(new string[0], new ImageSharpImageUrlTokenGenerator((byte[])null));
+    private static readonly ImageSharpImageUrlGenerator _generator = new ImageSharpImageUrlGenerator(new string[0]);
 
     [Test]
     public void GetImageUrl_CropAliasTest()
@@ -263,7 +270,20 @@ public class ImageSharpImageUrlGeneratorTests
     [Test]
     public void GetImageUrl_HMACSecurityKey()
     {
-        var generator = new ImageSharpImageUrlGenerator(new string[0], new ImageSharpImageUrlTokenGenerator(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31 }));
+        var requestAuthorizationUtilities = new ImageSharpRequestAuthorizationUtilities(
+            Options.Create(new ImageSharpMiddlewareOptions()
+            {
+                HMACSecretKey = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31 }
+            }),
+            new QueryCollectionRequestParser(),
+            new[]
+            {
+                new ResizeWebProcessor()
+            },
+            new CommandParser(Enumerable.Empty<ICommandConverter>()),
+            new ServiceCollection().BuildServiceProvider());
+
+        var generator = new ImageSharpImageUrlGenerator(new string[0], requestAuthorizationUtilities);
         var options = new ImageUrlGenerationOptions(MediaPath)
         {
             Width = 400,
@@ -274,53 +294,14 @@ public class ImageSharpImageUrlGeneratorTests
 
         // CacheBusterValue isn't included in HMAC generation
         options.CacheBusterValue = "not-included-in-hmac";
-        Assert.AreEqual(MediaPath + "?width=400&height=400&hmac=6335195986da0663e23eaadfb9bb32d537375aaeec253aae66b8f4388506b4b2&v=not-included-in-hmac", generator.GetImageUrl(options));
+        Assert.AreEqual(MediaPath + "?width=400&height=400&v=not-included-in-hmac&hmac=6335195986da0663e23eaadfb9bb32d537375aaeec253aae66b8f4388506b4b2", generator.GetImageUrl(options));
 
         // Removing height should generate a different HMAC
         options.Height = null;
-        Assert.AreEqual(MediaPath + "?width=400&hmac=5bd24a05de5ea068533579863773ddac9269482ad515575be4aace7e9e50c88c&v=not-included-in-hmac", generator.GetImageUrl(options));
+        Assert.AreEqual(MediaPath + "?width=400&v=not-included-in-hmac&hmac=5bd24a05de5ea068533579863773ddac9269482ad515575be4aace7e9e50c88c", generator.GetImageUrl(options));
 
         // But adding it again using FurtherOptions should include it (and produce the same HMAC as before)
         options.FurtherOptions = "height=400";
-        Assert.AreEqual(MediaPath + "?width=400&height=400&hmac=6335195986da0663e23eaadfb9bb32d537375aaeec253aae66b8f4388506b4b2&v=not-included-in-hmac", generator.GetImageUrl(options));
-    }
-
-    /// <summary>
-    /// Test to check result when using a HMAC security key and custom known commands.
-    /// </summary>
-    [Test]
-    public void GetImageUrl_HMACSecurityKeyKnownCommands()
-    {
-        var knownCommands = new List<string>()
-        {
-            "width",
-            "height",
-            "v" // The cache buster value is never included in the HMAC
-        };
-
-        var generator = new ImageSharpImageUrlGenerator(new string[0], new ImageSharpImageUrlTokenGenerator(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31 }, knownCommands));
-        var options = new ImageUrlGenerationOptions(MediaPath)
-        {
-            Width = 400,
-            Height = 400,
-        };
-
-        Assert.AreEqual(MediaPath + "?width=400&height=400&hmac=6335195986da0663e23eaadfb9bb32d537375aaeec253aae66b8f4388506b4b2", generator.GetImageUrl(options));
-
-        // CacheBusterValue isn't included in HMAC generation
-        options.CacheBusterValue = "never-included-in-hmac";
-        Assert.AreEqual(MediaPath + "?width=400&height=400&hmac=6335195986da0663e23eaadfb9bb32d537375aaeec253aae66b8f4388506b4b2&v=never-included-in-hmac", generator.GetImageUrl(options));
-
-        // Removing height should generate a different HMAC
-        options.Height = null;
-        Assert.AreEqual(MediaPath + "?width=400&hmac=5bd24a05de5ea068533579863773ddac9269482ad515575be4aace7e9e50c88c&v=never-included-in-hmac", generator.GetImageUrl(options));
-
-        // Adding an unknown command shouldn't chnage the HMAC
-        options.FurtherOptions = "whitelisted=whatever";
-        Assert.AreEqual(MediaPath + "?width=400&whitelisted=whatever&hmac=5bd24a05de5ea068533579863773ddac9269482ad515575be4aace7e9e50c88c&v=never-included-in-hmac", generator.GetImageUrl(options));
-
-        // But adding the height again using FurtherOptions should produce the same HMAC as before
-        options.FurtherOptions = "height=400";
-        Assert.AreEqual(MediaPath + "?width=400&height=400&hmac=6335195986da0663e23eaadfb9bb32d537375aaeec253aae66b8f4388506b4b2&v=never-included-in-hmac", generator.GetImageUrl(options));
+        Assert.AreEqual(MediaPath + "?width=400&height=400&v=not-included-in-hmac&hmac=6335195986da0663e23eaadfb9bb32d537375aaeec253aae66b8f4388506b4b2", generator.GetImageUrl(options));
     }
 }

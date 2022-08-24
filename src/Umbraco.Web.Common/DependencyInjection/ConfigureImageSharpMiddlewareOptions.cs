@@ -21,30 +21,17 @@ public sealed class ConfigureImageSharpMiddlewareOptions : IConfigureOptions<Ima
 {
     private readonly Configuration _configuration;
     private readonly ImagingSettings _imagingSettings;
-    private readonly IImageUrlTokenGenerator _imageUrlTokenGenerator;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ConfigureImageSharpMiddlewareOptions" /> class.
     /// </summary>
     /// <param name="configuration">The ImageSharp configuration.</param>
     /// <param name="imagingSettings">The Umbraco imaging settings.</param>
-    /// <param name="imageUrlTokenGenerator">The image URL token generator.</param>
-    public ConfigureImageSharpMiddlewareOptions(Configuration configuration, IOptions<ImagingSettings> imagingSettings, IImageUrlTokenGenerator imageUrlTokenGenerator)
+    public ConfigureImageSharpMiddlewareOptions(Configuration configuration, IOptions<ImagingSettings> imagingSettings)
     {
         _configuration = configuration;
         _imagingSettings = imagingSettings.Value;
-        _imageUrlTokenGenerator = imageUrlTokenGenerator;
     }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ConfigureImageSharpMiddlewareOptions" /> class.
-    /// </summary>
-    /// <param name="configuration">The ImageSharp configuration.</param>
-    /// <param name="imagingSettings">The Umbraco imaging settings.</param>
-    [Obsolete("Use ctor with all params - This will be removed in Umbraco 12.")]
-    public ConfigureImageSharpMiddlewareOptions(Configuration configuration, IOptions<ImagingSettings> imagingSettings)
-        : this(configuration, imagingSettings, StaticServiceProvider.Instance.GetRequiredService<IImageUrlTokenGenerator>())
-    { }
 
     /// <inheritdoc />
     public void Configure(ImageSharpMiddlewareOptions options)
@@ -55,14 +42,6 @@ public sealed class ConfigureImageSharpMiddlewareOptions : IConfigureOptions<Ima
         options.BrowserMaxAge = _imagingSettings.Cache.BrowserMaxAge;
         options.CacheMaxAge = _imagingSettings.Cache.CacheMaxAge;
         options.CacheHashLength = _imagingSettings.Cache.CacheHashLength;
-
-        // Use the image URL token generator to compute the HMAC
-        options.OnComputeHMACAsync = (context, _) =>
-        {
-            string imageUrl = UriHelper.BuildRelative(context.Context.Request.PathBase, context.Context.Request.Path);
-
-            return Task.FromResult(_imageUrlTokenGenerator.GetImageUrlToken(imageUrl, context.Commands));
-        };
 
         // Use configurable maximum width and height
         options.OnParseCommandsAsync = context =>
