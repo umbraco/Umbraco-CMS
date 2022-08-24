@@ -1,6 +1,6 @@
 ﻿/// <reference types="Cypress" />	
 
-import {MediaBuilder} from 'umbraco-cypress-testhelpers";
+import {MediaBuilder} from 'umbraco-cypress-testhelpers';
 
 context('Media', () => {
 
