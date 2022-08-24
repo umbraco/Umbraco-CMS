@@ -4,13 +4,14 @@ import 'router-slot';
 import { UUIIconRegistryEssential } from '@umbraco-ui/uui';
 import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { Guard, IRoute } from 'router-slot/model';
 
 import { getServerStatus } from './core/api/fetcher';
 import { UmbContextProviderMixin } from './core/context';
 import { UmbExtensionManifest, UmbExtensionManifestCore, UmbExtensionRegistry } from './core/extension';
-import { ServerStatus } from './core/models';
 import { internalManifests } from './temp-internal-manifests';
+
+import type { Guard, IRoute } from 'router-slot/model';
+import type { ServerStatus } from './core/models';
 
 @customElement('umb-app')
 export class UmbApp extends UmbContextProviderMixin(LitElement) {
@@ -49,8 +50,8 @@ export class UmbApp extends UmbContextProviderMixin(LitElement) {
 		},
 	];
 
-	private _extensionRegistry: UmbExtensionRegistry = new UmbExtensionRegistry();
-	private _iconRegistry: UUIIconRegistryEssential = new UUIIconRegistryEssential();
+	private _extensionRegistry = new UmbExtensionRegistry();
+	private _iconRegistry = new UUIIconRegistryEssential();
 	private _serverStatus: ServerStatus = 'running';
 
 	constructor() {
