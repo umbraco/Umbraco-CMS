@@ -40,7 +40,7 @@
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="all" />
     <PackageReference Include="MiniProfiler.AspNetCore.Mvc" Version="4.2.22" />
     <PackageReference Include="Serilog.AspNetCore" Version="5.0.0" />
-    <PackageReference Include="SixLabors.ImageSharp.Web" Version="2.0.2" />
+    <PackageReference Include="SixLabors.ImageSharp.Web" Version="2.0.3-alpha.0.3" />
     <PackageReference Include="Smidge.InMemory" Version="4.1.0" />
     <PackageReference Include="Smidge.Nuglify" Version="4.1.0" />
     <PackageReference Include="Umbraco.Code" Version="2.0.0" PrivateAssets="all" />

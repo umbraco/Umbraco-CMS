@@ -15,4 +15,8 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
   </ItemGroup>
+
+  <PropertyGroup>
+    <RestoreAdditionalProjectSources>https://www.myget.org/F/sixlabors/api/v3/index.json</RestoreAdditionalProjectSources>
+  </PropertyGroup>
 </Project>
