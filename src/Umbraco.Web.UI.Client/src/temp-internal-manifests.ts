@@ -123,7 +123,7 @@ export const internalManifests: Array<UmbExtensionManifestCore> = [
 		type: 'propertyEditorUI',
 		alias: 'Umb.PropertyEditorUI.Text',
 		name: 'Text',
-		js: () => import('./backoffice/property-editors/property-editor-text.element'),
+		js: () => import('./backoffice/property-editors/text/property-editor-text.element'),
 		meta: {
 			icon: 'edit',
 			group: 'common',
@@ -134,7 +134,7 @@ export const internalManifests: Array<UmbExtensionManifestCore> = [
 		alias: 'Umb.PropertyEditorUI.Textarea',
 		name: 'Textarea',
 		elementName: 'umb-property-editor-textarea',
-		js: () => import('./backoffice/property-editors/property-editor-textarea.element'),
+		js: () => import('./backoffice/property-editors/textarea/property-editor-textarea.element'),
 		meta: {
 			icon: 'edit',
 			group: 'common',
@@ -144,7 +144,7 @@ export const internalManifests: Array<UmbExtensionManifestCore> = [
 		type: 'propertyEditorUI',
 		alias: 'Umb.PropertyEditorUI.ContextExample',
 		name: 'Context Example',
-		js: () => import('./backoffice/property-editors/property-editor-context-example.element'),
+		js: () => import('./backoffice/property-editors/context-example/property-editor-context-example.element'),
 		meta: {
 			icon: 'favorite',
 			group: 'common',
@@ -235,7 +235,7 @@ export const internalManifests: Array<UmbExtensionManifestCore> = [
 		alias: 'Umb.PropertyEditorUI.ContentPicker',
 		name: 'ContentPicker',
 		elementName: 'umb-property-editor-content-picker',
-		js: () => import('./backoffice/property-editors/property-editor-content-picker.element'),
+		js: () => import('./backoffice/property-editors/content-picker/property-editor-content-picker.element'),
 		meta: {
 			icon: 'document',
 			group: 'common',
