@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <Content Include="buildTransitive\**" PackagePath="buildTransitive" />
+    <Content Include="$(JsonSchemaPath)" PackagePath="." />
   </ItemGroup>
 
   <!-- Generate appsettings.json schema on build (and before copying to project) -->
