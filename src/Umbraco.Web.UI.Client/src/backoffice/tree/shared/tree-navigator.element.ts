@@ -1,16 +1,16 @@
 import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbContextProviderMixin } from '../../../core/context';
+import { UmbContextConsumerMixin } from '../../../core/context';
 import { UmbTreeService } from '../tree.service';
 
 import './tree-item.element';
 
 @customElement('umb-tree-navigator')
-export class UmbTreeNavigator extends UmbContextProviderMixin(LitElement) {
+export class UmbTreeNavigator extends UmbContextConsumerMixin(LitElement) {
 	static styles = [UUITextStyles, css``];
 
-	private _treeService: UmbTreeService;
+	private _treeService?: UmbTreeService;
 
 	@state()
 	id = '2';
@@ -24,14 +24,17 @@ export class UmbTreeNavigator extends UmbContextProviderMixin(LitElement) {
 	@state()
 	loading = true;
 
-	constructor() {
-		super();
-		this._treeService = new UmbTreeService();
-		this.provideContext('umbTreeService', this._treeService);
-		this._treeService.getTreeItem(this.id).then((item) => {
-			this.label = item.name;
-			this.hasChildren = item.hasChildren;
-			this.loading = false;
+	connectedCallback(): void {
+		super.connectedCallback();
+
+		this.consumeContext('umbTreeService', (treeService) => {
+			this._treeService = treeService;
+
+			this._treeService?.getTreeItem(this.id).then((item) => {
+				this.label = item.name;
+				this.hasChildren = item.hasChildren;
+				this.loading = false;
+			});
 		});
 	}
 
