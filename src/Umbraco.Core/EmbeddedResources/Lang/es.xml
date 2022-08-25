@@ -1260,6 +1260,7 @@
     <key alias="memberRoles">Roles</key>
     <key alias="memberTypes">Tipos de miembros</key>
     <key alias="documentTypes">Tipos de documento</key>
+	<key alias="relationTypes">Tipos de relaciones</key>
     <key alias="packager">Paquetes</key>
     <key alias="packages">Paquetes</key>
     <key alias="partialViews">Vistas Parciales</key>
