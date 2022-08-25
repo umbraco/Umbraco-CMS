@@ -18,6 +18,9 @@ export class UmbTreeItem extends UmbContextConsumerMixin(LitElement) {
 	@property({ type: String })
 	label = '';
 
+	@property({ type: String })
+	href = '';
+
 	@state()
 	childItems: any[] = [];
 
@@ -36,7 +39,11 @@ export class UmbTreeItem extends UmbContextConsumerMixin(LitElement) {
 
 	private _renderChildItems() {
 		return this.childItems.map((item) => {
-			return html`<umb-tree-item .label=${item.name} .hasChildren=${item.hasChildren} .id=${item.id}></umb-tree-item>`;
+			return html`<umb-tree-item
+				.label=${item.name}
+				.hasChildren=${item.hasChildren}
+				.id=${item.id}
+				href="${item.href}"></umb-tree-item>`;
 		});
 	}
 
@@ -46,7 +53,6 @@ export class UmbTreeItem extends UmbContextConsumerMixin(LitElement) {
 
 		this.loading = true;
 		this._treeService?.getChildren(this.id).then((items) => {
-			console.log(items);
 			this.childItems = items;
 			this.loading = false;
 		});
@@ -58,7 +64,8 @@ export class UmbTreeItem extends UmbContextConsumerMixin(LitElement) {
 				@show-children=${this._onShowChildren}
 				.loading=${this.loading}
 				.hasChildren=${this.hasChildren}
-				label=${this.label}>
+				label=${this.label}
+				href="${this.href}">
 				${this._renderChildItems()}
 			</uui-menu-item>
 		`;

@@ -18,6 +18,7 @@ export const handlers = [
 				key: '865a11f9-d140-4f21-8dfe-2caafc65a971',
 				name: 'John Doe',
 				hasChildren: false,
+				href: 'https://google.com',
 			},
 		];
 
@@ -38,18 +39,21 @@ export const handlers = [
 				key: 'fcb3f468-97de-469d-8090-d14d068ad968',
 				name: 'Group 1',
 				hasChildren: false,
+				href: 'https://google.com',
 			},
 			{
 				id: '2',
 				key: 'd99bfca4-551d-427d-a842-d47b756b8977',
 				name: 'Group 2',
 				hasChildren: false,
+				href: 'https://google.com',
 			},
 			{
 				id: '3',
 				key: 'b7b7ec7c-1c4a-4a78-9a6a-0652e891972a',
 				name: 'Group 3',
-				hasChildren: false,
+				hasChildren: true,
+				href: 'https://google.com',
 			},
 		];
 
