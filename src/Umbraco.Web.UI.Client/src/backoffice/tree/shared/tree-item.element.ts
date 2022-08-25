@@ -1,8 +1,8 @@
 import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
-import { UmbContextConsumerMixin } from '../../core/context';
-import { UmbTreeService } from './tree.service';
+import { UmbContextConsumerMixin } from '../../../core/context';
+import { UmbTreeService } from '../tree.service';
 import { UUIMenuItemEvent } from '@umbraco-ui/uui';
 
 @customElement('umb-tree-item')

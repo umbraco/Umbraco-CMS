@@ -7,7 +7,7 @@ import { UmbContextConsumerMixin } from '../../../core/context';
 import { UmbExtensionManifestTree, UmbExtensionRegistry } from '../../../core/extension';
 import { UmbSectionContext } from '../section.context';
 
-import '../../tree/tree.element';
+import '../../tree/shared/tree.element';
 
 @customElement('umb-section-trees')
 export class UmbSectionTrees extends UmbContextConsumerMixin(LitElement) {

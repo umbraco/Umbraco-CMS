@@ -8,7 +8,7 @@ import { UmbDataTypeStore } from '../../../core/stores/data-type.store';
 import { map, Subscription, first } from 'rxjs';
 import { UmbDocumentTypeStore } from '../../../core/stores/document-type.store';
 import { createExtensionElement, UmbExtensionRegistry } from '../../../core/extension';
-import '../../tree/tree.element';
+import '../../tree/shared/tree.element';
 import { UmbSectionContext } from '../section.context';
 
 @customElement('umb-settings-section-tree')

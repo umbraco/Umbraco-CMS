@@ -1,8 +1,8 @@
 import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbContextProviderMixin } from '../../core/context';
-import { UmbTreeService } from './tree.service';
+import { UmbContextProviderMixin } from '../../../core/context';
+import { UmbTreeService } from '../tree.service';
 
 @customElement('umb-tree-navigator')
 export class UmbTreeNavigator extends UmbContextProviderMixin(LitElement) {
