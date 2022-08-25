@@ -49,7 +49,7 @@ export interface MetaDashboard {
 	sections: string[];
 	pathname: string;
 	weight: number;
-	label: string;
+	label?: string;
 }
 
 export interface MetaEditorView {
@@ -65,7 +65,7 @@ export interface MetaPropertyAction {
 
 export interface IManifestElement extends IManifest {
 	name: string;
-	js: string;
+	js?: string;
 	elementName: string;
 }
 

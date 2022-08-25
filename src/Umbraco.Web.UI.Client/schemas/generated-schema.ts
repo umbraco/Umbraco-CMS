@@ -115,7 +115,7 @@ export interface components {
       type: "section";
       meta: components["schemas"]["MetaSection"];
       name: string;
-      js: string;
+      js?: string;
       elementName: string;
       alias: string;
     };
@@ -128,7 +128,7 @@ export interface components {
       type: "propertyEditorUI";
       meta: components["schemas"]["MetaPropertyEditorUI"];
       name: string;
-      js: string;
+      js?: string;
       elementName: string;
       alias: string;
     };
@@ -137,14 +137,14 @@ export interface components {
       pathname: string;
       /** Format: float */
       weight: number;
-      label: string;
+      label?: string;
     };
     IManifestDashboard: {
       /** @enum {string} */
       type: "dashboard";
       meta: components["schemas"]["MetaDashboard"];
       name: string;
-      js: string;
+      js?: string;
       elementName: string;
       alias: string;
     };
@@ -160,7 +160,7 @@ export interface components {
       type: "editorView";
       meta: components["schemas"]["MetaEditorView"];
       name: string;
-      js: string;
+      js?: string;
       elementName: string;
       alias: string;
     };
@@ -172,7 +172,7 @@ export interface components {
       type: "propertyAction";
       meta: components["schemas"]["MetaPropertyAction"];
       name: string;
-      js: string;
+      js?: string;
       elementName: string;
       alias: string;
     };

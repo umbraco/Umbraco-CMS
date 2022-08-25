@@ -389,7 +389,6 @@ components:
         - type
         - meta
         - name
-        - js
         - elementName
         - alias
     MetaPropertyEditorUI:
@@ -423,7 +422,6 @@ components:
         - type
         - meta
         - name
-        - js
         - elementName
         - alias
     MetaDashboard:
@@ -444,7 +442,6 @@ components:
         - sections
         - pathname
         - weight
-        - label
     IManifestDashboard:
       type: object
       properties:
@@ -466,7 +463,6 @@ components:
         - type
         - meta
         - name
-        - js
         - elementName
         - alias
     MetaEditorView:
@@ -509,7 +505,6 @@ components:
         - type
         - meta
         - name
-        - js
         - elementName
         - alias
     MetaPropertyAction:
@@ -542,7 +537,6 @@ components:
         - type
         - meta
         - name
-        - js
         - elementName
         - alias
     IManifestEntrypoint:
