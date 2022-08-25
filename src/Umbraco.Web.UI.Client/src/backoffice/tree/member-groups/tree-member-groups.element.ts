@@ -19,7 +19,9 @@ export class UmbTreeMemberGroups extends UmbContextProviderMixin(LitElement) {
 
 	connectedCallback() {
 		super.connectedCallback();
-		this._treeContext = new UmbTreeMemberGroupsContext();
+		if (!this.tree) return;
+
+		this._treeContext = new UmbTreeMemberGroupsContext(this.tree);
 		this.provideContext('umbTreeService', this._treeContext);
 	}
 

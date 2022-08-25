@@ -1,7 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { map, Subscription, first } from 'rxjs';
+import { map, Subscription, first, switchMap, EMPTY, of } from 'rxjs';
 
 import { UmbContextConsumerMixin } from '../../../core/context';
 import { UmbExtensionManifestTree, UmbExtensionRegistry } from '../../../core/extension';
@@ -16,8 +16,6 @@ export class UmbSectionTrees extends UmbContextConsumerMixin(LitElement) {
 	@state()
 	private _trees: Array<UmbExtensionManifestTree> = [];
 
-	private _currentSectionAlias = '';
-
 	private _extensionStore?: UmbExtensionRegistry;
 	private _treesSubscription?: Subscription;
 
@@ -28,44 +26,39 @@ export class UmbSectionTrees extends UmbContextConsumerMixin(LitElement) {
 		super();
 
 		// TODO: wait for more contexts
-		this.consumeContext('umbExtensionRegistry', (_instance: UmbExtensionRegistry) => {
-			this._extensionStore = _instance;
-			this._useTrees();
-		});
-
-		this.consumeContext('umbSectionContext', (context: UmbSectionContext) => {
-			this._sectionContext = context;
-			this._useSectionContext();
-		});
-	}
-
-	private _useSectionContext() {
-		this._sectionContextSubscription?.unsubscribe();
-
-		this._sectionContextSubscription = this._sectionContext?.data.pipe(first()).subscribe((section) => {
-			this._currentSectionAlias = section.alias;
-			this._useTrees();
+		this.consumeContext('umbExtensionRegistry', (extensionStore: UmbExtensionRegistry) => {
+			this.consumeContext('umbSectionContext', (sectionContext: UmbSectionContext) => {
+				this._extensionStore = extensionStore;
+				this._sectionContext = sectionContext;
+				this._useTrees();
+			});
 		});
 	}
 
 	private _useTrees() {
-		//TODO: Merge streams
-		if (this._extensionStore && this._currentSectionAlias) {
-			this._treesSubscription?.unsubscribe();
+		this._treesSubscription?.unsubscribe();
 
-			this._treesSubscription = this._extensionStore
-				?.extensionsOfType('tree')
-				.pipe(
-					map((extensions) =>
-						extensions
-							.filter((extension) => extension.meta.sections.includes(this._currentSectionAlias as string)) // TODO: Why do whe need "as string" here??
-							.sort((a, b) => b.meta.weight - a.meta.weight)
-					)
-				)
-				.subscribe((treeExtensions) => {
-					this._trees = treeExtensions;
-				});
-		}
+		this._treesSubscription = this._sectionContext?.data
+			.pipe(
+				switchMap((section) => {
+					if (!section) return EMPTY;
+
+					return (
+						this._extensionStore
+							?.extensionsOfType('tree')
+							.pipe(
+								map((trees) =>
+									trees
+										.filter((tree) => tree.meta.sections.includes(section.alias))
+										.sort((a, b) => b.meta.weight - a.meta.weight)
+								)
+							) ?? of([])
+					);
+				})
+			)
+			.subscribe((trees) => {
+				this._trees = trees;
+			});
 	}
 
 	disconnectedCallback() {

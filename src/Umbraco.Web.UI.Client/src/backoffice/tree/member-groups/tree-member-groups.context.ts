@@ -1,6 +1,13 @@
+import { UmbExtensionManifestTree } from '../../../core/extension';
 import { ITreeService } from '../tree.service';
 
 export class UmbTreeMemberGroupsContext implements ITreeService {
+	public tree: UmbExtensionManifestTree;
+
+	constructor(tree: UmbExtensionManifestTree) {
+		this.tree = tree;
+	}
+
 	public async getRoot() {
 		return {
 			id: -1,

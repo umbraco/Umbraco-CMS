@@ -249,6 +249,8 @@ export const internalManifests: Array<UmbExtensionManifestCore> = [
 		elementName: 'umb-datatype-tree',
 		js: () => import('./backoffice/tree/data-types/datatypes-tree.element'),
 		meta: {
+			pathname: 'data-types',
+			editor: 'Umb.Editor.DataType',
 			label: 'Data Types',
 			weight: -10,
 			sections: ['Umb.Section.Settings'],
@@ -261,6 +263,8 @@ export const internalManifests: Array<UmbExtensionManifestCore> = [
 		elementName: 'umb-document-type-tree',
 		js: () => import('./backoffice/tree/document-types/document-type-tree.element'),
 		meta: {
+			pathname: 'document-types',
+			editor: 'Umb.Editor.DocumentType',
 			label: 'Document Types',
 			weight: -10,
 			sections: ['Umb.Section.Content', 'Umb.Section.Settings'],
@@ -284,6 +288,8 @@ export const internalManifests: Array<UmbExtensionManifestCore> = [
 		name: 'Members Tree',
 		js: () => import('./backoffice/tree/members/tree-members.element'),
 		meta: {
+			editor: 'Umb.Editor.Member',
+			pathname: 'members',
 			label: 'Members',
 			weight: -10,
 			sections: ['Umb.Section.Members'],
@@ -295,9 +301,23 @@ export const internalManifests: Array<UmbExtensionManifestCore> = [
 		name: 'Members Groups Tree',
 		js: () => import('./backoffice/tree/member-groups/tree-member-groups.element'),
 		meta: {
+			editor: 'Umb.Editor.MemberGroup',
+			pathname: 'member-groups',
 			label: 'Member Groups',
 			weight: -10,
 			sections: ['Umb.Section.Members'],
 		},
+	},
+	{
+		type: 'editor',
+		alias: 'Umb.Editor.Member',
+		name: 'Member Editor',
+		js: () => import('./backoffice/editors/member/editor-member.element'),
+	},
+	{
+		type: 'editor',
+		alias: 'Umb.Editor.MemberGroup',
+		name: 'Member Group',
+		js: () => import('./backoffice/editors/member-group/editor-member-group.element'),
 	},
 ];

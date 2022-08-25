@@ -1,8 +1,11 @@
 // import { BehaviorSubject, Observable } from 'rxjs';
 
+import { UmbExtensionManifestTree } from '../../core/extension';
+
 export interface ITreeService {
+	tree: UmbExtensionManifestTree;
 	getRoot?(): Promise<UmbTreeItem>;
-	getChildren(id: string): Promise<Array<UmbTreeItem>>;
+	getChildren(id: number): Promise<Array<UmbTreeItem>>;
 }
 
 export interface UmbTreeItem {
@@ -13,12 +16,18 @@ export interface UmbTreeItem {
 }
 
 export class UmbTreeService implements ITreeService {
-	public async getRoot() {
-		await new Promise((resolve) => setTimeout(resolve, Math.random() * 2000));
-		return fakeApi.getTreeItem('2');
+	public tree: UmbExtensionManifestTree;
+
+	constructor(tree: UmbExtensionManifestTree) {
+		this.tree = tree;
 	}
 
-	public async getChildren(id: string) {
+	public async getRoot() {
+		await new Promise((resolve) => setTimeout(resolve, Math.random() * 2000));
+		return fakeApi.getTreeItem(2);
+	}
+
+	public async getChildren(id: number) {
 		await new Promise((resolve) => setTimeout(resolve, Math.random() * 2000));
 		return fakeApi.getTreeChildren(id);
 	}
@@ -28,7 +37,7 @@ export class UmbTreeService implements ITreeService {
 
 const fakeApi = {
 	//find nested child id of array
-	getTreeChildren: (id: string) => {
+	getTreeChildren: (id: number) => {
 		const children = recursive(treeData, id).children;
 		if (!children) return 'not found';
 
@@ -41,7 +50,7 @@ const fakeApi = {
 		});
 	},
 
-	getTreeItem: (id: string) => {
+	getTreeItem: (id: number) => {
 		const item = recursive(treeData, id);
 		if (!item) return 'not found';
 
@@ -62,7 +71,7 @@ const fakeApi = {
 	},
 };
 
-const recursive = (data: any, id: string): any => {
+const recursive = (data: any, id: number): any => {
 	for (let index = 0; index < data.length; index++) {
 		const element = data[index];
 
@@ -79,20 +88,20 @@ const recursive = (data: any, id: string): any => {
 
 const treeData = [
 	{
-		id: '1',
+		id: 1,
 		name: 'content',
 		children: [
 			{
-				id: '1-1',
+				id: 11,
 				name: 'content-1-1',
 				children: [
 					{
-						id: '1-1-1',
+						id: 111,
 						name: 'content-1-1-1',
 						children: [],
 					},
 					{
-						id: '1-1-2',
+						id: 112,
 						name: 'content-1-1-2',
 						children: [],
 					},
@@ -101,20 +110,20 @@ const treeData = [
 		],
 	},
 	{
-		id: '2',
+		id: 2,
 		name: 'DataTypes',
 		children: [
 			{
-				id: '2-1',
+				id: 21,
 				name: 'DataTypes-2-1',
 				children: [],
 			},
 			{
-				id: '2-2',
+				id: 22,
 				name: 'DataTypes-2-2',
 				children: [
 					{
-						id: '2-2-1',
+						id: 221,
 						name: 'DataTypes-2-2-1',
 						children: [],
 					},
@@ -123,16 +132,16 @@ const treeData = [
 		],
 	},
 	{
-		id: '3',
+		id: 3,
 		name: 'Something',
 		children: [
 			{
-				id: '3-1',
+				id: 31,
 				name: 'Something-3-1',
 				children: [],
 			},
 			{
-				id: '3-2',
+				id: 32,
 				name: 'Something-3-2',
 				children: [],
 			},
