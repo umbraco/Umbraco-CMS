@@ -27,6 +27,7 @@ export type UmbExtensionManifestSection = {
 
 //tree
 export type UmbManifestTreeMeta = {
+	label: string;
 	weight: number;
 	sections: Array<string>;
 };

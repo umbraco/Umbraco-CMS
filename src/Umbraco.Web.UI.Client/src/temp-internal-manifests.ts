@@ -245,10 +245,11 @@ export const internalManifests: Array<UmbExtensionManifestCore> = [
 	{
 		type: 'tree',
 		alias: 'Umb.Tree.Datatypes',
-		name: 'DataTypes',
+		name: 'Data Types Tree',
 		elementName: 'umb-datatype-tree',
 		js: () => import('./backoffice/tree/datatypes-tree.element'),
 		meta: {
+			label: 'Data Types',
 			weight: -10,
 			sections: ['Umb.Section.Settings'],
 		},
@@ -256,23 +257,13 @@ export const internalManifests: Array<UmbExtensionManifestCore> = [
 	{
 		type: 'tree',
 		alias: 'Umb.Tree.DocumentTypes',
-		name: 'DocumentTypes',
+		name: 'Document Types Tree',
 		elementName: 'umb-document-type-tree',
 		js: () => import('./backoffice/tree/document-type-tree.element'),
 		meta: {
+			label: 'Document Types',
 			weight: -10,
-			sections: ['Umb.Section.Settings'],
-		},
-	},
-	{
-		type: 'tree',
-		alias: 'Umb.Tree.DocumentTypes',
-		name: 'DocumentTypes',
-		elementName: 'umb-document-type-tree',
-		js: () => import('./backoffice/tree/document-type-tree.element'),
-		meta: {
-			weight: -10,
-			sections: ['Umb.Section.Content'],
+			sections: ['Umb.Section.Content', 'Umb.Section.Settings'],
 		},
 	},
 	{
@@ -290,9 +281,10 @@ export const internalManifests: Array<UmbExtensionManifestCore> = [
 	{
 		type: 'tree',
 		alias: 'Umb.Tree.Members',
-		name: 'Members',
+		name: 'Members Tree',
 		js: () => import('./backoffice/tree/members/tree-members.element'),
 		meta: {
+			label: 'Members',
 			weight: -10,
 			sections: ['Umb.Section.Members'],
 		},
