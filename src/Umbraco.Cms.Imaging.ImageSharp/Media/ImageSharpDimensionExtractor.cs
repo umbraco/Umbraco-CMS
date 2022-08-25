@@ -3,7 +3,7 @@ using SixLabors.ImageSharp.Metadata.Profiles.Exif;
 using Umbraco.Cms.Core.Media;
 using Size = System.Drawing.Size;
 
-namespace Umbraco.Cms.Infrastructure.Media;
+namespace Umbraco.Cms.Imaging.ImageSharp.Media;
 
 internal class ImageSharpDimensionExtractor : IImageDimensionExtractor
 {

@@ -5,10 +5,10 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Web.Processors;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Web.Common.ImageProcessors;
+using Umbraco.Cms.Imaging.ImageSharp.ImageProcessors;
 using static Umbraco.Cms.Core.Models.ImageUrlGenerationOptions;
 
-namespace Umbraco.Cms.Web.Common.Media;
+namespace Umbraco.Cms.Imaging.ImageSharp.Media;
 
 /// <summary>
 ///     Exposes a method that generates an image URL based on the specified options that can be processed by ImageSharp.
@@ -16,14 +16,16 @@ namespace Umbraco.Cms.Web.Common.Media;
 /// <seealso cref="IImageUrlGenerator" />
 public class ImageSharpImageUrlGenerator : IImageUrlGenerator
 {
+    /// <inheritdoc />
+    public IEnumerable<string> SupportedImageFileTypes { get; }
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="ImageSharpImageUrlGenerator" /> class.
     /// </summary>
     /// <param name="configuration">The ImageSharp configuration.</param>
     public ImageSharpImageUrlGenerator(Configuration configuration)
         : this(configuration.ImageFormats.SelectMany(f => f.FileExtensions).ToArray())
-    {
-    }
+    { }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ImageSharpImageUrlGenerator" /> class.
@@ -34,9 +36,6 @@ public class ImageSharpImageUrlGenerator : IImageUrlGenerator
     /// </remarks>
     internal ImageSharpImageUrlGenerator(IEnumerable<string> supportedImageFileTypes) =>
         SupportedImageFileTypes = supportedImageFileTypes;
-
-    /// <inheritdoc />
-    public IEnumerable<string> SupportedImageFileTypes { get; }
 
     /// <inheritdoc />
     public string? GetImageUrl(ImageUrlGenerationOptions? options)

@@ -8,7 +8,7 @@ using SixLabors.ImageSharp.Web;
 using SixLabors.ImageSharp.Web.Commands;
 using SixLabors.ImageSharp.Web.Processors;
 
-namespace Umbraco.Cms.Web.Common.ImageProcessors;
+namespace Umbraco.Cms.Imaging.ImageSharp.ImageProcessors;
 
 /// <summary>
 ///     Allows the cropping of images.

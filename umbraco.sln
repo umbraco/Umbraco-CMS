@@ -145,6 +145,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "styles", "styles", "{EA628A
 		build\csharp-docs\umbracotemplate\styles\main.css = build\csharp-docs\umbracotemplate\styles\main.css
 	EndProjectSection
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Cms.Imaging.ImageSharp", "src\Umbraco.Cms.Imaging.ImageSharp\Umbraco.Cms.Imaging.ImageSharp.csproj", "{C280181E-597B-4AA5-82E7-D7017E928749}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -273,6 +275,12 @@ Global
 		{B51C10FC-FD20-451E-90DD-A117133403DF}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B51C10FC-FD20-451E-90DD-A117133403DF}.SkipTests|Any CPU.ActiveCfg = Debug|Any CPU
 		{B51C10FC-FD20-451E-90DD-A117133403DF}.SkipTests|Any CPU.Build.0 = Debug|Any CPU
+		{C280181E-597B-4AA5-82E7-D7017E928749}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C280181E-597B-4AA5-82E7-D7017E928749}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C280181E-597B-4AA5-82E7-D7017E928749}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C280181E-597B-4AA5-82E7-D7017E928749}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C280181E-597B-4AA5-82E7-D7017E928749}.SkipTests|Any CPU.ActiveCfg = Debug|Any CPU
+		{C280181E-597B-4AA5-82E7-D7017E928749}.SkipTests|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

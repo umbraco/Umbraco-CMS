@@ -4,7 +4,7 @@ using SixLabors.ImageSharp.Web.Caching;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Extensions;
 
-namespace Umbraco.Cms.Web.Common.DependencyInjection;
+namespace Umbraco.Cms.Imaging.ImageSharp;
 
 /// <summary>
 ///     Configures the ImageSharp physical file system cache options.
