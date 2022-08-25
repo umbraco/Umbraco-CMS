@@ -1,5 +1,7 @@
 import { BehaviorSubject, map, Observable } from 'rxjs';
 
+import { createExtensionElement } from './create-extension-element.function';
+
 import type {
 	ManifestCore,
 	ManifestDashboard,
@@ -23,6 +25,11 @@ export class UmbExtensionRegistry {
 		}
 
 		this._extensions.next([...extensionsValues, manifest]);
+
+		// If entrypoint extension, we should load it immediately
+		if (manifest.type === 'entrypoint') {
+			createExtensionElement(manifest);
+		}
 	}
 
 	getByAlias(alias: string): Observable<ManifestCore | null> {
