@@ -3,7 +3,7 @@ import { CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 
 import { createExtensionElement } from '../../../core/extension';
-import { ManifestPropertyAction } from '../../../core/models';
+import type { ManifestPropertyAction } from '../../../core/models';
 
 import type { UmbPropertyAction } from './property-action.model';
 

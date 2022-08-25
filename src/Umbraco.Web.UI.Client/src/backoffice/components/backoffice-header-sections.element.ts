@@ -5,7 +5,7 @@ import { when } from 'lit/directives/when.js';
 import { Subscription } from 'rxjs';
 
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '../../core/context';
-import { ManifestSection } from '../../core/models';
+import type { ManifestSection } from '../../core/models';
 import { UmbSectionStore } from '../../core/stores/section.store';
 
 @customElement('umb-backoffice-header-sections')

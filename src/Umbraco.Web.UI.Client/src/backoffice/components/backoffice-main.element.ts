@@ -7,7 +7,7 @@ import { Subscription } from 'rxjs';
 
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '../../core/context';
 import { createExtensionElement } from '../../core/extension';
-import { ManifestSection } from '../../core/models';
+import type { ManifestSection } from '../../core/models';
 import { UmbSectionStore } from '../../core/stores/section.store';
 import { UmbSectionContext } from '../sections/section.context';
 

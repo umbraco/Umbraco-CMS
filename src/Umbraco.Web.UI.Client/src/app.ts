@@ -10,8 +10,8 @@ import { UmbContextProviderMixin } from './core/context';
 import { UmbExtensionRegistry } from './core/extension';
 import { internalManifests } from './temp-internal-manifests';
 
-import type { Guard, IRoute } from 'router-slot/model';
 import type { ServerStatus } from './core/models';
+import type { Guard, IRoute } from 'router-slot/model';
 
 @customElement('umb-app')
 export class UmbApp extends UmbContextProviderMixin(LitElement) {

@@ -6,7 +6,7 @@ import { ifDefined } from 'lit/directives/if-defined.js';
 import { distinctUntilChanged, Subscription } from 'rxjs';
 
 import { UmbContextConsumerMixin } from '../../../../core/context';
-import { ManifestPropertyEditorUI } from '../../../../core/models';
+import type { ManifestPropertyEditorUI } from '../../../../core/models';
 import { UmbDataTypeContext } from '../data-type.context';
 
 import type { DataTypeEntity } from '../../../../mocks/data/data-type.data';

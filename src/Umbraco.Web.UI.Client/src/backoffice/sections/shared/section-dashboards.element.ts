@@ -6,8 +6,9 @@ import { first, map, Subscription } from 'rxjs';
 
 import { UmbContextConsumerMixin } from '../../../core/context';
 import { createExtensionElement, UmbExtensionRegistry } from '../../../core/extension';
-import { ManifestDashboard } from '../../../core/models';
 import { UmbSectionContext } from '../section.context';
+
+import type { ManifestDashboard } from '../../../core/models';
 
 @customElement('umb-section-dashboards')
 export class UmbSectionDashboards extends UmbContextConsumerMixin(LitElement) {

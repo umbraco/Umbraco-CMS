@@ -1,6 +1,6 @@
 import { BehaviorSubject } from 'rxjs';
 
-import { ManifestSection } from '../../core/models';
+import type { ManifestSection } from '../../core/models';
 
 export class UmbSectionContext {
 	// TODO: figure out how fine grained we want to make our observables.

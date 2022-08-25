@@ -5,7 +5,7 @@ import { Subscription } from 'rxjs';
 
 import { postInstallSetup, postInstallValidateDatabase } from '../core/api/fetcher';
 import { UmbContextConsumerMixin } from '../core/context';
-import { UmbracoInstallerDatabaseModel, UmbracoPerformInstallDatabaseConfiguration } from '../core/models';
+import type { UmbracoInstallerDatabaseModel, UmbracoPerformInstallDatabaseConfiguration } from '../core/models';
 import { UmbInstallerContext } from './installer-context';
 
 @customElement('umb-installer-database')

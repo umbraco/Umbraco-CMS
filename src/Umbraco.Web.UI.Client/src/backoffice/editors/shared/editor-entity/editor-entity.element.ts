@@ -8,7 +8,7 @@ import { map, Subscription } from 'rxjs';
 
 import { UmbContextConsumerMixin } from '../../../../core/context';
 import { UmbExtensionRegistry } from '../../../../core/extension';
-import { ManifestEditorView } from '../../../../core/models';
+import type { ManifestEditorView } from '../../../../core/models';
 
 @customElement('umb-editor-entity')
 export class UmbEditorEntity extends UmbContextConsumerMixin(LitElement) {

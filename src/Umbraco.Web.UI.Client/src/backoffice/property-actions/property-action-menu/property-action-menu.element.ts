@@ -7,7 +7,7 @@ import { map, Subscription } from 'rxjs';
 
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '../../../core/context';
 import { UmbExtensionRegistry } from '../../../core/extension';
-import { ManifestPropertyAction } from '../../../core/models';
+import type { ManifestPropertyAction } from '../../../core/models';
 import { UmbPropertyActionMenuContext } from './property-action-menu.context';
 
 @customElement('umb-property-action-menu')

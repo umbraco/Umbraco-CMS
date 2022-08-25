@@ -7,7 +7,7 @@ import { distinctUntilChanged, EMPTY, of, Subscription, switchMap } from 'rxjs';
 
 import { UmbContextConsumerMixin } from '../../core/context';
 import { createExtensionElement, UmbExtensionRegistry } from '../../core/extension';
-import { ManifestPropertyEditorUI } from '../../core/models';
+import type { ManifestPropertyEditorUI } from '../../core/models';
 import { UmbDataTypeStore } from '../../core/stores/data-type.store';
 import { DataTypeEntity } from '../../mocks/data/data-type.data';
 

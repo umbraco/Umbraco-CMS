@@ -1,7 +1,7 @@
 import { rest } from 'msw';
 
 import umbracoPath from '../src/core/helpers/umbraco-path';
-import { ProblemDetails, StatusResponse } from '../src/core/models';
+import type { ProblemDetails, StatusResponse } from '../src/core/models';
 import { expect, test } from '../test';
 
 test.describe('upgrader tests', () => {
