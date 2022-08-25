@@ -389,7 +389,6 @@ components:
         - type
         - meta
         - name
-        - elementName
         - alias
     MetaPropertyEditorUI:
       type: object
@@ -422,7 +421,6 @@ components:
         - type
         - meta
         - name
-        - elementName
         - alias
     MetaDashboard:
       type: object
@@ -463,7 +461,6 @@ components:
         - type
         - meta
         - name
-        - elementName
         - alias
     MetaEditorView:
       type: object
@@ -505,7 +502,6 @@ components:
         - type
         - meta
         - name
-        - elementName
         - alias
     MetaPropertyAction:
       type: object
@@ -537,7 +533,6 @@ components:
         - type
         - meta
         - name
-        - elementName
         - alias
     IManifestEntrypoint:
       type: object

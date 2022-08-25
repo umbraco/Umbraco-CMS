@@ -66,7 +66,7 @@ export interface MetaPropertyAction {
 export interface IManifestElement extends IManifest {
 	name: string;
 	js?: string;
-	elementName: string;
+	elementName?: string;
 }
 
 export interface IManifestSection extends IManifestElement {

@@ -116,7 +116,7 @@ export interface components {
       meta: components["schemas"]["MetaSection"];
       name: string;
       js?: string;
-      elementName: string;
+      elementName?: string;
       alias: string;
     };
     MetaPropertyEditorUI: {
@@ -129,7 +129,7 @@ export interface components {
       meta: components["schemas"]["MetaPropertyEditorUI"];
       name: string;
       js?: string;
-      elementName: string;
+      elementName?: string;
       alias: string;
     };
     MetaDashboard: {
@@ -145,7 +145,7 @@ export interface components {
       meta: components["schemas"]["MetaDashboard"];
       name: string;
       js?: string;
-      elementName: string;
+      elementName?: string;
       alias: string;
     };
     MetaEditorView: {
@@ -161,7 +161,7 @@ export interface components {
       meta: components["schemas"]["MetaEditorView"];
       name: string;
       js?: string;
-      elementName: string;
+      elementName?: string;
       alias: string;
     };
     MetaPropertyAction: {
@@ -173,7 +173,7 @@ export interface components {
       meta: components["schemas"]["MetaPropertyAction"];
       name: string;
       js?: string;
-      elementName: string;
+      elementName?: string;
       alias: string;
     };
     IManifestEntrypoint: {
