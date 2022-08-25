@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
     <IsPackable>true</IsPackable>
@@ -64,5 +64,6 @@
       <DependentUpon>ImportResources.resx</DependentUpon>
     </Compile>
     <EmbeddedResource Include="Umbraco.Web.BackOffice\UrlAndDomains\package.xml" />
+    <Content Include="appsettings.Tests.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>
