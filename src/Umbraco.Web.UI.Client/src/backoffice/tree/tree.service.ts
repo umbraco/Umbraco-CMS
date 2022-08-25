@@ -1,10 +1,18 @@
 // import { BehaviorSubject, Observable } from 'rxjs';
 
-export class UmbTreeService {
-	public getRoot() {
-		return fakeApi.getTreeRoot();
-	}
+export interface ITreeService {
+	getTreeItem(id: string): Promise<UmbTreeItem>;
+	getChildren(id: string): Promise<Array<UmbTreeItem>>;
+}
 
+export interface UmbTreeItem {
+	id: number;
+	key: string;
+	name: string;
+	hasChildren: boolean;
+}
+
+export class UmbTreeService implements ITreeService {
 	public async getTreeItem(id: string) {
 		await new Promise((resolve) => setTimeout(resolve, Math.random() * 2000));
 		return fakeApi.getTreeItem(id);

@@ -28,7 +28,7 @@ export class UmbTree extends LitElement {
 		try {
 			this._element = (await createExtensionElement(this.tree)) as any | undefined;
 			if (!this._element) return;
-			this._element.alias = this._tree?.alias;
+			this._element.tree = this._tree;
 		} catch (error) {
 			// TODO: loading JS failed so we should do some nice UI. (This does only happen if extension has a js prop, otherwise we concluded that no source was needed resolved the load.)
 		}
