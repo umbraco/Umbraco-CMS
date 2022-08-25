@@ -247,7 +247,7 @@ export const internalManifests: Array<UmbExtensionManifestCore> = [
 		alias: 'Umb.Tree.Datatypes',
 		name: 'Data Types Tree',
 		elementName: 'umb-datatype-tree',
-		js: () => import('./backoffice/tree/datatypes-tree.element'),
+		js: () => import('./backoffice/tree/data-types/datatypes-tree.element'),
 		meta: {
 			label: 'Data Types',
 			weight: -10,
@@ -259,7 +259,7 @@ export const internalManifests: Array<UmbExtensionManifestCore> = [
 		alias: 'Umb.Tree.DocumentTypes',
 		name: 'Document Types Tree',
 		elementName: 'umb-document-type-tree',
-		js: () => import('./backoffice/tree/document-type-tree.element'),
+		js: () => import('./backoffice/tree/document-types/document-type-tree.element'),
 		meta: {
 			label: 'Document Types',
 			weight: -10,
