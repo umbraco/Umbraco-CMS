@@ -4,6 +4,8 @@ import { customElement, state } from 'lit/decorators.js';
 import { UmbContextProviderMixin } from '../../../core/context';
 import { UmbTreeService } from '../tree.service';
 
+import './tree-item.element';
+
 @customElement('umb-tree-navigator')
 export class UmbTreeNavigator extends UmbContextProviderMixin(LitElement) {
 	static styles = [UUITextStyles, css``];
