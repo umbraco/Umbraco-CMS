@@ -1,37 +1,29 @@
 import { ManifestTypes } from '../models';
 
 export type ManifestLoaderType = ManifestTypes & { loader: () => Promise<object | HTMLElement> };
+export type ManifestJSType = ManifestTypes & { js: string };
 
-export function loadExtension(manifest: ManifestTypes) {
-	// TODO: change this back to dynamic import after POC. Vite complains about the dynamic imports in the public folder but doesn't include the temp app_plugins folder in the final build.
-	// return import(/* @vite-ignore */ manifest.js);
+export async function loadExtension(manifest: ManifestTypes): Promise<object | HTMLElement | null> {
 	if (isManifestLoaderType(manifest)) {
 		return manifest.loader();
 	}
 
-	return new Promise((resolve, reject) => {
-		if (!manifest.js) {
-			resolve(null);
-			return;
+	if (isManifestJSType(manifest) && manifest.js) {
+		try {
+			return await import(/* @vite-ignore */ manifest.js);
+		} catch {
+			console.warn('-- Extension failed to load script', manifest.js);
+			return Promise.resolve(null);
 		}
+	}
 
-		const script = document.createElement('script');
-		script.type = 'text/javascript';
-		//script.charset = 'utf-8';
-		script.async = true;
-		script.type = 'module';
-		script.src = manifest.js;
-		script.crossOrigin = 'anonymous';
-		script.onload = function () {
-			resolve(null);
-		};
-		script.onerror = function () {
-			reject(new Error(`Script load error for ${manifest.js}`));
-		};
-		document.body.appendChild(script);
-	}) as Promise<null>;
+	return Promise.resolve(null);
 }
 
 export function isManifestLoaderType(manifest: ManifestTypes): manifest is ManifestLoaderType {
 	return typeof (manifest as ManifestLoaderType).loader === 'function';
+}
+
+export function isManifestJSType(manifest: ManifestTypes): manifest is ManifestJSType {
+	return (manifest as ManifestJSType).js !== undefined;
 }
