@@ -635,7 +635,6 @@
 
                     var observer = new MutationObserver(function(mutations) {
                         mutations.forEach(function(mutation) {
-                            console.log("MODELOBJECT mutation:", mutation.target.textContent)
                             blockObject.label = mutation.target.textContent;
                             blockObject.__scope.$evalAsync();
                         });
@@ -644,7 +643,6 @@
                     observer.observe(labelElement[0], {characterData: true, subtree:true});
 
                     blockObject.__watchers.push(() => {
-                        console.log("disconnet mutioation observer")
                         observer.disconnect();
                     })
 

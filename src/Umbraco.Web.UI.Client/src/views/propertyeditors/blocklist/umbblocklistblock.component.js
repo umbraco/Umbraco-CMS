@@ -9,7 +9,7 @@
    * If a stylesheet is used then this uses a ShadowDom to make a scoped element.
    * This way the backoffice styling does not collide with the block style.
    */
-
+  
   angular
     .module("umbraco")
     .component("umbBlockListBlock", {
@@ -27,7 +27,7 @@
         valFormManager: "^^valFormManager"
       }
     }
-    );
+  );
 
   function BlockListBlockController($scope, $compile, $element) {
     var model = this;
@@ -68,21 +68,12 @@
       }
     };
 
-    /*
-    // React to changes to the block data and reset the scope data to force a digest cycle
-    $scope.$watchCollection(function () {
-      return model.block.data;
-    }, function () {
-      $scope.block.data = Object.assign({}, model.block.data);
-    });
-    */
-
     // We need to watch for changes on primitive types and update the $scope values.
     model.$onChanges = function (changes) {
       if (changes.index) {
         var index = changes.index.currentValue;
         $scope.index = index;
-        
+
         // let the Block know about the current index:
         if ($scope.block) {
           $scope.block.index = index;
