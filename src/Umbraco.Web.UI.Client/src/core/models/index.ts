@@ -1,4 +1,4 @@
-import { components } from '../../../schemas/generated-schema';
+import type { components } from '../../../schemas/generated-schema';
 
 export type PostInstallRequest = components['schemas']['InstallSetupRequest'];
 export type StatusResponse = components['schemas']['StatusResponse'];

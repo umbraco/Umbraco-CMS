@@ -1,4 +1,4 @@
-import { ManifestTypes } from '../models';
+import type { ManifestTypes } from '../models';
 
 export type ManifestLoaderType = ManifestTypes & { loader: () => Promise<object | HTMLElement> };
 export type ManifestJSType = ManifestTypes & { js: string };

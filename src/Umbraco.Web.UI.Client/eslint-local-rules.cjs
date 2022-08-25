@@ -20,7 +20,7 @@ module.exports = {
 		create: function (context) {
 			return {
 				ImportDeclaration: function (node) {
-					if (node.source.parent.importKind !== 'type' && (node.source.value.endsWith('core/models') || node.source.value === 'router-slot/model')) {
+					if (node.source.parent.importKind !== 'type' && (node.source.value.endsWith('/models') || node.source.value.endsWith('/generated-schema') || node.source.value === 'router-slot/model')) {
 						const sourceCode = context.getSourceCode();
 						const nodeSource = sourceCode.getText(node);
 						context.report({

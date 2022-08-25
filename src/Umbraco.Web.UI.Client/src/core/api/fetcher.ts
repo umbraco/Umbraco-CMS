@@ -1,6 +1,6 @@
 import { Fetcher } from 'openapi-typescript-fetch';
 
-import { paths } from '../../../schemas/generated-schema';
+import type { paths } from '../../../schemas/generated-schema';
 
 const fetcher = Fetcher.for<paths>();
 
