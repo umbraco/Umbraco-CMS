@@ -1,8 +1,7 @@
-import { css, CSSResultGroup, html, LitElement } from 'lit';
+import { CSSResultGroup, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { createExtensionElement, UmbExtensionManifestTree } from '../../../core/extension';
-import { UmbTreeNavigator } from './tree-navigator.element';
 
 @customElement('umb-tree')
 export class UmbTree extends LitElement {
