@@ -1,6 +1,7 @@
 import { defineElement } from '@umbraco-ui/uui-base/lib/registration';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
+import { Subscription } from 'rxjs';
 
 import { UmbContextProviderMixin, UmbContextConsumerMixin } from '../core/context';
 import { UmbNotificationService } from '../core/services/notification';
@@ -19,7 +20,7 @@ import './components/node-property.element';
 import './sections/shared/section-layout.element';
 import './sections/shared/section-sidebar.element';
 import './sections/shared/section-main.element';
-import { Subscription } from 'rxjs';
+import './sections/shared/section.element';
 
 @defineElement('umb-backoffice')
 export default class UmbBackoffice extends UmbContextConsumerMixin(UmbContextProviderMixin(LitElement)) {
