@@ -29,7 +29,8 @@ export const internalManifests: Array<UmbExtensionManifestCore> = [
 		type: 'section',
 		alias: 'Umb.Section.Members',
 		name: 'Members',
-		elementName: 'umb-members-section',
+		elementName: 'umb-section-members',
+		js: () => import('./backoffice/sections/members/section-members.element'),
 		meta: {
 			pathname: 'members',
 			weight: 30,
