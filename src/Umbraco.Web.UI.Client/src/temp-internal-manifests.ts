@@ -289,4 +289,15 @@ export const internalManifests: Array<UmbExtensionManifestCore> = [
 			sections: ['Umb.Section.Members'],
 		},
 	},
+	{
+		type: 'tree',
+		alias: 'Umb.Tree.MemberGroups',
+		name: 'Members Groups Tree',
+		js: () => import('./backoffice/tree/member-groups/tree-member-groups.element'),
+		meta: {
+			label: 'Member Groups',
+			weight: -10,
+			sections: ['Umb.Section.Members'],
+		},
+	},
 ];
