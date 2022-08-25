@@ -1,8 +1,7 @@
-using Umbraco.Cms.Infrastructure.Persistence.FaultHandling.Strategies;
+using Umbraco.Cms.Infrastructure.Persistence.FaultHandling;
+using Umbraco.Cms.Persistence.SqlServer.FaultHandling.Strategies;
 
-namespace Umbraco.Cms.Infrastructure.Persistence.FaultHandling;
-
-// TODO: These should move to Persistence.SqlServer
+namespace Umbraco.Cms.Persistence.SqlServer.FaultHandling;
 
 /// <summary>
 ///     Provides a factory class for instantiating application-specific retry policies.

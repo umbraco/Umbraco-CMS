@@ -2,7 +2,7 @@ using System.Data;
 using System.Diagnostics;
 using Microsoft.Data.SqlClient;
 
-namespace Umbraco.Cms.Infrastructure.Persistence;
+namespace Umbraco.Cms.Persistence.SqlServer;
 
 /// <summary>
 ///     Manages LocalDB databases.
@@ -153,7 +153,7 @@ public class LocalDb
             return null;
         }
 
-        return output.Split(new[] {Environment.NewLine}, StringSplitOptions.RemoveEmptyEntries);
+        return output.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
     }
 
     /// <summary>
@@ -861,7 +861,7 @@ public class LocalDb
     {
         var nop = (targetFilesPath == null || targetFilesPath == filesPath)
                   && (targetDatabaseName == null || targetDatabaseName == databaseName)
-                  && ((sourceExtension == null && targetExtension == null) || sourceExtension == targetExtension);
+                  && (sourceExtension == null && targetExtension == null || sourceExtension == targetExtension);
         if (nop && delete == false)
         {
             return;
@@ -994,8 +994,8 @@ public class LocalDb
         }
 
         using (var p = new Process
-               {
-                   StartInfo =
+        {
+            StartInfo =
                    {
                        UseShellExecute = false,
                        RedirectStandardOutput = true,
@@ -1005,7 +1005,7 @@ public class LocalDb
                        CreateNoWindow = true,
                        WindowStyle = ProcessWindowStyle.Hidden
                    }
-               })
+        })
         {
             p.Start();
             output = p.StandardOutput.ReadToEnd();

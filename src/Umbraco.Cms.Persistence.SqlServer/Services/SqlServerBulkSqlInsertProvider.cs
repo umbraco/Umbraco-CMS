@@ -50,8 +50,7 @@ public class SqlServerBulkSqlInsertProvider : IBulkSqlInsertProvider
         {
             // use typed connection and transaction or SqlBulkCopy
             SqlConnection tConnection = NPocoDatabaseExtensions.GetTypedConnection<SqlConnection>(database.Connection);
-            SqlTransaction tTransaction =
-                NPocoDatabaseExtensions.GetTypedTransaction<SqlTransaction>(command.Transaction);
+            SqlTransaction tTransaction = NPocoDatabaseExtensions.GetTypedTransaction<SqlTransaction>(command.Transaction);
             var tableName = pocoData.TableInfo.TableName;
 
             if (database.SqlContext.SqlSyntax is not SqlServerSyntaxProvider syntax)
@@ -62,9 +61,8 @@ public class SqlServerBulkSqlInsertProvider : IBulkSqlInsertProvider
             using (var copy = new SqlBulkCopy(tConnection, SqlBulkCopyOptions.Default, tTransaction)
             {
                 // 0 = no bulk copy timeout. If a timeout occurs it will be an connection/command timeout.
-                BulkCopyTimeout = 0, 
+                BulkCopyTimeout = 0,
                 DestinationTableName = tableName,
-
                 // be consistent with NPoco: https://github.com/schotime/NPoco/blob/5117a55fde57547e928246c044fd40bd00b2d7d1/src/NPoco.SqlServer/SqlBulkCopyHelper.cs#L50
                 BatchSize = 4096,
             })
