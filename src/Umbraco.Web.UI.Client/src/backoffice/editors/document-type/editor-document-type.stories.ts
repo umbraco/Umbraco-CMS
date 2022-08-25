@@ -1,10 +1,11 @@
+import './editor-document-type.element';
+
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit-html';
 
-import { UmbEditorDocumentTypeElement } from './editor-document-type.element';
-import './editor-document-type.element';
-
 import { data } from '../../../mocks/data/document-type.data';
+
+import type { UmbEditorDocumentTypeElement } from './editor-document-type.element';
 
 export default {
 	title: 'Editors/Document Type',
