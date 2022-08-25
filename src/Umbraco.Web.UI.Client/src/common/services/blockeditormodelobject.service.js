@@ -13,7 +13,7 @@
 (function () {
     'use strict';
 
-    function blockEditorModelObjectFactory($q, udiService, contentResource, localizationService, umbRequestHelper, clipboardService, notificationsService) {
+    function blockEditorModelObjectFactory($q, $compile, udiService, contentResource, localizationService, umbRequestHelper, clipboardService, notificationsService) {
 
         /**
          * Simple mapping from property model content entry to editing model,
@@ -291,11 +291,11 @@
          * @param {object} propertyModelValue data object of the property editor, usually model.value.
          * @param {string} propertyEditorAlias alias of the property.
          * @param {object} blockConfigurations block configurations.
-         * @param {angular-scope} scopeOfExistance A local angularJS scope that exists as long as the data exists.
+         * @param {angular-scope} scopeOfExistence A local angularJS scope that exists as long as the data exists.
          * @param {angular-scope} propertyEditorScope A local angularJS scope that represents the property editors scope.
          * @returns {BlockEditorModelObject} A instance of BlockEditorModelObject.
          */
-        function BlockEditorModelObject(propertyModelValue, propertyEditorAlias, blockConfigurations, scopeOfExistance, propertyEditorScope) {
+        function BlockEditorModelObject(propertyModelValue, propertyEditorAlias, blockConfigurations, scopeOfExistence, propertyEditorScope) {
 
             if (!propertyModelValue) {
                 throw new Error("propertyModelValue cannot be undefined, to ensure we keep the binding to the angular model we need minimum an empty object.");
@@ -327,8 +327,8 @@
             });
 
             this.scaffolds = [];
-
-            this.isolatedScope = scopeOfExistance.$new(true);
+            this.__scopeOfExistence = scopeOfExistence;
+            this.isolatedScope = scopeOfExistence.$new(true);
             this.isolatedScope.blockObjects = {};
 
             this.__watchers.push(this.isolatedScope.$on("$destroy", this.destroy.bind(this)));
@@ -627,8 +627,63 @@
                 };
 
                 // first time instant update of label.
-                blockObject.label = getBlockLabel(blockObject);
+                blockObject.label = blockObject.content.contentTypeName;
                 blockObject.index = 0;
+
+                if (blockObject.config.label && blockObject.config.label !== "") {
+                    var labelElement = $('<div></div>', { text: blockObject.config.label});
+
+                    var observer = new MutationObserver(function(mutations) {
+                        mutations.forEach(function(mutation) {
+                            console.log("MODELOBJECT mutation:", mutation.target.textContent)
+                            blockObject.label = mutation.target.textContent;
+                            blockObject.__scope.$evalAsync();
+                        });
+                    });
+    
+                    observer.observe(labelElement[0], {characterData: true, subtree:true});
+
+                    blockObject.__watchers.push(() => {
+                        console.log("disconnet mutioation observer")
+                        observer.disconnect();
+                    })
+
+                    blockObject.__labelScope = this.__scopeOfExistence.$new(true);
+                    blockObject.__renderLabel = function() {
+
+                        var labelVars = {
+                            $contentTypeName: this.content.contentTypeName,
+                            $settings: this.settingsData || {},
+                            $layout: this.layout || {},
+                            $index: this.index + 1,
+                            ... this.data
+                        };
+    
+                        this.__labelScope = Object.assign(this.__labelScope, labelVars);
+    
+                        $compile(labelElement.contents())(this.__labelScope);
+                    }.bind(blockObject)
+                } else {
+                    blockObject.__renderLabel = function() {};
+                }
+
+                blockObject.updateLabel = _.debounce(blockObject.__renderLabel, 10);
+
+
+                // label rendering watchers:
+                blockObject.__watchers.push(blockObject.__scope.$watchCollection(function () {
+                return blockObject.data;
+                }, blockObject.__renderLabel));
+                blockObject.__watchers.push(blockObject.__scope.$watchCollection(function () {
+                return blockObject.settingsData;
+                }, blockObject.__renderLabel));
+                blockObject.__watchers.push(blockObject.__scope.$watchCollection(function () {
+                return blockObject.layout;
+                }, blockObject.__renderLabel));
+                blockObject.__watchers.push(blockObject.__scope.$watch(function () {
+                return blockObject.index;
+                }, blockObject.__renderLabel));
+
 
                 // Add blockObject to our isolated scope to enable watching its values:
                 this.isolatedScope.blockObjects["_" + blockObject.key] = blockObject;

@@ -24,15 +24,24 @@ angular
         blockHtmlScope: "<",
         blockHtmlCompile: "<"
       },
-      link: function (scope, element, attrs) {
+      link: function (scope, element) {
 
         var blockObject = scope.blockHtmlScope;
+        var labelElement = $('<div></div>', { text: scope.blockHtmlCompile});
+
+        element.append(labelElement)
+
+        var observer = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            console.log("mutation directive:", mutation.target.textContent)
+          });
+        });
+
+        var config = {characterData: true, subtree:true};// TODO:
+        observer.observe(labelElement[0], config);
+
 
         function compileBlock() {
-          // In case value is a TrustedValueHolderType, sometimes it
-          // needs to be explicitly called into a string in order to
-          // get the HTML string.
-          element.html(scope.blockHtmlCompile);
 
           var labelVars = {
             $contentTypeName: blockObject.content.contentTypeName,
@@ -45,7 +54,8 @@ angular
           var compileScope = scope.$new(true);
           compileScope = Object.assign(compileScope, labelVars);
 
-          $compile(element.contents())(compileScope);
+          blockObject.renderedLabel = $compile(labelElement.contents())(compileScope);
+          console.log('blockObject.renderedLabel:', blockObject.renderedLabel[0])
         }
 
         // Watch for changes to the isolated block scope
@@ -58,13 +68,18 @@ angular
         scope.$watchCollection(function () {
           return blockObject.layout;
         }, compileBlock);
+        scope.$watch(function () {
+          return blockObject.index;
+        }, compileBlock);
 
         /*
         // No need to watch contentTypeName as it wont change.
         scope.$watch(function () {
-          return scope.blockHtmlScope.content.contentTypeName;
+          return blockObject.content.contentTypeName;
         }, compileBlock);
         */
+
+        // TODO: Destroy
 
       }
     };

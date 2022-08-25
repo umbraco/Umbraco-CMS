@@ -45,7 +45,7 @@
       model.block.setParentForm(model.parentForm);
 
       // let the Block know about the current index
-      model.block.$index = model.index + 1;
+      model.block.index = model.index;
 
       $scope.block = model.block;
       $scope.api = model.api;
@@ -82,7 +82,7 @@
       if (changes.index) {
         var index = changes.index.currentValue;
         $scope.index = index;
-
+        
         // let the Block know about the current index:
         if ($scope.block) {
           $scope.block.index = index;
