@@ -442,7 +442,7 @@
                 openSettings: openSettings === true,
                 createFlow: options.createFlow === true,
                 liveEditing: liveEditing,
-                title: $interpolate(blockObject.label)(blockObject.interpolatableData),
+                title: blockObject.label,
                 view: "views/common/infiniteeditors/blockeditor/blockeditor.html",
                 size: blockObject.config.editorSize || "medium",
                 hideSubmitButton: vm.readonly,
