@@ -65,7 +65,7 @@ stages:
               targets: coreBuild
               workingDirectory: src/Umbraco.Web.UI.Client
           - task: UseDotNet@2
-            displayName: Use .Net 7.x
+            displayName: Use .NET 7.x
             inputs:
               version: 7.x
               includePreviewVersions: true
