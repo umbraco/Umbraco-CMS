@@ -1,13 +1,15 @@
 import { rest } from 'msw';
 
-// TODO: set up schema
+import umbracoPath from '../../core/helpers/umbraco-path';
+
+import type { ManifestsResponse } from '../../core/models';
+
 export const handlers = [
-	rest.get('/umbraco/backoffice/manifests', (_req, res, ctx) => {
-		console.warn('Please move to schema');
+	rest.get(umbracoPath('/manifests'), (_req, res, ctx) => {
 		return res(
 			// Respond with a 200 status code
 			ctx.status(200),
-			ctx.json({
+			ctx.json<ManifestsResponse>({
 				manifests: [
 					{
 						type: 'section',
@@ -30,6 +32,11 @@ export const handlers = [
 							icon: 'document',
 							group: 'common',
 						},
+					},
+					{
+						type: 'entrypoint',
+						alias: 'My.Entrypoint.Custom',
+						js: '/App_Plugins/custom-entrypoint.js',
 					},
 				],
 			})

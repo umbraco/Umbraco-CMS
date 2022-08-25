@@ -1,12 +1,14 @@
+import '../property-action/property-action.element';
+
 import { UUITextStyles } from '@umbraco-ui/uui';
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { Subscription, map } from 'rxjs';
-import { UmbContextProviderMixin, UmbContextConsumerMixin } from '../../../core/context';
-import { UmbExtensionManifestPropertyAction, UmbExtensionRegistry } from '../../../core/extension';
-import { UmbPropertyActionMenuContext } from './property-action-menu.context';
+import { map, Subscription } from 'rxjs';
 
-import '../property-action/property-action.element';
+import { UmbContextConsumerMixin, UmbContextProviderMixin } from '../../../core/context';
+import { UmbExtensionRegistry } from '../../../core/extension';
+import { ManifestPropertyAction } from '../../../core/models';
+import { UmbPropertyActionMenuContext } from './property-action-menu.context';
 
 @customElement('umb-property-action-menu')
 export class UmbPropertyActionMenuElement extends UmbContextProviderMixin(UmbContextConsumerMixin(LitElement)) {
@@ -47,7 +49,7 @@ export class UmbPropertyActionMenuElement extends UmbContextProviderMixin(UmbCon
 	public value?: string;
 
 	@state()
-	private _actions: Array<UmbExtensionManifestPropertyAction> = [];
+	private _actions: Array<ManifestPropertyAction> = [];
 
 	@state()
 	private _open = false;

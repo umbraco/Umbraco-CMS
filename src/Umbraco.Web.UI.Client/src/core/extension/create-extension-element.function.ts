@@ -1,12 +1,14 @@
-import { UmbExtensionManifest } from './extension.registry';
+import { ManifestCore } from '../models';
 import { hasDefaultExport } from './has-default-export.function';
-import { isExtensionType } from './is-extension.function';
+import { isManifestElementType } from './is-extension.function';
 import { loadExtension } from './load-extension.function';
 
-export async function createExtensionElement(manifest: UmbExtensionManifest): Promise<HTMLElement | undefined> {
+export async function createExtensionElement(manifest: ManifestCore): Promise<HTMLElement | undefined> {
+	console.log('🚀 ~ file: create-extension-element.function.ts ~ line 7 ~ createExtensionElement ~ manifest', manifest);
 	//TODO: Write tests for these extension options:
 	const js = await loadExtension(manifest);
-	if (manifest.elementName) {
+	console.log('🚀 ~ file: create-extension-element.function.ts ~ line 9 ~ createExtensionElement ~ js', js);
+	if (isManifestElementType(manifest) && manifest.elementName) {
 		// created by manifest method providing HTMLElement
 		return document.createElement(manifest.elementName);
 	}
@@ -15,10 +17,11 @@ export async function createExtensionElement(manifest: UmbExtensionManifest): Pr
 			console.log('-- created by manifest method providing HTMLElement', js);
 			return js;
 		}
-		if (isExtensionType(js)) {
+		if ('elementName' in js) {
 			// created by js export elementName
-			return js.elementName ? document.createElement(js.elementName) : Promise.resolve(undefined);
+			return document.createElement((js as any).elementName);
 		}
+
 		if (hasDefaultExport(js)) {
 			// created by default class
 			return new js.default();

@@ -1,26 +1,29 @@
-import { BehaviorSubject, Observable } from 'rxjs';
-import { UmbExtensionManifestSection } from '../../core/extension';
+import { BehaviorSubject } from 'rxjs';
+
+import { ManifestSection } from '../../core/models';
 
 export class UmbSectionContext {
 	// TODO: figure out how fine grained we want to make our observables.
-	private _data: BehaviorSubject<UmbExtensionManifestSection> = new BehaviorSubject({
+	private _data = new BehaviorSubject<ManifestSection>({
 		type: 'section',
 		alias: '',
 		name: '',
+		js: '',
+		elementName: '',
 		meta: {
 			pathname: '',
 			weight: 0,
 		},
 	});
-	public readonly data: Observable<UmbExtensionManifestSection> = this._data.asObservable();
+	public readonly data = this._data.asObservable();
 
-	constructor(section: UmbExtensionManifestSection) {
+	constructor(section: ManifestSection) {
 		if (!section) return;
 		this._data.next(section);
 	}
 
 	// TODO: figure out how we want to update data
-	public update(data: Partial<UmbExtensionManifestSection>) {
+	public update(data: Partial<ManifestSection>) {
 		this._data.next({ ...this._data.getValue(), ...data });
 	}
 

@@ -1,12 +1,15 @@
-import { css, html, LitElement, nothing } from 'lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, property, state } from 'lit/decorators.js';
-import { UmbContextConsumerMixin } from '../../../../core/context';
-import { UmbExtensionManifestEditorView, UmbExtensionRegistry } from '../../../../core/extension';
-import { map, Subscription } from 'rxjs';
-import { IRoute, IRoutingInfo, RouterSlot } from 'router-slot';
-
 import '../editor-layout/editor-layout.element';
+
+import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
+import { css, html, LitElement, nothing } from 'lit';
+import { customElement, property, state } from 'lit/decorators.js';
+import { IRoute, IRoutingInfo, RouterSlot } from 'router-slot';
+import { map, Subscription } from 'rxjs';
+
+import { UmbContextConsumerMixin } from '../../../../core/context';
+import { UmbExtensionRegistry } from '../../../../core/extension';
+import { ManifestEditorView } from '../../../../core/models';
+
 @customElement('umb-editor-entity')
 export class UmbEditorEntity extends UmbContextConsumerMixin(LitElement) {
 	static styles = [
@@ -62,7 +65,7 @@ export class UmbEditorEntity extends UmbContextConsumerMixin(LitElement) {
 	name = '';
 
 	@state()
-	private _editorViews: Array<UmbExtensionManifestEditorView> = [];
+	private _editorViews: Array<ManifestEditorView> = [];
 
 	@state()
 	private _currentView = '';
@@ -147,7 +150,7 @@ export class UmbEditorEntity extends UmbContextConsumerMixin(LitElement) {
 				? html`
 						<uui-tab-group slot="views">
 							${this._editorViews.map(
-								(view: UmbExtensionManifestEditorView) => html`
+								(view: ManifestEditorView) => html`
 									<uui-tab
 										.label="${view.name}"
 										href="${this._routerFolder}/view/${view.meta.pathname}"
