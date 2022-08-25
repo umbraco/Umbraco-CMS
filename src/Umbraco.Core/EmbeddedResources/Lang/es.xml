@@ -1271,6 +1271,7 @@
     <key alias="scripts">Scripts</key>
     <key alias="stylesheets">Hojas de estilo</key>
     <key alias="templates">Plantillas</key>
+	<key alias="logViewer">Visor de registro</key>
     <key alias="users">Usuarios</key>
   </area>
   <area alias="update">
