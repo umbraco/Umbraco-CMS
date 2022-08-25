@@ -1,21 +1,13 @@
-import { css, html, LitElement } from 'lit';
+import { html, LitElement } from 'lit';
 import { customElement, state, property } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { data } from '../../../mocks/data/node.data';
 import { UmbContextConsumerMixin } from '../../../core/context';
 import { UmbNodeStore } from '../../../core/stores/node.store';
 import { map, Subscription } from 'rxjs';
 
 @customElement('umb-content-section-tree')
 class UmbContentSectionTree extends UmbContextConsumerMixin(LitElement) {
-	static styles = [
-		UUITextStyles,
-		css`
-			h3 {
-				padding: var(--uui-size-4) var(--uui-size-8);
-			}
-		`,
-	];
+	static styles = [UUITextStyles];
 
 	@property()
 	public currentNodeId?: string;
@@ -53,10 +45,6 @@ class UmbContentSectionTree extends UmbContextConsumerMixin(LitElement) {
 
 	render() {
 		return html`
-			<a href="${'/section/content'}">
-				<h3>Content</h3>
-			</a>
-
 			<div class="nav-list">
 				${this._tree.map(
 					(item) => html`

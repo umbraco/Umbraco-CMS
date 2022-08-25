@@ -1,26 +1,17 @@
 import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { data as dataTypeData } from '../../../mocks/data/data-type.data';
-import { data as documentTypeData } from '../../../mocks/data/document-type.data';
 import { UmbContextConsumerMixin } from '../../../core/context';
 import { UmbDataTypeStore } from '../../../core/stores/data-type.store';
 import { map, Subscription, first } from 'rxjs';
 import { UmbDocumentTypeStore } from '../../../core/stores/document-type.store';
-import { createExtensionElement, UmbExtensionRegistry } from '../../../core/extension';
+import { UmbExtensionRegistry } from '../../../core/extension';
 import '../../tree/shared/tree.element';
 import { UmbSectionContext } from '../section.context';
 
 @customElement('umb-settings-section-tree')
 class UmbSettingsSectionTree extends UmbContextConsumerMixin(LitElement) {
-	static styles = [
-		UUITextStyles,
-		css`
-			h3 {
-				padding: var(--uui-size-4) var(--uui-size-8);
-			}
-		`,
-	];
+	static styles = [UUITextStyles];
 
 	// TODO: implement dynamic tree data
 	@state()
@@ -117,10 +108,6 @@ class UmbSettingsSectionTree extends UmbContextConsumerMixin(LitElement) {
 
 	render() {
 		return html`
-			<a href="${'/section/settings'}">
-				<h3>Settings</h3>
-			</a>
-
 			<!-- TODO: hardcoded tree items. These should come the extensions -->
 			<uui-menu-item label="Extensions" href="/section/settings/extensions"></uui-menu-item>
 			<uui-menu-item label="Data Types" has-children>
