@@ -18,7 +18,7 @@
                     <div class="umb-group-panel">
 
                         <div class="umb-group-panel__header">
-                            <localize key="blockEditor_TODO">Identification</localize>
+                            <localize key="blockEditor_areaIdentification">Identification</localize>
                         </div>
 
                         <div class="umb-group-panel__content">
@@ -26,7 +26,7 @@
                             <!-- alias -->
                             <div class="control-group umb-control-group -no-border">
                                 <div class="umb-el-wrap">
-                                    <label class="control-label" for="alias"><localize key="blockEditor_TODO">alias</localize></label>
+                                    <label class="control-label" for="alias"><localize key="general_alias">Alias</localize></label>
                                     <div class="controls">
                                         <input type="text" name="alias" ng-model="vm.area.alias" style="width:100%" umb-auto-focus/>
                                     </div>
@@ -40,7 +40,7 @@
                     <div class="umb-group-panel">
 
                         <div class="umb-group-panel__header">
-                            <localize key="blockEditor_TODO">Requirements</localize>
+                            <localize key="blockEditor_areaValidation">Validation</localize>
                         </div>
 
                         <div class="umb-group-panel__content">
@@ -48,7 +48,7 @@
                             <!-- min/max -->
                             <div class="control-group umb-control-group -no-border">
                                 <div class="umb-el-wrap">
-                                    <label class="control-label" for="minMaxEditor"><localize key="blockEditor_TODO">Required amount of Blocks</localize></label>
+                                    <label class="control-label" for="minMaxEditor"><localize key="blockEditor_areaNumberOfBlocks">Number of blocks</localize></label>
                                     <div class="controls">
                                         <umb-property-editor name="minMaxEditor" model="vm.minMaxModel" is-pre-value="true"></umb-property-editor>
                                     </div>
@@ -58,7 +58,7 @@
                             <!-- onlySpecifiedAllowance -->
                             <div class="control-group umb-control-group -no-border">
                                 <div class="umb-el-wrap">
-                                    <label class="control-label" for="onlySpecifiedAllowance"><localize key="blockEditor_TODO">Only allow specific Blocks</localize></label>
+                                    <label class="control-label" for="onlySpecifiedAllowance"><localize key="blockEditor_areaDisallowAllBlocks">Only allow specific block types</localize></label>
                                     <div class="controls">
                                         <umb-toggle
                                             input-id="onlySpecifiedAllowance"
@@ -72,9 +72,9 @@
                             <!-- specifiedAllowance -->
                             <div class="control-group umb-control-group -no-border">
                                 <div class="umb-el-wrap">
-                                    <label class="control-label" ><localize key="blockEditor_TODO">Allowed Block Types</localize></label>
-                                    <umb-property-info-button button-title-key="blockEditor_TODO">
-                                        <localize key="blockEditor_TODO">Define which specific Blocks that are allowed in this Area.</localize>
+                                    <label class="control-label" ><localize key="blockEditor_areaAllowedBlocks">Allowed block types</localize></label>
+                                    <umb-property-info-button button-title-key="general_readMore">
+                                        <localize key="blockEditor_areaAllowedBlocksHelp">Define which specific types of blocks that are allowed in this area.</localize>
                                     </umb-property-info-button>
                                     <div class="controls">
                                         <umb-block-grid-area-block-allowance-editor disabled="vm.area.onlySpecifiedAllowance !== true" model="vm.area.specifiedAllowance" all-block-types="model.allBlockTypes" loaded-element-types="model.loadedElementTypes"></umb-block-grid-area-block-allowance-editor>

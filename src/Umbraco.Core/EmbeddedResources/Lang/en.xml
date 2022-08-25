@@ -2743,6 +2743,12 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="addBlock">Add content</key>
     <key alias="addThis">Add %0%</key>
     <key alias="propertyEditorNotSupported">Property '%0%' uses editor '%1%' which is not supported in blocks.</key>
+    <key alias="areaIdentification">Identification</key>
+    <key alias="areaValidation">Validation</key>
+    <key alias="areaNumberOfBlocks">Number of blocks</key>
+    <key alias="areaDisallowAllBlocks">Only allow specific block types</key>
+    <key alias="areaAllowedBlocks">Allowed block types</key>
+    <key alias="areaAllowedBlocksHelp">Define which specific types of blocks that are allowed in this area.</key>
   </area>
   <area alias="contentTemplatesDashboard">
     <key alias="whatHeadline">What are Content Templates?</key>
