@@ -1,7 +1,7 @@
 // import { BehaviorSubject, Observable } from 'rxjs';
 
 export interface ITreeService {
-	getTreeItem(id: string): Promise<UmbTreeItem>;
+	getRoot?(): Promise<UmbTreeItem>;
 	getChildren(id: string): Promise<Array<UmbTreeItem>>;
 }
 
@@ -13,9 +13,9 @@ export interface UmbTreeItem {
 }
 
 export class UmbTreeService implements ITreeService {
-	public async getTreeItem(id: string) {
+	public async getRoot() {
 		await new Promise((resolve) => setTimeout(resolve, Math.random() * 2000));
-		return fakeApi.getTreeItem(id);
+		return fakeApi.getTreeItem('2');
 	}
 
 	public async getChildren(id: string) {

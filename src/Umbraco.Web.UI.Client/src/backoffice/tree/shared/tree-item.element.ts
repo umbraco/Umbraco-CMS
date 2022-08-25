@@ -46,6 +46,7 @@ export class UmbTreeItem extends UmbContextConsumerMixin(LitElement) {
 
 		this.loading = true;
 		this._treeService?.getChildren(this.id).then((items) => {
+			console.log(items);
 			this.childItems = items;
 			this.loading = false;
 		});

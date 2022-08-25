@@ -13,7 +13,7 @@ export class UmbTreeNavigator extends UmbContextConsumerMixin(LitElement) {
 	private _treeService?: UmbTreeService;
 
 	@state()
-	id = '2';
+	id = '-1';
 
 	@state()
 	label = '';
@@ -30,7 +30,8 @@ export class UmbTreeNavigator extends UmbContextConsumerMixin(LitElement) {
 		this.consumeContext('umbTreeService', (treeService) => {
 			this._treeService = treeService;
 
-			this._treeService?.getTreeItem(this.id).then((item) => {
+			this._treeService?.getRoot().then((item) => {
+				this.id = item.id;
 				this.label = item.name;
 				this.hasChildren = item.hasChildren;
 				this.loading = false;

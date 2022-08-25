@@ -1,9 +1,9 @@
-import { ITreeService, UmbTreeItem } from '../tree.service';
+import { ITreeService } from '../tree.service';
 
 export class UmbTreeMemberContext implements ITreeService {
-	public async getTreeItem(id: string) {
+	public async getRoot() {
 		return {
-			id: 1,
+			id: -1,
 			key: '81ea7423-985a-43d7-b36e-32a128143c40',
 			name: 'Hej Jesper',
 			hasChildren: true,
@@ -11,13 +11,9 @@ export class UmbTreeMemberContext implements ITreeService {
 	}
 
 	public async getChildren(id: string) {
-		return [
-			{
-				id: 2,
-				key: 'f44101ff-8530-4c5d-926e-f2dbdc7b1e4b',
-				name: 'Hej Jesper',
-				hasChildren: true,
-			},
-		];
+		// TODO: figure out url structure
+		const res = await fetch(`/umbraco/backoffice/trees/members/${id}`);
+		const json = await res.json();
+		return json;
 	}
 }
