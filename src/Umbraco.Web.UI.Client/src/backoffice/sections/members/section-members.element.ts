@@ -2,7 +2,12 @@ import { html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { Subscription, map, switchMap, EMPTY, of } from 'rxjs';
 import { UmbContextConsumerMixin } from '../../../core/context';
-import { createExtensionElement, UmbExtensionManifestTree, UmbExtensionRegistry } from '../../../core/extension';
+import {
+	createExtensionElement,
+	UmbExtensionManifestEditor,
+	UmbExtensionManifestTree,
+	UmbExtensionRegistry,
+} from '../../../core/extension';
 import { UmbSectionContext } from '../section.context';
 
 import '../shared/section-trees.element.ts';
@@ -16,6 +21,9 @@ export class UmbSectionMembers extends UmbContextConsumerMixin(LitElement) {
 	@state()
 	private _trees?: Array<UmbExtensionManifestTree>;
 
+	private _editors?: Array<UmbExtensionManifestEditor>;
+	private _editorsSubscription?: Subscription;
+
 	private _sectionContext?: UmbSectionContext;
 	private _extensionRegistry?: UmbExtensionRegistry;
 	private _treesSubscription?: Subscription;
@@ -28,8 +36,17 @@ export class UmbSectionMembers extends UmbContextConsumerMixin(LitElement) {
 			this.consumeContext('umbSectionContext', (sectionContext: UmbSectionContext) => {
 				this._extensionRegistry = extensionsRegistry;
 				this._sectionContext = sectionContext;
+				this._useEditors();
 				this._useTrees();
 			});
+		});
+	}
+
+	private _useEditors() {
+		this._editorsSubscription?.unsubscribe();
+
+		this._extensionRegistry?.extensionsOfType('editor').subscribe((editors) => {
+			this._editors = editors;
 		});
 	}
 
@@ -63,9 +80,15 @@ export class UmbSectionMembers extends UmbContextConsumerMixin(LitElement) {
 	private _createRoutes() {
 		const treeRoutes =
 			this._trees?.map((tree) => {
+				// TODO: make this code respond to updates in editor extensions
+				const editor = this._editors?.find((editor) => editor.alias === tree.meta.editor);
+				// TODO: implement fallback editor
+				const fallbackEditor = document.createElement('div');
+				fallbackEditor.innerHTML = '<p>No editor found</p>';
+
 				return {
 					path: `${tree.meta.pathname}/:id`,
-					component: () => createExtensionElement(tree),
+					component: () => (editor ? createExtensionElement(editor) : fallbackEditor),
 				};
 			}) ?? [];
 
@@ -85,6 +108,7 @@ export class UmbSectionMembers extends UmbContextConsumerMixin(LitElement) {
 	disconnectedCallback(): void {
 		super.disconnectedCallback();
 		this._treesSubscription?.unsubscribe();
+		this._editorsSubscription?.unsubscribe();
 	}
 
 	render() {
