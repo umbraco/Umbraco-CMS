@@ -21,7 +21,9 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     "File upload",
     "fileupload",
     Group = Constants.PropertyEditors.Groups.Media,
-    Icon = "icon-download-alt")]
+    Icon = "icon-download-alt",
+    // TODO: test if file upload can be made reusable
+    IsReusable = false)]
 public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
     INotificationHandler<ContentCopiedNotification>, INotificationHandler<ContentDeletedNotification>,
     INotificationHandler<MediaDeletedNotification>, INotificationHandler<MediaSavingNotification>,

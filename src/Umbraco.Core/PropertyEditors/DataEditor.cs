@@ -21,6 +21,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 public class DataEditor : IDataEditor
 {
     private IDictionary<string, object>? _defaultConfiguration;
+    private IDataValueEditor? _reusableEditor;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="DataEditor" /> class.
@@ -48,6 +49,7 @@ public class DataEditor : IDataEditor
         Icon = Attribute.Icon;
         Group = Attribute.Group;
         IsDeprecated = Attribute.IsDeprecated;
+        IsReusable = Attribute.IsReusable;
     }
 
     /// <summary>
@@ -99,6 +101,9 @@ public class DataEditor : IDataEditor
     [IgnoreDataMember]
     public bool IsDeprecated { get; }
 
+    [IgnoreDataMember]
+    private bool IsReusable { get; }
+
     /// <inheritdoc />
     [DataMember(Name = "defaultConfig")]
     public IDictionary<string, object> DefaultConfiguration
@@ -129,7 +134,10 @@ public class DataEditor : IDataEditor
     ///     </para>
     /// </remarks>
     // TODO: point of that one? shouldn't we always configure?
-    public IDataValueEditor GetValueEditor() => ExplicitValueEditor ?? CreateValueEditor();
+    public IDataValueEditor GetValueEditor() => ExplicitValueEditor
+                                                ?? (IsReusable
+                                                    ? _reusableEditor ??= CreateValueEditor()
+                                                    : CreateValueEditor());
 
     /// <inheritdoc />
     /// <remarks>
