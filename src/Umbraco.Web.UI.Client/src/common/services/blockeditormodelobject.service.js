@@ -62,8 +62,8 @@
         /**
          * Map property values from an ElementModel to another ElementModel.
          * Used to tricker watchers for synchronization.
-         * @param {Object} fromModel ElementModel to recive property values from.
-         * @param {Object} toModel ElementModel to recive property values from.
+         * @param {Object} fromModel ElementModel to receive property values from.
+         * @param {Object} toModel ElementModel to receive property values from.
          */
         function mapElementValues(fromModel, toModel) {
             if (!fromModel || !fromModel.variants) {
@@ -614,6 +614,7 @@
                     if (this.config.settingsElementTypeKey !== null) {
                         mapElementValues(settings, this.settings);
                     }
+
                 };
 
                 blockObject.sync = function () {
@@ -627,14 +628,7 @@
 
                 // first time instant update of label.
                 blockObject.label = getBlockLabel(blockObject);
-
-                blockObject.interpolatableData = {
-                  $contentTypeName: blockObject.content.contentTypeName,
-                  $settings: blockObject.settingsData || {},
-                  $layout: blockObject.layout || {},
-                  $index: 1,
-                  ...blockObject.data
-                };
+                blockObject.index = 0;
 
                 // Add blockObject to our isolated scope to enable watching its values:
                 this.isolatedScope.blockObjects["_" + blockObject.key] = blockObject;

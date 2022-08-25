@@ -20,17 +20,27 @@ angular
   .directive("blockHtmlCompile", function ($compile) {
     return {
       restrict: "A",
+      scope: {
+        blockHtmlScope: "<",
+        blockHtmlCompile: "<"
+      },
       link: function (scope, element, attrs) {
-        function compileBlock(value, blockObject) {
+
+        var blockObject = scope.blockHtmlScope;
+
+        function compileBlock() {
           // In case value is a TrustedValueHolderType, sometimes it
           // needs to be explicitly called into a string in order to
           // get the HTML string.
-          element.html(value && value.toString());
+          element.html(scope.blockHtmlCompile);
 
-          var labelVars = Object.assign(
-            blockObject.interpolatableData,
-            blockObject.data
-          );
+          var labelVars = {
+            $contentTypeName: blockObject.content.contentTypeName,
+            $settings: blockObject.settingsData || {},
+            $layout: blockObject.layout || {},
+            $index: blockObject.index + 1,
+            ... blockObject.data
+          };
 
           var compileScope = scope.$new(true);
           compileScope = Object.assign(compileScope, labelVars);
@@ -40,23 +50,22 @@ angular
 
         // Watch for changes to the isolated block scope
         scope.$watchCollection(function () {
-          return scope.$eval(attrs.blockHtmlScope);
-        }, function (value) {
-          compileBlock(scope.$eval(attrs.blockHtmlCompile), value);
-        });
+          return blockObject.data;
+        }, compileBlock);
+        scope.$watchCollection(function () {
+          return blockObject.settingsData;
+        }, compileBlock);
+        scope.$watchCollection(function () {
+          return blockObject.layout;
+        }, compileBlock);
 
-        // Compile the block on initial load
-        var ensureCompileRunsOnce = scope.$watch(
-          function () {
-            return scope.$eval(attrs.blockHtmlCompile);
-          },
-          function (value) {
-            compileBlock(value, scope.$eval(attrs.blockHtmlScope));
+        /*
+        // No need to watch contentTypeName as it wont change.
+        scope.$watch(function () {
+          return scope.blockHtmlScope.content.contentTypeName;
+        }, compileBlock);
+        */
 
-            // Use un-watch feature to ensure compilation happens only once.
-            ensureCompileRunsOnce();
-          }
-        );
       }
     };
   });

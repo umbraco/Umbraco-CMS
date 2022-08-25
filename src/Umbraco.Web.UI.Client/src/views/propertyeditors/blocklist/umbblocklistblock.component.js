@@ -45,7 +45,7 @@
       model.block.setParentForm(model.parentForm);
 
       // let the Block know about the current index
-      model.block.interpolatableData.$index = model.index + 1;
+      model.block.$index = model.index + 1;
 
       $scope.block = model.block;
       $scope.api = model.api;
@@ -68,14 +68,16 @@
       }
     };
 
+    /*
     // React to changes to the block data and reset the scope data to force a digest cycle
     $scope.$watchCollection(function () {
       return model.block.data;
     }, function () {
       $scope.block.data = Object.assign({}, model.block.data);
     });
+    */
 
-    // We need to watch for changes on primitive types and upate the $scope values.
+    // We need to watch for changes on primitive types and update the $scope values.
     model.$onChanges = function (changes) {
       if (changes.index) {
         var index = changes.index.currentValue;
@@ -83,7 +85,7 @@
 
         // let the Block know about the current index:
         if ($scope.block) {
-          $scope.block.index = $scope.block.interpolatableData.$index = index + 1;
+          $scope.block.index = index;
         }
       }
     };
