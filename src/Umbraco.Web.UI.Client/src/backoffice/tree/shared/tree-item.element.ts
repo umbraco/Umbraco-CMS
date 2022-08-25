@@ -4,6 +4,8 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { UmbContextConsumerMixin } from '../../../core/context';
 import { ITreeService } from '../tree.service';
 import { UUIMenuItemEvent } from '@umbraco-ui/uui';
+import { UmbSectionContext } from '../../sections/section.context';
+import { Subscription } from 'rxjs';
 
 @customElement('umb-tree-item')
 export class UmbTreeItem extends UmbContextConsumerMixin(LitElement) {
@@ -30,7 +32,13 @@ export class UmbTreeItem extends UmbContextConsumerMixin(LitElement) {
 	@state()
 	private _pathName? = '';
 
+	@state()
+	private _sectionPathname?: string;
+
 	private _treeService?: ITreeService;
+
+	private _sectionContext?: UmbSectionContext;
+	private _sectionSubscription?: Subscription;
 
 	constructor() {
 		super();
@@ -39,11 +47,24 @@ export class UmbTreeItem extends UmbContextConsumerMixin(LitElement) {
 			this._treeService = treeService;
 			this._pathName = this._treeService?.tree?.meta?.pathname;
 		});
+
+		this.consumeContext('umbSectionContext', (sectionContext: UmbSectionContext) => {
+			this._sectionContext = sectionContext;
+			this._useSection();
+		});
+	}
+
+	private _useSection() {
+		this._sectionSubscription?.unsubscribe();
+
+		this._sectionSubscription = this._sectionContext?.data.subscribe((section) => {
+			this._sectionPathname = section.meta.pathname;
+		});
 	}
 
 	// TODO: how do we handle this?
 	private _constructPath(id: number) {
-		return `/section/members/${this._pathName}/${id}`;
+		return `/section/${this._sectionPathname}/${this._pathName}/${id}`;
 	}
 
 	private _onShowChildren(event: UUIMenuItemEvent) {
@@ -56,6 +77,11 @@ export class UmbTreeItem extends UmbContextConsumerMixin(LitElement) {
 			this.childItems = items;
 			this._loading = false;
 		});
+	}
+
+	disconnectedCallback(): void {
+		super.disconnectedCallback();
+		this._sectionSubscription?.unsubscribe();
 	}
 
 	private _renderChildItems() {
