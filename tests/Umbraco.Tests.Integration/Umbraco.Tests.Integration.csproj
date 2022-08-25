@@ -1,120 +1,68 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
+    <IsPackable>true</IsPackable>
+    <IsTestProject>true</IsTestProject>
     <RootNamespace>Umbraco.Cms.Tests.Integration</RootNamespace>
     <PackageId>Umbraco.Cms.Tests.Integration</PackageId>
     <Title>Umbraco CMS Integration Tests</Title>
     <Description>Contains helper classes for integration tests with Umbraco, including all internal integration tests.</Description>
-    <IsPackable>true</IsPackable>
-    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(OS)' == 'Windows_NT'">
+    <DefineConstants>$(DefineConstants);IS_WINDOWS</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(OS)' == 'Windows_NT'">
     <PackageReference Include="Microsoft.ICU.ICU4C.Runtime" Version="68.2.0.9" />
-    <RuntimeHostConfigurationOption Include="System.Globalization.AppLocalIcu" Value="68.2" />
+    <RuntimeHostConfigurationOption Include="System.Globalization.AppLocalIcu" Value="68.2.0.9" />
   </ItemGroup>
 
-  <PropertyGroup Condition=" '$(OS)' == 'Windows_NT' ">
-    <DefineConstants>IS_WINDOWS</DefineConstants>
-  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Bogus" Version="34.0.2" />
+    <PackageReference Include="Examine.Lucene" Version="3.0.0" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.9" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="7.0.0-preview.7.22376.6" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.0" />
+    <PackageReference Include="Moq" Version="4.18.2" />
+    <PackageReference Include="NUnit" Version="3.13.3" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.2.1" PrivateAssets="all" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="4.0.1" />
+  </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="App_Data\**" />
-    <Compile Remove="TEMP\**" />
-    <Compile Remove="Umbraco\**" />
-    <EmbeddedResource Remove="App_Data\**" />
-    <EmbeddedResource Remove="TEMP\**" />
-    <EmbeddedResource Remove="Umbraco\**" />
-    <None Remove="App_Data\**" />
-    <None Remove="TEMP\**" />
-    <Compile Remove="Views\**" />
-    <EmbeddedResource Remove="Views\**" />
-    <None Remove="Umbraco\**" />
-    <None Remove="Views\**" />
-    <None Remove="create_slicing_filter_condition.sh" />
-    <None Remove="Umbraco.Examine.Lucene\UmbracoExamine\TestFiles\media.xml" />
+    <ProjectReference Include="..\Umbraco.Tests.Common\Umbraco.Tests.Common.csproj" />
+    <ProjectReference Include="..\..\src\Umbraco.Cms.Persistence.Sqlite\Umbraco.Cms.Persistence.Sqlite.csproj" />
+    <ProjectReference Include="..\..\src\Umbraco.Cms.Persistence.SqlServer\Umbraco.Cms.Persistence.SqlServer.csproj" />
+    <ProjectReference Include="..\..\src\Umbraco.Core\Umbraco.Core.csproj" />
+    <ProjectReference Include="..\..\src\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\Umbraco.PublishedCache.NuCache\Umbraco.PublishedCache.NuCache.csproj" />
+    <ProjectReference Include="..\..\src\Umbraco.Web.BackOffice\Umbraco.Web.BackOffice.csproj" />
+    <ProjectReference Include="..\..\src\Umbraco.Web.Website\Umbraco.Web.Website.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <EmbeddedResource Update="Umbraco.Examine.Lucene\UmbracoExamine\TestFiles.resx">
       <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>TestFiles.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Umbraco.Infrastructure\Services\Importing\ImportResources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>ImportResources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
+      <LastGenOutput>TestFiles.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <Compile Update="Umbraco.Examine.Lucene\UmbracoExamine\TestFiles.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>TestFiles.resx</DependentUpon>
     </Compile>
+    <Content Include="Umbraco.Infrastructure\Services\Importing\*.xml" />
+    <EmbeddedResource Update="Umbraco.Infrastructure\Services\Importing\ImportResources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <SubType>Designer</SubType>
+      <LastGenOutput>ImportResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <Compile Update="Umbraco.Infrastructure\Services\Importing\ImportResources.Designer.cs">
-      <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
       <DependentUpon>ImportResources.resx</DependentUpon>
     </Compile>
-    <None Remove="Umbraco.Web.BackOffice\UrlAndDomains\package.xml" />
     <EmbeddedResource Include="Umbraco.Web.BackOffice\UrlAndDomains\package.xml" />
   </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="Umbraco.Infrastructure\Services\Importing\Dictionary-Package.xml" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="Umbraco.Examine.Lucene\UmbracoExamine\TestFiles\media.xml" />
-    <Content Include="Umbraco.Infrastructure\Services\Importing\CheckboxList-Content-Package.xml">
-      <SubType>Designer</SubType>
-    </Content>
-    <Content Include="Umbraco.Infrastructure\Services\Importing\CompositionsTestPackage-Random.xml" />
-    <Content Include="Umbraco.Infrastructure\Services\Importing\CompositionsTestPackage.xml" />
-    <Content Include="Umbraco.Infrastructure\Services\Importing\Dictionary-Package.xml" />
-    <Content Include="Umbraco.Infrastructure\Services\Importing\Fanoe-Package.xml" />
-    <Content Include="Umbraco.Infrastructure\Services\Importing\InheritedDocTypes-Package.xml" />
-    <Content Include="Umbraco.Infrastructure\Services\Importing\SingleDocType.xml" />
-    <Content Include="Umbraco.Infrastructure\Services\Importing\StandardMvc-Package.xml">
-      <SubType>Designer</SubType>
-    </Content>
-    <Content Include="Umbraco.Infrastructure\Services\Importing\TemplateOnly-Package.xml" />
-    <Content Include="Umbraco.Infrastructure\Services\Importing\TemplateOnly-Updated-Package.xml" />
-    <Content Include="Umbraco.Infrastructure\Services\Importing\uBlogsy-Package.xml" />
-    <Content Include="Umbraco.Infrastructure\Services\Importing\XsltSearch-Package.xml" />
-    <Content Include="*.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Examine.Lucene" Version="3.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="7.0.0-preview.7.22375.6" />
-    <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.9" />
-    <PackageReference Include="Bogus" Version="34.0.2" />
-    <PackageReference Include="Microsoft.ICU.ICU4C.Runtime" Version="68.2.0.9" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0" />
-    <PackageReference Include="Moq" Version="4.18.1" />
-    <PackageReference Include="NUnit" Version="3.13.3" />
-    <PackageReference Include="NUnit3TestAdapter" Version="4.2.1">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Serilog.Sinks.Console" Version="4.0.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\src\Umbraco.Cms.Persistence.Sqlite\Umbraco.Cms.Persistence.Sqlite.csproj" />
-    <ProjectReference Include="..\..\src\Umbraco.Cms.Persistence.SqlServer\Umbraco.Cms.Persistence.SqlServer.csproj" />
-    <ProjectReference Include="..\..\src\Umbraco.Core\Umbraco.Core.csproj" />
-    <ProjectReference Include="..\..\src\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj" />
-    <ProjectReference Include="..\..\src\Umbraco.PublishedCache.NuCache\Umbraco.PublishedCache.NuCache.csproj" />
-    <ProjectReference Include="..\Umbraco.Tests.Common\Umbraco.Tests.Common.csproj" />
-    <ProjectReference Include="..\..\src\Umbraco.Web.BackOffice\Umbraco.Web.BackOffice.csproj" />
-    <ProjectReference Include="..\..\src\Umbraco.Web.Website\Umbraco.Web.Website.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="Umbraco.Examine.Lucene\UmbracoExamine\TestFiles\umbraco-sort.config">
-      <SubType>Designer</SubType>
-    </None>
-  </ItemGroup>
-
 </Project>

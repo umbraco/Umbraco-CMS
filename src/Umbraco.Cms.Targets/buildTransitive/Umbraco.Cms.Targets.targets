@@ -3,31 +3,22 @@
     <SchemaFilePath>$(MSBuildThisFileDirectory)..\appsettings-schema.json</SchemaFilePath>
   </PropertyGroup>
 
-  <Target Name="CopyUmbracoSchema" BeforeTargets="Build">
+  <Target Name="CopyAppsettingsSchema" BeforeTargets="Build">
     <ItemGroup>
-      <SchemaFile Include="$(SchemaFilePath)"/>
+      <SchemaFile Include="$(SchemaFilePath)" />
     </ItemGroup>
-
-    <Message Text="Copying Umbraco json schema file" Importance="high"/>
-    <Copy SourceFiles="@(SchemaFile)"
-          DestinationFolder="$(MSBuildProjectDirectory)"
-          SkipUnchangedFiles="true" />
+    <Message Text="Copying appsettings.json schema file" Importance="high" />
+    <Copy SourceFiles="@(SchemaFile)" DestinationFolder="$(MSBuildProjectDirectory)" SkipUnchangedFiles="true" />
   </Target>
 
-  <Target Name="IncludeAppPluginsContent" BeforeTargets="GetCopyToOutputDirectoryItems;GetCopyToPublishDirectoryItems;">
+  <Target Name="IncludeAppPluginsContent" BeforeTargets="GetCopyToOutputDirectoryItems;GetCopyToPublishDirectoryItems">
     <ItemGroup>
       <_AppPluginsFiles Include="App_Plugins\**" />
-
-      <ContentWithTargetPath
-        Include="@(_AppPluginsFiles)"
-        Exclude="@(ContentWithTargetPath)"
-        TargetPath="%(Identity)"
-        CopyToOutputDirectory="PreserveNewest"
-        CopyToPublishDirectory="PreserveNewest"/>
+      <ContentWithTargetPath Include="@(_AppPluginsFiles)" Exclude="@(ContentWithTargetPath)" TargetPath="%(Identity)" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     </ItemGroup>
   </Target>
 
-  <Target Name="IncludeUmbracoFolderContent" BeforeTargets="GetCopyToOutputDirectoryItems;GetCopyToPublishDirectoryItems;">
+  <Target Name="IncludeUmbracoFolderContent" BeforeTargets="GetCopyToOutputDirectoryItems;GetCopyToPublishDirectoryItems">
     <ItemGroup>
       <_UmbracoFolderFiles Include="umbraco\config\**" />
       <_UmbracoFolderFiles Include="umbraco\PartialViewMacros\**" />

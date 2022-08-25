@@ -1,18 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project>
-  <!-- Package references and additional files which are consumed by all projects -->
   <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="all" />
+    <PackageReference Include="Nerdbank.GitVersioning" Version="3.5.109" PrivateAssets="all" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.406" PrivateAssets="all" IsImplicitlyDefined="true"/>
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Nerdbank.GitVersioning" Condition="!Exists('packages.config')">
-      <PrivateAssets>all</PrivateAssets>
-      <Version>3.5.107</Version>
-    </PackageReference>
-
-    <PackageReference Include="Umbraco.GitVersioning.Extensions" Version="0.1.1">
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
+    <PackageReference Include="Umbraco.Code" Version="2.0.0" PrivateAssets="all" />
+    <PackageReference Include="Umbraco.GitVersioning.Extensions" Version="0.1.1" PrivateAssets="all" />
   </ItemGroup>
 </Project>
