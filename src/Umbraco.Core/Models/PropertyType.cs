@@ -284,13 +284,6 @@ public class PropertyType : EntityBase, IPropertyType, IEquatable<PropertyType>
 
         var clonedEntity = (PropertyType)clone;
         clonedEntity.ClearPropertyChangedEvents();
-
-        // need to manually assign the Lazy value as it will not be automatically mapped
-        if (_propertyGroupId != null)
-        {
-            var value = _propertyGroupId.Value;
-            clonedEntity._propertyGroupId = new Lazy<int>(() => value);
-        }
     }
 
     /// <summary>
