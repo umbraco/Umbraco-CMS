@@ -275,4 +275,27 @@ export const internalManifests: Array<UmbExtensionManifestCore> = [
 			sections: ['Umb.Section.Content'],
 		},
 	},
+	{
+		type: 'dashboard',
+		alias: 'Umb.Dashboard.MembersTest',
+		name: 'Members Test',
+		elementName: 'umb-dashboard-welcome',
+		js: () => import('./backoffice/dashboards/welcome/dashboard-welcome.element'),
+		meta: {
+			weight: -10,
+			pathname: 'welcome',
+			sections: ['Umb.Section.Members'],
+		},
+	},
+	{
+		type: 'tree',
+		alias: 'Umb.Tree.Members',
+		name: 'Members',
+		elementName: 'umb-document-type-tree',
+		js: () => import('./backoffice/tree/document-type-tree.element'),
+		meta: {
+			weight: -10,
+			sections: ['Umb.Section.Members'],
+		},
+	},
 ];
