@@ -17,7 +17,9 @@ export type Manifest =
 	| IManifestDashboard
 	| IManifestEditorView
 	| IManifestPropertyAction
-	| IManifestEntrypoint;
+	| IManifestEntrypoint
+	| IManifestCustom;
+
 export type ManifestStandardTypes =
 	| 'section'
 	| 'propertyEditorUI'
@@ -31,7 +33,7 @@ export interface ManifestsResponse {
 }
 
 export interface IManifest {
-	type: ManifestStandardTypes;
+	type: string;
 	alias: string;
 }
 
@@ -63,10 +65,17 @@ export interface MetaPropertyAction {
 	propertyEditors: string[];
 }
 
+export interface IManifestCustom extends IManifest {
+	type: 'custom';
+	meta?: {};
+}
+
 export interface IManifestElement extends IManifest {
+	type: ManifestStandardTypes;
 	name: string;
 	js?: string;
 	elementName?: string;
+	meta?: {};
 }
 
 export interface IManifestSection extends IManifestElement {

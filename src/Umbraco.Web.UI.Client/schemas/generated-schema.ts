@@ -182,13 +182,20 @@ export interface components {
       js: string;
       alias: string;
     };
+    IManifestCustom: {
+      /** @enum {string} */
+      type: "custom";
+      meta?: { [key: string]: unknown };
+      alias: string;
+    };
     Manifest:
       | components["schemas"]["IManifestSection"]
       | components["schemas"]["IManifestPropertyEditorUI"]
       | components["schemas"]["IManifestDashboard"]
       | components["schemas"]["IManifestEditorView"]
       | components["schemas"]["IManifestPropertyAction"]
-      | components["schemas"]["IManifestEntrypoint"];
+      | components["schemas"]["IManifestEntrypoint"]
+      | components["schemas"]["IManifestCustom"];
     ManifestsResponse: {
       manifests: components["schemas"]["Manifest"][];
     };
