@@ -357,12 +357,6 @@ components:
       required:
         - user
         - telemetryLevel
-    ManifestStandardTypes:
-      type: string
-      enum:
-        - section
-        - propertyEditorUI
-        - dashboard
     MetaSection:
       type: object
       properties:
@@ -374,6 +368,30 @@ components:
       required:
         - pathname
         - weight
+    IManifestSection:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - section
+        meta:
+          $ref: '#/components/schemas/MetaSection'
+        name:
+          type: string
+        js:
+          type: string
+        elementName:
+          type: string
+        alias:
+          type: string
+      required:
+        - type
+        - meta
+        - name
+        - js
+        - elementName
+        - alias
     MetaPropertyEditorUI:
       type: object
       properties:
@@ -384,6 +402,30 @@ components:
       required:
         - icon
         - group
+    IManifestPropertyEditorUI:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - propertyEditorUI
+        meta:
+          $ref: '#/components/schemas/MetaPropertyEditorUI'
+        name:
+          type: string
+        js:
+          type: string
+        elementName:
+          type: string
+        alias:
+          type: string
+      required:
+        - type
+        - meta
+        - name
+        - js
+        - elementName
+        - alias
     MetaDashboard:
       type: object
       properties:
@@ -396,35 +438,113 @@ components:
         weight:
           type: number
           format: float
+        label:
+          type: string
       required:
         - sections
         - pathname
         - weight
-    IManifestElement:
+        - label
+    IManifestDashboard:
       type: object
       properties:
         type:
-          $ref: '#/components/schemas/ManifestStandardTypes'
-        alias:
           type: string
+          enum:
+            - dashboard
+        meta:
+          $ref: '#/components/schemas/MetaDashboard'
         name:
           type: string
         js:
           type: string
         elementName:
           type: string
-        meta:
-          oneOf:
-            - $ref: '#/components/schemas/MetaSection'
-            - $ref: '#/components/schemas/MetaPropertyEditorUI'
-            - $ref: '#/components/schemas/MetaDashboard'
+        alias:
+          type: string
       required:
         - type
-        - alias
+        - meta
         - name
         - js
         - elementName
+        - alias
+    MetaEditorView:
+      type: object
+      properties:
+        editors:
+          type: array
+          items:
+            type: string
+        pathname:
+          type: string
+        weight:
+          type: number
+          format: float
+        icon:
+          type: string
+      required:
+        - editors
+        - pathname
+        - weight
+        - icon
+    IManifestEditorView:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - editorView
+        meta:
+          $ref: '#/components/schemas/MetaEditorView'
+        name:
+          type: string
+        js:
+          type: string
+        elementName:
+          type: string
+        alias:
+          type: string
+      required:
+        - type
         - meta
+        - name
+        - js
+        - elementName
+        - alias
+    MetaPropertyAction:
+      type: object
+      properties:
+        propertyEditors:
+          type: array
+          items:
+            type: string
+      required:
+        - propertyEditors
+    IManifestPropertyAction:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - propertyAction
+        meta:
+          $ref: '#/components/schemas/MetaPropertyAction'
+        name:
+          type: string
+        js:
+          type: string
+        elementName:
+          type: string
+        alias:
+          type: string
+      required:
+        - type
+        - meta
+        - name
+        - js
+        - elementName
+        - alias
     IManifestEntrypoint:
       type: object
       properties:
@@ -434,13 +554,29 @@ components:
             - entrypoint
         js:
           type: string
+        alias:
+          type: string
       required:
         - type
         - js
+        - alias
     Manifest:
       oneOf:
-        - $ref: '#/components/schemas/IManifestElement'
+        - $ref: '#/components/schemas/IManifestSection'
+        - $ref: '#/components/schemas/IManifestPropertyEditorUI'
+        - $ref: '#/components/schemas/IManifestDashboard'
+        - $ref: '#/components/schemas/IManifestEditorView'
+        - $ref: '#/components/schemas/IManifestPropertyAction'
         - $ref: '#/components/schemas/IManifestEntrypoint'
+      discriminator:
+        propertyName: type
+        mapping:
+          section: '#/components/schemas/IManifestSection'
+          propertyEditorUI: '#/components/schemas/IManifestPropertyEditorUI'
+          dashboard: '#/components/schemas/IManifestDashboard'
+          editorView: '#/components/schemas/IManifestEditorView'
+          propertyAction: '#/components/schemas/IManifestPropertyAction'
+          entrypoint: '#/components/schemas/IManifestEntrypoint'
     ManifestsResponse:
       type: object
       properties:
