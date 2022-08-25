@@ -291,8 +291,7 @@ export const internalManifests: Array<UmbExtensionManifestCore> = [
 		type: 'tree',
 		alias: 'Umb.Tree.Members',
 		name: 'Members',
-		elementName: 'umb-document-type-tree',
-		js: () => import('./backoffice/tree/document-type-tree.element'),
+		js: () => import('./backoffice/tree/members/tree-members.element'),
 		meta: {
 			weight: -10,
 			sections: ['Umb.Section.Members'],
