@@ -1,8 +1,8 @@
-import type { ManifestCore } from './core/models';
+import type { ManifestTypes } from './core/models';
 
 // TODO: consider moving weight from meta to the main part of the manifest. We need it for every extension.
 // TODO: consider adding a label property as part of the meta. It might make sense to have an "extension" name label where one is needed.
-export const internalManifests: Array<ManifestCore & { loader: () => Promise<object | HTMLElement> }> = [
+export const internalManifests: Array<ManifestTypes & { loader: () => Promise<object | HTMLElement> }> = [
 	{
 		type: 'section',
 		alias: 'Umb.Section.Content',

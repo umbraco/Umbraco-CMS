@@ -1,8 +1,8 @@
-import { ManifestCore } from '../models';
+import { ManifestTypes } from '../models';
 
-export type ManifestLoaderType = ManifestCore & { loader: () => Promise<object | HTMLElement> };
+export type ManifestLoaderType = ManifestTypes & { loader: () => Promise<object | HTMLElement> };
 
-export function loadExtension(manifest: ManifestCore) {
+export function loadExtension(manifest: ManifestTypes) {
 	// TODO: change this back to dynamic import after POC. Vite complains about the dynamic imports in the public folder but doesn't include the temp app_plugins folder in the final build.
 	// return import(/* @vite-ignore */ manifest.js);
 	if (isManifestLoaderType(manifest)) {
@@ -32,6 +32,6 @@ export function loadExtension(manifest: ManifestCore) {
 	}) as Promise<null>;
 }
 
-export function isManifestLoaderType(manifest: ManifestCore): manifest is ManifestLoaderType {
+export function isManifestLoaderType(manifest: ManifestTypes): manifest is ManifestLoaderType {
 	return typeof (manifest as ManifestLoaderType).loader === 'function';
 }

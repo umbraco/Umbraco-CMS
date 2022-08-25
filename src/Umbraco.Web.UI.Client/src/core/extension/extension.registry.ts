@@ -3,19 +3,20 @@ import { BehaviorSubject, map, Observable } from 'rxjs';
 import { createExtensionElement } from './create-extension-element.function';
 
 import type {
-	ManifestCore,
+	ManifestTypes,
 	ManifestDashboard,
 	ManifestEditorView,
 	ManifestEntrypoint,
 	ManifestPropertyAction,
 	ManifestPropertyEditorUI,
 	ManifestSection,
+	ManifestCustom,
 } from '../models';
 export class UmbExtensionRegistry {
-	private _extensions = new BehaviorSubject<Array<ManifestCore>>([]);
+	private _extensions = new BehaviorSubject<Array<ManifestTypes>>([]);
 	public readonly extensions = this._extensions.asObservable();
 
-	register(manifest: ManifestCore): void {
+	register(manifest: ManifestTypes): void {
 		const extensionsValues = this._extensions.getValue();
 		const extension = extensionsValues.find((extension) => extension.alias === manifest.alias);
 
@@ -32,7 +33,8 @@ export class UmbExtensionRegistry {
 		}
 	}
 
-	getByAlias(alias: string): Observable<ManifestCore | null> {
+	getByAlias<T extends ManifestTypes>(alias: string): Observable<T | null>;
+	getByAlias(alias: string) {
 		// TODO: make pipes prettier/simpler/reuseable
 		return this.extensions.pipe(map((dataTypes) => dataTypes.find((extension) => extension.alias === alias) || null));
 	}
@@ -46,9 +48,9 @@ export class UmbExtensionRegistry {
 	extensionsOfType(type: 'propertyEditorUI'): Observable<Array<ManifestPropertyEditorUI>>;
 	extensionsOfType(type: 'propertyAction'): Observable<Array<ManifestPropertyAction>>;
 	extensionsOfType(type: 'entrypoint'): Observable<Array<ManifestEntrypoint>>;
-	extensionsOfType(type: string): Observable<Array<ManifestCore>>;
-	extensionsOfType<T extends ManifestCore>(type: string): Observable<Array<T>>;
-	extensionsOfType(type: string) {
+	extensionsOfType(type: 'custom'): Observable<Array<ManifestCustom>>;
+	extensionsOfType<T extends ManifestTypes>(type: string): Observable<Array<T>>;
+	extensionsOfType(type: string): Observable<Array<ManifestTypes>> {
 		return this.extensions.pipe(map((exts) => exts.filter((ext) => ext.type === type)));
 	}
 }

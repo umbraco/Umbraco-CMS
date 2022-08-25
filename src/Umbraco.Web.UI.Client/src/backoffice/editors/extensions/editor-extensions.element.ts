@@ -7,12 +7,13 @@ import { Subscription } from 'rxjs';
 import { UmbContextConsumerMixin } from '../../../core/context';
 import { UmbExtensionRegistry } from '../../../core/extension';
 import { isManifestElementType } from '../../../core/extension/is-extension.function';
-import type { ManifestCore } from '../../../core/models';
+
+import type { ManifestTypes } from '../../../core/models';
 
 @customElement('umb-editor-extensions')
 export class UmbEditorExtensionsElement extends UmbContextConsumerMixin(LitElement) {
 	@state()
-	private _extensions: Array<ManifestCore> = [];
+	private _extensions: Array<ManifestTypes> = [];
 
 	private _extensionRegistry?: UmbExtensionRegistry;
 	private _extensionsSubscription?: Subscription;

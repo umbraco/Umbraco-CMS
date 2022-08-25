@@ -16,13 +16,14 @@ export type UmbracoInstallerDatabaseModel = components['schemas']['InstallDataba
 export type UmbracoInstallerUserModel = components['schemas']['InstallUserModel'];
 export type TelemetryModel = components['schemas']['TelemetryModel'];
 export type ServerStatus = components['schemas']['ServerStatus'];
-export type ManifestCore = components['schemas']['Manifest'];
+export type ManifestTypes = components['schemas']['Manifest'];
 export type ManifestSection = components['schemas']['IManifestSection'];
 export type ManifestPropertyEditorUI = components['schemas']['IManifestPropertyEditorUI'];
 export type ManifestDashboard = components['schemas']['IManifestDashboard'];
 export type ManifestEditorView = components['schemas']['IManifestEditorView'];
 export type ManifestPropertyAction = components['schemas']['IManifestPropertyAction'];
 export type ManifestEntrypoint = components['schemas']['IManifestEntrypoint'];
+export type ManifestCustom = components['schemas']['IManifestCustom'];
 
 export type ManifestElementType =
 	| ManifestSection
