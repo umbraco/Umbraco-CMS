@@ -4,7 +4,7 @@ import { customElement, property } from 'lit/decorators.js';
 
 import '../shared/editor-entity/editor-entity.element';
 
-@customElement('umb-editor-member')
+@customElement('umb-editor-member-group')
 export class UmbEditorMemberGroupElement extends LitElement {
 	static styles = [
 		UUITextStyles,
@@ -29,6 +29,6 @@ export default UmbEditorMemberGroupElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-editor-member': UmbEditorMemberGroupElement;
+		'umb-editor-member-group': UmbEditorMemberGroupElement;
 	}
 }
