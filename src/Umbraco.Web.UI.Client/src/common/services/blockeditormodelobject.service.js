@@ -366,7 +366,7 @@
              * @name getBlockConfiguration
              * @methodOf umbraco.services.blockEditorModelObject
              * @description Get block configuration object for a given contentElementTypeKey.
-             * @param {string} key contentElementTypeKey to recive the configuration model for.
+             * @param {string} key contentElementTypeKey to receive the configuration model for.
              * @returns {Object | null} Configuration model for the that specific block. Or ´null´ if the contentElementTypeKey isnt available in the current block configurations.
              */
             getBlockConfiguration: function (key) {
@@ -446,7 +446,7 @@
              * @ngdoc method
              * @name getAvailableBlocksForBlockPicker
              * @methodOf umbraco.services.blockEditorModelObject
-             * @description Retrieve a list of available blocks, the list containing object with the confirugation model(blockConfigModel) and the element type model(elementTypeModel).
+             * @description Retrieve a list of available blocks, the list containing object with the configuration model(blockConfigModel) and the element type model(elementTypeModel).
              * The purpose of this data is to provide it for the Block Picker.
              * @return {Array} array of objects representing available blocks, each object containing properties blockConfigModel and elementTypeModel.
              */
@@ -472,7 +472,7 @@
              * @name getScaffoldFromKey
              * @methodOf umbraco.services.blockEditorModelObject
              * @description Get scaffold model for a given contentTypeKey.
-             * @param {string} key contentTypeKey to recive the scaffold model for.
+             * @param {string} key contentTypeKey to receive the scaffold model for.
              * @returns {Object | null} Scaffold model for the that content type. Or null if the scaffolding model dosnt exist in this context.
              */
             getScaffoldFromKey: function (contentTypeKey) {
@@ -484,7 +484,7 @@
              * @name getScaffoldFromAlias
              * @methodOf umbraco.services.blockEditorModelObject
              * @description Get scaffold model for a given contentTypeAlias, used by clipboardService.
-             * @param {string} alias contentTypeAlias to recive the scaffold model for.
+             * @param {string} alias contentTypeAlias to receive the scaffold model for.
              * @returns {Object | null} Scaffold model for the that content type. Or null if the scaffolding model dosnt exist in this context.
              */
             getScaffoldFromAlias: function (contentTypeAlias) {
@@ -693,7 +693,7 @@
                     this.__watchers.forEach(w => { w(); });
                     delete this.__watchers;
 
-                    // help carbage collector:
+                    // help garbage collector:
                     delete this.config;
                     delete this.layout;
                     delete this.data;
