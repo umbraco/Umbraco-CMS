@@ -695,7 +695,6 @@
 
                     // help carbage collector:
                     delete this.config;
-
                     delete this.layout;
                     delete this.data;
                     delete this.settingsData;
@@ -708,6 +707,11 @@
                     // however that is not the case since __scope is actually this.isolatedScope which gets cleaned up when the outer scope is
                     // destroyed. If we do that here it breaks the scope chain and validation.
                     delete this.__scope;
+
+                    if(this.__labelScope) {
+                        this.__labelScope.$destroy();
+                        delete this.__labelScope;
+                    }
 
                     // removes this method, making it impossible to destroy again.
                     delete this.destroy;
@@ -931,6 +935,7 @@
                 delete this.scaffolds;
                 this.isolatedScope.$destroy();
                 delete this.isolatedScope;
+                delete this.__scopeOfExistence;
                 delete this.destroy;
             }
         }
