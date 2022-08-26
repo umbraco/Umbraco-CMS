@@ -4,17 +4,17 @@ export type ManifestLoaderType = ManifestTypes & { loader: () => Promise<object 
 export type ManifestJSType = ManifestTypes & { js: string };
 
 export async function loadExtension(manifest: ManifestTypes): Promise<object | HTMLElement | null> {
-	if (isManifestLoaderType(manifest)) {
-		return manifest.loader();
-	}
-
-	if (isManifestJSType(manifest) && manifest.js) {
-		try {
-			return await import(/* @vite-ignore */ manifest.js);
-		} catch {
-			console.warn('-- Extension failed to load script', manifest.js);
-			return Promise.resolve(null);
+	try {
+		if (isManifestLoaderType(manifest)) {
+			return manifest.loader();
 		}
+
+		if (isManifestJSType(manifest) && manifest.js) {
+			return await import(/* @vite-ignore */ manifest.js);
+		}
+	} catch {
+		console.warn('-- Extension failed to load script', manifest);
+		return Promise.resolve(null);
 	}
 
 	return Promise.resolve(null);
