@@ -98,41 +98,6 @@
         }
 
         /**
-         * Generate label for Block, uses either the labelInterpolator or falls back to the contentTypeName.
-         * @param {Object} blockObject BlockObject to receive data values from.
-         * @deprecated label is now compiled and saved on blockObject.label on creation
-         */
-         function getBlockLabel(blockObject) {
-          if (blockObject.labelInterpolator !== undefined) {
-              // blockobject.content may be null if the block is no longer allowed,
-              // so try and fall back to the label in the config,
-              // if that too is null, there's not much we can do, so just default to empty string.
-              var contentTypeName;
-              if(blockObject.content != null){
-                contentTypeName = blockObject.content.contentTypeName;
-              }
-              else if(blockObject.config != null && blockObject.config.label != null){
-                contentTypeName = blockObject.config.label;
-              }
-              else {
-                contentTypeName = "";
-              }
-
-              var labelVars = Object.assign({
-                "$contentTypeName": contentTypeName,
-                "$settings": blockObject.settingsData || {},
-                "$layout": blockObject.layout || {},
-                "$index": (blockObject.index || 0)+1
-              }, blockObject.data);
-              var label = blockObject.labelInterpolator(labelVars);
-              if (label) {
-                  return label;
-              }
-          }
-          return blockObject.content.contentTypeName;
-        }
-
-        /**
          * Used to add watchers on all properties in a content or settings model
          */
         function addWatchers(blockObject, isolatedScope, forSettings) {
