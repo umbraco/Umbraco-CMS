@@ -1,4 +1,4 @@
-<div 
+<div
     class="umb-block-grid__layout-container"
     ng-class="{'--not-allowed-for-drop': vm.showNotAllowedUI}"
 >
@@ -20,7 +20,7 @@
         index="$index"
         layout-entry="layoutEntry"
         block-editor-api="vm.blockEditorApi"
-        
+
     >
 
     </umb-block-grid-entry>
@@ -79,10 +79,10 @@
 
     <div ng-messages="vm.parentForm.areaTypeRequirements.$error">
         <div ng-message="areaTypeRequirements">
-            <localize 
-                ng-repeat="invalidBlockType in vm.invalidBlockTypes track by invalidBlockType.key" 
-                key="{{(vm.invalidBlockType.amount < vm.invalidBlockType.minRequirement) ? 'blockEditor_TODO_entriesShort' : 'blockEditor_TODO_entriesExceed'}}" 
-                tokens="[vm.invalidBlockType.name, vm.invalidBlockType.amount, vm.invalidBlockType.minRequirement, vm.invalidBlockType.maxRequirement]" 
+            <localize
+                ng-repeat="invalidBlockType in vm.invalidBlockTypes track by invalidBlockType.key"
+                key="{{(vm.invalidBlockType.amount < vm.invalidBlockType.minRequirement) ? 'blockEditor_areaValidationEntriesShort' : 'blockEditor_areaValidationEntriesExceed'}}"
+                tokens="[vm.invalidBlockType.name, vm.invalidBlockType.amount, vm.invalidBlockType.minRequirement, vm.invalidBlockType.maxRequirement]"
                 watch-tokens="true"
                 >%0% must be present between %2% – %3% times.<br/></localize>
         </div>

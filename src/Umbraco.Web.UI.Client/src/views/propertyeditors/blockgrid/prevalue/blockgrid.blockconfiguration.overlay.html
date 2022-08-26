@@ -99,7 +99,7 @@
                     <div class="umb-group-panel umb-block-grid-block-configuration__umb-group-panel">
 
                         <div class="umb-group-panel__header">
-                            <localize key="blockEditor_TODO">Layout options</localize>
+                            <localize key="blockEditor_layoutOptions">Layout options</localize>
                         </div>
 
                         <div class="umb-group-panel__content">
@@ -107,9 +107,9 @@
                             <!-- Column span options -->
                             <div class="control-group umb-control-group -no-border">
                                 <div class="umb-el-wrap">
-                                    <label class="control-label" for="addNewColumnSpan"><localize key="blockEditor_TODO">Available widths</localize></label>
-                                    <umb-property-info-button button-title-key="blockEditor_TODO">
-                                        <localize key="blockEditor_TODO">Set different column span options to define the block width.</localize>
+                                    <label class="control-label" for="addNewColumnSpan"><localize key="blockEditor_allowedBlockColumns">Available column spans</localize></label>
+                                    <umb-property-info-button button-title-key="general_readMore">
+                                        <localize key="blockEditor_allowedBlockColumnsHelp">Define the different number of layout columns this block is allowed to span across.</localize>
                                     </umb-property-info-button>
                                     <div class="controls">
                                         <umb-block-grid-column-editor model="vm.block.columnSpanOptions" block="vm.block" grid-columns="model.gridColumns"></umb-block-grid-column-editor>
@@ -120,9 +120,9 @@
                             <!-- min/max Row span options -->
                             <div class="control-group umb-control-group -no-border">
                                 <div class="umb-el-wrap">
-                                    <label class="control-label" for="label"><localize key="blockEditor_TODO">Row span range</localize></label>
-                                    <umb-property-info-button button-title-key="blockEditor_TODO">
-                                        <localize key="blockEditor_TODO">Specify the amount of rows this block can span across.</localize>
+                                    <label class="control-label" for="label"><localize key="blockEditor_allowedBlockRows">Available row spans</localize></label>
+                                    <umb-property-info-button button-title-key="general_readMore">
+                                        <localize key="blockEditor_allowedBlockRowsHelp">Define the range of layout rows this block is allowed to span across.</localize>
                                     </umb-property-info-button>
                                     <div class="controls">
                                         <umb-property-editor name="rowMinMaxModel" model="vm.rowMinMaxModel" is-pre-value="true"></umb-property-editor>
@@ -133,9 +133,9 @@
                             <!-- allowAtRoot -->
                             <div class="control-group umb-control-group -no-border">
                                 <div class="umb-el-wrap">
-                                    <label class="control-label" for="allowAtRoot"><localize key="blockEditor_TODO">Allow in root</localize></label>
-                                    <umb-property-info-button button-title-key="blockEditor_TODO">
-                                        <localize key="blockEditor_TODO">Make this Block available in the root of the layout. If disabled it will only be available at specified locations.</localize>
+                                    <label class="control-label" for="allowAtRoot"><localize key="blockEditor_allowBlockInRoot">Allowed in root</localize></label>
+                                    <umb-property-info-button button-title-key="general_readMore">
+                                        <localize key="blockEditor_allowBlockInRootHelp">Make this block available in the root of the layout. When disabled, this block can only be used within areas of other blocks in the layout.</localize>
                                     </umb-property-info-button>
                                     <div class="controls">
                                         <umb-toggle
@@ -147,7 +147,7 @@
                                 </div>
                             </div>
                         </div>
-                    
+
                     </div>
 
 
@@ -272,9 +272,9 @@
 
                     <div class="umb-group-panel umb-block-grid-block-configuration__umb-group-panel --span-two">
 
-                        
+
                         <div class="umb-group-panel__header">
-                            <localize key="blockEditor_TODO">Block areas</localize>
+                            <localize key="blockEditor_areas">Block areas</localize>
                         </div>
 
                         <div class="umb-group-panel__content">
@@ -282,22 +282,22 @@
                             <!-- areaGridColumns -->
                             <div class="control-group umb-control-group -no-border">
                                 <div class="umb-el-wrap">
-                                    <label class="control-label" for="label"><localize key="blockEditor_TODO">Area layout columns</localize></label>
-                                    <umb-property-info-button button-title-key="blockEditor_TODO">
-                                        <localize key="blockEditor_TODO">Define a specific amount of columns for the grid that Areas of this Block will be using. If unset the Blocks current column span will be used.</localize>
+                                    <label class="control-label" for="label"><localize key="blockEditor_areasLayoutColumns">Layout columns</localize></label>
+                                    <umb-property-info-button button-title-key="general_readMore">
+                                        <localize key="blockEditor_areasLayoutColumnsHelp">Define how many layout columns that areas of this block will span. If not defined, the number of layout columns defined for the entire layout will be used.</localize>
                                     </umb-property-info-button>
                                     <div class="controls">
                                         <input type="text" name="label" ng-model="vm.block.areaGridColumns"/>
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <!-- areas -->
                             <div class="control-group umb-control-group -no-border">
                                 <div class="umb-el-wrap">
-                                    <label class="control-label" for="label"><localize key="blockEditor_TODO">Areas</localize></label>
-                                    <umb-property-info-button button-title-key="blockEditor_TODO">
-                                        <localize key="blockEditor_TODO">Enable nesting Blocks inside this Block Type. Define one or more Areas for Blocks to be appended within.</localize>
+                                    <label class="control-label" for="label"><localize key="blockEditor_areasConfigurations">Area configurations</localize></label>
+                                    <umb-property-info-button button-title-key="general_readMore">
+                                        <localize key="blockEditor_areasConfigurationsHelp">To enable nesting of blocks within this block, define one or more areas for blocks to be nested within.</localize>
                                     </umb-property-info-button>
                                     <div class="controls">
                                         <umb-block-grid-area-editor model="vm.block.areas" block="vm.block" grid-columns="model.gridColumns" all-block-types="model.allBlockTypes" loaded-element-types="model.loadedElementTypes"></umb-block-grid-area-editor>
@@ -305,7 +305,7 @@
                                 </div>
                             </div>
                         </div>
-                    
+
                     </div>
 
                     <div class="umb-group-panel umb-block-grid-block-configuration__umb-group-panel">
