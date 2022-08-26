@@ -104,6 +104,7 @@ export class UmbSectionElement extends UmbContextConsumerMixin(LitElement) {
 						// TODO: temp hack - we need to make sure it's the component and not a promise
 						const hello = await component;
 						hello.entityId = parseInt(info.match.params.id);
+						hello.entityKey = info.match.params.id;
 					},
 				};
 			}) ?? [];

@@ -72,8 +72,8 @@ export class UmbTreeItem extends UmbContextConsumerMixin(LitElement) {
 	}
 
 	// TODO: how do we handle this?
-	private _constructPath(id: number) {
-		return `/section/${this._sectionPathname}/${this._pathName}/${id}`;
+	private _constructPath(key: string) {
+		return `/section/${this._sectionPathname}/${this._pathName}/${key}`;
 	}
 
 	private _onShowChildren(event: UUIMenuItemEvent) {
@@ -101,7 +101,7 @@ export class UmbTreeItem extends UmbContextConsumerMixin(LitElement) {
 				.label=${item.name}
 				.hasChildren=${item.hasChildren}
 				.itemKey=${item.key}
-				href="${this._constructPath(item.id)}">
+				href="${this._constructPath(item.key)}">
 			</umb-tree-item>`;
 		});
 	}
@@ -113,7 +113,7 @@ export class UmbTreeItem extends UmbContextConsumerMixin(LitElement) {
 				.loading=${this._loading}
 				.hasChildren=${this.hasChildren}
 				label="${this.label}"
-				href="${this._constructPath(this.itemId)}">
+				href="${this._constructPath(this.itemKey)}">
 				${this._renderChildItems()}
 			</uui-menu-item>
 		`;
