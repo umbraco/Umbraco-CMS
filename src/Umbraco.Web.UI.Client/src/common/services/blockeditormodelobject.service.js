@@ -13,7 +13,7 @@
 (function () {
     'use strict';
 
-    function blockEditorModelObjectFactory($interpolate, $q, udiService, contentResource, localizationService, umbRequestHelper, clipboardService, notificationsService) {
+    function blockEditorModelObjectFactory($interpolate, $q, udiService, contentResource, localizationService, umbRequestHelper, clipboardService, notificationsService, $compile) {
 
         /**
          * Simple mapping from property model content entry to editing model,
@@ -62,8 +62,8 @@
         /**
          * Map property values from an ElementModel to another ElementModel.
          * Used to tricker watchers for synchronization.
-         * @param {Object} fromModel ElementModel to recive property values from.
-         * @param {Object} toModel ElementModel to recive property values from.
+         * @param {Object} fromModel ElementModel to receive property values from.
+         * @param {Object} toModel ElementModel to receive property values from.
          */
         function mapElementValues(fromModel, toModel) {
             if (!fromModel || !fromModel.variants) {
@@ -98,40 +98,6 @@
         }
 
         /**
-         * Generate label for Block, uses either the labelInterpolator or falls back to the contentTypeName.
-         * @param {Object} blockObject BlockObject to receive data values from.
-         */
-        function getBlockLabel(blockObject) {
-            if (blockObject.labelInterpolator !== undefined) {
-                // blockobject.content may be null if the block is no longer allowed,
-                // so try and fall back to the label in the config,
-                // if that too is null, there's not much we can do, so just default to empty string.
-                var contentTypeName;
-                if(blockObject.content != null){
-                  contentTypeName = blockObject.content.contentTypeName;
-                }
-                else if(blockObject.config != null && blockObject.config.label != null){
-                  contentTypeName = blockObject.config.label;
-                }
-                else {
-                  contentTypeName = "";
-                }
-
-                var labelVars = Object.assign({
-                  "$contentTypeName": contentTypeName,
-                  "$settings": blockObject.settingsData || {},
-                  "$layout": blockObject.layout || {},
-                  "$index": (blockObject.index || 0)+1
-                }, blockObject.data);
-                var label = blockObject.labelInterpolator(labelVars);
-                if (label) {
-                    return label;
-                }
-            }
-            return blockObject.content.contentTypeName;
-        }
-
-        /**
          * Used to add watchers on all properties in a content or settings model
          */
         function addWatchers(blockObject, isolatedScope, forSettings) {
@@ -161,10 +127,6 @@
                     }
                 }
             }
-            if (blockObject.__watchers.length === 0) {
-                // If no watcher where created, it means we have no properties to watch. This means that nothing will activate our generate the label, since its only triggered by watchers.
-                blockObject.updateLabel();
-            }
         }
 
         /**
@@ -176,8 +138,6 @@
 
                     // sync data:
                     prop.value = blockObject.data[prop.alias];
-
-                    blockObject.updateLabel();
                 }
             }
         }
@@ -203,8 +163,6 @@
                     // sync data:
                     blockObject.data[prop.alias] = prop.value;
                 }
-
-                blockObject.updateLabel();
             }
         }
 
@@ -322,11 +280,11 @@
          * @param {object} propertyModelValue data object of the property editor, usually model.value.
          * @param {string} propertyEditorAlias alias of the property.
          * @param {object} blockConfigurations block configurations.
-         * @param {angular-scope} scopeOfExistance A local angularJS scope that exists as long as the data exists.
+         * @param {angular-scope} scopeOfExistence A local angularJS scope that exists as long as the data exists.
          * @param {angular-scope} propertyEditorScope A local angularJS scope that represents the property editors scope.
          * @returns {BlockEditorModelObject} A instance of BlockEditorModelObject.
          */
-        function BlockEditorModelObject(propertyModelValue, propertyEditorAlias, blockConfigurations, scopeOfExistance, propertyEditorScope) {
+        function BlockEditorModelObject(propertyModelValue, propertyEditorAlias, blockConfigurations, scopeOfExistence, propertyEditorScope) {
 
             if (!propertyModelValue) {
                 throw new Error("propertyModelValue cannot be undefined, to ensure we keep the binding to the angular model we need minimum an empty object.");
@@ -358,8 +316,8 @@
             });
 
             this.scaffolds = [];
-
-            this.isolatedScope = scopeOfExistance.$new(true);
+            this.__scopeOfExistence = scopeOfExistence;
+            this.isolatedScope = scopeOfExistence.$new(true);
             this.isolatedScope.blockObjects = {};
 
             this.__watchers.push(this.isolatedScope.$on("$destroy", this.destroy.bind(this)));
@@ -397,7 +355,7 @@
              * @name getBlockConfiguration
              * @methodOf umbraco.services.blockEditorModelObject
              * @description Get block configuration object for a given contentElementTypeKey.
-             * @param {string} key contentElementTypeKey to recive the configuration model for.
+             * @param {string} key contentElementTypeKey to receive the configuration model for.
              * @returns {Object | null} Configuration model for the that specific block. Or ´null´ if the contentElementTypeKey isnt available in the current block configurations.
              */
             getBlockConfiguration: function (key) {
@@ -477,7 +435,7 @@
              * @ngdoc method
              * @name getAvailableBlocksForBlockPicker
              * @methodOf umbraco.services.blockEditorModelObject
-             * @description Retrieve a list of available blocks, the list containing object with the confirugation model(blockConfigModel) and the element type model(elementTypeModel).
+             * @description Retrieve a list of available blocks, the list containing object with the configuration model(blockConfigModel) and the element type model(elementTypeModel).
              * The purpose of this data is to provide it for the Block Picker.
              * @return {Array} array of objects representing available blocks, each object containing properties blockConfigModel and elementTypeModel.
              */
@@ -503,7 +461,7 @@
              * @name getScaffoldFromKey
              * @methodOf umbraco.services.blockEditorModelObject
              * @description Get scaffold model for a given contentTypeKey.
-             * @param {string} key contentTypeKey to recive the scaffold model for.
+             * @param {string} key contentTypeKey to receive the scaffold model for.
              * @returns {Object | null} Scaffold model for the that content type. Or null if the scaffolding model dosnt exist in this context.
              */
             getScaffoldFromKey: function (contentTypeKey) {
@@ -515,7 +473,7 @@
              * @name getScaffoldFromAlias
              * @methodOf umbraco.services.blockEditorModelObject
              * @description Get scaffold model for a given contentTypeAlias, used by clipboardService.
-             * @param {string} alias contentTypeAlias to recive the scaffold model for.
+             * @param {string} alias contentTypeAlias to receive the scaffold model for.
              * @returns {Object | null} Scaffold model for the that content type. Or null if the scaffolding model dosnt exist in this context.
              */
             getScaffoldFromAlias: function (contentTypeAlias) {
@@ -535,8 +493,7 @@
              * - content {Object}: Content model, the content data in a ElementType model.
              * - settings {Object}: Settings model, the settings data in a ElementType model.
              * - config {Object}: A local deep copy of the block configuration model.
-             * - label {string}: The label for this block.
-             * - updateLabel {Method}: Method to trigger an update of the label for this block.
+             * - label {string}: The compiled label for this block.
              * - data {Object}: A reference to the content data object from your property editor model.
              * - settingsData {Object}: A reference to the settings data object from your property editor model.
              * - layout {Object}: A reference to the layout entry from your property editor model.
@@ -581,18 +538,12 @@
                 blockObject.key = String.CreateGuid().replace(/-/g, "");
                 blockObject.config = Utilities.copy(blockConfiguration);
                 if (blockObject.config.label && blockObject.config.label !== "") {
-                    blockObject.labelInterpolator = $interpolate(blockObject.config.label);
+                  /**
+                   * @deprecated use blockObject.label instead
+                   */
+                  blockObject.labelInterpolator = $interpolate(blockObject.config.label);
                 }
                 blockObject.__scope = this.isolatedScope;
-                blockObject.updateLabel = _.debounce(
-                    function () {
-                        // Check wether scope still exists, maybe object was destoyed in these seconds.
-                        if (this.__scope) {
-                            this.label = getBlockLabel(this);
-                            this.__scope.$evalAsync();
-                        }
-                    }.bind(blockObject)
-                    , 10);
 
                 // make basics from scaffold
                 if(contentScaffold !== null) {// We might not have contentScaffold
@@ -655,6 +606,7 @@
                     if (this.config.settingsElementTypeKey !== null) {
                         mapElementValues(settings, this.settings);
                     }
+
                 };
 
                 blockObject.sync = function () {
@@ -667,7 +619,61 @@
                 };
 
                 // first time instant update of label.
-                blockObject.label = getBlockLabel(blockObject);
+                blockObject.label = blockObject.content.contentTypeName;
+                blockObject.index = 0;
+
+                if (blockObject.config.label && blockObject.config.label !== "") {
+                    var labelElement = $('<div></div>', { text: blockObject.config.label});
+
+                    var observer = new MutationObserver(function(mutations) {
+                        mutations.forEach(function(mutation) {
+                            blockObject.label = mutation.target.textContent;
+                            blockObject.__scope.$evalAsync();
+                        });
+                    });
+    
+                    observer.observe(labelElement[0], {characterData: true, subtree:true});
+
+                    blockObject.__watchers.push(() => {
+                        observer.disconnect();
+                    })
+
+                    blockObject.__labelScope = this.__scopeOfExistence.$new(true);
+                    blockObject.__renderLabel = function() {
+
+                        var labelVars = {
+                            $contentTypeName: this.content.contentTypeName,
+                            $settings: this.settingsData || {},
+                            $layout: this.layout || {},
+                            $index: this.index + 1,
+                            ... this.data
+                        };
+    
+                        this.__labelScope = Object.assign(this.__labelScope, labelVars);
+    
+                        $compile(labelElement.contents())(this.__labelScope);
+                    }.bind(blockObject)
+                } else {
+                    blockObject.__renderLabel = function() {};
+                }
+
+                blockObject.updateLabel = _.debounce(blockObject.__renderLabel, 10);
+
+
+                // label rendering watchers:
+                blockObject.__watchers.push(blockObject.__scope.$watchCollection(function () {
+                return blockObject.data;
+                }, blockObject.__renderLabel));
+                blockObject.__watchers.push(blockObject.__scope.$watchCollection(function () {
+                return blockObject.settingsData;
+                }, blockObject.__renderLabel));
+                blockObject.__watchers.push(blockObject.__scope.$watchCollection(function () {
+                return blockObject.layout;
+                }, blockObject.__renderLabel));
+                blockObject.__watchers.push(blockObject.__scope.$watch(function () {
+                return blockObject.index;
+                }, blockObject.__renderLabel));
+
 
                 // Add blockObject to our isolated scope to enable watching its values:
                 this.isolatedScope.blockObjects["_" + blockObject.key] = blockObject;
@@ -679,9 +685,8 @@
                     this.__watchers.forEach(w => { w(); });
                     delete this.__watchers;
 
-                    // help carbage collector:
+                    // help garbage collector:
                     delete this.config;
-
                     delete this.layout;
                     delete this.data;
                     delete this.settingsData;
@@ -694,6 +699,11 @@
                     // however that is not the case since __scope is actually this.isolatedScope which gets cleaned up when the outer scope is
                     // destroyed. If we do that here it breaks the scope chain and validation.
                     delete this.__scope;
+
+                    if(this.__labelScope) {
+                        this.__labelScope.$destroy();
+                        delete this.__labelScope;
+                    }
 
                     // removes this method, making it impossible to destroy again.
                     delete this.destroy;
@@ -917,6 +927,7 @@
                 delete this.scaffolds;
                 this.isolatedScope.$destroy();
                 delete this.isolatedScope;
+                delete this.__scopeOfExistence;
                 delete this.destroy;
             }
         }
