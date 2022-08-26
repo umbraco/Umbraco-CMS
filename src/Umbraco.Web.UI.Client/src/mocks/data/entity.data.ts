@@ -1,8 +1,10 @@
+import { UmbData } from './data';
+
 export interface Entity {
 	id: number;
 	key: string;
 	name: string;
-	icon: string; // TODO: Should this be here?
+	icon?: string; // TODO: Should this be here?
 	type: string;
 	hasChildren: boolean; // TODO: Should this be here?
 	parentKey: string;
@@ -11,38 +13,39 @@ export interface Entity {
 export const data: Array<Entity> = [
 	{
 		id: 1,
-		key: '74e4008a-ea4f-4793-b924-15e02fd380d1',
-		parentKey: '',
-		name: 'Document 1',
-		type: 'document',
-		icon: 'document',
+		key: '865a11f9-d140-4f21-8dfe-2caafc65a971',
+		type: 'member',
+		parentKey: '24fcd88a-d1bb-423b-b794-8a94dcddcb6a',
+		name: 'Member 1',
 		hasChildren: false,
 	},
 	{
 		id: 2,
-		key: '74e4008a-ea4f-4793-b924-15e02fd380d2',
-		parentKey: '',
-		name: 'Document 2',
-		type: 'document',
-		icon: 'favorite',
-		hasChildren: false,
+		key: '06c6919c-6fa7-4aa5-8214-0582c721c472',
+		type: 'member',
+		parentKey: '24fcd88a-d1bb-423b-b794-8a94dcddcb6a',
+		name: 'Member 2',
+		hasChildren: true,
 	},
 	{
-		id: 3,
-		key: 'cdd30288-2d1c-41b4-89a9-61647b4a10d5',
-		parentKey: '',
-		name: 'Document 3',
-		type: 'document',
-		icon: 'document',
-		hasChildren: false,
-	},
-	{
-		id: 2001,
-		key: 'f2f81a40-c989-4b6b-84e2-057cecd3adc1',
-		parentKey: '',
-		name: 'Media 1',
-		type: 'media',
-		icon: 'picture',
+		id: 2,
+		key: '725a26c4-158d-4dc0-8aaa-b64473b11aa8',
+		type: 'member',
+		parentKey: '06c6919c-6fa7-4aa5-8214-0582c721c472',
+		name: 'Member 3',
 		hasChildren: false,
 	},
 ];
+
+// Temp mocked database
+class UmbEntityData extends UmbData<Entity> {
+	constructor() {
+		super(data);
+	}
+
+	getChildren(key: string) {
+		return data.filter((item) => item.parentKey === key);
+	}
+}
+
+export const umbEntityData = new UmbEntityData();
