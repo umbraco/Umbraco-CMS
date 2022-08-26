@@ -5,24 +5,25 @@ using Size = System.Drawing.Size;
 
 namespace Umbraco.Cms.Imaging.ImageSharp.Media;
 
-internal class ImageSharpDimensionExtractor : IImageDimensionExtractor
+public sealed class ImageSharpDimensionExtractor : IImageDimensionExtractor
 {
     private readonly Configuration _configuration;
 
+    /// <inheritdoc />
+    public IEnumerable<string> SupportedImageFileTypes { get; }
+
     /// <summary>
-    ///     Initializes a new instance of the <see cref="ImageSharpDimensionExtractor" /> class.
+    /// Initializes a new instance of the <see cref="ImageSharpDimensionExtractor" /> class.
     /// </summary>
     /// <param name="configuration">The configuration.</param>
     public ImageSharpDimensionExtractor(Configuration configuration)
-        => _configuration = configuration;
+    {
+        _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
 
-    /// <summary>
-    ///     Gets the dimensions of an image.
-    /// </summary>
-    /// <param name="stream">A stream containing the image bytes.</param>
-    /// <returns>
-    ///     The dimension of the image.
-    /// </returns>
+        SupportedImageFileTypes = configuration.ImageFormats.SelectMany(f => f.FileExtensions).ToArray();
+    }
+
+    /// <inheritdoc />
     public Size? GetDimensions(Stream? stream)
     {
         Size? size = null;

@@ -3,7 +3,7 @@
     <TargetFramework>net7.0</TargetFramework>
     <PackageId>Umbraco.Cms.Imaging.ImageSharp</PackageId>
     <Title>Umbraco.Cms.Imaging.ImageSharp</Title>
-    <Description>Adds support for ImageSharp/ImageSharp.Web to Umbraco CMS.</Description>
+    <Description>Adds imaging support using ImageSharp/ImageSharp.Web to Umbraco CMS.</Description>
   </PropertyGroup>
   
   <ItemGroup>

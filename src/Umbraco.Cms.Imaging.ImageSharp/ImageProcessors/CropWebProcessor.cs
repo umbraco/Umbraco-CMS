@@ -11,17 +11,18 @@ using SixLabors.ImageSharp.Web.Processors;
 namespace Umbraco.Cms.Imaging.ImageSharp.ImageProcessors;
 
 /// <summary>
-///     Allows the cropping of images.
+/// Allows the cropping of images.
 /// </summary>
+/// <seealso cref="SixLabors.ImageSharp.Web.Processors.IImageWebProcessor" />
 public class CropWebProcessor : IImageWebProcessor
 {
     /// <summary>
-    ///     The command constant for the crop coordinates.
+    /// The command constant for the crop coordinates.
     /// </summary>
     public const string Coordinates = "cc";
 
     /// <summary>
-    ///     The command constant for the resize orientation handling mode.
+    /// The command constant for the resize orientation handling mode.
     /// </summary>
     public const string Orient = "orient";
 
@@ -59,10 +60,8 @@ public class CropWebProcessor : IImageWebProcessor
         var right = Math.Clamp(1 - coordinates[2], 0, 1);
         var bottom = Math.Clamp(1 - coordinates[3], 0, 1);
         var orientation = GetExifOrientation(image, commands, parser, culture);
-        Vector2 xy1 =
-            ExifOrientationUtilities.Transform(new Vector2(left, top), Vector2.Zero, Vector2.One, orientation);
-        Vector2 xy2 =
-            ExifOrientationUtilities.Transform(new Vector2(right, bottom), Vector2.Zero, Vector2.One, orientation);
+        Vector2 xy1 = ExifOrientationUtilities.Transform(new Vector2(left, top), Vector2.Zero, Vector2.One, orientation);
+        Vector2 xy2 = ExifOrientationUtilities.Transform(new Vector2(right, bottom), Vector2.Zero, Vector2.One, orientation);
 
         // Scale points to a pixel based rectangle
         Size size = image.Image.Size();

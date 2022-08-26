@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Imaging.ImageSharp.Media;
 ///     Exposes a method that generates an image URL based on the specified options that can be processed by ImageSharp.
 /// </summary>
 /// <seealso cref="IImageUrlGenerator" />
-public class ImageSharpImageUrlGenerator : IImageUrlGenerator
+public sealed class ImageSharpImageUrlGenerator : IImageUrlGenerator
 {
     /// <inheritdoc />
     public IEnumerable<string> SupportedImageFileTypes { get; }
