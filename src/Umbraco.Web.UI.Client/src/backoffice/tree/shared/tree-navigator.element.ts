@@ -30,7 +30,7 @@ export class UmbTreeNavigator extends UmbContextConsumerMixin(LitElement) {
 	connectedCallback(): void {
 		super.connectedCallback();
 
-		this.consumeContext('umbTreeService', async (treeService) => {
+		this.consumeContext('umbTreeContext', async (treeService) => {
 			this._treeService = treeService;
 
 			const item = await this._treeService?.getRoot?.();

@@ -22,7 +22,7 @@ export class UmbTreeMembers extends UmbContextProviderMixin(LitElement) {
 		if (!this.tree) return;
 
 		this._treeContext = new UmbTreeMemberContext(this.tree);
-		this.provideContext('umbTreeService', this._treeContext);
+		this.provideContext('umbTreeContext', this._treeContext);
 	}
 
 	render() {

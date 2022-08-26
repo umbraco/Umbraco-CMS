@@ -26,7 +26,7 @@ export class UmbTreeDataTypesElement extends UmbContextProviderMixin(UmbContextC
 			if (!this.tree || !this._entityStore) return;
 
 			this._treeContext = new UmbTreeDataTypesContext(this.tree, this._entityStore);
-			this.provideContext('umbTreeService', this._treeContext);
+			this.provideContext('umbTreeContext', this._treeContext);
 		});
 	}
 

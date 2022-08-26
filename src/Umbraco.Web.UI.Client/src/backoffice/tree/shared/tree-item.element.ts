@@ -49,7 +49,7 @@ export class UmbTreeItem extends UmbContextConsumerMixin(LitElement) {
 	constructor() {
 		super();
 
-		this.consumeContext('umbTreeService', (treeService: ITreeService) => {
+		this.consumeContext('umbTreeContext', (treeService: ITreeService) => {
 			this._treeService = treeService;
 			this._pathName = this._treeService?.tree?.meta?.pathname;
 		});
