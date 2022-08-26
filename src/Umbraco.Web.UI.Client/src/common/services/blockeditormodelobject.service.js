@@ -504,7 +504,7 @@
              * - content {Object}: Content model, the content data in a ElementType model.
              * - settings {Object}: Settings model, the settings data in a ElementType model.
              * - config {Object}: A local deep copy of the block configuration model.
-             * - label {string}: The label for this block.
+             * - label {string}: The compiled label for this block.
              * - data {Object}: A reference to the content data object from your property editor model.
              * - settingsData {Object}: A reference to the settings data object from your property editor model.
              * - layout {Object}: A reference to the layout entry from your property editor model.
