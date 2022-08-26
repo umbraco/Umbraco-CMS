@@ -33,8 +33,8 @@ export class UmbEditorDataTypeElement extends UmbContextProviderMixin(UmbContext
 		`,
 	];
 
-	@property()
-	id!: string;
+	@property({ type: Number })
+	entityId!: number;
 
 	@state()
 	private _dataType?: DataTypeEntity;
@@ -69,7 +69,7 @@ export class UmbEditorDataTypeElement extends UmbContextProviderMixin(UmbContext
 		this._dataTypeStoreSubscription?.unsubscribe();
 
 		// TODO: This should be done in a better way, but for now it works.
-		this._dataTypeStoreSubscription = this._dataTypeStore?.getById(parseInt(this.id)).subscribe((dataType) => {
+		this._dataTypeStoreSubscription = this._dataTypeStore?.getById(this.entityId).subscribe((dataType) => {
 			if (!dataType) return; // TODO: Handle nicely if there is no node.
 
 			this._dataTypeContextSubscription?.unsubscribe();

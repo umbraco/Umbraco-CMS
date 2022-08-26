@@ -40,7 +40,6 @@ export const internalManifests: Array<UmbExtensionManifestCore> = [
 		type: 'section',
 		alias: 'Umb.Section.Settings',
 		name: 'Settings',
-		elementName: 'umb-settings-section',
 		js: () => import('./backoffice/sections/settings/settings-section.element'),
 		meta: {
 			pathname: 'settings', // TODO: how to we want to support pretty urls?
@@ -246,8 +245,7 @@ export const internalManifests: Array<UmbExtensionManifestCore> = [
 		type: 'tree',
 		alias: 'Umb.Tree.Datatypes',
 		name: 'Data Types Tree',
-		elementName: 'umb-datatype-tree',
-		js: () => import('./backoffice/tree/data-types/datatypes-tree.element'),
+		js: () => import('./backoffice/tree/data-types/tree-data-types.element'),
 		meta: {
 			pathname: 'data-types',
 			editor: 'Umb.Editor.DataType',
@@ -319,5 +317,11 @@ export const internalManifests: Array<UmbExtensionManifestCore> = [
 		alias: 'Umb.Editor.MemberGroup',
 		name: 'Member Group',
 		js: () => import('./backoffice/editors/member-group/editor-member-group.element'),
+	},
+	{
+		type: 'editor',
+		alias: 'Umb.Editor.DataType',
+		name: 'Member Group',
+		js: () => import('./backoffice/editors/data-type/editor-data-type.element'),
 	},
 ];

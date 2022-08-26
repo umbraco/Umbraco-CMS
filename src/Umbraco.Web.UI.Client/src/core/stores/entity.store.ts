@@ -1,23 +1,16 @@
-import { BehaviorSubject, map, Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { Entity } from '../../mocks/data/entity.data';
-import { umbNodeData } from '../../mocks/data/node.data';
 
 export class UmbEntityStore {
 	private _entities: BehaviorSubject<Array<Entity>> = new BehaviorSubject(<Array<Entity>>[]);
 	public readonly entities: Observable<Array<Entity>> = this._entities.asObservable();
 
-	getById(id: number): Observable<Entity | null> {
-		// fetch from server and update store
-		fetch(`/umbraco/backoffice/content/${id}`)
-			.then((res) => res.json())
-			.then((data) => {
-				this._updateStore(data);
-			});
-
-		return this.entities.pipe(map((nodes: Array<Entity>) => nodes.find((node: Entity) => node.id === id) || null));
+	update(entities: Array<Entity>) {
+		this._updateStore(entities);
+		console.log('entities', this.entities);
 	}
 
-	private _updateStore(fetchedNodes: Array<any>) {
+	private _updateStore(fetchedNodes: Array<Entity>) {
 		const storedNodes = this._entities.getValue();
 		const updated: Entity[] = [...storedNodes];
 

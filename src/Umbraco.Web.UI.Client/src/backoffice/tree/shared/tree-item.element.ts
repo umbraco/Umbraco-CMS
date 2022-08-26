@@ -5,7 +5,8 @@ import { UmbContextConsumerMixin } from '../../../core/context';
 import { ITreeService } from '../tree.service';
 import { UUIMenuItemEvent } from '@umbraco-ui/uui';
 import { UmbSectionContext } from '../../sections/section.context';
-import { Subscription } from 'rxjs';
+import { map, Subscription } from 'rxjs';
+import { UmbEntityStore } from '../../../core/stores/entity.store';
 
 @customElement('umb-tree-item')
 export class UmbTreeItem extends UmbContextConsumerMixin(LitElement) {
@@ -37,8 +38,13 @@ export class UmbTreeItem extends UmbContextConsumerMixin(LitElement) {
 
 	private _treeService?: ITreeService;
 
+	private _entityStore?: UmbEntityStore;
+
 	private _sectionContext?: UmbSectionContext;
 	private _sectionSubscription?: Subscription;
+
+	@state()
+	private _itemName = '';
 
 	constructor() {
 		super();
@@ -51,6 +57,17 @@ export class UmbTreeItem extends UmbContextConsumerMixin(LitElement) {
 		this.consumeContext('umbSectionContext', (sectionContext: UmbSectionContext) => {
 			this._sectionContext = sectionContext;
 			this._useSection();
+		});
+
+		this.consumeContext('umbEntityStore', (entityStore: UmbEntityStore) => {
+			this._entityStore = entityStore;
+
+			this._entityStore?.entities
+				.pipe(map((items) => items.filter((item) => item.id === this.itemId)))
+				.subscribe((items) => {
+					this._itemName = items?.[0]?.name;
+					console.log(this.label, items);
+				});
 		});
 	}
 
@@ -101,7 +118,7 @@ export class UmbTreeItem extends UmbContextConsumerMixin(LitElement) {
 				@show-children=${this._onShowChildren}
 				.loading=${this._loading}
 				.hasChildren=${this.hasChildren}
-				label=${this.label}
+				label="${this._itemName}"
 				href="${this._constructPath(this.itemId)}">
 				${this._renderChildItems()}
 			</uui-menu-item>

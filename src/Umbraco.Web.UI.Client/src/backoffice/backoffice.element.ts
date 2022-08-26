@@ -10,6 +10,7 @@ import { UmbDataTypeStore } from '../core/stores/data-type.store';
 import { UmbDocumentTypeStore } from '../core/stores/document-type.store';
 import { UmbNodeStore } from '../core/stores/node.store';
 import { UmbSectionStore } from '../core/stores/section.store';
+import { UmbEntityStore } from '../core/stores/entity.store';
 
 import './components/backoffice-header.element';
 import './components/backoffice-main.element';
@@ -45,6 +46,7 @@ export default class UmbBackoffice extends UmbContextConsumerMixin(UmbContextPro
 	constructor() {
 		super();
 
+		this.provideContext('umbEntityStore', new UmbEntityStore());
 		this.provideContext('umbNodeStore', new UmbNodeStore());
 		this.provideContext('umbDataTypeStore', new UmbDataTypeStore());
 		this.provideContext('umbDocumentTypeStore', new UmbDocumentTypeStore());
