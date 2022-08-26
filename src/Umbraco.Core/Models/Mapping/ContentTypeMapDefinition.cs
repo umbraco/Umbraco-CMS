@@ -323,6 +323,7 @@ public class ContentTypeMapDefinition : IMapDefinition
         target.AllowCultureVariant = source.VariesByCulture();
         target.AllowSegmentVariant = source.VariesBySegment();
         target.ContentApps = _commonMapper.GetContentAppsForEntity(source);
+        target.Variations = source.Variations;
 
         // sync templates
         if (source.AllowedTemplates is not null)
@@ -419,6 +420,7 @@ public class ContentTypeMapDefinition : IMapDefinition
             ? string.Empty
             : _hostingEnvironment.ToAbsolute("~/umbraco/images/thumbnails/" + source.Thumbnail);
         target.UpdateDate = source.UpdateDate;
+        target.Variations = source.Variations;
     }
 
     // no MapAll - uses the IContentTypeBase map method, which has MapAll
@@ -751,6 +753,7 @@ public class ContentTypeMapDefinition : IMapDefinition
         target.AllowedContentTypes = source.AllowedContentTypes?.OrderBy(c => c.SortOrder).Select(x => x.Id.Value);
         target.CompositeContentTypes = source.ContentTypeComposition.Select(x => x.Alias);
         target.LockedCompositeContentTypes = MapLockedCompositions(source);
+        target.Variations = source.Variations;
     }
 
     // no MapAll - relies on the non-generic method
@@ -794,6 +797,7 @@ public class ContentTypeMapDefinition : IMapDefinition
             : _hostingEnvironment.ToAbsolute("~/umbraco/images/thumbnails/" + source.Thumbnail);
         target.Trashed = source.Trashed;
         target.Udi = source.Udi;
+        target.Variations = source.Variations;
     }
 
     // no MapAll - relies on the non-generic method

@@ -526,10 +526,21 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
             $"DELETE FROM {Constants.DatabaseSchema.Tables.User2UserGroup} WHERE userId = @id",
             $"DELETE FROM {Constants.DatabaseSchema.Tables.User2NodeNotify} WHERE userId = @id",
             $"DELETE FROM {Constants.DatabaseSchema.Tables.UserStartNode} WHERE userId = @id",
+            $"DELETE FROM {Constants.DatabaseSchema.Tables.ExternalLoginToken} WHERE externalLoginId = (SELECT id FROM {Constants.DatabaseSchema.Tables.ExternalLogin} WHERE userOrMemberKey = @key)",
+            $"DELETE FROM {Constants.DatabaseSchema.Tables.ExternalLogin} WHERE userOrMemberKey = @key",
             $"DELETE FROM {Constants.DatabaseSchema.Tables.User} WHERE id = @id",
-            $"DELETE FROM {Constants.DatabaseSchema.Tables.ExternalLogin} WHERE id = @id"
         };
         return list;
+    }
+    protected override void PersistDeletedItem(IUser entity)
+    {
+        IEnumerable<string> deletes = GetDeleteClauses();
+        foreach (var delete in deletes)
+        {
+            Database.Execute(delete, new { id = GetEntityId(entity), key = entity.Key });
+        }
+
+        entity.DeleteDate = DateTime.Now;
     }
 
     protected override void PersistNewItem(IUser entity)

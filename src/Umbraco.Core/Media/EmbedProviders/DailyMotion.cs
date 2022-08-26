@@ -3,7 +3,9 @@ using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Core.Media.EmbedProviders;
 
-// TODO (V10): change base class to OEmbedProviderBase
+/// <summary>
+///     Embed Provider for Dailymotion the popular online video-sharing platform.
+/// </summary>
 public class DailyMotion : EmbedProviderBase
 {
     public DailyMotion(IJsonSerializer jsonSerializer)
