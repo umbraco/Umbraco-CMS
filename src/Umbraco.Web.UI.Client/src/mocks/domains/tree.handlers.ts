@@ -1,8 +1,6 @@
 import { rest } from 'msw';
 import { Entity } from '../data/entity.data';
 
-import { NodeEntity, umbNodeData } from '../data/node.data';
-
 // TODO: add schema
 export const handlers = [
 	rest.get('/umbraco/backoffice/trees/members/:id', (req, res, ctx) => {
@@ -17,12 +15,29 @@ export const handlers = [
 			{
 				id: '1',
 				key: '865a11f9-d140-4f21-8dfe-2caafc65a971',
-				name: 'John Doe',
+				parentKey: '24fcd88a-d1bb-423b-b794-8a94dcddcb6a',
+				name: 'Member 1',
+				hasChildren: false,
+			},
+			{
+				id: '2',
+				key: '06c6919c-6fa7-4aa5-8214-0582c721c472',
+				parentKey: '24fcd88a-d1bb-423b-b794-8a94dcddcb6a',
+				name: 'Member 2',
+				hasChildren: true,
+			},
+			{
+				id: '2',
+				key: '725a26c4-158d-4dc0-8aaa-b64473b11aa8',
+				parentKey: '06c6919c-6fa7-4aa5-8214-0582c721c472',
+				name: 'Member 3',
 				hasChildren: false,
 			},
 		];
 
-		return res(ctx.status(200), ctx.json(items));
+		const test = items.filter((item) => item.parentKey === id);
+
+		return res(ctx.status(200), ctx.json(test));
 	}),
 
 	rest.get('/umbraco/backoffice/trees/member-groups/:id', (req, res, ctx) => {

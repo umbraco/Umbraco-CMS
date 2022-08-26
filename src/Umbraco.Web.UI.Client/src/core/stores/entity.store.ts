@@ -7,7 +7,6 @@ export class UmbEntityStore {
 
 	update(entities: Array<Entity>) {
 		this._updateStore(entities);
-		console.log('entities', this.entities);
 	}
 
 	private _updateStore(fetchedNodes: Array<Entity>) {
@@ -15,7 +14,7 @@ export class UmbEntityStore {
 		const updated: Entity[] = [...storedNodes];
 
 		fetchedNodes.forEach((fetchedNode) => {
-			const index = storedNodes.map((storedNode) => storedNode.id).indexOf(fetchedNode.id);
+			const index = storedNodes.map((storedNode) => storedNode.key).indexOf(fetchedNode.key);
 
 			if (index !== -1) {
 				// If the node is already in the store, update it

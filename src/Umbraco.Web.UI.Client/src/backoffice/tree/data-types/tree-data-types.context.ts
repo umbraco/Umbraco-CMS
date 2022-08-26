@@ -1,8 +1,9 @@
+import { map } from 'rxjs';
 import { UmbExtensionManifestTree } from '../../../core/extension';
 import { UmbEntityStore } from '../../../core/stores/entity.store';
-import { ITreeContext } from '../tree.context';
+import { UmbTreeContext } from '../tree.context';
 
-export class UmbTreeDataTypesContext implements ITreeContext {
+export class UmbTreeDataTypesContext implements UmbTreeContext {
 	public tree: UmbExtensionManifestTree;
 	public entityStore: UmbEntityStore;
 
@@ -12,7 +13,7 @@ export class UmbTreeDataTypesContext implements ITreeContext {
 		this.entityStore = entityStore;
 	}
 
-	public async getRoot() {
+	public fetchRoot() {
 		const data = {
 			id: -1,
 			key: '3fd3eba5-c893-4d3c-af67-f574e6eded38',
@@ -20,16 +21,20 @@ export class UmbTreeDataTypesContext implements ITreeContext {
 			hasChildren: true,
 			type: 'data-type',
 			icon: 'favorite',
+			parentKey: '',
 		};
 		this.entityStore.update([data]);
-		return data;
+		return this.entityStore.entities.pipe(map((items) => items.filter((item) => item.key === data.key)));
 	}
 
-	public async getChildren(id: number) {
+	public fetchChildren(key: string) {
 		// TODO: figure out url structure
-		const res = await fetch(`/umbraco/backoffice/trees/data-types/${id}`);
-		const json = await res.json();
-		this.entityStore.update(json);
-		return json;
+		fetch(`/umbraco/backoffice/trees/data-types/${key}`)
+			.then((res) => res.json())
+			.then((data) => {
+				this.entityStore.update(data);
+			});
+
+		return this.entityStore.entities.pipe(map((items) => items.filter((item) => item.key === key)));
 	}
 }

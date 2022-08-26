@@ -2,18 +2,17 @@ import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbContextConsumerMixin } from '../../../core/context';
-import { ITreeContext } from '../tree.context';
+import { UmbTreeContext } from '../tree.context';
 
 import './tree-item.element';
+import { Subscription } from 'rxjs';
 
 @customElement('umb-tree-navigator')
 export class UmbTreeNavigator extends UmbContextConsumerMixin(LitElement) {
 	static styles = [UUITextStyles, css``];
 
-	private _treeContext?: ITreeContext;
-
 	@state()
-	private _id = -1;
+	private _entityKey = '';
 
 	@state()
 	private _label = '';
@@ -24,33 +23,40 @@ export class UmbTreeNavigator extends UmbContextConsumerMixin(LitElement) {
 	@state()
 	private _loading = true;
 
-	@state()
-	private _href? = '';
+	private _rootSubscription?: Subscription;
 
-	connectedCallback(): void {
-		super.connectedCallback();
+	private _treeContext?: UmbTreeContext;
 
-		this.consumeContext('umbTreeContext', async (treeContext) => {
+	constructor() {
+		super();
+
+		this.consumeContext('umbTreeContext', (treeContext) => {
 			this._treeContext = treeContext;
 
-			const item = await this._treeContext?.getRoot?.();
-			if (!item) return;
+			this._loading = true;
 
-			this._id = item.id;
-			this._label = item.name;
-			this._hasChildren = item.hasChildren;
-			this._loading = false;
-			this._href = this._treeContext?.tree?.meta?.pathname;
+			this._rootSubscription = this._treeContext?.fetchRoot().subscribe((items) => {
+				if (items?.length === 0) return;
+
+				this._loading = false;
+				this._entityKey = items[0].key;
+				this._label = items[0].name;
+				this._hasChildren = items[0].hasChildren;
+			});
 		});
+	}
+
+	disconnectedCallback(): void {
+		super.disconnectedCallback();
+		this._rootSubscription?.unsubscribe();
 	}
 
 	render() {
 		return html`<umb-tree-item
-			.id=${this._id}
+			.itemKey=${this._entityKey}
 			.label=${this._label}
 			?hasChildren=${this._hasChildren}
-			.loading=${this._loading}
-			href=""></umb-tree-item> `;
+			.loading=${this._loading}></umb-tree-item> `;
 	}
 }
 
