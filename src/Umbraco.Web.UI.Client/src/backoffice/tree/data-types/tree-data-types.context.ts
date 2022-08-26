@@ -35,6 +35,6 @@ export class UmbTreeDataTypesContext implements UmbTreeContext {
 				this.entityStore.update(data);
 			});
 
-		return this.entityStore.entities.pipe(map((items) => items.filter((item) => item.key === key)));
+		return this.entityStore.entities.pipe(map((items) => items.filter((item) => item.parentKey === key)));
 	}
 }
