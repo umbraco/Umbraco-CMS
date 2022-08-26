@@ -13,7 +13,7 @@
 (function () {
     'use strict';
 
-    function blockEditorModelObjectFactory($q, $compile, $interpolate, udiService, contentResource, localizationService, umbRequestHelper, clipboardService, notificationsService) {
+    function blockEditorModelObjectFactory($interpolate, $q, udiService, contentResource, localizationService, umbRequestHelper, clipboardService, notificationsService, $compile) {
 
         /**
          * Simple mapping from property model content entry to editing model,
