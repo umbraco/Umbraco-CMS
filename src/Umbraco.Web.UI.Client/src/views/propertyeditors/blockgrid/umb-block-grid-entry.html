@@ -1,5 +1,6 @@
 <uui-button-inline-create
     class="umb-block-grid__block--inline-create-button __above"
+    style="--umb-block-grid__block--inline-create-button--depth: {{vm.depth}}"
     ng-click="vm.blockEditorApi.requestShowCreate(vm.parentBlock, vm.areaKey, $index, $event)">
 </uui-button-inline-create>
 
@@ -26,7 +27,7 @@
                 slot="areas"
                 class="umb-block-grid__block-area-container"
                 ng-style="vm.areaGridStyles">
-                <umb-block-grid-entries
+                <umb-block-grid-entries 
                     class="umb-block-grid__block-area"
                     data-area-col-span="{{areaEntry.$config.columnSpan}}"
                     data-area-row-span="{{areaEntry.$config.rowSpan}}"
@@ -40,7 +41,8 @@
                     entries="areaEntry.items"
                     area-key="areaEntry.key"
                     parent-block="vm.layoutEntry.$block"
-                    parent-form="vm.blockRowForm">
+                    parent-form="vm.blockRowForm"
+                    depth="{{vm.childDepth}}">
                 </umb-block-grid-entries>
             </div>
 

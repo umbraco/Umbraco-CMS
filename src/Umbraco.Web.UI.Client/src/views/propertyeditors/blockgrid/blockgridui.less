@@ -449,7 +449,8 @@ umb-block-grid-block {
     position: absolute;
 }
 .umb-block-grid__block--inline-create-button.__above {
-    left: 0;
+    left: calc(-20px + var(--umb-block-grid__block--inline-create-button--depth, 0) * 20px);
+    width: calc(100% + 40px - var(--umb-block-grid__block--inline-create-button--depth, 0) * 40px);
 }
 .umb-block-grid__block--inline-create-button.__after {
     right: 0;

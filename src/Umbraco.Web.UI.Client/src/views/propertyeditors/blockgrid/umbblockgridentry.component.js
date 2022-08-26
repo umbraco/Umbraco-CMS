@@ -89,7 +89,8 @@
                 layoutEntry: "<",
                 index: "<",
                 parentBlock: "<",
-                areaKey: "<"
+                areaKey: "<",
+                depth: "@"
             }
         }
     );
@@ -100,6 +101,9 @@
         vm.areaGridStyles = {};
 
         vm.$onInit = function() {
+
+            vm.childDepth = parseInt(vm.depth) + 1;
+
             if(vm.layoutEntry.$block.config.areaGridColumns) {
                 vm.areaGridStyles['--umb-block-grid--area-grid-columns'] = vm.layoutEntry.$block.config.areaGridColumns.toString();
             } else {

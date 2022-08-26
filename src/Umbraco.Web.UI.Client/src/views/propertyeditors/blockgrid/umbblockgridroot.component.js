@@ -43,7 +43,8 @@
                 <div class="umb-block-grid__root-container">
                     <umb-block-grid-entries
                         block-editor-api="vm.blockEditorApi"
-                        entries="vm.entries">
+                        entries="vm.entries"
+                        depth="0">
                     </umb-block-grid-entries>
                 </div>
             `;
