@@ -2,7 +2,7 @@
 
 import { UmbExtensionManifestTree } from '../../core/extension';
 
-export interface ITreeService {
+export interface ITreeContext {
 	tree: UmbExtensionManifestTree;
 	getRoot?(): Promise<UmbTreeItem>;
 	getChildren(id: number): Promise<Array<UmbTreeItem>>;
@@ -15,7 +15,7 @@ export interface UmbTreeItem {
 	hasChildren: boolean;
 }
 
-export class UmbTreeService implements ITreeService {
+export class UmbTreeContext implements ITreeContext {
 	public tree: UmbExtensionManifestTree;
 
 	constructor(tree: UmbExtensionManifestTree) {

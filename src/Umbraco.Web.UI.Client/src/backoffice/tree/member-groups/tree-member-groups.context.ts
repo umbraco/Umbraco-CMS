@@ -1,7 +1,7 @@
 import { UmbExtensionManifestTree } from '../../../core/extension';
-import { ITreeService } from '../tree.service';
+import { ITreeContext } from '../tree.context';
 
-export class UmbTreeMemberGroupsContext implements ITreeService {
+export class UmbTreeMemberGroupsContext implements ITreeContext {
 	public tree: UmbExtensionManifestTree;
 
 	constructor(tree: UmbExtensionManifestTree) {

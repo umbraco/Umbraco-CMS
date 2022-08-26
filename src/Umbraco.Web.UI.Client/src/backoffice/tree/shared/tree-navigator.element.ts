@@ -2,7 +2,7 @@ import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbContextConsumerMixin } from '../../../core/context';
-import { ITreeService } from '../tree.service';
+import { ITreeContext } from '../tree.context';
 
 import './tree-item.element';
 
@@ -10,7 +10,7 @@ import './tree-item.element';
 export class UmbTreeNavigator extends UmbContextConsumerMixin(LitElement) {
 	static styles = [UUITextStyles, css``];
 
-	private _treeService?: ITreeService;
+	private _treeContext?: ITreeContext;
 
 	@state()
 	private _id = -1;
@@ -30,17 +30,17 @@ export class UmbTreeNavigator extends UmbContextConsumerMixin(LitElement) {
 	connectedCallback(): void {
 		super.connectedCallback();
 
-		this.consumeContext('umbTreeContext', async (treeService) => {
-			this._treeService = treeService;
+		this.consumeContext('umbTreeContext', async (treeContext) => {
+			this._treeContext = treeContext;
 
-			const item = await this._treeService?.getRoot?.();
+			const item = await this._treeContext?.getRoot?.();
 			if (!item) return;
 
 			this._id = item.id;
 			this._label = item.name;
 			this._hasChildren = item.hasChildren;
 			this._loading = false;
-			this._href = this._treeService?.tree?.meta?.pathname;
+			this._href = this._treeContext?.tree?.meta?.pathname;
 		});
 	}
 

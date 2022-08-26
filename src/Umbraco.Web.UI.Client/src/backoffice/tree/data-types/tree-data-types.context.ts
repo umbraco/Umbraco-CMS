@@ -1,8 +1,8 @@
 import { UmbExtensionManifestTree } from '../../../core/extension';
 import { UmbEntityStore } from '../../../core/stores/entity.store';
-import { ITreeService } from '../tree.service';
+import { ITreeContext } from '../tree.context';
 
-export class UmbTreeDataTypesContext implements ITreeService {
+export class UmbTreeDataTypesContext implements ITreeContext {
 	public tree: UmbExtensionManifestTree;
 	public entityStore: UmbEntityStore;
 

@@ -2,7 +2,7 @@ import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UmbContextConsumerMixin } from '../../../core/context';
-import { ITreeService } from '../tree.service';
+import { ITreeContext } from '../tree.context';
 import { UUIMenuItemEvent } from '@umbraco-ui/uui';
 import { UmbSectionContext } from '../../sections/section.context';
 import { map, Subscription } from 'rxjs';
@@ -36,7 +36,7 @@ export class UmbTreeItem extends UmbContextConsumerMixin(LitElement) {
 	@state()
 	private _sectionPathname?: string;
 
-	private _treeService?: ITreeService;
+	private _treeContext?: ITreeContext;
 
 	private _entityStore?: UmbEntityStore;
 
@@ -49,9 +49,9 @@ export class UmbTreeItem extends UmbContextConsumerMixin(LitElement) {
 	constructor() {
 		super();
 
-		this.consumeContext('umbTreeContext', (treeService: ITreeService) => {
-			this._treeService = treeService;
-			this._pathName = this._treeService?.tree?.meta?.pathname;
+		this.consumeContext('umbTreeContext', (treeContext: ITreeContext) => {
+			this._treeContext = treeContext;
+			this._pathName = this._treeContext?.tree?.meta?.pathname;
 		});
 
 		this.consumeContext('umbSectionContext', (sectionContext: UmbSectionContext) => {
@@ -90,7 +90,7 @@ export class UmbTreeItem extends UmbContextConsumerMixin(LitElement) {
 
 		this._loading = true;
 
-		this._treeService?.getChildren(this.itemId).then((items) => {
+		this._treeContext?.getChildren(this.itemId).then((items) => {
 			this.childItems = items;
 			this._loading = false;
 		});
