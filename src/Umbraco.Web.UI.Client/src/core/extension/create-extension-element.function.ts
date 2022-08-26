@@ -15,16 +15,6 @@ export async function createExtensionElement(manifest: ManifestTypes): Promise<H
 
 	// TODO: Do we need this except for the default() loader?
 	if (js) {
-		if (js instanceof HTMLElement) {
-			console.log('-- created by manifest method providing HTMLElement', js);
-			return js;
-		}
-
-		if (isManifestElementType(js) && js.elementName) {
-			// created by js export elementName
-			return document.createElement(js.elementName);
-		}
-
 		if (hasDefaultExport(js)) {
 			// created by default class
 			return new js.default();
