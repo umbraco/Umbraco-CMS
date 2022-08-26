@@ -13,7 +13,7 @@
 (function () {
     'use strict';
 
-    function blockEditorModelObjectFactory($q, $compile, udiService, contentResource, localizationService, umbRequestHelper, clipboardService, notificationsService) {
+    function blockEditorModelObjectFactory($q, $compile, $interpolate, udiService, contentResource, localizationService, umbRequestHelper, clipboardService, notificationsService) {
 
         /**
          * Simple mapping from property model content entry to editing model,
@@ -98,12 +98,36 @@
         }
 
         /**
-         * Generate label for Block, uses either the configured label or falls back to the contentTypeName.
+         * Generate label for Block, uses either the labelInterpolator or falls back to the contentTypeName.
          * @param {Object} blockObject BlockObject to receive data values from.
+         * @deprecated label is now compiled and saved on blockObject.label on creation
          */
-        function getBlockLabel(blockObject) {
-          if (blockObject.config.label !== null && blockObject.config.label.length) {
-            return blockObject.config.label;
+         function getBlockLabel(blockObject) {
+          if (blockObject.labelInterpolator !== undefined) {
+              // blockobject.content may be null if the block is no longer allowed,
+              // so try and fall back to the label in the config,
+              // if that too is null, there's not much we can do, so just default to empty string.
+              var contentTypeName;
+              if(blockObject.content != null){
+                contentTypeName = blockObject.content.contentTypeName;
+              }
+              else if(blockObject.config != null && blockObject.config.label != null){
+                contentTypeName = blockObject.config.label;
+              }
+              else {
+                contentTypeName = "";
+              }
+
+              var labelVars = Object.assign({
+                "$contentTypeName": contentTypeName,
+                "$settings": blockObject.settingsData || {},
+                "$layout": blockObject.layout || {},
+                "$index": (blockObject.index || 0)+1
+              }, blockObject.data);
+              var label = blockObject.labelInterpolator(labelVars);
+              if (label) {
+                  return label;
+              }
           }
           return blockObject.content.contentTypeName;
         }
@@ -548,9 +572,12 @@
                 }
                 blockObject.key = String.CreateGuid().replace(/-/g, "");
                 blockObject.config = Utilities.copy(blockConfiguration);
-                // if (blockObject.config.label && blockObject.config.label !== "") {
-                //     blockObject.labelInterpolator = $interpolate(blockObject.config.label);
-                // }
+                if (blockObject.config.label && blockObject.config.label !== "") {
+                  /**
+                   * @deprecated use blockObject.label instead
+                   */
+                  blockObject.labelInterpolator = $interpolate(blockObject.config.label);
+                }
                 blockObject.__scope = this.isolatedScope;
 
                 // make basics from scaffold
