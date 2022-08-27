@@ -98,8 +98,10 @@
             }
             $scope.$evalAsync();
         }
-        vm.mouseOverArea = function() {
-            vm.isHoveringArea = true;
+        vm.mouseOverArea = function(area) {
+            if(area.items.length > 0) {
+                vm.isHoveringArea = true;
+            }
         }
         vm.mouseLeaveArea = function() {
             vm.isHoveringArea = false;
