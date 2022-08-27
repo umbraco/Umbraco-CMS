@@ -12,7 +12,7 @@
         ng-class="{
                     '--active':vm.layoutEntry.$block.active, 
                     '--show-validation': vm.layoutEntry.$block.showValidation === true,
-                    '--has-content-in-areas': vm.layoutEntry.areas.length > 0,
+                    '--hovering-area': vm.isHoveringArea,
                     '--block-ui-visible': vm.layoutEntry.$block.blockUiVisibility === true
                 }">
 
@@ -42,6 +42,8 @@
                     area-key="areaEntry.key"
                     parent-block="vm.layoutEntry.$block"
                     parent-form="vm.blockRowForm"
+                    ng-mouseover="vm.mouseOverArea()"
+                    ng-mouseleave="vm.mouseLeaveArea()"
                     depth="{{vm.childDepth}}">
                 </umb-block-grid-entries>
             </div>

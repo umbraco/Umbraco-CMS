@@ -8,20 +8,6 @@
      * @param {number[]} weights - array of numbers each representing the weight/length.
      * @returns {number} - the index of the weight that contains the accumulated value
      */
-    /*
-    function getIndexOfPositionInWeightMap(position, weights) {
-        let i = 0, len = weights.length, calc = 0;
-        while(i<len) {
-            if(position < calc) {
-                return i;
-            }
-
-            calc += weights[i];
-            i++;
-        }
-        return i;
-    }
-    */
     function getInterpolatedIndexOfPositionInWeightMap(target, weights) {
         const map = [0];
         weights.reduce((a, b, i) => { return map[i+1] = a+b; }, 0);
@@ -99,6 +85,7 @@
 
         const vm = this;
         vm.areaGridStyles = {};
+        vm.isHoveringArea = false;
 
         vm.$onInit = function() {
 
@@ -110,6 +97,12 @@
                 vm.areaGridStyles['--umb-block-grid--area-grid-columns'] = 'initial';
             }
             $scope.$evalAsync();
+        }
+        vm.mouseOverArea = function() {
+            vm.isHoveringArea = true;
+        }
+        vm.mouseLeaveArea = function() {
+            vm.isHoveringArea = false;
         }
 
         // Block sizing functionality:
