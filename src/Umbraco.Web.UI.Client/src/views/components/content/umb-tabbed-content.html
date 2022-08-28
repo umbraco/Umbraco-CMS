@@ -11,7 +11,7 @@
                     data-element="property-{{property.alias}}"
                     ng-repeat="property in tab.properties track by property.alias"
                     property="property"
-                    show-inherit="contentNodeModel.variants.length > 1 && !property.culture"
+                    show-inherit="contentNodeModel.variants.length > 1 && property.variation !== 'CultureAndSegment'"
                     inherits-from="defaultVariant.displayName">
 
                     <umb-property-editor
@@ -43,11 +43,13 @@
                     data-element="property-{{property.alias}}"
                     ng-repeat="property in group.properties track by property.alias"
                     property="property"
-                    show-inherit="contentNodeModel.variants.length > 1 && !property.culture"
+                    node="contentNodeModel"
+                    show-inherit="contentNodeModel.variants.length > 1 && property.variation !== 'CultureAndSegment'"
                     inherits-from="defaultVariant.displayName">
 
                     <umb-property-editor
                         model="property"
+                        node="contentNodeModel"
                         preview="(propertyEditorDisabled(property) && allowUpdate) || (!allowUpdate && !property.supportsReadOnly)"
                         allow-unlock="allowUpdate && allowEditInvariantFromNonDefault"
                         on-unlock="unlockInvariantValue(property)"

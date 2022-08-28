@@ -56,6 +56,9 @@ internal class ContentPropertyDisplayMapper : ContentPropertyBasicMapper<Content
         dest.HideLabel = valEditor?.HideLabel ?? false;
         dest.LabelOnTop = originalProp.PropertyType?.LabelOnTop;
 
+        // Set variation, the frontend needs this to determine if the content varies by segment
+        dest.Variations = originalProp.PropertyType?.Variations ?? ContentVariation.Nothing;
+
         // add the validation information
         dest.Validation.Mandatory = originalProp.PropertyType?.Mandatory ?? false;
         dest.Validation.MandatoryMessage = originalProp.PropertyType?.MandatoryMessage;
