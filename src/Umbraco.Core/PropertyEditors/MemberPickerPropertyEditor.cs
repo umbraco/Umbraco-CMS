@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     ValueType = ValueTypes.String,
     Group = Constants.PropertyEditors.Groups.People,
     Icon = Constants.Icons.Member,
-    IsReusable = true)]
+    ValueEditorIsReusable = true)]
 public class MemberPickerPropertyEditor : DataEditor
 {
     public MemberPickerPropertyEditor(

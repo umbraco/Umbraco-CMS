@@ -24,7 +24,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     "Tags",
     "tags",
     Icon = "icon-tags",
-    IsReusable = true)]
+    ValueEditorIsReusable = true)]
 public class TagsPropertyEditor : DataEditor
 {
     private readonly IEditorConfigurationParser _editorConfigurationParser;

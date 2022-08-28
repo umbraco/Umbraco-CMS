@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     "Label",
     "readonlyvalue",
     Icon = "icon-readonly",
-    IsReusable = true)]
+    ValueEditorIsReusable = true)]
 public class LabelPropertyEditor : DataEditor
 {
     private readonly IEditorConfigurationParser _editorConfigurationParser;

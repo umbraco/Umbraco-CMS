@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     "eyedropper",
     Icon = "icon-colorpicker",
     Group = Constants.PropertyEditors.Groups.Pickers,
-    IsReusable = true)]
+    ValueEditorIsReusable = true)]
 public class EyeDropperColorPickerPropertyEditor : DataEditor
 {
     private readonly IEditorConfigurationParser _editorConfigurationParser;

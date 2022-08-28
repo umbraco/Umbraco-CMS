@@ -20,8 +20,9 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 [DataContract]
 public class DataEditor : IDataEditor
 {
+    private readonly bool _canReuseValueEditor;
+    private IDataValueEditor? _reusableValueEditor;
     private IDictionary<string, object>? _defaultConfiguration;
-    private IDataValueEditor? _reusableEditor;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="DataEditor" /> class.
@@ -49,7 +50,8 @@ public class DataEditor : IDataEditor
         Icon = Attribute.Icon;
         Group = Attribute.Group;
         IsDeprecated = Attribute.IsDeprecated;
-        IsReusable = Attribute.IsReusable;
+
+        _canReuseValueEditor = Attribute.ValueEditorIsReusable;
     }
 
     /// <summary>
@@ -101,9 +103,6 @@ public class DataEditor : IDataEditor
     [IgnoreDataMember]
     public bool IsDeprecated { get; }
 
-    [IgnoreDataMember]
-    private bool IsReusable { get; }
-
     /// <inheritdoc />
     [DataMember(Name = "defaultConfig")]
     public IDictionary<string, object> DefaultConfiguration
@@ -123,20 +122,13 @@ public class DataEditor : IDataEditor
     ///         instance is returned. Otherwise, a new instance is created by CreateValueEditor.
     ///     </para>
     ///     <para>
-    ///         The instance created by CreateValueEditor is not cached, i.e.
-    ///         a new instance is created each time the property value is retrieved. The
-    ///         property editor is a singleton, and the value editor cannot be a singleton
-    ///         since it depends on the datatype configuration.
-    ///     </para>
-    ///     <para>
-    ///         Technically, it could be cached by datatype but let's keep things
-    ///         simple enough for now.
+    ///         The instance created by CreateValueEditor is cached if allowed by the DataEditor
+    ///         attribute (<see cref="DataEditorAttribute.ValueEditorIsReusable"/> == true).
     ///     </para>
     /// </remarks>
-    // TODO: point of that one? shouldn't we always configure?
     public IDataValueEditor GetValueEditor() => ExplicitValueEditor
-                                                ?? (IsReusable
-                                                    ? _reusableEditor ??= CreateValueEditor()
+                                                ?? (_canReuseValueEditor
+                                                    ? _reusableValueEditor ??= CreateValueEditor()
                                                     : CreateValueEditor());
 
     /// <inheritdoc />

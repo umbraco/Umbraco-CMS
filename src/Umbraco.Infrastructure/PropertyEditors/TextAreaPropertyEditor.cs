@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     "textarea",
     ValueType = ValueTypes.Text,
     Icon = "icon-application-window-alt",
-    IsReusable = true)]
+    ValueEditorIsReusable = true)]
 public class TextAreaPropertyEditor : DataEditor
 {
     private readonly IEditorConfigurationParser _editorConfigurationParser;

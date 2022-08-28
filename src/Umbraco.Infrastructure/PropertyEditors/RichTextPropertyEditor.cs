@@ -30,7 +30,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     HideLabel = false,
     Group = Constants.PropertyEditors.Groups.RichContent,
     Icon = "icon-browser-window",
-    IsReusable = true)]
+    ValueEditorIsReusable = true)]
 public class RichTextPropertyEditor : DataEditor
 {
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;

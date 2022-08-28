@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     "Slider",
     "slider",
     Icon = "icon-navigation-horizontal",
-    IsReusable = true)]
+    ValueEditorIsReusable = true)]
 public class SliderPropertyEditor : DataEditor
 {
     private readonly IEditorConfigurationParser _editorConfigurationParser;

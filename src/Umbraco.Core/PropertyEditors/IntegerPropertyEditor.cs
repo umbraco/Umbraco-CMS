@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     "Numeric",
     "integer",
     ValueType = ValueTypes.Integer,
-    IsReusable = true)]
+    ValueEditorIsReusable = true)]
 public class IntegerPropertyEditor : DataEditor
 {
     public IntegerPropertyEditor(

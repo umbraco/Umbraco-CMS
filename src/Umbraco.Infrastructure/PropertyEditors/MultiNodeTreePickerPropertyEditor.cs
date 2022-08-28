@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     ValueType = ValueTypes.Text,
     Group = Constants.PropertyEditors.Groups.Pickers,
     Icon = "icon-page-add",
-    IsReusable = true)]
+    ValueEditorIsReusable = true)]
 public class MultiNodeTreePickerPropertyEditor : DataEditor
 {
     private readonly IEditorConfigurationParser _editorConfigurationParser;

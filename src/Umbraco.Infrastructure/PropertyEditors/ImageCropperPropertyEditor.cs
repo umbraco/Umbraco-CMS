@@ -30,7 +30,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     Group = Constants.PropertyEditors.Groups.Media,
     Icon = "icon-crop",
     // TODO: test if media cropper can be made reusable
-    IsReusable = false)]
+    ValueEditorIsReusable = false)]
 public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
     INotificationHandler<ContentCopiedNotification>, INotificationHandler<ContentDeletedNotification>,
     INotificationHandler<MediaDeletedNotification>, INotificationHandler<MediaSavingNotification>,

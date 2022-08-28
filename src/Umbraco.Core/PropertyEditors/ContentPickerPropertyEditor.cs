@@ -22,7 +22,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     "contentpicker",
     ValueType = ValueTypes.String,
     Group = Constants.PropertyEditors.Groups.Pickers,
-    IsReusable = true)]
+    ValueEditorIsReusable = true)]
 public class ContentPickerPropertyEditor : DataEditor
 {
     private readonly IEditorConfigurationParser _editorConfigurationParser;

@@ -26,7 +26,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     ValueType = ValueTypes.Json,
     Group = Constants.PropertyEditors.Groups.Lists,
     Icon = "icon-thumbnail-list",
-    IsReusable = false)]
+    ValueEditorIsReusable = false)]
 public class NestedContentPropertyEditor : DataEditor
 {
     public const string ContentTypeAliasPropertyKey = "ncContentTypeAlias";

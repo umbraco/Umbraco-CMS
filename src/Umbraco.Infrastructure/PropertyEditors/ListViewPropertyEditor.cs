@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     HideLabel = true,
     Group = Constants.PropertyEditors.Groups.Lists,
     Icon = Constants.Icons.ListView,
-    IsReusable = true)]
+    ValueEditorIsReusable = true)]
 public class ListViewPropertyEditor : DataEditor
 {
     private readonly IEditorConfigurationParser _editorConfigurationParser;

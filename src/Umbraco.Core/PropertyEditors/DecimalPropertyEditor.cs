@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     "Decimal",
     "decimal",
     ValueType = ValueTypes.Decimal,
-    IsReusable = true)]
+    ValueEditorIsReusable = true)]
 public class DecimalPropertyEditor : DataEditor
 {
     /// <summary>

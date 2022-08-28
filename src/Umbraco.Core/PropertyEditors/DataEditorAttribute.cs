@@ -183,5 +183,5 @@ public sealed class DataEditorAttribute : Attribute
     ///     Gets or sets a value indicating whether the value editor can be reused (cached).
     /// </summary>
     /// <remarks>While most value editors can be reused, complex editors (e.g. block based editors) might not be applicable for reuse.</remarks>
-    public bool IsReusable { get; set; }
+    public bool ValueEditorIsReusable { get; set; }
 }
