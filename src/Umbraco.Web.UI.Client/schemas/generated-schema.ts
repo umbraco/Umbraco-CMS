@@ -119,6 +119,32 @@ export interface components {
       elementName?: string;
       alias: string;
     };
+    MetaTree: {
+      editor: string;
+      pathname: string;
+      label: string;
+      /** Format: float */
+      weight: number;
+      sections: string[];
+    };
+    IManifestTree: {
+      /** @enum {string} */
+      type: "tree";
+      meta: components["schemas"]["MetaTree"];
+      name: string;
+      js?: string;
+      elementName?: string;
+      alias: string;
+    };
+    IManifestEditor: {
+      /** @enum {string} */
+      type: "editor";
+      name: string;
+      js?: string;
+      elementName?: string;
+      meta?: { [key: string]: unknown };
+      alias: string;
+    };
     MetaPropertyEditorUI: {
       icon: string;
       group: string;
@@ -190,6 +216,8 @@ export interface components {
     };
     Manifest:
       | components["schemas"]["IManifestSection"]
+      | components["schemas"]["IManifestTree"]
+      | components["schemas"]["IManifestEditor"]
       | components["schemas"]["IManifestPropertyEditorUI"]
       | components["schemas"]["IManifestDashboard"]
       | components["schemas"]["IManifestEditorView"]

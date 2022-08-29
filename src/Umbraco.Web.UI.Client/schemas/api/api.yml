@@ -390,6 +390,71 @@ components:
         - meta
         - name
         - alias
+    MetaTree:
+      type: object
+      properties:
+        editor:
+          type: string
+        pathname:
+          type: string
+        label:
+          type: string
+        weight:
+          type: number
+          format: float
+        sections:
+          type: array
+          items:
+            type: string
+      required:
+        - editor
+        - pathname
+        - label
+        - weight
+        - sections
+    IManifestTree:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - tree
+        meta:
+          $ref: '#/components/schemas/MetaTree'
+        name:
+          type: string
+        js:
+          type: string
+        elementName:
+          type: string
+        alias:
+          type: string
+      required:
+        - type
+        - meta
+        - name
+        - alias
+    IManifestEditor:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - editor
+        name:
+          type: string
+        js:
+          type: string
+        elementName:
+          type: string
+        meta:
+          type: object
+        alias:
+          type: string
+      required:
+        - type
+        - name
+        - alias
     MetaPropertyEditorUI:
       type: object
       properties:
@@ -566,6 +631,8 @@ components:
     Manifest:
       oneOf:
         - $ref: '#/components/schemas/IManifestSection'
+        - $ref: '#/components/schemas/IManifestTree'
+        - $ref: '#/components/schemas/IManifestEditor'
         - $ref: '#/components/schemas/IManifestPropertyEditorUI'
         - $ref: '#/components/schemas/IManifestDashboard'
         - $ref: '#/components/schemas/IManifestEditorView'
@@ -576,6 +643,8 @@ components:
         propertyName: type
         mapping:
           section: '#/components/schemas/IManifestSection'
+          tree: '#/components/schemas/IManifestTree'
+          editor: '#/components/schemas/IManifestEditor'
           propertyEditorUI: '#/components/schemas/IManifestPropertyEditorUI'
           dashboard: '#/components/schemas/IManifestDashboard'
           editorView: '#/components/schemas/IManifestEditorView'

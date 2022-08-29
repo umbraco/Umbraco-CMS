@@ -14,8 +14,19 @@ import type {
 	ManifestPropertyAction,
 	ManifestPropertyEditorUI,
 	ManifestSection,
+	ManifestTree,
+	ManifestEditor,
 	ManifestCustom,
 } from '../models';
+
+// TODO: add to schema
+export type ManifestBase = {
+	alias: string;
+	name: string;
+	js?: string | (() => Promise<unknown>);
+	elementName?: string;
+};
+
 export class UmbExtensionRegistry {
 	private _extensions = new BehaviorSubject<Array<ManifestTypes>>([]);
 	public readonly extensions = this._extensions.asObservable();

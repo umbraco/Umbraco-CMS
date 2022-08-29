@@ -13,6 +13,8 @@ export class Manifests {
 
 export type Manifest =
 	| IManifestSection
+	| IManifestTree
+	| IManifestEditor
 	| IManifestPropertyEditorUI
 	| IManifestDashboard
 	| IManifestEditorView
@@ -22,6 +24,8 @@ export type Manifest =
 
 export type ManifestStandardTypes =
 	| 'section'
+	| 'tree'
+	| 'editor'
 	| 'propertyEditorUI'
 	| 'dashboard'
 	| 'editorView'
@@ -40,6 +44,14 @@ export interface IManifest {
 export interface MetaSection {
 	pathname: string;
 	weight: number;
+}
+
+export interface MetaTree {
+	editor: string;
+	pathname: string;
+	label: string;
+	weight: number;
+	sections: Array<string>;
 }
 
 export interface MetaPropertyEditorUI {
@@ -81,6 +93,15 @@ export interface IManifestElement extends IManifest {
 export interface IManifestSection extends IManifestElement {
 	type: 'section';
 	meta: MetaSection;
+}
+
+export interface IManifestTree extends IManifestElement {
+	type: 'tree';
+	meta: MetaTree;
+}
+
+export interface IManifestEditor extends IManifestElement {
+	type: 'editor';
 }
 
 export interface IManifestPropertyEditorUI extends IManifestElement {

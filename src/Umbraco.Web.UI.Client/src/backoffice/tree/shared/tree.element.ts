@@ -1,19 +1,20 @@
 import { CSSResultGroup, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
-import { createExtensionElement, UmbExtensionManifestTree } from '../../../core/extension';
+import { createExtensionElement } from '../../../core/extension';
+import type { ManifestTree } from '../../../core/models';
 
 @customElement('umb-tree')
 export class UmbTree extends LitElement {
 	static styles: CSSResultGroup = [UUITextStyles];
 
-	private _tree?: UmbExtensionManifestTree;
+	private _tree?: ManifestTree;
 
 	@property({ type: Object })
-	public get tree(): UmbExtensionManifestTree | undefined {
+	public get tree(): ManifestTree | undefined {
 		return this._tree;
 	}
-	public set tree(value: UmbExtensionManifestTree | undefined) {
+	public set tree(value: ManifestTree | undefined) {
 		this._tree = value;
 		this._createElement();
 	}

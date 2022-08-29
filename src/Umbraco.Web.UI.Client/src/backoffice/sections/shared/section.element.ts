@@ -3,13 +3,9 @@ import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { Subscription, map, switchMap, EMPTY, of } from 'rxjs';
 import { UmbContextConsumerMixin } from '../../../core/context';
-import {
-	createExtensionElement,
-	UmbExtensionManifestEditor,
-	UmbExtensionManifestTree,
-	UmbExtensionRegistry,
-} from '../../../core/extension';
+import { createExtensionElement, UmbExtensionRegistry } from '../../../core/extension';
 import { UmbSectionContext } from '../section.context';
+import type { ManifestTree, ManifestEditor } from '../../../core/models';
 
 import '../shared/section-trees.element.ts';
 
@@ -30,9 +26,9 @@ export class UmbSectionElement extends UmbContextConsumerMixin(LitElement) {
 	private _routes: Array<any> = [];
 
 	@state()
-	private _trees?: Array<UmbExtensionManifestTree>;
+	private _trees?: Array<ManifestTree>;
 
-	private _editors?: Array<UmbExtensionManifestEditor>;
+	private _editors?: Array<ManifestEditor>;
 	private _editorsSubscription?: Subscription;
 
 	private _sectionContext?: UmbSectionContext;
