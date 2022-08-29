@@ -5,6 +5,7 @@ using NPoco;
 using NPoco.FluentMappings;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
@@ -31,7 +32,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence;
 // TODO: this class needs not be disposable!
 public class UmbracoDatabaseFactory : DisposableObjectSlim, IUmbracoDatabaseFactory
 {
-    private readonly DatabaseSchemaCreatorFactory _databaseSchemaCreatorFactory;
+    private readonly IDatabaseInfo _databaseInfo;
     private readonly IDbProviderFactoryCreator _dbProviderFactoryCreator;
     private readonly IOptions<GlobalSettings> _globalSettings;
     private readonly ILogger<UmbracoDatabaseFactory> _logger;
@@ -68,15 +69,15 @@ public class UmbracoDatabaseFactory : DisposableObjectSlim, IUmbracoDatabaseFact
         IOptionsMonitor<ConnectionStrings> connectionStrings,
         IMapperCollection mappers,
         IDbProviderFactoryCreator dbProviderFactoryCreator,
-        DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory,
+        IDatabaseInfo databaseInfo,
         NPocoMapperCollection npocoMappers)
     {
         _globalSettings = globalSettings;
         _mappers = mappers ?? throw new ArgumentNullException(nameof(mappers));
         _dbProviderFactoryCreator = dbProviderFactoryCreator ??
                                     throw new ArgumentNullException(nameof(dbProviderFactoryCreator));
-        _databaseSchemaCreatorFactory = databaseSchemaCreatorFactory ??
-                                        throw new ArgumentNullException(nameof(databaseSchemaCreatorFactory));
+        _databaseInfo = databaseInfo ??
+                                        throw new ArgumentNullException(nameof(databaseInfo));
         _npocoMappers = npocoMappers;
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _loggerFactory = loggerFactory;
@@ -285,7 +286,7 @@ public class UmbracoDatabaseFactory : DisposableObjectSlim, IUmbracoDatabaseFact
             DbProviderFactory,
             _loggerFactory.CreateLogger<UmbracoDatabase>(),
             _bulkSqlInsertProvider,
-            _databaseSchemaCreatorFactory,
+            _databaseInfo,
             _pocoMappers);
     }
 

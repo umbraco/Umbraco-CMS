@@ -53,9 +53,8 @@ public class DatabaseConfigureStep : InstallSetupStep<DatabaseModel>
             try
             {
                 // Since a connection string was present we verify the db can connect and query
-                _databaseBuilder.ValidateSchema();
+                return _databaseBuilder.DetermineHasInstalledVersion()!;
 
-                return false;
             }
             catch (Exception ex)
             {

@@ -69,8 +69,4 @@
   <ItemGroup>
     <EmbeddedResource Include="EmbeddedResources\**\*" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Persistence\Dtos" />
-  </ItemGroup>
 </Project>

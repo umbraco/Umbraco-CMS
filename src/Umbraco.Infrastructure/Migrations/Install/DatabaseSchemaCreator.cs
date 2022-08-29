@@ -1,5 +1,4 @@
 using System.Data.SqlTypes;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NPoco;
@@ -17,10 +16,20 @@ using ColumnInfo = Umbraco.Cms.Infrastructure.Persistence.SqlSyntax.ColumnInfo;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Install;
 
+public interface IDatabaseSchemaCreator
+{
+    /// <summary>
+    ///     Initializes the database by creating the umbraco db schema.
+    /// </summary>
+    /// <remarks>This needs to execute as part of a transaction.</remarks>
+    Task InitializeDatabaseSchema();
+}
+
 /// <summary>
 ///     Creates the initial database schema during install.
 /// </summary>
-public class DatabaseSchemaCreator
+
+public class DatabaseSchemaCreator : IDatabaseSchemaCreator
 {
     // all tables, in order
     internal static readonly List<Type> _orderedTables = new()
@@ -149,7 +158,7 @@ public class DatabaseSchemaCreator
     ///     Initializes the database by creating the umbraco db schema.
     /// </summary>
     /// <remarks>This needs to execute as part of a transaction.</remarks>
-    public void InitializeDatabaseSchema()
+    public Task InitializeDatabaseSchema()
     {
         if (!_database.InTransaction)
         {
@@ -175,12 +184,14 @@ public class DatabaseSchemaCreator
         DatabaseSchemaCreatedNotification createdNotification =
             new DatabaseSchemaCreatedNotification(eventMessages).WithStateFrom(creatingNotification);
         FireAfterCreation(createdNotification);
+
+        return Task.CompletedTask;
     }
 
     /// <summary>
     ///     Validates the schema of the current database.
     /// </summary>
-    internal DatabaseSchemaResult ValidateSchema() => ValidateSchema(_orderedTables);
+    private DatabaseSchemaResult ValidateSchema() => ValidateSchema(_orderedTables);
 
     internal DatabaseSchemaResult ValidateSchema(IEnumerable<Type> orderedTables)
     {
@@ -537,6 +548,11 @@ public class DatabaseSchemaCreator
     {
         var sql = new Sql(string.Format(SqlSyntax.DropTable, SqlSyntax.GetQuotedTableName(tableName)));
         _database.Execute(sql);
+    }
+
+    public Task<bool> IsUmbracoInstalled()
+    {
+        return Task.FromResult(ValidateSchema().ValidTables.Count > 0);
     }
 
     #endregion

@@ -7,10 +7,15 @@ using Umbraco.Cms.Infrastructure.Persistence;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Install;
 
+public interface IDatabaseSchemaCreatorFactory
+{
+    IDatabaseSchemaCreator Create(IUmbracoDatabase? database);
+}
+
 /// <summary>
 ///     Creates the initial database schema during install.
 /// </summary>
-public class DatabaseSchemaCreatorFactory
+public class DatabaseSchemaCreatorFactory : IDatabaseSchemaCreatorFactory
 {
     private readonly IEventAggregator _eventAggregator;
     private readonly IOptionsMonitor<InstallDefaultDataSettings> _installDefaultDataSettings;
@@ -32,6 +37,6 @@ public class DatabaseSchemaCreatorFactory
             _installDefaultDataSettings = installDefaultDataSettings;
         }
 
-    public DatabaseSchemaCreator Create(IUmbracoDatabase? database) => new DatabaseSchemaCreator(database, _logger,
+    public IDatabaseSchemaCreator Create(IUmbracoDatabase? database) => new DatabaseSchemaCreator(database, _logger,
         _loggerFactory, _umbracoVersion, _eventAggregator, _installDefaultDataSettings);
 }

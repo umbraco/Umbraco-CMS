@@ -3,7 +3,9 @@ using System.Data.Common;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using NPoco;
+using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
+using Umbraco.Cms.Infrastructure.Runtime;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence;
@@ -22,7 +24,7 @@ public class UmbracoDatabase : Database, IUmbracoDatabase
 {
     private readonly ILogger<UmbracoDatabase> _logger;
     private readonly IBulkSqlInsertProvider? _bulkSqlInsertProvider;
-    private readonly DatabaseSchemaCreatorFactory? _databaseSchemaCreatorFactory;
+    private readonly IDatabaseInfo _databaseInfo;
     private readonly IEnumerable<IMapper>? _mapperCollection;
     private readonly Guid _instanceGuid = Guid.NewGuid();
     private List<CommandInfo>? _commands;
@@ -42,33 +44,15 @@ public class UmbracoDatabase : Database, IUmbracoDatabase
         DbProviderFactory provider,
         ILogger<UmbracoDatabase> logger,
         IBulkSqlInsertProvider? bulkSqlInsertProvider,
-        DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory,
+        IDatabaseInfo databaseInfo,
         IEnumerable<IMapper>? mapperCollection = null)
         : base(connectionString, sqlContext.DatabaseType, provider, sqlContext.SqlSyntax.DefaultIsolationLevel)
     {
         SqlContext = sqlContext;
         _logger = logger;
         _bulkSqlInsertProvider = bulkSqlInsertProvider;
-        _databaseSchemaCreatorFactory = databaseSchemaCreatorFactory;
+        _databaseInfo = databaseInfo;
         _mapperCollection = mapperCollection;
-
-        Init();
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="UmbracoDatabase" /> class.
-    /// </summary>
-    /// <remarks>Internal for unit tests only.</remarks>
-    internal UmbracoDatabase(
-        DbConnection connection,
-        ISqlContext sqlContext,
-        ILogger<UmbracoDatabase> logger,
-        IBulkSqlInsertProvider bulkSqlInsertProvider)
-        : base(connection, sqlContext.DatabaseType, sqlContext.SqlSyntax.DefaultIsolationLevel)
-    {
-        SqlContext = sqlContext;
-        _logger = logger;
-        _bulkSqlInsertProvider = bulkSqlInsertProvider;
 
         Init();
     }
@@ -168,21 +152,15 @@ public class UmbracoDatabase : Database, IUmbracoDatabase
     public int BulkInsertRecords<T>(IEnumerable<T> records) =>
         _bulkSqlInsertProvider?.BulkInsertRecords(this, records) ?? 0;
 
-    /// <summary>
-    ///     Returns the <see cref="DatabaseSchemaResult" /> for the database
-    /// </summary>
-    public DatabaseSchemaResult ValidateSchema()
-    {
-        DatabaseSchemaCreator? dbSchema = _databaseSchemaCreatorFactory?.Create(this);
-        DatabaseSchemaResult? databaseSchemaValidationResult = dbSchema?.ValidateSchema();
-
-        return databaseSchemaValidationResult ?? new DatabaseSchemaResult();
-    }
 
     /// <summary>
     ///     Returns true if Umbraco database tables are detected to be installed
     /// </summary>
-    public bool IsUmbracoInstalled() => ValidateSchema().DetermineHasInstalledVersion();
+    public bool IsUmbracoInstalled()
+    {
+        return _databaseInfo.IsUmbracoInstalledAsync().GetAwaiter().GetResult();
+
+    }
 
     #endregion
 

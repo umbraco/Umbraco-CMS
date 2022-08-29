@@ -79,8 +79,7 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
             {
                 // A connection string was present, determine whether this is an install/upgrade
                 // Return true (upgrade) if there is an installed version, else false (install)
-                DatabaseSchemaResult? result = _databaseBuilder.ValidateSchema();
-                return result?.DetermineHasInstalledVersion() ?? false;
+                return _databaseBuilder.DetermineHasInstalledVersion();
             }
 
             // No connection string configured, probably a fresh install

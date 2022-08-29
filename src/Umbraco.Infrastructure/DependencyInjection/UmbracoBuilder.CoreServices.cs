@@ -25,6 +25,7 @@ using Umbraco.Cms.Core.Migrations;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Packaging;
+using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.PublishedCache;
@@ -263,8 +264,8 @@ public static partial class UmbracoBuilderExtensions
             IHostingEnvironment hostingEnvironment = factory.GetRequiredService<IHostingEnvironment>();
 
             IDbProviderFactoryCreator dbCreator = factory.GetRequiredService<IDbProviderFactoryCreator>();
-            DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory =
-                factory.GetRequiredService<DatabaseSchemaCreatorFactory>();
+            IDatabaseInfo databaseInfo =
+                factory.GetRequiredService<IDatabaseInfo>();
             ILoggerFactory loggerFactory = factory.GetRequiredService<ILoggerFactory>();
             NPocoMapperCollection npocoMappers = factory.GetRequiredService<NPocoMapperCollection>();
             IMainDomKeyGenerator mainDomKeyGenerator = factory.GetRequiredService<IMainDomKeyGenerator>();
@@ -278,7 +279,7 @@ public static partial class UmbracoBuilderExtensions
                         connectionStrings,
                         dbCreator,
                         mainDomKeyGenerator,
-                        databaseSchemaCreatorFactory,
+                        databaseInfo,
                         npocoMappers);
 
                 case "MainDomSemaphoreLock":

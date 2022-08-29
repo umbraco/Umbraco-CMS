@@ -4,6 +4,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
@@ -17,7 +18,7 @@ namespace Umbraco.Cms.Tests.Integration.Testing;
 public class TestUmbracoDatabaseFactoryProvider
 {
     private readonly IOptionsMonitor<ConnectionStrings> _connectionStrings;
-    private readonly DatabaseSchemaCreatorFactory _databaseSchemaCreatorFactory;
+    private readonly IDatabaseInfo _databaseInfo;
     private readonly IDbProviderFactoryCreator _dbProviderFactoryCreator;
     private readonly IOptions<GlobalSettings> _globalSettings;
     private readonly ILoggerFactory _loggerFactory;
@@ -30,7 +31,7 @@ public class TestUmbracoDatabaseFactoryProvider
         IOptionsMonitor<ConnectionStrings> connectionStrings,
         IMapperCollection mappers,
         IDbProviderFactoryCreator dbProviderFactoryCreator,
-        DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory,
+        IDatabaseInfo databaseInfo,
         NPocoMapperCollection npocoMappers)
     {
         _loggerFactory = loggerFactory;
@@ -38,7 +39,7 @@ public class TestUmbracoDatabaseFactoryProvider
         _connectionStrings = connectionStrings;
         _mappers = mappers;
         _dbProviderFactoryCreator = dbProviderFactoryCreator;
-        _databaseSchemaCreatorFactory = databaseSchemaCreatorFactory;
+        _databaseInfo = databaseInfo;
         _npocoMappers = npocoMappers;
     }
 
@@ -50,6 +51,6 @@ public class TestUmbracoDatabaseFactoryProvider
             _connectionStrings,
             _mappers,
             _dbProviderFactoryCreator,
-            _databaseSchemaCreatorFactory,
+            _databaseInfo,
             _npocoMappers);
 }
