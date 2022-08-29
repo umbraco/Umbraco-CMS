@@ -463,7 +463,7 @@
             }
         }
 
-        unsubscribe.push($scope.$watch(() => vm.model.value.length, onAmountOfMediaChanged));
+        unsubscribe.push($scope.$watch(() => vm.model.value?.length || 0, onAmountOfMediaChanged));
 
         $scope.$on("$destroy", function () {
             for (const subscription of unsubscribe) {
