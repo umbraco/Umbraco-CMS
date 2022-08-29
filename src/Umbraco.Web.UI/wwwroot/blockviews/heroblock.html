@@ -1,0 +1,31 @@
+<style>
+
+    :host {
+        position: relative;
+        border-radius: 3px;
+        height: 100%;/* Add this to fill the cell fully */
+        min-height: 320px;
+        box-sizing: border-box;
+    }
+    
+    img {
+        position: absolute;
+        object-fit: cover;
+        height: 100%;
+        width: 100%;
+        pointer-events: none;
+    }
+
+    /*
+    Push one column in..
+    slot[name='areas'] {
+        
+    }
+    */
+
+</style>
+
+<div ng-controller="Umbraco.PropertyEditors.BlockEditor.HeroBlockEditor as bc">
+    <img ng-if="bc.isImage" ng-src="{{bc.imageSource}}" alt="{{bc.mediaName}}" />
+</div>
+<slot name="areas" part="areas"></slot>
