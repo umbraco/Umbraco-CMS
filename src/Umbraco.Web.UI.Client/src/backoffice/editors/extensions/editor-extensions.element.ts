@@ -1,15 +1,19 @@
+import '../shared/editor-entity/editor-entity.element';
+
 import { html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { Subscription } from 'rxjs';
-import { UmbContextConsumerMixin } from '../../../core/context';
-import { UmbExtensionManifest, UmbExtensionRegistry } from '../../../core/extension';
 
-import '../shared/editor-entity/editor-entity.element';
+import { UmbContextConsumerMixin } from '../../../core/context';
+import { UmbExtensionRegistry } from '../../../core/extension';
+import { isManifestElementType } from '../../../core/extension/is-extension.function';
+
+import type { ManifestTypes } from '../../../core/models';
 
 @customElement('umb-editor-extensions')
 export class UmbEditorExtensionsElement extends UmbContextConsumerMixin(LitElement) {
 	@state()
-	private _extensions: Array<UmbExtensionManifest> = [];
+	private _extensions: Array<ManifestTypes> = [];
 
 	private _extensionRegistry?: UmbExtensionRegistry;
 	private _extensionsSubscription?: Subscription;
@@ -62,7 +66,9 @@ export class UmbEditorExtensionsElement extends UmbContextConsumerMixin(LitEleme
 							(extension) => html`
 								<uui-table-row>
 									<uui-table-cell>${extension.type}</uui-table-cell>
-									<uui-table-cell>${extension.name}</uui-table-cell>
+									<uui-table-cell>
+										${isManifestElementType(extension) ? extension.name : 'Custom extension'}
+									</uui-table-cell>
 									<uui-table-cell>${extension.alias}</uui-table-cell>
 								</uui-table-row>
 							`

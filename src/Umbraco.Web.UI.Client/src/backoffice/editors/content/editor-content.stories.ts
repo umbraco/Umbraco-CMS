@@ -1,10 +1,11 @@
+import './editor-content.element';
+
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit-html';
 
-import { UmbEditorContentElement } from './editor-content.element';
-import './editor-content.element';
-
 import { data } from '../../../mocks/data/node.data';
+
+import type { UmbEditorContentElement } from './editor-content.element';
 
 export default {
 	title: 'Editors/Content',

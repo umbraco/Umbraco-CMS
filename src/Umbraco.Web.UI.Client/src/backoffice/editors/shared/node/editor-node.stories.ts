@@ -1,10 +1,11 @@
+import './editor-node.element';
+
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit-html';
 
-import { UmbEditorNodeElement } from './editor-node.element';
-import './editor-node.element';
-
 import { data } from '../../../../mocks/data/node.data';
+
+import type { UmbEditorNodeElement } from './editor-node.element';
 
 export default {
 	title: 'Editors/Shared/Node',

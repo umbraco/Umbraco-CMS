@@ -1,13 +1,15 @@
+import '../property-actions/property-action-menu/property-action-menu.element';
+
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement, PropertyValueMap } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { distinctUntilChanged, EMPTY, of, Subscription, switchMap } from 'rxjs';
+
 import { UmbContextConsumerMixin } from '../../core/context';
-import { createExtensionElement, UmbExtensionManifest, UmbExtensionRegistry } from '../../core/extension';
+import { createExtensionElement, UmbExtensionRegistry } from '../../core/extension';
+import type { ManifestPropertyEditorUI } from '../../core/models';
 import { UmbDataTypeStore } from '../../core/stores/data-type.store';
 import { DataTypeEntity } from '../../mocks/data/data-type.data';
-
-import '../property-actions/property-action-menu/property-action-menu.element';
 
 @customElement('umb-node-property')
 class UmbNodeProperty extends UmbContextConsumerMixin(LitElement) {
@@ -94,16 +96,16 @@ class UmbNodeProperty extends UmbContextConsumerMixin(LitElement) {
 						return this._extensionRegistry?.getByAlias(dataTypeEntity.propertyEditorUIAlias) ?? of(null);
 					})
 				)
-				.subscribe((propertyEditorUI) => {
-					if (propertyEditorUI) {
-						this._gotData(propertyEditorUI);
+				.subscribe((extension) => {
+					if (extension?.type === 'propertyEditorUI') {
+						this._gotData(extension);
 					}
 					// TODO: If gone what then...
 				});
 		}
 	}
 
-	private _gotData(_propertyEditorUI?: UmbExtensionManifest) {
+	private _gotData(_propertyEditorUI?: ManifestPropertyEditorUI) {
 		if (!this._dataType || !_propertyEditorUI) {
 			// TODO: if dataTypeKey didn't exist in store, we should do some nice UI.
 			return;

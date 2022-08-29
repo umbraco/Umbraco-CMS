@@ -2,11 +2,13 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { IRoutingInfo } from 'router-slot';
-import { map, Subscription, first } from 'rxjs';
+import { first, map, Subscription } from 'rxjs';
 
 import { UmbContextConsumerMixin } from '../../../core/context';
-import { createExtensionElement, UmbExtensionManifestDashboard, UmbExtensionRegistry } from '../../../core/extension';
+import { createExtensionElement, UmbExtensionRegistry } from '../../../core/extension';
 import { UmbSectionContext } from '../section.context';
+
+import type { ManifestDashboard } from '../../../core/models';
 
 @customElement('umb-section-dashboards')
 export class UmbSectionDashboards extends UmbContextConsumerMixin(LitElement) {
@@ -33,7 +35,7 @@ export class UmbSectionDashboards extends UmbContextConsumerMixin(LitElement) {
 	];
 
 	@state()
-	private _dashboards: Array<UmbExtensionManifestDashboard> = [];
+	private _dashboards: Array<ManifestDashboard> = [];
 
 	@state()
 	private _currentDashboardPathname = '';
@@ -104,7 +106,7 @@ export class UmbSectionDashboards extends UmbContextConsumerMixin(LitElement) {
 			return {
 				path: `${dashboard.meta.pathname}`,
 				component: () => createExtensionElement(dashboard),
-				setup: (_element: UmbExtensionManifestDashboard, info: IRoutingInfo) => {
+				setup: (_element: ManifestDashboard, info: IRoutingInfo) => {
 					this._currentDashboardPathname = info.match.route.path;
 				},
 			};
@@ -122,7 +124,7 @@ export class UmbSectionDashboards extends UmbContextConsumerMixin(LitElement) {
 				? html`
 						<uui-tab-group id="tabs">
 							${this._dashboards.map(
-								(dashboard: UmbExtensionManifestDashboard) => html`
+								(dashboard) => html`
 									<uui-tab
 										href="${`/section/${this._currentSectionPathname}/dashboard/${dashboard.meta.pathname}`}"
 										label=${dashboard.meta.label || dashboard.name}
