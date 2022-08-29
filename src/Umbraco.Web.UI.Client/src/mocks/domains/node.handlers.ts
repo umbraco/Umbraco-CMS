@@ -4,7 +4,7 @@ import { NodeEntity, umbNodeData } from '../data/node.data';
 
 // TODO: add schema
 export const handlers = [
-	rest.get('/umbraco/backoffice/content/:key', (req, res, ctx) => {
+	rest.get('/umbraco/backoffice/node/:key', (req, res, ctx) => {
 		console.warn('Please move to schema');
 		const key = req.params.key as string;
 		if (!key) return;
@@ -14,7 +14,7 @@ export const handlers = [
 		return res(ctx.status(200), ctx.json([document]));
 	}),
 
-	rest.post<NodeEntity[]>('/umbraco/backoffice/content/save', (req, res, ctx) => {
+	rest.post<NodeEntity[]>('/umbraco/backoffice/node/save', (req, res, ctx) => {
 		console.warn('Please move to schema');
 		const data = req.body;
 		if (!data) return;
