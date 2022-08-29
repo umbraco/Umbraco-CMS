@@ -3,35 +3,26 @@
   <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))"/>
 
   <PropertyGroup>
-    <Version>10.0.0</Version>
-    <AssemblyVersion>10.0.0</AssemblyVersion>
-    <InformationalVersion>10.0.0-rc1</InformationalVersion>
-    <FileVersion>10.0.0</FileVersion>
-    <LangVersion Condition="'$(LangVersion)' == ''">preview</LangVersion>
-    <NeutralLanguage>en-US</NeutralLanguage>
-    <Company>Umbraco CMS</Company>
-    <Copyright>Copyright © Umbraco 2021</Copyright>
-    <Authors>Umbraco HQ</Authors>
+    <Company>Umbraco HQ</Company>
+    <Authors>Umbraco</Authors>
+    <Copyright>Copyright © Umbraco $([System.DateTime]::Today.ToString('yyyy'))</Copyright>
+    <Product>Umbraco CMS</Product>
     <PackageProjectUrl>https://umbraco.com/</PackageProjectUrl>
     <PackageIconUrl>https://umbraco.com/dist/nuget/logo-small.png</PackageIconUrl>
-    <PackageLicenseUrl>https://opensource.org/licenses/MIT</PackageLicenseUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageTags>umbraco</PackageTags>
-    <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>https://github.com/umbraco/umbraco-cms</RepositoryUrl>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <LangVersion Condition="'$(LangVersion)' == ''">preview</LangVersion>
     <Nullable>enable</Nullable>
-    <WarningsAsErrors>Nullable</WarningsAsErrors>
+    <WarningsAsErrors>nullable</WarningsAsErrors>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <!-- SourceLink -->
   <PropertyGroup>
-    <!-- SourceLink: Publish the repository URL in the built .nupkg (in the NuSpec <Repository> element)-->
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
-
-    <!-- SourceLink: Embed source files that are not tracked by the source control manager in the PDB -->
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
-
-    <!-- SourceLink: Build symbol package (.snupkg) to distribute the PDB containing Source Link -->
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>

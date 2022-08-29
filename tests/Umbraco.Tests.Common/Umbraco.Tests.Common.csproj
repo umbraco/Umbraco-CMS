@@ -1,11 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <PackageId>Umbraco.Cms.Tests</PackageId>
+    <Title>Umbraco CMS - Test tools</Title>
+    <Description>Contains commonly used tools to write tests for Umbraco CMS, such as various builders for content etc.</Description>
     <TargetFramework>net7.0</TargetFramework>
     <IsPackable>true</IsPackable>
     <RootNamespace>Umbraco.Cms.Tests.Common</RootNamespace>
-    <PackageId>Umbraco.Cms.Tests</PackageId>
-    <Title>Umbraco CMS Test Tools</Title>
-    <Description>Contains commonly used tools to write tests for Umbraco CMS, such as various builders for content etc.</Description>
   </PropertyGroup>
 
   <ItemGroup>

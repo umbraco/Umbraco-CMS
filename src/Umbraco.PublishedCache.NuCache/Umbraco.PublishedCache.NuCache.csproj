@@ -1,10 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <PackageId>Umbraco.Cms.PublishedCache.NuCache</PackageId>
+    <Title>Umbraco CMS - Published cache - NuCache</Title>
+    <Description>Contains the published cache assembly needed to run Umbraco CMS.</Description>
     <TargetFramework>net7.0</TargetFramework>
     <RootNamespace>Umbraco.Cms.Infrastructure.PublishedCache</RootNamespace>
-    <PackageId>Umbraco.Cms.PublishedCache.NuCache</PackageId>
-    <Title>Umbraco CMS Published Cache</Title>
-    <Description>Contains the Published Cache assembly needed to run Umbraco Cms. This package only contains the assembly, and can be used for package development. Use the template in the Umbraco.Templates package to setup Umbraco</Description>
   </PropertyGroup>
 
   <ItemGroup>

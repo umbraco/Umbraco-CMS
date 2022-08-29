@@ -1,10 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk.Razor">
   <PropertyGroup>
+    <Title>Umbraco CMS - Static assets</Title>
+    <Description>Contains the static assets needed to run Umbraco CMS.</Description>
     <TargetFramework>net7.0</TargetFramework>
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
     <StaticWebAssetBasePath>/</StaticWebAssetBasePath>
-    <PackageId>Umbraco.Cms.StaticAssets</PackageId>
-    <Description>Contains the static assets that is required to run Umbraco CMS.</Description>
   </PropertyGroup>
 
   <ItemGroup>

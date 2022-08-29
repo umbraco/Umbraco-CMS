@@ -1,10 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <PackageId>Umbraco.Cms.Examine.Lucene</PackageId>
+    <Title>Umbraco CMS - Examine - Lucene</Title>
+    <Description>Adds Examine searching support using Lucene to Umbraco CMS.</Description>
     <TargetFramework>net7.0</TargetFramework>
     <RootNamespace>Umbraco.Cms.Infrastructure.Examine</RootNamespace>
-    <PackageId>Umbraco.Cms.Examine.Lucene</PackageId>
-    <Product>Umbraco CMS</Product>
-    <Title>Umbraco.Examine.Lucene</Title>
   </PropertyGroup>
 
   <ItemGroup>

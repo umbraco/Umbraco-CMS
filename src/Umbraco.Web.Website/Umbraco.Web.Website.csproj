@@ -1,11 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <PackageId>Umbraco.Cms.Web.Website</PackageId>
+    <Title>Umbraco CMS - Web - Website</Title>
+    <Description>Contains the website assembly needed to run the frontend of Umbraco CMS.</Description>
     <TargetFramework>net7.0</TargetFramework>
     <OutputType>Library</OutputType>
     <RootNamespace>Umbraco.Cms.Web.Website</RootNamespace>
-    <PackageId>Umbraco.Cms.Web.Website</PackageId>
-    <Title>Umbraco CMS Website</Title>
-    <Description>Contains the Website assembly needed to run Umbraco Cms (Front office). This package only contains the assembly, and can be used for package development. Use the template in the Umbraco.Templates package to setup Umbraco</Description>
   </PropertyGroup>
 
   <ItemGroup>

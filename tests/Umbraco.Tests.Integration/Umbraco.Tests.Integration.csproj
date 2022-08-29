@@ -1,12 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <PackageId>Umbraco.Cms.Tests.Integration</PackageId>
+    <Title>Umbraco CMS - Integration tests</Title>
+    <Description>Contains helper classes for integration tests with Umbraco CMS, including all internal integration tests.</Description>
     <TargetFramework>net7.0</TargetFramework>
     <IsPackable>true</IsPackable>
     <IsTestProject>true</IsTestProject>
     <RootNamespace>Umbraco.Cms.Tests.Integration</RootNamespace>
-    <PackageId>Umbraco.Cms.Tests.Integration</PackageId>
-    <Title>Umbraco CMS Integration Tests</Title>
-    <Description>Contains helper classes for integration tests with Umbraco, including all internal integration tests.</Description>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(OS)' == 'Windows_NT'">

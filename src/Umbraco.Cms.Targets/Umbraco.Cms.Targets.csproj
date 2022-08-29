@@ -1,11 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <Title>Umbraco CMS</Title>
+    <Description>Installs Umbraco CMS with minimal dependencies in your ASP.NET Core project.</Description>
     <TargetFramework>net7.0</TargetFramework>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <IncludeSymbols>false</IncludeSymbols>
-    <PackageId>Umbraco.Cms.Targets</PackageId>
-    <Title>Umbraco.Cms.Targets</Title>
-    <Description>Installs Umbraco CMS with minimal dependencies in your ASP.NET Core project</Description>
   </PropertyGroup>
 
   <ItemGroup>
