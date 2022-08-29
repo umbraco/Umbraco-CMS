@@ -91,6 +91,22 @@ export const data: Array<Entity> = [
 		hasChildren: false,
 		type: 'dataType',
 	},
+	{
+		id: 99,
+		key: 'd81c7957-153c-4b5a-aa6f-b434a4964624',
+		name: 'Document Type 1',
+		type: 'documentType',
+		hasChildren: false,
+		parentKey: '055a17d0-525a-4d06-9f75-92dc174ab0bd',
+	},
+	{
+		id: 100,
+		key: 'a99e4018-3ffc-486b-aa76-eecea9593d17',
+		name: 'Document Type 2',
+		type: 'documentType',
+		hasChildren: false,
+		parentKey: '055a17d0-525a-4d06-9f75-92dc174ab0bd',
+	},
 ];
 
 // Temp mocked database

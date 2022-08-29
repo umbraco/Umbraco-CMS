@@ -259,13 +259,13 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		alias: 'Umb.Tree.DocumentTypes',
 		name: 'Document Types Tree',
 		elementName: 'umb-document-type-tree',
-		loader: () => import('./backoffice/tree/document-types/document-type-tree.element'),
+		loader: () => import('./backoffice/tree/document-types/tree-document-types.element'),
 		meta: {
 			pathname: 'document-types',
 			editor: 'Umb.Editor.DocumentType',
 			label: 'Document Types',
 			weight: -10,
-			sections: ['Umb.Section.Content', 'Umb.Section.Settings'],
+			sections: ['Umb.Section.Settings'],
 		},
 	},
 	{
@@ -315,13 +315,19 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 	{
 		type: 'editor',
 		alias: 'Umb.Editor.MemberGroup',
-		name: 'Member Group',
+		name: 'Member Group Editor',
 		loader: () => import('./backoffice/editors/member-group/editor-member-group.element'),
 	},
 	{
 		type: 'editor',
 		alias: 'Umb.Editor.DataType',
-		name: 'Member Group',
+		name: 'Data Type Editor',
 		loader: () => import('./backoffice/editors/data-type/editor-data-type.element'),
+	},
+	{
+		type: 'editor',
+		alias: 'Umb.Editor.DocumentType',
+		name: 'Document Type Editor',
+		loader: () => import('./backoffice/editors/document-type/editor-document-type.element'),
 	},
 ];

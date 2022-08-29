@@ -38,7 +38,7 @@ export class UmbEditorDocumentTypeElement extends UmbContextProviderMixin(UmbCon
 	];
 
 	@property()
-	id!: string;
+	entityKey!: string;
 
 	@state()
 	private _documentType?: DocumentTypeEntity;
@@ -74,7 +74,7 @@ export class UmbEditorDocumentTypeElement extends UmbContextProviderMixin(UmbCon
 
 		// TODO: This should be done in a better way, but for now it works.
 		this._documentTypeStoreSubscription = this._documentTypeStore
-			?.getById(parseInt(this.id))
+			?.getByKey(this.entityKey)
 			.subscribe((documentType) => {
 				if (!documentType) return; // TODO: Handle nicely if there is no document type
 

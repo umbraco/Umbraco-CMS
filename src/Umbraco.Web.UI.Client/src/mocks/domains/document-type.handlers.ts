@@ -4,12 +4,11 @@ import { DocumentTypeEntity, umbDocumentTypeData } from '../data/document-type.d
 
 // TODO: add schema
 export const handlers = [
-	rest.get('/umbraco/backoffice/document-type/:id', (req, res, ctx) => {
-		const id = req.params.id as string;
-		if (!id) return;
+	rest.get('/umbraco/backoffice/document-type/:key', (req, res, ctx) => {
+		const key = req.params.key as string;
+		if (!key) return;
 
-		const int = parseInt(id);
-		const document = umbDocumentTypeData.getById(int);
+		const document = umbDocumentTypeData.getByKey(key);
 
 		return res(ctx.status(200), ctx.json([document]));
 	}),
