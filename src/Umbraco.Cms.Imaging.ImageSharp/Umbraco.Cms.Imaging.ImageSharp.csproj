@@ -3,6 +3,8 @@
     <Title>Umbraco CMS - Imaging - ImageSharp</Title>
     <Description>Adds imaging support using ImageSharp/ImageSharp.Web to Umbraco CMS.</Description>
     <TargetFramework>net7.0</TargetFramework>
+    <!-- TODO: Enable when final version is shipped (because there's currently no previous version) -->
+    <EnablePackageValidation>false</EnablePackageValidation>
   </PropertyGroup>
 
   <ItemGroup>

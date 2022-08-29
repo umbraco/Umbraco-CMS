@@ -28,18 +28,16 @@
   </PropertyGroup>
 
   <!-- SourceLink: Deterministic -->
-  <!-- https://github.com/clairernovotny/DeterministicBuilds -->
-  <!-- Only for Azure Pipelines CI Build -->
   <PropertyGroup Condition="'$(TF_BUILD)' == 'true'">
     <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
   </PropertyGroup>
 
   <!-- Package Validation -->
-<!--  TODO - Introduce when v11 is shipped-->
-<!--  <PropertyGroup>-->
-<!--    <EnablePackageValidation>true</EnablePackageValidation>-->
-<!--    <PackageValidationBaselineVersion>11.0.0</PackageValidationBaselineVersion>-->
-<!--    <EnableStrictModeForCompatibleFrameworksInPackage>true</EnableStrictModeForCompatibleFrameworksInPackage>-->
-<!--    <EnableStrictModeForCompatibleTfms>true</EnableStrictModeForCompatibleTfms>-->
-<!--  </PropertyGroup>-->
+  <PropertyGroup>
+    <EnablePackageValidation>true</EnablePackageValidation>
+    <!-- TODO: Change to 11.0.0 and remove all CompatibilitySupressions.xml files when final version shipped -->
+    <PackageValidationBaselineVersion>10.1.0</PackageValidationBaselineVersion>
+    <EnableStrictModeForCompatibleFrameworksInPackage>true</EnableStrictModeForCompatibleFrameworksInPackage>
+    <EnableStrictModeForCompatibleTfms>true</EnableStrictModeForCompatibleTfms>
+  </PropertyGroup>
 </Project>
