@@ -38,7 +38,6 @@
         var copyAllBlocksAction = null;
         var deleteAllBlocksAction = null;
 
-        var inlineEditing = false;
         var liveEditing = true;
 
         var shadowRoot;
@@ -93,7 +92,6 @@
             // once the data is submitted. If so we need to re-initialize
             vm.model.onValueChanged = onServerValueChanged;
 
-            inlineEditing = vm.model.config.useInlineEditingAsDefault;
             liveEditing = vm.model.config.useLiveEditing;
 
             vm.validationLimit = vm.model.config.validationLimit;
@@ -337,7 +335,7 @@
             block.stylesheet = block.config.stylesheet;
             block.showValidation = block.config.view ? true : false;
 
-            block.hideContentInOverlay = block.config.forceHideContentEditorInOverlay === true || inlineEditing === true;
+            block.hideContentInOverlay = block.config.forceHideContentEditorInOverlay === true;
             block.showSettings = block.config.settingsElementTypeKey != null;
 
             // If we have content, otherwise it doesn't make sense to copy.
@@ -763,25 +761,24 @@
 
         };
         function userFlowWhenBlockWasCreated(parentBlock, areaKey, createIndex) {
-            if (vm.layout.length > createIndex) {
-                var blockObject;
-                
-                if (parentBlock) {
-                    var area = parentBlock.layout.areas.find(x => x.key === areaKey);
-                    if (!area) {
-                        console.error("Area could not be found...", parentBlock, areaKey)
-                    }
-                    blockObject = area.items[createIndex].$block;
-                } else {
-                    blockObject = vm.layout[createIndex].$block;
+            var blockObject;
+            
+            if (parentBlock) {
+                var area = parentBlock.layout.areas.find(x => x.key === areaKey);
+                if (!area) {
+                    console.error("Area could not be found...", parentBlock, areaKey)
                 }
-                if (inlineEditing === true) {
-                    blockObject.activate();
-                } else if (inlineEditing === false && blockObject.hideContentInOverlay !== true) {
-                    vm.options.createFlow = true;
-                    blockObject.edit();
-                    vm.options.createFlow = false;
+                blockObject = area.items[createIndex].$block;
+            } else {
+                if (vm.layout.length <= createIndex) {
+                    console.error("Create index does not fit within available items of root.")
                 }
+                blockObject = vm.layout[createIndex].$block;
+            }
+            if(blockObject.hideContentInOverlay !== true) {
+                vm.options.createFlow = true;
+                blockObject.edit();
+                vm.options.createFlow = false;
             }
         }
 
