@@ -1,7 +1,7 @@
 <uui-button-inline-create
     class="umb-block-grid__block--inline-create-button --above"
     ng-class="{'--at-root': vm.depth === '0'}"
-    ng-click="vm.blockEditorApi.requestShowCreate(vm.parentBlock, vm.areaKey, $index, $event)">
+    ng-click="vm.blockEditorApi.requestShowCreate(vm.parentBlock, vm.areaKey, vm.index, $event)">
 </uui-button-inline-create>
 
 <ng-form name="vm.blockRowForm" val-server-match="{ 'contains' : { 'valServerMatchContent': vm.layoutEntry.$block.content.key, 'valServerMatchSettings': vm.layoutEntry.$block.settings.key } }">
@@ -133,6 +133,6 @@
 
 <uui-button-inline-create
     class="umb-block-grid__block--inline-create-button --after"
-    ng-click="vm.blockEditorApi.requestShowCreate(vm.parentBlock, vm.areaKey, $index+1, $event, {'fitInRow': true})"
+    ng-click="vm.blockEditorApi.requestShowCreate(vm.parentBlock, vm.areaKey, vm.index+1, $event, {'fitInRow': true})"
     vertical>
 </uui-button-inline-create>
