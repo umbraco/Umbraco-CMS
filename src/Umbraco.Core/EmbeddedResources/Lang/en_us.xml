@@ -2854,8 +2854,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="focusParentBlock">Set focus on the container block</key>
     <key alias="areaIdentification">Identification</key>
     <key alias="areaValidation">Validation</key>
-    <key alias="areaValidationEntriesShort"><![CDATA[Not enough blocks of type <strong>%0%</strong> added. This type must be present between <strong>%2%</strong> and <strong>%3%</strong> times.]]></key>
-    <key alias="areaValidationEntriesExceed"><![CDATA[Too many blocks of type <strong>%0%</strong> added. This type must be present between <strong>%2%</strong> and <strong>%3%</strong> times.]]></key>
+    <key alias="areaValidationEntriesShort"><![CDATA[<strong>%0%</strong> must be present atleast <strong>%2%</strong> time(s).]]></key>
+    <key alias="areaValidationEntriesExceed"><![CDATA[<strong>%0%</strong> must maximum be present <strong>%3%</strong> time(s).]]></key>
     <key alias="areaNumberOfBlocks">Number of blocks</key>
     <key alias="areaDisallowAllBlocks">Only allow specific block types</key>
     <key alias="areaAllowedBlocks">Allowed block types</key>
@@ -2874,6 +2874,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="areasLayoutColumnsHelp">Define how many layout columns that areas of this block will span. If not defined, the number of layout columns defined for the entire layout will be used.</key>
     <key alias="areasConfigurations">Area configurations</key>
     <key alias="areasConfigurationsHelp">To enable nesting of blocks within this block, define one or more areas for blocks to be nested within.</key>
+    <key alias="invalidDropPosition">Not allowed at this spot.</key>
   </area>
   <area alias="contentTemplatesDashboard">
     <key alias="whatHeadline">What are Content Templates?</key>

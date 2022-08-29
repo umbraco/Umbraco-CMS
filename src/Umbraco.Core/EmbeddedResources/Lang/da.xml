@@ -2205,8 +2205,8 @@ Mange hilsner fra Umbraco robotten
     <key alias="focusParentBlock">Fokusér på den ydre blok</key>
     <key alias="areaIdentification">Identifikation</key>
     <key alias="areaValidation">Validering</key>
-    <key alias="areaValidationEntriesShort"><![CDATA[Der er ikke tilføjet nok blokke at typen <strong>%0%</strong>. Denne type skal tilføjes mellem <strong>%2%</strong> og <strong>%3%</strong> gange.]]></key>
-    <key alias="areaValidationEntriesExceed"><![CDATA[Der er tilføjet for mange blokke at typen <strong>%0%</strong>. Denne type skal tilføjes mellem <strong>%2%</strong> og <strong>%3%</strong> gange.]]></key>
+    <key alias="areaValidationEntriesShort"><![CDATA[<strong>%0%</strong> skal tilføjes minimum <strong>%2%</strong> gang(e).]]></key>
+    <key alias="areaValidationEntriesExceed"><![CDATA[<strong>%0%</strong> må maksimalt tilføjes <strong>%3%</strong> gang(e).]]></key>
     <key alias="areaNumberOfBlocks">Antal blokke</key>
     <key alias="areaDisallowAllBlocks">Tillad kun specifikke blok-typer</key>
     <key alias="areaAllowedBlocks">Tilladte blok-typer</key>
