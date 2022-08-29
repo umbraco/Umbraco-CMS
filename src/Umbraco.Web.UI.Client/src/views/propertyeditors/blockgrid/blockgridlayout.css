@@ -36,17 +36,20 @@
     /* overwrite grid-columns for the area: */
     /* notice --umb-block-grid--grid-columns inherits to .umb-block-grid__layout-container to adjust for fitting in the Area*/
     --umb-block-grid--grid-columns: var(--umb-block-grid--area-column-span, var(--umb-block-grid--area-grid-columns--overwrite, 1));
-    grid-column: span var(--umb-block-grid--area-column-span);
+    grid-column-end: span var(--umb-block-grid--area-column-span);
     grid-row: span var(--umb-block-grid--area-row-span, 1);
 }
 
 .umb-block-grid__layout-item {
-    grid-column: span var(--umb-block-grid--item-column-span, var(--umb-block-grid--grid-columns, 1));
+    grid-column-end: span var(--umb-block-grid--item-column-span, var(--umb-block-grid--grid-columns, 1));
     grid-row: span var(--umb-block-grid--item-row-span, 1);
 }
 
-.umb-block-grid__layout-item[data-new-line] {
+.umb-block-grid__layout-item[data-force-left] {
     grid-column-start: 1;
+}
+.umb-block-grid__layout-item[data-force-right] {
+    grid-column-start: calc(1 + var(--umb-block-grid--grid-columns) - var(--umb-block-grid--item-column-span));
 }
 
 /*

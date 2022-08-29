@@ -484,6 +484,20 @@
         function isElementTypeKeyAllowedAt(parentBlock, areaKey, contentElementTypeKey) {
             return getAllowedTypesOf(parentBlock, areaKey).filter(x => x.blockConfigModel.contentElementTypeKey === contentElementTypeKey).length > 0;
         }
+
+        // Used by umbblockgridentries.component to set data for a block when drag n' drop specials(force new line etc.):
+        vm.getLayoutEntryByIndex = getLayoutEntryByIndex;
+        function getLayoutEntryByIndex(parentBlock, areaKey, index) {
+            if(parentBlock) {
+                const area = parentBlock.layout.areas.find(x => x.key === areaKey);
+                if(area && area.items.length >= index) {
+                    return area.items[index];
+                }
+            } else {
+                return vm.layout[index];
+            }
+            return null;
+        }
         
 
         // Used by umbblockgridentries.component to check how many block types that are available for creation in an area:

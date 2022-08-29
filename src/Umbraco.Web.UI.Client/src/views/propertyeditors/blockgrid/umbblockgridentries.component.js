@@ -89,6 +89,10 @@
             return vm.blockEditorApi.internal.isElementTypeKeyAllowedAt(vm.parentBlock, vm.areaKey, contentTypeKey);
         }
 
+        vm.getLayoutEntry = function(index) {
+            return vm.blockEditorApi.internal.getLayoutEntryByIndex(vm.parentBlock, vm.areaKey, index);
+        }
+
         vm.showNotAllowed = function() {
             vm.showNotAllowedUI = true;
             $scope.$evalAsync();
@@ -102,6 +106,8 @@
 
             const gridLayoutContainerEl = $element[0].querySelector('.umb-block-grid__layout-container');
             var _lastGridLayoutContainerEl = null;
+            var movingBlockObject = null;
+            var targetRect = null;
 
             // Setup DOM method for communication between sortables:
             gridLayoutContainerEl['Sortable:controller'] = () => {
@@ -187,6 +193,25 @@
                 return false;
             }
 
+            function _onDragMouseMove(evt) {
+                /** ignorer last drag event, comes as screenX === 0 and screenY === 0 */
+                if(targetRect && evt.screenX !== 0 && evt.screenY !== 0) {
+                    var oldValue = movingBlockObject.forceLeft
+                    var newValue = (evt.screenX < targetRect.x + 20);
+                    if(newValue !== oldValue) {
+                        movingBlockObject.forceLeft = newValue;
+                        $scope.$apply();
+                    }
+
+                    oldValue = movingBlockObject.forceRight;
+                    newValue = (evt.screenX > targetRect.x + targetRect.width - 20);
+                    if(newValue !== oldValue) {
+                        movingBlockObject.forceRight = newValue;
+                        $scope.$apply();
+                    }
+                }
+            }
+
             const sortable = Sortable.create(gridLayoutContainerEl, {
                 group: "uniqueGridEditorID",  // links groups with same name.
                 sort: true,  // sorting inside list
@@ -195,7 +220,7 @@
                 //touchStartThreshold: 0, // px, how many pixels the point should move before cancelling a delayed drag event
                 //disabled: false, // Disables the sortable if set to true.
                 //store: null,  // @see Store
-                animation: 120,  // ms, animation speed moving items when sorting, `0` — without animation
+                animation: 0,  // ms, animation speed moving items when sorting, `0` — without animation
                 easing: "cubic-bezier(1, 0, 0, 1)", // Easing for animation. Defaults to null. See https://easings.net/ for examples.
                 //handle: "umb-block-grid-block",  // Drag handle selector within list items,
                 cancel: '',
@@ -209,12 +234,12 @@
                 //chosenClass: "sortable-chosen",  // Class name for the chosen item
                 //dragClass: "sortable-drag",  // Class name for the dragging item
 
-                //swapThreshold: 1, // Threshold of the swap zone
-                //invertSwap: false, // Will always use inverted swap zone if set to true
-                //invertedSwapThreshold: 1, // Threshold of the inverted swap zone (will be set to swapThreshold value by default)
+                swapThreshold: 0.5, // Threshold of the swap zone
+                invertSwap: true, // Will always use inverted swap zone if set to true
+                invertedSwapThreshold: 1, // Threshold of the inverted swap zone (will be set to swapThreshold value by default)
                 //direction: 'horizontal', // Direction of Sortable (will be detected automatically if not given)
 
-                //forceFallback: false,  // ignore the HTML5 DnD behaviour and force the fallback to kick in
+                //forceFallback: true,  // ignore the HTML5 DnD behaviour and force the fallback to kick in
 
                 //fallbackClass: "sortable-fallback",  // Class name for the cloned DOM Element when using forceFallback
                 //fallbackOnBody: false,  // Appends the cloned DOM Element into the Document's Body
@@ -224,10 +249,25 @@
                 //removeCloneOnHide: true, // Remove the clone element when it is not showing, rather than just hiding it
                 //emptyInsertThreshold: 5, // px, distance mouse must be from empty sortable to insert drag element into it
 
-                /*onStart: function (evt) {
+                onStart: function (evt) {
                     //nextSibling = evt.from === evt.item.parentNode ? evt.item.nextSibling : evt.clone.nextSibling;
+
+                    var contextVM = vm;
+                    if (gridLayoutContainerEl !== evt.to) {
+                        contextVM = evt.to['Sortable:controller']();
+                    }
+                    
+                    const oldIndex = evt.oldIndex;
+                    movingBlockObject = contextVM.getLayoutEntry(oldIndex);
+                    movingBlockObject.forceLeft = false;
+                    movingBlockObject.forceRight = false;
+
+                    targetRect = evt.to.getBoundingClientRect();
+
+                    window.addEventListener('drag', _onDragMouseMove);
+
                     $scope.$apply();
-                },*/
+                },
                 onAdd: function (evt) {
                     /*if(_indication(evt) === false) {
                         return false;
@@ -244,15 +284,23 @@
                 },
                 // Called by any change to the list (add / update / remove)
                 onMove: function (evt) {
+
+                    targetRect = evt.to.getBoundingClientRect();
+                    
                     // same properties as onEnd
                     return _indication(evt)
                 },
                 onEnd: function(evt) {
+                    window.removeEventListener('drag', _onDragMouseMove);
+
                     // ensure not-allowed indication is removed.
                     if(_lastGridLayoutContainerEl) {
                         _lastGridLayoutContainerEl.hideNotAllowed();
                         _lastGridLayoutContainerEl = null;
                     }
+
+                    movingBlockObject = null;
+                    targetRect = null;
                 }
                 /*
                 setData: function (dataTransfer, dragEl) {

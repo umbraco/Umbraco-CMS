@@ -10,6 +10,8 @@
         data-element-udi="{{layoutEntry.contentUdi}}"
         data-col-span="{{layoutEntry.columnSpan}}"
         data-row-span="{{layoutEntry.rowSpan}}"
+        ng-attr-data-force-left="{{layoutEntry.forceLeft || undefined}}"
+        ng-attr-data-force-right="{{layoutEntry.forceRight || undefined}}"
         style="
         --umb-block-grid--item-column-span: {{layoutEntry.columnSpan}};
         --umb-block-grid--item-row-span: {{layoutEntry.rowSpan}};
@@ -39,7 +41,7 @@
 </div>
 
 <div ng-if="vm.showNotAllowedUI" class="umb-block-grid__not-allowed-box">
-
+    <localize key="invalidDropPosition">Not allowed at this</localize>
 </div>
 
 
