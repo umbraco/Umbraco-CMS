@@ -19,7 +19,7 @@ export class UmbTreeDataTypesContext implements UmbTreeContext {
 			key: '3fd3eba5-c893-4d3c-af67-f574e6eded38',
 			name: 'Data Types',
 			hasChildren: true,
-			type: 'data-type',
+			type: 'dataType',
 			icon: 'favorite',
 			parentKey: '',
 		};
