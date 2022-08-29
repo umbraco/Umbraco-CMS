@@ -12,24 +12,23 @@
         position: relative;
         display: block;
         cursor: pointer;
-        color: black;
         background-color: transparent;
         text-align: left;
+        color: inherit;
         user-select: none;
         border: none;
-        padding: 2px 6px;
+        padding: 0;
         width: 100%;
         height: 100%;
         transition: border-color 120ms, background-color 120ms;
     }
     button:hover {
-        color: #2152A3;// TODO: Set right colors:
-        background-color: #F9F9FA;
+        color: var(--umb-text-color, #2152A3);
     }
 
 </style>
 
 <button type="button" ng-click="block.edit()" ng-focus="block.focus">
-    <h1>{{block.data.headline}}</h1>
+    <h1 style="margin: 0 20px;">{{block.data.headline}}</h1>
 </button>
 <slot name="areas" part="areas"></slot>

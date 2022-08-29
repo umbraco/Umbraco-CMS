@@ -104,7 +104,7 @@ ng-form.ng-invalid-val-server-match-content > .umb-block-grid__block:not(.--acti
         display: none;
         inset: 0;
         border: 1px solid transparent;
-        box-shadow: 0 0 0 1px rgba(255, 255, 255, .75), inset 0 0 0 1px white;
+        box-shadow: 0 0 0 1px rgba(255, 255, 255, .75), inset 0 0 0 1px rgba(255, 255, 255, .75);
         
         transition: border-color 240ms ease-in;
         
@@ -510,7 +510,7 @@ umb-block-grid-block {
         border-radius: @baseBorderRadius;
         box-sizing: border-box;
         
-        &:hover {
+        &:not([disabled]):hover {
             color: @ui-action-discreet-type-hover;
             border-color: @ui-action-discreet-border-hover;
             text-decoration: none;
@@ -586,11 +586,13 @@ umb-block-grid-block {
         align-items: center;
         justify-content: center;
         
-        color: @ui-action-discreet-type;
+        /* TODO: dont use --umb-text-color, its temporary to inherit UI */
+        color: var(--umb-text-color, @ui-action-discreet-type);
         font-weight: bold;
         padding: 5px 15px;
 
-        border: 1px dashed @ui-action-discreet-border;
+        /* TODO: dont use --umb-text-color, its temporary to inherit UI */
+        border: 1px dashed var(--umb-text-color, @ui-action-discreet-border);
         border-radius: @baseBorderRadius;
         box-sizing: border-box;
 
@@ -598,8 +600,8 @@ umb-block-grid-block {
         height: 100%;
         
         &:hover {
-            color: @ui-action-discreet-type-hover;
-            border-color: @ui-action-discreet-border-hover;
+            color: var(--umb-text-color, @ui-action-discreet-type-hover);
+            border-color: var(--umb-text-color, @ui-action-discreet-border-hover);
             text-decoration: none;
             z-index: 1;
         }
@@ -690,12 +692,11 @@ umb-block-grid-block {
 
 
 
-/*
+
 .umb-block-grid__layout-container {
-    //min-height: 32px;
-    //height: calc(100% - 32px);
+    height: calc(100%);
 }
-*/
+
 
 
 /** make sure block with areas stay on top, so they don't look like they are 'not-allowed'*/

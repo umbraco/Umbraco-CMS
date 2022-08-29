@@ -6,6 +6,7 @@
         height: 100%;/* Add this to fill the cell fully */
         min-height: 320px;
         box-sizing: border-box;
+
     }
     
     img {
@@ -16,16 +17,33 @@
         pointer-events: none;
     }
 
-    /*
-    Push one column in..
-    slot[name='areas'] {
-        
+    :host > div:after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-color: rgba(0,0,0,.5);
+        pointer-events: none;
     }
-    */
+
+    .hero-content {
+        z-index: 1;
+        position: relative;
+        display: flex;
+        align-items: center;
+        height: 100%;
+        margin-left: 50px;
+        margin-right: 50px;
+
+        color: white;
+        --umb-text-color: white;
+    }
+    
 
 </style>
 
 <div ng-controller="Umbraco.PropertyEditors.BlockEditor.HeroBlockEditor as bc">
     <img ng-if="bc.isImage" ng-src="{{bc.imageSource}}" alt="{{bc.mediaName}}" />
 </div>
-<slot name="areas" part="areas"></slot>
+<div class="hero-content">
+    <slot name="areas" part="areas"></slot>
+</div>

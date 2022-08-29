@@ -23,7 +23,7 @@
                     //set a property on the 'scope' for the returned media object.
                     bc.mediaName = mediaEntity.name;
                     bc.isImage = mediaHelper.detectIfImageByExtension(mediaPath);
-                    bc.imageSource = mediaHelper.getThumbnailFromPath(mediaPath);
+                    bc.imageSource = mediaPath;
                 });
             }
         }

@@ -431,7 +431,8 @@
             if (options.fitInRow === true) {
                 // TODO: find the best way to add this in with the rest of the row?
 
-                const minColumnSpan = blockObject.config.columnSpanOptions.reduce((prev, option) => Math.min(prev, option.columnSpan), 1);
+
+                const minColumnSpan = blockObject.config.columnSpanOptions.reduce((prev, option) => Math.min(prev, option.columnSpan), vm.gridColumns);
                 layoutEntry.columnSpan = minColumnSpan;
                 
             } else {
@@ -655,7 +656,7 @@
                     userFlowWhenBlockWasCreated(parentBlock, areaKey, createIndex);
                 }
             } else {
-                showCreateDialog(parentBlock, areaKey, createIndex, options);
+                showCreateDialog(parentBlock, areaKey, createIndex, false, options);
             }
 
         }

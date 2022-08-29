@@ -22,7 +22,7 @@
         min-height: 100%;
         cursor: pointer;
         color: black;
-        background-color: white;
+        background-color: transparent;
         text-align: left;
         padding: 0;
         user-select: none;
@@ -33,7 +33,6 @@
     }
     button:hover {
         color: #2152A3;// TODO: Set right colors:
-        background-color: #F9F9FA;
     }
     img {
         pointer-events: none;
@@ -83,8 +82,8 @@
 </style>
 
 <button ng-controller="Umbraco.PropertyEditors.BlockEditor.MediaBlockEditor as bc" type="button" ng-click="block.edit()" ng-focus="block.focus">
-    <img ng-if="bc.isImage" ng-src="{{bc.imageSource}}" alt="{{bc.mediaName}}" />
-    <umb-icon ng-if="!bc.isImage" icon="{{bc.icon}} color-black" class="icon"></umb-icon>
+    <img ng-if="bc.isImage || bc.fileExtension === 'svg'" ng-src="{{bc.imageSource}}" alt="{{bc.mediaName}}" />
+    <umb-icon ng-if="!bc.isImage && bc.fileExtension !== 'svg'" icon="{{bc.icon}} color-black" class="icon"></umb-icon>
     <span ng-if="bc.mediaName" class="file-name">{{bc.mediaName}}</span>
 </button>
 <slot name="areas" part="areas"></slot>
