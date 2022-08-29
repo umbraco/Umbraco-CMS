@@ -70,11 +70,16 @@ stages:
               version: 7.x
               includePreviewVersions: true
           - task: DotNetCoreCLI@2
+            displayName: Run dotnet restore
+            inputs:
+              command: restore
+              projects: umbraco.sln
+          - task: DotNetCoreCLI@2
             displayName: Run dotnet build
             inputs:
               command: build
               projects: umbraco.sln
-              arguments: '--configuration $(buildConfiguration)'
+              arguments: '--configuration $(buildConfiguration) --no-restore -p:ContinuousIntegrationBuild=true'
           - script: |
               version="$(Build.BuildNumber)"
               echo "varsion: $version"
@@ -101,7 +106,7 @@ stages:
                   }
                 }
 
-                dotnet pack --configuration $(buildConfiguration) umbraco.sln -o $(Build.ArtifactStagingDirectory)/nupkg
+                dotnet pack umbraco.sln --configuration $(buildConfiguration) --no-restore --no-build --output $(Build.ArtifactStagingDirectory)/nupkg
           - script: |
               sha="$(Build.SourceVersion)"
               sha=${sha:0:7}
@@ -233,7 +238,7 @@ stages:
               artifact: build_output
               path: $(Build.SourcesDirectory)
           - task: UseDotNet@2
-            displayName: Use net7
+            displayName: Use .NET 7.x
             inputs:
               version: 7.x
               includePreviewVersions: true
@@ -242,7 +247,7 @@ stages:
             inputs:
               command: test
               projects: '**/*.Tests.UnitTests.csproj'
-              arguments: '--no-build --configuration $(buildConfiguration)'
+              arguments: '--configuration $(buildConfiguration) --no-restore --no-build'
               testRunTitle: Unit Tests - $(Agent.OS)
 
   - stage: Integration
@@ -269,7 +274,7 @@ stages:
               artifact: build_output
               path: $(Build.SourcesDirectory)
           - task: UseDotNet@2
-            displayName: Use net7
+            displayName: Use .NET 7.x
             inputs:
               version: 7.x
               includePreviewVersions: true
@@ -278,7 +283,7 @@ stages:
             inputs:
               command: test
               projects: '**/*.Tests.Integration.csproj'
-              arguments: '--no-build --configuration $(buildConfiguration)'
+              arguments: '--configuration $(buildConfiguration) --no-restore --no-build'
               testRunTitle: Integration Tests SQLite - $(Agent.OS)
             env:
               Tests__Database__DatabaseType: 'Sqlite'
@@ -318,7 +323,7 @@ stages:
             inputs:
               command: test
               projects: '**/*.Tests.Integration.csproj'
-              arguments: '--no-build --configuration $(buildConfiguration)'
+              arguments: '--configuration $(buildConfiguration) --no-restore --no-build'
               testRunTitle: Integration Tests SQL Server - $(Agent.OS)
             env:
               Tests__Database__DatabaseType: $(testDb)
@@ -403,7 +408,7 @@ stages:
             displayName: Create database (Windows only)
             condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
           - task: UseDotNet@2
-            displayName: Use .Net 7.x
+            displayName: Use .NET 7.x
             inputs:
               version: 7.x
               includePreviewVersions: true
@@ -434,8 +439,8 @@ stages:
                 dotnet new --install ./nupkg/Umbraco.Templates.*.nupkg
                 dotnet new umbraco --name Cypress -o . --no-restore
                 dotnet restore --configfile ./nuget.config
-                dotnet build --no-restore -c Release
-                Start-Process -FilePath "dotnet" -ArgumentList "run --no-build -c Release --no-launch-profile --urls $(CYPRESS_BASE_URL)"
+                dotnet build --configuration Release --no-restore
+                Start-Process -FilePath "dotnet" -ArgumentList "run --configuration Release --no-restore --no-build --no-launch-profile --urls $(CYPRESS_BASE_URL)"
           - task: PowerShell@2
             displayName: Wait for app
             inputs:
