@@ -15,7 +15,7 @@ public class Version : ServerController
     [HttpGet("version")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ServerStatusViewModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(VersionViewModel), StatusCodes.Status200OK)]
     public async Task<ActionResult<VersionViewModel>> Get() =>
         new VersionViewModel { Version = _umbracoVersion.SemanticVersion.ToSemanticStringWithoutBuild() };
 }
