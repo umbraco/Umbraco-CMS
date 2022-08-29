@@ -245,7 +245,7 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		type: 'tree',
 		alias: 'Umb.Tree.Datatypes',
 		name: 'Data Types Tree',
-		js: () => import('./backoffice/tree/data-types/tree-data-types.element'),
+		loader: () => import('./backoffice/tree/data-types/tree-data-types.element'),
 		meta: {
 			pathname: 'data-types',
 			editor: 'Umb.Editor.DataType',
@@ -259,7 +259,7 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		alias: 'Umb.Tree.DocumentTypes',
 		name: 'Document Types Tree',
 		elementName: 'umb-document-type-tree',
-		js: () => import('./backoffice/tree/document-types/document-type-tree.element'),
+		loader: () => import('./backoffice/tree/document-types/document-type-tree.element'),
 		meta: {
 			pathname: 'document-types',
 			editor: 'Umb.Editor.DocumentType',
@@ -273,7 +273,7 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		alias: 'Umb.Dashboard.MembersTest',
 		name: 'Members Test',
 		elementName: 'umb-dashboard-welcome',
-		js: () => import('./backoffice/dashboards/welcome/dashboard-welcome.element'),
+		loader: () => import('./backoffice/dashboards/welcome/dashboard-welcome.element'),
 		meta: {
 			weight: -10,
 			pathname: 'welcome',
@@ -284,7 +284,7 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		type: 'tree',
 		alias: 'Umb.Tree.Members',
 		name: 'Members Tree',
-		js: () => import('./backoffice/tree/members/tree-members.element'),
+		loader: () => import('./backoffice/tree/members/tree-members.element'),
 		meta: {
 			editor: 'Umb.Editor.Member',
 			pathname: 'members',
@@ -297,7 +297,7 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		type: 'tree',
 		alias: 'Umb.Tree.MemberGroups',
 		name: 'Members Groups Tree',
-		js: () => import('./backoffice/tree/member-groups/tree-member-groups.element'),
+		loader: () => import('./backoffice/tree/member-groups/tree-member-groups.element'),
 		meta: {
 			editor: 'Umb.Editor.MemberGroup',
 			pathname: 'member-groups',
@@ -310,18 +310,18 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		type: 'editor',
 		alias: 'Umb.Editor.Member',
 		name: 'Member Editor',
-		js: () => import('./backoffice/editors/member/editor-member.element'),
+		loader: () => import('./backoffice/editors/member/editor-member.element'),
 	},
 	{
 		type: 'editor',
 		alias: 'Umb.Editor.MemberGroup',
 		name: 'Member Group',
-		js: () => import('./backoffice/editors/member-group/editor-member-group.element'),
+		loader: () => import('./backoffice/editors/member-group/editor-member-group.element'),
 	},
 	{
 		type: 'editor',
 		alias: 'Umb.Editor.DataType',
 		name: 'Member Group',
-		js: () => import('./backoffice/editors/data-type/editor-data-type.element'),
+		loader: () => import('./backoffice/editors/data-type/editor-data-type.element'),
 	},
 ];
