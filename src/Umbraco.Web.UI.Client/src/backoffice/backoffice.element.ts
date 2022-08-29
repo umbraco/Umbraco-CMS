@@ -1,27 +1,27 @@
+import './components/backoffice-header.element';
+import './components/backoffice-main.element';
+import './components/backoffice-modal-container.element';
+import './components/backoffice-notification-container.element';
+import './components/editor-property-layout.element';
+import './components/node-property.element';
+import './sections/shared/section-layout.element';
+import './sections/shared/section-main.element';
+import './sections/shared/section-sidebar.element';
+import './sections/shared/section.element';
+
 import { defineElement } from '@umbraco-ui/uui-base/lib/registration';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
-import { Subscription } from 'rxjs';
+import type { Subscription } from 'rxjs';
 
-import { UmbContextProviderMixin, UmbContextConsumerMixin } from '../core/context';
-import { UmbNotificationService } from '../core/services/notification';
+import { UmbContextConsumerMixin, UmbContextProviderMixin } from '../core/context';
 import { UmbModalService } from '../core/services/modal';
+import { UmbNotificationService } from '../core/services/notification';
 import { UmbDataTypeStore } from '../core/stores/data-type.store';
 import { UmbDocumentTypeStore } from '../core/stores/document-type.store';
 import { UmbNodeStore } from '../core/stores/node.store';
 import { UmbSectionStore } from '../core/stores/section.store';
 import { UmbEntityStore } from '../core/stores/entity.store';
-
-import './components/backoffice-header.element';
-import './components/backoffice-main.element';
-import './components/backoffice-notification-container.element';
-import './components/backoffice-modal-container.element';
-import './components/editor-property-layout.element';
-import './components/node-property.element';
-import './sections/shared/section-layout.element';
-import './sections/shared/section-sidebar.element';
-import './sections/shared/section-main.element';
-import './sections/shared/section.element';
 
 @defineElement('umb-backoffice')
 export default class UmbBackoffice extends UmbContextConsumerMixin(UmbContextProviderMixin(LitElement)) {
