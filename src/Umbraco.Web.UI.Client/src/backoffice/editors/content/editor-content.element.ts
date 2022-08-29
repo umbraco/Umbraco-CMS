@@ -18,10 +18,10 @@ export class UmbEditorContentElement extends LitElement {
 	];
 
 	@property()
-	id!: string;
+	entityKey!: string;
 
 	render() {
-		return html`<umb-editor-node id=${this.id} alias="Umb.Editor.Content"></umb-editor-node>`;
+		return html`<umb-editor-node .entityKey=${this.entityKey} alias="Umb.Editor.Content"></umb-editor-node>`;
 	}
 }
 

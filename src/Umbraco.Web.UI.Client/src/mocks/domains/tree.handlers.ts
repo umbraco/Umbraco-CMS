@@ -38,4 +38,13 @@ export const handlers = [
 		const entities = umbEntityData.getChildren(key);
 		return res(ctx.status(200), ctx.json(entities));
 	}),
+
+	rest.get('/umbraco/backoffice/trees/node/:key', (req, res, ctx) => {
+		console.warn('Please move to schema');
+		const key = req.params.key as string;
+		if (!key) return;
+
+		const entities = umbEntityData.getChildren(key);
+		return res(ctx.status(200), ctx.json(entities));
+	}),
 ];

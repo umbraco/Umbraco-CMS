@@ -320,6 +320,32 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		},
 	},
 	{
+		type: 'tree',
+		alias: 'Umb.Tree.Media',
+		name: 'Media Tree',
+		loader: () => import('./backoffice/tree/media/tree-media.element'),
+		meta: {
+			editor: 'Umb.Editor.Media',
+			pathname: 'media',
+			label: 'Media',
+			weight: 100,
+			sections: ['Umb.Section.Media'],
+		},
+	},
+	{
+		type: 'tree',
+		alias: 'Umb.Tree.Content',
+		name: 'Content Tree',
+		loader: () => import('./backoffice/tree/content/tree-content.element'),
+		meta: {
+			editor: 'Umb.Editor.Content',
+			pathname: 'content',
+			label: 'Content',
+			weight: 100,
+			sections: ['Umb.Section.Content'],
+		},
+	},
+	{
 		type: 'editor',
 		alias: 'Umb.Editor.Member',
 		name: 'Member Editor',
@@ -348,6 +374,18 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		alias: 'Umb.Editor.Extensions',
 		name: 'Extensions Editor',
 		loader: () => import('./backoffice/editors/extensions/editor-extensions.element'),
+	},
+	{
+		type: 'editor',
+		alias: 'Umb.Editor.Media',
+		name: 'Media Editor',
+		loader: () => import('./backoffice/editors/media/editor-media.element'),
+	},
+	{
+		type: 'editor',
+		alias: 'Umb.Editor.Content',
+		name: 'Content Editor',
+		loader: () => import('./backoffice/editors/content/editor-content.element'),
 	},
 	{
 		type: 'entityAction',

@@ -5,15 +5,17 @@ export class UmbNodeStore {
 	private _nodes: BehaviorSubject<Array<NodeEntity>> = new BehaviorSubject(<Array<NodeEntity>>[]);
 	public readonly nodes: Observable<Array<NodeEntity>> = this._nodes.asObservable();
 
-	getById(id: number): Observable<NodeEntity | null> {
+	getByKey(key: string): Observable<NodeEntity | null> {
 		// fetch from server and update store
-		fetch(`/umbraco/backoffice/content/${id}`)
+		fetch(`/umbraco/backoffice/content/${key}`)
 			.then((res) => res.json())
 			.then((data) => {
 				this._updateStore(data);
 			});
 
-		return this.nodes.pipe(map((nodes: Array<NodeEntity>) => nodes.find((node: NodeEntity) => node.id === id) || null));
+		return this.nodes.pipe(
+			map((nodes: Array<NodeEntity>) => nodes.find((node: NodeEntity) => node.key === key) || null)
+		);
 	}
 
 	// TODO: temp solution until we know where to get tree data from

@@ -51,7 +51,7 @@ export class UmbEditorNodeElement extends UmbContextProviderMixin(UmbContextCons
 	];
 
 	@property()
-	id!: string;
+	entityKey!: string;
 
 	@property()
 	alias!: string;
@@ -105,7 +105,7 @@ export class UmbEditorNodeElement extends UmbContextProviderMixin(UmbContextCons
 	private _useNode() {
 		this._nodeStoreSubscription?.unsubscribe();
 
-		this._nodeStoreSubscription = this._nodeStore?.getById(parseInt(this.id)).subscribe((node) => {
+		this._nodeStoreSubscription = this._nodeStore?.getByKey(this.entityKey).subscribe((node) => {
 			if (!node) return; // TODO: Handle nicely if there is no node.
 
 			this._nodeContextSubscription?.unsubscribe();
