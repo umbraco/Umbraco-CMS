@@ -595,6 +595,7 @@
     <key alias="parentDoesNotExists">Parent item does not exist.</key>
     <key alias="noItems">There are no dictionary items.</key>
     <key alias="noItemsInFile">There are no dictionary items in this file.</key>
+    <key alias="noItemsFound">There were no dictionary items found.</key>
     <key alias="createNew">Create dictionary item</key>
   </area>
   <area alias="dictionaryItem">
@@ -1967,7 +1968,11 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     </key>
     <key alias="fallbackLanguage">Fall back language</key>
     <key alias="none">none</key>
-    <key alias="invariantPropertyUnlockHelp"><![CDATA[<strong>%0%</strong> is shared across all languages.]]></key>
+    <key alias="invariantPropertyUnlockHelp"><![CDATA[<strong>%0%</strong> is shared across languages and segments.]]></key>
+    <key alias="invariantCulturePropertyUnlockHelp"><![CDATA[<strong>%0%</strong> is shared across all languages.]]></key>
+    <key alias="invariantSegmentPropertyUnlockHelp"><![CDATA[<strong>%0%</strong> is shared across all segments.]]></key>
+    <key alias="invariantLanguageProperty">Shared: Languages</key>
+    <key alias="invariantSegmentProperty">Shared: Segments</key>
   </area>
   <area alias="macro">
     <key alias="addParameter">Add parameter</key>

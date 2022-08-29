@@ -15,23 +15,21 @@
             data-col-span="@item.ColumnSpan"
             data-row-span="@item.RowSpan"
             style=" --umb-block-grid--item-column-span: @item.ColumnSpan; --umb-block-grid--item-row-span: @item.RowSpan; ">
-            <div class="umb-block-grid__block--view">
-                @{
-                    var partialViewName = "blockgrid/Components/" + item.Content.ContentType.Alias;
-                    try
-                    {
-                        @await Html.PartialAsync(partialViewName, item)
-                    }
-                    catch (InvalidOperationException)
-                    {
-                        <p>
-                            <strong>Could not render component of type: @(item.Content.ContentType.Alias)</strong>
-                            <br/>
-                            This likely happened because the partial view <em>@partialViewName</em> could not be found.
-                        </p>
-                    }
+            @{
+                var partialViewName = "blockgrid/Components/" + item.Content.ContentType.Alias;
+                try
+                {
+                    @await Html.PartialAsync(partialViewName, item)
                 }
-            </div>
+                catch (InvalidOperationException)
+                {
+                    <p>
+                        <strong>Could not render component of type: @(item.Content.ContentType.Alias)</strong>
+                        <br/>
+                        This likely happened because the partial view <em>@partialViewName</em> could not be found.
+                    </p>
+                }
+            }
         </div>
     }
 </div>

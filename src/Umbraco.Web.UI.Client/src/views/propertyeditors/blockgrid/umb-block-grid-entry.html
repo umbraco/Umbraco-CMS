@@ -1,5 +1,6 @@
 <uui-button-inline-create
-    class="umb-block-grid__block--inline-create-button __above"
+    class="umb-block-grid__block--inline-create-button --above"
+    ng-class="{'--at-root': vm.depth === '0'}"
     ng-click="vm.blockEditorApi.requestShowCreate(vm.parentBlock, vm.areaKey, $index, $event)">
 </uui-button-inline-create>
 
@@ -11,7 +12,7 @@
         ng-class="{
                     '--active':vm.layoutEntry.$block.active,
                     '--show-validation': vm.layoutEntry.$block.showValidation === true,
-                    '--has-content-in-areas': vm.layoutEntry.areas.length > 0,
+                    '--hovering-area': vm.isHoveringArea,
                     '--block-ui-visible': vm.layoutEntry.$block.blockUiVisibility === true
                 }">
 
@@ -26,7 +27,7 @@
                 slot="areas"
                 class="umb-block-grid__block-area-container"
                 ng-style="vm.areaGridStyles">
-                <umb-block-grid-entries
+                <umb-block-grid-entries 
                     class="umb-block-grid__block-area"
                     data-area-col-span="{{areaEntry.$config.columnSpan}}"
                     data-area-row-span="{{areaEntry.$config.rowSpan}}"
@@ -40,7 +41,10 @@
                     entries="areaEntry.items"
                     area-key="areaEntry.key"
                     parent-block="vm.layoutEntry.$block"
-                    parent-form="vm.blockRowForm">
+                    parent-form="vm.blockRowForm"
+                    ng-mouseover="vm.mouseOverArea(areaEntry)"
+                    ng-mouseleave="vm.mouseLeaveArea()"
+                    depth="{{vm.childDepth}}">
                 </umb-block-grid-entries>
             </div>
 
@@ -128,7 +132,7 @@
 </ng-form>
 
 <uui-button-inline-create
-    class="umb-block-grid__block--inline-create-button __after"
+    class="umb-block-grid__block--inline-create-button --after"
     ng-click="vm.blockEditorApi.requestShowCreate(vm.parentBlock, vm.areaKey, $index+1, $event, {'fitInRow': true})"
     vertical>
 </uui-button-inline-create>

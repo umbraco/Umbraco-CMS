@@ -11,6 +11,7 @@ function umbPropEditor(umbPropEditorHelper, localizationService) {
         return {
             scope: {
                 model: "=",
+                node: "<",
                 isPreValue: "@",
                 preview: "<",
                 allowUnlock: "<?",
@@ -41,6 +42,16 @@ function umbPropEditor(umbPropEditorHelper, localizationService) {
                 localizationService.localize('languages_invariantPropertyUnlockHelp',  [scope.model.label])
                     .then(function(value) {
                         scope.labels.invariantPropertyUnlockHelp = value;
+                    });
+
+                localizationService.localize('languages_invariantCulturePropertyUnlockHelp',  [scope.model.label])
+                    .then(function(value) {
+                        scope.labels.invariantCulturePropertyUnlockHelp = value;
+                    });
+                
+                localizationService.localize('languages_invariantSegmentPropertyUnlockHelp',  [scope.model.label])
+                    .then(function(value) {
+                        scope.labels.invariantSegmentPropertyUnlockHelp = value;
                     });
 
                 var unbindWatcher = scope.$watch("model.view",

@@ -52,6 +52,7 @@ public static partial class UmbracoBuilderExtensions
             .AddRoleManager<IMemberRoleManager, MemberRoleManager>()
             .AddMemberManager<IMemberManager, MemberManager>()
             .AddSignInManager<IMemberSignInManager, MemberSignInManager>()
+            .AddClaimsPrincipalFactory<MemberClaimsPrincipalFactory>()
             .AddErrorDescriber<MembersErrorDescriber>()
             .AddUserConfirmation<UmbracoUserConfirmation<MemberIdentityUser>>();
 

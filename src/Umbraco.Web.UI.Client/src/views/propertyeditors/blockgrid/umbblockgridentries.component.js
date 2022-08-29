@@ -19,7 +19,8 @@
                 entries: "<",
                 areaKey: "<?",
                 parentBlock: "<?",
-                parentForm: "<?"
+                parentForm: "<?",
+                depth: "@"
             }
         }
     );

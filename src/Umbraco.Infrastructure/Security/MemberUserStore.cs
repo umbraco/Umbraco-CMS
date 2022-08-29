@@ -107,7 +107,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
                     ? Constants.Security.DefaultMemberTypeAlias
                     : user.MemberTypeAlias!);
 
-            UpdateMemberProperties(memberEntity, user);
+            UpdateMemberProperties(memberEntity, user, out bool _);
 
             // create the member
             _memberService.Save(memberEntity);
@@ -188,9 +188,15 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
                 var isLoginsPropertyDirty = user.IsPropertyDirty(nameof(MemberIdentityUser.Logins));
                 var isTokensPropertyDirty = user.IsPropertyDirty(nameof(MemberIdentityUser.LoginTokens));
 
-                if (UpdateMemberProperties(found, user))
+                if (UpdateMemberProperties(found, user, out var updateRoles))
                 {
                     _memberService.Save(found);
+
+                    if (updateRoles)
+                    {
+                        var identityUserRoles = user.Roles.Select(x => x.RoleId).ToArray();
+                        _memberService.ReplaceRoles(new[] { found.Id }, identityUserRoles);
+                    }
                 }
 
                 if (isLoginsPropertyDirty)
@@ -580,14 +586,21 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
 
         IIdentityUserToken? token = user.LoginTokens.FirstOrDefault(x =>
             x.LoginProvider.InvariantEquals(loginProvider) && x.Name.InvariantEquals(name));
-        if (token == null)
+
+        // We have to remove token and then re-add to ensure that LoginTokens are dirty, which is required for them to save
+        // This is because we're using an observable collection, which only cares about added/removed items.
+        if (token is not null)
         {
-            user.LoginTokens.Add(new IdentityUserToken(loginProvider, name, value, user.Id));
+            // The token hasn't changed, so there's no reason for us to re-add it.
+            if (token.Value == value)
+            {
+                return Task.CompletedTask;
+            }
+
+            user.LoginTokens.Remove(token);
         }
-        else
-        {
-            token.Value = value;
-        }
+
+        user.LoginTokens.Add(new IdentityUserToken(loginProvider, name, value, user.Id));
 
         return Task.CompletedTask;
     }
@@ -666,9 +679,10 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
         return user;
     }
 
-    private bool UpdateMemberProperties(IMember member, MemberIdentityUser identityUser)
+    private bool UpdateMemberProperties(IMember member, MemberIdentityUser identityUser, out bool updateRoles)
     {
         var anythingChanged = false;
+        updateRoles = false;
 
         // don't assign anything if nothing has changed as this will trigger the track changes of the model
         if (identityUser.IsPropertyDirty(nameof(MemberIdentityUser.LastLoginDateUtc))
@@ -780,10 +794,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
 
         if (identityUser.IsPropertyDirty(nameof(MemberIdentityUser.Roles)))
         {
-            anythingChanged = true;
-
-            var identityUserRoles = identityUser.Roles.Select(x => x.RoleId).ToArray();
-            _memberService.ReplaceRoles(new[] { member.Id }, identityUserRoles);
+            updateRoles = true;
         }
 
         // reset all changes

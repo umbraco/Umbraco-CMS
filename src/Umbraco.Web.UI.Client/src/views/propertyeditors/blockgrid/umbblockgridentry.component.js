@@ -8,20 +8,6 @@
      * @param {number[]} weights - array of numbers each representing the weight/length.
      * @returns {number} - the index of the weight that contains the accumulated value
      */
-    /*
-    function getIndexOfPositionInWeightMap(position, weights) {
-        let i = 0, len = weights.length, calc = 0;
-        while(i<len) {
-            if(position < calc) {
-                return i;
-            }
-
-            calc += weights[i];
-            i++;
-        }
-        return i;
-    }
-    */
     function getInterpolatedIndexOfPositionInWeightMap(target, weights) {
         const map = [0];
         weights.reduce((a, b, i) => { return map[i+1] = a+b; }, 0);
@@ -89,7 +75,8 @@
                 layoutEntry: "<",
                 index: "<",
                 parentBlock: "<",
-                areaKey: "<"
+                areaKey: "<",
+                depth: "@"
             }
         }
     );
@@ -98,14 +85,26 @@
 
         const vm = this;
         vm.areaGridStyles = {};
+        vm.isHoveringArea = false;
 
         vm.$onInit = function() {
+
+            vm.childDepth = parseInt(vm.depth) + 1;
+
             if(vm.layoutEntry.$block.config.areaGridColumns) {
                 vm.areaGridStyles['--umb-block-grid--area-grid-columns'] = vm.layoutEntry.$block.config.areaGridColumns.toString();
             } else {
                 vm.areaGridStyles['--umb-block-grid--area-grid-columns'] = 'initial';
             }
             $scope.$evalAsync();
+        }
+        vm.mouseOverArea = function(area) {
+            if(area.items.length > 0) {
+                vm.isHoveringArea = true;
+            }
+        }
+        vm.mouseLeaveArea = function() {
+            vm.isHoveringArea = false;
         }
 
         // Block sizing functionality:
