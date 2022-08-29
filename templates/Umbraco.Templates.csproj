@@ -12,7 +12,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="icon.png" Visible="false" />
     <Content Include="UmbracoPackage\**" Exclude="bin;obj" />
     <Content Include="UmbracoProject\**" Exclude="bin;obj" />
     <Content Include="..\src\Umbraco.Web.UI\Program.cs">

@@ -9,6 +9,7 @@
     <Product>Umbraco CMS</Product>
     <PackageProjectUrl>https://umbraco.com/</PackageProjectUrl>
     <PackageIconUrl>https://umbraco.com/dist/nuget/logo-small.png</PackageIconUrl>
+    <PackageIcon>icon.png</PackageIcon>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageTags>umbraco</PackageTags>
@@ -18,6 +19,10 @@
     <WarningsAsErrors>nullable</WarningsAsErrors>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="$(MSBuildThisFileDirectory)..\icon.png" Pack="true" PackagePath="" Visible="false" />
+  </ItemGroup>
 
   <!-- SourceLink -->
   <PropertyGroup>
