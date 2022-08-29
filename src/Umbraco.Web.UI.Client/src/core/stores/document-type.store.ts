@@ -24,13 +24,6 @@ export class UmbDocumentTypeStore {
 		);
 	}
 
-	// TODO: temp solution until we know where to get tree data from
-	getAll(): Observable<Array<DocumentTypeEntity>> {
-		const documentTypes = umbDocumentTypeData.getAll();
-		this._documentTypes.next(documentTypes);
-		return this.documentTypes;
-	}
-
 	async save(documentTypes: Array<DocumentTypeEntity>) {
 		// TODO: use Fetcher API.
 		try {
