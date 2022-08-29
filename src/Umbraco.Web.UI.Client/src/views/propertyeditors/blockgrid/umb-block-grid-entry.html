@@ -5,12 +5,12 @@
 </uui-button-inline-create>
 
 <ng-form name="vm.blockRowForm" val-server-match="{ 'contains' : { 'valServerMatchContent': vm.layoutEntry.$block.content.key, 'valServerMatchSettings': vm.layoutEntry.$block.settings.key } }">
-    <div 
-        class="umb-block-grid__block" 
+    <div
+        class="umb-block-grid__block"
         ng-mouseleave="vm.layoutEntry.$block.onMouseLeave()"
         ng-mouseenter="vm.layoutEntry.$block.onMouseEnter()"
         ng-class="{
-                    '--active':vm.layoutEntry.$block.active, 
+                    '--active':vm.layoutEntry.$block.active,
                     '--show-validation': vm.layoutEntry.$block.showValidation === true,
                     '--hovering-area': vm.isHoveringArea,
                     '--block-ui-visible': vm.layoutEntry.$block.blockUiVisibility === true
@@ -23,7 +23,7 @@
                               block="vm.layoutEntry.$block"
                               index="vm.index"
                               parent-form="vm.blockRowForm">
-            <div 
+            <div
                 slot="areas"
                 class="umb-block-grid__block-area-container"
                 ng-style="vm.areaGridStyles">
@@ -55,7 +55,7 @@
 
         <div class="umb-block-grid__block--context">
             <div class="__context-bar">
-                <button 
+                <button
                     ng-if="vm.parentBlock"
                     type="button"
                     class="btn-reset umb-outline action --parent"
@@ -69,7 +69,7 @@
                         {{vm.parentBlock.label}}
                     </span>
                     <span class="sr-only">
-                        <localize key="blockeditor_TODO">Focus parent block</localize>
+                        <localize key="blockeditor_focusParentBlock">Focus parent block</localize>
                     </span>
                     <div class="__error-badge">!</div>
                 </button>
@@ -84,7 +84,7 @@
         <div class="umb-block-grid__block--actions">
 
             <div class="__local-context">
-                
+
 
                 <button type="button" class="btn-reset umb-outline action --settings" localize="title" title="actions_editContent"
                         ng-click="vm.blockEditorApi.editBlock(vm.layoutEntry.$block, false, vm.index, vm.blockRowForm);"
@@ -96,7 +96,7 @@
                     </span>
                     <div class="__error-badge">!</div>
                 </button>
-                
+
                 <button type="button" class="btn-reset umb-outline action --settings" localize="title" title="actions_editSettings"
                         ng-click="vm.blockEditorApi.openSettingsForBlock(vm.layoutEntry.$block, vm.index, vm.blockRowForm);"
                         ng-class="{ '--error': vm.blockRowForm.$error.valServerMatchSettings && vm.valFormManager.isShowingValidation() }"
