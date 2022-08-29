@@ -10,7 +10,7 @@ import { customElement, state } from 'lit/decorators.js';
 
 import { postInstallSetup } from '../core/api/fetcher';
 import { UmbContextProviderMixin } from '../core/context';
-import { ProblemDetails } from '../core/models';
+import type { ProblemDetails } from '../core/models';
 import { UmbInstallerContext } from './installer-context';
 
 @customElement('umb-installer')

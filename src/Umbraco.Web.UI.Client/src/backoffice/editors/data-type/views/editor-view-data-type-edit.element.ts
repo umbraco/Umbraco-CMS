@@ -1,14 +1,16 @@
-import { css, html, LitElement } from 'lit';
+import { UUIComboboxListElement, UUIComboboxListEvent } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
+import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
-import { UmbContextConsumerMixin } from '../../../../core/context';
-import type { DataTypeEntity } from '../../../../mocks/data/data-type.data';
-import type { UmbExtensionManifestPropertyEditorUI, UmbExtensionRegistry } from '../../../../core/extension';
-import { Subscription, distinctUntilChanged } from 'rxjs';
-import { UmbDataTypeContext } from '../data-type.context';
-import { UUIComboboxListElement, UUIComboboxListEvent } from '@umbraco-ui/uui';
+import { distinctUntilChanged, Subscription } from 'rxjs';
 
+import { UmbContextConsumerMixin } from '../../../../core/context';
+import type { ManifestPropertyEditorUI } from '../../../../core/models';
+import { UmbDataTypeContext } from '../data-type.context';
+
+import type { DataTypeEntity } from '../../../../mocks/data/data-type.data';
+import type { UmbExtensionRegistry } from '../../../../core/extension';
 @customElement('umb-editor-view-data-type-edit')
 export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(LitElement) {
 	static styles = [UUITextStyles, css``];
@@ -17,7 +19,7 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Li
 	_dataType?: DataTypeEntity;
 
 	@state()
-	private _propertyEditorUIs: Array<UmbExtensionManifestPropertyEditorUI> = [];
+	private _propertyEditorUIs: Array<ManifestPropertyEditorUI> = [];
 
 	private _extensionRegistry?: UmbExtensionRegistry;
 	private _dataTypeContext?: UmbDataTypeContext;

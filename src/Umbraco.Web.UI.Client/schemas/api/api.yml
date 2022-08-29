@@ -57,6 +57,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
+  /manifests:
+    get:
+      operationId: Manifests
+      responses:
+        '200':
+          description: 200 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ManifestsResponse'
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
   /server/status:
     get:
       operationId: GetStatus
@@ -341,6 +357,240 @@ components:
       required:
         - user
         - telemetryLevel
+    MetaSection:
+      type: object
+      properties:
+        pathname:
+          type: string
+        weight:
+          type: number
+          format: float
+      required:
+        - pathname
+        - weight
+    IManifestSection:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - section
+        meta:
+          $ref: '#/components/schemas/MetaSection'
+        name:
+          type: string
+        js:
+          type: string
+        elementName:
+          type: string
+        alias:
+          type: string
+      required:
+        - type
+        - meta
+        - name
+        - alias
+    MetaPropertyEditorUI:
+      type: object
+      properties:
+        icon:
+          type: string
+        group:
+          type: string
+      required:
+        - icon
+        - group
+    IManifestPropertyEditorUI:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - propertyEditorUI
+        meta:
+          $ref: '#/components/schemas/MetaPropertyEditorUI'
+        name:
+          type: string
+        js:
+          type: string
+        elementName:
+          type: string
+        alias:
+          type: string
+      required:
+        - type
+        - meta
+        - name
+        - alias
+    MetaDashboard:
+      type: object
+      properties:
+        sections:
+          type: array
+          items:
+            type: string
+        pathname:
+          type: string
+        weight:
+          type: number
+          format: float
+        label:
+          type: string
+      required:
+        - sections
+        - pathname
+        - weight
+    IManifestDashboard:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - dashboard
+        meta:
+          $ref: '#/components/schemas/MetaDashboard'
+        name:
+          type: string
+        js:
+          type: string
+        elementName:
+          type: string
+        alias:
+          type: string
+      required:
+        - type
+        - meta
+        - name
+        - alias
+    MetaEditorView:
+      type: object
+      properties:
+        editors:
+          type: array
+          items:
+            type: string
+        pathname:
+          type: string
+        weight:
+          type: number
+          format: float
+        icon:
+          type: string
+      required:
+        - editors
+        - pathname
+        - weight
+        - icon
+    IManifestEditorView:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - editorView
+        meta:
+          $ref: '#/components/schemas/MetaEditorView'
+        name:
+          type: string
+        js:
+          type: string
+        elementName:
+          type: string
+        alias:
+          type: string
+      required:
+        - type
+        - meta
+        - name
+        - alias
+    MetaPropertyAction:
+      type: object
+      properties:
+        propertyEditors:
+          type: array
+          items:
+            type: string
+      required:
+        - propertyEditors
+    IManifestPropertyAction:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - propertyAction
+        meta:
+          $ref: '#/components/schemas/MetaPropertyAction'
+        name:
+          type: string
+        js:
+          type: string
+        elementName:
+          type: string
+        alias:
+          type: string
+      required:
+        - type
+        - meta
+        - name
+        - alias
+    IManifestEntrypoint:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - entrypoint
+        js:
+          type: string
+        alias:
+          type: string
+      required:
+        - type
+        - js
+        - alias
+    IManifestCustom:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - custom
+        meta:
+          type: object
+        alias:
+          type: string
+      required:
+        - type
+        - alias
+    Manifest:
+      oneOf:
+        - $ref: '#/components/schemas/IManifestSection'
+        - $ref: '#/components/schemas/IManifestPropertyEditorUI'
+        - $ref: '#/components/schemas/IManifestDashboard'
+        - $ref: '#/components/schemas/IManifestEditorView'
+        - $ref: '#/components/schemas/IManifestPropertyAction'
+        - $ref: '#/components/schemas/IManifestEntrypoint'
+        - $ref: '#/components/schemas/IManifestCustom'
+      discriminator:
+        propertyName: type
+        mapping:
+          section: '#/components/schemas/IManifestSection'
+          propertyEditorUI: '#/components/schemas/IManifestPropertyEditorUI'
+          dashboard: '#/components/schemas/IManifestDashboard'
+          editorView: '#/components/schemas/IManifestEditorView'
+          propertyAction: '#/components/schemas/IManifestPropertyAction'
+          entrypoint: '#/components/schemas/IManifestEntrypoint'
+          custom: '#/components/schemas/IManifestCustom'
+    ManifestsResponse:
+      type: object
+      properties:
+        manifests:
+          type: array
+          items:
+            $ref: '#/components/schemas/Manifest'
+      required:
+        - manifests
     ServerStatus:
       type: string
       enum:

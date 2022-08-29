@@ -1,7 +1,7 @@
 import { BehaviorSubject, ReplaySubject } from 'rxjs';
 
 import { getInstallSettings, postInstallSetup } from '../core/api/fetcher';
-import { PostInstallRequest, UmbracoInstaller } from '../core/models';
+import type { PostInstallRequest, UmbracoInstaller } from '../core/models';
 
 export class UmbInstallerContext {
 	private _data = new BehaviorSubject<PostInstallRequest>({

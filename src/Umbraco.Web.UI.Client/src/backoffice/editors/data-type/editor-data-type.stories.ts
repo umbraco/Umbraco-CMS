@@ -1,10 +1,11 @@
+import './editor-data-type.element';
+
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit-html';
 
-import { UmbEditorDataTypeElement } from './editor-data-type.element';
-import './editor-data-type.element';
-
 import { data } from '../../../mocks/data/data-type.data';
+
+import type { UmbEditorDataTypeElement } from './editor-data-type.element';
 
 export default {
 	title: 'Editors/Data Type',
