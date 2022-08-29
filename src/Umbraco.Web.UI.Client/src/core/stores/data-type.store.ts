@@ -5,20 +5,6 @@ export class UmbDataTypeStore {
 	private _dataTypes: BehaviorSubject<Array<DataTypeEntity>> = new BehaviorSubject(<Array<DataTypeEntity>>[]);
 	public readonly dataTypes: Observable<Array<DataTypeEntity>> = this._dataTypes.asObservable();
 
-	getById(id: number): Observable<DataTypeEntity | null> {
-		// TODO: use Fetcher API.
-		// TODO: only fetch if the data type is not in the store?
-		fetch(`/umbraco/backoffice/data-type/${id}`)
-			.then((res) => res.json())
-			.then((data) => {
-				this._updateStore(data);
-			});
-
-		return this.dataTypes.pipe(
-			map((dataTypes: Array<DataTypeEntity>) => dataTypes.find((node: DataTypeEntity) => node.id === id) || null)
-		);
-	}
-
 	getByKey(key: string): Observable<DataTypeEntity | null> {
 		// TODO: use Fetcher API.
 		// TODO: only fetch if the data type is not in the store?
