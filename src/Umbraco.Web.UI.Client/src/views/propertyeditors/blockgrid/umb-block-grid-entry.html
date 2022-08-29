@@ -1,6 +1,6 @@
 <uui-button-inline-create
-    class="umb-block-grid__block--inline-create-button __above"
-    style="--umb-block-grid__block--inline-create-button--depth: {{vm.depth}}"
+    class="umb-block-grid__block--inline-create-button --above"
+    ng-class="{'--at-root': vm.depth === '0'}"
     ng-click="vm.blockEditorApi.requestShowCreate(vm.parentBlock, vm.areaKey, $index, $event)">
 </uui-button-inline-create>
 
@@ -132,7 +132,7 @@
 </ng-form>
 
 <uui-button-inline-create
-    class="umb-block-grid__block--inline-create-button __after"
+    class="umb-block-grid__block--inline-create-button --after"
     ng-click="vm.blockEditorApi.requestShowCreate(vm.parentBlock, vm.areaKey, $index+1, $event, {'fitInRow': true})"
     vertical>
 </uui-button-inline-create>

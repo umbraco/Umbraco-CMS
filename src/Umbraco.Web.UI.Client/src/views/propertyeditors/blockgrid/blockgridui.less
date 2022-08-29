@@ -95,6 +95,8 @@ ng-form.ng-invalid-val-server-match-content > .umb-block-grid__block:not(.--acti
     width: 100%;
     height: 100%;
 
+    --umb-block-grid__block--show-ui: 0;// Publicly available.
+
     &::after {
         content: '';
         position: absolute;
@@ -181,6 +183,8 @@ ng-form.ng-invalid-val-server-match-content > .umb-block-grid__block:not(.--acti
     &:not(.--hovering-area):focus,
     &:not(.--hovering-area):focus-within,
     &.--active {
+
+        --umb-block-grid__block--show-ui: 1;
 
         > .umb-block-grid__block--context {
             opacity: 1;
@@ -450,19 +454,23 @@ umb-block-grid-block {
     top: 0px;
     position: absolute;
 }
-.umb-block-grid__block--inline-create-button.__above {
-    left: calc(-20px + var(--umb-block-grid__block--inline-create-button--depth, 0) * 20px);
-    width: calc(100% + 40px - var(--umb-block-grid__block--inline-create-button--depth, 0) * 40px);
+.umb-block-grid__block--inline-create-button.--above {
+    left: 0;
+    width: 100%;
 }
-.umb-block-grid__block--inline-create-button.__after {
+.umb-block-grid__block--inline-create-button.--above.--at-root {
+    left: -20px;
+    width: calc(100% + 40px);
+}
+.umb-block-grid__block--inline-create-button.--after {
     right: 0;
 }
 
 .umb-block-grid__block--after-inline-create-button {
     position: absolute;
     z-index:2;
-    left: calc(-20px + var(--umb-block-grid__block--inline-create-button--depth, 0) * 20px);
-    width: calc(100% + 40px - var(--umb-block-grid__block--inline-create-button--depth, 0) * 40px);
+    left: 0;
+    width: 100%;
 }
 
 

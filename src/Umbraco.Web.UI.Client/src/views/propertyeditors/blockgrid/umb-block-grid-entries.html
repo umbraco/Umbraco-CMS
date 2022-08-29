@@ -26,7 +26,7 @@
 
     </umb-block-grid-entry>
 
-    <div ng-if="vm.entries.length === 0" class="umb-block-grid__area-actions">
+    <div ng-if="vm.depth !== '0' && vm.entries.length === 0" class="umb-block-grid__area-actions">
         <button
                 id="{{vm.model.alias}}"
                 type="button"
@@ -47,10 +47,33 @@
 <uui-button-inline-create
     ng-if="vm.entries.length > 0"
     class="umb-block-grid__block--after-inline-create-button"
-    style="--umb-block-grid__block--inline-create-button--depth: {{vm.depth}}"
+    ng-class="{'--at-root': vm.depth === '0'}"
     ng-click="vm.blockEditorApi.requestShowCreate(vm.parentBlock, vm.areaKey, vm.entries.length - 1, $event)">
 </uui-button-inline-create>
 
+<div class="umb-block-grid__actions" ng-if="vm.depth === '0'">
+    <button
+            id="{{vm.model.alias}}"
+            type="button"
+            class="btn-reset umb-block-grid__create-button umb-outline"
+            ng-disabled="vm.locallyAvailableBlockTypes.length === 0"
+            ng-click="vm.blockEditorApi.requestShowCreate(vm.parentBlock, vm.areaKey, vm.entries.length, $event)">
+        <localize ng-if="vm.locallyAvailableBlockTypes.length !== 1" key="blockEditor_addBlock">Add content</localize>
+        <localize ng-if="vm.locallyAvailableBlockTypes.length === 1" key="blockEditor_addThis" tokens="[vm.locallyAvailableBlockTypes[0].elementTypeModel.name]">Add content</localize>
+    </button>
+    <button type="button"
+            class="btn-reset umb-block-grid__clipboard-button umb-outline"
+            ng-class="{'--jump': vm.jumpClipboardButton}"
+            ng-disabled="vm.clipboardItems.length === 0"
+            ng-click="vm.blockEditorApi.requestShowClipboard(vm.parentBlock, vm.areaKey, vm.entries.length, $event)"
+            localize="title"
+            title="@blockEditor_tabClipboard">
+        <umb-icon icon="icon-paste-in" class="icon"></umb-icon>
+        <span class="sr-only">
+            <localize key="blockEditor_tabClipboard">Clipboard</localize>
+        </span>
+    </button>
+</div>
 
 
 <input type="hidden" name="areaMinCount" ng-model="vm.entries" val-server="areaMinCount" />
