@@ -15,6 +15,7 @@ export type Manifest =
 	| IManifestSection
 	| IManifestTree
 	| IManifestEditor
+	| IManifestEntityAction
 	| IManifestPropertyEditorUI
 	| IManifestDashboard
 	| IManifestEditorView
@@ -26,6 +27,7 @@ export type ManifestStandardTypes =
 	| 'section'
 	| 'tree'
 	| 'editor'
+	| 'entityAction'
 	| 'propertyEditorUI'
 	| 'dashboard'
 	| 'editorView'
@@ -52,6 +54,12 @@ export interface MetaTree {
 	label: string;
 	weight: number;
 	sections: Array<string>;
+}
+
+export interface MetaEntityAction {
+	label: string;
+	icon: string;
+	weight: number;
 }
 
 export interface MetaPropertyEditorUI {
@@ -102,6 +110,11 @@ export interface IManifestTree extends IManifestElement {
 
 export interface IManifestEditor extends IManifestElement {
 	type: 'editor';
+}
+
+export interface IManifestEntityAction extends IManifestElement {
+	type: 'entityAction';
+	meta: MetaEntityAction;
 }
 
 export interface IManifestPropertyEditorUI extends IManifestElement {

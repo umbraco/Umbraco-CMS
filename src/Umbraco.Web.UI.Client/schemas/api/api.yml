@@ -455,6 +455,42 @@ components:
         - type
         - name
         - alias
+    MetaEntityAction:
+      type: object
+      properties:
+        label:
+          type: string
+        icon:
+          type: string
+        weight:
+          type: number
+          format: float
+      required:
+        - label
+        - icon
+        - weight
+    IManifestEntityAction:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - entityAction
+        meta:
+          $ref: '#/components/schemas/MetaEntityAction'
+        name:
+          type: string
+        js:
+          type: string
+        elementName:
+          type: string
+        alias:
+          type: string
+      required:
+        - type
+        - meta
+        - name
+        - alias
     MetaPropertyEditorUI:
       type: object
       properties:
@@ -633,6 +669,7 @@ components:
         - $ref: '#/components/schemas/IManifestSection'
         - $ref: '#/components/schemas/IManifestTree'
         - $ref: '#/components/schemas/IManifestEditor'
+        - $ref: '#/components/schemas/IManifestEntityAction'
         - $ref: '#/components/schemas/IManifestPropertyEditorUI'
         - $ref: '#/components/schemas/IManifestDashboard'
         - $ref: '#/components/schemas/IManifestEditorView'
@@ -645,6 +682,7 @@ components:
           section: '#/components/schemas/IManifestSection'
           tree: '#/components/schemas/IManifestTree'
           editor: '#/components/schemas/IManifestEditor'
+          entityAction: '#/components/schemas/IManifestEntityAction'
           propertyEditorUI: '#/components/schemas/IManifestPropertyEditorUI'
           dashboard: '#/components/schemas/IManifestDashboard'
           editorView: '#/components/schemas/IManifestEditorView'

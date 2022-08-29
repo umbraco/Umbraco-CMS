@@ -16,6 +16,7 @@ import type {
 	ManifestSection,
 	ManifestTree,
 	ManifestEditor,
+	ManifestEntityAction,
 	ManifestCustom,
 } from '../models';
 
@@ -60,6 +61,7 @@ export class UmbExtensionRegistry {
 	extensionsOfType(type: 'section'): Observable<Array<ManifestSection>>;
 	extensionsOfType(type: 'tree'): Observable<Array<ManifestTree>>;
 	extensionsOfType(type: 'editor'): Observable<Array<ManifestEditor>>;
+	extensionsOfType(type: 'entityAction'): Observable<Array<ManifestEntityAction>>;
 	extensionsOfType(type: 'dashboard'): Observable<Array<ManifestDashboard>>;
 	extensionsOfType(type: 'editorView'): Observable<Array<ManifestEditorView>>;
 	extensionsOfType(type: 'propertyEditorUI'): Observable<Array<ManifestPropertyEditorUI>>;

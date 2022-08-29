@@ -145,6 +145,21 @@ export interface components {
       meta?: { [key: string]: unknown };
       alias: string;
     };
+    MetaEntityAction: {
+      label: string;
+      icon: string;
+      /** Format: float */
+      weight: number;
+    };
+    IManifestEntityAction: {
+      /** @enum {string} */
+      type: "entityAction";
+      meta: components["schemas"]["MetaEntityAction"];
+      name: string;
+      js?: string;
+      elementName?: string;
+      alias: string;
+    };
     MetaPropertyEditorUI: {
       icon: string;
       group: string;
@@ -218,6 +233,7 @@ export interface components {
       | components["schemas"]["IManifestSection"]
       | components["schemas"]["IManifestTree"]
       | components["schemas"]["IManifestEditor"]
+      | components["schemas"]["IManifestEntityAction"]
       | components["schemas"]["IManifestPropertyEditorUI"]
       | components["schemas"]["IManifestDashboard"]
       | components["schemas"]["IManifestEditorView"]

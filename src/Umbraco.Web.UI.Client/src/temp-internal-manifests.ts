@@ -349,4 +349,15 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		name: 'Extensions Editor',
 		loader: () => import('./backoffice/editors/extensions/editor-extensions.element'),
 	},
+	{
+		type: 'entityAction',
+		alias: 'Umb.EntityAction.Create',
+		name: 'Document Type Create',
+		loader: () => import('./backoffice/editors/extensions/editor-extensions.element'),
+		meta: {
+			label: 'Create',
+			icon: 'plus',
+			weight: 100,
+		},
+	},
 ];
