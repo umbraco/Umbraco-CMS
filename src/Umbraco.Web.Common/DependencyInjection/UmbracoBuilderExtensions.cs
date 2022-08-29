@@ -142,7 +142,7 @@ public static partial class UmbracoBuilderExtensions
 
         builder.Services.AddHostedService(factory => factory.GetRequiredService<IRuntime>());
 
-        builder.Services.AddSingleton<DatabaseSchemaCreatorFactory>();
+        builder.Services.AddSingleton<IDatabaseSchemaCreatorFactory, DatabaseSchemaCreatorFactory>();
         builder.Services.TryAddEnumerable(ServiceDescriptor
             .Singleton<IDatabaseProviderMetadata, CustomConnectionStringDatabaseProviderMetadata>());
 

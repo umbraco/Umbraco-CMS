@@ -155,6 +155,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "styles", "styles", "{EA628A
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Cms.Imaging.ImageSharp", "src\Umbraco.Cms.Imaging.ImageSharp\Umbraco.Cms.Imaging.ImageSharp.csproj", "{C280181E-597B-4AA5-82E7-D7017E928749}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Cms.Persistence.EFCore", "src\Umbraco.Cms.Persistence.EFCore\Umbraco.Cms.Persistence.EFCore.csproj", "{DCFB7164-8355-457B-A4BE-8A7378A15ADF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -314,6 +315,12 @@ Global
 		{C280181E-597B-4AA5-82E7-D7017E928749}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C280181E-597B-4AA5-82E7-D7017E928749}.SkipTests|Any CPU.ActiveCfg = Debug|Any CPU
 		{C280181E-597B-4AA5-82E7-D7017E928749}.SkipTests|Any CPU.Build.0 = Debug|Any CPU
+		{DCFB7164-8355-457B-A4BE-8A7378A15ADF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DCFB7164-8355-457B-A4BE-8A7378A15ADF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DCFB7164-8355-457B-A4BE-8A7378A15ADF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DCFB7164-8355-457B-A4BE-8A7378A15ADF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DCFB7164-8355-457B-A4BE-8A7378A15ADF}.SkipTests|Any CPU.ActiveCfg = Debug|Any CPU
+		{DCFB7164-8355-457B-A4BE-8A7378A15ADF}.SkipTests|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

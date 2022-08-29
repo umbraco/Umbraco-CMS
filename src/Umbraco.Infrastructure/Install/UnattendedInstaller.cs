@@ -15,7 +15,7 @@ public class UnattendedInstaller : INotificationAsyncHandler<RuntimeUnattendedIn
 {
     private readonly IUmbracoDatabaseFactory _databaseFactory;
 
-    private readonly DatabaseSchemaCreatorFactory _databaseSchemaCreatorFactory;
+    private readonly IDatabaseSchemaCreatorFactory _databaseSchemaCreatorFactory;
     private readonly IDbProviderFactoryCreator _dbProviderFactoryCreator;
     private readonly IEventAggregator _eventAggregator;
     private readonly ILogger<UnattendedInstaller> _logger;
@@ -23,7 +23,7 @@ public class UnattendedInstaller : INotificationAsyncHandler<RuntimeUnattendedIn
     private readonly IOptions<UnattendedSettings> _unattendedSettings;
 
     public UnattendedInstaller(
-        DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory,
+        IDatabaseSchemaCreatorFactory databaseSchemaCreatorFactory,
         IEventAggregator eventAggregator,
         IOptions<UnattendedSettings> unattendedSettings,
         IUmbracoDatabaseFactory databaseFactory,
@@ -111,7 +111,7 @@ public class UnattendedInstaller : INotificationAsyncHandler<RuntimeUnattendedIn
                 _logger.LogInformation("Starting unattended install.");
 
                 database.BeginTransaction();
-                DatabaseSchemaCreator creator = _databaseSchemaCreatorFactory.Create(database);
+                IDatabaseSchemaCreator creator = _databaseSchemaCreatorFactory.Create(database);
                 creator.InitializeDatabaseSchema();
                 database.CompleteTransaction();
                 _logger.LogInformation("Unattended install completed.");

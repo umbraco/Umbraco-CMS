@@ -33,7 +33,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
         private readonly IOptionsMonitor<ConnectionStrings> _connectionStrings;
         private readonly IMigrationPlanExecutor _migrationPlanExecutor;
-        private readonly DatabaseSchemaCreatorFactory _databaseSchemaCreatorFactory;
+        private readonly IDatabaseSchemaCreatorFactory _databaseSchemaCreatorFactory;
         private readonly IEnumerable<IDatabaseProviderMetadata> _databaseProviderMetadata;
 
         private DatabaseSchemaResult? _databaseSchemaValidationResult;
@@ -53,7 +53,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             IOptionsMonitor<GlobalSettings> globalSettings,
             IOptionsMonitor<ConnectionStrings> connectionStrings,
             IMigrationPlanExecutor migrationPlanExecutor,
-            DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory,
+            IDatabaseSchemaCreatorFactory databaseSchemaCreatorFactory,
             IEnumerable<IDatabaseProviderMetadata> databaseProviderMetadata)
         {
             _scopeProvider = scopeProvider;
@@ -206,37 +206,37 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
 
         public void CreateDatabase() => _dbProviderFactoryCreator.CreateDatabase(_databaseFactory.ProviderName!, _databaseFactory.ConnectionString!);
 
-        /// <summary>
-        /// Validates the database schema.
-        /// </summary>
-        /// <remarks>
-        /// <para>This assumes that the database exists and the connection string is
-        /// configured and it is possible to connect to the database.</para>
-        /// </remarks>
-        public DatabaseSchemaResult? ValidateSchema()
-        {
-            using (var scope = _scopeProvider.CreateCoreScope())
-            {
-                var result = ValidateSchema(scope);
-                scope.Complete();
-                return result;
-            }
-        }
+        // /// <summary>
+        // /// Validates the database schema.
+        // /// </summary>
+        // /// <remarks>
+        // /// <para>This assumes that the database exists and the connection string is
+        // /// configured and it is possible to connect to the database.</para>
+        // /// </remarks>
+        // public DatabaseSchemaResult? ValidateSchema()
+        // {
+        //     using (var scope = _scopeProvider.CreateCoreScope())
+        //     {
+        //         var result = ValidateSchema(scope);
+        //         scope.Complete();
+        //         return result;
+        //     }
+        // }
 
-        private DatabaseSchemaResult? ValidateSchema(ICoreScope scope)
-        {
-            if (_databaseFactory.Initialized == false)
-                return new DatabaseSchemaResult();
-
-            if (_databaseSchemaValidationResult != null)
-                return _databaseSchemaValidationResult;
-
-            _databaseSchemaValidationResult = _scopeAccessor.AmbientScope?.Database.ValidateSchema();
-
-            scope.Complete();
-
-            return _databaseSchemaValidationResult;
-        }
+        // private DatabaseSchemaResult? ValidateSchema(ICoreScope scope)
+        // {
+        //     if (_databaseFactory.Initialized == false)
+        //         return new DatabaseSchemaResult();
+        //
+        //     if (_databaseSchemaValidationResult != null)
+        //         return _databaseSchemaValidationResult;
+        //
+        //     _databaseSchemaValidationResult = _scopeAccessor.AmbientScope?.Database.ValidateSchema();
+        //
+        //     scope.Complete();
+        //
+        //     return _databaseSchemaValidationResult;
+        // }
 
         /// <summary>
         /// Creates the database schema and inserts initial data.
@@ -271,8 +271,9 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
 
                 var message = string.Empty;
 
-                var schemaResult = ValidateSchema();
-                var hasInstalledVersion = schemaResult?.DetermineHasInstalledVersion() ?? false;
+
+
+                var hasInstalledVersion = DetermineHasInstalledVersion();
 
                 //If the determined version is "empty" its a new install - otherwise upgrade the existing
                 if (!hasInstalledVersion)
@@ -305,6 +306,11 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             {
                 return HandleInstallException(ex);
             }
+        }
+
+        public bool DetermineHasInstalledVersion()
+        {
+            return _scopeAccessor.AmbientScope?.Database?.IsUmbracoInstalled() ?? false;
         }
 
         /// <summary>

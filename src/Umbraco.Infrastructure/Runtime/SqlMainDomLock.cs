@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Persistence;
@@ -37,7 +38,7 @@ public class SqlMainDomLock : IMainDomLock
         IOptionsMonitor<ConnectionStrings> connectionStrings,
         IDbProviderFactoryCreator dbProviderFactoryCreator,
         IMainDomKeyGenerator mainDomKeyGenerator,
-        DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory,
+        IDatabaseInfo databaseInfo,
         NPocoMapperCollection npocoMappers)
     {
         // unique id for our appdomain, this is more unique than the appdomain id which is just an INT counter to its safer
@@ -52,7 +53,7 @@ public class SqlMainDomLock : IMainDomLock
             connectionStrings,
             new MapperCollection(() => Enumerable.Empty<BaseMapper>()),
             dbProviderFactoryCreator,
-            databaseSchemaCreatorFactory,
+            databaseInfo,
             npocoMappers);
 
         MainDomKey = MainDomKeyPrefix + "-" + mainDomKeyGenerator.GenerateKey();

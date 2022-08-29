@@ -31,6 +31,4 @@ public interface IUmbracoDatabase : IDatabase
     int BulkInsertRecords<T>(IEnumerable<T> records);
 
     bool IsUmbracoInstalled();
-
-    DatabaseSchemaResult ValidateSchema();
 }

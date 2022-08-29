@@ -37,7 +37,7 @@ internal class UmbracoCustomizations : ICustomization
             .Customize(new ConstructorCustomization(typeof(BackOfficeController), new GreedyConstructorQuery()))
             .Customize(new ConstructorCustomization(typeof(BackOfficeUserManager), new GreedyConstructorQuery()))
             .Customize(new ConstructorCustomization(typeof(MemberManager), new GreedyConstructorQuery()))
-            .Customize(new ConstructorCustomization(typeof(DatabaseSchemaCreatorFactory), new GreedyConstructorQuery()))
+            .Customize(new ConstructorCustomization(typeof(IDatabaseSchemaCreatorFactory), new GreedyConstructorQuery()))
             .Customize(new ConstructorCustomization(typeof(BackOfficeServerVariables), new GreedyConstructorQuery()))
             .Customize(new ConstructorCustomization(typeof(InstallHelper), new GreedyConstructorQuery()));
 
