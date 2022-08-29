@@ -24,10 +24,10 @@ public class DistributedCacheTests
 
         var cacheRefresherCollection = new CacheRefresherCollection(() => new[] { new TestCacheRefresher() });
 
-        _distributedCache = new Cms.Core.Cache.DistributedCache(ServerMessenger, cacheRefresherCollection);
+        _distributedCache = new global::Umbraco.Cms.Core.Cache.DistributedCache(ServerMessenger, cacheRefresherCollection);
     }
 
-    private Cms.Core.Cache.DistributedCache _distributedCache;
+    private global::Umbraco.Cms.Core.Cache.DistributedCache _distributedCache;
 
     private IServerRoleAccessor ServerRegistrar { get; set; }
 

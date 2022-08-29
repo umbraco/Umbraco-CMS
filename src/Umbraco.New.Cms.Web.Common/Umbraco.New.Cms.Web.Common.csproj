@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+      <TargetFramework>net6.0</TargetFramework>
+      <ImplicitUsings>enable</ImplicitUsings>
+      <Nullable>enable</Nullable>
+      <IsPackable>false</IsPackable>
+      <WarningsAsErrors>nullable</WarningsAsErrors>
+      <EnablePackageValidation>false</EnablePackageValidation>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Umbraco.Web.Common\Umbraco.Web.Common.csproj" />
+      <ProjectReference Include="..\Umbraco.New.Cms.Infrastructure\Umbraco.New.Cms.Infrastructure.csproj" />
+    </ItemGroup>
+
+</Project>

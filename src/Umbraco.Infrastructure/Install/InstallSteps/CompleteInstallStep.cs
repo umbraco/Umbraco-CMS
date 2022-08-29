@@ -2,6 +2,7 @@ using Umbraco.Cms.Core.Install.Models;
 
 namespace Umbraco.Cms.Infrastructure.Install.InstallSteps;
 
+[Obsolete("Will be replace with a new step with the new backoffice")]
 [InstallSetupStep(
     InstallationType.NewInstall | InstallationType.Upgrade,
     "UmbracoVersion",
