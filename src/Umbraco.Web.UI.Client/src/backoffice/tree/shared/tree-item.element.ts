@@ -7,7 +7,6 @@ import { UUIMenuItemEvent } from '@umbraco-ui/uui';
 import { UmbSectionContext } from '../../sections/section.context';
 import { Subscription } from 'rxjs';
 import { Entity } from '../../../mocks/data/entity.data';
-import './tree-actions-modal';
 import { UmbActionService } from '../actions.service';
 
 @customElement('umb-tree-item')
