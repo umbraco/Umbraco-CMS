@@ -5,9 +5,10 @@ import { customElement, property } from 'lit/decorators.js';
 import '../shared/tree-navigator.element';
 
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '../../../core/context';
-import { UmbExtensionManifestTree } from '../../../core/extension';
 import { UmbTreeMembersContext } from './tree-members.context';
 import { UmbEntityStore } from '../../../core/stores/entity.store';
+import type { ManifestTree } from '../../../core/models';
+
 @customElement('umb-tree-members')
 export class UmbTreeMembers extends UmbContextProviderMixin(UmbContextConsumerMixin(LitElement)) {
 	static styles = [UUITextStyles, css``];
@@ -15,7 +16,7 @@ export class UmbTreeMembers extends UmbContextProviderMixin(UmbContextConsumerMi
 	private _treeContext?: UmbTreeMembersContext;
 
 	@property({ attribute: false })
-	public tree?: UmbExtensionManifestTree;
+	public tree?: ManifestTree;
 
 	private _entityStore?: UmbEntityStore;
 

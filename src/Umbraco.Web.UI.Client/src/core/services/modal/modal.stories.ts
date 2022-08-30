@@ -1,18 +1,18 @@
 import '../../../backoffice/components/backoffice-modal-container.element';
+import '../../../backoffice/editors/shared/editor-layout/editor-layout.element';
 import '../../../core/services/modal/layouts/content-picker/modal-layout-content-picker.element';
 import '../../context/context-provider.element';
-import '../../../backoffice/editors/shared/editor-layout/editor-layout.element';
-
 import '@umbraco-ui/uui-modal';
 import '@umbraco-ui/uui-modal-container';
-import '@umbraco-ui/uui-modal-sidebar';
 import '@umbraco-ui/uui-modal-dialog';
+import '@umbraco-ui/uui-modal-sidebar';
 
 import { Meta, Story } from '@storybook/web-components';
+import { LitElement } from 'lit';
 import { html } from 'lit-html';
 import { customElement, property, state } from 'lit/decorators.js';
+
 import { UmbContextConsumerMixin } from '../../context';
-import { LitElement } from 'lit';
 import { UmbModalService } from './';
 
 export default {
@@ -34,7 +34,7 @@ export default {
 } as Meta;
 
 @customElement('story-modal-service-example')
-class StoryModalServiceExampleElement extends UmbContextConsumerMixin(LitElement) {
+export class StoryModalServiceExampleElement extends UmbContextConsumerMixin(LitElement) {
 	@property()
 	modalLayout = 'confirm';
 

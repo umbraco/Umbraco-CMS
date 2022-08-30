@@ -1,23 +1,9 @@
 import { BehaviorSubject, map, Observable } from 'rxjs';
-import { DataTypeEntity, umbDataTypeData } from '../../mocks/data/data-type.data';
+import { DataTypeEntity } from '../../mocks/data/data-type.data';
 
 export class UmbDataTypeStore {
 	private _dataTypes: BehaviorSubject<Array<DataTypeEntity>> = new BehaviorSubject(<Array<DataTypeEntity>>[]);
 	public readonly dataTypes: Observable<Array<DataTypeEntity>> = this._dataTypes.asObservable();
-
-	getById(id: number): Observable<DataTypeEntity | null> {
-		// TODO: use Fetcher API.
-		// TODO: only fetch if the data type is not in the store?
-		fetch(`/umbraco/backoffice/data-type/${id}`)
-			.then((res) => res.json())
-			.then((data) => {
-				this._updateStore(data);
-			});
-
-		return this.dataTypes.pipe(
-			map((dataTypes: Array<DataTypeEntity>) => dataTypes.find((node: DataTypeEntity) => node.id === id) || null)
-		);
-	}
 
 	getByKey(key: string): Observable<DataTypeEntity | null> {
 		// TODO: use Fetcher API.
@@ -31,13 +17,6 @@ export class UmbDataTypeStore {
 		return this.dataTypes.pipe(
 			map((dataTypes: Array<DataTypeEntity>) => dataTypes.find((node: DataTypeEntity) => node.key === key) || null)
 		);
-	}
-
-	// TODO: temp solution until we know where to get tree data from
-	getAll(): Observable<Array<DataTypeEntity>> {
-		const documentTypes = umbDataTypeData.getAll();
-		this._dataTypes.next(documentTypes);
-		return this.dataTypes;
 	}
 
 	async save(dataTypes: Array<DataTypeEntity>) {

@@ -1,7 +1,7 @@
 import { rest } from 'msw';
 
 import umbracoPath from '../../core/helpers/umbraco-path';
-import {
+import type {
   PostInstallRequest,
   ProblemDetails,
   UmbracoInstaller,

@@ -7,10 +7,10 @@ export class UmbDocumentTypeStore {
 	);
 	public readonly documentTypes: Observable<Array<DocumentTypeEntity>> = this._documentTypes.asObservable();
 
-	getById(id: number): Observable<DocumentTypeEntity | null> {
+	getByKey(key: string): Observable<DocumentTypeEntity | null> {
 		// TODO: use Fetcher API.
 		// TODO: only fetch if the data type is not in the store?
-		fetch(`/umbraco/backoffice/document-type/${id}`)
+		fetch(`/umbraco/backoffice/document-type/${key}`)
 			.then((res) => res.json())
 			.then((data) => {
 				this._updateStore(data);
@@ -19,16 +19,9 @@ export class UmbDocumentTypeStore {
 		return this.documentTypes.pipe(
 			map(
 				(documentTypes: Array<DocumentTypeEntity>) =>
-					documentTypes.find((node: DocumentTypeEntity) => node.id === id) || null
+					documentTypes.find((documentType: DocumentTypeEntity) => documentType.key === key) || null
 			)
 		);
-	}
-
-	// TODO: temp solution until we know where to get tree data from
-	getAll(): Observable<Array<DocumentTypeEntity>> {
-		const documentTypes = umbDocumentTypeData.getAll();
-		this._documentTypes.next(documentTypes);
-		return this.documentTypes;
 	}
 
 	async save(documentTypes: Array<DocumentTypeEntity>) {
@@ -53,7 +46,7 @@ export class UmbDocumentTypeStore {
 		const updated: DocumentTypeEntity[] = [...storedDocumentTypes];
 
 		fetchedDocumentTypes.forEach((fetchedDocumentType) => {
-			const index = storedDocumentTypes.map((storedNode) => storedNode.id).indexOf(fetchedDocumentType.id);
+			const index = storedDocumentTypes.map((storedNode) => storedNode.key).indexOf(fetchedDocumentType.key);
 
 			if (index !== -1) {
 				// If the data type is already in the store, update it

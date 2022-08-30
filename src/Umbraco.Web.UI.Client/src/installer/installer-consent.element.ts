@@ -4,7 +4,7 @@ import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import { Subscription } from 'rxjs';
 
 import { UmbContextConsumerMixin } from '../core/context';
-import { TelemetryModel } from '../core/models';
+import type { TelemetryModel } from '../core/models';
 import { UmbInstallerContext } from './installer-context';
 
 @customElement('umb-installer-consent')

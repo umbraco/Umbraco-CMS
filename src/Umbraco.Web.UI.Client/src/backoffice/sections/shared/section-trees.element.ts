@@ -1,11 +1,12 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { map, Subscription, first, switchMap, EMPTY, of } from 'rxjs';
+import { map, Subscription, switchMap, EMPTY, of } from 'rxjs';
 
 import { UmbContextConsumerMixin } from '../../../core/context';
-import { UmbExtensionManifestTree, UmbExtensionRegistry } from '../../../core/extension';
+import { UmbExtensionRegistry } from '../../../core/extension';
 import { UmbSectionContext } from '../section.context';
+import type { ManifestTree } from '../../../core/models';
 
 import '../../tree/shared/tree.element';
 
@@ -14,7 +15,7 @@ export class UmbSectionTrees extends UmbContextConsumerMixin(LitElement) {
 	static styles = [UUITextStyles];
 
 	@state()
-	private _trees: Array<UmbExtensionManifestTree> = [];
+	private _trees: Array<ManifestTree> = [];
 
 	private _extensionStore?: UmbExtensionRegistry;
 	private _treesSubscription?: Subscription;

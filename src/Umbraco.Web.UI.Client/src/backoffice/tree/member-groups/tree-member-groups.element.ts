@@ -5,9 +5,9 @@ import { customElement, property } from 'lit/decorators.js';
 import '../shared/tree-navigator.element';
 
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '../../../core/context';
-import { UmbExtensionManifestTree } from '../../../core/extension';
 import { UmbTreeMemberGroupsContext } from './tree-member-groups.context';
 import { UmbEntityStore } from '../../../core/stores/entity.store';
+import type { ManifestTree } from '../../../core/models';
 
 @customElement('umb-tree-member-groups')
 export class UmbTreeMemberGroups extends UmbContextProviderMixin(UmbContextConsumerMixin(LitElement)) {
@@ -16,7 +16,7 @@ export class UmbTreeMemberGroups extends UmbContextProviderMixin(UmbContextConsu
 	private _treeContext?: UmbTreeMemberGroupsContext;
 
 	@property({ attribute: false })
-	public tree?: UmbExtensionManifestTree;
+	public tree?: ManifestTree;
 
 	private _entityStore?: UmbEntityStore;
 

@@ -13,6 +13,9 @@ export interface paths {
   "/install/validateDatabase": {
     post: operations["PostInstallValidateDatabase"];
   };
+  "/manifests": {
+    get: operations["Manifests"];
+  };
   "/server/status": {
     get: operations["GetStatus"];
   };
@@ -102,6 +105,144 @@ export interface components {
       telemetryLevel: components["schemas"]["ConsentLevel"];
       database?: components["schemas"]["InstallSetupDatabaseConfiguration"];
     };
+    MetaSection: {
+      pathname: string;
+      /** Format: float */
+      weight: number;
+    };
+    IManifestSection: {
+      /** @enum {string} */
+      type: "section";
+      meta: components["schemas"]["MetaSection"];
+      name: string;
+      js?: string;
+      elementName?: string;
+      alias: string;
+    };
+    MetaTree: {
+      /** Format: float */
+      weight: number;
+      sections: string[];
+    };
+    IManifestTree: {
+      /** @enum {string} */
+      type: "tree";
+      meta: components["schemas"]["MetaTree"];
+      name: string;
+      js?: string;
+      elementName?: string;
+      alias: string;
+    };
+    MetaEditor: {
+      entityType: string;
+    };
+    IManifestEditor: {
+      /** @enum {string} */
+      type: "editor";
+      meta: components["schemas"]["MetaEditor"];
+      name: string;
+      js?: string;
+      elementName?: string;
+      alias: string;
+    };
+    MetaEntityAction: {
+      label: string;
+      icon: string;
+      /** Format: float */
+      weight: number;
+    };
+    IManifestEntityAction: {
+      /** @enum {string} */
+      type: "entityAction";
+      meta: components["schemas"]["MetaEntityAction"];
+      name: string;
+      js?: string;
+      elementName?: string;
+      alias: string;
+    };
+    MetaPropertyEditorUI: {
+      icon: string;
+      group: string;
+    };
+    IManifestPropertyEditorUI: {
+      /** @enum {string} */
+      type: "propertyEditorUI";
+      meta: components["schemas"]["MetaPropertyEditorUI"];
+      name: string;
+      js?: string;
+      elementName?: string;
+      alias: string;
+    };
+    MetaDashboard: {
+      sections: string[];
+      pathname: string;
+      /** Format: float */
+      weight: number;
+      label?: string;
+    };
+    IManifestDashboard: {
+      /** @enum {string} */
+      type: "dashboard";
+      meta: components["schemas"]["MetaDashboard"];
+      name: string;
+      js?: string;
+      elementName?: string;
+      alias: string;
+    };
+    MetaEditorView: {
+      editors: string[];
+      pathname: string;
+      /** Format: float */
+      weight: number;
+      icon: string;
+    };
+    IManifestEditorView: {
+      /** @enum {string} */
+      type: "editorView";
+      meta: components["schemas"]["MetaEditorView"];
+      name: string;
+      js?: string;
+      elementName?: string;
+      alias: string;
+    };
+    MetaPropertyAction: {
+      propertyEditors: string[];
+    };
+    IManifestPropertyAction: {
+      /** @enum {string} */
+      type: "propertyAction";
+      meta: components["schemas"]["MetaPropertyAction"];
+      name: string;
+      js?: string;
+      elementName?: string;
+      alias: string;
+    };
+    IManifestEntrypoint: {
+      /** @enum {string} */
+      type: "entrypoint";
+      js: string;
+      alias: string;
+    };
+    IManifestCustom: {
+      /** @enum {string} */
+      type: "custom";
+      meta?: { [key: string]: unknown };
+      alias: string;
+    };
+    Manifest:
+      | components["schemas"]["IManifestSection"]
+      | components["schemas"]["IManifestTree"]
+      | components["schemas"]["IManifestEditor"]
+      | components["schemas"]["IManifestEntityAction"]
+      | components["schemas"]["IManifestPropertyEditorUI"]
+      | components["schemas"]["IManifestDashboard"]
+      | components["schemas"]["IManifestEditorView"]
+      | components["schemas"]["IManifestPropertyAction"]
+      | components["schemas"]["IManifestEntrypoint"]
+      | components["schemas"]["IManifestCustom"];
+    ManifestsResponse: {
+      manifests: components["schemas"]["Manifest"][];
+    };
     /** @enum {string} */
     ServerStatus: "running" | "must-install" | "must-upgrade";
     StatusResponse: {
@@ -182,6 +323,22 @@ export interface operations {
     requestBody: {
       content: {
         "application/json": components["schemas"]["InstallSetupDatabaseConfiguration"];
+      };
+    };
+  };
+  Manifests: {
+    responses: {
+      /** 200 response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["ManifestsResponse"];
+        };
+      };
+      /** default response */
+      default: {
+        content: {
+          "application/json": components["schemas"]["ProblemDetails"];
+        };
       };
     };
   };

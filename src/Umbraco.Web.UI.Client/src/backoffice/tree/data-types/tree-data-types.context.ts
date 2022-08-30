@@ -1,13 +1,13 @@
 import { map } from 'rxjs';
-import { UmbExtensionManifestTree } from '../../../core/extension';
 import { UmbEntityStore } from '../../../core/stores/entity.store';
 import { UmbTreeContext } from '../tree.context';
+import type { ManifestTree } from '../../../core/models';
 
 export class UmbTreeDataTypesContext implements UmbTreeContext {
-	public tree: UmbExtensionManifestTree;
+	public tree: ManifestTree;
 	public entityStore: UmbEntityStore;
 
-	constructor(tree: UmbExtensionManifestTree, entityStore: UmbEntityStore) {
+	constructor(tree: ManifestTree, entityStore: UmbEntityStore) {
 		this.tree = tree;
 		// TODO: temp solution until we know where to get tree data from
 		this.entityStore = entityStore;
@@ -19,7 +19,7 @@ export class UmbTreeDataTypesContext implements UmbTreeContext {
 			key: '3fd3eba5-c893-4d3c-af67-f574e6eded38',
 			name: 'Data Types',
 			hasChildren: true,
-			type: 'data-type',
+			type: 'dataType',
 			icon: 'favorite',
 			parentKey: '',
 		};
@@ -29,7 +29,7 @@ export class UmbTreeDataTypesContext implements UmbTreeContext {
 
 	public fetchChildren(key: string) {
 		// TODO: figure out url structure
-		fetch(`/umbraco/backoffice/trees/data-types/${key}`)
+		fetch(`/umbraco/backoffice/entities/data-types/${key}`)
 			.then((res) => res.json())
 			.then((data) => {
 				this.entityStore.update(data);

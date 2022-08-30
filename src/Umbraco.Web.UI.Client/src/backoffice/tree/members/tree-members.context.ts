@@ -1,13 +1,13 @@
 import { map } from 'rxjs';
-import { UmbExtensionManifestTree } from '../../../core/extension';
 import { UmbEntityStore } from '../../../core/stores/entity.store';
 import { UmbTreeContext } from '../tree.context';
+import type { ManifestTree } from '../../../core/models';
 
 export class UmbTreeMembersContext implements UmbTreeContext {
-	public tree: UmbExtensionManifestTree;
+	public tree: ManifestTree;
 	public entityStore: UmbEntityStore;
 
-	constructor(tree: UmbExtensionManifestTree, entityStore: UmbEntityStore) {
+	constructor(tree: ManifestTree, entityStore: UmbEntityStore) {
 		this.tree = tree;
 		this.entityStore = entityStore;
 	}
@@ -28,7 +28,7 @@ export class UmbTreeMembersContext implements UmbTreeContext {
 
 	public fetchChildren(key: string) {
 		// TODO: figure out url structure
-		fetch(`/umbraco/backoffice/trees/members/${key}`)
+		fetch(`/umbraco/backoffice/entities/members/${key}`)
 			.then((res) => res.json())
 			.then((data) => {
 				this.entityStore.update(data);

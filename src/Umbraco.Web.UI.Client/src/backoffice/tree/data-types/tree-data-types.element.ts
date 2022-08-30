@@ -3,9 +3,9 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
 import '../shared/tree-navigator.element';
 import { UmbTreeDataTypesContext } from './tree-data-types.context';
-import { UmbExtensionManifestTree } from '../../../core/extension';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '../../../core/context';
 import { UmbEntityStore } from '../../../core/stores/entity.store';
+import type { ManifestTree } from '../../../core/models';
 
 @customElement('umb-tree-data-types')
 export class UmbTreeDataTypesElement extends UmbContextProviderMixin(UmbContextConsumerMixin(LitElement)) {
@@ -14,7 +14,7 @@ export class UmbTreeDataTypesElement extends UmbContextProviderMixin(UmbContextC
 	private _treeContext?: UmbTreeDataTypesContext;
 
 	@property({ attribute: false })
-	public tree?: UmbExtensionManifestTree;
+	public tree?: ManifestTree;
 
 	private _entityStore?: UmbEntityStore;
 
