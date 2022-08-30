@@ -28,7 +28,7 @@ export class UmbTreeMediaContext implements UmbTreeContext {
 
 	public fetchChildren(key: string) {
 		// TODO: figure out url structure
-		fetch(`/umbraco/backoffice/trees/node/${key}`)
+		fetch(`/umbraco/backoffice/entities/node/${key}`)
 			.then((res) => res.json())
 			.then((data) => {
 				this.entityStore.update(data);

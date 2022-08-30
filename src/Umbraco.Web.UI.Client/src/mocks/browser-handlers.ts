@@ -6,7 +6,7 @@ import * as manifestsHandlers from './domains/manifests.handlers';
 import * as serverHandlers from './domains/server.handlers';
 import { handlers as upgradeHandlers } from './domains/upgrade.handlers';
 import { handlers as userHandlers } from './domains/user.handlers';
-import { handlers as treeHandlers } from './domains/tree.handlers';
+import { handlers as treeHandlers } from './domains/entity.handlers';
 
 const handlers = [
 	serverHandlers.serverVersionHandler,

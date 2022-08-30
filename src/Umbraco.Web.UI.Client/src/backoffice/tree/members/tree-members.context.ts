@@ -28,7 +28,7 @@ export class UmbTreeMembersContext implements UmbTreeContext {
 
 	public fetchChildren(key: string) {
 		// TODO: figure out url structure
-		fetch(`/umbraco/backoffice/trees/members/${key}`)
+		fetch(`/umbraco/backoffice/entities/members/${key}`)
 			.then((res) => res.json())
 			.then((data) => {
 				this.entityStore.update(data);

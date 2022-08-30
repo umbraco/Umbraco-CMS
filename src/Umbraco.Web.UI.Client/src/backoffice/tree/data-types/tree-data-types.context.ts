@@ -29,7 +29,7 @@ export class UmbTreeDataTypesContext implements UmbTreeContext {
 
 	public fetchChildren(key: string) {
 		// TODO: figure out url structure
-		fetch(`/umbraco/backoffice/trees/data-types/${key}`)
+		fetch(`/umbraco/backoffice/entities/data-types/${key}`)
 			.then((res) => res.json())
 			.then((data) => {
 				this.entityStore.update(data);

@@ -29,7 +29,7 @@ export class UmbTreeMemberGroupsContext implements UmbTreeContext {
 
 	public fetchChildren(key: string) {
 		// TODO: figure out url structure
-		fetch(`/umbraco/backoffice/trees/member-groups/${key}`)
+		fetch(`/umbraco/backoffice/entities/member-groups/${key}`)
 			.then((res) => res.json())
 			.then((data) => {
 				this.entityStore.update(data);
