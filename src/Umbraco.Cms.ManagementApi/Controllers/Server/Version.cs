@@ -6,6 +6,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.Server;
 
+[ApiVersion("1.0")]
 public class Version : ServerController
 {
     private readonly IUmbracoVersion _umbracoVersion;

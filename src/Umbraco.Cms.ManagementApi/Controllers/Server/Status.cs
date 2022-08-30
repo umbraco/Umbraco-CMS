@@ -5,6 +5,7 @@ using Umbraco.Cms.ManagementApi.ViewModels.Server;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.Server;
 
+[ApiVersion("1.0")]
 public class Status : ServerController
 {
     private readonly IRuntimeState _runtimeState;
