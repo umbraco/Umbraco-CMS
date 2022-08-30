@@ -39,9 +39,11 @@ export class UmbTreeItem extends UmbContextConsumerMixin(LitElement) {
 	private _sectionContext?: UmbSectionContext;
 	private _sectionSubscription?: Subscription;
 	private _childrenSubscription?: Subscription;
+	private _actionService?: UmbActionService;
 
 	@state()
 	private _itemName = '';
+
 	constructor() {
 		super();
 
