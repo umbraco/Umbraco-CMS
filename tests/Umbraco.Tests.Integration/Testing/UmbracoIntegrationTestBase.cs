@@ -13,6 +13,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Persistence.EFCore;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Implementations;
 
@@ -27,12 +28,13 @@ public abstract class UmbracoIntegrationTestBase
 {
     private static readonly object s_dbLocker = new();
     private static ITestDatabase s_dbInstance;
-    private static TestDbMeta s_fixtureDbMeta;
+    protected static TestDbMeta s_fixtureDbMeta;
     private static int s_testCount = 1;
     private readonly List<Action> _fixtureTeardown = new();
     private readonly Queue<Action> _testTeardown = new();
 
     private bool _firstTestInFixture = true;
+    protected IOptionsMonitor<ConnectionStrings> s_connectionStrings;
 
     protected Dictionary<string, string> InMemoryConfiguration { get; } = new();
 
@@ -121,10 +123,12 @@ public abstract class UmbracoIntegrationTestBase
         var testDatabaseFactoryProvider = serviceProvider.GetRequiredService<TestUmbracoDatabaseFactoryProvider>();
         var databaseFactory = serviceProvider.GetRequiredService<IUmbracoDatabaseFactory>();
         var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
-        var connectionStrings = serviceProvider.GetRequiredService<IOptionsMonitor<ConnectionStrings>>();
+        var umbracoDbContextFactory = serviceProvider.GetRequiredService<UmbracoDbContextFactory>();
+        
+        s_connectionStrings = serviceProvider.GetRequiredService<IOptionsMonitor<ConnectionStrings>>();
 
         // This will create a db, install the schema and ensure the app is configured to run
-        SetupTestDatabase(testDatabaseFactoryProvider, connectionStrings, databaseFactory, loggerFactory, state);
+        SetupTestDatabase(testDatabaseFactoryProvider, s_connectionStrings, databaseFactory, loggerFactory, state, umbracoDbContextFactory);
     }
 
     private void ConfigureTestDatabaseFactory(
@@ -147,14 +151,15 @@ public abstract class UmbracoIntegrationTestBase
         IOptionsMonitor<ConnectionStrings> connectionStrings,
         IUmbracoDatabaseFactory databaseFactory,
         ILoggerFactory loggerFactory,
-        IRuntimeState runtimeState)
+        IRuntimeState runtimeState,
+        UmbracoDbContextFactory umbracoDbContextFactory)
     {
         if (TestOptions.Database == UmbracoTestOptions.Database.None)
         {
             return;
         }
 
-        var db = GetOrCreateDatabase(loggerFactory, testUmbracoDatabaseFactoryProvider);
+        var db = GetOrCreateDatabase(loggerFactory, testUmbracoDatabaseFactoryProvider, umbracoDbContextFactory);
 
         switch (TestOptions.Database)
         {
@@ -222,7 +227,7 @@ public abstract class UmbracoIntegrationTestBase
     }
 
 
-    private ITestDatabase GetOrCreateDatabase(ILoggerFactory loggerFactory, TestUmbracoDatabaseFactoryProvider dbFactory)
+    private ITestDatabase GetOrCreateDatabase(ILoggerFactory loggerFactory, TestUmbracoDatabaseFactoryProvider dbFactory, UmbracoDbContextFactory umbracoDbContextFactory)
     {
         lock (s_dbLocker)
         {
@@ -245,7 +250,7 @@ public abstract class UmbracoIntegrationTestBase
 
             Directory.CreateDirectory(settings.FilesPath);
 
-            s_dbInstance = TestDatabaseFactory.Create(settings, dbFactory, loggerFactory);
+            s_dbInstance = TestDatabaseFactory.Create(settings, dbFactory, loggerFactory, umbracoDbContextFactory);
 
             return s_dbInstance;
         }

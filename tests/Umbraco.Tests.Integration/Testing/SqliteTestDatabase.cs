@@ -14,6 +14,7 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
+using Umbraco.Cms.Persistence.EFCore;
 using Umbraco.Cms.Persistence.Sqlite;
 using Umbraco.Cms.Persistence.Sqlite.Mappers;
 using Umbraco.Cms.Tests.Common;
@@ -24,14 +25,16 @@ public class SqliteTestDatabase : BaseTestDatabase, ITestDatabase
 {
     public const string DatabaseName = "UmbracoTests";
     private readonly TestUmbracoDatabaseFactoryProvider _dbFactoryProvider;
+    private readonly UmbracoDbContextFactory _umbracoDbContextFactory;
     private readonly TestDatabaseSettings _settings;
 
     protected UmbracoDatabase.CommandInfo[] _cachedDatabaseInitCommands = new UmbracoDatabase.CommandInfo[0];
 
-    public SqliteTestDatabase(TestDatabaseSettings settings, TestUmbracoDatabaseFactoryProvider dbFactoryProvider, ILoggerFactory loggerFactory)
+    public SqliteTestDatabase(TestDatabaseSettings settings, TestUmbracoDatabaseFactoryProvider dbFactoryProvider, ILoggerFactory loggerFactory, UmbracoDbContextFactory umbracoDbContextFactory)
     {
         _settings = settings ?? throw new ArgumentNullException(nameof(settings));
         _dbFactoryProvider = dbFactoryProvider;
+        _umbracoDbContextFactory = umbracoDbContextFactory;
         _databaseFactory = dbFactoryProvider.Create();
         _loggerFactory = loggerFactory;
 
@@ -119,16 +122,15 @@ public class SqliteTestDatabase : BaseTestDatabase, ITestDatabase
         var options =
             new TestOptionsMonitor<InstallDefaultDataSettings>(
                 new InstallDefaultDataSettings { InstallData = InstallDefaultDataOption.All });
+        
+        var databaseDataCreator = new EFCoreDatabaseDataCreator(_umbracoDbContextFactory, options);
+        
+        var schemaCreator = new EFDatabaseSchemaCreator(
+            _loggerFactory.CreateLogger<EFDatabaseSchemaCreator>(),
+            _umbracoDbContextFactory,
+            databaseDataCreator);
 
-        var schemaCreator = new DatabaseSchemaCreator(
-            database,
-            _loggerFactory.CreateLogger<DatabaseSchemaCreator>(),
-            _loggerFactory,
-            new UmbracoVersion(),
-            Mock.Of<IEventAggregator>(),
-            options);
-
-        schemaCreator.InitializeDatabaseSchema();
+        schemaCreator.InitializeDatabaseSchema().GetAwaiter().GetResult();
         transaction.Complete();
 
         _cachedDatabaseInitCommands = database.Commands

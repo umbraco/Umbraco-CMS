@@ -9,6 +9,11 @@ public static class IdentityHelpers
 
     private static Task SetIdentityInsert<T>(DbContext context, bool enable)
     {
+        if (context.Database.IsSqlite())
+        {
+            return Task.CompletedTask;
+        }
+
         var entityType = context.Model.FindEntityType(typeof(T));
         if (entityType is null)
         {
