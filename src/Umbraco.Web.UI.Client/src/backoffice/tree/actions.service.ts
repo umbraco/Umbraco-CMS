@@ -68,6 +68,10 @@ export class UmbActionService extends UmbContextProviderMixin(LitElement) {
 		this._modalOpen = false;
 	}
 
+	public execute(action: any) {
+		console.log('Execute action: ', action);
+	}
+
 	private _renderBackdrop() {
 		// eslint-disable-next-line lit-a11y/click-events-have-key-events
 		return this._modalOpen ? html`<div id="backdrop" @click=${this.close}></div>` : nothing;
