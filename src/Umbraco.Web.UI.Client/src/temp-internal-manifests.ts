@@ -247,8 +247,6 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		name: 'Data Types Tree',
 		loader: () => import('./backoffice/tree/data-types/tree-data-types.element'),
 		meta: {
-			pathname: 'data-types',
-			label: 'Data Types',
 			weight: 1,
 			sections: ['Umb.Section.Settings'],
 		},
@@ -260,8 +258,6 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		elementName: 'umb-document-type-tree',
 		loader: () => import('./backoffice/tree/document-types/tree-document-types.element'),
 		meta: {
-			pathname: 'document-types',
-			label: 'Document Types',
 			weight: 2,
 			sections: ['Umb.Section.Settings'],
 		},
@@ -284,8 +280,6 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		name: 'Members Tree',
 		loader: () => import('./backoffice/tree/members/tree-members.element'),
 		meta: {
-			pathname: 'members',
-			label: 'Members',
 			weight: 0,
 			sections: ['Umb.Section.Members'],
 		},
@@ -296,8 +290,6 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		name: 'Members Groups Tree',
 		loader: () => import('./backoffice/tree/member-groups/tree-member-groups.element'),
 		meta: {
-			pathname: 'member-groups',
-			label: 'Member Groups',
 			weight: 1,
 			sections: ['Umb.Section.Members'],
 		},
@@ -308,8 +300,6 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		name: 'Extensions Tree',
 		loader: () => import('./backoffice/tree/extensions/tree-extensions.element'),
 		meta: {
-			pathname: 'extensions',
-			label: 'Extensions',
 			weight: 3,
 			sections: ['Umb.Section.Settings'],
 		},
@@ -320,8 +310,6 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		name: 'Media Tree',
 		loader: () => import('./backoffice/tree/media/tree-media.element'),
 		meta: {
-			pathname: 'media',
-			label: 'Media',
 			weight: 100,
 			sections: ['Umb.Section.Media'],
 		},
@@ -332,8 +320,6 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		name: 'Content Tree',
 		loader: () => import('./backoffice/tree/content/tree-content.element'),
 		meta: {
-			pathname: 'content',
-			label: 'Content',
 			weight: 100,
 			sections: ['Umb.Section.Content'],
 		},

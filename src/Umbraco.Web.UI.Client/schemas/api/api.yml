@@ -393,10 +393,6 @@ components:
     MetaTree:
       type: object
       properties:
-        pathname:
-          type: string
-        label:
-          type: string
         weight:
           type: number
           format: float
@@ -405,8 +401,6 @@ components:
           items:
             type: string
       required:
-        - pathname
-        - label
         - weight
         - sections
     IManifestTree:

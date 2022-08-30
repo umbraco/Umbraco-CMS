@@ -120,8 +120,6 @@ export interface components {
       alias: string;
     };
     MetaTree: {
-      pathname: string;
-      label: string;
       /** Format: float */
       weight: number;
       sections: string[];

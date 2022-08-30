@@ -49,8 +49,6 @@ export interface MetaSection {
 }
 
 export interface MetaTree {
-	pathname: string;
-	label: string;
 	weight: number;
 	sections: Array<string>;
 }
