@@ -1274,6 +1274,7 @@
     <key alias="templates">Plantillas</key>
 	<key alias="logViewer">Visor de registro</key>
     <key alias="users">Usuarios</key>
+    <key alias="settingsGroup">Ajustes</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">Existe una nueva actualización</key>
