@@ -1,6 +1,6 @@
 <div
     class="umb-block-grid__layout-container"
-    ng-class="{'--not-allowed-for-drop': vm.showNotAllowedUI}"
+    ng-class="{'--not-allowing-drop': vm.showNotAllowedUI}"
 >
     <umb-block-grid-entry ng-repeat="layoutEntry in vm.entries track by layoutEntry.$block.key"
         class="umb-block-grid__layout-item"
@@ -18,6 +18,7 @@
         "
 
         parent-block="vm.parentBlock"
+        property-editor-form="vm.propertyEditorForm"
         area-key="vm.areaKey"
         index="$index"
         layout-entry="layoutEntry"
@@ -41,7 +42,7 @@
 </div>
 
 <div ng-if="vm.showNotAllowedUI" class="umb-block-grid__not-allowed-box">
-    <localize key="invalidDropPosition">Not allowed at this</localize>
+    <localize key="blockEditor_invalidDropPosition" tokens="[vm.movingLayoutEntry.$block.content.contentTypeName]">Not allowed at this</localize>
 </div>
 
 

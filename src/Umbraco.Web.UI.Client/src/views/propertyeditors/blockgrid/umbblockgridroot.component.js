@@ -18,6 +18,7 @@
                 gridColumns: "@",
                 stylesheet: "@",
                 blockEditorApi: "<",
+                propertyEditorForm: "<?",
                 entries: "<"
             }
         }
@@ -44,6 +45,7 @@
                     <umb-block-grid-entries
                         block-editor-api="vm.blockEditorApi"
                         entries="vm.entries"
+                        property-editor-form="vm.propertyEditorForm"
                         depth="0">
                     </umb-block-grid-entries>
                 </div>

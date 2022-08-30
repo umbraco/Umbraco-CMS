@@ -38,13 +38,15 @@
 .umb-block-grid__block--validation-border {
     display:none;
 }
+ng-form.ng-invalid-val-server-match-settings > .umb-block-grid__block:not(.--active) > .umb-block-grid__block--validation-border, 
 ng-form.ng-invalid-val-server-match-content > .umb-block-grid__block:not(.--active) > .umb-block-grid__block--validation-border {
     display: block;
     position: absolute;
     inset: 0;
     border-radius: 3px;
     border: 1px solid @formErrorText;
-    /* not working cause we are in a shadow DOM: */
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, .75), inset 0 0 0 1px rgba(255, 255, 255, .75);
+    /* TODO: not working cause we are in a shadow DOM: */
     .show-validation-type-warning & {
         border-color: @formWarningText;
     }
@@ -54,6 +56,7 @@ ng-form.ng-invalid-val-server-match-content > .umb-block-grid__block:not(.--acti
 .umb-block-grid__block--validation-badge {
     display:none;
 }
+ng-form.ng-invalid-val-server-match-settings > .umb-block-grid__block:not(.--active) > .umb-block-grid__block--validation-badge, 
 ng-form.ng-invalid-val-server-match-content > .umb-block-grid__block:not(.--active) > .umb-block-grid__block--validation-badge {
     display:block;
     text-align: center;
@@ -202,52 +205,24 @@ ng-form.ng-invalid-val-server-match-content > .umb-block-grid__block:not(.--acti
         }
     }
 
+    /*
     &.--show-validation {
         ng-form.ng-invalid-val-server-match-content > & {
             border: 2px solid @formErrorText;
             border-radius: @baseBorderRadius;
-            &::after {
-                content: "!";
-                position: absolute;
-                top: -12px;
-                right: -12px;
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                width: 18px;
-                height: 18px;
-                border-radius: 50%;
-                font-size: 13px;
-                text-align: center;
-                font-weight: bold;
-                background-color: @errorBackground;
-                color: @errorText;
-                border: 2px solid @white;
-                font-weight: 900;
-    
-                animation-duration: 1.4s;
-                animation-iteration-count: infinite;
-                animation-name: umb-block-grid__block--badge-bounce;
-                animation-timing-function: ease;
-                @keyframes umb-block-grid__block--badge-bounce {
-                    0%   { transform: translateY(0); }
-                    20%  { transform: translateY(-6px); }
-                    40%  { transform: translateY(0); }
-                    55%  { transform: translateY(-3px); }
-                    70%  { transform: translateY(0); }
-                    100% { transform: translateY(0); }
-                }
-            }
         }
     }
+    */
 }
 
-ng-form.ng-invalid-val-server-match-settings > .umb-block-grid__block > .umb-block-grid__block--actions {
+ng-form.ng-invalid > .umb-block-grid__block:not(.--active) > .umb-block-grid__block--actions {
     opacity: 1;
 }
-ng-form.ng-invalid-val-server-match-settings > .umb-block-grid__block > .umb-block-grid__block--context {
+/*
+ng-form.ng-invalid > .umb-block-grid__block:not(.--active) > .umb-block-grid__block--context {
     opacity: 1;
 }
+*/
 
 .umb-block-grid__block--view {
     --umb-block-grid--hint-area-ui: 0;
@@ -352,6 +327,7 @@ ng-form.ng-invalid-val-server-match-settings > .umb-block-grid__block > .umb-blo
  
         &.--error {
             color: @errorBackground;
+            /** TODO: warning color class does not work in shadowDOM. */
             .show-validation-type-warning & {
                 color: @warningBackground;
             }
@@ -700,7 +676,7 @@ umb-block-grid-block {
 
 
 /** make sure block with areas stay on top, so they don't look like they are 'not-allowed'*/
-.umb-block-grid__layout-container.--not-allowed-for-drop {
+.umb-block-grid__layout-container.--not-allowing-drop {
     .umb-block-grid__layout-item.--has-areas {
         z-index: 2;
     }
@@ -712,6 +688,7 @@ umb-block-grid-block {
     z-index:1;
     border: 1px solid @red;
     pointer-events: none;
+    cursor: no-drop;
 
     animation: umb-block-grid__not-allowed-box__pulse 400ms ease-in-out alternate infinite;
     @keyframes umb-block-grid__not-allowed-box__pulse {

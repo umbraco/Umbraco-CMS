@@ -4,7 +4,7 @@
     ng-click="vm.blockEditorApi.requestShowCreate(vm.parentBlock, vm.areaKey, vm.index, $event)">
 </uui-button-inline-create>
 
-<ng-form name="vm.blockRowForm" val-server-match="{ 'contains' : { 'valServerMatchContent': vm.layoutEntry.$block.content.key, 'valServerMatchSettings': vm.layoutEntry.$block.settings.key } }">
+<ng-form name="vm.blockForm" val-server-match="{ 'contains' : { 'valServerMatchContent': vm.layoutEntry.$block.content.key, 'valServerMatchSettings': vm.layoutEntry.$block.settings.key } }">
     <div
         class="umb-block-grid__block"
         ng-mouseleave="vm.layoutEntry.$block.onMouseLeave()"
@@ -22,7 +22,7 @@
                               api="vm.blockEditorApi"
                               block="vm.layoutEntry.$block"
                               index="vm.index"
-                              parent-form="vm.blockRowForm">
+                              parent-form="vm.blockForm">
             <div
                 slot="areas"
                 class="umb-block-grid__block-area-container"
@@ -41,7 +41,8 @@
                     entries="areaEntry.items"
                     area-key="areaEntry.key"
                     parent-block="vm.layoutEntry.$block"
-                    parent-form="vm.blockRowForm"
+                    parent-form="vm.blockForm"
+                    property-editor-form="vm.propertyEditorForm"
                     ng-mouseover="vm.mouseOverArea(areaEntry)"
                     ng-mouseleave="vm.mouseLeaveArea()"
                     depth="{{vm.childDepth}}">
@@ -86,9 +87,9 @@
             <div class="__local-context">
 
 
-                <button type="button" class="btn-reset umb-outline action --settings" localize="title" title="actions_editContent"
-                        ng-click="vm.blockEditorApi.editBlock(vm.layoutEntry.$block, false, vm.index, vm.blockRowForm);"
-                        ng-class="{ '--error': vm.blockRowForm.$error.valServerMatchSettings && vm.valFormManager.isShowingValidation() }"
+                <button type="button" class="btn-reset umb-outline action --content" localize="title" title="actions_editContent"
+                        ng-click="vm.blockEditorApi.editBlock(vm.layoutEntry.$block, false, vm.index, vm.blockForm);"
+                        ng-class="{ '--error': vm.blockForm.$error.valServerMatchContent }"
                         ng-if="vm.layoutEntry.$block.hideContentInOverlay !== true">
                     <umb-icon icon="icon-edit" class="icon"></umb-icon>
                     <span class="sr-only">
@@ -98,8 +99,8 @@
                 </button>
 
                 <button type="button" class="btn-reset umb-outline action --settings" localize="title" title="actions_editSettings"
-                        ng-click="vm.blockEditorApi.openSettingsForBlock(vm.layoutEntry.$block, vm.index, vm.blockRowForm);"
-                        ng-class="{ '--error': vm.blockRowForm.$error.valServerMatchSettings && vm.valFormManager.isShowingValidation() }"
+                        ng-click="vm.blockEditorApi.openSettingsForBlock(vm.layoutEntry.$block, vm.index, vm.blockForm);"
+                        ng-class="{ '--error': vm.blockForm.$error.valServerMatchSettings }"
                         ng-if="vm.layoutEntry.$block.showSettings === true">
                     <umb-icon icon="icon-settings" class="icon"></umb-icon>
                     <span class="sr-only">

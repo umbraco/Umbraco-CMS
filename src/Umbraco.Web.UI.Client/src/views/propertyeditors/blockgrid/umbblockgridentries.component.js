@@ -20,6 +20,7 @@
                 areaKey: "<?",
                 parentBlock: "<?",
                 parentForm: "<?",
+                propertyEditorForm: "<?",
                 depth: "@"
             }
         }
@@ -33,6 +34,8 @@
         vm.areaConfig = null;
         vm.locallyAvailableBlockTypes = 0;
         vm.invalidBlockTypes = [];
+
+        vm.movingLayoutEntry = null;
 
         vm.$onInit = function () {
             initializeSortable();
@@ -50,6 +53,7 @@
 
             if (vm.parentForm && vm.areaConfig) {
 
+                
                 var isMinRequirementGood = vm.entries.length >= vm.areaConfig.minAllowed;
                 vm.parentForm.areaMinCount.$setValidity("areaMinCount", isMinRequirementGood);
 
@@ -82,6 +86,7 @@
                 vm.invalidAmount = !isMinRequirementGood || !isMaxRequirementGood || !isTypeRequirementGood;
 
                 $element.toggleClass("--invalid", vm.invalidAmount);
+
             }
         }
 
@@ -106,8 +111,8 @@
 
             const gridLayoutContainerEl = $element[0].querySelector('.umb-block-grid__layout-container');
             var _lastGridLayoutContainerEl = null;
-            var movingBlockObject = null;
             var targetRect = null;
+            var movingElement = null;
 
             // Setup DOM method for communication between sortables:
             gridLayoutContainerEl['Sortable:controller'] = () => {
@@ -181,33 +186,40 @@
 
                 if(_lastGridLayoutContainerEl !== contextVM && _lastGridLayoutContainerEl !== null) {
                     _lastGridLayoutContainerEl.hideNotAllowed();
+                    movingBlock.classList.remove('__dropNotAllowed');
                 }
                 _lastGridLayoutContainerEl = contextVM;
                 
                 if(contextVM.acceptBlock(movingBlock.dataset.contentElementTypeKey) === true) {
                     _lastGridLayoutContainerEl.hideNotAllowed();
+                    movingBlock.classList.remove('__dropNotAllowed');
                     _lastGridLayoutContainerEl = null;
                     return true;
                 }
+
                 contextVM.showNotAllowed();
+                movingBlock.classList.add('__dropNotAllowed')
+
                 return false;
             }
 
-            function _onDragMouseMove(evt) {
+            function _onDragMouseMove(evt) {    
                 /** ignorer last drag event, comes as screenX === 0 and screenY === 0 */
                 if(targetRect && evt.screenX !== 0 && evt.screenY !== 0) {
-                    var oldValue = movingBlockObject.forceLeft
-                    var newValue = (evt.screenX < targetRect.x + 20);
+                    var oldValue = vm.movingLayoutEntry.forceLeft;
+                    // TODO: get first columns width and use it:
+                    var newValue = (evt.screenX < targetRect.x + 50);
                     if(newValue !== oldValue) {
-                        movingBlockObject.forceLeft = newValue;
-                        $scope.$apply();
+                        vm.movingLayoutEntry.forceLeft = newValue;
+                        vm.movingLayoutEntry.$block.__scope.$evalAsync();// needed for the block to be updated
                     }
 
-                    oldValue = movingBlockObject.forceRight;
-                    newValue = (evt.screenX > targetRect.x + targetRect.width - 20);
+                    oldValue = vm.movingLayoutEntry.forceRight;
+                    // TODO: get last columns width and use it:
+                    newValue = (evt.screenX > targetRect.x + targetRect.width - 50);
                     if(newValue !== oldValue) {
-                        movingBlockObject.forceRight = newValue;
-                        $scope.$apply();
+                        vm.movingLayoutEntry.forceRight = newValue;
+                        vm.movingLayoutEntry.$block.__scope.$evalAsync();// needed for the block to be updated
                     }
                 }
             }
@@ -234,9 +246,9 @@
                 //chosenClass: "sortable-chosen",  // Class name for the chosen item
                 //dragClass: "sortable-drag",  // Class name for the dragging item
 
-                swapThreshold: 0.5, // Threshold of the swap zone
-                invertSwap: true, // Will always use inverted swap zone if set to true
-                invertedSwapThreshold: 1, // Threshold of the inverted swap zone (will be set to swapThreshold value by default)
+                swapThreshold: .1, // Threshold of the swap zone
+                //invertSwap: true, // Will always use inverted swap zone if set to true
+                //invertedSwapThreshold: 1, // Threshold of the inverted swap zone (will be set to swapThreshold value by default)
                 //direction: 'horizontal', // Direction of Sortable (will be detected automatically if not given)
 
                 //forceFallback: true,  // ignore the HTML5 DnD behaviour and force the fallback to kick in
@@ -247,7 +259,7 @@
 
                 //dragoverBubble: false,
                 //removeCloneOnHide: true, // Remove the clone element when it is not showing, rather than just hiding it
-                //emptyInsertThreshold: 5, // px, distance mouse must be from empty sortable to insert drag element into it
+                emptyInsertThreshold: 40, // px, distance mouse must be from empty sortable to insert drag element into it
 
                 onStart: function (evt) {
                     //nextSibling = evt.from === evt.item.parentNode ? evt.item.nextSibling : evt.clone.nextSibling;
@@ -256,11 +268,15 @@
                     if (gridLayoutContainerEl !== evt.to) {
                         contextVM = evt.to['Sortable:controller']();
                     }
+
+                    console.log(evt)
                     
                     const oldIndex = evt.oldIndex;
-                    movingBlockObject = contextVM.getLayoutEntry(oldIndex);
-                    movingBlockObject.forceLeft = false;
-                    movingBlockObject.forceRight = false;
+                    vm.movingLayoutEntry = contextVM.getLayoutEntry(oldIndex);
+                    vm.movingLayoutEntry.forceLeft = false;
+                    vm.movingLayoutEntry.forceRight = false;
+
+                    movingElement = evt.item;
 
                     targetRect = evt.to.getBoundingClientRect();
 
@@ -299,7 +315,8 @@
                         _lastGridLayoutContainerEl = null;
                     }
 
-                    movingBlockObject = null;
+                    vm.movingLayoutEntry = null;
+                    movingElement = null;
                     targetRect = null;
                 }
                 /*

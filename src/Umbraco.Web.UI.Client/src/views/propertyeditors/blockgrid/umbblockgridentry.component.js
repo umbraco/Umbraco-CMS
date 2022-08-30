@@ -76,6 +76,7 @@
                 index: "<",
                 parentBlock: "<",
                 areaKey: "<",
+                propertyEditorForm: "<?",
                 depth: "@"
             }
         }
@@ -97,6 +98,20 @@
                 vm.areaGridStyles['--umb-block-grid--area-grid-columns'] = 'initial';
             }
             $scope.$evalAsync();
+        }
+        /**
+         * We want to only show the validation errors on the specific Block, not the parent blocks.
+         * So we need to avoid having a Block as the parent to the Block Form.
+         * Therefor we skip any parent blocks forms, and sets the parent form to the property editor.
+         */
+        vm.$postLink = function() {
+            // If parent form is not the property editor form, then its another Block Forms and we will change it.
+            if(vm.blockForm.$$parentForm !== vm.propertyEditorForm) {
+                // Remove from parent block:
+                vm.blockForm.$$parentForm.$removeControl(vm.blockForm);
+                // Connect with property editor form:
+                vm.propertyEditorForm.$addControl(vm.blockForm);
+            }
         }
         vm.mouseOverArea = function(area) {
             if(area.items.length > 0) {

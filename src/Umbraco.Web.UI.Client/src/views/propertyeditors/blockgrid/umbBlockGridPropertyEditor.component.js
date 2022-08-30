@@ -333,7 +333,7 @@
             }
 
             block.stylesheet = block.config.stylesheet;
-            block.showValidation = block.config.view ? true : false;
+            block.showValidation = true;
 
             block.hideContentInOverlay = block.config.forceHideContentEditorInOverlay === true;
             block.showSettings = block.config.settingsElementTypeKey != null;
