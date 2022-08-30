@@ -4,6 +4,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { Subscription } from 'rxjs';
 import { UmbContextConsumerMixin } from '../../../core/context';
 import { UmbSectionContext } from '../section.context';
+import '../../tree/actions.service';
 
 @customElement('umb-section-sidebar')
 export class UmbSectionSidebar extends UmbContextConsumerMixin(LitElement) {
@@ -60,11 +61,13 @@ export class UmbSectionSidebar extends UmbContextConsumerMixin(LitElement) {
 
 	render() {
 		return html`
-			<a href="${`/section/${this._sectionPathname}`}">
-				<h3>${this._sectionName}</h3>
-			</a>
+			<umb-action-service>
+				<a href="${`/section/${this._sectionPathname}`}">
+					<h3>${this._sectionName}</h3>
+				</a>
 
-			<slot></slot>
+				<slot></slot>
+			</umb-action-service>
 		`;
 	}
 }

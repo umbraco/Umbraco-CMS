@@ -5,8 +5,9 @@ import { UmbContextConsumerMixin } from '../../../core/context';
 import { UmbTreeContext } from '../tree.context';
 import { UUIMenuItemEvent } from '@umbraco-ui/uui';
 import { UmbSectionContext } from '../../sections/section.context';
-import { map, Subscription } from 'rxjs';
-import { UmbEntityStore } from '../../../core/stores/entity.store';
+import { Subscription } from 'rxjs';
+import './tree-actions-modal';
+import { UmbActionService } from '../actions.service';
 
 @customElement('umb-tree-item')
 export class UmbTreeItem extends UmbContextConsumerMixin(LitElement) {
@@ -46,6 +47,8 @@ export class UmbTreeItem extends UmbContextConsumerMixin(LitElement) {
 
 	private _entitySubscription?: Subscription;
 
+	private _actionService?: UmbActionService;
+
 	@state()
 	private _itemName = '';
 
@@ -60,6 +63,10 @@ export class UmbTreeItem extends UmbContextConsumerMixin(LitElement) {
 		this.consumeContext('umbSectionContext', (sectionContext: UmbSectionContext) => {
 			this._sectionContext = sectionContext;
 			this._useSection();
+		});
+
+		this.consumeContext('umbActionService', (actionService: UmbActionService) => {
+			this._actionService = actionService;
 		});
 	}
 
@@ -106,6 +113,10 @@ export class UmbTreeItem extends UmbContextConsumerMixin(LitElement) {
 		});
 	}
 
+	private _openActions() {
+		this._actionService?.open(this.label);
+	}
+
 	render() {
 		return html`
 			<uui-menu-item
@@ -115,6 +126,11 @@ export class UmbTreeItem extends UmbContextConsumerMixin(LitElement) {
 				label="${this.label}"
 				href="${this._constructPath(this.itemKey)}">
 				${this._renderChildItems()}
+				<uui-action-bar slot="actions">
+					<uui-button @click=${this._openActions} label="Open actions menu">
+						<uui-symbol-more></uui-symbol-more>
+					</uui-button>
+				</uui-action-bar>
 			</uui-menu-item>
 		`;
 	}
