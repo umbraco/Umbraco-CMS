@@ -4,7 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { UmbContextConsumerMixin } from '../../../../core/context';
 import { createExtensionElement, UmbExtensionRegistry } from '../../../../core/extension';
 import { map } from 'rxjs';
-import { ManifestEditor } from '../../../../core/models';
+import type { ManifestEditor } from '../../../../core/models';
 
 @customElement('umb-editor-entity')
 export class UmbEditorEntityElement extends UmbContextConsumerMixin(LitElement) {
