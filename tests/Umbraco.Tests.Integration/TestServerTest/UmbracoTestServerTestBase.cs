@@ -9,13 +9,16 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
@@ -72,6 +75,7 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
              */
             var factory = new UmbracoWebApplicationFactory<UmbracoTestServerTestBase>(CreateHostBuilder);
 
+            
             // additional host configuration for web server integration tests
             Factory = factory.WithWebHostBuilder(builder =>
             {
@@ -80,10 +84,34 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
 
                 // Executes after the standard ConfigureServices method
                 builder.ConfigureTestServices(services =>
+                {
+                    
+                    services.AddUmbracoEFCore(Configuration, (options, configuration) =>
+                    {
+                        var connectionStrings = s_connectionStrings;
+                                                                                 
+                        var connectionString = connectionStrings?.CurrentValue.ConnectionString;
+                        var providerName = connectionStrings?.CurrentValue.ProviderName;
+                        
+                        if (!connectionString.IsNullOrWhiteSpace())
+                        {
+                            if (providerName == "Microsoft.Data.Sqlite")
+                            {
+                                options.UseSqlite(connectionString!);
+                            }
+                            else if (providerName == "Microsoft.Data.SqlClient")
+                            {
+                                options.UseSqlServer(connectionString!);
+                            }
+                        }
+                    });
 
+                    
                     // Add a test auth scheme with a test auth handler to authn and assign the user
                     services.AddAuthentication(TestAuthHandler.TestAuthenticationScheme)
-                        .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(TestAuthHandler.TestAuthenticationScheme, options => { }));
+                        .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(
+                            TestAuthHandler.TestAuthenticationScheme, options => { });
+                });
             });
 
             Client = Factory.CreateClient(new WebApplicationFactoryClientOptions

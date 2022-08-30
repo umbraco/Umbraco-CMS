@@ -22,19 +22,30 @@ public class EFDatabaseSchemaCreator : IDatabaseSchemaCreator
 
     public async Task InitializeDatabaseSchema()
     {
-        await _dbContextFactory.ExecuteWithContextAsync<Task>(async db =>
+        try
         {
-
-            using (var transaction = await db.Database.BeginTransactionAsync())
+            await _dbContextFactory.ExecuteWithContextAsync<Task>(async db =>
             {
-                await db.Database.MigrateAsync();
 
-                await transaction.CommitAsync();
-            }
-        });
+                //TODO transaction cannot work with SQLite
+                //using (var transaction = await db.Database.BeginTransactionAsync())
+                {
+                    await db.Database.
+                        MigrateAsync();
+
+                   // await transaction.CommitAsync();
+                }
+            });
 
 
-        await _databaseDataCreator.SeedDataAsync();
+            await _databaseDataCreator.SeedDataAsync();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+
     }
 
 
