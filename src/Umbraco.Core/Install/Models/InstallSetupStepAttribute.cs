@@ -1,5 +1,6 @@
-namespace Umbraco.Cms.Core.Install.Models;
+﻿namespace Umbraco.Cms.Core.Install.Models;
 
+[Obsolete("Will no longer be required with the use of IInstallStep in the new backoffice API")]
 public sealed class InstallSetupStepAttribute : Attribute
 {
     public InstallSetupStepAttribute(InstallationType installTypeTarget, string name, string view, int serverOrder, string description)

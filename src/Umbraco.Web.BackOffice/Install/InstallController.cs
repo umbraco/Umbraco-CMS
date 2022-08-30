@@ -22,6 +22,7 @@ namespace Umbraco.Cms.Web.BackOffice.Install;
 /// <summary>
 ///     The Installation controller
 /// </summary>
+[Obsolete("Will no longer be required with the new backoffice API")]
 [InstallAuthorize]
 [Area(Constants.Web.Mvc.InstallArea)]
 public class InstallController : Controller

@@ -14,6 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Umbraco.Cms.ManagementApi\Umbraco.Cms.ManagementApi.csproj" />
     <ProjectReference Include="..\..\src\Umbraco.PublishedCache.NuCache\Umbraco.PublishedCache.NuCache.csproj" />
     <ProjectReference Include="..\Umbraco.Tests.Common\Umbraco.Tests.Common.csproj" />
     <ProjectReference Include="..\..\src\Umbraco.Web.BackOffice\Umbraco.Web.BackOffice.csproj" />
