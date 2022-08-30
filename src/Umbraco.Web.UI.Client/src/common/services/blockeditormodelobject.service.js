@@ -107,7 +107,7 @@
                 // so try and fall back to the label in the config,
                 // if that too is null, there's not much we can do, so just default to empty string.
                 var contentTypeName;
-                if(blockObject.content != null){
+                if(blockObject.content != null) {
                   contentTypeName = blockObject.content.contentTypeName;
                 }
                 else if(blockObject.config != null && blockObject.config.label != null){
