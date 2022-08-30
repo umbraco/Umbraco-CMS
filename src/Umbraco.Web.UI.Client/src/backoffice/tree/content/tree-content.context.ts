@@ -18,7 +18,7 @@ export class UmbTreeContentContext implements UmbTreeContext {
 			key: '485d49ef-a4aa-46ac-843f-4256fe167347',
 			name: 'Content',
 			hasChildren: true,
-			type: 'node',
+			type: 'document',
 			icon: 'favorite',
 			parentKey: '',
 		};

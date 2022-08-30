@@ -1,17 +1,13 @@
-import '../editor-layout/editor-layout.element';
-
+import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html, LitElement, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { IRoute, IRoutingInfo, RouterSlot } from 'router-slot';
-import { map, Subscription } from 'rxjs';
-
 import { UmbContextConsumerMixin } from '../../../../core/context';
-import { UmbExtensionRegistry } from '../../../../core/extension';
-import type { ManifestEditorView } from '../../../../core/models';
+import { createExtensionElement, UmbExtensionRegistry } from '../../../../core/extension';
+import { map } from 'rxjs';
+import { ManifestEditor } from '../../../../core/models';
 
 @customElement('umb-editor-entity')
-export class UmbEditorEntity extends UmbContextConsumerMixin(LitElement) {
+export class UmbEditorEntityElement extends UmbContextConsumerMixin(LitElement) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -20,175 +16,74 @@ export class UmbEditorEntity extends UmbContextConsumerMixin(LitElement) {
 				width: 100%;
 				height: 100%;
 			}
-
-			#header {
-				display: flex;
-				gap: 16px;
-				align-items: center;
-				min-height: 60px;
-			}
-
-			#name {
-				display: block;
-				flex: 1 1 auto;
-			}
-
-			#footer {
-				display: flex;
-				height: 100%;
-				align-items: center;
-				gap: 16px;
-				flex: 1 1 auto;
-			}
-
-			#actions {
-				display: block;
-				margin-left: auto;
-			}
-
-			uui-input {
-				width: 100%;
-			}
-
-			uui-tab-group {
-				--uui-tab-divider: var(--uui-color-border);
-				border-left: 1px solid var(--uui-color-border);
-				border-right: 1px solid var(--uui-color-border);
-			}
 		`,
 	];
 
 	@property()
-	alias = '';
+	public entityKey!: string;
 
+	private _entityType = '';
 	@property()
-	name = '';
+	public get entityType(): string {
+		return this._entityType;
+	}
+	public set entityType(value: string) {
+		this._entityType = value;
+		this._useEditors();
+	}
 
 	@state()
-	private _editorViews: Array<ManifestEditorView> = [];
-
-	@state()
-	private _currentView = '';
-
-	@state()
-	private _routes: Array<IRoute> = [];
+	private _element?: any;
 
 	private _extensionRegistry?: UmbExtensionRegistry;
-	private _editorViewsSubscription?: Subscription;
-	private _routerFolder = '';
 
 	constructor() {
 		super();
 
 		this.consumeContext('umbExtensionRegistry', (extensionRegistry: UmbExtensionRegistry) => {
 			this._extensionRegistry = extensionRegistry;
-			this._useEditorViews();
+			this._useEditors();
 		});
 	}
 
-	connectedCallback(): void {
-		super.connectedCallback();
-		/* TODO: find a way to construct absolute urls */
-		this._routerFolder = window.location.pathname.split('/view')[0];
-	}
+	private _useEditors() {
+		if (!this._extensionRegistry) return;
 
-	private _useEditorViews() {
-		this._editorViewsSubscription?.unsubscribe();
-
-		this._editorViewsSubscription = this._extensionRegistry
-			?.extensionsOfType('editorView')
-			.pipe(
-				map((extensions) =>
-					extensions
-						.filter((extension) => extension.meta.editors.includes(this.alias))
-						.sort((a, b) => b.meta.weight - a.meta.weight)
-				)
-			)
-			.subscribe((editorViews) => {
-				this._editorViews = editorViews;
-				this._createRoutes();
+		this._extensionRegistry
+			.extensionsOfType('editor')
+			.pipe(map((editors) => editors.find((editor) => editor.meta.entityType === this.entityType)))
+			.subscribe((editor) => {
+				this._createElement(editor);
 			});
 	}
 
-	private async _createRoutes() {
-		if (this._editorViews.length > 0) {
-			this._routes = [];
+	private async _createElement(editor?: ManifestEditor) {
+		// TODO: implement fallback editor
+		const fallbackEditor = document.createElement('div');
+		fallbackEditor.innerHTML = '<p>No editor found</p>';
 
-			this._routes = this._editorViews.map((view) => {
-				return {
-					path: `view/${view.meta.pathname}`,
-					component: () => document.createElement(view.elementName || 'div'),
-					setup: (element: HTMLElement, info: IRoutingInfo) => {
-						this._currentView = info.match.route.path;
-					},
-				};
-			});
-
-			this._routes.push({
-				path: '**',
-				redirectTo: `view/${this._editorViews?.[0].meta.pathname}`,
-			});
-
-			this.requestUpdate();
-			await this.updateComplete;
-
-			this._forceRouteRender();
+		if (!editor) {
+			this._element = fallbackEditor;
+			return;
 		}
-	}
 
-	// TODO: Figure out why this has been necessary for this case. Come up with another case
-	private _forceRouteRender() {
-		const routerSlotEl = this.shadowRoot?.querySelector('router-slot') as RouterSlot;
-		if (routerSlotEl) {
-			routerSlotEl.render();
+		try {
+			this._element = (await createExtensionElement(editor)) as any;
+			this._element.entityKey = this.entityKey;
+		} catch (error) {
+			this._element = fallbackEditor;
 		}
-	}
-
-	private _renderViews() {
-		return html`
-			${this._editorViews?.length > 0
-				? html`
-						<uui-tab-group slot="views">
-							${this._editorViews.map(
-								(view: ManifestEditorView) => html`
-									<uui-tab
-										.label="${view.name}"
-										href="${this._routerFolder}/view/${view.meta.pathname}"
-										?active="${this._currentView.includes(view.meta.pathname)}">
-										<uui-icon slot="icon" name="${view.meta.icon}"></uui-icon>
-										${view.name}
-									</uui-tab>
-								`
-							)}
-						</uui-tab-group>
-				  `
-				: nothing}
-		`;
 	}
 
 	render() {
-		return html`
-			<umb-editor-layout>
-				<div id="header" slot="header">
-					<slot id="icon" name="icon"></slot>
-					<slot id="name" name="name"></slot>
-					${this._renderViews()}
-				</div>
-
-				<router-slot .routes="${this._routes}"></router-slot>
-				<slot></slot>
-
-				<div id="footer" slot="footer">
-					<slot name="footer"></slot>
-					<slot id="actions" name="actions"></slot>
-				</div>
-			</umb-editor-layout>
-		`;
+		return html`${this._element}`;
 	}
 }
 
+export default UmbEditorEntityElement;
+
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-editor-entity': UmbEditorEntity;
+		'umb-editor-entity': UmbEditorEntityElement;
 	}
 }

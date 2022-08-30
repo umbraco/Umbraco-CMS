@@ -18,7 +18,7 @@ export class UmbTreeMemberGroupsContext implements UmbTreeContext {
 			key: 'd46d144e-33d8-41e3-bf7a-545287e16e3c',
 			name: 'Member Groups',
 			hasChildren: true,
-			type: 'member-group',
+			type: 'memberGroup',
 			icon: 'favorite',
 			parentKey: '',
 		};

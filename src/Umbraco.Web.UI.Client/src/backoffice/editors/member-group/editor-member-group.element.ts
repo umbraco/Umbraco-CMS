@@ -2,7 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
-import '../shared/editor-entity/editor-entity.element';
+import '../shared/editor-entity-layout/editor-entity-layout.element';
 
 @customElement('umb-editor-member-group')
 export class UmbEditorMemberGroupElement extends LitElement {
@@ -21,7 +21,9 @@ export class UmbEditorMemberGroupElement extends LitElement {
 	id!: string;
 
 	render() {
-		return html` <umb-editor-entity alias="Umb.Editor.MemberGroup">Member Group Editor</umb-editor-entity> `;
+		return html`
+			<umb-editor-entity-layout alias="Umb.Editor.MemberGroup">Member Group Editor</umb-editor-entity-layout>
+		`;
 	}
 }
 

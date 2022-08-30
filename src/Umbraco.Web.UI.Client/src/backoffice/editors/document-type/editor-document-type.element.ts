@@ -9,7 +9,7 @@ import { UmbDocumentTypeStore } from '../../../core/stores/document-type.store';
 import { DocumentTypeEntity } from '../../../mocks/data/document-type.data';
 import { UmbDocumentTypeContext } from './document-type.context';
 
-import '../shared/editor-entity/editor-entity.element';
+import '../shared/editor-entity-layout/editor-entity-layout.element';
 
 // Lazy load
 // TODO: Make this dynamic, use load-extensions method to loop over extensions for this node.
@@ -124,7 +124,7 @@ export class UmbEditorDocumentTypeElement extends UmbContextProviderMixin(UmbCon
 
 	render() {
 		return html`
-			<umb-editor-entity alias="Umb.Editor.DocumentType">
+			<umb-editor-entity-layout alias="Umb.Editor.DocumentType">
 				<div slot="icon">Icon</div>
 
 				<div slot="name">
@@ -144,7 +144,7 @@ export class UmbEditorDocumentTypeElement extends UmbContextProviderMixin(UmbCon
 						label="Save"
 						.state="${this._saveButtonState}"></uui-button>
 				</div>
-			</umb-editor-entity>
+			</umb-editor-entity-layout>
 		`;
 	}
 }

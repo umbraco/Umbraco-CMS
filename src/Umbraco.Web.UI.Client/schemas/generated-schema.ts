@@ -120,7 +120,6 @@ export interface components {
       alias: string;
     };
     MetaTree: {
-      editor: string;
       pathname: string;
       label: string;
       /** Format: float */
@@ -136,13 +135,16 @@ export interface components {
       elementName?: string;
       alias: string;
     };
+    MetaEditor: {
+      entityType: string;
+    };
     IManifestEditor: {
       /** @enum {string} */
       type: "editor";
+      meta: components["schemas"]["MetaEditor"];
       name: string;
       js?: string;
       elementName?: string;
-      meta?: { [key: string]: unknown };
       alias: string;
     };
     MetaEntityAction: {

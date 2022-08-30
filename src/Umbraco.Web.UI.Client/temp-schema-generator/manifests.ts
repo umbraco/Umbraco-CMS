@@ -49,11 +49,14 @@ export interface MetaSection {
 }
 
 export interface MetaTree {
-	editor: string;
 	pathname: string;
 	label: string;
 	weight: number;
 	sections: Array<string>;
+}
+
+export interface MetaEditor {
+	entityType: string;
 }
 
 export interface MetaEntityAction {
@@ -110,6 +113,7 @@ export interface IManifestTree extends IManifestElement {
 
 export interface IManifestEditor extends IManifestElement {
 	type: 'editor';
+	meta: MetaEditor;
 }
 
 export interface IManifestEntityAction extends IManifestElement {

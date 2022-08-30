@@ -393,8 +393,6 @@ components:
     MetaTree:
       type: object
       properties:
-        editor:
-          type: string
         pathname:
           type: string
         label:
@@ -407,7 +405,6 @@ components:
           items:
             type: string
       required:
-        - editor
         - pathname
         - label
         - weight
@@ -434,6 +431,13 @@ components:
         - meta
         - name
         - alias
+    MetaEditor:
+      type: object
+      properties:
+        entityType:
+          type: string
+      required:
+        - entityType
     IManifestEditor:
       type: object
       properties:
@@ -441,18 +445,19 @@ components:
           type: string
           enum:
             - editor
+        meta:
+          $ref: '#/components/schemas/MetaEditor'
         name:
           type: string
         js:
           type: string
         elementName:
           type: string
-        meta:
-          type: object
         alias:
           type: string
       required:
         - type
+        - meta
         - name
         - alias
     MetaEntityAction:

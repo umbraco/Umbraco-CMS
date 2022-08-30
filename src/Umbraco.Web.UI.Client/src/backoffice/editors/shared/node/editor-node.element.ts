@@ -9,7 +9,7 @@ import { NodeEntity } from '../../../../mocks/data/node.data';
 import type { UmbNotificationService } from '../../../../core/services/notification';
 import { UmbNodeContext } from './node.context';
 
-import '../../shared/editor-entity/editor-entity.element';
+import '../../shared/editor-entity-layout/editor-entity-layout.element';
 
 // Lazy load
 // TODO: Make this dynamic, use load-extensions method to loop over extensions for this node.
@@ -172,7 +172,7 @@ export class UmbEditorNodeElement extends UmbContextProviderMixin(UmbContextCons
 
 	render() {
 		return html`
-			<umb-editor-entity alias=${this.alias}>
+			<umb-editor-entity-layout alias=${this.alias}>
 				<div slot="name">
 					<uui-input .value=${this._node?.name} @input="${this._handleInput}">
 						<!-- Implement Variant Selector -->
@@ -215,7 +215,7 @@ export class UmbEditorNodeElement extends UmbContextProviderMixin(UmbContextCons
 						color="positive"
 						label="Save and publish"></uui-button>
 				</div>
-			</umb-editor-entity>
+			</umb-editor-entity-layout>
 		`;
 	}
 }

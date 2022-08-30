@@ -5,56 +5,45 @@ import { UmbContextConsumerMixin } from '../../../core/context';
 import { UmbTreeContext } from '../tree.context';
 import { UUIMenuItemEvent } from '@umbraco-ui/uui';
 import { UmbSectionContext } from '../../sections/section.context';
-import { map, Subscription } from 'rxjs';
-import { UmbEntityStore } from '../../../core/stores/entity.store';
+import { Subscription } from 'rxjs';
+import { Entity } from '../../../mocks/data/entity.data';
 
 @customElement('umb-tree-item')
 export class UmbTreeItem extends UmbContextConsumerMixin(LitElement) {
 	static styles = [UUITextStyles, css``];
 
-	@property({ type: Boolean })
-	hasChildren = false;
-
-	@property({ type: Number })
-	itemId = -1;
-
 	@property()
 	itemKey = '';
+
+	@property()
+	itemType = '';
 
 	@property({ type: String })
 	label = '';
 
-	@property({ type: String })
-	href = '';
+	@property({ type: Boolean })
+	hasChildren = false;
 
 	@state()
-	childItems: any[] = [];
+	private _childItems: Entity[] = [];
+
+	@state()
+	private _href = '';
 
 	@state()
 	private _loading = false;
-
-	@state()
-	private _pathName? = '';
-
-	@state()
-	private _sectionPathname?: string;
 
 	private _treeContext?: UmbTreeContext;
 
 	private _sectionContext?: UmbSectionContext;
 	private _sectionSubscription?: Subscription;
-
-	private _entitySubscription?: Subscription;
-
-	@state()
-	private _itemName = '';
+	private _childrenSubscription?: Subscription;
 
 	constructor() {
 		super();
 
 		this.consumeContext('umbTreeContext', (treeContext: UmbTreeContext) => {
 			this._treeContext = treeContext;
-			this._pathName = this._treeContext?.tree?.meta?.pathname;
 		});
 
 		this.consumeContext('umbSectionContext', (sectionContext: UmbSectionContext) => {
@@ -67,25 +56,26 @@ export class UmbTreeItem extends UmbContextConsumerMixin(LitElement) {
 		this._sectionSubscription?.unsubscribe();
 
 		this._sectionSubscription = this._sectionContext?.data.subscribe((section) => {
-			this._sectionPathname = section.meta.pathname;
+			this._href = this._constructPath(section.meta.pathname, this.itemType, this.itemKey);
 		});
 	}
 
 	// TODO: how do we handle this?
-	private _constructPath(key: string) {
-		return `/section/${this._sectionPathname}/${this._pathName}/${key}`;
+	private _constructPath(sectionPathname: string, type: string, key: string) {
+		return `/section/${sectionPathname}/${type}/${key}`;
 	}
 
 	private _onShowChildren(event: UUIMenuItemEvent) {
 		event.stopPropagation();
-		if (this.childItems.length > 0) return;
+		if (this._childItems.length > 0) return;
 
 		this._loading = true;
 
-		this._treeContext?.fetchChildren(this.itemKey).subscribe((items) => {
-			if (items?.length === 0) return;
+		this._childrenSubscription?.unsubscribe();
 
-			this.childItems = items;
+		this._childrenSubscription = this._treeContext?.fetchChildren(this.itemKey).subscribe((items) => {
+			if (items?.length === 0) return;
+			this._childItems = items;
 			this._loading = false;
 		});
 	}
@@ -93,15 +83,16 @@ export class UmbTreeItem extends UmbContextConsumerMixin(LitElement) {
 	disconnectedCallback(): void {
 		super.disconnectedCallback();
 		this._sectionSubscription?.unsubscribe();
+		this._childrenSubscription?.unsubscribe();
 	}
 
 	private _renderChildItems() {
-		return this.childItems.map((item) => {
+		return this._childItems.map((item) => {
 			return html`<umb-tree-item
 				.label=${item.name}
 				.hasChildren=${item.hasChildren}
 				.itemKey=${item.key}
-				href="${this._constructPath(item.key)}">
+				.itemType=${item.type}>
 			</umb-tree-item>`;
 		});
 	}
@@ -113,7 +104,7 @@ export class UmbTreeItem extends UmbContextConsumerMixin(LitElement) {
 				.loading=${this._loading}
 				.hasChildren=${this.hasChildren}
 				label="${this.label}"
-				href="${this._constructPath(this.itemKey)}">
+				href="${this._href}">
 				${this._renderChildItems()}
 			</uui-menu-item>
 		`;

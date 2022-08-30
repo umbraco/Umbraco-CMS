@@ -15,6 +15,9 @@ export class UmbTreeNavigator extends UmbContextConsumerMixin(LitElement) {
 	private _entityKey = '';
 
 	@state()
+	private _entityType = '';
+
+	@state()
 	private _label = '';
 
 	@state()
@@ -40,6 +43,7 @@ export class UmbTreeNavigator extends UmbContextConsumerMixin(LitElement) {
 
 				this._loading = false;
 				this._entityKey = items[0].key;
+				this._entityType = items[0].type;
 				this._label = items[0].name;
 				this._hasChildren = items[0].hasChildren;
 			});
@@ -54,6 +58,7 @@ export class UmbTreeNavigator extends UmbContextConsumerMixin(LitElement) {
 	render() {
 		return html`<umb-tree-item
 			.itemKey=${this._entityKey}
+			.itemType=${this._entityType}
 			.label=${this._label}
 			?hasChildren=${this._hasChildren}
 			.loading=${this._loading}></umb-tree-item> `;

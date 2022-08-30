@@ -89,7 +89,7 @@ export class UmbModalLayoutContentPickerElement extends UmbModalLayoutElement<Um
 	render() {
 		return html`
 			<!-- TODO: maybe we need a layout component between umb-editor-layout and umb-editor-entity? -->
-			<umb-editor-entity>
+			<umb-editor-entity-layout>
 				<h3 slot="name">Select content</h3>
 				<uui-box>
 					<uui-input></uui-input>
@@ -110,7 +110,7 @@ export class UmbModalLayoutContentPickerElement extends UmbModalLayoutElement<Um
 					<uui-button label="Close" @click=${this._close}></uui-button>
 					<uui-button label="Submit" look="primary" color="positive" @click=${this._submit}></uui-button>
 				</div>
-			</umb-editor-entity>
+			</umb-editor-entity-layout>
 		`;
 	}
 }

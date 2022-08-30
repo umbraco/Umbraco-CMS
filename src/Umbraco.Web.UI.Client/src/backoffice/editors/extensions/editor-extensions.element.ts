@@ -1,4 +1,4 @@
-import '../shared/editor-entity/editor-entity.element';
+import '../shared/editor-entity-layout/editor-entity-layout.element';
 
 import { html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
@@ -52,7 +52,7 @@ export class UmbEditorExtensionsElement extends UmbContextConsumerMixin(LitEleme
 
 	render() {
 		return html`
-			<umb-editor-entity alias="Umb.Editor.Extensions">
+			<umb-editor-entity-layout alias="Umb.Editor.Extensions">
 				<h3 slot="name">Extensions</h3>
 				<uui-box headline="Extensions">
 					<uui-table>
@@ -75,7 +75,7 @@ export class UmbEditorExtensionsElement extends UmbContextConsumerMixin(LitEleme
 						)}
 					</uui-table>
 				</uui-box>
-			</umb-editor-entity>
+			</umb-editor-entity-layout>
 		`;
 	}
 }

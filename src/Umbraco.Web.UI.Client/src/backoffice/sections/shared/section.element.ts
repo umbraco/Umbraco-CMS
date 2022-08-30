@@ -3,11 +3,13 @@ import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { Subscription, map, switchMap, EMPTY, of } from 'rxjs';
 import { UmbContextConsumerMixin } from '../../../core/context';
-import { createExtensionElement, UmbExtensionRegistry } from '../../../core/extension';
+import { UmbExtensionRegistry } from '../../../core/extension';
 import { UmbSectionContext } from '../section.context';
 import type { ManifestTree, ManifestEditor } from '../../../core/models';
 
 import '../shared/section-trees.element.ts';
+import { UmbEditorElement } from '../../editors/shared/editor-entity/editor-entity.element';
+import { UmbEntityStore } from '../../../core/stores/entity.store';
 
 @customElement('umb-section')
 export class UmbSectionElement extends UmbContextConsumerMixin(LitElement) {
@@ -31,6 +33,8 @@ export class UmbSectionElement extends UmbContextConsumerMixin(LitElement) {
 	private _editors?: Array<ManifestEditor>;
 	private _editorsSubscription?: Subscription;
 
+	private _entityStore?: UmbEntityStore;
+
 	private _sectionContext?: UmbSectionContext;
 	private _extensionRegistry?: UmbExtensionRegistry;
 	private _treesSubscription?: Subscription;
@@ -40,24 +44,24 @@ export class UmbSectionElement extends UmbContextConsumerMixin(LitElement) {
 
 		// TODO: wait for more contexts
 		this.consumeContext('umbExtensionRegistry', (extensionsRegistry: UmbExtensionRegistry) => {
-			this.consumeContext('umbSectionContext', (sectionContext: UmbSectionContext) => {
-				this._extensionRegistry = extensionsRegistry;
-				this._sectionContext = sectionContext;
-				this._useEditors();
-				this._useTrees();
-			});
+			this._extensionRegistry = extensionsRegistry;
+			this._useTrees();
 		});
-	}
 
-	private _useEditors() {
-		this._editorsSubscription?.unsubscribe();
+		this.consumeContext('umbSectionContext', (sectionContext: UmbSectionContext) => {
+			this._sectionContext = sectionContext;
+			this._useTrees();
+		});
 
-		this._extensionRegistry?.extensionsOfType('editor').subscribe((editors) => {
-			this._editors = editors;
+		this.consumeContext('umbEntityStore', (entityStore: UmbEntityStore) => {
+			this._entityStore = entityStore;
+			this._useTrees();
 		});
 	}
 
 	private _useTrees() {
+		if (!this._sectionContext || !this._extensionRegistry || !this._entityStore) return;
+
 		this._treesSubscription?.unsubscribe();
 
 		this._treesSubscription = this._sectionContext?.data
@@ -87,20 +91,12 @@ export class UmbSectionElement extends UmbContextConsumerMixin(LitElement) {
 	private _createRoutes() {
 		const treeRoutes =
 			this._trees?.map((tree) => {
-				// TODO: make this code respond to updates in editor extensions
-				const editor = this._editors?.find((editor) => editor.alias === tree.meta.editor);
-				// TODO: implement fallback editor
-				const fallbackEditor = document.createElement('div');
-				fallbackEditor.innerHTML = '<p>No editor found</p>';
-
 				return {
-					path: `${tree.meta.pathname}/:id`,
-					component: () => (editor ? createExtensionElement(editor) : fallbackEditor),
-					async setup(component: any, info: any) {
-						// TODO: temp hack - we need to make sure it's the component and not a promise
-						const hello = await component;
-						hello.entityId = parseInt(info.match.params.id);
-						hello.entityKey = info.match.params.id;
+					path: `:entityType/:key`,
+					component: () => import('../../editors/shared/editor-entity/editor-entity.element'),
+					setup: (component: UmbEditorElement, info: any) => {
+						component.entityKey = info.match.params.key;
+						component.entityType = info.match.params.entityType;
 					},
 				};
 			}) ?? [];
