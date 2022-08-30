@@ -2225,6 +2225,8 @@ Mange hilsner fra Umbraco robotten
     <key alias="areasLayoutColumnsHelp">Vælg hvor mange layout-kolonnner der skal være tilgængelig for blokkens områder. Hvis der ikke er valgt noget her, benyttes det antal layout-kolonner der er valgt for hele layoutet.</key>
     <key alias="areasConfigurations">Opsætning af områder</key>
     <key alias="areasConfigurationsHelp">Hvis det skal være muligt at indsætte nye blokke indeni denne blok, skal der oprettes ét eller flere områder til at indsætte de nye blokke i.</key>
+    <key alias="invalidDropPosition">Ikke tilladt placering.</key>
+    <key alias="defaultLayoutStylesheet">Standart layout stylesheet</key>
   </area>
   <area alias="contentTemplatesDashboard">
     <key alias="whatHeadline">Hvad er Indholdsskabeloner?</key>

@@ -2874,7 +2874,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="areasLayoutColumnsHelp">Define how many layout columns that areas of this block will span. If not defined, the number of layout columns defined for the entire layout will be used.</key>
     <key alias="areasConfigurations">Area configurations</key>
     <key alias="areasConfigurationsHelp">To enable nesting of blocks within this block, define one or more areas for blocks to be nested within.</key>
-    <key alias="invalidDropPosition">Not allowed at this spot.</key>
+    <key alias="invalidDropPosition"><![CDATA[<strong>%0%</strong> is not allowed at this spot.]]></key>
+    <key alias="defaultLayoutStylesheet">Default layout stylesheet</key>
   </area>
   <area alias="contentTemplatesDashboard">
     <key alias="whatHeadline">What are Content Templates?</key>
