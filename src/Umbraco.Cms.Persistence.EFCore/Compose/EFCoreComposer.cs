@@ -13,6 +13,8 @@ public class EFCoreComposer : IComposer
 {
     public void Compose(IUmbracoBuilder builder)
     {
+        // builder.Services.AddEntityFrameworkSqlServer();
+        // builder.Services.AddEntityFrameworkSqlite();
         builder.Services.AddDbContext<UmbracoEFContext>(options =>
         {
             //TODO make this possible to change
