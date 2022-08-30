@@ -59,7 +59,14 @@ public class InstallApiController : ControllerBase
     internal InstallHelper InstallHelper { get; }
 
     public bool PostValidateDatabaseConnection(DatabaseModel databaseSettings)
-        => _databaseBuilder.ConfigureDatabaseConnection(databaseSettings, true);
+    {
+        if (_runtime.State.Level != RuntimeLevel.Install)
+        {
+            return false;
+        }
+
+        return _databaseBuilder.ConfigureDatabaseConnection(databaseSettings, true);
+    }
 
     /// <summary>
     ///     Gets the install setup.
@@ -86,11 +93,16 @@ public class InstallApiController : ControllerBase
     [HttpPost]
     public async Task<ActionResult> CompleteInstall()
     {
+        var loginUserAfterRestart = _runtime.State.Level == RuntimeLevel.Install;
+
         await _runtime.RestartAsync();
 
-        BackOfficeIdentityUser identityUser =
-            await _backOfficeUserManager.FindByIdAsync(Constants.Security.SuperUserIdAsString);
-        _backOfficeSignInManager.SignInAsync(identityUser, false);
+        if (loginUserAfterRestart)
+        {
+            BackOfficeIdentityUser identityUser =
+                await _backOfficeUserManager.FindByIdAsync(Constants.Security.SuperUserIdAsString);
+            _backOfficeSignInManager.SignInAsync(identityUser, false);
+        }
 
         return NoContent();
     }
