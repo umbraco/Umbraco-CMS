@@ -1,21 +1,26 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Dazinator.Extensions.FileProviders;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using NSwag.AspNetCore;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
-using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.ManagementApi.Configuration;
 using Umbraco.Cms.ManagementApi.DependencyInjection;
 using Umbraco.Cms.Web.Common.ApplicationBuilder;
 using Umbraco.Extensions;
 using Umbraco.New.Cms.Web.Common.Routing;
+using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Cms.ManagementApi;
 
@@ -59,17 +64,8 @@ public class ManagementApiComposer : IComposer
             options.AddApiVersionParametersWhenVersionNeutral = true;
             options.AssumeDefaultVersionWhenUnspecified = true;
         });
-
-        // Not super happy with this, but we need to know the UmbracoPath when registering the controller
-        // To be able to replace the route template token
-        GlobalSettings? globalSettings =
-            builder.Config.GetSection(Constants.Configuration.ConfigGlobal).Get<GlobalSettings>();
-        var backofficePath = globalSettings.UmbracoPath.TrimStart(Constants.CharArrays.TildeForwardSlash);
-
-        services.AddControllers(options =>
-        {
-            options.Conventions.Add(new UmbracoBackofficeToken(Constants.Web.AttributeRouting.BackOfficeToken, backofficePath));
-        });
+        services.AddControllers();
+        builder.Services.ConfigureOptions<ConfigureMvcOptions>();
 
         builder.Services.Configure<UmbracoPipelineOptions>(options =>
         {
@@ -99,31 +95,47 @@ public class ManagementApiComposer : IComposer
                 applicationBuilder =>
                 {
                     IServiceProvider provider = applicationBuilder.ApplicationServices;
-                    GlobalSettings? settings = provider.GetRequiredService<IOptions<GlobalSettings>>().Value;
-                    IHostingEnvironment hostingEnvironment = provider.GetRequiredService<IHostingEnvironment>();
-                    var officePath = settings.GetBackOfficePath(hostingEnvironment);
+                    IWebHostEnvironment webHostEnvironment = provider.GetRequiredService<IWebHostEnvironment>();
 
-                    // serve documents (same as app.UseSwagger())
-                    applicationBuilder.UseOpenApi(config =>
+                    if (!webHostEnvironment.IsProduction())
                     {
-                        config.Path = $"{officePath}/swagger/{{documentName}}/swagger.json";
-                    });
+                        GlobalSettings? settings = provider.GetRequiredService<IOptions<GlobalSettings>>().Value;
+                        IHostingEnvironment hostingEnvironment = provider.GetRequiredService<IHostingEnvironment>();
+                        var officePath = settings.GetBackOfficePath(hostingEnvironment);
+                        // serve documents (same as app.UseSwagger())
+                        applicationBuilder.UseOpenApi(config =>
+                        {
+                            config.Path = $"{officePath}/swagger/{{documentName}}/swagger.json";
+                        });
 
-                    // Serve Swagger UI
-                    applicationBuilder.UseSwaggerUi3(config =>
-                    {
-                        config.Path = officePath + "/swagger";
-                        config.SwaggerRoutes.Clear();
-                        var swaggerPath = $"{officePath}/swagger/{ApiAllName}/swagger.json";
-                        config.SwaggerRoutes.Add(new SwaggerUi3Route(ApiAllName, swaggerPath));
-                    });
+                        // Serve Swagger UI
+                        applicationBuilder.UseSwaggerUi3(config =>
+                        {
+                            config.Path = officePath + "/swagger";
+                            config.SwaggerRoutes.Clear();
+                            var swaggerPath = $"{officePath}/swagger/{ApiAllName}/swagger.json";
+                            config.SwaggerRoutes.Add(new SwaggerUi3Route(ApiAllName, swaggerPath));
+                        });
+                    }
+
                 },
                 applicationBuilder =>
                 {
+                    IServiceProvider provider = applicationBuilder.ApplicationServices;
+
                     applicationBuilder.UseEndpoints(endpoints =>
                     {
+                        GlobalSettings? settings = provider.GetRequiredService<IOptions<GlobalSettings>>().Value;
+                        IHostingEnvironment hostingEnvironment = provider.GetRequiredService<IHostingEnvironment>();
+                        var officePath = settings.GetBackOfficePath(hostingEnvironment);
                         // Maps attribute routed controllers.
                         endpoints.MapControllers();
+
+                        // Serve contract
+                        endpoints.MapGet($"{officePath}/api/openapi.json",async  context =>
+                        {
+                            await context.Response.SendFileAsync(new EmbeddedFileProvider(this.GetType().Assembly).GetFileInfo("OpenApi.json"));
+                        });
                     });
                 }
             ));
