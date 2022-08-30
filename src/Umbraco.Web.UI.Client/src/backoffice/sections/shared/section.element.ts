@@ -90,7 +90,7 @@ export class UmbSectionElement extends UmbContextConsumerMixin(LitElement) {
 
 	private _createRoutes() {
 		const treeRoutes =
-			this._trees?.map((tree) => {
+			this._trees?.map(() => {
 				return {
 					path: `:entityType/:key`,
 					component: () => import('../../editors/shared/editor-entity/editor-entity.element'),
@@ -102,11 +102,11 @@ export class UmbSectionElement extends UmbContextConsumerMixin(LitElement) {
 			}) ?? [];
 
 		this._routes = [
-			...treeRoutes,
 			{
 				path: 'dashboard',
 				component: () => import('../shared/section-dashboards.element'),
 			},
+			...treeRoutes,
 			{
 				path: '**',
 				redirectTo: 'dashboard',
