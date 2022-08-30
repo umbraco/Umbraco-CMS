@@ -23,6 +23,7 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
@@ -58,12 +59,7 @@ public class ComponentTests
             Mock.Of<IOptionsMonitor<ConnectionStrings>>(x => x.Get(It.IsAny<string>()) == connectionStrings),
             new MapperCollection(() => Enumerable.Empty<BaseMapper>()),
             Mock.Of<IDbProviderFactoryCreator>(),
-            new DatabaseSchemaCreatorFactory(
-                loggerFactory.CreateLogger<DatabaseSchemaCreator>(),
-                loggerFactory,
-                new UmbracoVersion(),
-                Mock.Of<IEventAggregator>(),
-                Mock.Of<IOptionsMonitor<InstallDefaultDataSettings>>()),
+            Mock.Of<IDatabaseInfo>(),
             mapperCollection);
 
         var fs = new FileSystems(

@@ -4,12 +4,15 @@ using AutoFixture;
 using AutoFixture.Kernel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Install;
@@ -38,6 +41,7 @@ internal class UmbracoCustomizations : ICustomization
             .Customize(new ConstructorCustomization(typeof(BackOfficeUserManager), new GreedyConstructorQuery()))
             .Customize(new ConstructorCustomization(typeof(MemberManager), new GreedyConstructorQuery()))
             .Customize(new ConstructorCustomization(typeof(IDatabaseSchemaCreatorFactory), new GreedyConstructorQuery()))
+            .Customize(new ConstructorCustomization(typeof(IDatabaseInfo), new GreedyConstructorQuery()))
             .Customize(new ConstructorCustomization(typeof(BackOfficeServerVariables), new GreedyConstructorQuery()))
             .Customize(new ConstructorCustomization(typeof(InstallHelper), new GreedyConstructorQuery()));
 
@@ -48,6 +52,16 @@ internal class UmbracoCustomizations : ICustomization
         fixture.Customize<IUmbracoVersion>(
             u => u.FromFactory(
                 () => new UmbracoVersion()));
+
+
+        fixture.Customize<IDatabaseSchemaCreatorFactory>(u => u.FromFactory(
+            () => new DatabaseSchemaCreatorFactory(
+            Mock.Of<ILogger<DatabaseSchemaCreator>>(),
+            Mock.Of<ILoggerFactory>(),
+            Mock.Of<IUmbracoVersion>(),
+            Mock.Of<IEventAggregator>(),
+            Mock.Of<IOptionsMonitor<InstallDefaultDataSettings>>()
+            )));
 
         fixture.Customize<HostingSettings>(x =>
             x.With(settings => settings.ApplicationVirtualPath, string.Empty));
