@@ -3,6 +3,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
 import { UmbActionService } from './actions.service';
 import { UmbContextConsumerMixin } from '../../core/context';
+import type { ManifestEntityAction } from '../../core/models';
 
 @customElement('umb-actions-modal')
 export class UmbActionsModal extends UmbContextConsumerMixin(LitElement) {
@@ -23,9 +24,12 @@ export class UmbActionsModal extends UmbContextConsumerMixin(LitElement) {
 			}
 
 			.action {
+				display: flex;
 				padding: var(--uui-size-2) var(--uui-size-4);
 				border-bottom: 1px solid var(--uui-color-divider);
 				cursor: pointer;
+				align-items: center;
+				gap: var(--uui-size-3);
 			}
 			.action:hover {
 				background-color: var(--uui-color-surface-emphasis);
@@ -47,12 +51,60 @@ export class UmbActionsModal extends UmbContextConsumerMixin(LitElement) {
 	@property()
 	name = '';
 
-	private _actionList = ['create', 'rename', 'delete', 'reload'];
+	private _actionList: ManifestEntityAction[] = [
+		{
+			name: 'create',
+			alias: 'action.create',
+			meta: {
+				label: 'Create',
+				icon: 'add',
+				weight: 10,
+			},
+			type: 'entityAction',
+		},
+		{
+			name: 'rename',
+			alias: 'action.rename',
+			meta: {
+				label: 'Rename',
+				icon: 'edit',
+				weight: 20,
+			},
+			type: 'entityAction',
+		},
+		{
+			name: 'delete',
+			alias: 'action.delete',
+			meta: {
+				label: 'Delete',
+				icon: 'delete',
+				weight: 30,
+			},
+			type: 'entityAction',
+		},
+		{
+			name: 'reload',
+			alias: 'action.reload',
+			meta: {
+				label: 'Reload',
+				icon: 'sync',
+				weight: 40,
+			},
+			type: 'entityAction',
+		},
+	];
 
 	renderActions() {
-		return this._actionList.map((action) => {
-			return html` <div class="action" @click=${() => this._actionService?.execute(action)}>${action}</div> `;
-		});
+		return this._actionList
+			.sort((a, b) => a.meta.weight - b.meta.weight)
+			.map((action) => {
+				return html`
+					<div class="action" @keydown=${() => ''} @click=${() => this._actionService?.execute(action.name)}>
+						<uui-icon .name=${action.meta.icon}></uui-icon>
+						${action.meta.label}
+					</div>
+				`;
+			});
 	}
 
 	render() {
