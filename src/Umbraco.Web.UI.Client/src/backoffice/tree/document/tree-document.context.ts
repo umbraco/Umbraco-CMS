@@ -3,7 +3,7 @@ import { UmbEntityStore } from '../../../core/stores/entity.store';
 import { UmbTreeContext } from '../tree.context';
 import type { ManifestTree } from '../../../core/models';
 
-export class UmbTreeContentContext implements UmbTreeContext {
+export class UmbTreeDocumentContext implements UmbTreeContext {
 	public tree: ManifestTree;
 	public entityStore: UmbEntityStore;
 
