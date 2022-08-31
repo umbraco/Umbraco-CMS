@@ -1066,6 +1066,7 @@
                             const overlay = {
                                 title: localizations[0],
                                 content: localizationService.tokenReplace(localizations[1], [blockToRevert.label]),
+                                disableBackdropClick: true,
                                 closeButtonLabel: localizations[2],
                                 submitButtonLabel: localizations[3],
                                 close: function () {
