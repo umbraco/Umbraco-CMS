@@ -4,6 +4,7 @@ import { customElement, property } from 'lit/decorators.js';
 import { UmbActionService } from './actions.service';
 import { UmbContextConsumerMixin } from '../../core/context';
 import type { ManifestEntityAction } from '../../core/models';
+import './shared/tree-action.element';
 
 @customElement('umb-actions-modal')
 export class UmbActionsModal extends UmbContextConsumerMixin(LitElement) {
@@ -22,19 +23,6 @@ export class UmbActionsModal extends UmbContextConsumerMixin(LitElement) {
 			#title > * {
 				margin: 0;
 			}
-
-			.action {
-				display: flex;
-				padding: var(--uui-size-2) var(--uui-size-4);
-				border-bottom: 1px solid var(--uui-color-divider);
-				cursor: pointer;
-				align-items: center;
-				gap: var(--uui-size-3);
-			}
-			.action:hover {
-				background-color: var(--uui-color-surface-emphasis);
-				color: var(--uui-color-interactive-emphasis);
-			}
 		`,
 	];
 
@@ -51,7 +39,7 @@ export class UmbActionsModal extends UmbContextConsumerMixin(LitElement) {
 	@property()
 	name = '';
 
-	private _actionList: ManifestEntityAction[] = [
+	private _actionList: Array<ManifestEntityAction & { loader?: () => Promise<object | HTMLElement> }> = [
 		{
 			name: 'create',
 			alias: 'action.create',
@@ -60,16 +48,7 @@ export class UmbActionsModal extends UmbContextConsumerMixin(LitElement) {
 				icon: 'add',
 				weight: 10,
 			},
-			type: 'entityAction',
-		},
-		{
-			name: 'rename',
-			alias: 'action.rename',
-			meta: {
-				label: 'Rename',
-				icon: 'edit',
-				weight: 20,
-			},
+			loader: () => import('./actions/tree-action-create.element'),
 			type: 'entityAction',
 		},
 		{
@@ -78,8 +57,9 @@ export class UmbActionsModal extends UmbContextConsumerMixin(LitElement) {
 			meta: {
 				label: 'Delete',
 				icon: 'delete',
-				weight: 30,
+				weight: 20,
 			},
+			loader: () => import('./actions/tree-action-delete.element'),
 			type: 'entityAction',
 		},
 		{
@@ -88,8 +68,9 @@ export class UmbActionsModal extends UmbContextConsumerMixin(LitElement) {
 			meta: {
 				label: 'Reload',
 				icon: 'sync',
-				weight: 40,
+				weight: 30,
 			},
+			loader: () => import('./actions/tree-action-reload.element'),
 			type: 'entityAction',
 		},
 	];
@@ -98,12 +79,7 @@ export class UmbActionsModal extends UmbContextConsumerMixin(LitElement) {
 		return this._actionList
 			.sort((a, b) => a.meta.weight - b.meta.weight)
 			.map((action) => {
-				return html`
-					<div class="action" @keydown=${() => ''} @click=${() => this._actionService?.execute(action)}>
-						<uui-icon .name=${action.meta.icon}></uui-icon>
-						${action.meta.label}
-					</div>
-				`;
+				return html`<umb-tree-action .treeAction=${action}></umb-tree-action> `;
 			});
 	}
 
