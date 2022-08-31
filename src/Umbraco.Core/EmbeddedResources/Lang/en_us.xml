@@ -2877,9 +2877,9 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="areasConfigurationsHelp">To enable nesting of blocks within this block, define one or more areas for blocks to be nested within.</key>
     <key alias="invalidDropPosition"><![CDATA[<strong>%0%</strong> is not allowed at this spot.]]></key>
     <key alias="defaultLayoutStylesheet">Default layout stylesheet</key>
-    <key alias="confirmPasteDisallowedNestedBlockHeadline">Disallowed content was inserted</key>
+    <key alias="confirmPasteDisallowedNestedBlockHeadline">Disallowed content was rejected</key>
     <key alias="confirmPasteDisallowedNestedBlockMessage">
-      <![CDATA[The pasted content contained disallowed content, Would you like to insert this content anyway?]]></key>
+      <![CDATA[The inserted content contained disallowed content, which has not been created. Would you like to keep the rest of this content anyway?]]></key>
   </area>
   <area alias="contentTemplatesDashboard">
     <key alias="whatHeadline">What are Content Templates?</key>
