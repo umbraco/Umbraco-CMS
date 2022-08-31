@@ -99,7 +99,7 @@ export class UmbActionsModal extends UmbContextConsumerMixin(LitElement) {
 			.sort((a, b) => a.meta.weight - b.meta.weight)
 			.map((action) => {
 				return html`
-					<div class="action" @keydown=${() => ''} @click=${() => this._actionService?.execute(action.name)}>
+					<div class="action" @keydown=${() => ''} @click=${() => this._actionService?.execute(action)}>
 						<uui-icon .name=${action.meta.icon}></uui-icon>
 						${action.meta.label}
 					</div>

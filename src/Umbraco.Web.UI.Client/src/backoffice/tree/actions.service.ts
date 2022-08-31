@@ -2,6 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, LitElement, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbContextProviderMixin } from '../../core/context';
+import { ManifestEntityAction } from '../../core/models';
 import './actions-modal.element';
 
 @customElement('umb-action-service')
@@ -68,7 +69,7 @@ export class UmbActionService extends UmbContextProviderMixin(LitElement) {
 		this._modalOpen = false;
 	}
 
-	public execute(action: any) {
+	public execute(action: ManifestEntityAction) {
 		console.log('Execute action: ', action);
 	}
 
