@@ -7,7 +7,7 @@ import { UmbContextConsumerMixin, UmbContextProviderMixin } from '../../../core/
 import { UmbEntityStore } from '../../../core/stores/entity.store';
 import type { ManifestTree } from '../../../core/models';
 
-@customElement('umb-tree-data-types')
+@customElement('umb-tree-media')
 export class UmbTreeMediaElement extends UmbContextProviderMixin(UmbContextConsumerMixin(LitElement)) {
 	static styles = [UUITextStyles, css``];
 

@@ -8,8 +8,8 @@ import type { ManifestTree } from '../../../core/models';
 
 import '../shared/tree-navigator.element';
 
-@customElement('umb-document-type-tree')
-export class UmbDocumentTypeTree extends UmbContextConsumerMixin(UmbContextProviderMixin(LitElement)) {
+@customElement('umb-tree-document-types')
+export class UmbTreeDocumentTypes extends UmbContextConsumerMixin(UmbContextProviderMixin(LitElement)) {
 	static styles = [UUITextStyles, css``];
 
 	@property({ type: String })
@@ -38,8 +38,10 @@ export class UmbDocumentTypeTree extends UmbContextConsumerMixin(UmbContextProvi
 	}
 }
 
+export default UmbTreeDocumentTypes;
+
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-document-type-tree': UmbDocumentTypeTree;
+		'umb-tree-document-types': UmbTreeDocumentTypes;
 	}
 }

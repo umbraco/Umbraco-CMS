@@ -243,7 +243,7 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 	},
 	{
 		type: 'tree',
-		alias: 'Umb.Tree.Datatypes',
+		alias: 'Umb.Tree.DataTypes',
 		name: 'Data Types Tree',
 		loader: () => import('./backoffice/tree/data-types/tree-data-types.element'),
 		meta: {
@@ -255,7 +255,6 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		type: 'tree',
 		alias: 'Umb.Tree.DocumentTypes',
 		name: 'Document Types Tree',
-		elementName: 'umb-document-type-tree',
 		loader: () => import('./backoffice/tree/document-types/tree-document-types.element'),
 		meta: {
 			weight: 2,
