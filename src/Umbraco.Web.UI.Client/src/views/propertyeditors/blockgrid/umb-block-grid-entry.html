@@ -1,4 +1,5 @@
 <uui-button-inline-create
+    ng-if="!vm.blockEditorApi.readonly"
     class="umb-block-grid__block--inline-create-button --above"
     ng-class="{'--at-root': vm.depth === '0'}"
     ng-click="vm.blockEditorApi.requestShowCreate(vm.parentBlock, vm.areaKey, vm.index, $event)">
@@ -114,7 +115,8 @@
                         <localize key="general_copy">Copy</localize>
                     </span>
                 </button>
-                <button type="button" class="btn-reset umb-outline action --delete" localize="title" title="actions_delete"
+                <button ng-if="!vm.blockEditorApi.readonly"
+                        type="button" class="btn-reset umb-outline action --delete" localize="title" title="actions_delete"
                         ng-click="vm.blockEditorApi.requestDeleteBlock(vm.layoutEntry.$block);">
                     <umb-icon icon="icon-trash" class="icon"></umb-icon>
                     <span class="sr-only">
@@ -125,13 +127,13 @@
         </div>
 
         <button 
-            ng-if="vm.layoutEntry.$block.config.columnSpanOptions.length > 1 || vm.layoutEntry.$block.config.rowMaxSpan !== vm.layoutEntry.$block.config.rowMinSpan" 
+            ng-if="!vm.blockEditorApi.readonly && (vm.layoutEntry.$block.config.columnSpanOptions.length > 1 || vm.layoutEntry.$block.config.rowMaxSpan !== vm.layoutEntry.$block.config.rowMinSpan)" 
             type="button" class="umb-block-grid__scale-handler" 
             ng-mousedown="vm.scaleHandlerMouseDown($event)" 
             ng-keyup="vm.scaleHandlerKeyUp($event)">
         </button>
 
-        <div ng-if="vm.layoutEntry.$block.config.columnSpanOptions.length > 1 || vm.layoutEntry.$block.config.rowMaxSpan !== vm.layoutEntry.$block.config.rowMinSpan" 
+        <div ng-if="!vm.blockEditorApi.readonly && (vm.layoutEntry.$block.config.columnSpanOptions.length > 1 || vm.layoutEntry.$block.config.rowMaxSpan !== vm.layoutEntry.$block.config.rowMinSpan)" 
             class="umb-block-grid__scale-label">
             {{vm.layoutEntry.columnSpan}} x {{vm.layoutEntry.rowSpan}}
         </div>
@@ -140,6 +142,7 @@
 </ng-form>
 
 <uui-button-inline-create
+    ng-if="!vm.blockEditorApi.readonly"
     class="umb-block-grid__block--inline-create-button --after"
     ng-click="vm.blockEditorApi.requestShowCreate(vm.parentBlock, vm.areaKey, vm.index+1, $event, {'fitInRow': true})"
     vertical>

@@ -29,7 +29,7 @@
             }
         });
 
-    function BlockGridController($element, $scope, $timeout, $q, editorService, clipboardService, localizationService, overlayService, blockEditorService, udiService, serverValidationManager, angularHelper, eventsService, assetsService, umbRequestHelper) {
+    function BlockGridController($element, $attrs, $scope, $timeout, $q, editorService, clipboardService, localizationService, overlayService, blockEditorService, udiService, serverValidationManager, angularHelper, eventsService, assetsService, umbRequestHelper) {
 
         var unsubscribe = [];
         var modelObject;
@@ -43,6 +43,18 @@
         var shadowRoot;
 
         var vm = this;
+
+        vm.readonly = false;
+
+        $attrs.$observe('readonly', (value) => {
+            vm.readonly = value !== undefined;
+
+            vm.blockEditorApi.readonly = vm.readonly;
+
+            if (deleteAllBlocksAction) {
+                deleteAllBlocksAction.isDisabled = vm.readonly;
+            }
+        });
 
         vm.loading = true;
         vm.currentBlockInFocus = null;
@@ -611,6 +623,7 @@
                 title: blockObject.label,
                 view: "views/common/infiniteeditors/blockeditor/blockeditor.html",
                 size: blockObject.config.editorSize || "medium",
+                hideSubmitButton: vm.readonly,
                 submit: function(blockEditorModel) {
 
                     if (liveEditing === false) {
@@ -858,6 +871,8 @@
                 return b.date - a.date
             });
 
+            console.log("clipboardItems", vm.clipboardItems, vm.availableContentTypesAliases)
+
             if(firstTime !== true && vm.clipboardItems.length > oldAmount) {
                 jumpClipboard();
             }
@@ -914,6 +929,7 @@
             }
 
             localizationService.localize("clipboard_labelForArrayOfItemsFrom", [vm.model.label, contentNodeName]).then(function (localizedLabel) {
+                console.log("copyArray aliases:", aliases)
                 clipboardService.copyArray(clipboardService.TYPES.BLOCK, aliases, elementTypesToCopy, localizedLabel, contentNodeIcon || "icon-thumbnail-list", vm.model.id);
             });
         };
@@ -1065,6 +1081,8 @@
         }
 
         function requestDeleteBlock(block) {
+            if (vm.readonly) return;
+
             localizationService.localizeMany(["general_delete", "blockEditor_confirmDeleteBlockMessage", "contentTypeEditor_yesDelete"]).then(function (data) {
                 const overlay = {
                     title: data[0],
@@ -1112,7 +1130,8 @@
             openSettingsForBlock: openSettingsForBlock,
             requestShowCreate: requestShowCreate,
             requestShowClipboard: requestShowClipboard,
-            internal: vm
+            internal: vm,
+            readonly: vm.readonly
         };
 
         function onAmountOfBlocksChanged() {
