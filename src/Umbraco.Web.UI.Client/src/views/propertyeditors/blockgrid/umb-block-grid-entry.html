@@ -13,6 +13,7 @@
                     '--active':vm.layoutEntry.$block.active,
                     '--show-validation': vm.layoutEntry.$block.showValidation === true,
                     '--hovering-area': vm.isHoveringArea,
+                    '--scale-mode': vm.isScaleMode,
                     '--block-ui-visible': vm.layoutEntry.$block.blockUiVisibility === true
                 }">
 
@@ -52,7 +53,10 @@
         </umb-block-grid-block>
 
         <div class="umb-block-grid__block--validation-border"></div>
-        <div class="umb-block-grid__block--validation-badge">!</div>
+        <!--<div class="umb-block-grid__block--validation-badge">!</div>-->
+        <div class="umb-block-grid__block--no-drop-message">
+            <localize key="blockEditor_invalidDropPosition">Not allowed at this location</localize>
+        </div>
 
         <div class="umb-block-grid__block--context">
             <div class="__context-bar">
@@ -124,8 +128,17 @@
             </div>
         </div>
 
-        <button ng-if="vm.layoutEntry.$block.config.columnSpanOptions.length > 1 || vm.layoutEntry.$block.config.rowMaxSpan !== vm.layoutEntry.$block.config.rowMinSpan" type="button" class="umb-block-grid__scale-handler" ng-mousedown="vm.scaleHandlerMouseDown($event)" ng-keyup="vm.scaleHandlerKeyUp($event)">
+        <button 
+            ng-if="vm.layoutEntry.$block.config.columnSpanOptions.length > 1 || vm.layoutEntry.$block.config.rowMaxSpan !== vm.layoutEntry.$block.config.rowMinSpan" 
+            type="button" class="umb-block-grid__scale-handler" 
+            ng-mousedown="vm.scaleHandlerMouseDown($event)" 
+            ng-keyup="vm.scaleHandlerKeyUp($event)">
         </button>
+
+        <div ng-if="vm.layoutEntry.$block.config.columnSpanOptions.length > 1 || vm.layoutEntry.$block.config.rowMaxSpan !== vm.layoutEntry.$block.config.rowMinSpan" 
+            class="umb-block-grid__scale-label">
+            {{vm.layoutEntry.columnSpan}} x {{vm.layoutEntry.rowSpan}}
+        </div>
 
     </div>
 </ng-form>

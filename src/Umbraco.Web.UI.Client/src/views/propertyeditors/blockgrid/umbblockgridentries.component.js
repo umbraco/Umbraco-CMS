@@ -186,19 +186,19 @@
 
                 if(_lastGridLayoutContainerEl !== contextVM && _lastGridLayoutContainerEl !== null) {
                     _lastGridLayoutContainerEl.hideNotAllowed();
-                    movingBlock.classList.remove('__dropNotAllowed');
+                    movingBlock.classList.remove('--drop-not-allowed');
                 }
                 _lastGridLayoutContainerEl = contextVM;
                 
                 if(contextVM.acceptBlock(movingBlock.dataset.contentElementTypeKey) === true) {
                     _lastGridLayoutContainerEl.hideNotAllowed();
-                    movingBlock.classList.remove('__dropNotAllowed');
+                    movingBlock.classList.remove('--drop-not-allowed');
                     _lastGridLayoutContainerEl = null;
                     return true;
                 }
 
                 contextVM.showNotAllowed();
-                movingBlock.classList.add('__dropNotAllowed')
+                movingBlock.classList.add('--drop-not-allowed')
 
                 return false;
             }
@@ -232,7 +232,7 @@
                 //touchStartThreshold: 0, // px, how many pixels the point should move before cancelling a delayed drag event
                 //disabled: false, // Disables the sortable if set to true.
                 //store: null,  // @see Store
-                animation: 0,  // ms, animation speed moving items when sorting, `0` — without animation
+                animation: 120,  // ms, animation speed moving items when sorting, `0` — without animation
                 easing: "cubic-bezier(1, 0, 0, 1)", // Easing for animation. Defaults to null. See https://easings.net/ for examples.
                 //handle: "umb-block-grid-block",  // Drag handle selector within list items,
                 cancel: '',

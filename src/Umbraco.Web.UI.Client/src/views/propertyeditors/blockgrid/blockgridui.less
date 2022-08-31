@@ -53,7 +53,7 @@ ng-form.ng-invalid-val-server-match-content > .umb-block-grid__block:not(.--acti
     pointer-events: none;
 }
 
-.umb-block-grid__block--validation-badge {
+/*.umb-block-grid__block--validation-badge {
     display:none;
 }
 ng-form.ng-invalid-val-server-match-settings > .umb-block-grid__block:not(.--active) > .umb-block-grid__block--validation-badge, 
@@ -72,7 +72,6 @@ ng-form.ng-invalid-val-server-match-content > .umb-block-grid__block:not(.--acti
     padding: 2px;
     line-height: 10px;
     background-color: @formErrorText;
-    /* not working cause we are in a shadow DOM: */
     .show-validation-type-warning & {
         background-color: @formWarningText;
     }
@@ -92,6 +91,7 @@ ng-form.ng-invalid-val-server-match-content > .umb-block-grid__block:not(.--acti
         100% { transform: translateY(0); }
     }
 }
+*/
 
 .umb-block-grid__block {
     position: relative;
@@ -103,6 +103,7 @@ ng-form.ng-invalid-val-server-match-content > .umb-block-grid__block:not(.--acti
     &::after {
         content: '';
         position: absolute;
+        z-index: 2;
         pointer-events: none;
         display: none;
         inset: 0;
@@ -141,8 +142,42 @@ ng-form.ng-invalid-val-server-match-content > .umb-block-grid__block:not(.--acti
     }
     &.--active {
         &::after {
+            display: block;
             border-color: @pinkLight;
             animation: none;
+        }
+    }
+
+    &.--scale-mode {
+        &::after {
+            display: block;
+
+            z-index: 10;
+            cursor: nwse-resize;
+            pointer-events: all;
+
+            transition: background-color 240ms ease-in;
+            animation: umb-block-grid__scalebox__pulse 400ms ease-in-out alternate infinite;
+            @keyframes umb-block-grid__scalebox__pulse {
+                0%   { background-color: rgba(@blueMidLight, 0.33); }
+                100% { background-color: rgba(@blueMidLight, 0.22); }
+            }
+        }
+
+        > .umb-block-grid__block--context {
+            opacity: 1;
+        }
+        > .umb-block-grid__scale-handler {
+            opacity: 1;
+        }
+        > .umb-block-grid__scale-label {
+            opacity: 1;
+        }
+    }
+
+    &.--drop-not-allowed {
+        > .umb-block-grid__block--no-drop-message{
+            display: block;
         }
     }
 
@@ -192,14 +227,16 @@ ng-form.ng-invalid-val-server-match-content > .umb-block-grid__block:not(.--acti
         > .umb-block-grid__block--context {
             opacity: 1;
         }
-        > .umb-block-grid__block--actions {
-            opacity: 1;
+        &:not(.--scale-mode) {
+            > .umb-block-grid__block--actions {
+                opacity: 1;
+            }
+    
+            > umb-block-grid-block > umb-block-grid-entries > .umb-block-grid__layout-container > .umb-block-grid__layout-item > .umb-block-grid__area-actions {
+                opacity: 1;
+            }
         }
-
-        > umb-block-grid-block > umb-block-grid-entries > .umb-block-grid__layout-container > .umb-block-grid__layout-item > .umb-block-grid__area-actions {
-            opacity: 1;
-        }
-
+        
         > .umb-block-grid__scale-handler {
             opacity: 1;
         }
@@ -236,13 +273,28 @@ ng-form.ng-invalid > .umb-block-grid__block:not(.--active) > .umb-block-grid__bl
     --umb-block-grid--hint-area-ui: 1;
 }
 
+.umb-block-grid__block--no-drop-message {
+    position: absolute;
+    top: -20px;
+    left: 0;
+    font-size: 12px;
+    z-index: 2;
+    pointer-events: none;
+    user-select: none;
+
+    padding: 0 9px;
+    padding-top: 1px;
+    background-color: @errorBackground;
+    color: @errorText;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    display: none;
+}
+
 .umb-block-grid__block--context {
     position: absolute;
     top: -20px;
     right: 0;
-    /*padding-bottom: 10px;*/
-    pointer-events: none;
-    pointer-events: all;
     font-size: 12px;
     z-index: 2;
     display: var(--umb-block-grid--block-ui-display, flex);
@@ -255,7 +307,6 @@ ng-form.ng-invalid > .umb-block-grid__block:not(.--active) > .umb-block-grid__bl
         color: white;
         border-top-left-radius: 3px;
         border-top-right-radius: 3px;
-        pointer-events: all;
         display: inline-block;
         .action {
             color: white;
@@ -420,9 +471,30 @@ umb-block-grid-block {
     background-color: rgba(0,0,0,0);
 }
 
-/* When inside scalebox its always visible: */
-.umb-block-grid__scalebox .umb-block-grid__scale-handler {
+.umb-block-grid__scale-handler:focus + .umb-block-grid__scale-label,
+.umb-block-grid__scale-handler:hover + .umb-block-grid__scale-label {
     opacity: 1;
+}
+
+
+.umb-block-grid__scale-label {
+    position: absolute;
+    display: block;
+    left: 100%;
+    margin-left: 6px;
+    margin-top: 6px;
+    z-index: 2;
+
+    background-color: white;
+    color: black;
+    font-size: 12px;
+    padding: 0px 6px;
+    border-radius: 3px;
+    opacity: 0;
+    transition: opacity 120ms;
+
+    pointer-events: none;
+    white-space: nowrap;
 }
 
 
@@ -639,7 +711,6 @@ umb-block-grid-block {
 }
 
 .umb-block-grid__scalebox-backdrop {
-    background-color: rgba(255, 255, 255, 0.1);
     position: absolute;
     top:0;
     left:0;
@@ -647,16 +718,21 @@ umb-block-grid-block {
     right:0;
     z-index: 1;
     cursor: nwse-resize;
+    box-shadow: 0 0 0 50vw rgba(0,0,0,0.2);
+
+    animation: umb-block-grid__scalebox__appear 1000ms;
+    @keyframes umb-block-grid__scalebox__appear {
+        0%   { opacity: 0 }
+        100% { opacity: 1; }
+    }
 }
+/*
 .umb-block-grid__scalebox {
     position: absolute;
     top:0;
     left:0;
     z-index: 10;
     cursor: nwse-resize;
-
-    border: @blueDark solid 1px;
-    border-radius: 3px;
 
     transition: background-color 240ms ease-in;
     animation: umb-block-grid__scalebox__pulse 400ms ease-in-out alternate infinite;
@@ -665,6 +741,7 @@ umb-block-grid-block {
         100% { background-color: rgba(@blueMidLight, 0.22); }
     }
 }
+*/
 
 
 

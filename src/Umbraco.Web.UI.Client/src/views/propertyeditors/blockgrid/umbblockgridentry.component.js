@@ -87,6 +87,7 @@
         const vm = this;
         vm.areaGridStyles = {};
         vm.isHoveringArea = false;
+        vm.isScaleMode = false;
 
         vm.$onInit = function() {
 
@@ -184,6 +185,8 @@
                 // Push its own height twice, to give something to scale with.
                 gridRows.push(layoutItemRect.height);
                 gridRows.push(layoutItemRect.height);
+                // TODO: need to do some more here..
+                // Fill up with something til the items position? then the items height and then just 50ish.
             }
 
             // add a few extra rows, so there is something to extend too.
@@ -195,6 +198,7 @@
 
         vm.scaleHandlerMouseDown = function($event) {
             $event.originalEvent.preventDefault();
+            vm.isScaleMode = true;
             
             window.addEventListener('mousemove', vm.onMouseMove);
             window.addEventListener('mouseup', vm.onMouseUp);
@@ -210,18 +214,20 @@
             const layoutItemRect = $element[0].getBoundingClientRect();
             updateGridLayoutData(layoutContainerRect, layoutItemRect);
 
+            
             scaleBoxBackdropEl = document.createElement('div');
             scaleBoxBackdropEl.className = 'umb-block-grid__scalebox-backdrop';
             layoutContainer.appendChild(scaleBoxBackdropEl);
 
-            scaleBoxEl = document.createElement('div');
-            scaleBoxEl.className = 'umb-block-grid__scalebox';
+            //scaleBoxEl = document.createElement('div');
+            //scaleBoxEl.className = 'umb-block-grid__scalebox';
 
-            const scaleBoxScaleHandler = document.createElement('button');
-            scaleBoxScaleHandler.className = 'umb-block-grid__scale-handler';
-            scaleBoxEl.appendChild(scaleBoxScaleHandler);
+            //const scaleBoxScaleHandler = document.createElement('button');
+            //scaleBoxScaleHandler.className = 'umb-block-grid__scale-handler';
+            //scaleBoxEl.appendChild(scaleBoxScaleHandler);
 
-            $element[0].appendChild(scaleBoxEl);
+            //$element[0].appendChild(scaleBoxEl);
+            
 
 
         }
@@ -247,8 +253,8 @@
             const endCellX =  getAccumulatedValueOfIndex(endCol, gridColumns);
             const endCellY =  getAccumulatedValueOfIndex(endRow, gridRows);
 
-            scaleBoxEl.style.width = Math.round(endCellX-startCellX)+'px';
-            scaleBoxEl.style.height = Math.round(endCellY-startCellY)+'px';
+            //scaleBoxEl.style.width = Math.round(endCellX-startCellX)+'px';
+            //scaleBoxEl.style.height = Math.round(endCellY-startCellY)+'px';
             
             // update as we go:
             vm.layoutEntry.columnSpan = newSpans.columnSpan;
@@ -258,6 +264,8 @@
         }
 
         vm.onMouseUp = function(e) {
+
+            vm.isScaleMode = false;
 
             const layoutContainerRect = layoutContainer.getBoundingClientRect();
             const layoutItemRect = $element[0].getBoundingClientRect();
@@ -275,15 +283,15 @@
             window.removeEventListener('mouseleave', vm.onMouseUp);
 
             layoutContainer.removeChild(scaleBoxBackdropEl);
-            $element[0].removeChild(scaleBoxEl);
+            //$element[0].removeChild(scaleBoxEl);
 
             // Clean up variables:
             layoutContainer = null;
             gridColumns = null;
             gridRows = null;
-            scaleBoxEl = null;
+            //scaleBoxEl = null;
             scaleBoxBackdropEl = null;
-
+ 
             // Update block size:
             vm.layoutEntry.columnSpan = newSpans.columnSpan;
             vm.layoutEntry.rowSpan = newSpans.rowSpan;
