@@ -11,7 +11,8 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     EditorType.PropertyValue | EditorType.MacroParameter,
     "Decimal",
     "decimal",
-    ValueType = ValueTypes.Decimal)]
+    ValueType = ValueTypes.Decimal,
+    ValueEditorIsReusable = true)]
 public class DecimalPropertyEditor : DataEditor
 {
     /// <summary>
