@@ -114,7 +114,7 @@ export const data: Array<Entity> = [
 		type: 'media',
 		icon: 'picture',
 		hasChildren: false,
-		parentKey: '05a8b8bc-bd90-47cc-a897-e67c8fa682ee',
+		parentKey: '',
 	},
 	{
 		id: 2002,
@@ -123,7 +123,7 @@ export const data: Array<Entity> = [
 		name: 'Media 2',
 		icon: 'picture',
 		hasChildren: false,
-		parentKey: '05a8b8bc-bd90-47cc-a897-e67c8fa682ee',
+		parentKey: '',
 	},
 	{
 		id: 1,
@@ -132,7 +132,7 @@ export const data: Array<Entity> = [
 		type: 'document',
 		icon: 'document',
 		hasChildren: false,
-		parentKey: '485d49ef-a4aa-46ac-843f-4256fe167347',
+		parentKey: '',
 	},
 	{
 		id: 2,
@@ -141,7 +141,7 @@ export const data: Array<Entity> = [
 		type: 'document',
 		icon: 'favorite',
 		hasChildren: false,
-		parentKey: '485d49ef-a4aa-46ac-843f-4256fe167347',
+		parentKey: '',
 	},
 	{
 		id: 3,
@@ -150,7 +150,7 @@ export const data: Array<Entity> = [
 		type: 'document',
 		icon: 'document',
 		hasChildren: false,
-		parentKey: '485d49ef-a4aa-46ac-843f-4256fe167347',
+		parentKey: '',
 	},
 ];
 
@@ -160,8 +160,9 @@ class UmbEntityData extends UmbData<Entity> {
 		super(data);
 	}
 
-	getChildren(key: string) {
-		return data.filter((item) => item.parentKey === key);
+	getItems(type = '', parentKey = '') {
+		if (!type) return [];
+		return data.filter((item) => item.type === type && item.parentKey === parentKey);
 	}
 }
 

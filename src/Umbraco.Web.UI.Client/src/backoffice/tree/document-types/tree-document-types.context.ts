@@ -7,6 +7,8 @@ export class UmbTreeDocumentTypesContext implements UmbTreeContext {
 	public tree: ManifestTree;
 	public entityStore: UmbEntityStore;
 
+	private _entityType = 'documentType';
+
 	constructor(tree: ManifestTree, entityStore: UmbEntityStore) {
 		this.tree = tree;
 		this.entityStore = entityStore;
@@ -23,12 +25,14 @@ export class UmbTreeDocumentTypesContext implements UmbTreeContext {
 			parentKey: '',
 		};
 		this.entityStore.update([data]);
-		return this.entityStore.entities.pipe(map((items) => items.filter((item) => item.key === data.key)));
+		return this.entityStore.entities.pipe(
+			map((items) => items.filter((item) => item.type === this._entityType && item.parentKey === ''))
+		);
 	}
 
 	public fetchChildren(key: string) {
 		// TODO: figure out url structure
-		fetch(`/umbraco/backoffice/entities/document-types/${key}`)
+		fetch(`/umbraco/backoffice/entities?type=${this._entityType}&parentKey=${key}`)
 			.then((res) => res.json())
 			.then((data) => {
 				this.entityStore.update(data);

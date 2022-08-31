@@ -12,56 +12,51 @@ export class UmbTreeNavigator extends UmbContextConsumerMixin(LitElement) {
 	static styles = [UUITextStyles, css``];
 
 	@state()
-	private _entityKey = '';
-
-	@state()
-	private _entityType = '';
-
-	@state()
-	private _label = '';
-
-	@state()
-	private _hasChildren = false;
-
-	@state()
 	private _loading = true;
 
-	private _rootSubscription?: Subscription;
-
 	private _treeContext?: UmbTreeContext;
+	private _treeRootSubscription?: Subscription;
+
+	@state()
+	private _items: any[] = [];
 
 	constructor() {
 		super();
 
 		this.consumeContext('umbTreeContext', (treeContext) => {
 			this._treeContext = treeContext;
+			this._observeTreeRoot();
+		});
+	}
 
-			this._loading = true;
+	private _observeTreeRoot() {
+		this._loading = true;
 
-			this._rootSubscription = this._treeContext?.fetchRoot().subscribe((items) => {
-				if (items?.length === 0) return;
-
-				this._loading = false;
-				this._entityKey = items[0].key;
-				this._entityType = items[0].type;
-				this._label = items[0].name;
-				this._hasChildren = items[0].hasChildren;
-			});
+		this._treeRootSubscription = this._treeContext?.fetchRoot().subscribe((items) => {
+			if (items?.length === 0) return;
+			this._items = items;
+			this._loading = false;
 		});
 	}
 
 	disconnectedCallback(): void {
 		super.disconnectedCallback();
-		this._rootSubscription?.unsubscribe();
+		this._treeRootSubscription?.unsubscribe();
 	}
 
 	render() {
-		return html`<umb-tree-item
-			.itemKey=${this._entityKey}
-			.itemType=${this._entityType}
-			.label=${this._label}
-			?hasChildren=${this._hasChildren}
-			.loading=${this._loading}></umb-tree-item> `;
+		return html`
+			${this._items?.map(
+				(item) => html`
+					<umb-tree-item
+						.itemKey=${item.key}
+						.itemType=${item.type}
+						.label=${item.name}
+						?hasChildren=${item.hasChildren}
+						.loading=${this._loading}></umb-tree-item>
+				`
+			)}
+		`;
 	}
 }
 
