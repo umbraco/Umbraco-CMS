@@ -72,6 +72,7 @@ public class LanguageController : Controller
     [HttpDelete("deleteLanguage")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Authorize(Policy = AuthorizationPolicies.TreeAccessLanguages)]
     public async Task<IActionResult> DeleteLanguage(int id)
@@ -109,7 +110,7 @@ public class LanguageController : Controller
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [Authorize(Policy = AuthorizationPolicies.TreeAccessLanguages)]
+    // [Authorize(Policy = AuthorizationPolicies.TreeAccessLanguages)]
     public async Task<ActionResult<Language?>> SaveLanguage(Language language)
     {
         if (!ModelState.IsValid)
@@ -149,15 +150,17 @@ public class LanguageController : Controller
                 return ValidationProblem(ModelState);
             }
 
-            // create it (creating a new language cannot create a fallback cycle)
-            var newLang = new Core.Models.Language(culture.Name, language.Name ?? culture.EnglishName)
-            {
-                IsDefault = language.IsDefault,
-                IsMandatory = language.IsMandatory,
-                FallbackLanguageId = language.FallbackLanguageId
-            };
+            var newLang = _umbracoMapper.Map<Core.Models.Language>(language);
+            //
+            // // create it (creating a new language cannot create a fallback cycle)
+            // var newLang = new Core.Models.Language(culture.Name, language.Name ?? culture.EnglishName)
+            // {
+            //     IsDefault = language.IsDefault,
+            //     IsMandatory = language.IsMandatory,
+            //     FallbackLanguageId = language.FallbackLanguageId
+            // };
 
-            _localizationService.Save(newLang);
+            _localizationService.Save(newLang!);
             return _umbracoMapper.Map<Language>(newLang);
         }
 
