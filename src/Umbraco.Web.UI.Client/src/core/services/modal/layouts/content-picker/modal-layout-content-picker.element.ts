@@ -7,6 +7,8 @@ export interface UmbModalContentPickerData {
 	multiple?: boolean;
 }
 
+import '../../../../../backoffice/tree/document/tree-document.element';
+import '../../../../../backoffice/tree/shared/tree-navigator.element';
 @customElement('umb-modal-layout-content-picker')
 export class UmbModalLayoutContentPickerElement extends UmbModalLayoutElement<UmbModalContentPickerData> {
 	static styles = [
@@ -94,17 +96,7 @@ export class UmbModalLayoutContentPickerElement extends UmbModalLayoutElement<Um
 				<uui-box>
 					<uui-input></uui-input>
 					<hr />
-					<div id="content-list">
-						${this._tempContent.map(
-							(content) =>
-								// eslint-disable-next-line lit-a11y/click-events-have-key-events
-								html`<div
-									class=${`content-item ${this._selectedContent.includes(content) ? 'selected' : ''}`}
-									@click=${() => this._clickContent(content)}>
-									${content.name}
-								</div>`
-						)}
-					</div>
+					<umb-tree-document></umb-tree-document>
 				</uui-box>
 				<div slot="actions">
 					<uui-button label="Close" @click=${this._close}></uui-button>
