@@ -159,7 +159,7 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		meta: {
 			// TODO: how do we want to filter where editor views are shown? https://our.umbraco.com/documentation/extending/Content-Apps/#setting-up-the-plugin
 			// this is a temp solution
-			editors: ['Umb.Editor.Content', 'Umb.Editor.Media'],
+			editors: ['Umb.Editor.Document', 'Umb.Editor.Media'],
 			pathname: 'content',
 			weight: 100,
 			icon: 'document',
@@ -174,7 +174,7 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		meta: {
 			// TODO: how do we want to filter where editor views are shown? https://our.umbraco.com/documentation/extending/Content-Apps/#setting-up-the-plugin
 			// this is a temp solution
-			editors: ['Umb.Editor.Content', 'Umb.Editor.Media'],
+			editors: ['Umb.Editor.Document', 'Umb.Editor.Media'],
 			pathname: 'info',
 			weight: 90,
 			icon: 'info',
@@ -380,9 +380,9 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 	},
 	{
 		type: 'editor',
-		alias: 'Umb.Editor.Content',
+		alias: 'Umb.Editor.Document',
 		name: 'Content Editor',
-		loader: () => import('./backoffice/editors/content/editor-content.element'),
+		loader: () => import('./backoffice/editors/document/editor-document.element'),
 		meta: {
 			entityType: 'document',
 		},
