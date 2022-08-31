@@ -7,9 +7,10 @@ export class UmbTreeDataTypesContext implements UmbTreeContext {
 	public tree: ManifestTree;
 	public entityStore: UmbEntityStore;
 
+	private _entityType = 'dataType';
+
 	constructor(tree: ManifestTree, entityStore: UmbEntityStore) {
 		this.tree = tree;
-		// TODO: temp solution until we know where to get tree data from
 		this.entityStore = entityStore;
 	}
 
@@ -24,12 +25,14 @@ export class UmbTreeDataTypesContext implements UmbTreeContext {
 			parentKey: '',
 		};
 		this.entityStore.update([data]);
-		return this.entityStore.entities.pipe(map((items) => items.filter((item) => item.key === data.key)));
+		return this.entityStore.entities.pipe(
+			map((items) => items.filter((item) => item.type === this._entityType && item.parentKey === ''))
+		);
 	}
 
 	public fetchChildren(key: string) {
 		// TODO: figure out url structure
-		fetch(`/umbraco/backoffice/entities/data-types/${key}`)
+		fetch(`/umbraco/backoffice/entities?type=${this._entityType}&parentKey=${key}`)
 			.then((res) => res.json())
 			.then((data) => {
 				this.entityStore.update(data);

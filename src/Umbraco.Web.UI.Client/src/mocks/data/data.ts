@@ -14,11 +14,6 @@ export class UmbData<T extends { id: number; key: string }> {
 		return this._data.find((item) => item.key === key);
 	}
 
-	// TODO: temp solution until we know where to get tree data from
-	getAll() {
-		return this._data;
-	}
-
 	save(data: Array<T>) {
 		data.forEach((storedItem) => {
 			const foundIndex = this._data.findIndex((item) => item.id === storedItem.id);

@@ -366,7 +366,7 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		name: 'Extensions Editor',
 		loader: () => import('./backoffice/editors/extensions/editor-extensions.element'),
 		meta: {
-			entityType: 'extensions',
+			entityType: 'extensionsList',
 		},
 	},
 	{

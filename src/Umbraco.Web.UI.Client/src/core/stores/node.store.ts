@@ -18,13 +18,6 @@ export class UmbNodeStore {
 		);
 	}
 
-	// TODO: temp solution until we know where to get tree data from
-	getAll(): Observable<Array<NodeEntity>> {
-		const nodes = umbNodeData.getAll();
-		this._nodes.next(nodes);
-		return this.nodes;
-	}
-
 	// TODO: Use Node type, to not be specific about Document.
 	// TODO: make sure UI somehow can follow the status of this action.
 	save(data: NodeEntity[]): Promise<void> {

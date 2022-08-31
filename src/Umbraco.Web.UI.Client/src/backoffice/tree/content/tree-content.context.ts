@@ -7,28 +7,28 @@ export class UmbTreeContentContext implements UmbTreeContext {
 	public tree: ManifestTree;
 	public entityStore: UmbEntityStore;
 
+	private _entityType = 'document';
+
 	constructor(tree: ManifestTree, entityStore: UmbEntityStore) {
 		this.tree = tree;
 		this.entityStore = entityStore;
 	}
 
 	public fetchRoot() {
-		const data = {
-			id: -1,
-			key: '485d49ef-a4aa-46ac-843f-4256fe167347',
-			name: 'Content',
-			hasChildren: true,
-			type: 'document',
-			icon: 'favorite',
-			parentKey: '',
-		};
-		this.entityStore.update([data]);
-		return this.entityStore.entities.pipe(map((items) => items.filter((item) => item.key === data.key)));
+		fetch(`/umbraco/backoffice/entities?type=${this._entityType}&parentKey=`)
+			.then((res) => res.json())
+			.then((data) => {
+				this.entityStore.update(data);
+			});
+
+		return this.entityStore.entities.pipe(
+			map((items) => items.filter((item) => item.type === this._entityType && item.parentKey === ''))
+		);
 	}
 
 	public fetchChildren(key: string) {
 		// TODO: figure out url structure
-		fetch(`/umbraco/backoffice/entities/node/${key}`)
+		fetch(`/umbraco/backoffice/entities?type=${this._entityType}&parentKey=${key}`)
 			.then((res) => res.json())
 			.then((data) => {
 				this.entityStore.update(data);
