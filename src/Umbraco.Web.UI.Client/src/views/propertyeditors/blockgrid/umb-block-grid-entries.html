@@ -46,9 +46,8 @@
 
 
 <uui-button-inline-create
-    ng-if="!vm.blockEditorApi.readonly && vm.entries.length > 0"
+    ng-if="!vm.blockEditorApi.readonly && vm.entries.length > 0 && vm.depth > 0"
     class="umb-block-grid__block--after-inline-create-button"
-    ng-class="{'--at-root': vm.depth === '0'}"
     ng-click="vm.blockEditorApi.requestShowCreate(vm.parentBlock, vm.areaKey, vm.entries.length, $event)">
 </uui-button-inline-create>
 

@@ -520,11 +520,15 @@
              */
             getBlockObject: function (layoutEntry) {
                 var contentUdi = layoutEntry.contentUdi;
+                if(!contentUdi) {
+                    console.error("layoutEntry skipped cause it did not have contentUdi:", layoutEntry);
+                    return null;
+                }
 
                 var dataModel = getDataByUdi(contentUdi, this.value.contentData);
 
                 if (dataModel === null) {
-                    console.error("Couldn't find content data of " + contentUdi)
+                    console.error("Couldn't find content data of UDI:", contentUdi, "layoutEntry:", layoutEntry)
                     return null;
                 }
 

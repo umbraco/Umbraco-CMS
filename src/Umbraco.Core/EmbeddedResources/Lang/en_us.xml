@@ -845,6 +845,7 @@
     <key alias="recycleBin">Recycle Bin</key>
     <key alias="recycleBinEmpty">Your recycle bin is empty</key>
     <key alias="reload">Reload</key>
+    <key alias="revert">Revert</key>
     <key alias="remaining">Remaining</key>
     <key alias="remove">Remove</key>
     <key alias="rename">Rename</key>
@@ -2876,6 +2877,9 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="areasConfigurationsHelp">To enable nesting of blocks within this block, define one or more areas for blocks to be nested within.</key>
     <key alias="invalidDropPosition"><![CDATA[<strong>%0%</strong> is not allowed at this spot.]]></key>
     <key alias="defaultLayoutStylesheet">Default layout stylesheet</key>
+    <key alias="confirmPasteDisallowedNestedBlockHeadline">Disallowed content was inserted</key>
+    <key alias="confirmPasteDisallowedNestedBlockMessage">
+      <![CDATA[The pasted content contained disallowed content, Would you like to insert this content anyway?]]></key>
   </area>
   <area alias="contentTemplatesDashboard">
     <key alias="whatHeadline">What are Content Templates?</key>

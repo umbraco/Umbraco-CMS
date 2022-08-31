@@ -356,7 +356,8 @@
             block.blockUiVisibility = false;
             block.showBlockUI = function () {
                 delete block.__timeout;
-                shadowRoot.querySelector('*[data-element-udi="'+block.layout.contentUdi+'"] .umb-block-grid__block > .umb-block-grid__block--actions').scrollIntoView({block: "nearest", inline: "nearest", behavior: "smooth"});
+                // TODO: test that this scrolling works:
+                shadowRoot.querySelector('*[data-element-udi="'+block.layout.contentUdi+'"] .umb-block-grid__block > .umb-block-grid__block--context').scrollIntoView({block: "nearest", inline: "nearest", behavior: "smooth"});
                 block.blockUiVisibility = true;
             };
             block.onMouseLeave = function () {
@@ -974,6 +975,11 @@
                 return null;
             }
 
+            if(!isElementTypeKeyAllowedAt(parentBlock, areaKey, pasteEntry.data.contentTypeKey)) {
+                console.error("paste clipboard entry inserted an disallowed type.")
+                return {failed: true};
+            }
+
             var layoutEntry;
             if (pasteType === clipboardService.TYPES.ELEMENT_TYPE) {
                 layoutEntry = modelObject.createFromElementType(pasteEntry);
@@ -989,21 +995,24 @@
                 return null;
             }
 
-            initializeLayoutEntry(layoutEntry);
+            if (initializeLayoutEntry(layoutEntry) === null) {
+                return null;
+            }
             
             if (layoutEntry.$block === null) {
                 // Initalization of the Block Object didnt go well, therefor we will fail the paste action.
                 return null;
             }
 
+            var nestedBlockFailed = false;
             if(pasteEntry.nested && pasteEntry.nested.length) {
-                var nestedBlockFailed = false;
 
                 // Handle nested blocks:
                 pasteEntry.nested.forEach( nestedEntry => {
                     if(nestedEntry.areaKey) {
-                        const entry = pasteClipboardEntry(layoutEntry.$block, nestedEntry.areaKey, null, nestedEntry, pasteType) === false
-                        if(entry === null || entry.failed === true) {
+                        console.log("nested > ")
+                        const data = pasteClipboardEntry(layoutEntry.$block, nestedEntry.areaKey, null, nestedEntry, pasteType);
+                        if(data === null || data.failed === true) {
                             console.error("Nested requestPasteFromClipboard failed.");
                             nestedBlockFailed = true;
                             // TODO: better fail message.
@@ -1013,10 +1022,6 @@
                     }
                 });
 
-                // If failed then ask if we should revert other blocks created..
-                if(nestedBlockFailed === true) {
-                    return {layoutEntry, failed: true};
-                }
             }
 
             // insert layout entry at the decided location in layout.
@@ -1039,39 +1044,46 @@
                     vm.layout.push(layoutEntry);
                 }
             }
-
-            return {layoutEntry};
+            
+            return {layoutEntry, failed: nestedBlockFailed};
         }
 
-        function requestPasteFromClipboard(parentBlock,  areaKey, index, pasteEntry, pasteType) {
+        function requestPasteFromClipboard(parentBlock, areaKey, index, pasteEntry, pasteType) {
 
-
-            const data = pasteClipboardEntry(parentBlock,  areaKey, index, pasteEntry, pasteType);
+            console.log("requestPasteFromClipboard")
+            const data = pasteClipboardEntry(parentBlock, areaKey, index, pasteEntry, pasteType);
+            console.log("-- result: ", data)
             if(data) { 
-                if(data.failed) {
+                if(data.failed === true) {
                     // one or more of nested block creation failed.
                     // Ask wether the user likes to continue:
                     // TODO: test scenario:
                     // TODO: Texts
-                    localizationService.localizeMany(["general_delete", "blockEditor_confirmDeleteBlockMessage", "paste_anyway", "revert"]).then(function (data) {
-                        const overlay = {
-                            title: data[0],
-                            content: localizationService.tokenReplace(data[1], [block.label]),
-                            submitButtonLabel: data[2],
-                            submitButtonLabel: data[3],
-                            close: function () {
-                                // revert: 
-                                deleteBlock(data.layoutEntry.$block);
-                                overlayService.close();
-                            },
-                            submit: function () {
-                                // continue: 
-                                overlayService.close();
-                            }
-                        };
-        
-                        overlayService.confirmDelete(overlay);
-                    });
+                    if(data.layoutEntry) {
+                        console.log("Pasting failed, ask:")
+                        var blockToRevert = data.layoutEntry.$block;
+                        localizationService.localizeMany(["blockEditor_confirmPasteDisallowedNestedBlockHeadline", "blockEditor_confirmPasteDisallowedNestedBlockMessage", "general_revert", "general_continue"]).then(function (localizations) {
+                            const overlay = {
+                                title: localizations[0],
+                                content: localizationService.tokenReplace(localizations[1], [blockToRevert.label]),
+                                closeButtonLabel: localizations[2],
+                                submitButtonLabel: localizations[3],
+                                close: function () {
+                                    // revert: 
+                                    deleteBlock(blockToRevert);
+                                    overlayService.close();
+                                },
+                                submit: function () {
+                                    // continue: 
+                                    overlayService.close();
+                                }
+                            };
+            
+                            overlayService.open(overlay);
+                        });
+                    } else {
+                        console.log("Pasting failed, we have nothing to revert.")
+                    }
                 } else {
                     vm.currentBlockInFocus = data.layoutEntry.$block;
                     return true;
