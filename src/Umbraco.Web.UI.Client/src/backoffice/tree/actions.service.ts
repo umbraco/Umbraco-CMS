@@ -2,7 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, LitElement, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbContextProviderMixin } from '../../core/context';
-import { ManifestEntityAction } from '../../core/models';
+import type { ManifestEntityAction } from '../../core/models';
 import './actions-modal.element';
 
 @customElement('umb-action-service')
