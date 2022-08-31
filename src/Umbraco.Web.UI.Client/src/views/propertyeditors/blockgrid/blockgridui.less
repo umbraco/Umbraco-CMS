@@ -175,11 +175,6 @@ ng-form.ng-invalid-val-server-match-content > .umb-block-grid__block:not(.--acti
         }
     }
 
-    .umb-block-grid__layout-item.--drop-not-allowed > ng-form > & {
-        > .umb-block-grid__block--no-drop-message {
-            display: block;
-        }
-    }
 
     
     /** make sure to hide child block ui: */
@@ -273,24 +268,6 @@ ng-form.ng-invalid > .umb-block-grid__block:not(.--active) > .umb-block-grid__bl
     --umb-block-grid--hint-area-ui: 1;
 }
 
-.umb-block-grid__block--no-drop-message {
-    position: absolute;
-    top: -20px;
-    left: 0;
-    font-size: 12px;
-    z-index: 2;
-    pointer-events: none;
-    user-select: none;
-
-    padding: 0 9px;
-    padding-top: 1px;
-    background-color: @errorBackground;
-    color: @errorText;
-    border-top-left-radius: 3px;
-    border-top-right-radius: 3px;
-    display: none;
-}
-
 .umb-block-grid__block--context {
     position: absolute;
     top: -20px;
@@ -371,7 +348,7 @@ ng-form.ng-invalid > .umb-block-grid__block:not(.--active) > .umb-block-grid__bl
     }
 
 }
-.umb-block-grid__block--context, .umb-block-grid__block--actions {
+.umb-block-grid__block--actions {
     .action {
         position: relative;
         display: inline-block;

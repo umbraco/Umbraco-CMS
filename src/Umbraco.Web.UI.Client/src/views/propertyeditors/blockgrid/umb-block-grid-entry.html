@@ -54,16 +54,13 @@
 
         <div class="umb-block-grid__block--validation-border"></div>
         <!--<div class="umb-block-grid__block--validation-badge">!</div>-->
-        <div class="umb-block-grid__block--no-drop-message">
-            <localize key="blockEditor_invalidDropPosition">Not allowed at this location</localize>
-        </div>
 
         <div class="umb-block-grid__block--context">
             <div class="__context-bar">
                 <button
                     ng-if="vm.parentBlock"
                     type="button"
-                    class="btn-reset umb-outline action --parent"
+                    class="btn-reset umb-outline action"
                     localize="title"
                     title="actions_editSettings"
                     data-ng-click="vm.parentBlock.showBlockUI()"
@@ -75,7 +72,6 @@
                     <span class="sr-only">
                         <localize key="blockeditor_focusParentBlock">Focus parent block</localize>
                     </span>
-                    <div class="__error-badge">!</div>
                 </button>
                 <div class="__divider" ng-if="vm.parentBlock">/</div>
                 <div class="__label">
