@@ -28,15 +28,19 @@ export class UmbSectionTrees extends UmbContextConsumerMixin(LitElement) {
 
 		// TODO: wait for more contexts
 		this.consumeContext('umbExtensionRegistry', (extensionStore: UmbExtensionRegistry) => {
-			this.consumeContext('umbSectionContext', (sectionContext: UmbSectionContext) => {
-				this._extensionStore = extensionStore;
-				this._sectionContext = sectionContext;
-				this._useTrees();
-			});
+			this._extensionStore = extensionStore;
+			this._useTrees();
+		});
+
+		this.consumeContext('umbSectionContext', (sectionContext: UmbSectionContext) => {
+			this._sectionContext = sectionContext;
+			this._useTrees();
 		});
 	}
 
 	private _useTrees() {
+		if (!this._extensionStore || !this._sectionContext) return;
+
 		this._treesSubscription?.unsubscribe();
 
 		this._treesSubscription = this._sectionContext?.data

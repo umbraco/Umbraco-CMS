@@ -8,7 +8,6 @@ export const handlers = [
 		const entityType = req.url.searchParams.get('type') ?? '';
 		const parentKey = req.url.searchParams.get('parentKey') ?? '';
 		const entities = umbEntityData.getItems(entityType, parentKey);
-		console.log(entities);
 		return res(ctx.status(200), ctx.json(entities));
 	}),
 ];
