@@ -28,6 +28,7 @@
         function onInit() {
 
             // TODO: Can and should we do this smarter? parent parent is very dirty.
+            // TODO: This does not work in infinite editors:
             vm.gridColumnsPrevalue = $scope.$parent.$parent.$parent.$parent.$parent.model.preValues.find(x => x.alias === "gridColumns");
 
             if (!$scope.model.value) {
