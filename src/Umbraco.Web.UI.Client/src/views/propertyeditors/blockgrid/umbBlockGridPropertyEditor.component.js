@@ -697,7 +697,18 @@
             
             var amountOfAvailableTypes = availableTypes.length;
             var availableContentTypesAliases = modelObject.getAvailableAliasesOfElementTypeKeys(availableTypes.map(x => x.blockConfigModel.contentElementTypeKey));
-            var availableClipboardItems = vm.clipboardItems.filter(entry => availableContentTypesAliases.indexOf(entry.alias) !== -1);
+            var availableClipboardItems = vm.clipboardItems.filter(
+                (entry) => {
+                    if(entry.aliases) {
+                        return entry.aliases.filter((alias, index) => availableContentTypesAliases.indexOf(alias) === index);
+                    } else {
+                        return availableContentTypesAliases.indexOf(entry.alias) !== -1;
+                    }
+                }
+            );
+
+            console.log(vm.clipboardItems, availableContentTypesAliases)
+            console.log("result in", availableClipboardItems)
             
             var blockPickerModel = {
                 $parentScope: $scope, // pass in a $parentScope, this maintains the scope inheritance in infinite editing
@@ -828,8 +839,9 @@
             entriesForPaste.forEach(function (entry) {
                 var pasteEntry = {
                     type: clipboardService.TYPES.BLOCK,
-                    date: entry.date,   
+                    date: entry.date,
                     alias: entry.alias,
+                    aliases: entry.aliases,
                     pasteData: entry.data,
                     elementTypeModel: {
                         name: entry.label,
@@ -874,8 +886,13 @@
 
                     aliases.push(entry.$block.content.contentTypeAlias);
 
+                    const clipboardData = { "layout": entry.$block.layout, "data": entry.$block.data, "settingsData": entry.$block.settingsData };
+                    // If areas:
+                    if(entry.$block.layout.areas.length > 0) {
+                        clipboardData.nested = gatherNestedBlocks(entry.$block);
+                    }
                     // No need to clone the data as its begin handled by the clipboardService.
-                    return { "layout": entry.$block.layout, "data": entry.$block.data, "settingsData": entry.$block.settingsData }
+                    return clipboardData;
                 }
             );
 
