@@ -1,7 +1,7 @@
 import { entities } from './entities';
 
 // Temp mocked database
-export class UmbData<T extends { id: number; key: string }> {
+export class UmbData<T extends { id: number; key: string; isTrashed: boolean }> {
 	private _data: Array<T> = [];
 
 	constructor(data: Array<T>) {
@@ -30,6 +30,15 @@ export class UmbData<T extends { id: number; key: string }> {
 		});
 
 		return saveItems;
+	}
+
+	trash(key: string) {
+		const item = this.getByKey(key);
+		if (!item) return;
+
+		item.isTrashed = true;
+		this._updateEntity(item);
+		return item;
 	}
 
 	private _updateEntity(saveItem: T) {

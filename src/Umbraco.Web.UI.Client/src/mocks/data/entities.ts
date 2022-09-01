@@ -8,6 +8,7 @@ export const entities: Array<Entity> = [
 		parentKey: '24fcd88a-d1bb-423b-b794-8a94dcddcb6a',
 		name: 'Member 1',
 		hasChildren: false,
+		isTrashed: false,
 	},
 	{
 		id: 2,
@@ -16,6 +17,7 @@ export const entities: Array<Entity> = [
 		parentKey: '24fcd88a-d1bb-423b-b794-8a94dcddcb6a',
 		name: 'Member 2',
 		hasChildren: true,
+		isTrashed: false,
 	},
 	{
 		id: 3,
@@ -24,6 +26,7 @@ export const entities: Array<Entity> = [
 		parentKey: '06c6919c-6fa7-4aa5-8214-0582c721c472',
 		name: 'Member 3',
 		hasChildren: false,
+		isTrashed: false,
 	},
 	{
 		id: 4,
@@ -32,6 +35,7 @@ export const entities: Array<Entity> = [
 		type: 'memberGroup',
 		name: 'Member Group 1',
 		hasChildren: false,
+		isTrashed: false,
 	},
 	{
 		id: 5,
@@ -40,6 +44,7 @@ export const entities: Array<Entity> = [
 		type: 'memberGroup',
 		name: 'Member Group 2',
 		hasChildren: false,
+		isTrashed: false,
 	},
 	{
 		id: 1245,
@@ -47,6 +52,7 @@ export const entities: Array<Entity> = [
 		parentKey: '3fd3eba5-c893-4d3c-af67-f574e6eded38',
 		name: 'Text',
 		hasChildren: false,
+		isTrashed: false,
 		type: 'dataType',
 	},
 	{
@@ -55,6 +61,7 @@ export const entities: Array<Entity> = [
 		parentKey: '3fd3eba5-c893-4d3c-af67-f574e6eded38',
 		name: 'Textarea',
 		hasChildren: false,
+		isTrashed: false,
 		type: 'dataType',
 	},
 	{
@@ -63,6 +70,7 @@ export const entities: Array<Entity> = [
 		parentKey: '3fd3eba5-c893-4d3c-af67-f574e6eded38',
 		name: 'My JS Property Editor',
 		hasChildren: false,
+		isTrashed: false,
 		type: 'dataType',
 	},
 	{
@@ -71,6 +79,7 @@ export const entities: Array<Entity> = [
 		parentKey: '3fd3eba5-c893-4d3c-af67-f574e6eded38',
 		name: 'Context Example',
 		hasChildren: false,
+		isTrashed: false,
 		type: 'dataType',
 	},
 	{
@@ -79,6 +88,7 @@ export const entities: Array<Entity> = [
 		parentKey: '3fd3eba5-c893-4d3c-af67-f574e6eded38',
 		name: 'Content Picker (DataType)',
 		hasChildren: false,
+		isTrashed: false,
 		type: 'dataType',
 	},
 	{
@@ -87,6 +97,7 @@ export const entities: Array<Entity> = [
 		name: 'Document Type 1',
 		type: 'documentType',
 		hasChildren: false,
+		isTrashed: false,
 		parentKey: '055a17d0-525a-4d06-9f75-92dc174ab0bd',
 	},
 	{
@@ -95,6 +106,7 @@ export const entities: Array<Entity> = [
 		name: 'Document Type 2',
 		type: 'documentType',
 		hasChildren: false,
+		isTrashed: false,
 		parentKey: '055a17d0-525a-4d06-9f75-92dc174ab0bd',
 	},
 	{
@@ -104,6 +116,7 @@ export const entities: Array<Entity> = [
 		type: 'media',
 		icon: 'picture',
 		hasChildren: false,
+		isTrashed: false,
 		parentKey: '',
 	},
 	{
@@ -113,6 +126,7 @@ export const entities: Array<Entity> = [
 		name: 'Media 2',
 		icon: 'picture',
 		hasChildren: false,
+		isTrashed: false,
 		parentKey: '',
 	},
 	{
@@ -122,6 +136,7 @@ export const entities: Array<Entity> = [
 		type: 'document',
 		icon: 'document',
 		hasChildren: false,
+		isTrashed: false,
 		parentKey: '',
 	},
 	{
@@ -131,6 +146,7 @@ export const entities: Array<Entity> = [
 		type: 'document',
 		icon: 'favorite',
 		hasChildren: false,
+		isTrashed: false,
 		parentKey: '',
 	},
 	{
@@ -140,6 +156,7 @@ export const entities: Array<Entity> = [
 		type: 'document',
 		icon: 'document',
 		hasChildren: false,
+		isTrashed: false,
 		parentKey: '',
 	},
 ];

@@ -9,6 +9,7 @@ export interface NodeEntity {
 	properties: Array<NodeProperty>;
 	data: Array<NodePropertyData>;
 	variants: Array<any>; // TODO: define variant data
+	isTrashed: boolean;
 	//layout?: any; // TODO: define layout type - make it non-optional
 }
 
@@ -35,6 +36,7 @@ export const data: Array<NodeEntity> = [
 	{
 		id: 1,
 		key: '74e4008a-ea4f-4793-b924-15e02fd380d1',
+		isTrashed: false,
 		name: 'Document 1',
 		type: 'document',
 		icon: 'document',
@@ -85,6 +87,7 @@ export const data: Array<NodeEntity> = [
 	{
 		id: 2,
 		key: '74e4008a-ea4f-4793-b924-15e02fd380d2',
+		isTrashed: false,
 		name: 'Document 2',
 		type: 'document',
 		icon: 'favorite',
@@ -148,6 +151,7 @@ export const data: Array<NodeEntity> = [
 	{
 		id: 3,
 		key: 'cdd30288-2d1c-41b4-89a9-61647b4a10d5',
+		isTrashed: false,
 		name: 'Document 3',
 		type: 'document',
 		icon: 'document',
@@ -170,6 +174,7 @@ export const data: Array<NodeEntity> = [
 	{
 		id: 2001,
 		key: 'f2f81a40-c989-4b6b-84e2-057cecd3adc1',
+		isTrashed: false,
 		name: 'Media 1',
 		type: 'media',
 		icon: 'picture',
@@ -192,6 +197,7 @@ export const data: Array<NodeEntity> = [
 	{
 		id: 2002,
 		key: '69431027-8867-45bf-a93b-72bbdabfb177',
+		isTrashed: false,
 		type: 'media',
 		name: 'Media 2',
 		icon: 'picture',

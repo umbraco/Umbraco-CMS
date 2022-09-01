@@ -9,6 +9,7 @@ export interface Entity {
 	type: string;
 	hasChildren: boolean; // TODO: Should this be here?
 	parentKey: string;
+	isTrashed: boolean;
 }
 
 // Temp mocked database
