@@ -13,6 +13,12 @@ import { internalManifests } from './temp-internal-manifests';
 import type { ServerStatus } from './core/models';
 import type { Guard, IRoute } from 'router-slot/model';
 
+// TODO Remove these imports when they are a part of UUI
+import '@umbraco-ui/uui-modal';
+import '@umbraco-ui/uui-modal-sidebar';
+import '@umbraco-ui/uui-modal-container';
+import '@umbraco-ui/uui-modal-dialog';
+
 @customElement('umb-app')
 export class UmbApp extends UmbContextProviderMixin(LitElement) {
 	static styles = css`
