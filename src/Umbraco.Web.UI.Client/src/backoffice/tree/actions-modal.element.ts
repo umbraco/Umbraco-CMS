@@ -4,7 +4,7 @@ import { customElement, property } from 'lit/decorators.js';
 import { UmbActionService } from './actions.service';
 import { UmbContextConsumerMixin } from '../../core/context';
 import type { ManifestEntityAction } from '../../core/models';
-import './shared/tree-action.element';
+import './actions/tree-action.element';
 
 @customElement('umb-actions-modal')
 export class UmbActionsModal extends UmbContextConsumerMixin(LitElement) {
@@ -25,16 +25,6 @@ export class UmbActionsModal extends UmbContextConsumerMixin(LitElement) {
 			}
 		`,
 	];
-
-	private _actionService?: UmbActionService;
-
-	constructor() {
-		super();
-
-		this.consumeContext('umbActionService', (actionService: UmbActionService) => {
-			this._actionService = actionService;
-		});
-	}
 
 	@property()
 	name = '';
