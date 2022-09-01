@@ -22,7 +22,7 @@ public class ProblemDetailsBuilder
         return this;
     }
 
-    public ProblemDetailsBuilder WithDetail(int status)
+    public ProblemDetailsBuilder WithStatus(int status)
     {
         _status = status;
         return this;
