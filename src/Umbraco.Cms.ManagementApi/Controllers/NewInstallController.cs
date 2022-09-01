@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.Install.Models;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Infrastructure.Install;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
+using Umbraco.Cms.ManagementApi.Builders;
 using Umbraco.Cms.ManagementApi.Filters;
 using Umbraco.Cms.ManagementApi.ViewModels.Installer;
 using Umbraco.Extensions;
@@ -98,13 +99,12 @@ public class NewInstallController : Controller
             return Ok();
         }
 
-        var invalidModelProblem = new ProblemDetails
-        {
-            Title = "Invalid database configuration",
-            Detail = "The provided database configuration is invalid",
-            Status = StatusCodes.Status400BadRequest,
-            Type = "Error",
-        };
+        ProblemDetails invalidModelProblem =
+            new ProblemDetailsBuilder()
+                .WithTitle("Invalid database configuration")
+                .WithDetail("The provided database configuration is invalid")
+                .WithStatus(StatusCodes.Status400BadRequest)
+                .Build();
 
         return BadRequest(invalidModelProblem);
     }
