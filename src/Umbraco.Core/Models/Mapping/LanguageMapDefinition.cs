@@ -38,7 +38,7 @@ public class LanguageMapDefinition : IMapDefinition
     private static void Map(ContentEditing.Language source, Language target, MapperContext context)
     {
         target.CreateDate = default;
-        target.CultureName = source.Name ?? string.Empty;
+        target.CultureName = source.Name!;
         target.DeleteDate = null;
         target.FallbackLanguageId = source.FallbackLanguageId;
         target.Id = source.Id;

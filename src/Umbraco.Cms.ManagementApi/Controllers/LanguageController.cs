@@ -150,15 +150,9 @@ public class LanguageController : Controller
                 return ValidationProblem(ModelState);
             }
 
-            var newLang = _umbracoMapper.Map<Core.Models.Language>(language);
-            //
-            // // create it (creating a new language cannot create a fallback cycle)
-            // var newLang = new Core.Models.Language(culture.Name, language.Name ?? culture.EnglishName)
-            // {
-            //     IsDefault = language.IsDefault,
-            //     IsMandatory = language.IsMandatory,
-            //     FallbackLanguageId = language.FallbackLanguageId
-            // };
+            language.Name ??= culture.EnglishName;
+
+            Core.Models.Language? newLang = _umbracoMapper.Map<Core.Models.Language>(language);
 
             _localizationService.Save(newLang!);
             return _umbracoMapper.Map<Language>(newLang);
