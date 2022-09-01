@@ -40,19 +40,19 @@ public class LanguageController : Controller
     /// <returns></returns>
     [HttpGet("getAllLanguages")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(IDictionary<string, string>), StatusCodes.Status200OK)]
-    public async Task<IEnumerable<Language>?> GetAllLanguages()
+    [ProducesResponseType(typeof(IEnumerable<LanguageViewModel>), StatusCodes.Status200OK)]
+    public async Task<IEnumerable<LanguageViewModel>?> GetAllLanguages()
     {
         IEnumerable<ILanguage> allLanguages = _localizationService.GetAllLanguages();
 
-        return _umbracoMapper.Map<IEnumerable<ILanguage>, IEnumerable<Language>>(allLanguages);
+        return _umbracoMapper.Map<IEnumerable<ILanguage>, IEnumerable<LanguageViewModel>>(allLanguages);
     }
 
     [HttpGet("getLanguage")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<Language?>> GetLanguage(int id)
+    public async Task<ActionResult<LanguageViewModel?>> GetLanguage(int id)
     {
         ILanguage? lang = _localizationService.GetLanguageById(id);
         if (lang == null)
@@ -60,7 +60,7 @@ public class LanguageController : Controller
             return NotFound();
         }
 
-        return _umbracoMapper.Map<Language>(lang);
+        return _umbracoMapper.Map<LanguageViewModel>(lang);
     }
 
     /// <summary>
