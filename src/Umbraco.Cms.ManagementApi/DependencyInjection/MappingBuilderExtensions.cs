@@ -10,10 +10,9 @@ public static class MappingBuilderExtensions
     internal static IUmbracoBuilder AddMappers(this IUmbracoBuilder builder)
     {
         builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>()
-            .Add<LanguageViewModelsMapDefinition>();
-
-        builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>()
+            .Add<LanguageViewModelsMapDefinition>()
             .Add<InstallerViewModelsMapDefinition>();
+
         return builder;
     }
 }
