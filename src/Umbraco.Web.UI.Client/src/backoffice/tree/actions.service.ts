@@ -7,7 +7,6 @@ import type { ManifestEntityAction } from '../../core/models';
 import './actions-modal.element';
 import './actions/tree-action-create-page.element';
 import './actions/tree-action-create-page-2.element';
-import './actions/tree-action-delete-page.element';
 // TODO how do we dynamically import this so we don't have to import every page that could potentially be used?
 
 @customElement('umb-action-service')
@@ -78,6 +77,7 @@ export class UmbActionService extends UmbContextProviderMixin(LitElement) {
 
 	public close() {
 		this._modalOpen = false;
+		this._pages = [];
 	}
 
 	public openPage(elementName: string) {

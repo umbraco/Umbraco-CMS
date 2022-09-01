@@ -35,8 +35,6 @@ export default class UmbTreeActionDeleteElement extends UmbContextConsumerMixin(
 	}
 
 	private _handleLabelClick() {
-		console.log(this.treeAction, 'label clicked');
-		this._actionService?.openPage('umb-tree-action-delete-page');
 		const modalHandler = this._modalService?.confirm({
 			headline: 'Delete page 1',
 			content: 'Are you sure you want to delete this page?',
@@ -46,6 +44,7 @@ export default class UmbTreeActionDeleteElement extends UmbContextConsumerMixin(
 		modalHandler?.onClose.then(({ confirmed }: any) => {
 			if (confirmed && this._actionService) {
 				this._nodeStore?.trash(this._actionService.key);
+				this._actionService.close();
 			}
 		});
 	}
