@@ -1,46 +1,24 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
-using Umbraco.Cms.ManagementApi.Filters;
 using Umbraco.Cms.ManagementApi.ViewModels.Installer;
 using Umbraco.New.Cms.Core.Factories;
 using Umbraco.New.Cms.Core.Models.Installer;
-using Umbraco.New.Cms.Core.Services.Installer;
-using Umbraco.New.Cms.Web.Common.Routing;
 
-namespace Umbraco.Cms.ManagementApi.Controllers;
+namespace Umbraco.Cms.ManagementApi.Controllers.Upgrade;
 
-// TODO: This needs to be an authorized controller.
-[ApiController]
 [ApiVersion("1.0")]
-[RequireRuntimeLevel(RuntimeLevel.Upgrade)]
-[BackOfficeRoute("api/v{version:apiVersion}/upgrade")]
-public class UpgradeController : Controller
+public class SettingsUpgradeController : UpgradeControllerBase
 {
     private readonly IUpgradeSettingsFactory _upgradeSettingsFactory;
-    private readonly IUpgradeService _upgradeService;
     private readonly IUmbracoMapper _mapper;
 
-    public UpgradeController(
+    public SettingsUpgradeController(
         IUpgradeSettingsFactory upgradeSettingsFactory,
-        IUpgradeService upgradeService,
         IUmbracoMapper mapper)
     {
         _upgradeSettingsFactory = upgradeSettingsFactory;
-        _upgradeService = upgradeService;
         _mapper = mapper;
-    }
-
-    [HttpPost("authorize")]
-    [MapToApiVersion("1.0")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status428PreconditionRequired)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> Authorize()
-    {
-        await _upgradeService.Upgrade();
-        return Ok();
     }
 
     [HttpGet("settings")]
