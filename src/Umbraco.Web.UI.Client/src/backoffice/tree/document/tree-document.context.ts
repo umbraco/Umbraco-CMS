@@ -19,7 +19,7 @@ export class UmbTreeDocumentContext implements UmbTreeContext {
 			});
 
 		return this.entityStore.entities.pipe(
-			map((items) => items.filter((item) => item.type === this._entityType && item.parentKey === ''))
+			map((items) => items.filter((item) => item.type === this._entityType && item.parentKey === '' && !item.isTrashed))
 		);
 	}
 
@@ -31,6 +31,8 @@ export class UmbTreeDocumentContext implements UmbTreeContext {
 				this.entityStore.update(data);
 			});
 
-		return this.entityStore.entities.pipe(map((items) => items.filter((item) => item.parentKey === key)));
+		return this.entityStore.entities.pipe(
+			map((items) => items.filter((item) => item.parentKey === key && !item.isTrashed))
+		);
 	}
 }
