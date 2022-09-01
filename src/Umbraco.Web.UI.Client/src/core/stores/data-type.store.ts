@@ -1,9 +1,16 @@
 import { BehaviorSubject, map, Observable } from 'rxjs';
 import { DataTypeEntity } from '../../mocks/data/data-type.data';
+import { UmbEntityStore } from './entity.store';
 
 export class UmbDataTypeStore {
 	private _dataTypes: BehaviorSubject<Array<DataTypeEntity>> = new BehaviorSubject(<Array<DataTypeEntity>>[]);
 	public readonly dataTypes: Observable<Array<DataTypeEntity>> = this._dataTypes.asObservable();
+
+	private _entityStore: UmbEntityStore;
+
+	constructor(entityStore: UmbEntityStore) {
+		this._entityStore = entityStore;
+	}
 
 	getByKey(key: string): Observable<DataTypeEntity | null> {
 		// TODO: use Fetcher API.
@@ -31,6 +38,7 @@ export class UmbDataTypeStore {
 			});
 			const json = await res.json();
 			this._updateStore(json);
+			this._entityStore.update(json);
 		} catch (error) {
 			console.error('Save Data Type error', error);
 		}
