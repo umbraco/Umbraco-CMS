@@ -77,10 +77,6 @@ export class UmbActionService extends UmbContextProviderMixin(LitElement) {
 		this._modalOpen = false;
 	}
 
-	public execute(action: ManifestEntityAction) {
-		console.log('Execute action: ', action);
-	}
-
 	public openPage(elementName: string) {
 		const element = document.createElement(elementName);
 		this._pages.push(element);
