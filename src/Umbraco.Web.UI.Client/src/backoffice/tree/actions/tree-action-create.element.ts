@@ -3,6 +3,7 @@ import { css, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { UmbContextConsumerMixin } from '../../../core/context';
 import type { ManifestEntityAction } from '../../../core/models';
+import { UmbActionService } from '../actions.service';
 
 @customElement('umb-tree-action-create')
 export default class UmbTreeActionCreateElement extends UmbContextConsumerMixin(LitElement) {
@@ -11,12 +12,23 @@ export default class UmbTreeActionCreateElement extends UmbContextConsumerMixin(
 	@property({ attribute: false })
 	public treeAction?: ManifestEntityAction;
 
+	private _actionService?: UmbActionService;
+
+	constructor() {
+		super();
+
+		this.consumeContext('umbActionService', (actionService: UmbActionService) => {
+			this._actionService = actionService;
+		});
+	}
+
 	private _handleLabelClick() {
 		console.log(this.treeAction, 'label clicked');
+		this._actionService?.openPage('umb-tree-action-create-page');
 	}
 
 	render() {
-		return html` <uui-menu-item label=${this.treeAction?.meta.label ?? ''} @click-label="${this._handleLabelClick}">
+		return html`<uui-menu-item label=${this.treeAction?.meta.label ?? ''} @click-label="${this._handleLabelClick}">
 			<uui-icon slot="icon" name=${this.treeAction?.meta.icon ?? ''}></uui-icon>
 		</uui-menu-item>`;
 	}
