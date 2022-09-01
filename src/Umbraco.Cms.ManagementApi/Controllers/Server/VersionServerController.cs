@@ -7,11 +7,11 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.ManagementApi.Controllers.Server;
 
 [ApiVersion("1.0")]
-public class Version : ServerController
+public class VersionServerController : ServerControllerBase
 {
     private readonly IUmbracoVersion _umbracoVersion;
 
-    public Version(IUmbracoVersion umbracoVersion) => _umbracoVersion = umbracoVersion;
+    public VersionServerController(IUmbracoVersion umbracoVersion) => _umbracoVersion = umbracoVersion;
 
     [HttpGet("version")]
     [MapToApiVersion("1.0")]
