@@ -1,6 +1,6 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, LitElement, nothing } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import { UmbContextProviderMixin } from '../../core/context';
 import type { ManifestEntityAction } from '../../core/models';
 
@@ -60,6 +60,8 @@ export class UmbActionService extends UmbContextProviderMixin(LitElement) {
 	@state()
 	private _name = '';
 
+	public key = '';
+
 	@state()
 	private _pages: Array<HTMLElement> = [];
 
@@ -68,8 +70,9 @@ export class UmbActionService extends UmbContextProviderMixin(LitElement) {
 		this.provideContext('umbActionService', this);
 	}
 
-	public open(name: string) {
+	public open(name: string, key: string) {
 		this._name = name;
+		this.key = key;
 		this._modalOpen = true;
 	}
 

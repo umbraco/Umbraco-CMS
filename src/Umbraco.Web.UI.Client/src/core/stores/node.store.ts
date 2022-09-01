@@ -25,6 +25,23 @@ export class UmbNodeStore {
 		);
 	}
 
+	trash(key: string) {
+		// fetch from server and update store
+		// TODO: Use node type to hit the right API, or have a general Node API?
+		return fetch('/umbraco/backoffice/node/trash', {
+			method: 'POST',
+			body: key,
+			headers: {
+				'Content-Type': 'application/json',
+			},
+		})
+			.then((res) => res.json())
+			.then((data: Array<NodeEntity>) => {
+				this._updateStore(data);
+				this._updateEntity(data);
+			});
+	}
+
 	// TODO: make sure UI somehow can follow the status of this action.
 	save(data: NodeEntity[]): Promise<void> {
 		// fetch from server and update store

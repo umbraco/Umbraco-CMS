@@ -21,6 +21,15 @@ export const handlers = [
 
 		const saved = umbNodeData.save(data);
 
-		return res(ctx.status(200), ctx.json(saved));
+		return res(ctx.status(200), ctx.json([saved]));
+	}),
+
+	rest.post<NodeEntity[]>('/umbraco/backoffice/node/trash', (req, res, ctx) => {
+		console.warn('Please move to schema');
+		const key = req.body as string;
+
+		const trashed = umbNodeData.trash(key);
+
+		return res(ctx.status(200), ctx.json([trashed]));
 	}),
 ];

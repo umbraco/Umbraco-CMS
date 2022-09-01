@@ -3,6 +3,8 @@ import { css, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { UmbContextConsumerMixin } from '../../../core/context';
 import type { ManifestEntityAction } from '../../../core/models';
+import { UmbModalService } from '../../../core/services/modal';
+import { UmbNodeStore } from '../../../core/stores/node.store';
 import { UmbActionService } from '../actions.service';
 
 @customElement('umb-tree-action-delete')
@@ -13,6 +15,8 @@ export default class UmbTreeActionDeleteElement extends UmbContextConsumerMixin(
 	public treeAction?: ManifestEntityAction;
 
 	private _actionService?: UmbActionService;
+	private _modalService?: UmbModalService;
+	private _nodeStore?: UmbNodeStore;
 
 	constructor() {
 		super();
@@ -20,11 +24,30 @@ export default class UmbTreeActionDeleteElement extends UmbContextConsumerMixin(
 		this.consumeContext('umbActionService', (actionService: UmbActionService) => {
 			this._actionService = actionService;
 		});
+
+		this.consumeContext('umbModalService', (modalService: UmbModalService) => {
+			this._modalService = modalService;
+		});
+
+		this.consumeContext('umbNodeStore', (nodeStore: UmbNodeStore) => {
+			this._nodeStore = nodeStore;
+		});
 	}
 
 	private _handleLabelClick() {
 		console.log(this.treeAction, 'label clicked');
 		this._actionService?.openPage('umb-tree-action-delete-page');
+		const modalHandler = this._modalService?.confirm({
+			headline: 'Delete page 1',
+			content: 'Are you sure you want to delete this page?',
+			color: 'danger',
+		});
+
+		modalHandler?.onClose.then(({ confirmed }: any) => {
+			if (confirmed && this._actionService) {
+				this._nodeStore?.trash(this._actionService.key);
+			}
+		});
 	}
 
 	render() {

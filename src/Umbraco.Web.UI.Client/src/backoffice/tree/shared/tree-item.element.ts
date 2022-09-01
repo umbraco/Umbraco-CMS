@@ -107,7 +107,7 @@ export class UmbTreeItem extends UmbContextConsumerMixin(LitElement) {
 	}
 
 	private _openActions() {
-		this._actionService?.open(this.label);
+		this._actionService?.open(this.label, this.itemKey);
 	}
 
 	render() {
