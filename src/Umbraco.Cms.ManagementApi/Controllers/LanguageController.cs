@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.ManagementApi.ViewModels.Languages;
+using Umbraco.New.Cms.Core.Services.Installer;
 using Umbraco.New.Cms.Web.Common.Routing;
 
 namespace Umbraco.Cms.ManagementApi.Controllers;
@@ -16,11 +17,13 @@ public class LanguageController : Controller
 {
     private readonly ILocalizationService _localizationService;
     private readonly IUmbracoMapper _umbracoMapper;
+    private readonly ILanguageService _languageService;
 
-    public LanguageController(ILocalizationService localizationService, IUmbracoMapper umbracoMapper)
+    public LanguageController(ILocalizationService localizationService, IUmbracoMapper umbracoMapper, ILanguageService languageService)
     {
         _localizationService = localizationService;
         _umbracoMapper = umbracoMapper;
+        _languageService = languageService;
     }
 
     /// <summary>
@@ -111,22 +114,7 @@ public class LanguageController : Controller
     // TODO: This needs to be an authorized endpoint.
     public async Task<ActionResult<LanguageViewModel?>> SaveLanguage(LanguageViewModel language)
     {
-        if (!ModelState.IsValid)
-        {
-            return ValidationProblem(ModelState);
-        }
-
-        // this is prone to race conditions but the service will not let us proceed anyways
-        ILanguage? existingByCulture = _localizationService.GetLanguageByIsoCode(language.IsoCode);
-
-        // the localization service might return the generic language even when queried for specific ones (e.g. "da" when queried for "da-DK")
-        // - we need to handle that explicitly
-        if (existingByCulture?.IsoCode != language.IsoCode)
-        {
-            existingByCulture = null;
-        }
-
-        if (existingByCulture != null && language.Id != existingByCulture.Id)
+        if (_languageService.LanguageAlreadyExists(language.Id, language.IsoCode))
         {
             // Someone is trying to create a language that already exist
             ModelState.AddModelError("IsoCode", "The language " + language.IsoCode + " already exists");
@@ -156,12 +144,6 @@ public class LanguageController : Controller
             return _umbracoMapper.Map<LanguageViewModel>(newLang);
         }
 
-        existingById.IsoCode = language.IsoCode;
-        if (!string.IsNullOrEmpty(language.Name))
-        {
-            existingById.CultureName = language.Name;
-        }
-
         // note that the service will prevent the default language from being "un-defaulted"
         // but does not hurt to test here - though the UI should prevent it too
         if (existingById.IsDefault && !language.IsDefault)
@@ -170,56 +152,27 @@ public class LanguageController : Controller
             return ValidationProblem(ModelState);
         }
 
-        existingById.IsDefault = language.IsDefault;
-        existingById.IsMandatory = language.IsMandatory;
-        existingById.FallbackLanguageId = language.FallbackLanguageId;
+        _umbracoMapper.Map(existingById, language);
 
-        // modifying an existing language can create a fallback, verify
-        // note that the service will check again, dealing with race conditions
-        if (existingById.FallbackLanguageId.HasValue)
+        existingById.IsoCode = language.IsoCode;
+        if (!string.IsNullOrEmpty(language.Name))
         {
-            var languages = _localizationService.GetAllLanguages().ToDictionary(x => x.Id, x => x);
-            if (!languages.ContainsKey(existingById.FallbackLanguageId.Value))
-            {
-                ModelState.AddModelError("FallbackLanguage", "The selected fall back language does not exist.");
-                return ValidationProblem(ModelState);
-            }
+            existingById.CultureName = language.Name;
+        }
 
-            if (CreatesCycle(existingById, languages))
-            {
-                ModelState.AddModelError("FallbackLanguage",
-                    $"The selected fall back language {languages[existingById.FallbackLanguageId.Value].IsoCode} would create a circular path.");
-                return ValidationProblem(ModelState);
-            }
+        if (!_languageService.CanUseLanguagesFallbackLanguage(existingById))
+        {
+            ModelState.AddModelError("FallbackLanguage", "The selected fall back language does not exist.");
+            return ValidationProblem(ModelState);
+        }
+
+        if (!_languageService.CanGetProperFallbackLanguage(existingById))
+        {
+            ModelState.AddModelError("FallbackLanguage", $"The selected fall back language {_localizationService.GetLanguageById(existingById.FallbackLanguageId!.Value)} would create a circular path.");
+            return ValidationProblem(ModelState);
         }
 
         _localizationService.Save(existingById);
         return _umbracoMapper.Map<LanguageViewModel>(existingById);
-    }
-
-    // see LocalizationService
-    private bool CreatesCycle(ILanguage language, IDictionary<int, ILanguage> languages)
-    {
-        // a new language is not referenced yet, so cannot be part of a cycle
-        if (!language.HasIdentity)
-        {
-            return false;
-        }
-
-        var id = language.FallbackLanguageId;
-        while (true) // assuming languages does not already contains a cycle, this must end
-        {
-            if (!id.HasValue)
-            {
-                return false; // no fallback means no cycle
-            }
-
-            if (id.Value == language.Id)
-            {
-                return true; // back to language = cycle!
-            }
-
-            id = languages[id.Value].FallbackLanguageId; // else keep chaining
-        }
     }
 }
