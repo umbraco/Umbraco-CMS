@@ -122,7 +122,7 @@ public class LanguageController : Controller
         }
 
         ILanguage? existingById = language.Id != default ? _localizationService.GetLanguageById(language.Id) : null;
-        if (existingById == null)
+        if (existingById is null)
         {
             // Creating a new lang...
             CultureInfo culture;
