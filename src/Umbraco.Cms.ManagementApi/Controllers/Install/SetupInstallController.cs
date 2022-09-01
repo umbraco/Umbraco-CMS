@@ -11,6 +11,7 @@ using Umbraco.New.Cms.Core.Services.Installer;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.Install;
 
+[ApiVersion("1.0")]
 public class SetupInstallController : InstallControllerBase
 {
     private readonly IUmbracoMapper _mapper;

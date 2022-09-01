@@ -8,6 +8,7 @@ using Umbraco.New.Cms.Core.Models.Installer;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.Install;
 
+[ApiVersion("1.0")]
 public class SettingsInstallController : InstallControllerBase
 {
     private readonly InstallHelper _installHelper;

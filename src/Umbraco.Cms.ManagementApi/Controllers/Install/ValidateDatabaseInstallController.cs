@@ -7,6 +7,7 @@ using Umbraco.Cms.ManagementApi.ViewModels.Installer;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.Install;
 
+[ApiVersion("1.0")]
 public class ValidateDatabaseInstallController : InstallControllerBase
 {
     private readonly DatabaseBuilder _databaseBuilder;
