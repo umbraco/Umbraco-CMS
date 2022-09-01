@@ -28,22 +28,22 @@
 
     </umb-block-grid-entry>
 
-    <div ng-if="!vm.blockEditorApi.readonly && vm.depth !== '0' && vm.entries.length === 0" class="umb-block-grid__area-actions">
-        <button
-                id="{{vm.model.alias}}"
-                type="button"
-                class="btn-reset umb-block-grid__create-button umb-outline"
-                ng-disabled="vm.locallyAvailableBlockTypes.length === 0"
-                ng-click="vm.blockEditorApi.requestShowCreate(vm.parentBlock, vm.areaKey, vm.entries.length, $event)">
-            <localize ng-if="vm.locallyAvailableBlockTypes.length !== 1" key="blockEditor_addBlock">Add content</localize>
-            <localize ng-if="vm.locallyAvailableBlockTypes.length === 1" key="blockEditor_addThis" tokens="[vm.locallyAvailableBlockTypes[0].elementTypeModel.name]">Add content</localize>
-        </button>
-    </div>
 </div>
 
 <div ng-if="vm.showNotAllowedUI" class="umb-block-grid__not-allowed-box">
 </div>
 
+<div ng-if="!vm.blockEditorApi.readonly && vm.depth !== '0' && vm.entries.length === 0" class="umb-block-grid__area-actions">
+    <button
+            id="{{vm.model.alias}}"
+            type="button"
+            class="btn-reset umb-block-grid__create-button umb-outline"
+            ng-disabled="vm.locallyAvailableBlockTypes.length === 0"
+            ng-click="vm.blockEditorApi.requestShowCreate(vm.parentBlock, vm.areaKey, vm.entries.length, $event)">
+        <localize ng-if="vm.locallyAvailableBlockTypes.length !== 1" key="blockEditor_addBlock">Add content</localize>
+        <localize ng-if="vm.locallyAvailableBlockTypes.length === 1" key="blockEditor_addThis" tokens="[vm.locallyAvailableBlockTypes[0].elementTypeModel.name]">Add content</localize>
+    </button>
+</div>
 
 <uui-button-inline-create
     ng-if="!vm.blockEditorApi.readonly && vm.entries.length > 0 && vm.depth > 0"
