@@ -2432,6 +2432,11 @@ public class ContentService : RepositoryService, IContentService
     /// <param name="userId">Optional Id of the User moving the Content</param>
     public void Move(IContent content, int parentId, int userId = Constants.Security.SuperUserId)
     {
+        if(content.Id == parentId)
+        {
+            return;
+        }
+
         // if moving to the recycle bin then use the proper method
         if (parentId == Constants.System.RecycleBinContent)
         {

@@ -79,6 +79,11 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
 
     public IEnumerable<MoveEventInfo<TEntity>> Move(TEntity moving, EntityContainer? container)
     {
+        if(moving.ParentId == container?.Id)
+        {
+            return new List<MoveEventInfo<TEntity>> { new(moving, moving.Path, container.Id) };
+        }
+
         var parentId = Constants.System.Root;
         if (container != null)
         {

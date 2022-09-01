@@ -978,6 +978,15 @@ namespace Umbraco.Cms.Core.Services
         public Attempt<OperationResult?> Move(IMedia media, int parentId, int userId = Constants.Security.SuperUserId)
         {
             EventMessages messages = EventMessagesFactory.Get();
+            if(media.ParentId == parentId)
+            {
+                return OperationResult.Attempt.Succeed(messages);
+            }
+
+            if (media.ParentId == parentId)
+            {
+                return OperationResult.Attempt.Succeed(messages);
+            }
 
             // if moving to the recycle bin then use the proper method
             if (parentId == Constants.System.RecycleBinMedia)

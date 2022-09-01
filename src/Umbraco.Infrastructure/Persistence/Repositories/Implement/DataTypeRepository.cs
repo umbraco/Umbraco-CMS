@@ -48,6 +48,11 @@ internal class DataTypeRepository : EntityRepositoryBase<int, IDataType>, IDataT
 
     public IEnumerable<MoveEventInfo<IDataType>> Move(IDataType toMove, EntityContainer? container)
     {
+        if(toMove.ParentId == container?.Id)
+        {
+            return new List<MoveEventInfo<IDataType>> { new (toMove, toMove.Path, container.Id) };
+        }
+
         var parentId = -1;
         if (container != null)
         {

@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
@@ -396,6 +397,11 @@ namespace Umbraco.Cms.Core.Services.Implement
         public Attempt<OperationResult<MoveOperationStatusType>?> Move(IDataType toMove, int parentId)
         {
             EventMessages evtMsgs = EventMessagesFactory.Get();
+            if (toMove.ParentId == parentId)
+            {
+                return OperationResult.Attempt.Succeed(MoveOperationStatusType.Success, evtMsgs);
+            }
+
             var moveInfo = new List<MoveEventInfo<IDataType>>();
 
             using (ICoreScope scope = ScopeProvider.CreateCoreScope())
