@@ -1,0 +1,36 @@
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.ManagementApi.ViewModels.Languages;
+using Umbraco.Cms.ManagementApi.ViewModels.Pagination;
+using Umbraco.New.Cms.Core.Models;
+
+namespace Umbraco.Cms.ManagementApi.Controllers.Language;
+
+public class GetAllLanguageController
+{
+    private readonly ILocalizationService _localizationService;
+    private readonly UmbracoMapper _umbracoMapper;
+
+    public GetAllLanguageController(ILocalizationService localizationService, UmbracoMapper umbracoMapper)
+    {
+        _localizationService = localizationService;
+        _umbracoMapper = umbracoMapper;
+    }
+    /// <summary>
+    ///     Returns all currently configured languages.
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet("/")]
+    [MapToApiVersion("1.0")]
+    [ProducesResponseType(typeof(IEnumerable<LanguageViewModel>), StatusCodes.Status200OK)]
+    public async Task<PagedViewModel<LanguageViewModel>?> GetAllLanguages(int skip, int take)
+    {
+        PagedModel<ILanguage> allLanguages = _localizationService.GetAllLanguagesPaged(skip, take);
+
+        return _umbracoMapper.Map<PagedModel<ILanguage>, PagedViewModel<LanguageViewModel>>(allLanguages);
+
+    }
+}

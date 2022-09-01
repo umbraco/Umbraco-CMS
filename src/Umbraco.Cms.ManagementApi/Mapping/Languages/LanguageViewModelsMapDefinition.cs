@@ -1,6 +1,9 @@
-﻿using Umbraco.Cms.Core.Mapping;
+﻿using NPoco.FluentMappings;
+using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.ManagementApi.ViewModels.Languages;
+using Umbraco.Cms.ManagementApi.ViewModels.Pagination;
+using Umbraco.New.Cms.Core.Models;
 
 namespace Umbraco.Cms.ManagementApi.Mapping.Languages;
 
@@ -10,7 +13,7 @@ public class LanguageViewModelsMapDefinition : IMapDefinition
     {
         mapper.Define<LanguageViewModel, ILanguage>((source, context) => new Language(string.Empty, string.Empty), Map);
         mapper.Define<ILanguage, LanguageViewModel>((source, context) => new LanguageViewModel(), Map);
-        mapper.Define<IEnumerable<ILanguage>, IEnumerable<LanguageViewModel>>((source, context) => new List<LanguageViewModel>(), Map);
+        mapper.Define<PagedModel<ILanguage>, PagedViewModel<LanguageViewModel>>((source, context) => new PagedViewModel<LanguageViewModel>(), Map);
 
     }
 
@@ -45,28 +48,32 @@ public class LanguageViewModelsMapDefinition : IMapDefinition
         target.UpdateDate = default;
     }
 
-    private static void Map(IEnumerable<ILanguage> source, IEnumerable<LanguageViewModel> target, MapperContext context)
+    private static void Map(PagedModel<ILanguage> source, PagedViewModel<LanguageViewModel> target, MapperContext context)
     {
         if (target is null)
         {
             throw new ArgumentNullException(nameof(target));
         }
 
-        if (target is not List<LanguageViewModel> list)
+        if (target is not PagedViewModel<LanguageViewModel> list)
         {
             throw new NotSupportedException($"{nameof(target)} must be a List<Language>.");
         }
 
-        List<LanguageViewModel> temp = context.MapEnumerable<ILanguage, LanguageViewModel>(source);
+        List<LanguageViewModel> temp = context.MapEnumerable<ILanguage, LanguageViewModel>(source.Items);
 
         // Put the default language first in the list & then sort rest by a-z
         LanguageViewModel? defaultLang = temp.SingleOrDefault(x => x.IsDefault);
 
+        var languages = new List<LanguageViewModel>();
+
         // insert default lang first, then remaining language a-z
         if (defaultLang is not null)
         {
-            list.Add(defaultLang);
-            list.AddRange(temp.Where(x => x != defaultLang).OrderBy(x => x.Name));
+            languages.Add(defaultLang);
+            languages.AddRange(temp.Where(x => x != defaultLang).OrderBy(x => x.Name));
         }
+
+        list.Items = languages;
     }
 }
