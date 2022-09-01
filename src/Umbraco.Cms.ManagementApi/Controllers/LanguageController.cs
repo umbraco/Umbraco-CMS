@@ -1,13 +1,11 @@
 ﻿using System.Globalization;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Cms.ManagementApi.ViewModels.Languages;
 using Umbraco.New.Cms.Web.Common.Routing;
-using Language = Umbraco.Cms.Core.Models.ContentEditing.Language;
 
 namespace Umbraco.Cms.ManagementApi.Controllers;
 
@@ -74,7 +72,7 @@ public class LanguageController : Controller
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [Authorize(Policy = AuthorizationPolicies.TreeAccessLanguages)]
+    // TODO: This needs to be an authorized endpoint.
     public async Task<IActionResult> DeleteLanguage(int id)
     {
         ILanguage? language = _localizationService.GetLanguageById(id);
@@ -110,8 +108,8 @@ public class LanguageController : Controller
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [Authorize(Policy = AuthorizationPolicies.TreeAccessLanguages)]
-    public async Task<ActionResult<Language?>> SaveLanguage(Language language)
+    // TODO: This needs to be an authorized endpoint.
+    public async Task<ActionResult<LanguageViewModel?>> SaveLanguage(LanguageViewModel language)
     {
         if (!ModelState.IsValid)
         {
@@ -152,10 +150,10 @@ public class LanguageController : Controller
 
             language.Name ??= culture.EnglishName;
 
-            Core.Models.Language? newLang = _umbracoMapper.Map<Core.Models.Language>(language);
+            Language? newLang = _umbracoMapper.Map<Language>(language);
 
             _localizationService.Save(newLang!);
-            return _umbracoMapper.Map<Language>(newLang);
+            return _umbracoMapper.Map<LanguageViewModel>(newLang);
         }
 
         existingById.IsoCode = language.IsoCode;
@@ -196,7 +194,7 @@ public class LanguageController : Controller
         }
 
         _localizationService.Save(existingById);
-        return _umbracoMapper.Map<Language>(existingById);
+        return _umbracoMapper.Map<LanguageViewModel>(existingById);
     }
 
     // see LocalizationService
