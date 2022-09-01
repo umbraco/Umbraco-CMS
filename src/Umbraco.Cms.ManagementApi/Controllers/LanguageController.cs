@@ -110,7 +110,7 @@ public class LanguageController : Controller
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    // [Authorize(Policy = AuthorizationPolicies.TreeAccessLanguages)]
+    [Authorize(Policy = AuthorizationPolicies.TreeAccessLanguages)]
     public async Task<ActionResult<Language?>> SaveLanguage(Language language)
     {
         if (!ModelState.IsValid)
