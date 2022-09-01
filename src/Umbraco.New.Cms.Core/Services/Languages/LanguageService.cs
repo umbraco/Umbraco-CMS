@@ -1,7 +1,8 @@
 ﻿using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
+using Umbraco.New.Cms.Core.Services.Installer;
 
-namespace Umbraco.New.Cms.Core.Services.Installer;
+namespace Umbraco.New.Cms.Core.Services.Languages;
 
 public class LanguageService : ILanguageService
 {
