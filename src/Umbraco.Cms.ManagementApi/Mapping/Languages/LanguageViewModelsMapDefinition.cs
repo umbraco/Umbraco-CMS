@@ -8,7 +8,7 @@ public class LanguageViewModelsMapDefinition : IMapDefinition
 {
     public void DefineMaps(IUmbracoMapper mapper)
     {
-        mapper.Define<LanguageViewModel, Language>((source, context) => new Language(string.Empty, string.Empty), Map);
+        mapper.Define<LanguageViewModel, ILanguage>((source, context) => new Language(string.Empty, string.Empty), Map);
         mapper.Define<ILanguage, LanguageViewModel>((source, context) => new LanguageViewModel(), Map);
         mapper.Define<IEnumerable<ILanguage>, IEnumerable<LanguageViewModel>>((source, context) => new List<LanguageViewModel>(), Map);
 
@@ -27,7 +27,7 @@ public class LanguageViewModelsMapDefinition : IMapDefinition
 
 
     // Umbraco.Code.MapAll
-    private static void Map(LanguageViewModel source, Language target, MapperContext context)
+    private static void Map(LanguageViewModel source, ILanguage target, MapperContext context)
     {
         target.CreateDate = default;
         if (!string.IsNullOrEmpty(source.Name))
