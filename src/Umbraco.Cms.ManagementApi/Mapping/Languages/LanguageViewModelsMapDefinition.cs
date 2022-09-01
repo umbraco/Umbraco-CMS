@@ -30,7 +30,11 @@ public class LanguageViewModelsMapDefinition : IMapDefinition
     private static void Map(LanguageViewModel source, Language target, MapperContext context)
     {
         target.CreateDate = default;
-        target.CultureName = source.Name!;
+        if (!string.IsNullOrEmpty(source.Name))
+        {
+            target.CultureName = source.Name;
+        }
+
         target.DeleteDate = null;
         target.FallbackLanguageId = source.FallbackLanguageId;
         target.Id = source.Id;

@@ -154,11 +154,6 @@ public class LanguageController : Controller
 
         existingById = _umbracoMapper.Map(language, existingById);
 
-        if (!string.IsNullOrEmpty(language.Name))
-        {
-            existingById.CultureName = language.Name;
-        }
-
         if (!_languageService.CanUseLanguagesFallbackLanguage(existingById))
         {
             ModelState.AddModelError("FallbackLanguage", "The selected fall back language does not exist.");
