@@ -152,9 +152,8 @@ public class LanguageController : Controller
             return ValidationProblem(ModelState);
         }
 
-        _umbracoMapper.Map(existingById, language);
+        existingById = _umbracoMapper.Map(language, existingById);
 
-        existingById.IsoCode = language.IsoCode;
         if (!string.IsNullOrEmpty(language.Name))
         {
             existingById.CultureName = language.Name;
