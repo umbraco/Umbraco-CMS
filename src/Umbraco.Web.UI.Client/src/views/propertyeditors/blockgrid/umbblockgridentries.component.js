@@ -26,7 +26,7 @@
         }
     );
 
-    function BlockGridEntriesController($element, $scope) {
+    function BlockGridEntriesController($element, $scope, $timeout) {
 
         var vm = this;
         vm.showNotAllowedUI = false;
@@ -107,6 +107,21 @@
             $scope.$evalAsync();
         }
 
+        var revertIndicateDroppableTimeout;
+        vm.revertIndicateDroppable = function() {
+            revertIndicateDroppableTimeout = $timeout(() => {
+                vm.droppableIndication = false;
+            }, 2000);
+        }
+        vm.indicateDroppable = function() {
+            if (revertIndicateDroppableTimeout) {
+                $timeout.cancel(revertIndicateDroppableTimeout);
+                revertIndicateDroppableTimeout = null;
+             }
+            vm.droppableIndication = true;
+            $scope.$evalAsync();
+        }
+
         function initializeSortable() {
 
             const gridLayoutContainerEl = $element[0].querySelector('.umb-block-grid__layout-container');
@@ -131,23 +146,25 @@
                 if (gridLayoutContainerEl !== evt.from) {
                     const fromCtrl = evt.from['Sortable:controller']();
                     const prevEntries = fromCtrl.entries;
-                    const movingBlock = prevEntries[oldIndex];
+                    const movingEl = prevEntries[oldIndex];
 
                     // Perform the transfer:
 
                     if (Sortable.active && Sortable.active.lastPullMode === 'clone') {
-                        movingBlock = Utilities.copy(movingBlock);
+                        movingEl = Utilities.copy(movingEl);
                         prevEntries.splice(Sortable.utils.index(evt.clone, sortable.options.draggable), 0, prevEntries.splice(oldIndex, 1)[0]);
 
+                        /*
                         if (evt.from.contains(evt.clone)) {
                             evt.from.removeChild(evt.clone);
                         }
+                        */
                     }
                     else {
                         prevEntries.splice(oldIndex, 1);
                     }
 
-                    vm.entries.splice(newIndex, 0, movingBlock);
+                    vm.entries.splice(newIndex, 0, movingEl);
 
                     // I currently do not think below line is necessary as this is updated through angularJS. This was giving trouble/errors.
                     //evt.from.insertBefore(evt.item, nextSibling); // revert element
@@ -173,29 +190,30 @@
                     contextVM = evt.to['Sortable:controller']();
                 }
 
-                const movingBlock = evt.dragged;
+                const movingEl = evt.dragged;
                 /*if (evt.dragged) {
-                    movingBlock = evt.dragged;
+                    movingEl = evt.dragged;
                 } else {
                     if(gridLayoutContainerEl !== evt.from) {
-                        movingBlock = evt.from['Sortable:controller']().entries[evt.oldIndex];
+                        movingEl = evt.from['Sortable:controller']().entries[evt.oldIndex];
                     } else {
-                        movingBlock = vm.entries[evt.oldIndex];
+                        movingEl = vm.entries[evt.oldIndex];
                     }
                 }*/
 
                 if(_lastGridLayoutContainerEl !== contextVM && _lastGridLayoutContainerEl !== null) {
                     _lastGridLayoutContainerEl.hideNotAllowed();
+                    _lastGridLayoutContainerEl.revertIndicateDroppable();
                 }
                 _lastGridLayoutContainerEl = contextVM;
                 
-                if(contextVM.acceptBlock(movingBlock.dataset.contentElementTypeKey) === true) {
+                if(contextVM.acceptBlock(movingEl.dataset.contentElementTypeKey) === true) {
                     _lastGridLayoutContainerEl.hideNotAllowed();
-                    _lastGridLayoutContainerEl = null;
+                    _lastGridLayoutContainerEl.indicateDroppable();// This block is accepted to we will indicate a good drop.
                     return true;
                 }
 
-                contextVM.showNotAllowed();
+                contextVM.showNotAllowed();// This block is not accepted to we will indicate that its not allowed.
 
 
                 return false;
@@ -266,8 +284,6 @@
                     if (gridLayoutContainerEl !== evt.to) {
                         contextVM = evt.to['Sortable:controller']();
                     }
-
-                    console.log("onStart", evt)
                     
                     const oldIndex = evt.oldIndex;
                     vm.movingLayoutEntry = contextVM.getLayoutEntry(oldIndex);
@@ -279,21 +295,21 @@
 
                     window.addEventListener('drag', _onDragMouseMove);
 
-                    $scope.$apply();
+                    $scope.$evalAsync();
                 },
                 onAdd: function (evt) {
                     /*if(_indication(evt) === false) {
                         return false;
                     }*/
                     _sync(evt);
-                    $scope.$apply();
+                    $scope.$evalAsync();
                 },
                 onUpdate: function (evt) {
                     /*if(_indication(evt) === false) {
                         return false;
                     }*/
                     _sync(evt);
-                    $scope.$apply();
+                    $scope.$evalAsync();
                 },
                 // Called by any change to the list (add / update / remove)
                 onMove: function (evt) {
@@ -310,6 +326,7 @@
                     // ensure not-allowed indication is removed.
                     if(_lastGridLayoutContainerEl) {
                         _lastGridLayoutContainerEl.hideNotAllowed();
+                        _lastGridLayoutContainerEl.revertIndicateDroppable();
                         _lastGridLayoutContainerEl = null;
                     }
 

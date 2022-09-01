@@ -1,6 +1,9 @@
 <div
     class="umb-block-grid__layout-container"
-    ng-class="{'--not-allowing-drop': vm.showNotAllowedUI}"
+    ng-class="{
+        '--not-allowing-drop': vm.showNotAllowedUI,
+        '--droppable-indication': vm.droppableIndication
+    }"
 >
     <umb-block-grid-entry ng-repeat="layoutEntry in vm.entries track by layoutEntry.$block.key"
         class="umb-block-grid__layout-item"
