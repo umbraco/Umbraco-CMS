@@ -3,7 +3,12 @@ import { css, html, LitElement, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbContextProviderMixin } from '../../core/context';
 import type { ManifestEntityAction } from '../../core/models';
+
 import './actions-modal.element';
+import './actions/tree-action-create-page.element';
+import './actions/tree-action-create-page-2.element';
+import './actions/tree-action-delete-page.element';
+// TODO how do we dynamically import this so we don't have to import every page that could potentially be used?
 
 @customElement('umb-action-service')
 export class UmbActionService extends UmbContextProviderMixin(LitElement) {
@@ -55,6 +60,9 @@ export class UmbActionService extends UmbContextProviderMixin(LitElement) {
 	@state()
 	private _name = '';
 
+	@state()
+	private _pages: Array<HTMLElement> = [];
+
 	connectedCallback() {
 		super.connectedCallback();
 		this.provideContext('umbActionService', this);
@@ -73,6 +81,25 @@ export class UmbActionService extends UmbContextProviderMixin(LitElement) {
 		console.log('Execute action: ', action);
 	}
 
+	public openPage(elementName: string) {
+		const element = document.createElement(elementName);
+		this._pages.push(element);
+		this.requestUpdate('_pages');
+	}
+
+	public closeTopPage() {
+		this._pages.pop();
+		this.requestUpdate('_pages');
+	}
+
+	private _renderTopPage() {
+		if (this._pages.length === 0) {
+			return nothing;
+		}
+
+		return this._pages[this._pages.length - 1];
+	}
+
 	private _renderBackdrop() {
 		// eslint-disable-next-line lit-a11y/click-events-have-key-events
 		return this._modalOpen ? html`<div id="backdrop" @click=${this.close}></div>` : nothing;
@@ -80,8 +107,10 @@ export class UmbActionService extends UmbContextProviderMixin(LitElement) {
 
 	private _renderModal() {
 		return this._modalOpen
-			? html`<div id="action-modal">
-					<umb-actions-modal .name=${this._name}></umb-actions-modal>
+			? html` <div id="action-modal">
+					${this._pages.length === 0
+						? html`<umb-actions-modal .name=${this._name}></umb-actions-modal>`
+						: this._renderTopPage()}
 			  </div>`
 			: nothing;
 	}
