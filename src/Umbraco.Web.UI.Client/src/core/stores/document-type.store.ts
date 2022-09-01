@@ -1,11 +1,18 @@
 import { BehaviorSubject, map, Observable } from 'rxjs';
-import { DocumentTypeEntity, umbDocumentTypeData } from '../../mocks/data/document-type.data';
+import { DocumentTypeEntity } from '../../mocks/data/document-type.data';
+import { UmbEntityStore } from './entity.store';
 
 export class UmbDocumentTypeStore {
 	private _documentTypes: BehaviorSubject<Array<DocumentTypeEntity>> = new BehaviorSubject(
 		<Array<DocumentTypeEntity>>[]
 	);
 	public readonly documentTypes: Observable<Array<DocumentTypeEntity>> = this._documentTypes.asObservable();
+
+	private _entityStore: UmbEntityStore;
+
+	constructor(entityStore: UmbEntityStore) {
+		this._entityStore = entityStore;
+	}
 
 	getByKey(key: string): Observable<DocumentTypeEntity | null> {
 		// TODO: use Fetcher API.
@@ -36,6 +43,7 @@ export class UmbDocumentTypeStore {
 			});
 			const json = await res.json();
 			this._updateStore(json);
+			this._entityStore.update(json);
 		} catch (error) {
 			console.error('Save Document Type error', error);
 		}

@@ -4,19 +4,15 @@ import { customElement, property } from 'lit/decorators.js';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '../../../core/context';
 import { UmbEntityStore } from '../../../core/stores/entity.store';
 import { UmbTreeDocumentTypesContext } from './tree-document-types.context';
-import type { ManifestTree } from '../../../core/models';
 
 import '../shared/tree-navigator.element';
 
-@customElement('umb-document-type-tree')
-export class UmbDocumentTypeTree extends UmbContextConsumerMixin(UmbContextProviderMixin(LitElement)) {
+@customElement('umb-tree-document-types')
+export class UmbTreeDocumentTypes extends UmbContextConsumerMixin(UmbContextProviderMixin(LitElement)) {
 	static styles = [UUITextStyles, css``];
 
 	@property({ type: String })
 	public alias = '';
-
-	@property({ attribute: false })
-	public tree?: ManifestTree;
 
 	private _entityStore?: UmbEntityStore;
 	private _treeContext?: UmbTreeDocumentTypesContext;
@@ -26,9 +22,9 @@ export class UmbDocumentTypeTree extends UmbContextConsumerMixin(UmbContextProvi
 
 		this.consumeContext('umbEntityStore', (entityStore: UmbEntityStore) => {
 			this._entityStore = entityStore;
-			if (!this.tree || !this._entityStore) return;
+			if (!this._entityStore) return;
 
-			this._treeContext = new UmbTreeDocumentTypesContext(this.tree, this._entityStore);
+			this._treeContext = new UmbTreeDocumentTypesContext(this._entityStore);
 			this.provideContext('umbTreeContext', this._treeContext);
 		});
 	}
@@ -38,8 +34,10 @@ export class UmbDocumentTypeTree extends UmbContextConsumerMixin(UmbContextProvi
 	}
 }
 
+export default UmbTreeDocumentTypes;
+
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-document-type-tree': UmbDocumentTypeTree;
+		'umb-tree-document-types': UmbTreeDocumentTypes;
 	}
 }

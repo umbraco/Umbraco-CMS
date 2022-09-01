@@ -1,16 +1,13 @@
 import { map } from 'rxjs';
 import { UmbEntityStore } from '../../../core/stores/entity.store';
 import { UmbTreeContext } from '../tree.context';
-import type { ManifestTree } from '../../../core/models';
 
 export class UmbTreeMembersContext implements UmbTreeContext {
-	public tree: ManifestTree;
 	public entityStore: UmbEntityStore;
 
 	private _entityType = 'member';
 
-	constructor(tree: ManifestTree, entityStore: UmbEntityStore) {
-		this.tree = tree;
+	constructor(entityStore: UmbEntityStore) {
 		this.entityStore = entityStore;
 	}
 

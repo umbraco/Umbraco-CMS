@@ -41,15 +41,18 @@ export default class UmbBackoffice extends UmbContextConsumerMixin(UmbContextPro
 	];
 
 	private _umbSectionStore?: UmbSectionStore;
+	private _umbEntityStore?: UmbEntityStore;
 	private _currentSectionSubscription?: Subscription;
 
 	constructor() {
 		super();
 
-		this.provideContext('umbEntityStore', new UmbEntityStore());
-		this.provideContext('umbNodeStore', new UmbNodeStore());
-		this.provideContext('umbDataTypeStore', new UmbDataTypeStore());
-		this.provideContext('umbDocumentTypeStore', new UmbDocumentTypeStore());
+		this._umbEntityStore = new UmbEntityStore();
+
+		this.provideContext('umbEntityStore', this._umbEntityStore);
+		this.provideContext('umbNodeStore', new UmbNodeStore(this._umbEntityStore));
+		this.provideContext('umbDataTypeStore', new UmbDataTypeStore(this._umbEntityStore));
+		this.provideContext('umbDocumentTypeStore', new UmbDocumentTypeStore(this._umbEntityStore));
 		this.provideContext('umbNotificationService', new UmbNotificationService());
 		this.provideContext('umbModalService', new UmbModalService());
 

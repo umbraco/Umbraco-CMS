@@ -1,10 +1,9 @@
 import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement } from 'lit/decorators.js';
 import { UmbTreeExtensionsContext } from './tree-extensions.context';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '../../../core/context';
 import { UmbEntityStore } from '../../../core/stores/entity.store';
-import type { ManifestTree } from '../../../core/models';
 
 import '../shared/tree-navigator.element';
 
@@ -14,9 +13,6 @@ export class UmbTreeExtensionsElement extends UmbContextProviderMixin(UmbContext
 
 	private _treeContext?: UmbTreeExtensionsContext;
 
-	@property({ attribute: false })
-	public tree?: ManifestTree;
-
 	private _entityStore?: UmbEntityStore;
 
 	constructor() {
@@ -24,9 +20,9 @@ export class UmbTreeExtensionsElement extends UmbContextProviderMixin(UmbContext
 
 		this.consumeContext('umbEntityStore', (entityStore: UmbEntityStore) => {
 			this._entityStore = entityStore;
-			if (!this.tree || !this._entityStore) return;
+			if (!this._entityStore) return;
 
-			this._treeContext = new UmbTreeExtensionsContext(this.tree, this._entityStore);
+			this._treeContext = new UmbTreeExtensionsContext(this._entityStore);
 			this.provideContext('umbTreeContext', this._treeContext);
 		});
 	}

@@ -27,8 +27,8 @@ export const handlers = [
 		const data = req.body;
 		if (!data) return;
 
-		umbDataTypeData.save(data);
+		const saved = umbDataTypeData.save(data);
 
-		return res(ctx.status(200), ctx.json(data));
+		return res(ctx.status(200), ctx.json(saved));
 	}),
 ];

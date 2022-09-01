@@ -1,9 +1,16 @@
 import { BehaviorSubject, map, Observable } from 'rxjs';
-import { NodeEntity, umbNodeData } from '../../mocks/data/node.data';
+import { NodeEntity } from '../../mocks/data/node.data';
+import { UmbEntityStore } from './entity.store';
 
 export class UmbNodeStore {
 	private _nodes: BehaviorSubject<Array<NodeEntity>> = new BehaviorSubject(<Array<NodeEntity>>[]);
 	public readonly nodes: Observable<Array<NodeEntity>> = this._nodes.asObservable();
+
+	private _entityStore: UmbEntityStore;
+
+	constructor(entityStore: UmbEntityStore) {
+		this._entityStore = entityStore;
+	}
 
 	getByKey(key: string): Observable<NodeEntity | null> {
 		// fetch from server and update store
@@ -18,7 +25,6 @@ export class UmbNodeStore {
 		);
 	}
 
-	// TODO: Use Node type, to not be specific about Document.
 	// TODO: make sure UI somehow can follow the status of this action.
 	save(data: NodeEntity[]): Promise<void> {
 		// fetch from server and update store
@@ -41,9 +47,14 @@ export class UmbNodeStore {
 			},
 		})
 			.then((res) => res.json())
-			.then((data) => {
+			.then((data: Array<NodeEntity>) => {
 				this._updateStore(data);
+				this._updateEntity(data);
 			});
+	}
+
+	private _updateEntity(data: Array<NodeEntity>) {
+		this._entityStore.update(data);
 	}
 
 	private _updateStore(fetchedNodes: Array<any>) {
