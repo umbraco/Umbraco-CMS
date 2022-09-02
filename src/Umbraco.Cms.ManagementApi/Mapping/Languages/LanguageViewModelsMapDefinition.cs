@@ -75,5 +75,6 @@ public class LanguageViewModelsMapDefinition : IMapDefinition
         }
 
         list.Items = languages;
+        list.Total = source.Total;
     }
 }
