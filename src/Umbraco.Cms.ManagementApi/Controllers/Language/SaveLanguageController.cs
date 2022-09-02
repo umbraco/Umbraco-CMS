@@ -9,13 +9,14 @@ using Umbraco.New.Cms.Core.Services.Installer;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.Language;
 
+[ApiVersion("1.0")]
 public class SaveLanguageController : LanguageControllerBase
 {
     private readonly ILanguageService _languageService;
-    private readonly UmbracoMapper _umbracoMapper;
+    private readonly IUmbracoMapper _umbracoMapper;
     private readonly ILocalizationService _localizationService;
 
-    public SaveLanguageController(ILanguageService languageService, UmbracoMapper umbracoMapper, ILocalizationService localizationService)
+    public SaveLanguageController(ILanguageService languageService, IUmbracoMapper umbracoMapper, ILocalizationService localizationService)
     {
         _languageService = languageService;
         _umbracoMapper = umbracoMapper;

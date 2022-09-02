@@ -9,21 +9,22 @@ using Umbraco.New.Cms.Core.Models;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.Language;
 
-public class GetAllLanguageController
+[ApiVersion("1.0")]
+public class GetAllLanguageController : LanguageControllerBase
 {
     private readonly ILocalizationService _localizationService;
-    private readonly UmbracoMapper _umbracoMapper;
+    private readonly IUmbracoMapper _umbracoMapper;
 
-    public GetAllLanguageController(ILocalizationService localizationService, UmbracoMapper umbracoMapper)
+    public GetAllLanguageController(ILocalizationService localizationService, IUmbracoMapper umbracoMapper)
     {
         _localizationService = localizationService;
         _umbracoMapper = umbracoMapper;
     }
-    /// <summary>
+    /// <summary>1
     ///     Returns all currently configured languages.
     /// </summary>
     /// <returns></returns>
-    [HttpGet("/")]
+    [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<LanguageViewModel>), StatusCodes.Status200OK)]
     public async Task<PagedViewModel<LanguageViewModel>?> GetAllLanguages(int skip, int take)

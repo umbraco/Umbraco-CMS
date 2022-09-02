@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.Language;
 
+[ApiVersion("1.0")]
 public class CultureLanguageController : LanguageControllerBase
 {
     /// <summary>

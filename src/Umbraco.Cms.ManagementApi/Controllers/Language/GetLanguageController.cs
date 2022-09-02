@@ -7,12 +7,13 @@ using Umbraco.Cms.ManagementApi.ViewModels.Languages;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.Language;
 
+[ApiVersion("1.0")]
 public class GetLanguageController : LanguageControllerBase
 {
     private readonly ILocalizationService _localizationService;
-    private readonly UmbracoMapper _umbracoMapper;
+    private readonly IUmbracoMapper _umbracoMapper;
 
-    public GetLanguageController(ILocalizationService localizationService, UmbracoMapper umbracoMapper)
+    public GetLanguageController(ILocalizationService localizationService, IUmbracoMapper umbracoMapper)
     {
         _localizationService = localizationService;
         _umbracoMapper = umbracoMapper;

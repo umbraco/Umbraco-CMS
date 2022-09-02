@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.Language;
 
+[ApiVersion("1.0")]
 public class DeleteLanguageController : LanguageControllerBase
 {
     private readonly ILocalizationService _localizationService;
