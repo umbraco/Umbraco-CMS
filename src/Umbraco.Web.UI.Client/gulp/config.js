@@ -21,7 +21,8 @@ module.exports = {
     sources: {
         // css files used in backoffice
         css: {
-            blockgridlayout: { files: "./src/views/propertyeditors/blockgrid/blockgridlayout.css", watch: "./src/views/propertyeditors/blockgrid/blockgridlayout.css", out: "blockgridlayout.css", dist: "/css" }
+            blockgridlayout: { files: "./src/views/propertyeditors/blockgrid/blockgridlayout.css", watch: "./src/views/propertyeditors/blockgrid/blockgridlayout.css", out: "blockgridlayout.css", dist: "/css" },
+            blockgridlayout_flexbox: { files: "./src/views/propertyeditors/blockgrid/blockgridlayout_flexbox.css", watch: "./src/views/propertyeditors/blockgrid/blockgridlayout_flexbox.css", out: "blockgridlayout_flexbox.css", dist: "/css" }
         },
 
         // less files used by backoffice and preview

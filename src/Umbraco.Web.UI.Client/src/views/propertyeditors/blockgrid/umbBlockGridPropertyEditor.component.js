@@ -121,7 +121,7 @@
                 vm.layoutStylesheet = "assets/css/blockgridlayout.css";
             }
 
-            // We need to ensure that the property model value is an object, this is needed for modelObject to recive a reference and keep that updated.
+            // We need to ensure that the property model value is an object, this is needed for modelObject to receive a reference and keep that updated.
             if(typeof vm.model.value !== 'object' || vm.model.value === null) {// testing if we have null or undefined value or if the value is set to another type than Object.
                 vm.model.value = {};
             }
