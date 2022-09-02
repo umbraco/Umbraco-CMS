@@ -484,8 +484,9 @@ umb-block-grid-block {
     width: 100%;
 }
 .umb-block-grid__block--inline-create-button.--above.--at-root {
-    left: -20px;
-    width: calc(100% + 40px);
+    --calc: clamp(0, calc(var(--umb-block-grid--item-column-span) - (var(--umb-block-grid--grid-columns)-1)), 1);
+    left: calc(-20px * var(--calc));
+    width: calc(100% + 40px * var(--calc));
 }
 .umb-block-grid__block--inline-create-button.--after {
     right: 0;
