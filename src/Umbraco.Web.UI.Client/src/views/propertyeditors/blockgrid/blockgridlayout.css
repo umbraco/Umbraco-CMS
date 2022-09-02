@@ -44,7 +44,7 @@
     grid-auto-rows: minmax(50px, min-content);
     width: 100%;
 }
-.umb-block-grid__block-area {
+.umb-block-grid__area {
     /* overwrite grid-columns for the area: */
     /* notice we do this cause --umb-block-grid--grid-columns inherits to .umb-block-grid__layout-container to adjust for fitting in the Area*/
     --umb-block-grid--grid-columns: var(--umb-block-grid--area-column-span, var(--umb-block-grid--area-grid-columns--overwrite, 1));
@@ -65,13 +65,13 @@
     .umb-block-grid__layout-item[data-col-span='4'] {
         grid-column-end: span min(6, var(--umb-block-grid--grid-columns));
     }
-    .umb-block-grid__block-area {
+    .umb-block-grid__area {
         grid-column-end: span min(calc(var(--umb-block-grid--item-column-span, 1) * 2), var(--umb-block-grid--grid-columns));
     }
-    .umb-block-grid__block-area[data-col-span='5'] {
+    .umb-block-grid__area[data-col-span='5'] {
         grid-column-end: span min(12, var(--umb-block-grid--grid-columns));
     }
-    .umb-block-grid__block-area[data-col-span='4'] {
+    .umb-block-grid__area[data-col-span='4'] {
         grid-column-end: span min(6, var(--umb-block-grid--grid-columns));
     }
 }*/
@@ -79,7 +79,7 @@
     .umb-block-grid__layout-item {
         grid-column-end: span var(--umb-block-grid--item-column-span, 1);
     }
-    .umb-block-grid__block-area {
+    .umb-block-grid__area {
         grid-column-end: span var(--umb-block-grid--area-column-span, 1);
     }
 }

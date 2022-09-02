@@ -598,7 +598,7 @@ umb-block-grid-block {
 
 .umb-block-grid__area-actions {
     grid-column: span var(--umb-block-grid--area-column-span);
-    opacity: calc(var(--umb-block-grid--hint-area-ui, 0) * .5 + var(--umb-block-area--show-area-ui, 0));
+    opacity: calc(var(--umb-block-grid--hint-area-ui, 0) * .5 + var(--umb-block-grid--show-area-ui, 0));
     transition: opacity 120ms;
 
     &:focus, 
@@ -676,26 +676,26 @@ umb-block-grid-block {
 }
 
 
-.umb-block-grid__block-area {
+.umb-block-grid__area {
     position: relative;
-    --umb-block-area--show-area-ui: 0;
+    --umb-block-grid--show-area-ui: 0;
 }
-.umb-block-grid__block-area:focus,
-.umb-block-grid__block-area:focus-within,
-.umb-block-grid__block-area:hover {
-    --umb-block-area--show-area-ui: 1;
+.umb-block-grid__area:focus,
+.umb-block-grid__area:focus-within,
+.umb-block-grid__area:hover {
+    --umb-block-grid--show-area-ui: 1;
 }
-.umb-block-grid__block-area::after {
+.umb-block-grid__area::after {
     content: '';
     position: absolute;
     inset: 0;
     border-radius: 3px;
     border: 1px solid rgba(@gray-5, 0.3);
     pointer-events: none;
-    opacity: var(--umb-block-area--show-area-ui, 0);
+    opacity: var(--umb-block-grid--show-area-ui, 0);
     transition: opacity 240ms;
 }
-.umb-block-grid__block-area::after {
+.umb-block-grid__area::after {
 }
 
 .umb-block-grid__scalebox-backdrop {
