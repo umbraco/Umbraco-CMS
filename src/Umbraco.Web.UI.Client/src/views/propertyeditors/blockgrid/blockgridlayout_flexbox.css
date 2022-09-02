@@ -23,7 +23,7 @@
     align-self: flex-start;
 }
 .umb-block-grid__layout-item[data-force-left]::before {
-    content'';
+    content: '';
     flex-basis: 100%;
     height: 0;
 }
