@@ -58,22 +58,6 @@ public class DictionaryMapDefinition : IMapDefinition
         target.Name = source.ItemKey;
     }
 
-    private static void GetParentId(Guid parentId, ILocalizationService localizationService, List<int> ids)
-    {
-        IDictionaryItem? dictionary = localizationService.GetDictionaryItemById(parentId);
-        if (dictionary == null)
-        {
-            return;
-        }
-
-        ids.Add(dictionary.Id);
-
-        if (dictionary.ParentId.HasValue)
-        {
-            GetParentId(dictionary.ParentId.Value, localizationService, ids);
-        }
-    }
-
     // Umbraco.Code.MapAll -Icon -Trashed -Alias
     private void Map(IDictionaryItem source, DictionaryDisplay target, MapperContext context)
     {
