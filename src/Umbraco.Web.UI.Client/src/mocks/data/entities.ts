@@ -5,7 +5,7 @@ export const entities: Array<Entity> = [
 		id: 1,
 		key: '865a11f9-d140-4f21-8dfe-2caafc65a971',
 		type: 'member',
-		parentKey: '24fcd88a-d1bb-423b-b794-8a94dcddcb6a',
+		parentKey: '8f974b62-392b-4ddd-908c-03c2e03ab1a6',
 		name: 'Member 1',
 		hasChildren: false,
 		isTrashed: false,
@@ -14,16 +14,16 @@ export const entities: Array<Entity> = [
 		id: 2,
 		key: '06c6919c-6fa7-4aa5-8214-0582c721c472',
 		type: 'member',
-		parentKey: '24fcd88a-d1bb-423b-b794-8a94dcddcb6a',
+		parentKey: '8f974b62-392b-4ddd-908c-03c2e03ab1a6',
 		name: 'Member 2',
-		hasChildren: true,
+		hasChildren: false,
 		isTrashed: false,
 	},
 	{
 		id: 3,
 		key: '725a26c4-158d-4dc0-8aaa-b64473b11aa8',
 		type: 'member',
-		parentKey: '06c6919c-6fa7-4aa5-8214-0582c721c472',
+		parentKey: '8f974b62-392b-4ddd-908c-03c2e03ab1a6',
 		name: 'Member 3',
 		hasChildren: false,
 		isTrashed: false,
@@ -31,7 +31,7 @@ export const entities: Array<Entity> = [
 	{
 		id: 4,
 		key: '14be0f66-1472-452a-abde-9da6b4136073',
-		parentKey: 'd46d144e-33d8-41e3-bf7a-545287e16e3c',
+		parentKey: '575645a5-0f25-4671-b9a0-be515096ad6b',
 		type: 'memberGroup',
 		name: 'Member Group 1',
 		hasChildren: false,
@@ -40,7 +40,7 @@ export const entities: Array<Entity> = [
 	{
 		id: 5,
 		key: '8d5cf29a-e73b-4bf5-ad56-8adf6cbf8766',
-		parentKey: 'd46d144e-33d8-41e3-bf7a-545287e16e3c',
+		parentKey: '575645a5-0f25-4671-b9a0-be515096ad6b',
 		type: 'memberGroup',
 		name: 'Member Group 2',
 		hasChildren: false,
@@ -49,7 +49,7 @@ export const entities: Array<Entity> = [
 	{
 		id: 1245,
 		key: 'dt-1',
-		parentKey: '3fd3eba5-c893-4d3c-af67-f574e6eded38',
+		parentKey: '29d78e6c-c1bf-4c15-b820-d511c237ffae',
 		name: 'Text',
 		hasChildren: false,
 		isTrashed: false,
@@ -58,7 +58,7 @@ export const entities: Array<Entity> = [
 	{
 		id: 1244,
 		key: 'dt-2',
-		parentKey: '3fd3eba5-c893-4d3c-af67-f574e6eded38',
+		parentKey: '29d78e6c-c1bf-4c15-b820-d511c237ffae',
 		name: 'Textarea',
 		hasChildren: false,
 		isTrashed: false,
@@ -67,7 +67,7 @@ export const entities: Array<Entity> = [
 	{
 		id: 1246,
 		key: 'dt-3',
-		parentKey: '3fd3eba5-c893-4d3c-af67-f574e6eded38',
+		parentKey: '29d78e6c-c1bf-4c15-b820-d511c237ffae',
 		name: 'My JS Property Editor',
 		hasChildren: false,
 		isTrashed: false,
@@ -76,7 +76,7 @@ export const entities: Array<Entity> = [
 	{
 		id: 1247,
 		key: 'dt-4',
-		parentKey: '3fd3eba5-c893-4d3c-af67-f574e6eded38',
+		parentKey: '29d78e6c-c1bf-4c15-b820-d511c237ffae',
 		name: 'Context Example',
 		hasChildren: false,
 		isTrashed: false,
@@ -85,7 +85,7 @@ export const entities: Array<Entity> = [
 	{
 		id: 1248,
 		key: 'dt-5',
-		parentKey: '3fd3eba5-c893-4d3c-af67-f574e6eded38',
+		parentKey: '29d78e6c-c1bf-4c15-b820-d511c237ffae',
 		name: 'Content Picker (DataType)',
 		hasChildren: false,
 		isTrashed: false,
@@ -98,7 +98,7 @@ export const entities: Array<Entity> = [
 		type: 'documentType',
 		hasChildren: false,
 		isTrashed: false,
-		parentKey: '055a17d0-525a-4d06-9f75-92dc174ab0bd',
+		parentKey: 'f50eb86d-3ef2-4011-8c5d-c56c04eec0da',
 	},
 	{
 		id: 100,
@@ -107,7 +107,7 @@ export const entities: Array<Entity> = [
 		type: 'documentType',
 		hasChildren: false,
 		isTrashed: false,
-		parentKey: '055a17d0-525a-4d06-9f75-92dc174ab0bd',
+		parentKey: 'f50eb86d-3ef2-4011-8c5d-c56c04eec0da',
 	},
 	{
 		id: 2001,
@@ -117,7 +117,7 @@ export const entities: Array<Entity> = [
 		icon: 'picture',
 		hasChildren: false,
 		isTrashed: false,
-		parentKey: '',
+		parentKey: 'c0858d71-52be-4bb2-822f-42fa0c9a1ea5',
 	},
 	{
 		id: 2002,
@@ -127,7 +127,7 @@ export const entities: Array<Entity> = [
 		icon: 'picture',
 		hasChildren: false,
 		isTrashed: false,
-		parentKey: '',
+		parentKey: 'c0858d71-52be-4bb2-822f-42fa0c9a1ea5',
 	},
 	{
 		id: 1,
@@ -137,7 +137,7 @@ export const entities: Array<Entity> = [
 		icon: 'document',
 		hasChildren: false,
 		isTrashed: false,
-		parentKey: '',
+		parentKey: 'ba23245c-d8c0-46f7-a2bc-7623743d6eba',
 	},
 	{
 		id: 2,
@@ -147,7 +147,7 @@ export const entities: Array<Entity> = [
 		icon: 'favorite',
 		hasChildren: false,
 		isTrashed: false,
-		parentKey: '',
+		parentKey: 'ba23245c-d8c0-46f7-a2bc-7623743d6eba',
 	},
 	{
 		id: 3,
@@ -157,6 +157,6 @@ export const entities: Array<Entity> = [
 		icon: 'document',
 		hasChildren: false,
 		isTrashed: false,
-		parentKey: '',
+		parentKey: 'ba23245c-d8c0-46f7-a2bc-7623743d6eba',
 	},
 ];

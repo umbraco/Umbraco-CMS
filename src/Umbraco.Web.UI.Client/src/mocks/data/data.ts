@@ -1,7 +1,9 @@
 import { entities } from './entities';
+import { deepmerge } from 'deepmerge-ts';
+import { Entity } from './entity.data';
 
 // Temp mocked database
-export class UmbData<T extends { id: number; key: string; isTrashed: boolean }> {
+export class UmbData<T extends Entity> {
 	private _data: Array<T> = [];
 
 	constructor(data: Array<T>) {
@@ -42,13 +44,12 @@ export class UmbData<T extends { id: number; key: string; isTrashed: boolean }> 
 	}
 
 	private _updateEntity(saveItem: T) {
-		// TODO consider deep merge
 		const entityIndex = entities.findIndex((item) => item.key === saveItem.key);
 		const entity = entities[entityIndex];
 		if (!entity) return;
 
 		const entityKeys = Object.keys(entity);
-		const mergedData = Object.assign(entity, saveItem);
+		const mergedData = deepmerge(entity, saveItem);
 
 		for (const [key] of Object.entries(mergedData)) {
 			if (entityKeys.indexOf(key) === -1) {

@@ -32,7 +32,7 @@ export class UmbTreeNavigator extends UmbContextConsumerMixin(LitElement) {
 	private _observeTreeRoot() {
 		this._loading = true;
 
-		this._treeRootSubscription = this._treeContext?.fetchRoot().subscribe((items) => {
+		this._treeRootSubscription = this._treeContext?.fetchRoot?.().subscribe((items) => {
 			if (items?.length === 0) return;
 			this._items = items;
 			this._loading = false;

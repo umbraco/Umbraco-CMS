@@ -5,7 +5,7 @@ import { UmbTreeContext } from '../tree.context';
 export class UmbTreeMembersContext implements UmbTreeContext {
 	public entityStore: UmbEntityStore;
 
-	private _entityType = 'member';
+	private _rootKey = '8f974b62-392b-4ddd-908c-03c2e03ab1a6';
 
 	constructor(entityStore: UmbEntityStore) {
 		this.entityStore = entityStore;
@@ -13,8 +13,7 @@ export class UmbTreeMembersContext implements UmbTreeContext {
 
 	public fetchRoot() {
 		const data = {
-			id: -1,
-			key: '24fcd88a-d1bb-423b-b794-8a94dcddcb6a',
+			key: this._rootKey,
 			parentKey: '',
 			name: 'Members',
 			hasChildren: true,
@@ -22,14 +21,12 @@ export class UmbTreeMembersContext implements UmbTreeContext {
 			icon: 'favorite',
 		};
 		this.entityStore.update([data]);
-		return this.entityStore.entities.pipe(
-			map((items) => items.filter((item) => item.type === this._entityType && item.parentKey === ''))
-		);
+		return this.entityStore.entities.pipe(map((items) => items.filter((item) => item.key === this._rootKey)));
 	}
 
 	public fetchChildren(key: string) {
 		// TODO: figure out url structure
-		fetch(`/umbraco/backoffice/entities?type=${this._entityType}&parentKey=${key}`)
+		fetch(`/umbraco/backoffice/entities/members?parentKey=${key}`)
 			.then((res) => res.json())
 			.then((data) => {
 				this.entityStore.update(data);

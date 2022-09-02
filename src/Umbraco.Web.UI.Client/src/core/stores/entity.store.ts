@@ -1,9 +1,16 @@
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, map } from 'rxjs';
 import { Entity } from '../../mocks/data/entity.data';
+import { deepmerge } from 'deepmerge-ts';
 
 export class UmbEntityStore {
 	private _entities: BehaviorSubject<Array<Entity>> = new BehaviorSubject(<Array<Entity>>[]);
 	public readonly entities: Observable<Array<Entity>> = this._entities.asObservable();
+
+	getByKeys(keys: Array<string>): Observable<Array<Entity>> {
+		return this.entities.pipe(
+			map((entities: Array<Entity>) => entities.filter((entity: Entity) => keys.includes(entity.key)))
+		);
+	}
 
 	update(entities: Array<any>) {
 		this._updateStore(entities);
@@ -17,9 +24,8 @@ export class UmbEntityStore {
 			const index = storedItems.map((storedNode) => storedNode.key).indexOf(updatedItem.key);
 
 			if (index !== -1) {
-				// TODO consider deep merge
 				const entityKeys = Object.keys(storedItems[index]);
-				const mergedData = Object.assign(storedItems[index], updatedItem);
+				const mergedData = deepmerge(storedItems[index], updatedItem);
 
 				for (const [key] of Object.entries(mergedData)) {
 					if (entityKeys.indexOf(key) === -1) {

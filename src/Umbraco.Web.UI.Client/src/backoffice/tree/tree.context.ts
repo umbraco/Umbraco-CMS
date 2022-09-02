@@ -4,6 +4,6 @@ import { Entity } from '../../mocks/data/entity.data';
 
 export interface UmbTreeContext {
 	entityStore: UmbEntityStore;
-	fetchRoot(): Observable<Entity[]>;
-	fetchChildren(key: string): Observable<Entity[]>;
+	fetchRoot?(): Observable<Entity[]>;
+	fetchChildren?(key: string): Observable<Entity[]>;
 }

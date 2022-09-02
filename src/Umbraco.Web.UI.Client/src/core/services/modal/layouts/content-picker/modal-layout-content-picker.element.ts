@@ -46,46 +46,31 @@ export class UmbModalLayoutContentPickerElement extends UmbModalLayoutElement<Um
 		`,
 	];
 
-	private _tempContent = [
-		{
-			id: 1,
-			name: 'Content 1',
-			description: 'Content 1 description',
-			icon: 'icon-umb-content',
-		},
-		{
-			id: 2,
-			name: 'Content 2',
-			description: 'Content 2 description',
-			icon: 'icon-umb-content',
-		},
-		{
-			id: 3,
-			name: 'Content 3',
-			description: 'Content 3 description',
-			icon: 'icon-umb-content',
-		},
-	];
-
 	@state()
-	_selectedContent: any[] = [];
+	_selection: Array<string> = [];
 
-	private _clickContent(content: any) {
-		if (this._selectedContent.includes(content)) {
-			this._selectedContent = this._selectedContent.filter((c) => c !== content);
+	private _handleSelect(e: CustomEvent) {
+		e.stopPropagation();
+		const item = e.composedPath()?.[0] as any;
+		const key = item.itemKey;
+		this._select(key);
+	}
+
+	private _select(key: string) {
+		// TODO: implement single selection
+		if (this._selection.includes(key)) {
+			this._selection = this._selection.filter((c) => c !== key);
 		} else {
-			this._selectedContent.push(content);
+			this._selection.push(key);
 		}
-
-		this.requestUpdate('_selectedContent');
 	}
 
 	private _submit() {
-		this.modalHandler?.close({ selection: this._selectedContent });
+		this.modalHandler?.close({ selection: this._selection });
 	}
 
 	private _close() {
-		this.modalHandler?.close();
+		this.modalHandler?.close({ selection: this._selection });
 	}
 
 	render() {
@@ -96,7 +81,7 @@ export class UmbModalLayoutContentPickerElement extends UmbModalLayoutElement<Um
 				<uui-box>
 					<uui-input></uui-input>
 					<hr />
-					<umb-tree-document></umb-tree-document>
+					<umb-tree-document @select="${this._handleSelect}" selectable></umb-tree-document>
 				</uui-box>
 				<div slot="actions">
 					<uui-button label="Close" @click=${this._close}></uui-button>

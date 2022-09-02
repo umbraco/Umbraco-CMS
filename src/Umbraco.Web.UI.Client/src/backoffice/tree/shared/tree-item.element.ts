@@ -61,6 +61,14 @@ export class UmbTreeItem extends UmbContextConsumerMixin(LitElement) {
 		});
 	}
 
+	connectedCallback(): void {
+		super.connectedCallback();
+		this.addEventListener('selected', (e) => {
+			e.stopPropagation();
+			this.dispatchEvent(new CustomEvent('select', { bubbles: true, composed: true }));
+		});
+	}
+
 	private _useSection() {
 		this._sectionSubscription?.unsubscribe();
 
@@ -82,7 +90,7 @@ export class UmbTreeItem extends UmbContextConsumerMixin(LitElement) {
 
 		this._childrenSubscription?.unsubscribe();
 
-		this._childrenSubscription = this._treeContext?.fetchChildren(this.itemKey).subscribe((items) => {
+		this._childrenSubscription = this._treeContext?.fetchChildren?.(this.itemKey).subscribe((items) => {
 			if (items?.length === 0) return;
 			this._childItems = items;
 			this._loading = false;
