@@ -26,4 +26,8 @@
         <PrivateAssets>all</PrivateAssets>
       </PackageReference>
     </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="ViewModels\Culture" />
+    </ItemGroup>
 </Project>
