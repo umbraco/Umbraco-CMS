@@ -7,19 +7,19 @@ using Umbraco.Cms.Core.Services;
 namespace Umbraco.Cms.ManagementApi.Controllers.Dictionary;
 
 [ApiVersion("1.0")]
-public class GetByIntIdDictionaryController : DictionaryControllerBase
+public class GetDictionaryController : DictionaryControllerBase
 {
     private readonly ILocalizationService _localizationService;
     private readonly IUmbracoMapper _umbracoMapper;
 
-    public GetByIntIdDictionaryController(ILocalizationService localizationService, IUmbracoMapper umbracoMapper)
+    public GetDictionaryController(ILocalizationService localizationService, IUmbracoMapper umbracoMapper)
     {
         _localizationService = localizationService;
         _umbracoMapper = umbracoMapper;
     }
 
     /// <summary>
-    ///     Gets a dictionary item by id
+    ///     Gets a dictionary item by guid
     /// </summary>
     /// <param name="id">
     ///     The id.
@@ -27,7 +27,8 @@ public class GetByIntIdDictionaryController : DictionaryControllerBase
     /// <returns>
     ///     The <see cref="DictionaryDisplay" />. Returns a not found response when dictionary item does not exist
     /// </returns>
-    public ActionResult<DictionaryDisplay?> GetById(int id)
+    [HttpGet("/{id:Guid}")]
+    public ActionResult<DictionaryDisplay?> GetById(Guid id)
     {
         IDictionaryItem? dictionary = _localizationService.GetDictionaryItemById(id);
         if (dictionary == null)
