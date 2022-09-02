@@ -19,11 +19,11 @@ public class GetLanguageController : LanguageControllerBase
         _umbracoMapper = umbracoMapper;
     }
 
-    [HttpGet("/{id:int}")]
+    [HttpGet("{id:int}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<LanguageViewModel?>> GetLanguage(int id)
+    public async Task<ActionResult<LanguageViewModel?>> Get(int id)
     {
         ILanguage? lang = _localizationService.GetLanguageById(id);
         if (lang == null)
