@@ -26,7 +26,7 @@ public class UpdateLanguageController : LanguageControllerBase
     /// <summary>
     ///     Creates or saves a language
     /// </summary>
-    [HttpPost("update")]
+    [HttpPut("update")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status200OK)]
