@@ -17,7 +17,8 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     "blocklist",
     ValueType = ValueTypes.Json,
     Group = Constants.PropertyEditors.Groups.Lists,
-    Icon = "icon-thumbnail-list")]
+    Icon = "icon-thumbnail-list",
+    ValueEditorIsReusable = false)]
 public class BlockListPropertyEditor : BlockEditorPropertyEditor
 {
     private readonly IEditorConfigurationParser _editorConfigurationParser;
