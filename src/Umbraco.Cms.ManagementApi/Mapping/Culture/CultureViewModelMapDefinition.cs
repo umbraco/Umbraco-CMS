@@ -5,6 +5,7 @@ using Umbraco.Cms.ManagementApi.ViewModels.Pagination;
 
 namespace Umbraco.Cms.ManagementApi.Mapping.Culture;
 
+/// <inheritdoc />
 public class CultureViewModelMapDefinition : IMapDefinition
 {
     /// <inheritdoc/>
