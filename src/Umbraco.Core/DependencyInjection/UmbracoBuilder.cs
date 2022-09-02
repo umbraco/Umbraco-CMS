@@ -325,6 +325,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IDataTypeUsageService, DataTypeUsageService>();
 
             Services.AddUnique<ICultureImpactFactory, CultureImpactFactory>();
+            Services.AddUnique<IDictionaryService, DictionaryService>();
         }
     }
 }
