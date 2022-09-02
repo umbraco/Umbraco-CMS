@@ -221,10 +221,10 @@
 
             function _onDragMouseMove(evt) {    
                 /** ignorer last drag event, comes as screenX === 0 and screenY === 0 */
-                if(targetRect && itemRect && evt.screenX !== 0 && evt.screenY !== 0) {
+                if(targetRect && itemRect && evt.clientX !== 0 && evt.screenY !== 0) {
                     var oldValue = vm.movingLayoutEntry.forceLeft;
                     // TODO: get first columns width and use it:
-                    var newValue = (evt.screenX < targetRect.x + itemRect.width);
+                    var newValue = (evt.clientX < targetRect.left + 50);
                     if(newValue !== oldValue) {
                         vm.movingLayoutEntry.forceLeft = newValue;
                         vm.movingLayoutEntry.$block.__scope.$evalAsync();// needed for the block to be updated
@@ -232,7 +232,7 @@
 
                     oldValue = vm.movingLayoutEntry.forceRight;
                     // TODO: get last columns width and use it:
-                    newValue = (evt.screenX > targetRect.x + targetRect.width - itemRect.width);
+                    newValue = (evt.clientX > targetRect.left + targetRect.width - 50);
                     if(newValue !== oldValue) {
                         vm.movingLayoutEntry.forceRight = newValue;
                         vm.movingLayoutEntry.$block.__scope.$evalAsync();// needed for the block to be updated
@@ -267,7 +267,7 @@
                 invertedSwapThreshold: .55, // Threshold of the inverted swap zone (will be set to swapThreshold value by default)
                 //direction: 'horizontal', // Direction of Sortable (will be detected automatically if not given)
 
-                //forceFallback: true,  // ignore the HTML5 DnD behaviour and force the fallback to kick in
+                //forceFallback: true,  // ignore the HTML5 DnD behavior and force the fallback to kick in
 
                 //fallbackClass: "sortable-fallback",  // Class name for the cloned DOM Element when using forceFallback
                 //fallbackOnBody: false,  // Appends the cloned DOM Element into the Document's Body
