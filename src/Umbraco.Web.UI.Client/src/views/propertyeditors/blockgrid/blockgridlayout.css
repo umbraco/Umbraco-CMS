@@ -19,6 +19,7 @@
     grid-auto-rows: minmax(50px, min-content);
 }
 .umb-block-grid__layout-item {
+    position: relative;
     grid-column-end: span min(calc(var(--umb-block-grid--item-column-span, 1) * 3), var(--umb-block-grid--grid-columns));
     grid-row: span var(--umb-block-grid--item-row-span, 1);
 }
@@ -31,11 +32,12 @@
 
 
 .umb-block-grid__block-area-container {
-    position: relative;
-    display: grid;
     /* overwrite grid-columns for the areas container: */
     /* the overwrite of --umb-block-grid--grid-columns needs to be transfered to the areas to not overwrite it self.*/
     --umb-block-grid--area-grid-columns--overwrite: var(--umb-block-grid--area-grid-columns, var(--umb-block-grid--grid-columns, 1));
+    
+    position: relative;
+    display: grid;
     grid-template-columns: repeat(var(--umb-block-grid--area-grid-columns--overwrite), minmax(0, 1fr));
     grid-gap: 0px;
     grid-auto-flow: row;
@@ -46,7 +48,8 @@
     /* overwrite grid-columns for the area: */
     /* notice we do this cause --umb-block-grid--grid-columns inherits to .umb-block-grid__layout-container to adjust for fitting in the Area*/
     --umb-block-grid--grid-columns: var(--umb-block-grid--area-column-span, var(--umb-block-grid--area-grid-columns--overwrite, 1));
-    //grid-column-end: span var(--umb-block-grid--area-column-span, 1);
+    
+    position: relative;
     grid-column-end: span min(calc(var(--umb-block-grid--item-column-span, 1) * 3), var(--umb-block-grid--grid-columns));
     grid-row: span var(--umb-block-grid--area-row-span, 1);
 }
