@@ -1,6 +1,8 @@
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Core.Models.Mapping;
 
@@ -14,8 +16,9 @@ public class DictionaryMapDefinition : IMapDefinition
     private readonly ILocalizationService _localizationService;
 
     [Obsolete("Use the constructor with the CommonMapper")]
-    public DictionaryMapDefinition(ILocalizationService localizationService) =>
-        _localizationService = localizationService;
+    public DictionaryMapDefinition(ILocalizationService localizationService) : this(localizationService, StaticServiceProvider.Instance.GetRequiredService<CommonMapper>())
+    {
+    }
 
     public DictionaryMapDefinition(ILocalizationService localizationService, CommonMapper commonMapper)
     {
