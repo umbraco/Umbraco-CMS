@@ -22,7 +22,7 @@ public class DeleteLanguageController : LanguageControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     // TODO: This needs to be an authorized endpoint.
-    public async Task<IActionResult> DeleteLanguage(int id)
+    public async Task<IActionResult> Delete(int id)
     {
         ILanguage? language = _localizationService.GetLanguageById(id);
         if (language == null)
