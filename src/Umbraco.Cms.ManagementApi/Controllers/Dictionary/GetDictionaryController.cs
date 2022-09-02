@@ -27,7 +27,7 @@ public class GetDictionaryController : DictionaryControllerBase
     /// <returns>
     ///     The <see cref="DictionaryDisplay" />. Returns a not found response when dictionary item does not exist
     /// </returns>
-    [HttpGet("/{id:Guid}")]
+    [HttpGet("{id:guid}")]
     public ActionResult<DictionaryDisplay?> GetById(Guid id)
     {
         IDictionaryItem? dictionary = _localizationService.GetDictionaryItemById(id);
