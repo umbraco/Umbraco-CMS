@@ -41,7 +41,7 @@ public class CreateDictionaryController : DictionaryControllerBase
     ///     The <see cref="HttpResponseMessage" />.
     /// </returns>
     [HttpPost("create")]
-    public async Task<ActionResult<int>> Create(DictionaryViewModel dictionaryViewModel)
+    public async Task<ActionResult<int>> Create(DictionaryItemViewModel dictionaryViewModel)
     {
         if (string.IsNullOrEmpty(dictionaryViewModel.Key))
         {
