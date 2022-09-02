@@ -12,11 +12,7 @@ public class RichTextEditorSettings
 
     internal const string StaticInvalidElements = "font";
 
-    private static readonly string[] Default_plugins =
-    {
-        "paste", "anchor", "charmap", "table", "lists", "advlist", "hr", "autolink", "directionality", "tabfocus",
-        "searchreplace",
-    };
+    internal const string StaticPlugins = "paste,anchor,charmap,table,lists,advlist,hr,autolink,directionality,tabfocus,searchreplace";
 
     private static readonly RichTextEditorCommand[] Default_commands =
     {
@@ -124,7 +120,8 @@ public class RichTextEditorSettings
     /// <summary>
     ///     HTML RichText Editor TinyMCE Plugins
     /// </summary>
-    public IEnumerable<string> Plugins { get; set; } = Default_plugins;
+    [DefaultValue(StaticPlugins)]
+    public IEnumerable<string> Plugins { get; set; } = StaticPlugins.Split(',');
 
     /// <summary>
     ///     HTML RichText Editor TinyMCE Custom Config
