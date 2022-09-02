@@ -1,5 +1,6 @@
 ﻿using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.ManagementApi.Mapping.Culture;
 using Umbraco.Cms.ManagementApi.Mapping.Installer;
 using Umbraco.Cms.ManagementApi.Mapping.Languages;
 
@@ -11,7 +12,8 @@ public static class MappingBuilderExtensions
     {
         builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>()
             .Add<LanguageViewModelsMapDefinition>()
-            .Add<InstallerViewModelsMapDefinition>();
+            .Add<InstallerViewModelsMapDefinition>()
+            .Add<CultureViewModelMapDefinition>();
 
         return builder;
     }
