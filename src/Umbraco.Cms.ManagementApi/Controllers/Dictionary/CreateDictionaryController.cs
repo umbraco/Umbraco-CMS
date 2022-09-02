@@ -76,7 +76,7 @@ public class CreateDictionaryController : DictionaryControllerBase
                 string.Empty);
 
 
-            return item.Id;
+            return Created($"api/v1.0/dictionary/{item.Key}", null);
         }
         catch (Exception ex)
         {
