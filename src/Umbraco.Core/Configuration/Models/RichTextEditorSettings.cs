@@ -124,7 +124,7 @@ public class RichTextEditorSettings
     /// <summary>
     ///     HTML RichText Editor TinyMCE Plugins
     /// </summary>
-    public string[] Plugins { get; set; } = Default_plugins;
+    public IEnumerable<string> Plugins { get; set; } = Default_plugins;
 
     /// <summary>
     ///     HTML RichText Editor TinyMCE Custom Config
