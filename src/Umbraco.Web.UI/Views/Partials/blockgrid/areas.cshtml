@@ -4,6 +4,7 @@
 }
 
 <div class="umb-block-grid__block-area-container"
+     data-area-grid-columns="@(Model.AreaGridColumns?.ToString() ?? "initial");"
      style="--umb-block-grid--area-grid-columns: @(Model.AreaGridColumns?.ToString() ?? "initial");">
     @foreach (var area in Model.Areas)
     {

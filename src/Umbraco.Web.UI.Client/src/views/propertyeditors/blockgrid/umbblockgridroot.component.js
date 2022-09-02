@@ -41,7 +41,10 @@
                         --umb-block-grid--grid-columns: ${vm.gridColumns};
                     }
                 </style>
-                <div class="umb-block-grid__root-container">
+                <div 
+                    class="umb-block-grid__root-container"
+                    data-grid-columns="${vm.gridColumns}"
+                >
                     <umb-block-grid-entries
                         block-editor-api="vm.blockEditorApi"
                         entries="vm.entries"
