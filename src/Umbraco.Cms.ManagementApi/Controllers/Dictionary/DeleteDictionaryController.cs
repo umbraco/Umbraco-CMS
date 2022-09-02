@@ -24,7 +24,7 @@ public class DeleteDictionaryController : DictionaryControllerBase
     ///     <see cref="HttpResponseMessage" />
     /// </returns>
     [HttpDelete("delete/{id:int}")]
-    public IActionResult Delete(int id)
+    public async Task<IActionResult> Delete(int id)
     {
         IDictionaryItem? foundDictionary = _localizationService.GetDictionaryItemById(id);
 
