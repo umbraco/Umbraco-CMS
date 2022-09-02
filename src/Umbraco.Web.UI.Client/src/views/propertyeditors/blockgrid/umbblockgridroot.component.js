@@ -42,7 +42,7 @@
                     }
                 </style>
                 <div 
-                    class="umb-block-grid__root-container"
+                    class="umb-block-grid"
                     data-grid-columns="${vm.gridColumns}"
                 >
                     <umb-block-grid-entries

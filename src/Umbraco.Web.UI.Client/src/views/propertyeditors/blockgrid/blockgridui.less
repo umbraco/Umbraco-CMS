@@ -24,7 +24,7 @@
     */
 }
 
-.umb-block-grid__root-container {
+.umb-block-grid {
     position: relative;
 }
 
@@ -505,6 +505,8 @@ umb-block-grid-block {
     border: 1px dashed @ui-action-discreet-border;
     border-radius: @baseBorderRadius;
     box-sizing: border-box;
+
+    clear: both;// needed for layouts using float.
 
     &:hover {
         border-color: transparent;

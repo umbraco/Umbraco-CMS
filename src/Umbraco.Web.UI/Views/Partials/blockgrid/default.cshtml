@@ -3,7 +3,7 @@
     if (Model?.Any() != true) { return; }
 }
 
-<div class="umb-block-grid__root-container"
+<div class="umb-block-grid"
      data-grid-columns="@(Model.GridColumns?.ToString() ?? "initial");"
      style="--umb-block-grid--grid-columns: @(Model.GridColumns?.ToString() ?? "initial");">
     @await Html.GetBlockGridItemsHtmlAsync(Model)
