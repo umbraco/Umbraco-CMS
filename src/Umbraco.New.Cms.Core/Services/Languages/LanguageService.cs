@@ -30,7 +30,8 @@ public class LanguageService : ILanguageService
             return true;
         }
 
-        return false;
+        ILanguage? existingById = id != default ? _localizationService.GetLanguageById(id) : null;
+        return existingById is not null;
     }
 
     public bool CanUseLanguagesFallbackLanguage(ILanguage language)
