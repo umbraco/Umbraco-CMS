@@ -31,7 +31,7 @@ public class UpdateLanguageController : LanguageControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     // TODO: This needs to be an authorized endpoint.
-    public async Task<ActionResult<LanguageViewModel?>> Update(LanguageViewModel language)
+    public async Task<ActionResult> Update(LanguageViewModel language)
     {
         ILanguage? existingById = language.Id != default ? _localizationService.GetLanguageById(language.Id) : null;
         if (existingById is null)
@@ -64,6 +64,6 @@ public class UpdateLanguageController : LanguageControllerBase
         }
 
         _localizationService.Save(existingById);
-        return _umbracoMapper.Map<LanguageViewModel>(existingById);
+        return Ok();
     }
 }

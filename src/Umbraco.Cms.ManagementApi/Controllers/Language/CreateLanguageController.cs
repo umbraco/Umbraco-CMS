@@ -31,7 +31,7 @@ public class CreateLanguageController : LanguageControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     // TODO: This needs to be an authorized endpoint.
-    public async Task<ActionResult<LanguageViewModel?>> Create(LanguageViewModel language)
+    public async Task<ActionResult> Create(LanguageViewModel language)
     {
         if (_languageService.LanguageAlreadyExists(language.Id, language.IsoCode))
         {
@@ -54,9 +54,9 @@ public class CreateLanguageController : LanguageControllerBase
 
         language.Name ??= culture.EnglishName;
 
-        ILanguage? newLang = _umbracoMapper.Map<ILanguage>(language);
+        ILanguage newLang = _umbracoMapper.Map<ILanguage>(language)!;
 
-        _localizationService.Save(newLang!);
-        return _umbracoMapper.Map<LanguageViewModel>(newLang);
+        _localizationService.Save(newLang);
+        return Created($"api/v1.0/language/{newLang.Id}", null);
     }
 }
