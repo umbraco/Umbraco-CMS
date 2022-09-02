@@ -1,40 +1,34 @@
 <div>
     <div class="umb-app-header">
         <div class="umb-app-header__logo" ng-if="hideBackofficeLogo !== true">
-            <button
-                type="button"
-                class="btn-reset"
-                ng-click="toggleLogoModal()"
-            >
-                <img
-                    src="assets/img/application/umbraco_logomark_white.svg"
-                    alt="Umbraco"
-                />
+            <button type="button"
+                    class="btn-reset"
+                    ng-click="toggleLogoModal()">
+                <img src="assets/img/application/umbraco_logomark_white.svg"
+                     alt="Umbraco"
+                     width="32"
+                     height="32"
+                     draggable="false" />
             </button>
             <div
                 tabindex="0"
+                class="umb-app-header__logo-modal"
                 on-outside-click="hideLogoModal()"
                 ng-click="stopClickEvent($event)"
                 ng-focus="keepLogoModal()"
                 ng-blur="hideLogoModal()"
-                class="umb-app-header__logo-modal"
-                ng-if="logoModal.show"
-            >
-                <img
-                    src="assets/img/application/umbraco_logo_large_blue.svg"
-                    alt="Umbraco — The Friendly CMS"
-                />
+                ng-if="logoModal.show">
+                <img src="assets/img/application/umbraco_logo_large_blue.svg"
+                     alt="Umbraco — The Friendly CMS" />
                 <small> {{logoModal.text}} </small>
                 <br /><br />
-                <a
-                    href="https://umbraco.com"
-                    title="Umbraco website"
-                    target="_blank"
-                    rel="noopener"
-                    ng-focus="keepLogoModal()"
-                    ng-blur="hideLogoModal()"
-                    >Umbraco.com</a
-                >
+                <a href="https://umbraco.com"
+                   title="Umbraco website"
+                   target="_blank"
+                   rel="noopener"
+                   ng-focus="keepLogoModal()"
+                   ng-blur="hideLogoModal()">
+                Umbraco.com</a>
             </div>
         </div>
 
