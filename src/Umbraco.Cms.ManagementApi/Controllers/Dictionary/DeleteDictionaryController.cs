@@ -22,7 +22,7 @@ public class DeleteDictionaryController : DictionaryControllerBase
     /// <returns>
     ///     <see cref="HttpResponseMessage" />
     /// </returns>
-    [HttpDelete]
+    [HttpDelete("delete/{id:int}")]
     public IActionResult Delete(int id)
     {
         IDictionaryItem? foundDictionary = _localizationService.GetDictionaryItemById(id);
