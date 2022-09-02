@@ -1,0 +1,67 @@
+
+
+/*
+    Dev note, maybe this concept can be used for somethings:
+    grid-template-columns: 
+        [column-start] 1fr
+        repeat(calc(var(--umb-block-grid--area-column-span, var(--umb-block-grid--grid-columns, 1)) - 2), minmax(0, 1fr))
+        [column-end] 1fr
+    ;
+*/
+
+.umb-block-grid__layout-container {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+}
+.umb-block-grid__layout-item {
+    
+    --umb-block-grid__layout-item-calc: calc(var(--umb-block-grid--item-column-span) / var(--umb-block-grid--grid-columns));
+    width: calc(var(--umb-block-grid__layout-item-calc) * 100%);
+}
+.umb-block-grid__layout-item[data-force-left] {
+    align-self: flex-start;
+    ::before {
+        content'';
+        flex-basis: 100%;
+        height: 0;
+    }
+}
+.umb-block-grid__layout-item[data-force-right] {
+    margin-left: auto;
+    align-self: flex-end;
+}
+
+
+/* TODO: remove block from these classes: */
+.umb-block-grid__area-container {
+    /* overwrite grid-columns for the areas container: */
+    /* the overwrite of --umb-block-grid--grid-columns needs to be transfered to the areas to not overwrite it self.*/
+    /*--umb-block-grid--area-grid-columns--overwrite: var(--umb-block-grid--area-grid-columns, var(--umb-block-grid--grid-columns, 1));*/
+    
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+}
+.umb-block-grid__area {
+    
+    --umb-block-grid--area-grid-columns--overwrite: var(--umb-block-grid--area-grid-columns, var(--umb-block-grid--grid-columns, 1));
+    --umb-block-grid__area-calc: calc(var(--umb-block-grid--area-column-span) / var(--umb-block-grid--area-grid-columns--overwrite));
+    width: calc(var(--umb-block-grid__area-calc) * 100%);
+}
+.umb-block-grid__area > .umb-block-grid__layout-container {
+    /* overwrite grid-columns for the area: */
+    /* notice we do this cause --umb-block-grid--grid-columns inherits to .umb-block-grid__layout-container to adjust for fitting in the Area*/
+    --umb-block-grid--grid-columns: var(--umb-block-grid--area-column-span, var(--umb-block-grid--area-grid-columns--overwrite, 1));
+}
+/*
+@media (min-width:1024px) {
+    .umb-block-grid__layout-item {
+        grid-column-end: span var(--umb-block-grid--item-column-span, 1);
+    }
+    .umb-block-grid__area {
+        grid-column-end: span var(--umb-block-grid--area-column-span, 1);
+    }
+}
+*/
