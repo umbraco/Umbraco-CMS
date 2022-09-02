@@ -31,7 +31,7 @@
 }
 
 
-.umb-block-grid__block-area-container {
+.umb-block-grid__area-container {
     /* overwrite grid-columns for the areas container: */
     /* the overwrite of --umb-block-grid--grid-columns needs to be transfered to the areas to not overwrite it self.*/
     --umb-block-grid--area-grid-columns--overwrite: var(--umb-block-grid--area-grid-columns, var(--umb-block-grid--grid-columns, 1));

@@ -3,12 +3,12 @@
     if (Model?.Areas.Any() != true) { return; }
 }
 
-<div class="umb-block-grid__block-area-container"
+<div class="umb-block-grid__area-container"
      data-area-grid-columns="@(Model.AreaGridColumns?.ToString() ?? "initial");"
      style="--umb-block-grid--area-grid-columns: @(Model.AreaGridColumns?.ToString() ?? "initial");">
     @foreach (var area in Model.Areas)
     {
-        <div class="umb-block-grid__block-area"
+        <div class="umb-block-grid__area"
          data-area-col-span="@area.ColumnSpan"
          data-area-row-span="@area.RowSpan"
          data-area-alias="@area.Alias"

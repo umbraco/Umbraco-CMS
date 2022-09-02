@@ -22,13 +22,13 @@
             <div class="umb-block-grid__block--view">
                 <!-- render razor view for this block. -->
                 <!-- Razor view must handle/inject/ decide where the 'area-container' should be printed: -->
-                <div class="umb-block-grid__block-area-container"
+                <div class="umb-block-grid__area-container"
                      style="--umb-block-grid--area-grid-columns: {{ 'the-configured-amount' or 'initial'}};"
                 >
 
                     <!-- repeat for each area configured for this block type. -->
                     <div
-                        class="umb-block-grid__block-area"
+                        class="umb-block-grid__area"
                         data-area-col-span="{{areaEntry.$config.columnSpan}}"
                         data-area-row-span="{{areaEntry.$config.rowSpan}}"
                         style="
