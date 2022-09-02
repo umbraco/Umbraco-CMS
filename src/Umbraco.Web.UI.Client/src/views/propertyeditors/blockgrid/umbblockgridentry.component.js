@@ -160,12 +160,14 @@
             gridRows = computedStyles.gridTemplateRows.trim().split("px").map(x => Number(x));
 
             // remove empties:
-            if(gridColumns[gridColumns.length-1] === 0) {
+            gridColumns = gridColumns.filter(n => n >= 0)
+            /*if(gridColumns[gridColumns.length-1] === 0) {
                 gridColumns.pop();
-            }
-            if(gridRows[gridRows.length-1] === 0) {
+            }*/
+            gridRows = gridRows.filter(n => n >= 0)
+            /*if(gridRows[gridRows.length-1] === 0) {
                 gridRows.pop();
-            }
+            }*/
             // ensure all columns are there.
             // This will ensure handling non-css-grid mode,
             // use container width divided by amount of columns( or the item width divided by its amount of columnSpan)
@@ -173,7 +175,7 @@
             let gridColumnNumber = parseInt(computedStyles.getPropertyValue('--umb-block-grid--grid-columns'));
             const amountOfUnknownColumns = gridColumnNumber-amountOfColumnsInWeightMap;
             if(amountOfUnknownColumns > 0) {
-                let accumulatedValue = getAccumulatedValueOfIndex(amountOfColumnsInWeightMap, gridColumns);
+                let accumulatedValue = getAccumulatedValueOfIndex(amountOfColumnsInWeightMap, gridColumns) || 0;
                 const layoutWidth = layoutContainerRect.width;
                 const missingColumnWidth = (layoutWidth-accumulatedValue)/amountOfUnknownColumns;
                 while(amountOfColumnsInWeightMap++ < gridColumnNumber) {
@@ -181,14 +183,18 @@
                 }
             }
 
+
             // Handle non css grid mode for Rows:
             // use item height divided by rowSpan to identify row heights.
             if(gridRows.length === 0) {
                 // Push its own height twice, to give something to scale with.
-                gridRows.push(layoutItemRect.height);
-                gridRows.push(layoutItemRect.height);
-                // TODO: need to do some more here..
-                // Fill up with something til the items position? then the items height and then just 50ish.
+                gridRows.push(layoutItemRect.top - layoutContainerRect.top);
+
+                let i = 0;
+                const itemSingleRowHeight = layoutItemRect.height;
+                while(i++ < vm.layoutEntry.rowSpan) {
+                    gridRows.push(itemSingleRowHeight);
+                }
             }
 
             // add a few extra rows, so there is something to extend too.
