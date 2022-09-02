@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.ManagementApi.ViewModels.Dictionary;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.Dictionary;
@@ -31,27 +32,23 @@ public class CreateDictionaryController : DictionaryControllerBase
         _backofficeSecurityAccessor = backofficeSecurityAccessor;
         _logger = logger;
     }
+
     /// <summary>
     ///     Creates a new dictionary item
     /// </summary>
-    /// <param name="parentId">
-    ///     The parent id.
-    /// </param>
-    /// <param name="key">
-    ///     The key.
-    /// </param>
+    /// <param name="dictionaryViewModel">The viewmodel to pass to the action</param>
     /// <returns>
     ///     The <see cref="HttpResponseMessage" />.
     /// </returns>
     [HttpPost("create")]
-    public async Task<ActionResult<int>> Create(int parentId, string key)
+    public async Task<ActionResult<int>> Create(DictionaryViewModel dictionaryViewModel)
     {
-        if (string.IsNullOrEmpty(key))
+        if (string.IsNullOrEmpty(dictionaryViewModel.Key))
         {
             return ValidationProblem("Key can not be empty."); // TODO: translate
         }
 
-        if (_localizationService.DictionaryItemExists(key))
+        if (_localizationService.DictionaryItemExists(dictionaryViewModel.Key))
         {
             var message = _localizedTextService.Localize(
                 "dictionaryItem",
@@ -59,7 +56,7 @@ public class CreateDictionaryController : DictionaryControllerBase
                 _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.GetUserCulture(_localizedTextService, _globalSettings),
                 new Dictionary<string, string?>
                 {
-                    {"0", key}
+                    { "0", dictionaryViewModel.Key },
                 });
             return ValidationProblem(message);
         }
@@ -68,13 +65,13 @@ public class CreateDictionaryController : DictionaryControllerBase
         {
             Guid? parentGuid = null;
 
-            if (parentId > 0)
+            if (dictionaryViewModel.ParentId > 0)
             {
-                parentGuid = _localizationService.GetDictionaryItemById(parentId)?.Key;
+                parentGuid = _localizationService.GetDictionaryItemById(dictionaryViewModel.ParentId)?.Key;
             }
 
             IDictionaryItem item = _localizationService.CreateDictionaryItemWithIdentity(
-                key,
+                dictionaryViewModel.Key,
                 parentGuid,
                 string.Empty);
 
@@ -83,7 +80,7 @@ public class CreateDictionaryController : DictionaryControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error creating dictionary with {Name} under {ParentId}", key, parentId);
+            _logger.LogError(ex, "Error creating dictionary with {Name} under {ParentId}", dictionaryViewModel.Key, dictionaryViewModel.ParentId);
             return ValidationProblem("Error creating dictionary item");
         }
     }
