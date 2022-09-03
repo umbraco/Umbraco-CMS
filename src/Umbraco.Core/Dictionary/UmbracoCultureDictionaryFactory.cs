@@ -21,7 +21,6 @@ public class DefaultCultureDictionaryFactory : ICultureDictionaryFactory
         _localizationService = localizationService;
         _appCaches = appCaches;
     }
-
     public ICultureDictionary CreateDictionary() =>
         new DefaultCultureDictionary(_localizationService, _appCaches.RequestCache);
     public ICultureDictionary CreateDictionary(CultureInfo specificCulture) => new DefaultCultureDictionary(specificCulture,_localizationService, _appCaches.RequestCache);
