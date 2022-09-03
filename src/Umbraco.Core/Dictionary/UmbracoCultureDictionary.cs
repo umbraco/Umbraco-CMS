@@ -48,7 +48,7 @@ internal class DefaultCultureDictionary : ICultureDictionary
     }
 
     /// <summary>
-    ///     Returns the current culture
+    ///     Returns the defualt umbraco's back office culture
     /// </summary>
     public CultureInfo Culture => _specificCulture ?? new CultureInfo( _localizationService.GetDefaultLanguageIsoCode());
 
