@@ -35,6 +35,11 @@ angular.module("umbraco")
                     }
                 }
 
+                var activeApp = apps.filter(x => x.active);
+                if (activeApp.length === 0 && apps.length > 0) {
+                  apps[0].active = true;
+                }
+
                 vm.tabs = apps;
             }
 
