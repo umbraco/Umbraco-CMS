@@ -151,7 +151,7 @@ public class UmbracoHelper
     public string? GetDictionaryValue(string key, CultureInfo specificCulture)
     {
         this._cultureDictionary = _cultureDictionaryFactory.CreateDictionary(specificCulture);
-        return this.GetDictionaryValue(key);
+        return GetDictionaryValue(key);
     }
 
     /// <summary>
@@ -181,7 +181,7 @@ public class UmbracoHelper
     public string GetDictionaryValueOrDefault(string key, CultureInfo specificCulture, string altText)
     {
         _cultureDictionary = _cultureDictionaryFactory.CreateDictionary(specificCulture);
-        var dictionaryValue = this.GetDictionaryValue(key);
+        var dictionaryValue = GetDictionaryValue(key);
         if (string.IsNullOrWhiteSpace(dictionaryValue))
         {
             dictionaryValue = altText;
