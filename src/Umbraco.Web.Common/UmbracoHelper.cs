@@ -1,4 +1,6 @@
+using System.Globalization;
 using System.Xml.XPath;
+using Serilog.Events;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Dictionary;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -139,13 +141,26 @@ public class UmbracoHelper
     /// <returns></returns>
     public string? GetDictionaryValue(string key) => CultureDictionary[key];
 
+
+    /// <summary>
+    ///     Returns the dictionary value for the key specified, and if empty returns the specified default fall back value
+    /// </summary>
+    /// <param name="key">key of dictionary item</param>
+    /// <param name="specificCulture">the specific culture on which the result well be back upon</param>
+    /// <returns></returns>
+    public string? GetDictionaryValue(string key, CultureInfo specificCulture)
+    {
+        this._cultureDictionary = _cultureDictionaryFactory.CreateDictionary(specificCulture);
+        return this.GetDictionaryValue(key);
+    }
+
     /// <summary>
     ///     Returns the dictionary value for the key specified, and if empty returns the specified default fall back value
     /// </summary>
     /// <param name="key">key of dictionary item</param>
     /// <param name="altText">fall back text if dictionary item is empty - Name altText to match Umbraco.Field</param>
     /// <returns></returns>
-    public string GetDictionaryValue(string key, string altText)
+    public string GetDictionaryValueOrDefault(string key, string altText)
     {
         var dictionaryValue = GetDictionaryValue(key);
         if (string.IsNullOrWhiteSpace(dictionaryValue))
@@ -155,6 +170,25 @@ public class UmbracoHelper
 
         return dictionaryValue;
     }
+
+    /// <summary>
+    ///     Returns the dictionary value for the key specified, and if empty returns the specified default fall back value
+    /// </summary>
+    /// <param name="key">key of dictionary item</param>
+    /// <param name="specificCulture">the specific culture on which the result well be back upon</param>
+    /// <param name="altText">fall back text if dictionary item is empty - Name altText to match Umbraco.Field</param>
+    /// <returns></returns>
+    public string GetDictionaryValueOrDefault(string key, CultureInfo specificCulture, string altText)
+    {
+        _cultureDictionary = _cultureDictionaryFactory.CreateDictionary(specificCulture);
+        var dictionaryValue = this.GetDictionaryValue(key);
+        if (string.IsNullOrWhiteSpace(dictionaryValue))
+        {
+            dictionaryValue = altText;
+        }
+        return dictionaryValue;
+    }
+
 
     /// <summary>
     ///     Returns the ICultureDictionary for access to dictionary items
