@@ -1173,6 +1173,24 @@
     <key alias="showOnMemberProfile">Mostrar en perfil de miembro</key>
     <key alias="tabHasNoSortOrder">pestaña no tiene orden</key>
   </area>
+  <area alias="languages">
+    <key alias="addLanguage">Agregar idioma</key>
+    <key alias="culture">Código ISO</key>
+    <key alias="mandatoryLanguage">Idioma obligatorio</key>
+    <key alias="mandatoryLanguageHelp">
+      Las propiedades en este idioma deben completarse antes de que se pueda publicar el nodo.
+    </key>
+    <key alias="defaultLanguage">Idioma predeterminado</key>
+    <key alias="defaultLanguageHelp">Un sitio de Umbraco solo puede tener un conjunto de idiomas predeterminado.</key>
+    <key alias="changingDefaultLanguageWarning">Cambiar el idioma predeterminado puede provocar que falte el contenido predeterminado.</key>
+    <key alias="fallsbackToLabel">Vuelve a caer</key>
+    <key alias="noFallbackLanguageOption">Sin lenguaje alternativo</key>
+    <key alias="fallbackLanguageDescription">
+      Para permitir que el contenido multilingüe retroceda a otro idioma si no está presente en el idioma solicitado, selecciónelo aquí.
+    </key>
+    <key alias="fallbackLanguage">Idioma de retroceso</key>
+    <key alias="none">ninguno</key>
+  </area>
   <area alias="modelsBuilder">
     <key alias="buildingModels">Construyendo modelos</key>
     <key alias="waitingMessage">esto puede llevar un rato, no te preocupes</key>
