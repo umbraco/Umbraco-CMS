@@ -12,9 +12,10 @@ export class UmbTreeMembersContext extends UmbTreeContextBase {
 			hasChildren: true,
 			type: 'member',
 			icon: 'favorite',
+			isTrashed: false,
 		};
 		this.entityStore.update([data]);
-		return this.entityStore.entities.pipe(map((items) => items.filter((item) => item.key === this._rootKey)));
+		return this.entityStore.items.pipe(map((items) => items.filter((item) => item.key === this._rootKey)));
 	}
 
 	public fetchChildren(key: string) {
@@ -25,6 +26,6 @@ export class UmbTreeMembersContext extends UmbTreeContextBase {
 				this.entityStore.update(data);
 			});
 
-		return this.entityStore.entities.pipe(map((items) => items.filter((item) => item.parentKey === key)));
+		return this.entityStore.items.pipe(map((items) => items.filter((item) => item.parentKey === key)));
 	}
 }

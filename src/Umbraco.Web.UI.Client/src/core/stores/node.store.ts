@@ -1,14 +1,13 @@
-import { BehaviorSubject, map, Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { NodeEntity } from '../../mocks/data/node.data';
 import { UmbEntityStore } from './entity.store';
+import { UmbDataStoreBase } from './store';
 
-export class UmbNodeStore {
-	private _nodes: BehaviorSubject<Array<NodeEntity>> = new BehaviorSubject(<Array<NodeEntity>>[]);
-	public readonly nodes: Observable<Array<NodeEntity>> = this._nodes.asObservable();
-
+export class UmbNodeStore extends UmbDataStoreBase<NodeEntity> {
 	private _entityStore: UmbEntityStore;
 
 	constructor(entityStore: UmbEntityStore) {
+		super();
 		this._entityStore = entityStore;
 	}
 
@@ -17,10 +16,10 @@ export class UmbNodeStore {
 		fetch(`/umbraco/backoffice/node/${key}`)
 			.then((res) => res.json())
 			.then((data) => {
-				this._updateStore(data);
+				this.update(data);
 			});
 
-		return this.nodes.pipe(
+		return this.items.pipe(
 			map((nodes: Array<NodeEntity>) => nodes.find((node: NodeEntity) => node.key === key) || null)
 		);
 	}
@@ -37,8 +36,8 @@ export class UmbNodeStore {
 		})
 			.then((res) => res.json())
 			.then((data: Array<NodeEntity>) => {
-				this._updateStore(data);
-				this._updateEntity(data);
+				this.update(data);
+				this._entityStore.update(data);
 			});
 	}
 
@@ -65,31 +64,8 @@ export class UmbNodeStore {
 		})
 			.then((res) => res.json())
 			.then((data: Array<NodeEntity>) => {
-				this._updateStore(data);
-				this._updateEntity(data);
+				this.update(data);
+				this._entityStore.update(data);
 			});
-	}
-
-	private _updateEntity(data: Array<NodeEntity>) {
-		this._entityStore.update(data);
-	}
-
-	private _updateStore(fetchedNodes: Array<any>) {
-		const storedNodes = this._nodes.getValue();
-		const updated: NodeEntity[] = [...storedNodes];
-
-		fetchedNodes.forEach((fetchedNode) => {
-			const index = storedNodes.map((storedNode) => storedNode.id).indexOf(fetchedNode.id);
-
-			if (index !== -1) {
-				// If the node is already in the store, update it
-				updated[index] = fetchedNode;
-			} else {
-				// If the node is not in the store, add it
-				updated.push(fetchedNode);
-			}
-		});
-
-		this._nodes.next([...updated]);
 	}
 }

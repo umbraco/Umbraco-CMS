@@ -42,7 +42,6 @@
 		"@umbraco-ui/uui-modal-container": "file:umbraco-ui-uui-modal-container-0.0.0.tgz",
 		"@umbraco-ui/uui-modal-dialog": "file:umbraco-ui-uui-modal-dialog-0.0.0.tgz",
 		"@umbraco-ui/uui-modal-sidebar": "file:umbraco-ui-uui-modal-sidebar-0.0.0.tgz",
-		"deepmerge-ts": "^4.2.1",
 		"element-internals-polyfill": "^1.1.9",
 		"lit": "^2.3.1",
 		"openapi-typescript-fetch": "^1.1.3",

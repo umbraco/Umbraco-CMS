@@ -1,5 +1,4 @@
 import { entities } from './entities';
-import { deepmerge } from 'deepmerge-ts';
 import { Entity } from './entity.data';
 
 // Temp mocked database
@@ -10,17 +9,13 @@ export class UmbData<T extends Entity> {
 		this._data = data;
 	}
 
-	getById(id: number) {
-		return this._data.find((item) => item.id === id);
-	}
-
 	getByKey(key: string) {
 		return this._data.find((item) => item.key === key);
 	}
 
 	save(saveItems: Array<T>) {
 		saveItems.forEach((saveItem) => {
-			const foundIndex = this._data.findIndex((item) => item.id === saveItem.id);
+			const foundIndex = this._data.findIndex((item) => item.key === saveItem.key);
 			if (foundIndex !== -1) {
 				// update
 				this._data[foundIndex] = saveItem;
@@ -49,16 +44,18 @@ export class UmbData<T extends Entity> {
 		if (!entity) return;
 
 		const entityKeys = Object.keys(entity);
-		const mergedData = deepmerge(entity, saveItem);
+		const newItem = {};
 
-		for (const [key] of Object.entries(mergedData)) {
-			if (entityKeys.indexOf(key) === -1) {
+		for (const [key] of Object.entries(saveItem)) {
+			if (entityKeys.indexOf(key) !== -1) {
 				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 				// @ts-ignore
-				delete mergedData[key];
+				newItem[key] = saveItem[key];
 			}
 		}
 
-		entities[entityIndex] = mergedData;
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		entities[entityIndex] = newItem;
 	}
 }

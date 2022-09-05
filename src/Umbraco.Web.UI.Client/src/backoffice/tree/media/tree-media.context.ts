@@ -11,7 +11,7 @@ export class UmbTreeMediaContext extends UmbTreeContextBase {
 				this.entityStore.update(data);
 			});
 
-		return this.entityStore.entities.pipe(map((items) => items.filter((item) => item.parentKey === this._rootKey)));
+		return this.entityStore.items.pipe(map((items) => items.filter((item) => item.parentKey === this._rootKey)));
 	}
 
 	public fetchChildren(key: string) {
@@ -22,6 +22,6 @@ export class UmbTreeMediaContext extends UmbTreeContextBase {
 				this.entityStore.update(data);
 			});
 
-		return this.entityStore.entities.pipe(map((items) => items.filter((item) => item.parentKey === key)));
+		return this.entityStore.items.pipe(map((items) => items.filter((item) => item.parentKey === key)));
 	}
 }

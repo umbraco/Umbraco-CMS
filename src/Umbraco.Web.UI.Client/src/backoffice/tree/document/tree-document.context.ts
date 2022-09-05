@@ -11,7 +11,7 @@ export class UmbTreeDocumentContext extends UmbTreeContextBase {
 				this.entityStore.update(data);
 			});
 
-		return this.entityStore.entities.pipe(
+		return this.entityStore.items.pipe(
 			map((items) => items.filter((item) => item.parentKey === this._rootKey && !item.isTrashed))
 		);
 	}
@@ -24,7 +24,7 @@ export class UmbTreeDocumentContext extends UmbTreeContextBase {
 				this.entityStore.update(data);
 			});
 
-		return this.entityStore.entities.pipe(
+		return this.entityStore.items.pipe(
 			map((items) => items.filter((item) => item.parentKey === key && !item.isTrashed))
 		);
 	}

@@ -14,6 +14,6 @@ export class UmbTreeExtensionsContext extends UmbTreeContextBase {
 			parentKey: '',
 		};
 		this.entityStore.update([data]);
-		return this.entityStore.entities.pipe(map((items) => items.filter((item) => item.key === this._rootKey)));
+		return this.entityStore.items.pipe(map((items) => items.filter((item) => item.key === this._rootKey)));
 	}
 }

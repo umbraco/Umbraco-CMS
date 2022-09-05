@@ -2,7 +2,6 @@ import { UmbData } from './data';
 import { entities } from './entities';
 
 export interface Entity {
-	id: number;
 	key: string;
 	name: string;
 	icon?: string; // TODO: Should this be here?

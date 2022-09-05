@@ -1,42 +1,60 @@
 import { UmbData } from './data';
 
 export interface DataTypeEntity {
-	id: number;
 	key: string;
 	name: string;
-	//configUI: any; // this is the prevalues...
+	type: string;
+	parentKey: string;
+	isTrashed: boolean;
+	hasChildren: boolean;
 	propertyEditorUIAlias: string;
+	//configUI: any; // this is the prevalues...
 }
 
 export const data: Array<DataTypeEntity> = [
 	{
-		id: 1245,
 		key: 'dt-1',
 		name: 'Text',
+		type: 'dataType',
+		parentKey: '29d78e6c-c1bf-4c15-b820-d511c237ffae',
+		isTrashed: false,
+		hasChildren: false,
 		propertyEditorUIAlias: 'Umb.PropertyEditorUI.Text',
 	},
 	{
-		id: 1244,
 		key: 'dt-2',
 		name: 'Textarea',
+		type: 'dataType',
+		parentKey: '29d78e6c-c1bf-4c15-b820-d511c237ffae',
+		isTrashed: false,
+		hasChildren: false,
 		propertyEditorUIAlias: 'Umb.PropertyEditorUI.Textarea',
 	},
 	{
-		id: 1246,
 		key: 'dt-3',
 		name: 'My JS Property Editor',
+		type: 'dataType',
+		parentKey: '29d78e6c-c1bf-4c15-b820-d511c237ffae',
+		isTrashed: false,
+		hasChildren: false,
 		propertyEditorUIAlias: 'My.PropertyEditorUI.Custom',
 	},
 	{
-		id: 1247,
 		key: 'dt-4',
 		name: 'Context Example',
+		type: 'dataType',
+		parentKey: '29d78e6c-c1bf-4c15-b820-d511c237ffae',
+		isTrashed: false,
+		hasChildren: false,
 		propertyEditorUIAlias: 'Umb.PropertyEditorUI.ContextExample',
 	},
 	{
-		id: 1248,
 		key: 'dt-5',
 		name: 'Content Picker (DataType)',
+		type: 'dataType',
+		parentKey: '29d78e6c-c1bf-4c15-b820-d511c237ffae',
+		isTrashed: false,
+		hasChildren: false,
 		propertyEditorUIAlias: 'Umb.PropertyEditorUI.ContentPicker',
 	},
 ];
