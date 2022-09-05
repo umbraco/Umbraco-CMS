@@ -3,10 +3,10 @@ import { css, CSSResultGroup, html, LitElement, nothing } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { Subscription } from 'rxjs';
 
-import { postInstallSetup, postInstallValidateDatabase } from '../core/api/fetcher';
-import { UmbContextConsumerMixin } from '../core/context';
-import type { UmbracoInstallerDatabaseModel, UmbracoPerformInstallDatabaseConfiguration } from '../core/models';
-import { UmbInstallerContext } from './installer-context';
+import { postInstallSetup, postInstallValidateDatabase } from '../../core/api/fetcher';
+import { UmbContextConsumerMixin } from '../../core/context';
+import type { UmbracoInstallerDatabaseModel, UmbracoPerformInstallDatabaseConfiguration } from '../../core/models';
+import { UmbInstallerContext } from '../installer-context';
 
 @customElement('umb-installer-database')
 export class UmbInstallerDatabaseElement extends UmbContextConsumerMixin(LitElement) {

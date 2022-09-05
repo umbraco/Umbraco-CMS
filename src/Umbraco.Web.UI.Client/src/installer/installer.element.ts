@@ -1,9 +1,9 @@
-import './installer-consent.element';
-import './installer-database.element';
-import './installer-error.element';
-import './installer-installing.element';
-import './installer-layout.element';
-import './installer-user.element';
+import './consent/installer-consent.element';
+import './database/installer-database.element';
+import './error/installer-error.element';
+import './installing/installer-installing.element';
+import './shared/layout/installer-layout.element';
+import './user/installer-user.element';
 
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';

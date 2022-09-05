@@ -1,7 +1,7 @@
 import { css, CSSResultGroup, html, LitElement, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
-import type { ProblemDetails } from '../core/models';
+import type { ProblemDetails } from '../../core/models';
 
 @customElement('umb-installer-error')
 export class UmbInstallerErrorElement extends LitElement {
