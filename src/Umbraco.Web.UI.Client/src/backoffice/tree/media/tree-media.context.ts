@@ -1,15 +1,8 @@
 import { map } from 'rxjs';
-import { UmbEntityStore } from '../../../core/stores/entity.store';
-import { UmbTreeContext } from '../tree.context';
+import { UmbTreeContextBase } from '../tree.context';
 
-export class UmbTreeMediaContext implements UmbTreeContext {
-	public entityStore: UmbEntityStore;
-
+export class UmbTreeMediaContext extends UmbTreeContextBase {
 	private _rootKey = 'c0858d71-52be-4bb2-822f-42fa0c9a1ea5';
-
-	constructor(entityStore: UmbEntityStore) {
-		this.entityStore = entityStore;
-	}
 
 	public fetchRoot() {
 		fetch(`/umbraco/backoffice/entities/media?parentKey=${this._rootKey}`)

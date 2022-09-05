@@ -1,15 +1,8 @@
 import { map } from 'rxjs';
-import { UmbEntityStore } from '../../../core/stores/entity.store';
-import { UmbTreeContext } from '../tree.context';
+import { UmbTreeContextBase } from '../tree.context';
 
-export class UmbTreeDocumentTypesContext implements UmbTreeContext {
-	public entityStore: UmbEntityStore;
-
+export class UmbTreeDocumentTypesContext extends UmbTreeContextBase {
 	private _rootKey = 'f50eb86d-3ef2-4011-8c5d-c56c04eec0da';
-
-	constructor(entityStore: UmbEntityStore) {
-		this.entityStore = entityStore;
-	}
 
 	public fetchRoot() {
 		const data = {

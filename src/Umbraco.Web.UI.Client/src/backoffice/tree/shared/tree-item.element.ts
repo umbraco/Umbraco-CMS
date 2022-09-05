@@ -2,7 +2,7 @@ import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UmbContextConsumerMixin } from '../../../core/context';
-import { UmbTreeContext } from '../tree.context';
+import { UmbTreeContextBase } from '../tree.context';
 import { UUIMenuItemEvent } from '@umbraco-ui/uui';
 import { UmbSectionContext } from '../../sections/section.context';
 import { map, Subscription } from 'rxjs';
@@ -40,7 +40,7 @@ export class UmbTreeItem extends UmbContextConsumerMixin(LitElement) {
 	@state()
 	private _selected = false;
 
-	private _treeContext?: UmbTreeContext;
+	private _treeContext?: UmbTreeContextBase;
 	private _sectionContext?: UmbSectionContext;
 	private _sectionSubscription?: Subscription;
 	private _childrenSubscription?: Subscription;
@@ -51,7 +51,7 @@ export class UmbTreeItem extends UmbContextConsumerMixin(LitElement) {
 	constructor() {
 		super();
 
-		this.consumeContext('umbTreeContext', (treeContext: UmbTreeContext) => {
+		this.consumeContext('umbTreeContext', (treeContext: UmbTreeContextBase) => {
 			this._treeContext = treeContext;
 			this._observeSelectable();
 			this._observeSelection();

@@ -3,7 +3,7 @@ import { repeat } from 'lit/directives/repeat.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbContextConsumerMixin } from '../../../core/context';
-import { UmbTreeContext } from '../tree.context';
+import { UmbTreeContextBase } from '../tree.context';
 
 import './tree-item.element';
 import { Subscription } from 'rxjs';
@@ -16,7 +16,7 @@ export class UmbTreeNavigator extends UmbContextConsumerMixin(LitElement) {
 	@state()
 	private _loading = true;
 
-	private _treeContext?: UmbTreeContext;
+	private _treeContext?: UmbTreeContextBase;
 	private _treeRootSubscription?: Subscription;
 
 	@state()

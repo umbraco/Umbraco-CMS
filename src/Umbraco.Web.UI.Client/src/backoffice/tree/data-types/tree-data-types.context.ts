@@ -1,18 +1,8 @@
-import { BehaviorSubject, map, Observable } from 'rxjs';
-import { UmbEntityStore } from '../../../core/stores/entity.store';
-import { UmbTreeContext } from '../tree.context';
+import { map } from 'rxjs';
+import { UmbTreeContextBase } from '../tree.context';
 
-export class UmbTreeDataTypesContext implements UmbTreeContext {
-	public entityStore: UmbEntityStore;
-
-	private _selectable: BehaviorSubject<boolean> = new BehaviorSubject(false);
-	public readonly selectable: Observable<boolean> = this._selectable.asObservable();
-
+export class UmbTreeDataTypesContext extends UmbTreeContextBase {
 	private _rootKey = '29d78e6c-c1bf-4c15-b820-d511c237ffae';
-
-	constructor(entityStore: UmbEntityStore) {
-		this.entityStore = entityStore;
-	}
 
 	public fetchRoot() {
 		const data = {
@@ -36,9 +26,5 @@ export class UmbTreeDataTypesContext implements UmbTreeContext {
 			});
 
 		return this.entityStore.entities.pipe(map((items) => items.filter((item) => item.parentKey === key)));
-	}
-
-	public setSelectable(value: boolean) {
-		this._selectable.next(value);
 	}
 }
