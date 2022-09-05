@@ -8,7 +8,7 @@ export interface UmbModalContentPickerData {
 	selection: Array<string>;
 }
 
-import '../../../../../backoffice/tree/document/tree-document.element';
+import '../../../../../backoffice/tree/documents/tree-documents.element';
 
 @customElement('umb-modal-layout-content-picker')
 export class UmbModalLayoutContentPickerElement extends UmbModalLayoutElement<UmbModalContentPickerData> {

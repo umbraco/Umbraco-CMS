@@ -317,7 +317,7 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		type: 'tree',
 		alias: 'Umb.Tree.Content',
 		name: 'Content Tree',
-		loader: () => import('./backoffice/tree/document/tree-document.element'),
+		loader: () => import('./backoffice/tree/documents/tree-documents.element'),
 		meta: {
 			weight: 100,
 			sections: ['Umb.Section.Content'],

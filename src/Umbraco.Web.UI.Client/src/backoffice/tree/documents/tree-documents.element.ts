@@ -2,7 +2,7 @@ import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
 import '../shared/tree-navigator.element';
-import { UmbTreeDocumentContext } from './tree-document.context';
+import { UmbTreeDocumentContext } from './tree-documents.context';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '../../../core/context';
 import { UmbEntityStore } from '../../../core/stores/entity.store';
 import { Subscription } from 'rxjs';
