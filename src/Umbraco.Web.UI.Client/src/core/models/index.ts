@@ -9,6 +9,7 @@ export type AllowedSectionsResponse = components['schemas']['AllowedSectionsResp
 export type UmbracoInstaller = components['schemas']['InstallSettingsResponse'];
 export type UmbracoUpgrader = components['schemas']['UpgradeSettingsResponse'];
 export type ManifestsResponse = components['schemas']['ManifestsResponse'];
+export type ManifestsPackagesInstalledResponse = components['schemas']['ManifestsPackagesInstalledResponse'];
 
 // Models
 export type UmbracoPerformInstallDatabaseConfiguration = components['schemas']['InstallSetupDatabaseConfiguration'];
