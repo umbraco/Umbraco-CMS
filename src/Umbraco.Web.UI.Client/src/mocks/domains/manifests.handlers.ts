@@ -37,6 +37,16 @@ export const manifestDevelopmentHandler = rest.get(umbracoPath('/manifests'), (_
 					alias: 'My.Entrypoint.Custom',
 					js: '/src/mocks/App_Plugins/custom-entrypoint.js',
 				},
+				{
+					type: 'packageView',
+					alias: 'My.PackageView.Custom',
+					name: 'My Custom Package View',
+					js: '/src/mocks/App_Plugins/package-view.js',
+					elementName: 'my-package-view-custom',
+					meta: {
+						packageAlias: 'my.package',
+					},
+				},
 			],
 		})
 	);
@@ -51,3 +61,26 @@ export const manifestEmptyHandler = rest.get(umbracoPath('/manifests'), (_req, r
 		})
 	);
 });
+
+export default [
+	rest.get(umbracoPath('/manifests/packages'), (_req, res, ctx) => {
+		return res(
+			// Respond with a 200 status code
+			ctx.status(200),
+			ctx.json({
+				packages: [
+					{
+						name: 'My very own package',
+						alias: 'my.package',
+						version: '1.0.0',
+					},
+					{
+						name: 'Some other community package',
+						alias: 'our.package',
+						version: '2.0.1',
+					},
+				],
+			})
+		);
+	}),
+];
