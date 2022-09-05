@@ -11,6 +11,15 @@ export class Manifests {
 	default(@body body: ProblemDetails) {}
 }
 
+@endpoint({ method: 'GET', path: '/manifests/packages' })
+export class Packages {
+	@response({ status: 200 })
+	response(@body body: PackagesResponse) {}
+
+	@defaultResponse
+	default(@body body: ProblemDetails) {}
+}
+
 export type Manifest =
 	| IManifestSection
 	| IManifestPropertyEditorUI
@@ -30,6 +39,16 @@ export type ManifestStandardTypes =
 
 export interface ManifestsResponse {
 	manifests: Manifest[];
+}
+
+export interface PackagesResponse {
+	packages: Package[];
+}
+
+export interface Package {
+	name: string;
+	alias: string;
+	version: string;
 }
 
 export interface IManifest {
