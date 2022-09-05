@@ -1,26 +1,13 @@
 import '../../../backoffice/editors/shared/editor-entity/editor-entity.element';
 
 import { html, LitElement } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
-import { IRoute } from 'router-slot';
+import { customElement } from 'lit/decorators.js';
 
 import { UmbContextConsumerMixin } from '../../../core/context';
 import { UmbExtensionRegistry } from '../../../core/extension';
 
 @customElement('umb-packages-section')
 export class UmbPackagesSection extends UmbContextConsumerMixin(LitElement) {
-	@state()
-	private _routes: Array<IRoute> = [
-		{
-			path: '',
-			component: () => import('./packages-overview.element'),
-		},
-		{
-			path: '**',
-			redirectTo: '',
-		},
-	];
-
 	private umbExtensionRegistry?: UmbExtensionRegistry;
 
 	constructor() {
