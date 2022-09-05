@@ -2,10 +2,10 @@
 using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.ManagementApi.ViewModels.Move;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.Dictionary;
@@ -20,7 +20,6 @@ public class MoveDictionaryController : DictionaryControllerBase
     public MoveDictionaryController(
         ILocalizationService localizationService,
         ILocalizedTextService localizedTextService,
-        IUmbracoMapper umbracoMapper,
         IDictionaryService dictionaryService)
     {
         _localizationService = localizationService;
@@ -33,8 +32,8 @@ public class MoveDictionaryController : DictionaryControllerBase
     /// </summary>
     /// <param name="move"></param>
     /// <returns></returns>
-    [HttpPost]
-    public IActionResult Move(MoveOrCopy move)
+    [HttpPut("move")]
+    public async Task<IActionResult> Move(MoveOrCopyViewModel move)
     {
         IDictionaryItem? dictionaryItem = _localizationService.GetDictionaryItemById(move.Id);
         if (dictionaryItem == null)
