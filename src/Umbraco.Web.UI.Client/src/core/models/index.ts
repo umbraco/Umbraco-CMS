@@ -25,6 +25,7 @@ export type ManifestPropertyAction = components['schemas']['IManifestPropertyAct
 export type ManifestEntrypoint = components['schemas']['IManifestEntrypoint'];
 export type ManifestCustom = components['schemas']['IManifestCustom'];
 export type ManifestPackageView = components['schemas']['IManifestPackageView'];
+export type PackageInstalled = components['schemas']['PackageInstalled'];
 
 export type ManifestElementType =
 	| ManifestSection

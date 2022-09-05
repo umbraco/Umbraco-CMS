@@ -1,15 +1,15 @@
 import { html, LitElement, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
-import { getPackages } from '../../../core/api/fetcher';
+import { getPackagesInstalled } from '../../../core/api/fetcher';
 import { UmbContextConsumerMixin } from '../../../core/context';
 
-import type { Package } from '../../../core/models';
+import type { PackageInstalled } from '../../../core/models';
 
 @customElement('umb-packages-installed')
 export class UmbPackagesInstalled extends UmbContextConsumerMixin(LitElement) {
 	@state()
-	private _installedPackages: Package[] = [];
+	private _installedPackages: PackageInstalled[] = [];
 
 	@state()
 	private _errorMessage = '';
@@ -29,10 +29,10 @@ export class UmbPackagesInstalled extends UmbContextConsumerMixin(LitElement) {
 		try {
 			const {
 				data: { packages },
-			} = await getPackages({});
+			} = await getPackagesInstalled({});
 			this._installedPackages = packages;
 		} catch (e) {
-			if (e instanceof getPackages.Error) {
+			if (e instanceof getPackagesInstalled.Error) {
 				const error = e.getActualType();
 				this._errorMessage = error.data.detail ?? 'An error occurred while loading the installed packages';
 			}

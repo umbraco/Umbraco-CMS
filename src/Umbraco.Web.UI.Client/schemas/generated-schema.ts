@@ -17,7 +17,10 @@ export interface paths {
     get: operations["Manifests"];
   };
   "/manifests/packages": {
-    get: operations["Packages"];
+    get: operations["ManifestsPackages"];
+  };
+  "/manifests/packages/installed": {
+    get: operations["ManifestsPackagesInstalled"];
   };
   "/server/status": {
     get: operations["GetStatus"];
@@ -225,13 +228,17 @@ export interface components {
     ManifestsResponse: {
       manifests: components["schemas"]["Manifest"][];
     };
-    Package: {
+    PackageInstalled: {
+      id: string;
       name: string;
       alias: string;
       version: string;
+      hasMigrations: boolean;
+      hasPendingMigrations: boolean;
+      plans: { [key: string]: unknown }[];
     };
-    PackagesResponse: {
-      packages: components["schemas"]["Package"][];
+    ManifestsPackagesInstalledResponse: {
+      packages: components["schemas"]["PackageInstalled"][];
     };
     /** @enum {string} */
     ServerStatus: "running" | "must-install" | "must-upgrade";
@@ -332,12 +339,28 @@ export interface operations {
       };
     };
   };
-  Packages: {
+  ManifestsPackages: {
     responses: {
       /** 200 response */
       200: {
         content: {
-          "application/json": components["schemas"]["PackagesResponse"];
+          "application/json": { [key: string]: unknown };
+        };
+      };
+      /** default response */
+      default: {
+        content: {
+          "application/json": components["schemas"]["ProblemDetails"];
+        };
+      };
+    };
+  };
+  ManifestsPackagesInstalled: {
+    responses: {
+      /** 200 response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["ManifestsPackagesInstalledResponse"];
         };
       };
       /** default response */

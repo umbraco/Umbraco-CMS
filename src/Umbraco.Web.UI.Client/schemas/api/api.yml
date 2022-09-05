@@ -75,14 +75,30 @@ paths:
                 $ref: '#/components/schemas/ProblemDetails'
   /manifests/packages:
     get:
-      operationId: Packages
+      operationId: ManifestsPackages
       responses:
         '200':
           description: 200 response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PackagesResponse'
+                type: object
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /manifests/packages/installed:
+    get:
+      operationId: ManifestsPackagesInstalled
+      responses:
+        '200':
+          description: 200 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ManifestsPackagesInstalledResponse'
         default:
           description: default response
           content:
@@ -663,26 +679,40 @@ components:
             $ref: '#/components/schemas/Manifest'
       required:
         - manifests
-    Package:
+    PackageInstalled:
       type: object
       properties:
+        id:
+          type: string
         name:
           type: string
         alias:
           type: string
         version:
           type: string
+        hasMigrations:
+          type: boolean
+        hasPendingMigrations:
+          type: boolean
+        plans:
+          type: array
+          items:
+            type: object
       required:
+        - id
         - name
         - alias
         - version
-    PackagesResponse:
+        - hasMigrations
+        - hasPendingMigrations
+        - plans
+    ManifestsPackagesInstalledResponse:
       type: object
       properties:
         packages:
           type: array
           items:
-            $ref: '#/components/schemas/Package'
+            $ref: '#/components/schemas/PackageInstalled'
       required:
         - packages
     ServerStatus:
