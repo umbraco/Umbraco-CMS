@@ -24,13 +24,15 @@ export type ManifestEditorView = components['schemas']['IManifestEditorView'];
 export type ManifestPropertyAction = components['schemas']['IManifestPropertyAction'];
 export type ManifestEntrypoint = components['schemas']['IManifestEntrypoint'];
 export type ManifestCustom = components['schemas']['IManifestCustom'];
+export type ManifestPackageView = components['schemas']['IManifestPackageView'];
 
 export type ManifestElementType =
 	| ManifestSection
 	| ManifestPropertyAction
 	| ManifestPropertyEditorUI
 	| ManifestDashboard
-	| ManifestEditorView;
+	| ManifestEditorView
+	| ManifestPackageView;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type HTMLElementConstructor<T = HTMLElement> = new (...args: any[]) => T;

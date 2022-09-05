@@ -11,6 +11,7 @@ import type {
 	ManifestPropertyEditorUI,
 	ManifestSection,
 	ManifestCustom,
+	ManifestPackageView,
 } from '../models';
 export class UmbExtensionRegistry {
 	private _extensions = new BehaviorSubject<Array<ManifestTypes>>([]);
@@ -47,6 +48,7 @@ export class UmbExtensionRegistry {
 	extensionsOfType(type: 'editorView'): Observable<Array<ManifestEditorView>>;
 	extensionsOfType(type: 'propertyEditorUI'): Observable<Array<ManifestPropertyEditorUI>>;
 	extensionsOfType(type: 'propertyAction'): Observable<Array<ManifestPropertyAction>>;
+	extensionsOfType(type: 'packageView'): Observable<Array<ManifestPackageView>>;
 	extensionsOfType(type: 'entrypoint'): Observable<Array<ManifestEntrypoint>>;
 	extensionsOfType(type: 'custom'): Observable<Array<ManifestCustom>>;
 	extensionsOfType<T extends ManifestTypes>(type: string): Observable<Array<T>>;
