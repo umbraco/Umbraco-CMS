@@ -5,7 +5,7 @@ import { Subscription } from 'rxjs';
 
 import { UmbContextConsumerMixin } from '../../core/context';
 import type { TelemetryModel } from '../../core/models';
-import { UmbInstallerContext } from '../installer-context';
+import { UmbInstallerContext } from '../installer.context';
 
 @customElement('umb-installer-consent')
 export class UmbInstallerConsentElement extends UmbContextConsumerMixin(LitElement) {
