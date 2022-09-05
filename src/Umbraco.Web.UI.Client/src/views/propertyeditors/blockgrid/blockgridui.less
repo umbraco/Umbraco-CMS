@@ -99,6 +99,7 @@ ng-form.ng-invalid-val-server-match-content > .umb-block-grid__block:not(.--acti
     height: 100%;
 
     --umb-block-grid__block--show-ui: 0;// Publicly available.
+    --umb-block-grid--hint-area-ui: 0;
 
     &::after {
         content: '';
@@ -130,6 +131,9 @@ ng-form.ng-invalid-val-server-match-content > .umb-block-grid__block:not(.--acti
     &:hover,
     &:focus,
     &:focus-within {
+
+        --umb-block-grid--hint-area-ui: 1;
+
         &::after {
             /*border-color: @blueDark;*/
             display: var(--umb-block-grid--block-ui-display, block);
@@ -174,8 +178,6 @@ ng-form.ng-invalid-val-server-match-content > .umb-block-grid__block:not(.--acti
             opacity: 1;
         }
     }
-
-
     
     /** make sure to hide child block ui: */
     &.--hovering-area:not(.--block-ui-visible) {
@@ -216,9 +218,7 @@ ng-form.ng-invalid-val-server-match-content > .umb-block-grid__block:not(.--acti
     &:not(.--hovering-area):focus,
     &:not(.--hovering-area):focus-within,
     &.--active {
-
-        --umb-block-grid__block--show-ui: 1;
-
+        
         > .umb-block-grid__block--context {
             opacity: 1;
         }
@@ -257,15 +257,9 @@ ng-form.ng-invalid > .umb-block-grid__block:not(.--active) > .umb-block-grid__bl
 */
 
 .umb-block-grid__block--view {
-    --umb-block-grid--hint-area-ui: 0;
     height: 100%;
     width: 100%;
     display: block;
-}
-.umb-block-grid__block--view:focus,
-.umb-block-grid__block--view:focus-within,
-.umb-block-grid__block--view:hover {
-    --umb-block-grid--hint-area-ui: 1;
 }
 
 .umb-block-grid__block--context {
