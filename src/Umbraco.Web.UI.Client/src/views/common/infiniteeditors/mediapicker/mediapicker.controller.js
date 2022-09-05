@@ -218,6 +218,9 @@ angular.module("umbraco")
             }
 
             function submitFolder() {
+                if ($scope.model.creatingFolder) {
+                    return;
+                }
                 if ($scope.model.newFolderName) {
                     $scope.model.creatingFolder = true;
                     mediaResource
