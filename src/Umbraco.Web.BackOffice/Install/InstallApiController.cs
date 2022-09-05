@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Install;
 using Umbraco.Cms.Core.Install.Models;
 using Umbraco.Cms.Core.Logging;
@@ -93,11 +94,14 @@ namespace Umbraco.Cms.Web.BackOffice.Install
         [HttpPost]
         public async Task<ActionResult> CompleteInstall()
         {
-
+            var levelBeforeRestart = _runtime.State.Level;
             await _runtime.RestartAsync();
 
-            var identityUser = await _backOfficeUserManager.FindByIdAsync(Core.Constants.Security.SuperUserIdAsString);
-            _backOfficeSignInManager.SignInAsync(identityUser, false);
+            if (levelBeforeRestart == RuntimeLevel.Install)
+            {
+                var identityUser = await _backOfficeUserManager.FindByIdAsync(Core.Constants.Security.SuperUserIdAsString);
+                _backOfficeSignInManager.SignInAsync(identityUser, false);
+            }
 
             return NoContent();
         }
