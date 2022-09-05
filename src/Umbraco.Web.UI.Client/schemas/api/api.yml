@@ -406,6 +406,20 @@ components:
         - meta
         - name
         - alias
+    IPrevalueField:
+      type: object
+      properties:
+        label:
+          type: string
+        description:
+          type: string
+        key:
+          type: string
+        view:
+          type: string
+      required:
+        - key
+        - view
     MetaPropertyEditorUI:
       type: object
       properties:
@@ -413,9 +427,21 @@ components:
           type: string
         group:
           type: string
+        prevalues:
+          type: object
+          properties:
+            fields:
+              type: array
+              items:
+                $ref: '#/components/schemas/IPrevalueField'
+          required:
+            - fields
+        defaultConfig:
+          type: object
       required:
         - icon
         - group
+        - prevalues
     IManifestPropertyEditorUI:
       type: object
       properties:

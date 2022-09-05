@@ -58,12 +58,26 @@ export interface IManifest {
 	alias: string;
 }
 
+export interface IPrevalueField {
+	label?: string;
+	description?: string;
+	key: string;
+	view: string;
+}
+
+export interface IPrevalues {
+	prevalues: {
+		fields: IPrevalueField[];
+	};
+	defaultConfig?: {};
+}
+
 export interface MetaSection {
 	pathname: string;
 	weight: number;
 }
 
-export interface MetaPropertyEditorUI {
+export interface MetaPropertyEditorUI extends IPrevalues {
 	icon: string;
 	group: string;
 }
