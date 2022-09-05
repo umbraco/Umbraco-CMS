@@ -23,7 +23,7 @@ public class DictionaryViewModel : EntityBasic, INotificationModel
     ///     Gets or sets the parent id.
     /// </summary>
     [DataMember(Name = "parentId")]
-    public new Guid ParentId { get; set; }
+    public new Guid? ParentId { get; set; }
 
     /// <summary>
     ///     Gets the translations.
