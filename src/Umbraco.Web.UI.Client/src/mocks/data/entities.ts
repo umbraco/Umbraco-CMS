@@ -1,5 +1,24 @@
 import { Entity } from './entity.data';
 
+const generateDocumentEntities = (amount: number) => {
+	const entities = [];
+	for (let i = 0; i < amount; i++) {
+		entities.push({
+			id: 1000 + i,
+			key: `document-${i}`,
+			name: `Document ${i}`,
+			type: 'document',
+			icon: 'document',
+			hasChildren: false,
+			isTrashed: false,
+			parentKey: 'ba23245c-d8c0-46f7-a2bc-7623743d6eba',
+		});
+	}
+	return entities;
+};
+
+const documents = generateDocumentEntities(0);
+
 export const entities: Array<Entity> = [
 	{
 		id: 1,
@@ -159,4 +178,5 @@ export const entities: Array<Entity> = [
 		isTrashed: false,
 		parentKey: 'ba23245c-d8c0-46f7-a2bc-7623743d6eba',
 	},
+	...documents,
 ];
