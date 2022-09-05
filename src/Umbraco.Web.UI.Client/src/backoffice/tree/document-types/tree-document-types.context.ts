@@ -10,7 +10,7 @@ export class UmbTreeDocumentTypesContext extends UmbTreeContextBase {
 			name: 'Document Types',
 			hasChildren: true,
 			type: 'documentTypeRoot',
-			icon: 'favorite',
+			icon: 'folder',
 			parentKey: '',
 		};
 		this.entityStore.update([data]);

@@ -10,7 +10,7 @@ export class UmbTreeMemberGroupsContext extends UmbTreeContextBase {
 			name: 'Member Groups',
 			hasChildren: true,
 			type: 'memberGroupRoot',
-			icon: 'favorite',
+			icon: 'folder',
 			parentKey: '',
 		};
 

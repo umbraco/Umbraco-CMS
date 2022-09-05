@@ -11,7 +11,7 @@ export class UmbTreeMembersContext extends UmbTreeContextBase {
 			name: 'Members',
 			hasChildren: true,
 			type: 'member',
-			icon: 'favorite',
+			icon: 'folder',
 			isTrashed: false,
 		};
 		this.entityStore.update([data]);
