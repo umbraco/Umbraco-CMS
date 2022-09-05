@@ -1,12 +1,11 @@
-import { map } from 'rxjs';
 import { UmbTreeContextBase } from '../tree.context';
 
 export class UmbTreeMemberGroupsContext extends UmbTreeContextBase {
-	private _rootKey = '575645a5-0f25-4671-b9a0-be515096ad6b';
+	public rootKey = '575645a5-0f25-4671-b9a0-be515096ad6b';
 
-	public fetchRoot() {
+	public rootChanges() {
 		const data = {
-			key: this._rootKey,
+			key: this.rootKey,
 			name: 'Member Groups',
 			hasChildren: true,
 			type: 'memberGroupRoot',
@@ -16,17 +15,16 @@ export class UmbTreeMemberGroupsContext extends UmbTreeContextBase {
 		};
 
 		this.entityStore.update([data]);
-		return this.entityStore.items.pipe(map((items) => items.filter((item) => item.key === this._rootKey)));
+		return super.rootChanges();
 	}
 
-	public fetchChildren(key: string) {
+	public childrenChanges(key: string) {
 		// TODO: figure out url structure
 		fetch(`/umbraco/backoffice/entities/member-groups?parentKey=${key}`)
 			.then((res) => res.json())
 			.then((data) => {
 				this.entityStore.update(data);
 			});
-
-		return this.entityStore.items.pipe(map((items) => items.filter((item) => item.parentKey === key)));
+		return super.childrenChanges(key);
 	}
 }

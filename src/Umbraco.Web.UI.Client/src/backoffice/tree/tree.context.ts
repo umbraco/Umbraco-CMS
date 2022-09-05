@@ -1,19 +1,21 @@
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, map, Observable } from 'rxjs';
 import type { UmbEntityStore } from '../../core/stores/entity.store';
 import { Entity } from '../../mocks/data/entity.data';
 
 export interface UmbTreeContext {
+	rootKey: string;
 	entityStore: UmbEntityStore;
 	readonly selectable: Observable<boolean>;
 	readonly selection: Observable<Array<string>>;
-	fetchRoot?(): Observable<Entity[]>;
-	fetchChildren?(key: string): Observable<Entity[]>;
+	rootChanges?(key: string): Observable<Entity[]>;
+	childrenChanges?(key: string): Observable<Entity[]>;
 	setSelectable(value: boolean): void;
 	select(key: string): void;
 }
 
 export class UmbTreeContextBase implements UmbTreeContext {
 	public entityStore: UmbEntityStore;
+	public rootKey = '';
 
 	private _selectable: BehaviorSubject<boolean> = new BehaviorSubject(false);
 	public readonly selectable: Observable<boolean> = this._selectable.asObservable();
@@ -23,6 +25,18 @@ export class UmbTreeContextBase implements UmbTreeContext {
 
 	constructor(entityStore: UmbEntityStore) {
 		this.entityStore = entityStore;
+	}
+
+	public rootChanges() {
+		return this.entityStore.items.pipe(
+			map((items) => items.filter((item) => item.key === this.rootKey && !item.isTrashed))
+		);
+	}
+
+	public childrenChanges(key: string) {
+		return this.entityStore.items.pipe(
+			map((items) => items.filter((item) => item.parentKey === key && !item.isTrashed))
+		);
 	}
 
 	public setSelectable(value: boolean) {

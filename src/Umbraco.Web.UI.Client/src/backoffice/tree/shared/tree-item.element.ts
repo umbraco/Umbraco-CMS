@@ -115,7 +115,7 @@ export class UmbTreeItem extends UmbContextConsumerMixin(LitElement) {
 
 		this._childrenSubscription?.unsubscribe();
 
-		this._childrenSubscription = this._treeContext?.fetchChildren?.(this.itemKey).subscribe((items) => {
+		this._childrenSubscription = this._treeContext?.childrenChanges(this.itemKey).subscribe((items) => {
 			if (items?.length === 0) return;
 			this._childItems = items;
 			this._loading = false;

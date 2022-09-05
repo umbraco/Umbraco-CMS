@@ -1,12 +1,11 @@
-import { map } from 'rxjs';
 import { UmbTreeContextBase } from '../tree.context';
 
 export class UmbTreeDataTypesContext extends UmbTreeContextBase {
-	private _rootKey = '29d78e6c-c1bf-4c15-b820-d511c237ffae';
+	public rootKey = '29d78e6c-c1bf-4c15-b820-d511c237ffae';
 
-	public fetchRoot() {
+	public rootChanges() {
 		const data = {
-			key: this._rootKey,
+			key: this.rootKey,
 			name: 'Data Types',
 			hasChildren: true,
 			type: 'dataTypeRoot',
@@ -15,10 +14,10 @@ export class UmbTreeDataTypesContext extends UmbTreeContextBase {
 			isTrashed: false,
 		};
 		this.entityStore.update([data]);
-		return this.entityStore.items.pipe(map((items) => items.filter((item) => item.key === this._rootKey)));
+		return super.rootChanges();
 	}
 
-	public fetchChildren(key = '') {
+	public childrenChanges(key = '') {
 		// TODO: figure out url structure
 		fetch(`/umbraco/backoffice/entities/data-types?parentKey=${key}`)
 			.then((res) => res.json())
@@ -26,6 +25,6 @@ export class UmbTreeDataTypesContext extends UmbTreeContextBase {
 				this.entityStore.update(data);
 			});
 
-		return this.entityStore.items.pipe(map((items) => items.filter((item) => item.parentKey === key)));
+		return super.childrenChanges(key);
 	}
 }
