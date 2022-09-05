@@ -43,4 +43,22 @@ public class DictionaryViewModel : EntityBasic, INotificationModel
     /// </summary>
     [DataMember(Name = "notifications")]
     public List<BackOfficeNotification> Notifications { get; private set; }
+
+    /// <summary>
+    ///     Gets or sets a value indicating whether name is dirty.
+    /// </summary>
+    [DataMember(Name = "nameIsDirty")]
+    public bool NameIsDirty { get; set; }
+
+    /// <summary>
+    ///     Gets or sets a value indicating when the object was created.
+    /// </summary>
+    [DataMember(Name = "createDate")]
+    public DateTime CreateDate { get; set; }
+
+    /// <summary>
+    ///     Gets or sets a value indicating when the object was updated.
+    /// </summary>
+    [DataMember(Name = "updateDate")]
+    public DateTime UpdateDate { get; set; }
 }
