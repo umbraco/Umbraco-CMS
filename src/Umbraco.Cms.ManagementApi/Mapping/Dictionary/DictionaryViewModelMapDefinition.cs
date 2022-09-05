@@ -22,9 +22,9 @@ public class DictionaryViewModelMapDefinition : IMapDefinition
     }
     public void DefineMaps(IUmbracoMapper mapper)
     {
-        mapper.Define<DictionaryViewModel, IDictionaryItem>((source, context) => new DictionaryItem(string.Empty));
-        mapper.Define<IDictionaryItem, DictionaryViewModel>((source, context) => new DictionaryViewModel());
-        mapper.Define<DictionaryTranslationDisplay, IDictionaryTranslation>((source, context) => new DictionaryTranslation(source.LanguageId, string.Empty));
+        mapper.Define<DictionaryViewModel, IDictionaryItem>((source, context) => new DictionaryItem(string.Empty), Map);
+        mapper.Define<IDictionaryItem, DictionaryViewModel>((source, context) => new DictionaryViewModel(), Map);
+        mapper.Define<DictionaryTranslationDisplay, IDictionaryTranslation>((source, context) => new DictionaryTranslation(source.LanguageId, string.Empty), Map);
     }
 
     // Umbraco.Code.MapAll
@@ -41,19 +41,21 @@ public class DictionaryViewModelMapDefinition : IMapDefinition
 
     }
 
-    // Umbraco.Code.MapAll -CreateDate -DeleteDate -Id -Key -UpdateDate -Language
+    // Umbraco.Code.MapAll -CreateDate -DeleteDate -UpdateDate -Language
     private void Map(DictionaryTranslationDisplay source, IDictionaryTranslation target, MapperContext context)
     {
-        target.Value = source.Translation; // fixme
+        target.Value = source.Translation;
+        target.Id = source.Id;
+        target.Key = source.Key;
     }
 
-    // Umbraco.Code.MapAll -Icon -Trashed -Alias
+    // Umbraco.Code.MapAll -Icon -Trashed -Alias -NameIsDirty
     private void Map(IDictionaryItem source, DictionaryViewModel target, MapperContext context)
     {
         target.Id = source.Id;
         target.Key = source.Key;
         target.Name = source.ItemKey;
-        target.ParentId = source.ParentId ?? Guid.Empty;
+        target.ParentId = source.ParentId ?? null;
         target.Udi = Udi.Create(Constants.UdiEntityType.DictionaryItem, source.Key);
         target.ContentApps.AddRange(_commonMapper.GetContentAppsForEntity(source));
         target.Path = _dictionaryService.CalculatePath(source.ParentId, source.Id);
@@ -70,11 +72,12 @@ public class DictionaryViewModelMapDefinition : IMapDefinition
                 DisplayName = lang.CultureName,
                 Translation = translation?.Value ?? string.Empty,
                 LanguageId = lang.Id,
+                Id = translation?.Id ?? 0,
+                Key = translation?.Key ?? Guid.Empty,
             });
         }
 
         target.CreateDate = source.CreateDate;
-        target.NameIsDirty = false; // fixme
         target.UpdateDate = source.UpdateDate;
     }
 }
