@@ -87,11 +87,15 @@ public class InstallApiController : ControllerBase
     [HttpPost]
     public async Task<ActionResult> CompleteInstall()
     {
+        RuntimeLevel levelBeforeRestart = _runtime.State.Level;
+
         await _runtime.RestartAsync();
 
-        BackOfficeIdentityUser identityUser =
-            await _backOfficeUserManager.FindByIdAsync(Constants.Security.SuperUserIdAsString);
-        _backOfficeSignInManager.SignInAsync(identityUser, false);
+        if (levelBeforeRestart == RuntimeLevel.Install)
+        {
+            BackOfficeIdentityUser identityUser = await _backOfficeUserManager.FindByIdAsync(Core.Constants.Security.SuperUserIdAsString);
+            _backOfficeSignInManager.SignInAsync(identityUser, false);
+        }
 
         return NoContent();
     }
