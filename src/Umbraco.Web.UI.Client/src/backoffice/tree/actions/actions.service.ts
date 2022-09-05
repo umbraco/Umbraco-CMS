@@ -1,12 +1,16 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, LitElement, nothing } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
-import { UmbContextProviderMixin } from '../../core/context';
-import type { ManifestEntityAction } from '../../core/models';
+import { customElement, query, state } from 'lit/decorators.js';
+import { UmbContextProviderMixin } from '../../../core/context';
 
-import './actions-modal.element';
-import './actions/tree-action-create-page.element';
-import './actions/tree-action-create-page-2.element';
+import { ActionPageEntity } from './action.element';
+import { UmbActionPageService } from '.';
+import '.';
+
+// import './actions-modal.element';
+// import './tree-action-create-page.element';
+// import './tree-action-create-page-2.element';
+// import './action-page.service';
 // TODO how do we dynamically import this so we don't have to import every page that could potentially be used?
 
 @customElement('umb-action-service')
@@ -53,50 +57,27 @@ export class UmbActionService extends UmbContextProviderMixin(LitElement) {
 		`,
 	];
 
+	@query('umb-action-page-service')
+	private _actionPageService!: UmbActionPageService;
+
 	@state()
 	private _modalOpen = false;
 
 	@state()
-	private _name = '';
-
-	public key = '';
-
-	@state()
-	private _pages: Array<HTMLElement> = [];
+	private entity: { name: string; key: string } = { name: '', key: '' };
 
 	connectedCallback() {
 		super.connectedCallback();
 		this.provideContext('umbActionService', this);
 	}
 
-	public open(name: string, key: string) {
-		this._name = name;
-		this.key = key;
+	public open(entity: ActionPageEntity) {
+		this.entity = entity;
 		this._modalOpen = true;
 	}
 
 	public close() {
 		this._modalOpen = false;
-		this._pages = [];
-	}
-
-	public openPage(elementName: string) {
-		const element = document.createElement(elementName);
-		this._pages.push(element);
-		this.requestUpdate('_pages');
-	}
-
-	public closeTopPage() {
-		this._pages.pop();
-		this.requestUpdate('_pages');
-	}
-
-	private _renderTopPage() {
-		if (this._pages.length === 0) {
-			return nothing;
-		}
-
-		return this._pages[this._pages.length - 1];
 	}
 
 	private _renderBackdrop() {
@@ -106,11 +87,7 @@ export class UmbActionService extends UmbContextProviderMixin(LitElement) {
 
 	private _renderModal() {
 		return this._modalOpen
-			? html` <div id="action-modal">
-					${this._pages.length === 0
-						? html`<umb-actions-modal .name=${this._name}></umb-actions-modal>`
-						: this._renderTopPage()}
-			  </div>`
+			? html`<umb-action-page-service id="action-modal" .actionEntity=${this.entity}></umb-action-page-service>`
 			: nothing;
 	}
 

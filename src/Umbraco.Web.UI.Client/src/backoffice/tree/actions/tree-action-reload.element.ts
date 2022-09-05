@@ -1,11 +1,11 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html, LitElement } from 'lit';
+import { css, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { UmbContextConsumerMixin } from '../../../core/context';
 import type { ManifestEntityAction } from '../../../core/models';
+import UmbActionElement from './action.element';
 
 @customElement('umb-tree-action-reload')
-export default class UmbTreeActionReloadElement extends UmbContextConsumerMixin(LitElement) {
+export default class UmbTreeActionReloadElement extends UmbActionElement {
 	static styles = [UUITextStyles, css``];
 
 	@property({ attribute: false })

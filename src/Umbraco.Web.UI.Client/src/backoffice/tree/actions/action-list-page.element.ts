@@ -1,13 +1,11 @@
-import { css, html, LitElement } from 'lit';
+import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, property } from 'lit/decorators.js';
-import { UmbActionService } from './actions.service';
-import { UmbContextConsumerMixin } from '../../core/context';
-import type { ManifestEntityAction } from '../../core/models';
-import './actions/tree-action.element';
+import { customElement } from 'lit/decorators.js';
+import type { ManifestEntityAction } from '../../../core/models';
+import UmbActionElement from './action.element';
 
-@customElement('umb-actions-modal')
-export class UmbActionsModal extends UmbContextConsumerMixin(LitElement) {
+@customElement('umb-action-list-page')
+export class UmbActionListPageElement extends UmbActionElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -26,9 +24,7 @@ export class UmbActionsModal extends UmbContextConsumerMixin(LitElement) {
 		`,
 	];
 
-	@property()
-	name = '';
-
+	//TODO Replace with real data
 	private _actionList: Array<ManifestEntityAction & { loader?: () => Promise<object | HTMLElement> }> = [
 		{
 			name: 'create',
@@ -38,7 +34,7 @@ export class UmbActionsModal extends UmbContextConsumerMixin(LitElement) {
 				icon: 'add',
 				weight: 10,
 			},
-			loader: () => import('./actions/tree-action-create.element'),
+			loader: () => import('./tree-action-create.element'),
 			type: 'entityAction',
 		},
 		{
@@ -49,7 +45,7 @@ export class UmbActionsModal extends UmbContextConsumerMixin(LitElement) {
 				icon: 'delete',
 				weight: 20,
 			},
-			loader: () => import('./actions/tree-action-delete.element'),
+			loader: () => import('./tree-action-delete.element'),
 			type: 'entityAction',
 		},
 		{
@@ -60,7 +56,7 @@ export class UmbActionsModal extends UmbContextConsumerMixin(LitElement) {
 				icon: 'sync',
 				weight: 30,
 			},
-			loader: () => import('./actions/tree-action-reload.element'),
+			loader: () => import('./tree-action-reload.element'),
 			type: 'entityAction',
 		},
 	];
@@ -76,7 +72,7 @@ export class UmbActionsModal extends UmbContextConsumerMixin(LitElement) {
 	render() {
 		return html`
 			<div id="title">
-				<h3>${this.name}</h3>
+				<h3>${this._entity.name}</h3>
 			</div>
 			<div id="action-list">${this.renderActions()}</div>
 		`;
@@ -85,6 +81,6 @@ export class UmbActionsModal extends UmbContextConsumerMixin(LitElement) {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-actions-modal': UmbActionsModal;
+		'umb-action-list-page': UmbActionListPageElement;
 	}
 }

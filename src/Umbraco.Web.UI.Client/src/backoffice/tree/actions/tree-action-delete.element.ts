@@ -1,29 +1,23 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html, LitElement } from 'lit';
+import { css, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { UmbContextConsumerMixin } from '../../../core/context';
 import type { ManifestEntityAction } from '../../../core/models';
 import { UmbModalService } from '../../../core/services/modal';
 import { UmbNodeStore } from '../../../core/stores/node.store';
-import { UmbActionService } from '../actions.service';
+import UmbActionElement from './action.element';
 
 @customElement('umb-tree-action-delete')
-export default class UmbTreeActionDeleteElement extends UmbContextConsumerMixin(LitElement) {
+export default class UmbTreeActionDeleteElement extends UmbActionElement {
 	static styles = [UUITextStyles, css``];
 
 	@property({ attribute: false })
 	public treeAction?: ManifestEntityAction;
 
-	private _actionService?: UmbActionService;
 	private _modalService?: UmbModalService;
 	private _nodeStore?: UmbNodeStore;
 
 	constructor() {
 		super();
-
-		this.consumeContext('umbActionService', (actionService: UmbActionService) => {
-			this._actionService = actionService;
-		});
 
 		this.consumeContext('umbModalService', (modalService: UmbModalService) => {
 			this._modalService = modalService;
@@ -43,7 +37,7 @@ export default class UmbTreeActionDeleteElement extends UmbContextConsumerMixin(
 
 		modalHandler?.onClose.then(({ confirmed }: any) => {
 			if (confirmed && this._actionService) {
-				this._nodeStore?.trash(this._actionService.key);
+				this._nodeStore?.trash(this._entity.key);
 				this._actionService.close();
 			}
 		});

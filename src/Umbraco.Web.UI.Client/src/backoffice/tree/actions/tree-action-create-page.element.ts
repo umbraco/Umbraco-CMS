@@ -1,34 +1,22 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html, LitElement } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
-import { UmbContextConsumerMixin } from '../../../core/context';
-import type { ManifestEntityAction } from '../../../core/models';
-import { UmbActionService } from '../actions.service';
+import { css, html } from 'lit';
+import { customElement } from 'lit/decorators.js';
+import UmbActionElement from './action.element';
 
 @customElement('umb-tree-action-create-page')
-export default class UmbTreeActionCreatePageElement extends UmbContextConsumerMixin(LitElement) {
+export class UmbTreeActionCreatePageElement extends UmbActionElement {
 	static styles = [UUITextStyles, css``];
 
-	private _actionService?: UmbActionService;
-
-	constructor() {
-		super();
-
-		this.consumeContext('umbActionService', (actionService: UmbActionService) => {
-			this._actionService = actionService;
-		});
-	}
-
 	private _next() {
-		this._actionService?.openPage('umb-tree-action-create-page-2');
+		this._actionPageService?.openPage('umb-tree-action-create-page-2');
 	}
 
 	private _back() {
-		this._actionService?.closeTopPage();
+		this._actionPageService?.closeTopPage();
 	}
 
 	render() {
-		return html`<h2>Create page 1</h2>
+		return html`<h2>Create page 1 for entity: ${this._entity.name}</h2>
 			<p>This is the first create page, here you can go next or back (it just closes the modal for now)</p>
 			<uui-button label="Back" look="secondary" @click=${this._back}></uui-button>
 			<uui-button label="Next" look="primary" @click=${this._next}></uui-button>`;
