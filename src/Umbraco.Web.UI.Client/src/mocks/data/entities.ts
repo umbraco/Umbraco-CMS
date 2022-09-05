@@ -26,6 +26,7 @@ export const entities: Array<Entity> = [
 		name: 'Member 1',
 		hasChildren: false,
 		isTrashed: false,
+		icon: 'document',
 	},
 	{
 		key: '06c6919c-6fa7-4aa5-8214-0582c721c472',
@@ -34,6 +35,7 @@ export const entities: Array<Entity> = [
 		name: 'Member 2',
 		hasChildren: false,
 		isTrashed: false,
+		icon: 'document',
 	},
 	{
 		key: '725a26c4-158d-4dc0-8aaa-b64473b11aa8',
@@ -42,6 +44,7 @@ export const entities: Array<Entity> = [
 		name: 'Member 3',
 		hasChildren: false,
 		isTrashed: false,
+		icon: 'document',
 	},
 	{
 		key: '14be0f66-1472-452a-abde-9da6b4136073',
@@ -50,6 +53,7 @@ export const entities: Array<Entity> = [
 		name: 'Member Group 1',
 		hasChildren: false,
 		isTrashed: false,
+		icon: 'document',
 	},
 	{
 		key: '8d5cf29a-e73b-4bf5-ad56-8adf6cbf8766',
@@ -58,6 +62,7 @@ export const entities: Array<Entity> = [
 		name: 'Member Group 2',
 		hasChildren: false,
 		isTrashed: false,
+		icon: 'document',
 	},
 	{
 		key: 'dt-1',
@@ -66,6 +71,7 @@ export const entities: Array<Entity> = [
 		hasChildren: false,
 		isTrashed: false,
 		type: 'dataType',
+		icon: 'document',
 	},
 	{
 		key: 'dt-2',
@@ -74,6 +80,7 @@ export const entities: Array<Entity> = [
 		hasChildren: false,
 		isTrashed: false,
 		type: 'dataType',
+		icon: 'document',
 	},
 	{
 		key: 'dt-3',
@@ -82,6 +89,7 @@ export const entities: Array<Entity> = [
 		hasChildren: false,
 		isTrashed: false,
 		type: 'dataType',
+		icon: 'document',
 	},
 	{
 		key: 'dt-4',
@@ -90,6 +98,7 @@ export const entities: Array<Entity> = [
 		hasChildren: false,
 		isTrashed: false,
 		type: 'dataType',
+		icon: 'document',
 	},
 	{
 		key: 'dt-5',
@@ -98,6 +107,7 @@ export const entities: Array<Entity> = [
 		hasChildren: false,
 		isTrashed: false,
 		type: 'dataType',
+		icon: 'document',
 	},
 	{
 		key: 'd81c7957-153c-4b5a-aa6f-b434a4964624',
@@ -106,6 +116,7 @@ export const entities: Array<Entity> = [
 		hasChildren: false,
 		isTrashed: false,
 		parentKey: 'f50eb86d-3ef2-4011-8c5d-c56c04eec0da',
+		icon: 'document',
 	},
 	{
 		key: 'a99e4018-3ffc-486b-aa76-eecea9593d17',
@@ -114,6 +125,7 @@ export const entities: Array<Entity> = [
 		hasChildren: false,
 		isTrashed: false,
 		parentKey: 'f50eb86d-3ef2-4011-8c5d-c56c04eec0da',
+		icon: 'document',
 	},
 	{
 		key: 'f2f81a40-c989-4b6b-84e2-057cecd3adc1',

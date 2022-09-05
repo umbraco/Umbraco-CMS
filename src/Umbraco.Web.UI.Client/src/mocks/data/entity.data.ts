@@ -4,9 +4,9 @@ import { entities } from './entities';
 export interface Entity {
 	key: string;
 	name: string;
-	icon?: string; // TODO: Should this be here?
+	icon: string;
 	type: string;
-	hasChildren: boolean; // TODO: Should this be here?
+	hasChildren: boolean;
 	parentKey: string;
 	isTrashed: boolean;
 }

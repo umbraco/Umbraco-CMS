@@ -22,6 +22,9 @@ export class UmbTreeItem extends UmbContextConsumerMixin(LitElement) {
 	@property({ type: String })
 	label = '';
 
+	@property({ type: String })
+	icon = '';
+
 	@property({ type: Boolean })
 	hasChildren = false;
 
@@ -133,7 +136,8 @@ export class UmbTreeItem extends UmbContextConsumerMixin(LitElement) {
 				.label=${item.name}
 				.hasChildren=${item.hasChildren}
 				.itemKey=${item.key}
-				.itemType=${item.type}>
+				.itemType=${item.type}
+				.icon="${item.icon}">
 			</umb-tree-item>`;
 		});
 	}
@@ -153,6 +157,7 @@ export class UmbTreeItem extends UmbContextConsumerMixin(LitElement) {
 				label="${this.label}"
 				href="${this._href}">
 				${this._renderChildItems()}
+				<uui-icon slot="icon" name="${this.icon}"></uui-icon>
 				<uui-action-bar slot="actions">
 					<uui-button @click=${this._openActions} label="Open actions menu">
 						<uui-symbol-more></uui-symbol-more>

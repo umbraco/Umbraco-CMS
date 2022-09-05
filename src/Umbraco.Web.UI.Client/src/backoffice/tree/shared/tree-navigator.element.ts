@@ -55,6 +55,7 @@ export class UmbTreeNavigator extends UmbContextConsumerMixin(LitElement) {
 					.itemKey=${item.key}
 					.itemType=${item.type}
 					.label=${item.name}
+					.icon="${item.icon}"
 					?hasChildren=${item.hasChildren}
 					.loading=${this._loading}></umb-tree-item>`
 			)}
