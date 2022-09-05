@@ -12,6 +12,7 @@ export class UmbTreeExtensionsContext extends UmbTreeContextBase {
 			type: 'extensionsList',
 			icon: 'favorite',
 			parentKey: '',
+			isTrashed: false,
 		};
 		this.entityStore.update([data]);
 		return this.entityStore.items.pipe(map((items) => items.filter((item) => item.key === this._rootKey)));

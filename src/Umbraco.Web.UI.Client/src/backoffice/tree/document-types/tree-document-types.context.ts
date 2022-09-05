@@ -12,6 +12,7 @@ export class UmbTreeDocumentTypesContext extends UmbTreeContextBase {
 			type: 'documentTypeRoot',
 			icon: 'folder',
 			parentKey: '',
+			isTrashed: false,
 		};
 		this.entityStore.update([data]);
 		return this.entityStore.items.pipe(map((items) => items.filter((item) => item.key === this._rootKey)));

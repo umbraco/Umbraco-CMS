@@ -12,6 +12,7 @@ export class UmbTreeMemberGroupsContext extends UmbTreeContextBase {
 			type: 'memberGroupRoot',
 			icon: 'folder',
 			parentKey: '',
+			isTrashed: false,
 		};
 
 		this.entityStore.update([data]);
