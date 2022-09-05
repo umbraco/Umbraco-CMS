@@ -1,30 +1,19 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html, LitElement } from 'lit';
+import { css, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { UmbContextConsumerMixin } from '../../../core/context';
 import type { ManifestEntityAction } from '../../../core/models';
-import { UmbActionService } from '../actions.service';
+import UmbActionElement from './action.element';
 
 @customElement('umb-tree-action-create')
-export default class UmbTreeActionCreateElement extends UmbContextConsumerMixin(LitElement) {
+export default class UmbTreeActionCreateElement extends UmbActionElement {
 	static styles = [UUITextStyles, css``];
 
 	@property({ attribute: false })
 	public treeAction?: ManifestEntityAction;
 
-	private _actionService?: UmbActionService;
-
-	constructor() {
-		super();
-
-		this.consumeContext('umbActionService', (actionService: UmbActionService) => {
-			this._actionService = actionService;
-		});
-	}
-
 	private _handleLabelClick() {
 		console.log(this.treeAction, 'label clicked');
-		this._actionService?.openPage('umb-tree-action-create-page');
+		this._actionPageService?.openPage('umb-tree-action-create-page');
 	}
 
 	render() {

@@ -7,7 +7,7 @@ import { UUIMenuItemEvent } from '@umbraco-ui/uui';
 import { UmbSectionContext } from '../../sections/section.context';
 import { Subscription } from 'rxjs';
 import { Entity } from '../../../mocks/data/entity.data';
-import { UmbActionService } from '../actions.service';
+import { UmbActionService } from '../actions/actions.service';
 
 @customElement('umb-tree-item')
 export class UmbTreeItem extends UmbContextConsumerMixin(LitElement) {
@@ -115,7 +115,7 @@ export class UmbTreeItem extends UmbContextConsumerMixin(LitElement) {
 	}
 
 	private _openActions() {
-		this._actionService?.open(this.label, this.itemKey);
+		this._actionService?.open({ name: this.label, key: this.itemKey });
 	}
 
 	render() {
