@@ -14,7 +14,7 @@ export class UmbInstallerContext {
 	public readonly settings = this._settings.asObservable();
 
 	constructor() {
-		this.loadIntallerSettings();
+		this.loadInstallerSettings();
 	}
 
 	public appendData(data: any) {
@@ -30,7 +30,7 @@ export class UmbInstallerContext {
 		return postInstallSetup(this.getData());
 	}
 
-	private loadIntallerSettings() {
+	private loadInstallerSettings() {
 		getInstallSettings({}).then(({ data }) => {
 			this._settings.next(data);
 		});
