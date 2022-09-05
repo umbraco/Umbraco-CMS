@@ -4,7 +4,7 @@ import { defaultA11yConfig } from '../../core/helpers/chai';
 import { UmbInstallerErrorElement } from './installer-error.element';
 
 // TODO: Write tests
-describe('UmbInstallerError', () => {
+describe('UmbInstallerErrorElement', () => {
 	let element: UmbInstallerErrorElement;
 
 	beforeEach(async () => {

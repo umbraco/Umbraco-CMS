@@ -4,7 +4,7 @@ import { defaultA11yConfig } from '../../core/helpers/chai';
 import { UmbInstallerUserElement } from './installer-user.element';
 
 // TODO: Write tests
-describe('UmbInstallerUser', () => {
+describe('UmbInstallerUserElement', () => {
 	let element: UmbInstallerUserElement;
 
 	beforeEach(async () => {

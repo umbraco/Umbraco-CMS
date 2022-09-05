@@ -4,7 +4,7 @@ import { defaultA11yConfig } from '../../core/helpers/chai';
 import { UmbInstallerDatabaseElement } from './installer-database.element';
 
 // TODO: Write tests
-describe('UmbInstallerDatabase', () => {
+describe('UmbInstallerDatabaseElement', () => {
 	let element: UmbInstallerDatabaseElement;
 
 	beforeEach(async () => {
