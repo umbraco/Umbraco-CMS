@@ -66,7 +66,7 @@ export interface IPrevalueField {
 }
 
 export interface IPrevalues {
-	prevalues: {
+	prevalues?: {
 		fields: IPrevalueField[];
 	};
 	defaultConfig?: {};
