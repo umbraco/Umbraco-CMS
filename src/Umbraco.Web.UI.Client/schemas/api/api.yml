@@ -550,6 +550,35 @@ components:
         - meta
         - name
         - alias
+    MetaPackageView:
+      type: object
+      properties:
+        packageAlias:
+          type: string
+      required:
+        - packageAlias
+    IManifestPackageView:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - packageView
+        meta:
+          $ref: '#/components/schemas/MetaPackageView'
+        name:
+          type: string
+        js:
+          type: string
+        elementName:
+          type: string
+        alias:
+          type: string
+      required:
+        - type
+        - meta
+        - name
+        - alias
     IManifestEntrypoint:
       type: object
       properties:
@@ -586,6 +615,7 @@ components:
         - $ref: '#/components/schemas/IManifestDashboard'
         - $ref: '#/components/schemas/IManifestEditorView'
         - $ref: '#/components/schemas/IManifestPropertyAction'
+        - $ref: '#/components/schemas/IManifestPackageView'
         - $ref: '#/components/schemas/IManifestEntrypoint'
         - $ref: '#/components/schemas/IManifestCustom'
       discriminator:
@@ -596,6 +626,7 @@ components:
           dashboard: '#/components/schemas/IManifestDashboard'
           editorView: '#/components/schemas/IManifestEditorView'
           propertyAction: '#/components/schemas/IManifestPropertyAction'
+          packageView: '#/components/schemas/IManifestPackageView'
           entrypoint: '#/components/schemas/IManifestEntrypoint'
           custom: '#/components/schemas/IManifestCustom'
     ManifestsResponse:
@@ -607,6 +638,28 @@ components:
             $ref: '#/components/schemas/Manifest'
       required:
         - manifests
+    Package:
+      type: object
+      properties:
+        name:
+          type: string
+        alias:
+          type: string
+        version:
+          type: string
+      required:
+        - name
+        - alias
+        - version
+    PackagesResponse:
+      type: object
+      properties:
+        packages:
+          type: array
+          items:
+            $ref: '#/components/schemas/Package'
+      required:
+        - packages
     ServerStatus:
       type: string
       enum:

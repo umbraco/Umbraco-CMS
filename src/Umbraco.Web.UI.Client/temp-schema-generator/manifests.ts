@@ -26,6 +26,7 @@ export type Manifest =
 	| IManifestDashboard
 	| IManifestEditorView
 	| IManifestPropertyAction
+	| IManifestPackageView
 	| IManifestEntrypoint
 	| IManifestCustom;
 
@@ -35,6 +36,7 @@ export type ManifestStandardTypes =
 	| 'dashboard'
 	| 'editorView'
 	| 'propertyAction'
+	| 'packageView'
 	| 'entrypoint';
 
 export interface ManifestsResponse {
@@ -84,6 +86,10 @@ export interface MetaPropertyAction {
 	propertyEditors: string[];
 }
 
+export interface MetaPackageView {
+	packageAlias: string;
+}
+
 export interface IManifestCustom extends IManifest {
 	type: 'custom';
 	meta?: {};
@@ -120,6 +126,11 @@ export interface IManifestEditorView extends IManifestElement {
 export interface IManifestPropertyAction extends IManifestElement {
 	type: 'propertyAction';
 	meta: MetaPropertyAction;
+}
+
+export interface IManifestPackageView extends IManifestElement {
+	type: 'packageView';
+	meta: MetaPackageView;
 }
 
 export interface IManifestEntrypoint extends IManifest {
