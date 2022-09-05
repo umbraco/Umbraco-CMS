@@ -1,15 +1,16 @@
 import { UmbData } from './data';
 
 export interface NodeEntity {
-	id: number;
 	key: string;
 	name: string;
 	icon: string; // TODO: should come from the doc type?
 	type: string;
+	isTrashed: boolean;
+	hasChildren: boolean;
+	parentKey: string;
 	properties: Array<NodeProperty>;
 	data: Array<NodePropertyData>;
 	variants: Array<any>; // TODO: define variant data
-	isTrashed: boolean;
 	//layout?: any; // TODO: define layout type - make it non-optional
 }
 
@@ -34,12 +35,13 @@ If we split entityData into its own object, then that could go in the entityStor
 */
 export const data: Array<NodeEntity> = [
 	{
-		id: 1,
 		key: '74e4008a-ea4f-4793-b924-15e02fd380d1',
 		isTrashed: false,
 		name: 'Document 1',
 		type: 'document',
 		icon: 'document',
+		parentKey: 'ba23245c-d8c0-46f7-a2bc-7623743d6eba',
+		hasChildren: false,
 		properties: [
 			{
 				alias: 'myHeadline',
@@ -85,12 +87,13 @@ export const data: Array<NodeEntity> = [
     */
 	},
 	{
-		id: 2,
 		key: '74e4008a-ea4f-4793-b924-15e02fd380d2',
 		isTrashed: false,
 		name: 'Document 2',
 		type: 'document',
 		icon: 'favorite',
+		parentKey: 'ba23245c-d8c0-46f7-a2bc-7623743d6eba',
+		hasChildren: false,
 		properties: [
 			{
 				alias: 'myHeadline',
@@ -149,12 +152,13 @@ export const data: Array<NodeEntity> = [
 		variants: [{ name: 'Variant 1' }],
 	},
 	{
-		id: 3,
 		key: 'cdd30288-2d1c-41b4-89a9-61647b4a10d5',
 		isTrashed: false,
 		name: 'Document 3',
 		type: 'document',
 		icon: 'document',
+		parentKey: 'ba23245c-d8c0-46f7-a2bc-7623743d6eba',
+		hasChildren: false,
 		properties: [
 			{
 				alias: 'myDescription',
@@ -172,12 +176,13 @@ export const data: Array<NodeEntity> = [
 		variants: [{ name: 'Variant 1' }],
 	},
 	{
-		id: 2001,
 		key: 'f2f81a40-c989-4b6b-84e2-057cecd3adc1',
 		isTrashed: false,
 		name: 'Media 1',
 		type: 'media',
 		icon: 'picture',
+		parentKey: 'c0858d71-52be-4bb2-822f-42fa0c9a1ea5',
+		hasChildren: false,
 		properties: [
 			{
 				alias: 'myMediaHeadline',
@@ -195,12 +200,13 @@ export const data: Array<NodeEntity> = [
 		variants: [],
 	},
 	{
-		id: 2002,
 		key: '69431027-8867-45bf-a93b-72bbdabfb177',
 		isTrashed: false,
 		type: 'media',
 		name: 'Media 2',
 		icon: 'picture',
+		parentKey: 'c0858d71-52be-4bb2-822f-42fa0c9a1ea5',
+		hasChildren: false,
 		properties: [
 			{
 				alias: 'myMediaDescription',

@@ -1,11 +1,13 @@
 import { css, html, LitElement } from 'lit';
+import { repeat } from 'lit/directives/repeat.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbContextConsumerMixin } from '../../../core/context';
-import { UmbTreeContext } from '../tree.context';
+import { UmbTreeContextBase } from '../tree.context';
 
 import './tree-item.element';
 import { Subscription } from 'rxjs';
+import { Entity } from '../../../mocks/data/entity.data';
 
 @customElement('umb-tree-navigator')
 export class UmbTreeNavigator extends UmbContextConsumerMixin(LitElement) {
@@ -14,11 +16,11 @@ export class UmbTreeNavigator extends UmbContextConsumerMixin(LitElement) {
 	@state()
 	private _loading = true;
 
-	private _treeContext?: UmbTreeContext;
+	private _treeContext?: UmbTreeContextBase;
 	private _treeRootSubscription?: Subscription;
 
 	@state()
-	private _items: any[] = [];
+	private _items: Entity[] = [];
 
 	constructor() {
 		super();
@@ -46,15 +48,16 @@ export class UmbTreeNavigator extends UmbContextConsumerMixin(LitElement) {
 
 	render() {
 		return html`
-			${this._items?.map(
-				(item) => html`
-					<umb-tree-item
-						.itemKey=${item.key}
-						.itemType=${item.type}
-						.label=${item.name}
-						?hasChildren=${item.hasChildren}
-						.loading=${this._loading}></umb-tree-item>
-				`
+			${repeat(
+				this._items,
+				(item) => item.key,
+				(item) => html`<umb-tree-item
+					.itemKey=${item.key}
+					.itemType=${item.type}
+					.label=${item.name}
+					.icon="${item.icon}"
+					?hasChildren=${item.hasChildren}
+					.loading=${this._loading}></umb-tree-item>`
 			)}
 		`;
 	}

@@ -1,15 +1,8 @@
 import { map } from 'rxjs';
-import { UmbEntityStore } from '../../../core/stores/entity.store';
-import { UmbTreeContext } from '../tree.context';
+import { UmbTreeContextBase } from '../tree.context';
 
-export class UmbTreeMembersContext implements UmbTreeContext {
-	public entityStore: UmbEntityStore;
-
+export class UmbTreeMembersContext extends UmbTreeContextBase {
 	private _rootKey = '8f974b62-392b-4ddd-908c-03c2e03ab1a6';
-
-	constructor(entityStore: UmbEntityStore) {
-		this.entityStore = entityStore;
-	}
 
 	public fetchRoot() {
 		const data = {
@@ -18,10 +11,11 @@ export class UmbTreeMembersContext implements UmbTreeContext {
 			name: 'Members',
 			hasChildren: true,
 			type: 'member',
-			icon: 'favorite',
+			icon: 'folder',
+			isTrashed: false,
 		};
 		this.entityStore.update([data]);
-		return this.entityStore.entities.pipe(map((items) => items.filter((item) => item.key === this._rootKey)));
+		return this.entityStore.items.pipe(map((items) => items.filter((item) => item.key === this._rootKey)));
 	}
 
 	public fetchChildren(key: string) {
@@ -32,6 +26,6 @@ export class UmbTreeMembersContext implements UmbTreeContext {
 				this.entityStore.update(data);
 			});
 
-		return this.entityStore.entities.pipe(map((items) => items.filter((item) => item.parentKey === key)));
+		return this.entityStore.items.pipe(map((items) => items.filter((item) => item.parentKey === key)));
 	}
 }

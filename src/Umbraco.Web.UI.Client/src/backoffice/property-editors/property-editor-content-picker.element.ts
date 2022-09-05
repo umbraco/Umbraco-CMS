@@ -65,7 +65,7 @@ export class UmbPropertyEditorContentPicker extends UmbContextConsumerMixin(LitE
 	}
 
 	private _openPicker() {
-		const modalHandler = this._modalService?.contentPicker({ multiple: true });
+		const modalHandler = this._modalService?.contentPicker({ multiple: true, selection: this.value });
 		modalHandler?.onClose.then(({ selection }: any) => {
 			this._setValue([...this.value, ...selection]);
 		});

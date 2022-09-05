@@ -1,16 +1,13 @@
-import { BehaviorSubject, map, Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { DocumentTypeEntity } from '../../mocks/data/document-type.data';
 import { UmbEntityStore } from './entity.store';
+import { UmbDataStoreBase } from './store';
 
-export class UmbDocumentTypeStore {
-	private _documentTypes: BehaviorSubject<Array<DocumentTypeEntity>> = new BehaviorSubject(
-		<Array<DocumentTypeEntity>>[]
-	);
-	public readonly documentTypes: Observable<Array<DocumentTypeEntity>> = this._documentTypes.asObservable();
-
+export class UmbDocumentTypeStore extends UmbDataStoreBase<DocumentTypeEntity> {
 	private _entityStore: UmbEntityStore;
 
 	constructor(entityStore: UmbEntityStore) {
+		super();
 		this._entityStore = entityStore;
 	}
 
@@ -20,10 +17,10 @@ export class UmbDocumentTypeStore {
 		fetch(`/umbraco/backoffice/document-type/${key}`)
 			.then((res) => res.json())
 			.then((data) => {
-				this._updateStore(data);
+				this.update(data);
 			});
 
-		return this.documentTypes.pipe(
+		return this.items.pipe(
 			map(
 				(documentTypes: Array<DocumentTypeEntity>) =>
 					documentTypes.find((documentType: DocumentTypeEntity) => documentType.key === key) || null
@@ -42,29 +39,10 @@ export class UmbDocumentTypeStore {
 				},
 			});
 			const json = await res.json();
-			this._updateStore(json);
+			this.update(json);
 			this._entityStore.update(json);
 		} catch (error) {
 			console.error('Save Document Type error', error);
 		}
-	}
-
-	private _updateStore(fetchedDocumentTypes: Array<DocumentTypeEntity>) {
-		const storedDocumentTypes = this._documentTypes.getValue();
-		const updated: DocumentTypeEntity[] = [...storedDocumentTypes];
-
-		fetchedDocumentTypes.forEach((fetchedDocumentType) => {
-			const index = storedDocumentTypes.map((storedNode) => storedNode.key).indexOf(fetchedDocumentType.key);
-
-			if (index !== -1) {
-				// If the data type is already in the store, update it
-				updated[index] = fetchedDocumentType;
-			} else {
-				// If the data type is not in the store, add it
-				updated.push(fetchedDocumentType);
-			}
-		});
-
-		this._documentTypes.next([...updated]);
 	}
 }

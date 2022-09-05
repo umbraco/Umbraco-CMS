@@ -5,6 +5,7 @@ import { UmbModalLayoutElement } from '../modal-layout.element';
 
 export interface UmbModalContentPickerData {
 	multiple?: boolean;
+	selection: Array<string>;
 }
 
 import '../../../../../backoffice/tree/document/tree-document.element';
@@ -49,20 +50,15 @@ export class UmbModalLayoutContentPickerElement extends UmbModalLayoutElement<Um
 	@state()
 	_selection: Array<string> = [];
 
-	private _handleSelect(e: CustomEvent) {
-		e.stopPropagation();
-		const item = e.composedPath()?.[0] as any;
-		const key = item.itemKey;
-		this._select(key);
+	connectedCallback() {
+		super.connectedCallback();
+		this._selection = this.data?.selection ?? [];
 	}
 
-	private _select(key: string) {
-		// TODO: implement single selection
-		if (this._selection.includes(key)) {
-			this._selection = this._selection.filter((c) => c !== key);
-		} else {
-			this._selection.push(key);
-		}
+	private _handleSelectionChange(e: CustomEvent) {
+		e.stopPropagation();
+		const element = e.composedPath()[0] as any;
+		this._selection = element.selection;
 	}
 
 	private _submit() {
@@ -81,7 +77,10 @@ export class UmbModalLayoutContentPickerElement extends UmbModalLayoutElement<Um
 				<uui-box>
 					<uui-input></uui-input>
 					<hr />
-					<umb-tree-document @select="${this._handleSelect}" selectable></umb-tree-document>
+					<umb-tree-document
+						@change="${this._handleSelectionChange}"
+						.selection=${this._selection}
+						selectable></umb-tree-document>
 				</uui-box>
 				<div slot="actions">
 					<uui-button label="Close" @click=${this._close}></uui-button>

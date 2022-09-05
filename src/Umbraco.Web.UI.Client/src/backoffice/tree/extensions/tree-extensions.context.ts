@@ -1,15 +1,8 @@
 import { map } from 'rxjs';
-import { UmbEntityStore } from '../../../core/stores/entity.store';
-import { UmbTreeContext } from '../tree.context';
+import { UmbTreeContextBase } from '../tree.context';
 
-export class UmbTreeExtensionsContext implements UmbTreeContext {
-	public entityStore: UmbEntityStore;
-
+export class UmbTreeExtensionsContext extends UmbTreeContextBase {
 	private _rootKey = 'fd32ea8b-893b-4ee9-b1d0-72f41c4a6d38';
-
-	constructor(entityStore: UmbEntityStore) {
-		this.entityStore = entityStore;
-	}
 
 	public fetchRoot() {
 		const data = {
@@ -19,8 +12,9 @@ export class UmbTreeExtensionsContext implements UmbTreeContext {
 			type: 'extensionsList',
 			icon: 'favorite',
 			parentKey: '',
+			isTrashed: false,
 		};
 		this.entityStore.update([data]);
-		return this.entityStore.entities.pipe(map((items) => items.filter((item) => item.key === this._rootKey)));
+		return this.entityStore.items.pipe(map((items) => items.filter((item) => item.key === this._rootKey)));
 	}
 }
