@@ -1,7 +1,12 @@
+using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.AspNetCore.Mvc.Razor.Compilation;
+using Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation;
+using Microsoft.AspNetCore.Razor.Language;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -129,6 +134,7 @@ public static class UmbracoBuilderDependencyInjectionExtensions
 
         // copy the current collection, we need to use this later to rebuild a container
         // to re-create the razor compiler provider
+
         var initialCollection = new ServiceCollection { builder.Services };
 
         // Replace the default with our custom engine
@@ -138,7 +144,9 @@ public static class UmbracoBuilderDependencyInjectionExtensions
                 {
                     // re-create the original container so that a brand new IRazorPageActivator
                     // is produced, if we don't re-create the container then it will just return the same instance.
+                    initialCollection.AddCustomViewCompiler(s);
                     ServiceProvider recreatedServices = initialCollection.BuildServiceProvider();
+
                     return recreatedServices.GetRequiredService<IRazorViewEngine>();
                 },
                 s.GetRequiredService<InMemoryModelFactory>()));
@@ -161,5 +169,15 @@ public static class UmbracoBuilderDependencyInjectionExtensions
         });
 
         return builder;
+    }
+
+    private static void AddCustomViewCompiler(this ServiceCollection oldCollection, IServiceProvider actualProvider)
+    {
+        oldCollection.AddSingleton<IViewCompilerProvider, UmbracoViewCompilerProvider>(prov => new UmbracoViewCompilerProvider(
+            prov.GetRequiredService<ApplicationPartManager>(),
+            prov.GetRequiredService<RazorProjectEngine>(),
+            actualProvider.GetRequiredService<ILoggerFactory>(),
+            prov.GetRequiredService<IOptions<MvcRazorRuntimeCompilationOptions>>(),
+            actualProvider.GetRequiredService<InMemoryModelFactory>()));
     }
 }

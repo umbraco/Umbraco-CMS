@@ -44,7 +44,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
         private int _ver;
         private int? _skipver;
         private RoslynCompiler? _roslynCompiler;
-        private UmbracoAssemblyLoadContext? _currentAssemblyLoadContext;
+        internal UmbracoAssemblyLoadContext? _currentAssemblyLoadContext;
         private ModelsBuilderSettings _config;
         private bool _disposedValue;
 
