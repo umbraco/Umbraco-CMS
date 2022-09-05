@@ -52,7 +52,7 @@ export class UmbInstallerConsentElement extends UmbContextConsumerMixin(LitEleme
 	private _telemetryFormData?: TelemetryModel['level'];
 
 	@state()
-	private _installerStore?: UmbInstallerContext;
+	private _installerContext?: UmbInstallerContext;
 
 	private storeDataSubscription?: Subscription;
 	private storeSettingsSubscription?: Subscription;
@@ -60,16 +60,16 @@ export class UmbInstallerConsentElement extends UmbContextConsumerMixin(LitEleme
 	constructor() {
 		super();
 
-		this.consumeContext('umbInstallerContext', (installerStore: UmbInstallerContext) => {
-			this._installerStore = installerStore;
+		this.consumeContext('umbInstallerContext', (installerContext: UmbInstallerContext) => {
+			this._installerContext = installerContext;
 
 			this.storeSettingsSubscription?.unsubscribe();
-			this.storeSettingsSubscription = installerStore.settings.subscribe((settings) => {
+			this.storeSettingsSubscription = installerContext.settings.subscribe((settings) => {
 				this._telemetryLevels = settings.user.consentLevels;
 			});
 
 			this.storeDataSubscription?.unsubscribe();
-			this.storeDataSubscription = installerStore.data.subscribe((data) => {
+			this.storeDataSubscription = installerContext.data.subscribe((data) => {
 				this._telemetryFormData = data.telemetryLevel;
 			});
 		});
@@ -86,15 +86,15 @@ export class UmbInstallerConsentElement extends UmbContextConsumerMixin(LitEleme
 
 		const value: { [key: string]: string } = {};
 		value[target.name] = this._telemetryLevels[parseInt(target.value) - 1].level;
-		this._installerStore?.appendData(value);
+		this._installerContext?.appendData(value);
 	}
 
 	private _onNext() {
-		this._installerStore?.nextStep();
+		this._installerContext?.nextStep();
 	}
 
 	private _onBack() {
-		this._installerStore?.prevStep();
+		this._installerContext?.prevStep();
 	}
 
 	private get _selectedTelemetryIndex() {

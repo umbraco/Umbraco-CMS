@@ -94,7 +94,7 @@ export class UmbInstallerDatabaseElement extends UmbContextConsumerMixin(LitElem
 	private _preConfiguredDatabase?: UmbracoInstallerDatabaseModel;
 
 	@state()
-	private _installerStore?: UmbInstallerContext;
+	private _installerContext?: UmbInstallerContext;
 
 	@state()
 	private _validationErrorMessage = '';
@@ -105,11 +105,11 @@ export class UmbInstallerDatabaseElement extends UmbContextConsumerMixin(LitElem
 	constructor() {
 		super();
 
-		this.consumeContext('umbInstallerContext', (installerStore: UmbInstallerContext) => {
-			this._installerStore = installerStore;
+		this.consumeContext('umbInstallerContext', (installerContext: UmbInstallerContext) => {
+			this._installerContext = installerContext;
 
 			this.storeSettingsSubscription?.unsubscribe();
-			this.storeSettingsSubscription = installerStore.settings.subscribe((settings) => {
+			this.storeSettingsSubscription = installerContext.settings.subscribe((settings) => {
 				this._databases = settings.databases;
 
 				// If there is an isConfigured database in the databases array then we can skip the database selection step
@@ -121,7 +121,7 @@ export class UmbInstallerDatabaseElement extends UmbContextConsumerMixin(LitElem
 			});
 
 			this.storeDataSubscription?.unsubscribe();
-			this.storeDataSubscription = installerStore.data.subscribe((data) => {
+			this.storeDataSubscription = installerContext.data.subscribe((data) => {
 				this.databaseFormData = data.database ?? {};
 				this._options.forEach((x, i) => (x.selected = data.database?.id === x.value || i === 0));
 			});
@@ -140,9 +140,9 @@ export class UmbInstallerDatabaseElement extends UmbContextConsumerMixin(LitElem
 		const value: { [key: string]: string | boolean } = {};
 		value[target.name] = target.checked ?? target.value; // handle boolean and text inputs
 
-		const database = { ...this._installerStore?.getData().database, ...value };
+		const database = { ...this._installerContext?.getData().database, ...value };
 
-		this._installerStore?.appendData({ database });
+		this._installerContext?.appendData({ database });
 	}
 
 	private _handleSubmit = async (evt: SubmitEvent) => {
@@ -154,7 +154,7 @@ export class UmbInstallerDatabaseElement extends UmbContextConsumerMixin(LitElem
 		const isValid = form.checkValidity();
 		if (!isValid) return;
 
-		if (!this._installerStore) return;
+		if (!this._installerContext) return;
 
 		this._installButton.state = 'waiting';
 
@@ -202,7 +202,7 @@ export class UmbInstallerDatabaseElement extends UmbContextConsumerMixin(LitElem
 			}
 
 			const database = {
-				...this._installerStore?.getData().database,
+				...this._installerContext?.getData().database,
 				id,
 				username,
 				password,
@@ -212,11 +212,11 @@ export class UmbInstallerDatabaseElement extends UmbContextConsumerMixin(LitElem
 				connectionString,
 			} as UmbracoPerformInstallDatabaseConfiguration;
 
-			this._installerStore?.appendData({ database });
+			this._installerContext?.appendData({ database });
 		}
 
-		this._installerStore?.nextStep();
-		this._installerStore
+		this._installerContext?.nextStep();
+		this._installerContext
 			.requestInstall()
 			.then(() => this._handleFulfilled())
 			.catch((error) => this._handleRejected(error));
@@ -232,18 +232,18 @@ export class UmbInstallerDatabaseElement extends UmbContextConsumerMixin(LitElem
 		if (e instanceof postInstallSetup.Error) {
 			const error = e.getActualType();
 			if (error.status === 400) {
-				this._installerStore?.setInstallStatus(error.data);
+				this._installerContext?.setInstallStatus(error.data);
 			}
 		}
-		this._installerStore?.nextStep();
+		this._installerContext?.nextStep();
 	}
 
 	private _onBack() {
-		this._installerStore?.prevStep();
+		this._installerContext?.prevStep();
 	}
 
 	private get selectedDatabase() {
-		const id = this._installerStore?.getData().database?.id;
+		const id = this._installerContext?.getData().database?.id;
 		return this._databases.find((x) => x.id === id) ?? this._databases[0];
 	}
 

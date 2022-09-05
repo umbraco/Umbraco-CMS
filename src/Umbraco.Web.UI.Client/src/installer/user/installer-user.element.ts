@@ -61,17 +61,17 @@ export class UmbInstallerUserElement extends UmbContextConsumerMixin(LitElement)
 	private _userFormData?: { name: string; password: string; email: string; subscribeToNewsletter: boolean };
 
 	@state()
-	private _installerStore?: UmbInstallerContext;
+	private _installerContext?: UmbInstallerContext;
 
-	private installerStoreSubscription?: Subscription;
+	private installerContextSubscription?: Subscription;
 
 	constructor() {
 		super();
 
-		this.consumeContext('umbInstallerContext', (installerStore: UmbInstallerContext) => {
-			this._installerStore = installerStore;
-			this.installerStoreSubscription?.unsubscribe();
-			this.installerStoreSubscription = installerStore.data.subscribe(({ user }) => {
+		this.consumeContext('umbInstallerContext', (installerContext: UmbInstallerContext) => {
+			this._installerContext = installerContext;
+			this.installerContextSubscription?.unsubscribe();
+			this.installerContextSubscription = installerContext.data.subscribe(({ user }) => {
 				this._userFormData = {
 					name: user.name,
 					password: user.password,
@@ -84,7 +84,7 @@ export class UmbInstallerUserElement extends UmbContextConsumerMixin(LitElement)
 
 	disconnectedCallback(): void {
 		super.disconnectedCallback();
-		this.installerStoreSubscription?.unsubscribe();
+		this.installerContextSubscription?.unsubscribe();
 	}
 
 	private _handleSubmit = (e: SubmitEvent) => {
@@ -102,8 +102,8 @@ export class UmbInstallerUserElement extends UmbContextConsumerMixin(LitElement)
 		const email = formData.get('email');
 		const subscribeToNewsletter = formData.has('subscribeToNewsletter');
 
-		this._installerStore?.appendData({ user: { name, password, email, subscribeToNewsletter } });
-		this._installerStore?.nextStep();
+		this._installerContext?.appendData({ user: { name, password, email, subscribeToNewsletter } });
+		this._installerContext?.nextStep();
 	};
 
 	render() {
