@@ -11,7 +11,7 @@ import { rest } from 'msw';
 
 import { UmbInstallerContext } from './installer-context';
 
-import type { UmbInstallerError, UmbInstallerUser } from '.';
+import type { UmbInstallerErrorElement, UmbInstallerUserElement } from '.';
 import type { UmbracoInstaller } from '../core/models';
 export default {
 	title: 'Components/Installer/Steps',
@@ -28,7 +28,7 @@ export default {
 	],
 } as Meta;
 
-export const Step1User: Story<UmbInstallerUser> = () => html`<umb-installer-user></umb-installer-user>`;
+export const Step1User: Story<UmbInstallerUserElement> = () => html`<umb-installer-user></umb-installer-user>`;
 Step1User.storyName = 'Step 1: User';
 Step1User.parameters = {
 	actions: {
@@ -93,7 +93,7 @@ Step3DatabasePreconfigured.parameters = {
 export const Step4Installing: Story = () => html`<umb-installer-installing></umb-installer-installing>`;
 Step4Installing.storyName = 'Step 4: Installing';
 
-export const Step5Error: Story<UmbInstallerError> = ({ error }) =>
+export const Step5Error: Story<UmbInstallerErrorElement> = ({ error }) =>
 	html`<umb-installer-error .error=${error}></umb-installer-error>`;
 Step5Error.storyName = 'Step 5: Error';
 Step5Error.args = {

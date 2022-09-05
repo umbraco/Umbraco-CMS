@@ -9,7 +9,7 @@ import type { UmbracoInstallerDatabaseModel, UmbracoPerformInstallDatabaseConfig
 import { UmbInstallerContext } from './installer-context';
 
 @customElement('umb-installer-database')
-export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
+export class UmbInstallerDatabaseElement extends UmbContextConsumerMixin(LitElement) {
 	static styles: CSSResultGroup = [
 		css`
 			:host,
@@ -384,6 +384,6 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-installer-database': UmbInstallerDatabase;
+		'umb-installer-database': UmbInstallerDatabaseElement;
 	}
 }

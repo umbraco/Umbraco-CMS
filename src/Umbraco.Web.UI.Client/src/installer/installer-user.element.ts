@@ -6,7 +6,7 @@ import { UmbContextConsumerMixin } from '../core/context';
 import { UmbInstallerContext } from './installer-context';
 
 @customElement('umb-installer-user')
-export class UmbInstallerUser extends UmbContextConsumerMixin(LitElement) {
+export class UmbInstallerUserElement extends UmbContextConsumerMixin(LitElement) {
 	static styles: CSSResultGroup = [
 		css`
 			:host,
@@ -166,6 +166,6 @@ export class UmbInstallerUser extends UmbContextConsumerMixin(LitElement) {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-installer-user': UmbInstallerUser;
+		'umb-installer-user': UmbInstallerUserElement;
 	}
 }

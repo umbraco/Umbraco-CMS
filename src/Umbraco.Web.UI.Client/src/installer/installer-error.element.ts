@@ -4,7 +4,7 @@ import { customElement, property } from 'lit/decorators.js';
 import type { ProblemDetails } from '../core/models';
 
 @customElement('umb-installer-error')
-export class UmbInstallerError extends LitElement {
+export class UmbInstallerErrorElement extends LitElement {
 	static styles: CSSResultGroup = [
 		css`
 			:host,
@@ -71,6 +71,6 @@ export class UmbInstallerError extends LitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-installer-error': UmbInstallerError;
+		'umb-installer-error': UmbInstallerErrorElement;
 	}
 }

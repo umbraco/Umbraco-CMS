@@ -3,22 +3,22 @@ import '.';
 import { expect, fixture, html } from '@open-wc/testing';
 
 import { defaultA11yConfig } from '../core/helpers/chai';
-import { UmbInstallerConsent } from './installer-consent.element';
-import { UmbInstallerDatabase } from './installer-database.element';
-import { UmbInstallerInstalling } from './installer-installing.element';
-import { UmbInstallerLayout } from './installer-layout.element';
-import { UmbInstallerUser } from './installer-user.element';
-import { UmbInstaller } from './installer.element';
+import { UmbInstallerConsentElement } from './installer-consent.element';
+import { UmbInstallerDatabaseElement } from './installer-database.element';
+import { UmbInstallerInstallingElement } from './installer-installing.element';
+import { UmbInstallerLayoutElement } from './installer-layout.element';
+import { UmbInstallerUserElement } from './installer-user.element';
+import { UmbInstallerElement } from './installer.element';
 
 describe('UmbInstaller', () => {
-	let element: UmbInstaller;
+	let element: UmbInstallerElement;
 
 	beforeEach(async () => {
 		element = await fixture(html`<umb-installer></umb-installer>`);
 	});
 
 	it('is defined with its own instance', () => {
-		expect(element).to.be.instanceOf(UmbInstaller);
+		expect(element).to.be.instanceOf(UmbInstallerElement);
 	});
 
 	it('passes the a11y audit', async () => {
@@ -27,14 +27,14 @@ describe('UmbInstaller', () => {
 });
 
 describe('UmbInstallerLayout', () => {
-	let element: UmbInstallerLayout;
+	let element: UmbInstallerLayoutElement;
 
 	beforeEach(async () => {
 		element = await fixture(html`<umb-installer-layout></umb-installer-layout>`);
 	});
 
 	it('is defined with its own instance', () => {
-		expect(element).to.be.instanceOf(UmbInstallerLayout);
+		expect(element).to.be.instanceOf(UmbInstallerLayoutElement);
 	});
 
 	it('passes the a11y audit', async () => {
@@ -43,14 +43,14 @@ describe('UmbInstallerLayout', () => {
 });
 
 describe('UmbInstallerUser', () => {
-	let element: UmbInstallerUser;
+	let element: UmbInstallerUserElement;
 
 	beforeEach(async () => {
 		element = await fixture(html`<umb-installer-user></umb-installer-user>`);
 	});
 
 	it('is defined with its own instance', () => {
-		expect(element).to.be.instanceOf(UmbInstallerUser);
+		expect(element).to.be.instanceOf(UmbInstallerUserElement);
 	});
 
 	it('passes the a11y audit', async () => {
@@ -59,14 +59,14 @@ describe('UmbInstallerUser', () => {
 });
 
 describe('UmbInstallerConsent', () => {
-	let element: UmbInstallerConsent;
+	let element: UmbInstallerConsentElement;
 
 	beforeEach(async () => {
 		element = await fixture(html`<umb-installer-consent></umb-installer-consent>`);
 	});
 
 	it('is defined with its own instance', () => {
-		expect(element).to.be.instanceOf(UmbInstallerConsent);
+		expect(element).to.be.instanceOf(UmbInstallerConsentElement);
 	});
 
 	it('passes the a11y audit', async () => {
@@ -75,14 +75,14 @@ describe('UmbInstallerConsent', () => {
 });
 
 describe('UmbInstallerDatabase', () => {
-	let element: UmbInstallerDatabase;
+	let element: UmbInstallerDatabaseElement;
 
 	beforeEach(async () => {
 		element = await fixture(html`<umb-installer-database></umb-installer-database>`);
 	});
 
 	it('is defined with its own instance', () => {
-		expect(element).to.be.instanceOf(UmbInstallerDatabase);
+		expect(element).to.be.instanceOf(UmbInstallerDatabaseElement);
 	});
 
 	it('passes the a11y audit', async () => {
@@ -91,14 +91,14 @@ describe('UmbInstallerDatabase', () => {
 });
 
 describe('UmbInstallerInstalling', () => {
-	let element: UmbInstallerInstalling;
+	let element: UmbInstallerInstallingElement;
 
 	beforeEach(async () => {
 		element = await fixture(html`<umb-installer-installing></umb-installer-installing>`);
 	});
 
 	it('is defined with its own instance', () => {
-		expect(element).to.be.instanceOf(UmbInstallerInstalling);
+		expect(element).to.be.instanceOf(UmbInstallerInstallingElement);
 	});
 
 	it('passes the a11y audit', async () => {

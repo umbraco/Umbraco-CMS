@@ -14,7 +14,7 @@ import type { ProblemDetails } from '../core/models';
 import { UmbInstallerContext } from './installer-context';
 
 @customElement('umb-installer')
-export class UmbInstaller extends UmbContextProviderMixin(LitElement) {
+export class UmbInstallerElement extends UmbContextProviderMixin(LitElement) {
 	static styles: CSSResultGroup = [css``];
 
 	@state()
@@ -96,10 +96,10 @@ export class UmbInstaller extends UmbContextProviderMixin(LitElement) {
 	}
 }
 
-export default UmbInstaller;
+export default UmbInstallerElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-installer': UmbInstaller;
+		'umb-installer': UmbInstallerElement;
 	}
 }

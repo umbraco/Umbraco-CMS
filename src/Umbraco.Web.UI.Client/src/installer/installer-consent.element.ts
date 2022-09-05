@@ -8,7 +8,7 @@ import type { TelemetryModel } from '../core/models';
 import { UmbInstallerContext } from './installer-context';
 
 @customElement('umb-installer-consent')
-export class UmbInstallerConsent extends UmbContextConsumerMixin(LitElement) {
+export class UmbInstallerConsentElement extends UmbContextConsumerMixin(LitElement) {
 	static styles: CSSResultGroup = [
 		css`
 			:host,
@@ -139,6 +139,6 @@ export class UmbInstallerConsent extends UmbContextConsumerMixin(LitElement) {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-installer-consent': UmbInstallerConsent;
+		'umb-installer-consent': UmbInstallerConsentElement;
 	}
 }
