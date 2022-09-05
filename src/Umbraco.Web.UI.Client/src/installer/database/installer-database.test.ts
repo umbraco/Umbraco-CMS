@@ -3,6 +3,7 @@ import { expect, fixture, html } from '@open-wc/testing';
 import { defaultA11yConfig } from '../../core/helpers/chai';
 import { UmbInstallerDatabaseElement } from './installer-database.element';
 
+// TODO: Write tests
 describe('UmbInstallerDatabase', () => {
 	let element: UmbInstallerDatabaseElement;
 
