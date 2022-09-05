@@ -9,7 +9,7 @@ export default {
 	title: 'Components/Installer/Steps',
 	component: 'umb-installer-installing',
 	id: 'umb-installer-installing',
-	decorators: [installerContextProvider],
+	decorators: [(story) => installerContextProvider(story)],
 } as Meta;
 
 export const Step4Installing: Story<UmbInstallerInstallingElement> = () =>

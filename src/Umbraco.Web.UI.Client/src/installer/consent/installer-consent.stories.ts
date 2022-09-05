@@ -9,14 +9,9 @@ export default {
 	title: 'Components/Installer/Steps',
 	component: 'umb-installer-consent',
 	id: 'umb-installer-consent',
-	decorators: [installerContextProvider],
+	decorators: [(story) => installerContextProvider(story)],
 } as Meta;
 
 export const Step2Telemetry: Story<UmbInstallerConsentElement> = () =>
 	html`<umb-installer-consent></umb-installer-consent>`;
 Step2Telemetry.storyName = 'Step 2: Telemetry data';
-Step2Telemetry.parameters = {
-	actions: {
-		handles: ['previous', 'next'],
-	},
-};

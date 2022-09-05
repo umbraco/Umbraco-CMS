@@ -11,25 +11,17 @@ export default {
 	title: 'Components/Installer/Steps',
 	component: 'umb-installer-database',
 	id: 'umb-installer-database',
-	decorators: [installerContextProvider],
+	decorators: [(story) => installerContextProvider(story)],
 } as Meta;
 
 export const Step3Database: Story<UmbInstallerDatabaseElement> = () =>
 	html`<umb-installer-database></umb-installer-database>`;
 Step3Database.storyName = 'Step 3: Database';
-Step3Database.parameters = {
-	actions: {
-		handles: ['previous', 'submit'],
-	},
-};
 
 export const Step3DatabasePreconfigured: Story<UmbInstallerDatabaseElement> = () =>
 	html`<umb-installer-database></umb-installer-database>`;
 Step3DatabasePreconfigured.storyName = 'Step 3: Database (preconfigured)';
 Step3DatabasePreconfigured.parameters = {
-	actions: {
-		handles: ['previous', 'submit'],
-	},
 	msw: {
 		handlers: {
 			global: null,

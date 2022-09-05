@@ -103,7 +103,7 @@ export class UmbInstallerUserElement extends UmbContextConsumerMixin(LitElement)
 		const subscribeToNewsletter = formData.has('subscribeToNewsletter');
 
 		this._installerStore?.appendData({ user: { name, password, email, subscribeToNewsletter } });
-		this.dispatchEvent(new CustomEvent('next', { bubbles: true, composed: true }));
+		this._installerStore?.nextStep();
 	};
 
 	render() {

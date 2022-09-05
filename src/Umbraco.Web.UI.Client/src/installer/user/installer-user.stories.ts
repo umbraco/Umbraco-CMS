@@ -9,13 +9,8 @@ export default {
 	title: 'Components/Installer/Steps',
 	component: 'umb-installer-user',
 	id: 'umb-installer-user',
-	decorators: [installerContextProvider],
+	decorators: [(story) => installerContextProvider(story)],
 } as Meta;
 
 export const Step1User: Story<UmbInstallerUserElement> = () => html`<umb-installer-user></umb-installer-user>`;
 Step1User.storyName = 'Step 1: User';
-Step1User.parameters = {
-	actions: {
-		handles: ['next'],
-	},
-};

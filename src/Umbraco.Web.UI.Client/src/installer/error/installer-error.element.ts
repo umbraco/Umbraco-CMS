@@ -1,10 +1,13 @@
 import { css, CSSResultGroup, html, LitElement, nothing } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, state } from 'lit/decorators.js';
+import { Subscription } from 'rxjs';
+import { UmbContextConsumerMixin } from '../../core/context';
 
 import type { ProblemDetails } from '../../core/models';
+import { UmbInstallerContext } from '../installer.context';
 
 @customElement('umb-installer-error')
-export class UmbInstallerErrorElement extends LitElement {
+export class UmbInstallerErrorElement extends UmbContextConsumerMixin(LitElement) {
 	static styles: CSSResultGroup = [
 		css`
 			:host,
@@ -24,12 +27,34 @@ export class UmbInstallerErrorElement extends LitElement {
 		`,
 	];
 
-	@property({ type: Object })
-	error?: ProblemDetails;
+	@state()
+	_error?: ProblemDetails;
+
+	private _installerContext?: UmbInstallerContext;
+	private _installStatusSubscription?: Subscription;
+
+	connectedCallback() {
+		super.connectedCallback();
+
+		this.consumeContext('umbInstallerContext', (installerContext) => {
+			this._installerContext = installerContext;
+			this._observeInstallStatus();
+		});
+	}
+
+	private _observeInstallStatus() {
+		this._installStatusSubscription?.unsubscribe();
+
+		this._installerContext?.installStatusChanges().subscribe((status) => {
+			if (status) {
+				this._error = status;
+			}
+		});
+	}
 
 	private _handleSubmit(e: SubmitEvent) {
 		e.preventDefault();
-		this.dispatchEvent(new CustomEvent('reset', { bubbles: true, composed: true }));
+		this._installerContext?.reset();
 	}
 
 	private _renderError(error: ProblemDetails) {
@@ -48,13 +73,18 @@ export class UmbInstallerErrorElement extends LitElement {
 		`;
 	}
 
+	disconnectedCallback(): void {
+		super.disconnectedCallback();
+		this._installStatusSubscription?.unsubscribe();
+	}
+
 	render() {
 		return html` <div id="container" class="uui-text" data-test="installer-error">
 			<uui-form>
 				<form id="installer-form" @submit="${this._handleSubmit}">
 					<h1 class="uui-h3">Installing Umbraco</h1>
 					<h2>Something went wrong</h2>
-					${this.error ? this._renderError(this.error) : nothing}
+					${this._error ? this._renderError(this._error) : nothing}
 					<div id="buttons">
 						<uui-button
 							id="button-reset"

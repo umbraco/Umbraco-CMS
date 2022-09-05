@@ -215,11 +215,31 @@ export class UmbInstallerDatabaseElement extends UmbContextConsumerMixin(LitElem
 			this._installerStore?.appendData({ database });
 		}
 
-		this.dispatchEvent(new CustomEvent('submit', { bubbles: true, composed: true }));
+		this._installerStore?.nextStep();
+		this._installerStore
+			.requestInstall()
+			.then(() => this._handleFulfilled())
+			.catch((error) => this._handleRejected(error));
 	};
 
+	private _handleFulfilled() {
+		console.warn('TODO: Set up real authentication');
+		sessionStorage.setItem('is-authenticated', 'true');
+		history.replaceState(null, '', '/content');
+	}
+
+	private _handleRejected(e: unknown) {
+		if (e instanceof postInstallSetup.Error) {
+			const error = e.getActualType();
+			if (error.status === 400) {
+				this._installerStore?.setInstallStatus(error.data);
+			}
+		}
+		this._installerStore?.nextStep();
+	}
+
 	private _onBack() {
-		this.dispatchEvent(new CustomEvent('previous', { bubbles: true, composed: true }));
+		this._installerStore?.prevStep();
 	}
 
 	private get selectedDatabase() {

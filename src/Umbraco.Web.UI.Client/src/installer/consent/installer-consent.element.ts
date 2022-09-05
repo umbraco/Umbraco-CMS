@@ -90,11 +90,11 @@ export class UmbInstallerConsentElement extends UmbContextConsumerMixin(LitEleme
 	}
 
 	private _onNext() {
-		this.dispatchEvent(new CustomEvent('next', { bubbles: true, composed: true }));
+		this._installerStore?.nextStep();
 	}
 
 	private _onBack() {
-		this.dispatchEvent(new CustomEvent('previous', { bubbles: true, composed: true }));
+		this._installerStore?.prevStep();
 	}
 
 	private get _selectedTelemetryIndex() {
