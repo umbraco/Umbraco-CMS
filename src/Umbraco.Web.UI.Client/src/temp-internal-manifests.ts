@@ -47,6 +47,17 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		},
 	},
 	{
+		type: 'section',
+		alias: 'Umb.Section.Packages',
+		name: 'Packages',
+		elementName: 'umb-packages-section',
+		loader: () => import('./backoffice/sections/packages/packages-section.element'),
+		meta: {
+			pathname: 'packages',
+			weight: 20,
+		},
+	},
+	{
 		type: 'dashboard',
 		alias: 'Umb.Dashboard.Welcome',
 		name: 'Welcome',
