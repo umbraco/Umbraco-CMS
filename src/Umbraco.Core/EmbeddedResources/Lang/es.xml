@@ -72,8 +72,8 @@
     <key alias="createblueprint">Permitir acceso para crear una Plantilla de Contenido</key>
   </area>
   <area alias="apps">
-    <key alias="umbContent">Content</key>
-    <key alias="umbInfo">Info</key>
+    <key alias="umbContent">Contenido</key>
+    <key alias="umbInfo">Información</key>
   </area>
   <area alias="assignDomain">
     <key alias="permissionDenied">Permiso denegado.</key>
