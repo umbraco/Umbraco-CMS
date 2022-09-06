@@ -63,28 +63,32 @@ export class UmbInstallerUserElement extends UmbContextConsumerMixin(LitElement)
 	@state()
 	private _installerContext?: UmbInstallerContext;
 
-	private installerContextSubscription?: Subscription;
+	private _installerDataSubscription?: Subscription;
 
 	constructor() {
 		super();
 
 		this.consumeContext('umbInstallerContext', (installerContext: UmbInstallerContext) => {
 			this._installerContext = installerContext;
-			this.installerContextSubscription?.unsubscribe();
-			this.installerContextSubscription = installerContext.data.subscribe(({ user }) => {
-				this._userFormData = {
-					name: user.name,
-					password: user.password,
-					email: user.email,
-					subscribeToNewsletter: user.subscribeToNewsletter,
-				};
-			});
+			this._observeInstallerData();
+		});
+	}
+
+	private _observeInstallerData() {
+		this._installerDataSubscription?.unsubscribe();
+		this._installerDataSubscription = this._installerContext?.data.subscribe(({ user }) => {
+			this._userFormData = {
+				name: user.name,
+				password: user.password,
+				email: user.email,
+				subscribeToNewsletter: user.subscribeToNewsletter,
+			};
 		});
 	}
 
 	disconnectedCallback(): void {
 		super.disconnectedCallback();
-		this.installerContextSubscription?.unsubscribe();
+		this._installerDataSubscription?.unsubscribe();
 	}
 
 	private _handleSubmit = (e: SubmitEvent) => {
