@@ -20,10 +20,10 @@ public class UploadDictionaryController : DictionaryControllerBase
         _hostingEnvironment = hostingEnvironment;
     }
 
-    [HttpGet("export/{key:guid}")]
+    [HttpPost("upload")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IActionResult), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(IActionResult), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public ActionResult<DictionaryImportViewModel> Upload(IFormFile file)
     {
         var fileName = file.FileName.Trim(Constants.CharArrays.DoubleQuote);
