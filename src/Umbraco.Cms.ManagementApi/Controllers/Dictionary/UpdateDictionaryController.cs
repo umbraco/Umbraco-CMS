@@ -34,7 +34,7 @@ public class UpdateDictionaryController : DictionaryControllerBase
     }
 
     [HttpPatch("update/{id:Guid}")]
-    public async Task<IActionResult> Update(Guid id, object updateViewModel)
+    public async Task<IActionResult> Update(Guid id, JsonPatchViewModel[] updateViewModel)
     {
         IDictionaryItem? dictionaryItem = _localizationService.GetDictionaryItemById(id);
         DictionaryViewModel dictionaryToPatch = _umbracoMapper.Map<DictionaryViewModel>(dictionaryItem)!;
