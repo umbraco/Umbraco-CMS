@@ -1,14 +1,14 @@
 import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
-import { UmbModalService } from '../../core/services/modal';
-import { UmbModalLayoutElement } from '../../core/services/modal/layouts/modal-layout.element';
-import { UmbModalContentPickerData } from '../../core/services/modal/layouts/content-picker/modal-layout-content-picker.element';
+import { UmbModalService } from '../..';
+import { UmbModalLayoutElement } from '../modal-layout.element';
+import { UmbModalContentPickerData } from '../content-picker/modal-layout-content-picker.element';
 
-import '../editors/shared/editor-entity/editor-entity.element';
+import '../../../../../backoffice/editors/shared/editor-entity/editor-entity.element';
 
-@customElement('umb-icon-selector')
-class UmbIconSelector extends UmbModalLayoutElement<UmbModalContentPickerData> {
+@customElement('umb-modal-layout-icon-picker')
+class UmbModalLayoutIconPickerElement extends UmbModalLayoutElement<null> {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -301,6 +301,6 @@ class UmbIconSelector extends UmbModalLayoutElement<UmbModalContentPickerData> {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-icon-selector': UmbIconSelector;
+		'umb-modal-layout-icon-picker': UmbModalLayoutIconPickerElement;
 	}
 }

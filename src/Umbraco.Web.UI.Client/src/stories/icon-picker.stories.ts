@@ -2,7 +2,9 @@ import '../backoffice/components/backoffice-modal-container.element';
 import '../core/services/modal/layouts/content-picker/modal-layout-content-picker.element';
 import '../core/context/context-provider.element';
 import '../backoffice/editors/shared/editor-layout/editor-layout.element';
-import '../backoffice/components/icon-selector.element';
+
+import '../backoffice/property-editors/property-editor-icon-picker.element';
+import '../core/services/modal/layouts/icon-picker/modal-layout-icon-picker.element';
 
 import '@umbraco-ui/uui-modal';
 import '@umbraco-ui/uui-modal-container';
@@ -17,9 +19,9 @@ import { UmbModalService } from '../core/services/modal';
 import { UmbContextConsumerMixin } from '../core/context';
 
 export default {
-	title: 'Icon Selector',
-	component: 'umb-icon-selector',
-	id: 'icon-selector',
+	title: 'Icon Picker',
+	component: 'umb-property-editor-icon-picker',
+	id: 'icon-picker',
 	decorators: [
 		(story) =>
 			html`
@@ -35,38 +37,11 @@ export default {
 	],
 } as Meta;
 
-@customElement('story-modal-icon-selector')
-class StoryModalIconSelector extends UmbContextConsumerMixin(LitElement) {
-	@state()
-	value = '';
-
-	private _modalService?: UmbModalService;
-
-	constructor() {
-		super();
-		this.consumeContext('umbModalService', (modalService: UmbModalService) => {
-			this._modalService = modalService;
-		});
-	}
-
-	private _openModal() {
-		this._modalService?.open('umb-icon-selector', { type: 'sidebar', size: 'small' });
-	}
-
-	render() {
-		return html`
-			<uui-button label="open-dialog" look="secondary" @click=${() => this._openModal()} style="margin-right: 9px;"
-				>Pick an icon</uui-button
-			>
-		`;
-	}
-}
-
 const Template: Story = () => {
 	return html`<umb-backoffice-modal-container></umb-backoffice-modal-container>
-		<story-modal-icon-selector></story-modal-icon-selector> `;
+		<umb-property-editor-icon-picker></umb-property-editor-icon-picker> `;
 };
 
 export const IconSelectorModal = Template.bind({});
 
-export const IconSelector = () => html`<umb-icon-selector></umb-icon-selector>`;
+export const IconSelector = () => html`<umb-modal-layout-icon-picker></umb-modal-layout-icon-picker>`;
