@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -28,6 +29,9 @@ public class GetDictionaryController : DictionaryControllerBase
     ///     The <see cref="DictionaryDisplay" />. Returns a not found response when dictionary item does not exist
     /// </returns>
     [HttpGet("{id:guid}")]
+    [MapToApiVersion("1.0")]
+    [ProducesResponseType(typeof(IActionResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(NotFoundResult), StatusCodes.Status404NotFound)]
     public ActionResult<DictionaryDisplay?> GetById(Guid id)
     {
         IDictionaryItem? dictionary = _localizationService.GetDictionaryItemById(id);

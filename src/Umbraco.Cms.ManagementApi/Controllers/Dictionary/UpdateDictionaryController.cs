@@ -3,12 +3,14 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Json.Patch;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.ManagementApi.Services;
 using Umbraco.Cms.ManagementApi.ViewModels.Dictionary;
+using Umbraco.Cms.ManagementApi.ViewModels.Installer;
 using Umbraco.Cms.ManagementApi.ViewModels.JsonPatch;
 using Umbraco.New.Cms.Core.Factories;
 
@@ -38,6 +40,9 @@ public class UpdateDictionaryController : DictionaryControllerBase
     }
 
     [HttpPatch("update/{id:Guid}")]
+    [MapToApiVersion("1.0")]
+    [ProducesResponseType(typeof(UpgradeSettingsViewModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Update(Guid id, JsonPatchViewModel[] updateViewModel)
     {
         IDictionaryItem? dictionaryItem = _localizationService.GetDictionaryItemById(id);
@@ -48,7 +53,7 @@ public class UpdateDictionaryController : DictionaryControllerBase
         DictionaryViewModel? updatedDictionaryItem = JsonSerializer.Deserialize<DictionaryViewModel>(result?.Result);
         if (updatedDictionaryItem is null)
         {
-            throw new JsonException("Could not serialize JsonNode to DictionaryViewModel");
+            throw new JsonException("Could not serialize from PatchResult to DictionaryViewModel");
         }
 
         IDictionaryItem dictionaryToSave = _dictionaryFactory.CreateDictionary(updatedDictionaryItem!);

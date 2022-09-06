@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -41,6 +42,9 @@ public class CreateDictionaryController : DictionaryControllerBase
     ///     The <see cref="HttpResponseMessage" />.
     /// </returns>
     [HttpPost("create")]
+    [MapToApiVersion("1.0")]
+    [ProducesResponseType(typeof(ActionResult<int>), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<int>> Create(DictionaryItemViewModel dictionaryViewModel)
     {
         if (string.IsNullOrEmpty(dictionaryViewModel.Key))

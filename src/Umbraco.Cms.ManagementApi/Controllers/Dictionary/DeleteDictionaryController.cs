@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
@@ -24,6 +25,9 @@ public class DeleteDictionaryController : DictionaryControllerBase
     ///     <see cref="HttpResponseMessage" />
     /// </returns>
     [HttpDelete("delete/{id:int}")]
+    [MapToApiVersion("1.0")]
+    [ProducesResponseType(typeof(ActionResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(NotFoundResult), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(int id)
     {
         IDictionaryItem? foundDictionary = _localizationService.GetDictionaryItemById(id);
