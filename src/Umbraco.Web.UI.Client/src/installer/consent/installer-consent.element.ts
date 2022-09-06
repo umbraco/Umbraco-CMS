@@ -51,9 +51,7 @@ export class UmbInstallerConsentElement extends UmbContextConsumerMixin(LitEleme
 	@state()
 	private _telemetryFormData?: TelemetryModel['level'];
 
-	@state()
 	private _installerContext?: UmbInstallerContext;
-
 	private _installerDataSubscription?: Subscription;
 	private _installerSettingsSubscription?: Subscription;
 

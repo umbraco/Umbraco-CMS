@@ -60,9 +60,7 @@ export class UmbInstallerUserElement extends UmbContextConsumerMixin(LitElement)
 	@state()
 	private _userFormData?: { name: string; password: string; email: string; subscribeToNewsletter: boolean };
 
-	@state()
 	private _installerContext?: UmbInstallerContext;
-
 	private _installerDataSubscription?: Subscription;
 
 	constructor() {

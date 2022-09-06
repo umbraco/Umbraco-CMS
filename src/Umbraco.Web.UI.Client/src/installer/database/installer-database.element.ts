@@ -90,11 +90,9 @@ export class UmbInstallerDatabaseElement extends UmbContextConsumerMixin(LitElem
 	private _preConfiguredDatabase?: UmbracoInstallerDatabaseModel;
 
 	@state()
-	private _installerContext?: UmbInstallerContext;
-
-	@state()
 	private _validationErrorMessage = '';
 
+	private _installerContext?: UmbInstallerContext;
 	private _installerDataSubscription?: Subscription;
 	private _installerSettingsSubscription?: Subscription;
 
