@@ -46,12 +46,6 @@ public class DictionaryViewModel : INotificationModel
     public List<BackOfficeNotification> Notifications { get; private set; }
 
     /// <summary>
-    ///     Gets or sets a value indicating whether name is dirty.
-    /// </summary>
-    [JsonPropertyName("nameIsDirty")]
-    public bool NameIsDirty { get; set; }
-
-    /// <summary>
     ///     Gets or sets a value indicating when the object was created.
     /// </summary>
     [JsonPropertyName("createDate")]
