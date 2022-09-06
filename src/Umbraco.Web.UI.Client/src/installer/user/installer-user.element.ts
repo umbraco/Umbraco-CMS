@@ -99,9 +99,9 @@ export class UmbInstallerUserElement extends UmbContextConsumerMixin(LitElement)
 		if (!isValid) return;
 
 		const formData = new FormData(form);
-		const name = formData.get('name');
-		const password = formData.get('password');
-		const email = formData.get('email');
+		const name = formData.get('name') as string;
+		const password = formData.get('password') as string;
+		const email = formData.get('email') as string;
 		const subscribeToNewsletter = formData.has('subscribeToNewsletter');
 
 		this._installerContext?.appendData({ user: { name, password, email, subscribeToNewsletter } });
