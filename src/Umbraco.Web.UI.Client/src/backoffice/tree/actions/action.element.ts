@@ -32,7 +32,6 @@ export default class UmbActionElement extends UmbContextConsumerMixin(LitElement
 			this._actionPageSubscription?.unsubscribe();
 			this._actionPageService?.entity.subscribe((entity: ActionPageEntity) => {
 				this._entity = entity;
-				console.log('entity changed', this._entity);
 			});
 		});
 	}

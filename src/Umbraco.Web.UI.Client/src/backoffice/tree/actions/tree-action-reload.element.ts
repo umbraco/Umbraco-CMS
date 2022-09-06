@@ -12,7 +12,7 @@ export default class UmbTreeActionReloadElement extends UmbActionElement {
 	public treeAction?: ManifestEntityAction;
 
 	private _handleLabelClick() {
-		console.log(this.treeAction, 'label clicked');
+		// console.log(this.treeAction, 'label clicked');
 	}
 
 	render() {

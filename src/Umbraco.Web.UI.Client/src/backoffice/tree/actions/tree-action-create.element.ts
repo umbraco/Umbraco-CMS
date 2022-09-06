@@ -12,7 +12,6 @@ export default class UmbTreeActionCreateElement extends UmbActionElement {
 	public treeAction?: ManifestEntityAction;
 
 	private _handleLabelClick() {
-		console.log(this.treeAction, 'label clicked');
 		this._actionPageService?.openPage('umb-tree-action-create-page');
 	}
 
