@@ -25,6 +25,8 @@ public class DictionaryViewModelMapDefinition : IMapDefinition
         mapper.Define<DictionaryViewModel, IDictionaryItem>((source, context) => new DictionaryItem(string.Empty), Map);
         mapper.Define<IDictionaryItem, DictionaryViewModel>((source, context) => new DictionaryViewModel(), Map);
         mapper.Define<DictionaryTranslationViewModel, IDictionaryTranslation>((source, context) => new DictionaryTranslation(source.LanguageId, string.Empty), Map);
+        mapper.Define<IDictionaryItem, DictionaryOverviewViewModel>((source, context) => new DictionaryOverviewViewModel(), Map);
+
     }
 
     // Umbraco.Code.MapAll -Id
@@ -79,5 +81,26 @@ public class DictionaryViewModelMapDefinition : IMapDefinition
 
         target.CreateDate = source.CreateDate;
         target.UpdateDate = source.UpdateDate;
+    }
+
+    // Umbraco.Code.MapAll -Level -Translations
+    private void Map(IDictionaryItem source, DictionaryOverviewViewModel target, MapperContext context)
+    {
+        target.Id = source.Id;
+        target.Name = source.ItemKey;
+
+        // add all languages and  the translations
+        foreach (ILanguage lang in _localizationService.GetAllLanguages())
+        {
+            var langId = lang.Id;
+            IDictionaryTranslation? translation = source.Translations?.FirstOrDefault(x => x.LanguageId == langId);
+
+            target.Translations.Add(
+                new DictionaryTranslationOverviewViewModel
+                {
+                    DisplayName = lang.CultureName,
+                    HasTranslation = translation != null && string.IsNullOrEmpty(translation.Value) == false,
+                });
+        }
     }
 }
