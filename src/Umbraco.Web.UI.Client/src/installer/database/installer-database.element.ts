@@ -242,27 +242,27 @@ export class UmbInstallerDatabaseElement extends UmbContextConsumerMixin(LitElem
 		this._installerContext?.prevStep();
 	}
 
-	private get selectedDatabase() {
+	private get _selectedDatabase() {
 		const id = this._installerContext?.getData().database?.id;
 		return this._databases.find((x) => x.id === id) ?? this._databases[0];
 	}
 
 	private _renderSettings() {
-		if (!this.selectedDatabase) return;
+		if (!this._selectedDatabase) return;
 
-		if (this.selectedDatabase.displayName.toLowerCase() === 'custom') {
+		if (this._selectedDatabase.displayName.toLowerCase() === 'custom') {
 			return this._renderCustom();
 		}
 
 		const result = [];
 
-		if (this.selectedDatabase.requiresServer) {
+		if (this._selectedDatabase.requiresServer) {
 			result.push(this._renderServer());
 		}
 
-		result.push(this._renderDatabaseName(this.databaseFormData.name ?? this.selectedDatabase.defaultDatabaseName));
+		result.push(this._renderDatabaseName(this.databaseFormData.name ?? this._selectedDatabase.defaultDatabaseName));
 
-		if (this.selectedDatabase.requiresCredentials) {
+		if (this._selectedDatabase.requiresCredentials) {
 			result.push(this._renderCredentials());
 		}
 
@@ -281,7 +281,7 @@ export class UmbInstallerDatabaseElement extends UmbContextConsumerMixin(LitElem
 				label="Server address"
 				@input=${this._handleChange}
 				.value=${this.databaseFormData.server ?? ''}
-				.placeholder=${this.selectedDatabase?.serverPlaceholder ?? ''}
+				.placeholder=${this._selectedDatabase?.serverPlaceholder ?? ''}
 				required
 				required-message="Server is required"></uui-input>
 		</uui-form-layout-item>
