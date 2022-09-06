@@ -1,20 +1,19 @@
-import './installer-consent.element';
-import './installer-database.element';
-import './installer-error.element';
-import './installer-installing.element';
-import './installer-layout.element';
-import './installer-user.element';
+import './consent/installer-consent.element';
+import './database/installer-database.element';
+import './error/installer-error.element';
+import './installing/installer-installing.element';
+import './shared/layout/installer-layout.element';
+import './user/installer-user.element';
 
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
-import { postInstallSetup } from '../core/api/fetcher';
 import { UmbContextProviderMixin } from '../core/context';
-import type { ProblemDetails } from '../core/models';
-import { UmbInstallerContext } from './installer-context';
+import { UmbInstallerContext } from './installer.context';
+import { Subscription } from 'rxjs';
 
 @customElement('umb-installer')
-export class UmbInstaller extends UmbContextProviderMixin(LitElement) {
+export class UmbInstallerElement extends UmbContextProviderMixin(LitElement) {
 	static styles: CSSResultGroup = [css``];
 
 	@state()
@@ -22,7 +21,7 @@ export class UmbInstaller extends UmbContextProviderMixin(LitElement) {
 
 	private _umbInstallerContext = new UmbInstallerContext();
 
-	private _error?: ProblemDetails;
+	private _currentStepSubscription?: Subscription;
 
 	constructor() {
 		super();
@@ -31,48 +30,15 @@ export class UmbInstaller extends UmbContextProviderMixin(LitElement) {
 
 	connectedCallback(): void {
 		super.connectedCallback();
-		this.addEventListener('next', () => this._handleNext());
-		this.addEventListener('previous', () => this._goToPreviousStep());
-		this.addEventListener('submit', () => this._handleSubmit());
-		this.addEventListener('reset', () => this._handleReset());
+		this._observeCurrentStep();
 	}
 
-	private _handleNext() {
-		this.step++;
-	}
+	private _observeCurrentStep() {
+		this._currentStepSubscription?.unsubscribe();
 
-	private _goToPreviousStep() {
-		this.step--;
-	}
-
-	private _handleFulfilled() {
-		console.warn('TODO: Set up real authentication');
-		sessionStorage.setItem('is-authenticated', 'true');
-		history.replaceState(null, '', '/content');
-	}
-
-	private _handleRejected(e: unknown) {
-		if (e instanceof postInstallSetup.Error) {
-			const error = e.getActualType();
-			if (error.status === 400) {
-				this._error = error.data;
-			}
-		}
-		this._handleNext();
-	}
-
-	private _handleSubmit() {
-		this._handleNext();
-
-		this._umbInstallerContext
-			.requestInstall()
-			.then(() => this._handleFulfilled())
-			.catch((error) => this._handleRejected(error));
-	}
-
-	private _handleReset() {
-		this.step = 1;
-		this._error = undefined;
+		this._currentStepSubscription = this._umbInstallerContext
+			.currentStepChanges()
+			.subscribe((step) => (this.step = step));
 	}
 
 	private _renderSection() {
@@ -84,8 +50,7 @@ export class UmbInstaller extends UmbContextProviderMixin(LitElement) {
 			case 4:
 				return html`<umb-installer-installing></umb-installer-installing>`;
 			case 5:
-				return html`<umb-installer-error .error=${this._error}></umb-installer-error>`;
-
+				return html`<umb-installer-error></umb-installer-error>`;
 			default:
 				return html`<umb-installer-user></umb-installer-user>`;
 		}
@@ -96,10 +61,10 @@ export class UmbInstaller extends UmbContextProviderMixin(LitElement) {
 	}
 }
 
-export default UmbInstaller;
+export default UmbInstallerElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-installer': UmbInstaller;
+		'umb-installer': UmbInstallerElement;
 	}
 }

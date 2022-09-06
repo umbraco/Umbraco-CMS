@@ -1,4 +1,4 @@
-import '../installer/installer-layout.element';
+import '../installer/shared/layout/installer-layout.element';
 import './upgrader-view.element';
 
 import { html, LitElement } from 'lit';
