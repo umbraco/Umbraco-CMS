@@ -5,6 +5,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.ManagementApi.ViewModels.Dictionary;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.Dictionary;
@@ -24,7 +25,7 @@ public class UploadDictionaryController : DictionaryControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IActionResult), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(IActionResult), StatusCodes.Status404NotFound)]
-    public ActionResult<DictionaryImportModel> Upload(IFormFile file)
+    public ActionResult<DictionaryImportViewModel> Upload(IFormFile file)
     {
         var fileName = file.FileName.Trim(Constants.CharArrays.DoubleQuote);
         var ext = fileName.Substring(fileName.LastIndexOf('.') + 1).ToLower();
@@ -60,9 +61,9 @@ public class UploadDictionaryController : DictionaryControllerBase
                 _localizedTextService.Localize("speechBubbles", "fileErrorNotFound"));
         }
 
-        var model = new DictionaryImportModel()
+        var model = new DictionaryImportViewModel
         {
-            TempFileName = tempPath, DictionaryItems = new List<DictionaryPreviewImportModel>(),
+            TempFileName = tempPath, DictionaryItems = new List<DictionaryItemsImportViewModel>(),
         };
 
         var level = 1;
@@ -78,7 +79,7 @@ public class UploadDictionaryController : DictionaryControllerBase
                 currentParent = parentKey;
             }
 
-            model.DictionaryItems.Add(new DictionaryPreviewImportModel() {Level = level, Name = name});
+            model.DictionaryItems.Add(new DictionaryItemsImportViewModel { Level = level, Name = name });
         }
 
         if (!model.DictionaryItems.Any())
