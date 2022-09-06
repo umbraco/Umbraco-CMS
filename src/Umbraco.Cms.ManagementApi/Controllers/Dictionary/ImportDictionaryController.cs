@@ -7,9 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Hosting;
-using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Packaging;
@@ -22,7 +20,6 @@ public class ImportDictionaryController : DictionaryControllerBase
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly ILocalizationService _localizationService;
     private readonly PackageDataInstallation _packageDataInstallation;
-    private readonly IUmbracoMapper _umbracoMapper;
     private readonly ILogger<ImportDictionaryController> _logger;
     private readonly IDictionaryService _dictionaryService;
 
@@ -31,7 +28,6 @@ public class ImportDictionaryController : DictionaryControllerBase
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         ILocalizationService localizationService,
         PackageDataInstallation packageDataInstallation,
-        IUmbracoMapper umbracoMapper,
         ILogger<ImportDictionaryController> logger,
         IDictionaryService dictionaryService)
     {
@@ -39,7 +35,6 @@ public class ImportDictionaryController : DictionaryControllerBase
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
         _localizationService = localizationService;
         _packageDataInstallation = packageDataInstallation;
-        _umbracoMapper = umbracoMapper;
         _logger = logger;
         _dictionaryService = dictionaryService;
     }
