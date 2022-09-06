@@ -54,31 +54,37 @@ export class UmbInstallerConsentElement extends UmbContextConsumerMixin(LitEleme
 	@state()
 	private _installerContext?: UmbInstallerContext;
 
-	private storeDataSubscription?: Subscription;
-	private storeSettingsSubscription?: Subscription;
+	private _installerDataSubscription?: Subscription;
+	private _installerSettingsSubscription?: Subscription;
 
 	constructor() {
 		super();
 
 		this.consumeContext('umbInstallerContext', (installerContext: UmbInstallerContext) => {
 			this._installerContext = installerContext;
+			this._observeInstallerSettings();
+			this._observeInstallerData();
+		});
+	}
 
-			this.storeSettingsSubscription?.unsubscribe();
-			this.storeSettingsSubscription = installerContext.settings.subscribe((settings) => {
-				this._telemetryLevels = settings.user.consentLevels;
-			});
+	private _observeInstallerSettings() {
+		this._installerSettingsSubscription?.unsubscribe();
+		this._installerSettingsSubscription = this._installerContext?.settings.subscribe((settings) => {
+			this._telemetryLevels = settings.user.consentLevels;
+		});
+	}
 
-			this.storeDataSubscription?.unsubscribe();
-			this.storeDataSubscription = installerContext.data.subscribe((data) => {
-				this._telemetryFormData = data.telemetryLevel;
-			});
+	private _observeInstallerData() {
+		this._installerDataSubscription?.unsubscribe();
+		this._installerDataSubscription = this._installerContext?.data.subscribe((data) => {
+			this._telemetryFormData = data.telemetryLevel;
 		});
 	}
 
 	disconnectedCallback(): void {
 		super.disconnectedCallback();
-		this.storeSettingsSubscription?.unsubscribe();
-		this.storeDataSubscription?.unsubscribe();
+		this._installerSettingsSubscription?.unsubscribe();
+		this._installerDataSubscription?.unsubscribe();
 	}
 
 	private _handleChange(e: InputEvent) {
