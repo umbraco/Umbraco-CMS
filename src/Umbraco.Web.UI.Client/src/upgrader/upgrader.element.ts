@@ -5,7 +5,8 @@ import { html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
 import { getUpgradeSettings, PostUpgradeAuthorize } from '../core/api/fetcher';
-import { UmbracoUpgrader } from '../core/models';
+
+import type { UmbracoUpgrader } from '../core/models';
 
 /**
  * @element umb-upgrader
@@ -30,7 +31,7 @@ export class UmbUpgrader extends LitElement {
 	}
 
 	render() {
-		return html`<umb-installer-layout>
+		return html`<umb-installer-layout data-test="upgrader">
 			<umb-upgrader-view
 				.fetching=${this.fetching}
 				.upgrading=${this.upgrading}
@@ -49,7 +50,7 @@ export class UmbUpgrader extends LitElement {
 			this.upgradeSettings = data;
 		} catch (e) {
 			if (e instanceof getUpgradeSettings.Error) {
-				this.errorMessage = e.message;
+				this.errorMessage = e.data.detail;
 			}
 		}
 

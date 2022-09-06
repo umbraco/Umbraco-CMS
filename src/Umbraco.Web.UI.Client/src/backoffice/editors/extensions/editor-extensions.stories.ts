@@ -1,8 +1,9 @@
+import './editor-extensions.element';
+
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit-html';
 
-import { UmbEditorExtensionsElement } from './editor-extensions.element';
-import './editor-extensions.element';
+import type { UmbEditorExtensionsElement } from './editor-extensions.element';
 
 export default {
 	title: 'Editors/Extensions',

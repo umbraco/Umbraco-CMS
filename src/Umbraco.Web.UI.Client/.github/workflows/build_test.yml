@@ -43,6 +43,8 @@ jobs:
     #     retention-days: 30
     - name: Report code coverage
       uses: zgosalvez/github-actions-report-lcov@v1
+      if: always()
+      continue-on-error: true
       with:
         coverage-files: coverage/lcov.info
         artifact-name: code-coverage-report

@@ -1,9 +1,7 @@
-import { UmbExtensionManifestBase } from './extension.registry';
+import type { ManifestElementType } from '../models';
 
-export function isExtensionType(manifest: unknown): manifest is UmbExtensionManifestBase {
+export function isManifestElementType(manifest: unknown): manifest is ManifestElementType {
 	return (
-		typeof manifest === 'object' &&
-		manifest !== null &&
-		(manifest as UmbExtensionManifestBase).elementName !== undefined
+		typeof manifest === 'object' && manifest !== null && (manifest as ManifestElementType).elementName !== undefined
 	);
 }

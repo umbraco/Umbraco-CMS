@@ -11,7 +11,7 @@ export class UmbSettingsSection extends UmbContextConsumerMixin(LitElement) {
 	private _routes: Array<IRoute> = [
 		{
 			path: 'dashboard',
-			component: () => import('../../components/section-dashboards.element'),
+			component: () => import('../shared/section-dashboards.element'),
 		},
 		{
 			path: 'extensions',

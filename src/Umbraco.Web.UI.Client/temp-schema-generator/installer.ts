@@ -3,103 +3,99 @@ import { body, defaultResponse, endpoint, request, response } from '@airtasker/s
 import { ProblemDetails } from './models';
 
 @endpoint({
-  method: 'GET',
-  path: '/install/settings',
+	method: 'GET',
+	path: '/install/settings',
 })
 export class GetInstallSettings {
-  @response({ status: 200 })
-  success(@body body: InstallSettingsResponse) {}
+	@response({ status: 200 })
+	success(@body body: InstallSettingsResponse) {}
 
-  @defaultResponse
-  default(@body body: ProblemDetails) {}
+	@defaultResponse
+	default(@body body: ProblemDetails) {}
 }
 
 @endpoint({
-  method: 'POST',
-  path: '/install/setup',
+	method: 'POST',
+	path: '/install/setup',
 })
 export class PostInstallSetup {
-  @request
-  request(@body body: InstallSetupRequest) {}
+	@request
+	request(@body body: InstallSetupRequest) {}
 
-  @response({ status: 201 })
-  success() {}
+	@response({ status: 201 })
+	success() {}
 
-  @response({ status: 400 })
-  badRequest(@body body: ProblemDetails) {}
+	@response({ status: 400 })
+	badRequest(@body body: ProblemDetails) {}
 }
 
 @endpoint({
-  method: 'POST',
-  path: '/install/validateDatabase',
+	method: 'POST',
+	path: '/install/validateDatabase',
 })
 export class PostInstallValidateDatabase {
-  @request
-  request(@body body: InstallValidateDatabaseRequest) {}
+	@request
+	request(@body body: InstallSetupDatabaseConfiguration) {}
 
-  @response({ status: 201 })
-  success() {}
+	@response({ status: 201 })
+	success() {}
 
-  @response({ status: 400 })
-  badRequest(@body body: ProblemDetails) {}
+	@response({ status: 400 })
+	badRequest(@body body: ProblemDetails) {}
 }
 
 export interface InstallSetupRequest {
-  user: InstallSetupUserConfiguration;
-  telemetryLevel: ConsentLevel;
-  database?: InstallSetupDatabaseConfiguration;
-}
-
-export interface InstallValidateDatabaseRequest {
-  database: InstallSetupDatabaseConfiguration;
+	user: InstallSetupUserConfiguration;
+	telemetryLevel: ConsentLevel;
+	database?: InstallSetupDatabaseConfiguration;
 }
 
 export interface InstallSettingsResponse {
-  user: InstallUserModel;
-  databases: InstallDatabaseModel[];
+	user: InstallUserModel;
+	databases: InstallDatabaseModel[];
 }
 
 export interface InstallUserModel {
-  minCharLength: number;
-  minNonAlphaNumericLength: number;
-  consentLevels: TelemetryModel[];
+	minCharLength: number;
+	minNonAlphaNumericLength: number;
+	consentLevels: TelemetryModel[];
 }
 
 export interface InstallSetupUserConfiguration {
-  name: string;
-  email: string;
-  password: string;
-  subscribeToNewsletter: boolean;
+	name: string;
+	email: string;
+	password: string;
+	subscribeToNewsletter: boolean;
 }
 
 export interface InstallSetupDatabaseConfiguration {
-  id?: string;
-  server?: string | null;
-  password?: string | null;
-  username?: string | null;
-  name?: string | null;
-  providerName?: string | null;
-  useIntegratedAuthentication?: boolean | null;
-  connectionString?: string | null;
+	id?: string;
+	server?: string | null;
+	password?: string | null;
+	username?: string | null;
+	name?: string | null;
+	providerName?: string | null;
+	useIntegratedAuthentication?: boolean | null;
+	connectionString?: string | null;
 }
 
 export interface TelemetryModel {
-  level: ConsentLevel;
-  description: string;
+	level: ConsentLevel;
+	description: string;
 }
 
 export interface InstallDatabaseModel {
-  id: string;
-  sortOrder: number;
-  displayName: string;
-  defaultDatabaseName: string;
-  providerName: null | string;
-  isConfigured: boolean;
-  requiresServer: boolean;
-  serverPlaceholder: null | string;
-  requiresCredentials: boolean;
-  supportsIntegratedAuthentication: boolean;
-  requiresConnectionTest: boolean;
+	id: string;
+	sortOrder: number;
+	displayName: string;
+	defaultDatabaseName: string;
+	providerName: null | string;
+	isConfigured: boolean;
+	requiresServer: boolean;
+	serverPlaceholder: null | string;
+	requiresCredentials: boolean;
+	supportsIntegratedAuthentication: boolean;
+	requiresConnectionTest: boolean;
 }
 
 export type ConsentLevel = 'Minimal' | 'Basic' | 'Detailed';

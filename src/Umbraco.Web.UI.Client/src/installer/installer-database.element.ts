@@ -1,14 +1,11 @@
 import { UUIButtonElement } from '@umbraco-ui/uui';
-import { css, CSSResultGroup, html, LitElement } from 'lit';
+import { css, CSSResultGroup, html, LitElement, nothing } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { Subscription } from 'rxjs';
 
+import { postInstallSetup, postInstallValidateDatabase } from '../core/api/fetcher';
 import { UmbContextConsumerMixin } from '../core/context';
-import {
-	ProblemDetails,
-	UmbracoInstallerDatabaseModel,
-	UmbracoPerformInstallDatabaseConfiguration,
-} from '../core/models';
+import type { UmbracoInstallerDatabaseModel, UmbracoPerformInstallDatabaseConfiguration } from '../core/models';
 import { UmbInstallerContext } from './installer-context';
 
 @customElement('umb-installer-database')
@@ -60,7 +57,7 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
 				margin-bottom: var(--uui-size-layout-3);
 			}
 
-			h4 {
+			h2 {
 				margin: 0;
 			}
 
@@ -74,17 +71,15 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
 				min-width: 120px;
 			}
 
-			#error-message {
-				color: var(--uui-color-error, red);
+			.error {
+				color: var(--uui-color-danger);
+				padding: var(--uui-size-space-2) 0;
 			}
 		`,
 	];
 
 	@query('#button-install')
 	private _installButton!: UUIButtonElement;
-
-	@query('#error-message')
-	private _errorMessage!: HTMLElement;
 
 	@property({ attribute: false })
 	public databaseFormData!: UmbracoPerformInstallDatabaseConfiguration;
@@ -100,6 +95,9 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
 
 	@state()
 	private _installerStore?: UmbInstallerContext;
+
+	@state()
+	private _validationErrorMessage = '';
 
 	private storeDataSubscription?: Subscription;
 	private storeSettingsSubscription?: Subscription;
@@ -147,14 +145,18 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
 		this._installerStore?.appendData({ database });
 	}
 
-	private _handleSubmit = (e: SubmitEvent) => {
-		e.preventDefault();
+	private _handleSubmit = async (evt: SubmitEvent) => {
+		evt.preventDefault();
 
-		const form = e.target as HTMLFormElement;
+		const form = evt.target as HTMLFormElement;
 		if (!form) return;
 
 		const isValid = form.checkValidity();
 		if (!isValid) return;
+
+		if (!this._installerStore) return;
+
+		this._installButton.state = 'waiting';
 
 		// Only append the database if it's not pre-configured
 		if (!this._preConfiguredDatabase) {
@@ -165,6 +167,39 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
 			const server = formData.get('server') as string;
 			const name = formData.get('name') as string;
 			const useIntegratedAuthentication = formData.has('useIntegratedAuthentication');
+			const connectionString = formData.get('connectionString') as string;
+
+			// Validate connection
+			const selectedDatabase = this._databases.find((x) => x.id === id);
+			if (selectedDatabase?.requiresConnectionTest) {
+				try {
+					let databaseDetails: UmbracoPerformInstallDatabaseConfiguration = {};
+
+					if (connectionString) {
+						databaseDetails.connectionString = connectionString;
+					} else {
+						databaseDetails = {
+							id,
+							username,
+							password,
+							server,
+							useIntegratedAuthentication,
+							name,
+						};
+					}
+					await postInstallValidateDatabase(databaseDetails);
+				} catch (e) {
+					if (e instanceof postInstallSetup.Error) {
+						const error = e.getActualType();
+						console.warn('Database validation failed', error.data);
+						this._validationErrorMessage = error.data.detail ?? 'Could not verify database connection';
+					} else {
+						this._validationErrorMessage = 'A server error happened when trying to validate the database';
+					}
+					this._installButton.state = 'failed';
+					return;
+				}
+			}
 
 			const database = {
 				...this._installerStore?.getData().database,
@@ -174,22 +209,14 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
 				server,
 				name,
 				useIntegratedAuthentication,
+				connectionString,
 			} as UmbracoPerformInstallDatabaseConfiguration;
 
 			this._installerStore?.appendData({ database });
 		}
 
-		this._installerStore?.requestInstall().then(this._handleFulfilled.bind(this), this._handleRejected.bind(this));
-		this._installButton.state = 'waiting';
+		this.dispatchEvent(new CustomEvent('submit', { bubbles: true, composed: true }));
 	};
-	private _handleFulfilled() {
-		this.dispatchEvent(new CustomEvent('next', { bubbles: true, composed: true }));
-		this._installButton.state = undefined;
-	}
-	private _handleRejected(error: ProblemDetails) {
-		this._installButton.state = 'failed';
-		this._errorMessage.innerText = error.type;
-	}
 
 	private _onBack() {
 		this.dispatchEvent(new CustomEvent('previous', { bubbles: true, composed: true }));
@@ -197,7 +224,6 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
 
 	private get selectedDatabase() {
 		const id = this._installerStore?.getData().database?.id;
-		console.log('selected id', id, this._databases);
 		return this._databases.find((x) => x.id === id) ?? this._databases[0];
 	}
 
@@ -224,14 +250,15 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
 	}
 
 	private _renderServer = () => html`
-		<h4>Connection</h4>
+		<h2 class="uui-h4">Connection</h2>
 		<hr />
 		<uui-form-layout-item>
-			<uui-label for="server" slot="label" required>Server</uui-label>
+			<uui-label for="server" slot="label" required>Server address</uui-label>
 			<uui-input
 				type="text"
 				id="server"
 				name="server"
+				label="Server address"
 				@input=${this._handleChange}
 				.value=${this.databaseFormData.server ?? ''}
 				.placeholder=${this.selectedDatabase?.serverPlaceholder ?? ''}
@@ -247,6 +274,7 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
 			.value=${value}
 			id="database-name"
 			name="name"
+			label="Database name"
 			@input=${this._handleChange}
 			placeholder="umbraco"
 			required
@@ -254,16 +282,16 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
 	</uui-form-layout-item>`;
 
 	private _renderCredentials = () => html`
-		<h4>Credentials</h4>
+		<h2 class="uui-h4">Credentials</h2>
 		<hr />
 		<uui-form-layout-item>
 			<uui-checkbox
 				name="useIntegratedAuthentication"
-				label="use-integrated-authentication"
+				label="Use integrated authentication"
 				@change=${this._handleChange}
-				.checked=${this.databaseFormData.useIntegratedAuthentication || false}
-				>Use integrated authentication</uui-checkbox
-			>
+				.checked=${this.databaseFormData.useIntegratedAuthentication || false}>
+				Use integrated authentication
+			</uui-checkbox>
 		</uui-form-layout-item>
 
 		${!this.databaseFormData.useIntegratedAuthentication
@@ -274,6 +302,7 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
 							.value=${this.databaseFormData.username ?? ''}
 							id="username"
 							name="username"
+							label="Username"
 							@input=${this._handleChange}
 							required
 							required-message="Username is required"></uui-input>
@@ -286,6 +315,7 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
 							.value=${this.databaseFormData.password ?? ''}
 							id="password"
 							name="password"
+							label="Password"
 							@input=${this._handleChange}
 							autocomplete="new-password"
 							required
@@ -333,16 +363,14 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
 	`;
 
 	render() {
-		return html` <div id="container" class="uui-text">
+		return html` <div id="container" class="uui-text" data-test="installer-database">
 			<h1 class="uui-h3">Database Configuration</h1>
 			<uui-form>
 				<form id="database-form" name="database" @submit="${this._handleSubmit}">
 					${this._preConfiguredDatabase
 						? this._renderPreConfiguredDatabase(this._preConfiguredDatabase)
 						: this._renderDatabaseSelection()}
-
-					<!-- TODO: Apply error message to the fields that has errors -->
-					<p id="error-message"></p>
+					${this._validationErrorMessage ? html` <div class="error">${this._validationErrorMessage}</div> ` : nothing}
 
 					<div id="buttons">
 						<uui-button label="Back" @click=${this._onBack} look="secondary"></uui-button>

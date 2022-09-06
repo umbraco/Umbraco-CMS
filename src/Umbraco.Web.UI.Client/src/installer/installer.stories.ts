@@ -1,6 +1,7 @@
 import '../core/context/context-provider.element';
 import './installer-consent.element';
 import './installer-database.element';
+import './installer-error.element';
 import './installer-installing.element';
 import './installer-user.element';
 
@@ -8,10 +9,10 @@ import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit-html';
 import { rest } from 'msw';
 
-import { UmbInstallerUser } from '.';
-import { UmbracoInstaller } from '../core/models';
 import { UmbInstallerContext } from './installer-context';
 
+import type { UmbInstallerError, UmbInstallerUser } from '.';
+import type { UmbracoInstaller } from '../core/models';
 export default {
 	title: 'Components/Installer/Steps',
 	component: 'umb-installer',
@@ -47,7 +48,7 @@ export const Step3Database: Story = () => html`<umb-installer-database></umb-ins
 Step3Database.storyName = 'Step 3: Database';
 Step3Database.parameters = {
 	actions: {
-		handles: ['previous', 'next'],
+		handles: ['previous', 'submit'],
 	},
 };
 
@@ -55,7 +56,7 @@ export const Step3DatabasePreconfigured: Story = () => html`<umb-installer-datab
 Step3DatabasePreconfigured.storyName = 'Step 3: Database (preconfigured)';
 Step3DatabasePreconfigured.parameters = {
 	actions: {
-		handles: ['previous', 'next'],
+		handles: ['previous', 'submit'],
 	},
 	msw: {
 		handlers: {
@@ -91,3 +92,27 @@ Step3DatabasePreconfigured.parameters = {
 
 export const Step4Installing: Story = () => html`<umb-installer-installing></umb-installer-installing>`;
 Step4Installing.storyName = 'Step 4: Installing';
+
+export const Step5Error: Story<UmbInstallerError> = ({ error }) =>
+	html`<umb-installer-error .error=${error}></umb-installer-error>`;
+Step5Error.storyName = 'Step 5: Error';
+Step5Error.args = {
+	error: {
+		type: 'validation',
+		status: 400,
+		detail: 'The form did not pass validation',
+		title: 'Validation error',
+		errors: {
+			'user.password': [
+				'The password must be at least 6 characters long',
+				'The password must contain at least one number',
+			],
+			databaseName: ['The database name is required'],
+		},
+	},
+};
+Step5Error.parameters = {
+	actions: {
+		handles: ['reset'],
+	},
+};

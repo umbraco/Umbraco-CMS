@@ -1,8 +1,9 @@
-import { UmbEditorEntity } from './editor-entity.element';
 import './editor-entity.element';
 
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit-html';
+
+import type { UmbEditorEntity } from './editor-entity.element';
 
 export default {
 	title: 'Editors/Shared/Editor Entity',

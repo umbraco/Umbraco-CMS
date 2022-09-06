@@ -4,7 +4,7 @@ import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import { Subscription } from 'rxjs';
 
 import { UmbContextConsumerMixin } from '../core/context';
-import { TelemetryModel } from '../core/models';
+import type { TelemetryModel } from '../core/models';
 import { UmbInstallerContext } from './installer-context';
 
 @customElement('umb-installer-consent')
@@ -125,7 +125,7 @@ export class UmbInstallerConsent extends UmbContextConsumerMixin(LitElement) {
 
 	render() {
 		return html`
-			<div id="container" class="uui-text">
+			<div id="container" class="uui-text" data-test="installer-telemetry">
 				<h1>Consent for telemetry data</h1>
 				${this._renderSlider()}
 				<div id="buttons">
