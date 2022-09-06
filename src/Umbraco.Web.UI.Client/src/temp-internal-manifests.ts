@@ -245,7 +245,7 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		type: 'tree',
 		alias: 'Umb.Tree.DataTypes',
 		name: 'Data Types Tree',
-		loader: () => import('./backoffice/tree/data-types/tree-data-types.element'),
+		loader: () => import('./backoffice/trees/data-types/tree-data-types.element'),
 		meta: {
 			weight: 1,
 			sections: ['Umb.Section.Settings'],
@@ -255,7 +255,7 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		type: 'tree',
 		alias: 'Umb.Tree.DocumentTypes',
 		name: 'Document Types Tree',
-		loader: () => import('./backoffice/tree/document-types/tree-document-types.element'),
+		loader: () => import('./backoffice/trees/document-types/tree-document-types.element'),
 		meta: {
 			weight: 2,
 			sections: ['Umb.Section.Settings'],
@@ -277,7 +277,7 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		type: 'tree',
 		alias: 'Umb.Tree.Members',
 		name: 'Members Tree',
-		loader: () => import('./backoffice/tree/members/tree-members.element'),
+		loader: () => import('./backoffice/trees/members/tree-members.element'),
 		meta: {
 			weight: 0,
 			sections: ['Umb.Section.Members'],
@@ -287,7 +287,7 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		type: 'tree',
 		alias: 'Umb.Tree.MemberGroups',
 		name: 'Members Groups Tree',
-		loader: () => import('./backoffice/tree/member-groups/tree-member-groups.element'),
+		loader: () => import('./backoffice/trees/member-groups/tree-member-groups.element'),
 		meta: {
 			weight: 1,
 			sections: ['Umb.Section.Members'],
@@ -297,7 +297,7 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		type: 'tree',
 		alias: 'Umb.Tree.Extensions',
 		name: 'Extensions Tree',
-		loader: () => import('./backoffice/tree/extensions/tree-extensions.element'),
+		loader: () => import('./backoffice/trees/extensions/tree-extensions.element'),
 		meta: {
 			weight: 3,
 			sections: ['Umb.Section.Settings'],
@@ -307,7 +307,7 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		type: 'tree',
 		alias: 'Umb.Tree.Media',
 		name: 'Media Tree',
-		loader: () => import('./backoffice/tree/media/tree-media.element'),
+		loader: () => import('./backoffice/trees/media/tree-media.element'),
 		meta: {
 			weight: 100,
 			sections: ['Umb.Section.Media'],
@@ -317,7 +317,7 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		type: 'tree',
 		alias: 'Umb.Tree.Content',
 		name: 'Content Tree',
-		loader: () => import('./backoffice/tree/documents/tree-documents.element'),
+		loader: () => import('./backoffice/trees/documents/tree-documents.element'),
 		meta: {
 			weight: 100,
 			sections: ['Umb.Section.Content'],
