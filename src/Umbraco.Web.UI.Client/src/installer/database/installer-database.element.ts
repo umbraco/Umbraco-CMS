@@ -29,10 +29,6 @@ export class UmbInstallerDatabaseElement extends UmbContextConsumerMixin(LitElem
 				flex-direction: column;
 			}
 
-			form > uui-form-layout-item {
-				/* margin-bottom: var(--uui-size-layout-2); */
-			}
-
 			uui-form-layout-item {
 				margin-top: 0;
 				margin-bottom: var(--uui-size-space-6);
