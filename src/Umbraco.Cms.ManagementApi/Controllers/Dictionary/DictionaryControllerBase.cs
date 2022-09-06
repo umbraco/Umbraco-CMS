@@ -7,6 +7,7 @@ namespace Umbraco.Cms.ManagementApi.Controllers.Dictionary;
 [ApiController]
 [BackOfficeRoute("api/v{version:apiVersion}/dictionary")]
 [OpenApiTag("Server")]
+// TODO: Add authentication
 public abstract class DictionaryControllerBase : Controller
 {
 }
