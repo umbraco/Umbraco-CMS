@@ -11,15 +11,12 @@ import '@umbraco-ui/uui-modal-container';
 import '@umbraco-ui/uui-modal-sidebar';
 import '@umbraco-ui/uui-modal-dialog';
 
-import { Meta, Story } from '@storybook/web-components';
-import { customElement, property, state } from 'lit/decorators.js';
-import { LitElement } from 'lit';
+import { Meta } from '@storybook/web-components';
 import { html } from 'lit-html';
 import { UmbModalService } from '../core/services/modal';
-import { UmbContextConsumerMixin } from '../core/context';
 
 export default {
-	title: 'Icon Picker',
+	title: 'Editors/Icon Picker',
 	component: 'umb-property-editor-icon-picker',
 	id: 'icon-picker',
 	decorators: [
@@ -37,11 +34,7 @@ export default {
 	],
 } as Meta;
 
-const Template: Story = () => {
-	return html`<umb-backoffice-modal-container></umb-backoffice-modal-container>
-		<umb-property-editor-icon-picker></umb-property-editor-icon-picker> `;
-};
+export const IconPickerEditor = () => html`<umb-backoffice-modal-container></umb-backoffice-modal-container>
+	<umb-property-editor-icon-picker></umb-property-editor-icon-picker>`;
 
-export const IconSelectorModal = Template.bind({});
-
-export const IconSelector = () => html`<umb-modal-layout-icon-picker></umb-modal-layout-icon-picker>`;
+export const IconPickerModalLayout = () => html`<umb-modal-layout-icon-picker></umb-modal-layout-icon-picker>`;
