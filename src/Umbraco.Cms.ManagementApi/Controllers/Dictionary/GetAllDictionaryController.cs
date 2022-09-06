@@ -1,7 +1,10 @@
-﻿using Umbraco.Cms.Core.Mapping;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.ManagementApi.ViewModels.Pagination;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.Dictionary;
 
@@ -24,36 +27,43 @@ public class GetAllDictionaryController : DictionaryControllerBase
     /// <returns>
     ///     The <see cref="IEnumerable{T}" />.
     /// </returns>
-    public IEnumerable<DictionaryOverviewDisplay> GetList()
+    [HttpGet]
+    [MapToApiVersion("1.0")]
+    [ProducesResponseType(typeof(IActionResult), StatusCodes.Status200OK)]
+    public PagedViewModel<DictionaryOverviewDisplay> GetAll(int skip, int take)
     {
         IDictionaryItem[] items = _localizationService.GetDictionaryItemDescendants(null).ToArray();
         var list = new List<DictionaryOverviewDisplay>(items.Length);
 
-        // recursive method to build a tree structure from the flat structure returned above
-        void BuildTree(int level = 0, Guid? parentId = null)
+        BuildTree(list, items);
+
+        var model = new PagedViewModel<DictionaryOverviewDisplay>
         {
-            IDictionaryItem[] children = items.Where(t => t.ParentId == parentId).ToArray();
-            if (children.Any() == false)
-            {
-                return;
-            }
+            Total = list.Count,
+            Items = list.Skip(skip).Take(take),
+        };
+        return model;
+    }
 
-            foreach (IDictionaryItem child in children.OrderBy(item => item.ItemKey))
-            {
-                DictionaryOverviewDisplay? display =
-                    _umbracoMapper.Map<IDictionaryItem, DictionaryOverviewDisplay>(child);
-                if (display is not null)
-                {
-                    display.Level = level;
-                    list.Add(display);
-                }
-
-                BuildTree(level + 1, child.Key);
-            }
+    // recursive method to build a tree structure from the flat structure returned above
+    private void BuildTree(List<DictionaryOverviewDisplay> list, IDictionaryItem[] items, int level = 0, Guid? parentId = null)
+    {
+        IDictionaryItem[] children = items.Where(t => t.ParentId == parentId).ToArray();
+        if (children.Any() == false)
+        {
+            return;
         }
 
-        BuildTree();
+        foreach (IDictionaryItem child in children.OrderBy(item => item.ItemKey))
+        {
+            DictionaryOverviewDisplay? display = _umbracoMapper.Map<IDictionaryItem, DictionaryOverviewDisplay>(child);
+            if (display is not null)
+            {
+                display.Level = level;
+                list.Add(display);
+            }
 
-        return list;
+            BuildTree(list, items, level + 1, child.Key);
+        }
     }
 }
