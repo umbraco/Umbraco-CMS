@@ -62,11 +62,13 @@ export class UmbSectionSidebar extends UmbContextConsumerMixin(LitElement) {
 	render() {
 		return html`
 			<umb-action-service>
-				<a href="${`/section/${this._sectionPathname}`}">
-					<h3>${this._sectionName}</h3>
-				</a>
+				<uui-scroll-container>
+					<a href="${`/section/${this._sectionPathname}`}">
+						<h3>${this._sectionName}</h3>
+					</a>
 
-				<slot></slot>
+					<slot></slot>
+				</uui-scroll-container>
 			</umb-action-service>
 		`;
 	}
