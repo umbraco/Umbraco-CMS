@@ -3,13 +3,13 @@ import { css, CSSResultGroup, html, LitElement, nothing } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { Subscription } from 'rxjs';
 
-import { postInstallSetup, postInstallValidateDatabase } from '../core/api/fetcher';
-import { UmbContextConsumerMixin } from '../core/context';
-import type { UmbracoInstallerDatabaseModel, UmbracoPerformInstallDatabaseConfiguration } from '../core/models';
-import { UmbInstallerContext } from './installer-context';
+import { postInstallSetup, postInstallValidateDatabase } from '../../core/api/fetcher';
+import { UmbContextConsumerMixin } from '../../core/context';
+import type { UmbracoInstallerDatabaseModel, UmbracoPerformInstallDatabaseConfiguration } from '../../core/models';
+import { UmbInstallerContext } from '../installer.context';
 
 @customElement('umb-installer-database')
-export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
+export class UmbInstallerDatabaseElement extends UmbContextConsumerMixin(LitElement) {
 	static styles: CSSResultGroup = [
 		css`
 			:host,
@@ -27,10 +27,6 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
 				height: 100%;
 				display: flex;
 				flex-direction: column;
-			}
-
-			form > uui-form-layout-item {
-				/* margin-bottom: var(--uui-size-layout-2); */
 			}
 
 			uui-form-layout-item {
@@ -94,44 +90,48 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
 	private _preConfiguredDatabase?: UmbracoInstallerDatabaseModel;
 
 	@state()
-	private _installerStore?: UmbInstallerContext;
-
-	@state()
 	private _validationErrorMessage = '';
 
-	private storeDataSubscription?: Subscription;
-	private storeSettingsSubscription?: Subscription;
+	private _installerContext?: UmbInstallerContext;
+	private _installerDataSubscription?: Subscription;
+	private _installerSettingsSubscription?: Subscription;
 
 	constructor() {
 		super();
 
-		this.consumeContext('umbInstallerContext', (installerStore: UmbInstallerContext) => {
-			this._installerStore = installerStore;
+		this.consumeContext('umbInstallerContext', (installerContext: UmbInstallerContext) => {
+			this._installerContext = installerContext;
+			this._observeInstallerSettings();
+			this._observeInstallerData();
+		});
+	}
 
-			this.storeSettingsSubscription?.unsubscribe();
-			this.storeSettingsSubscription = installerStore.settings.subscribe((settings) => {
-				this._databases = settings.databases;
+	private _observeInstallerSettings() {
+		this._installerSettingsSubscription?.unsubscribe();
+		this._installerSettingsSubscription = this._installerContext?.settings.subscribe((settings) => {
+			this._databases = settings.databases;
 
-				// If there is an isConfigured database in the databases array then we can skip the database selection step
-				// and just use that.
-				this._preConfiguredDatabase = this._databases.find((x) => x.isConfigured);
-				if (!this._preConfiguredDatabase) {
-					this._options = settings.databases.map((x, i) => ({ name: x.displayName, value: x.id, selected: i === 0 }));
-				}
-			});
+			// If there is an isConfigured database in the databases array then we can skip the database selection step
+			// and just use that.
+			this._preConfiguredDatabase = this._databases.find((x) => x.isConfigured);
+			if (!this._preConfiguredDatabase) {
+				this._options = settings.databases.map((x, i) => ({ name: x.displayName, value: x.id, selected: i === 0 }));
+			}
+		});
+	}
 
-			this.storeDataSubscription?.unsubscribe();
-			this.storeDataSubscription = installerStore.data.subscribe((data) => {
-				this.databaseFormData = data.database ?? {};
-				this._options.forEach((x, i) => (x.selected = data.database?.id === x.value || i === 0));
-			});
+	private _observeInstallerData() {
+		this._installerDataSubscription?.unsubscribe();
+		this._installerDataSubscription = this._installerContext?.data.subscribe((data) => {
+			this.databaseFormData = data.database ?? {};
+			this._options.forEach((x, i) => (x.selected = data.database?.id === x.value || i === 0));
 		});
 	}
 
 	disconnectedCallback(): void {
 		super.disconnectedCallback();
-		this.storeSettingsSubscription?.unsubscribe();
-		this.storeDataSubscription?.unsubscribe();
+		this._installerSettingsSubscription?.unsubscribe();
+		this._installerDataSubscription?.unsubscribe();
 	}
 
 	private _handleChange(e: InputEvent) {
@@ -140,9 +140,9 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
 		const value: { [key: string]: string | boolean } = {};
 		value[target.name] = target.checked ?? target.value; // handle boolean and text inputs
 
-		const database = { ...this._installerStore?.getData().database, ...value };
+		const database = { ...this._installerContext?.getData().database, ...value };
 
-		this._installerStore?.appendData({ database });
+		this._installerContext?.appendData({ database });
 	}
 
 	private _handleSubmit = async (evt: SubmitEvent) => {
@@ -154,7 +154,7 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
 		const isValid = form.checkValidity();
 		if (!isValid) return;
 
-		if (!this._installerStore) return;
+		if (!this._installerContext) return;
 
 		this._installButton.state = 'waiting';
 
@@ -202,7 +202,7 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
 			}
 
 			const database = {
-				...this._installerStore?.getData().database,
+				...this._installerContext?.getData().database,
 				id,
 				username,
 				password,
@@ -212,37 +212,57 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
 				connectionString,
 			} as UmbracoPerformInstallDatabaseConfiguration;
 
-			this._installerStore?.appendData({ database });
+			this._installerContext?.appendData({ database });
 		}
 
-		this.dispatchEvent(new CustomEvent('submit', { bubbles: true, composed: true }));
+		this._installerContext?.nextStep();
+		this._installerContext
+			.requestInstall()
+			.then(() => this._handleFulfilled())
+			.catch((error) => this._handleRejected(error));
 	};
 
-	private _onBack() {
-		this.dispatchEvent(new CustomEvent('previous', { bubbles: true, composed: true }));
+	private _handleFulfilled() {
+		console.warn('TODO: Set up real authentication');
+		sessionStorage.setItem('is-authenticated', 'true');
+		history.replaceState(null, '', '/content');
 	}
 
-	private get selectedDatabase() {
-		const id = this._installerStore?.getData().database?.id;
+	private _handleRejected(e: unknown) {
+		if (e instanceof postInstallSetup.Error) {
+			const error = e.getActualType();
+			if (error.status === 400) {
+				this._installerContext?.setInstallStatus(error.data);
+			}
+		}
+		this._installerContext?.nextStep();
+	}
+
+	private _onBack() {
+		this._installerContext?.prevStep();
+	}
+
+	private get _selectedDatabase() {
+		const id = this._installerContext?.getData().database?.id;
 		return this._databases.find((x) => x.id === id) ?? this._databases[0];
 	}
 
 	private _renderSettings() {
-		if (!this.selectedDatabase) return;
+		if (!this._selectedDatabase) return;
 
-		if (this.selectedDatabase.displayName.toLowerCase() === 'custom') {
+		if (this._selectedDatabase.displayName.toLowerCase() === 'custom') {
 			return this._renderCustom();
 		}
 
 		const result = [];
 
-		if (this.selectedDatabase.requiresServer) {
+		if (this._selectedDatabase.requiresServer) {
 			result.push(this._renderServer());
 		}
 
-		result.push(this._renderDatabaseName(this.databaseFormData.name ?? this.selectedDatabase.defaultDatabaseName));
+		result.push(this._renderDatabaseName(this.databaseFormData.name ?? this._selectedDatabase.defaultDatabaseName));
 
-		if (this.selectedDatabase.requiresCredentials) {
+		if (this._selectedDatabase.requiresCredentials) {
 			result.push(this._renderCredentials());
 		}
 
@@ -261,7 +281,7 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
 				label="Server address"
 				@input=${this._handleChange}
 				.value=${this.databaseFormData.server ?? ''}
-				.placeholder=${this.selectedDatabase?.serverPlaceholder ?? ''}
+				.placeholder=${this._selectedDatabase?.serverPlaceholder ?? ''}
 				required
 				required-message="Server is required"></uui-input>
 		</uui-form-layout-item>
@@ -384,6 +404,6 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-installer-database': UmbInstallerDatabase;
+		'umb-installer-database': UmbInstallerDatabaseElement;
 	}
 }

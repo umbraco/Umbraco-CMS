@@ -2,7 +2,7 @@ import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
 
 @customElement('umb-installer-installing')
-export class UmbInstallerInstalling extends LitElement {
+export class UmbInstallerInstallingElement extends LitElement {
 	static styles: CSSResultGroup = [
 		css`
 			h1 {
@@ -21,6 +21,6 @@ export class UmbInstallerInstalling extends LitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-installer-installing': UmbInstallerInstalling;
+		'umb-installer-installing': UmbInstallerInstallingElement;
 	}
 }
