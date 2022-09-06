@@ -7,7 +7,7 @@ namespace Umbraco.Cms.ManagementApi.ViewModels.Move;
 ///     A model representing a model for moving or copying
 /// </summary>
 [DataContract(Name = "content", Namespace = "")]
-public class MoveOrCopyViewModel
+public class MoveViewModel
 {
     /// <summary>
     ///     The Id of the node to move or copy to
@@ -22,13 +22,6 @@ public class MoveOrCopyViewModel
     [DataMember(Name = "id", IsRequired = true)]
     [Required]
     public int Id { get; set; }
-
-    /// <summary>
-    ///     Boolean indicating whether copying the object should create a relation to it's original
-    /// </summary>
-    [DataMember(Name = "relateToOriginal", IsRequired = true)]
-    [Required]
-    public bool RelateToOriginal { get; set; }
 
     /// <summary>
     ///     Boolean indicating whether copying the object should be recursive

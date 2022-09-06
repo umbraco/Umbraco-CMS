@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.ManagementApi.ViewModels.Move;
 using Umbraco.Extensions;
@@ -37,7 +36,7 @@ public class MoveDictionaryController : DictionaryControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IActionResult), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Move(MoveOrCopyViewModel move)
+    public async Task<IActionResult> Move(MoveViewModel move)
     {
         IDictionaryItem? dictionaryItem = _localizationService.GetDictionaryItemById(move.Id);
         if (dictionaryItem == null)
