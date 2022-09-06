@@ -20,7 +20,7 @@ export class UmbInstallerContext {
 	public readonly installStatus = this._installStatus.asObservable();
 
 	constructor() {
-		this.loadInstallerSettings();
+		this._loadInstallerSettings();
 	}
 
 	public currentStepChanges() {
@@ -61,7 +61,7 @@ export class UmbInstallerContext {
 		this._installStatus.next(status);
 	}
 
-	private loadInstallerSettings() {
+	private _loadInstallerSettings() {
 		getInstallSettings({}).then(({ data }) => {
 			this._settings.next(data);
 		});
