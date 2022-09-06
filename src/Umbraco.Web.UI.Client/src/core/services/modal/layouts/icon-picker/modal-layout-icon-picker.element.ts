@@ -1,9 +1,7 @@
-import { css, html, LitElement } from 'lit';
+import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
-import { UmbModalService } from '../..';
 import { UmbModalLayoutElement } from '../modal-layout.element';
-import { UmbModalContentPickerData } from '../content-picker/modal-layout-content-picker.element';
 
 import '../../../../../backoffice/editors/shared/editor-entity/editor-entity.element';
 
