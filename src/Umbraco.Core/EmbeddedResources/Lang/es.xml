@@ -71,6 +71,10 @@
     <key alias="update">Permitir acceso para guardar un nodo</key>
     <key alias="createblueprint">Permitir acceso para crear una Plantilla de Contenido</key>
   </area>
+  <area alias="apps">
+    <key alias="umbContent">Contenido</key>
+    <key alias="umbInfo">Información</key>
+  </area>
   <area alias="assignDomain">
     <key alias="permissionDenied">Permiso denegado.</key>
     <key alias="addNew">Añadir nuevo dominio</key>
