@@ -1,17 +1,14 @@
-﻿using Dazinator.Extensions.FileProviders;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Versioning;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using NSwag.AspNetCore;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -19,7 +16,6 @@ using Umbraco.Cms.ManagementApi.Configuration;
 using Umbraco.Cms.ManagementApi.DependencyInjection;
 using Umbraco.Cms.Web.Common.ApplicationBuilder;
 using Umbraco.Extensions;
-using Umbraco.New.Cms.Web.Common.Routing;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Cms.ManagementApi;
@@ -117,7 +113,6 @@ public class ManagementApiComposer : IComposer
                             config.SwaggerRoutes.Add(new SwaggerUi3Route(ApiAllName, swaggerPath));
                         });
                     }
-
                 },
                 applicationBuilder =>
                 {
