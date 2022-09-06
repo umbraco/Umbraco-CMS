@@ -95,39 +95,45 @@ export class UmbInstallerDatabaseElement extends UmbContextConsumerMixin(LitElem
 	@state()
 	private _validationErrorMessage = '';
 
-	private storeDataSubscription?: Subscription;
-	private storeSettingsSubscription?: Subscription;
+	private _installerDataSubscription?: Subscription;
+	private _installerSettingsSubscription?: Subscription;
 
 	constructor() {
 		super();
 
 		this.consumeContext('umbInstallerContext', (installerContext: UmbInstallerContext) => {
 			this._installerContext = installerContext;
+			this._observeInstallerSettings();
+			this._observeInstallerData();
+		});
+	}
 
-			this.storeSettingsSubscription?.unsubscribe();
-			this.storeSettingsSubscription = installerContext.settings.subscribe((settings) => {
-				this._databases = settings.databases;
+	private _observeInstallerSettings() {
+		this._installerSettingsSubscription?.unsubscribe();
+		this._installerSettingsSubscription = this._installerContext?.settings.subscribe((settings) => {
+			this._databases = settings.databases;
 
-				// If there is an isConfigured database in the databases array then we can skip the database selection step
-				// and just use that.
-				this._preConfiguredDatabase = this._databases.find((x) => x.isConfigured);
-				if (!this._preConfiguredDatabase) {
-					this._options = settings.databases.map((x, i) => ({ name: x.displayName, value: x.id, selected: i === 0 }));
-				}
-			});
+			// If there is an isConfigured database in the databases array then we can skip the database selection step
+			// and just use that.
+			this._preConfiguredDatabase = this._databases.find((x) => x.isConfigured);
+			if (!this._preConfiguredDatabase) {
+				this._options = settings.databases.map((x, i) => ({ name: x.displayName, value: x.id, selected: i === 0 }));
+			}
+		});
+	}
 
-			this.storeDataSubscription?.unsubscribe();
-			this.storeDataSubscription = installerContext.data.subscribe((data) => {
-				this.databaseFormData = data.database ?? {};
-				this._options.forEach((x, i) => (x.selected = data.database?.id === x.value || i === 0));
-			});
+	private _observeInstallerData() {
+		this._installerDataSubscription?.unsubscribe();
+		this._installerDataSubscription = this._installerContext?.data.subscribe((data) => {
+			this.databaseFormData = data.database ?? {};
+			this._options.forEach((x, i) => (x.selected = data.database?.id === x.value || i === 0));
 		});
 	}
 
 	disconnectedCallback(): void {
 		super.disconnectedCallback();
-		this.storeSettingsSubscription?.unsubscribe();
-		this.storeDataSubscription?.unsubscribe();
+		this._installerSettingsSubscription?.unsubscribe();
+		this._installerDataSubscription?.unsubscribe();
 	}
 
 	private _handleChange(e: InputEvent) {
