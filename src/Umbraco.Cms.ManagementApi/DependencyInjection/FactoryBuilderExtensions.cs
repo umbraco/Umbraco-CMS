@@ -8,7 +8,7 @@ public static class FactoryBuilderExtensions
 {
     internal static IUmbracoBuilder AddFactories(this IUmbracoBuilder builder)
     {
-        builder.Services.AddTransient<IViewModelFactory, ViewModelFactory>();
+        builder.Services.AddTransient<IPagedViewModelFactory, PagedViewModelFactory>();
         return builder;
     }
 
