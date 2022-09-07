@@ -17,7 +17,7 @@ export class UmbExtensionRegistry {
 	private _extensions = new BehaviorSubject<Array<ManifestTypes>>([]);
 	public readonly extensions = this._extensions.asObservable();
 
-	register(manifest: ManifestTypes & { loader: () => Promise<object | HTMLElement> }): void {
+	register(manifest: ManifestTypes & { loader?: () => Promise<object | HTMLElement> }): void {
 		const extensionsValues = this._extensions.getValue();
 		const extension = extensionsValues.find((extension) => extension.alias === manifest.alias);
 
