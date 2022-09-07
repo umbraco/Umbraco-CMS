@@ -30,4 +30,6 @@ public class RelationViewModelFactory : IRelationViewModelFactory
 
         return relationViewModel;
     }
+
+    public IEnumerable<RelationViewModel> CreateMultiple(IEnumerable<IRelation> relations) => relations.Select(Create);
 }
