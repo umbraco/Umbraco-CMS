@@ -17,6 +17,6 @@ public class DocumentTypeTreeChildrenController : DocumentTypeTreeControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(PagedResult<FolderTreeItemViewModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult> Children(Guid parentKey, long pageNumber = 0, int pageSize = 100, bool foldersOnly = false)
+    public async Task<ActionResult<PagedResult<DocumentTypeTreeItemViewModel>>> Children(Guid parentKey, long pageNumber = 0, int pageSize = 100, bool foldersOnly = false)
         => await GetChildren(parentKey, pageNumber, pageSize, foldersOnly);
 }

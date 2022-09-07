@@ -24,7 +24,7 @@ public abstract class TreeControllerBase<TItem> : Controller
 
     protected abstract UmbracoObjectTypes ItemObjectType { get; }
 
-    protected async Task<ActionResult> GetRoot(long pageNumber, int pageSize)
+    protected async Task<ActionResult<PagedResult<TItem>>> GetRoot(long pageNumber, int pageSize)
     {
         IEntitySlim[] rootEntities = GetPagedRootEntities(pageNumber, pageSize, out var totalItems);
 
@@ -34,7 +34,7 @@ public abstract class TreeControllerBase<TItem> : Controller
         return await Task.FromResult(Ok(result));
     }
 
-    protected async Task<ActionResult> GetChildren(Guid parentKey, long pageNumber, int pageSize)
+    protected async Task<ActionResult<PagedResult<TItem>>> GetChildren(Guid parentKey, long pageNumber, int pageSize)
     {
         IEntitySlim[] children = GetPagedChildEntities(parentKey, pageNumber, pageSize, out var totalItems);
 
@@ -46,7 +46,7 @@ public abstract class TreeControllerBase<TItem> : Controller
         return await Task.FromResult(Ok(result));
     }
 
-    protected async Task<ActionResult> GetItems(Guid[] keys)
+    protected async Task<ActionResult<PagedResult<TItem>>> GetItems(Guid[] keys)
     {
         if (keys.IsCollectionEmpty())
         {

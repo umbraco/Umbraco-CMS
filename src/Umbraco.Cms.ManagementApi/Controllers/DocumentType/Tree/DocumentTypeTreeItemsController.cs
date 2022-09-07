@@ -17,6 +17,6 @@ public class DocumentTypeTreeItemsController : DocumentTypeTreeControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(PagedResult<FolderTreeItemViewModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult> Items([FromQuery(Name = "key")] Guid[] keys)
+    public async Task<ActionResult<PagedResult<DocumentTypeTreeItemViewModel>>> Items([FromQuery(Name = "key")] Guid[] keys)
         => await GetItems(keys);
 }

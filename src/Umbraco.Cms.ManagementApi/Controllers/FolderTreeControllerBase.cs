@@ -20,13 +20,13 @@ public abstract class FolderTreeControllerBase<TItem> : TreeControllerBase<TItem
 
     protected abstract UmbracoObjectTypes FolderObjectType { get; }
 
-    protected async Task<ActionResult> GetRoot(long pageNumber, int pageSize, bool foldersOnly)
+    protected async Task<ActionResult<PagedResult<TItem>>> GetRoot(long pageNumber, int pageSize, bool foldersOnly)
     {
         _foldersOnly = foldersOnly;
         return await GetRoot(pageNumber, pageSize);
     }
 
-    protected async Task<ActionResult> GetChildren(Guid parentKey, long pageNumber, int pageSize, bool foldersOnly)
+    protected async Task<ActionResult<PagedResult<TItem>>> GetChildren(Guid parentKey, long pageNumber, int pageSize, bool foldersOnly)
     {
         _foldersOnly = foldersOnly;
         return await GetChildren(parentKey, pageNumber, pageSize);

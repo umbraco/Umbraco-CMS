@@ -24,6 +24,6 @@ public class MediaTreeItemsController : MediaTreeControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(PagedResult<TreeItemViewModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult> Items([FromQuery(Name = "key")] Guid[] keys)
+    public async Task<ActionResult<PagedResult<ContentTreeItemViewModel>>> Items([FromQuery(Name = "key")] Guid[] keys)
         => await GetItems(keys);
 }

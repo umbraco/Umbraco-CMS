@@ -23,7 +23,7 @@ public class MediaTreeChildrenController : MediaTreeControllerBase
     [HttpGet("children")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(PagedResult<TreeItemViewModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult> Children(Guid parentKey, long pageNumber = 0, int pageSize = 100)
+    [ProducesResponseType(typeof(PagedResult<ContentTreeItemViewModel>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<PagedResult<ContentTreeItemViewModel>>> Children(Guid parentKey, long pageNumber = 0, int pageSize = 100)
         => await GetChildren(parentKey, pageNumber, pageSize);
 }
