@@ -143,6 +143,9 @@ export class UmbTreeItem extends UmbContextConsumerMixin(LitElement) {
 	}
 
 	private _openActions() {
+		if (!this._treeContext || !this._sectionContext) return;
+
+		this._sectionContext?.setActiveTree(this._treeContext?.tree);
 		this._actionService?.open({ name: this.label, key: this.itemKey });
 	}
 

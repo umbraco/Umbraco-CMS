@@ -145,16 +145,17 @@ export interface components {
       elementName?: string;
       alias: string;
     };
-    MetaEntityAction: {
+    MetaTreeItemAction: {
+      trees: string[];
       label: string;
       icon: string;
       /** Format: float */
       weight: number;
     };
-    IManifestEntityAction: {
+    IManifestTreeItemAction: {
       /** @enum {string} */
-      type: "entityAction";
-      meta: components["schemas"]["MetaEntityAction"];
+      type: "treeItemAction";
+      meta: components["schemas"]["MetaTreeItemAction"];
       name: string;
       js?: string;
       elementName?: string;
@@ -233,7 +234,7 @@ export interface components {
       | components["schemas"]["IManifestSection"]
       | components["schemas"]["IManifestTree"]
       | components["schemas"]["IManifestEditor"]
-      | components["schemas"]["IManifestEntityAction"]
+      | components["schemas"]["IManifestTreeItemAction"]
       | components["schemas"]["IManifestPropertyEditorUI"]
       | components["schemas"]["IManifestDashboard"]
       | components["schemas"]["IManifestEditorView"]

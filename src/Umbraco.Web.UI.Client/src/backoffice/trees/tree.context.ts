@@ -1,8 +1,10 @@
 import { BehaviorSubject, map, Observable } from 'rxjs';
+import type { ManifestTree } from '../../core/models';
 import type { UmbEntityStore } from '../../core/stores/entity.store';
 import { Entity } from '../../mocks/data/entity.data';
 
 export interface UmbTreeContext {
+	tree: ManifestTree;
 	rootKey: string;
 	entityStore: UmbEntityStore;
 	readonly selectable: Observable<boolean>;
@@ -14,6 +16,7 @@ export interface UmbTreeContext {
 }
 
 export class UmbTreeContextBase implements UmbTreeContext {
+	public tree: ManifestTree;
 	public entityStore: UmbEntityStore;
 	public rootKey = '';
 
@@ -23,7 +26,8 @@ export class UmbTreeContextBase implements UmbTreeContext {
 	private _selection: BehaviorSubject<Array<string>> = new BehaviorSubject(<Array<string>>[]);
 	public readonly selection: Observable<Array<string>> = this._selection.asObservable();
 
-	constructor(entityStore: UmbEntityStore) {
+	constructor(tree: ManifestTree, entityStore: UmbEntityStore) {
+		this.tree = tree;
 		this.entityStore = entityStore;
 	}
 

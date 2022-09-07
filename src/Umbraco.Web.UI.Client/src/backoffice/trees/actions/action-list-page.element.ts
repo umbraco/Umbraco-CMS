@@ -1,11 +1,15 @@
 import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement } from 'lit/decorators.js';
-import type { ManifestEntityAction } from '../../../core/models';
+import { customElement, state } from 'lit/decorators.js';
+import type { ManifestEntityAction, ManifestTree } from '../../../core/models';
 import UmbActionElement from './action.element';
+import { UmbExtensionRegistry } from '../../../core/extension';
+import { UmbContextConsumerMixin } from '../../../core/context';
+import { map, Subscription } from 'rxjs';
+import { UmbSectionContext } from '../../sections/section.context';
 
 @customElement('umb-action-list-page')
-export class UmbActionListPageElement extends UmbActionElement {
+export class UmbActionListPageElement extends UmbContextConsumerMixin(UmbActionElement) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -24,49 +28,66 @@ export class UmbActionListPageElement extends UmbActionElement {
 		`,
 	];
 
-	//TODO Replace with real data
-	private _actionList: Array<ManifestEntityAction & { loader?: () => Promise<object | HTMLElement> }> = [
-		{
-			name: 'create',
-			alias: 'action.create',
-			meta: {
-				label: 'Create',
-				icon: 'add',
-				weight: 10,
-			},
-			loader: () => import('./tree-action-create.element'),
-			type: 'entityAction',
-		},
-		{
-			name: 'delete',
-			alias: 'action.delete',
-			meta: {
-				label: 'Delete',
-				icon: 'delete',
-				weight: 20,
-			},
-			loader: () => import('./tree-action-delete.element'),
-			type: 'entityAction',
-		},
-		{
-			name: 'reload',
-			alias: 'action.reload',
-			meta: {
-				label: 'Reload',
-				icon: 'sync',
-				weight: 30,
-			},
-			loader: () => import('./tree-action-reload.element'),
-			type: 'entityAction',
-		},
-	];
+	@state()
+	private _actions: Array<ManifestEntityAction> = [];
 
-	renderActions() {
-		return this._actionList
+	@state()
+	private _activeTree?: ManifestTree;
+
+	private _extensionRegistry?: UmbExtensionRegistry;
+	private _sectionContext?: UmbSectionContext;
+
+	private _treeItemActionsSubscription?: Subscription;
+	private _activeTreeSubscription?: Subscription;
+
+	connectedCallback() {
+		super.connectedCallback();
+
+		this.consumeContext('umbExtensionRegistry', (extensionRegistry) => {
+			this._extensionRegistry = extensionRegistry;
+			this._observeTreeItemActions();
+		});
+
+		this.consumeContext('umbSectionContext', (sectionContext) => {
+			this._sectionContext = sectionContext;
+			this._observeActiveTree();
+			this._observeTreeItemActions();
+		});
+	}
+
+	private _observeTreeItemActions() {
+		if (!this._extensionRegistry || !this._sectionContext) return;
+
+		this._treeItemActionsSubscription?.unsubscribe();
+
+		this._treeItemActionsSubscription = this._extensionRegistry
+			?.extensionsOfType('treeItemAction')
+			.pipe(map((actions) => actions.filter((action) => action.meta.trees.includes(this._activeTree?.alias))))
+			.subscribe((actions) => {
+				this._actions = actions;
+			});
+	}
+
+	private _observeActiveTree() {
+		this._activeTreeSubscription?.unsubscribe();
+
+		this._activeTreeSubscription = this._sectionContext?.activeTree.subscribe((tree) => {
+			this._activeTree = tree;
+		});
+	}
+
+	private _renderActions() {
+		return this._actions
 			.sort((a, b) => a.meta.weight - b.meta.weight)
 			.map((action) => {
 				return html`<umb-tree-action .treeAction=${action}></umb-tree-action> `;
 			});
+	}
+
+	disconnectCallback(): void {
+		super.disconnectCallback();
+		this._treeItemActionsSubscription?.unsubscribe();
+		this._activeTreeSubscription?.unsubscribe();
 	}
 
 	render() {
@@ -74,7 +95,7 @@ export class UmbActionListPageElement extends UmbActionElement {
 			<div id="title">
 				<h3>${this._entity.name}</h3>
 			</div>
-			<div id="action-list">${this.renderActions()}</div>
+			<div id="action-list">${this._renderActions()}</div>
 		`;
 	}
 }

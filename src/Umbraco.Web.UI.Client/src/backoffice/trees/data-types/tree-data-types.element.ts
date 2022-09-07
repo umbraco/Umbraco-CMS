@@ -5,10 +5,14 @@ import '../shared/tree-navigator.element';
 import { UmbTreeDataTypesContext } from './tree-data-types.context';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '../../../core/context';
 import { UmbEntityStore } from '../../../core/stores/entity.store';
+import type { ManifestTree } from '../../../core/models';
 
 @customElement('umb-tree-data-types')
 export class UmbTreeDataTypesElement extends UmbContextProviderMixin(UmbContextConsumerMixin(LitElement)) {
 	static styles = [UUITextStyles, css``];
+
+	@property({ type: Object, attribute: false })
+	tree?: ManifestTree;
 
 	private _selectable = false;
 	@property({ type: Boolean, reflect: true })
@@ -30,9 +34,9 @@ export class UmbTreeDataTypesElement extends UmbContextProviderMixin(UmbContextC
 
 		this.consumeContext('umbEntityStore', (entityStore: UmbEntityStore) => {
 			this._entityStore = entityStore;
-			if (!this._entityStore) return;
+			if (!this._entityStore || !this.tree) return;
 
-			this._treeContext = new UmbTreeDataTypesContext(this._entityStore);
+			this._treeContext = new UmbTreeDataTypesContext(this.tree, this._entityStore);
 			this._treeContext.setSelectable(this.selectable);
 			this.provideContext('umbTreeContext', this._treeContext);
 		});

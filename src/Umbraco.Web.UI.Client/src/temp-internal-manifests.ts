@@ -387,13 +387,14 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		},
 	},
 	{
-		type: 'entityAction',
+		type: 'treeItemAction',
 		alias: 'Umb.EntityAction.Create',
-		name: 'Document Type Create',
-		loader: () => import('./backoffice/editors/extensions/editor-extensions.element'),
+		name: 'Data Type Create',
+		loader: () => import('./backoffice/trees/data-types/actions/action-data-type-create.element'),
 		meta: {
+			trees: ['Umb.Tree.DataTypes'],
 			label: 'Create',
-			icon: 'plus',
+			icon: 'add',
 			weight: 100,
 		},
 	},

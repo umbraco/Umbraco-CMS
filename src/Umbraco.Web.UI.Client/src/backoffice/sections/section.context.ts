@@ -1,6 +1,6 @@
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, ReplaySubject } from 'rxjs';
 
-import type { ManifestSection } from '../../core/models';
+import type { ManifestSection, ManifestTree } from '../../core/models';
 
 export class UmbSectionContext {
 	// TODO: figure out how fine grained we want to make our observables.
@@ -17,6 +17,10 @@ export class UmbSectionContext {
 	});
 	public readonly data = this._data.asObservable();
 
+	// TODO: what is the best context to put this in?
+	private _activeTree = new ReplaySubject<ManifestTree>(1);
+	public readonly activeTree = this._activeTree.asObservable();
+
 	constructor(section: ManifestSection) {
 		if (!section) return;
 		this._data.next(section);
@@ -29,5 +33,9 @@ export class UmbSectionContext {
 
 	public getData() {
 		return this._data.getValue();
+	}
+
+	public setActiveTree(tree: ManifestTree) {
+		this._activeTree.next(tree);
 	}
 }

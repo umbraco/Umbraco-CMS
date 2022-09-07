@@ -454,9 +454,13 @@ components:
         - meta
         - name
         - alias
-    MetaEntityAction:
+    MetaTreeItemAction:
       type: object
       properties:
+        trees:
+          type: array
+          items:
+            type: string
         label:
           type: string
         icon:
@@ -465,18 +469,19 @@ components:
           type: number
           format: float
       required:
+        - trees
         - label
         - icon
         - weight
-    IManifestEntityAction:
+    IManifestTreeItemAction:
       type: object
       properties:
         type:
           type: string
           enum:
-            - entityAction
+            - treeItemAction
         meta:
-          $ref: '#/components/schemas/MetaEntityAction'
+          $ref: '#/components/schemas/MetaTreeItemAction'
         name:
           type: string
         js:
@@ -668,7 +673,7 @@ components:
         - $ref: '#/components/schemas/IManifestSection'
         - $ref: '#/components/schemas/IManifestTree'
         - $ref: '#/components/schemas/IManifestEditor'
-        - $ref: '#/components/schemas/IManifestEntityAction'
+        - $ref: '#/components/schemas/IManifestTreeItemAction'
         - $ref: '#/components/schemas/IManifestPropertyEditorUI'
         - $ref: '#/components/schemas/IManifestDashboard'
         - $ref: '#/components/schemas/IManifestEditorView'
@@ -681,7 +686,7 @@ components:
           section: '#/components/schemas/IManifestSection'
           tree: '#/components/schemas/IManifestTree'
           editor: '#/components/schemas/IManifestEditor'
-          entityAction: '#/components/schemas/IManifestEntityAction'
+          treeItemAction: '#/components/schemas/IManifestTreeItemAction'
           propertyEditorUI: '#/components/schemas/IManifestPropertyEditorUI'
           dashboard: '#/components/schemas/IManifestDashboard'
           editorView: '#/components/schemas/IManifestEditorView'

@@ -6,10 +6,14 @@ import { UmbTreeDocumentContext } from './tree-documents.context';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '../../../core/context';
 import { UmbEntityStore } from '../../../core/stores/entity.store';
 import { Subscription } from 'rxjs';
+import type { ManifestTree } from '../../../core/models';
 
 @customElement('umb-tree-document')
 export class UmbTreeDocumentElement extends UmbContextProviderMixin(UmbContextConsumerMixin(LitElement)) {
 	static styles = [UUITextStyles, css``];
+
+	@property({ type: Object, attribute: false })
+	tree?: ManifestTree;
 
 	private _selectable = false;
 	@property({ type: Boolean, reflect: true })
@@ -44,9 +48,9 @@ export class UmbTreeDocumentElement extends UmbContextProviderMixin(UmbContextCo
 
 		this.consumeContext('umbEntityStore', (entityStore: UmbEntityStore) => {
 			this._entityStore = entityStore;
-			if (!this._entityStore) return;
+			if (!this._entityStore || !this.tree) return;
 
-			this._treeContext = new UmbTreeDocumentContext(this._entityStore);
+			this._treeContext = new UmbTreeDocumentContext(this.tree, this._entityStore);
 			this._treeContext.setSelectable(this.selectable);
 			this._treeContext.setSelection(this.selection);
 			this._observeSelection();

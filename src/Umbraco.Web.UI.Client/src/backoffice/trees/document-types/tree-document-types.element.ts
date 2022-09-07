@@ -6,10 +6,14 @@ import { UmbEntityStore } from '../../../core/stores/entity.store';
 import { UmbTreeDocumentTypesContext } from './tree-document-types.context';
 
 import '../shared/tree-navigator.element';
+import type { ManifestTree } from '../../../core/models';
 
 @customElement('umb-tree-document-types')
 export class UmbTreeDocumentTypes extends UmbContextConsumerMixin(UmbContextProviderMixin(LitElement)) {
 	static styles = [UUITextStyles, css``];
+
+	@property({ type: Object, attribute: false })
+	tree?: ManifestTree;
 
 	@property({ type: String })
 	public alias = '';
@@ -22,9 +26,9 @@ export class UmbTreeDocumentTypes extends UmbContextConsumerMixin(UmbContextProv
 
 		this.consumeContext('umbEntityStore', (entityStore: UmbEntityStore) => {
 			this._entityStore = entityStore;
-			if (!this._entityStore) return;
+			if (!this._entityStore || !this.tree) return;
 
-			this._treeContext = new UmbTreeDocumentTypesContext(this._entityStore);
+			this._treeContext = new UmbTreeDocumentTypesContext(this.tree, this._entityStore);
 			this.provideContext('umbTreeContext', this._treeContext);
 		});
 	}
