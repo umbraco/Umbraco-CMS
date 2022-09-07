@@ -2,6 +2,7 @@ import '../../../backoffice/editors/shared/editor-entity/editor-entity.element';
 
 import { html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
+import { IRoute, IRoutingInfo } from 'router-slot';
 
 import { UmbContextConsumerMixin } from '../../../core/context';
 import { UmbExtensionRegistry } from '../../../core/extension';
@@ -10,57 +11,26 @@ import { UmbExtensionRegistry } from '../../../core/extension';
 export class UmbPackagesSection extends UmbContextConsumerMixin(LitElement) {
 	private umbExtensionRegistry?: UmbExtensionRegistry;
 
-	constructor() {
-		super();
-
-		this.consumeContext('umbExtensionRegistry', (umbExtensionRegistry: UmbExtensionRegistry) => {
-			this.umbExtensionRegistry = umbExtensionRegistry;
-			this._registerViews();
-		});
-	}
-
-	private _registerViews() {
-		this.umbExtensionRegistry?.register({
-			alias: 'Umb.Editor.Packages.Overview',
-			name: 'Packages',
-			type: 'editorView',
-			elementName: 'umb-packages-overview',
-			loader: () => import('./packages-overview.element'),
-			meta: {
-				icon: 'document',
-				pathname: 'repo',
-				editors: ['Umb.Editor.Packages'],
-				weight: 10,
+	private _routes: IRoute[] = [
+		{
+			path: 'details/:id',
+			component: () => import('./packages-details.element'),
+			setup(component: any, info: IRoutingInfo) {
+				component.id = info.match.params.id;
 			},
-		});
-
-		this.umbExtensionRegistry?.register({
-			alias: 'Umb.Editor.Packages.Installed',
-			name: 'Installed',
-			type: 'editorView',
-			elementName: 'umb-packages-installed',
-			loader: () => import('./packages-installed.element'),
-			meta: {
-				icon: 'document',
-				pathname: 'installed',
-				editors: ['Umb.Editor.Packages'],
-				weight: 0,
-			},
-		});
-	}
+		},
+		{
+			path: '',
+			component: () => import('./packages-editor.element'),
+		},
+		{
+			path: '**',
+			redirectTo: '',
+		},
+	];
 
 	render() {
-		return html`
-			<uui-icon-registry-essential>
-				<umb-section-layout>
-					<umb-section-main>
-						<umb-editor-entity alias="Umb.Editor.Packages">
-							<h1 slot="name">Packages</h1>
-						</umb-editor-entity>
-					</umb-section-main>
-				</umb-section-layout>
-			</uui-icon-registry-essential>
-		`;
+		return html` <router-slot .routes=${this._routes}></router-slot> `;
 	}
 }
 

@@ -83,7 +83,7 @@ export class UmbPackagesInstalledItem extends UmbContextConsumerMixin(LitElement
 	}
 
 	private _onClick() {
-		window.history.pushState({}, '', `/section/packages/view/repo/${this.package.id}`);
+		window.history.pushState({}, '', `/section/packages/details/${this.package.id}`);
 	}
 }
 
