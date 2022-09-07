@@ -26,6 +26,8 @@
         }
     );
 
+    const ANIMATION_DURATION = 120;
+
     function BlockGridEntriesController($element, $scope, $timeout) {
 
         var vm = this;
@@ -126,8 +128,15 @@
 
             const gridLayoutContainerEl = $element[0].querySelector('.umb-block-grid__layout-container');
             var _lastGridLayoutContainerEl = null;
+            //var targetEl = null;
+            //var movingEl = null;
+
             var targetRect = null;
-            var itemRect = null;
+            var ghostEl = null;
+            var ghostRect = null;
+            var dragX = 0;
+            var dragY = 0;
+            var dragOffsetX = 0;
 
             // Setup DOM method for communication between sortables:
             gridLayoutContainerEl['Sortable:controller'] = () => {
@@ -139,6 +148,8 @@
             // Borrowed concept from, its not identical as more has been implemented: https://github.com/SortableJS/angular-legacy-sortablejs/blob/master/angular-legacy-sortable.js
             function _sync(evt) {
 
+                console.log("_sync");
+
                 const oldIndex = evt.oldIndex,
                       newIndex = evt.newIndex;
 
@@ -146,12 +157,12 @@
                 if (gridLayoutContainerEl !== evt.from) {
                     const fromCtrl = evt.from['Sortable:controller']();
                     const prevEntries = fromCtrl.entries;
-                    const movingEl = prevEntries[oldIndex];
+                    const syncEntry = prevEntries[oldIndex];
 
                     // Perform the transfer:
 
                     if (Sortable.active && Sortable.active.lastPullMode === 'clone') {
-                        movingEl = Utilities.copy(movingEl);
+                        syncEntry = Utilities.copy(syncEntry);
                         prevEntries.splice(Sortable.utils.index(evt.clone, sortable.options.draggable), 0, prevEntries.splice(oldIndex, 1)[0]);
 
                         /*
@@ -164,7 +175,7 @@
                         prevEntries.splice(oldIndex, 1);
                     }
 
-                    vm.entries.splice(newIndex, 0, movingEl);
+                    vm.entries.splice(newIndex, 0, syncEntry);
 
                     // I currently do not think below line is necessary as this is updated through angularJS. This was giving trouble/errors.
                     //evt.from.insertBefore(evt.item, nextSibling); // revert element
@@ -181,6 +192,95 @@
                 }
             }
 
+            var checkEvent = null;
+            var awaitingContainer = null;
+            var approvedContainer = gridLayoutContainerEl;
+            var approvedContainerDate = null;
+
+            var awaitingTarget = null;
+            var approvedTarget = {related: null, after: false};
+            //var lastApprovedAfter = null;
+            var awaitingTimeout = null;
+
+            function _checkReset() {
+                awaitingContainer = null;
+                approvedContainer = null;
+                //preventAwaitingNewContainer = false;
+
+                awaitingTarget = null;
+                approvedTarget = {related: null, after: false};
+                clearTimeout(awaitingTimeout);
+
+                awaitingTimeout = null;
+            }
+
+            function _checkStart() {
+                console.log("_checkStart")
+                approvedContainer = gridLayoutContainerEl;
+                approvedContainerDate = new Date().getTime();
+            }
+
+            //var preventAwaitingNewContainer = false;
+            function _checkMove(evt) {
+
+                checkEvent = evt;
+
+                //TODO: if cursor is within items box, then a move should be prevented:
+                if(dragX > ghostRect.left && dragX < ghostRect.right && dragY > ghostRect.top && dragY < ghostRect.bottom) {
+                //if(ghostEl.offsetLeft > ghostRect.left && ghostEl.offsetLeft < ghostRect.right && ghostEl.offsetTop > ghostRect.top && ghostEl.offsetTop < ghostRect.bottom) {
+                //if(ghostEl.offsetLeft > 0 && ghostEl.offsetLeft < ghostRect.width && ghostEl.offsetTop > 0 && ghostEl.offsetTop < ghostRect.height) {
+                    console.log("_checkMove Reject€€€€€€€€€€€€.", dragX, dragX, ghostRect.left, ghostRect.top)
+                    return false;
+                }
+                console.log("_checkMove goooooooood!", dragX, dragX, ghostRect.left, ghostRect.top)
+
+                if(evt.to !== approvedContainer) {
+                    // If its only a few milliseconds since we approved the current container, then we will reject the new container:
+                    if(approvedContainerDate + ANIMATION_DURATION*2 > new Date().getTime()) {
+                        //console.log('_checkMove Rejected new container.', gridLayoutContainerEl)
+                        return false;
+                    }
+                    if(awaitingContainer === null) {//&& preventAwaitingNewContainer !== true
+                        awaitingContainer = evt.to;
+                        awaitingTimeout = setTimeout(_approveAwaitingContainer, ANIMATION_DURATION);
+                    }
+                    return false;
+                }
+
+                // Check, could we set a maximum distance requirement?
+                if(approvedTarget && evt.related === approvedTarget.related && evt.willInsertAfter === approvedTarget.after) {
+                    //console.log("_checkMove ❤️", gridLayoutContainerEl);
+                    return true;
+                }
+                if(awaitingTarget === null) {
+                    /*if(evt.related === approvedTarget.related && evt.willInsertAfter === lastApprovedAfter) {
+                        return false;
+                    }*/
+                    awaitingTarget = {related: evt.related, after: evt.willInsertAfter};
+                    awaitingTimeout = setTimeout(_approveAwaitingRelated, ANIMATION_DURATION*2);
+                }
+                return false;
+            }
+            function _approveAwaitingRelated() {
+                //console.log("________________ _approveAwaitingRelated")
+                //lastApprovedAfter = approvedTarget?.after || null;
+                approvedTarget = awaitingTarget;
+                awaitingTarget = null;
+                //preventAwaitingNewContainer = false;
+                sortable.handleEvent(checkEvent);
+            }
+            function _approveAwaitingContainer() {
+
+                //console.log("________________ _approveAwaitingContainer", approvedContainer)
+                approvedContainer = awaitingContainer;
+                approvedContainerDate = new Date().getTime();
+                awaitingContainer = null;
+                //vm.movingLayoutEntry.$block.__scope.$evalAsync();
+
+                //checkEvent.detail = {} || checkEvent.detail;
+                //preventAwaitingNewContainer = true;
+                sortable.handleEvent(checkEvent);
+            }
             function _indication(evt) {
 
                 // If not the same gridLayoutContainerEl, then test for transfer option:
@@ -191,6 +291,7 @@
                 }
 
                 const movingEl = evt.dragged;
+
                 /*if (evt.dragged) {
                     movingEl = evt.dragged;
                 } else {
@@ -219,24 +320,38 @@
                 return false;
             }
 
-            function _onDragMouseMove(evt) {    
+            function _onDragMouseMove(evt) {
                 /** ignorer last drag event, comes as screenX === 0 and screenY === 0 */
-                if(targetRect && itemRect && evt.clientX !== 0 && evt.screenY !== 0) {
+                if(targetRect && ghostRect && evt.clientX !== 0 && evt.screenY !== 0) {
+
+                    dragX = evt.clientX;
+                    dragY = evt.clientY;
+
                     var oldValue = vm.movingLayoutEntry.forceLeft;
                     // TODO: get first columns width and use it:
-                    var newValue = (evt.clientX < targetRect.left + 50);
+                    var newValue = (dragX - dragOffsetX < targetRect.left + 30);
+                    console.log(dragX, dragOffsetX, targetRect.left)
                     if(newValue !== oldValue) {
                         vm.movingLayoutEntry.forceLeft = newValue;
+                        if(newValue) {
+                            console.log("---FORCE--LEFT---")
+                        }
                         vm.movingLayoutEntry.$block.__scope.$evalAsync();// needed for the block to be updated
                     }
 
                     oldValue = vm.movingLayoutEntry.forceRight;
                     // TODO: get last columns width and use it:
-                    newValue = (evt.clientX > targetRect.left + targetRect.width - 50);
+                    newValue = (dragX - dragOffsetX + ghostRect.width > targetRect.right - 30) && (vm.movingLayoutEntry.forceLeft !== true);
+                    console.log("---TEST-FORCE--RIGHT---", dragX - dragOffsetX, ghostRect.width, "== ", dragX - dragOffsetX + ghostRect.width, " > ", targetRect.right - 30)
                     if(newValue !== oldValue) {
                         vm.movingLayoutEntry.forceRight = newValue;
+                        if(newValue) {
+                            console.log("---FORCE--RIGHT---", dragX - dragOffsetX, ghostRect.width, " > ", targetRect.right)
+                        }
                         vm.movingLayoutEntry.$block.__scope.$evalAsync();// needed for the block to be updated
                     }
+                } else {
+                    console.error("[ALERT] not everything", targetRect, ghostRect, evt.clientX)
                 }
             }
 
@@ -248,7 +363,7 @@
                 //touchStartThreshold: 0, // px, how many pixels the point should move before cancelling a delayed drag event
                 //disabled: false, // Disables the sortable if set to true.
                 //store: null,  // @see Store
-                animation: 120,  // ms, animation speed moving items when sorting, `0` — without animation
+                animation: ANIMATION_DURATION,  // ms, animation speed moving items when sorting, `0` — without animation
                 easing: "cubic-bezier(1, 0, 0, 1)", // Easing for animation. Defaults to null. See https://easings.net/ for examples.
                 //handle: "umb-block-grid-block",  // Drag handle selector within list items,
                 cancel: '',
@@ -263,9 +378,16 @@
                 //dragClass: "sortable-drag",  // Class name for the dragging item
 
                 swapThreshold: .45, // Threshold of the swap zone
-                invertSwap: true, // Will always use inverted swap zone if set to true
-                invertedSwapThreshold: .55, // Threshold of the inverted swap zone (will be set to swapThreshold value by default)
+                //invertSwap: true, // Will always use inverted swap zone if set to true
+                //invertedSwapThreshold: .55, // Threshold of the inverted swap zone (will be set to swapThreshold value by default)
                 //direction: 'horizontal', // Direction of Sortable (will be detected automatically if not given)
+                /*direction: function(evt, target, dragEl) {
+                    //if (target !== null && target.className.includes('half-column') && dragEl.className.includes('half-column')) {
+                    //    return 'horizontal';
+                    //}
+                    console.log(evt, target, dragEl)
+                    return 'vertical';
+                },*/
 
                 //forceFallback: true,  // ignore the HTML5 DnD behavior and force the fallback to kick in
 
@@ -273,7 +395,7 @@
                 //fallbackOnBody: false,  // Appends the cloned DOM Element into the Document's Body
                 //fallbackTolerance: 0, // Specify in pixels how far the mouse should move before it's considered as a drag.
 
-                //dragoverBubble: false,
+                dragoverBubble: true,
                 //removeCloneOnHide: true, // Remove the clone element when it is not showing, rather than just hiding it
                 emptyInsertThreshold: 120, // px, distance mouse must be from empty sortable to insert drag element into it
 
@@ -289,15 +411,59 @@
                     vm.movingLayoutEntry = contextVM.getLayoutEntry(oldIndex);
                     vm.movingLayoutEntry.forceLeft = false;
                     vm.movingLayoutEntry.forceRight = false;
+                    vm.movingLayoutEntry.$block.__scope.$evalAsync();// needed for the block to be updated
+
+
+                    //targetEl = evt.to;
+                    ghostEl = evt.item;
 
                     targetRect = evt.to.getBoundingClientRect();
-                    itemRect = evt.item.getBoundingClientRect();
+                    ghostRect = evt.item.getBoundingClientRect();
+                    dragOffsetX = evt.originalEvent.offsetX - evt.item.offsetLeft;
+                    console.log("startX: ", dragOffsetX, -evt.item.offsetLeft, evt)
+                    //dragOffsetY = evt.originalEvent.offsetY;
 
                     window.addEventListener('drag', _onDragMouseMove);
 
+                    _checkStart();
                     $scope.$evalAsync();
                 },
+                // Called by any change to the list (add / update / remove)
+                onMove: function (evt) {
+                    console.log('onMove', evt)
+                    
+                    //targetEl = evt.to;
+                    //movingEl = evt.dragged;
+
+                    /*targetRect = evt.targetRect;
+                    if(evt.targetRect === undefined) {
+                        console.log("target was undefined", evt)
+                    }*/
+                    targetRect = evt.to.getBoundingClientRect();
+                    ghostRect = evt.draggedRect;
+
+                    if(_checkMove(evt) === false) {
+                        return false;
+                    }
+                    // same properties as onEnd
+                    if(_indication(evt) === false) {
+                        return false;
+                    }
+
+                    return true;
+                },
+                
+                onChange: function (evt) {
+                    console.log('onChange', evt)
+                    //evt.oldIndex;  // element index within parent
+                },
+                onSort: function (evt) {
+                    console.log('onSort', evt)
+                    //evt.oldIndex;  // element index within parent
+                },
+                
                 onAdd: function (evt) {
+                    //console.log("# onAdd")
                     /*if(_indication(evt) === false) {
                         return false;
                     }*/
@@ -305,22 +471,15 @@
                     $scope.$evalAsync();
                 },
                 onUpdate: function (evt) {
+                    console.log("onUpdate", evt)
                     /*if(_indication(evt) === false) {
                         return false;
                     }*/
                     _sync(evt);
                     $scope.$evalAsync();
                 },
-                // Called by any change to the list (add / update / remove)
-                onMove: function (evt) {
-
-                    //targetRect = evt.to.getBoundingClientRect();
-                    //itemRect = evt.item.getBoundingClientRect();
-                    
-                    // same properties as onEnd
-                    return _indication(evt)
-                },
                 onEnd: function(evt) {
+                    console.log("# onEnd")
                     window.removeEventListener('drag', _onDragMouseMove);
 
                     // ensure not-allowed indication is removed.
@@ -330,9 +489,13 @@
                         _lastGridLayoutContainerEl = null;
                     }
 
+                    _checkReset();
+
                     vm.movingLayoutEntry = null;
+                    //targetEl = null;
+                    //movingEl = null;
                     targetRect = null;
-                    itemRect = null;
+                    ghostRect = null;
                 }
                 /*
                 setData: function (dataTransfer, dragEl) {
@@ -341,9 +504,9 @@
 
                 // Element is chosen
                 onChoose: function (evt) {
-                    evt.oldIndex;  // element index within parent
+                    console.log('onChoose')
+                    //evt.oldIndex;  // element index within parent
                 },
-
                 // Element is unchosen
                 onUnchoose: function(evt) {
                     // same properties as onEnd
