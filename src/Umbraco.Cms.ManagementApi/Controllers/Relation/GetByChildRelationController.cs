@@ -15,12 +15,18 @@ public class GetByChildRelationController : RelationControllerBase
     private readonly IRelationService _relationService;
     private readonly IUmbracoMapper _umbracoMapper;
     private readonly IPagedViewModelFactory _pagedViewModelFactory;
+    private readonly IRelationViewModelFactory _relationViewModelFactory;
 
-    public GetByChildRelationController(IRelationService relationService, IUmbracoMapper umbracoMapper, IPagedViewModelFactory pagedViewModelFactory)
+    public GetByChildRelationController(
+        IRelationService relationService,
+        IUmbracoMapper umbracoMapper,
+        IPagedViewModelFactory pagedViewModelFactory,
+        IRelationViewModelFactory relationViewModelFactory)
     {
         _relationService = relationService;
         _umbracoMapper = umbracoMapper;
         _pagedViewModelFactory = pagedViewModelFactory;
+        _relationViewModelFactory = relationViewModelFactory;
     }
 
     [HttpGet("childRelations/{childId:int}")]
@@ -35,13 +41,12 @@ public class GetByChildRelationController : RelationControllerBase
         {
             if (string.IsNullOrWhiteSpace(relationTypeAlias) == false)
             {
-                result = _umbracoMapper
-                    .MapEnumerable<IRelation, RelationViewModel>(relations.Where(x => x.RelationType.Alias.InvariantEquals(relationTypeAlias)))
-                    .WhereNotNull();
+                result = _relationViewModelFactory.CreateMultiple(relations.Where(x =>
+                    x.RelationType.Alias.InvariantEquals(relationTypeAlias)));
             }
             else
             {
-                result = _umbracoMapper.MapEnumerable<IRelation, RelationViewModel>(relations).WhereNotNull();
+                result = _relationViewModelFactory.CreateMultiple(relations);
             }
         }
 
