@@ -15,13 +15,13 @@ public class GetHelpController : HelpControllerBase
 {
     private static HttpClient? _httpClient;
     private readonly ILogger<GetHelpController> _logger;
-    private readonly IViewModelFactory _viewModelFactory;
+    private readonly IPagedViewModelFactory _viewModelFactory;
     private HelpPageSettings _helpPageSettings;
 
     public GetHelpController(
         IOptionsMonitor<HelpPageSettings> helpPageSettings,
         ILogger<GetHelpController> logger,
-        IViewModelFactory viewModelFactory)
+        IPagedViewModelFactory viewModelFactory)
     {
         _logger = logger;
         _viewModelFactory = viewModelFactory;
@@ -34,7 +34,7 @@ public class GetHelpController : HelpControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(PagedViewModel<HelpPageViewModel>),StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagedViewModel<HelpPageViewModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> Get(string section, string tree, int skip, int take, string? baseUrl = "https://our.umbraco.com")
     {
         if (IsAllowedUrl(baseUrl) is false)
