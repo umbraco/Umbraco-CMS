@@ -30,14 +30,22 @@ public abstract class ContentTreeControllerBase<TItem> : TreeControllerBase<TIte
     protected override IEntitySlim[] GetPagedRootEntities(long pageNumber, int pageSize, out long totalItems)
         => UserHasRootAccess()
             ? base.GetPagedRootEntities(pageNumber, pageSize, out totalItems)
-            : CalculateAccessMap(() => _userAccessEntitiesService.RootEntities(ItemObjectType, UserStartNodeIds), out totalItems);
+            : CalculateAccessMap(() => _userAccessEntitiesService.RootUserAccessEntities(ItemObjectType, UserStartNodeIds), out totalItems);
 
     protected override IEntitySlim[] GetPagedChildEntities(Guid parentKey, long pageNumber, int pageSize, out long totalItems)
     {
         IEntitySlim[] children = base.GetPagedChildEntities(parentKey, pageNumber, pageSize, out totalItems);
         return UserHasRootAccess()
             ? children
-            : CalculateAccessMap(() => _userAccessEntitiesService.FilteredChildEntities(children, UserStartNodePaths), out totalItems);
+            : CalculateAccessMap(() => _userAccessEntitiesService.ChildUserAccessEntities(children, UserStartNodePaths), out totalItems);
+    }
+
+    protected override IEntitySlim[] GetEntities(Guid[] keys)
+    {
+        IEntitySlim[] entities = base.GetEntities(keys);
+        return UserHasRootAccess()
+            ? entities
+            : CalculateAccessMap(() => _userAccessEntitiesService.UserAccessEntities(entities, UserStartNodePaths), out _);
     }
 
     protected override TItem[] MapTreeItemViewModels(Guid? parentKey, IEntitySlim[] entities)

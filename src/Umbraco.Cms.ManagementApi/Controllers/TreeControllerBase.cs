@@ -28,7 +28,7 @@ public abstract class TreeControllerBase<TItem> : Controller
     {
         IEntitySlim[] rootEntities = GetPagedRootEntities(pageNumber, pageSize, out var totalItems);
 
-        TItem[] treeItemViewModels = MapRootTreeItemViewModels(rootEntities);
+        TItem[] treeItemViewModels = MapTreeItemViewModels(null, rootEntities);
 
         PagedResult<TItem> result = PagedTreeItemViewModels(treeItemViewModels, pageNumber, pageSize, totalItems);
         return await Task.FromResult(Ok(result));
@@ -38,7 +38,7 @@ public abstract class TreeControllerBase<TItem> : Controller
     {
         IEntitySlim[] children = GetPagedChildEntities(parentKey, pageNumber, pageSize, out var totalItems);
 
-        TItem[] treeItemViewModels = MapChildTreeItemViewModels(parentKey, children);
+        TItem[] treeItemViewModels = MapTreeItemViewModels(parentKey, children);
 
         // NOTE: totalItems won't be accurate here if some where filtered out .. but we can't get any closer at the moment
         PagedResult<TItem> result = PagedTreeItemViewModels(treeItemViewModels, pageNumber, pageSize, totalItems);
@@ -53,7 +53,7 @@ public abstract class TreeControllerBase<TItem> : Controller
             return await Task.FromResult(Ok(PagedTreeItemViewModels(Array.Empty<TItem>(), 0, 0, 0)));
         }
 
-        IEntitySlim[] itemEntities = EntityService.GetAll(ItemObjectType, keys).ToArray();
+        IEntitySlim[] itemEntities = GetEntities(keys);
 
         TItem[] treeItemViewModels = MapTreeItemViewModels(null, itemEntities);
 
@@ -95,14 +95,7 @@ public abstract class TreeControllerBase<TItem> : Controller
         return children;
     }
 
-    protected PagedResult<TItem> PagedTreeItemViewModels(IEnumerable<TItem> treeItemViewModels, long pageNumber, int pageSize, long totalItems)
-        => new(totalItems, pageNumber, pageSize) { Items = treeItemViewModels };
-
-    protected virtual TItem[] MapRootTreeItemViewModels(IEntitySlim[] entities)
-        => MapTreeItemViewModels(null, entities);
-
-    protected virtual TItem[] MapChildTreeItemViewModels(Guid parentKey, IEntitySlim[] entities)
-        => MapTreeItemViewModels(parentKey, entities);
+    protected virtual IEntitySlim[] GetEntities(Guid[] keys) => EntityService.GetAll(ItemObjectType, keys).ToArray();
 
     protected virtual TItem[] MapTreeItemViewModels(Guid? parentKey, IEntitySlim[] entities)
     {
@@ -126,4 +119,7 @@ public abstract class TreeControllerBase<TItem> : Controller
 
         return treeItemViewModel;
     }
+
+    private PagedResult<TItem> PagedTreeItemViewModels(IEnumerable<TItem> treeItemViewModels, long pageNumber, int pageSize, long totalItems)
+        => new(totalItems, pageNumber, pageSize) { Items = treeItemViewModels };
 }

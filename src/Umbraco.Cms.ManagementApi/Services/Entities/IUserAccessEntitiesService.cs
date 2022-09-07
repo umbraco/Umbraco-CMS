@@ -1,5 +1,6 @@
 ﻿using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.ManagementApi.Models.Entities;
 
 namespace Umbraco.Cms.ManagementApi.Services.Entities;
@@ -16,10 +17,10 @@ public interface IUserAccessEntitiesService
     /// The returned entities may include entities that outside of the user start node scope, but are needed to
     /// for browsing to the actual user start nodes. These entities will be marked as "no access" entities.
     /// </remarks>
-    IEnumerable<UserAccessEntity> RootEntities(UmbracoObjectTypes umbracoObjectType, int[] userStartNodeIds);
+    IEnumerable<UserAccessEntity> RootUserAccessEntities(UmbracoObjectTypes umbracoObjectType, int[] userStartNodeIds);
 
     /// <summary>
-    /// Filters the applicable child entities for a list of candidate child entities.
+    /// Calculates the applicable child entities from a list of candidate child entities for users without root access.
     /// </summary>
     /// <param name="candidateChildren">The candidate child entities to filter (i.e. entities fetched with <see cref="EntityService.GetPagedChildren"/>).</param>
     /// <param name="userStartNodePaths">The calculated start node paths for the user.</param>
@@ -27,6 +28,15 @@ public interface IUserAccessEntitiesService
     /// <remarks>
     /// The returned entities may include entities that outside of the user start node scope, but are needed to
     /// for browsing to the actual user start nodes. These entities will be marked as "no access" entities.
+    /// Some candidate entities may be filtered out if they are not applicable for the user scope.
     /// </remarks>
-    IEnumerable<UserAccessEntity> FilteredChildEntities(IEnumerable<IEntitySlim> candidateChildren, string[] userStartNodePaths);
+    IEnumerable<UserAccessEntity> ChildUserAccessEntities(IEnumerable<IEntitySlim> candidateChildren, string[] userStartNodePaths);
+
+    /// <summary>
+    /// Calculates the access level of a collection of entities for users without root access.
+    /// </summary>
+    /// <param name="entities">The entities.</param>
+    /// <param name="userStartNodePaths">The calculated start node paths for the user.</param>
+    /// <returns> The access level for each entity.</returns>
+    IEnumerable<UserAccessEntity> UserAccessEntities(IEnumerable<IEntitySlim> entities, string[] userStartNodePaths);
 }

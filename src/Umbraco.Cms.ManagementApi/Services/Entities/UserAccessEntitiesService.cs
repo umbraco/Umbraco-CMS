@@ -14,7 +14,7 @@ public class UserAccessEntitiesService : IUserAccessEntitiesService
     public UserAccessEntitiesService(IEntityService entityService) => _entityService = entityService;
 
     /// <inheritdoc />
-    public IEnumerable<UserAccessEntity> RootEntities(UmbracoObjectTypes umbracoObjectType, int[] userStartNodeIds)
+    public IEnumerable<UserAccessEntity> RootUserAccessEntities(UmbracoObjectTypes umbracoObjectType, int[] userStartNodeIds)
     {
         // root entities for users without root access should include:
         // - the start nodes that are actual root entities (level == 1)
@@ -42,14 +42,15 @@ public class UserAccessEntitiesService : IUserAccessEntitiesService
     }
 
     /// <inheritdoc />
-    public IEnumerable<UserAccessEntity> FilteredChildEntities(IEnumerable<IEntitySlim> candidateChildren, string[] userStartNodePaths)
-        // child items for users without root access should include:
+    public IEnumerable<UserAccessEntity> ChildUserAccessEntities(IEnumerable<IEntitySlim> candidateChildren, string[] userStartNodePaths)
+        // child entities for users without root access should include:
         // - children that are descendant-or-self of a user start node
         // - children that are ancestors of a user start node (required for browsing to the actual start nodes - will be marked as "no access")
+        // all other candidate children should be discarded
         => candidateChildren.Select(child =>
         {
             // is descendant-or-self of a start node?
-            if (userStartNodePaths.Any(path => child.Path.StartsWith(path)))
+            if (IsDescendantOrSelf(child, userStartNodePaths))
             {
                 return new UserAccessEntity(child, true);
             }
@@ -62,4 +63,14 @@ public class UserAccessEntitiesService : IUserAccessEntitiesService
 
             return null;
         }).WhereNotNull().ToArray();
+
+    /// <inheritdoc />
+    public IEnumerable<UserAccessEntity> UserAccessEntities(IEnumerable<IEntitySlim> entities, string[] userStartNodePaths)
+        // entities for users without root access should include:
+        // - entities that are descendant-or-self of a user start node as regular entities
+        // - all other entities as "no access" entities
+        => entities.Select(entity => new UserAccessEntity(entity, IsDescendantOrSelf(entity, userStartNodePaths))).ToArray();
+
+    private static bool IsDescendantOrSelf(IEntitySlim child, string[] userStartNodePaths)
+        => userStartNodePaths.Any(path => child.Path.StartsWith(path));
 }
