@@ -398,7 +398,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             EventMessages evtMsgs = EventMessagesFactory.Get();
             if (toMove.ParentId == parentId)
             {
-                return OperationResult.Attempt.Succeed(MoveOperationStatusType.Success, evtMsgs);
+                return OperationResult.Attempt.Fail(MoveOperationStatusType.FailedNotAllowedByPath, evtMsgs);
             }
 
             var moveInfo = new List<MoveEventInfo<IDataType>>();
