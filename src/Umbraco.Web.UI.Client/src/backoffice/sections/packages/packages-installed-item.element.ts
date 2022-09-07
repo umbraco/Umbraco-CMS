@@ -67,7 +67,7 @@ export class UmbPackagesInstalledItem extends UmbContextConsumerMixin(LitElement
 	}
 
 	private async _onConfigure() {
-		if (!this._packageView?.elementName) {
+		if (!this._packageView) {
 			console.warn('Tried to configure package without view');
 			return;
 		}
