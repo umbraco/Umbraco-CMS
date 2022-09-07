@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.ManagementApi.Services.Entities;
 using Umbraco.Cms.ManagementApi.ViewModels.Tree;
 using Umbraco.New.Cms.Web.Common.Routing;
 
@@ -15,12 +16,18 @@ namespace Umbraco.Cms.ManagementApi.Controllers.Media.Tree;
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.Media}/tree")]
 public class MediaTreeControllerBase : ContentTreeControllerBase<ContentTreeItemViewModel>
 {
+    private readonly AppCaches _appCaches;
+    private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
+
     public MediaTreeControllerBase(
         IEntityService entityService,
+        IUserAccessEntitiesService userAccessEntitiesService,
         AppCaches appCaches,
         IBackOfficeSecurityAccessor backofficeSecurityAccessor)
-        : base(entityService, appCaches, backofficeSecurityAccessor)
+        : base(entityService, userAccessEntitiesService)
     {
+        _appCaches = appCaches;
+        _backofficeSecurityAccessor = backofficeSecurityAccessor;
     }
 
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.Media;
@@ -44,16 +51,16 @@ public class MediaTreeControllerBase : ContentTreeControllerBase<ContentTreeItem
 
     // TODO: use these implementations instead of the dummy ones above
     // protected override int[] GetUserStartNodeIds()
-    //     => BackofficeSecurityAccessor
+    //     => _backofficeSecurityAccessor
     //            .BackOfficeSecurity?
     //            .CurrentUser?
-    //            .CalculateMediaStartNodeIds(EntityService, AppCaches)
+    //            .CalculateMediaStartNodeIds(EntityService, _appCaches)
     //        ?? Array.Empty<int>();
     //
     // protected override string[] GetUserStartNodePaths()
-    //     => BackofficeSecurityAccessor
+    //     => _backofficeSecurityAccessor
     //            .BackOfficeSecurity?
     //            .CurrentUser?
-    //            .GetMediaStartNodePaths(EntityService, AppCaches)
+    //            .GetMediaStartNodePaths(EntityService, _appCaches)
     //        ?? Array.Empty<string>();
 }

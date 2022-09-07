@@ -2,6 +2,7 @@
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.ManagementApi.Mapping.Installer;
+using Umbraco.Cms.ManagementApi.Services.Entities;
 using Umbraco.New.Cms.Core.Factories;
 using Umbraco.New.Cms.Core.Installer;
 using Umbraco.New.Cms.Core.Installer.Steps;
@@ -27,6 +28,7 @@ public static class InstallerBuilderExtensions
 
         builder.AddInstallSteps();
         services.AddTransient<IInstallService, InstallService>();
+        services.AddTransient<IUserAccessEntitiesService, UserAccessEntitiesService>();
 
         return builder;
     }

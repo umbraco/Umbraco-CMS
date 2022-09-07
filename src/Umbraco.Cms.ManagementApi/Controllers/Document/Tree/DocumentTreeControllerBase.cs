@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.ManagementApi.Services.Entities;
 using Umbraco.Cms.ManagementApi.ViewModels.Tree;
 using Umbraco.New.Cms.Web.Common.Routing;
 
@@ -16,14 +17,21 @@ namespace Umbraco.Cms.ManagementApi.Controllers.Document.Tree;
 public abstract class DocumentTreeControllerBase : ContentTreeControllerBase<DocumentTreeItemViewModel>
 {
     private readonly IPublicAccessService _publicAccessService;
+    private readonly AppCaches _appCaches;
+    private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
 
     protected DocumentTreeControllerBase(
         IEntityService entityService,
+        IUserAccessEntitiesService userAccessEntitiesService,
         IPublicAccessService publicAccessService,
         AppCaches appCaches,
         IBackOfficeSecurityAccessor backofficeSecurityAccessor)
-        : base(entityService, appCaches, backofficeSecurityAccessor) =>
+        : base(entityService, userAccessEntitiesService)
+    {
         _publicAccessService = publicAccessService;
+        _appCaches = appCaches;
+        _backofficeSecurityAccessor = backofficeSecurityAccessor;
+    }
 
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.Document;
 
@@ -52,18 +60,18 @@ public abstract class DocumentTreeControllerBase : ContentTreeControllerBase<Doc
 
     protected override string[] GetUserStartNodePaths() => new[] { "-1,1056,1068,1078", "-1,1082,1083" };
 
-    // TODO: use these implementations instead of the dummy ones above
+    // // TODO: use these implementations instead of the dummy ones above
     // protected override int[] GetUserStartNodeIds()
-    //     => BackofficeSecurityAccessor
+    //     => _backofficeSecurityAccessor
     //            .BackOfficeSecurity?
     //            .CurrentUser?
-    //            .CalculateContentStartNodeIds(EntityService, AppCaches)
+    //            .CalculateContentStartNodeIds(EntityService, _appCaches)
     //        ?? Array.Empty<int>();
     //
     // protected override string[] GetUserStartNodePaths()
-    //     => BackofficeSecurityAccessor
+    //     => _backofficeSecurityAccessor
     //            .BackOfficeSecurity?
     //            .CurrentUser?
-    //            .GetContentStartNodePaths(EntityService, AppCaches)
+    //            .GetContentStartNodePaths(EntityService, _appCaches)
     //        ?? Array.Empty<string>();
 }

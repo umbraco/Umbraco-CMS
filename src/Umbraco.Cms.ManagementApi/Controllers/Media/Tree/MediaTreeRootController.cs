@@ -4,6 +4,7 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.ManagementApi.Services.Entities;
 using Umbraco.Cms.ManagementApi.ViewModels.Tree;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.Media.Tree;
@@ -12,9 +13,10 @@ public class MediaTreeRootController : MediaTreeControllerBase
 {
     public MediaTreeRootController(
         IEntityService entityService,
+        IUserAccessEntitiesService userAccessEntitiesService,
         AppCaches appCaches,
         IBackOfficeSecurityAccessor backofficeSecurityAccessor)
-        : base(entityService, appCaches, backofficeSecurityAccessor)
+        : base(entityService, userAccessEntitiesService, appCaches, backofficeSecurityAccessor)
     {
     }
 

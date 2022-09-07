@@ -4,6 +4,7 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.ManagementApi.Services.Entities;
 using Umbraco.Cms.ManagementApi.ViewModels.Tree;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.Document.Tree;
@@ -12,10 +13,11 @@ public class DocumentTreeChildrenController : DocumentTreeControllerBase
 {
     public DocumentTreeChildrenController(
         IEntityService entityService,
+        IUserAccessEntitiesService userAccessEntitiesService,
         IPublicAccessService publicAccessService,
         AppCaches appCaches,
         IBackOfficeSecurityAccessor backofficeSecurityAccessor)
-        : base(entityService, publicAccessService, appCaches, backofficeSecurityAccessor)
+        : base(entityService, userAccessEntitiesService, publicAccessService, appCaches, backofficeSecurityAccessor)
     {
     }
 
