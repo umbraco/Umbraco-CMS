@@ -243,7 +243,7 @@ public class ContentCache : PublishedCacheBase, IPublishedContentCache, INavigab
             IPublishedContent? rootNode = GetByRoute(preview, "/", true);
             if (rootNode == null)
             {
-                throw new Exception("Failed to get node at /.");
+                throw new Exception("Failed to get node at /. This might be because you're trying to publish a variant, with no domains setup");
             }
 
             // remove only if we're the default node
