@@ -59,26 +59,27 @@ public class InstallApiController : ControllerBase
     internal InstallHelper InstallHelper { get; }
 
     public bool PostValidateDatabaseConnection(DatabaseModel databaseSettings)
-        => _databaseBuilder.ConfigureDatabaseConnection(databaseSettings, true);
+    {
+        if (_runtime.State.Level != RuntimeLevel.Install)
+        {
+            return false;
+        }
+
+        return _databaseBuilder.ConfigureDatabaseConnection(databaseSettings, true);
+    }
 
     /// <summary>
-    ///     Gets the install setup.
+    /// Gets the install setup.
     /// </summary>
     public InstallSetup GetSetup()
     {
-        var setup = new InstallSetup();
+        // Only get the steps that are targeting the current install type
+        var setup = new InstallSetup
+        {
+            Steps = _installSteps.GetStepsForCurrentInstallType().ToList()
+        };
 
-        // TODO: Check for user/site token
-
-        var steps = new List<InstallSetupStep>();
-
-        InstallSetupStep[] installSteps = _installSteps.GetStepsForCurrentInstallType().ToArray();
-
-        //only get the steps that are targeting the current install type
-        steps.AddRange(installSteps);
-        setup.Steps = steps;
-
-        _installStatusTracker.Initialize(setup.InstallId, installSteps);
+        _installStatusTracker.Initialize(setup.InstallId, setup.Steps);
 
         return setup;
     }
@@ -99,9 +100,6 @@ public class InstallApiController : ControllerBase
         return NoContent();
     }
 
-    /// <summary>
-    ///     Installs.
-    /// </summary>
     public async Task<ActionResult<InstallProgressResultModel>> PostPerformInstall(InstallInstructions installModel)
     {
         if (installModel == null)
@@ -109,14 +107,14 @@ public class InstallApiController : ControllerBase
             throw new ArgumentNullException(nameof(installModel));
         }
 
+        // There won't be any statuses returned if the app pool has restarted so we need to re-read from file
         InstallTrackingItem[] status = InstallStatusTracker.GetStatus().ToArray();
-        //there won't be any statuses returned if the app pool has restarted so we need to re-read from file.
         if (status.Any() == false)
         {
             status = _installStatusTracker.InitializeFromFile(installModel.InstallId).ToArray();
         }
 
-        //create a new queue of the non-finished ones
+        // Create a new queue of the non-finished ones
         var queue = new Queue<InstallTrackingItem>(status.Where(x => x.IsComplete == false));
         while (queue.Count > 0)
         {
@@ -143,14 +141,15 @@ public class InstallApiController : ControllerBase
 
                 // determine's the next step in the queue and dequeue's any items that don't need to execute
                 var nextStep = IterateSteps(step, queue, installModel.InstallId, installModel);
+                bool processComplete = string.IsNullOrEmpty(nextStep) && InstallStatusTracker.GetStatus().All(x => x.IsComplete);
 
                 // check if there's a custom view to return for this step
                 if (setupData != null && setupData.View.IsNullOrWhiteSpace() == false)
                 {
-                    return new InstallProgressResultModel(false, step.Name, nextStep, setupData.View, setupData.ViewModel);
+                    return new InstallProgressResultModel(processComplete, step.Name, nextStep, setupData.View, setupData.ViewModel);
                 }
 
-                return new InstallProgressResultModel(false, step.Name, nextStep);
+                return new InstallProgressResultModel(processComplete, step.Name, nextStep);
             }
             catch (Exception ex)
             {
@@ -251,8 +250,7 @@ public class InstallApiController : ControllerBase
         Attempt<object?> modelAttempt = instruction.TryConvertTo(step.StepType);
         if (!modelAttempt.Success)
         {
-            throw new InvalidCastException(
-                $"Cannot cast/convert {step.GetType().FullName} into {step.StepType.FullName}");
+            throw new InvalidCastException($"Cannot cast/convert {step.GetType().FullName} into {step.StepType.FullName}");
         }
 
         var model = modelAttempt.Result;
@@ -280,8 +278,7 @@ public class InstallApiController : ControllerBase
             Attempt<object?> modelAttempt = instruction.TryConvertTo(step.StepType);
             if (!modelAttempt.Success)
             {
-                throw new InvalidCastException(
-                    $"Cannot cast/convert {step.GetType().FullName} into {step.StepType.FullName}");
+                throw new InvalidCastException($"Cannot cast/convert {step.GetType().FullName} into {step.StepType.FullName}");
             }
 
             var model = modelAttempt.Result;
