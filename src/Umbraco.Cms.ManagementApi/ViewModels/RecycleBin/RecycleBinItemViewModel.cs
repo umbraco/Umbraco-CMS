@@ -1,6 +1,6 @@
-﻿namespace Umbraco.Cms.ManagementApi.ViewModels.Tree;
+﻿namespace Umbraco.Cms.ManagementApi.ViewModels.RecycleBin;
 
-public class TreeItemViewModel
+public class RecycleBinItemViewModel
 {
     public Guid Key { get; set; }
 
@@ -16,3 +16,4 @@ public class TreeItemViewModel
 
     public Guid? ParentKey { get; set; }
 }
+

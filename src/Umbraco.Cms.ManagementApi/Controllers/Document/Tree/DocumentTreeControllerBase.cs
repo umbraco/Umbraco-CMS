@@ -50,17 +50,17 @@ public abstract class DocumentTreeControllerBase : ContentTreeControllerBase<Doc
         return viewModel;
     }
 
-    // TODO: delete (faking start node setup for unlimited editor)
+    // TODO: delete these (faking start node setup for unlimited editor)
     // protected override int[] GetUserStartNodeIds() => new[] { -1 };
     //
     // protected override string[] GetUserStartNodePaths() => Array.Empty<string>();
 
-    // TODO: delete (faking start node setup for limited editor)
+    // TODO: delete these (faking start node setup for limited editor)
     protected override int[] GetUserStartNodeIds() => new[] { 1078, 1083 };
 
     protected override string[] GetUserStartNodePaths() => new[] { "-1,1056,1068,1078", "-1,1082,1083" };
 
-    // // TODO: use these implementations instead of the dummy ones above
+    // TODO: use these implementations instead of the dummy ones above once we have backoffice auth in place
     // protected override int[] GetUserStartNodeIds()
     //     => _backofficeSecurityAccessor
     //            .BackOfficeSecurity?

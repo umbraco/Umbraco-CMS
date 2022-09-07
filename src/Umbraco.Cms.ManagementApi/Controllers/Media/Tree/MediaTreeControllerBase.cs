@@ -44,12 +44,12 @@ public class MediaTreeControllerBase : ContentTreeControllerBase<ContentTreeItem
         return viewModel;
     }
 
-    // TODO: delete (faking start node setup for unlimited editor)
+    // TODO: delete these (faking start node setup for unlimited editor)
     protected override int[] GetUserStartNodeIds() => new[] { -1 };
 
     protected override string[] GetUserStartNodePaths() => Array.Empty<string>();
 
-    // TODO: use these implementations instead of the dummy ones above
+    // TODO: use these implementations instead of the dummy ones above once we have backoffice auth in place
     // protected override int[] GetUserStartNodeIds()
     //     => _backofficeSecurityAccessor
     //            .BackOfficeSecurity?
