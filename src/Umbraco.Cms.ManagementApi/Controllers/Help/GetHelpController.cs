@@ -35,14 +35,11 @@ public class GetHelpController : HelpControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(PagedViewModel<HelpPageViewModel>),StatusCodes.Status200OK)]
-    public async Task<IActionResult> Get(string section, string tree, int skip, int take, string baseUrl = "https://our.umbraco.com")
+    public async Task<IActionResult> Get(string section, string tree, int skip, int take, string? baseUrl = "https://our.umbraco.com")
     {
         if (IsAllowedUrl(baseUrl) is false)
         {
-            _logger.LogError(
-                $"The following URL is not listed in the allowlist for HelpPage in HelpPageSettings: {baseUrl}");
-            HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-
+            _logger.LogError($"The following URL is not listed in the allowlist for HelpPage in HelpPageSettings: {baseUrl}");
 
             var invalidModelProblem = new ProblemDetails
             {
@@ -77,6 +74,6 @@ public class GetHelpController : HelpControllerBase
         return Ok(_viewModelFactory.Create(new List<HelpPageViewModel>(), skip, take));
     }
 
-    private bool IsAllowedUrl(string url) =>
+    private bool IsAllowedUrl(string? url) =>
         _helpPageSettings.HelpPageUrlAllowList is null || _helpPageSettings.HelpPageUrlAllowList.Contains(url);
 }
