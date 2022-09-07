@@ -135,6 +135,7 @@
             var dragX = 0;
             var dragY = 0;
             var dragOffsetX = 0;
+            var dragOffsetY = 0;
 
             // Setup DOM method for communication between sortables:
             gridLayoutContainerEl['Sortable:controller'] = () => {
@@ -216,6 +217,10 @@
                 approvedContainerDate = new Date().getTime();
             }
 
+            function dist(x1,y1,x2,y2){
+                return Math.sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1)); 
+            }
+
             //var preventAwaitingNewContainer = false;
             function _checkMove(evt) {
 
@@ -228,7 +233,7 @@
 
                 if(evt.to !== approvedContainer) {
                     // If its only a few milliseconds since we approved the current container, then we will reject the new container:
-                    if(approvedContainerDate + ANIMATION_DURATION*2 > new Date().getTime()) {
+                    if(approvedContainerDate + ANIMATION_DURATION*1.5 > new Date().getTime()) {
                         //console.log('_checkMove Rejected new container.', gridLayoutContainerEl)
                         return false;
                     }
@@ -243,8 +248,48 @@
                     return true;
                 }
                 if(awaitingTarget === null) {
+
+                    // Measure distance from related element, this is not accurate as we don't know how the layout will turn out, but we need to do something to prevent the UI from trying out too possibilities, as it will flip around weirdly.
+                    const dragRect = {
+                        left: dragX - dragOffsetX,
+                        top: dragY - dragOffsetY,
+                        right: dragX - dragOffsetX + ghostRect.width,
+                        bottom: dragY - dragOffsetY + ghostRect.height
+                    }
+                    let oldDistanceY = Math.min(
+                        dist(dragRect.left, dragRect.top, ghostRect.left, ghostRect.top),
+                        dist(dragRect.right, dragRect.top, ghostRect.right,ghostRect.top),
+                        dist(dragRect.left, dragRect.bottom, ghostRect.left,ghostRect.bottom),
+                        dist(dragRect.right, dragRect.bottom, ghostRect.right,ghostRect.bottom)
+                    );
+                    let newDistanceY = 0;
+                    if(evt.willInsertAfter) {
+                        newDistanceY = Math.min(
+                            dist(dragRect.left, dragRect.top, evt.relatedRect.left, evt.relatedRect.bottom),
+                            dist(dragRect.right, dragRect.top, evt.relatedRect.right, evt.relatedRect.bottom),
+
+                            dist(dragRect.left, dragRect.top, evt.relatedRect.right, evt.relatedRect.top),
+                            dist(dragRect.left, dragRect.bottom, evt.relatedRect.right, evt.relatedRect.bottom)
+                        );
+                    } else {
+                        newDistanceY = Math.min(
+                            dist(dragRect.left, dragRect.bottom, evt.relatedRect.left, evt.relatedRect.top),
+                            dist(dragRect.right, dragRect.bottom, evt.relatedRect.right, evt.relatedRect.top),
+
+                            dist(dragRect.right, dragRect.top, evt.relatedRect.left, evt.relatedRect.top),
+                            dist(dragRect.right, dragRect.bottom, evt.relatedRect.left, evt.relatedRect.bottom)
+                        );
+                    }
+                    //console.log("calc", ghostRect.left,  ghostRect.top, "  |  ", dragRect.left, dragRect.top, "              calc: ", oldDistanceY, " < ", newDistanceY);
+                    if(oldDistanceY < newDistanceY) {
+                        //console.log("existing is closer on Y");
+                        // prevent the target to become approved, as its further than existing distance.
+                        return false;
+                    }
+                    //console.log("New is closer on Y");
+
                     awaitingTarget = {related: evt.related, after: evt.willInsertAfter};
-                    awaitingTimeout = setTimeout(_approveAwaitingRelated, ANIMATION_DURATION*2);
+                    awaitingTimeout = setTimeout(_approveAwaitingRelated, ANIMATION_DURATION);
                 }
                 return false;
             }
@@ -379,7 +424,10 @@
 
                     targetRect = evt.to.getBoundingClientRect();
                     ghostRect = evt.item.getBoundingClientRect();
-                    dragOffsetX = evt.originalEvent.offsetX - evt.item.offsetLeft;
+                    dragOffsetX = evt.originalEvent.clientX - ghostRect.left;
+                    dragOffsetY = evt.originalEvent.clientY - ghostRect.top;
+
+                    console.log("dragOffsets", dragOffsetX, dragOffsetY, targetRect, ghostRect, evt.item.offsetLeft, evt.originalEvent)
 
                     window.addEventListener('drag', _onDragMouseMove);
 
@@ -403,7 +451,7 @@
 
                     return true;
                 },
-                /*
+                
                 onChange: function (evt) {
                     console.log('onChange', evt)
                     //evt.oldIndex;  // element index within parent
@@ -412,14 +460,13 @@
                     console.log('onSort', evt)
                     //evt.oldIndex;  // element index within parent
                 },
-                */
+                
                 onAdd: function (evt) {
                     //console.log("# onAdd")
                     _sync(evt);
                     $scope.$evalAsync();
                 },
                 onUpdate: function (evt) {
-                    //console.log("onUpdate", evt)
                     _sync(evt);
                     $scope.$evalAsync();
                 },
