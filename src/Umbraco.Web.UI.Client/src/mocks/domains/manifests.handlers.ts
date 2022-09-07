@@ -42,7 +42,6 @@ export const manifestDevelopmentHandler = rest.get(umbracoPath('/manifests'), (_
 					alias: 'My.PackageView.Custom',
 					name: 'My Custom Package View',
 					js: '/src/mocks/App_Plugins/package-view.js',
-					elementName: 'my-package-view-custom',
 					meta: {
 						packageAlias: 'my.package',
 					},
