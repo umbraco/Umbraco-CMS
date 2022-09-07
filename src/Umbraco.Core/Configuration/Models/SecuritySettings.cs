@@ -86,9 +86,10 @@ public class SecuritySettings
     [DefaultValue(StaticUserBypassTwoFactorForExternalLogins)]
     public bool UserBypassTwoFactorForExternalLogins { get; set; } = StaticUserBypassTwoFactorForExternalLogins;
 
-        /// <summary>
-        /// Gets or sets a value indicating whether to allow editing invariant properties from a non-default language variation.
-        /// </summary>
-        [DefaultValue(StaticAllowEditInvariantFromNonDefault)]
-        public bool AllowEditInvariantFromNonDefault { get; set; } = StaticAllowEditInvariantFromNonDefault;
+    /// <summary>
+    /// Gets or sets a value indicating whether to allow editing invariant properties from a non-default language variation.
+    /// </summary>
+    [Obsolete("Use ContentSettings.AllowEditFromInvariant instead")]
+    [DefaultValue(StaticAllowEditInvariantFromNonDefault)]
+    public bool AllowEditInvariantFromNonDefault { get; set; } = StaticAllowEditInvariantFromNonDefault;
 }
