@@ -13,10 +13,10 @@ public class MediaTreeItemsController : MediaTreeControllerBase
 {
     public MediaTreeItemsController(
         IEntityService entityService,
-        IUserAccessEntitiesService userAccessEntitiesService,
+        IUserStartNodeEntitiesService userStartNodeEntitiesService,
         AppCaches appCaches,
         IBackOfficeSecurityAccessor backofficeSecurityAccessor)
-        : base(entityService, userAccessEntitiesService, appCaches, backofficeSecurityAccessor)
+        : base(entityService, userStartNodeEntitiesService, appCaches, backofficeSecurityAccessor)
     {
     }
 

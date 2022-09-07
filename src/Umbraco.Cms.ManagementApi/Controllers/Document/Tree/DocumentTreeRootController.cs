@@ -13,11 +13,11 @@ public class DocumentTreeRootController : DocumentTreeControllerBase
 {
     public DocumentTreeRootController(
         IEntityService entityService,
-        IUserAccessEntitiesService userAccessEntitiesService,
+        IUserStartNodeEntitiesService userStartNodeEntitiesService,
         IPublicAccessService publicAccessService,
         AppCaches appCaches,
         IBackOfficeSecurityAccessor backofficeSecurityAccessor)
-        : base(entityService, userAccessEntitiesService, publicAccessService, appCaches, backofficeSecurityAccessor)
+        : base(entityService, userStartNodeEntitiesService, publicAccessService, appCaches, backofficeSecurityAccessor)
     {
     }
 

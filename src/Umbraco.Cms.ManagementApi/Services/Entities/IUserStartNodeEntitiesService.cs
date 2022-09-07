@@ -5,7 +5,7 @@ using Umbraco.Cms.ManagementApi.Models.Entities;
 
 namespace Umbraco.Cms.ManagementApi.Services.Entities;
 
-public interface IUserAccessEntitiesService
+public interface IUserStartNodeEntitiesService
 {
     /// <summary>
     /// Calculates the applicable root entities for a given object type for users without root access.

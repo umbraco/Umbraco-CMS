@@ -8,20 +8,20 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.ManagementApi.Controllers;
 
-public abstract class ContentTreeControllerBase<TItem> : TreeControllerBase<TItem>
+public abstract class UserStartNodeTreeControllerBase<TItem> : TreeControllerBase<TItem>
     where TItem : ContentTreeItemViewModel, new()
 {
-    private readonly IUserAccessEntitiesService _userAccessEntitiesService;
+    private readonly IUserStartNodeEntitiesService _userStartNodeEntitiesService;
 
     private int[]? _userStartNodeIds;
     private string[]? _userStartNodePaths;
     private Dictionary<Guid, bool> _accessMap = new();
 
-    protected ContentTreeControllerBase(
+    protected UserStartNodeTreeControllerBase(
         IEntityService entityService,
-        IUserAccessEntitiesService userAccessEntitiesService)
+        IUserStartNodeEntitiesService userStartNodeEntitiesService)
         : base(entityService) =>
-        _userAccessEntitiesService = userAccessEntitiesService;
+        _userStartNodeEntitiesService = userStartNodeEntitiesService;
 
     protected abstract int[] GetUserStartNodeIds();
 
@@ -30,14 +30,14 @@ public abstract class ContentTreeControllerBase<TItem> : TreeControllerBase<TIte
     protected override IEntitySlim[] GetPagedRootEntities(long pageNumber, int pageSize, out long totalItems)
         => UserHasRootAccess()
             ? base.GetPagedRootEntities(pageNumber, pageSize, out totalItems)
-            : CalculateAccessMap(() => _userAccessEntitiesService.RootUserAccessEntities(ItemObjectType, UserStartNodeIds), out totalItems);
+            : CalculateAccessMap(() => _userStartNodeEntitiesService.RootUserAccessEntities(ItemObjectType, UserStartNodeIds), out totalItems);
 
     protected override IEntitySlim[] GetPagedChildEntities(Guid parentKey, long pageNumber, int pageSize, out long totalItems)
     {
         IEntitySlim[] children = base.GetPagedChildEntities(parentKey, pageNumber, pageSize, out totalItems);
         return UserHasRootAccess()
             ? children
-            : CalculateAccessMap(() => _userAccessEntitiesService.ChildUserAccessEntities(children, UserStartNodePaths), out totalItems);
+            : CalculateAccessMap(() => _userStartNodeEntitiesService.ChildUserAccessEntities(children, UserStartNodePaths), out totalItems);
     }
 
     protected override IEntitySlim[] GetEntities(Guid[] keys)
@@ -45,7 +45,7 @@ public abstract class ContentTreeControllerBase<TItem> : TreeControllerBase<TIte
         IEntitySlim[] entities = base.GetEntities(keys);
         return UserHasRootAccess()
             ? entities
-            : CalculateAccessMap(() => _userAccessEntitiesService.UserAccessEntities(entities, UserStartNodePaths), out _);
+            : CalculateAccessMap(() => _userStartNodeEntitiesService.UserAccessEntities(entities, UserStartNodePaths), out _);
     }
 
     protected override TItem[] MapTreeItemViewModels(Guid? parentKey, IEntitySlim[] entities)

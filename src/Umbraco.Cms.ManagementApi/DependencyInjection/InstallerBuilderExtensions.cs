@@ -28,7 +28,7 @@ public static class InstallerBuilderExtensions
 
         builder.AddInstallSteps();
         services.AddTransient<IInstallService, InstallService>();
-        services.AddTransient<IUserAccessEntitiesService, UserAccessEntitiesService>();
+        services.AddTransient<IUserStartNodeEntitiesService, UserStartNodeEntitiesService>();
 
         return builder;
     }

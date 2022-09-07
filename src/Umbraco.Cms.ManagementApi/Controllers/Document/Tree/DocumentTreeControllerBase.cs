@@ -14,7 +14,7 @@ namespace Umbraco.Cms.ManagementApi.Controllers.Document.Tree;
 [ApiVersion("1.0")]
 [ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.Document}/tree")]
-public abstract class DocumentTreeControllerBase : ContentTreeControllerBase<DocumentTreeItemViewModel>
+public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBase<DocumentTreeItemViewModel>
 {
     private readonly IPublicAccessService _publicAccessService;
     private readonly AppCaches _appCaches;
@@ -22,11 +22,11 @@ public abstract class DocumentTreeControllerBase : ContentTreeControllerBase<Doc
 
     protected DocumentTreeControllerBase(
         IEntityService entityService,
-        IUserAccessEntitiesService userAccessEntitiesService,
+        IUserStartNodeEntitiesService userStartNodeEntitiesService,
         IPublicAccessService publicAccessService,
         AppCaches appCaches,
         IBackOfficeSecurityAccessor backofficeSecurityAccessor)
-        : base(entityService, userAccessEntitiesService)
+        : base(entityService, userStartNodeEntitiesService)
     {
         _publicAccessService = publicAccessService;
         _appCaches = appCaches;

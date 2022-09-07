@@ -14,17 +14,17 @@ namespace Umbraco.Cms.ManagementApi.Controllers.Media.Tree;
 [ApiVersion("1.0")]
 [ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.Media}/tree")]
-public class MediaTreeControllerBase : ContentTreeControllerBase<ContentTreeItemViewModel>
+public class MediaTreeControllerBase : UserStartNodeTreeControllerBase<ContentTreeItemViewModel>
 {
     private readonly AppCaches _appCaches;
     private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
 
     public MediaTreeControllerBase(
         IEntityService entityService,
-        IUserAccessEntitiesService userAccessEntitiesService,
+        IUserStartNodeEntitiesService userStartNodeEntitiesService,
         AppCaches appCaches,
         IBackOfficeSecurityAccessor backofficeSecurityAccessor)
-        : base(entityService, userAccessEntitiesService)
+        : base(entityService, userStartNodeEntitiesService)
     {
         _appCaches = appCaches;
         _backofficeSecurityAccessor = backofficeSecurityAccessor;

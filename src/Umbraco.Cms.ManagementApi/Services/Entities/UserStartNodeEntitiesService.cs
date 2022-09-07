@@ -7,11 +7,11 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.ManagementApi.Services.Entities;
 
-public class UserAccessEntitiesService : IUserAccessEntitiesService
+public class UserStartNodeEntitiesService : IUserStartNodeEntitiesService
 {
     private readonly IEntityService _entityService;
 
-    public UserAccessEntitiesService(IEntityService entityService) => _entityService = entityService;
+    public UserStartNodeEntitiesService(IEntityService entityService) => _entityService = entityService;
 
     /// <inheritdoc />
     public IEnumerable<UserAccessEntity> RootUserAccessEntities(UmbracoObjectTypes umbracoObjectType, int[] userStartNodeIds)
