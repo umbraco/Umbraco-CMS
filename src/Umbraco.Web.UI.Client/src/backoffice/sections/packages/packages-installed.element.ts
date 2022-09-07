@@ -1,30 +1,23 @@
+import './packages-installed-item.element';
+
 import { html, LitElement, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
-import { until } from 'lit/directives/until.js';
-import { firstValueFrom, map } from 'rxjs';
 
 import { getPackagesInstalled } from '../../../core/api/fetcher';
-import { UmbContextConsumerMixin } from '../../../core/context';
-import { UmbExtensionRegistry } from '../../../core/extension';
 
 import type { PackageInstalled } from '../../../core/models';
+
 @customElement('umb-packages-installed')
-export class UmbPackagesInstalled extends UmbContextConsumerMixin(LitElement) {
+export class UmbPackagesInstalled extends LitElement {
 	@state()
 	private _installedPackages: PackageInstalled[] = [];
 
 	@state()
 	private _errorMessage = '';
 
-	private umbExtensionRegistry?: UmbExtensionRegistry;
-
 	constructor() {
 		super();
-
-		this.consumeContext('umbExtensionRegistry', (umbExtensionRegistry: UmbExtensionRegistry) => {
-			this.umbExtensionRegistry = umbExtensionRegistry;
-		});
 	}
 
 	connectedCallback(): void {
@@ -52,24 +45,6 @@ export class UmbPackagesInstalled extends UmbContextConsumerMixin(LitElement) {
 		}
 	}
 
-	private findPackageView(alias: string) {
-		const observable = this.umbExtensionRegistry
-			?.extensionsOfType('packageView')
-			.pipe(map((e) => e.filter((m) => m.meta.packageAlias === alias)));
-		return observable ? firstValueFrom(observable) : undefined;
-	}
-
-	async renderPackage(p: PackageInstalled) {
-		const packageView = await this.findPackageView(p.alias);
-		return html`
-			<uui-ref-node-package name=${p.name} version=${p.version}>
-				<uui-action-bar slot="actions">
-					${packageView?.length ? html`<uui-button label="Configure"></uui-button>` : nothing}
-				</uui-action-bar>
-			</uui-ref-node-package>
-		`;
-	}
-
 	render() {
 		return html`
 			<uui-box headline="Installed packages">
@@ -79,7 +54,7 @@ export class UmbPackagesInstalled extends UmbContextConsumerMixin(LitElement) {
 					${repeat(
 						this._installedPackages,
 						(item) => item.id,
-						(item) => until(this.renderPackage(item), 'Loading...')
+						(item) => html`<umb-packages-installed-item .package=${item}></umb-packages-installed-item>`
 					)}
 				</uui-ref-list>
 			</uui-box>
