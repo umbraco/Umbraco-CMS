@@ -16,9 +16,9 @@ public class SetAnalyticsController : AnalyticsControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ServerStatusViewModel), StatusCodes.Status200OK)]
-    public IActionResult SetConsentLevel(AnalyticsViewModel telemetryResource)
+    public IActionResult SetConsentLevel(AnalyticsLevelViewModel telemetryResource)
     {
-        _metricsConsentService.SetConsentLevel(telemetryResource.TelemetryLevel);
+        _metricsConsentService.SetConsentLevel(telemetryResource.AnalyticsLevel);
         return Ok();
     }
 }

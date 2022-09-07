@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.ManagementApi.ViewModels.Analytics;
-using Umbraco.Cms.ManagementApi.ViewModels.Server;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.Analytics;
 
@@ -15,6 +14,6 @@ public class GetAnalyticsController : AnalyticsControllerBase
 
     [HttpGet]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(ServerStatusViewModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(AnalyticsLevelViewModel), StatusCodes.Status200OK)]
     public AnalyticsLevelViewModel Get() => new() { AnalyticsLevel = _metricsConsentService.GetConsentLevel() };
 }
