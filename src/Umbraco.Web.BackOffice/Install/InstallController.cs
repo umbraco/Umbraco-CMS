@@ -1,6 +1,4 @@
 using System.Net;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
@@ -13,12 +11,10 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.WebAssets;
 using Umbraco.Cms.Infrastructure.Install;
-using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Filters;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.BackOffice.Install;
-
 /// <summary>
 ///     The Installation controller
 /// </summary>
@@ -27,8 +23,6 @@ namespace Umbraco.Cms.Web.BackOffice.Install;
 [Area(Constants.Web.Mvc.InstallArea)]
 public class InstallController : Controller
 {
-    private static bool _reported;
-    private static RuntimeLevel _reportedLevel;
     private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
     private readonly GlobalSettings _globalSettings;
     private readonly IHostingEnvironment _hostingEnvironment;
@@ -63,31 +57,12 @@ public class InstallController : Controller
 
     [HttpGet]
     [StatusCodeResult(HttpStatusCode.ServiceUnavailable)]
-    [TypeFilter(typeof(StatusCodeResultAttribute), Arguments = new object[] { HttpStatusCode.ServiceUnavailable })]
     public async Task<ActionResult> Index()
     {
-        var umbracoPath = Url.GetBackOfficeUrl();
-
-        if (_runtime.Level == RuntimeLevel.Run)
-        {
-            return Redirect(umbracoPath!);
-        }
-
-        // TODO: Update for package migrations
-        if (_runtime.Level == RuntimeLevel.Upgrade)
-        {
-            AuthenticateResult authResult = await this.AuthenticateBackOfficeAsync();
-
-            if (!authResult.Succeeded)
-            {
-                return Redirect(_globalSettings.UmbracoPath + "/AuthorizeUpgrade?redir=" + Request.GetEncodedUrl());
-            }
-        }
-
-        // gen the install base URL
+        // Get the install base URL
         ViewData.SetInstallApiBaseUrl(_linkGenerator.GetInstallerApiUrl());
 
-        // get the base umbraco folder
+        // Get the base umbraco folder
         var baseFolder = _hostingEnvironment.ToAbsolute(_globalSettings.UmbracoPath);
         ViewData.SetUmbracoBaseFolder(baseFolder);
 
@@ -96,35 +71,5 @@ public class InstallController : Controller
         await _installHelper.SetInstallStatusAsync(false, string.Empty);
 
         return View(Path.Combine(Constants.SystemDirectories.Umbraco.TrimStart("~"), Constants.Web.Mvc.InstallArea, nameof(Index) + ".cshtml"));
-    }
-
-    /// <summary>
-    ///     Used to perform the redirect to the installer when the runtime level is <see cref="RuntimeLevel.Install" /> or
-    ///     <see cref="RuntimeLevel.Upgrade" />
-    /// </summary>
-    /// <returns></returns>
-    [HttpGet]
-    [IgnoreFromNotFoundSelectorPolicy]
-    public ActionResult Redirect()
-    {
-        var uri = HttpContext.Request.GetEncodedUrl();
-
-        // redirect to install
-        ReportRuntime(_logger, _runtime.Level, "Umbraco must install or upgrade.");
-
-        var installUrl = $"{_linkGenerator.GetInstallerUrl()}?redir=true&url={uri}";
-        return Redirect(installUrl);
-    }
-
-    private static void ReportRuntime(ILogger<InstallController> logger, RuntimeLevel level, string message)
-    {
-        if (_reported && _reportedLevel == level)
-        {
-            return;
-        }
-
-        _reported = true;
-        _reportedLevel = level;
-        logger.LogWarning(message);
     }
 }
