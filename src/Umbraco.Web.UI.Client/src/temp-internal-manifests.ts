@@ -222,6 +222,32 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		},
 	},
 	{
+		type: 'editorView',
+		alias: 'Umb.Editor.Packages.Overview',
+		name: 'Packages',
+		elementName: 'umb-packages-overview',
+		loader: () => import('./backoffice/sections/packages/packages-overview.element'),
+		meta: {
+			icon: 'document',
+			pathname: 'repo',
+			editors: ['Umb.Editor.Packages'],
+			weight: 10,
+		},
+	},
+	{
+		type: 'editorView',
+		alias: 'Umb.Editor.Packages.Installed',
+		name: 'Installed',
+		elementName: 'umb-packages-installed',
+		loader: () => import('./backoffice/sections/packages/packages-installed.element'),
+		meta: {
+			icon: 'document',
+			pathname: 'installed',
+			editors: ['Umb.Editor.Packages'],
+			weight: 0,
+		},
+	},
+	{
 		type: 'propertyAction',
 		alias: 'Umb.PropertyAction.Copy',
 		name: 'Copy',
