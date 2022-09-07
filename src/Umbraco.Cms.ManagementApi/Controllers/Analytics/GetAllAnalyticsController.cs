@@ -10,9 +10,9 @@ namespace Umbraco.Cms.ManagementApi.Controllers.Analytics;
 [ApiVersion("1.0")]
 public class GetAllAnalyticsController : AnalyticsControllerBase
 {
-    private readonly IViewModelFactory _viewModelFactory;
+    private readonly IPagedViewModelFactory _pagedViewModelFactory;
 
-    public GetAllAnalyticsController(IViewModelFactory viewModelFactory) => _viewModelFactory = viewModelFactory;
+    public GetAllAnalyticsController(IPagedViewModelFactory pagedViewModelFactory) => _pagedViewModelFactory = pagedViewModelFactory;
 
     [HttpGet("all")]
     [MapToApiVersion("1.0")]
@@ -20,6 +20,6 @@ public class GetAllAnalyticsController : AnalyticsControllerBase
     public PagedViewModel<TelemetryLevel> GetAll(int skip, int take)
     {
         TelemetryLevel[] levels = { TelemetryLevel.Minimal, TelemetryLevel.Basic, TelemetryLevel.Detailed };
-        return _viewModelFactory.Create(levels, skip, take);
+        return _pagedViewModelFactory.Create(levels, skip, take);
     }
 }
