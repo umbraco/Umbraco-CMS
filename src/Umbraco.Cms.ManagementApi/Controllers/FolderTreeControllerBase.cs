@@ -1,4 +1,5 @@
-﻿using Umbraco.Cms.Core;
+﻿using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
@@ -10,6 +11,7 @@ public abstract class FolderTreeControllerBase<TItem> : TreeControllerBase<TItem
     where TItem : FolderTreeItemViewModel, new()
 {
     private readonly Guid _folderObjectTypeId;
+    private bool _foldersOnly;
 
     protected FolderTreeControllerBase(IEntityService entityService)
         : base(entityService) =>
@@ -18,11 +20,25 @@ public abstract class FolderTreeControllerBase<TItem> : TreeControllerBase<TItem
 
     protected abstract UmbracoObjectTypes FolderObjectType { get; }
 
+    protected async Task<ActionResult> GetRoot(long pageNumber, int pageSize, bool foldersOnly)
+    {
+        _foldersOnly = foldersOnly;
+        return await GetRoot(pageNumber, pageSize);
+    }
+
+    protected async Task<ActionResult> GetChildren(Guid parentKey, long pageNumber, int pageSize, bool foldersOnly)
+    {
+        _foldersOnly = foldersOnly;
+        return await GetChildren(parentKey, pageNumber, pageSize);
+    }
+
     protected override IEntitySlim[] GetPagedRootEntities(long pageNumber, int pageSize, out long totalItems)
     {
         // for now we'll just get all root entities; perhaps later on it will make sense to use EntityService.GetPagedChildren
         IEntitySlim[] folderEntities = EntityService.GetRootEntities(FolderObjectType).ToArray();
-        IEntitySlim[] itemEntities = EntityService.GetRootEntities(ItemObjectType).ToArray();
+        IEntitySlim[] itemEntities = _foldersOnly
+            ? Array.Empty<IEntitySlim>()
+            : EntityService.GetRootEntities(ItemObjectType).ToArray();
 
         IEntitySlim[] allEntities = folderEntities.Union(itemEntities).ToArray();
         totalItems = allEntities.Length;
@@ -31,18 +47,23 @@ public abstract class FolderTreeControllerBase<TItem> : TreeControllerBase<TItem
 
     protected override IEntitySlim[] GetPagedChildEntities(Guid parentKey, long pageNumber, int pageSize, out long totalItems)
     {
+        totalItems = 0;
+
         // TODO: make EntityService able to get paged children by parent key - this is a workaround for now
         IEntitySlim? parent = EntityService.Get(parentKey, FolderObjectType) ?? EntityService.Get(parentKey, ItemObjectType);
         if (parent == null)
         {
             // not much else we can do here but return nothing
-            totalItems = 0;
             return Array.Empty<IEntitySlim>();
         }
 
         // TODO: expand EntityService.GetPagedChildren to be able to paginate multiple item types - for now we'll only paginate the items
         IEntitySlim[] folderEntities = EntityService.GetChildren(parent.Id, FolderObjectType).ToArray();
-        IEntitySlim[] itemEntities = EntityService.GetPagedChildren(parent.Id, ItemObjectType, pageNumber, pageSize, out totalItems).ToArray();
+        IEntitySlim[] itemEntities = _foldersOnly
+            ? Array.Empty<IEntitySlim>()
+            : EntityService.GetPagedChildren(parent.Id, ItemObjectType, pageNumber, pageSize, out totalItems).ToArray();
+
+        totalItems += folderEntities.Length;
 
         return folderEntities.Union(itemEntities).ToArray();
     }
