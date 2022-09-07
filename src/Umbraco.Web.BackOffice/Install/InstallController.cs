@@ -11,6 +11,7 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.WebAssets;
 using Umbraco.Cms.Infrastructure.Install;
+using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Filters;
 using Umbraco.Extensions;
 
@@ -72,4 +73,8 @@ public class InstallController : Controller
 
         return View(Path.Combine(Constants.SystemDirectories.Umbraco.TrimStart("~"), Constants.Web.Mvc.InstallArea, nameof(Index) + ".cshtml"));
     }
+
+    [HttpGet]
+    [IgnoreFromNotFoundSelectorPolicy]
+    public ActionResult Redirect() => NotFound();
 }
