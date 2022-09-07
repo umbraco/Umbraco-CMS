@@ -7,6 +7,6 @@ namespace Umbraco.Cms.ManagementApi.Controllers.Analytics;
 [ApiController]
 [BackOfficeRoute("api/v{version:apiVersion}/analytics")]
 [OpenApiTag("Analytics")]
-public class AnalyticsControllerBase : Controller
+public abstract class AnalyticsControllerBase : Controller
 {
 }
