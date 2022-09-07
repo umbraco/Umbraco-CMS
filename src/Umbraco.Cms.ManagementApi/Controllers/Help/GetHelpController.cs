@@ -13,7 +13,6 @@ namespace Umbraco.Cms.ManagementApi.Controllers.Help;
 
 public class GetHelpController : HelpControllerBase
 {
-    private static HttpClient? _httpClient;
     private readonly ILogger<GetHelpController> _logger;
     private readonly IPagedViewModelFactory _viewModelFactory;
     private HelpPageSettings _helpPageSettings;
@@ -56,10 +55,10 @@ public class GetHelpController : HelpControllerBase
 
         try
         {
-            _httpClient ??= new HttpClient();
+            var httpClient = new HttpClient();
 
             // fetch dashboard json and parse to JObject
-            var json = await _httpClient.GetStringAsync(url);
+            var json = await httpClient.GetStringAsync(url);
             List<HelpPageViewModel>? result = JsonConvert.DeserializeObject<List<HelpPageViewModel>>(json);
             if (result != null)
             {
