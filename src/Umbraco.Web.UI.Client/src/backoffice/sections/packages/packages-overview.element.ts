@@ -1,10 +1,8 @@
 import { html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
 
-import { UmbContextConsumerMixin } from '../../../core/context';
-
 @customElement('umb-packages-overview')
-export class UmbPackagesOverview extends UmbContextConsumerMixin(LitElement) {
+export class UmbPackagesOverview extends LitElement {
 	render() {
 		return html`
 			<uui-box headline="Popular"></uui-box>

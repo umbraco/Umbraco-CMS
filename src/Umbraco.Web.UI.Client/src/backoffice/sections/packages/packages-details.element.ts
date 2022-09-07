@@ -1,10 +1,8 @@
 import { html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
-import { UmbContextConsumerMixin } from '../../../core/context';
-
 @customElement('umb-packages-details')
-export class UmbPackagesDetails extends UmbContextConsumerMixin(LitElement) {
+export class UmbPackagesDetails extends LitElement {
 	@property()
 	id!: string;
 

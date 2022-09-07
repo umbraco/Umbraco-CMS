@@ -3,10 +3,8 @@ import '../../editors/shared/editor-entity/editor-entity.element';
 import { html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
 
-import { UmbContextConsumerMixin } from '../../../core/context';
-
 @customElement('umb-packages-editor')
-export class UmbPackagesEditor extends UmbContextConsumerMixin(LitElement) {
+export class UmbPackagesEditor extends LitElement {
 	render() {
 		return html`
 			<uui-icon-registry-essential>
