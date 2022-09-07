@@ -43,7 +43,7 @@ public class ImportDictionaryController : DictionaryControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IActionResult), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(IActionResult), StatusCodes.Status404NotFound)]
-    public IActionResult ImportDictionary(string file, int? parentId)
+    public async Task<IActionResult> ImportDictionary(string file, int? parentId)
     {
         if (string.IsNullOrWhiteSpace(file))
         {

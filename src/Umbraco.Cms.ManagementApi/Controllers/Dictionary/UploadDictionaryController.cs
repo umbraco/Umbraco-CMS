@@ -24,7 +24,7 @@ public class UploadDictionaryController : DictionaryControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IActionResult), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public ActionResult<DictionaryImportViewModel> Upload(IFormFile file)
+    public async Task<ActionResult<DictionaryImportViewModel>> Upload(IFormFile file)
     {
         var fileName = file.FileName.Trim(Constants.CharArrays.DoubleQuote);
         var ext = fileName.Substring(fileName.LastIndexOf('.') + 1).ToLower();

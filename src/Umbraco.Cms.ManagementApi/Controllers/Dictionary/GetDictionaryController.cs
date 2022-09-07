@@ -32,7 +32,7 @@ public class GetDictionaryController : DictionaryControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IActionResult), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(NotFoundResult), StatusCodes.Status404NotFound)]
-    public ActionResult<DictionaryDisplay?> GetById(Guid id)
+    public async Task<ActionResult<DictionaryDisplay?>> GetById(Guid id)
     {
         IDictionaryItem? dictionary = _localizationService.GetDictionaryItemById(id);
         if (dictionary == null)

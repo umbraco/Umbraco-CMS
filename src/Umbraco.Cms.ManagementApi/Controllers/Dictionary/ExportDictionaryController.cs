@@ -24,7 +24,7 @@ public class ExportDictionaryController : DictionaryControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IActionResult), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(IActionResult), StatusCodes.Status404NotFound)]
-    public IActionResult ExportDictionary(Guid key, bool includeChildren = false)
+    public async Task<IActionResult> ExportDictionary(Guid key, bool includeChildren = false)
     {
         IDictionaryItem? dictionaryItem = _localizationService.GetDictionaryItemById(key);
         if (dictionaryItem is null)
