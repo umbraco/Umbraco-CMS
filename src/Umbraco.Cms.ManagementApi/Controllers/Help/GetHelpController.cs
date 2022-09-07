@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.ManagementApi.Factories;
 using Umbraco.Cms.ManagementApi.ViewModels.Help;
 using Umbraco.Cms.ManagementApi.ViewModels.Pagination;
 
@@ -14,11 +15,16 @@ public class GetHelpController : HelpControllerBase
 {
     private static HttpClient? _httpClient;
     private readonly ILogger<GetHelpController> _logger;
+    private readonly IViewModelFactory _viewModelFactory;
     private HelpPageSettings _helpPageSettings;
 
-    public GetHelpController(IOptionsMonitor<HelpPageSettings> helpPageSettings, ILogger<GetHelpController> logger)
+    public GetHelpController(
+        IOptionsMonitor<HelpPageSettings> helpPageSettings,
+        ILogger<GetHelpController> logger,
+        IViewModelFactory viewModelFactory)
     {
         _logger = logger;
+        _viewModelFactory = viewModelFactory;
         _helpPageSettings = helpPageSettings.CurrentValue;
         helpPageSettings.OnChange(UpdateHelpPageSettings);
     }
@@ -29,7 +35,7 @@ public class GetHelpController : HelpControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(PagedViewModel<HelpPageViewModel>),StatusCodes.Status200OK)]
-    public async Task<IActionResult> Get(string section, string tree, string baseUrl = "https://our.umbraco.com")
+    public async Task<IActionResult> Get(string section, string tree, int skip, int take, string baseUrl = "https://our.umbraco.com")
     {
         if (IsAllowedUrl(baseUrl) is false)
         {
@@ -60,7 +66,7 @@ public class GetHelpController : HelpControllerBase
             List<HelpPageViewModel>? result = JsonConvert.DeserializeObject<List<HelpPageViewModel>>(json);
             if (result != null)
             {
-                return Ok(result);
+                return Ok(_viewModelFactory.Create(result, skip, take));
             }
         }
         catch (HttpRequestException rex)
@@ -68,7 +74,7 @@ public class GetHelpController : HelpControllerBase
             _logger.LogInformation($"Check your network connection, exception: {rex.Message}");
         }
 
-        return Ok(new List<HelpPageViewModel>());
+        return Ok(_viewModelFactory.Create(new List<HelpPageViewModel>(), skip, take));
     }
 
     private bool IsAllowedUrl(string url) =>
