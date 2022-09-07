@@ -2,6 +2,7 @@
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.ManagementApi.ViewModels.Tree;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.ManagementApi.Controllers;
@@ -123,48 +124,4 @@ public abstract class TreeControllerBase<TItem> : Controller
 
         return treeItemViewModel;
     }
-}
-
-// TODO: move to appropriate models location
-public class TreeItemViewModel
-{
-    public Guid Key { get; set; }
-
-    public string Name { get; set; } = string.Empty;
-
-    public string Type { get; set; } = string.Empty;
-
-    public string Icon { get; set; } = string.Empty;
-
-    public bool HasChildren { get; set; }
-
-    public bool IsTrashed { get; set; }
-
-    public bool IsContainer { get; set; }
-
-    public Guid? ParentKey { get; set; }
-}
-
-public class ContentTreeItemViewModel : TreeItemViewModel
-{
-    public bool NoAccess { get; set; }
-}
-
-public class DocumentTreeItemViewModel : ContentTreeItemViewModel
-{
-    public bool IsProtected { get; set; }
-
-    public bool IsPublished { get; set; }
-
-    public bool IsEdited { get; set; }
-}
-
-public class FolderTreeItemViewModel : TreeItemViewModel
-{
-    public bool IsFolder { get; set; }
-}
-
-public class DocumentTypeTreeItemViewModel : FolderTreeItemViewModel
-{
-    public bool IsElement { get; set; }
 }

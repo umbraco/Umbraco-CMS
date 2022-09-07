@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.ManagementApi.ViewModels.Tree;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.DocumentType.Tree;
 

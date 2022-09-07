@@ -4,6 +4,7 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.ManagementApi.ViewModels.Tree;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.Media.Tree;
 
