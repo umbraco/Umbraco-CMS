@@ -299,7 +299,6 @@
 
                     var oldValue = vm.movingLayoutEntry.forceLeft;
                     var newValue = (dragX - dragOffsetX < targetRect.left + 30);
-                    console.log(dragX, dragOffsetX, targetRect.left)
                     if(newValue !== oldValue) {
                         vm.movingLayoutEntry.forceLeft = newValue;
                         vm.movingLayoutEntry.$block.__scope.$evalAsync();// needed for the block to be updated
