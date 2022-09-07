@@ -128,8 +128,6 @@
 
             const gridLayoutContainerEl = $element[0].querySelector('.umb-block-grid__layout-container');
             var _lastGridLayoutContainerEl = null;
-            //var targetEl = null;
-            //var movingEl = null;
 
             var targetRect = null;
             var ghostEl = null;
@@ -199,7 +197,6 @@
 
             var awaitingTarget = null;
             var approvedTarget = {related: null, after: false};
-            //var lastApprovedAfter = null;
             var awaitingTimeout = null;
 
             function _checkReset() {
@@ -215,7 +212,6 @@
             }
 
             function _checkStart() {
-                console.log("_checkStart")
                 approvedContainer = gridLayoutContainerEl;
                 approvedContainerDate = new Date().getTime();
             }
@@ -225,14 +221,10 @@
 
                 checkEvent = evt;
 
-                //TODO: if cursor is within items box, then a move should be prevented:
+                // if cursor is within the ghostBox, then a move will be prevented:
                 if(dragX > ghostRect.left && dragX < ghostRect.right && dragY > ghostRect.top && dragY < ghostRect.bottom) {
-                //if(ghostEl.offsetLeft > ghostRect.left && ghostEl.offsetLeft < ghostRect.right && ghostEl.offsetTop > ghostRect.top && ghostEl.offsetTop < ghostRect.bottom) {
-                //if(ghostEl.offsetLeft > 0 && ghostEl.offsetLeft < ghostRect.width && ghostEl.offsetTop > 0 && ghostEl.offsetTop < ghostRect.height) {
-                    console.log("_checkMove Reject€€€€€€€€€€€€.", dragX, dragX, ghostRect.left, ghostRect.top)
                     return false;
                 }
-                console.log("_checkMove goooooooood!", dragX, dragX, ghostRect.left, ghostRect.top)
 
                 if(evt.to !== approvedContainer) {
                     // If its only a few milliseconds since we approved the current container, then we will reject the new container:
@@ -247,26 +239,18 @@
                     return false;
                 }
 
-                // Check, could we set a maximum distance requirement?
                 if(approvedTarget && evt.related === approvedTarget.related && evt.willInsertAfter === approvedTarget.after) {
-                    //console.log("_checkMove ❤️", gridLayoutContainerEl);
                     return true;
                 }
                 if(awaitingTarget === null) {
-                    /*if(evt.related === approvedTarget.related && evt.willInsertAfter === lastApprovedAfter) {
-                        return false;
-                    }*/
                     awaitingTarget = {related: evt.related, after: evt.willInsertAfter};
                     awaitingTimeout = setTimeout(_approveAwaitingRelated, ANIMATION_DURATION*2);
                 }
                 return false;
             }
             function _approveAwaitingRelated() {
-                //console.log("________________ _approveAwaitingRelated")
-                //lastApprovedAfter = approvedTarget?.after || null;
                 approvedTarget = awaitingTarget;
                 awaitingTarget = null;
-                //preventAwaitingNewContainer = false;
                 sortable.handleEvent(checkEvent);
             }
             function _approveAwaitingContainer() {
@@ -275,10 +259,6 @@
                 approvedContainer = awaitingContainer;
                 approvedContainerDate = new Date().getTime();
                 awaitingContainer = null;
-                //vm.movingLayoutEntry.$block.__scope.$evalAsync();
-
-                //checkEvent.detail = {} || checkEvent.detail;
-                //preventAwaitingNewContainer = true;
                 sortable.handleEvent(checkEvent);
             }
             function _indication(evt) {
@@ -291,16 +271,6 @@
                 }
 
                 const movingEl = evt.dragged;
-
-                /*if (evt.dragged) {
-                    movingEl = evt.dragged;
-                } else {
-                    if(gridLayoutContainerEl !== evt.from) {
-                        movingEl = evt.from['Sortable:controller']().entries[evt.oldIndex];
-                    } else {
-                        movingEl = vm.entries[evt.oldIndex];
-                    }
-                }*/
 
                 if(_lastGridLayoutContainerEl !== contextVM && _lastGridLayoutContainerEl !== null) {
                     _lastGridLayoutContainerEl.hideNotAllowed();
@@ -328,30 +298,21 @@
                     dragY = evt.clientY;
 
                     var oldValue = vm.movingLayoutEntry.forceLeft;
-                    // TODO: get first columns width and use it:
                     var newValue = (dragX - dragOffsetX < targetRect.left + 30);
                     console.log(dragX, dragOffsetX, targetRect.left)
                     if(newValue !== oldValue) {
                         vm.movingLayoutEntry.forceLeft = newValue;
-                        if(newValue) {
-                            console.log("---FORCE--LEFT---")
-                        }
                         vm.movingLayoutEntry.$block.__scope.$evalAsync();// needed for the block to be updated
                     }
 
                     oldValue = vm.movingLayoutEntry.forceRight;
-                    // TODO: get last columns width and use it:
                     newValue = (dragX - dragOffsetX + ghostRect.width > targetRect.right - 30) && (vm.movingLayoutEntry.forceLeft !== true);
-                    console.log("---TEST-FORCE--RIGHT---", dragX - dragOffsetX, ghostRect.width, "== ", dragX - dragOffsetX + ghostRect.width, " > ", targetRect.right - 30)
                     if(newValue !== oldValue) {
                         vm.movingLayoutEntry.forceRight = newValue;
-                        if(newValue) {
-                            console.log("---FORCE--RIGHT---", dragX - dragOffsetX, ghostRect.width, " > ", targetRect.right)
-                        }
                         vm.movingLayoutEntry.$block.__scope.$evalAsync();// needed for the block to be updated
                     }
                 } else {
-                    console.error("[ALERT] not everything", targetRect, ghostRect, evt.clientX)
+                    console.error("We did not have everything for this method to run!!!!!", targetRect, ghostRect, evt.clientX)
                 }
             }
 
@@ -420,8 +381,6 @@
                     targetRect = evt.to.getBoundingClientRect();
                     ghostRect = evt.item.getBoundingClientRect();
                     dragOffsetX = evt.originalEvent.offsetX - evt.item.offsetLeft;
-                    console.log("startX: ", dragOffsetX, -evt.item.offsetLeft, evt)
-                    //dragOffsetY = evt.originalEvent.offsetY;
 
                     window.addEventListener('drag', _onDragMouseMove);
 
@@ -430,15 +389,8 @@
                 },
                 // Called by any change to the list (add / update / remove)
                 onMove: function (evt) {
-                    console.log('onMove', evt)
-                    
-                    //targetEl = evt.to;
-                    //movingEl = evt.dragged;
+                    //console.log('onMove', evt)
 
-                    /*targetRect = evt.targetRect;
-                    if(evt.targetRect === undefined) {
-                        console.log("target was undefined", evt)
-                    }*/
                     targetRect = evt.to.getBoundingClientRect();
                     ghostRect = evt.draggedRect;
 
@@ -452,7 +404,7 @@
 
                     return true;
                 },
-                
+                /*
                 onChange: function (evt) {
                     console.log('onChange', evt)
                     //evt.oldIndex;  // element index within parent
@@ -461,25 +413,19 @@
                     console.log('onSort', evt)
                     //evt.oldIndex;  // element index within parent
                 },
-                
+                */
                 onAdd: function (evt) {
                     //console.log("# onAdd")
-                    /*if(_indication(evt) === false) {
-                        return false;
-                    }*/
                     _sync(evt);
                     $scope.$evalAsync();
                 },
                 onUpdate: function (evt) {
-                    console.log("onUpdate", evt)
-                    /*if(_indication(evt) === false) {
-                        return false;
-                    }*/
+                    //console.log("onUpdate", evt)
                     _sync(evt);
                     $scope.$evalAsync();
                 },
                 onEnd: function(evt) {
-                    console.log("# onEnd")
+                    //console.log("# onEnd")
                     window.removeEventListener('drag', _onDragMouseMove);
 
                     // ensure not-allowed indication is removed.
@@ -492,8 +438,6 @@
                     _checkReset();
 
                     vm.movingLayoutEntry = null;
-                    //targetEl = null;
-                    //movingEl = null;
                     targetRect = null;
                     ghostRect = null;
                 }
