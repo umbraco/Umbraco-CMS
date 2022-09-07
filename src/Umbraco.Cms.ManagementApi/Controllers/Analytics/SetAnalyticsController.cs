@@ -16,9 +16,21 @@ public class SetAnalyticsController : AnalyticsControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ServerStatusViewModel), StatusCodes.Status200OK)]
-    public IActionResult SetConsentLevel(AnalyticsLevelViewModel telemetryResource)
+    public IActionResult SetConsentLevel(AnalyticsLevelViewModel analyticsLevelViewModel)
     {
-        _metricsConsentService.SetConsentLevel(telemetryResource.AnalyticsLevel);
+        if (!Enum.IsDefined(analyticsLevelViewModel.AnalyticsLevel))
+        {
+            var invalidModelProblem = new ProblemDetails
+            {
+                Title = "Invalid AnalyticsLevel value",
+                Detail = "The provided value for AnalyticsLevel is not valid",
+                Status = StatusCodes.Status400BadRequest,
+                Type = "Error",
+            };
+            return BadRequest(invalidModelProblem);
+        }
+
+        _metricsConsentService.SetConsentLevel(analyticsLevelViewModel.AnalyticsLevel);
         return Ok();
     }
 }
