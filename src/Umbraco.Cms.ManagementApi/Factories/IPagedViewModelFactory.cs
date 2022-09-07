@@ -2,7 +2,7 @@
 
 namespace Umbraco.Cms.ManagementApi.Factories;
 
-public interface IViewModelFactory
+public interface IPagedViewModelFactory
 {
     PagedViewModel<T> Create<T>(IEnumerable<T> items, int skip, int take);
 }
