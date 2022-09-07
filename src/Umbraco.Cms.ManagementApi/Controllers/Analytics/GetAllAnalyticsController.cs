@@ -14,6 +14,7 @@ public class GetAllAnalyticsController : AnalyticsControllerBase
 
     public GetAllAnalyticsController(IViewModelFactory viewModelFactory) => _viewModelFactory = viewModelFactory;
 
+    [HttpGet("all")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(AnalyticsLevelViewModel), StatusCodes.Status200OK)]
     public PagedViewModel<TelemetryLevel> GetAll(int skip, int take)
