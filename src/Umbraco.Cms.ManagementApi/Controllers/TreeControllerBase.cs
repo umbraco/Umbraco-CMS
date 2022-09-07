@@ -80,7 +80,9 @@ public abstract class TreeControllerBase<TItem> : Controller
         IEntitySlim? parent = EntityService.Get(parentKey, ItemObjectType);
         if (parent == null)
         {
-            throw new NotImplementedException("TODO: handle missing parent");
+            // not much else we can do here but return nothing
+            totalItems = 0;
+            return Array.Empty<IEntitySlim>();
         }
 
         IEntitySlim[] children = EntityService.GetPagedChildren(

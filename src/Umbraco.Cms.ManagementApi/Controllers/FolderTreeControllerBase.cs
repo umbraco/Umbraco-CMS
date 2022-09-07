@@ -35,7 +35,9 @@ public abstract class FolderTreeControllerBase<TItem> : TreeControllerBase<TItem
         IEntitySlim? parent = EntityService.Get(parentKey, FolderObjectType) ?? EntityService.Get(parentKey, ItemObjectType);
         if (parent == null)
         {
-            throw new NotImplementedException("TODO: handle missing parent");
+            // not much else we can do here but return nothing
+            totalItems = 0;
+            return Array.Empty<IEntitySlim>();
         }
 
         // TODO: expand EntityService.GetPagedChildren to be able to paginate multiple item types - for now we'll only paginate the items
