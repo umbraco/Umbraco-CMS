@@ -8,8 +8,8 @@ namespace Umbraco.Cms.ManagementApi.Controllers.MemberType.Tree;
 
 public class MemberTypeTreeItemsController : MemberTypeTreeControllerBase
 {
-    public MemberTypeTreeItemsController(IEntityService entityService, IContentTypeService contentTypeService)
-        : base(entityService, contentTypeService)
+    public MemberTypeTreeItemsController(IEntityService entityService)
+        : base(entityService)
     {
     }
 

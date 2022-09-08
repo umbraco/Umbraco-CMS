@@ -13,11 +13,10 @@ namespace Umbraco.Cms.ManagementApi.Controllers.MemberType.Tree;
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.MemberType}/tree")]
 public class MemberTypeTreeControllerBase : TreeControllerBase<TreeItemViewModel>
 {
-    private readonly IContentTypeService _contentTypeService;
-
-    public MemberTypeTreeControllerBase(IEntityService entityService, IContentTypeService contentTypeService)
-        : base(entityService) =>
-        _contentTypeService = contentTypeService;
+    public MemberTypeTreeControllerBase(IEntityService entityService)
+        : base(entityService)
+    {
+    }
 
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.MemberType;
 
