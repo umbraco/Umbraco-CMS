@@ -30,42 +30,45 @@ public class TrackedReferencesSkipTakeRepository : ITrackedReferencesSkipTakeRep
         out long totalRecords)
     {
         Sql<ISqlContext> innerUnionSql = GetInnerUnionSql();
-            var sql = _scopeAccessor.AmbientScope?.Database.SqlContext.Sql().SelectDistinct(
-                                                                            "[x].[otherId] as nodeId",
-                                                                            "[n].[uniqueId] as nodeKey",
-                                                                            "[n].[text] as nodeName",
-                                                                            "[n].[nodeObjectType] as nodeObjectType",
-                                                                            "[ct].[icon] as contentTypeIcon",
-                                                                            "[ct].[alias] as contentTypeAlias",
-                                                                            "[ctn].[text] as contentTypeName",
-                                                                            "[x].[alias] as relationTypeAlias",
-                                                                            "[x].[name] as relationTypeName",
-                                                                            "[x].[isDependency] as relationTypeIsDependency",
-                                                                            "[x].[dual] as relationTypeIsBidirectional")
-                                                                        .From<NodeDto>("n")
-                                                                        .InnerJoinNested(innerUnionSql, "x")
-                                                                        .On<NodeDto, UnionHelperDto>((n, x) => n.NodeId == x.OtherId, "n", "x")
-                                                                        .LeftJoin<ContentDto>("c").On<NodeDto, ContentDto>((left, right) => left.NodeId == right.NodeId, aliasLeft: "n",
-                                                                            aliasRight: "c")
-                                                                        .LeftJoin<ContentTypeDto>("ct")
-                                                                        .On<ContentDto, ContentTypeDto>((left, right) => left.ContentTypeId == right.NodeId, aliasLeft: "c",
-                                                                            aliasRight: "ct")
-                                                                        .LeftJoin<NodeDto>("ctn").On<ContentTypeDto, NodeDto>((left, right) => left.NodeId == right.NodeId,
-                                                                            aliasLeft: "ct", aliasRight: "ctn")
-                                                                        .Where<UnionHelperDto>(x => x.Id == id, "x");
+        var sql = _scopeAccessor.AmbientScope?.Database.SqlContext.Sql().SelectDistinct(
+                "[x].[otherId] as nodeId",
+                "[n].[uniqueId] as nodeKey",
+                "[n].[text] as nodeName",
+                "[n].[nodeObjectType] as nodeObjectType",
+                "[ct].[icon] as contentTypeIcon",
+                "[ct].[alias] as contentTypeAlias",
+                "[ctn].[text] as contentTypeName",
+                "[x].[alias] as relationTypeAlias",
+                "[x].[name] as relationTypeName",
+                "[x].[isDependency] as relationTypeIsDependency",
+                "[x].[dual] as relationTypeIsBidirectional")
+            .From<NodeDto>("n")
+            .InnerJoinNested(innerUnionSql, "x")
+            .On<NodeDto, UnionHelperDto>((n, x) => n.NodeId == x.OtherId, "n", "x")
+            .LeftJoin<ContentDto>("c").On<NodeDto, ContentDto>((left, right) => left.NodeId == right.NodeId,
+                aliasLeft: "n",
+                aliasRight: "c")
+            .LeftJoin<ContentTypeDto>("ct")
+            .On<ContentDto, ContentTypeDto>((left, right) => left.ContentTypeId == right.NodeId, aliasLeft: "c",
+                aliasRight: "ct")
+            .LeftJoin<NodeDto>("ctn").On<ContentTypeDto, NodeDto>((left, right) => left.NodeId == right.NodeId,
+                aliasLeft: "ct", aliasRight: "ctn")
+            .Where<UnionHelperDto>(x => x.Id == id, "x");
 
-            if (filterMustBeIsDependency)
-            {
-                sql = sql?.Where<RelationTypeDto>(rt => rt.IsDependency, "x");
-            }
+        if (filterMustBeIsDependency)
+        {
+            sql = sql?.Where<RelationTypeDto>(rt => rt.IsDependency, "x");
+        }
 
-            // Ordering is required for paging
-            sql = sql?.OrderBy<RelationTypeDto>(x => x.Alias, "x");
+        // Ordering is required for paging
+        sql = sql?.OrderBy<RelationTypeDto>(x => x.Alias, "x");
 
-            RelationItemDto[] pagedResult = _scopeAccessor.AmbientScope?.Database.SkipTake<RelationItemDto>(skip, take, sql).ToArray() ?? Array.Empty<RelationItemDto>();
-            totalRecords = pagedResult.Length;
+        RelationItemDto[] pagedResult =
+            _scopeAccessor.AmbientScope?.Database.SkipTake<RelationItemDto>(skip, take, sql).ToArray() ??
+            Array.Empty<RelationItemDto>();
+        totalRecords = pagedResult.Length;
 
-            return _umbracoMapper.MapEnumerable<RelationItemDto, RelationItemModel>(pagedResult);
+        return _umbracoMapper.MapEnumerable<RelationItemDto, RelationItemModel>(pagedResult);
     }
 
     public IEnumerable<RelationItemModel> GetPagedItemsWithRelations(
@@ -110,7 +113,9 @@ public class TrackedReferencesSkipTakeRepository : ITrackedReferencesSkipTakeRep
         // Ordering is required for paging
         sql = sql?.OrderBy<RelationTypeDto>(x => x.Alias, "x");
 
-        RelationItemDto[] pagedResult = _scopeAccessor.AmbientScope?.Database.SkipTake<RelationItemDto>(skip, take, sql).ToArray() ?? Array.Empty<RelationItemDto>();
+        RelationItemDto[] pagedResult =
+            _scopeAccessor.AmbientScope?.Database.SkipTake<RelationItemDto>(skip, take, sql).ToArray() ??
+            Array.Empty<RelationItemDto>();
         totalRecords = pagedResult.Length;
 
         return _umbracoMapper.MapEnumerable<RelationItemDto, RelationItemModel>(pagedResult);
@@ -125,55 +130,55 @@ public class TrackedReferencesSkipTakeRepository : ITrackedReferencesSkipTakeRep
     {
         var syntax = _scopeAccessor.AmbientScope?.Database.SqlContext.SqlSyntax;
 
-            // Gets the path of the parent with ",%" added
-            var subsubQuery = _scopeAccessor.AmbientScope?.Database.SqlContext.Sql()
-                .Select(syntax?.GetConcat("[node].[path]", "',%'"))
-                .From<NodeDto>("node")
-                .Where<NodeDto>(x => x.NodeId == parentId, "node");
+        // Gets the path of the parent with ",%" added
+        var subsubQuery = _scopeAccessor.AmbientScope?.Database.SqlContext.Sql()
+            .Select(syntax?.GetConcat("[node].[path]", "',%'"))
+            .From<NodeDto>("node")
+            .Where<NodeDto>(x => x.NodeId == parentId, "node");
 
-            // Gets the descendants of the parent node
-            Sql<ISqlContext>? subQuery = _scopeAccessor.AmbientScope?.Database.SqlContext.Sql()
-                .Select<NodeDto>(x => x.NodeId)
-                .From<NodeDto>()
-                .WhereLike<NodeDto>(x => x.Path, subsubQuery);
+        // Gets the descendants of the parent node
+        Sql<ISqlContext>? subQuery = _scopeAccessor.AmbientScope?.Database.SqlContext.Sql()
+            .Select<NodeDto>(x => x.NodeId)
+            .From<NodeDto>()
+            .WhereLike<NodeDto>(x => x.Path, subsubQuery);
 
-            Sql<ISqlContext> innerUnionSql = GetInnerUnionSql();
-            var sql = _scopeAccessor.AmbientScope?.Database.SqlContext.Sql().SelectDistinct(
-                                                                            "[x].[id] as nodeId",
-                                                                            "[n].[uniqueId] as nodeKey",
-                                                                            "[n].[text] as nodeName",
-                                                                            "[n].[nodeObjectType] as nodeObjectType",
-                                                                            "[ct].[icon] as contentTypeIcon",
-                                                                            "[ct].[alias] as contentTypeAlias",
-                                                                            "[ctn].[text] as contentTypeName",
-                                                                            "[x].[alias] as relationTypeAlias",
-                                                                            "[x].[name] as relationTypeName",
-                                                                            "[x].[isDependency] as relationTypeIsDependency",
-                                                                            "[x].[dual] as relationTypeIsBidirectional")
-                                                                        .From<NodeDto>("n")
-                                                                        .InnerJoinNested(innerUnionSql, "x")
-                                                                        .On<NodeDto, UnionHelperDto>((n, x) => n.NodeId == x.Id, "n", "x")
-                                                                        .LeftJoin<ContentDto>("c").On<NodeDto, ContentDto>((left, right) => left.NodeId == right.NodeId, aliasLeft: "n",
-                                                                            aliasRight: "c")
-                                                                        .LeftJoin<ContentTypeDto>("ct")
-                                                                        .On<ContentDto, ContentTypeDto>((left, right) => left.ContentTypeId == right.NodeId, aliasLeft: "c",
-                                                                            aliasRight: "ct")
-                                                                        .LeftJoin<NodeDto>("ctn").On<ContentTypeDto, NodeDto>((left, right) => left.NodeId == right.NodeId,
-                                                                            aliasLeft: "ct", aliasRight: "ctn");
-            sql = sql?.WhereIn((System.Linq.Expressions.Expression<Func<NodeDto, object?>>)(x => x.NodeId), subQuery, "n");
+        Sql<ISqlContext> innerUnionSql = GetInnerUnionSql();
+        var sql = _scopeAccessor.AmbientScope?.Database.SqlContext.Sql().SelectDistinct(
+                "[x].[id] as nodeId",
+                "[n].[uniqueId] as nodeKey",
+                "[n].[text] as nodeName",
+                "[n].[nodeObjectType] as nodeObjectType",
+                "[ct].[icon] as contentTypeIcon",
+                "[ct].[alias] as contentTypeAlias",
+                "[ctn].[text] as contentTypeName",
+                "[x].[alias] as relationTypeAlias",
+                "[x].[name] as relationTypeName",
+                "[x].[isDependency] as relationTypeIsDependency",
+                "[x].[dual] as relationTypeIsBidirectional")
+            .From<NodeDto>("n")
+            .InnerJoinNested(innerUnionSql, "x")
+            .On<NodeDto, UnionHelperDto>((n, x) => n.NodeId == x.Id, "n", "x")
+            .LeftJoin<ContentDto>("c").On<NodeDto, ContentDto>((left, right) => left.NodeId == right.NodeId, aliasLeft: "n", aliasRight: "c")
+            .LeftJoin<ContentTypeDto>("ct")
+            .On<ContentDto, ContentTypeDto>((left, right) => left.ContentTypeId == right.NodeId, aliasLeft: "c", aliasRight: "ct")
+            .LeftJoin<NodeDto>("ctn")
+            .On<ContentTypeDto, NodeDto>((left, right) => left.NodeId == right.NodeId, aliasLeft: "ct", aliasRight: "ctn");
+        sql = sql?.WhereIn((System.Linq.Expressions.Expression<Func<NodeDto, object?>>)(x => x.NodeId), subQuery, "n");
 
-            if (filterMustBeIsDependency)
-            {
-                sql = sql?.Where<RelationTypeDto>(rt => rt.IsDependency, "x");
-            }
+        if (filterMustBeIsDependency)
+        {
+            sql = sql?.Where<RelationTypeDto>(rt => rt.IsDependency, "x");
+        }
 
-            // Ordering is required for paging
-            sql = sql?.OrderBy<RelationTypeDto>(x => x.Alias, "x");
+        // Ordering is required for paging
+        sql = sql?.OrderBy<RelationTypeDto>(x => x.Alias, "x");
 
-            RelationItemDto[] pagedResult = _scopeAccessor.AmbientScope?.Database.SkipTake<RelationItemDto>(skip, take, sql).ToArray() ?? Array.Empty<RelationItemDto>();
-            totalRecords = pagedResult.Length;
+        List<RelationItemDto>? pagedResult =
+            _scopeAccessor.AmbientScope?.Database.SkipTake<RelationItemDto>(skip, take, sql);
+        totalRecords = pagedResult?.Capacity ?? 0;
 
-            return _umbracoMapper.MapEnumerable<RelationItemDto, RelationItemModel>(pagedResult);
+        return _umbracoMapper.MapEnumerable<RelationItemDto, RelationItemModel>(pagedResult ??
+            new List<RelationItemDto>());
     }
 
     private Sql<ISqlContext> GetInnerUnionSql()
