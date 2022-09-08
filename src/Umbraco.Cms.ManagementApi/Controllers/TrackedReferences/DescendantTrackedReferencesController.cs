@@ -31,9 +31,9 @@ public class DescendantTrackedReferencesController : TrackedReferencesController
     [HttpGet("descendants/{parentId:int}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ServerStatusViewModel), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<RelationItemViewModel>>> Descendants(int parentId, long skip, long take, bool filterMustBeIsDependency = true)
+    public async Task<ActionResult<PagedViewModel<RelationItemViewModel>>> Descendants(int parentId, long skip, long take, bool? filterMustBeIsDependency)
     {
-        PagedViewModel<RelationItemModel> relationItems = _trackedReferencesSkipTakeService.GetPagedDescendantsInReferences(parentId, skip, take, filterMustBeIsDependency);
+        PagedViewModel<RelationItemModel> relationItems = _trackedReferencesSkipTakeService.GetPagedDescendantsInReferences(parentId, skip, take, filterMustBeIsDependency ?? true);
         return new PagedViewModel<RelationItemViewModel>
         {
             Items = _umbracoMapper.MapEnumerable<RelationItemModel, RelationItemViewModel>(relationItems.Items),
