@@ -9,10 +9,10 @@ public class RelationModelMapDefinition : IMapDefinition
 {
     public void DefineMaps(IUmbracoMapper mapper)
     {
-        mapper.Define<RelationItemDto, RelationModel>((source, context) => new RelationModel(), Map);
+        mapper.Define<RelationItemDto, RelationItemModel>((source, context) => new RelationItemModel(), Map);
     }
 
-    private void Map(RelationItemDto source, RelationModel target, MapperContext context)
+    private void Map(RelationItemDto source, RelationItemModel target, MapperContext context)
     {
         target.NodeKey = source.ChildNodeKey;
         target.NodeType = ObjectTypes.GetUdiType(source.ChildNodeObjectType);

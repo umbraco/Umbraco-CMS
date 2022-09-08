@@ -22,7 +22,7 @@ public class TrackedReferencesSkipTakeRepository : ITrackedReferencesSkipTakeRep
         _umbracoMapper = umbracoMapper;
     }
 
-    public IEnumerable<RelationModel> GetPagedRelationsForItem(
+    public IEnumerable<RelationItemModel> GetPagedRelationsForItem(
         int id,
         long skip,
         long take,
@@ -65,10 +65,10 @@ public class TrackedReferencesSkipTakeRepository : ITrackedReferencesSkipTakeRep
             RelationItemDto[] pagedResult = _scopeAccessor.AmbientScope?.Database.SkipTake<RelationItemDto>(skip, take, sql).ToArray() ?? Array.Empty<RelationItemDto>();
             totalRecords = pagedResult.Length;
 
-            return _umbracoMapper.MapEnumerable<RelationItemDto, RelationModel>(pagedResult);
+            return _umbracoMapper.MapEnumerable<RelationItemDto, RelationItemModel>(pagedResult);
     }
 
-    public IEnumerable<RelationModel> GetPagedItemsWithRelations(
+    public IEnumerable<RelationItemModel> GetPagedItemsWithRelations(
         int[] ids,
         long skip,
         long take,
@@ -113,10 +113,10 @@ public class TrackedReferencesSkipTakeRepository : ITrackedReferencesSkipTakeRep
         RelationItemDto[] pagedResult = _scopeAccessor.AmbientScope?.Database.SkipTake<RelationItemDto>(skip, take, sql).ToArray() ?? Array.Empty<RelationItemDto>();
         totalRecords = pagedResult.Length;
 
-        return _umbracoMapper.MapEnumerable<RelationItemDto, RelationModel>(pagedResult);
+        return _umbracoMapper.MapEnumerable<RelationItemDto, RelationItemModel>(pagedResult);
     }
 
-    public IEnumerable<RelationModel> GetPagedDescendantsInReferences(
+    public IEnumerable<RelationItemModel> GetPagedDescendantsInReferences(
         int parentId,
         long skip,
         long take,
@@ -173,7 +173,7 @@ public class TrackedReferencesSkipTakeRepository : ITrackedReferencesSkipTakeRep
             RelationItemDto[] pagedResult = _scopeAccessor.AmbientScope?.Database.SkipTake<RelationItemDto>(skip, take, sql).ToArray() ?? Array.Empty<RelationItemDto>();
             totalRecords = pagedResult.Length;
 
-            return _umbracoMapper.MapEnumerable<RelationItemDto, RelationModel>(pagedResult);
+            return _umbracoMapper.MapEnumerable<RelationItemDto, RelationItemModel>(pagedResult);
     }
 
     private Sql<ISqlContext> GetInnerUnionSql()
