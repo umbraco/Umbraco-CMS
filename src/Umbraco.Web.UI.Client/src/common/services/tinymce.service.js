@@ -4,7 +4,9 @@
  *
  *
  * @description
- * A service containing all logic for all of the Umbraco TinyMCE plugins
+ * A service containing all logic for all of the Umbraco TinyMCE v6 plugins
+ *
+ * @doc https://www.tiny.cloud/docs/tinymce/6/
  */
 function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, stylesheetResource, macroResource, macroService,
   $routeParams, umbRequestHelper, angularHelper, userService, editorService, entityResource, eventsService, localStorageService, mediaHelper) {
@@ -386,7 +388,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
           body_class: "umb-rte",
 
-          //see http://archive.tinymce.com/wiki.php/Configuration:cache_suffix
+          //see https://www.tiny.cloud/docs/tinymce/6/editor-important-options/#cache_suffix
           cache_suffix: "?umb__rnd=" + Umbraco.Sys.ServerVariables.application.cacheBuster
         };
 
