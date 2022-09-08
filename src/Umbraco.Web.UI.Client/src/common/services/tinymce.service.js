@@ -938,10 +938,9 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
       function createLinkList(callback) {
         return function () {
-          console.log('editor settings', editor.settings)
-          var linkList = editor.settings?.link_list;
+          var linkList = editor.options.get('link_list');
 
-          if (!linkList || typeof (linkList) === "string") {
+          if (linkList && typeof linkList === "string") {
             fetch(linkList).then(function (response) {
               callback(response.json());
             }).catch(function (error) {
@@ -993,13 +992,16 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             value: ''
           }];
 
-          tinymce.each(editor.settings.rel_list, function (rel) {
-            relListItems.push({
-              text: rel.text || rel.title,
-              value: rel.value,
-              selected: relValue === rel.value
+          var linkRelList = editor.options.get('link_rel_list');
+          if (linkRelList) {
+            tinymce.each(linkRelList, function (rel) {
+              relListItems.push({
+                text: rel.text || rel.title,
+                value: rel.value,
+                selected: relValue === rel.value
+              });
             });
-          });
+          }
 
           return relListItems;
         }
@@ -1010,20 +1012,21 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             value: ''
           }];
 
-          if (!editor.settings.target_list) {
+          var linkList = editor.options.get('link_list');
+          if (linkList) {
+            tinymce.each(linkList, function (target) {
+              targetListItems.push({
+                text: target.text || target.title,
+                value: target.value,
+                selected: targetValue === target.value
+              });
+            });
+          } else {
             targetListItems.push({
               text: 'New window',
               value: '_blank'
             });
           }
-
-          tinymce.each(editor.settings.target_list, function (target) {
-            targetListItems.push({
-              text: target.text || target.title,
-              value: target.value,
-              selected: targetValue === target.value
-            });
-          });
 
           return targetListItems;
         }
@@ -1088,7 +1091,8 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
           };
         }
 
-        if (editor.settings.target_list !== false) {
+        var optionsLinkList = editor.options.get('link_list');
+        if (optionsLinkList !== false) {
           targetListCtrl = {
             name: 'target',
             type: 'listbox',
@@ -1097,7 +1101,8 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
           };
         }
 
-        if (editor.settings.rel_list) {
+        var linkRelList = editor.options.get('link_rel_list');
+        if (linkRelList) {
           relListCtrl = {
             name: 'rel',
             type: 'listbox',
