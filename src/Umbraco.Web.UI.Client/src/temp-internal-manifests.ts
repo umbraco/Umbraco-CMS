@@ -386,9 +386,35 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 			entityType: 'document',
 		},
 	},
+	// TODO: can we have generic tree item actions across trees?
 	{
 		type: 'treeItemAction',
-		alias: 'Umb.TreeItemAction.Create',
+		alias: 'Umb.TreeItemAction.Document.Create',
+		name: 'Tree Item Action Create',
+		loader: () => import('./backoffice/trees/actions/tree-action-create.element'),
+		meta: {
+			trees: ['Umb.Tree.Content'],
+			label: 'Create',
+			icon: 'add',
+			weight: 100,
+		},
+	},
+	{
+		type: 'treeItemAction',
+		alias: 'Umb.TreeItemAction.Document.Delete',
+		name: 'Tree Item Action Create',
+		loader: () => import('./backoffice/trees/actions/tree-action-delete.element'),
+		meta: {
+			trees: ['Umb.Tree.Content'],
+			label: 'Delete',
+			icon: 'delete',
+			weight: 100,
+		},
+	},
+	// TODO: or specific tree item actions per tree?
+	{
+		type: 'treeItemAction',
+		alias: 'Umb.TreeItemAction.DataType.Create',
 		name: 'Tree Item Action Create',
 		loader: () => import('./backoffice/trees/data-types/actions/action-data-type-create.element'),
 		meta: {
@@ -400,7 +426,7 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 	},
 	{
 		type: 'treeItemAction',
-		alias: 'Umb.TreeItemAction.Delete',
+		alias: 'Umb.TreeItemAction.DataType.Delete',
 		name: 'Tree Item Action Delete',
 		loader: () => import('./backoffice/trees/data-types/actions/action-data-type-delete.element'),
 		meta: {
