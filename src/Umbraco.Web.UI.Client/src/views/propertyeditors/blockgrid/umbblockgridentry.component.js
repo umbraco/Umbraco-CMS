@@ -124,6 +124,18 @@
         vm.mouseLeaveArea = function() {
             vm.isHoveringArea = false;
         }
+        vm.toggleForceLeft = function() {
+            vm.layoutEntry.forceLeft = !vm.layoutEntry.forceLeft;
+            if(vm.layoutEntry.forceLeft) {
+                vm.layoutEntry.forceRight = false;
+            }
+        }
+        vm.toggleForceRight = function() {
+            vm.layoutEntry.forceRight = !vm.layoutEntry.forceRight;
+            if(vm.layoutEntry.forceRight) {
+                vm.layoutEntry.forceLeft = false;
+            }
+        }
 
         // Block sizing functionality:
         let layoutContainer = null;

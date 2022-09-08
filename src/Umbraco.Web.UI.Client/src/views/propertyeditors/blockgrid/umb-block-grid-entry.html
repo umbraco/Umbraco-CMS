@@ -128,10 +128,32 @@
         </div>
 
         <button 
+            ng-if="!vm.blockEditorApi.readonly"
+            type="button" 
+            class="umb-block-grid__force-left"
+            ng-class="{ '--active': vm.layoutEntry.forceLeft }"
+            ng-click="vm.toggleForceLeft()">
+            <!-- TODO: missing readable text -->
+            <umb-icon icon="icon-navigation-left" class="icon"></umb-icon>
+        </button>
+
+        <button 
+            ng-if="!vm.blockEditorApi.readonly"
+            type="button" 
+            class="umb-block-grid__force-right"
+            ng-class="{ '--active': vm.layoutEntry.forceRight }"
+            ng-click="vm.toggleForceRight()">
+            <!-- TODO: missing readable text -->
+            <umb-icon icon="icon-navigation-right" class="icon"></umb-icon>
+        </button>
+
+        <button 
             ng-if="!vm.blockEditorApi.readonly && (vm.layoutEntry.$block.config.columnSpanOptions.length > 1 || vm.layoutEntry.$block.config.rowMaxSpan !== vm.layoutEntry.$block.config.rowMinSpan)" 
-            type="button" class="umb-block-grid__scale-handler" 
-            ng-mousedown="vm.scaleHandlerMouseDown($event)" 
-            ng-keyup="vm.scaleHandlerKeyUp($event)">
+            type="button"
+            class="umb-block-grid__scale-handler"
+            ng-class="{ '--active': vm.layoutEntry.forceRight }"
+            ng-click="vm.toggleForceRight()">
+            <!-- TODO: missing readable text -->
         </button>
 
         <div ng-if="!vm.blockEditorApi.readonly && (vm.layoutEntry.$block.config.columnSpanOptions.length > 1 || vm.layoutEntry.$block.config.rowMaxSpan !== vm.layoutEntry.$block.config.rowMinSpan)" 
