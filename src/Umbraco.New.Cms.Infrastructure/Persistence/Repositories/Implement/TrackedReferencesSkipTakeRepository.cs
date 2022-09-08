@@ -175,7 +175,7 @@ public class TrackedReferencesSkipTakeRepository : ITrackedReferencesSkipTakeRep
 
         List<RelationItemDto>? pagedResult =
             _scopeAccessor.AmbientScope?.Database.SkipTake<RelationItemDto>(skip, take, sql);
-        totalRecords = pagedResult?.Capacity ?? 0;
+        totalRecords = pagedResult?.Count ?? 0;
 
         return _umbracoMapper.MapEnumerable<RelationItemDto, RelationItemModel>(pagedResult ??
             new List<RelationItemDto>());
