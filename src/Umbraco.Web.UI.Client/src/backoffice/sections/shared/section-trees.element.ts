@@ -8,7 +8,7 @@ import { UmbExtensionRegistry } from '../../../core/extension';
 import { UmbSectionContext } from '../section.context';
 import type { ManifestTree } from '../../../core/models';
 
-import '../../trees/shared/tree.element';
+import '../../trees/shared/tree-extension.element';
 
 @customElement('umb-section-trees')
 export class UmbSectionTrees extends UmbContextConsumerMixin(LitElement) {
@@ -73,7 +73,7 @@ export class UmbSectionTrees extends UmbContextConsumerMixin(LitElement) {
 	}
 
 	render() {
-		return html`${this._trees.map((tree) => html`<umb-tree .tree=${tree}></umb-tree>`)} `;
+		return html`${this._trees.map((tree) => html`<umb-tree-extension .tree=${tree}></umb-tree-extension>`)} `;
 	}
 }
 

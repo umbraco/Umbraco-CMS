@@ -9,8 +9,8 @@ import './context-menu/tree-context-menu-page.service';
 import './context-menu/tree-context-menu.service';
 import './tree-item-action-extension.element';
 
-@customElement('umb-tree')
-export class UmbTree extends LitElement {
+@customElement('umb-tree-extension')
+export class UmbTreeExtension extends LitElement {
 	static styles: CSSResultGroup = [UUITextStyles];
 
 	private _tree?: ManifestTree;
@@ -46,6 +46,6 @@ export class UmbTree extends LitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-tree': UmbTree;
+		'umb-tree-extension': UmbTreeExtension;
 	}
 }
