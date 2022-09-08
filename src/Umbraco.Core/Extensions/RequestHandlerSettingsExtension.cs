@@ -7,13 +7,13 @@ namespace Umbraco.Extensions;
 
 /// <summary>
 ///     Get concatenated user and default character replacements
-///     taking into account <see cref="RequestHandlerSettings.EnableDefaultCharReplacements" />.
+///     taking into account <see cref="RequestHandlerSettings.EnableDefaultCharReplacements" />
 /// </summary>
 public static class RequestHandlerSettingsExtension
 {
     /// <summary>
     ///     Get concatenated user and default character replacements
-    ///     taking into account <see cref="RequestHandlerSettings.EnableDefaultCharReplacements" />.
+    ///     taking into account <see cref="RequestHandlerSettings.EnableDefaultCharReplacements" />
     /// </summary>
     public static IEnumerable<CharItem> GetCharReplacements(this RequestHandlerSettings requestHandlerSettings)
     {
@@ -34,7 +34,7 @@ public static class RequestHandlerSettingsExtension
     }
 
     /// <summary>
-    ///     Merges CharCollection and UserDefinedCharCollection, prioritizing UserDefinedCharCollection.
+    ///     Merges CharCollection and UserDefinedCharCollection, prioritizing UserDefinedCharCollection
     /// </summary>
     internal static void MergeReplacements(
         this RequestHandlerSettings requestHandlerSettings,
@@ -71,7 +71,8 @@ public static class RequestHandlerSettingsExtension
     }
 
     /// <summary>
-    ///     Merges two IEnumerable of CharItem without any duplicates, items in priorityReplacements will override those in alternativeReplacements.
+    ///     Merges two IEnumerable of CharItem without any duplicates, items in priorityReplacements will override those in
+    ///     alternativeReplacements
     /// </summary>
     private static IEnumerable<CharItem> MergeUnique(
         IEnumerable<CharItem> priorityReplacements,
