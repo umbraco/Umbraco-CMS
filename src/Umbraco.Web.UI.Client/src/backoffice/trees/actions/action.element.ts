@@ -2,7 +2,7 @@ import { LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { Subscription } from 'rxjs';
 import { UmbContextConsumerMixin } from '../../../core/context';
-import { ManifestTree } from '../../../core/models';
+import type { ManifestTree } from '../../../core/models';
 import { Entity } from '../../../mocks/data/entity.data';
 import { UmbSectionContext } from '../../sections/section.context';
 import { UmbActionPageService } from './action-page.service';
