@@ -360,7 +360,6 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
         // Plugins that must always be active
         plugins.push("autoresize");
-        // plugins.push("noneditable");
 
         var modeInline = false;
         var toolbar = args.toolbar.join(" ");
@@ -369,16 +368,16 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         // classic = Theme: modern, inline: false
         // inline = Theme: modern, inline: true,
         // distraction-free = Theme: inlite, inline: true
-        if (args.mode === "distraction-free") {
+        if (args.mode === "inline") {
+          modeInline = true;
+        }
+        else if (args.mode === "distraction-free") {
           modeInline = true;
           toolbar = false;
         }
 
-
-
         //create a baseline Config to extend upon
         var config = {
-          // theme: modeTheme,
           inline: modeInline,
           plugins: plugins,
           valid_elements: tinyMceConfig.validElements,
