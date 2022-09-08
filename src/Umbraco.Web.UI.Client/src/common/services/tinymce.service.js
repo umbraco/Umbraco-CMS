@@ -1243,54 +1243,6 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
     },
 
-    pinToolbar: function (editor) {
-
-      //we can't pin the toolbar if this doesn't exist (i.e. when in distraction free mode)
-      if (!editor.editorContainer) {
-        return;
-      }
-
-      var tinyMce = $(editor.editorContainer);
-      var toolbar = tinyMce.find(".mce-toolbar");
-      var toolbarHeight = toolbar.height();
-      var tinyMceRect = editor.editorContainer.getBoundingClientRect();
-      var tinyMceTop = tinyMceRect.top;
-      var tinyMceBottom = tinyMceRect.bottom;
-      var tinyMceWidth = tinyMceRect.width;
-
-      var tinyMceEditArea = tinyMce.find(".mce-edit-area");
-
-      // set padding in top of mce so the content does not "jump" up
-      tinyMceEditArea.css("padding-top", toolbarHeight);
-
-      if (tinyMceTop < 177 && ((177 + toolbarHeight) < tinyMceBottom)) {
-        toolbar
-          .css("position", "fixed")
-          .css("top", "177px")
-          .css("left", "auto")
-          .css("right", "auto")
-          .css("width", tinyMceWidth);
-      } else {
-        toolbar
-          .css("position", "absolute")
-          .css("left", "")
-          .css("right", "")
-          .css("top", "")
-          .css("width", "");
-      }
-
-    },
-
-    unpinToolbar: function (editor) {
-
-      var tinyMce = $(editor.editorContainer);
-      var toolbar = tinyMce.find(".mce-toolbar");
-      var tinyMceEditArea = tinyMce.find(".mce-edit-area");
-      // reset padding in top of mce so the content does not "jump" up
-      tinyMceEditArea.css("padding-top", "0");
-      toolbar.css("position", "static");
-    },
-
     /** Helper method to initialize the tinymce editor within Umbraco */
     initializeEditor: function (args) {
 
