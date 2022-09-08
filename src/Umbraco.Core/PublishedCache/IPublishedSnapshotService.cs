@@ -75,10 +75,7 @@ public interface IPublishedSnapshotService : IDisposable
     ///         <see cref="DistributedCache" /> RefreshAllPublishedSnapshot method.
     ///     </para>
     /// </remarks>
-    void RebuildAll()
-    {
-        Rebuild(Array.Empty<int>(),Array.Empty<int>(), Array.Empty<int>());
-    }
+    void RebuildAll() => Rebuild(Array.Empty<int>(), Array.Empty<int>(), Array.Empty<int>());
 
     /* An IPublishedCachesService implementation can rely on transaction-level events to update
      * its internal, database-level data, as these events are purely internal. However, it cannot

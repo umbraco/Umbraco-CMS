@@ -112,10 +112,12 @@ public class NuCacheContentRepository : RepositoryBase, INuCacheContentRepositor
         {
             RebuildContentDbCache(serializer, _nucacheSettings.Value.SqlPageSize, contentTypeIds);
         }
+
         if (mediaTypeIds != null)
         {
             RebuildMediaDbCache(serializer, _nucacheSettings.Value.SqlPageSize, mediaTypeIds);
         }
+
         if (memberTypeIds != null)
         {
             RebuildMemberDbCache(serializer, _nucacheSettings.Value.SqlPageSize, memberTypeIds);
