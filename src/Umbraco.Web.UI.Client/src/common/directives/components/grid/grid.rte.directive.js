@@ -85,6 +85,7 @@ angular.module("umbraco.directives")
                         //initialize the standard editor functionality for Umbraco
                         tinyMceService.initializeEditor({
                             editor: editor,
+                            toolbar: editorConfig.toolbar,
                             model: scope,
                             // Form is found in the scope of the grid controller above us, not in our isolated scope
                             // https://github.com/umbraco/Umbraco-CMS/issues/7461
