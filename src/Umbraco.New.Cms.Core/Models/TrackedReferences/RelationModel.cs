@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.New.Cms.Core.Models.TrackedReferences;
 
-public class Relation
+public class RelationModel
 {
     public Guid NodeKey { get; set; }
 
