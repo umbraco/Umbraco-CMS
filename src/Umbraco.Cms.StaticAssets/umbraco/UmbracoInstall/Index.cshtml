@@ -16,7 +16,7 @@
 
 <body ng-class="{loading:installer.loading}" ng-controller="Umbraco.InstallerController" id="umbracoInstallPageBody">
 
-    <img src="assets/img/application/logo_white.png" id="logo" />
+    <img src="assets/img/application/umbraco_logomark_white.svg" width="32" height="32" alt="Umbraco" draggable="false" id="logo" />
 
     <umb-loader position="bottom"
                 class="umb-installer-loader"
@@ -26,7 +26,7 @@
 
     <div id="overlay" ng-cloak ng-animate="'fade'" ng-show="installer.done"></div>
 
-    <div id="installer" class="absolute-center clearfix"
+    <div id="installer"
          ng-cloak
          ng-animate="'fade'"
          ng-show="installer.configuring">

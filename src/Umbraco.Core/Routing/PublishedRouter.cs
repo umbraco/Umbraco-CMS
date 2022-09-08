@@ -127,11 +127,18 @@ public class PublishedRouter : IPublishedRouter
 
         IPublishedRequestBuilder builder = new PublishedRequestBuilder(request.Uri, _fileService);
 
+        // ensure we keep the previous domain and culture
+        if (request.Domain is not null)
+        {
+            builder.SetDomain(request.Domain);
+        }
+        builder.SetCulture(request.Culture);
+
         // set to the new content (or null if specified)
         builder.SetPublishedContent(publishedContent);
 
         // re-route
-        await RouteRequestInternalAsync(builder);
+        await RouteRequestInternalAsync(builder, true);
 
         // return if we are redirect
         if (builder.IsRedirect())
@@ -145,11 +152,6 @@ public class PublishedRouter : IPublishedRouter
             // means the engine could not find a proper document to handle 404
             // restore the saved content so we know it exists
             builder.SetPublishedContent(content);
-        }
-
-        if (!builder.HasDomain())
-        {
-            FindDomain(builder);
         }
 
         return BuildRequest(builder);
@@ -211,7 +213,7 @@ public class PublishedRouter : IPublishedRouter
         _variationContextAccessor.VariationContext = new VariationContext(culture);
     }
 
-    private async Task RouteRequestInternalAsync(IPublishedRequestBuilder builder)
+    private async Task RouteRequestInternalAsync(IPublishedRequestBuilder builder, bool skipContentFinders = false)
     {
         // if request builder was already flagged to redirect then return
         // whoever called us is in charge of actually redirecting
@@ -229,7 +231,7 @@ public class PublishedRouter : IPublishedRouter
         // This could be manually assigned with a custom route handler, etc...
         // which in turn could call this method
         // to setup the rest of the pipeline but we don't want to run the finders since there's one assigned.
-        if (!builder.HasPublishedContent())
+        if (!builder.HasPublishedContent() && !skipContentFinders)
         {
             if (_logger.IsEnabled(LogLevel.Debug))
             {

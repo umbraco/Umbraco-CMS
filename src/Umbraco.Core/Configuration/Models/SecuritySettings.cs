@@ -16,6 +16,7 @@ public class SecuritySettings
     internal const bool StaticKeepUserLoggedIn = false;
     internal const bool StaticHideDisabledUsersInBackOffice = false;
     internal const bool StaticAllowPasswordReset = true;
+    internal const bool StaticAllowEditInvariantFromNonDefault = false;
     internal const string StaticAuthCookieName = "UMB_UCONTEXT";
 
     internal const string StaticAllowedUserNameCharacters =
@@ -84,4 +85,10 @@ public class SecuritySettings
     /// </summary>
     [DefaultValue(StaticUserBypassTwoFactorForExternalLogins)]
     public bool UserBypassTwoFactorForExternalLogins { get; set; } = StaticUserBypassTwoFactorForExternalLogins;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to allow editing invariant properties from a non-default language variation.
+        /// </summary>
+        [DefaultValue(StaticAllowEditInvariantFromNonDefault)]
+        public bool AllowEditInvariantFromNonDefault { get; set; } = StaticAllowEditInvariantFromNonDefault;
 }

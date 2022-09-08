@@ -320,6 +320,11 @@
     <key alias="createEmpty">Create new</key>
     <key alias="createFromClipboard">Paste from clipboard</key>
     <key alias="nodeIsInTrash">This item is in the Recycle Bin</key>
+    <key alias="variantSaveNotAllowed">Save is not allowed</key>
+    <key alias="variantPublishNotAllowed">Publish is not allowed</key>
+    <key alias="variantSendForApprovalNotAllowed">Send for approval is not allowed</key>
+    <key alias="variantScheduleNotAllowed">Schedule is not allowed</key>
+    <key alias="variantUnpublishNotAllowed">Unpublish is not allowed</key>
   </area>
   <area alias="blueprints">
     <key alias="createBlueprintFrom"><![CDATA[Create a new Content Template from <em>%0%</em>]]></key>
@@ -478,10 +483,10 @@
     <key alias="anchorInsert">Name</key>
     <key alias="closeThisWindow">Close this window</key>
     <key alias="confirmdelete">Are you sure you want to delete</key>
-    <key alias="confirmdeleteNumberOfItems"><![CDATA[Are you sure you want to delete <b>%0%</b> of <b>%1%</b> items]]></key>
+    <key alias="confirmdeleteNumberOfItems"><![CDATA[Are you sure you want to delete <strong>%0%</strong> of <strong>%1%</strong> items]]></key>
     <key alias="confirmdisable">Are you sure you want to disable</key>
     <key alias="confirmremove">Are you sure you want to remove</key>
-    <key alias="confirmremoveusageof"><![CDATA[Are you sure you want to remove the usage of <b>%0%</b>]]></key>
+    <key alias="confirmremoveusageof"><![CDATA[Are you sure you want to remove the usage of <strong>%0%</strong>]]></key>
     <key alias="confirmlogout">Are you sure?</key>
     <key alias="confirmSure">Are you sure?</key>
     <key alias="cut">Cut</key>
@@ -554,6 +559,7 @@
     <key alias="selectMemberGroup">Select member group</key>
     <key alias="selectMemberType">Select member type</key>
     <key alias="selectNode">Select node</key>
+    <key alias="selectLanguages">Select languages</key>
     <key alias="selectSections">Select sections</key>
     <key alias="selectUser">Select user</key>
     <key alias="selectUsers">Select users</key>
@@ -573,8 +579,8 @@
     <key alias="variantdeletewarning">This will delete the node and all its languages. If you only want to delete one
       language, you should unpublish the node in that language instead.
     </key>
-    <key alias="propertyuserpickerremovewarning"><![CDATA[This will remove the user <b>%0%</b>.]]></key>
-    <key alias="userremovewarning"><![CDATA[This will remove the user <b>%0%</b> from the <b>%1%</b> group]]></key>
+    <key alias="propertyuserpickerremovewarning"><![CDATA[This will remove the user <strong>%0%</strong>.]]></key>
+    <key alias="userremovewarning"><![CDATA[This will remove the user <strong>%0%</strong> from the <strong>%1%</strong> group]]></key>
     <key alias="yesRemove">Yes, remove</key>
     <key alias="deleteLayout">You are deleting the layout</key>
     <key alias="deletingALayout">Modifying layout will result in loss of data for any existing content that is based on this configuration.</key>
@@ -588,6 +594,7 @@
     <key alias="parentDoesNotExists">Parent item does not exist.</key>
     <key alias="noItems">There are no dictionary items.</key>
     <key alias="noItemsInFile">There are no dictionary items in this file.</key>
+    <key alias="noItemsFound">There were no dictionary items found.</key>
     <key alias="createNew">Create dictionary item</key>
   </area>
   <area alias="dictionaryItem">
@@ -851,6 +858,7 @@
     <key alias="noItemsInList">No items have been added</key>
     <key alias="server">Server</key>
     <key alias="settings">Settings</key>
+    <key alias="shared">Shared</key>
     <key alias="show">Show</key>
     <key alias="showPageOnSend">Show page on Send</key>
     <key alias="size">Size</key>
@@ -967,7 +975,7 @@
     <key alias="defaultUserChangePass">
       <![CDATA[<strong>The Default users' password needs to be changed!</strong>]]></key>
     <key alias="defaultUserDisabled">
-      <![CDATA[<strong>The Default user has been disabled or has no access to Umbraco!</strong></p><p>No further actions needs to be taken. Click <b>Next</b> to proceed.]]></key>
+      <![CDATA[<strong>The Default user has been disabled or has no access to Umbraco!</strong></p><p>No further actions needs to be taken. Click <strong>Next</strong> to proceed.]]></key>
     <key alias="defaultUserPassChanged">
       <![CDATA[<strong>The Default user's password has been successfully changed since the installation!</strong></p><p>No further actions needs to be taken. Click <strong>Next</strong> to proceed.]]></key>
     <key alias="defaultUserPasswordChanged">The password is changed!</key>
@@ -1939,7 +1947,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="historyCleanupKeepAllVersionsNewerThanDays">Keep all versions newer than days</key>
     <key alias="historyCleanupKeepLatestVersionPerDayForDays">Keep latest version per day for days</key>
     <key alias="historyCleanupPreventCleanup">Prevent cleanup</key>
-    <key alias="historyCleanupGloballyDisabled"><![CDATA[<b>NOTE!</b> The cleanup of historically content versions are disabled globally. These settings will not take effect before it is enabled.]]></key>
+    <key alias="historyCleanupGloballyDisabled"><![CDATA[<strong>NOTE!</strong> The cleanup of historically content versions are disabled globally. These settings will not take effect before it is enabled.]]></key>
     <key alias="changeDataTypeHelpText">Changing a data type with stored values is disabled. To allow this you can change the Umbraco:CMS:DataTypes:CanBeChanged setting in appsettings.json.</key>
   </area>
   <area alias="languages">
@@ -1959,6 +1967,11 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     </key>
     <key alias="fallbackLanguage">Fall back language</key>
     <key alias="none">none</key>
+    <key alias="invariantPropertyUnlockHelp"><![CDATA[<strong>%0%</strong> is shared across languages and segments.]]></key>
+    <key alias="invariantCulturePropertyUnlockHelp"><![CDATA[<strong>%0%</strong> is shared across all languages.]]></key>
+    <key alias="invariantSegmentPropertyUnlockHelp"><![CDATA[<strong>%0%</strong> is shared across all segments.]]></key>
+    <key alias="invariantLanguageProperty">Shared: Languages</key>
+    <key alias="invariantSegmentProperty">Shared: Segments</key>
   </area>
   <area alias="macro">
     <key alias="addParameter">Add parameter</key>
@@ -2167,6 +2180,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="permissionsGranularHelp">Set permissions for specific nodes</key>
     <key alias="profile">Profile</key>
     <key alias="searchAllChildren">Search all children</key>
+    <key alias="languagesHelp">Limit the languages users have access to edit</key>
+    <key alias="allowAccessToAllLanguages">Allow access to all languages</key>
     <key alias="sectionsHelp">Add sections to give users access</key>
     <key alias="selectUserGroups">Select user groups</key>
     <key alias="noStartNode">No start node selected</key>
@@ -2528,7 +2543,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="settingsPublishedStatus">Published Status</key>
     <key alias="settingsModelsBuilder">Models Builder</key>
     <key alias="settingsHealthCheck">Health Check</key>
-    <key alias="settingsAnalytics">Analytics</key>
+    <key alias="settingsAnalytics">Telemetry data</key>
     <key alias="settingsProfiler">Profiling</key>
     <key alias="memberIntro">Getting Started</key>
     <key alias="formsInstall">Install Umbraco Forms</key>
@@ -2702,12 +2717,12 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
                     Umbraco currently runs in debug mode. This means you can use the built-in performance profiler to assess the performance when rendering pages.
                 </p>
                 <p>
-                    If you want to activate the profiler for a specific page rendering, simply add <b>umbDebug=true</b> to the querystring when requesting the page.
+                    If you want to activate the profiler for a specific page rendering, simply add <strong>umbDebug=true</strong> to the querystring when requesting the page.
                 </p>
                 <p>
                     If you want the profiler to be activated by default for all page renderings, you can use the toggle below.
                     It will set a cookie in your browser, which then activates the profiler automatically.
-                    In other words, the profiler will only be active by default in <i>your</i> browser - not everyone else's.
+                    In other words, the profiler will only be active by default in <em>your</em> browser - not everyone else's.
                 </p>
         ]]>
     </key>
@@ -2716,7 +2731,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="reminderDescription">
       <![CDATA[
             <p>
-                You should never let a production site run in debug mode. Debug mode is turned off by setting <b>Umbraco:CMS:Hosting:Debug</b> to <b>false</b> in appsettings.json, appsettings.{Environment}.json or via an environment variable.
+                You should never let a production site run in debug mode. Debug mode is turned off by setting <strong>Umbraco:CMS:Hosting:Debug</strong> to <strong>false</strong> in appsettings.json, appsettings.{Environment}.json or via an environment variable.
             </p>
         ]]>
     </key>
@@ -2726,7 +2741,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
                 Umbraco currently does not run in debug mode, so you can't use the built-in profiler. This is how it should be for a production site.
             </p>
             <p>
-                Debug mode is turned on by setting <b>Umbraco:CMS:Hosting:Debug</b> to <b>true</b> in appsettings.json, appsettings.{Environment}.json or via an environment variable.
+                Debug mode is turned on by setting <strong>Umbraco:CMS:Hosting:Debug</strong> to <strong>true</strong> in appsettings.json, appsettings.{Environment}.json or via an environment variable.
             </p>
         ]]>
     </key>
@@ -2886,8 +2901,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="searchResults">items returned</key>
   </area>
   <area alias="analytics">
-    <key alias="consentForAnalytics">Consent for analytics</key>
-    <key alias="analyticsLevelSavedSuccess">Analytics level saved!</key>
+    <key alias="consentForAnalytics">Consent for telemetry data</key>
+    <key alias="analyticsLevelSavedSuccess">Telemetry level saved!</key>
     <key alias="analyticsDescription">
       <![CDATA[
       In order to improve Umbraco and add new functionality based on as relevant information as possible,
@@ -2895,21 +2910,22 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
           <br>Aggregate data will be shared on a regular basis as well as learnings from these metrics.
           <br>Hopefully, you will help us collect some valuable data.
           <br>
-          <br>We <b>WILL NOT</b> collect any personal data such as content, code, user information, and all data will be fully anonymized.
+          <br>We <strong>WILL NOT</strong> collect any personal data such as content, code, user information, and all data will be fully anonymized.
        ]]>
     </key>
     <key alias="minimalLevelDescription">We will only send an anonymized site ID to let us know that the site exists.</key>
-    <key alias="basicLevelDescription">We will send an anonymized site ID, umbraco version, and packages installed</key>
+    <key alias="basicLevelDescription">We will send an anonymized site ID, Umbraco version, and packages installed</key>
     <key alias="detailedLevelDescription">
       <![CDATA[
           We will send:
-          <br>- Anonymized site ID, umbraco version, and packages installed.
-          <br>- Number of: Root nodes, Content nodes, Macros, Media, Document Types, Templates, Languages, Domains, User Group, Users, Members, and Property Editors in use.
-          <br>- System information: Webserver, server OS, server framework, server OS language, and database provider.
-          <br>- Configuration settings: Modelsbuilder mode, if custom Umbraco path exists, ASP environment, and if you are in debug mode.
-          <br>
-          <br><i>We might change what we send on the Detailed level in the future. If so, it will be listed above.
-          <br>By choosing "Detailed" you agree to current and future anonymized information being collected.</i>
+          <ul>
+            <li>Anonymized site ID, Umbraco version, and packages installed.</li>
+            <li>Number of: Root nodes, Content nodes, Macros, Media, Document Types, Templates, Languages, Domains, User Group, Users, Members, and Property Editors in use.</li>
+            <li>System information: Webserver, server OS, server framework, server OS language, and database provider.</li>
+            <li>Configuration settings: Modelsbuilder mode, if custom Umbraco path exists, ASP environment, and if you are in debug mode.</li>
+          </ul>
+          <em>We might change what we send on the Detailed level in the future. If so, it will be listed above.
+          <br>By choosing "Detailed" you agree to current and future anonymized information being collected.</em>
        ]]>
     </key>
   </area>

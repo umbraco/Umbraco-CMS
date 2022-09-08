@@ -27,7 +27,7 @@ Use this directive to generate color swatches to pick from.
 
     function ColorSwatchesDirective() {
 
-        function link(scope, el, attr, ctrl) {
+        function link(scope, el, attrs, ctrl) {
 
             // Set default to true if not defined
             if (Utilities.isUndefined(scope.useColorClass)) {
@@ -40,6 +40,12 @@ Use this directive to generate color swatches to pick from.
             }
 
             scope.setColor = function (color, $index, $event) {
+                if (scope.readonly) {
+                    $event.preventDefault();
+                    $event.stopPropagation();
+                    return;
+                }
+
                 if (scope.onSelect) {
                     // did the value change?
                     if (scope.selectedColor != null && scope.selectedColor.value === color.value) {
@@ -59,6 +65,10 @@ Use this directive to generate color swatches to pick from.
             scope.isSelectedColor = function (color) {
                 return scope.selectedColor && color.value === scope.selectedColor.value;
             }
+
+            attrs.$observe('readonly', (value) => {
+                scope.readonly = value !== undefined;
+            });
         }
 
         var directive = {
