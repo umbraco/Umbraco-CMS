@@ -2,15 +2,17 @@
   <umb-box>
     <umb-box-content>
       <h3 class="bold">
-        <localize key="analytics_consentForAnalytics">Consent for analytics</localize>
+        <localize key="analytics_consentForAnalytics">Consent for telemetry data</localize>
       </h3>
       <div class="umb-healthcheck-help-text">
-        <p>In order to improve Umbraco and add new functionality based on as relevant information as possible,
+        <localize key="analytics_analyticsDescription">
+          In order to improve Umbraco and add new functionality based on as relevant information as possible,
           <br>we would like to collect system- and usage information from your installation.
-          <br>We will NOT collect any personal data like content, code or users, and all data will be fully anonymous.
+          <br>Aggregate data will be shared on a regular basis as well as learnings from these metrics.
+          <br>Hopefully, you will help us collect some valuable data.
           <br>
-          <br>We will on a regular basis share some of the overall learnings from these metrics.
-          Hopefully, you'll help us collect some valuable data.</p>
+          <br>We <b>WILL NOT</b> collect any personal data such as content, code, user information, and all data will be fully anonymized.
+        </localize>
         <div ng-if="!vm.loading" style="padding-left: 12px;padding-top: 50px; padding-bottom: 50px; width: 25%">
           <umb-range-slider
             ng-model="vm.val"
@@ -20,29 +22,28 @@
           </umb-range-slider>
         </div>
 
-        <p>
         <div ng-if="vm.sliderVal === 'Minimal'">
-          <b>{{vm.sliderVal}}</b>
-          <br>We'll only send an anonymous site ID to let us know that the site exists.
+          <localize key="analytics_minimalLevelDescription">We'll only send an anonymous site ID to let us know that the
+            site exists.
+          </localize>
         </div>
         <div ng-if="vm.sliderVal === 'Basic'">
-          <b>{{vm.sliderVal}}</b>
-          <br>We'll send site ID, umbraco version and packages installed
+          <localize key="analytics_basicLevelDescription">We'll send site ID, umbraco version and packages installed
+          </localize>
         </div>
         <div ng-if="vm.sliderVal === 'Detailed'">
-          <b>{{vm.sliderVal}}</b>
-
-          <br> We'll send:
-          <br>- Site ID, umbraco version and packages installed
-          <br>- System information like Server OS and Webserver
-          <br>- Statistics, like number of content nodes and number of media items
-          <br>- Configuration settings, like modelsbuilder mode and used languages
-          <br>
-          <br>We might change/extend what we send on the detailed level in the future, but if so, it will be listed in
-          this view.
-          By choosing "detailed" I accept these future changes
+          <localize key="analytics_detailedLevelDescription">
+            We will send:
+            <ul>
+              <li>Anonymized site ID, umbraco version, and packages installed.</li>
+              <li>Number of: Root nodes, Content nodes, Macros, Media, Document Types, Templates, Languages, Domains, User Group, Users, Members, and Property Editors in use.</li>
+              <li>System information: Webserver, server OS, server framework, server OS language, and database provider.</li>
+              <li>Configuration settings: Modelsbuilder mode, if custom Umbraco path exists, ASP environment, and if you are in debug mode.</li>
+            </ul>
+            <i>We might change what we send on the Detailed level in the future. If so, it will be listed above.
+            <br>By choosing "Detailed" you agree to current and future anonymized information being collected.</i>
+          </localize>
         </div>
-        </p>
       </div>
       <div class="umb-panel-group__details-status-actions">
         <umb-button type="button"

@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DistributedLocking;
@@ -10,12 +6,12 @@ namespace Umbraco.Cms.Infrastructure.DistributedLocking;
 
 public class DefaultDistributedLockingMechanismFactory : IDistributedLockingMechanismFactory
 {
-    private object _lock = new();
-    private bool _initialized;
-    private IDistributedLockingMechanism _distributedLockingMechanism;
+    private readonly IEnumerable<IDistributedLockingMechanism> _distributedLockingMechanisms;
 
     private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
-    private readonly IEnumerable<IDistributedLockingMechanism> _distributedLockingMechanisms;
+    private IDistributedLockingMechanism _distributedLockingMechanism = null!;
+    private bool _initialized;
+    private object _lock = new();
 
     public DefaultDistributedLockingMechanismFactory(
         IOptionsMonitor<GlobalSettings> globalSettings,
@@ -44,21 +40,22 @@ public class DefaultDistributedLockingMechanismFactory : IDistributedLockingMech
 
         if (!string.IsNullOrEmpty(configured))
         {
-            IDistributedLockingMechanism value = _distributedLockingMechanisms
+            IDistributedLockingMechanism? value = _distributedLockingMechanisms
                 .FirstOrDefault(x => x.GetType().FullName?.EndsWith(configured) ?? false);
 
             if (value == null)
             {
-                throw new InvalidOperationException($"Couldn't find DistributedLockingMechanism specified by global config: {configured}");
+                throw new InvalidOperationException(
+                    $"Couldn't find DistributedLockingMechanism specified by global config: {configured}");
             }
         }
 
-        IDistributedLockingMechanism defaultMechanism = _distributedLockingMechanisms.FirstOrDefault(x => x.Enabled);
+        IDistributedLockingMechanism? defaultMechanism = _distributedLockingMechanisms.FirstOrDefault(x => x.Enabled);
         if (defaultMechanism != null)
         {
             return defaultMechanism;
         }
 
-        throw new InvalidOperationException($"Couldn't find an appropriate default distributed locking mechanism.");
+        throw new InvalidOperationException("Couldn't find an appropriate default distributed locking mechanism.");
     }
 }

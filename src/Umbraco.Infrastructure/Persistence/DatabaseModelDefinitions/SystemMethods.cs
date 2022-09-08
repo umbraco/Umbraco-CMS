@@ -1,10 +1,11 @@
-﻿namespace Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions
+namespace Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
+
+public enum SystemMethods
 {
-    public enum SystemMethods
-    {
-        NewGuid,
-        CurrentDateTime,
-        //NewSequentialId,
-        //CurrentUTCDateTime
-    }
+    NewGuid,
+
+    CurrentDateTime,
+
+    // NewSequentialId,
+    // CurrentUTCDateTime
 }

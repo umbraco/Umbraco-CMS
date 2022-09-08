@@ -1,10 +1,13 @@
-using System;
-using System.Linq;
 using Microsoft.AspNetCore.Mvc.Controllers;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Web.Website.Controllers;
+using Umbraco.Extensions;
+using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Cms.Web.UI.Composers
 {
@@ -55,6 +58,7 @@ namespace Umbraco.Cms.Web.UI.Composers
                 builder.Services.TryAddTransient(controller, controller);
             }
 
+            builder.Services.AddUnique<RenderNoContentController>(x => new RenderNoContentController(x.GetService<IUmbracoContextAccessor>()!, x.GetService<IOptionsSnapshot<GlobalSettings>>()!, x.GetService<IHostingEnvironment>()!));
             return builder;
         }
     }

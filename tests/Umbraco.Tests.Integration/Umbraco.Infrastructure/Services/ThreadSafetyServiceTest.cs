@@ -2,22 +2,20 @@
 // See LICENSE for more details.
 
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Services.Implement;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
+using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 {
@@ -32,7 +30,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
     // but still, the test fails on VSTS in most cases, so now ignoring it,
     // as I could not figure out _why_ and it does not look like we are
     // causing it, getting into __sysObjects locks, no idea why
-
     [TestFixture]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Console)]
     public class ThreadSafetyServiceTest : UmbracoIntegrationTest
@@ -130,11 +127,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                 {
                     try
                     {
-                        ConcurrentStack<IScope>
-                            currentStack = ((ScopeProvider)ScopeProvider).GetCallContextScopeValue();
-                        log.LogInformation("[{ThreadId}] Current Stack? {CurrentStack}",
-                            Thread.CurrentThread.ManagedThreadId, currentStack?.Count);
-
                         // NOTE: This is NULL because we have supressed the execution context flow.
                         // If we don't do that we will get various exceptions because we're trying to run concurrent threads
                         // against an ambient context which cannot be done due to the rules of scope creation and completion.
@@ -146,8 +138,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                         // So although the test passes in v8, there's actually some strange things occuring because Scopes
                         // are being created and disposed concurrently and out of order.
                         var currentScope = ScopeAccessor.AmbientScope;
-                        log.LogInformation("[{ThreadId}] Current Scope? {CurrentScope}",
-                            Thread.CurrentThread.ManagedThreadId, currentScope?.GetDebugInfo());
+                        log.LogInformation("[{ThreadId}] Current Scope? {CurrentScope}", Thread.CurrentThread.ManagedThreadId, currentScope?.GetDebugInfo());
                         Assert.IsNull(currentScope);
 
                         string name1 = "test-" + Guid.NewGuid();
@@ -166,7 +157,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                     }
                     catch (Exception e)
                     {
-                        //throw;
+                        // throw;
                         lock (exceptions)
                         {
                             exceptions.Add(e);
@@ -230,11 +221,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                 {
                     try
                     {
-                        ConcurrentStack<IScope>
-                            currentStack = ((ScopeProvider)ScopeProvider).GetCallContextScopeValue();
-                        log.LogInformation("[{ThreadId}] Current Stack? {CurrentStack}",
-                            Thread.CurrentThread.ManagedThreadId, currentStack?.Count);
-
                         // NOTE: This is NULL because we have supressed the execution context flow.
                         // If we don't do that we will get various exceptions because we're trying to run concurrent threads
                         // against an ambient context which cannot be done due to the rules of scope creation and completion.
@@ -246,8 +232,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                         // So although the test passes in v8, there's actually some strange things occuring because Scopes
                         // are being created and disposed concurrently and out of order.
                         var currentScope = ScopeAccessor.AmbientScope;
-                        log.LogInformation("[{ThreadId}] Current Scope? {CurrentScope}",
-                            Thread.CurrentThread.ManagedThreadId, currentScope?.GetDebugInfo());
+                        log.LogInformation("[{ThreadId}] Current Scope? {CurrentScope}", Thread.CurrentThread.ManagedThreadId, currentScope?.GetDebugInfo());
                         Assert.IsNull(currentScope);
 
                         string name1 = "test-" + Guid.NewGuid();

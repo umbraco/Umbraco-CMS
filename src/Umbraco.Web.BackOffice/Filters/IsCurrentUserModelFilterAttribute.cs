@@ -1,72 +1,70 @@
-﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Web.BackOffice.Controllers;
 
-namespace Umbraco.Cms.Web.BackOffice.Filters
+namespace Umbraco.Cms.Web.BackOffice.Filters;
+
+internal class IsCurrentUserModelFilterAttribute : TypeFilterAttribute
 {
-    internal class IsCurrentUserModelFilterAttribute : TypeFilterAttribute
+    public IsCurrentUserModelFilterAttribute() : base(typeof(IsCurrentUserModelFilter))
     {
-        public IsCurrentUserModelFilterAttribute() : base(typeof(IsCurrentUserModelFilter))
-        {
-        }
+    }
 
-        private class IsCurrentUserModelFilter : IActionFilter
-        {
-            private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
+    private class IsCurrentUserModelFilter : IActionFilter
+    {
+        private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
 
-            public IsCurrentUserModelFilter(IBackOfficeSecurityAccessor backofficeSecurityAccessor)
+        public IsCurrentUserModelFilter(IBackOfficeSecurityAccessor backofficeSecurityAccessor) =>
+            _backofficeSecurityAccessor = backofficeSecurityAccessor;
+
+
+        public void OnActionExecuted(ActionExecutedContext context)
+        {
+            if (context.Result == null)
             {
-                _backofficeSecurityAccessor = backofficeSecurityAccessor;
+                return;
             }
 
-
-            public void OnActionExecuted(ActionExecutedContext context)
+            IUser? user = _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
+            if (user == null)
             {
-                if (context.Result == null) return;
+                return;
+            }
 
-                var user = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
-                if (user == null) return;
-
-                var objectContent = context.Result as ObjectResult;
-                if (objectContent != null)
+            if (context.Result is ObjectResult objectContent)
+            {
+                if (objectContent.Value is UserBasic model)
                 {
-                    var model = objectContent.Value as UserBasic;
-                    if (model != null)
+                    model.IsCurrentUser = (int?)model.Id == user.Id;
+                }
+                else
+                {
+                    if (objectContent.Value is IEnumerable<UserBasic> collection)
                     {
-                        model.IsCurrentUser = (int) model.Id == user.Id;
+                        foreach (UserBasic userBasic in collection)
+                        {
+                            userBasic.IsCurrentUser = (int?)userBasic.Id == user.Id;
+                        }
                     }
                     else
                     {
-                        var collection = objectContent.Value as IEnumerable<UserBasic>;
-                        if (collection != null)
+                        if (objectContent.Value is UsersController.PagedUserResult paged && paged.Items != null)
                         {
-                            foreach (var userBasic in collection)
+                            foreach (UserBasic userBasic in paged.Items)
                             {
-                                userBasic.IsCurrentUser = (int) userBasic.Id == user.Id;
-                            }
-                        }
-                        else
-                        {
-                            var paged = objectContent.Value as UsersController.PagedUserResult;
-                            if (paged != null && paged.Items != null)
-                            {
-                                foreach (var userBasic in paged.Items)
-                                {
-                                    userBasic.IsCurrentUser = (int)userBasic.Id == user.Id;
-                                }
+                                userBasic.IsCurrentUser = (int?)userBasic.Id == user.Id;
                             }
                         }
                     }
                 }
             }
+        }
 
-            public void OnActionExecuting(ActionExecutingContext context)
-            {
-
-            }
+        public void OnActionExecuting(ActionExecutingContext context)
+        {
         }
     }
 }

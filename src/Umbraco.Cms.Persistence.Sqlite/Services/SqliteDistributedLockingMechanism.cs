@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.DistributedLocking.Exceptions;
+using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
@@ -15,10 +16,10 @@ namespace Umbraco.Cms.Persistence.Sqlite.Services;
 
 public class SqliteDistributedLockingMechanism : IDistributedLockingMechanism
 {
-    private readonly ILogger<SqliteDistributedLockingMechanism> _logger;
-    private readonly Lazy<IScopeAccessor> _scopeAccessor;
     private readonly IOptionsMonitor<ConnectionStrings> _connectionStrings;
     private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
+    private readonly ILogger<SqliteDistributedLockingMechanism> _logger;
+    private readonly Lazy<IScopeAccessor> _scopeAccessor;
 
     public SqliteDistributedLockingMechanism(
         ILogger<SqliteDistributedLockingMechanism> logger,
@@ -34,7 +35,7 @@ public class SqliteDistributedLockingMechanism : IDistributedLockingMechanism
 
     /// <inheritdoc />
     public bool Enabled => _connectionStrings.CurrentValue.IsConnectionStringConfigured() &&
-                           _connectionStrings.CurrentValue.ProviderName == Constants.ProviderName;
+                           string.Equals(_connectionStrings.CurrentValue.ProviderName, Constants.ProviderName, StringComparison.InvariantCultureIgnoreCase);
 
     // With journal_mode=wal we can always read a snapshot.
     public IDistributedLock ReadLock(int lockId, TimeSpan? obtainLockTimeout = null)
@@ -99,11 +100,9 @@ public class SqliteDistributedLockingMechanism : IDistributedLockingMechanism
 
         public DistributedLockType LockType { get; }
 
-        public void Dispose()
-        {
+        public void Dispose() =>
             // Mostly no op, cleaned up by completing transaction in scope.
             _parent._logger.LogDebug("Dropped {lockType} for id {id}", LockType, LockId);
-        }
 
         public override string ToString()
             => $"SqliteDistributedLock({LockId})";
@@ -112,11 +111,17 @@ public class SqliteDistributedLockingMechanism : IDistributedLockingMechanism
         // Mostly no-op just check that we didn't end up ReadUncommitted for real.
         private void ObtainReadLock()
         {
-            IUmbracoDatabase db = _parent._scopeAccessor.Value.AmbientScope.Database;
+            IUmbracoDatabase? db = _parent._scopeAccessor.Value.AmbientScope?.Database;
+
+            if (db is null)
+            {
+                throw new PanicException("no database was found");
+            }
 
             if (!db.InTransaction)
             {
-                throw new InvalidOperationException("SqliteDistributedLockingMechanism requires a transaction to function.");
+                throw new InvalidOperationException(
+                    "SqliteDistributedLockingMechanism requires a transaction to function.");
             }
         }
 
@@ -124,11 +129,17 @@ public class SqliteDistributedLockingMechanism : IDistributedLockingMechanism
         // lock occurs for entire database as opposed to row/table.
         private void ObtainWriteLock()
         {
-            IUmbracoDatabase db = _parent._scopeAccessor.Value.AmbientScope.Database;
+            IUmbracoDatabase? db = _parent._scopeAccessor.Value.AmbientScope?.Database;
+
+            if (db is null)
+            {
+                throw new PanicException("no database was found");
+            }
 
             if (!db.InTransaction)
             {
-                throw new InvalidOperationException("SqliteDistributedLockingMechanism requires a transaction to function.");
+                throw new InvalidOperationException(
+                    "SqliteDistributedLockingMechanism requires a transaction to function.");
             }
 
             var query = @$"UPDATE umbracoLock SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id = {LockId}";
@@ -136,7 +147,9 @@ public class SqliteDistributedLockingMechanism : IDistributedLockingMechanism
             DbCommand command = db.CreateCommand(db.Connection, CommandType.Text, query);
 
             // imagine there is an existing writer, whilst elapsed time is < command timeout sqlite will busy loop
-            command.CommandTimeout = _timeout.Seconds;
+            // Important to note that if this value == 0 then Command.DefaultTimeout (30s) is used.
+            // Math.Ceiling such that (0 < totalseconds < 1) is rounded up to 1.
+            command.CommandTimeout = (int)Math.Ceiling(_timeout.TotalSeconds);
 
             try
             {

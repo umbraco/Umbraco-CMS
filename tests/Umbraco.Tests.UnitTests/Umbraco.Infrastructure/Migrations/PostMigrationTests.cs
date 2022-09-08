@@ -2,7 +2,6 @@
 // See LICENSE for more details.
 
 using System;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
@@ -17,145 +16,149 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Migrations;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 using Umbraco.Cms.Infrastructure.Persistence;
-using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Persistence.SqlServer.Services;
 using Umbraco.Cms.Tests.Common.TestHelpers;
+using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
 
-namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations;
+
+[TestFixture]
+public class PostMigrationTests
 {
-    [TestFixture]
-    public class PostMigrationTests
+    private static readonly ILoggerFactory s_loggerFactory = NullLoggerFactory.Instance;
+
+    private IMigrationPlanExecutor GetMigrationPlanExecutor(
+        ICoreScopeProvider scopeProvider,
+        IScopeAccessor scopeAccessor,
+        IMigrationBuilder builder)
+        => new MigrationPlanExecutor(scopeProvider, scopeAccessor, s_loggerFactory, builder);
+
+    [Test]
+    public void ExecutesPlanPostMigration()
     {
-        private static readonly ILoggerFactory s_loggerFactory = NullLoggerFactory.Instance;
-        private IMigrationPlanExecutor GetMigrationPlanExecutor(IScopeProvider scopeProvider, IScopeAccessor scopeAccessor,IMigrationBuilder builder)
-            => new MigrationPlanExecutor(scopeProvider, scopeAccessor, s_loggerFactory, builder);
-
-        [Test]
-        public void ExecutesPlanPostMigration()
-        {
-            IMigrationBuilder builder = Mock.Of<IMigrationBuilder>();
-            Mock.Get(builder)
-                .Setup(x => x.Build(It.IsAny<Type>(), It.IsAny<IMigrationContext>()))
-                .Returns<Type, IMigrationContext>((t, c) =>
+        var builder = Mock.Of<IMigrationBuilder>();
+        Mock.Get(builder)
+            .Setup(x => x.Build(It.IsAny<Type>(), It.IsAny<IMigrationContext>()))
+            .Returns<Type, IMigrationContext>((t, c) =>
+            {
+                switch (t.Name)
                 {
-                    switch (t.Name)
-                    {
-                        case nameof(NoopMigration):
-                            return new NoopMigration(c);
-                        case nameof(TestPostMigration):
-                            return new TestPostMigration(c);
-                        default:
-                            throw new NotSupportedException();
-                    }
-                });
+                    case nameof(NoopMigration):
+                        return new NoopMigration(c);
+                    case nameof(TestPostMigration):
+                        return new TestPostMigration(c);
+                    default:
+                        throw new NotSupportedException();
+                }
+            });
 
-            var database = new TestDatabase();
-            IDatabaseScope scope = Mock.Of<IDatabaseScope>(x => x.Notifications == Mock.Of<IScopedNotificationPublisher>());
-            Mock.Get(scope)
-                .Setup(x => x.Database)
-                .Returns(database);
+        var database = new TestDatabase();
+        var scope = Mock.Of<IScope>(x => x.Notifications == Mock.Of<IScopedNotificationPublisher>());
+        Mock.Get(scope)
+            .Setup(x => x.Database)
+            .Returns(database);
 
-            var sqlContext = new SqlContext(
-                new SqlServerSyntaxProvider(Options.Create(new GlobalSettings())),
-                DatabaseType.SQLCe,
-                Mock.Of<IPocoDataFactory>());
-            var scopeProvider = new MigrationTests.TestScopeProvider(scope) { SqlContext = sqlContext };
+        var sqlContext = new SqlContext(
+            new SqlServerSyntaxProvider(Options.Create(new GlobalSettings())),
+            DatabaseType.SQLCe,
+            Mock.Of<IPocoDataFactory>());
+        var scopeProvider = new MigrationTests.TestScopeProvider(scope) { SqlContext = sqlContext };
 
-            MigrationPlan plan = new MigrationPlan("Test")
-                .From(string.Empty).To("done");
+        var plan = new MigrationPlan("Test")
+            .From(string.Empty).To("done");
 
-            plan.AddPostMigration<TestPostMigration>();
-            TestPostMigration.MigrateCount = 0;
+        plan.AddPostMigration<TestPostMigration>();
+        TestPostMigration.MigrateCount = 0;
 
-            var upgrader = new Upgrader(plan);
-            IMigrationPlanExecutor executor = GetMigrationPlanExecutor(scopeProvider, scopeProvider, builder);
-            upgrader.Execute(
-                executor,
-                scopeProvider,
-                Mock.Of<IKeyValueService>());
+        var upgrader = new Upgrader(plan);
+        var executor = GetMigrationPlanExecutor(scopeProvider, scopeProvider, builder);
+        upgrader.Execute(
+            executor,
+            scopeProvider,
+            Mock.Of<IKeyValueService>());
 
-            Assert.AreEqual(1, TestPostMigration.MigrateCount);
-        }
+        Assert.AreEqual(1, TestPostMigration.MigrateCount);
+    }
 
-        [Test]
-        public void MigrationCanAddPostMigration()
-        {
-            IMigrationBuilder builder = Mock.Of<IMigrationBuilder>();
-            Mock.Get(builder)
-                .Setup(x => x.Build(It.IsAny<Type>(), It.IsAny<IMigrationContext>()))
-                .Returns<Type, IMigrationContext>((t, c) =>
+    [Test]
+    public void MigrationCanAddPostMigration()
+    {
+        var builder = Mock.Of<IMigrationBuilder>();
+        Mock.Get(builder)
+            .Setup(x => x.Build(It.IsAny<Type>(), It.IsAny<IMigrationContext>()))
+            .Returns<Type, IMigrationContext>((t, c) =>
+            {
+                switch (t.Name)
                 {
-                    switch (t.Name)
-                    {
-                        case nameof(NoopMigration):
-                            return new NoopMigration(c);
-                        case nameof(TestMigration):
-                            return new TestMigration(c);
-                        case nameof(TestPostMigration):
-                            return new TestPostMigration(c);
-                        default:
-                            throw new NotSupportedException();
-                    }
-                });
+                    case nameof(NoopMigration):
+                        return new NoopMigration(c);
+                    case nameof(TestMigration):
+                        return new TestMigration(c);
+                    case nameof(TestPostMigration):
+                        return new TestPostMigration(c);
+                    default:
+                        throw new NotSupportedException();
+                }
+            });
 
-            var database = new TestDatabase();
-            IDatabaseScope scope = Mock.Of<IDatabaseScope>(x => x.Notifications == Mock.Of<IScopedNotificationPublisher>());
-            Mock.Get(scope)
-                .Setup(x => x.Database)
-                .Returns(database);
+        var database = new TestDatabase();
+        var scope = Mock.Of<IScope>(x => x.Notifications == Mock.Of<IScopedNotificationPublisher>());
+        Mock.Get(scope)
+            .Setup(x => x.Database)
+            .Returns(database);
 
-            var sqlContext = new SqlContext(
-                new SqlServerSyntaxProvider(Options.Create(new GlobalSettings())),
-                DatabaseType.SQLCe,
-                Mock.Of<IPocoDataFactory>());
-            var scopeProvider = new MigrationTests.TestScopeProvider(scope) { SqlContext = sqlContext };
+        var sqlContext = new SqlContext(
+            new SqlServerSyntaxProvider(Options.Create(new GlobalSettings())),
+            DatabaseType.SQLCe,
+            Mock.Of<IPocoDataFactory>());
+        var scopeProvider = new MigrationTests.TestScopeProvider(scope) { SqlContext = sqlContext };
 
-            MigrationPlan plan = new MigrationPlan("Test")
-                .From(string.Empty).To<TestMigration>("done");
+        var plan = new MigrationPlan("Test")
+            .From(string.Empty).To<TestMigration>("done");
 
-            TestMigration.MigrateCount = 0;
-            TestPostMigration.MigrateCount = 0;
+        TestMigration.MigrateCount = 0;
+        TestPostMigration.MigrateCount = 0;
 
-            new MigrationContext(plan, database, s_loggerFactory.CreateLogger<MigrationContext>());
+        new MigrationContext(plan, database, s_loggerFactory.CreateLogger<MigrationContext>());
 
-            var upgrader = new Upgrader(plan);
-            IMigrationPlanExecutor executor = GetMigrationPlanExecutor(scopeProvider, scopeProvider, builder);
-            upgrader.Execute(
-                executor,
-                scopeProvider,
-                Mock.Of<IKeyValueService>());
+        var upgrader = new Upgrader(plan);
+        var executor = GetMigrationPlanExecutor(scopeProvider, scopeProvider, builder);
+        upgrader.Execute(
+            executor,
+            scopeProvider,
+            Mock.Of<IKeyValueService>());
 
-            Assert.AreEqual(1, TestMigration.MigrateCount);
-            Assert.AreEqual(1, TestPostMigration.MigrateCount);
-        }
+        Assert.AreEqual(1, TestMigration.MigrateCount);
+        Assert.AreEqual(1, TestPostMigration.MigrateCount);
+    }
 
-        public class TestMigration : MigrationBase
+    public class TestMigration : MigrationBase
+    {
+        public TestMigration(IMigrationContext context)
+            : base(context)
         {
-            public TestMigration(IMigrationContext context)
-                : base(context)
-            {
-            }
-
-            public static int MigrateCount { get; set; }
-
-            protected override void Migrate()
-            {
-                MigrateCount++;
-
-                Context.AddPostMigration<TestPostMigration>();
-            }
         }
 
-        public class TestPostMigration : MigrationBase
+        public static int MigrateCount { get; set; }
+
+        protected override void Migrate()
         {
-            public TestPostMigration(IMigrationContext context) : base(context)
-            {
-            }
+            MigrateCount++;
 
-            public static int MigrateCount { get; set; }
-
-            protected override void Migrate() => MigrateCount++;
+            Context.AddPostMigration<TestPostMigration>();
         }
+    }
+
+    public class TestPostMigration : MigrationBase
+    {
+        public TestPostMigration(IMigrationContext context)
+            : base(context)
+        {
+        }
+
+        public static int MigrateCount { get; set; }
+
+        protected override void Migrate() => MigrateCount++;
     }
 }

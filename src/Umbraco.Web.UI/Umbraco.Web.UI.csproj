@@ -1,112 +1,62 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
-
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <RootNamespace>Umbraco.Cms.Web.UI</RootNamespace>
+    <EnablePackageValidation>false</EnablePackageValidation>
   </PropertyGroup>
 
-  <Import Project="../../build/NuSpecs/buildTransitive/Umbraco.Cms.StaticAssets.props" />
+  <Import Project="..\Umbraco.Cms\buildTransitive\Umbraco.Cms.props" />
+  <ItemGroup>
+    <ProjectReference Include="..\Umbraco.Cms\Umbraco.Cms.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.5" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="all" />
+    <PackageReference Include="Umbraco.Code" Version="2.0.0" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Opt-in to app-local ICU to ensure consistent globalization APIs across different platforms -->
+    <PackageReference Include="Microsoft.ICU.ICU4C.Runtime" Version="68.2.0.9" />
+    <RuntimeHostConfigurationOption Include="System.Globalization.AppLocalIcu" Value="68.2.0.9" Condition="$(RuntimeIdentifier.StartsWith('linux')) or $(RuntimeIdentifier.StartsWith('win')) or ('$(RuntimeIdentifier)' == '' and !$([MSBuild]::IsOSPlatform('osx')))" />
+  </ItemGroup>
+
   <PropertyGroup>
-    <DefaultItemExcludes>$(DefaultItemExcludes);wwwroot/umbraco/**</DefaultItemExcludes>
-  </PropertyGroup>
-  
-  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
-    <DocumentationFile>bin/Release/Umbraco.Web.UI.xml</DocumentationFile>
-  </PropertyGroup>
-  
-  <PropertyGroup>
+    <!-- Razor files are needed for the backoffice to work correctly -->
     <CopyRazorGenerateFilesToPublishDirectory>true</CopyRazorGenerateFilesToPublishDirectory>
   </PropertyGroup>
-  
-  <ItemGroup>
-    <ProjectReference Include="..\Umbraco.PublishedCache.NuCache\Umbraco.PublishedCache.NuCache.csproj" />
-    <ProjectReference Include="..\Umbraco.Web.BackOffice\Umbraco.Web.BackOffice.csproj" />
-    <ProjectReference Include="..\Umbraco.Web.Common\Umbraco.Web.Common.csproj" />
-    <ProjectReference Include="..\Umbraco.Web.Website\Umbraco.Web.Website.csproj" />
-    <ProjectReference Include="..\Umbraco.Cms.Persistence.Sqlite\Umbraco.Cms.Persistence.Sqlite.csproj" />
-    <ProjectReference Include="..\Umbraco.Cms.Persistence.SqlServer\Umbraco.Cms.Persistence.SqlServer.csproj" />
-    <ProjectReference Include="../Umbraco.PublishedCache.NuCache/Umbraco.PublishedCache.NuCache.csproj" />
-    <ProjectReference Include="../Umbraco.Web.BackOffice/Umbraco.Web.BackOffice.csproj" />
-    <ProjectReference Include="../Umbraco.Web.Common/Umbraco.Web.Common.csproj" />
-    <ProjectReference Include="../Umbraco.Web.Website/Umbraco.Web.Website.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.ICU.ICU4C.Runtime" Version="68.2.0.9" />
-    <RuntimeHostConfigurationOption Condition="$(RuntimeIdentifier.StartsWith('linux')) Or $(RuntimeIdentifier.StartsWith('win')) Or ('$(RuntimeIdentifier)' == '' And !$([MSBuild]::IsOSPlatform('osx')))" Include="System.Globalization.AppLocalIcu" Value="68.2.0.9" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.4" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Umbraco.Code" Version="2.0.0">
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-    <_ContentIncludedByDefault Remove="wwwroot\umbraco\views\common\infiniteeditors\twofactor\enabletwofactor.html" />
-  </ItemGroup>
 
   <PropertyGroup>
+    <!-- Remove RazorCompileOnBuild and RazorCompileOnPublish when not using ModelsMode InMemoryAuto -->
     <RazorCompileOnBuild>false</RazorCompileOnBuild>
     <RazorCompileOnPublish>false</RazorCompileOnPublish>
-    <UseRazorSourceGenerator>false</UseRazorSourceGenerator> <!-- Disabling the Razor source generators in .NET 6 -->
   </PropertyGroup>
 
   <PropertyGroup>
-    <BellePath>$(ProjectDir)wwwroot/umbraco</BellePath>
-    <JsonSchemaPath>$(ProjectDir)umbraco/config/appsettings-schema.json</JsonSchemaPath>
+    <JsonSchemaPath>$(ProjectDir)appsettings-schema.json</JsonSchemaPath>
+    <JsonSchemaProjectPath>$(ProjectDir)../JsonSchema/JsonSchema.csproj</JsonSchemaProjectPath>
   </PropertyGroup>
-  
+
   <Target Name="CheckPreconditions" BeforeTargets="Build">
     <Message Text="-CheckPreconditions-" Importance="high" />
     <Message Text="JsonSchemaPath:  $(JsonSchemaPath)" Importance="high" />
-    <Message Text="BellePath:       $(BellePath)" Importance="high" />
-
-    <!-- Build Belle, if building is Visual Studio and the build folder does not exist yet -->
-    <Message Text="Skip Belle because UmbracoBuild is '$(UmbracoBuild)' (this is not Visual Studio)." Importance="High" Condition="'$(UmbracoBuild)' != ''" />
-    <Message Text="Skip Belle because $(BellePath) exists." Importance="High" Condition="Exists('$(BellePath)')" />
-    <Message Text="Build Belle because UmbracoBuild is empty (this is Visual Studio), and $(BellePath) does not exist." Importance="High" Condition="!Exists('$(BellePath)') and '$(UmbracoBuild)' == ''" />
-    <CallTarget Targets="BelleBuild" Condition="!Exists('$(BellePath)') and '$(UmbracoBuild)' == ''" />
-    <Message Text="Skip JsonSchema generation because $(JsonSchemaPath) exists." Importance="High" Condition="Exists('$(JsonSchemaPath)')" />
-    <Message Text="Generate the appsettings json schema." Importance="High" Condition="!Exists('$(JsonSchemaPath)') and '$(UmbracoBuild)' == ''" />
     <CallTarget Targets="JsonSchemaBuild" Condition="!Exists('$(JsonSchemaPath)') and '$(UmbracoBuild)' == ''" />
     <CallTarget Targets="AppsettingsBuild" Condition="!Exists('appsettings.json')" />
     <CallTarget Targets="AppsettingsDevBuild" Condition="!Exists('appsettings.Development.json')" />
   </Target>
-  
-  <Target Name="BelleBuild">
-    <Exec WorkingDirectory="$(ProjectDir)/../Umbraco.Web.UI.Client/" Command="npm ci --no-fund --no-audit --prefer-offline" />
-    <Exec WorkingDirectory="$(ProjectDir)/../Umbraco.Web.UI.Client/" Command="npm run build:skip-tests" />
-  </Target>
-  
+
   <Target Name="JsonSchemaBuild">
-    <!-- <Exec WorkingDirectory="$(ProjectDir)/../../" Command="powershell -ExecutionPolicy RemoteSigned -Command '&amp;dotnet run &#45;&#45;project $pwd/src/JsonSchema/JsonSchema.csproj -c Release &#45;&#45; &#45;&#45;outputFile $pwd/src/Umbraco.Web.UI/$(JsonSchemaPath)'" /> -->
+    <Exec Command="dotnet run -c Release --project $(JsonSchemaProjectPath) -o &quot;$(ProjectDir)appsettings-schema.json&quot;" />
   </Target>
-  
+
   <Target Name="AppsettingsBuild">
-     <Message Text="Generating appsettings.json because it doesnt exist" Importance="High" />
-     <Copy SourceFiles="$(Projectdir)/appsettings.template.json" DestinationFiles="$(ProjectDir)/appsettings.json" />
+    <Message Text="Generating appsettings.json because it doesnt exist" Importance="High" />
+    <Copy SourceFiles="$(Projectdir)/appsettings.template.json" DestinationFiles="$(ProjectDir)/appsettings.json" />
   </Target>
-  
+
   <Target Name="AppsettingsDevBuild">
     <Message Text="Generating appsettings.Development.json because it doesnt exist" Importance="High" />
     <Copy SourceFiles="$(ProjectDir)appsettings.Development.template.json" DestinationFiles="$(ProjectDir)appsettings.Development.json" />
   </Target>
-
-  <!-- Clean Belle when cleaning and rebuilding, but only in Visual Studio -->
-  <Target Name="CleanPreconditions" AfterTargets="Clean" Condition="'$(UmbracoBuild)' == ''">
-    <Message Text="-CleanPreconditions-" Importance="high" />
-    <Message Text="Nothing to clean, as $(BellePath) does not exist." Importance="High" Condition="!Exists('$(BellePath)')" />
-    <Message Text="Not cleaning (found src/preserve.belle)." Importance="High" Condition="Exists('$(BellePath)') and Exists('$(SolutionDir)preserve.belle')" />
-    <Message Text="Remove $(BellePath)." Importance="High" Condition="Exists('$(BellePath)') and !Exists('$(SolutionDir)preserve.belle')" />
-    <ItemGroup>
-      <BelleLib Include="$(BellePath)" />
-    </ItemGroup>
-    <RemoveDir Directories="@(BelleLib)" Condition="Exists('$(BellePath)') and !Exists('$(SolutionDir)preserve.belle')" />
-    <Message Text="Remove $(JsonSchemaPath)." Importance="High" Condition="Exists('$(JsonSchemaPath)') and !Exists('$(SolutionDir)preserve.jsonschema')" />
-    <Delete Files="$(JsonSchemaPath)" Condition="Exists('$(JsonSchemaPath)') and !Exists('$(SolutionDir)preserve.jsonschema')" />
-  </Target>
- 
 </Project>

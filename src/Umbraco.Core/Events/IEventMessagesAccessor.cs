@@ -1,7 +1,6 @@
-﻿namespace Umbraco.Cms.Core.Events
+namespace Umbraco.Cms.Core.Events;
+
+public interface IEventMessagesAccessor
 {
-    public interface IEventMessagesAccessor
-    {
-        EventMessages EventMessages { get; set; }
-    }
+    EventMessages? EventMessages { get; set; }
 }

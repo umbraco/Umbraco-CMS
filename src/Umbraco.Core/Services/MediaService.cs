@@ -1,12 +1,9 @@
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
-using System.Linq;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Querying;
@@ -33,9 +30,16 @@ namespace Umbraco.Cms.Core.Services
 
         #region Constructors
 
-        public MediaService(IScopeProvider provider, MediaFileManager mediaFileManager, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory,
-            IMediaRepository mediaRepository, IAuditRepository auditRepository, IMediaTypeRepository mediaTypeRepository,
-            IEntityRepository entityRepository, IShortStringHelper shortStringHelper)
+        public MediaService(
+            ICoreScopeProvider provider,
+            MediaFileManager mediaFileManager,
+            ILoggerFactory loggerFactory,
+            IEventMessagesFactory eventMessagesFactory,
+            IMediaRepository mediaRepository,
+            IAuditRepository auditRepository,
+            IMediaTypeRepository mediaTypeRepository,
+            IEntityRepository entityRepository,
+            IShortStringHelper shortStringHelper)
             : base(provider, loggerFactory, eventMessagesFactory)
         {
             _mediaFileManager = mediaFileManager;
@@ -50,52 +54,53 @@ namespace Umbraco.Cms.Core.Services
 
         #region Count
 
-        public int Count(string mediaTypeAlias = null)
+        public int Count(string? mediaTypeAlias = null)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                scope.ReadLock(Cms.Core.Constants.Locks.MediaTree);
-                return _mediaRepository.Count(mediaTypeAlias);
-            }
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            scope.ReadLock(Constants.Locks.MediaTree);
+            return _mediaRepository.Count(mediaTypeAlias);
         }
 
-        public int CountNotTrashed(string mediaTypeAlias = null)
+        public int CountNotTrashed(string? mediaTypeAlias = null)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                scope.ReadLock(Cms.Core.Constants.Locks.MediaTree);
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            scope.ReadLock(Constants.Locks.MediaTree);
 
-                var mediaTypeId = 0;
-                if (string.IsNullOrWhiteSpace(mediaTypeAlias) == false)
+            var mediaTypeId = 0;
+            if (string.IsNullOrWhiteSpace(mediaTypeAlias) == false)
+            {
+                IMediaType? mediaType = _mediaTypeRepository.Get(mediaTypeAlias);
+                if (mediaType == null)
                 {
-                    var mediaType = _mediaTypeRepository.Get(mediaTypeAlias);
-                    if (mediaType == null) return 0;
-                    mediaTypeId = mediaType.Id;
+                    return 0;
                 }
 
-                var query = Query<IMedia>().Where(x => x.Trashed == false);
-                if (mediaTypeId > 0)
-                    query = query.Where(x => x.ContentTypeId == mediaTypeId);
-                return _mediaRepository.Count(query);
+                mediaTypeId = mediaType.Id;
             }
+
+            IQuery<IMedia> query = Query<IMedia>().Where(x => x.Trashed == false);
+            if (mediaTypeId > 0)
+            {
+                query = query.Where(x => x.ContentTypeId == mediaTypeId);
+            }
+
+            return _mediaRepository.Count(query);
         }
 
-        public int CountChildren(int parentId, string mediaTypeAlias = null)
+        public int CountChildren(int parentId, string? mediaTypeAlias = null)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
-                scope.ReadLock(Cms.Core.Constants.Locks.MediaTree);
+                scope.ReadLock(Constants.Locks.MediaTree);
                 return _mediaRepository.CountChildren(parentId, mediaTypeAlias);
             }
         }
 
-        public int CountDescendants(int parentId, string mediaTypeAlias = null)
+        public int CountDescendants(int parentId, string? mediaTypeAlias = null)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                scope.ReadLock(Cms.Core.Constants.Locks.MediaTree);
-                return _mediaRepository.CountDescendants(parentId, mediaTypeAlias);
-            }
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            scope.ReadLock(Constants.Locks.MediaTree);
+            return _mediaRepository.CountDescendants(parentId, mediaTypeAlias);
         }
 
         #endregion
@@ -116,9 +121,9 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="mediaTypeAlias">Alias of the <see cref="IMediaType"/></param>
         /// <param name="userId">Optional id of the user creating the media item</param>
         /// <returns><see cref="IMedia"/></returns>
-        public IMedia CreateMedia(string name, Guid parentId, string mediaTypeAlias, int userId = Cms.Core.Constants.Security.SuperUserId)
+        public IMedia CreateMedia(string name, Guid parentId, string mediaTypeAlias, int userId = Constants.Security.SuperUserId)
         {
-            var parent = GetById(parentId);
+            IMedia? parent = GetById(parentId);
             return CreateMedia(name, parent, mediaTypeAlias, userId);
         }
 
@@ -134,25 +139,29 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="mediaTypeAlias">The alias of the media type.</param>
         /// <param name="userId">The optional id of the user creating the media.</param>
         /// <returns>The media object.</returns>
-        public IMedia CreateMedia(string name, int parentId, string mediaTypeAlias, int userId = Cms.Core.Constants.Security.SuperUserId)
+        public IMedia CreateMedia(string? name, int parentId, string mediaTypeAlias, int userId = Constants.Security.SuperUserId)
         {
-            var mediaType = GetMediaType(mediaTypeAlias);
+            IMediaType? mediaType = GetMediaType(mediaTypeAlias);
             if (mediaType == null)
+            {
                 throw new ArgumentException("No media type with that alias.", nameof(mediaTypeAlias));
-            var parent = parentId > 0 ? GetById(parentId) : null;
+            }
+
+            IMedia? parent = parentId > 0 ? GetById(parentId) : null;
             if (parentId > 0 && parent == null)
+            {
                 throw new ArgumentException("No media with that id.", nameof(parentId));
+            }
+
             if (name != null && name.Length > 255)
             {
-                throw new InvalidOperationException("Name cannot be more than 255 characters in length."); throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
+                throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
             }
 
             var media = new Core.Models.Media(name, parentId, mediaType);
-            using (var scope = ScopeProvider.CreateScope())
-            {
-                CreateMedia(scope, media, parent, userId, false);
-                scope.Complete();
-            }
+            using ICoreScope scope = ScopeProvider.CreateCoreScope();
+            CreateMedia(scope, media, parent!, userId, false);
+            scope.Complete();
 
             return media;
         }
@@ -168,24 +177,25 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="mediaTypeAlias">The alias of the media type.</param>
         /// <param name="userId">The optional id of the user creating the media.</param>
         /// <returns>The media object.</returns>
-        public IMedia CreateMedia(string name, string mediaTypeAlias, int userId = Cms.Core.Constants.Security.SuperUserId)
+        public IMedia CreateMedia(string name, string mediaTypeAlias, int userId = Constants.Security.SuperUserId)
         {
             // not locking since not saving anything
 
-            var mediaType = GetMediaType(mediaTypeAlias);
+            IMediaType? mediaType = GetMediaType(mediaTypeAlias);
             if (mediaType == null)
+            {
                 throw new ArgumentException("No media type with that alias.", nameof(mediaTypeAlias));
+            }
+
             if (name != null && name.Length > 255)
             {
-                throw new InvalidOperationException("Name cannot be more than 255 characters in length."); throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
+                throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
             }
 
             var media = new Core.Models.Media(name, -1, mediaType);
-            using (var scope = ScopeProvider.CreateScope())
-            {
-                CreateMedia(scope, media, null, userId, false);
-                scope.Complete();
-            }
+            using ICoreScope scope = ScopeProvider.CreateCoreScope();
+            CreateMedia(scope, media, null, userId, false);
+            scope.Complete();
 
             return media;
         }
@@ -202,28 +212,32 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="mediaTypeAlias">The alias of the media type.</param>
         /// <param name="userId">The optional id of the user creating the media.</param>
         /// <returns>The media object.</returns>
-        public IMedia CreateMedia(string name, IMedia parent, string mediaTypeAlias, int userId = Cms.Core.Constants.Security.SuperUserId)
+        public IMedia CreateMedia(string name, IMedia? parent, string mediaTypeAlias, int userId = Constants.Security.SuperUserId)
         {
-            if (parent == null) throw new ArgumentNullException(nameof(parent));
-
-            using (var scope = ScopeProvider.CreateScope())
+            if (parent == null)
             {
-                // not locking since not saving anything
-
-                var mediaType = GetMediaType(mediaTypeAlias);
-                if (mediaType == null)
-                    throw new ArgumentException("No media type with that alias.", nameof(mediaTypeAlias)); // causes rollback
-                if (name != null && name.Length > 255)
-                {
-                    throw new InvalidOperationException("Name cannot be more than 255 characters in length."); throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
-                }
-
-                var media = new Core.Models.Media(name, parent, mediaType);
-                CreateMedia(scope, media, parent, userId, false);
-
-                scope.Complete();
-                return media;
+                throw new ArgumentNullException(nameof(parent));
             }
+
+            using ICoreScope scope = ScopeProvider.CreateCoreScope();
+            // not locking since not saving anything
+
+            IMediaType? mediaType = GetMediaType(mediaTypeAlias);
+            if (mediaType == null)
+            {
+                throw new ArgumentException("No media type with that alias.", nameof(mediaTypeAlias)); // causes rollback
+            }
+
+            if (name != null && name.Length > 255)
+            {
+                throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
+            }
+
+            var media = new Core.Models.Media(name, parent, mediaType);
+            CreateMedia(scope, media, parent, userId, false);
+
+            scope.Complete();
+            return media;
         }
 
         /// <summary>
@@ -235,27 +249,29 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="mediaTypeAlias">The alias of the media type.</param>
         /// <param name="userId">The optional id of the user creating the media.</param>
         /// <returns>The media object.</returns>
-        public IMedia CreateMediaWithIdentity(string name, int parentId, string mediaTypeAlias, int userId = Cms.Core.Constants.Security.SuperUserId)
+        public IMedia CreateMediaWithIdentity(string name, int parentId, string mediaTypeAlias, int userId = Constants.Security.SuperUserId)
         {
-            using (var scope = ScopeProvider.CreateScope())
+            using ICoreScope scope = ScopeProvider.CreateCoreScope();
+            // locking the media tree secures media types too
+            scope.WriteLock(Constants.Locks.MediaTree);
+
+            IMediaType? mediaType = GetMediaType(mediaTypeAlias); // + locks
+            if (mediaType == null)
             {
-                // locking the media tree secures media types too
-                scope.WriteLock(Cms.Core.Constants.Locks.MediaTree);
-
-                var mediaType = GetMediaType(mediaTypeAlias); // + locks
-                if (mediaType == null)
-                    throw new ArgumentException("No media type with that alias.", nameof(mediaTypeAlias)); // causes rollback
-
-                var parent = parentId > 0 ? GetById(parentId) : null; // + locks
-                if (parentId > 0 && parent == null)
-                    throw new ArgumentException("No media with that id.", nameof(parentId)); // causes rollback
-
-                var media = parentId > 0 ? new Core.Models.Media(name, parent, mediaType) : new Core.Models.Media(name, parentId, mediaType);
-                CreateMedia(scope, media, parent, userId, true);
-
-                scope.Complete();
-                return media;
+                throw new ArgumentException("No media type with that alias.", nameof(mediaTypeAlias)); // causes rollback
             }
+
+            IMedia? parent = parentId > 0 ? GetById(parentId) : null; // + locks
+            if (parentId > 0 && parent == null)
+            {
+                throw new ArgumentException("No media with that id.", nameof(parentId)); // causes rollback
+            }
+
+            Models.Media media = parentId > 0 ? new Core.Models.Media(name, parent, mediaType) : new Core.Models.Media(name, parentId, mediaType);
+            CreateMedia(scope, media, parent, userId, true);
+
+            scope.Complete();
+            return media;
         }
 
         /// <summary>
@@ -267,28 +283,31 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="mediaTypeAlias">The alias of the media type.</param>
         /// <param name="userId">The optional id of the user creating the media.</param>
         /// <returns>The media object.</returns>
-        public IMedia CreateMediaWithIdentity(string name, IMedia parent, string mediaTypeAlias, int userId = Cms.Core.Constants.Security.SuperUserId)
+        public IMedia CreateMediaWithIdentity(string name, IMedia parent, string mediaTypeAlias, int userId = Constants.Security.SuperUserId)
         {
-            if (parent == null) throw new ArgumentNullException(nameof(parent));
-
-            using (var scope = ScopeProvider.CreateScope())
+            if (parent == null)
             {
-                // locking the media tree secures media types too
-                scope.WriteLock(Cms.Core.Constants.Locks.MediaTree);
-
-                var mediaType = GetMediaType(mediaTypeAlias); // + locks
-                if (mediaType == null)
-                    throw new ArgumentException("No media type with that alias.", nameof(mediaTypeAlias)); // causes rollback
-
-                var media = new Core.Models.Media(name, parent, mediaType);
-                CreateMedia(scope, media, parent, userId, true);
-
-                scope.Complete();
-                return media;
+                throw new ArgumentNullException(nameof(parent));
             }
+
+            using ICoreScope scope = ScopeProvider.CreateCoreScope();
+            // locking the media tree secures media types too
+            scope.WriteLock(Constants.Locks.MediaTree);
+
+            IMediaType? mediaType = GetMediaType(mediaTypeAlias); // + locks
+            if (mediaType == null)
+            {
+                throw new ArgumentException("No media type with that alias.", nameof(mediaTypeAlias)); // causes rollback
+            }
+
+            var media = new Core.Models.Media(name, parent, mediaType);
+            CreateMedia(scope, media, parent, userId, true);
+
+            scope.Complete();
+            return media;
         }
 
-        private void CreateMedia(IScope scope, Core.Models.Media media, IMedia parent, int userId, bool withIdentity)
+        private void CreateMedia(ICoreScope scope, Core.Models.Media media, IMedia? parent, int userId, bool withIdentity)
         {
             EventMessages eventMessages = EventMessagesFactory.Get();
 
@@ -309,7 +328,9 @@ namespace Umbraco.Cms.Core.Services
             }
 
             if (withIdentity == false)
+            {
                 return;
+            }
 
             Audit(AuditType.New, media.CreatorId, media.Id, $"Media '{media.Name}' was created with Id {media.Id}");
         }
@@ -323,13 +344,11 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="id">Id of the Media to retrieve</param>
         /// <returns><see cref="IMedia"/></returns>
-        public IMedia GetById(int id)
+        public IMedia? GetById(int id)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                scope.ReadLock(Cms.Core.Constants.Locks.MediaTree);
-                return _mediaRepository.Get(id);
-            }
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            scope.ReadLock(Constants.Locks.MediaTree);
+            return _mediaRepository.Get(id);
         }
 
         /// <summary>
@@ -340,13 +359,14 @@ namespace Umbraco.Cms.Core.Services
         public IEnumerable<IMedia> GetByIds(IEnumerable<int> ids)
         {
             var idsA = ids.ToArray();
-            if (idsA.Length == 0) return Enumerable.Empty<IMedia>();
-
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            if (idsA.Length == 0)
             {
-                scope.ReadLock(Cms.Core.Constants.Locks.MediaTree);
-                return _mediaRepository.GetMany(idsA);
+                return Enumerable.Empty<IMedia>();
             }
+
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            scope.ReadLock(Constants.Locks.MediaTree);
+            return _mediaRepository.GetMany(idsA);
         }
 
         /// <summary>
@@ -354,13 +374,11 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="key">Guid key of the Media to retrieve</param>
         /// <returns><see cref="IMedia"/></returns>
-        public IMedia GetById(Guid key)
+        public IMedia? GetById(Guid key)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                scope.ReadLock(Cms.Core.Constants.Locks.MediaTree);
-                return _mediaRepository.Get(key);
-            }
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            scope.ReadLock(Constants.Locks.MediaTree);
+            return _mediaRepository.Get(key);
         }
 
         /// <summary>
@@ -370,50 +388,62 @@ namespace Umbraco.Cms.Core.Services
         /// <returns><see cref="IMedia"/></returns>
         public IEnumerable<IMedia> GetByIds(IEnumerable<Guid> ids)
         {
-            var idsA = ids.ToArray();
-            if (idsA.Length == 0) return Enumerable.Empty<IMedia>();
-
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            Guid[] idsA = ids.ToArray();
+            if (idsA.Length == 0)
             {
-                scope.ReadLock(Cms.Core.Constants.Locks.MediaTree);
-                return _mediaRepository.GetMany(idsA);
+                return Enumerable.Empty<IMedia>();
             }
+
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            scope.ReadLock(Constants.Locks.MediaTree);
+            return _mediaRepository.GetMany(idsA);
         }
 
         /// <inheritdoc />
-        public IEnumerable<IMedia> GetPagedOfType(int contentTypeId, long pageIndex, int pageSize, out long totalRecords, IQuery<IMedia> filter = null, Ordering ordering = null)
+        public IEnumerable<IMedia> GetPagedOfType(int contentTypeId, long pageIndex, int pageSize, out long totalRecords, IQuery<IMedia>? filter = null, Ordering? ordering = null)
         {
-            if (pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
-            if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
+            if (pageIndex < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(pageIndex));
+            }
+
+            if (pageSize <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(pageSize));
+            }
 
             if (ordering == null)
-                ordering = Ordering.By("sortOrder");
-
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                scope.ReadLock(Cms.Core.Constants.Locks.ContentTree);
-                return _mediaRepository.GetPage(
-                    Query<IMedia>().Where(x => x.ContentTypeId == contentTypeId),
-                    pageIndex, pageSize, out totalRecords, filter, ordering);
+                ordering = Ordering.By("sortOrder");
             }
+
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            scope.ReadLock(Constants.Locks.ContentTree);
+            return _mediaRepository.GetPage(Query<IMedia>()?.Where(x => x.ContentTypeId == contentTypeId), pageIndex, pageSize, out totalRecords, filter, ordering);
         }
 
         /// <inheritdoc />
-        public IEnumerable<IMedia> GetPagedOfTypes(int[] contentTypeIds, long pageIndex, int pageSize, out long totalRecords, IQuery<IMedia> filter = null, Ordering ordering = null)
+        public IEnumerable<IMedia> GetPagedOfTypes(int[] contentTypeIds, long pageIndex, int pageSize, out long totalRecords, IQuery<IMedia>? filter = null, Ordering? ordering = null)
         {
-            if (pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
-            if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
+            if (pageIndex < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(pageIndex));
+            }
+
+            if (pageSize <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(pageSize));
+            }
 
             if (ordering == null)
-                ordering = Ordering.By("sortOrder");
-
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                scope.ReadLock(Cms.Core.Constants.Locks.ContentTree);
-                return _mediaRepository.GetPage(
-                    Query<IMedia>().Where(x => contentTypeIds.Contains(x.ContentTypeId)),
-                    pageIndex, pageSize, out totalRecords, filter, ordering);
+                ordering = Ordering.By("sortOrder");
             }
+
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            scope.ReadLock(Constants.Locks.ContentTree);
+            return _mediaRepository.GetPage(
+                Query<IMedia>()?.Where(x => contentTypeIds.Contains(x.ContentTypeId)), pageIndex, pageSize, out totalRecords, filter, ordering);
         }
 
         /// <summary>
@@ -422,14 +452,12 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="level">The level to retrieve Media from</param>
         /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
         /// <remarks>Contrary to most methods, this method filters out trashed media items.</remarks>
-        public IEnumerable<IMedia> GetByLevel(int level)
+        public IEnumerable<IMedia>? GetByLevel(int level)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                scope.ReadLock(Cms.Core.Constants.Locks.MediaTree);
-                var query = Query<IMedia>().Where(x => x.Level == level && x.Trashed == false);
-                return _mediaRepository.Get(query);
-            }
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            scope.ReadLock(Constants.Locks.MediaTree);
+            IQuery<IMedia> query = Query<IMedia>().Where(x => x.Level == level && x.Trashed == false);
+            return _mediaRepository.Get(query);
         }
 
         /// <summary>
@@ -437,13 +465,11 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="versionId">Id of the version to retrieve</param>
         /// <returns>An <see cref="IMedia"/> item</returns>
-        public IMedia GetVersion(int versionId)
+        public IMedia? GetVersion(int versionId)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                scope.ReadLock(Cms.Core.Constants.Locks.MediaTree);
-                return _mediaRepository.GetVersion(versionId);
-            }
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            scope.ReadLock(Constants.Locks.MediaTree);
+            return _mediaRepository.GetVersion(versionId);
         }
 
         /// <summary>
@@ -453,11 +479,9 @@ namespace Umbraco.Cms.Core.Services
         /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
         public IEnumerable<IMedia> GetVersions(int id)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                scope.ReadLock(Cms.Core.Constants.Locks.MediaTree);
-                return _mediaRepository.GetAllVersions(id);
-            }
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            scope.ReadLock(Constants.Locks.MediaTree);
+            return _mediaRepository.GetAllVersions(id);
         }
 
         /// <summary>
@@ -468,7 +492,7 @@ namespace Umbraco.Cms.Core.Services
         public IEnumerable<IMedia> GetAncestors(int id)
         {
             // intentionally not locking
-            var media = GetById(id);
+            IMedia? media = GetById(id);
             return GetAncestors(media);
         }
 
@@ -477,85 +501,108 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="media"><see cref="IMedia"/> to retrieve ancestors for</param>
         /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
-        public IEnumerable<IMedia> GetAncestors(IMedia media)
+        public IEnumerable<IMedia> GetAncestors(IMedia? media)
         {
             //null check otherwise we get exceptions
-            if (media.Path.IsNullOrWhiteSpace()) return Enumerable.Empty<IMedia>();
+            if (media is null || media.Path.IsNullOrWhiteSpace())
+            {
+                return Enumerable.Empty<IMedia>();
+            }
 
-            var rootId = Cms.Core.Constants.System.RootString;
+            var rootId = Constants.System.RootString;
             var ids = media.Path.Split(Constants.CharArrays.Comma)
                 .Where(x => x != rootId && x != media.Id.ToString(CultureInfo.InvariantCulture))
                 .Select(s => int.Parse(s, CultureInfo.InvariantCulture))
                 .ToArray();
             if (ids.Any() == false)
+            {
                 return new List<IMedia>();
-
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                scope.ReadLock(Cms.Core.Constants.Locks.MediaTree);
-                return _mediaRepository.GetMany(ids);
             }
+
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            scope.ReadLock(Constants.Locks.MediaTree);
+            return _mediaRepository.GetMany(ids);
         }
 
         /// <inheritdoc />
-        public IEnumerable<IMedia> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalChildren,
-            IQuery<IMedia> filter = null, Ordering ordering = null)
+        public IEnumerable<IMedia> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalChildren, IQuery<IMedia>? filter = null, Ordering? ordering = null)
         {
-            if (pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
-            if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
+            if (pageIndex < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(pageIndex));
+            }
+
+            if (pageSize <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(pageSize));
+            }
 
             if (ordering == null)
+            {
                 ordering = Ordering.By("sortOrder");
-
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                scope.ReadLock(Cms.Core.Constants.Locks.MediaTree);
-
-                var query = Query<IMedia>().Where(x => x.ParentId == id);
-                return _mediaRepository.GetPage(query, pageIndex, pageSize, out totalChildren, filter, ordering);
             }
+
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            scope.ReadLock(Constants.Locks.MediaTree);
+
+            IQuery<IMedia>? query = Query<IMedia>()?.Where(x => x.ParentId == id);
+            return _mediaRepository.GetPage(query, pageIndex, pageSize, out totalChildren, filter, ordering);
         }
 
         /// <inheritdoc />
-        public IEnumerable<IMedia> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalChildren,
-            IQuery<IMedia> filter = null, Ordering ordering = null)
+        public IEnumerable<IMedia> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalChildren, IQuery<IMedia>? filter = null, Ordering? ordering = null)
         {
             if (ordering == null)
-                ordering = Ordering.By("Path");
-
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                scope.ReadLock(Cms.Core.Constants.Locks.MediaTree);
-
-                //if the id is System Root, then just get all
-                if (id != Cms.Core.Constants.System.Root)
-                {
-                    var mediaPath = _entityRepository.GetAllPaths(Cms.Core.Constants.ObjectTypes.Media, id).ToArray();
-                    if (mediaPath.Length == 0)
-                    {
-                        totalChildren = 0;
-                        return Enumerable.Empty<IMedia>();
-                    }
-                    return GetPagedLocked(GetPagedDescendantQuery(mediaPath[0].Path), pageIndex, pageSize, out totalChildren, filter, ordering);
-                }
-                return GetPagedLocked(GetPagedDescendantQuery(null), pageIndex, pageSize, out totalChildren, filter, ordering);
+                ordering = Ordering.By("Path");
             }
+
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            scope.ReadLock(Constants.Locks.MediaTree);
+
+            //if the id is System Root, then just get all
+            if (id != Constants.System.Root)
+            {
+                TreeEntityPath[] mediaPath = _entityRepository.GetAllPaths(Constants.ObjectTypes.Media, id).ToArray();
+                if (mediaPath.Length == 0)
+                {
+                    totalChildren = 0;
+                    return Enumerable.Empty<IMedia>();
+                }
+
+                return GetPagedLocked(GetPagedDescendantQuery(mediaPath[0].Path), pageIndex, pageSize, out totalChildren, filter, ordering);
+            }
+
+            return GetPagedLocked(GetPagedDescendantQuery(null), pageIndex, pageSize, out totalChildren, filter, ordering);
         }
 
-        private IQuery<IMedia> GetPagedDescendantQuery(string mediaPath)
+        private IQuery<IMedia>? GetPagedDescendantQuery(string? mediaPath)
         {
-            var query = Query<IMedia>();
+            IQuery<IMedia>? query = Query<IMedia>();
             if (!mediaPath.IsNullOrWhiteSpace())
-                query.Where(x => x.Path.SqlStartsWith(mediaPath + ",", TextColumnType.NVarchar));
+            {
+                query?.Where(x => x.Path.SqlStartsWith(mediaPath + ",", TextColumnType.NVarchar));
+            }
+
             return query;
         }
 
-        private IEnumerable<IMedia> GetPagedLocked(IQuery<IMedia> query, long pageIndex, int pageSize, out long totalChildren,
-            IQuery<IMedia> filter, Ordering ordering)
+        private IEnumerable<IMedia> GetPagedLocked(IQuery<IMedia>? query, long pageIndex, int pageSize, out long totalChildren, IQuery<IMedia>? filter, Ordering ordering)
         {
-            if (pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
-            if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
-            if (ordering == null) throw new ArgumentNullException(nameof(ordering));
+            if (pageIndex < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(pageIndex));
+            }
+
+            if (pageSize <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(pageSize));
+            }
+
+            if (ordering == null)
+            {
+                throw new ArgumentNullException(nameof(ordering));
+            }
 
             return _mediaRepository.GetPage(query, pageIndex, pageSize, out totalChildren, filter, ordering);
         }
@@ -565,10 +612,10 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="id">Id of the <see cref="IMedia"/> to retrieve the parent from</param>
         /// <returns>Parent <see cref="IMedia"/> object</returns>
-        public IMedia GetParent(int id)
+        public IMedia? GetParent(int id)
         {
             // intentionally not locking
-            var media = GetById(id);
+            IMedia? media = GetById(id);
             return GetParent(media);
         }
 
@@ -577,12 +624,15 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="media"><see cref="IMedia"/> to retrieve the parent from</param>
         /// <returns>Parent <see cref="IMedia"/> object</returns>
-        public IMedia GetParent(IMedia media)
+        public IMedia? GetParent(IMedia? media)
         {
-            if (media.ParentId == Cms.Core.Constants.System.Root || media.ParentId == Cms.Core.Constants.System.RecycleBinMedia)
+            var parentId = media?.ParentId;
+            if (parentId is null || media?.ParentId == Constants.System.Root || media?.ParentId == Constants.System.RecycleBinMedia)
+            {
                 return null;
+            }
 
-            return GetById(media.ParentId);
+            return GetById(parentId.Value);
         }
 
         /// <summary>
@@ -591,27 +641,24 @@ namespace Umbraco.Cms.Core.Services
         /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
         public IEnumerable<IMedia> GetRootMedia()
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                scope.ReadLock(Cms.Core.Constants.Locks.MediaTree);
-                var query = Query<IMedia>().Where(x => x.ParentId == Cms.Core.Constants.System.Root);
-                return _mediaRepository.Get(query);
-            }
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            scope.ReadLock(Constants.Locks.MediaTree);
+            IQuery<IMedia> query = Query<IMedia>().Where(x => x.ParentId == Constants.System.Root);
+            return _mediaRepository.Get(query);
         }
 
         /// <inheritdoc />
-        public IEnumerable<IMedia> GetPagedMediaInRecycleBin(long pageIndex, int pageSize, out long totalRecords,
-            IQuery<IMedia> filter = null, Ordering ordering = null)
+        public IEnumerable<IMedia> GetPagedMediaInRecycleBin(long pageIndex, int pageSize, out long totalRecords, IQuery<IMedia>? filter = null, Ordering? ordering = null)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            if (ordering == null)
             {
-                if (ordering == null)
-                    ordering = Ordering.By("Path");
-
-                scope.ReadLock(Cms.Core.Constants.Locks.MediaTree);
-                var query = Query<IMedia>().Where(x => x.Path.StartsWith(Cms.Core.Constants.System.RecycleBinMediaPathPrefix));
-                return _mediaRepository.GetPage(query, pageIndex, pageSize, out totalRecords, filter, ordering);
+                ordering = Ordering.By("Path");
             }
+
+            scope.ReadLock(Constants.Locks.MediaTree);
+            IQuery<IMedia>? query = Query<IMedia>()?.Where(x => x.Path.StartsWith(Constants.System.RecycleBinMediaPathPrefix));
+            return _mediaRepository.GetPage(query, pageIndex, pageSize, out totalRecords, filter, ordering);
         }
 
         /// <summary>
@@ -621,12 +668,10 @@ namespace Umbraco.Cms.Core.Services
         /// <returns>True if the media has any children otherwise False</returns>
         public bool HasChildren(int id)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                var query = Query<IMedia>().Where(x => x.ParentId == id);
-                var count = _mediaRepository.Count(query);
-                return count > 0;
-            }
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            IQuery<IMedia> query = Query<IMedia>().Where(x => x.ParentId == id);
+            var count = _mediaRepository.Count(query);
+            return count > 0;
         }
 
         /// <summary>
@@ -634,9 +679,9 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="mediaPath">Path of the media item to retrieve (for example: /media/1024/koala_403x328.jpg)</param>
         /// <returns><see cref="IMedia"/></returns>
-        public IMedia GetMediaByPath(string mediaPath)
+        public IMedia? GetMediaByPath(string mediaPath)
         {
-            using (ScopeProvider.CreateScope(autoComplete: true))
+            using (ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _mediaRepository.GetMediaByPath(mediaPath);
             }
@@ -653,11 +698,11 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="media">The <see cref="IMedia"/> to save</param>
         /// <param name="userId">Id of the User saving the Media</param>
-        public Attempt<OperationResult> Save(IMedia media, int userId = Cms.Core.Constants.Security.SuperUserId)
+        public Attempt<OperationResult?> Save(IMedia media, int userId = Constants.Security.SuperUserId)
         {
             EventMessages eventMessages = EventMessagesFactory.Get();
 
-            using (IScope scope = ScopeProvider.CreateScope())
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
                 var savingNotification = new MediaSavingNotification(media, eventMessages);
                 if (scope.Notifications.PublishCancelable(savingNotification))
@@ -674,10 +719,10 @@ namespace Umbraco.Cms.Core.Services
 
                 if (media.Name != null && media.Name.Length > 255)
                 {
-                    throw new InvalidOperationException("Name cannot be more than 255 characters in length."); throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
+                    throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
                 }
 
-                scope.WriteLock(Cms.Core.Constants.Locks.MediaTree);
+                scope.WriteLock(Constants.Locks.MediaTree);
                 if (media.HasIdentity == false)
                 {
                     media.CreatorId = userId;
@@ -700,12 +745,12 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="medias">Collection of <see cref="IMedia"/> to save</param>
         /// <param name="userId">Id of the User saving the Media</param>
-        public Attempt<OperationResult> Save(IEnumerable<IMedia> medias, int userId = Cms.Core.Constants.Security.SuperUserId)
+        public Attempt<OperationResult?> Save(IEnumerable<IMedia> medias, int userId = Constants.Security.SuperUserId)
         {
             EventMessages messages = EventMessagesFactory.Get();
             IMedia[] mediasA = medias.ToArray();
 
-            using (IScope scope = ScopeProvider.CreateScope())
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
                 var savingNotification = new MediaSavingNotification(mediasA, messages);
                 if (scope.Notifications.PublishCancelable(savingNotification))
@@ -716,7 +761,7 @@ namespace Umbraco.Cms.Core.Services
 
                 IEnumerable<TreeChange<IMedia>> treeChanges = mediasA.Select(x => new TreeChange<IMedia>(x, TreeChangeTypes.RefreshNode));
 
-                scope.WriteLock(Cms.Core.Constants.Locks.MediaTree);
+                scope.WriteLock(Constants.Locks.MediaTree);
                 foreach (IMedia media in mediasA)
                 {
                     if (media.HasIdentity == false)
@@ -730,7 +775,7 @@ namespace Umbraco.Cms.Core.Services
                 scope.Notifications.Publish(new MediaSavedNotification(mediasA, messages).WithStateFrom(savingNotification));
                 // TODO: See note about suppressing events in content service
                 scope.Notifications.Publish(new MediaTreeChangeNotification(treeChanges, messages));
-                Audit(AuditType.Save, userId == -1 ? 0 : userId, Cms.Core.Constants.System.Root, "Bulk save media");
+                Audit(AuditType.Save, userId == -1 ? 0 : userId, Constants.System.Root, "Bulk save media");
 
                 scope.Complete();
             }
@@ -747,11 +792,11 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="media">The <see cref="IMedia"/> to delete</param>
         /// <param name="userId">Id of the User deleting the Media</param>
-        public Attempt<OperationResult> Delete(IMedia media, int userId = Cms.Core.Constants.Security.SuperUserId)
+        public Attempt<OperationResult?> Delete(IMedia media, int userId = Constants.Security.SuperUserId)
         {
             EventMessages messages = EventMessagesFactory.Get();
 
-            using (IScope scope = ScopeProvider.CreateScope())
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
                 if (scope.Notifications.PublishCancelable(new MediaDeletingNotification(media, messages)))
                 {
@@ -759,7 +804,7 @@ namespace Umbraco.Cms.Core.Services
                     return OperationResult.Attempt.Cancel(messages);
                 }
 
-                scope.WriteLock(Cms.Core.Constants.Locks.MediaTree);
+                scope.WriteLock(Constants.Locks.MediaTree);
 
                 DeleteLocked(scope, media, messages);
 
@@ -772,7 +817,7 @@ namespace Umbraco.Cms.Core.Services
             return OperationResult.Attempt.Succeed(messages);
         }
 
-        private void DeleteLocked(IScope scope, IMedia media, EventMessages evtMsgs)
+        private void DeleteLocked(ICoreScope scope, IMedia media, EventMessages evtMsgs)
         {
             void DoDelete(IMedia c)
             {
@@ -788,10 +833,13 @@ namespace Umbraco.Cms.Core.Services
             while (page * pageSize < total)
             {
                 //get descendants - ordered from deepest to shallowest
-                var descendants = GetPagedDescendants(media.Id, page, pageSize, out total, ordering: Ordering.By("Path", Direction.Descending));
-                foreach (var c in descendants)
+                IEnumerable<IMedia> descendants = GetPagedDescendants(media.Id, page, pageSize, out total, ordering: Ordering.By("Path", Direction.Descending));
+                foreach (IMedia c in descendants)
+                {
                     DoDelete(c);
+                }
             }
+
             DoDelete(media);
         }
 
@@ -807,18 +855,16 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="id">Id of the <see cref="IMedia"/> object to delete versions from</param>
         /// <param name="versionDate">Latest version date</param>
         /// <param name="userId">Optional Id of the User deleting versions of a Media object</param>
-        public void DeleteVersions(int id, DateTime versionDate, int userId = Cms.Core.Constants.Security.SuperUserId)
+        public void DeleteVersions(int id, DateTime versionDate, int userId = Constants.Security.SuperUserId)
         {
-            using (var scope = ScopeProvider.CreateScope())
-            {
-                DeleteVersions(scope, true, id, versionDate, userId);
-                scope.Complete();
-            }
+            using ICoreScope scope = ScopeProvider.CreateCoreScope();
+            DeleteVersions(scope, true, id, versionDate, userId);
+            scope.Complete();
         }
 
-        private void DeleteVersions(IScope scope, bool wlock, int id, DateTime versionDate, int userId = Cms.Core.Constants.Security.SuperUserId)
+        private void DeleteVersions(ICoreScope scope, bool wlock, int id, DateTime versionDate, int userId = Constants.Security.SuperUserId)
         {
-            var evtMsgs = EventMessagesFactory.Get();
+            EventMessages evtMsgs = EventMessagesFactory.Get();
 
             var deletingVersionsNotification = new MediaDeletingVersionsNotification(id, evtMsgs, dateToRetain: versionDate);
             if (scope.Notifications.PublishCancelable(deletingVersionsNotification))
@@ -827,11 +873,14 @@ namespace Umbraco.Cms.Core.Services
             }
 
             if (wlock)
-                scope.WriteLock(Cms.Core.Constants.Locks.MediaTree);
+            {
+                scope.WriteLock(Constants.Locks.MediaTree);
+            }
+
             _mediaRepository.DeleteVersions(id, versionDate);
 
             scope.Notifications.Publish(new MediaDeletedVersionsNotification(id, evtMsgs, dateToRetain: versionDate).WithStateFrom(deletingVersionsNotification));
-            Audit(AuditType.Delete, userId, Cms.Core.Constants.System.Root, "Delete Media by version date");
+            Audit(AuditType.Delete, userId, Constants.System.Root, "Delete Media by version date");
         }
 
         /// <summary>
@@ -842,36 +891,37 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="versionId">Id of the version to delete</param>
         /// <param name="deletePriorVersions">Boolean indicating whether to delete versions prior to the versionId</param>
         /// <param name="userId">Optional Id of the User deleting versions of a Media object</param>
-        public void DeleteVersion(int id, int versionId, bool deletePriorVersions, int userId = Cms.Core.Constants.Security.SuperUserId)
+        public void DeleteVersion(int id, int versionId, bool deletePriorVersions, int userId = Constants.Security.SuperUserId)
         {
-            var evtMsgs = EventMessagesFactory.Get();
+            EventMessages evtMsgs = EventMessagesFactory.Get();
 
-            using (IScope scope = ScopeProvider.CreateScope())
+            using ICoreScope scope = ScopeProvider.CreateCoreScope();
+            var deletingVersionsNotification = new MediaDeletingVersionsNotification(id, evtMsgs, specificVersion: versionId);
+            if (scope.Notifications.PublishCancelable(deletingVersionsNotification))
             {
-                var deletingVersionsNotification = new MediaDeletingVersionsNotification(id, evtMsgs, specificVersion: versionId);
-                if (scope.Notifications.PublishCancelable(deletingVersionsNotification))
-                {
-                    scope.Complete();
-                    return;
-                }
+                scope.Complete();
+                return;
+            }
 
-                if (deletePriorVersions)
+            if (deletePriorVersions)
+            {
+                IMedia? media = GetVersion(versionId);
+                if (media is not null)
                 {
-                    var media = GetVersion(versionId);
                     DeleteVersions(scope, true, id, media.UpdateDate, userId);
                 }
-                else
-                {
-                    scope.WriteLock(Cms.Core.Constants.Locks.MediaTree);
-                }
-
-                _mediaRepository.DeleteVersion(versionId);
-
-                scope.Notifications.Publish(new MediaDeletedVersionsNotification(id, evtMsgs, specificVersion: versionId).WithStateFrom(deletingVersionsNotification));
-                Audit(AuditType.Delete, userId, Cms.Core.Constants.System.Root, "Delete Media by version");
-
-                scope.Complete();
             }
+            else
+            {
+                scope.WriteLock(Constants.Locks.MediaTree);
+            }
+
+            _mediaRepository.DeleteVersion(versionId);
+
+            scope.Notifications.Publish(new MediaDeletedVersionsNotification(id, evtMsgs, specificVersion: versionId).WithStateFrom(deletingVersionsNotification));
+            Audit(AuditType.Delete, userId, Constants.System.Root, "Delete Media by version");
+
+            scope.Complete();
         }
 
         #endregion
@@ -883,21 +933,21 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="media">The <see cref="IMedia"/> to delete</param>
         /// <param name="userId">Id of the User deleting the Media</param>
-        public Attempt<OperationResult> MoveToRecycleBin(IMedia media, int userId = Cms.Core.Constants.Security.SuperUserId)
+        public Attempt<OperationResult?> MoveToRecycleBin(IMedia media, int userId = Constants.Security.SuperUserId)
         {
             EventMessages messages = EventMessagesFactory.Get();
             var moves = new List<(IMedia, string)>();
 
-            using (IScope scope = ScopeProvider.CreateScope())
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
-                scope.WriteLock(Cms.Core.Constants.Locks.MediaTree);
+                scope.WriteLock(Constants.Locks.MediaTree);
 
                 // TODO: missing 7.6 "ensure valid path" thing here?
                 // but then should be in PerformMoveLocked on every moved item?
 
                 var originalPath = media.Path;
 
-                var moveEventInfo = new MoveEventInfo<IMedia>(media, originalPath, Cms.Core.Constants.System.RecycleBinMedia);
+                var moveEventInfo = new MoveEventInfo<IMedia>(media, originalPath, Constants.System.RecycleBinMedia);
 
                 var movingToRecycleBinNotification = new MediaMovingToRecycleBinNotification(moveEventInfo, messages);
                 if (scope.Notifications.PublishCancelable(movingToRecycleBinNotification))
@@ -906,7 +956,7 @@ namespace Umbraco.Cms.Core.Services
                     return OperationResult.Attempt.Cancel(messages);
                 }
 
-                PerformMoveLocked(media, Cms.Core.Constants.System.RecycleBinMedia, null, userId, moves, true);
+                PerformMoveLocked(media, Constants.System.RecycleBinMedia, null, userId, moves, true);
 
                 scope.Notifications.Publish(new MediaTreeChangeNotification(media, TreeChangeTypes.RefreshBranch, messages));
                 MoveEventInfo<IMedia>[] moveInfo = moves.Select(x => new MoveEventInfo<IMedia>(x.Item1, x.Item2, x.Item1.ParentId)).ToArray();
@@ -925,12 +975,12 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="media">The <see cref="IMedia"/> to move</param>
         /// <param name="parentId">Id of the Media's new Parent</param>
         /// <param name="userId">Id of the User moving the Media</param>
-        public Attempt<OperationResult> Move(IMedia media, int parentId, int userId = Cms.Core.Constants.Security.SuperUserId)
+        public Attempt<OperationResult?> Move(IMedia media, int parentId, int userId = Constants.Security.SuperUserId)
         {
             EventMessages messages = EventMessagesFactory.Get();
 
             // if moving to the recycle bin then use the proper method
-            if (parentId == Cms.Core.Constants.System.RecycleBinMedia)
+            if (parentId == Constants.System.RecycleBinMedia)
             {
                 MoveToRecycleBin(media, userId);
                 return OperationResult.Attempt.Succeed(messages);
@@ -938,12 +988,12 @@ namespace Umbraco.Cms.Core.Services
 
             var moves = new List<(IMedia, string)>();
 
-            using (IScope scope = ScopeProvider.CreateScope())
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
-                scope.WriteLock(Cms.Core.Constants.Locks.MediaTree);
+                scope.WriteLock(Constants.Locks.MediaTree);
 
-                IMedia parent = parentId == Cms.Core.Constants.System.Root ? null : GetById(parentId);
-                if (parentId != Cms.Core.Constants.System.Root && (parent == null || parent.Trashed))
+                IMedia? parent = parentId == Constants.System.Root ? null : GetById(parentId);
+                if (parentId != Constants.System.Root && (parent == null || parent.Trashed))
                 {
                     throw new InvalidOperationException("Parent does not exist or is trashed."); // causes rollback
                 }
@@ -976,7 +1026,7 @@ namespace Umbraco.Cms.Core.Services
 
         // MUST be called from within WriteLock
         // trash indicates whether we are trashing, un-trashing, or not changing anything
-        private void PerformMoveLocked(IMedia media, int parentId, IMedia parent, int userId, ICollection<(IMedia, string)> moves, bool? trash)
+        private void PerformMoveLocked(IMedia media, int parentId, IMedia? parent, int userId, ICollection<(IMedia, string)> moves, bool? trash)
         {
             media.ParentId = parentId;
 
@@ -995,38 +1045,43 @@ namespace Umbraco.Cms.Core.Services
             //media.Path = (parent == null ? "-1" : parent.Path) + "," + media.Id;
             //media.SortOrder = ((MediaRepository) repository).NextChildSortOrder(parentId);
             //media.Level += levelDelta;
-            PerformMoveMediaLocked(media, userId, trash);
+            PerformMoveMediaLocked(media, trash);
 
             // if uow is not immediate, content.Path will be updated only when the UOW commits,
             // and because we want it now, we have to calculate it by ourselves
             //paths[media.Id] = media.Path;
-            paths[media.Id] = (parent == null ? (parentId == Cms.Core.Constants.System.RecycleBinMedia ? "-1,-21" : Cms.Core.Constants.System.RootString) : parent.Path) + "," + media.Id;
+            paths[media.Id] = (parent == null ? parentId == Constants.System.RecycleBinMedia ? "-1,-21" : Constants.System.RootString : parent.Path) + "," + media.Id;
 
             const int pageSize = 500;
-            var query = GetPagedDescendantQuery(originalPath);
+            IQuery<IMedia>? query = GetPagedDescendantQuery(originalPath);
             long total;
             do
             {
                 // We always page a page 0 because for each page, we are moving the result so the resulting total will be reduced
-                var descendants = GetPagedLocked(query, 0, pageSize, out total, null, Ordering.By("Path", Direction.Ascending));
+                IEnumerable<IMedia> descendants = GetPagedLocked(query, 0, pageSize, out total, null, Ordering.By("Path"));
 
-                foreach (var descendant in descendants)
+                foreach (IMedia descendant in descendants)
                 {
                     moves.Add((descendant, descendant.Path)); // capture original path
 
                     // update path and level since we do not update parentId
                     descendant.Path = paths[descendant.Id] = paths[descendant.ParentId] + "," + descendant.Id;
                     descendant.Level += levelDelta;
-                    PerformMoveMediaLocked(descendant, userId, trash);
+                    PerformMoveMediaLocked(descendant, trash);
                 }
 
-            } while (total > pageSize);
+            }
+            while (total > pageSize);
 
         }
 
-        private void PerformMoveMediaLocked(IMedia media, int userId, bool? trash)
+        private void PerformMoveMediaLocked(IMedia media, bool? trash)
         {
-            if (trash.HasValue) ((ContentBase)media).Trashed = trash.Value;
+            if (trash.HasValue)
+            {
+                ((ContentBase)media).Trashed = trash.Value;
+            }
+
             _mediaRepository.Save(media);
         }
 
@@ -1034,18 +1089,18 @@ namespace Umbraco.Cms.Core.Services
         /// Empties the Recycle Bin by deleting all <see cref="IMedia"/> that resides in the bin
         /// </summary>
         /// <param name="userId">Optional Id of the User emptying the Recycle Bin</param>
-        public OperationResult EmptyRecycleBin(int userId = Cms.Core.Constants.Security.SuperUserId)
+        public OperationResult EmptyRecycleBin(int userId = Constants.Security.SuperUserId)
         {
             var deleted = new List<IMedia>();
             EventMessages messages = EventMessagesFactory.Get(); // TODO: and then?
 
-            using (IScope scope = ScopeProvider.CreateScope())
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
-                scope.WriteLock(Cms.Core.Constants.Locks.MediaTree);
+                scope.WriteLock(Constants.Locks.MediaTree);
 
                 // emptying the recycle bin means deleting whatever is in there - do it properly!
-                IQuery<IMedia> query = Query<IMedia>().Where(x => x.ParentId == Cms.Core.Constants.System.RecycleBinMedia);
-                IMedia[] medias = _mediaRepository.Get(query).ToArray();
+                IQuery<IMedia>? query = Query<IMedia>().Where(x => x.ParentId == Constants.System.RecycleBinMedia);
+                IMedia[] medias = _mediaRepository.Get(query)?.ToArray() ?? Array.Empty<IMedia>();
 
                 var emptyingRecycleBinNotification = new MediaEmptyingRecycleBinNotification(medias, messages);
                 if (scope.Notifications.PublishCancelable(emptyingRecycleBinNotification))
@@ -1061,7 +1116,7 @@ namespace Umbraco.Cms.Core.Services
                 }
                 scope.Notifications.Publish(new MediaEmptiedRecycleBinNotification(deleted, new EventMessages()).WithStateFrom(emptyingRecycleBinNotification));
                 scope.Notifications.Publish(new MediaTreeChangeNotification(deleted, TreeChangeTypes.Remove, messages));
-                Audit(AuditType.Delete, userId, Cms.Core.Constants.System.RecycleBinMedia, "Empty Media recycle bin");
+                Audit(AuditType.Delete, userId, Constants.System.RecycleBinMedia, "Empty Media recycle bin");
                 scope.Complete();
             }
 
@@ -1070,11 +1125,9 @@ namespace Umbraco.Cms.Core.Services
 
         public bool RecycleBinSmells()
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                scope.ReadLock(Constants.Locks.MediaTree);
-                return _mediaRepository.RecycleBinSmells();
-            }
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            scope.ReadLock(Constants.Locks.MediaTree);
+            return _mediaRepository.RecycleBinSmells();
         }
 
         #endregion
@@ -1088,7 +1141,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="items"></param>
         /// <param name="userId"></param>
         /// <returns>True if sorting succeeded, otherwise False</returns>
-        public bool Sort(IEnumerable<IMedia> items, int userId = Cms.Core.Constants.Security.SuperUserId)
+        public bool Sort(IEnumerable<IMedia> items, int userId = Constants.Security.SuperUserId)
         {
             IMedia[] itemsA = items.ToArray();
             if (itemsA.Length == 0)
@@ -1098,7 +1151,7 @@ namespace Umbraco.Cms.Core.Services
 
             EventMessages messages = EventMessagesFactory.Get();
 
-            using (IScope scope = ScopeProvider.CreateScope())
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
                 var savingNotification = new MediaSavingNotification(itemsA, messages);
                 if (scope.Notifications.PublishCancelable(savingNotification))
@@ -1109,7 +1162,7 @@ namespace Umbraco.Cms.Core.Services
 
                 var saved = new List<IMedia>();
 
-                scope.WriteLock(Cms.Core.Constants.Locks.MediaTree);
+                scope.WriteLock(Constants.Locks.MediaTree);
                 var sortOrder = 0;
 
                 foreach (IMedia media in itemsA)
@@ -1142,9 +1195,9 @@ namespace Umbraco.Cms.Core.Services
 
         public ContentDataIntegrityReport CheckDataIntegrity(ContentDataIntegrityReportOptions options)
         {
-            using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
-                scope.WriteLock(Cms.Core.Constants.Locks.MediaTree);
+                scope.WriteLock(Constants.Locks.MediaTree);
 
                 ContentDataIntegrityReport report = _mediaRepository.CheckDataIntegrity(options);
 
@@ -1163,7 +1216,7 @@ namespace Umbraco.Cms.Core.Services
 
         #region Private Methods
 
-        private void Audit(AuditType type, int userId, int objectId, string message = null)
+        private void Audit(AuditType type, int userId, int objectId, string? message = null)
         {
             _auditRepository.Save(new AuditItem(objectId, type, userId, ObjectTypes.GetName(UmbracoObjectTypes.Media), message));
         }
@@ -1175,7 +1228,9 @@ namespace Umbraco.Cms.Core.Services
         public Stream GetMediaFileContentStream(string filepath)
         {
             if (_mediaFileManager.FileSystem.FileExists(filepath) == false)
-                return null;
+            {
+                return Stream.Null;
+            }
 
             try
             {
@@ -1183,7 +1238,7 @@ namespace Umbraco.Cms.Core.Services
             }
             catch
             {
-                return null; // deal with race conds
+                return Stream.Null; // deal with race conds
             }
         }
 
@@ -1216,7 +1271,7 @@ namespace Umbraco.Cms.Core.Services
         /// </remarks>
         /// <param name="mediaTypeIds">Id of the <see cref="IMediaType"/></param>
         /// <param name="userId">Optional id of the user deleting the media</param>
-        public void DeleteMediaOfTypes(IEnumerable<int> mediaTypeIds, int userId = Cms.Core.Constants.Security.SuperUserId)
+        public void DeleteMediaOfTypes(IEnumerable<int> mediaTypeIds, int userId = Constants.Security.SuperUserId)
         {
             // TODO: This currently this is called from the ContentTypeService but that needs to change,
             // if we are deleting a content type, we should just delete the data and do this operation slightly differently.
@@ -1230,12 +1285,12 @@ namespace Umbraco.Cms.Core.Services
             var mediaTypeIdsA = mediaTypeIds.ToArray();
             EventMessages messages = EventMessagesFactory.Get();
 
-            using (IScope scope = ScopeProvider.CreateScope())
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
-                scope.WriteLock(Cms.Core.Constants.Locks.MediaTree);
+                scope.WriteLock(Constants.Locks.MediaTree);
 
-                IQuery<IMedia> query = Query<IMedia>().WhereIn(x => x.ContentTypeId, mediaTypeIdsA);
-                IMedia[] medias = _mediaRepository.Get(query).ToArray();
+                IQuery<IMedia>? query = Query<IMedia>().WhereIn(x => x.ContentTypeId, mediaTypeIdsA);
+                IMedia[] medias = _mediaRepository.Get(query)?.ToArray() ?? Array.Empty<IMedia>();
 
                 if (scope.Notifications.PublishCancelable(new MediaDeletingNotification(medias, messages)))
                 {
@@ -1249,13 +1304,16 @@ namespace Umbraco.Cms.Core.Services
                 {
                     // if current media has children, move them to trash
                     IMedia m = media;
-                    IQuery<IMedia> childQuery = Query<IMedia>().Where(x => x.Path.StartsWith(m.Path));
-                    IEnumerable<IMedia> children = _mediaRepository.Get(childQuery);
-                    foreach (IMedia child in children.Where(x => mediaTypeIdsA.Contains(x.ContentTypeId) == false))
+                    IQuery<IMedia>? childQuery = Query<IMedia>().Where(x => x.Path.StartsWith(m.Path));
+                    IEnumerable<IMedia>? children = _mediaRepository.Get(childQuery);
+                    if (children is not null)
                     {
-                        // see MoveToRecycleBin
-                        PerformMoveLocked(child, Cms.Core.Constants.System.RecycleBinMedia, null, userId, moves, true);
-                        changes.Add(new TreeChange<IMedia>(media, TreeChangeTypes.RefreshBranch));
+                        foreach (IMedia child in children.Where(x => mediaTypeIdsA.Contains(x.ContentTypeId) == false))
+                        {
+                            // see MoveToRecycleBin
+                            PerformMoveLocked(child, Constants.System.RecycleBinMedia, null, userId, moves, true);
+                            changes.Add(new TreeChange<IMedia>(media, TreeChangeTypes.RefreshBranch));
+                        }
                     }
 
                     // delete media
@@ -1272,7 +1330,7 @@ namespace Umbraco.Cms.Core.Services
                 }
                 scope.Notifications.Publish(new MediaTreeChangeNotification(changes, messages));
 
-                Audit(AuditType.Delete, userId, Cms.Core.Constants.System.Root, $"Delete Media of types {string.Join(",", mediaTypeIdsA)}");
+                Audit(AuditType.Delete, userId, Constants.System.Root, $"Delete Media of types {string.Join(",", mediaTypeIdsA)}");
 
                 scope.Complete();
             }
@@ -1284,29 +1342,36 @@ namespace Umbraco.Cms.Core.Services
         /// <remarks>This needs extra care and attention as its potentially a dangerous and extensive operation</remarks>
         /// <param name="mediaTypeId">Id of the <see cref="IMediaType"/></param>
         /// <param name="userId">Optional id of the user deleting the media</param>
-        public void DeleteMediaOfType(int mediaTypeId, int userId = Cms.Core.Constants.Security.SuperUserId)
+        public void DeleteMediaOfType(int mediaTypeId, int userId = Constants.Security.SuperUserId)
         {
             DeleteMediaOfTypes(new[] { mediaTypeId }, userId);
         }
 
         private IMediaType GetMediaType(string mediaTypeAlias)
         {
-            if (mediaTypeAlias == null) throw new ArgumentNullException(nameof(mediaTypeAlias));
-            if (string.IsNullOrWhiteSpace(mediaTypeAlias)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(mediaTypeAlias));
-
-            using (IScope scope = ScopeProvider.CreateScope())
+            if (mediaTypeAlias == null)
             {
-                scope.ReadLock(Cms.Core.Constants.Locks.MediaTypes);
-
-                var query = Query<IMediaType>().Where(x => x.Alias == mediaTypeAlias);
-                var mediaType = _mediaTypeRepository.Get(query).FirstOrDefault();
-
-                if (mediaType == null)
-                    throw new InvalidOperationException($"No media type matched the specified alias '{mediaTypeAlias}'.");
-
-                scope.Complete();
-                return mediaType;
+                throw new ArgumentNullException(nameof(mediaTypeAlias));
             }
+
+            if (string.IsNullOrWhiteSpace(mediaTypeAlias))
+            {
+                throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(mediaTypeAlias));
+            }
+
+            using ICoreScope scope = ScopeProvider.CreateCoreScope();
+            scope.ReadLock(Constants.Locks.MediaTypes);
+
+            IQuery<IMediaType> query = Query<IMediaType>().Where(x => x.Alias == mediaTypeAlias);
+            IMediaType? mediaType = _mediaTypeRepository.Get(query)?.FirstOrDefault();
+
+            if (mediaType == null)
+            {
+                throw new InvalidOperationException($"No media type matched the specified alias '{mediaTypeAlias}'.");
+            }
+
+            scope.Complete();
+            return mediaType;
         }
 
         #endregion

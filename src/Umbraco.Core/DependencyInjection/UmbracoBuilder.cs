@@ -1,8 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,7 +23,6 @@ using Umbraco.Cms.Core.Install;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Mail;
-using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Packaging;
@@ -38,6 +35,7 @@ using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Snippets;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Telemetry;
 using Umbraco.Cms.Core.Templates;
@@ -60,7 +58,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
         public ILoggerFactory BuilderLoggerFactory { get; }
 
         /// <inheritdoc />
-        public IHostingEnvironment BuilderHostingEnvironment { get; }
+        public IHostingEnvironment? BuilderHostingEnvironment { get; }
 
         public IProfiler Profiler { get; }
 
@@ -83,7 +81,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             ILoggerFactory loggerFactory,
             IProfiler profiler,
             AppCaches appCaches,
-            IHostingEnvironment hostingEnvironment)
+            IHostingEnvironment? hostingEnvironment)
         {
             Services = services;
             Config = config;
@@ -106,13 +104,12 @@ namespace Umbraco.Cms.Core.DependencyInjection
         {
             Type typeOfBuilder = typeof(TBuilder);
 
-            if (_builders.TryGetValue(typeOfBuilder, out ICollectionBuilder o))
+            if (_builders.TryGetValue(typeOfBuilder, out ICollectionBuilder? o))
             {
                 return (TBuilder)o;
             }
 
             TBuilder builder;
-
             if (typeof(TBuilder).GetConstructor(Type.EmptyTypes) != null)
             {
                 builder = Activator.CreateInstance<TBuilder>();
@@ -120,7 +117,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             else if (typeof(TBuilder).GetConstructor(new[] { typeof(IUmbracoBuilder) }) != null)
             {
                 // Handle those collection builders which need a reference to umbraco builder i.e. DistributedLockingCollectionBuilder.
-                builder = (TBuilder)Activator.CreateInstance(typeof(TBuilder), this);
+                builder = (TBuilder)Activator.CreateInstance(typeof(TBuilder), this)!;
             }
             else
             {
@@ -147,7 +144,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddSingleton(Profiler);
 
             // Register as singleton to allow injection everywhere.
-            Services.AddSingleton<ServiceFactory>(p => p.GetService);
+            Services.AddSingleton<ServiceFactory>(p => p.GetService!);
             Services.AddSingleton<IEventAggregator, EventAggregator>();
 
             Services.AddLazySupport();
@@ -189,9 +186,6 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddSingleton<UmbracoRequestPaths>();
 
             Services.AddSingleton<InstallStatusTracker>();
-
-            // by default, register a noop factory
-            Services.AddUnique<IPublishedModelFactory, NoopPublishedModelFactory>();
 
             Services.AddUnique<ICultureDictionaryFactory, DefaultCultureDictionaryFactory>();
             Services.AddSingleton(f => f.GetRequiredService<ICultureDictionaryFactory>().CreateDictionary());
@@ -308,7 +302,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<INotificationService, NotificationService>();
             Services.AddUnique<ITrackedReferencesService, TrackedReferencesService>();
             Services.AddUnique<ExternalLoginService>(factory => new ExternalLoginService(
-                factory.GetRequiredService<IScopeProvider>(),
+                factory.GetRequiredService<ICoreScopeProvider>(),
                 factory.GetRequiredService<ILoggerFactory>(),
                 factory.GetRequiredService<IEventMessagesFactory>(),
                 factory.GetRequiredService<IExternalLoginWithKeyRepository>()
@@ -326,6 +320,11 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
             // Register a noop IHtmlSanitizer to be replaced
             Services.AddUnique<IHtmlSanitizer, NoopHtmlSanitizer>();
+
+            Services.AddUnique<IPropertyTypeUsageService, PropertyTypeUsageService>();
+            Services.AddUnique<IDataTypeUsageService, DataTypeUsageService>();
+
+            Services.AddUnique<ICultureImpactFactory>(provider => new CultureImpactFactory(provider.GetRequiredService<IOptionsMonitor<ContentSettings>>()));
         }
     }
 }

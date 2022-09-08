@@ -1,49 +1,45 @@
-﻿using System.Collections.Generic;
 using System.Reflection;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 
-namespace Umbraco.Cms.Core.HealthChecks.NotificationMethods
+namespace Umbraco.Cms.Core.HealthChecks.NotificationMethods;
+
+public abstract class NotificationMethodBase : IHealthCheckNotificationMethod
 {
-    public abstract class NotificationMethodBase : IHealthCheckNotificationMethod
+    protected NotificationMethodBase(IOptionsMonitor<HealthChecksSettings> healthCheckSettings)
     {
-        protected NotificationMethodBase(IOptionsMonitor<HealthChecksSettings> healthCheckSettings)
+        Type type = GetType();
+        HealthCheckNotificationMethodAttribute? attribute = type.GetCustomAttribute<HealthCheckNotificationMethodAttribute>();
+        if (attribute == null)
         {
-            var type = GetType();
-            var attribute = type.GetCustomAttribute<HealthCheckNotificationMethodAttribute>();
-            if (attribute == null)
-            {
-                Enabled = false;
-                return;
-            }
-
-            var notificationMethods = healthCheckSettings.CurrentValue.Notification.NotificationMethods;
-            if (!notificationMethods.TryGetValue(attribute.Alias, out var notificationMethod))
-            {
-                Enabled = false;
-                return;
-            }
-
-            Enabled = notificationMethod.Enabled;
-            FailureOnly = notificationMethod.FailureOnly;
-            Verbosity = notificationMethod.Verbosity;
-            Settings = notificationMethod.Settings;
+            Enabled = false;
+            return;
         }
 
-        public bool Enabled {  get; protected set; }
-
-        public bool FailureOnly { get; protected set; }
-
-        public HealthCheckNotificationVerbosity Verbosity { get; protected set; }
-
-        public IDictionary<string, string> Settings { get; }
-
-        protected bool ShouldSend(HealthCheckResults results)
+        IDictionary<string, HealthChecksNotificationMethodSettings> notificationMethods =
+            healthCheckSettings.CurrentValue.Notification.NotificationMethods;
+        if (!notificationMethods.TryGetValue(
+            attribute.Alias, out HealthChecksNotificationMethodSettings? notificationMethod))
         {
-            return Enabled && (!FailureOnly || !results.AllChecksSuccessful);
+            Enabled = false;
+            return;
         }
 
-        public abstract Task SendAsync(HealthCheckResults results);
+        Enabled = notificationMethod.Enabled;
+        FailureOnly = notificationMethod.FailureOnly;
+        Verbosity = notificationMethod.Verbosity;
+        Settings = notificationMethod.Settings;
     }
+
+    public bool FailureOnly { get; protected set; }
+
+    public HealthCheckNotificationVerbosity Verbosity { get; protected set; }
+
+    public IDictionary<string, string>? Settings { get; }
+
+    public bool Enabled { get; protected set; }
+
+    public abstract Task SendAsync(HealthCheckResults results);
+
+    protected bool ShouldSend(HealthCheckResults results) => Enabled && (!FailureOnly || !results.AllChecksSuccessful);
 }

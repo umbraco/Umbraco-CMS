@@ -1,11 +1,11 @@
 <Project>
   <!-- Enable multi-level merging -->
-  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))"/>
 
   <PropertyGroup>
     <Version>10.0.0</Version>
     <AssemblyVersion>10.0.0</AssemblyVersion>
-    <InformationalVersion>10.0.0-rc</InformationalVersion>
+    <InformationalVersion>10.0.0-rc1</InformationalVersion>
     <FileVersion>10.0.0</FileVersion>
     <LangVersion Condition="'$(LangVersion)' == ''">10.0</LangVersion>
     <NeutralLanguage>en-US</NeutralLanguage>
@@ -19,6 +19,9 @@
     <PackageTags>umbraco</PackageTags>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/umbraco/umbraco-cms</RepositoryUrl>
+    <Nullable>enable</Nullable>
+    <WarningsAsErrors>Nullable</WarningsAsErrors>
+    <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -38,5 +41,13 @@
   <!-- Only for Azure Pipelines CI Build -->
   <PropertyGroup Condition="'$(TF_BUILD)' == 'true'">
     <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+
+  <!-- Package Validation -->
+  <PropertyGroup>
+    <EnablePackageValidation>true</EnablePackageValidation>
+    <PackageValidationBaselineVersion>10.0.0</PackageValidationBaselineVersion>
+    <EnableStrictModeForCompatibleFrameworksInPackage>true</EnableStrictModeForCompatibleFrameworksInPackage>
+    <EnableStrictModeForCompatibleTfms>true</EnableStrictModeForCompatibleTfms>
   </PropertyGroup>
 </Project>

@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json.schemastore.org/dotnetcli.host",
+  "$schema": "https://json.schemastore.org/dotnetcli.host.json",
   "symbolInfo": {
     "Framework": {
       "longName": "Framework",
@@ -13,12 +13,28 @@
       "longName": "use-https-redirect",
       "shortName": ""
     },
-    "UseSqlCe": {
-      "longName": "SqlCe",
-      "shortName": "ce"
-    },
     "SkipRestore": {
       "longName": "no-restore",
+      "shortName": ""
+    },
+    "ExcludeGitignore": {
+      "longName": "exclude-gitignore",
+      "shortName": ""
+    },
+    "MinimalGitignore": {
+      "longName": "minimal-gitignore",
+      "shortName": ""
+    },
+    "ConnectionString": {
+      "longName": "connection-string",
+      "shortName": ""
+    },
+    "ConnectionStringProviderName": {
+      "longName": "connection-string-provider-name",
+      "shortName": ""
+    },
+    "DevelopmentDatabaseType": {
+      "longName": "development-database-type",
       "shortName": ""
     },
     "UnattendedUserName": {
@@ -33,10 +49,6 @@
       "longName": "password",
       "shortName": ""
     },
-    "ConnectionString": {
-      "longName": "connection-string",
-      "shortName": ""
-    },
     "NoNodesViewPath": {
       "longName": "no-nodes-view-path",
       "shortName": ""
@@ -48,8 +60,9 @@
   },
   "usageExamples": [
     "dotnet new umbraco -n MyNewProject",
-    "dotnet new umbraco -n MyNewProjectUsingSqlCE -ce",
     "dotnet new umbraco -n MyNewProject --no-restore",
+    "dotnet new umbraco -n MyNewProject --development-database-type SQLite",
+    "dotnet new umbraco -n MyNewProject --development-database-type LocalDB",
     "dotnet new umbraco -n MyNewProject --friendly-name \"Friendly Admin User\" --email admin@example.com --password password1234 --connection-string \"Server=ConnectionStringHere\""
   ]
 }

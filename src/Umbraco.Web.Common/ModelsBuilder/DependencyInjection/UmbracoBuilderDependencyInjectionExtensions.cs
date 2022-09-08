@@ -1,19 +1,15 @@
-using System.Linq;
 using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
-using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Infrastructure.ModelsBuilder;
 using Umbraco.Cms.Infrastructure.ModelsBuilder.Building;
-using Umbraco.Cms.Infrastructure.WebAssets;
-using Umbraco.Cms.Web.Common.ModelBinders;
 using Umbraco.Cms.Web.Common.ModelsBuilder;
 
 /*
@@ -74,94 +70,96 @@ using Umbraco.Cms.Web.Common.ModelsBuilder;
  *   graph includes all of the above mentioned services, all the way up to the RazorProjectEngine and it's LazyMetadataReferenceFeature.
  */
 
-namespace Umbraco.Extensions
+namespace Umbraco.Extensions;
+
+/// <summary>
+///     Extension methods for <see cref="IUmbracoBuilder" /> for the common Umbraco functionality
+/// </summary>
+public static class UmbracoBuilderDependencyInjectionExtensions
 {
     /// <summary>
-    /// Extension methods for <see cref="IUmbracoBuilder"/> for the common Umbraco functionality
+    ///     Adds umbraco's embedded model builder support
     /// </summary>
-    public static class UmbracoBuilderDependencyInjectionExtensions
+    public static IUmbracoBuilder AddModelsBuilder(this IUmbracoBuilder builder)
     {
-        /// <summary>
-        /// Adds umbraco's embedded model builder support
-        /// </summary>
-        public static IUmbracoBuilder AddModelsBuilder(this IUmbracoBuilder builder)
+        var umbServices = new UniqueServiceDescriptor(typeof(UmbracoServices), typeof(UmbracoServices), ServiceLifetime.Singleton);
+        if (builder.Services.Contains(umbServices))
         {
-            var umbServices = new UniqueServiceDescriptor(typeof(UmbracoServices), typeof(UmbracoServices), ServiceLifetime.Singleton);
-            if (builder.Services.Contains(umbServices))
-            {
-                // if this ext method is called more than once just exit
-                return builder;
-            }
+            // if this ext method is called more than once just exit
+            return builder;
+        }
 
-            builder.Services.Add(umbServices);
+        builder.Services.Add(umbServices);
 
+        if (builder.Config.GetRuntimeMode() == RuntimeMode.BackofficeDevelopment)
+        {
+            // Configure services to allow InMemoryAuto mode
             builder.AddInMemoryModelsRazorEngine();
 
-            // TODO: I feel like we could just do builder.AddNotificationHandler<ModelsBuilderNotificationHandler>() and it
-            // would automatically just register for all implemented INotificationHandler{T}?
-            builder.AddNotificationHandler<TemplateSavingNotification, ModelsBuilderNotificationHandler>();
-            builder.AddNotificationHandler<ServerVariablesParsingNotification, ModelsBuilderNotificationHandler>();
             builder.AddNotificationHandler<ModelBindingErrorNotification, ModelsBuilderNotificationHandler>();
+            builder.AddNotificationHandler<ContentTypeCacheRefresherNotification, OutOfDateModelsStatus>();
+            builder.AddNotificationHandler<DataTypeCacheRefresherNotification, OutOfDateModelsStatus>();
+        }
+
+        if (builder.Config.GetRuntimeMode() != RuntimeMode.Production)
+        {
+            // Configure service to allow models generation
+            builder.AddNotificationHandler<ServerVariablesParsingNotification, ModelsBuilderNotificationHandler>();
+            builder.AddNotificationHandler<TemplateSavingNotification, ModelsBuilderNotificationHandler>();
+
             builder.AddNotificationHandler<UmbracoApplicationStartingNotification, AutoModelsNotificationHandler>();
             builder.AddNotificationHandler<UmbracoRequestEndNotification, AutoModelsNotificationHandler>();
             builder.AddNotificationHandler<ContentTypeCacheRefresherNotification, AutoModelsNotificationHandler>();
             builder.AddNotificationHandler<DataTypeCacheRefresherNotification, AutoModelsNotificationHandler>();
-
-            builder.Services.AddSingleton<ModelsGenerator>();
-            builder.Services.AddSingleton<OutOfDateModelsStatus>();
-            builder.AddNotificationHandler<ContentTypeCacheRefresherNotification, OutOfDateModelsStatus>();
-            builder.AddNotificationHandler<DataTypeCacheRefresherNotification, OutOfDateModelsStatus>();
-            builder.Services.AddSingleton<ModelsGenerationError>();
-
-            builder.Services.AddSingleton<InMemoryModelFactory>();
-
-            // This is what the community MB would replace, all of the above services are fine to be registered
-            // even if the community MB is in place.
-            builder.Services.AddSingleton<IPublishedModelFactory>(factory =>
-            {
-                ModelsBuilderSettings config = factory.GetRequiredService<IOptions<ModelsBuilderSettings>>().Value;
-                if (config.ModelsMode == ModelsMode.InMemoryAuto)
-                {
-                    return factory.GetRequiredService<InMemoryModelFactory>();
-                }
-                else
-                {
-                    return factory.CreateDefaultPublishedModelFactory();
-                }
-            });
-
-
-            if (!builder.Services.Any(x=>x.ServiceType == typeof(IModelsBuilderDashboardProvider)))
-            {
-                builder.Services.AddUnique<IModelsBuilderDashboardProvider, NoopModelsBuilderDashboardProvider>();
-            }
-
-            return builder;
         }
 
-        private static IUmbracoBuilder AddInMemoryModelsRazorEngine(this IUmbracoBuilder builder)
+        builder.Services.TryAddSingleton<IModelsBuilderDashboardProvider, NoopModelsBuilderDashboardProvider>();
+
+        // Register required services for ModelsBuilderDashboardController
+        builder.Services.AddSingleton<ModelsGenerator>();
+        builder.Services.AddSingleton<OutOfDateModelsStatus>();
+        builder.Services.AddSingleton<ModelsGenerationError>();
+
+        return builder;
+    }
+
+    private static IUmbracoBuilder AddInMemoryModelsRazorEngine(this IUmbracoBuilder builder)
+    {
+        // See notes in RefreshingRazorViewEngine for information on what this is doing.
+
+        // copy the current collection, we need to use this later to rebuild a container
+        // to re-create the razor compiler provider
+        var initialCollection = new ServiceCollection { builder.Services };
+
+        // Replace the default with our custom engine
+        builder.Services.AddSingleton<IRazorViewEngine>(
+            s => new RefreshingRazorViewEngine(
+                () =>
+                {
+                    // re-create the original container so that a brand new IRazorPageActivator
+                    // is produced, if we don't re-create the container then it will just return the same instance.
+                    ServiceProvider recreatedServices = initialCollection.BuildServiceProvider();
+                    return recreatedServices.GetRequiredService<IRazorViewEngine>();
+                },
+                s.GetRequiredService<InMemoryModelFactory>()));
+
+        builder.Services.AddSingleton<InMemoryModelFactory>();
+
+        // This is what the community MB would replace, all of the above services are fine to be registered
+        // even if the community MB is in place.
+        builder.Services.AddSingleton<IPublishedModelFactory>(factory =>
         {
-            // See notes in RefreshingRazorViewEngine for information on what this is doing.
-
-            // copy the current collection, we need to use this later to rebuild a container
-            // to re-create the razor compiler provider
-            var initialCollection = new ServiceCollection
+            ModelsBuilderSettings modelsBuilderSettings = factory.GetRequiredService<IOptions<ModelsBuilderSettings>>().Value;
+            if (modelsBuilderSettings.ModelsMode == ModelsMode.InMemoryAuto)
             {
-                builder.Services
-            };
+                return factory.GetRequiredService<InMemoryModelFactory>();
+            }
+            else
+            {
+                return factory.CreateDefaultPublishedModelFactory();
+            }
+        });
 
-            // Replace the default with our custom engine
-            builder.Services.AddSingleton<IRazorViewEngine>(
-                s => new RefreshingRazorViewEngine(
-                        () =>
-                        {
-                            // re-create the original container so that a brand new IRazorPageActivator
-                            // is produced, if we don't re-create the container then it will just return the same instance.
-                            ServiceProvider recreatedServices = initialCollection.BuildServiceProvider();
-                            return recreatedServices.GetRequiredService<IRazorViewEngine>();
-                        }, s.GetRequiredService<InMemoryModelFactory>()));
-
-            return builder;
-        }
+        return builder;
     }
 }

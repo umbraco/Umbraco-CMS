@@ -6,13 +6,13 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Persistence.SqlServer.Services;
 
 /// <summary>
-/// Provider metadata for SQL Azure
+///     Provider metadata for SQL Azure
 /// </summary>
 [DataContract]
 public class SqlAzureDatabaseProviderMetadata : IDatabaseProviderMetadata
 {
     /// <inheritdoc />
-    public Guid Id => new ("7858e827-8951-4fe0-a7fe-6883011b1f1b");
+    public Guid Id => new("7858e827-8951-4fe0-a7fe-6883011b1f1b");
 
     /// <inheritdoc />
     public int SortOrder => 3;
@@ -53,43 +53,60 @@ public class SqlAzureDatabaseProviderMetadata : IDatabaseProviderMetadata
     /// <inheritdoc />
     public string GenerateConnectionString(DatabaseModel databaseModel)
     {
+        if (databaseModel.Server is null)
+        {
+            throw new ArgumentNullException(nameof(databaseModel.Server));
+        }
+
         var server = databaseModel.Server;
         var databaseName = databaseModel.DatabaseName;
         var user = databaseModel.Login;
         var password = databaseModel.Password;
 
         if (server.Contains(".") && ServerStartsWithTcp(server) == false)
+        {
             server = $"tcp:{server}";
+        }
 
         if (server.Contains(".") == false && ServerStartsWithTcp(server))
         {
-            string serverName = server.Contains(",")
+            var serverName = server.Contains(",")
                 ? server.Substring(0, server.IndexOf(",", StringComparison.Ordinal))
                 : server;
 
             var portAddition = string.Empty;
 
             if (server.Contains(","))
+            {
                 portAddition = server.Substring(server.IndexOf(",", StringComparison.Ordinal));
+            }
 
             server = $"{serverName}.database.windows.net{portAddition}";
         }
 
         if (ServerStartsWithTcp(server) == false)
+        {
             server = $"tcp:{server}.database.windows.net";
+        }
 
         if (server.Contains(",") == false)
+        {
             server = $"{server},1433";
+        }
 
-        if (user.Contains("@") == false)
+        if (user?.Contains("@") == false)
         {
             var userDomain = server;
 
             if (ServerStartsWithTcp(server))
+            {
                 userDomain = userDomain.Substring(userDomain.IndexOf(":", StringComparison.Ordinal) + 1);
+            }
 
             if (userDomain.Contains("."))
+            {
                 userDomain = userDomain.Substring(0, userDomain.IndexOf(".", StringComparison.Ordinal));
+            }
 
             user = $"{user}@{userDomain}";
         }

@@ -1,12 +1,15 @@
 name: pr-first-response
 
 on:
-  pull_request:
+  pull_request_target:
     types: [opened]
 
-jobs: 
+jobs:
   send-response:
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
     steps:
       - name: Install dependencies
         run: |
@@ -42,8 +45,17 @@ jobs:
                         body: data
                     });
                 } else {
-                    console.log("Status code did not indicate success:", response.status);
+                    console.log("Returned data not indicate success.");
+                    
+                    if(response.status !== 200) {
+                      console.log("Status code:", response.status)
+                    }
+
                     console.log("Returned data:", data);
+                    
+                    if(data === '') {
+                      console.log("An empty response usually indicates that either no comment was found or the actor user was not eligible for getting an automated response (HQ users are not getting auto-responses).")
+                    }
                 }
             } catch(error) {
                 console.log(error);

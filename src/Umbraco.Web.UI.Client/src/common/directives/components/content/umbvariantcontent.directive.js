@@ -108,9 +108,10 @@
         });
 
         function onAppChanged(activeApp) {
-
-            // disable the name field if the active content app is not "Content" or "Info"
-            vm.nameDisabled = (activeApp && !contentAppHelper.isContentBasedApp(activeApp)); 
+            // set the name field to readonly if the user don't have update permissions or the active content app is not "Content" or "Info"
+            const allowUpdate = vm.editor.content.allowedActions.includes('A');
+            const isContentBasedApp = activeApp && contentAppHelper.isContentBasedApp(activeApp);
+            vm.nameReadonly = !allowUpdate || !isContentBasedApp;
         }
 
         /**

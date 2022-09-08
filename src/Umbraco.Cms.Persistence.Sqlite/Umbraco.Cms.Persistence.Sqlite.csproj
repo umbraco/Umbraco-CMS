@@ -2,9 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-
     <PackageId>Umbraco.Cms.Persistence.Sqlite</PackageId>
     <Title>Umbraco.Cms.Persistence.Sqlite</Title>
     <Description>Adds support for SQLite to Umbraco CMS.</Description>
@@ -15,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="6.0.4" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="6.0.5" />
   </ItemGroup>
 
 </Project>

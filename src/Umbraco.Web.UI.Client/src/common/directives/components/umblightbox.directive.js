@@ -94,6 +94,8 @@
                     for (var e in eventBindings) {
                         eventBindings[e]();
                     }
+                    
+                    el.remove();
                 });
             }
 

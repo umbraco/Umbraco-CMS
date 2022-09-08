@@ -81,7 +81,7 @@ module.exports = {
             assets: "./src/assets/**"
         }
     },
-    roots: ["../Umbraco.Web.UI/wwwroot/"],
+    roots: ["../Umbraco.Cms.StaticAssets/wwwroot/"],
     targets: {
         js: "umbraco/js/",
         lib: "umbraco/lib/",

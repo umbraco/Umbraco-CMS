@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.DistributedLocking.Exceptions;
+using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
@@ -12,17 +13,17 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Persistence.SqlServer.Services;
 
 /// <summary>
-/// SQL Server implementation of <see cref="IDistributedLockingMechanism"/>.
+///     SQL Server implementation of <see cref="IDistributedLockingMechanism" />.
 /// </summary>
 public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
 {
+    private readonly IOptionsMonitor<ConnectionStrings> _connectionStrings;
+    private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
     private readonly ILogger<SqlServerDistributedLockingMechanism> _logger;
     private readonly Lazy<IScopeAccessor> _scopeAccessor; // Hooray it's a circular dependency.
-    private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
-    private readonly IOptionsMonitor<ConnectionStrings> _connectionStrings;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="SqlServerDistributedLockingMechanism"/> class.
+    ///     Initializes a new instance of the <see cref="SqlServerDistributedLockingMechanism" /> class.
     /// </summary>
     public SqlServerDistributedLockingMechanism(
         ILogger<SqlServerDistributedLockingMechanism> logger,
@@ -38,7 +39,7 @@ public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
 
     /// <inheritdoc />
     public bool Enabled => _connectionStrings.CurrentValue.IsConnectionStringConfigured() &&
-                           _connectionStrings.CurrentValue.ProviderName == Constants.ProviderName;
+                           string.Equals(_connectionStrings.CurrentValue.ProviderName,Constants.ProviderName, StringComparison.InvariantCultureIgnoreCase);
 
     /// <inheritdoc />
     public IDistributedLock ReadLock(int lockId, TimeSpan? obtainLockTimeout = null)
@@ -103,34 +104,39 @@ public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
 
         public DistributedLockType LockType { get; }
 
-        public void Dispose()
-        {
+        public void Dispose() =>
             // Mostly no op, cleaned up by completing transaction in scope.
             _parent._logger.LogDebug("Dropped {lockType} for id {id}", LockType, LockId);
-        }
 
         public override string ToString()
             => $"SqlServerDistributedLock({LockId}, {LockType}";
 
         private void ObtainReadLock()
         {
-            IUmbracoDatabase db = _parent._scopeAccessor.Value.AmbientScope.Database;
+            IUmbracoDatabase? db = _parent._scopeAccessor.Value.AmbientScope?.Database;
+
+            if (db is null)
+            {
+                throw new PanicException("Could not find a database");
+            }
 
             if (!db.InTransaction)
             {
-                throw new InvalidOperationException("SqlServerDistributedLockingMechanism requires a transaction to function.");
+                throw new InvalidOperationException(
+                    "SqlServerDistributedLockingMechanism requires a transaction to function.");
             }
 
             if (db.Transaction.IsolationLevel < IsolationLevel.ReadCommitted)
             {
-                throw new InvalidOperationException("A transaction with minimum ReadCommitted isolation level is required.");
+                throw new InvalidOperationException(
+                    "A transaction with minimum ReadCommitted isolation level is required.");
             }
 
             const string query = "SELECT value FROM umbracoLock WITH (REPEATABLEREAD)  WHERE id=@id";
 
             db.Execute("SET LOCK_TIMEOUT " + _timeout.TotalMilliseconds + ";");
 
-            var i = db.ExecuteScalar<int?>(query, new {id = LockId});
+            var i = db.ExecuteScalar<int?>(query, new { id = LockId });
 
             if (i == null)
             {
@@ -141,23 +147,31 @@ public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
 
         private void ObtainWriteLock()
         {
-            IUmbracoDatabase db = _parent._scopeAccessor.Value.AmbientScope.Database;
+            IUmbracoDatabase? db = _parent._scopeAccessor.Value.AmbientScope?.Database;
+
+            if (db is null)
+            {
+                throw new PanicException("Could not find a database");
+            }
 
             if (!db.InTransaction)
             {
-                throw new InvalidOperationException("SqlServerDistributedLockingMechanism requires a transaction to function.");
+                throw new InvalidOperationException(
+                    "SqlServerDistributedLockingMechanism requires a transaction to function.");
             }
 
             if (db.Transaction.IsolationLevel < IsolationLevel.ReadCommitted)
             {
-                throw new InvalidOperationException("A transaction with minimum ReadCommitted isolation level is required.");
+                throw new InvalidOperationException(
+                    "A transaction with minimum ReadCommitted isolation level is required.");
             }
 
-            const string query = @"UPDATE umbracoLock WITH (REPEATABLEREAD) SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id=@id";
+            const string query =
+                @"UPDATE umbracoLock WITH (REPEATABLEREAD) SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id=@id";
 
             db.Execute("SET LOCK_TIMEOUT " + _timeout.TotalMilliseconds + ";");
 
-            var i = db.Execute(query, new {id = LockId});
+            var i = db.Execute(query, new { id = LockId });
 
             if (i == 0)
             {

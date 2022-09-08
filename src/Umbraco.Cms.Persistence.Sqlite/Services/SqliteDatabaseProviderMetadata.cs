@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Persistence.Sqlite.Services;
 public class SqliteDatabaseProviderMetadata : IDatabaseProviderMetadata
 {
     /// <inheritdoc />
-    public Guid Id => new ("530386a2-b219-4d5f-b68c-b965e14c9ac9");
+    public Guid Id => new("530386a2-b219-4d5f-b68c-b965e14c9ac9");
 
     /// <inheritdoc />
     public int SortOrder => -1;
@@ -34,7 +34,7 @@ public class SqliteDatabaseProviderMetadata : IDatabaseProviderMetadata
     public bool RequiresServer => false;
 
     /// <inheritdoc />
-    public string ServerPlaceholder => null;
+    public string? ServerPlaceholder => null;
 
     /// <inheritdoc />
     public bool RequiresCredentials => false;
@@ -47,12 +47,12 @@ public class SqliteDatabaseProviderMetadata : IDatabaseProviderMetadata
 
     /// <inheritdoc />
     /// <remarks>
-    /// <para>
-    /// Required to ensure database creator is used regardless of configured InstallMissingDatabase value.
-    /// </para>
-    /// <para>
-    /// Ensures database setup with journal_mode = wal;
-    /// </para>
+    ///     <para>
+    ///         Required to ensure database creator is used regardless of configured InstallMissingDatabase value.
+    ///     </para>
+    ///     <para>
+    ///         Ensures database setup with journal_mode = wal;
+    ///     </para>
     /// </remarks>
     public bool ForceCreateDatabase => true;
 
@@ -64,7 +64,7 @@ public class SqliteDatabaseProviderMetadata : IDatabaseProviderMetadata
             DataSource = $"{ConnectionStrings.DataDirectoryPlaceholder}/{databaseModel.DatabaseName}.sqlite.db",
             ForeignKeys = true,
             Pooling = true,
-            Cache = SqliteCacheMode.Shared,
+            Cache = SqliteCacheMode.Shared
         };
 
         return builder.ConnectionString;
