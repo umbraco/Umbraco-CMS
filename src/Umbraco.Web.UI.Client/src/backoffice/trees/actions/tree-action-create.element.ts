@@ -1,15 +1,11 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
-import type { ManifestEntityAction } from '../../../core/models';
+import { customElement } from 'lit/decorators.js';
 import UmbActionElement from './action.element';
 
 @customElement('umb-tree-action-create')
 export class UmbTreeActionCreateElement extends UmbActionElement {
 	static styles = [UUITextStyles, css``];
-
-	@property({ attribute: false })
-	public treeAction?: ManifestEntityAction;
 
 	private _handleLabelClick() {
 		this._actionPageService?.openPage('umb-tree-action-create-page');

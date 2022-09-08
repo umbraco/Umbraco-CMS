@@ -1,7 +1,6 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
-import type { ManifestEntityAction } from '../../../core/models';
+import { customElement } from 'lit/decorators.js';
 import { UmbModalService } from '../../../core/services/modal';
 import { UmbNodeStore } from '../../../core/stores/node.store';
 import UmbActionElement from './action.element';
@@ -9,9 +8,6 @@ import UmbActionElement from './action.element';
 @customElement('umb-tree-action-delete')
 export class UmbTreeActionDeleteElement extends UmbActionElement {
 	static styles = [UUITextStyles, css``];
-
-	@property({ attribute: false })
-	public treeAction?: ManifestEntityAction;
 
 	private _modalService?: UmbModalService;
 	private _nodeStore?: UmbNodeStore;

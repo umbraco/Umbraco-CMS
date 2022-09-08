@@ -4,14 +4,8 @@ import { customElement, query, state } from 'lit/decorators.js';
 import { UmbContextProviderMixin } from '../../../core/context';
 
 import { ActionPageEntity } from './action.element';
-import { UmbActionPageService } from '.';
+import type { UmbActionPageService } from '.';
 import '.';
-
-// import './actions-modal.element';
-// import './tree-action-create-page.element';
-// import './tree-action-create-page-2.element';
-// import './action-page.service';
-// TODO how do we dynamically import this so we don't have to import every page that could potentially be used?
 
 @customElement('umb-action-service')
 export class UmbActionService extends UmbContextProviderMixin(LitElement) {
