@@ -1,8 +1,7 @@
-import { css, html } from 'lit';
+import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import type { ManifestEntityAction, ManifestTree } from '../../../core/models';
-import UmbActionElement from './action.element';
 import { UmbExtensionRegistry } from '../../../core/extension';
 import { UmbContextConsumerMixin } from '../../../core/context';
 import { map, Subscription } from 'rxjs';
@@ -10,7 +9,7 @@ import { UmbSectionContext } from '../../sections/section.context';
 import { Entity } from '../../../mocks/data/entity.data';
 
 @customElement('umb-action-list-page')
-export class UmbActionListPageElement extends UmbContextConsumerMixin(UmbActionElement) {
+export class UmbActionListPageElement extends UmbContextConsumerMixin(LitElement) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -98,10 +97,11 @@ export class UmbActionListPageElement extends UmbContextConsumerMixin(UmbActionE
 			});
 	}
 
-	disconnectCallback(): void {
-		super.disconnectCallback();
+	disconnectedCallback(): void {
+		super.disconnectedCallback();
 		this._treeItemActionsSubscription?.unsubscribe();
 		this._activeTreeSubscription?.unsubscribe();
+		this._activeTreeItemSubscription?.unsubscribe();
 	}
 
 	render() {
