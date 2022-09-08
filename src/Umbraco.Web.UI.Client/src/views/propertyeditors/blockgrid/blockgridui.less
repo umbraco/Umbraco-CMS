@@ -45,7 +45,7 @@ ng-form.ng-invalid-val-server-match-content > .umb-block-grid__block:not(.--acti
     inset: 0;
     border-radius: 3px;
     border: 1px solid @formErrorText;
-    box-shadow: 0 0 0 1px rgba(255, 255, 255, .75), inset 0 0 0 1px rgba(255, 255, 255, .75);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, .7), inset 0 0 0 1px rgba(255, 255, 255, .7);
     /* TODO: not working cause we are in a shadow DOM: */
     .show-validation-type-warning & {
         border-color: @formWarningText;
@@ -109,7 +109,7 @@ ng-form.ng-invalid-val-server-match-content > .umb-block-grid__block:not(.--acti
         display: none;
         inset: 0;
         border: 1px solid transparent;
-        box-shadow: 0 0 0 1px rgba(255, 255, 255, .75), inset 0 0 0 1px rgba(255, 255, 255, .75);
+        box-shadow: 0 0 0 1px rgba(255, 255, 255, .7), inset 0 0 0 1px rgba(255, 255, 255, .7);
         
         transition: border-color 240ms ease-in;
         
@@ -762,6 +762,8 @@ umb-block-grid-block {
 umb-block-grid-entries.--invalid {
     border: 2px solid @errorBackground;
     border-radius: 3px;
+
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, .2), inset 0 0 0 1px rgba(255, 255, 255, .2);
 }
 
 .umb-block-grid__entries-validation-message {
@@ -769,5 +771,7 @@ umb-block-grid-entries.--invalid {
     background-color: @errorBackground;
     color: @errorText;
     padding: 3px 6px;
+
+    border-top: 1px solid rgba(255, 255, 255, .2);
 
 }
