@@ -4,7 +4,6 @@ import { customElement, state } from 'lit/decorators.js';
 import { UmbContextProviderMixin } from '../../../../core/context';
 
 import { ActionPageEntity } from '../tree-item-action.element';
-import '../../actions';
 
 @customElement('umb-tree-context-menu-service')
 export class UmbTreeContextMenuService extends UmbContextProviderMixin(LitElement) {

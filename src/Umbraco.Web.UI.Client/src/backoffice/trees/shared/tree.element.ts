@@ -4,6 +4,11 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { createExtensionElement } from '../../../core/extension';
 import type { ManifestTree } from '../../../core/models';
 
+import './context-menu/tree-context-menu-page-action-list.element';
+import './context-menu/tree-context-menu-page.service';
+import './context-menu/tree-context-menu.service';
+import './tree-item-action-extension.element';
+
 @customElement('umb-tree')
 export class UmbTree extends LitElement {
 	static styles: CSSResultGroup = [UUITextStyles];

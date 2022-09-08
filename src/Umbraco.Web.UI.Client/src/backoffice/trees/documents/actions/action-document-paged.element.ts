@@ -3,6 +3,9 @@ import { css, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import UmbTreeItemActionElement from '../../shared/tree-item-action.element';
 
+import './action-document-paged-page.element';
+import './action-document-paged-page-2.element';
+
 @customElement('umb-tree-action-create')
 export class UmbTreeActionCreateElement extends UmbTreeItemActionElement {
 	static styles = [UUITextStyles, css``];
