@@ -990,43 +990,6 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
           return targetListItems;
         }
 
-        function buildAnchorListControl(url) {
-          var anchorList = [];
-
-          tinymce.each(editor.dom.select('a:not([href])'), function (anchor) {
-            var id = anchor.name || anchor.id;
-
-            if (id) {
-              anchorList.push({
-                text: id,
-                value: '#' + id,
-                selected: url.indexOf('#' + id) !== -1
-              });
-            }
-          });
-
-          if (anchorList.length) {
-            anchorList.unshift({
-              text: 'None',
-              value: ''
-            });
-
-            return {
-              name: 'anchor',
-              type: 'listbox',
-              label: 'Anchors',
-              values: anchorList,
-              onselect: linkListChangeHandler
-            };
-          }
-        }
-
-        function updateText() {
-          if (!initialText && data.text.length === 0) {
-            this.parent().parent().find('#text')[0].value(this.value());
-          }
-        }
-
         selectedElm = selection.getNode();
         anchorElm = dom.getParent(selectedElm, 'a[href]');
 
