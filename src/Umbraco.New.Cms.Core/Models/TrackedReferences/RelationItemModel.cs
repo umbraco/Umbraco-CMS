@@ -1,6 +1,5 @@
 ﻿namespace Umbraco.New.Cms.Core.Models.TrackedReferences;
 
-// TODO V13: Renamed to RelationItem when we get rid of RelationItem in new backoffice
 public class RelationItemModel
 {
     public Guid NodeKey { get; set; }
