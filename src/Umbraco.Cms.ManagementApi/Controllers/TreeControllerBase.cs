@@ -114,6 +114,6 @@ public abstract class TreeControllerBase<TItem> : Controller
         return viewModel;
     }
 
-    private PagedResult<TItem> PagedResult(IEnumerable<TItem> treeItemViewModels, long pageNumber, int pageSize, long totalItems)
+    protected PagedResult<TItem> PagedResult(IEnumerable<TItem> treeItemViewModels, long pageNumber, int pageSize, long totalItems)
         => new(totalItems, pageNumber, pageSize) { Items = treeItemViewModels };
 }
