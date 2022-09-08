@@ -16,8 +16,9 @@ public interface ITrackedReferencesSkipTakeService
     ///     A boolean indicating whether to filter only the RelationTypes which are
     ///     dependencies (isDependency field is set to true).
     /// </param>
+    /// <param name="totalItems">The total amount of items.</param>
     /// <returns>A paged result of <see cref="RelationItemModel" /> objects.</returns>
-    PagedViewModel<RelationItemModel> GetPagedRelationsForItem(int id, long skip, long take, bool filterMustBeIsDependency);
+    IEnumerable<RelationItemModel> GetPagedRelationsForItem(int id, long skip, long take, bool filterMustBeIsDependency, out long totalItems);
 
     /// <summary>
     ///     Gets a paged result of the descending items that have any references, given a parent id.
@@ -29,8 +30,9 @@ public interface ITrackedReferencesSkipTakeService
     ///     A boolean indicating whether to filter only the RelationTypes which are
     ///     dependencies (isDependency field is set to true).
     /// </param>
+    /// <param name="totalItems">The total amount of items.</param>
     /// <returns>A paged result of <see cref="RelationItemModel" /> objects.</returns>
-    PagedViewModel<RelationItemModel> GetPagedDescendantsInReferences(int parentId, long skip, long take, bool filterMustBeIsDependency);
+    IEnumerable<RelationItemModel> GetPagedDescendantsInReferences(int parentId, long skip, long take, bool filterMustBeIsDependency, out long totalItems);
 
     /// <summary>
     ///     Gets a paged result of items used in any kind of relation from selected integer ids.
@@ -42,6 +44,7 @@ public interface ITrackedReferencesSkipTakeService
     ///     A boolean indicating whether to filter only the RelationTypes which are
     ///     dependencies (isDependency field is set to true).
     /// </param>
+    /// <param name="totalItems">The total amount of items.</param>
     /// <returns>A paged result of <see cref="RelationItemModel" /> objects.</returns>
-    PagedViewModel<RelationItemModel> GetPagedItemsWithRelations(int[] ids, long skip, long take, bool filterMustBeIsDependency);
+    IEnumerable<RelationItemModel> GetPagedItemsWithRelations(int[] ids, long skip, long take, bool filterMustBeIsDependency, out long totalItems);
 }

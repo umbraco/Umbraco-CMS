@@ -15,15 +15,15 @@ public class TrackedReferencesSkipTakeService : ITrackedReferencesSkipTakeServic
         _scopeProvider = scopeProvider;
         _trackedReferencesSkipTakeRepository = trackedReferencesSkipTakeRepository;
     }
-    public PagedViewModel<RelationItemModel> GetPagedRelationsForItem(int id, long skip, long take, bool filterMustBeIsDependency)
+    public IEnumerable<RelationItemModel> GetPagedRelationsForItem(int id, long skip, long take, bool filterMustBeIsDependency, out long totalItems)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
-        IEnumerable<RelationItemModel> items = _trackedReferencesSkipTakeRepository.GetPagedRelationsForItem(id, skip, take, filterMustBeIsDependency, out var totalItems);
+        IEnumerable<RelationItemModel> items = _trackedReferencesSkipTakeRepository.GetPagedRelationsForItem(id, skip, take, filterMustBeIsDependency, out totalItems);
 
-        return new PagedViewModel<RelationItemModel> { Total = totalItems, Items = items };
+        return items;
     }
 
-    public PagedViewModel<RelationItemModel> GetPagedDescendantsInReferences(int parentId, long skip, long take, bool filterMustBeIsDependency)
+    public IEnumerable<RelationItemModel> GetPagedDescendantsInReferences(int parentId, long skip, long take, bool filterMustBeIsDependency, out long totalItems)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
 
@@ -32,15 +32,15 @@ public class TrackedReferencesSkipTakeService : ITrackedReferencesSkipTakeServic
             skip,
             take,
             filterMustBeIsDependency,
-            out var totalItems);
-        return new PagedViewModel<RelationItemModel> { Total = totalItems, Items = items };
+            out totalItems);
+        return items;
     }
 
-    public PagedViewModel<RelationItemModel> GetPagedItemsWithRelations(int[] ids, long skip, long take, bool filterMustBeIsDependency)
+    public IEnumerable<RelationItemModel> GetPagedItemsWithRelations(int[] ids, long skip, long take, bool filterMustBeIsDependency, out long totalItems)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
-        IEnumerable<RelationItemModel> items = _trackedReferencesSkipTakeRepository.GetPagedItemsWithRelations(ids, skip, take, filterMustBeIsDependency, out var totalItems);
+        IEnumerable<RelationItemModel> items = _trackedReferencesSkipTakeRepository.GetPagedItemsWithRelations(ids, skip, take, filterMustBeIsDependency, out totalItems);
 
-        return new PagedViewModel<RelationItemModel> { Total = totalItems, Items = items };
+        return items;
     }
 }

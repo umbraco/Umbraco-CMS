@@ -37,11 +37,11 @@ public class ForItemTrackedReferencesController : TrackedReferencesControllerBas
         bool? filterMustBeIsDependency)
     {
 
-        PagedViewModel<RelationItemModel> relationItems = _trackedReferencesService.GetPagedRelationsForItem(id, skip, take, filterMustBeIsDependency ?? false);
+        IEnumerable<RelationItemModel> relationItems = _trackedReferencesService.GetPagedRelationsForItem(id, skip, take, filterMustBeIsDependency ?? false, out var totalItems);
         return new PagedViewModel<RelationItemViewModel>
         {
-            Items = _umbracoMapper.MapEnumerable<RelationItemModel, RelationItemViewModel>(relationItems.Items),
-            Total = relationItems.Total
+            Items = _umbracoMapper.MapEnumerable<RelationItemModel, RelationItemViewModel>(relationItems),
+            Total = totalItems,
         };
     }
 }

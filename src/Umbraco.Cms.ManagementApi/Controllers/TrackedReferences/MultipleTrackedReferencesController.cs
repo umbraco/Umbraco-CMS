@@ -30,12 +30,12 @@ public class MultipleTrackedReferencesController : TrackedReferencesControllerBa
     [ProducesResponseType(typeof(RelationItemViewModel), StatusCodes.Status200OK)]
     public async Task<ActionResult<PagedViewModel<RelationItemViewModel>>> GetPagedReferencedItems([FromBody] int[] ids, long skip, long take, bool? filterMustBeIsDependency)
     {
-        PagedViewModel<RelationItemModel> relationItems =  _trackedReferencesSkipTakeService.GetPagedItemsWithRelations(ids, skip, take, filterMustBeIsDependency ?? true);
+        IEnumerable<RelationItemModel> relationItems = _trackedReferencesSkipTakeService.GetPagedItemsWithRelations(ids, skip, take, filterMustBeIsDependency ?? true, out var totalItems);
 
         return new PagedViewModel<RelationItemViewModel>
         {
-            Items = _umbracoMapper.MapEnumerable<RelationItemModel, RelationItemViewModel>(relationItems.Items),
-            Total = relationItems.Total
+            Items = _umbracoMapper.MapEnumerable<RelationItemModel, RelationItemViewModel>(relationItems),
+            Total = totalItems,
         };
     }
 }
