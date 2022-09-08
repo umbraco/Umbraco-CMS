@@ -1,19 +1,24 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.ManagementApi.Services;
+using Umbraco.Cms.ManagementApi.ViewModels.Pagination;
 using Umbraco.Cms.ManagementApi.ViewModels.Server;
+using Umbraco.Cms.ManagementApi.ViewModels.TrackedReferences;
+using Umbraco.New.Cms.Core.Models.TrackedReferences;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.TrackedReferences;
 
 [ApiVersion("1.0")]
 public class GetTrackedReferencesController : TrackedReferencesControllerBase
 {
-    private readonly ITrackedReferencesService _trackedReferencesService;
+    private readonly ITrackedReferencesSkipTakeService _trackedReferencesService;
+    private readonly IUmbracoMapper _umbracoMapper;
 
-    public GetTrackedReferencesController(ITrackedReferencesService trackedReferencesService)
+    public GetTrackedReferencesController(ITrackedReferencesSkipTakeService trackedReferencesService, IUmbracoMapper umbracoMapper)
     {
         _trackedReferencesService = trackedReferencesService;
+        _umbracoMapper = umbracoMapper;
     }
 
     /// <summary>
@@ -23,22 +28,22 @@ public class GetTrackedReferencesController : TrackedReferencesControllerBase
     ///     Used by info tabs on content, media etc. and for the delete and unpublish of single items.
     ///     This is basically finding parents of relations.
     /// </remarks>
-
     [HttpGet("status")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ServerStatusViewModel), StatusCodes.Status200OK)]
-    public ActionResult<PagedResult<RelationItem>> GetPagedReferences(
+    public ActionResult<PagedViewModel<RelationItemViewModel>> GetPagedReferences(
         int id,
-        int pageNumber = 1,
-        int pageSize = 100,
-        bool filterMustBeIsDependency = false)
+        long skip,
+        long take,
+        bool? filterMustBeIsDependency)
     {
-        if (pageNumber <= 0 || pageSize <= 0)
-        {
-            return BadRequest("Both pageNumber and pageSize must be greater than zero");
-        }
 
-        return _trackedReferencesService.GetPagedRelationsForItem(id, pageNumber - 1, pageSize, filterMustBeIsDependency);
+        PagedViewModel<RelationItemModel> relationItems = _trackedReferencesService.GetPagedRelationsForItem(id, skip, take, filterMustBeIsDependency ?? false);
+        return new PagedViewModel<RelationItemViewModel>()
+        {
+            Items = _umbracoMapper.MapEnumerable<RelationItemModel, RelationItemViewModel>(relationItems.Items),
+            Total = relationItems.Total
+        };
     }
 }
