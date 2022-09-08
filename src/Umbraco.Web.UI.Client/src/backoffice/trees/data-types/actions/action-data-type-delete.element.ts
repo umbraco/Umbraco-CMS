@@ -4,10 +4,10 @@ import { customElement } from 'lit/decorators.js';
 import { UmbContextConsumerMixin } from '../../../../core/context';
 import { UmbModalService } from '../../../../core/services/modal';
 import { UmbDataTypeStore } from '../../../../core/stores/data-type.store';
-import UmbActionElement from '../../actions/action.element';
+import UmbTreeItemActionElement from '../../shared/tree-item-action.element';
 
 @customElement('umb-tree-action-data-type-delete')
-export default class UmbTreeActionDataTypeDeleteElement extends UmbContextConsumerMixin(UmbActionElement) {
+export default class UmbTreeActionDataTypeDeleteElement extends UmbContextConsumerMixin(UmbTreeItemActionElement) {
 	static styles = [UUITextStyles, css``];
 
 	private _modalService?: UmbModalService;

@@ -2,7 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, LitElement, nothing, PropertyValueMap } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UmbContextProviderMixin } from '../../../../core/context';
-import UmbActionElement, { ActionPageEntity } from '../../actions/action.element';
+import UmbTreeItemActionElement, { ActionPageEntity } from '../tree-item-action.element';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 @customElement('umb-tree-context-menu-page-service')
@@ -35,7 +35,7 @@ export class UmbTreeContextMenuPageService extends UmbContextProviderMixin(LitEl
 	}
 
 	public openPage(elementName: string) {
-		const element = document.createElement(elementName) as UmbActionElement;
+		const element = document.createElement(elementName) as UmbTreeItemActionElement;
 		this._pages.push(element);
 		this.requestUpdate('_pages');
 	}

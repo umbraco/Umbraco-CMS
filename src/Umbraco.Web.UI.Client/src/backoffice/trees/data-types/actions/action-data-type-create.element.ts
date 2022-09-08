@@ -1,10 +1,10 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import UmbActionElement from '../../actions/action.element';
+import UmbTreeItemActionElement from '../../shared/tree-item-action.element';
 
 @customElement('umb-tree-action-data-type-create')
-export default class UmbTreeActionDataTypeCreateElement extends UmbActionElement {
+export default class UmbTreeActionDataTypeCreateElement extends UmbTreeItemActionElement {
 	static styles = [UUITextStyles, css``];
 
 	// TODO: how do we handle the href?

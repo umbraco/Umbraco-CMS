@@ -5,16 +5,16 @@ import { UmbContextConsumerMixin } from '../../../core/context';
 import type { ManifestEntityAction, ManifestTree } from '../../../core/models';
 import { Entity } from '../../../mocks/data/entity.data';
 import { UmbSectionContext } from '../../sections/section.context';
-import { UmbTreeContextMenuPageService } from '../shared/context-menu/tree-context-menu-page.service';
-import { UmbTreeContextMenuService } from '../shared/context-menu/tree-context-menu.service';
+import { UmbTreeContextMenuPageService } from './context-menu/tree-context-menu-page.service';
+import { UmbTreeContextMenuService } from './context-menu/tree-context-menu.service';
 
 export type ActionPageEntity = {
 	key: string;
 	name: string;
 };
 
-@customElement('umb-action')
-export default class UmbActionElement extends UmbContextConsumerMixin(LitElement) {
+@customElement('umb-tree-item-action')
+export default class UmbTreeItemActionElement extends UmbContextConsumerMixin(LitElement) {
 	@property({ attribute: false })
 	public treeAction?: ManifestEntityAction;
 
@@ -81,6 +81,6 @@ export default class UmbActionElement extends UmbContextConsumerMixin(LitElement
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-action': UmbActionElement;
+		'umb-tree-item-action': UmbTreeItemActionElement;
 	}
 }

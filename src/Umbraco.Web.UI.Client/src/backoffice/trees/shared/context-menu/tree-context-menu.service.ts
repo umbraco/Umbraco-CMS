@@ -3,7 +3,7 @@ import { css, html, LitElement, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbContextProviderMixin } from '../../../../core/context';
 
-import { ActionPageEntity } from '../../actions/action.element';
+import { ActionPageEntity } from '../tree-item-action.element';
 import '../../actions';
 
 @customElement('umb-tree-context-menu-service')
