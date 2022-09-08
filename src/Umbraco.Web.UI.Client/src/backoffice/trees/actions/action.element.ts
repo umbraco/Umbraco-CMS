@@ -6,7 +6,7 @@ import type { ManifestEntityAction, ManifestTree } from '../../../core/models';
 import { Entity } from '../../../mocks/data/entity.data';
 import { UmbSectionContext } from '../../sections/section.context';
 import { UmbActionPageService } from './action-page.service';
-import { UmbActionService } from './actions.service';
+import { UmbTreeContextMenuService } from '../shared/context-menu/tree-context-menu.service';
 
 export type ActionPageEntity = {
 	key: string;
@@ -25,7 +25,7 @@ export default class UmbActionElement extends UmbContextConsumerMixin(LitElement
 	protected _activeTreeItem?: Entity;
 
 	protected _sectionContext?: UmbSectionContext;
-	protected _actionService?: UmbActionService;
+	protected _treeContextMenuService?: UmbTreeContextMenuService;
 	protected _actionPageService?: UmbActionPageService;
 
 	protected _actionPageSubscription?: Subscription;
@@ -41,8 +41,8 @@ export default class UmbActionElement extends UmbContextConsumerMixin(LitElement
 			this._observeActiveTreeItem();
 		});
 
-		this.consumeContext('umbActionService', (actionService: UmbActionService) => {
-			this._actionService = actionService;
+		this.consumeContext('umbTreeContextMenuService', (treeContextMenuService: UmbTreeContextMenuService) => {
+			this._treeContextMenuService = treeContextMenuService;
 		});
 
 		this.consumeContext('umbActionPageService', (actionPageService: UmbActionPageService) => {

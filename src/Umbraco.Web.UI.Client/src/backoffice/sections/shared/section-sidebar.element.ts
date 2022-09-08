@@ -4,7 +4,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { Subscription } from 'rxjs';
 import { UmbContextConsumerMixin } from '../../../core/context';
 import { UmbSectionContext } from '../section.context';
-import '../../trees/actions/actions.service';
+import '../../trees/shared/context-menu/tree-context-menu.service';
 
 @customElement('umb-section-sidebar')
 export class UmbSectionSidebar extends UmbContextConsumerMixin(LitElement) {
@@ -61,7 +61,7 @@ export class UmbSectionSidebar extends UmbContextConsumerMixin(LitElement) {
 
 	render() {
 		return html`
-			<umb-action-service>
+			<umb-tree-context-menu-service>
 				<uui-scroll-container>
 					<a href="${`/section/${this._sectionPathname}`}">
 						<h3>${this._sectionName}</h3>
@@ -69,7 +69,7 @@ export class UmbSectionSidebar extends UmbContextConsumerMixin(LitElement) {
 
 					<slot></slot>
 				</uui-scroll-container>
-			</umb-action-service>
+			</umb-tree-context-menu-service>
 		`;
 	}
 }

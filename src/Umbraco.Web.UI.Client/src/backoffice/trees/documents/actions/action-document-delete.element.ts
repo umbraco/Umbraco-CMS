@@ -34,9 +34,9 @@ export default class UmbTreeActionDocumentDeleteElement extends UmbContextConsum
 		});
 
 		modalHandler?.onClose.then(({ confirmed }: any) => {
-			if (confirmed && this._actionService && this._nodeStore && this._activeTreeItem) {
+			if (confirmed && this._treeContextMenuService && this._nodeStore && this._activeTreeItem) {
 				this._nodeStore?.trash(this._activeTreeItem.key);
-				this._actionService.close();
+				this._treeContextMenuService.close();
 			}
 		});
 	}

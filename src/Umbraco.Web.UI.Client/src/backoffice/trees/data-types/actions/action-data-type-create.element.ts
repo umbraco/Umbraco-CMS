@@ -14,10 +14,10 @@ export default class UmbTreeActionDataTypeCreateElement extends UmbActionElement
 
 	// TODO: change to href. This is a temporary solution to get the link to work. For some reason query params gets removed when using href.
 	private _handleLabelClick() {
-		if (!this._actionService) return;
+		if (!this._treeContextMenuService) return;
 		const href = this._constructUrl();
 		history.pushState(null, '', href);
-		this._actionService.close();
+		this._treeContextMenuService.close();
 	}
 
 	render() {

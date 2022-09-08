@@ -7,7 +7,7 @@ import { UUIMenuItemEvent } from '@umbraco-ui/uui';
 import { UmbSectionContext } from '../../sections/section.context';
 import { map, Subscription } from 'rxjs';
 import { Entity } from '../../../mocks/data/entity.data';
-import { UmbActionService } from '../actions/actions.service';
+import { UmbTreeContextMenuService } from './context-menu/tree-context-menu.service';
 import { repeat } from 'lit/directives/repeat.js';
 
 @customElement('umb-tree-item')
@@ -37,7 +37,7 @@ export class UmbTreeItem extends UmbContextConsumerMixin(LitElement) {
 
 	private _treeContext?: UmbTreeContextBase;
 	private _sectionContext?: UmbSectionContext;
-	private _actionService?: UmbActionService;
+	private _treeContextMenuService?: UmbTreeContextMenuService;
 
 	private _sectionSubscription?: Subscription;
 	private _childrenSubscription?: Subscription;
@@ -60,8 +60,8 @@ export class UmbTreeItem extends UmbContextConsumerMixin(LitElement) {
 			this._observeActiveTreeItem();
 		});
 
-		this.consumeContext('umbActionService', (actionService: UmbActionService) => {
-			this._actionService = actionService;
+		this.consumeContext('umbTreeContextMenuService', (treeContextMenuService: UmbTreeContextMenuService) => {
+			this._treeContextMenuService = treeContextMenuService;
 		});
 	}
 
@@ -149,7 +149,7 @@ export class UmbTreeItem extends UmbContextConsumerMixin(LitElement) {
 
 		this._sectionContext?.setActiveTree(this._treeContext?.tree);
 		this._sectionContext?.setActiveTreeItem(this.treeItem);
-		this._actionService?.open({ name: this.treeItem.name, key: this.treeItem.key });
+		this._treeContextMenuService?.open({ name: this.treeItem.name, key: this.treeItem.key });
 	}
 
 	render() {

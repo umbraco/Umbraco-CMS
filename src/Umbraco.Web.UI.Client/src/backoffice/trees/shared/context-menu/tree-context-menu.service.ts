@@ -1,14 +1,13 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, LitElement, nothing } from 'lit';
-import { customElement, query, state } from 'lit/decorators.js';
-import { UmbContextProviderMixin } from '../../../core/context';
+import { customElement, state } from 'lit/decorators.js';
+import { UmbContextProviderMixin } from '../../../../core/context';
 
-import { ActionPageEntity } from './action.element';
-import type { UmbActionPageService } from '.';
-import '.';
+import { ActionPageEntity } from '../../actions/action.element';
+import '../../actions';
 
-@customElement('umb-action-service')
-export class UmbActionService extends UmbContextProviderMixin(LitElement) {
+@customElement('umb-tree-context-menu-service')
+export class UmbTreeContextMenuService extends UmbContextProviderMixin(LitElement) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -51,9 +50,6 @@ export class UmbActionService extends UmbContextProviderMixin(LitElement) {
 		`,
 	];
 
-	@query('umb-action-page-service')
-	private _actionPageService!: UmbActionPageService;
-
 	@state()
 	private _modalOpen = false;
 
@@ -62,7 +58,7 @@ export class UmbActionService extends UmbContextProviderMixin(LitElement) {
 
 	connectedCallback() {
 		super.connectedCallback();
-		this.provideContext('umbActionService', this);
+		this.provideContext('umbTreeContextMenuService', this);
 	}
 
 	public open(entity: ActionPageEntity) {
@@ -98,6 +94,6 @@ export class UmbActionService extends UmbContextProviderMixin(LitElement) {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-action-service': UmbActionService;
+		'umb-tree-context-menu-service': UmbTreeContextMenuService;
 	}
 }

@@ -8,7 +8,7 @@ export class UmbTreeActionCreatePage2Element extends UmbActionElement {
 	static styles = [UUITextStyles, css``];
 
 	private _save() {
-		this._actionService?.close();
+		this._treeContextMenuService?.close();
 	}
 
 	private _back() {
