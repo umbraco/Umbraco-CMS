@@ -2,6 +2,9 @@ import { LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { Subscription } from 'rxjs';
 import { UmbContextConsumerMixin } from '../../../core/context';
+import { ManifestTree } from '../../../core/models';
+import { Entity } from '../../../mocks/data/entity.data';
+import { UmbSectionContext } from '../../sections/section.context';
 import { UmbActionPageService } from './action-page.service';
 import { UmbActionService } from './actions.service';
 
@@ -15,12 +18,25 @@ export default class UmbActionElement extends UmbContextConsumerMixin(LitElement
 	@state()
 	protected _entity: ActionPageEntity = { name: '', key: '' };
 
+	protected _activeTree?: ManifestTree;
+	protected _activeTreeItem?: Entity;
+
+	protected _sectionContext?: UmbSectionContext;
 	protected _actionService?: UmbActionService;
 	protected _actionPageService?: UmbActionPageService;
-	private _actionPageSubscription?: Subscription;
+
+	protected _actionPageSubscription?: Subscription;
+	protected _activeTreeSubscription?: Subscription;
+	protected _activeTreeItemSubscription?: Subscription;
 
 	connectedCallback() {
 		super.connectedCallback();
+
+		this.consumeContext('umbSectionContext', (sectionContext) => {
+			this._sectionContext = sectionContext;
+			this._observeActiveTree();
+			this._observeActiveTreeItem();
+		});
 
 		this.consumeContext('umbActionService', (actionService: UmbActionService) => {
 			this._actionService = actionService;
@@ -36,9 +52,27 @@ export default class UmbActionElement extends UmbContextConsumerMixin(LitElement
 		});
 	}
 
+	private _observeActiveTree() {
+		this._activeTreeSubscription?.unsubscribe();
+
+		this._activeTreeSubscription = this._sectionContext?.activeTree.subscribe((tree) => {
+			this._activeTree = tree;
+		});
+	}
+
+	private _observeActiveTreeItem() {
+		this._activeTreeItemSubscription?.unsubscribe();
+
+		this._activeTreeItemSubscription = this._sectionContext?.activeTreeItem.subscribe((treeItem) => {
+			this._activeTreeItem = treeItem;
+		});
+	}
+
 	disconnectCallback() {
 		super.disconnectedCallback();
 		this._actionPageSubscription?.unsubscribe();
+		this._activeTreeSubscription?.unsubscribe();
+		this._activeTreeItemSubscription?.unsubscribe();
 	}
 }
 

@@ -1,13 +1,7 @@
 import { UmbData } from './data';
+import { Entity } from './entity.data';
 
-export interface NodeEntity {
-	key: string;
-	name: string;
-	icon: string; // TODO: should come from the doc type?
-	type: string;
-	isTrashed: boolean;
-	hasChildren: boolean;
-	parentKey: string;
+export interface NodeEntity extends Entity {
 	properties: Array<NodeProperty>;
 	data: Array<NodePropertyData>;
 	variants: Array<any>; // TODO: define variant data

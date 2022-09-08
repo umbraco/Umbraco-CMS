@@ -62,7 +62,6 @@ export class UmbTreeDocumentElement extends UmbContextProviderMixin(UmbContextCo
 		this._selectionSubscription?.unsubscribe();
 		this._selectionSubscription = this._treeContext?.selection.subscribe((selection) => {
 			this._selection = selection;
-			this.dispatchEvent(new CustomEvent('change', { bubbles: true, composed: true }));
 		});
 	}
 

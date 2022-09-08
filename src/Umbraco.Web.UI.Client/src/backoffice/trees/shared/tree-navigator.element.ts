@@ -51,13 +51,7 @@ export class UmbTreeNavigator extends UmbContextConsumerMixin(LitElement) {
 			${repeat(
 				this._items,
 				(item) => item.key,
-				(item) => html`<umb-tree-item
-					.itemKey=${item.key}
-					.itemType=${item.type}
-					.label=${item.name}
-					.icon="${item.icon}"
-					?hasChildren=${item.hasChildren}
-					.loading=${this._loading}></umb-tree-item>`
+				(item) => html`<umb-tree-item .treeItem=${item} .loading=${this._loading}></umb-tree-item>`
 			)}
 		`;
 	}

@@ -7,6 +7,7 @@ import { UmbExtensionRegistry } from '../../../core/extension';
 import { UmbContextConsumerMixin } from '../../../core/context';
 import { map, Subscription } from 'rxjs';
 import { UmbSectionContext } from '../../sections/section.context';
+import { Entity } from '../../../mocks/data/entity.data';
 
 @customElement('umb-action-list-page')
 export class UmbActionListPageElement extends UmbContextConsumerMixin(UmbActionElement) {
@@ -34,11 +35,15 @@ export class UmbActionListPageElement extends UmbContextConsumerMixin(UmbActionE
 	@state()
 	private _activeTree?: ManifestTree;
 
+	@state()
+	private _activeTreeItem?: Entity;
+
 	private _extensionRegistry?: UmbExtensionRegistry;
 	private _sectionContext?: UmbSectionContext;
 
 	private _treeItemActionsSubscription?: Subscription;
 	private _activeTreeSubscription?: Subscription;
+	private _activeTreeItemSubscription?: Subscription;
 
 	connectedCallback() {
 		super.connectedCallback();
@@ -51,6 +56,7 @@ export class UmbActionListPageElement extends UmbContextConsumerMixin(UmbActionE
 		this.consumeContext('umbSectionContext', (sectionContext) => {
 			this._sectionContext = sectionContext;
 			this._observeActiveTree();
+			this._observeActiveTreeItem();
 			this._observeTreeItemActions();
 		});
 	}
@@ -76,6 +82,14 @@ export class UmbActionListPageElement extends UmbContextConsumerMixin(UmbActionE
 		});
 	}
 
+	private _observeActiveTreeItem() {
+		this._activeTreeItemSubscription?.unsubscribe();
+
+		this._activeTreeItemSubscription = this._sectionContext?.activeTreeItem.subscribe((treeItem) => {
+			this._activeTreeItem = treeItem;
+		});
+	}
+
 	private _renderActions() {
 		return this._actions
 			.sort((a, b) => a.meta.weight - b.meta.weight)
@@ -93,7 +107,7 @@ export class UmbActionListPageElement extends UmbContextConsumerMixin(UmbActionE
 	render() {
 		return html`
 			<div id="title">
-				<h3>${this._entity.name}</h3>
+				<h3>${this._activeTreeItem?.name}</h3>
 			</div>
 			<div id="action-list">${this._renderActions()}</div>
 		`;

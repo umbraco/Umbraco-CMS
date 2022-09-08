@@ -1,17 +1,27 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html, LitElement } from 'lit';
+import { css, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import type { ManifestEntityAction } from '../../../../core/models';
+import UmbActionElement from '../../actions/action.element';
 
 @customElement('umb-tree-action-data-type-create')
-export default class UmbTreeActionDataTypeCreateElement extends LitElement {
+export default class UmbTreeActionDataTypeCreateElement extends UmbActionElement {
 	static styles = [UUITextStyles, css``];
 
 	@property({ attribute: false })
 	public treeAction?: ManifestEntityAction;
 
+	// TODO: how do we handle the href?
+	private _constructUrl() {
+		return `/section/settings/${this._activeTreeItem?.type}/${this._activeTreeItem?.key}/view/edit?create=true`;
+	}
+
+	// TODO: change to href. This is a temporary solution to get the link to work. For some reason query params gets removed when using href.
 	private _handleLabelClick() {
-		console.log('create new treee item');
+		if (!this._actionService) return;
+		const href = this._constructUrl();
+		history.pushState(null, '', href);
+		this._actionService.close();
 	}
 
 	render() {

@@ -30,4 +30,13 @@ export const handlers = [
 
 		return res(ctx.status(200), ctx.json(saved));
 	}),
+
+	rest.post<DataTypeEntity[]>('/umbraco/backoffice/data-type/trash', (req, res, ctx) => {
+		console.warn('Please move to schema');
+		const key = req.body as string;
+
+		const trashed = umbDataTypeData.trash(key);
+
+		return res(ctx.status(200), ctx.json([trashed]));
+	}),
 ];

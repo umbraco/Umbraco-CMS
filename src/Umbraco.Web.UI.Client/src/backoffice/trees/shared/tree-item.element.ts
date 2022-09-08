@@ -8,25 +8,14 @@ import { UmbSectionContext } from '../../sections/section.context';
 import { map, Subscription } from 'rxjs';
 import { Entity } from '../../../mocks/data/entity.data';
 import { UmbActionService } from '../actions/actions.service';
+import { repeat } from 'lit/directives/repeat.js';
 
 @customElement('umb-tree-item')
 export class UmbTreeItem extends UmbContextConsumerMixin(LitElement) {
 	static styles = [UUITextStyles, css``];
 
-	@property()
-	itemKey = '';
-
-	@property()
-	itemType = '';
-
-	@property({ type: String })
-	label = '';
-
-	@property({ type: String })
-	icon = '';
-
-	@property({ type: Boolean })
-	hasChildren = false;
+	@property({ type: Object, attribute: false })
+	treeItem!: Entity;
 
 	@state()
 	private _childItems: Entity[] = [];
@@ -43,13 +32,18 @@ export class UmbTreeItem extends UmbContextConsumerMixin(LitElement) {
 	@state()
 	private _selected = false;
 
+	@state()
+	private _isActive = false;
+
 	private _treeContext?: UmbTreeContextBase;
 	private _sectionContext?: UmbSectionContext;
+	private _actionService?: UmbActionService;
+
 	private _sectionSubscription?: Subscription;
 	private _childrenSubscription?: Subscription;
-	private _actionService?: UmbActionService;
 	private _selectableSubscription?: Subscription;
 	private _selectionSubscription?: Subscription;
+	private _activeTreeItemSubscription?: Subscription;
 
 	constructor() {
 		super();
@@ -62,7 +56,8 @@ export class UmbTreeItem extends UmbContextConsumerMixin(LitElement) {
 
 		this.consumeContext('umbSectionContext', (sectionContext: UmbSectionContext) => {
 			this._sectionContext = sectionContext;
-			this._useSection();
+			this._observeSection();
+			this._observeActiveTreeItem();
 		});
 
 		this.consumeContext('umbActionService', (actionService: UmbActionService) => {
@@ -74,15 +69,15 @@ export class UmbTreeItem extends UmbContextConsumerMixin(LitElement) {
 		super.connectedCallback();
 		this.addEventListener('selected', (e) => {
 			e.stopPropagation();
-			this._treeContext?.select(this.itemKey);
+			this._treeContext?.select(this.treeItem.key);
 		});
 	}
 
-	private _useSection() {
+	private _observeSection() {
 		this._sectionSubscription?.unsubscribe();
 
 		this._sectionSubscription = this._sectionContext?.data.subscribe((section) => {
-			this._href = this._constructPath(section.meta.pathname, this.itemType, this.itemKey);
+			this._href = this._constructPath(section.meta.pathname, this.treeItem.type, this.treeItem.key);
 		});
 	}
 
@@ -96,10 +91,18 @@ export class UmbTreeItem extends UmbContextConsumerMixin(LitElement) {
 	private _observeSelection() {
 		this._selectionSubscription?.unsubscribe();
 		this._selectionSubscription = this._treeContext?.selection
-			.pipe(map((keys) => keys.includes(this.itemKey)))
+			.pipe(map((keys) => keys.includes(this.treeItem.key)))
 			.subscribe((isSelected) => {
 				this._selected = isSelected;
 			});
+	}
+
+	private _observeActiveTreeItem() {
+		this._activeTreeItemSubscription?.unsubscribe();
+
+		this._activeTreeItemSubscription = this._sectionContext?.activeTreeItem.subscribe((treeItem) => {
+			this._isActive = treeItem.key === this.treeItem.key;
+		});
 	}
 
 	// TODO: how do we handle this?
@@ -115,7 +118,7 @@ export class UmbTreeItem extends UmbContextConsumerMixin(LitElement) {
 
 		this._childrenSubscription?.unsubscribe();
 
-		this._childrenSubscription = this._treeContext?.childrenChanges(this.itemKey).subscribe((items) => {
+		this._childrenSubscription = this._treeContext?.childrenChanges(this.treeItem.key).subscribe((items) => {
 			if (items?.length === 0) return;
 			this._childItems = items;
 			this._loading = false;
@@ -128,39 +131,40 @@ export class UmbTreeItem extends UmbContextConsumerMixin(LitElement) {
 		this._childrenSubscription?.unsubscribe();
 		this._selectableSubscription?.unsubscribe();
 		this._selectionSubscription?.unsubscribe();
+		this._activeTreeItemSubscription?.unsubscribe();
 	}
 
 	private _renderChildItems() {
-		return this._childItems.map((item) => {
-			return html`<umb-tree-item
-				.label=${item.name}
-				.hasChildren=${item.hasChildren}
-				.itemKey=${item.key}
-				.itemType=${item.type}
-				.icon="${item.icon}">
-			</umb-tree-item>`;
-		});
+		return html`
+			${repeat(
+				this._childItems,
+				(item) => item.key,
+				(item) => html`<umb-tree-item .treeItem=${item}></umb-tree-item>`
+			)}
+		`;
 	}
 
 	private _openActions() {
-		if (!this._treeContext || !this._sectionContext) return;
+		if (!this._treeContext || !this._sectionContext || !this.treeItem) return;
 
 		this._sectionContext?.setActiveTree(this._treeContext?.tree);
-		this._actionService?.open({ name: this.label, key: this.itemKey });
+		this._sectionContext?.setActiveTreeItem(this.treeItem);
+		this._actionService?.open({ name: this.treeItem.name, key: this.treeItem.key });
 	}
 
 	render() {
 		return html`
 			<uui-menu-item
+				@show-children=${this._onShowChildren}
 				?selectable=${this._selectable}
 				?selected=${this._selected}
-				@show-children=${this._onShowChildren}
 				.loading=${this._loading}
-				.hasChildren=${this.hasChildren}
-				label="${this.label}"
-				href="${this._href}">
+				.hasChildren=${this.treeItem.hasChildren}
+				label="${this.treeItem.name}"
+				href="${this._href}"
+				?active=${this._isActive}>
 				${this._renderChildItems()}
-				<uui-icon slot="icon" name="${this.icon}"></uui-icon>
+				<uui-icon slot="icon" name="${this.treeItem.icon}"></uui-icon>
 				<uui-action-bar slot="actions">
 					<uui-button @click=${this._openActions} label="Open actions menu">
 						<uui-symbol-more></uui-symbol-more>

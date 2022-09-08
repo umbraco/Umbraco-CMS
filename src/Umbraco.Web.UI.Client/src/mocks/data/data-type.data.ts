@@ -1,12 +1,7 @@
 import { UmbData } from './data';
+import { Entity } from './entity.data';
 
-export interface DataTypeEntity {
-	key: string;
-	name: string;
-	type: string;
-	parentKey: string;
-	isTrashed: boolean;
-	hasChildren: boolean;
+export interface DataTypeEntity extends Entity {
 	propertyEditorUIAlias: string;
 	//configUI: any; // this is the prevalues...
 }
@@ -19,6 +14,7 @@ export const data: Array<DataTypeEntity> = [
 		parentKey: '29d78e6c-c1bf-4c15-b820-d511c237ffae',
 		isTrashed: false,
 		hasChildren: false,
+		icon: '',
 		propertyEditorUIAlias: 'Umb.PropertyEditorUI.Text',
 	},
 	{
@@ -28,6 +24,7 @@ export const data: Array<DataTypeEntity> = [
 		parentKey: '29d78e6c-c1bf-4c15-b820-d511c237ffae',
 		isTrashed: false,
 		hasChildren: false,
+		icon: '',
 		propertyEditorUIAlias: 'Umb.PropertyEditorUI.Textarea',
 	},
 	{
@@ -37,6 +34,7 @@ export const data: Array<DataTypeEntity> = [
 		parentKey: '29d78e6c-c1bf-4c15-b820-d511c237ffae',
 		isTrashed: false,
 		hasChildren: false,
+		icon: '',
 		propertyEditorUIAlias: 'My.PropertyEditorUI.Custom',
 	},
 	{
@@ -46,6 +44,7 @@ export const data: Array<DataTypeEntity> = [
 		parentKey: '29d78e6c-c1bf-4c15-b820-d511c237ffae',
 		isTrashed: false,
 		hasChildren: false,
+		icon: '',
 		propertyEditorUIAlias: 'Umb.PropertyEditorUI.ContextExample',
 	},
 	{
@@ -55,6 +54,7 @@ export const data: Array<DataTypeEntity> = [
 		parentKey: '29d78e6c-c1bf-4c15-b820-d511c237ffae',
 		isTrashed: false,
 		hasChildren: false,
+		icon: '',
 		propertyEditorUIAlias: 'Umb.PropertyEditorUI.ContentPicker',
 	},
 ];

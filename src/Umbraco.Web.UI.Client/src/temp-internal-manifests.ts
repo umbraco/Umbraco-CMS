@@ -388,13 +388,25 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 	},
 	{
 		type: 'treeItemAction',
-		alias: 'Umb.EntityAction.Create',
-		name: 'Data Type Create',
+		alias: 'Umb.TreeItemAction.Create',
+		name: 'Tree Item Action Create',
 		loader: () => import('./backoffice/trees/data-types/actions/action-data-type-create.element'),
 		meta: {
 			trees: ['Umb.Tree.DataTypes'],
 			label: 'Create',
 			icon: 'add',
+			weight: 100,
+		},
+	},
+	{
+		type: 'treeItemAction',
+		alias: 'Umb.TreeItemAction.Delete',
+		name: 'Tree Item Action Delete',
+		loader: () => import('./backoffice/trees/data-types/actions/action-data-type-delete.element'),
+		meta: {
+			trees: ['Umb.Tree.DataTypes'],
+			label: 'Delete',
+			icon: 'delete',
 			weight: 100,
 		},
 	},

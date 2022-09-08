@@ -1,6 +1,7 @@
 import { UmbData } from './data';
+import { Entity } from './entity.data';
 
-export interface DocumentTypeEntity {
+export interface DocumentTypeEntity extends Entity {
 	key: string;
 	name: string;
 	alias: string;
@@ -20,6 +21,7 @@ export const data: Array<DocumentTypeEntity> = [
 		parentKey: 'f50eb86d-3ef2-4011-8c5d-c56c04eec0da',
 		isTrashed: false,
 		hasChildren: false,
+		icon: '',
 		properties: [],
 	},
 	{
@@ -30,6 +32,7 @@ export const data: Array<DocumentTypeEntity> = [
 		parentKey: 'f50eb86d-3ef2-4011-8c5d-c56c04eec0da',
 		isTrashed: false,
 		hasChildren: false,
+		icon: '',
 		properties: [],
 	},
 ];

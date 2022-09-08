@@ -42,4 +42,19 @@ export class UmbDataTypeStore extends UmbDataStoreBase<DataTypeEntity> {
 			console.error('Save Data Type error', error);
 		}
 	}
+
+	trash(key: string) {
+		return fetch('/umbraco/backoffice/data-type/trash', {
+			method: 'POST',
+			body: key,
+			headers: {
+				'Content-Type': 'application/json',
+			},
+		})
+			.then((res) => res.json())
+			.then((data: Array<DataTypeEntity>) => {
+				this.update(data);
+				this._entityStore.update(data);
+			});
+	}
 }
