@@ -1696,7 +1696,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
           view: 'views/propertyeditors/rte/codeeditor.html',
           submit: function (model) {
             args.editor.setContent(model.content);
-            args.editor.fire('Change');
+            args.editor.dispatch('Change');
             editorService.close();
           },
           close: function () {
