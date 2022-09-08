@@ -148,7 +148,7 @@
         </button>
 
         <button 
-            ng-if="!vm.blockEditorApi.readonly && (vm.layoutEntry.$block.config.columnSpanOptions.length > 1 || vm.layoutEntry.$block.config.rowMaxSpan !== vm.layoutEntry.$block.config.rowMinSpan)" 
+            ng-if="!vm.blockEditorApi.readonly && (vm.layoutEntry.$block.config.columnSpanOptions.length > 1 || (vm.layoutEntry.$block.config.rowMinSpan && vm.layoutEntry.$block.config.rowMaxSpan && vm.layoutEntry.$block.config.rowMaxSpan !== vm.layoutEntry.$block.config.rowMinSpan))" 
             type="button"
             class="umb-block-grid__scale-handler"
             ng-class="{ '--active': vm.layoutEntry.forceRight }"
@@ -156,7 +156,7 @@
             <!-- TODO: missing readable text -->
         </button>
 
-        <div ng-if="!vm.blockEditorApi.readonly && (vm.layoutEntry.$block.config.columnSpanOptions.length > 1 || vm.layoutEntry.$block.config.rowMaxSpan !== vm.layoutEntry.$block.config.rowMinSpan)" 
+        <div ng-if="!vm.blockEditorApi.readonly && (vm.layoutEntry.$block.config.columnSpanOptions.length > 1 || (vm.layoutEntry.$block.config.rowMinSpan && vm.layoutEntry.$block.config.rowMaxSpan && vm.layoutEntry.$block.config.rowMaxSpan !== vm.layoutEntry.$block.config.rowMinSpan))" 
             class="umb-block-grid__scale-label">
             {{vm.layoutEntry.columnSpan}} x {{vm.layoutEntry.rowSpan}}
         </div>
