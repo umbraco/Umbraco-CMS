@@ -1567,6 +1567,11 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
       args.editor.on('ObjectResized', function (e) {
         var srcAttr = $(e.target).attr("src");
+
+        if (!srcAttr) {
+          return;
+        }
+
         var path = srcAttr.split("?")[0];
         mediaHelper.getProcessedImageUrl(path, {
           width: e.width,
