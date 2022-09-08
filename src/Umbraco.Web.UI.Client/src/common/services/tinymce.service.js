@@ -706,7 +706,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
           // When image is loaded we are ready to call sizeImageInEditor.
           var onImageLoaded = function () {
             sizeImageInEditor(editor, imgElm, img.url);
-            editor.fire("Change");
+            editor.dispatch("Change");
           }
 
           // Check if image already is loaded.
@@ -1358,9 +1358,9 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             //uses an empty string in the editor when the value is null
             args.editor.setContent(newVal || "", { format: 'raw' });
 
-            //we need to manually fire this event since it is only ever fired based on loading from the DOM, this
+            //we need to manually dispatch this event since it is only ever dispatchd based on loading from the DOM, this
             // is required for our plugins listening to this event to execute
-            args.editor.fire('LoadContent', null);
+            args.editor.dispatch('LoadContent', null);
           }
         });
       }
