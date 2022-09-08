@@ -449,13 +449,13 @@
     <key alias="assignDomain">Gweinyddu enwau gwesteia</key>
     <key alias="closeThisWindow">Cau'r ffenestr yma</key>
     <key alias="confirmdelete">Ydych chi'n sicr eich bod eisiau dileu</key>
-    <key alias="confirmdeleteNumberOfItems"><![CDATA[Wyt ti'n siŵr fod ti eisiau dileu <b>%0%</b> yn seiliedig ar <b>%1%</b>]]></key>
+    <key alias="confirmdeleteNumberOfItems"><![CDATA[Wyt ti'n siŵr fod ti eisiau dileu <strong>%0%</strong> yn seiliedig ar <strong>%1%</strong>]]></key>
 
     <key alias="confirmdisable">Ydych chi'n sicr eich bod eisiau analluogi</key>
 
     <key alias="confirmremove">Wyt ti'n siŵr fod ti eisiau dileu</key>
-    <key alias="confirmremoveusageof"><![CDATA[Ydych chi'n siŵr bod chi am gael gwared ar y defnydd o <b>%0%</b>]]></key>
-    <key alias="confirmremovereferenceto"><![CDATA[Ydych chi'n siŵr bod chi am gael gwared ar y cyfeirnod i <b>%0%</b>]]></key>
+    <key alias="confirmremoveusageof"><![CDATA[Ydych chi'n siŵr bod chi am gael gwared ar y defnydd o <strong>%0%</strong>]]></key>
+    <key alias="confirmremovereferenceto"><![CDATA[Ydych chi'n siŵr bod chi am gael gwared ar y cyfeirnod i <strong>%0%</strong>]]></key>
 
     <key alias="confirmlogout">Ydych chi'n sicr?</key>
     <key alias="confirmSure">Ydych chi'n sicr?</key>
@@ -546,8 +546,8 @@
     <key alias="selectEditorConfiguration">Dewiswch ffurfweddiad</key>
     <key alias="selectSnippet">Dewiswch damaid</key>
     <key alias="variantdeletewarning">Bydd hyn yn dileu'r nod a'i holl ieithoedd. Os mai dim ond un iaith yr ydych am ei dileu, ewch i'w anghyhoedd yn lle.</key>
-    <key alias="propertyuserpickerremovewarning"><![CDATA[Bydd hyn yn cael gwared ar y defnyddiwr <b>%0%</b>.]]></key>
-    <key alias="userremovewarning"><![CDATA[bydd hyn yn cael gwared ar y defnyddiwr <b>%0%</b> o'r grŵp <b>%1%</b>]]></key>
+    <key alias="propertyuserpickerremovewarning"><![CDATA[Bydd hyn yn cael gwared ar y defnyddiwr <strong>%0%</strong>.]]></key>
+    <key alias="userremovewarning"><![CDATA[bydd hyn yn cael gwared ar y defnyddiwr <strong>%0%</strong> o'r grŵp <strong>%1%</strong>]]></key>
     <key alias="yesRemove">Ydw, dileu</key>
   </area>
   <area alias="dictionary">
@@ -965,7 +965,7 @@
     </key>
     <key alias="databaseUpToDate"><![CDATA[Mae eich cronfa ddata bresennol wedi diweddaru eisoes!. Cliciwch <strong>nesaf</strong> i barhau gyda'r dewin ffurfwedd]]></key>
     <key alias="defaultUserChangePass"><![CDATA[<strong>Mae angen newid cyfrinair y defnyddiwr Diofyn!</strong>]]></key>
-    <key alias="defaultUserDisabled"><![CDATA[<strong>Mae'r defnyddiwr Diofyn wedi'u analluogi neu does dim hawliau i Umbraco!</strong></p><p>Does dim angen unrhyw weithredoedd pellach. Cliciwch <b>Nesaf</b> i barhau.]]></key>
+    <key alias="defaultUserDisabled"><![CDATA[<strong>Mae'r defnyddiwr Diofyn wedi'u analluogi neu does dim hawliau i Umbraco!</strong></p><p>Does dim angen unrhyw weithredoedd pellach. Cliciwch <strong>Nesaf</strong> i barhau.]]></key>
     <key alias="defaultUserPassChanged"><![CDATA[<strong>Mae cyfrinair y defnyddiwr Diofyn wedi'i newid yn llwyddiannus ers y gosodiad!</strong></p><p>Does dim angen unrhyw weithredoedd pellach. Cliciwch <strong>Nesaf</strong> i barhau.]]></key>
     <key alias="defaultUserPasswordChanged">Mae'r cyfrinair wedi'i newid!</key>
     <key alias="greatStart">Cewch gychwyn gwych, gwyliwch ein fideos rhaglith</key>
@@ -2695,12 +2695,12 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
                     Mae Umbraco yn rhedeg mewn modd dadfygio. Mae hyn yn golygu y gallwch chi ddefnyddio'r proffiliwr perfformiad adeiledig i asesu'r perfformiad wrth rendro tudalennau.
                 </p>
                 <p>
-                    OS ti eisiau actifadu'r proffiliwr am rendro tudalen penodol, bydd angen ychwanegu <b>umbDebug=true</b> i'r ymholiad wrth geisio am y tudalen
+                    OS ti eisiau actifadu'r proffiliwr am rendro tudalen penodol, bydd angen ychwanegu <strong>umbDebug=true</strong> i'r ymholiad wrth geisio am y tudalen
                 </p>
                 <p>
                     Os ydych chi am i'r proffiliwr gael ei actifadu yn ddiofyn am bob rendrad tudalen, gallwch chi ddefnyddio'r togl isod.
                     Bydd e'n gosod cwci yn eich porwr, sydd wedyn yn actifadu'r proffiliwr yn awtomatig.
-                    Mewn geiriau eraill, bydd y proffiliwr dim ond yn actif yn ddiofyn yn eich porwr <i>chi</i> - nid porwr pawb eraill.
+                    Mewn geiriau eraill, bydd y proffiliwr dim ond yn actif yn ddiofyn yn eich porwr <em>chi</em> - nid porwr pawb eraill.
                 </p>
         ]]>
     </key>
@@ -2709,7 +2709,7 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
     <key alias="reminderDescription">
       <![CDATA[
             <p>
-                Ni ddylech chi fyth adael i safle cynhyrchu redeg yn y modd dadfygio. Mae'r modd dadfygio yn gallu cael ei diffodd trwy ychwanegu'r gosodiad <b>debug="false"</b> ar yr elfen <b>&lt;grynhoi /&gt;</b> yn web.config.
+                Ni ddylech chi fyth adael i safle cynhyrchu redeg yn y modd dadfygio. Mae'r modd dadfygio yn gallu cael ei diffodd trwy ychwanegu'r gosodiad <strong>debug="false"</strong> ar yr elfen <strong>&lt;grynhoi /&gt;</strong> yn web.config.
             </p>
         ]]>
     </key>
@@ -2719,7 +2719,7 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
                 Mae Umbraco ddim yn rhedeg mewn modd dadfygio ar hyn o bryd, felly nid allwch chi ddefnyddio'r proffiliwer adeiledig. Dyma sut y dylai fod ar gyfer safle cynhyrchu.
             </p>
             <p>
-                Mae'r modd dadfygio yn gallu cael ei throi arno gan ychwanegu'r gosodiad <b>debug="true"</b> ar yr elfen <b>&lt;grynhoi /&gt;</b> yn web.config.
+                Mae'r modd dadfygio yn gallu cael ei throi arno gan ychwanegu'r gosodiad <strong>debug="true"</strong> ar yr elfen <strong>&lt;grynhoi /&gt;</strong> yn web.config.
             </p>
         ]]>
     </key>
