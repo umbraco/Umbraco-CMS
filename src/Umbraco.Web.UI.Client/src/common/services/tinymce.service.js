@@ -221,60 +221,62 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
     }
   }
 
-  function uploadImageHandler(blobInfo, success, failure, progress) {
-    let xhr, formData;
+  function uploadImageHandler(blobInfo, progress) {
+    return new Promise(function (resolve, reject) {
+      let xhr, formData;
 
-    xhr = new XMLHttpRequest();
-    xhr.open('POST', Umbraco.Sys.ServerVariables.umbracoUrls.tinyMceApiBaseUrl + 'UploadImage');
+      xhr = new XMLHttpRequest();
+      xhr.open('POST', Umbraco.Sys.ServerVariables.umbracoUrls.tinyMceApiBaseUrl + 'UploadImage');
 
-    xhr.onloadstart = function (e) {
-      angularHelper.safeApply($rootScope, function () {
-        eventsService.emit("rte.file.uploading");
-      });
-    };
+      xhr.onloadstart = function () {
+        angularHelper.safeApply($rootScope, function () {
+          eventsService.emit("rte.file.uploading");
+        });
+      };
 
-    xhr.onloadend = function (e) {
-      angularHelper.safeApply($rootScope, function () {
-        eventsService.emit("rte.file.uploaded");
-      });
-    };
+      xhr.onloadend = function (e) {
+        angularHelper.safeApply($rootScope, function () {
+          eventsService.emit("rte.file.uploaded");
+        });
+      };
 
-    xhr.upload.onprogress = function (e) {
-      progress(e.loaded / e.total * 100);
-    };
+      xhr.upload.onprogress = function (e) {
+        progress(e.loaded / e.total * 100);
+      };
 
-    xhr.onerror = function () {
-      failure('Image upload failed due to a XHR Transport error. Code: ' + xhr.status);
-    };
+      xhr.onerror = function () {
+        reject('Image upload failed due to a XHR Transport error. Code: ' + xhr.status);
+      };
 
-    xhr.onload = function () {
-      let json;
+      xhr.onload = function () {
+        let json;
 
-      if (xhr.status < 200 || xhr.status >= 300) {
-        failure('HTTP Error: ' + xhr.status);
-        return;
-      }
+        if (xhr.status < 200 || xhr.status >= 300) {
+          reject('HTTP Error: ' + xhr.status);
+          return;
+        }
 
-      json = JSON.parse(xhr.responseText);
+        json = JSON.parse(xhr.responseText);
 
-      if (!json || typeof json.tmpLocation !== 'string') {
-        failure('Invalid JSON: ' + xhr.responseText);
-        return;
-      }
+        if (!json || typeof json.tmpLocation !== 'string') {
+          reject('Invalid JSON: ' + xhr.responseText);
+          return;
+        }
 
-      // Put temp location into localstorage (used to update the img with data-tmpimg later on)
-      localStorageService.set(`tinymce__${blobInfo.blobUri()}`, json.tmpLocation);
+        // Put temp location into localstorage (used to update the img with data-tmpimg later on)
+        localStorageService.set(`tinymce__${blobInfo.blobUri()}`, json.tmpLocation);
 
-      // We set the img src url to be the same as we started
-      // The Blob URI is stored in TinyMce's cache
-      // so the img still shows in the editor
-      success(blobInfo.blobUri());
-    };
+        // We set the img src url to be the same as we started
+        // The Blob URI is stored in TinyMce's cache
+        // so the img still shows in the editor
+        resolve(blobInfo.blobUri());
+      };
 
-    formData = new FormData();
-    formData.append('file', blobInfo.blob(), blobInfo.blob().name);
+      formData = new FormData();
+      formData.append('file', blobInfo.blob(), blobInfo.blob().name);
 
-    xhr.send(formData);
+      xhr.send(formData);
+    });
   }
 
   function cleanupPasteData(plugin, args) {
