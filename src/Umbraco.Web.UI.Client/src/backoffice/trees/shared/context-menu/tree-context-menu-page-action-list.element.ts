@@ -1,15 +1,15 @@
 import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
-import type { ManifestEntityAction, ManifestTree } from '../../../core/models';
-import { UmbExtensionRegistry } from '../../../core/extension';
-import { UmbContextConsumerMixin } from '../../../core/context';
+import type { ManifestEntityAction, ManifestTree } from '../../../../core/models';
+import { UmbExtensionRegistry } from '../../../../core/extension';
+import { UmbContextConsumerMixin } from '../../../../core/context';
 import { map, Subscription } from 'rxjs';
-import { UmbSectionContext } from '../../sections/section.context';
-import { Entity } from '../../../mocks/data/entity.data';
+import { UmbSectionContext } from '../../../sections/section.context';
+import { Entity } from '../../../../mocks/data/entity.data';
 
-@customElement('umb-action-list-page')
-export class UmbActionListPageElement extends UmbContextConsumerMixin(LitElement) {
+@customElement('umb-tree-context-menu-page-action-list')
+export class UmbTreeContextMenuPageActionListElement extends UmbContextConsumerMixin(LitElement) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -116,6 +116,6 @@ export class UmbActionListPageElement extends UmbContextConsumerMixin(LitElement
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-action-list-page': UmbActionListPageElement;
+		'umb-tree-context-menu-page-action-list': UmbTreeContextMenuPageActionListElement;
 	}
 }

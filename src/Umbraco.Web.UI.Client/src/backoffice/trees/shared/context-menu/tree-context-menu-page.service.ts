@@ -5,8 +5,6 @@ import { UmbContextProviderMixin } from '../../../../core/context';
 import UmbActionElement, { ActionPageEntity } from '../../actions/action.element';
 import { BehaviorSubject, Observable } from 'rxjs';
 
-// TODO how do we dynamically import this so we don't have to import every page that could potentially be used?
-
 @customElement('umb-tree-context-menu-page-service')
 export class UmbTreeContextMenuPageService extends UmbContextProviderMixin(LitElement) {
 	static styles = [UUITextStyles, css``];
@@ -23,7 +21,7 @@ export class UmbTreeContextMenuPageService extends UmbContextProviderMixin(LitEl
 	connectedCallback() {
 		super.connectedCallback();
 		this.provideContext('umbTreeContextMenuPageService', this);
-		this.openFreshPage('umb-action-list-page');
+		this.openFreshPage('umb-tree-context-menu-page-action-list');
 	}
 
 	protected updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
@@ -32,7 +30,7 @@ export class UmbTreeContextMenuPageService extends UmbContextProviderMixin(LitEl
 		if (_changedProperties.has('actionEntity')) {
 			this._entity.next(this.actionEntity);
 			//TODO: Move back to first page
-			this.openFreshPage('umb-action-list-page');
+			this.openFreshPage('umb-tree-context-menu-page-action-list');
 		}
 	}
 
