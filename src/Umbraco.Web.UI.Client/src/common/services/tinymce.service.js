@@ -223,9 +223,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
   function uploadImageHandler(blobInfo, progress) {
     return new Promise(function (resolve, reject) {
-      let xhr, formData;
-
-      xhr = new XMLHttpRequest();
+      const xhr = new XMLHttpRequest();
       xhr.open('POST', Umbraco.Sys.ServerVariables.umbracoUrls.tinyMceApiBaseUrl + 'UploadImage');
 
       xhr.onloadstart = function () {
@@ -249,17 +247,32 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
       };
 
       xhr.onload = function () {
-        let json;
-
         if (xhr.status < 200 || xhr.status >= 300) {
           reject('HTTP Error: ' + xhr.status);
           return;
         }
 
-        json = JSON.parse(xhr.responseText);
+        let data = xhr.responseText;
+
+        // The response is fitted as an AngularJS resource response and needs to be cleaned of the AngularJS metadata
+        data = data.split("\n");
+
+        if (!data.length > 1) {
+          reject('Unrecognized text string: ' + data);
+          return;
+        }
+
+        let json = {};
+
+        try {
+          json = JSON.parse(data[1]);
+        } catch (e) {
+          reject('Invalid JSON: ' + data + ' - ' + e.message);
+          return;
+        }
 
         if (!json || typeof json.tmpLocation !== 'string') {
-          reject('Invalid JSON: ' + xhr.responseText);
+          reject('Invalid JSON: ' + data);
           return;
         }
 
@@ -272,15 +285,14 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         resolve(blobInfo.blobUri());
       };
 
-      formData = new FormData();
+      const formData = new FormData();
       formData.append('file', blobInfo.blob(), blobInfo.blob().name);
 
       xhr.send(formData);
     });
   }
 
-  function cleanupPasteData(plugin, args) {
-
+  function cleanupPasteData(_editor, args) {
     // Remove spans
     args.content = args.content.replace(/<\s*span[^>]*>(.*?)<\s*\/\s*span>/g, "$1");
 
