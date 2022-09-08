@@ -505,7 +505,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
      */
     defaultPrevalues: function () {
       var cfg = {};
-      cfg.toolbar = ["ace", "styleselect", "bold", "italic", "alignleft", "aligncenter", "alignright", "bullist", "numlist", "outdent", "indent", "link", "umbmediapicker", "umbmacro", "umbembeddialog"];
+      cfg.toolbar = ["ace", "styles", "bold", "italic", "alignleft", "aligncenter", "alignright", "bullist", "numlist", "outdent", "indent", "link", "umbmediapicker", "umbmacro", "umbembeddialog"];
       cfg.stylesheets = [];
       cfg.maxImageSize = 500;
       return cfg;
