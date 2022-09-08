@@ -5,8 +5,8 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { createExtensionElement } from '../../../core/extension';
 import type { ManifestEntityAction } from '../../../core/models';
 
-@customElement('umb-tree-action')
-export class UmbTreeActionElement extends LitElement {
+@customElement('umb-tree-item-action-extension')
+export class UmbTreeItemActionExtensionElement extends LitElement {
 	static styles: CSSResultGroup = [UUITextStyles];
 
 	private _treeAction?: ManifestEntityAction;
@@ -20,13 +20,13 @@ export class UmbTreeActionElement extends LitElement {
 	}
 
 	@state()
-	private _element?: UmbTreeActionElement;
+	private _element?: UmbTreeItemActionExtensionElement;
 
 	private async _createElement() {
 		if (!this.treeAction) return;
 
 		try {
-			this._element = (await createExtensionElement(this.treeAction)) as UmbTreeActionElement | undefined;
+			this._element = (await createExtensionElement(this.treeAction)) as UmbTreeItemActionExtensionElement | undefined;
 			if (!this._element) return;
 
 			this._element.treeAction = this.treeAction;
@@ -42,6 +42,6 @@ export class UmbTreeActionElement extends LitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-tree-action': UmbTreeActionElement;
+		'umb-tree-item-action-extension': UmbTreeItemActionExtensionElement;
 	}
 }
