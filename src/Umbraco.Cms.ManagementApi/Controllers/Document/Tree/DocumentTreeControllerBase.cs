@@ -51,14 +51,9 @@ public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBa
     }
 
     // TODO: delete these (faking start node setup for unlimited editor)
-    // protected override int[] GetUserStartNodeIds() => new[] { -1 };
-    //
-    // protected override string[] GetUserStartNodePaths() => Array.Empty<string>();
+    protected override int[] GetUserStartNodeIds() => new[] { -1 };
 
-    // TODO: delete these (faking start node setup for limited editor)
-    protected override int[] GetUserStartNodeIds() => new[] { 1078, 1083 };
-
-    protected override string[] GetUserStartNodePaths() => new[] { "-1,1056,1068,1078", "-1,1082,1083" };
+    protected override string[] GetUserStartNodePaths() => Array.Empty<string>();
 
     // TODO: use these implementations instead of the dummy ones above once we have backoffice auth in place
     // protected override int[] GetUserStartNodeIds()
