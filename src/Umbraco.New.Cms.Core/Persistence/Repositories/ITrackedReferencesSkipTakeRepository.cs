@@ -1,8 +1,9 @@
 ﻿using Umbraco.Cms.Core.Models;
+using Umbraco.New.Cms.Core.Models.TrackedReferences;
 
 namespace Umbraco.New.Cms.Core.Persistence.Repositories;
 
-public interface ITrackedReferencesRepository
+public interface ITrackedReferencesSkipTakeRepository
 {
         /// <summary>
     ///     Gets a page of items which are in relation with the current item.
@@ -17,7 +18,7 @@ public interface ITrackedReferencesRepository
     /// </param>
     /// <param name="totalRecords">The total count of the items with reference to the current item.</param>
     /// <returns>An enumerable list of <see cref="RelationItem" /> objects.</returns>
-    IEnumerable<Relation> GetPagedRelationsForItem(int id, long skip, long take, bool filterMustBeIsDependency, out long totalRecords);
+    IEnumerable<RelationModel> GetPagedRelationsForItem(int id, long skip, long take, bool filterMustBeIsDependency, out long totalRecords);
 
     /// <summary>
     ///     Gets a page of items used in any kind of relation from selected integer ids.
@@ -31,7 +32,7 @@ public interface ITrackedReferencesRepository
     /// </param>
     /// <param name="totalRecords">The total count of the items in any kind of relation.</param>
     /// <returns>An enumerable list of <see cref="RelationItem" /> objects.</returns>
-    IEnumerable<Relation> GetPagedItemsWithRelations(int[] ids, long skip, long take, bool filterMustBeIsDependency, out long totalRecords);
+    IEnumerable<RelationModel> GetPagedItemsWithRelations(int[] ids, long skip, long take, bool filterMustBeIsDependency, out long totalRecords);
 
     /// <summary>
     ///     Gets a page of the descending items that have any references, given a parent id.
@@ -45,5 +46,5 @@ public interface ITrackedReferencesRepository
     /// </param>
     /// <param name="totalRecords">The total count of descending items.</param>
     /// <returns>An enumerable list of <see cref="RelationItem" /> objects.</returns>
-    IEnumerable<Relation> GetPagedDescendantsInReferences(int parentId, long skip, long take, bool filterMustBeIsDependency, out long totalRecords);
+    IEnumerable<RelationModel> GetPagedDescendantsInReferences(int parentId, long skip, long take, bool filterMustBeIsDependency, out long totalRecords);
 }
