@@ -386,12 +386,11 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 			entityType: 'document',
 		},
 	},
-	// TODO: can we have generic tree item actions across trees?
 	{
 		type: 'treeItemAction',
 		alias: 'Umb.TreeItemAction.Document.Create',
-		name: 'Tree Item Action Create',
-		loader: () => import('./backoffice/trees/actions/tree-action-create.element'),
+		name: 'Document Tree Item Action Create',
+		loader: () => import('./backoffice/trees/documents/actions/action-document-create.element'),
 		meta: {
 			trees: ['Umb.Tree.Content'],
 			label: 'Create',
@@ -402,8 +401,8 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 	{
 		type: 'treeItemAction',
 		alias: 'Umb.TreeItemAction.Document.Delete',
-		name: 'Tree Item Action Create',
-		loader: () => import('./backoffice/trees/actions/tree-action-delete.element'),
+		name: 'Document Tree Item Action Delete',
+		loader: () => import('./backoffice/trees/documents/actions/action-document-delete.element'),
 		meta: {
 			trees: ['Umb.Tree.Content'],
 			label: 'Delete',
@@ -411,7 +410,18 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 			weight: 100,
 		},
 	},
-	// TODO: or specific tree item actions per tree?
+	{
+		type: 'treeItemAction',
+		alias: 'Umb.TreeItemAction.Document.Paged',
+		name: 'Document Tree Item Action Paged',
+		loader: () => import('./backoffice/trees/documents/actions/action-document-paged.element'),
+		meta: {
+			trees: ['Umb.Tree.Content'],
+			label: 'Paged',
+			icon: 'favorite',
+			weight: 100,
+		},
+	},
 	{
 		type: 'treeItemAction',
 		alias: 'Umb.TreeItemAction.DataType.Create',

@@ -1,7 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import UmbActionElement from './action.element';
+import UmbActionElement from '../../actions/action.element';
 
 @customElement('umb-tree-action-create-page')
 export class UmbTreeActionCreatePageElement extends UmbActionElement {
