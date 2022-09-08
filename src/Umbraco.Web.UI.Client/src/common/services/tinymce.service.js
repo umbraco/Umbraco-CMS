@@ -12,7 +12,25 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
   //These are absolutely required in order for the macros to render inline
   //we put these as extended elements because they get merged on top of the normal allowed elements by tiny mce
   var extendedValidElements = "@[id|class|style],-div[id|dir|class|align|style],ins[datetime|cite],-ul[class|style],-li[class|style],-h1[id|dir|class|align|style],-h2[id|dir|class|align|style],-h3[id|dir|class|align|style],-h4[id|dir|class|align|style],-h5[id|dir|class|align|style],-h6[id|style|dir|class|align],span[id|class|style|lang],figure,figcaption";
-  var fallbackStyles = [{ title: "Page header", block: "h2" }, { title: "Section header", block: "h3" }, { title: "Paragraph header", block: "h4" }, { title: "Normal", block: "p" }, { title: "Quote", block: "blockquote" }, { title: "Code", block: "code" }];
+  var fallbackStyles = [
+    {
+      title: 'Headers', items: [
+        { title: "Page header", block: "h2" },
+        { title: "Section header", block: "h3" },
+        { title: "Paragraph header", block: "h4" }
+      ]
+    },
+    {
+      title: 'Blocks', items: [
+        { title: "Normal", block: "p" }
+      ]
+    },
+    {
+      title: 'Containers', items: [
+        { title: "Quote", block: "blockquote" },
+        { title: "Code", block: "code" }
+      ]
+    }];
   // these languages are available for localization
   var availableLanguages = [
     'ar',
@@ -106,7 +124,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
     var promises = [$q.when(true)]; //a collection of promises, the first one is an empty promise
 
     //queue rules loading
-    if (configuredStylesheets) {
+    if (configuredStylesheets?.length) {
       configuredStylesheets.forEach(function (val, key) {
 
         if (val.indexOf(Umbraco.Sys.ServerVariables.umbracoSettings.cssPath + "/") === 0) {
@@ -360,6 +378,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
           autoresize_bottom_margin: 10,
           content_css: styles.stylesheets,
           style_formats: styles.styleFormats,
+          style_formats_autohide: true,
           language: getLanguage(),
 
           //this would be for a theme other than inlite
