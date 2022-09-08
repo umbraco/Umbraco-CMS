@@ -23,7 +23,7 @@ public class MemberTypeTreeControllerBase : TreeControllerBase<TreeItemViewModel
     protected override TreeItemViewModel MapTreeItemViewModel(Guid? parentKey, IEntitySlim entity)
     {
         TreeItemViewModel viewModel = base.MapTreeItemViewModel(parentKey, entity);
-        viewModel.Icon = "icon-user";
+        viewModel.Icon = Constants.Icons.User;
         return viewModel;
     }
 }

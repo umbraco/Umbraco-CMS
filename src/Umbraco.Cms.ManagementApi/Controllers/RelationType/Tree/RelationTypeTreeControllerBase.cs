@@ -25,7 +25,7 @@ public class RelationTypeTreeControllerBase : TreeControllerBase<TreeItemViewMod
     protected TreeItemViewModel[] MapTreeItemViewModels(Guid? parentKey, IRelationType[] relationTypes)
         => relationTypes.Select(relationType => new TreeItemViewModel
         {
-            Icon = "icon-trafic",
+            Icon = Constants.Icons.RelationType,
             Name = relationType.Name!,
             Key = relationType.Key,
             Type = Constants.UdiEntityType.RelationType,

@@ -138,5 +138,10 @@ public static partial class Constants
         ///     System user group icon
         /// </summary>
         public const string UserGroup = "icon-users";
+
+        /// <summary>
+        ///     Relation type icon
+        /// </summary>
+        public const string RelationType = "icon-trafic";
     }
 }
