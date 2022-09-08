@@ -1,4 +1,4 @@
-import { css, html, LitElement } from 'lit';
+import { css, html, LitElement, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 
@@ -101,6 +101,7 @@ export class UmbPropertyEditorContentPicker extends UmbContextConsumerMixin(LitE
 	private _renderItem(item: Entity) {
 		return html`
 			<uui-ref-node name=${item.name} detail=${item.key}>
+				${item.isTrashed ? html` <uui-tag size="s" slot="tag" color="danger">Trashed</uui-tag> ` : nothing}
 				<uui-action-bar slot="actions">
 					<uui-button @click=${() => this._removeItem(item)}>Remove</uui-button>
 				</uui-action-bar>
