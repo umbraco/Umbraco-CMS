@@ -5,7 +5,7 @@ using Umbraco.New.Cms.Core.Models.TrackedReferences;
 
 namespace Umbraco.New.Cms.Infrastructure.Persistence.Mappers;
 
-public class RelationMapDefinition : IMapDefinition
+public class RelationModelMapDefinition : IMapDefinition
 {
     public void DefineMaps(IUmbracoMapper mapper)
     {
