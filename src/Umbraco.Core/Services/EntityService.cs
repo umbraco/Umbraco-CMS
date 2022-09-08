@@ -37,6 +37,7 @@ public class EntityService : RepositoryService, IEntityService
             { typeof(IMediaType).FullName!, UmbracoObjectTypes.MediaType },
             { typeof(IMember).FullName!, UmbracoObjectTypes.Member },
             { typeof(IMemberType).FullName!, UmbracoObjectTypes.MemberType },
+            { typeof(ITemplate).FullName!, UmbracoObjectTypes.Template },
         };
     }
 
