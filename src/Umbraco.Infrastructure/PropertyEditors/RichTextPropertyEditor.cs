@@ -62,13 +62,6 @@ public class RichTextPropertyEditor : DataEditor
             macroParameterParser,
             StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
     {
-        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
-        _imageSourceParser = imageSourceParser;
-        _localLinkParser = localLinkParser;
-        _pastedImages = pastedImages;
-        _ioHelper = ioHelper;
-        _imageUrlGenerator = imageUrlGenerator;
-        _macroParameterParser = macroParameterParser;
     }
 
     [Obsolete("Use the constructor which takes an IHtmlMacroParameterParser instead")]
@@ -116,6 +109,7 @@ public class RichTextPropertyEditor : DataEditor
         _imageUrlGenerator = imageUrlGenerator;
         _macroParameterParser = macroParameterParser;
         _editorConfigurationParser = editorConfigurationParser;
+        SupportsReadOnly = true;
     }
 
     public override IPropertyIndexValueFactory PropertyIndexValueFactory => new RichTextPropertyIndexValueFactory();

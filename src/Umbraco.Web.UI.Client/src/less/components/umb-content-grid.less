@@ -8,32 +8,33 @@
 .umb-content-grid__item {
    background: @white;
    flex: 0 1 200px;
-   cursor: pointer;
    position: relative;
    user-select: none;
    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.16);
    border-radius: 3px;
 }
 
-.umb-content-grid__item {
-    &.-selected, &:hover {
-        &::before {
-            content: "";
-            position: absolute;
-            z-index: 2;
-            top: -2px;
-            left: -2px;
-            right: -2px;
-            bottom: -2px;
-            border: 2px solid @ui-selected-border;
-            border-radius: 5px;
-            box-shadow: 0 0 4px 0 darken(@ui-selected-border, 20), inset 0 0 2px 0 darken(@ui-selected-border, 20);
-            pointer-events: none;
-            transition: opacity 100ms;
-        }
-    }
+.umb-content-grid__item.-clickable {
+   cursor: pointer;
 }
 
+.umb-content-grid__item.-selected,
+.umb-content-grid__item.-clickable:hover {
+   &::before {
+      content: "";
+      position: absolute;
+      z-index: 2;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      border: 2px solid @ui-selected-border;
+      border-radius: 5px;
+      box-shadow: 0 0 4px 0 darken(@ui-selected-border, 20), inset 0 0 2px 0 darken(@ui-selected-border, 20);
+      pointer-events: none;
+      transition: opacity 100ms;
+   }
+}
 
 .umb-content-grid__item:hover {    
     &::before {

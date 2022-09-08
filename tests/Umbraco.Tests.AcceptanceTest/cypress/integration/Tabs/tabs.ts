@@ -214,9 +214,9 @@ import {
         cy.get('.umb-group-builder__tab-sort-order > .umb-property-editor-tiny').first().type('3');
         cy.get('[alias="reorder"]').click();
         //Assert
-        cy.get('.umb-group-builder__group-title-input').eq(0).invoke('attr', 'title').should('eq', 'aTab 2')
-        cy.get('.umb-group-builder__group-title-input').eq(1).invoke('attr', 'title').should('eq', 'aTab 3')
-        cy.get('.umb-group-builder__group-title-input').eq(2).invoke('attr', 'title').should('eq', 'aTab 1')
+        cy.get('.umb-group-builder__tab-name').eq(0).invoke('attr', 'title').should('eq', 'aTab 2')
+        cy.get('.umb-group-builder__tab-name').eq(1).invoke('attr', 'title').should('eq', 'aTab 3')
+        cy.get('.umb-group-builder__group-title-input').eq(0).invoke('attr', 'title').should('eq', 'aTab 1')
       });
 
       it('Reorders groups in a tab', () => {

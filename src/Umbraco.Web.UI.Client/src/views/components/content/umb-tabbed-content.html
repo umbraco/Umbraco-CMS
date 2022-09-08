@@ -11,15 +11,17 @@
                     data-element="property-{{property.alias}}"
                     ng-repeat="property in tab.properties track by property.alias"
                     property="property"
-                    show-inherit="propertyEditorDisabled(property)"
+                    show-inherit="contentNodeModel.variants.length > 1 && property.variation !== 'CultureAndSegment'"
                     inherits-from="defaultVariant.displayName">
 
-                    <div ng-class="{'o-40 cursor-not-allowed': propertyEditorDisabled(property) }">
-                        <umb-property-editor
-                            model="property"
-                            preview="propertyEditorDisabled(property)">
-                        </umb-property-editor>
-                    </div>
+                    <umb-property-editor
+                        model="property"
+                        preview="(propertyEditorDisabled(property) && allowUpdate) || (!allowUpdate && !property.supportsReadOnly)"
+                        allow-unlock="allowUpdate && allowEditInvariantFromNonDefault"
+                        on-unlock="unlockInvariantValue(property)"
+                        ng-attr-readonly="{{ !allowUpdate || undefined}}">
+                    </umb-property-editor>
+                    
                 </umb-property>
             </umb-box-content>
         </umb-box>
@@ -41,15 +43,18 @@
                     data-element="property-{{property.alias}}"
                     ng-repeat="property in group.properties track by property.alias"
                     property="property"
-                    show-inherit="propertyEditorDisabled(property)"
+                    node="contentNodeModel"
+                    show-inherit="contentNodeModel.variants.length > 1 && property.variation !== 'CultureAndSegment'"
                     inherits-from="defaultVariant.displayName">
 
-                    <div ng-class="{'o-40 cursor-not-allowed': propertyEditorDisabled(property) }">
-                        <umb-property-editor
-                            model="property"
-                            preview="propertyEditorDisabled(property)">
-                        </umb-property-editor>
-                    </div>
+                    <umb-property-editor
+                        model="property"
+                        node="contentNodeModel"
+                        preview="(propertyEditorDisabled(property) && allowUpdate) || (!allowUpdate && !property.supportsReadOnly)"
+                        allow-unlock="allowUpdate && allowEditInvariantFromNonDefault"
+                        on-unlock="unlockInvariantValue(property)"
+                        ng-attr-readonly="{{!allowUpdate || undefined}}">
+                    </umb-property-editor>
 
                 </umb-property>
             </div>

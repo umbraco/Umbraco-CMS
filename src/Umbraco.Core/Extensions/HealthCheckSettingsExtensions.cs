@@ -3,6 +3,9 @@ using Umbraco.Cms.Core.Configuration.Models;
 
 namespace Umbraco.Extensions;
 
+// TODO (V12): Remove this class that's no longer used.
+
+[Obsolete("Please use RecurringHostedServiceBase.GetDelay(). This class is no longer used within Umbraco and will be removed in V12.")]
 public static class HealthCheckSettingsExtensions
 {
     public static TimeSpan GetNotificationDelay(this HealthChecksSettings settings, ICronTabParser cronTabParser, DateTime now, TimeSpan defaultDelay)

@@ -11,9 +11,8 @@ public class UserPickerPropertyEditor : DataEditor
 {
     public UserPickerPropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory)
-        : base(dataValueEditorFactory)
-    {
-    }
+        : base(dataValueEditorFactory) =>
+        SupportsReadOnly = true;
 
     protected override IConfigurationEditor CreateConfigurationEditor() => new UserPickerConfiguration();
 }

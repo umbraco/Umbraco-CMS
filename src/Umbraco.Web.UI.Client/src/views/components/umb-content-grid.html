@@ -3,7 +3,7 @@
    <div
       class="umb-content-grid__item umb-outline umb-outline--surrounding"
       ng-repeat="item in content"
-      ng-class="{'-selected': item.selected}"
+      ng-class="{'-selected': item.selected, '-clickable': allowClick !== false}"
       ng-click="clickItem(item, $event, $index)">
 
       <div class="umb-content-grid__content">

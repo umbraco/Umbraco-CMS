@@ -93,6 +93,7 @@ public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
         _logger = loggerFactory.CreateLogger<ImageCropperPropertyEditor>();
 
         contentSettings.OnChange(x => _contentSettings = x);
+        SupportsReadOnly = true;
     }
 
     public bool TryGetMediaPath(string? propertyEditorAlias, object? value, out string? mediaPath)

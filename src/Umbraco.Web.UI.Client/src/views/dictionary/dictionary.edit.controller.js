@@ -6,7 +6,7 @@
  * @description
  * The controller for editing dictionary items
  */
-function DictionaryEditController($scope, $routeParams, $location, dictionaryResource, navigationService, appState, editorState, contentEditingHelper, formHelper, notificationsService, localizationService) {
+function DictionaryEditController($scope, $routeParams, $location, dictionaryResource, navigationService, appState, editorState, contentEditingHelper, formHelper, notificationsService, localizationService, userService) {
 
   var vm = this;
 
@@ -26,6 +26,7 @@ function DictionaryEditController($scope, $routeParams, $location, dictionaryRes
   vm.description = "";
   vm.showBackButton = true;
   vm.maxlength = 1000;
+  vm.currentUser = null;
 
   vm.save = saveDictionary;
   vm.back = back;
@@ -54,6 +55,12 @@ function DictionaryEditController($scope, $routeParams, $location, dictionaryRes
   }
 
   function bindDictionary(data) {
+
+    data.translations.forEach(translation => {
+      const allowUpdate = vm.currentUser.allowedLanguageIds && vm.currentUser.allowedLanguageIds.length > 0 && vm.currentUser.allowedLanguageIds.includes(translation.languageId);
+      translation.allowUpdate = allowUpdate;
+    });
+
     localizationService.localize("dictionaryItem_description").then(function (value) {
       vm.description = value.replace("%0%", data.name);
     });
@@ -81,7 +88,14 @@ function DictionaryEditController($scope, $routeParams, $location, dictionaryRes
   }
 
   function onInit() {
-    loadDictionary();
+    vm.page.loading = true;
+
+    userService.getCurrentUser().then(user => {
+      vm.currentUser = user;
+      vm.page.loading = false;
+
+      loadDictionary();
+    });
   }
 
   function saveDictionary() {

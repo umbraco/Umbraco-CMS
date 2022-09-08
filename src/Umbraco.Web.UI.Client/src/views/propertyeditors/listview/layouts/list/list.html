@@ -40,6 +40,7 @@
         <umb-table
             ng-if="items"
             items="items"
+            allow-select="!options.readonly"
             allow-select-all="options.bulkActionsAllowed"
             item-properties="options.includeProperties"
             on-select="vm.selectItem(item, $index, $event)"

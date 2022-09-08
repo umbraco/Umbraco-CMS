@@ -52,6 +52,7 @@ public class MediaPickerPropertyEditor : DataEditor
     {
         _ioHelper = ioHelper;
         _editorConfigurationParser = editorConfigurationParser;
+        SupportsReadOnly = true;
     }
 
     /// <inheritdoc />
@@ -69,9 +70,8 @@ public class MediaPickerPropertyEditor : DataEditor
             IJsonSerializer jsonSerializer,
             IIOHelper ioHelper,
             DataEditorAttribute attribute)
-            : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
-        {
-        }
+            : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute) =>
+            SupportsReadOnly = true;
 
         public IEnumerable<UmbracoEntityReference> GetReferences(object? value)
         {

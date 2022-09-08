@@ -16,9 +16,8 @@ public class IntegerPropertyEditor : DataEditor
 {
     public IntegerPropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory)
-        : base(dataValueEditorFactory)
-    {
-    }
+        : base(dataValueEditorFactory) =>
+        SupportsReadOnly = true;
 
     /// <inheritdoc />
     protected override IDataValueEditor CreateValueEditor()

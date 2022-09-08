@@ -78,7 +78,7 @@ For extra details about options and events take a look here: https://refreshless
         }
     };
 
-    function UmbRangeSliderController($element, $timeout, $scope, assetsService) {
+    function UmbRangeSliderController($element, $timeout, $scope, assetsService, $attrs) {
 
         const ctrl = this;
         let sliderInstance = null;
@@ -95,6 +95,20 @@ For extra details about options and events take a look here: https://refreshless
             });
 
         };
+
+        $attrs.$observe('readonly', (value) => {
+            ctrl.readonly = value !== undefined;
+
+            if (!sliderInstance) {
+                return;
+            }
+
+            if (ctrl.readonly) {
+                sliderInstance.setAttribute('disabled', true);
+            } else {
+                sliderInstance.removeAttribute('disabled');
+            }
+        });
 
         function grabElementAndRun() {
             $timeout(function () {
@@ -133,12 +147,20 @@ For extra details about options and events take a look here: https://refreshless
                 sliderInstance.noUiSlider.set(ctrl.ngModel);
             }
 
+            if (ctrl.readonly) {
+                sliderInstance.setAttribute('disabled', true);
+            } else {
+                sliderInstance.removeAttribute('disabled');
+            }
+
             // destroy the slider instance when the dom element is removed
             $(element).on('$destroy', function () {
                 sliderInstance.noUiSlider.off();
             });
 
             setUpCallbacks();
+            setUpActivePipsHandling();
+            addPipClickHandler();
 
             // Refresh the scope
             $scope.$applyAsync();
@@ -227,15 +249,15 @@ For extra details about options and events take a look here: https://refreshless
             var isVertical = slider.noUiSlider.options.orientation === 'vertical';
             var tooltips = slider.noUiSlider.getTooltips();
             var origins = slider.noUiSlider.getOrigins();
-
+            
             // Move tooltips into the origin element. The default stylesheet handles this.
-          if(tooltips && tooltips.length !== 0){
-            tooltips.forEach(function (tooltip, index) {
-              if (tooltip) {
-                origins[index].appendChild(tooltip);
-              }
-            });
-          }
+            if(tooltips && tooltips.length !== 0){
+              tooltips.forEach(function (tooltip, index) {
+                if (tooltip) {
+                  origins[index].appendChild(tooltip);
+                }
+              });
+            }
 
             slider.noUiSlider.on('update', function (values, handle, unencoded, tap, positions) {
 
@@ -271,17 +293,17 @@ For extra details about options and events take a look here: https://refreshless
 
                     for (var j = 0; j < handlesInPool; j++) {
                         var handleNumber = pool[j];
-
+                        
                         if (j === handlesInPool - 1) {
                             var offset = 0;
-
+                            
                             poolPositions[poolIndex].forEach(function (value) {
-                                offset += 1000 - 10 * value;
+                                offset += 1000 - value;
                             });
-
+                            
                             var direction = isVertical ? 'bottom' : 'right';
                             var last = isRtl ? 0 : handlesInPool - 1;
-                            var lastOffset = 1000 - 10 * poolPositions[poolIndex][last];
+                            var lastOffset = 1000 - poolPositions[poolIndex][last];
                             offset = (textIsRtl && !isVertical ? 100 : 0) + (offset / handlesInPool) - lastOffset;
 
                             // Filter to unique values
@@ -299,7 +321,28 @@ For extra details about options and events take a look here: https://refreshless
                 });
             });
         }
-
+      function setUpActivePipsHandling() {
+        let activePip = [null, null];
+        sliderInstance.noUiSlider.on('update', function (values,handle) {
+          if(activePip[handle]){
+            activePip[handle].classList.remove("noUi-value-active");
+          }
+          sliderInstance.querySelectorAll('.noUi-value').forEach(pip => {
+            if (Number(values[handle]) === Number(pip.getAttribute('data-value'))) {
+              activePip[handle] = pip;
+            }
+          });
+          activePip[handle].classList.add("noUi-value-active");
+        });
+      }
+      function addPipClickHandler(){
+          sliderInstance.querySelectorAll('.noUi-value').forEach(function(pip){
+            pip.addEventListener('click', function () {
+              const value = pip.getAttribute('data-value');
+              sliderInstance.noUiSlider.set(value);
+            });
+          });
+      }
     }
 
     angular.module('umbraco.directives').component('umbRangeSlider', umbRangeSlider);

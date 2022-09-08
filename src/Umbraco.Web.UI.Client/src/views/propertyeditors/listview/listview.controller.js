@@ -143,12 +143,14 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
             layouts: $scope.model.config.layouts,
             activeLayout: listViewHelper.getLayout($routeParams.id, $scope.model.config.layouts)
         },
-        allowBulkPublish: $scope.entityType === 'content' && $scope.model.config.bulkActionPermissions.allowBulkPublish,
-        allowBulkUnpublish: $scope.entityType === 'content' && $scope.model.config.bulkActionPermissions.allowBulkUnpublish,
-        allowBulkCopy: $scope.entityType === 'content' && $scope.model.config.bulkActionPermissions.allowBulkCopy,
-        allowBulkMove: $scope.entityType !== 'member' && $scope.model.config.bulkActionPermissions.allowBulkMove,
-        allowBulkDelete: $scope.model.config.bulkActionPermissions.allowBulkDelete,
-        cultureName: $routeParams.cculture ? $routeParams.cculture : $routeParams.mculture
+        allowBulkPublish: $scope.entityType === 'content' && $scope.model.config.bulkActionPermissions.allowBulkPublish && !$scope.readonly,
+        allowBulkUnpublish: $scope.entityType === 'content' && $scope.model.config.bulkActionPermissions.allowBulkUnpublish && !$scope.readonly,
+        allowBulkCopy: $scope.entityType === 'content' && $scope.model.config.bulkActionPermissions.allowBulkCopy && !$scope.readonly,
+        allowBulkMove: $scope.entityType !== 'member' && $scope.model.config.bulkActionPermissions.allowBulkMove && !$scope.readonly,
+        allowBulkDelete: $scope.model.config.bulkActionPermissions.allowBulkDelete && !$scope.readonly,
+        allowCreate: !$scope.readonly,
+        cultureName: $routeParams.cculture ? $routeParams.cculture : $routeParams.mculture,
+        readonly: $scope.readonly
     };
     
     _.each($scope.options.includeProperties, function (property) {
@@ -302,6 +304,14 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
                     navigationService.reloadSection(section);
                 }
             }
+        }).catch(function(error){
+          // if someone attempts to add mix listviews across sections (i.e. use a members list view on content types),
+          // a not-supported exception will be most likely be thrown, at least for the default list views - lets be
+          // helpful and show a meaningful error message directly in content/content type UI
+          if(error.data && error.data.ExceptionType && error.data.ExceptionType.indexOf("System.NotSupportedException") > -1) {
+            $scope.viewLoadedError = error.errorMsg + ": " + error.data.ExceptionMessage;
+          }
+          $scope.viewLoaded = true;
         });
     };
 
