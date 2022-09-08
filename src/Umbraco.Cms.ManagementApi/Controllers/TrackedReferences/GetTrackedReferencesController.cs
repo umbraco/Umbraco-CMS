@@ -31,7 +31,7 @@ public class GetTrackedReferencesController : TrackedReferencesControllerBase
     [HttpGet("{id:int}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ServerStatusViewModel), StatusCodes.Status200OK)]
-    public ActionResult<PagedViewModel<RelationItemViewModel>> GetPagedReferences(
+    public async Task<ActionResult<PagedViewModel<RelationItemViewModel>>> GetPagedReferences(
         int id,
         long skip,
         long take,
