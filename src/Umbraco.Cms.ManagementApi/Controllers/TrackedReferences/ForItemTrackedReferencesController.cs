@@ -3,19 +3,18 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.ManagementApi.Services;
 using Umbraco.Cms.ManagementApi.ViewModels.Pagination;
-using Umbraco.Cms.ManagementApi.ViewModels.Server;
 using Umbraco.Cms.ManagementApi.ViewModels.TrackedReferences;
 using Umbraco.New.Cms.Core.Models.TrackedReferences;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.TrackedReferences;
 
 [ApiVersion("1.0")]
-public class GetTrackedReferencesController : TrackedReferencesControllerBase
+public class ForItemTrackedReferencesController : TrackedReferencesControllerBase
 {
     private readonly ITrackedReferencesSkipTakeService _trackedReferencesService;
     private readonly IUmbracoMapper _umbracoMapper;
 
-    public GetTrackedReferencesController(ITrackedReferencesSkipTakeService trackedReferencesService, IUmbracoMapper umbracoMapper)
+    public ForItemTrackedReferencesController(ITrackedReferencesSkipTakeService trackedReferencesService, IUmbracoMapper umbracoMapper)
     {
         _trackedReferencesService = trackedReferencesService;
         _umbracoMapper = umbracoMapper;
@@ -30,7 +29,7 @@ public class GetTrackedReferencesController : TrackedReferencesControllerBase
     /// </remarks>
     [HttpGet("{id:int}")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(ServerStatusViewModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(RelationItemViewModel), StatusCodes.Status200OK)]
     public async Task<ActionResult<PagedViewModel<RelationItemViewModel>>> Get(
         int id,
         long skip,
