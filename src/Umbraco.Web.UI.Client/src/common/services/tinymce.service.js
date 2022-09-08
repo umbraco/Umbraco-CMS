@@ -490,7 +490,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
      */
     createInsertEmbeddedMedia: function (editor, callback) {
       editor.ui.registry.addButton('umbembeddialog', {
-        icon: 'custom icon-tv',
+        icon: 'embed',
         tooltip: 'Embed',
         stateSelector: 'div[data-embed-url]',
         onAction: function () {
@@ -552,7 +552,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
     createAceCodeEditor: function (editor, callback) {
 
       editor.ui.registry.addButton("ace", {
-        icon: "code",
+        icon: "sourcecode",
         tooltip: "View Source Code",
         onAction: function () {
           if (callback) {
@@ -577,7 +577,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
      */
     createMediaPicker: function (editor, callback) {
       editor.ui.registry.addButton('umbmediapicker', {
-        icon: 'custom icon-picture',
+        icon: 'image',
         tooltip: 'Media Picker',
         stateSelector: 'img[data-udi]',
         onAction: function () {
@@ -750,7 +750,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
       /** Adds the button instance */
       editor.ui.registry.addButton('umbmacro', {
-        icon: 'custom icon-settings-alt',
+        icon: 'preferences',
         tooltip: 'Insert macro',
         onSetup: function (buttonApi) {
           /**
