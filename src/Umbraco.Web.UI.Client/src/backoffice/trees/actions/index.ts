@@ -8,4 +8,3 @@ export * from './tree-action-create-page.element';
 export * from './tree-action-create-page-2.element';
 export * from './tree-action-create.element';
 export * from './tree-action-delete.element';
-export * from './tree-action-reload.element';
