@@ -1,14 +1,14 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, LitElement, nothing, PropertyValueMap } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { UmbContextProviderMixin } from '../../../core/context';
-import UmbActionElement, { ActionPageEntity } from './action.element';
+import { UmbContextProviderMixin } from '../../../../core/context';
+import UmbActionElement, { ActionPageEntity } from '../../actions/action.element';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 // TODO how do we dynamically import this so we don't have to import every page that could potentially be used?
 
-@customElement('umb-action-page-service')
-export class UmbActionPageService extends UmbContextProviderMixin(LitElement) {
+@customElement('umb-tree-context-menu-page-service')
+export class UmbTreeContextMenuPageService extends UmbContextProviderMixin(LitElement) {
 	static styles = [UUITextStyles, css``];
 
 	@property({ type: Object })
@@ -22,7 +22,7 @@ export class UmbActionPageService extends UmbContextProviderMixin(LitElement) {
 
 	connectedCallback() {
 		super.connectedCallback();
-		this.provideContext('umbActionPageService', this);
+		this.provideContext('umbTreeContextMenuPageService', this);
 		this.openFreshPage('umb-action-list-page');
 	}
 
@@ -67,6 +67,6 @@ export class UmbActionPageService extends UmbContextProviderMixin(LitElement) {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-action-page-service': UmbActionPageService;
+		'umb-tree-context-menu-page-service': UmbTreeContextMenuPageService;
 	}
 }

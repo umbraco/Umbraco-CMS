@@ -1,5 +1,5 @@
 export * from './action-list-page.element';
-export * from './action-page.service';
+export * from '../shared/context-menu/tree-context-menu-page.service';
 export * from '../shared/context-menu/tree-context-menu.service';
 export * from './tree-action.element';
 

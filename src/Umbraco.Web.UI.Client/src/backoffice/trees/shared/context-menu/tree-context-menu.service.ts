@@ -77,7 +77,9 @@ export class UmbTreeContextMenuService extends UmbContextProviderMixin(LitElemen
 
 	private _renderModal() {
 		return this._modalOpen
-			? html`<umb-action-page-service id="action-modal" .actionEntity=${this.entity}></umb-action-page-service>`
+			? html`<umb-tree-context-menu-page-service
+					id="action-modal"
+					.actionEntity=${this.entity}></umb-tree-context-menu-page-service>`
 			: nothing;
 	}
 
