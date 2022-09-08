@@ -1,12 +1,15 @@
 ﻿using Examine;
-using Umbraco.Cms.Core;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.ManagementApi.Factories;
 using Umbraco.Cms.ManagementApi.ViewModels.Pagination;
+using Umbraco.Cms.ManagementApi.ViewModels.Server;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.ExamineManagement;
 
+[ApiVersion("1.0")]
 public class IndexesExamineManagementController : ExamineManagementControllerBase
 {
     private readonly IExamineManager _examineManager;
@@ -23,7 +26,10 @@ public class IndexesExamineManagementController : ExamineManagementControllerBas
     ///     Get the details for indexers
     /// </summary>
     /// <returns></returns>
-    public PagedViewModel<ExamineIndexModel> GetIndexerDetails(int skip, int take)
+    [HttpGet("Indexes")]
+    [MapToApiVersion("1.0")]
+    [ProducesResponseType(typeof(ServerStatusViewModel), StatusCodes.Status200OK)]
+    public PagedViewModel<ExamineIndexModel> Indexes(int skip, int take)
     {
         ExamineIndexModel[] indexes = _examineManager.Indexes
             .Select(_examineIndexModelFactory.Create)
