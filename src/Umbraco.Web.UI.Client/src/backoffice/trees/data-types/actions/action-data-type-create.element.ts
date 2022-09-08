@@ -1,15 +1,11 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
-import type { ManifestEntityAction } from '../../../../core/models';
+import { customElement } from 'lit/decorators.js';
 import UmbActionElement from '../../actions/action.element';
 
 @customElement('umb-tree-action-data-type-create')
 export default class UmbTreeActionDataTypeCreateElement extends UmbActionElement {
 	static styles = [UUITextStyles, css``];
-
-	@property({ attribute: false })
-	public treeAction?: ManifestEntityAction;
 
 	// TODO: how do we handle the href?
 	private _constructUrl() {

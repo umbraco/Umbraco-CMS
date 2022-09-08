@@ -1,8 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement } from 'lit/decorators.js';
 import { UmbContextConsumerMixin } from '../../../../core/context';
-import type { ManifestEntityAction } from '../../../../core/models';
 import { UmbModalService } from '../../../../core/services/modal';
 import { UmbDataTypeStore } from '../../../../core/stores/data-type.store';
 import UmbActionElement from '../../actions/action.element';
@@ -10,9 +9,6 @@ import UmbActionElement from '../../actions/action.element';
 @customElement('umb-tree-action-data-type-delete')
 export default class UmbTreeActionDataTypeDeleteElement extends UmbContextConsumerMixin(UmbActionElement) {
 	static styles = [UUITextStyles, css``];
-
-	@property({ attribute: false })
-	public treeAction?: ManifestEntityAction;
 
 	private _modalService?: UmbModalService;
 	private _dataTypeStore?: UmbDataTypeStore;

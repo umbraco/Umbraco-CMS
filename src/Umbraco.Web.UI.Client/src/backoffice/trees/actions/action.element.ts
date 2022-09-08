@@ -1,8 +1,8 @@
 import { LitElement } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import { Subscription } from 'rxjs';
 import { UmbContextConsumerMixin } from '../../../core/context';
-import type { ManifestTree } from '../../../core/models';
+import type { ManifestEntityAction, ManifestTree } from '../../../core/models';
 import { Entity } from '../../../mocks/data/entity.data';
 import { UmbSectionContext } from '../../sections/section.context';
 import { UmbActionPageService } from './action-page.service';
@@ -15,6 +15,9 @@ export type ActionPageEntity = {
 
 @customElement('umb-action')
 export default class UmbActionElement extends UmbContextConsumerMixin(LitElement) {
+	@property({ attribute: false })
+	public treeAction?: ManifestEntityAction;
+
 	@state()
 	protected _entity: ActionPageEntity = { name: '', key: '' };
 
