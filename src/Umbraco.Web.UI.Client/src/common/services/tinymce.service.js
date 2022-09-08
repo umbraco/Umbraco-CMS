@@ -182,45 +182,6 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
     return language;
   }
 
-  /**
-   * Gets toolbars for the inlite theme
-   * @param {any} configuredToolbar
-   * @param {any} tinyMceConfig
-   */
-  function getToolbars(configuredToolbar, tinyMceConfig) {
-
-    //the commands for selection/all
-    var allowedSelectionToolbar = _.map(_.filter(tinyMceConfig.commands,
-      function (f) {
-        return f.mode === "Selection" || f.mode === "All";
-      }),
-      function (f) {
-        return f.alias;
-      });
-
-    //the commands for insert/all
-    var allowedInsertToolbar = _.map(_.filter(tinyMceConfig.commands,
-      function (f) {
-        return f.mode === "Insert" || f.mode === "All";
-      }),
-      function (f) {
-        return f.alias;
-      });
-
-    var insertToolbar = _.filter(configuredToolbar, function (t) {
-      return allowedInsertToolbar.indexOf(t) !== -1;
-    }).join(" | ");
-
-    var selectionToolbar = _.filter(configuredToolbar, function (t) {
-      return allowedSelectionToolbar.indexOf(t) !== -1;
-    }).join(" | ");
-
-    return {
-      insertToolbar: insertToolbar,
-      selectionToolbar: selectionToolbar
-    }
-  }
-
   function uploadImageHandler(blobInfo, progress) {
     return new Promise(function (resolve, reject) {
       const xhr = new XMLHttpRequest();
@@ -363,8 +324,6 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
         var tinyMceConfig = result[0];
         var styles = result[1];
-
-        var toolbars = getToolbars(args.toolbar, tinyMceConfig);
 
         var plugins = _.map(tinyMceConfig.plugins, function (plugin) {
           return plugin.name;
@@ -761,7 +720,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
       });
 
       /** when the contents load we need to find any macros declared and load in their content */
-      editor.on("SetContent", function (o) {
+      editor.on("SetContent", function () {
 
         //get all macro divs and load their content
         $(editor.dom.select(".umb-macro-holder.mceNonEditable")).each(function () {
@@ -1415,16 +1374,15 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
       // Then we need to add an event listener to the editor
       // That will update native browser drag & drop events
       // To update the icon to show you can NOT drop something into the editor
-      // var toolbarItems = args.editor.settings.toolbar.split(" ");
-      // if(isMediaPickerEnabled(toolbarItems) === false){
-      //     // Wire up the event listener
-      //     args.editor.on('dragend dragover draggesture dragdrop drop drag', function (e) {
-      //         e.preventDefault();
-      //         e.dataTransfer.effectAllowed = "none";
-      //         e.dataTransfer.dropEffect = "none";
-      //         e.stopPropagation();
-      //     });
-      // }
+      if (args.toolbar && isMediaPickerEnabled(args.toolbar) === false) {
+        // Wire up the event listener
+        args.editor.on('dragend dragover draggesture dragdrop drop drag', function (e) {
+          e.preventDefault();
+          e.dataTransfer.effectAllowed = "none";
+          e.dataTransfer.dropEffect = "none";
+          e.stopPropagation();
+        });
+      }
 
       args.editor.on('SetContent', function (e) {
         var content = e.content;
@@ -1494,7 +1452,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
       });
 
-      args.editor.on('init', function (e) {
+      args.editor.on('init', function () {
 
         if (args.model.value) {
           args.editor.setContent(args.model.value);
@@ -1502,7 +1460,6 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
         //enable browser based spell checking
         args.editor.getBody().setAttribute('spellcheck', true);
-
 
         /** Setup sanitization for preventing injecting arbitrary JavaScript execution in attributes:
          * https://github.com/advisories/GHSA-w7jx-j77m-wp65
