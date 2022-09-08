@@ -423,35 +423,12 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
           config.target = args.target;
         }
 
-        /*
-        // We are not ready to limit the pasted elements further than default, we will return to this feature. ( TODO: Make this feature an option. )
-        // We keep spans here, cause removing spans here also removes b-tags inside of them, instead we strip them out later. (TODO: move this definition to the config file... )
-        var validPasteElements = "-strong/b,-em/i,-u,-span,-p,-ol,-ul,-li,-p/div,-a[href|name],sub,sup,strike,br,del,table[width],tr,td[colspan|rowspan|width],th[colspan|rowspan|width],thead,tfoot,tbody,img[src|alt|width|height],ul,ol,li,hr,pre,dl,dt,figure,figcaption,wbr"
-
-        // add elements from user configurated styleFormats to our list of validPasteElements.
-        // (This means that we only allow H3-element if its configured as a styleFormat on this specific propertyEditor.)
-        var style, i = 0;
-        for(; i < styles.styleFormats.length; i++) {
-            style = styles.styleFormats[i];
-            if(style.block) {
-                validPasteElements += "," + style.block;
-            }
-        }
-        */
-
         /**
          The default paste config can be overwritten by defining these properties in the customConfig.
          */
         var pasteConfig = {
-
-          paste_remove_styles: true,
-          paste_text_linebreaktype: true, //Converts plaintext linebreaks to br or p elements.
-          paste_strip_class_attributes: "none",
-
-          //paste_word_valid_elements: validPasteElements,
-
+          paste_remove_styles_if_webkit: true,
           paste_preprocess: cleanupPasteData
-
         };
 
         Utilities.extend(config, pasteConfig);
