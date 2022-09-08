@@ -28,9 +28,8 @@ public class GetTrackedReferencesController : TrackedReferencesControllerBase
     ///     Used by info tabs on content, media etc. and for the delete and unpublish of single items.
     ///     This is basically finding parents of relations.
     /// </remarks>
-    [HttpGet("status")]
+    [HttpGet("{id:int}")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ServerStatusViewModel), StatusCodes.Status200OK)]
     public ActionResult<PagedViewModel<RelationItemViewModel>> GetPagedReferences(
         int id,
@@ -40,7 +39,7 @@ public class GetTrackedReferencesController : TrackedReferencesControllerBase
     {
 
         PagedViewModel<RelationItemModel> relationItems = _trackedReferencesService.GetPagedRelationsForItem(id, skip, take, filterMustBeIsDependency ?? false);
-        return new PagedViewModel<RelationItemViewModel>()
+        return new PagedViewModel<RelationItemViewModel>
         {
             Items = _umbracoMapper.MapEnumerable<RelationItemModel, RelationItemViewModel>(relationItems.Items),
             Total = relationItems.Total
