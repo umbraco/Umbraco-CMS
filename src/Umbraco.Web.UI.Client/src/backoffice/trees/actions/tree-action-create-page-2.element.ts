@@ -4,7 +4,7 @@ import { customElement } from 'lit/decorators.js';
 import UmbActionElement from './action.element';
 
 @customElement('umb-tree-action-create-page-2')
-export class UmbTreeActionCreatePageElement extends UmbActionElement {
+export class UmbTreeActionCreatePage2Element extends UmbActionElement {
 	static styles = [UUITextStyles, css``];
 
 	private _save() {
@@ -25,6 +25,6 @@ export class UmbTreeActionCreatePageElement extends UmbActionElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-tree-action-create-page-2': UmbTreeActionCreatePageElement;
+		'umb-tree-action-create-page-2': UmbTreeActionCreatePage2Element;
 	}
 }

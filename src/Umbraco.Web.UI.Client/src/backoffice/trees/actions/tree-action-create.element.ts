@@ -5,7 +5,7 @@ import type { ManifestEntityAction } from '../../../core/models';
 import UmbActionElement from './action.element';
 
 @customElement('umb-tree-action-create')
-export default class UmbTreeActionCreateElement extends UmbActionElement {
+export class UmbTreeActionCreateElement extends UmbActionElement {
 	static styles = [UUITextStyles, css``];
 
 	@property({ attribute: false })
@@ -21,6 +21,8 @@ export default class UmbTreeActionCreateElement extends UmbActionElement {
 		</uui-menu-item>`;
 	}
 }
+
+export default UmbTreeActionCreateElement;
 
 declare global {
 	interface HTMLElementTagNameMap {

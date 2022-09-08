@@ -7,7 +7,7 @@ import { UmbNodeStore } from '../../../core/stores/node.store';
 import UmbActionElement from './action.element';
 
 @customElement('umb-tree-action-delete')
-export default class UmbTreeActionDeleteElement extends UmbActionElement {
+export class UmbTreeActionDeleteElement extends UmbActionElement {
 	static styles = [UUITextStyles, css``];
 
 	@property({ attribute: false })
@@ -49,6 +49,8 @@ export default class UmbTreeActionDeleteElement extends UmbActionElement {
 		</uui-menu-item>`;
 	}
 }
+
+export default UmbTreeActionDeleteElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
