@@ -1,30 +1,30 @@
-import { UmbTreeContextBase } from '../tree.context';
+import { UmbTreeDataContextBase } from '../tree-data.context';
 
-export class UmbTreeDataTypesContext extends UmbTreeContextBase {
-	public rootKey = '29d78e6c-c1bf-4c15-b820-d511c237ffae';
+export class UmbTreeMemberGroupsDataContext extends UmbTreeDataContextBase {
+	public rootKey = '575645a5-0f25-4671-b9a0-be515096ad6b';
 
 	public rootChanges() {
 		const data = {
 			key: this.rootKey,
-			name: 'Data Types',
+			name: 'Member Groups',
 			hasChildren: true,
-			type: 'dataTypeRoot',
+			type: 'memberGroupRoot',
 			icon: 'folder',
 			parentKey: '',
 			isTrashed: false,
 		};
+
 		this.entityStore.update([data]);
 		return super.rootChanges();
 	}
 
-	public childrenChanges(key = '') {
+	public childrenChanges(key: string) {
 		// TODO: figure out url structure
-		fetch(`/umbraco/backoffice/entities/data-types?parentKey=${key}`)
+		fetch(`/umbraco/backoffice/entities/member-groups?parentKey=${key}`)
 			.then((res) => res.json())
 			.then((data) => {
 				this.entityStore.update(data);
 			});
-
 		return super.childrenChanges(key);
 	}
 }

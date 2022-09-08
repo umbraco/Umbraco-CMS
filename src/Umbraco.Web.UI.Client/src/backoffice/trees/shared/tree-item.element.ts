@@ -9,6 +9,7 @@ import { map, Subscription } from 'rxjs';
 import { Entity } from '../../../mocks/data/entity.data';
 import { UmbTreeContextMenuService } from './context-menu/tree-context-menu.service';
 import { repeat } from 'lit/directives/repeat.js';
+import { UmbTreeDataContextBase } from '../tree-data.context';
 
 @customElement('umb-tree-item')
 export class UmbTreeItem extends UmbContextConsumerMixin(LitElement) {
@@ -36,6 +37,7 @@ export class UmbTreeItem extends UmbContextConsumerMixin(LitElement) {
 	private _isActive = false;
 
 	private _treeContext?: UmbTreeContextBase;
+	private _treeDataContext?: UmbTreeDataContextBase;
 	private _sectionContext?: UmbSectionContext;
 	private _treeContextMenuService?: UmbTreeContextMenuService;
 
@@ -54,6 +56,10 @@ export class UmbTreeItem extends UmbContextConsumerMixin(LitElement) {
 			this._observeSelection();
 		});
 
+		this.consumeContext('umbTreeDataContext', (treeDataContext: UmbTreeDataContextBase) => {
+			this._treeDataContext = treeDataContext;
+		});
+
 		this.consumeContext('umbSectionContext', (sectionContext: UmbSectionContext) => {
 			this._sectionContext = sectionContext;
 			this._observeSection();
@@ -70,6 +76,7 @@ export class UmbTreeItem extends UmbContextConsumerMixin(LitElement) {
 		this.addEventListener('selected', (e) => {
 			e.stopPropagation();
 			this._treeContext?.select(this.treeItem.key);
+			this.dispatchEvent(new CustomEvent('change', { composed: true, bubbles: true }));
 		});
 	}
 
@@ -91,7 +98,7 @@ export class UmbTreeItem extends UmbContextConsumerMixin(LitElement) {
 	private _observeSelection() {
 		this._selectionSubscription?.unsubscribe();
 		this._selectionSubscription = this._treeContext?.selection
-			.pipe(map((keys) => keys.includes(this.treeItem.key)))
+			.pipe(map((keys) => keys?.includes(this.treeItem.key)))
 			.subscribe((isSelected) => {
 				this._selected = isSelected;
 			});
@@ -118,7 +125,7 @@ export class UmbTreeItem extends UmbContextConsumerMixin(LitElement) {
 
 		this._childrenSubscription?.unsubscribe();
 
-		this._childrenSubscription = this._treeContext?.childrenChanges(this.treeItem.key).subscribe((items) => {
+		this._childrenSubscription = this._treeDataContext?.childrenChanges(this.treeItem.key).subscribe((items) => {
 			if (items?.length === 0) return;
 			this._childItems = items;
 			this._loading = false;

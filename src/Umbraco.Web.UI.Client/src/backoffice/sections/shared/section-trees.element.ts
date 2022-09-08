@@ -6,7 +6,6 @@ import { map, Subscription, switchMap, EMPTY, of } from 'rxjs';
 import { UmbContextConsumerMixin } from '../../../core/context';
 import { UmbExtensionRegistry } from '../../../core/extension';
 import { UmbSectionContext } from '../section.context';
-import type { ManifestTree } from '../../../core/models';
 
 import '../../trees/shared/tree-extension.element';
 
@@ -15,7 +14,7 @@ export class UmbSectionTrees extends UmbContextConsumerMixin(LitElement) {
 	static styles = [UUITextStyles];
 
 	@state()
-	private _trees: Array<ManifestTree> = [];
+	private _treeAliases: Array<string> = [];
 
 	private _extensionStore?: UmbExtensionRegistry;
 	private _treesSubscription?: Subscription;
@@ -49,20 +48,19 @@ export class UmbSectionTrees extends UmbContextConsumerMixin(LitElement) {
 					if (!section) return EMPTY;
 
 					return (
-						this._extensionStore
-							?.extensionsOfType('tree')
-							.pipe(
-								map((trees) =>
-									trees
-										.filter((tree) => tree.meta.sections.includes(section.alias))
-										.sort((a, b) => b.meta.weight - a.meta.weight)
-								)
-							) ?? of([])
+						this._extensionStore?.extensionsOfType('tree').pipe(
+							map((trees) =>
+								trees
+									.filter((tree) => tree.meta.sections.includes(section.alias))
+									.sort((a, b) => b.meta.weight - a.meta.weight)
+									.map((tree) => tree.alias)
+							)
+						) ?? of([])
 					);
 				})
 			)
-			.subscribe((trees) => {
-				this._trees = trees;
+			.subscribe((treeAliases) => {
+				this._treeAliases = treeAliases;
 			});
 	}
 
@@ -73,7 +71,7 @@ export class UmbSectionTrees extends UmbContextConsumerMixin(LitElement) {
 	}
 
 	render() {
-		return html`${this._trees.map((tree) => html`<umb-tree-extension .tree=${tree}></umb-tree-extension>`)} `;
+		return html`${this._treeAliases.map((treeAlias) => html`<umb-tree alias="${treeAlias}"></umb-tree>`)} `;
 	}
 }
 

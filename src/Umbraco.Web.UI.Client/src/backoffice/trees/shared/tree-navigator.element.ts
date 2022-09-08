@@ -3,11 +3,11 @@ import { repeat } from 'lit/directives/repeat.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbContextConsumerMixin } from '../../../core/context';
-import { UmbTreeContextBase } from '../tree.context';
-
-import './tree-item.element';
 import { Subscription } from 'rxjs';
 import { Entity } from '../../../mocks/data/entity.data';
+import { UmbTreeDataContextBase } from '../tree-data.context';
+
+import './tree-item.element';
 
 @customElement('umb-tree-navigator')
 export class UmbTreeNavigator extends UmbContextConsumerMixin(LitElement) {
@@ -16,17 +16,17 @@ export class UmbTreeNavigator extends UmbContextConsumerMixin(LitElement) {
 	@state()
 	private _loading = true;
 
-	private _treeContext?: UmbTreeContextBase;
-	private _treeRootSubscription?: Subscription;
-
 	@state()
 	private _items: Entity[] = [];
+
+	private _treeDataContext?: UmbTreeDataContextBase;
+	private _treeRootSubscription?: Subscription;
 
 	constructor() {
 		super();
 
-		this.consumeContext('umbTreeContext', (treeContext) => {
-			this._treeContext = treeContext;
+		this.consumeContext('umbTreeDataContext', (treeDataContext) => {
+			this._treeDataContext = treeDataContext;
 			this._observeTreeRoot();
 		});
 	}
@@ -34,7 +34,7 @@ export class UmbTreeNavigator extends UmbContextConsumerMixin(LitElement) {
 	private _observeTreeRoot() {
 		this._loading = true;
 
-		this._treeRootSubscription = this._treeContext?.rootChanges?.().subscribe((items) => {
+		this._treeRootSubscription = this._treeDataContext?.rootChanges?.().subscribe((items) => {
 			if (items?.length === 0) return;
 			this._items = items;
 			this._loading = false;

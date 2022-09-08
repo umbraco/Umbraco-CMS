@@ -1,7 +1,7 @@
 import { map } from 'rxjs';
-import { UmbTreeContextBase } from '../tree.context';
+import { UmbTreeDataContextBase } from '../tree-data.context';
 
-export class UmbTreeDocumentContext extends UmbTreeContextBase {
+export class UmbTreeDocumentDataContext extends UmbTreeDataContextBase {
 	public rootKey = 'ba23245c-d8c0-46f7-a2bc-7623743d6eba';
 
 	public rootChanges() {

@@ -1,24 +1,14 @@
-import { css, html, LitElement } from 'lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, property } from 'lit/decorators.js';
+import { html } from 'lit';
+import { customElement } from 'lit/decorators.js';
+import { UmbContextConsumerMixin, UmbContextProviderMixin } from '../../../core/context';
+import { UmbTreeMemberGroupsDataContext } from './tree-member-groups-data.context';
+import { UmbEntityStore } from '../../../core/stores/entity.store';
 
 import '../shared/tree-navigator.element';
-
-import { UmbContextConsumerMixin, UmbContextProviderMixin } from '../../../core/context';
-import { UmbTreeMemberGroupsContext } from './tree-member-groups.context';
-import { UmbEntityStore } from '../../../core/stores/entity.store';
-import type { ManifestTree } from '../../../core/models';
+import { UmbTreeBase } from '../shared/tree-base.element';
 
 @customElement('umb-tree-member-groups')
-export class UmbTreeMemberGroups extends UmbContextProviderMixin(UmbContextConsumerMixin(LitElement)) {
-	static styles = [UUITextStyles, css``];
-
-	@property({ type: Object, attribute: false })
-	tree?: ManifestTree;
-
-	private _treeContext?: UmbTreeMemberGroupsContext;
-	private _entityStore?: UmbEntityStore;
-
+export class UmbTreeMemberGroups extends UmbContextProviderMixin(UmbContextConsumerMixin(UmbTreeBase)) {
 	constructor() {
 		super();
 
@@ -26,8 +16,8 @@ export class UmbTreeMemberGroups extends UmbContextProviderMixin(UmbContextConsu
 			this._entityStore = entityStore;
 			if (!this._entityStore || !this.tree) return;
 
-			this._treeContext = new UmbTreeMemberGroupsContext(this.tree, this._entityStore);
-			this.provideContext('umbTreeContext', this._treeContext);
+			this._treeDataContext = new UmbTreeMemberGroupsDataContext(this._entityStore);
+			this.provideContext('umbTreeDataContext', this._treeDataContext);
 		});
 	}
 

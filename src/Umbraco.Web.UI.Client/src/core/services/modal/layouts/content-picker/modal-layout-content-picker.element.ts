@@ -9,6 +9,7 @@ export interface UmbModalContentPickerData {
 }
 
 import '../../../../../backoffice/trees/documents/tree-documents.element';
+import { UmbTreeElement } from '../../../../../backoffice/trees/shared/tree.element';
 
 @customElement('umb-modal-layout-content-picker')
 export class UmbModalLayoutContentPickerElement extends UmbModalLayoutElement<UmbModalContentPickerData> {
@@ -57,7 +58,7 @@ export class UmbModalLayoutContentPickerElement extends UmbModalLayoutElement<Um
 
 	private _handleSelectionChange(e: CustomEvent) {
 		e.stopPropagation();
-		const element = e.composedPath()[0] as any;
+		const element = e.target as UmbTreeElement;
 		this._selection = element.selection;
 	}
 
@@ -77,10 +78,11 @@ export class UmbModalLayoutContentPickerElement extends UmbModalLayoutElement<Um
 				<uui-box>
 					<uui-input></uui-input>
 					<hr />
-					<umb-tree-document
-						@change="${this._handleSelectionChange}"
+					<umb-tree
+						alias="Umb.Tree.Content"
+						@change=${this._handleSelectionChange}
 						.selection=${this._selection}
-						selectable></umb-tree-document>
+						selectable></umb-tree>
 				</uui-box>
 				<div slot="actions">
 					<uui-button label="Close" @click=${this._close}></uui-button>

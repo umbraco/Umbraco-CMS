@@ -8,6 +8,8 @@ import './sections/shared/section-layout.element';
 import './sections/shared/section-main.element';
 import './sections/shared/section-sidebar.element';
 import './sections/shared/section.element';
+import './trees/shared/tree-base.element';
+import './trees/shared/tree.element';
 
 import { defineElement } from '@umbraco-ui/uui-base/lib/registration';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';

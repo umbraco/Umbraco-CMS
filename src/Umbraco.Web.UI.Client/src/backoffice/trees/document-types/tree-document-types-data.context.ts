@@ -1,6 +1,6 @@
-import { UmbTreeContextBase } from '../tree.context';
+import { UmbTreeDataContextBase } from '../tree-data.context';
 
-export class UmbTreeDocumentTypesContext extends UmbTreeContextBase {
+export class UmbTreeDocumentTypesDataContext extends UmbTreeDataContextBase {
 	public rootKey = 'f50eb86d-3ef2-4011-8c5d-c56c04eec0da';
 
 	public rootChanges() {
