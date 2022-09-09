@@ -2,7 +2,7 @@
 
 namespace Umbraco.Cms.ManagementApi.Services;
 
-public interface IExamineSearcherValidationService
+public interface IExamineSearcherFinderService
 {
     bool TryFindSearcher(string searcherName, out ISearcher searcher);
 }

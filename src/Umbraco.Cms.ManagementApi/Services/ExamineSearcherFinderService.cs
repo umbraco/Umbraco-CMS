@@ -2,7 +2,7 @@
 
 namespace Umbraco.Cms.ManagementApi.Services;
 
-public class ExamineSearcherFinderService : IExamineSearcherValidationService
+public class ExamineSearcherFinderService : IExamineSearcherFinderService
 {
     private readonly IExamineManager _examineManager;
 
