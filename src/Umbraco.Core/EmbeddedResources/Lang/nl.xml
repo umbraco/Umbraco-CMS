@@ -1915,6 +1915,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="profile">Profiel</key>
     <key alias="searchAllChildren">Doorzoek alle subitems</key>
     <key alias="sectionsHelp">Geef de gebruiker toegang tot secties</key>
+    <key alias="languagesHelp">Beperk de talen die gebruikers mogen bewerken</key>
     <key alias="selectUserGroups">Selecteer een gebruikersgroep</key>
     <key alias="noStartNode">Geen startnode geselecteerd</key>
     <key alias="noStartNodes">Geen startnodes geselecteerd</key>
