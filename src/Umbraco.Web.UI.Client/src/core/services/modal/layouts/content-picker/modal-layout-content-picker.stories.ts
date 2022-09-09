@@ -15,7 +15,10 @@ export default {
 	id: 'modal-layout-content-picker',
 } as Meta;
 
-const data: UmbModalContentPickerData = {};
+const data: UmbModalContentPickerData = {
+	multiple: true,
+	selection: [],
+};
 
 export const Overview: Story<UmbModalLayoutContentPickerElement> = () => html`
 	<!-- TODO: figure out if generics are allowed for properties:

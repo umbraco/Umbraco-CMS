@@ -22,8 +22,8 @@ export const handlers = [
 		return res(ctx.status(200), ctx.json([dataType]));
 	}),
 
-	rest.post<DataTypeEntity[]>('/umbraco/backoffice/data-type/save', (req, res, ctx) => {
-		const data = req.body;
+	rest.post<DataTypeEntity[]>('/umbraco/backoffice/data-type/save', async (req, res, ctx) => {
+		const data = await req.json();
 		if (!data) return;
 
 		const saved = umbDataTypeData.save(data);
@@ -31,9 +31,9 @@ export const handlers = [
 		return res(ctx.status(200), ctx.json(saved));
 	}),
 
-	rest.post<DataTypeEntity[]>('/umbraco/backoffice/data-type/trash', (req, res, ctx) => {
+	rest.post<DataTypeEntity[]>('/umbraco/backoffice/data-type/trash', async (req, res, ctx) => {
 		console.warn('Please move to schema');
-		const key = req.body as string;
+		const key = await req.text();
 
 		const trashed = umbDataTypeData.trash(key);
 
