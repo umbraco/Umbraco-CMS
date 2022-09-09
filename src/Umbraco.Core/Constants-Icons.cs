@@ -122,7 +122,27 @@ public static partial class Constants
         /// <summary>
         ///     System property editor icon
         /// </summary>
+        public const string PartialView = "icon-article";
+
+        /// <summary>
+        ///     System property editor icon
+        /// </summary>
         public const string PropertyEditor = "icon-autofill";
+
+        /// <summary>
+        ///     Relation type icon
+        /// </summary>
+        public const string RelationType = "icon-trafic";
+
+        /// <summary>
+        ///     Script type icon
+        /// </summary>
+        public const string Script = "icon-script";
+
+        /// <summary>
+        ///     Stylesheet type icon
+        /// </summary>
+        public const string Stylesheet = "icon-brackets";
 
         /// <summary>
         ///     System member icon
@@ -138,10 +158,5 @@ public static partial class Constants
         ///     System user group icon
         /// </summary>
         public const string UserGroup = "icon-users";
-
-        /// <summary>
-        ///     Relation type icon
-        /// </summary>
-        public const string RelationType = "icon-trafic";
     }
 }
