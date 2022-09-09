@@ -15,7 +15,6 @@ public class StylesheetTreeItemsController : StylesheetTreeControllerBase
 
     [HttpGet("items")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(PagedResult<FileSystemTreeItemViewModel>), StatusCodes.Status200OK)]
     public async Task<ActionResult<PagedResult<FileSystemTreeItemViewModel>>> Items([FromQuery(Name = "path")] string[] paths)
         => await GetItems(paths);

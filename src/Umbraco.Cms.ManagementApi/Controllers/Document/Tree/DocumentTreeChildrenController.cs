@@ -23,7 +23,6 @@ public class DocumentTreeChildrenController : DocumentTreeControllerBase
 
     [HttpGet("children")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(PagedResult<DocumentTreeItemViewModel>), StatusCodes.Status200OK)]
     public async Task<ActionResult<PagedResult<DocumentTreeItemViewModel>>> Children(Guid parentKey, long pageNumber = 0, int pageSize = 100)
         => await GetChildren(parentKey, pageNumber, pageSize);

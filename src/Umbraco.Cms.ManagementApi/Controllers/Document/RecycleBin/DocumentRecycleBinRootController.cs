@@ -15,7 +15,6 @@ public class DocumentRecycleBinRootController : DocumentRecycleBinControllerBase
 
     [HttpGet("root")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(PagedResult<RecycleBinItemViewModel>), StatusCodes.Status200OK)]
     public async Task<ActionResult<PagedResult<RecycleBinItemViewModel>>> Root(long pageNumber = 0, int pageSize = 100)
         => await GetRoot(pageNumber, pageSize);

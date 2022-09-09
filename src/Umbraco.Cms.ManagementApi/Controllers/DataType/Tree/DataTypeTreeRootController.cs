@@ -15,7 +15,6 @@ public class DataTypeTreeRootController : DataTypeTreeControllerBase
 
     [HttpGet("root")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(PagedResult<FolderTreeItemViewModel>), StatusCodes.Status200OK)]
     public async Task<ActionResult<PagedResult<FolderTreeItemViewModel>>> Root(long pageNumber = 0, int pageSize = 100, bool foldersOnly = false)
         => await GetRoot(pageNumber, pageSize, foldersOnly);

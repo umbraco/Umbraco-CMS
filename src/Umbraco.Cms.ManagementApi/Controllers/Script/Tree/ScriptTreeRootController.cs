@@ -15,7 +15,6 @@ public class ScriptTreeRootController : ScriptTreeControllerBase
 
     [HttpGet("root")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(PagedResult<FileSystemTreeItemViewModel>), StatusCodes.Status200OK)]
     public async Task<ActionResult<PagedResult<FileSystemTreeItemViewModel>>> Root(long pageNumber = 0, int pageSize = 100)
         => await GetRoot(pageNumber, pageSize);
