@@ -3,11 +3,11 @@ import '../editor-layout/editor-layout.element';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { IRoute, IRoutingInfo, RouterSlot } from 'router-slot';
+import { IRoute, IRoutingInfo, PageComponent, RouterSlot } from 'router-slot';
 import { map, Subscription } from 'rxjs';
 
 import { UmbContextConsumerMixin } from '../../../../core/context';
-import { UmbExtensionRegistry } from '../../../../core/extension';
+import { createExtensionElement, UmbExtensionRegistry } from '../../../../core/extension';
 import type { ManifestEditorView } from '../../../../core/models';
 
 @customElement('umb-editor-entity-layout')
@@ -117,8 +117,8 @@ export class UmbEditorEntityLayout extends UmbContextConsumerMixin(LitElement) {
 			this._routes = this._editorViews.map((view) => {
 				return {
 					path: `view/${view.meta.pathname}`,
-					component: () => document.createElement(view.elementName || 'div'),
-					setup: (element: HTMLElement, info: IRoutingInfo) => {
+					component: () => createExtensionElement(view) as unknown as PageComponent,
+					setup: (_element: HTMLElement, info: IRoutingInfo) => {
 						this._currentView = info.match.route.path;
 					},
 				};
