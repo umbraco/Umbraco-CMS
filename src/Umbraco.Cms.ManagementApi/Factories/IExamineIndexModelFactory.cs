@@ -1,9 +1,9 @@
 ﻿using Examine;
-using Umbraco.Cms.Infrastructure.Examine;
+using Umbraco.Cms.ManagementApi.ViewModels.ExamineManagement;
 
 namespace Umbraco.Cms.ManagementApi.Factories;
 
 public interface IExamineIndexModelFactory
 {
-    ExamineIndexModel Create(IIndex index);
+    ExamineIndexViewModel Create(IIndex index);
 }

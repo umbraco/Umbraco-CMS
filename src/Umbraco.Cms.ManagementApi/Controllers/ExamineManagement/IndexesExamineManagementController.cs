@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.ManagementApi.Factories;
+using Umbraco.Cms.ManagementApi.ViewModels.ExamineManagement;
 using Umbraco.Cms.ManagementApi.ViewModels.Pagination;
 using Umbraco.Cms.ManagementApi.ViewModels.Server;
 using Umbraco.Extensions;
@@ -26,15 +27,16 @@ public class IndexesExamineManagementController : ExamineManagementControllerBas
     ///     Get the details for indexers
     /// </summary>
     /// <returns></returns>
-    [HttpGet("Indexes")]
+    [HttpGet("indexes")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(ServerStatusViewModel), StatusCodes.Status200OK)]
-    public PagedViewModel<ExamineIndexModel> Indexes(int skip, int take)
+    [ProducesResponseType(typeof(PagedViewModel<ExamineIndexModel>), StatusCodes.Status200OK)]
+    public async Task<PagedViewModel<ExamineIndexViewModel>> Indexes(int skip, int take)
     {
-        ExamineIndexModel[] indexes = _examineManager.Indexes
+        ExamineIndexViewModel[] indexes = _examineManager.Indexes
             .Select(_examineIndexModelFactory.Create)
             .OrderBy(examineIndexModel => examineIndexModel.Name?.TrimEnd("Indexer")).ToArray();
 
-        return new PagedViewModel<ExamineIndexModel> { Items = indexes.Skip(skip).Take(take), Total = indexes.Length };
+        var viewModel = new PagedViewModel<ExamineIndexViewModel> { Items = indexes.Skip(skip).Take(take), Total = indexes.Length };
+        return viewModel;
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Examine;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Examine;
+using Umbraco.Cms.ManagementApi.ViewModels.ExamineManagement;
 
 namespace Umbraco.Cms.ManagementApi.Factories;
 
@@ -15,7 +16,7 @@ public class ExamineIndexModelFactory : IExamineIndexModelFactory
         _indexRebuilder = indexRebuilder;
     }
 
-    public ExamineIndexModel Create(IIndex index)
+    public ExamineIndexViewModel Create(IIndex index)
     {
         var indexName = index.Name;
 
@@ -34,7 +35,7 @@ public class ExamineIndexModelFactory : IExamineIndexModelFactory
             properties[p.Key] = p.Value;
         }
 
-        var indexerModel = new ExamineIndexModel
+        var indexerModel = new ExamineIndexViewModel
         {
             Name = indexName,
             HealthStatus = isHealthy.Success ? isHealthy.Result ?? "Healthy" : isHealthy.Result ?? "Unhealthy",
