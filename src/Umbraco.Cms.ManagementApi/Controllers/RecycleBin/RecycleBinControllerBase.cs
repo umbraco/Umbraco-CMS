@@ -5,7 +5,7 @@ using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.ManagementApi.ViewModels.RecycleBin;
 
-namespace Umbraco.Cms.ManagementApi.Controllers;
+namespace Umbraco.Cms.ManagementApi.Controllers.RecycleBin;
 
 public abstract class RecycleBinControllerBase<TItem> : Controller
     where TItem : RecycleBinItemViewModel, new()
