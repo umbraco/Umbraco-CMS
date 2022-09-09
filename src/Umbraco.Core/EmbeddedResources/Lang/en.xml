@@ -1178,7 +1178,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="nodeSelected">has been selected as the root of your new content, click 'ok' below.</key>
     <key alias="noNodeSelected">No node selected yet, please select a node in the list above before clicking 'ok'</key>
     <key alias="notAllowedByContentType">The current node is not allowed under the chosen node because of its type</key>
-    <key alias="notAllowedByPath">The current node cannot be moved to one of its subpages</key>
+    <key alias="notAllowedByPath">The current node cannot be moved to one of its subpages neither can the parent and destination be the same</key>
     <key alias="notAllowedAtRoot">The current node cannot exist at the root</key>
     <key alias="notValid">The action isn't allowed since you have insufficient permissions on 1 or more child
       documents.
