@@ -27,14 +27,8 @@
 
         function onInit() {
 
-            // TODO: Can and should we do this smarter? parent parent is very dirty.
-            const preValues = $scope.$parent.$parent.$parent.$parent.$parent.model.preValues || $scope.$parent.$parent.$parent.$parent.$parent.$parent.$parent.vm.dataType.preValues;
-            if(!preValues || !preValues.length) {
-                throw Error("BlockConfigurationController could not find prevalues of DataType.");
-            }
-            console.log("preValues", preValues)
-            vm.gridColumnsPrevalue = preValues.find(x => x.key ? x.key === "gridColumns" : x.alias === "gridColumns");
-            console.log("gridColumnsPrevalue", vm.gridColumnsPrevalue)
+            // Somehow the preValues models are different, so we will try to match either key or alias.
+            vm.gridColumnsPreValue = $scope.preValues.find(x => x.key ? x.key === "gridColumns" : x.alias === "gridColumns");
 
             if (!$scope.model.value) {
                 $scope.model.value = [];
@@ -224,7 +218,7 @@
                         block: clonedBlockData,
                         allBlockTypes: $scope.model.value,
                         loadedElementTypes: vm.elementTypes,
-                        gridColumns: vm.gridColumnsPrevalue.value || DEFAULT_GRID_COLUMNS,
+                        gridColumns: vm.gridColumnsPreValue.value || DEFAULT_GRID_COLUMNS,
                         title: data,
                         view: "views/propertyeditors/blockgrid/prevalue/blockgrid.blockconfiguration.overlay.html",
                         size: "large",
