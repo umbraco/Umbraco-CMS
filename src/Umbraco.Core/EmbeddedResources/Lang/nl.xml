@@ -510,6 +510,7 @@
     <key alias="selectMemberGroup">Selecteer lid groep</key>
     <key alias="selectMemberType">Selecteer lid type</key>
     <key alias="selectNode">Selecteer node</key>
+    <key alias="selectLanguages">Selecteer talen</key>
     <key alias="selectSections">Selecteer secties</key>
     <key alias="selectUser">Selecteer gebruiker</key>
     <key alias="selectUsers">Selecteer gebruikers</key>
