@@ -67,7 +67,7 @@ export class UmbTreeContextMenuPageActionListElement extends UmbContextConsumerM
 
 		this._treeItemActionsSubscription = this._extensionRegistry
 			?.extensionsOfType('treeItemAction')
-			.pipe(map((actions) => actions.filter((action) => action.meta.trees.includes(this._activeTree?.alias))))
+			.pipe(map((actions) => actions.filter((action) => action.meta.trees.includes(this._activeTree?.alias || ''))))
 			.subscribe((actions) => {
 				this._actions = actions;
 			});
