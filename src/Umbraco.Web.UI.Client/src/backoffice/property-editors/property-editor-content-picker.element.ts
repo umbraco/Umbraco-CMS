@@ -6,7 +6,7 @@ import type { Subscription } from 'rxjs';
 import { UmbContextConsumerMixin } from '../../core/context';
 import type { UmbModalService } from '../../core/services/modal';
 import type { UmbEntityStore } from '../../core/stores/entity.store';
-import type { Entity } from '../../mocks/data/entity.data';
+import type { Entity } from '../../mocks/data/entities';
 
 @customElement('umb-property-editor-content-picker')
 export class UmbPropertyEditorContentPicker extends UmbContextConsumerMixin(LitElement) {

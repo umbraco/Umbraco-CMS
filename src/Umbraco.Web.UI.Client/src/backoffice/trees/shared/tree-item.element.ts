@@ -6,7 +6,7 @@ import { UmbTreeContextBase } from '../tree.context';
 import { UUIMenuItemEvent } from '@umbraco-ui/uui';
 import { UmbSectionContext } from '../../sections/section.context';
 import { map, Subscription } from 'rxjs';
-import { Entity } from '../../../mocks/data/entity.data';
+import { Entity } from '../../../mocks/data/entities';
 import { UmbTreeContextMenuService } from './context-menu/tree-context-menu.service';
 import { repeat } from 'lit/directives/repeat.js';
 import { UmbTreeDataContextBase } from '../tree-data.context';

@@ -1,4 +1,12 @@
-import { Entity } from './entity.data';
+export interface Entity {
+	key: string;
+	name: string;
+	icon: string;
+	type: string;
+	hasChildren: boolean;
+	parentKey: string;
+	isTrashed: boolean;
+}
 
 const generateDocumentEntities = (amount: number) => {
 	const entities = [];

@@ -1,5 +1,5 @@
 import { Observable, map } from 'rxjs';
-import type { Entity } from '../../mocks/data/entity.data';
+import type { Entity } from '../../mocks/data/entities';
 import { UmbDataStoreBase } from './store';
 
 export class UmbEntityStore extends UmbDataStoreBase<Entity> {

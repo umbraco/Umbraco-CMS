@@ -1,5 +1,4 @@
-import { entities } from './entities';
-import { Entity } from './entity.data';
+import { Entity, entities } from './entities';
 
 // Temp mocked database
 export class UmbData<T extends Entity> {

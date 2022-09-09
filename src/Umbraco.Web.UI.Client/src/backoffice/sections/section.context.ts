@@ -1,7 +1,7 @@
 import { BehaviorSubject, ReplaySubject } from 'rxjs';
 
 import type { ManifestSection, ManifestTree } from '../../core/models';
-import { Entity } from '../../mocks/data/entity.data';
+import { Entity } from '../../mocks/data/entities';
 
 export class UmbSectionContext {
 	// TODO: figure out how fine grained we want to make our observables.

@@ -6,7 +6,7 @@ import { UmbExtensionRegistry } from '../../../../core/extension';
 import { UmbContextConsumerMixin } from '../../../../core/context';
 import { map, Subscription } from 'rxjs';
 import { UmbSectionContext } from '../../../sections/section.context';
-import { Entity } from '../../../../mocks/data/entity.data';
+import { Entity } from '../../../../mocks/data/entities';
 
 @customElement('umb-tree-context-menu-page-action-list')
 export class UmbTreeContextMenuPageActionListElement extends UmbContextConsumerMixin(LitElement) {

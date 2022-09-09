@@ -1,5 +1,5 @@
 import { UmbData } from './data';
-import { Entity } from './entity.data';
+import { Entity } from './entities';
 
 export interface DataTypeEntity extends Entity {
 	propertyEditorUIAlias: string;

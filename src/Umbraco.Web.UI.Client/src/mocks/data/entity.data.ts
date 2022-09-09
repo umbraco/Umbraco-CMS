@@ -1,15 +1,5 @@
 import { UmbData } from './data';
-import { entities } from './entities';
-
-export interface Entity {
-	key: string;
-	name: string;
-	icon: string;
-	type: string;
-	hasChildren: boolean;
-	parentKey: string;
-	isTrashed: boolean;
-}
+import { Entity, entities } from './entities';
 
 // Temp mocked database
 class UmbEntityData extends UmbData<Entity> {

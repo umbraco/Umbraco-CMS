@@ -1,5 +1,5 @@
 import { BehaviorSubject, Observable } from 'rxjs';
-import { Entity } from '../../mocks/data/entity.data';
+import { Entity } from '../../mocks/data/entities';
 
 export interface UmbDataStore<T> {
 	readonly items: Observable<Array<T>>;

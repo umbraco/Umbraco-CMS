@@ -1,6 +1,6 @@
 import { map, Observable } from 'rxjs';
 import type { UmbEntityStore } from '../../core/stores/entity.store';
-import { Entity } from '../../mocks/data/entity.data';
+import { Entity } from '../../mocks/data/entities';
 
 export interface UmbTreeDataContext {
 	rootKey: string;
