@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using NSwag.Annotations;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
@@ -11,6 +12,7 @@ namespace Umbraco.Cms.ManagementApi.Controllers.RelationType.Tree;
 [ApiVersion("1.0")]
 [ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.RelationType}/tree")]
+[OpenApiTag(nameof(Constants.UdiEntityType.RelationType))]
 // NOTE: at the moment relation types aren't supported by EntityService, so we have little use of the
 // tree controller base. We'll keep it though, in the hope that we can mend EntityService.
 public class RelationTypeTreeControllerBase : EntityTreeControllerBase<EntityTreeItemViewModel>

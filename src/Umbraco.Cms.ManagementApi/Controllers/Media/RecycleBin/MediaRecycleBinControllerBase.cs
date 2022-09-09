@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using NSwag.Annotations;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -14,6 +15,7 @@ namespace Umbraco.Cms.ManagementApi.Controllers.Media.RecycleBin;
 [ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.Media}/recycle-bin")]
 [RequireMediaTreeRootAccess] // NOTE: this is pending evaluation for new backoffice
+[OpenApiTag(nameof(Constants.UdiEntityType.Media))]
 public class MediaRecycleBinControllerBase : RecycleBinControllerBase<RecycleBinItemViewModel>
 {
     public MediaRecycleBinControllerBase(IEntityService entityService)

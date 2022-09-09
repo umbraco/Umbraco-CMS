@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using NSwag.Annotations;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.ManagementApi.Controllers.Tree;
@@ -9,6 +10,7 @@ namespace Umbraco.Cms.ManagementApi.Controllers.PartialView.Tree;
 [ApiVersion("1.0")]
 [ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.PartialView}/tree")]
+[OpenApiTag(nameof(Constants.UdiEntityType.PartialView))]
 public class PartialViewTreeControllerBase : FileSystemTreeControllerBase
 {
     public PartialViewTreeControllerBase(FileSystems fileSystems)

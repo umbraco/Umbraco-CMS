@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using NSwag.Annotations;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.ManagementApi.Controllers.Tree;
@@ -9,6 +10,7 @@ namespace Umbraco.Cms.ManagementApi.Controllers.StaticFile.Tree;
 [ApiVersion("1.0")]
 [ApiController]
 [VersionedApiBackOfficeRoute("static-file/tree")]
+[OpenApiTag("StaticFile")]
 public class StaticFileTreeControllerBase : FileSystemTreeControllerBase
 {
     private static readonly string[] _whiteListedRootFolders = { "App_Plugins", "wwwroot" };

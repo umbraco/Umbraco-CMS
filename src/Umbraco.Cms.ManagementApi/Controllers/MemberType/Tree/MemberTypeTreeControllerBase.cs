@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using NSwag.Annotations;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -12,6 +13,7 @@ namespace Umbraco.Cms.ManagementApi.Controllers.MemberType.Tree;
 [ApiVersion("1.0")]
 [ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.MemberType}/tree")]
+[OpenApiTag(nameof(Constants.UdiEntityType.MemberType))]
 public class MemberTypeTreeControllerBase : EntityTreeControllerBase<EntityTreeItemViewModel>
 {
     public MemberTypeTreeControllerBase(IEntityService entityService)
