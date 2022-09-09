@@ -73,9 +73,9 @@ export class UmbPropertyEditorContentPicker extends UmbContextConsumerMixin(LitE
 	private _removeItem(item: Entity) {
 		const modalHandler = this._modalService?.confirm({
 			color: 'danger',
-			headline: 'Remove',
+			headline: `Remove ${item.name}?`,
+			content: 'Are you sure you want to remove this item',
 			confirmLabel: 'Remove',
-			content: html`Remove <strong>${item.name}</strong>?`,
 		});
 
 		modalHandler?.onClose.then(({ confirmed }) => {
