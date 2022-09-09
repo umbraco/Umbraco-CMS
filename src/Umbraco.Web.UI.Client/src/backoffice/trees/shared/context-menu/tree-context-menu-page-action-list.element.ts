@@ -1,10 +1,10 @@
 import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
+import { map, Subscription } from 'rxjs';
 import type { ManifestTreeItemAction, ManifestTree } from '../../../../core/models';
 import { UmbExtensionRegistry } from '../../../../core/extension';
 import { UmbContextConsumerMixin } from '../../../../core/context';
-import { map, Subscription } from 'rxjs';
 import { UmbSectionContext } from '../../../sections/section.context';
 import { Entity } from '../../../../mocks/data/entities';
 

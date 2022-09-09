@@ -32,6 +32,7 @@
 			"rules": {
 				"no-var": "error",
 				"import/no-unresolved": "error",
+				"import/order": "warn",
 				"local-rules/bad-type-import": "error"
 			},
 			"settings": {

@@ -1,9 +1,9 @@
 import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
+import { Subscription, distinctUntilChanged } from 'rxjs';
 import { UmbContextConsumerMixin } from '../../../../core/context';
 import type { DocumentTypeEntity } from '../../../../mocks/data/document-type.data';
-import { Subscription, distinctUntilChanged } from 'rxjs';
 import { UmbDocumentTypeContext } from '../document-type.context';
 
 @customElement('umb-editor-view-document-type-design')

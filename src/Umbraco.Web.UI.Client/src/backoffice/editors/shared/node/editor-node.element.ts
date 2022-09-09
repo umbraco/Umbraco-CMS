@@ -2,11 +2,12 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
+import { distinctUntilChanged, Subscription } from 'rxjs';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '../../../../core/context';
 import { UmbNodeStore } from '../../../../core/stores/node.store';
-import { distinctUntilChanged, Subscription } from 'rxjs';
 import { NodeEntity } from '../../../../mocks/data/node.data';
 import type { UmbNotificationService } from '../../../../core/services/notification';
+import { UmbNotificationDefaultData } from '../../../../core/services/notification/layouts/default';
 import { UmbNodeContext } from './node.context';
 
 import '../../shared/editor-entity-layout/editor-entity-layout.element';
@@ -15,7 +16,6 @@ import '../../shared/editor-entity-layout/editor-entity-layout.element';
 // TODO: Make this dynamic, use load-extensions method to loop over extensions for this node.
 import './views/edit/editor-view-node-edit.element';
 import './views/info/editor-view-node-info.element';
-import { UmbNotificationDefaultData } from '../../../../core/services/notification/layouts/default';
 
 @customElement('umb-editor-node')
 export class UmbEditorNodeElement extends UmbContextProviderMixin(UmbContextConsumerMixin(LitElement)) {

@@ -8,9 +8,9 @@ import './user/installer-user.element';
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
+import { Subscription } from 'rxjs';
 import { UmbContextProviderMixin } from '../core/context';
 import { UmbInstallerContext } from './installer.context';
-import { Subscription } from 'rxjs';
 
 @customElement('umb-installer')
 export class UmbInstallerElement extends UmbContextProviderMixin(LitElement) {

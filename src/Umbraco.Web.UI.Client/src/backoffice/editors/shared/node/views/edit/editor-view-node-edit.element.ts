@@ -1,10 +1,10 @@
 import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
+import { Subscription, distinctUntilChanged } from 'rxjs';
 import { NodeProperty, NodePropertyData } from '../../../../../../mocks/data/node.data';
 import { UmbContextConsumerMixin } from '../../../../../../core/context';
 import { UmbNodeContext } from '../../node.context';
-import { Subscription, distinctUntilChanged } from 'rxjs';
 
 import '../../../../../components/node-property.element';
 

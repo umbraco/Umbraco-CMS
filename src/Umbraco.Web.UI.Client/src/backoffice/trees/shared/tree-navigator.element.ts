@@ -2,8 +2,8 @@ import { css, html, LitElement } from 'lit';
 import { repeat } from 'lit/directives/repeat.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbContextConsumerMixin } from '../../../core/context';
 import { Subscription } from 'rxjs';
+import { UmbContextConsumerMixin } from '../../../core/context';
 import { Entity } from '../../../mocks/data/entities';
 import { UmbTreeDataContextBase } from '../tree-data.context';
 

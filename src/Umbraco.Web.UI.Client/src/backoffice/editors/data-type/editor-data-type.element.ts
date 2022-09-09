@@ -7,6 +7,7 @@ import { UmbContextProviderMixin, UmbContextConsumerMixin } from '../../../core/
 import { UmbNotificationService } from '../../../core/services/notification';
 import { UmbDataTypeStore } from '../../../core/stores/data-type.store';
 import { DataTypeEntity } from '../../../mocks/data/data-type.data';
+import { UmbNotificationDefaultData } from '../../../core/services/notification/layouts/default';
 import { UmbDataTypeContext } from './data-type.context';
 
 import '../shared/editor-entity-layout/editor-entity-layout.element';
@@ -14,7 +15,6 @@ import '../shared/editor-entity-layout/editor-entity-layout.element';
 // Lazy load
 // TODO: Make this dynamic, use load-extensions method to loop over extensions for this node.
 import './views/editor-view-data-type-edit.element';
-import { UmbNotificationDefaultData } from '../../../core/services/notification/layouts/default';
 
 @customElement('umb-editor-data-type')
 export class UmbEditorDataTypeElement extends UmbContextProviderMixin(UmbContextConsumerMixin(LitElement)) {

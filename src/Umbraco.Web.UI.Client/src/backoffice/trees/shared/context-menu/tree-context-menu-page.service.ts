@@ -1,9 +1,9 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, LitElement, nothing, PropertyValueMap } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { UmbContextProviderMixin } from '../../../../core/context';
 import UmbTreeItemActionElement, { ActionPageEntity } from '../tree-item-action.element';
-import { BehaviorSubject, Observable } from 'rxjs';
 
 @customElement('umb-tree-context-menu-page-service')
 export class UmbTreeContextMenuPageService extends UmbContextProviderMixin(LitElement) {
