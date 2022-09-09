@@ -16,14 +16,14 @@ public class RelationTypeTreeRootController : RelationTypeTreeControllerBase
     [HttpGet("root")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(PagedResult<TreeItemViewModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedResult<TreeItemViewModel>>> Root(long pageNumber = 0, int pageSize = 100)
+    [ProducesResponseType(typeof(PagedResult<EntityTreeItemViewModel>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<PagedResult<EntityTreeItemViewModel>>> Root(long pageNumber = 0, int pageSize = 100)
     {
         IRelationType[] relationTypes = RelationService.GetAllRelationTypes().ToArray();
 
-        TreeItemViewModel[] viewModels = MapTreeItemViewModels(null, relationTypes);
+        EntityTreeItemViewModel[] viewModels = MapTreeItemViewModels(null, relationTypes);
 
-        PagedResult<TreeItemViewModel> result = PagedResult(viewModels, pageNumber, pageSize, viewModels.Length);
+        PagedResult<EntityTreeItemViewModel> result = PagedResult(viewModels, pageNumber, pageSize, viewModels.Length);
         return await Task.FromResult(Ok(result));
     }
 }

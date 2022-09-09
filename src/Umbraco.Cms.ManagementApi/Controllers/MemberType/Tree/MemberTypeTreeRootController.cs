@@ -16,7 +16,7 @@ public class MemberTypeTreeRootController : MemberTypeTreeControllerBase
     [HttpGet("root")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(PagedResult<TreeItemViewModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedResult<TreeItemViewModel>>> Root(long pageNumber = 0, int pageSize = 100)
+    [ProducesResponseType(typeof(PagedResult<EntityTreeItemViewModel>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<PagedResult<EntityTreeItemViewModel>>> Root(long pageNumber = 0, int pageSize = 100)
         => await GetRoot(pageNumber, pageSize);
 }

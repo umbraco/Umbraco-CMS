@@ -11,7 +11,7 @@ namespace Umbraco.Cms.ManagementApi.Controllers.MemberGroup.Tree;
 [ApiVersion("1.0")]
 [ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.MemberGroup}/tree")]
-public class MemberGroupTreeControllerBase : TreeControllerBase<TreeItemViewModel>
+public class MemberGroupTreeControllerBase : EntityTreeControllerBase<EntityTreeItemViewModel>
 {
     public MemberGroupTreeControllerBase(IEntityService entityService)
         : base(entityService)
@@ -20,9 +20,9 @@ public class MemberGroupTreeControllerBase : TreeControllerBase<TreeItemViewMode
 
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.MemberGroup;
 
-    protected override TreeItemViewModel MapTreeItemViewModel(Guid? parentKey, IEntitySlim entity)
+    protected override EntityTreeItemViewModel MapTreeItemViewModel(Guid? parentKey, IEntitySlim entity)
     {
-        TreeItemViewModel viewModel = base.MapTreeItemViewModel(parentKey, entity);
+        EntityTreeItemViewModel viewModel = base.MapTreeItemViewModel(parentKey, entity);
         viewModel.Icon = Constants.Icons.MemberGroup;
         return viewModel;
     }

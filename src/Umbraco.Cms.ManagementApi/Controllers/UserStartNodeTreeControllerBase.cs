@@ -8,7 +8,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.ManagementApi.Controllers;
 
-public abstract class UserStartNodeTreeControllerBase<TItem> : TreeControllerBase<TItem>
+public abstract class UserStartNodeTreeControllerBase<TItem> : EntityTreeControllerBase<TItem>
     where TItem : ContentTreeItemViewModel, new()
 {
     private readonly IUserStartNodeEntitiesService _userStartNodeEntitiesService;

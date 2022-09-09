@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Cms.ManagementApi.ViewModels.Tree;
 
-public class DocumentBlueprintTreeItemViewModel : TreeItemViewModel
+public class DocumentBlueprintTreeItemViewModel : EntityTreeItemViewModel
 {
     public Guid DocumentTypeKey { get; set; }
 

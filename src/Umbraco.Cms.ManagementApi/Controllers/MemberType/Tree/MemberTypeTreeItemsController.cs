@@ -16,7 +16,7 @@ public class MemberTypeTreeItemsController : MemberTypeTreeControllerBase
     [HttpGet("items")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(PagedResult<TreeItemViewModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedResult<TreeItemViewModel>>> Items([FromQuery(Name = "key")] Guid[] keys)
+    [ProducesResponseType(typeof(PagedResult<EntityTreeItemViewModel>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<PagedResult<EntityTreeItemViewModel>>> Items([FromQuery(Name = "key")] Guid[] keys)
         => await GetItems(keys);
 }

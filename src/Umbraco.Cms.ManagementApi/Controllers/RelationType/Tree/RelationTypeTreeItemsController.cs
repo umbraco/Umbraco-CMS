@@ -25,9 +25,9 @@ public class RelationTypeTreeItemsController : RelationTypeTreeControllerBase
             .GetAllRelationTypes()
             .Where(relationType => keys.Contains(relationType.Key)).ToArray();
 
-        TreeItemViewModel[] viewModels = MapTreeItemViewModels(null, relationTypes);
+        EntityTreeItemViewModel[] viewModels = MapTreeItemViewModels(null, relationTypes);
 
-        PagedResult<TreeItemViewModel> result = PagedResult(viewModels, 0, viewModels.Length, viewModels.Length);
+        PagedResult<EntityTreeItemViewModel> result = PagedResult(viewModels, 0, viewModels.Length, viewModels.Length);
         return await Task.FromResult(Ok(result));
     }
 }

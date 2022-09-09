@@ -7,12 +7,12 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.ManagementApi.Controllers;
 
-public abstract class TreeControllerBase<TItem> : Controller
-    where TItem : TreeItemViewModel, new()
+public abstract class EntityTreeControllerBase<TItem> : Controller
+    where TItem : EntityTreeItemViewModel, new()
 {
     private readonly string _itemUdiType;
 
-    protected TreeControllerBase(IEntityService entityService)
+    protected EntityTreeControllerBase(IEntityService entityService)
     {
         EntityService = entityService;
 

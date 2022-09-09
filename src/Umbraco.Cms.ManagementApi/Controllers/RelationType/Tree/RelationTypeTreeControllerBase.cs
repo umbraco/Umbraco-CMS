@@ -12,7 +12,7 @@ namespace Umbraco.Cms.ManagementApi.Controllers.RelationType.Tree;
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.RelationType}/tree")]
 // NOTE: at the moment relation types aren't supported by EntityService, so we have little use of the
 // tree controller base. We'll keep it though, in the hope that we can mend EntityService.
-public class RelationTypeTreeControllerBase : TreeControllerBase<TreeItemViewModel>
+public class RelationTypeTreeControllerBase : EntityTreeControllerBase<EntityTreeItemViewModel>
 {
     public RelationTypeTreeControllerBase(IEntityService entityService, IRelationService relationService)
         : base(entityService) =>
@@ -22,8 +22,8 @@ public class RelationTypeTreeControllerBase : TreeControllerBase<TreeItemViewMod
 
     protected IRelationService RelationService { get; }
 
-    protected TreeItemViewModel[] MapTreeItemViewModels(Guid? parentKey, IRelationType[] relationTypes)
-        => relationTypes.Select(relationType => new TreeItemViewModel
+    protected EntityTreeItemViewModel[] MapTreeItemViewModels(Guid? parentKey, IRelationType[] relationTypes)
+        => relationTypes.Select(relationType => new EntityTreeItemViewModel
         {
             Icon = Constants.Icons.RelationType,
             Name = relationType.Name!,
