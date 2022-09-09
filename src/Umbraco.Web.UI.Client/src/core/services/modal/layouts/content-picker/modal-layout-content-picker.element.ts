@@ -5,7 +5,11 @@ import { UmbModalLayoutElement } from '../modal-layout.element';
 
 export interface UmbModalContentPickerData {
 	multiple?: boolean;
+	selection: Array<string>;
 }
+
+import '../../../../../backoffice/trees/documents/tree-documents.element';
+import { UmbTreeElement } from '../../../../../backoffice/trees/shared/tree.element';
 
 @customElement('umb-modal-layout-content-picker')
 export class UmbModalLayoutContentPickerElement extends UmbModalLayoutElement<UmbModalContentPickerData> {
@@ -44,73 +48,47 @@ export class UmbModalLayoutContentPickerElement extends UmbModalLayoutElement<Um
 		`,
 	];
 
-	private _tempContent = [
-		{
-			id: 1,
-			name: 'Content 1',
-			description: 'Content 1 description',
-			icon: 'icon-umb-content',
-		},
-		{
-			id: 2,
-			name: 'Content 2',
-			description: 'Content 2 description',
-			icon: 'icon-umb-content',
-		},
-		{
-			id: 3,
-			name: 'Content 3',
-			description: 'Content 3 description',
-			icon: 'icon-umb-content',
-		},
-	];
-
 	@state()
-	_selectedContent: any[] = [];
+	_selection: Array<string> = [];
 
-	private _clickContent(content: any) {
-		if (this._selectedContent.includes(content)) {
-			this._selectedContent = this._selectedContent.filter((c) => c !== content);
-		} else {
-			this._selectedContent.push(content);
-		}
+	connectedCallback() {
+		super.connectedCallback();
+		this._selection = this.data?.selection ?? [];
+	}
 
-		this.requestUpdate('_selectedContent');
+	private _handleSelectionChange(e: CustomEvent) {
+		e.stopPropagation();
+		const element = e.target as UmbTreeElement;
+		this._selection = element.selection;
 	}
 
 	private _submit() {
-		this.modalHandler?.close({ selection: this._selectedContent });
+		this.modalHandler?.close({ selection: this._selection });
 	}
 
 	private _close() {
-		this.modalHandler?.close();
+		this.modalHandler?.close({ selection: this._selection });
 	}
 
 	render() {
 		return html`
 			<!-- TODO: maybe we need a layout component between umb-editor-layout and umb-editor-entity? -->
-			<umb-editor-entity>
+			<umb-editor-entity-layout>
 				<h3 slot="name">Select content</h3>
 				<uui-box>
 					<uui-input></uui-input>
 					<hr />
-					<div id="content-list">
-						${this._tempContent.map(
-							(content) =>
-								// eslint-disable-next-line lit-a11y/click-events-have-key-events
-								html`<div
-									class=${`content-item ${this._selectedContent.includes(content) ? 'selected' : ''}`}
-									@click=${() => this._clickContent(content)}>
-									${content.name}
-								</div>`
-						)}
-					</div>
+					<umb-tree
+						alias="Umb.Tree.Content"
+						@change=${this._handleSelectionChange}
+						.selection=${this._selection}
+						selectable></umb-tree>
 				</uui-box>
 				<div slot="actions">
 					<uui-button label="Close" @click=${this._close}></uui-button>
 					<uui-button label="Submit" look="primary" color="positive" @click=${this._submit}></uui-button>
 				</div>
-			</umb-editor-entity>
+			</umb-editor-entity-layout>
 		`;
 	}
 }

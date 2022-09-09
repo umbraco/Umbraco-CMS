@@ -14,5 +14,5 @@ export default {
 } as Meta;
 
 export const AAAOverview: Story<UmbEditorDataTypeElement> = () =>
-	html` <umb-editor-data-type id="${data[0].id}"></umb-editor-data-type>`;
+	html` <umb-editor-data-type id="${data[0].key}"></umb-editor-data-type>`;
 AAAOverview.storyName = 'Overview';

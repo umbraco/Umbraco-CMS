@@ -4,8 +4,8 @@ import { customElement, property } from 'lit/decorators.js';
 
 import '../shared/node/editor-node.element';
 
-@customElement('umb-editor-content')
-export class UmbEditorContentElement extends LitElement {
+@customElement('umb-editor-document')
+export class UmbEditorDocumentElement extends LitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -18,17 +18,17 @@ export class UmbEditorContentElement extends LitElement {
 	];
 
 	@property()
-	id!: string;
+	entityKey!: string;
 
 	render() {
-		return html`<umb-editor-node id=${this.id} alias="Umb.Editor.Content"></umb-editor-node>`;
+		return html`<umb-editor-node .entityKey=${this.entityKey} alias="Umb.Editor.Document"></umb-editor-node>`;
 	}
 }
 
-export default UmbEditorContentElement;
+export default UmbEditorDocumentElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-editor-content': UmbEditorContentElement;
+		'umb-editor-document': UmbEditorDocumentElement;
 	}
 }

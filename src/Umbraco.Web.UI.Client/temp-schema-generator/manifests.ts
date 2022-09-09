@@ -31,6 +31,9 @@ export class ManifestsPackagesInstalled {
 
 export type Manifest =
 	| IManifestSection
+	| IManifestTree
+	| IManifestEditor
+	| IManifestTreeItemAction
 	| IManifestPropertyEditorUI
 	| IManifestDashboard
 	| IManifestEditorView
@@ -41,6 +44,9 @@ export type Manifest =
 
 export type ManifestStandardTypes =
 	| 'section'
+	| 'tree'
+	| 'editor'
+	| 'treeItemAction'
 	| 'propertyEditorUI'
 	| 'dashboard'
 	| 'editorView'
@@ -69,6 +75,7 @@ export interface PackageInstalled {
 export interface IManifest {
 	type: string;
 	alias: string;
+	name: string;
 }
 
 export interface IPrevalueField {
@@ -90,6 +97,21 @@ export interface MetaSection {
 	weight: number;
 }
 
+export interface MetaTree {
+	weight: number;
+	sections: Array<string>;
+}
+
+export interface MetaEditor {
+	entityType: string;
+}
+
+export interface MetaTreeItemAction {
+	trees: Array<string>;
+	label: string;
+	icon: string;
+	weight: number;
+}
 export interface MetaPropertyEditorUI extends IPrevalues {
 	icon: string;
 	group: string;
@@ -124,7 +146,6 @@ export interface IManifestCustom extends IManifest {
 
 export interface IManifestElement extends IManifest {
 	type: ManifestStandardTypes;
-	name: string;
 	js?: string;
 	elementName?: string;
 	meta?: {};
@@ -133,6 +154,21 @@ export interface IManifestElement extends IManifest {
 export interface IManifestSection extends IManifestElement {
 	type: 'section';
 	meta: MetaSection;
+}
+
+export interface IManifestTree extends IManifestElement {
+	type: 'tree';
+	meta: MetaTree;
+}
+
+export interface IManifestEditor extends IManifestElement {
+	type: 'editor';
+	meta: MetaEditor;
+}
+
+export interface IManifestTreeItemAction extends IManifestElement {
+	type: 'treeItemAction';
+	meta: MetaTreeItemAction;
 }
 
 export interface IManifestPropertyEditorUI extends IManifestElement {

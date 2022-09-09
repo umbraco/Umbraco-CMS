@@ -120,10 +120,52 @@ export interface components {
       /** @enum {string} */
       type: "section";
       meta: components["schemas"]["MetaSection"];
-      name: string;
       js?: string;
       elementName?: string;
       alias: string;
+      name: string;
+    };
+    MetaTree: {
+      /** Format: float */
+      weight: number;
+      sections: string[];
+    };
+    IManifestTree: {
+      /** @enum {string} */
+      type: "tree";
+      meta: components["schemas"]["MetaTree"];
+      js?: string;
+      elementName?: string;
+      alias: string;
+      name: string;
+    };
+    MetaEditor: {
+      entityType: string;
+    };
+    IManifestEditor: {
+      /** @enum {string} */
+      type: "editor";
+      meta: components["schemas"]["MetaEditor"];
+      js?: string;
+      elementName?: string;
+      alias: string;
+      name: string;
+    };
+    MetaTreeItemAction: {
+      trees: string[];
+      label: string;
+      icon: string;
+      /** Format: float */
+      weight: number;
+    };
+    IManifestTreeItemAction: {
+      /** @enum {string} */
+      type: "treeItemAction";
+      meta: components["schemas"]["MetaTreeItemAction"];
+      js?: string;
+      elementName?: string;
+      alias: string;
+      name: string;
     };
     IPrevalueField: {
       label?: string;
@@ -143,10 +185,10 @@ export interface components {
       /** @enum {string} */
       type: "propertyEditorUI";
       meta: components["schemas"]["MetaPropertyEditorUI"];
-      name: string;
       js?: string;
       elementName?: string;
       alias: string;
+      name: string;
     };
     MetaDashboard: {
       sections: string[];
@@ -159,10 +201,10 @@ export interface components {
       /** @enum {string} */
       type: "dashboard";
       meta: components["schemas"]["MetaDashboard"];
-      name: string;
       js?: string;
       elementName?: string;
       alias: string;
+      name: string;
     };
     MetaEditorView: {
       editors: string[];
@@ -175,10 +217,10 @@ export interface components {
       /** @enum {string} */
       type: "editorView";
       meta: components["schemas"]["MetaEditorView"];
-      name: string;
       js?: string;
       elementName?: string;
       alias: string;
+      name: string;
     };
     MetaPropertyAction: {
       propertyEditors: string[];
@@ -187,10 +229,10 @@ export interface components {
       /** @enum {string} */
       type: "propertyAction";
       meta: components["schemas"]["MetaPropertyAction"];
-      name: string;
       js?: string;
       elementName?: string;
       alias: string;
+      name: string;
     };
     MetaPackageView: {
       packageAlias: string;
@@ -199,25 +241,30 @@ export interface components {
       /** @enum {string} */
       type: "packageView";
       meta: components["schemas"]["MetaPackageView"];
-      name: string;
       js?: string;
       elementName?: string;
       alias: string;
+      name: string;
     };
     IManifestEntrypoint: {
       /** @enum {string} */
       type: "entrypoint";
       js: string;
       alias: string;
+      name: string;
     };
     IManifestCustom: {
       /** @enum {string} */
       type: "custom";
       meta?: { [key: string]: unknown };
       alias: string;
+      name: string;
     };
     Manifest:
       | components["schemas"]["IManifestSection"]
+      | components["schemas"]["IManifestTree"]
+      | components["schemas"]["IManifestEditor"]
+      | components["schemas"]["IManifestTreeItemAction"]
       | components["schemas"]["IManifestPropertyEditorUI"]
       | components["schemas"]["IManifestDashboard"]
       | components["schemas"]["IManifestEditorView"]

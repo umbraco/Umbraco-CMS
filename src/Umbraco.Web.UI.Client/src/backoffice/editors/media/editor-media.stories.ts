@@ -16,5 +16,5 @@ export default {
 const mediaNodes = data.filter((node) => node.type === 'media');
 
 export const AAAOverview: Story<UmbEditorMediaElement> = () =>
-	html` <umb-editor-media id="${mediaNodes[0].id}"></umb-editor-media>`;
+	html` <umb-editor-media id="${mediaNodes[0].key}"></umb-editor-media>`;
 AAAOverview.storyName = 'Overview';

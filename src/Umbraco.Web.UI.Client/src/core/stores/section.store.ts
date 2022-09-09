@@ -1,6 +1,7 @@
 import { map, Observable, ReplaySubject } from 'rxjs';
 import { UmbExtensionRegistry } from '../extension';
 
+// TODO: maybe this should be named something else than store?
 export class UmbSectionStore {
 	private _extensionRegistry: UmbExtensionRegistry;
 

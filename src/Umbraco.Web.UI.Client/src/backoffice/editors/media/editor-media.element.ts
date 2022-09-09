@@ -18,14 +18,14 @@ export class UmbEditorMediaElement extends LitElement {
 	];
 
 	@property()
-	id!: string;
+	entityKey!: string;
 
 	constructor() {
 		super();
 	}
 
 	render() {
-		return html`<umb-editor-node id=${this.id} alias="Umb.Editor.Media"></umb-editor-node>`;
+		return html`<umb-editor-node .entityKey=${this.entityKey} alias="Umb.Editor.Media"></umb-editor-node>`;
 	}
 }
 

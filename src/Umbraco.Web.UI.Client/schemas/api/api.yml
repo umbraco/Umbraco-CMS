@@ -409,19 +409,124 @@ components:
             - section
         meta:
           $ref: '#/components/schemas/MetaSection'
-        name:
-          type: string
         js:
           type: string
         elementName:
           type: string
         alias:
           type: string
+        name:
+          type: string
       required:
         - type
         - meta
-        - name
         - alias
+        - name
+    MetaTree:
+      type: object
+      properties:
+        weight:
+          type: number
+          format: float
+        sections:
+          type: array
+          items:
+            type: string
+      required:
+        - weight
+        - sections
+    IManifestTree:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - tree
+        meta:
+          $ref: '#/components/schemas/MetaTree'
+        js:
+          type: string
+        elementName:
+          type: string
+        alias:
+          type: string
+        name:
+          type: string
+      required:
+        - type
+        - meta
+        - alias
+        - name
+    MetaEditor:
+      type: object
+      properties:
+        entityType:
+          type: string
+      required:
+        - entityType
+    IManifestEditor:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - editor
+        meta:
+          $ref: '#/components/schemas/MetaEditor'
+        js:
+          type: string
+        elementName:
+          type: string
+        alias:
+          type: string
+        name:
+          type: string
+      required:
+        - type
+        - meta
+        - alias
+        - name
+    MetaTreeItemAction:
+      type: object
+      properties:
+        trees:
+          type: array
+          items:
+            type: string
+        label:
+          type: string
+        icon:
+          type: string
+        weight:
+          type: number
+          format: float
+      required:
+        - trees
+        - label
+        - icon
+        - weight
+    IManifestTreeItemAction:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - treeItemAction
+        meta:
+          $ref: '#/components/schemas/MetaTreeItemAction'
+        js:
+          type: string
+        elementName:
+          type: string
+        alias:
+          type: string
+        name:
+          type: string
+      required:
+        - type
+        - meta
+        - alias
+        - name
     IPrevalueField:
       type: object
       properties:
@@ -466,19 +571,19 @@ components:
             - propertyEditorUI
         meta:
           $ref: '#/components/schemas/MetaPropertyEditorUI'
-        name:
-          type: string
         js:
           type: string
         elementName:
           type: string
         alias:
           type: string
+        name:
+          type: string
       required:
         - type
         - meta
-        - name
         - alias
+        - name
     MetaDashboard:
       type: object
       properties:
@@ -506,19 +611,19 @@ components:
             - dashboard
         meta:
           $ref: '#/components/schemas/MetaDashboard'
-        name:
-          type: string
         js:
           type: string
         elementName:
           type: string
         alias:
           type: string
+        name:
+          type: string
       required:
         - type
         - meta
-        - name
         - alias
+        - name
     MetaEditorView:
       type: object
       properties:
@@ -547,19 +652,19 @@ components:
             - editorView
         meta:
           $ref: '#/components/schemas/MetaEditorView'
-        name:
-          type: string
         js:
           type: string
         elementName:
           type: string
         alias:
           type: string
+        name:
+          type: string
       required:
         - type
         - meta
-        - name
         - alias
+        - name
     MetaPropertyAction:
       type: object
       properties:
@@ -578,19 +683,19 @@ components:
             - propertyAction
         meta:
           $ref: '#/components/schemas/MetaPropertyAction'
-        name:
-          type: string
         js:
           type: string
         elementName:
           type: string
         alias:
           type: string
+        name:
+          type: string
       required:
         - type
         - meta
-        - name
         - alias
+        - name
     MetaPackageView:
       type: object
       properties:
@@ -607,19 +712,19 @@ components:
             - packageView
         meta:
           $ref: '#/components/schemas/MetaPackageView'
-        name:
-          type: string
         js:
           type: string
         elementName:
           type: string
         alias:
           type: string
+        name:
+          type: string
       required:
         - type
         - meta
-        - name
         - alias
+        - name
     IManifestEntrypoint:
       type: object
       properties:
@@ -631,10 +736,13 @@ components:
           type: string
         alias:
           type: string
+        name:
+          type: string
       required:
         - type
         - js
         - alias
+        - name
     IManifestCustom:
       type: object
       properties:
@@ -646,12 +754,18 @@ components:
           type: object
         alias:
           type: string
+        name:
+          type: string
       required:
         - type
         - alias
+        - name
     Manifest:
       oneOf:
         - $ref: '#/components/schemas/IManifestSection'
+        - $ref: '#/components/schemas/IManifestTree'
+        - $ref: '#/components/schemas/IManifestEditor'
+        - $ref: '#/components/schemas/IManifestTreeItemAction'
         - $ref: '#/components/schemas/IManifestPropertyEditorUI'
         - $ref: '#/components/schemas/IManifestDashboard'
         - $ref: '#/components/schemas/IManifestEditorView'
@@ -663,6 +777,9 @@ components:
         propertyName: type
         mapping:
           section: '#/components/schemas/IManifestSection'
+          tree: '#/components/schemas/IManifestTree'
+          editor: '#/components/schemas/IManifestEditor'
+          treeItemAction: '#/components/schemas/IManifestTreeItemAction'
           propertyEditorUI: '#/components/schemas/IManifestPropertyEditorUI'
           dashboard: '#/components/schemas/IManifestDashboard'
           editorView: '#/components/schemas/IManifestEditorView'

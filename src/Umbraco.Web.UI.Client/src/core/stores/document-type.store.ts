@@ -1,34 +1,31 @@
-import { BehaviorSubject, map, Observable } from 'rxjs';
-import { DocumentTypeEntity, umbDocumentTypeData } from '../../mocks/data/document-type.data';
+import { map, Observable } from 'rxjs';
+import { DocumentTypeEntity } from '../../mocks/data/document-type.data';
+import { UmbEntityStore } from './entity.store';
+import { UmbDataStoreBase } from './store';
 
-export class UmbDocumentTypeStore {
-	private _documentTypes: BehaviorSubject<Array<DocumentTypeEntity>> = new BehaviorSubject(
-		<Array<DocumentTypeEntity>>[]
-	);
-	public readonly documentTypes: Observable<Array<DocumentTypeEntity>> = this._documentTypes.asObservable();
+export class UmbDocumentTypeStore extends UmbDataStoreBase<DocumentTypeEntity> {
+	private _entityStore: UmbEntityStore;
 
-	getById(id: number): Observable<DocumentTypeEntity | null> {
-		// TODO: use Fetcher API.
-		// TODO: only fetch if the data type is not in the store?
-		fetch(`/umbraco/backoffice/document-type/${id}`)
-			.then((res) => res.json())
-			.then((data) => {
-				this._updateStore(data);
-			});
-
-		return this.documentTypes.pipe(
-			map(
-				(documentTypes: Array<DocumentTypeEntity>) =>
-					documentTypes.find((node: DocumentTypeEntity) => node.id === id) || null
-			)
-		);
+	constructor(entityStore: UmbEntityStore) {
+		super();
+		this._entityStore = entityStore;
 	}
 
-	// TODO: temp solution until we know where to get tree data from
-	getAll(): Observable<Array<DocumentTypeEntity>> {
-		const documentTypes = umbDocumentTypeData.getAll();
-		this._documentTypes.next(documentTypes);
-		return this.documentTypes;
+	getByKey(key: string): Observable<DocumentTypeEntity | null> {
+		// TODO: use Fetcher API.
+		// TODO: only fetch if the data type is not in the store?
+		fetch(`/umbraco/backoffice/document-type/${key}`)
+			.then((res) => res.json())
+			.then((data) => {
+				this.update(data);
+			});
+
+		return this.items.pipe(
+			map(
+				(documentTypes: Array<DocumentTypeEntity>) =>
+					documentTypes.find((documentType: DocumentTypeEntity) => documentType.key === key) || null
+			)
+		);
 	}
 
 	async save(documentTypes: Array<DocumentTypeEntity>) {
@@ -42,28 +39,10 @@ export class UmbDocumentTypeStore {
 				},
 			});
 			const json = await res.json();
-			this._updateStore(json);
+			this.update(json);
+			this._entityStore.update(json);
 		} catch (error) {
 			console.error('Save Document Type error', error);
 		}
-	}
-
-	private _updateStore(fetchedDocumentTypes: Array<DocumentTypeEntity>) {
-		const storedDocumentTypes = this._documentTypes.getValue();
-		const updated: DocumentTypeEntity[] = [...storedDocumentTypes];
-
-		fetchedDocumentTypes.forEach((fetchedDocumentType) => {
-			const index = storedDocumentTypes.map((storedNode) => storedNode.id).indexOf(fetchedDocumentType.id);
-
-			if (index !== -1) {
-				// If the data type is already in the store, update it
-				updated[index] = fetchedDocumentType;
-			} else {
-				// If the data type is not in the store, add it
-				updated.push(fetchedDocumentType);
-			}
-		});
-
-		this._documentTypes.next([...updated]);
 	}
 }
