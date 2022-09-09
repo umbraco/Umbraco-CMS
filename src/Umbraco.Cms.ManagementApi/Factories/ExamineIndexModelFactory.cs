@@ -40,7 +40,7 @@ public class ExamineIndexModelFactory : IExamineIndexModelFactory
             Name = indexName,
             HealthStatus = isHealthy.Success ? isHealthy.Result ?? "Healthy" : isHealthy.Result ?? "Unhealthy",
             ProviderProperties = properties,
-            CanRebuild = _indexRebuilder.CanRebuild(index.Name)
+            CanRebuild = _indexRebuilder.CanRebuild(index.Name),
         };
 
         return indexerModel;
