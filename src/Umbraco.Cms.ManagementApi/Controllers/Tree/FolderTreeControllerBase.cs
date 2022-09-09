@@ -5,7 +5,7 @@ using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.ManagementApi.ViewModels.Tree;
 
-namespace Umbraco.Cms.ManagementApi.Controllers;
+namespace Umbraco.Cms.ManagementApi.Controllers.Tree;
 
 public abstract class FolderTreeControllerBase<TItem> : EntityTreeControllerBase<TItem>
     where TItem : FolderTreeItemViewModel, new()

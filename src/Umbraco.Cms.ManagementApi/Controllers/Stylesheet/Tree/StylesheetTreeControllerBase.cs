@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.ManagementApi.Controllers.Tree;
 using Umbraco.New.Cms.Web.Common.Routing;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.Stylesheet.Tree;

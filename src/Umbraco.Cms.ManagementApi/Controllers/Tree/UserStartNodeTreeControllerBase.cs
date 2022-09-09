@@ -6,7 +6,7 @@ using Umbraco.Cms.ManagementApi.Services.Entities;
 using Umbraco.Cms.ManagementApi.ViewModels.Tree;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.ManagementApi.Controllers;
+namespace Umbraco.Cms.ManagementApi.Controllers.Tree;
 
 public abstract class UserStartNodeTreeControllerBase<TItem> : EntityTreeControllerBase<TItem>
     where TItem : ContentTreeItemViewModel, new()
