@@ -161,8 +161,8 @@ public class IconService : IIconService
     /// <returns>A collection of <see cref="FileInfo"/> representing the found SVG icon files.</returns>
     private static IEnumerable<FileInfo> GetIconsFiles(IFileProvider fileProvider, string path)
     {
-
-        // Iterate through all plugin folders
+        // Iterate through all plugin folders, this is necessary because on Linux we'll get casing issues when
+        // we directly try to access {path}/{pluginDirectory.Name}/{Constants.SystemDirectories.PluginIcons}
         foreach (IFileInfo pluginDirectory in fileProvider.GetDirectoryContents(path))
         {
             // Ideally there shouldn't be any files, but we'd better check to be sure
@@ -190,7 +190,7 @@ public class IconService : IIconService
                     }
 
                     // Does the directory match the plugin icons folder? (case insensitive for legacy support)
-                    if (!$"/{subDir1.Name}/{subDir2.Name}".Equals(Constants.SystemDirectories.PluginIcons, StringComparison.InvariantCultureIgnoreCase))
+                    if (!$"/{subDir1.Name}/{subDir2.Name}".InvariantEquals(Constants.SystemDirectories.PluginIcons))
                     {
                         continue;
                     }
@@ -198,17 +198,14 @@ public class IconService : IIconService
                     // Iterate though the files of the second level sub directory. This should be where the SVG files are located :D
                     foreach (IFileInfo file in fileProvider.GetDirectoryContents($"{path}/{pluginDirectory.Name}/{subDir1.Name}/{subDir2.Name}"))
                     {
-                        if (file.Name.EndsWith(".svg", StringComparison.InvariantCultureIgnoreCase))
+                        if (file.Name.InvariantEndsWith(".svg"))
                         {
                             yield return new FileInfo(file.PhysicalPath);
                         }
                     }
-
                 }
             }
-
         }
-
     }
 
     private IReadOnlyDictionary<string, string>? GetIconDictionary() => _cache.GetCacheItem(
