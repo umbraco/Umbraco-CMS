@@ -21,7 +21,8 @@ public class SearchersExamineManagementController : ExamineManagementControllerB
     [HttpGet("searchers")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<ExamineIndexModel>), StatusCodes.Status200OK)]
-    // This endpoint for now will throw errors, as System.Text.Json cannot serialize dictionary<string, object>
+    // This endpoint for now will throw errors if the ExamineIndexViewModel ever has providerProperties defined
+    // This is because System.Text.Json cannot serialize dictionary<string, object>
     // This has been fixed in .NET 7, so this will work when we upgrade: https://github.com/dotnet/runtime/issues/67588
     public async Task<PagedViewModel<ExamineIndexViewModel>> GetSearcherDetails(int skip, int take)
     {
