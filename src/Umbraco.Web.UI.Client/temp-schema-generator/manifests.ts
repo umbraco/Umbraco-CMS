@@ -75,6 +75,7 @@ export interface PackageInstalled {
 export interface IManifest {
 	type: string;
 	alias: string;
+	name: string;
 }
 
 export interface IPrevalueField {
@@ -145,7 +146,6 @@ export interface IManifestCustom extends IManifest {
 
 export interface IManifestElement extends IManifest {
 	type: ManifestStandardTypes;
-	name: string;
 	js?: string;
 	elementName?: string;
 	meta?: {};
