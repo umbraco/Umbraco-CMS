@@ -28,8 +28,13 @@
         function onInit() {
 
             // TODO: Can and should we do this smarter? parent parent is very dirty.
-            // TODO: This does not work in infinite editors:
-            vm.gridColumnsPrevalue = $scope.$parent.$parent.$parent.$parent.$parent.model.preValues.find(x => x.alias === "gridColumns");
+            const preValues = $scope.$parent.$parent.$parent.$parent.$parent.model.preValues || $scope.$parent.$parent.$parent.$parent.$parent.$parent.$parent.vm.dataType.preValues;
+            if(!preValues || !preValues.length) {
+                throw Error("BlockConfigurationController could not find prevalues of DataType.");
+            }
+            console.log("preValues", preValues)
+            vm.gridColumnsPrevalue = preValues.find(x => x.key ? x.key === "gridColumns" : x.alias === "gridColumns");
+            console.log("gridColumnsPrevalue", vm.gridColumnsPrevalue)
 
             if (!$scope.model.value) {
                 $scope.model.value = [];
@@ -37,9 +42,7 @@
 
             // Ensure good values:
             $scope.model.value.forEach(block => {
-                block.columnSpanOptions = block.columnSpanOptions || [{
-                    "columnSpan": vm.gridColumnsPrevalue.value || DEFAULT_GRID_COLUMNS
-                }];
+                block.columnSpanOptions = block.columnSpanOptions || [];
             })
             $scope.model.value.forEach(block => {
                 block.areas = block.areas || [];
@@ -182,9 +185,7 @@
         vm.addBlockFromElementTypeKey = function(key) {
 
             var blockType = {
-                "columnSpanOptions": [{
-                    "columnSpan": vm.gridColumnsPrevalue.value || DEFAULT_GRID_COLUMNS
-                }],
+                "columnSpanOptions": [],
                 "allowAtRoot": true,
                 "contentElementTypeKey": key,
                 "settingsElementTypeKey": null,

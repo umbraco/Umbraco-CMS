@@ -344,6 +344,13 @@
                 block.view = block.config.view;
             }
 
+            // ensure at least one columnSpanOptions:
+            if(block.config.columnSpanOptions.length === 0) {
+                block.config.columnSpanOptions.push({
+                    "columnSpan": vm.gridColumns
+                });
+            }
+
             block.stylesheet = block.config.stylesheet;
             block.showValidation = true;
 
