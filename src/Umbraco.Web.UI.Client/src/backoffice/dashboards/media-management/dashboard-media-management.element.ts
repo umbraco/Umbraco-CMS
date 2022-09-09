@@ -15,6 +15,8 @@ export class UmbDashboardMediaManagementElement extends LitElement {
 	}
 }
 
+export default UmbDashboardMediaManagementElement;
+
 declare global {
 	interface HTMLElementTagNameMap {
 		'umb-dashboard-media-management': UmbDashboardMediaManagementElement;

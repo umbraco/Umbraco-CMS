@@ -134,7 +134,7 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		type: 'propertyEditorUI',
 		alias: 'Umb.PropertyEditorUI.Text',
 		name: 'Text',
-		loader: () => import('./backoffice/property-editors/property-editor-text.element'),
+		loader: () => import('./backoffice/property-editors/text/property-editor-text.element'),
 		meta: {
 			icon: 'edit',
 			group: 'common',
@@ -145,7 +145,7 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		alias: 'Umb.PropertyEditorUI.Textarea',
 		name: 'Textarea',
 		elementName: 'umb-property-editor-textarea',
-		loader: () => import('./backoffice/property-editors/property-editor-textarea.element'),
+		loader: () => import('./backoffice/property-editors/textarea/property-editor-textarea.element'),
 		meta: {
 			icon: 'edit',
 			group: 'common',
@@ -155,7 +155,7 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		type: 'propertyEditorUI',
 		alias: 'Umb.PropertyEditorUI.ContextExample',
 		name: 'Context Example',
-		loader: () => import('./backoffice/property-editors/property-editor-context-example.element'),
+		loader: () => import('./backoffice/property-editors/context-example/property-editor-context-example.element'),
 		meta: {
 			icon: 'favorite',
 			group: 'common',
@@ -252,7 +252,7 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		alias: 'Umb.PropertyAction.Copy',
 		name: 'Copy',
 		elementName: 'umb-property-action-copy',
-		loader: () => import('./backoffice/property-actions/property-action-copy.element'),
+		loader: () => import('./backoffice/property-actions/copy/property-action-copy.element'),
 		meta: {
 			propertyEditors: ['Umb.PropertyEditorUI.Text'],
 		},
@@ -262,7 +262,7 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		alias: 'Umb.PropertyAction.Clear',
 		name: 'Clear',
 		elementName: 'umb-property-action-clear',
-		loader: () => import('./backoffice/property-actions/property-action-clear.element'),
+		loader: () => import('./backoffice/property-actions/clear/property-action-clear.element'),
 		meta: {
 			propertyEditors: ['Umb.PropertyEditorUI.Text'],
 		},
@@ -272,7 +272,7 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		alias: 'Umb.PropertyEditorUI.ContentPicker',
 		name: 'ContentPicker',
 		elementName: 'umb-property-editor-content-picker',
-		loader: () => import('./backoffice/property-editors/property-editor-content-picker.element'),
+		loader: () => import('./backoffice/property-editors/content-picker/property-editor-content-picker.element'),
 		meta: {
 			icon: 'document',
 			group: 'common',

@@ -3,13 +3,13 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { Subscription } from 'rxjs';
 
-import { UmbContextConsumerMixin } from '../../core/context';
-import type { UmbModalService } from '../../core/services/modal';
-import type { UmbEntityStore } from '../../core/stores/entity.store';
-import type { Entity } from '../../mocks/data/entities';
+import { UmbContextConsumerMixin } from '../../../core/context';
+import type { UmbModalService } from '../../../core/services/modal';
+import type { UmbEntityStore } from '../../../core/stores/entity.store';
+import type { Entity } from '../../../mocks/data/entities';
 
 @customElement('umb-property-editor-content-picker')
-export class UmbPropertyEditorContentPicker extends UmbContextConsumerMixin(LitElement) {
+export class UmbPropertyEditorContentPickerElement extends UmbContextConsumerMixin(LitElement) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -116,6 +116,6 @@ export class UmbPropertyEditorContentPicker extends UmbContextConsumerMixin(LitE
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-property-editor-content-picker': UmbPropertyEditorContentPicker;
+		'umb-property-editor-content-picker': UmbPropertyEditorContentPickerElement;
 	}
 }

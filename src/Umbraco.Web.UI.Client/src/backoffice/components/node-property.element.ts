@@ -1,4 +1,4 @@
-import '../property-actions/property-action-menu/property-action-menu.element';
+import '../property-actions/shared/property-action-menu/property-action-menu.element';
 
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement, PropertyValueMap } from 'lit';

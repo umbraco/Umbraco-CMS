@@ -2,12 +2,12 @@ import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
 
-@customElement('umb-property-editor-textarea')
-class UmbPropertyEditorTextarea extends LitElement {
+@customElement('umb-property-editor-text')
+export class UmbPropertyEditorTextElement extends LitElement {
 	static styles = [
 		UUITextStyles,
 		css`
-			uui-textarea {
+			uui-input {
 				width: 100%;
 			}
 		`,
@@ -22,12 +22,14 @@ class UmbPropertyEditorTextarea extends LitElement {
 	}
 
 	render() {
-		return html`<uui-textarea .value=${this.value} @input=${this.onInput}></uui-textarea>`;
+		return html`<uui-input .value=${this.value} type="text" @input=${this.onInput}></uui-input>`;
 	}
 }
 
+export default UmbPropertyEditorTextElement;
+
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-property-editor-textarea': UmbPropertyEditorTextarea;
+		'umb-property-editor-text': UmbPropertyEditorTextElement;
 	}
 }
