@@ -1,5 +1,5 @@
 import { Meta, Story } from '@storybook/web-components';
-import { LitElement, html } from 'lit';
+import { html } from 'lit';
 import './tree-navigator.element';
 import './tree-item.element';
 
