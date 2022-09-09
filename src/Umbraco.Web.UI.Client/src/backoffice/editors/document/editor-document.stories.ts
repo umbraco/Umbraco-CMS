@@ -16,5 +16,5 @@ export default {
 const documentNodes = data.filter((node) => node.type === 'document');
 
 export const AAAOverview: Story<UmbEditorDocumentElement> = () =>
-	html` <umb-editor-document id="${documentNodes[0].id}"></umb-editor-document>`;
+	html` <umb-editor-document id="${documentNodes[0].key}"></umb-editor-document>`;
 AAAOverview.storyName = 'Overview';
