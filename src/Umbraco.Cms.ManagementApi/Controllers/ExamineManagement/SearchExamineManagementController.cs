@@ -1,7 +1,9 @@
 ﻿using Examine;
 using Examine.Search;
 using Lucene.Net.QueryParsers.Classic;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.ManagementApi.Services;
 using Umbraco.Cms.ManagementApi.ViewModels.ExamineManagement;
 using Umbraco.Cms.ManagementApi.ViewModels.Pagination;
 using Umbraco.Extensions;
@@ -10,11 +12,14 @@ namespace Umbraco.Cms.ManagementApi.Controllers.ExamineManagement;
 
 public class SearchExamineManagementController : ExamineManagementControllerBase
 {
-    private readonly IExamineManager _examineManager;
+    private readonly IExamineSearcherFinderService _examineSearcherFinderService;
 
-    public SearchExamineManagementController(IExamineManager examineManager) => _examineManager = examineManager;
+    public SearchExamineManagementController(IExamineSearcherFinderService examineSearcherFinderService) => _examineSearcherFinderService = examineSearcherFinderService;
 
     [HttpGet("search")]
+    [MapToApiVersion("1.0")]
+    [ProducesResponseType(typeof(PagedViewModel<PagedViewModel<SearchResultViewModel>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public ActionResult<PagedViewModel<SearchResultViewModel>> GetSearchResults(string searcherName, string? query, int skip, int take)
     {
         query = query?.Trim();
@@ -24,10 +29,17 @@ public class SearchExamineManagementController : ExamineManagementControllerBase
             return new PagedViewModel<SearchResultViewModel>();
         }
 
-        ActionResult msg = ValidateSearcher(searcherName, out ISearcher searcher);
-        if (!msg.IsSuccessStatusCode())
+        if (!_examineSearcherFinderService.TryFindSearcher(searcherName, out ISearcher searcher))
         {
-            return msg;
+            var invalidModelProblem = new ProblemDetails
+            {
+                Title = "Could not find a valid searcher",
+                Detail = "The provided searcher name did not match any of our registered searchers",
+                Status = StatusCodes.Status404NotFound,
+                Type = "Error",
+            };
+
+            return NotFound(invalidModelProblem);
         }
 
         ISearchResults results;
@@ -42,8 +54,15 @@ public class SearchExamineManagementController : ExamineManagementControllerBase
         }
         catch (ParseException)
         {
-            // will occur if the query parser cannot parse this (i.e. starts with a *)
-            return new PagedViewModel<SearchResultViewModel>();
+            var invalidModelProblem = new ProblemDetails
+            {
+                Title = "Could not parse the query",
+                Detail = "Parser cannot parse the query, this can happen as en example if your query starts with a *)",
+                Status = StatusCodes.Status404NotFound,
+                Type = "Error",
+            };
+
+            return BadRequest(invalidModelProblem);
         }
 
         return new PagedViewModel<SearchResultViewModel>
@@ -56,25 +75,5 @@ public class SearchExamineManagementController : ExamineManagementControllerBase
                 Values = x.AllValues.OrderBy(y => y.Key).ToDictionary(y => y.Key, y => y.Value),
             }),
         };
-    }
-
-    private ActionResult ValidateSearcher(string searcherName, out ISearcher searcher)
-    {
-        //try to get the searcher from the indexes
-        if (_examineManager.TryGetIndex(searcherName, out IIndex index))
-        {
-            searcher = index.Searcher;
-            return new OkResult();
-        }
-
-        //if we didn't find anything try to find it by an explicitly declared searcher
-        if (_examineManager.TryGetSearcher(searcherName, out searcher))
-        {
-            return new OkResult();
-        }
-
-        var response1 = new BadRequestObjectResult($"No searcher found with name = {searcherName}");
-        HttpContext.SetReasonPhrase("Searcher Not Found");
-        return response1;
     }
 }
