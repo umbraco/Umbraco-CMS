@@ -10,9 +10,9 @@ namespace Umbraco.Cms.Web.BackOffice.Install;
 
 public class InstallAreaRoutes : IAreaRoutes
 {
+    private readonly IRuntimeState _runtime;
     private readonly IHostingEnvironment _hostingEnvironment;
     private readonly LinkGenerator _linkGenerator;
-    private readonly IRuntimeState _runtime;
 
     public InstallAreaRoutes(IRuntimeState runtime, IHostingEnvironment hostingEnvironment, LinkGenerator linkGenerator)
     {
@@ -23,40 +23,15 @@ public class InstallAreaRoutes : IAreaRoutes
 
     public void CreateRoutes(IEndpointRouteBuilder endpoints)
     {
-        var installPathSegment = _hostingEnvironment.ToAbsolute(Constants.SystemDirectories.Install).TrimStart('/');
-
-        switch (_runtime.Level)
+        if (_runtime.EnableInstaller())
         {
-            case var _ when _runtime.EnableInstaller():
+            var installPathSegment = _hostingEnvironment.ToAbsolute(Constants.SystemDirectories.Install).TrimStart('/');
 
-                endpoints.MapUmbracoRoute<InstallApiController>(installPathSegment, Constants.Web.Mvc.InstallArea,
-                    "api", includeControllerNameInRoute: false);
-                endpoints.MapUmbracoRoute<InstallController>(installPathSegment, Constants.Web.Mvc.InstallArea,
-                    string.Empty, includeControllerNameInRoute: false);
+            endpoints.MapUmbracoRoute<InstallApiController>(installPathSegment, Constants.Web.Mvc.InstallArea, "api", includeControllerNameInRoute: false);
+            endpoints.MapUmbracoRoute<InstallController>(installPathSegment, Constants.Web.Mvc.InstallArea, string.Empty, includeControllerNameInRoute: false);
 
-                // register catch all because if we are in install/upgrade mode then we'll catch everything and redirect
-                endpoints.MapFallbackToAreaController(
-                    "Redirect",
-                    ControllerExtensions.GetControllerName<InstallController>(),
-                    Constants.Web.Mvc.InstallArea);
-
-
-                break;
-            case RuntimeLevel.Run:
-
-                // when we are in run mode redirect to the back office if the installer endpoint is hit
-                endpoints.MapGet($"{installPathSegment}/{{controller?}}/{{action?}}", context =>
-                {
-                    // redirect to umbraco
-                    context.Response.Redirect(_linkGenerator.GetBackOfficeUrl(_hostingEnvironment)!, false);
-                    return Task.CompletedTask;
-                });
-
-                break;
-            case RuntimeLevel.BootFailed:
-            case RuntimeLevel.Unknown:
-            case RuntimeLevel.Boot:
-                break;
+            // Register catch all because if we are in install/upgrade mode then we'll catch everything and redirect
+            endpoints.MapFallbackToAreaController(nameof(InstallController.Redirect), ControllerExtensions.GetControllerName<InstallController>(), Constants.Web.Mvc.InstallArea);
         }
     }
 }
