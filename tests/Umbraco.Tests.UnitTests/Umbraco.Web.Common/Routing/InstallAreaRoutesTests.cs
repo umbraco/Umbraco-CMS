@@ -21,6 +21,7 @@ public class InstallAreaRoutesTests
     [TestCase(RuntimeLevel.BootFailed)]
     [TestCase(RuntimeLevel.Unknown)]
     [TestCase(RuntimeLevel.Boot)]
+    [TestCase(RuntimeLevel.Run)]
     public void RuntimeState_No_Routes(RuntimeLevel level)
     {
         var routes = GetInstallAreaRoutes(level);
@@ -68,20 +69,6 @@ public class InstallAreaRoutesTests
         Assert.AreEqual(1, fallbackRoute.Endpoints.Count);
 
         Assert.AreEqual("Fallback {*path:nonfile}", fallbackRoute.Endpoints[0].ToString());
-    }
-
-    [Test]
-    public void RuntimeState_Run()
-    {
-        var routes = GetInstallAreaRoutes(RuntimeLevel.Run);
-        var endpoints = new TestRouteBuilder();
-        routes.CreateRoutes(endpoints);
-
-        Assert.AreEqual(1, endpoints.DataSources.Count);
-        var route = endpoints.DataSources.First();
-        Assert.AreEqual(1, route.Endpoints.Count);
-
-        Assert.AreEqual("install/{controller?}/{action?} HTTP: GET", route.Endpoints[0].ToString());
     }
 
     private InstallAreaRoutes GetInstallAreaRoutes(RuntimeLevel level) =>
