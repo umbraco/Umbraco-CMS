@@ -17,6 +17,7 @@ const handlers = [
 	...dataTypeHandlers,
 	...documentTypeHandlers,
 	...treeHandlers,
+	...manifestsHandlers.default,
 ];
 
 switch (import.meta.env.VITE_UMBRACO_INSTALL_STATUS) {

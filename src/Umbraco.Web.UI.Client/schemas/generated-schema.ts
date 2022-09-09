@@ -16,6 +16,12 @@ export interface paths {
   "/manifests": {
     get: operations["Manifests"];
   };
+  "/manifests/packages": {
+    get: operations["ManifestsPackages"];
+  };
+  "/manifests/packages/installed": {
+    get: operations["ManifestsPackagesInstalled"];
+  };
   "/server/status": {
     get: operations["GetStatus"];
   };
@@ -161,9 +167,19 @@ export interface components {
       elementName?: string;
       alias: string;
     };
+    IPrevalueField: {
+      label?: string;
+      description?: string;
+      key: string;
+      view: string;
+    };
     MetaPropertyEditorUI: {
       icon: string;
       group: string;
+      prevalues?: {
+        fields: components["schemas"]["IPrevalueField"][];
+      };
+      defaultConfig?: { [key: string]: unknown };
     };
     IManifestPropertyEditorUI: {
       /** @enum {string} */
@@ -218,6 +234,18 @@ export interface components {
       elementName?: string;
       alias: string;
     };
+    MetaPackageView: {
+      packageAlias: string;
+    };
+    IManifestPackageView: {
+      /** @enum {string} */
+      type: "packageView";
+      meta: components["schemas"]["MetaPackageView"];
+      name: string;
+      js?: string;
+      elementName?: string;
+      alias: string;
+    };
     IManifestEntrypoint: {
       /** @enum {string} */
       type: "entrypoint";
@@ -239,10 +267,23 @@ export interface components {
       | components["schemas"]["IManifestDashboard"]
       | components["schemas"]["IManifestEditorView"]
       | components["schemas"]["IManifestPropertyAction"]
+      | components["schemas"]["IManifestPackageView"]
       | components["schemas"]["IManifestEntrypoint"]
       | components["schemas"]["IManifestCustom"];
     ManifestsResponse: {
       manifests: components["schemas"]["Manifest"][];
+    };
+    PackageInstalled: {
+      id: string;
+      name: string;
+      alias: string;
+      version: string;
+      hasMigrations: boolean;
+      hasPendingMigrations: boolean;
+      plans: { [key: string]: unknown }[];
+    };
+    ManifestsPackagesInstalledResponse: {
+      packages: components["schemas"]["PackageInstalled"][];
     };
     /** @enum {string} */
     ServerStatus: "running" | "must-install" | "must-upgrade";
@@ -333,6 +374,38 @@ export interface operations {
       200: {
         content: {
           "application/json": components["schemas"]["ManifestsResponse"];
+        };
+      };
+      /** default response */
+      default: {
+        content: {
+          "application/json": components["schemas"]["ProblemDetails"];
+        };
+      };
+    };
+  };
+  ManifestsPackages: {
+    responses: {
+      /** 200 response */
+      200: {
+        content: {
+          "application/json": { [key: string]: unknown };
+        };
+      };
+      /** default response */
+      default: {
+        content: {
+          "application/json": components["schemas"]["ProblemDetails"];
+        };
+      };
+    };
+  };
+  ManifestsPackagesInstalled: {
+    responses: {
+      /** 200 response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["ManifestsPackagesInstalledResponse"];
         };
       };
       /** default response */
