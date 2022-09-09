@@ -55,16 +55,23 @@ public abstract class UserStartNodeTreeControllerBase<TItem> : TreeControllerBas
             return base.MapTreeItemViewModels(parentKey, entities);
         }
 
-        // tree items for users without root access - pseudo code:
-        // - if the entity is in the access map as accessible, add a regular item
-        // - else if the entity is in the access map as not accessible, add a "no access" item
-        // - else remove the item
-        TItem[] contentTreeItemViewModels = entities.Select(entity
-                => _accessMap.TryGetValue(entity.Key, out var hasAccess)
-                    ? hasAccess
-                        ? MapTreeItemViewModel(parentKey, entity)
-                        : MapTreeItemViewModelAsNoAccess(parentKey, entity)
-                    : null)
+        // for users with no root access, only add items for the entities contained within the calculated access map.
+        // the access map may contain entities that the user does not have direct access to, but need still to see,
+        // because it has descendants that the user *does* have access to. these entities are added as "no access" items.
+        TItem[] contentTreeItemViewModels = entities.Select(entity =>
+            {
+                if (_accessMap.TryGetValue(entity.Key, out var hasAccess) == false)
+                {
+                    // entity is not a part of the calculated access map
+                    return null;
+                }
+
+                // direct access => return a regular item
+                // no direct access => return a "no access" item
+                return hasAccess
+                    ? MapTreeItemViewModel(parentKey, entity)
+                    : MapTreeItemViewModelAsNoAccess(parentKey, entity);
+            })
             .WhereNotNull()
             .ToArray();
 

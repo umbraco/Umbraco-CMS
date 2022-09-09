@@ -67,11 +67,12 @@ public abstract class RecycleBinControllerBase<TItem> : Controller
     private IEntitySlim[] GetPagedRootEntities(long pageNumber, int pageSize, out long totalItems)
     {
         // TODO: EntityService needs to be expanded to get root identifier (key?) by UmbracoObjectType - for now this is a workaround
-        int rootId = ItemObjectType == UmbracoObjectTypes.Document
-            ? Constants.System.RecycleBinContent
-            : ItemObjectType == UmbracoObjectTypes.Media
-                ? Constants.System.RecycleBinMedia
-                : throw new ArgumentOutOfRangeException(nameof(ItemObjectType), "Only Document and Media are supported");
+        var rootId = ItemObjectType switch
+        {
+            UmbracoObjectTypes.Document => Constants.System.RecycleBinContent,
+            UmbracoObjectTypes.Media => Constants.System.RecycleBinMedia,
+            _ => throw new ArgumentOutOfRangeException(nameof(ItemObjectType), "Only Document and Media are supported")
+        };
 
         // TODO: EntityService needs to be able to return paged trashed children - for now we'll get all children
         // IEntitySlim[] rootEntities = EntityService

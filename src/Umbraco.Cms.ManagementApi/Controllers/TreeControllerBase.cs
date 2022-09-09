@@ -63,7 +63,8 @@ public abstract class TreeControllerBase<TItem> : Controller
 
     protected virtual IEntitySlim[] GetPagedRootEntities(long pageNumber, int pageSize, out long totalItems)
     {
-        // for now we'll just get all root entities; perhaps later on it will make sense to use EntityService.GetPagedChildren
+        // for now we'll just get all root entities - we don't paginate root yet;
+        // perhaps later on it will make sense to use EntityService.GetPagedChildren
         IEntitySlim[] rootEntities = EntityService
             .GetRootEntities(ItemObjectType)
             .ToArray();
