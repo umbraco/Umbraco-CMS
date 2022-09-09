@@ -331,6 +331,7 @@
     <key alias="selectMember">Selecciona miembro</key>
     <key alias="selectMemberGroup">Selecciona grupo de miembros</key>
     <key alias="selectNode">Selecciona nodo</key>
+    <key alias="selectLanguages">Seleccionar idiomas</key>
     <key alias="selectSections">Selecciona secciones</key>
     <key alias="selectUsers">Selecciona usuarios</key>
     <key alias="noIconsFound">No se encontraron iconos</key>
