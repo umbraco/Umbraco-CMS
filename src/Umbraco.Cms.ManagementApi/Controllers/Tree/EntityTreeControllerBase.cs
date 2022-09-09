@@ -55,7 +55,7 @@ public abstract class EntityTreeControllerBase<TItem> : Controller
 
         TItem[] treeItemViewModels = MapTreeItemViewModels(null, itemEntities);
 
-        var totalItems = itemEntities.Count();
+        var totalItems = itemEntities.Length;
 
         PagedResult<TItem> result = PagedResult(treeItemViewModels, 0, totalItems, totalItems);
         return await Task.FromResult(Ok(result));

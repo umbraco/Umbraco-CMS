@@ -28,7 +28,6 @@ public static class InstallerBuilderExtensions
 
         builder.AddInstallSteps();
         services.AddTransient<IInstallService, InstallService>();
-        services.AddTransient<IUserStartNodeEntitiesService, UserStartNodeEntitiesService>();
 
         return builder;
     }
@@ -78,4 +77,10 @@ public static class InstallerBuilderExtensions
 
     public static UpgradeStepCollectionBuilder UpgradeSteps(this IUmbracoBuilder builder)
         => builder.WithCollectionBuilder<UpgradeStepCollectionBuilder>();
+
+    internal static IUmbracoBuilder AddTrees(this IUmbracoBuilder builder)
+    {
+        builder.Services.AddTransient<IUserStartNodeEntitiesService, UserStartNodeEntitiesService>();
+        return builder;
+    }
 }
