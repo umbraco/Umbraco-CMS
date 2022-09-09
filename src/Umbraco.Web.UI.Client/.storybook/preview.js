@@ -47,6 +47,12 @@ export const decorators = [
 ];
 
 export const parameters = {
+	options: {
+		storySort: {
+			method: 'alphabetical',
+			includeNames: true,
+		},
+	},
 	actions: { argTypesRegex: '^on.*' },
 	controls: {
 		expanded: true,

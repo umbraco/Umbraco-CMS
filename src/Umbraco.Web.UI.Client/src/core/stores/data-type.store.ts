@@ -1,22 +1,14 @@
-import { BehaviorSubject, map, Observable } from 'rxjs';
-import { DataTypeEntity, umbDataTypeData } from '../../mocks/data/data-type.data';
+import { map, Observable } from 'rxjs';
+import { DataTypeEntity } from '../../mocks/data/data-type.data';
+import { UmbEntityStore } from './entity.store';
+import { UmbDataStoreBase } from './store';
 
-export class UmbDataTypeStore {
-	private _dataTypes: BehaviorSubject<Array<DataTypeEntity>> = new BehaviorSubject(<Array<DataTypeEntity>>[]);
-	public readonly dataTypes: Observable<Array<DataTypeEntity>> = this._dataTypes.asObservable();
+export class UmbDataTypeStore extends UmbDataStoreBase<DataTypeEntity> {
+	private _entityStore: UmbEntityStore;
 
-	getById(id: number): Observable<DataTypeEntity | null> {
-		// TODO: use Fetcher API.
-		// TODO: only fetch if the data type is not in the store?
-		fetch(`/umbraco/backoffice/data-type/${id}`)
-			.then((res) => res.json())
-			.then((data) => {
-				this._updateStore(data);
-			});
-
-		return this.dataTypes.pipe(
-			map((dataTypes: Array<DataTypeEntity>) => dataTypes.find((node: DataTypeEntity) => node.id === id) || null)
-		);
+	constructor(entityStore: UmbEntityStore) {
+		super();
+		this._entityStore = entityStore;
 	}
 
 	getByKey(key: string): Observable<DataTypeEntity | null> {
@@ -25,19 +17,12 @@ export class UmbDataTypeStore {
 		fetch(`/umbraco/backoffice/data-type/by-key/${key}`)
 			.then((res) => res.json())
 			.then((data) => {
-				this._updateStore(data);
+				this.update(data);
 			});
 
-		return this.dataTypes.pipe(
+		return this.items.pipe(
 			map((dataTypes: Array<DataTypeEntity>) => dataTypes.find((node: DataTypeEntity) => node.key === key) || null)
 		);
-	}
-
-	// TODO: temp solution until we know where to get tree data from
-	getAll(): Observable<Array<DataTypeEntity>> {
-		const documentTypes = umbDataTypeData.getAll();
-		this._dataTypes.next(documentTypes);
-		return this.dataTypes;
 	}
 
 	async save(dataTypes: Array<DataTypeEntity>) {
@@ -51,28 +36,25 @@ export class UmbDataTypeStore {
 				},
 			});
 			const json = await res.json();
-			this._updateStore(json);
+			this.update(json);
+			this._entityStore.update(json);
 		} catch (error) {
 			console.error('Save Data Type error', error);
 		}
 	}
 
-	private _updateStore(fetchedDataTypes: Array<DataTypeEntity>) {
-		const storedDataTypes = this._dataTypes.getValue();
-		const updated: DataTypeEntity[] = [...storedDataTypes];
-
-		fetchedDataTypes.forEach((fetchedDataType) => {
-			const index = storedDataTypes.map((storedNode) => storedNode.id).indexOf(fetchedDataType.id);
-
-			if (index !== -1) {
-				// If the data type is already in the store, update it
-				updated[index] = fetchedDataType;
-			} else {
-				// If the data type is not in the store, add it
-				updated.push(fetchedDataType);
-			}
-		});
-
-		this._dataTypes.next([...updated]);
+	trash(key: string) {
+		return fetch('/umbraco/backoffice/data-type/trash', {
+			method: 'POST',
+			body: key,
+			headers: {
+				'Content-Type': 'application/json',
+			},
+		})
+			.then((res) => res.json())
+			.then((data: Array<DataTypeEntity>) => {
+				this.update(data);
+				this._entityStore.update(data);
+			});
 	}
 }

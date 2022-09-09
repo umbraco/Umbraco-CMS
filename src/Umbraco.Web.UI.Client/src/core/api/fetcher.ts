@@ -1,6 +1,6 @@
 import { Fetcher } from 'openapi-typescript-fetch';
 
-import { paths } from '../../../schemas/generated-schema';
+import type { paths } from '../../../schemas/generated-schema';
 
 const fetcher = Fetcher.for<paths>();
 
@@ -19,3 +19,5 @@ export const postInstallValidateDatabase = fetcher.path('/install/validateDataba
 export const postInstallSetup = fetcher.path('/install/setup').method('post').create();
 export const getUpgradeSettings = fetcher.path('/upgrade/settings').method('get').create();
 export const PostUpgradeAuthorize = fetcher.path('/upgrade/authorize').method('post').create();
+export const getManifests = fetcher.path('/manifests').method('get').create();
+export const getPackagesInstalled = fetcher.path('/manifests/packages/installed').method('get').create();

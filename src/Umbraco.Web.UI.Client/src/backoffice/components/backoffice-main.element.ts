@@ -6,7 +6,8 @@ import { IRoutingInfo } from 'router-slot';
 import { Subscription } from 'rxjs';
 
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '../../core/context';
-import { createExtensionElement, UmbExtensionManifestSection } from '../../core/extension';
+import { createExtensionElement } from '../../core/extension';
+import type { ManifestSection } from '../../core/models';
 import { UmbSectionStore } from '../../core/stores/section.store';
 import { UmbSectionContext } from '../sections/section.context';
 
@@ -29,7 +30,7 @@ export class UmbBackofficeMain extends UmbContextProviderMixin(UmbContextConsume
 	private _routes: Array<any> = [];
 
 	@state()
-	private _sections: Array<UmbExtensionManifestSection> = [];
+	private _sections: Array<ManifestSection> = [];
 
 	private _routePrefix = 'section/';
 	private _sectionContext?: UmbSectionContext;
@@ -79,7 +80,7 @@ export class UmbBackofficeMain extends UmbContextProviderMixin(UmbContextConsume
 		this._provideSectionContext(section);
 	};
 
-	private _provideSectionContext(section: UmbExtensionManifestSection) {
+	private _provideSectionContext(section: ManifestSection) {
 		if (!this._sectionContext) {
 			this._sectionContext = new UmbSectionContext(section);
 			this.provideContext('umbSectionContext', this._sectionContext);

@@ -3,10 +3,14 @@ import { DataTypeEntity } from '../../../mocks/data/data-type.data';
 
 export class UmbDataTypeContext {
 	// TODO: figure out how fine grained we want to make our observables.
-	private _data: BehaviorSubject<DataTypeEntity> = new BehaviorSubject({
-		id: -1,
+	private _data = new BehaviorSubject<DataTypeEntity>({
 		key: '',
 		name: '',
+		icon: '',
+		type: '',
+		hasChildren: false,
+		parentKey: '',
+		isTrashed: false,
 		propertyEditorUIAlias: '',
 	});
 	public readonly data: Observable<DataTypeEntity> = this._data.asObservable();

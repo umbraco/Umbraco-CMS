@@ -1,29 +1,46 @@
-import { BehaviorSubject, map, Observable } from 'rxjs';
-import { NodeEntity, umbNodeData } from '../../mocks/data/node.data';
+import { map, Observable } from 'rxjs';
+import { NodeEntity } from '../../mocks/data/node.data';
+import { UmbEntityStore } from './entity.store';
+import { UmbDataStoreBase } from './store';
 
-export class UmbNodeStore {
-	private _nodes: BehaviorSubject<Array<NodeEntity>> = new BehaviorSubject(<Array<NodeEntity>>[]);
-	public readonly nodes: Observable<Array<NodeEntity>> = this._nodes.asObservable();
+export class UmbNodeStore extends UmbDataStoreBase<NodeEntity> {
+	private _entityStore: UmbEntityStore;
 
-	getById(id: number): Observable<NodeEntity | null> {
+	constructor(entityStore: UmbEntityStore) {
+		super();
+		this._entityStore = entityStore;
+	}
+
+	getByKey(key: string): Observable<NodeEntity | null> {
 		// fetch from server and update store
-		fetch(`/umbraco/backoffice/content/${id}`)
+		fetch(`/umbraco/backoffice/node/${key}`)
 			.then((res) => res.json())
 			.then((data) => {
-				this._updateStore(data);
+				this.update(data);
 			});
 
-		return this.nodes.pipe(map((nodes: Array<NodeEntity>) => nodes.find((node: NodeEntity) => node.id === id) || null));
+		return this.items.pipe(
+			map((nodes: Array<NodeEntity>) => nodes.find((node: NodeEntity) => node.key === key) || null)
+		);
 	}
 
-	// TODO: temp solution until we know where to get tree data from
-	getAll(): Observable<Array<NodeEntity>> {
-		const nodes = umbNodeData.getAll();
-		this._nodes.next(nodes);
-		return this.nodes;
+	trash(key: string) {
+		// fetch from server and update store
+		// TODO: Use node type to hit the right API, or have a general Node API?
+		return fetch('/umbraco/backoffice/node/trash', {
+			method: 'POST',
+			body: key,
+			headers: {
+				'Content-Type': 'application/json',
+			},
+		})
+			.then((res) => res.json())
+			.then((data: Array<NodeEntity>) => {
+				this.update(data);
+				this._entityStore.update(data);
+			});
 	}
 
-	// TODO: Use Node type, to not be specific about Document.
 	// TODO: make sure UI somehow can follow the status of this action.
 	save(data: NodeEntity[]): Promise<void> {
 		// fetch from server and update store
@@ -38,7 +55,7 @@ export class UmbNodeStore {
 		}
 
 		// TODO: Use node type to hit the right API, or have a general Node API?
-		return fetch('/umbraco/backoffice/content/save', {
+		return fetch('/umbraco/backoffice/node/save', {
 			method: 'POST',
 			body: body,
 			headers: {
@@ -46,27 +63,9 @@ export class UmbNodeStore {
 			},
 		})
 			.then((res) => res.json())
-			.then((data) => {
-				this._updateStore(data);
+			.then((data: Array<NodeEntity>) => {
+				this.update(data);
+				this._entityStore.update(data);
 			});
-	}
-
-	private _updateStore(fetchedNodes: Array<any>) {
-		const storedNodes = this._nodes.getValue();
-		const updated: NodeEntity[] = [...storedNodes];
-
-		fetchedNodes.forEach((fetchedNode) => {
-			const index = storedNodes.map((storedNode) => storedNode.id).indexOf(fetchedNode.id);
-
-			if (index !== -1) {
-				// If the node is already in the store, update it
-				updated[index] = fetchedNode;
-			} else {
-				// If the node is not in the store, add it
-				updated.push(fetchedNode);
-			}
-		});
-
-		this._nodes.next([...updated]);
 	}
 }

@@ -1,8 +1,9 @@
+import './dashboard-welcome.element';
+
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit-html';
 
-import { UmbDashboardWelcomeElement } from './dashboard-welcome.element';
-import './dashboard-welcome.element';
+import type { UmbDashboardWelcomeElement } from './dashboard-welcome.element';
 
 export default {
 	title: 'Dashboards/Welcome',

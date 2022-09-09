@@ -57,6 +57,54 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
+  /manifests:
+    get:
+      operationId: Manifests
+      responses:
+        '200':
+          description: 200 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ManifestsResponse'
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /manifests/packages:
+    get:
+      operationId: ManifestsPackages
+      responses:
+        '200':
+          description: 200 response
+          content:
+            application/json:
+              schema:
+                type: object
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /manifests/packages/installed:
+    get:
+      operationId: ManifestsPackagesInstalled
+      responses:
+        '200':
+          description: 200 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ManifestsPackagesInstalledResponse'
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
   /server/status:
     get:
       operationId: GetStatus
@@ -341,6 +389,449 @@ components:
       required:
         - user
         - telemetryLevel
+    MetaSection:
+      type: object
+      properties:
+        pathname:
+          type: string
+        weight:
+          type: number
+          format: float
+      required:
+        - pathname
+        - weight
+    IManifestSection:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - section
+        meta:
+          $ref: '#/components/schemas/MetaSection'
+        js:
+          type: string
+        elementName:
+          type: string
+        alias:
+          type: string
+        name:
+          type: string
+      required:
+        - type
+        - meta
+        - alias
+        - name
+    MetaTree:
+      type: object
+      properties:
+        weight:
+          type: number
+          format: float
+        sections:
+          type: array
+          items:
+            type: string
+      required:
+        - weight
+        - sections
+    IManifestTree:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - tree
+        meta:
+          $ref: '#/components/schemas/MetaTree'
+        js:
+          type: string
+        elementName:
+          type: string
+        alias:
+          type: string
+        name:
+          type: string
+      required:
+        - type
+        - meta
+        - alias
+        - name
+    MetaEditor:
+      type: object
+      properties:
+        entityType:
+          type: string
+      required:
+        - entityType
+    IManifestEditor:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - editor
+        meta:
+          $ref: '#/components/schemas/MetaEditor'
+        js:
+          type: string
+        elementName:
+          type: string
+        alias:
+          type: string
+        name:
+          type: string
+      required:
+        - type
+        - meta
+        - alias
+        - name
+    MetaTreeItemAction:
+      type: object
+      properties:
+        trees:
+          type: array
+          items:
+            type: string
+        label:
+          type: string
+        icon:
+          type: string
+        weight:
+          type: number
+          format: float
+      required:
+        - trees
+        - label
+        - icon
+        - weight
+    IManifestTreeItemAction:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - treeItemAction
+        meta:
+          $ref: '#/components/schemas/MetaTreeItemAction'
+        js:
+          type: string
+        elementName:
+          type: string
+        alias:
+          type: string
+        name:
+          type: string
+      required:
+        - type
+        - meta
+        - alias
+        - name
+    IPrevalueField:
+      type: object
+      properties:
+        label:
+          type: string
+        description:
+          type: string
+        key:
+          type: string
+        view:
+          type: string
+      required:
+        - key
+        - view
+    MetaPropertyEditorUI:
+      type: object
+      properties:
+        icon:
+          type: string
+        group:
+          type: string
+        prevalues:
+          type: object
+          properties:
+            fields:
+              type: array
+              items:
+                $ref: '#/components/schemas/IPrevalueField'
+          required:
+            - fields
+        defaultConfig:
+          type: object
+      required:
+        - icon
+        - group
+    IManifestPropertyEditorUI:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - propertyEditorUI
+        meta:
+          $ref: '#/components/schemas/MetaPropertyEditorUI'
+        js:
+          type: string
+        elementName:
+          type: string
+        alias:
+          type: string
+        name:
+          type: string
+      required:
+        - type
+        - meta
+        - alias
+        - name
+    MetaDashboard:
+      type: object
+      properties:
+        sections:
+          type: array
+          items:
+            type: string
+        pathname:
+          type: string
+        weight:
+          type: number
+          format: float
+        label:
+          type: string
+      required:
+        - sections
+        - pathname
+        - weight
+    IManifestDashboard:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - dashboard
+        meta:
+          $ref: '#/components/schemas/MetaDashboard'
+        js:
+          type: string
+        elementName:
+          type: string
+        alias:
+          type: string
+        name:
+          type: string
+      required:
+        - type
+        - meta
+        - alias
+        - name
+    MetaEditorView:
+      type: object
+      properties:
+        editors:
+          type: array
+          items:
+            type: string
+        pathname:
+          type: string
+        weight:
+          type: number
+          format: float
+        icon:
+          type: string
+      required:
+        - editors
+        - pathname
+        - weight
+        - icon
+    IManifestEditorView:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - editorView
+        meta:
+          $ref: '#/components/schemas/MetaEditorView'
+        js:
+          type: string
+        elementName:
+          type: string
+        alias:
+          type: string
+        name:
+          type: string
+      required:
+        - type
+        - meta
+        - alias
+        - name
+    MetaPropertyAction:
+      type: object
+      properties:
+        propertyEditors:
+          type: array
+          items:
+            type: string
+      required:
+        - propertyEditors
+    IManifestPropertyAction:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - propertyAction
+        meta:
+          $ref: '#/components/schemas/MetaPropertyAction'
+        js:
+          type: string
+        elementName:
+          type: string
+        alias:
+          type: string
+        name:
+          type: string
+      required:
+        - type
+        - meta
+        - alias
+        - name
+    MetaPackageView:
+      type: object
+      properties:
+        packageAlias:
+          type: string
+      required:
+        - packageAlias
+    IManifestPackageView:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - packageView
+        meta:
+          $ref: '#/components/schemas/MetaPackageView'
+        js:
+          type: string
+        elementName:
+          type: string
+        alias:
+          type: string
+        name:
+          type: string
+      required:
+        - type
+        - meta
+        - alias
+        - name
+    IManifestEntrypoint:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - entrypoint
+        js:
+          type: string
+        alias:
+          type: string
+        name:
+          type: string
+      required:
+        - type
+        - js
+        - alias
+        - name
+    IManifestCustom:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - custom
+        meta:
+          type: object
+        alias:
+          type: string
+        name:
+          type: string
+      required:
+        - type
+        - alias
+        - name
+    Manifest:
+      oneOf:
+        - $ref: '#/components/schemas/IManifestSection'
+        - $ref: '#/components/schemas/IManifestTree'
+        - $ref: '#/components/schemas/IManifestEditor'
+        - $ref: '#/components/schemas/IManifestTreeItemAction'
+        - $ref: '#/components/schemas/IManifestPropertyEditorUI'
+        - $ref: '#/components/schemas/IManifestDashboard'
+        - $ref: '#/components/schemas/IManifestEditorView'
+        - $ref: '#/components/schemas/IManifestPropertyAction'
+        - $ref: '#/components/schemas/IManifestPackageView'
+        - $ref: '#/components/schemas/IManifestEntrypoint'
+        - $ref: '#/components/schemas/IManifestCustom'
+      discriminator:
+        propertyName: type
+        mapping:
+          section: '#/components/schemas/IManifestSection'
+          tree: '#/components/schemas/IManifestTree'
+          editor: '#/components/schemas/IManifestEditor'
+          treeItemAction: '#/components/schemas/IManifestTreeItemAction'
+          propertyEditorUI: '#/components/schemas/IManifestPropertyEditorUI'
+          dashboard: '#/components/schemas/IManifestDashboard'
+          editorView: '#/components/schemas/IManifestEditorView'
+          propertyAction: '#/components/schemas/IManifestPropertyAction'
+          packageView: '#/components/schemas/IManifestPackageView'
+          entrypoint: '#/components/schemas/IManifestEntrypoint'
+          custom: '#/components/schemas/IManifestCustom'
+    ManifestsResponse:
+      type: object
+      properties:
+        manifests:
+          type: array
+          items:
+            $ref: '#/components/schemas/Manifest'
+      required:
+        - manifests
+    PackageInstalled:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        alias:
+          type: string
+        version:
+          type: string
+        hasMigrations:
+          type: boolean
+        hasPendingMigrations:
+          type: boolean
+        plans:
+          type: array
+          items:
+            type: object
+      required:
+        - id
+        - name
+        - alias
+        - version
+        - hasMigrations
+        - hasPendingMigrations
+        - plans
+    ManifestsPackagesInstalledResponse:
+      type: object
+      properties:
+        packages:
+          type: array
+          items:
+            $ref: '#/components/schemas/PackageInstalled'
+      required:
+        - packages
     ServerStatus:
       type: string
       enum:

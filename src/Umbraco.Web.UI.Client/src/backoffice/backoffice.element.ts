@@ -7,10 +7,14 @@ import './components/node-property.element';
 import './sections/shared/section-layout.element';
 import './sections/shared/section-main.element';
 import './sections/shared/section-sidebar.element';
+import './sections/shared/section.element';
+import './trees/shared/tree-base.element';
+import './trees/shared/tree.element';
 
 import { defineElement } from '@umbraco-ui/uui-base/lib/registration';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
+import type { Subscription } from 'rxjs';
 
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '../core/context';
 import { UmbModalService } from '../core/services/modal';
@@ -19,8 +23,7 @@ import { UmbDataTypeStore } from '../core/stores/data-type.store';
 import { UmbDocumentTypeStore } from '../core/stores/document-type.store';
 import { UmbNodeStore } from '../core/stores/node.store';
 import { UmbSectionStore } from '../core/stores/section.store';
-
-import type { Subscription } from 'rxjs';
+import { UmbEntityStore } from '../core/stores/entity.store';
 
 @defineElement('umb-backoffice')
 export default class UmbBackoffice extends UmbContextConsumerMixin(UmbContextProviderMixin(LitElement)) {
@@ -40,14 +43,18 @@ export default class UmbBackoffice extends UmbContextConsumerMixin(UmbContextPro
 	];
 
 	private _umbSectionStore?: UmbSectionStore;
+	private _umbEntityStore?: UmbEntityStore;
 	private _currentSectionSubscription?: Subscription;
 
 	constructor() {
 		super();
 
-		this.provideContext('umbNodeStore', new UmbNodeStore());
-		this.provideContext('umbDataTypeStore', new UmbDataTypeStore());
-		this.provideContext('umbDocumentTypeStore', new UmbDocumentTypeStore());
+		this._umbEntityStore = new UmbEntityStore();
+
+		this.provideContext('umbEntityStore', this._umbEntityStore);
+		this.provideContext('umbNodeStore', new UmbNodeStore(this._umbEntityStore));
+		this.provideContext('umbDataTypeStore', new UmbDataTypeStore(this._umbEntityStore));
+		this.provideContext('umbDocumentTypeStore', new UmbDocumentTypeStore(this._umbEntityStore));
 		this.provideContext('umbNotificationService', new UmbNotificationService());
 		this.provideContext('umbModalService', new UmbModalService());
 

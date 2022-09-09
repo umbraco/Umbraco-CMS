@@ -9,7 +9,7 @@ import { UmbDataTypeStore } from '../../../core/stores/data-type.store';
 import { DataTypeEntity } from '../../../mocks/data/data-type.data';
 import { UmbDataTypeContext } from './data-type.context';
 
-import '../shared/editor-entity/editor-entity.element';
+import '../shared/editor-entity-layout/editor-entity-layout.element';
 
 // Lazy load
 // TODO: Make this dynamic, use load-extensions method to loop over extensions for this node.
@@ -33,8 +33,8 @@ export class UmbEditorDataTypeElement extends UmbContextProviderMixin(UmbContext
 		`,
 	];
 
-	@property()
-	id!: string;
+	@property({ type: String })
+	entityKey = '';
 
 	@state()
 	private _dataType?: DataTypeEntity;
@@ -69,7 +69,7 @@ export class UmbEditorDataTypeElement extends UmbContextProviderMixin(UmbContext
 		this._dataTypeStoreSubscription?.unsubscribe();
 
 		// TODO: This should be done in a better way, but for now it works.
-		this._dataTypeStoreSubscription = this._dataTypeStore?.getById(parseInt(this.id)).subscribe((dataType) => {
+		this._dataTypeStoreSubscription = this._dataTypeStore?.getByKey(this.entityKey).subscribe((dataType) => {
 			if (!dataType) return; // TODO: Handle nicely if there is no node.
 
 			this._dataTypeContextSubscription?.unsubscribe();
@@ -124,7 +124,7 @@ export class UmbEditorDataTypeElement extends UmbContextProviderMixin(UmbContext
 		return html`
 			${this._dataType
 				? html`
-						<umb-editor-entity alias="Umb.Editor.DataType">
+						<umb-editor-entity-layout alias="Umb.Editor.DataType">
 							<uui-input id="name" slot="name" .value=${this._dataType?.name} @input="${this._handleInput}"></uui-input>
 							<!-- TODO: these could be extensions points too -->
 							<div slot="actions">
@@ -135,7 +135,7 @@ export class UmbEditorDataTypeElement extends UmbContextProviderMixin(UmbContext
 									label="Save"
 									.state="${this._saveButtonState}"></uui-button>
 							</div>
-						</umb-editor-entity>
+						</umb-editor-entity-layout>
 				  `
 				: nothing}
 		`;

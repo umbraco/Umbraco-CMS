@@ -2,13 +2,11 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { when } from 'lit/directives/when.js';
-import { isPathActive, path } from 'router-slot';
 import { Subscription } from 'rxjs';
 
-import { UmbContextConsumerMixin, UmbContextProvider, UmbContextProviderMixin } from '../../core/context';
-import { UmbExtensionManifestSection } from '../../core/extension';
+import { UmbContextConsumerMixin, UmbContextProviderMixin } from '../../core/context';
+import type { ManifestSection } from '../../core/models';
 import { UmbSectionStore } from '../../core/stores/section.store';
-import { UmbSectionContext } from '../sections/section.context';
 
 @customElement('umb-backoffice-header-sections')
 export class UmbBackofficeHeaderSections extends UmbContextProviderMixin(UmbContextConsumerMixin(LitElement)) {
@@ -42,13 +40,13 @@ export class UmbBackofficeHeaderSections extends UmbContextProviderMixin(UmbCont
 	private _open = false;
 
 	@state()
-	private _sections: Array<UmbExtensionManifestSection> = [];
+	private _sections: Array<ManifestSection> = [];
 
 	@state()
-	private _visibleSections: Array<UmbExtensionManifestSection> = [];
+	private _visibleSections: Array<ManifestSection> = [];
 
 	@state()
-	private _extraSections: Array<UmbExtensionManifestSection> = [];
+	private _extraSections: Array<ManifestSection> = [];
 
 	@state()
 	private _currentSectionAlias = '';
@@ -117,7 +115,7 @@ export class UmbBackofficeHeaderSections extends UmbContextProviderMixin(UmbCont
 		return html`
 			<uui-tab-group id="tabs">
 				${this._visibleSections.map(
-					(section: UmbExtensionManifestSection) => html`
+					(section: ManifestSection) => html`
 						<uui-tab
 							@click="${this._handleTabClick}"
 							?active="${this._currentSectionAlias === section.alias}"

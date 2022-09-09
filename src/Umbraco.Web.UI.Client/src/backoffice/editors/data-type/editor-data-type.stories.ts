@@ -1,10 +1,11 @@
+import './editor-data-type.element';
+
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit-html';
 
-import { UmbEditorDataTypeElement } from './editor-data-type.element';
-import './editor-data-type.element';
-
 import { data } from '../../../mocks/data/data-type.data';
+
+import type { UmbEditorDataTypeElement } from './editor-data-type.element';
 
 export default {
 	title: 'Editors/Data Type',
@@ -13,5 +14,5 @@ export default {
 } as Meta;
 
 export const AAAOverview: Story<UmbEditorDataTypeElement> = () =>
-	html` <umb-editor-data-type id="${data[0].id}"></umb-editor-data-type>`;
+	html` <umb-editor-data-type id="${data[0].key}"></umb-editor-data-type>`;
 AAAOverview.storyName = 'Overview';

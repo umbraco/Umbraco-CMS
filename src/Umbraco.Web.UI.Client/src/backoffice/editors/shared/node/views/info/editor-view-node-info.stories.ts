@@ -1,10 +1,12 @@
+import './editor-view-node-info.element';
+
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit-html';
 
-import { UmbNodeContext } from '../../node.context';
-import { UmbEditorViewNodeInfoElement } from './editor-view-node-info.element';
-import './editor-view-node-info.element';
 import { data } from '../../../../../../mocks/data/node.data';
+import { UmbNodeContext } from '../../node.context';
+
+import type { UmbEditorViewNodeInfoElement } from './editor-view-node-info.element';
 
 export default {
 	title: 'Editors/Shared/Node/Views/Info',

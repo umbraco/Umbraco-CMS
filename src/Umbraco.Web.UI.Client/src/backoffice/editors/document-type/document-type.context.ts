@@ -3,10 +3,14 @@ import { DocumentTypeEntity } from '../../../mocks/data/document-type.data';
 
 export class UmbDocumentTypeContext {
 	// TODO: figure out how fine grained we want to make our observables.
-	private _data: BehaviorSubject<DocumentTypeEntity> = new BehaviorSubject({
-		id: -1,
+	private _data = new BehaviorSubject<DocumentTypeEntity>({
 		key: '',
 		name: '',
+		icon: '',
+		type: '',
+		hasChildren: false,
+		parentKey: '',
+		isTrashed: false,
 		alias: '',
 		properties: [],
 	});

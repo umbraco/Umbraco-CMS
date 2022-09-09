@@ -1,8 +1,9 @@
+import './dashboard-redirect-management.element';
+
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit-html';
 
-import { UmbDashboardRedirectManagementElement } from './dashboard-redirect-management.element';
-import './dashboard-redirect-management.element';
+import type { UmbDashboardRedirectManagementElement } from './dashboard-redirect-management.element';
 
 export default {
 	title: 'Dashboards/Redirect Management',

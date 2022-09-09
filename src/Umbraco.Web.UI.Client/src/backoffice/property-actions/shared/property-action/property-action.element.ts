@@ -1,19 +1,20 @@
 import { UUITextStyles } from '@umbraco-ui/uui';
 import { CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { createExtensionElement, UmbExtensionManifestPropertyAction } from '../../../../core/extension';
+import { createExtensionElement } from '../../../../core/extension';
+import type { ManifestPropertyAction } from '../../../../core/models';
 import type { UmbPropertyAction } from './property-action.model';
 
 @customElement('umb-property-action')
 export class UmbPropertyActionElement extends LitElement implements UmbPropertyAction {
 	static styles: CSSResultGroup = [UUITextStyles];
 
-	private _propertyAction?: UmbExtensionManifestPropertyAction;
+	private _propertyAction?: ManifestPropertyAction;
 	@property({ type: Object })
-	public get propertyAction(): UmbExtensionManifestPropertyAction | undefined {
+	public get propertyAction(): ManifestPropertyAction | undefined {
 		return this._propertyAction;
 	}
-	public set propertyAction(value: UmbExtensionManifestPropertyAction | undefined) {
+	public set propertyAction(value: ManifestPropertyAction | undefined) {
 		this._propertyAction = value;
 		this._createElement();
 	}
