@@ -22,12 +22,14 @@ public abstract class FolderTreeControllerBase<TItem> : TreeControllerBase<TItem
 
     protected async Task<ActionResult<PagedResult<TItem>>> GetRoot(long pageNumber, int pageSize, bool foldersOnly)
     {
+        // save "folders only" state for GetPagedRootEntities
         _foldersOnly = foldersOnly;
         return await GetRoot(pageNumber, pageSize);
     }
 
     protected async Task<ActionResult<PagedResult<TItem>>> GetChildren(Guid parentKey, long pageNumber, int pageSize, bool foldersOnly)
     {
+        // save "folders only" state for GetPagedChildEntities
         _foldersOnly = foldersOnly;
         return await GetChildren(parentKey, pageNumber, pageSize);
     }
