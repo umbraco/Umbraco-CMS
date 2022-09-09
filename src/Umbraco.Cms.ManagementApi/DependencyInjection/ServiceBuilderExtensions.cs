@@ -8,7 +8,7 @@ public static class ServiceBuilderExtensions
 {
     internal static IUmbracoBuilder AddServices(this IUmbracoBuilder builder)
     {
-        builder.Services.AddTransient<IExamineSearcherValidationService, ExamineSearcherValidationService>();
+        builder.Services.AddTransient<IExamineSearcherValidationService, ExamineSearcherFinderService>();
         return builder;
     }
 

@@ -2,16 +2,16 @@
 
 namespace Umbraco.Cms.ManagementApi.Services;
 
-public class ExamineSearcherValidationService : IExamineSearcherValidationService
+public class ExamineSearcherFinderService : IExamineSearcherValidationService
 {
     private readonly IExamineManager _examineManager;
 
-    public ExamineSearcherValidationService(IExamineManager examineManager)
+    public ExamineSearcherFinderService(IExamineManager examineManager)
     {
         _examineManager = examineManager;
     }
 
-    public bool ValidateSearcher(string searcherName, out ISearcher searcher)
+    public bool TryFindSearcher(string searcherName, out ISearcher searcher)
     {
         // try to get the searcher from the indexes
         if (!_examineManager.TryGetIndex(searcherName, out IIndex index))
