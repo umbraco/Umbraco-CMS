@@ -1,7 +1,7 @@
 import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
-import type { ManifestEntityAction, ManifestTree } from '../../../../core/models';
+import type { ManifestTreeItemAction, ManifestTree } from '../../../../core/models';
 import { UmbExtensionRegistry } from '../../../../core/extension';
 import { UmbContextConsumerMixin } from '../../../../core/context';
 import { map, Subscription } from 'rxjs';
@@ -29,7 +29,7 @@ export class UmbTreeContextMenuPageActionListElement extends UmbContextConsumerM
 	];
 
 	@state()
-	private _actions: Array<ManifestEntityAction> = [];
+	private _actions: Array<ManifestTreeItemAction> = [];
 
 	@state()
 	private _activeTree?: ManifestTree;

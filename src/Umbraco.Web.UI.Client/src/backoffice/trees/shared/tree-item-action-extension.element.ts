@@ -3,18 +3,18 @@ import { CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 
 import { createExtensionElement } from '../../../core/extension';
-import type { ManifestEntityAction } from '../../../core/models';
+import type { ManifestTreeItemAction } from '../../../core/models';
 
 @customElement('umb-tree-item-action-extension')
 export class UmbTreeItemActionExtensionElement extends LitElement {
 	static styles: CSSResultGroup = [UUITextStyles];
 
-	private _treeAction?: ManifestEntityAction;
+	private _treeAction?: ManifestTreeItemAction;
 	@property({ type: Object })
-	public get treeAction(): ManifestEntityAction | undefined {
+	public get treeAction(): ManifestTreeItemAction | undefined {
 		return this._treeAction;
 	}
-	public set treeAction(value: ManifestEntityAction | undefined) {
+	public set treeAction(value: ManifestTreeItemAction | undefined) {
 		this._treeAction = value;
 		this._createElement();
 	}

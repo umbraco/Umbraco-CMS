@@ -2,7 +2,7 @@ import { LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { Subscription } from 'rxjs';
 import { UmbContextConsumerMixin } from '../../../core/context';
-import type { ManifestEntityAction, ManifestTree } from '../../../core/models';
+import type { ManifestTreeItemAction, ManifestTree } from '../../../core/models';
 import { Entity } from '../../../mocks/data/entity.data';
 import { UmbSectionContext } from '../../sections/section.context';
 import { UmbTreeContextMenuPageService } from './context-menu/tree-context-menu-page.service';
@@ -16,7 +16,7 @@ export type ActionPageEntity = {
 @customElement('umb-tree-item-action')
 export default class UmbTreeItemActionElement extends UmbContextConsumerMixin(LitElement) {
 	@property({ attribute: false })
-	public treeAction?: ManifestEntityAction;
+	public treeAction?: ManifestTreeItemAction;
 
 	@state()
 	protected _entity: ActionPageEntity = { name: '', key: '' };

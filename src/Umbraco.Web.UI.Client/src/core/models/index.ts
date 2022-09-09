@@ -20,8 +20,8 @@ export type ServerStatus = components['schemas']['ServerStatus'];
 export type ManifestTypes = components['schemas']['Manifest'];
 export type ManifestSection = components['schemas']['IManifestSection'];
 export type ManifestTree = components['schemas']['IManifestTree'];
+export type ManifestTreeItemAction = components['schemas']['IManifestTreeItemAction'];
 export type ManifestEditor = components['schemas']['IManifestEditor'];
-export type ManifestEntityAction = components['schemas']['IManifestEntityAction'];
 export type ManifestPropertyEditorUI = components['schemas']['IManifestPropertyEditorUI'];
 export type ManifestDashboard = components['schemas']['IManifestDashboard'];
 export type ManifestEditorView = components['schemas']['IManifestEditorView'];
@@ -34,8 +34,8 @@ export type PackageInstalled = components['schemas']['PackageInstalled'];
 export type ManifestElementType =
 	| ManifestSection
 	| ManifestTree
+	| ManifestTreeItemAction
 	| ManifestEditor
-	| ManifestEntityAction
 	| ManifestPropertyAction
 	| ManifestPropertyEditorUI
 	| ManifestDashboard
