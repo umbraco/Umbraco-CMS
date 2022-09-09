@@ -73,6 +73,38 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
+  /manifests/packages:
+    get:
+      operationId: ManifestsPackages
+      responses:
+        '200':
+          description: 200 response
+          content:
+            application/json:
+              schema:
+                type: object
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /manifests/packages/installed:
+    get:
+      operationId: ManifestsPackagesInstalled
+      responses:
+        '200':
+          description: 200 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ManifestsPackagesInstalledResponse'
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
   /server/status:
     get:
       operationId: GetStatus
@@ -390,6 +422,20 @@ components:
         - meta
         - name
         - alias
+    IPrevalueField:
+      type: object
+      properties:
+        label:
+          type: string
+        description:
+          type: string
+        key:
+          type: string
+        view:
+          type: string
+      required:
+        - key
+        - view
     MetaPropertyEditorUI:
       type: object
       properties:
@@ -397,6 +443,17 @@ components:
           type: string
         group:
           type: string
+        prevalues:
+          type: object
+          properties:
+            fields:
+              type: array
+              items:
+                $ref: '#/components/schemas/IPrevalueField'
+          required:
+            - fields
+        defaultConfig:
+          type: object
       required:
         - icon
         - group
@@ -534,6 +591,35 @@ components:
         - meta
         - name
         - alias
+    MetaPackageView:
+      type: object
+      properties:
+        packageAlias:
+          type: string
+      required:
+        - packageAlias
+    IManifestPackageView:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - packageView
+        meta:
+          $ref: '#/components/schemas/MetaPackageView'
+        name:
+          type: string
+        js:
+          type: string
+        elementName:
+          type: string
+        alias:
+          type: string
+      required:
+        - type
+        - meta
+        - name
+        - alias
     IManifestEntrypoint:
       type: object
       properties:
@@ -570,6 +656,7 @@ components:
         - $ref: '#/components/schemas/IManifestDashboard'
         - $ref: '#/components/schemas/IManifestEditorView'
         - $ref: '#/components/schemas/IManifestPropertyAction'
+        - $ref: '#/components/schemas/IManifestPackageView'
         - $ref: '#/components/schemas/IManifestEntrypoint'
         - $ref: '#/components/schemas/IManifestCustom'
       discriminator:
@@ -580,6 +667,7 @@ components:
           dashboard: '#/components/schemas/IManifestDashboard'
           editorView: '#/components/schemas/IManifestEditorView'
           propertyAction: '#/components/schemas/IManifestPropertyAction'
+          packageView: '#/components/schemas/IManifestPackageView'
           entrypoint: '#/components/schemas/IManifestEntrypoint'
           custom: '#/components/schemas/IManifestCustom'
     ManifestsResponse:
@@ -591,6 +679,42 @@ components:
             $ref: '#/components/schemas/Manifest'
       required:
         - manifests
+    PackageInstalled:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        alias:
+          type: string
+        version:
+          type: string
+        hasMigrations:
+          type: boolean
+        hasPendingMigrations:
+          type: boolean
+        plans:
+          type: array
+          items:
+            type: object
+      required:
+        - id
+        - name
+        - alias
+        - version
+        - hasMigrations
+        - hasPendingMigrations
+        - plans
+    ManifestsPackagesInstalledResponse:
+      type: object
+      properties:
+        packages:
+          type: array
+          items:
+            $ref: '#/components/schemas/PackageInstalled'
+      required:
+        - packages
     ServerStatus:
       type: string
       enum:

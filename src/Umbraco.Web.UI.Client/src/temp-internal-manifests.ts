@@ -47,6 +47,17 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		},
 	},
 	{
+		type: 'section',
+		alias: 'Umb.Section.Packages',
+		name: 'Packages',
+		elementName: 'umb-packages-section',
+		loader: () => import('./backoffice/sections/packages/packages-section.element'),
+		meta: {
+			pathname: 'packages',
+			weight: 20,
+		},
+	},
+	{
 		type: 'dashboard',
 		alias: 'Umb.Dashboard.Welcome',
 		name: 'Welcome',
@@ -208,6 +219,32 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 			pathname: 'design',
 			weight: 90,
 			icon: 'edit',
+		},
+	},
+	{
+		type: 'editorView',
+		alias: 'Umb.Editor.Packages.Overview',
+		name: 'Packages',
+		elementName: 'umb-packages-overview',
+		loader: () => import('./backoffice/sections/packages/packages-overview.element'),
+		meta: {
+			icon: 'document',
+			pathname: 'repo',
+			editors: ['Umb.Editor.Packages'],
+			weight: 10,
+		},
+	},
+	{
+		type: 'editorView',
+		alias: 'Umb.Editor.Packages.Installed',
+		name: 'Installed',
+		elementName: 'umb-packages-installed',
+		loader: () => import('./backoffice/sections/packages/packages-installed.element'),
+		meta: {
+			icon: 'document',
+			pathname: 'installed',
+			editors: ['Umb.Editor.Packages'],
+			weight: 0,
 		},
 	},
 	{

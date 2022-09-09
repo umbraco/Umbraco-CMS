@@ -1,15 +1,9 @@
-import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
+import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
 import { UmbContextConsumerMixin } from '../../core/context';
 import { UmbModalService } from '../../core/services/modal';
-
-// TODO: remove these imports when they are part of UUI
-import '@umbraco-ui/uui-modal';
-import '@umbraco-ui/uui-modal-sidebar';
-import '@umbraco-ui/uui-modal-container';
-import '@umbraco-ui/uui-modal-dialog';
 
 @customElement('umb-property-editor-content-picker')
 export class UmbPropertyEditorContentPicker extends UmbContextConsumerMixin(LitElement) {

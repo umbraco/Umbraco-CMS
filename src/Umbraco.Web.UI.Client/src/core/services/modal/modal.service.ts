@@ -30,8 +30,8 @@ export class UmbModalService {
 		return this.open('umb-modal-layout-content-picker', { data, type: 'sidebar', size: 'small' });
 	}
 
-	public open(elementName: string, options?: UmbModalOptions<unknown>): UmbModalHandler {
-		const modalHandler = new UmbModalHandler(elementName, options);
+	public open(element: string | HTMLElement, options?: UmbModalOptions<unknown>): UmbModalHandler {
+		const modalHandler = new UmbModalHandler(element, options);
 
 		modalHandler.element.addEventListener('close-end', () => this._handleCloseEnd(modalHandler));
 

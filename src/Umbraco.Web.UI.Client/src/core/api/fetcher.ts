@@ -20,3 +20,4 @@ export const postInstallSetup = fetcher.path('/install/setup').method('post').cr
 export const getUpgradeSettings = fetcher.path('/upgrade/settings').method('get').create();
 export const PostUpgradeAuthorize = fetcher.path('/upgrade/authorize').method('post').create();
 export const getManifests = fetcher.path('/manifests').method('get').create();
+export const getPackagesInstalled = fetcher.path('/manifests/packages/installed').method('get').create();
