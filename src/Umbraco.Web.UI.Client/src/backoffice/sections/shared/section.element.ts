@@ -8,7 +8,7 @@ import { UmbSectionContext } from '../section.context';
 import type { ManifestTree, ManifestEditor } from '../../../core/models';
 
 import '../shared/section-trees.element.ts';
-import { UmbEditorElement } from '../../editors/shared/editor-entity/editor-entity.element';
+import { UmbEditorEntityElement } from '../../editors/shared/editor-entity/editor-entity.element';
 import { UmbEntityStore } from '../../../core/stores/entity.store';
 
 @customElement('umb-section')
@@ -94,7 +94,7 @@ export class UmbSectionElement extends UmbContextConsumerMixin(LitElement) {
 				return {
 					path: `:entityType/:key`,
 					component: () => import('../../editors/shared/editor-entity/editor-entity.element'),
-					setup: (component: UmbEditorElement, info: any) => {
+					setup: (component: UmbEditorEntityElement, info: any) => {
 						component.entityKey = info.match.params.key;
 						component.entityType = info.match.params.entityType;
 					},
