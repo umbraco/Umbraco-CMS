@@ -13,32 +13,25 @@ namespace Umbraco.Extensions;
 public static class LinkGeneratorExtensions
 {
     /// <summary>
-    ///     Return the back office url if the back office is installed
+    /// Gets the backoffice URL (if the back office is installed).
     /// </summary>
-    public static string? GetBackOfficeUrl(this LinkGenerator linkGenerator, IHostingEnvironment hostingEnvironment)
-    {
-        Type? backOfficeControllerType;
-        try
-        {
-            backOfficeControllerType = Assembly.Load("Umbraco.Web.BackOffice")
-                .GetType("Umbraco.Web.BackOffice.Controllers.BackOfficeController");
-            if (backOfficeControllerType == null)
-            {
-                return "/"; // this would indicate that the installer is installed without the back office
-            }
-        }
-        catch
-        {
-            return
-                hostingEnvironment
-                    .ApplicationVirtualPath; // this would indicate that the installer is installed without the back office
-        }
+    /// <param name="linkGenerator">The link generator.</param>
+    /// <returns>
+    /// The backoffice URL.
+    /// </returns>
+    public static string? GetBackOfficeUrl(this LinkGenerator linkGenerator)
+        => linkGenerator.GetPathByAction("Default", "BackOffice", new { area = Constants.Web.Mvc.BackOfficeArea });
 
-        return linkGenerator.GetPathByAction(
-            "Default",
-            ControllerExtensions.GetControllerName(backOfficeControllerType),
-            new { area = Constants.Web.Mvc.BackOfficeApiArea });
-    }
+    /// <summary>
+    /// Gets the backoffice URL (if the back office is installed) or application virtual path (in most cases just <c>"/"</c>).
+    /// </summary>
+    /// <param name="linkGenerator">The link generator.</param>
+    /// <param name="hostingEnvironment">The hosting environment.</param>
+    /// <returns>
+    /// The backoffice URL.
+    /// </returns>
+    public static string GetBackOfficeUrl(this LinkGenerator linkGenerator, IHostingEnvironment hostingEnvironment)
+         => GetBackOfficeUrl(linkGenerator) ?? hostingEnvironment.ApplicationVirtualPath;
 
     /// <summary>
     ///     Return the Url for a Web Api service
