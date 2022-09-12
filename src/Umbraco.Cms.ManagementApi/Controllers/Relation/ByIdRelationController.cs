@@ -8,12 +8,12 @@ using Umbraco.Cms.ManagementApi.ViewModels.Relation;
 namespace Umbraco.Cms.ManagementApi.Controllers.Relation;
 
 [ApiVersion("1.0")]
-public class GetRelationController : RelationControllerBase
+public class ByIdRelationController : RelationControllerBase
 {
     private readonly IRelationService _relationService;
     private readonly IRelationViewModelFactory _relationViewModelFactory;
 
-    public GetRelationController(IRelationService relationService, IRelationViewModelFactory relationViewModelFactory)
+    public ByIdRelationController(IRelationService relationService, IRelationViewModelFactory relationViewModelFactory)
     {
         _relationService = relationService;
         _relationViewModelFactory = relationViewModelFactory;
@@ -23,7 +23,7 @@ public class GetRelationController : RelationControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(RelationViewModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(NotFoundResult), StatusCodes.Status404NotFound)]
-    public IActionResult Get(int id)
+    public IActionResult ById(int id)
     {
         IRelation? relation = _relationService.GetById(id);
         if (relation is null)

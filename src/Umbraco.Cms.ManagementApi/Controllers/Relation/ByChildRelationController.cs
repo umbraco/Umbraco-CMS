@@ -10,14 +10,14 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.Relation;
 
-public class GetByChildRelationController : RelationControllerBase
+public class ByChildRelationController : RelationControllerBase
 {
     private readonly IRelationService _relationService;
     private readonly IUmbracoMapper _umbracoMapper;
     private readonly IPagedViewModelFactory _pagedViewModelFactory;
     private readonly IRelationViewModelFactory _relationViewModelFactory;
 
-    public GetByChildRelationController(
+    public ByChildRelationController(
         IRelationService relationService,
         IUmbracoMapper umbracoMapper,
         IPagedViewModelFactory pagedViewModelFactory,
@@ -32,7 +32,7 @@ public class GetByChildRelationController : RelationControllerBase
     [HttpGet("childRelations/{childId:int}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(RelationViewModel), StatusCodes.Status200OK)]
-    public PagedViewModel<RelationViewModel> GetByChild(int childId, int skip, int take, string? relationTypeAlias = "")
+    public PagedViewModel<RelationViewModel> ByChild(int childId, int skip, int take, string? relationTypeAlias = "")
     {
         IRelation[] relations = _relationService.GetByChildId(childId).ToArray();
         IEnumerable<RelationViewModel> result = Enumerable.Empty<RelationViewModel>();
