@@ -25,6 +25,7 @@ public class DictionaryMapDefinition : IMapDefinition
     {
     }
 
+    [Obsolete("Use the constructor with the CommonMapper, and IDictionaryService")]
     public DictionaryMapDefinition(ILocalizationService localizationService, CommonMapper commonMapper)
         : this(
         localizationService,

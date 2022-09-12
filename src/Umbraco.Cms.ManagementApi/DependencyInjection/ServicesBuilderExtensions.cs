@@ -1,5 +1,4 @@
-﻿using Microsoft.CodeAnalysis.Host;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.ManagementApi.Services;
 using Umbraco.New.Cms.Core.Services.Installer;
