@@ -12,9 +12,9 @@ namespace Umbraco.Cms.ManagementApi.Controllers.ExamineManagement;
 
 public class SearchExamineManagementController : ExamineManagementControllerBase
 {
-    private readonly IExamineSearcherFinderService _examineSearcherFinderService;
+    private readonly IExamineManagerService _examineManagerService;
 
-    public SearchExamineManagementController(IExamineSearcherFinderService examineSearcherFinderService) => _examineSearcherFinderService = examineSearcherFinderService;
+    public SearchExamineManagementController(IExamineManagerService examineManagerService) => _examineManagerService = examineManagerService;
 
     [HttpGet("search")]
     [MapToApiVersion("1.0")]
@@ -29,7 +29,7 @@ public class SearchExamineManagementController : ExamineManagementControllerBase
             return new PagedViewModel<SearchResultViewModel>();
         }
 
-        if (!_examineSearcherFinderService.TryFindSearcher(searcherName, out ISearcher searcher))
+        if (!_examineManagerService.TryFindSearcher(searcherName, out ISearcher searcher))
         {
             var invalidModelProblem = new ProblemDetails
             {

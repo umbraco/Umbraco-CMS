@@ -1,14 +1,17 @@
 ﻿using Examine;
+using Umbraco.Cms.Infrastructure.Examine;
 
 namespace Umbraco.Cms.ManagementApi.Services;
 
-public class ExamineSearcherFinderService : IExamineSearcherFinderService
+public class ExamineManagerService : IExamineManagerService
 {
     private readonly IExamineManager _examineManager;
+    private readonly IIndexRebuilder _indexRebuilder;
 
-    public ExamineSearcherFinderService(IExamineManager examineManager)
+    public ExamineManagerService(IExamineManager examineManager, IIndexRebuilder indexRebuilder)
     {
         _examineManager = examineManager;
+        _indexRebuilder = indexRebuilder;
     }
 
     public bool TryFindSearcher(string searcherName, out ISearcher searcher)
@@ -23,4 +26,13 @@ public class ExamineSearcherFinderService : IExamineSearcherFinderService
         searcher = index.Searcher;
         return true;
     }
+
+    public bool ValidateIndex(string indexName, out IIndex? index)
+    {
+        index = null;
+
+        return _examineManager.TryGetIndex(indexName, out index);
+    }
+
+    public bool ValidatePopulator(IIndex index) => _indexRebuilder.CanRebuild(index.Name);
 }
