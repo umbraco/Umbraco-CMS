@@ -43,6 +43,7 @@
                 </style>
                 <div 
                     class="umb-block-grid"
+                    ng-class="{'show-validation': vm.blockEditorApi.internal.showValidation}"
                     data-grid-columns="${vm.gridColumns}"
                 >
                     <umb-block-grid-entries

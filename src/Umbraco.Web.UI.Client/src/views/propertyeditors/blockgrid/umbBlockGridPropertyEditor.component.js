@@ -25,10 +25,10 @@
                 umbProperty: "?^umbProperty",
                 umbVariantContent: '?^^umbVariantContent',
                 umbVariantContentEditors: '?^^umbVariantContentEditors',
-                umbElementEditorContent: '?^^umbElementEditorContent'
+                umbElementEditorContent: '?^^umbElementEditorContent',
+                valFormManager: '?^^valFormManager'
             }
         });
-
     function BlockGridController($element, $attrs, $scope, $timeout, $q, editorService, clipboardService, localizationService, overlayService, blockEditorService, udiService, serverValidationManager, angularHelper, eventsService, assetsService, umbRequestHelper) {
 
         var unsubscribe = [];
@@ -89,6 +89,22 @@
         });
 
         vm.$onInit = function() {
+
+
+            //listen for form validation changes
+            console.log("valFormManager", vm.valFormManager);
+            vm.valFormManager.onValidationStatusChanged(function (evt, args) {
+                vm.showValidation = vm.valFormManager.showValidation;
+            });
+            //listen for the forms saving event
+            unsubscribe.push($scope.$on("formSubmitting", function (ev, args) {
+                vm.showValidation = true;
+            }));
+
+            //listen for the forms saved event
+            unsubscribe.push($scope.$on("formSubmitted", function (ev, args) {
+                vm.showValidation = false;
+            }));
 
             if (vm.umbProperty && !vm.umbVariantContent) {// if we dont have vm.umbProperty, it means we are in the DocumentTypeEditor.
                 // not found, then fallback to searching the scope chain, this may be needed when DOM inheritance isn't maintained but scope

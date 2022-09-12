@@ -55,11 +55,15 @@
                     </style>`
                     : ''
                 }
-                <div style="display:contents;" ng-include="'${model.view}'"></div>
+                <div 
+                    style="display:contents;" 
+                    ng-class="{'show-validation': vm.blockEditorApi.internal.showValidation}"
+                    ng-include="'${model.view}'"></div>
             `;
             $compile(shadowRoot)($scope);
             
         };
+        
 
         // We need to watch for changes on primitive types and update the $scope values.
         model.$onChanges = function (changes) {
