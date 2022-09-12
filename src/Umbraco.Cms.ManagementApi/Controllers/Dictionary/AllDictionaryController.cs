@@ -2,20 +2,18 @@
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.ManagementApi.ViewModels.Dictionary;
 using Umbraco.Cms.ManagementApi.ViewModels.Pagination;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.Dictionary;
 
-//TODO: Implement this when the PagedViewModel gets merged into dev
-public class GetAllDictionaryController : DictionaryControllerBase
+public class AllDictionaryController : DictionaryControllerBase
 {
     private readonly ILocalizationService _localizationService;
     private readonly IUmbracoMapper _umbracoMapper;
 
-    public GetAllDictionaryController(ILocalizationService localizationService, IUmbracoMapper umbracoMapper)
+    public AllDictionaryController(ILocalizationService localizationService, IUmbracoMapper umbracoMapper)
     {
         _localizationService = localizationService;
         _umbracoMapper = umbracoMapper;
