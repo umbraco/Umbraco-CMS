@@ -1,4 +1,5 @@
 using Umbraco.Cms.Core.Models;
+using Umbraco.New.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -175,4 +176,10 @@ public interface ILocalizationService : IService
     /// </summary>
     /// <returns>The full dictionary key map.</returns>
     Dictionary<string, Guid> GetDictionaryItemKeyMap();
+
+    PagedModel<ILanguage> GetAllLanguagesPaged(int skip, int take)
+    {
+        ILanguage[] all = GetAllLanguages().Skip(skip).Take(take).ToArray();
+        return new PagedModel<ILanguage>(all.Length, all);
+    }
 }
