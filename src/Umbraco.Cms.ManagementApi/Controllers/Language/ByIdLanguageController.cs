@@ -8,12 +8,12 @@ using Umbraco.Cms.ManagementApi.ViewModels.Languages;
 namespace Umbraco.Cms.ManagementApi.Controllers.Language;
 
 [ApiVersion("1.0")]
-public class GetLanguageController : LanguageControllerBase
+public class ByIdLanguageController : LanguageControllerBase
 {
     private readonly ILocalizationService _localizationService;
     private readonly IUmbracoMapper _umbracoMapper;
 
-    public GetLanguageController(ILocalizationService localizationService, IUmbracoMapper umbracoMapper)
+    public ByIdLanguageController(ILocalizationService localizationService, IUmbracoMapper umbracoMapper)
     {
         _localizationService = localizationService;
         _umbracoMapper = umbracoMapper;
@@ -23,7 +23,7 @@ public class GetLanguageController : LanguageControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<LanguageViewModel?>> Get(int id)
+    public async Task<ActionResult<LanguageViewModel?>> ById(int id)
     {
         ILanguage? lang = _localizationService.GetLanguageById(id);
         if (lang == null)

@@ -4,16 +4,17 @@ using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.ManagementApi.ViewModels.Dictionary;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.Dictionary;
 
 [ApiVersion("1.0")]
-public class GetDictionaryController : DictionaryControllerBase
+public class ByIdDictionaryController : DictionaryControllerBase
 {
     private readonly ILocalizationService _localizationService;
     private readonly IUmbracoMapper _umbracoMapper;
 
-    public GetDictionaryController(ILocalizationService localizationService, IUmbracoMapper umbracoMapper)
+    public ByIdDictionaryController(ILocalizationService localizationService, IUmbracoMapper umbracoMapper)
     {
         _localizationService = localizationService;
         _umbracoMapper = umbracoMapper;
@@ -32,7 +33,7 @@ public class GetDictionaryController : DictionaryControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IActionResult), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(NotFoundResult), StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<DictionaryDisplay?>> GetById(Guid id)
+    public async Task<ActionResult<DictionaryViewModel?>> ById(Guid id)
     {
         IDictionaryItem? dictionary = _localizationService.GetDictionaryItemById(id);
         if (dictionary == null)
@@ -40,6 +41,6 @@ public class GetDictionaryController : DictionaryControllerBase
             return NotFound();
         }
 
-        return _umbracoMapper.Map<IDictionaryItem, DictionaryDisplay>(dictionary);
+        return _umbracoMapper.Map<IDictionaryItem, DictionaryViewModel>(dictionary);
     }
 }
