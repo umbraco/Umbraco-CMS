@@ -19,10 +19,6 @@ public static class InstallerBuilderExtensions
     {
         IServiceCollection services = builder.Services;
 
-        builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>()
-            .Add<InstallerViewModelsMapDefinition>()
-            .Add<DictionaryViewModelMapDefinition>();
-
         services.AddTransient<IUserSettingsFactory, UserSettingsFactory>();
         services.AddTransient<IInstallSettingsFactory, InstallSettingsFactory>();
         services.AddTransient<IDatabaseSettingsFactory, DatabaseSettingsFactory>();
