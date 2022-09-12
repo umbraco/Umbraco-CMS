@@ -9,12 +9,12 @@ using Umbraco.New.Cms.Core.Models.TrackedReferences;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.TrackedReferences;
 
-public class DescendantTrackedReferencesController : TrackedReferencesControllerBase
+public class DescendantsTrackedReferencesController : TrackedReferencesControllerBase
 {
     private readonly ITrackedReferencesSkipTakeService _trackedReferencesSkipTakeService;
     private readonly IUmbracoMapper _umbracoMapper;
 
-    public DescendantTrackedReferencesController(ITrackedReferencesSkipTakeService trackedReferencesSkipTakeService, IUmbracoMapper umbracoMapper)
+    public DescendantsTrackedReferencesController(ITrackedReferencesSkipTakeService trackedReferencesSkipTakeService, IUmbracoMapper umbracoMapper)
     {
         _trackedReferencesSkipTakeService = trackedReferencesSkipTakeService;
         _umbracoMapper = umbracoMapper;
