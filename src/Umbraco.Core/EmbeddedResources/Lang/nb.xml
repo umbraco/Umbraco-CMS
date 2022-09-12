@@ -420,7 +420,7 @@
     <key alias="databaseUpgradeDone"><![CDATA[Databasen din har blitt oppgradert til den siste utgaven, %0%.<br/>Trykk <strong>Neste</strong> for å fortsette.]]></key>
     <key alias="databaseUpToDate"><![CDATA[Databasen din er av nyeste versjon! Klikk <strong>neste</strong> for å fortsette konfigurasjonsveiviseren]]></key>
     <key alias="defaultUserChangePass"><![CDATA[<strong>Passordet til standardbrukeren må endres!]]></key>
-    <key alias="defaultUserDisabled"><![CDATA[<strong>Standardbrukeren har blitt deaktivert eller har ingen tilgang til Umbraco!</strong></p><p>Ingen videre handling er nødvendig. Klikk <b>neste</b> for å fortsette.]]></key>
+    <key alias="defaultUserDisabled"><![CDATA[<strong>Standardbrukeren har blitt deaktivert eller har ingen tilgang til Umbraco!</strong></p><p>Ingen videre handling er nødvendig. Klikk <strong>neste</strong> for å fortsette.]]></key>
     <key alias="defaultUserPassChanged"><![CDATA[<strong>Passordet til standardbrukeren har blitt forandret etter installasjonen!</strong></p><p>Ingen videre handling er nødvendig. Klikk <strong>Neste</strong> for å fortsette.]]></key>
     <key alias="defaultUserPasswordChanged">Passordet er blitt endret!</key>
     <key alias="greatStart">Få en god start med våre introduksjonsvideoer</key>
