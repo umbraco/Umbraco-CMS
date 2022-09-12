@@ -9,6 +9,12 @@ namespace Umbraco.Cms.Core.Models.ContentEditing;
 [DataContract(Name = "dictionaryTranslation", Namespace = "")]
 public class DictionaryTranslationDisplay : DictionaryTranslationSave
 {
+    [DataMember(Name = "id")]
+    public int Id { get; set; }
+
+    [DataMember(Name = "key")]
+    public Guid Key { get; set; }
+
     /// <summary>
     ///     Gets or sets the display name.
     /// </summary>
