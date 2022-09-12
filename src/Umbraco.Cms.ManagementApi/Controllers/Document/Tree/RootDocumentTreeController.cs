@@ -24,6 +24,6 @@ public class RootDocumentTreeController : DocumentTreeControllerBase
     [HttpGet("root")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedResult<DocumentTreeItemViewModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedResult<DocumentTreeItemViewModel>>> Root(long pageNumber = 0, int pageSize = 100)
-        => await GetRoot(pageNumber, pageSize);
+    public async Task<ActionResult<PagedResult<DocumentTreeItemViewModel>>> Root(long pageNumber = 0, int pageSize = 100, string? culture = null)
+        => await GetRoot(pageNumber, pageSize, culture);
 }

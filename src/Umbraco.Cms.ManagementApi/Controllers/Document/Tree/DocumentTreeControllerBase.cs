@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.ManagementApi.Controllers.Tree;
 using Umbraco.Cms.ManagementApi.Services.Entities;
 using Umbraco.Cms.ManagementApi.ViewModels.Tree;
+using Umbraco.Extensions;
 using Umbraco.New.Cms.Web.Common.Routing;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.Document.Tree;
@@ -22,6 +23,7 @@ public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBa
     private readonly IPublicAccessService _publicAccessService;
     private readonly AppCaches _appCaches;
     private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
+    private string? _culture;
 
     protected DocumentTreeControllerBase(
         IEntityService entityService,
@@ -38,6 +40,27 @@ public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBa
 
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.Document;
 
+    protected async Task<ActionResult<PagedResult<DocumentTreeItemViewModel>>> GetRoot(long pageNumber, int pageSize, string? culture)
+    {
+        // save culture state for item mapping
+        _culture = culture;
+        return await GetRoot(pageNumber, pageSize);
+    }
+
+    protected async Task<ActionResult<PagedResult<DocumentTreeItemViewModel>>> GetChildren(Guid parentKey, long pageNumber, int pageSize, string? culture)
+    {
+        // save culture state for item mapping
+        _culture = culture;
+        return await GetChildren(parentKey, pageNumber, pageSize);
+    }
+
+    protected async Task<ActionResult<PagedResult<DocumentTreeItemViewModel>>> GetItems(Guid[] keys, string? culture)
+    {
+        // save culture state for item mapping
+        _culture = culture;
+        return await GetItems(keys);
+    }
+
     protected override DocumentTreeItemViewModel MapTreeItemViewModel(Guid? parentKey, IEntitySlim entity)
     {
         DocumentTreeItemViewModel viewModel = base.MapTreeItemViewModel(parentKey, entity);
@@ -48,6 +71,18 @@ public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBa
             viewModel.IsEdited = documentEntitySlim.Edited;
             viewModel.Icon = documentEntitySlim.ContentTypeIcon ?? viewModel.Icon;
             viewModel.IsProtected = _publicAccessService.IsProtected(entity.Path);
+
+            if (_culture != null && documentEntitySlim.Variations.VariesByCulture())
+            {
+                viewModel.Name = documentEntitySlim.CultureNames.TryGetValue(_culture, out var cultureName)
+                    ? cultureName
+                    : $"({viewModel.Name})";
+
+                viewModel.IsPublished = documentEntitySlim.PublishedCultures.Contains(_culture);
+                viewModel.IsEdited = documentEntitySlim.EditedCultures.Contains(_culture);
+            }
+
+            viewModel.IsEdited &= viewModel.IsPublished;
         }
 
         return viewModel;

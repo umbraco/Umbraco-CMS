@@ -24,6 +24,6 @@ public class ItemsDocumentTreeController : DocumentTreeControllerBase
     [HttpGet("items")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedResult<DocumentTreeItemViewModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedResult<DocumentTreeItemViewModel>>> Items([FromQuery(Name = "key")] Guid[] keys)
-        => await GetItems(keys);
+    public async Task<ActionResult<PagedResult<DocumentTreeItemViewModel>>> Items([FromQuery(Name = "key")] Guid[] keys, string? culture = null)
+        => await GetItems(keys, culture);
 }
