@@ -4,6 +4,7 @@ using System.Data;
 using System.Data.Common;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -49,6 +50,7 @@ public class SqliteTestDatabase : BaseTestDatabase, ITestDatabase
 
     public override void Detach(TestDbMeta meta)
     {
+        Current = null;
         meta.Connection.Close();
         _prepareQueue.TryAdd(CreateSqLiteMeta(meta.IsEmpty));
     }
@@ -64,11 +66,11 @@ public class SqliteTestDatabase : BaseTestDatabase, ITestDatabase
             _prepareQueue.Add(meta);
         }
 
-        for (var i = 0; i < _settings.PrepareThreadCount; i++)
-        {
-            var thread = new Thread(PrepareDatabase);
-            thread.Start();
-        }
+        var tasks = Enumerable.Range(0, _settings.PrepareThreadCount)
+            .Select(x => Task.Factory.StartNew(PrepareDatabase))
+            .ToArray();
+
+        Task.WaitAll(tasks);
     }
 
     protected override void ResetTestDatabase(TestDbMeta meta)
