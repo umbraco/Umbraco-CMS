@@ -2880,6 +2880,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="confirmPasteDisallowedNestedBlockHeadline">Disallowed content was rejected</key>
     <key alias="confirmPasteDisallowedNestedBlockMessage">
       <![CDATA[The inserted content contained disallowed content, which has not been created. Would you like to keep the rest of this content anyway?]]></key>
+    <key alias="areaAliasHelp">
+      <![CDATA[The alias will be printed by GetBlockGridHTML(), use the alias to target the Element representing this area. Ex. .umb-block-grid__area[data-area-alias="MyAreaAlias"] { ... }]]></key>
   </area>
   <area alias="contentTemplatesDashboard">
     <key alias="whatHeadline">What are Content Templates?</key>

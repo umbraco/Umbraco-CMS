@@ -62,8 +62,6 @@
                 var isMaxRequirementGood = vm.areaConfig.maxAllowed == null || vm.entries.length <= vm.areaConfig.maxAllowed;
                 vm.parentForm.areaMaxCount.$setValidity("areaMaxCount", isMaxRequirementGood);
 
-
-                // TODO: Figure out if type requirements are good?
                 vm.areaConfig.specifiedAllowance.forEach(allowance => {
 
                     vm.invalidBlockTypes = vm.invalidBlockTypes.filter(type => type.key !== allowance.elementTypeKey)

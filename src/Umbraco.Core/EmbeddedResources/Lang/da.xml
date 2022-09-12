@@ -2227,6 +2227,11 @@ Mange hilsner fra Umbraco robotten
     <key alias="areasConfigurationsHelp">Hvis det skal være muligt at indsætte nye blokke indeni denne blok, skal der oprettes ét eller flere områder til at indsætte de nye blokke i.</key>
     <key alias="invalidDropPosition">Ikke tilladt placering.</key>
     <key alias="defaultLayoutStylesheet">Standart layout stylesheet</key>
+    <key alias="confirmPasteDisallowedNestedBlockHeadline">Ikke tilladt indhold blev afvist</key>
+    <key alias="confirmPasteDisallowedNestedBlockMessage">
+      <![CDATA[Det indsatte indhold bestod af ikke tilladt del-indhold, disse dele er blevet afvist. Vil du beholde det resterene alligevel?]]></key>
+    <key alias="areaAliasHelp">
+      <![CDATA[Dette alias skrives ud via GetBlockGridHTML(), brug aliaset til at fange det element der repræsentere dette område. F.eks.. .umb-block-grid__area[data-area-alias="MitOmraadeAlias"] { ... }]]></key>
   </area>
   <area alias="contentTemplatesDashboard">
     <key alias="whatHeadline">Hvad er Indholdsskabeloner?</key>

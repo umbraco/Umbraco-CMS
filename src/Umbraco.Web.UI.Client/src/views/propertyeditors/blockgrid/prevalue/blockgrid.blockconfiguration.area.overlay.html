@@ -27,6 +27,9 @@
                             <div class="control-group umb-control-group -no-border">
                                 <div class="umb-el-wrap">
                                     <label class="control-label" for="alias"><localize key="general_alias">Alias</localize></label>
+                                    <umb-property-info-button button-title-key="general_readMore">
+                                        <localize key="blockEditor_areaAliasHelp">The alias will be printed by GetBlockGridHTML(), use the alias to target the Element representing this area. Ex. .umb-block-grid__area[data-area-alias="MyAreaAlias"] { ... }</localize>
+                                    </umb-property-info-button>
                                     <div class="controls">
                                         <input type="text" name="alias" ng-model="vm.area.alias" style="width:100%" umb-auto-focus/>
                                     </div>
