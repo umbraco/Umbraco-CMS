@@ -450,6 +450,7 @@
                     var newValue = (dragX - dragOffsetX < targetRect.left + 30);
                     if(newValue !== oldValue) {
                         vm.movingLayoutEntry.forceLeft = newValue;
+                        vm.blockEditorApi.internal.setDirty();
                         vm.movingLayoutEntry.$block.__scope.$evalAsync();// needed for the block to be updated
                     }
 
@@ -457,6 +458,7 @@
                     newValue = (dragX - dragOffsetX + ghostRect.width > targetRect.right - 30) && (vm.movingLayoutEntry.forceLeft !== true);
                     if(newValue !== oldValue) {
                         vm.movingLayoutEntry.forceRight = newValue;
+                        vm.blockEditorApi.internal.setDirty();
                         vm.movingLayoutEntry.$block.__scope.$evalAsync();// needed for the block to be updated
                     }
                 }
@@ -516,6 +518,10 @@
                     
                     const oldIndex = evt.oldIndex;
                     vm.movingLayoutEntry = contextVM.getLayoutEntry(oldIndex);
+                    if(vm.movingLayoutEntry.forceLeft ||  vm.movingLayoutEntry.forceRight) {
+                        // if one of these where true before, then we made a change here:
+                        vm.blockEditorApi.internal.setDirty();
+                    }
                     vm.movingLayoutEntry.forceLeft = false;
                     vm.movingLayoutEntry.forceRight = false;
                     vm.movingLayoutEntry.$block.__scope.$evalAsync();// needed for the block to be updated
@@ -555,16 +561,21 @@
 
                     return true;
                 },
+                
                 /*
+                // When runtime dragging around:
                 onChange: function (evt) {
-                    console.log('onChange', evt)
-                    //evt.oldIndex;  // element index within parent
-                },
-                onSort: function (evt) {
-                    console.log('onSort', evt)
+                    //console.log('onChange', evt)
                     //evt.oldIndex;  // element index within parent
                 },
                 */
+                // When an change actually was made, after drop has occurred:
+                onSort: function (evt) {
+                    //console.log('onSort', evt)
+                    //evt.oldIndex;  // element index within parent
+                    vm.blockEditorApi.internal.setDirty();
+                },
+                
                 onAdd: function (evt) {
                     //console.log("# onAdd")
                     _sync(evt);
@@ -669,12 +680,6 @@
                 }
                 */
             });
-
-
-            console.log("sortable", sortable)
-
-
-            // TODO: setDirty if sort has happened.
 
             $scope.$on('$destroy', function () {
                 sortable.destroy()

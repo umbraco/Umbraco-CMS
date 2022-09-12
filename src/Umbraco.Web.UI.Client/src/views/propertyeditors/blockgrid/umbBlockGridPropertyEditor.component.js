@@ -178,6 +178,7 @@
             onLoaded();
         }
 
+        vm.setDirty = setDirty;
         function setDirty() {
             if (vm.propertyForm) {
                 vm.propertyForm.$setDirty();

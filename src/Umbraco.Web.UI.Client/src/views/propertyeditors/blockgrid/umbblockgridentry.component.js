@@ -129,12 +129,14 @@
             if(vm.layoutEntry.forceLeft) {
                 vm.layoutEntry.forceRight = false;
             }
+            vm.blockEditorApi.internal.setDirty();
         }
         vm.toggleForceRight = function() {
             vm.layoutEntry.forceRight = !vm.layoutEntry.forceRight;
             if(vm.layoutEntry.forceRight) {
                 vm.layoutEntry.forceLeft = false;
             }
+            vm.blockEditorApi.internal.setDirty();
         }
 
         // Block sizing functionality:
@@ -315,6 +317,7 @@
             // Update block size:
             vm.layoutEntry.columnSpan = newSpans.columnSpan;
             vm.layoutEntry.rowSpan = newSpans.rowSpan;
+            vm.blockEditorApi.internal.setDirty();
             $scope.$evalAsync();
         }
 
@@ -349,6 +352,7 @@
             }
             vm.layoutEntry.rowSpan = newRowSpan;
 
+            vm.blockEditorApi.internal.setDirty();
             $event.originalEvent.stopPropagation();
         }
 
