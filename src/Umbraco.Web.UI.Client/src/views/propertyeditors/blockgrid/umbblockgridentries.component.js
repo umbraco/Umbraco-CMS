@@ -445,7 +445,7 @@
                     // Maybe its enough?
 
                     var oldValue = vm.movingLayoutEntry.forceLeft;
-                    var newValue = (dragX - dragOffsetX < targetRect.left + 30);
+                    var newValue = (dragX - dragOffsetX < targetRect.left - 20);
                     if(newValue !== oldValue) {
                         vm.movingLayoutEntry.forceLeft = newValue;
                         vm.blockEditorApi.internal.setDirty();
@@ -453,7 +453,7 @@
                     }
 
                     oldValue = vm.movingLayoutEntry.forceRight;
-                    newValue = (dragX - dragOffsetX + ghostRect.width > targetRect.right - 30) && (vm.movingLayoutEntry.forceLeft !== true);
+                    newValue = (dragX - dragOffsetX + ghostRect.width > targetRect.right + 20) && (vm.movingLayoutEntry.forceLeft !== true);
                     if(newValue !== oldValue) {
                         vm.movingLayoutEntry.forceRight = newValue;
                         vm.blockEditorApi.internal.setDirty();
