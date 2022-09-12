@@ -34,7 +34,7 @@ public class GetHelpController : HelpControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(PagedViewModel<HelpPageViewModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Get(string section, string tree, int skip, int take, string? baseUrl = "https://our.umbraco.com")
+    public async Task<IActionResult> Get(string section, string? tree, int skip, int take, string? baseUrl = "https://our.umbraco.com")
     {
         if (IsAllowedUrl(baseUrl) is false)
         {
