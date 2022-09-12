@@ -354,10 +354,11 @@
 
                     //console.log("calc", ghostRect.left,  ghostRect.top, "  |  ", dragRect.left, dragRect.top, "              calc: ", oldDistanceY, " < ", newDistanceY);
                     //&& oldDistance <= newDistance
-                    if(!isCursorGood || oldDistance <= newDistance) {
-                        console.log("rejected because existing is closer", evt.willInsertAfter);
+                    //!isCursorGood || 
+                    /*if(oldDistance <= newDistance) {
+                        console.log("rejected because existing is closer", !isCursorGood, oldDistance <= newDistance, evt.willInsertAfter);
                         return false;
-                    }
+                    }*/
 
                     awaitingTarget = {related: evt.related, after: evt.willInsertAfter};
                     clearTimeout(timeout);
@@ -483,7 +484,7 @@
                 //chosenClass: "sortable-chosen",  // Class name for the chosen item
                 //dragClass: "sortable-drag",  // Class name for the dragging item
 
-                swapThreshold: .45, // Threshold of the swap zone
+                swapThreshold: .4, // Threshold of the swap zone
                 //invertSwap: true, // Will always use inverted swap zone if set to true
                 //invertedSwapThreshold: .55, // Threshold of the inverted swap zone (will be set to swapThreshold value by default)
                 //direction: 'horizontal', // Direction of Sortable (will be detected automatically if not given)
@@ -503,7 +504,7 @@
 
                 dragoverBubble: true,
                 //removeCloneOnHide: true, // Remove the clone element when it is not showing, rather than just hiding it
-                emptyInsertThreshold: 120, // px, distance mouse must be from empty sortable to insert drag element into it
+                emptyInsertThreshold: 160, // px, distance mouse must be from empty sortable to insert drag element into it
 
                 onStart: function (evt) {
                     //nextSibling = evt.from === evt.item.parentNode ? evt.item.nextSibling : evt.clone.nextSibling;

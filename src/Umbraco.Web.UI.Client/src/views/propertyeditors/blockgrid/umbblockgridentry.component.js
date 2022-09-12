@@ -268,10 +268,10 @@
             const endRow = newSpans.startRow + newSpans.rowSpan;
 
 
-            const startCellX =  getAccumulatedValueOfIndex(newSpans.startCol, gridColumns);
-            const startCellY =  getAccumulatedValueOfIndex(newSpans.startRow, gridRows);
-            const endCellX =  getAccumulatedValueOfIndex(endCol, gridColumns);
-            const endCellY =  getAccumulatedValueOfIndex(endRow, gridRows);
+            //const startCellX =  getAccumulatedValueOfIndex(newSpans.startCol, gridColumns);
+            //const startCellY =  getAccumulatedValueOfIndex(newSpans.startRow, gridRows);
+            //const endCellX =  getAccumulatedValueOfIndex(endCol, gridColumns);
+            //const endCellY =  getAccumulatedValueOfIndex(endRow, gridRows);
 
             //scaleBoxEl.style.width = Math.round(endCellX-startCellX)+'px';
             //scaleBoxEl.style.height = Math.round(endCellY-startCellY)+'px';
