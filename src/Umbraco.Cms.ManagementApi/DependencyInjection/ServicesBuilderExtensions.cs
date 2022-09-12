@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.ManagementApi.Services;
 using Umbraco.New.Cms.Core.Services.Installer;
 using Umbraco.New.Cms.Core.Services.Languages;
 
@@ -9,8 +10,8 @@ public static class ServicesBuilderExtensions
 {
     internal static IUmbracoBuilder AddServices(this IUmbracoBuilder builder)
     {
+        builder.Services.AddTransient<IJsonPatchService, JsonPatchService>();
         builder.Services.AddTransient<ILanguageService, LanguageService>();
         return builder;
     }
-
 }

@@ -13,17 +13,32 @@ namespace Umbraco.Cms.Core.Models.Mapping;
 public class DictionaryMapDefinition : IMapDefinition
 {
     private readonly CommonMapper? _commonMapper;
+    private readonly IDictionaryService _dictionaryService;
     private readonly ILocalizationService _localizationService;
 
     [Obsolete("Use the constructor with the CommonMapper")]
-    public DictionaryMapDefinition(ILocalizationService localizationService) : this(localizationService, StaticServiceProvider.Instance.GetRequiredService<CommonMapper>())
+    public DictionaryMapDefinition(ILocalizationService localizationService)
+        : this(
+        localizationService,
+        StaticServiceProvider.Instance.GetRequiredService<CommonMapper>(),
+        StaticServiceProvider.Instance.GetRequiredService<IDictionaryService>())
     {
     }
 
+    [Obsolete("Use the constructor with the CommonMapper, and IDictionaryService")]
     public DictionaryMapDefinition(ILocalizationService localizationService, CommonMapper commonMapper)
+        : this(
+        localizationService,
+        commonMapper,
+        StaticServiceProvider.Instance.GetRequiredService<IDictionaryService>())
+    {
+    }
+
+    public DictionaryMapDefinition(ILocalizationService localizationService, CommonMapper commonMapper, IDictionaryService dictionaryService)
     {
         _localizationService = localizationService;
         _commonMapper = commonMapper;
+        _dictionaryService = dictionaryService;
     }
 
     public void DefineMaps(IUmbracoMapper mapper)
@@ -44,22 +59,6 @@ public class DictionaryMapDefinition : IMapDefinition
         target.Name = source.ItemKey;
     }
 
-    private static void GetParentId(Guid parentId, ILocalizationService localizationService, List<int> ids)
-    {
-        IDictionaryItem? dictionary = localizationService.GetDictionaryItemById(parentId);
-        if (dictionary == null)
-        {
-            return;
-        }
-
-        ids.Add(dictionary.Id);
-
-        if (dictionary.ParentId.HasValue)
-        {
-            GetParentId(dictionary.ParentId.Value, localizationService, ids);
-        }
-    }
-
     // Umbraco.Code.MapAll -Icon -Trashed -Alias
     private void Map(IDictionaryItem source, DictionaryDisplay target, MapperContext context)
     {
@@ -73,22 +72,7 @@ public class DictionaryMapDefinition : IMapDefinition
             target.ContentApps.AddRange(_commonMapper.GetContentAppsForEntity(source));
         }
 
-        // build up the path to make it possible to set active item in tree
-        // TODO: check if there is a better way
-        if (source.ParentId.HasValue)
-        {
-            var ids = new List<int> { -1 };
-            var parentIds = new List<int>();
-            GetParentId(source.ParentId.Value, _localizationService, parentIds);
-            parentIds.Reverse();
-            ids.AddRange(parentIds);
-            ids.Add(source.Id);
-            target.Path = string.Join(",", ids);
-        }
-        else
-        {
-            target.Path = "-1," + source.Id;
-        }
+        target.Path = _dictionaryService.CalculatePath(source.ParentId, source.Id);
 
         // add all languages and  the translations
         foreach (ILanguage lang in _localizationService.GetAllLanguages())
