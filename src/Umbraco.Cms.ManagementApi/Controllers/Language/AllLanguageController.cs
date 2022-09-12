@@ -10,12 +10,12 @@ using Umbraco.New.Cms.Core.Models;
 namespace Umbraco.Cms.ManagementApi.Controllers.Language;
 
 [ApiVersion("1.0")]
-public class GetAllLanguageController : LanguageControllerBase
+public class AllLanguageController : LanguageControllerBase
 {
     private readonly ILocalizationService _localizationService;
     private readonly IUmbracoMapper _umbracoMapper;
 
-    public GetAllLanguageController(ILocalizationService localizationService, IUmbracoMapper umbracoMapper)
+    public AllLanguageController(ILocalizationService localizationService, IUmbracoMapper umbracoMapper)
     {
         _localizationService = localizationService;
         _umbracoMapper = umbracoMapper;
@@ -32,6 +32,5 @@ public class GetAllLanguageController : LanguageControllerBase
         PagedModel<ILanguage> allLanguages = _localizationService.GetAllLanguagesPaged(skip, take);
 
         return _umbracoMapper.Map<PagedModel<ILanguage>, PagedViewModel<LanguageViewModel>>(allLanguages);
-
     }
 }
