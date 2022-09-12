@@ -49,6 +49,10 @@
         <ProjectReference Include="..\Umbraco.Web.Common\Umbraco.Web.Common.csproj" />
     </ItemGroup>
 
+  <ItemGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <ProjectReference Include="..\Umbraco.Cms.ManagementApi\Umbraco.Cms.ManagementApi.csproj" />
+  </ItemGroup>
+
     <ItemGroup>
       <EmbeddedResource Include="EmbeddedResources\**\*" />
     </ItemGroup>

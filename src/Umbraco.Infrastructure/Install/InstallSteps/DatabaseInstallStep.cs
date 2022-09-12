@@ -6,6 +6,7 @@ using Umbraco.Cms.Infrastructure.Migrations.Install;
 
 namespace Umbraco.Cms.Infrastructure.Install.InstallSteps;
 
+[Obsolete("Will be replace with a new step with the new backoffice")]
 [InstallSetupStep(InstallationType.NewInstall | InstallationType.Upgrade, "DatabaseInstall", 11, "")]
 public class DatabaseInstallStep : InstallSetupStep<object>
 {

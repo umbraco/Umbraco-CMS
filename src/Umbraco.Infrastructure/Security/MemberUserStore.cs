@@ -107,7 +107,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
                     ? Constants.Security.DefaultMemberTypeAlias
                     : user.MemberTypeAlias!);
 
-            UpdateMemberProperties(memberEntity, user);
+            UpdateMemberProperties(memberEntity, user, out bool _);
 
             // create the member
             _memberService.Save(memberEntity);
@@ -188,9 +188,15 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
                 var isLoginsPropertyDirty = user.IsPropertyDirty(nameof(MemberIdentityUser.Logins));
                 var isTokensPropertyDirty = user.IsPropertyDirty(nameof(MemberIdentityUser.LoginTokens));
 
-                if (UpdateMemberProperties(found, user))
+                if (UpdateMemberProperties(found, user, out var updateRoles))
                 {
                     _memberService.Save(found);
+
+                    if (updateRoles)
+                    {
+                        var identityUserRoles = user.Roles.Select(x => x.RoleId).ToArray();
+                        _memberService.ReplaceRoles(new[] { found.Id }, identityUserRoles);
+                    }
                 }
 
                 if (isLoginsPropertyDirty)
@@ -662,9 +668,10 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
         return user;
     }
 
-    private bool UpdateMemberProperties(IMember member, MemberIdentityUser identityUser)
+    private bool UpdateMemberProperties(IMember member, MemberIdentityUser identityUser, out bool updateRoles)
     {
         var anythingChanged = false;
+        updateRoles = false;
 
         // don't assign anything if nothing has changed as this will trigger the track changes of the model
         if (identityUser.IsPropertyDirty(nameof(MemberIdentityUser.LastLoginDateUtc))
@@ -777,9 +784,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
         if (identityUser.IsPropertyDirty(nameof(MemberIdentityUser.Roles)))
         {
             anythingChanged = true;
-
-            var identityUserRoles = identityUser.Roles.Select(x => x.RoleId).ToArray();
-            _memberService.ReplaceRoles(new[] { member.Id }, identityUserRoles);
+            updateRoles = true;
         }
 
         // reset all changes

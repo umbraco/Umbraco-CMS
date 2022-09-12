@@ -16,7 +16,6 @@
       <DefineConstants>TRACE_SCOPES;</DefineConstants>
     </PropertyGroup>
 
-
     <ItemGroup>
       <PackageReference Include="HtmlAgilityPack" Version="1.11.43" />
       <PackageReference Include="MailKit" Version="3.2.0" />
@@ -118,6 +117,9 @@
         </AssemblyAttribute>
         <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
             <_Parameter1>DynamicProxyGenAssembly2</_Parameter1>
+        </AssemblyAttribute>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+          <_Parameter1>Umbraco.New.Cms.Infrastructure</_Parameter1>
         </AssemblyAttribute>
     </ItemGroup>
 
