@@ -39,6 +39,9 @@ public class HasIndexRebuiltExamineManagementController : ExamineManagementContr
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ExamineIndexViewModel), StatusCodes.Status200OK)]
+    // This endpoint for now will throw errors if the ExamineIndexViewModel ever has providerProperties defined
+    // This is because System.Text.Json cannot serialize dictionary<string, object>
+    // This has been fixed in .NET 7, so this will work when we upgrade: https://github.com/dotnet/runtime/issues/67588
     public async Task<ActionResult<ExamineIndexViewModel?>> HasIndexRebuilt(string indexName)
     {
         if (!_examineManagerService.ValidateIndex(indexName, out IIndex? index))
