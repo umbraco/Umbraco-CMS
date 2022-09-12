@@ -601,7 +601,7 @@
     <key alias="databaseUpgradeDone"><![CDATA[La base de datos ha sido actualizada a la versión 0%.<br />Pincha en <strong>Próximo</strong> para continuar. ]]></key>
     <key alias="databaseUpToDate"><![CDATA[La base de datos está actualizada. Pincha en <strong>próximo</strong> para continuar con el asistente de configuración]]></key>
     <key alias="defaultUserChangePass"><![CDATA[<strong>La contraseña del usuario por defecto debe ser cambiada</strong>]]></key>
-    <key alias="defaultUserDisabled"><![CDATA[<strong>El usuario por defecto ha sido deshabilitado o ha perdido el acceso a Umbraco!</strong></p><p>Pincha en <b>Próximo</b> para continuar.]]></key>
+    <key alias="defaultUserDisabled"><![CDATA[<strong>El usuario por defecto ha sido deshabilitado o ha perdido el acceso a Umbraco!</strong></p><p>Pincha en <strong>Próximo</strong> para continuar.]]></key>
     <key alias="defaultUserPassChanged"><![CDATA[<strong>¡La contraseña del usuario por defecto ha sido cambiada desde que se instaló!</strong></p><p>No hay que realizar ninguna tarea más. Pulsa <strong>Siguiente</strong> para proseguir.]]></key>
     <key alias="defaultUserPasswordChanged">¡La contraseña se ha cambiado!</key>
     <key alias="greatStart">Ten un buen comienzo, visita nuestros videos de introducción</key>
