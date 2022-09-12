@@ -21,7 +21,7 @@ public class SearchExamineManagementController : ExamineManagementControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<PagedViewModel<SearchResultViewModel>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public ActionResult<PagedViewModel<SearchResultViewModel>> GetSearchResults(string searcherName, string? query, int skip, int take)
+    public async Task<ActionResult<PagedViewModel<SearchResultViewModel>>> GetSearchResults(string searcherName, string? query, int skip, int take)
     {
         query = query?.Trim();
 

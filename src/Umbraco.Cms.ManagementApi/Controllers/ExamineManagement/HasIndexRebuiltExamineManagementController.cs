@@ -39,7 +39,7 @@ public class HasIndexRebuiltExamineManagementController : ExamineManagementContr
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ExamineIndexViewModel), StatusCodes.Status200OK)]
-    public ActionResult<ExamineIndexViewModel?> HasIndexRebuilt(string indexName)
+    public async Task<ActionResult<ExamineIndexViewModel?>> HasIndexRebuilt(string indexName)
     {
         if (!_examineManagerService.ValidateIndex(indexName, out IIndex? index))
         {
