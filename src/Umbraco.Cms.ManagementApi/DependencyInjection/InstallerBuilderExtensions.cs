@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.ManagementApi.Mapping.Dictionary;
 using Umbraco.Cms.ManagementApi.Mapping.Installer;
 using Umbraco.New.Cms.Core.Factories;
 using Umbraco.New.Cms.Core.Installer;
@@ -19,7 +20,8 @@ public static class InstallerBuilderExtensions
         IServiceCollection services = builder.Services;
 
         builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>()
-            .Add<InstallerViewModelsMapDefinition>();
+            .Add<InstallerViewModelsMapDefinition>()
+            .Add<DictionaryViewModelMapDefinition>();
 
         services.AddTransient<IUserSettingsFactory, UserSettingsFactory>();
         services.AddTransient<IInstallSettingsFactory, InstallSettingsFactory>();

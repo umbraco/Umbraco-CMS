@@ -569,7 +569,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         {"minimumPasswordNonAlphaNum", _memberPasswordConfigurationSettings.GetMinNonAlphaNumericChars()},
                         {"sanitizeTinyMce", _globalSettings.SanitizeTinyMce},
                         {"dataTypesCanBeChanged", _dataTypesSettings.CanBeChanged.ToString()},
-                        {"allowEditInvariantFromNonDefault", _securitySettings.AllowEditInvariantFromNonDefault},
+                        {"allowEditInvariantFromNonDefault", _contentSettings.AllowEditInvariantFromNonDefault},
                     }
                 },
                 {
