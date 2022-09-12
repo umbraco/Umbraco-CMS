@@ -5,11 +5,13 @@ using Umbraco.New.Cms.Core.Factories;
 
 namespace Umbraco.Cms.ManagementApi.DependencyInjection;
 
-public static class FactoriesBuilderExtensions
+public static class FactoryBuilderExtensions
 {
     internal static IUmbracoBuilder AddFactories(this IUmbracoBuilder builder)
     {
+        builder.Services.AddTransient<IPagedViewModelFactory, PagedViewModelFactory>();
         builder.Services.AddTransient<IDictionaryFactory, DictionaryFactory>();
         return builder;
     }
+
 }
