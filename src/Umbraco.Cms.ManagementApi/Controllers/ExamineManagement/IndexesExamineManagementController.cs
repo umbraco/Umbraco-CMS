@@ -5,7 +5,6 @@ using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.ManagementApi.Factories;
 using Umbraco.Cms.ManagementApi.ViewModels.ExamineManagement;
 using Umbraco.Cms.ManagementApi.ViewModels.Pagination;
-using Umbraco.Cms.ManagementApi.ViewModels.Server;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.ExamineManagement;

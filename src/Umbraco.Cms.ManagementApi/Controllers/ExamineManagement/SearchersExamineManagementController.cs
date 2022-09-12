@@ -8,6 +8,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.ExamineManagement;
 
+[ApiVersion("1.0")]
 public class SearchersExamineManagementController : ExamineManagementControllerBase
 {
     private readonly IExamineManager _examineManager;

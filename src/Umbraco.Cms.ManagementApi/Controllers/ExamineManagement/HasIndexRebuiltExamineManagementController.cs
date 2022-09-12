@@ -17,11 +17,11 @@ public class HasIndexRebuiltExamineManagementController : ExamineManagementContr
     private readonly IExamineManagerService _examineManagerService;
 
     public HasIndexRebuiltExamineManagementController(
-        IAppPolicyCache runtimeCache,
+        AppCaches runtimeCache,
         IExamineIndexModelFactory examineIndexModelFactory,
         IExamineManagerService examineManagerService)
     {
-        _runtimeCache = runtimeCache;
+        _runtimeCache = runtimeCache.RuntimeCache;
         _examineIndexModelFactory = examineIndexModelFactory;
         _examineManagerService = examineManagerService;
     }
@@ -35,11 +35,11 @@ public class HasIndexRebuiltExamineManagementController : ExamineManagementContr
     ///     This is kind of rudimentary since there's no way we can know that the index has rebuilt, we
     ///     have a listener for the index op complete so we'll just check if that key is no longer there in the runtime cache
     /// </remarks>
-    [HttpGet("status")]
+    [HttpGet("hasIndexRebuilt")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ExamineIndexViewModel), StatusCodes.Status200OK)]
-    public ActionResult<ExamineIndexViewModel?> PostCheckRebuildIndex(string indexName)
+    public ActionResult<ExamineIndexViewModel?> HasIndexRebuilt(string indexName)
     {
         if (!_examineManagerService.ValidateIndex(indexName, out IIndex? index))
         {

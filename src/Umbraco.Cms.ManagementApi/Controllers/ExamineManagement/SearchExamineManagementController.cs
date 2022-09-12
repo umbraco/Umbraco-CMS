@@ -10,6 +10,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.ExamineManagement;
 
+[ApiVersion("1.0")]
 public class SearchExamineManagementController : ExamineManagementControllerBase
 {
     private readonly IExamineManagerService _examineManagerService;
