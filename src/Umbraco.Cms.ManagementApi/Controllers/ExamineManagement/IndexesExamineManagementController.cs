@@ -13,13 +13,13 @@ namespace Umbraco.Cms.ManagementApi.Controllers.ExamineManagement;
 public class IndexesExamineManagementController : ExamineManagementControllerBase
 {
     private readonly IExamineManager _examineManager;
-    private readonly IExamineIndexModelFactory _examineIndexModelFactory;
+    private readonly IExamineIndexViewModelFactory _examineIndexViewModelFactory;
     public IndexesExamineManagementController(
         IExamineManager examineManager,
-        IExamineIndexModelFactory examineIndexModelFactory)
+        IExamineIndexViewModelFactory examineIndexViewModelFactory)
     {
         _examineManager = examineManager;
-        _examineIndexModelFactory = examineIndexModelFactory;
+        _examineIndexViewModelFactory = examineIndexViewModelFactory;
     }
 
     /// <summary>
@@ -35,7 +35,7 @@ public class IndexesExamineManagementController : ExamineManagementControllerBas
     public async Task<PagedViewModel<ExamineIndexViewModel>> Indexes(int skip, int take)
     {
         ExamineIndexViewModel[] indexes = _examineManager.Indexes
-            .Select(_examineIndexModelFactory.Create)
+            .Select(_examineIndexViewModelFactory.Create)
             .OrderBy(examineIndexModel => examineIndexModel.Name?.TrimEnd("Indexer")).ToArray();
 
         var viewModel = new PagedViewModel<ExamineIndexViewModel> { Items = indexes.Skip(skip).Take(take), Total = indexes.Length };

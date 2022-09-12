@@ -5,12 +5,12 @@ using Umbraco.Cms.ManagementApi.ViewModels.ExamineManagement;
 
 namespace Umbraco.Cms.ManagementApi.Factories;
 
-public class ExamineIndexModelFactory : IExamineIndexModelFactory
+public class ExamineIndexViewModelFactory : IExamineIndexViewModelFactory
 {
     private readonly IIndexDiagnosticsFactory _indexDiagnosticsFactory;
     private readonly IIndexRebuilder _indexRebuilder;
 
-    public ExamineIndexModelFactory(IIndexDiagnosticsFactory indexDiagnosticsFactory, IIndexRebuilder indexRebuilder)
+    public ExamineIndexViewModelFactory(IIndexDiagnosticsFactory indexDiagnosticsFactory, IIndexRebuilder indexRebuilder)
     {
         _indexDiagnosticsFactory = indexDiagnosticsFactory;
         _indexRebuilder = indexRebuilder;

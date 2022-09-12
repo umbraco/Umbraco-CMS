@@ -13,16 +13,16 @@ namespace Umbraco.Cms.ManagementApi.Controllers.ExamineManagement;
 public class HasIndexRebuiltExamineManagementController : ExamineManagementControllerBase
 {
     private readonly IAppPolicyCache _runtimeCache;
-    private readonly IExamineIndexModelFactory _examineIndexModelFactory;
+    private readonly IExamineIndexViewModelFactory _examineIndexViewModelFactory;
     private readonly IExamineManagerService _examineManagerService;
 
     public HasIndexRebuiltExamineManagementController(
         AppCaches runtimeCache,
-        IExamineIndexModelFactory examineIndexModelFactory,
+        IExamineIndexViewModelFactory examineIndexViewModelFactory,
         IExamineManagerService examineManagerService)
     {
         _runtimeCache = runtimeCache.RuntimeCache;
-        _examineIndexModelFactory = examineIndexModelFactory;
+        _examineIndexViewModelFactory = examineIndexViewModelFactory;
         _examineManagerService = examineManagerService;
     }
 
@@ -76,6 +76,6 @@ public class HasIndexRebuiltExamineManagementController : ExamineManagementContr
         // if its still there then it's not done
         return found != null
             ? null
-            : _examineIndexModelFactory.Create(index!);
+            : _examineIndexViewModelFactory.Create(index!);
     }
 }
