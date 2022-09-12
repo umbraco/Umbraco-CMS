@@ -10,6 +10,7 @@ public static class FactoryBuilderExtensions
     internal static IUmbracoBuilder AddFactories(this IUmbracoBuilder builder)
     {
         builder.Services.AddTransient<IPagedViewModelFactory, PagedViewModelFactory>();
+        builder.Services.AddTransient<IRelationViewModelFactory, RelationViewModelFactory>();
         builder.Services.AddTransient<IDictionaryFactory, DictionaryFactory>();
         return builder;
     }
