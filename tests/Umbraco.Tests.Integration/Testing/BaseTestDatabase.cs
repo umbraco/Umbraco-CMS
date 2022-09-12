@@ -13,7 +13,7 @@ using Umbraco.Cms.Infrastructure.Persistence;
 
 namespace Umbraco.Cms.Tests.Integration.Testing;
 
-public abstract class BaseTestDatabase
+public abstract class BaseTestDatabase : ITestDatabase
 {
     protected IUmbracoDatabaseFactory _databaseFactory;
 
@@ -48,10 +48,18 @@ public abstract class BaseTestDatabase
             Initialize();
         }
 
-        return _readySchemaQueue.Take();
+        
+        Current = _readySchemaQueue.Take();
+        return Current!;
     }
 
-    public virtual void Detach(TestDbMeta meta) => _prepareQueue.TryAdd(meta);
+    public virtual void Detach(TestDbMeta meta)
+    {
+        Current = null;
+        _prepareQueue.TryAdd(meta);
+    }
+
+    public TestDbMeta? Current { get; set; }
 
     protected virtual void PrepareDatabase() =>
         Retry(10, () =>
@@ -59,12 +67,15 @@ public abstract class BaseTestDatabase
             while (_prepareQueue.IsCompleted == false)
             {
                 TestDbMeta meta;
+                
                 try
                 {
                     meta = _prepareQueue.Take();
+                    Current = meta;
                 }
                 catch (InvalidOperationException)
                 {
+                    Current = null;
                     continue;
                 }
 

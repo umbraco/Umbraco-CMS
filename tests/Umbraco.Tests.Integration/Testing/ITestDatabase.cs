@@ -10,4 +10,6 @@ public interface ITestDatabase
     TestDbMeta AttachSchema();
 
     void Detach(TestDbMeta id);
+
+    TestDbMeta? Current { get; }
 }

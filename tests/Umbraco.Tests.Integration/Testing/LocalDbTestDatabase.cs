@@ -79,11 +79,12 @@ public class LocalDbTestDatabase : SqlServerBaseTestDatabase, ITestDatabase
             _prepareQueue.Add(meta);
         }
 
-        for (var i = 0; i < _settings.PrepareThreadCount; i++)
-        {
-            var thread = new Thread(PrepareDatabase);
-            thread.Start();
-        }
+
+        var tasks = Enumerable.Range(0, _settings.PrepareThreadCount)
+            .Select(x => Task.Factory.StartNew(PrepareDatabase))
+            .ToArray();
+
+        Task.WaitAll(tasks);
     }
 
     public override void TearDown()

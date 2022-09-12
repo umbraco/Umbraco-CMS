@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -27,14 +28,13 @@ namespace Umbraco.Cms.Tests.Integration.Testing;
 public abstract class UmbracoIntegrationTestBase
 {
     private static readonly object s_dbLocker = new();
-    private static ITestDatabase s_dbInstance;
+    protected static ITestDatabase s_dbInstance;
     protected static TestDbMeta s_fixtureDbMeta;
     private static int s_testCount = 1;
     private readonly List<Action> _fixtureTeardown = new();
     private readonly Queue<Action> _testTeardown = new();
 
     private bool _firstTestInFixture = true;
-    protected IOptionsMonitor<ConnectionStrings> s_connectionStrings;
 
     protected Dictionary<string, string> InMemoryConfiguration { get; } = new();
 
@@ -124,11 +124,10 @@ public abstract class UmbracoIntegrationTestBase
         var databaseFactory = serviceProvider.GetRequiredService<IUmbracoDatabaseFactory>();
         var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
         var umbracoDbContextFactory = serviceProvider.GetRequiredService<UmbracoDbContextFactory>();
-        
-        s_connectionStrings = serviceProvider.GetRequiredService<IOptionsMonitor<ConnectionStrings>>();
+        var connectionStrings = serviceProvider.GetRequiredService<IOptionsMonitor<ConnectionStrings>>();
 
         // This will create a db, install the schema and ensure the app is configured to run
-        SetupTestDatabase(testDatabaseFactoryProvider, s_connectionStrings, databaseFactory, loggerFactory, state, umbracoDbContextFactory);
+        SetupTestDatabase(testDatabaseFactoryProvider, connectionStrings, databaseFactory, loggerFactory, state, umbracoDbContextFactory);
     }
 
     private void ConfigureTestDatabaseFactory(
@@ -168,9 +167,11 @@ public abstract class UmbracoIntegrationTestBase
                 // New DB + Schema
                 var newSchemaDbMeta = db.AttachSchema();
 
+                s_fixtureDbMeta = newSchemaDbMeta; 
                 // Add teardown callback
                 AddOnTestTearDown(() => db.Detach(newSchemaDbMeta));
 
+                
                 ConfigureTestDatabaseFactory(newSchemaDbMeta, databaseFactory, runtimeState, connectionStrings);
 
                 Assert.AreEqual(RuntimeLevel.Run, runtimeState.Level);
@@ -179,6 +180,7 @@ public abstract class UmbracoIntegrationTestBase
             case UmbracoTestOptions.Database.NewEmptyPerTest:
                 var newEmptyDbMeta = db.AttachEmpty();
 
+                s_fixtureDbMeta = newEmptyDbMeta;
                 // Add teardown callback
                 AddOnTestTearDown(() => db.Detach(newEmptyDbMeta));
 
