@@ -130,20 +130,34 @@
         <button 
             ng-if="!vm.blockEditorApi.readonly"
             type="button" 
+            aria-labelledby="forceLeftLabel"
+            title="@blockEditor_forceLeftButtonTitle"
+            localize="title"
             class="umb-block-grid__force-left"
             ng-class="{ '--active': vm.layoutEntry.forceLeft }"
             ng-click="vm.toggleForceLeft()">
             <!-- TODO: missing readable text -->
+            <span class="sr-only">
+                <localize ng-if="!vm.layoutEntry.forceLeft" id="forceLeftLabel" key="blockEditor_forceLeftLabel">Force placement at left side</localize>
+                <localize ng-if="vm.layoutEntry.forceLeft" id="forceLeftLabel" key="blockEditor_unforceLeftLabel">Remove forced placement at left side</localize>
+            </span>
             <umb-icon icon="icon-navigation-left" class="icon"></umb-icon>
         </button>
 
         <button 
             ng-if="!vm.blockEditorApi.readonly"
             type="button" 
+            aria-labelledby="forceRightLabel"
+            title="@blockEditor_forceRightButtonTitle"
+            localize="title"
             class="umb-block-grid__force-right"
             ng-class="{ '--active': vm.layoutEntry.forceRight }"
             ng-click="vm.toggleForceRight()">
             <!-- TODO: missing readable text -->
+            <span class="sr-only">
+                <localize ng-if="!vm.layoutEntry.forceRight" id="forceRightLabel" key="blockEditor_forceRightLabel">Force placement at right side</localize>
+                <localize ng-if="vm.layoutEntry.forceRight" id="forceRightLabel" key="blockEditor_unforceRightLabel">Remove forced placement at right side</localize>
+            </span>
             <umb-icon icon="icon-navigation-right" class="icon"></umb-icon>
         </button>
 

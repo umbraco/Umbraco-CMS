@@ -2882,6 +2882,12 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
       <![CDATA[The inserted content contained disallowed content, which has not been created. Would you like to keep the rest of this content anyway?]]></key>
     <key alias="areaAliasHelp">
       <![CDATA[The alias will be printed by GetBlockGridHTML(), use the alias to target the Element representing this area. Ex. .umb-block-grid__area[data-area-alias="MyAreaAlias"] { ... }]]></key>
+    <key alias="forceLeftLabel">Force placement at left side</key>
+    <key alias="forceRightLabel">Force placement at right side</key>
+    <key alias="unforceLeftLabel">Remove forced placement at left side</key>
+    <key alias="unforceRightLabel">Remove forced placement at right side</key>
+    <key alias="forceLeftButton">Toggle forced placement at left side</key>
+    <key alias="forceRightButton">Toggle forced placement at right side</key>
   </area>
   <area alias="contentTemplatesDashboard">
     <key alias="whatHeadline">What are Content Templates?</key>

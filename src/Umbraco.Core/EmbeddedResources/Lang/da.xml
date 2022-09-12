@@ -2232,6 +2232,12 @@ Mange hilsner fra Umbraco robotten
       <![CDATA[Det indsatte indhold bestod af ikke tilladt del-indhold, disse dele er blevet afvist. Vil du beholde det resterene alligevel?]]></key>
     <key alias="areaAliasHelp">
       <![CDATA[Dette alias skrives ud via GetBlockGridHTML(), brug aliaset til at fange det element der repræsentere dette område. F.eks.. .umb-block-grid__area[data-area-alias="MitOmraadeAlias"] { ... }]]></key>
+    <key alias="forceLeftLabel">Påtving placering i venstre side</key>
+    <key alias="forceRightLabel">Påtving placering i højre side</key>
+    <key alias="unforceLeftLabel">Fjern påtvungen placering i venstre side</key>
+    <key alias="unforceRightLabel">Fjern påtvungen placering i højre side</key>
+    <key alias="forceLeftButton">Skift påtvungen placering i venstre side</key>
+    <key alias="forceRightButton">Skift påtvungen placering i højre side</key>
   </area>
   <area alias="contentTemplatesDashboard">
     <key alias="whatHeadline">Hvad er Indholdsskabeloner?</key>
