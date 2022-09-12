@@ -25,10 +25,10 @@ public class MultipleTrackedReferencesController : TrackedReferencesControllerBa
     ///     Used when bulk deleting content/media and bulk unpublishing content (delete and unpublish on List view).
     ///     This is basically finding children of relations.
     /// </remarks>
-    [HttpPost("multiple")]
+    [HttpGet("multiple")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(RelationItemViewModel), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<RelationItemViewModel>>> GetPagedReferencedItems([FromBody] int[] ids, long skip, long take, bool? filterMustBeIsDependency)
+    public async Task<ActionResult<PagedViewModel<RelationItemViewModel>>> GetPagedReferencedItems([FromQuery]int[] ids, long skip, long take, bool? filterMustBeIsDependency)
     {
         IEnumerable<RelationItemModel> relationItems = _trackedReferencesSkipTakeService.GetPagedItemsWithRelations(ids, skip, take, filterMustBeIsDependency ?? true, out var totalItems);
 
