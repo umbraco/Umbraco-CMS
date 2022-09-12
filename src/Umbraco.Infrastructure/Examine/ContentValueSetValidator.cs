@@ -112,7 +112,10 @@ public class ContentValueSetValidator : ValueSetValidator, IContentValueSetValid
             return new ValueSetValidationResult(ValueSetValidationStatus.Failed, valueSet);
         }
 
-        var isFiltered = baseValidate.Status == ValueSetValidationStatus.Filtered;
+        if (baseValidate.Status == ValueSetValidationStatus.Filtered)
+        {
+            return new ValueSetValidationResult(ValueSetValidationStatus.Filtered, valueSet);
+        }
 
         var filteredValues = valueSet.Values.ToDictionary(x => x.Key, x => x.Value.ToList());
         //check for published content
@@ -134,17 +137,16 @@ public class ContentValueSetValidator : ValueSetValidator, IContentValueSetValid
             {
                 //so this valueset is for a content that varies by culture, now check for non-published cultures and remove those values
                 foreach (KeyValuePair<string, IReadOnlyList<object>> publishField in valueSet.Values
-                             .Where(x => x.Key.StartsWith($"{UmbracoExamineFieldNames.PublishedFieldName}_")).ToList())
+                             .Where(x => x.Key.StartsWith($"{UmbracoExamineFieldNames.PublishedFieldName}_")).ToArray())
                 {
                     if (publishField.Value.Count <= 0 || !publishField.Value[0].Equals("y"))
                     {
                         //this culture is not published, so remove all of these culture values
                         var cultureSuffix = publishField.Key.Substring(publishField.Key.LastIndexOf('_'));
                         foreach (KeyValuePair<string, IReadOnlyList<object>> cultureField in valueSet.Values
-                                     .Where(x => x.Key.InvariantEndsWith(cultureSuffix)).ToList())
+                                     .Where(x => x.Key.InvariantEndsWith(cultureSuffix)).ToArray())
                         {
                             filteredValues.Remove(cultureField.Key);
-                            isFiltered = true;
                         }
                     }
                 }
@@ -167,12 +169,11 @@ public class ContentValueSetValidator : ValueSetValidator, IContentValueSetValid
             return new ValueSetValidationResult(ValueSetValidationStatus.Failed, valueSet);
         }
 
-        if (pathValues[0].ToString().IsNullOrWhiteSpace())
+        string? path = pathValues[0].ToString();
+        if (path.IsNullOrWhiteSpace())
         {
             return new ValueSetValidationResult(ValueSetValidationStatus.Failed, valueSet);
         }
-
-        var path = pathValues[0].ToString();
 
         var filteredValueSet = new ValueSet(valueSet.Id, valueSet.Category, valueSet.ItemType, filteredValues.ToDictionary(x => x.Key, x => (IEnumerable<object>)x.Value));
         // We need to validate the path of the content based on ParentId, protected content and recycle bin rules.
@@ -185,7 +186,6 @@ public class ContentValueSetValidator : ValueSetValidator, IContentValueSetValid
             return new ValueSetValidationResult(ValueSetValidationStatus.Filtered, filteredValueSet);
         }
 
-        return new ValueSetValidationResult(
-            isFiltered ? ValueSetValidationStatus.Filtered : ValueSetValidationStatus.Valid, filteredValueSet);
+        return new ValueSetValidationResult(ValueSetValidationStatus.Valid, filteredValueSet);
     }
 }
