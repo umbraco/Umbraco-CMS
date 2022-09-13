@@ -416,7 +416,7 @@ public class UmbracoContentValueSetValidatorTests
         Assert.IsTrue(valueSet.Values.ContainsKey("title_es-ES"));
 
         result = validator.Validate(valueSet);
-        Assert.AreEqual(ValueSetValidationStatus.Filtered, result.Status);
+        Assert.AreEqual(ValueSetValidationStatus.Valid, result.Status);
 
         Assert.AreEqual(7, result.ValueSet.Values.Count()); // filtered to 7 values (removes es-es values)
         Assert.IsFalse(result.ValueSet.Values.ContainsKey($"{UmbracoExamineFieldNames.PublishedFieldName}_es-es"));
