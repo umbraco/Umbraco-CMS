@@ -81,6 +81,7 @@ angular.module("umbraco")
                     //initialize the standard editor functionality for Umbraco
                     tinyMceService.initializeEditor({
                         editor: editor,
+                        toolbar: editorConfig.toolbar,
                         model: $scope.model,
                         currentFormInput: $scope.rteForm.modelValue
                     });
