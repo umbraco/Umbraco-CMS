@@ -293,7 +293,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
     if (maxImageSize && maxImageSize > 0) {
       var newSize = imageHelper.scaleToMaxSize(maxImageSize, size.w, size.h);
 
-      editor.dom.setAttribs(imageDomElement, { 'width': newSize.width, 'height': newSize.height });
+      editor.dom.setAttribs(imageDomElement, { 'width': Math.round(newSize.width), 'height': Math.round(newSize.height) });
 
       // Images inserted via Media Picker will have a URL we can use for ImageResizer QueryStrings
       // Images pasted/dragged in are not persisted to media until saved & thus will need to be added
