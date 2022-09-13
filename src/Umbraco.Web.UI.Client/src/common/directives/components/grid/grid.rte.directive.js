@@ -62,7 +62,6 @@ angular.module("umbraco.directives")
 
                     //create a baseline Config to extend upon
                     var baseLineConfigObj = {
-                        maxImageSize: editorConfig.maxImageSize,
                         toolbar_sticky: true
                     };
 
@@ -80,7 +79,8 @@ angular.module("umbraco.directives")
                             model: scope,
                             // Form is found in the scope of the grid controller above us, not in our isolated scope
                             // https://github.com/umbraco/Umbraco-CMS/issues/7461
-                            currentForm: angularHelper.getCurrentForm(scope.$parent)
+                            currentForm: angularHelper.getCurrentForm(scope.$parent),
+                            maxImageSize: editorConfig.maxImageSize
                         });
 
                         //custom initialization for this editor within the grid

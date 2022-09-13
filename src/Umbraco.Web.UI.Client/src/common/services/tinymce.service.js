@@ -287,28 +287,37 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
   }
 
   function sizeImageInEditor(editor, imageDomElement, imgUrl) {
-    var size = editor.dom.getSize(imageDomElement);
+    try {
+      var size = editor.dom.getSize(imageDomElement);
 
-    if (editor.settings.maxImageSize && editor.settings.maxImageSize !== 0) {
-      var newSize = imageHelper.scaleToMaxSize(editor.settings.maxImageSize, size.w, size.h);
-
-      editor.dom.setAttrib(imageDomElement, 'width', newSize.width);
-      editor.dom.setAttrib(imageDomElement, 'height', newSize.height);
-
-      // Images inserted via Media Picker will have a URL we can use for ImageResizer QueryStrings
-      // Images pasted/dragged in are not persisted to media until saved & thus will need to be added
-      if (imgUrl) {
-        mediaHelper.getProcessedImageUrl(imgUrl,
-          {
-            width: newSize.width,
-            height: newSize.height
-          })
-          .then(function (resizedImgUrl) {
-            editor.dom.setAttrib(imageDomElement, 'data-mce-src', resizedImgUrl);
-          });
+      if (!size) {
+        throw new Error("Could not get size of image");
       }
 
-      editor.execCommand("mceAutoResize", false, null, null);
+      var maxImageSize = editor.options.get('umb_maxImageSize');
+
+      if (maxImageSize && maxImageSize > 0) {
+        var newSize = imageHelper.scaleToMaxSize(maxImageSize, size.w, size.h);
+
+        editor.dom.setAttribs(imageDomElement, { 'width': newSize.width, 'height': newSize.height });
+
+        // Images inserted via Media Picker will have a URL we can use for ImageResizer QueryStrings
+        // Images pasted/dragged in are not persisted to media until saved & thus will need to be added
+        if (imgUrl) {
+          mediaHelper.getProcessedImageUrl(imgUrl,
+            {
+              width: newSize.width,
+              height: newSize.height
+            })
+            .then(function (resizedImgUrl) {
+              editor.dom.setAttrib(imageDomElement, 'data-mce-src', resizedImgUrl);
+            });
+        }
+
+        editor.execCommand("mceAutoResize", false, null, null);
+      }
+    } catch (e) {
+      console.warn('Something went wrong with resizing the image', e);
     }
   }
 
@@ -382,6 +391,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
           style_formats: styles.styleFormats,
           style_formats_autohide: true,
           language: getLanguage(),
+          some_option: 'lol2',
 
           //this would be for a theme other than inlite
           toolbar: toolbar,
@@ -495,7 +505,6 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
       var cfg = {};
       cfg.toolbar = ["ace", "styles", "bold", "italic", "alignleft", "aligncenter", "alignright", "bullist", "numlist", "outdent", "indent", "link", "umbmediapicker", "umbmacro", "umbembeddialog"];
       cfg.stylesheets = [];
-      cfg.maxImageSize = 500;
       return cfg;
     },
 
@@ -1305,6 +1314,15 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         //re-watch the value
         startWatch();
       }
+
+      // Register option of umb_maxImageSize to be used to resize images
+      // Check for args.maxImageSize and if it is not a number, fallback to 500px
+      // This is a custom option for Umbraco
+      var maxImageSize = typeof args.maxImageSize !== 'undefined' && !isNaN(args.maxImageSize) ? args.maxImageSize : 500;
+      args.editor.options.register('umb_maxImageSize', {
+        processor: 'number',
+        default: maxImageSize
+      });
 
       // If we can not find the insert image/media toolbar button
       // Then we need to add an event listener to the editor
