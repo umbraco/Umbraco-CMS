@@ -324,6 +324,8 @@
                         );
                     }
                     let isCursorGood = false;
+                    const distanceFromTopLeft = dist(dragX, dragY, evt.relatedRect.left, evt.relatedRect.top);
+                    const distanceFromBottomRight = dist(dragX, dragY, evt.relatedRect.right, evt.relatedRect.bottom);
                     if(evt.willInsertAfter) {
                         /*
                         oldDistance = Math.min(
@@ -335,7 +337,7 @@
                             dist(dragRect.right, dragRect.bottom, evt.relatedRect.right,evt.relatedRect.bottom)
                         );
                         */
-                        isCursorGood = dragX > evt.relatedRect.right-(evt.relatedRect.width*.5) || dragY > evt.relatedRect.bottom-(evt.relatedRect.height*.5);
+                        isCursorGood = distanceFromTopLeft > distanceFromBottomRight;
                     } else {
                         /*
                         oldDistance = Math.min(
@@ -347,16 +349,16 @@
                             dist(dragRect.left, dragRect.bottom, evt.relatedRect.left,evt.relatedRect.bottom)
                         );
                         */
-                        isCursorGood = dragX < evt.relatedRect.left+(evt.relatedRect.width*.5) || dragX < evt.relatedRect.top+(evt.relatedRect.height*.5);
+                        isCursorGood = distanceFromTopLeft <= distanceFromBottomRight;
                     }
 
                     //console.log("calc", ghostRect.left,  ghostRect.top, "  |  ", dragRect.left, dragRect.top, "              calc: ", oldDistanceY, " < ", newDistanceY);
                     //&& oldDistance <= newDistance
                     //!isCursorGood || 
-                    /*if(oldDistance <= newDistance) {
+                    if(!isCursorGood) {
                         console.log("rejected because existing is closer", !isCursorGood, oldDistance <= newDistance, evt.willInsertAfter);
                         return false;
-                    }*/
+                    }
 
                     awaitingTarget = {related: evt.related, after: evt.willInsertAfter};
                     clearTimeout(timeout);
