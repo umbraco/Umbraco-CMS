@@ -391,7 +391,6 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
           style_formats: styles.styleFormats,
           style_formats_autohide: true,
           language: getLanguage(),
-          some_option: 'lol2',
 
           //this would be for a theme other than inlite
           toolbar: toolbar,
