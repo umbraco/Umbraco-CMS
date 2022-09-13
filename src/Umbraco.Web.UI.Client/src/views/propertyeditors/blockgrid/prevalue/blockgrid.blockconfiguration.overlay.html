@@ -282,12 +282,12 @@
                             <!-- areaGridColumns -->
                             <div class="control-group umb-control-group -no-border">
                                 <div class="umb-el-wrap">
-                                    <label class="control-label" for="label"><localize key="blockEditor_areasLayoutColumns">Layout columns</localize></label>
+                                    <label class="control-label" for="label"><localize key="blockEditor_areasLayoutColumns">Area layout columns</localize></label>
                                     <umb-property-info-button button-title-key="general_readMore">
-                                        <localize key="blockEditor_areasLayoutColumnsHelp">Define how many layout columns that areas of this block will span. If not defined, the number of layout columns defined for the entire layout will be used.</localize>
+                                        <localize key="blockEditor_areasLayoutColumnsHelp">Define how many layout columns that will be available for areas. If not defined, the number of layout columns defined for the entire layout will be used.</localize>
                                     </umb-property-info-button>
                                     <div class="controls">
-                                        <input type="text" name="label" ng-model="vm.block.areaGridColumns"/>
+                                        <input type="text" name="label" placeholder="{{model.gridColumns}}" ng-model="vm.block.areaGridColumns"/>
                                     </div>
                                 </div>
                             </div>
@@ -297,7 +297,7 @@
                                 <div class="umb-el-wrap">
                                     <label class="control-label" for="label"><localize key="blockEditor_areasConfigurations">Area configurations</localize></label>
                                     <umb-property-info-button button-title-key="general_readMore">
-                                        <localize key="blockEditor_areasConfigurationsHelp">To enable nesting of blocks within this block, define one or more areas for blocks to be nested within.</localize>
+                                        <localize key="blockEditor_areasConfigurationsHelp">To enable nesting of blocks within this block, define one or more areas for blocks to be nested within. Areas follow their own layout witch is defined by the Area Layout Columns. Each Areas column and row span can be adjusted by using the scale-handler in the bottom right.</localize>
                                     </umb-property-info-button>
                                     <div class="controls">
                                         <umb-block-grid-area-editor model="vm.block.areas" block="vm.block" grid-columns="model.gridColumns" all-block-types="model.allBlockTypes" loaded-element-types="model.loadedElementTypes"></umb-block-grid-area-editor>

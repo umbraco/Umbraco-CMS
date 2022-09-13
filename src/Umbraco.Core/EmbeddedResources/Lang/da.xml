@@ -2215,7 +2215,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="confirmDeleteBlockAreaNotice">Alle blokke, der er oprettet i dette område, vil blive slettet.</key>
     <key alias="layoutOptions">Layout-opsætning</key>
     <key alias="allowedBlockColumns">Tilgængelige kolonne-størrelser</key>
-    <key alias="allowedBlockColumnsHelp">Vælg de forskellite antal kolonner denne blok må optage i layoutet.</key>
+    <key alias="allowedBlockColumnsHelp">Vælg de forskellige antal kolonner denne blok må optage i layoutet.</key>
     <key alias="allowedBlockRows">TIlgængelige række-størrelser</key>
     <key alias="allowedBlockRowsHelp">Vælg hvor mange rækker denne blok på optage i layoutet.</key>
     <key alias="allowBlockInRoot">Tillad på rodniveay</key>

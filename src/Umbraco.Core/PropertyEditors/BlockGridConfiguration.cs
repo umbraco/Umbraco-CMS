@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
     /// </summary>
     public class BlockGridConfiguration
     {
-        [ConfigurationField("blocks", "Available Blocks", "views/propertyeditors/blockgrid/prevalue/blockgrid.blockconfiguration.html", Description = "Define the available blocks.")]
+        [ConfigurationField("blocks", "Blocks", "views/propertyeditors/blockgrid/prevalue/blockgrid.blockconfiguration.html", Description = "Define Blocks based on Element Types.")]
         public BlockGridBlockConfiguration[] Blocks { get; set; }  = null!;
 
         [DataContract]
@@ -116,7 +116,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             public bool ForceHideContentEditorInOverlay { get; set; }
         }
 
-        [ConfigurationField("validationLimit", "Amount", "numberrange", Description = "Set a required range of root blocks")]
+        [ConfigurationField("validationLimit", "Amount", "numberrange", Description = "Set a required range of blocks")]
         public NumberRange ValidationLimit { get; set; } = new NumberRange();
 
         [DataContract]
@@ -129,10 +129,10 @@ namespace Umbraco.Cms.Core.PropertyEditors
             public int? Max { get; set; }
         }
 
-        [ConfigurationField("useLiveEditing", "Live editing mode", "boolean", Description = "Live editing in editor overlays for live updated custom views or labels using custom expression.")]
+        [ConfigurationField("useLiveEditing", "Live editing mode", "boolean", Description = "Live update content when editing in overlay")]
         public bool UseLiveEditing { get; set; }
 
-        [ConfigurationField("maxPropertyWidth", "Property editor width", "textstring", Description = "optional css overwrite, example: 800px or 100%")]
+        [ConfigurationField("maxPropertyWidth", "Editor width", "textstring", Description = "optional css overwrite, example: 800px or 100%")]
         public string? MaxPropertyWidth { get; set; }
 
         [ConfigurationField("gridColumns", "Grid Columns", "number", Description = "Set the number of columns for the layout")]
