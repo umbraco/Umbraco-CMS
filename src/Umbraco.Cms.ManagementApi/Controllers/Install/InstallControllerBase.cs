@@ -7,7 +7,7 @@ using Umbraco.New.Cms.Web.Common.Routing;
 namespace Umbraco.Cms.ManagementApi.Controllers.Install;
 
 [ApiController]
-[BackOfficeRoute("api/v{version:apiVersion}/install")]
+[VersionedApiBackOfficeRoute("install")]
 [OpenApiTag("Install")]
 [RequireRuntimeLevel(RuntimeLevel.Install)]
 public abstract class InstallControllerBase : Controller
