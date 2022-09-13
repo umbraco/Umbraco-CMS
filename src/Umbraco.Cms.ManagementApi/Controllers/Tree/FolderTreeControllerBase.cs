@@ -38,19 +38,23 @@ public abstract class FolderTreeControllerBase<TItem> : EntityTreeControllerBase
     {
         totalItems = 0;
 
-        // TODO: make EntityService able to get paged children by parent key - this is a workaround for now
-        IEntitySlim? parent = EntityService.Get(parentKey, FolderObjectType) ?? EntityService.Get(parentKey, ItemObjectType);
-        if (parent == null)
+        // EntityService is only able to get paged children by parent ID, so we must first map parent key to parent ID
+        Attempt<int> parentId = EntityService.GetId(parentKey, FolderObjectType);
+        if (parentId.Success == false)
         {
-            // not much else we can do here but return nothing
-            return Array.Empty<IEntitySlim>();
+            parentId = EntityService.GetId(parentKey, ItemObjectType);
+            if (parentId.Success == false)
+            {
+                // not much else we can do here but return nothing
+                return Array.Empty<IEntitySlim>();
+            }
         }
 
-        // TODO: expand EntityService.GetPagedChildren to be able to paginate multiple item types - for now we'll only paginate the items
-        IEntitySlim[] folderEntities = EntityService.GetChildren(parent.Id, FolderObjectType).ToArray();
+        // EntityService is not able to paginate children of multiple item types, so we will only paginate the item type
+        IEntitySlim[] folderEntities = EntityService.GetChildren(parentId.Result, FolderObjectType).ToArray();
         IEntitySlim[] itemEntities = _foldersOnly
             ? Array.Empty<IEntitySlim>()
-            : EntityService.GetPagedChildren(parent.Id, ItemObjectType, pageNumber, pageSize, out totalItems).ToArray();
+            : EntityService.GetPagedChildren(parentId.Result, ItemObjectType, pageNumber, pageSize, out totalItems).ToArray();
 
         totalItems += folderEntities.Length;
 

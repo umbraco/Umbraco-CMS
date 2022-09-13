@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
@@ -75,9 +76,9 @@ public abstract class EntityTreeControllerBase<TItem> : Controller
 
     protected virtual IEntitySlim[] GetPagedChildEntities(Guid parentKey, long pageNumber, int pageSize, out long totalItems)
     {
-        // TODO: make EntityService able to get paged children by parent key - this is a workaround for now
-        IEntitySlim? parent = EntityService.Get(parentKey, ItemObjectType);
-        if (parent == null)
+        // EntityService is only able to get paged children by parent ID, so we must first map parent key to parent ID
+        Attempt<int> parentId = EntityService.GetId(parentKey, ItemObjectType);
+        if (parentId.Success == false)
         {
             // not much else we can do here but return nothing
             totalItems = 0;
@@ -85,7 +86,7 @@ public abstract class EntityTreeControllerBase<TItem> : Controller
         }
 
         IEntitySlim[] children = EntityService.GetPagedChildren(
-                parent.Id,
+                parentId.Result,
                 ItemObjectType,
                 pageNumber,
                 pageSize,
