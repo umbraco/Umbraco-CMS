@@ -8,6 +8,5 @@
   'lib/tinymce/plugins/advlist/plugin.min.js',
   'lib/tinymce/plugins/autolink/plugin.min.js',
   'lib/tinymce/plugins/directionality/plugin.min.js',
-  'lib/tinymce/plugins/searchreplace/plugin.min.js',
-  'lib/tinymce/plugins/fullscreen/plugin.min.js'
+  'lib/tinymce/plugins/searchreplace/plugin.min.js'
 ]
