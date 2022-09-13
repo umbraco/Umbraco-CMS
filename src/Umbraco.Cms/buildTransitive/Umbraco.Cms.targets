@@ -17,7 +17,6 @@
   <Target Name="IncludeAppPluginsContent" BeforeTargets="GetCopyToOutputDirectoryItems;GetCopyToPublishDirectoryItems;">
     <ItemGroup>
       <_AppPluginsFiles Include="App_Plugins\**" />
-
       <ContentWithTargetPath
         Include="@(_AppPluginsFiles)"
         Exclude="@(ContentWithTargetPath)"
@@ -38,4 +37,7 @@
       <ContentWithTargetPath Include="@(_UmbracoFolderFiles)" Exclude="@(ContentWithTargetPath)" TargetPath="%(Identity)" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     </ItemGroup>
   </Target>
+  <ItemGroup>
+    <Content Include="App_Plugins\**" CopyToPublishDirectory="PreserveNewest"/>
+  </ItemGroup>
 </Project>

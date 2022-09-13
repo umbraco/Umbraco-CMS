@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <Import Project="..\Umbraco.Cms\buildTransitive\Umbraco.Cms.props" />
+  <Import Project="..\Umbraco.Cms\buildTransitive\Umbraco.Cms.targets" />
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Cms\Umbraco.Cms.csproj" />
   </ItemGroup>
