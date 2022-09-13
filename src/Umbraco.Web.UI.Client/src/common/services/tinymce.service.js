@@ -1330,9 +1330,14 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         // find src attribute where value starts with `blob:`
         // search is case-insensitive and allows single or double quotes
         if (content.search(/src=["']blob:.*?["']/gi) !== -1) {
-          args.editor.uploadImages(function (data) {
+          args.editor.uploadImages().then(function (data) {
             // Once all images have been uploaded
             data.forEach(function (item) {
+              // Skip items that failed upload
+              if (item.status === false) {
+                return;
+              }
+
               // Select img element
               var img = item.element;
 
@@ -1343,7 +1348,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
               // Select the img & add new attr which we can search for
               // When its being persisted in RTE property editor
               // To create a media item & delete this tmp one etc
-              tinymce.activeEditor.$(img).attr({ "data-tmpimg": tmpLocation });
+              args.editor.dom.setAttrib(img, "data-tmpimg", tmpLocation);
 
               // Resize the image to the max size configured
               // NOTE: no imagesrc passed into func as the src is blob://...
@@ -1351,28 +1356,26 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
               sizeImageInEditor(args.editor, img);
             });
 
+            // Get all img where src starts with blob: AND does NOT have a data=tmpimg attribute
+            // This is most likely seen as a duplicate image that has already been uploaded
+            // editor.uploadImages() does not give us any indiciation that the image been uploaded already
+            var blobImageWithNoTmpImgAttribute = args.editor.dom.select("img[src^='blob:']:not([data-tmpimg])");
 
-          });
+            //For each of these selected items
+            blobImageWithNoTmpImgAttribute.forEach(imageElement => {
+              var blobSrcUri = args.editor.dom.getAttrib(imageElement, "src");
 
-          // Get all img where src starts with blob: AND does NOT have a data=tmpimg attribute
-          // This is most likely seen as a duplicate image that has already been uploaded
-          // editor.uploadImages() does not give us any indiciation that the image been uploaded already
-          var blobImageWithNoTmpImgAttribute = args.editor.dom.select("img[src^='blob:']:not([data-tmpimg])");
+              // Find the same image uploaded (Should be in LocalStorage)
+              // May already exist in the editor as duplicate image
+              // OR added to the RTE, deleted & re-added again
+              // So lets fetch the tempurl out of localstorage for that blob URI item
+              var tmpLocation = localStorageService.get(`tinymce__${blobSrcUri}`)
 
-          //For each of these selected items
-          blobImageWithNoTmpImgAttribute.forEach(imageElement => {
-            var blobSrcUri = args.editor.dom.getAttrib(imageElement, "src");
-
-            // Find the same image uploaded (Should be in LocalStorage)
-            // May already exist in the editor as duplicate image
-            // OR added to the RTE, deleted & re-added again
-            // So lets fetch the tempurl out of localstorage for that blob URI item
-            var tmpLocation = localStorageService.get(`tinymce__${blobSrcUri}`)
-
-            if (tmpLocation) {
-              sizeImageInEditor(args.editor, imageElement);
-              args.editor.dom.setAttrib(imageElement, "data-tmpimg", tmpLocation);
-            }
+              if (tmpLocation) {
+                sizeImageInEditor(args.editor, imageElement);
+                args.editor.dom.setAttrib(imageElement, "data-tmpimg", tmpLocation);
+              }
+            });
           });
 
         }
