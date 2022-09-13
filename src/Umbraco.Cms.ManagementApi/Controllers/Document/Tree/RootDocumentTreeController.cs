@@ -14,16 +14,21 @@ public class RootDocumentTreeController : DocumentTreeControllerBase
     public RootDocumentTreeController(
         IEntityService entityService,
         IUserStartNodeEntitiesService userStartNodeEntitiesService,
+        IDataTypeService dataTypeService,
         IPublicAccessService publicAccessService,
         AppCaches appCaches,
         IBackOfficeSecurityAccessor backofficeSecurityAccessor)
-        : base(entityService, userStartNodeEntitiesService, publicAccessService, appCaches, backofficeSecurityAccessor)
+        : base(entityService, userStartNodeEntitiesService, dataTypeService, publicAccessService, appCaches, backofficeSecurityAccessor)
     {
     }
 
     [HttpGet("root")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedResult<DocumentTreeItemViewModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedResult<DocumentTreeItemViewModel>>> Root(long pageNumber = 0, int pageSize = 100, string? culture = null)
-        => await GetRoot(pageNumber, pageSize, culture);
+    public async Task<ActionResult<PagedResult<DocumentTreeItemViewModel>>> Root(long pageNumber = 0, int pageSize = 100, Guid? dataTypeKey = null, string? culture = null)
+    {
+        IgnoreUserStartNodesForDataType(dataTypeKey);
+        RenderForClientCulture(culture);
+        return await GetRoot(pageNumber, pageSize);
+    }
 }

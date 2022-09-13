@@ -14,15 +14,19 @@ public class ItemsMediaTreeController : MediaTreeControllerBase
     public ItemsMediaTreeController(
         IEntityService entityService,
         IUserStartNodeEntitiesService userStartNodeEntitiesService,
+        IDataTypeService dataTypeService,
         AppCaches appCaches,
         IBackOfficeSecurityAccessor backofficeSecurityAccessor)
-        : base(entityService, userStartNodeEntitiesService, appCaches, backofficeSecurityAccessor)
+        : base(entityService, userStartNodeEntitiesService, dataTypeService, appCaches, backofficeSecurityAccessor)
     {
     }
 
     [HttpGet("items")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedResult<ContentTreeItemViewModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedResult<ContentTreeItemViewModel>>> Items([FromQuery(Name = "key")] Guid[] keys)
-        => await GetItems(keys);
+    public async Task<ActionResult<PagedResult<ContentTreeItemViewModel>>> Items([FromQuery(Name = "key")] Guid[] keys, Guid? dataTypeKey = null)
+    {
+        IgnoreUserStartNodesForDataType(dataTypeKey);
+        return await GetItems(keys);
+    }
 }

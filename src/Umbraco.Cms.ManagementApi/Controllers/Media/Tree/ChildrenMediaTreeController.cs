@@ -14,15 +14,19 @@ public class ChildrenMediaTreeController : MediaTreeControllerBase
     public ChildrenMediaTreeController(
         IEntityService entityService,
         IUserStartNodeEntitiesService userStartNodeEntitiesService,
+        IDataTypeService dataTypeService,
         AppCaches appCaches,
         IBackOfficeSecurityAccessor backofficeSecurityAccessor)
-        : base(entityService, userStartNodeEntitiesService, appCaches, backofficeSecurityAccessor)
+        : base(entityService, userStartNodeEntitiesService, dataTypeService, appCaches, backofficeSecurityAccessor)
     {
     }
 
     [HttpGet("children")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedResult<ContentTreeItemViewModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedResult<ContentTreeItemViewModel>>> Children(Guid parentKey, long pageNumber = 0, int pageSize = 100)
-        => await GetChildren(parentKey, pageNumber, pageSize);
+    public async Task<ActionResult<PagedResult<ContentTreeItemViewModel>>> Children(Guid parentKey, long pageNumber = 0, int pageSize = 100, Guid? dataTypeKey = null)
+    {
+        IgnoreUserStartNodesForDataType(dataTypeKey);
+        return await GetChildren(parentKey, pageNumber, pageSize);
+    }
 }

@@ -14,15 +14,19 @@ public class RootMediaTreeController : MediaTreeControllerBase
     public RootMediaTreeController(
         IEntityService entityService,
         IUserStartNodeEntitiesService userStartNodeEntitiesService,
+        IDataTypeService dataTypeService,
         AppCaches appCaches,
         IBackOfficeSecurityAccessor backofficeSecurityAccessor)
-        : base(entityService, userStartNodeEntitiesService, appCaches, backofficeSecurityAccessor)
+        : base(entityService, userStartNodeEntitiesService, dataTypeService, appCaches, backofficeSecurityAccessor)
     {
     }
 
     [HttpGet("root")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedResult<ContentTreeItemViewModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedResult<ContentTreeItemViewModel>>> Root(long pageNumber = 0, int pageSize = 100)
-        => await GetRoot(pageNumber, pageSize);
+    public async Task<ActionResult<PagedResult<ContentTreeItemViewModel>>> Root(long pageNumber = 0, int pageSize = 100, Guid? dataTypeKey = null)
+    {
+        IgnoreUserStartNodesForDataType(dataTypeKey);
+        return await GetRoot(pageNumber, pageSize);
+    }
 }

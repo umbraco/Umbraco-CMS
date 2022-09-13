@@ -25,9 +25,10 @@ public class MediaTreeControllerBase : UserStartNodeTreeControllerBase<ContentTr
     public MediaTreeControllerBase(
         IEntityService entityService,
         IUserStartNodeEntitiesService userStartNodeEntitiesService,
+        IDataTypeService dataTypeService,
         AppCaches appCaches,
         IBackOfficeSecurityAccessor backofficeSecurityAccessor)
-        : base(entityService, userStartNodeEntitiesService)
+        : base(entityService, userStartNodeEntitiesService, dataTypeService)
     {
         _appCaches = appCaches;
         _backofficeSecurityAccessor = backofficeSecurityAccessor;

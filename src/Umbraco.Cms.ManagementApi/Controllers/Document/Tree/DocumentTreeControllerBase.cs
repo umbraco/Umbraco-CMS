@@ -28,10 +28,11 @@ public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBa
     protected DocumentTreeControllerBase(
         IEntityService entityService,
         IUserStartNodeEntitiesService userStartNodeEntitiesService,
+        IDataTypeService dataTypeService,
         IPublicAccessService publicAccessService,
         AppCaches appCaches,
         IBackOfficeSecurityAccessor backofficeSecurityAccessor)
-        : base(entityService, userStartNodeEntitiesService)
+        : base(entityService, userStartNodeEntitiesService, dataTypeService)
     {
         _publicAccessService = publicAccessService;
         _appCaches = appCaches;
@@ -40,26 +41,7 @@ public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBa
 
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.Document;
 
-    protected async Task<ActionResult<PagedResult<DocumentTreeItemViewModel>>> GetRoot(long pageNumber, int pageSize, string? culture)
-    {
-        // save culture state for item mapping
-        _culture = culture;
-        return await GetRoot(pageNumber, pageSize);
-    }
-
-    protected async Task<ActionResult<PagedResult<DocumentTreeItemViewModel>>> GetChildren(Guid parentKey, long pageNumber, int pageSize, string? culture)
-    {
-        // save culture state for item mapping
-        _culture = culture;
-        return await GetChildren(parentKey, pageNumber, pageSize);
-    }
-
-    protected async Task<ActionResult<PagedResult<DocumentTreeItemViewModel>>> GetItems(Guid[] keys, string? culture)
-    {
-        // save culture state for item mapping
-        _culture = culture;
-        return await GetItems(keys);
-    }
+    protected void RenderForClientCulture(string? culture) => _culture = culture;
 
     protected override DocumentTreeItemViewModel MapTreeItemViewModel(Guid? parentKey, IEntitySlim entity)
     {
@@ -89,9 +71,13 @@ public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBa
     }
 
     // TODO: delete these (faking start node setup for unlimited editor)
-    protected override int[] GetUserStartNodeIds() => new[] { -1 };
+    // protected override int[] GetUserStartNodeIds() => new[] { -1 };
+    //
+    // protected override string[] GetUserStartNodePaths() => Array.Empty<string>();
 
-    protected override string[] GetUserStartNodePaths() => Array.Empty<string>();
+    protected override int[] GetUserStartNodeIds() => new[] { 1078, 1083 };
+
+    protected override string[] GetUserStartNodePaths() => new[] { "-1,1056,1068,1078", "-1,1082,1083" };
 
     // TODO: use these implementations instead of the dummy ones above once we have backoffice auth in place
     // protected override int[] GetUserStartNodeIds()

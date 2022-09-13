@@ -17,5 +17,8 @@ public class RootDocumentTypeTreeController : DocumentTypeTreeControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedResult<DocumentTypeTreeItemViewModel>), StatusCodes.Status200OK)]
     public async Task<ActionResult<PagedResult<DocumentTypeTreeItemViewModel>>> Root(long pageNumber = 0, int pageSize = 100, bool foldersOnly = false)
-        => await GetRoot(pageNumber, pageSize, foldersOnly);
+    {
+        RenderFoldersOnly(foldersOnly);
+        return await GetRoot(pageNumber, pageSize);
+    }
 }

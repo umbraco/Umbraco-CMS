@@ -14,16 +14,21 @@ public class ItemsDocumentTreeController : DocumentTreeControllerBase
     public ItemsDocumentTreeController(
         IEntityService entityService,
         IUserStartNodeEntitiesService userStartNodeEntitiesService,
+        IDataTypeService dataTypeService,
         IPublicAccessService publicAccessService,
         AppCaches appCaches,
         IBackOfficeSecurityAccessor backofficeSecurityAccessor)
-        : base(entityService, userStartNodeEntitiesService, publicAccessService, appCaches, backofficeSecurityAccessor)
+        : base(entityService, userStartNodeEntitiesService, dataTypeService, publicAccessService, appCaches, backofficeSecurityAccessor)
     {
     }
 
     [HttpGet("items")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedResult<DocumentTreeItemViewModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedResult<DocumentTreeItemViewModel>>> Items([FromQuery(Name = "key")] Guid[] keys, string? culture = null)
-        => await GetItems(keys, culture);
+    public async Task<ActionResult<PagedResult<DocumentTreeItemViewModel>>> Items([FromQuery(Name = "key")] Guid[] keys, Guid? dataTypeKey = null, string? culture = null)
+    {
+        IgnoreUserStartNodesForDataType(dataTypeKey);
+        RenderForClientCulture(culture);
+        return await GetItems(keys);
+    }
 }

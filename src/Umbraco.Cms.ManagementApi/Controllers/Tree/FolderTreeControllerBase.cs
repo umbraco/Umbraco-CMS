@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Core;
+﻿using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
@@ -20,19 +19,7 @@ public abstract class FolderTreeControllerBase<TItem> : EntityTreeControllerBase
 
     protected abstract UmbracoObjectTypes FolderObjectType { get; }
 
-    protected async Task<ActionResult<PagedResult<TItem>>> GetRoot(long pageNumber, int pageSize, bool foldersOnly)
-    {
-        // save "folders only" state for GetPagedRootEntities
-        _foldersOnly = foldersOnly;
-        return await GetRoot(pageNumber, pageSize);
-    }
-
-    protected async Task<ActionResult<PagedResult<TItem>>> GetChildren(Guid parentKey, long pageNumber, int pageSize, bool foldersOnly)
-    {
-        // save "folders only" state for GetPagedChildEntities
-        _foldersOnly = foldersOnly;
-        return await GetChildren(parentKey, pageNumber, pageSize);
-    }
+    protected void RenderFoldersOnly(bool foldersOnly) => _foldersOnly = foldersOnly;
 
     protected override IEntitySlim[] GetPagedRootEntities(long pageNumber, int pageSize, out long totalItems)
     {
