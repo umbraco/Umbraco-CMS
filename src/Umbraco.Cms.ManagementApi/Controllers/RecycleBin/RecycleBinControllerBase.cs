@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
@@ -21,6 +20,8 @@ public abstract class RecycleBinControllerBase<TItem> : Controller
     }
 
     protected abstract UmbracoObjectTypes ItemObjectType { get; }
+
+    protected abstract int RecycleBinRootId { get; }
 
     protected async Task<ActionResult<PagedResult<TItem>>> GetRoot(long pageNumber, int pageSize)
     {
@@ -66,22 +67,9 @@ public abstract class RecycleBinControllerBase<TItem> : Controller
 
     private IEntitySlim[] GetPagedRootEntities(long pageNumber, int pageSize, out long totalItems)
     {
-        // TODO: EntityService needs to be expanded to get root identifier (key?) by UmbracoObjectType - for now this is a workaround
-        var rootId = ItemObjectType switch
-        {
-            UmbracoObjectTypes.Document => Constants.System.RecycleBinContent,
-            UmbracoObjectTypes.Media => Constants.System.RecycleBinMedia,
-            _ => throw new ArgumentOutOfRangeException(nameof(ItemObjectType), "Only Document and Media are supported")
-        };
-
-        // TODO: EntityService needs to be able to return paged trashed children - for now we'll get all children
-        // IEntitySlim[] rootEntities = EntityService
-        //     .GetPagedChildren(rootId, ItemObjectType, pageNumber, pageSize, out totalItems)
-        //     .ToArray();
         IEntitySlim[] rootEntities = _entityService
-            .GetChildren(rootId, ItemObjectType)
+            .GetPagedTrashedChildren(RecycleBinRootId, ItemObjectType, pageNumber, pageSize, out totalItems)
             .ToArray();
-        totalItems = rootEntities.Length;
 
         return rootEntities;
     }
@@ -96,14 +84,9 @@ public abstract class RecycleBinControllerBase<TItem> : Controller
             return Array.Empty<IEntitySlim>();
         }
 
-        // TODO: EntityService needs to be able to return paged trashed children - for now we'll get all children
-        // IEntitySlim[] children = EntityService
-        //     .GetPagedChildren(parent.Id, ItemObjectType, pageNumber, pageSize, out totalItems)
-        //     .ToArray();
         IEntitySlim[] children = _entityService
-            .GetChildren(parent.Id, ItemObjectType)
+            .GetPagedTrashedChildren(parent.Id, ItemObjectType, pageNumber, pageSize, out totalItems)
             .ToArray();
-        totalItems = children.Length;
 
         return children;
     }

@@ -14,7 +14,7 @@ namespace Umbraco.Cms.ManagementApi.Controllers.Media.RecycleBin;
 [ApiVersion("1.0")]
 [ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.Media}/recycle-bin")]
-[RequireMediaTreeRootAccess] // NOTE: this is pending evaluation for new backoffice
+[RequireMediaTreeRootAccess]
 [OpenApiTag(nameof(Constants.UdiEntityType.Media))]
 public class MediaRecycleBinControllerBase : RecycleBinControllerBase<RecycleBinItemViewModel>
 {
@@ -24,6 +24,8 @@ public class MediaRecycleBinControllerBase : RecycleBinControllerBase<RecycleBin
     }
 
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.Document;
+
+    protected override int RecycleBinRootId => Constants.System.RecycleBinMedia;
 
     protected override RecycleBinItemViewModel MapRecycleBinViewModel(Guid? parentKey, IEntitySlim entity)
     {
