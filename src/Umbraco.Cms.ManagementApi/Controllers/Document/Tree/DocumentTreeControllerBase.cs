@@ -41,6 +41,8 @@ public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBa
 
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.Document;
 
+    protected override Ordering ItemOrdering => Ordering.By(nameof(Infrastructure.Persistence.Dtos.NodeDto.SortOrder));
+
     protected void RenderForClientCulture(string? culture) => _culture = culture;
 
     protected override DocumentTreeItemViewModel MapTreeItemViewModel(Guid? parentKey, IEntitySlim entity)

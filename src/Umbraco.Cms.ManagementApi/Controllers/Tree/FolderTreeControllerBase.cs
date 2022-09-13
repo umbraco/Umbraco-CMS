@@ -27,7 +27,14 @@ public abstract class FolderTreeControllerBase<TItem> : EntityTreeControllerBase
         IEntitySlim[] folderEntities = EntityService.GetRootEntities(FolderObjectType).ToArray();
         IEntitySlim[] itemEntities = _foldersOnly
             ? Array.Empty<IEntitySlim>()
-            : EntityService.GetRootEntities(ItemObjectType).ToArray();
+            : EntityService.GetPagedChildren(
+                    Constants.System.Root,
+                    ItemObjectType,
+                    pageNumber,
+                    pageSize,
+                    out totalItems,
+                    ordering: ItemOrdering)
+                .ToArray();
 
         IEntitySlim[] allEntities = folderEntities.Union(itemEntities).ToArray();
         totalItems = allEntities.Length;
@@ -54,7 +61,14 @@ public abstract class FolderTreeControllerBase<TItem> : EntityTreeControllerBase
         IEntitySlim[] folderEntities = EntityService.GetChildren(parentId.Result, FolderObjectType).ToArray();
         IEntitySlim[] itemEntities = _foldersOnly
             ? Array.Empty<IEntitySlim>()
-            : EntityService.GetPagedChildren(parentId.Result, ItemObjectType, pageNumber, pageSize, out totalItems).ToArray();
+            : EntityService.GetPagedChildren(
+                    parentId.Result,
+                    ItemObjectType,
+                    pageNumber,
+                    pageSize,
+                    out totalItems,
+                    ordering: ItemOrdering)
+                .ToArray();
 
         totalItems += folderEntities.Length;
 

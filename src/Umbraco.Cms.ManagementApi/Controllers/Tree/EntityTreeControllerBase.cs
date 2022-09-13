@@ -25,6 +25,8 @@ public abstract class EntityTreeControllerBase<TItem> : Controller
 
     protected abstract UmbracoObjectTypes ItemObjectType { get; }
 
+    protected virtual Ordering ItemOrdering => Ordering.By(nameof(Infrastructure.Persistence.Dtos.NodeDto.Text));
+
     protected async Task<ActionResult<PagedResult<TItem>>> GetRoot(long pageNumber, int pageSize)
     {
         IEntitySlim[] rootEntities = GetPagedRootEntities(pageNumber, pageSize, out var totalItems);
@@ -63,16 +65,15 @@ public abstract class EntityTreeControllerBase<TItem> : Controller
     }
 
     protected virtual IEntitySlim[] GetPagedRootEntities(long pageNumber, int pageSize, out long totalItems)
-    {
-        // for now we'll just get all root entities - we don't paginate root yet;
-        // perhaps later on it will make sense to use EntityService.GetPagedChildren
-        IEntitySlim[] rootEntities = EntityService
-            .GetRootEntities(ItemObjectType)
+        => EntityService
+            .GetPagedChildren(
+                Constants.System.Root,
+                ItemObjectType,
+                pageNumber,
+                pageSize,
+                out totalItems,
+                ordering: ItemOrdering)
             .ToArray();
-
-        totalItems = rootEntities.Length;
-        return rootEntities;
-    }
 
     protected virtual IEntitySlim[] GetPagedChildEntities(Guid parentKey, long pageNumber, int pageSize, out long totalItems)
     {
@@ -90,7 +91,8 @@ public abstract class EntityTreeControllerBase<TItem> : Controller
                 ItemObjectType,
                 pageNumber,
                 pageSize,
-                out totalItems)
+                out totalItems,
+                ordering: ItemOrdering)
             .ToArray();
         return children;
     }
