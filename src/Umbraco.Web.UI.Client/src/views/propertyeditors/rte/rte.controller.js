@@ -15,10 +15,6 @@ angular.module("umbraco")
             if (!editorConfig || Utilities.isString(editorConfig)) {
                 editorConfig = tinyMceService.defaultPrevalues();
             }
-            //make sure there's a max image size
-            if (!editorConfig.maxImageSize && editorConfig.maxImageSize !== 0) {
-                editorConfig.maxImageSize = tinyMceService.defaultPrevalues().maxImageSize;
-            }
 
             var width = editorConfig.dimensions ? parseInt(editorConfig.dimensions.width, 10) || null : null;
             var height = editorConfig.dimensions ? parseInt(editorConfig.dimensions.height, 10) || null : null;

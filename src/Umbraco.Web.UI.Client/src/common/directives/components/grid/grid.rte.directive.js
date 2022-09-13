@@ -29,10 +29,6 @@ angular.module("umbraco.directives")
                     //for the grid by default, we don't want to include the macro toolbar
                     editorConfig.toolbar = _.without(editorConfig, "umbmacro");
                 }
-                //make sure there's a max image size
-                if (!scope.configuration.maxImageSize && scope.configuration.maxImageSize !== 0) {
-                    editorConfig.maxImageSize = tinyMceService.defaultPrevalues().maxImageSize;
-                }
 
                 //ensure the grid's global config is being passed up to the RTE, these 2 properties need to be in this format
                 //since below we are just passing up `scope` as the actual model and for 2 way binding to work with `value` that

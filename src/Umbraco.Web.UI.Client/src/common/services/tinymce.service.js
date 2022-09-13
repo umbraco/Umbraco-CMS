@@ -288,12 +288,12 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
   function sizeImageInEditor(editor, imageDomElement, imgUrl) {
     var size = editor.dom.getSize(imageDomElement);
+    var maxImageSize = editor.options.get('maxImageSize');
 
-    if (editor.settings.maxImageSize && editor.settings.maxImageSize !== 0) {
-      var newSize = imageHelper.scaleToMaxSize(editor.settings.maxImageSize, size.w, size.h);
+    if (maxImageSize && maxImageSize > 0) {
+      var newSize = imageHelper.scaleToMaxSize(maxImageSize, size.w, size.h);
 
-      editor.dom.setAttrib(imageDomElement, 'width', newSize.width);
-      editor.dom.setAttrib(imageDomElement, 'height', newSize.height);
+      editor.dom.setAttribs(imageDomElement, { 'width': newSize.width, 'height': newSize.height });
 
       // Images inserted via Media Picker will have a URL we can use for ImageResizer QueryStrings
       // Images pasted/dragged in are not persisted to media until saved & thus will need to be added
@@ -1255,6 +1255,9 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
       // force TinyMCE to load plugins/themes from minified files (see http://archive.tinymce.com/wiki.php/api4:property.tinymce.suffix.static)
       args.editor.suffix = ".min";
+
+      // Register custom option maxImageSize
+      args.editor.options.register('maxImageSize', { processor: 'number', default: 500 });
 
       var unwatch = null;
 
