@@ -303,19 +303,13 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
             return await SignInOrTwoFactorAsync(autoLinkUser, false, loginInfo.LoginProvider);
         }
 
-        // If this fails, we should really delete the user since it will be in an inconsistent state!
-        IdentityResult? deleteResult = await UserManager.DeleteAsync(autoLinkUser);
-        if (deleteResult.Succeeded)
-        {
-            var errors = linkResult.Errors.Select(x => x.Description).ToList();
-            return AutoLinkSignInResult.FailedLinkingUser(errors);
-        }
-        else
-        {
-            // DOH! ... this isn't good, combine all errors to be shown
-            var errors = linkResult.Errors.Concat(deleteResult.Errors).Select(x => x.Description).ToList();
-            return AutoLinkSignInResult.FailedLinkingUser(errors);
-        }
+        // If this fails, we should disapprove the member,as it is now in an inconsistent state.
+        autoLinkUser.IsApproved = false;
+        await UserManager.UpdateAsync(autoLinkUser);
+        Logger.LogError("Disapproving member: {0}, as we could not autolink this member, and it is now in an unconsistent state ", autoLinkUser.Email);
+
+        var errors = linkResult.Errors.Select(x => x.Description).ToList();
+        return AutoLinkSignInResult.FailedLinkingUser(errors);
     }
 
     private void LogFailedExternalLogin(ExternalLoginInfo loginInfo, MemberIdentityUser user) =>
