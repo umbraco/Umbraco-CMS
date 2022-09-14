@@ -94,7 +94,7 @@
             return vm.blockEditorApi.internal.isElementTypeKeyAllowedAt(vm.parentBlock, vm.areaKey, contentTypeKey);
         }
 
-        vm.getLayoutEntry = function(index) {
+        vm.getLayoutEntryByIndex = function(index) {
             return vm.blockEditorApi.internal.getLayoutEntryByIndex(vm.parentBlock, vm.areaKey, index);
         }
 
@@ -142,7 +142,7 @@
                 return vm;
             };
 
-            //var nextSibling;
+            var nextSibling;
 
             // Borrowed concept from, its not identical as more has been implemented: https://github.com/SortableJS/angular-legacy-sortablejs/blob/master/angular-legacy-sortable.js
             function _sync(evt) {
@@ -289,20 +289,21 @@
                         right: dragX - dragOffsetX + ghostRect.width,
                         bottom: dragY - dragOffsetY + ghostRect.height
                     }
-                    let oldDistance = Math.min(
+                    /*let oldDistance = Math.min(
                         dist(dragRect.left, dragRect.top, ghostRect.left, ghostRect.top),
                         dist(dragRect.right, dragRect.top, ghostRect.right,ghostRect.top),
                         dist(dragRect.left, dragRect.bottom, ghostRect.left,ghostRect.bottom),
                         dist(dragRect.right, dragRect.bottom, ghostRect.right,ghostRect.bottom)
                     );
                     let newDistance = 0;
+                    */
                     /*newDistance = Math.min(
                         dist(dragRect.left, dragRect.top, evt.relatedRect.left, evt.relatedRect.top),
                         dist(dragRect.right, dragRect.top, evt.relatedRect.right,evt.relatedRect.top),
                         dist(dragRect.left, dragRect.bottom, evt.relatedRect.left,evt.relatedRect.bottom),
                         dist(dragRect.right, dragRect.bottom, evt.relatedRect.right,evt.relatedRect.bottom)
                     );*/
-                    
+                    /*
                     if(evt.willInsertAfter) {
                         newDistance = Math.min(
                             dist(dragRect.left, dragRect.top, evt.relatedRect.left, evt.relatedRect.bottom),
@@ -320,6 +321,7 @@
                             dist(dragRect.right, dragRect.bottom, evt.relatedRect.left, evt.relatedRect.bottom)
                         );
                     }
+                    */
                     let isCursorGood = false;
                     const distanceFromTopLeft = dist(dragX, dragY, evt.relatedRect.left, evt.relatedRect.top);
                     const distanceFromBottomRight = dist(dragX, dragY, evt.relatedRect.right, evt.relatedRect.bottom);
@@ -405,13 +407,124 @@
 
                 contextVM.showNotAllowed();// This block is not accepted to we will indicate that its not allowed.
 
-
                 return false;
             }
 
+            function _dropInTheVoid() {
+
+                if(!ghostEl) {
+                    return;
+                }
+
+                if(gridLayoutContainerEl.animated) {
+                    console.log("gridLayoutContainerEl.animated", gridLayoutContainerEl.animated)
+                    return;
+                }
+                
+                ghostRect = ghostEl.getBoundingClientRect();
+                relatedRect = relatedEl?.getBoundingClientRect();
+
+                const insideGhost = dragX > ghostRect.left && dragX < ghostRect.right && dragY > ghostRect.top && dragY < ghostRect.bottom;
+                // We do not necessary have a related element jet, if so we can conclude we are outside ist rectangle.
+                const insideRelated = relatedRect ? (dragX > relatedRect.left && dragX < relatedRect.right && dragY > relatedRect.top && dragY < relatedRect.bottom) : false;
+                //!insideGhost && 
+                //if (!insideRelated) {
+                    // We do not hover something meaningful, so lets try to find a solution:
+                    
+                    let onSameRow = [];
+                    const containerElements = Array.from(gridLayoutContainerEl.children);
+                    for (const el of containerElements) {
+                        const elRect = el.getBoundingClientRect();
+                        // gather elements on the same row.
+                        if(dragY >= elRect.top && dragY <= elRect.bottom && el !== ghostEl) {
+                            onSameRow.push({el: el, rect:elRect});
+                        }
+                    }
+
+                    let lastDistance = 99999;
+                    let foundRelatedEl = null;
+                    let foundRelatedRect = null;
+                    let placeAfter = false;
+                    onSameRow.forEach( sameRow => {
+                        const centerX = (sameRow.rect.left + (sameRow.rect.width*.5));
+                        let leftDistance = dragX - centerX;
+                        let rightDistance = centerX - dragX;
+                        if(leftDistance > Math.max(rightDistance, 0) && leftDistance < lastDistance) {
+                            foundRelatedEl = sameRow.el;
+                            foundRelatedRect = sameRow.rect;
+                            placeAfter = true;
+                        } else if (rightDistance > 0 && rightDistance < lastDistance) {
+                            foundRelatedEl = sameRow.el;
+                            foundRelatedRect = sameRow.rect;
+                            placeAfter = false;
+                        }
+                        console.log("dists: ", leftDistance, rightDistance, placeAfter)
+                    });
+
+                    //console.log("place ", placeAfter, "related to", foundRelatedEl);
+
+                    if (foundRelatedEl === ghostEl) {
+                        console.error("NO ghostEl was found!!! not good!!!");
+                        return;
+                    }
+
+                    if (foundRelatedEl) {
+
+
+                        /*
+                        const distanceFromGhost = dist(dragX, dragY, ghostRect.left + ghostRect.width*.5, ghostRect.top + ghostRect.height*.5);
+                        const distanceFromFound = dist(dragX, dragY, foundRelatedRect.left + foundRelatedRect.width*.5, foundRelatedRect.top + foundRelatedRect.height*.5);
+                        
+                        if(distanceFromGhost > distanceFromFound) {
+                            console.log("Too far?")
+                            return;
+                        }
+                        */
+                        let isCursorGood = false;
+                        const distanceFromTopLeft = dist(dragX, dragY, foundRelatedRect.left, foundRelatedRect.top);
+                        const distanceFromBottomRight = dist(dragX, dragY, foundRelatedRect.right, foundRelatedRect.bottom);
+                        if(placeAfter) {
+                            isCursorGood = distanceFromTopLeft > distanceFromBottomRight;
+                        } else {
+                            isCursorGood = distanceFromTopLeft <= distanceFromBottomRight;
+                        }
+                        if(!isCursorGood) {
+                            console.log("Too far?")
+                            return;
+                        }
+                        
+                        //const relatedElementUdi = foundRelatedEl.dataset.elementUdi;
+
+                        //const movingEntry = vm.entries.splice(oldIndex, 1)[0];
+
+                        //let newIndex = vm.entries.findIndex(x => x.contentUdi === relatedElementUdi);
+                        let newIndex = containerElements.indexOf(foundRelatedEl);
+                        console.log("indexes", newIndex, "   placeAfter:", placeAfter);
+                        if (newIndex === -1) {
+                            console.error("newIndex not found!!!");
+                        }
+                        const nextEl = containerElements[(placeAfter ? newIndex+1 : newIndex)];
+                        if (nextEl) {
+                            gridLayoutContainerEl.insertBefore(ghostEl, nextEl);
+                        } else {
+                            gridLayoutContainerEl.appendChild(ghostEl);
+                        }
+
+                        //gridLayoutContainerEl.insertBefore(nextSibling, ghostEl.nextSibling);
+                        /*vm.entries.splice(newIndex, 0, movingEntry);
+                        if (nextSibling.nodeType === Node.COMMENT_NODE) {
+                            gridLayoutContainerEl.insertBefore(nextSibling, ghostEl.nextSibling);
+                        }*/
+
+                        //$scope.$evalAsync();
+                    }
+                //}
+            }
+
+            var rqaId = null
             function _onDragMouseMove(evt) {
-                /** ignorer last drag event, comes as screenX === 0 and screenY === 0 */
-                if(targetRect && ghostRect && evt.clientX !== 0 && evt.screenY !== 0) {
+                /** ignorer last drag event, comes as clientX === 0 and clientY === 0 */
+                if(vm.movingLayoutEntry && targetRect && ghostRect && evt.clientX !== 0 && evt.clientY !== 0) {
 
                     dragX = evt.clientX;
                     dragY = evt.clientY;
@@ -421,31 +534,35 @@
                     relatedRect = relatedEl?.getBoundingClientRect();
 
                     const insideGhost = dragX > ghostRect.left && dragX < ghostRect.right && dragY > ghostRect.top && dragY < ghostRect.bottom;
-                    const insideRelated = relatedRect ? relatedRect.left && dragX < relatedRect.right && dragY > relatedRect.top && dragY < relatedRect.bottom : true;
+                    const insideRelated = relatedRect ? (dragX > relatedRect.left && dragX < relatedRect.right && dragY > relatedRect.top && dragY < relatedRect.bottom) : false;
 
-                    if (insideGhost || insideRelated) {
-                        // Then we would do nothing.
-                    } else {
-                        // If no target
-                        // find virtual target
-                        // move ghost/dragEl
-                        // Maybe its enough?
-                    }
+                    //if (!insideRelated) {
+                        if(rqaId === null) {
+                            requestAnimationFrame(_dropInTheVoid);
+                            rqaId = setTimeout(() => {rqaId = null;}, 150);
+                        }
+                    //}
 
-                    var oldValue = vm.movingLayoutEntry.forceLeft;
+
+                    const oldForceLeft = vm.movingLayoutEntry.forceLeft;
+                    const oldForceRight = vm.movingLayoutEntry.forceRight;
                     var newValue = (dragX - dragOffsetX < targetRect.left - 20);
-                    if(newValue !== oldValue) {
+                    if(newValue !== oldForceLeft) {
                         vm.movingLayoutEntry.forceLeft = newValue;
+                        if(oldForceRight) {
+                            vm.movingLayoutEntry.forceRight = false;
+                        }
                         vm.blockEditorApi.internal.setDirty();
                         vm.movingLayoutEntry.$block.__scope.$evalAsync();// needed for the block to be updated
+                        $scope.$evalAsync();
                     }
 
-                    oldValue = vm.movingLayoutEntry.forceRight;
                     newValue = (dragX - dragOffsetX + ghostRect.width > targetRect.right + 20) && (vm.movingLayoutEntry.forceLeft !== true);
-                    if(newValue !== oldValue) {
+                    if(newValue !== oldForceRight) {
                         vm.movingLayoutEntry.forceRight = newValue;
                         vm.blockEditorApi.internal.setDirty();
                         vm.movingLayoutEntry.$block.__scope.$evalAsync();// needed for the block to be updated
+                        $scope.$evalAsync();
                     }
                 }
             }
@@ -459,7 +576,7 @@
                 //touchStartThreshold: 0, // px, how many pixels the point should move before cancelling a delayed drag event
                 //disabled: false, // Disables the sortable if set to true.
                 //store: null,  // @see Store
-                animation: ANIMATION_DURATION,  // ms, animation speed moving items when sorting, `0` — without animation
+                animation: 0, //ANIMATION_DURATION,  // ms, animation speed moving items when sorting, `0` — without animation
                 easing: "cubic-bezier(1, 0, 0, 1)", // Easing for animation. Defaults to null. See https://easings.net/ for examples.
                 //handle: "umb-block-grid-block",  // Drag handle selector within list items,
                 cancel: '',
@@ -496,7 +613,7 @@
                 emptyInsertThreshold: 160, // px, distance mouse must be from empty sortable to insert drag element into it
 
                 onStart: function (evt) {
-                    //nextSibling = evt.from === evt.item.parentNode ? evt.item.nextSibling : evt.clone.nextSibling;
+                    nextSibling = evt.from === evt.item.parentNode ? evt.item.nextSibling : evt.clone.nextSibling;
 
                     var contextVM = vm;
                     if (gridLayoutContainerEl !== evt.to) {
@@ -504,7 +621,7 @@
                     }
                     
                     const oldIndex = evt.oldIndex;
-                    vm.movingLayoutEntry = contextVM.getLayoutEntry(oldIndex);
+                    vm.movingLayoutEntry = contextVM.getLayoutEntryByIndex(oldIndex);
                     if(vm.movingLayoutEntry.forceLeft ||  vm.movingLayoutEntry.forceRight) {
                         // if one of these where true before, then we made a change here:
                         vm.blockEditorApi.internal.setDirty();
@@ -539,7 +656,7 @@
                     relatedRect = evt.related.getBoundingClientRect();
                     targetRect = evt.to.getBoundingClientRect();
                     ghostRect = evt.draggedRect;
-
+                    
                     if(_checkMove(evt) === false) {
                         return false;
                     }
@@ -548,7 +665,7 @@
                         return false;
                     }
 
-                    return true;
+                    return false;
                 },
                 
                 /*
@@ -566,16 +683,26 @@
                 },
                 
                 onAdd: function (evt) {
-                    //console.log("# onAdd")
+                    console.log("# onAdd")
                     _sync(evt);
                     $scope.$evalAsync();
                 },
                 onUpdate: function (evt) {
-                    _sync(evt);
-                    $scope.$evalAsync();
+                    console.log("# onUpdate", evt)
+/*
+                    const itemElementUdi = evt.item.dataset.elementUdi;
+                    const currentIndex = vm.entries.findIndex(x => x.contentUdi === itemElementUdi);
+                    if(evt.oldIndex !== currentIndex) {
+                        console.error("SKIP SYNC")
+                        evt.preventDefault();
+                        evt.originalEvent.preventDefault();
+                    } else {*/
+                        _sync(evt);
+                        $scope.$evalAsync();
+                    //}
                 },
                 onEnd: function(evt) {
-                    //console.log("# onEnd")
+                    console.log("# onEnd")
                     window.removeEventListener('drag', _onDragMouseMove);
 
                     // ensure not-allowed indication is removed.
