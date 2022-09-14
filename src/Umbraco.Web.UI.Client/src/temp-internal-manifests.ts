@@ -197,7 +197,6 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		type: 'editorView',
 		alias: 'Umb.EditorView.DataType.Edit',
 		name: 'Data Type Editor Edit View',
-		elementName: 'umb-editor-view-data-type-edit',
 		loader: () => import('./backoffice/editors/data-type/views/edit/editor-view-data-type-edit.element'),
 		meta: {
 			// TODO: how do we want to filter where editor views are shown? https://our.umbraco.com/documentation/extending/Content-Apps/#setting-up-the-plugin
@@ -213,7 +212,6 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		type: 'editorView',
 		alias: 'Umb.EditorView.DataType.Info',
 		name: 'Data Type Editor Info View',
-		elementName: 'umb-editor-view-data-type-info',
 		loader: () => import('./backoffice/editors/data-type/views/info/editor-view-data-type-info.element'),
 		meta: {
 			// TODO: how do we want to filter where editor views are shown? https://our.umbraco.com/documentation/extending/Content-Apps/#setting-up-the-plugin
