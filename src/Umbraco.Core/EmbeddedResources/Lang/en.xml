@@ -1873,6 +1873,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="historyCleanupKeepAllVersionsNewerThanDays">Keep all versions newer than days</key>
     <key alias="historyCleanupKeepLatestVersionPerDayForDays">Keep latest version per day for days</key>
     <key alias="historyCleanupPreventCleanup">Prevent cleanup</key>
+    <key alias="historyCleanupEnableCleanup">Enable cleanup</key>
     <key alias="historyCleanupGloballyDisabled"><![CDATA[<strong>NOTE!</strong> The cleanup of historically content versions are disabled globally. These settings will not take effect before it is enabled.]]></key>
   </area>
   <area alias="languages">
