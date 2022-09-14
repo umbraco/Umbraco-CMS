@@ -3,14 +3,14 @@ import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { Subscription, distinctUntilChanged } from 'rxjs';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
-import { UmbModalService } from '../../../../core/services/modal';
+import { UmbModalService } from '../../../../../core/services/modal';
 
-import { UmbContextConsumerMixin } from '../../../../core/context';
-import type { ManifestPropertyEditorUI } from '../../../../core/models';
-import { UmbDataTypeContext } from '../data-type.context';
+import { UmbContextConsumerMixin } from '../../../../../core/context';
+import type { ManifestPropertyEditorUI } from '../../../../../core/models';
+import { UmbDataTypeContext } from '../../data-type.context';
 
-import type { DataTypeEntity } from '../../../../mocks/data/data-type.data';
-import type { UmbExtensionRegistry } from '../../../../core/extension';
+import type { DataTypeEntity } from '../../../../../mocks/data/data-type.data';
+import type { UmbExtensionRegistry } from '../../../../../core/extension';
 @customElement('umb-editor-view-data-type-edit')
 export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(LitElement) {
 	static styles = [UUITextStyles, css``];

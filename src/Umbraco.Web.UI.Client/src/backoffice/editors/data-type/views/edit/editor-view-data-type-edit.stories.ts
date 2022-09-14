@@ -3,8 +3,8 @@ import './editor-view-data-type-edit.element';
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit-html';
 
-import { data } from '../../../../mocks/data/data-type.data';
-import { UmbDataTypeContext } from '../data-type.context';
+import { data } from '../../../../../mocks/data/data-type.data';
+import { UmbDataTypeContext } from '../../data-type.context';
 
 import type { UmbEditorViewDataTypeEditElement } from './editor-view-data-type-edit.element';
 
