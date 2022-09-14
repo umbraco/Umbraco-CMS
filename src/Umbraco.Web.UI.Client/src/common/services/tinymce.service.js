@@ -1315,7 +1315,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
       // To update the icon to show you can NOT drop something into the editor
       if (args.toolbar && isMediaPickerEnabled(args.toolbar) === false) {
         // Wire up the event listener
-        args.editor.on('dragend dragover draggesture dragdrop drop drag', function (e) {
+        args.editor.on('dragstart dragend dragover draggesture dragdrop drop drag', function (e) {
           e.preventDefault();
           e.dataTransfer.effectAllowed = "none";
           e.dataTransfer.dropEffect = "none";
