@@ -19,7 +19,7 @@ public class SystemTextJsonConfigurationAttribute : TypeFilterAttribute
         {
             if (context.Result is ObjectResult objectResult)
             {
-                var serializerOptions = new JsonSerializerOptions()
+                var serializerOptions = new JsonSerializerOptions
                 {
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                 };
