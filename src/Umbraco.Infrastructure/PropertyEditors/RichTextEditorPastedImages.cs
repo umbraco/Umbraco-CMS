@@ -84,7 +84,7 @@ public sealed class RichTextEditorPastedImages
                 continue;
             }
 
-            var absoluteTempImagePath = _hostingEnvironment.MapPathContentRoot(tmpImgPath);
+            var absoluteTempImagePath = _hostingEnvironment.MapPathWebRoot(tmpImgPath);
             var fileName = Path.GetFileName(absoluteTempImagePath);
             var safeFileName = fileName.ToSafeFileName(_shortStringHelper);
 
