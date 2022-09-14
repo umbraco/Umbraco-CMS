@@ -1,16 +1,23 @@
 import './css/custom-properties.css';
 import 'router-slot';
 
+// TODO: remove these imports when they are part of UUI
+import '@umbraco-ui/uui-modal';
+import '@umbraco-ui/uui-modal-sidebar';
+import '@umbraco-ui/uui-modal-container';
+import '@umbraco-ui/uui-modal-dialog';
+
 import { UUIIconRegistryEssential } from '@umbraco-ui/uui';
 import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { Guard, IRoute } from 'router-slot/model';
 
-import { getServerStatus } from './core/api/fetcher';
+import { getManifests, getServerStatus } from './core/api/fetcher';
 import { UmbContextProviderMixin } from './core/context';
-import { UmbExtensionManifest, UmbExtensionManifestCore, UmbExtensionRegistry } from './core/extension';
-import { ServerStatus } from './core/models';
+import { UmbExtensionRegistry } from './core/extension';
 import { internalManifests } from './temp-internal-manifests';
+
+import type { ServerStatus } from './core/models';
+import type { Guard, IRoute } from 'router-slot/model';
 
 @customElement('umb-app')
 export class UmbApp extends UmbContextProviderMixin(LitElement) {
@@ -49,8 +56,8 @@ export class UmbApp extends UmbContextProviderMixin(LitElement) {
 		},
 	];
 
-	private _extensionRegistry: UmbExtensionRegistry = new UmbExtensionRegistry();
-	private _iconRegistry: UUIIconRegistryEssential = new UUIIconRegistryEssential();
+	private _extensionRegistry = new UmbExtensionRegistry();
+	private _iconRegistry = new UUIIconRegistryEssential();
 	private _serverStatus: ServerStatus = 'running';
 
 	constructor() {
@@ -120,17 +127,14 @@ export class UmbApp extends UmbContextProviderMixin(LitElement) {
 	}
 
 	private async _registerExtensionManifestsFromServer() {
-		// TODO: add schema and use fetcher
-		const res = await fetch('/umbraco/backoffice/manifests');
-		const { manifests } = await res.json();
-		manifests.forEach((manifest: UmbExtensionManifest) => this._extensionRegistry.register(manifest));
+		const res = await getManifests({});
+		const { manifests } = res.data;
+		manifests.forEach((manifest) => this._extensionRegistry.register(manifest));
 	}
 
 	private async _registerInternalManifests() {
 		// TODO: where do we get these from?
-		internalManifests.forEach((manifest: UmbExtensionManifestCore) =>
-			this._extensionRegistry.register<UmbExtensionManifestCore>(manifest)
-		);
+		internalManifests.forEach((manifest) => this._extensionRegistry.register(manifest));
 	}
 
 	render() {

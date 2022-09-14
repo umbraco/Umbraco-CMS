@@ -13,6 +13,15 @@ export interface paths {
   "/install/validateDatabase": {
     post: operations["PostInstallValidateDatabase"];
   };
+  "/manifests": {
+    get: operations["Manifests"];
+  };
+  "/manifests/packages": {
+    get: operations["ManifestsPackages"];
+  };
+  "/manifests/packages/installed": {
+    get: operations["ManifestsPackagesInstalled"];
+  };
   "/server/status": {
     get: operations["GetStatus"];
   };
@@ -102,8 +111,181 @@ export interface components {
       telemetryLevel: components["schemas"]["ConsentLevel"];
       database?: components["schemas"]["InstallSetupDatabaseConfiguration"];
     };
-    InstallValidateDatabaseRequest: {
-      database: components["schemas"]["InstallSetupDatabaseConfiguration"];
+    MetaSection: {
+      pathname: string;
+      /** Format: float */
+      weight: number;
+    };
+    IManifestSection: {
+      /** @enum {string} */
+      type: "section";
+      meta: components["schemas"]["MetaSection"];
+      js?: string;
+      elementName?: string;
+      alias: string;
+      name: string;
+    };
+    MetaTree: {
+      /** Format: float */
+      weight: number;
+      sections: string[];
+    };
+    IManifestTree: {
+      /** @enum {string} */
+      type: "tree";
+      meta: components["schemas"]["MetaTree"];
+      js?: string;
+      elementName?: string;
+      alias: string;
+      name: string;
+    };
+    MetaEditor: {
+      entityType: string;
+    };
+    IManifestEditor: {
+      /** @enum {string} */
+      type: "editor";
+      meta: components["schemas"]["MetaEditor"];
+      js?: string;
+      elementName?: string;
+      alias: string;
+      name: string;
+    };
+    MetaTreeItemAction: {
+      trees: string[];
+      label: string;
+      icon: string;
+      /** Format: float */
+      weight: number;
+    };
+    IManifestTreeItemAction: {
+      /** @enum {string} */
+      type: "treeItemAction";
+      meta: components["schemas"]["MetaTreeItemAction"];
+      js?: string;
+      elementName?: string;
+      alias: string;
+      name: string;
+    };
+    IPrevalueField: {
+      label?: string;
+      description?: string;
+      key: string;
+      view: string;
+    };
+    MetaPropertyEditorUI: {
+      icon: string;
+      group: string;
+      prevalues?: {
+        fields: components["schemas"]["IPrevalueField"][];
+      };
+      defaultConfig?: { [key: string]: unknown };
+    };
+    IManifestPropertyEditorUI: {
+      /** @enum {string} */
+      type: "propertyEditorUI";
+      meta: components["schemas"]["MetaPropertyEditorUI"];
+      js?: string;
+      elementName?: string;
+      alias: string;
+      name: string;
+    };
+    MetaDashboard: {
+      sections: string[];
+      pathname: string;
+      /** Format: float */
+      weight: number;
+      label?: string;
+    };
+    IManifestDashboard: {
+      /** @enum {string} */
+      type: "dashboard";
+      meta: components["schemas"]["MetaDashboard"];
+      js?: string;
+      elementName?: string;
+      alias: string;
+      name: string;
+    };
+    MetaEditorView: {
+      editors: string[];
+      pathname: string;
+      /** Format: float */
+      weight: number;
+      icon: string;
+    };
+    IManifestEditorView: {
+      /** @enum {string} */
+      type: "editorView";
+      meta: components["schemas"]["MetaEditorView"];
+      js?: string;
+      elementName?: string;
+      alias: string;
+      name: string;
+    };
+    MetaPropertyAction: {
+      propertyEditors: string[];
+    };
+    IManifestPropertyAction: {
+      /** @enum {string} */
+      type: "propertyAction";
+      meta: components["schemas"]["MetaPropertyAction"];
+      js?: string;
+      elementName?: string;
+      alias: string;
+      name: string;
+    };
+    MetaPackageView: {
+      packageAlias: string;
+    };
+    IManifestPackageView: {
+      /** @enum {string} */
+      type: "packageView";
+      meta: components["schemas"]["MetaPackageView"];
+      js?: string;
+      elementName?: string;
+      alias: string;
+      name: string;
+    };
+    IManifestEntrypoint: {
+      /** @enum {string} */
+      type: "entrypoint";
+      js: string;
+      alias: string;
+      name: string;
+    };
+    IManifestCustom: {
+      /** @enum {string} */
+      type: "custom";
+      meta?: { [key: string]: unknown };
+      alias: string;
+      name: string;
+    };
+    Manifest:
+      | components["schemas"]["IManifestSection"]
+      | components["schemas"]["IManifestTree"]
+      | components["schemas"]["IManifestEditor"]
+      | components["schemas"]["IManifestTreeItemAction"]
+      | components["schemas"]["IManifestPropertyEditorUI"]
+      | components["schemas"]["IManifestDashboard"]
+      | components["schemas"]["IManifestEditorView"]
+      | components["schemas"]["IManifestPropertyAction"]
+      | components["schemas"]["IManifestPackageView"]
+      | components["schemas"]["IManifestEntrypoint"]
+      | components["schemas"]["IManifestCustom"];
+    ManifestsResponse: {
+      manifests: components["schemas"]["Manifest"][];
+    };
+    PackageInstalled: {
+      id: string;
+      name: string;
+      alias: string;
+      version: string;
+      hasMigrations: boolean;
+      hasPendingMigrations: boolean;
+      plans: { [key: string]: unknown }[];
+    };
+    ManifestsPackagesInstalledResponse: {
+      packages: components["schemas"]["PackageInstalled"][];
     };
     /** @enum {string} */
     ServerStatus: "running" | "must-install" | "must-upgrade";
@@ -184,7 +366,55 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "application/json": components["schemas"]["InstallValidateDatabaseRequest"];
+        "application/json": components["schemas"]["InstallSetupDatabaseConfiguration"];
+      };
+    };
+  };
+  Manifests: {
+    responses: {
+      /** 200 response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["ManifestsResponse"];
+        };
+      };
+      /** default response */
+      default: {
+        content: {
+          "application/json": components["schemas"]["ProblemDetails"];
+        };
+      };
+    };
+  };
+  ManifestsPackages: {
+    responses: {
+      /** 200 response */
+      200: {
+        content: {
+          "application/json": { [key: string]: unknown };
+        };
+      };
+      /** default response */
+      default: {
+        content: {
+          "application/json": components["schemas"]["ProblemDetails"];
+        };
+      };
+    };
+  };
+  ManifestsPackagesInstalled: {
+    responses: {
+      /** 200 response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["ManifestsPackagesInstalledResponse"];
+        };
+      };
+      /** default response */
+      default: {
+        content: {
+          "application/json": components["schemas"]["ProblemDetails"];
+        };
       };
     };
   };

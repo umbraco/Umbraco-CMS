@@ -1,7 +1,12 @@
 import { rest } from 'msw';
 
 import umbracoPath from '../../core/helpers/umbraco-path';
-import { PostInstallRequest, ProblemDetails, UmbracoInstaller } from '../../core/models';
+import type {
+  PostInstallRequest,
+  ProblemDetails,
+  UmbracoInstaller,
+  UmbracoPerformInstallDatabaseConfiguration,
+} from '../../core/models';
 
 export const handlers = [
 	rest.get(umbracoPath('/install/settings'), (_req, res, ctx) => {
@@ -73,16 +78,38 @@ export const handlers = [
 		);
 	}),
 
-	rest.post<PostInstallRequest>(umbracoPath('/install/settings'), async (req, res, ctx) => {
-		await new Promise((resolve) => setTimeout(resolve, (Math.random() + 1) * 1000)); // simulate a delay of 1-2 seconds
+	rest.post(umbracoPath('/install/validateDatabase'), async (req, res, ctx) => {
+		const body = await req.json<UmbracoPerformInstallDatabaseConfiguration>();
 
-		if (req.body.database?.name === 'fail') {
+		if (body.name === 'validate') {
+			return res(
+				ctx.status(400),
+				ctx.json<ProblemDetails>({
+					type: 'connection',
+					status: 400,
+					detail: 'Database connection failed',
+				})
+			);
+		}
+
+		return res(
+			// Respond with a 200 status code
+			ctx.status(201)
+		);
+	}),
+
+	rest.post(umbracoPath('/install/setup'), async (req, res, ctx) => {
+		await new Promise((resolve) => setTimeout(resolve, (Math.random() + 1) * 1000)); // simulate a delay of 1-2 seconds
+		const body = await req.json<PostInstallRequest>();
+
+		if (body.database?.name === 'fail') {
 			return res(
 				// Respond with a 200 status code
 				ctx.status(400),
 				ctx.json<ProblemDetails>({
 					type: 'validation',
 					status: 400,
+					detail: 'Something went wrong',
 					errors: {
 						name: ['Database name is invalid'],
 					},

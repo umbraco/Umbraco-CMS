@@ -2,7 +2,7 @@
 	"ignorePatterns": ["vite.*.ts"],
 	"root": true,
 	"extends": ["eslint:recommended", "plugin:import/recommended", "prettier"],
-	"plugins": ["import"],
+	"plugins": ["import", "eslint-plugin-local-rules"],
 	"overrides": [
 		{
 			"files": ["**/*.ts"],
@@ -31,7 +31,8 @@
 			},
 			"rules": {
 				"no-var": "error",
-				"import/no-unresolved": "error"
+				"import/no-unresolved": "error",
+				"local-rules/bad-type-import": "error"
 			},
 			"settings": {
 				"import/parsers": {

@@ -3,12 +3,14 @@ import { NodeEntity } from '../../../../mocks/data/node.data';
 
 export class UmbNodeContext {
 	// TODO: figure out how fine grained we want to make our observables.
-	private _data: BehaviorSubject<NodeEntity> = new BehaviorSubject({
-		id: -1,
+	private _data = new BehaviorSubject<NodeEntity>({
 		key: '',
 		name: '',
-		type: '',
 		icon: '',
+		type: '',
+		hasChildren: false,
+		parentKey: '',
+		isTrashed: false,
 		properties: [
 			{
 				alias: '',

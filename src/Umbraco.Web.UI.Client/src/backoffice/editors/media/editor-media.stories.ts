@@ -1,10 +1,11 @@
+import './editor-media.element';
+
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit-html';
 
-import { UmbEditorMediaElement } from './editor-media.element';
-import './editor-media.element';
-
 import { data } from '../../../mocks/data/node.data';
+
+import type { UmbEditorMediaElement } from './editor-media.element';
 
 export default {
 	title: 'Editors/Media',
@@ -15,5 +16,5 @@ export default {
 const mediaNodes = data.filter((node) => node.type === 'media');
 
 export const AAAOverview: Story<UmbEditorMediaElement> = () =>
-	html` <umb-editor-media id="${mediaNodes[0].id}"></umb-editor-media>`;
+	html` <umb-editor-media id="${mediaNodes[0].key}"></umb-editor-media>`;
 AAAOverview.storyName = 'Overview';

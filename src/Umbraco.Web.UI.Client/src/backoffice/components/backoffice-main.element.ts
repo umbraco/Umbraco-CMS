@@ -2,13 +2,17 @@ import { defineElement } from '@umbraco-ui/uui-base/lib/registration';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { state } from 'lit/decorators.js';
-import { map, Subscription } from 'rxjs';
+import { IRoutingInfo } from 'router-slot';
+import { Subscription } from 'rxjs';
 
-import { UmbContextConsumerMixin } from '../../core/context';
-import { createExtensionElement, UmbExtensionManifestSection, UmbExtensionRegistry } from '../../core/extension';
+import { UmbContextConsumerMixin, UmbContextProviderMixin } from '../../core/context';
+import { createExtensionElement } from '../../core/extension';
+import type { ManifestSection } from '../../core/models';
+import { UmbSectionStore } from '../../core/stores/section.store';
+import { UmbSectionContext } from '../sections/section.context';
 
 @defineElement('umb-backoffice-main')
-export class UmbBackofficeMain extends UmbContextConsumerMixin(LitElement) {
+export class UmbBackofficeMain extends UmbContextProviderMixin(UmbContextConsumerMixin(LitElement)) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -26,42 +30,63 @@ export class UmbBackofficeMain extends UmbContextConsumerMixin(LitElement) {
 	private _routes: Array<any> = [];
 
 	@state()
-	private _sections: Array<UmbExtensionManifestSection> = [];
+	private _sections: Array<ManifestSection> = [];
 
-	private _extensionRegistry?: UmbExtensionRegistry;
+	private _routePrefix = 'section/';
+	private _sectionContext?: UmbSectionContext;
+	private _sectionStore?: UmbSectionStore;
 	private _sectionSubscription?: Subscription;
 
 	constructor() {
 		super();
 
-		this.consumeContext('umbExtensionRegistry', (_instance: UmbExtensionRegistry) => {
-			this._extensionRegistry = _instance;
+		this.consumeContext('umbSectionStore', (_instance: UmbSectionStore) => {
+			this._sectionStore = _instance;
 			this._useSections();
 		});
 	}
 
-	private _useSections() {
+	private async _useSections() {
 		this._sectionSubscription?.unsubscribe();
 
-		this._sectionSubscription = this._extensionRegistry
-			?.extensionsOfType('section')
-			.pipe(map((extensions) => extensions.sort((a, b) => b.meta.weight - a.meta.weight)))
-			.subscribe((sections) => {
-				this._routes = [];
-				this._sections = sections as Array<UmbExtensionManifestSection>;
+		this._sectionSubscription = this._sectionStore?.getAllowed().subscribe((sections) => {
+			if (!sections) return;
+			this._sections = sections;
+			this._createRoutes();
+		});
+	}
 
-				this._routes = this._sections.map((section) => {
-					return {
-						path: 'section/' + section.meta.pathname,
-						component: () => createExtensionElement(section),
-					};
-				});
+	private _createRoutes() {
+		this._routes = [];
+		this._routes = this._sections.map((section) => {
+			return {
+				path: this._routePrefix + section.meta.pathname,
+				component: () => createExtensionElement(section),
+				setup: this._onRouteSetup,
+			};
+		});
 
-				this._routes.push({
-					path: '**',
-					redirectTo: 'section/' + this._sections[0].meta.pathname,
-				});
-			});
+		this._routes.push({
+			path: '**',
+			redirectTo: this._routePrefix + this._sections?.[0]?.meta.pathname,
+		});
+	}
+
+	private _onRouteSetup = (_component: HTMLElement, info: IRoutingInfo) => {
+		const currentPath = info.match.route.path;
+		const section = this._sections.find((s) => this._routePrefix + s.meta.pathname === currentPath);
+		if (!section) return;
+		this._sectionStore?.setCurrent(section.alias);
+		this._provideSectionContext(section);
+	};
+
+	private _provideSectionContext(section: ManifestSection) {
+		if (!this._sectionContext) {
+			this._sectionContext = new UmbSectionContext(section);
+			this.provideContext('umbSectionContext', this._sectionContext);
+		} else {
+			this._sectionContext.update(section);
+		}
 	}
 
 	disconnectedCallback(): void {

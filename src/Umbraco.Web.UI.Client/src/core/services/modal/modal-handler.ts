@@ -2,6 +2,7 @@ import { UUIDialogElement } from '@umbraco-ui/uui';
 import { UUIModalDialogElement } from '@umbraco-ui/uui-modal-dialog';
 import { UUIModalSidebarElement, UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
 import { v4 as uuidv4 } from 'uuid';
+
 import { UmbModalOptions } from './modal.service';
 
 //TODO consider splitting this into two separate handlers
@@ -14,20 +15,20 @@ export class UmbModalHandler {
 	public type: string;
 	public size: UUIModalSidebarSize;
 
-	constructor(elementName: string, options?: UmbModalOptions<unknown>) {
+	constructor(element: string | HTMLElement, options?: UmbModalOptions<unknown>) {
 		this.key = uuidv4();
 
 		this.type = options?.type || 'dialog';
 		this.size = options?.size || 'small';
-		this.element = this._createElement(elementName, options);
+		this.element = this._createElement(element, options);
 
 		this._closePromise = new Promise((resolve) => {
 			this._closeResolver = resolve;
 		});
 	}
 
-	private _createElement(elementName: string, options?: UmbModalOptions<unknown>) {
-		const layoutElement = this._createLayoutElement(elementName, options?.data);
+	private _createElement(element: string | HTMLElement, options?: UmbModalOptions<unknown>) {
+		const layoutElement = this._createLayoutElement(element, options?.data);
 		return this.type === 'sidebar'
 			? this._createSidebarElement(layoutElement)
 			: this._createDialogElement(layoutElement);
@@ -48,8 +49,8 @@ export class UmbModalHandler {
 		return modalDialogElement;
 	}
 
-	private _createLayoutElement(elementName: string, data: unknown) {
-		const layoutElement: any = document.createElement(elementName);
+	private _createLayoutElement(element: string | HTMLElement, data: unknown) {
+		const layoutElement: any = element instanceof HTMLElement ? element : document.createElement(element);
 		layoutElement.data = data;
 		layoutElement.modalHandler = this;
 		return layoutElement;

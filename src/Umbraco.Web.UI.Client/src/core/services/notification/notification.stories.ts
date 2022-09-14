@@ -1,14 +1,15 @@
-import { Meta, Story } from '@storybook/web-components';
-import { LitElement, html } from 'lit';
-import { customElement } from 'lit/decorators.js';
-import { UmbNotificationService, UmbNotificationOptions, UmbNotificationColor } from '.';
-import type { UmbNotificationDefaultData } from './layouts/default';
-import { UmbContextConsumerMixin } from '../../context';
-
-import '../../context/context-provider.element';
 import '../../../backoffice/components/backoffice-notification-container.element';
+import '../../context/context-provider.element';
 import './layouts/default';
 
+import { Meta, Story } from '@storybook/web-components';
+import { html, LitElement } from 'lit';
+import { customElement } from 'lit/decorators.js';
+
+import { UmbNotificationColor, UmbNotificationOptions, UmbNotificationService } from '.';
+import { UmbContextConsumerMixin } from '../../context';
+
+import type { UmbNotificationDefaultData } from './layouts/default';
 export default {
 	title: 'API/Notifications/Overview',
 	component: 'ucp-notification-layout-default',
@@ -21,7 +22,7 @@ export default {
 } as Meta;
 
 @customElement('story-notification-default-example')
-class StoryNotificationDefaultExampleElement extends UmbContextConsumerMixin(LitElement) {
+export class StoryNotificationDefaultExampleElement extends UmbContextConsumerMixin(LitElement) {
 	private _notificationService?: UmbNotificationService;
 
 	connectedCallback(): void {
