@@ -27,6 +27,7 @@ import { UmbDocumentTypeStore } from '../core/stores/document-type.store';
 import { UmbNodeStore } from '../core/stores/node.store';
 import { UmbSectionStore } from '../core/stores/section.store';
 import { UmbEntityStore } from '../core/stores/entity.store';
+import { UmbPropertyEditorStore } from '../core/stores/property-editor.store';
 
 @defineElement('umb-backoffice')
 export default class UmbBackoffice extends UmbContextConsumerMixin(UmbContextProviderMixin(LitElement)) {
@@ -58,6 +59,7 @@ export default class UmbBackoffice extends UmbContextConsumerMixin(UmbContextPro
 		this.provideContext('umbNodeStore', new UmbNodeStore(this._umbEntityStore));
 		this.provideContext('umbDataTypeStore', new UmbDataTypeStore(this._umbEntityStore));
 		this.provideContext('umbDocumentTypeStore', new UmbDocumentTypeStore(this._umbEntityStore));
+		this.provideContext('umbPropertyEditorStore', new UmbPropertyEditorStore());
 		this.provideContext('umbNotificationService', new UmbNotificationService());
 		this.provideContext('umbModalService', new UmbModalService());
 

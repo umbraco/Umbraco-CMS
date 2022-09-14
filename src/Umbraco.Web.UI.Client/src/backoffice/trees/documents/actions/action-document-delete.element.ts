@@ -33,7 +33,7 @@ export default class UmbTreeActionDocumentDeleteElement extends UmbContextConsum
 			confirmLabel: 'Delete',
 		});
 
-		modalHandler?.onClose.then(({ confirmed }: any) => {
+		modalHandler?.onClose().then(({ confirmed }: any) => {
 			if (confirmed && this._treeContextMenuService && this._nodeStore && this._activeTreeItem) {
 				this._nodeStore?.trash(this._activeTreeItem.key);
 				this._treeContextMenuService.close();

@@ -58,7 +58,7 @@ class MyElement extends UmbContextConsumerMixin(LitElement) {
 	private _handleClick() {
 		const options = {'options goes here'}
 		const modalHandler = this._modalService?.openDialog('my-dialog'), options);
-		modalHandler.onClose.then((data) => {
+		modalHandler.onClose().then((data) => {
 			// if any data is supplied on close, it will be available here.
 		});
 	}

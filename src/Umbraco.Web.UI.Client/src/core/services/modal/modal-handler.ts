@@ -61,7 +61,7 @@ export class UmbModalHandler {
 		this.element.close();
 	}
 
-	public get onClose(): Promise<any> {
+	public onClose(): Promise<any> {
 		return this._closePromise;
 	}
 }

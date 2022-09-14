@@ -51,13 +51,28 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Li
 			});
 	}
 
+	private _openPropertyEditorPicker() {
+		if (!this._dataType) return;
+
+		const selection = [this._dataType.propertyEditorAlias] || [];
+		const modalHandler = this._modalService?.propertyEditorPicker({ selection });
+
+		modalHandler?.onClose().then((returnValue) => {
+			if (!this._dataType || !returnValue.selection) return;
+
+			const propertyEditorAlias = returnValue.selection[0];
+			this._dataType.propertyEditorAlias = propertyEditorAlias;
+			this._dataTypeContext?.update({ propertyEditorAlias });
+		});
+	}
+
 	private _openPropertyEditorUIPicker() {
 		if (!this._dataType) return;
 
 		const selection = [this._dataType.propertyEditorUIAlias] || [];
 		const modalHandler = this._modalService?.propertyEditorUIPicker({ selection });
 
-		modalHandler?.onClose.then((returnValue) => {
+		modalHandler?.onClose().then((returnValue) => {
 			if (!this._dataType || !returnValue.selection) return;
 
 			const propertyEditorUIAlias = returnValue.selection[0];
@@ -76,9 +91,11 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Li
 			<uui-box>
 				<h3>Property Editor</h3>
 				<!-- TODO: border is a bit weird attribute name. Maybe single or standalone would be better? -->
-				<umb-ref-property-editor
-					alias="${ifDefined(this._dataType?.propertyEditorAlias)}"
-					border></umb-ref-property-editor>
+				<umb-ref-property-editor alias="${ifDefined(this._dataType?.propertyEditorAlias)}" border>
+					<uui-action-bar slot="actions">
+						<uui-button label="Change" @click=${this._openPropertyEditorPicker}></uui-button>
+					</uui-action-bar>
+				</umb-ref-property-editor>
 
 				<h3>Property Editor UI</h3>
 				<!-- TODO: border is a bit weird attribute name. Maybe single or standalone would be better? -->

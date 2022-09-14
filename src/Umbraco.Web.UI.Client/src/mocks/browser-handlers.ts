@@ -7,6 +7,7 @@ import * as serverHandlers from './domains/server.handlers';
 import { handlers as upgradeHandlers } from './domains/upgrade.handlers';
 import { handlers as userHandlers } from './domains/user.handlers';
 import { handlers as treeHandlers } from './domains/entity.handlers';
+import { handlers as propertyEditorHandlers } from './domains/property-editor.handlers';
 
 const handlers = [
 	serverHandlers.serverVersionHandler,
@@ -17,6 +18,7 @@ const handlers = [
 	...dataTypeHandlers,
 	...documentTypeHandlers,
 	...treeHandlers,
+	...propertyEditorHandlers,
 	...manifestsHandlers.default,
 ];
 
