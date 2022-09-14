@@ -33,7 +33,7 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Li
 
 		this.consumeContext('umbDataTypeContext', (dataTypeContext) => {
 			this._dataTypeContext = dataTypeContext;
-			this._useDataType();
+			this._observeDataType();
 		});
 
 		this.consumeContext('umbModalService', (modalService) => {
@@ -41,7 +41,7 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Li
 		});
 	}
 
-	private _useDataType() {
+	private _observeDataType() {
 		this._dataTypeSubscription?.unsubscribe();
 
 		this._dataTypeSubscription = this._dataTypeContext?.data
@@ -74,6 +74,12 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Li
 	render() {
 		return html`
 			<uui-box>
+				<h3>Property Editor</h3>
+				<!-- TODO: border is a bit weird attribute name. Maybe single or standalone would be better? -->
+				<umb-ref-property-editor
+					alias="${ifDefined(this._dataType?.propertyEditorAlias)}"
+					border></umb-ref-property-editor>
+
 				<h3>Property Editor UI</h3>
 				<!-- TODO: border is a bit weird attribute name. Maybe single or standalone would be better? -->
 				<umb-ref-property-editor-ui alias="${ifDefined(this._dataType?.propertyEditorUIAlias)}" border>

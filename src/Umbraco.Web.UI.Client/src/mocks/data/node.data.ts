@@ -1,5 +1,6 @@
 import { UmbData } from './data';
 import { Entity } from './entities';
+import { UmbEntityData } from './entity.data';
 
 export interface NodeEntity extends Entity {
 	properties: Array<NodeProperty>;
@@ -220,7 +221,7 @@ export const data: Array<NodeEntity> = [
 ];
 
 // Temp mocked database
-class UmbNodeData extends UmbData<NodeEntity> {
+class UmbNodeData extends UmbEntityData<NodeEntity> {
 	constructor() {
 		super(data);
 	}
