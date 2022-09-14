@@ -2,6 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { Subscription, distinctUntilChanged } from 'rxjs';
+import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { UmbModalService } from '../../../../core/services/modal';
 
 import { UmbContextConsumerMixin } from '../../../../core/context';
@@ -73,10 +74,13 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Li
 	render() {
 		return html`
 			<uui-box>
-				<!-- TODO: temp property editor ui selector. Change when we have dialogs -->
 				<h3>Property Editor UI</h3>
-				${this._dataType?.propertyEditorUIAlias}
-				<uui-button label="Change" @click=${this._openPropertyEditorUIPicker}></uui-button>
+				<!-- TODO: border is a bit weird attribute name. Maybe single or standalone would be better? -->
+				<umb-ref-property-editor-ui alias="${ifDefined(this._dataType?.propertyEditorUIAlias)}" border>
+					<uui-action-bar slot="actions">
+						<uui-button label="Change" @click=${this._openPropertyEditorUIPicker}></uui-button>
+					</uui-action-bar>
+				</umb-ref-property-editor-ui>
 			</uui-box>
 		`;
 	}
