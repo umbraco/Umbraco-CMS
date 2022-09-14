@@ -1,4 +1,4 @@
-using Newtonsoft.Json.Linq;
+using System.Text.Json;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Notifications;
 
@@ -27,7 +27,6 @@ public class ServerVariablesParser
         // Raise event for developers to add custom variables
         await _eventAggregator.PublishAsync(new ServerVariablesParsingNotification(items));
 
-        var json = JObject.FromObject(items);
-        return vars.Replace(Token, json.ToString());
+        return vars.Replace(Token, JsonSerializer.Serialize(items));
     }
 }
