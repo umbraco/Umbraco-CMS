@@ -163,14 +163,15 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 	},
 	{
 		type: 'editorView',
-		alias: 'Umb.EditorView.ContentEdit',
-		name: 'Content',
+		alias: 'Umb.EditorView.Content.Edit',
+		name: 'Content Editor Edit View',
 		elementName: 'umb-editor-view-node-edit',
 		loader: () => import('./backoffice/editors/shared/node/views/edit/editor-view-node-edit.element'),
 		meta: {
 			// TODO: how do we want to filter where editor views are shown? https://our.umbraco.com/documentation/extending/Content-Apps/#setting-up-the-plugin
 			// this is a temp solution
 			editors: ['Umb.Editor.Document', 'Umb.Editor.Media'],
+			label: 'Info',
 			pathname: 'content',
 			weight: 100,
 			icon: 'document',
@@ -178,14 +179,15 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 	},
 	{
 		type: 'editorView',
-		alias: 'Umb.EditorView.ContentInfo',
-		name: 'Info',
+		alias: 'Umb.EditorView.Content.Info',
+		name: 'Content Editor Info View',
 		elementName: 'umb-editor-view-node-info',
 		loader: () => import('./backoffice/editors/shared/node/views/info/editor-view-node-info.element'),
 		meta: {
 			// TODO: how do we want to filter where editor views are shown? https://our.umbraco.com/documentation/extending/Content-Apps/#setting-up-the-plugin
 			// this is a temp solution
 			editors: ['Umb.Editor.Document', 'Umb.Editor.Media'],
+			label: 'Info',
 			pathname: 'info',
 			weight: 90,
 			icon: 'info',
@@ -193,14 +195,15 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 	},
 	{
 		type: 'editorView',
-		alias: 'Umb.EditorView.DataTypeEdit',
-		name: 'Edit',
+		alias: 'Umb.EditorView.DataType.Edit',
+		name: 'Data Type Editor Edit View',
 		elementName: 'umb-editor-view-data-type-edit',
 		loader: () => import('./backoffice/editors/data-type/views/edit/editor-view-data-type-edit.element'),
 		meta: {
 			// TODO: how do we want to filter where editor views are shown? https://our.umbraco.com/documentation/extending/Content-Apps/#setting-up-the-plugin
 			// this is a temp solution
 			editors: ['Umb.Editor.DataType'],
+			label: 'Edit',
 			pathname: 'edit',
 			weight: 90,
 			icon: 'edit',
@@ -208,14 +211,31 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 	},
 	{
 		type: 'editorView',
-		alias: 'Umb.EditorView.DocumentTypeDesign',
-		name: 'Design',
+		alias: 'Umb.EditorView.DataType.Info',
+		name: 'Data Type Editor Info View',
+		elementName: 'umb-editor-view-data-type-info',
+		loader: () => import('./backoffice/editors/data-type/views/info/editor-view-data-type-info.element'),
+		meta: {
+			// TODO: how do we want to filter where editor views are shown? https://our.umbraco.com/documentation/extending/Content-Apps/#setting-up-the-plugin
+			// this is a temp solution
+			editors: ['Umb.Editor.DataType'],
+			label: 'Info',
+			pathname: 'info',
+			weight: 90,
+			icon: 'info',
+		},
+	},
+	{
+		type: 'editorView',
+		alias: 'Umb.EditorView.DocumentType.Design',
+		name: 'Document Type Editor Design View',
 		elementName: 'umb-editor-view-document-type-design',
 		loader: () => import('./backoffice/editors/document-type/views/editor-view-document-type-design.element'),
 		meta: {
 			// TODO: how do we want to filter where editor views are shown? https://our.umbraco.com/documentation/extending/Content-Apps/#setting-up-the-plugin
 			// this is a temp solution
 			editors: ['Umb.Editor.DocumentType'],
+			label: 'Design',
 			pathname: 'design',
 			weight: 90,
 			icon: 'edit',
@@ -224,11 +244,12 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 	{
 		type: 'editorView',
 		alias: 'Umb.Editor.Packages.Overview',
-		name: 'Packages',
+		name: 'Packages Editor Overview View',
 		elementName: 'umb-packages-overview',
 		loader: () => import('./backoffice/sections/packages/packages-overview.element'),
 		meta: {
 			icon: 'document',
+			label: 'Packages',
 			pathname: 'repo',
 			editors: ['Umb.Editor.Packages'],
 			weight: 10,
@@ -237,11 +258,12 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 	{
 		type: 'editorView',
 		alias: 'Umb.Editor.Packages.Installed',
-		name: 'Installed',
+		name: 'Packages Editor Installed View',
 		elementName: 'umb-packages-installed',
 		loader: () => import('./backoffice/sections/packages/packages-installed.element'),
 		meta: {
 			icon: 'document',
+			label: 'Installed',
 			pathname: 'installed',
 			editors: ['Umb.Editor.Packages'],
 			weight: 0,
