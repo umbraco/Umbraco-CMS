@@ -313,13 +313,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
   }
 
   function isMediaPickerEnabled(toolbarItemArray) {
-    var insertMediaButtonFound = false;
-    toolbarItemArray.forEach(toolbarItem => {
-      if (toolbarItem.indexOf("umbmediapicker") > -1) {
-        insertMediaButtonFound = true;
-      }
-    });
-    return insertMediaButtonFound;
+    return toolbarItemArray.includes('umbmediapicker');
   }
 
   return {
