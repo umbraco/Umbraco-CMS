@@ -59,6 +59,9 @@ export class UmbEditorEntityLayout extends UmbContextConsumerMixin(LitElement) {
 	];
 
 	@property()
+	headline = '';
+
+	@property()
 	alias = '';
 
 	@property()
@@ -171,7 +174,10 @@ export class UmbEditorEntityLayout extends UmbContextConsumerMixin(LitElement) {
 			<umb-editor-layout>
 				<div id="header" slot="header">
 					<slot id="icon" name="icon"></slot>
-					<slot id="name" name="name"></slot>
+					<div id="name">
+						${this.headline ? html`<h3>${this.headline}</h3>` : nothing}
+						<slot id="name" name="name"></slot>
+					</div>
 					${this._renderViews()}
 				</div>
 

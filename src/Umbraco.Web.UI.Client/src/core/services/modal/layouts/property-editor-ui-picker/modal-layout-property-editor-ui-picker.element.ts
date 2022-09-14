@@ -3,10 +3,12 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { UmbContextConsumerMixin } from '../../../../context';
-import type { UmbModalHandler } from '../../modal-handler';
-import type { UmbExtensionManifestPropertyEditorUI, UmbExtensionRegistry } from '../../../../extension';
+
 import type { Subscription } from 'rxjs';
 import type { UUIComboboxListElement, UUIComboboxListEvent } from '@umbraco-ui/uui';
+import type { UmbModalHandler } from '../../modal-handler';
+import type { UmbExtensionRegistry } from '../../../../extension';
+import type { ManifestPropertyEditorUI } from '../../../../models';
 
 export interface UmbModalPropertyEditorUIPickerData {
 	selection?: Array<string>;
@@ -23,7 +25,7 @@ export class UmbModalLayoutPropertyEditorUIPickerElement extends UmbContextConsu
 	data?: UmbModalPropertyEditorUIPickerData;
 
 	@state()
-	private _propertyEditorUIs: Array<UmbExtensionManifestPropertyEditorUI> = [];
+	private _propertyEditorUIs: Array<ManifestPropertyEditorUI> = [];
 
 	@state()
 	private _selection?: Array<string>;
@@ -77,9 +79,7 @@ export class UmbModalLayoutPropertyEditorUIPickerElement extends UmbContextConsu
 
 	render() {
 		return html`
-			<!-- TODO: maybe we need a layout component between umb-editor-layout and umb-editor-entity? -->
-			<umb-editor-entity alias="Umb.Modal.PropertyEditorUIPicker">
-				<h3 slot="name">Select Property Editor UI</h3>
+			<umb-editor-entity-layout headline="Select Property Editor UI">
 				<uui-box>
 					<uui-combobox-list value="${ifDefined(this._selection?.[0])}" @change="${this._handleChange}">
 						${this._propertyEditorUIs.map(
@@ -97,7 +97,7 @@ export class UmbModalLayoutPropertyEditorUIPickerElement extends UmbContextConsu
 					<uui-button label="Close" @click=${this._close}></uui-button>
 					<uui-button label="Submit" look="primary" color="positive" @click=${this._submit}></uui-button>
 				</div>
-			</umb-editor-entity>
+			</umb-editor-entity-layout>
 		`;
 	}
 }
