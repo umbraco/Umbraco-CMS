@@ -128,6 +128,7 @@ export interface MetaEditorView {
 	editors: string[];
 	pathname: string;
 	weight: number;
+	label: string;
 	icon: string;
 }
 

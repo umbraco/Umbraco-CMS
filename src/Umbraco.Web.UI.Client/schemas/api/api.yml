@@ -636,12 +636,15 @@ components:
         weight:
           type: number
           format: float
+        label:
+          type: string
         icon:
           type: string
       required:
         - editors
         - pathname
         - weight
+        - label
         - icon
     IManifestEditorView:
       type: object

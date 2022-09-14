@@ -211,6 +211,7 @@ export interface components {
       pathname: string;
       /** Format: float */
       weight: number;
+      label: string;
       icon: string;
     };
     IManifestEditorView: {
