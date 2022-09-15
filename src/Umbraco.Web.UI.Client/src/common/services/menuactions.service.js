@@ -8,7 +8,7 @@
  * @description
  * Defines the methods that are called when menu items declare only an action to execute
  */
-function umbracoMenuActions(treeService, $location, navigationService, appState, localizationService, usersResource, umbRequestHelper, notificationsService) {
+function umbracoMenuActions(treeService, entityResource, $location, navigationService, appState, localizationService, usersResource, umbRequestHelper, notificationsService) {
     
     return {
 
@@ -78,6 +78,14 @@ function umbracoMenuActions(treeService, $location, navigationService, appState,
             }
 
             
+        },
+
+        "View" : function(args) {
+            const culture = $location.search().culture || null;
+            entityResource.getUrl(args.entity.id, "Document", culture).then(resp => {
+                window.open(window.location.origin + resp, "_blank");
+                navigationService.hideMenu();
+            });
         },
         
         /**

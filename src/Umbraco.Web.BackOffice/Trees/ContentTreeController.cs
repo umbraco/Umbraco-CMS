@@ -321,6 +321,10 @@ public class ContentTreeController : ContentTreeControllerBase, ISearchableTreeW
             });
         }
 
+
+        menu.Items.Add(new View(LocalizedTextService, true));
+
+
         if ((item is DocumentEntitySlim documentEntity && documentEntity.IsContainer) == false)
         {
             menu.Items.Add(new RefreshNode(LocalizedTextService, true));
