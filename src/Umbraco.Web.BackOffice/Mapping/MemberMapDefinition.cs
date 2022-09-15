@@ -60,6 +60,9 @@ public class MemberMapDefinition : IMapDefinition
         target.Udi = Udi.Create(Constants.UdiEntityType.Member, source.Key);
         target.UpdateDate = source.UpdateDate;
 
+        // Currently not possible for members to be protected
+        target.IsProtected = false;
+
         //Membership
         target.Username = source.Username;
         target.Email = source.Email;
@@ -88,6 +91,9 @@ public class MemberMapDefinition : IMapDefinition
         target.Udi = Udi.Create(Constants.UdiEntityType.Member, source.Key);
         target.UpdateDate = source.UpdateDate;
         target.Username = source.Username;
+
+        // Currently not possible for members to be protected
+        target.IsProtected = false;
     }
 
     // Umbraco.Code.MapAll -Icon -Trashed -ParentId -Alias

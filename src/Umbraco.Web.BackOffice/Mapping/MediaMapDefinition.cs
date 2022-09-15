@@ -82,6 +82,10 @@ public class MediaMapDefinition : IMapDefinition
         target.Udi = Udi.Create(Constants.UdiEntityType.Media, source.Key);
         target.UpdateDate = source.UpdateDate;
         target.VariesByCulture = source.ContentType.VariesByCulture();
+
+        // Currently not possible for media to be protected
+        target.IsProtected = false;
+
     }
 
     // Umbraco.Code.MapAll -Edited -Updater -Alias
@@ -104,6 +108,9 @@ public class MediaMapDefinition : IMapDefinition
         target.Udi = Udi.Create(Constants.UdiEntityType.Media, source.Key);
         target.UpdateDate = source.UpdateDate;
         target.VariesByCulture = source.ContentType.VariesByCulture();
+
+        // Currently not possible for media to be protected
+        target.IsProtected = false;
     }
 
     private bool DetermineIsChildOfListView(IMedia source)

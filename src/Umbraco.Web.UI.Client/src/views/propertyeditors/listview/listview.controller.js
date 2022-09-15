@@ -784,6 +784,8 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
                 return "general_email";
             case "username":
                 return "general_username";
+            case "protected":
+                return "actions_protect";
         }
         return alias;
     }

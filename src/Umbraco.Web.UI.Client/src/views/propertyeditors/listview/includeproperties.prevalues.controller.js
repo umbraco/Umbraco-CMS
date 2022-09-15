@@ -18,7 +18,8 @@ function includePropsPreValsController($rootScope, $scope, localizationService, 
         { value: "published"},
         { value: "contentTypeAlias" },
         { value: "email" },
-        { value: "username" }
+        { value: "username" },
+        { value: "protected" }
     ];
 
     $scope.getLocalizedKey = function(alias) {
@@ -44,6 +45,8 @@ function includePropsPreValsController($rootScope, $scope, localizationService, 
                 return "general_email";
             case "username":
                 return "general_username";
+            case "protected":
+                return "actions_protect";
         }
         return alias;
     }
@@ -76,6 +79,9 @@ function includePropsPreValsController($rootScope, $scope, localizationService, 
                     break;
                 case "username":
                     e.name += " (Members only)";
+                    break;
+                case "protected":
+                    e.name += " (Content only)";
                     break;
             }
 

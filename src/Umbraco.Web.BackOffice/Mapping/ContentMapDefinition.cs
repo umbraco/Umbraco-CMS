@@ -25,6 +25,7 @@ namespace Umbraco.Cms.Web.BackOffice.Mapping;
 internal class ContentMapDefinition : IMapDefinition
 {
     private readonly AppCaches _appCaches;
+    private readonly IPublicAccessService _publicAccessService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly ContentBasicSavedStateMapper<ContentPropertyBasic> _basicStateMapper;
     private readonly CommonMapper _commonMapper;
@@ -67,7 +68,8 @@ internal class ContentMapDefinition : IMapDefinition
         IPublishedUrlProvider publishedUrlProvider,
         IEntityService entityService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        AppCaches appCaches)
+        AppCaches appCaches,
+        IPublicAccessService publicAccessService)
     {
         _commonMapper = commonMapper;
         _commonTreeNodeMapper = commonTreeNodeMapper;
@@ -87,6 +89,7 @@ internal class ContentMapDefinition : IMapDefinition
         _uriUtility = uriUtility;
         _publishedUrlProvider = publishedUrlProvider;
         _appCaches = appCaches;
+        _publicAccessService = publicAccessService;
 
         _tabsAndPropertiesMapper = new TabsAndPropertiesMapper<IContent>(cultureDictionary, localizedTextService, contentTypeBaseServiceProvider);
         _stateMapper = new ContentSavedStateMapper<ContentPropertyDisplay>();
@@ -332,6 +335,7 @@ internal class ContentMapDefinition : IMapDefinition
         target.UpdateDate = GetUpdateDate(source, context);
         target.Updater = _commonMapper.GetCreator(source, context);
         target.VariesByCulture = source.ContentType.VariesByCulture();
+        target.IsProtected = _publicAccessService.IsProtected(source).Success;
     }
 
     private IEnumerable<string> GetActions(IContent source, IContent? parent, MapperContext context)

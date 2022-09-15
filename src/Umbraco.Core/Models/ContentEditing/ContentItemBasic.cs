@@ -96,6 +96,12 @@ public class ContentItemBasic<T> : ContentItemBasic, IContentProperties<T>
         // ensure its not null
         _properties = Enumerable.Empty<T>();
 
+    /// <summary>
+    /// Indicates if the item is restricted by public access
+    /// </summary>
+    [DataMember(Name = "protected")]
+    public bool IsProtected { get; set; }
+
     [DataMember(Name = "properties")]
     public virtual IEnumerable<T> Properties
     {
