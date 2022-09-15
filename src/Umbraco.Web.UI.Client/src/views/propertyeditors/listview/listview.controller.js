@@ -193,6 +193,11 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
                 e.alias === "contentTypeAlias";
         }
 
+        // Don't allow sorting on protected
+        if (e.isSystem && $scope.entityType === "content") {
+            e.allowSorting = e.alias !== "protected";
+        }
+
         if (e.isSystem) {
             //localize the header
             var key = getLocalizedKey(e.alias);
