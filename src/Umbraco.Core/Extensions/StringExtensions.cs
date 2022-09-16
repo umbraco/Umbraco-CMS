@@ -1325,8 +1325,6 @@ public static class StringExtensions
     /// </summary>
     /// <param name="path"></param>
     /// <returns></returns>
-    // From: http://stackoverflow.com/a/35046453/5018
-    // Updated from .NET 2.1+: https://stackoverflow.com/a/58250915
     public static bool IsFullPath(this string path) => Path.IsPathFullyQualified(path);
 
     // FORMAT STRINGS
