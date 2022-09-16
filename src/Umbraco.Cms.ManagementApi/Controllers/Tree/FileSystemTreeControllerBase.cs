@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.IO;
-using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.ManagementApi.ViewModels.Pagination;
 using Umbraco.Cms.ManagementApi.ViewModels.Tree;
 using Umbraco.Extensions;
 
@@ -15,23 +15,23 @@ public abstract class FileSystemTreeControllerBase : Controller
 
     protected abstract string ItemType(string path);
 
-    protected async Task<ActionResult<PagedResult<FileSystemTreeItemViewModel>>> GetRoot(long pageNumber = 0, int pageSize = 100)
+    protected async Task<ActionResult<PagedViewModel<FileSystemTreeItemViewModel>>> GetRoot(long pageNumber = 0, int pageSize = 100)
     {
         FileSystemTreeItemViewModel[] viewModels = GetPathViewModels(string.Empty);
 
-        PagedResult<FileSystemTreeItemViewModel> result = PagedResult(viewModels, 0, viewModels.Length, viewModels.Length);
+        PagedViewModel<FileSystemTreeItemViewModel> result = PagedViewModel(viewModels, viewModels.Length);
         return await Task.FromResult(Ok(result));
     }
 
-    protected async Task<ActionResult<PagedResult<FileSystemTreeItemViewModel>>> GetChildren(string path, long pageNumber = 0, int pageSize = 100)
+    protected async Task<ActionResult<PagedViewModel<FileSystemTreeItemViewModel>>> GetChildren(string path, long pageNumber = 0, int pageSize = 100)
     {
         FileSystemTreeItemViewModel[] viewModels = GetPathViewModels(path);
 
-        PagedResult<FileSystemTreeItemViewModel> result = PagedResult(viewModels, 0, viewModels.Length, viewModels.Length);
+        PagedViewModel<FileSystemTreeItemViewModel> result = PagedViewModel(viewModels, viewModels.Length);
         return await Task.FromResult(Ok(result));
     }
 
-    protected async Task<ActionResult<PagedResult<FileSystemTreeItemViewModel>>> GetItems(string[] paths)
+    protected async Task<ActionResult<PagedViewModel<FileSystemTreeItemViewModel>>> GetItems(string[] paths)
     {
         FileSystemTreeItemViewModel[] viewModels = paths
             .Where(FileSystem.FileExists)
@@ -43,7 +43,7 @@ public abstract class FileSystemTreeControllerBase : Controller
                     : MapViewModel(path, fileName, false);
             }).WhereNotNull().ToArray();
 
-        PagedResult<FileSystemTreeItemViewModel> result = PagedResult(viewModels, 0, viewModels.Length, viewModels.Length);
+        PagedViewModel<FileSystemTreeItemViewModel> result = PagedViewModel(viewModels, viewModels.Length);
         return await Task.FromResult(Ok(result));
     }
 
@@ -73,8 +73,8 @@ public abstract class FileSystemTreeControllerBase : Controller
             .ToArray();
     }
 
-    private PagedResult<FileSystemTreeItemViewModel> PagedResult(IEnumerable<FileSystemTreeItemViewModel> viewModels, long pageNumber, int pageSize, long totalItems)
-        => new(totalItems, pageNumber, pageSize) { Items = viewModels };
+    private PagedViewModel<FileSystemTreeItemViewModel> PagedViewModel(IEnumerable<FileSystemTreeItemViewModel> viewModels, long totalItems)
+        => new() { Total = totalItems, Items = viewModels };
 
     private FileSystemTreeItemViewModel MapViewModel(string path, string name, bool isFolder)
         => new()

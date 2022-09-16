@@ -2,6 +2,7 @@
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.ManagementApi.ViewModels.Pagination;
 using Umbraco.Cms.ManagementApi.ViewModels.RecycleBin;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.RecycleBin;
@@ -23,23 +24,23 @@ public abstract class RecycleBinControllerBase<TItem> : Controller
 
     protected abstract int RecycleBinRootId { get; }
 
-    protected async Task<ActionResult<PagedResult<TItem>>> GetRoot(long pageNumber, int pageSize)
+    protected async Task<ActionResult<PagedViewModel<TItem>>> GetRoot(long pageNumber, int pageSize)
     {
         IEntitySlim[] rootEntities = GetPagedRootEntities(pageNumber, pageSize, out var totalItems);
 
         TItem[] treeItemViewModels = MapRecycleBinViewModels(null, rootEntities);
 
-        PagedResult<TItem> result = PagedResult(treeItemViewModels, pageNumber, pageSize, totalItems);
+        PagedViewModel<TItem> result = PagedViewModel(treeItemViewModels, totalItems);
         return await Task.FromResult(Ok(result));
     }
 
-    protected async Task<ActionResult<PagedResult<TItem>>> GetChildren(Guid parentKey, long pageNumber, int pageSize)
+    protected async Task<ActionResult<PagedViewModel<TItem>>> GetChildren(Guid parentKey, long pageNumber, int pageSize)
     {
         IEntitySlim[] children = GetPagedChildEntities(parentKey, pageNumber, pageSize, out var totalItems);
 
         TItem[] treeItemViewModels = MapRecycleBinViewModels(parentKey, children);
 
-        PagedResult<TItem> result = PagedResult(treeItemViewModels, pageNumber, pageSize, totalItems);
+        PagedViewModel<TItem> result = PagedViewModel(treeItemViewModels, totalItems);
 
         return await Task.FromResult(Ok(result));
     }
@@ -94,6 +95,6 @@ public abstract class RecycleBinControllerBase<TItem> : Controller
     private TItem[] MapRecycleBinViewModels(Guid? parentKey, IEntitySlim[] entities)
         => entities.Select(entity => MapRecycleBinViewModel(parentKey, entity)).ToArray();
 
-    private PagedResult<TItem> PagedResult(IEnumerable<TItem> treeItemViewModels, long pageNumber, int pageSize, long totalItems)
-        => new(totalItems, pageNumber, pageSize) { Items = treeItemViewModels };
+    private PagedViewModel<TItem> PagedViewModel(IEnumerable<TItem> treeItemViewModels, long totalItems)
+        => new() { Total = totalItems, Items = treeItemViewModels };
 }

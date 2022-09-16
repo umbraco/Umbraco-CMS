@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.IO;
-using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.ManagementApi.ViewModels.Pagination;
 using Umbraco.Cms.ManagementApi.ViewModels.Tree;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.PartialView.Tree;
@@ -15,7 +15,7 @@ public class ItemsPartialViewTreeController : PartialViewTreeControllerBase
 
     [HttpGet("items")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(PagedResult<FileSystemTreeItemViewModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedResult<FileSystemTreeItemViewModel>>> Items([FromQuery(Name = "path")] string[] paths)
+    [ProducesResponseType(typeof(PagedViewModel<FileSystemTreeItemViewModel>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<PagedViewModel<FileSystemTreeItemViewModel>>> Items([FromQuery(Name = "path")] string[] paths)
         => await GetItems(paths);
 }

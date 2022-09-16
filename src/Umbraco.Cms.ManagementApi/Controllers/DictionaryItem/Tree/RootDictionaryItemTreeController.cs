@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.ManagementApi.ViewModels.Pagination;
 using Umbraco.Cms.ManagementApi.ViewModels.Tree;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.DictionaryItem.Tree;
@@ -15,14 +16,14 @@ public class RootDictionaryItemTreeController : DictionaryItemTreeControllerBase
 
     [HttpGet("root")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(PagedResult<EntityTreeItemViewModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedResult<EntityTreeItemViewModel>>> Root(long pageNumber = 0, int pageSize = 100)
+    [ProducesResponseType(typeof(PagedViewModel<EntityTreeItemViewModel>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<PagedViewModel<EntityTreeItemViewModel>>> Root(long pageNumber = 0, int pageSize = 100)
     {
         IDictionaryItem[] dictionaryItems = LocalizationService.GetRootDictionaryItems().ToArray();
 
         EntityTreeItemViewModel[] viewModels = MapTreeItemViewModels(null, dictionaryItems);
 
-        PagedResult<EntityTreeItemViewModel> result = PagedResult(viewModels, pageNumber, pageSize, viewModels.Length);
+        PagedViewModel<EntityTreeItemViewModel> result = PagedViewModel(viewModels, viewModels.Length);
         return await Task.FromResult(Ok(result));
     }
 }
