@@ -21,6 +21,7 @@ public class DictionaryItemTreeControllerBase : EntityTreeControllerBase<EntityT
         : base(entityService) =>
         LocalizationService = localizationService;
 
+    // dictionary items do not currently have a known UmbracoObjectType, so we'll settle with Unknown for now
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.Unknown;
 
     protected ILocalizationService LocalizationService { get; }
