@@ -76,7 +76,6 @@ preserve.belle
 /src/Umbraco.Web.UI.Client/src/[Ll]ess/*.css
 /src/Umbraco.Web.UI.Client/TESTS-*.xml
 /src/Umbraco.Web.UI/wwwroot/[Mm]edia/
-/src/Umbraco.Web.UI/wwwroot/umbraco/Data/TEMP
 /src/Umbraco.Web.UI/App_Code/
 /src/Umbraco.Web.UI/App_Plugins/
 /src/Umbraco.Web.UI/[Uu]mbraco/[Dd]ata/
