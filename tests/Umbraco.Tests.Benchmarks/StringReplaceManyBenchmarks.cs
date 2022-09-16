@@ -1,7 +1,5 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
 using BenchmarkDotNet.Attributes;
 using Umbraco.Tests.Benchmarks.Config;
 
@@ -15,25 +13,25 @@ public class StringReplaceManyBenchmarks
         // pick what you want to benchmark
 
         // short
-        //Text = "1,2.3:4&5#6";
+        Text = "1,2.3:4&5#6";
 
         // long
-        Text = "Sed ut perspiciatis unde omnis iste natus &error sit voluptatem accusantium doloremque l:audantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et &quasi architecto beatae vitae ::dicta sunt explicabo. Nemo enim ipsam volupta:tem quia voluptas sit aspernatur aut o&dit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciun&t. Neque porro quisquam est, qui dolorem: ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut e:nim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi co&&nsequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse: quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?";
+        //Text = "Sed ut perspiciatis unde omnis iste natus &error sit voluptatem accusantium doloremque l:audantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et &quasi architecto beatae vitae ::dicta sunt explicabo. Nemo enim ipsam volupta:tem quia voluptas sit aspernatur aut o&dit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciun&t. Neque porro quisquam est, qui dolorem: ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut e:nim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi co&&nsequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse: quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?";
 
         // short
-        /*Replacements = new Dictionary<string, string>
+        Replacements = new Dictionary<string, string>
         {
             {",", "*"},
             {".", "*"},
             {":", "*"},
             {"&", "*"},
             {"#", "*"}
-        };*/
+        };
 
         // long
-        Replacements = new Dictionary<string, string>();
-        for (var i = 2; i < 500; i++)
-            Replacements[Convert.ToChar(i).ToString()] = "*";
+        //Replacements = new Dictionary<string, string>();
+        //for (var i = 2; i < 100; i++)
+        //    Replacements[Convert.ToChar(i).ToString()] = "*";
     }
 
     // this is what v7 originally did
@@ -72,22 +70,6 @@ public class StringReplaceManyBenchmarks
         foreach (var item in Replacements)
         {
             result = result.Replace(item.Key, item.Value);
-        }
-
-        return result;
-    }
-
-    [Benchmark(Description = "String.ReplaceMany w/chars + span")]
-    public string ReplaceManyWithSpanForLoop()
-    {
-        var result = Text;
-        var replacedCharsAsSpan = new Span<char>(ReplacedChars, 0, ReplacedChars.Length);
-
-        // ReSharper disable once LoopCanBeConvertedToQuery
-        // ReSharper disable once ForCanBeConvertedToForeach
-        for (var i = 0; i < replacedCharsAsSpan.Length; i++)
-        {
-            result = result.Replace(replacedCharsAsSpan[i], ReplacementChar);
         }
 
         return result;
