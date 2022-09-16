@@ -1039,14 +1039,15 @@ public static class StringExtensions
             throw new ArgumentNullException(nameof(text));
         }
 
-        var pos = text.IndexOf(search, StringComparison.InvariantCulture);
+        ReadOnlySpan<char> spanText = text.AsSpan();
+        var pos = spanText.IndexOf(search, StringComparison.InvariantCulture);
 
         if (pos < 0)
         {
             return text;
         }
 
-        return text.Substring(0, pos) + replace + text.Substring(pos + search.Length);
+        return string.Concat(spanText[..pos], replace.AsSpan(), spanText[(pos + search.Length)..]);
     }
 
     /// <summary>

@@ -323,4 +323,12 @@ public class StringExtensionsTests
         var output = input.ReplaceMany(toReplace.ToArray(), replacement);
         Assert.AreEqual(expected, output);
     }
+
+    [TestCase("test to test", "test", "release", "release to test")]
+    [TestCase("nothing to do", "test", "release", "nothing to do")]
+    public void ReplaceFirst(string input, string search, string replacement, string expected)
+    {
+        var output = input.ReplaceFirst(search, replacement);
+        Assert.AreEqual(expected, output);
+    }
 }
