@@ -103,7 +103,8 @@ public interface IMemberService : IMembershipMemberService
     /// <returns>
     ///     <see cref="IMember" />
     /// </returns>
-    IMember CreateMemberWithIdentity(string username, string email, string memberTypeAlias);
+    IMember CreateMemberWithIdentity(string username, string email, string memberTypeAlias) =>
+        throw new NotImplementedException();
 
     /// <summary>
     ///     Creates and persists a Member
@@ -119,7 +120,8 @@ public interface IMemberService : IMembershipMemberService
     /// <returns>
     ///     <see cref="IMember" />
     /// </returns>
-    IMember CreateMemberWithIdentity(string username, string email, string memberTypeAlias, bool isApproved);
+    IMember CreateMemberWithIdentity(string username, string email, string memberTypeAlias, bool isApproved) =>
+        throw new NotImplementedException();
 
     /// <summary>
     ///     Creates and persists a Member
@@ -152,7 +154,8 @@ public interface IMemberService : IMembershipMemberService
     /// <returns>
     ///     <see cref="IMember" />
     /// </returns>
-    IMember CreateMemberWithIdentity(string username, string email, string name, string memberTypeAlias, bool isApproved);
+    IMember CreateMemberWithIdentity(string username, string email, string name, string memberTypeAlias, bool isApproved)
+        => throw new NotImplementedException();
 
     /// <summary>
     ///     Creates and persists a Member
