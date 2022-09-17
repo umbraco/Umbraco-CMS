@@ -9,7 +9,7 @@
 
     function propertyEditorReadonly () {
       // check for permission to update
-      return !$scope.variantContent.allowedActions.includes('A');
+      return !(typeof $scope.variantContent !== 'undefined' && $scope.variantContent.allowedActions.includes('A'));
     }
       
   }
