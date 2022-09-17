@@ -51,6 +51,7 @@
         vm.editMedia = editMedia;
         vm.removeMedia = removeMedia;
         vm.copyMedia = copyMedia;
+        vm.validateMandatory = validateMandatory;
 
         vm.labels = {};
 
@@ -394,6 +395,19 @@
             entityResource.getById(mediaEntry.mediaKey, "Media").then(function (mediaEntity) {
                 clipboardService.copy(clipboardService.TYPES.MEDIA, mediaEntity.metaData.ContentTypeAlias, mediaEntry, mediaEntity.name, mediaEntity.icon, mediaEntry.key);
             });
+        }
+
+        function validateMandatory() {
+            debugger;
+            var isValid = !vm.model.validation.mandatory || (
+              vm.model.value != null
+              && vm.model.value.length > 0
+            );
+            return {
+              isValid: isValid,
+              errorMsg: vm.model.validation.mandatoryMessage || "Value cannot be empty",
+              errorKey: "required"
+            };
         }
 
         function requestPasteFromClipboard(createIndex, pasteEntry, pasteType) {

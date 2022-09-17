@@ -71,7 +71,7 @@
     </div>
 
     <ng-form name="vm.modelValueForm">
-        <input type="hidden" name="modelValue" ng-model="vm.model.value.length" ng-required="vm.model.validation.mandatory && vm.model.value.length === 0" />
+        <input type="hidden" name="modelValue" ng-model="vm.model.value.length" val-property-validator="vm.validateMandatory" />
     </ng-form>
 
 </div>
