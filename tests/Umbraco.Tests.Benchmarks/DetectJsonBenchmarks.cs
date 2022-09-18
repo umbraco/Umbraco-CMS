@@ -35,6 +35,21 @@ public class DetectJsonBenchmarks
                || (input.StartsWith('[') && input.EndsWith(']'));
     }
 
+    [Benchmark]
+    public bool CharRangeIndexDetectJson()
+    {
+        var input = Input.Trim();
+        return (input[0] is '[' && input[^1] is ']') || (input[0] is '{' && input[^1] is '}');
+    }
+
+    [Benchmark]
+    public bool CharRangeIndexDetectJsonBad()
+    {
+        var input = Input;
+        return input[0] is '{' or '[' || input[^1] is '}' or ']';
+    }
+
+
     //|           Method |      Mean |      Error |     StdDev | Ratio | RatioSD | Allocated |
     //|----------------- |----------:|-----------:|-----------:|------:|--------:|----------:|
     //| StringDetectJson | 96.580 ns | 285.565 ns | 15.6528 ns |  1.00 |    0.00 |         - |

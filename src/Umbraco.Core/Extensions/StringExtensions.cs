@@ -129,8 +129,7 @@ public static class StringExtensions
         }
 
         input = input.Trim();
-        return (input.StartsWith('{') && input.EndsWith('}'))
-               || (input.StartsWith('[') && input.EndsWith(']'));
+        return input[0] is '{' or '[' || input[^1] is '}' or ']';
     }
 
     public static bool DetectIsEmptyJson(this string input) =>
