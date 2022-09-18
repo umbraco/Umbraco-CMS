@@ -119,8 +119,15 @@ app.run(['$rootScope', '$route', '$location', '$cookies', 'urlHelper', 'appState
                 event.preventDefault();
                 var returnPath = null;
                 if (rejection.path == "/login" || rejection.path.startsWith("/login/")) {
+                  // Check if a ReturnUrl is present on the querystring and redirect to it if set
+                  var queryStrings = urlHelper.getQueryStringParams();
+                  if (typeof queryStrings.ReturnUrl !== 'undefined' && queryStrings.ReturnUrl.length > 0) {
+                    returnPath = queryStrings.ReturnUrl;
+                  }
+                  else {
                     //Set the current path before redirecting so we know where to redirect back to
-                    returnPath = encodeURIComponent(window.location.href.replace(window.location.origin,''));
+                    returnPath = encodeURIComponent(window.location.href.replace(window.location.origin, ''));                    
+                  }
                 }
                 $location.path(rejection.path)
                 if (returnPath) {
