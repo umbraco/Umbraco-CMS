@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Globalization;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
