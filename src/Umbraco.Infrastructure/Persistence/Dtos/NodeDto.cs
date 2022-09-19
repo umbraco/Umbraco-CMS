@@ -67,11 +67,9 @@ public class NodeDto
     [Constraint(Default = SystemMethods.CurrentDateTime)]
     public DateTime CreateDate { get; set; }
 
-
     [ComputedColumn("textUpper")]
     [NullSetting(NullSetting = NullSettings.Null)]
     public string? TextUpper { get; set; }
-
 
     [ComputedColumn("pathUpper")]
     public string? PathUpper { get; set; }
