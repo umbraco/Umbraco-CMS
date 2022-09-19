@@ -22,7 +22,6 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_10_3_0
         {
             if (Context.Database.DatabaseType == NPoco.DatabaseType.SQLite)
             {
-                //SQLCE
                 if (ColumnExists(NodeDto.TableName, "textUpper") is false)
                 {
                     var addTextUpperComputedColumnSql = $"ALTER TABLE {NodeDto.TableName} ADD textUpper TEXT GENERATED ALWAYS AS (upper(text)) STORED";
