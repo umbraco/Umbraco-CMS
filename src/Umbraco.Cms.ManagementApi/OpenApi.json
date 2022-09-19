@@ -14,9 +14,9 @@
     "/umbraco/api/v1/install/settings": {
       "get": {
         "tags": [
-          "NewInstall"
+          "Install"
         ],
-        "operationId": "NewInstall_Settings",
+        "operationId": "SettingsInstall_Settings",
         "responses": {
           "400": {
             "description": "",
@@ -54,9 +54,9 @@
     "/umbraco/api/v1/install/setup": {
       "post": {
         "tags": [
-          "NewInstall"
+          "Install"
         ],
-        "operationId": "NewInstall_Setup",
+        "operationId": "SetupInstall_Setup",
         "requestBody": {
           "x-name": "installData",
           "content": {
@@ -99,9 +99,9 @@
     "/umbraco/api/v1/install/validateDatabase": {
       "post": {
         "tags": [
-          "NewInstall"
+          "Install"
         ],
-        "operationId": "NewInstall_ValidateDatabase",
+        "operationId": "ValidateDatabaseInstall_ValidateDatabase",
         "requestBody": {
           "x-name": "viewModel",
           "content": {
@@ -136,7 +136,7 @@
         "tags": [
           "Upgrade"
         ],
-        "operationId": "Upgrade_Authorize",
+        "operationId": "AuthorizeUpgrade_Authorize",
         "responses": {
           "200": {
             "description": ""
@@ -169,7 +169,7 @@
         "tags": [
           "Upgrade"
         ],
-        "operationId": "Upgrade_Settings",
+        "operationId": "SettingsUpgrade_Settings",
         "responses": {
           "200": {
             "description": "",
@@ -540,7 +540,13 @@
   },
   "tags": [
     {
+      "name": "Upgrade"
+    },
+    {
       "name": "Server"
+    },
+    {
+      "name": "Install"
     }
   ]
 }
