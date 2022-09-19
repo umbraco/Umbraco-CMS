@@ -1,15 +1,3 @@
-
-
-/*
-    Dev note, maybe this concept can be used for somethings:
-    grid-template-columns: 
-        [column-start] 1fr
-        repeat(calc(var(--umb-block-grid--area-column-span, var(--umb-block-grid--grid-columns, 1)) - 2), minmax(0, 1fr))
-        [column-end] 1fr
-    ;
-*/
-
-
 .umb-block-grid__layout-container {
     position: relative;
     display: grid;
@@ -20,6 +8,7 @@
 }
 .umb-block-grid__layout-item {
     position: relative;
+    /* For small devices we scale columnSpan by three, to make everything bigger than 1/3 take full width: */
     grid-column-end: span min(calc(var(--umb-block-grid--item-column-span, 1) * 3), var(--umb-block-grid--grid-columns));
     grid-row: span var(--umb-block-grid--item-row-span, 1);
 }
@@ -42,31 +31,11 @@
 }
 .umb-block-grid__area {
     position: relative;
+    /* For small devices we scale columnSpan by three, to make everything bigger than 1/3 take full width: */
     grid-column-end: span min(calc(var(--umb-block-grid--item-column-span, 1) * 3), var(--umb-block-grid--grid-columns));
     grid-row: span var(--umb-block-grid--area-row-span, 1);
 }
 
-/*
-@media (min-width:768px) and (max-width:1023px) {
-    .umb-block-grid__layout-item {
-        grid-column-end: span min(calc(var(--umb-block-grid--item-column-span, 1) * 2), var(--umb-block-grid--grid-columns));
-    }
-    .umb-block-grid__layout-item[data-col-span='5'] {
-        grid-column-end: span min(12, var(--umb-block-grid--grid-columns));
-    }
-    .umb-block-grid__layout-item[data-col-span='4'] {
-        grid-column-end: span min(6, var(--umb-block-grid--grid-columns));
-    }
-    .umb-block-grid__area {
-        grid-column-end: span min(calc(var(--umb-block-grid--item-column-span, 1) * 2), var(--umb-block-grid--grid-columns));
-    }
-    .umb-block-grid__area[data-col-span='5'] {
-        grid-column-end: span min(12, var(--umb-block-grid--grid-columns));
-    }
-    .umb-block-grid__area[data-col-span='4'] {
-        grid-column-end: span min(6, var(--umb-block-grid--grid-columns));
-    }
-}*/
 @media (min-width:1024px) {
     .umb-block-grid__layout-item {
         grid-column-end: span var(--umb-block-grid--item-column-span, 1);
@@ -75,21 +44,3 @@
         grid-column-end: span var(--umb-block-grid--area-column-span, 1);
     }
 }
-
-/*
-.umb-block-grid__layout-item[data-content-element-type-alias='feature'] {
-    border: 1px solid red;
-}
-*/
-
-/*
-.umb-block-grid__layout-item[data-content-property-hideOnMobile='True'] {
-    display:none;
-}
-*/
-
-/*
-.umb-block-grid__layout-item[data-col-span='4'] {
-    grid-column: span 4;
-}
-*/
