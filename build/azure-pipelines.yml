@@ -270,6 +270,7 @@ stages:
               vmImage: 'ubuntu-latest'
             macOS:
               vmImage: 'macOS-latest'
+              DOTNET_SYSTEM_GLOBALIZATION_APPLOCALICU: ''
         pool:
           vmImage: $(vmImage)
         steps:
