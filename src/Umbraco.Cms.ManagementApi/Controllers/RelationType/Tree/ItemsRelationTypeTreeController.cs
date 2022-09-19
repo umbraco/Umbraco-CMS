@@ -19,8 +19,8 @@ public class ItemsRelationTypeTreeController : RelationTypeTreeControllerBase
     [ProducesResponseType(typeof(PagedViewModel<FolderTreeItemViewModel>), StatusCodes.Status200OK)]
     public async Task<ActionResult<PagedViewModel<FolderTreeItemViewModel>>> Items([FromQuery(Name = "key")] Guid[] keys)
     {
-        // TODO: either make EntityService support relation types, or make RelationService able to query multiple relation types
-        // - for now this workaround works somewhat, as there likely isn't a whole lot of relation types defined.
+        // relation service does not allow fetching a collection of relation types by their ids; instead it relies
+        // heavily on caching, which means this is as fast as it gets - even if it looks less than performant
         IRelationType[] relationTypes = RelationService
             .GetAllRelationTypes()
             .Where(relationType => keys.Contains(relationType.Key)).ToArray();
