@@ -46,8 +46,7 @@ public class NodeDto
 
     [Column("trashed")]
     [Constraint(Default = "0")]
-    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_Trashed_ObjectType_textUpper", ForColumns = "trashed,nodeObjectType,textUpper")]
-    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_Trashed")]
+    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_Trashed", ForColumns = "trashed,nodeObjectType,textUpper")]
     public bool Trashed { get; set; }
 
     [Column("nodeUser")] // TODO: db rename to 'createUserId'
