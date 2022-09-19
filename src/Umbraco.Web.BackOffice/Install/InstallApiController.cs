@@ -94,12 +94,8 @@ public class InstallApiController : ControllerBase
 
         if (levelBeforeRestart == RuntimeLevel.Install)
         {
-            BackOfficeIdentityUser? identityUser =
-                await _backOfficeUserManager.FindByIdAsync(Core.Constants.Security.SuperUserIdAsString);
-            if (identityUser is not null)
-            {
-                _backOfficeSignInManager.SignInAsync(identityUser, false);
-            }
+            BackOfficeIdentityUser identityUser = await _backOfficeUserManager.FindByIdAsync(Core.Constants.Security.SuperUserIdAsString);
+            _backOfficeSignInManager.SignInAsync(identityUser, false);
         }
 
         return NoContent();

@@ -21,7 +21,7 @@ public interface IMemberSignInManager
 
     Task<SignInResult> ExternalLoginSignInAsync(ExternalLoginInfo loginInfo, bool isPersistent, bool bypassTwoFactor = false);
 
-    Task<MemberIdentityUser?> GetTwoFactorAuthenticationUserAsync();
+    Task<MemberIdentityUser> GetTwoFactorAuthenticationUserAsync();
 
-    Task<SignInResult> TwoFactorSignInAsync(string provider, string code, bool isPersistent, bool rememberClient);
+    Task<SignInResult> TwoFactorSignInAsync(string? provider, string? code, bool isPersistent, bool rememberClient);
 }

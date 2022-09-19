@@ -22,12 +22,8 @@ public class SignInUserStep : IInstallStep
 
     public async Task ExecuteAsync(InstallData model)
     {
-        BackOfficeIdentityUser? identityUser = await _backOfficeUserManager.FindByIdAsync(Constants.Security.SuperUserIdAsString);
-
-        if (identityUser is not null)
-        {
-            await _backOfficeSignInManager.SignInAsync(identityUser, false);
-        }
+        BackOfficeIdentityUser identityUser = await _backOfficeUserManager.FindByIdAsync(Constants.Security.SuperUserIdAsString);
+        await _backOfficeSignInManager.SignInAsync(identityUser, false);
     }
 
     public Task<bool> RequiresExecutionAsync(InstallData model) => Task.FromResult(true);

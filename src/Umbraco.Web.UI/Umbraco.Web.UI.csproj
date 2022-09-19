@@ -1,18 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <RootNamespace>Umbraco.Cms.Web.UI</RootNamespace>
     <EnablePackageValidation>false</EnablePackageValidation>
-  </PropertyGroup>
-
-  <Import Project="..\Umbraco.Cms\buildTransitive\Umbraco.Cms.props" />
-
-  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
-    <DocumentationFile>bin/Release/Umbraco.Web.UI.xml</DocumentationFile>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <CopyRazorGenerateFilesToPublishDirectory>true</CopyRazorGenerateFilesToPublishDirectory>
   </PropertyGroup>
 
   <Import Project="..\Umbraco.Cms\buildTransitive\Umbraco.Cms.props" />
@@ -21,6 +11,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.5" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="all" />
     <PackageReference Include="Umbraco.Code" Version="2.0.0" PrivateAssets="all" />
   </ItemGroup>
 
@@ -62,8 +54,6 @@
     <CallTarget Targets="AppsettingsDevBuild" Condition="!Exists('appsettings.Development.json')" />
   </Target>
 
-
-
   <Target Name="JsonSchemaBuild">
     <Exec Command="dotnet run -c Release --project $(JsonSchemaProjectPath) -o &quot;$(ProjectDir)appsettings-schema.json&quot;" />
   </Target>
@@ -77,5 +67,4 @@
     <Message Text="Generating appsettings.Development.json because it doesnt exist" Importance="High" />
     <Copy SourceFiles="$(ProjectDir)appsettings.Development.template.json" DestinationFiles="$(ProjectDir)appsettings.Development.json" />
   </Target>
-
 </Project>

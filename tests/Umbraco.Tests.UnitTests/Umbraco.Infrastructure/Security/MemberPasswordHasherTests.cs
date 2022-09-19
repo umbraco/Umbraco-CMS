@@ -15,11 +15,10 @@ public class MemberPasswordHasherTests
     [Test]
     [TestCase(
         "Password123!",
-        "AQAAAAIAAYagAAAAEJBorDjt+UEvw55UJVsbgAS6T2IGao+2XpCBbO3EKZoAMzoN+CNOpPdu1c0qrFcJVw==", null,  ExpectedResult = PasswordVerificationResult.Success, Description = "AspNetCoreIdentityPasswordHash: Correct password")]
-        [TestCase("Password123!", "AQAAAAEAACcQAAAAEGF/tTVoL6ef3bQPZFYfbgKFu1CDQIAMgyY1N4EDt9jqdG/hsOX93X1U6LNvlIQ3mw==",
+        "AQAAAAEAACcQAAAAEGF/tTVoL6ef3bQPZFYfbgKFu1CDQIAMgyY1N4EDt9jqdG/hsOX93X1U6LNvlIQ3mw==",
         null,
-        ExpectedResult = PasswordVerificationResult.SuccessRehashNeeded,
-        Description = "GivenALegacyAspNetCoreIdentityPasswordHash: Correct password")]
+        ExpectedResult = PasswordVerificationResult.Success,
+        Description = "AspNetCoreIdentityPasswordHash: Correct password")]
     [TestCase(
         "wrongPassword",
         "AQAAAAEAACcQAAAAEGF/tTVoL6ef3bQPZFYfbgKFu1CDQIAMgyY1N4EDt9jqdG/hsOX93X1U6LNvlIQ3mw==",

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -23,7 +23,7 @@ public class TwoFactorLoginController : UmbracoAuthorizedJsonController
     private readonly IBackOfficeSignInManager _backOfficeSignInManager;
     private readonly IBackOfficeUserManager _backOfficeUserManager;
     private readonly ILogger<TwoFactorLoginController> _logger;
-    private readonly ITwoFactorLoginService _twoFactorLoginService;
+    private readonly ITwoFactorLoginService2 _twoFactorLoginService;
     private readonly IOptionsSnapshot<TwoFactorLoginViewOptions> _twoFactorLoginViewOptions;
 
     public TwoFactorLoginController(
@@ -36,7 +36,15 @@ public class TwoFactorLoginController : UmbracoAuthorizedJsonController
     {
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
         _logger = logger;
-        _twoFactorLoginService = twoFactorLoginService;
+
+        if (twoFactorLoginService is not ITwoFactorLoginService2 twoFactorLoginService2)
+        {
+            throw new ArgumentException(
+                "twoFactorLoginService needs to implement ITwoFactorLoginService2 until the interfaces are merged",
+                nameof(twoFactorLoginService));
+        }
+
+        _twoFactorLoginService = twoFactorLoginService2;
         _backOfficeSignInManager = backOfficeSignInManager;
         _backOfficeUserManager = backOfficeUserManager;
         _twoFactorLoginViewOptions = twoFactorLoginViewOptions;
@@ -65,11 +73,7 @@ public class TwoFactorLoginController : UmbracoAuthorizedJsonController
     [HttpGet]
     public async Task<ActionResult<IEnumerable<UserTwoFactorProviderModel>>> Get2FAProvidersForUser(int userId)
     {
-        BackOfficeIdentityUser? user = await _backOfficeUserManager.FindByIdAsync(userId.ToString(CultureInfo.InvariantCulture));
-        if (user is null)
-        {
-            throw new InvalidOperationException("Could not find user");
-        }
+        BackOfficeIdentityUser user = await _backOfficeUserManager.FindByIdAsync(userId.ToString(CultureInfo.InvariantCulture));
 
         var enabledProviderNameHashSet =
             new HashSet<string>(await _twoFactorLoginService.GetEnabledTwoFactorProviderNamesAsync(user.Key));

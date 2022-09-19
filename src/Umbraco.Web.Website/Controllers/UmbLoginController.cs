@@ -41,6 +41,28 @@ public class UmbLoginController : SurfaceController
         _twoFactorLoginService = twoFactorLoginService;
     }
 
+    [Obsolete("Use ctor with all params")]
+    public UmbLoginController(
+        IUmbracoContextAccessor umbracoContextAccessor,
+        IUmbracoDatabaseFactory databaseFactory,
+        ServiceContext services,
+        AppCaches appCaches,
+        IProfilingLogger profilingLogger,
+        IPublishedUrlProvider publishedUrlProvider,
+        IMemberSignInManager signInManager)
+        : this(
+            umbracoContextAccessor,
+            databaseFactory,
+            services,
+            appCaches,
+            profilingLogger,
+            publishedUrlProvider,
+            signInManager,
+            StaticServiceProvider.Instance.GetRequiredService<IMemberManager>(),
+            StaticServiceProvider.Instance.GetRequiredService<ITwoFactorLoginService>())
+    {
+    }
+
     [HttpPost]
     [ValidateAntiForgeryToken]
     [ValidateUmbracoFormRouteString]
@@ -81,7 +103,7 @@ public class UmbLoginController : SurfaceController
 
         if (result.RequiresTwoFactor)
         {
-            MemberIdentityUser? attemptedUser = await _memberManager.FindByNameAsync(model.Username);
+            MemberIdentityUser attemptedUser = await _memberManager.FindByNameAsync(model.Username);
             if (attemptedUser == null!)
             {
                 return new ValidationErrorResult(

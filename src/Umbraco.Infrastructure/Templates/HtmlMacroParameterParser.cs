@@ -79,7 +79,7 @@ public sealed class HtmlMacroParameterParser : IHtmlMacroParameterParser
     private IEnumerable<UmbracoEntityReference> GetUmbracoEntityReferencesFromMacros(
         List<Tuple<string?, Dictionary<string, string>>> macros)
     {
-        if (_macroService is not IMacroService macroWithAliasService)
+        if (_macroService is not IMacroWithAliasService macroWithAliasService)
         {
             yield break;
         }
