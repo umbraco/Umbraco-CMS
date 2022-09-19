@@ -3,7 +3,7 @@ import { html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
 @customElement('umb-ref-property-editor')
-export class UmbRefPropertyEditor extends UUIRefNodeElement {
+export class UmbRefPropertyEditorElement extends UUIRefNodeElement {
 	static styles = [...UUIRefNodeElement.styles];
 
 	protected fallbackIcon =
@@ -27,6 +27,6 @@ export class UmbRefPropertyEditor extends UUIRefNodeElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-ref-property-editor': UmbRefPropertyEditor;
+		'umb-ref-property-editor': UmbRefPropertyEditorElement;
 	}
 }
