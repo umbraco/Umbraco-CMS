@@ -9,6 +9,7 @@
             ng-class="{'--isOpen':vm.openArea === area}"
             area="area"
             style="
+            --umb-block-grid--grid-column: {{area.columnSpan}};
             --umb-block-grid--area-column-span: {{area.columnSpan}};
             --umb-block-grid--area-row-span: {{area.rowSpan}};
             "
