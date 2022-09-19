@@ -174,6 +174,7 @@ export interface components {
       view: string;
     };
     MetaPropertyEditorUI: {
+      propertyEditors: string[];
       icon: string;
       group: string;
       prevalues?: {

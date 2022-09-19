@@ -138,6 +138,7 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		meta: {
 			icon: 'edit',
 			group: 'common',
+			propertyEditors: ['Umbraco.TextBox'],
 		},
 	},
 	{
@@ -149,6 +150,7 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		meta: {
 			icon: 'edit',
 			group: 'common',
+			propertyEditors: ['Umbraco.TextArea'],
 		},
 	},
 	{
@@ -159,6 +161,7 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		meta: {
 			icon: 'favorite',
 			group: 'common',
+			propertyEditors: ['Umbraco.Custom'],
 		},
 	},
 	{
@@ -294,6 +297,7 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		elementName: 'umb-property-editor-content-picker',
 		loader: () => import('./backoffice/property-editors/content-picker/property-editor-content-picker.element'),
 		meta: {
+			propertyEditors: ['Umbraco.ContentPicker'],
 			icon: 'document',
 			group: 'common',
 		},

@@ -544,6 +544,10 @@ components:
     MetaPropertyEditorUI:
       type: object
       properties:
+        propertyEditors:
+          type: array
+          items:
+            type: string
         icon:
           type: string
         group:
@@ -560,6 +564,7 @@ components:
         defaultConfig:
           type: object
       required:
+        - propertyEditors
         - icon
         - group
     IManifestPropertyEditorUI:

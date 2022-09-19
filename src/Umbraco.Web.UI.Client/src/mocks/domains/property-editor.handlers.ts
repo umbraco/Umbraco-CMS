@@ -9,4 +9,14 @@ export const handlers = [
 
 		return res(ctx.status(200), ctx.json(propertyEditors));
 	}),
+
+	rest.get('/umbraco/backoffice/property-editors/:alias', (req, res, ctx) => {
+		console.warn('Please move to schema');
+		const alias = req.params.alias as string;
+		if (!alias) return;
+
+		const propertyEditor = umbPropertyEditorData.getByAlias(alias);
+
+		return res(ctx.status(200), ctx.json([propertyEditor]));
+	}),
 ];

@@ -15,7 +15,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		alias: 'Umbraco.BlockGrid',
 		name: 'Block Grid',
-		icon: 'icon-thumbnail-list',
+		icon: 'umb:thumbnail-list',
 		editor: {
 			view: '',
 		},
@@ -23,7 +23,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		alias: 'Umbraco.BlockList',
 		name: 'Block List',
-		icon: 'icon-thumbnail-list',
+		icon: 'umb:thumbnail-list',
 		editor: {
 			view: '',
 		},
@@ -31,7 +31,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		alias: 'Umbraco.CheckBoxList',
 		name: 'Checkbox list',
-		icon: 'icon-bulleted-list',
+		icon: 'umb:bulleted-list',
 		editor: {
 			view: '',
 		},
@@ -39,7 +39,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		alias: 'Umbraco.ColorPicker',
 		name: 'Color Picker',
-		icon: 'icon-colorpicker',
+		icon: 'umb:colorpicker',
 		editor: {
 			view: '',
 		},
@@ -47,7 +47,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		alias: 'Umbraco.ContentPicker',
 		name: 'Content Picker',
-		icon: 'icon-autofill',
+		icon: 'umb:autofill',
 		editor: {
 			view: '',
 		},
@@ -55,7 +55,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		alias: 'Umbraco.DateTime',
 		name: 'Date/Time',
-		icon: 'icon-time',
+		icon: 'umb:time',
 		editor: {
 			view: '',
 		},
@@ -63,7 +63,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		alias: 'Umbraco.Decimal',
 		name: 'Decimal',
-		icon: 'icon-autofill',
+		icon: 'umb:autofill',
 		editor: {
 			view: '',
 		},
@@ -71,7 +71,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		alias: 'Umbraco.DropDown.Flexible',
 		name: 'Dropdown',
-		icon: 'icon-indent',
+		icon: 'umb:indent',
 		editor: {
 			view: '',
 		},
@@ -79,7 +79,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		alias: 'Umbraco.EmailAddress',
 		name: 'Email address',
-		icon: 'icon-message',
+		icon: 'umb:message',
 		editor: {
 			view: '',
 		},
@@ -87,7 +87,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		alias: 'Umbraco.ColorPicker.EyeDropper',
 		name: 'Eye Dropper Color Picker',
-		icon: 'icon-colorpicker',
+		icon: 'umb:colorpicker',
 		editor: {
 			view: '',
 		},
@@ -95,7 +95,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		alias: 'Umbraco.UploadField',
 		name: 'File upload',
-		icon: 'icon-download-alt',
+		icon: 'umb:download-alt',
 		editor: {
 			view: '',
 		},
@@ -103,7 +103,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		alias: 'Umbraco.Grid',
 		name: 'Grid layout',
-		icon: 'icon-layout',
+		icon: 'umb:layout',
 		editor: {
 			view: '',
 		},
@@ -111,7 +111,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		alias: 'Umbraco.ImageCropper',
 		name: 'Image Cropper',
-		icon: 'icon-crop',
+		icon: 'umb:crop',
 		editor: {
 			view: '',
 		},
@@ -119,7 +119,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		alias: 'Umbraco.Label',
 		name: 'Label',
-		icon: 'icon-readonly',
+		icon: 'umb:readonly',
 		editor: {
 			view: '',
 		},
@@ -127,7 +127,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		alias: 'Umbraco.ListView',
 		name: 'List view',
-		icon: 'icon-thumbnail-list',
+		icon: 'umb:thumbnail-list',
 		editor: {
 			view: '',
 		},
@@ -135,7 +135,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		alias: 'Umbraco.MarkdownEditor',
 		name: 'Markdown editor',
-		icon: 'icon-code',
+		icon: 'umb:code',
 		editor: {
 			view: '',
 		},
@@ -143,7 +143,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		alias: 'Umbraco.MediaPicker3',
 		name: 'Media Picker',
-		icon: 'icon-picture',
+		icon: 'umb:picture',
 		editor: {
 			view: '',
 		},
@@ -151,7 +151,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		alias: 'Umbraco.MediaPicker',
 		name: 'Media Picker (legacy)',
-		icon: 'icon-picture',
+		icon: 'umb:picture',
 		editor: {
 			view: '',
 		},
@@ -159,7 +159,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		alias: 'Umbraco.MemberGroupPicker',
 		name: 'Member Group Picker',
-		icon: 'icon-users-alt',
+		icon: 'umb:users-alt',
 		editor: {
 			view: '',
 		},
@@ -167,7 +167,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		alias: 'Umbraco.MemberPicker',
 		name: 'Member Picker',
-		icon: 'icon-user',
+		icon: 'umb:user',
 		editor: {
 			view: '',
 		},
@@ -175,7 +175,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		alias: 'Umbraco.MultiUrlPicker',
 		name: 'Multi URL Picker',
-		icon: 'icon-link',
+		icon: 'umb:link',
 		editor: {
 			view: '',
 		},
@@ -183,7 +183,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		alias: 'Umbraco.MultiNodeTreePicker',
 		name: 'Multinode Treepicker',
-		icon: 'icon-page-add',
+		icon: 'umb:page-add',
 		editor: {
 			view: '',
 		},
@@ -191,7 +191,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		alias: 'Umbraco.NestedContent',
 		name: 'Nested Content',
-		icon: 'icon-thumbnail-list',
+		icon: 'umb:thumbnail-list',
 		editor: {
 			view: '',
 		},
@@ -199,7 +199,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		alias: 'Umbraco.Integer',
 		name: 'Numeric',
-		icon: 'icon-autofill',
+		icon: 'umb:autofill',
 		editor: {
 			view: '',
 		},
@@ -207,7 +207,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		alias: 'Umbraco.RadioButtonList',
 		name: 'Radio button list',
-		icon: 'icon-target',
+		icon: 'umb:target',
 		editor: {
 			view: '',
 		},
@@ -215,7 +215,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		alias: 'Umbraco.MultipleTextstring',
 		name: 'Repeatable textstrings',
-		icon: 'icon-ordered-list',
+		icon: 'umb:ordered-list',
 		editor: {
 			view: '',
 		},
@@ -223,7 +223,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		alias: 'Umbraco.TinyMCE',
 		name: 'Rich Text Editor',
-		icon: 'icon-browser-window',
+		icon: 'umb:browser-window',
 		editor: {
 			view: '',
 		},
@@ -231,7 +231,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		alias: 'Umbraco.Slider',
 		name: 'Slider',
-		icon: 'icon-navigation-horizontal',
+		icon: 'umb:navigation-horizontal',
 		editor: {
 			view: '',
 		},
@@ -239,7 +239,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		alias: 'Umbraco.Tags',
 		name: 'Tags',
-		icon: 'icon-tags',
+		icon: 'umb:tags',
 		editor: {
 			view: '',
 		},
@@ -247,7 +247,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		alias: 'Umbraco.TextArea',
 		name: 'Textarea',
-		icon: 'icon-application-window-alt',
+		icon: 'umb:application-window-alt',
 		editor: {
 			view: '',
 		},
@@ -255,7 +255,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		alias: 'Umbraco.TextBox',
 		name: 'Textbox',
-		icon: 'icon-autofill',
+		icon: 'umb:autofill',
 		editor: {
 			view: '',
 		},
@@ -263,7 +263,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		alias: 'Umbraco.TrueFalse',
 		name: 'Toggle',
-		icon: 'icon-checkbox',
+		icon: 'umb:checkbox',
 		editor: {
 			view: '',
 		},
@@ -271,7 +271,15 @@ export const data: Array<PropertyEditor> = [
 	{
 		alias: 'Umbraco.UserPicker',
 		name: 'User Picker',
-		icon: 'icon-user',
+		icon: 'umb:user',
+		editor: {
+			view: '',
+		},
+	},
+	{
+		alias: 'Umbraco.Custom',
+		name: 'Custom Property Editor',
+		icon: 'umb:document',
 		editor: {
 			view: '',
 		},
@@ -286,6 +294,10 @@ class UmbPropertyEditorData extends UmbData<PropertyEditor> {
 
 	getAll() {
 		return this.data;
+	}
+
+	getByAlias(alias: string) {
+		return this.data.find((x) => x.alias === alias);
 	}
 }
 

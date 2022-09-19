@@ -16,8 +16,10 @@ export const data: Array<DataTypeEntity> = [
 		isTrashed: false,
 		hasChildren: false,
 		icon: '',
-		propertyEditorAlias: 'Umb.PropertyEditor.Text',
-		propertyEditorUIAlias: 'Umb.PropertyEditorUI.Text',
+		propertyEditorAlias: '',
+		propertyEditorUIAlias: '',
+		//propertyEditorAlias: 'Umbraco.TextBox',
+		//propertyEditorUIAlias: 'Umb.PropertyEditorUI.Text',
 	},
 	{
 		key: 'dt-2',
@@ -27,7 +29,7 @@ export const data: Array<DataTypeEntity> = [
 		isTrashed: false,
 		hasChildren: false,
 		icon: '',
-		propertyEditorAlias: 'Umb.PropertyEditor.Textarea',
+		propertyEditorAlias: 'Umbraco.TextArea',
 		propertyEditorUIAlias: 'Umb.PropertyEditorUI.Textarea',
 	},
 	{
@@ -38,7 +40,7 @@ export const data: Array<DataTypeEntity> = [
 		isTrashed: false,
 		hasChildren: false,
 		icon: '',
-		propertyEditorAlias: 'Umb.PropertyEditor.Custom',
+		propertyEditorAlias: 'Umbraco.Custom',
 		propertyEditorUIAlias: 'My.PropertyEditorUI.Custom',
 	},
 	{
@@ -49,7 +51,7 @@ export const data: Array<DataTypeEntity> = [
 		isTrashed: false,
 		hasChildren: false,
 		icon: '',
-		propertyEditorAlias: 'Umb.PropertyEditor.ContextExample',
+		propertyEditorAlias: 'Umbraco.Custom',
 		propertyEditorUIAlias: 'Umb.PropertyEditorUI.ContextExample',
 	},
 	{
@@ -60,7 +62,7 @@ export const data: Array<DataTypeEntity> = [
 		isTrashed: false,
 		hasChildren: false,
 		icon: '',
-		propertyEditorAlias: 'Umb.PropertyEditor.ContentPicker',
+		propertyEditorAlias: 'Umbraco.ContentPicker',
 		propertyEditorUIAlias: 'Umb.PropertyEditorUI.ContentPicker',
 	},
 ];

@@ -11,6 +11,7 @@ export class UmbDataTypeContext {
 		hasChildren: false,
 		parentKey: '',
 		isTrashed: false,
+		propertyEditorAlias: '',
 		propertyEditorUIAlias: '',
 	});
 	public readonly data: Observable<DataTypeEntity> = this._data.asObservable();
