@@ -43,8 +43,12 @@
         return calc;
     }
     
-    function closestColumnSpanOption(target, map) {
+    function closestColumnSpanOption(target, map, max) {
+        console.log("closestColumnSpanOption", max)
         return map.reduce((a, b) => {
+            if (a.columnSpan >= max) {
+                return b;
+            }
             let aDiff = Math.abs(a.columnSpan - target);
             let bDiff = Math.abs(b.columnSpan - target);
     
@@ -54,6 +58,7 @@
                 return bDiff < aDiff ? b : a;
             }
         });
+        // If no columnSpan was found, we could consider returning the lowest available?
     }
 
 
@@ -143,7 +148,6 @@
         let layoutContainer = null;
         let gridColumns = null;
         let gridRows = null;
-        let scaleBoxEl = null;
         let scaleBoxBackdropEl = null;
 
 
@@ -155,8 +159,9 @@
             const blockEndRow = getInterpolatedIndexOfPositionInWeightMap(endY, gridRows);
 
             let newColumnSpan = Math.max(blockEndCol-blockStartCol, 1);
+
             // Find nearest allowed Column:
-            newColumnSpan = closestColumnSpanOption(newColumnSpan , vm.layoutEntry.$block.config.columnSpanOptions).columnSpan;
+            newColumnSpan = closestColumnSpanOption(newColumnSpan , vm.layoutEntry.$block.config.columnSpanOptions, gridColumns.length - blockStartCol).columnSpan;
 
             let newRowSpan = Math.round(Math.max(blockEndRow-blockStartRow, vm.layoutEntry.$block.config.rowMinSpan || 1));
             if(vm.layoutEntry.$block.config.rowMaxSpan != null) {
@@ -241,17 +246,6 @@
             scaleBoxBackdropEl.className = 'umb-block-grid__scalebox-backdrop';
             layoutContainer.appendChild(scaleBoxBackdropEl);
 
-            //scaleBoxEl = document.createElement('div');
-            //scaleBoxEl.className = 'umb-block-grid__scalebox';
-
-            //const scaleBoxScaleHandler = document.createElement('button');
-            //scaleBoxScaleHandler.className = 'umb-block-grid__scale-handler';
-            //scaleBoxEl.appendChild(scaleBoxScaleHandler);
-
-            //$element[0].appendChild(scaleBoxEl);
-            
-
-
         }
         vm.onMouseMove = function(e) {
 
@@ -275,9 +269,6 @@
             //const endCellX =  getAccumulatedValueOfIndex(endCol, gridColumns);
             //const endCellY =  getAccumulatedValueOfIndex(endRow, gridRows);
 
-            //scaleBoxEl.style.width = Math.round(endCellX-startCellX)+'px';
-            //scaleBoxEl.style.height = Math.round(endCellY-startCellY)+'px';
-            
             // update as we go:
             vm.layoutEntry.columnSpan = newSpans.columnSpan;
             vm.layoutEntry.rowSpan = newSpans.rowSpan;
@@ -305,13 +296,11 @@
             window.removeEventListener('mouseleave', vm.onMouseUp);
 
             layoutContainer.removeChild(scaleBoxBackdropEl);
-            //$element[0].removeChild(scaleBoxEl);
 
             // Clean up variables:
             layoutContainer = null;
             gridColumns = null;
             gridRows = null;
-            //scaleBoxEl = null;
             scaleBoxBackdropEl = null;
  
             // Update block size:
@@ -345,7 +334,7 @@
 
             const newColumnSpan = Math.max(vm.layoutEntry.columnSpan + addCol, 1);
 
-            vm.layoutEntry.columnSpan = closestColumnSpanOption(newColumnSpan, vm.layoutEntry.$block.config.columnSpanOptions).columnSpan;
+            vm.layoutEntry.columnSpan = closestColumnSpanOption(newColumnSpan, vm.layoutEntry.$block.config.columnSpanOptions, gridColumns.length).columnSpan;
             let newRowSpan = Math.max(vm.layoutEntry.rowSpan + addRow, vm.layoutEntry.$block.config.rowMinSpan || 1);
             if(vm.layoutEntry.$block.config.rowMaxSpan != null) {
                 newRowSpan = Math.min(newRowSpan, vm.layoutEntry.$block.config.rowMaxSpan);
