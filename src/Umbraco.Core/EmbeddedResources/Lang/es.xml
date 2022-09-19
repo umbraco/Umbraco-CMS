@@ -1365,6 +1365,7 @@
     <key alias="profile">Perfil</key>
     <key alias="searchAllChildren">Buscar en todos los hijos</key>
     <key alias="languagesHelp">Limite los idiomas a los que los usuarios tienen acceso para editar</key>
+    <key alias="allowAccessToAllLanguages">Permitir el acceso a todos los idiomas</key>
     <key alias="sectionsHelp">Añadir secciones para dar acceso a usuarios</key>
     <key alias="selectUserGroups">Seleccionar grupos de usuarios</key>
     <key alias="noStartNode">Nodo de inicio no seleccionado</key>
