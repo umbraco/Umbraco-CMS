@@ -2888,6 +2888,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="unforceRightLabel">Remove forced placement at right side</key>
     <key alias="forceLeftButton">Toggle forced placement at left side</key>
     <key alias="forceRightButton">Toggle forced placement at right side</key>
+    <key alias="scaleHandlerButtonTitle">Drag to scale</key>
   </area>
   <area alias="contentTemplatesDashboard">
     <key alias="whatHeadline">What are Content Templates?</key>

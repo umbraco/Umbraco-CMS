@@ -2238,6 +2238,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="unforceRightLabel">Fjern påtvungen placering i højre side</key>
     <key alias="forceLeftButton">Skift påtvungen placering i venstre side</key>
     <key alias="forceRightButton">Skift påtvungen placering i højre side</key>
+    <key alias="scaleHandlerButtonTitle">Træk for at skalere</key>
   </area>
   <area alias="contentTemplatesDashboard">
     <key alias="whatHeadline">Hvad er Indholdsskabeloner?</key>
