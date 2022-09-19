@@ -355,11 +355,6 @@ public class StringExtensionsTests
         // Invalid on both Windows and Linux
         TryIsFullPath("", false, false);
         TryIsFullPath("   ", false, false); // technically, a valid filename on Linux
-
-        // Invalid on Windows, valid (but not full paths) on Linux
-        TryIsFullPath(@"\\is_this_a_dir_or_a_hostname", false, !isWindows);
-        TryIsFullPath(@"\\is_this_a_dir_or_a_hostname\", false, !isWindows);
-        TryIsFullPath(@"\\is_this_a_dir_or_a_hostname\\", false, !isWindows);
     }
 
     private static void TryIsFullPath(string path, bool expectedIsFull, bool expectedIsValid = true)
