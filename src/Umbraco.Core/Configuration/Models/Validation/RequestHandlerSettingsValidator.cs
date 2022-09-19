@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Core.Configuration.Models.Validation;
 public class RequestHandlerSettingsValidator : ConfigurationValidatorBase, IValidateOptions<RequestHandlerSettings>
 {
     /// <inheritdoc />
-    public ValidateOptionsResult Validate(string? name, RequestHandlerSettings options)
+    public ValidateOptionsResult Validate(string name, RequestHandlerSettings options)
     {
         if (!ValidateConvertUrlsToAscii(options.ConvertUrlsToAscii, out var message))
         {

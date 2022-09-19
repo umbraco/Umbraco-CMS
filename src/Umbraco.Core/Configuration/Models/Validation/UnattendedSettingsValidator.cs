@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Microsoft.Extensions.Options;
@@ -12,7 +12,7 @@ public class UnattendedSettingsValidator
     : IValidateOptions<UnattendedSettings>
 {
     /// <inheritdoc />
-    public ValidateOptionsResult Validate(string? name, UnattendedSettings options)
+    public ValidateOptionsResult Validate(string name, UnattendedSettings options)
     {
         if (options.InstallUnattended)
         {

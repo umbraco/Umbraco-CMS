@@ -49,7 +49,7 @@ public static class FormCollectionExtensions
     /// <param name="items"></param>
     /// <param name="key"></param>
     /// <returns></returns>
-    public static string? GetRequiredString(this FormCollection items, string key)
+    public static string GetRequiredString(this FormCollection items, string key)
     {
         if (items.HasKey(key) == false)
         {

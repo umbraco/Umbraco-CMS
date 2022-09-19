@@ -70,8 +70,7 @@ public class MemberTabsAndPropertiesMapper : TabsAndPropertiesMapper<IMember>
         return resolved;
     }
 
-    // We need this because we call GetCustomGenericProperties from TabsAndPropertiesMapper
-        // and we have no access to MapMembershipProperties from the base class without casting
+    [Obsolete("Use MapMembershipProperties. Will be removed in Umbraco 10.")]
     protected override IEnumerable<ContentPropertyDisplay> GetCustomGenericProperties(IContentBase content)
     {
         var member = (IMember)content;

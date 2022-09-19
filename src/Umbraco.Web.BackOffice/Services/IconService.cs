@@ -141,7 +141,7 @@ public class IconService : IIconService
 
         IEnumerable<FileInfo> coreIcons = iconFolder
             .Where(x => !x.IsDirectory && x.Name.EndsWith(".svg"))
-            .Select(x => new FileInfo(x.PhysicalPath!));
+            .Select(x => new FileInfo(x.PhysicalPath));
 
         icons.UnionWith(coreIcons);
 

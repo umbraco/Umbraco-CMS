@@ -82,7 +82,7 @@ public class AspNetCoreHostingEnvironment : IHostingEnvironment
     public Uri ApplicationMainUrl { get; private set; } = null!;
 
     /// <inheritdoc />
-    public string? SiteName { get; private set; }
+    public string SiteName { get; private set; } = null!;
 
     /// <inheritdoc />
     public string ApplicationId

@@ -39,14 +39,23 @@ public class TemplateController : BackOfficeNotificationsController
                                       throw new ArgumentNullException(nameof(defaultViewContentProvider));
     }
 
-        /// <summary>
-        /// Gets data type by alias
-        /// </summary>
-        /// <param name="alias"></param>
-        /// <returns></returns>
-        public TemplateDisplay? GetByAlias(string alias)
-        {
-            ITemplate? template = _fileService.GetTemplate(alias);
+    [Obsolete("Use ctor will all params")]
+    public TemplateController(
+        IFileService fileService,
+        IUmbracoMapper umbracoMapper,
+        IShortStringHelper shortStringHelper)
+        : this(fileService, umbracoMapper, shortStringHelper, StaticServiceProvider.Instance.GetRequiredService<IDefaultViewContentProvider>())
+    {
+    }
+
+    /// <summary>
+    ///     Gets data type by alias
+    /// </summary>
+    /// <param name="alias"></param>
+    /// <returns></returns>
+    public TemplateDisplay? GetByAlias(string alias)
+    {
+        ITemplate? template = _fileService.GetTemplate(alias);
         return template == null ? null : _umbracoMapper.Map<ITemplate, TemplateDisplay>(template);
     }
 

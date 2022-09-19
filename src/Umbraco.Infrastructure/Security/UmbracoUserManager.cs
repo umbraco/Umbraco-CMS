@@ -134,8 +134,8 @@ public abstract class UmbracoUserManager<TUser, TPasswordConfig> : UserManager<T
     /// <inheritdoc />
     public override async Task<bool> CheckPasswordAsync(TUser user, string? password)
     {
-        // we cannot proceed if the user passed in does not have an identity, or if no password is provided.
-        if (user.HasIdentity == false || password is null)
+        // we cannot proceed if the user passed in does not have an identity
+        if (user.HasIdentity == false)
         {
             return false;
         }
@@ -158,10 +158,10 @@ public abstract class UmbracoUserManager<TUser, TPasswordConfig> : UserManager<T
     ///     is to generate a token and reset it, however, when we do this we want to track a password change, not a password
     ///     reset
     /// </remarks>
-    public virtual async Task<IdentityResult> ChangePasswordWithResetAsync(string userId, string token, string newPassword)
+    public virtual async Task<IdentityResult> ChangePasswordWithResetAsync(string userId, string token, string? newPassword)
     {
-        TUser? user = await FindByIdAsync(userId);
-        if (user is null)
+        TUser user = await FindByIdAsync(userId);
+        if (user == null)
         {
             throw new InvalidOperationException("Could not find user");
         }
@@ -251,8 +251,8 @@ public abstract class UmbracoUserManager<TUser, TPasswordConfig> : UserManager<T
 
     public async Task<bool> ValidateCredentialsAsync(string username, string password)
     {
-        TUser? user = await FindByNameAsync(username);
-        if (user is null)
+        TUser user = await FindByNameAsync(username);
+        if (user == null)
         {
             return false;
         }

@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <PackageId>Umbraco.Cms.Persistence.SqlServer</PackageId>
     <Title>Umbraco.Cms.Persistence.SqlServer</Title>
     <Description>Adds support for SQL Server to Umbraco CMS.</Description>
