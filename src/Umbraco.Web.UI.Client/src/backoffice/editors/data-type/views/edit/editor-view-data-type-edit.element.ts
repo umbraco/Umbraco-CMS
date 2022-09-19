@@ -143,10 +143,10 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Li
 		const selection = [this._dataType.propertyEditorAlias] || [];
 		const modalHandler = this._modalService?.propertyEditorPicker({ selection });
 
-		modalHandler?.onClose().then((returnValue) => {
-			if (!returnValue.selection) return;
+		modalHandler?.onClose().then(({ selection } = {}) => {
+			if (!selection) return;
 
-			const propertyEditorAlias = returnValue.selection[0];
+			const propertyEditorAlias = selection[0];
 			this._selectPropertyEditor(propertyEditorAlias);
 		});
 	}
@@ -164,10 +164,10 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Li
 		const selection = [this._dataType.propertyEditorUIAlias] || [];
 		const modalHandler = this._modalService?.propertyEditorUIPicker({ selection });
 
-		modalHandler?.onClose().then((returnValue) => {
-			if (!returnValue.selection) return;
+		modalHandler?.onClose().then(({ selection } = {}) => {
+			if (!selection) return;
 
-			const propertyEditorUIAlias = returnValue.selection[0];
+			const propertyEditorUIAlias = selection[0];
 			this._selectPropertyEditorUI(propertyEditorUIAlias);
 		});
 	}
