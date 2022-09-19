@@ -214,7 +214,7 @@
                 return false;
             }
 
-            function _dropInTheVoid() {
+            function _moveGhostElement() {
 
                 rqaId = null;
                 if(!ghostEl) {
@@ -235,7 +235,7 @@
 
                 const insideGhost = dragX > ghostRect.left && dragX < ghostRect.right && dragY > ghostRect.top && dragY < ghostRect.bottom;
                 // We do not necessary have a related element jet, if so we can conclude we are outside ist rectangle.
-                const insideRelated = relatedRect ? (dragX > relatedRect.left && dragX < relatedRect.right && dragY > relatedRect.top && dragY < relatedRect.bottom) : false;
+                //const insideRelated = relatedRect ? (dragX > relatedRect.left && dragX < relatedRect.right && dragY > relatedRect.top && dragY < relatedRect.bottom) : false;
                 //!insideGhost && 
                 if (!insideGhost) {
                     // We do not hover something meaningful, so lets try to find a solution:
@@ -256,20 +256,13 @@
                     let placeAfter = false;
                     elementInSameRow.forEach( sameRow => {
                         const centerX = (sameRow.rect.left + (sameRow.rect.width*.5));
-                        let leftDistance = dragX - centerX;
-                        let rightDistance = centerX - dragX;
-                        if(leftDistance > Math.max(rightDistance, 0) && leftDistance < lastDistance) {
+                        let distance = Math.abs(dragX - centerX);
+                        if(distance < lastDistance) {
                             foundRelatedEl = sameRow.el;
                             foundRelatedRect = sameRow.rect;
-                            lastDistance = leftDistance;
-                            placeAfter = true;
-                        } else if (rightDistance > 0 && rightDistance < lastDistance) {
-                            foundRelatedEl = sameRow.el;
-                            foundRelatedRect = sameRow.rect;
-                            lastDistance = leftDistance;
-                            placeAfter = false;
+                            lastDistance = Math.abs(distance);
+                            placeAfter = dragX > centerX;
                         }
-                        //console.log("dists: ", leftDistance, rightDistance, placeAfter)
                     });
 
                     //console.log("place ", placeAfter, "related to", foundRelatedEl);
@@ -281,24 +274,61 @@
 
                     if (foundRelatedEl) {
 
-                        let isCursorGood = false;
-                        const distanceFromTopLeft = dist(dragX, dragY, foundRelatedRect.left, foundRelatedRect.top);
-                        const distanceFromBottomRight = dist(dragX, dragY, foundRelatedRect.right, foundRelatedRect.bottom);
-                        if(placeAfter) {
-                            isCursorGood = distanceFromTopLeft > distanceFromBottomRight;
-                        } else {
-                            isCursorGood = distanceFromTopLeft <= distanceFromBottomRight;
+                        let newIndex = containerElements.indexOf(foundRelatedEl);
+                        if (newIndex === -1) {
+                            console.error("newIndex not found!!!, this situation needs to be dealt with, TODO.");
                         }
-                        if(!isCursorGood) {
-                            //console.log("Too far?")
-                            return;
+
+                        let verticalDirection = false;
+                        const foundRelatedElRect = foundRelatedEl.getBoundingClientRect();
+                        if (ghostEl.dataset.forceLeft) {
+                            //verticalDirection = true;
+                            console.log("#A")
+                            placeAfter = true;
+                        } else if (ghostEl.dataset.forceRight) {
+                            //verticalDirection = true;
+                            console.log("#B")
+                            placeAfter = true;
+                        } else {
+                            /*const insideFoundRelated = dragX > foundRelatedElRect.left && dragX < foundRelatedElRect.right && dragY > foundRelatedElRect.top && dragY < foundRelatedElRect.bottom;
+                            if(insideFoundRelated) {*/
+
+                                // if the related element is forceLeft and we are in the left side, we will set vertical direction, to correct placeAfter.
+                                if (foundRelatedEl.dataset.forceLeft && placeAfter === false) {
+                                    verticalDirection = true;
+                                    console.log("#1")
+                                } else 
+                                // if the related element is forceRight and we are in the right side, we will set vertical direction, to correct placeAfter.
+                                if (foundRelatedEl.dataset.forceRight && placeAfter === true) {
+                                    verticalDirection = true;
+                                    console.log("#2")
+                                } else {
+                                    const totalColumns = getComputedStyle(approvedContainerEl).getPropertyValue("--umb-block-grid--grid-columns");
+
+                                    // maybe include the position of the related?
+                                    const relatedColumns = foundRelatedEl.dataset.colSpan;
+                                    const ghostColumns = ghostEl.dataset.colSpan;
+
+                                    if(relatedColumns + ghostColumns > totalColumns) {
+                                        verticalDirection = true;
+                                    }
+
+                                    console.log("totalColumns", totalColumns, relatedColumns, ghostColumns)
+                                    /*
+                                    If they fit, then we go horizontal? unless forceLeft/forceRight on both?
+
+                                    If they don't fit we go vertical...
+                                    */
+                                }
+                            //}
+                        }
+                        if (verticalDirection) {
+                            placeAfter = (dragY > foundRelatedElRect.top + (foundRelatedElRect.height*.5));
+                            console.log("vertical direction", placeAfter);
+                        } else {
+                            console.log("horizontal direction", placeAfter);
                         }
                         
-                        let newIndex = containerElements.indexOf(foundRelatedEl);
-                        //console.log("indexes", newIndex, "   placeAfter:", placeAfter);
-                        if (newIndex === -1) {
-                            console.error("newIndex not found!!!");
-                        }
 
                         //console.log("void drop at ", newIndex, " containerElements.length:", containerElements.length)
                         const nextEl = containerElements[(placeAfter ? newIndex+1 : newIndex)];
@@ -315,7 +345,12 @@
                         }*/
 
                         //$scope.$evalAsync();
+                        return
                     }
+
+
+                    // TODO: we found no related, maybe we are on another line than everyone else...
+                    console.log("No line found...")
                 }
             }
 
@@ -324,6 +359,9 @@
                 /** ignorer last drag event, comes as clientX === 0 and clientY === 0 */
                 if(vm.movingLayoutEntry && targetRect && ghostRect && evt.clientX !== 0 && evt.clientY !== 0) {
 
+                    if(dragX === evt.clientX && dragY === evt.clientY) {
+                        return;
+                    }
                     dragX = evt.clientX;
                     dragY = evt.clientY;
 
@@ -336,7 +374,7 @@
                     
                     if (!insideGhost) {
                         if(rqaId === null) {
-                            rqaId = requestAnimationFrame(_dropInTheVoid);
+                            rqaId = requestAnimationFrame(_moveGhostElement);
                             //rqaId = setTimeout(() => {rqaId = null;}, 150);
                         }
                     }
