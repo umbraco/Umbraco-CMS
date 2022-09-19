@@ -125,7 +125,7 @@
         function initializeSortable() {
 
             const gridLayoutContainerEl = $element[0].querySelector('.umb-block-grid__layout-container');
-            var _lastContainerVM = null;
+            var _lastIndicationContainerVM = null;
 
             var targetRect = null;
             var relatedEl = null;
@@ -189,219 +189,23 @@
                 }
             }
 
-            var awaitingContainer = null;
-            var approvedContainer = gridLayoutContainerEl;
-            var approvedContainerDate = null;
-
-            var awaitingTarget = null;
-            var approvedTarget = {related: null, after: false};
-            var timeout = null;
-
-            function _checkReset() {
-                awaitingContainer = null;
-                approvedContainer = null;
-                //preventAwaitingNewContainer = false;
-
-                awaitingTarget = null;
-                approvedTarget = {related: null, after: false};
-                clearTimeout(timeout);
-
-                timeout = null;
-            }
-
-            function _checkStart() {
-                approvedContainer = gridLayoutContainerEl;
-                approvedContainerDate = new Date().getTime();
-            }
+            var approvedContainerEl = null;
 
             function dist(x1,y1,x2,y2){
                 return Math.sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1)); 
             }
 
-            //var preventAwaitingNewContainer = false;
-            function _checkMove(evt) {
+            function _indication(contextVM, movingEl) {
 
-                if(approvedTarget && evt.related === approvedTarget.related && evt.willInsertAfter === approvedTarget.after) {
-                    return true;
+                if(_lastIndicationContainerVM !== contextVM && _lastIndicationContainerVM !== null) {
+                    _lastIndicationContainerVM.hideNotAllowed();
+                    _lastIndicationContainerVM.revertIndicateDroppable();
                 }
-                
-                // if cursor is within the ghostBox, then a move will be prevented:
-                if(dragX > ghostRect.left && dragX < ghostRect.right && dragY > ghostRect.top && dragY < ghostRect.bottom) {
-                    //console.log("Reject by ghostRect")
-                    return false;
-                }
-
-                var contextVM = vm;
-                if (gridLayoutContainerEl !== evt.to) {
-                    contextVM = evt.to['Sortable:controller']();
-                }
-
-                // Skip waiting if its an empty container:
-                const isEmptyContainer = (contextVM.entries.length === 0);
-
-                if(evt.to !== approvedContainer) {
-                    // If its only a few milliseconds since we approved the current container, then we will reject the new container:
-                    const timeSinceApproval = new Date().getTime() - approvedContainerDate;
-                    const rejectionTimeLeft = (ANIMATION_DURATION + 100) - timeSinceApproval;
-                    if(rejectionTimeLeft > 0) {
-                        //console.log("Reject by rejectionTimeLeft")
-                        return false;
-                    }
-                    if(awaitingContainer === null) {//&& preventAwaitingNewContainer !== true
-                        /*if(isEmptyContainer) {
-                            clearTimeout(timeout);
-                            timeout = null;
-                            awaitingTarget = null;
-                            awaitingContainer = null;
-                            approvedContainer = evt.to;
-                            // continuing..
-                        } else {*/
-                            awaitingTarget = null;
-                            awaitingContainer = null;
-                            awaitingContainer = evt.to;
-                            clearTimeout(timeout);
-                            timeout = setTimeout(_approveAwaitingContainer, ANIMATION_DURATION);
-                            //console.log("Reject by setting new awaitingContainer")
-                            return false;
-                        //}
-                    } else {
-                        //console.log("Reject by awaitingContainer")
-                        return false;
-                    }
-                }
-
-                if(awaitingTarget === null) {
-
-                    // Skip waiting if its an empty container:
-                    if(isEmptyContainer) {
-                        approvedTarget = {related: evt.related, after: evt.willInsertAfter};
-                        awaitingTarget = null;
-                        clearTimeout(timeout);
-                        timeout = null;
-                        return true;
-                    }
-
-
-                    // Measure distance from related element, this is not accurate as we don't know how the layout will turn out, but we need to do something to prevent the UI from trying out too possibilities, as it will flip around weirdly.
-                    const dragRect = {
-                        left: dragX - dragOffsetX,
-                        top: dragY - dragOffsetY,
-                        right: dragX - dragOffsetX + ghostRect.width,
-                        bottom: dragY - dragOffsetY + ghostRect.height
-                    }
-                    /*let oldDistance = Math.min(
-                        dist(dragRect.left, dragRect.top, ghostRect.left, ghostRect.top),
-                        dist(dragRect.right, dragRect.top, ghostRect.right,ghostRect.top),
-                        dist(dragRect.left, dragRect.bottom, ghostRect.left,ghostRect.bottom),
-                        dist(dragRect.right, dragRect.bottom, ghostRect.right,ghostRect.bottom)
-                    );
-                    let newDistance = 0;
-                    */
-                    /*newDistance = Math.min(
-                        dist(dragRect.left, dragRect.top, evt.relatedRect.left, evt.relatedRect.top),
-                        dist(dragRect.right, dragRect.top, evt.relatedRect.right,evt.relatedRect.top),
-                        dist(dragRect.left, dragRect.bottom, evt.relatedRect.left,evt.relatedRect.bottom),
-                        dist(dragRect.right, dragRect.bottom, evt.relatedRect.right,evt.relatedRect.bottom)
-                    );*/
-                    /*
-                    if(evt.willInsertAfter) {
-                        newDistance = Math.min(
-                            dist(dragRect.left, dragRect.top, evt.relatedRect.left, evt.relatedRect.bottom),
-                            dist(dragRect.right, dragRect.top, evt.relatedRect.right, evt.relatedRect.bottom),
-
-                            dist(dragRect.left, dragRect.top, evt.relatedRect.right, evt.relatedRect.top),
-                            dist(dragRect.left, dragRect.bottom, evt.relatedRect.right, evt.relatedRect.bottom)
-                        );
-                    } else {
-                        newDistance = Math.min(
-                            dist(dragRect.left, dragRect.bottom, evt.relatedRect.left, evt.relatedRect.top),
-                            dist(dragRect.right, dragRect.bottom, evt.relatedRect.right, evt.relatedRect.top),
-
-                            dist(dragRect.right, dragRect.top, evt.relatedRect.left, evt.relatedRect.top),
-                            dist(dragRect.right, dragRect.bottom, evt.relatedRect.left, evt.relatedRect.bottom)
-                        );
-                    }
-                    */
-                    let isCursorGood = false;
-                    const distanceFromTopLeft = dist(dragX, dragY, evt.relatedRect.left, evt.relatedRect.top);
-                    const distanceFromBottomRight = dist(dragX, dragY, evt.relatedRect.right, evt.relatedRect.bottom);
-                    if(evt.willInsertAfter) {
-                        /*
-                        oldDistance = Math.min(
-                            dist(dragRect.left, dragRect.top, ghostRect.left, ghostRect.top),
-                            dist(dragRect.right, dragRect.bottom, ghostRect.right,ghostRect.bottom)
-                        );
-                        newDistance = Math.min(
-                            dist(dragRect.right, dragRect.top, evt.relatedRect.right,evt.relatedRect.top),
-                            dist(dragRect.right, dragRect.bottom, evt.relatedRect.right,evt.relatedRect.bottom)
-                        );
-                        */
-                        isCursorGood = distanceFromTopLeft > distanceFromBottomRight;
-                    } else {
-                        /*
-                        oldDistance = Math.min(
-                            dist(dragRect.left, dragRect.top, ghostRect.left,ghostRect.top),
-                            dist(dragRect.right, dragRect.bottom, ghostRect.right,ghostRect.bottom)
-                        );
-                        newDistance = Math.min(
-                            dist(dragRect.left, dragRect.top, evt.relatedRect.left, evt.relatedRect.top),
-                            dist(dragRect.left, dragRect.bottom, evt.relatedRect.left,evt.relatedRect.bottom)
-                        );
-                        */
-                        isCursorGood = distanceFromTopLeft <= distanceFromBottomRight;
-                    }
-
-                    //console.log("calc", ghostRect.left,  ghostRect.top, "  |  ", dragRect.left, dragRect.top, "              calc: ", oldDistanceY, " < ", newDistanceY);
-                    //&& oldDistance <= newDistance
-
-                    // Reason: We judge if the drop is good, cause SortableJS out of the box would switch between before/after position very fast, instead we only allow either when the cursor is closest to the top/left -> before or bottom/right -> after.
-                    if(!isCursorGood) {
-                        //console.log("rejected because existing is closer", !isCursorGood, oldDistance <= newDistance, evt.willInsertAfter);
-                        return false;
-                    }
-
-                    awaitingTarget = {related: evt.related, after: evt.willInsertAfter};
-                    clearTimeout(timeout);
-                    timeout = setTimeout(_approveAwaitingRelated, ANIMATION_DURATION);
-                }
-                //console.log("awaitingTarget reject")
-                return false;
-            }
-            
-            function _approveAwaitingContainer() {
-                approvedContainer = awaitingContainer;
-                approvedContainerDate = new Date().getTime();
-                awaitingContainer = null;
-                timeout = null;
-                //_callOnMove();
-            }
-            function _approveAwaitingRelated() {
-                approvedTarget = awaitingTarget;
-                awaitingTarget = null;
-                timeout = null;
-                //_callOnMove();
-            }
-
-            function _indication(evt) {
-
-                // If not the same gridLayoutContainerEl, then test for transfer option:
-
-                var contextVM = vm;
-                if (gridLayoutContainerEl !== evt.to) {
-                    contextVM = evt.to['Sortable:controller']();
-                }
-
-                const movingEl = evt.dragged;
-
-                if(_lastContainerVM !== contextVM && _lastContainerVM !== null) {
-                    _lastContainerVM.hideNotAllowed();
-                    _lastContainerVM.revertIndicateDroppable();
-                }
-                _lastContainerVM = contextVM;
+                _lastIndicationContainerVM = contextVM;
                 
                 if(contextVM.acceptBlock(movingEl.dataset.contentElementTypeKey) === true) {
-                    _lastContainerVM.hideNotAllowed();
-                    _lastContainerVM.indicateDroppable();// This block is accepted to we will indicate a good drop.
+                    _lastIndicationContainerVM.hideNotAllowed();
+                    _lastIndicationContainerVM.indicateDroppable();// This block is accepted to we will indicate a good drop.
                     return true;
                 }
 
@@ -412,14 +216,19 @@
 
             function _dropInTheVoid() {
 
+                rqaId = null;
                 if(!ghostEl) {
                     return;
                 }
-
-                if(gridLayoutContainerEl.animated) {
-                    console.log("gridLayoutContainerEl.animated", gridLayoutContainerEl.animated)
+                if(!approvedContainerEl) {
                     return;
                 }
+                /*
+                if(approvedContainer.animated) {
+                    console.log("approvedContainer.animated", approvedContainer.animated)
+                    return;
+                }
+                */
                 
                 ghostRect = ghostEl.getBoundingClientRect();
                 relatedRect = relatedEl?.getBoundingClientRect();
@@ -428,16 +237,16 @@
                 // We do not necessary have a related element jet, if so we can conclude we are outside ist rectangle.
                 const insideRelated = relatedRect ? (dragX > relatedRect.left && dragX < relatedRect.right && dragY > relatedRect.top && dragY < relatedRect.bottom) : false;
                 //!insideGhost && 
-                //if (!insideRelated) {
+                if (!insideGhost) {
                     // We do not hover something meaningful, so lets try to find a solution:
                     
-                    let onSameRow = [];
-                    const containerElements = Array.from(gridLayoutContainerEl.children);
+                    let elementInSameRow = [];
+                    const containerElements = Array.from(approvedContainerEl.children);
                     for (const el of containerElements) {
                         const elRect = el.getBoundingClientRect();
                         // gather elements on the same row.
                         if(dragY >= elRect.top && dragY <= elRect.bottom && el !== ghostEl) {
-                            onSameRow.push({el: el, rect:elRect});
+                            elementInSameRow.push({el: el, rect:elRect});
                         }
                     }
 
@@ -445,20 +254,22 @@
                     let foundRelatedEl = null;
                     let foundRelatedRect = null;
                     let placeAfter = false;
-                    onSameRow.forEach( sameRow => {
+                    elementInSameRow.forEach( sameRow => {
                         const centerX = (sameRow.rect.left + (sameRow.rect.width*.5));
                         let leftDistance = dragX - centerX;
                         let rightDistance = centerX - dragX;
                         if(leftDistance > Math.max(rightDistance, 0) && leftDistance < lastDistance) {
                             foundRelatedEl = sameRow.el;
                             foundRelatedRect = sameRow.rect;
+                            lastDistance = leftDistance;
                             placeAfter = true;
                         } else if (rightDistance > 0 && rightDistance < lastDistance) {
                             foundRelatedEl = sameRow.el;
                             foundRelatedRect = sameRow.rect;
+                            lastDistance = leftDistance;
                             placeAfter = false;
                         }
-                        console.log("dists: ", leftDistance, rightDistance, placeAfter)
+                        //console.log("dists: ", leftDistance, rightDistance, placeAfter)
                     });
 
                     //console.log("place ", placeAfter, "related to", foundRelatedEl);
@@ -470,16 +281,6 @@
 
                     if (foundRelatedEl) {
 
-
-                        /*
-                        const distanceFromGhost = dist(dragX, dragY, ghostRect.left + ghostRect.width*.5, ghostRect.top + ghostRect.height*.5);
-                        const distanceFromFound = dist(dragX, dragY, foundRelatedRect.left + foundRelatedRect.width*.5, foundRelatedRect.top + foundRelatedRect.height*.5);
-                        
-                        if(distanceFromGhost > distanceFromFound) {
-                            console.log("Too far?")
-                            return;
-                        }
-                        */
                         let isCursorGood = false;
                         const distanceFromTopLeft = dist(dragX, dragY, foundRelatedRect.left, foundRelatedRect.top);
                         const distanceFromBottomRight = dist(dragX, dragY, foundRelatedRect.right, foundRelatedRect.bottom);
@@ -489,25 +290,22 @@
                             isCursorGood = distanceFromTopLeft <= distanceFromBottomRight;
                         }
                         if(!isCursorGood) {
-                            console.log("Too far?")
+                            //console.log("Too far?")
                             return;
                         }
                         
-                        //const relatedElementUdi = foundRelatedEl.dataset.elementUdi;
-
-                        //const movingEntry = vm.entries.splice(oldIndex, 1)[0];
-
-                        //let newIndex = vm.entries.findIndex(x => x.contentUdi === relatedElementUdi);
                         let newIndex = containerElements.indexOf(foundRelatedEl);
-                        console.log("indexes", newIndex, "   placeAfter:", placeAfter);
+                        //console.log("indexes", newIndex, "   placeAfter:", placeAfter);
                         if (newIndex === -1) {
                             console.error("newIndex not found!!!");
                         }
+
+                        //console.log("void drop at ", newIndex, " containerElements.length:", containerElements.length)
                         const nextEl = containerElements[(placeAfter ? newIndex+1 : newIndex)];
                         if (nextEl) {
-                            gridLayoutContainerEl.insertBefore(ghostEl, nextEl);
+                            approvedContainerEl.insertBefore(ghostEl, nextEl);
                         } else {
-                            gridLayoutContainerEl.appendChild(ghostEl);
+                            approvedContainerEl.appendChild(ghostEl);
                         }
 
                         //gridLayoutContainerEl.insertBefore(nextSibling, ghostEl.nextSibling);
@@ -518,11 +316,11 @@
 
                         //$scope.$evalAsync();
                     }
-                //}
+                }
             }
 
             var rqaId = null
-            function _onDragMouseMove(evt) {
+            function _onDragMove(evt) {
                 /** ignorer last drag event, comes as clientX === 0 and clientY === 0 */
                 if(vm.movingLayoutEntry && targetRect && ghostRect && evt.clientX !== 0 && evt.clientY !== 0) {
 
@@ -534,19 +332,19 @@
                     relatedRect = relatedEl?.getBoundingClientRect();
 
                     const insideGhost = dragX > ghostRect.left && dragX < ghostRect.right && dragY > ghostRect.top && dragY < ghostRect.bottom;
-                    const insideRelated = relatedRect ? (dragX > relatedRect.left && dragX < relatedRect.right && dragY > relatedRect.top && dragY < relatedRect.bottom) : false;
-
-                    //if (!insideRelated) {
+                    //const insideRelated = relatedRect ? (dragX > relatedRect.left && dragX < relatedRect.right && dragY > relatedRect.top && dragY < relatedRect.bottom) : false;
+                    
+                    if (!insideGhost) {
                         if(rqaId === null) {
-                            requestAnimationFrame(_dropInTheVoid);
-                            rqaId = setTimeout(() => {rqaId = null;}, 150);
+                            rqaId = requestAnimationFrame(_dropInTheVoid);
+                            //rqaId = setTimeout(() => {rqaId = null;}, 150);
                         }
-                    //}
+                    }
 
 
                     const oldForceLeft = vm.movingLayoutEntry.forceLeft;
                     const oldForceRight = vm.movingLayoutEntry.forceRight;
-                    var newValue = (dragX - dragOffsetX < targetRect.left - 20);
+                    var newValue = (dragX - dragOffsetX < targetRect.left - 50);
                     if(newValue !== oldForceLeft) {
                         vm.movingLayoutEntry.forceLeft = newValue;
                         if(oldForceRight) {
@@ -557,7 +355,7 @@
                         $scope.$evalAsync();
                     }
 
-                    newValue = (dragX - dragOffsetX + ghostRect.width > targetRect.right + 20) && (vm.movingLayoutEntry.forceLeft !== true);
+                    newValue = (dragX - dragOffsetX + ghostRect.width > targetRect.right + 50) && (vm.movingLayoutEntry.forceLeft !== true);
                     if(newValue !== oldForceRight) {
                         vm.movingLayoutEntry.forceRight = newValue;
                         vm.blockEditorApi.internal.setDirty();
@@ -617,8 +415,11 @@
 
                     var contextVM = vm;
                     if (gridLayoutContainerEl !== evt.to) {
+                        console.error("container was different on start??")
                         contextVM = evt.to['Sortable:controller']();
                     }
+
+                    approvedContainerEl = evt.to;
                     
                     const oldIndex = evt.oldIndex;
                     vm.movingLayoutEntry = contextVM.getLayoutEntryByIndex(oldIndex);
@@ -630,7 +431,6 @@
                     vm.movingLayoutEntry.forceRight = false;
                     vm.movingLayoutEntry.$block.__scope.$evalAsync();// needed for the block to be updated
 
-
                     //targetEl = evt.to;
                     //cloneEl = evt.clone;
                     ghostEl = evt.item;
@@ -640,12 +440,11 @@
                     dragOffsetX = evt.originalEvent.clientX - ghostRect.left;
                     dragOffsetY = evt.originalEvent.clientY - ghostRect.top;
 
-                    window.addEventListener('drag', _onDragMouseMove);
+                    window.addEventListener('drag', _onDragMove);
 
                     //gridLayoutContainerEl.getRootNode().host.style.setProperty("--umb-block-grid--dragging-mode", 1);
                     document.documentElement.style.setProperty("--umb-block-grid--dragging-mode", 1);
 
-                    _checkStart();
                     $scope.$evalAsync();
                 },
                 // Called by any change to the list (add / update / remove)
@@ -657,14 +456,24 @@
                     targetRect = evt.to.getBoundingClientRect();
                     ghostRect = evt.draggedRect;
                     
-                    if(_checkMove(evt) === false) {
-                        return false;
+
+                    var contextVM = vm;
+                    if (gridLayoutContainerEl !== evt.to) {
+                        contextVM = evt.to['Sortable:controller']();
                     }
+
                     // same properties as onEnd
-                    if(_indication(evt) === false) {
+                    if(_indication(contextVM, evt.dragged) === false) {
                         return false;
                     }
 
+                    if(evt.to !== approvedContainerEl) {
+                        // We will let SortableJS do the move when switching to a new container, otherwise not.
+                        approvedContainerEl = evt.to;
+                        return true;
+                    }
+    
+                    // Disable SortableJS from handling the drop, instead we will use our own.
                     return false;
                 },
                 
@@ -683,37 +492,27 @@
                 },
                 
                 onAdd: function (evt) {
-                    console.log("# onAdd")
+                    //console.log("# onAdd")
                     _sync(evt);
                     $scope.$evalAsync();
                 },
                 onUpdate: function (evt) {
-                    console.log("# onUpdate", evt)
-/*
-                    const itemElementUdi = evt.item.dataset.elementUdi;
-                    const currentIndex = vm.entries.findIndex(x => x.contentUdi === itemElementUdi);
-                    if(evt.oldIndex !== currentIndex) {
-                        console.error("SKIP SYNC")
-                        evt.preventDefault();
-                        evt.originalEvent.preventDefault();
-                    } else {*/
-                        _sync(evt);
-                        $scope.$evalAsync();
-                    //}
+                    //console.log("# onUpdate", evt)
+                    _sync(evt);
+                    $scope.$evalAsync();
                 },
                 onEnd: function(evt) {
                     console.log("# onEnd")
-                    window.removeEventListener('drag', _onDragMouseMove);
+                    window.removeEventListener('drag', _onDragMove);
 
                     // ensure not-allowed indication is removed.
-                    if(_lastContainerVM) {
-                        _lastContainerVM.hideNotAllowed();
-                        _lastContainerVM.revertIndicateDroppable();
-                        _lastContainerVM = null;
+                    if(_lastIndicationContainerVM) {
+                        _lastIndicationContainerVM.hideNotAllowed();
+                        _lastIndicationContainerVM.revertIndicateDroppable();
+                        _lastIndicationContainerVM = null;
                     }
 
-                    _checkReset();
-
+                    approvedContainerEl = null;
                     vm.movingLayoutEntry = null;
                     targetRect = null;
                     ghostRect = null;
@@ -790,83 +589,12 @@
                     var origEl = evt.item;
                     var cloneEl = evt.clone;
                 },
-
-                // Called when dragging element changes position
-                onChange: function(evt) {
-                    evt.newIndex // most likely why this event is used is to get the dragging element's current index
-                    // same properties as onEnd
-                }
                 */
             });
-
-
-
-
-
-
-
-            function _nearestDrop(evt) {
-                /*
-                console.log("____ _nearestDrop")
-                const oldIndex = evt.oldIndex,
-                      newIndex = evt.newIndex;
-
-                // If not the same gridLayoutContainerEl, then test for transfer option:
-                if (gridLayoutContainerEl !== evt.from) {
-                    const fromCtrl = evt.from['Sortable:controller']();
-                    const prevEntries = fromCtrl.entries;
-                    const syncEntry = prevEntries[oldIndex];
-
-                    // Perform the transfer:
-
-                    if (Sortable.active && Sortable.active.lastPullMode === 'clone') {
-                        syncEntry = Utilities.copy(syncEntry);
-                        prevEntries.splice(Sortable.utils.index(evt.clone, sortable.options.draggable), 0, prevEntries.splice(oldIndex, 1)[0]);
-                    }
-                    else {
-                        prevEntries.splice(oldIndex, 1);
-                    }
-
-                    vm.entries.splice(newIndex, 0, syncEntry);
-                }
-                else {
-                    vm.entries.splice(newIndex, 0, vm.entries.splice(oldIndex, 1)[0]);
-                }
-                */
-            }
-/*
-            const sortableBackground = Sortable.create(gridLayoutContainerEl, {
-                group: "uniqueGridEditorID",  // links groups with same name.
-                animation: ANIMATION_DURATION,  // ms, animation speed moving items when sorting, `0` — without animation
-                easing: "cubic-bezier(1, 0, 0, 1)", // Easing for animation. Defaults to null. See https://easings.net/ for examples.
-                cancel: '',
-                draggable: ".umb-block-grid__layout-item",  // Specifies which items inside the element should be draggable
-
-                dragoverBubble: true,
-                
-                onStart: function (evt) {
-                    console.log("Background start");
-                },
-                onAdd: function (evt) {
-                    _nearestDrop(evt);
-                    console.log("Background start");
-                    $scope.$evalAsync();
-                },
-                onUpdate: function (evt) {
-                    _nearestDrop(evt);
-                    $scope.$evalAsync();
-                },
-                onEnd: function(evt) {
-                    console.log("Background end");
-                    //window.removeEventListener('drag', _onDragMouseMove);
-                }
-            });
-*/
 
 
             $scope.$on('$destroy', function () {
-                sortable.destroy()
-                sortableBackground.destroy()
+                sortable.destroy();
             });
 
         }
