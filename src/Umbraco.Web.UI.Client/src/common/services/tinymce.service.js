@@ -222,7 +222,9 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
     }
 
     function uploadImageHandler(blobInfo, success, failure, progress){
-        const xhr = new XMLHttpRequest();
+        let xhr, formData;
+
+        xhr = new XMLHttpRequest();
         xhr.open('POST', Umbraco.Sys.ServerVariables.umbracoUrls.tinyMceApiBaseUrl + 'UploadImage');
 
         xhr.onloadstart = function(e) {
@@ -246,33 +248,18 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         };
 
         xhr.onload = function () {
+            let json;
+
             if (xhr.status < 200 || xhr.status >= 300) {
                 failure('HTTP Error: ' + xhr.status);
                 return;
             }
 
-            let data = xhr.responseText;
-
-            // The response is fitted as an AngularJS resource response and needs to be cleaned of the AngularJS metadata
-            data = data.split("\n");
-
-            if (!data.length > 1) {
-              failure('Unrecognized text string: ' + data);
-              return;
-            }
-
-            let json = {};
-
-            try {
-              json = JSON.parse(data[1]);
-            } catch (e) {
-              failure('Invalid JSON: ' + data + ' - ' + e.message);
-              return;
-            }
+            json = JSON.parse(xhr.responseText);
 
             if (!json || typeof json.tmpLocation !== 'string') {
-              failure('Invalid JSON: ' + data);
-              return;
+                failure('Invalid JSON: ' + xhr.responseText);
+                return;
             }
 
             // Put temp location into localstorage (used to update the img with data-tmpimg later on)
@@ -284,7 +271,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             success(blobInfo.blobUri());
         };
 
-        const formData = new FormData();
+        formData = new FormData();
         formData.append('file', blobInfo.blob(), blobInfo.blob().name);
 
         xhr.send(formData);
@@ -448,7 +435,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
 
                 if (args.htmlId) {
-                    config.selector = `[id="${args.htmlId}"]`;
+                    config.selector = "#" + args.htmlId;
                 } else if (args.target) {
                     config.target = args.target;
                 }

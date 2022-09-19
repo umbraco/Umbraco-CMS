@@ -19,36 +19,30 @@ public class RequestHandlerSettings
 
     internal static readonly CharItem[] DefaultCharCollection =
     {
-        new() { Char = " ", Replacement = "-" },
-        new() { Char = "\"", Replacement = string.Empty },
-        new() { Char = "'", Replacement = string.Empty },
-        new() { Char = "%", Replacement = string.Empty },
-        new() { Char = ".", Replacement = string.Empty },
-        new() { Char = ";", Replacement = string.Empty },
-        new() { Char = "/", Replacement = string.Empty },
-        new() { Char = "\\", Replacement = string.Empty },
-        new() { Char = ":", Replacement = string.Empty },
-        new() { Char = "#", Replacement = string.Empty },
-        new() { Char = "&", Replacement = string.Empty },
-        new() { Char = "?", Replacement = string.Empty },
-        new() { Char = "<", Replacement = string.Empty },
-        new() { Char = ">", Replacement = string.Empty },
-        new() { Char = "+", Replacement = "plus" },
-        new() { Char = "*", Replacement = "star" },
-        new() { Char = "æ", Replacement = "ae" },
-        new() { Char = "Æ", Replacement = "ae" },
-        new() { Char = "ä", Replacement = "ae" },
-        new() { Char = "Ä", Replacement = "ae" },
-        new() { Char = "ø", Replacement = "oe" },
-        new() { Char = "Ø", Replacement = "oe" },
-        new() { Char = "ö", Replacement = "oe" },
-        new() { Char = "Ö", Replacement = "oe" },
-        new() { Char = "å", Replacement = "aa" },
-        new() { Char = "Å", Replacement = "aa" },
-        new() { Char = "ü", Replacement = "ue" },
-        new() { Char = "Ü", Replacement = "ue" },
-        new() { Char = "ß", Replacement = "ss" },
-        new() { Char = "|", Replacement = "-" },
+            new () { Char = " ", Replacement = "-" },
+            new () { Char = "\"", Replacement = string.Empty },
+            new () { Char = "'", Replacement = string.Empty },
+            new () { Char = "%", Replacement = string.Empty },
+            new () { Char = ".", Replacement = string.Empty },
+            new () { Char = ";", Replacement = string.Empty },
+            new () { Char = "/", Replacement = string.Empty },
+            new () { Char = "\\", Replacement = string.Empty },
+            new () { Char = ":", Replacement = string.Empty },
+            new () { Char = "#", Replacement = string.Empty },
+            new () { Char = "+", Replacement = "plus" },
+            new () { Char = "*", Replacement = "star" },
+            new () { Char = "&", Replacement = string.Empty },
+            new () { Char = "?", Replacement = string.Empty },
+            new () { Char = "æ", Replacement = "ae" },
+            new () { Char = "ä", Replacement = "ae" },
+            new () { Char = "ø", Replacement = "oe" },
+            new () { Char = "ö", Replacement = "oe" },
+            new () { Char = "å", Replacement = "aa" },
+            new () { Char = "ü", Replacement = "ue" },
+            new () { Char = "ß", Replacement = "ss" },
+            new () { Char = "|", Replacement = "-" },
+            new () { Char = "<", Replacement = string.Empty },
+            new () { Char = ">", Replacement = string.Empty },
     };
 
     /// <summary>
@@ -78,6 +72,13 @@ public class RequestHandlerSettings
     /// </summary>
     [DefaultValue(StaticEnableDefaultCharReplacements)]
     public bool EnableDefaultCharReplacements { get; set; } = StaticEnableDefaultCharReplacements;
+
+    /// <summary>
+    ///     Add additional character replacements, or override defaults
+    /// </summary>
+    [Obsolete(
+        "Use the GetCharReplacements extension method in the Umbraco.Extensions namespace instead. Scheduled for removal in V11")]
+    public IEnumerable<IChar> CharCollection { get; set; } = DefaultCharCollection;
 
     /// <summary>
     ///     Add additional character replacements, or override defaults

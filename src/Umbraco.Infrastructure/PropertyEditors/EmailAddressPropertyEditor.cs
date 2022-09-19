@@ -12,8 +12,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     EditorType.PropertyValue | EditorType.MacroParameter,
     "Email address",
     "email",
-    Icon = "icon-message",
-    ValueEditorIsReusable = true)]
+    Icon = "icon-message")]
 public class EmailAddressPropertyEditor : DataEditor
 {
     private readonly IIOHelper _ioHelper;

@@ -7,7 +7,7 @@
     <AssemblyVersion>10.0.0</AssemblyVersion>
     <InformationalVersion>10.0.0-rc1</InformationalVersion>
     <FileVersion>10.0.0</FileVersion>
-    <LangVersion Condition="'$(LangVersion)' == ''">preview</LangVersion>
+    <LangVersion Condition="'$(LangVersion)' == ''">10.0</LangVersion>
     <NeutralLanguage>en-US</NeutralLanguage>
     <Company>Umbraco CMS</Company>
     <Copyright>Copyright © Umbraco 2021</Copyright>
@@ -44,11 +44,10 @@
   </PropertyGroup>
 
   <!-- Package Validation -->
-<!--  TODO - Introduce when v11 is shipped-->
-<!--  <PropertyGroup>-->
-<!--    <EnablePackageValidation>true</EnablePackageValidation>-->
-<!--    <PackageValidationBaselineVersion>11.0.0</PackageValidationBaselineVersion>-->
-<!--    <EnableStrictModeForCompatibleFrameworksInPackage>true</EnableStrictModeForCompatibleFrameworksInPackage>-->
-<!--    <EnableStrictModeForCompatibleTfms>true</EnableStrictModeForCompatibleTfms>-->
-<!--  </PropertyGroup>-->
+  <PropertyGroup>
+    <EnablePackageValidation>true</EnablePackageValidation>
+    <PackageValidationBaselineVersion>10.0.0</PackageValidationBaselineVersion>
+    <EnableStrictModeForCompatibleFrameworksInPackage>true</EnableStrictModeForCompatibleFrameworksInPackage>
+    <EnableStrictModeForCompatibleTfms>true</EnableStrictModeForCompatibleTfms>
+  </PropertyGroup>
 </Project>

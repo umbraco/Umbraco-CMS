@@ -23,13 +23,8 @@ public class ConfigureConnectionStrings : IConfigureNamedOptions<ConnectionStrin
     public void Configure(ConnectionStrings options) => Configure(Options.DefaultName, options);
 
     /// <inheritdoc />
-    public void Configure(string? name, ConnectionStrings options)
+    public void Configure(string name, ConnectionStrings options)
     {
-        if (name is null)
-        {
-            throw new InvalidOperationException("The name of the option instance is required.");
-        }
-
         // Default to using UmbracoConnectionName
         if (name == Options.DefaultName)
         {

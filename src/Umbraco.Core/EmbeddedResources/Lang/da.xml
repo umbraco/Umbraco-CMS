@@ -465,7 +465,7 @@
     <key alias="confirmdelete">Er du sikker på at du vil slette</key>
     <key alias="confirmdisable">Er du sikker på du vil deaktivere</key>
     <key alias="confirmremove">Er du sikker på at du vil fjerne</key>
-    <key alias="confirmremoveusageof"><![CDATA[Er du sikker på du vil fjerne brugen af <strong>%0%</strong>]]></key>
+    <key alias="confirmremoveusageof"><![CDATA[Er du sikker på du vil fjerne brugen af <b>%0%</b>]]></key>
     <key alias="confirmlogout">Er du sikker på at du vil forlade Umbraco?</key>
     <key alias="confirmSure">Er du sikker?</key>
     <key alias="cut">Klip</key>
@@ -556,8 +556,8 @@
     <key alias="variantdeletewarning">Dette vil slette noden og alle dets sprog. Hvis du kun vil slette et sprog, så
       afpublicér det i stedet.
     </key>
-    <key alias="propertyuserpickerremovewarning"><![CDATA[Dette vil fjerne brugeren <strong>%0%</strong>]]></key>
-    <key alias="userremovewarning"><![CDATA[Dette vil fjerne brugeren <strong>%0%</strong> fra <strong>%1%</strong> gruppen]]></key>
+    <key alias="propertyuserpickerremovewarning"><![CDATA[Dette vil fjerne brugeren <b>%0%</b>]]></key>
+    <key alias="userremovewarning"><![CDATA[Dette vil fjerne brugeren <b>%0%</b> fra <b%1%</b> gruppen]]></key>
     <key alias="yesRemove">Ja, fjern</key>
   </area>
   <area alias="dictionary">

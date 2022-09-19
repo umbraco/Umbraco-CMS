@@ -24,8 +24,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     "mediapicker3",
     ValueType = ValueTypes.Json,
     Group = Constants.PropertyEditors.Groups.Media,
-    Icon = Constants.Icons.MediaImage,
-    ValueEditorIsReusable = true)]
+    Icon = Constants.Icons.MediaImage)]
 public class MediaPicker3PropertyEditor : DataEditor
 {
     private readonly IEditorConfigurationParser _editorConfigurationParser;

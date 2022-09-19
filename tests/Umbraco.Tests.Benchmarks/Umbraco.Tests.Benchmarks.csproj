@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <OutputType>Exe</OutputType>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <IsPackable>false</IsPackable>
@@ -23,10 +23,10 @@
 
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet">
-      <Version>0.13.2</Version>
+      <Version>0.13.1</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Logging.Debug">
-      <Version>7.0.0-preview.7.22375.6</Version>
+      <Version>6.0.0</Version>
     </PackageReference>
     <PackageReference Include="Moq">
       <Version>4.18.1</Version>

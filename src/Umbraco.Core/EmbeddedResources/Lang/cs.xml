@@ -781,8 +781,8 @@
     <key alias="databaseUpgradeDone"><![CDATA[Vaše databáze byla povýšená na konečnou verzi %0%.<br />Stiskněte <strong>Následující</strong> pro pokračování. ]]></key>
     <key alias="databaseUpToDate"><![CDATA[Vaše současná databáze je aktuální!. Klikněte na <strong>následující</strong>, pro pokračování konfiguračního průvodce]]></key>
     <key alias="defaultUserChangePass"><![CDATA[<strong>Heslo výchozího uživatele musí být změněno!</strong>]]></key>
-    <key alias="defaultUserDisabled"><![CDATA[<strong>Výchozí uživatel byl deaktivován, nebo nemá přístup k umbracu!</strong></p><p>Netřeba nic dalšího dělat. Klikněte na <strong>Následující</strong> pro pokračování.]]></key>
-    <key alias="defaultUserPassChanged"><![CDATA[<strong>Heslo výchozího uživatele bylo úspěšně změněno od doby instalace!</strong></p><p>Netřeba nic dalšího dělat. Klikněte na <strong>Následující</strong> pro pokračování.]]></key>
+    <key alias="defaultUserDisabled"><![CDATA[<strong>Výchozí uživatel byl deaktivován, nebo nemá přístup k umbracu!</strong></p><p>Netřeba nic dalšího dělat. Klikněte na <b>Následující</b> pro pokračování.]]></key>
+    <key alias="defaultUserPassChanged"><![CDATA[<strong>Heslo výchozího uživatele bylo úspěšně změněno od doby instalace!</strong></p><p>Netřeba nic dalšího dělat. Klikněte na <b>Následující</b> pro pokračování.]]></key>
     <key alias="defaultUserPasswordChanged">Heslo je změněno!</key>
     <key alias="greatStart">Mějte skvělý start, sledujte naše uváděcí videa</key>
     <key alias="None">Není nainstalováno.</key>
@@ -797,7 +797,7 @@
     <key alias="permissionsMaybeAnIssue"><![CDATA[<strong>Vaše nastavení oprávnění může být problém!</strong>
       <br/><br />
       Můžete provozovat Umbraco bez potíží, ale nebudete smět vytvářet složky a instalovat balíčky, které jsou doporučené pro plné využívání všech možností umbraca.]]></key>
-    <key alias="permissionsNotReady"><![CDATA[<strong>Vaše nastavení oprívnění není připraveno pro Umbraco!</strong>
+    <key alias="permissionsNotReady"><![CDATA[<strong>Vaše nastavení oprívnění není připraveno pro umbraco!</strong>
           <br /><br />
           Abyste mohli Umbraco provozovat, budete muset aktualizovat Vaše nastavení oprávnění.]]></key>
     <key alias="permissionsPerfect"><![CDATA[<strong>Vaše nastavení oprávnění je dokonalé!</strong><br /><br />
@@ -838,7 +838,7 @@
     <key alias="step3">Krok 3/5: Ověřování oprávnění k souborům</key>
     <key alias="step4">Krok 4/5: Kontrola zabezpečení umbraca</key>
     <key alias="step5">Krok 5/5: Umbraco je připraveno a můžete začít</key>
-    <key alias="thankYou">Děkujeme, že jeste si vybrali Umbraco</key>
+    <key alias="thankYou">Děkujeme, že jeste si vybrali umbraco</key>
     <key alias="theEndBrowseSite"><![CDATA[<h3>Prohlédněte si svůj nový web</h3>
     Nainstalovali jste Runway, tak proč se nepodívat, jak Váš nový web vypadá.]]></key>
     <key alias="theEndFurtherHelp"><![CDATA[<h3>Další pomoc a informace</h3>
@@ -1379,7 +1379,7 @@
     <key alias="insertMacroDesc">
       Makro je konfigurovatelná součást, která je skvělá pro opakovaně použitelné části návrhu, kde potřebujete předat parametry, jako jsou galerie, formuláře a seznamy.
     </key>
-    <key alias="insertPageField">Vložit pole stránky Umbraco</key>
+    <key alias="insertPageField">Vložit pole stránky umbraco</key>
     <key alias="insertPageFieldDesc">Zobrazuje hodnotu pojmenovaného pole z aktuální stránky s možnostmi upravit hodnotu nebo alternativní hodnoty.</key>
     <key alias="insertPartialView">Částečná šablona</key>
     <key alias="insertPartialViewDesc">
@@ -2132,7 +2132,7 @@
     <key alias="performanceProfiling">Profilování výkonu</key>
     <key alias="performanceProfilingDescription">
       <![CDATA[
-                <p> Umbraco aktuálně běží v režimu ladění. To znamená, že můžete použít vestavěný profiler výkonu k vyhodnocení výkonu při vykreslování stránek. </p> <p> Pokud chcete aktivovat profiler pro konkrétní vykreslení stránky, jednoduše při požadavku na stránku jednoduše přidejte <strong>umbDebug=true</strong> do URL.</p> <p> Pokud chcete, aby byl profiler ve výchozím nastavení aktivován pro všechna vykreslení stránky, můžete použít přepínač níže. Ve vašem prohlížeči nastaví soubor cookie, který automaticky aktivuje profiler. Jinými slovy, profiler bude ve výchozím nastavení aktivní pouze ve <em> vašem </em> prohlížeči, ne v ostatních. </p>
+                <p> Umbraco aktuálně běží v režimu ladění. To znamená, že můžete použít vestavěný profiler výkonu k vyhodnocení výkonu při vykreslování stránek. </p> <p> Pokud chcete aktivovat profiler pro konkrétní vykreslení stránky, jednoduše při požadavku na stránku jednoduše přidejte <b>umbDebug=true</b> do URL.</p> <p> Pokud chcete, aby byl profiler ve výchozím nastavení aktivován pro všechna vykreslení stránky, můžete použít přepínač níže. Ve vašem prohlížeči nastaví soubor cookie, který automaticky aktivuje profiler. Jinými slovy, profiler bude ve výchozím nastavení aktivní pouze ve <i> vašem </i> prohlížeči, ne v ostatních. </p>
         ]]>
     </key>
     <key alias="activateByDefault">Ve výchozím stavu aktivovat profiler</key>

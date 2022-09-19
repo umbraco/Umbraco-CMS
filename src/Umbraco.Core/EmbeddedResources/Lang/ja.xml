@@ -481,7 +481,7 @@
       を押して続行してください。]]></key>
     <key alias="databaseUpToDate"><![CDATA[データベースを更新しました！ <strong>次へ</strong> をクリックして設定ウィザードを進めてください。]]></key>
     <key alias="defaultUserChangePass"><![CDATA[<strong>デフォルトユーザーのパスワードを変更する必要があります！</strong>]]></key>
-    <key alias="defaultUserDisabled"><![CDATA[<strong>デフォルトユーザーは無効化されているかUmbracoにアクセスできない状態になっています！</strong></p><p>これ以上のアクションは必要ありません。<strong>次へ</strong>をクリックして続行してください。]]></key>
+    <key alias="defaultUserDisabled"><![CDATA[<strong>デフォルトユーザーは無効化されているかUmbracoにアクセスできない状態になっています！</strong></p><p>これ以上のアクションは必要ありません。<b>次へ</b>をクリックして続行してください。]]></key>
     <key alias="defaultUserPassChanged"><![CDATA[<strong>インストール後にデフォルトユーザーのパスワードが変更されています！</strong></p><p>これ以上のアクションは必要ありません。<strong>次へ</strong>をクリックして続行してください。]]></key>
     <key alias="defaultUserPasswordChanged">パスワードは変更されました！</key>
     <key alias="greatStart">始めに、ビデオによる解説を見ましょう</key>
@@ -555,7 +555,7 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="Version3">Umbraco Version 3</key>
     <key alias="Version4">Umbraco Version 4</key>
     <key alias="watch">見る</key>
-    <key alias="welcomeIntro"><![CDATA[このウィザードでは <strong>Umbraco %0%</strong> の新規インストールまたは3.0からの更新について設定方法を案内します。
+    <key alias="welcomeIntro"><![CDATA[このウィザードでは <strong>umbraco %0%</strong> の新規インストールまたは3.0からの更新について設定方法を案内します。
                                 <br /><br />
                                 <strong>"次へ"</strong>を押してウィザードを開始します。]]></key>
   </area>
@@ -849,9 +849,9 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="insertContentAreaPlaceHolder">コンテンツ領域プレースホルダーの挿入</key>
     <key alias="insertDictionaryItem">ディクショナリ アイテムを挿入</key>
     <key alias="insertMacro">マクロの挿入</key>
-    <key alias="insertPageField">Umbraco ページフィールドの挿入</key>
+    <key alias="insertPageField">umbraco ページフィールドの挿入</key>
     <key alias="mastertemplate">マスターテンプレート</key>
-    <key alias="quickGuide">Umbraco テンプレートタグのクイックガイド</key>
+    <key alias="quickGuide">umbraco テンプレートタグのクイックガイド</key>
     <key alias="template">テンプレート</key>
   </area>
   <area alias="grid">

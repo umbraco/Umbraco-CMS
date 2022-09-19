@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Serilog.Events;
@@ -13,6 +13,14 @@ public abstract class SerilogLogViewerSourceBase : ILogViewer
     private readonly ILogLevelLoader _logLevelLoader;
     private readonly ILogViewerConfig _logViewerConfig;
     private readonly ILogger _serilogLog;
+
+    [Obsolete("Please use ctor with all params instead. Scheduled for removal in V11.")]
+    protected SerilogLogViewerSourceBase(ILogViewerConfig logViewerConfig, ILogger serilogLog)
+    {
+        _logViewerConfig = logViewerConfig;
+        _logLevelLoader = StaticServiceProvider.Instance.GetRequiredService<ILogLevelLoader>();
+        _serilogLog = serilogLog;
+    }
 
     protected SerilogLogViewerSourceBase(ILogViewerConfig logViewerConfig, ILogLevelLoader logLevelLoader, ILogger serilogLog)
     {
@@ -39,6 +47,17 @@ public abstract class SerilogLogViewerSourceBase : ILogViewer
         var errorCounter = new ErrorCounterFilter();
         GetLogs(logTimePeriod, errorCounter, 0, int.MaxValue);
         return errorCounter.Count;
+    }
+
+    /// <summary>
+    ///     Get the Serilog minimum-level value from the config file.
+    /// </summary>
+    [Obsolete("Please use LogLevelLoader.GetGlobalMinLogLevel() instead. Scheduled for removal in V11.")]
+    public string GetLogLevel()
+    {
+        LogEventLevel? logLevel = Enum.GetValues(typeof(LogEventLevel)).Cast<LogEventLevel>()
+            .Where(_serilogLog.IsEnabled).DefaultIfEmpty(LogEventLevel.Information).Min();
+        return logLevel?.ToString() ?? string.Empty;
     }
 
     public LogLevelCounts GetLogLevelCounts(LogTimePeriod logTimePeriod)

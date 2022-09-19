@@ -483,10 +483,10 @@
     <key alias="anchorInsert">Name</key>
     <key alias="closeThisWindow">Close this window</key>
     <key alias="confirmdelete">Are you sure you want to delete</key>
-    <key alias="confirmdeleteNumberOfItems"><![CDATA[Are you sure you want to delete <strong>%0%</strong> of <strong>%1%</strong> items]]></key>
+    <key alias="confirmdeleteNumberOfItems"><![CDATA[Are you sure you want to delete <b>%0%</b> of <b>%1%</b> items]]></key>
     <key alias="confirmdisable">Are you sure you want to disable</key>
     <key alias="confirmremove">Are you sure you want to remove</key>
-    <key alias="confirmremoveusageof"><![CDATA[Are you sure you want to remove the usage of <strong>%0%</strong>]]></key>
+    <key alias="confirmremoveusageof"><![CDATA[Are you sure you want to remove the usage of <b>%0%</b>]]></key>
     <key alias="confirmlogout">Are you sure?</key>
     <key alias="confirmSure">Are you sure?</key>
     <key alias="cut">Cut</key>
@@ -579,8 +579,8 @@
     <key alias="variantdeletewarning">This will delete the node and all its languages. If you only want to delete one
       language, you should unpublish the node in that language instead.
     </key>
-    <key alias="propertyuserpickerremovewarning"><![CDATA[This will remove the user <strong>%0%</strong>.]]></key>
-    <key alias="userremovewarning"><![CDATA[This will remove the user <strong>%0%</strong> from the <strong>%1%</strong> group]]></key>
+    <key alias="propertyuserpickerremovewarning"><![CDATA[This will remove the user <b>%0%</b>.]]></key>
+    <key alias="userremovewarning"><![CDATA[This will remove the user <b>%0%</b> from the <b>%1%</b> group]]></key>
     <key alias="yesRemove">Yes, remove</key>
     <key alias="deleteLayout">You are deleting the layout</key>
     <key alias="deletingALayout">Modifying layout will result in loss of data for any existing content that is based on this configuration.</key>
@@ -975,7 +975,7 @@
     <key alias="defaultUserChangePass">
       <![CDATA[<strong>The Default users' password needs to be changed!</strong>]]></key>
     <key alias="defaultUserDisabled">
-      <![CDATA[<strong>The Default user has been disabled or has no access to Umbraco!</strong></p><p>No further actions needs to be taken. Click <strong>Next</strong> to proceed.]]></key>
+      <![CDATA[<strong>The Default user has been disabled or has no access to Umbraco!</strong></p><p>No further actions needs to be taken. Click <b>Next</b> to proceed.]]></key>
     <key alias="defaultUserPassChanged">
       <![CDATA[<strong>The Default user's password has been successfully changed since the installation!</strong></p><p>No further actions needs to be taken. Click <strong>Next</strong> to proceed.]]></key>
     <key alias="defaultUserPasswordChanged">The password is changed!</key>
@@ -1947,7 +1947,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="historyCleanupKeepAllVersionsNewerThanDays">Keep all versions newer than days</key>
     <key alias="historyCleanupKeepLatestVersionPerDayForDays">Keep latest version per day for days</key>
     <key alias="historyCleanupPreventCleanup">Prevent cleanup</key>
-    <key alias="historyCleanupGloballyDisabled"><![CDATA[<strong>NOTE!</strong> The cleanup of historically content versions are disabled globally. These settings will not take effect before it is enabled.]]></key>
+    <key alias="historyCleanupGloballyDisabled"><![CDATA[<b>NOTE!</b> The cleanup of historically content versions are disabled globally. These settings will not take effect before it is enabled.]]></key>
     <key alias="changeDataTypeHelpText">Changing a data type with stored values is disabled. To allow this you can change the Umbraco:CMS:DataTypes:CanBeChanged setting in appsettings.json.</key>
   </area>
   <area alias="languages">
@@ -2717,12 +2717,12 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
                     Umbraco currently runs in debug mode. This means you can use the built-in performance profiler to assess the performance when rendering pages.
                 </p>
                 <p>
-                    If you want to activate the profiler for a specific page rendering, simply add <strong>umbDebug=true</strong> to the querystring when requesting the page.
+                    If you want to activate the profiler for a specific page rendering, simply add <b>umbDebug=true</b> to the querystring when requesting the page.
                 </p>
                 <p>
                     If you want the profiler to be activated by default for all page renderings, you can use the toggle below.
                     It will set a cookie in your browser, which then activates the profiler automatically.
-                    In other words, the profiler will only be active by default in <em>your</em> browser - not everyone else's.
+                    In other words, the profiler will only be active by default in <i>your</i> browser - not everyone else's.
                 </p>
         ]]>
     </key>
@@ -2731,7 +2731,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="reminderDescription">
       <![CDATA[
             <p>
-                You should never let a production site run in debug mode. Debug mode is turned off by setting <strong>Umbraco:CMS:Hosting:Debug</strong> to <strong>false</strong> in appsettings.json, appsettings.{Environment}.json or via an environment variable.
+                You should never let a production site run in debug mode. Debug mode is turned off by setting <b>Umbraco:CMS:Hosting:Debug</b> to <b>false</b> in appsettings.json, appsettings.{Environment}.json or via an environment variable.
             </p>
         ]]>
     </key>
@@ -2741,7 +2741,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
                 Umbraco currently does not run in debug mode, so you can't use the built-in profiler. This is how it should be for a production site.
             </p>
             <p>
-                Debug mode is turned on by setting <strong>Umbraco:CMS:Hosting:Debug</strong> to <strong>true</strong> in appsettings.json, appsettings.{Environment}.json or via an environment variable.
+                Debug mode is turned on by setting <b>Umbraco:CMS:Hosting:Debug</b> to <b>true</b> in appsettings.json, appsettings.{Environment}.json or via an environment variable.
             </p>
         ]]>
     </key>
@@ -2910,22 +2910,22 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
           <br>Aggregate data will be shared on a regular basis as well as learnings from these metrics.
           <br>Hopefully, you will help us collect some valuable data.
           <br>
-          <br>We <strong>WILL NOT</strong> collect any personal data such as content, code, user information, and all data will be fully anonymized.
+          <br>We <b>WILL NOT</b> collect any personal data such as content, code, user information, and all data will be fully anonymized.
        ]]>
     </key>
     <key alias="minimalLevelDescription">We will only send an anonymized site ID to let us know that the site exists.</key>
-    <key alias="basicLevelDescription">We will send an anonymized site ID, Umbraco version, and packages installed</key>
+    <key alias="basicLevelDescription">We will send an anonymized site ID, umbraco version, and packages installed</key>
     <key alias="detailedLevelDescription">
       <![CDATA[
           We will send:
           <ul>
-            <li>Anonymized site ID, Umbraco version, and packages installed.</li>
+            <li>Anonymized site ID, umbraco version, and packages installed.</li>
             <li>Number of: Root nodes, Content nodes, Macros, Media, Document Types, Templates, Languages, Domains, User Group, Users, Members, and Property Editors in use.</li>
             <li>System information: Webserver, server OS, server framework, server OS language, and database provider.</li>
             <li>Configuration settings: Modelsbuilder mode, if custom Umbraco path exists, ASP environment, and if you are in debug mode.</li>
           </ul>
-          <em>We might change what we send on the Detailed level in the future. If so, it will be listed above.
-          <br>By choosing "Detailed" you agree to current and future anonymized information being collected.</em>
+          <i>We might change what we send on the Detailed level in the future. If so, it will be listed above.
+          <br>By choosing "Detailed" you agree to current and future anonymized information being collected.</i>
        ]]>
     </key>
   </area>

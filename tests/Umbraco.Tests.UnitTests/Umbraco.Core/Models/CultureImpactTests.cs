@@ -13,25 +13,24 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models;
 [TestFixture]
 public class CultureImpactTests
 {
-    private CultureImpactFactory BasicImpactFactory => createCultureImpactService();
+        private CultureImpactFactory BasicImpactFactory => createCultureImpactService();
 
     [Test]
     public void Get_Culture_For_Invariant_Errors()
     {
-        var result = BasicImpactFactory.GetCultureForInvariantErrors(
+            var result = BasicImpactFactory.GetCultureForInvariantErrors(
             Mock.Of<IContent>(x => x.Published == true),
             new[] { "en-US", "fr-FR" },
             "en-US");
         Assert.AreEqual("en-US", result); // default culture is being saved so use it
 
-        result = BasicImpactFactory.GetCultureForInvariantErrors(
+            result = BasicImpactFactory.GetCultureForInvariantErrors(
             Mock.Of<IContent>(x => x.Published == false),
             new[] { "fr-FR" },
             "en-US");
-        Assert.AreEqual("fr-FR",
-            result); // default culture not being saved with not published version, use the first culture being saved
+        Assert.AreEqual("fr-FR", result); // default culture not being saved with not published version, use the first culture being saved
 
-        result = BasicImpactFactory.GetCultureForInvariantErrors(
+            result = BasicImpactFactory.GetCultureForInvariantErrors(
             Mock.Of<IContent>(x => x.Published == true),
             new[] { "fr-FR" },
             "en-US");
@@ -71,7 +70,7 @@ public class CultureImpactTests
     [Test]
     public void Explicit_Default_Culture()
     {
-        var impact = BasicImpactFactory.ImpactExplicit("en-US", true);
+            var impact = BasicImpactFactory.ImpactExplicit("en-US", true);
 
         Assert.AreEqual(impact.Culture, "en-US");
 
@@ -86,7 +85,7 @@ public class CultureImpactTests
     [Test]
     public void Explicit_NonDefault_Culture()
     {
-        var impact = BasicImpactFactory.ImpactExplicit("en-US", false);
+            var impact = BasicImpactFactory.ImpactExplicit("en-US", false);
 
         Assert.AreEqual(impact.Culture, "en-US");
 
@@ -101,11 +100,10 @@ public class CultureImpactTests
     [Test]
     public void TryCreate_Explicit_Default_Culture()
     {
-        var success =
-            BasicImpactFactory.TryCreate("en-US", true, ContentVariation.Culture, false, false, out var impact);
+        var success = BasicImpactFactory.TryCreate("en-US", true, ContentVariation.Culture, false, false, out var impact);
         Assert.IsTrue(success);
 
-        Assert.IsNotNull(impact);
+            Assert.IsNotNull(impact);
         Assert.AreEqual(impact.Culture, "en-US");
 
         Assert.IsTrue(impact.ImpactsInvariantProperties);
@@ -119,11 +117,10 @@ public class CultureImpactTests
     [Test]
     public void TryCreate_Explicit_NonDefault_Culture()
     {
-        var success =
-            BasicImpactFactory.TryCreate("en-US", false, ContentVariation.Culture, false, false, out var impact);
+        var success = BasicImpactFactory.TryCreate("en-US", false, ContentVariation.Culture, false, false, out var impact);
         Assert.IsTrue(success);
 
-        Assert.IsNotNull(impact);
+            Assert.IsNotNull(impact);
         Assert.AreEqual(impact.Culture, "en-US");
 
         Assert.IsFalse(impact.ImpactsInvariantProperties);
@@ -140,10 +137,10 @@ public class CultureImpactTests
         var success = BasicImpactFactory.TryCreate("*", false, ContentVariation.Nothing, false, false, out var impact);
         Assert.IsTrue(success);
 
-        Assert.IsNotNull(impact);
+            Assert.IsNotNull(impact);
         Assert.AreEqual(impact.Culture, null);
 
-        Assert.AreSame(BasicImpactFactory.ImpactInvariant(), impact);
+            Assert.AreSame(BasicImpactFactory.ImpactInvariant(), impact);
     }
 
     [Test]
@@ -152,10 +149,10 @@ public class CultureImpactTests
         var success = BasicImpactFactory.TryCreate("*", false, ContentVariation.Culture, false, false, out var impact);
         Assert.IsTrue(success);
 
-        Assert.IsNotNull(impact);
+            Assert.IsNotNull(impact);
         Assert.AreEqual(impact.Culture, "*");
 
-        Assert.AreSame(BasicImpactFactory.ImpactAll(), impact);
+            Assert.AreSame(BasicImpactFactory.ImpactAll(), impact);
     }
 
     [Test]
@@ -171,27 +168,28 @@ public class CultureImpactTests
         var success = BasicImpactFactory.TryCreate(null, false, ContentVariation.Nothing, false, false, out var impact);
         Assert.IsTrue(success);
 
-        Assert.AreSame(BasicImpactFactory.ImpactInvariant(), impact);
-    }
+            Assert.AreSame(BasicImpactFactory.ImpactInvariant(), impact);
+        }
 
-    [Test]
-    [TestCase(true)]
-    [TestCase(false)]
-    public void Edit_Invariant_From_Non_Default_Impacts_Invariant_Properties(bool allowEditInvariantFromNonDefault)
-    {
-        var sut = createCultureImpactService(new ContentSettings
+        [Test]
+        [TestCase(true)]
+        [TestCase(false)]
+        public void Edit_Invariant_From_Non_Default_Impacts_Invariant_Properties(bool allowEditInvariantFromNonDefault)
         {
-            AllowEditInvariantFromNonDefault = allowEditInvariantFromNonDefault
-        });
-        var impact = sut.ImpactExplicit("da", false);
+            var sut = createCultureImpactService(new SecuritySettings { AllowEditInvariantFromNonDefault = allowEditInvariantFromNonDefault });
+            var impact = sut.ImpactExplicit("da", false);
 
-        Assert.AreEqual(allowEditInvariantFromNonDefault, impact.ImpactsAlsoInvariantProperties);
+            Assert.AreEqual(allowEditInvariantFromNonDefault, impact.ImpactsAlsoInvariantProperties);
     }
 
-    private CultureImpactFactory createCultureImpactService(ContentSettings contentSettings = null)
-    {
-        contentSettings ??= new ContentSettings { AllowEditInvariantFromNonDefault = false, };
+        private CultureImpactFactory createCultureImpactService(SecuritySettings securitySettings = null)
+        {
+            securitySettings ??= new SecuritySettings
+            {
+                AllowEditInvariantFromNonDefault = false,
+            };
 
-        return new CultureImpactFactory(new TestOptionsMonitor<ContentSettings>(contentSettings));
-    }
+            return new CultureImpactFactory(new TestOptionsMonitor<SecuritySettings>(securitySettings));
+        }
+
 }

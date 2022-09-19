@@ -24,7 +24,6 @@ using Umbraco.Cms.Core.WebAssets;
 using Umbraco.Cms.Infrastructure.WebAssets;
 using Umbraco.Cms.Web.BackOffice.ActionResults;
 using Umbraco.Cms.Web.BackOffice.Filters;
-using Umbraco.Cms.Web.BackOffice.Install;
 using Umbraco.Cms.Web.BackOffice.Security;
 using Umbraco.Cms.Web.Common.ActionsResults;
 using Umbraco.Cms.Web.Common.Attributes;
@@ -212,12 +211,6 @@ public class BackOfficeController : UmbracoController
     {
         // force authentication to occur since this is not an authorized endpoint
         AuthenticateResult result = await this.AuthenticateBackOfficeAsync();
-        if (result.Succeeded)
-        {
-            // Redirect to installer if we're already authorized
-            var installerUrl = Url.Action(nameof(InstallController.Index), ControllerExtensions.GetControllerName<InstallController>(), new { area = Cms.Core.Constants.Web.Mvc.InstallArea }) ?? "/";
-            return new LocalRedirectResult(installerUrl);
-        }
 
         var viewPath = Path.Combine(Constants.SystemDirectories.Umbraco, Constants.Web.Mvc.BackOfficeArea, nameof(AuthorizeUpgrade) + ".cshtml");
 
@@ -386,7 +379,7 @@ public class BackOfficeController : UmbracoController
     [HttpGet]
     public async Task<IActionResult> ExternalLinkLoginCallback()
     {
-        BackOfficeIdentityUser? user = await _userManager.GetUserAsync(User);
+        BackOfficeIdentityUser user = await _userManager.GetUserAsync(User);
         if (user == null)
         {
             // ... this should really not happen
@@ -504,8 +497,9 @@ public class BackOfficeController : UmbracoController
         }
         else if (result == SignInResult.TwoFactorRequired)
         {
-            BackOfficeIdentityUser? attemptedUser = await _userManager.FindByLoginAsync(loginInfo.LoginProvider, loginInfo.ProviderKey);
-                if (attemptedUser?.UserName is null)
+            BackOfficeIdentityUser? attemptedUser =
+                await _userManager.FindByLoginAsync(loginInfo.LoginProvider, loginInfo.ProviderKey);
+            if (attemptedUser == null)
             {
                 return new ValidationErrorResult(
                     $"No local user found for the login provider {loginInfo.LoginProvider} - {loginInfo.ProviderKey}");

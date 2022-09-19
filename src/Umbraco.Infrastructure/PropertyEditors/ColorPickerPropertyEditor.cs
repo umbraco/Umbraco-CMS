@@ -14,8 +14,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     "Color Picker",
     "colorpicker",
     Icon = "icon-colorpicker",
-    Group = Constants.PropertyEditors.Groups.Pickers,
-    ValueEditorIsReusable = true)]
+    Group = Constants.PropertyEditors.Groups.Pickers)]
 public class ColorPickerPropertyEditor : DataEditor
 {
     private readonly IEditorConfigurationParser _editorConfigurationParser;

@@ -17,8 +17,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     "markdowneditor",
     ValueType = ValueTypes.Text,
     Group = Constants.PropertyEditors.Groups.RichContent,
-    Icon = "icon-code",
-    ValueEditorIsReusable = true)]
+    Icon = "icon-code")]
 public class MarkdownPropertyEditor : DataEditor
 {
     private readonly IEditorConfigurationParser _editorConfigurationParser;

@@ -11,8 +11,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     EditorType.PropertyValue | EditorType.MacroParameter,
     "Numeric",
     "integer",
-    ValueType = ValueTypes.Integer,
-    ValueEditorIsReusable = true)]
+    ValueType = ValueTypes.Integer)]
 public class IntegerPropertyEditor : DataEditor
 {
     public IntegerPropertyEditor(

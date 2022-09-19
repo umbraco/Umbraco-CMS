@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net7.0</TargetFramework>
+        <TargetFramework>net6.0</TargetFramework>
         <OutputType>Library</OutputType>
         <RootNamespace>Umbraco.Cms.Web.BackOffice</RootNamespace>
         <PackageId>Umbraco.Cms.Web.BackOffice</PackageId>
@@ -24,7 +24,7 @@
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
       <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-      <PackageReference Include="Serilog.AspNetCore" Version="6.0.1" />
+      <PackageReference Include="Serilog.AspNetCore" Version="5.0.0" />
       <PackageReference Include="Umbraco.Code" Version="2.0.0">
         <PrivateAssets>all</PrivateAssets>
       </PackageReference>

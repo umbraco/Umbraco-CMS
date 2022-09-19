@@ -439,7 +439,7 @@
     <key alias="confirmdelete">Weet je zeker dat je dit wilt verwijderen</key>
     <key alias="confirmdisable">Weet je zeker dat je dit wilt uitschakelen</key>
     <key alias="confirmremove">Weet u zeker dat u wilt verwijderen</key>
-    <key alias="confirmremoveusageof"><![CDATA[Ben je zeker dat je het gebruik van <strong>%0%</strong> wil verwijderen]]></key>
+    <key alias="confirmremoveusageof"><![CDATA[Ben je zeker dat je het gebruik van <b>%0%</b> wil verwijderen]]></key>
     <key alias="confirmlogout">Weet je het zeker?</key>
     <key alias="confirmSure">Weet je het zeker?</key>
     <key alias="cut">Knippen</key>
@@ -529,8 +529,8 @@
     <key alias="variantdeletewarning">Dit zal de node en al zijn talen verwijderen. Als je slechts één taal wil
       verwijderen, moet je de node in die taal depubliceren.
     </key>
-    <key alias="propertyuserpickerremovewarning"><![CDATA[Dit zal de gebruiker <strong>%0%</strong> verwijderen.]]></key>
-    <key alias="userremovewarning"><![CDATA[Dit zal de gebruiker <strong>%0%</strong> verwijderen van de <strong>%1%</strong> groep]]></key>
+    <key alias="propertyuserpickerremovewarning"><![CDATA[Dit zal de gebruiker <b>%0%</b> verwijderen.]]></key>
+    <key alias="userremovewarning"><![CDATA[Dit zal de gebruiker <b>%0%</b> verwijderen van de <b>%1%</b> groep]]></key>
     <key alias="yesRemove">Ja, verwijderen</key>
   </area>
   <area alias="dictionary">
@@ -889,7 +889,7 @@
     <key alias="defaultUserChangePass">
       <![CDATA[<strong>Het wachtwoord van de default gebruiker dient veranderd te worden!</strong>]]></key>
     <key alias="defaultUserDisabled">
-      <![CDATA[<strong>De default gebruiker is geblokkeerd of heeft geen toegang tot Umbraco!</strong></p><p>Geen verdere actie noodzakelijk. Klik <strong>Volgende</strong> om verder te gaan.]]></key>
+      <![CDATA[<strong>De default gebruiker is geblokkeerd of heeft geen toegang tot Umbraco!</strong></p><p>Geen verdere actie noodzakelijk. Klik <b>Volgende</b> om verder te gaan.]]></key>
     <key alias="defaultUserPassChanged">
       <![CDATA[<strong>Het wachtwoord van de default gebruiker is sinds installatie met succes veranderd.</strong></p><p>Geen verdere actie noodzakelijk. Klik <strong>Volgende</strong> om verder te gaan.]]></key>
     <key alias="defaultUserPasswordChanged">Het wachtwoord is veranderd!</key>
@@ -2399,12 +2399,12 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
                   Umbraco wordt uitgevoerd in de foutopsporingsmodus. Dit betekent dat u de ingebouwde prestatieprofiler kunt gebruiken om de prestaties te beoordelen bij het renderen van pagina's.
               </p>
               <p>
-                  Als je de profiler voor een specifieke paginaweergave wilt activeren, voeg je <strong>umbDebug=true</strong> toe aan de querystring wanneer je de pagina opvraagt.
+                  Als je de profiler voor een specifieke paginaweergave wilt activeren, voeg je <b>umbDebug=true</b> toe aan de querystring wanneer je de pagina opvraagt.
               </p>
               <p>
                   Als je wil dat de profiler standaard wordt geactiveerd voor alle paginaweergaven, kun je de onderstaande schakelaar gebruiken.
                   Het plaatst een cookie in je browser, die vervolgens de profiler automatisch activeert.
-                  Met andere woorden, de profiler zal alleen voor <em>jouw</em> browser actief zijn, niet voor andere bezoekers.
+                  Met andere woorden, de profiler zal alleen voor <i>jouw</i> browser actief zijn, niet voor andere bezoekers.
               </p>
       ]]>
     </key>

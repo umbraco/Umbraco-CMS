@@ -17,8 +17,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     "radiobuttons",
     ValueType = ValueTypes.String,
     Group = Constants.PropertyEditors.Groups.Lists,
-    Icon = "icon-target",
-    ValueEditorIsReusable = true)]
+    Icon = "icon-target")]
 public class RadioButtonsPropertyEditor : DataEditor
 {
     private readonly IEditorConfigurationParser _editorConfigurationParser;

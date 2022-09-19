@@ -1,8 +1,6 @@
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Core.Models.Mapping;
 
@@ -15,6 +13,10 @@ public class DictionaryMapDefinition : IMapDefinition
     private readonly CommonMapper? _commonMapper;
     private readonly ILocalizationService _localizationService;
 
+    [Obsolete("Use the constructor with the CommonMapper")]
+    public DictionaryMapDefinition(ILocalizationService localizationService) =>
+        _localizationService = localizationService;
+
     public DictionaryMapDefinition(ILocalizationService localizationService, CommonMapper commonMapper)
     {
         _localizationService = localizationService;
@@ -25,7 +27,9 @@ public class DictionaryMapDefinition : IMapDefinition
     {
         mapper.Define<IDictionaryItem, EntityBasic>((source, context) => new EntityBasic(), Map);
         mapper.Define<IDictionaryItem, DictionaryDisplay>((source, context) => new DictionaryDisplay(), Map);
-        mapper.Define<IDictionaryItem, DictionaryOverviewDisplay>((source, context) => new DictionaryOverviewDisplay(), Map);
+        mapper.Define<IDictionaryItem, DictionaryOverviewDisplay>(
+            (source, context) => new DictionaryOverviewDisplay(),
+            Map);
     }
 
     // Umbraco.Code.MapAll -ParentId -Path -Trashed -Udi -Icon

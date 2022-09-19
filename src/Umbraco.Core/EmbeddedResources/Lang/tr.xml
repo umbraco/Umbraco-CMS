@@ -393,7 +393,7 @@
     <key alias="confirmdelete">Silmek istediğinizden emin misiniz</key>
     <key alias="confirmdisable">Devre dışı bırakmak istediğinizden emin misiniz</key>
     <key alias="confirmremove">Kaldırmak istediğinizden emin misiniz</key>
-    <key alias="confirmremoveusageof"><![CDATA[<strong>%0%</strong> kullanımını kaldırmak istediğinizden emin misiniz?]]></key>
+    <key alias="confirmremoveusageof"><![CDATA[<b>%0%</b> kullanımını kaldırmak istediğinizden emin misiniz?]]></key>
     <key alias="confirmlogout">Emin misiniz?</key>
     <key alias="confirmSure">Emin misiniz?</key>
     <key alias="cut">Kes</key>
@@ -471,8 +471,8 @@
     <key alias="selectEditor">Düzenleyici seçin</key>
     <key alias="selectSnippet">Snippet seçin</key>
     <key alias="variantdeletewarning">Bu, düğümü ve tüm dillerini silecektir. Yalnızca bir dili silmek istiyorsanız, bunun yerine düğümü o dilde yayından kaldırmalısınız.</key>
-    <key alias="propertyuserpickerremovewarning"><![CDATA[Bu, <strong>%0%</strong> kullanıcısını kaldıracaktır.]]></key>
-    <key alias="userremovewarning"><![CDATA[Bu, <strong>%0% </strong> kullanıcısını <strong>%1%</strong> grubundan kaldıracak]]></key>
+    <key alias="propertyuserpickerremovewarning"><![CDATA[Bu, <b>%0%</b> kullanıcısını kaldıracaktır.]]></key>
+    <key alias="userremovewarning"><![CDATA[Bu, <b>%0% </b> kullanıcısını <b>%1%</b> grubundan kaldıracak]]></key>
     <key alias="yesRemove">Evet, kaldır</key>
   </area>
   <area alias="dictionary">
@@ -818,7 +818,7 @@
     </key>
     <key alias="databaseUpToDate"><![CDATA[Mevcut veritabanınız güncel !. Yapılandırma sihirbazına devam etmek için <strong> ileri </strong> 'yi tıklayın]]></key>
     <key alias="defaultUserChangePass"><![CDATA[<strong> Varsayılan kullanıcıların şifresinin değiştirilmesi gerekiyor! </strong>]]></key>
-    <key alias="defaultUserDisabled"><![CDATA[<strong> Varsayılan kullanıcı devre dışı bırakıldı veya Umbraco'ya erişimi yok! </strong> </p> <p> Başka işlem yapılmasına gerek yok. Devam etmek için <strong> İleri </strong> 'yi tıklayın.]]></key>
+    <key alias="defaultUserDisabled"><![CDATA[<strong> Varsayılan kullanıcı devre dışı bırakıldı veya Umbraco'ya erişimi yok! </strong> </p> <p> Başka işlem yapılmasına gerek yok. Devam etmek için <b> İleri </b> 'yi tıklayın.]]></key>
     <key alias="defaultUserPassChanged"><![CDATA[<strong> Varsayılan kullanıcının şifresi kurulumdan bu yana başarıyla değiştirildi! </strong> </p> <p> Başka işlem yapılmasına gerek yok. Devam etmek için <strong> İleri </strong> 'yi tıklayın.]]></key>
     <key alias="defaultUserPasswordChanged">Şifre değiştirildi!</key>
     <key alias="greatStart">Harika bir başlangıç ​​yapın, tanıtım videolarımızı izleyin</key>
@@ -2289,12 +2289,12 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
                 Umbraco şu anda hata ayıklama modunda çalışıyor. Bu, sayfaları işlerken performansı değerlendirmek için yerleşik performans profilleyicisini kullanabileceğiniz anlamına gelir.
             </p>
             <p>
-                Profil oluşturucuyu belirli bir sayfa oluşturma için etkinleştirmek istiyorsanız, sayfayı talep ederken sorgu dizesine <strong> umbDebug=true </strong> eklemeniz yeterlidir.
+                Profil oluşturucuyu belirli bir sayfa oluşturma için etkinleştirmek istiyorsanız, sayfayı talep ederken sorgu dizesine <b> umbDebug=true </b> eklemeniz yeterlidir.
             </p>
             <p>
                 Profilcinin tüm sayfa görüntülemeleri için varsayılan olarak etkinleştirilmesini istiyorsanız, aşağıdaki geçişi kullanabilirsiniz.
                 Tarayıcınızda, profil oluşturucuyu otomatik olarak etkinleştiren bir çerez ayarlayacaktır.
-                Başka bir deyişle, profil oluşturucu yalnızca <em>tarayıcınızda</em> varsayılan olarak etkin olacaktır - diğer herkesin değil.
+                Başka bir deyişle, profil oluşturucu yalnızca <i>tarayıcınızda</i> varsayılan olarak etkin olacaktır - diğer herkesin değil.
             </p>
     ]]>
     </key>

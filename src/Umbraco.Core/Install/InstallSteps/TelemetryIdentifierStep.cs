@@ -29,11 +29,20 @@ public class TelemetryIdentifierStep : InstallSetupStep<object>
         _siteIdentifierService = siteIdentifierService;
     }
 
-        public override Task<InstallSetupResult?> ExecuteAsync(object model)
-        {
-            _siteIdentifierService.TryCreateSiteIdentifier(out _);
-            return Task.FromResult<InstallSetupResult?>(null);
-        }
+    [Obsolete("Use constructor that takes GlobalSettings and ISiteIdentifierService")]
+    public TelemetryIdentifierStep(
+        ILogger<TelemetryIdentifierStep> logger,
+        IOptions<GlobalSettings> globalSettings,
+        IConfigManipulator configManipulator)
+        : this(globalSettings, StaticServiceProvider.Instance.GetRequiredService<ISiteIdentifierService>())
+    {
+    }
+
+    public override Task<InstallSetupResult?> ExecuteAsync(object model)
+    {
+        _siteIdentifierService.TryCreateSiteIdentifier(out _);
+        return Task.FromResult<InstallSetupResult?>(null);
+    }
 
     public override bool RequiresExecution(object model)
     {

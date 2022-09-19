@@ -25,8 +25,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     "multipletextbox",
     ValueType = ValueTypes.Text,
     Group = Constants.PropertyEditors.Groups.Lists,
-    Icon = "icon-ordered-list",
-    ValueEditorIsReusable = true)]
+    Icon = "icon-ordered-list")]
 public class MultipleTextStringPropertyEditor : DataEditor
 {
     private readonly IEditorConfigurationParser _editorConfigurationParser;

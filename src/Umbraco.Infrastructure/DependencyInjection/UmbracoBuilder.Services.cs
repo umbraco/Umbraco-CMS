@@ -57,7 +57,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddTransient<IExamineIndexCountService, ExamineIndexCountService>();
         builder.Services.AddUnique<IUserDataService, SystemInformationTelemetryProvider>();
         builder.Services.AddTransient<IUsageInformationService, UsageInformationService>();
-        builder.Services.AddSingleton<IEditorConfigurationParser, EditorConfigurationParser>();
+        builder.Services.AddTransient<IEditorConfigurationParser, EditorConfigurationParser>();
 
         return builder;
     }

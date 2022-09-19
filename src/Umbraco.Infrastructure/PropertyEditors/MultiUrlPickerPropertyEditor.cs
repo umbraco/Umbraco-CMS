@@ -16,8 +16,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     "multiurlpicker",
     ValueType = ValueTypes.Json,
     Group = Constants.PropertyEditors.Groups.Pickers,
-    Icon = "icon-link",
-    ValueEditorIsReusable = true)]
+    Icon = "icon-link")]
 public class MultiUrlPickerPropertyEditor : DataEditor
 {
     private readonly IEditorConfigurationParser _editorConfigurationParser;

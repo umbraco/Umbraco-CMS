@@ -1,3 +1,4 @@
+using Dazinator.Extensions.FileProviders.PrependBasePath;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,7 +8,6 @@ using SixLabors.ImageSharp.Web.DependencyInjection;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Web.Common.Media;
 using Umbraco.Extensions;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
@@ -96,7 +96,7 @@ public class UmbracoApplicationBuilder : IUmbracoApplicationBuilder, IUmbracoEnd
             {
                 webHostEnvironment.WebRootFileProvider =
                     webHostEnvironment.WebRootFileProvider.ConcatComposite(
-                        new MediaPrependBasePathFileProvider(mediaRequestPath, mediaFileProvider));
+                        new PrependBasePathFileProvider(mediaRequestPath, mediaFileProvider));
             }
         }
 
