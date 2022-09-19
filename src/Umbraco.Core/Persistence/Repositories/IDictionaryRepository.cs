@@ -6,6 +6,10 @@ public interface IDictionaryRepository : IReadWriteQueryRepository<int, IDiction
 {
     IDictionaryItem? Get(Guid uniqueId);
 
+    IEnumerable<IDictionaryItem> GetMany(params Guid[] uniqueIds) => Array.Empty<IDictionaryItem>();
+
+    IEnumerable<IDictionaryItem> GetMany(params string[] keys) => Array.Empty<IDictionaryItem>();
+
     IDictionaryItem? Get(string key);
 
     IEnumerable<IDictionaryItem> GetDictionaryItemDescendants(Guid? parentId);

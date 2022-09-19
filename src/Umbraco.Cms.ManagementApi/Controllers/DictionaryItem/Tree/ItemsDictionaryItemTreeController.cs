@@ -4,7 +4,6 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.ManagementApi.ViewModels.Pagination;
 using Umbraco.Cms.ManagementApi.ViewModels.Tree;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.DictionaryItem.Tree;
 
@@ -20,11 +19,7 @@ public class ItemsDictionaryItemTreeController : DictionaryItemTreeControllerBas
     [ProducesResponseType(typeof(PagedViewModel<FolderTreeItemViewModel>), StatusCodes.Status200OK)]
     public async Task<ActionResult<PagedViewModel<FolderTreeItemViewModel>>> Items([FromQuery(Name = "key")] Guid[] keys)
     {
-        // TODO: either make EntityService support relation types, or make LocalizationService able to query multiple relation types
-        // - for now this workaround works somewhat, as long as a reasonable amount of items are requested.
-        IDictionaryItem[] dictionaryItems = keys.Select(key => LocalizationService.GetDictionaryItemById(key))
-            .WhereNotNull()
-            .ToArray();
+        IDictionaryItem[] dictionaryItems = LocalizationService.GetDictionaryItemsByIds(keys).ToArray();
 
         EntityTreeItemViewModel[] viewModels = MapTreeItemViewModels(null, dictionaryItems);
 

@@ -55,7 +55,7 @@ internal abstract class SimpleGetRepository<TId, TEntity, TDto> : EntityReposito
 
     protected override IEnumerable<TEntity> PerformGetAll(params TId[]? ids)
     {
-        Sql<ISqlContext> sql = Sql().From<TEntity>();
+        Sql<ISqlContext> sql = Sql().From<TDto>();
 
         if (ids?.Any() ?? false)
         {
