@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using Umbraco.Extensions;
 
@@ -22,4 +22,13 @@ public class UserGroupPermissionsSave
     /// </summary>
     [DataMember(Name = "permissions")]
     public IDictionary<int, IEnumerable<string>> AssignedPermissions { get; set; }
+
+    [Obsolete("This is not used and will be removed in Umbraco 10")]
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+    {
+        if (AssignedPermissions.SelectMany(x => x.Value).Any(x => x.IsNullOrWhiteSpace()))
+        {
+            yield return new ValidationResult("A permission value cannot be null or empty", new[] { "Permissions" });
+        }
+    }
 }

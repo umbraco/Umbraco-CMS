@@ -15,7 +15,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
-internal class MacroRepository : EntityRepositoryBase<int, IMacro>, IMacroRepository
+internal class MacroRepository : EntityRepositoryBase<int, IMacro>, IMacroWithAliasRepository
 {
     private readonly IRepositoryCachePolicy<IMacro, string> _macroByAliasCachePolicy;
     private readonly IShortStringHelper _shortStringHelper;

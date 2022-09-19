@@ -46,12 +46,12 @@ public class BackOfficeClaimsPrincipalFactory : UserClaimsPrincipalFactory<BackO
         // ensure our required claims are there
         id.AddRequiredClaims(
             user.Id,
-            user.UserName!,
+            user.UserName,
             user.Name!,
             user.CalculatedContentStartNodeIds,
             user.CalculatedMediaStartNodeIds,
             user.Culture,
-            user.SecurityStamp!,
+            user.SecurityStamp,
             user.AllowedSections,
             user.Roles.Select(x => x.RoleId).ToArray());
 

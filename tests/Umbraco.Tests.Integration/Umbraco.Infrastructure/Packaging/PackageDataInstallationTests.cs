@@ -786,7 +786,7 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
         // Act
         var contentTypes = PackageDataInstallation
             .ImportDocumentType(withoutCleanupPolicy, 0)
-            .OfType<IContentType>();
+            .OfType<IContentTypeWithHistoryCleanup>();
 
         // Assert
         Assert.Multiple(() =>
@@ -805,7 +805,7 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
         // Act
         var contentTypes = PackageDataInstallation
             .ImportDocumentType(docTypeElement, 0)
-            .OfType<IContentType>();
+            .OfType<IContentTypeWithHistoryCleanup>();
 
         // Assert
         Assert.Multiple(() =>
@@ -827,11 +827,11 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
         // Act
         var contentTypes = PackageDataInstallation
             .ImportDocumentType(withCleanupPolicy, 0)
-            .OfType<IContentType>();
+            .OfType<IContentTypeWithHistoryCleanup>();
 
         var contentTypesUpdated = PackageDataInstallation
             .ImportDocumentType(withoutCleanupPolicy, 0)
-            .OfType<IContentType>();
+            .OfType<IContentTypeWithHistoryCleanup>();
 
         // Assert
         Assert.Multiple(() =>

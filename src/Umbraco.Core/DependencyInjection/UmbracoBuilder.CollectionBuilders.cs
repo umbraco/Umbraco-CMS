@@ -84,8 +84,12 @@ public static partial class UmbracoBuilderExtensions
         return builder;
     }
 
+    [Obsolete("Use AddEmbedProvider instead. This will be removed in Umbraco 11")]
+    public static IUmbracoBuilder AddOEmbedProvider<T>(this IUmbracoBuilder builder)
+        where T : class, IEmbedProvider => AddEmbedProvider<T>(builder);
+
     /// <summary>
-    /// Register a section.
+    ///     Register a section.
     /// </summary>
     /// <typeparam name="T">The type of the section.</typeparam>
     /// <param name="builder">The builder.</param>

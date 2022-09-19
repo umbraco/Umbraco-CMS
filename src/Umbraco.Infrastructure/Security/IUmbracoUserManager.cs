@@ -22,14 +22,14 @@ public interface IUmbracoUserManager<TUser> : IDisposable
     /// </summary>
     /// <param name="principal">The <see cref="ClaimsPrincipal" /></param>
     /// <returns>A <see cref="Task{TResult}" /> representing the result of the asynchronous operation.</returns>
-    Task<TUser?> GetUserAsync(ClaimsPrincipal principal);
+    Task<TUser> GetUserAsync(ClaimsPrincipal principal);
 
     /// <summary>
     ///     Get the user id from the <see cref="ClaimsPrincipal" />
     /// </summary>
     /// <param name="principal">the <see cref="ClaimsPrincipal" /></param>
     /// <returns>Returns the user id from the <see cref="ClaimsPrincipal" /></returns>
-    string? GetUserId(ClaimsPrincipal principal);
+    string GetUserId(ClaimsPrincipal principal);
 
     /// <summary>
     ///     Gets the external logins for the user
@@ -47,7 +47,7 @@ public interface IUmbracoUserManager<TUser> : IDisposable
     ///     Finds a user by the external login provider
     /// </summary>
     /// <returns>A <see cref="Task{TResult}" /> representing the result of the asynchronous operation.</returns>
-    Task<TUser?> FindByLoginAsync(string loginProvider, string providerKey);
+    Task<TUser> FindByLoginAsync(string loginProvider, string providerKey);
 
     /// <summary>
     ///     Finds and returns a user, if any, who has the specified <paramref name="userId" />.
@@ -57,7 +57,7 @@ public interface IUmbracoUserManager<TUser> : IDisposable
     ///     The <see cref="Task" /> that represents the asynchronous operation, containing the user matching the specified
     ///     <paramref name="userId" /> if it exists.
     /// </returns>
-    Task<TUser?> FindByIdAsync(string userId);
+    Task<TUser> FindByIdAsync(string? userId);
 
     /// <summary>
     ///     Generates a password reset token for the specified <paramref name="user" />, using
@@ -80,7 +80,7 @@ public interface IUmbracoUserManager<TUser> : IDisposable
     ///     is to generate a token and reset it, however, when we do this we want to track a password change, not a password
     ///     reset
     /// </remarks>
-    Task<IdentityResult> ChangePasswordWithResetAsync(string userId, string token, string newPassword);
+    Task<IdentityResult> ChangePasswordWithResetAsync(string userId, string token, string? newPassword);
 
     /// <summary>
     ///     Validates that an email confirmation token matches the specified <paramref name="user" />.
@@ -91,7 +91,7 @@ public interface IUmbracoUserManager<TUser> : IDisposable
     ///     The <see cref="Task" /> that represents the asynchronous operation, containing the <see cref="IdentityResult" />
     ///     of the operation.
     /// </returns>
-    Task<IdentityResult> ConfirmEmailAsync(TUser user, string token);
+    Task<IdentityResult> ConfirmEmailAsync(TUser user, string? token);
 
     /// <summary>
     ///     Gets the user, if any, associated with the normalized value of the specified email address.
@@ -103,7 +103,7 @@ public interface IUmbracoUserManager<TUser> : IDisposable
     ///     The task object containing the results of the asynchronous lookup operation, the user, if any, associated with a
     ///     normalized value of the specified email address.
     /// </returns>
-    Task<TUser?> FindByEmailAsync(string email);
+    Task<TUser> FindByEmailAsync(string email);
 
     /// <summary>
     ///     Resets the <paramref name="user" />'s password to the specified <paramref name="newPassword" /> after
@@ -116,7 +116,7 @@ public interface IUmbracoUserManager<TUser> : IDisposable
     ///     The <see cref="Task" /> that represents the asynchronous operation, containing the <see cref="IdentityResult" />
     ///     of the operation.
     /// </returns>
-    Task<IdentityResult> ResetPasswordAsync(TUser user, string token, string newPassword);
+    Task<IdentityResult> ResetPasswordAsync(TUser user, string? token, string? newPassword);
 
     /// <summary>
     ///     Override to check the user approval value as well as the user lock out date, by default this only checks the user's
@@ -216,7 +216,7 @@ public interface IUmbracoUserManager<TUser> : IDisposable
     ///     The <see cref="Task" /> that represents the asynchronous operation, containing the <see cref="IdentityResult" />
     ///     of the operation.
     /// </returns>
-    Task<IdentityResult> ChangePasswordAsync(TUser user, string currentPassword, string newPassword);
+    Task<IdentityResult> ChangePasswordAsync(TUser user, string? currentPassword, string? newPassword);
 
     /// <summary>
     ///     Used to validate a user's session
@@ -268,7 +268,7 @@ public interface IUmbracoUserManager<TUser> : IDisposable
     ///     The <see cref="Task" /> that represents the asynchronous operation, containing the <see cref="IdentityResult" />
     ///     of the operation.
     /// </returns>
-    Task<IdentityResult> CreateAsync(TUser user, string password);
+    Task<IdentityResult> CreateAsync(TUser user, string? password);
 
     /// <summary>
     ///     Generate a password for a user based on the current password validator
@@ -302,7 +302,7 @@ public interface IUmbracoUserManager<TUser> : IDisposable
     ///     The <see cref="Task" /> that represents the asynchronous operation, containing the user matching the specified
     ///     <paramref name="userName" /> if it exists.
     /// </returns>
-    Task<TUser?> FindByNameAsync(string userName);
+    Task<TUser> FindByNameAsync(string userName);
 
     /// <summary>
     ///     Increments the access failed count for the user as an asynchronous operation.
@@ -373,7 +373,7 @@ public interface IUmbracoUserManager<TUser> : IDisposable
     ///     The System.Threading.Tasks.Task that represents the asynchronous operation, containing the
     ///     Microsoft.AspNetCore.Identity.IdentityResult of the operation.
     /// </returns>
-    Task<IdentityResult> RemoveLoginAsync(TUser user, string loginProvider, string providerKey);
+    Task<IdentityResult> RemoveLoginAsync(TUser user, string? loginProvider, string? providerKey);
 
     /// <summary>
     ///     Resets the access failed count for the user
@@ -395,7 +395,7 @@ public interface IUmbracoUserManager<TUser> : IDisposable
     ///     The task object containing the results of the asynchronous operation, the email address for the specified
     ///     user.
     /// </returns>
-    Task<string?> GetEmailAsync(TUser user);
+    Task<string> GetEmailAsync(TUser user);
 
     /// <summary>
     ///     Gets the telephone number, if any, for the specified user.
@@ -409,7 +409,7 @@ public interface IUmbracoUserManager<TUser> : IDisposable
     ///     A user can only support a phone number if the BackOfficeUserStore is replaced with another that implements
     ///     IUserPhoneNumberStore
     /// </remarks>
-    Task<string?> GetPhoneNumberAsync(TUser user);
+    Task<string> GetPhoneNumberAsync(TUser user);
 
     /// <summary>
     ///     Validates that a user's credentials are correct without actually logging them in.
