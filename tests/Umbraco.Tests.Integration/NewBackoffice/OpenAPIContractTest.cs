@@ -14,18 +14,17 @@ namespace Umbraco.Cms.Tests.Integration.NewBackoffice;
 public class OpenAPIContractTest : UmbracoTestServerTestBase
 {
     // ensure composers are added
-
     protected override void CustomTestSetup(IUmbracoBuilder builder) => builder.AddComposers();
 
-
     private GlobalSettings GlobalSettings => GetRequiredService<IOptions<GlobalSettings>>().Value;
+
     private IHostingEnvironment HostingEnvironment => GetRequiredService<IHostingEnvironment>();
 
     [Test]
     public async Task Validate_OpenApi_Contract_is_implemented()
     {
-        string[] keysToIgnore = new[] { "servers" };
-        
+        string[] keysToIgnore = { "servers" };
+
         var officePath = GlobalSettings.GetBackOfficePath(HostingEnvironment);
 
         var urlToContract = $"{officePath}/api/openapi.json";
@@ -37,7 +36,7 @@ public class OpenAPIContractTest : UmbracoTestServerTestBase
         var originalGeneratedContract = JObject.Parse(generatedJsonString);
 
 
-        mergedContract.Merge(apiContract, new JsonMergeSettings()
+        mergedContract.Merge(apiContract, new JsonMergeSettings
         {
             MergeArrayHandling = MergeArrayHandling.Merge
         });
