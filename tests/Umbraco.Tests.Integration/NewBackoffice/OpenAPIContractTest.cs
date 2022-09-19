@@ -13,8 +13,6 @@ namespace Umbraco.Cms.Tests.Integration.NewBackoffice;
 [TestFixture]
 public class OpenAPIContractTest : UmbracoTestServerTestBase
 {
-    // ensure composers are added
-    protected override void CustomTestSetup(IUmbracoBuilder builder) => builder.AddComposers();
 
     private GlobalSettings GlobalSettings => GetRequiredService<IOptions<GlobalSettings>>().Value;
 
