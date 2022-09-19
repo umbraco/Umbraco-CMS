@@ -11,7 +11,6 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageTags>umbraco</PackageTags>
     <NeutralLanguage>en-US</NeutralLanguage>
-    <LangVersion Condition="'$(LangVersion)' == ''">preview</LangVersion>
     <Nullable>enable</Nullable>
     <WarningsAsErrors>nullable</WarningsAsErrors>
     <ImplicitUsings>enable</ImplicitUsings>
