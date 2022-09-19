@@ -188,7 +188,7 @@ public class MemberManager : UmbracoUserManager<MemberIdentityUser, MemberPasswo
                 return null;
             }
 
-            _currentMember = await GetUserAsync(_httpContextAccessor.HttpContext?.User);
+            _currentMember = await GetUserAsync(_httpContextAccessor.HttpContext?.User!);
         }
 
         return _currentMember;
@@ -204,7 +204,7 @@ public class MemberManager : UmbracoUserManager<MemberIdentityUser, MemberPasswo
     private async Task<bool> HasAccessAsync(string path)
     {
         MemberIdentityUser? currentMember = await GetCurrentMemberAsync();
-        if (currentMember == null || !currentMember.IsApproved || currentMember.IsLockedOut)
+        if (currentMember?.UserName is null || !currentMember.IsApproved || currentMember.IsLockedOut)
         {
             return false;
         }
@@ -220,7 +220,7 @@ public class MemberManager : UmbracoUserManager<MemberIdentityUser, MemberPasswo
         var result = new Dictionary<string, bool>();
         MemberIdentityUser? currentMember = await GetCurrentMemberAsync();
 
-        if (currentMember == null || !currentMember.IsApproved || currentMember.IsLockedOut)
+        if (currentMember?.UserName is null || !currentMember.IsApproved || currentMember.IsLockedOut)
         {
             return result;
         }

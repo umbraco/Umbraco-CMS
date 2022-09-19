@@ -22,12 +22,6 @@ public class LogViewerController : BackOfficeNotificationsController
     private readonly ILogLevelLoader _logLevelLoader;
     private readonly ILogViewer _logViewer;
 
-    [Obsolete]
-    public LogViewerController(ILogViewer logViewer)
-        : this(logViewer, StaticServiceProvider.Instance.GetRequiredService<ILogLevelLoader>())
-    {
-    }
-
     [ActivatorUtilitiesConstructor]
     public LogViewerController(ILogViewer logViewer, ILogLevelLoader logLevelLoader)
     {
@@ -147,8 +141,4 @@ public class LogViewerController : BackOfficeNotificationsController
 
     [HttpGet]
     public ReadOnlyDictionary<string, LogEventLevel?> GetLogLevels() => _logLevelLoader.GetLogLevelsFromSinks();
-
-    [Obsolete("Please use GetLogLevels() instead. Scheduled for removal in V11.")]
-    [HttpGet]
-    public string GetLogLevel() => _logViewer.GetLogLevel();
 }

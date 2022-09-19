@@ -62,9 +62,10 @@ public class ManagementApiComposer : IComposer
 
         // Not super happy with this, but we need to know the UmbracoPath when registering the controller
         // To be able to replace the route template token
+        // TODO this is fixed in Bjarkes PR for v10, and will need to be removed in v11 merge
         GlobalSettings? globalSettings =
             builder.Config.GetSection(Constants.Configuration.ConfigGlobal).Get<GlobalSettings>();
-        var backofficePath = globalSettings.UmbracoPath.TrimStart(Constants.CharArrays.TildeForwardSlash);
+        var backofficePath = (globalSettings?.UmbracoPath ?? new GlobalSettings().UmbracoPath).TrimStart(Constants.CharArrays.TildeForwardSlash);
 
         services.AddControllers(options =>
         {

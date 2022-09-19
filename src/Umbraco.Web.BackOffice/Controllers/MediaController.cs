@@ -986,37 +986,6 @@ public class MediaController : ContentControllerBase
         return new ActionResult<IMedia>(toMove);
     }
 
-    [Obsolete(
-        "Please use TrackedReferencesController.GetPagedRelationsForItem() instead. Scheduled for removal in V11.")]
-    public PagedResult<EntityBasic> GetPagedReferences(int id, string entityType, int pageNumber = 1,
-        int pageSize = 100)
-    {
-        if (pageNumber <= 0 || pageSize <= 0)
-        {
-            throw new NotSupportedException("Both pageNumber and pageSize must be greater than zero");
-        }
-
-        UmbracoObjectTypes objectType = ObjectTypes.GetUmbracoObjectType(entityType);
-        var udiType = objectType.GetUdiType();
-
-        IEnumerable<IUmbracoEntity> relations =
-            _relationService.GetPagedParentEntitiesByChildId(id, pageNumber - 1, pageSize, out var totalRecords,
-                objectType);
-
-        return new PagedResult<EntityBasic>(totalRecords, pageNumber, pageSize)
-        {
-            Items = relations.Cast<ContentEntitySlim>().Select(rel => new EntityBasic
-            {
-                Id = rel.Id,
-                Key = rel.Key,
-                Udi = Udi.Create(udiType, rel.Key),
-                Icon = rel.ContentTypeIcon,
-                Name = rel.Name,
-                Alias = rel.ContentTypeAlias
-            })
-        };
-    }
-
     #region GetChildren
 
     private int[]? _userStartNodes;

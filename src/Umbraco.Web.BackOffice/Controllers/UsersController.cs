@@ -565,10 +565,20 @@ public class UsersController : BackOfficeNotificationsController
         return new ActionResult<IUser?>(user);
     }
 
-    private async Task SendUserInviteEmailAsync(UserBasic? userDisplay, string? from, string? fromEmail, IUser? to,
-        string? message)
+    private async Task SendUserInviteEmailAsync(UserBasic? userDisplay, string? from, string? fromEmail, IUser? to, string? message)
     {
-        BackOfficeIdentityUser user = await _userManager.FindByIdAsync(((int?)userDisplay?.Id).ToString());
+        var userId = userDisplay?.Id?.ToString();
+        if (userId is null)
+        {
+            throw new InvalidOperationException("Could not find user Id");
+        }
+        var user = await _userManager.FindByIdAsync(userId);
+
+        if (user is null)
+        {
+            throw new InvalidOperationException("Could not find user");
+        }
+
         var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
 
         // Use info from SMTP Settings if configured, otherwise set fromEmail as fallback
