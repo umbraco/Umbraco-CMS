@@ -272,6 +272,16 @@
                         return;
                     }
 
+                    const foundRelatedElRect = foundRelatedEl.getBoundingClientRect();
+
+                    // Ghost is already on same line and we are not hovering the related element?
+                    const ghostCenterY = ghostRect.top + (ghostRect.height*.5);
+                    const isInsideFoundRelated = (dragX > foundRelatedElRect.left && dragX < foundRelatedElRect.right && dragY > foundRelatedElRect.top && dragY < foundRelatedElRect.bottom);
+                    if (ghostCenterY > foundRelatedElRect.top && ghostCenterY < foundRelatedElRect.bottom && !isInsideFoundRelated) {
+                        console.log("Ghost is already on same line and we are not hovering the related element?")
+                        return;
+                    }
+
                     if (foundRelatedEl) {
 
                         let newIndex = containerElements.indexOf(foundRelatedEl);
@@ -280,7 +290,6 @@
                         }
 
                         let verticalDirection = false;
-                        const foundRelatedElRect = foundRelatedEl.getBoundingClientRect();
                         if (ghostEl.dataset.forceLeft) {
                             //verticalDirection = true;
                             console.log("#A")
@@ -290,8 +299,7 @@
                             console.log("#B")
                             placeAfter = true;
                         } else {
-                            /*const insideFoundRelated = dragX > foundRelatedElRect.left && dragX < foundRelatedElRect.right && dragY > foundRelatedElRect.top && dragY < foundRelatedElRect.bottom;
-                            if(insideFoundRelated) {*/
+                            //if(isInsideFoundRelated) {
 
                                 // if the related element is forceLeft and we are in the left side, we will set vertical direction, to correct placeAfter.
                                 if (foundRelatedEl.dataset.forceLeft && placeAfter === false) {
