@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "@microsoft/signalr": "6.0.9",
+    "@umbraco-ui/uui": "1.0.1",
     "ace-builds": "1.10.1",
     "angular": "1.8.3",
     "angular-animate": "1.8.3",
