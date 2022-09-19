@@ -29,6 +29,8 @@ public class ManagementApiComposer : IComposer
 
     public void Compose(IUmbracoBuilder builder)
     {
+        // TODO Should just call a single extension method that can be called fromUmbracoTestServerTestBase too, instead of calling this method
+
         IServiceCollection services = builder.Services;
 
         builder
