@@ -272,21 +272,22 @@
                         return;
                     }
 
-                    const foundRelatedElRect = foundRelatedEl.getBoundingClientRect();
-
-                    // Ghost is already on same line and we are not hovering the related element?
-                    const ghostCenterY = ghostRect.top + (ghostRect.height*.5);
-                    const isInsideFoundRelated = (dragX > foundRelatedElRect.left && dragX < foundRelatedElRect.right && dragY > foundRelatedElRect.top && dragY < foundRelatedElRect.bottom);
-                    if (ghostCenterY > foundRelatedElRect.top && ghostCenterY < foundRelatedElRect.bottom && !isInsideFoundRelated) {
-                        console.log("Ghost is already on same line and we are not hovering the related element?")
-                        return;
-                    }
-
                     if (foundRelatedEl) {
 
                         let newIndex = containerElements.indexOf(foundRelatedEl);
                         if (newIndex === -1) {
                             console.error("newIndex not found!!!, this situation needs to be dealt with, TODO.");
+                        }
+
+
+                        const foundRelatedElRect = foundRelatedEl.getBoundingClientRect();
+
+                        // Ghost is already on same line and we are not hovering the related element?
+                        const ghostCenterY = ghostRect.top + (ghostRect.height*.5);
+                        const isInsideFoundRelated = (dragX > foundRelatedElRect.left && dragX < foundRelatedElRect.right && dragY > foundRelatedElRect.top && dragY < foundRelatedElRect.bottom);
+                        if (ghostCenterY > foundRelatedElRect.top && ghostCenterY < foundRelatedElRect.bottom && !isInsideFoundRelated) {
+                            console.log("Ghost is already on same line and we are not hovering the related element?")
+                            return;
                         }
 
                         let verticalDirection = false;
