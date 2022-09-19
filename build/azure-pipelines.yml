@@ -23,12 +23,15 @@ parameters:
     default: false
 
 variables:
-  buildConfiguration: Release
-  SA_PASSWORD: UmbracoIntegration123!
-  UMBRACO__CMS_GLOBAL__ID: 00000000-0000-0000-0000-000000000042
   nodeVersion: 14.18.1
-  DOTNET_NOLOGO: 1
-  DOTNET_CLI_TELEMETRY_OPTOUT: 1
+  dotnetVersion: 6.x
+  solution: umbraco.sln
+  buildConfiguration: Release
+  UMBRACO__CMS__GLOBAL__ID: 00000000-0000-0000-0000-000000000042
+  DOTNET_NOLOGO: true
+  DOTNET_GENERATE_ASPNET_CERTIFICATE: false
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
 
 stages:
   ###############################################
@@ -44,7 +47,7 @@ stages:
           vmImage: 'ubuntu-latest'
         steps:
           - task: NodeTool@0
-            displayName: Use node $(nodeVersion)
+            displayName: Use Node.js $(nodeVersion)
             inputs:
               versionSpec: $(nodeVersion)
           - task: Cache@2
@@ -64,12 +67,22 @@ stages:
               gulpFile: src/Umbraco.Web.UI.Client/gulpfile.js
               targets: coreBuild
               workingDirectory: src/Umbraco.Web.UI.Client
+          - task: UseDotNet@2
+            displayName: Use .NET $(dotnetVersion)
+            inputs:
+              version: $(dotnetVersion)
+              performMultiLevelLookup: true
+          - task: DotNetCoreCLI@2
+            displayName: Run dotnet restore
+            inputs:
+              command: restore
+              projects: $(solution)
           - task: DotNetCoreCLI@2
             displayName: Run dotnet build
             inputs:
               command: build
-              projects: umbraco.sln
-              arguments: '--configuration $(buildConfiguration)'
+              projects: $(solution)
+              arguments: '--configuration $(buildConfiguration) --no-restore -p:ContinuousIntegrationBuild=true'
           - script: |
               version="$(Build.BuildNumber)"
               echo "varsion: $version"
@@ -96,7 +109,7 @@ stages:
                   }
                 }
 
-                dotnet pack --configuration $(buildConfiguration) umbraco.sln -o $(Build.ArtifactStagingDirectory)/nupkg
+                dotnet pack $(solution) --configuration $(buildConfiguration) --no-build --output $(Build.ArtifactStagingDirectory)/nupkg
           - script: |
               sha="$(Build.SourceVersion)"
               sha=${sha:0:7}
@@ -119,7 +132,7 @@ stages:
     displayName: Prepare API Documentation
     dependsOn: Build
     variables:
-      umbracoMajorVersion:  $[ stageDependencies.Build.A.outputs['determineMajorVersion.majorVersion'] ]
+      umbracoMajorVersion: $[ stageDependencies.Build.A.outputs['determineMajorVersion.majorVersion'] ]
     jobs:
       # C# API Reference
       - job:
@@ -173,7 +186,7 @@ stages:
           vmImage: 'ubuntu-latest'
         steps:
           - task: NodeTool@0
-            displayName: Use Node 10.15.0
+            displayName: Use Node.js 10.15.0
             inputs:
               versionSpec: 10.15.0 # Won't work with 14.18.1
           - script: |
@@ -228,16 +241,16 @@ stages:
               artifact: build_output
               path: $(Build.SourcesDirectory)
           - task: UseDotNet@2
-            condition: and(succeeded(), eq(variables['Agent.OS'], 'Darwin')) # net6 already on the other images
-            displayName: Use net6
+            displayName: Use .NET $(dotnetVersion)
             inputs:
-              version: 6.x
+              version: $(dotnetVersion)
+              performMultiLevelLookup: true
           - task: DotNetCoreCLI@2
             displayName: Run dotnet test
             inputs:
               command: test
               projects: '**/*.Tests.UnitTests.csproj'
-              arguments: '--no-build --configuration $(buildConfiguration)'
+              arguments: '--configuration $(buildConfiguration) --no-build'
               testRunTitle: Unit Tests - $(Agent.OS)
 
   - stage: Integration
@@ -264,20 +277,20 @@ stages:
               artifact: build_output
               path: $(Build.SourcesDirectory)
           - task: UseDotNet@2
-            displayName: Use net6
-            condition: and(succeeded(), eq(variables['Agent.OS'], 'Darwin')) # net6 already on the other images
+            displayName: Use .NET $(dotnetVersion)
             inputs:
-              version: 6.x
+              version: $(dotnetVersion)
+              performMultiLevelLookup: true
           - task: DotNetCoreCLI@2
             displayName: Run dotnet test
             inputs:
               command: test
               projects: '**/*.Tests.Integration.csproj'
-              arguments: '--no-build --configuration $(buildConfiguration)'
+              arguments: '--configuration $(buildConfiguration) --no-build'
               testRunTitle: Integration Tests SQLite - $(Agent.OS)
             env:
               Tests__Database__DatabaseType: 'Sqlite'
-              Umbraco__Cms__global__MainDomLock: 'FileSystemMainDomLock'
+              Umbraco__CMS__Global__MainDomLock: 'FileSystemMainDomLock'
 
       # Integration Tests (SQL Server)
       - job:
@@ -296,6 +309,8 @@ stages:
               connectionString: 'Server=localhost,1433;User Id=sa;Password=$(SA_PASSWORD);'
         pool:
           vmImage: $(vmImage)
+        variables:
+          SA_PASSWORD: UmbracoIntegration123!
         steps:
           - task: DownloadPipelineArtifact@2
             displayName: Download build artifacts
@@ -313,12 +328,12 @@ stages:
             inputs:
               command: test
               projects: '**/*.Tests.Integration.csproj'
-              arguments: '--no-build --configuration $(buildConfiguration)'
+              arguments: '--configuration $(buildConfiguration) --no-build'
               testRunTitle: Integration Tests SQL Server - $(Agent.OS)
             env:
               Tests__Database__DatabaseType: $(testDb)
               Tests__Database__SQLServerMasterConnectionString: $(connectionString)
-              Umbraco__Cms__global__MainDomLock: 'SqlMainDomLock'
+              Umbraco__CMS__Global__MainDomLock: 'SqlMainDomLock'
 
   - stage: E2E
     variables:
@@ -327,7 +342,7 @@ stages:
     displayName: E2E Tests
     dependsOn: Build
     jobs:
-    # E2E Tests
+      # E2E Tests
       - job:
         displayName: E2E Tests
         variables:
@@ -358,7 +373,7 @@ stages:
             Windows:
               vmImage: 'windows-latest'
         pool:
-            vmImage: $(vmImage)
+          vmImage: $(vmImage)
         steps:
           - task: DownloadPipelineArtifact@2
             displayName: Download nupkg
@@ -366,7 +381,7 @@ stages:
               artifact: nupkg
               path: $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/misc/nupkg
           - task: NodeTool@0
-            displayName: Use Node $(nodeVersion)
+            displayName: Use Node.js $(nodeVersion)
             inputs:
               versionSpec: $(nodeVersion)
           - task: Cache@2
@@ -397,7 +412,12 @@ stages:
           - powershell:  Invoke-Sqlcmd -Query "CREATE DATABASE $env:UmbracoDatabaseName" -ServerInstance $env:UmbracoDatabaseServer
             displayName: Create database (Windows only)
             condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
-           # Linux containers smooth
+          - task: UseDotNet@2
+            displayName: Use .NET $(dotnetVersion)
+            inputs:
+              version: $(dotnetVersion)
+              performMultiLevelLookup: true
+          # Linux containers smooth
           - task: PowerShell@2
             condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
             displayName: Build & run container (Linux only)
@@ -409,7 +429,7 @@ stages:
                 docker build -t $(dockerImageName):$sha -f $(dockerfile) .
                 mkdir -p $(Build.ArtifactStagingDirectory)/docker-images
                 docker save -o $(Build.ArtifactStagingDirectory)/docker-images/$(dockerImageName).$sha.tar $(dockerImageName):$sha
-                docker run --name $(dockerImageName) -dp 8080:5000 -e UMBRACO__CMS_GLOBAL__ID=$(UMBRACO__CMS_GLOBAL__ID) $(dockerImageName):$sha
+                docker run --name $(dockerImageName) -dp 8080:5000 -e UMBRACO__CMS__GLOBAL__ID=$(UMBRACO__CMS__GLOBAL__ID) $(dockerImageName):$sha
                 docker ps
           # Windows containers take forever.
           # --no-launch-profile stops ASPNETCORE_ENVIRONMENT=Development which breaks the users.ts tests (smtp config = invite user button)
@@ -424,8 +444,8 @@ stages:
                 dotnet new --install ./nupkg/Umbraco.Templates.*.nupkg
                 dotnet new umbraco --name Cypress -o . --no-restore
                 dotnet restore --configfile ./nuget.config
-                dotnet build --no-restore -c Release
-                Start-Process -FilePath "dotnet" -ArgumentList "run --no-build -c Release --no-launch-profile --urls $(CYPRESS_BASE_URL)"
+                dotnet build --configuration $(buildConfiguration) --no-restore
+                Start-Process -FilePath "dotnet" -ArgumentList "run --configuration $(buildConfiguration) --no-build --no-launch-profile --urls $(CYPRESS_BASE_URL)"
           - task: PowerShell@2
             displayName: Wait for app
             inputs:
@@ -483,7 +503,7 @@ stages:
               artifact: nupkg
               path: $(Build.ArtifactStagingDirectory)/nupkg
           - task: NuGetCommand@2
-            displayName: Nuget push
+            displayName: NuGet push
             inputs:
               command: 'push'
               packagesToPush: $(Build.ArtifactStagingDirectory)/**/*.nupkg
@@ -507,7 +527,7 @@ stages:
               artifact: nupkg
               path: $(Build.ArtifactStagingDirectory)/nupkg
           - task: NuGetCommand@2
-            displayName: Nuget push
+            displayName: NuGet push
             inputs:
               command: 'push'
               packagesToPush: $(Build.ArtifactStagingDirectory)/**/*.nupkg
