@@ -1,4 +1,4 @@
-using System.Runtime.Serialization;
+﻿using System.Runtime.Serialization;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Install.Models;
@@ -7,6 +7,7 @@ namespace Umbraco.Cms.Core.Install.Models;
 ///     Model to give to the front-end to collect the information for each step
 /// </summary>
 [DataContract(Name = "step", Namespace = "")]
+[Obsolete("Will be replaced with IInstallStep in the new backoffice API")]
 public abstract class InstallSetupStep<T> : InstallSetupStep
 {
     /// <summary>
@@ -30,6 +31,7 @@ public abstract class InstallSetupStep<T> : InstallSetupStep
 }
 
 [DataContract(Name = "step", Namespace = "")]
+[Obsolete("Will be replaced with IInstallStep in the new backoffice API")]
 public abstract class InstallSetupStep
 {
     protected InstallSetupStep()

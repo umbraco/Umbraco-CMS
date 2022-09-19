@@ -24,6 +24,7 @@ using Umbraco.Cms.Core.WebAssets;
 using Umbraco.Cms.Infrastructure.WebAssets;
 using Umbraco.Cms.Web.BackOffice.ActionResults;
 using Umbraco.Cms.Web.BackOffice.Filters;
+using Umbraco.Cms.Web.BackOffice.Install;
 using Umbraco.Cms.Web.BackOffice.Security;
 using Umbraco.Cms.Web.Common.ActionsResults;
 using Umbraco.Cms.Web.Common.Attributes;
@@ -211,6 +212,12 @@ public class BackOfficeController : UmbracoController
     {
         // force authentication to occur since this is not an authorized endpoint
         AuthenticateResult result = await this.AuthenticateBackOfficeAsync();
+        if (result.Succeeded)
+        {
+            // Redirect to installer if we're already authorized
+            var installerUrl = Url.Action(nameof(InstallController.Index), ControllerExtensions.GetControllerName<InstallController>(), new { area = Cms.Core.Constants.Web.Mvc.InstallArea }) ?? "/";
+            return new LocalRedirectResult(installerUrl);
+        }
 
         var viewPath = Path.Combine(Constants.SystemDirectories.Umbraco, Constants.Web.Mvc.BackOfficeArea, nameof(AuthorizeUpgrade) + ".cshtml");
 

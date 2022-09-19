@@ -562,7 +562,7 @@ public class MemberControllerUnitTests
 
         var map = new MapDefinitionCollection(() => new List<IMapDefinition>
         {
-            new Cms.Core.Models.Mapping.MemberMapDefinition(),
+            new global::Umbraco.Cms.Core.Models.Mapping.MemberMapDefinition(),
             memberMapDefinition,
             new ContentTypeMapDefinition(
                 commonMapper,

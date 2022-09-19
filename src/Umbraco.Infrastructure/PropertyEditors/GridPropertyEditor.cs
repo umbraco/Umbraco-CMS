@@ -28,7 +28,8 @@ namespace Umbraco.Cms.Core.PropertyEditors
         HideLabel = true,
         ValueType = ValueTypes.Json,
         Icon = "icon-layout",
-        Group = Constants.PropertyEditors.Groups.RichContent)]
+        Group = Constants.PropertyEditors.Groups.RichContent,
+        ValueEditorIsReusable = false)]
     public class GridPropertyEditor : DataEditor
     {
         private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
