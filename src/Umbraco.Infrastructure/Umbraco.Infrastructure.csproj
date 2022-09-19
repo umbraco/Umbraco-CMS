@@ -18,8 +18,8 @@
 
     <ItemGroup>
       <PackageReference Include="HtmlAgilityPack" Version="1.11.43" />
-      <PackageReference Include="MailKit" Version="3.2.0" />
-      <PackageReference Include="IPNetwork2" Version="2.5.422" />
+      <PackageReference Include="MailKit" Version="3.4.1" />
+      <PackageReference Include="IPNetwork2" Version="2.6.467" />
       <PackageReference Include="Markdown" Version="2.2.1" />
       <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.0.1" />
       <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
@@ -36,14 +36,14 @@
       <PackageReference Include="ncrontab" Version="3.3.1" />
       <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
       <PackageReference Include="NPoco.SqlServer" Version="5.3.2" />
-      <PackageReference Include="Serilog" Version="2.11.0" />
+      <PackageReference Include="Serilog" Version="2.12.0" />
       <PackageReference Include="Serilog.Enrichers.Process" Version="2.0.2" />
       <PackageReference Include="Serilog.Enrichers.Thread" Version="3.1.0" />
       <PackageReference Include="Serilog.Expressions" Version="3.4.0" />
-      <PackageReference Include="Serilog.Extensions.Hosting" Version="4.2.0" />
+      <PackageReference Include="Serilog.Extensions.Hosting" Version="5.0.1" />
       <PackageReference Include="Serilog.Formatting.Compact" Version="1.1.0" />
       <PackageReference Include="Serilog.Formatting.Compact.Reader" Version="1.0.5" />
-      <PackageReference Include="Serilog.Settings.Configuration" Version="3.3.0" />
+      <PackageReference Include="Serilog.Settings.Configuration" Version="3.4.0" />
       <PackageReference Include="Serilog.Sinks.Async" Version="1.5.0" />
       <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
       <PackageReference Include="Serilog.Sinks.Map" Version="1.0.2" />
