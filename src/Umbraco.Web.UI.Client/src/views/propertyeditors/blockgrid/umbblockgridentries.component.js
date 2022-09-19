@@ -303,17 +303,17 @@
                                     verticalDirection = true;
                                     console.log("#2")
                                 } else {
-                                    const totalColumns = getComputedStyle(approvedContainerEl).getPropertyValue("--umb-block-grid--grid-columns");
+                                    const totalColumns = parseInt(getComputedStyle(approvedContainerEl).getPropertyValue("--umb-block-grid--grid-columns"), 10);
 
                                     // maybe include the position of the related?
-                                    const relatedColumns = foundRelatedEl.dataset.colSpan;
-                                    const ghostColumns = ghostEl.dataset.colSpan;
+                                    const relatedColumns = parseInt(foundRelatedEl.dataset.colSpan, 10);
+                                    const ghostColumns = parseInt(ghostEl.dataset.colSpan, 10);
 
                                     if(relatedColumns + ghostColumns > totalColumns) {
                                         verticalDirection = true;
                                     }
 
-                                    console.log("totalColumns", totalColumns, relatedColumns, ghostColumns)
+                                    console.log("totalColumns", typeof totalColumns, typeof relatedColumns, typeof ghostColumns)
                                     /*
                                     If they fit, then we go horizontal? unless forceLeft/forceRight on both?
 
