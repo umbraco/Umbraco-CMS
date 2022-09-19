@@ -60,10 +60,19 @@ public class NodeDto
 
     [Column("nodeObjectType")] // TODO: db rename to 'objectType'
     [NullSetting(NullSetting = NullSettings.Null)]
-    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_ObjectType", ForColumns = "nodeObjectType,trashed", IncludeColumns = "uniqueId,parentId,level,path,sortOrder,nodeUser,text,createDate")]
+    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_ObjectType_textUpper", ForColumns = "nodeObjectType,textUpper", IncludeColumns = "path")]
     public Guid? NodeObjectType { get; set; }
 
     [Column("createDate")]
     [Constraint(Default = SystemMethods.CurrentDateTime)]
     public DateTime CreateDate { get; set; }
+
+
+    [ComputedColumn("textUpper")]
+    [NullSetting(NullSetting = NullSettings.Null)]
+    public string? TextUpper { get; set; }
+
+
+    [ComputedColumn("pathUpper")]
+    public string? PathUpper { get; set; }
 }
