@@ -8,6 +8,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.BackOffice.Install;
 
+[Obsolete("Will be replaced with attribute routing in the new backoffice API")]
 public class InstallAreaRoutes : IAreaRoutes
 {
     private readonly IHostingEnvironment _hostingEnvironment;
@@ -28,22 +29,14 @@ public class InstallAreaRoutes : IAreaRoutes
         switch (_runtime.Level)
         {
             case var _ when _runtime.EnableInstaller():
+                endpoints.MapUmbracoRoute<InstallApiController>(installPathSegment, Constants.Web.Mvc.InstallArea, "api", includeControllerNameInRoute: false);
+                endpoints.MapUmbracoRoute<InstallController>(installPathSegment, Constants.Web.Mvc.InstallArea, string.Empty, includeControllerNameInRoute: false);
 
-                endpoints.MapUmbracoRoute<InstallApiController>(installPathSegment, Constants.Web.Mvc.InstallArea,
-                    "api", includeControllerNameInRoute: false);
-                endpoints.MapUmbracoRoute<InstallController>(installPathSegment, Constants.Web.Mvc.InstallArea,
-                    string.Empty, includeControllerNameInRoute: false);
-
-                // register catch all because if we are in install/upgrade mode then we'll catch everything and redirect
-                endpoints.MapFallbackToAreaController(
-                    "Redirect",
-                    ControllerExtensions.GetControllerName<InstallController>(),
-                    Constants.Web.Mvc.InstallArea);
-
+                // register catch all because if we are in install/upgrade mode then we'll catch everything
+                endpoints.MapFallbackToAreaController(nameof(InstallController.Index), ControllerExtensions.GetControllerName<InstallController>(), Constants.Web.Mvc.InstallArea);
 
                 break;
             case RuntimeLevel.Run:
-
                 // when we are in run mode redirect to the back office if the installer endpoint is hit
                 endpoints.MapGet($"{installPathSegment}/{{controller?}}/{{action?}}", context =>
                 {

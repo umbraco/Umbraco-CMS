@@ -4,7 +4,6 @@
     <Title>Umbraco CMS - Web</Title>
     <Description>Contains the web assembly needed to run Umbraco CMS.</Description>
     <TargetFramework>net7.0</TargetFramework>
-    <OutputType>Library</OutputType>
     <RootNamespace>Umbraco.Cms.Web.Common</RootNamespace>
   </PropertyGroup>
 
