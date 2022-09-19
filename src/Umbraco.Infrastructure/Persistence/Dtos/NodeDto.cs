@@ -46,6 +46,7 @@ public class NodeDto
 
     [Column("trashed")]
     [Constraint(Default = "0")]
+    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_Trashed_ObjectType_textUpper", ForColumns = "trashed,nodeObjectType,textUpper")]
     [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_Trashed")]
     public bool Trashed { get; set; }
 
@@ -61,7 +62,7 @@ public class NodeDto
     [Column("nodeObjectType")] // TODO: db rename to 'objectType'
     [NullSetting(NullSetting = NullSettings.Null)]
     [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_ObjectType_textUpper", ForColumns = "nodeObjectType,textUpper", IncludeColumns = "path")]
-    public Guid? NodeObjectType { get; set; }
+     public Guid? NodeObjectType { get; set; }
 
     [Column("createDate")]
     [Constraint(Default = SystemMethods.CurrentDateTime)]

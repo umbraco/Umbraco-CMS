@@ -56,6 +56,10 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_10_3_0
             var nodeDtoObjectTypeTextUpperIndex = $"IX_{NodeDto.TableName}_ObjectType_textUpper";
             DeleteIndex<NodeDto>(nodeDtoObjectTypeTextUpperIndex);
             CreateIndex<NodeDto>(nodeDtoObjectTypeTextUpperIndex);
+
+            var nodeDtoTrashedObjectTypeTextUpperIndex = $"IX_{NodeDto.TableName}_Trashed_ObjectType_textUpper";
+            DeleteIndex<NodeDto>(nodeDtoTrashedObjectTypeTextUpperIndex);
+            CreateIndex<NodeDto>(nodeDtoTrashedObjectTypeTextUpperIndex);
         }
     }
 }
