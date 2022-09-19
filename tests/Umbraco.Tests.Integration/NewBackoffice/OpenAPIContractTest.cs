@@ -1,5 +1,7 @@
+using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -45,6 +47,6 @@ public class OpenAPIContractTest : UmbracoTestServerTestBase
             mergedContract.Remove(key);
         }
 
-        Assert.AreEqual(mergedContract, originalGeneratedContract, "Generated API do not respect the contract");
+        Assert.AreEqual(originalGeneratedContract, mergedContract, $"Generated API do not respect the contract:{Environment.NewLine}Expected:{Environment.NewLine}{originalGeneratedContract.ToString(Formatting.Indented)}{Environment.NewLine}{Environment.NewLine}Actual:{Environment.NewLine}{mergedContract.ToString(Formatting.Indented)}");
     }
 }
