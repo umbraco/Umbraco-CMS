@@ -18,7 +18,7 @@ public sealed class ConfigureMemberCookieOptions : IConfigureNamedOptions<Cookie
         _umbracoRequestPaths = umbracoRequestPaths;
     }
 
-    public void Configure(string name, CookieAuthenticationOptions options)
+    public void Configure(string? name, CookieAuthenticationOptions options)
     {
         if (name == IdentityConstants.ApplicationScheme || name == IdentityConstants.ExternalScheme)
         {

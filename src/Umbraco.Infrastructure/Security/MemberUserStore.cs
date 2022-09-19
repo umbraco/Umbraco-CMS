@@ -62,7 +62,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
         ICoreScopeProvider scopeProvider,
         IdentityErrorDescriber describer,
         IPublishedSnapshotAccessor publishedSnapshotAccessor,
-        IExternalLoginService externalLoginService)
+        IExternalLoginWithKeyService externalLoginService)
         : this(memberService, mapper, scopeProvider, describer, publishedSnapshotAccessor,
             StaticServiceProvider.Instance.GetRequiredService<IExternalLoginWithKeyService>(),
             StaticServiceProvider.Instance.GetRequiredService<ITwoFactorLoginService>())
@@ -91,7 +91,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
-            if (user == null)
+            if (user is null)
             {
                 throw new ArgumentNullException(nameof(user));
             }
@@ -100,9 +100,9 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
 
             // create member
             IMember memberEntity = _memberService.CreateMember(
-                user.UserName,
-                user.Email,
-                user.Name.IsNullOrWhiteSpace() ? user.UserName : user.Name!,
+                user.UserName!,
+                user.Email!,
+                user.Name.IsNullOrWhiteSpace() ? user.UserName! : user.Name!,
                 user.MemberTypeAlias.IsNullOrWhiteSpace()
                     ? Constants.Security.DefaultMemberTypeAlias
                     : user.MemberTypeAlias!);
@@ -261,21 +261,19 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
     }
 
     /// <inheritdoc />
-    public override Task<MemberIdentityUser> FindByNameAsync(
-        string userName,
-        CancellationToken cancellationToken = default)
+    public override Task<MemberIdentityUser?> FindByNameAsync(string userName, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
         ThrowIfDisposed();
         IMember? user = _memberService.GetByUsername(userName);
         if (user == null)
         {
-            return Task.FromResult((MemberIdentityUser)null!);
+            return Task.FromResult<MemberIdentityUser?>(null);
         }
 
-        MemberIdentityUser result = AssignLoginsCallback(_mapper.Map<MemberIdentityUser>(user))!;
+        MemberIdentityUser? result = AssignLoginsCallback(_mapper.Map<MemberIdentityUser>(user))!;
 
-        return Task.FromResult(result);
+        return Task.FromResult<MemberIdentityUser?>(result);
     }
 
     public IPublishedContent? GetPublishedMember(MemberIdentityUser? user)
@@ -296,7 +294,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
     }
 
     /// <inheritdoc />
-    public override Task<MemberIdentityUser> FindByEmailAsync(
+    public override Task<MemberIdentityUser?> FindByEmailAsync(
         string email,
         CancellationToken cancellationToken = default)
     {
@@ -307,11 +305,11 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
             ? null
             : _mapper.Map<MemberIdentityUser>(member);
 
-        return Task.FromResult(AssignLoginsCallback(result))!;
+        return Task.FromResult(AssignLoginsCallback(result));
     }
 
     /// <inheritdoc />
-    protected override Task<MemberIdentityUser> FindUserAsync(string userId, CancellationToken cancellationToken)
+    protected override Task<MemberIdentityUser?> FindUserAsync(string userId, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         ThrowIfDisposed();
@@ -326,7 +324,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
             : _memberService.GetById(UserIdToInt(userId));
         if (user == null)
         {
-            return Task.FromResult((MemberIdentityUser)null!);
+            return Task.FromResult((MemberIdentityUser)null!)!;
         }
 
         return Task.FromResult(AssignLoginsCallback(_mapper.Map<MemberIdentityUser>(user)))!;
@@ -446,7 +444,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
     }
 
     /// <inheritdoc />
-    protected override async Task<IdentityUserLogin<string>> FindUserLoginAsync(string userId, string loginProvider,
+    protected override async Task<IdentityUserLogin<string>?> FindUserLoginAsync(string userId, string loginProvider,
         string providerKey, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -462,38 +460,32 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
             throw new ArgumentNullException(nameof(providerKey));
         }
 
-        MemberIdentityUser user = await FindUserAsync(userId, cancellationToken);
-        if (user == null)
+        MemberIdentityUser? user = await FindUserAsync(userId, cancellationToken);
+        if (user?.Id is null)
         {
-            return await Task.FromResult((IdentityUserLogin<string>)null!);
+            return await Task.FromResult<IdentityUserLogin<string>?>(null);
         }
 
         IList<UserLoginInfo> logins = await GetLoginsAsync(user, cancellationToken);
         UserLoginInfo? found =
             logins.FirstOrDefault(x => x.ProviderKey == providerKey && x.LoginProvider == loginProvider);
-        if (found == null)
+        if (found is null)
         {
-            return await Task.FromResult((IdentityUserLogin<string>)null!);
+            return await Task.FromResult<IdentityUserLogin<string>?>(null);
         }
 
-        if (user.Id is not null)
+        return new IdentityUserLogin<string>
         {
-            return new IdentityUserLogin<string>
-            {
-                LoginProvider = found.LoginProvider,
-                ProviderKey = found.ProviderKey,
-
-                // TODO: We don't store this value so it will be null
-                ProviderDisplayName = found.ProviderDisplayName,
-                UserId = user.Id,
-            };
-        }
-
-        return null!;
+            LoginProvider = found.LoginProvider,
+            ProviderKey = found.ProviderKey,
+            // TODO: We don't store this value so it will be null
+            ProviderDisplayName = found.ProviderDisplayName,
+            UserId = user.Id
+        };
     }
 
     /// <inheritdoc />
-    protected override Task<IdentityUserLogin<string>> FindUserLoginAsync(string loginProvider, string providerKey,
+    protected override Task<IdentityUserLogin<string>?> FindUserLoginAsync(string loginProvider, string providerKey,
         CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -512,11 +504,11 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
         var logins = _externalLoginService.Find(loginProvider, providerKey).ToList();
         if (logins.Count == 0)
         {
-            return Task.FromResult((IdentityUserLogin<string>)null!);
+            return Task.FromResult<IdentityUserLogin<string>?>(null);
         }
 
         IIdentityUserLogin found = logins[0];
-        return Task.FromResult(new IdentityUserLogin<string>
+        return Task.FromResult<IdentityUserLogin<string>?>(new IdentityUserLogin<string>
         {
             LoginProvider = found.LoginProvider,
             ProviderKey = found.ProviderKey,
@@ -533,7 +525,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
         {
             // if there are no roles, they either haven't been loaded since we don't eagerly
             // load for members, or they just have no roles.
-            IEnumerable<string> currentRoles = _memberService.GetAllRoles(user.UserName);
+            IEnumerable<string> currentRoles = _memberService.GetAllRoles(user.UserName!);
             ICollection<IdentityUserRole<string>> roles = currentRoles
                 .Select(role => new IdentityUserRole<string> { RoleId = role, UserId = user.Id }).ToList();
 
@@ -544,7 +536,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
     /// <summary>
     ///     Lists all users of a given role.
     /// </summary>
-    public override Task<IList<MemberIdentityUser>?> GetUsersInRoleAsync(
+    public override Task<IList<MemberIdentityUser>> GetUsersInRoleAsync(
         string roleName,
         CancellationToken cancellationToken = default)
     {
@@ -556,10 +548,10 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
             throw new ArgumentNullException(nameof(roleName));
         }
 
-        IEnumerable<IMember>? members = _memberService.GetMembersByMemberType(roleName);
+        IEnumerable<IMember> members = _memberService.GetMembersByMemberType(roleName);
 
-        IList<MemberIdentityUser>? membersIdentityUsers =
-            members?.Select(x => _mapper.Map<MemberIdentityUser>(x)!).ToList();
+        IList<MemberIdentityUser> membersIdentityUsers =
+            members.Select(x => _mapper.Map<MemberIdentityUser>(x)!).ToList();
 
         return Task.FromResult(membersIdentityUsers);
     }
@@ -573,8 +565,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
     ///     tracking ORMs like EFCore.
     /// </remarks>
     /// <inheritdoc />
-    public override Task SetTokenAsync(MemberIdentityUser user, string loginProvider, string name, string value,
-        CancellationToken cancellationToken)
+    public override Task SetTokenAsync(MemberIdentityUser user, string loginProvider, string name, string? value, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         ThrowIfDisposed();
@@ -632,7 +623,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
     }
 
     /// <inheritdoc />
-    protected override Task<UmbracoIdentityRole> FindRoleAsync(string roleName, CancellationToken cancellationToken)
+    protected override Task<UmbracoIdentityRole?> FindRoleAsync(string roleName, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(roleName))
         {
@@ -640,12 +631,12 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
         }
 
         IMemberGroup? group = _memberService.GetAllRoles().SingleOrDefault(x => x.Name == roleName);
-        if (group == null)
+        if (group?.Name is null)
         {
-            return Task.FromResult((UmbracoIdentityRole)null!);
+            return Task.FromResult<UmbracoIdentityRole?>(null);
         }
 
-        return Task.FromResult(new UmbracoIdentityRole(group.Name)
+        return Task.FromResult<UmbracoIdentityRole?>(new UmbracoIdentityRole(group.Name)
         {
             // TODO: what should the alias be?
             Id = group.Id.ToString(),
@@ -653,27 +644,25 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
     }
 
     /// <inheritdoc />
-    protected override async Task<IdentityUserRole<string>> FindUserRoleAsync(string userId, string roleId,
+    protected override async Task<IdentityUserRole<string>?> FindUserRoleAsync(string userId, string roleId,
         CancellationToken cancellationToken)
     {
-        MemberIdentityUser user = await FindUserAsync(userId, cancellationToken);
-        if (user == null)
+        MemberIdentityUser? user = await FindUserAsync(userId, cancellationToken);
+        if (user is null)
         {
-            return null!;
+            return null;
         }
 
         IdentityUserRole<string>? found = user.Roles.FirstOrDefault(x => x.RoleId.InvariantEquals(roleId));
-        return found!;
+        return found;
     }
 
     private MemberIdentityUser? AssignLoginsCallback(MemberIdentityUser? user)
     {
-        if (user != null)
+        if (user is not null)
         {
-            user.SetLoginsCallback(
-                new Lazy<IEnumerable<IIdentityUserLogin>?>(() => _externalLoginService.GetExternalLogins(user.Key)));
-            user.SetTokensCallback(new Lazy<IEnumerable<IIdentityUserToken>?>(() =>
-                _externalLoginService.GetExternalLoginTokens(user.Key)));
+            user.SetLoginsCallback(new Lazy<IEnumerable<IIdentityUserLogin>?>(() => _externalLoginService.GetExternalLogins(user.Key)));
+            user.SetTokensCallback(new Lazy<IEnumerable<IIdentityUserToken>?>(() => _externalLoginService.GetExternalLoginTokens(user.Key)));
         }
 
         return user;
@@ -736,7 +725,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
             && member.Email != identityUser.Email && identityUser.Email.IsNullOrWhiteSpace() == false)
         {
             anythingChanged = true;
-            member.Email = identityUser.Email;
+            member.Email = identityUser.Email!;
         }
 
         if (identityUser.IsPropertyDirty(nameof(MemberIdentityUser.AccessFailedCount))
@@ -768,7 +757,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
             && member.Username != identityUser.UserName && identityUser.UserName.IsNullOrWhiteSpace() == false)
         {
             anythingChanged = true;
-            member.Username = identityUser.UserName;
+            member.Username = identityUser.UserName!;
         }
 
         if (identityUser.IsPropertyDirty(nameof(MemberIdentityUser.PasswordHash))

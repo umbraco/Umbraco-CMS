@@ -299,7 +299,7 @@ internal class ContentTypeRepository : ContentTypeRepositoryBase<IContentType>, 
     {
         // historyCleanup property is not mandatory for api endpoint, handle the case where it's not present.
         // DocumentTypeSave doesn't handle this for us like ContentType constructors do.
-        if (entity is IContentTypeWithHistoryCleanup entityWithHistoryCleanup)
+        if (entity is IContentType entityWithHistoryCleanup)
         {
             var dto = new ContentVersionCleanupPolicyDto
             {

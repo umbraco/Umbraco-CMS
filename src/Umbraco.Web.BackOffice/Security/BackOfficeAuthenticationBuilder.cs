@@ -62,10 +62,10 @@ public class BackOfficeAuthenticationBuilder : AuthenticationBuilder
     internal class EnsureBackOfficeScheme<TOptions> : IPostConfigureOptions<TOptions>
         where TOptions : RemoteAuthenticationOptions
     {
-        public void PostConfigure(string name, TOptions options)
+        public void PostConfigure(string? name, TOptions options)
         {
             // ensure logic only applies to backoffice authentication schemes
-            if (name.StartsWith(Constants.Security.BackOfficeExternalAuthenticationTypePrefix))
+            if (name is not null && name.StartsWith(Constants.Security.BackOfficeExternalAuthenticationTypePrefix))
             {
                 options.SignInScheme = Constants.Security.BackOfficeExternalAuthenticationType;
             }
