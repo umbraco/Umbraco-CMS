@@ -7,6 +7,10 @@
     "test": "npx cypress run",
     "ui": "npx cypress open"
   },
+  "engines": {
+    "node": ">=16.17",
+    "npm": ">=8.15"
+  },
   "devDependencies": {
     "cross-env": "^7.0.2",
     "cypress": "8.4.1",

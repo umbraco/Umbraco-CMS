@@ -23,7 +23,7 @@ parameters:
     default: false
 
 variables:
-  nodeVersion: 14.18.1
+  nodeVersion: 16.17.0
   dotnetVersion: 7.x
   solution: umbraco.sln
   buildConfiguration: Release
@@ -189,7 +189,7 @@ stages:
           - task: NodeTool@0
             displayName: Use Node.js 10.15.0
             inputs:
-              versionSpec: 10.15.0 # Won't work with 14.18.1
+              versionSpec: 10.15.0 # Won't work with higher versions
           - script: |
               npm ci --no-fund --no-audit --prefer-offline
               npx gulp docs
