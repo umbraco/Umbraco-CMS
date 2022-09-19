@@ -20,8 +20,6 @@ public class SignInUserStep : IInstallStep
         _backOfficeUserManager = backOfficeUserManager;
     }
 
-    public InstallationType InstallationTypeTarget => InstallationType.NewInstall;
-
     public async Task ExecuteAsync(InstallData model)
     {
         BackOfficeIdentityUser identityUser = await _backOfficeUserManager.FindByIdAsync(Constants.Security.SuperUserIdAsString);

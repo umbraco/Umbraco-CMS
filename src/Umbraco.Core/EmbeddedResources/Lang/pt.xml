@@ -358,7 +358,7 @@
     <key alias="databaseUpgradeDone"><![CDATA[Seu banco de dados foi atualizado para última versão %0%. <br />Pressione <strong>Próximo</strong> para prosseguir.]]></key>
     <key alias="databaseUpToDate"><![CDATA[Seu banco de dados atual está desatualizado! Clique <strong>próximo</strong> para continuar com o assistente de configuração]]></key>
     <key alias="defaultUserChangePass"><![CDATA[<strong>A senha do usuário padrão precisa ser alterada!</strong>]]></key>
-    <key alias="defaultUserDisabled"><![CDATA[<strong>O usuário padrão foi desabilitado ou não tem acesso à Umbraco!</strong></p><p>Nenhuma ação posterior precisa ser tomada. Clique <b>Próximo</b> para prosseguir.]]></key>
+    <key alias="defaultUserDisabled"><![CDATA[<strong>O usuário padrão foi desabilitado ou não tem acesso à Umbraco!</strong></p><p>Nenhuma ação posterior precisa ser tomada. Clique <strong>Próximo</strong> para prosseguir.]]></key>
     <key alias="defaultUserPassChanged"><![CDATA[<strong>A senha do usuário padrão foi alterada com sucesso desde a instalação!</strong></p><p>Nenhuma ação posterior é necessária. Clique <strong>Próximo</strong> para prosseguir.]]></key>
     <key alias="defaultUserPasswordChanged">Senha foi alterada!</key>
     <key alias="greatStart">Comece com o pé direito, assista nossos vídeos introdutórios</key>

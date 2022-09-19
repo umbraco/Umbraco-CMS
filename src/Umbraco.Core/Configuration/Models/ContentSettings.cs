@@ -157,6 +157,7 @@ public class ContentSettings
     internal const bool StaticHideBackOfficeLogo = false;
     internal const bool StaticDisableDeleteWhenReferenced = false;
     internal const bool StaticDisableUnpublishWhenReferenced = false;
+    internal const bool StaticAllowEditInvariantFromNonDefault = false;
 
     /// <summary>
     ///     Gets or sets a value for the content notification settings.
@@ -242,4 +243,10 @@ public class ContentSettings
     ///     Get or sets the model representing the global content version cleanup policy
     /// </summary>
     public ContentVersionCleanupPolicySettings ContentVersionCleanupPolicy { get; set; } = new();
+
+    /// <summary>
+    /// Gets or sets a value indicating whether to allow editing invariant properties from a non-default language variation.
+    /// </summary>
+    [DefaultValue(StaticAllowEditInvariantFromNonDefault)]
+    public bool AllowEditInvariantFromNonDefault { get; set; } = StaticAllowEditInvariantFromNonDefault;
 }
