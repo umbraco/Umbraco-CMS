@@ -8,15 +8,9 @@
     <EnablePackageValidation>false</EnablePackageValidation>
   </PropertyGroup>
 
-  <ItemGroup Condition="'$(OS)' == 'Windows_NT'">
-    <PackageReference Include="Microsoft.ICU.ICU4C.Runtime" Version="68.2.0.9" />
-    <RuntimeHostConfigurationOption Include="System.Globalization.AppLocalIcu" Value="68.2.0.9" />
-  </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="AngleSharp" Version="0.17.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.1" />
-    <PackageReference Include="NUnit" Version="3.13.3" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.2.1" />
     <PackageReference Include="System.Data.Odbc" Version="7.0.0-preview.7.22375.6" />
     <PackageReference Include="System.Data.OleDb" Version="7.0.0-preview.7.22375.6" />
