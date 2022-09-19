@@ -47,7 +47,7 @@ internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>
         return keyRepo.Get(key);
     }
 
-    public IEnumerable<IDictionaryItem> GetMany(string[] keys)
+    public IEnumerable<IDictionaryItem> GetManyByKeys(string[] keys)
     {
         var keyRepo = new DictionaryByKeyRepository(this, ScopeAccessor, AppCaches,
             _loggerFactory.CreateLogger<DictionaryByKeyRepository>());

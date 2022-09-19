@@ -8,7 +8,7 @@ public interface IDictionaryRepository : IReadWriteQueryRepository<int, IDiction
 
     IEnumerable<IDictionaryItem> GetMany(params Guid[] uniqueIds) => Array.Empty<IDictionaryItem>();
 
-    IEnumerable<IDictionaryItem> GetMany(params string[] keys) => Array.Empty<IDictionaryItem>();
+    IEnumerable<IDictionaryItem> GetManyByKeys(params string[] keys) => Array.Empty<IDictionaryItem>();
 
     IDictionaryItem? Get(string key);
 

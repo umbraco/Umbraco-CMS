@@ -223,7 +223,7 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            IEnumerable<IDictionaryItem> items = _dictionaryRepository.GetMany(keys).ToArray();
+            IEnumerable<IDictionaryItem> items = _dictionaryRepository.GetManyByKeys(keys).ToArray();
 
             // ensure the lazy Language callback is assigned
             foreach (IDictionaryItem item in items)
