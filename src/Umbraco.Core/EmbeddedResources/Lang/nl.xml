@@ -1693,6 +1693,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="historyCleanupKeepAllVersionsNewerThanDays">Bewaar alle versies nieuwer dan dagen</key>
     <key alias="historyCleanupKeepLatestVersionPerDayForDays">Bewaar de laatste versie per dag voor dagen</key>
     <key alias="historyCleanupPreventCleanup">Voorkom opschonen</key>
+    <key alias="historyCleanupEnableCleanup">Opschonen aanzetten</key>
     <key alias="historyCleanupGloballyDisabled">Geschiedenis opschonen is globaal uitgeschakeld. Deze instellingen worden pas van kracht nadat ze zijn ingeschakeld.</key>
   </area>
   <area alias="languages">
