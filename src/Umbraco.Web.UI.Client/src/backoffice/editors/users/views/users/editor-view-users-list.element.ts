@@ -67,8 +67,9 @@ export class UmbEditorViewUsersListElement extends UmbContextConsumerMixin(LitEl
 	@state()
 	private _users: Array<UserItem> = [];
 
-	protected _usersSubscription?: Subscription;
 	protected _usersContext?: UmbEditorViewUsersElement;
+	protected _usersSubscription?: Subscription;
+	protected _selectionSubscription?: Subscription;
 
 	connectedCallback(): void {
 		super.connectedCallback();
@@ -77,8 +78,12 @@ export class UmbEditorViewUsersListElement extends UmbContextConsumerMixin(LitEl
 			this._usersContext = usersContext;
 
 			this._usersSubscription?.unsubscribe();
+			this._selectionSubscription?.unsubscribe();
 			this._usersSubscription = this._usersContext?.users.subscribe((users: Array<UserItem>) => {
 				this._users = users;
+			});
+			this._selectionSubscription = this._usersContext?.selection.subscribe((selection: Array<string>) => {
+				this._selection = selection;
 			});
 		});
 
@@ -126,28 +131,19 @@ export class UmbEditorViewUsersListElement extends UmbContextConsumerMixin(LitEl
 		super.disconnectedCallback();
 
 		this._usersSubscription?.unsubscribe();
+		this._selectionSubscription?.unsubscribe();
 	}
 
 	private _selectAllHandler(event: Event) {
-		const checkboxElement = event.target as HTMLInputElement;
-		this._selection = checkboxElement.checked ? this._users.map((item: UserItem) => item.key) : [];
-		this._selectionMode = this._selection.length > 0;
+		console.log('SELECT ALL NOT IMPLEMENTED');
 	}
 
-	private _selectHandler(event: Event, item: UserItem) {
-		const checkboxElement = event.target as HTMLInputElement;
-		this._selection = checkboxElement.checked
-			? [...this._selection, item.key]
-			: this._selection.filter((selectionKey) => selectionKey !== item.key);
-		this._selectionMode = this._selection.length > 0;
+	private _selectRowHandler(user: UserItem) {
+		this._usersContext?.select(user.key);
 	}
-	private _selectRowHandler(item: UserItem) {
-		this._selection = [...this._selection, item.key];
-		this._selectionMode = this._selection.length > 0;
-	}
-	private _unselectRowHandler(item: UserItem) {
-		this._selection = this._selection.filter((selectionKey) => selectionKey !== item.key);
-		this._selectionMode = this._selection.length > 0;
+
+	private _deselectRowHandler(user: UserItem) {
+		this._usersContext?.deselect(user.key);
 	}
 
 	private _sortingHandler(column: TableColumn) {
@@ -181,8 +177,8 @@ export class UmbEditorViewUsersListElement extends UmbContextConsumerMixin(LitEl
 			selectable
 			?select-only=${this._selectionMode}
 			?selected=${this._isSelected(user.key)}
-			@selected=${() => this._selectRowHandler(user)}
-			@unselected=${() => this._unselectRowHandler(user)}>
+			@selected=${() => this._usersContext?.select(user.key)}
+			@unselected=${() => this._usersContext?.deselect(user.key)}>
 			<uui-table-cell>
 				<div style="display: flex; align-items: center;">
 					<uui-avatar name="${user.name}"></uui-avatar>

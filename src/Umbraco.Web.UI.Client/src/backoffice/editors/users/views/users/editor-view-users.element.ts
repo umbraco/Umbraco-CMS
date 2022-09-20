@@ -80,10 +80,42 @@ export class UmbEditorViewUsersElement extends UmbContextProviderMixin(LitElemen
 	private _users: BehaviorSubject<Array<UserItem>> = new BehaviorSubject(this.tempData);
 	public readonly users: Observable<Array<UserItem>> = this._users.asObservable();
 
+	private _selection: BehaviorSubject<Array<string>> = new BehaviorSubject(<Array<string>>[]);
+	public readonly selection: Observable<Array<string>> = this._selection.asObservable();
+
 	constructor() {
 		super();
 
 		this.provideContext('umbUsersContext', this);
+	}
+
+	public setSelection(value: Array<string>) {
+		if (!value) return;
+		this._selection.next(value);
+	}
+
+	public select(key: string) {
+		const selection = this._selection.getValue();
+		this._selection.next([...selection, key]);
+	}
+
+	public deselect(key: string) {
+		const selection = this._selection.getValue();
+		this._selection.next(selection.filter((k) => k !== key));
+	}
+
+	public getTagLookAndColor(status: string): { color: InterfaceColor; look: InterfaceLook } {
+		switch (status.toLowerCase()) {
+			case 'invited':
+			case 'inactive':
+				return { look: 'primary', color: 'warning' };
+			case 'active':
+				return { look: 'primary', color: 'positive' };
+			case 'disabled':
+				return { look: 'primary', color: 'danger' };
+			default:
+				return { look: 'secondary', color: 'default' };
+		}
 	}
 
 	private _renderViewType() {
@@ -99,20 +131,6 @@ export class UmbEditorViewUsersElement extends UmbContextProviderMixin(LitElemen
 
 	private _toggleViewType() {
 		this._viewType = this._viewType === 'list' ? 'grid' : 'list';
-	}
-
-	public getTagLookAndColor(status: string): { color: InterfaceColor; look: InterfaceLook } {
-		switch (status.toLowerCase()) {
-			case 'invited':
-			case 'inactive':
-				return { look: 'primary', color: 'warning' };
-			case 'active':
-				return { look: 'primary', color: 'positive' };
-			case 'disabled':
-				return { look: 'primary', color: 'danger' };
-			default:
-				return { look: 'secondary', color: 'default' };
-		}
 	}
 
 	render() {

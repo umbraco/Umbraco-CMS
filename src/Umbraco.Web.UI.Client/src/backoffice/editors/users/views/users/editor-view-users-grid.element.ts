@@ -31,8 +31,12 @@ export class UmbEditorViewUsersGridElement extends UmbContextConsumerMixin(LitEl
 	@state()
 	private _users: Array<UserItem> = [];
 
-	protected _usersSubscription?: Subscription;
+	@state()
+	private _selection: Array<string> = [];
+
 	protected _usersContext?: UmbEditorViewUsersElement;
+	protected _usersSubscription?: Subscription;
+	protected _selectionSubscription?: Subscription;
 
 	connectedCallback(): void {
 		super.connectedCallback();
@@ -41,8 +45,12 @@ export class UmbEditorViewUsersGridElement extends UmbContextConsumerMixin(LitEl
 			this._usersContext = usersContext;
 
 			this._usersSubscription?.unsubscribe();
+			this._selectionSubscription?.unsubscribe();
 			this._usersSubscription = this._usersContext?.users.subscribe((users: Array<UserItem>) => {
 				this._users = users;
+			});
+			this._selectionSubscription = this._usersContext?.selection.subscribe((selection: Array<string>) => {
+				this._selection = selection;
 			});
 		});
 	}
@@ -51,6 +59,11 @@ export class UmbEditorViewUsersGridElement extends UmbContextConsumerMixin(LitEl
 		super.disconnectedCallback();
 
 		this._usersSubscription?.unsubscribe();
+		this._selectionSubscription?.unsubscribe();
+	}
+
+	private _isSelected(key: string) {
+		return this._selection.includes(key);
 	}
 
 	private renderUserCard(user: UserItem) {
@@ -59,7 +72,13 @@ export class UmbEditorViewUsersGridElement extends UmbContextConsumerMixin(LitEl
 		const statusLook = this._usersContext.getTagLookAndColor(user.status ? user.status : '');
 
 		return html`
-			<uui-card-user .name=${user.name}>
+			<uui-card-user
+				.name=${user.name}
+				selectable
+				?select-only=${this._selection.length > 0}
+				?selected=${this._isSelected(user.key)}
+				@selected=${() => this._usersContext?.select(user.key)}
+				@unselected=${() => this._usersContext?.deselect(user.key)}>
 				${user.status
 					? html`<uui-tag slot="tag" size="s" look="${statusLook.look}" color="${statusLook.color}">
 							${user.status}
