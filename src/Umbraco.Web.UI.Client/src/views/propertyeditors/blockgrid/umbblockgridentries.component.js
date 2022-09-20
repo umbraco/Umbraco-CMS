@@ -252,14 +252,12 @@
 
                     let lastDistance = 99999;
                     let foundRelatedEl = null;
-                    let foundRelatedRect = null;
                     let placeAfter = false;
                     elementInSameRow.forEach( sameRow => {
                         const centerX = (sameRow.rect.left + (sameRow.rect.width*.5));
                         let distance = Math.abs(dragX - centerX);
                         if(distance < lastDistance) {
                             foundRelatedEl = sameRow.el;
-                            foundRelatedRect = sameRow.rect;
                             lastDistance = Math.abs(distance);
                             placeAfter = dragX > centerX;
                         }
@@ -292,12 +290,8 @@
 
                         let verticalDirection = false;
                         if (ghostEl.dataset.forceLeft) {
-                            //verticalDirection = true;
-                            console.log("#A")
                             placeAfter = true;
                         } else if (ghostEl.dataset.forceRight) {
-                            //verticalDirection = true;
-                            console.log("#B")
                             placeAfter = true;
                         } else {
                             //if(isInsideFoundRelated) {
@@ -305,12 +299,10 @@
                                 // if the related element is forceLeft and we are in the left side, we will set vertical direction, to correct placeAfter.
                                 if (foundRelatedEl.dataset.forceLeft && placeAfter === false) {
                                     verticalDirection = true;
-                                    console.log("#1")
                                 } else 
                                 // if the related element is forceRight and we are in the right side, we will set vertical direction, to correct placeAfter.
                                 if (foundRelatedEl.dataset.forceRight && placeAfter === true) {
                                     verticalDirection = true;
-                                    console.log("#2")
                                 } else {
                                     const totalColumns = parseInt(getComputedStyle(approvedContainerEl).getPropertyValue("--umb-block-grid--grid-columns"), 10);
 
@@ -322,7 +314,6 @@
                                         verticalDirection = true;
                                     }
 
-                                    console.log("totalColumns", typeof totalColumns, typeof relatedColumns, typeof ghostColumns)
                                     /*
                                     If they fit, then we go horizontal? unless forceLeft/forceRight on both?
 
@@ -333,13 +324,9 @@
                         }
                         if (verticalDirection) {
                             placeAfter = (dragY > foundRelatedElRect.top + (foundRelatedElRect.height*.5));
-                            console.log("vertical direction", placeAfter);
-                        } else {
-                            console.log("horizontal direction", placeAfter);
                         }
                         
 
-                        //console.log("void drop at ", newIndex, " containerElements.length:", containerElements.length)
                         const nextEl = containerElements[(placeAfter ? newIndex+1 : newIndex)];
                         if (nextEl) {
                             approvedContainerEl.insertBefore(ghostEl, nextEl);
@@ -347,13 +334,6 @@
                             approvedContainerEl.appendChild(ghostEl);
                         }
 
-                        //gridLayoutContainerEl.insertBefore(nextSibling, ghostEl.nextSibling);
-                        /*vm.entries.splice(newIndex, 0, movingEntry);
-                        if (nextSibling.nodeType === Node.COMMENT_NODE) {
-                            gridLayoutContainerEl.insertBefore(nextSibling, ghostEl.nextSibling);
-                        }*/
-
-                        //$scope.$evalAsync();
                         return
                     }
 
