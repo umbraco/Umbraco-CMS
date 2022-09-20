@@ -1,10 +1,9 @@
-﻿using System.Net;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.ManagementApi.Factories;
 using Umbraco.Cms.ManagementApi.ViewModels.Help;
 using Umbraco.Cms.ManagementApi.ViewModels.Pagination;
@@ -15,15 +14,18 @@ public class GetHelpController : HelpControllerBase
 {
     private readonly ILogger<GetHelpController> _logger;
     private readonly IPagedViewModelFactory _viewModelFactory;
+    private readonly IJsonSerializer _jsonSerializer;
     private HelpPageSettings _helpPageSettings;
 
     public GetHelpController(
         IOptionsMonitor<HelpPageSettings> helpPageSettings,
         ILogger<GetHelpController> logger,
-        IPagedViewModelFactory viewModelFactory)
+        IPagedViewModelFactory viewModelFactory,
+        IJsonSerializer jsonSerializer)
     {
         _logger = logger;
         _viewModelFactory = viewModelFactory;
+        _jsonSerializer = jsonSerializer;
         _helpPageSettings = helpPageSettings.CurrentValue;
         helpPageSettings.OnChange(UpdateHelpPageSettings);
     }
@@ -59,7 +61,7 @@ public class GetHelpController : HelpControllerBase
 
             // fetch dashboard json and parse to JObject
             var json = await httpClient.GetStringAsync(url);
-            List<HelpPageViewModel>? result = JsonConvert.DeserializeObject<List<HelpPageViewModel>>(json);
+            List<HelpPageViewModel>? result = _jsonSerializer.Deserialize<List<HelpPageViewModel>>(json);
             if (result != null)
             {
                 return Ok(_viewModelFactory.Create(result, skip, take));
