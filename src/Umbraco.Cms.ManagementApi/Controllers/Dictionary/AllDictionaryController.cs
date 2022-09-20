@@ -28,7 +28,7 @@ public class AllDictionaryController : DictionaryControllerBase
     /// </returns>
     [HttpGet]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(IActionResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagedViewModel<DictionaryOverviewViewModel>), StatusCodes.Status200OK)]
     public async Task<PagedViewModel<DictionaryOverviewViewModel>> GetAll(int skip, int take)
     {
         IDictionaryItem[] items = _localizationService.GetDictionaryItemDescendants(null).ToArray();
