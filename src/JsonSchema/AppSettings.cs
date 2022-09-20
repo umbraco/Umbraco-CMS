@@ -116,6 +116,8 @@ namespace JsonSchema
                     public Recaptcha2Settings? Recaptcha2 { get; set; }
 
                     public Recaptcha3Settings? Recaptcha3 { get; set; }
+
+                    public RichTextSettings? RichText { get; set; }
                 }
             }
 
