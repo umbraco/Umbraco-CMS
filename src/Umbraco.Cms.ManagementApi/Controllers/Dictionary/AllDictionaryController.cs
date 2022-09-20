@@ -34,6 +34,7 @@ public class AllDictionaryController : DictionaryControllerBase
         IDictionaryItem[] items = _localizationService.GetDictionaryItemDescendants(null).ToArray();
         var list = new List<DictionaryOverviewViewModel>(items.Length);
 
+        // Build the proper tree structure, as we can have nested dictionary items
         BuildTree(list, items);
 
         var model = new PagedViewModel<DictionaryOverviewViewModel>
