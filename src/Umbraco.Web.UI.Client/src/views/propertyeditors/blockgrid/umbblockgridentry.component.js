@@ -45,7 +45,7 @@
     
     function closestColumnSpanOption(target, map, max) {
         return map.reduce((a, b) => {
-            if (a.columnSpan >= max) {
+            if (a.columnSpan > max) {
                 return b;
             }
             let aDiff = Math.abs(a.columnSpan - target);
