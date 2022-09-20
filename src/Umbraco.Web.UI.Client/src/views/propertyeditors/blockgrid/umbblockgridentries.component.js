@@ -26,8 +26,6 @@
         }
     );
 
-    const ANIMATION_DURATION = 120;
-
     function BlockGridEntriesController($element, $scope, $timeout) {
 
         var vm = this;
@@ -129,13 +127,14 @@
 
             var targetRect = null;
             var relatedEl = null;
+            var relatedRect = null;
             var ghostEl = null;
             var ghostRect = null;
-            var relatedRect = null;
             var dragX = 0;
             var dragY = 0;
             var dragOffsetX = 0;
             var dragOffsetY = 0;
+
 
             // Setup DOM method for communication between sortables:
             gridLayoutContainerEl['Sortable:controller'] = () => {
@@ -477,6 +476,7 @@
                     dragOffsetY = evt.originalEvent.clientY - ghostRect.top;
 
                     window.addEventListener('drag', _onDragMove);
+                    window.addEventListener('dragover', _onDragMove);
 
                     //gridLayoutContainerEl.getRootNode().host.style.setProperty("--umb-block-grid--dragging-mode", 1);
                     document.documentElement.style.setProperty("--umb-block-grid--dragging-mode", 1);
@@ -543,6 +543,7 @@
                         cancelAnimationFrame(rqaId);
                     }
                     window.removeEventListener('drag', _onDragMove);
+                    window.removeEventListener('dragover', _onDragMove);
 
                     // ensure not-allowed indication is removed.
                     if(_lastIndicationContainerVM) {
