@@ -32,7 +32,7 @@ public class ByIdDictionaryController : DictionaryControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(DictionaryViewModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(NotFoundResult), StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<DictionaryViewModel>> ById(Guid id)
+    public async Task<ActionResult<DictionaryViewModel>> ByKey(Guid id)
     {
         IDictionaryItem? dictionary = _localizationService.GetDictionaryItemById(id);
         if (dictionary == null)
