@@ -2,7 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { when } from 'lit-html/directives/when.js';
-import { Subscription, distinctUntilChanged, map } from 'rxjs';
+import { Subscription, map } from 'rxjs';
 import { UmbModalService } from '../../../../../core/services/modal';
 
 import { UmbContextConsumerMixin } from '../../../../../core/context';
@@ -75,17 +75,20 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Li
 	private _observeDataType() {
 		this._dataTypeSubscription?.unsubscribe();
 
-		this._dataTypeSubscription = this._dataTypeContext?.data
-			.pipe(distinctUntilChanged())
-			.subscribe((dataType: DataTypeEntity) => {
-				this._dataType = dataType;
+		this._dataTypeSubscription = this._dataTypeContext?.data.subscribe((dataType: DataTypeEntity) => {
+			this._dataType = dataType;
 
-				if (!this._dataType) return;
+			if (!this._dataType) return;
 
+			if (this._dataType.propertyEditorAlias !== this._propertyEditorAlias) {
 				this._observePropertyEditor(this._dataType.propertyEditorAlias);
 				this._observeAvailablePropertyEditorUIs(this._dataType.propertyEditorAlias);
+			}
+
+			if (this._dataType.propertyEditorUIAlias !== this._propertyEditorUIAlias) {
 				this._observePropertyEditorUI(this._dataType.propertyEditorUIAlias);
-			});
+			}
+		});
 	}
 
 	private _observePropertyEditor(propertyEditorAlias: string) {
@@ -117,6 +120,7 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Li
 				)
 			)
 			.subscribe((availablePropertyEditorUIs) => {
+				// Select the Property Editor UI if there is only one available
 				if (availablePropertyEditorUIs?.length === 1) {
 					this._selectPropertyEditorUI(availablePropertyEditorUIs[0].alias);
 				}
@@ -152,7 +156,7 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Li
 	}
 
 	private _selectPropertyEditor(propertyEditorAlias: string) {
-		if (!this._dataType) return;
+		if (!this._dataType || this._dataType.propertyEditorUIAlias === propertyEditorAlias) return;
 
 		this._dataType.propertyEditorAlias = propertyEditorAlias;
 		this._dataTypeContext?.update({ propertyEditorAlias });
@@ -173,7 +177,7 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Li
 	}
 
 	private _selectPropertyEditorUI(propertyEditorUIAlias: string) {
-		if (!this._dataType) return;
+		if (!this._dataType || this._dataType.propertyEditorUIAlias === propertyEditorUIAlias) return;
 
 		this._dataType.propertyEditorUIAlias = propertyEditorUIAlias;
 		this._dataTypeContext?.update({ propertyEditorUIAlias });
