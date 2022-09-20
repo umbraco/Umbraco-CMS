@@ -3,8 +3,8 @@ using Umbraco.Cms.ManagementApi.Filters;
 
 namespace Umbraco.Cms.ManagementApi.Controllers;
 
-[SystemTextJsonConfiguration]
-public class MananagementApiBaseController : Controller
+[ManagementApiJsonConfiguration]
+public class ManagementApiControllerBase : Controller
 {
 
 }

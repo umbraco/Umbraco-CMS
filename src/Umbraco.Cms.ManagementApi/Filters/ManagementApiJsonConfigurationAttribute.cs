@@ -4,9 +4,9 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Umbraco.Cms.ManagementApi.Filters;
 
-public class SystemTextJsonConfigurationAttribute : TypeFilterAttribute
+public class ManagementApiJsonConfigurationAttribute : TypeFilterAttribute
 {
-    public SystemTextJsonConfigurationAttribute() : base(typeof(SystemTextJsonConfigurationFilter)) =>
+    public ManagementApiJsonConfigurationAttribute() : base(typeof(SystemTextJsonConfigurationFilter)) =>
         Order = 1; // Must be low, to be overridden by other custom formatters, but higher then all framework stuff.
 
     private class SystemTextJsonConfigurationFilter : IResultFilter
@@ -24,7 +24,7 @@ public class SystemTextJsonConfigurationAttribute : TypeFilterAttribute
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                 };
                 objectResult.Formatters.Clear();
-                objectResult.Formatters.Add(new EnumOutputFormatter(serializerOptions));
+                objectResult.Formatters.Add(new ManagementApiJsonOutputFormatter(serializerOptions));
             }
         }
     }

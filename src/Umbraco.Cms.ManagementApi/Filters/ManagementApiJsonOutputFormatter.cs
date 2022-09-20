@@ -4,9 +4,9 @@ using Microsoft.AspNetCore.Mvc.Formatters;
 
 namespace Umbraco.Cms.ManagementApi.Filters;
 
-public class EnumOutputFormatter : SystemTextJsonOutputFormatter
+public class ManagementApiJsonOutputFormatter : SystemTextJsonOutputFormatter
 {
-    public EnumOutputFormatter(JsonSerializerOptions jsonSerializerOptions) : base(RegisterJsonConverters(jsonSerializerOptions))
+    public ManagementApiJsonOutputFormatter(JsonSerializerOptions jsonSerializerOptions) : base(RegisterJsonConverters(jsonSerializerOptions))
     {
     }
 
