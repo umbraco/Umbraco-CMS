@@ -51,14 +51,13 @@
 
         function onLocalAmountOfBlocksChanged() {
 
-            if (vm.parentForm && vm.areaConfig) {
-
+            if (vm.entriesForm && vm.areaConfig) {
                 
                 var isMinRequirementGood = vm.entries.length >= vm.areaConfig.minAllowed;
-                vm.parentForm.areaMinCount.$setValidity("areaMinCount", isMinRequirementGood);
+                vm.entriesForm.areaMinCount.$setValidity("areaMinCount", isMinRequirementGood);
 
                 var isMaxRequirementGood = vm.areaConfig.maxAllowed == null || vm.entries.length <= vm.areaConfig.maxAllowed;
-                vm.parentForm.areaMaxCount.$setValidity("areaMaxCount", isMaxRequirementGood);
+                vm.entriesForm.areaMaxCount.$setValidity("areaMaxCount", isMaxRequirementGood);
 
                 vm.areaConfig.specifiedAllowance.forEach(allowance => {
 
@@ -78,13 +77,12 @@
                     }
                 });
                 var isTypeRequirementGood = vm.invalidBlockTypes.length === 0;
-                vm.parentForm.areaTypeRequirements.$setValidity("areaTypeRequirements", isTypeRequirementGood);
+                vm.entriesForm.areaTypeRequirements.$setValidity("areaTypeRequirements", isTypeRequirementGood);
 
 
                 vm.invalidAmount = !isMinRequirementGood || !isMaxRequirementGood || !isTypeRequirementGood;
 
                 $element.toggleClass("--invalid", vm.invalidAmount);
-
             }
         }
 
