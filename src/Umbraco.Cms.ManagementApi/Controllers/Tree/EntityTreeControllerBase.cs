@@ -9,7 +9,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.Tree;
 
-public abstract class EntityTreeControllerBase<TItem> : Controller
+public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerBase
     where TItem : EntityTreeItemViewModel, new()
 {
     private readonly string _itemUdiType;

@@ -7,7 +7,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.Tree;
 
-public abstract class FileSystemTreeControllerBase : Controller
+public abstract class FileSystemTreeControllerBase : ManagementApiControllerBase
 {
     protected abstract IFileSystem FileSystem { get; }
 
