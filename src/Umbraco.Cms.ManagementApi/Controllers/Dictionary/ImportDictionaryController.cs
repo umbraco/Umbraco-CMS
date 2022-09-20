@@ -56,11 +56,11 @@ public class ImportDictionaryController : DictionaryControllerBase
             return await Task.FromResult(NotFound());
         }
 
-        var xd = new XmlDocument { XmlResolver = null };
-        xd.Load(filePath);
+        var xmlDocument = new XmlDocument { XmlResolver = null };
+        xmlDocument.Load(filePath);
 
         var userId = _backOfficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? 0;
-        var element = XElement.Parse(xd.InnerXml);
+        var element = XElement.Parse(xmlDocument.InnerXml);
 
         IDictionaryItem? parentDictionaryItem = _localizationService.GetDictionaryItemById(parentId ?? 0);
         IEnumerable<IDictionaryItem> dictionaryItems = _packageDataInstallation.ImportDictionaryItem(element, userId, parentDictionaryItem?.Key);
