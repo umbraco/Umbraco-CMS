@@ -92,10 +92,8 @@
             });
         }
         vm.deleteArea = function(area) {
-            console.log("deleteArea?")
             const index = vm.model.findIndex(x => x.key === area.key);
             if(index !== -1) {
-                console.log("performe delete")
                 vm.model.splice(index, 1);
             }
             setDirty();

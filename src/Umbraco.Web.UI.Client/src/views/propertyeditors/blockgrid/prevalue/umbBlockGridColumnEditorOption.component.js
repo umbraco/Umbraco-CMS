@@ -28,8 +28,6 @@
         var vm = this;
 
         vm.$onInit = function() {
-            
-            console.log("option", vm.column, vm.columnSpanOption)
 
         };
 

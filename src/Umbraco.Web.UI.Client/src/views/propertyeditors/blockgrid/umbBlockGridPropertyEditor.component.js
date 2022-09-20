@@ -92,7 +92,6 @@
 
 
             //listen for form validation changes
-            console.log("valFormManager", vm.valFormManager);
             vm.valFormManager.onValidationStatusChanged(function (evt, args) {
                 vm.showValidation = vm.valFormManager.showValidation;
             });
@@ -746,9 +745,6 @@
                     }
                 }
             );
-
-            console.log(vm.clipboardItems, availableContentTypesAliases)
-            console.log("result in", availableClipboardItems)
             
             var blockPickerModel = {
                 $parentScope: $scope, // pass in a $parentScope, this maintains the scope inheritance in infinite editing
@@ -898,8 +894,6 @@
                 return b.date - a.date
             });
 
-            console.log("clipboardItems", vm.clipboardItems, vm.availableContentTypesAliases)
-
             if(firstTime !== true && vm.clipboardItems.length > oldAmount) {
                 jumpClipboard();
             }
@@ -956,7 +950,6 @@
             }
 
             localizationService.localize("clipboard_labelForArrayOfItemsFrom", [vm.model.label, contentNodeName]).then(function (localizedLabel) {
-                console.log("copyArray aliases:", aliases)
                 clipboardService.copyArray(clipboardService.TYPES.BLOCK, aliases, elementTypesToCopy, localizedLabel, contentNodeIcon || "icon-thumbnail-list", vm.model.id);
             });
         };
@@ -1036,10 +1029,8 @@
                 // Handle nested blocks:
                 pasteEntry.nested.forEach( nestedEntry => {
                     if(nestedEntry.areaKey) {
-                        console.log("nested > ")
                         const data = pasteClipboardEntry(layoutEntry.$block, nestedEntry.areaKey, null, nestedEntry, pasteType);
                         if(data === null || data.failed === true) {
-                            console.error("Nested requestPasteFromClipboard failed.");
                             nestedBlockFailed = true;
                             // TODO: better fail message.
                             // This can also happen if the specific block content element type isnt allowed at the given spot :-)
@@ -1063,10 +1054,8 @@
                 }
             } else {
                 if(index !== null) {
-                    console.log(" at index", index)
                     vm.layout.splice(index, 0, layoutEntry);
                 } else {
-                    console.log("at the end", index)
                     vm.layout.push(layoutEntry);
                 }
             }
@@ -1076,9 +1065,7 @@
 
         function requestPasteFromClipboard(parentBlock, areaKey, index, pasteEntry, pasteType) {
 
-            console.log("requestPasteFromClipboard")
             const data = pasteClipboardEntry(parentBlock, areaKey, index, pasteEntry, pasteType);
-            console.log("-- result: ", data)
             if(data) { 
                 if(data.failed === true) {
                     // one or more of nested block creation failed.
@@ -1086,7 +1073,6 @@
                     // TODO: test scenario:
                     // TODO: Texts
                     if(data.layoutEntry) {
-                        console.log("Pasting failed, ask:")
                         var blockToRevert = data.layoutEntry.$block;
                         localizationService.localizeMany(["blockEditor_confirmPasteDisallowedNestedBlockHeadline", "blockEditor_confirmPasteDisallowedNestedBlockMessage", "general_revert", "general_continue"]).then(function (localizations) {
                             const overlay = {
@@ -1109,7 +1095,7 @@
                             overlayService.open(overlay);
                         });
                     } else {
-                        console.log("Pasting failed, we have nothing to revert.")
+                        console.error("Pasting failed, there was nothing to revert. Should be good to move on with content creation.")
                     }
                 } else {
                     vm.currentBlockInFocus = data.layoutEntry.$block;

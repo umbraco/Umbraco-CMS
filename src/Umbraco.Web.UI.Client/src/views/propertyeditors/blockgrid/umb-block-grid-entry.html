@@ -133,7 +133,6 @@
             class="umb-block-grid__force-left"
             ng-class="{ '--active': vm.layoutEntry.forceLeft }"
             ng-click="vm.toggleForceLeft()">
-            <!-- TODO: missing readable text -->
             <span class="sr-only">
                 <localize ng-if="!vm.layoutEntry.forceLeft" id="forceLeftLabel" key="blockEditor_forceLeftLabel">Force placement at left side</localize>
                 <localize ng-if="vm.layoutEntry.forceLeft" id="forceLeftLabel" key="blockEditor_unforceLeftLabel">Remove forced placement at left side</localize>
@@ -150,7 +149,6 @@
             class="umb-block-grid__force-right"
             ng-class="{ '--active': vm.layoutEntry.forceRight }"
             ng-click="vm.toggleForceRight()">
-            <!-- TODO: missing readable text -->
             <span class="sr-only">
                 <localize ng-if="!vm.layoutEntry.forceRight" id="forceRightLabel" key="blockEditor_forceRightLabel">Force placement at right side</localize>
                 <localize ng-if="vm.layoutEntry.forceRight" id="forceRightLabel" key="blockEditor_unforceRightLabel">Remove forced placement at right side</localize>
@@ -166,9 +164,7 @@
             class="umb-block-grid__scale-handler" 
             ng-mousedown="vm.scaleHandlerMouseDown($event)" 
             ng-keyup="vm.scaleHandlerKeyUp($event)">
-            <!-- TODO: missing readable text -->
         </button>
-
         <div ng-if="!vm.blockEditorApi.readonly && (vm.layoutEntry.$block.config.columnSpanOptions.length > 1 || (vm.layoutEntry.$block.config.rowMinSpan && vm.layoutEntry.$block.config.rowMaxSpan && vm.layoutEntry.$block.config.rowMaxSpan !== vm.layoutEntry.$block.config.rowMinSpan))" 
             class="umb-block-grid__scale-label">
             {{vm.layoutEntry.columnSpan}} x {{vm.layoutEntry.rowSpan}}
