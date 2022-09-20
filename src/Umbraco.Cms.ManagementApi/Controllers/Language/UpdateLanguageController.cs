@@ -22,10 +22,11 @@ public class UpdateLanguageController : LanguageControllerBase
     }
 
     /// <summary>
-    ///     Creates or saves a language
+    ///     Updates a language
     /// </summary>
     [HttpPut("update")]
     [MapToApiVersion("1.0")]
+    [ProducesResponseType(typeof(NotFoundResult), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     // TODO: This needs to be an authorized endpoint.
@@ -34,9 +35,7 @@ public class UpdateLanguageController : LanguageControllerBase
         ILanguage? existingById = language.Id != default ? _localizationService.GetLanguageById(language.Id) : null;
         if (existingById is null)
         {
-            // Someone is trying to update a language that doesn't exist
-            ModelState.AddModelError("IsoCode", "The language " + language.IsoCode + " does not exist");
-            return await Task.FromResult(ValidationProblem(ModelState));
+            return await Task.FromResult(NotFound());
         }
 
         // note that the service will prevent the default language from being "un-defaulted"
