@@ -1,6 +1,6 @@
 import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, state } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import { UmbContextConsumerMixin } from '../../../../../core/context';
 import { repeat } from 'lit/directives/repeat.js';
 
@@ -52,11 +52,11 @@ export class UmbEditorViewUsersListElement extends UmbContextConsumerMixin(LitEl
 		`,
 	];
 
-	@state()
-	private _columns: Array<TableColumn> = [];
+	@property()
+	public users: Array<TableItem> = [];
 
 	@state()
-	private _items: Array<TableItem> = [];
+	private _columns: Array<TableColumn> = [];
 
 	@state()
 	private _selectionMode = false;
@@ -72,7 +72,7 @@ export class UmbEditorViewUsersListElement extends UmbContextConsumerMixin(LitEl
 
 	private _selectAllHandler(event: Event) {
 		const checkboxElement = event.target as HTMLInputElement;
-		this._selection = checkboxElement.checked ? this._items.map((item: TableItem) => item.key) : [];
+		this._selection = checkboxElement.checked ? this.users.map((item: TableItem) => item.key) : [];
 		this._selectionMode = this._selection.length > 0;
 	}
 
@@ -95,7 +95,7 @@ export class UmbEditorViewUsersListElement extends UmbContextConsumerMixin(LitEl
 	private _sortingHandler(column: TableColumn) {
 		this._sortingDesc = this._sortingColumn === column.name ? !this._sortingDesc : false;
 		this._sortingColumn = column.name;
-		this._items = column.sort(this._items, this._sortingDesc);
+		this.users = column.sort(this.users, this._sortingDesc);
 	}
 
 	private _isSelected(key: string) {
@@ -143,41 +143,6 @@ export class UmbEditorViewUsersListElement extends UmbContextConsumerMixin(LitEl
 				},
 			},
 		];
-
-		this._items = [
-			{
-				key: 'a9b18a00-58f2-420e-bf60-48d33ab156db',
-				name: 'Cecílie Bryon',
-				userGroup: 'Translators',
-				lastLogin: 'Fri, 23 April 2021',
-				status: 'Invited',
-			},
-			{
-				key: '3179d0b2-eec2-4045-b86a-149e13b93e14',
-				name: 'Kathleen G. Smith',
-				userGroup: 'Editors',
-				lastLogin: 'Tue, 6 June 2021', // random date
-				status: 'Invited',
-			},
-			{
-				key: '1b1c9733-b845-4d9a-9ed2-b2f46c05fd72',
-				name: 'Adrian Andresen',
-				userGroup: 'Administrators',
-				lastLogin: 'Mon, 15 November 2021',
-			},
-			{
-				key: 'b75af81a-b994-4e65-9330-b66c336d0207',
-				name: 'Lorenza Trentino',
-				userGroup: 'Editors',
-				lastLogin: 'Fri, 13 April 2022',
-			},
-			{
-				key: 'b75af81a-b994-4e65-9330-b66c336d0202',
-				name: 'John Doe',
-				userGroup: 'Translators',
-				lastLogin: 'Tue, 11 December 2021',
-			},
-		];
 	}
 
 	renderHeaderCellTemplate(column: TableColumn) {
@@ -217,7 +182,6 @@ export class UmbEditorViewUsersListElement extends UmbContextConsumerMixin(LitEl
 
 	render() {
 		return html`
-			<div style="margin-bottom: 20px;">Selected ${this._selection.length} of ${this._items.length}</div>
 			<uui-table class="uui-text">
 				<uui-table-column style="width: 60px;"></uui-table-column>
 				<uui-table-head>
@@ -225,11 +189,11 @@ export class UmbEditorViewUsersListElement extends UmbContextConsumerMixin(LitEl
 						<uui-checkbox
 							style="padding: var(--uui-size-4) var(--uui-size-5);"
 							@change="${this._selectAllHandler}"
-							?checked="${this._selection.length === this._items.length}"></uui-checkbox>
+							?checked="${this._selection.length === this.users.length}"></uui-checkbox>
 					</uui-table-head-cell>
 					${this._columns.map((column) => this.renderHeaderCellTemplate(column))}
 				</uui-table-head>
-				${repeat(this._items, (item) => item.key, this.renderRowTemplate)}
+				${repeat(this.users, (item) => item.key, this.renderRowTemplate)}
 			</uui-table>
 		`;
 	}
