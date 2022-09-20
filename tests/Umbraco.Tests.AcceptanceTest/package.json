@@ -7,16 +7,20 @@
     "test": "npx cypress run",
     "ui": "npx cypress open"
   },
+  "engines": {
+    "node": ">=14.0.0 <17",
+    "npm": ">=8.0.0 < 9"
+  },
   "devDependencies": {
-    "cross-env": "^7.0.2",
-    "cypress": "8.4.1",
-    "cy-verify-downloads": "0.0.5",
+    "cross-env": "^7.0.3",
+    "cypress": "8.7.0",
+    "cy-verify-downloads": "0.1.5",
     "del": "^6.0.0",
     "ncp": "^2.0.0",
     "prompt": "^1.2.0",
     "umbraco-cypress-testhelpers": "^1.0.0-beta-73"
   },
   "dependencies": {
-    "typescript": "^3.9.2"
+    "typescript": "^4.6.3"
   }
 }

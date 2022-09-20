@@ -35,7 +35,8 @@ exports.buildDev = series(setDevelopmentMode, coreBuild);
 
 exports.coreBuild = coreBuild;
 exports.dev = series(setDevelopmentMode, coreBuild, runUnitTestServer, watchTask);
-exports.watch = series(watchTask);
+exports.fastdev = series(setDevelopmentMode, coreBuild, watchTask);
+exports.watch = series(setDevelopmentMode, watchTask);
 //
 exports.runTests = series(setTestMode, series(js, testUnit));
 exports.runUnit = series(setTestMode, series(js, runUnitTestServer), watchTask);
