@@ -54,19 +54,31 @@ export class UmbEditorViewUsersGridElement extends UmbContextConsumerMixin(LitEl
 		this._usersSubscription?.unsubscribe();
 	}
 
+	private renderUserCard(user: UserItem) {
+		if (!this._usersContext) return;
+
+		const statusLook = this._usersContext.getTagLookAndColor(user.status ? user.status : '');
+
+		return html`
+			<uui-card-user .name=${user.name}>
+				${user.status
+					? html`<uui-tag slot="tag" size="s" look="${statusLook.look}" color="${statusLook.color}">
+							${user.status}
+					  </uui-tag>`
+					: nothing}
+				<div>${user.userGroup}</div>
+				<div class="user-login-time">${user.lastLogin}</div>
+			</uui-card-user>
+		`;
+	}
+
 	render() {
 		return html`
 			<div id="user-grid">
 				${repeat(
 					this._users,
 					(user) => user.key,
-					(user) => html`
-						<uui-card-user .name=${user.name}>
-							${user.status ? html`<uui-tag slot="tag" size="s">${user.status}</uui-tag>` : nothing}
-							<div>${user.userGroup}</div>
-							<div class="user-login-time">${user.lastLogin}</div>
-						</uui-card-user>
-					`
+					(user) => this.renderUserCard(user)
 				)}
 			</div>
 		`;
