@@ -22,8 +22,8 @@ public class ExportDictionaryController : DictionaryControllerBase
 
     [HttpGet("export/{key:guid}")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(IActionResult), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(IActionResult), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(NotFoundObjectResult), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ExportDictionary(Guid key, bool includeChildren = false)
     {
         IDictionaryItem? dictionaryItem = _localizationService.GetDictionaryItemById(key);
