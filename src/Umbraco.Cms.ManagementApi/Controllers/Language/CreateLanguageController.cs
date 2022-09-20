@@ -9,7 +9,6 @@ using Umbraco.New.Cms.Core.Services.Installer;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.Language;
 
-[ApiVersion("1.0")]
 public class CreateLanguageController : LanguageControllerBase
 {
     private readonly ILanguageService _languageService;

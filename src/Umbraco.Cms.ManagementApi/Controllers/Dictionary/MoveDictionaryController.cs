@@ -10,7 +10,6 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.Dictionary;
 
-[ApiVersion("1.0")]
 public class MoveDictionaryController : DictionaryControllerBase
 {
     private readonly ILocalizationService _localizationService;

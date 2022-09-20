@@ -16,7 +16,6 @@ using Umbraco.New.Cms.Core.Factories;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.Dictionary;
 
-[ApiVersion("1.0")]
 public class UpdateDictionaryController : DictionaryControllerBase
 {
     private readonly ILocalizationService _localizationService;

@@ -7,7 +7,6 @@ using Umbraco.Cms.ManagementApi.ViewModels.Pagination;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.Culture;
 
-[ApiVersion("1.0")]
 public class GetAllCultureController : CultureControllerBase
 {
     private readonly IUmbracoMapper _umbracoMapper;

@@ -6,7 +6,6 @@ using Umbraco.Cms.ManagementApi.ViewModels.Server;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.Analytics;
 
-[ApiVersion("1.0")]
 public class SetAnalyticsController : AnalyticsControllerBase
 {
     private readonly IMetricsConsentService _metricsConsentService;

@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
@@ -9,7 +8,6 @@ using Umbraco.New.Cms.Core.Services.Installer;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.Language;
 
-[ApiVersion("1.0")]
 public class UpdateLanguageController : LanguageControllerBase
 {
     private readonly ILanguageService _languageService;

@@ -8,7 +8,6 @@ using Umbraco.Cms.ManagementApi.ViewModels.Dictionary;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.Dictionary;
 
-[ApiVersion("1.0")]
 public class ByIdDictionaryController : DictionaryControllerBase
 {
     private readonly ILocalizationService _localizationService;

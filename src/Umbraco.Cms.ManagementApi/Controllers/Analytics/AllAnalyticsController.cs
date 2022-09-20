@@ -7,7 +7,6 @@ using Umbraco.Cms.ManagementApi.ViewModels.Pagination;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.Analytics;
 
-[ApiVersion("1.0")]
 public class AllAnalyticsController : AnalyticsControllerBase
 {
     private readonly IPagedViewModelFactory _pagedViewModelFactory;

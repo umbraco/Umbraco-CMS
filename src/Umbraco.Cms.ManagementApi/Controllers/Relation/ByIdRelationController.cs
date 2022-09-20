@@ -7,7 +7,6 @@ using Umbraco.Cms.ManagementApi.ViewModels.Relation;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.Relation;
 
-[ApiVersion("1.0")]
 public class ByIdRelationController : RelationControllerBase
 {
     private readonly IRelationService _relationService;

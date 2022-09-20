@@ -8,7 +8,6 @@ using Umbraco.New.Cms.Core.Models.TrackedReferences;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.TrackedReferences;
 
-[ApiVersion("1.0")]
 public class ForItemTrackedReferencesController : TrackedReferencesControllerBase
 {
     private readonly ITrackedReferencesSkipTakeService _trackedReferencesService;
