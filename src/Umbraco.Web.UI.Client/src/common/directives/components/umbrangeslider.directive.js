@@ -249,15 +249,15 @@ For extra details about options and events take a look here: https://refreshless
             var isVertical = slider.noUiSlider.options.orientation === 'vertical';
             var tooltips = slider.noUiSlider.getTooltips();
             var origins = slider.noUiSlider.getOrigins();
-
+            
             // Move tooltips into the origin element. The default stylesheet handles this.
-          if(tooltips && tooltips.length !== 0){
-            tooltips.forEach(function (tooltip, index) {
-              if (tooltip) {
-                origins[index].appendChild(tooltip);
-              }
-            });
-          }
+            if(tooltips && tooltips.length !== 0){
+              tooltips.forEach(function (tooltip, index) {
+                if (tooltip) {
+                  origins[index].appendChild(tooltip);
+                }
+              });
+            }
 
             slider.noUiSlider.on('update', function (values, handle, unencoded, tap, positions) {
 
@@ -293,17 +293,17 @@ For extra details about options and events take a look here: https://refreshless
 
                     for (var j = 0; j < handlesInPool; j++) {
                         var handleNumber = pool[j];
-
+                        
                         if (j === handlesInPool - 1) {
                             var offset = 0;
-
+                            
                             poolPositions[poolIndex].forEach(function (value) {
-                                offset += 1000 - 10 * value;
+                                offset += 1000 - value;
                             });
-
+                            
                             var direction = isVertical ? 'bottom' : 'right';
                             var last = isRtl ? 0 : handlesInPool - 1;
-                            var lastOffset = 1000 - 10 * poolPositions[poolIndex][last];
+                            var lastOffset = 1000 - poolPositions[poolIndex][last];
                             offset = (textIsRtl && !isVertical ? 100 : 0) + (offset / handlesInPool) - lastOffset;
 
                             // Filter to unique values
