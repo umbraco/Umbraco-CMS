@@ -58,6 +58,16 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		},
 	},
 	{
+		type: 'section',
+		alias: 'Umb.Section.Users',
+		name: 'Users',
+		loader: () => import('./backoffice/sections/users/users-section.element'),
+		meta: {
+			pathname: 'users',
+			weight: 20,
+		},
+	},
+	{
 		type: 'dashboard',
 		alias: 'Umb.Dashboard.Welcome',
 		name: 'Welcome',
@@ -245,6 +255,30 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 			pathname: 'installed',
 			editors: ['Umb.Editor.Packages'],
 			weight: 0,
+		},
+	},
+	{
+		type: 'editorView',
+		alias: 'Umb.EditorView.Users.Users',
+		name: 'Users',
+		loader: () => import('./backoffice/editors/users/views/users/editor-view-users.element'),
+		meta: {
+			editors: ['Umb.Editor.Users'],
+			pathname: 'users',
+			weight: 1,
+			icon: 'document',
+		},
+	},
+	{
+		type: 'editorView',
+		alias: 'Umb.EditorView.Users.UserGroups',
+		name: 'User Groups',
+		loader: () => import('./backoffice/editors/users/views/user-groups/editor-view-user-groups.element'),
+		meta: {
+			editors: ['Umb.Editor.Users'],
+			pathname: 'user-groups',
+			weight: 0,
+			icon: 'document',
 		},
 	},
 	{
