@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NJsonSchema.Generation;
+using Umbraco.Cms.Core.Configuration.Models;
 
 namespace JsonSchema
 {
@@ -43,12 +44,20 @@ namespace JsonSchema
 
             var result = await response.Content.ReadAsStringAsync();
 
-            return JsonConvert.DeserializeObject<JObject>(result)!;
+            JObject schema = JsonConvert.DeserializeObject<JObject>(result)!;
+
+            // TODO: when "UmbracoPath" is removed from the from the official schema store, remove this line as well
+            (schema.Root["definitions"]?["umbracoGlobal"]?["properties"] as JObject)?.Remove(nameof(GlobalSettings.UmbracoPath));
+
+            return schema;
         }
 
         private JObject GenerateUmbracoSchema()
         {
             NJsonSchema.JsonSchema schema = _innerGenerator.Generate(typeof(AppSettings));
+
+            // TODO: when the "UmbracoPath" setter is removed from "GlobalSettings" (scheduled for V12), remove this line as well
+            schema.Definitions["UmbracoCmsCoreConfigurationModelsGlobalSettings"]?.Properties?.Remove(nameof(GlobalSettings.UmbracoPath));
 
             return JsonConvert.DeserializeObject<JObject>(schema.ToJson())!;
         }
