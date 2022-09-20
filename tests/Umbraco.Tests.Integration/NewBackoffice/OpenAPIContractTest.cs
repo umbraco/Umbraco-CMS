@@ -12,7 +12,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.NewBackoffice;
 
-#if !DEBUG
+// We only run this test in release because the schema looks different depending if it's built against release or debug.
+// XML summaries is included in the description of a response model in release, but not debug mode.
+#if DEBUG
 [Ignore("This test runs only in release")]
 #endif
 [TestFixture]
