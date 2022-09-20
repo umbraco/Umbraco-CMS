@@ -20,6 +20,9 @@
       <PackageReference Include="HtmlAgilityPack" Version="1.11.46" />
       <PackageReference Include="MailKit" Version="3.4.1" />
       <PackageReference Include="IPNetwork2" Version="2.6.467" />
+      <PackageReference Include="HtmlAgilityPack" Version="1.11.43" />
+      <PackageReference Include="MailKit" Version="3.4.1" />
+      <PackageReference Include="IPNetwork2" Version="2.6.467" />
       <PackageReference Include="Markdown" Version="2.2.1" />
       <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.0.1" />
       <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
