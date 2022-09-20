@@ -29,10 +29,6 @@ angular.module("umbraco.directives")
                     //for the grid by default, we don't want to include the macro toolbar
                     editorConfig.toolbar = _.without(editorConfig, "umbmacro");
                 }
-                //make sure there's a max image size
-                if (!scope.configuration.maxImageSize && scope.configuration.maxImageSize !== 0) {
-                    editorConfig.maxImageSize = tinyMceService.defaultPrevalues().maxImageSize;
-                }
 
                 //ensure the grid's global config is being passed up to the RTE, these 2 properties need to be in this format
                 //since below we are just passing up `scope` as the actual model and for 2 way binding to work with `value` that
@@ -56,23 +52,14 @@ angular.module("umbraco.directives")
                     mode: editorConfig.mode
                 }));
 
-                // pin toolbar to top of screen if we have focus and it scrolls off the screen
-                function pinToolbar() {
-                    tinyMceService.pinToolbar(tinyMceEditor);
-                }
-
-                // unpin toolbar to top of screen
-                function unpinToolbar() {
-                    tinyMceService.unpinToolbar(tinyMceEditor);
-                }
-
                 $q.all(promises).then(function (result) {
 
                     var standardConfig = result[promises.length - 1];
 
                     //create a baseline Config to extend upon
                     var baseLineConfigObj = {
-                        maxImageSize: editorConfig.maxImageSize
+                        maxImageSize: editorConfig.maxImageSize,
+                        toolbar_sticky: true
                     };
 
                     Utilities.extend(baseLineConfigObj, standardConfig);
@@ -85,6 +72,7 @@ angular.module("umbraco.directives")
                         //initialize the standard editor functionality for Umbraco
                         tinyMceService.initializeEditor({
                             editor: editor,
+                            toolbar: editorConfig.toolbar,
                             model: scope,
                             // Form is found in the scope of the grid controller above us, not in our isolated scope
                             // https://github.com/umbraco/Umbraco-CMS/issues/7461
@@ -108,35 +96,6 @@ angular.module("umbraco.directives")
                             }, 400);
 
                         });
-
-                        // TODO: Perhaps we should pin the toolbar for the rte always, regardless of if it's in the grid or not?
-                        // this would mean moving this code into the tinyMceService.initializeEditor
-
-                        //when we leave the editor (maybe)
-                        editor.on('blur', function (e) {
-                            angularHelper.safeApply(scope, function () {
-                                unpinToolbar();
-                                $('.umb-panel-body').off('scroll', pinToolbar);
-                            });
-                        });
-
-                        // Focus on editor
-                        editor.on('focus', function (e) {
-                            angularHelper.safeApply(scope, function () {
-                                pinToolbar();
-                                $('.umb-panel-body').on('scroll', pinToolbar);
-                            });
-                        });
-
-                        // Click on editor
-                        editor.on('click', function (e) {
-                            angularHelper.safeApply(scope, function () {
-                                pinToolbar();
-                                $('.umb-panel-body').on('scroll', pinToolbar);
-                            });
-                        });
-
-
                     };
 
                     /** Loads in the editor */
@@ -173,7 +132,6 @@ angular.module("umbraco.directives")
                     scope.$on('$destroy', function () {
                         eventsService.unsubscribe(tabShownListener);
                         //ensure we unbind this in case the blur doesn't fire above
-                        $('.umb-panel-body').off('scroll', pinToolbar);
                         if (tinyMceEditor !== undefined && tinyMceEditor != null) {
                             tinyMceEditor.destroy()
                         }

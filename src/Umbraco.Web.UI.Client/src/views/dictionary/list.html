@@ -1,9 +1,6 @@
 <div ng-controller="Umbraco.Editors.Dictionary.ListController as vm">
 
-    <umb-load-indicator ng-if="vm.loading">
-    </umb-load-indicator>
-
-    <umb-editor-view ng-if="!vm.loading">
+    <umb-editor-view>
         <umb-editor-header
             name="vm.title"
             hide-alias="true"
@@ -32,7 +29,9 @@
 
           </umb-editor-sub-header>
 
-          <umb-box ng-if="vm.items.length === 0">
+          <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
+
+          <umb-box ng-if="!vm.loading && vm.items.length === 0">
             <umb-box-content class="block-form">
 
               <umb-empty-state size="small">
@@ -42,7 +41,7 @@
             </umb-box-content>
           </umb-box>
 
-          <table class="table table-hover" ng-if="vm.items.length > 0">
+          <table class="table table-hover" ng-show="!vm.loading && vm.filtered.length > 0">
             <caption class="sr-only"><localize key="visuallyHiddenTexts_dictionaryListCaption">Dictionary items</localize></caption>
             <thead>
               <tr>
@@ -51,7 +50,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr ng-repeat="item in vm.filtered = (vm.items | filter: { 'name': vm.filter.searchTerm }) track by $id(item)" style="cursor: pointer;">
+              <tr ng-repeat="item in vm.filtered = (vm.items | filter: { 'name': vm.filter.searchTerm })" class="cursor-pointer">
                 <th>
                   <button type="button" ng-style="item.style" class="btn-reset bold" ng-click="vm.clickItem(item.id)">{{item.name}}</button>
                 </th>
@@ -69,8 +68,8 @@
               </tr>
             </tbody>
           </table>
-     
-          <umb-empty-state ng-if="vm.filtered.length === 0"
+
+          <umb-empty-state ng-if="!vm.loading && vm.filtered.length === 0"
                            position="center">
             <localize key="dictionary_noItemsFound">There were no dictionary items found.</localize>
           </umb-empty-state>

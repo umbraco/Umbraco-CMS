@@ -20,7 +20,7 @@ public class ContentVariantMapper
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IContentService _contentService;
     private readonly IUserService _userService;
-    private SecuritySettings _securitySettings;
+    private ContentSettings _contentSettings;
 
     public ContentVariantMapper(
         ILocalizationService localizationService,
@@ -28,17 +28,36 @@ public class ContentVariantMapper
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IContentService contentService,
         IUserService userService,
-        IOptionsMonitor<SecuritySettings> securitySettings)
+        IOptionsMonitor<ContentSettings> contentSettings)
     {
         _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
         _localizedTextService = localizedTextService ?? throw new ArgumentNullException(nameof(localizedTextService));
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
         _contentService = contentService;
         _userService = userService;
-        _securitySettings = securitySettings.CurrentValue;
-        securitySettings.OnChange(settings => _securitySettings = settings);
+        _contentSettings = contentSettings.CurrentValue;
+        contentSettings.OnChange(settings => _contentSettings = settings);
     }
 
+    [Obsolete("Use constructor that takes all parameters instead")]
+    public ContentVariantMapper(
+        ILocalizationService localizationService,
+        ILocalizedTextService localizedTextService,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+        IContentService contentService,
+        IUserService userService,
+        IOptionsMonitor<SecuritySettings> securitySettings)
+    : this(
+        localizationService,
+        localizedTextService,
+        backOfficeSecurityAccessor,
+        contentService,
+        userService,
+        StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<ContentSettings>>())
+    {
+    }
+
+    [Obsolete("Use constructor that takes all parameters instead")]
     public ContentVariantMapper(ILocalizationService localizationService, ILocalizedTextService localizedTextService)
         : this(
             localizationService,
@@ -244,7 +263,7 @@ public class ContentVariantMapper
             if (variantDisplay.Language is null)
             {
                 var defaultLanguageId = _localizationService.GetDefaultLanguageId();
-                if (_securitySettings.AllowEditInvariantFromNonDefault || (defaultLanguageId.HasValue && group.HasAccessToLanguage(defaultLanguageId.Value)))
+                if (_contentSettings.AllowEditInvariantFromNonDefault || (defaultLanguageId.HasValue && group.HasAccessToLanguage(defaultLanguageId.Value)))
                 {
                     hasAccess = true;
                 }

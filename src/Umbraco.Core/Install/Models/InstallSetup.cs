@@ -1,4 +1,4 @@
-using System.Runtime.Serialization;
+﻿using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Core.Install.Models;
 
@@ -6,6 +6,7 @@ namespace Umbraco.Cms.Core.Install.Models;
 ///     Model containing all the install steps for setting up the UI
 /// </summary>
 [DataContract(Name = "installSetup", Namespace = "")]
+[Obsolete("Will no longer be required with the new backoffice API")]
 public class InstallSetup
 {
     public InstallSetup()

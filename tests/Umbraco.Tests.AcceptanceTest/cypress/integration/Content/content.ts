@@ -675,7 +675,7 @@ context('Content', () => {
     cy.umbracoTreeItem("content", [viewMacroName]).click();
 
     // Insert macro
-    cy.get('#mceu_13-button').click();
+    cy.get('button[title="Insert macro"]').click();
     cy.get('.umb-card-grid-item').contains(viewMacroName).click();
 
     // Save and publish
