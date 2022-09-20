@@ -467,7 +467,9 @@
             // fit in row?
             if (options.fitInRow === true) {
                 // TODO: find the best way to add this in with the rest of the row?
-
+                // One take could be to take the index minus one, get the block element for that one?
+                // Figure out the start column of that element, and the grid columns for that layout/area.
+                // Check if that and the new one can fit on the line.
 
                 const minColumnSpan = blockObject.config.columnSpanOptions.reduce((prev, option) => Math.min(prev, option.columnSpan), vm.gridColumns);
                 layoutEntry.columnSpan = minColumnSpan;
