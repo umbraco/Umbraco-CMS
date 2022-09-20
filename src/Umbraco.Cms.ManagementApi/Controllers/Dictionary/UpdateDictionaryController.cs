@@ -38,7 +38,7 @@ public class UpdateDictionaryController : DictionaryControllerBase
         _jsonPatchService = jsonPatchService;
     }
 
-    [HttpPatch("update/{id:Guid}")]
+    [HttpPatch("{id:Guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(UpgradeSettingsViewModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
