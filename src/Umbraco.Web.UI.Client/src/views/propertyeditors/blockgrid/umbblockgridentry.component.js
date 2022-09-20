@@ -254,9 +254,8 @@
             const endY = e.clientY - layoutContainerRect.top;
 
             const newSpans = getNewSpans(startX, startY, endX, endY);
-            const endCol = newSpans.startCol + newSpans.columnSpan;
-            const endRow = newSpans.startRow + newSpans.rowSpan;
-
+            //const endCol = newSpans.startCol + newSpans.columnSpan;
+            //const endRow = newSpans.startRow + newSpans.rowSpan;
 
             //const startCellX =  getAccumulatedValueOfIndex(newSpans.startCol, gridColumns);
             //const startCellY =  getAccumulatedValueOfIndex(newSpans.startRow, gridRows);
