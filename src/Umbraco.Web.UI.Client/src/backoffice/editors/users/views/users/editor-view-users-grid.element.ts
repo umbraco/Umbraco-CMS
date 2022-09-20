@@ -3,19 +3,8 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UmbContextConsumerMixin } from '../../../../../core/context';
 import { repeat } from 'lit/directives/repeat.js';
-
-interface TableColumn {
-	name: string;
-	sort: Function;
-}
-
-interface TableItem {
-	key: string;
-	name: string;
-	userGroup: string;
-	lastLogin: string;
-	status?: string;
-}
+import UmbEditorViewUsersElement, { UserItem } from './editor-view-users.element';
+import { Subscription } from 'rxjs';
 
 @customElement('umb-editor-view-users-grid')
 export class UmbEditorViewUsersGridElement extends UmbContextConsumerMixin(LitElement) {
@@ -40,14 +29,36 @@ export class UmbEditorViewUsersGridElement extends UmbContextConsumerMixin(LitEl
 		`,
 	];
 
-	@property()
-	public users: Array<TableItem> = [];
+	@state()
+	private _users: Array<UserItem> = [];
+
+	protected _usersSubscription?: Subscription;
+	protected _usersContext?: UmbEditorViewUsersElement;
+
+	connectedCallback(): void {
+		super.connectedCallback();
+
+		this.consumeContext('umbUsersContext', (usersContext: UmbEditorViewUsersElement) => {
+			this._usersContext = usersContext;
+
+			this._usersSubscription?.unsubscribe();
+			this._usersSubscription = this._usersContext?.users.subscribe((users: Array<UserItem>) => {
+				this._users = users;
+			});
+		});
+	}
+
+	disconnectedCallback(): void {
+		super.disconnectedCallback();
+
+		this._usersSubscription?.unsubscribe();
+	}
 
 	render() {
 		return html`
 			<div id="user-grid">
 				${repeat(
-					this.users,
+					this._users,
 					(user) => user.key,
 					(user) => html`
 						<uui-card-user .name=${user.name}>

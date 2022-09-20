@@ -3,18 +3,12 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UmbContextConsumerMixin } from '../../../../../core/context';
 import { repeat } from 'lit/directives/repeat.js';
+import UmbEditorViewUsersElement, { UserItem } from './editor-view-users.element';
+import { Subscription } from 'rxjs';
 
 interface TableColumn {
 	name: string;
 	sort: Function;
-}
-
-interface TableItem {
-	key: string;
-	name: string;
-	userGroup: string;
-	lastLogin: string;
-	status?: string;
 }
 
 @customElement('umb-editor-view-users-list')
@@ -52,9 +46,6 @@ export class UmbEditorViewUsersListElement extends UmbContextConsumerMixin(LitEl
 		`,
 	];
 
-	@property()
-	public users: Array<TableItem> = [];
-
 	@state()
 	private _columns: Array<TableColumn> = [];
 
@@ -70,45 +61,28 @@ export class UmbEditorViewUsersListElement extends UmbContextConsumerMixin(LitEl
 	@state()
 	private _sortingDesc = false;
 
-	private _selectAllHandler(event: Event) {
-		const checkboxElement = event.target as HTMLInputElement;
-		this._selection = checkboxElement.checked ? this.users.map((item: TableItem) => item.key) : [];
-		this._selectionMode = this._selection.length > 0;
-	}
+	@state()
+	private _users: Array<UserItem> = [];
 
-	private _selectHandler(event: Event, item: TableItem) {
-		const checkboxElement = event.target as HTMLInputElement;
-		this._selection = checkboxElement.checked
-			? [...this._selection, item.key]
-			: this._selection.filter((selectionKey) => selectionKey !== item.key);
-		this._selectionMode = this._selection.length > 0;
-	}
-	private _selectRowHandler(item: TableItem) {
-		this._selection = [...this._selection, item.key];
-		this._selectionMode = this._selection.length > 0;
-	}
-	private _unselectRowHandler(item: TableItem) {
-		this._selection = this._selection.filter((selectionKey) => selectionKey !== item.key);
-		this._selectionMode = this._selection.length > 0;
-	}
+	protected _usersSubscription?: Subscription;
+	protected _usersContext?: UmbEditorViewUsersElement;
 
-	private _sortingHandler(column: TableColumn) {
-		this._sortingDesc = this._sortingColumn === column.name ? !this._sortingDesc : false;
-		this._sortingColumn = column.name;
-		this.users = column.sort(this.users, this._sortingDesc);
-	}
-
-	private _isSelected(key: string) {
-		return this._selection.includes(key);
-	}
-
-	connectedCallback() {
+	connectedCallback(): void {
 		super.connectedCallback();
+
+		this.consumeContext('umbUsersContext', (usersContext: UmbEditorViewUsersElement) => {
+			this._usersContext = usersContext;
+
+			this._usersSubscription?.unsubscribe();
+			this._usersSubscription = this._usersContext?.users.subscribe((users: Array<UserItem>) => {
+				this._users = users;
+			});
+		});
 
 		this._columns = [
 			{
 				name: 'Name',
-				sort: (items: Array<TableItem>, desc: boolean) => {
+				sort: (items: Array<UserItem>, desc: boolean) => {
 					return desc
 						? [...items].sort((a, b) => b.name.localeCompare(a.name))
 						: [...items].sort((a, b) => a.name.localeCompare(b.name));
@@ -116,7 +90,7 @@ export class UmbEditorViewUsersListElement extends UmbContextConsumerMixin(LitEl
 			},
 			{
 				name: 'User group',
-				sort: (items: Array<TableItem>, desc: boolean) => {
+				sort: (items: Array<UserItem>, desc: boolean) => {
 					return desc
 						? [...items].sort((a, b) => b.name.localeCompare(a.name))
 						: [...items].sort((a, b) => a.name.localeCompare(b.name));
@@ -124,7 +98,7 @@ export class UmbEditorViewUsersListElement extends UmbContextConsumerMixin(LitEl
 			},
 			{
 				name: 'Last login',
-				sort: (items: Array<TableItem>, desc: boolean) => {
+				sort: (items: Array<UserItem>, desc: boolean) => {
 					return desc
 						? [...items].sort((a, b) => +new Date(b.lastLogin) - +new Date(a.lastLogin))
 						: [...items].sort((a, b) => +new Date(a.lastLogin) - +new Date(b.lastLogin));
@@ -132,7 +106,7 @@ export class UmbEditorViewUsersListElement extends UmbContextConsumerMixin(LitEl
 			},
 			{
 				name: 'status',
-				sort: (items: Array<TableItem>, desc: boolean) => {
+				sort: (items: Array<UserItem>, desc: boolean) => {
 					return desc
 						? [...items].sort((a, b) =>
 								b.status && a.status ? b.status.localeCompare(a.status) : (a.status ? 1 : 0) - (b.status ? 1 : 0)
@@ -143,6 +117,44 @@ export class UmbEditorViewUsersListElement extends UmbContextConsumerMixin(LitEl
 				},
 			},
 		];
+	}
+
+	disconnectedCallback(): void {
+		super.disconnectedCallback();
+
+		this._usersSubscription?.unsubscribe();
+	}
+
+	private _selectAllHandler(event: Event) {
+		const checkboxElement = event.target as HTMLInputElement;
+		this._selection = checkboxElement.checked ? this._users.map((item: UserItem) => item.key) : [];
+		this._selectionMode = this._selection.length > 0;
+	}
+
+	private _selectHandler(event: Event, item: UserItem) {
+		const checkboxElement = event.target as HTMLInputElement;
+		this._selection = checkboxElement.checked
+			? [...this._selection, item.key]
+			: this._selection.filter((selectionKey) => selectionKey !== item.key);
+		this._selectionMode = this._selection.length > 0;
+	}
+	private _selectRowHandler(item: UserItem) {
+		this._selection = [...this._selection, item.key];
+		this._selectionMode = this._selection.length > 0;
+	}
+	private _unselectRowHandler(item: UserItem) {
+		this._selection = this._selection.filter((selectionKey) => selectionKey !== item.key);
+		this._selectionMode = this._selection.length > 0;
+	}
+
+	private _sortingHandler(column: TableColumn) {
+		this._sortingDesc = this._sortingColumn === column.name ? !this._sortingDesc : false;
+		this._sortingColumn = column.name;
+		this._users = column.sort(this._users, this._sortingDesc);
+	}
+
+	private _isSelected(key: string) {
+		return this._selection.includes(key);
 	}
 
 	renderHeaderCellTemplate(column: TableColumn) {
@@ -157,8 +169,8 @@ export class UmbEditorViewUsersListElement extends UmbContextConsumerMixin(LitEl
 		`;
 	}
 
-	protected renderRowTemplate = (item: TableItem) => {
-		return html` <uui-table-row
+	protected renderRowTemplate = (item: UserItem) => {
+		return html`<uui-table-row
 			selectable
 			?select-only=${this._selectionMode}
 			?selected=${this._isSelected(item.key)}
@@ -189,11 +201,11 @@ export class UmbEditorViewUsersListElement extends UmbContextConsumerMixin(LitEl
 						<uui-checkbox
 							style="padding: var(--uui-size-4) var(--uui-size-5);"
 							@change="${this._selectAllHandler}"
-							?checked="${this._selection.length === this.users.length}"></uui-checkbox>
+							?checked="${this._selection.length === this._users.length}"></uui-checkbox>
 					</uui-table-head-cell>
 					${this._columns.map((column) => this.renderHeaderCellTemplate(column))}
 				</uui-table-head>
-				${repeat(this.users, (item) => item.key, this.renderRowTemplate)}
+				${repeat(this._users, (item) => item.key, this.renderRowTemplate)}
 			</uui-table>
 		`;
 	}

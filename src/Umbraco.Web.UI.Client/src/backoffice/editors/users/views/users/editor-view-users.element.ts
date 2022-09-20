@@ -1,16 +1,23 @@
 import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
-import { UmbContextConsumerMixin } from '../../../../../core/context';
-import type { DocumentTypeEntity } from '../../../../../mocks/data/document-type.data';
-import { Subscription, distinctUntilChanged } from 'rxjs';
+import { UmbContextConsumerMixin, UmbContextProviderMixin } from '../../../../../core/context';
 import './editor-view-users-list.element';
 import './editor-view-users-grid.element';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 export type UsersViewType = 'list' | 'grid';
 
+export interface UserItem {
+	key: string;
+	name: string;
+	userGroup: string;
+	lastLogin: string;
+	status?: string;
+}
+
 @customElement('umb-editor-view-users')
-export class UmbEditorViewUsersElement extends UmbContextConsumerMixin(LitElement) {
+export class UmbEditorViewUsersElement extends UmbContextProviderMixin(LitElement) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -27,11 +34,7 @@ export class UmbEditorViewUsersElement extends UmbContextConsumerMixin(LitElemen
 		`,
 	];
 
-	@state()
-	private _viewType: UsersViewType = 'grid';
-
-	@state()
-	private _users = [
+	private tempData = [
 		{
 			key: 'a9b18a00-58f2-420e-bf60-48d33ab156db',
 			name: 'Cecílie Bryon',
@@ -43,7 +46,7 @@ export class UmbEditorViewUsersElement extends UmbContextConsumerMixin(LitElemen
 			key: '3179d0b2-eec2-4045-b86a-149e13b93e14',
 			name: 'Kathleen G. Smith',
 			userGroup: 'Editors',
-			lastLogin: 'Tue, 6 June 2021', // random date
+			lastLogin: 'Tue, 6 June 2021',
 			status: 'Invited',
 		},
 		{
@@ -66,14 +69,26 @@ export class UmbEditorViewUsersElement extends UmbContextConsumerMixin(LitElemen
 		},
 	];
 
+	@state()
+	private _viewType: UsersViewType = 'grid';
+
+	private _users: BehaviorSubject<Array<UserItem>> = new BehaviorSubject(this.tempData);
+	public readonly users: Observable<Array<UserItem>> = this._users.asObservable();
+
+	constructor() {
+		super();
+
+		this.provideContext('umbUsersContext', this);
+	}
+
 	private _renderViewType() {
 		switch (this._viewType) {
 			case 'list':
-				return html`<umb-editor-view-users-list .users=${this._users}></umb-editor-view-users-list>`;
+				return html`<umb-editor-view-users-list></umb-editor-view-users-list>`;
 			case 'grid':
-				return html`<umb-editor-view-users-grid .users=${this._users}></umb-editor-view-users-grid>`;
+				return html`<umb-editor-view-users-grid></umb-editor-view-users-grid>`;
 			default:
-				return html`<umb-editor-view-users-grid .users=${this._users}></umb-editor-view-users-grid>`;
+				return html`<umb-editor-view-users-grid></umb-editor-view-users-grid>`;
 		}
 	}
 
