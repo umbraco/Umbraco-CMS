@@ -1,5 +1,6 @@
 ﻿using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Mapping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.ManagementApi.ViewModels.Dictionary;
 using Umbraco.New.Cms.Core.Factories;
@@ -10,18 +11,56 @@ public class DictionaryFactory : IDictionaryFactory
 {
     private readonly IUmbracoMapper _umbracoMapper;
     private readonly ILocalizationService _localizationService;
+    private readonly IDictionaryService _dictionaryService;
+    private readonly CommonMapper _commonMapper;
 
-    public DictionaryFactory(IUmbracoMapper umbracoMapper, ILocalizationService localizationService)
+    public DictionaryFactory(
+        IUmbracoMapper umbracoMapper,
+        ILocalizationService localizationService,
+        IDictionaryService dictionaryService,
+        CommonMapper commonMapper)
     {
         _umbracoMapper = umbracoMapper;
         _localizationService = localizationService;
+        _dictionaryService = dictionaryService;
+        _commonMapper = commonMapper;
     }
 
-    public IDictionaryItem CreateDictionary(DictionaryViewModel dictionaryViewModel)
+    public IDictionaryItem CreateDictionaryItem(DictionaryViewModel dictionaryViewModel)
     {
-        IDictionaryItem dictionaryToSave = _umbracoMapper.Map<IDictionaryItem>(dictionaryViewModel)!;
+        IDictionaryItem dictionaryItem = _umbracoMapper.Map<IDictionaryItem>(dictionaryViewModel)!;
         IDictionaryItem? dic = _localizationService.GetDictionaryItemById(dictionaryViewModel.Key);
-        dictionaryToSave.Id = dic!.Id;
-        return dictionaryToSave;
+        dictionaryItem.Id = dic!.Id;
+        return dictionaryItem;
+    }
+
+    public DictionaryViewModel CreateDictionaryViewModel(IDictionaryItem dictionaryItem)
+    {
+        DictionaryViewModel dictionaryViewModel = _umbracoMapper.Map<DictionaryViewModel>(dictionaryItem)!;
+
+        dictionaryViewModel.ContentApps = _commonMapper.GetContentAppsForEntity(dictionaryItem);
+        dictionaryViewModel.Path = _dictionaryService.CalculatePath(dictionaryItem.ParentId, dictionaryItem.Id);
+
+        var translations = new List<DictionaryTranslationViewModel>();
+        // add all languages and  the translations
+        foreach (ILanguage lang in _localizationService.GetAllLanguages())
+        {
+            var langId = lang.Id;
+            IDictionaryTranslation? translation = dictionaryItem.Translations?.FirstOrDefault(x => x.LanguageId == langId);
+
+            translations.Add(new DictionaryTranslationViewModel
+            {
+                IsoCode = lang.IsoCode,
+                DisplayName = lang.CultureName,
+                Translation = translation?.Value ?? string.Empty,
+                LanguageId = lang.Id,
+                Id = translation?.Id ?? 0,
+                Key = translation?.Key ?? Guid.Empty,
+            });
+        }
+
+        dictionaryViewModel.Translations = translations;
+
+        return dictionaryViewModel;
     }
 }

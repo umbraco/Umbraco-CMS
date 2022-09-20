@@ -5,5 +5,6 @@ namespace Umbraco.New.Cms.Core.Factories;
 
 public interface IDictionaryFactory
 {
-    IDictionaryItem CreateDictionary(DictionaryViewModel dictionaryViewModel);
+    IDictionaryItem CreateDictionaryItem(DictionaryViewModel dictionaryViewModel);
+    DictionaryViewModel CreateDictionaryViewModel(IDictionaryItem dictionaryItem);
 }

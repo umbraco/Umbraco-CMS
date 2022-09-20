@@ -1,22 +1,24 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.ManagementApi.ViewModels.Dictionary;
+using Umbraco.New.Cms.Core.Factories;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.Dictionary;
 
 public class ByIdDictionaryController : DictionaryControllerBase
 {
     private readonly ILocalizationService _localizationService;
-    private readonly IUmbracoMapper _umbracoMapper;
+    private readonly IDictionaryFactory _dictionaryFactory;
 
-    public ByIdDictionaryController(ILocalizationService localizationService, IUmbracoMapper umbracoMapper)
+    public ByIdDictionaryController(
+        ILocalizationService localizationService,
+        IDictionaryFactory dictionaryFactory)
     {
         _localizationService = localizationService;
-        _umbracoMapper = umbracoMapper;
+        _dictionaryFactory = dictionaryFactory;
     }
 
     /// <summary>
@@ -40,6 +42,6 @@ public class ByIdDictionaryController : DictionaryControllerBase
             return NotFound();
         }
 
-        return await Task.FromResult(_umbracoMapper.Map<IDictionaryItem, DictionaryViewModel>(dictionary)!);
+        return await Task.FromResult(_dictionaryFactory.CreateDictionaryViewModel(dictionary));
     }
 }

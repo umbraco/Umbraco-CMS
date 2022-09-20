@@ -50,35 +50,12 @@ public class DictionaryViewModelMapDefinition : IMapDefinition
         target.Key = source.Key;
     }
 
-    // Umbraco.Code.MapAll -Icon -Trashed -Alias -NameIsDirty
+    // Umbraco.Code.MapAll -Icon -Trashed -Alias -NameIsDirty -ContentApps -Path -Translations
     private void Map(IDictionaryItem source, DictionaryViewModel target, MapperContext context)
     {
         target.Key = source.Key;
         target.Name = source.ItemKey;
         target.ParentId = source.ParentId ?? null;
-        target.ContentApps = _commonMapper.GetContentAppsForEntity(source);
-        target.Path = _dictionaryService.CalculatePath(source.ParentId, source.Id);
-
-        var translations = new List<DictionaryTranslationViewModel>();
-        // add all languages and  the translations
-        foreach (ILanguage lang in _localizationService.GetAllLanguages())
-        {
-            var langId = lang.Id;
-            IDictionaryTranslation? translation = source.Translations?.FirstOrDefault(x => x.LanguageId == langId);
-
-            translations.Add(new DictionaryTranslationViewModel
-            {
-                IsoCode = lang.IsoCode,
-                DisplayName = lang.CultureName,
-                Translation = translation?.Value ?? string.Empty,
-                LanguageId = lang.Id,
-                Id = translation?.Id ?? 0,
-                Key = translation?.Key ?? Guid.Empty,
-            });
-        }
-
-        target.Translations = translations;
-
         target.CreateDate = source.CreateDate;
         target.UpdateDate = source.UpdateDate;
     }

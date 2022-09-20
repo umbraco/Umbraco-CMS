@@ -55,7 +55,7 @@ public class UpdateDictionaryController : DictionaryControllerBase
             throw new JsonException("Could not serialize from PatchResult to DictionaryViewModel");
         }
 
-        IDictionaryItem dictionaryToSave = _dictionaryFactory.CreateDictionary(updatedDictionaryItem!);
+        IDictionaryItem dictionaryToSave = _dictionaryFactory.CreateDictionaryItem(updatedDictionaryItem!);
         _localizationService.Save(dictionaryToSave);
         return await Task.FromResult(Content(_dictionaryService.CalculatePath(dictionaryToSave.ParentId, dictionaryToSave.Id), MediaTypeNames.Text.Plain, Encoding.UTF8));
     }
