@@ -28,7 +28,7 @@ public class CreateLanguageController : LanguageControllerBase
     [HttpPost("create")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status201Created)]
     // TODO: This needs to be an authorized endpoint.
     public async Task<ActionResult> Create(LanguageViewModel language)
     {
