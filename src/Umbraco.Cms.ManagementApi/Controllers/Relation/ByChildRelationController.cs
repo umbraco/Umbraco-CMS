@@ -27,7 +27,7 @@ public class ByChildRelationController : RelationControllerBase
 
     [HttpGet("childRelations/{childId:int}")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(RelationViewModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagedViewModel<RelationViewModel>), StatusCodes.Status200OK)]
     public async Task<PagedViewModel<RelationViewModel>> ByChild(int childId, int skip, int take, string? relationTypeAlias = "")
     {
         IRelation[] relations = _relationService.GetByChildId(childId).ToArray();
