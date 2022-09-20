@@ -86,6 +86,29 @@ public static class ClaimsIdentityExtensions
         return username;
     }
 
+    /// <summary>
+    ///     Returns the real name from the <see cref="IIdentity" /> from the claim type <see cref="ClaimTypes.GivenName" />
+    /// </summary>
+    /// <param name="identity"></param>
+    /// <returns>
+    ///     The string value of the real name if found otherwise null
+    /// </returns>
+    public static string? GetRealName(this IIdentity identity)
+    {
+        if (identity == null)
+        {
+            throw new ArgumentNullException(nameof(identity));
+        }
+
+        string? realName = null;
+        if (identity is ClaimsIdentity claimsIdentity)
+        {
+            realName = claimsIdentity.FindFirstValue(ClaimTypes.GivenName);
+        }
+
+        return realName;
+    }
+
     public static string? GetEmail(this IIdentity identity)
     {
         if (identity == null)
