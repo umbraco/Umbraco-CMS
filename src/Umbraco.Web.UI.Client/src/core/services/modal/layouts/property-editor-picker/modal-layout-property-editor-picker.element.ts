@@ -56,10 +56,12 @@ export class UmbModalLayoutPropertyEditorPickerElement extends UmbContextConsume
 				list-style: none;
 				height: 100%;
 				border: 1px solid transparent;
+				border-radius: var(--uui-border-radius);
 			}
 
 			#item-grid .item:hover {
-				background: whitesmoke;
+				background: var(--uui-color-surface-emphasis);
+				color: var(--uui-color-interactive-emphasis);
 				cursor: pointer;
 			}
 
@@ -80,6 +82,8 @@ export class UmbModalLayoutPropertyEditorPickerElement extends UmbContextConsume
 				font-size: 0.8rem;
 				height: 100%;
 				width: 100%;
+				color: var(--uui-color-interactive);
+				border-radius: var(--uui-border-radius);
 			}
 
 			#item-grid .item .icon {
