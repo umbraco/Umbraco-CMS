@@ -68,9 +68,9 @@ public class CreateDictionaryController : DictionaryControllerBase
         {
             Guid? parentGuid = null;
 
-            if (dictionaryViewModel.ParentId > 0)
+            if (dictionaryViewModel.ParentId.HasValue)
             {
-                parentGuid = _localizationService.GetDictionaryItemById(dictionaryViewModel.ParentId)?.Key;
+                parentGuid = dictionaryViewModel.ParentId;
             }
 
             IDictionaryItem item = _localizationService.CreateDictionaryItemWithIdentity(
