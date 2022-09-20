@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.ManagementApi.Factories;
@@ -13,18 +12,15 @@ namespace Umbraco.Cms.ManagementApi.Controllers.Relation;
 public class ByChildRelationController : RelationControllerBase
 {
     private readonly IRelationService _relationService;
-    private readonly IUmbracoMapper _umbracoMapper;
     private readonly IPagedViewModelFactory _pagedViewModelFactory;
     private readonly IRelationViewModelFactory _relationViewModelFactory;
 
     public ByChildRelationController(
         IRelationService relationService,
-        IUmbracoMapper umbracoMapper,
         IPagedViewModelFactory pagedViewModelFactory,
         IRelationViewModelFactory relationViewModelFactory)
     {
         _relationService = relationService;
-        _umbracoMapper = umbracoMapper;
         _pagedViewModelFactory = pagedViewModelFactory;
         _relationViewModelFactory = relationViewModelFactory;
     }
