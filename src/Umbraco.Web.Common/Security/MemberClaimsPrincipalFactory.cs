@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Security;
@@ -26,10 +26,10 @@ public class MemberClaimsPrincipalFactory : UserClaimsPrincipalFactory<MemberIde
     protected virtual string AuthenticationType => IdentityConstants.ApplicationScheme;
 
     /// <inheritdoc />
-    protected override async Task<ClaimsIdentity> GenerateClaimsAsync(MemberIdentityUser user)
+    protected override async Task<ClaimsIdentity> GenerateClaimsAsync(MemberIdentityUser member)
     {
         // Get the base
-        ClaimsIdentity baseIdentity = await base.GenerateClaimsAsync(user);
+        ClaimsIdentity baseIdentity = await base.GenerateClaimsAsync(member);
 
         // now create a new one with the correct authentication type
         var memberIdentity = new ClaimsIdentity(
@@ -41,11 +41,22 @@ public class MemberClaimsPrincipalFactory : UserClaimsPrincipalFactory<MemberIde
         memberIdentity.MergeAllClaims(baseIdentity);
 
         // And merge claims added to the user, for instance in OnExternalLogin, we need to do this explicitly, since the claims are IdentityClaims, so it's not handled by memberIdentity.
-        foreach (Claim claim in user.Claims
+        foreach (Claim claim in member.Claims
                      .Where(claim => memberIdentity.HasClaim(claim.ClaimType, claim.ClaimValue) is false)
                      .Select(x => new Claim(x.ClaimType, x.ClaimValue)))
         {
             memberIdentity.AddClaim(claim);
+        }
+
+        if(string.IsNullOrEmpty(member.Name) == false)
+        {
+            // Updates/overwrites the name claim that is storing the username/email address
+            // to actually be the member's name
+            memberIdentity.AddOrUpdateClaim(new Claim(ClaimTypes.Name, member.Name));
+
+            // Add additional claim if people wish to be more explict 
+            // and call the extension method GetRealname()
+            memberIdentity.AddOrUpdateClaim(new Claim(ClaimTypes.GivenName, member.Name));
         }
 
         return memberIdentity;
