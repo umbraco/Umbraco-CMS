@@ -16,7 +16,6 @@ namespace Umbraco.Cms.Infrastructure.Telemetry.Providers;
 
 internal class SystemInformationTelemetryProvider : IDetailedTelemetryProvider, IUserDataService
 {
-    private readonly GlobalSettings _globalSettings;
     private readonly IHostEnvironment _hostEnvironment;
     private readonly HostingSettings _hostingSettings;
     private readonly ILocalizationService _localizationService;
@@ -25,13 +24,25 @@ internal class SystemInformationTelemetryProvider : IDetailedTelemetryProvider, 
     private readonly IUmbracoVersion _version;
     private readonly IServerRoleAccessor _serverRoleAccessor;
 
-
+    [Obsolete($"Use the constructor that does not take an IOptionsMonitor<GlobalSettings> parameter, scheduled for removal in V12")]
     public SystemInformationTelemetryProvider(
         IUmbracoVersion version,
         ILocalizationService localizationService,
         IOptionsMonitor<ModelsBuilderSettings> modelsBuilderSettings,
         IOptionsMonitor<HostingSettings> hostingSettings,
         IOptionsMonitor<GlobalSettings> globalSettings,
+        IHostEnvironment hostEnvironment,
+        IUmbracoDatabaseFactory umbracoDatabaseFactory,
+        IServerRoleAccessor serverRoleAccessor)
+        : this(version, localizationService, modelsBuilderSettings, hostingSettings, hostEnvironment, umbracoDatabaseFactory, serverRoleAccessor)
+    {
+    }
+
+    public SystemInformationTelemetryProvider(
+        IUmbracoVersion version,
+        ILocalizationService localizationService,
+        IOptionsMonitor<ModelsBuilderSettings> modelsBuilderSettings,
+        IOptionsMonitor<HostingSettings> hostingSettings,
         IHostEnvironment hostEnvironment,
         IUmbracoDatabaseFactory umbracoDatabaseFactory,
         IServerRoleAccessor serverRoleAccessor)
@@ -42,7 +53,6 @@ internal class SystemInformationTelemetryProvider : IDetailedTelemetryProvider, 
         _umbracoDatabaseFactory = umbracoDatabaseFactory;
         _serverRoleAccessor = serverRoleAccessor;
 
-        _globalSettings = globalSettings.CurrentValue;
         _hostingSettings = hostingSettings.CurrentValue;
         _modelsBuilderSettings = modelsBuilderSettings.CurrentValue;
     }
