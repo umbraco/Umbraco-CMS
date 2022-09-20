@@ -40,11 +40,17 @@ public class UpdateDictionaryController : DictionaryControllerBase
 
     [HttpPatch("{id:Guid}")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(UpgradeSettingsViewModel), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ContentResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(NotFoundResult), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Update(Guid id, JsonPatchViewModel[] updateViewModel)
     {
         IDictionaryItem? dictionaryItem = _localizationService.GetDictionaryItemById(id);
+
+        if (dictionaryItem is null)
+        {
+            return NotFound();
+        }
+
         DictionaryViewModel dictionaryToPatch = _umbracoMapper.Map<DictionaryViewModel>(dictionaryItem)!;
 
         PatchResult? result = _jsonPatchService.Patch(updateViewModel, dictionaryToPatch);
