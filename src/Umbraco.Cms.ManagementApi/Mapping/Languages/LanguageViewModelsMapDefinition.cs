@@ -1,7 +1,7 @@
 ﻿using NPoco.FluentMappings;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.ManagementApi.ViewModels.Languages;
+using Umbraco.Cms.ManagementApi.ViewModels.Language;
 using Umbraco.Cms.ManagementApi.ViewModels.Pagination;
 using Umbraco.New.Cms.Core.Models;
 

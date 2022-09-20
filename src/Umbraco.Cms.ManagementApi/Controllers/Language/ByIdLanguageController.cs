@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.ManagementApi.ViewModels.Languages;
+using Umbraco.Cms.ManagementApi.ViewModels.Language;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.Language;
 
@@ -25,7 +25,7 @@ public class ByIdLanguageController : LanguageControllerBase
     public async Task<ActionResult<LanguageViewModel?>> ById(int id)
     {
         ILanguage? lang = _localizationService.GetLanguageById(id);
-        if (lang == null)
+        if (lang is null)
         {
             return NotFound();
         }

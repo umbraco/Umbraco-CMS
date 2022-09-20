@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 
-namespace Umbraco.Cms.ManagementApi.ViewModels.Languages;
+namespace Umbraco.Cms.ManagementApi.ViewModels.Language;
 
 [DataContract(Name = "language", Namespace = "")]
 public class LanguageViewModel

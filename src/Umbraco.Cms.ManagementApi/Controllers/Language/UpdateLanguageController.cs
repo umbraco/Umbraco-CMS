@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.ManagementApi.ViewModels.Languages;
+using Umbraco.Cms.ManagementApi.ViewModels.Language;
 using Umbraco.New.Cms.Core.Services.Installer;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.Language;
