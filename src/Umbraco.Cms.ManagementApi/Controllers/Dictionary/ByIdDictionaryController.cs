@@ -30,9 +30,9 @@ public class ByIdDictionaryController : DictionaryControllerBase
     /// </returns>
     [HttpGet("{id:guid}")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(IActionResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(DictionaryViewModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(NotFoundResult), StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<DictionaryViewModel?>> ById(Guid id)
+    public async Task<ActionResult<DictionaryViewModel>> ById(Guid id)
     {
         IDictionaryItem? dictionary = _localizationService.GetDictionaryItemById(id);
         if (dictionary == null)
@@ -40,6 +40,6 @@ public class ByIdDictionaryController : DictionaryControllerBase
             return NotFound();
         }
 
-        return await Task.FromResult(_umbracoMapper.Map<IDictionaryItem, DictionaryViewModel>(dictionary));
+        return await Task.FromResult(_umbracoMapper.Map<IDictionaryItem, DictionaryViewModel>(dictionary)!);
     }
 }
