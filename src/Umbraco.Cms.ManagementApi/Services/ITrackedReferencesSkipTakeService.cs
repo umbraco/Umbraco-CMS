@@ -1,4 +1,5 @@
 ﻿using Umbraco.Cms.ManagementApi.ViewModels.Pagination;
+using Umbraco.New.Cms.Core.Models;
 using Umbraco.New.Cms.Core.Models.TrackedReferences;
 
 namespace Umbraco.Cms.ManagementApi.Services;
@@ -18,7 +19,7 @@ public interface ITrackedReferencesSkipTakeService
     /// </param>
     /// <param name="totalItems">The total amount of items.</param>
     /// <returns>A paged result of <see cref="RelationItemModel" /> objects.</returns>
-    IEnumerable<RelationItemModel> GetPagedRelationsForItem(int id, long skip, long take, bool filterMustBeIsDependency, out long totalItems);
+    PagedModel<RelationItemModel> GetPagedRelationsForItem(int id, long skip, long take, bool filterMustBeIsDependency);
 
     /// <summary>
     ///     Gets a paged result of the descending items that have any references, given a parent id.
@@ -32,7 +33,7 @@ public interface ITrackedReferencesSkipTakeService
     /// </param>
     /// <param name="totalItems">The total amount of items.</param>
     /// <returns>A paged result of <see cref="RelationItemModel" /> objects.</returns>
-    IEnumerable<RelationItemModel> GetPagedDescendantsInReferences(int parentId, long skip, long take, bool filterMustBeIsDependency, out long totalItems);
+    PagedModel<RelationItemModel> GetPagedDescendantsInReferences(int parentId, long skip, long take, bool filterMustBeIsDependency);
 
     /// <summary>
     ///     Gets a paged result of items used in any kind of relation from selected integer ids.
@@ -46,5 +47,5 @@ public interface ITrackedReferencesSkipTakeService
     /// </param>
     /// <param name="totalItems">The total amount of items.</param>
     /// <returns>A paged result of <see cref="RelationItemModel" /> objects.</returns>
-    IEnumerable<RelationItemModel> GetPagedItemsWithRelations(int[] ids, long skip, long take, bool filterMustBeIsDependency, out long totalItems);
+    PagedModel<RelationItemModel> GetPagedItemsWithRelations(int[] ids, long skip, long take, bool filterMustBeIsDependency);
 }

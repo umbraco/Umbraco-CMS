@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.ManagementApi.Services;
 using Umbraco.Cms.ManagementApi.ViewModels.Pagination;
-using Umbraco.Cms.ManagementApi.ViewModels.Server;
 using Umbraco.Cms.ManagementApi.ViewModels.TrackedReferences;
+using Umbraco.New.Cms.Core.Models;
 using Umbraco.New.Cms.Core.Models.TrackedReferences;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.TrackedReferences;
@@ -30,15 +30,16 @@ public class DescendantsTrackedReferencesController : TrackedReferencesControlle
     /// </remarks>
     [HttpGet("descendants/{parentId:int}")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(ServerStatusViewModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagedViewModel<RelationItemViewModel>), StatusCodes.Status200OK)]
     public async Task<ActionResult<PagedViewModel<RelationItemViewModel>>> Descendants(int parentId, long skip, long take, bool? filterMustBeIsDependency)
     {
-        IEnumerable<RelationItemModel> relationItems = _trackedReferencesSkipTakeService.GetPagedDescendantsInReferences(parentId, skip, take, filterMustBeIsDependency ?? true, out var totalItems);
+        PagedModel<RelationItemModel> relationItems = _trackedReferencesSkipTakeService.GetPagedDescendantsInReferences(parentId, skip, take, filterMustBeIsDependency ?? true);
         var pagedViewModel = new PagedViewModel<RelationItemViewModel>
         {
-            Items = _umbracoMapper.MapEnumerable<RelationItemModel, RelationItemViewModel>(relationItems),
-            Total = totalItems,
+            Total = relationItems.Total,
+            Items = _umbracoMapper.MapEnumerable<RelationItemModel, RelationItemViewModel>(relationItems.Items),
         };
+
         return await Task.FromResult(pagedViewModel);
     }
 }

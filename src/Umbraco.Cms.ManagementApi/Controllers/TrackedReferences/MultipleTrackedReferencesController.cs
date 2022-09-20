@@ -4,6 +4,7 @@ using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.ManagementApi.Services;
 using Umbraco.Cms.ManagementApi.ViewModels.Pagination;
 using Umbraco.Cms.ManagementApi.ViewModels.TrackedReferences;
+using Umbraco.New.Cms.Core.Models;
 using Umbraco.New.Cms.Core.Models.TrackedReferences;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.TrackedReferences;
@@ -18,6 +19,7 @@ public class MultipleTrackedReferencesController : TrackedReferencesControllerBa
         _trackedReferencesSkipTakeService = trackedReferencesSkipTakeService;
         _umbracoMapper = umbracoMapper;
     }
+
     /// <summary>
     ///     Gets a page list of the items used in any kind of relation from selected integer ids.
     /// </summary>
@@ -27,15 +29,14 @@ public class MultipleTrackedReferencesController : TrackedReferencesControllerBa
     /// </remarks>
     [HttpGet("multiple")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(RelationItemViewModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagedViewModel<RelationItemViewModel>), StatusCodes.Status200OK)]
     public async Task<ActionResult<PagedViewModel<RelationItemViewModel>>> GetPagedReferencedItems([FromQuery]int[] ids, long skip, long take, bool? filterMustBeIsDependency)
     {
-        IEnumerable<RelationItemModel> relationItems = _trackedReferencesSkipTakeService.GetPagedItemsWithRelations(ids, skip, take, filterMustBeIsDependency ?? true, out var totalItems);
-
+        PagedModel<RelationItemModel> relationItems = _trackedReferencesSkipTakeService.GetPagedItemsWithRelations(ids, skip, take, filterMustBeIsDependency ?? true);
         var pagedViewModel = new PagedViewModel<RelationItemViewModel>
         {
-            Items = _umbracoMapper.MapEnumerable<RelationItemModel, RelationItemViewModel>(relationItems),
-            Total = totalItems,
+            Total = relationItems.Total,
+            Items = _umbracoMapper.MapEnumerable<RelationItemModel, RelationItemViewModel>(relationItems.Items),
         };
 
         return await Task.FromResult(pagedViewModel);

@@ -12,7 +12,7 @@ public class PagedModel<T>
         Items = items;
     }
 
-    public IEnumerable<T> Items { get; } = Enumerable.Empty<T>();
+    public IEnumerable<T> Items { get; init; } = Enumerable.Empty<T>();
 
-    public long Total { get; }
+    public long Total { get; init; }
 }
