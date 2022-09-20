@@ -1,9 +1,11 @@
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.New.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Services;
 
+//
 public class TrackedReferencesService : ITrackedReferencesService
 {
     private readonly IEntityService _entityService;
@@ -57,5 +59,38 @@ public class TrackedReferencesService : ITrackedReferencesService
             filterMustBeIsDependency,
             out var totalItems);
         return new PagedResult<RelationItem>(totalItems, pageIndex + 1, pageSize) { Items = items };
+    }
+
+    public PagedModel<RelationItemModel> GetPagedRelationsForItem(int id, long skip, long take, bool filterMustBeIsDependency)
+    {
+        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
+        IEnumerable<RelationItemModel> items = _trackedReferencesSkipTakeRepository.GetPagedRelationsForItem(id, skip, take, filterMustBeIsDependency, out var totalItems);
+        var pagedModel = new PagedModel<RelationItemModel>(totalItems, items);
+
+        return pagedModel;
+    }
+
+    public PagedModel<RelationItemModel> GetPagedDescendantsInReferences(int parentId, long skip, long take, bool filterMustBeIsDependency)
+    {
+        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
+
+        IEnumerable<RelationItemModel> items = _trackedReferencesSkipTakeRepository.GetPagedDescendantsInReferences(
+            parentId,
+            skip,
+            take,
+            filterMustBeIsDependency,
+            out var totalItems);
+        var pagedModel = new PagedModel<RelationItemModel>(totalItems, items);
+
+        return pagedModel;
+    }
+
+    public PagedModel<RelationItemModel> GetPagedItemsWithRelations(int[] ids, long skip, long take, bool filterMustBeIsDependency)
+    {
+        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
+        IEnumerable<RelationItemModel> items = _trackedReferencesSkipTakeRepository.GetPagedItemsWithRelations(ids, skip, take, filterMustBeIsDependency, out var totalItems);
+        var pagedModel = new PagedModel<RelationItemModel>(totalItems, items);
+
+        return pagedModel;
     }
 }

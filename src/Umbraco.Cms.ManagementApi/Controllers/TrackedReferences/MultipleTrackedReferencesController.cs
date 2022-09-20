@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.ManagementApi.Services;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.ManagementApi.ViewModels.Pagination;
 using Umbraco.Cms.ManagementApi.ViewModels.TrackedReferences;
 using Umbraco.New.Cms.Core.Models;
@@ -11,10 +11,10 @@ namespace Umbraco.Cms.ManagementApi.Controllers.TrackedReferences;
 
 public class MultipleTrackedReferencesController : TrackedReferencesControllerBase
 {
-    private readonly ITrackedReferencesSkipTakeService _trackedReferencesSkipTakeService;
+    private readonly ITrackedReferencesService _trackedReferencesSkipTakeService;
     private readonly IUmbracoMapper _umbracoMapper;
 
-    public MultipleTrackedReferencesController(ITrackedReferencesSkipTakeService trackedReferencesSkipTakeService, IUmbracoMapper umbracoMapper)
+    public MultipleTrackedReferencesController(ITrackedReferencesService trackedReferencesSkipTakeService, IUmbracoMapper umbracoMapper)
     {
         _trackedReferencesSkipTakeService = trackedReferencesSkipTakeService;
         _umbracoMapper = umbracoMapper;
