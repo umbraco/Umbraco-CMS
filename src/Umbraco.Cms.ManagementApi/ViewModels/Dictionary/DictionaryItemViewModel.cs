@@ -9,5 +9,5 @@ public class DictionaryItemViewModel
     public Guid? ParentId { get; set; }
 
     [DataMember(Name = "key")]
-    public string Key { get; set; } = null!;
+    public Guid Key { get; set; }
 }

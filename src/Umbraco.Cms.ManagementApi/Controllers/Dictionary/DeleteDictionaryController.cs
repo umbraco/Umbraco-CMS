@@ -19,17 +19,17 @@ public class DeleteDictionaryController : DictionaryControllerBase
     /// <summary>
     ///     Deletes a data type with a given ID
     /// </summary>
-    /// <param name="id"></param>
+    /// <param name="key">The key of the dictionary item to delete</param>
     /// <returns>
     ///     <see cref="HttpResponseMessage" />
     /// </returns>
-    [HttpDelete("delete/{id:int}")]
+    [HttpDelete("delete/{key}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ActionResult), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(NotFoundResult), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Delete(int id)
+    public async Task<IActionResult> Delete(Guid key)
     {
-        IDictionaryItem? foundDictionary = _localizationService.GetDictionaryItemById(id);
+        IDictionaryItem? foundDictionary = _localizationService.GetDictionaryItemByKey(key.ToString());
 
         if (foundDictionary == null)
         {

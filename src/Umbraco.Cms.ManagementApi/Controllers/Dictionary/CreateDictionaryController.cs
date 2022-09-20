@@ -46,12 +46,12 @@ public class CreateDictionaryController : DictionaryControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<int>> Create(DictionaryItemViewModel dictionaryViewModel)
     {
-        if (string.IsNullOrEmpty(dictionaryViewModel.Key))
+        if (string.IsNullOrEmpty(dictionaryViewModel.Key.ToString()))
         {
             return ValidationProblem("Key can not be empty."); // TODO: translate
         }
 
-        if (_localizationService.DictionaryItemExists(dictionaryViewModel.Key))
+        if (_localizationService.DictionaryItemExists(dictionaryViewModel.Key.ToString()))
         {
             var message = _localizedTextService.Localize(
                 "dictionaryItem",
@@ -59,7 +59,7 @@ public class CreateDictionaryController : DictionaryControllerBase
                 _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.GetUserCulture(_localizedTextService, _globalSettings),
                 new Dictionary<string, string?>
                 {
-                    { "0", dictionaryViewModel.Key },
+                    { "0", dictionaryViewModel.Key.ToString() },
                 });
             return await Task.FromResult(ValidationProblem(message));
         }
@@ -74,7 +74,7 @@ public class CreateDictionaryController : DictionaryControllerBase
             }
 
             IDictionaryItem item = _localizationService.CreateDictionaryItemWithIdentity(
-                dictionaryViewModel.Key,
+                dictionaryViewModel.Key.ToString(),
                 parentGuid,
                 string.Empty);
 
