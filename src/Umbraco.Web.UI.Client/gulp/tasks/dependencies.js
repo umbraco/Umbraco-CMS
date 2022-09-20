@@ -281,6 +281,16 @@ function dependencies() {
             "base": "./node_modules/wicg-inert"
         },
         {
+            "name": "umbraco-ui",
+            "src": [
+                "./node_modules/@umbraco-ui/uui/dist/uui.min.js",
+                "./node_modules/@umbraco-ui/uui/dist/uui.min.js.map",
+                "./node_modules/@umbraco-ui/uui-css/dist/custom-properties.css",
+                "./node_modules/@umbraco-ui/uui-css/dist/uui-text.css"
+            ],
+            "base": "./node_modules/@umbraco-ui"
+        },
+        {
             "name": "sortablejs",
             "src":  ["./node_modules/sortablejs/Sortable.min.js"],
             "base": "./node_modules/sortablejs"

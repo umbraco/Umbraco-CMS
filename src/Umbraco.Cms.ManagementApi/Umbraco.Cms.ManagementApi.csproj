@@ -26,4 +26,9 @@
         <PrivateAssets>all</PrivateAssets>
       </PackageReference>
     </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="OpenApi.json" />
+      <EmbeddedResource Include="OpenApi.json" />
+    </ItemGroup>
 </Project>

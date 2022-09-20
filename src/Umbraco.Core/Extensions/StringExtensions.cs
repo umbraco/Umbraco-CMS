@@ -419,7 +419,8 @@ public static class StringExtensions
     ///     returns <see langword="false" />.
     /// </returns>
     public static bool IsNullOrWhiteSpace(this string? value) => string.IsNullOrWhiteSpace(value);
-
+    
+    [return: NotNullIfNotNull("defaultValue")]
     public static string? IfNullOrWhiteSpace(this string? str, string? defaultValue) =>
         str.IsNullOrWhiteSpace() ? defaultValue : str;
 
@@ -1326,11 +1327,8 @@ public static class StringExtensions
     /// <param name="path"></param>
     /// <returns></returns>
     // From: http://stackoverflow.com/a/35046453/5018
-    public static bool IsFullPath(this string path) =>
-        string.IsNullOrWhiteSpace(path) == false
-        && path.IndexOfAny(Path.GetInvalidPathChars().ToArray()) == -1
-        && Path.IsPathRooted(path)
-        && Path.GetPathRoot(path)?.Equals(Path.DirectorySeparatorChar.ToString(), StringComparison.Ordinal) == false;
+    // Updated from .NET 2.1+: https://stackoverflow.com/a/58250915
+    public static bool IsFullPath(this string path) => Path.IsPathFullyQualified(path);
 
     // FORMAT STRINGS
 
