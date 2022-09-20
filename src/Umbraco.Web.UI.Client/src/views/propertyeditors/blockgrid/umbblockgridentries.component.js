@@ -549,7 +549,10 @@
                     $scope.$evalAsync();
                 },
                 onEnd: function(evt) {
-                    console.log("# onEnd")
+                    console.log("# onEnd");
+                    if(rqaId !== null) {
+                        cancelAnimationFrame(rqaId);
+                    }
                     window.removeEventListener('drag', _onDragMove);
 
                     // ensure not-allowed indication is removed.

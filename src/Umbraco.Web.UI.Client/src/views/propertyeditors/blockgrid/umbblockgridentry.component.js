@@ -44,7 +44,6 @@
     }
     
     function closestColumnSpanOption(target, map, max) {
-        console.log("closestColumnSpanOption", max)
         return map.reduce((a, b) => {
             if (a.columnSpan >= max) {
                 return b;
@@ -179,16 +178,11 @@
             gridRows = computedStyles.gridTemplateRows.trim().split("px").map(x => Number(x));
 
             // remove empties:
-            gridColumns = gridColumns.filter(n => n >= 0)
-            /*if(gridColumns[gridColumns.length-1] === 0) {
-                gridColumns.pop();
-            }*/
-            gridRows = gridRows.filter(n => n >= 0)
-            /*if(gridRows[gridRows.length-1] === 0) {
-                gridRows.pop();
-            }*/
+            gridColumns = gridColumns.filter(n => n > 0);
+            gridRows = gridRows.filter(n => n > 0);
+
             // ensure all columns are there.
-            // This will ensure handling non-css-grid mode,
+            // This will also ensure handling non-css-grid mode,
             // use container width divided by amount of columns( or the item width divided by its amount of columnSpan)
             let amountOfColumnsInWeightMap = gridColumns.length;
             let gridColumnNumber = parseInt(computedStyles.getPropertyValue('--umb-block-grid--grid-columns'));
