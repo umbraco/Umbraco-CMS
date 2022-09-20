@@ -28,6 +28,7 @@ import { UmbNodeStore } from '../core/stores/node.store';
 import { UmbSectionStore } from '../core/stores/section.store';
 import { UmbEntityStore } from '../core/stores/entity.store';
 import { UmbPropertyEditorStore } from '../core/stores/property-editor.store';
+import { UmbIconStore } from '../core/stores/icon/icon.store';
 
 @defineElement('umb-backoffice')
 export default class UmbBackoffice extends UmbContextConsumerMixin(UmbContextProviderMixin(LitElement)) {
@@ -46,14 +47,15 @@ export default class UmbBackoffice extends UmbContextConsumerMixin(UmbContextPro
 		`,
 	];
 
+	private _umbIconRegistry = new UmbIconStore();
+	private _umbEntityStore = new UmbEntityStore();
 	private _umbSectionStore?: UmbSectionStore;
-	private _umbEntityStore?: UmbEntityStore;
 	private _currentSectionSubscription?: Subscription;
 
 	constructor() {
 		super();
 
-		this._umbEntityStore = new UmbEntityStore();
+		this._umbIconRegistry.attach(this);
 
 		this.provideContext('umbEntityStore', this._umbEntityStore);
 		this.provideContext('umbNodeStore', new UmbNodeStore(this._umbEntityStore));
