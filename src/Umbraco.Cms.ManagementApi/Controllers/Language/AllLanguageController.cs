@@ -19,6 +19,7 @@ public class AllLanguageController : LanguageControllerBase
         _localizationService = localizationService;
         _umbracoMapper = umbracoMapper;
     }
+
     /// <summary>1
     ///     Returns all currently configured languages.
     /// </summary>

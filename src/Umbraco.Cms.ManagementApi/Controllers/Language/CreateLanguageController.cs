@@ -43,7 +43,7 @@ public class CreateLanguageController : LanguageControllerBase
         CultureInfo culture;
         try
         {
-            culture = CultureInfo.GetCultureInfo(language.IsoCode!);
+            culture = CultureInfo.GetCultureInfo(language.IsoCode);
         }
         catch (CultureNotFoundException)
         {
