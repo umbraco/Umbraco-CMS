@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.ManagementApi.Services;
 using Umbraco.Cms.ManagementApi.ViewModels.Pagination;
 using Umbraco.Cms.ManagementApi.ViewModels.TrackedReferences;
 using Umbraco.New.Cms.Core.Models;
-using Umbraco.New.Cms.Core.Models.TrackedReferences;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.TrackedReferences;
 

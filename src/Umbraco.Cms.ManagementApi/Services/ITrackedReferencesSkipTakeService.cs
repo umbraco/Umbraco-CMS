@@ -1,6 +1,6 @@
-﻿using Umbraco.Cms.ManagementApi.ViewModels.Pagination;
+﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.ManagementApi.ViewModels.Pagination;
 using Umbraco.New.Cms.Core.Models;
-using Umbraco.New.Cms.Core.Models.TrackedReferences;
 
 namespace Umbraco.Cms.ManagementApi.Services;
 

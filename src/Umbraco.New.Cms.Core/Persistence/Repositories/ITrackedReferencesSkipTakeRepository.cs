@@ -1,5 +1,4 @@
 ﻿using Umbraco.Cms.Core.Models;
-using Umbraco.New.Cms.Core.Models.TrackedReferences;
 
 namespace Umbraco.New.Cms.Core.Persistence.Repositories;
 

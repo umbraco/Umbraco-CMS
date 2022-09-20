@@ -1,7 +1,7 @@
-﻿using Umbraco.Cms.Core.Scoping;
+﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.ManagementApi.ViewModels.Pagination;
 using Umbraco.New.Cms.Core.Models;
-using Umbraco.New.Cms.Core.Models.TrackedReferences;
 using Umbraco.New.Cms.Core.Persistence.Repositories;
 
 namespace Umbraco.Cms.ManagementApi.Services;

@@ -1,4 +1,4 @@
-﻿namespace Umbraco.New.Cms.Core.Models.TrackedReferences;
+﻿namespace Umbraco.Cms.Core.Models;
 
 public class RelationItemModel
 {

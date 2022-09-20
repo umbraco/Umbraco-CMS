@@ -1,7 +1,6 @@
 ﻿using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
-using Umbraco.New.Cms.Core.Models.TrackedReferences;
 
 namespace Umbraco.New.Cms.Infrastructure.Persistence.Mappers;
 
