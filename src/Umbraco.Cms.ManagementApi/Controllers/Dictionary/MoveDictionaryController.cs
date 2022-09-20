@@ -33,7 +33,7 @@ public class MoveDictionaryController : DictionaryControllerBase
     /// <returns></returns>
     [HttpPut("move")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(IActionResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ContentResult), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Move(MoveViewModel move)
     {
