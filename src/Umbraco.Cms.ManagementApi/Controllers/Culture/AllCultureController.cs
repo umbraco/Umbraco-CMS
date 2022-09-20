@@ -7,11 +7,11 @@ using Umbraco.Cms.ManagementApi.ViewModels.Pagination;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.Culture;
 
-public class GetAllCultureController : CultureControllerBase
+public class AllCultureController : CultureControllerBase
 {
     private readonly IUmbracoMapper _umbracoMapper;
 
-    public GetAllCultureController(IUmbracoMapper umbracoMapper) => _umbracoMapper = umbracoMapper;
+    public AllCultureController(IUmbracoMapper umbracoMapper) => _umbracoMapper = umbracoMapper;
 
     /// <summary>
     ///     Returns all cultures available for creating languages.
