@@ -12,6 +12,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.NewBackoffice;
 
+#if !DEBUG
+[Ignore("This test runs only in release")]
+#endif
 [TestFixture]
 public class OpenAPIContractTest : UmbracoTestServerTestBase
 {

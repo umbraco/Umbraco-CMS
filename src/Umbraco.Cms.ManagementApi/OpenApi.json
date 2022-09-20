@@ -509,7 +509,7 @@
       },
       "RuntimeLevel": {
         "type": "string",
-        "description": "",
+        "description": "Describes the levels in which the runtime can run.\\n            ",
         "x-enumNames": [
           "Unknown",
           "Boot",
