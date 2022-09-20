@@ -19,7 +19,7 @@ public class AllCultureController : CultureControllerBase
     /// <returns></returns>
     [HttpGet]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(IDictionary<string, string>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagedViewModel<CultureViewModel>), StatusCodes.Status200OK)]
     public async Task<PagedViewModel<CultureViewModel>> GetAll(int skip, int take)
     {
         IEnumerable<CultureInfo> list = CultureInfo.GetCultures(CultureTypes.AllCultures)
