@@ -337,9 +337,18 @@
                         return
                     }
 
-
-                    // TODO: we found no related, maybe we are on another line than everyone else...
-                    console.log("No line found...")
+                    // If above or below container, we will go first or last.
+                    const approvedContainerRect = approvedContainerEl.getBoundingClientRect();
+                    if(dragY < approvedContainerRect.top) {
+                        const firstEl = containerElements[0];
+                        if (firstEl) {
+                            approvedContainerEl.insertBefore(ghostEl, firstEl);
+                        } else {
+                            approvedContainerEl.appendChild(ghostEl);
+                        }
+                    } else if(dragY > approvedContainerRect.bottom) {
+                        approvedContainerEl.appendChild(ghostEl);
+                    }
                 }
             }
 
