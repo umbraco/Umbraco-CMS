@@ -28,10 +28,10 @@ public class DictionaryFactory : IDictionaryFactory
 
     public IDictionaryItem CreateDictionaryItem(DictionaryViewModel dictionaryViewModel)
     {
-        IDictionaryItem dictionaryItem = _umbracoMapper.Map<IDictionaryItem>(dictionaryViewModel)!;
-        IDictionaryItem? dic = _localizationService.GetDictionaryItemById(dictionaryViewModel.Key);
-        dictionaryItem.Id = dic!.Id;
-        return dictionaryItem;
+        IDictionaryItem mappedItem = _umbracoMapper.Map<IDictionaryItem>(dictionaryViewModel)!;
+        IDictionaryItem? dictionaryItem = _localizationService.GetDictionaryItemById(dictionaryViewModel.Key);
+        mappedItem.Id = dictionaryItem!.Id;
+        return mappedItem;
     }
 
     public DictionaryViewModel CreateDictionaryViewModel(IDictionaryItem dictionaryItem)
