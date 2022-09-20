@@ -23,7 +23,7 @@ public class DeleteDictionaryController : DictionaryControllerBase
     /// <returns>
     ///     <see cref="HttpResponseMessage" />
     /// </returns>
-    [HttpDelete("delete/{key}")]
+    [HttpDelete("{key}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ActionResult), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(NotFoundResult), StatusCodes.Status404NotFound)]
