@@ -42,7 +42,7 @@ public class CreateDictionaryController : DictionaryControllerBase
     /// </returns>
     [HttpPost("create")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(ActionResult<int>), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(CreatedResult), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<int>> Create(DictionaryItemViewModel dictionaryViewModel)
     {
