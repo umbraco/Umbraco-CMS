@@ -16,20 +16,22 @@
 		"url": "https://umbraco.com"
 	},
 	"scripts": {
-		"dev": "vite",
-		"build": "tsc && vite build --mode staging",
-		"build:production": "tsc && vite build",
+		"pre-run": "generate:icons",
+		"dev": "npm run pre-run && vite",
+		"build": "npm run pre-run && tsc && vite build --mode staging",
+		"build:production": "npm run pre-run && tsc && vite build",
 		"preview": "vite preview --open",
-		"test": "web-test-runner --coverage",
-		"test:watch": "web-test-runner --watch",
-		"test:e2e": "playwright test",
+		"test": "npm run pre-run && web-test-runner --coverage",
+		"test:watch": "npm run pre-run && web-test-runner --watch",
+		"test:e2e": "npm run pre-run && playwright test",
 		"lint": "eslint --cache src e2e",
 		"lint:fix": "npm run lint -- --fix",
 		"format": "prettier 'src/**/*.ts'",
 		"format:fix": "npm run format -- --write",
 		"generate:api": "npx openapi-typescript schemas/**/*.yml --output schemas/generated-schema.ts",
-		"storybook": "start-storybook -p 6006",
-		"build-storybook": "build-storybook"
+		"storybook": "npm run pre-run && start-storybook -p 6006",
+		"build-storybook": "npm run pre-run && build-storybook",
+		"generate:icons": "node ./scripts/generate-icons.mjs"
 	},
 	"engines": {
 		"node": ">=16.0.0 <17",
@@ -83,8 +85,10 @@
 		"msw-storybook-addon": "^1.6.3",
 		"playwright-msw": "^1.0.0",
 		"prettier": "2.7.1",
+		"tiny-glob": "^0.2.9",
 		"typescript": "^4.7.4",
-		"vite": "^3.1.0"
+		"vite": "^3.1.0",
+		"vite-plugin-static-copy": "^0.9.0"
 	},
 	"msw": {
 		"workerDirectory": "public"

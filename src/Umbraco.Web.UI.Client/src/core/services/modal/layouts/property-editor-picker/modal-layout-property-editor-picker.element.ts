@@ -16,6 +16,17 @@ export interface UmbModalPropertyEditorPickerData {
 	submitLabel?: string;
 }
 
+interface GroupedPropertyEditors {
+	[key: string]: Array<PropertyEditor>;
+}
+
+const groupBy = (xs: Array<any>, key: string) => {
+	return xs.reduce(function (rv, x) {
+		(rv[x[key]] = rv[x[key]] || []).push(x);
+		return rv;
+	}, {});
+};
+
 @customElement('umb-modal-layout-property-editor-picker')
 export class UmbModalLayoutPropertyEditorPickerElement extends UmbContextConsumerMixin(LitElement) {
 	static styles = [
@@ -85,7 +96,7 @@ export class UmbModalLayoutPropertyEditorPickerElement extends UmbContextConsume
 	data?: UmbModalPropertyEditorPickerData;
 
 	@state()
-	private _filteredPropertyEditors: Array<PropertyEditor> = [];
+	private _groupedPropertyEditors: GroupedPropertyEditors = {};
 
 	@state()
 	private _selection: Array<string> = [];
@@ -116,7 +127,7 @@ export class UmbModalLayoutPropertyEditorPickerElement extends UmbContextConsume
 	private _observePropertyEditors() {
 		this._propertyEditorsSubscription = this._propertyEditorStore?.getAll().subscribe((propertyEditors) => {
 			this._propertyEditors = propertyEditors;
-			this._filteredPropertyEditors = propertyEditors;
+			this._groupedPropertyEditors = groupBy(propertyEditors, 'group');
 		});
 	}
 
@@ -144,13 +155,15 @@ export class UmbModalLayoutPropertyEditorPickerElement extends UmbContextConsume
 		let query = (event.target.value as string) || '';
 		query = query.toLowerCase();
 
-		this._filteredPropertyEditors = !query
+		const result = !query
 			? this._propertyEditors
 			: this._propertyEditors.filter((propertyEditor) => {
 					return (
 						propertyEditor.name.toLowerCase().includes(query) || propertyEditor.alias.toLowerCase().includes(query)
 					);
 			  });
+
+		this._groupedPropertyEditors = groupBy(result, 'group');
 	}
 
 	private _close() {
@@ -168,7 +181,7 @@ export class UmbModalLayoutPropertyEditorPickerElement extends UmbContextConsume
 
 	render() {
 		return html`
-			<umb-editor-entity-layout headline="Select Property Editor UI">
+			<umb-editor-entity-layout headline="Select Property Editor">
 				<uui-box> ${this._renderFilter()} ${this._renderGrid()} </uui-box>
 				<div slot="actions">
 					<uui-button label="Close" @click=${this._close}></uui-button>
@@ -189,13 +202,21 @@ export class UmbModalLayoutPropertyEditorPickerElement extends UmbContextConsume
 	}
 
 	private _renderGrid() {
-		return html`<ul id="item-grid">
+		return html` ${Object.entries(this._groupedPropertyEditors).map(
+			([key, value]) =>
+				html` <h4>${key}</h4>
+					${this._renderGroupItems(value)}`
+		)}`;
+	}
+
+	private _renderGroupItems(groupItems: Array<PropertyEditor>) {
+		return html` <ul id="item-grid">
 			${repeat(
-				this._filteredPropertyEditors,
+				groupItems,
 				(propertyEditor) => propertyEditor.alias,
 				(propertyEditor) => html` <li class="item" ?selected=${this._selection.includes(propertyEditor.alias)}>
 					<button type="button" @click="${() => this._handleClick(propertyEditor)}">
-						<uui-icon name="document" class="icon"></uui-icon>
+						<uui-icon name="${propertyEditor.icon}" class="icon"></uui-icon>
 						${propertyEditor.name}
 					</button>
 				</li>`
