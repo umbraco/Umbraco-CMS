@@ -17,10 +17,10 @@ public class DictionaryOverviewViewModel
     public string? Name { get; set; }
 
     /// <summary>
-    ///     Gets or sets the id.
+    ///     Gets or sets the key.
     /// </summary>
     [DataMember(Name = "id")]
-    public int Id { get; set; }
+    public Guid Key { get; set; }
 
     /// <summary>
     ///     Gets or sets the level.

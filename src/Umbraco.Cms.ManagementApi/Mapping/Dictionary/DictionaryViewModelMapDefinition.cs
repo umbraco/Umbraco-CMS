@@ -86,7 +86,7 @@ public class DictionaryViewModelMapDefinition : IMapDefinition
     // Umbraco.Code.MapAll -Level -Translations
     private void Map(IDictionaryItem source, DictionaryOverviewViewModel target, MapperContext context)
     {
-        target.Id = source.Id;
+        target.Key = source.Key;
         target.Name = source.ItemKey;
 
         // add all languages and  the translations
