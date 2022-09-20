@@ -30,7 +30,7 @@ public class DictionaryViewModel : INotificationModel
     ///     Gets or sets the translations.
     /// </summary>
     [JsonPropertyName("translations")]
-    public IEnumerable<DictionaryTranslationViewModel> Translations { get; set; } = Enumerable.Empty<DictionaryTranslationViewModel>()
+    public IEnumerable<DictionaryTranslationViewModel> Translations { get; set; } = Enumerable.Empty<DictionaryTranslationViewModel>();
 
     /// <summary>
     ///     Apps for the dictionary item
