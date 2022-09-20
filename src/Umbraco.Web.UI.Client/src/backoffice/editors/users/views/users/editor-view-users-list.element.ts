@@ -1,4 +1,4 @@
-import { css, html, LitElement } from 'lit';
+import { css, html, LitElement, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UmbContextConsumerMixin } from '../../../../../core/context';
@@ -169,26 +169,34 @@ export class UmbEditorViewUsersListElement extends UmbContextConsumerMixin(LitEl
 		`;
 	}
 
-	protected renderRowTemplate = (item: UserItem) => {
+	protected renderRowTemplate = (user: UserItem) => {
+		if (!this._usersContext) return;
+
+		const statusLook = this._usersContext.getTagLookAndColor(user.status ? user.status : '');
+
 		return html`<uui-table-row
 			selectable
 			?select-only=${this._selectionMode}
-			?selected=${this._isSelected(item.key)}
-			@selected=${() => this._selectRowHandler(item)}
-			@unselected=${() => this._unselectRowHandler(item)}>
+			?selected=${this._isSelected(user.key)}
+			@selected=${() => this._selectRowHandler(user)}
+			@unselected=${() => this._unselectRowHandler(user)}>
 			<uui-table-cell>
 				<div style="display: flex; align-items: center;">
-					<uui-avatar name="${item.name}"></uui-avatar>
+					<uui-avatar name="${user.name}"></uui-avatar>
 				</div>
 			</uui-table-cell>
 			<uui-table-cell>
 				<div style="display: flex; align-items: center;">
-					<a style="font-weight: bold;" href="http://">${item.name}</a>
+					<a style="font-weight: bold;" href="http://">${user.name}</a>
 				</div>
 			</uui-table-cell>
-			<uui-table-cell> ${item.userGroup} </uui-table-cell>
-			<uui-table-cell>${item.lastLogin}</uui-table-cell>
-			<uui-table-cell>${item.status}</uui-table-cell>
+			<uui-table-cell> ${user.userGroup} </uui-table-cell>
+			<uui-table-cell>${user.lastLogin}</uui-table-cell>
+			<uui-table-cell>
+				${user.status
+					? html`<uui-tag size="s" look="${statusLook.look}" color="${statusLook.color}"> ${user.status} </uui-tag>`
+					: nothing}
+			</uui-table-cell>
 		</uui-table-row>`;
 	};
 

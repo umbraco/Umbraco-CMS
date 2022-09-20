@@ -5,6 +5,7 @@ import { UmbContextConsumerMixin, UmbContextProviderMixin } from '../../../../..
 import './editor-view-users-list.element';
 import './editor-view-users-grid.element';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { InterfaceColor, InterfaceLook } from '@umbraco-ui/uui-base/lib/types';
 
 export type UsersViewType = 'list' | 'grid';
 
@@ -47,7 +48,7 @@ export class UmbEditorViewUsersElement extends UmbContextProviderMixin(LitElemen
 			name: 'Kathleen G. Smith',
 			userGroup: 'Editors',
 			lastLogin: 'Tue, 6 June 2021',
-			status: 'Invited',
+			status: 'Disabled',
 		},
 		{
 			key: '1b1c9733-b845-4d9a-9ed2-b2f46c05fd72',
@@ -94,6 +95,20 @@ export class UmbEditorViewUsersElement extends UmbContextProviderMixin(LitElemen
 
 	private _toggleViewType() {
 		this._viewType = this._viewType === 'list' ? 'grid' : 'list';
+	}
+
+	public getTagLookAndColor(status: string): { color: InterfaceColor; look: InterfaceLook } {
+		switch (status.toLowerCase()) {
+			case 'invited':
+			case 'inactive':
+				return { look: 'primary', color: 'warning' };
+			case 'active':
+				return { look: 'primary', color: 'positive' };
+			case 'disabled':
+				return { look: 'primary', color: 'danger' };
+			default:
+				return { look: 'secondary', color: 'default' };
+		}
 	}
 
 	render() {
