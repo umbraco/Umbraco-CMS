@@ -20,4 +20,8 @@
     <ProjectReference Include="..\Umbraco.New.Cms.Web.Common\Umbraco.New.Cms.Web.Common.csproj" />
     <ProjectReference Include="..\Umbraco.Web.Common\Umbraco.Web.Common.csproj" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <EmbeddedResource Include="OpenApi.json" />
+  </ItemGroup>
 </Project>
