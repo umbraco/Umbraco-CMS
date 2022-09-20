@@ -20,7 +20,7 @@ public class ByIdLanguageController : LanguageControllerBase
 
     [HttpGet("{id:int}")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(NotFoundResult), StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<LanguageViewModel?>> ById(int id)
     {
@@ -30,6 +30,6 @@ public class ByIdLanguageController : LanguageControllerBase
             return NotFound();
         }
 
-        return _umbracoMapper.Map<LanguageViewModel>(lang);
+        return await Task.FromResult(_umbracoMapper.Map<LanguageViewModel>(lang));
     }
 }

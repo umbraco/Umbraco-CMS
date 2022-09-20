@@ -36,7 +36,7 @@ public class UpdateLanguageController : LanguageControllerBase
         {
             // Someone is trying to update a language that doesn't exist
             ModelState.AddModelError("IsoCode", "The language " + language.IsoCode + " does not exist");
-            return ValidationProblem(ModelState);
+            return await Task.FromResult(ValidationProblem(ModelState));
         }
 
         // note that the service will prevent the default language from being "un-defaulted"
@@ -44,7 +44,7 @@ public class UpdateLanguageController : LanguageControllerBase
         if (existingById.IsDefault && !language.IsDefault)
         {
             ModelState.AddModelError("IsDefault", "Cannot un-default the default language.");
-            return ValidationProblem(ModelState);
+            return await Task.FromResult(ValidationProblem(ModelState));
         }
 
         existingById = _umbracoMapper.Map(language, existingById);
@@ -52,16 +52,16 @@ public class UpdateLanguageController : LanguageControllerBase
         if (!_languageService.CanUseLanguagesFallbackLanguage(existingById))
         {
             ModelState.AddModelError("FallbackLanguage", "The selected fall back language does not exist.");
-            return ValidationProblem(ModelState);
+            return await Task.FromResult(ValidationProblem(ModelState));
         }
 
         if (!_languageService.CanGetProperFallbackLanguage(existingById))
         {
             ModelState.AddModelError("FallbackLanguage", $"The selected fall back language {_localizationService.GetLanguageById(existingById.FallbackLanguageId!.Value)} would create a circular path.");
-            return ValidationProblem(ModelState);
+            return await Task.FromResult(ValidationProblem(ModelState));
         }
 
         _localizationService.Save(existingById);
-        return Ok();
+        return await Task.FromResult(Ok());
     }
 }

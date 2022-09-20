@@ -41,7 +41,7 @@ public class AllDictionaryController : DictionaryControllerBase
             Total = list.Count,
             Items = list.Skip(skip).Take(take),
         };
-        return model;
+        return await Task.FromResult(model);
     }
 
     // recursive method to build a tree structure from the flat structure returned above

@@ -56,6 +56,6 @@ public class CreateLanguageController : LanguageControllerBase
         ILanguage newLang = _umbracoMapper.Map<ILanguage>(language)!;
 
         _localizationService.Save(newLang);
-        return Created($"api/v1.0/language/{newLang.Id}", null);
+        return await Task.FromResult(Created($"api/v1.0/language/{newLang.Id}", null));
     }
 }

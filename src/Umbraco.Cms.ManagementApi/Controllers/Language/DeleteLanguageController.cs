@@ -25,7 +25,7 @@ public class DeleteLanguageController : LanguageControllerBase
         ILanguage? language = _localizationService.GetLanguageById(id);
         if (language == null)
         {
-            return NotFound();
+            return await Task.FromResult(NotFound());
         }
 
         // the service would not let us do it, but test here nevertheless
@@ -45,6 +45,6 @@ public class DeleteLanguageController : LanguageControllerBase
         // will just remove it - so no need to check here
         _localizationService.Delete(language);
 
-        return Ok();
+        return await Task.FromResult(Ok());
     }
 }

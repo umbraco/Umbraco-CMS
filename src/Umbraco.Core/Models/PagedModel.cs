@@ -2,6 +2,10 @@
 
 public class PagedModel<T>
 {
+    public PagedModel()
+    {
+    }
+
     public PagedModel(long total, IEnumerable<T> items)
     {
         Total = total;

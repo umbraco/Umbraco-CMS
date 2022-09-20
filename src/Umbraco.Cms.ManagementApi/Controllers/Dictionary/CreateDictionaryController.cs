@@ -61,7 +61,7 @@ public class CreateDictionaryController : DictionaryControllerBase
                 {
                     { "0", dictionaryViewModel.Key },
                 });
-            return ValidationProblem(message);
+            return await Task.FromResult(ValidationProblem(message));
         }
 
         try
@@ -79,12 +79,12 @@ public class CreateDictionaryController : DictionaryControllerBase
                 string.Empty);
 
 
-            return Created($"api/v1.0/dictionary/{item.Key}", item.Key);
+            return await Task.FromResult(Created($"api/v1.0/dictionary/{item.Key}", item.Key));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error creating dictionary with {Name} under {ParentId}", dictionaryViewModel.Key, dictionaryViewModel.ParentId);
-            return ValidationProblem("Error creating dictionary item");
+            return await Task.FromResult(ValidationProblem("Error creating dictionary item"));
         }
     }
 }

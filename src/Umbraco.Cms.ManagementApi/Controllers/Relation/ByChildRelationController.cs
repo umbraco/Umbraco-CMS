@@ -32,7 +32,7 @@ public class ByChildRelationController : RelationControllerBase
     [HttpGet("childRelations/{childId:int}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(RelationViewModel), StatusCodes.Status200OK)]
-    public PagedViewModel<RelationViewModel> ByChild(int childId, int skip, int take, string? relationTypeAlias = "")
+    public async Task<PagedViewModel<RelationViewModel>> ByChild(int childId, int skip, int take, string? relationTypeAlias = "")
     {
         IRelation[] relations = _relationService.GetByChildId(childId).ToArray();
         IEnumerable<RelationViewModel> result = Enumerable.Empty<RelationViewModel>();
@@ -50,6 +50,6 @@ public class ByChildRelationController : RelationControllerBase
             }
         }
 
-        return _pagedViewModelFactory.Create(result, skip, take);
+        return await Task.FromResult(_pagedViewModelFactory.Create(result, skip, take));
     }
 }

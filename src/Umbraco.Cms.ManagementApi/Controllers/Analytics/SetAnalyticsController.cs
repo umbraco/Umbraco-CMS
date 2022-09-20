@@ -31,6 +31,6 @@ public class SetAnalyticsController : AnalyticsControllerBase
         }
 
         _metricsConsentService.SetConsentLevel(analyticsLevelViewModel.AnalyticsLevel);
-        return Ok();
+        return await Task.FromResult(Ok());
     }
 }

@@ -40,7 +40,7 @@ public class MoveDictionaryController : DictionaryControllerBase
         IDictionaryItem? dictionaryItem = _localizationService.GetDictionaryItemById(move.Id);
         if (dictionaryItem == null)
         {
-            return ValidationProblem(_localizedTextService.Localize("dictionary", "itemDoesNotExists"));
+            return await Task.FromResult(ValidationProblem(_localizedTextService.Localize("dictionary", "itemDoesNotExists")));
         }
 
         IDictionaryItem? parent = _localizationService.GetDictionaryItemById(move.ParentId);
@@ -52,7 +52,7 @@ public class MoveDictionaryController : DictionaryControllerBase
             }
             else
             {
-                return ValidationProblem(_localizedTextService.Localize("dictionary", "parentDoesNotExists"));
+                return await Task.FromResult(ValidationProblem(_localizedTextService.Localize("dictionary", "parentDoesNotExists")));
             }
         }
         else
@@ -60,7 +60,7 @@ public class MoveDictionaryController : DictionaryControllerBase
             dictionaryItem.ParentId = parent.Key;
             if (dictionaryItem.Key == parent.ParentId)
             {
-                return ValidationProblem(_localizedTextService.Localize("moveOrCopy", "notAllowedByPath"));
+                return await Task.FromResult(ValidationProblem(_localizedTextService.Localize("moveOrCopy", "notAllowedByPath")));
             }
         }
 
@@ -68,6 +68,6 @@ public class MoveDictionaryController : DictionaryControllerBase
 
         var path = _dictionaryService.CalculatePath(dictionaryItem.ParentId, dictionaryItem.Id);
 
-        return Content(path, MediaTypeNames.Text.Plain, Encoding.UTF8);
+        return await Task.FromResult(Content(path, MediaTypeNames.Text.Plain, Encoding.UTF8));
     }
 }

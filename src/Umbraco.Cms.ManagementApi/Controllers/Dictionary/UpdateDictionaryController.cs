@@ -57,6 +57,6 @@ public class UpdateDictionaryController : DictionaryControllerBase
 
         IDictionaryItem dictionaryToSave = _dictionaryFactory.CreateDictionary(updatedDictionaryItem!);
         _localizationService.Save(dictionaryToSave);
-        return Content(_dictionaryService.CalculatePath(dictionaryToSave.ParentId, dictionaryToSave.Id), MediaTypeNames.Text.Plain, Encoding.UTF8);
+        return await Task.FromResult(Content(_dictionaryService.CalculatePath(dictionaryToSave.ParentId, dictionaryToSave.Id), MediaTypeNames.Text.Plain, Encoding.UTF8));
     }
 }

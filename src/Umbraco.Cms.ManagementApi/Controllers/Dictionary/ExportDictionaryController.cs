@@ -29,7 +29,7 @@ public class ExportDictionaryController : DictionaryControllerBase
         IDictionaryItem? dictionaryItem = _localizationService.GetDictionaryItemById(key);
         if (dictionaryItem is null)
         {
-            return NotFound("No dictionary item found with id ");
+            return await Task.FromResult(NotFound("No dictionary item found with id "));
         }
 
         XElement xml = _entityXmlSerializer.Serialize(dictionaryItem, includeChildren);
@@ -39,6 +39,6 @@ public class ExportDictionaryController : DictionaryControllerBase
         // Set custom header so umbRequestHelper.downloadFile can save the correct filename
         HttpContext.Response.Headers.Add("x-filename", fileName);
 
-        return File(Encoding.UTF8.GetBytes(xml.ToDataString()), MediaTypeNames.Application.Octet, fileName);
+        return await Task.FromResult(File(Encoding.UTF8.GetBytes(xml.ToDataString()), MediaTypeNames.Application.Octet, fileName));
     }
 }

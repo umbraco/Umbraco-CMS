@@ -19,6 +19,6 @@ public class AllAnalyticsController : AnalyticsControllerBase
     public async Task<PagedViewModel<TelemetryLevel>> GetAll(int skip, int take)
     {
         TelemetryLevel[] levels = Enum.GetValues<TelemetryLevel>();
-        return _pagedViewModelFactory.Create(levels, skip, take);
+        return await Task.FromResult(_pagedViewModelFactory.Create(levels, skip, take));
     }
 }

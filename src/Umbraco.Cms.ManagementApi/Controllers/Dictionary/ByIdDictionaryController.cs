@@ -40,6 +40,6 @@ public class ByIdDictionaryController : DictionaryControllerBase
             return NotFound();
         }
 
-        return _umbracoMapper.Map<IDictionaryItem, DictionaryViewModel>(dictionary);
+        return await Task.FromResult(_umbracoMapper.Map<IDictionaryItem, DictionaryViewModel>(dictionary));
     }
 }

@@ -34,10 +34,11 @@ public class DescendantsTrackedReferencesController : TrackedReferencesControlle
     public async Task<ActionResult<PagedViewModel<RelationItemViewModel>>> Descendants(int parentId, long skip, long take, bool? filterMustBeIsDependency)
     {
         IEnumerable<RelationItemModel> relationItems = _trackedReferencesSkipTakeService.GetPagedDescendantsInReferences(parentId, skip, take, filterMustBeIsDependency ?? true, out var totalItems);
-        return new PagedViewModel<RelationItemViewModel>
+        var pagedViewModel = new PagedViewModel<RelationItemViewModel>
         {
             Items = _umbracoMapper.MapEnumerable<RelationItemModel, RelationItemViewModel>(relationItems),
             Total = totalItems,
         };
+        return await Task.FromResult(pagedViewModel);
     }
 }

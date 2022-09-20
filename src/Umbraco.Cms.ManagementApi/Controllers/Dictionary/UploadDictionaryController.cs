@@ -55,9 +55,9 @@ public class UploadDictionaryController : DictionaryControllerBase
 
         if (xd.DocumentElement == null)
         {
-            return ValidationProblem(
+            return await Task.FromResult(ValidationProblem(
                 _localizedTextService.Localize("media", "failedFileUpload"),
-                _localizedTextService.Localize("speechBubbles", "fileErrorNotFound"));
+                _localizedTextService.Localize("speechBubbles", "fileErrorNotFound")));
         }
 
         var model = new DictionaryImportViewModel
@@ -88,6 +88,6 @@ public class UploadDictionaryController : DictionaryControllerBase
                 _localizedTextService.Localize("dictionary", "noItemsInFile"));
         }
 
-        return model;
+        return await Task.FromResult(model);
     }
 }

@@ -11,10 +11,8 @@ public class GetAllCultureController : CultureControllerBase
 {
     private readonly IUmbracoMapper _umbracoMapper;
 
-    public GetAllCultureController(IUmbracoMapper umbracoMapper)
-    {
-        _umbracoMapper = umbracoMapper;
-    }
+    public GetAllCultureController(IUmbracoMapper umbracoMapper) => _umbracoMapper = umbracoMapper;
+
     /// <summary>
     ///     Returns all cultures available for creating languages.
     /// </summary>
@@ -30,6 +28,6 @@ public class GetAllCultureController : CultureControllerBase
             .Skip(skip)
             .Take(take);
 
-        return _umbracoMapper.Map<PagedViewModel<CultureViewModel>>(list)!;
+        return await Task.FromResult(_umbracoMapper.Map<PagedViewModel<CultureViewModel>>(list)!);
     }
 }

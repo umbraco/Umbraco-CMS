@@ -31,6 +31,6 @@ public class AllLanguageController : LanguageControllerBase
     {
         PagedModel<ILanguage> allLanguages = _localizationService.GetAllLanguagesPaged(skip, take);
 
-        return _umbracoMapper.Map<PagedModel<ILanguage>, PagedViewModel<LanguageViewModel>>(allLanguages)!;
+        return await Task.FromResult(_umbracoMapper.Map<PagedModel<ILanguage>, PagedViewModel<LanguageViewModel>>(allLanguages)!);
     }
 }

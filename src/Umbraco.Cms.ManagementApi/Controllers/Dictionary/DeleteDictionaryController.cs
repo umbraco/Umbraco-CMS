@@ -33,7 +33,7 @@ public class DeleteDictionaryController : DictionaryControllerBase
 
         if (foundDictionary == null)
         {
-            return NotFound();
+            return await Task.FromResult(NotFound());
         }
 
         IEnumerable<IDictionaryItem> foundDictionaryDescendants =
@@ -46,6 +46,6 @@ public class DeleteDictionaryController : DictionaryControllerBase
 
         _localizationService.Delete(foundDictionary, _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
 
-        return Ok();
+        return await Task.FromResult(Ok());
     }
 }

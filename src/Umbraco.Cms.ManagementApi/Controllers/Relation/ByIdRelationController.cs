@@ -22,7 +22,7 @@ public class ByIdRelationController : RelationControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(RelationViewModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(NotFoundResult), StatusCodes.Status404NotFound)]
-    public IActionResult ById(int id)
+    public async Task<ActionResult> ById(int id)
     {
         IRelation? relation = _relationService.GetById(id);
         if (relation is null)
@@ -30,6 +30,6 @@ public class ByIdRelationController : RelationControllerBase
             return NotFound();
         }
 
-        return Ok(_relationViewModelFactory.Create(relation));
+        return await Task.FromResult(Ok(_relationViewModelFactory.Create(relation)));
     }
 }

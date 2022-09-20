@@ -53,7 +53,7 @@ public class ImportDictionaryController : DictionaryControllerBase
         var filePath = Path.Combine(_hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.Data), file);
         if (!System.IO.File.Exists(filePath))
         {
-            return NotFound();
+            return await Task.FromResult(NotFound());
         }
 
         var xd = new XmlDocument { XmlResolver = null };
@@ -77,6 +77,6 @@ public class ImportDictionaryController : DictionaryControllerBase
 
         IDictionaryItem dictionaryItem = dictionaryItems.First();
 
-        return Content(_dictionaryService.CalculatePath(dictionaryItem.ParentId, dictionaryItem.Id), MediaTypeNames.Text.Plain, Encoding.UTF8);
+        return await Task.FromResult(Content(_dictionaryService.CalculatePath(dictionaryItem.ParentId, dictionaryItem.Id), MediaTypeNames.Text.Plain, Encoding.UTF8));
     }
 }

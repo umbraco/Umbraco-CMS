@@ -37,10 +37,12 @@ public class ForItemTrackedReferencesController : TrackedReferencesControllerBas
     {
 
         IEnumerable<RelationItemModel> relationItems = _trackedReferencesService.GetPagedRelationsForItem(id, skip, take, filterMustBeIsDependency ?? false, out var totalItems);
-        return new PagedViewModel<RelationItemViewModel>
+        var pagedViewModel = new PagedViewModel<RelationItemViewModel>
         {
             Items = _umbracoMapper.MapEnumerable<RelationItemModel, RelationItemViewModel>(relationItems),
             Total = totalItems,
         };
+
+        return await Task.FromResult(pagedViewModel);
     }
 }
