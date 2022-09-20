@@ -57,8 +57,6 @@ internal class SystemInformationTelemetryProvider : IDetailedTelemetryProvider, 
 
     private bool IsDebug => _hostingSettings.Debug;
 
-    private bool UmbracoPathCustomized => _globalSettings.UmbracoPath != Constants.System.DefaultUmbracoPath;
-
     private string AspEnvironment => _hostEnvironment.EnvironmentName;
 
     private string ServerOs => RuntimeInformation.OSDescription;
@@ -74,7 +72,6 @@ internal class SystemInformationTelemetryProvider : IDetailedTelemetryProvider, 
             new(Constants.Telemetry.OsLanguage, CurrentCulture),
             new(Constants.Telemetry.WebServer, CurrentWebServer),
             new(Constants.Telemetry.ModelsBuilderMode, ModelsBuilderMode),
-            new(Constants.Telemetry.CustomUmbracoPath, UmbracoPathCustomized),
             new(Constants.Telemetry.AspEnvironment, AspEnvironment), new(Constants.Telemetry.IsDebug, IsDebug),
             new(Constants.Telemetry.DatabaseProvider, DatabaseProvider),
             new(Constants.Telemetry.CurrentServerRole, CurrentServerRole),

@@ -65,23 +65,6 @@ public class SystemInformationTelemetryProviderTests
     }
 
     [Test]
-    [TestCase(GlobalSettings.StaticUmbracoPath, false)]
-    [TestCase("mycustompath", true)]
-    [TestCase("~/notUmbraco", true)]
-    [TestCase("/umbraco", true)]
-    [TestCase("umbraco", true)]
-    public void ReportsCustomUmbracoPathCorrectly(string path, bool isCustom)
-    {
-        var telemetryProvider = CreateProvider(umbracoPath: path);
-
-        var usageInformation = telemetryProvider.GetInformation().ToArray();
-        var actual = usageInformation.FirstOrDefault(x => x.Name == Constants.Telemetry.CustomUmbracoPath);
-
-        Assert.NotNull(actual?.Data);
-        Assert.AreEqual(isCustom, actual.Data);
-    }
-
-    [Test]
     [TestCase("Development")]
     [TestCase("Staging")]
     [TestCase("Production")]
