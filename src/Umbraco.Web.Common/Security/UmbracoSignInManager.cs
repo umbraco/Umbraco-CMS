@@ -219,13 +219,6 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
             userPrincipal.Identities.First().AddClaim(claim);
         }
 
-        // Setting GivenName claim to be the name of member/user
-        // As the name claim is currently the emailaddress/login of the member/user
-        // Can't set the 'name' claim to be the name of the member or user as the backoffice is expecting
-        // the name claim to contain the email/username for the backoffice user login
-        var name = user.Name ?? "Unknown";
-        userPrincipal.Identities.First().AddOrUpdateClaim(new Claim(ClaimTypes.GivenName, name));
-
         // FYI (just for informational purposes):
         // This calls an ext method will eventually reaches `IAuthenticationService.SignInAsync`
         // which then resolves the `IAuthenticationSignInHandler` for the current scheme
