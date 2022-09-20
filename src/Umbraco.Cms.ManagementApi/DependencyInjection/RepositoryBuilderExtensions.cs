@@ -16,10 +16,6 @@ public static class RepositoryBuilderExtensions
         builder.Services.AddScoped<ITrackedReferencesSkipTakeRepository, TrackedReferencesSkipTakeRepository>();
         builder.Services.AddTransient<ITrackedReferencesSkipTakeService, TrackedReferencesSkipTakeService>();
 
-        builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>()
-            .Add<TrackedReferenceViewModelsMapDefinition>()
-            .Add<RelationModelMapDefinition>();
-
         return builder;
     }
 
