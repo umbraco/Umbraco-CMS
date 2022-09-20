@@ -151,13 +151,11 @@ namespace Umbraco.Cms.Infrastructure.WebAssets {
         ///   Looks up a localized string similar to [
         ///    &apos;lib/tinymce/tinymce.min.js&apos;,
         ///
-        ///    &apos;lib/tinymce/plugins/paste/plugin.min.js&apos;,
         ///    &apos;lib/tinymce/plugins/anchor/plugin.min.js&apos;,
         ///    &apos;lib/tinymce/plugins/charmap/plugin.min.js&apos;,
         ///    &apos;lib/tinymce/plugins/table/plugin.min.js&apos;,
         ///    &apos;lib/tinymce/plugins/lists/plugin.min.js&apos;,
         ///    &apos;lib/tinymce/plugins/advlist/plugin.min.js&apos;,
-        ///    &apos;lib/tinymce/plugins/hr/plugin.min.js&apos;,
         ///    &apos;lib/tinymce/plugins/autolink/plugin.min.js&apos;,
         ///    &apos;lib/tinymce/plugins/directionality/plugin.min.js&apos;,
         ///    &apos;lib/tinymce/plugins/t [rest of string was truncated]&quot;;.
