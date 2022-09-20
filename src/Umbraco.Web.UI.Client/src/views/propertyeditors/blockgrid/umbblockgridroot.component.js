@@ -49,6 +49,7 @@
                     <umb-block-grid-entries
                         block-editor-api="vm.blockEditorApi"
                         entries="vm.entries"
+                        layout-columns="vm.gridColumns"
                         property-editor-form="vm.propertyEditorForm"
                         depth="0">
                     </umb-block-grid-entries>

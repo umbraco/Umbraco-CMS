@@ -76,6 +76,7 @@
             controllerAs: "vm",
             bindings: {
                 blockEditorApi: "<",
+                layoutColumns: "<",
                 layoutEntry: "<",
                 index: "<",
                 parentBlock: "<",

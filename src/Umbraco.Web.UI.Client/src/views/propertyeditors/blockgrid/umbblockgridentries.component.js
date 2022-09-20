@@ -17,6 +17,7 @@
             bindings: {
                 blockEditorApi: "<",
                 entries: "<",
+                layoutColumns: "<",
                 areaKey: "<?",
                 parentBlock: "<?",
                 parentForm: "<?",
@@ -374,18 +375,19 @@
                         }
                     }
 
-
-                    const oldForceLeft = vm.movingLayoutEntry.forceLeft;
-                    const oldForceRight = vm.movingLayoutEntry.forceRight;
-                    var newValue = (dragX - dragOffsetX < targetRect.left - 50);
-                    if(newValue !== oldForceLeft) {
-                        vm.movingLayoutEntry.forceLeft = newValue;
-                        if(oldForceRight) {
-                            vm.movingLayoutEntry.forceRight = false;
+                    if(vm.movingLayoutEntry.columnSpan !== vm.layoutColumns) {
+                        const oldForceLeft = vm.movingLayoutEntry.forceLeft;
+                        const oldForceRight = vm.movingLayoutEntry.forceRight;
+                        var newValue = (dragX - dragOffsetX < targetRect.left - 50);
+                        if(newValue !== oldForceLeft) {
+                            vm.movingLayoutEntry.forceLeft = newValue;
+                            if(oldForceRight) {
+                                vm.movingLayoutEntry.forceRight = false;
+                            }
+                            vm.blockEditorApi.internal.setDirty();
+                            vm.movingLayoutEntry.$block.__scope.$evalAsync();// needed for the block to be updated
+                            $scope.$evalAsync();
                         }
-                        vm.blockEditorApi.internal.setDirty();
-                        vm.movingLayoutEntry.$block.__scope.$evalAsync();// needed for the block to be updated
-                        $scope.$evalAsync();
                     }
 
                     newValue = (dragX - dragOffsetX + ghostRect.width > targetRect.right + 50) && (vm.movingLayoutEntry.forceLeft !== true);

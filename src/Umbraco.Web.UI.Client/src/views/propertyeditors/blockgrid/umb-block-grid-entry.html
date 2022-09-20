@@ -44,6 +44,7 @@
                     block-editor-api="vm.blockEditorApi"
                     entries="areaEntry.items"
                     area-key="areaEntry.key"
+                    layout-columns="areaEntry.$config.columnSpan"
                     parent-block="vm.layoutEntry.$block"
                     parent-form="vm.blockForm"
                     property-editor-form="vm.propertyEditorForm"
@@ -125,7 +126,7 @@
         </div>
 
         <button 
-            ng-if="!vm.blockEditorApi.readonly"
+            ng-if="vm.blockEditorApi.readonly !== true && (vm.layoutColumns !== vm.layoutEntry.columnSpan || (vm.layoutColumns === vm.layoutEntry.columnSpan && vm.layoutEntry.forceLeft))"
             type="button" 
             aria-labelledby="forceLeftLabel"
             title="@blockEditor_forceLeftButtonTitle"
@@ -141,7 +142,7 @@
         </button>
 
         <button 
-            ng-if="!vm.blockEditorApi.readonly"
+            ng-if="vm.blockEditorApi.readonly !== true && (vm.layoutColumns !== vm.layoutEntry.columnSpan || (vm.layoutColumns === vm.layoutEntry.columnSpan && vm.layoutEntry.forceRight))"
             type="button" 
             aria-labelledby="forceRightLabel"
             title="@blockEditor_forceRightButtonTitle"
@@ -157,7 +158,7 @@
         </button>
 
         <button 
-            ng-if="!vm.blockEditorApi.readonly && (vm.layoutEntry.$block.config.columnSpanOptions.length > 1 || (vm.layoutEntry.$block.config.rowMinSpan && vm.layoutEntry.$block.config.rowMaxSpan && vm.layoutEntry.$block.config.rowMaxSpan !== vm.layoutEntry.$block.config.rowMinSpan))" 
+            ng-if="::!vm.blockEditorApi.readonly && (vm.layoutEntry.$block.config.columnSpanOptions.length > 1 || (vm.layoutEntry.$block.config.rowMinSpan && vm.layoutEntry.$block.config.rowMaxSpan && vm.layoutEntry.$block.config.rowMaxSpan !== vm.layoutEntry.$block.config.rowMinSpan))" 
             type="button"
             title="@blockEditor_scaleHandlerButtonTitle"
             localize="title"
@@ -165,7 +166,7 @@
             ng-mousedown="vm.scaleHandlerMouseDown($event)" 
             ng-keyup="vm.scaleHandlerKeyUp($event)">
         </button>
-        <div ng-if="!vm.blockEditorApi.readonly && (vm.layoutEntry.$block.config.columnSpanOptions.length > 1 || (vm.layoutEntry.$block.config.rowMinSpan && vm.layoutEntry.$block.config.rowMaxSpan && vm.layoutEntry.$block.config.rowMaxSpan !== vm.layoutEntry.$block.config.rowMinSpan))" 
+        <div ng-if="::!vm.blockEditorApi.readonly && (vm.layoutEntry.$block.config.columnSpanOptions.length > 1 || (vm.layoutEntry.$block.config.rowMinSpan && vm.layoutEntry.$block.config.rowMaxSpan && vm.layoutEntry.$block.config.rowMaxSpan !== vm.layoutEntry.$block.config.rowMinSpan))" 
             class="umb-block-grid__scale-label">
             {{vm.layoutEntry.columnSpan}} x {{vm.layoutEntry.rowSpan}}
         </div>
