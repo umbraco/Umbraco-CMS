@@ -90,7 +90,7 @@
     function BlockGridEntryController($scope, $element) {
 
         const vm = this;
-        vm.areaGridColumns = 'initial';
+        vm.areaGridColumns = '';
         vm.areaGridStyles = {};
         vm.isHoveringArea = false;
         vm.isScaleMode = false;
@@ -101,9 +101,8 @@
 
             if(vm.layoutEntry.$block.config.areaGridColumns) {
                 vm.areaGridColumns = vm.layoutEntry.$block.config.areaGridColumns.toString();
-                vm.areaGridStyles['--umb-block-grid--area-grid-columns'] = vm.areaGridColumns;
             } else {
-                vm.areaGridStyles['--umb-block-grid--area-grid-columns'] = 'initial';
+                vm.areaGridColumns = vm.layoutColumns.toString();
             }
             $scope.$evalAsync();
         }
