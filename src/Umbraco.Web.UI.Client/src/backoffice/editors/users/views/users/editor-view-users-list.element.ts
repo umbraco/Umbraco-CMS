@@ -8,7 +8,7 @@ import { Subscription } from 'rxjs';
 
 interface TableColumn {
 	name: string;
-	sort: Function;
+	sort: (items: Array<UserItem>, desc: boolean) => Array<UserItem>;
 }
 
 @customElement('umb-editor-view-users-list')
