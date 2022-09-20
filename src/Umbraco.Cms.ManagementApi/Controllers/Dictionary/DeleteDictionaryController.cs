@@ -25,7 +25,7 @@ public class DeleteDictionaryController : DictionaryControllerBase
     /// </returns>
     [HttpDelete("{key}")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(ActionResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(NotFoundResult), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(Guid key)
     {
