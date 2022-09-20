@@ -28,6 +28,10 @@ export class UmbEditorViewUsersElement extends UmbContextProviderMixin(LitElemen
 				justify-content: space-between;
 			}
 
+			#user-list-top-bar {
+				margin-bottom: var(--uui-size-space-4);
+			}
+
 			#user-list {
 				margin-top: var(--uui-size-layout-2);
 				font-size: 1rem;
