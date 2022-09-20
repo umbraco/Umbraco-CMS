@@ -19,7 +19,7 @@ public class AllAnalyticsController : AnalyticsControllerBase
     [ProducesResponseType(typeof(AnalyticsLevelViewModel), StatusCodes.Status200OK)]
     public async Task<PagedViewModel<TelemetryLevel>> GetAll(int skip, int take)
     {
-        TelemetryLevel[] levels = { TelemetryLevel.Minimal, TelemetryLevel.Basic, TelemetryLevel.Detailed };
+        TelemetryLevel[] levels = Enum.GetValues<TelemetryLevel>();
         return _pagedViewModelFactory.Create(levels, skip, take);
     }
 }

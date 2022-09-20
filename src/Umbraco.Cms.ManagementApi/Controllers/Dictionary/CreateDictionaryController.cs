@@ -80,7 +80,7 @@ public class CreateDictionaryController : DictionaryControllerBase
                 string.Empty);
 
 
-            return Created($"api/v1.0/dictionary/{item.Key}", null);
+            return Created($"api/v1.0/dictionary/{item.Key}", item.Key);
         }
         catch (Exception ex)
         {
