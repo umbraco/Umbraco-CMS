@@ -8,18 +8,15 @@ namespace Umbraco.Cms.Core.Services;
 //
 public class TrackedReferencesService : ITrackedReferencesService
 {
-    private readonly IEntityService _entityService;
     private readonly ICoreScopeProvider _scopeProvider;
     private readonly ITrackedReferencesRepository _trackedReferencesRepository;
 
     public TrackedReferencesService(
         ITrackedReferencesRepository trackedReferencesRepository,
-        ICoreScopeProvider scopeProvider,
-        IEntityService entityService)
+        ICoreScopeProvider scopeProvider)
     {
         _trackedReferencesRepository = trackedReferencesRepository;
         _scopeProvider = scopeProvider;
-        _entityService = entityService;
     }
 
     /// <summary>
@@ -64,7 +61,7 @@ public class TrackedReferencesService : ITrackedReferencesService
     public PagedModel<RelationItemModel> GetPagedRelationsForItem(int id, long skip, long take, bool filterMustBeIsDependency)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
-        IEnumerable<RelationItemModel> items = _trackedReferencesSkipTakeRepository.GetPagedRelationsForItem(id, skip, take, filterMustBeIsDependency, out var totalItems);
+        IEnumerable<RelationItemModel> items = _trackedReferencesRepository.GetPagedRelationsForItem(id, skip, take, filterMustBeIsDependency, out var totalItems);
         var pagedModel = new PagedModel<RelationItemModel>(totalItems, items);
 
         return pagedModel;
@@ -74,7 +71,7 @@ public class TrackedReferencesService : ITrackedReferencesService
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
 
-        IEnumerable<RelationItemModel> items = _trackedReferencesSkipTakeRepository.GetPagedDescendantsInReferences(
+        IEnumerable<RelationItemModel> items = _trackedReferencesRepository.GetPagedDescendantsInReferences(
             parentId,
             skip,
             take,
@@ -88,7 +85,7 @@ public class TrackedReferencesService : ITrackedReferencesService
     public PagedModel<RelationItemModel> GetPagedItemsWithRelations(int[] ids, long skip, long take, bool filterMustBeIsDependency)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
-        IEnumerable<RelationItemModel> items = _trackedReferencesSkipTakeRepository.GetPagedItemsWithRelations(ids, skip, take, filterMustBeIsDependency, out var totalItems);
+        IEnumerable<RelationItemModel> items = _trackedReferencesRepository.GetPagedItemsWithRelations(ids, skip, take, filterMustBeIsDependency, out var totalItems);
         var pagedModel = new PagedModel<RelationItemModel>(totalItems, items);
 
         return pagedModel;
