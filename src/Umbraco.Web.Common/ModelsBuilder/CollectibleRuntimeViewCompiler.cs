@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Razor.Hosting;
 using Microsoft.AspNetCore.Razor.Language;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.Emit;
 using Microsoft.CodeAnalysis.Text;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.FileProviders;
@@ -27,6 +28,7 @@ internal class CollectibleRuntimeViewCompiler : IViewCompiler
     private readonly ILogger _logger;
     private readonly InMemoryModelFactory _inMemoryModelFactory;
     private readonly UmbracoRazorReferenceManager _referenceManager;
+    private readonly CompilationOptionsProvider _compilationOptionsProvider;
     private UmbracoAssemblyLoadContext? _currentAssemblyLoadContext;
 
     public CollectibleRuntimeViewCompiler(
@@ -35,7 +37,8 @@ internal class CollectibleRuntimeViewCompiler : IViewCompiler
         IList<CompiledViewDescriptor> precompiledViews,
         ILogger logger,
         InMemoryModelFactory inMemoryModelFactory,
-        UmbracoRazorReferenceManager referenceManager)
+        UmbracoRazorReferenceManager referenceManager,
+        CompilationOptionsProvider compilationOptionsProvider)
     {
         if (fileProvider == null)
         {
@@ -62,6 +65,7 @@ internal class CollectibleRuntimeViewCompiler : IViewCompiler
         _logger = logger;
         _inMemoryModelFactory = inMemoryModelFactory;
         _referenceManager = referenceManager;
+        _compilationOptionsProvider = compilationOptionsProvider;
 
         _normalizedPathCache = new ConcurrentDictionary<string, string>(StringComparer.Ordinal);
 
@@ -339,23 +343,22 @@ internal class CollectibleRuntimeViewCompiler : IViewCompiler
 
     internal Assembly CompileAndEmit(RazorCodeDocument codeDocument, string generatedCode)
     {
-
         var startTimestamp = _logger.IsEnabled(LogLevel.Debug) ? Stopwatch.GetTimestamp() : 0;
 
         var assemblyName = Path.GetRandomFileName();
-        var compilation = CreateCompilation(generatedCode, assemblyName);
+        CSharpCompilation compilation = CreateCompilation(generatedCode, assemblyName);
 
-        // TODO: Need a way to know if Pdb needs to be emited...
-        // var emitOptions = _csharpCompiler.EmitOptions;
-        // var emitPdbFile = _csharpCompiler.EmitPdb && emitOptions.DebugInformationFormat != DebugInformationFormat.Embedded;
+        EmitOptions emitOptions = _compilationOptionsProvider.EmitOptions;
+        var emitPdbFile = _compilationOptionsProvider.EmitPdb && emitOptions.DebugInformationFormat != DebugInformationFormat.Embedded;
+
 
         using (var assemblyStream = new MemoryStream())
-        using (var pdbStream = /*emitPdbFile ?*/ new MemoryStream() /*: null*/)
+        using (MemoryStream? pdbStream = emitPdbFile ? new MemoryStream() : null)
         {
             var result = compilation.Emit(
-                assemblyStream
-                /* pdbStream */
-                /*options: emitOptions*/);
+                assemblyStream,
+                pdbStream,
+                options: _compilationOptionsProvider.EmitOptions);
 
             if (!result.Success)
             {
@@ -373,7 +376,7 @@ internal class CollectibleRuntimeViewCompiler : IViewCompiler
 
             // TODO: Use collectible context.
             // var assembly = Assembly.Load(assemblyStream.ToArray(), pdbStream?.ToArray());
-            var assembly = _inMemoryModelFactory._currentAssemblyLoadContext?.LoadFromStream(assemblyStream);
+            var assembly = _inMemoryModelFactory._currentAssemblyLoadContext?.LoadFromStream(assemblyStream, pdbStream);
             // var assembly = Assembly.Load(assemblyStream.ToArray(), pdbStream?.ToArray());
 
             return assembly!;
@@ -390,21 +393,18 @@ internal class CollectibleRuntimeViewCompiler : IViewCompiler
         }
         PortableExecutableReference inMemoryAutoReference = MetadataReference.CreateFromFile(_inMemoryModelFactory.CurrentModelsAssembly.Location);
 
-        var options = new CSharpCompilationOptions(
-            OutputKind.DynamicallyLinkedLibrary,
-            optimizationLevel: OptimizationLevel.Release,
-            assemblyIdentityComparer: DesktopAssemblyIdentityComparer.Default);
-
 
         var sourceText = SourceText.From(compilationContent, Encoding.UTF8);
-        // var syntaxTree = _csharpCompiler.CreateSyntaxTree(sourceText).WithFilePath(assemblyName);
-        var syntaxTree = SyntaxFactory.ParseSyntaxTree(sourceText).WithFilePath(assemblyName);
+        SyntaxTree syntaxTree = SyntaxFactory
+            .ParseSyntaxTree(sourceText, _compilationOptionsProvider.ParseOptions)
+            .WithFilePath(assemblyName);
+
         return CSharpCompilation
                 .Create(assemblyName)
                 .AddSyntaxTrees(syntaxTree)
                 .AddReferences(refs)
                 .AddReferences(inMemoryAutoReference)
-                .WithOptions(options);
+                .WithOptions(_compilationOptionsProvider.CSharpCompilationOptions);
     }
 
     private string GetNormalizedPath(string relativePath)

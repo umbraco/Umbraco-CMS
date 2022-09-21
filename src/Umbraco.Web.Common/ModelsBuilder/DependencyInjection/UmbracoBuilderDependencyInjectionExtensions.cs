@@ -135,6 +135,7 @@ public static class UmbracoBuilderDependencyInjectionExtensions
         // copy the current collection, we need to use this later to rebuild a container
         // to re-create the razor compiler provider
         builder.Services.AddSingleton<UmbracoRazorReferenceManager>();
+        builder.Services.AddSingleton<CompilationOptionsProvider>();
 
         var initialCollection = new ServiceCollection { builder.Services };
 
@@ -180,6 +181,7 @@ public static class UmbracoBuilderDependencyInjectionExtensions
             actualProvider.GetRequiredService<ILoggerFactory>(),
             prov.GetRequiredService<IOptions<MvcRazorRuntimeCompilationOptions>>(),
             actualProvider.GetRequiredService<InMemoryModelFactory>(),
-            actualProvider.GetRequiredService<UmbracoRazorReferenceManager>()));
+            actualProvider.GetRequiredService<UmbracoRazorReferenceManager>(),
+            actualProvider.GetRequiredService<CompilationOptionsProvider>()));
     }
 }
