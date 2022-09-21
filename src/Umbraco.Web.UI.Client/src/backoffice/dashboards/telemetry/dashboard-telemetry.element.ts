@@ -2,10 +2,10 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 
-import { customElement, property, state } from 'lit/decorators.js';
+import { customElement, state } from 'lit/decorators.js';
 
 import type { TelemetryModel } from '../../../core/models';
-import { getConsentLevel, getConsentLevels } from '../../../core/api/fetcher';
+import { getConsentLevel, getConsentLevels, postConsentLevel } from '../../../core/api/fetcher';
 
 export type SettingOption = 'Minimal' | 'Basic' | 'Detailed';
 
@@ -21,25 +21,16 @@ export class UmbDashboardTelemetryElement extends LitElement {
 	];
 
 	@state()
-	private _telemetryLevels: TelemetryModel[] = [
-		{ level: 'Minimal', description: 'We will only send an anonymized site ID to let us know that the site exists.' },
-		{ level: 'Basic', description: 'We will send an anonymized site ID, Umbraco version, and packages installed.' },
-		{
-			level: 'Detailed',
-			description: `We will send:<ul>
-			<li>Anonymized site ID, Umbraco version, and packages installed.</li>
-			<li>Number of: Root nodes, Content nodes, Macros, Media, Document Types, Templates, Languages, Domains, User Group, Users, Members, and Property Editors in use.</li>
-			<li>System information: Webserver, server OS, server framework, server OS language, and database provider.</li>
-			<li>Configuration settings: Modelsbuilder mode, if custom Umbraco path exists, ASP environment, and if you are in debug mode.</li>
-			</ul>
-			
-			<i>We might change what we send on the Detailed level in the future. If so, it will be listed above.
-			By choosing "Detailed" you agree to current and future anonymized information being collected.</i>`,
-		},
-	];
+	private _telemetryFormData: TelemetryModel['level'] = 'Basic';
 
 	@state()
-	private _telemetryFormData?: TelemetryModel['level'] = 'Basic';
+	private _description = 'We will send an anonymized site ID, Umbraco version, and packages installed.';
+
+	@state()
+	private _telemetryLevels: TelemetryModel['level'][] = [];
+
+	@state()
+	private _errorMessage = '';
 
 	constructor() {
 		super();
@@ -47,13 +38,46 @@ export class UmbDashboardTelemetryElement extends LitElement {
 
 	connectedCallback(): void {
 		super.connectedCallback();
-		getConsentLevel({}).then((data) => {
-			console.log(data);
-		});
-		getConsentLevels({}).then((data) => {
-			console.log(data);
-		});
+		this._setup();
 	}
+
+	private async _setup() {
+		// All telemetry levels
+		try {
+			const consentLevels = await getConsentLevels({});
+			// TODO ....
+			this._telemetryLevels = consentLevels.data;
+		} catch (e) {
+			this._errorMessage;
+		}
+
+		// Current setting
+		try {
+			const consentSetting = await getConsentLevel({});
+			this._telemetryFormData = consentSetting.data.telemetryLevel;
+		} catch (e) {
+			if (e instanceof getConsentLevel.Error) {
+				this._errorMessage = e.data.detail;
+			}
+		}
+	}
+
+	private _handleSubmit = async (e: CustomEvent<SubmitEvent>) => {
+		e.stopPropagation();
+
+		try {
+			await postConsentLevel({ telemetryLevel: this._telemetryFormData });
+		} catch (e) {
+			if (e instanceof postConsentLevel.Error) {
+				const error = e.getActualType();
+				if (error.status === 400) {
+					this._errorMessage = error.data.detail || 'Unknown error, please try again';
+				}
+			} else {
+				this._errorMessage = 'Unknown error, please try again';
+			}
+		}
+	};
 
 	disconnectedCallback(): void {
 		super.disconnectedCallback();
@@ -61,15 +85,36 @@ export class UmbDashboardTelemetryElement extends LitElement {
 
 	private _handleChange(e: InputEvent) {
 		const target = e.target as HTMLInputElement;
-		this._telemetryFormData = this._telemetryLevels[parseInt(target.value) - 1].level;
+		this._telemetryFormData = this._telemetryLevels[parseInt(target.value) - 1];
 	}
 
 	private get _selectedTelemetryIndex() {
-		return this._telemetryLevels?.findIndex((x) => x.level === this._telemetryFormData) ?? 0;
+		return this._telemetryLevels?.findIndex((x) => x === this._telemetryFormData) ?? 0;
 	}
 
 	private get _selectedTelemetry() {
-		return this._telemetryLevels?.find((x) => x.level === this._telemetryFormData) ?? this._telemetryLevels[0];
+		return this._telemetryLevels?.find((x) => x === this._telemetryFormData) ?? this._telemetryLevels[0];
+	}
+
+	private get _selectedTelemetryDescription() {
+		switch (this._selectedTelemetry) {
+			case 'Minimal':
+				return 'We will only send an anonymized site ID to let us know that the site exists.';
+			case 'Basic':
+				return 'We will send an anonymized site ID, Umbraco version, and packages installed.';
+			case 'Detailed':
+				return `We will send:<ul>
+				<li>Anonymized site ID, Umbraco version, and packages installed.</li>
+				<li>Number of: Root nodes, Content nodes, Macros, Media, Document Types, Templates, Languages, Domains, User Group, Users, Members, and Property Editors in use.</li>
+				<li>System information: Webserver, server OS, server framework, server OS language, and database provider.</li>
+				<li>Configuration settings: Modelsbuilder mode, if custom Umbraco path exists, ASP environment, and if you are in debug mode.</li>
+				</ul>
+				
+				<i>We might change what we send on the Detailed level in the future. If so, it will be listed above.
+				By choosing "Detailed" you agree to current and future anonymized information being collected.</i>`;
+			default:
+				return 'Something may have gone wrong';
+		}
 	}
 
 	private _renderSettingSlider() {
@@ -84,8 +129,8 @@ export class UmbDashboardTelemetryElement extends LitElement {
 				min="1"
 				max=${this._telemetryLevels.length}
 				hide-step-values></uui-slider>
-			<h2>${this._selectedTelemetry.level}</h2>
-			<p>${unsafeHTML(this._selectedTelemetry.description)}</p>
+			<h2>${this._selectedTelemetry}</h2>
+			<p>${unsafeHTML(this._selectedTelemetryDescription)}</p>
 		`;
 	}
 
@@ -104,7 +149,9 @@ export class UmbDashboardTelemetryElement extends LitElement {
 						will be fully anonymized.
 					</p>
 					${this._renderSettingSlider()}
-					<uui-button look="primary" color="positive" label="Save telemetry settings">Save</uui-button>
+					<uui-button look="primary" color="positive" label="Save telemetry settings" @click="${this._handleSubmit}">
+						Save
+					</uui-button>
 				</div>
 			</uui-box>
 		`;

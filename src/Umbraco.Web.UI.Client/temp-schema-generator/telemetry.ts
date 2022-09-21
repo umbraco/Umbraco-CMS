@@ -1,4 +1,5 @@
 import { body, defaultResponse, endpoint, request, response } from '@airtasker/spot';
+import { TelemetryModel } from './installer';
 
 import { ProblemDetails } from './models';
 
@@ -42,5 +43,5 @@ export class PostConsentLevel {
 }
 
 export interface ConsentLevelSettings {
-	telemetryLevel: string;
+	telemetryLevel: TelemetryModel['level'];
 }

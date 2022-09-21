@@ -1,9 +1,9 @@
 import { rest } from 'msw';
 
 import umbracoPath from '../../core/helpers/umbraco-path';
-import type { ConsentLevelSettings } from '../../core/models';
+import type { ConsentLevelSettings, TelemetryModel } from '../../core/models';
 
-let telemetryLevel = 'Basic';
+let telemetryLevel: TelemetryModel['level'] = 'Basic';
 
 export const handlers = [
 	rest.get(umbracoPath('/telemetry/ConsentLevel'), (_req, res, ctx) => {
@@ -19,7 +19,7 @@ export const handlers = [
 		return res(
 			// Respond with a 200 status code
 			ctx.status(200),
-			ctx.json<string[]>(['Minimal', 'Basic', 'Detailed'])
+			ctx.json<TelemetryModel['level'][]>(['Minimal', 'Basic', 'Detailed'])
 		);
 	}),
 

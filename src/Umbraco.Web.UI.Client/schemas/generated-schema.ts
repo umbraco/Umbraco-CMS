@@ -322,7 +322,7 @@ export interface components {
       sections: string[];
     };
     ConsentLevelSettings: {
-      telemetryLevel: string;
+      telemetryLevel: components["schemas"]["ConsentLevel"];
     };
   };
 }

@@ -959,6 +959,6 @@ components:
       type: object
       properties:
         telemetryLevel:
-          type: string
+          $ref: '#/components/schemas/ConsentLevel'
       required:
         - telemetryLevel
