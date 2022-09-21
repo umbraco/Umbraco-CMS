@@ -55,6 +55,7 @@ public class UpdateDictionaryController : DictionaryControllerBase
 
         PatchResult? result = _jsonPatchService.Patch(updateViewModel, dictionaryToPatch);
 
+        // TODO V13: Use IJsonSerializer instead of JsonSerializer.Deserialize
         DictionaryViewModel? updatedDictionaryItem = JsonSerializer.Deserialize<DictionaryViewModel>(result?.Result);
         if (updatedDictionaryItem is null)
         {
