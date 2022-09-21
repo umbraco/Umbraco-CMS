@@ -16,7 +16,7 @@
 		"url": "https://umbraco.com"
 	},
 	"scripts": {
-		"pre-run": "generate:icons",
+		"pre-run": "npm run generate:icons",
 		"dev": "npm run pre-run && vite",
 		"build": "npm run pre-run && tsc && vite build --mode staging",
 		"build:production": "npm run pre-run && tsc && vite build",
