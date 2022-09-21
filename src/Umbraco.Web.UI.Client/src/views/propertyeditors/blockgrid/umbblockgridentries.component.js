@@ -374,9 +374,12 @@
                         }
                     }
 
+                    
                     if(vm.movingLayoutEntry.columnSpan !== vm.layoutColumns) {
+                        
                         const oldForceLeft = vm.movingLayoutEntry.forceLeft;
                         const oldForceRight = vm.movingLayoutEntry.forceRight;
+
                         var newValue = (dragX - dragOffsetX < targetRect.left - 50);
                         if(newValue !== oldForceLeft) {
                             vm.movingLayoutEntry.forceLeft = newValue;
@@ -387,14 +390,14 @@
                             vm.movingLayoutEntry.$block.__scope.$evalAsync();// needed for the block to be updated
                             $scope.$evalAsync();
                         }
-                    }
 
-                    newValue = (dragX - dragOffsetX + ghostRect.width > targetRect.right + 50) && (vm.movingLayoutEntry.forceLeft !== true);
-                    if(newValue !== oldForceRight) {
-                        vm.movingLayoutEntry.forceRight = newValue;
-                        vm.blockEditorApi.internal.setDirty();
-                        vm.movingLayoutEntry.$block.__scope.$evalAsync();// needed for the block to be updated
-                        $scope.$evalAsync();
+                        newValue = (dragX - dragOffsetX + ghostRect.width > targetRect.right + 50) && (vm.movingLayoutEntry.forceLeft !== true);
+                        if(newValue !== oldForceRight) {
+                            vm.movingLayoutEntry.forceRight = newValue;
+                            vm.blockEditorApi.internal.setDirty();
+                            vm.movingLayoutEntry.$block.__scope.$evalAsync();// needed for the block to be updated
+                            $scope.$evalAsync();
+                        }
                     }
                 }
             }
