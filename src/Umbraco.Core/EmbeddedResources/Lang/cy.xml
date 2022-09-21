@@ -2442,10 +2442,6 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
     <key alias="hSTSCheckHeaderNotFound"><![CDATA[Nid yw'r peniad <strong>Strict-Transport-Security</strong> wedi'i ganfod.]]></key>
     <key alias="hSTSSetHeaderInConfigDescription">Ychwanegu'r peniad 'Strict-Transport-Security' gyda'r gwerth 'max-age=10886400; preload' i'r adran httpProtocol/customHeaders o'r ffeil web.config. Defnyddiwch y trwsiad hyn dim ond os bydd gennych chi eich parthau yn rhedeg gyda https am yr 18 wythnos nesaf (o leiaf).</key>
     <key alias="hSTSSetHeaderInConfigSuccess">Mae'r peniad HSTS wedi'i ychwanegu at y ffeil web.config.</key>
-    <key alias="xssProtectionCheckHeaderFound"><![CDATA[Mae'r peniad <strong>X-XSS-Protection</strong> wedi'i ganfod.]]></key>
-    <key alias="xssProtectionCheckHeaderNotFound"><![CDATA[Nid yw'r peniad <strong>X-XSS-Protection</strong> wedi'i ganfod.]]></key>
-    <key alias="xssProtectionSetHeaderInConfigDescription">Ychwanegu'r peniad 'X-XSS-Protection' gyda'r gwerth '1; mode=block' at yr adran httpProtocol/customHeaders yn y ffeil web.config. </key>
-    <key alias="xssProtectionSetHeaderInConfigSuccess">Mae'r peniad X-XSS-Protection wedi'i ychwanegu at y ffeil web.config.</key>
     <!-- The following key get these tokens passed in:
   0: Comma delimitted list of headers found
 -->

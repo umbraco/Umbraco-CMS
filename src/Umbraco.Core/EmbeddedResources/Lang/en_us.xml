@@ -2444,9 +2444,6 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
       <![CDATA[The header <strong>Strict-Transport-Security</strong>, also known as the HSTS-header, was found.]]></key>
     <key alias="hSTSCheckHeaderNotFound">
       <![CDATA[The header <strong>Strict-Transport-Security</strong> was not found.]]></key>
-    <key alias="xssProtectionCheckHeaderFound"><![CDATA[The header <strong>X-XSS-Protection</strong> was found.]]></key>
-    <key alias="xssProtectionCheckHeaderNotFound">
-      <![CDATA[The header <strong>X-XSS-Protection</strong> was not found.]]></key>
     <!-- The following key get these tokens passed in:
 	    0: Comma delimitted list of headers found
   	-->
