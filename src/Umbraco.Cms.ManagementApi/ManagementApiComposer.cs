@@ -35,8 +35,7 @@ public class ManagementApiComposer : IComposer
             .AddUpgrader()
             .AddFactories()
             .AddServices()
-            .AddMappers()
-            .AddRepositories();
+            .AddMappers();
 
         services.AddApiVersioning(options =>
         {
