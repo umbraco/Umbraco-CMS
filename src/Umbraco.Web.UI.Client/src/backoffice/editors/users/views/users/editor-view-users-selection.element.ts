@@ -3,8 +3,8 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UmbContextConsumerMixin } from '../../../../../core/context';
 import { repeat } from 'lit/directives/repeat.js';
-import UmbEditorViewUsersElement, { UserItem } from './editor-view-users.element';
 import { Subscription } from 'rxjs';
+import UmbEditorViewUsersListElement, { UserItem } from './editor-view-users-list.element';
 
 @customElement('umb-editor-view-users-selection')
 export class UmbEditorViewUsersSelectionElement extends UmbContextConsumerMixin(LitElement) {
@@ -30,14 +30,14 @@ export class UmbEditorViewUsersSelectionElement extends UmbContextConsumerMixin(
 	@state()
 	private _selection: Array<string> = [];
 
-	protected _usersContext?: UmbEditorViewUsersElement;
+	protected _usersContext?: UmbEditorViewUsersListElement;
 	protected _usersSubscription?: Subscription;
 	protected _selectionSubscription?: Subscription;
 
 	connectedCallback(): void {
 		super.connectedCallback();
 
-		this.consumeContext('umbUsersContext', (usersContext: UmbEditorViewUsersElement) => {
+		this.consumeContext('umbUsersContext', (usersContext: UmbEditorViewUsersListElement) => {
 			this._usersContext = usersContext;
 
 			this._usersSubscription?.unsubscribe();
