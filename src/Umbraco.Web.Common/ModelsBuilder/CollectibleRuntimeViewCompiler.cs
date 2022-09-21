@@ -1,6 +1,5 @@
 ﻿using System.Collections.Concurrent;
 using System.Diagnostics;
-using System.Linq;
 using System.Reflection;
 using System.Text;
 using Microsoft.AspNetCore.Mvc.Razor.Compilation;
@@ -8,15 +7,12 @@ using Microsoft.AspNetCore.Razor.Hosting;
 using Microsoft.AspNetCore.Razor.Language;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.Emit;
 using Microsoft.CodeAnalysis.Text;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.DependencyModel;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
 using Umbraco.Cms.Core.Exceptions;
-using Umbraco.Cms.Infrastructure.ModelsBuilder;
 
 namespace Umbraco.Cms.Web.Common.ModelsBuilder;
 
@@ -30,6 +26,7 @@ internal class CollectibleRuntimeViewCompiler : IViewCompiler
     private readonly IMemoryCache _cache;
     private readonly ILogger _logger;
     private readonly InMemoryModelFactory _inMemoryModelFactory;
+    private readonly UmbracoRazorReferenceManager _referenceManager;
     private UmbracoAssemblyLoadContext? _currentAssemblyLoadContext;
 
     public CollectibleRuntimeViewCompiler(
@@ -37,7 +34,8 @@ internal class CollectibleRuntimeViewCompiler : IViewCompiler
         RazorProjectEngine projectEngine,
         IList<CompiledViewDescriptor> precompiledViews,
         ILogger logger,
-        InMemoryModelFactory inMemoryModelFactory)
+        InMemoryModelFactory inMemoryModelFactory,
+        UmbracoRazorReferenceManager referenceManager)
     {
         if (fileProvider == null)
         {
@@ -63,6 +61,7 @@ internal class CollectibleRuntimeViewCompiler : IViewCompiler
         _projectEngine = projectEngine;
         _logger = logger;
         _inMemoryModelFactory = inMemoryModelFactory;
+        _referenceManager = referenceManager;
 
         _normalizedPathCache = new ConcurrentDictionary<string, string>(StringComparer.Ordinal);
 
@@ -383,13 +382,13 @@ internal class CollectibleRuntimeViewCompiler : IViewCompiler
 
     private CSharpCompilation CreateCompilation(string compilationContent, string assemblyName)
     {
-        var refs =
-            DependencyContext.Default?.CompileLibraries
-                .SelectMany(cl => cl.ResolveReferencePaths())
-                .Select(asm => MetadataReference.CreateFromFile(asm));
-
-        var test = refs?.ToList();
-        test?.Add(MetadataReference.CreateFromFile(_inMemoryModelFactory.CurrentModelsAssembly?.Location!));
+        IReadOnlyList<MetadataReference> refs = _referenceManager.CompilationReferences;
+        // We'll add the reference to the InMemory assembly directly, this means we don't have to hack around with assembly parts.
+        if (_inMemoryModelFactory.CurrentModelsAssembly is null)
+        {
+            throw new InvalidOperationException("No InMemory assembly available, cannot compile views");
+        }
+        PortableExecutableReference inMemoryAutoReference = MetadataReference.CreateFromFile(_inMemoryModelFactory.CurrentModelsAssembly.Location);
 
         var options = new CSharpCompilationOptions(
             OutputKind.DynamicallyLinkedLibrary,
@@ -403,7 +402,8 @@ internal class CollectibleRuntimeViewCompiler : IViewCompiler
         return CSharpCompilation
                 .Create(assemblyName)
                 .AddSyntaxTrees(syntaxTree)
-                .AddReferences(test!)
+                .AddReferences(refs)
+                .AddReferences(inMemoryAutoReference)
                 .WithOptions(options);
     }
 

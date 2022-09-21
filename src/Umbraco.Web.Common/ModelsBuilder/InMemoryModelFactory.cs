@@ -35,7 +35,6 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
         private readonly IApplicationShutdownRegistry _hostingLifetime;
         private readonly ModelsGenerationError _errors;
         private readonly IPublishedValueFallback _publishedValueFallback;
-        private readonly ApplicationPartManager _applicationPartManager;
         private readonly Lazy<string> _pureLiveDirectory = null!;
         private readonly int _debugLevel;
         private Infos _infos = new Infos { ModelInfos = null, ModelTypeMap = new Dictionary<string, Type>() };
@@ -48,6 +47,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
         private ModelsBuilderSettings _config;
         private bool _disposedValue;
 
+        // TODO: Obsolete this ( we no longer need ApplicationPartManager)
         public InMemoryModelFactory(
             Lazy<UmbracoServices> umbracoServices,
             IProfilingLogger profilingLogger,
@@ -65,7 +65,6 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
             _hostingEnvironment = hostingEnvironment;
             _hostingLifetime = hostingLifetime;
             _publishedValueFallback = publishedValueFallback;
-            _applicationPartManager = applicationPartManager;
             _errors = new ModelsGenerationError(config, _hostingEnvironment);
             _ver = 1; // zero is for when we had no version
             _skipver = -1; // nothing to skip
@@ -368,13 +367,6 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
             if (!(_currentAssemblyLoadContext is null))
             {
                 _currentAssemblyLoadContext.Unload();
-
-                // we need to remove the current part too
-                ApplicationPart? currentPart = _applicationPartManager.ApplicationParts.FirstOrDefault(x => x.Name == RoslynCompiler.GeneratedAssemblyName);
-                if (currentPart != null)
-                {
-                    _applicationPartManager.ApplicationParts.Remove(currentPart);
-                }
             }
 
             // We must create a new assembly load context
@@ -394,15 +386,6 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
 
             // Load it in
             Assembly assembly = _currentAssemblyLoadContext.LoadFromAssemblyPath(tempFile);
-
-            // Add the assembly to the application parts - this is required because this is how
-            // the razor ReferenceManager resolves what to load, see
-            // https://github.com/dotnet/aspnetcore/blob/master/src/Mvc/Mvc.Razor.RuntimeCompilation/src/RazorReferenceManager.cs#L53
-            var partFactory = ApplicationPartFactory.GetApplicationPartFactory(assembly);
-            foreach (ApplicationPart applicationPart in partFactory.GetApplicationParts(assembly))
-            {
-                _applicationPartManager.ApplicationParts.Add(applicationPart);
-            }
 
             return assembly;
         }

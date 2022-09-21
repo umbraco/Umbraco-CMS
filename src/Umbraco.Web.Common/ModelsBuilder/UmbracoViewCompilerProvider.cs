@@ -13,6 +13,7 @@ internal class UmbracoViewCompilerProvider : IViewCompilerProvider
 {
     private readonly RazorProjectEngine _razorProjectEngine;
     private readonly InMemoryModelFactory _inMemoryModelFactory;
+    private readonly UmbracoRazorReferenceManager _umbracoRazorReferenceManager;
 
     private readonly ApplicationPartManager _applicationPartManager;
 
@@ -32,11 +33,13 @@ internal class UmbracoViewCompilerProvider : IViewCompilerProvider
         // RuntimeCompilationFileProvider fileProvider,
         ILoggerFactory loggerFactory,
         IOptions<MvcRazorRuntimeCompilationOptions> options,
-        InMemoryModelFactory inMemoryModelFactory)
+        InMemoryModelFactory inMemoryModelFactory,
+        UmbracoRazorReferenceManager umbracoRazorReferenceManager)
     {
         _applicationPartManager = applicationPartManager;
         _razorProjectEngine = razorProjectEngine;
         _inMemoryModelFactory = inMemoryModelFactory;
+        _umbracoRazorReferenceManager = umbracoRazorReferenceManager;
         _options = options.Value;
         // _fileProvider = fileProvider;
 
@@ -63,7 +66,8 @@ internal class UmbracoViewCompilerProvider : IViewCompilerProvider
             _razorProjectEngine,
             feature.ViewDescriptors,
             _logger,
-            _inMemoryModelFactory);
+            _inMemoryModelFactory,
+            _umbracoRazorReferenceManager);
     }
 
     private static IFileProvider GetCompositeFileProvider(MvcRazorRuntimeCompilationOptions options)
