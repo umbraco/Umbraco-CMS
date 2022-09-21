@@ -1,9 +1,8 @@
 import { css, html, LitElement, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, property, state } from 'lit/decorators.js';
-import { UmbContextConsumerMixin, UmbContextProviderMixin } from '../../../../../core/context';
-import { BehaviorSubject, Observable, Subscription } from 'rxjs';
-import { InterfaceColor, InterfaceLook } from '@umbraco-ui/uui-base/lib/types';
+import { customElement, state } from 'lit/decorators.js';
+import { UmbContextConsumerMixin } from '../../../../../core/context';
+import { Subscription } from 'rxjs';
 import './editor-view-users-table.element';
 import './editor-view-users-grid.element';
 import './editor-view-users-selection.element';

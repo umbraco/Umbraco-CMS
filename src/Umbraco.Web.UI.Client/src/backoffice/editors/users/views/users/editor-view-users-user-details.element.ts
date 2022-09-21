@@ -1,6 +1,6 @@
-import { css, html, LitElement, nothing } from 'lit';
+import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, property, state } from 'lit/decorators.js';
+import { customElement } from 'lit/decorators.js';
 import { UmbContextConsumerMixin } from '../../../../../core/context';
 
 @customElement('umb-editor-view-users-user-details')
