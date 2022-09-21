@@ -20,11 +20,19 @@ public class RootRelationTypeTreeController : RelationTypeTreeControllerBase
     [ProducesResponseType(typeof(PagedViewModel<EntityTreeItemViewModel>), StatusCodes.Status200OK)]
     public async Task<ActionResult<PagedViewModel<EntityTreeItemViewModel>>> Root(long pageNumber = 0, int pageSize = 100)
     {
-        IRelationType[] relationTypes = _relationService.GetAllRelationTypes().ToArray();
+        // pagination is not supported (yet) by relation service, so we do it in memory for now
+        // - chances are we won't have many relation types, so it won't be an actual issue
+        IRelationType[] allRelationTypes = _relationService.GetAllRelationTypes().ToArray();
 
-        EntityTreeItemViewModel[] viewModels = MapTreeItemViewModels(null, relationTypes);
+        EntityTreeItemViewModel[] viewModels = MapTreeItemViewModels(
+            null,
+            allRelationTypes
+                .OrderBy(relationType => relationType.Name)
+                .Skip((int)(pageNumber * pageSize))
+                .Take(pageSize)
+                .ToArray());
 
-        PagedViewModel<EntityTreeItemViewModel> result = PagedViewModel(viewModels, viewModels.Length);
+        PagedViewModel<EntityTreeItemViewModel> result = PagedViewModel(viewModels, allRelationTypes.Length);
         return await Task.FromResult(Ok(result));
     }
 }
