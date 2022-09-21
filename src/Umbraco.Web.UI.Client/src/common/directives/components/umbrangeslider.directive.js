@@ -332,7 +332,10 @@ For extra details about options and events take a look here: https://refreshless
               activePip[handle] = pip;
             }
           });
-          activePip[handle].classList.add("noUi-value-active");
+
+          if (activePip[handle]) {
+            activePip[handle].classList.add("noUi-value-active");
+          }
         });
       }
       function addPipClickHandler(){

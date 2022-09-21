@@ -64,7 +64,10 @@ angular.module("umbraco.install").controller("Umbraco.Install.UserController", f
             activePip[handle] = pip;
           }
         });
-        activePip[handle].classList.add("noUi-value-active");
+
+        if (activePip[handle]) {
+          activePip[handle].classList.add("noUi-value-active");
+        }
       });
 
       $(consentSlider).on('$destroy', function () {
