@@ -37,4 +37,17 @@ public class DictionaryItemTreeControllerBase : EntityTreeControllerBase<EntityT
             IsContainer = LocalizationService.GetDictionaryItemChildren(dictionaryItem.Key).Any(),
             ParentKey = parentKey
         }).ToArray();
+
+    // localization service does not (yet) allow pagination of dictionary items, we have to do it in memory for now
+    protected IDictionaryItem[] PaginatedDictionaryItems(long pageNumber, int pageSize, IEnumerable<IDictionaryItem> allDictionaryItems, out long totalItems)
+    {
+        IDictionaryItem[] allDictionaryItemsAsArray = allDictionaryItems.ToArray();
+
+        totalItems = allDictionaryItemsAsArray.Length;
+        return allDictionaryItemsAsArray
+            .OrderBy(item => item.ItemKey)
+            .Skip((int)pageNumber * pageSize)
+            .Take(pageSize)
+            .ToArray();
+    }
 }

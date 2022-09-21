@@ -19,11 +19,15 @@ public class RootDictionaryItemTreeController : DictionaryItemTreeControllerBase
     [ProducesResponseType(typeof(PagedViewModel<EntityTreeItemViewModel>), StatusCodes.Status200OK)]
     public async Task<ActionResult<PagedViewModel<EntityTreeItemViewModel>>> Root(long pageNumber = 0, int pageSize = 100)
     {
-        IDictionaryItem[] dictionaryItems = LocalizationService.GetRootDictionaryItems().ToArray();
+        IDictionaryItem[] dictionaryItems = PaginatedDictionaryItems(
+            pageNumber,
+            pageSize,
+            LocalizationService.GetRootDictionaryItems(),
+            out var totalItems);
 
         EntityTreeItemViewModel[] viewModels = MapTreeItemViewModels(null, dictionaryItems);
 
-        PagedViewModel<EntityTreeItemViewModel> result = PagedViewModel(viewModels, viewModels.Length);
+        PagedViewModel<EntityTreeItemViewModel> result = PagedViewModel(viewModels, totalItems);
         return await Task.FromResult(Ok(result));
     }
 }
