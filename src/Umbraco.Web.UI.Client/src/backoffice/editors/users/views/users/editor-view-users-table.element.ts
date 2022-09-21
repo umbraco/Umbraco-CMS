@@ -4,7 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { UmbContextConsumerMixin } from '../../../../../core/context';
 import { repeat } from 'lit/directives/repeat.js';
 import { Subscription } from 'rxjs';
-import UmbEditorViewUsersListElement, { UserItem } from './editor-view-users-list.element';
+import UmbEditorViewUsersElement, { UserItem } from './editor-view-users.element';
 
 interface TableColumn {
 	name: string;
@@ -67,14 +67,14 @@ export class UmbEditorViewUsersTableElement extends UmbContextConsumerMixin(LitE
 	@state()
 	private _users: Array<UserItem> = [];
 
-	protected _usersContext?: UmbEditorViewUsersListElement;
-	protected _usersSubscription?: Subscription;
-	protected _selectionSubscription?: Subscription;
+	private _usersContext?: UmbEditorViewUsersElement;
+	private _usersSubscription?: Subscription;
+	private _selectionSubscription?: Subscription;
 
 	connectedCallback(): void {
 		super.connectedCallback();
 
-		this.consumeContext('umbUsersContext', (usersContext: UmbEditorViewUsersListElement) => {
+		this.consumeContext('umbUsersContext', (usersContext: UmbEditorViewUsersElement) => {
 			this._usersContext = usersContext;
 
 			this._usersSubscription?.unsubscribe();
@@ -177,8 +177,8 @@ export class UmbEditorViewUsersTableElement extends UmbContextConsumerMixin(LitE
 			selectable
 			?select-only=${this._selectionMode}
 			?selected=${this._isSelected(user.key)}
-			@selected=${() => this._usersContext?.select(user.key)}
-			@unselected=${() => this._usersContext?.deselect(user.key)}>
+			@selected=${() => this._selectRowHandler(user)}
+			@unselected=${() => this._deselectRowHandler(user)}>
 			<uui-table-cell>
 				<div style="display: flex; align-items: center;">
 					<uui-avatar name="${user.name}"></uui-avatar>
