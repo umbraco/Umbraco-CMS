@@ -1,0 +1,552 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Umbraco Backoffice API",
+    "description": "This shows all APIs available in this version of Umbraco - Including all the legacy apis that is available for backward compatibility",
+    "version": "All"
+  },
+  "servers": [
+    {
+      "url": "https://localhost:44331"
+    }
+  ],
+  "paths": {
+    "/umbraco/api/v1/install/settings": {
+      "get": {
+        "tags": [
+          "Install"
+        ],
+        "operationId": "SettingsInstall_Settings",
+        "responses": {
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "428": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InstallSettingsViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/install/setup": {
+      "post": {
+        "tags": [
+          "Install"
+        ],
+        "operationId": "SetupInstall_Setup",
+        "requestBody": {
+          "x-name": "installData",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InstallViewModel"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "428": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/install/validateDatabase": {
+      "post": {
+        "tags": [
+          "Install"
+        ],
+        "operationId": "ValidateDatabaseInstall_ValidateDatabase",
+        "requestBody": {
+          "x-name": "viewModel",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DatabaseInstallViewModel"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/upgrade/authorize": {
+      "post": {
+        "tags": [
+          "Upgrade"
+        ],
+        "operationId": "AuthorizeUpgrade_Authorize",
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "428": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/upgrade/settings": {
+      "get": {
+        "tags": [
+          "Upgrade"
+        ],
+        "operationId": "SettingsUpgrade_Settings",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpgradeSettingsViewModel"
+                }
+              }
+            }
+          },
+          "428": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/server/status": {
+      "get": {
+        "tags": [
+          "Server"
+        ],
+        "operationId": "StatusServer_Get",
+        "responses": {
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerStatusViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/server/version": {
+      "get": {
+        "tags": [
+          "Server"
+        ],
+        "operationId": "VersionServer_Get",
+        "responses": {
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ProblemDetails": {
+        "type": "object",
+        "additionalProperties": {
+          "nullable": true
+        },
+        "properties": {
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "detail": {
+            "type": "string",
+            "nullable": true
+          },
+          "instance": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "InstallSettingsViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "user": {
+            "$ref": "#/components/schemas/UserSettingsViewModel"
+          },
+          "databases": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DatabaseSettingsViewModel"
+            }
+          }
+        }
+      },
+      "UserSettingsViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "minCharLength": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "minNonAlphaNumericLength": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "consentLevels": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ConsentLevelViewModel"
+            }
+          }
+        }
+      },
+      "ConsentLevelViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "level": {
+            "$ref": "#/components/schemas/TelemetryLevel"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
+      "TelemetryLevel": {
+        "type": "string",
+        "description": "",
+        "x-enumNames": [
+          "Minimal",
+          "Basic",
+          "Detailed"
+        ],
+        "enum": [
+          "Minimal",
+          "Basic",
+          "Detailed"
+        ]
+      },
+      "DatabaseSettingsViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "sortOrder": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "defaultDatabaseName": {
+            "type": "string"
+          },
+          "providerName": {
+            "type": "string"
+          },
+          "isConfigured": {
+            "type": "boolean"
+          },
+          "requiresServer": {
+            "type": "boolean"
+          },
+          "serverPlaceholder": {
+            "type": "string"
+          },
+          "requiresCredentials": {
+            "type": "boolean"
+          },
+          "supportsIntegratedAuthentication": {
+            "type": "boolean"
+          },
+          "requiresConnectionTest": {
+            "type": "boolean"
+          }
+        }
+      },
+      "InstallViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "user",
+          "database"
+        ],
+        "properties": {
+          "user": {
+            "$ref": "#/components/schemas/UserInstallViewModel"
+          },
+          "database": {
+            "$ref": "#/components/schemas/DatabaseInstallViewModel"
+          },
+          "telemetryLevel": {
+            "$ref": "#/components/schemas/TelemetryLevel"
+          }
+        }
+      },
+      "UserInstallViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "email",
+          "password"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 255,
+            "minLength": 0
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "minLength": 1
+          },
+          "password": {
+            "type": "string",
+            "minLength": 1
+          },
+          "subscribeToNewsletter": {
+            "type": "boolean"
+          }
+        }
+      },
+      "DatabaseInstallViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "providerName"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "minLength": 1
+          },
+          "providerName": {
+            "type": "string",
+            "minLength": 1
+          },
+          "server": {
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "username": {
+            "type": "string",
+            "nullable": true
+          },
+          "password": {
+            "type": "string",
+            "nullable": true
+          },
+          "useIntegratedAuthentication": {
+            "type": "boolean"
+          },
+          "connectionString": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "UpgradeSettingsViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "currentState": {
+            "type": "string"
+          },
+          "newState": {
+            "type": "string"
+          },
+          "newVersion": {
+            "type": "string"
+          },
+          "oldVersion": {
+            "type": "string"
+          },
+          "reportUrl": {
+            "type": "string"
+          }
+        }
+      },
+      "ServerStatusViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "serverStatus": {
+            "$ref": "#/components/schemas/RuntimeLevel"
+          }
+        }
+      },
+      "RuntimeLevel": {
+        "type": "string",
+        "description": "Describes the levels in which the runtime can run.\n            ",
+        "x-enumNames": [
+          "Unknown",
+          "Boot",
+          "Install",
+          "Upgrade",
+          "Run",
+          "BootFailed"
+        ],
+        "enum": [
+          "Unknown",
+          "Boot",
+          "Install",
+          "Upgrade",
+          "Run",
+          "BootFailed"
+        ]
+      },
+      "VersionViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "version": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Upgrade"
+    },
+    {
+      "name": "Server"
+    },
+    {
+      "name": "Install"
+    }
+  ]
+}

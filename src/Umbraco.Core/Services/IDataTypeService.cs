@@ -100,4 +100,15 @@ public interface IDataTypeService : IService
     IEnumerable<IDataType> GetByEditorAlias(string propertyEditorAlias);
 
     Attempt<OperationResult<MoveOperationStatusType>?> Move(IDataType toMove, int parentId);
+
+    /// <summary>
+    /// Copies the give <see cref="IDataType"/> to a given container
+    /// We have the default implementation here to avoid breaking changes for the user
+    /// </summary>
+    /// <param name="copying">The data type that will be copied</param>
+    /// <param name="containerId">The container ID under where the data type will be copied</param>
+    /// <returns></returns>
+    /// <exception cref="NotImplementedException"></exception>
+    Attempt<OperationResult<MoveOperationStatusType, IDataType>?> Copy(IDataType copying, int containerId) => throw new NotImplementedException();
+
 }

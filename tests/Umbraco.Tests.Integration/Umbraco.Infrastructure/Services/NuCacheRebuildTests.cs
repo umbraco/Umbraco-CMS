@@ -1,3 +1,4 @@
+using System;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.PublishedCache;
@@ -59,7 +60,7 @@ public class NuCacheRebuildTests : UmbracoIntegrationTest
 
         Assert.AreEqual("hello", segment);
 
-        PublishedSnapshotService.Rebuild();
+        PublishedSnapshotService.RebuildAll();
 
         cachedContent = ContentService.GetById(content.Id);
         segment = urlSegmentProvider.GetUrlSegment(cachedContent);
@@ -76,7 +77,7 @@ public class NuCacheRebuildTests : UmbracoIntegrationTest
         // The page has now been published, so we should see the new url segment
         Assert.AreEqual("goodbye", segment);
 
-        PublishedSnapshotService.Rebuild();
+        PublishedSnapshotService.RebuildAll();
         cachedContent = ContentService.GetById(content.Id);
         segment = urlSegmentProvider.GetUrlSegment(cachedContent);
 
