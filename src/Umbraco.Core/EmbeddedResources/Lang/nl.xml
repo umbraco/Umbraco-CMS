@@ -510,6 +510,7 @@
     <key alias="selectMemberGroup">Selecteer lid groep</key>
     <key alias="selectMemberType">Selecteer lid type</key>
     <key alias="selectNode">Selecteer node</key>
+    <key alias="selectLanguages">Selecteer talen</key>
     <key alias="selectSections">Selecteer secties</key>
     <key alias="selectUser">Selecteer gebruiker</key>
     <key alias="selectUsers">Selecteer gebruikers</key>
@@ -1916,6 +1917,8 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="profile">Profiel</key>
     <key alias="searchAllChildren">Doorzoek alle subitems</key>
     <key alias="sectionsHelp">Geef de gebruiker toegang tot secties</key>
+    <key alias="languagesHelp">Beperk de talen die gebruikers mogen bewerken</key>
+    <key alias="allowAccessToAllLanguages">Toegang tot alle talen toestaan</key>
     <key alias="selectUserGroups">Selecteer een gebruikersgroep</key>
     <key alias="noStartNode">Geen startnode geselecteerd</key>
     <key alias="noStartNodes">Geen startnodes geselecteerd</key>
