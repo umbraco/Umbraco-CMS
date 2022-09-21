@@ -80,12 +80,6 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         public bool IsDatabaseConfigured => _databaseFactory.Configured;
 
         /// <summary>
-        /// Gets a value indicating whether it is possible to connect to the configured database.
-        /// It does not necessarily mean that Umbraco is installed, nor up-to-date.
-        /// </summary>
-        public bool CanConnectToDatabase => _databaseFactory.CanConnect;
-
-        /// <summary>
         /// Verifies whether a it is possible to connect to a database.
         /// </summary>
         public bool CanConnect(string? connectionString, string providerName)
@@ -96,7 +90,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
 
         public bool HasSomeNonDefaultUser()
         {
-            using (var scope = _scopeProvider.CreateCoreScope())
+            using (ICoreScope scope = _scopeProvider.CreateCoreScope())
             {
                 // look for the super user with default password
                 var sql = _scopeAccessor.AmbientScope?.Database.SqlContext.Sql()
@@ -119,7 +113,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
 
         internal bool IsUmbracoInstalled()
         {
-            using (var scope = _scopeProvider.CreateCoreScope(autoComplete: true))
+            using (ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _scopeAccessor.AmbientScope?.Database.IsUmbracoInstalled() ?? false;
             }
