@@ -1,9 +1,9 @@
 import { map, Observable } from 'rxjs';
-import { DataTypeEntity } from '../../mocks/data/data-type.data';
-import { UmbEntityStore } from './entity.store';
-import { UmbDataStoreBase } from './store';
+import { DataTypeDetails } from '../../../mocks/data/data-type.data';
+import { UmbEntityStore } from '../entity.store';
+import { UmbDataStoreBase } from '../store';
 
-export class UmbDataTypeStore extends UmbDataStoreBase<DataTypeEntity> {
+export class UmbDataTypeStore extends UmbDataStoreBase<DataTypeDetails> {
 	private _entityStore: UmbEntityStore;
 
 	constructor(entityStore: UmbEntityStore) {
@@ -11,21 +11,21 @@ export class UmbDataTypeStore extends UmbDataStoreBase<DataTypeEntity> {
 		this._entityStore = entityStore;
 	}
 
-	getByKey(key: string): Observable<DataTypeEntity | null> {
+	getByKey(key: string): Observable<DataTypeDetails | null> {
 		// TODO: use Fetcher API.
 		// TODO: only fetch if the data type is not in the store?
-		fetch(`/umbraco/backoffice/data-type/by-key/${key}`)
+		fetch(`/umbraco/backoffice/data-type/details/${key}`)
 			.then((res) => res.json())
 			.then((data) => {
 				this.update(data);
 			});
 
 		return this.items.pipe(
-			map((dataTypes: Array<DataTypeEntity>) => dataTypes.find((node: DataTypeEntity) => node.key === key) || null)
+			map((dataTypes: Array<DataTypeDetails>) => dataTypes.find((node: DataTypeDetails) => node.key === key) || null)
 		);
 	}
 
-	async save(dataTypes: Array<DataTypeEntity>) {
+	async save(dataTypes: Array<DataTypeDetails>) {
 		// TODO: use Fetcher API.
 		try {
 			const res = await fetch('/umbraco/backoffice/data-type/save', {
@@ -43,18 +43,16 @@ export class UmbDataTypeStore extends UmbDataStoreBase<DataTypeEntity> {
 		}
 	}
 
-	trash(key: string) {
-		return fetch('/umbraco/backoffice/data-type/trash', {
+	async trash(keys: string[]) {
+		const res = await fetch('/umbraco/backoffice/data-type/trash', {
 			method: 'POST',
-			body: key,
+			body: JSON.stringify(keys),
 			headers: {
 				'Content-Type': 'application/json',
 			},
-		})
-			.then((res) => res.json())
-			.then((data: Array<DataTypeEntity>) => {
-				this.update(data);
-				this._entityStore.update(data);
-			});
+		});
+		const data = await res.json();
+		this.update(data);
+		this._entityStore.update(data);
 	}
 }

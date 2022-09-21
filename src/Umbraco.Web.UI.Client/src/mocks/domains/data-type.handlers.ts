@@ -1,6 +1,6 @@
 import { rest } from 'msw';
 
-import { DataTypeEntity, umbDataTypeData } from '../data/data-type.data';
+import { DataTypeDetails, umbDataTypeData } from '../data/data-type.data';
 
 // TODO: add schema
 export const handlers = [
@@ -13,7 +13,7 @@ export const handlers = [
 		return res(ctx.status(200), ctx.json([dataType]));
 	}),
 
-	rest.get('/umbraco/backoffice/data-type/by-key/:key', (req, res, ctx) => {
+	rest.get('/umbraco/backoffice/data-type/details/:key', (req, res, ctx) => {
 		const key = req.params.key as string;
 		if (!key) return;
 
@@ -22,7 +22,7 @@ export const handlers = [
 		return res(ctx.status(200), ctx.json([dataType]));
 	}),
 
-	rest.post<DataTypeEntity[]>('/umbraco/backoffice/data-type/save', async (req, res, ctx) => {
+	rest.post<DataTypeDetails[]>('/umbraco/backoffice/data-type/save', async (req, res, ctx) => {
 		const data = await req.json();
 		if (!data) return;
 
@@ -31,12 +31,12 @@ export const handlers = [
 		return res(ctx.status(200), ctx.json(saved));
 	}),
 
-	rest.post<DataTypeEntity[]>('/umbraco/backoffice/data-type/trash', async (req, res, ctx) => {
+	rest.post<string[]>('/umbraco/backoffice/data-type/trash', async (req, res, ctx) => {
 		console.warn('Please move to schema');
-		const key = await req.text();
+		const keys = await req.json();
 
-		const trashed = umbDataTypeData.trash(key);
+		const trashed = umbDataTypeData.trash(keys);
 
-		return res(ctx.status(200), ctx.json([trashed]));
+		return res(ctx.status(200), ctx.json(trashed));
 	}),
 ];

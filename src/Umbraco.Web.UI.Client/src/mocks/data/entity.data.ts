@@ -32,13 +32,19 @@ export class UmbEntityData<T extends Entity> extends UmbData<T> {
 		return saveItems;
 	}
 
-	trash(key: string) {
-		const item = this.getByKey(key);
-		if (!item) return;
+	trash(keys: Array<string>) {
+		const trashedItems: Array<T> = [];
 
-		item.isTrashed = true;
-		this.updateData(item);
-		return item;
+		keys.forEach((key) => {
+			const item = this.getByKey(key);
+			if (!item) return;
+
+			item.isTrashed = true;
+			this.updateData(item);
+			trashedItems.push(item);
+		});
+
+		return trashedItems;
 	}
 
 	protected updateData(updateItem: T) {

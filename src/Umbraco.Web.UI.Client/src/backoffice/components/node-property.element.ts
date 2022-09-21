@@ -8,7 +8,7 @@ import { distinctUntilChanged, EMPTY, of, Subscription, switchMap } from 'rxjs';
 import { UmbContextConsumerMixin } from '../../core/context';
 import { createExtensionElement, UmbExtensionRegistry } from '../../core/extension';
 import type { ManifestPropertyEditorUI } from '../../core/models';
-import { UmbDataTypeStore } from '../../core/stores/data-type.store';
+import { UmbDataTypeStore } from '../../core/stores/data-type/data-type.store';
 import { DataTypeEntity } from '../../mocks/data/data-type.data';
 
 @customElement('umb-node-property')
@@ -61,7 +61,7 @@ class UmbNodeProperty extends UmbContextConsumerMixin(LitElement) {
 	constructor() {
 		super();
 
-		/** TODO: Use DI for these types of services. */
+		// TODO: solution to know when both contexts are available
 		this.consumeContext('umbDataTypeStore', (_instance: UmbDataTypeStore) => {
 			this._dataTypeStore = _instance;
 			this._useDataType();
@@ -71,7 +71,6 @@ class UmbNodeProperty extends UmbContextConsumerMixin(LitElement) {
 			this._extensionRegistry = _instance;
 			this._useDataType();
 		});
-		// TODO: solution to know when both contexts are available
 	}
 
 	connectedCallback(): void {

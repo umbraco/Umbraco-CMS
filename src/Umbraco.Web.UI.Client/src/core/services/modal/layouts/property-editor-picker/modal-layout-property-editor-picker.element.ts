@@ -7,7 +7,7 @@ import { UmbContextConsumerMixin } from '../../../../context';
 import type { Subscription } from 'rxjs';
 import type { UmbModalHandler } from '../../modal-handler';
 import type { PropertyEditor } from '../../../../../mocks/data/property-editor.data';
-import type { UmbPropertyEditorStore } from '../../../../stores/property-editor.store';
+import type { UmbPropertyEditorStore } from '../../../../stores/property-editor/property-editor.store';
 import { UUIInputEvent } from '@umbraco-ui/uui';
 
 export interface UmbModalPropertyEditorPickerData {

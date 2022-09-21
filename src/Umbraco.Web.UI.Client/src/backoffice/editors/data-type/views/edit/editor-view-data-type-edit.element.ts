@@ -8,16 +8,19 @@ import { UmbModalService } from '../../../../../core/services/modal';
 import { UmbContextConsumerMixin } from '../../../../../core/context';
 import { UmbDataTypeContext } from '../../data-type.context';
 
-import type { DataTypeEntity } from '../../../../../mocks/data/data-type.data';
+import type { DataTypeDetails } from '../../../../../mocks/data/data-type.data';
 import type { UmbExtensionRegistry } from '../../../../../core/extension';
-import type { UmbPropertyEditorStore } from '../../../../../core/stores/property-editor.store';
+import type { UmbPropertyEditorStore } from '../../../../../core/stores/property-editor/property-editor.store';
 import type { ManifestPropertyEditorUI } from '../../../../../core/models';
+
+import '../../shared/property-editor-config.element';
+
 @customElement('umb-editor-view-data-type-edit')
 export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(LitElement) {
 	static styles = [UUITextStyles, css``];
 
 	@state()
-	_dataType?: DataTypeEntity;
+	_dataType?: DataTypeDetails;
 
 	@state()
 	private _propertyEditorIcon = '';
@@ -80,7 +83,7 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Li
 
 		this._dataTypeSubscription?.unsubscribe();
 
-		this._dataTypeSubscription = this._dataTypeContext?.data.subscribe((dataType: DataTypeEntity) => {
+		this._dataTypeSubscription = this._dataTypeContext?.data.subscribe((dataType: DataTypeDetails) => {
 			this._dataType = dataType;
 
 			if (!this._dataType) return;
@@ -202,10 +205,12 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Li
 
 	render() {
 		return html`
-			<uui-box>
+			<uui-box style="margin-bottom: 20px;">
 				${this._renderPropertyEditor()}
 				${when(this._dataType?.propertyEditorAlias, () => html` ${this._renderPropertyEditorUI()} `)}</uui-box
 			>
+
+			${this._renderPropertyEditorConfig()}
 		`;
 	}
 
@@ -262,6 +267,15 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Li
 									@click=${this._openPropertyEditorUIPicker}></uui-button>`
 							: html`No Property Editor UIs registered for this Property Editor`}
 				  `}
+		`;
+	}
+
+	private _renderPropertyEditorConfig() {
+		return html`
+			<uui-box style="margin-bottom: 20px;">
+				<h3>Property Editor Config</h3>
+				<umb-property-editor-config property-editor-alias="${this._propertyEditorAlias}"></umb-property-editor-config>
+			</uui-box>
 		`;
 	}
 }

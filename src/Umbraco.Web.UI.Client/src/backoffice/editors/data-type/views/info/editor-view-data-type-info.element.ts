@@ -6,14 +6,14 @@ import { Subscription, distinctUntilChanged } from 'rxjs';
 import { UmbContextConsumerMixin } from '../../../../../core/context';
 import { UmbDataTypeContext } from '../../data-type.context';
 
-import type { DataTypeEntity } from '../../../../../mocks/data/data-type.data';
+import type { DataTypeDetails } from '../../../../../mocks/data/data-type.data';
 
 @customElement('umb-editor-view-data-type-info')
 export class UmbEditorViewDataTypeInfoElement extends UmbContextConsumerMixin(LitElement) {
 	static styles = [UUITextStyles, css``];
 
 	@state()
-	_dataType?: DataTypeEntity;
+	_dataType?: DataTypeDetails;
 
 	private _dataTypeContext?: UmbDataTypeContext;
 	private _dataTypeSubscription?: Subscription;
@@ -32,7 +32,7 @@ export class UmbEditorViewDataTypeInfoElement extends UmbContextConsumerMixin(Li
 
 		this._dataTypeSubscription = this._dataTypeContext?.data
 			.pipe(distinctUntilChanged())
-			.subscribe((dataType: DataTypeEntity) => {
+			.subscribe((dataType: DataTypeDetails) => {
 				this._dataType = dataType;
 			});
 	}

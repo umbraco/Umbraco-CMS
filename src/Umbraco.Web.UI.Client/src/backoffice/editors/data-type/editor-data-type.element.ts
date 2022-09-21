@@ -5,8 +5,8 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { Subscription, distinctUntilChanged } from 'rxjs';
 import { UmbContextProviderMixin, UmbContextConsumerMixin } from '../../../core/context';
 import { UmbNotificationService } from '../../../core/services/notification';
-import { UmbDataTypeStore } from '../../../core/stores/data-type.store';
-import { DataTypeEntity } from '../../../mocks/data/data-type.data';
+import { UmbDataTypeStore } from '../../../core/stores/data-type/data-type.store';
+import { DataTypeDetails } from '../../../mocks/data/data-type.data';
 import { UmbDataTypeContext } from './data-type.context';
 
 import '../shared/editor-entity-layout/editor-entity-layout.element';
@@ -37,7 +37,7 @@ export class UmbEditorDataTypeElement extends UmbContextProviderMixin(UmbContext
 	entityKey = '';
 
 	@state()
-	private _dataType?: DataTypeEntity;
+	private _dataType?: DataTypeDetails;
 
 	@state()
 	private _saveButtonState?: UUIButtonState;

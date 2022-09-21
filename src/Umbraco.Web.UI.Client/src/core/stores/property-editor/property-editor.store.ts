@@ -1,5 +1,5 @@
 import { BehaviorSubject, map, Observable } from 'rxjs';
-import { PropertyEditor } from '../../mocks/data/property-editor.data';
+import { PropertyEditor } from '../../../mocks/data/property-editor.data';
 
 export class UmbPropertyEditorStore {
 	private _items: BehaviorSubject<Array<PropertyEditor>> = new BehaviorSubject(<Array<PropertyEditor>>[]);
@@ -20,7 +20,7 @@ export class UmbPropertyEditorStore {
 	getByAlias(alias: string): Observable<PropertyEditor | undefined> {
 		// TODO: use Fetcher API.
 		// TODO: only fetch if the data type is not in the store?
-		fetch(`/umbraco/backoffice/property-editors/${alias}`)
+		fetch(`/umbraco/backoffice/property-editors/property-editor/${alias}`)
 			.then((res) => res.json())
 			.then((data) => {
 				this.update(data);

@@ -1,48 +1,57 @@
 import { UmbData } from './data';
 
 export interface PropertyEditorConfig {
-	key: string;
+	propertyEditorAlias: string;
 	properties: Array<PropertyEditorConfigProperty>;
-	data: Array<PropertyEditorConfigPropertyData>;
 }
 
 export interface PropertyEditorConfigProperty {
 	alias: string;
 	label: string;
 	description: string;
-	view: string; // TODO: change to custom element
-}
-
-export interface PropertyEditorConfigPropertyData {
-	alias: string;
-	value: any;
+	view: string;
 }
 
 export const data: Array<PropertyEditorConfig> = [
 	{
-		key: 'a837ba37-b409-4437-ae50-a583a4f828c9',
+		propertyEditorAlias: 'Umbraco.TextBox',
 		properties: [
 			{
 				alias: 'maxChars',
 				label: 'Maximum allowed characters',
 				description: 'If empty, 512 character limit',
-				view: 'textstringlimited',
+				view: 'number',
 			},
 		],
-		data: [
+	},
+	{
+		propertyEditorAlias: 'Umbraco.TextArea',
+		properties: [
 			{
 				alias: 'maxChars',
-				value: null,
+				label: 'Maximum allowed characters',
+				description: 'If empty - no character limit',
+				view: 'number',
+			},
+			{
+				alias: 'rows',
+				label: 'Number of rows',
+				description: 'If empty - 10 rows would be set as the default value',
+				view: 'number',
 			},
 		],
 	},
 ];
 
 // Temp mocked database
-class UmbDataTypeData extends UmbData<PropertyEditorConfig> {
+class UmbPropertyEditorConfigData extends UmbData<PropertyEditorConfig> {
 	constructor() {
 		super(data);
 	}
+
+	getByAlias(alias: string) {
+		return this.data.find((x) => x.propertyEditorAlias === alias);
+	}
 }
 
-export const umbDataTypeData = new UmbDataTypeData();
+export const umbPropertyEditorConfigData = new UmbPropertyEditorConfigData();

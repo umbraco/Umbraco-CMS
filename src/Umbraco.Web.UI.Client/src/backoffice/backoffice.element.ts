@@ -22,13 +22,14 @@ import type { Subscription } from 'rxjs';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '../core/context';
 import { UmbModalService } from '../core/services/modal';
 import { UmbNotificationService } from '../core/services/notification';
-import { UmbDataTypeStore } from '../core/stores/data-type.store';
+import { UmbDataTypeStore } from '../core/stores/data-type/data-type.store';
 import { UmbDocumentTypeStore } from '../core/stores/document-type.store';
 import { UmbNodeStore } from '../core/stores/node.store';
 import { UmbSectionStore } from '../core/stores/section.store';
 import { UmbEntityStore } from '../core/stores/entity.store';
-import { UmbPropertyEditorStore } from '../core/stores/property-editor.store';
+import { UmbPropertyEditorStore } from '../core/stores/property-editor/property-editor.store';
 import { UmbIconStore } from '../core/stores/icon/icon.store';
+import { UmbPropertyEditorConfigStore } from '../core/stores/property-editor-config/property-editor-config.store';
 
 @defineElement('umb-backoffice')
 export default class UmbBackoffice extends UmbContextConsumerMixin(UmbContextProviderMixin(LitElement)) {
@@ -62,6 +63,7 @@ export default class UmbBackoffice extends UmbContextConsumerMixin(UmbContextPro
 		this.provideContext('umbDataTypeStore', new UmbDataTypeStore(this._umbEntityStore));
 		this.provideContext('umbDocumentTypeStore', new UmbDocumentTypeStore(this._umbEntityStore));
 		this.provideContext('umbPropertyEditorStore', new UmbPropertyEditorStore());
+		this.provideContext('umbPropertyEditorConfigStore', new UmbPropertyEditorConfigStore());
 		this.provideContext('umbNotificationService', new UmbNotificationService());
 		this.provideContext('umbModalService', new UmbModalService());
 
