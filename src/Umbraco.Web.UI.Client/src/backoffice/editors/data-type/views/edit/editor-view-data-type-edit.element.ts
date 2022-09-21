@@ -1,5 +1,5 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html, LitElement } from 'lit';
+import { css, html, LitElement, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { when } from 'lit-html/directives/when.js';
 import { Subscription, map } from 'rxjs';
@@ -37,6 +37,9 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Li
 	@state()
 	private _propertyEditorUIAlias = '';
 
+	@state()
+	private _availablePropertyEditorUIsCount = 0;
+
 	private _dataTypeContext?: UmbDataTypeContext;
 	private _extensionRegistry?: UmbExtensionRegistry;
 	private _propertyEditorStore?: UmbPropertyEditorStore;
@@ -73,6 +76,8 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Li
 	}
 
 	private _observeDataType() {
+		if (!this._dataTypeContext || !this._propertyEditorStore || !this._extensionRegistry) return;
+
 		this._dataTypeSubscription?.unsubscribe();
 
 		this._dataTypeSubscription = this._dataTypeContext?.data.subscribe((dataType: DataTypeEntity) => {
@@ -121,6 +126,7 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Li
 			)
 			.subscribe((availablePropertyEditorUIs) => {
 				// Select the Property Editor UI if there is only one available
+				this._availablePropertyEditorUIsCount = availablePropertyEditorUIs.length;
 				if (availablePropertyEditorUIs?.length === 1) {
 					this._selectPropertyEditorUI(availablePropertyEditorUIs[0].alias);
 				}
@@ -234,16 +240,25 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Li
 							.alias=${this._propertyEditorUIAlias}
 							border>
 							<uui-icon name="${this._propertyEditorUIIcon}" slot="icon"></uui-icon>
-							<uui-action-bar slot="actions">
-								<uui-button label="Change" @click=${this._openPropertyEditorUIPicker}></uui-button>
-							</uui-action-bar>
+
+							${this._availablePropertyEditorUIsCount > 1
+								? html`
+										<uui-action-bar slot="actions">
+											<uui-button label="Change" @click=${this._openPropertyEditorUIPicker}></uui-button>
+										</uui-action-bar>
+								  `
+								: nothing}
 						</umb-ref-property-editor-ui>
 				  `
-				: html`<uui-button
-						label="Select Property Editor UI"
-						look="placeholder"
-						color="default"
-						@click=${this._openPropertyEditorUIPicker}></uui-button>`}
+				: html`
+						${this._availablePropertyEditorUIsCount > 0
+							? html`<uui-button
+									label="Select Property Editor UI"
+									look="placeholder"
+									color="default"
+									@click=${this._openPropertyEditorUIPicker}></uui-button>`
+							: html`No Property Editor UIs registered for this Property Editor`}
+				  `}
 		`;
 	}
 }
