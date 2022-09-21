@@ -7,7 +7,38 @@ import { Subscription } from 'rxjs';
 
 @customElement('umb-editor-view-users-user-details')
 export class UmbEditorViewUsersUserDetailsElement extends UmbContextConsumerMixin(LitElement) {
-	static styles = [UUITextStyles, css``];
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: grid;
+				grid-template-columns: 1fr 350px;
+				gap: var(--uui-size-space-6);
+				padding: var(--uui-size-space-6);
+			}
+
+			#left-column {
+				display: flex;
+				flex-direction: column;
+				gap: var(--uui-size-space-4);
+			}
+			#right-column > uui-box > div {
+				display: flex;
+				flex-direction: column;
+				gap: var(--uui-size-space-2);
+			}
+			uui-avatar {
+				width: 50%;
+				flex: 1 1 0%;
+				place-self: center;
+			}
+			hr {
+				border: none;
+				border-bottom: 1px solid var(--uui-color-divider);
+				width: 100%;
+			}
+		`,
+	];
 
 	@state()
 	private _users: Array<UserItem> = [];
@@ -46,7 +77,26 @@ export class UmbEditorViewUsersUserDetailsElement extends UmbContextConsumerMixi
 	}
 
 	render() {
-		return html`${this._user?.name}`;
+		return html`
+			<div id="left-column">
+				<uui-box>
+					<p slot="headline">Profile</p>
+				</uui-box>
+				<uui-box>
+					<p slot="headline">Profile</p>
+				</uui-box>
+			</div>
+			<div id="right-column">
+				<uui-box>
+					<div>
+						<uui-avatar .name=${this._user?.name || ''}></uui-avatar>
+						<uui-button label="Change photo"></uui-button>
+						<hr />
+						<uui-button look="primary" color="danger" label="Delete User"></uui-button>
+					</div>
+				</uui-box>
+			</div>
+		`;
 	}
 }
 
