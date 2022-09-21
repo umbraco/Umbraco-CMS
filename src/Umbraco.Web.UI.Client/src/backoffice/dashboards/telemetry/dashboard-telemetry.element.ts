@@ -24,9 +24,6 @@ export class UmbDashboardTelemetryElement extends LitElement {
 	private _telemetryFormData: TelemetryModel['level'] = 'Basic';
 
 	@state()
-	private _description = 'We will send an anonymized site ID, Umbraco version, and packages installed.';
-
-	@state()
 	private _telemetryLevels: TelemetryModel['level'][] = [];
 
 	@state()
