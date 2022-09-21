@@ -16,7 +16,6 @@
       <DefineConstants>TRACE_SCOPES;</DefineConstants>
     </PropertyGroup>
 
-
     <ItemGroup>
       <PackageReference Include="HtmlAgilityPack" Version="1.11.43" />
       <PackageReference Include="MailKit" Version="3.2.0" />
@@ -53,7 +52,7 @@
       <PackageReference Include="System.Security.Cryptography.Pkcs" Version="6.0.1" />
       <PackageReference Include="System.Text.Encodings.Web" Version="6.0.0" /> <!-- Explicit updated this nested dependency due to this https://github.com/dotnet/announcements/issues/178-->
       <PackageReference Include="System.Threading.Tasks.Dataflow" Version="6.0.0" />
-      <PackageReference Include="Examine.Core" Version="3.0.0" />
+      <PackageReference Include="Examine.Core" Version="3.0.1" />
       <PackageReference Include="Umbraco.Code" Version="2.0.0">
         <PrivateAssets>all</PrivateAssets>
       </PackageReference>
@@ -110,6 +109,9 @@
         </AssemblyAttribute>
         <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
             <_Parameter1>DynamicProxyGenAssembly2</_Parameter1>
+        </AssemblyAttribute>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+          <_Parameter1>Umbraco.New.Cms.Infrastructure</_Parameter1>
         </AssemblyAttribute>
     </ItemGroup>
 

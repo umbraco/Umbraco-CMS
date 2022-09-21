@@ -85,7 +85,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Examine.Lucene" Version="3.0.0" />
+    <PackageReference Include="Examine.Lucene" Version="3.0.1" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.9" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="6.0.5" />
     <PackageReference Include="Bogus" Version="34.0.2" />
@@ -105,6 +105,7 @@
     <ProjectReference Include="..\..\src\Umbraco.Cms.Persistence.SqlServer\Umbraco.Cms.Persistence.SqlServer.csproj" />
     <ProjectReference Include="..\..\src\Umbraco.Core\Umbraco.Core.csproj" />
     <ProjectReference Include="..\..\src\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\Umbraco.Cms.ManagementApi\Umbraco.Cms.ManagementApi.csproj" />
     <ProjectReference Include="..\..\src\Umbraco.PublishedCache.NuCache\Umbraco.PublishedCache.NuCache.csproj" />
     <ProjectReference Include="..\Umbraco.Tests.Common\Umbraco.Tests.Common.csproj" />
     <ProjectReference Include="..\..\src\Umbraco.Web.BackOffice\Umbraco.Web.BackOffice.csproj" />

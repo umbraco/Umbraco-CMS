@@ -9,6 +9,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Install.InstallSteps;
 
+[Obsolete("Will be replace with a new step with the new backoffice")]
 [InstallSetupStep(InstallationType.NewInstall, "DatabaseConfigure", "database", 10, "Setting up a database, so Umbraco has a place to store your website", PerformsAppRestart = true)]
 public class DatabaseConfigureStep : InstallSetupStep<DatabaseModel>
 {

@@ -16,6 +16,10 @@
     <ProjectReference Include="..\Umbraco.Web.Website\Umbraco.Web.Website.csproj" />
   </ItemGroup>
 
+  <ItemGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <ProjectReference Include="..\Umbraco.Cms.ManagementApi\Umbraco.Cms.ManagementApi.csproj" />
+  </ItemGroup>
+
   <PropertyGroup>
     <JsonSchemaPath>$(ProjectDir)appsettings-schema.json</JsonSchemaPath>
     <JsonSchemaProjectPath>$(ProjectDir)../JsonSchema/</JsonSchemaProjectPath>
