@@ -134,6 +134,9 @@
             var dragOffsetX = 0;
             var dragOffsetY = 0;
 
+            var approvedContainerEl = null;
+            var approvedContainerDate = null;
+
 
             // Setup DOM method for communication between sortables:
             gridLayoutContainerEl['Sortable:controller'] = () => {
@@ -187,12 +190,6 @@
                         evt.from.insertBefore(nextSibling, evt.item.nextSibling);
                     }*/
                 }
-            }
-
-            var approvedContainerEl = null;
-
-            function dist(x1,y1,x2,y2){
-                return Math.sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1)); 
             }
 
             function _indication(contextVM, movingEl) {
@@ -493,7 +490,11 @@
                     relatedRect = evt.related.getBoundingClientRect();
                     targetRect = evt.to.getBoundingClientRect();
                     ghostRect = evt.draggedRect;
-                    
+
+                    // if cursor is within the ghostBox, then a move will be prevented:
+                    if(dragX > ghostRect.left && dragX < ghostRect.right && dragY > ghostRect.top && dragY < ghostRect.bottom) {
+                        return false;
+                    }
 
                     var contextVM = vm;
                     if (gridLayoutContainerEl !== evt.to) {
@@ -506,8 +507,19 @@
                     }
 
                     if(evt.to !== approvedContainerEl) {
+
+                        if(approvedContainerDate) {
+                            const timeSinceApproval = new Date().getTime() - approvedContainerDate;
+                            const rejectionTimeLeft = 500 - timeSinceApproval;
+                            if(rejectionTimeLeft > 0) {
+                                //console.log("Reject by rejectionTimeLeft")
+                                return false;
+                            }
+                        }
+
                         // We will let SortableJS do the move when switching to a new container, otherwise not.
                         approvedContainerEl = evt.to;
+                        approvedContainerDate = new Date().getTime();
                         return true;
                     }
     
