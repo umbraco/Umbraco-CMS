@@ -23,7 +23,7 @@ public class MediaRecycleBinControllerBase : RecycleBinControllerBase<RecycleBin
     {
     }
 
-    protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.Document;
+    protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.Media;
 
     protected override int RecycleBinRootId => Constants.System.RecycleBinMedia;
 
