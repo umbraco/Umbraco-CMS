@@ -44,7 +44,7 @@
     }
     
     function closestColumnSpanOption(target, map, max) {
-        return map.reduce((a, b) => {
+        const result = map.reduce((a, b) => {
             if (a.columnSpan > max) {
                 return b;
             }
@@ -57,7 +57,10 @@
                 return bDiff < aDiff ? b : a;
             }
         });
-        // If no columnSpan was found, we could consider returning the lowest available?
+        if(result) {
+            return result;
+        }
+        return max;
     }
 
 
@@ -91,7 +94,6 @@
 
         const vm = this;
         vm.areaGridColumns = '';
-        vm.areaGridStyles = {};
         vm.isHoveringArea = false;
         vm.isScaleMode = false;
 

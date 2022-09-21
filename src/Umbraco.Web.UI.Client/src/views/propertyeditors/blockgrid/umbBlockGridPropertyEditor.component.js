@@ -270,6 +270,7 @@
                 if (!layoutEntry.columnSpan) {
                     // set columnSpan to minimum allowed span for this BlockType:
                     const minimumColumnSpan = block.config.columnSpanOptions.reduce((prev, option) => Math.min(prev, option.columnSpan), vm.gridColumns);
+                    // TODO, use contextual layout columns, if no defined.
                     layoutEntry.columnSpan = minimumColumnSpan;
                 }
                 // if no rowSpan, then we set one:
@@ -361,6 +362,7 @@
             }
 
             // ensure at least one columnSpanOptions:
+            // TODO, use contextual layout columns, if no defined. Do not set a default.
             if(block.config.columnSpanOptions.length === 0) {
                 block.config.columnSpanOptions.push({
                     "columnSpan": vm.gridColumns
@@ -471,12 +473,14 @@
                 // Check if that and the new one can fit on the line.
 
                 const minColumnSpan = blockObject.config.columnSpanOptions.reduce((prev, option) => Math.min(prev, option.columnSpan), vm.gridColumns);
+                // TODO, use contextual layout columns, if no defined.
                 layoutEntry.columnSpan = minColumnSpan;
                 
             } else {
 
                 // set columnSpan to maximum allowed span for this BlockType:
                 const maximumColumnSpan = blockObject.config.columnSpanOptions.reduce((prev, option) => Math.max(prev, option.columnSpan), 1);
+                // TODO, use contextual layout columns, if no defined.
                 layoutEntry.columnSpan = maximumColumnSpan;
 
             }

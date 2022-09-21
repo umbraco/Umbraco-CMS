@@ -170,6 +170,8 @@
                         prevEntries.splice(oldIndex, 1);
                     }
 
+                    // TODO: block changed context, if no columnSpanOptions this Block colSpan would then have to be adjusted for the context.
+                    // TODO: In general make sure the size fits in the new context.
                     vm.entries.splice(newIndex, 0, syncEntry);
 
                     // I currently do not think below line is necessary as this is updated through angularJS. This was giving trouble/errors.
