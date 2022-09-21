@@ -17,13 +17,12 @@ namespace Umbraco.Cms.ManagementApi.Controllers.RelationType.Tree;
 // tree controller base. We'll keep it though, in the hope that we can mend EntityService.
 public class RelationTypeTreeControllerBase : EntityTreeControllerBase<EntityTreeItemViewModel>
 {
-    public RelationTypeTreeControllerBase(IEntityService entityService, IRelationService relationService)
-        : base(entityService) =>
-        RelationService = relationService;
+    public RelationTypeTreeControllerBase(IEntityService entityService)
+        : base(entityService)
+    {
+    }
 
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.RelationType;
-
-    protected IRelationService RelationService { get; }
 
     protected EntityTreeItemViewModel[] MapTreeItemViewModels(Guid? parentKey, IRelationType[] relationTypes)
         => relationTypes.Select(relationType => new EntityTreeItemViewModel

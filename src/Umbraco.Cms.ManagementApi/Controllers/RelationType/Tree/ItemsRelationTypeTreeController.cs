@@ -9,10 +9,11 @@ namespace Umbraco.Cms.ManagementApi.Controllers.RelationType.Tree;
 
 public class ItemsRelationTypeTreeController : RelationTypeTreeControllerBase
 {
+    private readonly IRelationService _relationService;
+
     public ItemsRelationTypeTreeController(IEntityService entityService, IRelationService relationService)
-        : base(entityService, relationService)
-    {
-    }
+        : base(entityService) =>
+        _relationService = relationService;
 
     [HttpGet("items")]
     [MapToApiVersion("1.0")]
@@ -21,7 +22,7 @@ public class ItemsRelationTypeTreeController : RelationTypeTreeControllerBase
     {
         // relation service does not allow fetching a collection of relation types by their ids; instead it relies
         // heavily on caching, which means this is as fast as it gets - even if it looks less than performant
-        IRelationType[] relationTypes = RelationService
+        IRelationType[] relationTypes = _relationService
             .GetAllRelationTypes()
             .Where(relationType => keys.Contains(relationType.Key)).ToArray();
 
