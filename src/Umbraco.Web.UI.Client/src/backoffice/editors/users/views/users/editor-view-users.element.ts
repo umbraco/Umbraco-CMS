@@ -25,8 +25,13 @@ export class UmbEditorViewUsersElement extends UmbContextProviderMixin(LitElemen
 		css`
 			#sticky-top {
 				position: sticky;
-				top: 0px;
+				top: -1px;
 				z-index: 1;
+				box-shadow: 0 1px 3px rgba(0, 0, 0, 0), 0 1px 2px rgba(0, 0, 0, 0);
+				transition: 250ms box-shadow ease-in-out;
+			}
+
+			#sticky-top.header-shadow {
 				box-shadow: var(--uui-shadow-depth-2);
 			}
 
@@ -196,10 +201,32 @@ export class UmbEditorViewUsersElement extends UmbContextProviderMixin(LitElemen
 	private _selection: BehaviorSubject<Array<string>> = new BehaviorSubject(<Array<string>>[]);
 	public readonly selection: Observable<Array<string>> = this._selection.asObservable();
 
+	private _IntersectionObserverOptions = {
+		root: this,
+		rootMargin: '0px',
+		threshold: 1.0,
+	};
+
 	constructor() {
 		super();
 
 		this.provideContext('umbUsersContext', this);
+		this.setupHeaderIntersectionObserver();
+	}
+
+	public setupHeaderIntersectionObserver() {
+		requestAnimationFrame(() => {
+			const el = this.shadowRoot?.querySelector('#sticky-top');
+
+			if (el) {
+				const options = { threshold: [1] };
+				const callback = (entries: IntersectionObserverEntry[]) =>
+					entries[0].target.classList.toggle('header-shadow', entries[0].intersectionRatio < 1);
+				const observer = new IntersectionObserver(callback, options);
+
+				observer.observe(el);
+			}
+		});
 	}
 
 	public setSelection(value: Array<string>) {
