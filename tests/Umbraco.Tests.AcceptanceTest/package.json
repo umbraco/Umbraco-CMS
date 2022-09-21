@@ -13,8 +13,8 @@
   },
   "devDependencies": {
     "cross-env": "^7.0.3",
-    "cypress": "8.7.0",
-    "cy-verify-downloads": "0.1.5",
+    "cypress": "8.4.1",
+    "cy-verify-downloads": "0.0.5",
     "del": "^6.0.0",
     "ncp": "^2.0.0",
     "prompt": "^1.2.0",
