@@ -89,7 +89,7 @@
             <button type="button" class="btn-reset umb-outline action --content" localize="title" title="actions_editContent"
                     ng-click="vm.blockEditorApi.editBlock(vm.layoutEntry.$block, false, vm.index, vm.blockForm);"
                     ng-class="{ '--error': vm.blockForm.$error.valServerMatchContent }"
-                    ng-if="vm.layoutEntry.$block.hideContentInOverlay !== true">
+                    ng-if="vm.layoutEntry.$block.showContent === true">
                 <umb-icon icon="icon-edit" class="icon"></umb-icon>
                 <span class="sr-only">
                     <localize key="general_content">Content</localize>

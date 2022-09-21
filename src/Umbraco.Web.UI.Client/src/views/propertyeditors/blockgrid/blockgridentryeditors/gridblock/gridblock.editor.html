@@ -57,7 +57,7 @@
 
 <div class="blockelement-gridblock-editor" ng-class="{ '--active': block.active, '--error': parentForm.$invalid && valFormManager.isShowingValidation() }">
     <button type="button"
-        ng-click="block.edit()"
+        ng-click="block.showContent ? block.edit() : null"
         ng-focus="block.focus"
         val-server-property-class="">
         <umb-icon icon="{{block.content.icon}}" class="icon"></umb-icon>
