@@ -4,13 +4,14 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { UmbContextConsumerMixin } from '../../../../context';
 
-import type { Subscription } from 'rxjs';
+import { map, Subscription } from 'rxjs';
 import type { UUIComboboxListElement, UUIComboboxListEvent } from '@umbraco-ui/uui';
 import type { UmbModalHandler } from '../../modal-handler';
 import type { UmbExtensionRegistry } from '../../../../extension';
 import type { ManifestPropertyEditorUI } from '../../../../models';
 
 export interface UmbModalPropertyEditorUIPickerData {
+	propertyEditorAlias: string;
 	selection?: Array<string>;
 }
 
@@ -49,8 +50,17 @@ export class UmbModalLayoutPropertyEditorUIPickerElement extends UmbContextConsu
 	}
 
 	private _usePropertyEditorUIs() {
+		if (!this.data) return;
+
 		this._propertyEditorUIsSubscription = this._extensionRegistry
 			?.extensionsOfType('propertyEditorUI')
+			.pipe(
+				map((propertyEditorUIs) =>
+					propertyEditorUIs.filter((propertyEditorUI) =>
+						propertyEditorUI.meta.propertyEditors.includes(this.data?.propertyEditorAlias ?? '')
+					)
+				)
+			)
 			.subscribe((propertyEditorUIs) => {
 				this._propertyEditorUIs = propertyEditorUIs;
 			});

@@ -170,10 +170,12 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Li
 	}
 
 	private _openPropertyEditorUIPicker() {
-		if (!this._dataType) return;
+		if (!this._dataType || !this._dataType.propertyEditorAlias) return;
 
-		const selection = this._dataType.propertyEditorUIAlias ? [this._dataType.propertyEditorUIAlias] : [];
-		const modalHandler = this._modalService?.propertyEditorUIPicker({ selection });
+		const modalHandler = this._modalService?.propertyEditorUIPicker({
+			propertyEditorAlias: this._dataType.propertyEditorAlias,
+			selection: this._dataType.propertyEditorUIAlias ? [this._dataType.propertyEditorUIAlias] : [],
+		});
 
 		modalHandler?.onClose().then(({ selection } = {}) => {
 			if (!selection) return;
