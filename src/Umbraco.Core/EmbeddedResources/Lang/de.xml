@@ -2005,8 +2005,6 @@
     <key alias="noSniffCheckHeaderNotFound"><![CDATA[Der Header oder das Meta-Tag <strong>X-Content-Type-Options</strong> ist <strong>nicht</strong> vorhanden. Diese dienen zum Schutz gegen MIME-'Schnüffeln'-Schwachstellen. ]]></key>
     <key alias="hSTSCheckHeaderFound"><![CDATA[Der Header <strong>Strict-Transport-Security</strong>, auch bekannt als HSTS-Header, ist vorhanden.]]></key>
     <key alias="hSTSCheckHeaderNotFound"><![CDATA[Der Header <strong>Strict-Transport-Security</strong>, auch bekannt als HSTS-Header, ist <strong>nicht</strong> vorhanden.]]></key>
-    <key alias="xssProtectionCheckHeaderFound"><![CDATA[Der Header <strong>X-XSS-Protection</strong> ist vorhanden.]]></key>
-    <key alias="xssProtectionCheckHeaderNotFound"><![CDATA[Der Header <strong>X-XSS-Protection</strong> ist <strong>nicht</strong> vorhanden]]></key>
     <key alias="excessiveHeadersFound"><![CDATA[Folgende Header, die Informationen über die Website-Technologie preisgeben, sind vorhanden: <strong>%0%</strong>.]]></key>
     <key alias="excessiveHeadersNotFound">Es sind keine Header, die Informationen über die Website-Technologie preisgeben, vorhanden.</key>
     <key alias="smtpMailSettingsConnectionSuccess">Die SMTP-Einstellungen sind korrekt konfiguriert und der Dienst arbeitet wie erwartet.</key>

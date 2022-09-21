@@ -2490,15 +2490,6 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
       avrai i tuoi domini in esecuzione con https per le prossime 18 settimane (minimo).
     </key>
     <key alias="hSTSSetHeaderInConfigSuccess"><![CDATA[L'header HSTS è stato aggiunto al file web.config.]]></key>
-    <key alias="xssProtectionCheckHeaderFound">
-      <![CDATA[L'header <strong>X-XSS-Protection</strong> è stato trovato.]]></key>
-    <key alias="xssProtectionCheckHeaderNotFound">
-      <![CDATA[L'header <strong>X-XSS-Protection</strong> non è stato trovato.]]></key>
-    <key alias="xssProtectionSetHeaderInConfigDescription">Aggiunge l'header 'X-XSS-Protection' con il valore '1;
-      mode=block' alla sezione httpProtocol/customHeaders del file web.config.
-    </key>
-    <key alias="xssProtectionSetHeaderInConfigSuccess">
-      <![CDATA[L'header X-XSS-Protection è stato aggiunto al file web.config.]]></key>
     <!-- The following key get these tokens passed in:
   0: Comma delimitted list of headers found
 -->

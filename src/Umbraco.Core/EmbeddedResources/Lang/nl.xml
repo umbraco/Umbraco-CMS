@@ -2149,10 +2149,6 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
       <![CDATA[De <strong>Strict-Transport-Security</strong> header, ook bekend als de HSTS-header, is gevonden.]]></key>
     <key alias="hSTSCheckHeaderNotFound">
       <![CDATA[De <strong>Strict-Transport-Security</strong>header is niet gevonden.]]></key>
-    <key alias="xssProtectionCheckHeaderFound">
-      <![CDATA[De header <strong>X-XSS-Protection</strong> is gevonden.]]></key>
-    <key alias="xssProtectionCheckHeaderNotFound">
-      <![CDATA[De header <strong>X-XSS-Protection</strong> is niet gevonden.]]></key>
     <!-- The following key get these tokens passed in:
 	    0: Comma delimitted list of headers found
   	-->

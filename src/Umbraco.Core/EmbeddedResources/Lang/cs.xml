@@ -1942,8 +1942,6 @@
     <key alias="noSniffCheckHeaderNotFound"><![CDATA[Záhlaví nebo metaznačky <strong>X-Content-Type-Options</strong> použité k ochraně před zranitelnostmi čichání MIME nebyly nalezeny.]]></key>
     <key alias="hSTSCheckHeaderFound"><![CDATA[Záhlaví <strong>Strict-Transport-Security</strong>, také známo jako HSTS-header, bylo nalezeno.]]></key>
     <key alias="hSTSCheckHeaderNotFound"><![CDATA[záhlaví <strong>Strict-Transport-Security</strong> nebylo nalezeno.]]></key>
-    <key alias="xssProtectionCheckHeaderFound"><![CDATA[Záhlaví <strong>X-XSS-Protection</strong> bylo nalezeno.]]></key>
-    <key alias="xssProtectionCheckHeaderNotFound"><![CDATA[Záhlaví <strong>X-XSS-Protection</strong> bylo nalezeno.]]></key>
     <!-- The following key get these tokens passed in:
         0: Comma delimitted list of headers found
     -->

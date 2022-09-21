@@ -2071,8 +2071,6 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="noSniffCheckHeaderNotFound">​​<![CDATA[MIME koklama güvenlik açıklarına karşı koruma sağlamak için kullanılan başlık veya meta etiketi <strong> X-Content-Type-Options </strong> bulunamadı.]]></key>
     <key alias="hSTSCheckHeaderFound">​​<![CDATA[HSTS başlığı olarak da bilinen <strong> Strict-Transport-Security </strong> başlığı bulundu.]]></key>
     <key alias="hSTSCheckHeaderNotFound">​​<![CDATA[<strong> Strict-Transport-Security </strong> başlığı bulunamadı.]]></key>
-    <key alias="xssProtectionCheckHeaderFound">​​<![CDATA[<strong> X-XSS-Protection </strong> başlığı bulundu.]]></key>
-    <key alias="xssProtectionCheckHeaderNotFound">​​<![CDATA[<strong> X-XSS-Protection </strong> başlığı bulunamadı.]]></key>
     <!-- The following key get these tokens passed in:
 	    0: Comma delimitted list of headers found
   	-->
