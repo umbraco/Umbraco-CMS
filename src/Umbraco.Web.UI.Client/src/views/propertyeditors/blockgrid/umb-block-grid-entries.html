@@ -40,7 +40,7 @@
     <div 
         class="umb-block-grid__area-actions" 
         ng-if="!vm.blockEditorApi.readonly && vm.depth !== '0' && (vm.entries.length === 0 || !vm.entriesForm.areaMinCount.$valid)" 
-        ng-class="{'--highlight': !vm.entriesForm.areaMinCount.$valid || !vm.entriesForm.areaMaxCount.$valid || !vm.entriesForm.areaTypeRequirements.$valid}"
+        ng-class="{'--highlight': vm.entries.length === 0 || !vm.entriesForm.areaMinCount.$valid || !vm.entriesForm.areaMaxCount.$valid || !vm.entriesForm.areaTypeRequirements.$valid}"
 
         data-min="{{vm.entriesForm.areaMinCount.$valid ? 'true' : 'false'}}"
         data-max="{{vm.entriesForm.areaMaxCount.$valid ? 'true' : 'false'}}"
