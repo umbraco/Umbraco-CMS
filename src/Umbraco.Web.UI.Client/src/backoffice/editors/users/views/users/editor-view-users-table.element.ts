@@ -46,6 +46,14 @@ export class UmbEditorViewUsersTableElement extends UmbContextConsumerMixin(LitE
 				justify-content: space-between;
 				width: 100%;
 			}
+			.link-button {
+				font-weight: bold;
+				color: var(--uui-color-interactive);
+			}
+			.link-button:hover {
+				text-decoration: underline;
+				color: var(--uui-color-interactive-emphasis);
+			}
 		`,
 	];
 
@@ -138,6 +146,12 @@ export class UmbEditorViewUsersTableElement extends UmbContextConsumerMixin(LitE
 		console.log('SELECT ALL NOT IMPLEMENTED');
 	}
 
+	//TODO How should we handle url stuff?
+	private _handleOpenUser(event: Event, key: string) {
+		event.stopImmediatePropagation();
+		history.pushState(null, '', location.pathname + '/' + key);
+	}
+
 	private _selectRowHandler(user: UserItem) {
 		this._usersContext?.select(user.key);
 	}
@@ -186,7 +200,17 @@ export class UmbEditorViewUsersTableElement extends UmbContextConsumerMixin(LitE
 			</uui-table-cell>
 			<uui-table-cell>
 				<div style="display: flex; align-items: center;">
-					<a style="font-weight: bold;" href="http://">${user.name}</a>
+					<div
+						class="link-button"
+						@keydown=${(e: KeyboardEvent) => {
+							if (e.key === 'Enter') {
+								this._handleOpenUser(e, user.key);
+							}
+						}}
+						@click=${(e: Event) => this._handleOpenUser(e, user.key)}
+						href=${location.pathname + '/' + user.key}>
+						${user.name}
+					</div>
 				</div>
 			</uui-table-cell>
 			<uui-table-cell> ${user.userGroup} </uui-table-cell>

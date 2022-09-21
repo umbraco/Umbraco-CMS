@@ -134,12 +134,13 @@ export class UmbEditorViewUsersListElement extends UmbContextConsumerMixin(LitEl
 			<div id="sticky-top">
 				<div id="user-list-top-bar">
 					<uui-button label="Invite user" look="outline"></uui-button>
-					<uui-input id="input-search"></uui-input>
+					<uui-input label="search" id="input-search"></uui-input>
 					<div>
-						<uui-button> Status: <b>All</b> </uui-button>
-						<uui-button> Groups: <b>All</b> </uui-button>
-						<uui-button> Order by: <b>Name (A-Z)</b> </uui-button>
+						<uui-button label="status"> Status: <b>All</b> </uui-button>
+						<uui-button label="groups"> Groups: <b>All</b> </uui-button>
+						<uui-button label="order by"> Order by: <b>Name (A-Z)</b> </uui-button>
 						<uui-button
+							label="view toggle"
 							@click=${this._toggleViewType}
 							look="${this._viewType === 'grid' ? 'outline' : 'primary'}"
 							compact>
