@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.ManagementApi.Builders;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.Language;
 
@@ -31,13 +32,12 @@ public class DeleteLanguageController : LanguageControllerBase
         // the service would not let us do it, but test here nevertheless
         if (language.IsDefault)
         {
-            var invalidModelProblem = new ProblemDetails
-            {
-                Title = "Cannot delete default language",
-                Detail = $"Language '{language.IsoCode}' is currently set to 'default' and can not be deleted.",
-                Status = StatusCodes.Status400BadRequest,
-                Type = "Error",
-            };
+            ProblemDetails invalidModelProblem =
+                new ProblemDetailsBuilder()
+                    .WithTitle("Cannot delete default language")
+                    .WithDetail($"Language '{language.IsoCode}' is currently set to 'default' and can not be deleted.")
+                    .Build();
+
             return BadRequest(invalidModelProblem);
         }
 

@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.ManagementApi.Builders;
 using Umbraco.Cms.ManagementApi.Factories;
 using Umbraco.Cms.ManagementApi.ViewModels.Help;
 using Umbraco.Cms.ManagementApi.ViewModels.Pagination;
@@ -42,13 +43,11 @@ public class GetHelpController : HelpControllerBase
         {
             _logger.LogError($"The following URL is not listed in the allowlist for HelpPage in HelpPageSettings: {baseUrl}");
 
-            var invalidModelProblem = new ProblemDetails
-            {
-                Title = "Invalid database configuration",
-                Detail = "The provided database configuration is invalid",
-                Status = StatusCodes.Status400BadRequest,
-                Type = "Error",
-            };
+            ProblemDetails invalidModelProblem =
+                new ProblemDetailsBuilder()
+                    .WithTitle("Invalid database configuration")
+                    .WithDetail("The provided database configuration is invalid")
+                    .Build();
 
             return BadRequest(invalidModelProblem);
         }
