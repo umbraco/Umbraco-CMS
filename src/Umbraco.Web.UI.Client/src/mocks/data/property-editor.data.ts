@@ -298,6 +298,14 @@ export const data: Array<PropertyEditor> = [
 		icon: 'umb:picture',
 		alias: 'Umbraco.MediaPicker',
 	},
+	{
+		isSystem: false,
+		group: 'Custom',
+		hasPrevalues: true,
+		name: 'Custom Property Editor',
+		icon: 'umb:autofill',
+		alias: 'Umbraco.Custom',
+	},
 ];
 
 // Temp mocked database
