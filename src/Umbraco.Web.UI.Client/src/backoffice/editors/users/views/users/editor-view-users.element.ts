@@ -23,23 +23,27 @@ export class UmbEditorViewUsersElement extends UmbContextProviderMixin(LitElemen
 	static styles = [
 		UUITextStyles,
 		css`
-			#top-bar,
+			#sticky-top {
+				position: sticky;
+				top: 0px;
+				z-index: 1;
+				box-shadow: var(--uui-shadow-depth-2);
+			}
+
 			#user-list-top-bar {
+				padding: var(--uui-size-space-4) var(--uui-size-space-6);
+				background-color: var(--uui-color-surface-alt);
 				display: flex;
 				justify-content: space-between;
+				white-space: nowrap;
+				gap: 16px;
+				align-items: center;
 			}
-
-			#user-list-top-bar {
-				margin-bottom: var(--uui-size-space-4);
-			}
-
 			#user-list {
-				margin-top: var(--uui-size-layout-2);
-				font-size: 1rem;
+				padding: var(--uui-size-space-6);
 			}
-
-			umb-editor-view-users-selection {
-				margin-bottom: var(--uui-size-layout-2);
+			#input-search {
+				width: 100%;
 			}
 		`,
 	];
@@ -253,35 +257,28 @@ export class UmbEditorViewUsersElement extends UmbContextProviderMixin(LitElemen
 
 	render() {
 		return html`
-			${this._renderSelection()}
-
-			<div id="top-bar">
-				<uui-button label="Invite user" look="outline"></uui-button>
-				<div>
-					<uui-button
-						@click=${this._toggleViewType}
-						look="${this._viewType === 'grid' ? 'outline' : 'primary'}"
-						compact>
-						<uui-icon name="settings"></uui-icon>
-					</uui-button>
-					<uui-button look="outline" compact>
-						<uui-icon name="search"></uui-icon>
-					</uui-button>
-				</div>
-			</div>
-
-			<div id="user-list">
+			<div id="sticky-top">
 				<div id="user-list-top-bar">
-					<b>Users (23)</b>
+					<uui-button label="Invite user" look="outline"></uui-button>
+					<uui-input id="input-search"></uui-input>
 					<div>
 						<uui-button> Status: <b>All</b> </uui-button>
 						<uui-button> Groups: <b>All</b> </uui-button>
 						<uui-button> Order by: <b>Name (A-Z)</b> </uui-button>
+						<uui-button
+							@click=${this._toggleViewType}
+							look="${this._viewType === 'grid' ? 'outline' : 'primary'}"
+							compact>
+							<uui-icon name="settings"></uui-icon>
+						</uui-button>
 					</div>
 				</div>
 
-				${this._renderViewType()}
+				${this._renderSelection()}
 			</div>
+			<!-- <div id="sticky-top-shadow"></div> -->
+
+			<div id="user-list">${this._renderViewType()}</div>
 		`;
 	}
 }

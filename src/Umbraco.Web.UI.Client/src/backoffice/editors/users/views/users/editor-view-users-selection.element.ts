@@ -15,11 +15,10 @@ export class UmbEditorViewUsersSelectionElement extends UmbContextConsumerMixin(
 				display: flex;
 				gap: var(--uui-size-3);
 				width: 100%;
-				padding: var(--uui-size-space-4);
+				padding: var(--uui-size-space-4) var(--uui-size-space-6);
 				background-color: var(--uui-color-selected);
 				color: var(--uui-color-selected-contrast);
 				align-items: center;
-				border-radius: var(--uui-size-space-2);
 				box-sizing: border-box;
 			}
 		`,
