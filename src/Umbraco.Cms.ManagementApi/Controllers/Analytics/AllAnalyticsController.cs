@@ -15,7 +15,7 @@ public class AllAnalyticsController : AnalyticsControllerBase
 
     [HttpGet("all")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(AnalyticsLevelViewModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagedViewModel<TelemetryLevel>), StatusCodes.Status200OK)]
     public async Task<PagedViewModel<TelemetryLevel>> GetAll(int skip, int take)
     {
         TelemetryLevel[] levels = Enum.GetValues<TelemetryLevel>();
