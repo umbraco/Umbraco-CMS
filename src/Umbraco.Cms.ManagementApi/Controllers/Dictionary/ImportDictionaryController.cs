@@ -1,42 +1,33 @@
 ﻿using System.Net.Mime;
 using System.Text;
-using System.Xml;
-using System.Xml.Linq;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Infrastructure.Packaging;
+using Umbraco.Cms.ManagementApi.Services;
+using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.Dictionary;
 
 public class ImportDictionaryController : DictionaryControllerBase
 {
     private readonly IHostingEnvironment _hostingEnvironment;
-    private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
-    private readonly ILocalizationService _localizationService;
-    private readonly PackageDataInstallation _packageDataInstallation;
-    private readonly ILogger<ImportDictionaryController> _logger;
     private readonly IDictionaryService _dictionaryService;
+    private readonly IWebHostEnvironment _webHostEnvironment;
+    private readonly ILoadDictionaryItemService _loadDictionaryItemService;
 
     public ImportDictionaryController(
         IHostingEnvironment hostingEnvironment,
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        ILocalizationService localizationService,
-        PackageDataInstallation packageDataInstallation,
-        ILogger<ImportDictionaryController> logger,
-        IDictionaryService dictionaryService)
+        IDictionaryService dictionaryService,
+        IWebHostEnvironment webHostEnvironment,
+        ILoadDictionaryItemService loadDictionaryItemService)
     {
         _hostingEnvironment = hostingEnvironment;
-        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
-        _localizationService = localizationService;
-        _packageDataInstallation = packageDataInstallation;
-        _logger = logger;
         _dictionaryService = dictionaryService;
+        _webHostEnvironment = webHostEnvironment;
+        _loadDictionaryItemService = loadDictionaryItemService;
     }
 
     [HttpPost("import")]
@@ -51,31 +42,12 @@ public class ImportDictionaryController : DictionaryControllerBase
         }
 
         var filePath = Path.Combine(_hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.Data), file);
-        if (!System.IO.File.Exists(filePath))
+        if (_webHostEnvironment.ContentRootFileProvider.GetFileInfo(filePath) is null)
         {
             return await Task.FromResult(NotFound());
         }
 
-        var xmlDocument = new XmlDocument { XmlResolver = null };
-        xmlDocument.Load(filePath);
-
-        var userId = _backOfficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? 0;
-        var element = XElement.Parse(xmlDocument.InnerXml);
-
-        IDictionaryItem? parentDictionaryItem = _localizationService.GetDictionaryItemById(parentId ?? 0);
-        IEnumerable<IDictionaryItem> dictionaryItems = _packageDataInstallation.ImportDictionaryItem(element, userId, parentDictionaryItem?.Key);
-
-        // Try to clean up the temporary file.
-        try
-        {
-            System.IO.File.Delete(filePath);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error cleaning up temporary udt file in {File}", filePath);
-        }
-
-        IDictionaryItem dictionaryItem = dictionaryItems.First();
+        IDictionaryItem dictionaryItem = _loadDictionaryItemService.Load(filePath, parentId);
 
         return await Task.FromResult(Content(_dictionaryService.CalculatePath(dictionaryItem.ParentId, dictionaryItem.Id), MediaTypeNames.Text.Plain, Encoding.UTF8));
     }

@@ -12,6 +12,7 @@ public static class ServicesBuilderExtensions
     {
         builder.Services.AddTransient<IJsonPatchService, JsonPatchService>();
         builder.Services.AddTransient<ILanguageService, LanguageService>();
+        builder.Services.AddTransient<ILoadDictionaryItemService, LoadDictionaryItemService>();
         return builder;
     }
 }
