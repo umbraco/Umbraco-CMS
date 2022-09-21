@@ -1,7 +1,6 @@
 ﻿using System.Net.Mime;
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Nodes;
 using Json.Patch;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -11,7 +10,6 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.ManagementApi.Serialization;
 using Umbraco.Cms.ManagementApi.Services;
 using Umbraco.Cms.ManagementApi.ViewModels.Dictionary;
-using Umbraco.Cms.ManagementApi.ViewModels.Installer;
 using Umbraco.Cms.ManagementApi.ViewModels.JsonPatch;
 using Umbraco.New.Cms.Core.Factories;
 
