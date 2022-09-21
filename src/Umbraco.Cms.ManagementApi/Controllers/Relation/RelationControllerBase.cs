@@ -9,7 +9,7 @@ namespace Umbraco.Cms.ManagementApi.Controllers.Relation;
 [OpenApiTag("Relation")]
 [ApiVersion("1.0")]
 // TODO: Implement Authentication
-public abstract class RelationControllerBase : Controller
+public abstract class RelationControllerBase : ManagementApiControllerBase
 {
 
 }

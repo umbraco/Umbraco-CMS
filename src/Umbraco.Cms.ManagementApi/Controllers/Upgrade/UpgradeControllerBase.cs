@@ -12,7 +12,7 @@ namespace Umbraco.Cms.ManagementApi.Controllers.Upgrade;
 [RequireRuntimeLevel(RuntimeLevel.Upgrade)]
 [BackOfficeRoute("api/v{version:apiVersion}/upgrade")]
 [OpenApiTag("Upgrade")]
-public abstract class UpgradeControllerBase : Controller
+public abstract class UpgradeControllerBase : ManagementApiControllerBase
 {
 
 }

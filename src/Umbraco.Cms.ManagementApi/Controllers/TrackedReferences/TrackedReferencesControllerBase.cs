@@ -8,6 +8,6 @@ namespace Umbraco.Cms.ManagementApi.Controllers.TrackedReferences;
 [BackOfficeRoute("api/v{version:apiVersion}/trackedReferences")]
 [OpenApiTag("TrackedReferences")]
 [ApiVersion("1.0")]
-public abstract class TrackedReferencesControllerBase : Controller
+public abstract class TrackedReferencesControllerBase : ManagementApiControllerBase
 {
 }

@@ -8,6 +8,6 @@ namespace Umbraco.Cms.ManagementApi.Controllers.Language;
 [BackOfficeRoute("api/v{version:apiVersion}/language")]
 [OpenApiTag("Language")]
 [ApiVersion("1.0")]
-public abstract class LanguageControllerBase : Controller
+public abstract class LanguageControllerBase : ManagementApiControllerBase
 {
 }

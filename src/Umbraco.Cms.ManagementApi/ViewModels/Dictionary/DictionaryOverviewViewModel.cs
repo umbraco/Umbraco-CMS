@@ -1,5 +1,4 @@
-﻿using System.Runtime.Serialization;
-using Umbraco.Cms.Core.Models.ContentEditing;
+﻿using Umbraco.Cms.Core.Models.ContentEditing;
 
 namespace Umbraco.Cms.ManagementApi.ViewModels.Dictionary;
 
@@ -13,24 +12,20 @@ public class DictionaryOverviewViewModel
     /// <summary>
     ///     Gets or sets the key.
     /// </summary>
-    [DataMember(Name = "name")]
     public string? Name { get; set; }
 
     /// <summary>
     ///     Gets or sets the key.
     /// </summary>
-    [DataMember(Name = "id")]
     public Guid Key { get; set; }
 
     /// <summary>
     ///     Gets or sets the level.
     /// </summary>
-    [DataMember(Name = "level")]
     public int Level { get; set; }
 
     /// <summary>
     ///     Gets or sets the translations.
     /// </summary>
-    [DataMember(Name = "translations")]
-    public List<DictionaryTranslationOverviewViewModel> Translations { get; set; }
+    public List<DictionaryTranslationOverviewViewModel> Translations { get; }
 }

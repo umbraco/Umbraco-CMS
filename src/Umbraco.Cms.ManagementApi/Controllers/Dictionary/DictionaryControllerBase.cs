@@ -9,6 +9,6 @@ namespace Umbraco.Cms.ManagementApi.Controllers.Dictionary;
 [OpenApiTag("Dictionary")]
 [ApiVersion("1.0")]
 // TODO: Add authentication
-public abstract class DictionaryControllerBase : Controller
+public abstract class DictionaryControllerBase : ManagementApiControllerBase
 {
 }

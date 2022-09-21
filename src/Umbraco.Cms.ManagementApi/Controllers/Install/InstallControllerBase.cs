@@ -10,6 +10,6 @@ namespace Umbraco.Cms.ManagementApi.Controllers.Install;
 [BackOfficeRoute("api/v{version:apiVersion}/install")]
 [OpenApiTag("Install")]
 [RequireRuntimeLevel(RuntimeLevel.Install)]
-public abstract class InstallControllerBase : Controller
+public abstract class InstallControllerBase : ManagementApiControllerBase
 {
 }

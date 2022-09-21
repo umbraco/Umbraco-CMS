@@ -8,6 +8,6 @@ namespace Umbraco.Cms.ManagementApi.Controllers.Culture;
 [BackOfficeRoute("api/v{version:apiVersion}/culture")]
 [OpenApiTag("Culture")]
 [ApiVersion("1.0")]
-public abstract class CultureControllerBase : Controller
+public abstract class CultureControllerBase : ManagementApiControllerBase
 {
 }
