@@ -66,6 +66,19 @@ export class UmbEditorViewUsersGridElement extends UmbContextConsumerMixin(LitEl
 		return this._selection.includes(key);
 	}
 
+	//TODO How should we handle url stuff?
+	private _handleOpenCard(key: string) {
+		history.pushState(null, '', window.location.pathname + '/' + key);
+	}
+
+	private _selectRowHandler(user: UserItem) {
+		this._usersContext?.select(user.key);
+	}
+
+	private _deselectRowHandler(user: UserItem) {
+		this._usersContext?.deselect(user.key);
+	}
+
 	private renderUserCard(user: UserItem) {
 		if (!this._usersContext) return;
 
@@ -77,8 +90,9 @@ export class UmbEditorViewUsersGridElement extends UmbContextConsumerMixin(LitEl
 				selectable
 				?select-only=${this._selection.length > 0}
 				?selected=${this._isSelected(user.key)}
-				@selected=${() => this._usersContext?.select(user.key)}
-				@unselected=${() => this._usersContext?.deselect(user.key)}>
+				@open=${() => this._handleOpenCard(user.key)}
+				@selected=${() => this._selectRowHandler(user)}
+				@unselected=${() => this._deselectRowHandler(user)}>
 				${user.status
 					? html`<uui-tag slot="tag" size="s" look="${statusLook.look}" color="${statusLook.color}">
 							${user.status}
