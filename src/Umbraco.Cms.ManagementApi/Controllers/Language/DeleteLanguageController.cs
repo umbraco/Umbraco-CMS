@@ -14,7 +14,7 @@ public class DeleteLanguageController : LanguageControllerBase
     /// <summary>
     ///     Deletes a language with a given ID
     /// </summary>
-    [HttpDelete("delete/{id:int}")]
+    [HttpDelete("{id:int}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
