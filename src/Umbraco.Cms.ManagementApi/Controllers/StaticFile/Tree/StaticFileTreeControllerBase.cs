@@ -25,18 +25,18 @@ public class StaticFileTreeControllerBase : FileSystemTreeControllerBase
     protected override string ItemType(string path) => "static-file";
 
     protected override string[] GetDirectories(string path) =>
-        IsRootPath(path)
+        IsTreeRootPath(path)
             ? _allowedRootFolders
             : IsAllowedPath(path)
                 ? base.GetDirectories(path)
                 : Array.Empty<string>();
 
     protected override string[] GetFiles(string path)
-        => IsRootPath(path) || IsAllowedPath(path) == false
+        => IsTreeRootPath(path) || IsAllowedPath(path) == false
             ? Array.Empty<string>()
             : base.GetFiles(path);
 
-    private bool IsRootPath(string path) => string.IsNullOrWhiteSpace(path);
+    private bool IsTreeRootPath(string path) => string.IsNullOrWhiteSpace(path);
 
     private bool IsAllowedPath(string path) => _allowedRootFolders.Contains(path) || _allowedRootFolders.Any(folder => path.StartsWith($"{folder}/"));
 }
