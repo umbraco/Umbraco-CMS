@@ -13,7 +13,7 @@ namespace Umbraco.Cms.ManagementApi.Controllers.StaticFile.Tree;
 [OpenApiTag("StaticFile")]
 public class StaticFileTreeControllerBase : FileSystemTreeControllerBase
 {
-    private static readonly string[] _whiteListedRootFolders = { "App_Plugins", "wwwroot" };
+    private static readonly string[] _allowedRootFolders = { "App_Plugins", "wwwroot" };
 
     public StaticFileTreeControllerBase(IPhysicalFileSystem physicalFileSystem)
         => FileSystem = physicalFileSystem;
@@ -26,17 +26,17 @@ public class StaticFileTreeControllerBase : FileSystemTreeControllerBase
 
     protected override string[] GetDirectories(string path) =>
         IsRootPath(path)
-            ? _whiteListedRootFolders
-            : IsWhiteListedPath(path)
+            ? _allowedRootFolders
+            : IsAllowedPath(path)
                 ? base.GetDirectories(path)
                 : Array.Empty<string>();
 
     protected override string[] GetFiles(string path)
-        => IsRootPath(path) || IsWhiteListedPath(path) == false
+        => IsRootPath(path) || IsAllowedPath(path) == false
             ? Array.Empty<string>()
             : base.GetFiles(path);
 
     private bool IsRootPath(string path) => string.IsNullOrWhiteSpace(path);
 
-    private bool IsWhiteListedPath(string path) => _whiteListedRootFolders.Contains(path) || _whiteListedRootFolders.Any(folder => path.StartsWith($"{folder}/"));
+    private bool IsAllowedPath(string path) => _allowedRootFolders.Contains(path) || _allowedRootFolders.Any(folder => path.StartsWith($"{folder}/"));
 }
