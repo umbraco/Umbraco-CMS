@@ -2,8 +2,8 @@ import { Entity } from './entities';
 import { UmbEntityData } from './entity.data';
 
 export interface DataTypeEntity extends Entity {
-	propertyEditorAlias: string;
-	propertyEditorUIAlias: string;
+	propertyEditorAlias: string | null;
+	propertyEditorUIAlias: string | null;
 	//configUI: any; // this is the prevalues...
 }
 

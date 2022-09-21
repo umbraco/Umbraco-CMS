@@ -96,7 +96,7 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Li
 		});
 	}
 
-	private _observePropertyEditor(propertyEditorAlias: string) {
+	private _observePropertyEditor(propertyEditorAlias: string | null) {
 		if (!propertyEditorAlias) return;
 
 		this._propertyEditorSubscription?.unsubscribe();
@@ -110,7 +110,7 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Li
 			});
 	}
 
-	private _observeAvailablePropertyEditorUIs(propertyEditorAlias: string) {
+	private _observeAvailablePropertyEditorUIs(propertyEditorAlias: string | null) {
 		if (!propertyEditorAlias) return;
 
 		this._availablePropertyEditorUIsSubscription?.unsubscribe();
@@ -133,7 +133,7 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Li
 			});
 	}
 
-	private _observePropertyEditorUI(propertyEditorUIAlias: string) {
+	private _observePropertyEditorUI(propertyEditorUIAlias: string | null) {
 		if (!propertyEditorUIAlias) return;
 
 		this._propertyEditorUISubscription?.unsubscribe();
@@ -150,7 +150,7 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Li
 	private _openPropertyEditorPicker() {
 		if (!this._dataType) return;
 
-		const selection = [this._dataType.propertyEditorAlias] || [];
+		const selection = this._dataType.propertyEditorAlias ? [this._dataType.propertyEditorAlias] : [];
 		const modalHandler = this._modalService?.propertyEditorPicker({ selection });
 
 		modalHandler?.onClose().then(({ selection } = {}) => {
@@ -164,6 +164,7 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Li
 	private _selectPropertyEditor(propertyEditorAlias: string) {
 		if (!this._dataType || this._dataType.propertyEditorUIAlias === propertyEditorAlias) return;
 
+		this._selectPropertyEditorUI(null);
 		this._dataType.propertyEditorAlias = propertyEditorAlias;
 		this._dataTypeContext?.update({ propertyEditorAlias });
 	}
@@ -171,7 +172,7 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Li
 	private _openPropertyEditorUIPicker() {
 		if (!this._dataType) return;
 
-		const selection = [this._dataType.propertyEditorUIAlias] || [];
+		const selection = this._dataType.propertyEditorUIAlias ? [this._dataType.propertyEditorUIAlias] : [];
 		const modalHandler = this._modalService?.propertyEditorUIPicker({ selection });
 
 		modalHandler?.onClose().then(({ selection } = {}) => {
@@ -182,7 +183,7 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Li
 		});
 	}
 
-	private _selectPropertyEditorUI(propertyEditorUIAlias: string) {
+	private _selectPropertyEditorUI(propertyEditorUIAlias: string | null) {
 		if (!this._dataType || this._dataType.propertyEditorUIAlias === propertyEditorUIAlias) return;
 
 		this._dataType.propertyEditorUIAlias = propertyEditorUIAlias;
