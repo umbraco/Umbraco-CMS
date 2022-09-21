@@ -18,10 +18,4 @@ public class MoveViewModel
     /// </summary>
     [Required]
     public int Id { get; set; }
-
-    /// <summary>
-    ///     Boolean indicating whether copying the object should be recursive
-    /// </summary>
-    [Required]
-    public bool Recursive { get; set; }
 }

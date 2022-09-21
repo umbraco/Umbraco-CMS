@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.ManagementApi.Serialization;
 using Umbraco.Cms.ManagementApi.Services;
 using Umbraco.Cms.ManagementApi.ViewModels.Dictionary;
 using Umbraco.Cms.ManagementApi.ViewModels.Installer;
@@ -23,19 +24,22 @@ public class UpdateDictionaryController : DictionaryControllerBase
     private readonly IDictionaryService _dictionaryService;
     private readonly IDictionaryFactory _dictionaryFactory;
     private readonly IJsonPatchService _jsonPatchService;
+    private readonly ISystemTextJsonSerializer _systemTextJsonSerializer;
 
     public UpdateDictionaryController(
         ILocalizationService localizationService,
         IUmbracoMapper umbracoMapper,
         IDictionaryService dictionaryService,
         IDictionaryFactory dictionaryFactory,
-        IJsonPatchService jsonPatchService)
+        IJsonPatchService jsonPatchService,
+        ISystemTextJsonSerializer systemTextJsonSerializer)
     {
         _localizationService = localizationService;
         _umbracoMapper = umbracoMapper;
         _dictionaryService = dictionaryService;
         _dictionaryFactory = dictionaryFactory;
         _jsonPatchService = jsonPatchService;
+        _systemTextJsonSerializer = systemTextJsonSerializer;
     }
 
     [HttpPatch("{id:Guid}")]
@@ -55,8 +59,12 @@ public class UpdateDictionaryController : DictionaryControllerBase
 
         PatchResult? result = _jsonPatchService.Patch(updateViewModel, dictionaryToPatch);
 
-        // TODO V13: Use IJsonSerializer instead of JsonSerializer.Deserialize
-        DictionaryViewModel? updatedDictionaryItem = JsonSerializer.Deserialize<DictionaryViewModel>(result?.Result);
+        if (result?.Result is null)
+        {
+            throw new JsonException("Could not patch the JsonPatchViewModel");
+        }
+
+        DictionaryViewModel? updatedDictionaryItem = _systemTextJsonSerializer.Deserialize<DictionaryViewModel>(result.Result.ToJsonString());
         if (updatedDictionaryItem is null)
         {
             throw new JsonException("Could not serialize from PatchResult to DictionaryViewModel");

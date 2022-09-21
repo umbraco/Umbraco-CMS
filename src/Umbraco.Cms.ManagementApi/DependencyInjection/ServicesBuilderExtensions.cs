@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.ManagementApi.Serialization;
 using Umbraco.Cms.ManagementApi.Services;
 using Umbraco.New.Cms.Core.Services.Installer;
 using Umbraco.New.Cms.Core.Services.Languages;
@@ -13,6 +14,8 @@ public static class ServicesBuilderExtensions
         builder.Services.AddTransient<IJsonPatchService, JsonPatchService>();
         builder.Services.AddTransient<ILanguageService, LanguageService>();
         builder.Services.AddTransient<ILoadDictionaryItemService, LoadDictionaryItemService>();
+        builder.Services.AddTransient<ISystemTextJsonSerializer, SystemTextJsonSerializer>();
+
         return builder;
     }
 }
