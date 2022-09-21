@@ -46,6 +46,13 @@ export interface paths {
   "/user/sections": {
     get: operations["GetAllowedSections"];
   };
+  "/telemetry/ConsentLevel": {
+    get: operations["GetConsentLevel"];
+    post: operations["PostConsentLevel"];
+  };
+  "/telemetry/ConsentLevels": {
+    get: operations["ConsentLevels"];
+  };
 }
 
 export interface components {
@@ -314,6 +321,9 @@ export interface components {
     AllowedSectionsResponse: {
       sections: string[];
     };
+    ConsentLevelSettings: {
+      telemetryLevel: string;
+    };
   };
 }
 
@@ -531,6 +541,56 @@ export interface operations {
       200: {
         content: {
           "application/json": components["schemas"]["AllowedSectionsResponse"];
+        };
+      };
+      /** default response */
+      default: {
+        content: {
+          "application/json": components["schemas"]["ProblemDetails"];
+        };
+      };
+    };
+  };
+  GetConsentLevel: {
+    responses: {
+      /** 200 response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["ConsentLevelSettings"];
+        };
+      };
+      /** default response */
+      default: {
+        content: {
+          "application/json": components["schemas"]["ProblemDetails"];
+        };
+      };
+    };
+  };
+  PostConsentLevel: {
+    parameters: {};
+    responses: {
+      /** 201 response */
+      201: unknown;
+      /** 400 response */
+      400: {
+        content: {
+          "application/json": components["schemas"]["ProblemDetails"];
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ConsentLevelSettings"];
+      };
+    };
+  };
+  ConsentLevels: {
+    responses: {
+      /** 200 response */
+      200: {
+        content: {
+          "application/json": string[];
         };
       };
       /** default response */

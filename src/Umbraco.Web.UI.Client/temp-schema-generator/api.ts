@@ -3,6 +3,7 @@ import './manifests';
 import './server';
 import './upgrader';
 import './user';
+import './telemetry';
 
 import { api } from '@airtasker/spot';
 

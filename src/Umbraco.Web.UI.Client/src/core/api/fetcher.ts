@@ -21,3 +21,6 @@ export const getUpgradeSettings = fetcher.path('/upgrade/settings').method('get'
 export const PostUpgradeAuthorize = fetcher.path('/upgrade/authorize').method('post').create();
 export const getManifests = fetcher.path('/manifests').method('get').create();
 export const getPackagesInstalled = fetcher.path('/manifests/packages/installed').method('get').create();
+export const getConsentLevels = fetcher.path('/telemetry/ConsentLevels').method('get').create();
+export const getConsentLevel = fetcher.path('/telemetry/ConsentLevel').method('get').create();
+export const postConsentLevel = fetcher.path('/telemetry/ConsentLevel').method('post').create();

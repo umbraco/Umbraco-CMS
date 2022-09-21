@@ -96,6 +96,19 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 	},
 	{
 		type: 'dashboard',
+		alias: 'Umb.Dashboard.Telemetry',
+		name: 'Telemetry',
+		elementName: 'umb-dashboard-telemetry',
+		loader: () => import('./backoffice/dashboards/telemetry/dashboard-telemetry.element'),
+		meta: {
+			label: 'Telemetry Data',
+			sections: ['Umb.Section.Settings'],
+			pathname: 'telemetry', // TODO: how do we want to support pretty urls?
+			weight: 0,
+		},
+	},
+	{
+		type: 'dashboard',
 		alias: 'Umb.Dashboard.ExamineManagement',
 		name: 'Examine Management',
 		elementName: 'umb-dashboard-examine-management',
