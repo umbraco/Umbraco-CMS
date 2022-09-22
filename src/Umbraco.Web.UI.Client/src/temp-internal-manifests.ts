@@ -165,6 +165,17 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		},
 	},
 	{
+		type: 'propertyEditorUI',
+		alias: 'Umb.PropertyEditorUI.Number',
+		name: 'Property Editor Number',
+		loader: () => import('./backoffice/property-editors/number/property-editor-number.element'),
+		meta: {
+			icon: 'umb:autofill',
+			group: 'Common',
+			propertyEditors: ['Umbraco.Integer'],
+		},
+	},
+	{
 		type: 'editorView',
 		alias: 'Umb.EditorView.Content.Edit',
 		name: 'Content Editor Edit View',
