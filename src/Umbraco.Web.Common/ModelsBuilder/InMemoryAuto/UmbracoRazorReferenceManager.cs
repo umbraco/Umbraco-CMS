@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation;
 using Microsoft.CodeAnalysis;
 using Microsoft.Extensions.Options;
 
-namespace Umbraco.Cms.Web.Common.ModelsBuilder;
+namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto;
 
 
 /*

@@ -9,7 +9,7 @@ using Microsoft.Extensions.DependencyModel;
 using Microsoft.Extensions.Hosting;
 using DependencyContextCompilationOptions = Microsoft.Extensions.DependencyModel.CompilationOptions;
 
-namespace Umbraco.Cms.Web.Common.ModelsBuilder;
+namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto;
 
 /*
  * This is a partial Clone'n'Own of microsofts CSharpCompiler, this is just the parts relevant for getting the CompilationOptions
@@ -25,10 +25,8 @@ internal class CompilationOptionsProvider
     private EmitOptions? _emitOptions;
     private bool _optionsInitialized;
 
-    public CompilationOptionsProvider(IWebHostEnvironment hostingEnvironment)
-    {
+    public CompilationOptionsProvider(IWebHostEnvironment hostingEnvironment) =>
         _hostingEnvironment = hostingEnvironment;
-    }
 
     public virtual CSharpParseOptions ParseOptions
     {

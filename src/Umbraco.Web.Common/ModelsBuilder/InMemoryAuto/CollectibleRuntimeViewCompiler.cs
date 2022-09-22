@@ -15,7 +15,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
 using Umbraco.Cms.Core.Exceptions;
 
-namespace Umbraco.Cms.Web.Common.ModelsBuilder;
+namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto;
 
 internal class CollectibleRuntimeViewCompiler : IViewCompiler
 {

@@ -18,7 +18,7 @@ using Umbraco.Cms.Infrastructure.ModelsBuilder.Building;
 using Umbraco.Extensions;
 using File = System.IO.File;
 
-namespace Umbraco.Cms.Web.Common.ModelsBuilder
+namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
 {
     internal class InMemoryModelFactory : IAutoPublishedModelFactory, IRegisteredObject, IDisposable
     {

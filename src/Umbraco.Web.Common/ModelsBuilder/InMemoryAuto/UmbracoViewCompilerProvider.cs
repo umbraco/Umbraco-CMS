@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Exceptions;
 
-namespace Umbraco.Cms.Web.Common.ModelsBuilder;
+namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto;
 
 internal class UmbracoViewCompilerProvider : IViewCompilerProvider
 {

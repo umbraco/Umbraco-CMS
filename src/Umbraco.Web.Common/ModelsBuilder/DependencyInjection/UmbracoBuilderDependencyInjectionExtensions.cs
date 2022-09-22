@@ -16,6 +16,7 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Infrastructure.ModelsBuilder;
 using Umbraco.Cms.Infrastructure.ModelsBuilder.Building;
 using Umbraco.Cms.Web.Common.ModelsBuilder;
+using Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto;
 
 /*
  * OVERVIEW:
