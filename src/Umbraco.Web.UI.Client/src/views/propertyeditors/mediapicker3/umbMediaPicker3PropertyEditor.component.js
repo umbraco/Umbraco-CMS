@@ -398,7 +398,6 @@
         }
 
         function validateMandatory() {
-            debugger;
             var isValid = !vm.model.validation.mandatory || (
               vm.model.value != null
               && vm.model.value.length > 0
