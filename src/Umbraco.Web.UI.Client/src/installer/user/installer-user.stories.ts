@@ -6,7 +6,7 @@ import { installerContextProvider } from '../shared/utils.story-helpers';
 import './installer-user.element';
 
 export default {
-	title: 'Components/Installer/Steps',
+	title: 'Apps/Installer/Steps',
 	component: 'umb-installer-user',
 	id: 'umb-installer-user',
 	decorators: [(story) => installerContextProvider(story)],

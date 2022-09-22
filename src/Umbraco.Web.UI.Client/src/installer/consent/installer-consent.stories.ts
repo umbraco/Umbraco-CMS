@@ -6,7 +6,7 @@ import type { UmbInstallerConsentElement } from './installer-consent.element';
 import './installer-consent.element';
 
 export default {
-	title: 'Components/Installer/Steps',
+	title: 'Apps/Installer/Steps',
 	component: 'umb-installer-consent',
 	id: 'umb-installer-consent',
 	decorators: [(story) => installerContextProvider(story)],

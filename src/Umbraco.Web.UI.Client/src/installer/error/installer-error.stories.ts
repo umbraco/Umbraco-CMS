@@ -24,7 +24,7 @@ const installerContext = new UmbInstallerContext();
 installerContext.setInstallStatus(error);
 
 export default {
-	title: 'Components/Installer/Steps',
+	title: 'Apps/Installer/Steps',
 	component: 'umb-installer-error',
 	id: 'umb-installer-error',
 	decorators: [(story) => installerContextProvider(story, installerContext)],
