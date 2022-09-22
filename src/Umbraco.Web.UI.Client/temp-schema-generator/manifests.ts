@@ -113,7 +113,7 @@ export interface MetaTreeItemAction {
 	weight: number;
 }
 export interface MetaPropertyEditorUI extends IPrevalues {
-	propertyEditors: Array<string>;
+	propertyEditor: string;
 	icon: string;
 	group: string;
 }

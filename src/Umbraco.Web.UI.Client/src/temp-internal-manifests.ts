@@ -138,7 +138,7 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		meta: {
 			icon: 'edit',
 			group: 'common',
-			propertyEditors: ['Umbraco.TextBox'],
+			propertyEditor: 'Umbraco.TextBox',
 		},
 	},
 	{
@@ -150,7 +150,7 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		meta: {
 			icon: 'edit',
 			group: 'common',
-			propertyEditors: ['Umbraco.TextArea'],
+			propertyEditor: 'Umbraco.TextArea',
 		},
 	},
 	{
@@ -161,7 +161,7 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		meta: {
 			icon: 'favorite',
 			group: 'common',
-			propertyEditors: ['Umbraco.Custom'],
+			propertyEditor: 'Umbraco.Custom',
 		},
 	},
 	{
@@ -172,7 +172,7 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		meta: {
 			icon: 'umb:autofill',
 			group: 'Common',
-			propertyEditors: ['Umbraco.Integer'],
+			propertyEditor: 'Umbraco.Integer',
 		},
 	},
 	{
@@ -308,7 +308,7 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		elementName: 'umb-property-editor-content-picker',
 		loader: () => import('./backoffice/property-editors/content-picker/property-editor-content-picker.element'),
 		meta: {
-			propertyEditors: ['Umbraco.ContentPicker'],
+			propertyEditor: 'Umbraco.ContentPicker',
 			icon: 'document',
 			group: 'common',
 		},

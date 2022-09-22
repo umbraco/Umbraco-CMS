@@ -56,8 +56,8 @@ export class UmbModalLayoutPropertyEditorUIPickerElement extends UmbContextConsu
 			?.extensionsOfType('propertyEditorUI')
 			.pipe(
 				map((propertyEditorUIs) =>
-					propertyEditorUIs.filter((propertyEditorUI) =>
-						propertyEditorUI.meta.propertyEditors.includes(this.data?.propertyEditorAlias ?? '')
+					propertyEditorUIs.filter(
+						(propertyEditorUI) => propertyEditorUI.meta.propertyEditor === this.data?.propertyEditorAlias
 					)
 				)
 			)

@@ -2,7 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { customElement, property, state } from 'lit/decorators.js';
-import { distinctUntilChanged, EMPTY, of, Subscription, switchMap } from 'rxjs';
+import { EMPTY, of, Subscription, switchMap } from 'rxjs';
 
 import { UmbContextConsumerMixin } from '../../../core/context';
 import { UmbDataTypeStore } from '../../../core/stores/data-type/data-type.store';
@@ -29,7 +29,7 @@ export class UmbNodePropertyElement extends UmbContextConsumerMixin(LitElement) 
 	}
 	public set property(value: NodeProperty | undefined) {
 		this._property = value;
-		this._useDataType();
+		this._observeDataType();
 	}
 
 	@property()
@@ -37,6 +37,9 @@ export class UmbNodePropertyElement extends UmbContextConsumerMixin(LitElement) 
 
 	@state()
 	private _propertyEditorUIAlias?: string;
+
+	@state()
+	private _dataTypeData?: any;
 
 	private _extensionRegistry?: UmbExtensionRegistry;
 	private _dataTypeStore?: UmbDataTypeStore;
@@ -48,16 +51,16 @@ export class UmbNodePropertyElement extends UmbContextConsumerMixin(LitElement) 
 		// TODO: solution to know when both contexts are available
 		this.consumeContext('umbDataTypeStore', (_instance: UmbDataTypeStore) => {
 			this._dataTypeStore = _instance;
-			this._useDataType();
+			this._observeDataType();
 		});
 
 		this.consumeContext('umbExtensionRegistry', (_instance: UmbExtensionRegistry) => {
 			this._extensionRegistry = _instance;
-			this._useDataType();
+			this._observeDataType();
 		});
 	}
 
-	private _useDataType() {
+	private _observeDataType() {
 		if (!this._dataTypeStore || !this._extensionRegistry || !this._property) return;
 
 		this._dataTypeSubscription?.unsubscribe();
@@ -65,9 +68,9 @@ export class UmbNodePropertyElement extends UmbContextConsumerMixin(LitElement) 
 		this._dataTypeSubscription = this._dataTypeStore
 			.getByKey(this._property.dataTypeKey)
 			.pipe(
-				distinctUntilChanged(),
 				switchMap((dataType) => {
 					if (!dataType?.propertyEditorUIAlias) return EMPTY;
+					this._dataTypeData = dataType.data;
 					return this._extensionRegistry?.getByAlias(dataType.propertyEditorUIAlias) ?? of(null);
 				})
 			)
@@ -89,7 +92,8 @@ export class UmbNodePropertyElement extends UmbContextConsumerMixin(LitElement) 
 			description=${ifDefined(this.property?.description)}
 			alias="${ifDefined(this.property?.alias)}"
 			property-editor-ui-alias="${ifDefined(this._propertyEditorUIAlias)}"
-			.value="${this.value}"></umb-entity-property>`;
+			.value="${this.value}"
+			.config="${this._dataTypeData}"></umb-entity-property>`;
 	}
 }
 

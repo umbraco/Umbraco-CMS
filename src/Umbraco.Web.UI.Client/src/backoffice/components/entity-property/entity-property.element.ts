@@ -59,12 +59,15 @@ export class UmbEntityPropertyElement extends UmbContextConsumerMixin(LitElement
 		this._observePropertyEditorUI();
 	}
 
-	@property()
-	value?: string;
+	@property({ type: Object, attribute: false })
+	value?: any;
+
+	@property({ type: Object, attribute: false })
+	config?: any;
 
 	// TODO: make interface for UMBPropertyEditorElement
 	@state()
-	private _element?: { value?: string } & HTMLElement; // TODO: invent interface for propertyEditorUI.
+	private _element?: { value?: any; config?: any } & HTMLElement; // TODO: invent interface for propertyEditorUI.
 
 	private _extensionRegistry?: UmbExtensionRegistry;
 	private _propertyEditorUISubscription?: Subscription;
@@ -108,9 +111,9 @@ export class UmbEntityPropertyElement extends UmbContextConsumerMixin(LitElement
 				const oldValue = this._element;
 				this._element = el;
 
-				// TODO: Set/Parse Data-Type-UI-configuration
 				if (this._element) {
 					this._element.value = this.value; // Be aware its duplicated code
+					this._element.config = this.config; // Be aware its duplicated code
 				}
 				this.requestUpdate('element', oldValue);
 			})
@@ -132,9 +135,12 @@ export class UmbEntityPropertyElement extends UmbContextConsumerMixin(LitElement
 	willUpdate(changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>) {
 		super.willUpdate(changedProperties);
 
-		const hasChangedProps = changedProperties.has('value');
-		if (hasChangedProps && this._element) {
+		if (changedProperties.has('value') && this._element) {
 			this._element.value = this.value; // Be aware its duplicated code
+		}
+
+		if (changedProperties.has('config') && this._element) {
+			this._element.config = this.config; // Be aware its duplicated code
 		}
 	}
 
