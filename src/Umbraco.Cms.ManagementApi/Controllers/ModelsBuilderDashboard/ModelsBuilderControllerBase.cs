@@ -8,6 +8,6 @@ namespace Umbraco.Cms.ManagementApi.Controllers.ModelsBuilderDashboard;
 [BackOfficeRoute("api/v{version:apiVersion}/modelsBuilderDashboard")]
 [OpenApiTag("ModelsBuilderDashboard")]
 [ApiVersion("1.0")]
-public class ModelsBuilderDashboardControllerBase : ManagementApiControllerBase
+public class ModelsBuilderControllerBase : ManagementApiControllerBase
 {
 }

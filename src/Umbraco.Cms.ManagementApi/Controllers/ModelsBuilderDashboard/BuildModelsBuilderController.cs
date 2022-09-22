@@ -8,13 +8,13 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.ModelsBuilderDashboard;
 
-public class BuildModelsBuilderDashboardController : ModelsBuilderDashboardControllerBase
+public class BuildModelsBuilderController : ModelsBuilderControllerBase
 {
     private ModelsBuilderSettings _modelsBuilderSettings;
     private readonly ModelsGenerationError _mbErrors;
     private readonly ModelsGenerator _modelGenerator;
 
-    public BuildModelsBuilderDashboardController(
+    public BuildModelsBuilderController(
         IOptionsMonitor<ModelsBuilderSettings> modelsBuilderSettings,
         ModelsGenerationError mbErrors,
         ModelsGenerator modelGenerator)

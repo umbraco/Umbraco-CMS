@@ -8,7 +8,7 @@ public static class FactoryBuilderExtensions
 {
     internal static IUmbracoBuilder AddFactories(this IUmbracoBuilder builder)
     {
-        builder.Services.AddTransient<IModelsBuilderDashboardViewModelFactory, ModelsBuilderDashboardViewModelFactory>();
+        builder.Services.AddTransient<IModelsBuilderViewModelFactory, ModelsBuilderViewModelFactory>();
         return builder;
     }
 }

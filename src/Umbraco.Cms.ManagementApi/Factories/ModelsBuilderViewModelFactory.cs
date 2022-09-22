@@ -9,13 +9,13 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.ManagementApi.Factories;
 
-public class ModelsBuilderDashboardViewModelFactory : IModelsBuilderDashboardViewModelFactory
+public class ModelsBuilderViewModelFactory : IModelsBuilderViewModelFactory
 {
     private ModelsBuilderSettings _modelsBuilderSettings;
     private readonly ModelsGenerationError _mbErrors;
     private readonly OutOfDateModelsStatus _outOfDateModels;
 
-    public ModelsBuilderDashboardViewModelFactory(IOptionsMonitor<ModelsBuilderSettings> modelsBuilderSettings, ModelsGenerationError mbErrors, OutOfDateModelsStatus outOfDateModels)
+    public ModelsBuilderViewModelFactory(IOptionsMonitor<ModelsBuilderSettings> modelsBuilderSettings, ModelsGenerationError mbErrors, OutOfDateModelsStatus outOfDateModels)
     {
         _mbErrors = mbErrors;
         _outOfDateModels = outOfDateModels;
@@ -25,7 +25,7 @@ public class ModelsBuilderDashboardViewModelFactory : IModelsBuilderDashboardVie
     }
 
 
-    public ModelsBuilderDashboardViewModel Create() =>
+    public ModelsBuilderViewModel Create() =>
         new()
         {
             Mode = _modelsBuilderSettings.ModelsMode,

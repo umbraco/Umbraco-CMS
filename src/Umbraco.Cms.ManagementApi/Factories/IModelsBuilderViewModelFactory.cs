@@ -2,7 +2,7 @@
 
 namespace Umbraco.Cms.ManagementApi.Factories;
 
-public interface IModelsBuilderDashboardViewModelFactory
+public interface IModelsBuilderViewModelFactory
 {
-    ModelsBuilderDashboardViewModel Create();
+    ModelsBuilderViewModel Create();
 }

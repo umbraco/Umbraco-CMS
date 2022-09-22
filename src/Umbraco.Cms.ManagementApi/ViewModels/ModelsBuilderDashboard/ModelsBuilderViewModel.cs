@@ -2,7 +2,7 @@
 
 namespace Umbraco.Cms.ManagementApi.ViewModels.ModelsBuilderDashboard;
 
-public class ModelsBuilderDashboardViewModel
+public class ModelsBuilderViewModel
 {
     public ModelsMode Mode { get; set; }
 

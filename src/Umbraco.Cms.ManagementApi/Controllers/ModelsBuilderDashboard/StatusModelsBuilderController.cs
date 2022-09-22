@@ -6,11 +6,11 @@ using Umbraco.New.Cms.Core.Models;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.ModelsBuilderDashboard;
 
-public class StatusModelsBuilderDashboardController : ModelsBuilderDashboardControllerBase
+public class StatusModelsBuilderController : ModelsBuilderControllerBase
 {
     private readonly OutOfDateModelsStatus _outOfDateModelsStatus;
 
-    public StatusModelsBuilderDashboardController(OutOfDateModelsStatus outOfDateModelsStatus) => _outOfDateModelsStatus = outOfDateModelsStatus;
+    public StatusModelsBuilderController(OutOfDateModelsStatus outOfDateModelsStatus) => _outOfDateModelsStatus = outOfDateModelsStatus;
 
     [HttpGet("status")]
     [ProducesResponseType(typeof(OutOfDateStatusViewModel), StatusCodes.Status200OK)]
