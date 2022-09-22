@@ -10,15 +10,7 @@ import '../../../../../components/node-property/node-property.element';
 
 @customElement('umb-editor-view-node-edit')
 export class UmbEditorViewNodeEditElement extends UmbContextConsumerMixin(LitElement) {
-	static styles = [
-		UUITextStyles,
-		css`
-			hr {
-				border: 0;
-				border-top: 1px solid var(--uui-color-border);
-			}
-		`,
-	];
+	static styles = [UUITextStyles];
 
 	@state()
 	_properties: NodeProperty[] = [];
@@ -60,7 +52,6 @@ export class UmbEditorViewNodeEditElement extends UmbContextConsumerMixin(LitEle
 						<umb-node-property
 							.property=${property}
 							.value=${this._data.find((data) => data.alias === property.alias)?.value}></umb-node-property>
-						<hr />
 					`
 				)}
 			</uui-box>

@@ -32,6 +32,11 @@ export class UmbEntityPropertyElement extends UmbContextConsumerMixin(LitElement
 			#property-action-menu[open] {
 				opacity: 1;
 			}
+
+			hr {
+				border: 0;
+				border-top: 1px solid var(--uui-color-border);
+			}
 		`,
 	];
 
@@ -157,6 +162,7 @@ export class UmbEntityPropertyElement extends UmbContextConsumerMixin(LitElement
 				</div>
 				<div slot="editor">${this._element}</div>
 			</umb-editor-property-layout>
+			<hr />
 		`;
 	}
 }

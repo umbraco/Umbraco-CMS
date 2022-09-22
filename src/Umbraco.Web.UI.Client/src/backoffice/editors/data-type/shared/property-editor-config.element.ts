@@ -60,9 +60,9 @@ export class UmbPropertyEditorConfigElement extends UmbContextConsumerMixin(LitE
 					<umb-entity-property
 						label="${property.label}"
 						description="${property.description}"
+						alias="${property.alias}"
 						property-editor-ui-alias="${property.propertyEditorUI}"
 						.value=${this.data.find((data) => data.alias === property.alias)?.value}></umb-entity-property>
-					<hr />
 				`
 			)}
 		`;

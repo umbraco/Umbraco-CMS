@@ -30,4 +30,13 @@ export class UmbDataTypeContext {
 	public getData() {
 		return this._data.getValue();
 	}
+
+	public setPropertyValue(propertyAlias: string, value: any) {
+		const data = this._data.getValue();
+		const property = data.data.find((p) => p.alias === propertyAlias);
+		if (!property) return;
+
+		property.value = value;
+		this._data.next({ ...data });
+	}
 }
