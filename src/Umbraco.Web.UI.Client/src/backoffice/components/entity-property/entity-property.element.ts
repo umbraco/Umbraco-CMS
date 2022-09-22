@@ -8,9 +8,10 @@ import { createExtensionElement, UmbExtensionRegistry } from '../../../core/exte
 import type { ManifestPropertyEditorUI } from '../../../core/models';
 
 import '../../property-actions/shared/property-action-menu/property-action-menu.element';
+import '../editor-property-layout.element';
 
 @customElement('umb-entity-property')
-class UmbEntityPropertyElement extends UmbContextConsumerMixin(LitElement) {
+export class UmbEntityPropertyElement extends UmbContextConsumerMixin(LitElement) {
 	static styles = [
 		UUITextStyles,
 		css`

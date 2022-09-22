@@ -12,7 +12,7 @@ import { NodeProperty } from '../../../mocks/data/node.data';
 import '../entity-property/entity-property.element';
 
 @customElement('umb-node-property')
-class UmbNodePropertyElement extends UmbContextConsumerMixin(LitElement) {
+export class UmbNodePropertyElement extends UmbContextConsumerMixin(LitElement) {
 	static styles = [
 		UUITextStyles,
 		css`
