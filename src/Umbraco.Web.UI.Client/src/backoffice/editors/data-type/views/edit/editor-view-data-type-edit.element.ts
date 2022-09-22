@@ -212,7 +212,7 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Li
 
 	render() {
 		return html`
-			<uui-box style="margin-bottom: 20px;">
+			<uui-box headline="Property Editor" style="margin-bottom: 20px;">
 				${this._renderPropertyEditor()}
 				${when(this._dataType?.propertyEditorAlias, () => html` ${this._renderPropertyEditorUI()} `)}</uui-box
 			>
@@ -223,7 +223,7 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Li
 
 	private _renderPropertyEditor() {
 		return html`
-			<h3>Property Editor</h3>
+			<h4>Property Editor Model</h4>
 
 			${this._dataType?.propertyEditorAlias
 				? html`
@@ -245,7 +245,7 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Li
 
 	private _renderPropertyEditorUI() {
 		return html`
-			<h3>Property Editor UI</h3>
+			<h4>Property Editor UI</h4>
 
 			${this._dataType?.propertyEditorUIAlias
 				? html`
@@ -279,8 +279,7 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Li
 
 	private _renderPropertyEditorConfig() {
 		return html`
-			<uui-box style="margin-bottom: 20px;">
-				<h3>Property Editor Config</h3>
+			<uui-box headline="Config" style="margin-bottom: 20px;">
 				<umb-property-editor-config
 					property-editor-alias="${this._propertyEditorAlias}"
 					.data="${this._data}"></umb-property-editor-config>

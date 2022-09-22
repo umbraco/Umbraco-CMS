@@ -55,8 +55,6 @@ export class UmbPropertyEditorConfigElement extends UmbContextConsumerMixin(LitE
 
 	render() {
 		return html`
-			<div>Property Editor Config for alias: ${this.propertyEditorAlias}</div>
-
 			${this._properties?.map(
 				(property) => html`
 					<umb-entity-property
