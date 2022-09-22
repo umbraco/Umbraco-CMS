@@ -31,7 +31,7 @@ import { UmbIconStore } from '../core/stores/icon/icon.store';
 import { UmbPropertyEditorConfigStore } from '../core/stores/property-editor-config/property-editor-config.store';
 
 @defineElement('umb-backoffice')
-export default class UmbBackoffice extends UmbContextConsumerMixin(UmbContextProviderMixin(LitElement)) {
+export class UmbBackofficeElement extends UmbContextConsumerMixin(UmbContextProviderMixin(LitElement)) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -88,8 +88,9 @@ export default class UmbBackoffice extends UmbContextConsumerMixin(UmbContextPro
 	}
 }
 
+export default UmbBackofficeElement;
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-backoffice': UmbBackoffice;
+		'umb-backoffice': UmbBackofficeElement;
 	}
 }
