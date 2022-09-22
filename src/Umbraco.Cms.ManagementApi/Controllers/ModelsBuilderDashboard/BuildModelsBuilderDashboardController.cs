@@ -8,13 +8,13 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.ModelsBuilderDashboard;
 
-public class BuildModelsController : ModelsBuilderDashboardControllerBase
+public class BuildModelsBuilderDashboardController : ModelsBuilderDashboardControllerBase
 {
     private ModelsBuilderSettings _modelsBuilderSettings;
     private readonly ModelsGenerationError _mbErrors;
     private readonly ModelsGenerator _modelGenerator;
 
-    public BuildModelsController(
+    public BuildModelsBuilderDashboardController(
         IOptionsMonitor<ModelsBuilderSettings> modelsBuilderSettings,
         ModelsGenerationError mbErrors,
         ModelsGenerator modelGenerator)
@@ -26,7 +26,7 @@ public class BuildModelsController : ModelsBuilderDashboardControllerBase
         modelsBuilderSettings.OnChange(x => _modelsBuilderSettings = x);
     }
 
-    [HttpPost]
+    [HttpPost("build")]
     [ProducesResponseType(typeof(CreatedResult), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status428PreconditionRequired)]
     [MapToApiVersion("1.0")]
