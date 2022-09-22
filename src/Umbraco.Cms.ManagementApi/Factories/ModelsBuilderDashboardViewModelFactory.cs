@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -10,24 +11,26 @@ namespace Umbraco.Cms.ManagementApi.Factories;
 
 public class ModelsBuilderDashboardViewModelFactory : IModelsBuilderDashboardViewModelFactory
 {
-    private readonly ModelsBuilderSettings _config;
+    private ModelsBuilderSettings _modelsBuilderSettings;
     private readonly ModelsGenerationError _mbErrors;
     private readonly OutOfDateModelsStatus _outOfDateModels;
 
-    public ModelsBuilderDashboardViewModelFactory(ModelsBuilderSettings config, ModelsGenerationError mbErrors, OutOfDateModelsStatus outOfDateModels)
+    public ModelsBuilderDashboardViewModelFactory(IOptionsMonitor<ModelsBuilderSettings> modelsBuilderSettings, ModelsGenerationError mbErrors, OutOfDateModelsStatus outOfDateModels)
     {
-        _config = config;
         _mbErrors = mbErrors;
         _outOfDateModels = outOfDateModels;
+        _modelsBuilderSettings = modelsBuilderSettings.CurrentValue;
+
+        modelsBuilderSettings.OnChange(x => _modelsBuilderSettings = x);
     }
 
 
     public ModelsBuilderDashboardViewModel Create() =>
         new()
         {
-            Mode = _config.ModelsMode,
+            Mode = _modelsBuilderSettings.ModelsMode,
             Text = Text(),
-            CanGenerate = _config.ModelsMode.SupportsExplicitGeneration(),
+            CanGenerate = _modelsBuilderSettings.ModelsMode.SupportsExplicitGeneration(),
             OutOfDateModels = _outOfDateModels.IsOutOfDate,
             LastError = _mbErrors.GetLastError(),
         };
@@ -45,10 +48,10 @@ public class ModelsBuilderDashboardViewModelFactory : IModelsBuilderDashboardVie
         sb.Append("<ul>");
 
         sb.Append("<li>The <strong>models mode</strong> is '");
-        sb.Append(_config.ModelsMode.ToString());
+        sb.Append(_modelsBuilderSettings.ModelsMode.ToString());
         sb.Append("'. ");
 
-        switch (_config.ModelsMode)
+        switch (_modelsBuilderSettings.ModelsMode)
         {
             case ModelsMode.Nothing:
                 sb.Append(
@@ -70,13 +73,13 @@ public class ModelsBuilderDashboardViewModelFactory : IModelsBuilderDashboardVie
 
         sb.Append("</li>");
 
-        if (_config.ModelsMode != ModelsMode.Nothing)
+        if (_modelsBuilderSettings.ModelsMode != ModelsMode.Nothing)
         {
             sb.Append(
-                $"<li>Models namespace is {_config.ModelsNamespace ?? Constants.ModelsBuilder.DefaultModelsNamespace}.</li>");
+                $"<li>Models namespace is {_modelsBuilderSettings.ModelsNamespace ?? Constants.ModelsBuilder.DefaultModelsNamespace}.</li>");
 
             sb.Append("<li>Tracking of <strong>out-of-date models</strong> is ");
-            sb.Append(_config.FlagOutOfDateModels ? "enabled" : "not enabled");
+            sb.Append(_modelsBuilderSettings.FlagOutOfDateModels ? "enabled" : "not enabled");
             sb.Append(".</li>");
         }
 

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Infrastructure.ModelsBuilder;
 using Umbraco.Cms.Infrastructure.ModelsBuilder.Building;
@@ -9,18 +10,20 @@ namespace Umbraco.Cms.ManagementApi.Controllers.ModelsBuilderDashboard;
 
 public class BuildModelsController : ModelsBuilderDashboardControllerBase
 {
-    private readonly ModelsBuilderSettings _modelsBuilderSettings;
+    private ModelsBuilderSettings _modelsBuilderSettings;
     private readonly ModelsGenerationError _mbErrors;
     private readonly ModelsGenerator _modelGenerator;
 
     public BuildModelsController(
-        ModelsBuilderSettings modelsBuilderSettings,
+        IOptionsMonitor<ModelsBuilderSettings> modelsBuilderSettings,
         ModelsGenerationError mbErrors,
         ModelsGenerator modelGenerator)
     {
-        _modelsBuilderSettings = modelsBuilderSettings;
         _mbErrors = mbErrors;
         _modelGenerator = modelGenerator;
+        _modelsBuilderSettings = modelsBuilderSettings.CurrentValue;
+
+        modelsBuilderSettings.OnChange(x => _modelsBuilderSettings = x);
     }
 
     [HttpPost]
