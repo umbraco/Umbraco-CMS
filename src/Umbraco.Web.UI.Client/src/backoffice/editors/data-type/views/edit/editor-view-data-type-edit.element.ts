@@ -43,6 +43,9 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Li
 	@state()
 	private _availablePropertyEditorUIsCount = 0;
 
+	@state()
+	private _data: Array<any> = [];
+
 	private _dataTypeContext?: UmbDataTypeContext;
 	private _extensionRegistry?: UmbExtensionRegistry;
 	private _propertyEditorStore?: UmbPropertyEditorStore;
@@ -95,6 +98,10 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Li
 
 			if (this._dataType.propertyEditorUIAlias !== this._propertyEditorUIAlias) {
 				this._observePropertyEditorUI(this._dataType.propertyEditorUIAlias);
+			}
+
+			if (this._dataType.data !== this._data) {
+				this._data = this._dataType.data;
 			}
 		});
 	}
@@ -274,7 +281,9 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Li
 		return html`
 			<uui-box style="margin-bottom: 20px;">
 				<h3>Property Editor Config</h3>
-				<umb-property-editor-config property-editor-alias="${this._propertyEditorAlias}"></umb-property-editor-config>
+				<umb-property-editor-config
+					property-editor-alias="${this._propertyEditorAlias}"
+					.data="${this._data}"></umb-property-editor-config>
 			</uui-box>
 		`;
 	}

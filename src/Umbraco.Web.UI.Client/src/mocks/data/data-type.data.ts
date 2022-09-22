@@ -27,7 +27,12 @@ export const data: Array<DataTypeDetails> = [
 		icon: 'umb:autofill',
 		propertyEditorAlias: 'Umbraco.TextBox',
 		propertyEditorUIAlias: 'Umb.PropertyEditorUI.Text',
-		data: [],
+		data: [
+			{
+				alias: 'maxChars',
+				value: 10,
+			},
+		],
 	},
 	{
 		key: 'dt-2',
@@ -39,7 +44,16 @@ export const data: Array<DataTypeDetails> = [
 		icon: 'umb:autofill',
 		propertyEditorAlias: 'Umbraco.TextArea',
 		propertyEditorUIAlias: 'Umb.PropertyEditorUI.Textarea',
-		data: [],
+		data: [
+			{
+				alias: 'maxChars',
+				value: 500,
+			},
+			{
+				alias: 'rows',
+				value: 25,
+			},
+		],
 	},
 	{
 		key: 'dt-3',

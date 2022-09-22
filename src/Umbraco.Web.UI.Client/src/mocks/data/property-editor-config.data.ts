@@ -9,7 +9,7 @@ export interface PropertyEditorConfigProperty {
 	alias: string;
 	label: string;
 	description: string;
-	view: string;
+	propertyEditorUI: string;
 }
 
 export const data: Array<PropertyEditorConfig> = [
@@ -20,7 +20,7 @@ export const data: Array<PropertyEditorConfig> = [
 				alias: 'maxChars',
 				label: 'Maximum allowed characters',
 				description: 'If empty, 512 character limit',
-				view: 'number',
+				propertyEditorUI: 'Umb.PropertyEditorUI.Textarea',
 			},
 		],
 	},
@@ -31,13 +31,13 @@ export const data: Array<PropertyEditorConfig> = [
 				alias: 'maxChars',
 				label: 'Maximum allowed characters',
 				description: 'If empty - no character limit',
-				view: 'number',
+				propertyEditorUI: 'Umb.PropertyEditorUI.Number',
 			},
 			{
 				alias: 'rows',
 				label: 'Number of rows',
 				description: 'If empty - 10 rows would be set as the default value',
-				view: 'number',
+				propertyEditorUI: 'Umb.PropertyEditorUI.Number',
 			},
 		],
 	},

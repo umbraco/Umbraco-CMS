@@ -1,15 +1,15 @@
-import '../property-actions/shared/property-action-menu/property-action-menu.element';
-
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html, LitElement, PropertyValueMap } from 'lit';
+import { css, html, LitElement } from 'lit';
+import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { distinctUntilChanged, EMPTY, of, Subscription, switchMap } from 'rxjs';
 
 import { UmbContextConsumerMixin } from '../../core/context';
-import { createExtensionElement, UmbExtensionRegistry } from '../../core/extension';
-import type { ManifestPropertyEditorUI } from '../../core/models';
 import { UmbDataTypeStore } from '../../core/stores/data-type/data-type.store';
-import { DataTypeEntity } from '../../mocks/data/data-type.data';
+import { UmbExtensionRegistry } from '../../core/extension';
+import { NodeProperty } from '../../mocks/data/node.data';
+
+import './entity-property/entity-property.element';
 
 @customElement('umb-node-property')
 class UmbNodeProperty extends UmbContextConsumerMixin(LitElement) {
@@ -19,29 +19,15 @@ class UmbNodeProperty extends UmbContextConsumerMixin(LitElement) {
 			:host {
 				display: block;
 			}
-
-			p {
-				color: var(--uui-color-text-alt);
-			}
-
-			#property-action-menu {
-				opacity: 0;
-			}
-
-			#layout:focus-within #property-action-menu,
-			#layout:hover #property-action-menu,
-			#property-action-menu[open] {
-				opacity: 1;
-			}
 		`,
 	];
 
-	private _property: any; // TODO: property data model interface..
-	@property()
-	public get property(): any {
+	private _property?: NodeProperty;
+	@property({ type: Object, attribute: false })
+	public get property(): NodeProperty | undefined {
 		return this._property;
 	}
-	public set property(value: any) {
+	public set property(value: NodeProperty | undefined) {
 		this._property = value;
 		this._useDataType();
 	}
@@ -49,11 +35,9 @@ class UmbNodeProperty extends UmbContextConsumerMixin(LitElement) {
 	@property()
 	value?: string;
 
-	// TODO: make interface for UMBPropertyEditorElement
 	@state()
-	private _element?: { value?: string } & HTMLElement; // TODO: invent interface for propertyEditorUI.
+	private _propertyEditorUIAlias?: string;
 
-	private _dataType?: DataTypeEntity;
 	private _extensionRegistry?: UmbExtensionRegistry;
 	private _dataTypeStore?: UmbDataTypeStore;
 	private _dataTypeSubscription?: Subscription;
@@ -73,76 +57,25 @@ class UmbNodeProperty extends UmbContextConsumerMixin(LitElement) {
 		});
 	}
 
-	connectedCallback(): void {
-		super.connectedCallback();
-		this.addEventListener('property-editor-change', this._onPropertyEditorChange as any as EventListener);
-	}
-
 	private _useDataType() {
+		if (!this._dataTypeStore || !this._extensionRegistry || !this._property) return;
+
 		this._dataTypeSubscription?.unsubscribe();
 
-		if (this._property.dataTypeKey && this._extensionRegistry && this._dataTypeStore) {
-			this._dataTypeSubscription = this._dataTypeStore
-				.getByKey(this._property.dataTypeKey)
-				.pipe(
-					distinctUntilChanged(),
-					switchMap((dataTypeEntity) => {
-						if (!dataTypeEntity) {
-							return EMPTY;
-						}
-						this._dataType = dataTypeEntity;
-
-						return this._extensionRegistry?.getByAlias(dataTypeEntity.propertyEditorUIAlias) ?? of(null);
-					})
-				)
-				.subscribe((extension) => {
-					if (extension?.type === 'propertyEditorUI') {
-						this._gotData(extension);
-					}
-					// TODO: If gone what then...
-				});
-		}
-	}
-
-	private _gotData(_propertyEditorUI?: ManifestPropertyEditorUI) {
-		if (!this._dataType || !_propertyEditorUI) {
-			// TODO: if dataTypeKey didn't exist in store, we should do some nice UI.
-			return;
-		}
-
-		createExtensionElement(_propertyEditorUI)
-			.then((el) => {
-				const oldValue = this._element;
-				this._element = el;
-
-				// TODO: Set/Parse Data-Type-UI-configuration
-				if (this._element) {
-					this._element.value = this.value; // Be aware its duplicated code
+		this._dataTypeSubscription = this._dataTypeStore
+			.getByKey(this._property.dataTypeKey)
+			.pipe(
+				distinctUntilChanged(),
+				switchMap((dataType) => {
+					if (!dataType?.propertyEditorUIAlias) return EMPTY;
+					return this._extensionRegistry?.getByAlias(dataType.propertyEditorUIAlias) ?? of(null);
+				})
+			)
+			.subscribe((manifest) => {
+				if (manifest?.type === 'propertyEditorUI') {
+					this._propertyEditorUIAlias = manifest.alias;
 				}
-				this.requestUpdate('element', oldValue);
-			})
-			.catch(() => {
-				// TODO: loading JS failed so we should do some nice UI. (This does only happen if extension has a js prop, otherwise we concluded that no source was needed resolved the load.)
 			});
-	}
-
-	private _onPropertyEditorChange = (e: CustomEvent) => {
-		const target = e.composedPath()[0] as any;
-		this.value = target.value;
-		this.dispatchEvent(new CustomEvent('property-value-change', { bubbles: true, composed: true }));
-		e.stopPropagation();
-	};
-
-	/** Lit does not currently handle dynamic tag names, therefor we are doing some manual rendering */
-	// TODO: Refactor into a base class for dynamic-tag element? we will be using this a lot for extensions.
-	// This could potentially hook into Lit and parse all properties defined in the specific class on to the dynamic-element. (see static elementProperties: PropertyDeclarationMap;)
-	willUpdate(changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>) {
-		super.willUpdate(changedProperties);
-
-		const hasChangedProps = changedProperties.has('value');
-		if (hasChangedProps && this._element) {
-			this._element.value = this.value; // Be aware its duplicated code
-		}
 	}
 
 	disconnectedCallback(): void {
@@ -150,26 +83,12 @@ class UmbNodeProperty extends UmbContextConsumerMixin(LitElement) {
 		this._dataTypeSubscription?.unsubscribe();
 	}
 
-	private _renderPropertyActionMenu() {
-		return html`${this._dataType
-			? html`<umb-property-action-menu
-					id="property-action-menu"
-					.propertyEditorUIAlias="${this._dataType.propertyEditorUIAlias}"
-					.value="${this.value}"></umb-property-action-menu>`
-			: ''}`;
-	}
-
 	render() {
-		return html`
-			<umb-editor-property-layout id="layout">
-				<div slot="header">
-					<uui-label>${this.property.label}</uui-label>
-					${this._renderPropertyActionMenu()}
-					<p>${this.property.description}</p>
-				</div>
-				<div slot="editor">${this._element}</div>
-			</umb-editor-property-layout>
-		`;
+		return html`<umb-entity-property
+			label=${ifDefined(this.property?.label)}
+			description=${ifDefined(this.property?.description)}
+			property-editor-ui-alias="${ifDefined(this._propertyEditorUIAlias)}"
+			.value="${this.value}"></umb-entity-property>`;
 	}
 }
 

@@ -4,7 +4,8 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { Subscription } from 'rxjs';
 import { UmbContextConsumerMixin } from '../../../../core/context';
 import { UmbPropertyEditorConfigStore } from '../../../../core/stores/property-editor-config/property-editor-config.store';
-import { PropertyEditorConfig } from '../../../../mocks/data/property-editor-config.data';
+
+import '../../../components/entity-property/entity-property.element';
 
 @customElement('umb-property-editor-config')
 export class UmbPropertyEditorConfigElement extends UmbContextConsumerMixin(LitElement) {
@@ -22,11 +23,11 @@ export class UmbPropertyEditorConfigElement extends UmbContextConsumerMixin(LitE
 		this._observePropertyEditorConfig();
 	}
 
-	@state()
-	private _properties?: any;
+	@property({ type: Array })
+	public data: Array<any> = [];
 
 	@state()
-	private _data?: any;
+	private _properties?: Array<any> = [];
 
 	private _propertyEditorConfigStore?: UmbPropertyEditorConfigStore;
 	private _propertyEditorConfigSubscription?: Subscription;
@@ -56,11 +57,13 @@ export class UmbPropertyEditorConfigElement extends UmbContextConsumerMixin(LitE
 		return html`
 			<div>Property Editor Config for alias: ${this.propertyEditorAlias}</div>
 
-			${this._properties.map(
-				(property: any) => html`
-					<umb-node-property
-						.property=${property}
-						.value=${this._data.find((data) => data.alias === property.alias)?.value}></umb-node-property>
+			${this._properties?.map(
+				(property) => html`
+					<umb-entity-property
+						label="${property.label}"
+						description="${property.description}"
+						property-editor-ui-alias="${property.propertyEditorUI}"
+						.value=${this.data.find((data) => data.alias === property.alias)?.value}></umb-entity-property>
 					<hr />
 				`
 			)}
