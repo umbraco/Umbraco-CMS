@@ -14,18 +14,15 @@ namespace Umbraco.Cms.ManagementApi.Controllers.Help;
 public class GetHelpController : HelpControllerBase
 {
     private readonly ILogger<GetHelpController> _logger;
-    private readonly IPagedViewModelFactory _viewModelFactory;
     private readonly IJsonSerializer _jsonSerializer;
     private HelpPageSettings _helpPageSettings;
 
     public GetHelpController(
         IOptionsMonitor<HelpPageSettings> helpPageSettings,
         ILogger<GetHelpController> logger,
-        IPagedViewModelFactory viewModelFactory,
         IJsonSerializer jsonSerializer)
     {
         _logger = logger;
-        _viewModelFactory = viewModelFactory;
         _jsonSerializer = jsonSerializer;
         _helpPageSettings = helpPageSettings.CurrentValue;
         helpPageSettings.OnChange(UpdateHelpPageSettings);
@@ -63,7 +60,11 @@ public class GetHelpController : HelpControllerBase
             List<HelpPageViewModel>? result = _jsonSerializer.Deserialize<List<HelpPageViewModel>>(json);
             if (result != null)
             {
-                return Ok(_viewModelFactory.Create(result, skip, take));
+                return Ok(new PagedViewModel<HelpPageViewModel>
+                {
+                    Total = result.Count,
+                    Items = result.Skip(skip).Take(take),
+                });
             }
         }
         catch (HttpRequestException rex)
@@ -71,7 +72,7 @@ public class GetHelpController : HelpControllerBase
             _logger.LogInformation($"Check your network connection, exception: {rex.Message}");
         }
 
-        return Ok(_viewModelFactory.Create(new List<HelpPageViewModel>(), skip, take));
+        return Ok(PagedViewModel<HelpPageViewModel>.Empty());
     }
 
     private bool IsAllowedUrl(string? url) =>
