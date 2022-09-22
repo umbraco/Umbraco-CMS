@@ -634,10 +634,10 @@
       "name": "Server"
     },
     {
-      "name": "Profiling"
+      "name": "PublishedCache"
     },
     {
-      "name": "PublishedCache"
+      "name": "Profiling"
     },
     {
       "name": "Install"
