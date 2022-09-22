@@ -129,9 +129,7 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Li
 			?.extensionsOfType('propertyEditorUI')
 			.pipe(
 				map((propertyEditorUIs) =>
-					propertyEditorUIs.filter((propertyEditorUI) =>
-						propertyEditorUI?.meta?.propertyEditors?.includes(propertyEditorAlias)
-					)
+					propertyEditorUIs.filter((propertyEditorUI) => propertyEditorUI.meta.propertyEditor === propertyEditorAlias)
 				)
 			)
 			.subscribe((availablePropertyEditorUIs) => {
