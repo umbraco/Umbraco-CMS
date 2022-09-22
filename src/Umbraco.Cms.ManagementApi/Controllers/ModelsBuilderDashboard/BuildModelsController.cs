@@ -29,7 +29,7 @@ public class BuildModelsController : ModelsBuilderDashboardControllerBase
     }
 
     [HttpPost]
-    [ProducesResponseType(typeof(OkResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(CreatedResult), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status428PreconditionRequired)]
     [MapToApiVersion("1.0")]
     public IActionResult BuildModels()
@@ -57,6 +57,6 @@ public class BuildModelsController : ModelsBuilderDashboardControllerBase
             _mbErrors.Report("Failed to build models.", e);
         }
 
-        return Ok(_modelsBuilderDashboardViewModelFactory.Create());
+        return Created("api/v1/modelsBuilderDashboard", null);
     }
 }
