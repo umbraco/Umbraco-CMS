@@ -279,11 +279,15 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Li
 
 	private _renderPropertyEditorConfig() {
 		return html`
-			<uui-box headline="Config" style="margin-bottom: 20px;">
-				<umb-property-editor-config
-					property-editor-alias="${this._propertyEditorAlias}"
-					.data="${this._data}"></umb-property-editor-config>
-			</uui-box>
+			${this._propertyEditorAlias
+				? html`
+						<uui-box headline="Config">
+							<umb-property-editor-config
+								property-editor-alias="${this._propertyEditorAlias}"
+								.data="${this._data}"></umb-property-editor-config>
+						</uui-box>
+				  `
+				: nothing}
 		`;
 	}
 }
