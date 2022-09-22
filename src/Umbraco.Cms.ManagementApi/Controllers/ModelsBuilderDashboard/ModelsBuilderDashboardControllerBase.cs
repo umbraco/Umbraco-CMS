@@ -10,5 +10,4 @@ namespace Umbraco.Cms.ManagementApi.Controllers.ModelsBuilderDashboard;
 [ApiVersion("1.0")]
 public class ModelsBuilderDashboardControllerBase : ManagementApiControllerBase
 {
-
 }
