@@ -41,6 +41,9 @@ export class UmbEntityPropertyElement extends UmbContextConsumerMixin(LitElement
 	@property({ type: String })
 	public description = '';
 
+	@property({ type: String })
+	public alias = '';
+
 	private _propertyEditorUIAlias = '';
 	@property({ type: String, attribute: 'property-editor-ui-alias' })
 	public get propertyEditorUIAlias(): string {

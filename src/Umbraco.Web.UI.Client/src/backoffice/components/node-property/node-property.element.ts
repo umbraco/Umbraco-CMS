@@ -87,6 +87,7 @@ export class UmbNodePropertyElement extends UmbContextConsumerMixin(LitElement) 
 		return html`<umb-entity-property
 			label=${ifDefined(this.property?.label)}
 			description=${ifDefined(this.property?.description)}
+			alias="${ifDefined(this.property?.alias)}"
 			property-editor-ui-alias="${ifDefined(this._propertyEditorUIAlias)}"
 			.value="${this.value}"></umb-entity-property>`;
 	}

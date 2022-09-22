@@ -14,6 +14,7 @@ export const AAAOverview: Story<UmbEntityPropertyElement> = () =>
 	html` <umb-entity-property
 		label="Property"
 		description="Description"
+		alias="textProperty"
 		property-editor-ui-alias="Umb.PropertyEditorUI.Text"
 		value="Hello"></umb-entity-property>`;
 AAAOverview.storyName = 'Overview';
