@@ -14,5 +14,5 @@ public class GetModelsBuilderController : ModelsBuilderControllerBase
     [HttpGet]
     [ProducesResponseType(typeof(CreatedResult), StatusCodes.Status201Created)]
     [MapToApiVersion("1.0")]
-    public ModelsBuilderViewModel GetDashboard() => _modelsBuilderViewModelFactory.Create();
+    public async Task<ModelsBuilderViewModel> GetDashboard() => await Task.FromResult(_modelsBuilderViewModelFactory.Create());
 }
