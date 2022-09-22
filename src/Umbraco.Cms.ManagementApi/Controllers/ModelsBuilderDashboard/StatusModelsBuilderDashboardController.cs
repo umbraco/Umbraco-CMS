@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Infrastructure.ModelsBuilder;
 using Umbraco.Cms.ManagementApi.ViewModels.ModelsBuilderDashboard;
 using Umbraco.New.Cms.Core.Models;
@@ -12,7 +13,9 @@ public class StatusModelsBuilderDashboardController : ModelsBuilderDashboardCont
     public StatusModelsBuilderDashboardController(OutOfDateModelsStatus outOfDateModelsStatus) => _outOfDateModelsStatus = outOfDateModelsStatus;
 
     [HttpGet("status")]
-    public ActionResult<OutOfDateStatusViewModel> GetModelsOutOfDateStatus()
+    [ProducesResponseType(typeof(OutOfDateStatusViewModel), StatusCodes.Status200OK)]
+    [MapToApiVersion("1.0")]
+    public OutOfDateStatusViewModel GetModelsOutOfDateStatus()
     {
         OutOfDateStatusViewModel status = _outOfDateModelsStatus.IsEnabled
             ? _outOfDateModelsStatus.IsOutOfDate
