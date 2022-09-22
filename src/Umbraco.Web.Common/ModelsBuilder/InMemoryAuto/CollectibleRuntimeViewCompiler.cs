@@ -177,8 +177,8 @@ internal class CollectibleRuntimeViewCompiler : IViewCompiler
         {
             Debug.Assert(taskSource != null);
 
-            if (item.Descriptor?.Item != null /*&&
-                ChecksumValidator.IsItemValid(_projectEngine.FileSystem, item.Descriptor.Item)*/ )
+            if (item.Descriptor?.Item != null &&
+                ChecksumValidator.IsItemValid(_projectEngine.FileSystem, item.Descriptor.Item) )
             {
                 // If the item has checksums to validate, we should also have a precompiled view.
                 Debug.Assert(item.Descriptor != null);
@@ -211,7 +211,7 @@ internal class CollectibleRuntimeViewCompiler : IViewCompiler
         //
         // Then we'll attempt to validate if any of those files have different content than the original sources
         // based on checksums.
-        if (precompiledView.Item == null /*|| !ChecksumValidator.IsRecompilationSupported(precompiledView.Item) */)
+        if (precompiledView.Item == null || !ChecksumValidator.IsRecompilationSupported(precompiledView.Item))
         {
             return new ViewCompilerWorkItem()
             {
