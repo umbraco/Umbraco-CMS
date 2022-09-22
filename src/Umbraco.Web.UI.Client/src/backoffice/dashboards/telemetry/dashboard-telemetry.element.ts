@@ -39,16 +39,12 @@ export class UmbDashboardTelemetryElement extends LitElement {
 	}
 
 	private async _setup() {
-		// All telemetry levels
 		try {
 			const consentLevels = await getConsentLevels({});
-			// TODO ....
-			this._telemetryLevels = consentLevels.data;
+			this._telemetryLevels = consentLevels.data as TelemetryModel['level'][];
 		} catch (e) {
 			this._errorMessage;
 		}
-
-		// Current setting
 		try {
 			const consentSetting = await getConsentLevel({});
 			this._telemetryFormData = consentSetting.data.telemetryLevel;
@@ -61,7 +57,6 @@ export class UmbDashboardTelemetryElement extends LitElement {
 
 	private _handleSubmit = async (e: CustomEvent<SubmitEvent>) => {
 		e.stopPropagation();
-
 		try {
 			await postConsentLevel({ telemetryLevel: this._telemetryFormData });
 		} catch (e) {
@@ -110,7 +105,7 @@ export class UmbDashboardTelemetryElement extends LitElement {
 				<i>We might change what we send on the Detailed level in the future. If so, it will be listed above.
 				By choosing "Detailed" you agree to current and future anonymized information being collected.</i>`;
 			default:
-				return 'Something may have gone wrong';
+				return 'Could not find description for this setting';
 		}
 	}
 
