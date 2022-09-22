@@ -6,8 +6,6 @@ public class ModelsBuilderDashboardViewModel
 {
     public ModelsMode Mode { get; set; }
 
-    public string? Text { get; set; }
-
     public bool CanGenerate { get; set; }
 
     public bool OutOfDateModels { get; set; }
