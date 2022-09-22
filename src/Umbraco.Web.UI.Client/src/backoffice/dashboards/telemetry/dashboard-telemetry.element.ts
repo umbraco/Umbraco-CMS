@@ -47,7 +47,7 @@ export class UmbDashboardTelemetryElement extends LitElement {
 		}
 		try {
 			const consentSetting = await getConsentLevel({});
-			this._telemetryFormData = consentSetting.data.telemetryLevel;
+			this._telemetryFormData = consentSetting.data.telemetryLevel as TelemetryModel['level'];
 		} catch (e) {
 			if (e instanceof getConsentLevel.Error) {
 				this._errorMessage = e.data.detail;
