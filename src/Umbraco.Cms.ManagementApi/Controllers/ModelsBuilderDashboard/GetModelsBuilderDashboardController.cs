@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.ManagementApi.Factories;
 using Umbraco.Cms.ManagementApi.ViewModels.ModelsBuilderDashboard;
 
@@ -11,5 +12,7 @@ public class GetModelsBuilderDashboardController : ModelsBuilderDashboardControl
     public GetModelsBuilderDashboardController(IModelsBuilderDashboardViewModelFactory modelsBuilderDashboardViewModelFactory) => _modelsBuilderDashboardViewModelFactory = modelsBuilderDashboardViewModelFactory;
 
     [HttpGet]
+    [ProducesResponseType(typeof(CreatedResult), StatusCodes.Status201Created)]
+    [MapToApiVersion("1.0")]
     public ModelsBuilderDashboardViewModel GetDashboard() => _modelsBuilderDashboardViewModelFactory.Create();
 }
