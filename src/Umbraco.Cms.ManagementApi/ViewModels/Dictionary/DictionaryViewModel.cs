@@ -40,16 +40,6 @@ public class DictionaryViewModel : INotificationModel
     /// </summary>
     public List<BackOfficeNotification> Notifications { get; private set; }
 
-    /// <summary>
-    ///     Gets or sets a value indicating when the object was created.
-    /// </summary>
-    public DateTime CreateDate { get; set; }
-
-    /// <summary>
-    ///     Gets or sets a value indicating when the object was updated.
-    /// </summary>
-    public DateTime UpdateDate { get; set; }
-
     [RequiredForPersistence(AllowEmptyStrings = false, ErrorMessage = "Required")]
     [Required]
     public string Name { get; set; } = null!;

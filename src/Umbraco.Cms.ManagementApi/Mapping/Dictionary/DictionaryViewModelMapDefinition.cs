@@ -2,7 +2,6 @@
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
-using Umbraco.Cms.Core.Models.Mapping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.ManagementApi.ViewModels.Dictionary;
 
@@ -11,15 +10,9 @@ namespace Umbraco.Cms.ManagementApi.Mapping.Dictionary;
 public class DictionaryViewModelMapDefinition : IMapDefinition
 {
     private readonly ILocalizationService _localizationService;
-    private readonly CommonMapper _commonMapper;
-    private readonly IDictionaryService _dictionaryService;
 
-    public DictionaryViewModelMapDefinition(ILocalizationService localizationService, CommonMapper commonMapper, IDictionaryService dictionaryService)
-    {
-        _localizationService = localizationService;
-        _commonMapper = commonMapper;
-        _dictionaryService = dictionaryService;
-    }
+    public DictionaryViewModelMapDefinition(ILocalizationService localizationService) => _localizationService = localizationService;
+
     public void DefineMaps(IUmbracoMapper mapper)
     {
         mapper.Define<DictionaryViewModel, IDictionaryItem>((source, context) => new DictionaryItem(string.Empty), Map);
@@ -29,17 +22,14 @@ public class DictionaryViewModelMapDefinition : IMapDefinition
 
     }
 
-    // Umbraco.Code.MapAll -Id
+    // Umbraco.Code.MapAll -Id -CreateDate -UpdateDate
     private void Map(DictionaryViewModel source, IDictionaryItem target, MapperContext context)
     {
-        target.CreateDate = source.CreateDate;
         target.ItemKey = source.Name!;
         target.Key = source.Key;
         target.ParentId = source.ParentId;
         target.Translations = context.MapEnumerable<DictionaryTranslationViewModel, IDictionaryTranslation>(source.Translations);
-        target.UpdateDate = source.UpdateDate;
         target.DeleteDate = null;
-
     }
 
     // Umbraco.Code.MapAll -CreateDate -DeleteDate -UpdateDate -Language
@@ -56,8 +46,6 @@ public class DictionaryViewModelMapDefinition : IMapDefinition
         target.Key = source.Key;
         target.Name = source.ItemKey;
         target.ParentId = source.ParentId ?? null;
-        target.CreateDate = source.CreateDate;
-        target.UpdateDate = source.UpdateDate;
     }
 
     // Umbraco.Code.MapAll -Level -Translations
