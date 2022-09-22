@@ -1,0 +1,16 @@
+﻿using Umbraco.Cms.Core.Configuration;
+
+namespace Umbraco.Cms.ManagementApi.ViewModels.ModelsBuilderDashboard;
+
+public class ModelsBuilderDashboardViewModel
+{
+    public ModelsMode Mode { get; set; }
+
+    public string? Text { get; set; }
+
+    public bool CanGenerate { get; set; }
+
+    public bool OutOfDateModels { get; set; }
+
+    public string? LastError { get; set; }
+}
