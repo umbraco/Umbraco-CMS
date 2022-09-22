@@ -13,7 +13,6 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
-using Umbraco.Cms.Core.Exceptions;
 
 namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto;
 
@@ -330,7 +329,9 @@ internal class CollectibleRuntimeViewCompiler : IViewCompiler
 
         if (cSharpDocument.Diagnostics.Count > 0)
         {
-            throw new PanicException();
+            throw CompilationExceptionFactory.Create(
+                codeDocument,
+                cSharpDocument.Diagnostics);
         }
 
         var assembly = CompileAndEmit(codeDocument, cSharpDocument.GeneratedCode);
@@ -362,7 +363,11 @@ internal class CollectibleRuntimeViewCompiler : IViewCompiler
 
             if (!result.Success)
             {
-                throw new PanicException();
+                throw CompilationExceptionFactory.Create(
+                    codeDocument,
+                    generatedCode,
+                    assemblyName,
+                    result.Diagnostics);
             }
 
             // Time to actually load the assembly
