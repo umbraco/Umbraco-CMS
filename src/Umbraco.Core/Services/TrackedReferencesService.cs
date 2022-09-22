@@ -5,11 +5,18 @@ using Umbraco.New.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Services;
 
-//
 public class TrackedReferencesService : ITrackedReferencesService
 {
     private readonly ICoreScopeProvider _scopeProvider;
     private readonly ITrackedReferencesRepository _trackedReferencesRepository;
+
+    [Obsolete("Please use ctor that does not take an IEntityService, scheduled for removal in V12")]
+    public TrackedReferencesService(
+        ITrackedReferencesRepository trackedReferencesRepository,
+        ICoreScopeProvider scopeProvider,
+        IEntityService entityService) : this(trackedReferencesRepository, scopeProvider)
+    {
+    }
 
     public TrackedReferencesService(
         ITrackedReferencesRepository trackedReferencesRepository,
