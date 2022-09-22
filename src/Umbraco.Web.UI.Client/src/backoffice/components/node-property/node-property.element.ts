@@ -4,15 +4,15 @@ import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { distinctUntilChanged, EMPTY, of, Subscription, switchMap } from 'rxjs';
 
-import { UmbContextConsumerMixin } from '../../core/context';
-import { UmbDataTypeStore } from '../../core/stores/data-type/data-type.store';
-import { UmbExtensionRegistry } from '../../core/extension';
-import { NodeProperty } from '../../mocks/data/node.data';
+import { UmbContextConsumerMixin } from '../../../core/context';
+import { UmbDataTypeStore } from '../../../core/stores/data-type/data-type.store';
+import { UmbExtensionRegistry } from '../../../core/extension';
+import { NodeProperty } from '../../../mocks/data/node.data';
 
-import './entity-property/entity-property.element';
+import '../entity-property/entity-property.element';
 
 @customElement('umb-node-property')
-class UmbNodeProperty extends UmbContextConsumerMixin(LitElement) {
+class UmbNodePropertyElement extends UmbContextConsumerMixin(LitElement) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -94,6 +94,6 @@ class UmbNodeProperty extends UmbContextConsumerMixin(LitElement) {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-node-property': UmbNodeProperty;
+		'umb-node-property': UmbNodePropertyElement;
 	}
 }

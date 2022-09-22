@@ -6,7 +6,7 @@ import './components/backoffice-main.element';
 import './components/backoffice-modal-container.element';
 import './components/backoffice-notification-container.element';
 import './components/editor-property-layout.element';
-import './components/node-property.element';
+import './components/node-property/node-property.element';
 import './sections/shared/section-layout.element';
 import './sections/shared/section-main.element';
 import './sections/shared/section-sidebar.element';

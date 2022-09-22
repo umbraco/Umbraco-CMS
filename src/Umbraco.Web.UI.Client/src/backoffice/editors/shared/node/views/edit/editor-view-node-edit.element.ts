@@ -6,7 +6,7 @@ import { UmbContextConsumerMixin } from '../../../../../../core/context';
 import { UmbNodeContext } from '../../node.context';
 import { Subscription, distinctUntilChanged } from 'rxjs';
 
-import '../../../../../components/node-property.element';
+import '../../../../../components/node-property/node-property.element';
 
 @customElement('umb-editor-view-node-edit')
 export class UmbEditorViewNodeEditElement extends UmbContextConsumerMixin(LitElement) {

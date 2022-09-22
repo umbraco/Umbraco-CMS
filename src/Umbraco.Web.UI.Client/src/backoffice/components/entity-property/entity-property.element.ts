@@ -10,7 +10,7 @@ import type { ManifestPropertyEditorUI } from '../../../core/models';
 import '../../property-actions/shared/property-action-menu/property-action-menu.element';
 
 @customElement('umb-entity-property')
-class UmbEntityProperty extends UmbContextConsumerMixin(LitElement) {
+class UmbEntityPropertyElement extends UmbContextConsumerMixin(LitElement) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -159,6 +159,6 @@ class UmbEntityProperty extends UmbContextConsumerMixin(LitElement) {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-entity-property': UmbEntityProperty;
+		'umb-entity-property': UmbEntityPropertyElement;
 	}
 }
