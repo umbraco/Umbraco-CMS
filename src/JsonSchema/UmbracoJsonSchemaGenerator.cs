@@ -46,9 +46,6 @@ namespace JsonSchema
 
             JObject schema = JsonConvert.DeserializeObject<JObject>(result)!;
 
-            // TODO: when "UmbracoPath" is removed from the from the official schema store, remove this line as well
-            (schema.Root["definitions"]?["umbracoGlobal"]?["properties"] as JObject)?.Remove(nameof(GlobalSettings.UmbracoPath));
-
             return schema;
         }
 

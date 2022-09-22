@@ -254,6 +254,26 @@
         }
       }
     },
+    "/umbraco/api/v1/profiling/status": {
+      "get": {
+        "tags": [
+          "Profiling"
+        ],
+        "operationId": "StatusProfiling_Status",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfilingStatusViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/umbraco/api/v1/published-cache/collect": {
       "post": {
         "tags": [
@@ -594,6 +614,15 @@
             "type": "string"
           }
         }
+      },
+      "ProfilingStatusViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          }
+        }
       }
     }
   },
@@ -603,6 +632,9 @@
     },
     {
       "name": "Server"
+    },
+    {
+      "name": "Profiling"
     },
     {
       "name": "PublishedCache"
