@@ -13,4 +13,10 @@ public class ModelsBuilderDashboardViewModel
     public bool OutOfDateModels { get; set; }
 
     public string? LastError { get; set; }
+
+    public string? Version { get; set; }
+
+    public string? ModelsNamespace { get; set; }
+
+    public bool TrackingOutOfDateModels { get; set; }
 }
