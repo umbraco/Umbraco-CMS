@@ -15,7 +15,7 @@ public class SetAnalyticsController : AnalyticsControllerBase
     [HttpPost]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ServerStatusViewModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(OkResult), StatusCodes.Status200OK)]
     public async Task<IActionResult> SetConsentLevel(AnalyticsLevelViewModel analyticsLevelViewModel)
     {
         if (!Enum.IsDefined(analyticsLevelViewModel.AnalyticsLevel))
