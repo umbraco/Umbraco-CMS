@@ -51,6 +51,7 @@ export class UmbDashboardPublishedStatusElement extends UmbContextConsumerMixin(
 		this._buttonState = 'waiting';
 		try {
 			await postPublishedCacheReload({});
+			this._getPublishedStatus();
 			this._buttonState = 'success';
 		} catch (e) {
 			this._buttonState = 'failed';
