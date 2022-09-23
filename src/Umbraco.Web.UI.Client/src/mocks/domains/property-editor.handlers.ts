@@ -27,7 +27,7 @@ export const handlers = [
 		if (!alias) return;
 
 		const propertyEditorConfig = umbPropertyEditorConfigData.getByAlias(alias);
-
-		return res(ctx.status(200), ctx.json([propertyEditorConfig]));
+		const response = propertyEditorConfig ? [propertyEditorConfig] : [];
+		return res(ctx.status(200), ctx.json(response));
 	}),
 ];

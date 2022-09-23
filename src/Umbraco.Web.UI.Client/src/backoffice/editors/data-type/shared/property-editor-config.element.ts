@@ -27,7 +27,7 @@ export class UmbPropertyEditorConfigElement extends UmbContextConsumerMixin(LitE
 	public data: Array<any> = [];
 
 	@state()
-	private _properties?: Array<any> = [];
+	private _properties: Array<any> = [];
 
 	private _propertyEditorConfigStore?: UmbPropertyEditorConfigStore;
 	private _propertyEditorConfigSubscription?: Subscription;
@@ -49,22 +49,29 @@ export class UmbPropertyEditorConfigElement extends UmbContextConsumerMixin(LitE
 		this._propertyEditorConfigSubscription = this._propertyEditorConfigStore
 			?.getByAlias(this.propertyEditorAlias)
 			.subscribe((propertyEditorConfig) => {
+				if (!propertyEditorConfig) return;
 				this._properties = propertyEditorConfig?.properties;
 			});
 	}
 
 	render() {
 		return html`
-			${this._properties?.map(
-				(property) => html`
-					<umb-entity-property
-						label="${property.label}"
-						description="${property.description}"
-						alias="${property.alias}"
-						property-editor-ui-alias="${property.propertyEditorUI}"
-						.value=${this.data.find((data) => data.alias === property.alias)?.value}></umb-entity-property>
-				`
-			)}
+			<uui-box headline="Config">
+				${this._properties.length > 0
+					? html`
+							${this._properties?.map(
+								(property) => html`
+									<umb-entity-property
+										label="${property.label}"
+										description="${property.description}"
+										alias="${property.alias}"
+										property-editor-ui-alias="${property.propertyEditorUI}"
+										.value=${this.data.find((data) => data.alias === property.alias)?.value}></umb-entity-property>
+								`
+							)}
+					  `
+					: html` <div>No configuration</div> `}
+			</uui-box>
 		`;
 	}
 }
