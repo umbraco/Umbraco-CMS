@@ -25,18 +25,18 @@ public class SearchersExamineManagementController : ExamineManagementControllerB
     // This endpoint for now will throw errors if the ExamineIndexViewModel ever has providerProperties defined
     // This is because System.Text.Json cannot serialize dictionary<string, object>
     // This has been fixed in .NET 7, so this will work when we upgrade: https://github.com/dotnet/runtime/issues/67588
-    public async Task<PagedViewModel<ExamineIndexViewModel>> GetSearcherDetails(int skip, int take)
+    public async Task<PagedViewModel<SearcherViewModel>> GetSearcherDetails(int skip, int take)
     {
-        var searchers = new List<ExamineIndexViewModel>(
-            _examineManager.RegisteredSearchers.Select(searcher => new ExamineIndexViewModel { Name = searcher.Name })
+        var searchers = new List<SearcherViewModel>(
+            _examineManager.RegisteredSearchers.Select(searcher => new SearcherViewModel { Name = searcher.Name })
                 .OrderBy(x =>
-                    x.Name?.TrimEnd("Searcher"))); // order by name , but strip the "Searcher" from the end if it exists
-        var viewModel = new PagedViewModel<ExamineIndexViewModel>
+                    x.Name.TrimEnd("Searcher"))); // order by name , but strip the "Searcher" from the end if it exists
+        var viewModel = new PagedViewModel<SearcherViewModel>
         {
             Items = searchers.Skip(skip).Take(take),
             Total = searchers.Count,
         };
 
-        return viewModel;
+        return await Task.FromResult(viewModel);
     }
 }
