@@ -273,6 +273,65 @@
           }
         }
       }
+    },
+    "/umbraco/api/v1/published-cache/collect": {
+      "post": {
+        "tags": [
+          "PublishedCache"
+        ],
+        "operationId": "CollectPublishedCache_Collect",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/published-cache/rebuild": {
+      "post": {
+        "tags": [
+          "PublishedCache"
+        ],
+        "operationId": "RebuildPublishedCache_Collect",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/published-cache/reload": {
+      "post": {
+        "tags": [
+          "PublishedCache"
+        ],
+        "operationId": "ReloadPublishedCache_Reload",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/published-cache/status": {
+      "get": {
+        "tags": [
+          "PublishedCache"
+        ],
+        "operationId": "StatusPublishedCache_Status",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -573,6 +632,9 @@
     },
     {
       "name": "Server"
+    },
+    {
+      "name": "PublishedCache"
     },
     {
       "name": "Profiling"

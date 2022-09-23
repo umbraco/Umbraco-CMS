@@ -28,7 +28,7 @@ public class OpenAPIContractTest : UmbracoTestServerTestBase
     [Test]
     public async Task Validate_OpenApi_Contract_is_implemented()
     {
-        string[] keysToIgnore = { "servers" };
+        string[] keysToIgnore = { "servers", "x-generator" };
 
         var officePath = GlobalSettings.GetBackOfficePath(HostingEnvironment);
 
