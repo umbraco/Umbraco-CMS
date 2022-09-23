@@ -47,7 +47,6 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
         private ModelsBuilderSettings _config;
         private bool _disposedValue;
 
-        // TODO: Obsolete this ( we no longer need ApplicationPartManager)
         public InMemoryModelFactory(
             Lazy<UmbracoServices> umbracoServices,
             IProfilingLogger profilingLogger,
@@ -55,8 +54,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
             IOptionsMonitor<ModelsBuilderSettings> config,
             IHostingEnvironment hostingEnvironment,
             IApplicationShutdownRegistry hostingLifetime,
-            IPublishedValueFallback publishedValueFallback,
-            ApplicationPartManager applicationPartManager)
+            IPublishedValueFallback publishedValueFallback)
         {
             _umbracoServices = umbracoServices;
             _profilingLogger = profilingLogger;
