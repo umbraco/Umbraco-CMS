@@ -120,6 +120,18 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 	},
 	{
 		type: 'dashboard',
+		alias: 'Umb.Dashboard.PublishedStatus',
+		name: 'Published Status',
+		elementName: 'umb-dashboard-published-status',
+		loader: () => import('./backoffice/dashboards/published-status/dashboard-published-status.element'),
+		meta: {
+			sections: ['Umb.Section.Settings'],
+			pathname: 'published-status', // TODO: how to we want to support pretty urls?
+			weight: 9,
+		},
+	},
+	{
+		type: 'dashboard',
 		alias: 'Umb.Dashboard.MediaManagement',
 		name: 'Media',
 		elementName: 'umb-dashboard-media-management',
