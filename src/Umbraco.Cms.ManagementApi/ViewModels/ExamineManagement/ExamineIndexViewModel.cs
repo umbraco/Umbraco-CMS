@@ -8,11 +8,11 @@ public class ExamineIndexViewModel
 
     public bool IsHealthy => HealthStatus == "Healthy";
 
-    public IReadOnlyDictionary<string, object?> ProviderProperties { get; init; } = null!;
-
     public bool CanRebuild { get; init; }
 
     public string? SearcherName { get; init; }
 
     public long DocumentCount { get; init; }
+
+    public int FieldCount { get; init; }
 }

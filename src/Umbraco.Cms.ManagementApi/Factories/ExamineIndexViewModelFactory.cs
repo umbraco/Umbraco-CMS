@@ -31,24 +31,14 @@ public class ExamineIndexViewModelFactory : IExamineIndexViewModelFactory
 
         Attempt<string?> isHealthy = indexDiag.IsHealthy();
 
-        var properties = new Dictionary<string, object?>
-        {
-            ["DocumentCount"] = indexDiag.GetDocumentCount(),
-            ["FieldCount"] = indexDiag.GetFieldNames().Count(),
-        };
-
-        foreach (KeyValuePair<string, object?> p in indexDiag.Metadata)
-        {
-            properties[p.Key] = p.Value;
-        }
-
         var indexerModel = new ExamineIndexViewModel
         {
             Name = index.Name,
             HealthStatus = isHealthy.Success ? isHealthy.Result ?? "Healthy" : isHealthy.Result ?? "Unhealthy",
-            ProviderProperties = properties,
             CanRebuild = _indexRebuilder.CanRebuild(index.Name),
             SearcherName = index.Searcher.Name,
+            DocumentCount = indexDiag.GetDocumentCount(),
+            FieldCount = indexDiag.GetFieldNames().Count(),
         };
 
         return indexerModel;
