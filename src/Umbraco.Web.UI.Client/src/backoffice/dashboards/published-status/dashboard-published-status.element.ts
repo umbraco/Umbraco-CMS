@@ -86,22 +86,22 @@ export class UmbDashboardPublishedStatusElement extends UmbContextConsumerMixin(
 		return html`
 			<uui-box headline="Published Cache Status">
 				<p>${this._publishedStatusText}</p>
-				<uui-button .state=${this._buttonState} type="button" look="primary" @click=${this._onRefreshCacheHandler}>Refresh Status</uui-button>
+				<uui-button .state=${this._buttonState} type="button" look="primary" color="danger" @click=${this._onRefreshCacheHandler}>Refresh Status</uui-button>
 			</uui-box>
 
 			<uui-box headline="Memory Cache">
 				<p>This button lets you reload the in-memory cache, by entirely reloading it from the database cache (but it does not rebuild that database cache). This is relatively fast. Use it when you think that the memory cache has not been properly refreshed, after some events triggered—which would indicate a minor Umbraco issue. (note: triggers the reload on all servers in an LB environment).</p>
-				<uui-button type="button" look="danger" @click=${this._onReloadCacheHandler}>Reload Memory Cache</uui-button>
+				<uui-button type="button" look="primary" color="danger" @click=${this._onReloadCacheHandler}>Reload Memory Cache</uui-button>
 			</uui-box>
 
 			<uui-box headline="Database Cache">
 				<p>This button lets you rebuild the database cache, ie the content of the cmsContentNu table. Rebuilding can be expensive. Use it when reloading is not enough, and you think that the database cache has not been properly generated—which would indicate some critical Umbraco issue.</p>
-				<uui-button type="button" look="danger" @click=${this._onRebuildCacheHandler}>Rebuild Database Cache</uui-button>
+				<uui-button type="button" look="primary" color="danger" @click=${this._onRebuildCacheHandler}>Rebuild Database Cache</uui-button>
 			</uui-box>
 
 			<uui-box headline="Internal Cache">
 				<p>This button lets you trigger a NuCache snapshots collection (after running a fullCLR GC). Unless you know what that means, you probably do not need to use it.</p>
-				<uui-button type="button" look="danger" @click=${this._onSnapshotCacheHandler}>Snapshot Internal Cache</uui-button>
+				<uui-button type="button" look="primary" color="danger" @click=${this._onSnapshotCacheHandler}>Snapshot Internal Cache</uui-button>
 			</uui-box>
 		`;
 	}

@@ -33,7 +33,7 @@ export class UmbSectionDashboards extends UmbContextConsumerMixin(LitElement) {
 			}
 
 			#scroll-container {
-				height: 500px;
+				height: 500px; // TODO: This is a temporary fix to get scrolling to work
 			}
 		`,
 	];
