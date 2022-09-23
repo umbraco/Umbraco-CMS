@@ -575,6 +575,9 @@
       "name": "Profiling"
     },
     {
+      "name": "PublishedCache"
+    },
+    {
       "name": "Server"
     },
     {
