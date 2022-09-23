@@ -1,3 +1,4 @@
+import { UUIButtonState } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
@@ -13,6 +14,9 @@ export class UmbDashboardPublishedStatusElement extends UmbContextConsumerMixin(
 
 	@state()
 	private _publishedStatusText = '';
+
+	@state()
+	private _buttonState: UUIButtonState = undefined;
 
 	private _notificationService?: UmbNotificationService;
 
@@ -36,9 +40,12 @@ export class UmbDashboardPublishedStatusElement extends UmbContextConsumerMixin(
 	}
 
 	private async _onReloadCacheHandler() {
+		this._buttonState = 'waiting';
 		try {
 			await postPublishedCacheReload({});
+			this._buttonState = 'success';
 		} catch (e) {
+			this._buttonState = 'failed';
 			if (e instanceof postPublishedCacheReload.Error) {
 				const error = e.getActualType();
 				const data: UmbNotificationDefaultData = { message: error.data.detail ?? 'Something went wrong' };
@@ -55,7 +62,9 @@ export class UmbDashboardPublishedStatusElement extends UmbContextConsumerMixin(
 			</uui-box>
 
 			<uui-box>
-				<uui-button type="button" look="primary" @click=${this._onReloadCacheHandler}>Reload Cache</uui-button>
+				<uui-button .state=${this._buttonState} type="button" look="primary" @click=${this._onReloadCacheHandler}
+					>Reload Cache</uui-button
+				>
 			</uui-box>
 		`;
 	}
