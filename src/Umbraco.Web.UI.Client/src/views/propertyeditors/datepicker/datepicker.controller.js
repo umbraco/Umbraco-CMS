@@ -106,7 +106,7 @@ function dateTimePickerController($scope, angularHelper, dateHelper, validationM
                 setDate(momentDate);
             }
             setDatePickerVal();
-            flatPickr.setDate($scope.model.value, false);
+            flatPickr.setDate($scope.model.datetimePickerValue, false);
         }
     }
     
