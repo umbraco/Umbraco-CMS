@@ -33,11 +33,11 @@ public class RebuildIndexExamineManagementController : ExamineManagementControll
     /// </summary>
     /// <param name="indexName"></param>
     /// <returns></returns>
-    [HttpPost("rebuildIndex")]
+    [HttpPost("rebuild")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(OkResult), StatusCodes.Status200OK)]
-    public async Task<IActionResult> RebuildIndex(string indexName)
+    public async Task<IActionResult> Rebuild(string indexName)
     {
         if (!_examineManagerService.ValidateIndex(indexName, out IIndex? index))
         {
@@ -49,7 +49,7 @@ public class RebuildIndexExamineManagementController : ExamineManagementControll
                 Type = "Error",
             };
 
-            return BadRequest(invalidModelProblem);
+            return await Task.FromResult(BadRequest(invalidModelProblem));
         }
 
         if (!_examineManagerService.ValidatePopulator(index!))
@@ -62,7 +62,7 @@ public class RebuildIndexExamineManagementController : ExamineManagementControll
                 Type = "Error",
             };
 
-            return BadRequest(invalidModelProblem);
+            return await Task.FromResult(BadRequest(invalidModelProblem));
         }
 
         _logger.LogInformation("Rebuilding index '{IndexName}'", indexName);
@@ -81,7 +81,7 @@ public class RebuildIndexExamineManagementController : ExamineManagementControll
 
             _indexRebuilder.RebuildIndex(indexName);
 
-            return Ok();
+            return await Task.FromResult(Ok());
         }
         catch (Exception ex)
         {
@@ -96,7 +96,7 @@ public class RebuildIndexExamineManagementController : ExamineManagementControll
                 Type = "Error",
             };
 
-            return Conflict(invalidModelProblem);
+            return await Task.FromResult(Conflict(invalidModelProblem));
         }
     }
 
