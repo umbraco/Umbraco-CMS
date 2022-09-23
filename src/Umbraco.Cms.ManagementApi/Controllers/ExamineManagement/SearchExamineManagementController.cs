@@ -74,7 +74,7 @@ public class SearchExamineManagementController : ExamineManagementControllerBase
             {
                 Id = x.Id,
                 Score = x.Score,
-                Fields = x.AllValues.OrderBy(y => y.Key).Select(y => new FieldsViewModel { Name = y.Key, Values = y.Value }),
+                Fields = x.AllValues.OrderBy(y => y.Key).Select(y => new FieldViewModel { Name = y.Key, Values = y.Value }),
             }),
         };
     }

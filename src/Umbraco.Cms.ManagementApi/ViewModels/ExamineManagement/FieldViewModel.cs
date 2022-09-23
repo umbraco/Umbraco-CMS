@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Cms.ManagementApi.ViewModels.ExamineManagement;
 
-public class FieldsViewModel
+public class FieldViewModel
 {
     public string? Name { get; init; }
 

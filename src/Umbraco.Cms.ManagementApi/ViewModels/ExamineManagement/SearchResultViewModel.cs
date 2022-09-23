@@ -14,5 +14,5 @@ public class SearchResultViewModel
     public int FieldCount => Fields?.Count() ?? 0;
 
     [JsonPropertyName("values")]
-    public IEnumerable<FieldsViewModel>? Fields { get; set; }
+    public IEnumerable<FieldViewModel>? Fields { get; set; }
 }
