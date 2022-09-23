@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.ManagementApi.Factories;
-using Umbraco.Cms.ManagementApi.Services;
 using Umbraco.Cms.ManagementApi.ViewModels.ExamineManagement;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.ExamineManagement;
@@ -11,14 +10,14 @@ namespace Umbraco.Cms.ManagementApi.Controllers.ExamineManagement;
 public class HasIndexRebuiltExamineManagementController : ExamineManagementControllerBase
 {
     private readonly IExamineIndexViewModelFactory _examineIndexViewModelFactory;
-    private readonly IExamineManagerService _examineManagerService;
+    private readonly IExamineManager _examineManager;
 
     public HasIndexRebuiltExamineManagementController(
         IExamineIndexViewModelFactory examineIndexViewModelFactory,
-        IExamineManagerService examineManagerService)
+        IExamineManager examineManager)
     {
         _examineIndexViewModelFactory = examineIndexViewModelFactory;
-        _examineManagerService = examineManagerService;
+        _examineManager = examineManager;
     }
 
     /// <summary>
@@ -39,19 +38,20 @@ public class HasIndexRebuiltExamineManagementController : ExamineManagementContr
     // This has been fixed in .NET 7, so this will work when we upgrade: https://github.com/dotnet/runtime/issues/67588
     public async Task<ActionResult<ExamineIndexViewModel?>> Index(string indexName)
     {
-        if (!_examineManagerService.ValidateIndex(indexName, out IIndex? index))
+        if (_examineManager.TryGetIndex(indexName, out IIndex? index))
         {
-            var invalidModelProblem = new ProblemDetails
-            {
-                Title = "Index Not Found",
-                Detail = $"No index found with name = {indexName}",
-                Status = StatusCodes.Status400BadRequest,
-                Type = "Error",
-            };
-
-            return BadRequest(invalidModelProblem);
+            return await Task.FromResult(_examineIndexViewModelFactory.Create(index!));
         }
 
-        return await Task.FromResult(_examineIndexViewModelFactory.Create(index!));
+        var invalidModelProblem = new ProblemDetails
+        {
+            Title = "Index Not Found",
+            Detail = $"No index found with name = {indexName}",
+            Status = StatusCodes.Status400BadRequest,
+            Type = "Error",
+        };
+
+        return await Task.FromResult(BadRequest(invalidModelProblem));
+
     }
 }

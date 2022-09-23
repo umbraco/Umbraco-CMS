@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Infrastructure.Examine;
-using Umbraco.Cms.ManagementApi.Services;
 using Umbraco.New.Cms.Infrastructure.Services;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.ExamineManagement;
@@ -11,21 +10,21 @@ namespace Umbraco.Cms.ManagementApi.Controllers.ExamineManagement;
 [ApiVersion("1.0")]
 public class RebuildExamineManagementController : ExamineManagementControllerBase
 {
-    private readonly IExamineManagerService _examineManagerService;
     private readonly ILogger<RebuildExamineManagementController> _logger;
     private readonly IIndexRebuilder _indexRebuilder;
     private readonly ITemporaryIndexingService _temporaryIndexingService;
+    private readonly IExamineManager _examineManager;
 
     public RebuildExamineManagementController(
-        IExamineManagerService examineManagerService,
         ILogger<RebuildExamineManagementController> logger,
         IIndexRebuilder indexRebuilder,
-        ITemporaryIndexingService temporaryIndexingService)
+        ITemporaryIndexingService temporaryIndexingService,
+        IExamineManager examineManager)
     {
-        _examineManagerService = examineManagerService;
         _logger = logger;
         _indexRebuilder = indexRebuilder;
         _temporaryIndexingService = temporaryIndexingService;
+        _examineManager = examineManager;
     }
 
     /// <summary>
@@ -39,7 +38,7 @@ public class RebuildExamineManagementController : ExamineManagementControllerBas
     [ProducesResponseType(typeof(OkResult), StatusCodes.Status200OK)]
     public async Task<IActionResult> Rebuild(string indexName)
     {
-        if (!_examineManagerService.ValidateIndex(indexName, out IIndex? index))
+        if (!_examineManager.TryGetIndex(indexName, out var index))
         {
             var invalidModelProblem = new ProblemDetails
             {
@@ -52,7 +51,7 @@ public class RebuildExamineManagementController : ExamineManagementControllerBas
             return await Task.FromResult(BadRequest(invalidModelProblem));
         }
 
-        if (!_examineManagerService.ValidatePopulator(index!))
+        if (!_indexRebuilder.CanRebuild(index.Name))
         {
             var invalidModelProblem = new ProblemDetails
             {
