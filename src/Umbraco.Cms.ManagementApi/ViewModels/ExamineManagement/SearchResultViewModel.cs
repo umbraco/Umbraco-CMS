@@ -11,8 +11,8 @@ public class SearchResultViewModel
     public float Score { get; set; }
 
     [JsonPropertyName("fieldCount")]
-    public int FieldCount => Values?.Count ?? 0;
+    public int FieldCount => Fields?.Count() ?? 0;
 
     [JsonPropertyName("values")]
-    public IReadOnlyDictionary<string, IReadOnlyList<string>>? Values { get; set; }
+    public IEnumerable<FieldsViewModel>? Fields { get; set; }
 }

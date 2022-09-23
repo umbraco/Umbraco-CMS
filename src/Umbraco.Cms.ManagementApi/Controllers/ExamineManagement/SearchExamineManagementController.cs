@@ -1,5 +1,6 @@
 ﻿using Examine;
 using Examine.Search;
+using Lucene.Net.Documents;
 using Lucene.Net.QueryParsers.Classic;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -73,7 +74,7 @@ public class SearchExamineManagementController : ExamineManagementControllerBase
             {
                 Id = x.Id,
                 Score = x.Score,
-                Values = x.AllValues.OrderBy(y => y.Key).ToDictionary(y => y.Key, y => y.Value),
+                Fields = x.AllValues.OrderBy(y => y.Key).Select(y => new FieldsViewModel { Name = y.Key, Values = y.Value }),
             }),
         };
     }
