@@ -569,16 +569,16 @@
   },
   "tags": [
     {
-      "name": "Upgrade"
-    },
-    {
-      "name": "Server"
+      "name": "Install"
     },
     {
       "name": "Profiling"
     },
     {
-      "name": "Install"
+      "name": "Server"
+    },
+    {
+      "name": "Upgrade"
     }
   ]
 }
