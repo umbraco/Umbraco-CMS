@@ -35,8 +35,16 @@ export class UmbDashboardPublishedStatusElement extends UmbContextConsumerMixin(
 	}
 
 	private async _getPublishedStatus() {
-		const request = await getPublishedCacheStatus({});
-		this._publishedStatusText = request.data;
+		try {
+			const { data } = await getPublishedCacheStatus({});
+			this._publishedStatusText = data;
+		} catch (e) {
+			if (e instanceof getPublishedCacheStatus.Error) {
+				const error = e.getActualType();
+				const data: UmbNotificationDefaultData = { message: error.data.detail ?? 'Something went wrong' };
+				this._notificationService?.peek('danger', { data });
+			}
+		}
 	}
 
 	private async _onReloadCacheHandler() {
