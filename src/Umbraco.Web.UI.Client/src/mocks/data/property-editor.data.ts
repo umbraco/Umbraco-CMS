@@ -1,19 +1,11 @@
 import { UmbData } from './data';
-
-export interface PropertyEditor {
-	alias: string;
-	name: string;
-	icon: string;
-	group?: string;
-	isSystem: boolean;
-	hasPrevalues: boolean;
-}
+import type { PropertyEditor } from '../../core/models';
 
 export const data: Array<PropertyEditor> = [
 	{
 		isSystem: false,
 		group: 'Pickers',
-		hasPrevalues: true,
+		hasConfig: true,
 		name: 'Color Picker',
 		icon: 'umb:colorpicker',
 		alias: 'Umbraco.ColorPicker',
@@ -21,7 +13,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		isSystem: false,
 		group: 'Pickers',
-		hasPrevalues: true,
+		hasConfig: true,
 		name: 'Content Picker',
 		icon: 'umb:autofill',
 		alias: 'Umbraco.ContentPicker',
@@ -29,7 +21,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		isSystem: false,
 		group: 'Pickers',
-		hasPrevalues: true,
+		hasConfig: true,
 		name: 'Eye Dropper Color Picker',
 		icon: 'umb:colorpicker',
 		alias: 'Umbraco.ColorPicker.EyeDropper',
@@ -37,7 +29,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		isSystem: false,
 		group: 'Pickers',
-		hasPrevalues: true,
+		hasConfig: true,
 		name: 'Form Picker',
 		icon: 'umb:umb-contour',
 		alias: 'UmbracoForms.FormPicker',
@@ -45,7 +37,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		isSystem: false,
 		group: 'Pickers',
-		hasPrevalues: false,
+		hasConfig: false,
 		name: 'Form Theme Picker',
 		icon: 'umb:brush',
 		alias: 'UmbracoForms.ThemePicker',
@@ -53,7 +45,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		isSystem: false,
 		group: 'Pickers',
-		hasPrevalues: true,
+		hasConfig: true,
 		name: 'Multi URL Picker',
 		icon: 'umb:link',
 		alias: 'Umbraco.MultiUrlPicker',
@@ -61,7 +53,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		isSystem: false,
 		group: 'Pickers',
-		hasPrevalues: true,
+		hasConfig: true,
 		name: 'Multinode Treepicker',
 		icon: 'umb:page-add',
 		alias: 'Umbraco.MultiNodeTreePicker',
@@ -69,7 +61,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		isSystem: false,
 		group: 'Common',
-		hasPrevalues: true,
+		hasConfig: true,
 		name: 'Date/Time',
 		icon: 'umb:time',
 		alias: 'Umbraco.DateTime',
@@ -77,7 +69,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		isSystem: false,
 		group: 'Common',
-		hasPrevalues: true,
+		hasConfig: true,
 		name: 'Decimal',
 		icon: 'umb:autofill',
 		alias: 'Umbraco.Decimal',
@@ -85,7 +77,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		isSystem: false,
 		group: 'Common',
-		hasPrevalues: true,
+		hasConfig: true,
 		name: 'Email address',
 		icon: 'umb:message',
 		alias: 'Umbraco.EmailAddress',
@@ -93,7 +85,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		isSystem: false,
 		group: 'Common',
-		hasPrevalues: true,
+		hasConfig: true,
 		name: 'Label',
 		icon: 'umb:readonly',
 		alias: 'Umbraco.Label',
@@ -101,7 +93,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		isSystem: false,
 		group: 'Common',
-		hasPrevalues: true,
+		hasConfig: true,
 		name: 'Numeric',
 		icon: 'umb:autofill',
 		alias: 'Umbraco.Integer',
@@ -109,7 +101,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		isSystem: false,
 		group: 'Common',
-		hasPrevalues: true,
+		hasConfig: true,
 		name: 'Open Street Map',
 		icon: 'umb:map-location',
 		alias: 'Bergmania.OpenStreetMap',
@@ -117,7 +109,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		isSystem: false,
 		group: 'Common',
-		hasPrevalues: true,
+		hasConfig: true,
 		name: 'Slider',
 		icon: 'umb:navigation-horizontal',
 		alias: 'Umbraco.Slider',
@@ -125,7 +117,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		isSystem: false,
 		group: 'Common',
-		hasPrevalues: true,
+		hasConfig: true,
 		name: 'Tags',
 		icon: 'umb:tags',
 		alias: 'Umbraco.Tags',
@@ -133,23 +125,43 @@ export const data: Array<PropertyEditor> = [
 	{
 		isSystem: false,
 		group: 'Common',
-		hasPrevalues: true,
+		hasConfig: true,
 		name: 'Textarea',
 		icon: 'umb:application-window-alt',
 		alias: 'Umbraco.TextArea',
+		config: {
+			properties: [
+				{
+					alias: 'maxChars',
+					label: 'Maximum allowed characters',
+					description: 'If empty - no character limit',
+					propertyEditorUI: 'Umb.PropertyEditorUI.Number',
+				},
+			],
+		},
 	},
 	{
 		isSystem: false,
 		group: 'Common',
-		hasPrevalues: true,
+		hasConfig: true,
 		name: 'Textbox',
 		icon: 'umb:autofill',
 		alias: 'Umbraco.TextBox',
+		config: {
+			properties: [
+				{
+					alias: 'maxChars',
+					label: 'Maximum allowed characters',
+					description: 'If empty, 512 character limit',
+					propertyEditorUI: 'Umb.PropertyEditorUI.Textarea',
+				},
+			],
+		},
 	},
 	{
 		isSystem: false,
 		group: 'Common',
-		hasPrevalues: true,
+		hasConfig: true,
 		name: 'Toggle',
 		icon: 'umb:checkbox',
 		alias: 'Umbraco.TrueFalse',
@@ -157,7 +169,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		isSystem: false,
 		group: 'Rich Content',
-		hasPrevalues: true,
+		hasConfig: true,
 		name: 'Grid layout',
 		icon: 'umb:layout',
 		alias: 'Umbraco.Grid',
@@ -165,7 +177,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		isSystem: false,
 		group: 'Rich Content',
-		hasPrevalues: true,
+		hasConfig: true,
 		name: 'Markdown editor',
 		icon: 'umb:code',
 		alias: 'Umbraco.MarkdownEditor',
@@ -173,7 +185,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		isSystem: false,
 		group: 'Rich Content',
-		hasPrevalues: true,
+		hasConfig: true,
 		name: 'Rich Text Editor',
 		icon: 'umb:browser-window',
 		alias: 'Umbraco.TinyMCE',
@@ -181,7 +193,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		isSystem: false,
 		group: 'People',
-		hasPrevalues: false,
+		hasConfig: false,
 		name: 'Member Group Picker',
 		icon: 'umb:users-alt',
 		alias: 'Umbraco.MemberGroupPicker',
@@ -189,7 +201,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		isSystem: false,
 		group: 'People',
-		hasPrevalues: false,
+		hasConfig: false,
 		name: 'Member Picker',
 		icon: 'umb:user',
 		alias: 'Umbraco.MemberPicker',
@@ -197,7 +209,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		isSystem: false,
 		group: 'People',
-		hasPrevalues: false,
+		hasConfig: false,
 		name: 'User Picker',
 		icon: 'umb:user',
 		alias: 'Umbraco.UserPicker',
@@ -205,7 +217,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		isSystem: false,
 		group: 'Lists',
-		hasPrevalues: true,
+		hasConfig: true,
 		name: 'Block Grid',
 		icon: 'umb:thumbnail-list',
 		alias: 'Umbraco.BlockGrid',
@@ -213,7 +225,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		isSystem: false,
 		group: 'Lists',
-		hasPrevalues: true,
+		hasConfig: true,
 		name: 'Block List',
 		icon: 'umb:thumbnail-list',
 		alias: 'Umbraco.BlockList',
@@ -221,7 +233,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		isSystem: false,
 		group: 'Lists',
-		hasPrevalues: true,
+		hasConfig: true,
 		name: 'Checkbox list',
 		icon: 'umb:bulleted-list',
 		alias: 'Umbraco.CheckBoxList',
@@ -229,7 +241,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		isSystem: false,
 		group: 'Lists',
-		hasPrevalues: true,
+		hasConfig: true,
 		name: 'Dropdown',
 		icon: 'umb:indent',
 		alias: 'Umbraco.DropDown.Flexible',
@@ -237,7 +249,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		isSystem: false,
 		group: 'Lists',
-		hasPrevalues: true,
+		hasConfig: true,
 		name: 'List view',
 		icon: 'umb:thumbnail-list',
 		alias: 'Umbraco.ListView',
@@ -245,7 +257,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		isSystem: false,
 		group: 'Lists',
-		hasPrevalues: true,
+		hasConfig: true,
 		name: 'Nested Content',
 		icon: 'umb:thumbnail-list',
 		alias: 'Umbraco.NestedContent',
@@ -253,7 +265,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		isSystem: false,
 		group: 'Lists',
-		hasPrevalues: true,
+		hasConfig: true,
 		name: 'Radio button list',
 		icon: 'umb:target',
 		alias: 'Umbraco.RadioButtonList',
@@ -261,7 +273,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		isSystem: false,
 		group: 'Lists',
-		hasPrevalues: true,
+		hasConfig: true,
 		name: 'Repeatable textstrings',
 		icon: 'umb:ordered-list',
 		alias: 'Umbraco.MultipleTextstring',
@@ -269,7 +281,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		isSystem: false,
 		group: 'Media',
-		hasPrevalues: true,
+		hasConfig: true,
 		name: 'File upload',
 		icon: 'umb:download-alt',
 		alias: 'Umbraco.UploadField',
@@ -277,7 +289,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		isSystem: false,
 		group: 'Media',
-		hasPrevalues: true,
+		hasConfig: true,
 		name: 'Image Cropper',
 		icon: 'umb:crop',
 		alias: 'Umbraco.ImageCropper',
@@ -285,7 +297,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		isSystem: false,
 		group: 'Media',
-		hasPrevalues: true,
+		hasConfig: true,
 		name: 'Media Picker',
 		icon: 'umb:picture',
 		alias: 'Umbraco.MediaPicker3',
@@ -293,7 +305,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		isSystem: false,
 		group: 'Media',
-		hasPrevalues: true,
+		hasConfig: true,
 		name: 'Media Picker (legacy)',
 		icon: 'umb:picture',
 		alias: 'Umbraco.MediaPicker',
@@ -301,7 +313,7 @@ export const data: Array<PropertyEditor> = [
 	{
 		isSystem: false,
 		group: 'Custom',
-		hasPrevalues: true,
+		hasConfig: true,
 		name: 'Custom Property Editor',
 		icon: 'umb:autofill',
 		alias: 'Umbraco.Custom',
@@ -320,6 +332,11 @@ class UmbPropertyEditorData extends UmbData<PropertyEditor> {
 
 	getByAlias(alias: string) {
 		return this.data.find((x) => x.alias === alias);
+	}
+
+	getConfig(alias: string) {
+		const editor = this.getByAlias(alias);
+		return editor?.config ?? undefined;
 	}
 }
 

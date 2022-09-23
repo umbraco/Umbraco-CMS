@@ -1,17 +1,19 @@
 import { BehaviorSubject, map, Observable } from 'rxjs';
-import { PropertyEditorConfig } from '../../../mocks/data/property-editor-config.data';
+import { getPropertyEditorConfig } from '../../api/fetcher';
+import type { PropertyEditorConfig } from '../../models';
 
 export class UmbPropertyEditorConfigStore {
 	private _items: BehaviorSubject<Array<PropertyEditorConfig>> = new BehaviorSubject(<Array<PropertyEditorConfig>>[]);
 	public readonly items: Observable<Array<PropertyEditorConfig>> = this._items.asObservable();
 
 	getByAlias(alias: string): Observable<PropertyEditorConfig | undefined> {
-		// TODO: use Fetcher API.
 		// TODO: only fetch if the data type is not in the store?
-		fetch(`/umbraco/backoffice/property-editors/config/${alias}`)
-			.then((res) => res.json())
-			.then((data) => {
-				this.update(data);
+		getPropertyEditorConfig({ propertyEditorAlias: alias })
+			.then((res) => {
+				this.update([res.data]);
+			})
+			.catch((err) => {
+				console.log(err);
 			});
 
 		return this.items.pipe(map((items) => items.find((item) => item.propertyEditorAlias === alias)));

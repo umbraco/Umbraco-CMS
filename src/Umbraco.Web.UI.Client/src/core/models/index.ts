@@ -31,6 +31,13 @@ export type ManifestCustom = components['schemas']['IManifestCustom'];
 export type ManifestPackageView = components['schemas']['IManifestPackageView'];
 export type PackageInstalled = components['schemas']['PackageInstalled'];
 
+// Property Editors
+export type PropertyEditorsListResponse = components['schemas']['PropertyEditorsListResponse'];
+export type PropertyEditorResponse = components['schemas']['PropertyEditorResponse'];
+export type PropertyEditorConfigResponse = components['schemas']['PropertyEditorConfigResponse'];
+export type PropertyEditor = components['schemas']['PropertyEditor'];
+export type PropertyEditorConfigProperty = components['schemas']['PropertyEditorConfigProperty'];
+
 export type ManifestElementType =
 	| ManifestSection
 	| ManifestTree

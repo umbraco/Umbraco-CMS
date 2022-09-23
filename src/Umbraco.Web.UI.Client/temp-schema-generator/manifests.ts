@@ -1,6 +1,7 @@
 import { body, defaultResponse, endpoint, response } from '@airtasker/spot';
 
 import { ProblemDetails } from './models';
+import { PropertyEditorConfig } from './property-editors';
 
 @endpoint({ method: 'GET', path: '/manifests' })
 export class Manifests {
@@ -78,20 +79,6 @@ export interface IManifest {
 	name: string;
 }
 
-export interface IPrevalueField {
-	label?: string;
-	description?: string;
-	key: string;
-	view: string;
-}
-
-export interface IPrevalues {
-	prevalues?: {
-		fields: IPrevalueField[];
-	};
-	defaultConfig?: {};
-}
-
 export interface MetaSection {
 	pathname: string;
 	weight: number;
@@ -112,7 +99,7 @@ export interface MetaTreeItemAction {
 	icon: string;
 	weight: number;
 }
-export interface MetaPropertyEditorUI extends IPrevalues {
+export interface MetaPropertyEditorUI extends PropertyEditorConfig {
 	propertyEditor: string;
 	icon: string;
 	group: string;

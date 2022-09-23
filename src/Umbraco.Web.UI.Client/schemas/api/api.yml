@@ -105,6 +105,66 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
+  /property-editors/list:
+    get:
+      operationId: PropertyEditorsListRequest
+      responses:
+        '200':
+          description: 200 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PropertyEditorsListResponse'
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /property-editors/property-editor/{propertyEditorAlias}:
+    get:
+      operationId: PropertyEditorRequest
+      parameters:
+        - name: propertyEditorAlias
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 200 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PropertyEditorResponse'
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /property-editors/property-editor/config/{propertyEditorAlias}:
+    get:
+      operationId: PropertyEditorConfigRequest
+      parameters:
+        - name: propertyEditorAlias
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 200 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PropertyEditorConfigResponse'
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
   /server/status:
     get:
       operationId: GetStatus
@@ -527,20 +587,21 @@ components:
         - meta
         - alias
         - name
-    IPrevalueField:
+    PropertyEditorConfigProperty:
       type: object
       properties:
         label:
           type: string
         description:
           type: string
-        key:
+        alias:
           type: string
-        view:
+        propertyEditorUI:
           type: string
       required:
-        - key
-        - view
+        - label
+        - alias
+        - propertyEditorUI
     MetaPropertyEditorUI:
       type: object
       properties:
@@ -550,17 +611,17 @@ components:
           type: string
         group:
           type: string
-        prevalues:
+        config:
           type: object
           properties:
-            fields:
+            properties:
               type: array
               items:
-                $ref: '#/components/schemas/IPrevalueField'
+                $ref: '#/components/schemas/PropertyEditorConfigProperty'
+            defaultConfig:
+              type: object
           required:
-            - fields
-        defaultConfig:
-          type: object
+            - properties
       required:
         - propertyEditor
         - icon
@@ -838,6 +899,97 @@ components:
             $ref: '#/components/schemas/PackageInstalled'
       required:
         - packages
+    PropertyEditor:
+      type: object
+      properties:
+        alias:
+          type: string
+        name:
+          type: string
+        icon:
+          type: string
+        group:
+          type: string
+        isSystem:
+          type: boolean
+        hasConfig:
+          type: boolean
+        config:
+          type: object
+          properties:
+            properties:
+              type: array
+              items:
+                $ref: '#/components/schemas/PropertyEditorConfigProperty'
+            defaultConfig:
+              type: object
+          required:
+            - properties
+      required:
+        - alias
+        - name
+        - icon
+        - isSystem
+        - hasConfig
+    PropertyEditorsListResponse:
+      type: object
+      properties:
+        propertyEditors:
+          type: array
+          items:
+            $ref: '#/components/schemas/PropertyEditor'
+      required:
+        - propertyEditors
+    PropertyEditorResponse:
+      type: object
+      properties:
+        alias:
+          type: string
+        name:
+          type: string
+        icon:
+          type: string
+        group:
+          type: string
+        isSystem:
+          type: boolean
+        hasConfig:
+          type: boolean
+        config:
+          type: object
+          properties:
+            properties:
+              type: array
+              items:
+                $ref: '#/components/schemas/PropertyEditorConfigProperty'
+            defaultConfig:
+              type: object
+          required:
+            - properties
+      required:
+        - alias
+        - name
+        - icon
+        - isSystem
+        - hasConfig
+    PropertyEditorConfigResponse:
+      type: object
+      properties:
+        propertyEditorAlias:
+          type: string
+        config:
+          type: object
+          properties:
+            properties:
+              type: array
+              items:
+                $ref: '#/components/schemas/PropertyEditorConfigProperty'
+            defaultConfig:
+              type: object
+          required:
+            - properties
+      required:
+        - propertyEditorAlias
     ServerStatus:
       type: string
       enum:

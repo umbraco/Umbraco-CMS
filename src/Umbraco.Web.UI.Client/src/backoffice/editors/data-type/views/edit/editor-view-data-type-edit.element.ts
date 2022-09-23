@@ -60,11 +60,11 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Li
 	constructor() {
 		super();
 
+		// TODO: wait for more contexts
 		this.consumeContext('umbModalService', (modalService) => {
 			this._modalService = modalService;
 		});
 
-		// TODO: wait for more contexts
 		this.consumeContext('umbDataTypeContext', (dataTypeContext) => {
 			this._dataTypeContext = dataTypeContext;
 			this._observeDataType();
@@ -281,6 +281,7 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Li
 				? html`
 						<umb-property-editor-config
 							property-editor-alias="${this._propertyEditorAlias}"
+							property-editor-ui-alias="${this._propertyEditorUIAlias}"
 							.data="${this._data}"></umb-property-editor-config>
 				  `
 				: nothing}

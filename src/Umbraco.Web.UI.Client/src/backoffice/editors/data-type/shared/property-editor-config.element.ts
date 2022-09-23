@@ -1,9 +1,13 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
+import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { Subscription } from 'rxjs';
 import { UmbContextConsumerMixin } from '../../../../core/context';
+import { UmbExtensionRegistry } from '../../../../core/extension';
 import { UmbPropertyEditorConfigStore } from '../../../../core/stores/property-editor-config/property-editor-config.store';
+
+import type { PropertyEditorConfigProperty } from '../../../../core/models';
 
 import '../../../components/entity-property/entity-property.element';
 
@@ -23,14 +27,32 @@ export class UmbPropertyEditorConfigElement extends UmbContextConsumerMixin(LitE
 		this._observePropertyEditorConfig();
 	}
 
+	private _propertyEditorUIAlias = '';
+	@property({ type: String, attribute: 'property-editor-ui-alias' })
+	public get propertyEditorUIAlias(): string {
+		return this._propertyEditorUIAlias;
+	}
+	public set propertyEditorUIAlias(value: string) {
+		const oldVal = this._propertyEditorUIAlias;
+		this._propertyEditorUIAlias = value;
+		this.requestUpdate('propertyEditorUIAlias', oldVal);
+		this._observePropertyEditorUIConfig();
+	}
+
 	@property({ type: Array })
 	public data: Array<any> = [];
 
 	@state()
-	private _properties: Array<any> = [];
+	private _properties: Array<PropertyEditorConfigProperty> = [];
+
+	private _propertyEditorConfigProperties: Array<PropertyEditorConfigProperty> = [];
+	private _propertyEditorUIConfigProperties: Array<PropertyEditorConfigProperty> = [];
 
 	private _propertyEditorConfigStore?: UmbPropertyEditorConfigStore;
 	private _propertyEditorConfigSubscription?: Subscription;
+
+	private _extensionRegistry?: UmbExtensionRegistry;
+	private _propertyEditorUIConfigSubscription?: Subscription;
 
 	constructor() {
 		super();
@@ -38,6 +60,11 @@ export class UmbPropertyEditorConfigElement extends UmbContextConsumerMixin(LitE
 		this.consumeContext('umbPropertyEditorConfigStore', (propertyEditorConfigStore) => {
 			this._propertyEditorConfigStore = propertyEditorConfigStore;
 			this._observePropertyEditorConfig();
+		});
+
+		this.consumeContext('umbExtensionRegistry', (extensionRegistry) => {
+			this._extensionRegistry = extensionRegistry;
+			this._observePropertyEditorUIConfig();
 		});
 	}
 
@@ -50,8 +77,26 @@ export class UmbPropertyEditorConfigElement extends UmbContextConsumerMixin(LitE
 			?.getByAlias(this.propertyEditorAlias)
 			.subscribe((propertyEditorConfig) => {
 				if (!propertyEditorConfig) return;
-				this._properties = propertyEditorConfig?.properties;
+				this._propertyEditorConfigProperties = propertyEditorConfig?.config?.properties || [];
+				this._applyProperties();
 			});
+	}
+
+	private _observePropertyEditorUIConfig() {
+		if (!this._extensionRegistry || !this._propertyEditorUIAlias) return;
+
+		this._propertyEditorUIConfigSubscription?.unsubscribe();
+
+		this._extensionRegistry?.getByAlias(this.propertyEditorUIAlias).subscribe((manifest) => {
+			if (manifest?.type === 'propertyEditorUI') {
+				this._propertyEditorUIConfigProperties = manifest?.meta.config?.properties || [];
+				this._applyProperties();
+			}
+		});
+	}
+
+	private _applyProperties() {
+		this._properties = [...this._propertyEditorConfigProperties, ...this._propertyEditorUIConfigProperties];
 	}
 
 	render() {
@@ -63,14 +108,14 @@ export class UmbPropertyEditorConfigElement extends UmbContextConsumerMixin(LitE
 								(property) => html`
 									<umb-entity-property
 										label="${property.label}"
-										description="${property.description}"
+										description="${ifDefined(property.description)}"
 										alias="${property.alias}"
 										property-editor-ui-alias="${property.propertyEditorUI}"
 										.value=${this.data.find((data) => data.alias === property.alias)?.value}></umb-entity-property>
 								`
 							)}
 					  `
-					: html` <div>No configuration</div> `}
+					: html`<div>No configuration</div>`}
 			</uui-box>
 		`;
 	}

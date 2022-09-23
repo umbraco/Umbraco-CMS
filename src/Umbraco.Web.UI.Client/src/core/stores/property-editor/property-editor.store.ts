@@ -1,29 +1,32 @@
 import { BehaviorSubject, map, Observable } from 'rxjs';
-import { PropertyEditor } from '../../../mocks/data/property-editor.data';
+import type { PropertyEditor } from '../../models';
+import { getPropertyEditorsList, getPropertyEditor } from '../../api/fetcher';
 
 export class UmbPropertyEditorStore {
 	private _items: BehaviorSubject<Array<PropertyEditor>> = new BehaviorSubject(<Array<PropertyEditor>>[]);
 	public readonly items: Observable<Array<PropertyEditor>> = this._items.asObservable();
 
 	getAll(): Observable<Array<PropertyEditor> | []> {
-		// TODO: use Fetcher API.
 		// TODO: only fetch if the data type is not in the store?
-		fetch(`/umbraco/backoffice/property-editors/list`)
-			.then((res) => res.json())
-			.then((data) => {
-				this._items.next(data);
+		getPropertyEditorsList({})
+			.then((res) => {
+				this._items.next(res.data.propertyEditors);
+			})
+			.catch((err) => {
+				console.log(err);
 			});
 
 		return this.items;
 	}
 
 	getByAlias(alias: string): Observable<PropertyEditor | undefined> {
-		// TODO: use Fetcher API.
 		// TODO: only fetch if the data type is not in the store?
-		fetch(`/umbraco/backoffice/property-editors/property-editor/${alias}`)
-			.then((res) => res.json())
-			.then((data) => {
-				this.update(data);
+		getPropertyEditor({ propertyEditorAlias: alias })
+			.then((res) => {
+				this.update([res.data]);
+			})
+			.catch((err) => {
+				console.log(err);
 			});
 
 		return this.items.pipe(map((items) => items.find((item) => item.alias === alias)));

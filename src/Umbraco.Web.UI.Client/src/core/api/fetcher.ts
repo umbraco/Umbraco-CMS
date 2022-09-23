@@ -21,3 +21,14 @@ export const getUpgradeSettings = fetcher.path('/upgrade/settings').method('get'
 export const PostUpgradeAuthorize = fetcher.path('/upgrade/authorize').method('post').create();
 export const getManifests = fetcher.path('/manifests').method('get').create();
 export const getPackagesInstalled = fetcher.path('/manifests/packages/installed').method('get').create();
+
+// Property Editors
+export const getPropertyEditorsList = fetcher.path('/property-editors/list').method('get').create();
+export const getPropertyEditor = fetcher
+	.path('/property-editors/property-editor/{propertyEditorAlias}')
+	.method('get')
+	.create();
+export const getPropertyEditorConfig = fetcher
+	.path('/property-editors/property-editor/config/{propertyEditorAlias}')
+	.method('get')
+	.create();

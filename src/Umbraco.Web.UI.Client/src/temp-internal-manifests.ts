@@ -151,6 +151,16 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 			icon: 'edit',
 			group: 'common',
 			propertyEditor: 'Umbraco.TextArea',
+			config: {
+				properties: [
+					{
+						alias: 'rows',
+						label: 'Number of rows',
+						description: 'If empty - 10 rows would be set as the default value',
+						propertyEditorUI: 'Umb.PropertyEditorUI.Number',
+					},
+				],
+			},
 		},
 	},
 	{
@@ -162,6 +172,15 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 			icon: 'favorite',
 			group: 'common',
 			propertyEditor: 'Umbraco.Custom',
+			config: {
+				properties: [
+					{
+						label: 'Some Configuration',
+						alias: 'someConfiruation',
+						propertyEditorUI: 'Umb.PropertyEditorUI.Text',
+					},
+				],
+			},
 		},
 	},
 	{

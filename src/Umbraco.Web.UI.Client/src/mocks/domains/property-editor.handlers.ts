@@ -1,33 +1,48 @@
 import { rest } from 'msw';
+import umbracoPath from '../../core/helpers/umbraco-path';
+import type {
+	PropertyEditorsListResponse,
+	PropertyEditorResponse,
+	PropertyEditorConfigResponse,
+} from '../../core/models';
 
 import { umbPropertyEditorData } from '../data/property-editor.data';
-import { umbPropertyEditorConfigData } from '../data/property-editor-config.data';
 
 // TODO: add schema
 export const handlers = [
-	rest.get('/umbraco/backoffice/property-editors/list', (req, res, ctx) => {
+	rest.get(umbracoPath('/property-editors/list'), (req, res, ctx) => {
 		const propertyEditors = umbPropertyEditorData.getAll();
 
-		return res(ctx.status(200), ctx.json(propertyEditors));
+		const response = {
+			propertyEditors,
+		};
+
+		return res(ctx.status(200), ctx.json<PropertyEditorsListResponse>(response));
 	}),
 
 	rest.get('/umbraco/backoffice/property-editors/property-editor/:alias', (req, res, ctx) => {
-		console.warn('Please move to schema');
 		const alias = req.params.alias as string;
 		if (!alias) return;
 
 		const propertyEditor = umbPropertyEditorData.getByAlias(alias);
-
-		return res(ctx.status(200), ctx.json([propertyEditor]));
+		if (propertyEditor) {
+			return res(ctx.status(200), ctx.json<PropertyEditorResponse>(propertyEditor));
+		} else {
+			return res(ctx.status(404));
+		}
 	}),
 
-	rest.get('/umbraco/backoffice/property-editors/config/:alias', (req, res, ctx) => {
-		console.warn('Please move to schema');
+	rest.get('/umbraco/backoffice/property-editors/property-editor/config/:alias', (req, res, ctx) => {
 		const alias = req.params.alias as string;
 		if (!alias) return;
 
-		const propertyEditorConfig = umbPropertyEditorConfigData.getByAlias(alias);
-		const response = propertyEditorConfig ? [propertyEditorConfig] : [];
-		return res(ctx.status(200), ctx.json(response));
+		const config = umbPropertyEditorData.getConfig(alias);
+
+		const response = {
+			propertyEditorAlias: alias,
+			config: config,
+		};
+
+		return res(ctx.status(200), ctx.json<PropertyEditorConfigResponse>(response));
 	}),
 ];
