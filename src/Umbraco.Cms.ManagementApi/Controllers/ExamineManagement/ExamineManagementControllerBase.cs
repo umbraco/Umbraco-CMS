@@ -7,6 +7,6 @@ namespace Umbraco.Cms.ManagementApi.Controllers.ExamineManagement;
 [ApiController]
 [BackOfficeRoute("api/v{version:apiVersion}/examineManagement")]
 [OpenApiTag("ExamineManagement")]
-public class ExamineManagementControllerBase : Controller
+public class ExamineManagementControllerBase : ManagementApiControllerBase
 {
 }
