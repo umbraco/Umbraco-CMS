@@ -91,17 +91,17 @@
             "x-position": 1
           },
           {
-            "name": "pageNumber",
+            "name": "skip",
             "in": "query",
             "schema": {
               "type": "integer",
-              "format": "int64",
+              "format": "int32",
               "default": 0
             },
             "x-position": 2
           },
           {
-            "name": "pageSize",
+            "name": "take",
             "in": "query",
             "schema": {
               "type": "integer",
@@ -171,17 +171,17 @@
         "operationId": "RootTemplateTree_Root",
         "parameters": [
           {
-            "name": "pageNumber",
+            "name": "skip",
             "in": "query",
             "schema": {
               "type": "integer",
-              "format": "int64",
+              "format": "int32",
               "default": 0
             },
             "x-position": 1
           },
           {
-            "name": "pageSize",
+            "name": "take",
             "in": "query",
             "schema": {
               "type": "integer",
@@ -222,17 +222,17 @@
             "x-position": 1
           },
           {
-            "name": "pageNumber",
+            "name": "skip",
             "in": "query",
             "schema": {
               "type": "integer",
-              "format": "int64",
+              "format": "int32",
               "default": 0
             },
             "x-position": 2
           },
           {
-            "name": "pageSize",
+            "name": "take",
             "in": "query",
             "schema": {
               "type": "integer",
@@ -301,17 +301,17 @@
         "operationId": "RootStylesheetTree_Root",
         "parameters": [
           {
-            "name": "pageNumber",
+            "name": "skip",
             "in": "query",
             "schema": {
               "type": "integer",
-              "format": "int64",
+              "format": "int32",
               "default": 0
             },
             "x-position": 1
           },
           {
-            "name": "pageSize",
+            "name": "take",
             "in": "query",
             "schema": {
               "type": "integer",
@@ -352,17 +352,17 @@
             "x-position": 1
           },
           {
-            "name": "pageNumber",
+            "name": "skip",
             "in": "query",
             "schema": {
               "type": "integer",
-              "format": "int64",
+              "format": "int32",
               "default": 0
             },
             "x-position": 2
           },
           {
-            "name": "pageSize",
+            "name": "take",
             "in": "query",
             "schema": {
               "type": "integer",
@@ -431,17 +431,17 @@
         "operationId": "RootStaticFileTree_Root",
         "parameters": [
           {
-            "name": "pageNumber",
+            "name": "skip",
             "in": "query",
             "schema": {
               "type": "integer",
-              "format": "int64",
+              "format": "int32",
               "default": 0
             },
             "x-position": 1
           },
           {
-            "name": "pageSize",
+            "name": "take",
             "in": "query",
             "schema": {
               "type": "integer",
@@ -542,17 +542,17 @@
             "x-position": 1
           },
           {
-            "name": "pageNumber",
+            "name": "skip",
             "in": "query",
             "schema": {
               "type": "integer",
-              "format": "int64",
+              "format": "int32",
               "default": 0
             },
             "x-position": 2
           },
           {
-            "name": "pageSize",
+            "name": "take",
             "in": "query",
             "schema": {
               "type": "integer",
@@ -621,17 +621,17 @@
         "operationId": "RootScriptTree_Root",
         "parameters": [
           {
-            "name": "pageNumber",
+            "name": "skip",
             "in": "query",
             "schema": {
               "type": "integer",
-              "format": "int64",
+              "format": "int32",
               "default": 0
             },
             "x-position": 1
           },
           {
-            "name": "pageSize",
+            "name": "take",
             "in": "query",
             "schema": {
               "type": "integer",
@@ -701,17 +701,17 @@
         "operationId": "RootRelationTypeTree_Root",
         "parameters": [
           {
-            "name": "pageNumber",
+            "name": "skip",
             "in": "query",
             "schema": {
               "type": "integer",
-              "format": "int64",
+              "format": "int32",
               "default": 0
             },
             "x-position": 1
           },
           {
-            "name": "pageSize",
+            "name": "take",
             "in": "query",
             "schema": {
               "type": "integer",
@@ -752,17 +752,17 @@
             "x-position": 1
           },
           {
-            "name": "pageNumber",
+            "name": "skip",
             "in": "query",
             "schema": {
               "type": "integer",
-              "format": "int64",
+              "format": "int32",
               "default": 0
             },
             "x-position": 2
           },
           {
-            "name": "pageSize",
+            "name": "take",
             "in": "query",
             "schema": {
               "type": "integer",
@@ -831,17 +831,17 @@
         "operationId": "RootPartialViewTree_Root",
         "parameters": [
           {
-            "name": "pageNumber",
+            "name": "skip",
             "in": "query",
             "schema": {
               "type": "integer",
-              "format": "int64",
+              "format": "int32",
               "default": 0
             },
             "x-position": 1
           },
           {
-            "name": "pageSize",
+            "name": "take",
             "in": "query",
             "schema": {
               "type": "integer",
@@ -911,17 +911,17 @@
         "operationId": "RootMemberTypeTree_Root",
         "parameters": [
           {
-            "name": "pageNumber",
+            "name": "skip",
             "in": "query",
             "schema": {
               "type": "integer",
-              "format": "int64",
+              "format": "int32",
               "default": 0
             },
             "x-position": 1
           },
           {
-            "name": "pageSize",
+            "name": "take",
             "in": "query",
             "schema": {
               "type": "integer",
@@ -991,17 +991,17 @@
         "operationId": "RootMemberGroupTree_Root",
         "parameters": [
           {
-            "name": "pageNumber",
+            "name": "skip",
             "in": "query",
             "schema": {
               "type": "integer",
-              "format": "int64",
+              "format": "int32",
               "default": 0
             },
             "x-position": 1
           },
           {
-            "name": "pageSize",
+            "name": "take",
             "in": "query",
             "schema": {
               "type": "integer",
@@ -1042,17 +1042,17 @@
             "x-position": 1
           },
           {
-            "name": "pageNumber",
+            "name": "skip",
             "in": "query",
             "schema": {
               "type": "integer",
-              "format": "int64",
+              "format": "int32",
               "default": 0
             },
             "x-position": 2
           },
           {
-            "name": "pageSize",
+            "name": "take",
             "in": "query",
             "schema": {
               "type": "integer",
@@ -1142,17 +1142,17 @@
         "operationId": "RootMediaTree_Root",
         "parameters": [
           {
-            "name": "pageNumber",
+            "name": "skip",
             "in": "query",
             "schema": {
               "type": "integer",
-              "format": "int64",
+              "format": "int32",
               "default": 0
             },
             "x-position": 1
           },
           {
-            "name": "pageSize",
+            "name": "take",
             "in": "query",
             "schema": {
               "type": "integer",
@@ -1203,17 +1203,17 @@
             "x-position": 1
           },
           {
-            "name": "pageNumber",
+            "name": "skip",
             "in": "query",
             "schema": {
               "type": "integer",
-              "format": "int64",
+              "format": "int32",
               "default": 0
             },
             "x-position": 2
           },
           {
-            "name": "pageSize",
+            "name": "take",
             "in": "query",
             "schema": {
               "type": "integer",
@@ -1255,17 +1255,17 @@
         "operationId": "RootMediaRecycleBin_Root",
         "parameters": [
           {
-            "name": "pageNumber",
+            "name": "skip",
             "in": "query",
             "schema": {
               "type": "integer",
-              "format": "int64",
+              "format": "int32",
               "default": 0
             },
             "x-position": 1
           },
           {
-            "name": "pageSize",
+            "name": "take",
             "in": "query",
             "schema": {
               "type": "integer",
@@ -1316,17 +1316,17 @@
             "x-position": 1
           },
           {
-            "name": "pageNumber",
+            "name": "skip",
             "in": "query",
             "schema": {
               "type": "integer",
-              "format": "int64",
+              "format": "int32",
               "default": 0
             },
             "x-position": 2
           },
           {
-            "name": "pageSize",
+            "name": "take",
             "in": "query",
             "schema": {
               "type": "integer",
@@ -1405,17 +1405,17 @@
         "operationId": "RootMediaTypeTree_Root",
         "parameters": [
           {
-            "name": "pageNumber",
+            "name": "skip",
             "in": "query",
             "schema": {
               "type": "integer",
-              "format": "int64",
+              "format": "int32",
               "default": 0
             },
             "x-position": 1
           },
           {
-            "name": "pageSize",
+            "name": "take",
             "in": "query",
             "schema": {
               "type": "integer",
@@ -1585,17 +1585,17 @@
             "x-position": 1
           },
           {
-            "name": "pageNumber",
+            "name": "skip",
             "in": "query",
             "schema": {
               "type": "integer",
-              "format": "int64",
+              "format": "int32",
               "default": 0
             },
             "x-position": 2
           },
           {
-            "name": "pageSize",
+            "name": "take",
             "in": "query",
             "schema": {
               "type": "integer",
@@ -1703,17 +1703,17 @@
         "operationId": "RootDocumentTree_Root",
         "parameters": [
           {
-            "name": "pageNumber",
+            "name": "skip",
             "in": "query",
             "schema": {
               "type": "integer",
-              "format": "int64",
+              "format": "int32",
               "default": 0
             },
             "x-position": 1
           },
           {
-            "name": "pageSize",
+            "name": "take",
             "in": "query",
             "schema": {
               "type": "integer",
@@ -1773,17 +1773,17 @@
             "x-position": 1
           },
           {
-            "name": "pageNumber",
+            "name": "skip",
             "in": "query",
             "schema": {
               "type": "integer",
-              "format": "int64",
+              "format": "int32",
               "default": 0
             },
             "x-position": 2
           },
           {
-            "name": "pageSize",
+            "name": "take",
             "in": "query",
             "schema": {
               "type": "integer",
@@ -1825,17 +1825,17 @@
         "operationId": "RootDocumentRecycleBin_Root",
         "parameters": [
           {
-            "name": "pageNumber",
+            "name": "skip",
             "in": "query",
             "schema": {
               "type": "integer",
-              "format": "int64",
+              "format": "int32",
               "default": 0
             },
             "x-position": 1
           },
           {
-            "name": "pageSize",
+            "name": "take",
             "in": "query",
             "schema": {
               "type": "integer",
@@ -1886,17 +1886,17 @@
             "x-position": 1
           },
           {
-            "name": "pageNumber",
+            "name": "skip",
             "in": "query",
             "schema": {
               "type": "integer",
-              "format": "int64",
+              "format": "int32",
               "default": 0
             },
             "x-position": 2
           },
           {
-            "name": "pageSize",
+            "name": "take",
             "in": "query",
             "schema": {
               "type": "integer",
@@ -1975,17 +1975,17 @@
         "operationId": "RootDocumentTypeTree_Root",
         "parameters": [
           {
-            "name": "pageNumber",
+            "name": "skip",
             "in": "query",
             "schema": {
               "type": "integer",
-              "format": "int64",
+              "format": "int32",
               "default": 0
             },
             "x-position": 1
           },
           {
-            "name": "pageSize",
+            "name": "take",
             "in": "query",
             "schema": {
               "type": "integer",
@@ -2064,17 +2064,17 @@
         "operationId": "RootDocumentBlueprintTree_Root",
         "parameters": [
           {
-            "name": "pageNumber",
+            "name": "skip",
             "in": "query",
             "schema": {
               "type": "integer",
-              "format": "int64",
+              "format": "int32",
               "default": 0
             },
             "x-position": 1
           },
           {
-            "name": "pageSize",
+            "name": "take",
             "in": "query",
             "schema": {
               "type": "integer",
@@ -2115,17 +2115,17 @@
             "x-position": 1
           },
           {
-            "name": "pageNumber",
+            "name": "skip",
             "in": "query",
             "schema": {
               "type": "integer",
-              "format": "int64",
+              "format": "int32",
               "default": 0
             },
             "x-position": 2
           },
           {
-            "name": "pageSize",
+            "name": "take",
             "in": "query",
             "schema": {
               "type": "integer",
@@ -2195,17 +2195,17 @@
         "operationId": "RootDictionaryItemTree_Root",
         "parameters": [
           {
-            "name": "pageNumber",
+            "name": "skip",
             "in": "query",
             "schema": {
               "type": "integer",
-              "format": "int64",
+              "format": "int32",
               "default": 0
             },
             "x-position": 1
           },
           {
-            "name": "pageSize",
+            "name": "take",
             "in": "query",
             "schema": {
               "type": "integer",
@@ -2246,17 +2246,17 @@
             "x-position": 1
           },
           {
-            "name": "pageNumber",
+            "name": "skip",
             "in": "query",
             "schema": {
               "type": "integer",
-              "format": "int64",
+              "format": "int32",
               "default": 0
             },
             "x-position": 2
           },
           {
-            "name": "pageSize",
+            "name": "take",
             "in": "query",
             "schema": {
               "type": "integer",
@@ -2335,17 +2335,17 @@
         "operationId": "RootDataTypeTree_Root",
         "parameters": [
           {
-            "name": "pageNumber",
+            "name": "skip",
             "in": "query",
             "schema": {
               "type": "integer",
-              "format": "int64",
+              "format": "int32",
               "default": 0
             },
             "x-position": 1
           },
           {
-            "name": "pageSize",
+            "name": "take",
             "in": "query",
             "schema": {
               "type": "integer",
