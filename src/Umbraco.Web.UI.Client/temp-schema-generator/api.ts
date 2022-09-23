@@ -1,5 +1,6 @@
 import './installer';
 import './manifests';
+import './publishedstatus';
 import './server';
 import './upgrader';
 import './user';

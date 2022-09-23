@@ -105,6 +105,35 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
+  /published-cache/status:
+    get:
+      operationId: PublishedCacheStatus
+      responses:
+        '200':
+          description: 200 response
+          content:
+            application/json:
+              schema:
+                type: string
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /published-cache/reload:
+    post:
+      operationId: PublishedCacheReload
+      parameters: []
+      responses:
+        '201':
+          description: 201 response
+        '400':
+          description: 400 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
   /server/status:
     get:
       operationId: GetStatus
