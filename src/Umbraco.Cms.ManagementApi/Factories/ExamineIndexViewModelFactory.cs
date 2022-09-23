@@ -1,6 +1,5 @@
 ﻿using Examine;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.ManagementApi.ViewModels.ExamineManagement;
 using Umbraco.New.Cms.Infrastructure.Services;
@@ -13,7 +12,7 @@ public class ExamineIndexViewModelFactory : IExamineIndexViewModelFactory
     private readonly IIndexRebuilder _indexRebuilder;
     private readonly ITemporaryIndexingService _temporaryIndexingService;
 
-    public ExamineIndexViewModelFactory(IIndexDiagnosticsFactory indexDiagnosticsFactory, IIndexRebuilder indexRebuilder, AppCaches runtimeCache, ITemporaryIndexingService temporaryIndexingService)
+    public ExamineIndexViewModelFactory(IIndexDiagnosticsFactory indexDiagnosticsFactory, IIndexRebuilder indexRebuilder, ITemporaryIndexingService temporaryIndexingService)
     {
         _indexDiagnosticsFactory = indexDiagnosticsFactory;
         _indexRebuilder = indexRebuilder;
