@@ -9,16 +9,16 @@ using Umbraco.Cms.ManagementApi.Services;
 namespace Umbraco.Cms.ManagementApi.Controllers.ExamineManagement;
 
 [ApiVersion("1.0")]
-public class RebuildIndexExamineManagementController : ExamineManagementControllerBase
+public class RebuildExamineManagementController : ExamineManagementControllerBase
 {
     private readonly IExamineManagerService _examineManagerService;
-    private readonly ILogger<RebuildIndexExamineManagementController> _logger;
+    private readonly ILogger<RebuildExamineManagementController> _logger;
     private readonly IIndexRebuilder _indexRebuilder;
     private readonly IAppPolicyCache _runtimeCache;
 
-    public RebuildIndexExamineManagementController(
+    public RebuildExamineManagementController(
         IExamineManagerService examineManagerService,
-        ILogger<RebuildIndexExamineManagementController> logger,
+        ILogger<RebuildExamineManagementController> logger,
         AppCaches runtimeCache,
         IIndexRebuilder indexRebuilder)
     {
