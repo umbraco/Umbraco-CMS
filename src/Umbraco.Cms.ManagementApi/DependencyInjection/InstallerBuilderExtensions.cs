@@ -3,6 +3,7 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.ManagementApi.Mapping.Installer;
 using Umbraco.Cms.ManagementApi.Services.Entities;
+using Umbraco.Cms.ManagementApi.Services.Paging;
 using Umbraco.New.Cms.Core.Factories;
 using Umbraco.New.Cms.Core.Installer;
 using Umbraco.New.Cms.Core.Installer.Steps;

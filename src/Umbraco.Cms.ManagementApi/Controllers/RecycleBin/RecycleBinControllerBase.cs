@@ -2,6 +2,7 @@
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.ManagementApi.Services.Paging;
 using Umbraco.Cms.ManagementApi.ViewModels.Pagination;
 using Umbraco.Cms.ManagementApi.ViewModels.RecycleBin;
 
@@ -24,8 +25,13 @@ public abstract class RecycleBinControllerBase<TItem> : Controller
 
     protected abstract int RecycleBinRootId { get; }
 
-    protected async Task<ActionResult<PagedViewModel<TItem>>> GetRoot(long pageNumber, int pageSize)
+    protected async Task<ActionResult<PagedViewModel<TItem>>> GetRoot(int skip, int take)
     {
+        if (PaginationService.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize, out ProblemDetails? error) == false)
+        {
+            return BadRequest(error);
+        }
+
         IEntitySlim[] rootEntities = GetPagedRootEntities(pageNumber, pageSize, out var totalItems);
 
         TItem[] treeItemViewModels = MapRecycleBinViewModels(null, rootEntities);
@@ -34,8 +40,13 @@ public abstract class RecycleBinControllerBase<TItem> : Controller
         return await Task.FromResult(Ok(result));
     }
 
-    protected async Task<ActionResult<PagedViewModel<TItem>>> GetChildren(Guid parentKey, long pageNumber, int pageSize)
+    protected async Task<ActionResult<PagedViewModel<TItem>>> GetChildren(Guid parentKey, int skip, int take)
     {
+        if (PaginationService.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize, out ProblemDetails? error) == false)
+        {
+            return BadRequest(error);
+        }
+
         IEntitySlim[] children = GetPagedChildEntities(parentKey, pageNumber, pageSize, out var totalItems);
 
         TItem[] treeItemViewModels = MapRecycleBinViewModels(parentKey, children);

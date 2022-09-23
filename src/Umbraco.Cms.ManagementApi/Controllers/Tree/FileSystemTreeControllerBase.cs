@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.ManagementApi.Services.Paging;
 using Umbraco.Cms.ManagementApi.ViewModels.Pagination;
 using Umbraco.Cms.ManagementApi.ViewModels.Tree;
 using Umbraco.Extensions;
@@ -15,16 +16,26 @@ public abstract class FileSystemTreeControllerBase : ManagementApiControllerBase
 
     protected abstract string ItemType(string path);
 
-    protected async Task<ActionResult<PagedViewModel<FileSystemTreeItemViewModel>>> GetRoot(long pageNumber = 0, int pageSize = 100)
+    protected async Task<ActionResult<PagedViewModel<FileSystemTreeItemViewModel>>> GetRoot(int skip, int take)
     {
+        if (PaginationService.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize, out ProblemDetails? error) == false)
+        {
+            return BadRequest(error);
+        }
+
         FileSystemTreeItemViewModel[] viewModels = GetPathViewModels(string.Empty, pageNumber, pageSize, out var totalItems);
 
         PagedViewModel<FileSystemTreeItemViewModel> result = PagedViewModel(viewModels, totalItems);
         return await Task.FromResult(Ok(result));
     }
 
-    protected async Task<ActionResult<PagedViewModel<FileSystemTreeItemViewModel>>> GetChildren(string path, long pageNumber = 0, int pageSize = 100)
+    protected async Task<ActionResult<PagedViewModel<FileSystemTreeItemViewModel>>> GetChildren(string path, int skip, int take)
     {
+        if (PaginationService.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize, out ProblemDetails? error) == false)
+        {
+            return BadRequest(error);
+        }
+
         FileSystemTreeItemViewModel[] viewModels = GetPathViewModels(path, pageNumber, pageSize, out var totalItems);
 
         PagedViewModel<FileSystemTreeItemViewModel> result = PagedViewModel(viewModels, totalItems);
