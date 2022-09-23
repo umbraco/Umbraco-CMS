@@ -10,7 +10,14 @@ import { UmbNotificationDefaultData } from '../../../core/services/notification/
 
 @customElement('umb-dashboard-published-status')
 export class UmbDashboardPublishedStatusElement extends UmbContextConsumerMixin(LitElement) {
-	static styles = [UUITextStyles, css``];
+	static styles = [UUITextStyles, css`
+		uui-box + uui-box {
+			margin-top: var(--uui-size-space-5);
+		}
+		uui-box p:first-child {
+			margin-block-start: 0;
+		}
+	`];
 
 	@state()
 	private _publishedStatusText = '';
@@ -47,7 +54,7 @@ export class UmbDashboardPublishedStatusElement extends UmbContextConsumerMixin(
 		}
 	}
 
-	private async _onReloadCacheHandler() {
+	private async _onRefreshCacheHandler() {
 		this._buttonState = 'waiting';
 		try {
 			await postPublishedCacheReload({});
@@ -63,17 +70,38 @@ export class UmbDashboardPublishedStatusElement extends UmbContextConsumerMixin(
 		}
 	}
 
+	private async _onReloadCacheHandler() {
+		await undefined;
+	}
+
+	private async _onRebuildCacheHandler() {
+		await undefined;
+	}
+
+	private async _onSnapshotCacheHandler() {
+		await undefined;
+	}
+
 	render() {
 		return html`
-			<uui-box>
-				<h1>Published Status</h1>
+			<uui-box headline="Published Cache Status">
 				<p>${this._publishedStatusText}</p>
+				<uui-button .state=${this._buttonState} type="button" look="primary" @click=${this._onRefreshCacheHandler}>Refresh Status</uui-button>
 			</uui-box>
 
-			<uui-box>
-				<uui-button .state=${this._buttonState} type="button" look="primary" @click=${this._onReloadCacheHandler}
-					>Reload Cache</uui-button
-				>
+			<uui-box headline="Memory Cache">
+				<p>This button lets you reload the in-memory cache, by entirely reloading it from the database cache (but it does not rebuild that database cache). This is relatively fast. Use it when you think that the memory cache has not been properly refreshed, after some events triggered—which would indicate a minor Umbraco issue. (note: triggers the reload on all servers in an LB environment).</p>
+				<uui-button type="button" look="danger" @click=${this._onReloadCacheHandler}>Reload Memory Cache</uui-button>
+			</uui-box>
+
+			<uui-box headline="Database Cache">
+				<p>This button lets you rebuild the database cache, ie the content of the cmsContentNu table. Rebuilding can be expensive. Use it when reloading is not enough, and you think that the database cache has not been properly generated—which would indicate some critical Umbraco issue.</p>
+				<uui-button type="button" look="danger" @click=${this._onRebuildCacheHandler}>Rebuild Database Cache</uui-button>
+			</uui-box>
+
+			<uui-box headline="Internal Cache">
+				<p>This button lets you trigger a NuCache snapshots collection (after running a fullCLR GC). Unless you know what that means, you probably do not need to use it.</p>
+				<uui-button type="button" look="danger" @click=${this._onSnapshotCacheHandler}>Snapshot Internal Cache</uui-button>
 			</uui-box>
 		`;
 	}

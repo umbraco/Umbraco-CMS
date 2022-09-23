@@ -31,6 +31,10 @@ export class UmbSectionDashboards extends UmbContextConsumerMixin(LitElement) {
 				padding: var(--uui-size-space-5);
 				display: block;
 			}
+
+			#scroll-container {
+				height: 500px;
+			}
 		`,
 	];
 
@@ -146,7 +150,9 @@ export class UmbSectionDashboards extends UmbContextConsumerMixin(LitElement) {
 	render() {
 		return html`
 			${this._renderNavigation()}
-			<router-slot id="router-slot" .routes="${this._routes}"></router-slot>
+			<uui-scroll-container id="scroll-container">
+				<router-slot id="router-slot" .routes="${this._routes}"></router-slot>
+			</uui-scroll-container>
 		`;
 	}
 }
