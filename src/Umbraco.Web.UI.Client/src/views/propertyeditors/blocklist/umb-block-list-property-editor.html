@@ -1,5 +1,4 @@
 <div class="umb-block-list">
-
     <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
 
     <div class="umb-block-list__wrapper" ng-style="vm.listWrapperStyles">
@@ -19,7 +18,7 @@
                     </div>
                 </button>
 
-                <umb-block-list-row 
+                <umb-block-list-row
                     block-editor-api="vm.blockEditorApi"
                     layout="layout"
                     index="$index">
@@ -28,7 +27,7 @@
             </div>
         </div>
 
-        <div class="umb-block-list__actions" ng-if="vm.loading !== true">
+        <div class="umb-block-list__actions" ng-if="vm.loading !== true" ng-hide="vm.validationLimit.max === 1 && vm.layout.length === 1">
             <button
                     id="{{vm.model.alias}}"
                     type="button"
