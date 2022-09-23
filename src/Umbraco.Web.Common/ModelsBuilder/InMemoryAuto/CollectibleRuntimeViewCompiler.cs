@@ -99,7 +99,15 @@ internal class CollectibleRuntimeViewCompiler : IViewCompiler
         _inMemoryModelFactory.ModelsChanged += (sender, args) => ClearCache();
     }
 
-    private void ClearCache() => _cache = new MemoryCache(new MemoryCacheOptions());
+    private void ClearCache()
+    {
+        // I'm pretty sure this is not necessary, since it should be an atomic operation,
+        // but let's make sure that we don't end up resolving any views while clearing the cache.
+        lock (_cacheLock)
+        {
+            _cache = new MemoryCache(new MemoryCacheOptions());
+        }
+    }
 
     public Task<CompiledViewDescriptor> CompileAsync(string relativePath)
     {
@@ -382,14 +390,11 @@ internal class CollectibleRuntimeViewCompiler : IViewCompiler
             // }
 
             assemblyStream.Seek(0, SeekOrigin.Begin);
-            // pdbStream?.Seek(0, SeekOrigin.Begin);
+            pdbStream?.Seek(0, SeekOrigin.Begin);
 
-            // TODO: Use collectible context.
-            // var assembly = Assembly.Load(assemblyStream.ToArray(), pdbStream?.ToArray());
-            var assembly = _inMemoryModelFactory._currentAssemblyLoadContext?.LoadFromStream(assemblyStream, pdbStream);
-            // var assembly = Assembly.Load(assemblyStream.ToArray(), pdbStream?.ToArray());
+            Assembly assembly = _inMemoryModelFactory.LoadCollectibleAssemblyFromStream(assemblyStream, pdbStream);
 
-            return assembly!;
+            return assembly;
         }
     }
 

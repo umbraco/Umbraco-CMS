@@ -43,7 +43,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
         private int _ver;
         private int? _skipver;
         private RoslynCompiler? _roslynCompiler;
-        internal UmbracoAssemblyLoadContext? _currentAssemblyLoadContext;
+        private UmbracoAssemblyLoadContext? _currentAssemblyLoadContext;
         private ModelsBuilderSettings _config;
         private bool _disposedValue;
 
@@ -362,10 +362,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
         private Assembly ReloadAssembly(string pathToAssembly)
         {
             // If there's a current AssemblyLoadContext, unload it before creating a new one.
-            if (!(_currentAssemblyLoadContext is null))
-            {
-                _currentAssemblyLoadContext.Unload();
-            }
+            _currentAssemblyLoadContext?.Unload();
 
             // We must create a new assembly load context
             // as long as theres a reference to the assembly load context we can't delete the assembly it loaded
@@ -386,6 +383,20 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
             Assembly assembly = _currentAssemblyLoadContext.LoadFromAssemblyPath(tempFile);
 
             return assembly;
+        }
+
+        /// <summary>
+        /// Loads an assembly into the collectible assembly used by the factory
+        /// </summary>
+        /// <remarks>
+        /// This is essentially just a wrapper around the <see cref="UmbracoAssemblyLoadContext"/>,
+        /// because we don't want to allow other clases to take a reference on the AssemblyLoadContext
+        /// </remarks>
+        /// <returns>The loaded assembly</returns>
+        public Assembly LoadCollectibleAssemblyFromStream(Stream assembly, Stream? assemblySymbols)
+        {
+            _currentAssemblyLoadContext ??= new UmbracoAssemblyLoadContext();
+            return _currentAssemblyLoadContext.LoadFromStream(assembly, assemblySymbols);
         }
 
         // This is NOT thread safe but it is only called from within a lock
