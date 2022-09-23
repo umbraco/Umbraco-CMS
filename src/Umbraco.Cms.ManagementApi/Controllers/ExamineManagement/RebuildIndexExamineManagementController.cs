@@ -56,8 +56,8 @@ public class RebuildIndexExamineManagementController : ExamineManagementControll
         {
             var invalidModelProblem = new ProblemDetails
             {
-                Title = "Index cannot be rebuilt",
-                Detail = $"The index {index?.Name} cannot be rebuilt because it does not have an associated {typeof(IIndexPopulator)}",
+                Title = "Could not validate the populator",
+                Detail = $"The index {index?.Name} cannot be rebuilt because we could not validate its associated {typeof(IIndexPopulator)}",
                 Status = StatusCodes.Status400BadRequest,
                 Type = "Error",
             };
