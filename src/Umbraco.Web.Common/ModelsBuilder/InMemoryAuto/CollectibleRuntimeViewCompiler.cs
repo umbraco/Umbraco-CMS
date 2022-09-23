@@ -23,7 +23,7 @@ internal class CollectibleRuntimeViewCompiler : IViewCompiler
     private readonly ConcurrentDictionary<string, string> _normalizedPathCache;
     private readonly IFileProvider _fileProvider;
     private readonly RazorProjectEngine _projectEngine;
-    private readonly IMemoryCache _cache;
+    private IMemoryCache _cache;
     private readonly ILogger _logger;
     private readonly InMemoryModelFactory _inMemoryModelFactory;
     private readonly UmbracoRazorReferenceManager _referenceManager;
@@ -94,7 +94,12 @@ internal class CollectibleRuntimeViewCompiler : IViewCompiler
         if (_precompiledViews.Count == 0)
         {
         }
+
+        // We must bust the cache when we change our models.
+        _inMemoryModelFactory.ModelsChanged += (sender, args) => ClearCache();
     }
+
+    private void ClearCache() => _cache = new MemoryCache(new MemoryCacheOptions());
 
     public Task<CompiledViewDescriptor> CompileAsync(string relativePath)
     {

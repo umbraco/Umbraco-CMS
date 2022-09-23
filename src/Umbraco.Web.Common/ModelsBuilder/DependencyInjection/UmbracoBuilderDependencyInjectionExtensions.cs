@@ -137,22 +137,23 @@ public static class UmbracoBuilderDependencyInjectionExtensions
         // to re-create the razor compiler provider
         builder.Services.AddSingleton<UmbracoRazorReferenceManager>();
         builder.Services.AddSingleton<CompilationOptionsProvider>();
+        builder.Services.AddSingleton<IViewCompilerProvider, UmbracoViewCompilerProvider>();
 
-        var initialCollection = new ServiceCollection { builder.Services };
+        // var initialCollection = new ServiceCollection { builder.Services };
 
         // Replace the default with our custom engine
-        builder.Services.AddSingleton<IRazorViewEngine>(
-            s => new RefreshingRazorViewEngine(
-                () =>
-                {
-                    // re-create the original container so that a brand new IRazorPageActivator
-                    // is produced, if we don't re-create the container then it will just return the same instance.
-                    initialCollection.AddCustomViewCompiler(s);
-                    ServiceProvider recreatedServices = initialCollection.BuildServiceProvider();
-
-                    return recreatedServices.GetRequiredService<IRazorViewEngine>();
-                },
-                s.GetRequiredService<InMemoryModelFactory>()));
+        // builder.Services.AddSingleton<IRazorViewEngine>(
+        //     s => new RefreshingRazorViewEngine(
+        //         () =>
+        //         {
+        //             // re-create the original container so that a brand new IRazorPageActivator
+        //             // is produced, if we don't re-create the container then it will just return the same instance.
+        //             initialCollection.AddCustomViewCompiler(s);
+        //             ServiceProvider recreatedServices = initialCollection.BuildServiceProvider();
+        //
+        //             return recreatedServices.GetRequiredService<IRazorViewEngine>();
+        //         },
+        //         s.GetRequiredService<InMemoryModelFactory>()));
 
         builder.Services.AddSingleton<InMemoryModelFactory>();
 
