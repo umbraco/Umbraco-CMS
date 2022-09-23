@@ -1,6 +1,5 @@
 ﻿using Examine;
 using Examine.Search;
-using Lucene.Net.Documents;
 using Lucene.Net.QueryParsers.Classic;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -67,15 +66,15 @@ public class SearchExamineManagementController : ExamineManagementControllerBase
             return BadRequest(invalidModelProblem);
         }
 
-        return new PagedViewModel<SearchResultViewModel>
+        return await Task.FromResult(new PagedViewModel<SearchResultViewModel>
         {
-            Total= results.TotalItemCount,
+            Total = results.TotalItemCount,
             Items = results.Select(x => new SearchResultViewModel
             {
                 Id = x.Id,
                 Score = x.Score,
                 Fields = x.AllValues.OrderBy(y => y.Key).Select(y => new FieldViewModel { Name = y.Key, Values = y.Value }),
             }),
-        };
+        });
     }
 }

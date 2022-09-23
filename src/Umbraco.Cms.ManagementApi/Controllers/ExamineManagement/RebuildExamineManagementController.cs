@@ -2,9 +2,9 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.ManagementApi.Services;
+using Umbraco.New.Cms.Infrastructure.Services;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.ExamineManagement;
 
@@ -14,18 +14,18 @@ public class RebuildExamineManagementController : ExamineManagementControllerBas
     private readonly IExamineManagerService _examineManagerService;
     private readonly ILogger<RebuildExamineManagementController> _logger;
     private readonly IIndexRebuilder _indexRebuilder;
-    private readonly IAppPolicyCache _runtimeCache;
+    private readonly ITemporaryIndexingService _temporaryIndexingService;
 
     public RebuildExamineManagementController(
         IExamineManagerService examineManagerService,
         ILogger<RebuildExamineManagementController> logger,
-        AppCaches runtimeCache,
-        IIndexRebuilder indexRebuilder)
+        IIndexRebuilder indexRebuilder,
+        ITemporaryIndexingService temporaryIndexingService)
     {
         _examineManagerService = examineManagerService;
         _logger = logger;
         _indexRebuilder = indexRebuilder;
-        _runtimeCache = runtimeCache.RuntimeCache;
+        _temporaryIndexingService = temporaryIndexingService;
     }
 
     /// <summary>
@@ -75,10 +75,7 @@ public class RebuildExamineManagementController : ExamineManagementControllerBas
 
         try
         {
-            var cacheKey = "temp_indexing_op_" + index.Name;
-            //put temp val in cache which is used as a rudimentary way to know when the indexing is done
-            _runtimeCache.Insert(cacheKey, () => "tempValue", TimeSpan.FromMinutes(5));
-
+            _temporaryIndexingService.Set(indexName);
             _indexRebuilder.RebuildIndex(indexName);
 
             return await Task.FromResult(Ok());
@@ -114,7 +111,6 @@ public class RebuildExamineManagementController : ExamineManagementControllerBas
 
         _logger.LogInformation($"Rebuilding index '{indexer?.Name}' done.");
 
-        var cacheKey = "temp_indexing_op_" + indexer?.Name;
-        _runtimeCache.Clear(cacheKey);
+        _temporaryIndexingService.Clear(indexer?.Name);
     }
 }

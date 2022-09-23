@@ -14,6 +14,7 @@ public class IndexesExamineManagementController : ExamineManagementControllerBas
 {
     private readonly IExamineManager _examineManager;
     private readonly IExamineIndexViewModelFactory _examineIndexViewModelFactory;
+
     public IndexesExamineManagementController(
         IExamineManager examineManager,
         IExamineIndexViewModelFactory examineIndexViewModelFactory)
