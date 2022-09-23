@@ -48,6 +48,7 @@ public class ExamineIndexViewModelFactory : IExamineIndexViewModelFactory
             HealthStatus = isHealthy.Success ? isHealthy.Result ?? "Healthy" : isHealthy.Result ?? "Unhealthy",
             ProviderProperties = properties,
             CanRebuild = _indexRebuilder.CanRebuild(index.Name),
+            SearcherName = index.Searcher.Name,
         };
 
         return indexerModel;
