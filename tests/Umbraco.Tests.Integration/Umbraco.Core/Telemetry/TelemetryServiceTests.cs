@@ -46,7 +46,6 @@ public class TelemetryServiceTests : UmbracoIntegrationTest
             Constants.Telemetry.OsLanguage,
             Constants.Telemetry.WebServer,
             Constants.Telemetry.ModelsBuilderMode,
-            Constants.Telemetry.CustomUmbracoPath,
             Constants.Telemetry.AspEnvironment,
             Constants.Telemetry.IsDebug,
             Constants.Telemetry.DatabaseProvider,

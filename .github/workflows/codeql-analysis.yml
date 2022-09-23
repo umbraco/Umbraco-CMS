@@ -2,39 +2,41 @@ name: "Code scanning - action"
 
 on:
   push:
-    branches: ['*/dev','*/contrib']
+    branches: ["*/dev", "*/contrib"]
   pull_request:
     # The branches below must be a subset of the branches above
-    branches: ['*/dev','*/contrib']
+    branches: ["*/dev", "*/contrib"]
+
+permissions:
+  contents: read
 
 jobs:
   CodeQL-Build:
-
-    runs-on: ubuntu-latest
     permissions:
-      actions: read
-      contents: read
-      security-events: write
+      actions: read # for github/codeql-action/init to get workflow details
+      contents: read # for actions/checkout to fetch code
+      security-events: write # for github/codeql-action/analyze to upload SARIF results
+    runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
-    # Initializes the CodeQL tools for scanning.
-    - name: Initialize CodeQL
-      uses: github/codeql-action/init@v2
-      with:
-        config-file: ./.github/config/codeql-config.yml
+      # Initializes the CodeQL tools for scanning.
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          config-file: ./.github/config/codeql-config.yml
 
-    - name: Setup dotnet
-      uses: actions/setup-dotnet@v2
-      with:
-        dotnet-version: '6.0.x'
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: "6.0.x"
 
-    - name: dotnet build
-      run: dotnet build umbraco.sln -c SkipTests
+      - name: dotnet build
+        run: dotnet build umbraco.sln -c SkipTests
 
-    - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v2
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
