@@ -1,8 +1,6 @@
 ﻿using Examine;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.ManagementApi.Factories;
 using Umbraco.Cms.ManagementApi.Services;
 using Umbraco.Cms.ManagementApi.ViewModels.ExamineManagement;
