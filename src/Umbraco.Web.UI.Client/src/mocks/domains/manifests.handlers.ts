@@ -30,7 +30,7 @@ export const manifestDevelopmentHandler = rest.get(umbracoPath('/manifests'), (_
 					meta: {
 						icon: 'document',
 						group: 'common',
-						propertyEditors: ['Umbraco.Custom'],
+						propertyEditor: 'Umbraco.Custom',
 					},
 				},
 				{
