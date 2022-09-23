@@ -107,7 +107,7 @@ paths:
                 $ref: '#/components/schemas/ProblemDetails'
   /property-editors/list:
     get:
-      operationId: PropertyEditorsListRequest
+      operationId: PropertyEditorsListEndpoint
       responses:
         '200':
           description: 200 response
@@ -123,7 +123,7 @@ paths:
                 $ref: '#/components/schemas/ProblemDetails'
   /property-editors/property-editor/{propertyEditorAlias}:
     get:
-      operationId: PropertyEditorRequest
+      operationId: PropertyEditorEndpoint
       parameters:
         - name: propertyEditorAlias
           in: path
@@ -145,7 +145,7 @@ paths:
                 $ref: '#/components/schemas/ProblemDetails'
   /property-editors/property-editor/config/{propertyEditorAlias}:
     get:
-      operationId: PropertyEditorConfigRequest
+      operationId: PropertyEditorConfigEndpoint
       parameters:
         - name: propertyEditorAlias
           in: path
