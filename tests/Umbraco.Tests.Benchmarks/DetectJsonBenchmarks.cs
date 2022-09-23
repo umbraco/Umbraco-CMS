@@ -42,6 +42,8 @@ public class DetectJsonBenchmarks
         return (input[0] is '[' && input[^1] is ']') || (input[0] is '{' && input[^1] is '}');
     }
 
+
+    //This is the fastest, however we the check will be less good than before as it'll return true on things like this: [test or {test]
     [Benchmark]
     public bool CharRangeIndexDetectJsonBad()
     {
@@ -49,9 +51,21 @@ public class DetectJsonBenchmarks
         return input[0] is '{' or '[' || input[^1] is '}' or ']';
     }
 
+    [Benchmark]
+    public bool CharDetectJsonTwoLookups()
+    {
+        var input = Input.Trim();
+        var firstChar = input[0];
+        var lastChar = input[^1];
+        return (firstChar is '[' && lastChar is ']') || (firstChar is '{' && lastChar is '}');
+    }
 
-    //|           Method |      Mean |      Error |     StdDev | Ratio | RatioSD | Allocated |
-    //|----------------- |----------:|-----------:|-----------:|------:|--------:|----------:|
-    //| StringDetectJson | 96.580 ns | 285.565 ns | 15.6528 ns |  1.00 |    0.00 |         - |
-    //|   CharDetectJson |  8.846 ns |   1.220 ns |  0.0669 ns |  0.09 |    0.02 |         - |
+
+//|                      Method |        Mean |     Error |    StdDev | Ratio | Allocated |
+//|---------------------------- |------------:|----------:|----------:|------:|----------:|
+//|            StringDetectJson | 103.7203 ns | 1.5370 ns | 0.0842 ns | 1.000 |         - |
+//|              CharDetectJson |   8.8119 ns | 1.0330 ns | 0.0566 ns | 0.085 |         - |
+//|    CharRangeIndexDetectJson |   7.8054 ns | 1.2396 ns | 0.0679 ns | 0.075 |         - |
+//| CharRangeIndexDetectJsonBad |   0.4597 ns | 0.1882 ns | 0.0103 ns | 0.004 |         - |
+//|    CharDetectJsonTwoLookups |   7.8292 ns | 1.7397 ns | 0.0954 ns | 0.075 |         - |
 }
