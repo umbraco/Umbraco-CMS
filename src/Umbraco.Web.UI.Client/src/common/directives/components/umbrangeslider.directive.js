@@ -322,17 +322,13 @@ For extra details about options and events take a look here: https://refreshless
             });
         }
       function setUpActivePipsHandling() {
-        let activePip = [null, null];
         sliderInstance.noUiSlider.on('update', function (values,handle) {
-          if(activePip[handle]){
-            activePip[handle].classList.remove("noUi-value-active");
-          }
           sliderInstance.querySelectorAll('.noUi-value').forEach(pip => {
+            pip.classList.remove("noUi-value-active");
             if (Number(values[handle]) === Number(pip.getAttribute('data-value'))) {
-              activePip[handle] = pip;
+              pip.classList.add("noUi-value-active");
             }
           });
-          activePip[handle].classList.add("noUi-value-active");
         });
       }
       function addPipClickHandler(){
