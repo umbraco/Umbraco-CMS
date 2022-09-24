@@ -52,6 +52,10 @@ public class ManagementApiComposer : IComposer
             options.Version = ApiAllName;
             options.DocumentName = ApiAllName;
             options.Description = "This shows all APIs available in this version of Umbraco - Including all the legacy apis that is available for backward compatibility";
+            options.PostProcess = document =>
+            {
+                document.Tags = document.Tags.OrderBy(tag => tag.Name).ToList();
+            };
         });
 
         services.AddVersionedApiExplorer(options =>
@@ -113,6 +117,8 @@ public class ManagementApiComposer : IComposer
                             config.SwaggerRoutes.Clear();
                             var swaggerPath = $"{officePath}/swagger/{ApiAllName}/swagger.json";
                             config.SwaggerRoutes.Add(new SwaggerUi3Route(ApiAllName, swaggerPath));
+                            config.OperationsSorter = "alpha";
+                            config.TagsSorter = "alpha";
                         });
                     }
                 },

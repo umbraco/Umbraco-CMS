@@ -628,19 +628,19 @@
   },
   "tags": [
     {
-      "name": "Upgrade"
-    },
-    {
-      "name": "Server"
-    },
-    {
-      "name": "PublishedCache"
+      "name": "Install"
     },
     {
       "name": "Profiling"
     },
     {
-      "name": "Install"
+      "name": "PublishedCache"
+    },
+    {
+      "name": "Server"
+    },
+    {
+      "name": "Upgrade"
     }
   ]
 }
