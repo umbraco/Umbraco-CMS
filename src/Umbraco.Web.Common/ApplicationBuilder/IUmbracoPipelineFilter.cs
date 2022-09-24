@@ -35,5 +35,11 @@ public interface IUmbracoPipelineFilter
     ///     Executes after <see cref="OnPostPipeline(IApplicationBuilder)" /> just before any Umbraco endpoints are declared.
     /// </summary>
     /// <param name="app"></param>
-    void OnEndpoints(IApplicationBuilder app);
+    void OnPreEndpoints(IApplicationBuilder app);
+
+    /// <summary>
+    ///     Executes after <see cref="OnPostPipeline(IApplicationBuilder)" /> after any Umbraco endpoints are declared.
+    /// </summary>
+    /// <param name="app"></param>
+    void OnPostEndpoints(IApplicationBuilder app);
 }

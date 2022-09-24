@@ -20,19 +20,37 @@ public class UmbracoPipelineFilter : IUmbracoPipelineFilter
         string name,
         Action<IApplicationBuilder>? prePipeline,
         Action<IApplicationBuilder>? postPipeline,
-        Action<IApplicationBuilder>? endpointCallback)
+        Action<IApplicationBuilder>? preEndpointCallback,
+        Action<IApplicationBuilder>? postEndpointCallback = null)
     {
         Name = name ?? throw new ArgumentNullException(nameof(name));
         PrePipeline = prePipeline;
         PostPipeline = postPipeline;
-        Endpoints = endpointCallback;
+        PreEndpoints = preEndpointCallback;
+        PostEndpoints = postEndpointCallback;
     }
 
     public Action<IApplicationBuilder>? PrePipeline { get; set; }
 
     public Action<IApplicationBuilder>? PostPipeline { get; set; }
 
-    public Action<IApplicationBuilder>? Endpoints { get; set; }
+    // This has been retained for backward compatability
+    [Obsolete("Use PreEndpoints for adding endpoints before the Umbraco endpoints and PostEndpoints for endpoints after the Umbraco endpoints")]
+    public Action<IApplicationBuilder>? Endpoints
+    {
+        get
+        {
+            return PreEndpoints;
+        }
+        set
+        {
+            PreEndpoints = value;
+        }
+    }
+
+    public Action<IApplicationBuilder>? PreEndpoints { get; set; }
+
+    public Action<IApplicationBuilder>? PostEndpoints { get; set; }
 
     public string Name { get; }
 
@@ -40,5 +58,7 @@ public class UmbracoPipelineFilter : IUmbracoPipelineFilter
 
     public void OnPostPipeline(IApplicationBuilder app) => PostPipeline?.Invoke(app);
 
-    public void OnEndpoints(IApplicationBuilder app) => Endpoints?.Invoke(app);
+    public void OnPreEndpoints(IApplicationBuilder app) => PreEndpoints?.Invoke(app);
+
+    public void OnPostEndpoints(IApplicationBuilder app) => PostEndpoints?.Invoke(app);
 }

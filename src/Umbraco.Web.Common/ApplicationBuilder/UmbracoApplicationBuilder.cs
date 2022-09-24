@@ -161,13 +161,23 @@ public class UmbracoApplicationBuilder : IUmbracoApplicationBuilder, IUmbracoEnd
                     ApplicationServices, AppBuilder, endpoints);
             configureUmbraco(umbAppBuilder);
         });
+
+        RunPostEndpointsPipeline();
     }
 
     private void RunPreEndpointsPipeline()
     {
         foreach (IUmbracoPipelineFilter filter in _umbracoPipelineStartupOptions.Value.PipelineFilters)
         {
-            filter.OnEndpoints(AppBuilder);
+            filter.OnPreEndpoints(AppBuilder);
+        }
+    }
+
+    private void RunPostEndpointsPipeline()
+    {
+        foreach (IUmbracoPipelineFilter filter in _umbracoPipelineStartupOptions.Value.PipelineFilters)
+        {
+            filter.OnPostEndpoints(AppBuilder);
         }
     }
 }
