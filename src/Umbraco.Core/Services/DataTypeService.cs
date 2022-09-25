@@ -396,6 +396,11 @@ namespace Umbraco.Cms.Core.Services.Implement
         public Attempt<OperationResult<MoveOperationStatusType>?> Move(IDataType toMove, int parentId)
         {
             EventMessages evtMsgs = EventMessagesFactory.Get();
+            if (toMove.ParentId == parentId)
+            {
+                return OperationResult.Attempt.Fail(MoveOperationStatusType.FailedNotAllowedByPath, evtMsgs);
+            }
+
             var moveInfo = new List<MoveEventInfo<IDataType>>();
 
             using (ICoreScope scope = ScopeProvider.CreateCoreScope())

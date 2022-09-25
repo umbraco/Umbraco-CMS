@@ -73,7 +73,8 @@
                                                 size="xxs"
                                                 state="version.pinningState"
                                                 action="vm.pinVersion(version, $event)"
-                                                label="{{ version.preventCleanup ? 'Enable cleanup' : 'Prevent cleanup' }}">
+                                                label="{{ version.preventCleanup ? 'Enable cleanup' : 'Prevent cleanup' }}"
+                                                label-key="{{version.preventCleanup ? 'contentTypeEditor_historyCleanupEnableCleanup' : 'contentTypeEditor_historyCleanupPreventCleanup' }}">
                                             </umb-button>
                                         </div>
                                     </div>

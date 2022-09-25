@@ -208,15 +208,13 @@ function mediaTypeResource($q, $http, umbRequestHelper, umbDataFormatter, locali
                 throw "args.id cannot be null";
             }
 
-            var promise = localizationService.localize("mediaType_moveFailed");
-
             return umbRequestHelper.resourcePromise(
                 $http.post(umbRequestHelper.getApiUrl("mediaTypeApiBaseUrl", "PostMove"),
                     {
                         parentId: args.parentId,
                         id: args.id
                     }, { responseType: 'text' }),
-                promise);
+                'Failed to move media type');
         },
 
         copy: function (args) {
