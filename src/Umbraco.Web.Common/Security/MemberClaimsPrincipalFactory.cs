@@ -32,10 +32,20 @@ public class MemberClaimsPrincipalFactory : UserClaimsPrincipalFactory<MemberIde
         ClaimsIdentity baseIdentity = await base.GenerateClaimsAsync(member);
 
         // now create a new one with the correct authentication type
+
+        // NOTE: NameClaim is not Options.ClaimsIdentity.UserNameClaimType
+        // As we override the default from MS Identity to not be ClaimType.Name
+        // and be 'Umbraco.MemberUserName' to store the login/username warren@umbraco.com
+        // Then we can use the name claim type to store actual friendly member name
         var memberIdentity = new ClaimsIdentity(
             AuthenticationType,
-            Options.ClaimsIdentity.UserNameClaimType,
+            ClaimTypes.Name,
             Options.ClaimsIdentity.RoleClaimType);
+
+        // Explicitly set the Name claim to be the actual friendly member name
+        // and not the login/email of the member
+        // This means the identity above we are creating will assign User.Identity.Name correctly
+        memberIdentity.AddOrUpdateClaim(new Claim(ClaimTypes.Name, member.Name ?? "Unknown"));
 
         // and merge all others from the base implementation
         memberIdentity.MergeAllClaims(baseIdentity);
@@ -48,17 +58,16 @@ public class MemberClaimsPrincipalFactory : UserClaimsPrincipalFactory<MemberIde
             memberIdentity.AddClaim(claim);
         }
 
-        if(string.IsNullOrEmpty(member.Name) == false)
-        {
-            // Updates/overwrites the name claim that is storing the username/email address
-            // to actually be the member's name
-            memberIdentity.AddOrUpdateClaim(new Claim(ClaimTypes.Name, member.Name));
-
-            // Add additional claim if people wish to be more explict 
-            // and call the extension method GetRealname()
-            memberIdentity.AddOrUpdateClaim(new Claim(ClaimTypes.GivenName, member.Name));
-        }
-
+        // if(string.IsNullOrEmpty(member.Name) == false)
+        // {
+        //     // Updates/overwrites the name claim that is storing the username/email address
+        //     // to actually be the member's name
+        //     memberIdentity.AddOrUpdateClaim(new Claim(ClaimTypes.Name, member.Name));
+        //
+        //     // Add additional claim if people wish to be more explict
+        //     // and call the extension method GetRealname()
+        //     memberIdentity.AddOrUpdateClaim(new Claim(ClaimTypes.GivenName, member.Name));
+        // }
         return memberIdentity;
     }
 }

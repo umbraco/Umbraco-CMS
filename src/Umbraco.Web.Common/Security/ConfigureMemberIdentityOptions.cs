@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -20,6 +21,8 @@ public sealed class ConfigureMemberIdentityOptions : IConfigureOptions<IdentityO
 
     public void Configure(IdentityOptions options)
     {
+        options.ClaimsIdentity.UserNameClaimType = "Umbraco.MemberUserName";
+
         options.SignIn.RequireConfirmedAccount = true; // uses our custom IUserConfirmation
         options.SignIn.RequireConfirmedEmail = false; // not implemented
         options.SignIn.RequireConfirmedPhoneNumber = false; // not implemented
