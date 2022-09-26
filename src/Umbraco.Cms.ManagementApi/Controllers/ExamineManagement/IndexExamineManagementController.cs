@@ -7,12 +7,12 @@ using Umbraco.Cms.ManagementApi.ViewModels.ExamineManagement;
 namespace Umbraco.Cms.ManagementApi.Controllers.ExamineManagement;
 
 [ApiVersion("1.0")]
-public class HasIndexRebuiltExamineManagementController : ExamineManagementControllerBase
+public class IndexExamineManagementController : ExamineManagementControllerBase
 {
     private readonly IExamineIndexViewModelFactory _examineIndexViewModelFactory;
     private readonly IExamineManager _examineManager;
 
-    public HasIndexRebuiltExamineManagementController(
+    public IndexExamineManagementController(
         IExamineIndexViewModelFactory examineIndexViewModelFactory,
         IExamineManager examineManager)
     {
