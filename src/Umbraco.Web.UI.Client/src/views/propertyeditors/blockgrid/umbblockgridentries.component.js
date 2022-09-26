@@ -214,9 +214,10 @@
                     const contextColumns = vm.blockEditorApi.internal.getContextColumns(vm.parentBlock, vm.areaKey);
 
                     // if colSpan is lower than contextColumns, and we do have some columnSpanOptions:
-                    if (syncEntry.colSpan < contextColumns && syncEntry.$block.config.columnSpanOptions.length > 0) {
+                    if (syncEntry.columnSpan < contextColumns && syncEntry.$block.config.columnSpanOptions.length > 0) {
                         // then check if the colSpan is a columnSpanOption, if NOT then reset to contextColumns.
-                        if(!syncEntry.$block.config.columnSpanOptions.find(option => option.columnSpan === syncEntry.colSpan)) {
+                        const found = syncEntry.$block.config.columnSpanOptions.find(option => option.columnSpan === syncEntry.columnSpan);
+                        if(!found) {
                             syncEntry.columnSpan = contextColumns;
                         }
                     } else {
