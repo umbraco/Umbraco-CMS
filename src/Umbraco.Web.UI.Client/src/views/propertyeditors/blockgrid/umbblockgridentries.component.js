@@ -157,7 +157,7 @@
 
             var targetRect = null;
             var relatedEl = null;
-            var relatedRect = null;
+            //var relatedRect = null;
             var ghostEl = null;
             var ghostRect = null;
             var dragX = 0;
@@ -206,9 +206,12 @@
 
                     const contextColumns = vm.blockEditorApi.internal.getContextColumns(vm.parentBlock, vm.areaKey);
 
-                    if (syncEntry.$block.config.columnSpanOptions.length > 0) {
-                        // get any allowed span lower than contextColumns of this BlockType, otherwise contextColumns.
-                        syncEntry.columnSpan = syncEntry.$block.config.columnSpanOptions.reduce((prev, option) => Math.min(prev, option.columnSpan), contextColumns);
+                    // if colSpan is lower than contextColumns, and we do have some columnSpanOptions:
+                    if (syncEntry.colSpan < contextColumns && syncEntry.$block.config.columnSpanOptions.length > 0) {
+                        // then check if the colSpan is a columnSpanOption, if NOT then reset to contextColumns.
+                        if(!syncEntry.$block.config.columnSpanOptions.find(option => option.columnSpan === syncEntry.colSpan)) {
+                            syncEntry.columnSpan = contextColumns;
+                        }
                     } else {
                         syncEntry.columnSpan = contextColumns;
                     }
@@ -272,7 +275,7 @@
                 */
                 
                 ghostRect = ghostEl.getBoundingClientRect();
-                relatedRect = relatedEl?.getBoundingClientRect();
+                //relatedRect = relatedEl?.getBoundingClientRect();
 
                 const insideGhost = dragX > ghostRect.left && dragX < ghostRect.right && dragY > ghostRect.top && dragY < ghostRect.bottom;
                 // We do not necessary have a related element jet, if so we can conclude we are outside ist rectangle.
@@ -419,18 +422,22 @@
 
             var rqaId = null
             function _onDragMove(evt) {
-                /** ignorer last drag event, comes as clientX === 0 and clientY === 0 */
-                if(vm.movingLayoutEntry && targetRect && ghostRect && evt.clientX !== 0 && evt.clientY !== 0) {
 
-                    if(dragX === evt.clientX && dragY === evt.clientY) {
+                const clientX = (evt.touches ? evt.touches[0] : evt).clientX;
+                const clientY = (evt.touches ? evt.touches[1] : evt).clientY;
+                /** ignorer last drag event, comes as clientX === 0 and clientY === 0 */
+                if(vm.movingLayoutEntry && targetRect && ghostRect && clientX !== 0 && clientY !== 0) {
+
+                    if(dragX === clientX && dragY === clientY) {
                         return;
                     }
-                    dragX = evt.clientX;
-                    dragY = evt.clientY;
+                    dragX = clientX;
+                    dragY = clientY;
+
 
                     
                     ghostRect = ghostEl.getBoundingClientRect();
-                    relatedRect = relatedEl?.getBoundingClientRect();
+                    //relatedRect = relatedEl?.getBoundingClientRect();
 
                     const insideGhost = dragX > ghostRect.left && dragX < ghostRect.right && dragY > ghostRect.top && dragY < ghostRect.bottom;
                     //const insideRelated = relatedRect ? (dragX > relatedRect.left && dragX < relatedRect.right && dragY > relatedRect.top && dragY < relatedRect.bottom) : false;
@@ -542,7 +549,9 @@
 
                     targetRect = evt.to.getBoundingClientRect();
                     ghostRect = ghostEl.getBoundingClientRect();
-                    dragOffsetX = evt.originalEvent.clientX - ghostRect.left;
+
+                    const clientX = (evt.originalEvent.touches ? evt.originalEvent.touches[0] : evt.originalEvent).clientX;
+                    dragOffsetX = clientX - ghostRect.left;
                     //dragOffsetY = evt.originalEvent.clientY - ghostRect.top;
 
                     window.addEventListener('drag', _onDragMove);
@@ -558,7 +567,7 @@
                     //console.log('onMove', evt)
 
                     relatedEl = evt.related;
-                    relatedRect = evt.related.getBoundingClientRect();
+                    //relatedRect = evt.related.getBoundingClientRect();
                     targetRect = evt.to.getBoundingClientRect();
                     ghostRect = evt.draggedRect;
 
@@ -641,7 +650,7 @@
                     vm.movingLayoutEntry = null;
                     targetRect = null;
                     ghostRect = null;
-                    relatedRect = null;
+                    //relatedRect = null;
                     relatedEl = null;
                 }
                 /*
