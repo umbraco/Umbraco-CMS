@@ -23,7 +23,14 @@ public class ExamineIndexViewModelFactory : IExamineIndexViewModelFactory
     {
         if (_temporaryIndexingService.Detect(index.Name))
         {
-            throw new OperationCanceledException("The index is still rebuilding, so could not get it");
+            return new ExamineIndexViewModel
+            {
+                Name = index.Name,
+                HealthStatus = "Rebuilding",
+                SearcherName = index.Searcher.Name,
+                DocumentCount = 0,
+                FieldCount = 0,
+            };
         }
 
         IIndexDiagnostics indexDiag = _indexDiagnosticsFactory.Create(index);
