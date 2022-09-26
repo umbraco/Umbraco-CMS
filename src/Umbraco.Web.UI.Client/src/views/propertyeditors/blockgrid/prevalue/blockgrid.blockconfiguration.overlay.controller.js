@@ -26,7 +26,7 @@
         vm.rowMinMaxModel = {
             hideLabel: true,
             view: "numberrange",
-            value: {min: vm.block.rowMinSpan || 1, max: vm.block.rowMaxSpan || null}
+            value: {min: vm.block.rowMinSpan || 1, max: vm.block.rowMaxSpan || 1}
         }
 
         loadElementTypes();

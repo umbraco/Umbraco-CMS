@@ -181,6 +181,8 @@
             var blockType = {
                 "columnSpanOptions": [],
                 "allowAtRoot": true,
+                "rowMinSpan": 1,
+                "rowMaxSpan": 1,
                 "contentElementTypeKey": key,
                 "settingsElementTypeKey": null,
                 "labelTemplate": "",
