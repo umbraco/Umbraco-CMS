@@ -172,9 +172,11 @@
             var dragOffsetX = 0;
             //var dragOffsetY = 0;
 
+            var ghostElIndicateForceLeft = null;
+            var ghostElIndicateForceRight = null;
+
             var approvedContainerEl = null;
             var approvedContainerDate = null;
-
 
             // Setup DOM method for communication between sortables:
             gridLayoutContainerEl['Sortable:controller'] = () => {
@@ -468,10 +470,24 @@
                             vm.movingLayoutEntry.forceLeft = newValue;
                             if(oldForceRight) {
                                 vm.movingLayoutEntry.forceRight = false;
+                                if(ghostElIndicateForceRight) {
+                                    ghostEl.removeChild(ghostElIndicateForceRight);
+                                    ghostElIndicateForceRight = null;
+                                }
                             }
                             vm.blockEditorApi.internal.setDirty();
                             vm.movingLayoutEntry.$block.__scope.$evalAsync();// needed for the block to be updated
                             $scope.$evalAsync();
+
+                            // Append element for indication, as angularJS lost connection:
+                            if(newValue === true) {
+                                ghostElIndicateForceLeft = document.createElement("div");
+                                ghostElIndicateForceLeft.className = "indicateForceLeft";
+                                ghostEl.appendChild(ghostElIndicateForceLeft);
+                            } else if(ghostElIndicateForceLeft) {
+                                ghostEl.removeChild(ghostElIndicateForceLeft);
+                                ghostElIndicateForceLeft = null;
+                            }
                         }
 
                         newValue = (dragX - dragOffsetX + ghostRect.width > targetRect.right + 50) && (vm.movingLayoutEntry.forceLeft !== true);
@@ -480,6 +496,16 @@
                             vm.blockEditorApi.internal.setDirty();
                             vm.movingLayoutEntry.$block.__scope.$evalAsync();// needed for the block to be updated
                             $scope.$evalAsync();
+
+                            // Append element for indication, as angularJS lost connection:
+                            if(newValue === true) {
+                                ghostElIndicateForceRight = document.createElement("div");
+                                ghostElIndicateForceRight.className = "indicateForceRight";
+                                ghostEl.appendChild(ghostElIndicateForceRight);
+                            } else if(ghostElIndicateForceRight) {
+                                ghostEl.removeChild(ghostElIndicateForceRight);
+                                ghostElIndicateForceRight = null;
+                            }
                         }
                     }
                 }
@@ -652,6 +678,15 @@
                     window.removeEventListener('drag', _onDragMove);
                     window.removeEventListener('dragover', _onDragMove);
 
+                    if(ghostElIndicateForceLeft) {
+                        ghostEl.removeChild(ghostElIndicateForceLeft);
+                        ghostElIndicateForceLeft = null;
+                    }
+                    if(ghostElIndicateForceRight) {
+                        ghostEl.removeChild(ghostElIndicateForceRight);
+                        ghostElIndicateForceRight = null;
+                    }
+
                     // ensure not-allowed indication is removed.
                     if(_lastIndicationContainerVM) {
                         _lastIndicationContainerVM.hideNotAllowed();
@@ -739,16 +774,14 @@
                 */
             });
 
-
+            $scope.$on('$destroy', function () {
+                sortable.destroy();
+                for (const subscription of unsubscribe) {
+                    subscription();
+                }
+            });
 
         };
-
-        $scope.$on('$destroy', function () {
-            sortable.destroy();
-            for (const subscription of unsubscribe) {
-                subscription();
-            }
-        });
     }
 
 })();
