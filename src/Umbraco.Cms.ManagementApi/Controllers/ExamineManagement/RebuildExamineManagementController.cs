@@ -56,7 +56,8 @@ public class RebuildExamineManagementController : ExamineManagementControllerBas
             var invalidModelProblem = new ProblemDetails
             {
                 Title = "Could not validate the populator",
-                Detail = $"The index {index?.Name} could not be rebuilt because we could not validate its associated {typeof(IIndexPopulator)}",
+                Detail =
+                    $"The index {index?.Name} could not be rebuilt because we could not validate its associated {typeof(IIndexPopulator)}",
                 Status = StatusCodes.Status400BadRequest,
                 Type = "Error",
             };
@@ -66,50 +67,19 @@ public class RebuildExamineManagementController : ExamineManagementControllerBas
 
         _logger.LogInformation("Rebuilding index '{IndexName}'", indexName);
 
-        // remove it in case there's a handler there already
-        index!.IndexOperationComplete -= Indexer_IndexOperationComplete;
-
-        //now add a single handler
-        index.IndexOperationComplete += Indexer_IndexOperationComplete;
-
-        try
+        if (_indexingRebuilderService.Rebuild(index, indexName))
         {
-            _indexingRebuilderService.Set(indexName);
-            _indexRebuilder.RebuildIndex(indexName);
-
             return await Task.FromResult(Ok());
         }
-        catch (Exception ex)
+
+        var problemDetails = new ProblemDetails
         {
-            //ensure it's not listening
-            index.IndexOperationComplete -= Indexer_IndexOperationComplete;
-            _logger.LogError(ex, "An error occurred rebuilding index");
-            var invalidModelProblem = new ProblemDetails
-            {
-                Title = "Index could not be rebuilt",
-                Detail = $"The index {index.Name} could not be rebuild. Check the log for details on this error.",
-                Status = StatusCodes.Status400BadRequest,
-                Type = "Error",
-            };
+            Title = "Index could not be rebuilt",
+            Detail = $"The index {index.Name} could not be rebuild. Check the log for details on this error.",
+            Status = StatusCodes.Status400BadRequest,
+            Type = "Error",
+        };
 
-            return await Task.FromResult(Conflict(invalidModelProblem));
-        }
-    }
-
-    private void Indexer_IndexOperationComplete(object? sender, EventArgs e)
-    {
-        var indexer = (IIndex?)sender;
-
-        _logger.LogDebug("Logging operation completed for index {IndexName}", indexer?.Name);
-
-        if (indexer is not null)
-        {
-            //ensure it's not listening anymore
-            indexer.IndexOperationComplete -= Indexer_IndexOperationComplete;
-        }
-
-        _logger.LogInformation($"Rebuilding index '{indexer?.Name}' done.");
-
-        _indexingRebuilderService.Clear(indexer?.Name);
+        return await Task.FromResult(Conflict(problemDetails));
     }
 }
