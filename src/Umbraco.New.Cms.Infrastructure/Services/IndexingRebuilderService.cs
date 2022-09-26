@@ -9,23 +9,20 @@ public class IndexingRebuilderService : IIndexingRebuilderService
 {
     private const string TempKey = "temp_indexing_op_";
     private readonly IAppPolicyCache _runtimeCache;
-    private readonly IndexingRebuilderService _indexingRebuilderService;
     private readonly IIndexRebuilder _indexRebuilder;
     private readonly ILogger<IndexingRebuilderService> _logger;
 
     public IndexingRebuilderService(
         AppCaches runtimeCache,
-        IndexingRebuilderService indexingRebuilderService,
         IIndexRebuilder indexRebuilder,
         ILogger<IndexingRebuilderService> logger)
     {
-        _indexingRebuilderService = indexingRebuilderService;
         _indexRebuilder = indexRebuilder;
         _logger = logger;
         _runtimeCache = runtimeCache.RuntimeCache;
     }
 
-    public bool Rebuild(IIndex index, string indexName)
+    public bool TryRebuild(IIndex index, string indexName)
     {
         // Remove it in case there's a handler there already
         index.IndexOperationComplete -= Indexer_IndexOperationComplete;
@@ -35,7 +32,7 @@ public class IndexingRebuilderService : IIndexingRebuilderService
 
         try
         {
-            _indexingRebuilderService.Set(indexName);
+            Set(indexName);
             _indexRebuilder.RebuildIndex(indexName);
             return true;
         }
@@ -48,7 +45,7 @@ public class IndexingRebuilderService : IIndexingRebuilderService
         }
     }
 
-    public void Set(string indexName)
+    private void Set(string indexName)
     {
         var cacheKey = TempKey + indexName;
 
@@ -56,13 +53,13 @@ public class IndexingRebuilderService : IIndexingRebuilderService
         _runtimeCache.Insert(cacheKey, () => "tempValue", TimeSpan.FromMinutes(5));
     }
 
-    public void Clear(string? indexName)
+    private void Clear(string? indexName)
     {
         var cacheKey = TempKey + indexName;
         _runtimeCache.Clear(cacheKey);
     }
 
-    public bool Detect(string indexName)
+    public bool IsRebuilding(string indexName)
     {
         var cacheKey = "temp_indexing_op_" + indexName;
         return _runtimeCache.Get(cacheKey) is not null;
@@ -82,6 +79,6 @@ public class IndexingRebuilderService : IIndexingRebuilderService
 
         _logger.LogInformation($"Rebuilding index '{indexer?.Name}' done.");
 
-        _indexingRebuilderService.Clear(indexer?.Name);
+        Clear(indexer?.Name);
     }
 }

@@ -21,7 +21,7 @@ public class ExamineIndexViewModelFactory : IExamineIndexViewModelFactory
 
     public ExamineIndexViewModel Create(IIndex index)
     {
-        if (_indexingRebuilderService.Detect(index.Name))
+        if (_indexingRebuilderService.IsRebuilding(index.Name))
         {
             return new ExamineIndexViewModel
             {

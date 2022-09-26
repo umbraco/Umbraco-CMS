@@ -13,7 +13,7 @@ public static class ExamineManagementBuilderExtensions
     {
         // Add examine service
         builder.Services.AddTransient<IExamineManagerService, ExamineManagerService>();
-        builder.Services.AddTransient<IndexingRebuilderService, IndexingRebuilderService>();
+        builder.Services.AddTransient<IIndexingRebuilderService, IndexingRebuilderService>();
 
         // Add factories
         builder.Services.AddTransient<IIndexDiagnosticsFactory, IndexDiagnosticsFactory>();
