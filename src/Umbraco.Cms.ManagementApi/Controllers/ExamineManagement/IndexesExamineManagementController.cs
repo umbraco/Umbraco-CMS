@@ -29,10 +29,7 @@ public class IndexesExamineManagementController : ExamineManagementControllerBas
     /// <returns></returns>
     [HttpGet("indexes")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(PagedViewModel<ExamineIndexModel>), StatusCodes.Status200OK)]
-    // This endpoint for now will throw errors if the ExamineIndexViewModel ever has providerProperties defined
-    // This is because System.Text.Json cannot serialize dictionary<string, object>
-    // This has been fixed in .NET 7, so this will work when we upgrade: https://github.com/dotnet/runtime/issues/67588
+    [ProducesResponseType(typeof(PagedViewModel<ExamineIndexViewModel>), StatusCodes.Status200OK)]
     public async Task<PagedViewModel<ExamineIndexViewModel>> Indexes(int skip, int take)
     {
         ExamineIndexViewModel[] indexes = _examineManager.Indexes

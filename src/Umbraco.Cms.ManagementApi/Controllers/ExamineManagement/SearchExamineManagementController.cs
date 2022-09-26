@@ -58,7 +58,7 @@ public class SearchExamineManagementController : ExamineManagementControllerBase
             var invalidModelProblem = new ProblemDetails
             {
                 Title = "Could not parse the query",
-                Detail = "Parser cannot parse the query, this can happen as en example if your query starts with a *)",
+                Detail = "Parser could not parse the query. Please double check if the query is valid. Sometimes this can also happen if your query starts with a wildcard (*)",
                 Status = StatusCodes.Status404NotFound,
                 Type = "Error",
             };
