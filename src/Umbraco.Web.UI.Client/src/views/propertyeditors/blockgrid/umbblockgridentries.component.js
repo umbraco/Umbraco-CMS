@@ -60,7 +60,8 @@
 
     function BlockGridEntriesController($element, $scope, $timeout) {
 
-        var vm = this;
+        const unsubscribe = [];
+        const vm = this;
         vm.showNotAllowedUI = false;
         vm.invalidAmount = false;
         vm.areaConfig = null;
@@ -68,6 +69,7 @@
         vm.invalidBlockTypes = [];
 
         vm.movingLayoutEntry = null;
+        vm.layoutColumnsInt = 0;
 
         vm.$onInit = function () {
             initializeSortable();
@@ -78,8 +80,13 @@
             
             vm.locallyAvailableBlockTypes = vm.blockEditorApi.internal.getAllowedTypesOf(vm.parentBlock, vm.areaKey);
             
-            $scope.$watch('vm.entries', onLocalAmountOfBlocksChanged, true);
+            unsubscribe.push($scope.$watch('vm.entries', onLocalAmountOfBlocksChanged, true));
         };
+
+        unsubscribe.push($scope.$watch("layoutColumns", (newVal, oldVal) => {
+            vm.layoutColumnsInt = parseInt(vm.layoutColumns, 10);
+        }));
+
 
         function onLocalAmountOfBlocksChanged() {
 
@@ -450,7 +457,7 @@
                     }
 
                     
-                    if(vm.movingLayoutEntry.columnSpan !== vm.layoutColumns) {
+                    if(vm.movingLayoutEntry.columnSpan !== vm.layoutColumnsInt) {
                         
                         const oldForceLeft = vm.movingLayoutEntry.forceLeft;
                         const oldForceRight = vm.movingLayoutEntry.forceRight;
@@ -732,11 +739,15 @@
             });
 
 
-            $scope.$on('$destroy', function () {
-                sortable.destroy();
-            });
 
-        }
+        };
+
+        $scope.$on('$destroy', function () {
+            sortable.destroy();
+            for (const subscription of unsubscribe) {
+                subscription();
+            }
+        });
     }
 
 })();

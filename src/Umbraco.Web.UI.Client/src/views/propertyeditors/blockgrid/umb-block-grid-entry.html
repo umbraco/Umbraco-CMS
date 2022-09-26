@@ -31,16 +31,16 @@
                 data-area-grid-columns="vm.areaGridColumns"
                 style="--umb-block-grid--area-grid-columns: {{vm.areaGridColumns}}">
                 <umb-block-grid-entries 
-                    class="umb-block-grid__area"
-                    data-area-col-span="{{areaEntry.$config.columnSpan}}"
-                    data-area-row-span="{{areaEntry.$config.rowSpan}}"
-                    data-area-alias="{{areaEntry.$config.alias}}"
-                    style="
-                    --umb-block-grid--grid-columns: {{areaEntry.$config.columnSpan}};
-                    --umb-block-grid--area-column-span: {{areaEntry.$config.columnSpan}};
-                    --umb-block-grid--area-row-span: {{areaEntry.$config.rowSpan}};
-                    "
                     ng-repeat="areaEntry in vm.layoutEntry.areas track by areaEntry.key"
+                    class="umb-block-grid__area"
+                    data-area-col-span="{{::areaEntry.$config.columnSpan}}"
+                    data-area-row-span="{{::areaEntry.$config.rowSpan}}"
+                    data-area-alias="{{::areaEntry.$config.alias}}"
+                    style="
+                    --umb-block-grid--grid-columns: {{::areaEntry.$config.columnSpan}};
+                    --umb-block-grid--area-column-span: {{::areaEntry.$config.columnSpan}};
+                    --umb-block-grid--area-row-span: {{::areaEntry.$config.rowSpan}};
+                    "
                     block-editor-api="vm.blockEditorApi"
                     entries="areaEntry.items"
                     area-key="areaEntry.key"
@@ -126,7 +126,7 @@
         </div>
 
         <button 
-            ng-if="vm.blockEditorApi.readonly !== true && (vm.layoutColumns !== vm.layoutEntry.columnSpan || (vm.layoutColumns === vm.layoutEntry.columnSpan && vm.layoutEntry.forceLeft))"
+            ng-if="vm.blockEditorApi.readonly !== true && (vm.layoutColumnsInt !== vm.layoutEntry.columnSpan || (vm.layoutColumnsInt === vm.layoutEntry.columnSpan && vm.layoutEntry.forceLeft))"
             type="button" 
             aria-labelledby="forceLeftLabel"
             title="@blockEditor_forceLeftButtonTitle"
@@ -142,7 +142,7 @@
         </button>
 
         <button 
-            ng-if="vm.blockEditorApi.readonly !== true && (vm.layoutColumns !== vm.layoutEntry.columnSpan || (vm.layoutColumns === vm.layoutEntry.columnSpan && vm.layoutEntry.forceRight))"
+            ng-if="vm.blockEditorApi.readonly !== true && (vm.layoutColumnsInt !== vm.layoutEntry.columnSpan || (vm.layoutColumnsInt === vm.layoutEntry.columnSpan && vm.layoutEntry.forceRight))"
             type="button" 
             aria-labelledby="forceRightLabel"
             title="@blockEditor_forceRightButtonTitle"

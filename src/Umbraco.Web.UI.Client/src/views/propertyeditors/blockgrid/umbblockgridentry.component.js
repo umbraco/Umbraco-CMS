@@ -92,10 +92,12 @@
 
     function BlockGridEntryController($scope, $element) {
 
+        const unsubscribe = [];
         const vm = this;
         vm.areaGridColumns = '';
         vm.isHoveringArea = false;
         vm.isScaleMode = false;
+        vm.layoutColumnsInt = 0;
 
         vm.$onInit = function() {
 
@@ -106,8 +108,23 @@
             } else {
                 vm.areaGridColumns = vm.layoutColumns.toString();
             }
+
+            vm.layoutColumnsInt = parseInt(vm.layoutColumns, 10)
+
             $scope.$evalAsync();
         }
+        unsubscribe.push($scope.$watch("depth", (newVal, oldVal) => {
+            vm.childDepth = parseInt(vm.depth) + 1;
+        }));
+        unsubscribe.push($scope.$watch("layoutColumns", (newVal, oldVal) => {
+            vm.layoutColumnsInt = parseInt(vm.layoutColumns, 10);
+
+            if(vm.layoutEntry.$block.config.areaGridColumns) {
+                // nothing to update.
+            } else {
+                vm.areaGridColumns = vm.layoutColumns.toString();
+            }
+        }));
         /**
          * We want to only show the validation errors on the specific Block, not the parent blocks.
          * So we need to avoid having a Block as the parent to the Block Form.
@@ -339,6 +356,12 @@
             vm.blockEditorApi.internal.setDirty();
             $event.originalEvent.stopPropagation();
         }
+
+        $scope.$on("$destroy", function () {
+            for (const subscription of unsubscribe) {
+                subscription();
+            }
+        });
 
     }   
 
