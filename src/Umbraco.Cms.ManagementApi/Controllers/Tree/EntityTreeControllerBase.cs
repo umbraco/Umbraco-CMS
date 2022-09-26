@@ -59,7 +59,7 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
         return await Task.FromResult(Ok(result));
     }
 
-    protected async Task<ActionResult<PagedViewModel<TItem>>> GetItems(Guid[] keys)
+    protected async Task<ActionResult<IEnumerable<TItem>>> GetItems(Guid[] keys)
     {
         if (keys.IsCollectionEmpty())
         {
@@ -70,10 +70,7 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
 
         TItem[] treeItemViewModels = MapTreeItemViewModels(null, itemEntities);
 
-        var totalItems = itemEntities.Length;
-
-        PagedViewModel<TItem> result = PagedViewModel(treeItemViewModels, totalItems);
-        return await Task.FromResult(Ok(result));
+        return await Task.FromResult(Ok(treeItemViewModels));
     }
 
     protected virtual IEntitySlim[] GetPagedRootEntities(long pageNumber, int pageSize, out long totalItems)

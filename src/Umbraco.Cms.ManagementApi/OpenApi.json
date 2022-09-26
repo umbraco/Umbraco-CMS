@@ -155,7 +155,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedViewModelOfEntityTreeItemViewModel"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/EntityTreeItemViewModel"
+                  }
                 }
               }
             }
@@ -285,7 +288,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedViewModelOfFileSystemTreeItemViewModel"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FileSystemTreeItemViewModel"
+                  }
                 }
               }
             }
@@ -415,7 +421,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedViewModelOfFileSystemTreeItemViewModel"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FileSystemTreeItemViewModel"
+                  }
                 }
               }
             }
@@ -605,7 +614,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedViewModelOfFileSystemTreeItemViewModel"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FileSystemTreeItemViewModel"
+                  }
                 }
               }
             }
@@ -685,7 +697,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedViewModelOfFolderTreeItemViewModel"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FolderTreeItemViewModel"
+                  }
                 }
               }
             }
@@ -894,7 +909,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedViewModelOfFileSystemTreeItemViewModel"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FileSystemTreeItemViewModel"
+                  }
                 }
               }
             }
@@ -974,7 +992,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedViewModelOfEntityTreeItemViewModel"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/EntityTreeItemViewModel"
+                  }
                 }
               }
             }
@@ -1054,7 +1075,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedViewModelOfEntityTreeItemViewModel"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/EntityTreeItemViewModel"
+                  }
                 }
               }
             }
@@ -1205,7 +1229,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedViewModelOfContentTreeItemViewModel"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ContentTreeItemViewModel"
+                  }
                 }
               }
             }
@@ -1468,7 +1495,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedViewModelOfFolderTreeItemViewModel"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FolderTreeItemViewModel"
+                  }
                 }
               }
             }
@@ -1766,7 +1796,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedViewModelOfDocumentTreeItemViewModel"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DocumentTreeItemViewModel"
+                  }
                 }
               }
             }
@@ -2038,7 +2071,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedViewModelOfDocumentTypeTreeItemViewModel"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DocumentTypeTreeItemViewModel"
+                  }
                 }
               }
             }
@@ -2127,7 +2163,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedViewModelOfDocumentBlueprintTreeItemViewModel"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DocumentBlueprintTreeItemViewModel"
+                  }
                 }
               }
             }
@@ -2258,7 +2297,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedViewModelOfFolderTreeItemViewModel"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FolderTreeItemViewModel"
+                  }
                 }
               }
             }
@@ -2398,7 +2440,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedViewModelOfFolderTreeItemViewModel"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FolderTreeItemViewModel"
+                  }
                 }
               }
             }
@@ -2642,22 +2687,6 @@
           }
         }
       },
-      "PagedViewModelOfFolderTreeItemViewModel": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "total": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/FolderTreeItemViewModel"
-            }
-          }
-        }
-      },
       "FolderTreeItemViewModel": {
         "allOf": [
           {
@@ -2758,6 +2787,22 @@
             "type": "string",
             "format": "guid",
             "nullable": true
+          }
+        }
+      },
+      "PagedViewModelOfFolderTreeItemViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FolderTreeItemViewModel"
+            }
           }
         }
       },
@@ -3022,22 +3067,6 @@
           }
         ]
       },
-      "PagedViewModelOfDocumentBlueprintTreeItemViewModel": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "total": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/DocumentBlueprintTreeItemViewModel"
-            }
-          }
-        }
-      },
       "DocumentBlueprintTreeItemViewModel": {
         "allOf": [
           {
@@ -3061,6 +3090,22 @@
             }
           }
         ]
+      },
+      "PagedViewModelOfDocumentBlueprintTreeItemViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DocumentBlueprintTreeItemViewModel"
+            }
+          }
+        }
       }
     }
   },

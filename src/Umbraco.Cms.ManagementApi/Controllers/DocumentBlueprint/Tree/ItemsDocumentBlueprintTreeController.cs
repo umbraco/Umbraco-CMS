@@ -15,7 +15,7 @@ public class ItemsDocumentBlueprintTreeController : DocumentBlueprintTreeControl
 
     [HttpGet("items")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(PagedViewModel<DocumentBlueprintTreeItemViewModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<DocumentBlueprintTreeItemViewModel>>> Items([FromQuery(Name = "key")] Guid[] keys)
+    [ProducesResponseType(typeof(IEnumerable<DocumentBlueprintTreeItemViewModel>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<IEnumerable<DocumentBlueprintTreeItemViewModel>>> Items([FromQuery(Name = "key")] Guid[] keys)
         => await GetItems(keys);
 }

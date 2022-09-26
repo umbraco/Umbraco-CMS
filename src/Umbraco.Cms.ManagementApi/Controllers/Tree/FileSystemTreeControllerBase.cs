@@ -42,7 +42,7 @@ public abstract class FileSystemTreeControllerBase : ManagementApiControllerBase
         return await Task.FromResult(Ok(result));
     }
 
-    protected async Task<ActionResult<PagedViewModel<FileSystemTreeItemViewModel>>> GetItems(string[] paths)
+    protected async Task<ActionResult<IEnumerable<FileSystemTreeItemViewModel>>> GetItems(string[] paths)
     {
         FileSystemTreeItemViewModel[] viewModels = paths
             .Where(FileSystem.FileExists)
@@ -54,8 +54,7 @@ public abstract class FileSystemTreeControllerBase : ManagementApiControllerBase
                     : MapViewModel(path, fileName, false);
             }).WhereNotNull().ToArray();
 
-        PagedViewModel<FileSystemTreeItemViewModel> result = PagedViewModel(viewModels, viewModels.Length);
-        return await Task.FromResult(Ok(result));
+        return await Task.FromResult(Ok(viewModels));
     }
 
     protected virtual string[] GetDirectories(string path) => FileSystem
