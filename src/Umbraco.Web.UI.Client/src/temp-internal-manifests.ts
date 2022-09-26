@@ -537,4 +537,38 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 			weight: 100,
 		},
 	},
+	{
+		type: 'propertyEditorUI',
+		alias: 'Umb.PropertyEditorUI.TextArea',
+		name: 'Textarea',
+		elementName: 'umb-property-editor-textarea',
+		loader: () => import('./backoffice/property-editors/textarea/property-editor-textarea.element'),
+		meta: {
+			icon: 'edit',
+			group: 'common',
+			propertyEditor: 'Umbraco.Unknown',
+			config: {
+				properties: [
+					{
+						alias: 'rows',
+						label: 'Number of rows',
+						description: 'If empty - 10 rows would be set as the default value',
+						propertyEditorUI: 'Umb.PropertyEditorUI.Number',
+					},
+				],
+			},
+		},
+	},
+	{
+		type: 'propertyEditorUI',
+		alias: 'Umb.PropertyEditorUI.TextField',
+		name: 'Text Field',
+		elementName: 'umb-property-editor-text',
+		loader: () => import('./backoffice/property-editors/text/property-editor-text.element'),
+		meta: {
+			icon: 'edit',
+			group: 'common',
+			propertyEditor: 'Umbraco.Unknown',
+		},
+	},
 ];

@@ -101,22 +101,20 @@ export class UmbPropertyEditorConfigElement extends UmbContextConsumerMixin(LitE
 
 	render() {
 		return html`
-			<uui-box headline="Config">
-				${this._properties.length > 0
-					? html`
-							${this._properties?.map(
-								(property) => html`
-									<umb-entity-property
-										label="${property.label}"
-										description="${ifDefined(property.description)}"
-										alias="${property.alias}"
-										property-editor-ui-alias="${property.propertyEditorUI}"
-										.value=${this.data.find((data) => data.alias === property.alias)?.value}></umb-entity-property>
-								`
-							)}
-					  `
-					: html`<div>No configuration</div>`}
-			</uui-box>
+			${this._properties.length > 0
+				? html`
+						${this._properties?.map(
+							(property) => html`
+								<umb-entity-property
+									label="${property.label}"
+									description="${ifDefined(property.description)}"
+									alias="${property.alias}"
+									property-editor-ui-alias="${property.propertyEditorUI}"
+									.value=${this.data.find((data) => data.alias === property.alias)?.value}></umb-entity-property>
+							`
+						)}
+				  `
+				: html`<div>No configuration</div>`}
 		`;
 	}
 }

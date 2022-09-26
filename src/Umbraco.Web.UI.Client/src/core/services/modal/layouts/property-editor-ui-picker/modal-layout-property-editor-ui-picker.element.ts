@@ -11,7 +11,6 @@ import type { UmbExtensionRegistry } from '../../../../extension';
 import type { ManifestPropertyEditorUI } from '../../../../models';
 
 export interface UmbModalPropertyEditorUIPickerData {
-	propertyEditorAlias: string;
 	selection?: Array<string>;
 }
 
@@ -54,13 +53,6 @@ export class UmbModalLayoutPropertyEditorUIPickerElement extends UmbContextConsu
 
 		this._propertyEditorUIsSubscription = this._extensionRegistry
 			?.extensionsOfType('propertyEditorUI')
-			.pipe(
-				map((propertyEditorUIs) =>
-					propertyEditorUIs.filter(
-						(propertyEditorUI) => propertyEditorUI.meta.propertyEditor === this.data?.propertyEditorAlias
-					)
-				)
-			)
 			.subscribe((propertyEditorUIs) => {
 				this._propertyEditorUIs = propertyEditorUIs;
 			});
@@ -83,7 +75,6 @@ export class UmbModalLayoutPropertyEditorUIPickerElement extends UmbContextConsu
 
 	disconnectedCallback(): void {
 		super.disconnectedCallback();
-
 		this._propertyEditorUIsSubscription?.unsubscribe();
 	}
 
