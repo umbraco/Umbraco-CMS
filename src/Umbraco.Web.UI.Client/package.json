@@ -36,7 +36,7 @@
 		"npm": ">=8.0.0 < 9"
 	},
 	"dependencies": {
-		"@umbraco-ui/uui": "^1.0.0",
+		"@umbraco-ui/uui": "^1.0.1",
 		"@umbraco-ui/uui-css": "^1.0.0",
 		"@umbraco-ui/uui-modal": "file:umbraco-ui-uui-modal-0.0.0.tgz",
 		"@umbraco-ui/uui-modal-container": "file:umbraco-ui-uui-modal-container-0.0.0.tgz",
