@@ -10,9 +10,9 @@ public class ExamineIndexViewModelFactory : IExamineIndexViewModelFactory
 {
     private readonly IIndexDiagnosticsFactory _indexDiagnosticsFactory;
     private readonly IIndexRebuilder _indexRebuilder;
-    private readonly IndexingRebuilderService _indexingRebuilderService;
+    private readonly IIndexingRebuilderService _indexingRebuilderService;
 
-    public ExamineIndexViewModelFactory(IIndexDiagnosticsFactory indexDiagnosticsFactory, IIndexRebuilder indexRebuilder, IndexingRebuilderService indexingRebuilderService)
+    public ExamineIndexViewModelFactory(IIndexDiagnosticsFactory indexDiagnosticsFactory, IIndexRebuilder indexRebuilder, IIndexingRebuilderService indexingRebuilderService)
     {
         _indexDiagnosticsFactory = indexDiagnosticsFactory;
         _indexRebuilder = indexRebuilder;
