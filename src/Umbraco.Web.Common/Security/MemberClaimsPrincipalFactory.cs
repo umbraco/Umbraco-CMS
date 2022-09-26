@@ -58,16 +58,6 @@ public class MemberClaimsPrincipalFactory : UserClaimsPrincipalFactory<MemberIde
             memberIdentity.AddClaim(claim);
         }
 
-        // if(string.IsNullOrEmpty(member.Name) == false)
-        // {
-        //     // Updates/overwrites the name claim that is storing the username/email address
-        //     // to actually be the member's name
-        //     memberIdentity.AddOrUpdateClaim(new Claim(ClaimTypes.Name, member.Name));
-        //
-        //     // Add additional claim if people wish to be more explict
-        //     // and call the extension method GetRealname()
-        //     memberIdentity.AddOrUpdateClaim(new Claim(ClaimTypes.GivenName, member.Name));
-        // }
         return memberIdentity;
     }
 }
