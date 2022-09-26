@@ -132,7 +132,7 @@
             var dragX = 0;
             var dragY = 0;
             var dragOffsetX = 0;
-            var dragOffsetY = 0;
+            //var dragOffsetY = 0;
 
             var approvedContainerEl = null;
             var approvedContainerDate = null;
@@ -173,8 +173,21 @@
                         prevEntries.splice(oldIndex, 1);
                     }
 
-                    // TODO: block changed context, if no columnSpanOptions this Block colSpan would then have to be adjusted for the context.
-                    // TODO: In general make sure the size fits in the new context.
+                    const contextColumns = vm.blockEditorApi.internal.getContextColumns(vm.parentBlock, vm.areaKey);
+
+                    if (syncEntry.$block.config.columnSpanOptions.length > 0) {
+                        // get any allowed span lower than contextColumns of this BlockType, otherwise contextColumns.
+                        syncEntry.columnSpan = syncEntry.$block.config.columnSpanOptions.reduce((prev, option) => Math.min(prev, option.columnSpan), contextColumns);
+                    } else {
+                        syncEntry.columnSpan = contextColumns;
+                    }
+
+                    if(syncEntry.columnSpan === contextColumns) {
+                        // If we are full width, then reset forceLeft/right.
+                        syncEntry.forceLeft = false;
+                        syncEntry.forceRight = false;
+                    }
+                    
                     vm.entries.splice(newIndex, 0, syncEntry);
 
                     // I currently do not think below line is necessary as this is updated through angularJS. This was giving trouble/errors.
@@ -475,7 +488,7 @@
                     targetRect = evt.to.getBoundingClientRect();
                     ghostRect = ghostEl.getBoundingClientRect();
                     dragOffsetX = evt.originalEvent.clientX - ghostRect.left;
-                    dragOffsetY = evt.originalEvent.clientY - ghostRect.top;
+                    //dragOffsetY = evt.originalEvent.clientY - ghostRect.top;
 
                     window.addEventListener('drag', _onDragMove);
                     window.addEventListener('dragover', _onDragMove);

@@ -193,14 +193,32 @@
             onLoaded();
         }
 
-        vm.setDirty = setDirty;
-        function setDirty() {
-            if (vm.propertyForm) {
-                vm.propertyForm.$setDirty();
-            }
+
+
+        function onLoaded() {
+
+            // Store a reference to the layout model, because we need to maintain this model.
+            vm.layout = modelObject.getLayout([]);
+
+
+            initializeLayout(vm.layout);
+
+            vm.availableContentTypesAliases = modelObject.getAvailableAliasesForBlockContent();
+            vm.availableBlockTypes = modelObject.getAvailableBlocksForBlockPicker();
+
+            updateClipboard(true);
+
+            vm.loading = false;
+
+            window.requestAnimationFrame(() => {
+                shadowRoot = $element[0].querySelector('umb-block-grid-root').shadowRoot;
+            })
+
         }
 
-        function initializeLayout(layoutList) {
+
+
+        function initializeLayout(layoutList, parentBlock, areaKey) {
 
             // reference the invalid items of this list, to be removed after the loop.
             var invalidLayoutItems = [];
@@ -208,7 +226,7 @@
             // Append the blockObjects to our layout.
             layoutList.forEach(layoutEntry => {
 
-                var block = initializeLayoutEntry(layoutEntry);
+                var block = initializeLayoutEntry(layoutEntry, parentBlock, areaKey);
                 if(!block) {
                     // then we need to filter this out and also update the underlying model. This could happen if the data is invalid.
                     invalidLayoutItems.push(layoutEntry);
@@ -224,7 +242,7 @@
             });
         }
 
-        function initializeLayoutEntry(layoutEntry) {
+        function initializeLayoutEntry(layoutEntry, parentBlock, areaKey) {
 
             // $block must have the data property to be a valid BlockObject, if not, its considered as a destroyed blockObject.
             if (!layoutEntry.$block || layoutEntry.$block.data === undefined) {
@@ -253,7 +271,7 @@
                     } else {
                         // set $config as its not persisted:
                         layoutEntry.areas[areaIndex].$config = areaConfig;
-                        initializeLayout(layoutEntry.areas[areaIndex].items);
+                        initializeLayout(layoutEntry.areas[areaIndex].items, block, areaConfig.key);
                     }
                 });
 
@@ -269,10 +287,18 @@
 
                 // if no columnSpan, then we set one:
                 if (!layoutEntry.columnSpan) {
-                    // set columnSpan to minimum allowed span for this BlockType:
-                    const minimumColumnSpan = block.config.columnSpanOptions.reduce((prev, option) => Math.min(prev, option.columnSpan), vm.gridColumns);
-                    // TODO, use contextual layout columns, if no defined.
-                    layoutEntry.columnSpan = minimumColumnSpan;
+
+                    const contextColumns = getContextColumns(parentBlock, areaKey)
+
+                    if (block.config.columnSpanOptions.length > 0) {
+                        // set columnSpan to minimum allowed span for this BlockType:
+                        const minimumColumnSpan = block.config.columnSpanOptions.reduce((prev, option) => Math.min(prev, option.columnSpan), vm.gridColumns);
+
+                        // If minimumColumnSpan is larger than contextColumns, then we will make it fit within context anyway:
+                        layoutEntry.columnSpan = Math.min(minimumColumnSpan, contextColumns)
+                    } else {
+                        layoutEntry.columnSpan = contextColumns;
+                    }
                 }
                 // if no rowSpan, then we set one:
                 if (!layoutEntry.rowSpan) {
@@ -287,26 +313,22 @@
             return layoutEntry.$block;
         }
 
-        function onLoaded() {
+        vm.getContextColumns = getContextColumns;
+        function getContextColumns(parentBlock, areaKey) {
 
-            // Store a reference to the layout model, because we need to maintain this model.
-            vm.layout = modelObject.getLayout([]);
+            if(parentBlock != null) {
+                var area = parentBlock.layout.areas.find(x => x.key === areaKey);
+                if(!area) {
+                    return null;
+                }
 
+                return area.$config.columnSpan;
+            }
 
-            initializeLayout(vm.layout);
-
-            vm.availableContentTypesAliases = modelObject.getAvailableAliasesForBlockContent();
-            vm.availableBlockTypes = modelObject.getAvailableBlocksForBlockPicker();
-
-            updateClipboard(true);
-
-            vm.loading = false;
-
-            window.requestAnimationFrame(() => {
-                shadowRoot = $element[0].querySelector('umb-block-grid-root').shadowRoot;
-            })
-
+            return vm.gridColumns;
         }
+
+
         function updateAllBlockObjects() {
             // Update the blockObjects in our layout.
             vm.layout.forEach(entry => {
@@ -458,7 +480,7 @@
             }
 
             // Development note: Notice this is ran before added to the data model.
-            initializeLayoutEntry(layoutEntry);
+            initializeLayoutEntry(layoutEntry, parentBlock, areaKey);
 
             // make block model
             var blockObject = layoutEntry.$block;
@@ -987,13 +1009,6 @@
             clipboardService.copy(clipboardService.TYPES.BLOCK, block.content.contentTypeAlias, clipboardData, block.label, block.content.icon, block.content.udi);
         }
 
-        function revertPaste() {
-            nestedEntries.forEach(entry => {
-                // TODO: clean up..
-                deleteBlock(entry.$block);
-            })
-        }
-
         function pasteClipboardEntry(parentBlock, areaKey, index, pasteEntry, pasteType) {
 
             if (pasteEntry === undefined) {
@@ -1020,7 +1035,7 @@
                 return null;
             }
 
-            if (initializeLayoutEntry(layoutEntry) === null) {
+            if (initializeLayoutEntry(layoutEntry, parentBlock, areaKey) === null) {
                 return null;
             }
             
@@ -1164,6 +1179,13 @@
             internal: vm,
             readonly: vm.readonly
         };
+
+        vm.setDirty = setDirty;
+        function setDirty() {
+            if (vm.propertyForm) {
+                vm.propertyForm.$setDirty();
+            }
+        }
 
         function onAmountOfBlocksChanged() {
 
