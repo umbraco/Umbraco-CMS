@@ -36,7 +36,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="all" IsImplicitlyDefined="true" />
-    <PackageReference Include="Nerdbank.GitVersioning" Version="3.5.109" PrivateAssets="all" IsImplicitlyDefined="true" />
+    <PackageReference Include="Nerdbank.GitVersioning" Version="3.5.113" PrivateAssets="all" IsImplicitlyDefined="true" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.406" PrivateAssets="all" IsImplicitlyDefined="true" />
     <PackageReference Include="Umbraco.Code" Version="2.0.0" PrivateAssets="all" IsImplicitlyDefined="true" />
     <PackageReference Include="Umbraco.GitVersioning.Extensions" Version="0.1.1" PrivateAssets="all" IsImplicitlyDefined="true" />
