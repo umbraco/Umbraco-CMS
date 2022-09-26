@@ -522,6 +522,11 @@
                 //removeCloneOnHide: true, // Remove the clone element when it is not showing, rather than just hiding it
                 emptyInsertThreshold: 160, // px, distance mouse must be from empty sortable to insert drag element into it
 
+                scrollSensitivity: 50,
+                scrollSpeed: 16,
+                scroll: true,
+                forceAutoScrollFallback: true,
+
                 onStart: function (evt) {
                     nextSibling = evt.from === evt.item.parentNode ? evt.item.nextSibling : evt.clone.nextSibling;
 
@@ -590,7 +595,7 @@
 
                         if(approvedContainerDate) {
                             const timeSinceApproval = new Date().getTime() - approvedContainerDate;
-                            const rejectionTimeLeft = 500 - timeSinceApproval;
+                            const rejectionTimeLeft = 250 - timeSinceApproval;
                             if(rejectionTimeLeft > 0) {
                                 //console.log("Reject by rejectionTimeLeft")
                                 return false;
