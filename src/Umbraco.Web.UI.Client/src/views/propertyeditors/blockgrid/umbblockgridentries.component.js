@@ -1,6 +1,37 @@
 (function () {
     "use strict";
 
+
+
+    function getInterpolatedIndexOfPositionInWeightMap(target, weights) {
+        const map = [0];
+        weights.reduce((a, b, i) => { return map[i+1] = a+b; }, 0);
+        const foundValue = map.reduce((a, b) => {
+            let aDiff = Math.abs(a - target);
+            let bDiff = Math.abs(b - target);
+    
+            if (aDiff === bDiff) {
+                return a < b ? a : b;
+            } else {
+                return bDiff < aDiff ? b : a;
+            }
+        })
+        const foundIndex = map.indexOf(foundValue);
+        const targetDiff = (target-foundValue);
+        let interpolatedIndex = foundIndex;
+        if (targetDiff < 0 && foundIndex === 0) {
+            // Don't adjust.
+        } else if (targetDiff > 0 && foundIndex === map.length-1) {
+            // Don't adjust.
+        } else {
+            const foundInterpolationWeight = weights[targetDiff >= 0 ? foundIndex : foundIndex-1];
+            interpolatedIndex += foundInterpolationWeight === 0 ? interpolatedIndex : (targetDiff/foundInterpolationWeight)
+        }
+        return interpolatedIndex;
+    }
+
+
+
     /**
      * @ngdoc directive
      * @name umbraco.directives.directive:umbBlockGridEntries
@@ -314,13 +345,37 @@
                                 if (foundRelatedEl.dataset.forceRight && placeAfter === true) {
                                     verticalDirection = true;
                                 } else {
-                                    const totalColumns = parseInt(getComputedStyle(approvedContainerEl).getPropertyValue("--umb-block-grid--grid-columns"), 10);
 
-                                    // maybe include the position of the related?
+                                    // TODO: move calculations out so they can be persisted a bit longer?
+                                    const approvedContainerRect = approvedContainerEl.getBoundingClientRect();
+                                    const approvedContainerComputedStyles = getComputedStyle(approvedContainerEl);
+                                    const gridColumnNumber = parseInt(approvedContainerComputedStyles.getPropertyValue("--umb-block-grid--grid-columns"), 10);
+
                                     const relatedColumns = parseInt(foundRelatedEl.dataset.colSpan, 10);
                                     const ghostColumns = parseInt(ghostEl.dataset.colSpan, 10);
 
-                                    if(relatedColumns + ghostColumns > totalColumns) {
+                                    // Get grid template:
+                                    const approvedContainerGridColumns = approvedContainerComputedStyles.gridTemplateColumns.trim().split("px").map(x => Number(x)).filter(n => n > 0);
+
+                                    // ensure all columns are there.
+                                    // This will also ensure handling non-css-grid mode,
+                                    // use container width divided by amount of columns( or the item width divided by its amount of columnSpan)
+                                    let amountOfColumnsInWeightMap = approvedContainerGridColumns.length;
+                                    const amountOfUnknownColumns = gridColumnNumber-amountOfColumnsInWeightMap;
+                                    if(amountOfUnknownColumns > 0) {
+                                        let accumulatedValue = getAccumulatedValueOfIndex(amountOfColumnsInWeightMap, approvedContainerGridColumns) || 0;
+                                        const layoutWidth = approvedContainerRect.width;
+                                        const missingColumnWidth = (layoutWidth-accumulatedValue)/amountOfUnknownColumns;
+                                        while(amountOfColumnsInWeightMap++ < gridColumnNumber) {
+                                            approvedContainerGridColumns.push(missingColumnWidth);
+                                        }
+                                    }
+
+
+                                    const relatedStartX = foundRelatedElRect.left - approvedContainerRect.left;
+                                    const relatedStartCol = Math.round(getInterpolatedIndexOfPositionInWeightMap(relatedStartX, approvedContainerGridColumns));
+
+                                    if(relatedStartCol + relatedColumns + ghostColumns > gridColumnNumber) {
                                         verticalDirection = true;
                                     }
 
