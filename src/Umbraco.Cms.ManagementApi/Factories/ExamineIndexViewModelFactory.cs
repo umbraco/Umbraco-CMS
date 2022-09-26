@@ -10,18 +10,18 @@ public class ExamineIndexViewModelFactory : IExamineIndexViewModelFactory
 {
     private readonly IIndexDiagnosticsFactory _indexDiagnosticsFactory;
     private readonly IIndexRebuilder _indexRebuilder;
-    private readonly ITemporaryIndexingService _temporaryIndexingService;
+    private readonly IndexingRebuilderService _indexingRebuilderService;
 
-    public ExamineIndexViewModelFactory(IIndexDiagnosticsFactory indexDiagnosticsFactory, IIndexRebuilder indexRebuilder, ITemporaryIndexingService temporaryIndexingService)
+    public ExamineIndexViewModelFactory(IIndexDiagnosticsFactory indexDiagnosticsFactory, IIndexRebuilder indexRebuilder, IndexingRebuilderService indexingRebuilderService)
     {
         _indexDiagnosticsFactory = indexDiagnosticsFactory;
         _indexRebuilder = indexRebuilder;
-        _temporaryIndexingService = temporaryIndexingService;
+        _indexingRebuilderService = indexingRebuilderService;
     }
 
     public ExamineIndexViewModel Create(IIndex index)
     {
-        if (_temporaryIndexingService.Detect(index.Name))
+        if (_indexingRebuilderService.Detect(index.Name))
         {
             return new ExamineIndexViewModel
             {

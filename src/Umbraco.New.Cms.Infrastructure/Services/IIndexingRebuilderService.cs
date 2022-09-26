@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.New.Cms.Infrastructure.Services;
 
-public interface ITemporaryIndexingService
+public interface IIndexingRebuilderService
 {
     void Set(string indexName);
 

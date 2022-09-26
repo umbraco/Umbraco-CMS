@@ -2,12 +2,12 @@
 
 namespace Umbraco.New.Cms.Infrastructure.Services;
 
-public class TemporaryIndexingService : ITemporaryIndexingService
+public class IndexingRebuilderService : IIndexingRebuilderService
 {
     private const string TempKey = "temp_indexing_op_";
     private readonly IAppPolicyCache _runtimeCache;
 
-    public TemporaryIndexingService(AppCaches runtimeCache) => _runtimeCache = runtimeCache.RuntimeCache;
+    public IndexingRebuilderService(AppCaches runtimeCache) => _runtimeCache = runtimeCache.RuntimeCache;
 
     public void Set(string indexName)
     {

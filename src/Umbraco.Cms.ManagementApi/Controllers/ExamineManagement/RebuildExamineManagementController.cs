@@ -12,18 +12,18 @@ public class RebuildExamineManagementController : ExamineManagementControllerBas
 {
     private readonly ILogger<RebuildExamineManagementController> _logger;
     private readonly IIndexRebuilder _indexRebuilder;
-    private readonly ITemporaryIndexingService _temporaryIndexingService;
+    private readonly IndexingRebuilderService _indexingRebuilderService;
     private readonly IExamineManager _examineManager;
 
     public RebuildExamineManagementController(
         ILogger<RebuildExamineManagementController> logger,
         IIndexRebuilder indexRebuilder,
-        ITemporaryIndexingService temporaryIndexingService,
+        IndexingRebuilderService indexingRebuilderService,
         IExamineManager examineManager)
     {
         _logger = logger;
         _indexRebuilder = indexRebuilder;
-        _temporaryIndexingService = temporaryIndexingService;
+        _indexingRebuilderService = indexingRebuilderService;
         _examineManager = examineManager;
     }
 
@@ -74,7 +74,7 @@ public class RebuildExamineManagementController : ExamineManagementControllerBas
 
         try
         {
-            _temporaryIndexingService.Set(indexName);
+            _indexingRebuilderService.Set(indexName);
             _indexRebuilder.RebuildIndex(indexName);
 
             return await Task.FromResult(Ok());
@@ -110,6 +110,6 @@ public class RebuildExamineManagementController : ExamineManagementControllerBas
 
         _logger.LogInformation($"Rebuilding index '{indexer?.Name}' done.");
 
-        _temporaryIndexingService.Clear(indexer?.Name);
+        _indexingRebuilderService.Clear(indexer?.Name);
     }
 }
