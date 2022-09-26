@@ -2,7 +2,7 @@
 
 public class FieldViewModel
 {
-    public string? Name { get; init; }
+    public string Name { get; init; } = null!;
 
-    public IEnumerable<string>? Values { get; init; }
+    public IEnumerable<string> Values { get; init; } = null!;
 }

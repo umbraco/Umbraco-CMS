@@ -2,11 +2,11 @@
 
 public class SearchResultViewModel
 {
-    public string? Id { get; set; }
+    public string Id { get; set; } = null!;
 
     public float Score { get; set; }
 
-    public int FieldCount => Fields?.Count() ?? 0;
+    public int FieldCount => Fields.Count();
 
-    public IEnumerable<FieldViewModel>? Fields { get; set; }
+    public IEnumerable<FieldViewModel> Fields { get; set; } = null!;
 }

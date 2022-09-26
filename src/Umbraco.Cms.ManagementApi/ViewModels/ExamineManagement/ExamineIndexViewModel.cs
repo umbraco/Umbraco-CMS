@@ -2,7 +2,7 @@
 
 public class ExamineIndexViewModel
 {
-    public string? Name { get; init; }
+    public string Name { get; init; } = null!;
 
     public string? HealthStatus { get; init; }
 
@@ -10,7 +10,7 @@ public class ExamineIndexViewModel
 
     public bool CanRebuild { get; init; }
 
-    public string? SearcherName { get; init; }
+    public string SearcherName { get; init; } = null!;
 
     public long DocumentCount { get; init; }
 
