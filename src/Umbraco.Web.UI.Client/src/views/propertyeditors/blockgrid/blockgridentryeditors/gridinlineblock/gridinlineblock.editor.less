@@ -1,0 +1,173 @@
+.blockelement-inlineblock-editor {
+    display: block;
+    margin-bottom: 4px;
+    margin-top: 4px;
+    border: 1px solid @gray-9;
+    border-radius: @baseBorderRadius;
+    transition: border-color 120ms, background-color 120ms;
+
+    .umb-block-list__block:not(.--active) &:hover {
+        border-color: @gray-8;
+    }
+
+    .umb-editor-tab-bar {
+        margin: 0;
+        position: static;
+        padding: 0;
+    }
+
+    > button {
+        width: 100%;
+        min-height: 48px;
+        cursor: pointer;
+        color: @ui-action-discreet-type;
+        text-align: left;
+        padding-left: 10px;
+        padding-bottom: 2px;
+        user-select: none;
+        background-color: white;
+
+        .caret {
+            vertical-align: middle;
+            transform: rotate(-90deg);
+            transition: transform 80ms ease-out;
+        }
+
+        .icon {
+            font-size: 1.1rem;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        span.name {
+            position: relative;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        &:hover {
+            color: @ui-action-discreet-type-hover;
+            border-color: @gray-8;
+        }
+    }
+
+    ng-form.ng-invalid-val-server-match-content > .umb-block-list__block > .umb-block-list__block--content > div > & {
+        > button {
+            color: @formErrorText;
+
+            .show-validation-type-warning & {
+                color: @formWarningText;
+            }
+
+            span.caret {
+                border-top-color: @formErrorText;
+
+                .show-validation-type-warning & {
+                    border-top-color: @formWarningText;
+                }
+            }
+        }
+    }
+
+    ng-form.ng-invalid-val-server-match-content > .umb-block-list__block:not(.--active) > .umb-block-list__block--content > div > & {
+        > button {
+            span.name {
+                &::after {
+                    content: "!";
+                    text-align: center;
+                    position: absolute;
+                    top: -6px;
+                    right: -15px;
+                    min-width: 10px;
+                    color: @white;
+                    background-color: @ui-active-type;
+                    border: 2px solid @white;
+                    border-radius: 50%;
+                    font-size: 10px;
+                    font-weight: bold;
+                    padding: 2px;
+                    line-height: 10px;
+                    background-color: @formErrorText;
+
+                    .show-validation-type-warning & {
+                        background-color: @formWarningText;
+                    }
+
+                    font-weight: 900;
+                    animation-duration: 1.4s;
+                    animation-iteration-count: infinite;
+                    animation-name: blockelement-inlineblock-editor--badge-bounce;
+                    animation-timing-function: ease;
+
+                    @keyframes blockelement-inlineblock-editor--badge-bounce {
+                        0% {
+                            transform: translateY(0);
+                        }
+
+                        20% {
+                            transform: translateY(-4px);
+                        }
+
+                        40% {
+                            transform: translateY(0);
+                        }
+
+                        55% {
+                            transform: translateY(-2px);
+                        }
+
+                        70% {
+                            transform: translateY(0);
+                        }
+
+                        100% {
+                            transform: translateY(0);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+.umb-block-list__block.--active {
+    border-color: @gray-8;
+    box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.05);
+
+    > .umb-block-list__block--content {
+        > .umb-block-list__block--view  {
+            > .blockelement-inlineblock-editor {
+                > button {
+                    > .caret {
+                        transform: rotate(0deg);
+                    }
+                }
+            }
+        }
+    }
+}
+
+.blockelement-inlineblock-editor__inner {
+    border-top: 1px solid @gray-8;
+    background-color: @gray-12;
+
+    > * > * > * > .umb-group-panel {
+        background-color: transparent;
+        box-shadow: none;
+        margin-top: 10px;
+        margin-bottom: 0;
+        > .umb-group-panel__content .umb-property {
+            margin-bottom: 20px;
+        }
+    }
+    .umb-group-panel + .umb-group-panel {
+        margin-top: 20px;
+    }
+    &.--singleGroup > * > * > * > .umb-group-panel {
+        margin-top: 0;
+        > .umb-group-panel__header {
+            display: none;
+        }
+    }
+    
+}
