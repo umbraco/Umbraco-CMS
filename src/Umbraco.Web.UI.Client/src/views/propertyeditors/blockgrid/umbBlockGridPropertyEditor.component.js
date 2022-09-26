@@ -241,6 +241,7 @@
                     return null;
                 }
 
+                // Create areas that is not already created:
                 block.config.areas.forEach(areaConfig => {
                     const areaIndex = layoutEntry.areas.findIndex(x => x.key === areaConfig.key);
                     if(areaIndex === -1) {
@@ -256,7 +257,7 @@
                     }
                 });
 
-                // TODO: clean this up.
+                // Clean up areas that does not exist in config:
                 let i = layoutEntry.areas.length;
                 while(i--) {
                     const layoutEntryArea = layoutEntry.areas[i];
@@ -382,7 +383,6 @@
             block.blockUiVisibility = false;
             block.showBlockUI = function () {
                 delete block.__timeout;
-                // TODO: test that this scrolling works:
                 shadowRoot.querySelector('*[data-element-udi="'+block.layout.contentUdi+'"] .umb-block-grid__block > .umb-block-grid__block--context').scrollIntoView({block: "nearest", inline: "nearest", behavior: "smooth"});
                 block.blockUiVisibility = true;
             };
@@ -1025,7 +1025,7 @@
             }
             
             if (layoutEntry.$block === null) {
-                // Initalization of the Block Object didnt go well, therefor we will fail the paste action.
+                // Initialization of the Block Object didn't go well, therefor we will fail the paste action.
                 return null;
             }
 
