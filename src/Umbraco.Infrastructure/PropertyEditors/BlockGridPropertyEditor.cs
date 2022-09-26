@@ -13,8 +13,8 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     "Block Grid",
     "blockgrid",
     ValueType = ValueTypes.Json,
-    Group = Constants.PropertyEditors.Groups.Lists,
-    Icon = "icon-thumbnail-list")]
+    Group = Constants.PropertyEditors.Groups.RichContent,
+    Icon = "icon-layout")]
 public class BlockGridPropertyEditor : BlockGridPropertyEditorBase
 {
     private readonly IIOHelper _ioHelper;
