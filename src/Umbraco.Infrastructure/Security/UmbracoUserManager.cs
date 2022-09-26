@@ -264,7 +264,7 @@ public abstract class UmbracoUserManager<TUser, TPasswordConfig> : UserManager<T
                                             typeof(IUserPasswordStore<>));
         }
 
-        var hash = await userPasswordStore.GetPasswordHashAsync(user, CancellationToken.None);
+        await userPasswordStore.GetPasswordHashAsync(user, CancellationToken.None);
 
         var result = await VerifyPasswordAsync(userPasswordStore, user, password);
 
