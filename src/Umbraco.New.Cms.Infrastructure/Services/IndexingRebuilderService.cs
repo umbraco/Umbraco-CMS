@@ -22,6 +22,8 @@ public class IndexingRebuilderService : IIndexingRebuilderService
         _runtimeCache = runtimeCache.RuntimeCache;
     }
 
+    public bool CanRebuild(string indexName) => _indexRebuilder.CanRebuild(indexName);
+
     public bool TryRebuild(IIndex index, string indexName)
     {
         // Remove it in case there's a handler there already

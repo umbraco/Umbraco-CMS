@@ -11,18 +11,15 @@ namespace Umbraco.Cms.ManagementApi.Controllers.ExamineManagement;
 public class RebuildExamineManagementController : ExamineManagementControllerBase
 {
     private readonly ILogger<RebuildExamineManagementController> _logger;
-    private readonly IIndexRebuilder _indexRebuilder;
     private readonly IIndexingRebuilderService _indexingRebuilderService;
     private readonly IExamineManager _examineManager;
 
     public RebuildExamineManagementController(
         ILogger<RebuildExamineManagementController> logger,
-        IIndexRebuilder indexRebuilder,
         IIndexingRebuilderService indexingRebuilderService,
         IExamineManager examineManager)
     {
         _logger = logger;
-        _indexRebuilder = indexRebuilder;
         _indexingRebuilderService = indexingRebuilderService;
         _examineManager = examineManager;
     }
@@ -51,7 +48,7 @@ public class RebuildExamineManagementController : ExamineManagementControllerBas
             return await Task.FromResult(BadRequest(invalidModelProblem));
         }
 
-        if (!_indexRebuilder.CanRebuild(index.Name))
+        if (!_indexingRebuilderService.CanRebuild(index.Name))
         {
             var invalidModelProblem = new ProblemDetails
             {
