@@ -10,6 +10,7 @@ import { UmbDataTypeStore } from '../src/core/stores/data-type/data-type.store';
 import { UmbDocumentTypeStore } from '../src/core/stores/document-type.store';
 import { UmbNodeStore } from '../src/core/stores/node.store';
 import { UmbPropertyEditorStore } from '../src/core/stores/property-editor/property-editor.store';
+import { UmbPropertyEditorConfigStore } from '../src/core/stores/property-editor-config/property-editor-config.store';
 import { onUnhandledRequest } from '../src/mocks/browser';
 import { handlers } from '../src/mocks/browser-handlers';
 import { internalManifests } from '../src/temp-internal-manifests';
@@ -41,6 +42,12 @@ const propertyEditorStoreProvider = (story) => html`
 	>
 `;
 
+const propertyEditorConfigStoreProvider = (story) => html`
+	<umb-context-provider key="umbPropertyEditorConfigStore" .value=${new UmbPropertyEditorConfigStore()}
+		>${story()}</umb-context-provider
+	>
+`;
+
 // Initialize MSW
 initialize({ onUnhandledRequest });
 
@@ -52,6 +59,7 @@ export const decorators = [
 	dataTypeStoreProvider,
 	documentTypeStoreProvider,
 	propertyEditorStoreProvider,
+	propertyEditorConfigStoreProvider,
 ];
 
 export const parameters = {
