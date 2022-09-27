@@ -157,6 +157,9 @@ export const data: Array<PropertyEditor> = [
 					propertyEditorUI: 'Umb.PropertyEditorUI.Textarea',
 				},
 			],
+			defaultData: {
+				maxChars: 512,
+			},
 		},
 	},
 	{

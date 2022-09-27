@@ -64,7 +64,7 @@ export interface PropertyEditor {
 
 export interface PropertyEditorConfig {
 	properties: PropertyEditorConfigProperty[];
-	defaultConfig?: {};
+	defaultData?: {};
 }
 
 export interface PropertyEditorConfigProperty {

@@ -184,7 +184,7 @@ export interface components {
     };
     PropertyEditorConfig: {
       properties: components["schemas"]["PropertyEditorConfigProperty"][];
-      defaultConfig?: { [key: string]: unknown };
+      defaultData?: { [key: string]: unknown };
     };
     MetaPropertyEditorUI: {
       label: string;
@@ -323,7 +323,7 @@ export interface components {
     };
     PropertyEditorConfigResponse: {
       properties: components["schemas"]["PropertyEditorConfigProperty"][];
-      defaultConfig?: { [key: string]: unknown };
+      defaultData?: { [key: string]: unknown };
     };
     /** @enum {string} */
     ServerStatus: "running" | "must-install" | "must-upgrade";

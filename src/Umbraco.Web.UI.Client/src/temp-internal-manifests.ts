@@ -179,10 +179,13 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 				properties: [
 					{
 						label: 'Some Configuration',
-						alias: 'someConfiruation',
+						alias: 'someConfiguration',
 						propertyEditorUI: 'Umb.PropertyEditorUI.Text',
 					},
 				],
+				defaultData: {
+					someConfiguration: 'Hello Default World',
+				},
 			},
 		},
 	},

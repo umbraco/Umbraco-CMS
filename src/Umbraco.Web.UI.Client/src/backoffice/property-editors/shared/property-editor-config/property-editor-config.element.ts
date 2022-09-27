@@ -45,6 +45,9 @@ export class UmbPropertyEditorConfigElement extends UmbContextConsumerMixin(LitE
 	@state()
 	private _properties: Array<PropertyEditorConfigProperty> = [];
 
+	private _propertyEditorConfigDefaultData?: any;
+	private _propertyEditorUIConfigDefaultData?: any;
+
 	private _propertyEditorConfigProperties: Array<PropertyEditorConfigProperty> = [];
 	private _propertyEditorUIConfigProperties: Array<PropertyEditorConfigProperty> = [];
 
@@ -78,6 +81,7 @@ export class UmbPropertyEditorConfigElement extends UmbContextConsumerMixin(LitE
 			.subscribe((propertyEditorConfig) => {
 				if (!propertyEditorConfig) return;
 				this._propertyEditorConfigProperties = propertyEditorConfig?.config?.properties || [];
+				this._propertyEditorConfigDefaultData = propertyEditorConfig?.config?.defaultData || {};
 				this._applyProperties();
 			});
 	}
@@ -90,6 +94,7 @@ export class UmbPropertyEditorConfigElement extends UmbContextConsumerMixin(LitE
 		this._extensionRegistry?.getByAlias(this.propertyEditorUIAlias).subscribe((manifest) => {
 			if (manifest?.type === 'propertyEditorUI') {
 				this._propertyEditorUIConfigProperties = manifest?.meta.config?.properties || [];
+				this._propertyEditorUIConfigDefaultData = manifest?.meta.config?.defaultData || {};
 				this._applyProperties();
 			}
 		});
@@ -97,6 +102,14 @@ export class UmbPropertyEditorConfigElement extends UmbContextConsumerMixin(LitE
 
 	private _applyProperties() {
 		this._properties = [...this._propertyEditorConfigProperties, ...this._propertyEditorUIConfigProperties];
+	}
+
+	private _getValue(property: PropertyEditorConfigProperty) {
+		const value = this.data.find((data) => data.alias === property.alias)?.value;
+		const defaultValue =
+			this._propertyEditorConfigDefaultData?.[property.alias] ||
+			this._propertyEditorUIConfigDefaultData?.[property.alias];
+		return value || defaultValue || null;
 	}
 
 	disconnectedCallback(): void {
@@ -116,7 +129,7 @@ export class UmbPropertyEditorConfigElement extends UmbContextConsumerMixin(LitE
 									description="${ifDefined(property.description)}"
 									alias="${property.alias}"
 									property-editor-ui-alias="${property.propertyEditorUI}"
-									.value=${this.data.find((data) => data.alias === property.alias)?.value}></umb-entity-property>
+									.value=${this._getValue(property)}></umb-entity-property>
 							`
 						)}
 				  `

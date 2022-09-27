@@ -609,7 +609,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/PropertyEditorConfigProperty'
-        defaultConfig:
+        defaultData:
           type: object
       required:
         - properties
@@ -966,7 +966,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/PropertyEditorConfigProperty'
-        defaultConfig:
+        defaultData:
           type: object
       required:
         - properties
