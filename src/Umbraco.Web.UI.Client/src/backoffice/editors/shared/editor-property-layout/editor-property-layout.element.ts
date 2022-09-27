@@ -1,6 +1,6 @@
 import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement } from 'lit/decorators.js';
+import { customElement, property } from 'lit/decorators.js';
 
 @customElement('umb-editor-property-layout')
 export class UmbEditorPropertyLayoutElement extends LitElement {
@@ -15,10 +15,23 @@ export class UmbEditorPropertyLayoutElement extends LitElement {
 		`,
 	];
 
+	@property({ type: String })
+	public label = '';
+
+	@property({ type: String })
+	public description = '';
+
 	render() {
 		return html`
-			<slot name="header" class="header"></slot>
-			<slot name="editor" class="editor"></slot>
+			<div>
+				<uui-label>${this.label}</uui-label>
+				<slot name="property-action-menu"></slot>
+				<p>${this.description}</p>
+				<slot name="header"></slot>
+			</div>
+			<div>
+				<slot name="editor"></slot>
+			</div>
 		`;
 	}
 }

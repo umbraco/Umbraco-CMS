@@ -149,27 +149,24 @@ export class UmbEntityPropertyElement extends UmbContextConsumerMixin(LitElement
 		this._propertyEditorUISubscription?.unsubscribe();
 	}
 
-	private _renderPropertyActionMenu() {
-		return html`${this.propertyEditorUIAlias
-			? html`<umb-property-action-menu
-					id="property-action-menu"
-					.propertyEditorUIAlias="${this.propertyEditorUIAlias}"
-					.value="${this.value}"></umb-property-action-menu>`
-			: ''}`;
-	}
-
 	render() {
 		return html`
-			<umb-editor-property-layout id="layout">
-				<div slot="header">
-					<uui-label>${this.label}</uui-label>
-					${this._renderPropertyActionMenu()}
-					<p>${this.description}</p>
-				</div>
+			<umb-editor-property-layout id="layout" label="${this.label}" description="${this.description}">
+				${this._renderPropertyActionMenu()}
 				<div slot="editor">${this._element}</div>
 			</umb-editor-property-layout>
 			<hr />
 		`;
+	}
+
+	private _renderPropertyActionMenu() {
+		return html`${this.propertyEditorUIAlias
+			? html`<umb-property-action-menu
+					slot="property-action-menu"
+					id="property-action-menu"
+					.propertyEditorUIAlias="${this.propertyEditorUIAlias}"
+					.value="${this.value}"></umb-property-action-menu>`
+			: ''}`;
 	}
 }
 
