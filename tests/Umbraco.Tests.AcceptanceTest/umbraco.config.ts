@@ -1,6 +1,6 @@
 const umbracoConfig = {
     environment: {
-      baseUrl: process.env.URL || "https://localhost:44331"
+      baseUrl: process.env.URL || "http://localhost:8080"
     },
     user: {
       login: process.env.UMBRACO_USER_LOGIN || "nge@umbraco.dk",

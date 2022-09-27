@@ -305,7 +305,7 @@ stages:
           - powershell: sqllocaldb start mssqllocaldb
             displayName: Start localdb (Windows only)
             condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
-          - powershell: docker run --name mssql -d -p 1433:1433 -e ACCEPT_EULA=Y -e SA_PASSWORD=$(SA_PASSWORD) -e MSSQL_PID=Developer mcr.microsoft.com/mssql/server:2019-latest 
+          - powershell: docker run --name mssql -d -p 1433:1433 -e ACCEPT_EULA=Y -e SA_PASSWORD=$(SA_PASSWORD) -e MSSQL_PID=Developer mcr.microsoft.com/mssql/server:2019-latest
             displayName: Start SQL Server (Linux only)
             condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
           - task: DotNetCoreCLI@2
@@ -334,17 +334,17 @@ stages:
           - name: Umbraco__CMS__Unattended__InstallUnattended  # Windows only
             value: true
           - name: Umbraco__CMS__Unattended__UnattendedUserName  # Windows only
-            value: Cypress Test
+            value: Playwright test
           - name: Umbraco__CMS__Unattended__UnattendedUserEmail  # Windows only
-            value: cypress@umbraco.com
+            value: nge@umbraco.dk
           - name: Umbraco__CMS__Unattended__UnattendedUserPassword  # Windows only
-            value: UmbracoAcceptance123!
+            value: 1234567890
           - name: Umbraco__CMS__Global__InstallMissingDatabase  # Windows only
             value: true
           - name: UmbracoDatabaseServer # Windows only
             value: (LocalDB)\MSSQLLocalDB
           - name: UmbracoDatabaseName  # Windows only
-            value: Cypress
+            value: Playwright
           - name: ConnectionStrings__umbracoDbDSN  # Windows only
             value: Server=$(UmbracoDatabaseServer);Database=$(UmbracoDatabaseName);Integrated Security=true;
           - name: CYPRESS_BASE_URL
@@ -440,7 +440,7 @@ stages:
             inputs:
               targetType: inline
               workingDirectory: tests/Umbraco.Tests.AcceptanceTest
-              script: 'npm run test -- --reporter junit --reporter-options "mochaFile=results/test-output-D-[hash].xml,toConsole=true" --config="viewportHeight=1600,viewportWidth=2560,screenshotsFolder=cypress/artifacts/desktop/screenshots,videosFolder=cypress/artifacts/desktop/videos,videoUploadOnPasses=false"'
+              script: 'npm run ui --reporter junit --reporter-options "mochaFile=results/test-output-D-[hash].xml,toConsole=true"'
           - task: PublishTestResults@2
             displayName: Publish test results
             condition: always()
