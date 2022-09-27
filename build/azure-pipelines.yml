@@ -435,6 +435,12 @@ stages:
                 npm i -g wait-on
                 wait-on -v --interval 1000 --timeout 120000 $(CYPRESS_BASE_URL)
           - task: PowerShell@2
+            displayName: Install playwright
+            inputs:
+              targetType: inline
+              workingDirectory: tests/Umbraco.Tests.AcceptanceTest
+              script: npx playwright install
+          - task: PowerShell@2
             displayName: Run Cypress (Desktop)
             continueOnError: true
             inputs:
