@@ -322,7 +322,6 @@ export interface components {
       config?: components["schemas"]["PropertyEditorConfig"];
     };
     PropertyEditorConfigResponse: {
-      propertyEditorAlias: string;
       properties: components["schemas"]["PropertyEditorConfigProperty"][];
       defaultConfig?: { [key: string]: unknown };
     };

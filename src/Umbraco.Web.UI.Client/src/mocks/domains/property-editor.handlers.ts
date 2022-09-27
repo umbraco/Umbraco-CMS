@@ -37,12 +37,8 @@ export const handlers = [
 		if (!alias) return;
 
 		const config = umbPropertyEditorData.getConfig(alias);
+		if (!config) return;
 
-		const response = {
-			propertyEditorAlias: alias,
-			config: config,
-		};
-
-		return res(ctx.status(200), ctx.json<PropertyEditorConfigResponse>(response));
+		return res(ctx.status(200), ctx.json<PropertyEditorConfigResponse>(config));
 	}),
 ];

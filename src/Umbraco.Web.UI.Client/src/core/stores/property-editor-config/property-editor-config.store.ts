@@ -2,15 +2,23 @@ import { BehaviorSubject, map, Observable } from 'rxjs';
 import { getPropertyEditorConfig } from '../../api/fetcher';
 import type { PropertyEditorConfig } from '../../models';
 
-export class UmbPropertyEditorConfigStore {
-	private _items: BehaviorSubject<Array<PropertyEditorConfig>> = new BehaviorSubject(<Array<PropertyEditorConfig>>[]);
-	public readonly items: Observable<Array<PropertyEditorConfig>> = this._items.asObservable();
+export interface PropertyEditorConfigRef {
+	propertyEditorAlias: string;
+	config: PropertyEditorConfig;
+}
 
-	getByAlias(alias: string): Observable<PropertyEditorConfig | undefined> {
+export class UmbPropertyEditorConfigStore {
+	private _items: BehaviorSubject<Array<PropertyEditorConfigRef>> = new BehaviorSubject(
+		<Array<PropertyEditorConfigRef>>[]
+	);
+	public readonly items: Observable<Array<PropertyEditorConfigRef>> = this._items.asObservable();
+
+	getByAlias(alias: string): Observable<PropertyEditorConfigRef | undefined> {
 		// TODO: only fetch if the data type is not in the store?
 		getPropertyEditorConfig({ propertyEditorAlias: alias })
 			.then((res) => {
-				this.update([res.data]);
+				const propertyEditorConfigRef: PropertyEditorConfigRef = { propertyEditorAlias: alias, config: res.data };
+				this.update([propertyEditorConfigRef]);
 			})
 			.catch((err) => {
 				console.log(err);
@@ -19,9 +27,9 @@ export class UmbPropertyEditorConfigStore {
 		return this.items.pipe(map((items) => items.find((item) => item.propertyEditorAlias === alias)));
 	}
 
-	public update(updatedItems: Array<PropertyEditorConfig>) {
+	public update(updatedItems: Array<PropertyEditorConfigRef>) {
 		const storedItems = this._items.getValue();
-		const updated: PropertyEditorConfig[] = [...storedItems];
+		const updated: PropertyEditorConfigRef[] = [...storedItems];
 
 		updatedItems.forEach((updatedItem) => {
 			const index = storedItems

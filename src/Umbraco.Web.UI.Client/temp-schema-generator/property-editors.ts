@@ -50,9 +50,7 @@ export interface PropertyEditorsListResponse {
 
 export interface PropertyEditorResponse extends PropertyEditor {}
 
-export interface PropertyEditorConfigResponse extends PropertyEditorConfig {
-	propertyEditorAlias: string;
-}
+export interface PropertyEditorConfigResponse extends PropertyEditorConfig {}
 
 export interface PropertyEditor {
 	alias: string;
