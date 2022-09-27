@@ -12,7 +12,7 @@ import type { UmbExtensionRegistry } from '../../../../../core/extension';
 import type { UmbPropertyEditorStore } from '../../../../../core/stores/property-editor/property-editor.store';
 import type { ManifestPropertyEditorUI } from '../../../../../core/models';
 
-import '../../shared/property-editor-config.element';
+import '../../../../property-editors/shared/property-editor-config.element';
 
 @customElement('umb-editor-view-data-type-edit')
 export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(LitElement) {

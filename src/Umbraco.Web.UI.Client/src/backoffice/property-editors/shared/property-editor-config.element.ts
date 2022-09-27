@@ -3,13 +3,13 @@ import { html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { Subscription } from 'rxjs';
-import { UmbContextConsumerMixin } from '../../../../core/context';
-import { UmbExtensionRegistry } from '../../../../core/extension';
-import { UmbPropertyEditorConfigStore } from '../../../../core/stores/property-editor-config/property-editor-config.store';
+import { UmbContextConsumerMixin } from '../../../core/context';
+import { UmbExtensionRegistry } from '../../../core/extension';
+import { UmbPropertyEditorConfigStore } from '../../../core/stores/property-editor-config/property-editor-config.store';
 
-import type { PropertyEditorConfigProperty } from '../../../../core/models';
+import type { PropertyEditorConfigProperty } from '../../../core/models';
 
-import '../../../components/entity-property/entity-property.element';
+import '../../components/entity-property/entity-property.element';
 
 @customElement('umb-property-editor-config')
 export class UmbPropertyEditorConfigElement extends UmbContextConsumerMixin(LitElement) {
