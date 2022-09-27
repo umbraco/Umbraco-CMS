@@ -153,36 +153,38 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Li
 
 	render() {
 		return html`
-			<uui-box headline="Property Editor" style="margin-bottom: 20px;"> ${this._renderPropertyEditorUI()} </uui-box>
+			<uui-box style="margin-bottom: 20px;"> ${this._renderPropertyEditorUI()} </uui-box>
 			${this._renderConfig()} </uui-box>
 		`;
 	}
 
 	private _renderPropertyEditorUI() {
 		return html`
-			<h4>Property Editor UI</h4>
-
-			${this._dataType?.propertyEditorUIAlias
-				? html`
-						<!-- TODO: border is a bit weird attribute name. Maybe single or standalone would be better? -->
-						<umb-ref-property-editor-ui
-							name=${this._propertyEditorUIName}
-							alias=${this._propertyEditorUIAlias}
-							property-editor-alias=${this._propertyEditorAlias}
-							border>
-							<uui-icon name="${this._propertyEditorUIIcon}" slot="icon"></uui-icon>
-							<uui-action-bar slot="actions">
-								<uui-button label="Change" @click=${this._openPropertyEditorUIPicker}></uui-button>
-							</uui-action-bar>
-						</umb-ref-property-editor-ui>
-				  `
-				: html`
-						<uui-button
-							label="Select Property Editor UI"
-							look="placeholder"
-							color="default"
-							@click=${this._openPropertyEditorUIPicker}></uui-button>
-				  `}
+			<umb-editor-property-layout label="Property Editor" description="Select a property editor">
+				${this._dataType?.propertyEditorUIAlias
+					? html`
+							<!-- TODO: border is a bit weird attribute name. Maybe single or standalone would be better? -->
+							<umb-ref-property-editor-ui
+								slot="editor"
+								name=${this._propertyEditorUIName}
+								alias=${this._propertyEditorUIAlias}
+								property-editor-alias=${this._propertyEditorAlias}
+								border>
+								<uui-icon name="${this._propertyEditorUIIcon}" slot="icon"></uui-icon>
+								<uui-action-bar slot="actions">
+									<uui-button label="Change" @click=${this._openPropertyEditorUIPicker}></uui-button>
+								</uui-action-bar>
+							</umb-ref-property-editor-ui>
+					  `
+					: html`
+							<uui-button
+								slot="editor"
+								label="Select Property Editor"
+								look="placeholder"
+								color="default"
+								@click=${this._openPropertyEditorUIPicker}></uui-button>
+					  `}
+			</umb-editor-property-layout>
 		`;
 	}
 
