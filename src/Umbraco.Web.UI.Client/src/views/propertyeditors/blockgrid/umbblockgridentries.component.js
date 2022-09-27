@@ -212,6 +212,11 @@
                     else {
                         prevEntries.splice(oldIndex, 1);
                     }
+                    
+                    vm.entries.splice(newIndex, 0, syncEntry);
+
+                    // I currently do not think below line is necessary as this is updated through angularJS. This was giving trouble/errors.
+                    //fromCtrl.$element.insertBefore(evt.item, nextSibling); // revert element
 
                     const contextColumns = vm.blockEditorApi.internal.getContextColumns(vm.parentBlock, vm.areaKey);
 
@@ -232,11 +237,6 @@
                         syncEntry.forceRight = false;
                     }
                     
-                    vm.entries.splice(newIndex, 0, syncEntry);
-
-                    // I currently do not think below line is necessary as this is updated through angularJS. This was giving trouble/errors.
-                    //evt.from.insertBefore(evt.item, nextSibling); // revert element
-                    
                 }
                 else {
                     vm.entries.splice(newIndex, 0, vm.entries.splice(oldIndex, 1)[0]);
@@ -244,7 +244,7 @@
                     // TODO: I don't think this is necessary, I would like to prove it purpose:
                     // move ng-repeat comment node to right position:
                     /*if (nextSibling.nodeType === Node.COMMENT_NODE) {
-                        evt.from.insertBefore(nextSibling, evt.item.nextSibling);
+                        fromCtrl.$element.insertBefore(nextSibling, evt.item.nextSibling);
                     }*/
                 }
             }
@@ -639,7 +639,9 @@
                         // We will let SortableJS do the move when switching to a new container, otherwise not.
                         approvedContainerEl = evt.to;
                         approvedContainerDate = new Date().getTime();
-                        return true;
+
+                        // Always return false, cause it ends bad when sortableJS tries to do it..
+                        return false;
                     }
     
                     // Disable SortableJS from handling the drop, instead we will use our own.
@@ -661,17 +663,17 @@
                 },
                 
                 onAdd: function (evt) {
-                    //console.log("# onAdd")
+                    //console.log("# onAdd", vm, vm.movingLayoutEntry)
                     _sync(evt);
                     $scope.$evalAsync();
                 },
                 onUpdate: function (evt) {
-                    //console.log("# onUpdate", evt)
+                    //console.log("# onUpdate", vm)
                     _sync(evt);
                     $scope.$evalAsync();
                 },
                 onEnd: function(evt) {
-                    console.log("# onEnd");
+                    //console.log("# onEnd", vm);
                     if(rqaId !== null) {
                         cancelAnimationFrame(rqaId);
                     }
