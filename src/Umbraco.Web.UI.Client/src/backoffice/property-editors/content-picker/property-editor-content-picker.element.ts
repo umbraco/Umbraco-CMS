@@ -37,6 +37,9 @@ export class UmbPropertyEditorContentPickerElement extends UmbContextConsumerMix
 	@property({ type: Array })
 	public value: Array<string> = [];
 
+	@property({ type: Array, attribute: false })
+	public config = [];
+
 	@state()
 	private _items: Array<Entity> = [];
 
