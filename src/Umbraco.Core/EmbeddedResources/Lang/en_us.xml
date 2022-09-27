@@ -2892,6 +2892,9 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="scaleHandlerButtonTitle">Drag to scale</key>
     <key alias="areaCreateLabelTitle">Create Button Label</key>
     <key alias="areaCreateLabelHelp">Overwrite the label on the create button of this Area.</key>
+    <key alias="addSizeOptions">Add resize options</key>
+    <key alias="addAreaOptions">Add areas</key>
+    <key alias="addAppearanceOptions">Add catalogue appearance</key>
   </area>
   <area alias="contentTemplatesDashboard">
     <key alias="whatHeadline">What are Content Templates?</key>

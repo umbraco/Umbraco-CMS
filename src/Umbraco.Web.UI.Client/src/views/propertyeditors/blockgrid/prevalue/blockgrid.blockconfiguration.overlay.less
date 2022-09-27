@@ -68,6 +68,7 @@
         font-weight: bold;
         display: inline-flex;
         flex-flow: row nowrap;
+        align-items: center;
 
         localize {
             width: 100%;
@@ -79,11 +80,15 @@
             overflow: hidden;
         }
 
+        
+
         &.--noValue {
             text-align: center;
             border-radius: @baseBorderRadius;
-            color: white;
             transition: color 120ms;
+            &.--hideText {
+                color: white;
+            }
             &:hover, &:focus {
                 color: @ui-action-discreet-type-hover;
                 border-color: @ui-action-discreet-border-hover;

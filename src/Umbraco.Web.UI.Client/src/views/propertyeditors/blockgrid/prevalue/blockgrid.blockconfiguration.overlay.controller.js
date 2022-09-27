@@ -29,6 +29,10 @@
             value: {min: vm.block.rowMinSpan || 1, max: vm.block.rowMaxSpan || 1}
         }
 
+        vm.showSizeOptions = vm.block.columnSpanOptions.length > 0 || vm.rowMinMaxModel.value.min !== 1 || vm.rowMinMaxModel.value.max !== 1;
+        vm.showAreaOptions = vm.block.areas.length > 0;
+        vm.showAppearanceOptions = !!vm.block.backgroundColor || !!vm.block.iconColor || !!vm.block.thumbnail;
+
         loadElementTypes();
 
         function loadElementTypes() {
