@@ -8,6 +8,7 @@
   <Import Project="..\Umbraco.Cms\buildTransitive\Umbraco.Cms.props" />
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Cms\Umbraco.Cms.csproj" />
+    <ProjectReference Include="..\Umbraco.Cms.ManagementApi\Umbraco.Cms.ManagementApi.csproj" />
   </ItemGroup>
 
   <ItemGroup>

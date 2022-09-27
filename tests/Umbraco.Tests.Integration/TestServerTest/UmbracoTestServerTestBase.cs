@@ -19,9 +19,6 @@ using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Cms.ManagementApi;
-using Umbraco.Cms.ManagementApi.Configuration;
-using Umbraco.Cms.ManagementApi.Controllers.Install;
 using Umbraco.Cms.Persistence.Sqlite;
 using Umbraco.Cms.Persistence.SqlServer;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -240,17 +237,12 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
 
                     // Adds Umbraco.Tests.Integration
                     mvcBuilder.AddApplicationPart(typeof(UmbracoTestServerTestBase).Assembly);
-
-                    // Adds Umbraco.Tests.Integration
-                    mvcBuilder.AddApplicationPart(typeof(InstallControllerBase).Assembly);
                 })
                 .AddWebServer()
                 .AddWebsite()
                 .AddUmbracoSqlServerSupport()
                 .AddUmbracoSqliteSupport()
                 .AddTestServices(TestHelper); // This is the important one!
-
-            new ManagementApiComposer().Compose(builder);
 
             CustomTestSetup(builder);
             builder.Build();

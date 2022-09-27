@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -12,18 +13,23 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.NewBackoffice;
 
-// We only run this test in release because the schema looks different depending if it's built against release or debug.
-// XML summaries is included in the description of a response model in release, but not debug mode.
-#if DEBUG
-[Ignore("This test runs only in release")]
-#endif
 [TestFixture]
-public class OpenAPIContractTest : UmbracoTestServerTestBase
+internal sealed class OpenAPIContractTest : UmbracoTestServerTestBase
 {
-
     private GlobalSettings GlobalSettings => GetRequiredService<IOptions<GlobalSettings>>().Value;
 
     private IHostingEnvironment HostingEnvironment => GetRequiredService<IHostingEnvironment>();
+
+    protected override void CustomTestSetup(IUmbracoBuilder builder)
+    {
+        builder.AddMvcAndRazor(mvcBuilder =>
+        {
+            // Adds Umbraco.Cms.ManagementApi
+            mvcBuilder.AddApplicationPart(typeof(ManagementApi.Controllers.Install.InstallControllerBase).Assembly);
+        });
+
+        new ManagementApi.ManagementApiComposer().Compose(builder);
+    }
 
     [Test]
     public async Task Validate_OpenApi_Contract_is_implemented()
@@ -39,7 +45,6 @@ public class OpenAPIContractTest : UmbracoTestServerTestBase
         var generatedJsonString = await Client.GetStringAsync(swaggerPath);
         var mergedContract = JObject.Parse(generatedJsonString);
         var originalGeneratedContract = JObject.Parse(generatedJsonString);
-
 
         mergedContract.Merge(apiContract, new JsonMergeSettings
         {
