@@ -11,6 +11,237 @@
     }
   ],
   "paths": {
+    "/umbraco/api/v1/examineManagement/index": {
+      "get": {
+        "operationId": "IndexExamineManagement_Index",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "indexName",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExamineIndexViewModel"
+                }
+              }
+            },
+            "description": ""
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "ExamineManagement"
+        ]
+      }
+    },
+    "/umbraco/api/v1/examineManagement/indexes": {
+      "get": {
+        "operationId": "IndexesExamineManagement_Indexes",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "skip",
+            "schema": {
+              "format": "int32",
+              "type": "integer"
+            },
+            "x-position": 1
+          },
+          {
+            "in": "query",
+            "name": "take",
+            "schema": {
+              "format": "int32",
+              "type": "integer"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedViewModelOfExamineIndexViewModel"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "ExamineManagement"
+        ]
+      }
+    },
+    "/umbraco/api/v1/examineManagement/rebuild": {
+      "post": {
+        "operationId": "RebuildExamineManagement_Rebuild",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "indexName",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": ""
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "ExamineManagement"
+        ]
+      }
+    },
+    "/umbraco/api/v1/examineManagement/search": {
+      "get": {
+        "operationId": "SearchExamineManagement_GetSearchResults",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "searcherName",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            },
+            "x-position": 1
+          },
+          {
+            "in": "query",
+            "name": "query",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            },
+            "x-position": 2
+          },
+          {
+            "in": "query",
+            "name": "skip",
+            "schema": {
+              "format": "int32",
+              "type": "integer"
+            },
+            "x-position": 3
+          },
+          {
+            "in": "query",
+            "name": "take",
+            "schema": {
+              "format": "int32",
+              "type": "integer"
+            },
+            "x-position": 4
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedViewModelOfPagedViewModelOfSearchResultViewModel"
+                }
+              }
+            },
+            "description": ""
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "ExamineManagement"
+        ]
+      }
+    },
+    "/umbraco/api/v1/examineManagement/searchers": {
+      "get": {
+        "operationId": "SearchersExamineManagement_Searchers",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "skip",
+            "schema": {
+              "format": "int32",
+              "type": "integer"
+            },
+            "x-position": 1
+          },
+          {
+            "in": "query",
+            "name": "take",
+            "schema": {
+              "format": "int32",
+              "type": "integer"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedViewModelOfSearcherViewModel"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "ExamineManagement"
+        ]
+      }
+    },
     "/umbraco/api/v1/install/settings": {
       "get": {
         "tags": [
@@ -627,6 +858,9 @@
     }
   },
   "tags": [
+    {
+      "name": "ExamineManagement"
+    },
     {
       "name": "Install"
     },
