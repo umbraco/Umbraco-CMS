@@ -1,4 +1,3 @@
-import { UmbData } from './data';
 import { Entity } from './entities';
 import { UmbEntityData } from './entity.data';
 
