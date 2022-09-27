@@ -109,7 +109,7 @@ stages:
                   }
                 }
 
-                dotnet pack $(solution) --configuration $(buildConfiguration) --no-build --output $(Build.ArtifactStagingDirectory)/nupkg
+                dotnet pack $(solution) --configuration $(buildConfiguration) --no-build -p:BuildProjectReferences=false --output $(Build.ArtifactStagingDirectory)/nupkg
           - script: |
               sha="$(Build.SourceVersion)"
               sha=${sha:0:7}
