@@ -31,6 +31,12 @@ export interface paths {
   "/property-editors/property-editor/config/{propertyEditorAlias}": {
     get: operations["PropertyEditorConfigEndpoint"];
   };
+  "/published-cache/status": {
+    get: operations["PublishedCacheStatus"];
+  };
+  "/published-cache/reload": {
+    post: operations["PublishedCacheReload"];
+  };
   "/server/status": {
     get: operations["GetStatus"];
   };
@@ -508,6 +514,35 @@ export interface operations {
       };
       /** default response */
       default: {
+        content: {
+          "application/json": components["schemas"]["ProblemDetails"];
+        };
+      };
+    };
+  };
+  PublishedCacheStatus: {
+    responses: {
+      /** 200 response */
+      200: {
+        content: {
+          "application/json": string;
+        };
+      };
+      /** default response */
+      default: {
+        content: {
+          "application/json": components["schemas"]["ProblemDetails"];
+        };
+      };
+    };
+  };
+  PublishedCacheReload: {
+    parameters: {};
+    responses: {
+      /** 201 response */
+      201: unknown;
+      /** 400 response */
+      400: {
         content: {
           "application/json": components["schemas"]["ProblemDetails"];
         };

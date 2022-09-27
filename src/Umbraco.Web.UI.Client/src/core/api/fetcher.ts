@@ -32,3 +32,5 @@ export const getPropertyEditorConfig = fetcher
 	.path('/property-editors/property-editor/config/{propertyEditorAlias}')
 	.method('get')
 	.create();
+export const getPublishedCacheStatus = fetcher.path('/published-cache/status').method('get').create();
+export const postPublishedCacheReload = fetcher.path('/published-cache/reload').method('post').create();
