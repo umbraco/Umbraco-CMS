@@ -1,5 +1,6 @@
 import { UmbData } from './data';
 import type { PropertyEditor } from '../../core/models';
+import { cloneDeep } from 'lodash';
 
 export const data: Array<PropertyEditor> = [
 	{
@@ -327,15 +328,20 @@ class UmbPropertyEditorData extends UmbData<PropertyEditor> {
 	}
 
 	getAll() {
-		return this.data;
+		const clonedEditors = cloneDeep(this.data);
+		clonedEditors.forEach((editor) => delete editor.config);
+		return clonedEditors;
 	}
 
 	getByAlias(alias: string) {
-		return this.data.find((x) => x.alias === alias);
+		const editor = this.data.find((e) => e.alias === alias);
+		const clone = cloneDeep(editor);
+		delete clone?.config;
+		return clone;
 	}
 
 	getConfig(alias: string) {
-		const editor = this.getByAlias(alias);
+		const editor = this.data.find((e) => e.alias === alias);
 		return editor?.config ?? undefined;
 	}
 }
