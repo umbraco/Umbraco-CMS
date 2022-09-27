@@ -429,11 +429,46 @@ internal class CollectibleRuntimeViewCompiler : IViewCompiler
 
         if (!_normalizedPathCache.TryGetValue(relativePath, out var normalizedPath))
         {
-            normalizedPath = relativePath; /* ViewPath.NormalizePath(relativePath); */
+            normalizedPath = NormalizePath(relativePath);
             _normalizedPathCache[relativePath] = normalizedPath;
         }
 
         return normalizedPath;
+    }
+
+    // Taken from: https://github.com/dotnet/aspnetcore/blob/a450cb69b5e4549f5515cdb057a68771f56cefd7/src/Mvc/Mvc.Razor/src/ViewPath.cs
+    // This normalizes the relative path to the view, ensuring that it matches with what we have as keys in _precompiledViews
+    private string NormalizePath(string path)
+    {
+        var addLeadingSlash = path[0] != '\\' && path[0] != '/';
+        var transformSlashes = path.IndexOf('\\') != -1;
+
+        if (!addLeadingSlash && !transformSlashes)
+        {
+            return path;
+        }
+
+        var length = path.Length;
+        if (addLeadingSlash)
+        {
+            length++;
+        }
+
+        return string.Create(length, (path, addLeadingSlash), (span, tuple) =>
+        {
+            var (pathValue, addLeadingSlashValue) = tuple;
+            var spanIndex = 0;
+
+            if (addLeadingSlashValue)
+            {
+                span[spanIndex++] = '/';
+            }
+
+            foreach (var ch in pathValue)
+            {
+                span[spanIndex++] = ch == '\\' ? '/' : ch;
+            }
+        });
     }
 
     private sealed class ViewCompilerWorkItem
