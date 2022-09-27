@@ -102,7 +102,7 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Li
 		this._propertyEditorUISubscription = this._extensionRegistry
 			?.getByAlias<ManifestPropertyEditorUI>(propertyEditorUIAlias)
 			.subscribe((propertyEditorUI) => {
-				this._propertyEditorUIName = propertyEditorUI?.name ?? '';
+				this._propertyEditorUIName = propertyEditorUI?.meta.label ?? propertyEditorUI?.name ?? '';
 				this._propertyEditorUIAlias = propertyEditorUI?.alias ?? '';
 				this._propertyEditorUIIcon = propertyEditorUI?.meta?.icon ?? '';
 
