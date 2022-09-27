@@ -97,8 +97,6 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
             _debugLevel = _config.DebugLevel;
         }
 
-        public event EventHandler? ModelsChanged;
-
         /// <summary>
         /// Gets the currently loaded Live models assembly
         /// </summary>
@@ -301,15 +299,17 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
 
                         CurrentModelsAssembly = assembly;
 
-                        // Raise the model changing event.
-                        // NOTE: That on first load, if there is content, this will execute before the razor view engine
-                        // has loaded which means it hasn't yet bound to this event so there's no need to worry about if
-                        // it will be eagerly re-generated unecessarily on first render. BUT we should be aware that if we
-                        // change this to use the event aggregator that will no longer be the case.
-                        ModelsChanged?.Invoke(this, new EventArgs());
                         /*
-                         * In regards to the above comment, this does indeed clear the cache regardless on first load.
-                         * However, this is still not really a big problem since this will execute before the razor view engine has loaded,
+                         * We used to use an event here, and a RefreshingRazorViewEngine to bust the caches,
+                         * this worked by essentially completely recreating the entire ViewEngine/ViewCompiler every time we generate models.
+                         * There was this note about first load:
+                         * NOTE: That on first load, if there is content, this will execute before the razor view engine
+                         * has loaded which means it hasn't yet bound to this event so there's no need to worry about if
+                         * it will be eagerly re-generated unnecessarily on first render. BUT we should be aware that if we
+                         * change this to use the event aggregator that will no longer be the case.
+                         *
+                         * Now we have our own ViewCompiler, and clear the caches more directly, however what the comment mentioned
+                         * is not really a big problem since this will execute before the razor view engine has loaded,
                          * which means the cache will be empty already.
                          */
                         _runtimeCompilationCacheBuster.BustCache();
