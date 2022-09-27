@@ -183,6 +183,7 @@ export interface components {
       propertyEditorUI: string;
     };
     MetaPropertyEditorUI: {
+      label: string;
       propertyEditor: string;
       icon: string;
       group: string;

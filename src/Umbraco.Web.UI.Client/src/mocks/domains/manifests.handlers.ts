@@ -28,8 +28,9 @@ export const manifestDevelopmentHandler = rest.get(umbracoPath('/manifests'), (_
 					js: '/src/mocks/App_Plugins/property-editor.js',
 					elementName: 'my-property-editor-ui-custom',
 					meta: {
+						label: 'My Custom Property',
 						icon: 'document',
-						group: 'common',
+						group: 'Common',
 						propertyEditor: 'Umbraco.Custom',
 					},
 				},

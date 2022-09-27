@@ -100,6 +100,7 @@ export interface MetaTreeItemAction {
 	weight: number;
 }
 export interface MetaPropertyEditorUI extends PropertyEditorConfig {
+	label: string;
 	propertyEditor: string;
 	icon: string;
 	group: string;

@@ -133,23 +133,25 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 	{
 		type: 'propertyEditorUI',
 		alias: 'Umb.PropertyEditorUI.Text',
-		name: 'Text',
+		name: 'Text Property Editor UI',
 		loader: () => import('./backoffice/property-editors/text/property-editor-text.element'),
 		meta: {
-			icon: 'edit',
-			group: 'common',
+			label: 'Text',
+			icon: 'umb:edit',
+			group: 'Common',
 			propertyEditor: 'Umbraco.TextBox',
 		},
 	},
 	{
 		type: 'propertyEditorUI',
 		alias: 'Umb.PropertyEditorUI.Textarea',
-		name: 'Textarea',
+		name: 'Textarea Property Editor UI',
 		elementName: 'umb-property-editor-textarea',
 		loader: () => import('./backoffice/property-editors/textarea/property-editor-textarea.element'),
 		meta: {
-			icon: 'edit',
-			group: 'common',
+			label: 'Textarea',
+			icon: 'umb:edit',
+			group: 'Common',
 			propertyEditor: 'Umbraco.TextArea',
 			config: {
 				properties: [
@@ -166,11 +168,12 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 	{
 		type: 'propertyEditorUI',
 		alias: 'Umb.PropertyEditorUI.ContextExample',
-		name: 'Context Example',
+		name: 'Context Example Property Editor UI',
 		loader: () => import('./backoffice/property-editors/context-example/property-editor-context-example.element'),
 		meta: {
-			icon: 'favorite',
-			group: 'common',
+			label: 'Context Example',
+			icon: 'umb:favorite',
+			group: 'Common',
 			propertyEditor: 'Umbraco.Custom',
 			config: {
 				properties: [
@@ -186,9 +189,10 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 	{
 		type: 'propertyEditorUI',
 		alias: 'Umb.PropertyEditorUI.Number',
-		name: 'Property Editor Number',
+		name: 'Number Property Editor UI',
 		loader: () => import('./backoffice/property-editors/number/property-editor-number.element'),
 		meta: {
+			label: 'Number',
 			icon: 'umb:autofill',
 			group: 'Common',
 			propertyEditor: 'Umbraco.Integer',
@@ -323,13 +327,14 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 	{
 		type: 'propertyEditorUI',
 		alias: 'Umb.PropertyEditorUI.ContentPicker',
-		name: 'ContentPicker',
+		name: 'Content Picker Property Editor UI',
 		elementName: 'umb-property-editor-content-picker',
 		loader: () => import('./backoffice/property-editors/content-picker/property-editor-content-picker.element'),
 		meta: {
+			label: 'Content Picker',
 			propertyEditor: 'Umbraco.ContentPicker',
-			icon: 'document',
-			group: 'common',
+			icon: 'umb:document',
+			group: 'Common',
 		},
 	},
 	{
@@ -535,40 +540,6 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 			label: 'Delete',
 			icon: 'delete',
 			weight: 100,
-		},
-	},
-	{
-		type: 'propertyEditorUI',
-		alias: 'Umb.PropertyEditorUI.TextArea',
-		name: 'Textarea',
-		elementName: 'umb-property-editor-textarea',
-		loader: () => import('./backoffice/property-editors/textarea/property-editor-textarea.element'),
-		meta: {
-			icon: 'edit',
-			group: 'common',
-			propertyEditor: 'Umbraco.Unknown',
-			config: {
-				properties: [
-					{
-						alias: 'rows',
-						label: 'Number of rows',
-						description: 'If empty - 10 rows would be set as the default value',
-						propertyEditorUI: 'Umb.PropertyEditorUI.Number',
-					},
-				],
-			},
-		},
-	},
-	{
-		type: 'propertyEditorUI',
-		alias: 'Umb.PropertyEditorUI.TextField',
-		name: 'Text Field',
-		elementName: 'umb-property-editor-text',
-		loader: () => import('./backoffice/property-editors/text/property-editor-text.element'),
-		meta: {
-			icon: 'edit',
-			group: 'common',
-			propertyEditor: 'Umbraco.Unknown',
 		},
 	},
 ];

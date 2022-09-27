@@ -318,30 +318,6 @@ export const data: Array<PropertyEditor> = [
 		icon: 'umb:autofill',
 		alias: 'Umbraco.Custom',
 	},
-	{
-		isSystem: false,
-		group: 'Custom',
-		hasConfig: true,
-		name: 'String',
-		icon: 'umb:autofill',
-		alias: 'Umbraco.String',
-		config: {
-			properties: [
-				{
-					alias: 'minChars',
-					label: 'Minimum allowed characters',
-					description: 'If empty, no min characters limit',
-					propertyEditorUI: 'Umb.PropertyEditorUI.Number',
-				},
-				{
-					alias: 'maxChars',
-					label: 'Maximum allowed characters',
-					description: 'If empty, 512 character limit',
-					propertyEditorUI: 'Umb.PropertyEditorUI.Number',
-				},
-			],
-		},
-	},
 ];
 
 // Temp mocked database

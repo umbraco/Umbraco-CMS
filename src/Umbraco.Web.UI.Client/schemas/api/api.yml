@@ -605,6 +605,8 @@ components:
     MetaPropertyEditorUI:
       type: object
       properties:
+        label:
+          type: string
         propertyEditor:
           type: string
         icon:
@@ -623,6 +625,7 @@ components:
           required:
             - properties
       required:
+        - label
         - propertyEditor
         - icon
         - group

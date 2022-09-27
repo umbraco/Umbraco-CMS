@@ -3,6 +3,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { Subscription } from 'rxjs';
+import { groupBy } from 'lodash';
 import { UmbContextConsumerMixin } from '../../../../context';
 
 import type { UUIInputEvent } from '@umbraco-ui/uui';
@@ -18,13 +19,6 @@ export interface UmbModalPropertyEditorUIPickerData {
 interface GroupedPropertyEditorUIs {
 	[key: string]: Array<ManifestPropertyEditorUI>;
 }
-
-const groupBy = (xs: Array<any>, key: string) => {
-	return xs.reduce(function (rv, x) {
-		(rv[x[key]] = rv[x[key]] || []).push(x);
-		return rv;
-	}, {});
-};
 
 @customElement('umb-modal-layout-property-editor-ui-picker')
 export class UmbModalLayoutPropertyEditorUIPickerElement extends UmbContextConsumerMixin(LitElement) {
@@ -136,7 +130,7 @@ export class UmbModalLayoutPropertyEditorUIPickerElement extends UmbContextConsu
 			?.extensionsOfType('propertyEditorUI')
 			.subscribe((propertyEditorUIs) => {
 				this._propertyEditorUIs = propertyEditorUIs;
-				this._groupedPropertyEditorUIs = groupBy(propertyEditorUIs, 'group');
+				this._groupedPropertyEditorUIs = groupBy(propertyEditorUIs, 'meta.group');
 			});
 	}
 
@@ -160,7 +154,7 @@ export class UmbModalLayoutPropertyEditorUIPickerElement extends UmbContextConsu
 					);
 			  });
 
-		this._groupedPropertyEditorUIs = groupBy(result, 'group');
+		this._groupedPropertyEditorUIs = groupBy(result, 'meta.group');
 	}
 
 	private _close() {
@@ -214,7 +208,7 @@ export class UmbModalLayoutPropertyEditorUIPickerElement extends UmbContextConsu
 				(propertyEditorUI) => html` <li class="item" ?selected=${this._selection.includes(propertyEditorUI.alias)}>
 					<button type="button" @click="${() => this._handleClick(propertyEditorUI)}">
 						<uui-icon name="${propertyEditorUI.meta.icon}" class="icon"></uui-icon>
-						${propertyEditorUI.name}
+						${propertyEditorUI.meta.label || propertyEditorUI.name}
 					</button>
 				</li>`
 			)}
