@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-const configPath = './cypress.env.json';
+const configPath = './playwright.env.json';
 
 try {
   if (fs.existsSync(configPath)) {

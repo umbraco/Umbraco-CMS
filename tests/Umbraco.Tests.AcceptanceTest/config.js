@@ -20,7 +20,7 @@ const properties = [
 ];
 
 
-const configPath = './cypress.env.json'
+const configPath = './playwright.env.json'
 
 console.log("Configure your test enviroment")
 
