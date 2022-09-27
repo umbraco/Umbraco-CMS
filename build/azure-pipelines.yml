@@ -348,7 +348,7 @@ stages:
           - name: ConnectionStrings__umbracoDbDSN  # Windows only
             value: Server=$(UmbracoDatabaseServer);Database=$(UmbracoDatabaseName);Integrated Security=true;
           - name: CYPRESS_BASE_URL
-            value: https://localhost:44331
+            value: http://localhost:8080
         strategy:
           matrix:
             Linux:
@@ -383,11 +383,13 @@ stages:
               key: '"cypress_binaries" | "$(Agent.OS)" | $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/package-lock.json'
               path: $(CYPRESS_CACHE_FOLDER)
           - task: PowerShell@2
-            displayName: Generate Cypress.env.json
+            displayName: Generate .env
             inputs:
               targetType: inline
               script: >
-                @{ username = "$(Umbraco__CMS__Unattended__UnattendedUserEmail)"; password = "$(Umbraco__CMS__Unattended__UnattendedUserPassword)" } | ConvertTo-Json | Set-Content -Path "tests/Umbraco.Tests.AcceptanceTest/cypress.env.json"#
+                @UMBRACO_USER_LOGIN=nge@umbraco.dk
+                 UMBRACO_USER_PASSWORD=1234567890
+                 URL=http://localhost:8080 | ConvertTo-Json | Set-Content -Path "tests/Umbraco.Tests.AcceptanceTest/.env"#
           - script: npm ci --no-fund --no-audit --prefer-offline
             workingDirectory:  $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/
             displayName: Run npm ci
