@@ -113,6 +113,10 @@ context('Routing', () => {
 
         // Refresh to update the tree
         refreshContentTree();
+        // We have to reload the entire page to see the language change.
+        cy.reload();
+        cy.get('.umb-tour-step', { timeout: 60000 }).should('be.visible'); // We now due to the api calls this will be shown, but slow computers can take a while
+        cy.get('.umb-tour-step__close').click();
 
         cy.umbracoTreeItem("content", [nodeName, childNodeName]).click();
         cy.umbracoButtonByLabelKey('buttons_saveAndPublish').click();
@@ -169,6 +173,10 @@ context('Routing', () => {
 
         // Refresh to update the tree
         refreshContentTree();
+        // We have to reload the entire page to see the language change.
+        cy.reload();
+        cy.get('.umb-tour-step', { timeout: 60000 }).should('be.visible'); // We now due to the api calls this will be shown, but slow computers can take a while
+        cy.get('.umb-tour-step__close').click();
 
         cy.umbracoTreeItem("content", [nodeName, childNodeName]).click();
         cy.umbracoButtonByLabelKey('buttons_saveAndPublish').click();
@@ -345,6 +353,10 @@ context('Routing', () => {
 
         // Refresh to update the tree
         refreshContentTree();
+        // We have to reload the entire page to see the language change.
+        cy.reload();
+        cy.get('.umb-tour-step', { timeout: 60000 }).should('be.visible'); // We now due to the api calls this will be shown, but slow computers can take a while
+        cy.get('.umb-tour-step__close').click();
 
         // Publish Child
         cy.umbracoTreeItem("content", [nodeName, childNodeName]).click();

@@ -683,7 +683,7 @@ context('Content', () => {
     cy.umbracoSuccessNotification().should('be.visible');
 
     // Ensure that the view gets rendered correctly
-    const expected = `<h1>Acceptance test</h1><p> </p>`;
+    const expected = `<p> </p><h1>Acceptance test</h1><p> </p>`;
     cy.umbracoVerifyRenderedViewContent('/', expected, true).should('be.true');
 
     // Cleanup
