@@ -54,20 +54,19 @@ export interface PropertyEditorConfigResponse extends PropertyEditorConfig {
 	propertyEditorAlias: string;
 }
 
-export interface PropertyEditor extends PropertyEditorConfig {
+export interface PropertyEditor {
 	alias: string;
 	name: string;
 	icon: string;
 	group?: string;
 	isSystem: boolean;
 	hasConfig: boolean;
+	config?: PropertyEditorConfig;
 }
 
 export interface PropertyEditorConfig {
-	config?: {
-		properties: PropertyEditorConfigProperty[];
-		defaultConfig?: {};
-	};
+	properties: PropertyEditorConfigProperty[];
+	defaultConfig?: {};
 }
 
 export interface PropertyEditorConfigProperty {

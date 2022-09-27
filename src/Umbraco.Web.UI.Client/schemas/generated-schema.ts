@@ -182,15 +182,16 @@ export interface components {
       alias: string;
       propertyEditorUI: string;
     };
+    PropertyEditorConfig: {
+      properties: components["schemas"]["PropertyEditorConfigProperty"][];
+      defaultConfig?: { [key: string]: unknown };
+    };
     MetaPropertyEditorUI: {
       label: string;
       propertyEditor: string;
       icon: string;
       group: string;
-      config?: {
-        properties: components["schemas"]["PropertyEditorConfigProperty"][];
-        defaultConfig?: { [key: string]: unknown };
-      };
+      config?: components["schemas"]["PropertyEditorConfig"];
     };
     IManifestPropertyEditorUI: {
       /** @enum {string} */
@@ -306,10 +307,7 @@ export interface components {
       group?: string;
       isSystem: boolean;
       hasConfig: boolean;
-      config?: {
-        properties: components["schemas"]["PropertyEditorConfigProperty"][];
-        defaultConfig?: { [key: string]: unknown };
-      };
+      config?: components["schemas"]["PropertyEditorConfig"];
     };
     PropertyEditorsListResponse: {
       propertyEditors: components["schemas"]["PropertyEditor"][];
@@ -321,17 +319,12 @@ export interface components {
       group?: string;
       isSystem: boolean;
       hasConfig: boolean;
-      config?: {
-        properties: components["schemas"]["PropertyEditorConfigProperty"][];
-        defaultConfig?: { [key: string]: unknown };
-      };
+      config?: components["schemas"]["PropertyEditorConfig"];
     };
     PropertyEditorConfigResponse: {
       propertyEditorAlias: string;
-      config?: {
-        properties: components["schemas"]["PropertyEditorConfigProperty"][];
-        defaultConfig?: { [key: string]: unknown };
-      };
+      properties: components["schemas"]["PropertyEditorConfigProperty"][];
+      defaultConfig?: { [key: string]: unknown };
     };
     /** @enum {string} */
     ServerStatus: "running" | "must-install" | "must-upgrade";

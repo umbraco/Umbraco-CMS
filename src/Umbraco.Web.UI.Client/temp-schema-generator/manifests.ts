@@ -99,11 +99,12 @@ export interface MetaTreeItemAction {
 	icon: string;
 	weight: number;
 }
-export interface MetaPropertyEditorUI extends PropertyEditorConfig {
+export interface MetaPropertyEditorUI {
 	label: string;
 	propertyEditor: string;
 	icon: string;
 	group: string;
+	config?: PropertyEditorConfig;
 }
 
 export interface MetaDashboard {

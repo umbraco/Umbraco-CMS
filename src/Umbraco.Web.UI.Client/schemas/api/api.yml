@@ -602,6 +602,17 @@ components:
         - label
         - alias
         - propertyEditorUI
+    PropertyEditorConfig:
+      type: object
+      properties:
+        properties:
+          type: array
+          items:
+            $ref: '#/components/schemas/PropertyEditorConfigProperty'
+        defaultConfig:
+          type: object
+      required:
+        - properties
     MetaPropertyEditorUI:
       type: object
       properties:
@@ -614,16 +625,7 @@ components:
         group:
           type: string
         config:
-          type: object
-          properties:
-            properties:
-              type: array
-              items:
-                $ref: '#/components/schemas/PropertyEditorConfigProperty'
-            defaultConfig:
-              type: object
-          required:
-            - properties
+          $ref: '#/components/schemas/PropertyEditorConfig'
       required:
         - label
         - propertyEditor
@@ -918,16 +920,7 @@ components:
         hasConfig:
           type: boolean
         config:
-          type: object
-          properties:
-            properties:
-              type: array
-              items:
-                $ref: '#/components/schemas/PropertyEditorConfigProperty'
-            defaultConfig:
-              type: object
-          required:
-            - properties
+          $ref: '#/components/schemas/PropertyEditorConfig'
       required:
         - alias
         - name
@@ -959,16 +952,7 @@ components:
         hasConfig:
           type: boolean
         config:
-          type: object
-          properties:
-            properties:
-              type: array
-              items:
-                $ref: '#/components/schemas/PropertyEditorConfigProperty'
-            defaultConfig:
-              type: object
-          required:
-            - properties
+          $ref: '#/components/schemas/PropertyEditorConfig'
       required:
         - alias
         - name
@@ -980,19 +964,15 @@ components:
       properties:
         propertyEditorAlias:
           type: string
-        config:
+        properties:
+          type: array
+          items:
+            $ref: '#/components/schemas/PropertyEditorConfigProperty'
+        defaultConfig:
           type: object
-          properties:
-            properties:
-              type: array
-              items:
-                $ref: '#/components/schemas/PropertyEditorConfigProperty'
-            defaultConfig:
-              type: object
-          required:
-            - properties
       required:
         - propertyEditorAlias
+        - properties
     ServerStatus:
       type: string
       enum:
