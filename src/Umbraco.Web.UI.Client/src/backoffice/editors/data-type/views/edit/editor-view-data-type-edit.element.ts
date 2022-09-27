@@ -126,21 +126,17 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Li
 		if (!this._dataType) return;
 
 		const modalHandler = this._modalService?.propertyEditorUIPicker({
-			selection: this._dataType.propertyEditorUIAlias ? [this._dataType.propertyEditorUIAlias] : [],
+			selection: this._propertyEditorUIAlias ? [this._propertyEditorUIAlias] : [],
 		});
 
 		modalHandler?.onClose().then(({ selection } = {}) => {
 			if (!selection) return;
-
-			const propertyEditorUIAlias = selection[0];
-			this._selectPropertyEditorUI(propertyEditorUIAlias);
+			this._selectPropertyEditorUI(selection[0]);
 		});
 	}
 
 	private _selectPropertyEditorUI(propertyEditorUIAlias: string | null) {
 		if (!this._dataType || this._dataType.propertyEditorUIAlias === propertyEditorUIAlias) return;
-
-		this._dataType.propertyEditorUIAlias = propertyEditorUIAlias;
 		this._dataTypeContext?.update({ propertyEditorUIAlias });
 	}
 
@@ -161,7 +157,7 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Li
 	private _renderPropertyEditorUI() {
 		return html`
 			<umb-editor-property-layout label="Property Editor" description="Select a property editor">
-				${this._dataType?.propertyEditorUIAlias
+				${this._propertyEditorUIAlias
 					? html`
 							<!-- TODO: border is a bit weird attribute name. Maybe single or standalone would be better? -->
 							<umb-ref-property-editor-ui
