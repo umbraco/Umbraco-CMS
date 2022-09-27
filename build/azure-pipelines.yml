@@ -387,9 +387,9 @@ stages:
             inputs:
               targetType: inline
               script: >
-                @UMBRACO_USER_LOGIN=nge@umbraco.dk
-                 UMBRACO_USER_PASSWORD=1234567890
-                 URL=http://localhost:8080 | ConvertTo-Json | Set-Content -Path "tests/Umbraco.Tests.AcceptanceTest/.env"#
+                UMBRACO_USER_LOGIN=nge@umbraco.dk
+                UMBRACO_USER_PASSWORD=1234567890
+                URL=https://localhost:44332 | ConvertTo-Json | Set-Content -Path "tests/Umbraco.Tests.AcceptanceTest/cypress.env.json"#
           - script: npm ci --no-fund --no-audit --prefer-offline
             workingDirectory:  $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/
             displayName: Run npm ci
