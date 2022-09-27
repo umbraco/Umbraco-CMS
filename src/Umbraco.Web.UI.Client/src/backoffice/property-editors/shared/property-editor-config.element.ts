@@ -99,6 +99,12 @@ export class UmbPropertyEditorConfigElement extends UmbContextConsumerMixin(LitE
 		this._properties = [...this._propertyEditorConfigProperties, ...this._propertyEditorUIConfigProperties];
 	}
 
+	disconnectedCallback(): void {
+		super.disconnectedCallback();
+		this._propertyEditorConfigSubscription?.unsubscribe();
+		this._propertyEditorUIConfigSubscription?.unsubscribe();
+	}
+
 	render() {
 		return html`
 			${this._properties.length > 0
