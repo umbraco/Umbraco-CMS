@@ -1,6 +1,6 @@
 ﻿import {test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
-import {umbracoConfig} from "../../../umbraco.config";
+import {umbracoConfig} from "../../umbraco.config";
 
 test.describe('Test', () => {
 

@@ -1,7 +1,7 @@
 import {ApiHelpers, ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 import {ContentBuilder, DocumentTypeBuilder} from "@umbraco/playwright-models";
-import {umbracoConfig} from "../../../../umbraco.config";
+import {umbracoConfig} from "../../../umbraco.config";
 
 test.describe('Routing', () => {
   let swedishLanguageId = 0;
