@@ -3,6 +3,12 @@ import { DataTypeDetails } from '../../../mocks/data/data-type.data';
 import { UmbEntityStore } from '../entity.store';
 import { UmbDataStoreBase } from '../store';
 
+/**
+ * @export
+ * @class UmbDataTypeStore
+ * @extends {UmbDataStoreBase<DataTypeDetails>}
+ * @description - Data Store for Data Types
+ */
 export class UmbDataTypeStore extends UmbDataStoreBase<DataTypeDetails> {
 	private _entityStore: UmbEntityStore;
 
@@ -11,6 +17,12 @@ export class UmbDataTypeStore extends UmbDataStoreBase<DataTypeDetails> {
 		this._entityStore = entityStore;
 	}
 
+	/**
+	 * @description - Request a Data Type by key. The Data Type is returned as an Observable.
+	 * @param {string} key
+	 * @return {*}  {(Observable<DataTypeDetails | null>)}
+	 * @memberof UmbDataTypeStore
+	 */
 	getByKey(key: string): Observable<DataTypeDetails | null> {
 		// TODO: use Fetcher API.
 		// TODO: only fetch if the data type is not in the store?
@@ -25,7 +37,13 @@ export class UmbDataTypeStore extends UmbDataStoreBase<DataTypeDetails> {
 		);
 	}
 
-	async save(dataTypes: Array<DataTypeDetails>) {
+	/**
+	 * @description - Save a Data Type.
+	 * @param {Array<DataTypeDetails>} dataTypes
+	 * @memberof UmbDataTypeStore
+	 * @return {*}  {Promise<void>}
+	 */
+	async save(dataTypes: Array<DataTypeDetails>): Promise<void> {
 		// TODO: use Fetcher API.
 		try {
 			const res = await fetch('/umbraco/backoffice/data-type/save', {
@@ -43,7 +61,13 @@ export class UmbDataTypeStore extends UmbDataStoreBase<DataTypeDetails> {
 		}
 	}
 
-	async trash(keys: string[]) {
+	/**
+	 * @description - Add a Data Type to the recycle bin.
+	 * @param {string[]} keys
+	 * @memberof UmbDataTypeStore
+	 * @return {*}  {Promise<void>}
+	 */
+	async trash(keys: string[]): Promise<void> {
 		const res = await fetch('/umbraco/backoffice/data-type/trash', {
 			method: 'POST',
 			body: JSON.stringify(keys),

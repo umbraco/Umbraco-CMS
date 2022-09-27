@@ -15,6 +15,10 @@ import '../shared/editor-entity-layout/editor-entity-layout.element';
 import './views/edit/editor-view-data-type-edit.element';
 import { UmbNotificationDefaultData } from '../../../core/services/notification/layouts/default';
 
+/**
+ *  @element umb-editor-data-type
+ *  @description - Element for displaying a Data Type Editor
+ */
 @customElement('umb-editor-data-type')
 export class UmbEditorDataTypeElement extends UmbContextProviderMixin(UmbContextConsumerMixin(LitElement)) {
 	static styles = [
