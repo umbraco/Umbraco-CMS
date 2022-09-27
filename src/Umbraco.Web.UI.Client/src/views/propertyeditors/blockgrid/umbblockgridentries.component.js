@@ -53,7 +53,8 @@
                 parentBlock: "<?",
                 parentForm: "<?",
                 propertyEditorForm: "<?",
-                depth: "@"
+                depth: "@",
+                createLabel: "@?"
             }
         }
     );

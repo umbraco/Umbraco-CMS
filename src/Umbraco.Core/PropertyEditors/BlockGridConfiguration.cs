@@ -47,6 +47,9 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 [DataMember(Name ="alias")]
                 public string? Alias { get; set; }
 
+                [DataMember(Name ="createLabel")]
+                public string? CreateLabel { get; set; }
+
                 [DataMember(Name ="columnSpan")]
                 public int? ColumnSpan { get; set; }
 

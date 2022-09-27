@@ -48,7 +48,8 @@
                 property-editor-form="vm.propertyEditorForm"
                 ng-mouseover="vm.mouseOverArea(areaEntry)"
                 ng-mouseleave="vm.mouseLeaveArea()"
-                depth="{{vm.childDepth}}">
+                depth="{{vm.childDepth}}"
+                create-label="{{::areaEntry.$config.createLabel}}">
             </umb-block-grid-entries>
 
         </umb-block-grid-block>
