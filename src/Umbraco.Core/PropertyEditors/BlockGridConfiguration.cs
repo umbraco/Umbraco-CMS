@@ -143,5 +143,8 @@ namespace Umbraco.Cms.Core.PropertyEditors
         
         [ConfigurationField("layoutStylesheet", "Layout Stylesheet", "views/propertyeditors/blockgrid/prevalue/blockgrid.stylesheetpicker.html", Description = "Overwrite default stylesheet for layout.")]
         public string? LayoutStylesheet { get; set; }
+
+        [ConfigurationField("createLabel", "Create Button Label", "textstring", Description = "Overwrite the root create button label")]
+        public string? CreateLabel { get; set; }
     }
 }

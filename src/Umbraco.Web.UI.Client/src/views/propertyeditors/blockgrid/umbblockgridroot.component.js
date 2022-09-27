@@ -16,6 +16,7 @@
             controllerAs: "vm",
             bindings: {
                 gridColumns: "@",
+                createLabel: "@",
                 stylesheet: "@",
                 blockEditorApi: "<",
                 propertyEditorForm: "<?",
@@ -51,7 +52,8 @@
                         entries="vm.entries"
                         layout-columns="vm.gridColumns"
                         property-editor-form="vm.propertyEditorForm"
-                        depth="0">
+                        depth="0"
+                        create-label="{{::vm.createLabel}}">
                     </umb-block-grid-entries>
                 </div>
             `;

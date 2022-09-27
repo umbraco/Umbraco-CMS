@@ -123,6 +123,7 @@
 
             vm.validationLimit = vm.model.config.validationLimit;
             vm.gridColumns = vm.model.config.gridColumns || 12;
+            vm.createLabel = vm.model.config.createLabel || "";
 
             vm.editorWrapperStyles = {};
 
