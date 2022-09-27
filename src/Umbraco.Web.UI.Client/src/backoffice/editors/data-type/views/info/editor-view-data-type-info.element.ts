@@ -43,7 +43,32 @@ export class UmbEditorViewDataTypeInfoElement extends UmbContextConsumerMixin(Li
 	}
 
 	render() {
-		return html`<div>Data type info</div> `;
+		return html` ${this._renderGeneralInfo()}${this._renderReferences()} `;
+	}
+
+	private _renderGeneralInfo() {
+		return html`
+			<uui-box headline="General" style="margin-bottom: 20px;">
+				<umb-editor-property-layout label="Key">
+					<div slot="editor">${this._dataType?.key}</div>
+				</umb-editor-property-layout>
+				<umb-editor-property-layout
+					label="Property Editor Alias
+">
+					<div slot="editor">${this._dataType?.propertyEditorAlias}</div>
+				</umb-editor-property-layout>
+
+				<umb-editor-property-layout
+					label="Property Editor UI Alias
+">
+					<div slot="editor">${this._dataType?.propertyEditorUIAlias}</div>
+				</umb-editor-property-layout>
+			</uui-box>
+		`;
+	}
+
+	private _renderReferences() {
+		return html` <uui-box headline="References"> </uui-box> `;
 	}
 }
 
