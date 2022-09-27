@@ -27,7 +27,6 @@ export class UmbEditorPropertyLayoutElement extends LitElement {
 				<uui-label>${this.label}</uui-label>
 				<slot name="property-action-menu"></slot>
 				<p>${this.description}</p>
-				<slot name="header"></slot>
 			</div>
 			<div>
 				<slot name="editor"></slot>
