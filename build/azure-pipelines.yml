@@ -441,7 +441,7 @@ stages:
               workingDirectory: tests/Umbraco.Tests.AcceptanceTest
               script: npx playwright install
           - task: PowerShell@2
-            displayName: Run Cypress (Desktop)
+            displayName: Run Playwright (Desktop)
             continueOnError: true
             inputs:
               targetType: inline
