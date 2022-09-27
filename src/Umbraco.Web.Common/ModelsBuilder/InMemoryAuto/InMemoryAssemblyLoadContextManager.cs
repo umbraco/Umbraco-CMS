@@ -11,6 +11,10 @@ internal class InMemoryAssemblyLoadContextManager
     public InMemoryAssemblyLoadContextManager() =>
         AssemblyLoadContext.Default.Resolving += OnResolvingDefaultAssemblyLoadContext;
 
+    private string? _modelsAssemblyLocation;
+
+    public string? ModelsAssemblyLocation => _modelsAssemblyLocation;
+
     /// <summary>
     /// Handle the event when a reference cannot be resolved from the default context and return our custom MB assembly reference if we have one
     /// </summary>
@@ -22,10 +26,6 @@ internal class InMemoryAssemblyLoadContextManager
         => assemblyName.Name == RoslynCompiler.GeneratedAssemblyName
             ? _currentAssemblyLoadContext?.LoadFromAssemblyName(assemblyName)
             : null;
-
-    private string? _modelsAssemblyLocation;
-
-    public string? ModelsAssemblyLocation => _modelsAssemblyLocation;
 
     internal void RenewAssemblyLoadContext()
     {

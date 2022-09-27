@@ -379,12 +379,6 @@ internal class CollectibleRuntimeViewCompiler : IViewCompiler
                     result.Diagnostics);
             }
 
-            // Time to actually load the assembly
-            // if (_currentAssemblyLoadContext is null)
-            // {
-            //     _currentAssemblyLoadContext = new UmbracoAssemblyLoadContext();
-            // }
-
             assemblyStream.Seek(0, SeekOrigin.Begin);
             pdbStream?.Seek(0, SeekOrigin.Begin);
 
