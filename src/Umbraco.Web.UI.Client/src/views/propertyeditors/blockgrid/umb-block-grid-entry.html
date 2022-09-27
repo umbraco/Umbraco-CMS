@@ -24,35 +24,32 @@
                               api="vm.blockEditorApi"
                               block="vm.layoutEntry.$block"
                               index="vm.index"
-                              parent-form="vm.blockForm">
-            <div
-                slot="areas"
-                class="umb-block-grid__area-container"
-                data-area-grid-columns="vm.areaGridColumns"
-                style="--umb-block-grid--area-grid-columns: {{vm.areaGridColumns}}">
-                <umb-block-grid-entries 
-                    ng-repeat="areaEntry in vm.layoutEntry.areas track by areaEntry.key"
-                    class="umb-block-grid__area"
-                    data-area-col-span="{{::areaEntry.$config.columnSpan}}"
-                    data-area-row-span="{{::areaEntry.$config.rowSpan}}"
-                    data-area-alias="{{::areaEntry.$config.alias}}"
-                    style="
-                    --umb-block-grid--grid-columns: {{::areaEntry.$config.columnSpan}};
-                    --umb-block-grid--area-column-span: {{::areaEntry.$config.columnSpan}};
-                    --umb-block-grid--area-row-span: {{::areaEntry.$config.rowSpan}};
-                    "
-                    block-editor-api="vm.blockEditorApi"
-                    entries="areaEntry.items"
-                    area-key="areaEntry.key"
-                    layout-columns="areaEntry.$config.columnSpan"
-                    parent-block="vm.layoutEntry.$block"
-                    parent-form="vm.blockForm"
-                    property-editor-form="vm.propertyEditorForm"
-                    ng-mouseover="vm.mouseOverArea(areaEntry)"
-                    ng-mouseleave="vm.mouseLeaveArea()"
-                    depth="{{vm.childDepth}}">
-                </umb-block-grid-entries>
-            </div>
+                              parent-form="vm.blockForm"
+                              style="--umb-block-grid--area-grid-columns: {{vm.areaGridColumns}}"
+                              >
+            <umb-block-grid-entries 
+                slot="area-container"
+                ng-repeat="areaEntry in vm.layoutEntry.areas track by areaEntry.key"
+                class="umb-block-grid__area"
+                data-area-col-span="{{::areaEntry.$config.columnSpan}}"
+                data-area-row-span="{{::areaEntry.$config.rowSpan}}"
+                data-area-alias="{{::areaEntry.$config.alias}}"
+                style="
+                --umb-block-grid--grid-columns: {{::areaEntry.$config.columnSpan}};
+                --umb-block-grid--area-column-span: {{::areaEntry.$config.columnSpan}};
+                --umb-block-grid--area-row-span: {{::areaEntry.$config.rowSpan}};
+                "
+                block-editor-api="vm.blockEditorApi"
+                entries="areaEntry.items"
+                area-key="areaEntry.key"
+                layout-columns="areaEntry.$config.columnSpan"
+                parent-block="vm.layoutEntry.$block"
+                parent-form="vm.blockForm"
+                property-editor-form="vm.propertyEditorForm"
+                ng-mouseover="vm.mouseOverArea(areaEntry)"
+                ng-mouseleave="vm.mouseLeaveArea()"
+                depth="{{vm.childDepth}}">
+            </umb-block-grid-entries>
 
         </umb-block-grid-block>
 

@@ -20,7 +20,7 @@
 }
 
 
-.umb-block-grid__area-container {
+.umb-block-grid__area-container, .umb-block-grid__block--view::part(area-container) {
     position: relative;
     display: grid;
     grid-template-columns: repeat(var(--umb-block-grid--area-grid-columns, var(--umb-block-grid--grid-columns, 1)), minmax(0, 1fr));

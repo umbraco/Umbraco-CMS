@@ -22,12 +22,10 @@
             "
         >
 
-            <div class="umb-block-grid__block--view">
+            <div class="umb-block-grid__block--view" style="--umb-block-grid--area-grid-columns: {{ 'the-configured-amount' or 'inherited layout columns'}};">
                 <!-- render razor view for this block. -->
                 <!-- Razor view must handle/inject/ decide where the 'area-container' should be printed: -->
-                <div class="umb-block-grid__area-container"
-                     style="--umb-block-grid--area-grid-columns: {{ 'the-configured-amount' or 'inherited layout columns'}};"
-                >
+                <div class="umb-block-grid__area-container">
 
                     <!-- repeat for each area configured for this block type. -->
                     <div

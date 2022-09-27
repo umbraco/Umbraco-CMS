@@ -217,7 +217,7 @@ ng-form.ng-invalid-val-server-match-content > .umb-block-grid__block:not(.--acti
             /* take full width to prevent interaction with elements behind.*/
             left: 0;
         }
-        .umb-block-grid__area-container {
+        .umb-block-grid__area-container, .umb-block-grid__block--view::part(area-container) {
             --umb-block-grid--block-ui-display: none;
             .umb-block-grid__layout-item {
                 pointer-events: none;

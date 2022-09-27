@@ -24,7 +24,7 @@
 }
 
 
-.umb-block-grid__area-container {
+.umb-block-grid__area-container, .umb-block-grid__block--view::part(area-container) {
     position: relative;
     display: flex;
     flex-wrap: wrap;
