@@ -1,4 +1,4 @@
-import {ConstantHelper, test} from '../../../lib';
+import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 import {LabelDataTypeBuilder} from "@umbraco/playwright-models";
 

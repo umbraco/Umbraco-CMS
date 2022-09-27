@@ -1,5 +1,5 @@
 ﻿import { expect, Page } from '@playwright/test';
-import { test, ApiHelpers, UiHelpers, AliasHelper } from '../../../lib';
+import { test, ApiHelpers, UiHelpers, AliasHelper } from '@umbraco/playwright-testhelpers';
 import { UserGroupBuilder } from '@umbraco/playwright-models';
 
 test.describe('User groups', () => {

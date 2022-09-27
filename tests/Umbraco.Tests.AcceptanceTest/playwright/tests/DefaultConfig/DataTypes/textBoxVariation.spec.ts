@@ -1,5 +1,5 @@
 ﻿import {expect} from "@playwright/test";
-import {AliasHelper, ConstantHelper, test} from '../../../lib';
+import {AliasHelper, ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {ContentBuilder, DocumentTypeBuilder, DomainBuilder} from "@umbraco/playwright-models";
 
 test.describe('Vary by culture for TextBox', () => {

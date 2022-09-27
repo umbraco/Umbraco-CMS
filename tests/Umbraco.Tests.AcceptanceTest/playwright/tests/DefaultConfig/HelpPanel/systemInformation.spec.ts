@@ -1,4 +1,4 @@
-import {ConstantHelper, test, UiHelpers} from '../../../lib';
+import {ConstantHelper, test, UiHelpers} from '@umbraco/playwright-testhelpers';
 import {expect, Page} from "@playwright/test";
 
 test.describe('System Information', () => {

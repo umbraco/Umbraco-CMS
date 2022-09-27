@@ -1,4 +1,4 @@
-import {ConstantHelper, test} from '../../../lib';
+import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 
 test.describe('Packages', () => {
 

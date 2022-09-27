@@ -1,4 +1,4 @@
-﻿import {AliasHelper, ApiHelpers, test} from '../../lib';
+﻿import {AliasHelper, ApiHelpers, test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 import {ContentBuilder, DocumentTypeBuilder, MacroBuilder, PartialViewMacroBuilder} from "@umbraco/playwright-models";
 

@@ -1,4 +1,4 @@
-import {test} from '../../../lib';
+import {test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 import {ContentBuilder, DocumentTypeBuilder} from "@umbraco/playwright-models";
 

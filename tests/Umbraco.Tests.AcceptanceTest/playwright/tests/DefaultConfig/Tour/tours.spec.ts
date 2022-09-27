@@ -1,6 +1,6 @@
 import {expect} from '@playwright/test';
-import {test} from '../../../lib';
-import {umbracoConfig} from "../../../umbraco.config";
+import {test} from '@umbraco/playwright-testhelpers';
+import {umbracoConfig} from "../../../../umbraco.config";
 
 test.describe('Tours', () => {
   const timeout = 60000;

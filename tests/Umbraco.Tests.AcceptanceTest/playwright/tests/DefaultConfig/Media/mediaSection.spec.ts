@@ -1,6 +1,5 @@
-﻿
-import {expect, request} from "@playwright/test";
-import {ConstantHelper, test} from '../../../lib';
+﻿import {expect, request} from "@playwright/test";
+import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 
 test.describe('Media', () => {
 

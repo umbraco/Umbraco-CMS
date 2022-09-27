@@ -1,4 +1,4 @@
-import {AliasHelper, ApiHelpers, ConstantHelper, test} from '../../../lib';
+import {AliasHelper, ApiHelpers, ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 import {
   ContentBuilder,

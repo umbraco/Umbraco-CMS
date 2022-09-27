@@ -1,5 +1,5 @@
 import {expect} from '@playwright/test';
-import {ConstantHelper, test} from '../../../lib';
+import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {ContentBuilder, DocumentTypeBuilder, PackageBuilder} from "@umbraco/playwright-models";
 
 test.describe('Packages', () => {

@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { umbracoConfig } from '../../../umbraco.config';
+import { umbracoConfig } from '../../../../umbraco.config';
 test.describe('Login', () => {
 
     test.beforeEach(async ({ page }) => {

@@ -1,5 +1,5 @@
 import { expect, Page } from '@playwright/test';
-import {test, ApiHelpers, UiHelpers, AliasHelper, ConstantHelper} from '../../../lib';
+import {test, ApiHelpers, UiHelpers, AliasHelper, ConstantHelper} from '@umbraco/playwright-testhelpers';
 import { DocumentTypeBuilder } from "@umbraco/playwright-models";
 
 const tabsDocTypeName = 'Tabs Test Document';
