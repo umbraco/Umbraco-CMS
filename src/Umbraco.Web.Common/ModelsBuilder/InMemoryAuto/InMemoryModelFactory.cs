@@ -5,6 +5,7 @@ using System.Runtime.Loader;
 using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
+using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
@@ -35,6 +36,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
         private readonly IApplicationShutdownRegistry _hostingLifetime;
         private readonly ModelsGenerationError _errors;
         private readonly IPublishedValueFallback _publishedValueFallback;
+        private readonly Lazy<IRazorViewEngine> _razorViewEngine;
         private readonly Lazy<string> _pureLiveDirectory = null!;
         private readonly int _debugLevel;
         private Infos _infos = new Infos { ModelInfos = null, ModelTypeMap = new Dictionary<string, Type>() };
@@ -54,7 +56,8 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
             IOptionsMonitor<ModelsBuilderSettings> config,
             IHostingEnvironment hostingEnvironment,
             IApplicationShutdownRegistry hostingLifetime,
-            IPublishedValueFallback publishedValueFallback)
+            IPublishedValueFallback publishedValueFallback,
+            Lazy<IRazorViewEngine> razorViewEngine)
         {
             _umbracoServices = umbracoServices;
             _profilingLogger = profilingLogger;
@@ -63,6 +66,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
             _hostingEnvironment = hostingEnvironment;
             _hostingLifetime = hostingLifetime;
             _publishedValueFallback = publishedValueFallback;
+            _razorViewEngine = razorViewEngine;
             _errors = new ModelsGenerationError(config, _hostingEnvironment);
             _ver = 1; // zero is for when we had no version
             _skipver = -1; // nothing to skip
@@ -108,6 +112,8 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
         public object SyncRoot { get; } = new object();
 
         private UmbracoServices UmbracoServices => _umbracoServices.Value;
+
+        private IRazorViewEngine RazorViewEngine => _razorViewEngine.Value;
 
         /// <summary>
         /// Gets the RoslynCompiler
@@ -310,6 +316,15 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
 
                         CurrentModelsAssembly = assembly;
 
+                        var test = RazorViewEngine.ToString();
+                        if (RazorViewEngine is RazorViewEngine castedViewEngine)
+                        {
+                            MethodInfo? firstOrDefault = castedViewEngine.GetType().AllMethods().FirstOrDefault(x => x.Name == "ClearCache");
+                            if (firstOrDefault is not null)
+                            {
+                                firstOrDefault.Invoke(castedViewEngine, null);
+                            }
+                        }
                         // Raise the model changing event.
                         // NOTE: That on first load, if there is content, this will execute before the razor view engine
                         // has loaded which means it hasn't yet bound to this event so there's no need to worry about if

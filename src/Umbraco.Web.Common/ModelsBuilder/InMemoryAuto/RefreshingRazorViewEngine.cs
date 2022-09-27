@@ -58,7 +58,7 @@ using Microsoft.AspNetCore.Mvc.ViewEngines;
  *   graph includes all of the above mentioned services, all the way up to the RazorProjectEngine and it's LazyMetadataReferenceFeature.
  */
 
-namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto;
+// namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto;
 
 /// <summary>
 ///     Custom <see cref="IRazorViewEngine" /> that wraps aspnetcore's default implementation
@@ -67,128 +67,128 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto;
 ///     This is used so that when new models are built, the entire razor stack is re-constructed so all razor
 ///     caches and assembly references, etc... are cleared.
 /// </remarks>
-internal class RefreshingRazorViewEngine : IRazorViewEngine, IDisposable
-{
-    private readonly Func<IRazorViewEngine> _defaultRazorViewEngineFactory;
-    private readonly InMemoryModelFactory _inMemoryModelFactory;
-    private readonly ReaderWriterLockSlim _locker = new();
-    private IRazorViewEngine _current;
-    private bool _disposedValue;
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="RefreshingRazorViewEngine" /> class.
-    /// </summary>
-    /// <param name="defaultRazorViewEngineFactory">
-    ///     A factory method used to re-construct the default aspnetcore <see cref="RazorViewEngine" />
-    /// </param>
-    /// <param name="inMemoryModelFactory">The <see cref="InMemoryModelFactory" /></param>
-    public RefreshingRazorViewEngine(
-        Func<IRazorViewEngine> defaultRazorViewEngineFactory,
-        InMemoryModelFactory inMemoryModelFactory)
-    {
-        _inMemoryModelFactory = inMemoryModelFactory;
-        _defaultRazorViewEngineFactory = defaultRazorViewEngineFactory;
-        _current = _defaultRazorViewEngineFactory();
-        _inMemoryModelFactory.ModelsChanged += InMemoryModelFactoryModelsChanged;
-    }
-
-    public void Dispose() =>
-
-        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-        Dispose(true);
-
-    public RazorPageResult FindPage(ActionContext context, string pageName)
-    {
-        _locker.EnterReadLock();
-        try
-        {
-            return _current.FindPage(context, pageName);
-        }
-        finally
-        {
-            _locker.ExitReadLock();
-        }
-    }
-
-    public string? GetAbsolutePath(string? executingFilePath, string? pagePath)
-    {
-        _locker.EnterReadLock();
-        try
-        {
-            return _current.GetAbsolutePath(executingFilePath, pagePath);
-        }
-        finally
-        {
-            _locker.ExitReadLock();
-        }
-    }
-
-    public RazorPageResult GetPage(string executingFilePath, string pagePath)
-    {
-        _locker.EnterReadLock();
-        try
-        {
-            return _current.GetPage(executingFilePath, pagePath);
-        }
-        finally
-        {
-            _locker.ExitReadLock();
-        }
-    }
-
-    public ViewEngineResult FindView(ActionContext context, string viewName, bool isMainPage)
-    {
-        _locker.EnterReadLock();
-        try
-        {
-            return _current.FindView(context, viewName, isMainPage);
-        }
-        finally
-        {
-            _locker.ExitReadLock();
-        }
-    }
-
-    public ViewEngineResult GetView(string? executingFilePath, string viewPath, bool isMainPage)
-    {
-        _locker.EnterReadLock();
-        try
-        {
-            return _current.GetView(executingFilePath, viewPath, isMainPage);
-        }
-        finally
-        {
-            _locker.ExitReadLock();
-        }
-    }
-
-    protected virtual void Dispose(bool disposing)
-    {
-        if (!_disposedValue)
-        {
-            if (disposing)
-            {
-                _inMemoryModelFactory.ModelsChanged -= InMemoryModelFactoryModelsChanged;
-                _locker.Dispose();
-            }
-
-            _disposedValue = true;
-        }
-    }
-
-    /// <summary>
-    ///     When the models change, re-construct the razor stack
-    /// </summary>
-    private void InMemoryModelFactoryModelsChanged(object? sender, EventArgs e)
-    {
-        _locker.EnterWriteLock();
-        try
-        {
-            _current = _defaultRazorViewEngineFactory();
-        }
-        finally
-        {
-            _locker.ExitWriteLock();
-        }
-    }
-}
+// internal class RefreshingRazorViewEngine : IRazorViewEngine, IDisposable
+// {
+//     private readonly Func<IRazorViewEngine> _defaultRazorViewEngineFactory;
+//     private readonly InMemoryModelFactory _inMemoryModelFactory;
+//     private readonly ReaderWriterLockSlim _locker = new();
+//     private IRazorViewEngine _current;
+//     private bool _disposedValue;
+//
+//     /// <summary>
+//     ///     Initializes a new instance of the <see cref="RefreshingRazorViewEngine" /> class.
+//     /// </summary>
+//     /// <param name="defaultRazorViewEngineFactory">
+//     ///     A factory method used to re-construct the default aspnetcore <see cref="RazorViewEngine" />
+//     /// </param>
+//     /// <param name="inMemoryModelFactory">The <see cref="InMemoryModelFactory" /></param>
+//     public RefreshingRazorViewEngine(
+//         Func<IRazorViewEngine> defaultRazorViewEngineFactory,
+//         InMemoryModelFactory inMemoryModelFactory)
+//     {
+//         _inMemoryModelFactory = inMemoryModelFactory;
+//         _defaultRazorViewEngineFactory = defaultRazorViewEngineFactory;
+//         _current = _defaultRazorViewEngineFactory();
+//         _inMemoryModelFactory.ModelsChanged += InMemoryModelFactoryModelsChanged;
+//     }
+//
+//     public void Dispose() =>
+//
+//         // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+//         Dispose(true);
+//
+//     public RazorPageResult FindPage(ActionContext context, string pageName)
+//     {
+//         _locker.EnterReadLock();
+//         try
+//         {
+//             return _current.FindPage(context, pageName);
+//         }
+//         finally
+//         {
+//             _locker.ExitReadLock();
+//         }
+//     }
+//
+//     public string? GetAbsolutePath(string? executingFilePath, string? pagePath)
+//     {
+//         _locker.EnterReadLock();
+//         try
+//         {
+//             return _current.GetAbsolutePath(executingFilePath, pagePath);
+//         }
+//         finally
+//         {
+//             _locker.ExitReadLock();
+//         }
+//     }
+//
+//     public RazorPageResult GetPage(string executingFilePath, string pagePath)
+//     {
+//         _locker.EnterReadLock();
+//         try
+//         {
+//             return _current.GetPage(executingFilePath, pagePath);
+//         }
+//         finally
+//         {
+//             _locker.ExitReadLock();
+//         }
+//     }
+//
+//     public ViewEngineResult FindView(ActionContext context, string viewName, bool isMainPage)
+//     {
+//         _locker.EnterReadLock();
+//         try
+//         {
+//             return _current.FindView(context, viewName, isMainPage);
+//         }
+//         finally
+//         {
+//             _locker.ExitReadLock();
+//         }
+//     }
+//
+//     public ViewEngineResult GetView(string? executingFilePath, string viewPath, bool isMainPage)
+//     {
+//         _locker.EnterReadLock();
+//         try
+//         {
+//             return _current.GetView(executingFilePath, viewPath, isMainPage);
+//         }
+//         finally
+//         {
+//             _locker.ExitReadLock();
+//         }
+//     }
+//
+//     protected virtual void Dispose(bool disposing)
+//     {
+//         if (!_disposedValue)
+//         {
+//             if (disposing)
+//             {
+//                 _inMemoryModelFactory.ModelsChanged -= InMemoryModelFactoryModelsChanged;
+//                 _locker.Dispose();
+//             }
+//
+//             _disposedValue = true;
+//         }
+//     }
+//
+//     /// <summary>
+//     ///     When the models change, re-construct the razor stack
+//     /// </summary>
+//     private void InMemoryModelFactoryModelsChanged(object? sender, EventArgs e)
+//     {
+//         _locker.EnterWriteLock();
+//         try
+//         {
+//             _current = _defaultRazorViewEngineFactory();
+//         }
+//         finally
+//         {
+//             _locker.ExitWriteLock();
+//         }
+//     }
+// }

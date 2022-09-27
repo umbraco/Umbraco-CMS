@@ -177,13 +177,13 @@ public static class UmbracoBuilderDependencyInjectionExtensions
 
     private static void AddCustomViewCompiler(this ServiceCollection oldCollection, IServiceProvider actualProvider)
     {
-        oldCollection.AddSingleton<IViewCompilerProvider, UmbracoViewCompilerProvider>(prov => new UmbracoViewCompilerProvider(
-            prov.GetRequiredService<ApplicationPartManager>(),
-            prov.GetRequiredService<RazorProjectEngine>(),
-            actualProvider.GetRequiredService<ILoggerFactory>(),
-            prov.GetRequiredService<IOptions<MvcRazorRuntimeCompilationOptions>>(),
-            actualProvider.GetRequiredService<InMemoryModelFactory>(),
-            actualProvider.GetRequiredService<UmbracoRazorReferenceManager>(),
-            actualProvider.GetRequiredService<CompilationOptionsProvider>()));
+        // oldCollection.AddSingleton<IViewCompilerProvider, UmbracoViewCompilerProvider>(prov => new UmbracoViewCompilerProvider(
+        //     prov.GetRequiredService<ApplicationPartManager>(),
+        //     prov.GetRequiredService<RazorProjectEngine>(),
+        //     actualProvider.GetRequiredService<ILoggerFactory>(),
+        //     prov.GetRequiredService<IOptions<MvcRazorRuntimeCompilationOptions>>(),
+        //     actualProvider.GetRequiredService<InMemoryModelFactory>(),
+        //     actualProvider.GetRequiredService<UmbracoRazorReferenceManager>(),
+        //     actualProvider.GetRequiredService<CompilationOptionsProvider>()));
     }
 }
