@@ -100,10 +100,14 @@
         }
 
         vm.onNewAreaClick = function() {
+
+            const areaGridColumns = (vm.block.areaGridColumns || vm.rootLayoutColumns)
+            const columnSpan = areaGridColumns/2 === Math.round(areaGridColumns/2) ? areaGridColumns/2 : areaGridColumns;
+
             const newArea = {
                 'key': String.CreateGuid(),
                 'alias': '',
-                'columnSpan': (vm.block.areaGridColumns || vm.rootLayoutColumns),
+                'columnSpan': columnSpan,
                 'rowSpan': 1,
                 'minAllowed': 0,
                 'maxAllowed': null,
