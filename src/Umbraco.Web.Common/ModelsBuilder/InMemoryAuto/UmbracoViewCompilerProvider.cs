@@ -12,9 +12,9 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto;
 internal class UmbracoViewCompilerProvider : IViewCompilerProvider
 {
     private readonly RazorProjectEngine _razorProjectEngine;
-    private readonly InMemoryModelFactory _inMemoryModelFactory;
     private readonly UmbracoRazorReferenceManager _umbracoRazorReferenceManager;
     private readonly CompilationOptionsProvider _compilationOptionsProvider;
+    private readonly InMemoryAssemblyLoadContextManager _loadContextManager;
 
     private readonly ApplicationPartManager _applicationPartManager;
 
@@ -34,15 +34,15 @@ internal class UmbracoViewCompilerProvider : IViewCompilerProvider
         // RuntimeCompilationFileProvider fileProvider,
         ILoggerFactory loggerFactory,
         IOptions<MvcRazorRuntimeCompilationOptions> options,
-        InMemoryModelFactory inMemoryModelFactory,
         UmbracoRazorReferenceManager umbracoRazorReferenceManager,
-        CompilationOptionsProvider compilationOptionsProvider)
+        CompilationOptionsProvider compilationOptionsProvider,
+        InMemoryAssemblyLoadContextManager loadContextManager)
     {
         _applicationPartManager = applicationPartManager;
         _razorProjectEngine = razorProjectEngine;
-        _inMemoryModelFactory = inMemoryModelFactory;
         _umbracoRazorReferenceManager = umbracoRazorReferenceManager;
         _compilationOptionsProvider = compilationOptionsProvider;
+        _loadContextManager = loadContextManager;
         _options = options.Value;
         // _fileProvider = fileProvider;
 
@@ -69,9 +69,9 @@ internal class UmbracoViewCompilerProvider : IViewCompilerProvider
             _razorProjectEngine,
             feature.ViewDescriptors,
             _logger,
-            _inMemoryModelFactory,
             _umbracoRazorReferenceManager,
-            _compilationOptionsProvider);
+            _compilationOptionsProvider,
+            _loadContextManager);
     }
 
     private static IFileProvider GetCompositeFileProvider(MvcRazorRuntimeCompilationOptions options)

@@ -35,7 +35,8 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
         private readonly IApplicationShutdownRegistry _hostingLifetime;
         private readonly ModelsGenerationError _errors;
         private readonly IPublishedValueFallback _publishedValueFallback;
-        private readonly Lazy<IRazorViewEngine> _razorViewEngine;
+        private readonly InMemoryAssemblyLoadContextManager _loadContextManager;
+        private readonly RuntimeCompilationCacheBuster _runtimeCompilationCacheBuster;
         private readonly Lazy<string> _pureLiveDirectory = null!;
         private readonly int _debugLevel;
         private Infos _infos = new Infos { ModelInfos = null, ModelTypeMap = new Dictionary<string, Type>() };
@@ -44,7 +45,6 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
         private int _ver;
         private int? _skipver;
         private RoslynCompiler? _roslynCompiler;
-        private UmbracoAssemblyLoadContext? _currentAssemblyLoadContext;
         private ModelsBuilderSettings _config;
         private bool _disposedValue;
 
@@ -56,7 +56,8 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
             IHostingEnvironment hostingEnvironment,
             IApplicationShutdownRegistry hostingLifetime,
             IPublishedValueFallback publishedValueFallback,
-            Lazy<IRazorViewEngine> razorViewEngine)
+            InMemoryAssemblyLoadContextManager loadContextManager,
+            RuntimeCompilationCacheBuster runtimeCompilationCacheBuster)
         {
             _umbracoServices = umbracoServices;
             _profilingLogger = profilingLogger;
@@ -65,7 +66,8 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
             _hostingEnvironment = hostingEnvironment;
             _hostingLifetime = hostingLifetime;
             _publishedValueFallback = publishedValueFallback;
-            _razorViewEngine = razorViewEngine;
+            _loadContextManager = loadContextManager;
+            _runtimeCompilationCacheBuster = runtimeCompilationCacheBuster;
             _errors = new ModelsGenerationError(config, _hostingEnvironment);
             _ver = 1; // zero is for when we had no version
             _skipver = -1; // nothing to skip
@@ -93,8 +95,6 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
 
             // get it here, this need to be fast
             _debugLevel = _config.DebugLevel;
-
-            AssemblyLoadContext.Default.Resolving += OnResolvingDefaultAssemblyLoadContext;
         }
 
         public event EventHandler? ModelsChanged;
@@ -111,8 +111,6 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
         public object SyncRoot { get; } = new object();
 
         private UmbracoServices UmbracoServices => _umbracoServices.Value;
-
-        private IRazorViewEngine RazorViewEngine => _razorViewEngine.Value;
 
         /// <summary>
         /// Gets the RoslynCompiler
@@ -133,18 +131,6 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
 
         /// <inheritdoc />
         public bool Enabled => _config.ModelsMode == ModelsMode.InMemoryAuto;
-
-        /// <summary>
-        /// Handle the event when a reference cannot be resolved from the default context and return our custom MB assembly reference if we have one
-        /// </summary>
-        /// <remarks>
-        /// This is required because the razor engine will only try to load things from the default context, it doesn't know anything
-        /// about our context so we need to proxy.
-        /// </remarks>
-        private Assembly? OnResolvingDefaultAssemblyLoadContext(AssemblyLoadContext assemblyLoadContext, AssemblyName assemblyName)
-            => assemblyName.Name == RoslynCompiler.GeneratedAssemblyName
-                ? _currentAssemblyLoadContext?.LoadFromAssemblyName(assemblyName)
-                : null;
 
         public IPublishedElement CreateModel(IPublishedElement element)
         {
@@ -315,18 +301,18 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
 
                         CurrentModelsAssembly = assembly;
 
-                        if (RazorViewEngine is RazorViewEngine typedViewEngine)
-                        {
-                            Action<RazorViewEngine>? clearCacheMethod = ReflectionUtilities.EmitMethod<Action<RazorViewEngine>>("ClearCache");
-                            clearCacheMethod?.Invoke(typedViewEngine);
-                        }
-
                         // Raise the model changing event.
                         // NOTE: That on first load, if there is content, this will execute before the razor view engine
                         // has loaded which means it hasn't yet bound to this event so there's no need to worry about if
                         // it will be eagerly re-generated unecessarily on first render. BUT we should be aware that if we
                         // change this to use the event aggregator that will no longer be the case.
                         ModelsChanged?.Invoke(this, new EventArgs());
+                        /*
+                         * In regards to the above comment, this does indeed clear the cache regardless on first load.
+                         * However, this is still not really a big problem since this will execute before the razor view engine has loaded,
+                         * which means the cache will be empty already.
+                         */
+                        _runtimeCompilationCacheBuster.BustCache();
 
                         IEnumerable<Type> types = assembly.ExportedTypes.Where(x => x.Inherits<PublishedContentModel>() || x.Inherits<PublishedElementModel>());
                         _infos = RegisterModels(types);
@@ -372,12 +358,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
         // This is NOT thread safe but it is only called from within a lock
         private Assembly ReloadAssembly(string pathToAssembly)
         {
-            // If there's a current AssemblyLoadContext, unload it before creating a new one.
-            _currentAssemblyLoadContext?.Unload();
-
-            // We must create a new assembly load context
-            // as long as theres a reference to the assembly load context we can't delete the assembly it loaded
-            _currentAssemblyLoadContext = new UmbracoAssemblyLoadContext();
+            _loadContextManager.RenewAssemblyLoadContext();
 
             // NOTE: We cannot use in-memory assemblies due to the way the razor engine works which must use
             // application parts in order to add references to it's own CSharpCompiler.
@@ -391,23 +372,9 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
             File.Copy(pathToAssembly, tempFile, true);
 
             // Load it in
-            Assembly assembly = _currentAssemblyLoadContext.LoadFromAssemblyPath(tempFile);
+            Assembly assembly = _loadContextManager.LoadModelsAssembly(tempFile);
 
             return assembly;
-        }
-
-        /// <summary>
-        /// Loads an assembly into the collectible assembly used by the factory
-        /// </summary>
-        /// <remarks>
-        /// This is essentially just a wrapper around the <see cref="UmbracoAssemblyLoadContext"/>,
-        /// because we don't want to allow other clases to take a reference on the AssemblyLoadContext
-        /// </remarks>
-        /// <returns>The loaded assembly</returns>
-        public Assembly LoadCollectibleAssemblyFromStream(Stream assembly, Stream? assemblySymbols)
-        {
-            _currentAssemblyLoadContext ??= new UmbracoAssemblyLoadContext();
-            return _currentAssemblyLoadContext.LoadFromStream(assembly, assemblySymbols);
         }
 
         // This is NOT thread safe but it is only called from within a lock

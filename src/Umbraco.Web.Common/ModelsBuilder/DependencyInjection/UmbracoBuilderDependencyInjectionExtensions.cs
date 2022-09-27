@@ -138,6 +138,8 @@ public static class UmbracoBuilderDependencyInjectionExtensions
         builder.Services.AddSingleton<UmbracoRazorReferenceManager>();
         builder.Services.AddSingleton<CompilationOptionsProvider>();
         builder.Services.AddSingleton<IViewCompilerProvider, UmbracoViewCompilerProvider>();
+        builder.Services.AddSingleton<RuntimeCompilationCacheBuster>();
+        builder.Services.AddSingleton<InMemoryAssemblyLoadContextManager>();
 
         // var initialCollection = new ServiceCollection { builder.Services };
 

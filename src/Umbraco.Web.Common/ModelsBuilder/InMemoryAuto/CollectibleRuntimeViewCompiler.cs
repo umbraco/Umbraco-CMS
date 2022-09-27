@@ -25,18 +25,18 @@ internal class CollectibleRuntimeViewCompiler : IViewCompiler
     private readonly RazorProjectEngine _projectEngine;
     private IMemoryCache _cache;
     private readonly ILogger _logger;
-    private readonly InMemoryModelFactory _inMemoryModelFactory;
     private readonly UmbracoRazorReferenceManager _referenceManager;
     private readonly CompilationOptionsProvider _compilationOptionsProvider;
+    private readonly InMemoryAssemblyLoadContextManager _loadContextManager;
 
     public CollectibleRuntimeViewCompiler(
         IFileProvider fileProvider,
         RazorProjectEngine projectEngine,
         IList<CompiledViewDescriptor> precompiledViews,
         ILogger logger,
-        InMemoryModelFactory inMemoryModelFactory,
         UmbracoRazorReferenceManager referenceManager,
-        CompilationOptionsProvider compilationOptionsProvider)
+        CompilationOptionsProvider compilationOptionsProvider,
+        InMemoryAssemblyLoadContextManager loadContextManager)
     {
         if (fileProvider == null)
         {
@@ -61,9 +61,9 @@ internal class CollectibleRuntimeViewCompiler : IViewCompiler
         _fileProvider = fileProvider;
         _projectEngine = projectEngine;
         _logger = logger;
-        _inMemoryModelFactory = inMemoryModelFactory;
         _referenceManager = referenceManager;
         _compilationOptionsProvider = compilationOptionsProvider;
+        _loadContextManager = loadContextManager;
 
         _normalizedPathCache = new ConcurrentDictionary<string, string>(StringComparer.Ordinal);
 
@@ -93,12 +93,9 @@ internal class CollectibleRuntimeViewCompiler : IViewCompiler
         if (_precompiledViews.Count == 0)
         {
         }
-
-        // We must bust the cache when we change our models.
-        _inMemoryModelFactory.ModelsChanged += (sender, args) => ClearCache();
     }
 
-    private void ClearCache()
+    internal void ClearCache()
     {
         // I'm pretty sure this is not necessary, since it should be an atomic operation,
         // but let's make sure that we don't end up resolving any views while clearing the cache.
@@ -391,7 +388,7 @@ internal class CollectibleRuntimeViewCompiler : IViewCompiler
             assemblyStream.Seek(0, SeekOrigin.Begin);
             pdbStream?.Seek(0, SeekOrigin.Begin);
 
-            Assembly assembly = _inMemoryModelFactory.LoadCollectibleAssemblyFromStream(assemblyStream, pdbStream);
+            Assembly assembly = _loadContextManager.LoadCollectibleAssemblyFromStream(assemblyStream, pdbStream);
 
             return assembly;
         }
@@ -401,12 +398,12 @@ internal class CollectibleRuntimeViewCompiler : IViewCompiler
     {
         IReadOnlyList<MetadataReference> refs = _referenceManager.CompilationReferences;
         // We'll add the reference to the InMemory assembly directly, this means we don't have to hack around with assembly parts.
-        if (_inMemoryModelFactory.CurrentModelsAssembly is null)
+        if (_loadContextManager.ModelsAssemblyLocation is null)
         {
             throw new InvalidOperationException("No InMemory assembly available, cannot compile views");
         }
 
-        PortableExecutableReference inMemoryAutoReference = MetadataReference.CreateFromFile(_inMemoryModelFactory.CurrentModelsAssembly.Location);
+        PortableExecutableReference inMemoryAutoReference = MetadataReference.CreateFromFile(_loadContextManager.ModelsAssemblyLocation);
 
 
         var sourceText = SourceText.From(compilationContent, Encoding.UTF8);
