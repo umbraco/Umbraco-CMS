@@ -14,8 +14,7 @@
         "target": "es5",
 
         "types": [
-            "cypress",
-            "cy-verify-downloads"
+            "playwright",
         ],
         "lib": [
             "es5",
