@@ -8,7 +8,7 @@ using SixLabors.ImageSharp.Web.Middleware;
 using SixLabors.ImageSharp.Web.Processors;
 using Umbraco.Cms.Core.Configuration.Models;
 
-namespace Umbraco.Cms.Web.Common.DependencyInjection;
+namespace Umbraco.Cms.Imaging.ImageSharp;
 
 /// <summary>
 ///     Configures the ImageSharp middleware options.

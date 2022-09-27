@@ -4,15 +4,15 @@
     <OutputType>Exe</OutputType>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <IsPackable>false</IsPackable>
+    <EnablePackageValidation>false</EnablePackageValidation>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="CtorInvokeBenchmarks.cs.bak" />
-    <None Remove="ReflectionUtilities-Unused.cs.bak" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="app.config" />
+    <PackageReference Include="BenchmarkDotNet" Version="0.13.2" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0-rc.1.22426.10" />
+    <PackageReference Include="Moq" Version="4.18.2" />
+    <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
+    <PackageReference Include="System.Reflection.Emit" Version="4.7.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -20,19 +20,4 @@
     <ProjectReference Include="..\..\src\Umbraco.Core\Umbraco.Core.csproj" />
     <ProjectReference Include="..\..\src\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="BenchmarkDotNet">
-      <Version>0.13.2</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.Logging.Debug">
-      <Version>7.0.0-rc.1.*</Version>
-    </PackageReference>
-    <PackageReference Include="Moq">
-      <Version>4.18.1</Version>
-    </PackageReference>
-    <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
-    <PackageReference Include="System.Reflection.Emit" Version="4.7.0" />
-  </ItemGroup>
-
 </Project>

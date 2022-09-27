@@ -2,6 +2,10 @@
   <!-- Enable multi-level merging -->
   <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
 
+  <PropertyGroup>
+    <Nullable>annotations</Nullable>
+  </PropertyGroup>
+  
   <!-- Specify rule set for all test projects -->
   <PropertyGroup>
     <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)codeanalysis.ruleset</CodeAnalysisRuleSet>

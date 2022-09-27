@@ -1,6 +1,7 @@
 using Microsoft.Data.SqlClient;
+using Umbraco.Cms.Infrastructure.Persistence.FaultHandling;
 
-namespace Umbraco.Cms.Infrastructure.Persistence.FaultHandling.Strategies;
+namespace Umbraco.Cms.Persistence.SqlServer.FaultHandling.Strategies;
 
 /// <summary>
 ///     Implements a strategy that detects network connectivity errors such as host not found.

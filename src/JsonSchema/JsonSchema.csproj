@@ -1,33 +1,19 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
     <TargetFramework>net7.0</TargetFramework>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <OutputType>Exe</OutputType>
     <IsPackable>false</IsPackable>
     <EnablePackageValidation>false</EnablePackageValidation>
   </PropertyGroup>
 
-    <ItemGroup>
-      <PackageReference Include="CommandLineParser" Version="2.9.1" />
-      <PackageReference Include="NJsonSchema" Version="10.8.0" />
-      <PackageReference Include="System.Xml.XPath.XmlDocument" Version="4.3.0" />
-      <PackageReference Include="Umbraco.Deploy.Core" Version="10.1.0" />
-      <PackageReference Include="Umbraco.Forms.Core" Version="10.0.0" />
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="CommandLineParser" Version="2.9.1" />
+    <PackageReference Include="NJsonSchema" Version="10.8.0" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj" />
+    <PackageReference Include="Umbraco.Deploy.Core" Version="10.0.0" />
+    <PackageReference Include="Umbraco.Forms.Core" Version="10.0.0" />
   </ItemGroup>
-
-  <!--  Copy Forms XML docs-->
-  <PropertyGroup>
-    <NuGetPackageRoot Condition=" '$(NuGetPackageRoot)' == '' ">$(UserProfile)\.nuget\packages\</NuGetPackageRoot>
-  </PropertyGroup>
-
-  <Target Name="CopyPackagesXml" BeforeTargets="Build">
-    <ItemGroup>
-      <PackageReferenceFiles Include="$(NugetPackageRoot)%(PackageReference.Identity)\%(PackageReference.Version)%(PackageReference.CopyToOutputDirectory)\lib\**\*.xml" />
-    </ItemGroup>
-    <Copy SourceFiles="@(PackageReferenceFiles)" DestinationFolder="$(OutDir)" />
-  </Target>
 </Project>

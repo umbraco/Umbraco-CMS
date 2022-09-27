@@ -3,7 +3,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.Data.SqlClient;
 
-namespace Umbraco.Cms.Infrastructure.Persistence.FaultHandling;
+namespace Umbraco.Cms.Persistence.SqlServer.FaultHandling.Strategies;
 
 /// <summary>
 ///     Defines the possible throttling modes in SQL Azure.
@@ -299,7 +299,7 @@ public class ThrottlingCondition
             condition._throttledResources.Add(Tuple.Create(ThrottledResourceType.DatabaseSize, (ThrottlingType)((groupCode >>= 2) & 3)));
             condition._throttledResources.Add(Tuple.Create(ThrottledResourceType.Internal, (ThrottlingType)((groupCode >>= 2) & 3)));
             condition._throttledResources.Add(Tuple.Create(ThrottledResourceType.WorkerThreads, (ThrottlingType)((groupCode >>= 2) & 3)));
-            condition._throttledResources.Add(Tuple.Create(ThrottledResourceType.Internal, (ThrottlingType)((groupCode >> 2) & 3)));
+            condition._throttledResources.Add(Tuple.Create(ThrottledResourceType.Internal, (ThrottlingType)(groupCode >> 2 & 3)));
 
             return condition;
         }

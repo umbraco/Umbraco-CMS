@@ -1,50 +1,16 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <Title>Umbraco CMS</Title>
+    <Description>Installs Umbraco CMS with all default dependencies in your ASP.NET Core project.</Description>
     <TargetFramework>net7.0</TargetFramework>
     <IncludeBuildOutput>false</IncludeBuildOutput>
-    <PackageId>Umbraco.Cms</PackageId>
-    <Title>Umbraco.Cms</Title>
-    <Description>Installs Umbraco CMS in your ASP.NET Core project</Description>
     <IncludeSymbols>false</IncludeSymbols>
   </PropertyGroup>
-
+  
   <ItemGroup>
+    <ProjectReference Include="..\Umbraco.Cms.Targets\Umbraco.Cms.Targets.csproj" />
+    <ProjectReference Include="..\Umbraco.Cms.Imaging.ImageSharp\Umbraco.Cms.Imaging.ImageSharp.csproj" />
     <ProjectReference Include="..\Umbraco.Cms.Persistence.Sqlite\Umbraco.Cms.Persistence.Sqlite.csproj" />
     <ProjectReference Include="..\Umbraco.Cms.Persistence.SqlServer\Umbraco.Cms.Persistence.SqlServer.csproj" />
-    <ProjectReference Include="..\Umbraco.Cms.StaticAssets\Umbraco.Cms.StaticAssets.csproj" />
-    <ProjectReference Include="..\Umbraco.Web.BackOffice\Umbraco.Web.BackOffice.csproj" />
-    <ProjectReference Include="..\Umbraco.Web.Website\Umbraco.Web.Website.csproj" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(Configuration)' == 'Debug' ">
-    <ProjectReference Include="..\Umbraco.Cms.ManagementApi\Umbraco.Cms.ManagementApi.csproj" />
-  </ItemGroup>
-
-  <PropertyGroup>
-    <JsonSchemaPath>$(ProjectDir)appsettings-schema.json</JsonSchemaPath>
-    <JsonSchemaProjectPath>$(ProjectDir)../JsonSchema/</JsonSchemaProjectPath>
-  </PropertyGroup>
-
-
-  <ItemGroup>
-    <Content Include="buildTransitive\**" PackagePath="buildTransitive" />
-    <Content Include="$(JsonSchemaPath)" PackagePath="." />
-  </ItemGroup>
-
-  <Target Name="CheckPreConditions" BeforeTargets="Build">
-    <Message Text="JsonSchemaPath:  $(JsonSchemaPath)" Importance="high" />
-
-    <Message Text="Skip JsonSchema generation because $(JsonSchemaPath) exists." Condition="Exists('$(JsonSchemaPath)')" />
-    <Message Text="Generate the appsettings json schema." Importance="high" Condition="!Exists('$(JsonSchemaPath)')" />
-    <CallTarget Targets="JsonSchemaBuild" Condition="!Exists('$(JsonSchemaPath)')" />
-  </Target>
-
-  <Target Name="JsonSchemaBuild">
-    <Exec WorkingDirectory="$(JsonSchemaProjectPath)" Command="dotnet run -c Release -o &quot;../Umbraco.Cms/appsettings-schema.json&quot;" />
-  </Target>
-
-
-  <ItemGroup>
-    <Content Include="buildTransitive\**" PackagePath="buildTransitive" />
   </ItemGroup>
 </Project>

@@ -1,12 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Examine;
 using Examine.Lucene;
 using Examine.Lucene.Directories;
 using Lucene.Net.Analysis;
 using Lucene.Net.Analysis.Standard;
-using Lucene.Net.Store;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -22,6 +18,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Infrastructure.Persistence;
+using Directory = Lucene.Net.Store.Directory;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine;
 

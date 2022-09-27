@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
-using SixLabors.ImageSharp.Web.DependencyInjection;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Services;
@@ -77,9 +76,6 @@ public class UmbracoApplicationBuilder : IUmbracoApplicationBuilder, IUmbracoEnd
     public void RegisterDefaultRequiredMiddleware()
     {
         UseUmbracoCoreMiddleware();
-
-        // Important we handle image manipulations before the static files, otherwise the querystring is just ignored.
-        AppBuilder.UseImageSharp();
 
         // Get media file provider and request path/URL
         MediaFileManager mediaFileManager = AppBuilder.ApplicationServices.GetRequiredService<MediaFileManager>();
