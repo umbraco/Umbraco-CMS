@@ -348,7 +348,7 @@ stages:
           - name: ConnectionStrings__umbracoDbDSN  # Windows only
             value: Server=$(UmbracoDatabaseServer);Database=$(UmbracoDatabaseName);Integrated Security=true;
           - name: CYPRESS_BASE_URL
-            value: http://localhost:8080
+            value: https://localhost:44331
         strategy:
           matrix:
             Linux:
