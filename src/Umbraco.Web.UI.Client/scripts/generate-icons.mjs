@@ -8,7 +8,7 @@ const glob = globModule.default;
 
 const moduleDirectory = 'src/core/stores/icon/';
 const iconsSVGDirectory = `${moduleDirectory}svgs/`;
-const iconsOutputDirectory = `src/assets/icons/`;
+const iconsOutputDirectory = `public-assets/icons/`;
 
 const run = async () => {
 	const icons = await collectIcons();

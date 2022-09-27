@@ -1,5 +1,5 @@
 import { UUIIconRegistry } from '@umbraco-ui/uui';
-import iconManifests from '../../../assets/icons/icon.manifests.json';
+import iconManifests from '../../../../public-assets/icons/icon.manifests.json';
 
 export class UmbIconStore extends UUIIconRegistry {
 	acceptIcon(iconName: string) {
