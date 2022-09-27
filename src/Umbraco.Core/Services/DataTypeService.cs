@@ -462,7 +462,8 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                     copy.Name += " (copy)"; // might not be unique
                     copy.ParentId = containerId;
-                    _dataTypeRepository.Save(copy);
+
+                    Save(copy);
                     scope.Complete();
                 }
                 catch (DataOperationException<MoveOperationStatusType> ex)
