@@ -4,7 +4,6 @@ using System.Reflection.Emit;
 using System.Runtime.Loader;
 using System.Text;
 using System.Text.RegularExpressions;
-using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -316,15 +315,12 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
 
                         CurrentModelsAssembly = assembly;
 
-                        var test = RazorViewEngine.ToString();
-                        if (RazorViewEngine is RazorViewEngine castedViewEngine)
+                        if (RazorViewEngine is RazorViewEngine typedViewEngine)
                         {
-                            MethodInfo? firstOrDefault = castedViewEngine.GetType().AllMethods().FirstOrDefault(x => x.Name == "ClearCache");
-                            if (firstOrDefault is not null)
-                            {
-                                firstOrDefault.Invoke(castedViewEngine, null);
-                            }
+                            Action<RazorViewEngine>? clearCacheMethod = ReflectionUtilities.EmitMethod<Action<RazorViewEngine>>("ClearCache");
+                            clearCacheMethod?.Invoke(typedViewEngine);
                         }
+
                         // Raise the model changing event.
                         // NOTE: That on first load, if there is content, this will execute before the razor view engine
                         // has loaded which means it hasn't yet bound to this event so there's no need to worry about if

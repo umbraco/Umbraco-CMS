@@ -28,7 +28,6 @@ internal class CollectibleRuntimeViewCompiler : IViewCompiler
     private readonly InMemoryModelFactory _inMemoryModelFactory;
     private readonly UmbracoRazorReferenceManager _referenceManager;
     private readonly CompilationOptionsProvider _compilationOptionsProvider;
-    private UmbracoAssemblyLoadContext? _currentAssemblyLoadContext;
 
     public CollectibleRuntimeViewCompiler(
         IFileProvider fileProvider,
@@ -406,6 +405,7 @@ internal class CollectibleRuntimeViewCompiler : IViewCompiler
         {
             throw new InvalidOperationException("No InMemory assembly available, cannot compile views");
         }
+
         PortableExecutableReference inMemoryAutoReference = MetadataReference.CreateFromFile(_inMemoryModelFactory.CurrentModelsAssembly.Location);
 
 
