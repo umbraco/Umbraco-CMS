@@ -36,7 +36,8 @@ public class ManagementApiComposer : IComposer
         builder
             .AddNewInstaller()
             .AddUpgrader()
-            .AddExamineManagement();
+            .AddExamineManagement()
+            .AddTrees();
 
         services.AddApiVersioning(options =>
         {
