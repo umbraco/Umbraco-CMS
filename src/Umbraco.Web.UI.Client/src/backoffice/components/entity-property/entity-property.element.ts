@@ -46,7 +46,7 @@ export class UmbEntityPropertyElement extends UmbContextConsumerMixin(LitElement
 	];
 
 	/**
-	 * Label
+	 * Label. Name of the property
 	 * @type {string}
 	 * @attr
 	 * @default ''

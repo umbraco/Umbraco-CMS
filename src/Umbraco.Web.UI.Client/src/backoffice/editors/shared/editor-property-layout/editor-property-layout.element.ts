@@ -2,6 +2,12 @@ import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
 
+/**
+ *  @element umb-editor-property-layout
+ *  @description - Element for displaying a property in an editor.
+ *  @slot editor - Slot for rendering the Property Editor
+ *  @slot property-action-menu - Slot for rendering the Property Action Menu
+ */
 @customElement('umb-editor-property-layout')
 export class UmbEditorPropertyLayoutElement extends LitElement {
 	static styles = [
@@ -15,9 +21,21 @@ export class UmbEditorPropertyLayoutElement extends LitElement {
 		`,
 	];
 
+	/**
+	 * Label. Name of the property.
+	 * @type {string}
+	 * @attr
+	 * @default ''
+	 */
 	@property({ type: String })
 	public label = '';
 
+	/**
+	 * Description: render a description underneath the label.
+	 * @type {string}
+	 * @attr
+	 * @default ''
+	 */
 	@property({ type: String })
 	public description = '';
 
