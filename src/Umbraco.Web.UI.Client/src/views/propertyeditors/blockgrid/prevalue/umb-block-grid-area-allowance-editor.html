@@ -7,11 +7,15 @@
         
         <div ng-repeat="allowance in vm.model track by allowance.$key" class="umb-block-grid-area-allowance-editor__entry">
             <select 
-                ng-model="allowance.elementTypeKey"
+                ng-model="allowance.$chosenValue"
                 ng-disabled="vm.disabled"
+                localize="title"
+                title="blockEditor_pickSpecificAllowance"
                 required
             >
-                <option ng-repeat="blockType in vm.allBlockTypes" ng-init="elementType = vm.getElementTypeByKey(blockType.contentElementTypeKey)" value="{{elementType.key}}">{{elementType.name}}</option>
+                <option ng-repeat="blockGroup in vm.allBlockGroups" value="groupKey:{{blockGroup.key}}">{{blockGroup.name}}</option>
+                <option disabled value="">---------</option>
+                <option ng-repeat="blockType in vm.allBlockTypes" ng-init="elementType = vm.getElementTypeByKey(blockType.contentElementTypeKey)" value="elementTypeKey:{{elementType.key}}">{{elementType.name}}</option>
             </select>
             <input 
                 type="number"
@@ -21,8 +25,9 @@
                 ng-max="model.value.max"
                 placeholder="0"
                 ng-model="allowance.minAllowed"
-                fix-number
-                style="width:80px"/>
+                localize="title"
+                title="blockEditor_allowanceMinimum"
+                fix-number/>
             <span>–</span>
             <input 
                 type="number"
@@ -31,8 +36,9 @@
                 ng-model="allowance.maxAllowed"
                 placeholder="∞"
                 ng-min="model.value.min || 0"
-                fix-number
-                style="width:80px"/>
+                localize="title"
+                title="blockEditor_allowanceMaximum"
+                fix-number/>
             <button 
                 type="button" 
                 class="btn-reset umb-outline"

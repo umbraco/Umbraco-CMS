@@ -251,6 +251,7 @@
                     var overlayModel = {
                         block: clonedBlockData,
                         allBlockTypes: $scope.model.value,
+                        allBlockGroups: vm.blockGroups,
                         loadedElementTypes: vm.elementTypes,
                         gridColumns: vm.gridColumnsPreValue.value || DEFAULT_GRID_COLUMNS,
                         title: data,

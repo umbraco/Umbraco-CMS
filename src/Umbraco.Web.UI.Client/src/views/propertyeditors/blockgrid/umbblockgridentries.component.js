@@ -101,19 +101,43 @@
 
                 vm.areaConfig.specifiedAllowance.forEach(allowance => {
 
-                    vm.invalidBlockTypes = vm.invalidBlockTypes.filter(type => type.key !== allowance.elementTypeKey)
-                    const amount = vm.entries.filter(entry => entry.$block.data.contentTypeKey === allowance.elementTypeKey).length;
                     const minAllowed = allowance.minAllowed || 0;
                     const maxAllowed = allowance.maxAllowed || 0;
-                    
-                    if(amount < minAllowed || (maxAllowed > 0 && amount > maxAllowed)) {
-                        vm.invalidBlockTypes.push({
-                            'key': allowance.elementTypeKey,
-                            'name': vm.locallyAvailableBlockTypes.find(blockType => blockType.elementTypeModel.name).elementTypeModel.name,
-                            'amount': amount,
-                            'minRequirement': minAllowed,
-                            'maxRequirement': maxAllowed
-                        });
+
+                    // For block groups:
+                    if(allowance.groupKey) {
+
+                        vm.invalidBlockTypes = vm.invalidBlockTypes.filter(type => type.groupKey !== allowance.groupKey)
+
+                        const groupElementTypeKeys = vm.locallyAvailableBlockTypes.filter(blockType => blockType.blockConfigModel.groupKey === allowance.groupKey);
+                        const groupAmount = vm.entries.filter(entry => groupElementTypeKeys.indexOf(entry.$block.data.contentTypeKey) !== -1).length;
+
+                        if(groupAmount < minAllowed || (maxAllowed > 0 && groupAmount > maxAllowed)) {
+                            vm.invalidBlockTypes.push({
+                                'groupKey': allowance.groupKey,
+                                'name': vm.blockEditorApi.internal.getBlockGroupName(allowance.groupKey),
+                                'amount': groupAmount,
+                                'minRequirement': minAllowed,
+                                'maxRequirement': maxAllowed
+                            });
+                        }
+                    } else 
+                    // For specific elementTypes:
+                    if(allowance.elementTypeKey) {
+
+                        vm.invalidBlockTypes = vm.invalidBlockTypes.filter(type => type.key !== allowance.elementTypeKey)
+                        
+                        const amount = vm.entries.filter(entry => entry.$block.data.contentTypeKey === allowance.elementTypeKey).length;
+                        
+                        if(amount < minAllowed || (maxAllowed > 0 && amount > maxAllowed)) {
+                            vm.invalidBlockTypes.push({
+                                'key': allowance.elementTypeKey,
+                                'name': vm.locallyAvailableBlockTypes.find(blockType => blockType.elementTypeModel.name).elementTypeModel.name,
+                                'amount': amount,
+                                'minRequirement': minAllowed,
+                                'maxRequirement': maxAllowed
+                            });
+                        }
                     }
                 });
                 var isTypeRequirementGood = vm.invalidBlockTypes.length === 0;

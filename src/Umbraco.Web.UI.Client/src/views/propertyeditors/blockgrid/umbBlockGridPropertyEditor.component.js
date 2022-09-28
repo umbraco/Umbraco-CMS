@@ -330,6 +330,11 @@
             return vm.gridColumns;
         }
 
+        vm.getBlockGroupName = getBlockGroupName;
+        function getBlockGroupName(groupKey) {
+            return vm.blockGroups.find(x => x.key === groupKey)?.name;
+        }
+
 
         function updateAllBlockObjects() {
             // Update the blockObjects in our layout.
@@ -579,16 +584,28 @@
 
             if(area && area?.$config.onlySpecifiedAllowance) {
 
-                const allowedElementTypeKeys = [];
+                const allowedElementTypes = [];
 
+                // Then add specific types (This allows to overwrite the amount for a specific type)
                 area.$config.specifiedAllowance?.forEach(allowance => {
-                    // Future room for group support:
-                    if(allowance.elementTypeKey != null) {
-                        allowedElementTypeKeys.push(allowance.elementTypeKey);
+                    if(allowance.groupKey) {
+                        vm.availableBlockTypes.forEach(blockType => {
+                            if(blockType.blockConfigModel.groupKey === allowance.groupKey) {
+                                if(allowedElementTypes.indexOf(blockType) === -1) {
+                                    allowedElementTypes.push(blockType);
+                                }
+                            }
+                        });
+                    } else 
+                    if(allowance.elementTypeKey) {
+                        const blockType = vm.availableBlockTypes.find(x => x.blockConfigModel.contentElementTypeKey === allowance.elementTypeKey);
+                        if(allowedElementTypes.indexOf(blockType) === -1) {
+                            allowedElementTypes.push(blockType);
+                        }
                     }
                 });
 
-                return vm.availableBlockTypes.filter(x => allowedElementTypeKeys.indexOf(x.blockConfigModel.contentElementTypeKey) !== -1);
+                return allowedElementTypes;
             }
             return vm.availableBlockTypes;
         }

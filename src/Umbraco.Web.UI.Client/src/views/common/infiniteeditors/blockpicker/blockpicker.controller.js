@@ -14,7 +14,6 @@ angular.module("umbraco")
 
         function updateFiltering() {
             vm.filteredItems = $filter('umbCmsBlockCard')($scope.model.availableItems, vm.filterSearchTerm);
-            console.log("updateFiltering", vm.filteredItems)
         }
 
         localizationService.localizeMany(["blockEditor_tabCreateEmpty", "blockEditor_tabClipboard"]).then(

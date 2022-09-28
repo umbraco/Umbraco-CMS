@@ -11,13 +11,14 @@
      */
     angular
         .module("umbraco")
-        .component("umbBlockGridAreaBlockAllowanceEditor", {
-            templateUrl: "views/propertyeditors/blockgrid/prevalue/umb-block-grid-area-block-allowance-editor.html",
-            controller: BlockGridAreaBlockAllowanceController,
+        .component("umbBlockGridAreaAllowanceEditor", {
+            templateUrl: "views/propertyeditors/blockgrid/prevalue/umb-block-grid-area-allowance-editor.html",
+            controller: BlockGridAreaAllowanceController,
             controllerAs: "vm",
             bindings: {
                 model: "=",
                 allBlockTypes: "<",
+                allBlockGroups: "<",
                 loadedElementTypes: "<",
                 disabled: "<"
             },
@@ -26,7 +27,7 @@
             }
         });
 
-    function BlockGridAreaBlockAllowanceController($scope, $element, assetsService, localizationService, editorService) {
+    function BlockGridAreaAllowanceController($scope, $element, assetsService, localizationService, editorService) {
 
         var unsubscribe = [];
 
@@ -37,8 +38,15 @@
             vm.loading = false;
 
             vm.model.forEach((x) => {
-                x['$key'] = String.CreateGuid()
-            })
+                x['$key'] = String.CreateGuid();
+
+                // transfer the chosen key onto the $chosenValue property.
+                if(x.groupKey) {
+                    x['$chosenValue'] = "groupKey:"+x.groupKey;
+                } else if (x.elementTypeKey) {
+                    x['$chosenValue'] = "elementTypeKey:"+x.elementTypeKey;
+                }
+            });
         };
 
         vm.getElementTypeByKey = function(key) {
@@ -60,6 +68,7 @@
             const allowance = {
                 $key: String.CreateGuid(),
                 elementTypeKey: null,
+                groupKey: null,
                 min: 0,
                 max: 0
             };
@@ -74,6 +83,19 @@
         }
         
         $scope.$on("$destroy", function () {
+
+            // Set groupKey or elementTypeKey based on $chosenValue.
+            vm.model.forEach((x) => {
+                const value = x['$chosenValue'];
+                if (value.indexOf('groupKey:') === 0) {
+                    x.groupKey = value.slice(9);
+                    x.elementTypeKey = null;
+                } else if (value.indexOf('elementTypeKey:') === 0) {
+                    x.groupKey = null;
+                    x.elementTypeKey = value.slice(15);
+                }
+            });
+
             for (const subscription of unsubscribe) {
                 subscription();
             }

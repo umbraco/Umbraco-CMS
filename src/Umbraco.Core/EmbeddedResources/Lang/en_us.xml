@@ -2897,6 +2897,9 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="addAppearanceOptions">Add catalogue appearance</key>
     <key alias="addBlockType">Add Block</key>
     <key alias="addBlockGroup">Add group</key>
+    <key alias="pickSpecificAllowance">Pick group or Block</key>
+    <key alias="allowanceMinimum">Set minimum requirement for this allowance</key>
+    <key alias="allowanceMaximum">Set maximum requirement for this allowance</key>
   </area>
   <area alias="contentTemplatesDashboard">
     <key alias="whatHeadline">What are Content Templates?</key>

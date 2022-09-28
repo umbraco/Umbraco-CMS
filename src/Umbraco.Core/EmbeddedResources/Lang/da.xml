@@ -2246,6 +2246,9 @@ Mange hilsner fra Umbraco robotten
     <key alias="addAppearanceOptions">Tilføj katalog udseende</key>
     <key alias="addBlockType">Tilføj Blok</key>
     <key alias="addBlockGroup">Tilføj gruppe</key>
+    <key alias="pickSpecificAllowance">Tilføj gruppe eller block</key>
+    <key alias="allowanceMinimum">Sæt minimum krav for denne tilladelse</key>
+    <key alias="allowanceMaximum">Set maksimum krav for denne tilladelse</key>
   </area>
   <area alias="contentTemplatesDashboard">
     <key alias="whatHeadline">Hvad er Indholdsskabeloner?</key>

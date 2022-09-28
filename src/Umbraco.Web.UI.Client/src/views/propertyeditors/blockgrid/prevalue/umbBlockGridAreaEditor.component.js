@@ -25,6 +25,7 @@
                 model: "=",
                 block: "<",
                 allBlockTypes: "<",
+                allBlockGroups: "<",
                 loadedElementTypes: "<",
                 gridColumns: "<"
             },
@@ -139,6 +140,7 @@
                     area: clonedAreaData,
                     title: localized,
                     allBlockTypes: vm.allBlockTypes,
+                    allBlockGroups: vm.allBlockGroups,
                     loadedElementTypes: vm.loadedElementTypes,
                     view: "views/propertyeditors/blockgrid/prevalue/blockgrid.blockconfiguration.area.overlay.html",
                     size: "small",
