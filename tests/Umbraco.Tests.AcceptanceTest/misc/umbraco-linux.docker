@@ -4,14 +4,15 @@
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0.300 AS build
 
+COPY nuget.config .
+
 WORKDIR /nupkg
 COPY nupkg .
 
 WORKDIR /build
-COPY nuget.config .
 RUN dotnet new --install /nupkg/Umbraco.Templates.*.nupkg
 RUN dotnet new umbraco --name Playwright -o . --no-restore
-RUN dotnet restore --configfile ./nuget.config
+RUN dotnet restore --configfile /nuget.config
 RUN dotnet publish --no-restore --configuration Release -o /dist 
 
 ############################################
