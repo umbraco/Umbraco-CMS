@@ -15,15 +15,16 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.CheckboxListContro
             if (Utilities.isObject($scope.model.config.items)) {
 
                 // formatting the items in the dictionary into an array
-                var sortedItems = [];
-                var vals = _.values($scope.model.config.items);
-                var keys = _.keys($scope.model.config.items);
+                let sortedItems = [];
+                let vals = _.values($scope.model.config.items);
+                let keys = _.keys($scope.model.config.items);
+                
                 for (var i = 0; i < vals.length; i++) {
                     sortedItems.push({ key: keys[i], sortOrder: vals[i].sortOrder, value: vals[i].value});
                 }
 
                 // ensure the items are sorted by the provided sort order
-                sortedItems.sort(function (a, b) { return (a.sortOrder > b.sortOrder) ? 1 : ((b.sortOrder > a.sortOrder) ? -1 : 0); });
+                sortedItems.sort((a, b) => (a.sortOrder > b.sortOrder) ? 1 : ((b.sortOrder > a.sortOrder) ? -1 : 0) );
                 
                 vm.configItems = sortedItems;
                 
@@ -48,10 +49,10 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.CheckboxListContro
         
         function updateViewModel(newVal) {
             
-            var i = vm.configItems.length;
+            let i = vm.configItems.length;
             while(i--) {
                 
-                var item = vm.configItems[i];
+                const item = vm.configItems[i];
                 
                 // are this item the same in the model
                 if (item.checked !== (newVal.indexOf(item.value) !== -1)) {
@@ -69,22 +70,21 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.CheckboxListContro
             
             vm.viewItems = [];
             
-            var iConfigItem;
-            for (var i = 0; i < vm.configItems.length; i++) {
+            let iConfigItem;
+            for (let i = 0; i < vm.configItems.length; i++) {
                 iConfigItem = vm.configItems[i];
-                var isChecked = _.contains(newVal, iConfigItem.value);
+                const isChecked = _.contains(newVal, iConfigItem.value);
                 vm.viewItems.push({
                     checked: isChecked,
                     key: iConfigItem.key,
                     value: iConfigItem.value
                 });
             }
-            
         }
 
         function change(model, value) {
             
-            var index = $scope.model.value.indexOf(value);
+            const index = $scope.model.value.indexOf(value);
             
             if (model === true) {
                 //if it doesn't exist in the model, then add it

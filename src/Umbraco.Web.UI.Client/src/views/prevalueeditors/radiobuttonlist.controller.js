@@ -1,19 +1,19 @@
 angular.module("umbraco").controller("Umbraco.PrevalueEditors.RadiobuttonListController",
     function ($scope) {
         
-        var vm = this;
+        const vm = this;
 
         vm.configItems = [];
         vm.viewItems = [];
 
         function init() {
 
-            var prevalues = ($scope.model.config ? $scope.model.config.prevalues : $scope.model.prevalues) || [];
+            const prevalues = ($scope.model.config ? $scope.model.config.prevalues : $scope.model.prevalues) || [];
 
-            var items = [];
+            let items = [];
 
-            for (var i = 0; i < prevalues.length; i++) {
-                var item = {};
+            for (let i = 0; i < prevalues.length; i++) {
+                const item = {};
 
                 if (Utilities.isObject(prevalues[i])) {
                     item.value = prevalues[i].value;
@@ -37,8 +37,8 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.RadiobuttonListCon
 
             vm.viewItems = [];
 
-            var iConfigItem;
-            for (var i = 0; i < vm.configItems.length; i++) {
+            let iConfigItem;
+            for (let i = 0; i < vm.configItems.length; i++) {
                 iConfigItem = vm.configItems[i];
                 vm.viewItems.push({
                     value: iConfigItem.value,
