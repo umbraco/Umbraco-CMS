@@ -13,7 +13,7 @@ const iconsOutputDirectory = `public-assets/icons/`;
 const run = async () => {
 	const icons = await collectIcons();
 	outputIcons(icons);
-	generateManifest(icons);
+	generateJSON(icons);
 };
 
 const collectIcons = async () => {
@@ -57,19 +57,19 @@ const outputIcons = (icons) => {
 	});
 };
 
-const generateManifest = (icons) => {
-	const manifestsPath = `${iconsOutputDirectory}icon.manifests.json`;
+const generateJSON = (icons) => {
+	const JSONPath = `${iconsOutputDirectory}icons.json`;
 
-	const iconManifests = icons.map((icon) => {
+	const iconDescriptors = icons.map((icon) => {
 		return {
 			name: `umb:${icon.name}`,
 			path: `/icons/${icon.iconFileName}.js`,
 		};
 	});
 
-	const content = `${JSON.stringify(iconManifests)}`;
+	const content = `${JSON.stringify(iconDescriptors)}`;
 
-	writeFileWithDir(manifestsPath, content, (err) => {
+	writeFileWithDir(JSONPath, content, (err) => {
 		if (err) {
 			// eslint-disable-next-line no-undef
 			console.log(err);

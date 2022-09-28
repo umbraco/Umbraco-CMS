@@ -8,7 +8,20 @@ export interface PropertyEditorConfigRef {
 	config: PropertyEditorConfig;
 }
 
+/**
+ * @export
+ * @class UmbPropertyEditorConfigStore
+ * @extends {UmbDataStoreBase<PropertyEditorConfigRef>}
+ * @description - Data Store for Property Editor Configs
+ */
 export class UmbPropertyEditorConfigStore extends UmbDataStoreBase<PropertyEditorConfigRef> {
+	/**
+	 *
+	 * @description - Request a Property Editor Config by alias. The Property Editor Config is added to the store and is returned as an Observable.
+	 * @param {string} alias
+	 * @return {*}  {(Observable<PropertyEditorConfigRef | undefined>)}
+	 * @memberof UmbPropertyEditorConfigStore
+	 */
 	getByAlias(alias: string): Observable<PropertyEditorConfigRef | undefined> {
 		// TODO: only fetch if the data type is not in the store?
 		getPropertyEditorConfig({ propertyEditorAlias: alias })

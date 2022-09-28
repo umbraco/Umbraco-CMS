@@ -18,7 +18,7 @@ export class UmbDataTypeStore extends UmbDataStoreBase<DataTypeDetails> {
 	}
 
 	/**
-	 * @description - Request a Data Type by key. The Data Type is returned as an Observable.
+	 * @description - Request a Data Type by key. The Data Type is added to the store and is returned as an Observable.
 	 * @param {string} key
 	 * @return {*}  {(Observable<DataTypeDetails | null>)}
 	 * @memberof UmbDataTypeStore

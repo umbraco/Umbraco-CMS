@@ -11,12 +11,31 @@ import { UmbDocumentTypeStore } from '../src/core/stores/document-type.store';
 import { UmbNodeStore } from '../src/core/stores/node.store';
 import { UmbPropertyEditorStore } from '../src/core/stores/property-editor/property-editor.store';
 import { UmbPropertyEditorConfigStore } from '../src/core/stores/property-editor-config/property-editor-config.store';
+import { UmbIconStore } from '../src/core/stores/icon/icon.store';
 import { onUnhandledRequest } from '../src/mocks/browser';
 import { handlers } from '../src/mocks/browser-handlers';
 import { internalManifests } from '../src/temp-internal-manifests';
+import { LitElement } from 'lit';
 
 const extensionRegistry = new UmbExtensionRegistry();
 internalManifests.forEach((manifest) => extensionRegistry.register(manifest));
+
+class UmbStoryBookElement extends LitElement {
+	_umbIconStore = new UmbIconStore();
+
+	constructor() {
+		super();
+		this._umbIconStore.attach(this);
+	}
+
+	render() {
+		return html`<slot></slot>`;
+	}
+}
+
+customElements.define('umb-storybook', UmbStoryBookElement);
+
+const storybookProvider = (story) => html` <umb-storybook>${story()}</umb-storybook> `;
 
 const extensionRegistryProvider = (story) => html`
 	<umb-context-provider key="umbExtensionRegistry" .value=${extensionRegistry}>${story()}</umb-context-provider>
@@ -54,6 +73,7 @@ initialize({ onUnhandledRequest });
 // Provide the MSW addon decorator globally
 export const decorators = [
 	mswDecorator,
+	storybookProvider,
 	extensionRegistryProvider,
 	nodeStoreProvider,
 	dataTypeStoreProvider,
