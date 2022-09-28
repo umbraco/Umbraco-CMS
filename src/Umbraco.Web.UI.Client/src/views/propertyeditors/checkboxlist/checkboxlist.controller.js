@@ -38,10 +38,10 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.CheckboxListContro
                 //watch the model.value in case it changes so that we can keep our view model in sync
                 $scope.$watchCollection("model.value", updateViewModel);
             }
-
+            
             // Set the message to use for when a mandatory field isn't completed.
             // Will either use the one provided on the property type or a localised default.
-            validationMessageService.getMandatoryMessage($scope.model.validation).then(function (value) {
+            validationMessageService.getMandatoryMessage($scope.model.validation).then(value => {
                 $scope.mandatoryMessage = value;
             });  
             
