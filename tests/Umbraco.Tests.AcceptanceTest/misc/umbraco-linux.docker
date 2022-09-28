@@ -4,13 +4,15 @@
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0.300 AS build
 
+COPY nuget.config .
+
 WORKDIR /nupkg
 COPY nupkg .
 
 WORKDIR /build
 RUN dotnet new --install /nupkg/Umbraco.Templates.*.nupkg
 RUN dotnet new umbraco --name Playwright -o . --no-restore
-RUN dotnet restore -s /nupkg -s https://api.nuget.org/v3/index.json
+RUN dotnet restore --configfile /nuget.config
 RUN dotnet publish --no-restore --configuration Release -o /dist 
 
 ############################################
@@ -19,11 +21,10 @@ RUN dotnet publish --no-restore --configuration Release -o /dist
 
 FROM mcr.microsoft.com/dotnet/aspnet:6.0.5 AS run
 
-WORKDIR /playwright
+WORKDIR /app
 COPY --from=build dist .
 
 ENV ASPNETCORE_URLS="http://0.0.0.0:5000;https://0.0.0.0:5001"
-ENV DOTNET_GENERATE_ASPNET_CERTIFICATE="true"
 ENV ConnectionStrings__umbracoDbDSN_ProviderName="Microsoft.Data.Sqlite"
 ENV ConnectionStrings__umbracoDbDSN="Data Source=|DataDirectory|/Umbraco.sqlite.db;Cache=Shared;Foreign Keys=True;Pooling=True"
 ENV Umbraco__CMS__Unattended__InstallUnattended="true"
