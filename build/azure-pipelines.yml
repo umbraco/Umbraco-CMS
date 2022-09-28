@@ -415,7 +415,7 @@ stages:
                 docker build -t $(dockerImageName):$sha -f $(dockerfile) .
                 mkdir -p $(Build.ArtifactStagingDirectory)/docker-images
                 docker save -o $(Build.ArtifactStagingDirectory)/docker-images/$(dockerImageName).$sha.tar $(dockerImageName):$sha
-                docker run --name $(dockerImageName) -dp 8080:5000 -e UMBRACO__CMS_GLOBAL__ID=$(UMBRACO__CMS_GLOBAL__ID) $(dockerImageName):$sha
+                docker run --name $(dockerImageName) -dp 44331:5000 -e UMBRACO__CMS_GLOBAL__ID=$(UMBRACO__CMS_GLOBAL__ID) $(dockerImageName):$sha
                 docker ps
           # Windows containers take forever.
           # --no-launch-profile stops ASPNETCORE_ENVIRONMENT=Development which breaks the users.ts tests (smtp config = invite user button)
