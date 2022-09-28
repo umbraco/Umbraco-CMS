@@ -1,6 +1,6 @@
 import {expect} from '@playwright/test';
 import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
-import {ContentBuilder, DocumentTypeBuilder, PackageBuilder} from "@umbraco/playwright-models";
+import {ContentBuilder, DocumentTypeBuilder, PackageBuilder} from "@umbraco/json-models-builders";
 
 test.describe('Packages', () => {
 

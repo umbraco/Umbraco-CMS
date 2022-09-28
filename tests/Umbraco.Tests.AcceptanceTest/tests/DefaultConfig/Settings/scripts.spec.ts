@@ -1,6 +1,6 @@
 import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
-import {ScriptBuilder} from "@umbraco/playwright-models";
+import {ScriptBuilder} from "@umbraco/json-models-builders";
 
 test.describe('Scripts', () => {
   test.beforeEach(async ({ page, umbracoApi }) => {

@@ -1,6 +1,6 @@
 import { expect } from '@playwright/test';
 import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
-import {DocumentTypeBuilder} from "@umbraco/playwright-models";
+import {DocumentTypeBuilder} from "@umbraco/json-models-builders";
 
 test.describe('Document types', () => {
   test.beforeEach(async ({ page, umbracoApi }) => {

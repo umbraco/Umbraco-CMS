@@ -1,6 +1,6 @@
 import {expect} from '@playwright/test';
 import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
-import {TemplateBuilder} from "@umbraco/playwright-models";
+import {TemplateBuilder} from "@umbraco/json-models-builders";
 
 test.describe('Templates', () => {
   test.beforeEach(async ({page, umbracoApi}) => {

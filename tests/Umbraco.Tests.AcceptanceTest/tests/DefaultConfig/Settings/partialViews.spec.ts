@@ -1,6 +1,6 @@
 import {expect} from '@playwright/test';
 import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
-import {PartialViewBuilder} from "@umbraco/playwright-models";
+import {PartialViewBuilder} from "@umbraco/json-models-builders";
 
 test.describe('Partial Views', () => {
 

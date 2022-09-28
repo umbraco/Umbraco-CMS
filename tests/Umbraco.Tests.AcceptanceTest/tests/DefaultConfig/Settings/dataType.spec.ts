@@ -1,6 +1,6 @@
 import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
-import {LabelDataTypeBuilder} from "@umbraco/playwright-models";
+import {LabelDataTypeBuilder} from "@umbraco/json-models-builders";
 
 test.describe('Data Types', () => {
   

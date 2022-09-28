@@ -6,7 +6,7 @@ import {
   PartialViewMacroBuilder,
   MacroBuilder,
   GridDataTypeBuilder
-} from "@umbraco/playwright-models";
+} from "@umbraco/json-models-builders";
 
 test.describe('Content tests', () => {
 
