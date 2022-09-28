@@ -7,11 +7,11 @@ namespace Umbraco.Cms.ManagementApi.ViewModels.Installer;
 public class InstallViewModel
 {
     [Required]
-    public UserInstallViewModel User { get; } = null!;
+    public UserInstallViewModel User { get; set; } = null!;
 
     [Required]
-    public DatabaseInstallViewModel Database { get; } = null!;
+    public DatabaseInstallViewModel Database { get; set; } = null!;
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public TelemetryLevel TelemetryLevel { get; } = TelemetryLevel.Basic;
+    public TelemetryLevel TelemetryLevel { get; set; } = TelemetryLevel.Basic;
 }
