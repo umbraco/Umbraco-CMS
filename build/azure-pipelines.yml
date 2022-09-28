@@ -480,7 +480,7 @@ stages:
               targetFolder: $(Build.ArtifactStagingDirectory)/playwright
           - task: PublishPipelineArtifact@1
             displayName: "Publish test artifacts"
-            condition: always()
+            condition: eq(variables.myfileexists, 'true')
             inputs:
               targetPath: $(Build.ArtifactStagingDirectory)
               artifact: 'E2E artifacts - $(Agent.OS) - Attempt #$(System.JobAttempt)'
