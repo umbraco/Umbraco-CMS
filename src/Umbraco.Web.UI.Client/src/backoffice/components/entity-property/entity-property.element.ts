@@ -10,6 +10,12 @@ import type { ManifestPropertyEditorUI } from '../../../core/models';
 import '../../property-actions/shared/property-action-menu/property-action-menu.element';
 import '../../editors/shared/editor-property-layout/editor-property-layout.element';
 
+/**
+ *  @element umb-entity-property
+ *  @description - Component for displaying a entity property. The Element will render a Property Editor based on the Property Editor UI alias passed to the element.
+ *  The element will also render all Property Actions related to the Property Editor.
+ *  @extends UUIRefNodeElement
+ */
 @customElement('umb-entity-property')
 export class UmbEntityPropertyElement extends UmbContextConsumerMixin(LitElement) {
 	static styles = [
@@ -40,15 +46,41 @@ export class UmbEntityPropertyElement extends UmbContextConsumerMixin(LitElement
 		`,
 	];
 
+	/**
+	 * Label
+	 * @type {string}
+	 * @attr
+	 * @default ''
+	 */
 	@property({ type: String })
 	public label = '';
 
+	/**
+	 * Description: render a description underneath the label.
+	 * @type {string}
+	 * @attr
+	 * @default ''
+	 */
 	@property({ type: String })
 	public description = '';
 
+	/**
+	 * Alias
+	 * @public
+	 * @type {string}
+	 * @attr
+	 * @default ''
+	 */
 	@property({ type: String })
 	public alias = '';
 
+	/**
+	 * Property Editor UI Alias. Render the Property Editor UI registered for this alias.
+	 * @public
+	 * @type {string}
+	 * @attr
+	 * @default ''
+	 */
 	private _propertyEditorUIAlias = '';
 	@property({ type: String, attribute: 'property-editor-ui-alias' })
 	public get propertyEditorUIAlias(): string {
@@ -59,11 +91,25 @@ export class UmbEntityPropertyElement extends UmbContextConsumerMixin(LitElement
 		this._observePropertyEditorUI();
 	}
 
+	/**
+	 * Property Editor UI Alias. Render the Property Editor UI registered for this alias.
+	 * @public
+	 * @type {string}
+	 * @attr
+	 * @default ''
+	 */
 	@property({ type: Object, attribute: false })
-	value?: any;
+	public value?: any;
 
+	/**
+	 * Config. Configuration to pass to the Property Editor UI. This is also the configuration data stored on the Data Type.
+	 * @public
+	 * @type {string}
+	 * @attr
+	 * @default ''
+	 */
 	@property({ type: Object, attribute: false })
-	config?: any;
+	public config?: any;
 
 	// TODO: make interface for UMBPropertyEditorElement
 	@state()
