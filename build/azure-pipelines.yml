@@ -387,7 +387,8 @@ stages:
             inputs:
               targetType: inline
               workingDirectory: $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/
-              script: New-Item -Path "." -Name ".env" -ItemType "file" -Value |
+              script: |
+                New-Item -Path "." -Name ".env" -ItemType "file" -Value
                 "UMBRACO_USER_LOGIN=nge@umbraco.dk
                 UMBRACO_USER_PASSWORD=1234567890
                 URL=http://localhost:8080"
