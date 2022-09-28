@@ -631,6 +631,16 @@ components:
         - label
         - alias
         - propertyEditorUI
+    PropertyEditorConfigDefaultData:
+      type: object
+      properties:
+        alias:
+          type: string
+        value:
+          type: object
+      required:
+        - alias
+        - value
     PropertyEditorConfig:
       type: object
       properties:
@@ -639,7 +649,9 @@ components:
           items:
             $ref: '#/components/schemas/PropertyEditorConfigProperty'
         defaultData:
-          type: object
+          type: array
+          items:
+            $ref: '#/components/schemas/PropertyEditorConfigDefaultData'
       required:
         - properties
     MetaPropertyEditorUI:
@@ -996,7 +1008,9 @@ components:
           items:
             $ref: '#/components/schemas/PropertyEditorConfigProperty'
         defaultData:
-          type: object
+          type: array
+          items:
+            $ref: '#/components/schemas/PropertyEditorConfigDefaultData'
       required:
         - properties
     ServerStatus:

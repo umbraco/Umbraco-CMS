@@ -195,9 +195,12 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 						propertyEditorUI: 'Umb.PropertyEditorUI.Text',
 					},
 				],
-				defaultData: {
-					someConfiguration: 'Hello Default World',
-				},
+				defaultData: [
+					{
+						alias: 'someConfiguration',
+						value: 'Some default value',
+					},
+				],
 			},
 		},
 	},

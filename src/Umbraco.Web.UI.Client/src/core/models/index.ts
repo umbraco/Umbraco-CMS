@@ -38,6 +38,7 @@ export type PropertyEditorConfigResponse = components['schemas']['PropertyEditor
 export type PropertyEditorConfig = components['schemas']['PropertyEditorConfig'];
 export type PropertyEditor = components['schemas']['PropertyEditor'];
 export type PropertyEditorConfigProperty = components['schemas']['PropertyEditorConfigProperty'];
+export type PropertyEditorConfigDefaultData = components['schemas']['PropertyEditorConfigDefaultData'];
 
 export type ManifestElementType =
 	| ManifestSection

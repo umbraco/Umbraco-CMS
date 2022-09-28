@@ -7,7 +7,7 @@ import { UmbContextConsumerMixin } from '../../../../core/context';
 import { UmbExtensionRegistry } from '../../../../core/extension';
 import { UmbPropertyEditorConfigStore } from '../../../../core/stores/property-editor-config/property-editor-config.store';
 
-import type { PropertyEditorConfigProperty } from '../../../../core/models';
+import type { PropertyEditorConfigDefaultData, PropertyEditorConfigProperty } from '../../../../core/models';
 
 import '../../../components/entity-property/entity-property.element';
 
@@ -40,13 +40,15 @@ export class UmbPropertyEditorConfigElement extends UmbContextConsumerMixin(LitE
 	}
 
 	@property({ type: Array })
-	public data: Array<any> = [];
+	public data: Array<{ alias: string; value: unknown }> = [];
 
 	@state()
 	private _properties: Array<PropertyEditorConfigProperty> = [];
 
-	private _propertyEditorConfigDefaultData?: any;
-	private _propertyEditorUIConfigDefaultData?: any;
+	private _propertyEditorConfigDefaultData: Array<PropertyEditorConfigDefaultData> = [];
+	private _propertyEditorUIConfigDefaultData: Array<PropertyEditorConfigDefaultData> = [];
+
+	private _configDefaultData?: Array<PropertyEditorConfigDefaultData>;
 
 	private _propertyEditorConfigProperties: Array<PropertyEditorConfigProperty> = [];
 	private _propertyEditorUIConfigProperties: Array<PropertyEditorConfigProperty> = [];
@@ -81,8 +83,9 @@ export class UmbPropertyEditorConfigElement extends UmbContextConsumerMixin(LitE
 			.subscribe((propertyEditorConfig) => {
 				if (!propertyEditorConfig) return;
 				this._propertyEditorConfigProperties = propertyEditorConfig?.config?.properties || [];
-				this._propertyEditorConfigDefaultData = propertyEditorConfig?.config?.defaultData || {};
-				this._applyProperties();
+				this._mergeProperties();
+				this._propertyEditorConfigDefaultData = propertyEditorConfig?.config?.defaultData || [];
+				this._mergeDefaultData();
 			});
 	}
 
@@ -94,21 +97,24 @@ export class UmbPropertyEditorConfigElement extends UmbContextConsumerMixin(LitE
 		this._extensionRegistry?.getByAlias(this.propertyEditorUIAlias).subscribe((manifest) => {
 			if (manifest?.type === 'propertyEditorUI') {
 				this._propertyEditorUIConfigProperties = manifest?.meta.config?.properties || [];
-				this._propertyEditorUIConfigDefaultData = manifest?.meta.config?.defaultData || {};
-				this._applyProperties();
+				this._mergeProperties();
+				this._propertyEditorUIConfigDefaultData = manifest?.meta.config?.defaultData || [];
+				this._mergeDefaultData();
 			}
 		});
 	}
 
-	private _applyProperties() {
+	private _mergeProperties() {
 		this._properties = [...this._propertyEditorConfigProperties, ...this._propertyEditorUIConfigProperties];
+	}
+
+	private _mergeDefaultData() {
+		this._configDefaultData = [...this._propertyEditorConfigDefaultData, ...this._propertyEditorUIConfigDefaultData];
 	}
 
 	private _getValue(property: PropertyEditorConfigProperty) {
 		const value = this.data.find((data) => data.alias === property.alias)?.value;
-		const defaultValue =
-			this._propertyEditorConfigDefaultData?.[property.alias] ||
-			this._propertyEditorUIConfigDefaultData?.[property.alias];
+		const defaultValue = this._configDefaultData?.find((data) => data.alias === property.alias)?.value;
 		return value || defaultValue || null;
 	}
 

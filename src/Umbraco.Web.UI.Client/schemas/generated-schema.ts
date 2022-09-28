@@ -188,9 +188,13 @@ export interface components {
       alias: string;
       propertyEditorUI: string;
     };
+    PropertyEditorConfigDefaultData: {
+      alias: string;
+      value: { [key: string]: unknown };
+    };
     PropertyEditorConfig: {
       properties: components["schemas"]["PropertyEditorConfigProperty"][];
-      defaultData?: { [key: string]: unknown };
+      defaultData?: components["schemas"]["PropertyEditorConfigDefaultData"][];
     };
     MetaPropertyEditorUI: {
       label: string;
@@ -329,7 +333,7 @@ export interface components {
     };
     PropertyEditorConfigResponse: {
       properties: components["schemas"]["PropertyEditorConfigProperty"][];
-      defaultData?: { [key: string]: unknown };
+      defaultData?: components["schemas"]["PropertyEditorConfigDefaultData"][];
     };
     /** @enum {string} */
     ServerStatus: "running" | "must-install" | "must-upgrade";
