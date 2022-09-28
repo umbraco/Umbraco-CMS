@@ -46,56 +46,6 @@ test.describe('Packages', () => {
 
   }
 
-  // test('Creates a simple package', async ({page, umbracoApi, umbracoUi}) => {
-  //   await umbracoApi.packages.ensureNameNotExists(packageName);
-  //   await umbracoApi.content.deleteAllContent();
-  //   await umbracoApi.documentTypes.ensureNameNotExists(rootDocTypeName);
-  //
-  //   const rootDocType = new DocumentTypeBuilder()
-  //     .withName(rootDocTypeName)
-  //     .withAllowAsRoot(true)
-  //     .build();
-  //
-  //   const generatedRootDocType = await umbracoApi.documentTypes.save(rootDocType);
-  //   const rootDocTypeAlias = generatedRootDocType["alias"];
-  //
-  //   const rootContentNode = new ContentBuilder()
-  //     .withContentTypeAlias(rootDocTypeAlias)
-  //     .withAction("saveNew")
-  //     .addVariant()
-  //       .withName(nodeName)
-  //       .withSave(true)
-  //     .done()
-  //     .build();
-  //
-  //   await umbracoApi.content.save(rootContentNode);
-  //
-  //   // We have to wait for navigation to the packages section, if not it can cause the test to fail
-  //   await Promise.all([
-  //     page.waitForNavigation(),
-  //     umbracoUi.goToSection(ConstantHelper.sections.packages)
-  //   ]);
-  //   await page.locator('[data-element="sub-view-umbCreatedPackages"]').click();
-  //   await page.locator("button", {hasText: "Create package"}).click();
-  //
-  //   // Fill out package creation form
-  //   await page.waitForTimeout(1000);
-  //   await page.locator("#headerName").type(packageName);
-  //   await page.locator('.controls > .umb-node-preview-add').click();
-  //   await page.locator('.umb-tree-item__label').first().click();
-  //   await page.locator("button", {hasText: "Create"}).click();
-  //
-  //   // Navigate pack to packages and Assert the file is created
-  //   await umbracoUi.goToSection(ConstantHelper.sections.packages);
-  //   await page.locator('[data-element="sub-view-umbCreatedPackages"]').click();
-  //   await expect(await page.locator("body", {hasText: packageName})).toBeVisible();
-  //
-  //   // Cleanup
-  //   await umbracoApi.packages.ensureNameNotExists(packageName);
-  //   await umbracoApi.content.deleteAllContent();
-  //   await umbracoApi.documentTypes.ensureNameNotExists(rootDocTypeName);
-  // });
-
   test('Deletes a package', async ({page, umbracoApi, umbracoUi}) => {
     await umbracoApi.content.deleteAllContent();
     await umbracoApi.documentTypes.ensureNameNotExists(rootDocTypeName);
