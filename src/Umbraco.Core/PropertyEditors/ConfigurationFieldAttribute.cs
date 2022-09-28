@@ -120,9 +120,14 @@ public class ConfigurationFieldAttribute : Attribute
     public string? Name { get; }
 
     /// <summary>
-    ///     Gets or sets the view to use to render the field editor.
+    ///     Gets the view to use to render the field editor.
     /// </summary>
     public string? View { get; }
+
+    /// <summary>
+    ///     Gets the sort order to use to render the field editor.
+    /// </summary>
+    public int? SortOrder { get; }
 
     /// <summary>
     ///     Gets or sets the description of the field.

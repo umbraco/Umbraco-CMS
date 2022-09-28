@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.Reflection;
@@ -125,7 +125,8 @@ public abstract class ConfigurationEditor<TConfiguration> : ConfigurationEditor
                     PropertyType = property.PropertyType,
                     Description = attribute.Description,
                     HideLabel = attribute.HideLabel,
-                    View = attributeView,
+                    SortOrder = attribute.SortOrder ?? 0,
+                    View = attributeView
                 };
 
                 fields.Add(field);
@@ -176,12 +177,17 @@ public abstract class ConfigurationEditor<TConfiguration> : ConfigurationEditor
                 field.Description = attribute.Description;
             }
 
+            if (attribute.SortOrder.HasValue)
+            {
+                field.SortOrder = attribute.SortOrder.Value;
+            }
+
             if (attribute.HideLabelSettable.HasValue)
             {
                 field.HideLabel = attribute.HideLabel;
             }
         }
 
-        return fields;
+        return fields.OrderBy(x => x.SortOrder).ToList();
     }
 }
