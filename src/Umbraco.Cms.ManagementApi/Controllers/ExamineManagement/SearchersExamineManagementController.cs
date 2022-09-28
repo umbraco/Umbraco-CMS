@@ -22,7 +22,7 @@ public class SearchersExamineManagementController : ExamineManagementControllerB
     [HttpGet("searchers")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<SearcherViewModel>), StatusCodes.Status200OK)]
-    public async Task<PagedViewModel<SearcherViewModel>> Searchers(int skip, int take)
+    public async Task<ActionResult<PagedViewModel<SearcherViewModel>>> Searchers(int skip, int take)
     {
         var searchers = new List<SearcherViewModel>(
             _examineManager.RegisteredSearchers.Select(searcher => new SearcherViewModel { Name = searcher.Name })
@@ -34,6 +34,6 @@ public class SearchersExamineManagementController : ExamineManagementControllerB
             Total = searchers.Count,
         };
 
-        return await Task.FromResult(viewModel);
+        return await Task.FromResult(Ok(viewModel));
     }
 }
