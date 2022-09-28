@@ -1,6 +1,18 @@
-<div class="umb-radiobuttons-preval">
+<div class="umb-radiobuttons-preval" ng-controller="Umbraco.PrevalueEditors.RadiobuttonListController as vm">
 
-    <ul class="unstyled" ng-if="model.prevalues">
+    {{model.value}}
+
+    <ul class="unstyled" ng-if="vm.viewItems.length">
+        <li ng-repeat="item in vm.viewItems track by $id(item)">
+            <umb-radiobutton
+                value="{{item.value}}"
+                model="model.value"
+                text="{{item.label}}">
+            </umb-radiobutton>
+        </li>
+    </ul>
+
+    <!--<ul class="unstyled" ng-if="model.prevalues">
         <li ng-repeat="preval in model.prevalues">
 
             <umb-radiobutton model="model.value" value="{{preval.value || preval}}">
@@ -18,6 +30,6 @@
             </umb-radiobutton>
 
         </li>
-    </ul>
+    </ul>-->
 
 </div>
