@@ -18,17 +18,26 @@
 
     const DEFAULT_GRID_COLUMNS = 12;
 
-    function BlockConfigurationController($scope, elementTypeResource, overlayService, localizationService, editorService, eventsService, udiService) {
+    function BlockConfigurationController($scope, $element, elementTypeResource, overlayService, localizationService, editorService, eventsService, udiService) {
 
         var unsubscribe = [];
 
         var vm = this;
         vm.openBlock = null;
 
+        vm.ungroupedBlocks = [];
+
         function onInit() {
+
+            $element.closest('.umb-control-group').addClass('-no-border');
 
             // Somehow the preValues models are different, so we will try to match either key or alias.
             vm.gridColumnsPreValue = $scope.preValues.find(x => x.key ? x.key === "gridColumns" : x.alias === "gridColumns");
+            const blockGroupModel = $scope.preValues.find(x => x.key ? x.key === "blockGroups" : x.alias === "blockGroups");
+            if (blockGroupModel.value == null) {
+                blockGroupModel.value = [];
+            }
+            vm.blockGroups = blockGroupModel.value;
 
             if (!$scope.model.value) {
                 $scope.model.value = [];
@@ -37,14 +46,15 @@
             // Ensure good values:
             $scope.model.value.forEach(block => {
                 block.columnSpanOptions = block.columnSpanOptions || [];
-            })
+            });
             $scope.model.value.forEach(block => {
                 block.areas = block.areas || [];
-            })
+            });
 
             loadElementTypes();
 
         }
+
 
         function loadElementTypes() {
             return elementTypeResource.getAll().then(function (elementTypes) {
@@ -84,11 +94,32 @@
             $scope.model.value.splice(index, 1);
         };
 
-        vm.sortableOptions = {
+        const defaultOptions = {
+            axis: '',
+            tolerance: "pointer",
+            opacity: 0.7,
+            scroll: true
+        };
+        vm.groupSortableOptions = {
+            ...defaultOptions, 
+            handle: '.__handle',
+            items: ".umb-block-card-group",
+            cursor: "grabbing",
+            placeholder: 'umb-block-card-group --sortable-placeholder'
+        };
+        vm.blockSortableOptions = {
+            ...defaultOptions, 
             "ui-floating": true,
+            connectWith: ".umb-block-card-grid",
             items: "umb-block-card",
             cursor: "grabbing",
-            placeholder: 'umb-block-card --sortable-placeholder'
+            placeholder: '--sortable-placeholder',
+            forcePlaceHolderSize: true,
+            stop: function(e, ui) {
+                // We do not want sortable to actually move the data, as we are using the same ng-model. Instead we just change the groupKey and cancel the transfering.
+                ui.item.sortable.model.groupKey = ui.item.sortable.droptarget[0].dataset.groupKey || null;
+                ui.item.sortable.cancel();
+            }
         };
 
 
@@ -108,7 +139,7 @@
             }
         };
 
-        vm.openAddDialog = function () {
+        vm.openAddDialog = function (groupKey) {
 
             localizationService.localize("blockEditor_headlineCreateBlock").then(function(localizedTitle) {
 
@@ -130,7 +161,7 @@
                     },
                     filterCssClass: "not-allowed",
                     select: function (node) {
-                        vm.addBlockFromElementTypeKey(udiService.getKey(node.udi));
+                        vm.addBlockFromElementTypeKey(udiService.getKey(node.udi), groupKey);
                         editorService.close();
                     },
                     close: function () {
@@ -142,7 +173,7 @@
                             labelKey: "blockEditor_labelcreateNewElementType",
                             action: function () {
                                 vm.createElementTypeAndCallback((documentTypeKey) => {
-                                    vm.addBlockFromElementTypeKey(documentTypeKey);
+                                    vm.addBlockFromElementTypeKey(documentTypeKey, groupKey);
 
                                     // At this point we will close the contentTypePicker.
                                     editorService.close();
@@ -176,7 +207,7 @@
             editorService.documentTypeEditor(editor);
         }
 
-        vm.addBlockFromElementTypeKey = function(key) {
+        vm.addBlockFromElementTypeKey = function(key, groupKey) {
 
             var blockType = {
                 "columnSpanOptions": [],
@@ -193,7 +224,8 @@
                 "backgroundColor": null,
                 "thumbnail": null,
                 "areaGridColumns": null,
-                "areas": []
+                "areas": [],
+                "groupKey": groupKey || null
             };
 
             $scope.model.value.push(blockType);

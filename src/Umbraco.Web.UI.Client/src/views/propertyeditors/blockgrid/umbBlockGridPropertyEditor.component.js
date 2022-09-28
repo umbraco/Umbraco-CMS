@@ -124,6 +124,7 @@
             vm.validationLimit = vm.model.config.validationLimit;
             vm.gridColumns = vm.model.config.gridColumns || 12;
             vm.createLabel = vm.model.config.createLabel || "";
+            vm.blockGroups = vm.model.config.blockGroups;
 
             vm.editorWrapperStyles = {};
 
@@ -778,6 +779,7 @@
                 $parentScope: $scope, // pass in a $parentScope, this maintains the scope inheritance in infinite editing
                 $parentForm: vm.propertyForm, // pass in a $parentForm, this maintains the FormController hierarchy with the infinite editing view (if it contains a form)
                 availableItems: availableTypes,
+                blockGroups: vm.blockGroups,
                 title: vm.labels.grid_addElement,
                 openClipboard: openClipboard,
                 orderBy: "$index",

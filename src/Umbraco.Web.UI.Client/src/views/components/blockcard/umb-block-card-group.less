@@ -1,0 +1,62 @@
+.umb-block-card-group {
+    position: relative;
+    display: block;
+    width: 100%;
+    margin-top: 20px;
+
+    > .__handle {
+        display: inline-flex;
+        align-items: center;
+        width: 24px;
+        height: 32px;
+        opacity: 0;
+        margin-left: -28px;
+        transition: opacity 120ms;
+        &:hover {
+            opacity: 1;
+        }
+    }
+    &:focus-within > .__handle,
+    &:hover > .__handle {
+        opacity: 0.5;
+    }
+
+    >.__title {
+        border: 1px solid transparent;
+        font-weight: 700;
+        &:hover {
+            border-color: @inputBorder;
+        }
+    }
+
+    > h5 {
+        display: inline;
+    }
+
+    > .umb-block-card-grid {
+        margin-top: 10px;
+    }
+    
+    &.--sortable-placeholder {
+
+        height: 50px;
+
+        &::after {
+            content: "";
+            position: absolute;
+            background-color:rgba(@ui-drop-area-color, .5);
+            border: 2px solid rgba(@ui-drop-area-color, 1);
+            border-radius: @doubleBorderRadius;
+            box-shadow: 0 0 4px rgba(@ui-drop-area-color, 0.05);
+            top:0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            animation: umb-block-card--sortable-placeholder 400ms ease-in-out alternate infinite;
+            @keyframes umb-block-card--sortable-placeholder {
+                0%   { opacity: 1; }
+                100% { opacity: 0.5; }
+            }
+        }
+    }
+}

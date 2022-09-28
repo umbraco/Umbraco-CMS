@@ -73,10 +73,8 @@ namespace Umbraco.Cms.Core.PropertyEditors
                     [DataMember(Name ="elementTypeKey")]
                     public Guid? ElementTypeKey { get; set; }
 
-                    /*
                     [DataMember(Name ="groupKey")]
-                    public Guid? groupKey { get; set; }
-                    */
+                    public Guid? GroupKey { get; set; }
 
                     [DataMember(Name ="minAllowed")]
                     public int? MinAllowed { get; set; }
@@ -117,7 +115,26 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
             [DataMember(Name ="forceHideContentEditorInOverlay")]
             public bool ForceHideContentEditorInOverlay { get; set; }
+
+            [DataMember(Name ="groupKey")]
+            public string? GroupKey { get; set; }
+            
         }
+
+        [ConfigurationField("blockGroups", "Block Groups", "views/propertyeditors/blockgrid/prevalue/blockgrid.groupconfiguration.html", HideLabel = true)]
+        public BlockGridGroupConfiguration[] BlockGroups { get; set; }  = null!;
+
+        [DataContract]
+        public class BlockGridGroupConfiguration
+        {
+
+            [DataMember(Name ="key")]
+            public Guid Key { get; set; }
+
+            [DataMember(Name ="name")]
+            public string? Name { get; set; }
+        }
+
 
         [ConfigurationField("validationLimit", "Amount", "numberrange", Description = "Set a required range of blocks")]
         public NumberRange ValidationLimit { get; set; } = new NumberRange();
@@ -135,10 +152,10 @@ namespace Umbraco.Cms.Core.PropertyEditors
         [ConfigurationField("useLiveEditing", "Live editing mode", "boolean", Description = "Live update content when editing in overlay")]
         public bool UseLiveEditing { get; set; }
 
-        [ConfigurationField("maxPropertyWidth", "Editor width", "textstring", Description = "optional css overwrite, example: 800px or 100%")]
+        [ConfigurationField("maxPropertyWidth", "Editor width", "textstring", Description = "Optional css overwrite. (example: 1200px or 100%)")]
         public string? MaxPropertyWidth { get; set; }
 
-        [ConfigurationField("gridColumns", "Grid Columns", "number", Description = "Set the number of columns for the layout")]
+        [ConfigurationField("gridColumns", "Grid Columns", "number", Description = "Set the number of columns for the layout. (defaults to 12)")]
         public int? GridColumns { get; set; }
         
         [ConfigurationField("layoutStylesheet", "Layout Stylesheet", "views/propertyeditors/blockgrid/prevalue/blockgrid.stylesheetpicker.html", Description = "Overwrite default stylesheet for layout.")]

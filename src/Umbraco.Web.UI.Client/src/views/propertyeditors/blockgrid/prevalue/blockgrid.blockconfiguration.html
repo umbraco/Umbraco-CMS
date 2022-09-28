@@ -1,23 +1,65 @@
 <div class="umb-block-grid-block-configuration" ng-controller="Umbraco.PropertyEditors.BlockGrid.BlockConfigurationController as vm">
 
-    <div class="umb-block-card-grid" ui-sortable="vm.sortableOptions" ng-model="model.value">
 
-        <umb-block-card
-            block-config-model="block"
-            element-type-model="vm.getElementTypeByKey(block.contentElementTypeKey)"
-            ng-repeat="block in model.value"
-            ng-class="{'--isOpen':vm.openBlock === block}"
-            ng-click="vm.openBlockOverlay(block)">
-            <div class="__actions">
-                <button type="button" class="btn-reset __action umb-outline" ng-click="vm.requestRemoveBlockByIndex($index); $event.stopPropagation();">
-                    <umb-icon icon="icon-trash" class="icon"></umb-icon>
-                    <localize key="general_delete" class="sr-only">Delete</localize>
+    <div class="umb-block-card-group">
+
+        <div class="umb-block-card-grid" ui-sortable="vm.blockSortableOptions" ng-model="model.value">
+
+            <umb-block-card
+                ng-repeat="block in model.value track by block.contentElementTypeKey"
+                ng-show="block.groupKey === null"
+                block-config-model="block"
+                element-type-model="vm.getElementTypeByKey(block.contentElementTypeKey)"
+                ng-class="{'--isOpen':vm.openBlock === block}"
+                ng-click="vm.openBlockOverlay(block)"
+                data-content-element-type-key="{{block.contentElementTypeKey}}">
+                <div class="__actions">
+                    <button type="button" class="btn-reset __action umb-outline" ng-click="vm.requestRemoveBlockByIndex($index); $event.stopPropagation();">
+                        <umb-icon icon="icon-trash" class="icon"></umb-icon>
+                        <localize key="general_delete" class="sr-only">Delete</localize>
+                    </button>
+                </div>
+            </umb-block-card>
+
+            <button id="{{model.alias}}" type="button" class="btn-reset __add-button" ng-click="vm.openAddDialog()">
+                <localize key="blockEditor_addBlockType">Add Block</localize>
+            </button>
+        </div>
+
+    </div>
+
+    <div ui-sortable="vm.groupSortableOptions" ng-model="vm.blockGroups">
+        <div class="umb-block-card-group" ng-repeat="blockGroup in vm.blockGroups track by blockGroup.key">
+
+
+            <div class="__handle"><umb-icon icon="icon-navigation"></umb-icon></div>
+            
+            <input class="__title" title="group name" type="text" ng-model="blockGroup.name"></input>
+
+            <div class="umb-block-card-grid" ui-sortable="vm.blockSortableOptions" ng-model="model.value" data-group-key="{{blockGroup.key}}">
+
+                <umb-block-card 
+                    ng-repeat="block in model.value track by block.contentElementTypeKey"
+                    ng-show="block.groupKey === blockGroup.key"
+                    block-config-model="block"
+                    element-type-model="vm.getElementTypeByKey(block.contentElementTypeKey)"
+                    ng-class="{'--isOpen':vm.openBlock === block}"
+                    ng-click="vm.openBlockOverlay(block)"
+                    data-content-element-type-key="{{block.contentElementTypeKey}}">
+                    <div class="__actions">
+                        <button type="button" class="btn-reset __action umb-outline" ng-click="vm.requestRemoveBlockByIndex($index); $event.stopPropagation();">
+                            <umb-icon icon="icon-trash" class="icon"></umb-icon>
+                            <localize key="general_delete" class="sr-only">Delete</localize>
+                        </button>
+                    </div>
+                </umb-block-card>
+
+                <button id="{{model.alias}}" type="button" class="btn-reset __add-button" ng-click="vm.openAddDialog(blockGroup.key)">
+                    <localize key="blockEditor_addBlockType">Add Block</localize>
                 </button>
             </div>
-        </umb-block-card>
 
-        <button id="{{model.alias}}" type="button" class="btn-reset __add-button" ng-click="vm.openAddDialog($event)">
-            <localize key="general_add">Add</localize>
-        </button>
+        </div>
     </div>
+
 </div>

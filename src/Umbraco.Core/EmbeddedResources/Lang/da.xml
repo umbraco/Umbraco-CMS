@@ -2239,6 +2239,13 @@ Mange hilsner fra Umbraco robotten
     <key alias="forceLeftButton">Skift påtvungen placering i venstre side</key>
     <key alias="forceRightButton">Skift påtvungen placering i højre side</key>
     <key alias="scaleHandlerButtonTitle">Træk for at skalere</key>
+    <key alias="areaCreateLabelTitle">Tilføj indhold label</key>
+    <key alias="areaCreateLabelHelp">Overskriv labellen for tilføj indholds knappen i dette område.</key>
+    <key alias="addSizeOptions">Tilføj skalerings muligheder</key>
+    <key alias="addAreaOptions">Tilføj områder</key>
+    <key alias="addAppearanceOptions">Tilføj katalog udseende</key>
+    <key alias="addBlockType">Tilføj Blok</key>
+    <key alias="addBlockGroup">Tilføj gruppe</key>
   </area>
   <area alias="contentTemplatesDashboard">
     <key alias="whatHeadline">Hvad er Indholdsskabeloner?</key>

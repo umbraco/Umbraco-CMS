@@ -2895,6 +2895,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="addSizeOptions">Add resize options</key>
     <key alias="addAreaOptions">Add areas</key>
     <key alias="addAppearanceOptions">Add catalogue appearance</key>
+    <key alias="addBlockType">Add Block</key>
+    <key alias="addBlockGroup">Add group</key>
   </area>
   <area alias="contentTemplatesDashboard">
     <key alias="whatHeadline">What are Content Templates?</key>
