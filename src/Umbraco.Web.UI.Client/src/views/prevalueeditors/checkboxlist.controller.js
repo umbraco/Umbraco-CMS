@@ -18,7 +18,7 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.CheckboxListContro
 
                 if (Utilities.isObject(prevalues[i])) {
                     item.value = prevalues[i].value;
-                    item.label = prevalues[i].label;
+                    item.label = prevalues[i].label || prevalues[i].value;
                 }
                 else {
                     item.value = prevalues[i];
