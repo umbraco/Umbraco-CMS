@@ -391,9 +391,10 @@ stages:
                 >> UMBRACO_USER_PASSWORD=1234567890
                 >> URL=http://localhost:8080"
           - script: npm ci --no-fund --no-audit --prefer-offline
-            workingDirectory:  $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/
+            workingDirectory: $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/
             displayName: Run npm ci
           - powershell: get-content .env
+            workingDirectory: $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/
             displayName: ENV CONTENT
           - powershell: sqllocaldb start mssqllocaldb
             displayName: Start localdb (Windows only)
