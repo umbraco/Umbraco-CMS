@@ -1,7 +1,5 @@
 <div class="umb-radiobuttons-preval" ng-controller="Umbraco.PrevalueEditors.RadiobuttonListController as vm">
 
-    {{model.value}}
-
     <ul class="unstyled" ng-if="vm.viewItems.length">
         <li ng-repeat="item in vm.viewItems track by $id(item)">
             <umb-radiobutton
