@@ -125,8 +125,8 @@ public abstract class ConfigurationEditor<TConfiguration> : ConfigurationEditor
                     PropertyType = property.PropertyType,
                     Description = attribute.Description,
                     HideLabel = attribute.HideLabel,
-                    SortOrder = attribute.SortOrder ?? 0,
-                    View = attributeView
+                    SortOrder = attribute.SortOrder,
+                    View = attributeView,
                 };
 
                 fields.Add(field);
@@ -150,6 +150,8 @@ public abstract class ConfigurationEditor<TConfiguration> : ConfigurationEditor
 
             field.PropertyName = property.Name;
             field.PropertyType = property.PropertyType;
+
+            field.SortOrder = attribute.SortOrder;
 
             if (!string.IsNullOrWhiteSpace(attribute.Key))
             {
@@ -175,11 +177,6 @@ public abstract class ConfigurationEditor<TConfiguration> : ConfigurationEditor
             if (!string.IsNullOrWhiteSpace(attribute.Description))
             {
                 field.Description = attribute.Description;
-            }
-
-            if (attribute.SortOrder.HasValue)
-            {
-                field.SortOrder = attribute.SortOrder.Value;
             }
 
             if (attribute.HideLabelSettable.HasValue)

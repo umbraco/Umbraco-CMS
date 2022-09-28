@@ -48,7 +48,7 @@ public class ConfigurationField
         HideLabel = attribute.HideLabel;
         Key = attribute.Key;
         View = attribute.View;
-        SortOrder = attribute.SortOrder ?? 0;
+        SortOrder = attribute.SortOrder;
     }
 
     /// <summary>
