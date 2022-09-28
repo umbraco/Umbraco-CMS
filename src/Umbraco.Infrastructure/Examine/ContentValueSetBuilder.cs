@@ -1,12 +1,16 @@
 using Examine;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
+using IScopeProvider = Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
 
@@ -24,6 +28,19 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
     private readonly IShortStringHelper _shortStringHelper;
     private readonly UrlSegmentProviderCollection _urlSegmentProviders;
     private readonly IUserService _userService;
+
+    [Obsolete]
+    public ContentValueSetBuilder(
+        PropertyEditorCollection propertyEditors,
+        UrlSegmentProviderCollection urlSegmentProviders,
+        IUserService userService,
+        IShortStringHelper shortStringHelper,
+        Core.Scoping.IScopeProvider scopeProvider,
+        bool publishedValuesOnly)
+        : this(propertyEditors, urlSegmentProviders, userService, shortStringHelper,
+              StaticServiceProvider.Instance.GetRequiredService<IScopeProvider>(), publishedValuesOnly)
+    {
+    }
 
     public ContentValueSetBuilder(
         PropertyEditorCollection propertyEditors,
