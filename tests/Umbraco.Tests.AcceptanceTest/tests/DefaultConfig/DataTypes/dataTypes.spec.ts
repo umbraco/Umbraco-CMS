@@ -74,120 +74,120 @@ test.describe('DataTypes', () => {
     await umbracoApi.dataTypes.ensureNameNotExists(name);
     await umbracoApi.templates.ensureNameNotExists(name);
   });
-
-  test('Tests Textbox Maxlength', async ({page, umbracoApi, umbracoUi}) => {
-    const name = 'Textbox Maxlength Test';
-    const alias = AliasHelper.toAlias(name);
-
-    await umbracoApi.documentTypes.ensureNameNotExists(name);
-    await umbracoApi.dataTypes.ensureNameNotExists(name);
-    await umbracoApi.templates.ensureNameNotExists(name);
-
-    const textBoxDataType = new TextBoxDataTypeBuilder()
-      .withName(name)
-      .withMaxChars(10)
-      .build()
-
-    await umbracoApi.content.createDocTypeWithContent(name, alias, textBoxDataType);
-
-    // Act
-    // Enter content
-    // Assert no helptext with (max-2) chars & can save
-    await umbracoUi.refreshContentTree();
-    
-    // TODO: This hack is for the merge into core, this should be fixed after
-    await page.waitForTimeout(2000);
-    
-    await umbracoUi.clickElement(umbracoUi.getTreeItem('content', [name]));
-    await page.locator('input[name="textbox"]').type('12345678');
-    await expect(await page.locator('localize[key="textbox_characters_left"]')).not.toBeVisible()
-    await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.saveAndPublish));
-    await umbracoUi.isSuccessNotificationVisible();
-
-    // Add char and assert helptext appears - no publish to save time & has been asserted above & below
-    await page.locator('input[name="textbox"]').type('9');
-    await expect(page.locator('localize[key="textbox_characters_left"]', {hasText: "characters left"}).first()).toBeVisible();
-    await expect(await umbracoUi.getErrorNotification()).not.toBeVisible();
-
-    // Add char and assert errortext appears and can't save
-    await page.locator('input[name="textbox"]').type('10'); // 1 char over max
-    await expect(page.locator('localize[key="textbox_characters_exceed"]', {hasText: 'too many'}).first()).toBeVisible();
-    await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.saveAndPublish));
-    await expect(await page.locator('.property-error')).toBeVisible();
-
-    // Clean
-    await umbracoApi.documentTypes.ensureNameNotExists(name);
-    await umbracoApi.dataTypes.ensureNameNotExists(name);
-    await umbracoApi.templates.ensureNameNotExists(name);
-  });
-
-  test('Test Url Picker', async ({page, umbracoApi, umbracoUi}) => {
-
-    const urlPickerDocTypeName = 'Url Picker Test';
-    const pickerDocTypeAlias = AliasHelper.toAlias(urlPickerDocTypeName);
-    
-    await umbracoApi.documentTypes.ensureNameNotExists(urlPickerDocTypeName);
-    await umbracoApi.templates.ensureNameNotExists(urlPickerDocTypeName);
-
-    const pickerDocType = new DocumentTypeBuilder()
-      .withName(urlPickerDocTypeName)
-      .withAlias(pickerDocTypeAlias)
-      .withAllowAsRoot(true)
-      .withDefaultTemplate(pickerDocTypeAlias)
-      .addGroup()
-        .withName('ContentPickerGroup')
-        .addUrlPickerProperty()
-          .withAlias('picker')
-        .done()
-      .done()
-      .build();
-
-    await umbracoApi.documentTypes.save(pickerDocType);
-    
-    // This is an ugly wait, but we have to wait for cache to rebuild
-    await page.waitForTimeout(1000);
-    
-    await umbracoApi.templates.edit(urlPickerDocTypeName, '@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<UrlPickerTest>' +
-      '\n@{' +
-      '\n    Layout = null;' +
-      '\n}' +
-      '\n@foreach(var link in @Model.Picker)' +
-      '\n{' +
-      '\n    <a href="@link.Url">@link.Name</a>' +
-      '\n}');
-    
-    // Create content with url picker
-    await page.locator('.umb-tree-root').click({button: "right"});
-    await page.locator('[data-element="action-create"]').click();
-    await page.locator('[data-element="action-create-' + pickerDocTypeAlias + '"] > .umb-action-link').click();
-    
-    // Fill out content
-    await umbracoUi.setEditorHeaderName('UrlPickerContent');
-    await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.saveAndPublish));
-    await umbracoUi.isSuccessNotificationVisible();
-    await page.locator('.umb-node-preview-add').click();
-    
-    // Should really try and find a better way to do this, but umbracoTreeItem tries to click the content pane in the background
-    await page.locator('#treePicker >> [data-element="tree-item-UrlPickerContent"]').click();
-    await page.locator('.umb-editor-footer-content__right-side > [button-style="success"] > .umb-button > .btn > .umb-button__content').click();
-    await expect(await page.locator('.umb-node-preview__name').first()).toBeVisible();
-    
-    // Save and publish
-    await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.saveAndPublish));
-    await umbracoUi.isSuccessNotificationVisible();
-    
-    // Assert
-    await expect(await umbracoUi.getErrorNotification()).not.toBeVisible();
-    
-    // ugly , but wait for cache to be rebuilt after saving
-    await page.waitForTimeout(10000);
-
-    // Testing if the edits match the expected results
-    const expected = '<a href="/">UrlPickerContent</a>';
-    await expect(await umbracoApi.content.verifyRenderedContent('/', expected, true)).toBeTruthy();
-    
-    // Clean up
-    await umbracoApi.documentTypes.ensureNameNotExists(urlPickerDocTypeName);
-    await umbracoApi.templates.ensureNameNotExists(urlPickerDocTypeName);
-  });
+  //
+  // test('Tests Textbox Maxlength', async ({page, umbracoApi, umbracoUi}) => {
+  //   const name = 'Textbox Maxlength Test';
+  //   const alias = AliasHelper.toAlias(name);
+  //
+  //   await umbracoApi.documentTypes.ensureNameNotExists(name);
+  //   await umbracoApi.dataTypes.ensureNameNotExists(name);
+  //   await umbracoApi.templates.ensureNameNotExists(name);
+  //
+  //   const textBoxDataType = new TextBoxDataTypeBuilder()
+  //     .withName(name)
+  //     .withMaxChars(10)
+  //     .build()
+  //
+  //   await umbracoApi.content.createDocTypeWithContent(name, alias, textBoxDataType);
+  //
+  //   // Act
+  //   // Enter content
+  //   // Assert no helptext with (max-2) chars & can save
+  //   await umbracoUi.refreshContentTree();
+  //  
+  //   // TODO: This hack is for the merge into core, this should be fixed after
+  //   await page.waitForTimeout(2000);
+  //  
+  //   await umbracoUi.clickElement(umbracoUi.getTreeItem('content', [name]));
+  //   await page.locator('input[name="textbox"]').type('12345678');
+  //   await expect(await page.locator('localize[key="textbox_characters_left"]')).not.toBeVisible()
+  //   await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.saveAndPublish));
+  //   await umbracoUi.isSuccessNotificationVisible();
+  //
+  //   // Add char and assert helptext appears - no publish to save time & has been asserted above & below
+  //   await page.locator('input[name="textbox"]').type('9');
+  //   await expect(page.locator('localize[key="textbox_characters_left"]', {hasText: "characters left"}).first()).toBeVisible();
+  //   await expect(await umbracoUi.getErrorNotification()).not.toBeVisible();
+  //
+  //   // Add char and assert errortext appears and can't save
+  //   await page.locator('input[name="textbox"]').type('10'); // 1 char over max
+  //   await expect(page.locator('localize[key="textbox_characters_exceed"]', {hasText: 'too many'}).first()).toBeVisible();
+  //   await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.saveAndPublish));
+  //   await expect(await page.locator('.property-error')).toBeVisible();
+  //
+  //   // Clean
+  //   await umbracoApi.documentTypes.ensureNameNotExists(name);
+  //   await umbracoApi.dataTypes.ensureNameNotExists(name);
+  //   await umbracoApi.templates.ensureNameNotExists(name);
+  // });
+  //
+  // test('Test Url Picker', async ({page, umbracoApi, umbracoUi}) => {
+  //
+  //   const urlPickerDocTypeName = 'Url Picker Test';
+  //   const pickerDocTypeAlias = AliasHelper.toAlias(urlPickerDocTypeName);
+  //  
+  //   await umbracoApi.documentTypes.ensureNameNotExists(urlPickerDocTypeName);
+  //   await umbracoApi.templates.ensureNameNotExists(urlPickerDocTypeName);
+  //
+  //   const pickerDocType = new DocumentTypeBuilder()
+  //     .withName(urlPickerDocTypeName)
+  //     .withAlias(pickerDocTypeAlias)
+  //     .withAllowAsRoot(true)
+  //     .withDefaultTemplate(pickerDocTypeAlias)
+  //     .addGroup()
+  //       .withName('ContentPickerGroup')
+  //       .addUrlPickerProperty()
+  //         .withAlias('picker')
+  //       .done()
+  //     .done()
+  //     .build();
+  //
+  //   await umbracoApi.documentTypes.save(pickerDocType);
+  //  
+  //   // This is an ugly wait, but we have to wait for cache to rebuild
+  //   await page.waitForTimeout(1000);
+  //  
+  //   await umbracoApi.templates.edit(urlPickerDocTypeName, '@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<UrlPickerTest>' +
+  //     '\n@{' +
+  //     '\n    Layout = null;' +
+  //     '\n}' +
+  //     '\n@foreach(var link in @Model.Picker)' +
+  //     '\n{' +
+  //     '\n    <a href="@link.Url">@link.Name</a>' +
+  //     '\n}');
+  //  
+  //   // Create content with url picker
+  //   await page.locator('.umb-tree-root').click({button: "right"});
+  //   await page.locator('[data-element="action-create"]').click();
+  //   await page.locator('[data-element="action-create-' + pickerDocTypeAlias + '"] > .umb-action-link').click();
+  //  
+  //   // Fill out content
+  //   await umbracoUi.setEditorHeaderName('UrlPickerContent');
+  //   await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.saveAndPublish));
+  //   await umbracoUi.isSuccessNotificationVisible();
+  //   await page.locator('.umb-node-preview-add').click();
+  //  
+  //   // Should really try and find a better way to do this, but umbracoTreeItem tries to click the content pane in the background
+  //   await page.locator('#treePicker >> [data-element="tree-item-UrlPickerContent"]').click();
+  //   await page.locator('.umb-editor-footer-content__right-side > [button-style="success"] > .umb-button > .btn > .umb-button__content').click();
+  //   await expect(await page.locator('.umb-node-preview__name').first()).toBeVisible();
+  //  
+  //   // Save and publish
+  //   await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.saveAndPublish));
+  //   await umbracoUi.isSuccessNotificationVisible();
+  //  
+  //   // Assert
+  //   await expect(await umbracoUi.getErrorNotification()).not.toBeVisible();
+  //  
+  //   // ugly , but wait for cache to be rebuilt after saving
+  //   await page.waitForTimeout(10000);
+  //
+  //   // Testing if the edits match the expected results
+  //   const expected = '<a href="/">UrlPickerContent</a>';
+  //   await expect(await umbracoApi.content.verifyRenderedContent('/', expected, true)).toBeTruthy();
+  //  
+  //   // Clean up
+  //   await umbracoApi.documentTypes.ensureNameNotExists(urlPickerDocTypeName);
+  //   await umbracoApi.templates.ensureNameNotExists(urlPickerDocTypeName);
+  // });
 });
