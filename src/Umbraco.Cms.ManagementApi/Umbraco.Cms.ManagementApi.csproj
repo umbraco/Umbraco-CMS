@@ -19,9 +19,13 @@
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.9" />
       <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.0.0" />
       <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="5.0.0" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="6.0.9" />
       <PackageReference Include="NSwag.AspNetCore" Version="13.16.1" />
+      <PackageReference Include="OpenIddict.AspNetCore" Version="3.1.1" />
+      <PackageReference Include="OpenIddict.EntityFrameworkCore" Version="3.1.1" />
       <PackageReference Include="Umbraco.Code" Version="2.0.0">
         <PrivateAssets>all</PrivateAssets>
       </PackageReference>
