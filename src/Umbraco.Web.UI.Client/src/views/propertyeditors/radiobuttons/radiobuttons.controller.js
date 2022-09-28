@@ -1,7 +1,7 @@
 angular.module("umbraco").controller("Umbraco.PropertyEditors.RadioButtonsController",
     function ($scope, validationMessageService) {
 
-        var vm = this;
+        const vm = this;
 
         vm.viewItems = [];
 

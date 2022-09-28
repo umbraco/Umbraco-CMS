@@ -1,7 +1,7 @@
 angular.module("umbraco").controller("Umbraco.PropertyEditors.CheckboxListController",
     function ($scope, validationMessageService) {
         
-        var vm = this;
+        const vm = this;
         
         vm.configItems = [];
         vm.viewItems = [];
