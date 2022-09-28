@@ -22,7 +22,7 @@ FROM mcr.microsoft.com/dotnet/aspnet:6.0.5 AS run
 WORKDIR /cypress
 COPY --from=build dist .
 
-ENV ASPNETCORE_URLS="https://0.0.0.0:44331"
+ENV ASPNETCORE_URLS="https://127.0.0.1:44331"
 ENV Umbraco__CMS__Global__InstallMissingDatabase="true"
 ENV ConnectionStrings__umbracoDbDSN_ProviderName="Microsoft.Data.Sqlite"
 ENV ConnectionStrings__umbracoDbDSN="Data Source=|DataDirectory|/Umbraco.sqlite.db;Cache=Shared;Foreign Keys=True;Pooling=True"
