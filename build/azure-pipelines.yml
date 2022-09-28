@@ -29,7 +29,7 @@ variables:
   buildConfiguration: Release
   UMBRACO__CMS__GLOBAL__ID: 00000000-0000-0000-0000-000000000042
   DOTNET_NOLOGO: true
-  DOTNET_GENERATE_ASPNET_CERTIFICATE: true
+  DOTNET_GENERATE_ASPNET_CERTIFICATE: false
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
   DOTNET_CLI_TELEMETRY_OPTOUT: true
 
@@ -371,6 +371,7 @@ stages:
               dockerImageName: umbraco-linux
             Windows:
               vmImage: 'windows-latest'
+              DOTNET_GENERATE_ASPNET_CERTIFICATE: true # Automatically generate HTTPS development certificate on Windows
         pool:
           vmImage: $(vmImage)
         steps:
@@ -426,10 +427,13 @@ stages:
                 docker build -t $(dockerImageName):$sha -f $(dockerfile) .
                 mkdir -p $(Build.ArtifactStagingDirectory)/docker-images
                 docker save -o $(Build.ArtifactStagingDirectory)/docker-images/$(dockerImageName).$sha.tar $(dockerImageName):$sha
-                docker run --name $(dockerImageName) -dp 8080:5000 -dp 8443:5001 -e UMBRACO__CMS__GLOBAL__ID=$(UMBRACO__CMS__GLOBAL__ID) $(dockerImageName):$sha
+
+                # Manually generate HTTPS development certificate on Linux
+                dotnet dev-certs https -ep ${HOME}/.aspnet/https/aspnetapp.pfx -p UmbracoAcceptance123!
+                dotnet dev-certs https --trust
+
+                docker run --name $(dockerImageName) -dp 8080:5000 -dp 8443:5001 -e UMBRACO__CMS__GLOBAL__ID=$(UMBRACO__CMS__GLOBAL__ID) -e ASPNETCORE_Kestrel__Certificates__Default__Password="UmbracoAcceptance123!" -e ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx -v ${HOME}/.aspnet/https:/https/ $(dockerImageName):$sha
                 docker ps
-          # Windows containers take forever.
-          # --no-launch-profile stops ASPNETCORE_ENVIRONMENT=Development which breaks the users.ts tests (smtp config = invite user button)
           # Urls matching docker setup.
           - task: PowerShell@2
             condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
