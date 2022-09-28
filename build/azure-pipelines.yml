@@ -468,15 +468,13 @@ stages:
               targetType: inline
               workingDirectory: tests/Umbraco.Tests.AcceptanceTest
               script: 'npm run ui --ignore-certificate-errors --reporter junit --reporter-options "mochaFile=results/test-output-D-[hash].xml,toConsole=true"'
-          - task: PowerShell@2
-            displayName: Check if there are artifacts to publish
-            inputs:
-              targetType: inline
-              workingDirectory: tests/Umbraco.Tests.AcceptanceTest
-              script: $fileExists = Test-Path -Path "$(System.DefaultWorkingDirectory)/file.txt" Write-Output "##vso[task.setvariable variable=FileExists]$fileExists"
+          - bash: |
+              if [ -f tests/Umbraco.Tests.AcceptanceTest/results ]; then
+                echo "##vso[task.setVariable variable=myfileexists]true"
+              fi
           - task: PublishTestResults@2
             displayName: Publish test results
-            condition: eq(variables['FileExists'], True)
+            condition: eq(variables.myfileexists, 'true')
             inputs:
               testResultsFormat: 'JUnit'
               testResultsFiles: 'tests/Umbraco.Tests.AcceptanceTest/results/test-output-D-*.xml'
@@ -484,7 +482,7 @@ stages:
               testRunTitle: "E2E - $(Agent.OS)"
           - task: CopyFiles@2
             displayName: Prepare artifacts
-            condition: eq(variables['FileExists'], True)
+            condition: eq(variables.myfileexists, 'true')
             inputs:
               sourceFolder: $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/results/
               targetFolder: $(Build.ArtifactStagingDirectory)/playwright
