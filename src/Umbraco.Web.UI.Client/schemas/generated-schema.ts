@@ -190,7 +190,18 @@ export interface components {
     };
     PropertyEditorConfigDefaultData: {
       alias: string;
-      value: { [key: string]: unknown };
+      value:
+        | (
+            | string
+            | number
+            | boolean
+            | { [key: string]: unknown }
+            | string[]
+            | number[]
+            | boolean[]
+            | { [key: string]: unknown }[]
+          )
+        | null;
     };
     PropertyEditorConfig: {
       properties: components["schemas"]["PropertyEditorConfigProperty"][];

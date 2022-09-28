@@ -637,7 +637,26 @@ components:
         alias:
           type: string
         value:
-          type: object
+          nullable: true
+          oneOf:
+            - type: string
+            - type: number
+              format: float
+            - type: boolean
+            - type: object
+            - type: array
+              items:
+                type: string
+            - type: array
+              items:
+                type: number
+                format: float
+            - type: array
+              items:
+                type: boolean
+            - type: array
+              items:
+                type: object
       required:
         - alias
         - value

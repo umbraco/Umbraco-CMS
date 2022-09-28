@@ -76,5 +76,5 @@ export interface PropertyEditorConfigProperty {
 
 export interface PropertyEditorConfigDefaultData {
 	alias: string;
-	value: {};
+	value: string | number | boolean | {} | string[] | number[] | boolean[] | {}[] | null;
 }

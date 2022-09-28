@@ -154,13 +154,13 @@ export const data: Array<PropertyEditor> = [
 					alias: 'maxChars',
 					label: 'Maximum allowed characters',
 					description: 'If empty, 512 character limit',
-					propertyEditorUI: 'Umb.PropertyEditorUI.Textarea',
+					propertyEditorUI: 'Umb.PropertyEditorUI.Number',
 				},
 			],
 			defaultData: [
 				{
 					alias: 'maxChars',
-					value: '512',
+					value: 512,
 				},
 			],
 		},
