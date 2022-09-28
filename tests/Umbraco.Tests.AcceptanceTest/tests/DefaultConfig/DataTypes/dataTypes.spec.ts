@@ -48,6 +48,9 @@ test.describe('DataTypes', () => {
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.saveAndPublish));
     await umbracoUi.isSuccessNotificationVisible();
 
+    // TODO: This hack is for the merge into core, this should be fixed after
+    await page.waitForTimeout(2000);
+    
     //Assert
     const expected = `<p style="color:000000" > Lorem ipsum dolor sit amet </p>`;
     await expect(umbracoApi.content.verifyRenderedContent('/', expected, true)).toBeTruthy();
@@ -91,6 +94,10 @@ test.describe('DataTypes', () => {
     // Enter content
     // Assert no helptext with (max-2) chars & can save
     await umbracoUi.refreshContentTree();
+    
+    // TODO: This hack is for the merge into core, this should be fixed after
+    await page.waitForTimeout(2000);
+    
     await umbracoUi.clickElement(umbracoUi.getTreeItem('content', [name]));
     await page.locator('input[name="textbox"]').type('12345678');
     await expect(await page.locator('localize[key="textbox_characters_left"]')).not.toBeVisible()
