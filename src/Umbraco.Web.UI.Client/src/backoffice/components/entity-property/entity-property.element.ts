@@ -14,7 +14,6 @@ import '../../editors/shared/editor-property-layout/editor-property-layout.eleme
  *  @element umb-entity-property
  *  @description - Component for displaying a entity property. The Element will render a Property Editor based on the Property Editor UI alias passed to the element.
  *  The element will also render all Property Actions related to the Property Editor.
- *  @extends UUIRefNodeElement
  */
 @customElement('umb-entity-property')
 export class UmbEntityPropertyElement extends UmbContextConsumerMixin(LitElement) {

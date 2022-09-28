@@ -11,10 +11,20 @@ import type { PropertyEditorConfigDefaultData, PropertyEditorConfigProperty } fr
 
 import '../../../components/entity-property/entity-property.element';
 
+/**
+ *  @element umb-property-editor-config
+ *  @description - Element for displaying the configuration for a Property Editor and Property Editor UI.
+ */
 @customElement('umb-property-editor-config')
 export class UmbPropertyEditorConfigElement extends UmbContextConsumerMixin(LitElement) {
 	static styles = [UUITextStyles];
 
+	/**
+	 * Property Editor Alias. The element will render configuration for a Property Editor with this alias.
+	 * @type {string}
+	 * @attr
+	 * @default ''
+	 */
 	private _propertyEditorAlias = '';
 	@property({ type: String, attribute: 'property-editor-alias' })
 	public get propertyEditorAlias(): string {
@@ -27,6 +37,12 @@ export class UmbPropertyEditorConfigElement extends UmbContextConsumerMixin(LitE
 		this._observePropertyEditorConfig();
 	}
 
+	/**
+	 * Property Editor UI Alias. The element will render configuration for a Property Editor UI with this alias.
+	 * @type {string}
+	 * @attr
+	 * @default ''
+	 */
 	private _propertyEditorUIAlias = '';
 	@property({ type: String, attribute: 'property-editor-ui-alias' })
 	public get propertyEditorUIAlias(): string {
@@ -39,6 +55,13 @@ export class UmbPropertyEditorConfigElement extends UmbContextConsumerMixin(LitE
 		this._observePropertyEditorUIConfig();
 	}
 
+	/**
+	 * Data. The element will render configuration editors with values from this data.
+	 * If a value is not found in this data, the element will use the default value from the configuration.
+	 * @type {Array<{ alias: string; value: unknown }>}
+	 * @attr
+	 * @default []
+	 */
 	@property({ type: Array })
 	public data: Array<{ alias: string; value: unknown }> = [];
 
