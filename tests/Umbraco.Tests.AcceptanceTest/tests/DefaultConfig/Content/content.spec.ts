@@ -11,9 +11,6 @@ import {
 test.describe('Content tests', () => {
 
   test.beforeEach(async ({page, umbracoApi}) => {
-    console.log("*************** IM MR URL LOOK AT MEEE ********************");
-    console.log(process.env.URL);
-    console.log("*************** IM MR URL LOOK AT MEEE ********************");
     await umbracoApi.login();
   });
   
