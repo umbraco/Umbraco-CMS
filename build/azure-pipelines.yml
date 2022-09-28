@@ -384,9 +384,9 @@ stages:
               path: $(CYPRESS_CACHE_FOLDER)
           - task: PowerShell@2
             displayName: Generate .env
-            workingDirectory: $(Build.SourcesDirectory)
             inputs:
               targetType: inline
+              workingDirectory: $(Build.SourcesDirectory)
               script: New-Item -Path "tests/Umbraco.Tests.AcceptanceTest" -Name ".env" -ItemType "file" -Value "UMBRACO_USER_LOGIN=nge@umbraco.dk
                 >> UMBRACO_USER_PASSWORD=1234567890
                 >> URL=http://localhost:8080"
