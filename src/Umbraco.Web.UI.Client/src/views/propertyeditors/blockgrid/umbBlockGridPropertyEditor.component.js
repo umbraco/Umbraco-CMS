@@ -391,14 +391,6 @@
                 block.view = block.config.view;
             }
 
-            // ensure at least one columnSpanOptions:
-            // TODO, use contextual layout columns, if no defined. Do not set a default.
-            if(block.config.columnSpanOptions.length === 0) {
-                block.config.columnSpanOptions.push({
-                    "columnSpan": vm.gridColumns
-                });
-            }
-
             block.stylesheet = block.config.stylesheet;
             block.showValidation = true;
 
@@ -481,7 +473,7 @@
         function addNewBlock(parentBlock, areaKey, index, contentElementTypeKey, options) {
 
             // Create layout entry. (not added to property model jet.)
-            var layoutEntry = modelObject.create(contentElementTypeKey);
+            const layoutEntry = modelObject.create(contentElementTypeKey);
             if (layoutEntry === null) {
                 return false;
             }
@@ -490,10 +482,12 @@
             initializeLayoutEntry(layoutEntry, parentBlock, areaKey);
 
             // make block model
-            var blockObject = layoutEntry.$block;
+            const blockObject = layoutEntry.$block;
             if (blockObject === null) {
                 return false;
             }
+
+            const area = parentBlock?.layout.areas.find(x => x.key === areaKey);
 
             // fit in row?
             if (options.fitInRow === true) {
@@ -502,22 +496,30 @@
                 // Figure out the start column of that element, and the grid columns for that layout/area.
                 // Check if that and the new one can fit on the line.
 
-                const minColumnSpan = blockObject.config.columnSpanOptions.reduce((prev, option) => Math.min(prev, option.columnSpan), vm.gridColumns);
-                // TODO, use contextual layout columns, if no defined.
-                layoutEntry.columnSpan = minColumnSpan;
+                if(blockObject.config.columnSpanOptions.length > 0) {
+                    const minColumnSpan = blockObject.config.columnSpanOptions.reduce((prev, option) => Math.min(prev, option.columnSpan), vm.gridColumns);
+                    // TODO, use contextual layout columns, if no defined.
+                    layoutEntry.columnSpan = minColumnSpan;
+                } else {
+                    layoutEntry.columnSpan = area? area.$config.columnSpan : vm.gridColumns;
+                }
                 
             } else {
 
-                // set columnSpan to maximum allowed span for this BlockType:
-                const maximumColumnSpan = blockObject.config.columnSpanOptions.reduce((prev, option) => Math.max(prev, option.columnSpan), 1);
-                // TODO, use contextual layout columns, if no defined.
-                layoutEntry.columnSpan = maximumColumnSpan;
+                if(blockObject.config.columnSpanOptions.length > 0) {
+                    // set columnSpan to maximum allowed span for this BlockType:
+                    const maximumColumnSpan = blockObject.config.columnSpanOptions.reduce((prev, option) => Math.max(prev, option.columnSpan), 1);
+                    // TODO, use contextual layout columns, if no defined.
+                    layoutEntry.columnSpan = maximumColumnSpan;
+                } else {
+                    layoutEntry.columnSpan = area? area.$config.columnSpan : vm.gridColumns;
+                }
 
             }
 
             // add layout entry at the decided location in layout.
             if(parentBlock != null) {
-                var area = parentBlock.layout.areas.find(x => x.key === areaKey);
+                
                 if(!area) {
                     console.error("Could not find area in block creation");
                 }
@@ -527,6 +529,10 @@
 
                 area.items.splice(index, 0, layoutEntry);
             } else {
+
+                // limit columnSpan by grid columnSpan:
+                layoutEntry.columnSpan = Math.min(layoutEntry.columnSpan, vm.gridColumns);
+
                 vm.layout.splice(index, 0, layoutEntry);
             }
 
