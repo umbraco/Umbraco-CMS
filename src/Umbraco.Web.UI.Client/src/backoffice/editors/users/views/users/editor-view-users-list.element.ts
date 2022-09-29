@@ -8,6 +8,10 @@ import './editor-view-users-grid.element';
 import './editor-view-users-selection.element';
 import { IRoute } from 'router-slot';
 import UmbEditorViewUsersElement from './editor-view-users.element';
+<<<<<<< Updated upstream
+=======
+import { UUIPopoverElement } from '@umbraco-ui/uui';
+>>>>>>> Stashed changes
 
 export type UsersViewType = 'list' | 'grid';
 
@@ -44,6 +48,24 @@ export class UmbEditorViewUsersListElement extends UmbContextConsumerMixin(LitEl
 			#input-search {
 				width: 100%;
 			}
+<<<<<<< Updated upstream
+=======
+
+			uui-popover {
+				width: unset;
+			}
+
+			.filter-dropdown {
+				display: flex;
+				gap: 8px;
+				flex-direction: column;
+				background-color: var(--uui-color-surface);
+				padding: var(--uui-size-space-4);
+				border-radius: var(--uui-size-border-radius);
+				box-shadow: var(--uui-shadow-depth-2);
+				width: fit-content;
+			}
+>>>>>>> Stashed changes
 		`,
 	];
 
@@ -129,6 +151,18 @@ export class UmbEditorViewUsersListElement extends UmbContextConsumerMixin(LitEl
 		},
 	];
 
+<<<<<<< Updated upstream
+=======
+	private _handleTogglePopover(event: PointerEvent) {
+		const composedPath = event.composedPath();
+
+		const popover = composedPath.find((el) => el instanceof UUIPopoverElement) as UUIPopoverElement;
+		if (popover) {
+			popover.open = !popover.open;
+		}
+	}
+
+>>>>>>> Stashed changes
 	render() {
 		return html`
 			<div id="sticky-top">
@@ -136,9 +170,45 @@ export class UmbEditorViewUsersListElement extends UmbContextConsumerMixin(LitEl
 					<uui-button label="Invite user" look="outline"></uui-button>
 					<uui-input label="search" id="input-search"></uui-input>
 					<div>
+<<<<<<< Updated upstream
 						<uui-button label="status"> Status: <b>All</b> </uui-button>
 						<uui-button label="groups"> Groups: <b>All</b> </uui-button>
 						<uui-button label="order by"> Order by: <b>Name (A-Z)</b> </uui-button>
+=======
+						<uui-popover margin="8">
+							<uui-button @click=${this._handleTogglePopover} slot="trigger" label="status">
+								Status: <b>All</b>
+							</uui-button>
+							<div slot="popover" class="filter-dropdown">
+								<uui-checkbox label="Active"></uui-checkbox>
+								<uui-checkbox label="Inactive"></uui-checkbox>
+								<uui-checkbox label="Invited"></uui-checkbox>
+								<uui-checkbox label="Disabled"></uui-checkbox>
+							</div>
+						</uui-popover>
+						<uui-popover margin="8">
+							<uui-button @click=${this._handleTogglePopover} slot="trigger" label="groups">
+								Groups: <b>All</b>
+							</uui-button>
+							<div slot="popover" class="filter-dropdown">
+								<uui-checkbox label="Active"></uui-checkbox>
+								<uui-checkbox label="Inactive"></uui-checkbox>
+								<uui-checkbox label="Invited"></uui-checkbox>
+								<uui-checkbox label="Disabled"></uui-checkbox>
+							</div>
+						</uui-popover>
+						<uui-popover margin="8">
+							<uui-button @click=${this._handleTogglePopover} slot="trigger" label="order by">
+								Order by: <b>Name (A-Z)</b>
+							</uui-button>
+							<div slot="popover" class="filter-dropdown">
+								<uui-checkbox label="Active"></uui-checkbox>
+								<uui-checkbox label="Inactive"></uui-checkbox>
+								<uui-checkbox label="Invited"></uui-checkbox>
+								<uui-checkbox label="Disabled"></uui-checkbox>
+							</div>
+						</uui-popover>
+>>>>>>> Stashed changes
 						<uui-button
 							label="view toggle"
 							@click=${this._toggleViewType}
