@@ -37,6 +37,12 @@ export class UmbEditorViewUsersUserDetailsElement extends UmbContextConsumerMixi
 				border-bottom: 1px solid var(--uui-color-divider);
 				width: 100%;
 			}
+			uui-input {
+				width: 100%;
+			}
+			.faded-text {
+				color: var(--uui-color-text-alt);
+			}
 		`,
 	];
 
@@ -48,6 +54,14 @@ export class UmbEditorViewUsersUserDetailsElement extends UmbContextConsumerMixi
 
 	protected _usersContext?: UmbEditorViewUsersElement;
 	protected _usersSubscription?: Subscription;
+
+	private _languages = [
+		{ name: 'English', value: 'en', selected: true },
+		{ name: 'Dutch', value: 'nl' },
+		{ name: 'French', value: 'fr' },
+		{ name: 'German', value: 'de' },
+		{ name: 'Spanish', value: 'es' },
+	];
 
 	connectedCallback(): void {
 		super.connectedCallback();
@@ -80,10 +94,22 @@ export class UmbEditorViewUsersUserDetailsElement extends UmbContextConsumerMixi
 		return html`
 			<div id="left-column">
 				<uui-box>
-					<p slot="headline">Profile</p>
+					<div slot="headline">Profile</div>
+					<uui-form-layout-item>
+						<uui-label for="email">Email</uui-label>
+						<uui-input name="email" readonly value="FIX EMAIL"></uui-input>
+					</uui-form-layout-item>
+					<uui-form-layout-item>
+						<uui-label for="language">Language</uui-label>
+						<uui-select name="language" .options=${this._languages}> </uui-select>
+					</uui-form-layout-item>
 				</uui-box>
 				<uui-box>
-					<p slot="headline">Profile</p>
+					<div slot="headline">Assign access</div>
+					<div>
+						<b>Groups</b>
+						<div class="faded-text">Add groups to assign access and permissions</div>
+					</div>
 				</uui-box>
 			</div>
 			<div id="right-column">
