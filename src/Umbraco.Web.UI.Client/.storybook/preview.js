@@ -4,7 +4,9 @@ import '@umbraco-ui/uui';
 
 import { html } from 'lit-html';
 import { initialize, mswDecorator } from 'msw-storybook-addon';
+import { setCustomElements } from '@storybook/web-components';
 
+import customElementManifests from '../custom-elements.json';
 import { UmbExtensionRegistry } from '../src/core/extension';
 import { UmbDataTypeStore } from '../src/core/stores/data-type.store';
 import { UmbDocumentTypeStore } from '../src/core/stores/document-type.store';
@@ -67,3 +69,5 @@ export const parameters = {
 		},
 	},
 };
+
+setCustomElements(customElementManifests);
