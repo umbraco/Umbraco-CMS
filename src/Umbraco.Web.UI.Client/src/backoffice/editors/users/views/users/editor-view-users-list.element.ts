@@ -8,13 +8,9 @@ import './editor-view-users-grid.element';
 import './editor-view-users-selection.element';
 import { IRoute } from 'router-slot';
 import UmbEditorViewUsersElement from './editor-view-users.element';
-<<<<<<< Updated upstream
-=======
 import { UUIPopoverElement } from '@umbraco-ui/uui';
->>>>>>> Stashed changes
 
 export type UsersViewType = 'list' | 'grid';
-
 @customElement('umb-editor-view-users-list')
 export class UmbEditorViewUsersListElement extends UmbContextConsumerMixin(LitElement) {
 	static styles = [
@@ -48,8 +44,6 @@ export class UmbEditorViewUsersListElement extends UmbContextConsumerMixin(LitEl
 			#input-search {
 				width: 100%;
 			}
-<<<<<<< Updated upstream
-=======
 
 			uui-popover {
 				width: unset;
@@ -65,7 +59,6 @@ export class UmbEditorViewUsersListElement extends UmbContextConsumerMixin(LitEl
 				box-shadow: var(--uui-shadow-depth-2);
 				width: fit-content;
 			}
->>>>>>> Stashed changes
 		`,
 	];
 
@@ -151,8 +144,6 @@ export class UmbEditorViewUsersListElement extends UmbContextConsumerMixin(LitEl
 		},
 	];
 
-<<<<<<< Updated upstream
-=======
 	private _handleTogglePopover(event: PointerEvent) {
 		const composedPath = event.composedPath();
 
@@ -162,7 +153,6 @@ export class UmbEditorViewUsersListElement extends UmbContextConsumerMixin(LitEl
 		}
 	}
 
->>>>>>> Stashed changes
 	render() {
 		return html`
 			<div id="sticky-top">
@@ -170,11 +160,6 @@ export class UmbEditorViewUsersListElement extends UmbContextConsumerMixin(LitEl
 					<uui-button label="Invite user" look="outline"></uui-button>
 					<uui-input label="search" id="input-search"></uui-input>
 					<div>
-<<<<<<< Updated upstream
-						<uui-button label="status"> Status: <b>All</b> </uui-button>
-						<uui-button label="groups"> Groups: <b>All</b> </uui-button>
-						<uui-button label="order by"> Order by: <b>Name (A-Z)</b> </uui-button>
-=======
 						<uui-popover margin="8">
 							<uui-button @click=${this._handleTogglePopover} slot="trigger" label="status">
 								Status: <b>All</b>
@@ -208,7 +193,6 @@ export class UmbEditorViewUsersListElement extends UmbContextConsumerMixin(LitEl
 								<uui-checkbox label="Disabled"></uui-checkbox>
 							</div>
 						</uui-popover>
->>>>>>> Stashed changes
 						<uui-button
 							label="view toggle"
 							@click=${this._toggleViewType}
