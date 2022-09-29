@@ -1,7 +1,6 @@
 import {ApiHelpers, ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 import {ContentBuilder, DocumentTypeBuilder} from "@umbraco/json-models-builders";
-import {umbracoConfig} from "../../../umbraco.config";
 
 test.describe('Routing', () => {
   let swedishLanguageId = 0;
@@ -30,7 +29,7 @@ test.describe('Routing', () => {
 
   async function saveNewLanguages(umbracoApi: ApiHelpers) {
     // Save Danish
-    const url = umbracoConfig.environment.baseUrl + "/umbraco/backoffice/umbracoapi/language/SaveLanguage";
+    const url = process.env.URL + "/umbraco/backoffice/umbracoapi/language/SaveLanguage";
     const danishRequestBody = {
       culture: danishCulture
     }
@@ -49,7 +48,7 @@ test.describe('Routing', () => {
 
   async function configureDomain(id, name, lang, umbracoApi: ApiHelpers) {
     //Save domain for child node
-    const url = umbracoConfig.environment.baseUrl + "/umbraco/backoffice/umbracoapi/content/PostSaveLanguageAndDomains"
+    const url = process.env.URL + "/umbraco/backoffice/umbracoapi/content/PostSaveLanguageAndDomains"
     const body = {
       nodeId: id,
       domains: [

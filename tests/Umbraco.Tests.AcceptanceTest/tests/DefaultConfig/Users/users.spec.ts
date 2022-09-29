@@ -1,6 +1,5 @@
 import { expect, Page } from '@playwright/test';
 import { test, ApiHelpers, UiHelpers, AliasHelper, ConstantHelper } from '@umbraco/playwright-testhelpers';
-import { umbracoConfig} from "../../../umbraco.config";
 
 test.describe('Users', () => {
   
@@ -33,7 +32,7 @@ test.describe('Users', () => {
   });
   
   async function createUser(umbracoApi : ApiHelpers){
-    let url = `${umbracoConfig.environment.baseUrl}/umbraco/backoffice/umbracoapi/users/PostCreateUser`;
+    let url = process.env.URL + "/umbraco/backoffice/umbracoapi/users/PostCreateUser";
     await umbracoApi.post(url, userData);
   }
   

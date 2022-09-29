@@ -1,6 +1,5 @@
 import {expect} from '@playwright/test';
 import {test} from '@umbraco/playwright-testhelpers';
-import {umbracoConfig} from "../../../umbraco.config";
 
 test.describe('Tours', () => {
   const timeout = 60000;
@@ -25,7 +24,7 @@ test.describe('Tours', () => {
         "disabled": false
       };
 
-    const response = await umbracoApi.post(umbracoConfig.environment.baseUrl + "/umbraco/backoffice/UmbracoApi/CurrentUser/PostSetUserTour", tourStatus)
+    const response = await umbracoApi.post(process.env.URL + "/umbraco/backoffice/UmbracoApi/CurrentUser/PostSetUserTour", tourStatus)
   }
 
   async function runBackOfficeIntroTour(percentageComplete, buttonText, timeout, page, umbracoUi) {

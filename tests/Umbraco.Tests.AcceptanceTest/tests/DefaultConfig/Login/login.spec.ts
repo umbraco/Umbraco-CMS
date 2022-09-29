@@ -1,9 +1,8 @@
 import { test, expect } from '@playwright/test';
-import { umbracoConfig } from '../../../umbraco.config';
 test.describe('Login', () => {
 
     test.beforeEach(async ({ page }) => {
-        await page.goto(umbracoConfig.environment.baseUrl + '/umbraco');
+        await page.goto(process.env.URL + '/umbraco');
     });
     test('Login with correct username and password', async ({page}) => {
 
@@ -11,13 +10,13 @@ test.describe('Login', () => {
       await expect(error).toBeHidden();
 
       // Action
-      await page.fill('#umb-username', umbracoConfig.user.login);
-      await page.fill('#umb-passwordTwo', umbracoConfig.user.password);
+      await page.fill('#umb-username', process.env.UMBRACO_USER_LOGIN);
+      await page.fill('#umb-passwordTwo', process.env.UMBRACO_USER_PASSWORD);
       await page.locator('[label-key="general_login"]').click();
       await page.waitForNavigation();
 
       // Assert
-      await expect(page).toHaveURL(umbracoConfig.environment.baseUrl + '/umbraco#/content');
+      await expect(page).toHaveURL(process.env.URL + '/umbraco#/content');
       let usernameField = await page.locator('#umb-username');
       let passwordField = await page.locator('#umb-passwordTwo');
       await expect(usernameField).toHaveCount(0);
@@ -25,7 +24,7 @@ test.describe('Login', () => {
     });
 
     test('Login with correct username but wrong password', async({page}) => {
-      const username = umbracoConfig.user.login;
+      const username = process.env.UMBRACO_USER_LOGIN;
       const password = 'wrong';
 
       // Precondition
