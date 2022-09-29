@@ -71,7 +71,7 @@ export class UmbEditorEntityLayout extends UmbContextConsumerMixin(LitElement) {
 	];
 
 	/**
-	 * Alias of the editor that will be rendered. The editor has to be registered in the Extension Registry.
+	 * Alias of the editor. The Layout will render the editor views that are registered for this editor alias.
 	 * @public
 	 * @type {string}
 	 * @attr
