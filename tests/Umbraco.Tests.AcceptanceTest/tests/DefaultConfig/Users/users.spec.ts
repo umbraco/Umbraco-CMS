@@ -23,7 +23,7 @@ test.describe('Users', () => {
       "message": ""
     };
   
-  test.beforeEach(async ({ umbracoApi }) => {
+  test.beforeEach(async ({ umbracoApi, page }) => {
     // TODO: REMOVE THIS WHEN SQLITE IS FIXED
     // Wait so we don't bombard the API
     await page.waitForTimeout(1000);
