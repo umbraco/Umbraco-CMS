@@ -65,10 +65,9 @@ function IconPickerController($scope, localizationService, iconHelper) {
                         vm.loading = false;
                     });
             });
-
+        
         // set a default color if nothing is passed in
         vm.color = $scope.model.color ? findColor($scope.model.color) : vm.colors.find(x => x.default);
-
 
         // if an icon is passed in - preselect it
         vm.icon = $scope.model.icon ? $scope.model.icon : undefined;
@@ -76,10 +75,9 @@ function IconPickerController($scope, localizationService, iconHelper) {
 
     function setTitle() {
         if (!$scope.model.title) {
-            localizationService.localize("defaultdialogs_selectIcon")
-                .then(function(data){
-                    $scope.model.title = data;
-                });
+            localizationService.localize("defaultdialogs_selectIcon").then(data => {
+                $scope.model.title = data;
+            });
         }
     }
 
