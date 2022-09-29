@@ -4,6 +4,9 @@ import {test} from '@umbraco/playwright-testhelpers';
 test.describe('Tours', () => {
   const timeout = 60000;
   test.beforeEach(async ({page, umbracoApi}) => {
+    // TODO: REMOVE THIS WHEN SQLITE IS FIXED
+    // Wait so we don't bombard the API
+    await page.waitForTimeout(1000);
     await umbracoApi.login();
     await resetTourData(umbracoApi);
   });

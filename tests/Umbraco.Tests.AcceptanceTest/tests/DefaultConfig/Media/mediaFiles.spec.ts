@@ -4,6 +4,9 @@ import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 test.describe('media File Types', () => {
 
     test.beforeEach(async ({page, umbracoApi, umbracoUi}) => {
+        // TODO: REMOVE THIS WHEN SQLITE IS FIXED
+        // Wait so we don't bombard the API
+        await page.waitForTimeout(1000);
         await umbracoApi.login();
         await umbracoUi.goToSection(ConstantHelper.sections.media);
         await umbracoApi.media.deleteAllMedia();

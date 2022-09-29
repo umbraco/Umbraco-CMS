@@ -2,7 +2,10 @@ import { test, expect } from '@playwright/test';
 test.describe('Login', () => {
 
     test.beforeEach(async ({ page }) => {
-        await page.goto(process.env.URL + '/umbraco');
+      // TODO: REMOVE THIS WHEN SQLITE IS FIXED
+      // Wait so we don't bombard the API
+      await page.waitForTimeout(1000);
+      await page.goto(process.env.URL + '/umbraco');
     });
     test('Login with correct username and password', async ({page}) => {
 

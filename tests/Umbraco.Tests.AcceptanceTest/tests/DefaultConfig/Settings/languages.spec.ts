@@ -3,6 +3,9 @@ import {expect} from "@playwright/test";
 
 test.describe('Languages', () => {
   test.beforeEach(async ({ page, umbracoApi }) => {
+    // TODO: REMOVE THIS WHEN SQLITE IS FIXED
+    // Wait so we don't bombard the API
+    await page.waitForTimeout(1000);
     await umbracoApi.login();
   });
 
