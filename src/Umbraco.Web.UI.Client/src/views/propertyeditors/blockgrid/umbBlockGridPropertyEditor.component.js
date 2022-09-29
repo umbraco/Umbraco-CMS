@@ -786,6 +786,8 @@
             if (availableTypes.length === 0) {
                 return;
             }
+
+            const availableBlockGroups = vm.blockGroups.filter(group => !!availableTypes.find(item => item.blockConfigModel.groupKey === group.key));
             
             var amountOfAvailableTypes = availableTypes.length;
             var availableContentTypesAliases = modelObject.getAvailableAliasesOfElementTypeKeys(availableTypes.map(x => x.blockConfigModel.contentElementTypeKey));
@@ -803,7 +805,7 @@
                 $parentScope: $scope, // pass in a $parentScope, this maintains the scope inheritance in infinite editing
                 $parentForm: vm.propertyForm, // pass in a $parentForm, this maintains the FormController hierarchy with the infinite editing view (if it contains a form)
                 availableItems: availableTypes,
-                blockGroups: vm.blockGroups,
+                blockGroups: availableBlockGroups,
                 title: vm.labels.grid_addElement,
                 openClipboard: openClipboard,
                 orderBy: "$index",
