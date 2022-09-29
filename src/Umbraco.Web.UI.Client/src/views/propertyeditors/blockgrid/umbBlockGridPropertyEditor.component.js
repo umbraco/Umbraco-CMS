@@ -123,6 +123,7 @@
             vm.gridColumns = vm.model.config.gridColumns || 12;
             vm.createLabel = vm.model.config.createLabel || "";
             vm.blockGroups = vm.model.config.blockGroups;
+            vm.uniqueEditorKey = String.CreateGuid();
 
             vm.editorWrapperStyles = {};
 

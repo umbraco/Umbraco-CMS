@@ -536,9 +536,8 @@
                 }
             }
 
-            // TODO: Generate a unique ID for each Editor, also unique across variants.
             const sortable = Sortable.create(gridLayoutContainerEl, {
-                group: "uniqueGridEditorID",  // links groups with same name.
+                group: "BlockGridEditor_"+vm.blockEditorApi.internal.uniqueEditorKey,  // links groups with same name.
                 sort: true,  // sorting inside list
                 //delay: 0, // time in milliseconds to define when the sorting should start
                 //delayOnTouchOnly: false, // only delay if user is using touch
