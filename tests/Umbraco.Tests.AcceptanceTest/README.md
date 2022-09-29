@@ -13,10 +13,10 @@ The script will ask you to enter the username and password for a superadmin user
 ### Executing tests
 There are two npm scripts that can be used to execute the test:
 
-1. `npm run ui`
+1. `npm run test`
    - Executes the tests headless.
-1. `npm run headed`
-   - Executes the tests in a browser handled by a cypress application.
+1. `npm run ui`
+   - Executes the tests in a browser handled by a playwright application.
 
  In case of errors it is recommended to use `await page.pause()` so you can step through your test.
 
