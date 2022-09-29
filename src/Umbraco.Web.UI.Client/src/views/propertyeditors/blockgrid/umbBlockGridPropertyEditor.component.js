@@ -1,8 +1,6 @@
 (function () {
     "use strict";
 
-    // TODO: make sure clipboardService handles children.
-
     /**
      * @ngdoc directive
      * @name umbraco.directives.directive:umbBlockGridPropertyEditor
@@ -105,7 +103,7 @@
                 vm.showValidation = false;
             }));
 
-            if (vm.umbProperty && !vm.umbVariantContent) {// if we dont have vm.umbProperty, it means we are in the DocumentTypeEditor.
+            if (vm.umbProperty && !vm.umbVariantContent) {// if we don't have vm.umbProperty, it means we are in the DocumentTypeEditor.
                 // not found, then fallback to searching the scope chain, this may be needed when DOM inheritance isn't maintained but scope
                 // inheritance is (i.e.infinite editing)
                 var found = angularHelper.traverseScopeChain($scope, s => s && s.vm && s.vm.constructor.name === "umbVariantContentController");
@@ -358,9 +356,9 @@
         }
 
         /**
-         * Ensure that the containing content variant languag and current property culture is transfered along
+         * Ensure that the containing content variant language and current property culture is transferred along
          * to the scaffolded content object representing this block.
-         * This is required for validation along with ensuring that the umb-property inheritance is constently maintained.
+         * This is required for validation along with ensuring that the umb-property inheritance is constantly maintained.
          * @param {any} content
          */
         function ensureCultureData(content) {
@@ -492,15 +490,17 @@
             // fit in row?
             if (options.fitInRow === true) {
                 // TODO: find the best way to add this in with the rest of the row?
-                // One take could be to take the index minus one, get the block element for that one?
-                // Figure out the start column of that element, and the grid columns for that layout/area.
-                // Check if that and the new one can fit on the line.
+                /*
+                Use clientRect to measure previous items, once one is more to the right than the one before, then it must be a new line.
+                Combine those from the line to inspect if there is left room. Se if the left room fits?
+                Additionally the sizingOptions of the other can come into play?
+                */
 
                 if(blockObject.config.columnSpanOptions.length > 0) {
                     const minColumnSpan = blockObject.config.columnSpanOptions.reduce((prev, option) => Math.min(prev, option.columnSpan), vm.gridColumns);
-                    // TODO, use contextual layout columns, if no defined.
                     layoutEntry.columnSpan = minColumnSpan;
                 } else {
+                    // because no columnSpanOptions defined, then use contextual layout columns.
                     layoutEntry.columnSpan = area? area.$config.columnSpan : vm.gridColumns;
                 }
                 
@@ -509,9 +509,9 @@
                 if(blockObject.config.columnSpanOptions.length > 0) {
                     // set columnSpan to maximum allowed span for this BlockType:
                     const maximumColumnSpan = blockObject.config.columnSpanOptions.reduce((prev, option) => Math.max(prev, option.columnSpan), 1);
-                    // TODO, use contextual layout columns, if no defined.
                     layoutEntry.columnSpan = maximumColumnSpan;
                 } else {
+                    // because no columnSpanOptions defined, then use contextual layout columns.
                     layoutEntry.columnSpan = area? area.$config.columnSpan : vm.gridColumns;
                 }
 
@@ -661,9 +661,9 @@
 
             options = options || vm.options;
 
-            // this must be set
             /*
-            TODO: This is not possibility in grid, cause of the polymorphism 
+            We cannot use the blockIndex as is not possibility in grid, cause of the polymorphism.
+            But we keep it to stay consistent with Block List Editor.
             if (blockIndex === undefined) {
                 throw "blockIndex was not specified on call to editBlock";
             }
@@ -671,12 +671,12 @@
 
             var wasNotActiveBefore = blockObject.active !== true;
 
-	        // dont open the editor overlay if block has hidden its content editor in overlays and we are requesting to open content, not settings.
+	        // don't open the editor overlay if block has hidden its content editor in overlays and we are requesting to open content, not settings.
             if (openSettings !== true && blockObject.hideContentInOverlay === true) {
                 return;
             }
 
-            // if requesting to open settings but we dont have settings then return.
+            // if requesting to open settings but we don't have settings then return.
             if (openSettings === true && !blockObject.config.settingsElementTypeKey) {
                 return;
             }
@@ -1079,9 +1079,6 @@
                         const data = pasteClipboardEntry(layoutEntry.$block, nestedEntry.areaKey, null, nestedEntry, pasteType);
                         if(data === null || data.failed === true) {
                             nestedBlockFailed = true;
-                            // TODO: better fail message.
-                            // This can also happen if the specific block content element type isnt allowed at the given spot :-)
-
                         }
                     }
                 });
@@ -1117,8 +1114,6 @@
                 if(data.failed === true) {
                     // one or more of nested block creation failed.
                     // Ask wether the user likes to continue:
-                    // TODO: test scenario:
-                    // TODO: Texts
                     if(data.layoutEntry) {
                         var blockToRevert = data.layoutEntry.$block;
                         localizationService.localizeMany(["blockEditor_confirmPasteDisallowedNestedBlockHeadline", "blockEditor_confirmPasteDisallowedNestedBlockMessage", "general_revert", "general_continue"]).then(function (localizations) {
