@@ -4,8 +4,8 @@
   "scripts": {
     "postinstall": "node postinstall.js",
     "config": "node config.js",
-    "ui": "npx playwright test tests/DefaultConfig",
-    "headed": "npx playwright test --headed tests/DefaultConfig",
+    "ui": "npx playwright test --headed tests/DefaultConfig",
+    "test": "npx playwright test  tests/DefaultConfig",
     "all": "npx playwright test"
   },
   "devDependencies": {
