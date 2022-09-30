@@ -103,7 +103,7 @@ export const manifests: Array<ManifestTypes & { loader: () => Promise<object | H
 		type: 'propertyEditorUI',
 		alias: 'Umb.PropertyEditorUI.Number',
 		name: 'Number Property Editor UI',
-		loader: () => import('../backoffice/property-editors/number/property-editor-number.element'),
+		loader: () => import('../backoffice/property-editor-uis/number/property-editor-ui-number.element'),
 		meta: {
 			label: 'Number',
 			icon: 'umb:autofill',
