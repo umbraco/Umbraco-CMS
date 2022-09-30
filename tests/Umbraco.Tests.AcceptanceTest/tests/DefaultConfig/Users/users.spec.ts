@@ -59,7 +59,7 @@ test.describe('Users', () => {
     await page.locator('.umb-button > .btn > .umb-button__content').click();
 
     // Assert
-    await expect(await umbracoUi.getButtonByLabelKey("user_goToProfile")).toBeVisible();
+    await expect(await umbracoUi.getButtonByLabelKey("user_goToProfile")).not.toBeVisible();
   });
 
   test('Update user', async ({umbracoUi, umbracoApi, page}) => {
