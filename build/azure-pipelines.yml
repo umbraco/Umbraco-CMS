@@ -363,6 +363,8 @@ stages:
             value: Server=$(UmbracoDatabaseServer);Database=$(UmbracoDatabaseName);Integrated Security=true;
           - name: PLAYWRIGHT_BASE_URL
             value: https://localhost:8443
+          - name: ACCEPTANCE_TEST_FOLDER_EXISTS
+            value: false
         strategy:
           matrix:
             Linux:
@@ -468,19 +470,28 @@ stages:
               targetType: inline
               workingDirectory: tests/Umbraco.Tests.AcceptanceTest
               script: 'npm run test --ignore-certificate-errors'
-          - bash: |
-              if [ -f $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/results/ ]; then
-                echo "##vso[task.setVariable variable=myfileexists]true"
-              fi
+          - task: PowerShell@2
+            displayName: Check if artifacts folder exists
+            inputs:
+              targetType: inline
+              script: |
+                $MyVariable = Test-Path -Path $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/results
+                Write-Host "##vso[task.setvariable variable=myVar;]$MyVariable"
+          - task: Powershell@2
+            displayName: Echo myVar
+            inputs:
+              targetType: inline
+              script: |
+                echo variables.myVar
           - task: CopyFiles@2
             displayName: Prepare artifacts
-            condition: eq(variables.myfileexists, 'true')
+            condition: eq(variables.myVar, 'true')
             inputs:
               sourceFolder: $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/results/
               targetFolder: $(Build.ArtifactStagingDirectory)/playwright
           - task: PublishPipelineArtifact@1
             displayName: "Publish test artifacts"
-            condition: eq(variables.myfileexists, 'true')
+            condition: eq(variables.myVar, 'true')
             inputs:
               targetPath: $(Build.ArtifactStagingDirectory)
               artifact: 'E2E artifacts - $(Agent.OS) - Attempt #$(System.JobAttempt)'
