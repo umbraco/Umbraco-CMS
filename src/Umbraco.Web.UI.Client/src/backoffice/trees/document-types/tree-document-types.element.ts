@@ -2,8 +2,8 @@ import { html } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '../../../core/context';
 import { UmbEntityStore } from '../../../core/stores/entity.store';
-import { UmbTreeDocumentTypesDataContext } from './tree-document-types-data.context';
 import { UmbTreeBase } from '../shared/tree-base.element';
+import { UmbTreeDocumentTypesDataContext } from './tree-document-types-data.context';
 
 import '../shared/tree-navigator.element';
 
