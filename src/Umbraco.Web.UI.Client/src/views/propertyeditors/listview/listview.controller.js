@@ -691,11 +691,16 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
 
     function resolveExpression(e, result, value, alias, retestCount) {
         var newValue = e.nameExp({ value });
-        if (newValue && newValue.startsWith('Loading...') && retestCount < 5) {
-            retestCount++;
-            $timeout(function () {
-              resolveExpression(e, result, value, alias, retestCount);
-            }, retestCount * 1000);
+        if (newValue && newValue.startsWith('Loading...')) {
+            if (retestCount === 5) {
+                newValue = "Failed to load.";
+            }
+            else {
+                retestCount++;
+                $timeout(function () {
+                  resolveExpression(e, result, value, alias, retestCount);
+                }, retestCount * 1000);
+            }
         }
         if (newValue && (newValue = newValue.trim())) {
             result[alias] = newValue;
