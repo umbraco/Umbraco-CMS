@@ -3,7 +3,6 @@ import { hasDefaultExport } from './has-default-export.function';
 import { isManifestElementType } from './is-extension.function';
 import { loadExtension } from './load-extension.function';
 
-
 export async function createExtensionElement(manifest: ManifestTypes): Promise<HTMLElement | undefined> {
 	//TODO: Write tests for these extension options:
 	const js = await loadExtension(manifest);
