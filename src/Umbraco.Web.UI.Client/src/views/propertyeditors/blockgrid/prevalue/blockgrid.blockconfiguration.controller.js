@@ -140,9 +140,11 @@
             placeholder: '--sortable-placeholder',
             forcePlaceHolderSize: true,
             stop: function(e, ui) {
-                // We do not want sortable to actually move the data, as we are using the same ng-model. Instead we just change the groupKey and cancel the transfering.
-                ui.item.sortable.model.groupKey = ui.item.sortable.droptarget[0].dataset.groupKey || null;
-                ui.item.sortable.cancel();
+                if(ui.item.sortable.droptarget && ui.item.sortable.droptarget.length > 0) {
+                    // We do not want sortable to actually move the data, as we are using the same ng-model. Instead we just change the groupKey and cancel the transfering.
+                    ui.item.sortable.model.groupKey = ui.item.sortable.droptarget[0].dataset.groupKey || null;
+                    ui.item.sortable.cancel();
+                }
             }
         };
 
