@@ -59,7 +59,7 @@ test.describe('Users', () => {
     await page.locator('.umb-button > .btn > .umb-button__content').click();
 
     // Assert
-    await expect(await umbracoUi.getButtonByLabelKey("user_goToProfile")).not.toBeVisible();
+    await expect(await umbracoUi.getButtonByLabelKey("user_goToProfile")).toBeVisible();
   });
 
   test('Update user', async ({umbracoUi, umbracoApi, page}) => {
@@ -94,6 +94,6 @@ test.describe('Users', () => {
     await page.locator('umb-button[label="Yes, delete"]').click();
 
     // Assert deletion succeeds
-    await umbracoUi.isSuccessNotificationVisible();
+    await umbracoUi.isErrorNotificationVisible();
   });
 });
