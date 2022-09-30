@@ -116,15 +116,6 @@
         unsubscribe.push($scope.$watch("depth", (newVal, oldVal) => {
             vm.childDepth = parseInt(vm.depth) + 1;
         }));
-        unsubscribe.push($scope.$watch("layoutColumns", (newVal, oldVal) => {
-            vm.layoutColumnsInt = parseInt(vm.layoutColumns, 10);
-
-            if(vm.layoutEntry.$block.config.areaGridColumns) {
-                // nothing to update.
-            } else {
-                vm.areaGridColumns = vm.layoutColumns.toString();
-            }
-        }));
         /**
          * We want to only show the validation errors on the specific Block, not the parent blocks.
          * So we need to avoid having a Block as the parent to the Block Form.
