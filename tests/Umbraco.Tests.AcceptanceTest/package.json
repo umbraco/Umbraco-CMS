@@ -6,7 +6,8 @@
     "config": "node config.js",
     "ui": "npx playwright test --headed DefaultConfig",
     "test": "npx playwright test DefaultConfig",
-    "all": "npx playwright test"
+    "all": "npx playwright test",
+    "createTest": "node createTest.js"
   },
   "devDependencies": {
     "@playwright/test": "^1.19.2",
