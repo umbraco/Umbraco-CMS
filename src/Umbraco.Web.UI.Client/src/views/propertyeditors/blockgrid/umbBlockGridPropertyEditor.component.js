@@ -1,6 +1,19 @@
 (function () {
     "use strict";
 
+    function GetAreaAtBlock(parentBlock, areaKey) {
+        if(parentBlock != null) {
+            var area = parentBlock.layout.areas.find(x => x.key === areaKey);
+            if(!area) {
+                return null;
+            }
+
+            return area;
+        }
+        return null;
+    }
+
+
     /**
      * @ngdoc directive
      * @name umbraco.directives.directive:umbBlockGridPropertyEditor
@@ -55,6 +68,7 @@
         });
 
         vm.loading = true;
+
         vm.currentBlockInFocus = null;
         vm.setBlockFocus = function (block) {
             if (vm.currentBlockInFocus !== null) {
@@ -63,6 +77,19 @@
             vm.currentBlockInFocus = block;
             block.focus = true;
         };
+
+        vm.showAreaHighlight = function(parentBlock, areaKey) {
+            const area = GetAreaAtBlock(parentBlock, areaKey)
+            if(area) {
+                area.$highlight = true;
+            }
+        }
+        vm.hideAreaHighlight = function(parentBlock, areaKey) {
+            const area = GetAreaAtBlock(parentBlock, areaKey)
+            if(area) {
+                area.$highlight = false;
+            }
+        }
 
         vm.supportCopy = clipboardService.isSupported();
         vm.clipboardItems = [];

@@ -2,7 +2,9 @@
     ng-if="!vm.blockEditorApi.readonly"
     class="umb-block-grid__block--inline-create-button --above"
     ng-class="{'--at-root': vm.depth === '0'}"
-    ng-click="vm.blockEditorApi.requestShowCreate(vm.parentBlock, vm.areaKey, vm.index, $event)">
+    ng-click="vm.blockEditorApi.requestShowCreate(vm.parentBlock, vm.areaKey, vm.index, $event)"
+    ng-mouseover="vm.blockEditorApi.internal.showAreaHighlight(vm.parentBlock, vm.areaKey)"
+    ng-mouseleave="vm.blockEditorApi.internal.hideAreaHighlight(vm.parentBlock, vm.areaKey)">
 </uui-button-inline-create>
 
 <ng-form name="vm.blockForm" val-server-match="{ 'contains' : { 'valServerMatchContent': vm.layoutEntry.$block.content.key, 'valServerMatchSettings': vm.layoutEntry.$block.settings.key } }">
@@ -31,6 +33,7 @@
                 slot="area-container"
                 ng-repeat="areaEntry in vm.layoutEntry.areas track by areaEntry.key"
                 class="umb-block-grid__area"
+                ng-class="{'--highlight': areaEntry.$highlight}"
                 data-area-col-span="{{::areaEntry.$config.columnSpan}}"
                 data-area-row-span="{{::areaEntry.$config.rowSpan}}"
                 data-area-alias="{{::areaEntry.$config.alias}}"
@@ -175,6 +178,9 @@
 <uui-button-inline-create
     ng-if="!vm.blockEditorApi.readonly"
     class="umb-block-grid__block--inline-create-button --after"
+    ng-class="{'--at-root': vm.depth === '0'}"
     ng-click="vm.blockEditorApi.requestShowCreate(vm.parentBlock, vm.areaKey, vm.index+1, $event, {'fitInRow': true})"
+    ng-mouseover="vm.blockEditorApi.internal.showAreaHighlight(vm.parentBlock, vm.areaKey)"
+    ng-mouseleave="vm.blockEditorApi.internal.hideAreaHighlight(vm.parentBlock, vm.areaKey)"
     vertical>
 </uui-button-inline-create>

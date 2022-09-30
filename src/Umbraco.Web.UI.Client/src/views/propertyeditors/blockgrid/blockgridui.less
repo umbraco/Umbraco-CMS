@@ -115,6 +115,7 @@ ng-form.ng-invalid-val-server-match-content > .umb-block-grid__block:not(.--acti
         display: none;
         inset: 0;
         border: 1px solid transparent;
+        border-radius: 3px;
         box-shadow: 0 0 0 1px rgba(255, 255, 255, .7), inset 0 0 0 1px rgba(255, 255, 255, .7);
         
         transition: border-color 240ms ease-in;
@@ -598,19 +599,24 @@ umb-block-grid-block {
     width: 100%;
 }
 .umb-block-grid__block--inline-create-button.--above.--at-root {
+    /* If at root, and full-width then become 40px wider: */
     --calc: clamp(0, calc(var(--umb-block-grid--item-column-span) - (var(--umb-block-grid--grid-columns)-1)), 1);
     left: calc(-20px * var(--calc));
     width: calc(100% + 40px * var(--calc));
 }
 .umb-block-grid__block--inline-create-button.--after {
-    right: 0;
+    right: 1px;
+}
+.umb-block-grid__block--inline-create-button.--after.--at-root {
+    /* If at root, and full-width then move a little out to the right: */
+    --calc: clamp(0, calc(var(--umb-block-grid--item-column-span) - (var(--umb-block-grid--grid-columns)-1)), 1);
+    right: calc(-2px * var(--calc));
 }
 
 .umb-block-grid__block--after-inline-create-button {
-    position: absolute;
     z-index:2;
-    left: 0;
     width: 100%;
+    margin-bottom: -7px;
 }
 
 
@@ -849,6 +855,11 @@ umb-block-grid-block {
     opacity: var(--umb-block-grid--show-area-ui, 0);
     transition: opacity 240ms;
 }
+.umb-block-grid__area.--highlight::after {
+    opacity: 1;
+    border-color: @blueDark;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, .7), inset 0 0 0 1px rgba(255, 255, 255, .7);
+}
 
 .umb-block-grid__scalebox-backdrop {
     position: absolute;
@@ -891,6 +902,10 @@ umb-block-grid-block {
     .umb-block-grid__layout-item.--has-areas {
         z-index: 2;
     }
+}
+
+.umb-block-grid__layout-container .umb-block-grid__layout-item:first-of-type .umb-block-grid__block--inline-create-button.--above {
+    margin-top: -7px;
 }
 
 .umb-block-grid__not-allowed-box {
