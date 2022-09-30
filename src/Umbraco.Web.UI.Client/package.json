@@ -28,8 +28,8 @@
 		"format": "prettier 'src/**/*.ts'",
 		"format:fix": "npm run format -- --write",
 		"generate:api": "npx openapi-typescript schemas/**/*.yml --output schemas/generated-schema.ts",
-		"storybook": "start-storybook -p 6006",
-		"build-storybook": "wc-analyze && build-storybook",
+		"storybook": "npm run wc-analyze && start-storybook -p 6006",
+		"build-storybook": "npm run wc-analyze && build-storybook",
 		"wc-analyze": "wca **/*.element.ts --outFile custom-elements.json"
 	},
 	"engines": {
