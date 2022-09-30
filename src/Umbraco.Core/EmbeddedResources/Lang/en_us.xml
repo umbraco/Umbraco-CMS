@@ -2850,6 +2850,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="tabBlockSettings">Settings</key>
     <key alias="headlineAdvanced">Advanced</key>
     <key alias="forceHideContentEditor">Hide content editor</key>
+    <key alias="forceHideContentEditorHelp">Hide the content edit button and the content editor from the Block Editor overlay</key>
     <key alias="blockHasChanges">You have made changes to this content. Are you sure you want to discard them?</key>
     <key alias="confirmCancelBlockCreationHeadline">Discard creation?</key>
     <key alias="confirmCancelBlockCreationMessage"><![CDATA[Are you sure you want to cancel the creation.]]></key>
@@ -2870,8 +2871,10 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="confirmDeleteBlockAreaMessage">Are you sure you want to delete this area?</key>
     <key alias="confirmDeleteBlockAreaNotice">Any blocks currently created within this area will be deleted.</key>
     <key alias="layoutOptions">Layout options</key>
+    <key alias="structuralOptions">Structural</key>
+    <key alias="sizeOptions">Size options</key>
     <key alias="allowedBlockColumns">Available column spans</key>
-    <key alias="allowedBlockColumnsHelp">Define the different number of columns this block is allowed to span across.</key>
+    <key alias="allowedBlockColumnsHelp">Define the different number of columns this block is allowed to span across. This does not prevent Blocks from Areas of a smaller column span.</key>
     <key alias="allowedBlockRows">Available row spans</key>
     <key alias="allowedBlockRowsHelp">Define the range of layout rows this block is allowed to span across.</key>
     <key alias="allowBlockInRoot">Allowed in root</key>

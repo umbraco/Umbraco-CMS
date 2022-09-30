@@ -2200,6 +2200,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="tabBlockSettings">Indstillinger</key>
     <key alias="headlineAdvanced">Avanceret</key>
     <key alias="forceHideContentEditor">Skjul indholdseditoren</key>
+    <key alias="forceHideContentEditorHelp">Skjul indholds redigerings knappen samt indholdseditoren i Blok Redigerings vinduet</key>
     <key alias="blockHasChanges">Du har lavet ændringer til dette indhold. Er du sikker på at du vil kassere dem?</key>
     <key alias="confirmCancelBlockCreationHeadline">Annuller oprettelse?</key>
     <key alias="confirmCancelBlockCreationMessage"><![CDATA[Er du sikker på at du vil annullere oprettelsen.]]></key>
@@ -2220,8 +2221,10 @@ Mange hilsner fra Umbraco robotten
     <key alias="confirmDeleteBlockAreaMessage">Er du sikker på, at du vil slette dette område?</key>
     <key alias="confirmDeleteBlockAreaNotice">Alle blokke, der er oprettet i dette område, vil blive slettet.</key>
     <key alias="layoutOptions">Layout-opsætning</key>
+    <key alias="structuralOptions">Struktur</key>
+    <key alias="sizeOptions">Størrelses opsætning</key>
     <key alias="allowedBlockColumns">Tilgængelige kolonne-størrelser</key>
-    <key alias="allowedBlockColumnsHelp">Vælg de forskellige antal kolonner denne blok må optage i layoutet.</key>
+    <key alias="allowedBlockColumnsHelp">Vælg de forskellige antal kolonner denne blok må optage i layoutet. Dette forhindre ikke blokken i at optræde i et mindre område.</key>
     <key alias="allowedBlockRows">TIlgængelige række-størrelser</key>
     <key alias="allowedBlockRowsHelp">Vælg hvor mange rækker denne blok på optage i layoutet.</key>
     <key alias="allowBlockInRoot">Tillad på rodniveay</key>
