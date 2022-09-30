@@ -95,4 +95,16 @@ export const manifests: Array<ManifestTypes & { loader: () => Promise<object | H
 			group: 'Common',
 		},
 	},
+	{
+		type: 'propertyEditorUI',
+		alias: 'Umb.PropertyEditorUI.IconPicker',
+		name: 'Icon Picker Property Editor UI',
+		loader: () => import('../backoffice/property-editor-uis/icon-picker/property-editor-ui-icon-picker.element'),
+		meta: {
+			label: 'Icon Picker',
+			propertyEditor: 'Umbraco.IconPicker',
+			icon: 'umb:document',
+			group: 'Common',
+		},
+	},
 ];

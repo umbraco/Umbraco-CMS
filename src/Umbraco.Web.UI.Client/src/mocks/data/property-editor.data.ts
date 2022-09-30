@@ -325,6 +325,14 @@ export const data: Array<PropertyEditor> = [
 		icon: 'umb:autofill',
 		alias: 'Umbraco.Custom',
 	},
+	{
+		isSystem: false,
+		group: 'Custom',
+		hasConfig: true,
+		name: 'Icon Picker',
+		icon: 'umb:autofill',
+		alias: 'Umbraco.IconPicker',
+	},
 ];
 
 // Temp mocked database

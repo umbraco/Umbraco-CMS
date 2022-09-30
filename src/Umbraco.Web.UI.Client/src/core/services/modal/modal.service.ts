@@ -2,6 +2,7 @@
 import './layouts/confirm/modal-layout-confirm.element';
 import './layouts/content-picker/modal-layout-content-picker.element';
 import './layouts/property-editor-ui-picker/modal-layout-property-editor-ui-picker.element';
+import './layouts/icon-picker/modal-layout-icon-picker.element';
 
 import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
 import { BehaviorSubject, Observable } from 'rxjs';
