@@ -257,7 +257,7 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		elementName: 'umb-property-action-copy',
 		loader: () => import('../backoffice/property-actions/copy/property-action-copy.element'),
 		meta: {
-			propertyEditors: ['Umb.PropertyEditorUI.Text'],
+			propertyEditors: ['Umb.PropertyEditorUI.TextBox'],
 		},
 	},
 	{
@@ -267,7 +267,7 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		elementName: 'umb-property-action-clear',
 		loader: () => import('../backoffice/property-actions/clear/property-action-clear.element'),
 		meta: {
-			propertyEditors: ['Umb.PropertyEditorUI.Text'],
+			propertyEditors: ['Umb.PropertyEditorUI.TextBox'],
 		},
 	},
 	{

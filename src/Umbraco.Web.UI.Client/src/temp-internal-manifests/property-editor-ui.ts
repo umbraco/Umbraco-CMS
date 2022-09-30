@@ -39,9 +39,9 @@ export const manifests: Array<ManifestTypes & { loader: () => Promise<object | H
 	},
 	{
 		type: 'propertyEditorUI',
-		alias: 'Umb.PropertyEditorUI.Text',
+		alias: 'Umb.PropertyEditorUI.TextBox',
 		name: 'Text Property Editor UI',
-		loader: () => import('../backoffice/property-editors/text/property-editor-text.element'),
+		loader: () => import('../backoffice/property-editor-uis/text-box/property-editor-ui-text-box.element'),
 		meta: {
 			label: 'Text',
 			icon: 'umb:edit',
@@ -53,8 +53,7 @@ export const manifests: Array<ManifestTypes & { loader: () => Promise<object | H
 		type: 'propertyEditorUI',
 		alias: 'Umb.PropertyEditorUI.Textarea',
 		name: 'Textarea Property Editor UI',
-		elementName: 'umb-property-editor-textarea',
-		loader: () => import('../backoffice/property-editors/textarea/property-editor-textarea.element'),
+		loader: () => import('../backoffice/property-editor-uis/textarea/property-editor-ui-textarea.element'),
 		meta: {
 			label: 'Textarea',
 			icon: 'umb:edit',

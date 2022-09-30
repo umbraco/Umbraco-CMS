@@ -26,7 +26,7 @@ export const data: Array<DataTypeDetails> = [
 		hasChildren: false,
 		icon: 'umb:autofill',
 		propertyEditorAlias: 'Umbraco.TextBox',
-		propertyEditorUIAlias: 'Umb.PropertyEditorUI.Text',
+		propertyEditorUIAlias: 'Umb.PropertyEditorUI.TextBox',
 		data: [
 			{
 				alias: 'maxChars',

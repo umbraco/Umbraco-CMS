@@ -2,12 +2,12 @@ import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
 
-@customElement('umb-property-editor-textarea')
-export class UmbPropertyEditorTextareaElement extends LitElement {
+@customElement('umb-property-editor-ui-text-box')
+export class UmbPropertyEditorUITextBoxElement extends LitElement {
 	static styles = [
 		UUITextStyles,
 		css`
-			uui-textarea {
+			uui-input {
 				width: 100%;
 			}
 		`,
@@ -17,7 +17,7 @@ export class UmbPropertyEditorTextareaElement extends LitElement {
 	value = '';
 
 	@property({ type: Array, attribute: false })
-	config = [];
+	public config = [];
 
 	private onInput(e: InputEvent) {
 		this.value = (e.target as HTMLInputElement).value;
@@ -25,15 +25,14 @@ export class UmbPropertyEditorTextareaElement extends LitElement {
 	}
 
 	render() {
-		return html`<uui-textarea .value=${this.value} @input=${this.onInput}></uui-textarea>
-			${this.config?.map((property: any) => html`<div>${property.alias}: ${property.value}</div>`)} `;
+		return html`<uui-input .value=${this.value} type="text" @input=${this.onInput}></uui-input>`;
 	}
 }
 
-export default UmbPropertyEditorTextareaElement;
+export default UmbPropertyEditorUITextBoxElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-property-editor-textarea': UmbPropertyEditorTextareaElement;
+		'umb-property-editor-ui-text-box': UmbPropertyEditorUITextBoxElement;
 	}
 }
