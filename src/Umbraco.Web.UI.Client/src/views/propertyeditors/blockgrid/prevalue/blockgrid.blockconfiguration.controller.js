@@ -25,8 +25,6 @@
         var vm = this;
         vm.openBlock = null;
 
-        vm.ungroupedBlocks = [];
-
         function onInit() {
 
             $element.closest('.umb-control-group').addClass('-no-border');
@@ -278,6 +276,35 @@
             }
 
         };
+
+
+        vm.requestRemoveGroup = function(blockGroup) {
+            if(blockGroup.key) {
+                localizationService.localizeMany(["general_delete", "blockEditor_confirmDeleteBlockGroupMessage", "blockEditor_confirmDeleteBlockGroupNotice"]).then(function (data) {
+                    overlayService.confirmDelete({
+                        title: data[0],
+                        content: localizationService.tokenReplace(data[1], [blockGroup.name ? blockGroup.name : "'Unnamed group'"]),
+                        confirmMessage: data[2],
+                        close: function () {
+                            overlayService.close();
+                        },
+                        submit: function () {
+
+                            // Remove all blocks of this group:
+                            $scope.model.value = $scope.model.value.filter(block => block.groupKey !== blockGroup.key);
+
+                            // Then remove group:
+                            const groupIndex = vm.blockGroups.indexOf(blockGroup);
+                            if(groupIndex !== -1) {
+                                vm.blockGroups.splice(groupIndex, 1);
+                            }
+
+                            overlayService.close();
+                        }
+                    });
+                });
+            }
+        }
 
         $scope.$on('$destroy', function () {
             unsubscribe.forEach(u => { u(); });

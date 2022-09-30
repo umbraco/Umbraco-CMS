@@ -2185,6 +2185,12 @@ Mange hilsner fra Umbraco robotten
     <key alias="confirmDeleteBlockTypeNotice">Indholdet vil stadigt eksistere, men redigering af dette indhold vil ikke
       være muligt. Indholdet vil blive vist som ikke understøttet indhold.
     </key>
+
+    <key alias="confirmDeleteBlockGroupMessage">
+      <![CDATA[Er du sikker på at du vil slette gruppen <strong>%0%</strong> og blok konfigurationer?]]></key>
+    <key alias="confirmDeleteBlockGroupNotice">Indholdet af gruppens blokke vil stadigt eksistere, men redigering af dette indhold vil ikke
+      være muligt. Indholdet vil blive vist som ikke understøttet indhold.
+    </key>
     <key alias="blockConfigurationOverlayTitle"><![CDATA[Konfiguration af '%0%']]></key>
     <key alias="elementTypeDoesNotExist">Kan ikke redigeres fordi elementtypen ikke eksisterer.</key>
     <key alias="thumbnail">Billede</key>

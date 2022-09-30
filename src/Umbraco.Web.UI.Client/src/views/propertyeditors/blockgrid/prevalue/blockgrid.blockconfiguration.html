@@ -32,9 +32,24 @@
         <div class="umb-block-card-group" ng-repeat="blockGroup in vm.blockGroups track by blockGroup.key">
 
 
-            <div class="__handle"><umb-icon icon="icon-navigation"></umb-icon></div>
-            
-            <input class="__title" title="group name" type="text" ng-model="blockGroup.name"></input>
+            <div class="__controls">
+                <div class="__handle"><umb-icon icon="icon-navigation"></umb-icon></div>
+                
+                <input class="__title" title="group name" type="text" ng-model="blockGroup.name" ng-input="this.size = this.value.length"></input>
+
+                <button 
+                    type="button" 
+                    class="btn-reset umb-outline __remove"
+                    localize="title"
+                    title="actions_delete"
+                    ng-click="vm.requestRemoveGroup(blockGroup);"
+                    ng-disabled="vm.disabled">
+                    <umb-icon icon="icon-trash" class="icon"></umb-icon>
+                    <span class="sr-only">
+                        <localize key="actions_delete">Delete</localize>
+                    </span>
+                </button>
+            </div>
 
             <div class="umb-block-card-grid" ui-sortable="vm.blockSortableOptions" ng-model="model.value" data-group-key="{{blockGroup.key}}">
 

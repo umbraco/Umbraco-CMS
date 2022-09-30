@@ -2836,6 +2836,11 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="confirmDeleteBlockTypeNotice">The content of this block will still be present, editing of this content
       will no longer be available and will be shown as unsupported content.
     </key>
+    <key alias="confirmDeleteBlockGroupMessage">
+      <![CDATA[Are you sure you want to delete group <strong>%0%</strong> and all the Block configurations of this?]]></key>
+    <key alias="confirmDeleteBlockGroupNotice">The content of these Blocks will still be present, editing of this content
+      will no longer be available and will be shown as unsupported content.
+    </key>
     <key alias="blockConfigurationOverlayTitle"><![CDATA[Configuration of '%0%']]></key>
     <key alias="elementTypeDoesNotExist">Cannot be edited cause ElementType does not exist.</key>
     <key alias="thumbnail">Thumbnail</key>
