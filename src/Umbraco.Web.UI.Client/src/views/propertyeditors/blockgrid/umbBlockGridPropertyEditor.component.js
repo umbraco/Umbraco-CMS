@@ -108,9 +108,10 @@
             createFlow: false
         };
 
-        localizationService.localizeMany(["grid_addElement", "content_createEmpty"]).then(function (data) {
+        localizationService.localizeMany(["grid_addElement", "content_createEmpty", "blockEditor_addThis"]).then(function (data) {
             vm.labels.grid_addElement = data[0];
             vm.labels.content_createEmpty = data[1];
+            vm.labels.blockEditor_addThis = data[2]
         });
 
         vm.$onInit = function() {
@@ -827,13 +828,22 @@
                     }
                 }
             );
+
+            var createLabel;
+            if(parentBlock) {
+                const area = parentBlock.layout.areas.find(x => x.key === areaKey);
+                createLabel = area.$config.createLabel;
+            } else {
+                createLabel = vm.createLabel;
+            }
+            const headline = createLabel || (amountOfAvailableTypes.length === 1 ? localizationService.tokenReplace(vm.labels.blockEditor_addThis, [availableTypes[0].elementTypeModel.name]) : vm.labels.grid_addElement);
             
             var blockPickerModel = {
                 $parentScope: $scope, // pass in a $parentScope, this maintains the scope inheritance in infinite editing
                 $parentForm: vm.propertyForm, // pass in a $parentForm, this maintains the FormController hierarchy with the infinite editing view (if it contains a form)
                 availableItems: availableTypes,
                 blockGroups: availableBlockGroups,
-                title: vm.labels.grid_addElement,
+                title: headline,
                 openClipboard: openClipboard,
                 orderBy: "$index",
                 view: "views/common/infiniteeditors/blockpicker/blockpicker.html",
