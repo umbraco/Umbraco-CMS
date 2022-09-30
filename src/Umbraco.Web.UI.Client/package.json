@@ -59,7 +59,7 @@
 		"@storybook/addon-actions": "^6.5.12",
 		"@storybook/addon-essentials": "^6.5.12",
 		"@storybook/addon-links": "^6.5.12",
-		"@storybook/builder-vite": "^0.2.2",
+		"@storybook/builder-vite": "^0.2.3",
 		"@storybook/mdx2-csf": "^0.0.3",
 		"@storybook/web-components": "^6.5.12",
 		"@types/chai": "^4.3.1",
