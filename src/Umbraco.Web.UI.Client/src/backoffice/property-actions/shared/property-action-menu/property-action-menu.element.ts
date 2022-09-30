@@ -6,8 +6,8 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { Subscription, map } from 'rxjs';
 import { UmbContextProviderMixin, UmbContextConsumerMixin } from '../../../../core/context';
 import { UmbExtensionRegistry } from '../../../../core/extension';
-import { UmbPropertyActionMenuContext } from './property-action-menu.context';
 import type { ManifestPropertyAction } from '../../../../core/models';
+import { UmbPropertyActionMenuContext } from './property-action-menu.context';
 
 @customElement('umb-property-action-menu')
 export class UmbPropertyActionMenuElement extends UmbContextProviderMixin(UmbContextConsumerMixin(LitElement)) {
