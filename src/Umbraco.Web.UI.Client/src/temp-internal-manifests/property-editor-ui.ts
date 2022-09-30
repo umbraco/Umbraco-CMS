@@ -3,6 +3,42 @@ import type { ManifestTypes } from '../core/models';
 export const manifests: Array<ManifestTypes & { loader: () => Promise<object | HTMLElement> }> = [
 	{
 		type: 'propertyEditorUI',
+		alias: 'Umb.PropertyEditorUI.BlockList',
+		name: 'Block List Property Editor UI',
+		loader: () => import('../backoffice/property-editor-uis/block-list/property-editor-ui-block-list.element'),
+		meta: {
+			label: 'Block List',
+			icon: 'umb:thumbnail-list',
+			group: 'Lists',
+			propertyEditor: 'Umbraco.BlockList',
+		},
+	},
+	{
+		type: 'propertyEditorUI',
+		alias: 'Umb.PropertyEditorUI.Toggle',
+		name: 'Toggle Property Editor UI',
+		loader: () => import('../backoffice/property-editor-uis/toggle/property-editor-ui-toggle.element'),
+		meta: {
+			label: 'Toggle',
+			icon: 'umb:checkbox',
+			group: 'Common',
+			propertyEditor: 'Umbraco.TrueFalse',
+		},
+	},
+	{
+		type: 'propertyEditorUI',
+		alias: 'Umb.PropertyEditorUI.CheckboxList',
+		name: 'Checkbox List Property Editor UI',
+		loader: () => import('../backoffice/property-editor-uis/checkbox-list/property-editor-ui-checkbox-list.element'),
+		meta: {
+			label: 'Checkbox List',
+			icon: 'umb:bulleted-list',
+			group: 'Lists',
+			propertyEditor: 'Umbraco.CheckBoxList',
+		},
+	},
+	{
+		type: 'propertyEditorUI',
 		alias: 'Umb.PropertyEditorUI.Text',
 		name: 'Text Property Editor UI',
 		loader: () => import('../backoffice/property-editors/text/property-editor-text.element'),
