@@ -243,6 +243,8 @@
                     if (onSuccess) {
                         onSuccess();
                     }
+
+                    setDirty();
                 },
                 close: function () {
                     editorService.close();
@@ -291,12 +293,15 @@
             if (index !== -1) {
                 vm.model.value.splice(index, 1);
             }
+
+            setDirty();
         }
 
         function deleteAllMedias() {
             if (!vm.allowRemoveMedia) return;
 
             vm.model.value = [];
+            setDirty();
         }
 
         function setActiveMedia(mediaEntryOrNull) {
