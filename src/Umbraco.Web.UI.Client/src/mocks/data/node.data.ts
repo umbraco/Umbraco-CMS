@@ -108,12 +108,6 @@ export const data: Array<NodeEntity> = [
 				dataTypeKey: 'dt-3',
 			},
 			{
-				alias: 'myContextExampleEditor',
-				label: 'Context example label',
-				description: 'This is the a example property',
-				dataTypeKey: 'dt-4',
-			},
-			{
 				alias: 'myContentPicker',
 				label: 'Content Picker',
 				description: 'This is a content picker',

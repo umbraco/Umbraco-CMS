@@ -74,33 +74,6 @@ export const manifests: Array<ManifestTypes & { loader: () => Promise<object | H
 	},
 	{
 		type: 'propertyEditorUI',
-		alias: 'Umb.PropertyEditorUI.ContextExample',
-		name: 'Context Example Property Editor UI',
-		loader: () => import('../backoffice/property-editors/context-example/property-editor-context-example.element'),
-		meta: {
-			label: 'Context Example',
-			icon: 'umb:favorite',
-			group: 'Common',
-			propertyEditor: 'Umbraco.Custom',
-			config: {
-				properties: [
-					{
-						label: 'Some Configuration',
-						alias: 'someConfiguration',
-						propertyEditorUI: 'Umb.PropertyEditorUI.Text',
-					},
-				],
-				defaultData: [
-					{
-						alias: 'someConfiguration',
-						value: 'Some default value',
-					},
-				],
-			},
-		},
-	},
-	{
-		type: 'propertyEditorUI',
 		alias: 'Umb.PropertyEditorUI.Number',
 		name: 'Number Property Editor UI',
 		loader: () => import('../backoffice/property-editor-uis/number/property-editor-ui-number.element'),

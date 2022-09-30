@@ -68,18 +68,6 @@ export const data: Array<DataTypeDetails> = [
 		data: [],
 	},
 	{
-		key: 'dt-4',
-		name: 'Context Example',
-		type: 'dataType',
-		parentKey: '29d78e6c-c1bf-4c15-b820-d511c237ffae',
-		isTrashed: false,
-		hasChildren: false,
-		icon: 'umb:autofill',
-		propertyEditorAlias: 'Umbraco.Custom',
-		propertyEditorUIAlias: 'Umb.PropertyEditorUI.ContextExample',
-		data: [],
-	},
-	{
 		key: 'dt-5',
 		name: 'Content Picker (DataType)',
 		type: 'dataType',
