@@ -106,7 +106,7 @@
             if(vm.layoutEntry.$block.config.areaGridColumns) {
                 vm.areaGridColumns = vm.layoutEntry.$block.config.areaGridColumns.toString();
             } else {
-                vm.areaGridColumns = vm.layoutColumns.toString();
+                vm.areaGridColumns = vm.blockEditorApi.internal.gridColumns.toString();
             }
 
             vm.layoutColumnsInt = parseInt(vm.layoutColumns, 10)
