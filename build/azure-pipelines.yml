@@ -482,16 +482,16 @@ stages:
             inputs:
               targetType: inline
               script: |
-                echo variables.myVar
+                echo $variables.myVar
           - task: CopyFiles@2
             displayName: Prepare artifacts
-            condition: eq(variables.myVar, 'true')
+            condition: eq(variables.myVar, 'True')
             inputs:
               sourceFolder: $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/results/
               targetFolder: $(Build.ArtifactStagingDirectory)/playwright
           - task: PublishPipelineArtifact@1
             displayName: "Publish test artifacts"
-            condition: eq(variables.myVar, 'true')
+            condition: eq(variables.myVar, 'True')
             inputs:
               targetPath: $(Build.ArtifactStagingDirectory)
               artifact: 'E2E artifacts - $(Agent.OS) - Attempt #$(System.JobAttempt)'
