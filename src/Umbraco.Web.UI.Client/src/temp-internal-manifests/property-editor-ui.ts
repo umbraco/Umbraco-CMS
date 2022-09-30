@@ -115,8 +115,7 @@ export const manifests: Array<ManifestTypes & { loader: () => Promise<object | H
 		type: 'propertyEditorUI',
 		alias: 'Umb.PropertyEditorUI.ContentPicker',
 		name: 'Content Picker Property Editor UI',
-		elementName: 'umb-property-editor-content-picker',
-		loader: () => import('../backoffice/property-editors/content-picker/property-editor-content-picker.element'),
+		loader: () => import('../backoffice/property-editor-uis/content-picker/property-editor-ui-content-picker.element'),
 		meta: {
 			label: 'Content Picker',
 			propertyEditor: 'Umbraco.ContentPicker',

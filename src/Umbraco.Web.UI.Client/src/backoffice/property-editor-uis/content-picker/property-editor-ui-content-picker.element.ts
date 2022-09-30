@@ -8,8 +8,8 @@ import type { UmbModalService } from '../../../core/services/modal';
 import type { UmbEntityStore } from '../../../core/stores/entity.store';
 import type { Entity } from '../../../mocks/data/entities';
 
-@customElement('umb-property-editor-content-picker')
-export class UmbPropertyEditorContentPickerElement extends UmbContextConsumerMixin(LitElement) {
+@customElement('umb-property-editor-ui-content-picker')
+export class UmbPropertyEditorUIContentPickerElement extends UmbContextConsumerMixin(LitElement) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -117,8 +117,10 @@ export class UmbPropertyEditorContentPickerElement extends UmbContextConsumerMix
 	}
 }
 
+export default UmbPropertyEditorUIContentPickerElement;
+
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-property-editor-content-picker': UmbPropertyEditorContentPickerElement;
+		'umb-property-editor-ui-content-picker': UmbPropertyEditorUIContentPickerElement;
 	}
 }
