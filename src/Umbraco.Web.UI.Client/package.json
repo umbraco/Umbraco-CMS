@@ -84,7 +84,7 @@
 		"msw-storybook-addon": "^1.6.3",
 		"playwright-msw": "^1.0.0",
 		"prettier": "2.7.1",
-		"typescript": "^4.8.3",
+		"typescript": "^4.8.4",
 		"vite": "^3.1.4",
 		"web-component-analyzer": "^2.0.0-next.4"
 	},
