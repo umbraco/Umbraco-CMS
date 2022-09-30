@@ -22,7 +22,7 @@
 		"preview": "vite preview --open",
 		"test": "web-test-runner --coverage",
 		"test:watch": "web-test-runner --watch",
-		"test:e2e": "playwright test",
+		"test:e2e": "npx playwright test",
 		"lint": "eslint --cache src e2e",
 		"lint:fix": "npm run lint -- --fix",
 		"format": "prettier 'src/**/*.ts'",
