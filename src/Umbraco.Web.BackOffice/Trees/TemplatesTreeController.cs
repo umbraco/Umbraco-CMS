@@ -143,7 +143,7 @@ public class TemplatesTreeController : TreeController, ISearchableTree
         if (template.IsMasterTemplate == false)
         {
             //add delete option if it doesn't have children
-            menu.Items.Add<ActionDelete>(LocalizedTextService, hasSeparator: true, opensDialog: true);
+            menu.Items.Add<ActionDelete>(LocalizedTextService, hasSeparator: true, opensDialog: true, useLegacyIcon: false);
         }
 
             //add refresh
