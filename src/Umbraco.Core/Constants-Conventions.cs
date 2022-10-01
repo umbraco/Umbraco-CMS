@@ -348,5 +348,10 @@ public static partial class Constants
 
             // TODO: return a list of built in types so we can use that to prevent deletion in the uI
         }
+
+        public static class Udi
+        {
+            public const string StartUdi = "umb://";
+        }
     }
 }
