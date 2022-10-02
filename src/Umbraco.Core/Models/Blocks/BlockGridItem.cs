@@ -106,6 +106,12 @@ namespace Umbraco.Cms.Core.Models.Blocks
         /// </summary>
         [DataMember(Name = "areaGridColumns")]
         public int? AreaGridColumns { get; set; }
+
+        /// <summary>
+        /// The number of columns in the root grid
+        /// </summary>
+        [DataMember(Name = "gridColumns")]
+        public int? GridColumns { get; set; }
     }
 
     /// <summary>

@@ -49,7 +49,8 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
 
                     blockItem.RowSpan = layoutItem.RowSpan!.Value;
                     blockItem.ColumnSpan = layoutItem.ColumnSpan!.Value;
-                    blockItem.AreaGridColumns = layoutItem.AreaGridColumns;
+                    blockItem.AreaGridColumns = blockConfig.AreaGridColumns;
+                    blockItem.GridColumns = configuration.GridColumns;
                     blockItem.Areas = layoutItem.Areas.Select(area =>
                     {
                         if (!blockConfigAreaMap.TryGetValue(area.Key, out BlockGridBlockConfiguration.BlockGridAreaConfiguration? areaConfig))

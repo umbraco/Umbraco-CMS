@@ -4,7 +4,7 @@
 }
 
 <div class="umb-block-grid"
-     data-grid-columns="@(Model.GridColumns?.ToString() ?? "initial");"
-     style="--umb-block-grid--grid-columns: @(Model.GridColumns?.ToString() ?? "initial");">
+     data-grid-columns="@(Model.GridColumns?.ToString() ?? "12");"
+     style="--umb-block-grid--grid-columns: @(Model.GridColumns?.ToString() ?? "12");">
     @await Html.GetBlockGridItemsHtmlAsync(Model)
 </div>
