@@ -15,6 +15,45 @@
         var unsubscribe = [];
 
         var vm = this;
+        
+        vm.navigation = [];
+
+        localizationService.localizeMany(["blockEditor_tabBlockTypeStructure", "blockEditor_tabAdvance"]).then(
+            function (data) {
+
+                // TODO. localizations.
+                
+                vm.navigation = [{
+                    "alias": "block",
+                    "name": "Settings",
+                    "icon": "icon-settings",
+                    "view": ""
+                },
+                {
+                    "alias": "areas",
+                    "name": "Areas",//data[1]
+                    "icon": "icon-layout",
+                    "view": ""
+                },
+                {
+                    "alias": "advance",
+                    "name": "Advanced",//data[1]
+                    "icon": "icon-lab",
+                    "view": ""
+                }];
+
+                vm.activeTab = vm.navigation[0];
+                vm.activeTab.active = true;
+            }
+        );
+
+        vm.onNavigationChanged = function (tab) {
+            vm.activeTab.active = false;
+            vm.activeTab = tab;
+            vm.activeTab.active = true;
+        };
+
+
         vm.block = $scope.model.block;
 
         vm.colorPickerOptions = {

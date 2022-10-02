@@ -2836,6 +2836,11 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="confirmDeleteBlockTypeNotice">The content of this block will still be present, editing of this content
       will no longer be available and will be shown as unsupported content.
     </key>
+    <key alias="confirmDeleteBlockGroupMessage">
+      <![CDATA[Are you sure you want to delete group <strong>%0%</strong> and all the Block configurations of this?]]></key>
+    <key alias="confirmDeleteBlockGroupNotice">The content of these Blocks will still be present, editing of this content
+      will no longer be available and will be shown as unsupported content.
+    </key>
     <key alias="blockConfigurationOverlayTitle"><![CDATA[Configuration of '%0%']]></key>
     <key alias="elementTypeDoesNotExist">Cannot be edited cause ElementType does not exist.</key>
     <key alias="thumbnail">Thumbnail</key>
@@ -2845,6 +2850,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="tabBlockSettings">Settings</key>
     <key alias="headlineAdvanced">Advanced</key>
     <key alias="forceHideContentEditor">Hide content editor</key>
+    <key alias="forceHideContentEditorHelp">Hide the content edit button and the content editor from the Block Editor overlay</key>
     <key alias="blockHasChanges">You have made changes to this content. Are you sure you want to discard them?</key>
     <key alias="confirmCancelBlockCreationHeadline">Discard creation?</key>
     <key alias="confirmCancelBlockCreationMessage"><![CDATA[Are you sure you want to cancel the creation.]]></key>
@@ -2865,17 +2871,20 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="confirmDeleteBlockAreaMessage">Are you sure you want to delete this area?</key>
     <key alias="confirmDeleteBlockAreaNotice">Any blocks currently created within this area will be deleted.</key>
     <key alias="layoutOptions">Layout options</key>
+    <key alias="structuralOptions">Structural</key>
+    <key alias="sizeOptions">Size options</key>
+    <key alias="sizeOptionsHelp">Define one or more size options, this enables resizing of the Block</key>
     <key alias="allowedBlockColumns">Available column spans</key>
-    <key alias="allowedBlockColumnsHelp">Define the different number of columns this block is allowed to span across.</key>
+    <key alias="allowedBlockColumnsHelp">Define the different number of columns this block is allowed to span across. This does not prevent Blocks from Areas of a smaller column span.</key>
     <key alias="allowedBlockRows">Available row spans</key>
     <key alias="allowedBlockRowsHelp">Define the range of layout rows this block is allowed to span across.</key>
-    <key alias="allowBlockInRoot">Allowed in root</key>
+    <key alias="allowBlockInRoot">Allow in root</key>
     <key alias="allowBlockInRootHelp">Make this block available in the root of the layout. When disabled, this block can only be used within areas of other blocks in the layout.</key>
-    <key alias="areas">Block areas</key>
-    <key alias="areasLayoutColumns">Layout columns</key>
-    <key alias="areasLayoutColumnsHelp">Define how many layout columns that will be available for areas. If not defined, the number of layout columns defined for the entire layout will be used</key>
-    <key alias="areasConfigurations">Area configurations</key>
-    <key alias="areasConfigurationsHelp">To enable nesting of blocks within this block, define one or more areas for blocks to be nested within. Areas follow their own layout witch is defined by the Area Layout Columns. Each Areas column and row span can be adjusted by using the scale-handler in the bottom right.</key>
+    <key alias="areas">Areas</key>
+    <key alias="areasLayoutColumns">Grid Columns for Areas</key>
+    <key alias="areasLayoutColumnsHelp">Define how many columns that will be available for areas. If not defined, the number of columns defined for the entire layout will be used.</key>
+    <key alias="areasConfigurations">Areas</key>
+    <key alias="areasConfigurationsHelp">To enable nesting of blocks within this block, define one or more areas for blocks to be nested within. Areas follow their own layout witch is defined by the Grid Columns for Areas. Each Area column span and row span can be adjusted by using the scale-handler in the bottom right corner.</key>
     <key alias="invalidDropPosition"><![CDATA[<strong>%0%</strong> is not allowed at this spot.]]></key>
     <key alias="defaultLayoutStylesheet">Default layout stylesheet</key>
     <key alias="confirmPasteDisallowedNestedBlockHeadline">Disallowed content was rejected</key>
@@ -2892,14 +2901,17 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="scaleHandlerButtonTitle">Drag to scale</key>
     <key alias="areaCreateLabelTitle">Create Button Label</key>
     <key alias="areaCreateLabelHelp">Overwrite the label on the create button of this Area.</key>
-    <key alias="addSizeOptions">Add resize options</key>
-    <key alias="addAreaOptions">Add areas</key>
-    <key alias="addAppearanceOptions">Add catalogue appearance</key>
+    <key alias="showSizeOptions">Show resize options</key>
+    <key alias="showAppearanceOptions">Show catalogue appearance</key>
     <key alias="addBlockType">Add Block</key>
     <key alias="addBlockGroup">Add group</key>
     <key alias="pickSpecificAllowance">Pick group or Block</key>
     <key alias="allowanceMinimum">Set minimum requirement for this allowance</key>
     <key alias="allowanceMaximum">Set maximum requirement for this allowance</key>
+    <key alias="block">Block</key>
+    <key alias="tabBlock">Block</key>
+    <key alias="tabAreas">Areas</key>
+    <key alias="tabAdvanced">Advanced</key>
   </area>
   <area alias="contentTemplatesDashboard">
     <key alias="whatHeadline">What are Content Templates?</key>

@@ -25,8 +25,6 @@
         var vm = this;
         vm.openBlock = null;
 
-        vm.ungroupedBlocks = [];
-
         function onInit() {
 
             $element.closest('.umb-control-group').addClass('-no-border');
@@ -72,6 +70,28 @@
         }
         unsubscribe.push(eventsService.on("editors.documentType.saved", updateUsedElementTypes));
 
+        function removeReferencesToElementTypeKey(contentElementTypeKey) {
+            // Clean up references to this one:
+            $scope.model.value.forEach(blockType => {
+                blockType.areas.forEach(area => {
+                    area.specifiedAllowance = area.specifiedAllowance?.filter(allowance => 
+                        allowance.elementTypeKey !== contentElementTypeKey
+                    ) || [];
+                });
+            });
+        }
+
+        function removeReferencesToGroupKey(groupKey) {
+            // Clean up references to this one:
+            $scope.model.value.forEach(blockType => {
+                blockType.areas.forEach(area => {
+                    area.specifiedAllowance = area.specifiedAllowance?.filter(allowance => 
+                        allowance.groupKey !== groupKey
+                    ) || [];
+                });
+            });
+        }
+
         vm.requestRemoveBlockByIndex = function (index) {
             localizationService.localizeMany(["general_delete", "blockEditor_confirmDeleteBlockTypeMessage", "blockEditor_confirmDeleteBlockTypeNotice"]).then(function (data) {
                 var contentElementType = vm.getElementTypeByKey($scope.model.value[index].contentElementTypeKey);
@@ -91,7 +111,11 @@
         }
 
         vm.removeBlockByIndex = function (index) {
-            $scope.model.value.splice(index, 1);
+            const blockType = $scope.model.value[index];
+            if(blockType) {
+                $scope.model.value.splice(index, 1);
+                removeReferencesToElementTypeKey(blockType.contentElementTypeKey);
+            }
         };
 
         const defaultOptions = {
@@ -116,9 +140,11 @@
             placeholder: '--sortable-placeholder',
             forcePlaceHolderSize: true,
             stop: function(e, ui) {
-                // We do not want sortable to actually move the data, as we are using the same ng-model. Instead we just change the groupKey and cancel the transfering.
-                ui.item.sortable.model.groupKey = ui.item.sortable.droptarget[0].dataset.groupKey || null;
-                ui.item.sortable.cancel();
+                if(ui.item.sortable.droptarget && ui.item.sortable.droptarget.length > 0) {
+                    // We do not want sortable to actually move the data, as we are using the same ng-model. Instead we just change the groupKey and cancel the transfering.
+                    ui.item.sortable.model.groupKey = ui.item.sortable.droptarget[0].dataset.groupKey || null;
+                    ui.item.sortable.cancel();
+                }
             }
         };
 
@@ -278,6 +304,50 @@
             }
 
         };
+
+
+        vm.requestRemoveGroup = function(blockGroup) {
+            if(blockGroup.key) {
+                localizationService.localizeMany(["general_delete", "blockEditor_confirmDeleteBlockGroupMessage", "blockEditor_confirmDeleteBlockGroupNotice"]).then(function (data) {
+                    overlayService.confirmDelete({
+                        title: data[0],
+                        content: localizationService.tokenReplace(data[1], [blockGroup.name ? blockGroup.name : "'Unnamed group'"]),
+                        confirmMessage: data[2],
+                        close: function () {
+                            overlayService.close();
+                        },
+                        submit: function () {
+
+                            // Remove all blocks of this group:
+                            $scope.model.value = $scope.model.value.filter(block => {
+                                    if (block.groupKey === blockGroup.key) {
+                                        // Clean up references to this one:
+                                        removeReferencesToElementTypeKey(block.contentElementTypeKey);
+
+                                        return false;
+                                    } else {
+                                        return true;
+                                    }
+                                }
+                            );
+
+                            // Remove any special allowance for this
+
+                            // Then remove group:
+                            const groupIndex = vm.blockGroups.indexOf(blockGroup);
+                            if(groupIndex !== -1) {
+                                vm.blockGroups.splice(groupIndex, 1);
+                                removeReferencesToGroupKey(blockGroup.key);
+                            }
+
+                            // Remove any special allowance for this.
+
+                            overlayService.close();
+                        }
+                    });
+                });
+            }
+        }
 
         $scope.$on('$destroy', function () {
             unsubscribe.forEach(u => { u(); });

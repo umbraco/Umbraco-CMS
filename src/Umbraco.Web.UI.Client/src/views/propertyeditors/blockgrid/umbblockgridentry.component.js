@@ -106,7 +106,7 @@
             if(vm.layoutEntry.$block.config.areaGridColumns) {
                 vm.areaGridColumns = vm.layoutEntry.$block.config.areaGridColumns.toString();
             } else {
-                vm.areaGridColumns = vm.layoutColumns.toString();
+                vm.areaGridColumns = vm.blockEditorApi.internal.gridColumns.toString();
             }
 
             vm.layoutColumnsInt = parseInt(vm.layoutColumns, 10)
@@ -115,15 +115,6 @@
         }
         unsubscribe.push($scope.$watch("depth", (newVal, oldVal) => {
             vm.childDepth = parseInt(vm.depth) + 1;
-        }));
-        unsubscribe.push($scope.$watch("layoutColumns", (newVal, oldVal) => {
-            vm.layoutColumnsInt = parseInt(vm.layoutColumns, 10);
-
-            if(vm.layoutEntry.$block.config.areaGridColumns) {
-                // nothing to update.
-            } else {
-                vm.areaGridColumns = vm.layoutColumns.toString();
-            }
         }));
         /**
          * We want to only show the validation errors on the specific Block, not the parent blocks.
