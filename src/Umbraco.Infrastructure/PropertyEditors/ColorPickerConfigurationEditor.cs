@@ -3,8 +3,10 @@
 
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
-using Newtonsoft.Json.Linq;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
@@ -34,7 +36,6 @@ internal class ColorPickerConfigurationEditor : ConfigurationEditor<ColorPickerC
     {
         List<ValueListConfiguration.ValueListItem>? configuredItems = configuration?.Items; // ordered
         object editorItems;
-
         if (configuredItems == null)
         {
             editorItems = new object();
@@ -46,7 +47,7 @@ internal class ColorPickerConfigurationEditor : ConfigurationEditor<ColorPickerC
             var sortOrder = 0;
             foreach (ValueListConfiguration.ValueListItem item in configuredItems)
             {
-                d[item.Id.ToString()] = GetItemValue(item, configuration!.UseLabel, sortOrder++);
+                d[item.Id.ToString()] = GetItemValue(item, sortOrder++);
             }
         }
 
@@ -63,9 +64,14 @@ internal class ColorPickerConfigurationEditor : ConfigurationEditor<ColorPickerC
     {
         var output = new ColorPickerConfiguration();
 
-        if (editorValues is null || !editorValues.TryGetValue("items", out var jjj) || !(jjj is JArray jItems))
+        if (editorValues is null || !editorValues.TryGetValue("items", out var jjj))
         {
             return output; // oops
+        }
+
+        if(!JsonExtensions.TryParse(jjj!, out JsonArray? jItems) || jItems is null)
+        {
+            return output;
         }
 
         // handle useLabel
@@ -86,24 +92,34 @@ internal class ColorPickerConfigurationEditor : ConfigurationEditor<ColorPickerC
         }
 
         // create ValueListItem instances - ordered (items get submitted in the sorted order)
-        foreach (JObject item in jItems.OfType<JObject>())
+        foreach (JsonObject? item in jItems)
         {
+            if (item is null || !item.ContainsKey("value"))
+            {
+                continue;
+            }
+
             // in:  { "value": "<color>", "id": <id>, "label": "<label>" }
             // out: ValueListItem, Id = <id>, Value = <color> | { "value": "<color>", "label": "<label>" }
             //                                        (depending on useLabel)
-            var value = item.Property("value")?.Value.Value<string>();
+            string? value = item["value"]?.GetValue<string>();
             if (string.IsNullOrWhiteSpace(value))
             {
                 continue;
             }
 
-            var id = item.Property("id")?.Value.Value<int>() ?? 0;
+            int id = item["value"]?.SafeCast<int>() ?? 0;
             if (id >= nextId)
             {
                 nextId = id + 1;
             }
 
-            var label = item.Property("label")?.Value.Value<string>();
+            string? label = string.Empty;
+            if (item.ContainsKey("label"))
+            {
+                label = item["label"]?.GetValue<string>();
+            }
+
             value = _jsonSerializer.Serialize(new { value, label });
 
             output.Items.Add(new ValueListConfiguration.ValueListItem { Id = id, Value = value });
@@ -121,7 +137,7 @@ internal class ColorPickerConfigurationEditor : ConfigurationEditor<ColorPickerC
         return output;
     }
 
-    private object GetItemValue(ValueListConfiguration.ValueListItem item, bool useLabel, int sortOrder)
+    private object GetItemValue(ValueListConfiguration.ValueListItem item, int sortOrder)
     {
         // in:  ValueListItem, Id = <id>, Value = <color> | { "value": "<color>", "label": "<label>" }
         //                                        (depending on useLabel)
@@ -150,7 +166,12 @@ internal class ColorPickerConfigurationEditor : ConfigurationEditor<ColorPickerC
     {
         public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration)
         {
-            if (!(value is JArray json))
+            if (value is null)
+            {
+                yield break;
+            }
+
+            if (!JsonExtensions.TryParse(value!, out JsonArray? json) || json is null)
             {
                 yield break;
             }
@@ -158,14 +179,14 @@ internal class ColorPickerConfigurationEditor : ConfigurationEditor<ColorPickerC
             // validate each item which is a json object
             for (var index = 0; index < json.Count; index++)
             {
-                JToken i = json[index];
-                if (!(i is JObject jItem) || jItem["value"] == null)
+                JsonNode? node = json[index];
+                if (node is null || !(node is JsonObject obj) || !obj.ContainsKey("value"))
                 {
                     continue;
                 }
 
                 // NOTE: we will be removing empty values when persisting so no need to validate
-                var asString = jItem["value"]?.ToString();
+                var asString = obj["value"]?.GetValue<string>();
                 if (asString.IsNullOrWhiteSpace())
                 {
                     continue;

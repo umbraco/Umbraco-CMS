@@ -1,8 +1,8 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Extensions;
 
@@ -34,13 +34,19 @@ public class ColorPickerValueConverter : PropertyValueConverterBase
         {
             try
             {
-                JObject? jo = JsonConvert.DeserializeObject<JObject>(ssource);
-                if (useLabel)
+                JsonObject json = JsonNode.Parse(ssource)!.AsObject();
+                if (json.ContainsKey("value"))
                 {
-                    return new PickedColor(jo!["value"]!.ToString(), jo["label"]!.ToString());
-                }
+                    if (useLabel)
+                    {
+                        if (json.ContainsKey("value"))
+                        {
+                            return new PickedColor(json["value"]?.GetValue<string>()!, json["label"]?.GetValue<string>()!);
+                        }
+                    }
 
-                return jo!["value"]!.ToString();
+                    return json["value"]?.GetValue<string>();
+                }
             }
             catch
             {
