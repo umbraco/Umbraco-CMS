@@ -2,7 +2,7 @@
 
 public class DictionaryImportViewModel
 {
-    public List<DictionaryItemsImportViewModel>? DictionaryItems { get; set; }
+    public List<DictionaryItemsImportViewModel> DictionaryItems { get; set; } = null!;
 
     public string? TempFileName { get; set; }
 }

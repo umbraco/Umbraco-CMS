@@ -1,7 +1,9 @@
-﻿using Umbraco.Cms.Core.Mapping;
+﻿using System.Xml;
+using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Mapping;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.ManagementApi.Models;
 using Umbraco.Cms.ManagementApi.ViewModels.Dictionary;
 using Umbraco.New.Cms.Core.Factories;
 
@@ -62,5 +64,36 @@ public class DictionaryFactory : IDictionaryFactory
         dictionaryViewModel.Translations = translations;
 
         return dictionaryViewModel;
+    }
+
+    public DictionaryImportViewModel CreateDictionaryImportViewModel(FormFileUploadResult formFileUploadResult)
+    {
+        if (formFileUploadResult.CouldLoad is false || formFileUploadResult.XmlDocument is null)
+        {
+            throw new ArgumentNullException("The document of the FormFileUploadResult cannot be null");
+        }
+
+        var model = new DictionaryImportViewModel
+        {
+            TempFileName = formFileUploadResult.TemporaryPath, DictionaryItems = new List<DictionaryItemsImportViewModel>(),
+        };
+
+        var level = 1;
+        var currentParent = string.Empty;
+        foreach (XmlNode dictionaryItem in formFileUploadResult.XmlDocument.GetElementsByTagName("DictionaryItem"))
+        {
+            var name = dictionaryItem.Attributes?.GetNamedItem("Name")?.Value ?? string.Empty;
+            var parentKey = dictionaryItem?.ParentNode?.Attributes?.GetNamedItem("Key")?.Value ?? string.Empty;
+
+            if (parentKey != currentParent || level == 1)
+            {
+                level += 1;
+                currentParent = parentKey;
+            }
+
+            model.DictionaryItems.Add(new DictionaryItemsImportViewModel { Level = level, Name = name });
+        }
+
+        return model;
     }
 }

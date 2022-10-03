@@ -6,6 +6,7 @@ using Umbraco.Cms.ManagementApi.Models;
 using Umbraco.Cms.ManagementApi.Services;
 using Umbraco.Cms.ManagementApi.ViewModels.Dictionary;
 using Umbraco.Extensions;
+using Umbraco.New.Cms.Core.Factories;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.Dictionary;
 
@@ -13,11 +14,13 @@ public class UploadDictionaryController : DictionaryControllerBase
 {
     private readonly ILocalizedTextService _localizedTextService;
     private readonly IUploadFileService _uploadFileService;
+    private readonly IDictionaryFactory _dictionaryFactory;
 
-    public UploadDictionaryController(ILocalizedTextService localizedTextService, IUploadFileService uploadFileService)
+    public UploadDictionaryController(ILocalizedTextService localizedTextService, IUploadFileService uploadFileService, IDictionaryFactory dictionaryFactory)
     {
         _localizedTextService = localizedTextService;
         _uploadFileService = uploadFileService;
+        _dictionaryFactory = dictionaryFactory;
     }
 
     [HttpPost("upload")]
@@ -34,26 +37,7 @@ public class UploadDictionaryController : DictionaryControllerBase
                 formFileUploadResult.ErrorMessage));
         }
 
-        var model = new DictionaryImportViewModel
-        {
-            TempFileName = formFileUploadResult.TemporaryPath, DictionaryItems = new List<DictionaryItemsImportViewModel>(),
-        };
-
-        var level = 1;
-        var currentParent = string.Empty;
-        foreach (XmlNode dictionaryItem in formFileUploadResult.XmlDocument.GetElementsByTagName("DictionaryItem"))
-        {
-            var name = dictionaryItem.Attributes?.GetNamedItem("Name")?.Value ?? string.Empty;
-            var parentKey = dictionaryItem?.ParentNode?.Attributes?.GetNamedItem("Key")?.Value ?? string.Empty;
-
-            if (parentKey != currentParent || level == 1)
-            {
-                level += 1;
-                currentParent = parentKey;
-            }
-
-            model.DictionaryItems.Add(new DictionaryItemsImportViewModel { Level = level, Name = name });
-        }
+        DictionaryImportViewModel model = _dictionaryFactory.CreateDictionaryImportViewModel(formFileUploadResult);
 
         if (!model.DictionaryItems.Any())
         {
