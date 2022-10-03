@@ -114,6 +114,13 @@ export class UmbEditorViewUsersUserDetailsElement extends UmbContextConsumerMixi
 		this._usersContext?.updateUser(newUser);
 	}
 
+	private _deleteUser() {
+		if (!this._user) return;
+
+		this._usersContext?.deleteUser(this._user.key);
+		history.back();
+	}
+
 	render() {
 		if (!this._user || !this._usersContext) return html`User not found`;
 
@@ -154,7 +161,7 @@ export class UmbEditorViewUsersUserDetailsElement extends UmbContextConsumerMixi
 										label="${this._user.status === 'Disabled' ? 'Enable' : 'Disable'}"></uui-button>
 							  `
 							: nothing}
-						<uui-button look="primary" color="danger" label="Delete User"></uui-button>
+						<uui-button @click=${this._deleteUser} look="primary" color="danger" label="Delete User"></uui-button>
 						<div>
 							<b>Status:</b>
 							<uui-tag .look=${status.look} .color=${status.color}>${this._user.status}</uui-tag>

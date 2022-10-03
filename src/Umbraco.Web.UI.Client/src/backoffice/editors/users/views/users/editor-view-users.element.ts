@@ -231,6 +231,15 @@ export class UmbEditorViewUsersElement extends UmbContextProviderMixin(LitElemen
 		this.requestUpdate('users');
 	}
 
+	public deleteUser(key: string) {
+		const users = this._users.getValue();
+		const index = users.findIndex((u) => u.key === key);
+		if (index === -1) return;
+		users.splice(index, 1);
+		this._users.next(users);
+		this.requestUpdate('users');
+	}
+
 	public getTagLookAndColor(status?: string): { color: InterfaceColor; look: InterfaceLook } {
 		switch ((status || '').toLowerCase()) {
 			case 'invited':
