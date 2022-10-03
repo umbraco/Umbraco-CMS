@@ -351,7 +351,7 @@ public static partial class Constants
 
         public static class Udi
         {
-            public const string StartUdi = "umb://";
+            public const string Prefix = "umb://";
         }
     }
 }

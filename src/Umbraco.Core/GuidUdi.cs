@@ -61,13 +61,13 @@ public class GuidUdi : Udi
 
     private static string CreateStringValue(ReadOnlySpan<char> entityType, Guid guid)
     {
-        var startUdiLength = Constants.Conventions.Udi.StartUdi.Length;
+        var startUdiLength = Constants.Conventions.Udi.Prefix.Length;
         var outputSize = entityType.Length + startUdiLength + 32 + 1; //Based on the format umb://entityType/guid (32 = Guid N format, 1 = / between entityType and guid)
         Span<char> output = stackalloc char[outputSize];
 
         //Add all the values of the format to the output
-        Constants.Conventions.Udi.StartUdi.CopyTo(output[..startUdiLength]);
-        entityType.CopyTo(output.Slice(6, entityType.Length));
+        Constants.Conventions.Udi.Prefix.CopyTo(output[..startUdiLength]);
+        entityType.CopyTo(output.Slice(startUdiLength, entityType.Length));
         output[startUdiLength + entityType.Length] = '/';
         guid.TryFormat(output.Slice(outputSize - 32, 32), out _, "N");
 
