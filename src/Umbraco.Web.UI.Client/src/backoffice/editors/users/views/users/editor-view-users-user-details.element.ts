@@ -5,6 +5,7 @@ import { UmbContextConsumerMixin } from '../../../../../core/context';
 import UmbEditorViewUsersElement, { UserItem } from './editor-view-users.element';
 import { Subscription } from 'rxjs';
 import { tempData } from './tempData';
+import '../../../../property-editors/content-picker/property-editor-content-picker.element';
 
 @customElement('umb-editor-view-users-user-details')
 export class UmbEditorViewUsersUserDetailsElement extends UmbContextConsumerMixin(LitElement) {
@@ -55,6 +56,11 @@ export class UmbEditorViewUsersUserDetailsElement extends UmbContextConsumerMixi
 			#user-info > div {
 				display: flex;
 				flex-direction: column;
+			}
+			#assign-access {
+				display: flex;
+				flex-direction: column;
+				gap: var(--uui-size-space-4);
 			}
 			.access-content {
 				margin-top: var(--uui-size-space-1);
@@ -163,10 +169,22 @@ export class UmbEditorViewUsersUserDetailsElement extends UmbContextConsumerMixi
 				</uui-form-layout-item>
 			</uui-box>
 			<uui-box>
-				<div slot="headline">Assign access</div>
-				<div>
-					<b>Groups</b>
-					<div class="faded-text">Add groups to assign access and permissions</div>
+				<div id="assign-access">
+					<div slot="headline">Assign access</div>
+					<div>
+						<b>Groups</b>
+						<div class="faded-text">Add groups to assign access and permissions</div>
+					</div>
+					<div>
+						<b>Content start nodes</b>
+						<div class="faded-text">Limit the content tree to specific start nodes</div>
+						<umb-property-editor-content-picker></umb-property-editor-content-picker>
+					</div>
+					<div>
+						<b>Media start nodes</b>
+						<div class="faded-text">Limit the media library to specific start nodes</div>
+						<umb-property-editor-content-picker></umb-property-editor-content-picker>
+					</div>
 				</div>
 			</uui-box>
 			<uui-box>
