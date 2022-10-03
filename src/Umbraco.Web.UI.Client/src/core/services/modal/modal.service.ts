@@ -6,11 +6,10 @@ import './layouts/property-editor-ui-picker/modal-layout-property-editor-ui-pick
 import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
 import { BehaviorSubject, Observable } from 'rxjs';
 
-import { UmbModalHandler } from './';
-
 import type { UmbModalConfirmData } from './layouts/confirm/modal-layout-confirm.element';
 import type { UmbModalContentPickerData } from './layouts/content-picker/modal-layout-content-picker.element';
 import type { UmbModalPropertyEditorUIPickerData } from './layouts/property-editor-ui-picker/modal-layout-property-editor-ui-picker.element';
+import { UmbModalHandler } from './';
 
 export type UmbModelType = 'dialog' | 'sidebar';
 

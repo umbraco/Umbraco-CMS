@@ -1,15 +1,15 @@
 import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
+import { UUIMenuItemEvent } from '@umbraco-ui/uui';
+import { map, Subscription } from 'rxjs';
+import { repeat } from 'lit/directives/repeat.js';
 import { UmbContextConsumerMixin } from '../../../core/context';
 import { UmbTreeContextBase } from '../tree.context';
-import { UUIMenuItemEvent } from '@umbraco-ui/uui';
 import { UmbSectionContext } from '../../sections/section.context';
-import { map, Subscription } from 'rxjs';
 import { Entity } from '../../../mocks/data/entities';
-import { UmbTreeContextMenuService } from './context-menu/tree-context-menu.service';
-import { repeat } from 'lit/directives/repeat.js';
 import { UmbTreeDataContextBase } from '../tree-data.context';
+import { UmbTreeContextMenuService } from './context-menu/tree-context-menu.service';
 
 @customElement('umb-tree-item')
 export class UmbTreeItem extends UmbContextConsumerMixin(LitElement) {

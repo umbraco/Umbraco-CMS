@@ -6,6 +6,7 @@ import { Subscription } from 'rxjs';
 import { UmbContextProviderMixin, UmbContextConsumerMixin } from '../../../core/context';
 import { UmbNotificationService } from '../../../core/services/notification';
 import { UmbDataTypeStore } from '../../../core/stores/data-type/data-type.store';
+import { UmbNotificationDefaultData } from '../../../core/services/notification/layouts/default';
 import { UmbDataTypeContext } from './data-type.context';
 
 import '../shared/editor-entity-layout/editor-entity-layout.element';
@@ -13,7 +14,7 @@ import '../shared/editor-entity-layout/editor-entity-layout.element';
 // Lazy load
 // TODO: Make this dynamic, use load-extensions method to loop over extensions for this node.
 import './views/edit/editor-view-data-type-edit.element';
-import { UmbNotificationDefaultData } from '../../../core/services/notification/layouts/default';
+import './views/editor-view-data-type-edit.element';
 
 /**
  *  @element umb-editor-data-type

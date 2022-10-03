@@ -1,11 +1,4 @@
 import { BehaviorSubject, map, Observable } from 'rxjs';
-
-import { createExtensionElement } from './create-extension-element.function';
-
-export type UmbExtensionManifestJSModel = {
-	elementName?: string;
-};
-
 import type {
 	ManifestTypes,
 	ManifestDashboard,
@@ -20,6 +13,11 @@ import type {
 	ManifestCustom,
 	ManifestPackageView,
 } from '../models';
+import { createExtensionElement } from './create-extension-element.function';
+
+export type UmbExtensionManifestJSModel = {
+	elementName?: string;
+};
 
 // TODO: add to schema
 export type ManifestBase = {

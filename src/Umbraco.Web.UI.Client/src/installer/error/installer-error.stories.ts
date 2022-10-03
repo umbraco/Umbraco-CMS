@@ -1,10 +1,11 @@
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit-html';
 
-import type { UmbInstallerErrorElement } from './installer-error.element';
 import { installerContextProvider } from '../shared/utils.story-helpers';
-import './installer-error.element';
 import { UmbInstallerContext } from '../installer.context';
+import type { UmbInstallerErrorElement } from './installer-error.element';
+
+import './installer-error.element';
 
 const error = {
 	type: 'validation',
