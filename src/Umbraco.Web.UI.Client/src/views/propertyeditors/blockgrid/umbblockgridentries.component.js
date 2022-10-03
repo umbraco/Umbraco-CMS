@@ -99,6 +99,8 @@
                 var isMaxRequirementGood = vm.areaConfig.maxAllowed == null || vm.entries.length <= vm.areaConfig.maxAllowed;
                 vm.entriesForm.areaMaxCount.$setValidity("areaMaxCount", isMaxRequirementGood);
 
+                vm.invalidBlockTypes = [];
+
                 vm.areaConfig.specifiedAllowance.forEach(allowance => {
 
                     const minAllowed = allowance.minAllowed || 0;
@@ -107,9 +109,7 @@
                     // For block groups:
                     if(allowance.groupKey) {
 
-                        vm.invalidBlockTypes = vm.invalidBlockTypes.filter(type => type.groupKey !== allowance.groupKey)
-
-                        const groupElementTypeKeys = vm.locallyAvailableBlockTypes.filter(blockType => blockType.blockConfigModel.groupKey === allowance.groupKey);
+                        const groupElementTypeKeys = vm.locallyAvailableBlockTypes.filter(blockType => blockType.blockConfigModel.groupKey === allowance.groupKey && blockType.blockConfigModel.allowInAreas === true).map(x => x.blockConfigModel.contentElementTypeKey);
                         const groupAmount = vm.entries.filter(entry => groupElementTypeKeys.indexOf(entry.$block.data.contentTypeKey) !== -1).length;
 
                         if(groupAmount < minAllowed || (maxAllowed > 0 && groupAmount > maxAllowed)) {
@@ -125,14 +125,12 @@
                     // For specific elementTypes:
                     if(allowance.elementTypeKey) {
 
-                        vm.invalidBlockTypes = vm.invalidBlockTypes.filter(type => type.key !== allowance.elementTypeKey)
-                        
                         const amount = vm.entries.filter(entry => entry.$block.data.contentTypeKey === allowance.elementTypeKey).length;
                         
                         if(amount < minAllowed || (maxAllowed > 0 && amount > maxAllowed)) {
                             vm.invalidBlockTypes.push({
                                 'key': allowance.elementTypeKey,
-                                'name': vm.locallyAvailableBlockTypes.find(blockType => blockType.elementTypeModel.name).elementTypeModel.name,
+                                'name': vm.locallyAvailableBlockTypes.find(blockType => blockType.blockConfigModel.contentElementTypeKey === allowance.elementTypeKey).elementTypeModel.name,
                                 'amount': amount,
                                 'minRequirement': minAllowed,
                                 'maxRequirement': maxAllowed
