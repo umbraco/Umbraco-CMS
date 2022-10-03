@@ -24,19 +24,19 @@ public class ByIdDictionaryController : DictionaryControllerBase
     /// <summary>
     ///     Gets a dictionary item by guid
     /// </summary>
-    /// <param name="id">
+    /// <param name="key">
     ///     The id.
     /// </param>
     /// <returns>
     ///     The <see cref="DictionaryDisplay" />. Returns a not found response when dictionary item does not exist
     /// </returns>
-    [HttpGet("{id:guid}")]
+    [HttpGet("{key:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(DictionaryViewModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(NotFoundResult), StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<DictionaryViewModel>> ByKey(Guid id)
+    public async Task<ActionResult<DictionaryViewModel>> ByKey(Guid key)
     {
-        IDictionaryItem? dictionary = _localizationService.GetDictionaryItemById(id);
+        IDictionaryItem? dictionary = _localizationService.GetDictionaryItemById(key);
         if (dictionary == null)
         {
             return NotFound();
