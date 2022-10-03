@@ -15,6 +15,7 @@ public static class ServicesBuilderExtensions
         builder.Services.AddTransient<ILanguageService, LanguageService>();
         builder.Services.AddTransient<ILoadDictionaryItemService, LoadDictionaryItemService>();
         builder.Services.AddTransient<ISystemTextJsonSerializer, SystemTextJsonSerializer>();
+        builder.Services.AddTransient<IUploadFileService, UploadFileService>();
 
         return builder;
     }
