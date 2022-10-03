@@ -116,8 +116,8 @@ export class UmbEditorViewUsersTableElement extends UmbContextConsumerMixin(LitE
 				name: 'Last login',
 				sort: (items: Array<UserItem>, desc: boolean) => {
 					return desc
-						? [...items].sort((a, b) => +new Date(b.lastLogin) - +new Date(a.lastLogin))
-						: [...items].sort((a, b) => +new Date(a.lastLogin) - +new Date(b.lastLogin));
+						? [...items].sort((a, b) => +new Date(b.lastLoginDate || 0) - +new Date(a.lastLoginDate || 0))
+						: [...items].sort((a, b) => +new Date(a.lastLoginDate || 0) - +new Date(b.lastLoginDate || 0));
 				},
 			},
 			{
@@ -214,7 +214,7 @@ export class UmbEditorViewUsersTableElement extends UmbContextConsumerMixin(LitE
 				</div>
 			</uui-table-cell>
 			<uui-table-cell> ${user.userGroup} </uui-table-cell>
-			<uui-table-cell>${user.lastLogin}</uui-table-cell>
+			<uui-table-cell>${user.lastLoginDate}</uui-table-cell>
 			<uui-table-cell>
 				${user.status
 					? html`<uui-tag size="s" look="${statusLook.look}" color="${statusLook.color}"> ${user.status} </uui-tag>`
