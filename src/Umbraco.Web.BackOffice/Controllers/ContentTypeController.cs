@@ -650,4 +650,128 @@ public class ContentTypeController : ContentTypeControllerBase<IContentType>
 
         return model;
     }
+
+    [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
+    public ActionResult PostCreateBlockGridSample()
+    {
+        var userId = _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1;
+
+        const string containerName = "Umbraco Block Grid Demo";
+        EntityContainer? container = _contentTypeService.GetContainers(containerName, 1).FirstOrDefault();
+        if (container == null)
+        {
+            Attempt<OperationResult<OperationResultType, EntityContainer>?> attempt = _contentTypeService.CreateContainer(Constants.System.Root, Guid.NewGuid(), containerName, userId);
+            container = attempt.Result?.Entity;
+        }
+
+        if (container == null)
+        {
+            return ValidationProblem($"Unable to get or create content type container: {containerName}");
+        }
+
+        IDataType[] dataTypes = _dataTypeService.GetAll().OrderBy(d => d.Id).ToArray();
+
+        IDataType? textBox = dataTypes.FirstOrDefault(d => d.EditorAlias == Constants.PropertyEditors.Aliases.TextBox);
+        IDataType? tinyMce = dataTypes.FirstOrDefault(d => d.EditorAlias == Constants.PropertyEditors.Aliases.TinyMce);
+        IDataType? mediaPicker = dataTypes.Where(d =>
+                d.EditorAlias == Constants.PropertyEditors.Aliases.MediaPicker3
+                && d.ConfigurationAs<MediaPicker3Configuration>()?.Multiple == false)
+            .MinBy(d => d.Name == "Image Media Picker" ? 0 : 1);
+
+        if (textBox == null || tinyMce == null || mediaPicker == null)
+        {
+            return ValidationProblem($"Could not find required data types - must have {Constants.PropertyEditors.Aliases.TextBox}, {Constants.PropertyEditors.Aliases.TinyMce} and {Constants.PropertyEditors.Aliases.MediaPicker3} (configured in single picker mode)");
+        }
+
+        IContentType[] existingContentTypes = _contentTypeService.GetChildren(container.Key).ToArray();
+
+        var elementDescriptors = new[]
+        {
+            new
+            {
+                Alias = "umbBlockGridDemoHeadlineBlock",
+                Icon = "icon-font color-black",
+                Name = "Headline",
+                Property = new { Alias = "headline", Label = "Headline", EditorId = textBox.Id }
+            },
+            new
+            {
+                Alias = "umbBlockGridDemoImageBlock",
+                Icon = "icon-umb-media color-black",
+                Name = "Image",
+                Property = new { Alias = "image", Label = "Image", EditorId = mediaPicker.Id }
+            },
+            new
+            {
+                Alias = "umbBlockGridDemoRichTextBlock",
+                Icon = "icon-script color-black",
+                Name = "Rich Text",
+                Property = new { Alias = "richText", Label = "Text", EditorId = tinyMce.Id }
+            },
+            new
+            {
+                Alias = "umbBlockGridDemoTwoColumnSectionBlock",
+                Icon = "icon-book-alt color-black",
+                Name = "Two Column Section",
+                Property = new { Alias = string.Empty, Label = string.Empty, EditorId = -1 }
+            }
+        };
+
+        var elementUdisByAlias = new Dictionary<string, Udi>();
+
+        foreach (var elementDescriptor  in elementDescriptors)
+        {
+            IContentType? contentType = existingContentTypes.FirstOrDefault(c => c.Alias == elementDescriptor.Alias);
+            if (contentType != null)
+            {
+                elementUdisByAlias[elementDescriptor.Alias] = contentType.GetUdi();
+                continue;
+            }
+
+            var documentTypeSave = new DocumentTypeSave
+            {
+                Alias = elementDescriptor.Alias,
+                Icon = elementDescriptor.Icon,
+                Name = elementDescriptor.Name,
+                IsElement = true,
+                Groups = new[]
+                {
+                    new PropertyGroupBasic<PropertyTypeBasic>
+                    {
+                        Alias = "content",
+                        Name = "Content",
+                        Type = PropertyGroupType.Group,
+                        Properties = elementDescriptor.Property.Alias.IsNullOrWhiteSpace()
+                            ? Array.Empty<PropertyTypeBasic>()
+                            : new[]
+                            {
+                                new PropertyTypeBasic
+                                {
+                                    Alias = elementDescriptor.Property.Alias,
+                                    Label = elementDescriptor.Property.Label,
+                                    Validation = new PropertyTypeValidation { Mandatory = true },
+                                    DataTypeId = elementDescriptor.Property.EditorId
+                                }
+                            }
+                    }
+                },
+                ParentId = container.Id,
+                Thumbnail = "folder.png"
+            };
+
+            ActionResult<IContentType?> result = PerformPostSave<DocumentTypeDisplay, DocumentTypeSave, PropertyTypeBasic>(
+                documentTypeSave,
+                i => _contentTypeService.Get(i),
+                type => _contentTypeService.Save(type));
+
+            if (result.Result?.IsSuccessStatusCode() == false || result.Value == null)
+            {
+                return result.Result!;
+            }
+
+            elementUdisByAlias[elementDescriptor.Alias] = result.Value.GetUdi();
+        }
+
+        return Ok(elementUdisByAlias);
+    }
 }
