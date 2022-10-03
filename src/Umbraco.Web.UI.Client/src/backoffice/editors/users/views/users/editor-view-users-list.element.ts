@@ -6,6 +6,7 @@ import { Subscription } from 'rxjs';
 import './editor-view-users-table.element';
 import './editor-view-users-grid.element';
 import './editor-view-users-selection.element';
+import './editor-view-users-invite.element';
 import { IRoute } from 'router-slot';
 import UmbEditorViewUsersElement from './editor-view-users.element';
 import { UUIPopoverElement } from '@umbraco-ui/uui';
@@ -58,6 +59,10 @@ export class UmbEditorViewUsersListElement extends UmbContextConsumerMixin(LitEl
 				border-radius: var(--uui-size-border-radius);
 				box-shadow: var(--uui-shadow-depth-2);
 				width: fit-content;
+			}
+			a {
+				color: inherit;
+				text-decoration: none;
 			}
 		`,
 	];
@@ -135,12 +140,12 @@ export class UmbEditorViewUsersListElement extends UmbContextConsumerMixin(LitEl
 	@state()
 	private _routes: IRoute[] = [
 		{
-			path: 'list',
-			component: () => import('./editor-view-users-table.element'),
+			path: '/grid',
+			component: () => import('./editor-view-users-grid.element'),
 		},
 		{
-			path: 'details/:key',
-			component: () => import('./editor-view-users-user-details.element'),
+			path: '/list',
+			component: () => import('./editor-view-users-table.element'),
 		},
 	];
 
@@ -157,7 +162,9 @@ export class UmbEditorViewUsersListElement extends UmbContextConsumerMixin(LitEl
 		return html`
 			<div id="sticky-top">
 				<div id="user-list-top-bar">
-					<uui-button label="Invite user" look="outline"></uui-button>
+					<a href=${'section/users/view/users' + '/invite'}>
+						<uui-button label="Invite user" look="outline"></uui-button>
+					</a>
 					<uui-input label="search" id="input-search"></uui-input>
 					<div>
 						<uui-popover margin="8">
@@ -208,7 +215,7 @@ export class UmbEditorViewUsersListElement extends UmbContextConsumerMixin(LitEl
 
 			<router-slot .routes=${this._routes}></router-slot>
 
-			<div id="user-list">${this._renderViewType()}</div>
+			<!-- <div id="user-list">${this._renderViewType()}</div> -->
 		`;
 	}
 }

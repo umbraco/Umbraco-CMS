@@ -5,10 +5,12 @@ import { UmbContextProviderMixin } from '../../../../../core/context';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { InterfaceColor, InterfaceLook } from '@umbraco-ui/uui-base/lib/types';
 import { IRoute } from 'router-slot';
+import { v4 as uuidv4 } from 'uuid';
 import './editor-view-users-table.element';
 import './editor-view-users-grid.element';
 import './editor-view-users-selection.element';
 import './editor-view-users-user-details.element';
+import './editor-view-users-invite.element';
 
 import { tempData } from './tempData';
 
@@ -39,8 +41,8 @@ export class UmbEditorViewUsersElement extends UmbContextProviderMixin(LitElemen
 			component: () => import('./editor-view-users-list.element'),
 		},
 		{
-			path: '/:key',
-			component: () => import('./editor-view-users-user-details.element'),
+			path: '/invite',
+			component: () => import('./editor-view-users-invite.element'),
 		},
 	];
 
@@ -82,6 +84,27 @@ export class UmbEditorViewUsersElement extends UmbContextProviderMixin(LitElemen
 		console.log('updateUser', user, users[index]);
 		this._users.next(users);
 		this.requestUpdate('users');
+	}
+
+	public inviteUser(name: string, email: string, userGroup: string, message: string): UserItem {
+		const users = this._users.getValue();
+		const user = {
+			id: this._users.getValue().length + 1,
+			key: uuidv4(),
+			name: name,
+			email: email,
+			status: 'invited',
+			language: 'en',
+			updateDate: new Date().toISOString(),
+			createDate: new Date().toISOString(),
+			failedLoginAttempts: 0,
+			userGroup: userGroup,
+		};
+		this._users.next([...users, user]);
+		this.requestUpdate('users');
+
+		//TODO: Send invite email with message
+		return user;
 	}
 
 	public deleteUser(key: string) {
