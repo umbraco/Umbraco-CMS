@@ -32,6 +32,9 @@ namespace Umbraco.Cms.Core.PropertyEditors
             [DataMember(Name ="allowAtRoot")]
             public bool? AllowAtRoot { get; set; } = true;
 
+            [DataMember(Name ="allowInAreas")]
+            public bool? AllowInAreas { get; set; } = true;
+
             [DataMember(Name ="areaGridColumns")]
             public int? AreaGridColumns { get; set; }
 

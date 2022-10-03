@@ -238,6 +238,7 @@
             var blockType = {
                 "columnSpanOptions": [],
                 "allowAtRoot": true,
+                "allowInAreas": true,
                 "rowMinSpan": 1,
                 "rowMaxSpan": 1,
                 "contentElementTypeKey": key,
