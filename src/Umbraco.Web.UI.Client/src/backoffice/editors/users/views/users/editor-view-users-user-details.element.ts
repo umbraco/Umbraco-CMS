@@ -155,7 +155,7 @@ export class UmbEditorViewUsersUserDetailsElement extends UmbContextConsumerMixi
 				<div slot="headline">Profile</div>
 				<uui-form-layout-item style="margin-top: 0">
 					<uui-label for="email">Email</uui-label>
-					<uui-input name="email" readonly value="NOT IMPLEMENTED"></uui-input>
+					<uui-input name="email" readonly value=${this._user.email}></uui-input>
 				</uui-form-layout-item>
 				<uui-form-layout-item style="margin-bottom: 0">
 					<uui-label for="language">Language</uui-label>
