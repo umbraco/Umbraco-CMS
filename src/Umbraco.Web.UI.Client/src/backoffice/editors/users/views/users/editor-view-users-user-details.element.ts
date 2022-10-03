@@ -42,6 +42,7 @@ export class UmbEditorViewUsersUserDetailsElement extends UmbContextConsumerMixi
 			}
 			.faded-text {
 				color: var(--uui-color-text-alt);
+				font-size: 0.8rem;
 			}
 			uui-tag {
 				width: fit-content;
@@ -53,6 +54,17 @@ export class UmbEditorViewUsersUserDetailsElement extends UmbContextConsumerMixi
 			#user-info > div {
 				display: flex;
 				flex-direction: column;
+			}
+			.access-content {
+				margin-top: var(--uui-size-space-1);
+				margin-bottom: var(--uui-size-space-4);
+				display: flex;
+				align-items: center;
+				line-height: 1;
+				gap: var(--uui-size-space-3);
+			}
+			.access-content > span {
+				align-self: end;
 			}
 		`,
 	];
@@ -118,92 +130,118 @@ export class UmbEditorViewUsersUserDetailsElement extends UmbContextConsumerMixi
 		if (!this._user) return;
 
 		this._usersContext?.deleteUser(this._user.key);
-		history.back();
+		history.back(); //TODO Should redirect to users section
+	}
+
+	private renderLeftColumn() {
+		if (!this._user) return nothing;
+
+		return html` <uui-box>
+				<div slot="headline">Profile</div>
+				<uui-form-layout-item>
+					<uui-label for="email">Email</uui-label>
+					<uui-input name="email" readonly value="FIX EMAIL"></uui-input>
+				</uui-form-layout-item>
+				<uui-form-layout-item>
+					<uui-label for="language">Language</uui-label>
+					<uui-select name="language" .options=${this._languages}> </uui-select>
+				</uui-form-layout-item>
+			</uui-box>
+			<uui-box>
+				<div slot="headline">Assign access</div>
+				<div>
+					<b>Groups</b>
+					<div class="faded-text">Add groups to assign access and permissions</div>
+				</div>
+			</uui-box>
+			<uui-box>
+				<div slot="headline">Access</div>
+				<div slot="header" class="faded-text">
+					Based on the assigned groups and start nodes, the user has access to the following nodes
+				</div>
+
+				<b>Content</b>
+				<div class="access-content">
+					<uui-icon name="folder"></uui-icon>
+					<span>Content Root</span>
+				</div>
+
+				<b>Media</b>
+				<div class="access-content">
+					<uui-icon name="folder"></uui-icon>
+					<span>Media Root</span>
+				</div>
+			</uui-box>`;
+	}
+
+	private renderRightColumn() {
+		if (!this._user || !this._usersContext) return nothing;
+
+		const status = this._usersContext.getTagLookAndColor(this._user.status);
+		return html` <uui-box>
+			<div id="user-info">
+				<uui-avatar .name=${this._user?.name || ''}></uui-avatar>
+				<uui-button label="Change photo"></uui-button>
+				<hr />
+				${this._user?.status !== 'Invited'
+					? html`
+							<uui-button
+								@click=${this._updateUserStatus}
+								look="primary"
+								color="${this._user.status === 'Disabled' ? 'positive' : 'warning'}"
+								label="${this._user.status === 'Disabled' ? 'Enable' : 'Disable'}"></uui-button>
+					  `
+					: nothing}
+				<uui-button @click=${this._deleteUser} look="primary" color="danger" label="Delete User"></uui-button>
+				<div>
+					<b>Status:</b>
+					<uui-tag .look=${status.look} .color=${status.color}>${this._user.status}</uui-tag>
+				</div>
+				${this._user?.status === 'Invited'
+					? html`
+							<uui-textarea placeholder="Enter a message..."> </uui-textarea>
+							<uui-button look="primary" label="Resend invitation"></uui-button>
+					  `
+					: nothing}
+				<div>
+					<b>Last login:</b>
+					<span>${this._user.lastLogin}</span>
+				</div>
+				<div>
+					<b>Failed login attempts</b>
+					<span>NOT IMPLEMENTED</span>
+				</div>
+				<div>
+					<b>Last lockout date:</b>
+					<span>NOT IMPLEMENTED</span>
+				</div>
+				<div>
+					<b>Password last changed:</b>
+					<span>NOT IMPLEMENTED</span>
+				</div>
+				<div>
+					<b>User created:</b>
+					<span>NOT IMPLEMENTED</span>
+				</div>
+				<div>
+					<b>User last updated:</b>
+					<span>NOT IMPLEMENTED</span>
+				</div>
+				<div>
+					<b>Id:</b>
+					<span>${this._user.key}</span>
+					<span>NOT IMPLEMENTED</span>
+				</div>
+			</div>
+		</uui-box>`;
 	}
 
 	render() {
 		if (!this._user || !this._usersContext) return html`User not found`;
 
-		const status = this._usersContext.getTagLookAndColor(this._user.status);
 		return html`
-			<div id="left-column">
-				<uui-box>
-					<div slot="headline">Profile</div>
-					<uui-form-layout-item>
-						<uui-label for="email">Email</uui-label>
-						<uui-input name="email" readonly value="FIX EMAIL"></uui-input>
-					</uui-form-layout-item>
-					<uui-form-layout-item>
-						<uui-label for="language">Language</uui-label>
-						<uui-select name="language" .options=${this._languages}> </uui-select>
-					</uui-form-layout-item>
-				</uui-box>
-				<uui-box>
-					<div slot="headline">Assign access</div>
-					<div>
-						<b>Groups</b>
-						<div class="faded-text">Add groups to assign access and permissions</div>
-					</div>
-				</uui-box>
-			</div>
-			<div id="right-column">
-				<uui-box>
-					<div id="user-info">
-						<uui-avatar .name=${this._user?.name || ''}></uui-avatar>
-						<uui-button label="Change photo"></uui-button>
-						<hr />
-						${this._user?.status !== 'Invited'
-							? html`
-									<uui-button
-										@click=${this._updateUserStatus}
-										look="primary"
-										color="${this._user.status === 'Disabled' ? 'positive' : 'warning'}"
-										label="${this._user.status === 'Disabled' ? 'Enable' : 'Disable'}"></uui-button>
-							  `
-							: nothing}
-						<uui-button @click=${this._deleteUser} look="primary" color="danger" label="Delete User"></uui-button>
-						<div>
-							<b>Status:</b>
-							<uui-tag .look=${status.look} .color=${status.color}>${this._user.status}</uui-tag>
-						</div>
-						${this._user?.status === 'Invited'
-							? html`
-									<uui-textarea placeholder="Enter a message..."> </uui-textarea>
-									<uui-button look="primary" label="Resend invitation"></uui-button>
-							  `
-							: nothing}
-						<div>
-							<b>Last login:</b>
-							<span>${this._user.lastLogin}</span>
-						</div>
-						<div>
-							<b>Failed login attempts</b>
-							<span>NOT IMPLEMENTED</span>
-						</div>
-						<div>
-							<b>Last lockout date:</b>
-							<span>NOT IMPLEMENTED</span>
-						</div>
-						<div>
-							<b>Password last changed:</b>
-							<span>NOT IMPLEMENTED</span>
-						</div>
-						<div>
-							<b>User created:</b>
-							<span>NOT IMPLEMENTED</span>
-						</div>
-						<div>
-							<b>User last updated:</b>
-							<span>NOT IMPLEMENTED</span>
-						</div>
-						<div>
-							<b>Id:</b>
-							<span>${this._user.key}</span>
-							<span>NOT IMPLEMENTED</span>
-						</div>
-					</div>
-				</uui-box>
-			</div>
+			<div id="left-column">${this.renderLeftColumn()}</div>
+			<div id="right-column">${this.renderRightColumn()}</div>
 		`;
 	}
 }
