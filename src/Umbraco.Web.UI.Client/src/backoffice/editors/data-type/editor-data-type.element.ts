@@ -11,11 +11,6 @@ import { UmbDataTypeContext } from './data-type.context';
 
 import '../shared/editor-entity-layout/editor-entity-layout.element';
 
-// Lazy load
-// TODO: Make this dynamic, use load-extensions method to loop over extensions for this node.
-import './views/edit/editor-view-data-type-edit.element';
-import './views/editor-view-data-type-edit.element';
-
 /**
  *  @element umb-editor-data-type
  *  @description - Element for displaying a Data Type Editor
