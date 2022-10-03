@@ -25,7 +25,7 @@ public class DictionaryOverviewViewModel
     public int Level { get; set; }
 
     /// <summary>
-    ///     Gets or sets the translations.
+    ///     Sets the translations.
     /// </summary>
     public List<DictionaryTranslationOverviewViewModel> Translations { get; }
 }
