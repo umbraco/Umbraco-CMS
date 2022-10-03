@@ -289,7 +289,7 @@
                 }
 
                 // Create areas that is not already created:
-                block.config.areas.forEach(areaConfig => {
+                block.config.areas?.forEach(areaConfig => {
                     const areaIndex = layoutEntry.areas.findIndex(x => x.key === areaConfig.key);
                     if(areaIndex === -1) {
                         layoutEntry.areas.push({
@@ -379,9 +379,10 @@
 
             if (block.config.unsupported === true) {
                 block.view = defaultViewFolderPath + "unsupportedblock/unsupportedblock.editor.html";
+            } else {
+                block.view = defaultViewFolderPath + "gridblock/gridblock.editor.html";
             }
             
-            block.view = defaultViewFolderPath + "gridblock/gridblock.editor.html";
         }
 
         /**
@@ -422,7 +423,7 @@
             block.showValidation = true;
 
             block.hideContentInOverlay = block.config.forceHideContentEditorInOverlay === true;
-            block.showContent = !block.hideContentInOverlay && block.content.variants[0].tabs[0]?.properties.length > 0;
+            block.showContent = !block.hideContentInOverlay && block.content?.variants[0].tabs[0]?.properties.length > 0;
             block.showSettings = block.config.settingsElementTypeKey != null;
 
             // If we have content, otherwise it doesn't make sense to copy.
@@ -626,7 +627,7 @@
                     area.$config.specifiedAllowance?.forEach(allowance => {
                         if(allowance.groupKey) {
                             vm.availableBlockTypes.forEach(blockType => {
-                                if(blockType.blockConfigModel.groupKey === allowance.groupKey && blockType.blockConfigModel.allowInArea === true) {
+                                if(blockType.blockConfigModel.groupKey === allowance.groupKey && blockType.blockConfigModel.allowInAreas === true) {
                                     if(allowedElementTypes.indexOf(blockType) === -1) {
                                         allowedElementTypes.push(blockType);
                                     }
@@ -644,7 +645,7 @@
                     return allowedElementTypes;
                 } else {
                     // as none specifiedAllowance was defined we will allow all area Blocks:
-                    vm.availableBlockTypes.filter(x => x.blockConfigModel.allowInArea);
+                    return vm.availableBlockTypes.filter(x => x.blockConfigModel.allowInAreas === true);
                 }
             }
             return vm.availableBlockTypes;
