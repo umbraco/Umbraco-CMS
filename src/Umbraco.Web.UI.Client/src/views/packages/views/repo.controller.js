@@ -168,18 +168,31 @@
                     vm.pagination.totalPages = Math.ceil(pack.total / vm.pagination.pageSize);
                 });
         }
+        var previousElement = null;
 
         function openLightbox(itemIndex, items) {
+
+            previousElement = ( document.activeElement || document.body );
+
             vm.lightbox = {
                 show: true,
                 items: items,
-                activeIndex: itemIndex
+                activeIndex: itemIndex,
+                focus: true
             };
         }
 
         function closeLightbox() {
             vm.lightbox.show = false;
             vm.lightbox = null;
+
+            if(previousElement){
+
+                setTimeout(function(){ 
+                    previousElement.focus();
+                    previousElement = null;
+                  }, 100) 
+            }
         }
 
 
