@@ -477,12 +477,6 @@ stages:
               script: |
                 $MyVariable = Test-Path -Path $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/results
                 Write-Host "##vso[task.setvariable variable=myVar;]$MyVariable"
-          - task: Powershell@2
-            displayName: Echo myVar
-            inputs:
-              targetType: inline
-              script: |
-                echo $variables.myVar
           - task: CopyFiles@2
             displayName: Prepare artifacts
             condition: eq(variables.myVar, 'True')
