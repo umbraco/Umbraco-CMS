@@ -30,8 +30,7 @@ export class UmbEditorViewUsersUserDetailsElement extends UmbContextConsumerMixi
 				gap: var(--uui-size-space-2);
 			}
 			uui-avatar {
-				width: 50%;
-				flex: 1 1 0%;
+				font-size: var(--uui-size-16);
 				place-self: center;
 			}
 			hr {
