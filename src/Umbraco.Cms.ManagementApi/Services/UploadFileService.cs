@@ -14,7 +14,7 @@ public class UploadFileService : IUploadFileService
     private readonly IHostingEnvironment _hostingEnvironment;
     private readonly ILocalizedTextService _localizedTextService;
 
-    public UploadFileService(IHostingEnvironment hostingEnvironment, ILocalizedTextService localizedTextService, IFileProvider fileProvider)
+    public UploadFileService(IHostingEnvironment hostingEnvironment, ILocalizedTextService localizedTextService)
     {
         _hostingEnvironment = hostingEnvironment;
         _localizedTextService = localizedTextService;
