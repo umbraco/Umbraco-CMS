@@ -22,7 +22,7 @@ public class UploadDictionaryController : DictionaryControllerBase
 
     [HttpPost("upload")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(IActionResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(DictionaryImportViewModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<DictionaryImportViewModel>> Upload(IFormFile file)
     {
