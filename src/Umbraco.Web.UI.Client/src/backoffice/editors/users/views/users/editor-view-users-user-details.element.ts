@@ -1,4 +1,4 @@
-import { css, html, LitElement } from 'lit';
+import { css, html, LitElement, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbContextConsumerMixin } from '../../../../../core/context';
@@ -43,6 +43,9 @@ export class UmbEditorViewUsersUserDetailsElement extends UmbContextConsumerMixi
 			.faded-text {
 				color: var(--uui-color-text-alt);
 			}
+			uui-tag {
+				width: fit-content;
+			}
 		`,
 	];
 
@@ -51,6 +54,8 @@ export class UmbEditorViewUsersUserDetailsElement extends UmbContextConsumerMixi
 
 	@state()
 	private _user?: UserItem;
+
+	private _userKey = '';
 
 	protected _usersContext?: UmbEditorViewUsersElement;
 	protected _usersSubscription?: Subscription;
@@ -72,16 +77,17 @@ export class UmbEditorViewUsersUserDetailsElement extends UmbContextConsumerMixi
 			this._usersSubscription?.unsubscribe();
 			this._usersSubscription = this._usersContext?.users.subscribe((users: Array<UserItem>) => {
 				this._users = users;
+				this._user = this._users.find((user: UserItem) => user.key === this._userKey);
 			});
 		});
 
 		// get user id from url path
 		const path = window.location.pathname;
 		const pathParts = path.split('/');
-		const userKey = pathParts[pathParts.length - 1];
+		this._userKey = pathParts[pathParts.length - 1];
 
 		// get user from users array
-		this._user = this._users.find((user: UserItem) => user.key === userKey);
+		this._user = this._users.find((user: UserItem) => user.key === this._userKey);
 	}
 
 	disconnectedCallback(): void {
@@ -90,7 +96,18 @@ export class UmbEditorViewUsersUserDetailsElement extends UmbContextConsumerMixi
 		this._usersSubscription?.unsubscribe();
 	}
 
+	private _updateUserStatus() {
+		if (!this._user) return;
+
+		const newStatus = this._user.status === 'Disabled' ? 'Active' : 'Disabled';
+
+		this._usersContext?.updateUser({ key: this._user.key, status: newStatus });
+	}
+
 	render() {
+		if (!this._user || !this._usersContext) return html`User not found`;
+
+		const status = this._usersContext.getTagLookAndColor(this._user.status);
 		return html`
 			<div id="left-column">
 				<uui-box>
@@ -118,7 +135,18 @@ export class UmbEditorViewUsersUserDetailsElement extends UmbContextConsumerMixi
 						<uui-avatar .name=${this._user?.name || ''}></uui-avatar>
 						<uui-button label="Change photo"></uui-button>
 						<hr />
+						${this._user?.status !== 'Invited'
+							? html`
+									<uui-button
+										@click=${this._updateUserStatus}
+										look="primary"
+										color="${this._user.status === 'Disabled' ? 'positive' : 'warning'}"
+										label="${this._user.status === 'Disabled' ? 'Enable' : 'Disable'}"></uui-button>
+							  `
+							: nothing}
 						<uui-button look="primary" color="danger" label="Delete User"></uui-button>
+						<b>Status:</b>
+						<uui-tag .look=${status.look} .color=${status.color}>${this._user.status}</uui-tag>
 					</div>
 				</uui-box>
 			</div>
