@@ -363,8 +363,6 @@ stages:
             value: Server=$(UmbracoDatabaseServer);Database=$(UmbracoDatabaseName);Integrated Security=true;
           - name: PLAYWRIGHT_BASE_URL
             value: https://localhost:8443
-          - name: ACCEPTANCE_TEST_FOLDER_EXISTS
-            value: false
         strategy:
           matrix:
             Linux:
