@@ -42,7 +42,7 @@
                     "view": ""
                 }];
 
-                vm.activeTab = vm.navigation[0];
+                vm.activeTab = vm.navigation[$scope.model.openAreas === true ? 1 : 0];
                 vm.activeTab.active = true;
             }
         );

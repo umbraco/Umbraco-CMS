@@ -265,7 +265,7 @@
 
 
 
-        vm.openBlockOverlay = function (block) {
+        vm.openBlockOverlay = function (block, openAreas) {
 
             var elementType = vm.getElementTypeByKey(block.contentElementTypeKey);
 
@@ -282,6 +282,7 @@
                         loadedElementTypes: vm.elementTypes,
                         gridColumns: vm.gridColumnsPreValue.value || DEFAULT_GRID_COLUMNS,
                         title: data,
+                        openAreas: openAreas,
                         view: "views/propertyeditors/blockgrid/prevalue/blockgrid.blockconfiguration.overlay.html",
                         size: "large",
                         submit: function(overlayModel) {
