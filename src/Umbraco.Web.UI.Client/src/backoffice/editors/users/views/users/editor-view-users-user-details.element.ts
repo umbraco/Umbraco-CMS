@@ -4,6 +4,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { UmbContextConsumerMixin } from '../../../../../core/context';
 import UmbEditorViewUsersElement, { UserItem } from './editor-view-users.element';
 import { Subscription } from 'rxjs';
+import { tempData } from './tempData';
 
 @customElement('umb-editor-view-users-user-details')
 export class UmbEditorViewUsersUserDetailsElement extends UmbContextConsumerMixin(LitElement) {
@@ -80,24 +81,30 @@ export class UmbEditorViewUsersUserDetailsElement extends UmbContextConsumerMixi
 	protected _usersContext?: UmbEditorViewUsersElement;
 	protected _usersSubscription?: Subscription;
 
-	private _languages = [
-		{ name: 'English', value: 'en', selected: true },
-		{ name: 'Dutch', value: 'nl' },
-		{ name: 'French', value: 'fr' },
-		{ name: 'German', value: 'de' },
-		{ name: 'Spanish', value: 'es' },
-	];
+	private _languages = tempData //TODO Get languages from API instead of fakeData
+		.reduce((acc, curr) => {
+			if (!acc.includes(curr.language)) {
+				acc.push(curr.language);
+			}
+			return acc;
+		}, [] as Array<string>)
+		.map((language) => {
+			return {
+				name: language,
+				value: language,
+				selected: false,
+			};
+		});
 
 	connectedCallback(): void {
 		super.connectedCallback();
-
 		this.consumeContext('umbUsersContext', (usersContext: UmbEditorViewUsersElement) => {
 			this._usersContext = usersContext;
 
 			this._usersSubscription?.unsubscribe();
 			this._usersSubscription = this._usersContext?.users.subscribe((users: Array<UserItem>) => {
 				this._users = users;
-				this._user = this._users.find((user: UserItem) => user.key === this._userKey);
+				this._initUser();
 			});
 		});
 
@@ -106,14 +113,22 @@ export class UmbEditorViewUsersUserDetailsElement extends UmbContextConsumerMixi
 		const pathParts = path.split('/');
 		this._userKey = pathParts[pathParts.length - 1];
 
-		// get user from users array
-		this._user = this._users.find((user: UserItem) => user.key === this._userKey);
+		this._initUser();
 	}
 
 	disconnectedCallback(): void {
 		super.disconnectedCallback();
 
 		this._usersSubscription?.unsubscribe();
+	}
+
+	private _initUser() {
+		this._user = this._users.find((user: UserItem) => user.key === this._userKey);
+
+		const index = this._languages.findIndex((language) => language.value === this._user?.language);
+		if (index !== -1) {
+			this._languages[index].selected = true;
+		}
 	}
 
 	private _updateUserStatus() {
@@ -138,11 +153,11 @@ export class UmbEditorViewUsersUserDetailsElement extends UmbContextConsumerMixi
 
 		return html` <uui-box>
 				<div slot="headline">Profile</div>
-				<uui-form-layout-item>
+				<uui-form-layout-item style="margin-top: 0">
 					<uui-label for="email">Email</uui-label>
-					<uui-input name="email" readonly value="FIX EMAIL"></uui-input>
+					<uui-input name="email" readonly value="NOT IMPLEMENTED"></uui-input>
 				</uui-form-layout-item>
-				<uui-form-layout-item>
+				<uui-form-layout-item style="margin-bottom: 0">
 					<uui-label for="language">Language</uui-label>
 					<uui-select name="language" .options=${this._languages}> </uui-select>
 				</uui-form-layout-item>
@@ -205,32 +220,32 @@ export class UmbEditorViewUsersUserDetailsElement extends UmbContextConsumerMixi
 					: nothing}
 				<div>
 					<b>Last login:</b>
-					<span>${this._user.lastLogin}</span>
+					<span>${this._user.lastLoginDate || `${this._user.name} has not logged in yet`}</span>
 				</div>
 				<div>
 					<b>Failed login attempts</b>
-					<span>NOT IMPLEMENTED</span>
+					<span>${this._user.failedLoginAttempts}</span>
 				</div>
 				<div>
 					<b>Last lockout date:</b>
-					<span>NOT IMPLEMENTED</span>
+					<span>${this._user.lastLockoutDate || `${this._user.name} has not been locked out`}</span>
 				</div>
 				<div>
 					<b>Password last changed:</b>
-					<span>NOT IMPLEMENTED</span>
+					<span>${this._user.lastLoginDate || `${this._user.name} has not changed password`}</span>
 				</div>
 				<div>
 					<b>User created:</b>
-					<span>NOT IMPLEMENTED</span>
+					<span>${this._user.createDate}</span>
 				</div>
 				<div>
 					<b>User last updated:</b>
-					<span>NOT IMPLEMENTED</span>
+					<span>${this._user.updateDate}</span>
 				</div>
 				<div>
 					<b>Id:</b>
+					<span>${this._user.id}</span>
 					<span>${this._user.key}</span>
-					<span>NOT IMPLEMENTED</span>
 				</div>
 			</div>
 		</uui-box>`;

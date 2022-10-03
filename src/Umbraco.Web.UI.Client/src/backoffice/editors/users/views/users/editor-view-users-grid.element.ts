@@ -98,8 +98,13 @@ export class UmbEditorViewUsersGridElement extends UmbContextConsumerMixin(LitEl
 							${user.status}
 					  </uui-tag>`
 					: nothing}
-				<div>${user.userGroup}</div>
-				<div class="user-login-time">${user.lastLogin}</div>
+				<div>USER GROUPS NOT IMPLEMENTED</div>
+				${user.lastLoginDate
+					? html`<div class="user-login-time">
+							<div>Last login</div>
+							${user.lastLoginDate}
+					  </div>`
+					: html`<div class="user-login-time">${`${user.name} has not logged in yet`}</div>`}
 			</uui-card-user>
 		`;
 	}
