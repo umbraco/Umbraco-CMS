@@ -23,8 +23,6 @@ namespace Umbraco.Cms.Core.Extensions
             }
         }
 
-        public static bool TryParse(object json, out JsonNode? node) => TryParse(json.ToString()!, out node);
-
         public static bool TryParse(string json, out JsonArray? array)
         {
             try
@@ -39,8 +37,6 @@ namespace Umbraco.Cms.Core.Extensions
             }
         }
 
-        public static bool TryParse(object json, out JsonArray? array) => TryParse(json.ToString()!, out array);
-
         public static bool TryParse(string json, out JsonObject? obj)
         {
             try
@@ -54,7 +50,5 @@ namespace Umbraco.Cms.Core.Extensions
                 return false;
             }
         }
-
-        public static bool TryParse(object json, out JsonObject? obj) => TryParse(json.ToString()!, out obj);
     }
 }

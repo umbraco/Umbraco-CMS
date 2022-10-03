@@ -69,7 +69,7 @@ internal class ColorPickerConfigurationEditor : ConfigurationEditor<ColorPickerC
             return output; // oops
         }
 
-        if(!JsonExtensions.TryParse(jjj!, out JsonArray? jItems) || jItems is null)
+        if(!JsonExtensions.TryParse(jjj!.ToString()!, out JsonArray? jItems) || jItems is null)
         {
             return output;
         }
@@ -171,7 +171,7 @@ internal class ColorPickerConfigurationEditor : ConfigurationEditor<ColorPickerC
                 yield break;
             }
 
-            if (!JsonExtensions.TryParse(value!, out JsonArray? json) || json is null)
+            if (!JsonExtensions.TryParse(value.ToString()!, out JsonArray? json) || json is null)
             {
                 yield break;
             }
