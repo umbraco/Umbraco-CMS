@@ -617,30 +617,35 @@
 
             const area = parentBlock.layout.areas.find(x => x.key === areaKey);
 
-            if(area && area?.$config.onlySpecifiedAllowance) {
+            if(area) {
+                if(area.$config.specifiedAllowance.length > 0) {
 
-                const allowedElementTypes = [];
+                    const allowedElementTypes = [];
 
-                // Then add specific types (This allows to overwrite the amount for a specific type)
-                area.$config.specifiedAllowance?.forEach(allowance => {
-                    if(allowance.groupKey) {
-                        vm.availableBlockTypes.forEach(blockType => {
-                            if(blockType.blockConfigModel.groupKey === allowance.groupKey) {
-                                if(allowedElementTypes.indexOf(blockType) === -1) {
-                                    allowedElementTypes.push(blockType);
+                    // Then add specific types (This allows to overwrite the amount for a specific type)
+                    area.$config.specifiedAllowance?.forEach(allowance => {
+                        if(allowance.groupKey) {
+                            vm.availableBlockTypes.forEach(blockType => {
+                                if(blockType.blockConfigModel.groupKey === allowance.groupKey && blockType.blockConfigModel.allowInArea === true) {
+                                    if(allowedElementTypes.indexOf(blockType) === -1) {
+                                        allowedElementTypes.push(blockType);
+                                    }
                                 }
+                            });
+                        } else 
+                        if(allowance.elementTypeKey) {
+                            const blockType = vm.availableBlockTypes.find(x => x.blockConfigModel.contentElementTypeKey === allowance.elementTypeKey);
+                            if(allowedElementTypes.indexOf(blockType) === -1) {
+                                allowedElementTypes.push(blockType);
                             }
-                        });
-                    } else 
-                    if(allowance.elementTypeKey) {
-                        const blockType = vm.availableBlockTypes.find(x => x.blockConfigModel.contentElementTypeKey === allowance.elementTypeKey);
-                        if(allowedElementTypes.indexOf(blockType) === -1) {
-                            allowedElementTypes.push(blockType);
                         }
-                    }
-                });
+                    });
 
-                return allowedElementTypes;
+                    return allowedElementTypes;
+                } else {
+                    // allow all area Blocks:
+                    vm.availableBlockTypes.filter(x => x.blockConfigModel.allowInArea);
+                }
             }
             return vm.availableBlockTypes;
         }
