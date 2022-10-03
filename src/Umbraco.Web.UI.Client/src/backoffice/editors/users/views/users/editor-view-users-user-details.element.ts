@@ -46,6 +46,14 @@ export class UmbEditorViewUsersUserDetailsElement extends UmbContextConsumerMixi
 			uui-tag {
 				width: fit-content;
 			}
+			#user-info {
+				display: flex;
+				gap: var(--uui-size-space-6);
+			}
+			#user-info > div {
+				display: flex;
+				flex-direction: column;
+			}
 		`,
 	];
 
@@ -100,8 +108,10 @@ export class UmbEditorViewUsersUserDetailsElement extends UmbContextConsumerMixi
 		if (!this._user) return;
 
 		const newStatus = this._user.status === 'Disabled' ? 'Active' : 'Disabled';
+		const newUser = this._user;
+		newUser.status = newStatus;
 
-		this._usersContext?.updateUser({ key: this._user.key, status: newStatus });
+		this._usersContext?.updateUser(newUser);
 	}
 
 	render() {
@@ -131,7 +141,7 @@ export class UmbEditorViewUsersUserDetailsElement extends UmbContextConsumerMixi
 			</div>
 			<div id="right-column">
 				<uui-box>
-					<div>
+					<div id="user-info">
 						<uui-avatar .name=${this._user?.name || ''}></uui-avatar>
 						<uui-button label="Change photo"></uui-button>
 						<hr />
@@ -145,8 +155,45 @@ export class UmbEditorViewUsersUserDetailsElement extends UmbContextConsumerMixi
 							  `
 							: nothing}
 						<uui-button look="primary" color="danger" label="Delete User"></uui-button>
-						<b>Status:</b>
-						<uui-tag .look=${status.look} .color=${status.color}>${this._user.status}</uui-tag>
+						<div>
+							<b>Status:</b>
+							<uui-tag .look=${status.look} .color=${status.color}>${this._user.status}</uui-tag>
+						</div>
+						${this._user?.status === 'Invited'
+							? html`
+									<uui-textarea placeholder="Enter a message..."> </uui-textarea>
+									<uui-button look="primary" label="Resend invitation"></uui-button>
+							  `
+							: nothing}
+						<div>
+							<b>Last login:</b>
+							<span>${this._user.lastLogin}</span>
+						</div>
+						<div>
+							<b>Failed login attempts</b>
+							<span>NOT IMPLEMENTED</span>
+						</div>
+						<div>
+							<b>Last lockout date:</b>
+							<span>NOT IMPLEMENTED</span>
+						</div>
+						<div>
+							<b>Password last changed:</b>
+							<span>NOT IMPLEMENTED</span>
+						</div>
+						<div>
+							<b>User created:</b>
+							<span>NOT IMPLEMENTED</span>
+						</div>
+						<div>
+							<b>User last updated:</b>
+							<span>NOT IMPLEMENTED</span>
+						</div>
+						<div>
+							<b>Id:</b>
+							<span>${this._user.key}</span>
+							<span>NOT IMPLEMENTED</span>
+						</div>
 					</div>
 				</uui-box>
 			</div>
