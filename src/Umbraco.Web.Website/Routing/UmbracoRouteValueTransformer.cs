@@ -46,6 +46,7 @@ public class UmbracoRouteValueTransformer : DynamicRouteValueTransformer
     private readonly IUmbracoRouteValuesFactory _routeValuesFactory;
     private readonly IRuntimeState _runtime;
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+    private readonly IUmbracoVirtualPageRoute _umbracoVirtualPageRoute;
 
     [Obsolete("Please use constructor that does not take IOptions<GlobalSettings>, IHostingEnvironment & IEventAggregator instead")]
     public UmbracoRouteValueTransformer(
@@ -60,8 +61,9 @@ public class UmbracoRouteValueTransformer : DynamicRouteValueTransformer
         IDataProtectionProvider dataProtectionProvider,
         IControllerActionSearcher controllerActionSearcher,
         IEventAggregator eventAggregator,
-        IPublicAccessRequestHandler publicAccessRequestHandler)
-    : this(logger, umbracoContextAccessor, publishedRouter, runtime, routeValuesFactory, routableDocumentFilter, dataProtectionProvider, controllerActionSearcher, publicAccessRequestHandler)
+        IPublicAccessRequestHandler publicAccessRequestHandler,
+        IUmbracoVirtualPageRoute umbracoVirtualPageRoute)
+    : this(logger, umbracoContextAccessor, publishedRouter, runtime, routeValuesFactory, routableDocumentFilter, dataProtectionProvider, controllerActionSearcher, publicAccessRequestHandler, umbracoVirtualPageRoute)
     {
     }
 
@@ -77,7 +79,8 @@ public class UmbracoRouteValueTransformer : DynamicRouteValueTransformer
         IRoutableDocumentFilter routableDocumentFilter,
         IDataProtectionProvider dataProtectionProvider,
         IControllerActionSearcher controllerActionSearcher,
-        IPublicAccessRequestHandler publicAccessRequestHandler)
+        IPublicAccessRequestHandler publicAccessRequestHandler,
+        IUmbracoVirtualPageRoute umbracoVirtualPageRoute)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _umbracoContextAccessor =
@@ -90,6 +93,7 @@ public class UmbracoRouteValueTransformer : DynamicRouteValueTransformer
         _dataProtectionProvider = dataProtectionProvider;
         _controllerActionSearcher = controllerActionSearcher;
         _publicAccessRequestHandler = publicAccessRequestHandler;
+        _umbracoVirtualPageRoute = umbracoVirtualPageRoute;
     }
 
     /// <inheritdoc />
@@ -147,6 +151,10 @@ public class UmbracoRouteValueTransformer : DynamicRouteValueTransformer
         PostedDataProxyInfo? postedInfo = GetFormInfo(httpContext, values);
         if (postedInfo != null)
         {
+            // Ensure the virtual page content and route values are setup when submitting to a surface controller
+            // If we don't do this, the virtual page controller never gets called after the surface controller completes
+            await _umbracoVirtualPageRoute.SetupVirtualPageRoute(httpContext);
+
             return HandlePostedValues(postedInfo, httpContext);
         }
 

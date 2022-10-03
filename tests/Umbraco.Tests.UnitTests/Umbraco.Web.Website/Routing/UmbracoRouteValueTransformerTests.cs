@@ -21,6 +21,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Tests.UnitTests.TestHelpers;
 using Umbraco.Cms.Web.Common.Controllers;
+using Umbraco.Cms.Web.Common.Filters;
 using Umbraco.Cms.Web.Common.Routing;
 using Umbraco.Cms.Web.Website.Controllers;
 using Umbraco.Cms.Web.Website.Routing;
@@ -53,6 +54,9 @@ public class UmbracoRouteValueTransformerTests
                 x.RewriteForPublishedContentAccessAsync(It.IsAny<HttpContext>(), It.IsAny<UmbracoRouteValues>()))
             .Returns((HttpContext ctx, UmbracoRouteValues routeVals) => Task.FromResult(routeVals));
 
+        var umbracoVirtualPageRoute = new Mock<IUmbracoVirtualPageRoute>();
+        umbracoVirtualPageRoute.Setup(x => x.SetupVirtualPageRoute(It.IsAny<HttpContext>()));
+
         var transformer = new UmbracoRouteValueTransformer(
             new NullLogger<UmbracoRouteValueTransformer>(),
             ctx,
@@ -65,7 +69,8 @@ public class UmbracoRouteValueTransformerTests
             Mock.Of<IDataProtectionProvider>(),
             Mock.Of<IControllerActionSearcher>(),
             Mock.Of<IEventAggregator>(),
-            publicAccessRequestHandler.Object);
+            publicAccessRequestHandler.Object,
+            umbracoVirtualPageRoute.Object);
 
         return transformer;
     }

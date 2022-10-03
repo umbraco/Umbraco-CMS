@@ -43,6 +43,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<UmbracoRouteValueTransformer>();
         builder.Services.AddSingleton<IControllerActionSearcher, ControllerActionSearcher>();
         builder.Services.TryAddEnumerable(Singleton<MatcherPolicy, NotFoundSelectorPolicy>());
+        builder.Services.AddSingleton<IUmbracoVirtualPageRoute, UmbracoVirtualPageRoute>();
         builder.Services.AddSingleton<IUmbracoRouteValuesFactory, UmbracoRouteValuesFactory>();
         builder.Services.AddSingleton<IRoutableDocumentFilter, RoutableDocumentFilter>();
 
