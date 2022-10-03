@@ -28,7 +28,7 @@ test.describe('DataTypes', () => {
     await umbracoApi.content.createDocTypeWithContent(name, alias, pickerDataType);
 
     // This is an ugly wait, but we have to wait for cache to rebuild
-    await page.waitForTimeout(1000);
+    await page.waitForTimeout(5000);
 
     // Editing template with some content
     await umbracoApi.templates.edit(name,
@@ -55,6 +55,7 @@ test.describe('DataTypes', () => {
     await expect(await page.locator('.umb-button__overlay')).not.toBeVisible();
 
     // Pick another colour to verify both work
+    await page.waitForTimeout(5000);
     await page.locator('.btn-FF0000').click();
 
     // Save
@@ -62,6 +63,7 @@ test.describe('DataTypes', () => {
     await umbracoUi.isSuccessNotificationVisible();
     await expect(await umbracoUi.getSuccessNotification()).toBeVisible();
     await expect(await page.locator('.umb-button__overlay')).not.toBeVisible();
+    await page.waitForTimeout(5000);
 
     // Assert
     const expected2 = '<p style="color:FF0000">Lorem ipsum dolor sit amet</p>';
