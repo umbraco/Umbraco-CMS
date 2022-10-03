@@ -440,8 +440,18 @@
                         return
                     }
 
+                    var approvedContainerRect = approvedContainerEl.getBoundingClientRect();
+                    // more than 100px above/below?
+                    if (dragY - approvedContainerRect.top < -100 || dragY - approvedContainerRect.bottom > 100) {
+                        var parentContainer = approvedContainerEl.parentNode.closest('.umb-block-grid__layout-container');
+                        if(parentContainer['Sortable:controller']().sortGroupIdentifier === vm.sortGroupIdentifier) {
+                            approvedContainerEl = parentContainer;
+                            approvedContainerRect = approvedContainerEl.getBoundingClientRect();
+                        }
+                    }
+
                     // If above or below container, we will go first or last.
-                    const approvedContainerRect = approvedContainerEl.getBoundingClientRect();
+                    
                     if(dragY < approvedContainerRect.top) {
                         const firstEl = containerElements[0];
                         if (firstEl) {
@@ -536,8 +546,10 @@
                 }
             }
 
+            vm.sortGroupIdentifier = "BlockGridEditor_"+vm.blockEditorApi.internal.uniqueEditorKey;
+
             const sortable = Sortable.create(gridLayoutContainerEl, {
-                group: "BlockGridEditor_"+vm.blockEditorApi.internal.uniqueEditorKey,  // links groups with same name.
+                group: vm.sortGroupIdentifier,  // links groups with same name.
                 sort: true,  // sorting inside list
                 //delay: 0, // time in milliseconds to define when the sorting should start
                 //delayOnTouchOnly: false, // only delay if user is using touch
@@ -578,7 +590,7 @@
 
                 dragoverBubble: true,
                 //removeCloneOnHide: true, // Remove the clone element when it is not showing, rather than just hiding it
-                emptyInsertThreshold: 160, // px, distance mouse must be from empty sortable to insert drag element into it
+                emptyInsertThreshold: 240, // px, distance mouse must be from empty sortable to insert drag element into it
 
                 scrollSensitivity: 50,
                 scrollSpeed: 16,
