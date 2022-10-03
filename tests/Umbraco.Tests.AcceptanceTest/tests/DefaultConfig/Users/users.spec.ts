@@ -94,6 +94,6 @@ test.describe('Users', () => {
     await page.locator('umb-button[label="Yes, delete"]').click();
 
     // Assert deletion succeeds
-    await umbracoUi.isErrorNotificationVisible();
+    await umbracoUi.isSuccessNotificationVisible();
   });
 });
