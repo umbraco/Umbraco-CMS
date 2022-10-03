@@ -1,5 +1,11 @@
 <div class="umb-block-grid-block-configuration" ng-controller="Umbraco.PropertyEditors.BlockGrid.BlockConfigurationController as vm">
 
+    <div ng-if="vm.showSampleDataCTA" class="__get-sample-box">
+        <h3 ng-bind="vm.labels.blockEditor_getSampleHeadline">Setup demo configuration?</h3>
+        <p ng-html-bind="vm.labels.blockEditor_getSampleDescription">Setup a few basic Blocks for demonstration of how the Block Grid Editor works.
+            This will comes with a Headline, Rich-Text, Image and Two Column Layout.</p>
+        <umb-button action="vm.setupSample()" button-style="primary" state="vm.sampleButtonState" label="{{vm.labels.blockEditor_getSampleButton}}" type="button"></umb-button>
+    </div>
 
     <div class="umb-block-card-group">
 

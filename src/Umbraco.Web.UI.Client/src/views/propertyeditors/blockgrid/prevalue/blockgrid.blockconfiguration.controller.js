@@ -18,12 +18,35 @@
 
     const DEFAULT_GRID_COLUMNS = 12;
 
-    function BlockConfigurationController($scope, $element, elementTypeResource, overlayService, localizationService, editorService, eventsService, udiService) {
+    const DEFAULT_BLOCKTYPE_OBJECT = {
+        "columnSpanOptions": [],
+        "allowAtRoot": true,
+        "allowInAreas": true,
+        "rowMinSpan": 1,
+        "rowMaxSpan": 1,
+        "contentElementTypeKey": null,
+        "settingsElementTypeKey": null,
+        "label": "",
+        "view": null,
+        "stylesheet": null,
+        "editorSize": "medium",
+        "iconColor": null,
+        "backgroundColor": null,
+        "thumbnail": null,
+        "areaGridColumns": null,
+        "areas": [],
+        "groupKey": null
+    };
+
+
+    function BlockConfigurationController($scope, $element, $http, elementTypeResource, overlayService, localizationService, editorService, eventsService, udiService, dataTypeResource, umbRequestHelper) {
 
         var unsubscribe = [];
 
         var vm = this;
         vm.openBlock = null;
+        vm.showSampleDataCTA = false;
+        vm.labels = {};
 
         function onInit() {
 
@@ -235,25 +258,7 @@
 
         vm.addBlockFromElementTypeKey = function(key, groupKey) {
 
-            var blockType = {
-                "columnSpanOptions": [],
-                "allowAtRoot": true,
-                "allowInAreas": true,
-                "rowMinSpan": 1,
-                "rowMaxSpan": 1,
-                "contentElementTypeKey": key,
-                "settingsElementTypeKey": null,
-                "labelTemplate": "",
-                "view": null,
-                "stylesheet": null,
-                "editorSize": "medium",
-                "iconColor": null,
-                "backgroundColor": null,
-                "thumbnail": null,
-                "areaGridColumns": null,
-                "areas": [],
-                "groupKey": groupKey || null
-            };
+            const blockType = { ...DEFAULT_BLOCKTYPE_OBJECT, "contentElementTypeKey": key, "groupKey": groupKey || null}
 
             $scope.model.value.push(blockType);
 
@@ -350,6 +355,69 @@
                 });
             }
         }
+
+
+
+        dataTypeResource.getGroupedPropertyEditors().then(function(propertyEditors) {
+
+            //if(propertyEditors['rich content']?.filter(x => x.alias === "Umbraco.BlockGrid").length === 0) {
+                localizationService.localizeMany(["blockEditor_getSampleHeadline", "blockEditor_getSampleDescription", "blockEditor_getSampleButton"]).then(function (data) {
+                    vm.labels["blockEditor_getSampleHeadline"] = data[0];
+                    vm.labels["blockEditor_getSampleDescription"] = data[1];
+                    vm.labels["blockEditor_getSampleButton"] = data[2];
+                    vm.showSampleDataCTA = true;
+                });
+            //}
+        });
+
+        vm.setupSample = function() {
+            umbRequestHelper.resourcePromise(
+                $http.post(umbRequestHelper.getApiUrl("contentTypeApiBaseUrl", "PostCreateBlockGridSample")),
+                'Failed to create content types for block grid sample').then(function (data) {
+                    console.log("Got me some data", data);
+
+                    loadElementTypes().then(() => {
+                        const sampleGroup = {
+                            key: String.CreateGuid(),
+                            name: "Demo Blocks"
+                        };
+                        vm.blockGroups.push(sampleGroup);
+    
+                        function initSampleBlock(udi, groupKey, options) {
+                            const blockType = { ...DEFAULT_BLOCKTYPE_OBJECT, "contentElementTypeKey": udiService.getKey(udi), "groupKey": groupKey, ...options};
+                            $scope.model.value.push(blockType);
+                        }
+    
+                        initSampleBlock(data.umbBlockGridDemoHeadlineBlock, sampleGroup.key, {"label": "Headline", "view": "~/App_Plugins/Umbraco.BlockGridEditor.DefaultCustomViews/headlineblock.html"});
+                        initSampleBlock(data.umbBlockGridDemoImageBlock, sampleGroup.key, {"label": "Image", "view": "~/App_Plugins/Umbraco.BlockGridEditor.DefaultCustomViews/imageblock.html"});
+                        initSampleBlock(data.umbBlockGridDemoRichTextBlock, sampleGroup.key, { "label": "Rich Text", "view": "~/App_Plugins/Umbraco.BlockGridEditor.DefaultCustomViews/rteblock.html"});
+                        const twoColumnLayoutAreas = [
+                            {
+                                'key': String.CreateGuid(),
+                                'alias': 'left',
+                                'columnSpan': 6,
+                                'rowSpan': 1,
+                                'minAllowed': 0,
+                                'maxAllowed': null,
+                                'specifiedAllowance': []
+                            },
+                            {
+                                'key': String.CreateGuid(),
+                                'alias': 'right',
+                                'columnSpan': 6,
+                                'rowSpan': 1,
+                                'minAllowed': 0,
+                                'maxAllowed': null,
+                                'specifiedAllowance': []
+                            }
+                        ];
+                        initSampleBlock(data.umbBlockGridDemoTwoColumnSectionBlock, sampleGroup.key, {"label": "Two Column Layout", "view": "~/App_Plugins/Umbraco.BlockGridEditor.DefaultCustomViews/twocolumnsectionblock.html", "allowInAreas": false, "areas": twoColumnLayoutAreas});
+    
+                    });
+                    
+                });
+        }
+
 
         $scope.$on('$destroy', function () {
             unsubscribe.forEach(u => { u(); });
