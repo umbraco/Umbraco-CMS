@@ -12,6 +12,9 @@ using Umbraco.Cms.Web.Common.Extensions;
 
 namespace Umbraco.Cms.Web.Common.Routing;
 
+/// <summary>
+/// This is used to setup the virtual page route so the route values and content are set for virtual pages.
+/// </summary>
 public class UmbracoVirtualPageRoute : IUmbracoVirtualPageRoute
 {
     private readonly EndpointDataSource _endpointDataSource;
@@ -19,6 +22,13 @@ public class UmbracoVirtualPageRoute : IUmbracoVirtualPageRoute
     private readonly UriUtility _uriUtility;
     private readonly IPublishedRouter _publishedRouter;
 
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    /// <param name="endpointDataSource">The endpoint data source.</param>
+    /// <param name="linkParser">The link parser.</param>
+    /// <param name="uriUtility">The Uri utility.</param>
+    /// <param name="publishedRouter">The published router.</param>
     public UmbracoVirtualPageRoute(
         EndpointDataSource endpointDataSource,
         LinkParser linkParser,
@@ -31,8 +41,14 @@ public class UmbracoVirtualPageRoute : IUmbracoVirtualPageRoute
         _publishedRouter = publishedRouter;
     }
 
+    /// <summary>
+    /// This sets up the virtual page route for the current request if a mtahcing endpoint is found.
+    /// </summary>
+    /// <param name="httpContext">The HTTP context.</param>
+    /// <returns>Nothing</returns>
     public async Task SetupVirtualPageRoute(HttpContext httpContext)
     {
+        // Try and find an endpoint for the current path...
         Endpoint? endpoint = _endpointDataSource.GetEndpointByPath(_linkParser, httpContext.Request.Path, out RouteValueDictionary? routeValues);
 
         if (endpoint != null && routeValues != null)
@@ -45,8 +61,10 @@ public class UmbracoVirtualPageRoute : IUmbracoVirtualPageRoute
 
                 if (controllerType != null)
                 {
+                    // Get the controller for the endpoint
                     var controller = httpContext.RequestServices.GetRequiredService(controllerType);
 
+                    // Try and find the content if this is a virtual page
                     IPublishedContent? publishedContent = FindContent(
                         endpoint,
                         httpContext,
@@ -56,6 +74,7 @@ public class UmbracoVirtualPageRoute : IUmbracoVirtualPageRoute
 
                     if (publishedContent != null)
                     {
+                        // If we have content then set the route values
                         await SetRouteValues(httpContext, publishedContent, controllerActionDescriptor);
                     }
                 }
@@ -63,6 +82,17 @@ public class UmbracoVirtualPageRoute : IUmbracoVirtualPageRoute
         }
     }
 
+    /// <summary>
+    /// Finds the content from the custom route finder delegate or the virtual page controller.
+    /// Note - This creates a dummay action executing context so the FindContent method of the
+    /// IVirtualPageController can be called (without changing the interface contract).
+    /// </summary>
+    /// <param name="endpoint">The endpoint.</param>
+    /// <param name="httpContext">The HTTP context.</param>
+    /// <param name="routeValues">The route values.</param>
+    /// <param name="controllerActionDescriptor">The action descriptor.</param>
+    /// <param name="controller">The controller.</param>
+    /// <returns></returns>
     public IPublishedContent? FindContent(
         Endpoint endpoint,
         HttpContext httpContext,
@@ -82,6 +112,12 @@ public class UmbracoVirtualPageRoute : IUmbracoVirtualPageRoute
         return FindContent(endpoint, actionExecutingContext);
     }
 
+    /// <summary>
+    /// Finds the content from the custom route finder delegate or the virtual page controller.
+    /// </summary>
+    /// <param name="endpoint">The endpoint.</param>
+    /// <param name="actionExecutingContext">The action executing context.</param>
+    /// <returns>The published content if found or null.</returns>
     public IPublishedContent? FindContent(Endpoint endpoint, ActionExecutingContext actionExecutingContext)
     {
         // Check if there is any delegate in the metadata of the route, this
@@ -105,6 +141,12 @@ public class UmbracoVirtualPageRoute : IUmbracoVirtualPageRoute
         return null;
     }
 
+    /// <summary>
+    /// Creates the published request for the published content.
+    /// </summary>
+    /// <param name="httpContext">The HTTP context.</param>
+    /// <param name="publishedContent">The published content.</param>
+    /// <returns>The published request.</returns>
     public async Task<IPublishedRequest> CreatePublishedRequest(HttpContext httpContext, IPublishedContent publishedContent)
     {
         var originalRequestUrl = new Uri(httpContext.Request.GetEncodedUrl());
@@ -116,6 +158,13 @@ public class UmbracoVirtualPageRoute : IUmbracoVirtualPageRoute
         return requestBuilder.Build();
     }
 
+    /// <summary>
+    /// Sets the route values for the published content and the controller action descriptor.
+    /// </summary>
+    /// <param name="httpContext">The HTTP context.</param>
+    /// <param name="publishedContent">The published content.</param>
+    /// <param name="controllerActionDescriptor">The controller action descriptor.</param>
+    /// <returns>Nothing.</returns>
     public async Task SetRouteValues(HttpContext httpContext, IPublishedContent publishedContent, ControllerActionDescriptor controllerActionDescriptor)
     {
         IPublishedRequest publishedRequest = await CreatePublishedRequest(httpContext, publishedContent);
