@@ -18,7 +18,6 @@ internal class UmbracoViewCompilerProvider : IViewCompilerProvider
 
     private readonly ApplicationPartManager _applicationPartManager;
 
-    // 0 private readonly RuntimeCompilationFileProvider _fileProvider;
     private readonly ILogger<CollectibleRuntimeViewCompiler> _logger;
     private readonly Func<IViewCompiler> _createCompiler;
 
@@ -31,7 +30,6 @@ internal class UmbracoViewCompilerProvider : IViewCompilerProvider
     public UmbracoViewCompilerProvider(
         ApplicationPartManager applicationPartManager,
         RazorProjectEngine razorProjectEngine,
-        // RuntimeCompilationFileProvider fileProvider,
         ILoggerFactory loggerFactory,
         IOptions<MvcRazorRuntimeCompilationOptions> options,
         UmbracoRazorReferenceManager umbracoRazorReferenceManager,
@@ -44,7 +42,6 @@ internal class UmbracoViewCompilerProvider : IViewCompilerProvider
         _compilationOptionsProvider = compilationOptionsProvider;
         _loadContextManager = loadContextManager;
         _options = options.Value;
-        // _fileProvider = fileProvider;
 
         _logger = loggerFactory.CreateLogger<CollectibleRuntimeViewCompiler>();
         _createCompiler = CreateCompiler;

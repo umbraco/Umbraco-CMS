@@ -24,7 +24,7 @@ internal class CollectibleRuntimeViewCompiler : IViewCompiler
     private readonly IFileProvider _fileProvider;
     private readonly RazorProjectEngine _projectEngine;
     private IMemoryCache _cache;
-    private readonly ILogger _logger;
+    private readonly ILogger<CollectibleRuntimeViewCompiler> _logger;
     private readonly UmbracoRazorReferenceManager _referenceManager;
     private readonly CompilationOptionsProvider _compilationOptionsProvider;
     private readonly InMemoryAssemblyLoadContextManager _loadContextManager;
@@ -33,7 +33,7 @@ internal class CollectibleRuntimeViewCompiler : IViewCompiler
         IFileProvider fileProvider,
         RazorProjectEngine projectEngine,
         IList<CompiledViewDescriptor> precompiledViews,
-        ILogger logger,
+        ILogger<CollectibleRuntimeViewCompiler> logger,
         UmbracoRazorReferenceManager referenceManager,
         CompilationOptionsProvider compilationOptionsProvider,
         InMemoryAssemblyLoadContextManager loadContextManager)
@@ -81,7 +81,7 @@ internal class CollectibleRuntimeViewCompiler : IViewCompiler
 
         foreach (var precompiledView in precompiledViews)
         {
-
+            _logger.LogDebug("Initializing Razor view compiler with compiled view: '{ViewName}'", precompiledView.RelativePath);
             if (!_precompiledViews.ContainsKey(precompiledView.RelativePath))
             {
                 // View ordering has precedence semantics, a view with a higher precedence was
@@ -92,6 +92,7 @@ internal class CollectibleRuntimeViewCompiler : IViewCompiler
 
         if (_precompiledViews.Count == 0)
         {
+            _logger.LogDebug("Initializing Razor view compiler with no compiled views");
         }
     }
 
@@ -149,6 +150,7 @@ internal class CollectibleRuntimeViewCompiler : IViewCompiler
 
             if (_precompiledViews.TryGetValue(normalizedPath, out var precompiledView))
             {
+                _logger.LogTrace("Located compiled view for view at path '{Path}'", normalizedPath);
                 item = CreatePrecompiledWorkItem(normalizedPath, precompiledView);
             }
             else
@@ -196,6 +198,7 @@ internal class CollectibleRuntimeViewCompiler : IViewCompiler
                 return taskSource.Task;
             }
 
+            _logger.LogTrace("Invalidating compiled view at path '{Path}' with a file since the checksum did not match", item.NormalizedPath);
             try
             {
                 var descriptor = CompileAndEmit(normalizedPath);
@@ -267,7 +270,7 @@ internal class CollectibleRuntimeViewCompiler : IViewCompiler
         var projectItem = _projectEngine.FileSystem.GetItem(normalizedPath, fileKind: null);
         if (!projectItem.Exists)
         {
-
+            _logger.LogTrace("Could not find a file for view at path '{Path}'", normalizedPath);
             // If the file doesn't exist, we can't do compilation right now - we still want to cache
             // the fact that we tried. This will allow us to re-trigger compilation if the view file
             // is added.
@@ -286,6 +289,8 @@ internal class CollectibleRuntimeViewCompiler : IViewCompiler
                 ExpirationTokens = expirationTokens,
             };
         }
+
+        _logger.LogTrace("Found file at path '{Path}'", normalizedPath);
 
         GetChangeTokensFromImports(expirationTokens, projectItem);
 
