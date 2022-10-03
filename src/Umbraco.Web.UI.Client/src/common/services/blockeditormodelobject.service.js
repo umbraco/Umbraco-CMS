@@ -548,6 +548,7 @@
 
                     blockConfiguration = {
                         label: "Unsupported",
+                        labelInterpolator: "Unsupported",
                         unsupported: true
                     };
                 }
@@ -641,10 +642,10 @@
                 };
 
                 // first time instant update of label.
-                blockObject.label = blockObject.content.contentTypeName;
+                blockObject.label = blockObject.content?.contentTypeName || "";
                 blockObject.index = 0;
 
-                if (blockObject.config.label && blockObject.config.label !== "") {
+                if (blockObject.config.label && blockObject.config.label !== "" && blockObject.config.unsupported !== true) {
                     var labelElement = $('<div></div>', { text: blockObject.config.label});
 
                     var observer = new MutationObserver(function(mutations) {
@@ -664,7 +665,7 @@
                     blockObject.__renderLabel = function() {
 
                         var labelVars = {
-                            $contentTypeName: this.content.contentTypeName,
+                            $contentTypeName: this.content?.contentTypeName || "",
                             $settings: this.settingsData || {},
                             $layout: this.layout || {},
                             $index: this.index + 1,

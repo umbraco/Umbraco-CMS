@@ -32,6 +32,9 @@ namespace Umbraco.Cms.Core.PropertyEditors
             [DataMember(Name ="allowAtRoot")]
             public bool? AllowAtRoot { get; set; } = true;
 
+            [DataMember(Name ="allowInAreas")]
+            public bool? AllowInAreas { get; set; } = true;
+
             [DataMember(Name ="areaGridColumns")]
             public int? AreaGridColumns { get; set; }
 
@@ -60,9 +63,6 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 public int? MinAllowed { get; set; }
                  [DataMember(Name ="maxAllowed")]
                 public int? MaxAllowed { get; set; }
-
-                [DataMember(Name ="onlySpecifiedAllowance")]
-                public bool? OnlySpecifiedAllowance { get; set; }
 
                 [DataMember(Name ="specifiedAllowance")]
                 public BlockGridAreaConfigurationSpecifiedAllowance[] SpecifiedAllowance { get; set; }  = null!;

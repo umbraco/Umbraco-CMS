@@ -289,7 +289,7 @@
                 }
 
                 // Create areas that is not already created:
-                block.config.areas.forEach(areaConfig => {
+                block.config.areas?.forEach(areaConfig => {
                     const areaIndex = layoutEntry.areas.findIndex(x => x.key === areaConfig.key);
                     if(areaIndex === -1) {
                         layoutEntry.areas.push({
@@ -379,9 +379,10 @@
 
             if (block.config.unsupported === true) {
                 block.view = defaultViewFolderPath + "unsupportedblock/unsupportedblock.editor.html";
+            } else {
+                block.view = defaultViewFolderPath + "gridblock/gridblock.editor.html";
             }
             
-            block.view = defaultViewFolderPath + "gridblock/gridblock.editor.html";
         }
 
         /**
@@ -422,7 +423,7 @@
             block.showValidation = true;
 
             block.hideContentInOverlay = block.config.forceHideContentEditorInOverlay === true;
-            block.showContent = !block.hideContentInOverlay && block.content.variants[0].tabs[0]?.properties.length > 0;
+            block.showContent = !block.hideContentInOverlay && block.content?.variants[0].tabs[0]?.properties.length > 0;
             block.showSettings = block.config.settingsElementTypeKey != null;
 
             // If we have content, otherwise it doesn't make sense to copy.
@@ -617,30 +618,35 @@
 
             const area = parentBlock.layout.areas.find(x => x.key === areaKey);
 
-            if(area && area?.$config.onlySpecifiedAllowance) {
+            if(area) {
+                if(area.$config.specifiedAllowance.length > 0) {
 
-                const allowedElementTypes = [];
+                    const allowedElementTypes = [];
 
-                // Then add specific types (This allows to overwrite the amount for a specific type)
-                area.$config.specifiedAllowance?.forEach(allowance => {
-                    if(allowance.groupKey) {
-                        vm.availableBlockTypes.forEach(blockType => {
-                            if(blockType.blockConfigModel.groupKey === allowance.groupKey) {
-                                if(allowedElementTypes.indexOf(blockType) === -1) {
-                                    allowedElementTypes.push(blockType);
+                    // Then add specific types (This allows to overwrite the amount for a specific type)
+                    area.$config.specifiedAllowance?.forEach(allowance => {
+                        if(allowance.groupKey) {
+                            vm.availableBlockTypes.forEach(blockType => {
+                                if(blockType.blockConfigModel.groupKey === allowance.groupKey && blockType.blockConfigModel.allowInAreas === true) {
+                                    if(allowedElementTypes.indexOf(blockType) === -1) {
+                                        allowedElementTypes.push(blockType);
+                                    }
                                 }
+                            });
+                        } else 
+                        if(allowance.elementTypeKey) {
+                            const blockType = vm.availableBlockTypes.find(x => x.blockConfigModel.contentElementTypeKey === allowance.elementTypeKey);
+                            if(allowedElementTypes.indexOf(blockType) === -1) {
+                                allowedElementTypes.push(blockType);
                             }
-                        });
-                    } else 
-                    if(allowance.elementTypeKey) {
-                        const blockType = vm.availableBlockTypes.find(x => x.blockConfigModel.contentElementTypeKey === allowance.elementTypeKey);
-                        if(allowedElementTypes.indexOf(blockType) === -1) {
-                            allowedElementTypes.push(blockType);
                         }
-                    }
-                });
+                    });
 
-                return allowedElementTypes;
+                    return allowedElementTypes;
+                } else {
+                    // as none specifiedAllowance was defined we will allow all area Blocks:
+                    return vm.availableBlockTypes.filter(x => x.blockConfigModel.allowInAreas === true);
+                }
             }
             return vm.availableBlockTypes;
         }

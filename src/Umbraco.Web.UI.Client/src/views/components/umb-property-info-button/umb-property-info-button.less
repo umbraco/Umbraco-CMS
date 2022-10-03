@@ -99,3 +99,18 @@ umb-property-info-button {
 .umb-control-group:hover .umb-control-group:not(:hover) umb-property-info-button {
     opacity: 0;
 }
+
+
+
+.umb-group-panel > .umb-group-panel__header umb-property-info-button {
+    opacity: 0;
+}
+.umb-group-panel > .umb-group-panel__header umb-property-info-button:focus {
+    opacity: 1;
+}
+.umb-group-panel:focus-within, 
+.umb-group-panel:hover {
+    > .umb-group-panel__header umb-property-info-button {
+        opacity: 1;
+    }
+}

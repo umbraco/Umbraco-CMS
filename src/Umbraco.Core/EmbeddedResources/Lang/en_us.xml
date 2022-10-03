@@ -2879,7 +2879,9 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="allowedBlockRows">Available row spans</key>
     <key alias="allowedBlockRowsHelp">Define the range of layout rows this block is allowed to span across.</key>
     <key alias="allowBlockInRoot">Allow in root</key>
-    <key alias="allowBlockInRootHelp">Make this block available in the root of the layout. When disabled, this block can only be used within areas of other blocks in the layout.</key>
+    <key alias="allowBlockInRootHelp">Make this block available in the root of the layout.</key>
+    <key alias="allowBlockInAreas">Allow in areas</key>
+    <key alias="allowBlockInAreasHelp">Make this block available within other Blocks.</key>
     <key alias="areas">Areas</key>
     <key alias="areasLayoutColumns">Grid Columns for Areas</key>
     <key alias="areasLayoutColumnsHelp">Define how many columns that will be available for areas. If not defined, the number of columns defined for the entire layout will be used.</key>
@@ -2912,6 +2914,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="tabBlock">Block</key>
     <key alias="tabAreas">Areas</key>
     <key alias="tabAdvanced">Advanced</key>
+    <key alias="headlineAllowance">Allowance</key>
   </area>
   <area alias="contentTemplatesDashboard">
     <key alias="whatHeadline">What are Content Templates?</key>

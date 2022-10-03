@@ -18,7 +18,6 @@
 
         vm.area = $scope.model.area;
         vm.area.specifiedAllowance = vm.area.specifiedAllowance || [];
-        vm.area.onlySpecifiedAllowance = vm.area.onlySpecifiedAllowance || false;
 
         vm.minMaxModel = {
             hideLabel: true,

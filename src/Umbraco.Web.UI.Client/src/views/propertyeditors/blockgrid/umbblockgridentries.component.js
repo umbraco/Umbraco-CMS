@@ -31,6 +31,11 @@
     }
 
 
+    function isWithinRect(x, y, rect, modifier) {
+        return (x > rect.left - modifier && x < rect.right + modifier && y > rect.top - modifier && y < rect.bottom + modifier);
+    }
+
+
 
     /**
      * @ngdoc directive
@@ -99,6 +104,8 @@
                 var isMaxRequirementGood = vm.areaConfig.maxAllowed == null || vm.entries.length <= vm.areaConfig.maxAllowed;
                 vm.entriesForm.areaMaxCount.$setValidity("areaMaxCount", isMaxRequirementGood);
 
+                vm.invalidBlockTypes = [];
+
                 vm.areaConfig.specifiedAllowance.forEach(allowance => {
 
                     const minAllowed = allowance.minAllowed || 0;
@@ -107,9 +114,7 @@
                     // For block groups:
                     if(allowance.groupKey) {
 
-                        vm.invalidBlockTypes = vm.invalidBlockTypes.filter(type => type.groupKey !== allowance.groupKey)
-
-                        const groupElementTypeKeys = vm.locallyAvailableBlockTypes.filter(blockType => blockType.blockConfigModel.groupKey === allowance.groupKey);
+                        const groupElementTypeKeys = vm.locallyAvailableBlockTypes.filter(blockType => blockType.blockConfigModel.groupKey === allowance.groupKey && blockType.blockConfigModel.allowInAreas === true).map(x => x.blockConfigModel.contentElementTypeKey);
                         const groupAmount = vm.entries.filter(entry => groupElementTypeKeys.indexOf(entry.$block.data.contentTypeKey) !== -1).length;
 
                         if(groupAmount < minAllowed || (maxAllowed > 0 && groupAmount > maxAllowed)) {
@@ -125,14 +130,12 @@
                     // For specific elementTypes:
                     if(allowance.elementTypeKey) {
 
-                        vm.invalidBlockTypes = vm.invalidBlockTypes.filter(type => type.key !== allowance.elementTypeKey)
-                        
                         const amount = vm.entries.filter(entry => entry.$block.data.contentTypeKey === allowance.elementTypeKey).length;
                         
                         if(amount < minAllowed || (maxAllowed > 0 && amount > maxAllowed)) {
                             vm.invalidBlockTypes.push({
                                 'key': allowance.elementTypeKey,
-                                'name': vm.locallyAvailableBlockTypes.find(blockType => blockType.elementTypeModel.name).elementTypeModel.name,
+                                'name': vm.locallyAvailableBlockTypes.find(blockType => blockType.blockConfigModel.contentElementTypeKey === allowance.elementTypeKey).elementTypeModel.name,
                                 'amount': amount,
                                 'minRequirement': minAllowed,
                                 'maxRequirement': maxAllowed
@@ -312,13 +315,31 @@
                 ghostRect = ghostEl.getBoundingClientRect();
                 //relatedRect = relatedEl?.getBoundingClientRect();
 
-                const insideGhost = dragX > ghostRect.left && dragX < ghostRect.right && dragY > ghostRect.top && dragY < ghostRect.bottom;
-                // We do not necessary have a related element jet, if so we can conclude we are outside ist rectangle.
-                //const insideRelated = relatedRect ? (dragX > relatedRect.left && dragX < relatedRect.right && dragY > relatedRect.top && dragY < relatedRect.bottom) : false;
-                //!insideGhost && 
+                const insideGhost = isWithinRect(dragX, dragY, ghostRect);
                 if (!insideGhost) {
-                    // We do not hover something meaningful, so lets try to find a solution:
-                    
+
+                    var approvedContainerRect = approvedContainerEl.getBoundingClientRect();
+
+                    const approvedContainerHasItems = approvedContainerEl.querySelector('.umb-block-grid__layout-item:not(.umb-block-grid__layout-item-placeholder)');
+                    if(!approvedContainerHasItems && isWithinRect(dragX, dragY, approvedContainerRect, 100) || approvedContainerHasItems && isWithinRect(dragX, dragY, approvedContainerRect, -10)) {
+                        // we are good...
+                    } else {
+                        var parentContainer = approvedContainerEl.parentNode.closest('.umb-block-grid__layout-container');
+                        if(parentContainer) {
+
+                            const containerVM = parentContainer['Sortable:controller']();
+
+                            if(containerVM.sortGroupIdentifier === vm.sortGroupIdentifier) {
+
+                                if(_indication(containerVM, ghostEl)) {
+                                    approvedContainerEl = parentContainer;
+                                    approvedContainerRect = approvedContainerEl.getBoundingClientRect();
+                                }
+                            }
+                        }
+                    }
+
+                    // gather elements on the same row.
                     let elementInSameRow = [];
                     const containerElements = Array.from(approvedContainerEl.children);
                     for (const el of containerElements) {
@@ -342,8 +363,6 @@
                         }
                     });
 
-                    //console.log("place ", placeAfter, "related to", foundRelatedEl);
-
                     if (foundRelatedEl === ghostEl) {
                         console.error("NO ghostEl was found!!! not good!!!");
                         return;
@@ -351,17 +370,39 @@
 
                     if (foundRelatedEl) {
 
-                        let newIndex = containerElements.indexOf(foundRelatedEl);
-                        if (newIndex === -1) {
-                            console.error("newIndex not found!!!, this situation needs to be dealt with, TODO.");
-                        }
 
+                        let newIndex = containerElements.indexOf(foundRelatedEl);
 
                         const foundRelatedElRect = foundRelatedEl.getBoundingClientRect();
 
                         // Ghost is already on same line and we are not hovering the related element?
                         const ghostCenterY = ghostRect.top + (ghostRect.height*.5);
-                        const isInsideFoundRelated = (dragX > foundRelatedElRect.left && dragX < foundRelatedElRect.right && dragY > foundRelatedElRect.top && dragY < foundRelatedElRect.bottom);
+                        const isInsideFoundRelated = isWithinRect(dragX, dragY, foundRelatedElRect, 0);
+                        
+
+                        if (isInsideFoundRelated && foundRelatedEl.classList.contains('--has-areas')) {
+                            // If mouse is on top of an area, then make that the new approvedContainer?
+                            const blockView = foundRelatedEl.querySelector('.umb-block-grid__block--view');
+                            const subLayouts = blockView.querySelectorAll('.umb-block-grid__layout-container');
+                            for (const subLayout of subLayouts) {
+                                const subLayoutRect = subLayout.getBoundingClientRect();
+                                const hasItems = subLayout.querySelector('.umb-block-grid__layout-item:not(.umb-block-grid__layout-item-placeholder)');
+                                // gather elements on the same row.
+                                if(!hasItems && isWithinRect(dragX, dragY, subLayoutRect, 100) || hasItems && isWithinRect(dragX, dragY, subLayoutRect, -10)) {
+                                    
+                                    var subVm = subLayout['Sortable:controller']();
+                                    if(subVm.sortGroupIdentifier === vm.sortGroupIdentifier) {
+                                        if(_indication(subVm, ghostEl)) {
+                                            approvedContainerEl = subLayout;
+                                            _moveGhostElement();
+                                            return;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        
+                        
                         if (ghostCenterY > foundRelatedElRect.top && ghostCenterY < foundRelatedElRect.bottom && !isInsideFoundRelated) {
                             console.log("Ghost is already on same line and we are not hovering the related element?")
                             return;
@@ -385,7 +426,7 @@
                                 } else {
 
                                     // TODO: move calculations out so they can be persisted a bit longer?
-                                    const approvedContainerRect = approvedContainerEl.getBoundingClientRect();
+                                    //const approvedContainerRect = approvedContainerEl.getBoundingClientRect();
                                     const approvedContainerComputedStyles = getComputedStyle(approvedContainerEl);
                                     const gridColumnNumber = parseInt(approvedContainerComputedStyles.getPropertyValue("--umb-block-grid--grid-columns"), 10);
 
@@ -441,7 +482,7 @@
                     }
 
                     // If above or below container, we will go first or last.
-                    const approvedContainerRect = approvedContainerEl.getBoundingClientRect();
+                    
                     if(dragY < approvedContainerRect.top) {
                         const firstEl = containerElements[0];
                         if (firstEl) {
@@ -474,7 +515,7 @@
                     ghostRect = ghostEl.getBoundingClientRect();
                     //relatedRect = relatedEl?.getBoundingClientRect();
 
-                    const insideGhost = dragX > ghostRect.left && dragX < ghostRect.right && dragY > ghostRect.top && dragY < ghostRect.bottom;
+                    const insideGhost = isWithinRect(dragX, dragY, ghostRect, 0);
                     //const insideRelated = relatedRect ? (dragX > relatedRect.left && dragX < relatedRect.right && dragY > relatedRect.top && dragY < relatedRect.bottom) : false;
                     
                     if (!insideGhost) {
@@ -536,8 +577,10 @@
                 }
             }
 
+            vm.sortGroupIdentifier = "BlockGridEditor_"+vm.blockEditorApi.internal.uniqueEditorKey;
+
             const sortable = Sortable.create(gridLayoutContainerEl, {
-                group: "BlockGridEditor_"+vm.blockEditorApi.internal.uniqueEditorKey,  // links groups with same name.
+                group: vm.sortGroupIdentifier,  // links groups with same name.
                 sort: true,  // sorting inside list
                 //delay: 0, // time in milliseconds to define when the sorting should start
                 //delayOnTouchOnly: false, // only delay if user is using touch
@@ -578,7 +621,7 @@
 
                 dragoverBubble: true,
                 //removeCloneOnHide: true, // Remove the clone element when it is not showing, rather than just hiding it
-                emptyInsertThreshold: 160, // px, distance mouse must be from empty sortable to insert drag element into it
+                emptyInsertThreshold: 40, // px, distance mouse must be from empty sortable to insert drag element into it
 
                 scrollSensitivity: 50,
                 scrollSpeed: 16,
@@ -633,9 +676,9 @@
                     //relatedRect = evt.related.getBoundingClientRect();
                     targetRect = evt.to.getBoundingClientRect();
                     ghostRect = evt.draggedRect;
-
+                    /*
                     // if cursor is within the ghostBox, then a move will be prevented:
-                    if(dragX > ghostRect.left && dragX < ghostRect.right && dragY > ghostRect.top && dragY < ghostRect.bottom) {
+                    if(isWithinRect(dragX, dragY, ghostRect, 0)) {
                         return false;
                     }
 
@@ -645,10 +688,11 @@
                     }
 
                     // same properties as onEnd
+                    
                     if(_indication(contextVM, evt.dragged) === false) {
                         return false;
                     }
-
+                    
                     if(evt.to !== approvedContainerEl) {
 
                         if(approvedContainerDate) {
@@ -667,6 +711,7 @@
                         // Always return false, cause it ends bad when sortableJS tries to do it..
                         return false;
                     }
+                    */
     
                     // Disable SortableJS from handling the drop, instead we will use our own.
                     return false;
@@ -724,6 +769,7 @@
                     vm.movingLayoutEntry = null;
                     targetRect = null;
                     ghostRect = null;
+                    ghostEl = null;
                     //relatedRect = null;
                     relatedEl = null;
                 }
