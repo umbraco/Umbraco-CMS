@@ -643,7 +643,7 @@
 
                     return allowedElementTypes;
                 } else {
-                    // allow all area Blocks:
+                    // as none specifiedAllowance was defined we will allow all area Blocks:
                     vm.availableBlockTypes.filter(x => x.blockConfigModel.allowInArea);
                 }
             }

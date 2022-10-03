@@ -25,7 +25,6 @@ blocks: [
                 rowSpan: 1,
                 minAllowed: 1,
                 maxAllowed: 2,
-                onlySpecifiedAllowance: true,
                 specifiedAllowance: [{
                         elementTypeKey: 345;
                         minAllowed: 1,

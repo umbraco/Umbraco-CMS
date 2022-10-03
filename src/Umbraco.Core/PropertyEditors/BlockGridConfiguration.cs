@@ -64,9 +64,6 @@ namespace Umbraco.Cms.Core.PropertyEditors
                  [DataMember(Name ="maxAllowed")]
                 public int? MaxAllowed { get; set; }
 
-                [DataMember(Name ="onlySpecifiedAllowance")]
-                public bool? OnlySpecifiedAllowance { get; set; }
-
                 [DataMember(Name ="specifiedAllowance")]
                 public BlockGridAreaConfigurationSpecifiedAllowance[] SpecifiedAllowance { get; set; }  = null!;
 
