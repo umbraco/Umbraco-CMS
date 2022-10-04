@@ -680,27 +680,26 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
             if (isDate(value)) {
                 value = value.substring(0, value.length - 3);
             }
+
             if (e.nameExp) {
-                value = resolveExpression(e, result, value, alias, 0);
+                if (e.nameTemplate.indexOf('|') > -1) {
+                    value = {
+                      value,
+                      expression: e.nameExp
+                    };
+                }
+                else {
+                    var newValue = e.nameExp({ value });
+
+                    if (newValue && (newValue = newValue.trim())) {
+                      value = newValue;
+                    }
+                }
             }
 
             // set what we've got on the result
             result[alias] = value;
         });
-    }
-
-    function resolveExpression(e, result, value, alias, retestCount) {
-        var newValue = e.nameExp({ value });
-        if (newValue && newValue.startsWith('Loading...') && retestCount < 5) {
-            retestCount++;
-            $timeout(function () {
-              resolveExpression(e, result, value, alias, retestCount);
-            }, retestCount * 1000);
-        }
-        if (newValue && (newValue = newValue.trim())) {
-            result[alias] = newValue;
-        }
-        return newValue;
     }
 
     function isDate(val) {
