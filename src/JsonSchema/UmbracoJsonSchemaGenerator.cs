@@ -1,11 +1,10 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Net.Http;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NJsonSchema.Generation;
+using Umbraco.Cms.Core.Configuration.Models;
 
 namespace JsonSchema
 {
@@ -49,6 +48,9 @@ namespace JsonSchema
         private JObject GenerateUmbracoSchema()
         {
             NJsonSchema.JsonSchema schema = _innerGenerator.Generate(typeof(AppSettings));
+
+            // TODO: when the "UmbracoPath" setter is removed from "GlobalSettings" (scheduled for V12), remove this line as well
+            schema.Definitions["UmbracoCmsCoreConfigurationModelsGlobalSettings"]?.Properties?.Remove(nameof(GlobalSettings.UmbracoPath));
 
             return JsonConvert.DeserializeObject<JObject>(schema.ToJson())!;
         }
