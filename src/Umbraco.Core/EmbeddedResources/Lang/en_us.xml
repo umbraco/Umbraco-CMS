@@ -2875,7 +2875,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="sizeOptions">Size options</key>
     <key alias="sizeOptionsHelp">Define one or more size options, this enables resizing of the Block</key>
     <key alias="allowedBlockColumns">Available column spans</key>
-    <key alias="allowedBlockColumnsHelp">Define the different number of columns this block is allowed to span across. This does not prevent Blocks from Areas of a smaller column span.</key>
+    <key alias="allowedBlockColumnsHelp">Define the different number of columns this block is allowed to span across. This does not prevent Blocks to be placed in Areas of a smaller column span.</key>
     <key alias="allowedBlockRows">Available row spans</key>
     <key alias="allowedBlockRowsHelp">Define the range of layout rows this block is allowed to span across.</key>
     <key alias="allowBlockInRoot">Allow in root</key>
@@ -2912,6 +2912,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="allowanceMaximum">Set maximum requirement for this allowance</key>
     <key alias="block">Block</key>
     <key alias="tabBlock">Block</key>
+    <key alias="tabBlockTypeSettings">Settings</key>
     <key alias="tabAreas">Areas</key>
     <key alias="tabAdvanced">Advanced</key>
     <key alias="headlineAllowance">Allowance</key>

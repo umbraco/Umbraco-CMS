@@ -18,26 +18,24 @@
         
         vm.navigation = [];
 
-        localizationService.localizeMany(["blockEditor_tabBlockTypeStructure", "blockEditor_tabAdvance"]).then(
+        localizationService.localizeMany(["blockEditor_tabBlockTypeSettings", "blockEditor_tabAreas", "blockEditor_tabAdvanced"]).then(
             function (data) {
-
-                // TODO. localizations.
                 
                 vm.navigation = [{
                     "alias": "block",
-                    "name": "Settings",
+                    "name": data[0],
                     "icon": "icon-settings",
                     "view": ""
                 },
                 {
                     "alias": "areas",
-                    "name": "Areas",//data[1]
+                    "name": data[1],
                     "icon": "icon-layout",
                     "view": ""
                 },
                 {
                     "alias": "advance",
-                    "name": "Advanced",//data[1]
+                    "name": data[2],
                     "icon": "icon-lab",
                     "view": ""
                 }];
