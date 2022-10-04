@@ -4,15 +4,15 @@ import { customElement, state } from 'lit/decorators.js';
 import { UmbContextProviderMixin } from '../../../../../core/context';
 import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { InterfaceColor, InterfaceLook } from '@umbraco-ui/uui-base/lib/types';
-import { IRoute } from 'router-slot';
+import { IRoute, IRoutingInfo } from 'router-slot';
 import { v4 as uuidv4 } from 'uuid';
 import './list-view-layouts/table/editor-view-users-table.element';
 import './list-view-layouts/grid/editor-view-users-grid.element';
 import './editor-view-users-selection.element';
-import './editor-view-users-user-details.element';
 import './editor-view-users-invite.element';
 
 import type { UserDetails, UserEntity } from '../../../../../core/models';
+import type { UmbEditorViewUsersUserDetailsElement } from './editor-view-users-user-details.element';
 
 @customElement('umb-editor-view-users')
 export class UmbEditorViewUsersElement extends UmbContextProviderMixin(LitElement) {
@@ -31,6 +31,10 @@ export class UmbEditorViewUsersElement extends UmbContextProviderMixin(LitElemen
 		{
 			path: 'details/:key',
 			component: () => import('./editor-view-users-user-details.element'),
+			setup: (component: unknown, info: IRoutingInfo) => {
+				const element = component as UmbEditorViewUsersUserDetailsElement;
+				element.key = info.match.params.key;
+			},
 		},
 		{
 			path: '**',

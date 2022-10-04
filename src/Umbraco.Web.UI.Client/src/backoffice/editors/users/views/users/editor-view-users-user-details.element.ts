@@ -1,10 +1,12 @@
 import { css, html, LitElement, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, state } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import { UmbContextConsumerMixin } from '../../../../../core/context';
-import UmbEditorViewUsersElement, { UserItem } from './editor-view-users.element';
+import UmbEditorViewUsersElement from './editor-view-users.element';
 import { Subscription } from 'rxjs';
 import '../../../../property-editors/content-picker/property-editor-content-picker.element';
+import { UmbUserStore } from '../../../../../core/stores/user/user.store';
+import { UserDetails } from '../../../../../core/models';
 
 @customElement('umb-editor-view-users-user-details')
 export class UmbEditorViewUsersUserDetailsElement extends UmbContextConsumerMixin(LitElement) {
@@ -75,51 +77,34 @@ export class UmbEditorViewUsersUserDetailsElement extends UmbContextConsumerMixi
 	];
 
 	@state()
-	private _users: Array<UserItem> = [];
+	private _user?: UserDetails | null;
 
-	@state()
-	private _user?: UserItem;
+	@property()
+	public key = '';
 
-	private _userKey = '';
-
-	protected _usersContext?: UmbEditorViewUsersElement;
+	protected _userStore?: UmbUserStore;
 	protected _usersSubscription?: Subscription;
 
 	private _languages = []; //TODO Add languages
 
 	connectedCallback(): void {
 		super.connectedCallback();
-		this.consumeContext('umbUsersContext', (usersContext: UmbEditorViewUsersElement) => {
-			this._usersContext = usersContext;
+		this.consumeContext('umbUserStore', (usersContext: UmbUserStore) => {
+			this._userStore = usersContext;
 
 			this._usersSubscription?.unsubscribe();
-			this._usersSubscription = this._usersContext?.users.subscribe((users: Array<UserItem>) => {
-				this._users = users;
-				this._initUser();
+			this._usersSubscription = this._userStore?.getByKey(this.key).subscribe((user) => {
+				this._user = user;
 			});
 		});
 
-		// get user id from url path
-		const path = window.location.pathname;
-		const pathParts = path.split('/');
-		this._userKey = pathParts[pathParts.length - 1];
-
-		this._initUser();
+		console.log(this.key);
 	}
 
 	disconnectedCallback(): void {
 		super.disconnectedCallback();
 
 		this._usersSubscription?.unsubscribe();
-	}
-
-	private _initUser() {
-		this._user = this._users.find((user: UserItem) => user.key === this._userKey);
-
-		const index = this._languages.findIndex((language) => language.value === this._user?.language);
-		if (index !== -1) {
-			this._languages[index].selected = true;
-		}
 	}
 
 	private _updateUserStatus() {
@@ -129,13 +114,13 @@ export class UmbEditorViewUsersUserDetailsElement extends UmbContextConsumerMixi
 		const newUser = this._user;
 		newUser.status = newStatus;
 
-		this._usersContext?.updateUser(newUser);
+		// this._userStore?.updateUser(newUser);
 	}
 
 	private _deleteUser() {
 		if (!this._user) return;
 
-		this._usersContext?.deleteUser(this._user.key);
+		// this._userStore?.deleteUser(this._user.key);
 		history.back(); //TODO Should redirect to users section
 	}
 
@@ -193,9 +178,9 @@ export class UmbEditorViewUsersUserDetailsElement extends UmbContextConsumerMixi
 	}
 
 	private renderRightColumn() {
-		if (!this._user || !this._usersContext) return nothing;
+		if (!this._user || !this._userStore) return nothing;
 
-		const status = this._usersContext.getTagLookAndColor(this._user.status);
+		// const status = this._userStore.getTagLookAndColor(this._user.status);
 		return html` <uui-box>
 			<div id="user-info">
 				<uui-avatar .name=${this._user?.name || ''}></uui-avatar>
@@ -255,7 +240,7 @@ export class UmbEditorViewUsersUserDetailsElement extends UmbContextConsumerMixi
 	}
 
 	render() {
-		if (!this._user || !this._usersContext) return html`User not found`;
+		if (!this._user) return html`User not found`;
 
 		return html`
 			<div id="left-column">${this.renderLeftColumn()}</div>

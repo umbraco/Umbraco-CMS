@@ -1,4 +1,5 @@
 import { rest } from 'msw';
+import type { UserDetails } from '../../core/models';
 import { umbUsersData } from '../data/users.data';
 
 // TODO: add schema
@@ -17,6 +18,15 @@ export const handlers = [
 
 		const user = umbUsersData.getByKey(key);
 
-		return res(ctx.status(200), ctx.json([user]));
+		return res(ctx.status(200), ctx.json(user));
+	}),
+
+	rest.post<UserDetails[]>('/umbraco/backoffice/users/save', async (req, res, ctx) => {
+		const data = await req.json();
+		if (!data) return;
+
+		const saved = umbUsersData.save(data);
+
+		return res(ctx.status(200), ctx.json(saved));
 	}),
 ];

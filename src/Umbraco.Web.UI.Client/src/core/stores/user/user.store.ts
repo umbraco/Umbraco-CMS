@@ -1,5 +1,5 @@
 import { map, Observable } from 'rxjs';
-import type { UserEntity } from '../../models';
+import type { UserDetails, UserEntity } from '../../models';
 import { UmbEntityStore } from '../entity.store';
 import { UmbDataStoreBase } from '../store';
 
@@ -9,7 +9,7 @@ import { UmbDataStoreBase } from '../store';
  * @extends {UmbDataStoreBase<UserEntity>}
  * @description - Data Store for Users
  */
-export class UmbUserStore extends UmbDataStoreBase<UserEntity> {
+export class UmbUserStore extends UmbDataStoreBase<UserDetails> {
 	private _entityStore: UmbEntityStore;
 
 	constructor(entityStore: UmbEntityStore) {
@@ -17,7 +17,7 @@ export class UmbUserStore extends UmbDataStoreBase<UserEntity> {
 		this._entityStore = entityStore;
 	}
 
-	getAll(): Observable<Array<UserEntity>> {
+	getAll(): Observable<Array<UserDetails>> {
 		// TODO: use Fetcher API.
 		// TODO: only fetch if the data type is not in the store?
 		fetch(`/umbraco/backoffice/users`)
@@ -35,19 +35,42 @@ export class UmbUserStore extends UmbDataStoreBase<UserEntity> {
 	 * @return {*}  {(Observable<DataTypeDetails | null>)}
 	 * @memberof UmbDataTypeStore
 	 */
-	getByKey(key: string): Observable<UserEntity | null> {
+	getByKey(key: string): Observable<UserDetails | null> {
 		// TODO: use Fetcher API.
 		// TODO: only fetch if the data type is not in the store?
 		fetch(`/umbraco/backoffice/users/${key}`)
 			.then((res) => res.json())
 			.then((data) => {
-				console.log('getByKey', data);
-				this.update(data);
+				this.update([data]);
 			});
 
 		return this.items.pipe(
-			map((dataTypes: Array<UserEntity>) => dataTypes.find((node: UserEntity) => node.key === key) || null)
+			map((items: Array<UserDetails>) => items.find((node: UserDetails) => node.key === key) || null)
 		);
+	}
+
+	/**
+	 * @description - Save a Data Type.
+	 * @param {Array<DataTypeDetails>} dataTypes
+	 * @memberof UmbDataTypeStore
+	 * @return {*}  {Promise<void>}
+	 */
+	async save(users: Array<UserDetails>): Promise<void> {
+		// TODO: use Fetcher API.
+		try {
+			const res = await fetch('/umbraco/backoffice/users/save', {
+				method: 'POST',
+				body: JSON.stringify(users),
+				headers: {
+					'Content-Type': 'application/json',
+				},
+			});
+			const json = await res.json();
+			this.update(json);
+			this._entityStore.update(json);
+		} catch (error) {
+			console.error('Save Data Type error', error);
+		}
 	}
 
 	// public updateUser(user: UserItem) {
