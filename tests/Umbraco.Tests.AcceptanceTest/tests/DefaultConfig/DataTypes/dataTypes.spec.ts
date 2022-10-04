@@ -55,7 +55,6 @@ test.describe('DataTypes', () => {
     await expect(await page.locator('.umb-button__overlay')).not.toBeVisible();
 
     // Pick another colour to verify both work
-    await page.waitForTimeout(5000);
     await page.locator('.btn-FF0000').click();
 
     // Save
@@ -63,7 +62,6 @@ test.describe('DataTypes', () => {
     await umbracoUi.isSuccessNotificationVisible();
     await expect(await umbracoUi.getSuccessNotification()).toBeVisible();
     await expect(await page.locator('.umb-button__overlay')).not.toBeVisible();
-    await page.waitForTimeout(5000);
 
     // Assert
     const expected2 = '<p style="color:FF0000">Lorem ipsum dolor sit amet</p>';
@@ -174,9 +172,6 @@ test.describe('DataTypes', () => {
 
     // Assert
     await expect(await umbracoUi.getErrorNotification()).not.toBeVisible();
-
-    // ugly , but wait for cache to be rebuilt after saving
-    await page.waitForTimeout(1000);
     
     // Testing if the edits match the expected results
     const expected = '<a href="/">UrlPickerContent</a>';
