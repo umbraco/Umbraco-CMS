@@ -316,183 +316,184 @@
                 //relatedRect = relatedEl?.getBoundingClientRect();
 
                 const insideGhost = isWithinRect(dragX, dragY, ghostRect);
-                if (!insideGhost) {
+                if (insideGhost) {
+                    return;
+                }
 
-                    var approvedContainerRect = approvedContainerEl.getBoundingClientRect();
+                var approvedContainerRect = approvedContainerEl.getBoundingClientRect();
 
-                    const approvedContainerHasItems = approvedContainerEl.querySelector('.umb-block-grid__layout-item:not(.umb-block-grid__layout-item-placeholder)');
-                    if(!approvedContainerHasItems && isWithinRect(dragX, dragY, approvedContainerRect, 100) || approvedContainerHasItems && isWithinRect(dragX, dragY, approvedContainerRect, -10)) {
-                        // we are good...
-                    } else {
-                        var parentContainer = approvedContainerEl.parentNode.closest('.umb-block-grid__layout-container');
-                        if(parentContainer) {
+                const approvedContainerHasItems = approvedContainerEl.querySelector('.umb-block-grid__layout-item:not(.umb-block-grid__layout-item-placeholder)');
+                if(!approvedContainerHasItems && isWithinRect(dragX, dragY, approvedContainerRect, 100) || approvedContainerHasItems && isWithinRect(dragX, dragY, approvedContainerRect, -10)) {
+                    // we are good...
+                } else {
+                    var parentContainer = approvedContainerEl.parentNode.closest('.umb-block-grid__layout-container');
+                    if(parentContainer) {
 
-                            const containerVM = parentContainer['Sortable:controller']();
+                        if(parentContainer['Sortable:controller']().sortGroupIdentifier === vm.sortGroupIdentifier) {
+                            approvedContainerEl = parentContainer;
+                            approvedContainerRect = approvedContainerEl.getBoundingClientRect();
+                        }
+                    }
+                }
 
-                            if(containerVM.sortGroupIdentifier === vm.sortGroupIdentifier) {
+                // gather elements on the same row.
+                let elementInSameRow = [];
+                const containerElements = Array.from(approvedContainerEl.children);
+                for (const el of containerElements) {
+                    const elRect = el.getBoundingClientRect();
+                    // gather elements on the same row.
+                    if(dragY >= elRect.top && dragY <= elRect.bottom && el !== ghostEl) {
+                        elementInSameRow.push({el: el, rect:elRect});
+                    }
+                }
 
-                                if(_indication(containerVM, ghostEl)) {
-                                    approvedContainerEl = parentContainer;
-                                    approvedContainerRect = approvedContainerEl.getBoundingClientRect();
+                let lastDistance = 99999;
+                let foundRelatedEl = null;
+                let placeAfter = false;
+                elementInSameRow.forEach( sameRow => {
+                    const centerX = (sameRow.rect.left + (sameRow.rect.width*.5));
+                    let distance = Math.abs(dragX - centerX);
+                    if(distance < lastDistance) {
+                        foundRelatedEl = sameRow.el;
+                        lastDistance = Math.abs(distance);
+                        placeAfter = dragX > centerX;
+                    }
+                });
+
+                if (foundRelatedEl === ghostEl) {
+                    return;
+                }
+
+                if (foundRelatedEl) {
+
+
+                    let newIndex = containerElements.indexOf(foundRelatedEl);
+
+                    const foundRelatedElRect = foundRelatedEl.getBoundingClientRect();
+
+                    // Ghost is already on same line and we are not hovering the related element?
+                    const ghostCenterY = ghostRect.top + (ghostRect.height*.5);
+                    const isInsideFoundRelated = isWithinRect(dragX, dragY, foundRelatedElRect, 0);
+                    
+
+                    if (isInsideFoundRelated && foundRelatedEl.classList.contains('--has-areas')) {
+                        // If mouse is on top of an area, then make that the new approvedContainer?
+                        const blockView = foundRelatedEl.querySelector('.umb-block-grid__block--view');
+                        const subLayouts = blockView.querySelectorAll('.umb-block-grid__layout-container');
+                        for (const subLayout of subLayouts) {
+                            const subLayoutRect = subLayout.getBoundingClientRect();
+                            const hasItems = subLayout.querySelector('.umb-block-grid__layout-item:not(.umb-block-grid__layout-item-placeholder)');
+                            // gather elements on the same row.
+                            if(!hasItems && isWithinRect(dragX, dragY, subLayoutRect, 100) || hasItems && isWithinRect(dragX, dragY, subLayoutRect, -10)) {
+                                
+                                var subVm = subLayout['Sortable:controller']();
+                                if(subVm.sortGroupIdentifier === vm.sortGroupIdentifier) {
+                                    //if(_indication(subVm, ghostEl)) {
+                                        approvedContainerEl = subLayout;
+                                        _moveGhostElement();
+                                        return;
+                                    //}
                                 }
                             }
                         }
                     }
-
-                    // gather elements on the same row.
-                    let elementInSameRow = [];
-                    const containerElements = Array.from(approvedContainerEl.children);
-                    for (const el of containerElements) {
-                        const elRect = el.getBoundingClientRect();
-                        // gather elements on the same row.
-                        if(dragY >= elRect.top && dragY <= elRect.bottom && el !== ghostEl) {
-                            elementInSameRow.push({el: el, rect:elRect});
-                        }
-                    }
-
-                    let lastDistance = 99999;
-                    let foundRelatedEl = null;
-                    let placeAfter = false;
-                    elementInSameRow.forEach( sameRow => {
-                        const centerX = (sameRow.rect.left + (sameRow.rect.width*.5));
-                        let distance = Math.abs(dragX - centerX);
-                        if(distance < lastDistance) {
-                            foundRelatedEl = sameRow.el;
-                            lastDistance = Math.abs(distance);
-                            placeAfter = dragX > centerX;
-                        }
-                    });
-
-                    if (foundRelatedEl === ghostEl) {
-                        console.error("NO ghostEl was found!!! not good!!!");
+                    
+                    if (ghostCenterY > foundRelatedElRect.top && ghostCenterY < foundRelatedElRect.bottom && !isInsideFoundRelated) {
                         return;
                     }
 
-                    if (foundRelatedEl) {
-
-
-                        let newIndex = containerElements.indexOf(foundRelatedEl);
-
-                        const foundRelatedElRect = foundRelatedEl.getBoundingClientRect();
-
-                        // Ghost is already on same line and we are not hovering the related element?
-                        const ghostCenterY = ghostRect.top + (ghostRect.height*.5);
-                        const isInsideFoundRelated = isWithinRect(dragX, dragY, foundRelatedElRect, 0);
-                        
-
-                        if (isInsideFoundRelated && foundRelatedEl.classList.contains('--has-areas')) {
-                            // If mouse is on top of an area, then make that the new approvedContainer?
-                            const blockView = foundRelatedEl.querySelector('.umb-block-grid__block--view');
-                            const subLayouts = blockView.querySelectorAll('.umb-block-grid__layout-container');
-                            for (const subLayout of subLayouts) {
-                                const subLayoutRect = subLayout.getBoundingClientRect();
-                                const hasItems = subLayout.querySelector('.umb-block-grid__layout-item:not(.umb-block-grid__layout-item-placeholder)');
-                                // gather elements on the same row.
-                                if(!hasItems && isWithinRect(dragX, dragY, subLayoutRect, 100) || hasItems && isWithinRect(dragX, dragY, subLayoutRect, -10)) {
-                                    
-                                    var subVm = subLayout['Sortable:controller']();
-                                    if(subVm.sortGroupIdentifier === vm.sortGroupIdentifier) {
-                                        if(_indication(subVm, ghostEl)) {
-                                            approvedContainerEl = subLayout;
-                                            _moveGhostElement();
-                                            return;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        
-                        
-                        if (ghostCenterY > foundRelatedElRect.top && ghostCenterY < foundRelatedElRect.bottom && !isInsideFoundRelated) {
-                            console.log("Ghost is already on same line and we are not hovering the related element?")
-                            return;
-                        }
-
-                        let verticalDirection = false;
-                        if (ghostEl.dataset.forceLeft) {
-                            placeAfter = true;
-                        } else if (ghostEl.dataset.forceRight) {
-                            placeAfter = true;
-                        } else {
-                            //if(isInsideFoundRelated) {
-
-                                // if the related element is forceLeft and we are in the left side, we will set vertical direction, to correct placeAfter.
-                                if (foundRelatedEl.dataset.forceLeft && placeAfter === false) {
-                                    verticalDirection = true;
-                                } else 
-                                // if the related element is forceRight and we are in the right side, we will set vertical direction, to correct placeAfter.
-                                if (foundRelatedEl.dataset.forceRight && placeAfter === true) {
-                                    verticalDirection = true;
-                                } else {
-
-                                    // TODO: move calculations out so they can be persisted a bit longer?
-                                    //const approvedContainerRect = approvedContainerEl.getBoundingClientRect();
-                                    const approvedContainerComputedStyles = getComputedStyle(approvedContainerEl);
-                                    const gridColumnNumber = parseInt(approvedContainerComputedStyles.getPropertyValue("--umb-block-grid--grid-columns"), 10);
-
-                                    const relatedColumns = parseInt(foundRelatedEl.dataset.colSpan, 10);
-                                    const ghostColumns = parseInt(ghostEl.dataset.colSpan, 10);
-
-                                    // Get grid template:
-                                    const approvedContainerGridColumns = approvedContainerComputedStyles.gridTemplateColumns.trim().split("px").map(x => Number(x)).filter(n => n > 0);
-
-                                    // ensure all columns are there.
-                                    // This will also ensure handling non-css-grid mode,
-                                    // use container width divided by amount of columns( or the item width divided by its amount of columnSpan)
-                                    let amountOfColumnsInWeightMap = approvedContainerGridColumns.length;
-                                    const amountOfUnknownColumns = gridColumnNumber-amountOfColumnsInWeightMap;
-                                    if(amountOfUnknownColumns > 0) {
-                                        let accumulatedValue = getAccumulatedValueOfIndex(amountOfColumnsInWeightMap, approvedContainerGridColumns) || 0;
-                                        const layoutWidth = approvedContainerRect.width;
-                                        const missingColumnWidth = (layoutWidth-accumulatedValue)/amountOfUnknownColumns;
-                                        while(amountOfColumnsInWeightMap++ < gridColumnNumber) {
-                                            approvedContainerGridColumns.push(missingColumnWidth);
-                                        }
-                                    }
-
-
-                                    const relatedStartX = foundRelatedElRect.left - approvedContainerRect.left;
-                                    const relatedStartCol = Math.round(getInterpolatedIndexOfPositionInWeightMap(relatedStartX, approvedContainerGridColumns));
-
-                                    if(relatedStartCol + relatedColumns + ghostColumns > gridColumnNumber) {
-                                        verticalDirection = true;
-                                    }
-
-                                    /*
-                                    If they fit, then we go horizontal? unless forceLeft/forceRight on both?
-
-                                    If they don't fit we go vertical...
-                                    */
-                                }
-                            //}
-                        }
-                        if (verticalDirection) {
-                            placeAfter = (dragY > foundRelatedElRect.top + (foundRelatedElRect.height*.5));
-                        }
-                        
-
-                        const nextEl = containerElements[(placeAfter ? newIndex+1 : newIndex)];
-                        if (nextEl) {
-                            approvedContainerEl.insertBefore(ghostEl, nextEl);
-                        } else {
-                            approvedContainerEl.appendChild(ghostEl);
-                        }
-
-                        return
+                    const containerVM = approvedContainerEl['Sortable:controller']();
+                    if(_indication(containerVM, ghostEl) === false) {
+                        return;
                     }
 
-                    // If above or below container, we will go first or last.
+                    let verticalDirection = false;
+                    if (ghostEl.dataset.forceLeft) {
+                        placeAfter = true;
+                    } else if (ghostEl.dataset.forceRight) {
+                        placeAfter = true;
+                    } else {
+                        //if(isInsideFoundRelated) {
+
+                            // if the related element is forceLeft and we are in the left side, we will set vertical direction, to correct placeAfter.
+                            if (foundRelatedEl.dataset.forceLeft && placeAfter === false) {
+                                verticalDirection = true;
+                            } else 
+                            // if the related element is forceRight and we are in the right side, we will set vertical direction, to correct placeAfter.
+                            if (foundRelatedEl.dataset.forceRight && placeAfter === true) {
+                                verticalDirection = true;
+                            } else {
+
+                                // TODO: move calculations out so they can be persisted a bit longer?
+                                //const approvedContainerRect = approvedContainerEl.getBoundingClientRect();
+                                const approvedContainerComputedStyles = getComputedStyle(approvedContainerEl);
+                                const gridColumnNumber = parseInt(approvedContainerComputedStyles.getPropertyValue("--umb-block-grid--grid-columns"), 10);
+
+                                const relatedColumns = parseInt(foundRelatedEl.dataset.colSpan, 10);
+                                const ghostColumns = parseInt(ghostEl.dataset.colSpan, 10);
+
+                                // Get grid template:
+                                const approvedContainerGridColumns = approvedContainerComputedStyles.gridTemplateColumns.trim().split("px").map(x => Number(x)).filter(n => n > 0);
+
+                                // ensure all columns are there.
+                                // This will also ensure handling non-css-grid mode,
+                                // use container width divided by amount of columns( or the item width divided by its amount of columnSpan)
+                                let amountOfColumnsInWeightMap = approvedContainerGridColumns.length;
+                                const amountOfUnknownColumns = gridColumnNumber-amountOfColumnsInWeightMap;
+                                if(amountOfUnknownColumns > 0) {
+                                    let accumulatedValue = getAccumulatedValueOfIndex(amountOfColumnsInWeightMap, approvedContainerGridColumns) || 0;
+                                    const layoutWidth = approvedContainerRect.width;
+                                    const missingColumnWidth = (layoutWidth-accumulatedValue)/amountOfUnknownColumns;
+                                    while(amountOfColumnsInWeightMap++ < gridColumnNumber) {
+                                        approvedContainerGridColumns.push(missingColumnWidth);
+                                    }
+                                }
+
+
+                                const relatedStartX = foundRelatedElRect.left - approvedContainerRect.left;
+                                const relatedStartCol = Math.round(getInterpolatedIndexOfPositionInWeightMap(relatedStartX, approvedContainerGridColumns));
+
+                                if(relatedStartCol + relatedColumns + ghostColumns > gridColumnNumber) {
+                                    verticalDirection = true;
+                                }
+
+                                /*
+                                If they fit, then we go horizontal? unless forceLeft/forceRight on both?
+
+                                If they don't fit we go vertical...
+                                */
+                            }
+                        //}
+                    }
+                    if (verticalDirection) {
+                        placeAfter = (dragY > foundRelatedElRect.top + (foundRelatedElRect.height*.5));
+                    }
                     
-                    if(dragY < approvedContainerRect.top) {
-                        const firstEl = containerElements[0];
-                        if (firstEl) {
-                            approvedContainerEl.insertBefore(ghostEl, firstEl);
-                        } else {
-                            approvedContainerEl.appendChild(ghostEl);
-                        }
-                    } else if(dragY > approvedContainerRect.bottom) {
+
+                    const nextEl = containerElements[(placeAfter ? newIndex+1 : newIndex)];
+                    if (nextEl) {
+                        approvedContainerEl.insertBefore(ghostEl, nextEl);
+                    } else {
                         approvedContainerEl.appendChild(ghostEl);
                     }
+
+                    return;
+                }
+
+                // If above or below container, we will go first or last.
+                const containerVM = approvedContainerEl['Sortable:controller']();
+                if(_indication(containerVM, ghostEl) === false) {
+                    return;
+                }
+                if(dragY < approvedContainerRect.top) {
+                    const firstEl = containerElements[0];
+                    if (firstEl) {
+                        approvedContainerEl.insertBefore(ghostEl, firstEl);
+                    } else {
+                        approvedContainerEl.appendChild(ghostEl);
+                    }
+                } else if(dragY > approvedContainerRect.bottom) {
+                    approvedContainerEl.appendChild(ghostEl);
                 }
             }
 
@@ -531,7 +532,8 @@
                         const oldForceLeft = vm.movingLayoutEntry.forceLeft;
                         const oldForceRight = vm.movingLayoutEntry.forceRight;
 
-                        var newValue = (dragX - dragOffsetX < targetRect.left - 50);
+                        //var newValue = (dragX - dragOffsetX < targetRect.left - 50);
+                        var newValue = (dragX < targetRect.left);
                         if(newValue !== oldForceLeft) {
                             vm.movingLayoutEntry.forceLeft = newValue;
                             if(oldForceRight) {
@@ -556,7 +558,8 @@
                             }
                         }
 
-                        newValue = (dragX - dragOffsetX + ghostRect.width > targetRect.right + 50) && (vm.movingLayoutEntry.forceLeft !== true);
+                        //newValue = (dragX - dragOffsetX + ghostRect.width > targetRect.right + 50) && (vm.movingLayoutEntry.forceLeft !== true);
+                        newValue = (dragX + ghostRect.width > targetRect.right) && (vm.movingLayoutEntry.forceLeft !== true);
                         if(newValue !== oldForceRight) {
                             vm.movingLayoutEntry.forceRight = newValue;
                             vm.blockEditorApi.internal.setDirty();
@@ -633,7 +636,6 @@
 
                     var contextVM = vm;
                     if (gridLayoutContainerEl !== evt.to) {
-                        console.error("container was different on start??")
                         contextVM = evt.to['Sortable:controller']();
                     }
 
