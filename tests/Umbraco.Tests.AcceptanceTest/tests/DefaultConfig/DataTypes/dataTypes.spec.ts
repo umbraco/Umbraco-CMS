@@ -60,7 +60,6 @@ test.describe('DataTypes', () => {
     // Save
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.saveAndPublish));
     await umbracoUi.isSuccessNotificationVisible();
-    await expect(await umbracoUi.getSuccessNotification()).toBeVisible();
     await expect(await page.locator('.umb-button__overlay')).not.toBeVisible();
 
     // Assert
