@@ -2,7 +2,6 @@
   <PropertyGroup>
     <Title>Umbraco CMS - Management API</Title>
     <Description>Contains the presentation layer for the Umbraco CMS Management API.</Description>
-    <TargetFramework>net7.0</TargetFramework>
     <IsPackable>false</IsPackable>
     <EnablePackageValidation>false</EnablePackageValidation>
   </PropertyGroup>
