@@ -51,7 +51,9 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.MultiColorPickerCo
         
         var evts = [];
         evts.push(eventsService.on("toggleValue", function (e, args) {
-            vm.labelEnabled = args.value;
+            if (args.inputId === "useLabel") {
+               vm.labelEnabled = args.value;
+            }
         }));
         
         $scope.$on('$destroy', function () {
