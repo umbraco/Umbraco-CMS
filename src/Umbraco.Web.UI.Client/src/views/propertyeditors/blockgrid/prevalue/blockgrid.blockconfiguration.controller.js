@@ -358,34 +358,40 @@
 
 
 
-        dataTypeResource.getGroupedPropertyEditors().then(function(propertyEditors) {
-
-            //if(propertyEditors['rich content']?.filter(x => x.alias === "Umbraco.BlockGrid").length === 0) {
+        dataTypeResource.getAll().then(function(dataTypes) {
+            if(dataTypes.filter(x => x.alias === "Umbraco.BlockGrid").length === 0) {
                 localizationService.localizeMany(["blockEditor_getSampleHeadline", "blockEditor_getSampleDescription", "blockEditor_getSampleButton"]).then(function (data) {
                     vm.labels["blockEditor_getSampleHeadline"] = data[0];
                     vm.labels["blockEditor_getSampleDescription"] = data[1];
                     vm.labels["blockEditor_getSampleButton"] = data[2];
                     vm.showSampleDataCTA = true;
                 });
-            //}
+            }
         });
 
         vm.setupSample = function() {
             umbRequestHelper.resourcePromise(
                 $http.post(umbRequestHelper.getApiUrl("contentTypeApiBaseUrl", "PostCreateBlockGridSample")),
                 'Failed to create content types for block grid sample').then(function (data) {
-                    console.log("Got me some data", data);
 
                     loadElementTypes().then(() => {
-                        const sampleGroup = {
-                            key: String.CreateGuid(),
-                            name: "Demo Blocks"
-                        };
-                        vm.blockGroups.push(sampleGroup);
+
+                        const groupName = "Demo Blocks";
+                        var sampleGroup =  vm.blockGroups.find(x => x.name === groupName);
+                        if(!sampleGroup) {
+                            sampleGroup = {
+                                key: String.CreateGuid(),
+                                name: groupName
+                            };
+                            vm.blockGroups.push(sampleGroup);
+                        }
     
                         function initSampleBlock(udi, groupKey, options) {
-                            const blockType = { ...DEFAULT_BLOCKTYPE_OBJECT, "contentElementTypeKey": udiService.getKey(udi), "groupKey": groupKey, ...options};
-                            $scope.model.value.push(blockType);
+                            const key = udiService.getKey(udi);
+                            if ($scope.model.value.find(X => X.contentElementTypeKey === key) === undefined) {
+                                const blockType = { ...DEFAULT_BLOCKTYPE_OBJECT, "contentElementTypeKey": key, "groupKey": groupKey, ...options};
+                                $scope.model.value.push(blockType);
+                            }
                         }
     
                         initSampleBlock(data.umbBlockGridDemoHeadlineBlock, sampleGroup.key, {"label": "Headline", "view": "~/App_Plugins/Umbraco.BlockGridEditor.DefaultCustomViews/headlineblock.html"});
@@ -411,7 +417,7 @@
                                 'specifiedAllowance': []
                             }
                         ];
-                        initSampleBlock(data.umbBlockGridDemoTwoColumnSectionBlock, sampleGroup.key, {"label": "Two Column Layout", "view": "~/App_Plugins/Umbraco.BlockGridEditor.DefaultCustomViews/twocolumnsectionblock.html", "allowInAreas": false, "areas": twoColumnLayoutAreas});
+                        initSampleBlock(data.umbBlockGridDemoTwoColumnLayoutBlock, sampleGroup.key, {"label": "Two Column Layout", "view": "~/App_Plugins/Umbraco.BlockGridEditor.DefaultCustomViews/twocolumnsectionblock.html", "allowInAreas": false, "areas": twoColumnLayoutAreas});
     
                     });
                     

@@ -2916,8 +2916,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="tabAdvanced">Advanced</key>
     <key alias="headlineAllowance">Allowance</key>
     <key alias="getSampleHeadline">Setup demo configuration?</key>
-    <key alias="getSampleDescription"><![CDATA[Setup a few basic Blocks for demonstration of how the Block Grid Editor works.<br/>This will comes with a Headline, Rich-Text, Image and Two Column Layout.]]></key>
-    <key alias="getSampleButton">Get examples</key>
+    <key alias="getSampleDescription"><![CDATA[Get a few basic Blocks for demonstration of how the Block Grid Editor works.<br/>This contains Blocks for Headline, Rich-Text, Image and Two Column Layout.]]></key>
+    <key alias="getSampleButton">Setup examples</key>
   </area>
   <area alias="contentTemplatesDashboard">
     <key alias="whatHeadline">What are Content Templates?</key>
