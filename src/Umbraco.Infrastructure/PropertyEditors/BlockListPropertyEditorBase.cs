@@ -23,7 +23,7 @@ public abstract class BlockListPropertyEditorBase : DataEditor
     protected override IDataValueEditor CreateValueEditor() =>
         DataValueEditorFactory.Create<BlockListEditorPropertyValueEditor>(Attribute!);
 
-    private class BlockListEditorPropertyValueEditor : BlockEditorPropertyValueEditor
+    internal class BlockListEditorPropertyValueEditor : BlockEditorPropertyValueEditor
     {
         public BlockListEditorPropertyValueEditor(
             DataEditorAttribute attribute,
