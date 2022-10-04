@@ -27,12 +27,13 @@ internal class BlockEditorValues
 
     public BlockEditorData? DeserializeAndClean(object? propertyValue)
     {
-        if (propertyValue == null || string.IsNullOrWhiteSpace(propertyValue.ToString()))
+        var propertyValueAsString = propertyValue?.ToString();
+        if (string.IsNullOrWhiteSpace(propertyValueAsString))
         {
             return null;
         }
 
-        BlockEditorData blockEditorData = _dataConverter.Deserialize(propertyValue.ToString()!);
+        BlockEditorData blockEditorData = _dataConverter.Deserialize(propertyValueAsString);
 
         if (blockEditorData.BlockValue.ContentData.Count == 0)
         {

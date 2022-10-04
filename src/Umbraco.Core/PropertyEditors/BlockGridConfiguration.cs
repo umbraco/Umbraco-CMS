@@ -11,14 +11,14 @@ namespace Umbraco.Cms.Core.PropertyEditors
     public class BlockGridConfiguration
     {
         [ConfigurationField("blocks", "Blocks", "views/propertyeditors/blockgrid/prevalue/blockgrid.blockconfiguration.html", Description = "Define Blocks based on Element Types.")]
-        public BlockGridBlockConfiguration[] Blocks { get; set; }  = null!;
+        public BlockGridBlockConfiguration[] Blocks { get; set; }  = Array.Empty<BlockGridBlockConfiguration>();
 
         [DataContract]
         public class BlockGridBlockConfiguration : IBlockConfiguration
         {
 
             [DataMember(Name ="columnSpanOptions")]
-            public BlockGridColumnSpanOption[] ColumnSpanOptions { get; set; }  = null!;
+            public BlockGridColumnSpanOption[] ColumnSpanOptions { get; set; }  = Array.Empty<BlockGridColumnSpanOption>();
             [DataContract]
             public class BlockGridColumnSpanOption
             {
@@ -27,19 +27,19 @@ namespace Umbraco.Cms.Core.PropertyEditors
             }
 
             [DataMember(Name ="rowMaxSpan")]
-            public int? RowMaxSpan { get; set; }  = null!;
+            public int? RowMaxSpan { get; set; }
 
             [DataMember(Name ="allowAtRoot")]
-            public bool? AllowAtRoot { get; set; } = true;
+            public bool AllowAtRoot { get; set; } = true;
 
             [DataMember(Name ="allowInAreas")]
-            public bool? AllowInAreas { get; set; } = true;
+            public bool AllowInAreas { get; set; } = true;
 
             [DataMember(Name ="areaGridColumns")]
             public int? AreaGridColumns { get; set; }
 
-            [DataMember(Name ="areas")]
-            public BlockGridAreaConfiguration[] Areas { get; set; }  = null!;
+            [DataMember(Name = "areas")]
+            public BlockGridAreaConfiguration[] Areas { get; set; } = Array.Empty<BlockGridAreaConfiguration>();
 
             [DataContract]
             public class BlockGridAreaConfiguration
@@ -65,7 +65,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 public int? MaxAllowed { get; set; }
 
                 [DataMember(Name ="specifiedAllowance")]
-                public BlockGridAreaConfigurationSpecifiedAllowance[] SpecifiedAllowance { get; set; }  = null!;
+                public BlockGridAreaConfigurationSpecifiedAllowance[] SpecifiedAllowance { get; set; } = Array.Empty<BlockGridAreaConfigurationSpecifiedAllowance>();
 
                 [DataContract]
                 public class BlockGridAreaConfigurationSpecifiedAllowance
@@ -118,11 +118,11 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
             [DataMember(Name ="groupKey")]
             public string? GroupKey { get; set; }
-            
+
         }
 
         [ConfigurationField("blockGroups", "Block Groups", "views/propertyeditors/blockgrid/prevalue/blockgrid.groupconfiguration.html", HideLabel = true)]
-        public BlockGridGroupConfiguration[] BlockGroups { get; set; }  = null!;
+        public BlockGridGroupConfiguration[] BlockGroups { get; set; } = Array.Empty<BlockGridGroupConfiguration>();
 
         [DataContract]
         public class BlockGridGroupConfiguration
@@ -157,7 +157,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
         [ConfigurationField("gridColumns", "Grid Columns", "number", Description = "Set the number of columns for the layout. (defaults to 12)")]
         public int? GridColumns { get; set; }
-        
+
         [ConfigurationField("layoutStylesheet", "Layout Stylesheet", "views/propertyeditors/blockgrid/prevalue/blockgrid.stylesheetpicker.html", Description = "Overwrite default stylesheet for layout.")]
         public string? LayoutStylesheet { get; set; }
 

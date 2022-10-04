@@ -92,7 +92,6 @@ internal abstract class BlockEditorPropertyValueEditor : DataValueEditor, IDataV
     public override object ToEditor(IProperty property, string? culture = null, string? segment = null)
     {
         var val = property.GetValue(culture, segment);
-        var valEditors = new Dictionary<int, IDataValueEditor>();
 
         BlockEditorData? blockEditorData;
         try
@@ -110,59 +109,8 @@ internal abstract class BlockEditorPropertyValueEditor : DataValueEditor, IDataV
             return string.Empty;
         }
 
-        void MapBlockItemData(List<BlockItemData> items)
-        {
-            foreach (BlockItemData row in items)
-            {
-                foreach (KeyValuePair<string, BlockItemData.BlockPropertyValue> prop in row.PropertyValues)
-                {
-                    // create a temp property with the value
-                    // - force it to be culture invariant as the block editor can't handle culture variant element properties
-                    prop.Value.PropertyType.Variations = ContentVariation.Nothing;
-                    var tempProp = new Property(prop.Value.PropertyType);
-                    tempProp.SetValue(prop.Value.Value);
-
-                    IDataEditor? propEditor = _propertyEditors[prop.Value.PropertyType.PropertyEditorAlias];
-                    if (propEditor == null)
-                    {
-                        // NOTE: This logic was borrowed from Nested Content and I'm unsure why it exists.
-                        // if the property editor doesn't exist I think everything will break anyways?
-                        // update the raw value since this is what will get serialized out
-                        row.RawPropertyValues[prop.Key] = tempProp.GetValue()?.ToString();
-                        continue;
-                    }
-
-                    IDataType? dataType = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId);
-                    if (dataType == null)
-                    {
-                        // deal with weird situations by ignoring them (no comment)
-                        row.PropertyValues.Remove(prop.Key);
-                        _logger.LogWarning(
-                            "ToEditor removed property value {PropertyKey} in row {RowId} for property type {PropertyTypeAlias}",
-                            prop.Key,
-                            row.Key,
-                            property.PropertyType.Alias);
-                        continue;
-                    }
-
-                    if (!valEditors.TryGetValue(dataType.Id, out IDataValueEditor? valEditor))
-                    {
-                        var tempConfig = dataType.Configuration;
-                        valEditor = propEditor.GetValueEditor(tempConfig);
-
-                        valEditors.Add(dataType.Id, valEditor);
-                    }
-
-                    var convValue = valEditor.ToEditor(tempProp);
-
-                    // update the raw value since this is what will get serialized out
-                    row.RawPropertyValues[prop.Key] = convValue;
-                }
-            }
-        }
-
-        MapBlockItemData(blockEditorData.BlockValue.ContentData);
-        MapBlockItemData(blockEditorData.BlockValue.SettingsData);
+        MapBlockItemDataToEditor(property, blockEditorData.BlockValue.ContentData);
+        MapBlockItemDataToEditor(property, blockEditorData.BlockValue.SettingsData);
 
         // return json convertable object
         return blockEditorData.BlockValue;
@@ -197,39 +145,92 @@ internal abstract class BlockEditorPropertyValueEditor : DataValueEditor, IDataV
             return string.Empty;
         }
 
-        void MapBlockItemData(List<BlockItemData> items)
-        {
-            foreach (BlockItemData row in items)
-            {
-                foreach (KeyValuePair<string, BlockItemData.BlockPropertyValue> prop in row.PropertyValues)
-                {
-                    // Fetch the property types prevalue
-                    var propConfiguration = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId)?.Configuration;
-
-                    // Lookup the property editor
-                    IDataEditor? propEditor = _propertyEditors[prop.Value.PropertyType.PropertyEditorAlias];
-                    if (propEditor == null)
-                    {
-                        continue;
-                    }
-
-                    // Create a fake content property data object
-                    var contentPropData = new ContentPropertyData(prop.Value.Value, propConfiguration);
-
-                    // Get the property editor to do it's conversion
-                    var newValue = propEditor.GetValueEditor().FromEditor(contentPropData, prop.Value.Value);
-
-                    // update the raw value since this is what will get serialized out
-                    row.RawPropertyValues[prop.Key] = newValue;
-                }
-            }
-        }
-
-        MapBlockItemData(blockEditorData.BlockValue.ContentData);
-        MapBlockItemData(blockEditorData.BlockValue.SettingsData);
+        MapBlockItemDataFromEditor(blockEditorData.BlockValue.ContentData);
+        MapBlockItemDataFromEditor(blockEditorData.BlockValue.SettingsData);
 
         // return json
         return JsonConvert.SerializeObject(blockEditorData.BlockValue, Formatting.None);
+    }
+
+    private void MapBlockItemDataToEditor(IProperty property, List<BlockItemData> items)
+    {
+        var valEditors = new Dictionary<int, IDataValueEditor>();
+
+        foreach (BlockItemData row in items)
+        {
+            foreach (KeyValuePair<string, BlockItemData.BlockPropertyValue> prop in row.PropertyValues)
+            {
+                // create a temp property with the value
+                // - force it to be culture invariant as the block editor can't handle culture variant element properties
+                prop.Value.PropertyType.Variations = ContentVariation.Nothing;
+                var tempProp = new Property(prop.Value.PropertyType);
+                tempProp.SetValue(prop.Value.Value);
+
+                IDataEditor? propEditor = _propertyEditors[prop.Value.PropertyType.PropertyEditorAlias];
+                if (propEditor == null)
+                {
+                    // NOTE: This logic was borrowed from Nested Content and I'm unsure why it exists.
+                    // if the property editor doesn't exist I think everything will break anyways?
+                    // update the raw value since this is what will get serialized out
+                    row.RawPropertyValues[prop.Key] = tempProp.GetValue()?.ToString();
+                    continue;
+                }
+
+                IDataType? dataType = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId);
+                if (dataType == null)
+                {
+                    // deal with weird situations by ignoring them (no comment)
+                    row.PropertyValues.Remove(prop.Key);
+                    _logger.LogWarning(
+                        "ToEditor removed property value {PropertyKey} in row {RowId} for property type {PropertyTypeAlias}",
+                        prop.Key,
+                        row.Key,
+                        property.PropertyType.Alias);
+                    continue;
+                }
+
+                if (!valEditors.TryGetValue(dataType.Id, out IDataValueEditor? valEditor))
+                {
+                    var tempConfig = dataType.Configuration;
+                    valEditor = propEditor.GetValueEditor(tempConfig);
+
+                    valEditors.Add(dataType.Id, valEditor);
+                }
+
+                var convValue = valEditor.ToEditor(tempProp);
+
+                // update the raw value since this is what will get serialized out
+                row.RawPropertyValues[prop.Key] = convValue;
+            }
+        }
+    }
+
+    private void MapBlockItemDataFromEditor(List<BlockItemData> items)
+    {
+        foreach (BlockItemData row in items)
+        {
+            foreach (KeyValuePair<string, BlockItemData.BlockPropertyValue> prop in row.PropertyValues)
+            {
+                // Fetch the property types prevalue
+                var propConfiguration = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId)?.Configuration;
+
+                // Lookup the property editor
+                IDataEditor? propEditor = _propertyEditors[prop.Value.PropertyType.PropertyEditorAlias];
+                if (propEditor == null)
+                {
+                    continue;
+                }
+
+                // Create a fake content property data object
+                var contentPropData = new ContentPropertyData(prop.Value.Value, propConfiguration);
+
+                // Get the property editor to do it's conversion
+                var newValue = propEditor.GetValueEditor().FromEditor(contentPropData, prop.Value.Value);
+
+                // update the raw value since this is what will get serialized out
+                row.RawPropertyValues[prop.Key] = newValue;
+            }
+        }
     }
 
     #endregion
