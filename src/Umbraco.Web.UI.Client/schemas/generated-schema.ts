@@ -151,6 +151,34 @@ export interface components {
       alias: string;
       name: string;
     };
+    MetaEditorAction: {
+      editors: string[];
+    };
+    IManifestEditorAction: {
+      /** @enum {string} */
+      type: "editorAction";
+      meta: components["schemas"]["MetaEditorAction"];
+      js?: string;
+      elementName?: string;
+      alias: string;
+      name: string;
+    };
+    MetaEditorView: {
+      editors: string[];
+      pathname: string;
+      /** Format: float */
+      weight: number;
+      icon: string;
+    };
+    IManifestEditorView: {
+      /** @enum {string} */
+      type: "editorView";
+      meta: components["schemas"]["MetaEditorView"];
+      js?: string;
+      elementName?: string;
+      alias: string;
+      name: string;
+    };
     MetaTreeItemAction: {
       trees: string[];
       label: string;
@@ -206,22 +234,6 @@ export interface components {
       alias: string;
       name: string;
     };
-    MetaEditorView: {
-      editors: string[];
-      pathname: string;
-      /** Format: float */
-      weight: number;
-      icon: string;
-    };
-    IManifestEditorView: {
-      /** @enum {string} */
-      type: "editorView";
-      meta: components["schemas"]["MetaEditorView"];
-      js?: string;
-      elementName?: string;
-      alias: string;
-      name: string;
-    };
     MetaPropertyAction: {
       propertyEditors: string[];
     };
@@ -264,10 +276,11 @@ export interface components {
       | components["schemas"]["IManifestSection"]
       | components["schemas"]["IManifestTree"]
       | components["schemas"]["IManifestEditor"]
+      | components["schemas"]["IManifestEditorAction"]
+      | components["schemas"]["IManifestEditorView"]
       | components["schemas"]["IManifestTreeItemAction"]
       | components["schemas"]["IManifestPropertyEditorUI"]
       | components["schemas"]["IManifestDashboard"]
-      | components["schemas"]["IManifestEditorView"]
       | components["schemas"]["IManifestPropertyAction"]
       | components["schemas"]["IManifestPackageView"]
       | components["schemas"]["IManifestEntrypoint"]

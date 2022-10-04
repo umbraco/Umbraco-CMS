@@ -33,10 +33,11 @@ export type Manifest =
 	| IManifestSection
 	| IManifestTree
 	| IManifestEditor
+	| IManifestEditorAction
+	| IManifestEditorView
 	| IManifestTreeItemAction
 	| IManifestPropertyEditorUI
 	| IManifestDashboard
-	| IManifestEditorView
 	| IManifestPropertyAction
 	| IManifestPackageView
 	| IManifestEntrypoint
@@ -46,13 +47,15 @@ export type ManifestStandardTypes =
 	| 'section'
 	| 'tree'
 	| 'editor'
+	| 'editorView'
+	| 'editorAction'
 	| 'treeItemAction'
 	| 'propertyEditorUI'
 	| 'dashboard'
-	| 'editorView'
 	| 'propertyAction'
 	| 'packageView'
-	| 'entrypoint';
+	| 'entrypoint'
+	;
 
 export interface ManifestsResponse {
 	manifests: Manifest[];
@@ -155,6 +158,16 @@ export interface IManifestSection extends IManifestElement {
 	type: 'section';
 	meta: MetaSection;
 }
+
+export interface IManifestEditorAction extends IManifestElement {
+	type: 'editorAction';
+	meta: MetaEditorAction;
+}
+
+export interface MetaEditorAction {
+	editors: Array<string>;
+}
+
 
 export interface IManifestTree extends IManifestElement {
 	type: 'tree';

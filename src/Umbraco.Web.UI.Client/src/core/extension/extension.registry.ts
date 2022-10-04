@@ -17,6 +17,7 @@ import type {
 	ManifestTree,
 	ManifestTreeItemAction,
 	ManifestEditor,
+	ManifestEditorAction,
 	ManifestCustom,
 	ManifestPackageView,
 } from '../models';
@@ -65,6 +66,7 @@ export class UmbExtensionRegistry {
 	extensionsOfType(type: 'treeItemAction'): Observable<Array<ManifestTreeItemAction>>;
 	extensionsOfType(type: 'dashboard'): Observable<Array<ManifestDashboard>>;
 	extensionsOfType(type: 'editorView'): Observable<Array<ManifestEditorView>>;
+	extensionsOfType(type: 'editorAction'): Observable<Array<ManifestEditorAction>>;
 	extensionsOfType(type: 'propertyEditorUI'): Observable<Array<ManifestPropertyEditorUI>>;
 	extensionsOfType(type: 'propertyAction'): Observable<Array<ManifestPropertyAction>>;
 	extensionsOfType(type: 'packageView'): Observable<Array<ManifestPackageView>>;

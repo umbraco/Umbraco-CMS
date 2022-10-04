@@ -22,6 +22,7 @@ export type ManifestSection = components['schemas']['IManifestSection'];
 export type ManifestTree = components['schemas']['IManifestTree'];
 export type ManifestTreeItemAction = components['schemas']['IManifestTreeItemAction'];
 export type ManifestEditor = components['schemas']['IManifestEditor'];
+export type ManifestEditorAction = components['schemas']['IManifestEditorAction'];
 export type ManifestPropertyEditorUI = components['schemas']['IManifestPropertyEditorUI'];
 export type ManifestDashboard = components['schemas']['IManifestDashboard'];
 export type ManifestEditorView = components['schemas']['IManifestEditorView'];
@@ -40,6 +41,7 @@ export type ManifestElementType =
 	| ManifestPropertyEditorUI
 	| ManifestDashboard
 	| ManifestEditorView
+	| ManifestEditorAction
 	| ManifestPackageView;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

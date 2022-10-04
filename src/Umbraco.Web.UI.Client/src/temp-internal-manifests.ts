@@ -270,6 +270,24 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		},
 	},
 	{
+		type: 'editorAction',
+		alias: 'Umb.EditorAction.Users.Save',
+		name: 'EditorActionUserSave',
+		loader: () => import('./backoffice/editors/users/views/users/actions/editor-action-users-save.element'),
+		meta: {
+			editors: ['Umb.Editor.Users'],
+		},
+	},
+	{
+		type: 'editorAction',
+		alias: 'Umb.EditorAction.Users.Delete',
+		name: 'EditorActionUserDelete',
+		loader: () => import('./backoffice/editors/users/views/users/actions/editor-action-users-save.element'),
+		meta: {
+			editors: ['Umb.Editor.DataType'],
+		},
+	},
+	{
 		type: 'editorView',
 		alias: 'Umb.EditorView.Users.UserGroups',
 		name: 'User Groups',

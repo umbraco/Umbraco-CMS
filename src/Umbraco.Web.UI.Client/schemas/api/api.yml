@@ -486,6 +486,78 @@ components:
         - meta
         - alias
         - name
+    MetaEditorAction:
+      type: object
+      properties:
+        editors:
+          type: array
+          items:
+            type: string
+      required:
+        - editors
+    IManifestEditorAction:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - editorAction
+        meta:
+          $ref: '#/components/schemas/MetaEditorAction'
+        js:
+          type: string
+        elementName:
+          type: string
+        alias:
+          type: string
+        name:
+          type: string
+      required:
+        - type
+        - meta
+        - alias
+        - name
+    MetaEditorView:
+      type: object
+      properties:
+        editors:
+          type: array
+          items:
+            type: string
+        pathname:
+          type: string
+        weight:
+          type: number
+          format: float
+        icon:
+          type: string
+      required:
+        - editors
+        - pathname
+        - weight
+        - icon
+    IManifestEditorView:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - editorView
+        meta:
+          $ref: '#/components/schemas/MetaEditorView'
+        js:
+          type: string
+        elementName:
+          type: string
+        alias:
+          type: string
+        name:
+          type: string
+      required:
+        - type
+        - meta
+        - alias
+        - name
     MetaTreeItemAction:
       type: object
       properties:
@@ -624,47 +696,6 @@ components:
         - meta
         - alias
         - name
-    MetaEditorView:
-      type: object
-      properties:
-        editors:
-          type: array
-          items:
-            type: string
-        pathname:
-          type: string
-        weight:
-          type: number
-          format: float
-        icon:
-          type: string
-      required:
-        - editors
-        - pathname
-        - weight
-        - icon
-    IManifestEditorView:
-      type: object
-      properties:
-        type:
-          type: string
-          enum:
-            - editorView
-        meta:
-          $ref: '#/components/schemas/MetaEditorView'
-        js:
-          type: string
-        elementName:
-          type: string
-        alias:
-          type: string
-        name:
-          type: string
-      required:
-        - type
-        - meta
-        - alias
-        - name
     MetaPropertyAction:
       type: object
       properties:
@@ -765,10 +796,11 @@ components:
         - $ref: '#/components/schemas/IManifestSection'
         - $ref: '#/components/schemas/IManifestTree'
         - $ref: '#/components/schemas/IManifestEditor'
+        - $ref: '#/components/schemas/IManifestEditorAction'
+        - $ref: '#/components/schemas/IManifestEditorView'
         - $ref: '#/components/schemas/IManifestTreeItemAction'
         - $ref: '#/components/schemas/IManifestPropertyEditorUI'
         - $ref: '#/components/schemas/IManifestDashboard'
-        - $ref: '#/components/schemas/IManifestEditorView'
         - $ref: '#/components/schemas/IManifestPropertyAction'
         - $ref: '#/components/schemas/IManifestPackageView'
         - $ref: '#/components/schemas/IManifestEntrypoint'
@@ -779,10 +811,11 @@ components:
           section: '#/components/schemas/IManifestSection'
           tree: '#/components/schemas/IManifestTree'
           editor: '#/components/schemas/IManifestEditor'
+          editorAction: '#/components/schemas/IManifestEditorAction'
+          editorView: '#/components/schemas/IManifestEditorView'
           treeItemAction: '#/components/schemas/IManifestTreeItemAction'
           propertyEditorUI: '#/components/schemas/IManifestPropertyEditorUI'
           dashboard: '#/components/schemas/IManifestDashboard'
-          editorView: '#/components/schemas/IManifestEditorView'
           propertyAction: '#/components/schemas/IManifestPropertyAction'
           packageView: '#/components/schemas/IManifestPackageView'
           entrypoint: '#/components/schemas/IManifestEntrypoint'
