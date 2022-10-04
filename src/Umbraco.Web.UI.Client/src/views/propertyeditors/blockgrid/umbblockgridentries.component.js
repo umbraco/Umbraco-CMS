@@ -323,7 +323,7 @@
                 var approvedContainerRect = approvedContainerEl.getBoundingClientRect();
 
                 const approvedContainerHasItems = approvedContainerEl.querySelector('.umb-block-grid__layout-item:not(.umb-block-grid__layout-item-placeholder)');
-                if(!approvedContainerHasItems && isWithinRect(dragX, dragY, approvedContainerRect, 100) || approvedContainerHasItems && isWithinRect(dragX, dragY, approvedContainerRect, -10)) {
+                if(!approvedContainerHasItems && isWithinRect(dragX, dragY, approvedContainerRect, 50) || approvedContainerHasItems && isWithinRect(dragX, dragY, approvedContainerRect, -10)) {
                     // we are good...
                 } else {
                     var parentContainer = approvedContainerEl.parentNode.closest('.umb-block-grid__layout-container');
@@ -384,7 +384,7 @@
                             const subLayoutRect = subLayout.getBoundingClientRect();
                             const hasItems = subLayout.querySelector('.umb-block-grid__layout-item:not(.umb-block-grid__layout-item-placeholder)');
                             // gather elements on the same row.
-                            if(!hasItems && isWithinRect(dragX, dragY, subLayoutRect, 100) || hasItems && isWithinRect(dragX, dragY, subLayoutRect, -10)) {
+                            if(!hasItems && isWithinRect(dragX, dragY, subLayoutRect, 50) || hasItems && isWithinRect(dragX, dragY, subLayoutRect, -10)) {
                                 
                                 var subVm = subLayout['Sortable:controller']();
                                 if(subVm.sortGroupIdentifier === vm.sortGroupIdentifier) {
