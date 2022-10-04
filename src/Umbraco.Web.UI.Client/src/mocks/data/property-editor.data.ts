@@ -1,6 +1,6 @@
-import { UmbData } from './data';
+import cloneDeep from 'lodash-es/cloneDeep.js';
 import type { PropertyEditor } from '../../core/models';
-import { cloneDeep } from 'lodash';
+import { UmbData } from './data';
 
 export const data: Array<PropertyEditor> = [
 	{
