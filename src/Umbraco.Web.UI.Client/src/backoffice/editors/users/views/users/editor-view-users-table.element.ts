@@ -149,7 +149,7 @@ export class UmbEditorViewUsersTableElement extends UmbContextConsumerMixin(LitE
 	//TODO How should we handle url stuff?
 	private _handleOpenUser(event: Event, key: string) {
 		event.stopImmediatePropagation();
-		history.pushState(null, '', location.pathname + '/' + key);
+		history.pushState(null, '', '/section/users/view/users/details' + '/' + key); //TODO: make a tag with href
 	}
 
 	private _selectRowHandler(user: UserItem) {

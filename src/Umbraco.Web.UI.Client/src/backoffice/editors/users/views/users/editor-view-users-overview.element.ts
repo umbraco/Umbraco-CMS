@@ -10,10 +10,11 @@ import './editor-view-users-invite.element';
 import { IRoute } from 'router-slot';
 import UmbEditorViewUsersElement from './editor-view-users.element';
 import { UUIPopoverElement } from '@umbraco-ui/uui';
+import { isPathActive } from 'router-slot';
 
 export type UsersViewType = 'list' | 'grid';
-@customElement('umb-editor-view-users-list')
-export class UmbEditorViewUsersListElement extends UmbContextConsumerMixin(LitElement) {
+@customElement('umb-editor-view-users-overview')
+export class UmbEditorViewUsersOverviewElement extends UmbContextConsumerMixin(LitElement) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -68,9 +69,6 @@ export class UmbEditorViewUsersListElement extends UmbContextConsumerMixin(LitEl
 	];
 
 	@state()
-	private _viewType: UsersViewType = 'grid';
-
-	@state()
 	private _selection: Array<string> = [];
 
 	private _usersContext?: UmbEditorViewUsersElement;
@@ -117,18 +115,11 @@ export class UmbEditorViewUsersListElement extends UmbContextConsumerMixin(LitEl
 	}
 
 	private _toggleViewType() {
-		this._viewType = this._viewType === 'list' ? 'grid' : 'list';
-	}
+		const isList = window.location.pathname.split('/').pop() === 'list';
 
-	private _renderViewType() {
-		switch (this._viewType) {
-			case 'list':
-				return html`<umb-editor-view-users-table></umb-editor-view-users-table>`;
-			case 'grid':
-				return html`<umb-editor-view-users-grid></umb-editor-view-users-grid>`;
-			default:
-				return html`<umb-editor-view-users-grid></umb-editor-view-users-grid>`;
-		}
+		isList
+			? history.pushState(null, '', '/section/users/view/users/overview/grid')
+			: history.pushState(null, '', '/section/users/view/users/overview/list');
 	}
 
 	private _renderSelection() {
@@ -140,12 +131,16 @@ export class UmbEditorViewUsersListElement extends UmbContextConsumerMixin(LitEl
 	@state()
 	private _routes: IRoute[] = [
 		{
-			path: '/grid',
+			path: 'grid',
 			component: () => import('./editor-view-users-grid.element'),
 		},
 		{
-			path: '/list',
+			path: 'list',
 			component: () => import('./editor-view-users-table.element'),
+		},
+		{
+			path: '**',
+			redirectTo: '/section/users/view/users/overview/grid', //TODO: this should be dynamic
 		},
 	];
 
@@ -214,16 +209,14 @@ export class UmbEditorViewUsersListElement extends UmbContextConsumerMixin(LitEl
 			</div>
 
 			<router-slot .routes=${this._routes}></router-slot>
-
-			<!-- <div id="user-list">${this._renderViewType()}</div> -->
 		`;
 	}
 }
 
-export default UmbEditorViewUsersListElement;
+export default UmbEditorViewUsersOverviewElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-editor-view-users-list': UmbEditorViewUsersListElement;
+		'umb-editor-view-users-overview': UmbEditorViewUsersOverviewElement;
 	}
 }

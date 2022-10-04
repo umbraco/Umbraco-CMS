@@ -37,12 +37,20 @@ export class UmbEditorViewUsersElement extends UmbContextProviderMixin(LitElemen
 	@state()
 	private _routes: IRoute[] = [
 		{
-			path: '/',
-			component: () => import('./editor-view-users-list.element'),
+			path: 'overview',
+			component: () => import('./editor-view-users-overview.element'),
 		},
 		{
-			path: '/invite',
+			path: 'invite',
 			component: () => import('./editor-view-users-invite.element'),
+		},
+		{
+			path: 'details/:key',
+			component: () => import('./editor-view-users-user-details.element'),
+		},
+		{
+			path: '**',
+			redirectTo: '/section/users/view/users/overview', //TODO: this should be dynamic
 		},
 	];
 
