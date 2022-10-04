@@ -419,6 +419,7 @@
                         ];
                         initSampleBlock(data.umbBlockGridDemoTwoColumnLayoutBlock, sampleGroup.key, {"label": "Two Column Layout", "view": "~/App_Plugins/Umbraco.BlockGridEditor.DefaultCustomViews/twocolumnsectionblock.html", "allowInAreas": false, "areas": twoColumnLayoutAreas});
     
+                        vm.showSampleDataCTA = false;
                     });
                     
                 });
