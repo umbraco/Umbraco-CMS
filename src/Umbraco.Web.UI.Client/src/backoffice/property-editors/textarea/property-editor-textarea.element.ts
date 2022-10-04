@@ -16,13 +16,17 @@ export class UmbPropertyEditorTextareaElement extends LitElement {
 	@property()
 	value = '';
 
+	@property({ type: Array, attribute: false })
+	config = [];
+
 	private onInput(e: InputEvent) {
 		this.value = (e.target as HTMLInputElement).value;
 		this.dispatchEvent(new CustomEvent('property-editor-change', { bubbles: true, composed: true }));
 	}
 
 	render() {
-		return html`<uui-textarea .value=${this.value} @input=${this.onInput}></uui-textarea>`;
+		return html`<uui-textarea .value=${this.value} @input=${this.onInput}></uui-textarea>
+			${this.config?.map((property: any) => html`<div>${property.alias}: ${property.value}</div>`)} `;
 	}
 }
 

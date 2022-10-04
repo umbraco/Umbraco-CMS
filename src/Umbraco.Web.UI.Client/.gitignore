@@ -35,3 +35,8 @@ types
 
 # storybook
 storybook-static/
+
+# assets
+/public-assets/
+
+custom-elements.json

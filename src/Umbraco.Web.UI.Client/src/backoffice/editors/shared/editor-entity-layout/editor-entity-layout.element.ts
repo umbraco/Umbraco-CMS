@@ -11,6 +11,18 @@ import { UmbContextConsumerMixin } from '../../../../core/context';
 import { createExtensionElement, UmbExtensionRegistry } from '../../../../core/extension';
 import type { ManifestEditorAction, ManifestEditorView } from '../../../../core/models';
 
+/**
+ * @element umb-editor-entity-layout
+ * @description
+ * @slot icon - Slot for rendering the entity icon
+ * @slot name - Slot for rendering the entity name
+ * @slot footer - Slot for rendering the entity footer
+ * @slot actions - Slot for rendering the entity actions
+ * @slot default - slot for main content
+ * @export
+ * @class UmbEditorEntityLayout
+ * @extends {UmbContextConsumerMixin(LitElement)}
+ */
 @customElement('umb-editor-entity-layout')
 export class UmbEditorEntityLayout extends UmbContextConsumerMixin(LitElement) {
 	static styles = [
@@ -63,11 +75,18 @@ export class UmbEditorEntityLayout extends UmbContextConsumerMixin(LitElement) {
 		`,
 	];
 
+	/**
+	 * Alias of the editor. The Layout will render the editor views that are registered for this editor alias.
+	 * @public
+	 * @type {string}
+	 * @attr
+	 * @default ''
+	 */
 	@property()
-	alias = '';
+	public headline = '';
 
 	@property()
-	name = '';
+	public alias = '';
 
 	@state()
 	private _editorViews: Array<ManifestEditorView> = [];
@@ -173,11 +192,11 @@ export class UmbEditorEntityLayout extends UmbContextConsumerMixin(LitElement) {
 							${this._editorViews.map(
 								(view: ManifestEditorView) => html`
 									<uui-tab
-										.label="${view.name}"
+										.label="${view.meta.label || view.name}"
 										href="${this._routerFolder}/view/${view.meta.pathname}"
 										?active="${this._currentView.includes(view.meta.pathname)}">
 										<uui-icon slot="icon" name="${view.meta.icon}"></uui-icon>
-										${view.name}
+										${view.meta.label || view.name}
 									</uui-tab>
 								`
 							)}
@@ -192,7 +211,10 @@ export class UmbEditorEntityLayout extends UmbContextConsumerMixin(LitElement) {
 			<umb-editor-layout>
 				<div id="header" slot="header">
 					<slot id="icon" name="icon"></slot>
-					<slot id="name" name="name"></slot>
+					<div id="name">
+						${this.headline ? html`<h3>${this.headline}</h3>` : nothing}
+						<slot id="name" name="name"></slot>
+					</div>
 					${this._renderViews()}
 				</div>
 

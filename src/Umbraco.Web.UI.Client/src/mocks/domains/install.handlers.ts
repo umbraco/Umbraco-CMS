@@ -2,10 +2,10 @@ import { rest } from 'msw';
 
 import umbracoPath from '../../core/helpers/umbraco-path';
 import type {
-  PostInstallRequest,
-  ProblemDetails,
-  UmbracoInstaller,
-  UmbracoPerformInstallDatabaseConfiguration,
+	PostInstallRequest,
+	ProblemDetails,
+	UmbracoInstaller,
+	UmbracoPerformInstallDatabaseConfiguration,
 } from '../../core/models';
 
 export const handlers = [

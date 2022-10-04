@@ -1,14 +1,15 @@
 // TODO: lazy load
 import './layouts/confirm/modal-layout-confirm.element';
 import './layouts/content-picker/modal-layout-content-picker.element';
+import './layouts/property-editor-ui-picker/modal-layout-property-editor-ui-picker.element';
 
 import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
 import { BehaviorSubject, Observable } from 'rxjs';
 
-import { UmbModalHandler } from './';
-
 import type { UmbModalConfirmData } from './layouts/confirm/modal-layout-confirm.element';
 import type { UmbModalContentPickerData } from './layouts/content-picker/modal-layout-content-picker.element';
+import type { UmbModalPropertyEditorUIPickerData } from './layouts/property-editor-ui-picker/modal-layout-property-editor-ui-picker.element';
+import { UmbModalHandler } from './';
 
 export type UmbModelType = 'dialog' | 'sidebar';
 
@@ -42,6 +43,17 @@ export class UmbModalService {
 	 */
 	public contentPicker(data?: UmbModalContentPickerData): UmbModalHandler {
 		return this.open('umb-modal-layout-content-picker', { data, type: 'sidebar', size: 'small' });
+	}
+
+	/**
+	 * Opens a Property Editor UI sidebar modal
+	 * @public
+	 * @param {UmbModalPropertyEditorUIPickerData} [data]
+	 * @return {*}  {UmbModalHandler}
+	 * @memberof UmbModalService
+	 */
+	public propertyEditorUIPicker(data?: UmbModalPropertyEditorUIPickerData): UmbModalHandler {
+		return this.open('umb-modal-layout-property-editor-ui-picker', { data, type: 'sidebar', size: 'small' });
 	}
 
 	/**

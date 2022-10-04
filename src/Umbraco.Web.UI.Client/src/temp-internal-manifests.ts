@@ -130,6 +130,18 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 	},
 	{
 		type: 'dashboard',
+		alias: 'Umb.Dashboard.PublishedStatus',
+		name: 'Published Status',
+		elementName: 'umb-dashboard-published-status',
+		loader: () => import('./backoffice/dashboards/published-status/dashboard-published-status.element'),
+		meta: {
+			sections: ['Umb.Section.Settings'],
+			pathname: 'published-status', // TODO: how to we want to support pretty urls?
+			weight: 9,
+		},
+	},
+	{
+		type: 'dashboard',
 		alias: 'Umb.Dashboard.MediaManagement',
 		name: 'Media',
 		elementName: 'umb-dashboard-media-management',
@@ -143,44 +155,88 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 	{
 		type: 'propertyEditorUI',
 		alias: 'Umb.PropertyEditorUI.Text',
-		name: 'Text',
+		name: 'Text Property Editor UI',
 		loader: () => import('./backoffice/property-editors/text/property-editor-text.element'),
 		meta: {
-			icon: 'edit',
-			group: 'common',
+			label: 'Text',
+			icon: 'umb:edit',
+			group: 'Common',
+			propertyEditor: 'Umbraco.TextBox',
 		},
 	},
 	{
 		type: 'propertyEditorUI',
 		alias: 'Umb.PropertyEditorUI.Textarea',
-		name: 'Textarea',
+		name: 'Textarea Property Editor UI',
 		elementName: 'umb-property-editor-textarea',
 		loader: () => import('./backoffice/property-editors/textarea/property-editor-textarea.element'),
 		meta: {
-			icon: 'edit',
-			group: 'common',
+			label: 'Textarea',
+			icon: 'umb:edit',
+			group: 'Common',
+			propertyEditor: 'Umbraco.TextArea',
+			config: {
+				properties: [
+					{
+						alias: 'rows',
+						label: 'Number of rows',
+						description: 'If empty - 10 rows would be set as the default value',
+						propertyEditorUI: 'Umb.PropertyEditorUI.Number',
+					},
+				],
+			},
 		},
 	},
 	{
 		type: 'propertyEditorUI',
 		alias: 'Umb.PropertyEditorUI.ContextExample',
-		name: 'Context Example',
+		name: 'Context Example Property Editor UI',
 		loader: () => import('./backoffice/property-editors/context-example/property-editor-context-example.element'),
 		meta: {
-			icon: 'favorite',
-			group: 'common',
+			label: 'Context Example',
+			icon: 'umb:favorite',
+			group: 'Common',
+			propertyEditor: 'Umbraco.Custom',
+			config: {
+				properties: [
+					{
+						label: 'Some Configuration',
+						alias: 'someConfiguration',
+						propertyEditorUI: 'Umb.PropertyEditorUI.Text',
+					},
+				],
+				defaultData: [
+					{
+						alias: 'someConfiguration',
+						value: 'Some default value',
+					},
+				],
+			},
+		},
+	},
+	{
+		type: 'propertyEditorUI',
+		alias: 'Umb.PropertyEditorUI.Number',
+		name: 'Number Property Editor UI',
+		loader: () => import('./backoffice/property-editors/number/property-editor-number.element'),
+		meta: {
+			label: 'Number',
+			icon: 'umb:autofill',
+			group: 'Common',
+			propertyEditor: 'Umbraco.Integer',
 		},
 	},
 	{
 		type: 'editorView',
-		alias: 'Umb.EditorView.ContentEdit',
-		name: 'Content',
+		alias: 'Umb.EditorView.Content.Edit',
+		name: 'Content Editor Edit View',
 		elementName: 'umb-editor-view-node-edit',
 		loader: () => import('./backoffice/editors/shared/node/views/edit/editor-view-node-edit.element'),
 		meta: {
 			// TODO: how do we want to filter where editor views are shown? https://our.umbraco.com/documentation/extending/Content-Apps/#setting-up-the-plugin
 			// this is a temp solution
 			editors: ['Umb.Editor.Document', 'Umb.Editor.Media'],
+			label: 'Info',
 			pathname: 'content',
 			weight: 100,
 			icon: 'document',
@@ -188,14 +244,15 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 	},
 	{
 		type: 'editorView',
-		alias: 'Umb.EditorView.ContentInfo',
-		name: 'Info',
+		alias: 'Umb.EditorView.Content.Info',
+		name: 'Content Editor Info View',
 		elementName: 'umb-editor-view-node-info',
 		loader: () => import('./backoffice/editors/shared/node/views/info/editor-view-node-info.element'),
 		meta: {
 			// TODO: how do we want to filter where editor views are shown? https://our.umbraco.com/documentation/extending/Content-Apps/#setting-up-the-plugin
 			// this is a temp solution
 			editors: ['Umb.Editor.Document', 'Umb.Editor.Media'],
+			label: 'Info',
 			pathname: 'info',
 			weight: 90,
 			icon: 'info',
@@ -203,14 +260,14 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 	},
 	{
 		type: 'editorView',
-		alias: 'Umb.EditorView.DataTypeEdit',
-		name: 'Edit',
-		elementName: 'umb-editor-view-data-type-edit',
-		loader: () => import('./backoffice/editors/data-type/views/editor-view-data-type-edit.element'),
+		alias: 'Umb.EditorView.DataType.Edit',
+		name: 'Data Type Editor Edit View',
+		loader: () => import('./backoffice/editors/data-type/views/edit/editor-view-data-type-edit.element'),
 		meta: {
 			// TODO: how do we want to filter where editor views are shown? https://our.umbraco.com/documentation/extending/Content-Apps/#setting-up-the-plugin
 			// this is a temp solution
 			editors: ['Umb.Editor.DataType'],
+			label: 'Edit',
 			pathname: 'edit',
 			weight: 90,
 			icon: 'edit',
@@ -218,14 +275,30 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 	},
 	{
 		type: 'editorView',
-		alias: 'Umb.EditorView.DocumentTypeDesign',
-		name: 'Design',
+		alias: 'Umb.EditorView.DataType.Info',
+		name: 'Data Type Editor Info View',
+		loader: () => import('./backoffice/editors/data-type/views/info/editor-view-data-type-info.element'),
+		meta: {
+			// TODO: how do we want to filter where editor views are shown? https://our.umbraco.com/documentation/extending/Content-Apps/#setting-up-the-plugin
+			// this is a temp solution
+			editors: ['Umb.Editor.DataType'],
+			label: 'Info',
+			pathname: 'info',
+			weight: 90,
+			icon: 'info',
+		},
+	},
+	{
+		type: 'editorView',
+		alias: 'Umb.EditorView.DocumentType.Design',
+		name: 'Document Type Editor Design View',
 		elementName: 'umb-editor-view-document-type-design',
 		loader: () => import('./backoffice/editors/document-type/views/editor-view-document-type-design.element'),
 		meta: {
 			// TODO: how do we want to filter where editor views are shown? https://our.umbraco.com/documentation/extending/Content-Apps/#setting-up-the-plugin
 			// this is a temp solution
 			editors: ['Umb.Editor.DocumentType'],
+			label: 'Design',
 			pathname: 'design',
 			weight: 90,
 			icon: 'edit',
@@ -234,11 +307,12 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 	{
 		type: 'editorView',
 		alias: 'Umb.Editor.Packages.Overview',
-		name: 'Packages',
+		name: 'Packages Editor Overview View',
 		elementName: 'umb-packages-overview',
 		loader: () => import('./backoffice/sections/packages/packages-overview.element'),
 		meta: {
 			icon: 'document',
+			label: 'Packages',
 			pathname: 'repo',
 			editors: ['Umb.Editor.Packages'],
 			weight: 10,
@@ -247,11 +321,12 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 	{
 		type: 'editorView',
 		alias: 'Umb.Editor.Packages.Installed',
-		name: 'Installed',
+		name: 'Packages Editor Installed View',
 		elementName: 'umb-packages-installed',
 		loader: () => import('./backoffice/sections/packages/packages-installed.element'),
 		meta: {
 			icon: 'document',
+			label: 'Installed',
 			pathname: 'installed',
 			editors: ['Umb.Editor.Packages'],
 			weight: 0,
@@ -322,12 +397,14 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 	{
 		type: 'propertyEditorUI',
 		alias: 'Umb.PropertyEditorUI.ContentPicker',
-		name: 'ContentPicker',
+		name: 'Content Picker Property Editor UI',
 		elementName: 'umb-property-editor-content-picker',
 		loader: () => import('./backoffice/property-editors/content-picker/property-editor-content-picker.element'),
 		meta: {
-			icon: 'document',
-			group: 'common',
+			label: 'Content Picker',
+			propertyEditor: 'Umbraco.ContentPicker',
+			icon: 'umb:document',
+			group: 'Common',
 		},
 	},
 	{

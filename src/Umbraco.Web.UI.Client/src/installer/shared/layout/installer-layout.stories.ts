@@ -5,7 +5,7 @@ import type { UmbInstallerLayoutElement } from './installer-layout.element';
 import './installer-layout.element';
 
 export default {
-	title: 'Components/Installer/Shared',
+	title: 'Apps/Installer/Shared',
 	component: 'umb-installer-layout',
 	id: 'umb-installer-layout',
 } as Meta;

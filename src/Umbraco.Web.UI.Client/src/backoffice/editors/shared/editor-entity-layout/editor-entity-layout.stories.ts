@@ -16,6 +16,6 @@ export const AAAOverview: Story<UmbEditorEntityLayout> = () => html` <umb-editor
 	<div slot="name"><uui-button color="" look="placeholder">Name slot</uui-button></div>
 	<div slot="footer"><uui-button color="" look="placeholder">Footer slot</uui-button></div>
 	<div slot="actions"><uui-button color="" look="placeholder">Actions slot</uui-button></div>
-	<uui-button color="" look="placeholder">Main slot</uui-button>
+	<uui-button color="" look="placeholder">Default slot</uui-button>
 </umb-editor-entity-layout>`;
 AAAOverview.storyName = 'Overview';

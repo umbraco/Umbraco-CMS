@@ -1,12 +1,12 @@
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit-html';
 
-import type { UmbInstallerUserElement } from './installer-user.element';
 import { installerContextProvider } from '../shared/utils.story-helpers';
+import type { UmbInstallerUserElement } from './installer-user.element';
 import './installer-user.element';
 
 export default {
-	title: 'Components/Installer/Steps',
+	title: 'Apps/Installer/Steps',
 	component: 'umb-installer-user',
 	id: 'umb-installer-user',
 	decorators: [(story) => installerContextProvider(story)],

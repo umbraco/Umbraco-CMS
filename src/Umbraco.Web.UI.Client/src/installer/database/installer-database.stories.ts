@@ -2,13 +2,13 @@ import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit-html';
 import { rest } from 'msw';
 
-import type { UmbInstallerDatabaseElement } from './installer-database.element';
 import type { UmbracoInstaller } from '../../core/models';
 import { installerContextProvider } from '../shared/utils.story-helpers';
+import type { UmbInstallerDatabaseElement } from './installer-database.element';
 import './installer-database.element';
 
 export default {
-	title: 'Components/Installer/Steps',
+	title: 'Apps/Installer/Steps',
 	component: 'umb-installer-database',
 	id: 'umb-installer-database',
 	decorators: [(story) => installerContextProvider(story)],

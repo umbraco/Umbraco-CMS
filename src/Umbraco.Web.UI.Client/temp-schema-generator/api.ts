@@ -1,8 +1,10 @@
 import './installer';
 import './manifests';
+import './publishedstatus';
 import './server';
 import './upgrader';
 import './user';
+import './property-editors';
 
 import { api } from '@airtasker/spot';
 
