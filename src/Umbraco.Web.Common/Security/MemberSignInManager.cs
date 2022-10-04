@@ -304,12 +304,15 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
         }
 
         // If this fails, we should disapprove the member,as it is now in an inconsistent state.
-        autoLinkUser.IsApproved = false;
-        await UserManager.UpdateAsync(autoLinkUser);
-        Logger.LogError("Disapproving member: {0}, as we could not autolink this member, and it is now in an unconsistent state ", autoLinkUser.Email);
+        return await HandleFailedLinkingUser(autoLinkUser, linkResult);
+    }
 
+    protected Task<AutoLinkSignInResult> HandleFailedLinkingUser(MemberIdentityUser autoLinkUser, IdentityResult linkResult)
+    {
         var errors = linkResult.Errors.Select(x => x.Description).ToList();
-        return AutoLinkSignInResult.FailedLinkingUser(errors);
+
+        Logger.LogError("Failed to external link user. The following errors happened: {errors}", errors);
+        return Task.FromResult(AutoLinkSignInResult.FailedLinkingUser(errors));
     }
 
     private void LogFailedExternalLogin(ExternalLoginInfo loginInfo, MemberIdentityUser user) =>
