@@ -197,13 +197,11 @@
             var dragX = 0;
             var dragY = 0;
             var dragOffsetX = 0;
-            //var dragOffsetY = 0;
 
             var ghostElIndicateForceLeft = null;
             var ghostElIndicateForceRight = null;
 
             var approvedContainerEl = null;
-            //var approvedContainerDate = null;
 
             // Setup DOM method for communication between sortables:
             gridLayoutContainerEl['Sortable:controller'] = () => {
@@ -229,21 +227,12 @@
                     if (Sortable.active && Sortable.active.lastPullMode === 'clone') {
                         syncEntry = Utilities.copy(syncEntry);
                         prevEntries.splice(Sortable.utils.index(evt.clone, sortable.options.draggable), 0, prevEntries.splice(oldIndex, 1)[0]);
-
-                        /*
-                        if (evt.from.contains(evt.clone)) {
-                            evt.from.removeChild(evt.clone);
-                        }
-                        */
                     }
                     else {
                         prevEntries.splice(oldIndex, 1);
                     }
                     
                     vm.entries.splice(newIndex, 0, syncEntry);
-
-                    // I currently do not think below line is necessary as this is updated through angularJS. This was giving trouble/errors.
-                    //fromCtrl.$element.insertBefore(evt.item, nextSibling); // revert element
 
                     const contextColumns = vm.blockEditorApi.internal.getContextColumns(vm.parentBlock, vm.areaKey);
 
@@ -267,12 +256,6 @@
                 }
                 else {
                     vm.entries.splice(newIndex, 0, vm.entries.splice(oldIndex, 1)[0]);
-
-                    // TODO: I don't think this is necessary, I would like to prove it purpose:
-                    // move ng-repeat comment node to right position:
-                    /*if (nextSibling.nodeType === Node.COMMENT_NODE) {
-                        fromCtrl.$element.insertBefore(nextSibling, evt.item.nextSibling);
-                    }*/
                 }
             }
 
@@ -305,12 +288,6 @@
                     console.error("Cancel cause had no approvedContainerEl", approvedContainerEl)
                     return;
                 }
-                /*
-                if(approvedContainer.animated) {
-                    console.log("approvedContainer.animated", approvedContainer.animated)
-                    return;
-                }
-                */
                 
                 ghostRect = ghostEl.getBoundingClientRect();
 
@@ -387,11 +364,9 @@
                                 
                                 var subVm = subLayout['Sortable:controller']();
                                 if(subVm.sortGroupIdentifier === vm.sortGroupIdentifier) {
-                                    //if(_indication(subVm, ghostEl)) {
-                                        approvedContainerEl = subLayout;
-                                        _moveGhostElement();
-                                        return;
-                                    //}
+                                    approvedContainerEl = subLayout;
+                                    _moveGhostElement();
+                                    return;
                                 }
                             }
                         }
@@ -412,57 +387,49 @@
                     } else if (ghostEl.dataset.forceRight) {
                         placeAfter = true;
                     } else {
-                        //if(isInsideFoundRelated) {
 
-                            // if the related element is forceLeft and we are in the left side, we will set vertical direction, to correct placeAfter.
-                            if (foundRelatedEl.dataset.forceLeft && placeAfter === false) {
-                                verticalDirection = true;
-                            } else 
-                            // if the related element is forceRight and we are in the right side, we will set vertical direction, to correct placeAfter.
-                            if (foundRelatedEl.dataset.forceRight && placeAfter === true) {
-                                verticalDirection = true;
-                            } else {
+                        // if the related element is forceLeft and we are in the left side, we will set vertical direction, to correct placeAfter.
+                        if (foundRelatedEl.dataset.forceLeft && placeAfter === false) {
+                            verticalDirection = true;
+                        } else 
+                        // if the related element is forceRight and we are in the right side, we will set vertical direction, to correct placeAfter.
+                        if (foundRelatedEl.dataset.forceRight && placeAfter === true) {
+                            verticalDirection = true;
+                        } else {
 
-                                // TODO: move calculations out so they can be persisted a bit longer?
-                                //const approvedContainerRect = approvedContainerEl.getBoundingClientRect();
-                                const approvedContainerComputedStyles = getComputedStyle(approvedContainerEl);
-                                const gridColumnNumber = parseInt(approvedContainerComputedStyles.getPropertyValue("--umb-block-grid--grid-columns"), 10);
+                            // TODO: move calculations out so they can be persisted a bit longer?
+                            //const approvedContainerRect = approvedContainerEl.getBoundingClientRect();
+                            const approvedContainerComputedStyles = getComputedStyle(approvedContainerEl);
+                            const gridColumnNumber = parseInt(approvedContainerComputedStyles.getPropertyValue("--umb-block-grid--grid-columns"), 10);
 
-                                const relatedColumns = parseInt(foundRelatedEl.dataset.colSpan, 10);
-                                const ghostColumns = parseInt(ghostEl.dataset.colSpan, 10);
+                            const relatedColumns = parseInt(foundRelatedEl.dataset.colSpan, 10);
+                            const ghostColumns = parseInt(ghostEl.dataset.colSpan, 10);
 
-                                // Get grid template:
-                                const approvedContainerGridColumns = approvedContainerComputedStyles.gridTemplateColumns.trim().split("px").map(x => Number(x)).filter(n => n > 0);
+                            // Get grid template:
+                            const approvedContainerGridColumns = approvedContainerComputedStyles.gridTemplateColumns.trim().split("px").map(x => Number(x)).filter(n => n > 0);
 
-                                // ensure all columns are there.
-                                // This will also ensure handling non-css-grid mode,
-                                // use container width divided by amount of columns( or the item width divided by its amount of columnSpan)
-                                let amountOfColumnsInWeightMap = approvedContainerGridColumns.length;
-                                const amountOfUnknownColumns = gridColumnNumber-amountOfColumnsInWeightMap;
-                                if(amountOfUnknownColumns > 0) {
-                                    let accumulatedValue = getAccumulatedValueOfIndex(amountOfColumnsInWeightMap, approvedContainerGridColumns) || 0;
-                                    const layoutWidth = approvedContainerRect.width;
-                                    const missingColumnWidth = (layoutWidth-accumulatedValue)/amountOfUnknownColumns;
-                                    while(amountOfColumnsInWeightMap++ < gridColumnNumber) {
-                                        approvedContainerGridColumns.push(missingColumnWidth);
-                                    }
+                            // ensure all columns are there.
+                            // This will also ensure handling non-css-grid mode,
+                            // use container width divided by amount of columns( or the item width divided by its amount of columnSpan)
+                            let amountOfColumnsInWeightMap = approvedContainerGridColumns.length;
+                            const amountOfUnknownColumns = gridColumnNumber-amountOfColumnsInWeightMap;
+                            if(amountOfUnknownColumns > 0) {
+                                let accumulatedValue = getAccumulatedValueOfIndex(amountOfColumnsInWeightMap, approvedContainerGridColumns) || 0;
+                                const layoutWidth = approvedContainerRect.width;
+                                const missingColumnWidth = (layoutWidth-accumulatedValue)/amountOfUnknownColumns;
+                                while(amountOfColumnsInWeightMap++ < gridColumnNumber) {
+                                    approvedContainerGridColumns.push(missingColumnWidth);
                                 }
-
-
-                                const relatedStartX = foundRelatedElRect.left - approvedContainerRect.left;
-                                const relatedStartCol = Math.round(getInterpolatedIndexOfPositionInWeightMap(relatedStartX, approvedContainerGridColumns));
-
-                                if(relatedStartCol + relatedColumns + ghostColumns > gridColumnNumber) {
-                                    verticalDirection = true;
-                                }
-
-                                /*
-                                If they fit, then we go horizontal? unless forceLeft/forceRight on both?
-
-                                If they don't fit we go vertical...
-                                */
                             }
-                        //}
+
+
+                            const relatedStartX = foundRelatedElRect.left - approvedContainerRect.left;
+                            const relatedStartCol = Math.round(getInterpolatedIndexOfPositionInWeightMap(relatedStartX, approvedContainerGridColumns));
+
+                            if(relatedStartCol + relatedColumns + ghostColumns > gridColumnNumber) {
+                                verticalDirection = true;
+                            }
+                        }
                     }
                     if (verticalDirection) {
                         placeAfter = (dragY > foundRelatedElRect.top + (foundRelatedElRect.height*.5));
@@ -501,7 +468,6 @@
 
                 const clientX = (evt.touches ? evt.touches[0] : evt).clientX;
                 const clientY = (evt.touches ? evt.touches[1] : evt).clientY;
-                /** ignorer last drag event, comes as clientX === 0 and clientY === 0 */
                 if(vm.movingLayoutEntry && targetRect && ghostRect && clientX !== 0 && clientY !== 0) {
 
                     if(dragX === clientX && dragY === clientY) {
@@ -509,8 +475,6 @@
                     }
                     dragX = clientX;
                     dragY = clientY;
-
-
                     
                     ghostRect = ghostEl.getBoundingClientRect();
 
@@ -519,7 +483,6 @@
                     if (!insideGhost) {
                         if(rqaId === null) {
                             rqaId = requestAnimationFrame(_moveGhostElement);
-                            //rqaId = setTimeout(() => {rqaId = null;}, 150);
                         }
                     }
 
@@ -529,7 +492,6 @@
                         const oldForceLeft = vm.movingLayoutEntry.forceLeft;
                         const oldForceRight = vm.movingLayoutEntry.forceRight;
 
-                        //var newValue = (dragX - dragOffsetX < targetRect.left - 50);
                         var newValue = (dragX < targetRect.left);
                         if(newValue !== oldForceLeft) {
                             vm.movingLayoutEntry.forceLeft = newValue;
@@ -555,7 +517,6 @@
                             }
                         }
 
-                        //newValue = (dragX - dragOffsetX + ghostRect.width > targetRect.right + 50) && (vm.movingLayoutEntry.forceLeft !== true);
                         newValue = (dragX > targetRect.right) && (vm.movingLayoutEntry.forceLeft !== true);
                         if(newValue !== oldForceRight) {
                             vm.movingLayoutEntry.forceRight = newValue;
@@ -580,48 +541,15 @@
             vm.sortGroupIdentifier = "BlockGridEditor_"+vm.blockEditorApi.internal.uniqueEditorKey;
 
             const sortable = Sortable.create(gridLayoutContainerEl, {
-                group: vm.sortGroupIdentifier,  // links groups with same name.
-                sort: true,  // sorting inside list
-                //delay: 0, // time in milliseconds to define when the sorting should start
-                //delayOnTouchOnly: false, // only delay if user is using touch
-                //touchStartThreshold: 0, // px, how many pixels the point should move before cancelling a delayed drag event
-                //disabled: false, // Disables the sortable if set to true.
-                //store: null,  // @see Store
-                animation: 0, //ANIMATION_DURATION,  // ms, animation speed moving items when sorting, `0` — without animation
-                easing: "cubic-bezier(1, 0, 0, 1)", // Easing for animation. Defaults to null. See https://easings.net/ for examples.
-                //handle: "umb-block-grid-block",  // Drag handle selector within list items,
+                group: vm.sortGroupIdentifier,
+                sort: true,
+                animation: 0,
                 cancel: '',
-                //filter: ".ignore-elements",  // Selectors that do not lead to dragging (String or Function)
-                //preventOnFilter: true, // Call `event.preventDefault()` when triggered `filter`
-                draggable: ".umb-block-grid__layout-item",  // Specifies which items inside the element should be draggable
-
-                //dataIdAttr: 'data-element-udi', // HTML attribute that is used by the `toArray()` method
-
-                ghostClass: "umb-block-grid__layout-item-placeholder",  // Class name for the drop placeholder
-                //chosenClass: "sortable-chosen",  // Class name for the chosen item
-                //dragClass: "sortable-drag",  // Class name for the dragging item
-
-                swapThreshold: .4, // Threshold of the swap zone
-                //invertSwap: true, // Will always use inverted swap zone if set to true
-                //invertedSwapThreshold: .55, // Threshold of the inverted swap zone (will be set to swapThreshold value by default)
-                //direction: 'horizontal', // Direction of Sortable (will be detected automatically if not given)
-                /*direction: function(evt, target, dragEl) {
-                    //if (target !== null && target.className.includes('half-column') && dragEl.className.includes('half-column')) {
-                    //    return 'horizontal';
-                    //}
-                    console.log(evt, target, dragEl)
-                    return 'vertical';
-                },*/
-
-                //forceFallback: true,  // ignore the HTML5 DnD behavior and force the fallback to kick in
-
-                //fallbackClass: "sortable-fallback",  // Class name for the cloned DOM Element when using forceFallback
-                //fallbackOnBody: false,  // Appends the cloned DOM Element into the Document's Body
-                //fallbackTolerance: 0, // Specify in pixels how far the mouse should move before it's considered as a drag.
-
+                draggable: ".umb-block-grid__layout-item",
+                ghostClass: "umb-block-grid__layout-item-placeholder",
+                swapThreshold: .4,
                 dragoverBubble: true,
-                //removeCloneOnHide: true, // Remove the clone element when it is not showing, rather than just hiding it
-                emptyInsertThreshold: 40, // px, distance mouse must be from empty sortable to insert drag element into it
+                emptyInsertThreshold: 40,
 
                 scrollSensitivity: 50,
                 scrollSpeed: 16,
@@ -648,8 +576,6 @@
                     vm.movingLayoutEntry.forceRight = false;
                     vm.movingLayoutEntry.$block.__scope.$evalAsync();// needed for the block to be updated
 
-                    //targetEl = evt.to;
-                    //cloneEl = evt.clone;
                     ghostEl = evt.item;
 
                     targetRect = evt.to.getBoundingClientRect();
@@ -657,90 +583,37 @@
 
                     const clientX = (evt.originalEvent.touches ? evt.originalEvent.touches[0] : evt.originalEvent).clientX;
                     dragOffsetX = clientX - ghostRect.left;
-                    //dragOffsetY = evt.originalEvent.clientY - ghostRect.top;
 
                     window.addEventListener('drag', _onDragMove);
                     window.addEventListener('dragover', _onDragMove);
 
-                    //gridLayoutContainerEl.getRootNode().host.style.setProperty("--umb-block-grid--dragging-mode", 1);
                     document.documentElement.style.setProperty("--umb-block-grid--dragging-mode", 1);
 
                     $scope.$evalAsync();
                 },
                 // Called by any change to the list (add / update / remove)
                 onMove: function (evt) {
-                    //console.log('onMove', evt)
-
                     relatedEl = evt.related;
                     targetRect = evt.to.getBoundingClientRect();
                     ghostRect = evt.draggedRect;
-                    /*
-                    // if cursor is within the ghostBox, then a move will be prevented:
-                    if(isWithinRect(dragX, dragY, ghostRect, 0)) {
-                        return false;
-                    }
-
-                    var contextVM = vm;
-                    if (gridLayoutContainerEl !== evt.to) {
-                        contextVM = evt.to['Sortable:controller']();
-                    }
-
-                    // same properties as onEnd
-                    
-                    if(_indication(contextVM, evt.dragged) === false) {
-                        return false;
-                    }
-                    
-                    if(evt.to !== approvedContainerEl) {
-
-                        if(approvedContainerDate) {
-                            const timeSinceApproval = new Date().getTime() - approvedContainerDate;
-                            const rejectionTimeLeft = 250 - timeSinceApproval;
-                            if(rejectionTimeLeft > 0) {
-                                //console.log("Reject by rejectionTimeLeft")
-                                return false;
-                            }
-                        }
-
-                        // We will let SortableJS do the move when switching to a new container, otherwise not.
-                        approvedContainerEl = evt.to;
-                        approvedContainerDate = new Date().getTime();
-
-                        // Always return false, cause it ends bad when sortableJS tries to do it..
-                        return false;
-                    }
-                    */
     
                     // Disable SortableJS from handling the drop, instead we will use our own.
                     return false;
                 },
-                
-                /*
-                // When runtime dragging around:
-                onChange: function (evt) {
-                    //console.log('onChange', evt)
-                    //evt.oldIndex;  // element index within parent
-                },
-                */
                 // When an change actually was made, after drop has occurred:
                 onSort: function (evt) {
-                    //console.log('onSort', evt)
-                    //evt.oldIndex;  // element index within parent
                     vm.blockEditorApi.internal.setDirty();
                 },
                 
                 onAdd: function (evt) {
-                    //console.log("# onAdd", vm, vm.movingLayoutEntry)
                     _sync(evt);
                     $scope.$evalAsync();
                 },
                 onUpdate: function (evt) {
-                    //console.log("# onUpdate", vm)
                     _sync(evt);
                     $scope.$evalAsync();
                 },
                 onEnd: function(evt) {
-                    //console.log("# onEnd", vm);
                     if(rqaId !== null) {
                         cancelAnimationFrame(rqaId);
                     }
@@ -770,77 +643,6 @@
                     ghostEl = null;
                     relatedEl = null;
                 }
-                /*
-                setData: function (dataTransfer, dragEl) {
-                    dataTransfer.setData('Text', dragEl.textContent); // `dataTransfer` object of HTML5 DragEvent
-                },
-
-                // Element is chosen
-                onChoose: function (evt) {
-                    console.log('onChoose')
-                    //evt.oldIndex;  // element index within parent
-                },
-                // Element is unchosen
-                onUnchoose: function(evt) {
-                    // same properties as onEnd
-                },
-
-                // Element dragging started
-                onStart: function (evt) {
-                    evt.oldIndex;  // element index within parent
-                },
-
-                // Element dragging ended
-                onEnd: function (evt) {
-                    var itemEl = evt.item;  // dragged HTMLElement
-                    evt.to;    // target list
-                    evt.from;  // previous list
-                    evt.oldIndex;  // element's old index within old parent
-                    evt.newIndex;  // element's new index within new parent
-                    evt.oldDraggableIndex; // element's old index within old parent, only counting draggable elements
-                    evt.newDraggableIndex; // element's new index within new parent, only counting draggable elements
-                    evt.clone // the clone element
-                    evt.pullMode;  // when item is in another sortable: `"clone"` if cloning, `true` if moving
-                },
-
-                // Element is dropped into the list from another list
-                onAdd: function (evt) {
-                    // same properties as onEnd
-                },
-                
-
-                // Element is removed from the list into another list
-                onRemove: function (evt) {
-                    // same properties as onEnd
-                },
-
-                // Attempt to drag a filtered element
-                onFilter: function (evt) {
-                    var itemEl = evt.item;  // HTMLElement receiving the `mousedown|tapstart` event.
-                },
-
-                // Event when you move an item in the list or between lists
-                onMove: function (evt, originalEvent) {
-                    // Example: https://jsbin.com/nawahef/edit?js,output
-                    evt.dragged; // dragged HTMLElement
-                    evt.draggedRect; // DOMRect {left, top, right, bottom}
-                    evt.related; // HTMLElement on which have guided
-                    evt.relatedRect; // DOMRect
-                    evt.willInsertAfter; // Boolean that is true if Sortable will insert drag element after target by default
-                    originalEvent.clientY; // mouse position
-                    // return false; — for cancel
-                    // return -1; — insert before target
-                    // return 1; — insert after target
-                    // return true; — keep default insertion point based on the direction
-                    // return void; — keep default insertion point based on the direction
-                },
-
-                // Called when creating a clone of element
-                onClone: function (evt) {
-                    var origEl = evt.item;
-                    var cloneEl = evt.clone;
-                },
-                */
             });
 
             $scope.$on('$destroy', function () {

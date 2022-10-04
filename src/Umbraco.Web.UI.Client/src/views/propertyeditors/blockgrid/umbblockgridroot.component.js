@@ -29,9 +29,7 @@
         var vm = this;
 
         vm.$onInit = function () {
-
-            //$scope.valFormManager = vm.valFormManager;
-
+            
             var shadowRoot = $element[0].attachShadow({ mode: 'open' });
             shadowRoot.innerHTML = 
             `
