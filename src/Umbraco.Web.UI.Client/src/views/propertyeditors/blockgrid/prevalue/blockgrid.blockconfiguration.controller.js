@@ -394,9 +394,9 @@
                             }
                         }
     
-                        initSampleBlock(data.umbBlockGridDemoHeadlineBlock, sampleGroup.key, {"label": "Headline", "view": "~/App_Plugins/Umbraco.BlockGridEditor.DefaultCustomViews/headlineblock.html"});
+                        initSampleBlock(data.umbBlockGridDemoHeadlineBlock, sampleGroup.key, {"label": "Headline ({{headline | truncate:true:36}})", "view": "~/App_Plugins/Umbraco.BlockGridEditor.DefaultCustomViews/headlineblock.html"});
                         initSampleBlock(data.umbBlockGridDemoImageBlock, sampleGroup.key, {"label": "Image", "view": "~/App_Plugins/Umbraco.BlockGridEditor.DefaultCustomViews/imageblock.html"});
-                        initSampleBlock(data.umbBlockGridDemoRichTextBlock, sampleGroup.key, { "label": "Rich Text", "view": "~/App_Plugins/Umbraco.BlockGridEditor.DefaultCustomViews/rteblock.html"});
+                        initSampleBlock(data.umbBlockGridDemoRichTextBlock, sampleGroup.key, { "label": "Rich Text  ({{richText | ncRichText | truncate:true:36}})", "view": "~/App_Plugins/Umbraco.BlockGridEditor.DefaultCustomViews/rteblock.html"});
                         const twoColumnLayoutAreas = [
                             {
                                 'key': String.CreateGuid(),
