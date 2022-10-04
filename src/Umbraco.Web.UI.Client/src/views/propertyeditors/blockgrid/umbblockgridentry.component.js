@@ -352,14 +352,13 @@
 
             layoutContainer = $element[0].closest('.umb-block-grid__layout-container');
             if(!layoutContainer) {
-                console.error($element[0], 'could not find parent layout-container');
+                return;
             }
 
             const layoutContainerRect = layoutContainer.getBoundingClientRect();
             const layoutItemRect = $element[0].getBoundingClientRect();
 
             if(layoutItemRect.right > layoutContainerRect.right - 5) {
-                console.log("at right... reject.")
                 vm.hideInlineCreateAfter = true;
                 return;
             }
