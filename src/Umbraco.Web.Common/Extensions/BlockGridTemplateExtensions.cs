@@ -34,10 +34,7 @@ public static class BlockGridTemplateExtensions
 
     public static async Task<IHtmlContent> GetBlockGridHtmlAsync(this IHtmlHelper html, IPublishedContent contentItem, string propertyAlias, string template)
     {
-        if (propertyAlias == null)
-        {
-            throw new ArgumentNullException(nameof(propertyAlias));
-        }
+        ArgumentNullException.ThrowIfNull(propertyAlias);
 
         if (string.IsNullOrWhiteSpace(propertyAlias))
         {

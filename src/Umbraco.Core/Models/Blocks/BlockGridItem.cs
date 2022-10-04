@@ -9,9 +9,7 @@ namespace Umbraco.Cms.Core.Models.Blocks
     /// <summary>
     /// Represents a layout item for the Block Grid editor.
     /// </summary>
-    /// <seealso cref="Umbraco.Core.Models.Blocks.IBlockReference{Umbraco.Core.Models.PublishedContent.IPublishedElement}" />
-
-    // TODO: Change: Niels: this is also called block, be aware!
+    /// <seealso cref="Umbraco.Core.Models.Blocks.IBlockReference{Umbraco.Core.Models.PublishedContent.IPublishedElement,Umbraco.Core.Models.PublishedContent.IPublishedElement}" />
     [DataContract(Name = "block", Namespace = "")]
     public class BlockGridItem : IBlockReference<IPublishedElement, IPublishedElement>
     {
