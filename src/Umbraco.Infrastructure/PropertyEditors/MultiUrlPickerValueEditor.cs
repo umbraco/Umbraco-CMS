@@ -2,8 +2,8 @@
 // See LICENSE for more details.
 
 using System.Runtime.Serialization;
+using System.Text.Json;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -14,16 +14,24 @@ using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
 public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
 {
-    private static readonly JsonSerializerSettings _linkDisplayJsonSerializerSettings = new()
+    private static readonly JsonSerializerOptions _linkDisplayJsonSerializerSettings = new()
     {
-        Formatting = Formatting.None,
-        NullValueHandling = NullValueHandling.Ignore,
+        WriteIndented = false,
+        DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
+    };
+
+    private static readonly JsonSerializerOptions _deserializeOptions = new()
+    {
+        Converters = { new UdiConverter() },
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        PropertyNameCaseInsensitive = false
     };
 
     private readonly IEntityService _entityService;
@@ -54,12 +62,12 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
     {
         var asString = value == null ? string.Empty : value is string str ? str : value.ToString();
 
-        if (string.IsNullOrEmpty(asString))
+        if (string.IsNullOrWhiteSpace(asString))
         {
             yield break;
         }
 
-        List<LinkDto>? links = JsonConvert.DeserializeObject<List<LinkDto>>(asString);
+        List<LinkDto>? links = JsonSerializer.Deserialize<List<LinkDto>>(asString, _deserializeOptions);
         if (links is not null)
         {
             foreach (LinkDto link in links)
@@ -84,7 +92,7 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
 
         try
         {
-            List<LinkDto>? links = JsonConvert.DeserializeObject<List<LinkDto>>(value);
+            List<LinkDto>? links = JsonSerializer.Deserialize<List<LinkDto>>(value, _deserializeOptions);
 
             List<LinkDto>? documentLinks = links?.FindAll(link =>
                 link.Udi != null && link.Udi.EntityType == Constants.UdiEntityType.Document);
@@ -188,13 +196,13 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
 
         try
         {
-            List<LinkDisplay>? links = JsonConvert.DeserializeObject<List<LinkDisplay>>(value);
+            List<LinkDisplay>? links = JsonSerializer.Deserialize<List<LinkDisplay>>(value, _deserializeOptions);
             if (links?.Count == 0)
             {
                 return null;
             }
 
-            return JsonConvert.SerializeObject(
+            return JsonSerializer.Serialize(
                 from link in links
                 select new LinkDto
                 {
