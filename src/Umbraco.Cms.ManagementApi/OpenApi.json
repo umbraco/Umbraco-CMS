@@ -2736,7 +2736,7 @@
     "/umbraco/api/v1/modelsBuilder/build": {
       "post": {
         "tags": [
-          "ModelsBuilderDashboard"
+          "ModelsBuilder"
         ],
         "operationId": "BuildModelsBuilder_BuildModels",
         "responses": {
@@ -2767,7 +2767,7 @@
     "/umbraco/api/v1/modelsBuilder": {
       "get": {
         "tags": [
-          "ModelsBuilderDashboard"
+          "ModelsBuilder"
         ],
         "operationId": "GetModelsBuilder_GetDashboard",
         "responses": {
@@ -2788,7 +2788,7 @@
     "/umbraco/api/v1/modelsBuilder/status": {
       "get": {
         "tags": [
-          "ModelsBuilderDashboard"
+          "ModelsBuilder"
         ],
         "operationId": "StatusModelsBuilder_GetModelsOutOfDateStatus",
         "responses": {
@@ -3588,6 +3588,9 @@
       "name": "MemberType"
     },
     {
+      "name": "ModelsBuilder"
+    },
+    {
       "name": "PartialView"
     },
     {
@@ -3613,9 +3616,6 @@
     },
     {
       "name": "Template"
-    },
-    {
-      "name": "ModelsBuilderDashboard"
     },
     {
       "name": "Upgrade"
