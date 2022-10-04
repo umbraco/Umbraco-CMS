@@ -2258,6 +2258,15 @@ Mange hilsner fra Umbraco robotten
     <key alias="pickSpecificAllowance">Tilføj gruppe eller block</key>
     <key alias="allowanceMinimum">Sæt minimum krav for denne tilladelse</key>
     <key alias="allowanceMaximum">Set maksimum krav for denne tilladelse</key>
+    <key alias="block">Blok</key>
+    <key alias="tabBlock">Blok</key>
+    <key alias="tabBlockTypeSettings">Indstillinger</key>
+    <key alias="tabAreas">Områder</key>
+    <key alias="tabAdvanced">Avanceret</key>
+    <key alias="headlineAllowance">Tilladelser</key>
+    <key alias="getSampleHeadline">Opstil demo konfiguration?</key>
+    <key alias="getSampleDescription"><![CDATA[Få et par Blokke til demonstration af hvordan Block Grid Editor virker.<br/>Dette indeholder Blokke for Overskrift, Beriget-Tekst, Billede og To-Koloners-Layout.]]></key>
+    <key alias="getSampleButton">Opstil eksempler</key>
   </area>
   <area alias="contentTemplatesDashboard">
     <key alias="whatHeadline">Hvad er Indholdsskabeloner?</key>
