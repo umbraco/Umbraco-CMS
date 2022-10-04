@@ -3,6 +3,7 @@
 
 using System.Runtime.Serialization;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
@@ -24,7 +25,7 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
     private static readonly JsonSerializerOptions _linkDisplayJsonSerializerSettings = new()
     {
         WriteIndented = false,
-        DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
     };
 
     private static readonly JsonSerializerOptions _deserializeOptions = new()
