@@ -1,12 +1,12 @@
 import { css, html, LitElement, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
-import { UmbContextConsumerMixin } from '../../../../../core/context';
 import { repeat } from 'lit/directives/repeat.js';
-import UmbEditorViewUsersElement, { UserItem } from './editor-view-users.element';
 import { Subscription } from 'rxjs';
-import { UmbUserStore } from '../../../../../core/stores/user/user.store';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
+import { UmbContextConsumerMixin } from '../../../../../../../core/context';
+import UmbEditorViewUsersElement, { UserItem } from '../../editor-view-users.element';
+import { UmbUserStore } from '../../../../../../../core/stores/user/user.store';
 
 @customElement('umb-editor-view-users-grid')
 export class UmbEditorViewUsersGridElement extends UmbContextConsumerMixin(LitElement) {

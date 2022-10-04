@@ -1,11 +1,11 @@
 import { css, html, LitElement, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbContextConsumerMixin } from '../../../../../core/context';
+import { UmbContextConsumerMixin } from '../../../../../../../core/context';
 import { repeat } from 'lit/directives/repeat.js';
 import { Subscription } from 'rxjs';
-import UmbEditorViewUsersElement, { UserItem } from './editor-view-users.element';
-import { UmbUserStore } from '../../../../../core/stores/user/user.store';
+import UmbEditorViewUsersElement, { UserItem } from '../../editor-view-users.element';
+import { UmbUserStore } from '../../../../../../../core/stores/user/user.store';
 
 interface TableColumn {
 	name: string;

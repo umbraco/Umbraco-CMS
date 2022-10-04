@@ -3,7 +3,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, query, state } from 'lit/decorators.js';
 import { UmbContextConsumerMixin } from '../../../../../core/context';
 import { Subscription } from 'rxjs';
-import './editor-view-users-table.element';
+import './list-view-layouts/table/editor-view-users-table.element';
 import './editor-view-users-grid.element';
 import './editor-view-users-selection.element';
 import { IRoute } from 'router-slot';
