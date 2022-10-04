@@ -382,7 +382,7 @@
             } else {
                 block.view = defaultViewFolderPath + "gridblock/gridblock.editor.html";
             }
-            
+
         }
 
         /**
@@ -519,8 +519,8 @@
 
             // fit in row?
             if (options.fitInRow === true) {
-                // TODO: find the best way to add this in with the rest of the row?
                 /*
+                Idea for finding the proper size for this new block:
                 Use clientRect to measure previous items, once one is more to the right than the one before, then it must be a new line.
                 Combine those from the line to inspect if there is left room. Se if the left room fits?
                 Additionally the sizingOptions of the other can come into play?
