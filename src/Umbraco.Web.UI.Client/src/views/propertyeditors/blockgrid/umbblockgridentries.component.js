@@ -192,7 +192,6 @@
 
             var targetRect = null;
             var relatedEl = null;
-            //var relatedRect = null;
             var ghostEl = null;
             var ghostRect = null;
             var dragX = 0;
@@ -204,7 +203,7 @@
             var ghostElIndicateForceRight = null;
 
             var approvedContainerEl = null;
-            var approvedContainerDate = null;
+            //var approvedContainerDate = null;
 
             // Setup DOM method for communication between sortables:
             gridLayoutContainerEl['Sortable:controller'] = () => {
@@ -303,6 +302,7 @@
                     return;
                 }
                 if(!approvedContainerEl) {
+                    console.error("Cancel cause had no approvedContainerEl", approvedContainerEl)
                     return;
                 }
                 /*
@@ -313,7 +313,6 @@
                 */
                 
                 ghostRect = ghostEl.getBoundingClientRect();
-                //relatedRect = relatedEl?.getBoundingClientRect();
 
                 const insideGhost = isWithinRect(dragX, dragY, ghostRect);
                 if (insideGhost) {
@@ -323,7 +322,7 @@
                 var approvedContainerRect = approvedContainerEl.getBoundingClientRect();
 
                 const approvedContainerHasItems = approvedContainerEl.querySelector('.umb-block-grid__layout-item:not(.umb-block-grid__layout-item-placeholder)');
-                if(!approvedContainerHasItems && isWithinRect(dragX, dragY, approvedContainerRect, 50) || approvedContainerHasItems && isWithinRect(dragX, dragY, approvedContainerRect, -10)) {
+                if(!approvedContainerHasItems && isWithinRect(dragX, dragY, approvedContainerRect, 20) || approvedContainerHasItems && isWithinRect(dragX, dragY, approvedContainerRect, -10)) {
                     // we are good...
                 } else {
                     var parentContainer = approvedContainerEl.parentNode.closest('.umb-block-grid__layout-container');
@@ -384,7 +383,7 @@
                             const subLayoutRect = subLayout.getBoundingClientRect();
                             const hasItems = subLayout.querySelector('.umb-block-grid__layout-item:not(.umb-block-grid__layout-item-placeholder)');
                             // gather elements on the same row.
-                            if(!hasItems && isWithinRect(dragX, dragY, subLayoutRect, 50) || hasItems && isWithinRect(dragX, dragY, subLayoutRect, -10)) {
+                            if(!hasItems && isWithinRect(dragX, dragY, subLayoutRect, 20) || hasItems && isWithinRect(dragX, dragY, subLayoutRect, -10)) {
                                 
                                 var subVm = subLayout['Sortable:controller']();
                                 if(subVm.sortGroupIdentifier === vm.sortGroupIdentifier) {
@@ -514,10 +513,8 @@
 
                     
                     ghostRect = ghostEl.getBoundingClientRect();
-                    //relatedRect = relatedEl?.getBoundingClientRect();
 
                     const insideGhost = isWithinRect(dragX, dragY, ghostRect, 0);
-                    //const insideRelated = relatedRect ? (dragX > relatedRect.left && dragX < relatedRect.right && dragY > relatedRect.top && dragY < relatedRect.bottom) : false;
                     
                     if (!insideGhost) {
                         if(rqaId === null) {
@@ -675,7 +672,6 @@
                     //console.log('onMove', evt)
 
                     relatedEl = evt.related;
-                    //relatedRect = evt.related.getBoundingClientRect();
                     targetRect = evt.to.getBoundingClientRect();
                     ghostRect = evt.draggedRect;
                     /*
@@ -772,7 +768,6 @@
                     targetRect = null;
                     ghostRect = null;
                     ghostEl = null;
-                    //relatedRect = null;
                     relatedEl = null;
                 }
                 /*

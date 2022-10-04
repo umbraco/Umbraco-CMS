@@ -163,8 +163,8 @@
             type="button"
             title="@blockEditor_scaleHandlerButtonTitle"
             localize="title"
-            class="umb-block-grid__scale-handler" 
-            ng-mousedown="vm.scaleHandlerMouseDown($event)" 
+            class="umb-block-grid__scale-handler"
+            ng-mousedown="vm.scaleHandlerMouseDown($event)"
             ng-keyup="vm.scaleHandlerKeyUp($event)">
         </button>
         <div ng-if="::!vm.blockEditorApi.readonly && (vm.layoutEntry.$block.config.columnSpanOptions.length > 1 || (vm.layoutEntry.$block.config.rowMinSpan && vm.layoutEntry.$block.config.rowMaxSpan && vm.layoutEntry.$block.config.rowMaxSpan !== vm.layoutEntry.$block.config.rowMinSpan))" 
@@ -176,11 +176,14 @@
 </ng-form>
 
 <uui-button-inline-create
-    ng-if="!vm.blockEditorApi.readonly"
+    ng-if="!vm.blockEditorApi.readonly && !vm.hideInlineCreateAfter"
     class="umb-block-grid__block--inline-create-button --after"
     ng-class="{'--at-root': vm.depth === '0'}"
-    ng-click="vm.blockEditorApi.requestShowCreate(vm.parentBlock, vm.areaKey, vm.index+1, $event, {'fitInRow': true})"
-    ng-mouseover="vm.blockEditorApi.internal.showAreaHighlight(vm.parentBlock, vm.areaKey)"
+    ng-click="vm.clickInlineCreateAfter($event)"
+    ng-mouseover="vm.mouseOverInlineCreateAfter()"
     ng-mouseleave="vm.blockEditorApi.internal.hideAreaHighlight(vm.parentBlock, vm.areaKey)"
     vertical>
 </uui-button-inline-create>
+<div ng-if="vm.hideInlineCreateAfter"
+    class="umb-block-grid__block--inline-create-button --after --detector" ng-mouseover="vm.mouseOverInlineCreateAfter()">
+</div>

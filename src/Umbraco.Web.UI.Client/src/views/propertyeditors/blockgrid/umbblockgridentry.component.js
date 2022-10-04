@@ -98,6 +98,7 @@
         vm.isHoveringArea = false;
         vm.isScaleMode = false;
         vm.layoutColumnsInt = 0;
+        vm.hideInlineCreateAfter = true;
 
         vm.$onInit = function() {
 
@@ -346,6 +347,33 @@
 
             vm.blockEditorApi.internal.setDirty();
             $event.originalEvent.stopPropagation();
+        }
+
+
+        vm.clickInlineCreateAfter = function($event) {
+            if(vm.hideInlineCreateAfter === false) {
+                vm.blockEditorApi.requestShowCreate(vm.parentBlock, vm.areaKey, vm.index+1, $event, {'fitInRow': true});
+            }
+        }
+        vm.mouseOverInlineCreateAfter = function() {
+
+            layoutContainer = $element[0].closest('.umb-block-grid__layout-container');
+            if(!layoutContainer) {
+                console.error($element[0], 'could not find parent layout-container');
+            }
+
+            const layoutContainerRect = layoutContainer.getBoundingClientRect();
+            const layoutItemRect = $element[0].getBoundingClientRect();
+
+            if(layoutItemRect.right > layoutContainerRect.right - 5) {
+                console.log("at right... reject.")
+                vm.hideInlineCreateAfter = true;
+                return;
+            }
+
+            vm.hideInlineCreateAfter = false;
+            vm.blockEditorApi.internal.showAreaHighlight(vm.parentBlock, vm.areaKey);
+
         }
 
         $scope.$on("$destroy", function () {

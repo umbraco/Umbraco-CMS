@@ -607,10 +607,24 @@ umb-block-grid-block {
 .umb-block-grid__block--inline-create-button.--after {
     right: 1px;
 }
+.umb-block-grid__block--inline-create-button.--after.--detector {
+    width: 10px;
+    margin-right: -10px;
+    height: 100%;
+    z-index: 0;
+}
 .umb-block-grid__block--inline-create-button.--after.--at-root {
     /* If at root, and full-width then move a little out to the right: */
     --calc: clamp(0, calc(var(--umb-block-grid--item-column-span) - (var(--umb-block-grid--grid-columns)-1)), 1);
     right: calc(-2px * var(--calc));
+}
+.umb-block-grid__block--inline-create-button.--after.--hide {
+    /** If at right side, hide, but do still act on mouseOver so we can reevaluate if it should be shown again.*/
+    opacity: 0;
+    cursor: move !important;
+}
+.umb-block-grid__block--inline-create-button.--after.--hide > * {
+    pointer-events: none;
 }
 
 .umb-block-grid__block--after-inline-create-button {
