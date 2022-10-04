@@ -22,6 +22,7 @@ namespace Umbraco.Cms.Infrastructure.Serialization
             }
         }
 
-        public override void Write(Utf8JsonWriter writer, Udi value, JsonSerializerOptions options) => throw new NotImplementedException();
+        public override void Write(Utf8JsonWriter writer, Udi value, JsonSerializerOptions options)
+                => writer.WriteStringValue(value?.ToString());
     }
 }
