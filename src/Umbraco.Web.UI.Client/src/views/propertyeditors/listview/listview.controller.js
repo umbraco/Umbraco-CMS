@@ -682,7 +682,7 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
             }
 
             if (e.nameExp) {
-                if (e.nameTemplate.indexOf('|') > -1) {
+                if (/{{\s*\w+\|\w+\s*}}/.test(e.nameTemplate)) {
                     value = {
                       value,
                       expression: e.nameExp
