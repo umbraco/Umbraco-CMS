@@ -5,6 +5,7 @@ import { UmbContextConsumerMixin } from '../../../../../core/context';
 import { repeat } from 'lit/directives/repeat.js';
 import { Subscription } from 'rxjs';
 import UmbEditorViewUsersElement, { UserItem } from './editor-view-users.element';
+import { UmbUserStore } from '../../../../../core/stores/user/user.store';
 
 interface TableColumn {
 	name: string;
@@ -75,6 +76,7 @@ export class UmbEditorViewUsersTableElement extends UmbContextConsumerMixin(LitE
 	@state()
 	private _users: Array<UserItem> = [];
 
+	private _userStore?: UmbUserStore;
 	private _usersContext?: UmbEditorViewUsersElement;
 	private _usersSubscription?: Subscription;
 	private _selectionSubscription?: Subscription;
@@ -82,17 +84,14 @@ export class UmbEditorViewUsersTableElement extends UmbContextConsumerMixin(LitE
 	connectedCallback(): void {
 		super.connectedCallback();
 
+		this.consumeContext('umbUserStore', (userStore: UmbUserStore) => {
+			this._userStore = userStore;
+			this._observeUsers();
+		});
+
 		this.consumeContext('umbUsersContext', (usersContext: UmbEditorViewUsersElement) => {
 			this._usersContext = usersContext;
-
-			this._usersSubscription?.unsubscribe();
-			this._selectionSubscription?.unsubscribe();
-			this._usersSubscription = this._usersContext?.users.subscribe((users: Array<UserItem>) => {
-				this._users = users;
-			});
-			this._selectionSubscription = this._usersContext?.selection.subscribe((selection: Array<string>) => {
-				this._selection = selection;
-			});
+			this._observeSelection();
 		});
 
 		this._columns = [
@@ -140,6 +139,20 @@ export class UmbEditorViewUsersTableElement extends UmbContextConsumerMixin(LitE
 
 		this._usersSubscription?.unsubscribe();
 		this._selectionSubscription?.unsubscribe();
+	}
+
+	private _observeUsers() {
+		this._usersSubscription?.unsubscribe();
+		this._usersSubscription = this._userStore?.getAll().subscribe((users) => {
+			this._users = users;
+		});
+	}
+
+	private _observeSelection() {
+		this._selectionSubscription?.unsubscribe();
+		this._selectionSubscription = this._usersContext?.selection.subscribe((selection: Array<string>) => {
+			this._selection = selection;
+		});
 	}
 
 	private _selectAllHandler(event: Event) {

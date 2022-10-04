@@ -9,6 +9,7 @@ import * as serverHandlers from './domains/server.handlers';
 import { handlers as upgradeHandlers } from './domains/upgrade.handlers';
 import { handlers as userHandlers } from './domains/user.handlers';
 import { handlers as propertyEditorHandlers } from './domains/property-editor.handlers';
+import { handlers as usersHandlers } from './domains/users.handlers';
 
 const handlers = [
 	serverHandlers.serverVersionHandler,
@@ -22,6 +23,7 @@ const handlers = [
 	...propertyEditorHandlers,
 	...manifestsHandlers.default,
 	...publishedStatusHandlers,
+	...usersHandlers,
 ];
 
 switch (import.meta.env.VITE_UMBRACO_INSTALL_STATUS) {

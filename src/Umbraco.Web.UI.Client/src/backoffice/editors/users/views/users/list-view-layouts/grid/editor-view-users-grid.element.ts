@@ -5,6 +5,8 @@ import { UmbContextConsumerMixin } from '../../../../../core/context';
 import { repeat } from 'lit/directives/repeat.js';
 import UmbEditorViewUsersElement, { UserItem } from './editor-view-users.element';
 import { Subscription } from 'rxjs';
+import { UmbUserStore } from '../../../../../core/stores/user/user.store';
+import { ifDefined } from 'lit-html/directives/if-defined.js';
 
 @customElement('umb-editor-view-users-grid')
 export class UmbEditorViewUsersGridElement extends UmbContextConsumerMixin(LitElement) {
@@ -34,24 +36,36 @@ export class UmbEditorViewUsersGridElement extends UmbContextConsumerMixin(LitEl
 	@state()
 	private _selection: Array<string> = [];
 
-	protected _usersContext?: UmbEditorViewUsersElement;
-	protected _usersSubscription?: Subscription;
-	protected _selectionSubscription?: Subscription;
+	private _userStore?: UmbUserStore;
+	private _usersContext?: UmbEditorViewUsersElement;
+	private _usersSubscription?: Subscription;
+	private _selectionSubscription?: Subscription;
 
 	connectedCallback(): void {
 		super.connectedCallback();
 
+		this.consumeContext('umbUserStore', (userStore: UmbUserStore) => {
+			this._userStore = userStore;
+			this._observeUsers();
+		});
+
 		this.consumeContext('umbUsersContext', (usersContext: UmbEditorViewUsersElement) => {
 			this._usersContext = usersContext;
+			this._observeSelection();
+		});
+	}
 
-			this._usersSubscription?.unsubscribe();
-			this._selectionSubscription?.unsubscribe();
-			this._usersSubscription = this._usersContext?.users.subscribe((users: Array<UserItem>) => {
-				this._users = users;
-			});
-			this._selectionSubscription = this._usersContext?.selection.subscribe((selection: Array<string>) => {
-				this._selection = selection;
-			});
+	private _observeUsers() {
+		this._usersSubscription?.unsubscribe();
+		this._usersSubscription = this._userStore?.getAll().subscribe((users) => {
+			this._users = users;
+		});
+	}
+
+	private _observeSelection() {
+		this._selectionSubscription?.unsubscribe();
+		this._selectionSubscription = this._usersContext?.selection.subscribe((selection: Array<string>) => {
+			this._selection = selection;
 		});
 	}
 
@@ -80,9 +94,9 @@ export class UmbEditorViewUsersGridElement extends UmbContextConsumerMixin(LitEl
 	}
 
 	private renderUserCard(user: UserItem) {
-		if (!this._usersContext) return;
+		if (!this._userStore) return;
 
-		const statusLook = this._usersContext.getTagLookAndColor(user.status ? user.status : '');
+		const statusLook = this._usersContext?.getTagLookAndColor(user.status ? user.status : '');
 
 		return html`
 			<uui-card-user
@@ -94,7 +108,11 @@ export class UmbEditorViewUsersGridElement extends UmbContextConsumerMixin(LitEl
 				@selected=${() => this._selectRowHandler(user)}
 				@unselected=${() => this._deselectRowHandler(user)}>
 				${user.status && user.status !== 'Active'
-					? html`<uui-tag slot="tag" size="s" look="${statusLook.look}" color="${statusLook.color}">
+					? html`<uui-tag
+							slot="tag"
+							size="s"
+							look="${ifDefined(statusLook?.look)}"
+							color="${ifDefined(statusLook?.color)}">
 							${user.status}
 					  </uui-tag>`
 					: nothing}

@@ -2,7 +2,7 @@ import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbContextProviderMixin } from '../../../../../core/context';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { InterfaceColor, InterfaceLook } from '@umbraco-ui/uui-base/lib/types';
 import { IRoute } from 'router-slot';
 import { v4 as uuidv4 } from 'uuid';
