@@ -175,9 +175,9 @@
                             <div class="umb-package-details__description" ng-bind-html="vm.package.description"></div>
                             <div class="umb-gallery">
                                 <div class="umb-gallery__thumbnails">
-                                <button type="button" class="umb-gallery__thumbnail" ng-repeat="image in vm.package.images" ng-click="vm.openLightbox($index, vm.package.images)">
-                                    <img ng-src="{{ image.thumbnail }}" />
-                                </button>
+                                    <a ng-href="{{ image.source }}" type="button" class="umb-gallery__thumbnail" ng-repeat="image in vm.package.images" ng-click="vm.openLightbox($index, vm.package.images)" prevent-default>
+                                        <img ng-src="{{ image.thumbnail }}" alt="" />
+                                    </a>
                                 </div>
                             </div>
                         </umb-box-content>
