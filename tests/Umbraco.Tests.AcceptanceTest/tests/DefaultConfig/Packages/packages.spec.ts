@@ -79,14 +79,16 @@ test.describe('Packages', () => {
     await page.locator("button", {hasText: "Create package"}).click();
 
     // Fill out package creation form
-    await page.waitForTimeout(2000);
+    // Waits until the element package Content is visible
+    await page.locator('[key="packager_packageContent"]').isVisible();
     await page.locator("#headerName").type(packageName);
     await page.locator('.controls > .umb-node-preview-add').click();
     await page.locator('.umb-tree-item__label').first().click();
     await page.locator("button", {hasText: "Create"}).click();
     
     // Navigate pack to packages and Assert the file is created
-    await page.waitForTimeout(2000);
+    // Waits until the button download is visible
+    await page.locator('[label-key="general_download"]').isVisible();
     await umbracoUi.goToSection(ConstantHelper.sections.packages);
     await page.locator('[data-element="sub-view-umbCreatedPackages"]').click();
     await expect(await page.locator("body", {hasText: packageName})).toBeVisible();
