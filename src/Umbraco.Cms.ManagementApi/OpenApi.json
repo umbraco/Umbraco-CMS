@@ -208,6 +208,194 @@
         }
       }
     },
+    "/umbraco/api/v1/trackedReferences/{id}": {
+      "get": {
+        "description": "Used by info tabs on content, media etc. and for the delete and unpublish of single items.\nThis is basically finding parents of relations.\n            ",
+        "operationId": "ForItemTrackedReferences_Get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "int32",
+              "type": "integer"
+            },
+            "x-position": 1
+          },
+          {
+            "in": "query",
+            "name": "skip",
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            },
+            "x-position": 2
+          },
+          {
+            "in": "query",
+            "name": "take",
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            },
+            "x-position": 3
+          },
+          {
+            "in": "query",
+            "name": "filterMustBeIsDependency",
+            "schema": {
+              "nullable": true,
+              "type": "boolean"
+            },
+            "x-position": 4
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedViewModelOfRelationItemViewModel"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "summary": "Gets a page list of tracked references for the current item, so you can see where an item is being used.",
+        "tags": [
+          "TrackedReferences"
+        ]
+      }
+    },
+    "/umbraco/api/v1/trackedReferences/descendants/{parentId}": {
+      "get": {
+        "description": "Used when deleting and unpublishing a single item to check if this item has any descending items that are in any\nkind of relation.\nThis is basically finding the descending items which are children in relations.\n            ",
+        "operationId": "DescendantsTrackedReferences_Descendants",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "parentId",
+            "required": true,
+            "schema": {
+              "format": "int32",
+              "type": "integer"
+            },
+            "x-position": 1
+          },
+          {
+            "in": "query",
+            "name": "skip",
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            },
+            "x-position": 2
+          },
+          {
+            "in": "query",
+            "name": "take",
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            },
+            "x-position": 3
+          },
+          {
+            "in": "query",
+            "name": "filterMustBeIsDependency",
+            "schema": {
+              "nullable": true,
+              "type": "boolean"
+            },
+            "x-position": 4
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedViewModelOfRelationItemViewModel"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "summary": "Gets a page list of the child nodes of the current item used in any kind of relation.",
+        "tags": [
+          "TrackedReferences"
+        ]
+      }
+    },
+    "/umbraco/api/v1/trackedReferences/multiple": {
+      "get": {
+        "description": "Used when bulk deleting content/media and bulk unpublishing content (delete and unpublish on List view).\nThis is basically finding children of relations.\n            ",
+        "operationId": "MultipleTrackedReferences_GetPagedReferencedItems",
+        "parameters": [
+          {
+            "explode": true,
+            "in": "query",
+            "name": "ids",
+            "schema": {
+              "items": {
+                "format": "int32",
+                "type": "integer"
+              },
+              "nullable": true,
+              "type": "array"
+            },
+            "style": "form",
+            "x-position": 1
+          },
+          {
+            "in": "query",
+            "name": "skip",
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            },
+            "x-position": 2
+          },
+          {
+            "in": "query",
+            "name": "take",
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            },
+            "x-position": 3
+          },
+          {
+            "in": "query",
+            "name": "filterMustBeIsDependency",
+            "schema": {
+              "nullable": true,
+              "type": "boolean"
+            },
+            "x-position": 4
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedViewModelOfRelationItemViewModel"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "summary": "Gets a page list of the items used in any kind of relation from selected integer ids.",
+        "tags": [
+          "TrackedReferences"
+        ]
+      }
+    },
     "/umbraco/api/v1/stylesheet/tree/children": {
       "get": {
         "tags": [
@@ -4360,6 +4548,9 @@
     },
     {
       "name": "Template"
+    },
+    {
+      "name": "TrackedReferences"
     },
     {
       "name": "Upgrade"
