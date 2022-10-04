@@ -556,7 +556,7 @@
                         }
 
                         //newValue = (dragX - dragOffsetX + ghostRect.width > targetRect.right + 50) && (vm.movingLayoutEntry.forceLeft !== true);
-                        newValue = (dragX + ghostRect.width > targetRect.right) && (vm.movingLayoutEntry.forceLeft !== true);
+                        newValue = (dragX > targetRect.right) && (vm.movingLayoutEntry.forceLeft !== true);
                         if(newValue !== oldForceRight) {
                             vm.movingLayoutEntry.forceRight = newValue;
                             vm.blockEditorApi.internal.setDirty();
