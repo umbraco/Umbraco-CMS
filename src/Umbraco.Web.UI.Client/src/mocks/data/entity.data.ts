@@ -7,9 +7,9 @@ export class UmbEntityData<T extends Entity> extends UmbData<T> {
 		super(data);
 	}
 
-	getItems(type = '', parentKey = '') {
+	getItems(type: string, parentKey = '') {
 		if (!type) return [];
-		return entities.filter((item) => item.type === type && item.parentKey === parentKey);
+		return this.data.filter((item) => item.type === type && item.parentKey === parentKey);
 	}
 
 	getByKey(key: string) {

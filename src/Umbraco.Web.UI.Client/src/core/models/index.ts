@@ -1,4 +1,5 @@
 import type { components } from '../../../schemas/generated-schema';
+import { Entity } from '../../mocks/data/entities';
 
 export type PostInstallRequest = components['schemas']['InstallSetupRequest'];
 export type StatusResponse = components['schemas']['StatusResponse'];
@@ -55,3 +56,21 @@ export type ManifestElementType =
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type HTMLElementConstructor<T = HTMLElement> = new (...args: any[]) => T;
+
+// Users
+export interface UserEntity extends Entity {
+	type: 'user';
+}
+
+export interface UserDetails extends UserEntity {
+	email: string;
+	status: string;
+	language: string;
+	lastLoginDate?: string;
+	lastLockoutDate?: string;
+	lastPasswordChangeDate?: string;
+	updateDate: string;
+	createDate: string;
+	failedLoginAttempts: number;
+	userGroup?: string; //TODO Implement this
+}

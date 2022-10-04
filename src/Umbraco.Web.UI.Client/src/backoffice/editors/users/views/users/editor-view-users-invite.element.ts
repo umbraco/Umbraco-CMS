@@ -1,14 +1,8 @@
 import { css, html, LitElement, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, query, state } from 'lit/decorators.js';
+import { customElement, state } from 'lit/decorators.js';
 import { UmbContextConsumerMixin } from '../../../../../core/context';
-import { Subscription } from 'rxjs';
-import './list-view-layouts/table/editor-view-users-table.element';
-import './editor-view-users-grid.element';
-import './editor-view-users-selection.element';
-import { IRoute } from 'router-slot';
-import UmbEditorViewUsersElement, { UserItem } from './editor-view-users.element';
-import { UUIPopoverElement } from '@umbraco-ui/uui';
+import UmbEditorViewUsersElement from './editor-view-users.element';
 
 export type UsersViewType = 'list' | 'grid';
 @customElement('umb-editor-view-users-invite')

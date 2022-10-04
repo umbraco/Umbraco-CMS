@@ -12,23 +12,7 @@ import './editor-view-users-selection.element';
 import './editor-view-users-user-details.element';
 import './editor-view-users-invite.element';
 
-import { tempData } from './tempData';
-
-export interface UserItem {
-	id: number;
-	key: string;
-	name: string;
-	email: string;
-	status: string;
-	language: string;
-	lastLoginDate?: string;
-	lastLockoutDate?: string;
-	lastPasswordChangeDate?: string;
-	updateDate: string;
-	createDate: string;
-	failedLoginAttempts: number;
-	userGroup?: string; //TODO Implement this
-}
+import type { UserDetails, UserEntity } from '../../../../../core/models';
 
 @customElement('umb-editor-view-users')
 export class UmbEditorViewUsersElement extends UmbContextProviderMixin(LitElement) {
@@ -53,9 +37,6 @@ export class UmbEditorViewUsersElement extends UmbContextProviderMixin(LitElemen
 			redirectTo: '/section/users/view/users/overview', //TODO: this should be dynamic
 		},
 	];
-
-	private _users: BehaviorSubject<Array<UserItem>> = new BehaviorSubject(tempData);
-	public readonly users: Observable<Array<UserItem>> = this._users.asObservable();
 
 	private _selection: BehaviorSubject<Array<string>> = new BehaviorSubject(<Array<string>>[]);
 	public readonly selection: Observable<Array<string>> = this._selection.asObservable();
@@ -84,45 +65,45 @@ export class UmbEditorViewUsersElement extends UmbContextProviderMixin(LitElemen
 		this.requestUpdate('selection');
 	}
 
-	public updateUser(user: UserItem) {
-		const users = this._users.getValue();
-		const index = users.findIndex((u) => u.key === user.key);
-		if (index === -1) return;
-		users[index] = { ...users[index], ...user };
-		console.log('updateUser', user, users[index]);
-		this._users.next(users);
-		this.requestUpdate('users');
-	}
+	// public updateUser(user: UserEntity) {
+	// 	const users = this._users.getValue();
+	// 	const index = users.findIndex((u) => u.key === user.key);
+	// 	if (index === -1) return;
+	// 	users[index] = { ...users[index], ...user };
+	// 	console.log('updateUser', user, users[index]);
+	// 	this._users.next(users);
+	// 	this.requestUpdate('users');
+	// }
 
-	public inviteUser(name: string, email: string, userGroup: string, message: string): UserItem {
-		const users = this._users.getValue();
-		const user = {
-			id: this._users.getValue().length + 1,
-			key: uuidv4(),
-			name: name,
-			email: email,
-			status: 'invited',
-			language: 'en',
-			updateDate: new Date().toISOString(),
-			createDate: new Date().toISOString(),
-			failedLoginAttempts: 0,
-			userGroup: userGroup,
-		};
-		this._users.next([...users, user]);
-		this.requestUpdate('users');
+	// public inviteUser(name: string, email: string, userGroup: string, message: string): UserEntity {
+	// 	const users = this._users.getValue();
+	// 	const user = {
+	// 		id: this._users.getValue().length + 1,
+	// 		key: uuidv4(),
+	// 		name: name,
+	// 		email: email,
+	// 		status: 'invited',
+	// 		language: 'en',
+	// 		updateDate: new Date().toISOString(),
+	// 		createDate: new Date().toISOString(),
+	// 		failedLoginAttempts: 0,
+	// 		userGroup: userGroup,
+	// 	};
+	// 	this._users.next([...users, user]);
+	// 	this.requestUpdate('users');
 
-		//TODO: Send invite email with message
-		return user;
-	}
+	// 	//TODO: Send invite email with message
+	// 	return user;
+	// }
 
-	public deleteUser(key: string) {
-		const users = this._users.getValue();
-		const index = users.findIndex((u) => u.key === key);
-		if (index === -1) return;
-		users.splice(index, 1);
-		this._users.next(users);
-		this.requestUpdate('users');
-	}
+	// public deleteUser(key: string) {
+	// 	const users = this._users.getValue();
+	// 	const index = users.findIndex((u) => u.key === key);
+	// 	if (index === -1) return;
+	// 	users.splice(index, 1);
+	// 	this._users.next(users);
+	// 	this.requestUpdate('users');
+	// }
 
 	public getTagLookAndColor(status?: string): { color: InterfaceColor; look: InterfaceLook } {
 		switch ((status || '').toLowerCase()) {

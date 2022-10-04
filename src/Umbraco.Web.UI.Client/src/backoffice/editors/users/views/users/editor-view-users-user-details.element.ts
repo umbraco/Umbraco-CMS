@@ -4,7 +4,6 @@ import { customElement, state } from 'lit/decorators.js';
 import { UmbContextConsumerMixin } from '../../../../../core/context';
 import UmbEditorViewUsersElement, { UserItem } from './editor-view-users.element';
 import { Subscription } from 'rxjs';
-import { tempData } from './tempData';
 import '../../../../property-editors/content-picker/property-editor-content-picker.element';
 
 @customElement('umb-editor-view-users-user-details')
@@ -86,20 +85,7 @@ export class UmbEditorViewUsersUserDetailsElement extends UmbContextConsumerMixi
 	protected _usersContext?: UmbEditorViewUsersElement;
 	protected _usersSubscription?: Subscription;
 
-	private _languages = tempData //TODO Get languages from API instead of fakeData
-		.reduce((acc, curr) => {
-			if (!acc.includes(curr.language)) {
-				acc.push(curr.language);
-			}
-			return acc;
-		}, [] as Array<string>)
-		.map((language) => {
-			return {
-				name: language,
-				value: language,
-				selected: false,
-			};
-		});
+	private _languages = []; //TODO Add languages
 
 	connectedCallback(): void {
 		super.connectedCallback();

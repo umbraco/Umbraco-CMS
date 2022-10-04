@@ -4,7 +4,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { UmbContextConsumerMixin } from '../../../../../core/context';
 import { Subscription } from 'rxjs';
 import './list-view-layouts/table/editor-view-users-table.element';
-import './editor-view-users-grid.element';
+import './list-view-layouts/grid/editor-view-users-grid.element';
 import './editor-view-users-selection.element';
 import './editor-view-users-invite.element';
 import { IRoute } from 'router-slot';
@@ -132,7 +132,7 @@ export class UmbEditorViewUsersOverviewElement extends UmbContextConsumerMixin(L
 	private _routes: IRoute[] = [
 		{
 			path: 'grid',
-			component: () => import('./editor-view-users-grid.element'),
+			component: () => import('./list-view-layouts/grid/editor-view-users-grid.element'),
 		},
 		{
 			path: 'list',

@@ -5,8 +5,9 @@ import { repeat } from 'lit/directives/repeat.js';
 import { Subscription } from 'rxjs';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { UmbContextConsumerMixin } from '../../../../../../../core/context';
-import UmbEditorViewUsersElement, { UserItem } from '../../editor-view-users.element';
+import UmbEditorViewUsersElement from '../../editor-view-users.element';
 import { UmbUserStore } from '../../../../../../../core/stores/user/user.store';
+import type { UserEntity } from '../../../../../../../core/models';
 
 @customElement('umb-editor-view-users-grid')
 export class UmbEditorViewUsersGridElement extends UmbContextConsumerMixin(LitElement) {
@@ -31,7 +32,7 @@ export class UmbEditorViewUsersGridElement extends UmbContextConsumerMixin(LitEl
 	];
 
 	@state()
-	private _users: Array<UserItem> = [];
+	private _users: Array<UserEntity> = [];
 
 	@state()
 	private _selection: Array<string> = [];
@@ -85,15 +86,15 @@ export class UmbEditorViewUsersGridElement extends UmbContextConsumerMixin(LitEl
 		history.pushState(null, '', '/section/users/view/users/details' + '/' + key); //TODO Change to a tag with href and make dynamic
 	}
 
-	private _selectRowHandler(user: UserItem) {
+	private _selectRowHandler(user: UserEntity) {
 		this._usersContext?.select(user.key);
 	}
 
-	private _deselectRowHandler(user: UserItem) {
+	private _deselectRowHandler(user: UserEntity) {
 		this._usersContext?.deselect(user.key);
 	}
 
-	private renderUserCard(user: UserItem) {
+	private renderUserCard(user: UserEntity) {
 		if (!this._userStore) return;
 
 		const statusLook = this._usersContext?.getTagLookAndColor(user.status ? user.status : '');

@@ -1,15 +1,15 @@
 import { map, Observable } from 'rxjs';
-import { UserItem } from '../../../backoffice/editors/users/views/users/editor-view-users.element';
+import type { UserEntity } from '../../models';
 import { UmbEntityStore } from '../entity.store';
 import { UmbDataStoreBase } from '../store';
 
 /**
  * @export
  * @class UmbUserStore
- * @extends {UmbDataStoreBase<UserItem>}
+ * @extends {UmbDataStoreBase<UserEntity>}
  * @description - Data Store for Users
  */
-export class UmbUserStore extends UmbDataStoreBase<UserItem> {
+export class UmbUserStore extends UmbDataStoreBase<UserEntity> {
 	private _entityStore: UmbEntityStore;
 
 	constructor(entityStore: UmbEntityStore) {
@@ -17,7 +17,7 @@ export class UmbUserStore extends UmbDataStoreBase<UserItem> {
 		this._entityStore = entityStore;
 	}
 
-	getAll(): Observable<Array<UserItem>> {
+	getAll(): Observable<Array<UserEntity>> {
 		// TODO: use Fetcher API.
 		// TODO: only fetch if the data type is not in the store?
 		fetch(`/umbraco/backoffice/users`)
@@ -35,7 +35,7 @@ export class UmbUserStore extends UmbDataStoreBase<UserItem> {
 	 * @return {*}  {(Observable<DataTypeDetails | null>)}
 	 * @memberof UmbDataTypeStore
 	 */
-	getByKey(key: string): Observable<UserItem | null> {
+	getByKey(key: string): Observable<UserEntity | null> {
 		// TODO: use Fetcher API.
 		// TODO: only fetch if the data type is not in the store?
 		fetch(`/umbraco/backoffice/users/${key}`)
@@ -46,7 +46,7 @@ export class UmbUserStore extends UmbDataStoreBase<UserItem> {
 			});
 
 		return this.items.pipe(
-			map((dataTypes: Array<UserItem>) => dataTypes.find((node: UserItem) => node.key === key) || null)
+			map((dataTypes: Array<UserEntity>) => dataTypes.find((node: UserEntity) => node.key === key) || null)
 		);
 	}
 

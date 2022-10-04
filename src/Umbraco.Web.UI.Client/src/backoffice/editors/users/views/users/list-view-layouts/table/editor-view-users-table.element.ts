@@ -4,12 +4,13 @@ import { customElement, state } from 'lit/decorators.js';
 import { UmbContextConsumerMixin } from '../../../../../../../core/context';
 import { repeat } from 'lit/directives/repeat.js';
 import { Subscription } from 'rxjs';
-import UmbEditorViewUsersElement, { UserItem } from '../../editor-view-users.element';
+import UmbEditorViewUsersElement from '../../editor-view-users.element';
 import { UmbUserStore } from '../../../../../../../core/stores/user/user.store';
+import type { UserEntity } from '../../../../../../../core/models';
 
 interface TableColumn {
 	name: string;
-	sort: (items: Array<UserItem>, desc: boolean) => Array<UserItem>;
+	sort: (items: Array<UserEntity>, desc: boolean) => Array<UserEntity>;
 }
 
 @customElement('umb-editor-view-users-table')
@@ -74,7 +75,7 @@ export class UmbEditorViewUsersTableElement extends UmbContextConsumerMixin(LitE
 	private _sortingDesc = false;
 
 	@state()
-	private _users: Array<UserItem> = [];
+	private _users: Array<UserEntity> = [];
 
 	private _userStore?: UmbUserStore;
 	private _usersContext?: UmbEditorViewUsersElement;
@@ -97,7 +98,7 @@ export class UmbEditorViewUsersTableElement extends UmbContextConsumerMixin(LitE
 		this._columns = [
 			{
 				name: 'Name',
-				sort: (items: Array<UserItem>, desc: boolean) => {
+				sort: (items: Array<UserEntity>, desc: boolean) => {
 					return desc
 						? [...items].sort((a, b) => b.name.localeCompare(a.name))
 						: [...items].sort((a, b) => a.name.localeCompare(b.name));
@@ -105,7 +106,7 @@ export class UmbEditorViewUsersTableElement extends UmbContextConsumerMixin(LitE
 			},
 			{
 				name: 'User group',
-				sort: (items: Array<UserItem>, desc: boolean) => {
+				sort: (items: Array<UserEntity>, desc: boolean) => {
 					return desc
 						? [...items].sort((a, b) => b.name.localeCompare(a.name))
 						: [...items].sort((a, b) => a.name.localeCompare(b.name));
@@ -113,7 +114,7 @@ export class UmbEditorViewUsersTableElement extends UmbContextConsumerMixin(LitE
 			},
 			{
 				name: 'Last login',
-				sort: (items: Array<UserItem>, desc: boolean) => {
+				sort: (items: Array<UserEntity>, desc: boolean) => {
 					return desc
 						? [...items].sort((a, b) => +new Date(b.lastLoginDate || 0) - +new Date(a.lastLoginDate || 0))
 						: [...items].sort((a, b) => +new Date(a.lastLoginDate || 0) - +new Date(b.lastLoginDate || 0));
@@ -121,7 +122,7 @@ export class UmbEditorViewUsersTableElement extends UmbContextConsumerMixin(LitE
 			},
 			{
 				name: 'status',
-				sort: (items: Array<UserItem>, desc: boolean) => {
+				sort: (items: Array<UserEntity>, desc: boolean) => {
 					return desc
 						? [...items].sort((a, b) =>
 								b.status && a.status ? b.status.localeCompare(a.status) : (a.status ? 1 : 0) - (b.status ? 1 : 0)
@@ -165,11 +166,11 @@ export class UmbEditorViewUsersTableElement extends UmbContextConsumerMixin(LitE
 		history.pushState(null, '', '/section/users/view/users/details' + '/' + key); //TODO: make a tag with href
 	}
 
-	private _selectRowHandler(user: UserItem) {
+	private _selectRowHandler(user: UserEntity) {
 		this._usersContext?.select(user.key);
 	}
 
-	private _deselectRowHandler(user: UserItem) {
+	private _deselectRowHandler(user: UserEntity) {
 		this._usersContext?.deselect(user.key);
 	}
 
@@ -195,7 +196,7 @@ export class UmbEditorViewUsersTableElement extends UmbContextConsumerMixin(LitE
 		`;
 	}
 
-	protected renderRowTemplate = (user: UserItem) => {
+	protected renderRowTemplate = (user: UserEntity) => {
 		if (!this._usersContext) return;
 
 		const statusLook = this._usersContext.getTagLookAndColor(user.status ? user.status : '');

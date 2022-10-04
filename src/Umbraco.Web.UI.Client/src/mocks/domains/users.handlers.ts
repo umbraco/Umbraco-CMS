@@ -1,11 +1,11 @@
 import { rest } from 'msw';
-import { tempData } from '../../backoffice/editors/users/views/users/tempData';
+import { umbUsersData } from '../data/users.data';
 
 // TODO: add schema
 export const handlers = [
 	rest.get('/umbraco/backoffice/users', (req, res, ctx) => {
 		const response = {
-			items: tempData,
+			items: umbUsersData.getItems('user'),
 		};
 
 		return res(ctx.status(200), ctx.json(response));
@@ -15,7 +15,7 @@ export const handlers = [
 		const key = req.params.key as string;
 		if (!key) return;
 
-		const user = tempData.find((x) => x.key === key);
+		const user = umbUsersData.getByKey(key);
 
 		return res(ctx.status(200), ctx.json([user]));
 	}),
