@@ -448,7 +448,7 @@ stages:
               targetType: inline
               script: |
                 dotnet new --install ./nupkg/Umbraco.Templates.*.nupkg
-                dotnet new umbraco --name Playwright -o . --no-restore
+                dotnet new umbraco --name Playwright --no-restore --output .
                 dotnet restore --configfile ./nuget.config
                 dotnet build --configuration $(buildConfiguration) --no-restore
                 Start-Process -FilePath "dotnet" -ArgumentList "run --configuration $(buildConfiguration) --no-build --no-launch-profile --urls $(PLAYWRIGHT_BASE_URL)"
