@@ -67,7 +67,7 @@ using Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto;
  * ... Option C worked, however after a breaking change from dotnet, we cannot go with this options any longer.
  * The reason for this is that when the default RuntimeViewCompiler loads in the assembly using Assembly.Load,
  * This will not work for us since this loads the compiled views into the default AssemblyLoadContext,
- * and our compiled models is loaded in the the collectible UmbracoAssemblyLoadContext, and as per the breaking change
+ * and our compiled models are loaded in the collectible UmbracoAssemblyLoadContext, and as per the breaking change
  * you're no longer allowed reference a collectible load context from a non-collectible one
  * That is the non-collectible compiled views are not allowed to reference the collectible InMemoryAuto models.
  * https://learn.microsoft.com/en-us/dotnet/core/compatibility/core-libraries/7.0/collectible-assemblies
@@ -152,22 +152,6 @@ public static class UmbracoBuilderDependencyInjectionExtensions
         builder.Services.AddSingleton<RuntimeCompilationCacheBuster>();
         builder.Services.AddSingleton<InMemoryAssemblyLoadContextManager>();
 
-        // var initialCollection = new ServiceCollection { builder.Services };
-
-        // Replace the default with our custom engine
-        // builder.Services.AddSingleton<IRazorViewEngine>(
-        //     s => new RefreshingRazorViewEngine(
-        //         () =>
-        //         {
-        //             // re-create the original container so that a brand new IRazorPageActivator
-        //             // is produced, if we don't re-create the container then it will just return the same instance.
-        //             initialCollection.AddCustomViewCompiler(s);
-        //             ServiceProvider recreatedServices = initialCollection.BuildServiceProvider();
-        //
-        //             return recreatedServices.GetRequiredService<IRazorViewEngine>();
-        //         },
-        //         s.GetRequiredService<InMemoryModelFactory>()));
-
         builder.Services.AddSingleton<InMemoryModelFactory>();
 
         // This is what the community MB would replace, all of the above services are fine to be registered
@@ -186,17 +170,5 @@ public static class UmbracoBuilderDependencyInjectionExtensions
         });
 
         return builder;
-    }
-
-    private static void AddCustomViewCompiler(this ServiceCollection oldCollection, IServiceProvider actualProvider)
-    {
-        // oldCollection.AddSingleton<IViewCompilerProvider, UmbracoViewCompilerProvider>(prov => new UmbracoViewCompilerProvider(
-        //     prov.GetRequiredService<ApplicationPartManager>(),
-        //     prov.GetRequiredService<RazorProjectEngine>(),
-        //     actualProvider.GetRequiredService<ILoggerFactory>(),
-        //     prov.GetRequiredService<IOptions<MvcRazorRuntimeCompilationOptions>>(),
-        //     actualProvider.GetRequiredService<InMemoryModelFactory>(),
-        //     actualProvider.GetRequiredService<UmbracoRazorReferenceManager>(),
-        //     actualProvider.GetRequiredService<CompilationOptionsProvider>()));
     }
 }
