@@ -8,6 +8,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
 using NSwag.AspNetCore;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -37,7 +40,10 @@ public class ManagementApiComposer : IComposer
             .AddNewInstaller()
             .AddUpgrader()
             .AddExamineManagement()
-            .AddTrees();
+            .AddTrees()
+            .AddFactories()
+            .AddServices()
+            .AddMappers();
 
         services.AddApiVersioning(options =>
         {
