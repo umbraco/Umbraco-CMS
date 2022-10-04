@@ -1,13 +1,13 @@
-# New Backoffice
+# New backoffice
 
 > **Warning**:
-> This is an early WIP, and is set not to be packable since we don't want to release this yet. There will be breaking changes in these projects
+> This is an early WIP and is set not to be packable since we don't want to release this yet. There will be breaking changes in these projects.
 
-This solution folder contains the projects for the new BackOffice. If you're looking to fix or improve the existing CMS, this is not the place to do it, although we do very much appreciate your efforts.
+This solution folder contains the projects for the new backoffice. If you're looking to fix or improve the existing CMS, this is not the place to do it, although we do very much appreciate your efforts.
 
 ### Project structure
 
-Since the new backoffice API is still very much a work in progress we've created new projects for the new backoffice API:
+Since the new backoffice API is still very much a work in progress, we've created new projects for the new backoffice API:
 
 * Umbrao.Cms.ManagementApi - The "presentation layer" for the management API
 * "New" versions of existing projects, should be merged with the existing projects when the new API is released:
