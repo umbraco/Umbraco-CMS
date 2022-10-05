@@ -1,16 +1,15 @@
 import { css, html, LitElement, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbContextConsumerMixin } from '../../../../../core/context';
 import { Subscription } from 'rxjs';
 import './list-view-layouts/table/editor-view-users-table.element';
 import './list-view-layouts/grid/editor-view-users-grid.element';
 import './editor-view-users-selection.element';
 import './editor-view-users-invite.element';
-import { IRoute } from 'router-slot';
-import UmbSectionViewUsersElement from './section-view-users.element';
+import { IRoute , isPathActive } from 'router-slot';
 import { UUIPopoverElement } from '@umbraco-ui/uui';
-import { isPathActive } from 'router-slot';
+import { UmbContextConsumerMixin } from '../../../../../core/context';
+import UmbSectionViewUsersElement from './section-view-users.element';
 
 export type UsersViewType = 'list' | 'grid';
 @customElement('umb-editor-view-users-overview')

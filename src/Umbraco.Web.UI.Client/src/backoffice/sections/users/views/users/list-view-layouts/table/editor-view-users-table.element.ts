@@ -1,9 +1,9 @@
 import { css, html, LitElement, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbContextConsumerMixin } from '../../../../../../../core/context';
 import { repeat } from 'lit/directives/repeat.js';
 import { Subscription } from 'rxjs';
+import { UmbContextConsumerMixin } from '../../../../../../../core/context';
 import UmbSectionViewUsersElement from '../../section-view-users.element';
 import { UmbUserStore } from '../../../../../../../core/stores/user/user.store';
 import type { UserEntity } from '../../../../../../../core/models';

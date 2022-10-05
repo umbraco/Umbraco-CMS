@@ -1,8 +1,8 @@
 import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbContextConsumerMixin } from '../../../../../core/context';
 import { Subscription } from 'rxjs';
+import { UmbContextConsumerMixin } from '../../../../../core/context';
 import UmbSectionViewUsersElement, { UserItem } from './section-view-users.element';
 
 @customElement('umb-editor-view-users-selection')

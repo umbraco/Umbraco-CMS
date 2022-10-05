@@ -2,6 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { Subscription, map, switchMap, EMPTY, of } from 'rxjs';
+import { IRoutingInfo } from 'router-slot';
 import { UmbContextConsumerMixin } from '../../../core/context';
 import { createExtensionElement, UmbExtensionRegistry } from '../../../core/extension';
 import { UmbSectionContext } from '../section.context';
@@ -10,7 +11,6 @@ import type { ManifestTree, ManifestEditor, ManifestSectionView } from '../../..
 import '../shared/section-trees.element.ts';
 import { UmbEditorEntityElement } from '../../editors/shared/editor-entity/editor-entity.element';
 import { UmbEntityStore } from '../../../core/stores/entity.store';
-import { IRoutingInfo } from 'router-slot';
 
 @customElement('umb-section')
 export class UmbSectionElement extends UmbContextConsumerMixin(LitElement) {

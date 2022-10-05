@@ -1,9 +1,9 @@
 import { css, html, LitElement, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
+import { Subscription } from 'rxjs';
 import { UmbContextConsumerMixin } from '../../../../../../core/context';
 import { UmbUserStore } from '../../../../../../core/stores/user/user.store';
-import { Subscription } from 'rxjs';
 import type { UserEntity } from '../../../../../../core/models';
 
 @customElement('umb-editor-action-users-save')

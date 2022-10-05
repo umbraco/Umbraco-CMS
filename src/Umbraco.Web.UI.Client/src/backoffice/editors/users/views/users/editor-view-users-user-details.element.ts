@@ -1,12 +1,12 @@
 import { css, html, LitElement, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
+import { Subscription } from 'rxjs';
 import { UmbContextConsumerMixin } from '../../../../../core/context';
 import UmbSectionViewUsersElement from '../../../../sections/users/views/users/section-view-users.element';
-import { Subscription } from 'rxjs';
 import '../../../../property-editors/content-picker/property-editor-content-picker.element';
 import { UmbUserStore } from '../../../../../core/stores/user/user.store';
-import { UserDetails } from '../../../../../core/models';
+import type { UserDetails } from '../../../../../core/models';
 
 @customElement('umb-editor-view-users-user-details')
 export class UmbEditorViewUsersUserDetailsElement extends UmbContextConsumerMixin(LitElement) {
