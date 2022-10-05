@@ -375,7 +375,6 @@ stages:
               dockerImageName: umbraco-linux
             Windows:
               vmImage: 'windows-latest'
-              DOTNET_GENERATE_ASPNET_CERTIFICATE: true # Automatically generate HTTPS development certificate on Windows
         pool:
           vmImage: $(vmImage)
         steps:
@@ -432,11 +431,7 @@ stages:
                 docker build -t $(dockerImageName):$sha -f $(dockerfile) .
                 mkdir -p $(Build.ArtifactStagingDirectory)/docker-images
                 docker save -o $(Build.ArtifactStagingDirectory)/docker-images/$(dockerImageName).$sha.tar $(dockerImageName):$sha
-
-                # Manually generate HTTPS development certificate on Linux
                 dotnet dev-certs https -ep ${HOME}/.aspnet/https/aspnetapp.pfx -p UmbracoAcceptance123!
-                dotnet dev-certs https --trust
-
                 docker run --name $(dockerImageName) -dp 8080:5000 -dp 8443:5001 -e UMBRACO__CMS__GLOBAL__ID=$(UMBRACO__CMS__GLOBAL__ID) -e ASPNETCORE_Kestrel__Certificates__Default__Password="UmbracoAcceptance123!" -e ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx -v ${HOME}/.aspnet/https:/https/ $(dockerImageName):$sha
                 docker ps
           # Urls matching docker setup.
@@ -451,6 +446,7 @@ stages:
                 dotnet new umbraco --name Playwright --no-restore --output .
                 dotnet restore --configfile ./nuget.config
                 dotnet build --configuration $(buildConfiguration) --no-restore
+                dotnet dev-certs https
                 Start-Process -FilePath "dotnet" -ArgumentList "run --configuration $(buildConfiguration) --no-build --no-launch-profile --urls $(PLAYWRIGHT_BASE_URL)"
           - task: PowerShell@2
             displayName: Wait for app
