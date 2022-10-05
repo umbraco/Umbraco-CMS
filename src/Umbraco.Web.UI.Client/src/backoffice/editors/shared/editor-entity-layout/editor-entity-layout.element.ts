@@ -59,10 +59,6 @@ export class UmbEditorEntityLayout extends UmbContextConsumerMixin(LitElement) {
 				margin-left: auto;
 			}
 
-			router-slot {
-				height: 100%;
-			}
-
 			uui-input {
 				width: 100%;
 			}
