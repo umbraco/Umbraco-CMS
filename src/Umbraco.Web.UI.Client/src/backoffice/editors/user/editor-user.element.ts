@@ -8,12 +8,18 @@ import '../../property-editors/content-picker/property-editor-content-picker.ele
 import { UmbUserStore } from '../../../core/stores/user/user.store';
 import type { UserDetails } from '../../../core/models';
 
+import '../shared/editor-entity-layout/editor-entity-layout.element';
+
 @customElement('umb-editor-user')
 export class UmbEditorUserElement extends UmbContextConsumerMixin(LitElement) {
 	static styles = [
 		UUITextStyles,
 		css`
 			:host {
+				display: block;
+			}
+
+			#main {
 				display: grid;
 				grid-template-columns: 1fr 350px;
 				gap: var(--uui-size-space-6);
@@ -79,8 +85,8 @@ export class UmbEditorUserElement extends UmbContextConsumerMixin(LitElement) {
 	@state()
 	private _user?: UserDetails | null;
 
-	@property()
-	public key = '';
+	@property({ type: String })
+	entityKey = '';
 
 	protected _userStore?: UmbUserStore;
 	protected _usersSubscription?: Subscription;
@@ -93,7 +99,7 @@ export class UmbEditorUserElement extends UmbContextConsumerMixin(LitElement) {
 			this._userStore = usersContext;
 
 			this._usersSubscription?.unsubscribe();
-			this._usersSubscription = this._userStore?.getByKey(this.key).subscribe((user) => {
+			this._usersSubscription = this._userStore?.getByKey(this.entityKey).subscribe((user) => {
 				this._user = user;
 			});
 		});
@@ -240,8 +246,15 @@ export class UmbEditorUserElement extends UmbContextConsumerMixin(LitElement) {
 		if (!this._user) return html`User not found`;
 
 		return html`
-			<div id="left-column">${this.renderLeftColumn()}</div>
-			<div id="right-column">${this.renderRightColumn()}</div>
+			<umb-editor-entity-layout alias="Umb.Editor.User" headline="Hej Hej">
+				<!--
+				<uui-input id="name" slot="name" .value=${this._dataTypeName} @input="${this._handleInput}"></uui-input>
+	-->
+				<div id="main">
+					<div id="left-column">${this.renderLeftColumn()}</div>
+					<div id="right-column">${this.renderRightColumn()}</div>
+				</div>
+			</umb-editor-entity-layout>
 		`;
 	}
 }

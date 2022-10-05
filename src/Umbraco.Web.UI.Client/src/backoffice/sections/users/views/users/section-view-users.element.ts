@@ -13,6 +13,7 @@ import './editor-view-users-invite.element';
 
 import type { UserDetails, UserEntity } from '../../../../../core/models';
 import type { UmbEditorUserElement } from '../../../../editors/user/editor-user.element';
+import UmbEditorEntityElement from '../../../../editors/shared/editor-entity/editor-entity.element';
 
 @customElement('umb-section-view-users')
 export class UmbSectionViewUsersElement extends UmbContextProviderMixin(LitElement) {
@@ -29,11 +30,12 @@ export class UmbSectionViewUsersElement extends UmbContextProviderMixin(LitEleme
 			component: () => import('./editor-view-users-invite.element'),
 		},
 		{
-			path: 'details/:key',
-			component: () => import('../../../../editors/user/editor-user.element'),
-			setup: (component: unknown, info: IRoutingInfo) => {
-				const element = component as UmbEditorUserElement;
-				element.key = info.match.params.key;
+			path: `:entityType/:key`,
+			component: () => import('../../../../editors/shared/editor-entity/editor-entity.element'),
+			setup: (component: HTMLElement, info: IRoutingInfo) => {
+				const element = component as UmbEditorEntityElement;
+				element.entityKey = info.match.params.key;
+				element.entityType = info.match.params.entityType;
 			},
 		},
 		{
