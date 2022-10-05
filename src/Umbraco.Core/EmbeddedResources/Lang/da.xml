@@ -2264,9 +2264,9 @@ Mange hilsner fra Umbraco robotten
     <key alias="tabAreas">Områder</key>
     <key alias="tabAdvanced">Avanceret</key>
     <key alias="headlineAllowance">Tilladelser</key>
-    <key alias="getSampleHeadline">Opstil demo konfiguration?</key>
-    <key alias="getSampleDescription"><![CDATA[Få et par Blokke til demonstration af hvordan Block Grid Editor virker.<br/>Dette indeholder Blokke for Overskrift, Beriget-Tekst, Billede og To-Koloners-Layout.]]></key>
-    <key alias="getSampleButton">Opstil eksempler</key>
+    <key alias="getSampleHeadline">Installer demo konfiguration</key>
+    <key alias="getSampleDescription"><![CDATA[Dette tilføjer basale og hjælper dig til at komme igang med Block Grid Editor.<br/>Dette indeholder Blokke for Overskrift, Beriget-Tekst, Billede og To-Koloners-Layout.]]></key>
+    <key alias="getSampleButton">Installer</key>
   </area>
   <area alias="contentTemplatesDashboard">
     <key alias="whatHeadline">Hvad er Indholdsskabeloner?</key>
