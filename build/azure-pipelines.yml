@@ -447,7 +447,7 @@ stages:
                 dotnet restore --configfile ./nuget.config
                 dotnet build --configuration $(buildConfiguration) --no-restore
                 dotnet dev-certs https
-                Start-Process -FilePath "dotnet" -ArgumentList "run --configuration $(buildConfiguration) --no-build --no-launch-profile --urls $(PLAYWRIGHT_BASE_URL)"
+                Start-Process -FilePath "dotnet" -ArgumentList "run --configuration $(buildConfiguration) --no-build --no-launch-profile --urls $(PLAYWRIGHT_BASE_URL) 2>&1" -RedirectStandardOutput $(Build.ArtifactStagingDirectory)/playwright.log
           - task: PowerShell@2
             displayName: Wait for app
             inputs:
@@ -470,21 +470,15 @@ stages:
               workingDirectory: tests/Umbraco.Tests.AcceptanceTest
               script: 'npm run test --ignore-certificate-errors'
           - task: PowerShell@2
-            displayName: Check if artifacts folder exists
+            condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
+            displayName: Write Docker log to file
             inputs:
               targetType: inline
               script: |
-                $MyVariable = Test-Path -Path $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/results
-                Write-Host "##vso[task.setvariable variable=resultFolderExists;]$MyVariable"
-          - task: CopyFiles@2
-            displayName: Prepare artifacts
-            condition: eq(variables.resultFolderExists, 'True')
-            inputs:
-              sourceFolder: $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/results/
-              targetFolder: $(Build.ArtifactStagingDirectory)/playwright
+                docker logs $(dockerImageName) > $(Build.ArtifactStagingDirectory)/playwright.log 2>&1
           - task: PublishPipelineArtifact@1
-            displayName: "Publish test artifacts"
-            condition: eq(variables.resultFolderExists, 'True')
+            condition: always()
+            displayName: Publish test artifacts
             inputs:
               targetPath: $(Build.ArtifactStagingDirectory)
               artifact: 'E2E artifacts - $(Agent.OS) - Attempt #$(System.JobAttempt)'
