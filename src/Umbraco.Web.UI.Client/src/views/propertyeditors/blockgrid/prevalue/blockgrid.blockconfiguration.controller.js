@@ -394,9 +394,9 @@
                             }
                         }
     
-                        initSampleBlock(data.umbBlockGridDemoHeadlineBlock, sampleGroup.key, {"label": "Headline ({{headline | truncate:true:36}})", "view": "~/App_Plugins/Umbraco.BlockGridEditor.DefaultCustomViews/headlineblock.html"});
-                        initSampleBlock(data.umbBlockGridDemoImageBlock, sampleGroup.key, {"label": "Image", "view": "~/App_Plugins/Umbraco.BlockGridEditor.DefaultCustomViews/imageblock.html"});
-                        initSampleBlock(data.umbBlockGridDemoRichTextBlock, sampleGroup.key, { "label": "Rich Text  ({{richText | ncRichText | truncate:true:36}})", "view": "~/App_Plugins/Umbraco.BlockGridEditor.DefaultCustomViews/rteblock.html"});
+                        initSampleBlock(data.umbBlockGridDemoHeadlineBlock, sampleGroup.key, {"label": "Headline ({{headline | truncate:true:36}})", "view": "~/App_Plugins/Umbraco.BlockGridEditor.DefaultCustomViews/umbBlockGridDemoHeadlineBlock.html"});
+                        initSampleBlock(data.umbBlockGridDemoImageBlock, sampleGroup.key, {"label": "Image", "view": "~/App_Plugins/Umbraco.BlockGridEditor.DefaultCustomViews/umbBlockGridDemoImageBlock.html"});
+                        initSampleBlock(data.umbBlockGridDemoRichTextBlock, sampleGroup.key, { "label": "Rich Text  ({{richText | ncRichText | truncate:true:36}})", "view": "~/App_Plugins/Umbraco.BlockGridEditor.DefaultCustomViews/umbBlockGridDemoRichTextBlock.html"});
                         const twoColumnLayoutAreas = [
                             {
                                 'key': String.CreateGuid(),
@@ -417,7 +417,7 @@
                                 'specifiedAllowance': []
                             }
                         ];
-                        initSampleBlock(data.umbBlockGridDemoTwoColumnLayoutBlock, sampleGroup.key, {"label": "Two Column Layout", "view": "~/App_Plugins/Umbraco.BlockGridEditor.DefaultCustomViews/twocolumnsectionblock.html", "allowInAreas": false, "areas": twoColumnLayoutAreas});
+                        initSampleBlock(data.umbBlockGridDemoTwoColumnLayoutBlock, sampleGroup.key, {"label": "Two Column Layout", "view": "~/App_Plugins/Umbraco.BlockGridEditor.DefaultCustomViews/umbBlockGridDemoTwoColumnLayoutBlock.html", "allowInAreas": false, "areas": twoColumnLayoutAreas});
     
                         vm.showSampleDataCTA = false;
                     });
