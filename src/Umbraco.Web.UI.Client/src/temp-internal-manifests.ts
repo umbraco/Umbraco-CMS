@@ -373,18 +373,6 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		},
 	},
 	{
-		type: 'editorView',
-		alias: 'Umb.EditorView.Users.UserGroups',
-		name: 'User Groups',
-		loader: () => import('./backoffice/editors/users/views/user-groups/editor-view-user-groups.element'),
-		meta: {
-			editors: ['Umb.Editor.Users'],
-			pathname: 'user-groups',
-			weight: 0,
-			icon: 'document',
-		},
-	},
-	{
 		type: 'propertyAction',
 		alias: 'Umb.PropertyAction.Copy',
 		name: 'Copy Property Action',
