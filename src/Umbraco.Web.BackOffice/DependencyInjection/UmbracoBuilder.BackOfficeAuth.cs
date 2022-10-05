@@ -105,7 +105,14 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IAuthorizationHandler, MediaPermissionsQueryStringHandler>();
         builder.Services.AddSingleton<IAuthorizationHandler, DenyLocalLoginHandler>();
 
-        builder.Services.AddAuthorization(o => CreatePolicies(o, backOfficeAuthenticationScheme));
+        builder.Services.AddAuthorization(o =>
+        {
+            // TODO: we should not be creating the policies twice :) clean up once we can transition to OpenIddict
+            CreatePolicies(o, backOfficeAuthenticationScheme);
+            // TODO: create the correct policies for new backoffice auth
+            // TODO: use constant OpenIddictServerAspNetCoreDefaults.AuthenticationScheme instead of magic string
+            CreatePolicies(o, "OpenIddict.Validation.AspNetCore");
+        });
     }
 
     private static void CreatePolicies(AuthorizationOptions options, string backOfficeAuthenticationScheme)

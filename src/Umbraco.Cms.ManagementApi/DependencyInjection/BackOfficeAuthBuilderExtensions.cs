@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OpenIddict.Abstractions;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
 
 namespace Umbraco.Cms.ManagementApi.DependencyInjection;
@@ -93,6 +94,11 @@ public static class BackOfficeAuthBuilderExtensions
 
                 // Register the ASP.NET Core host.
                 options.UseAspNetCore();
+
+                options.Configure(validationOptions =>
+                {
+                    validationOptions.TokenValidationParameters.AuthenticationType = Constants.Security.BackOfficeAuthenticationType;
+                });
             });
 
         builder.Services.AddHostedService<ClientIdManager>();
@@ -169,6 +175,7 @@ public static class BackOfficeAuthBuilderExtensions
                         // - use IServerAddressesFeature?
                         // - put it in config?
                         // should we support multiple callback URLS (for external apps)?
+                        // check IHostingEnvironment.EnsureApplicationMainUrl
                         RedirectUris = { new Uri("https://localhost:44331/umbraco/login/callback/") },
                         Permissions =
                         {
