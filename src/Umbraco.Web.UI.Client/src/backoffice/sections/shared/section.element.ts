@@ -1,5 +1,5 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html, LitElement } from 'lit';
+import { css, html, LitElement, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { Subscription, map, switchMap, EMPTY, of } from 'rxjs';
 import { UmbContextConsumerMixin } from '../../../core/context';
@@ -123,9 +123,13 @@ export class UmbSectionElement extends UmbContextConsumerMixin(LitElement) {
 	render() {
 		return html`
 			<umb-section-layout>
-				<umb-section-sidebar>
-					<umb-section-trees></umb-section-trees>
-				</umb-section-sidebar>
+				${this._trees && this._trees.length > 0
+					? html`
+							<umb-section-sidebar>
+								<umb-section-trees></umb-section-trees>
+							</umb-section-sidebar>
+					  `
+					: nothing}
 				<umb-section-main>
 					<router-slot id="router-slot" .routes="${this._routes}"></router-slot>
 				</umb-section-main>
