@@ -2,7 +2,6 @@
   <PropertyGroup>
     <Title>Umbraco CMS - Static assets</Title>
     <Description>Contains the static assets needed to run Umbraco CMS.</Description>
-    <TargetFramework>net7.0</TargetFramework>
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
     <StaticWebAssetBasePath>/</StaticWebAssetBasePath>
   </PropertyGroup>

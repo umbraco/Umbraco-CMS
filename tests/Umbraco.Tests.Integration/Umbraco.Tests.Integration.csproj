@@ -3,7 +3,6 @@
     <PackageId>Umbraco.Cms.Tests.Integration</PackageId>
     <Title>Umbraco CMS - Integration tests</Title>
     <Description>Contains helper classes for integration tests with Umbraco CMS, including all internal integration tests.</Description>
-    <TargetFramework>net7.0</TargetFramework>
     <IsTestProject>true</IsTestProject>
     <RootNamespace>Umbraco.Cms.Tests.Integration</RootNamespace>
   </PropertyGroup>

@@ -3,7 +3,6 @@
     <PackageId>Umbraco.Cms.Infrastructure</PackageId>
     <Title>Umbraco CMS - Infrastructure</Title>
     <Description>Contains the infrastructure assembly needed to run Umbraco CMS.</Description>
-    <TargetFramework>net7.0</TargetFramework>
     <RootNamespace>Umbraco.Cms.Infrastructure</RootNamespace>
   </PropertyGroup>
 

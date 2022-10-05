@@ -5,6 +5,9 @@
     "precision": "build"
   },
   "gitCommitIdShortFixedLength": 7,
+  "nuGetPackageVersion": {
+    "semVer": 2.0
+  },
   "publicReleaseRefSpec": [
     "^refs/heads/main$",
     "^refs/heads/release/"
@@ -13,8 +16,5 @@
     "buildNumber": {
       "enabled": true
     }
-  },
-  "nugetPackageVersion": {
-    "semVer": 2
   }
 }
