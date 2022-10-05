@@ -83,6 +83,7 @@ export interface IManifest {
 }
 
 export interface MetaSection {
+	label: string;
 	pathname: string;
 	weight: number;
 }

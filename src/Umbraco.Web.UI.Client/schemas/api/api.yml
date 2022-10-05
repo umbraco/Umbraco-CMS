@@ -481,12 +481,15 @@ components:
     MetaSection:
       type: object
       properties:
+        label:
+          type: string
         pathname:
           type: string
         weight:
           type: number
           format: float
       required:
+        - label
         - pathname
         - weight
     IManifestSection:
