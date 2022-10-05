@@ -1,0 +1,7 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem>
+@{
+    var Content = Model.Content as UmbBlockGridDemoRichTextBlock;
+}
+<div style="padding: 20px">
+@Content.RichText
+</div>
