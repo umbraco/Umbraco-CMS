@@ -2,7 +2,7 @@ import { css, html, LitElement, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbContextConsumerMixin } from '../../../../../core/context';
-import UmbSectionViewUsersElement from '../../../../sections/users/views/users/section-view-users.element';
+import UmbSectionViewUsersElement from './section-view-users.element';
 
 export type UsersViewType = 'list' | 'grid';
 @customElement('umb-editor-view-users-invite')

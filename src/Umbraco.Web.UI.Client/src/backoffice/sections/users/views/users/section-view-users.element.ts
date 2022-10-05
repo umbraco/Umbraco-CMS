@@ -6,10 +6,10 @@ import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { InterfaceColor, InterfaceLook } from '@umbraco-ui/uui-base/lib/types';
 import { IRoute, IRoutingInfo } from 'router-slot';
 import { v4 as uuidv4 } from 'uuid';
-import '../../../../editors/users/views/users/list-view-layouts/table/editor-view-users-table.element';
-import '../../../../editors/users/views/users/list-view-layouts/grid/editor-view-users-grid.element';
-import '../../../../editors/users/views/users/editor-view-users-selection.element';
-import '../../../../editors/users/views/users/editor-view-users-invite.element';
+import './list-view-layouts/table/editor-view-users-table.element';
+import './list-view-layouts/grid/editor-view-users-grid.element';
+import './editor-view-users-selection.element';
+import './editor-view-users-invite.element';
 
 import type { UserDetails, UserEntity } from '../../../../../core/models';
 import type { UmbEditorViewUsersUserDetailsElement } from '../../../../editors/users/views/users/editor-view-users-user-details.element';
@@ -22,11 +22,11 @@ export class UmbSectionViewUsersElement extends UmbContextProviderMixin(LitEleme
 	private _routes: IRoute[] = [
 		{
 			path: 'overview',
-			component: () => import('../../../../editors/users/views/users/editor-view-users-overview.element'),
+			component: () => import('./editor-view-users-overview.element'),
 		},
 		{
 			path: 'invite',
-			component: () => import('../../../../editors/users/views/users/editor-view-users-invite.element'),
+			component: () => import('./editor-view-users-invite.element'),
 		},
 		{
 			path: 'details/:key',

@@ -3,9 +3,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbContextConsumerMixin } from '../../../../../core/context';
 import { Subscription } from 'rxjs';
-import UmbSectionViewUsersElement, {
-	UserItem,
-} from '../../../../sections/users/views/users/section-view-users.element';
+import UmbSectionViewUsersElement, { UserItem } from './section-view-users.element';
 
 @customElement('umb-editor-view-users-selection')
 export class UmbEditorViewUsersSelectionElement extends UmbContextConsumerMixin(LitElement) {

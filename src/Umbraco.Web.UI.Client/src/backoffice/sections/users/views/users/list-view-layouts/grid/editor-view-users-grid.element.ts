@@ -5,7 +5,7 @@ import { repeat } from 'lit/directives/repeat.js';
 import { Subscription } from 'rxjs';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { UmbContextConsumerMixin } from '../../../../../../../core/context';
-import UmbSectionViewUsersElement from '../../../../../../sections/users/views/users/section-view-users.element';
+import UmbSectionViewUsersElement from '../../section-view-users.element';
 import { UmbUserStore } from '../../../../../../../core/stores/user/user.store';
 import type { UserEntity } from '../../../../../../../core/models';
 

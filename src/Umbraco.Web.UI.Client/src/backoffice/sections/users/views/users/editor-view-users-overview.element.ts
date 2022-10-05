@@ -8,7 +8,7 @@ import './list-view-layouts/grid/editor-view-users-grid.element';
 import './editor-view-users-selection.element';
 import './editor-view-users-invite.element';
 import { IRoute } from 'router-slot';
-import UmbSectionViewUsersElement from '../../../../sections/users/views/users/section-view-users.element';
+import UmbSectionViewUsersElement from './section-view-users.element';
 import { UUIPopoverElement } from '@umbraco-ui/uui';
 import { isPathActive } from 'router-slot';
 
