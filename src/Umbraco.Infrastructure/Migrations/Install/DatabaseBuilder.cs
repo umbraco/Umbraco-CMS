@@ -80,6 +80,12 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         public bool IsDatabaseConfigured => _databaseFactory.Configured;
 
         /// <summary>
+        /// Gets a value indicating whether it is possible to connect to the configured database.
+        /// It does not necessarily mean that Umbraco is installed, nor up-to-date.
+        /// </summary>
+        public bool CanConnectToDatabase => _databaseFactory.CanConnect;
+
+        /// <summary>
         /// Verifies whether a it is possible to connect to a database.
         /// </summary>
         public bool CanConnect(string? connectionString, string providerName)
