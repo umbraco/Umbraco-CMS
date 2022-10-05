@@ -53,7 +53,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                     blockItem.GridColumns = configuration.GridColumns;
                     blockItem.Areas = layoutItem.Areas.Select(area =>
                     {
-                        if (!blockConfigAreaMap.TryGetValue(area.Key, out BlockGridBlockConfiguration.BlockGridAreaConfiguration? areaConfig))
+                        if (!blockConfigAreaMap.TryGetValue(area.Key, out BlockGridAreaConfiguration? areaConfig))
                         {
                             return null;
                         }
@@ -78,6 +78,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                 return blockModel;
             }
         }
+
         protected override BlockEditorDataConverter CreateBlockEditorDataConverter() => new BlockGridEditorDataConverter(_jsonSerializer);
 
         protected override BlockItemActivator<BlockGridItem> CreateBlockItemActivator() => new BlockGridItemActivator(BlockEditorConverter);
