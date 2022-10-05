@@ -1,8 +1,6 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Net.Http;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NJsonSchema.Generation;
@@ -44,9 +42,7 @@ namespace JsonSchema
 
             var result = await response.Content.ReadAsStringAsync();
 
-            JObject schema = JsonConvert.DeserializeObject<JObject>(result)!;
-
-            return schema;
+            return JsonConvert.DeserializeObject<JObject>(result)!;
         }
 
         private JObject GenerateUmbracoSchema()
