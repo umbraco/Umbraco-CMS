@@ -46,7 +46,6 @@
         var vm = this;
         vm.openBlock = null;
         vm.showSampleDataCTA = false;
-        vm.labels = {};
 
         function onInit() {
 
@@ -333,7 +332,7 @@
 
                                         return false;
                                     } else {
-                                        return true;
+                                        return true; 
                                     }
                                 }
                             );
@@ -360,12 +359,7 @@
 
         dataTypeResource.getAll().then(function(dataTypes) {
             if(dataTypes.filter(x => x.alias === "Umbraco.BlockGrid").length === 0) {
-                localizationService.localizeMany(["blockEditor_getSampleHeadline", "blockEditor_getSampleDescription", "blockEditor_getSampleButton"]).then(function (data) {
-                    vm.labels["blockEditor_getSampleHeadline"] = data[0];
-                    vm.labels["blockEditor_getSampleDescription"] = data[1];
-                    vm.labels["blockEditor_getSampleButton"] = data[2];
-                    vm.showSampleDataCTA = true;
-                });
+                vm.showSampleDataCTA = true;
             }
         });
 
