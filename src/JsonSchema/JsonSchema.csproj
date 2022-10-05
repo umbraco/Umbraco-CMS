@@ -8,6 +8,7 @@
   <ItemGroup>
     <PackageReference Include="CommandLineParser" Version="2.9.1" />
     <PackageReference Include="NJsonSchema" Version="10.8.0" />
+    <PackageReference Include="System.Xml.XPath.XmlDocument" Version="4.3.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -15,4 +16,21 @@
     <PackageReference Include="Umbraco.Deploy.Core" Version="10.1.0" />
     <PackageReference Include="Umbraco.Forms.Core" Version="10.1.0" />
   </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="appsettings-schema.json" />
+    <EmbeddedResource Include="appsettings-schema.json" />
+  </ItemGroup>
+
+  <!--  Copy Forms XML docs-->
+  <PropertyGroup>
+    <NuGetPackageRoot Condition=" '$(NuGetPackageRoot)' == '' ">$(UserProfile)\.nuget\packages\</NuGetPackageRoot>
+  </PropertyGroup>
+
+  <Target Name="CopyPackagesXml" BeforeTargets="Build">
+    <ItemGroup>
+      <PackageReferenceFiles Include="$(NugetPackageRoot)%(PackageReference.Identity)\%(PackageReference.Version)%(PackageReference.CopyToOutputDirectory)\lib\**\*.xml" />
+    </ItemGroup>
+    <Copy SourceFiles="@(PackageReferenceFiles)" DestinationFolder="$(OutDir)" />
+  </Target>
 </Project>
