@@ -4,13 +4,12 @@ VisualStudioVersion = 17.1.32328.378
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Web.UI", "src\Umbraco.Web.UI\Umbraco.Web.UI.csproj", "{DCDFE97C-5630-4F6F-855D-8AEEB96556A5}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{2849E9D4-3B4E-40A3-A309-F3CB4F0E125F}"
-	ProjectSection(SolutionItems) = preProject
-		build\azure-pipelines.yml = build\azure-pipelines.yml
-		version.json = version.json
-	EndProjectSection
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{B5BD12C1-A454-435E-8A46-FF4A364C0382}"
+	ProjectSection(SolutionItems) = preProject
+		tests\.editorconfig = tests\.editorconfig
+		tests\codeanalysis.ruleset = tests\codeanalysis.ruleset
+		tests\Directory.Build.props = tests\Directory.Build.props
+	EndProjectSection
 EndProject
 Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Umbraco.Web.UI.Client", "http://localhost:3961", "{3819A550-DCEC-4153-91B4-8BA9F7F0B9B4}"
 	ProjectSection(WebsiteProperties) = preProject
@@ -101,24 +100,46 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NewBackoffice", "NewBackoff
 		.github\New BackOffice - README.md = .github\New BackOffice - README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Cms.ManagementApi", "src\Umbraco.Cms.ManagementApi\Umbraco.Cms.ManagementApi.csproj", "{0946531B-F06D-415B-A4E3-6CBFF5DB1C12}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Cms.ManagementApi", "src\Umbraco.Cms.ManagementApi\Umbraco.Cms.ManagementApi.csproj", "{0946531B-F06D-415B-A4E3-6CBFF5DB1C12}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.New.Cms.Core", "src\Umbraco.New.Cms.Core\Umbraco.New.Cms.Core.csproj", "{CBCE0A1E-BF29-49A6-9581-EAB3587D823A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.New.Cms.Core", "src\Umbraco.New.Cms.Core\Umbraco.New.Cms.Core.csproj", "{CBCE0A1E-BF29-49A6-9581-EAB3587D823A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.New.Cms.Infrastructure", "src\Umbraco.New.Cms.Infrastructure\Umbraco.New.Cms.Infrastructure.csproj", "{2D978DAF-8F48-4D59-8FEA-7EF0F40DBC2C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.New.Cms.Infrastructure", "src\Umbraco.New.Cms.Infrastructure\Umbraco.New.Cms.Infrastructure.csproj", "{2D978DAF-8F48-4D59-8FEA-7EF0F40DBC2C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.New.Cms.Web.Common", "src\Umbraco.New.Cms.Web.Common\Umbraco.New.Cms.Web.Common.csproj", "{5ED13EC6-399E-49D5-9D26-86501729B08D}"
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{D4C3395A-BA9D-4032-9ED3-09F1FC032CBC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.New.Cms.Web.Common", "src\Umbraco.New.Cms.Web.Common\Umbraco.New.Cms.Web.Common.csproj", "{5ED13EC6-399E-49D5-9D26-86501729B08D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E5D4B5F9-6CCE-46CE-8985-9A350445F92B}"
 	ProjectSection(SolutionItems) = preProject
-		build\csharp-docs\docfx.filter.yml = build\csharp-docs\docfx.filter.yml
-		build\csharp-docs\toc.yml = build\csharp-docs\toc.yml
-		build\csharp-docs\docfx.json = build\csharp-docs\docfx.json
-		build\csharp-docs\index.md = build\csharp-docs\index.md
+		.artifactignore = .artifactignore
+		.editorconfig = .editorconfig
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		.globalconfig = .globalconfig
+		Directory.Build.props = Directory.Build.props
+		icon.png = icon.png
+		LICENSE.md = LICENSE.md
+		umbraco.sln.DotSettings = umbraco.sln.DotSettings
+		version.json = version.json
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Templating", "Templating", "{5FBDD50D-7A86-4F4D-BEB9-7967FBA4ED2C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Cms.Targets", "src\Umbraco.Cms.Targets\Umbraco.Cms.Targets.csproj", "{B51C10FC-FD20-451E-90DD-A117133403DF}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Partials", "Partials", "{55B028A8-6294-46A4-BED5-7888ADB92368}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{20CE9C97-9314-4A19-BCF1-D12CF49B7205}"
+	ProjectSection(SolutionItems) = preProject
+		build\azure-pipelines.yml = build\azure-pipelines.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "csharp-docs", "csharp-docs", "{F2BF84D9-0A14-40AF-A0F3-B9BBBBC16A44}"
+	ProjectSection(SolutionItems) = preProject
+		build\csharp-docs\docfx.filter.yml = build\csharp-docs\docfx.filter.yml
+		build\csharp-docs\docfx.json = build\csharp-docs\docfx.json
+		build\csharp-docs\index.md = build\csharp-docs\index.md
+		build\csharp-docs\toc.yml = build\csharp-docs\toc.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "umbracotemplate", "umbracotemplate", "{2B47AD9F-FFF1-448A-88F1-D4F568811738}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "partials", "partials", "{25AECCB5-B187-4406-844B-91B8FF0FCB37}"
 	ProjectSection(SolutionItems) = preProject
 		build\csharp-docs\umbracotemplate\partials\class.tmpl.partial = build\csharp-docs\umbracotemplate\partials\class.tmpl.partial
 		build\csharp-docs\umbracotemplate\partials\footer.tmpl.partial = build\csharp-docs\umbracotemplate\partials\footer.tmpl.partial
@@ -128,10 +149,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Partials", "Partials", "{55
 		build\csharp-docs\umbracotemplate\partials\rest.tmpl.partial = build\csharp-docs\umbracotemplate\partials\rest.tmpl.partial
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Styles", "Styles", "{6499F81C-CFF2-4F83-9105-83F7880879F8}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "styles", "styles", "{EA628ABD-624E-4AF3-B548-6710D4D66531}"
 	ProjectSection(SolutionItems) = preProject
 		build\csharp-docs\umbracotemplate\styles\main.css = build\csharp-docs\umbracotemplate\styles\main.css
 	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Cms.Imaging.ImageSharp", "src\Umbraco.Cms.Imaging.ImageSharp\Umbraco.Cms.Imaging.ImageSharp.csproj", "{C280181E-597B-4AA5-82E7-D7017E928749}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -279,6 +302,18 @@ Global
 		{5ED13EC6-399E-49D5-9D26-86501729B08D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5ED13EC6-399E-49D5-9D26-86501729B08D}.SkipTests|Any CPU.ActiveCfg = Debug|Any CPU
 		{5ED13EC6-399E-49D5-9D26-86501729B08D}.SkipTests|Any CPU.Build.0 = Debug|Any CPU
+		{B51C10FC-FD20-451E-90DD-A117133403DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B51C10FC-FD20-451E-90DD-A117133403DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B51C10FC-FD20-451E-90DD-A117133403DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B51C10FC-FD20-451E-90DD-A117133403DF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B51C10FC-FD20-451E-90DD-A117133403DF}.SkipTests|Any CPU.ActiveCfg = Debug|Any CPU
+		{B51C10FC-FD20-451E-90DD-A117133403DF}.SkipTests|Any CPU.Build.0 = Debug|Any CPU
+		{C280181E-597B-4AA5-82E7-D7017E928749}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C280181E-597B-4AA5-82E7-D7017E928749}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C280181E-597B-4AA5-82E7-D7017E928749}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C280181E-597B-4AA5-82E7-D7017E928749}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C280181E-597B-4AA5-82E7-D7017E928749}.SkipTests|Any CPU.ActiveCfg = Debug|Any CPU
+		{C280181E-597B-4AA5-82E7-D7017E928749}.SkipTests|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -295,10 +330,11 @@ Global
 		{CBCE0A1E-BF29-49A6-9581-EAB3587D823A} = {995D9EFA-8BB1-4333-80AD-C525A06FD984}
 		{2D978DAF-8F48-4D59-8FEA-7EF0F40DBC2C} = {995D9EFA-8BB1-4333-80AD-C525A06FD984}
 		{5ED13EC6-399E-49D5-9D26-86501729B08D} = {995D9EFA-8BB1-4333-80AD-C525A06FD984}
-		{D4C3395A-BA9D-4032-9ED3-09F1FC032CBC} = {2849E9D4-3B4E-40A3-A309-F3CB4F0E125F}
-		{5FBDD50D-7A86-4F4D-BEB9-7967FBA4ED2C} = {D4C3395A-BA9D-4032-9ED3-09F1FC032CBC}
-		{55B028A8-6294-46A4-BED5-7888ADB92368} = {5FBDD50D-7A86-4F4D-BEB9-7967FBA4ED2C}
-		{6499F81C-CFF2-4F83-9105-83F7880879F8} = {5FBDD50D-7A86-4F4D-BEB9-7967FBA4ED2C}
+		{20CE9C97-9314-4A19-BCF1-D12CF49B7205} = {E5D4B5F9-6CCE-46CE-8985-9A350445F92B}
+		{F2BF84D9-0A14-40AF-A0F3-B9BBBBC16A44} = {20CE9C97-9314-4A19-BCF1-D12CF49B7205}
+		{2B47AD9F-FFF1-448A-88F1-D4F568811738} = {F2BF84D9-0A14-40AF-A0F3-B9BBBBC16A44}
+		{25AECCB5-B187-4406-844B-91B8FF0FCB37} = {2B47AD9F-FFF1-448A-88F1-D4F568811738}
+		{EA628ABD-624E-4AF3-B548-6710D4D66531} = {2B47AD9F-FFF1-448A-88F1-D4F568811738}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7A0F2E34-D2AF-4DAB-86A0-7D7764B3D0EC}

@@ -13,8 +13,8 @@
     "watch": "gulp watch"
   },
   "engines": {
-    "node": ">=14.0.0 <17",
-    "npm": ">=8.0.0 < 9"
+    "node": ">=16.17",
+    "npm": ">=8.15"
   },
   "dependencies": {
     "@microsoft/signalr": "6.0.9",
