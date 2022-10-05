@@ -187,7 +187,7 @@
         <!-- Layout: Cards -->
         <div class="umb-user-cards" ng-if="vm.activeLayout.path === '1' && vm.loading === false">
             <div class="umb-user-card umb-outline umb-outline--surrounding" ng-class="{'-selected': user.selected, '-selectable': vm.isSelectable(user)}" ng-repeat="user in vm.users track by user.key" ng-click="vm.selectUser(user, $event)">
-                <div class="umb-user-card__content">
+                <div class="umb-user-card__content" umb-extend-click-area>
                     <umb-badge class="umb-user-card__badge" size="xs" ng-if="user.userDisplayState.key !== 'Active'" color="{{user.userDisplayState.color}}">
                         {{ user.userDisplayState.name }}
                     </umb-badge>
