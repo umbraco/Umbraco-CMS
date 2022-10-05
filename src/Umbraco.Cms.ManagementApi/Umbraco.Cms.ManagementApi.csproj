@@ -2,12 +2,12 @@
   <PropertyGroup>
     <Title>Umbraco CMS - Management API</Title>
     <Description>Contains the presentation layer for the Umbraco CMS Management API.</Description>
-    <TargetFramework>net7.0</TargetFramework>
     <IsPackable>false</IsPackable>
     <EnablePackageValidation>false</EnablePackageValidation>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="JsonPatch.Net" Version="2.0.4" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="5.0.0" />
     <PackageReference Include="NSwag.AspNetCore" Version="13.17.0" />

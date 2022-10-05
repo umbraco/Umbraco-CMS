@@ -1,6 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
     <OutputType>Exe</OutputType>
     <IsPackable>false</IsPackable>
     <EnablePackageValidation>false</EnablePackageValidation>
@@ -14,6 +13,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj" />
+    <PackageReference Include="Umbraco.Deploy.Core" Version="10.1.0" />
+    <PackageReference Include="Umbraco.Forms.Core" Version="10.1.0" />
   </ItemGroup>
 
   <ItemGroup>

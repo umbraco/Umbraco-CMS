@@ -235,17 +235,12 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
 
                     // Adds Umbraco.Tests.Integration
                     mvcBuilder.AddApplicationPart(typeof(UmbracoTestServerTestBase).Assembly);
-
-                    // Adds Umbraco.Tests.Integration
-                    mvcBuilder.AddApplicationPart(typeof(InstallControllerBase).Assembly);
                 })
                 .AddWebServer()
                 .AddWebsite()
                 .AddUmbracoSqlServerSupport()
                 .AddUmbracoSqliteSupport()
                 .AddTestServices(TestHelper); // This is the important one!
-
-            new ManagementApiComposer().Compose(builder);
 
             CustomTestSetup(builder);
             builder.Build();

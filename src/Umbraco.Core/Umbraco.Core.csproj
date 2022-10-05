@@ -3,7 +3,6 @@
     <PackageId>Umbraco.Cms.Core</PackageId>
     <Title>Umbraco CMS - Core</Title>
     <Description>Contains the core assembly needed to run Umbraco CMS.</Description>
-    <TargetFramework>net7.0</TargetFramework>
     <RootNamespace>Umbraco.Cms.Core</RootNamespace>
   </PropertyGroup>
 
