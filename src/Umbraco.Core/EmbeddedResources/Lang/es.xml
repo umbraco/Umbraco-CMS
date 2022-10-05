@@ -331,6 +331,7 @@
     <key alias="selectMember">Selecciona miembro</key>
     <key alias="selectMemberGroup">Selecciona grupo de miembros</key>
     <key alias="selectNode">Selecciona nodo</key>
+    <key alias="selectLanguages">Seleccionar idiomas</key>
     <key alias="selectSections">Selecciona secciones</key>
     <key alias="selectUsers">Selecciona usuarios</key>
     <key alias="noIconsFound">No se encontraron iconos</key>
@@ -1363,6 +1364,8 @@
     <key alias="permissionsGranularHelp">Establecer permisos para nodos específicos</key>
     <key alias="profile">Perfil</key>
     <key alias="searchAllChildren">Buscar en todos los hijos</key>
+    <key alias="languagesHelp">Limite los idiomas a los que los usuarios tienen acceso para editar</key>
+    <key alias="allowAccessToAllLanguages">Permitir el acceso a todos los idiomas</key>
     <key alias="sectionsHelp">Añadir secciones para dar acceso a usuarios</key>
     <key alias="selectUserGroups">Seleccionar grupos de usuarios</key>
     <key alias="noStartNode">Nodo de inicio no seleccionado</key>

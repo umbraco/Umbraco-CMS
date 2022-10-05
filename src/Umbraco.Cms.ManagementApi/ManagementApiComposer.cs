@@ -8,6 +8,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
 using NSwag.AspNetCore;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -35,7 +38,13 @@ public class ManagementApiComposer : IComposer
 
         builder
             .AddNewInstaller()
-            .AddUpgrader();
+            .AddUpgrader()
+            .AddExamineManagement()
+            .AddFactories()
+            .AddTrees()
+            .AddFactories()
+            .AddServices()
+            .AddMappers();
 
         services.AddApiVersioning(options =>
         {
@@ -52,6 +61,10 @@ public class ManagementApiComposer : IComposer
             options.Version = ApiAllName;
             options.DocumentName = ApiAllName;
             options.Description = "This shows all APIs available in this version of Umbraco - Including all the legacy apis that is available for backward compatibility";
+            options.PostProcess = document =>
+            {
+                document.Tags = document.Tags.OrderBy(tag => tag.Name).ToList();
+            };
         });
 
         services.AddVersionedApiExplorer(options =>
@@ -113,6 +126,8 @@ public class ManagementApiComposer : IComposer
                             config.SwaggerRoutes.Clear();
                             var swaggerPath = $"{officePath}/swagger/{ApiAllName}/swagger.json";
                             config.SwaggerRoutes.Add(new SwaggerUi3Route(ApiAllName, swaggerPath));
+                            config.OperationsSorter = "alpha";
+                            config.TagsSorter = "alpha";
                         });
                     }
                 },
