@@ -78,6 +78,8 @@ preserve.belle
 /src/Umbraco.Web.UI/wwwroot/[Mm]edia/
 /src/Umbraco.Web.UI/App_Code/
 /src/Umbraco.Web.UI/App_Plugins/
+!/src/Umbraco.Web.UI/App_Plugins/Umbraco.BlockGridEditor.DefaultCustomViews/
+!/src/Umbraco.Web.UI/App_Plugins/Umbraco.BlockGridEditor.DefaultCustomViews/*
 /src/Umbraco.Web.UI/[Uu]mbraco/[Dd]ata/
 /src/Umbraco.Web.UI/[Uu]mbraco/[Ll]ogs/
 /src/Umbraco.Web.UI/[Uu]mbraco/[Mm]odels/
