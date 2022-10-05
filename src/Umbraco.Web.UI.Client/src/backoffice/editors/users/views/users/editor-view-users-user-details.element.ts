@@ -116,7 +116,8 @@ export class UmbEditorViewUsersUserDetailsElement extends UmbContextConsumerMixi
 		if (!this._user || !this._userStore) return;
 
 		this._userStore.deleteUsers([this._user.key]);
-		// history.back(); //TODO Should redirect to users section
+
+		history.pushState(null, '', '/section/users/view/users/overview');
 	}
 
 	private renderLeftColumn() {

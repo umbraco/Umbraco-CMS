@@ -21,6 +21,13 @@ export class UmbDataStoreBase<T extends UmbDataStoreIdentifiers> implements UmbD
 	protected _items: BehaviorSubject<Array<T>> = new BehaviorSubject(<Array<T>>[]);
 	public readonly items: Observable<Array<T>> = this._items.asObservable();
 
+	public delete(deletedKeys: Array<string>): void {
+		const remainingItems = this._items
+			.getValue()
+			.filter((item) => item.key && deletedKeys.includes(item.key) === false);
+		this._items.next(remainingItems);
+	}
+
 	/**
 	 * @description - Update the store with new items. Existing items are updated, new items are added. Existing items are matched by the compareKey.
 	 * @param {Array<T>} updatedItems

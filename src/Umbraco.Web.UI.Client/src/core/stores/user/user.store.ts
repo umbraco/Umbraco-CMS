@@ -107,9 +107,9 @@ export class UmbUserStore extends UmbDataStoreBase<UserDetails> {
 					'Content-Type': 'application/json',
 				},
 			});
-			const json = await res.json();
-			this.update(json);
-			this._entityStore.update(json);
+			const deletedKeys = await res.json();
+			this.delete(deletedKeys);
+			this._entityStore.delete(deletedKeys);
 		} catch (error) {
 			console.error('Delete Users failed', error);
 		}
