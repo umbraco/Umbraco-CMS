@@ -21,7 +21,6 @@ public class GlobalSettings
     internal const bool StaticHideTopLevelNodeFromPath = true;
     internal const bool StaticUseHttps = false;
     internal const int StaticVersionCheckPeriod = 7;
-    internal const string StaticUmbracoPath = Constants.System.DefaultUmbracoPath;
     internal const string StaticIconsPath = "umbraco/assets/icons";
     internal const string StaticUmbracoCssPath = "~/css";
     internal const string StaticUmbracoScriptsPath = "~/scripts";
@@ -80,8 +79,13 @@ public class GlobalSettings
     /// <summary>
     ///     Gets or sets a value for the Umbraco back-office path.
     /// </summary>
-    [DefaultValue(StaticUmbracoPath)]
-    public string UmbracoPath { get; set; } = StaticUmbracoPath;
+    public string UmbracoPath
+    {
+        get => Constants.System.DefaultUmbracoPath;
+        [Obsolete($"{nameof(UmbracoPath)}  is no longer configurable, property setter is scheduled for removal in V12")]
+        // NOTE: when removing this, also clean up the hardcoded removal of UmbracoPath in UmbracoJsonSchemaGenerator
+        set { }
+    }
 
     /// <summary>
     ///     Gets or sets a value for the Umbraco icons path.

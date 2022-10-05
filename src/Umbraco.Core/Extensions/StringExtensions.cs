@@ -417,7 +417,7 @@ public static class StringExtensions
     ///     empty, or consists only of white-space characters, otherwise
     ///     returns <see langword="false" />.
     /// </returns>
-    public static bool IsNullOrWhiteSpace(this string? value) => string.IsNullOrWhiteSpace(value);
+    public static bool IsNullOrWhiteSpace([NotNullWhen(false)] this string? value) => string.IsNullOrWhiteSpace(value);
     
     [return: NotNullIfNotNull("defaultValue")]
     public static string? IfNullOrWhiteSpace(this string? str, string? defaultValue) =>
