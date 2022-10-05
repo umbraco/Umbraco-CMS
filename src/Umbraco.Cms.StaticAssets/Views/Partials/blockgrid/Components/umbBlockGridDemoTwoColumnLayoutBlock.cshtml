@@ -1,7 +1,5 @@
+@using Umbraco.Extensions
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem>
-@{
-    var Content = Model.Content as UmbBlockGridDemoRichTextBlock;
-}
 
 <div>
     @await Html.GetBlockGridItemAreasHtmlAsync(Model)

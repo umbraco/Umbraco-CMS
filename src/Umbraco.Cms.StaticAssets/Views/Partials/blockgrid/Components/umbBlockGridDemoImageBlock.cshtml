@@ -1,9 +1,8 @@
+@using Umbraco.Extensions
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem>
+
 @{
-    var Content = Model.Content as UmbBlockGridDemoImageBlock;
-}
-@{
-    var typedMediaPickerSingle = Content.Value<Umbraco.Cms.Core.Models.MediaWithCrops>("image");
+    var typedMediaPickerSingle = Model.Content.Value<Umbraco.Cms.Core.Models.MediaWithCrops>("image");
     if (typedMediaPickerSingle != null)
     {
         <img src="@typedMediaPickerSingle.MediaUrl()" style="object-fit:cover; width:100%; height:100%;"/>
