@@ -1,7 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.ManagementApi.Mapping.Dictionary;
 using Umbraco.Cms.ManagementApi.Mapping.Installer;
+using Umbraco.Cms.ManagementApi.Services.Entities;
+using Umbraco.Cms.ManagementApi.Services.Paging;
 using Umbraco.New.Cms.Core.Factories;
 using Umbraco.New.Cms.Core.Installer;
 using Umbraco.New.Cms.Core.Installer.Steps;
@@ -17,9 +20,6 @@ public static class InstallerBuilderExtensions
     internal static IUmbracoBuilder AddNewInstaller(this IUmbracoBuilder builder)
     {
         IServiceCollection services = builder.Services;
-
-        builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>()
-            .Add<InstallerViewModelsMapDefinition>();
 
         services.AddTransient<IUserSettingsFactory, UserSettingsFactory>();
         services.AddTransient<IInstallSettingsFactory, InstallSettingsFactory>();
@@ -76,4 +76,10 @@ public static class InstallerBuilderExtensions
 
     public static UpgradeStepCollectionBuilder UpgradeSteps(this IUmbracoBuilder builder)
         => builder.WithCollectionBuilder<UpgradeStepCollectionBuilder>();
+
+    internal static IUmbracoBuilder AddTrees(this IUmbracoBuilder builder)
+    {
+        builder.Services.AddTransient<IUserStartNodeEntitiesService, UserStartNodeEntitiesService>();
+        return builder;
+    }
 }

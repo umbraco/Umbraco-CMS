@@ -106,7 +106,7 @@ public class ConfigurationFieldAttribute : Attribute
     }
 
     /// <summary>
-    ///     Gets or sets the key of the field.
+    ///     Gets the key of the field.
     /// </summary>
     /// <remarks>
     ///     When null or empty, the <see cref="ConfigurationEditor" /> should derive a key
@@ -120,7 +120,7 @@ public class ConfigurationFieldAttribute : Attribute
     public string? Name { get; }
 
     /// <summary>
-    ///     Gets or sets the view to use to render the field editor.
+    ///     Gets the view to use to render the field editor.
     /// </summary>
     public string? View { get; }
 
