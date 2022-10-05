@@ -127,6 +127,7 @@ export interface components {
       database?: components["schemas"]["InstallSetupDatabaseConfiguration"];
     };
     MetaSection: {
+      label: string;
       pathname: string;
       /** Format: float */
       weight: number;

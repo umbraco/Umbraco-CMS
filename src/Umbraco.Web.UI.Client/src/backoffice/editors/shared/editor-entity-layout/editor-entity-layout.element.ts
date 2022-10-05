@@ -10,6 +10,18 @@ import { UmbContextConsumerMixin } from '../../../../core/context';
 import { createExtensionElement, UmbExtensionRegistry } from '../../../../core/extension';
 import type { ManifestEditorView } from '../../../../core/models';
 
+/**
+ * @element umb-editor-entity-layout
+ * @description
+ * @slot icon - Slot for rendering the entity icon
+ * @slot name - Slot for rendering the entity name
+ * @slot footer - Slot for rendering the entity footer
+ * @slot actions - Slot for rendering the entity actions
+ * @slot default - slot for main content
+ * @export
+ * @class UmbEditorEntityLayout
+ * @extends {UmbContextConsumerMixin(LitElement)}
+ */
 @customElement('umb-editor-entity-layout')
 export class UmbEditorEntityLayout extends UmbContextConsumerMixin(LitElement) {
 	static styles = [
@@ -58,14 +70,18 @@ export class UmbEditorEntityLayout extends UmbContextConsumerMixin(LitElement) {
 		`,
 	];
 
+	/**
+	 * Alias of the editor. The Layout will render the editor views that are registered for this editor alias.
+	 * @public
+	 * @type {string}
+	 * @attr
+	 * @default ''
+	 */
 	@property()
-	headline = '';
+	public headline = '';
 
 	@property()
-	alias = '';
-
-	@property()
-	name = '';
+	public alias = '';
 
 	@state()
 	private _editorViews: Array<ManifestEditorView> = [];

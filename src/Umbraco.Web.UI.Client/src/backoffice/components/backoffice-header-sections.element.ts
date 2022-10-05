@@ -120,7 +120,7 @@ export class UmbBackofficeHeaderSections extends UmbContextProviderMixin(UmbCont
 							@click="${this._handleTabClick}"
 							?active="${this._currentSectionAlias === section.alias}"
 							href="${`/section/${section.meta.pathname}`}"
-							label="${section.name}"
+							label="${section.meta.label || section.name}"
 							data-alias="${section.alias}"></uui-tab>
 					`
 				)}
@@ -144,7 +144,7 @@ export class UmbBackofficeHeaderSections extends UmbContextProviderMixin(UmbCont
 								(section) => html`
 									<uui-menu-item
 										?active="${this._currentSectionAlias === section.alias}"
-										label="${section.name}"
+										label="${section.meta.label || section.name}"
 										@click-label="${this._handleLabelClick}"></uui-menu-item>
 								`
 							)}

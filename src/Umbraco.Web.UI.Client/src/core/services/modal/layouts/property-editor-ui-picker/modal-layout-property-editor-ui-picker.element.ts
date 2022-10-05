@@ -3,10 +3,10 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { Subscription } from 'rxjs';
-import { groupBy } from 'lodash';
+import groupBy from 'lodash-es/groupBy.js';
+import type { UUIInputEvent } from '@umbraco-ui/uui';
 import { UmbContextConsumerMixin } from '../../../../context';
 
-import type { UUIInputEvent } from '@umbraco-ui/uui';
 import type { UmbModalHandler } from '../../modal-handler';
 import type { UmbExtensionRegistry } from '../../../../extension';
 import type { ManifestPropertyEditorUI } from '../../../../models';

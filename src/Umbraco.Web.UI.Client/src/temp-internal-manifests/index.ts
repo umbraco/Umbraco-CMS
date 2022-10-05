@@ -2,16 +2,16 @@ import type { ManifestTypes } from '../core/models';
 import { manifests as propertyEditorUIManifests } from './property-editor-ui';
 
 // TODO: consider moving weight from meta to the main part of the manifest. We need it for every extension.
-// TODO: consider adding a label property as part of the meta. It might make sense to have an "extension" name label where one is needed.
 export const internalManifests: Array<ManifestTypes & { loader: () => Promise<object | HTMLElement> }> = [
 	...propertyEditorUIManifests,
 	{
 		type: 'section',
 		alias: 'Umb.Section.Content',
-		name: 'Content',
+		name: 'Content Section',
 		elementName: 'umb-content-section',
 		loader: () => import('../backoffice/sections/content/content-section.element'),
 		meta: {
+			label: 'Content',
 			pathname: 'content', // TODO: how to we want to support pretty urls?
 			weight: 50,
 		},
@@ -19,10 +19,11 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 	{
 		type: 'section',
 		alias: 'Umb.Section.Media',
-		name: 'Media',
+		name: 'Media Section',
 		elementName: 'umb-media-section',
 		loader: () => import('../backoffice/sections/media/media-section.element'),
 		meta: {
+			label: 'Media',
 			pathname: 'media', // TODO: how to we want to support pretty urls?
 			weight: 50,
 		},
@@ -30,10 +31,11 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 	{
 		type: 'section',
 		alias: 'Umb.Section.Members',
-		name: 'Members',
+		name: 'Members Section',
 		elementName: 'umb-section-members',
 		loader: () => import('../backoffice/sections/members/section-members.element'),
 		meta: {
+			label: 'Members',
 			pathname: 'members',
 			weight: 30,
 		},
@@ -41,9 +43,10 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 	{
 		type: 'section',
 		alias: 'Umb.Section.Settings',
-		name: 'Settings',
+		name: 'Settings Section',
 		loader: () => import('../backoffice/sections/settings/settings-section.element'),
 		meta: {
+			label: 'Settings',
 			pathname: 'settings', // TODO: how to we want to support pretty urls?
 			weight: 20,
 		},
@@ -51,10 +54,11 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 	{
 		type: 'section',
 		alias: 'Umb.Section.Packages',
-		name: 'Packages',
+		name: 'Packages Section',
 		elementName: 'umb-packages-section',
 		loader: () => import('../backoffice/sections/packages/packages-section.element'),
 		meta: {
+			label: 'Packages',
 			pathname: 'packages',
 			weight: 20,
 		},
@@ -62,10 +66,11 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 	{
 		type: 'dashboard',
 		alias: 'Umb.Dashboard.Welcome',
-		name: 'Welcome',
+		name: 'Welcome Dashboard',
 		elementName: 'umb-dashboard-welcome',
 		loader: () => import('../backoffice/dashboards/welcome/dashboard-welcome.element'),
 		meta: {
+			label: 'Welcome',
 			sections: ['Umb.Section.Content'],
 			pathname: 'welcome', // TODO: how to we want to support pretty urls?
 			weight: 20,
@@ -74,10 +79,11 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 	{
 		type: 'dashboard',
 		alias: 'Umb.Dashboard.RedirectManagement',
-		name: 'Redirect Management',
+		name: 'Redirect Management Dashboard',
 		elementName: 'umb-dashboard-redirect-management',
 		loader: () => import('../backoffice/dashboards/redirect-management/dashboard-redirect-management.element'),
 		meta: {
+			label: 'Redirect Management',
 			sections: ['Umb.Section.Content'],
 			pathname: 'redirect-management', // TODO: how to we want to support pretty urls?
 			weight: 10,
@@ -86,7 +92,7 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 	{
 		type: 'dashboard',
 		alias: 'Umb.Dashboard.SettingsAbout',
-		name: 'Settings About',
+		name: 'About Settings Dashboard',
 		elementName: 'umb-dashboard-settings-about',
 		loader: () => import('../backoffice/dashboards/settings-about/dashboard-settings-about.element'),
 		meta: {
@@ -99,10 +105,11 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 	{
 		type: 'dashboard',
 		alias: 'Umb.Dashboard.ExamineManagement',
-		name: 'Examine Management',
+		name: 'Examine Management Dashboard',
 		elementName: 'umb-dashboard-examine-management',
 		loader: () => import('../backoffice/dashboards/examine-management/dashboard-examine-management.element'),
 		meta: {
+			label: 'Examine Management',
 			sections: ['Umb.Section.Settings'],
 			pathname: 'examine-management', // TODO: how to we want to support pretty urls?
 			weight: 10,
@@ -111,10 +118,11 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 	{
 		type: 'dashboard',
 		alias: 'Umb.Dashboard.ModelsBuilder',
-		name: 'Models Builder',
+		name: 'Models Builder Dashboard',
 		elementName: 'umb-dashboard-models-builder',
 		loader: () => import('../backoffice/dashboards/models-builder/dashboard-models-builder.element'),
 		meta: {
+			label: 'Models Builder',
 			sections: ['Umb.Section.Settings'],
 			pathname: 'models-builder', // TODO: how to we want to support pretty urls?
 			weight: 10,
@@ -123,10 +131,11 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 	{
 		type: 'dashboard',
 		alias: 'Umb.Dashboard.PublishedStatus',
-		name: 'Published Status',
+		name: 'Published Status Dashboard',
 		elementName: 'umb-dashboard-published-status',
 		loader: () => import('../backoffice/dashboards/published-status/dashboard-published-status.element'),
 		meta: {
+			label: 'Published Status',
 			sections: ['Umb.Section.Settings'],
 			pathname: 'published-status', // TODO: how to we want to support pretty urls?
 			weight: 9,
@@ -135,10 +144,11 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 	{
 		type: 'dashboard',
 		alias: 'Umb.Dashboard.MediaManagement',
-		name: 'Media',
+		name: 'Media Dashboard',
 		elementName: 'umb-dashboard-media-management',
 		loader: () => import('../backoffice/dashboards/media-management/dashboard-media-management.element'),
 		meta: {
+			label: 'Media',
 			sections: ['Umb.Section.Media'],
 			pathname: 'media-management', // TODO: how to we want to support pretty urls?
 			weight: 10,
@@ -253,7 +263,7 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 	{
 		type: 'propertyAction',
 		alias: 'Umb.PropertyAction.Copy',
-		name: 'Copy',
+		name: 'Copy Property Action',
 		elementName: 'umb-property-action-copy',
 		loader: () => import('../backoffice/property-actions/copy/property-action-copy.element'),
 		meta: {
@@ -263,7 +273,7 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 	{
 		type: 'propertyAction',
 		alias: 'Umb.PropertyAction.Clear',
-		name: 'Clear',
+		name: 'Clear Property Action',
 		elementName: 'umb-property-action-clear',
 		loader: () => import('../backoffice/property-actions/clear/property-action-clear.element'),
 		meta: {
