@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <PackageId>Umbraco.Cms.Core</PackageId>
     <Title>Umbraco CMS - Core</Title>

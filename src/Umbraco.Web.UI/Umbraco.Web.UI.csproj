@@ -46,25 +46,4 @@
     <Message Text="Copying appsettings.Development.template.json to appsettings.Development.json because it doesn't exist" Importance="high" />
     <Copy SourceFiles="appsettings.Development.template.json" DestinationFiles="appsettings.Development.json" />
   </Target>
-
-  <PropertyGroup>
-    <JsonSchemaPath>$(ProjectDir)appsettings-schema.json</JsonSchemaPath>
-    <JsonSchemaCmsPath>$(ProjectDir)appsettings-schema.umbraco.json</JsonSchemaCmsPath>
-    <JsonSchemaProjectPath>$(ProjectDir)../JsonSchema/</JsonSchemaProjectPath>
-  </PropertyGroup>
-
-  <Target Name="CheckPreconditions" BeforeTargets="Build">
-    <Message Text="-CheckPreconditions-" Importance="high" />
-    <Message Text="JsonSchemaPath:  $(JsonSchemaPath)" Importance="high" />
-    <Message Text="JsonSchemaCmsPath: $(JsonSchemaCmsPath)" Importance="high" />
-    <CallTarget Targets="JsonSchemaBuild" Condition="!(Exists('$(JsonSchemaPath)') AND Exists('$(JsonSchemaCmsPath)')) and '$(UmbracoBuild)' == ''" />
-    <CallTarget Targets="AppsettingsBuild" Condition="!Exists('appsettings.json')" />
-    <CallTarget Targets="AppsettingsDevBuild" Condition="!Exists('appsettings.Development.json')" />
-  </Target>
-
-
-
-  <Target Name="JsonSchemaBuild">
-    <Exec Command="dotnet run -c Release --project $(JsonSchemaProjectPath) --mainOutputFile &quot;$(ProjectDir)appsettings-schema.json&quot; --cmsOutputFile &quot;$(ProjectDir)appsettings-schema.umbraco.json&quot;" />
-  </Target>
 </Project>

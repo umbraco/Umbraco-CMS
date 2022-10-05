@@ -16,6 +16,16 @@ public class DictionaryMapDefinition : IMapDefinition
     private readonly IDictionaryService _dictionaryService;
     private readonly ILocalizationService _localizationService;
 
+    [Obsolete("Use the constructor with the CommonMapper")]
+    public DictionaryMapDefinition(ILocalizationService localizationService)
+        : this(
+        localizationService,
+        StaticServiceProvider.Instance.GetRequiredService<CommonMapper>(),
+        StaticServiceProvider.Instance.GetRequiredService<IDictionaryService>())
+    {
+    }
+
+    [Obsolete("Use the constructor with the CommonMapper, and IDictionaryService")]
     public DictionaryMapDefinition(ILocalizationService localizationService, CommonMapper commonMapper)
         : this(
         localizationService,

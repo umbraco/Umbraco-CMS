@@ -18,7 +18,7 @@ module.exports = function(files, out) {
         cssnano({zindex: false})
     ];
     _.forEach(config.roots, function(root){
-        console.log("LESS: ", files, " -> ", root + config.targets.css + out);
+        console.log("LESS: ", files, " -> ", root + config.targets.less + out);
     })
     
 
@@ -38,7 +38,7 @@ module.exports = function(files, out) {
     }
 
     _.forEach(config.roots, function(root){
-        task = task.pipe(gulp.dest(root + config.targets.css));
+        task = task.pipe(gulp.dest(root + config.targets.less));
     })
 
     
