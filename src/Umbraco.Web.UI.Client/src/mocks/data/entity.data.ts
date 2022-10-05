@@ -47,6 +47,12 @@ export class UmbEntityData<T extends Entity> extends UmbData<T> {
 		return trashedItems;
 	}
 
+	delete(keys: Array<string>) {
+		const deletedKeys = this.data.filter((item) => keys.includes(item.key)).map((item) => item.key);
+		this.data = this.data.filter((item) => keys.indexOf(item.key) === -1);
+		return deletedKeys;
+	}
+
 	protected updateData(updateItem: T) {
 		const itemIndex = this.data.findIndex((item) => item.key === updateItem.key);
 		const item = this.data[itemIndex];

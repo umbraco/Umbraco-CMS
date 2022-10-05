@@ -23,10 +23,40 @@ export const handlers = [
 
 	rest.post<UserDetails[]>('/umbraco/backoffice/users/save', async (req, res, ctx) => {
 		const data = await req.json();
+		console.log('HEJSA');
 		if (!data) return;
 
 		const saved = umbUsersData.save(data);
 
+		console.log('saved', saved);
+
 		return res(ctx.status(200), ctx.json(saved));
+	}),
+
+	rest.post<Array<string>>('/umbraco/backoffice/users/enable', async (req, res, ctx) => {
+		const data = await req.json();
+		if (!data) return;
+
+		const enabledKeys = umbUsersData.enable(data);
+
+		return res(ctx.status(200), ctx.json(enabledKeys));
+	}),
+
+	rest.post<Array<string>>('/umbraco/backoffice/users/disable', async (req, res, ctx) => {
+		const data = await req.json();
+		if (!data) return;
+
+		const disabledKeys = umbUsersData.disable(data);
+
+		return res(ctx.status(200), ctx.json(disabledKeys));
+	}),
+
+	rest.post<Array<string>>('/umbraco/backoffice/users/delete', async (req, res, ctx) => {
+		const data = await req.json();
+		if (!data) return;
+
+		const deletedKeys = umbUsersData.delete(data);
+
+		return res(ctx.status(200), ctx.json(deletedKeys));
 	}),
 ];

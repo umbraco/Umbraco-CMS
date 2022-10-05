@@ -108,7 +108,7 @@ export class UmbEditorViewUsersGridElement extends UmbContextConsumerMixin(LitEl
 				@open=${() => this._handleOpenCard(user.key)}
 				@selected=${() => this._selectRowHandler(user)}
 				@unselected=${() => this._deselectRowHandler(user)}>
-				${user.status && user.status !== 'Active'
+				${user.status && user.status !== 'Enabled'
 					? html`<uui-tag
 							slot="tag"
 							size="s"

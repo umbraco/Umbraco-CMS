@@ -49,12 +49,72 @@ export class UmbUserStore extends UmbDataStoreBase<UserDetails> {
 		);
 	}
 
-	/**
-	 * @description - Save a Data Type.
-	 * @param {Array<DataTypeDetails>} dataTypes
-	 * @memberof UmbDataTypeStore
-	 * @return {*}  {Promise<void>}
-	 */
+	async enableUsers(userKeys: Array<string>): Promise<void> {
+		// TODO: use Fetcher API.
+		try {
+			const res = await fetch('/umbraco/backoffice/users/enable', {
+				method: 'POST',
+				body: JSON.stringify(userKeys),
+				headers: {
+					'Content-Type': 'application/json',
+				},
+			});
+			const enabledKeys = await res.json();
+			const storedUsers = this._items.getValue().filter((user) => enabledKeys.includes(user.key));
+
+			storedUsers.forEach((user) => {
+				user.status = 'Enabled';
+			});
+
+			this.update(storedUsers);
+			this._entityStore.update(storedUsers);
+		} catch (error) {
+			console.error('Enable Users failed', error);
+		}
+	}
+
+	async disableUsers(userKeys: Array<string>): Promise<void> {
+		// TODO: use Fetcher API.
+		try {
+			const res = await fetch('/umbraco/backoffice/users/disable', {
+				method: 'POST',
+				body: JSON.stringify(userKeys),
+				headers: {
+					'Content-Type': 'application/json',
+				},
+			});
+			const disabledKeys = await res.json();
+			const storedUsers = this._items.getValue().filter((user) => disabledKeys.includes(user.key));
+
+			storedUsers.forEach((user) => {
+				user.status = 'Disabled';
+			});
+
+			this.update(storedUsers);
+			this._entityStore.update(storedUsers);
+		} catch (error) {
+			console.error('Disable Users failed', error);
+		}
+	}
+
+	async deleteUsers(userKeys: Array<string>): Promise<void> {
+		// TODO: use Fetcher API.
+		try {
+			const res = await fetch('/umbraco/backoffice/users/delete', {
+				method: 'POST',
+				body: JSON.stringify(userKeys),
+				headers: {
+					'Content-Type': 'application/json',
+				},
+			});
+			const json = await res.json();
+			this.update(json);
+			this._entityStore.update(json);
+		} catch (error) {
+			console.error('Delete Users failed', error);
+		}
+	}
+
 	async save(users: Array<UserDetails>): Promise<void> {
 		// TODO: use Fetcher API.
 		try {

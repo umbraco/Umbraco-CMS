@@ -69,46 +69,6 @@ export class UmbEditorViewUsersElement extends UmbContextProviderMixin(LitElemen
 		this.requestUpdate('selection');
 	}
 
-	// public updateUser(user: UserEntity) {
-	// 	const users = this._users.getValue();
-	// 	const index = users.findIndex((u) => u.key === user.key);
-	// 	if (index === -1) return;
-	// 	users[index] = { ...users[index], ...user };
-	// 	console.log('updateUser', user, users[index]);
-	// 	this._users.next(users);
-	// 	this.requestUpdate('users');
-	// }
-
-	// public inviteUser(name: string, email: string, userGroup: string, message: string): UserEntity {
-	// 	const users = this._users.getValue();
-	// 	const user = {
-	// 		id: this._users.getValue().length + 1,
-	// 		key: uuidv4(),
-	// 		name: name,
-	// 		email: email,
-	// 		status: 'invited',
-	// 		language: 'en',
-	// 		updateDate: new Date().toISOString(),
-	// 		createDate: new Date().toISOString(),
-	// 		failedLoginAttempts: 0,
-	// 		userGroup: userGroup,
-	// 	};
-	// 	this._users.next([...users, user]);
-	// 	this.requestUpdate('users');
-
-	// 	//TODO: Send invite email with message
-	// 	return user;
-	// }
-
-	// public deleteUser(key: string) {
-	// 	const users = this._users.getValue();
-	// 	const index = users.findIndex((u) => u.key === key);
-	// 	if (index === -1) return;
-	// 	users.splice(index, 1);
-	// 	this._users.next(users);
-	// 	this.requestUpdate('users');
-	// }
-
 	public getTagLookAndColor(status?: string): { color: InterfaceColor; look: InterfaceLook } {
 		switch ((status || '').toLowerCase()) {
 			case 'invited':

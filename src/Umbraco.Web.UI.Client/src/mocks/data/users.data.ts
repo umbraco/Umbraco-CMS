@@ -1,6 +1,31 @@
 import type { UserDetails } from '../../core/models';
 import { UmbEntityData } from './entity.data';
 
+// Temp mocked database
+class UmbUsersData extends UmbEntityData<UserDetails> {
+	constructor(data: UserDetails[]) {
+		super(data);
+	}
+
+	enable(keys: string[]) {
+		const users = this.data.filter((user) => keys.includes(user.key));
+		users.forEach((user) => {
+			user.status = 'Enabled';
+			this.updateData(user);
+		});
+		return users.map((user) => user.key);
+	}
+
+	disable(keys: string[]) {
+		const users = this.data.filter((user) => keys.includes(user.key));
+		users.forEach((user) => {
+			user.status = 'Disabled';
+			this.updateData(user);
+		});
+		return users.map((user) => user.key);
+	}
+}
+
 export const data: Array<UserDetails> = [
 	{
 		key: '50f184d4-71f3-4a43-b8be-7a36340fbd0d',
@@ -48,7 +73,7 @@ export const data: Array<UserDetails> = [
 		name: 'Nisse Grattan',
 		email: 'ngrattan2@alexa.com',
 		language: 'Tok Pisin',
-		status: 'Active',
+		status: 'Enabled',
 		lastLoginDate: '3/22/2022',
 		lastLockoutDate: '12/2/2021',
 		lastPasswordChangeDate: '5/28/2022',
@@ -66,7 +91,7 @@ export const data: Array<UserDetails> = [
 		name: 'Thain Rainville',
 		email: 'trainville3@merriam-webster.com',
 		language: 'Tajik',
-		status: 'Active',
+		status: 'Enabled',
 		lastLoginDate: '2/28/2022',
 		lastLockoutDate: '1/6/2022',
 		lastPasswordChangeDate: '7/1/2022',
@@ -84,7 +109,7 @@ export const data: Array<UserDetails> = [
 		name: 'Perren Balsdon',
 		email: 'pbalsdon4@ezinearticles.com',
 		language: 'Somali',
-		status: 'Active',
+		status: 'Enabled',
 		lastLoginDate: '5/6/2022',
 		lastLockoutDate: '11/12/2021',
 		lastPasswordChangeDate: '11/10/2021',
@@ -102,7 +127,7 @@ export const data: Array<UserDetails> = [
 		name: 'Athene Bilborough',
 		email: 'abilborough5@princeton.edu',
 		language: 'Tetum',
-		status: 'Active',
+		status: 'Enabled',
 		lastLoginDate: '3/11/2022',
 		lastLockoutDate: '7/7/2022',
 		lastPasswordChangeDate: '3/8/2022',
@@ -138,7 +163,7 @@ export const data: Array<UserDetails> = [
 		name: 'Tansy Hanna',
 		email: 'thanna7@google.pl',
 		language: 'Papiamento',
-		status: 'Active',
+		status: 'Enabled',
 		lastLoginDate: '9/10/2022',
 		lastLockoutDate: '10/28/2021',
 		lastPasswordChangeDate: '2/26/2022',
@@ -156,7 +181,7 @@ export const data: Array<UserDetails> = [
 		icon: 'umb:user',
 		email: 'hmohan8@google.co.jp',
 		language: 'Montenegrin',
-		status: 'Active',
+		status: 'Enabled',
 		lastLoginDate: '6/16/2022',
 		lastLockoutDate: '3/2/2022',
 		lastPasswordChangeDate: '4/14/2022',
@@ -276,7 +301,7 @@ export const data: Array<UserDetails> = [
 		name: 'Gennie Casaccia',
 		email: 'gcasacciaf@vkontakte.ru',
 		language: 'Catalan',
-		status: 'Active',
+		status: 'Enabled',
 		lastLoginDate: '4/11/2022',
 		lastLockoutDate: '3/17/2022',
 		lastPasswordChangeDate: '4/30/2022',
@@ -294,7 +319,7 @@ export const data: Array<UserDetails> = [
 		name: 'Vaughan Longstreet',
 		email: 'vlongstreetg@jugem.jp',
 		language: 'Khmer',
-		status: 'Active',
+		status: 'Enabled',
 		lastLoginDate: '3/16/2022',
 		lastLockoutDate: '11/4/2021',
 		lastPasswordChangeDate: '3/23/2022',
@@ -363,7 +388,7 @@ export const data: Array<UserDetails> = [
 		name: 'Felipe Finicj',
 		email: 'ffinicjk@economist.com',
 		language: 'Latvian',
-		status: 'Active',
+		status: 'Enabled',
 		lastLoginDate: '11/5/2021',
 		lastLockoutDate: '7/12/2022',
 		lastPasswordChangeDate: '4/12/2022',
@@ -399,7 +424,7 @@ export const data: Array<UserDetails> = [
 		name: 'Franni Plester',
 		email: 'fplesterm@nytimes.com',
 		language: 'Hungarian',
-		status: 'Active',
+		status: 'Enabled',
 		lastLoginDate: '7/27/2022',
 		lastLockoutDate: '8/17/2022',
 		lastPasswordChangeDate: '3/2/2022',
@@ -453,7 +478,7 @@ export const data: Array<UserDetails> = [
 		name: 'Terry McCorkell',
 		email: 'tmccorkellp@noaa.gov',
 		language: 'Dhivehi',
-		status: 'Active',
+		status: 'Enabled',
 		lastLoginDate: '7/23/2022',
 		lastLockoutDate: '7/24/2022',
 		lastPasswordChangeDate: '10/11/2021',
@@ -489,7 +514,7 @@ export const data: Array<UserDetails> = [
 		name: 'Bethena Grewe',
 		email: 'bgrewer@naver.com',
 		language: 'Haitian Creole',
-		status: 'Active',
+		status: 'Enabled',
 		lastLoginDate: '11/12/2021',
 		lastLockoutDate: '6/4/2022',
 		lastPasswordChangeDate: '8/25/2022',
@@ -669,7 +694,7 @@ export const data: Array<UserDetails> = [
 		name: 'Alberta Headech',
 		email: 'aheadech11@diigo.com',
 		language: 'Kazakh',
-		status: 'Active',
+		status: 'Enabled',
 		lastLoginDate: '8/12/2022',
 		lastLockoutDate: '8/8/2022',
 		lastPasswordChangeDate: '10/29/2021',
@@ -687,7 +712,7 @@ export const data: Array<UserDetails> = [
 		name: 'Kenon Maybey',
 		email: 'kmaybey12@cdbaby.com',
 		language: 'Telugu',
-		status: 'Active',
+		status: 'Enabled',
 		lastLoginDate: '6/11/2022',
 		lastLockoutDate: '3/4/2022',
 		lastPasswordChangeDate: '5/5/2022',
@@ -741,7 +766,7 @@ export const data: Array<UserDetails> = [
 		name: 'Benedicto Oda',
 		email: 'boda15@zimbio.com',
 		language: 'Hungarian',
-		status: 'Active',
+		status: 'Enabled',
 		lastLoginDate: '7/6/2022',
 		lastLockoutDate: '12/27/2021',
 		lastPasswordChangeDate: '9/15/2022',
@@ -879,7 +904,7 @@ export const data: Array<UserDetails> = [
 		name: 'Linn Early',
 		email: 'learly1d@msn.com',
 		language: 'Swedish',
-		status: 'Active',
+		status: 'Enabled',
 		lastLoginDate: '10/18/2021',
 		lastLockoutDate: '6/14/2022',
 		lastPasswordChangeDate: '4/10/2022',
@@ -897,7 +922,7 @@ export const data: Array<UserDetails> = [
 		name: 'Julianna Jakab',
 		email: 'jjakab1e@cbsnews.com',
 		language: 'Malay',
-		status: 'Active',
+		status: 'Enabled',
 		lastLoginDate: '3/22/2022',
 		lastLockoutDate: '6/2/2022',
 		lastPasswordChangeDate: '9/7/2022',
@@ -1017,7 +1042,7 @@ export const data: Array<UserDetails> = [
 		name: 'Bobina Macconachy',
 		email: 'bmacconachy1l@wikipedia.org',
 		language: 'Gujarati',
-		status: 'Active',
+		status: 'Enabled',
 		lastLoginDate: '5/25/2022',
 		lastLockoutDate: '6/28/2022',
 		lastPasswordChangeDate: '6/26/2022',
@@ -1068,7 +1093,7 @@ export const data: Array<UserDetails> = [
 		name: 'Melamie Chifney',
 		email: 'mchifney1o@umich.edu',
 		language: 'Albanian',
-		status: 'Active',
+		status: 'Enabled',
 		lastLoginDate: '3/16/2022',
 		lastLockoutDate: '12/22/2021',
 		lastPasswordChangeDate: '1/8/2022',
@@ -1122,7 +1147,7 @@ export const data: Array<UserDetails> = [
 		name: 'Clarke Rosenhaus',
 		email: 'crosenhaus1r@globo.com',
 		language: 'Afrikaans',
-		status: 'Active',
+		status: 'Enabled',
 		lastLoginDate: '6/23/2022',
 		lastLockoutDate: '7/4/2022',
 		lastPasswordChangeDate: '12/5/2021',
@@ -1155,7 +1180,7 @@ export const data: Array<UserDetails> = [
 		name: 'Bondon Corrin',
 		email: 'bcorrin1t@ustream.tv',
 		language: 'Hiri Motu',
-		status: 'Active',
+		status: 'Enabled',
 		lastLoginDate: '1/14/2022',
 		lastLockoutDate: '6/14/2022',
 		lastPasswordChangeDate: '11/28/2021',
@@ -1173,7 +1198,7 @@ export const data: Array<UserDetails> = [
 		name: 'Juli Birtwistle',
 		email: 'jbirtwistle1u@histats.com',
 		language: 'Haitian Creole',
-		status: 'Active',
+		status: 'Enabled',
 		lastLoginDate: '11/25/2021',
 		lastLockoutDate: '3/20/2022',
 		lastPasswordChangeDate: '12/20/2021',
@@ -1227,7 +1252,7 @@ export const data: Array<UserDetails> = [
 		name: 'Skelly Hockey',
 		email: 'shockey1x@usa.gov',
 		language: 'Burmese',
-		status: 'Active',
+		status: 'Enabled',
 		updateDate: '8/30/2022',
 		createDate: '1/16/2022',
 		failedLoginAttempts: 211,
@@ -1275,7 +1300,7 @@ export const data: Array<UserDetails> = [
 		name: 'Emmerich Sisey',
 		email: 'emm@sis.com',
 		language: 'Tetum',
-		status: 'Active',
+		status: 'Enabled',
 		lastLoginDate: '5/22/2022',
 		lastLockoutDate: '6/26/2022',
 		lastPasswordChangeDate: '5/22/2022',
@@ -1311,7 +1336,7 @@ export const data: Array<UserDetails> = [
 		name: 'Netty Rudge',
 		email: 'nrudge22@xinhuanet.com',
 		language: 'Fijian',
-		status: 'Active',
+		status: 'Enabled',
 		lastLoginDate: '4/21/2022',
 		lastLockoutDate: '7/21/2022',
 		lastPasswordChangeDate: '11/6/2021',
@@ -1329,7 +1354,7 @@ export const data: Array<UserDetails> = [
 		name: 'Joane Kuhne',
 		email: 'jkuhne23@opera.com',
 		language: 'Danish',
-		status: 'Active',
+		status: 'Enabled',
 		lastLoginDate: '1/10/2022',
 		lastLockoutDate: '9/18/2022',
 		lastPasswordChangeDate: '9/6/2022',
@@ -1383,7 +1408,7 @@ export const data: Array<UserDetails> = [
 		name: 'Cyrille Curm',
 		email: 'ccurm26@forbes.com',
 		language: 'Icelandic',
-		status: 'Active',
+		status: 'Enabled',
 		lastLoginDate: '12/17/2021',
 		lastLockoutDate: '8/9/2022',
 		lastPasswordChangeDate: '10/14/2021',
@@ -1419,7 +1444,7 @@ export const data: Array<UserDetails> = [
 		name: 'Nickie Bronger',
 		email: 'nbronger28@xrea.com',
 		language: 'West Frisian',
-		status: 'Active',
+		status: 'Enabled',
 		lastLoginDate: '8/5/2022',
 		lastLockoutDate: '1/21/2022',
 		lastPasswordChangeDate: '4/8/2022',
@@ -1437,7 +1462,7 @@ export const data: Array<UserDetails> = [
 		name: 'Annie Butterworth',
 		email: 'abutterworth29@marketwatch.com',
 		language: 'Bulgarian',
-		status: 'Active',
+		status: 'Enabled',
 		lastLoginDate: '10/30/2021',
 		lastLockoutDate: '10/5/2021',
 		lastPasswordChangeDate: '5/3/2022',
@@ -1527,7 +1552,7 @@ export const data: Array<UserDetails> = [
 		name: 'Juliana Clorley',
 		email: 'jclorley2e@mail.ru',
 		language: 'Luxembourgish',
-		status: 'Active',
+		status: 'Enabled',
 		lastLoginDate: '10/17/2021',
 		lastLockoutDate: '8/4/2022',
 		lastPasswordChangeDate: '12/23/2021',
@@ -1668,7 +1693,7 @@ export const data: Array<UserDetails> = [
 		name: 'Rodrick Twelftree',
 		email: 'rtwelftree2m@nbcnews.com',
 		language: 'Luxembourgish',
-		status: 'Active',
+		status: 'Enabled',
 		lastLoginDate: '5/23/2022',
 		lastLockoutDate: '6/21/2022',
 		lastPasswordChangeDate: '8/27/2022',
@@ -1686,7 +1711,7 @@ export const data: Array<UserDetails> = [
 		name: 'Liesa Arnoll',
 		email: 'larnoll2n@webnode.com',
 		language: 'Hebrew',
-		status: 'Active',
+		status: 'Enabled',
 		lastLoginDate: '9/13/2022',
 		lastLockoutDate: '7/14/2022',
 		lastPasswordChangeDate: '2/28/2022',
@@ -1758,7 +1783,7 @@ export const data: Array<UserDetails> = [
 		name: 'Isador Tibbles',
 		email: 'itibbles2r@cafepress.com',
 		language: 'Assamese',
-		status: 'Active',
+		status: 'Enabled',
 		lastLoginDate: '4/7/2022',
 		lastLockoutDate: '2/4/2022',
 		lastPasswordChangeDate: '11/14/2021',
@@ -1768,11 +1793,4 @@ export const data: Array<UserDetails> = [
 	},
 ];
 
-// Temp mocked database
-class UmbUsersData extends UmbEntityData<UserDetails> {
-	constructor() {
-		super(data);
-	}
-}
-
-export const umbUsersData = new UmbUsersData();
+export const umbUsersData = new UmbUsersData(data);

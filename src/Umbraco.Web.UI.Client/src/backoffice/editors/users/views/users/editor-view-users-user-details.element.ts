@@ -97,8 +97,6 @@ export class UmbEditorViewUsersUserDetailsElement extends UmbContextConsumerMixi
 				this._user = user;
 			});
 		});
-
-		console.log(this.key);
 	}
 
 	disconnectedCallback(): void {
@@ -108,20 +106,17 @@ export class UmbEditorViewUsersUserDetailsElement extends UmbContextConsumerMixi
 	}
 
 	private _updateUserStatus() {
-		if (!this._user) return;
+		if (!this._user || !this._userStore) return;
 
-		const newStatus = this._user.status === 'Disabled' ? 'Active' : 'Disabled';
-		const newUser = this._user;
-		newUser.status = newStatus;
-
-		// this._userStore?.updateUser(newUser);
+		const isDisabled = this._user.status === 'Disabled';
+		isDisabled ? this._userStore.enableUsers([this._user.key]) : this._userStore.disableUsers([this._user.key]);
 	}
 
 	private _deleteUser() {
-		if (!this._user) return;
+		if (!this._user || !this._userStore) return;
 
-		// this._userStore?.deleteUser(this._user.key);
-		history.back(); //TODO Should redirect to users section
+		this._userStore.deleteUsers([this._user.key]);
+		// history.back(); //TODO Should redirect to users section
 	}
 
 	private renderLeftColumn() {
@@ -180,6 +175,8 @@ export class UmbEditorViewUsersUserDetailsElement extends UmbContextConsumerMixi
 	private renderRightColumn() {
 		if (!this._user || !this._userStore) return nothing;
 
+		console.log('user', this._user);
+
 		// const status = this._userStore.getTagLookAndColor(this._user.status);
 		return html` <uui-box>
 			<div id="user-info">
@@ -231,8 +228,7 @@ export class UmbEditorViewUsersUserDetailsElement extends UmbContextConsumerMixi
 					<span>${this._user.updateDate}</span>
 				</div>
 				<div>
-					<b>Id:</b>
-					<span>${this._user.id}</span>
+					<b>Key:</b>
 					<span>${this._user.key}</span>
 				</div>
 			</div>

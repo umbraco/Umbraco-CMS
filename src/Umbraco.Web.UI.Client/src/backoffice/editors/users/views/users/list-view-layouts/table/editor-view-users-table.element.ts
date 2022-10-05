@@ -230,7 +230,7 @@ export class UmbEditorViewUsersTableElement extends UmbContextConsumerMixin(LitE
 			<uui-table-cell> ${user.userGroup} </uui-table-cell>
 			<uui-table-cell>${user.lastLoginDate}</uui-table-cell>
 			<uui-table-cell>
-				${user.status && user.status !== 'Active'
+				${user.status && user.status !== 'Enabled'
 					? html`<uui-tag size="s" look="${statusLook.look}" color="${statusLook.color}"> ${user.status} </uui-tag>`
 					: nothing}
 			</uui-table-cell>
