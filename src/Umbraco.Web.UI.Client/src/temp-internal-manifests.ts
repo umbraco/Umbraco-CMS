@@ -343,33 +343,21 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		},
 	},
 	{
-		type: 'editorView',
-		alias: 'Umb.EditorView.Users.Users',
-		name: 'Users',
-		loader: () => import('./backoffice/sections/users/views/users/section-view-users.element'),
+		type: 'editor',
+		alias: 'Umb.Editor.User',
+		name: 'User Editor',
+		loader: () => import('./backoffice/editors/user/editor-user.element'),
 		meta: {
-			editors: ['Umb.Editor.Users'],
-			pathname: 'users',
-			weight: 1,
-			icon: 'document',
+			entityType: 'user',
 		},
 	},
 	{
 		type: 'editorAction',
-		alias: 'Umb.EditorAction.Users.Save',
+		alias: 'Umb.EditorAction.User.Save',
 		name: 'EditorActionUserSave',
-		loader: () => import('./backoffice/editors/users/views/users/actions/editor-action-users-save.element'),
+		loader: () => import('./backoffice/editors/user/actions/editor-action-user-save.element'),
 		meta: {
-			editors: ['Umb.Editor.Users'],
-		},
-	},
-	{
-		type: 'editorAction',
-		alias: 'Umb.EditorAction.Users.Delete',
-		name: 'EditorActionUserDelete',
-		loader: () => import('./backoffice/editors/users/views/users/actions/editor-action-users-save.element'),
-		meta: {
-			editors: ['Umb.Editor.DataType'],
+			editors: ['Umb.Editor.User'],
 		},
 	},
 	{

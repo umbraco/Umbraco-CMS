@@ -2,12 +2,12 @@ import { css, html, LitElement, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { Subscription } from 'rxjs';
-import { UmbContextConsumerMixin } from '../../../../../../core/context';
-import { UmbUserStore } from '../../../../../../core/stores/user/user.store';
-import type { UserEntity } from '../../../../../../core/models';
+import { UmbContextConsumerMixin } from '../../../../core/context';
+import { UmbUserStore } from '../../../../core/stores/user/user.store';
+import type { UserEntity } from '../../../../core/models';
 
-@customElement('umb-editor-action-users-save')
-export class UmbEditorActionUsersSaveElement extends UmbContextConsumerMixin(LitElement) {
+@customElement('umb-editor-action-user-save')
+export class UmbEditorActionUserSaveElement extends UmbContextConsumerMixin(LitElement) {
 	static styles = [UUITextStyles, css``];
 
 	private _userStore?: UmbUserStore;
@@ -30,10 +30,10 @@ export class UmbEditorActionUsersSaveElement extends UmbContextConsumerMixin(Lit
 	}
 }
 
-export default UmbEditorActionUsersSaveElement;
+export default UmbEditorActionUserSaveElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-editor-action-users-save': UmbEditorActionUsersSaveElement;
+		'umb-editor-action-user-save': UmbEditorActionUserSaveElement;
 	}
 }

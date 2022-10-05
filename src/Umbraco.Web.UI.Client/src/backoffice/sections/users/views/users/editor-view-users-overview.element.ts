@@ -6,7 +6,7 @@ import './list-view-layouts/table/editor-view-users-table.element';
 import './list-view-layouts/grid/editor-view-users-grid.element';
 import './editor-view-users-selection.element';
 import './editor-view-users-invite.element';
-import { IRoute , isPathActive } from 'router-slot';
+import { IRoute } from 'router-slot';
 import { UUIPopoverElement } from '@umbraco-ui/uui';
 import { UmbContextConsumerMixin } from '../../../../../core/context';
 import UmbSectionViewUsersElement from './section-view-users.element';

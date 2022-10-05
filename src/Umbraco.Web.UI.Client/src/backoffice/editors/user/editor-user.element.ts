@@ -2,14 +2,14 @@ import { css, html, LitElement, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { Subscription } from 'rxjs';
-import { UmbContextConsumerMixin } from '../../../../../core/context';
-import UmbSectionViewUsersElement from '../../../../sections/users/views/users/section-view-users.element';
-import '../../../../property-editors/content-picker/property-editor-content-picker.element';
-import { UmbUserStore } from '../../../../../core/stores/user/user.store';
-import type { UserDetails } from '../../../../../core/models';
+import { UmbContextConsumerMixin } from '../../../core/context';
+import UmbSectionViewUsersElement from '../../sections/users/views/users/section-view-users.element';
+import '../../property-editors/content-picker/property-editor-content-picker.element';
+import { UmbUserStore } from '../../../core/stores/user/user.store';
+import type { UserDetails } from '../../../core/models';
 
-@customElement('umb-editor-view-users-user-details')
-export class UmbEditorViewUsersUserDetailsElement extends UmbContextConsumerMixin(LitElement) {
+@customElement('umb-editor-user')
+export class UmbEditorUserElement extends UmbContextConsumerMixin(LitElement) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -246,10 +246,10 @@ export class UmbEditorViewUsersUserDetailsElement extends UmbContextConsumerMixi
 	}
 }
 
-export default UmbEditorViewUsersUserDetailsElement;
+export default UmbEditorUserElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-editor-view-users-user-details': UmbEditorViewUsersUserDetailsElement;
+		'umb-editor-view-users-user-details': UmbEditorUserElement;
 	}
 }

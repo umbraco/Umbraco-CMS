@@ -12,7 +12,7 @@ import './editor-view-users-selection.element';
 import './editor-view-users-invite.element';
 
 import type { UserDetails, UserEntity } from '../../../../../core/models';
-import type { UmbEditorViewUsersUserDetailsElement } from '../../../../editors/users/views/users/editor-view-users-user-details.element';
+import type { UmbEditorUserElement } from '../../../../editors/user/editor-user.element';
 
 @customElement('umb-section-view-users')
 export class UmbSectionViewUsersElement extends UmbContextProviderMixin(LitElement) {
@@ -30,9 +30,9 @@ export class UmbSectionViewUsersElement extends UmbContextProviderMixin(LitEleme
 		},
 		{
 			path: 'details/:key',
-			component: () => import('../../../../editors/users/views/users/editor-view-users-user-details.element'),
+			component: () => import('../../../../editors/user/editor-user.element'),
 			setup: (component: unknown, info: IRoutingInfo) => {
-				const element = component as UmbEditorViewUsersUserDetailsElement;
+				const element = component as UmbEditorUserElement;
 				element.key = info.match.params.key;
 			},
 		},
