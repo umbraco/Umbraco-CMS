@@ -349,6 +349,12 @@ stages:
       - job:
         displayName: E2E Tests
         variables:
+          # Enable console logging in Release mode
+          - name: Serilog__WriteTo__0__Name
+            value: Async
+          - name: Serilog__WriteTo__0__Args__configure__0__Name
+            value: Console
+          # Set unattended install settings
           - name: Umbraco__CMS__Unattended__InstallUnattended  # Windows only
             value: true
           - name: Umbraco__CMS__Unattended__UnattendedUserName  # Windows only
