@@ -346,7 +346,7 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		type: 'editorView',
 		alias: 'Umb.EditorView.Users.Users',
 		name: 'Users',
-		loader: () => import('./backoffice/editors/users/views/users/editor-view-users.element'),
+		loader: () => import('./backoffice/sections/users/views/users/section-view-users.element'),
 		meta: {
 			editors: ['Umb.Editor.Users'],
 			pathname: 'users',

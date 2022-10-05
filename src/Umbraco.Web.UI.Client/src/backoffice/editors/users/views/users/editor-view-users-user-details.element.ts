@@ -2,7 +2,7 @@ import { css, html, LitElement, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UmbContextConsumerMixin } from '../../../../../core/context';
-import UmbEditorViewUsersElement from './editor-view-users.element';
+import UmbSectionViewUsersElement from '../../../../sections/users/views/users/section-view-users.element';
 import { Subscription } from 'rxjs';
 import '../../../../property-editors/content-picker/property-editor-content-picker.element';
 import { UmbUserStore } from '../../../../../core/stores/user/user.store';

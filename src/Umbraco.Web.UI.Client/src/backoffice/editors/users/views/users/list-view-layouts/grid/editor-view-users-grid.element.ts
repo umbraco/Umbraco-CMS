@@ -5,7 +5,7 @@ import { repeat } from 'lit/directives/repeat.js';
 import { Subscription } from 'rxjs';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { UmbContextConsumerMixin } from '../../../../../../../core/context';
-import UmbEditorViewUsersElement from '../../editor-view-users.element';
+import UmbSectionViewUsersElement from '../../../../../../sections/users/views/users/section-view-users.element';
 import { UmbUserStore } from '../../../../../../../core/stores/user/user.store';
 import type { UserEntity } from '../../../../../../../core/models';
 
@@ -38,7 +38,7 @@ export class UmbEditorViewUsersGridElement extends UmbContextConsumerMixin(LitEl
 	private _selection: Array<string> = [];
 
 	private _userStore?: UmbUserStore;
-	private _usersContext?: UmbEditorViewUsersElement;
+	private _usersContext?: UmbSectionViewUsersElement;
 	private _usersSubscription?: Subscription;
 	private _selectionSubscription?: Subscription;
 
@@ -50,7 +50,7 @@ export class UmbEditorViewUsersGridElement extends UmbContextConsumerMixin(LitEl
 			this._observeUsers();
 		});
 
-		this.consumeContext('umbUsersContext', (usersContext: UmbEditorViewUsersElement) => {
+		this.consumeContext('umbUsersContext', (usersContext: UmbSectionViewUsersElement) => {
 			this._usersContext = usersContext;
 			this._observeSelection();
 		});

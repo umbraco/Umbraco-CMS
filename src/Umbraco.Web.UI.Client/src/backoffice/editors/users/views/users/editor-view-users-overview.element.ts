@@ -8,7 +8,7 @@ import './list-view-layouts/grid/editor-view-users-grid.element';
 import './editor-view-users-selection.element';
 import './editor-view-users-invite.element';
 import { IRoute } from 'router-slot';
-import UmbEditorViewUsersElement from './editor-view-users.element';
+import UmbSectionViewUsersElement from '../../../../sections/users/views/users/section-view-users.element';
 import { UUIPopoverElement } from '@umbraco-ui/uui';
 import { isPathActive } from 'router-slot';
 
@@ -71,7 +71,7 @@ export class UmbEditorViewUsersOverviewElement extends UmbContextConsumerMixin(L
 	@state()
 	private _selection: Array<string> = [];
 
-	private _usersContext?: UmbEditorViewUsersElement;
+	private _usersContext?: UmbSectionViewUsersElement;
 	private _selectionSubscription?: Subscription;
 
 	constructor() {
@@ -83,7 +83,7 @@ export class UmbEditorViewUsersOverviewElement extends UmbContextConsumerMixin(L
 	connectedCallback(): void {
 		super.connectedCallback();
 
-		this.consumeContext('umbUsersContext', (usersContext: UmbEditorViewUsersElement) => {
+		this.consumeContext('umbUsersContext', (usersContext: UmbSectionViewUsersElement) => {
 			this._usersContext = usersContext;
 
 			this._selectionSubscription?.unsubscribe();

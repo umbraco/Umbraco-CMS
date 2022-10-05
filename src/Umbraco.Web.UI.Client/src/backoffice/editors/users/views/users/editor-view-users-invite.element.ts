@@ -2,7 +2,7 @@ import { css, html, LitElement, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbContextConsumerMixin } from '../../../../../core/context';
-import UmbEditorViewUsersElement from './editor-view-users.element';
+import UmbSectionViewUsersElement from '../../../../sections/users/views/users/section-view-users.element';
 
 export type UsersViewType = 'list' | 'grid';
 @customElement('umb-editor-view-users-invite')
@@ -48,14 +48,14 @@ export class UmbEditorViewUsersInviteElement extends UmbContextConsumerMixin(Lit
 	@state()
 	private _showPostInvite = false;
 
-	private _usersContext?: UmbEditorViewUsersElement;
+	private _usersContext?: UmbSectionViewUsersElement;
 
 	private _invitedUser?: UserItem;
 
 	connectedCallback(): void {
 		super.connectedCallback();
 
-		this.consumeContext('umbUsersContext', (usersContext: UmbEditorViewUsersElement) => {
+		this.consumeContext('umbUsersContext', (usersContext: UmbSectionViewUsersElement) => {
 			this._usersContext = usersContext;
 		});
 	}

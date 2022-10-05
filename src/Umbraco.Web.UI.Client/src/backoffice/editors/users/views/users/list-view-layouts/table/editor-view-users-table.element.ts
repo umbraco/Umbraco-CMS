@@ -4,7 +4,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { UmbContextConsumerMixin } from '../../../../../../../core/context';
 import { repeat } from 'lit/directives/repeat.js';
 import { Subscription } from 'rxjs';
-import UmbEditorViewUsersElement from '../../editor-view-users.element';
+import UmbSectionViewUsersElement from '../../../../../../sections/users/views/users/section-view-users.element';
 import { UmbUserStore } from '../../../../../../../core/stores/user/user.store';
 import type { UserEntity } from '../../../../../../../core/models';
 
@@ -78,7 +78,7 @@ export class UmbEditorViewUsersTableElement extends UmbContextConsumerMixin(LitE
 	private _users: Array<UserEntity> = [];
 
 	private _userStore?: UmbUserStore;
-	private _usersContext?: UmbEditorViewUsersElement;
+	private _usersContext?: UmbSectionViewUsersElement;
 	private _usersSubscription?: Subscription;
 	private _selectionSubscription?: Subscription;
 
@@ -90,7 +90,7 @@ export class UmbEditorViewUsersTableElement extends UmbContextConsumerMixin(LitE
 			this._observeUsers();
 		});
 
-		this.consumeContext('umbUsersContext', (usersContext: UmbEditorViewUsersElement) => {
+		this.consumeContext('umbUsersContext', (usersContext: UmbSectionViewUsersElement) => {
 			this._usersContext = usersContext;
 			this._observeSelection();
 		});
