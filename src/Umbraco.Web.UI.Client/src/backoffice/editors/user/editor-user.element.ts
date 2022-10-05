@@ -1,17 +1,18 @@
+import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import { css, html, LitElement, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { Subscription } from 'rxjs';
-import { UmbContextConsumerMixin } from '../../../core/context';
+import { UmbContextProviderMixin, UmbContextConsumerMixin } from '../../../core/context';
 import UmbSectionViewUsersElement from '../../sections/users/views/users/section-view-users.element';
 import '../../property-editors/content-picker/property-editor-content-picker.element';
 import { UmbUserStore } from '../../../core/stores/user/user.store';
 import type { UserDetails } from '../../../core/models';
+import { UmbUserContext } from './user.context';
 
 import '../shared/editor-entity-layout/editor-entity-layout.element';
-
 @customElement('umb-editor-user')
-export class UmbEditorUserElement extends UmbContextConsumerMixin(LitElement) {
+export class UmbEditorUserElement extends UmbContextProviderMixin(UmbContextConsumerMixin(LitElement)) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -85,22 +86,47 @@ export class UmbEditorUserElement extends UmbContextConsumerMixin(LitElement) {
 	@state()
 	private _user?: UserDetails | null;
 
+	@state()
+	private _userName = '';
+
 	@property({ type: String })
 	entityKey = '';
 
 	protected _userStore?: UmbUserStore;
 	protected _usersSubscription?: Subscription;
+	private _userContext?: UmbUserContext;
+
+	private _userNameSubscription?: Subscription;
 
 	private _languages = []; //TODO Add languages
 
 	connectedCallback(): void {
 		super.connectedCallback();
+
 		this.consumeContext('umbUserStore', (usersContext: UmbUserStore) => {
 			this._userStore = usersContext;
+			this._observeUser();
+		});
+	}
 
-			this._usersSubscription?.unsubscribe();
-			this._usersSubscription = this._userStore?.getByKey(this.entityKey).subscribe((user) => {
-				this._user = user;
+	private _observeUser() {
+		this._usersSubscription?.unsubscribe();
+
+		this._usersSubscription = this._userStore?.getByKey(this.entityKey).subscribe((user) => {
+			this._user = user;
+			if (!this._user) return;
+
+			if (!this._userContext) {
+				this._userContext = new UmbUserContext(this._user);
+				this.provideContext('umbUserContext', this._userContext);
+			} else {
+				this._userContext.update(this._user);
+			}
+
+			this._userNameSubscription = this._userContext.data.subscribe((user) => {
+				if (user && user.name !== this._userName) {
+					this._userName = user.name;
+				}
 			});
 		});
 	}
@@ -109,6 +135,7 @@ export class UmbEditorUserElement extends UmbContextConsumerMixin(LitElement) {
 		super.disconnectedCallback();
 
 		this._usersSubscription?.unsubscribe();
+		this._userNameSubscription?.unsubscribe();
 	}
 
 	private _updateUserStatus() {
@@ -182,8 +209,6 @@ export class UmbEditorUserElement extends UmbContextConsumerMixin(LitElement) {
 	private renderRightColumn() {
 		if (!this._user || !this._userStore) return nothing;
 
-		console.log('user', this._user);
-
 		// const status = this._userStore.getTagLookAndColor(this._user.status);
 		return html` <uui-box>
 			<div id="user-info">
@@ -242,14 +267,23 @@ export class UmbEditorUserElement extends UmbContextConsumerMixin(LitElement) {
 		</uui-box>`;
 	}
 
+	// TODO. find a way where we don't have to do this for all editors.
+	private _handleInput(event: UUIInputEvent) {
+		if (event instanceof UUIInputEvent) {
+			const target = event.composedPath()[0] as UUIInputElement;
+
+			if (typeof target?.value === 'string') {
+				this._userContext?.update({ name: target.value });
+			}
+		}
+	}
+
 	render() {
 		if (!this._user) return html`User not found`;
 
 		return html`
-			<umb-editor-entity-layout alias="Umb.Editor.User" headline="Hej Hej">
-				<!--
-				<uui-input id="name" slot="name" .value=${this._dataTypeName} @input="${this._handleInput}"></uui-input>
-	-->
+			<umb-editor-entity-layout alias="Umb.Editor.User">
+				<uui-input id="name" slot="name" .value=${this._userName} @input="${this._handleInput}"></uui-input>
 				<div id="main">
 					<div id="left-column">${this.renderLeftColumn()}</div>
 					<div id="right-column">${this.renderRightColumn()}</div>
