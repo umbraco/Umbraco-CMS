@@ -1,7 +1,4 @@
-﻿using System.Collections.Immutable;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OpenIddict.Abstractions;
@@ -16,10 +13,7 @@ public static class BackOfficeAuthBuilderExtensions
     {
         builder
             .AddDbContext()
-            .AddOpenIddict()
-            .AddAuthorizationPolicies();
-
-        builder.Services.AddTransient<IClaimsTransformation, ScopeClaimsTransformation>();
+            .AddOpenIddict();
 
         return builder;
     }
@@ -75,10 +69,10 @@ public static class BackOfficeAuthBuilderExtensions
                     // TODO: use an actual certificate here
                     .AddDevelopmentSigningCertificate();
 
-                // Register available scopes
-                options
-                    // TODO: figure out appropriate scopes (sections? trees?)
-                    .RegisterScopes("api1", "api2");
+                // // Register available scopes
+                // // TODO: if we want to use scopes, we need to setup the available ones here
+                // options
+                //     .RegisterScopes("some_scope", "another_scope");
 
                 // Register the ASP.NET Core host and configure for custom authentication endpoint.
                 options
@@ -106,45 +100,34 @@ public static class BackOfficeAuthBuilderExtensions
         return builder;
     }
 
-    private static IUmbracoBuilder AddAuthorizationPolicies(this IUmbracoBuilder builder)
-    {
-        builder.Services.AddAuthorization(options =>
-        {
-            // TODO: actual policies for APIs here
-            options.AddPolicy("can_use_api_1", policy => policy.RequireClaim("scope", "api1"));
-            options.AddPolicy("can_use_api_2", policy => policy.RequireClaim("scope", "api2"));
-        });
-
-        return builder;
-    }
-
-    // TODO: move this somewhere (find an appropriate namespace for it)
-    public class ScopeClaimsTransformation : IClaimsTransformation
-    {
-        public Task<ClaimsPrincipal> TransformAsync(ClaimsPrincipal principal)
-        {
-            if (principal.HasClaim("scope") == false)
-            {
-                return Task.FromResult(principal);
-            }
-
-            ImmutableArray<string> knownScopeClaims = principal.GetClaims("scope");
-            var missingScopeClaims = knownScopeClaims.SelectMany(s => s.Split(' ')).Except(knownScopeClaims).ToArray();
-            if (missingScopeClaims.Any() == false)
-            {
-                return Task.FromResult(principal);
-            }
-
-            var claimsIdentity = new ClaimsIdentity();
-            foreach (var missingScopeClaim in missingScopeClaims)
-            {
-                claimsIdentity.AddClaim("scope", missingScopeClaim);
-            }
-
-            principal.AddIdentity(claimsIdentity);
-            return Task.FromResult(principal);
-        }
-    }
+    // TODO: if we want to use scopes instead of claims, this will come in handy!
+    // install with builder.Services.AddTransient<IClaimsTransformation, ScopeClaimsTransformation>();
+    // public class ScopeClaimsTransformation : IClaimsTransformation
+    // {
+    //     public Task<ClaimsPrincipal> TransformAsync(ClaimsPrincipal principal)
+    //     {
+    //         if (principal.HasClaim("scope") == false)
+    //         {
+    //             return Task.FromResult(principal);
+    //         }
+    //
+    //         ImmutableArray<string> knownScopeClaims = principal.GetClaims("scope");
+    //         var missingScopeClaims = knownScopeClaims.SelectMany(s => s.Split(' ')).Except(knownScopeClaims).ToArray();
+    //         if (missingScopeClaims.Any() == false)
+    //         {
+    //             return Task.FromResult(principal);
+    //         }
+    //
+    //         var claimsIdentity = new ClaimsIdentity();
+    //         foreach (var missingScopeClaim in missingScopeClaims)
+    //         {
+    //             claimsIdentity.AddClaim("scope", missingScopeClaim);
+    //         }
+    //
+    //         principal.AddIdentity(claimsIdentity);
+    //         return Task.FromResult(principal);
+    //     }
+    // }
 
     // TODO: move this somewhere (find an appropriate namespace for it)
     public class ClientIdManager : IHostedService
@@ -183,9 +166,9 @@ public static class BackOfficeAuthBuilderExtensions
                             OpenIddictConstants.Permissions.Endpoints.Token,
                             OpenIddictConstants.Permissions.GrantTypes.AuthorizationCode,
                             OpenIddictConstants.Permissions.ResponseTypes.Code,
-                            // TODO: figure out appropriate scopes (sections? trees?)
-                            OpenIddictConstants.Permissions.Prefixes.Scope + "api1",
-                            OpenIddictConstants.Permissions.Prefixes.Scope + "api2"
+                            // TODO: if we're going with scopes, we may need to add them here
+                            // OpenIddictConstants.Permissions.Prefixes.Scope + "some_scope",
+                            // OpenIddictConstants.Permissions.Prefixes.Scope + "another_scope"
                         }
                     },
                     cancellationToken);
