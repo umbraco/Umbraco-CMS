@@ -162,7 +162,7 @@
             if (vm.model.config.layoutStylesheet) {
                 vm.layoutStylesheet = umbRequestHelper.convertVirtualToAbsolutePath(vm.model.config.layoutStylesheet);
             } else {
-                vm.layoutStylesheet = "assets/css/blockgridlayout.css";
+                vm.layoutStylesheet = "assets/css/umbraco-blockgridlayout.css";
             }
 
             // We need to ensure that the property model value is an object, this is needed for modelObject to receive a reference and keep that updated.
