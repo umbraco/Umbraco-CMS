@@ -20,6 +20,7 @@ export type TelemetryModel = components['schemas']['TelemetryModel'];
 export type ServerStatus = components['schemas']['ServerStatus'];
 export type ManifestTypes = components['schemas']['Manifest'];
 export type ManifestSection = components['schemas']['IManifestSection'];
+export type ManifestSectionView = components['schemas']['IManifestSectionView'];
 export type ManifestTree = components['schemas']['IManifestTree'];
 export type ManifestTreeItemAction = components['schemas']['IManifestTreeItemAction'];
 export type ManifestEditor = components['schemas']['IManifestEditor'];
@@ -44,6 +45,7 @@ export type PropertyEditorConfigDefaultData = components['schemas']['PropertyEdi
 
 export type ManifestElementType =
 	| ManifestSection
+	| ManifestSectionView
 	| ManifestTree
 	| ManifestTreeItemAction
 	| ManifestEditor

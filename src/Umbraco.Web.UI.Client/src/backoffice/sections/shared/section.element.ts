@@ -3,13 +3,14 @@ import { css, html, LitElement, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { Subscription, map, switchMap, EMPTY, of } from 'rxjs';
 import { UmbContextConsumerMixin } from '../../../core/context';
-import { UmbExtensionRegistry } from '../../../core/extension';
+import { createExtensionElement, UmbExtensionRegistry } from '../../../core/extension';
 import { UmbSectionContext } from '../section.context';
-import type { ManifestTree, ManifestEditor } from '../../../core/models';
+import type { ManifestTree, ManifestEditor, ManifestSectionView } from '../../../core/models';
 
 import '../shared/section-trees.element.ts';
 import { UmbEditorEntityElement } from '../../editors/shared/editor-entity/editor-entity.element';
 import { UmbEntityStore } from '../../../core/stores/entity.store';
+import { IRoutingInfo } from 'router-slot';
 
 @customElement('umb-section')
 export class UmbSectionElement extends UmbContextConsumerMixin(LitElement) {
@@ -20,6 +21,19 @@ export class UmbSectionElement extends UmbContextConsumerMixin(LitElement) {
 				flex: 1 1 auto;
 				height: 100%;
 			}
+
+			#header {
+				display: flex;
+				gap: 16px;
+				align-items: center;
+				min-height: 60px;
+			}
+
+			uui-tab-group {
+				--uui-tab-divider: var(--uui-color-border);
+				border-left: 1px solid var(--uui-color-border);
+				border-right: 1px solid var(--uui-color-border);
+			}
 		`,
 	];
 
@@ -28,7 +42,16 @@ export class UmbSectionElement extends UmbContextConsumerMixin(LitElement) {
 	private _routes: Array<any> = [];
 
 	@state()
-	private _trees?: Array<ManifestTree>;
+	private _trees: Array<ManifestTree> = [];
+
+	@state()
+	private _views: Array<ManifestSectionView> = [];
+
+	@state()
+	private _currentViewPath = '';
+
+	@state()
+	private _routerFolder = '';
 
 	private _editors?: Array<ManifestEditor>;
 	private _editorsSubscription?: Subscription;
@@ -38,6 +61,7 @@ export class UmbSectionElement extends UmbContextConsumerMixin(LitElement) {
 	private _sectionContext?: UmbSectionContext;
 	private _extensionRegistry?: UmbExtensionRegistry;
 	private _treesSubscription?: Subscription;
+	private _viewsSubscription?: Subscription;
 
 	constructor() {
 		super();
@@ -46,17 +70,26 @@ export class UmbSectionElement extends UmbContextConsumerMixin(LitElement) {
 		this.consumeContext('umbExtensionRegistry', (extensionsRegistry: UmbExtensionRegistry) => {
 			this._extensionRegistry = extensionsRegistry;
 			this._observeTrees();
+			this._observeViews();
 		});
 
 		this.consumeContext('umbSectionContext', (sectionContext: UmbSectionContext) => {
 			this._sectionContext = sectionContext;
 			this._observeTrees();
+			this._observeViews();
 		});
 
 		this.consumeContext('umbEntityStore', (entityStore: UmbEntityStore) => {
 			this._entityStore = entityStore;
 			this._observeTrees();
+			this._observeViews();
 		});
+	}
+
+	connectedCallback(): void {
+		super.connectedCallback();
+		/* TODO: find a way to construct absolute urls */
+		this._routerFolder = window.location.pathname.split('/view')[0];
 	}
 
 	private _observeTrees() {
@@ -84,11 +117,12 @@ export class UmbSectionElement extends UmbContextConsumerMixin(LitElement) {
 			)
 			.subscribe((trees) => {
 				this._trees = trees;
-				this._createRoutes();
+				if (this._trees.length === 0) return;
+				this._createTreeRoutes();
 			});
 	}
 
-	private _createRoutes() {
+	private _createTreeRoutes() {
 		const treeRoutes =
 			this._trees?.map(() => {
 				return {
@@ -114,16 +148,65 @@ export class UmbSectionElement extends UmbContextConsumerMixin(LitElement) {
 		];
 	}
 
+	private _observeViews() {
+		if (!this._sectionContext || !this._extensionRegistry || !this._entityStore) return;
+
+		this._viewsSubscription?.unsubscribe();
+
+		this._viewsSubscription = this._sectionContext?.data
+			.pipe(
+				switchMap((section) => {
+					if (!section) return EMPTY;
+
+					return (
+						this._extensionRegistry
+							?.extensionsOfType('sectionView')
+							.pipe(
+								map((views) =>
+									views
+										.filter((view) => view.meta.sections.includes(section.alias))
+										.sort((a, b) => b.meta.weight - a.meta.weight)
+								)
+							) ?? of([])
+					);
+				})
+			)
+			.subscribe((views) => {
+				this._views = views;
+				if (this._views.length === 0) return;
+				this._createViewRoutes();
+			});
+	}
+
+	private _createViewRoutes() {
+		this._routes =
+			this._views?.map((view) => {
+				return {
+					path: 'view/' + view.meta.pathname,
+					component: () => createExtensionElement(view),
+					setup: (component: UmbEditorEntityElement, info: IRoutingInfo) => {
+						this._currentViewPath = info.match.route.path;
+					},
+				};
+			}) ?? [];
+
+		this._routes.push({
+			path: '**',
+			redirectTo: 'view/' + this._views?.[0]?.meta.pathname,
+		});
+	}
+
 	disconnectedCallback(): void {
 		super.disconnectedCallback();
 		this._treesSubscription?.unsubscribe();
 		this._editorsSubscription?.unsubscribe();
+		this._viewsSubscription?.unsubscribe();
 	}
 
 	render() {
 		return html`
 			<umb-section-layout>
-				${this._trees && this._trees.length > 0
+				${this._trees.length > 0
 					? html`
 							<umb-section-sidebar>
 								<umb-section-trees></umb-section-trees>
@@ -131,9 +214,32 @@ export class UmbSectionElement extends UmbContextConsumerMixin(LitElement) {
 					  `
 					: nothing}
 				<umb-section-main>
+					${this._views.length > 0 ? html` <div id="header">${this._renderViews()}</div> ` : nothing}
 					<router-slot id="router-slot" .routes="${this._routes}"></router-slot>
 				</umb-section-main>
 			</umb-section-layout>
+		`;
+	}
+
+	private _renderViews() {
+		return html`
+			${this._views?.length > 0
+				? html`
+						<uui-tab-group>
+							${this._views.map(
+								(view: ManifestSectionView) => html`
+									<uui-tab
+										.label="${view.meta.label || view.name}"
+										href="${this._routerFolder}/view/${view.meta.pathname}"
+										?active="${this._currentViewPath.includes(view.meta.pathname)}">
+										<uui-icon slot="icon" name=${view.meta.icon}></uui-icon>
+										${view.meta.label || view.name}
+									</uui-tab>
+								`
+							)}
+						</uui-tab-group>
+				  `
+				: nothing}
 		`;
 	}
 }

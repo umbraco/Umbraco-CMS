@@ -141,6 +141,23 @@ export interface components {
       alias: string;
       name: string;
     };
+    MetaSectionView: {
+      sections: string[];
+      label: string;
+      pathname: string;
+      /** Format: float */
+      weight: number;
+      icon: string;
+    };
+    IManifestSectionView: {
+      /** @enum {string} */
+      type: "sectionView";
+      meta: components["schemas"]["MetaSectionView"];
+      js?: string;
+      elementName?: string;
+      alias: string;
+      name: string;
+    };
     MetaTree: {
       /** Format: float */
       weight: number;
@@ -309,6 +326,7 @@ export interface components {
     };
     Manifest:
       | components["schemas"]["IManifestSection"]
+      | components["schemas"]["IManifestSectionView"]
       | components["schemas"]["IManifestTree"]
       | components["schemas"]["IManifestEditor"]
       | components["schemas"]["IManifestEditorAction"]

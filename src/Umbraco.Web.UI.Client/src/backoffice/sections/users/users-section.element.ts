@@ -1,12 +1,10 @@
 import { html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
 
-import '../../editors/shared/editor-entity-layout/editor-entity-layout.element';
-
 @customElement('umb-section-users')
 export class UmbSectionUsersElement extends LitElement {
 	render() {
-		return html` <umb-editor-entity-layout alias="Umb.Editor.Users"></umb-editor-entity-layout> `;
+		return html` <umb-section></umb-section> `;
 	}
 }
 

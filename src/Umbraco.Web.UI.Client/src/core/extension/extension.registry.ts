@@ -7,6 +7,7 @@ import type {
 	ManifestPropertyAction,
 	ManifestPropertyEditorUI,
 	ManifestSection,
+	ManifestSectionView,
 	ManifestTree,
 	ManifestTreeItemAction,
 	ManifestEditor,
@@ -59,6 +60,7 @@ export class UmbExtensionRegistry {
 
 	// Typings concept, need to put all core types to get a good array return type for the provided type...
 	extensionsOfType(type: 'section'): Observable<Array<ManifestSection>>;
+	extensionsOfType(type: 'sectionView'): Observable<Array<ManifestSectionView>>;
 	extensionsOfType(type: 'tree'): Observable<Array<ManifestTree>>;
 	extensionsOfType(type: 'editor'): Observable<Array<ManifestEditor>>;
 	extensionsOfType(type: 'treeItemAction'): Observable<Array<ManifestTreeItemAction>>;

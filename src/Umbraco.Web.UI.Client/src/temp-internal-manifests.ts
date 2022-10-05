@@ -622,4 +622,30 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 			weight: 100,
 		},
 	},
+	{
+		type: 'sectionView',
+		alias: 'Umb.SectionView.Users',
+		name: 'Users Section View',
+		loader: () => import('./backoffice/sections/users/views/users/section-view-users.element'),
+		meta: {
+			sections: ['Umb.Section.Users'],
+			label: 'Users',
+			pathname: 'users',
+			weight: 200,
+			icon: 'umb:user',
+		},
+	},
+	{
+		type: 'sectionView',
+		alias: 'Umb.SectionView.UserGroups',
+		name: 'User Groups Section View',
+		loader: () => import('./backoffice/sections/users/views/user-groups/section-view-user-groups.element'),
+		meta: {
+			sections: ['Umb.Section.Users'],
+			label: 'User Groups',
+			pathname: 'user-groups',
+			weight: 100,
+			icon: 'umb:users',
+		},
+	},
 ];
