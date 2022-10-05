@@ -210,7 +210,7 @@
     },
     "/umbraco/api/v1/trackedReferences/{id}": {
       "get": {
-        "description": "Used by info tabs on content, media etc. and for the delete and unpublish of single items.\nThis is basically finding parents of relations.",
+        "description": "Used by info tabs on content, media etc. and for the delete and unpublish of single items.\nThis is basically finding parents of relations.\n            ",
         "operationId": "ForItemTrackedReferences_Get",
         "parameters": [
           {
@@ -271,7 +271,7 @@
     },
     "/umbraco/api/v1/trackedReferences/descendants/{parentId}": {
       "get": {
-        "description": "Used when deleting and unpublishing a single item to check if this item has any descending items that are in any\nkind of relation.\nThis is basically finding the descending items which are children in relations.",
+        "description": "Used when deleting and unpublishing a single item to check if this item has any descending items that are in any\nkind of relation.\nThis is basically finding the descending items which are children in relations.\n            ",
         "operationId": "DescendantsTrackedReferences_Descendants",
         "parameters": [
           {
@@ -332,7 +332,7 @@
     },
     "/umbraco/api/v1/trackedReferences/multiple": {
       "get": {
-        "description": "Used when bulk deleting content/media and bulk unpublishing content (delete and unpublish on List view).\nThis is basically finding children of relations.",
+        "description": "Used when bulk deleting content/media and bulk unpublishing content (delete and unpublish on List view).\nThis is basically finding children of relations.\n            ",
         "operationId": "MultipleTrackedReferences_GetPagedReferencedItems",
         "parameters": [
           {
@@ -3721,6 +3721,78 @@
           }
         }
       }
+    },
+    "/umbraco/api/v1/modelsBuilder/build": {
+      "post": {
+        "tags": [
+          "ModelsBuilder"
+        ],
+        "operationId": "BuildModelsBuilder_BuildModels",
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "428": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/modelsBuilder": {
+      "get": {
+        "tags": [
+          "ModelsBuilder"
+        ],
+        "operationId": "GetModelsBuilder_GetDashboard",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/modelsBuilder/status": {
+      "get": {
+        "tags": [
+          "ModelsBuilder"
+        ],
+        "operationId": "StatusModelsBuilder_GetModelsOutOfDateStatus",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OutOfDateStatusViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -4518,6 +4590,9 @@
     },
     {
       "name": "MemberType"
+    },
+    {
+      "name": "ModelsBuilder"
     },
     {
       "name": "PartialView"

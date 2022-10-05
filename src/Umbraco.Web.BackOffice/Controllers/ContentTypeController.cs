@@ -650,4 +650,18 @@ public class ContentTypeController : ContentTypeControllerBase<IContentType>
 
         return model;
     }
+
+    [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
+    public ActionResult PostCreateBlockGridSample()
+    {
+        var sampleHelper = new BlockGridSampleHelper(_contentTypeService, _dataTypeService, _backofficeSecurityAccessor);
+        Dictionary<string, Udi>? elementUdisByAlias = sampleHelper.CreateSampleElements(
+            documentTypeSave => PerformPostSave<DocumentTypeDisplay, DocumentTypeSave, PropertyTypeBasic>(
+                documentTypeSave,
+                i => _contentTypeService.Get(i),
+                type => _contentTypeService.Save(type)),
+            out string errorMessage);
+
+        return elementUdisByAlias != null ? Ok(elementUdisByAlias) : ValidationProblem(errorMessage);
+    }
 }
