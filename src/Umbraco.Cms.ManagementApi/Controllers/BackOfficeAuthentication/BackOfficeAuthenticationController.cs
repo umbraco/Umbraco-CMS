@@ -42,7 +42,7 @@ public class BackOfficeAuthenticationController : ManagementApiControllerBase
         if (request.Username != null && request.Password != null)
         {
             Microsoft.AspNetCore.Identity.SignInResult result = await _backOfficeSignInManager.PasswordSignInAsync(request.Username, request.Password, true, true);
-             if (result.Succeeded)
+            if (result.Succeeded)
             {
                 BackOfficeIdentityUser backOfficeUser = await _backOfficeUserManager.FindByNameAsync(request.Username);
                 // yes, back office user can be null despite nullable reference types saying otherwise.
