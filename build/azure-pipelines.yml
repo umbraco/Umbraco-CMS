@@ -25,6 +25,7 @@ parameters:
 variables:
   nodeVersion: 14.18.1
   dotnetVersion: 6.x
+  dotnetIncludePreviewVersions: false
   solution: umbraco.sln
   buildConfiguration: Release
   UMBRACO__CMS__GLOBAL__ID: 00000000-0000-0000-0000-000000000042
@@ -72,6 +73,7 @@ stages:
             inputs:
               version: $(dotnetVersion)
               performMultiLevelLookup: true
+              includePreviewVersions: $(dotnetIncludePreviewVersions)
           - task: DotNetCoreCLI@2
             displayName: Run dotnet restore
             inputs:
@@ -143,41 +145,41 @@ stages:
           - task: PowerShell@2
             displayName: Install DocFX
             inputs:
-                targetType: inline
-                script: |
-                  choco install docfx --version=2.59.2 -y
-                  if ($lastexitcode -ne 0){
-                      throw ("Error installing DocFX")
-                  }
+              targetType: inline
+              script: |
+                choco install docfx --version=2.59.2 -y
+                if ($lastexitcode -ne 0){
+                    throw ("Error installing DocFX")
+                }
           - task: PowerShell@2
             displayName: Generate metadata
             inputs:
-                targetType: inline
-                script: |
-                  docfx metadata "$(Build.SourcesDirectory)/build/csharp-docs/docfx.json"
-                  if ($lastexitcode -ne 0){
-                      throw ("Error generating metadata.")
-                  }
+              targetType: inline
+              script: |
+                docfx metadata "$(Build.SourcesDirectory)/build/csharp-docs/docfx.json"
+                if ($lastexitcode -ne 0){
+                    throw ("Error generating metadata.")
+                }
           - task: PowerShell@2
             displayName: Generate documentation
             inputs:
-                targetType: inline
-                script: |
-                  docfx build "$(Build.SourcesDirectory)/build/csharp-docs/docfx.json"
-                  if ($lastexitcode -ne 0){
-                        throw ("Error generating documentation.")
-                  }
+              targetType: inline
+              script: |
+                docfx build "$(Build.SourcesDirectory)/build/csharp-docs/docfx.json"
+                if ($lastexitcode -ne 0){
+                      throw ("Error generating documentation.")
+                }
           - task: ArchiveFiles@2
             displayName: Archive C# Docs
             inputs:
-                rootFolderOrFile: $(Build.SourcesDirectory)/build/csharp-docs/_site
-                includeRootFolder: false
-                archiveFile: $(Build.ArtifactStagingDirectory)/csharp-docs.zip
+              rootFolderOrFile: $(Build.SourcesDirectory)/build/csharp-docs/_site
+              includeRootFolder: false
+              archiveFile: $(Build.ArtifactStagingDirectory)/csharp-docs.zip
           - task: PublishPipelineArtifact@1
             displayName: Publish C# Docs
             inputs:
-                targetPath: $(Build.ArtifactStagingDirectory)/csharp-docs.zip
-                artifact: csharp-docs
+              targetPath: $(Build.ArtifactStagingDirectory)/csharp-docs.zip
+              artifact: csharp-docs
 
       # js API Reference
       - job:
@@ -188,7 +190,7 @@ stages:
           - task: NodeTool@0
             displayName: Use Node.js 10.15.0
             inputs:
-              versionSpec: 10.15.0 # Won't work with 14.18.1
+              versionSpec: 10.15.0 # Won't work with higher versions
           - script: |
               npm ci --no-fund --no-audit --prefer-offline
               npx gulp docs
@@ -205,14 +207,14 @@ stages:
           - task: ArchiveFiles@2
             displayName: Archive js Docs
             inputs:
-                rootFolderOrFile: $(Build.SourcesDirectory)/src/Umbraco.Web.UI.Docs/api
-                includeRootFolder: false
-                archiveFile: $(Build.ArtifactStagingDirectory)/ui-docs.zip
+              rootFolderOrFile: $(Build.SourcesDirectory)/src/Umbraco.Web.UI.Docs/api
+              includeRootFolder: false
+              archiveFile: $(Build.ArtifactStagingDirectory)/ui-docs.zip
           - task: PublishPipelineArtifact@1
             displayName: Publish js Docs
             inputs:
-                targetPath: $(Build.ArtifactStagingDirectory)/ui-docs.zip
-                artifact: ui-docs
+              targetPath: $(Build.ArtifactStagingDirectory)/ui-docs.zip
+              artifact: ui-docs
 
   ###############################################
   ## Test
@@ -245,6 +247,7 @@ stages:
             inputs:
               version: $(dotnetVersion)
               performMultiLevelLookup: true
+              includePreviewVersions: $(dotnetIncludePreviewVersions)
           - task: DotNetCoreCLI@2
             displayName: Run dotnet test
             inputs:
@@ -281,6 +284,7 @@ stages:
             inputs:
               version: $(dotnetVersion)
               performMultiLevelLookup: true
+              includePreviewVersions: $(dotnetIncludePreviewVersions)
           - task: DotNetCoreCLI@2
             displayName: Run dotnet test
             inputs:
@@ -371,7 +375,6 @@ stages:
               dockerImageName: umbraco-linux
             Windows:
               vmImage: 'windows-latest'
-              DOTNET_GENERATE_ASPNET_CERTIFICATE: true # Automatically generate HTTPS development certificate on Windows
         pool:
           vmImage: $(vmImage)
         steps:
@@ -415,6 +418,7 @@ stages:
             inputs:
               version: $(dotnetVersion)
               performMultiLevelLookup: true
+              includePreviewVersions: $(dotnetIncludePreviewVersions)
           # Linux containers smooth
           - task: PowerShell@2
             condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
@@ -427,11 +431,7 @@ stages:
                 docker build -t $(dockerImageName):$sha -f $(dockerfile) .
                 mkdir -p $(Build.ArtifactStagingDirectory)/docker-images
                 docker save -o $(Build.ArtifactStagingDirectory)/docker-images/$(dockerImageName).$sha.tar $(dockerImageName):$sha
-
-                # Manually generate HTTPS development certificate on Linux
                 dotnet dev-certs https -ep ${HOME}/.aspnet/https/aspnetapp.pfx -p UmbracoAcceptance123!
-                dotnet dev-certs https --trust
-
                 docker run --name $(dockerImageName) -dp 8080:5000 -dp 8443:5001 -e UMBRACO__CMS__GLOBAL__ID=$(UMBRACO__CMS__GLOBAL__ID) -e ASPNETCORE_Kestrel__Certificates__Default__Password="UmbracoAcceptance123!" -e ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx -v ${HOME}/.aspnet/https:/https/ $(dockerImageName):$sha
                 docker ps
           # Urls matching docker setup.
@@ -443,9 +443,10 @@ stages:
               targetType: inline
               script: |
                 dotnet new --install ./nupkg/Umbraco.Templates.*.nupkg
-                dotnet new umbraco --name Playwright -o . --no-restore
+                dotnet new umbraco --name Playwright --no-restore --output .
                 dotnet restore --configfile ./nuget.config
                 dotnet build --configuration $(buildConfiguration) --no-restore
+                dotnet dev-certs https
                 Start-Process -FilePath "dotnet" -ArgumentList "run --configuration $(buildConfiguration) --no-build --no-launch-profile --urls $(PLAYWRIGHT_BASE_URL)"
           - task: PowerShell@2
             displayName: Wait for app
