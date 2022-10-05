@@ -45,21 +45,21 @@ export class UmbSectionElement extends UmbContextConsumerMixin(LitElement) {
 		// TODO: wait for more contexts
 		this.consumeContext('umbExtensionRegistry', (extensionsRegistry: UmbExtensionRegistry) => {
 			this._extensionRegistry = extensionsRegistry;
-			this._useTrees();
+			this._observeTrees();
 		});
 
 		this.consumeContext('umbSectionContext', (sectionContext: UmbSectionContext) => {
 			this._sectionContext = sectionContext;
-			this._useTrees();
+			this._observeTrees();
 		});
 
 		this.consumeContext('umbEntityStore', (entityStore: UmbEntityStore) => {
 			this._entityStore = entityStore;
-			this._useTrees();
+			this._observeTrees();
 		});
 	}
 
-	private _useTrees() {
+	private _observeTrees() {
 		if (!this._sectionContext || !this._extensionRegistry || !this._entityStore) return;
 
 		this._treesSubscription?.unsubscribe();
