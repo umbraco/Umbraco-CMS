@@ -36,6 +36,10 @@ public class UmbracoJsonSchemaGenerator
     }
 
 
+    /// <summary>
+    /// Generates the CMS file
+    /// </summary>
+    /// <returns></returns>
     public Task<string> GenerateCmsFile()
     {
         JObject cmsSchema = GenerateUmbracoSchema();

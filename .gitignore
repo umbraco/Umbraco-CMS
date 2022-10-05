@@ -108,5 +108,6 @@ cypress.env.json
 /src/Umbraco.Web.UI/appsettings-schema.json
 /src/Umbraco.Web.UI/appsettings-schema.umbraco.json
 /tests/Umbraco.Tests.Integration/appsettings-schema.json
-/src/Umbraco.Cms/appsettings-schema.json
-/src/Umbraco.Cms/appsettings-schema.umbraco.json
+/src/Umbraco.Cms.Targets/appsettings-schema.json
+/src/Umbraco.Cms.Targets/appsettings-schema.umbraco.json
+
