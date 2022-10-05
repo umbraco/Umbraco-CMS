@@ -10,6 +10,11 @@ angular.module("umbraco")
         vm.filterSearchTerm = '';
         vm.filteredItems = [];
 
+        // Ensure groupKey value, as we need it to be present for the filtering logic.
+        $scope.model.availableItems.forEach(item => {
+            item.blockConfigModel.groupKey = item.blockConfigModel.groupKey || null;
+        });
+
         unsubscribe.push($scope.$watch('vm.filterSearchTerm', updateFiltering));
 
         function updateFiltering() {
