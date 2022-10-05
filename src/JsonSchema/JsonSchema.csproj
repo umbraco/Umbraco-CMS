@@ -40,6 +40,11 @@
     <EmbeddedResource Include="appsettings-schema.json" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="appsettings-schema.json" />
+    <EmbeddedResource Include="appsettings-schema.json" />
+  </ItemGroup>
+
   <!--  Copy Forms XML docs-->
   <PropertyGroup>
     <NuGetPackageRoot Condition=" '$(NuGetPackageRoot)' == '' ">$(UserProfile)\.nuget\packages\</NuGetPackageRoot>

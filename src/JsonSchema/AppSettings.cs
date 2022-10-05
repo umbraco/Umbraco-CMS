@@ -38,7 +38,6 @@ internal class AppSettings
         public LoggingSettings? Logging { get; set; }
 
 
-
         public NuCacheSettings? NuCache { get; set; }
 
         public RequestHandlerSettings? RequestHandler { get; set; }
@@ -50,7 +49,6 @@ internal class AppSettings
         public TourSettings? Tours { get; set; }
 
         public TypeFinderSettings? TypeFinder { get; set; }
-
 
 
         public WebRoutingSettings? WebRouting { get; set; }
