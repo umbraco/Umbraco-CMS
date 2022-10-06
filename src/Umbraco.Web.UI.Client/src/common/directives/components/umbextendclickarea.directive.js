@@ -69,6 +69,6 @@ Do this
 		return directive;
 	}
 
-	// angular.module("umbraco.directives").directive("UmbExtendClickArea", ExtendClickAreaDirective);
+	angular.module("umbraco.directives").directive("UmbExtendClickArea", ExtendClickAreaDirective);
 
 })();
