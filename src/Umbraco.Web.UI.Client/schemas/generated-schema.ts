@@ -22,6 +22,15 @@ export interface paths {
   "/manifests/packages/installed": {
     get: operations["ManifestsPackagesInstalled"];
   };
+  "/property-editors/list": {
+    get: operations["PropertyEditorsListEndpoint"];
+  };
+  "/property-editors/property-editor/{propertyEditorAlias}": {
+    get: operations["PropertyEditorEndpoint"];
+  };
+  "/property-editors/property-editor/config/{propertyEditorAlias}": {
+    get: operations["PropertyEditorConfigEndpoint"];
+  };
   "/published-cache/status": {
     get: operations["PublishedCacheStatus"];
   };
@@ -118,6 +127,7 @@ export interface components {
       database?: components["schemas"]["InstallSetupDatabaseConfiguration"];
     };
     MetaSection: {
+      label: string;
       pathname: string;
       /** Format: float */
       weight: number;
@@ -173,19 +183,37 @@ export interface components {
       alias: string;
       name: string;
     };
-    IPrevalueField: {
-      label?: string;
+    PropertyEditorConfigProperty: {
+      label: string;
       description?: string;
-      key: string;
-      view: string;
+      alias: string;
+      propertyEditorUI: string;
+    };
+    PropertyEditorConfigDefaultData: {
+      alias: string;
+      value:
+        | (
+            | string
+            | number
+            | boolean
+            | { [key: string]: unknown }
+            | string[]
+            | number[]
+            | boolean[]
+            | { [key: string]: unknown }[]
+          )
+        | null;
+    };
+    PropertyEditorConfig: {
+      properties: components["schemas"]["PropertyEditorConfigProperty"][];
+      defaultData?: components["schemas"]["PropertyEditorConfigDefaultData"][];
     };
     MetaPropertyEditorUI: {
+      label: string;
+      propertyEditor: string;
       icon: string;
       group: string;
-      prevalues?: {
-        fields: components["schemas"]["IPrevalueField"][];
-      };
-      defaultConfig?: { [key: string]: unknown };
+      config?: components["schemas"]["PropertyEditorConfig"];
     };
     IManifestPropertyEditorUI: {
       /** @enum {string} */
@@ -217,6 +245,7 @@ export interface components {
       pathname: string;
       /** Format: float */
       weight: number;
+      label: string;
       icon: string;
     };
     IManifestEditorView: {
@@ -292,6 +321,31 @@ export interface components {
     };
     ManifestsPackagesInstalledResponse: {
       packages: components["schemas"]["PackageInstalled"][];
+    };
+    PropertyEditor: {
+      alias: string;
+      name: string;
+      icon: string;
+      group?: string;
+      isSystem: boolean;
+      hasConfig: boolean;
+      config?: components["schemas"]["PropertyEditorConfig"];
+    };
+    PropertyEditorsListResponse: {
+      propertyEditors: components["schemas"]["PropertyEditor"][];
+    };
+    PropertyEditorResponse: {
+      alias: string;
+      name: string;
+      icon: string;
+      group?: string;
+      isSystem: boolean;
+      hasConfig: boolean;
+      config?: components["schemas"]["PropertyEditorConfig"];
+    };
+    PropertyEditorConfigResponse: {
+      properties: components["schemas"]["PropertyEditorConfigProperty"][];
+      defaultData?: components["schemas"]["PropertyEditorConfigDefaultData"][];
     };
     /** @enum {string} */
     ServerStatus: "running" | "must-install" | "must-upgrade";
@@ -414,6 +468,64 @@ export interface operations {
       200: {
         content: {
           "application/json": components["schemas"]["ManifestsPackagesInstalledResponse"];
+        };
+      };
+      /** default response */
+      default: {
+        content: {
+          "application/json": components["schemas"]["ProblemDetails"];
+        };
+      };
+    };
+  };
+  PropertyEditorsListEndpoint: {
+    responses: {
+      /** 200 response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["PropertyEditorsListResponse"];
+        };
+      };
+      /** default response */
+      default: {
+        content: {
+          "application/json": components["schemas"]["ProblemDetails"];
+        };
+      };
+    };
+  };
+  PropertyEditorEndpoint: {
+    parameters: {
+      path: {
+        propertyEditorAlias: string;
+      };
+    };
+    responses: {
+      /** 200 response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["PropertyEditorResponse"];
+        };
+      };
+      /** default response */
+      default: {
+        content: {
+          "application/json": components["schemas"]["ProblemDetails"];
+        };
+      };
+    };
+  };
+  PropertyEditorConfigEndpoint: {
+    parameters: {
+      path: {
+        propertyEditorAlias: string;
+      };
+    };
+    responses: {
+      /** 200 response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["PropertyEditorConfigResponse"];
         };
       };
       /** default response */

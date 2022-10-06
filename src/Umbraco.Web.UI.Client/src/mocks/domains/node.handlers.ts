@@ -24,12 +24,12 @@ export const handlers = [
 		return res(ctx.status(200), ctx.json(saved));
 	}),
 
-	rest.post<NodeEntity[]>('/umbraco/backoffice/node/trash', async (req, res, ctx) => {
+	rest.post<string[]>('/umbraco/backoffice/node/trash', async (req, res, ctx) => {
 		console.warn('Please move to schema');
-		const key = await req.text();
+		const keys = await req.json();
 
-		const trashed = umbNodeData.trash(key);
+		const trashed = umbNodeData.trash(keys);
 
-		return res(ctx.status(200), ctx.json([trashed]));
+		return res(ctx.status(200), ctx.json(trashed));
 	}),
 ];

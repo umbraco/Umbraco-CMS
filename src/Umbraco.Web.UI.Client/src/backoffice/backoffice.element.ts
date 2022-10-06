@@ -1,9 +1,10 @@
+//TODO: we need to figure out what components should be available for extensions and load them upfront
+import './components/ref-property-editor-ui/ref-property-editor-ui.element';
 import './components/backoffice-header.element';
 import './components/backoffice-main.element';
 import './components/backoffice-modal-container.element';
 import './components/backoffice-notification-container.element';
-import './components/editor-property-layout.element';
-import './components/node-property.element';
+import './components/node-property/node-property.element';
 import './sections/shared/section-layout.element';
 import './sections/shared/section-main.element';
 import './sections/shared/section-sidebar.element';
@@ -19,14 +20,17 @@ import type { Subscription } from 'rxjs';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '../core/context';
 import { UmbModalService } from '../core/services/modal';
 import { UmbNotificationService } from '../core/services/notification';
-import { UmbDataTypeStore } from '../core/stores/data-type.store';
+import { UmbDataTypeStore } from '../core/stores/data-type/data-type.store';
 import { UmbDocumentTypeStore } from '../core/stores/document-type.store';
 import { UmbNodeStore } from '../core/stores/node.store';
 import { UmbSectionStore } from '../core/stores/section.store';
 import { UmbEntityStore } from '../core/stores/entity.store';
+import { UmbPropertyEditorStore } from '../core/stores/property-editor/property-editor.store';
+import { UmbIconStore } from '../core/stores/icon/icon.store';
+import { UmbPropertyEditorConfigStore } from '../core/stores/property-editor-config/property-editor-config.store';
 
 @defineElement('umb-backoffice')
-export default class UmbBackoffice extends UmbContextConsumerMixin(UmbContextProviderMixin(LitElement)) {
+export class UmbBackofficeElement extends UmbContextConsumerMixin(UmbContextProviderMixin(LitElement)) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -42,19 +46,22 @@ export default class UmbBackoffice extends UmbContextConsumerMixin(UmbContextPro
 		`,
 	];
 
+	private _umbIconRegistry = new UmbIconStore();
+	private _umbEntityStore = new UmbEntityStore();
 	private _umbSectionStore?: UmbSectionStore;
-	private _umbEntityStore?: UmbEntityStore;
 	private _currentSectionSubscription?: Subscription;
 
 	constructor() {
 		super();
 
-		this._umbEntityStore = new UmbEntityStore();
+		this._umbIconRegistry.attach(this);
 
 		this.provideContext('umbEntityStore', this._umbEntityStore);
 		this.provideContext('umbNodeStore', new UmbNodeStore(this._umbEntityStore));
 		this.provideContext('umbDataTypeStore', new UmbDataTypeStore(this._umbEntityStore));
 		this.provideContext('umbDocumentTypeStore', new UmbDocumentTypeStore(this._umbEntityStore));
+		this.provideContext('umbPropertyEditorStore', new UmbPropertyEditorStore());
+		this.provideContext('umbPropertyEditorConfigStore', new UmbPropertyEditorConfigStore());
 		this.provideContext('umbNotificationService', new UmbNotificationService());
 		this.provideContext('umbModalService', new UmbModalService());
 
@@ -80,8 +87,9 @@ export default class UmbBackoffice extends UmbContextConsumerMixin(UmbContextPro
 	}
 }
 
+export default UmbBackofficeElement;
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-backoffice': UmbBackoffice;
+		'umb-backoffice': UmbBackofficeElement;
 	}
 }

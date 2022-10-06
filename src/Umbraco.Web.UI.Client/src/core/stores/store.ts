@@ -1,21 +1,38 @@
 import { BehaviorSubject, Observable } from 'rxjs';
-import { Entity } from '../../mocks/data/entities';
+
+export interface UmbDataStoreIdentifiers {
+	key?: string;
+	[more: string]: any;
+}
 
 export interface UmbDataStore<T> {
 	readonly items: Observable<Array<T>>;
 	update(items: Array<T>): void;
 }
 
-export class UmbDataStoreBase<T extends Entity> implements UmbDataStore<T> {
+/**
+ * @export
+ * @class UmbDataStoreBase
+ * @implements {UmbDataStore<T>}
+ * @template T
+ * @description - Base class for Data Stores
+ */
+export class UmbDataStoreBase<T extends UmbDataStoreIdentifiers> implements UmbDataStore<T> {
 	private _items: BehaviorSubject<Array<T>> = new BehaviorSubject(<Array<T>>[]);
 	public readonly items: Observable<Array<T>> = this._items.asObservable();
 
-	public update(updatedItems: Array<T>) {
+	/**
+	 * @description - Update the store with new items. Existing items are updated, new items are added. Existing items are matched by the compareKey.
+	 * @param {Array<T>} updatedItems
+	 * @param {keyof T} [compareKey='key']
+	 * @memberof UmbDataStoreBase
+	 */
+	public update(updatedItems: Array<T>, compareKey: keyof T = 'key'): void {
 		const storedItems = this._items.getValue();
 		const updated: T[] = [...storedItems];
 
 		updatedItems.forEach((updatedItem) => {
-			const index = storedItems.map((storedItem) => storedItem.key).indexOf(updatedItem.key);
+			const index = storedItems.map((storedItem) => storedItem[compareKey]).indexOf(updatedItem[compareKey]);
 
 			if (index !== -1) {
 				const itemKeys = Object.keys(storedItems[index]);

@@ -6,7 +6,7 @@ import type { UmbInstallerUserElement } from './installer-user.element';
 import './installer-user.element';
 
 export default {
-	title: 'Components/Installer/Steps',
+	title: 'Apps/Installer/Steps',
 	component: 'umb-installer-user',
 	id: 'umb-installer-user',
 	decorators: [(story) => installerContextProvider(story)],

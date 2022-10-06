@@ -8,7 +8,7 @@ import type { UmbInstallerDatabaseElement } from './installer-database.element';
 import './installer-database.element';
 
 export default {
-	title: 'Components/Installer/Steps',
+	title: 'Apps/Installer/Steps',
 	component: 'umb-installer-database',
 	id: 'umb-installer-database',
 	decorators: [(story) => installerContextProvider(story)],
