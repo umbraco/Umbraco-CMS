@@ -35,6 +35,8 @@ public static class BackOfficeAuthBuilderExtensions
 
     private static IUmbracoBuilder AddOpenIddict(this IUmbracoBuilder builder)
     {
+        builder.Services.AddAuthentication();
+
         builder.Services.AddOpenIddict()
 
             // Register the OpenIddict core components.
