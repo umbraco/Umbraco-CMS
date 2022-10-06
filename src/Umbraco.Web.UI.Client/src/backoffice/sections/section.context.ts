@@ -12,6 +12,7 @@ export class UmbSectionContext {
 		js: '',
 		elementName: '',
 		meta: {
+			label: '',
 			pathname: '',
 			weight: 0,
 		},
