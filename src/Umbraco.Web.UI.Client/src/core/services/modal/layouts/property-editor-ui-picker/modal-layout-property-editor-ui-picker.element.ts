@@ -3,7 +3,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { Subscription } from 'rxjs';
-import groupBy from 'lodash-es/groupBy.js';
+import { groupBy } from 'lodash';
 import type { UUIInputEvent } from '@umbraco-ui/uui';
 import { UmbContextConsumerMixin } from '../../../../context';
 
