@@ -169,9 +169,11 @@ export class UmbTableElement extends LitElement {
 			<uui-table-head>
 				<uui-table-head-cell style="--uui-table-cell-padding: 0">
 					<uui-checkbox
+						label="Select All"
 						style="padding: var(--uui-size-4) var(--uui-size-5);"
 						@change="${this._handleAllRowsCheckboxChange}"
-						?checked="${this.selection.length === this.items.length}"></uui-checkbox>
+						?checked="${this.selection.length === this.items.length}">
+					</uui-checkbox>
 				</uui-table-head-cell>
 				${this.columns.map((column) => this._renderHeaderCell(column))}
 			</uui-table-head>
@@ -193,9 +195,11 @@ export class UmbTableElement extends LitElement {
 			<uui-table-cell>
 				${item.icon ? html`<uui-icon name=${item.icon}></uui-icon>` : nothing}
 				<uui-checkbox
+					label="Select Row"
 					@click=${(e: PointerEvent) => e.stopPropagation()}
 					@change=${(event: Event) => this._handleRowCheckboxChange(event, item)}
-					?checked="${this._isSelected(item.key)}"></uui-checkbox>
+					?checked="${this._isSelected(item.key)}">
+				</uui-checkbox>
 			</uui-table-cell>
 			${this.columns.map((column) => this._renderRowCell(column, item))}
 		</uui-table-row>`;
