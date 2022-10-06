@@ -131,6 +131,20 @@
             scope.close = function() {
                 if(scope.onClose) {
                     scope.onClose();
+                    focusLockService.removeInertAttribute();
+
+                    if(previousElement){
+                          setTimeout(function(){ 
+                            previousElement.focus();
+                            previousElement = null;
+                          }, 200);
+                          
+                    }
+
+                    setTimeout(function(){ 
+                        previousElement.focus();
+                        previousElement = null;
+                    }, 200);
                 }
             };
 
