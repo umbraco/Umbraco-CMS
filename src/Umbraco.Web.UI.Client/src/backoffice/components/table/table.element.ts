@@ -36,6 +36,13 @@ export class UmbTableDeselectedEvent extends Event {
 	}
 }
 
+/**
+ *  @element umb-table
+ *  @description - Element for displaying a table
+ *  @fires {UmbTableSelectedEvent} selected - fires when a row is selected
+ *  @fires {UmbTableDeselectedEvent} deselected - fires when a row is deselected
+ *  @extends LitElement
+ */
 @customElement('umb-table')
 export class UmbTableElement extends LitElement {
 	static styles = [
@@ -81,17 +88,37 @@ export class UmbTableElement extends LitElement {
 		`,
 	];
 
+	/**
+	 * Table Items
+	 * @type {Array<UmbTableItem>}
+	 * @memberof UmbTableElement
+	 */
 	@property({ type: Array, attribute: false })
 	public items: Array<UmbTableItem> = [];
 
+	/**
+	 * @description Table Columns
+	 * @type {Array<UmbTableColumn>}
+	 * @memberof UmbTableElement
+	 */
 	@property({ type: Array, attribute: false })
 	public columns: Array<UmbTableColumn> = [];
 
+	/**
+	 * @description Table Config
+	 * @type {UmbTableConfig}
+	 * @memberof UmbTableElement
+	 */
 	@property({ type: Object, attribute: false })
 	public config: UmbTableConfig = {
 		allowSelection: false,
 	};
 
+	/**
+	 * @description Table Selection
+	 * @type {Array<string>}
+	 * @memberof UmbTableElement
+	 */
 	@property({ type: Array, attribute: false })
 	public selection: Array<string> = [];
 
