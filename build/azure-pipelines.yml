@@ -447,13 +447,13 @@ stages:
             inputs:
               targetType: inline
               workingDirectory: tests/Umbraco.Tests.AcceptanceTest
-              script: npx --yes wait-on -v --interval 1000 --timeout 120000 $(ASPNETCORE_URLS)
+              script: npx wait-on -v --interval 1000 --timeout 120000 $(ASPNETCORE_URLS)
           - task: PowerShell@2
             displayName: Install Playwright
             inputs:
               targetType: inline
               workingDirectory: tests/Umbraco.Tests.AcceptanceTest
-              script: npx --yes playwright install
+              script: npx playwright install
           - task: PowerShell@2
             displayName: Run Playwright (Desktop)
             continueOnError: true
