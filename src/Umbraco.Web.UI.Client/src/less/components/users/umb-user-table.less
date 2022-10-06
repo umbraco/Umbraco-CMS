@@ -14,6 +14,8 @@
     }
 
     .umb-table-cell a {
+      position: relative;
+      z-index: 3;
 
         &:hover, &:focus {
             .umb-avatar {
@@ -24,7 +26,7 @@
     
     .umb-table-body .umb-table-cell.umb-table__name {
         a {
-            display: flex;
+          position: relative;
         }
     }
     .umb-table-cell.umb-table__name a {
@@ -33,32 +35,7 @@
         }
     }
     
-    .umb-user-table-row {
-        .umb-checkmark {
-            visibility: hidden;
-        }
-    }
-    
-    &.-has-selection {
-        .umb-user-table-row.-selectable {
-            .umb-checkmark {
-                visibility: visible;
-            }
-        }
-    }
-    
-    .umb-user-table-row.-selectable:hover {
-        .umb-checkmark {
-            visibility: visible;
-        }
-    }
-    
-    .umb-user-table-row.-selected {
-        
-        .umb-checkmark {
-            visibility: visible;
-        }
-        
+    .umb-user-table-row__select {
         &::before {
             content: "";
             position: absolute;
@@ -69,8 +46,25 @@
             bottom: 1px;
             border: 2px solid @ui-selected-border;
             box-shadow: 0 0 2px 0 fade(@ui-selected-border, 80%);
-            pointer-events: none;
+            opacity: 0;
+        }
+
+        &:hover {
+            &::before {
+                opacity:.33;
+            }
         }
     }
-    
+
+    .umb-user-table-row__select.-selected {
+        &::before {
+          opacity: 1;
+        }
+
+          &:hover {
+            &::before {
+              opacity: .66;
+            }
+        }
+    }
 }

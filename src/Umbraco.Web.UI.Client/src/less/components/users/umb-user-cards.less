@@ -12,16 +12,8 @@
     user-select: none;
 }
 
-.umb-user-card:hover,
-.umb-user-card:focus {
-    outline: none;
-    text-decoration: none !important;
-}
 
-.umb-user-card.-selectable {
-    cursor: pointer;
-}
-.umb-user-card.-selected, .umb-user-card.-selectable:hover {
+.umb-user-card__select {
     &::before {
         content: "";
         position: absolute;
@@ -31,17 +23,25 @@
         right: -2px;
         bottom: -2px;
         border-radius: 5px;
-        pointer-events: none;
         border: 2px solid @ui-selected-border;
         box-shadow: 0 0 4px 0 darken(@ui-selected-border, 20), inset 0 0 2px 0 darken(@ui-selected-border, 20);
+        opacity: 0;
     }
 }
-.umb-user-card.-selectable:hover {
+
+.umb-user-card__select:hover {
     &::before {
         opacity: .33;
     }
 }
-.umb-user-card.-selected:hover {
+
+.umb-user-card__select.-selected {
+    &::before {
+        opacity: 1;
+    }
+}
+
+.umb-user-card__select.-selected:hover {
     &::before {
         opacity: .75;
     }
@@ -61,6 +61,9 @@
 }
 
 .umb-user-card__goToUser {
+    position: relative;
+    z-index: 3;
+
     &:hover, &:focus {
         text-decoration: none;
 
