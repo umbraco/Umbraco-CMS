@@ -78,20 +78,6 @@ export class UmbSectionViewUsersElement extends UmbContextProviderMixin(LitEleme
 		this.requestUpdate('selection');
 	}
 
-	public getTagLookAndColor(status?: string): { color: InterfaceColor; look: InterfaceLook } {
-		switch ((status || '').toLowerCase()) {
-			case 'invited':
-			case 'inactive':
-				return { look: 'primary', color: 'warning' };
-			case 'active':
-				return { look: 'primary', color: 'positive' };
-			case 'disabled':
-				return { look: 'primary', color: 'danger' };
-			default:
-				return { look: 'secondary', color: 'default' };
-		}
-	}
-
 	render() {
 		return html` <router-slot .routes=${this._routes}></router-slot> `;
 	}
