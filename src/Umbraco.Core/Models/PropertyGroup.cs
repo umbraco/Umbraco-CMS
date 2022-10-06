@@ -133,7 +133,7 @@ public class PropertyGroup : EntityBase, IEquatable<PropertyGroup>
     }
 
     public bool Equals(PropertyGroup? other) =>
-        base.Equals(other) && (other != null && Type == other.Type && Alias == other.Alias);
+        base.Equals(other) || (other != null && Type == other.Type && Alias == other.Alias && Id == other.Id);
 
     public override int GetHashCode() => (base.GetHashCode(), Type, Alias).GetHashCode();
 
