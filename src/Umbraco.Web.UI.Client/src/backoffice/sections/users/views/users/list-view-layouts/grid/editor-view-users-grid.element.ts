@@ -97,7 +97,7 @@ export class UmbEditorViewUsersGridElement extends UmbContextConsumerMixin(LitEl
 	private renderUserCard(user: UserEntity) {
 		if (!this._userStore) return;
 
-		const statusLook = this._usersContext?.getTagLookAndColor(user.status ? user.status : '');
+		const statusLook = null; //this._usersContext?.getTagLookAndColor(user.status ? user.status : '');
 
 		return html`
 			<uui-card-user

@@ -4,6 +4,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { Subscription } from 'rxjs';
 import { UmbContextConsumerMixin } from '../../../../../core/context';
 import UmbSectionViewUsersElement, { UserItem } from './section-view-users.element';
+import { UmbUserStore } from '../../../../../core/stores/user/user.store';
 
 @customElement('umb-editor-view-users-selection')
 export class UmbEditorViewUsersSelectionElement extends UmbContextConsumerMixin(LitElement) {
@@ -24,36 +25,28 @@ export class UmbEditorViewUsersSelectionElement extends UmbContextConsumerMixin(
 	];
 
 	@state()
-	private _users: Array<UserItem> = [];
-
-	@state()
 	private _selection: Array<string> = [];
 
 	private _usersContext?: UmbSectionViewUsersElement;
-	private _usersSubscription?: Subscription;
 	private _selectionSubscription?: Subscription;
 
 	connectedCallback(): void {
 		super.connectedCallback();
-
 		this.consumeContext('umbUsersContext', (usersContext: UmbSectionViewUsersElement) => {
 			this._usersContext = usersContext;
+			this._observeSelection();
+		});
+	}
 
-			this._usersSubscription?.unsubscribe();
-			this._selectionSubscription?.unsubscribe();
-			this._usersSubscription = this._usersContext?.users.subscribe((users: Array<UserItem>) => {
-				this._users = users;
-			});
-			this._selectionSubscription = this._usersContext?.selection.subscribe((selection: Array<string>) => {
-				this._selection = selection;
-			});
+	private _observeSelection() {
+		this._selectionSubscription?.unsubscribe();
+		this._selectionSubscription = this._usersContext?.selection.subscribe((selection: Array<string>) => {
+			this._selection = selection;
 		});
 	}
 
 	disconnectedCallback(): void {
 		super.disconnectedCallback();
-
-		this._usersSubscription?.unsubscribe();
 		this._selectionSubscription?.unsubscribe();
 	}
 
@@ -62,7 +55,7 @@ export class UmbEditorViewUsersSelectionElement extends UmbContextConsumerMixin(
 	}
 
 	private _renderSelectionCount() {
-		return html`<div>${this._selection.length} of ${this._users.length} selected</div>`;
+		return html`<div>${this._selection.length} of [??] selected</div>`;
 	}
 
 	render() {
