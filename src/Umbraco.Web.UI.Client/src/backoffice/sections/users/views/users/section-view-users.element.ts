@@ -17,7 +17,14 @@ import UmbEditorEntityElement from '../../../../editors/shared/editor-entity/edi
 
 @customElement('umb-section-view-users')
 export class UmbSectionViewUsersElement extends UmbContextProviderMixin(LitElement) {
-	static styles = [UUITextStyles, css``];
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				height: 100%;
+			}
+		`,
+	];
 
 	@state()
 	private _routes: IRoute[] = [

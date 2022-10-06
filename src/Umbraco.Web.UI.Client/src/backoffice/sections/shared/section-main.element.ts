@@ -11,6 +11,11 @@ export class UmbSectionMain extends LitElement {
 				flex: 1 1 auto;
 				height: 100%;
 			}
+			slot {
+				display: flex;
+				flex-direction: column;
+				height: 100%;
+			}
 		`,
 	];
 

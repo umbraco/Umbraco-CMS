@@ -16,7 +16,9 @@ export class UmbSectionDashboards extends UmbContextConsumerMixin(LitElement) {
 		UUITextStyles,
 		css`
 			:host {
-				display: block;
+				display: flex;
+				flex-direction: column;
+				height: 100%;
 				width: 100%;
 			}
 
@@ -30,10 +32,6 @@ export class UmbSectionDashboards extends UmbContextConsumerMixin(LitElement) {
 				box-sizing: border-box;
 				padding: var(--uui-size-space-5);
 				display: block;
-			}
-
-			#scroll-container {
-				height: 500px; // TODO: This is a temporary fix to get scrolling to work
 			}
 		`,
 	];

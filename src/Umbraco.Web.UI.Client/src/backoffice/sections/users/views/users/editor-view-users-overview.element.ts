@@ -17,6 +17,12 @@ export class UmbEditorViewUsersOverviewElement extends UmbContextConsumerMixin(L
 	static styles = [
 		UUITextStyles,
 		css`
+			:host {
+				height: 100%;
+				display: flex;
+				flex-direction: column;
+			}
+
 			#sticky-top {
 				position: sticky;
 				top: -1px;
@@ -63,6 +69,9 @@ export class UmbEditorViewUsersOverviewElement extends UmbContextConsumerMixin(L
 			a {
 				color: inherit;
 				text-decoration: none;
+			}
+			router-slot {
+				overflow: hidden;
 			}
 		`,
 	];

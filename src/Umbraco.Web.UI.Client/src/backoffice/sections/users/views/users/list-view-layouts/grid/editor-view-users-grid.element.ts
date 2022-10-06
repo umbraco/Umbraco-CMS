@@ -14,10 +14,17 @@ export class UmbEditorViewUsersGridElement extends UmbContextConsumerMixin(LitEl
 	static styles = [
 		UUITextStyles,
 		css`
+			:host {
+				height: 100%;
+				display: flex;
+				flex-direction: column;
+			}
+
 			#user-grid {
 				display: grid;
 				grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
 				gap: var(--uui-size-space-4);
+				padding: var(--uui-size-space-4);
 			}
 
 			uui-card-user {
@@ -130,13 +137,15 @@ export class UmbEditorViewUsersGridElement extends UmbContextConsumerMixin(LitEl
 
 	render() {
 		return html`
-			<div id="user-grid">
-				${repeat(
-					this._users,
-					(user) => user.key,
-					(user) => this.renderUserCard(user)
-				)}
-			</div>
+			<uui-scroll-container>
+				<div id="user-grid">
+					${repeat(
+						this._users,
+						(user) => user.key,
+						(user) => this.renderUserCard(user)
+					)}
+				</div>
+			</uui-scroll-container>
 		`;
 	}
 }

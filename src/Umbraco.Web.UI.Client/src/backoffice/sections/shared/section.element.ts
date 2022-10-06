@@ -34,6 +34,10 @@ export class UmbSectionElement extends UmbContextConsumerMixin(LitElement) {
 				border-left: 1px solid var(--uui-color-border);
 				border-right: 1px solid var(--uui-color-border);
 			}
+			#router-slot {
+				overflow: auto;
+				height: 100%;
+			}
 		`,
 	];
 

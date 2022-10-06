@@ -18,6 +18,7 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(UmbContextCons
 		css`
 			:host {
 				display: block;
+				height: 100%;
 			}
 
 			#main {
