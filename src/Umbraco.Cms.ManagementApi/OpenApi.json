@@ -3721,6 +3721,78 @@
           }
         }
       }
+    },
+    "/umbraco/api/v1/modelsBuilder/build": {
+      "post": {
+        "tags": [
+          "ModelsBuilder"
+        ],
+        "operationId": "BuildModelsBuilder_BuildModels",
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "428": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/modelsBuilder": {
+      "get": {
+        "tags": [
+          "ModelsBuilder"
+        ],
+        "operationId": "GetModelsBuilder_GetDashboard",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/modelsBuilder/status": {
+      "get": {
+        "tags": [
+          "ModelsBuilder"
+        ],
+        "operationId": "StatusModelsBuilder_GetModelsOutOfDateStatus",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OutOfDateStatusViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -4518,6 +4590,9 @@
     },
     {
       "name": "MemberType"
+    },
+    {
+      "name": "ModelsBuilder"
     },
     {
       "name": "PartialView"

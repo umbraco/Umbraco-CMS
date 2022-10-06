@@ -13,24 +13,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj" />
-    <PackageReference Include="Umbraco.Deploy.Core" Version="10.1.0" />
-    <PackageReference Include="Umbraco.Forms.Core" Version="10.1.0" />
   </ItemGroup>
 
   <ItemGroup>
     <None Remove="appsettings-schema.json" />
     <EmbeddedResource Include="appsettings-schema.json" />
   </ItemGroup>
-
-  <!--  Copy Forms XML docs-->
-  <PropertyGroup>
-    <NuGetPackageRoot Condition=" '$(NuGetPackageRoot)' == '' ">$(UserProfile)\.nuget\packages\</NuGetPackageRoot>
-  </PropertyGroup>
-
-  <Target Name="CopyPackagesXml" BeforeTargets="Build">
-    <ItemGroup>
-      <PackageReferenceFiles Include="$(NugetPackageRoot)%(PackageReference.Identity)\%(PackageReference.Version)%(PackageReference.CopyToOutputDirectory)\lib\**\*.xml" />
-    </ItemGroup>
-    <Copy SourceFiles="@(PackageReferenceFiles)" DestinationFolder="$(OutDir)" />
-  </Target>
 </Project>

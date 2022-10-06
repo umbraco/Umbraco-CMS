@@ -31,10 +31,11 @@
   <Target Name="JsonSchemaBuild">
     <Exec WorkingDirectory="$(JsonSchemaProjectPath)" Command="dotnet run -c Release --mainOutputFile &quot;../Umbraco.Cms.Targets/appsettings-schema.json&quot; --cmsOutputFile &quot;../Umbraco.Cms.Targets/appsettings-schema.umbraco.json&quot;" />
   </Target>
-  
+
   <!-- Generate appsettings.json schema on build (and before copying to project) -->
   <PropertyGroup>
     <JsonSchemaPath>$(MSBuildThisFileDirectory)appsettings-schema.json</JsonSchemaPath>
+    <JsonSchemaCmsPath>$(MSBuildThisFileDirectory)appsettings-schema.umbraco.json</JsonSchemaCmsPath>
     <JsonSchemaProjectPath>$(MSBuildThisFileDirectory)..\JsonSchema\</JsonSchemaProjectPath>
   </PropertyGroup>
   <Target Name="GenerateAppsettingsSchema" BeforeTargets="Build;CopyAppsettingsSchema">

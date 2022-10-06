@@ -586,7 +586,7 @@
                 var blockObject = vm.layout[createIndex].$block;
                 if (inlineEditing === true) {
                     blockObject.activate();
-                } else if (inlineEditing === false && blockObject.hideContentInOverlay !== true) {
+                } else if (inlineEditing === false && blockObject.hideContentInOverlay !== true && blockObject.content.variants[0].tabs[0]?.properties.length > 0) {
                     vm.options.createFlow = true;
                     blockObject.edit();
                     vm.options.createFlow = false;

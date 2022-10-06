@@ -3,6 +3,7 @@
   <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
 
   <PropertyGroup>
+    <!-- TODO: Update test projects to use nullable reference types and remove this to enable nullable warnings as errors (the solution default) -->
     <Nullable>annotations</Nullable>
   </PropertyGroup>
   
