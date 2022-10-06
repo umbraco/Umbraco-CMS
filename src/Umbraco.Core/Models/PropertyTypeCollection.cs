@@ -30,7 +30,7 @@ public class PropertyTypeCollection : KeyedCollection<string, IPropertyType>, IN
     // This baseclass calling is needed, else compiler will complain about nullability
 
     /// <inheritdoc />
-    public bool IsReadOnly => ((ICollection<IPropertyType>)this).IsReadOnly;
+    public bool IsReadOnly => false;
 
     // 'new' keyword is required! we can explicitly implement ICollection<IPropertyType>.Add BUT since normally a concrete PropertyType type
     // is passed in, the explicit implementation doesn't get called, this ensures it does get called.
