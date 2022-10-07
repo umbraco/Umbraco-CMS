@@ -1,4 +1,5 @@
-import { html, LitElement } from 'lit';
+import { css, html, LitElement } from 'lit';
+import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { Subscription } from 'rxjs';
 import { UmbContextConsumerMixin } from '../../../../../../../core/context';
@@ -20,6 +21,17 @@ import './column-layouts/status/user-table-status-column-layout.element';
 
 @customElement('umb-editor-view-users-table')
 export class UmbEditorViewUsersTableElement extends UmbContextConsumerMixin(LitElement) {
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				height: 100%;
+				display: flex;
+				flex-direction: column;
+			}
+		`,
+	];
+
 	@state()
 	private _users: Array<UserDetails> = [];
 

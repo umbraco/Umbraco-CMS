@@ -25,6 +25,7 @@ export class UmbEditorViewUsersGridElement extends UmbContextConsumerMixin(LitEl
 				grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
 				gap: var(--uui-size-space-4);
 				padding: var(--uui-size-space-4);
+				padding-top: 0;
 			}
 
 			uui-card-user {

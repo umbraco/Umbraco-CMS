@@ -55,6 +55,24 @@ export class UmbTableElement extends LitElement {
 	static styles = [
 		UUITextStyles,
 		css`
+			:host {
+				height: 100%;
+				overflow: auto;
+				padding: var(--uui-size-space-4);
+				padding-top: 0;
+			}
+
+			uui-table {
+				box-shadow: var(--uui-shadow-depth-1);
+			}
+
+			uui-table-head {
+				position: sticky;
+				top: 0;
+				background: white;
+				z-index: 1;
+			}
+
 			uui-table-row uui-checkbox {
 				display: none;
 			}
