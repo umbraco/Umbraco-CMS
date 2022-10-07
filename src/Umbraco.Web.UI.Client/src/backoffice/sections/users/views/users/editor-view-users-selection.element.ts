@@ -3,8 +3,8 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { Subscription } from 'rxjs';
 import { UmbContextConsumerMixin } from '../../../../../core/context';
-import UmbSectionViewUsersElement, { UserItem } from './section-view-users.element';
-import { UmbUserStore } from '../../../../../core/stores/user/user.store';
+import type { UmbUserStore } from '../../../../../core/stores/user/user.store';
+import { UmbSectionViewUsersElement } from './section-view-users.element';
 
 @customElement('umb-editor-view-users-selection')
 export class UmbEditorViewUsersSelectionElement extends UmbContextConsumerMixin(LitElement) {
@@ -27,14 +27,24 @@ export class UmbEditorViewUsersSelectionElement extends UmbContextConsumerMixin(
 	@state()
 	private _selection: Array<string> = [];
 
+	@state()
+	private _totalUsers = 0;
+
 	private _usersContext?: UmbSectionViewUsersElement;
 	private _selectionSubscription?: Subscription;
+	private _userStore?: UmbUserStore;
+	private _totalUsersSubscription?: Subscription;
 
 	connectedCallback(): void {
 		super.connectedCallback();
 		this.consumeContext('umbUsersContext', (usersContext: UmbSectionViewUsersElement) => {
 			this._usersContext = usersContext;
 			this._observeSelection();
+		});
+
+		this.consumeContext('umbUserStore', (userStore: UmbUserStore) => {
+			this._userStore = userStore;
+			this._observeTotalUsers();
 		});
 	}
 
@@ -45,9 +55,17 @@ export class UmbEditorViewUsersSelectionElement extends UmbContextConsumerMixin(
 		});
 	}
 
+	private _observeTotalUsers() {
+		this._totalUsersSubscription?.unsubscribe();
+		this._userStore?.totalUsers.subscribe((totalUsers: number) => {
+			this._totalUsers = totalUsers;
+		});
+	}
+
 	disconnectedCallback(): void {
 		super.disconnectedCallback();
 		this._selectionSubscription?.unsubscribe();
+		this._totalUsersSubscription?.unsubscribe();
 	}
 
 	private _handleClearSelection() {
@@ -55,7 +73,7 @@ export class UmbEditorViewUsersSelectionElement extends UmbContextConsumerMixin(
 	}
 
 	private _renderSelectionCount() {
-		return html`<div>${this._selection.length} of [??] selected</div>`;
+		return html`<div>${this._selection.length} of ${this._totalUsers} selected</div>`;
 	}
 
 	render() {

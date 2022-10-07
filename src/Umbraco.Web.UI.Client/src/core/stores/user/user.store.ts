@@ -1,4 +1,4 @@
-import { map, Observable } from 'rxjs';
+import { BehaviorSubject, map, Observable } from 'rxjs';
 import type { UserDetails, UserEntity } from '../../models';
 import { UmbEntityStore } from '../entity.store';
 import { UmbDataStoreBase } from '../store';
@@ -12,6 +12,9 @@ import { UmbDataStoreBase } from '../store';
 export class UmbUserStore extends UmbDataStoreBase<UserDetails> {
 	private _entityStore: UmbEntityStore;
 
+	private _totalUsers: BehaviorSubject<number> = new BehaviorSubject(0);
+	public readonly totalUsers: Observable<number> = this._totalUsers.asObservable();
+
 	constructor(entityStore: UmbEntityStore) {
 		super();
 		this._entityStore = entityStore;
@@ -20,9 +23,10 @@ export class UmbUserStore extends UmbDataStoreBase<UserDetails> {
 	getAll(): Observable<Array<UserDetails>> {
 		// TODO: use Fetcher API.
 		// TODO: only fetch if the data type is not in the store?
-		fetch(`/umbraco/backoffice/users`)
+		fetch(`/umbraco/backoffice/users/list/items`)
 			.then((res) => res.json())
 			.then((data) => {
+				this._totalUsers.next(data.total);
 				this.update(data.items);
 			});
 

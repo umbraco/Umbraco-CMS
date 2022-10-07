@@ -4,9 +4,12 @@ import { umbUsersData } from '../data/users.data';
 
 // TODO: add schema
 export const handlers = [
-	rest.get('/umbraco/backoffice/users', (req, res, ctx) => {
+	rest.get('/umbraco/backoffice/users/list/items', (req, res, ctx) => {
+		const items = umbUsersData.getItems('user');
+
 		const response = {
-			items: umbUsersData.getItems('user'),
+			total: items.length,
+			items,
 		};
 
 		return res(ctx.status(200), ctx.json(response));
@@ -23,7 +26,6 @@ export const handlers = [
 
 	rest.post<UserDetails[]>('/umbraco/backoffice/users/save', async (req, res, ctx) => {
 		const data = await req.json();
-		console.log('HEJSA');
 		if (!data) return;
 
 		const saved = umbUsersData.save(data);
