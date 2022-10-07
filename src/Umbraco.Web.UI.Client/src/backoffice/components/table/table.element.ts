@@ -36,11 +36,18 @@ export class UmbTableDeselectedEvent extends Event {
 	}
 }
 
+export class UmbTableOrderedEvent extends Event {
+	public constructor() {
+		super('ordered', { bubbles: true, composed: true });
+	}
+}
+
 /**
  *  @element umb-table
  *  @description - Element for displaying a table
  *  @fires {UmbTableSelectedEvent} selected - fires when a row is selected
  *  @fires {UmbTableDeselectedEvent} deselected - fires when a row is deselected
+ *  @fires {UmbTableOrderedEvent} sort - fires when a column order is changed
  *  @extends LitElement
  */
 @customElement('umb-table')
@@ -122,6 +129,12 @@ export class UmbTableElement extends LitElement {
 	@property({ type: Array, attribute: false })
 	public selection: Array<string> = [];
 
+	@property({ type: String, attribute: false })
+	public orderingColumn = '';
+
+	@property({ type: String, attribute: false })
+	public orderingDesc = false;
+
 	@state()
 	private _selectionMode = false;
 
@@ -137,6 +150,12 @@ export class UmbTableElement extends LitElement {
 	private _handleAllRowsCheckboxChange(event: Event) {
 		const checkboxElement = event.target as HTMLInputElement;
 		checkboxElement.checked ? this._selectAllRows() : this._deselectAllRows();
+	}
+
+	private _handleOrderingChange(column: UmbTableColumn) {
+		this.orderingDesc = this.orderingColumn === column.alias ? !this.orderingDesc : false;
+		this.orderingColumn = column.alias;
+		this.dispatchEvent(new UmbTableOrderedEvent());
 	}
 
 	private _selectRow(key: string) {
@@ -182,7 +201,16 @@ export class UmbTableElement extends LitElement {
 	}
 
 	private _renderHeaderCell(column: UmbTableColumn) {
-		return html` <uui-table-head-cell style="--uui-table-cell-padding: 0">${column.name}</uui-table-head-cell> `;
+		return html`
+			<uui-table-head-cell style="--uui-table-cell-padding: 0">
+				<button
+					style="padding: var(--uui-size-4) var(--uui-size-5);"
+					@click="${() => this._handleOrderingChange(column)}">
+					${column.name}
+					<uui-symbol-sort ?active=${this.orderingColumn === column.alias} ?descending=${this.orderingDesc}>
+					</uui-symbol-sort></button
+			></uui-table-head-cell>
+		`;
 	}
 
 	private _renderRow = (item: UmbTableItem) => {

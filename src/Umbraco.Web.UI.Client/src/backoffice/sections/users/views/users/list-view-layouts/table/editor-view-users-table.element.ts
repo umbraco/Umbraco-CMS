@@ -12,6 +12,7 @@ import {
 	UmbTableItem,
 	UmbTableSelectedEvent,
 	UmbTableConfig,
+	UmbTableOrderEvent,
 } from '../../../../../../components/table/table.element';
 
 import './column-layouts/name/user-table-name-column-layout.element';
@@ -134,6 +135,13 @@ export class UmbEditorViewUsersTableElement extends UmbContextConsumerMixin(LitE
 		this._usersContext?.setSelection(selection);
 	}
 
+	private _handleOrder(event: UmbTableOrderEvent) {
+		const table = event.target as UmbTableElement;
+		const orderingColumn = table.orderingColumn;
+		const orderingDesc = table.orderingDesc;
+		console.log(`fetch users, order column: ${orderingColumn}, desc: ${orderingDesc}`);
+	}
+
 	disconnectedCallback(): void {
 		super.disconnectedCallback();
 
@@ -149,7 +157,8 @@ export class UmbEditorViewUsersTableElement extends UmbContextConsumerMixin(LitE
 				.config=${this._tableConfig}
 				.selection=${this._selection}
 				@selected="${this._handleSelected}"
-				@deselected="${this._handleDeselected}"></umb-table>
+				@deselected="${this._handleDeselected}"
+				@ordered="${this._handleOrder}"></umb-table>
 		`;
 	}
 }
