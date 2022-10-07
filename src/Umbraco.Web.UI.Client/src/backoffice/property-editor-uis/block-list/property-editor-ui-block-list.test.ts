@@ -1,21 +1,19 @@
 import { expect, fixture, html } from '@open-wc/testing';
 import { defaultA11yConfig } from '../../../core/helpers/chai';
-import { UmbPropertyEditorUIBlockListElement } from './umb-property-editor-ui-block-list.element';
+import { UmbPropertyEditorUIBlockListElement } from './property-editor-ui-block-list.element';
 
 describe('UmbPropertyEditorUIBlockListElement', () => {
-  let element: UmbPropertyEditorUIBlockListElement;
+	let element: UmbPropertyEditorUIBlockListElement;
 
-  beforeEach(async () => {
-    element = await fixture(
-      html` <umb-property-editor-ui-block-list></umb-property-editor-ui-block-list> `
-    );
-  });
+	beforeEach(async () => {
+		element = await fixture(html` <umb-property-editor-ui-block-list></umb-property-editor-ui-block-list> `);
+	});
 
-  it('is defined with its own instance', () => {
-    expect(element).to.be.instanceOf(UmbPropertyEditorUIBlockListElement);
-  });
+	it('is defined with its own instance', () => {
+		expect(element).to.be.instanceOf(UmbPropertyEditorUIBlockListElement);
+	});
 
-  it('passes the a11y audit', async () => {
-    await expect(element).shadowDom.to.be.accessible(defaultA11yConfig);
-  });
+	it('passes the a11y audit', async () => {
+		await expect(element).shadowDom.to.be.accessible(defaultA11yConfig);
+	});
 });

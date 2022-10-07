@@ -32,7 +32,8 @@
 		"build-storybook": "npm run wc-analyze && build-storybook",
 		"generate:icons": "node ./devops/icons/index.mjs",
 		"wc-analyze": "wca **/*.element.ts --outFile custom-elements.json",
-		"new-extension": "plop  --plopfile ./devops/plop/plop.mjs"
+		"new-extension": "plop  --plopfile ./devops/plop/plop.mjs",
+		"compile": "tsc"
 	},
 	"engines": {
 		"node": ">=16.0.0 <17",
