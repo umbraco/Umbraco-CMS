@@ -8,6 +8,7 @@ import { handlers as publishedStatusHandlers } from './domains/published-status.
 import * as serverHandlers from './domains/server.handlers';
 import { handlers as upgradeHandlers } from './domains/upgrade.handlers';
 import { handlers as userHandlers } from './domains/user.handlers';
+import { handlers as telemetryHandlers } from './domains/telemetry.handlers';
 import { handlers as propertyEditorHandlers } from './domains/property-editor.handlers';
 
 const handlers = [
@@ -21,6 +22,7 @@ const handlers = [
 	...treeHandlers,
 	...propertyEditorHandlers,
 	...manifestsHandlers.default,
+	...telemetryHandlers,
 	...publishedStatusHandlers,
 ];
 
