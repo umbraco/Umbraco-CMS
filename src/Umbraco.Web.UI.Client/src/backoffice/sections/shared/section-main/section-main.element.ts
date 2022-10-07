@@ -3,7 +3,7 @@ import { css, html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
 
 @customElement('umb-section-main')
-export class UmbSectionMain extends LitElement {
+export class UmbSectionMainElement extends LitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -26,6 +26,6 @@ export class UmbSectionMain extends LitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-section-main': UmbSectionMain;
+		'umb-section-main': UmbSectionMainElement;
 	}
 }

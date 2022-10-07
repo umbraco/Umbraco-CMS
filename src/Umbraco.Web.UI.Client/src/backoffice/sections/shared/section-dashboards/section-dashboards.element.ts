@@ -4,14 +4,14 @@ import { customElement, state } from 'lit/decorators.js';
 import { IRoutingInfo } from 'router-slot';
 import { first, map, Subscription } from 'rxjs';
 
-import { UmbContextConsumerMixin } from '../../../core/context';
-import { createExtensionElement, UmbExtensionRegistry } from '../../../core/extension';
-import { UmbSectionContext } from '../section.context';
+import { UmbContextConsumerMixin } from '../../../../core/context';
+import { createExtensionElement, UmbExtensionRegistry } from '../../../../core/extension';
+import { UmbSectionContext } from '../../section.context';
 
-import type { ManifestDashboard } from '../../../core/models';
+import type { ManifestDashboard } from '../../../../core/models';
 
 @customElement('umb-section-dashboards')
-export class UmbSectionDashboards extends UmbContextConsumerMixin(LitElement) {
+export class UmbSectionDashboardsElement extends UmbContextConsumerMixin(LitElement) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -155,10 +155,10 @@ export class UmbSectionDashboards extends UmbContextConsumerMixin(LitElement) {
 	}
 }
 
-export default UmbSectionDashboards;
+export default UmbSectionDashboardsElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-section-dashboards': UmbSectionDashboards;
+		'umb-section-dashboards': UmbSectionDashboardsElement;
 	}
 }

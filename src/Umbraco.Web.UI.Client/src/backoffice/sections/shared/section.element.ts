@@ -7,10 +7,11 @@ import { UmbContextConsumerMixin } from '../../../core/context';
 import { createExtensionElement, UmbExtensionRegistry } from '../../../core/extension';
 import { UmbSectionContext } from '../section.context';
 import type { ManifestTree, ManifestEditor, ManifestSectionView } from '../../../core/models';
-
-import '../shared/section-trees.element.ts';
 import { UmbEditorEntityElement } from '../../editors/shared/editor-entity/editor-entity.element';
 import { UmbEntityStore } from '../../../core/stores/entity.store';
+
+import './section-trees/section-trees.element.ts';
+import '../shared/section-views/section-views.element.ts';
 
 @customElement('umb-section')
 export class UmbSectionElement extends UmbContextConsumerMixin(LitElement) {
@@ -51,12 +52,6 @@ export class UmbSectionElement extends UmbContextConsumerMixin(LitElement) {
 	@state()
 	private _views: Array<ManifestSectionView> = [];
 
-	@state()
-	private _currentViewPath = '';
-
-	@state()
-	private _routerFolder = '';
-
 	private _editors?: Array<ManifestEditor>;
 	private _editorsSubscription?: Subscription;
 
@@ -88,12 +83,6 @@ export class UmbSectionElement extends UmbContextConsumerMixin(LitElement) {
 			this._observeTrees();
 			this._observeViews();
 		});
-	}
-
-	connectedCallback(): void {
-		super.connectedCallback();
-		/* TODO: find a way to construct absolute urls */
-		this._routerFolder = window.location.pathname.split('/view')[0];
 	}
 
 	private _observeTrees() {
@@ -142,7 +131,7 @@ export class UmbSectionElement extends UmbContextConsumerMixin(LitElement) {
 		this._routes = [
 			{
 				path: 'dashboard',
-				component: () => import('../shared/section-dashboards.element'),
+				component: () => import('./section-dashboards/section-dashboards.element'),
 			},
 			...treeRoutes,
 			{
@@ -188,8 +177,8 @@ export class UmbSectionElement extends UmbContextConsumerMixin(LitElement) {
 				return {
 					path: 'view/' + view.meta.pathname,
 					component: () => createExtensionElement(view),
-					setup: (component: UmbEditorEntityElement, info: IRoutingInfo) => {
-						this._currentViewPath = info.match.route.path;
+					setup: () => {
+						this._sectionContext?.setActiveView(view);
 					},
 				};
 			}) ?? [];
@@ -218,32 +207,10 @@ export class UmbSectionElement extends UmbContextConsumerMixin(LitElement) {
 					  `
 					: nothing}
 				<umb-section-main>
-					${this._views.length > 0 ? html` <div id="header">${this._renderViews()}</div> ` : nothing}
+					${this._views.length > 0 ? html`<umb-section-views></umb-section-views>` : nothing}
 					<router-slot id="router-slot" .routes="${this._routes}"></router-slot>
 				</umb-section-main>
 			</umb-section-layout>
-		`;
-	}
-
-	private _renderViews() {
-		return html`
-			${this._views?.length > 0
-				? html`
-						<uui-tab-group>
-							${this._views.map(
-								(view: ManifestSectionView) => html`
-									<uui-tab
-										.label="${view.meta.label || view.name}"
-										href="${this._routerFolder}/view/${view.meta.pathname}"
-										?active="${this._currentViewPath.includes(view.meta.pathname)}">
-										<uui-icon slot="icon" name=${view.meta.icon}></uui-icon>
-										${view.meta.label || view.name}
-									</uui-tab>
-								`
-							)}
-						</uui-tab-group>
-				  `
-				: nothing}
 		`;
 	}
 }
