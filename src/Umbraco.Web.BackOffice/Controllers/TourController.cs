@@ -171,7 +171,8 @@ public class TourController : UmbracoAuthorizedJsonController
 
             // loop through the folder(s) in order to find tours
             //  - there could be multiple on case sensitive file system
-            foreach (var subDir in GetToursFolderPaths(fileProvider, pluginFolderPath))
+            // Hard-coding the "backoffice" directory name to gain a better performance when traversing the App_Plugins directory
+            foreach (var subDir in GetToursFolderPaths(fileProvider, pluginFolderPath, "backoffice"))
             {
                 IEnumerable<IFileInfo> tourFiles = fileProvider
                     .GetDirectoryContents(subDir)
@@ -186,20 +187,24 @@ public class TourController : UmbracoAuthorizedJsonController
         }
     }
 
-    private static IEnumerable<string> GetToursFolderPaths(IFileProvider fileProvider, string path)
+    private static IEnumerable<string> GetToursFolderPaths(IFileProvider fileProvider, string path, string subDirName)
     {
-        IEnumerable<IFileInfo> directories = fileProvider.GetDirectoryContents(path).Where(x => x.IsDirectory);
+        // Hard-coding the "tours" directory name to gain a better performance when traversing the sub directories
+        var toursDirName = "tours";
 
-        foreach (IFileInfo directory in directories)
+        // It is necessary to iterate through the subfolders because on Linux we'll get casing issues when
+        // we directly try to access {path}/{pluginDirectory.Name}/backoffice/tours;
+        // And we InvariantEquals({dirName}) to gain a better performance when looking for the tours folder
+        foreach (IFileInfo subDir in fileProvider.GetDirectoryContents(path).Where(x => x.IsDirectory && x.Name.InvariantEquals(subDirName)))
         {
-            var virtualPath = WebPath.Combine(path, directory.Name);
+            var virtualPath = WebPath.Combine(path, subDir.Name);
 
-            if (directory.Name.InvariantEquals("tours"))
+            if (subDir.Name.InvariantEquals(toursDirName))
             {
                 yield return virtualPath;
             }
 
-            foreach (var nested in GetToursFolderPaths(fileProvider, virtualPath))
+            foreach (var nested in GetToursFolderPaths(fileProvider, virtualPath, toursDirName))
             {
                 yield return nested;
             }

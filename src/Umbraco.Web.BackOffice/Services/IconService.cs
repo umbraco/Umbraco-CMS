@@ -165,7 +165,8 @@ public class IconService : IIconService
         foreach (IFileInfo pluginDirectory in fileProvider.GetDirectoryContents(path).Where(x => x.IsDirectory))
         {
             // Iterate through the sub directories of each plugin folder
-            foreach (IFileInfo subDir1 in fileProvider.GetDirectoryContents($"{path}/{pluginDirectory.Name}").Where(x => x.IsDirectory))
+            // Hard-coding the "backoffice" directory name to gain a better performance when traversing the pluginDirectory directories
+            foreach (IFileInfo subDir1 in fileProvider.GetDirectoryContents($"{path}/{pluginDirectory.Name}").Where(x => x.IsDirectory && x.Name.InvariantEquals("backoffice")))
             {
                 // Iterate through second level sub directories
                 foreach (IFileInfo subDir2 in fileProvider.GetDirectoryContents($"{path}/{pluginDirectory.Name}/{subDir1.Name}").Where(x => x.IsDirectory))
