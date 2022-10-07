@@ -72,9 +72,7 @@ export class UmbModalLayoutContentPickerElement extends UmbModalLayoutElement<Um
 
 	render() {
 		return html`
-			<!-- TODO: maybe we need a layout component between umb-editor-layout and umb-editor-entity? -->
-			<umb-editor-entity-layout>
-				<h3 slot="name">Select content</h3>
+			<umb-editor-entity-layout headline="Select Content">
 				<uui-box>
 					<uui-input></uui-input>
 					<hr />

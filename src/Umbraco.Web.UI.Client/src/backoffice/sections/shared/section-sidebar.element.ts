@@ -28,7 +28,7 @@ export class UmbSectionSidebar extends UmbContextConsumerMixin(LitElement) {
 	];
 
 	@state()
-	private _sectionName = '';
+	private _sectionLabel = '';
 
 	@state()
 	private _sectionPathname = '';
@@ -49,7 +49,7 @@ export class UmbSectionSidebar extends UmbContextConsumerMixin(LitElement) {
 		this._sectionContextSubscription?.unsubscribe();
 
 		this._sectionContextSubscription = this._sectionContext?.data.subscribe((section) => {
-			this._sectionName = section.name;
+			this._sectionLabel = section.meta.label || section.name;
 			this._sectionPathname = section.meta.pathname;
 		});
 	}
@@ -64,7 +64,7 @@ export class UmbSectionSidebar extends UmbContextConsumerMixin(LitElement) {
 			<umb-tree-context-menu-service>
 				<uui-scroll-container>
 					<a href="${`/section/${this._sectionPathname}`}">
-						<h3>${this._sectionName}</h3>
+						<h3>${this._sectionLabel}</h3>
 					</a>
 
 					<slot></slot>

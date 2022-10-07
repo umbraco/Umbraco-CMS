@@ -16,6 +16,9 @@ export class UmbPropertyEditorTextElement extends LitElement {
 	@property()
 	value = '';
 
+	@property({ type: Array, attribute: false })
+	public config = [];
+
 	private onInput(e: InputEvent) {
 		this.value = (e.target as HTMLInputElement).value;
 		this.dispatchEvent(new CustomEvent('property-editor-change', { bubbles: true, composed: true }));

@@ -1,15 +1,15 @@
 import type { ManifestTypes } from './core/models';
 
 // TODO: consider moving weight from meta to the main part of the manifest. We need it for every extension.
-// TODO: consider adding a label property as part of the meta. It might make sense to have an "extension" name label where one is needed.
 export const internalManifests: Array<ManifestTypes & { loader: () => Promise<object | HTMLElement> }> = [
 	{
 		type: 'section',
 		alias: 'Umb.Section.Content',
-		name: 'Content',
+		name: 'Content Section',
 		elementName: 'umb-content-section',
 		loader: () => import('./backoffice/sections/content/content-section.element'),
 		meta: {
+			label: 'Content',
 			pathname: 'content', // TODO: how to we want to support pretty urls?
 			weight: 50,
 		},
@@ -17,10 +17,11 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 	{
 		type: 'section',
 		alias: 'Umb.Section.Media',
-		name: 'Media',
+		name: 'Media Section',
 		elementName: 'umb-media-section',
 		loader: () => import('./backoffice/sections/media/media-section.element'),
 		meta: {
+			label: 'Media',
 			pathname: 'media', // TODO: how to we want to support pretty urls?
 			weight: 50,
 		},
@@ -28,10 +29,11 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 	{
 		type: 'section',
 		alias: 'Umb.Section.Members',
-		name: 'Members',
+		name: 'Members Section',
 		elementName: 'umb-section-members',
 		loader: () => import('./backoffice/sections/members/section-members.element'),
 		meta: {
+			label: 'Members',
 			pathname: 'members',
 			weight: 30,
 		},
@@ -39,9 +41,10 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 	{
 		type: 'section',
 		alias: 'Umb.Section.Settings',
-		name: 'Settings',
+		name: 'Settings Section',
 		loader: () => import('./backoffice/sections/settings/settings-section.element'),
 		meta: {
+			label: 'Settings',
 			pathname: 'settings', // TODO: how to we want to support pretty urls?
 			weight: 20,
 		},
@@ -49,10 +52,11 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 	{
 		type: 'section',
 		alias: 'Umb.Section.Packages',
-		name: 'Packages',
+		name: 'Packages Section',
 		elementName: 'umb-packages-section',
 		loader: () => import('./backoffice/sections/packages/packages-section.element'),
 		meta: {
+			label: 'Packages',
 			pathname: 'packages',
 			weight: 20,
 		},
@@ -60,10 +64,11 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 	{
 		type: 'dashboard',
 		alias: 'Umb.Dashboard.Welcome',
-		name: 'Welcome',
+		name: 'Welcome Dashboard',
 		elementName: 'umb-dashboard-welcome',
 		loader: () => import('./backoffice/dashboards/welcome/dashboard-welcome.element'),
 		meta: {
+			label: 'Welcome',
 			sections: ['Umb.Section.Content'],
 			pathname: 'welcome', // TODO: how to we want to support pretty urls?
 			weight: 20,
@@ -72,10 +77,11 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 	{
 		type: 'dashboard',
 		alias: 'Umb.Dashboard.RedirectManagement',
-		name: 'Redirect Management',
+		name: 'Redirect Management Dashboard',
 		elementName: 'umb-dashboard-redirect-management',
 		loader: () => import('./backoffice/dashboards/redirect-management/dashboard-redirect-management.element'),
 		meta: {
+			label: 'Redirect Management',
 			sections: ['Umb.Section.Content'],
 			pathname: 'redirect-management', // TODO: how to we want to support pretty urls?
 			weight: 10,
@@ -84,7 +90,7 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 	{
 		type: 'dashboard',
 		alias: 'Umb.Dashboard.SettingsAbout',
-		name: 'Settings About',
+		name: 'About Settings Dashboard',
 		elementName: 'umb-dashboard-settings-about',
 		loader: () => import('./backoffice/dashboards/settings-about/dashboard-settings-about.element'),
 		meta: {
@@ -110,10 +116,11 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 	{
 		type: 'dashboard',
 		alias: 'Umb.Dashboard.ExamineManagement',
-		name: 'Examine Management',
+		name: 'Examine Management Dashboard',
 		elementName: 'umb-dashboard-examine-management',
 		loader: () => import('./backoffice/dashboards/examine-management/dashboard-examine-management.element'),
 		meta: {
+			label: 'Examine Management',
 			sections: ['Umb.Section.Settings'],
 			pathname: 'examine-management', // TODO: how to we want to support pretty urls?
 			weight: 10,
@@ -122,10 +129,11 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 	{
 		type: 'dashboard',
 		alias: 'Umb.Dashboard.ModelsBuilder',
-		name: 'Models Builder',
+		name: 'Models Builder Dashboard',
 		elementName: 'umb-dashboard-models-builder',
 		loader: () => import('./backoffice/dashboards/models-builder/dashboard-models-builder.element'),
 		meta: {
+			label: 'Models Builder',
 			sections: ['Umb.Section.Settings'],
 			pathname: 'models-builder', // TODO: how to we want to support pretty urls?
 			weight: 10,
@@ -133,11 +141,25 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 	},
 	{
 		type: 'dashboard',
+		alias: 'Umb.Dashboard.PublishedStatus',
+		name: 'Published Status Dashboard',
+		elementName: 'umb-dashboard-published-status',
+		loader: () => import('./backoffice/dashboards/published-status/dashboard-published-status.element'),
+		meta: {
+			label: 'Published Status',
+			sections: ['Umb.Section.Settings'],
+			pathname: 'published-status', // TODO: how to we want to support pretty urls?
+			weight: 9,
+		},
+	},
+	{
+		type: 'dashboard',
 		alias: 'Umb.Dashboard.MediaManagement',
-		name: 'Media',
+		name: 'Media Dashboard',
 		elementName: 'umb-dashboard-media-management',
 		loader: () => import('./backoffice/dashboards/media-management/dashboard-media-management.element'),
 		meta: {
+			label: 'Media',
 			sections: ['Umb.Section.Media'],
 			pathname: 'media-management', // TODO: how to we want to support pretty urls?
 			weight: 10,
@@ -146,44 +168,88 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 	{
 		type: 'propertyEditorUI',
 		alias: 'Umb.PropertyEditorUI.Text',
-		name: 'Text',
+		name: 'Text Property Editor UI',
 		loader: () => import('./backoffice/property-editors/text/property-editor-text.element'),
 		meta: {
-			icon: 'edit',
-			group: 'common',
+			label: 'Text',
+			icon: 'umb:edit',
+			group: 'Common',
+			propertyEditor: 'Umbraco.TextBox',
 		},
 	},
 	{
 		type: 'propertyEditorUI',
 		alias: 'Umb.PropertyEditorUI.Textarea',
-		name: 'Textarea',
+		name: 'Textarea Property Editor UI',
 		elementName: 'umb-property-editor-textarea',
 		loader: () => import('./backoffice/property-editors/textarea/property-editor-textarea.element'),
 		meta: {
-			icon: 'edit',
-			group: 'common',
+			label: 'Textarea',
+			icon: 'umb:edit',
+			group: 'Common',
+			propertyEditor: 'Umbraco.TextArea',
+			config: {
+				properties: [
+					{
+						alias: 'rows',
+						label: 'Number of rows',
+						description: 'If empty - 10 rows would be set as the default value',
+						propertyEditorUI: 'Umb.PropertyEditorUI.Number',
+					},
+				],
+			},
 		},
 	},
 	{
 		type: 'propertyEditorUI',
 		alias: 'Umb.PropertyEditorUI.ContextExample',
-		name: 'Context Example',
+		name: 'Context Example Property Editor UI',
 		loader: () => import('./backoffice/property-editors/context-example/property-editor-context-example.element'),
 		meta: {
-			icon: 'favorite',
-			group: 'common',
+			label: 'Context Example',
+			icon: 'umb:favorite',
+			group: 'Common',
+			propertyEditor: 'Umbraco.Custom',
+			config: {
+				properties: [
+					{
+						label: 'Some Configuration',
+						alias: 'someConfiguration',
+						propertyEditorUI: 'Umb.PropertyEditorUI.Text',
+					},
+				],
+				defaultData: [
+					{
+						alias: 'someConfiguration',
+						value: 'Some default value',
+					},
+				],
+			},
+		},
+	},
+	{
+		type: 'propertyEditorUI',
+		alias: 'Umb.PropertyEditorUI.Number',
+		name: 'Number Property Editor UI',
+		loader: () => import('./backoffice/property-editors/number/property-editor-number.element'),
+		meta: {
+			label: 'Number',
+			icon: 'umb:autofill',
+			group: 'Common',
+			propertyEditor: 'Umbraco.Integer',
 		},
 	},
 	{
 		type: 'editorView',
-		alias: 'Umb.EditorView.ContentEdit',
-		name: 'Content',
+		alias: 'Umb.EditorView.Content.Edit',
+		name: 'Content Editor Edit View',
 		elementName: 'umb-editor-view-node-edit',
 		loader: () => import('./backoffice/editors/shared/node/views/edit/editor-view-node-edit.element'),
 		meta: {
 			// TODO: how do we want to filter where editor views are shown? https://our.umbraco.com/documentation/extending/Content-Apps/#setting-up-the-plugin
 			// this is a temp solution
 			editors: ['Umb.Editor.Document', 'Umb.Editor.Media'],
+			label: 'Info',
 			pathname: 'content',
 			weight: 100,
 			icon: 'document',
@@ -191,14 +257,15 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 	},
 	{
 		type: 'editorView',
-		alias: 'Umb.EditorView.ContentInfo',
-		name: 'Info',
+		alias: 'Umb.EditorView.Content.Info',
+		name: 'Content Editor Info View',
 		elementName: 'umb-editor-view-node-info',
 		loader: () => import('./backoffice/editors/shared/node/views/info/editor-view-node-info.element'),
 		meta: {
 			// TODO: how do we want to filter where editor views are shown? https://our.umbraco.com/documentation/extending/Content-Apps/#setting-up-the-plugin
 			// this is a temp solution
 			editors: ['Umb.Editor.Document', 'Umb.Editor.Media'],
+			label: 'Info',
 			pathname: 'info',
 			weight: 90,
 			icon: 'info',
@@ -206,14 +273,14 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 	},
 	{
 		type: 'editorView',
-		alias: 'Umb.EditorView.DataTypeEdit',
-		name: 'Edit',
-		elementName: 'umb-editor-view-data-type-edit',
-		loader: () => import('./backoffice/editors/data-type/views/editor-view-data-type-edit.element'),
+		alias: 'Umb.EditorView.DataType.Edit',
+		name: 'Data Type Editor Edit View',
+		loader: () => import('./backoffice/editors/data-type/views/edit/editor-view-data-type-edit.element'),
 		meta: {
 			// TODO: how do we want to filter where editor views are shown? https://our.umbraco.com/documentation/extending/Content-Apps/#setting-up-the-plugin
 			// this is a temp solution
 			editors: ['Umb.Editor.DataType'],
+			label: 'Edit',
 			pathname: 'edit',
 			weight: 90,
 			icon: 'edit',
@@ -221,14 +288,30 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 	},
 	{
 		type: 'editorView',
-		alias: 'Umb.EditorView.DocumentTypeDesign',
-		name: 'Design',
+		alias: 'Umb.EditorView.DataType.Info',
+		name: 'Data Type Editor Info View',
+		loader: () => import('./backoffice/editors/data-type/views/info/editor-view-data-type-info.element'),
+		meta: {
+			// TODO: how do we want to filter where editor views are shown? https://our.umbraco.com/documentation/extending/Content-Apps/#setting-up-the-plugin
+			// this is a temp solution
+			editors: ['Umb.Editor.DataType'],
+			label: 'Info',
+			pathname: 'info',
+			weight: 90,
+			icon: 'info',
+		},
+	},
+	{
+		type: 'editorView',
+		alias: 'Umb.EditorView.DocumentType.Design',
+		name: 'Document Type Editor Design View',
 		elementName: 'umb-editor-view-document-type-design',
 		loader: () => import('./backoffice/editors/document-type/views/editor-view-document-type-design.element'),
 		meta: {
 			// TODO: how do we want to filter where editor views are shown? https://our.umbraco.com/documentation/extending/Content-Apps/#setting-up-the-plugin
 			// this is a temp solution
 			editors: ['Umb.Editor.DocumentType'],
+			label: 'Design',
 			pathname: 'design',
 			weight: 90,
 			icon: 'edit',
@@ -237,11 +320,12 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 	{
 		type: 'editorView',
 		alias: 'Umb.Editor.Packages.Overview',
-		name: 'Packages',
+		name: 'Packages Editor Overview View',
 		elementName: 'umb-packages-overview',
 		loader: () => import('./backoffice/sections/packages/packages-overview.element'),
 		meta: {
 			icon: 'document',
+			label: 'Packages',
 			pathname: 'repo',
 			editors: ['Umb.Editor.Packages'],
 			weight: 10,
@@ -250,11 +334,12 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 	{
 		type: 'editorView',
 		alias: 'Umb.Editor.Packages.Installed',
-		name: 'Installed',
+		name: 'Packages Editor Installed View',
 		elementName: 'umb-packages-installed',
 		loader: () => import('./backoffice/sections/packages/packages-installed.element'),
 		meta: {
 			icon: 'document',
+			label: 'Installed',
 			pathname: 'installed',
 			editors: ['Umb.Editor.Packages'],
 			weight: 0,
@@ -263,7 +348,7 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 	{
 		type: 'propertyAction',
 		alias: 'Umb.PropertyAction.Copy',
-		name: 'Copy',
+		name: 'Copy Property Action',
 		elementName: 'umb-property-action-copy',
 		loader: () => import('./backoffice/property-actions/copy/property-action-copy.element'),
 		meta: {
@@ -273,7 +358,7 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 	{
 		type: 'propertyAction',
 		alias: 'Umb.PropertyAction.Clear',
-		name: 'Clear',
+		name: 'Clear Property Action',
 		elementName: 'umb-property-action-clear',
 		loader: () => import('./backoffice/property-actions/clear/property-action-clear.element'),
 		meta: {
@@ -283,12 +368,14 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 	{
 		type: 'propertyEditorUI',
 		alias: 'Umb.PropertyEditorUI.ContentPicker',
-		name: 'ContentPicker',
+		name: 'Content Picker Property Editor UI',
 		elementName: 'umb-property-editor-content-picker',
 		loader: () => import('./backoffice/property-editors/content-picker/property-editor-content-picker.element'),
 		meta: {
-			icon: 'document',
-			group: 'common',
+			label: 'Content Picker',
+			propertyEditor: 'Umbraco.ContentPicker',
+			icon: 'umb:document',
+			group: 'Common',
 		},
 	},
 	{

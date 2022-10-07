@@ -24,3 +24,18 @@ export const getPackagesInstalled = fetcher.path('/manifests/packages/installed'
 export const getConsentLevels = fetcher.path('/telemetry/ConsentLevels').method('get').create();
 export const getConsentLevel = fetcher.path('/telemetry/ConsentLevel').method('get').create();
 export const postConsentLevel = fetcher.path('/telemetry/ConsentLevel').method('post').create();
+
+
+// Property Editors
+export const getPropertyEditorsList = fetcher.path('/property-editors/list').method('get').create();
+export const getPropertyEditor = fetcher
+	.path('/property-editors/property-editor/{propertyEditorAlias}')
+	.method('get')
+	.create();
+export const getPropertyEditorConfig = fetcher
+	.path('/property-editors/property-editor/config/{propertyEditorAlias}')
+	.method('get')
+	.create();
+export const getPublishedCacheStatus = fetcher.path('/published-cache/status').method('get').create();
+export const postPublishedCacheReload = fetcher.path('/published-cache/reload').method('post').create();
+

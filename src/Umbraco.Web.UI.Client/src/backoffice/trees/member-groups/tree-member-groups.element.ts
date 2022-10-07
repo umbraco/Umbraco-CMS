@@ -1,11 +1,11 @@
 import { html } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '../../../core/context';
-import { UmbTreeMemberGroupsDataContext } from './tree-member-groups-data.context';
+import { UmbTreeBase } from '../shared/tree-base.element';
 import { UmbEntityStore } from '../../../core/stores/entity.store';
+import { UmbTreeMemberGroupsDataContext } from './tree-member-groups-data.context';
 
 import '../shared/tree-navigator.element';
-import { UmbTreeBase } from '../shared/tree-base.element';
 
 @customElement('umb-tree-member-groups')
 export class UmbTreeMemberGroups extends UmbContextProviderMixin(UmbContextConsumerMixin(UmbTreeBase)) {

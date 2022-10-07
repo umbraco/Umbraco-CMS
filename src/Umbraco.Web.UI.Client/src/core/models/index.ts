@@ -32,6 +32,15 @@ export type ManifestPackageView = components['schemas']['IManifestPackageView'];
 export type PackageInstalled = components['schemas']['PackageInstalled'];
 export type ConsentLevelSettings = components['schemas']['ConsentLevelSettings'];
 
+// Property Editors
+export type PropertyEditorsListResponse = components['schemas']['PropertyEditorsListResponse'];
+export type PropertyEditorResponse = components['schemas']['PropertyEditorResponse'];
+export type PropertyEditorConfigResponse = components['schemas']['PropertyEditorConfigResponse'];
+export type PropertyEditorConfig = components['schemas']['PropertyEditorConfig'];
+export type PropertyEditor = components['schemas']['PropertyEditor'];
+export type PropertyEditorConfigProperty = components['schemas']['PropertyEditorConfigProperty'];
+export type PropertyEditorConfigDefaultData = components['schemas']['PropertyEditorConfigDefaultData'];
+
 export type ManifestElementType =
 	| ManifestSection
 	| ManifestTree

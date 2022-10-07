@@ -1,24 +1,16 @@
-import { css, html, LitElement } from 'lit';
+import { html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
+import { Subscription, distinctUntilChanged } from 'rxjs';
 import { NodeProperty, NodePropertyData } from '../../../../../../mocks/data/node.data';
 import { UmbContextConsumerMixin } from '../../../../../../core/context';
 import { UmbNodeContext } from '../../node.context';
-import { Subscription, distinctUntilChanged } from 'rxjs';
 
-import '../../../../../components/node-property.element';
+import '../../../../../components/node-property/node-property.element';
 
 @customElement('umb-editor-view-node-edit')
 export class UmbEditorViewNodeEditElement extends UmbContextConsumerMixin(LitElement) {
-	static styles = [
-		UUITextStyles,
-		css`
-			hr {
-				border: 0;
-				border-top: 1px solid var(--uui-color-border);
-			}
-		`,
-	];
+	static styles = [UUITextStyles];
 
 	@state()
 	_properties: NodeProperty[] = [];
@@ -60,7 +52,6 @@ export class UmbEditorViewNodeEditElement extends UmbContextConsumerMixin(LitEle
 						<umb-node-property
 							.property=${property}
 							.value=${this._data.find((data) => data.alias === property.alias)?.value}></umb-node-property>
-						<hr />
 					`
 				)}
 			</uui-box>
