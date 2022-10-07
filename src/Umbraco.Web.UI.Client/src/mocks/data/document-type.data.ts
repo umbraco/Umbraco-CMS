@@ -1,5 +1,5 @@
-import { UmbData } from './data';
 import { Entity } from './entities';
+import { UmbEntityData } from './entity.data';
 
 export interface DocumentTypeEntity extends Entity {
 	key: string;
@@ -38,7 +38,7 @@ export const data: Array<DocumentTypeEntity> = [
 ];
 
 // Temp mocked database
-class UmbDocumentTypeData extends UmbData<DocumentTypeEntity> {
+class UmbDocumentTypeData extends UmbEntityData<DocumentTypeEntity> {
 	constructor() {
 		super(data);
 	}

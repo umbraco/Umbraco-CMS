@@ -3,7 +3,7 @@ import { css, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { UmbContextConsumerMixin } from '../../../../core/context';
 import { UmbModalService } from '../../../../core/services/modal';
-import { UmbDataTypeStore } from '../../../../core/stores/data-type.store';
+import { UmbDataTypeStore } from '../../../../core/stores/data-type/data-type.store';
 import UmbTreeItemActionElement from '../../shared/tree-item-action.element';
 
 @customElement('umb-tree-action-data-type-delete')
@@ -33,9 +33,9 @@ export default class UmbTreeActionDataTypeDeleteElement extends UmbContextConsum
 			confirmLabel: 'Delete',
 		});
 
-		modalHandler?.onClose.then(({ confirmed }: any) => {
+		modalHandler?.onClose().then(({ confirmed }: any) => {
 			if (confirmed && this._treeContextMenuService && this._dataTypeStore && this._activeTreeItem) {
-				this._dataTypeStore?.trash(this._activeTreeItem.key);
+				this._dataTypeStore?.trash([this._activeTreeItem.key]);
 				this._treeContextMenuService.close();
 			}
 		});
