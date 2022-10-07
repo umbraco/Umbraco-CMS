@@ -78,28 +78,22 @@ export class UmbDashboardPublishedStatusElement extends UmbContextConsumerMixin(
 	}
 	private async _onRefreshCacheHandler() {
 		this._buttonState = 'waiting';
-		try {
-			this._getPublishedStatus();
-			this._buttonState = 'success';
-		} catch (e) {
-			this._buttonState = 'failed';
-			if (e instanceof postPublishedCacheReload.Error) {
-				const error = e.getActualType();
-				const data: UmbNotificationDefaultData = { message: error.data.detail ?? 'Something went wrong' };
-				this._notificationService?.peek('danger', { data });
-			}
-		}
+		await this._getPublishedStatus();
+		this._buttonState = 'success';
 	}
 
 	//Reload
-
 	private async _reloadMemoryCache() {
 		this._buttonStateReload = 'waiting';
+		this._buttonState = 'waiting';
 		try {
 			await postPublishedCacheReload({});
 			this._buttonStateReload = 'success';
+			this._getPublishedStatus();
+			this._buttonState = 'success';
 		} catch (e) {
 			this._buttonStateReload = 'failed';
+			this._buttonState = 'failed';
 			if (e instanceof postPublishedCacheReload.Error) {
 				const error = e.getActualType();
 				const data: UmbNotificationDefaultData = { message: error.data.detail ?? 'Something went wrong' };
@@ -120,7 +114,6 @@ export class UmbDashboardPublishedStatusElement extends UmbContextConsumerMixin(
 	}
 
 	// Rebuild
-
 	private async _rebuildDatabaseCache() {
 		this._buttonStateRebuild = 'waiting';
 		try {
@@ -148,33 +141,22 @@ export class UmbDashboardPublishedStatusElement extends UmbContextConsumerMixin(
 	}
 
 	//Collect
-
-	private async _CacheCollect() {
+	private async _cacheCollect() {
 		try {
-			const { data } = await getPublishedCacheCollect({});
-			console.log(data);
+			await getPublishedCacheCollect({});
+			this._buttonStateCollect = 'success';
 		} catch (e) {
-			if (e instanceof postPublishedCacheRebuild.Error) {
+			this._buttonStateCollect = 'failed';
+			if (e instanceof getPublishedCacheCollect.Error) {
 				const error = e.getActualType();
 				const data: UmbNotificationDefaultData = { message: error.data.detail ?? 'Something went wrong' };
 				this._notificationService?.peek('danger', { data });
 			}
 		}
 	}
-
 	private async _onSnapshotCacheHandler() {
 		this._buttonStateCollect = 'waiting';
-		try {
-			this._CacheCollect();
-			this._buttonStateCollect = 'success';
-		} catch (e) {
-			this._buttonStateCollect = 'failed';
-			if (e instanceof postPublishedCacheRebuild.Error) {
-				const error = e.getActualType();
-				const data: UmbNotificationDefaultData = { message: error.data.detail ?? 'Something went wrong' };
-				this._notificationService?.peek('danger', { data });
-			}
-		}
+		await this._cacheCollect();
 	}
 
 	render() {
