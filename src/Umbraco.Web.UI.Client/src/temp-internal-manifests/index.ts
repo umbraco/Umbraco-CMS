@@ -107,7 +107,7 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		alias: 'Umb.Dashboard.Telemetry',
 		name: 'Telemetry',
 		elementName: 'umb-dashboard-telemetry',
-		loader: () => import('./backoffice/dashboards/telemetry/dashboard-telemetry.element'),
+		loader: () => import('../backoffice/dashboards/telemetry/dashboard-telemetry.element'),
 		meta: {
 			label: 'Telemetry Data',
 			sections: ['Umb.Section.Settings'],
