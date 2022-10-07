@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Core.Media.EmbedProviders;
 /// <summary>
 ///     Embed Provider for Flickr the popular online image hosting and video hosting service.
 /// </summary>
-public class Flickr : EmbedProviderBase
+public class Flickr : OEmbedProviderBase
 {
     public Flickr(IJsonSerializer jsonSerializer)
         : base(jsonSerializer)

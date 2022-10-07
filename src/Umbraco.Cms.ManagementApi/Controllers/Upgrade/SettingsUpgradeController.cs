@@ -33,6 +33,6 @@ public class SettingsUpgradeController : UpgradeControllerBase
         UpgradeSettingsModel upgradeSettings = _upgradeSettingsFactory.GetUpgradeSettings();
         UpgradeSettingsViewModel viewModel = _mapper.Map<UpgradeSettingsViewModel>(upgradeSettings)!;
 
-        return viewModel;
+        return await Task.FromResult(viewModel);
     }
 }
