@@ -108,7 +108,7 @@ export class UmbDashboardPublishedStatusElement extends UmbContextConsumerMixin(
 			color: 'danger',
 			confirmLabel: 'Continue',
 		});
-		modalHandler?.onClose.then(({ confirmed }: any) => {
+		modalHandler?.onClose().then(({ confirmed }: any) => {
 			if (confirmed) this._reloadMemoryCache();
 		});
 	}
@@ -135,7 +135,7 @@ export class UmbDashboardPublishedStatusElement extends UmbContextConsumerMixin(
 			color: 'danger',
 			confirmLabel: 'Continue',
 		});
-		modalHandler?.onClose.then(({ confirmed }: any) => {
+		modalHandler?.onClose().then(({ confirmed }: any) => {
 			if (confirmed) this._rebuildDatabaseCache();
 		});
 	}
