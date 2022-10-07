@@ -3,7 +3,7 @@ import '../core/services/modal/layouts/content-picker/modal-layout-content-picke
 import '../core/context/context-provider.element';
 import '../backoffice/editors/shared/editor-layout/editor-layout.element';
 
-import '../backoffice/property-editors/property-editor-icon-picker.element';
+import '../backoffice/property-editor-uis/icon-picker/property-editor-ui-icon-picker.element';
 import '../core/services/modal/layouts/icon-picker/modal-layout-icon-picker.element';
 
 import '@umbraco-ui/uui-modal';
