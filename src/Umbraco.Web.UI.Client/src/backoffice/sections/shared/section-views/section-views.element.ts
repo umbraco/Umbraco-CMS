@@ -91,7 +91,6 @@ export class UmbSectionViewsElement extends UmbContextConsumerMixin(LitElement) 
 	}
 
 	private _renderViews() {
-		console.log(this._routerFolder);
 		return html`
 			${this._views?.length > 0
 				? html`
