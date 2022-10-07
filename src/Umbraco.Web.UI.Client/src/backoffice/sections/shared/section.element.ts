@@ -193,19 +193,17 @@ export class UmbSectionElement extends UmbContextConsumerMixin(LitElement) {
 
 	render() {
 		return html`
-			<umb-section-layout>
-				${this._trees.length > 0
-					? html`
-							<umb-section-sidebar>
-								<umb-section-trees></umb-section-trees>
-							</umb-section-sidebar>
-					  `
-					: nothing}
-				<umb-section-main>
-					${this._views.length > 0 ? html`<umb-section-views></umb-section-views>` : nothing}
-					<router-slot id="router-slot" .routes="${this._routes}"></router-slot>
-				</umb-section-main>
-			</umb-section-layout>
+			${this._trees.length > 0
+				? html`
+						<umb-section-sidebar>
+							<umb-section-trees></umb-section-trees>
+						</umb-section-sidebar>
+				  `
+				: nothing}
+			<umb-section-main>
+				${this._views.length > 0 ? html`<umb-section-views></umb-section-views>` : nothing}
+				<router-slot id="router-slot" .routes="${this._routes}"></router-slot>
+			</umb-section-main>
 		`;
 	}
 }
