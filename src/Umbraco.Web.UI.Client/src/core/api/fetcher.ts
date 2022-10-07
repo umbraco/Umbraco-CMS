@@ -38,4 +38,6 @@ export const getPropertyEditorConfig = fetcher
 	.create();
 export const getPublishedCacheStatus = fetcher.path('/published-cache/status').method('get').create();
 export const postPublishedCacheReload = fetcher.path('/published-cache/reload').method('post').create();
+export const postPublishedCacheRebuild = fetcher.path('/published-cache/rebuild').method('post').create();
+export const getPublishedCacheCollect = fetcher.path('/published-cache/collect').method('get').create();
 
