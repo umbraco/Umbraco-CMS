@@ -18,7 +18,23 @@ export const handlers = [
 
 		return res(
 			// Respond with a 200 status code
-			ctx.status(201)
+			ctx.status(200)
+		);
+	}),
+
+	rest.post(umbracoPath('/published-cache/rebuild'), async (_req, res, ctx) => {
+		await new Promise((resolve) => setTimeout(resolve, (Math.random() + 1) * 1000)); // simulate a delay of 1-2 seconds
+
+		return res(
+			// Respond with a 200 status code
+			ctx.status(200)
+		);
+	}),
+
+	rest.get(umbracoPath('/published-cache/collect'), (_req, res, ctx) => {
+		return res(
+			// Respond with a 200 status code
+			ctx.status(200)
 		);
 	}),
 ];

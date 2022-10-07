@@ -3,8 +3,14 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
-import { getPublishedCacheStatus, postPublishedCacheReload } from '../../../core/api/fetcher';
+import {
+	getPublishedCacheStatus,
+	postPublishedCacheReload,
+	postPublishedCacheRebuild,
+	getPublishedCacheCollect,
+} from '../../../core/api/fetcher';
 import { UmbContextConsumerMixin } from '../../../core/context';
+import { UmbModalService } from '../../../core/services/modal';
 import { UmbNotificationService } from '../../../core/services/notification';
 import { UmbNotificationDefaultData } from '../../../core/services/notification/layouts/default';
 
@@ -28,7 +34,17 @@ export class UmbDashboardPublishedStatusElement extends UmbContextConsumerMixin(
 	@state()
 	private _buttonState: UUIButtonState = undefined;
 
+	@state()
+	private _buttonStateReload: UUIButtonState = undefined;
+
+	@state()
+	private _buttonStateRebuild: UUIButtonState = undefined;
+
+	@state()
+	private _buttonStateCollect: UUIButtonState = undefined;
+
 	private _notificationService?: UmbNotificationService;
+	private _modalService?: UmbModalService;
 
 	constructor() {
 		super();
@@ -36,13 +52,17 @@ export class UmbDashboardPublishedStatusElement extends UmbContextConsumerMixin(
 		this.consumeContext('umbNotificationService', (notificationService: UmbNotificationService) => {
 			this._notificationService = notificationService;
 		});
+		this.consumeContext('umbModalService', (modalService: UmbModalService) => {
+			this._modalService = modalService;
+		});
 	}
 
 	connectedCallback() {
 		super.connectedCallback();
-
 		this._getPublishedStatus();
 	}
+
+	// Refresh
 
 	private async _getPublishedStatus() {
 		try {
@@ -56,14 +76,23 @@ export class UmbDashboardPublishedStatusElement extends UmbContextConsumerMixin(
 			}
 		}
 	}
-
 	private async _onRefreshCacheHandler() {
+		this._buttonState = 'waiting';
+		await this._getPublishedStatus();
+		this._buttonState = 'success';
+	}
+
+	//Reload
+	private async _reloadMemoryCache() {
+		this._buttonStateReload = 'waiting';
 		this._buttonState = 'waiting';
 		try {
 			await postPublishedCacheReload({});
+			this._buttonStateReload = 'success';
 			this._getPublishedStatus();
 			this._buttonState = 'success';
 		} catch (e) {
+			this._buttonStateReload = 'failed';
 			this._buttonState = 'failed';
 			if (e instanceof postPublishedCacheReload.Error) {
 				const error = e.getActualType();
@@ -72,17 +101,62 @@ export class UmbDashboardPublishedStatusElement extends UmbContextConsumerMixin(
 			}
 		}
 	}
-
 	private async _onReloadCacheHandler() {
-		await undefined;
+		const modalHandler = this._modalService?.confirm({
+			headline: 'Reload',
+			content: html` Trigger a in-memory and local file cache reload on all servers. `,
+			color: 'danger',
+			confirmLabel: 'Continue',
+		});
+		modalHandler?.onClose().then(({ confirmed }: any) => {
+			if (confirmed) this._reloadMemoryCache();
+		});
 	}
 
+	// Rebuild
+	private async _rebuildDatabaseCache() {
+		this._buttonStateRebuild = 'waiting';
+		try {
+			await postPublishedCacheRebuild({});
+			this._buttonStateRebuild = 'success';
+		} catch (e) {
+			this._buttonStateRebuild = 'failed';
+			if (e instanceof postPublishedCacheRebuild.Error) {
+				const error = e.getActualType();
+				const data: UmbNotificationDefaultData = { message: error.data.detail ?? 'Something went wrong' };
+				this._notificationService?.peek('danger', { data });
+			}
+		}
+	}
 	private async _onRebuildCacheHandler() {
-		await undefined;
+		const modalHandler = this._modalService?.confirm({
+			headline: 'Rebuild',
+			content: html` Rebuild content in cmsContentNu database table. Expensive.`,
+			color: 'danger',
+			confirmLabel: 'Continue',
+		});
+		modalHandler?.onClose().then(({ confirmed }: any) => {
+			if (confirmed) this._rebuildDatabaseCache();
+		});
 	}
 
+	//Collect
+	private async _cacheCollect() {
+		try {
+			await getPublishedCacheCollect({});
+			this._buttonStateCollect = 'success';
+		} catch (e) {
+			this._buttonStateCollect = 'failed';
+			if (e instanceof getPublishedCacheCollect.Error) {
+				const error = e.getActualType();
+				const data: UmbNotificationDefaultData = { message: error.data.detail ?? 'Something went wrong' };
+				this._notificationService?.peek('danger', { data });
+			}
+		}
+	}
 	private async _onSnapshotCacheHandler() {
-		await undefined;
+		this._buttonStateCollect = 'waiting';
+		await this._cacheCollect();
 	}
 
 	render() {
@@ -106,7 +180,12 @@ export class UmbDashboardPublishedStatusElement extends UmbContextConsumerMixin(
 					been properly refreshed, after some events triggered—which would indicate a minor Umbraco issue. (note:
 					triggers the reload on all servers in an LB environment).
 				</p>
-				<uui-button type="button" look="primary" color="danger" @click=${this._onReloadCacheHandler}
+				<uui-button
+					type="button"
+					look="primary"
+					color="danger"
+					@click=${this._onReloadCacheHandler}
+					.state=${this._buttonStateReload}
 					>Reload Memory Cache</uui-button
 				>
 			</uui-box>
@@ -117,7 +196,12 @@ export class UmbDashboardPublishedStatusElement extends UmbContextConsumerMixin(
 					expensive. Use it when reloading is not enough, and you think that the database cache has not been properly
 					generated—which would indicate some critical Umbraco issue.
 				</p>
-				<uui-button type="button" look="primary" color="danger" @click=${this._onRebuildCacheHandler}
+				<uui-button
+					type="button"
+					look="primary"
+					color="danger"
+					@click=${this._onRebuildCacheHandler}
+					.state=${this._buttonStateRebuild}
 					>Rebuild Database Cache</uui-button
 				>
 			</uui-box>
@@ -127,7 +211,12 @@ export class UmbDashboardPublishedStatusElement extends UmbContextConsumerMixin(
 					This button lets you trigger a NuCache snapshots collection (after running a fullCLR GC). Unless you know what
 					that means, you probably do not need to use it.
 				</p>
-				<uui-button type="button" look="primary" color="danger" @click=${this._onSnapshotCacheHandler}
+				<uui-button
+					type="button"
+					look="primary"
+					color="danger"
+					@click=${this._onSnapshotCacheHandler}
+					.state=${this._buttonStateCollect}
 					>Snapshot Internal Cache</uui-button
 				>
 			</uui-box>

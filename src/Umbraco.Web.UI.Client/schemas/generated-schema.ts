@@ -37,6 +37,12 @@ export interface paths {
   "/published-cache/reload": {
     post: operations["PublishedCacheReload"];
   };
+  "/published-cache/rebuild": {
+    post: operations["PublishedCacheRebuild"];
+  };
+  "/published-cache/collect": {
+    get: operations["PublishedCacheCollect"];
+  };
   "/server/status": {
     get: operations["GetStatus"];
   };
@@ -569,6 +575,35 @@ export interface operations {
       201: unknown;
       /** 400 response */
       400: {
+        content: {
+          "application/json": components["schemas"]["ProblemDetails"];
+        };
+      };
+    };
+  };
+  PublishedCacheRebuild: {
+    parameters: {};
+    responses: {
+      /** 201 response */
+      201: unknown;
+      /** 400 response */
+      400: {
+        content: {
+          "application/json": components["schemas"]["ProblemDetails"];
+        };
+      };
+    };
+  };
+  PublishedCacheCollect: {
+    responses: {
+      /** 200 response */
+      200: {
+        content: {
+          "application/json": string;
+        };
+      };
+      /** default response */
+      default: {
         content: {
           "application/json": components["schemas"]["ProblemDetails"];
         };
