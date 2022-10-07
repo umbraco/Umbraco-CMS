@@ -12,7 +12,7 @@ import {
 	UmbTableItem,
 	UmbTableSelectedEvent,
 	UmbTableConfig,
-	UmbTableOrderEvent,
+	UmbTableOrderedEvent,
 } from '../../../../../../components/table/table.element';
 
 import './column-layouts/name/user-table-name-column-layout.element';
@@ -22,6 +22,11 @@ import './column-layouts/status/user-table-status-column-layout.element';
 export class UmbEditorViewUsersTableElement extends UmbContextConsumerMixin(LitElement) {
 	@state()
 	private _users: Array<UserDetails> = [];
+
+	@state()
+	private _tableConfig: UmbTableConfig = {
+		allowSelection: true,
+	};
 
 	@state()
 	private _tableColumns: Array<UmbTableColumn> = [
@@ -47,11 +52,6 @@ export class UmbEditorViewUsersTableElement extends UmbContextConsumerMixin(LitE
 
 	@state()
 	private _tableItems: Array<UmbTableItem> = [];
-
-	@state()
-	private _tableConfig: UmbTableConfig = {
-		allowSelection: true,
-	};
 
 	@state()
 	private _selection: Array<string> = [];
@@ -135,7 +135,7 @@ export class UmbEditorViewUsersTableElement extends UmbContextConsumerMixin(LitE
 		this._usersContext?.setSelection(selection);
 	}
 
-	private _handleOrder(event: UmbTableOrderEvent) {
+	private _handleOrdering(event: UmbTableOrderedEvent) {
 		const table = event.target as UmbTableElement;
 		const orderingColumn = table.orderingColumn;
 		const orderingDesc = table.orderingDesc;
@@ -152,13 +152,13 @@ export class UmbEditorViewUsersTableElement extends UmbContextConsumerMixin(LitE
 	render() {
 		return html`
 			<umb-table
-				.items=${this._tableItems}
-				.columns=${this._tableColumns}
 				.config=${this._tableConfig}
+				.columns=${this._tableColumns}
+				.items=${this._tableItems}
 				.selection=${this._selection}
 				@selected="${this._handleSelected}"
 				@deselected="${this._handleDeselected}"
-				@ordered="${this._handleOrder}"></umb-table>
+				@ordered="${this._handleOrdering}"></umb-table>
 		`;
 	}
 }
