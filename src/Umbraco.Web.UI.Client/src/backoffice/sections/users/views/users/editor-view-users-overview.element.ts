@@ -203,11 +203,7 @@ export class UmbEditorViewUsersOverviewElement extends UmbContextConsumerMixin(L
 								<uui-checkbox label="Disabled"></uui-checkbox>
 							</div>
 						</uui-popover>
-						<uui-button
-							label="view toggle"
-							@click=${this._toggleViewType}
-							look="${this._viewType === 'grid' ? 'outline' : 'primary'}"
-							compact>
+						<uui-button label="view toggle" @click=${this._toggleViewType} compact look="outline">
 							<uui-icon name="settings"></uui-icon>
 						</uui-button>
 					</div>

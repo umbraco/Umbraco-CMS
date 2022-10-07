@@ -1,6 +1,6 @@
 import { css, html, LitElement, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, property, state } from 'lit/decorators.js';
+import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { Subscription } from 'rxjs';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
@@ -8,6 +8,7 @@ import { UmbContextConsumerMixin } from '../../../../../../../core/context';
 import UmbSectionViewUsersElement from '../../section-view-users.element';
 import { UmbUserStore } from '../../../../../../../core/stores/user/user.store';
 import type { UserEntity } from '../../../../../../../core/models';
+import { getTagLookAndColor } from '../../../../user-extensions';
 
 @customElement('umb-editor-view-users-grid')
 export class UmbEditorViewUsersGridElement extends UmbContextConsumerMixin(LitElement) {
@@ -105,7 +106,7 @@ export class UmbEditorViewUsersGridElement extends UmbContextConsumerMixin(LitEl
 	private renderUserCard(user: UserEntity) {
 		if (!this._userStore) return;
 
-		const statusLook = null; //this._usersContext?.getTagLookAndColor(user.status ? user.status : '');
+		const statusLook = getTagLookAndColor(user.status);
 
 		return html`
 			<uui-card-user

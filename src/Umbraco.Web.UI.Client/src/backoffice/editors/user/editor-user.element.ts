@@ -3,6 +3,7 @@ import { css, html, LitElement, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { Subscription } from 'rxjs';
+import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { UmbContextProviderMixin, UmbContextConsumerMixin } from '../../../core/context';
 import UmbSectionViewUsersElement from '../../sections/users/views/users/section-view-users.element';
 import '../../property-editors/content-picker/property-editor-content-picker.element';
@@ -11,6 +12,7 @@ import type { UserDetails } from '../../../core/models';
 import { UmbUserContext } from './user.context';
 
 import '../shared/editor-entity-layout/editor-entity-layout.element';
+import { getTagLookAndColor } from '../../sections/users/user-extensions';
 @customElement('umb-editor-user')
 export class UmbEditorUserElement extends UmbContextProviderMixin(UmbContextConsumerMixin(LitElement)) {
 	static styles = [
@@ -210,7 +212,8 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(UmbContextCons
 	private renderRightColumn() {
 		if (!this._user || !this._userStore) return nothing;
 
-		// const status = this._userStore.getTagLookAndColor(this._user.status);
+		const statusLook = getTagLookAndColor(this._user.status);
+
 		return html` <uui-box>
 			<div id="user-info">
 				<uui-avatar .name=${this._user?.name || ''}></uui-avatar>
@@ -228,7 +231,9 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(UmbContextCons
 				<uui-button @click=${this._deleteUser} look="primary" color="danger" label="Delete User"></uui-button>
 				<div>
 					<b>Status:</b>
-					<uui-tag .look=${status.look} .color=${status.color}>${this._user.status}</uui-tag>
+					<uui-tag look="${ifDefined(statusLook?.look)}" color="${ifDefined(statusLook?.color)}">
+						${this._user.status}
+					</uui-tag>
 				</div>
 				${this._user?.status === 'Invited'
 					? html`
