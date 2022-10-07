@@ -27,7 +27,7 @@ export class UmbPropertyEditorUIIconPickerElement extends UmbContextConsumerMixi
 	}
 
 	private _openModal() {
-		this._modalService?.open('umb-modal-layout-icon-picker', { type: 'sidebar', size: 'small' });
+		this._modalService?.iconPicker();
 	}
 
 	render() {
