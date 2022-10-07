@@ -10,6 +10,7 @@ using Umbraco.Cms.Infrastructure.DependencyInjection;
 using Umbraco.Cms.Infrastructure.Examine.DependencyInjection;
 using Umbraco.Cms.Infrastructure.WebAssets;
 using Umbraco.Cms.Web.BackOffice.Controllers;
+using Umbraco.Cms.Web.BackOffice.FileProviders;
 using Umbraco.Cms.Web.BackOffice.Filters;
 using Umbraco.Cms.Web.BackOffice.Install;
 using Umbraco.Cms.Web.BackOffice.Middleware;
@@ -112,6 +113,10 @@ public static partial class UmbracoBuilderExtensions
                 hostingEnvironment.ToAbsolute(path)
             );
         });
+
+        builder.Services.AddSingleton<WebRootFileProviderFactory>();
+        builder.Services.AddSingleton<IManifestFileProviderFactory>(factory => factory.GetRequiredService<WebRootFileProviderFactory>());
+        builder.Services.AddSingleton<IGridEditorsConfigFileProviderFactory>(factory => factory.GetRequiredService<WebRootFileProviderFactory>());
 
         builder.Services.AddUnique<IIconService, IconService>();
         builder.Services.AddUnique<IConflictingRouteService, ConflictingRouteService>();
