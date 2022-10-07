@@ -52,9 +52,6 @@ export class UmbSectionElement extends UmbContextConsumerMixin(LitElement) {
 	@state()
 	private _views: Array<ManifestSectionView> = [];
 
-	private _editors?: Array<ManifestEditor>;
-	private _editorsSubscription?: Subscription;
-
 	private _entityStore?: UmbEntityStore;
 
 	private _sectionContext?: UmbSectionContext;
@@ -192,7 +189,6 @@ export class UmbSectionElement extends UmbContextConsumerMixin(LitElement) {
 	disconnectedCallback(): void {
 		super.disconnectedCallback();
 		this._treesSubscription?.unsubscribe();
-		this._editorsSubscription?.unsubscribe();
 		this._viewsSubscription?.unsubscribe();
 	}
 
