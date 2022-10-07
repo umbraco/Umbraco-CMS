@@ -8,15 +8,36 @@ import { setCustomElements } from '@storybook/web-components';
 
 import customElementManifests from '../custom-elements.json';
 import { UmbExtensionRegistry } from '../src/core/extension';
-import { UmbDataTypeStore } from '../src/core/stores/data-type.store';
+import { UmbDataTypeStore } from '../src/core/stores/data-type/data-type.store';
 import { UmbDocumentTypeStore } from '../src/core/stores/document-type.store';
 import { UmbNodeStore } from '../src/core/stores/node.store';
+import { UmbPropertyEditorStore } from '../src/core/stores/property-editor/property-editor.store';
+import { UmbPropertyEditorConfigStore } from '../src/core/stores/property-editor-config/property-editor-config.store';
+import { UmbIconStore } from '../src/core/stores/icon/icon.store';
 import { onUnhandledRequest } from '../src/mocks/browser';
 import { handlers } from '../src/mocks/browser-handlers';
 import { internalManifests } from '../src/temp-internal-manifests';
+import { LitElement } from 'lit';
 
 const extensionRegistry = new UmbExtensionRegistry();
 internalManifests.forEach((manifest) => extensionRegistry.register(manifest));
+
+class UmbStoryBookElement extends LitElement {
+	_umbIconStore = new UmbIconStore();
+
+	constructor() {
+		super();
+		this._umbIconStore.attach(this);
+	}
+
+	render() {
+		return html`<slot></slot>`;
+	}
+}
+
+customElements.define('umb-storybook', UmbStoryBookElement);
+
+const storybookProvider = (story) => html` <umb-storybook>${story()}</umb-storybook> `;
 
 const extensionRegistryProvider = (story) => html`
 	<umb-context-provider key="umbExtensionRegistry" .value=${extensionRegistry}>${story()}</umb-context-provider>
@@ -36,16 +57,31 @@ const documentTypeStoreProvider = (story) => html`
 	>
 `;
 
+const propertyEditorStoreProvider = (story) => html`
+	<umb-context-provider key="umbPropertyEditorStore" .value=${new UmbPropertyEditorStore()}
+		>${story()}</umb-context-provider
+	>
+`;
+
+const propertyEditorConfigStoreProvider = (story) => html`
+	<umb-context-provider key="umbPropertyEditorConfigStore" .value=${new UmbPropertyEditorConfigStore()}
+		>${story()}</umb-context-provider
+	>
+`;
+
 // Initialize MSW
 initialize({ onUnhandledRequest });
 
 // Provide the MSW addon decorator globally
 export const decorators = [
 	mswDecorator,
+	storybookProvider,
 	extensionRegistryProvider,
 	nodeStoreProvider,
 	dataTypeStoreProvider,
 	documentTypeStoreProvider,
+	propertyEditorStoreProvider,
+	propertyEditorConfigStoreProvider,
 ];
 
 export const parameters = {

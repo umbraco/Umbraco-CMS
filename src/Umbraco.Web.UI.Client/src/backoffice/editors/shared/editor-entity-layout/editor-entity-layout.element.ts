@@ -78,6 +78,9 @@ export class UmbEditorEntityLayout extends UmbContextConsumerMixin(LitElement) {
 	 * @default ''
 	 */
 	@property()
+	public headline = '';
+
+	@property()
 	public alias = '';
 
 	@state()
@@ -168,11 +171,11 @@ export class UmbEditorEntityLayout extends UmbContextConsumerMixin(LitElement) {
 							${this._editorViews.map(
 								(view: ManifestEditorView) => html`
 									<uui-tab
-										.label="${view.name}"
+										.label="${view.meta.label || view.name}"
 										href="${this._routerFolder}/view/${view.meta.pathname}"
 										?active="${this._currentView.includes(view.meta.pathname)}">
 										<uui-icon slot="icon" name="${view.meta.icon}"></uui-icon>
-										${view.name}
+										${view.meta.label || view.name}
 									</uui-tab>
 								`
 							)}
@@ -187,7 +190,10 @@ export class UmbEditorEntityLayout extends UmbContextConsumerMixin(LitElement) {
 			<umb-editor-layout>
 				<div id="header" slot="header">
 					<slot id="icon" name="icon"></slot>
-					<slot id="name" name="name"></slot>
+					<div id="name">
+						${this.headline ? html`<h3>${this.headline}</h3>` : nothing}
+						<slot id="name" name="name"></slot>
+					</div>
 					${this._renderViews()}
 				</div>
 

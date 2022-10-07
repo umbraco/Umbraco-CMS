@@ -7,6 +7,7 @@ const worker = setupWorker(...handlers);
 export const onUnhandledRequest = (req: MockedRequest) => {
 	if (req.url.pathname.startsWith('/node_modules/')) return;
 	if (req.url.pathname.startsWith('/src/')) return;
+	if (req.url.pathname.startsWith('/icons/')) return;
 	if (req.destination === 'image') return;
 
 	console.warn('Found an unhandled %s request to %s', req.method, req.url.href);

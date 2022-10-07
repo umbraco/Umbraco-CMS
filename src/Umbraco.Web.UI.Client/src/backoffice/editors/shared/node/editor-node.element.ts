@@ -86,11 +86,11 @@ export class UmbEditorNodeElement extends UmbContextProviderMixin(UmbContextCons
 		const target = e.composedPath()[0] as any;
 
 		// TODO: Set value.
-		const property = this._node?.properties.find((x) => x.alias === target.property.alias);
+		const property = this._node?.properties.find((x) => x.alias === target.alias);
 		if (property) {
 			this._setPropertyValue(property.alias, target.value);
 		} else {
-			console.error('property was not found', target.property.alias);
+			console.error('property was not found', target.alias);
 		}
 	};
 

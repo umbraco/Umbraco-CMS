@@ -24,21 +24,19 @@ export class UmbNodeStore extends UmbDataStoreBase<NodeEntity> {
 		);
 	}
 
-	trash(key: string) {
+	async trash(keys: Array<string>) {
 		// fetch from server and update store
 		// TODO: Use node type to hit the right API, or have a general Node API?
-		return fetch('/umbraco/backoffice/node/trash', {
+		const res = await fetch('/umbraco/backoffice/node/trash', {
 			method: 'POST',
-			body: key,
+			body: JSON.stringify(keys),
 			headers: {
 				'Content-Type': 'application/json',
 			},
-		})
-			.then((res) => res.json())
-			.then((data: Array<NodeEntity>) => {
-				this.update(data);
-				this._entityStore.update(data);
-			});
+		});
+		const data = await res.json();
+		this.update(data);
+		this._entityStore.update(data);
 	}
 
 	// TODO: make sure UI somehow can follow the status of this action.

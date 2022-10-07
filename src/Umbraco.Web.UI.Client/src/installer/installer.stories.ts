@@ -4,7 +4,7 @@ import { html } from 'lit-html';
 import '.';
 
 export default {
-	title: 'Components/Installer',
+	title: 'Apps/Installer',
 	component: 'umb-installer',
 	id: 'umb-installer',
 } as Meta;

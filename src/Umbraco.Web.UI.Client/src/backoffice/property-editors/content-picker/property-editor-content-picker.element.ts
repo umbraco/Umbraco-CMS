@@ -37,6 +37,9 @@ export class UmbPropertyEditorContentPickerElement extends UmbContextConsumerMix
 	@property({ type: Array })
 	public value: Array<string> = [];
 
+	@property({ type: Array, attribute: false })
+	public config = [];
+
 	@state()
 	private _items: Array<Entity> = [];
 
@@ -65,7 +68,7 @@ export class UmbPropertyEditorContentPickerElement extends UmbContextConsumerMix
 
 	private _openPicker() {
 		const modalHandler = this._modalService?.contentPicker({ multiple: true, selection: this.value });
-		modalHandler?.onClose.then(({ selection }: any) => {
+		modalHandler?.onClose().then(({ selection }: any) => {
 			this._setValue([...this.value, ...selection]);
 		});
 	}
@@ -78,7 +81,7 @@ export class UmbPropertyEditorContentPickerElement extends UmbContextConsumerMix
 			confirmLabel: 'Remove',
 		});
 
-		modalHandler?.onClose.then(({ confirmed }) => {
+		modalHandler?.onClose().then(({ confirmed }) => {
 			if (confirmed) {
 				const newValue = this.value.filter((value) => value !== item.key);
 				this._setValue(newValue);
