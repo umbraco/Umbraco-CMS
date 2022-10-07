@@ -34,7 +34,6 @@ public class IconService : IIconService
     {
     }
 
-    [Obsolete("Use other ctor - Will be removed in Umbraco 12")]
     public IconService(
         IOptionsMonitor<GlobalSettings> globalSettings,
         IHostingEnvironment hostingEnvironment,
@@ -163,32 +162,14 @@ public class IconService : IIconService
     {
         // Iterate through all plugin folders, this is necessary because on Linux we'll get casing issues when
         // we directly try to access {path}/{pluginDirectory.Name}/{Constants.SystemDirectories.PluginIcons}
-        foreach (IFileInfo pluginDirectory in fileProvider.GetDirectoryContents(path))
+        foreach (IFileInfo pluginDirectory in fileProvider.GetDirectoryContents(path).Where(x => x.IsDirectory))
         {
-            // Ideally there shouldn't be any files, but we'd better check to be sure
-            if (!pluginDirectory.IsDirectory)
-            {
-                continue;
-            }
-
             // Iterate through the sub directories of each plugin folder
-            foreach (IFileInfo subDir1 in fileProvider.GetDirectoryContents($"{path}/{pluginDirectory.Name}"))
+            foreach (IFileInfo subDir1 in fileProvider.GetDirectoryContents($"{path}/{pluginDirectory.Name}").Where(x => x.IsDirectory))
             {
-                // Skip files again
-                if (!subDir1.IsDirectory)
-                {
-                    continue;
-                }
-
                 // Iterate through second level sub directories
-                foreach (IFileInfo subDir2 in fileProvider.GetDirectoryContents($"{path}/{pluginDirectory.Name}/{subDir1.Name}"))
+                foreach (IFileInfo subDir2 in fileProvider.GetDirectoryContents($"{path}/{pluginDirectory.Name}/{subDir1.Name}").Where(x => x.IsDirectory))
                 {
-                    // Skip files again
-                    if (!subDir2.IsDirectory)
-                    {
-                        continue;
-                    }
-
                     // Does the directory match the plugin icons folder? (case insensitive for legacy support)
                     if (!$"/{subDir1.Name}/{subDir2.Name}".InvariantEquals(Constants.SystemDirectories.PluginIcons))
                     {
