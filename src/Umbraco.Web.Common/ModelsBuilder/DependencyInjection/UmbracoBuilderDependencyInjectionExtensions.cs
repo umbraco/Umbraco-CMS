@@ -78,7 +78,7 @@ using Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto;
  * First off we've added a new class InMemoryAssemblyLoadContextManager, the role of this class is to ensure that
  * no one will take a reference to the assembly load context (you cannot unload an assembly load context if there's any references to it).
  * This means that both the InMemoryAutoFactory and the ViewCompiler uses the LoadContextManager to load their assemblies.
- * This serves another purpose being that it keeps track of the location of the location of the models assembly.
+ * This serves another purpose being that it keeps track of the location of the models assembly.
  * This means that we no longer use the RazorReferencesManager to resolve that specific dependency, but instead add and explicit dependency to the models assembly.
  *
  * With this our assembly load context issue is solved, however the caching issue still persists now that we no longer use the RefreshingRazorViewEngine
