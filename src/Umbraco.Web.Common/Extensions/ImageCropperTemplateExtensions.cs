@@ -1,6 +1,5 @@
-using System.Globalization;
+using System.Text.Json;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
@@ -11,10 +10,9 @@ namespace Umbraco.Extensions;
 /// </summary>
 public static class ImageCropperTemplateExtensions
 {
-    private static readonly JsonSerializerSettings ImageCropperValueJsonSerializerSettings = new()
+    private static readonly JsonSerializerOptions _imageCropperValueJsonSerializerSettings = new()
     {
-        Culture = CultureInfo.InvariantCulture,
-        FloatParseHandling = FloatParseHandling.Decimal,
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
     };
 
     internal static ImageCropperValue DeserializeImageCropperValue(this string json)
@@ -26,7 +24,7 @@ public static class ImageCropperTemplateExtensions
             try
             {
                 imageCrops =
-                    JsonConvert.DeserializeObject<ImageCropperValue>(json, ImageCropperValueJsonSerializerSettings);
+                    JsonSerializer.Deserialize<ImageCropperValue>(json, _imageCropperValueJsonSerializerSettings);
             }
             catch (Exception ex)
             {
