@@ -7,20 +7,18 @@ namespace Umbraco.Cms.Core.Configuration.Models;
 /// </summary>
 public class ConnectionStrings // TODO: Rename to [Umbraco]ConnectionString (since v10 this only contains a single connection string)
 {
-    private string? _connectionString;
-
     /// <summary>
-    /// The default provider name when not present in configuration.
+    ///     The default provider name when not present in configuration.
     /// </summary>
     public const string DefaultProviderName = "Microsoft.Data.SqlClient";
 
     /// <summary>
-    /// The DataDirectory placeholder.
+    ///     The DataDirectory placeholder.
     /// </summary>
     public const string DataDirectoryPlaceholder = ConfigurationExtensions.DataDirectoryPlaceholder;
 
     /// <summary>
-    /// The postfix used to identify a connection strings provider setting.
+    ///     The postfix used to identify a connection strings provider setting.
     /// </summary>
     public const string ProviderNamePostfix = ConfigurationExtensions.ProviderNamePostfix;
 
@@ -39,14 +37,7 @@ public class ConnectionStrings // TODO: Rename to [Umbraco]ConnectionString (sin
     /// <value>
     /// The connection string.
     /// </value>
-    /// <remarks>
-    /// When set, the <see cref="DataDirectoryPlaceholder"/> will be replaced with the actual physical path.
-    /// </remarks>
-    public string? ConnectionString
-    {
-        get => _connectionString;
-        set => _connectionString = ConfigurationExtensions.ReplaceDataDirectoryPlaceholder(value);
-    }
+    public string? ConnectionString { get; set; }
 
     /// <summary>
     /// Gets or sets the name of the provider.

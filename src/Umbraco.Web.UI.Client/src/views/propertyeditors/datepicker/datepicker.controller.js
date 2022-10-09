@@ -50,7 +50,8 @@ function dateTimePickerController($scope, angularHelper, dateHelper, validationM
         $scope.datePickerConfig = {
             enableTime: $scope.model.config.pickTime,
             dateFormat: dateFormat,
-            time_24hr: true
+            time_24hr: true,
+            clickOpens: !$scope.readonly
         };
 
         // Don't show calendar if date format has been set to only time
@@ -105,7 +106,7 @@ function dateTimePickerController($scope, angularHelper, dateHelper, validationM
                 setDate(momentDate);
             }
             setDatePickerVal();
-            flatPickr.setDate($scope.model.value, false);
+            flatPickr.setDate($scope.model.datetimePickerValue, false);
         }
     }
     

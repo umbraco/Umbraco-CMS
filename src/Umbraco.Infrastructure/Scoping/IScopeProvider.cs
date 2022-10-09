@@ -7,7 +7,7 @@ using Umbraco.Cms.Infrastructure.Persistence;
 namespace Umbraco.Cms.Infrastructure.Scoping;
 
 /// <summary>
-/// Provides scopes.
+///     Provides scopes.
 /// </summary>
 public interface IScopeProvider : ICoreScopeProvider
 {
@@ -34,7 +34,7 @@ public interface IScopeProvider : ICoreScopeProvider
         SqlContext.Query<T>();
 
     /// <summary>
-    /// Creates an ambient scope.
+    ///     Creates an ambient scope.
     /// </summary>
     /// <param name="isolationLevel">The transaction isolation level.</param>
     /// <param name="repositoryCacheMode">The repositories cache mode.</param>
@@ -45,12 +45,14 @@ public interface IScopeProvider : ICoreScopeProvider
     /// <param name="autoComplete">A value indicating whether this scope is auto-completed.</param>
     /// <returns>The created ambient scope.</returns>
     /// <remarks>
-    /// <para>The created scope becomes the ambient scope.</para>
-    /// <para>If an ambient scope already exists, it becomes the parent of the created scope.</para>
-    /// <para>When the created scope is disposed, the parent scope becomes the ambient scope again.</para>
-    /// <para>Parameters must be specified on the outermost scope, or must be compatible with the parents.</para>
-    /// <para>Auto-completed scopes should be used for read-only operations ONLY. Do not use them if you do not
-    /// understand the associated issues, such as the scope being completed even though an exception is thrown.</para>
+    ///     <para>The created scope becomes the ambient scope.</para>
+    ///     <para>If an ambient scope already exists, it becomes the parent of the created scope.</para>
+    ///     <para>When the created scope is disposed, the parent scope becomes the ambient scope again.</para>
+    ///     <para>Parameters must be specified on the outermost scope, or must be compatible with the parents.</para>
+    ///     <para>
+    ///         Auto-completed scopes should be used for read-only operations ONLY. Do not use them if you do not
+    ///         understand the associated issues, such as the scope being completed even though an exception is thrown.
+    ///     </para>
     /// </remarks>
     IScope CreateScope(
         IsolationLevel isolationLevel = IsolationLevel.Unspecified,
@@ -62,7 +64,7 @@ public interface IScopeProvider : ICoreScopeProvider
         bool autoComplete = false);
 
     /// <summary>
-    /// Creates a detached scope.
+    ///     Creates a detached scope.
     /// </summary>
     /// <returns>A detached scope.</returns>
     /// <param name="isolationLevel">The transaction isolation level.</param>
@@ -71,8 +73,8 @@ public interface IScopeProvider : ICoreScopeProvider
     /// <param name="scopedNotificationPublisher">An option notification publisher.</param>
     /// <param name="scopeFileSystems">A value indicating whether to scope the filesystems.</param>
     /// <remarks>
-    /// <para>A detached scope is not ambient and has no parent.</para>
-    /// <para>It is meant to be attached by <see cref="AttachScope"/>.</para>
+    ///     <para>A detached scope is not ambient and has no parent.</para>
+    ///     <para>It is meant to be attached by <see cref="AttachScope" />.</para>
     /// </remarks>
     /// <remarks>
     /// This is not used by CMS but is used by Umbraco Deploy.
@@ -85,36 +87,30 @@ public interface IScopeProvider : ICoreScopeProvider
         bool? scopeFileSystems = null);
 
     /// <summary>
-    /// Attaches a scope.
+    ///     Attaches a scope.
     /// </summary>
     /// <param name="scope">The scope to attach.</param>
     /// <param name="callContext">A value indicating whether to force usage of call context.</param>
     /// <remarks>
-    /// <para>Only a scope created by <see cref="CreateDetachedScope"/> can be attached.</para>
+    ///     <para>Only a scope created by <see cref="CreateDetachedScope" /> can be attached.</para>
     /// </remarks>
     void AttachScope(IScope scope, bool callContext = false);
 
     /// <summary>
-    /// Detaches a scope.
+    ///     Detaches a scope.
     /// </summary>
     /// <returns>The detached scope.</returns>
     /// <remarks>
-    /// <para>Only a scope previously attached by <see cref="AttachScope"/> can be detached.</para>
+    ///     <para>Only a scope previously attached by <see cref="AttachScope" /> can be detached.</para>
     /// </remarks>
     IScope DetachScope();
 
     /// <summary>
-    /// Gets the scope context.
-    /// </summary>
-    IScopeContext? Context { get; }
-
-    /// <summary>
-    /// Gets the sql context.
+    ///     Gets the sql context.
     /// </summary>
     ISqlContext SqlContext { get; }
 
 #if DEBUG_SCOPES
-
         IEnumerable<ScopeInfo> ScopeInfos { get; }
         ScopeInfo GetScopeInfo(IScope scope);
 #endif

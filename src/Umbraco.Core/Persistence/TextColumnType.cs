@@ -1,8 +1,7 @@
-namespace Umbraco.Cms.Core.Persistence
+namespace Umbraco.Cms.Core.Persistence;
+
+public enum TextColumnType
 {
-    public enum TextColumnType
-    {
-        NVarchar,
-        NText
-    }
+    NVarchar,
+    NText,
 }

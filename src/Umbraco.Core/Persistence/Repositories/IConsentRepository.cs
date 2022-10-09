@@ -1,15 +1,14 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Cms.Core.Persistence.Repositories
+namespace Umbraco.Cms.Core.Persistence.Repositories;
+
+/// <summary>
+///     Represents a repository for <see cref="IConsent" /> entities.
+/// </summary>
+public interface IConsentRepository : IReadWriteQueryRepository<int, IConsent>
 {
     /// <summary>
-    /// Represents a repository for <see cref="IConsent"/> entities.
+    ///     Clears the current flag.
     /// </summary>
-    public interface IConsentRepository : IReadWriteQueryRepository<int, IConsent>
-    {
-        /// <summary>
-        /// Clears the current flag.
-        /// </summary>
-        void ClearCurrent(string source, string context, string action);
-    }
+    void ClearCurrent(string source, string context, string action);
 }

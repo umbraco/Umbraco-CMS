@@ -13,27 +13,34 @@ using Umbraco.Cms.Persistence.SqlServer.Services;
 namespace Umbraco.Cms.Persistence.SqlServer;
 
 /// <summary>
-/// SQLite support extensions for IUmbracoBuilder.
+///     SQLite support extensions for IUmbracoBuilder.
 /// </summary>
 public static class UmbracoBuilderExtensions
 {
     /// <summary>
-    /// Add required services for SQL Server support.
+    ///     Add required services for SQL Server support.
     /// </summary>
     public static IUmbracoBuilder AddUmbracoSqlServerSupport(this IUmbracoBuilder builder)
     {
         builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<ISqlSyntaxProvider, SqlServerSyntaxProvider>());
-        builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IBulkSqlInsertProvider, SqlServerBulkSqlInsertProvider>());
+        builder.Services.TryAddEnumerable(ServiceDescriptor
+            .Singleton<IBulkSqlInsertProvider, SqlServerBulkSqlInsertProvider>());
         builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IDatabaseCreator, SqlServerDatabaseCreator>());
 
-        builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IDatabaseProviderMetadata, SqlLocalDbDatabaseProviderMetadata>());
-        builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IDatabaseProviderMetadata, SqlServerDatabaseProviderMetadata>());
-        builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IDatabaseProviderMetadata, SqlAzureDatabaseProviderMetadata>());
+        builder.Services.TryAddEnumerable(ServiceDescriptor
+            .Singleton<IDatabaseProviderMetadata, SqlLocalDbDatabaseProviderMetadata>());
+        builder.Services.TryAddEnumerable(ServiceDescriptor
+            .Singleton<IDatabaseProviderMetadata, SqlServerDatabaseProviderMetadata>());
+        builder.Services.TryAddEnumerable(ServiceDescriptor
+            .Singleton<IDatabaseProviderMetadata, SqlAzureDatabaseProviderMetadata>());
 
-        builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IDistributedLockingMechanism, SqlServerDistributedLockingMechanism>());
+        builder.Services.TryAddEnumerable(ServiceDescriptor
+            .Singleton<IDistributedLockingMechanism, SqlServerDistributedLockingMechanism>());
 
-        builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IProviderSpecificInterceptor, SqlServerAddMiniProfilerInterceptor>());
-        builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IProviderSpecificInterceptor, SqlServerAddRetryPolicyInterceptor>());
+        builder.Services.TryAddEnumerable(ServiceDescriptor
+            .Singleton<IProviderSpecificInterceptor, SqlServerAddMiniProfilerInterceptor>());
+        builder.Services.TryAddEnumerable(ServiceDescriptor
+            .Singleton<IProviderSpecificInterceptor, SqlServerAddRetryPolicyInterceptor>());
 
         DbProviderFactories.UnregisterFactory(Constants.ProviderName);
         DbProviderFactories.RegisterFactory(Constants.ProviderName, SqlClientFactory.Instance);

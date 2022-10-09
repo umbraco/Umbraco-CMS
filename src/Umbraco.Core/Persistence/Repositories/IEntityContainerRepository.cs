@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
 using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Cms.Core.Persistence.Repositories
-{
-    public interface IEntityContainerRepository : IReadRepository<int, EntityContainer>, IWriteRepository<EntityContainer>
-    {
-        EntityContainer? Get(Guid id);
+namespace Umbraco.Cms.Core.Persistence.Repositories;
 
-        IEnumerable<EntityContainer> Get(string name, int level);
-    }
+public interface IEntityContainerRepository : IReadRepository<int, EntityContainer>, IWriteRepository<EntityContainer>
+{
+    EntityContainer? Get(Guid id);
+
+    IEnumerable<EntityContainer> Get(string name, int level);
 }

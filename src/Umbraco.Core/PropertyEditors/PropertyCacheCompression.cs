@@ -1,53 +1,56 @@
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.PropertyEditors;
 
+namespace Umbraco.Cms.Core.PropertyEditors;
 
-namespace Umbraco.Cms.Core.PropertyEditors
+/// <summary>
+///     Compresses property data based on config
+/// </summary>
+public class PropertyCacheCompression : IPropertyCacheCompression
 {
+    private readonly IPropertyCacheCompressionOptions _compressionOptions;
+    private readonly IReadOnlyDictionary<int, IContentTypeComposition> _contentTypes;
 
-    /// <summary>
-    /// Compresses property data based on config
-    /// </summary>
-    public class PropertyCacheCompression : IPropertyCacheCompression
+    private readonly ConcurrentDictionary<(int contentTypeId, string propertyAlias, bool published), bool>
+        _isCompressedCache;
+
+    private readonly PropertyEditorCollection _propertyEditors;
+
+    public PropertyCacheCompression(
+        IPropertyCacheCompressionOptions compressionOptions,
+        IReadOnlyDictionary<int, IContentTypeComposition> contentTypes,
+        PropertyEditorCollection propertyEditors,
+        ConcurrentDictionary<(int, string, bool), bool> compressedStoragePropertyEditorCache)
     {
-        private readonly IPropertyCacheCompressionOptions _compressionOptions;
-        private readonly IReadOnlyDictionary<int, IContentTypeComposition> _contentTypes;
-        private readonly PropertyEditorCollection _propertyEditors;
-        private readonly ConcurrentDictionary<(int contentTypeId, string propertyAlias, bool published), bool> _isCompressedCache;
+        _compressionOptions = compressionOptions;
+        _contentTypes = contentTypes ?? throw new ArgumentNullException(nameof(contentTypes));
+        _propertyEditors = propertyEditors ?? throw new ArgumentNullException(nameof(propertyEditors));
+        _isCompressedCache = compressedStoragePropertyEditorCache;
+    }
 
-        public PropertyCacheCompression(
-            IPropertyCacheCompressionOptions compressionOptions,
-            IReadOnlyDictionary<int, IContentTypeComposition> contentTypes,
-            PropertyEditorCollection propertyEditors,
-            ConcurrentDictionary<(int, string, bool), bool> compressedStoragePropertyEditorCache)
+    public bool IsCompressed(IReadOnlyContentBase content, string alias, bool published)
+    {
+        var compressedStorage = _isCompressedCache.GetOrAdd((content.ContentTypeId, alias, published), x =>
         {
-            _compressionOptions = compressionOptions;
-            _contentTypes = contentTypes ?? throw new System.ArgumentNullException(nameof(contentTypes));
-            _propertyEditors = propertyEditors ?? throw new System.ArgumentNullException(nameof(propertyEditors));
-            _isCompressedCache = compressedStoragePropertyEditorCache;
-        }
-
-        public bool IsCompressed(IReadOnlyContentBase content, string alias, bool published)
-        {
-            var compressedStorage = _isCompressedCache.GetOrAdd((content.ContentTypeId, alias, published), x =>
+            if (!_contentTypes.TryGetValue(x.contentTypeId, out IContentTypeComposition? ct))
             {
-                if (!_contentTypes.TryGetValue(x.contentTypeId, out var ct))
-                    return false;
+                return false;
+            }
 
-                var propertyType = ct.CompositionPropertyTypes.FirstOrDefault(x => x.Alias == alias);
-                if (propertyType == null)
-                    return false;
+            IPropertyType? propertyType = ct.CompositionPropertyTypes.FirstOrDefault(x => x.Alias == alias);
+            if (propertyType == null)
+            {
+                return false;
+            }
 
-                if (!_propertyEditors.TryGet(propertyType.PropertyEditorAlias, out var propertyEditor))
-                    return false;
+            if (!_propertyEditors.TryGet(propertyType.PropertyEditorAlias, out IDataEditor? propertyEditor))
+            {
+                return false;
+            }
 
-                return _compressionOptions.IsCompressed(content, propertyType, propertyEditor!, published);
-            });
+            return _compressionOptions.IsCompressed(content, propertyType, propertyEditor, published);
+        });
 
-            return compressedStorage;
-        }
+        return compressedStorage;
     }
 }

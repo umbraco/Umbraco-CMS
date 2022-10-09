@@ -1,0 +1,63 @@
+name: labeled-up-for-grabs-first-comment
+
+on:
+  issues:
+    types:
+      - labeled
+
+jobs:
+  send-response:
+    if: github.event.label.name == 'community/up-for-grabs'
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+      - name: Install dependencies
+        run: |
+          npm install node-fetch@2
+      - name: Fetch comment 🗣️ and add it to the issue
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fetch = require('node-fetch');
+            const response = await fetch('https://collaboratorsv2.euwest01.umbraco.io/umbraco/api/comments/PostComment', {
+              method: 'post',
+              body: JSON.stringify({
+                repo: '${{ github.repository }}',
+                number: '${{ github.event.issue.number }}',
+                actor: '${{ github.event.issue.user.login }}',
+                commentType: 'labeled-up-for-grabs-first-comment'
+              }),
+              headers: {
+                'Authorization': 'Bearer ${{ secrets.OUR_BOT_API_TOKEN }}',
+                'Content-Type': 'application/json'
+              }
+            });
+
+            try {
+                const data = await response.text();
+
+                if(response.status === 200 && data !== '') {
+                    github.rest.issues.createComment({
+                        issue_number: context.issue.number,
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        body: data
+                    });
+                } else {
+                    console.log("Returned data not indicate success.");
+
+                    if(response.status !== 200) {
+                      console.log("Status code:", response.status)
+                    }
+
+                    console.log("Returned data:", data);
+                    
+                    if(data === '') {
+                      console.log("An empty response usually indicates that either no comment was found or the actor user was not eligible for getting an automated response (HQ users are not getting auto-responses).")
+                    }
+                }
+            } catch(error) {
+                console.log(error);
+            };

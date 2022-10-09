@@ -1,9 +1,8 @@
-﻿namespace Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions
+namespace Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
+
+public enum ConstraintType
 {
-    public enum ConstraintType
-    {
-        PrimaryKey,
-        Unique,
-        NonUnique
-    }
+    PrimaryKey,
+    Unique,
+    NonUnique,
 }

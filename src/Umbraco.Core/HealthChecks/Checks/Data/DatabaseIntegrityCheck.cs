@@ -1,138 +1,127 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Cms.Core.HealthChecks.Checks.Data
+namespace Umbraco.Cms.Core.HealthChecks.Checks.Data;
+
+/// <summary>
+///     Health check for the integrity of the data in the database.
+/// </summary>
+[HealthCheck(
+    "73DD0C1C-E0CA-4C31-9564-1DCA509788AF",
+    "Database data integrity check",
+    Description = "Checks for various data integrity issues in the Umbraco database.",
+    Group = "Data Integrity")]
+public class DatabaseIntegrityCheck : HealthCheck
 {
+    private const string SSsFixMediaPaths = "fixMediaPaths";
+    private const string SFixContentPaths = "fixContentPaths";
+    private const string SFixMediaPathsTitle = "Fix media paths";
+    private const string SFixContentPathsTitle = "Fix content paths";
+    private readonly IContentService _contentService;
+    private readonly IMediaService _mediaService;
+
     /// <summary>
-    /// Health check for the integrity of the data in the database.
+    ///     Initializes a new instance of the <see cref="DatabaseIntegrityCheck" /> class.
     /// </summary>
-    [HealthCheck(
-        "73DD0C1C-E0CA-4C31-9564-1DCA509788AF",
-        "Database data integrity check",
-        Description = "Checks for various data integrity issues in the Umbraco database.",
-        Group = "Data Integrity")]
-    public class DatabaseIntegrityCheck : HealthCheck
+    public DatabaseIntegrityCheck(
+        IContentService contentService,
+        IMediaService mediaService)
     {
-        private readonly IContentService _contentService;
-        private readonly IMediaService _mediaService;
-        private const string SSsFixMediaPaths = "fixMediaPaths";
-        private const string SFixContentPaths = "fixContentPaths";
-        private const string SFixMediaPathsTitle = "Fix media paths";
-        private const string SFixContentPathsTitle = "Fix content paths";
+        _contentService = contentService;
+        _mediaService = mediaService;
+    }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DatabaseIntegrityCheck"/> class.
-        /// </summary>
-        public DatabaseIntegrityCheck(
-            IContentService contentService,
-            IMediaService mediaService)
+    /// <summary>
+    ///     Get the status for this health check
+    /// </summary>
+    public override Task<IEnumerable<HealthCheckStatus>> GetStatus() =>
+        Task.FromResult((IEnumerable<HealthCheckStatus>)new[] { CheckDocuments(false), CheckMedia(false) });
+
+    /// <inheritdoc />
+    public override HealthCheckStatus ExecuteAction(HealthCheckAction action)
+    {
+        switch (action.Alias)
         {
-            _contentService = contentService;
-            _mediaService = mediaService;
+            case SFixContentPaths:
+                return CheckDocuments(true);
+            case SSsFixMediaPaths:
+                return CheckMedia(true);
+            default:
+                throw new InvalidOperationException("Action not supported");
         }
+    }
 
-        /// <summary>
-        /// Get the status for this health check
-        /// </summary>
-        public override Task<IEnumerable<HealthCheckStatus>> GetStatus() =>
-            Task.FromResult((IEnumerable<HealthCheckStatus>)new[]
-            {
-                CheckDocuments(false),
-                CheckMedia(false)
-            });
+    private static string GetReport(ContentDataIntegrityReport report, string entityType, bool detailed)
+    {
+        var sb = new StringBuilder();
 
-        private HealthCheckStatus CheckMedia(bool fix) =>
-            CheckPaths(
-                SSsFixMediaPaths,
-                SFixMediaPathsTitle,
-                Constants.UdiEntityType.Media,
-                fix,
-                () => _mediaService.CheckDataIntegrity(new ContentDataIntegrityReportOptions { FixIssues = fix }));
-
-        private HealthCheckStatus CheckDocuments(bool fix) =>
-            CheckPaths(
-                SFixContentPaths,
-                SFixContentPathsTitle,
-                Constants.UdiEntityType.Document,
-                fix,
-                () => _contentService.CheckDataIntegrity(new ContentDataIntegrityReportOptions { FixIssues = fix }));
-
-        private HealthCheckStatus CheckPaths(string actionAlias, string actionName, string entityType, bool detailedReport, Func<ContentDataIntegrityReport> doCheck)
+        if (report.Ok)
         {
-            ContentDataIntegrityReport report = doCheck();
+            sb.AppendLine($"<p>All {entityType} paths are valid</p>");
 
-            var actions = new List<HealthCheckAction>();
-            if (!report.Ok)
+            if (!detailed)
             {
-                actions.Add(new HealthCheckAction(actionAlias, Id)
-                {
-                    Name = actionName
-                });
-            }
-
-            return new HealthCheckStatus(GetReport(report, entityType, detailedReport))
-            {
-                ResultType = report.Ok ? StatusResultType.Success : StatusResultType.Error,
-                Actions = actions
-            };
-        }
-
-        private static string GetReport(ContentDataIntegrityReport report, string entityType, bool detailed)
-        {
-            var sb = new StringBuilder();
-
-            if (report.Ok)
-            {
-                sb.AppendLine($"<p>All {entityType} paths are valid</p>");
-
-                if (!detailed)
-                {
-                    return sb.ToString();
-                }
-            }
-            else
-            {
-                sb.AppendLine($"<p>{report.DetectedIssues.Count} invalid {entityType} paths detected.</p>");
-            }
-
-            if (detailed && report.DetectedIssues.Count > 0)
-            {
-                sb.AppendLine("<ul>");
-                foreach (IGrouping<ContentDataIntegrityReport.IssueType, KeyValuePair<int, ContentDataIntegrityReportEntry>> issueGroup in report.DetectedIssues.GroupBy(x => x.Value.IssueType))
-                {
-                    var countByGroup = issueGroup.Count();
-                    var fixedByGroup = issueGroup.Count(x => x.Value.Fixed);
-                    sb.AppendLine("<li>");
-                    sb.AppendLine($"{countByGroup} issues of type <code>{issueGroup.Key}</code> ... {fixedByGroup} fixed");
-                    sb.AppendLine("</li>");
-                }
-
-                sb.AppendLine("</ul>");
-            }
-
-            return sb.ToString();
-        }
-
-        /// <inheritdoc/>
-        public override HealthCheckStatus ExecuteAction(HealthCheckAction action)
-        {
-            switch (action.Alias)
-            {
-                case SFixContentPaths:
-                    return CheckDocuments(true);
-                case SSsFixMediaPaths:
-                    return CheckMedia(true);
-                default:
-                    throw new InvalidOperationException("Action not supported");
+                return sb.ToString();
             }
         }
+        else
+        {
+            sb.AppendLine($"<p>{report.DetectedIssues.Count} invalid {entityType} paths detected.</p>");
+        }
+
+        if (detailed && report.DetectedIssues.Count > 0)
+        {
+            sb.AppendLine("<ul>");
+            foreach (IGrouping<ContentDataIntegrityReport.IssueType, KeyValuePair<int, ContentDataIntegrityReportEntry>>
+                         issueGroup in report.DetectedIssues.GroupBy(x => x.Value.IssueType))
+            {
+                var countByGroup = issueGroup.Count();
+                var fixedByGroup = issueGroup.Count(x => x.Value.Fixed);
+                sb.AppendLine("<li>");
+                sb.AppendLine($"{countByGroup} issues of type <code>{issueGroup.Key}</code> ... {fixedByGroup} fixed");
+                sb.AppendLine("</li>");
+            }
+
+            sb.AppendLine("</ul>");
+        }
+
+        return sb.ToString();
+    }
+
+    private HealthCheckStatus CheckMedia(bool fix) =>
+        CheckPaths(
+            SSsFixMediaPaths,
+            SFixMediaPathsTitle,
+            Constants.UdiEntityType.Media,
+            fix,
+            () => _mediaService.CheckDataIntegrity(new ContentDataIntegrityReportOptions { FixIssues = fix }));
+
+    private HealthCheckStatus CheckDocuments(bool fix) =>
+        CheckPaths(
+            SFixContentPaths,
+            SFixContentPathsTitle,
+            Constants.UdiEntityType.Document,
+            fix,
+            () => _contentService.CheckDataIntegrity(new ContentDataIntegrityReportOptions { FixIssues = fix }));
+
+    private HealthCheckStatus CheckPaths(string actionAlias, string actionName, string entityType, bool detailedReport, Func<ContentDataIntegrityReport> doCheck)
+    {
+        ContentDataIntegrityReport report = doCheck();
+
+        var actions = new List<HealthCheckAction>();
+        if (!report.Ok)
+        {
+            actions.Add(new HealthCheckAction(actionAlias, Id) { Name = actionName });
+        }
+
+        return new HealthCheckStatus(GetReport(report, entityType, detailedReport))
+        {
+            ResultType = report.Ok ? StatusResultType.Success : StatusResultType.Error,
+            Actions = actions,
+        };
     }
 }

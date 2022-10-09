@@ -910,7 +910,7 @@ public static class HtmlHelperRenderExtensions
     /// <summary>
     ///     Will take the first non-null value in the collection and return the value of it.
     /// </summary>
-    public static string Coalesce(this IHtmlHelper helper, params object[] args)
+    public static string Coalesce(this IHtmlHelper helper, params object?[] args)
         => s_stringUtilities.Coalesce(args);
 
     /// <summary>

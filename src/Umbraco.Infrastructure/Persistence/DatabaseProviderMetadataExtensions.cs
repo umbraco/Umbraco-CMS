@@ -27,7 +27,7 @@ public static class DatabaseProviderMetadataExtensions
     ///   <c>true</c> if a database can be created for the specified provider name; otherwise, <c>false</c>.
     /// </returns>
     public static bool CanForceCreateDatabase(this IEnumerable<IDatabaseProviderMetadata> databaseProviderMetadata, string? providerName)
-        => databaseProviderMetadata.FirstOrDefault(x => x.ProviderName == providerName)?.ForceCreateDatabase == true;
+        => databaseProviderMetadata.FirstOrDefault(x => string.Equals(x.ProviderName, providerName, StringComparison.InvariantCultureIgnoreCase))?.ForceCreateDatabase == true;
 
     /// <summary>
     /// Generates the connection string.

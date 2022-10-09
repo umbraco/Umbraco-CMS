@@ -89,6 +89,10 @@ angular.module("umbraco")
               
                 Utilities.extend(baseLineConfigObj, standardConfig);
 
+                // Readonly mode
+                baseLineConfigObj.toolbar = $scope.readonly ? false : baseLineConfigObj.toolbar;
+                baseLineConfigObj.readonly = $scope.readonly ? 1 : baseLineConfigObj.readonly;
+
                 // We need to wait for DOM to have rendered before we can find the element by ID.
                 $timeout(function () {
                     tinymce.init(baseLineConfigObj);

@@ -1,18 +1,17 @@
-using System;
 using Umbraco.Cms.Core.PublishedCache;
 
-namespace Umbraco.Extensions
-{
-    public static class PublishedSnapshotAccessorExtensions
-    {
-        public static IPublishedSnapshot GetRequiredPublishedSnapshot(this IPublishedSnapshotAccessor publishedSnapshotAccessor)
-        {
-            if (publishedSnapshotAccessor.TryGetPublishedSnapshot(out var publishedSnapshot))
-            {
-                return publishedSnapshot!;
-            }
+namespace Umbraco.Extensions;
 
-            throw new InvalidOperationException("Wasn't possible to a get a valid Snapshot");
+public static class PublishedSnapshotAccessorExtensions
+{
+    public static IPublishedSnapshot GetRequiredPublishedSnapshot(
+        this IPublishedSnapshotAccessor publishedSnapshotAccessor)
+    {
+        if (publishedSnapshotAccessor.TryGetPublishedSnapshot(out IPublishedSnapshot? publishedSnapshot))
+        {
+            return publishedSnapshot!;
         }
+
+        throw new InvalidOperationException("Wasn't possible to a get a valid Snapshot");
     }
 }

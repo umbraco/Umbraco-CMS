@@ -1,17 +1,14 @@
-using System;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Core
+namespace Umbraco.Cms.Core;
+
+/// <summary>
+///     Currently just used to get the machine name for use with file names
+/// </summary>
+internal class EnvironmentHelper
 {
     /// <summary>
-    /// Currently just used to get the machine name for use with file names
+    ///     Returns the machine name that is safe to use in file paths.
     /// </summary>
-    internal class EnvironmentHelper
-    {
-        /// <summary>
-        /// Returns the machine name that is safe to use in file paths.
-        /// </summary>
-        public static string FileSafeMachineName => Environment.MachineName.ReplaceNonAlphanumericChars('-');
-
-    }
+    public static string FileSafeMachineName => Environment.MachineName.ReplaceNonAlphanumericChars('-');
 }

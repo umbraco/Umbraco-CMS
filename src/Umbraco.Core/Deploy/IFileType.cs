@@ -1,32 +1,27 @@
-﻿using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
+namespace Umbraco.Cms.Core.Deploy;
 
-namespace Umbraco.Cms.Core.Deploy
+public interface IFileType
 {
-    public interface IFileType
-    {
-        Stream GetStream(StringUdi udi);
+    bool CanSetPhysical { get; }
 
-        Task<Stream> GetStreamAsync(StringUdi udi, CancellationToken token);
+    Stream GetStream(StringUdi udi);
 
-        Stream GetChecksumStream(StringUdi udi);
+    Task<Stream> GetStreamAsync(StringUdi udi, CancellationToken token);
 
-        long GetLength(StringUdi udi);
+    Stream GetChecksumStream(StringUdi udi);
 
-        void SetStream(StringUdi udi, Stream stream);
+    long GetLength(StringUdi udi);
 
-        Task SetStreamAsync(StringUdi udi, Stream stream, CancellationToken token);
+    void SetStream(StringUdi udi, Stream stream);
 
-        bool CanSetPhysical { get; }
+    Task SetStreamAsync(StringUdi udi, Stream stream, CancellationToken token);
 
-        void Set(StringUdi udi, string physicalPath, bool copy = false);
+    void Set(StringUdi udi, string physicalPath, bool copy = false);
 
-        // this is not pretty as *everywhere* in Deploy we take care of ignoring
-        // the physical path and always rely on Core's virtual IFileSystem but
-        // Cloud wants to add some of these files to Git and needs the path...
-        string GetPhysicalPath(StringUdi udi);
+    // this is not pretty as *everywhere* in Deploy we take care of ignoring
+    // the physical path and always rely on Core's virtual IFileSystem but
+    // Cloud wants to add some of these files to Git and needs the path...
+    string GetPhysicalPath(StringUdi udi);
 
-        string GetVirtualPath(StringUdi udi);
-    }
+    string GetVirtualPath(StringUdi udi);
 }

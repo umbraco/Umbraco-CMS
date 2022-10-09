@@ -1,10 +1,9 @@
-﻿namespace Umbraco.Cms.Core.PropertyEditors
+namespace Umbraco.Cms.Core.PropertyEditors;
+
+/// <summary>
+///     Marker interface for any editor configuration that supports Ignoring user start nodes
+/// </summary>
+public interface IIgnoreUserStartNodesConfig
 {
-    /// <summary>
-    /// Marker interface for any editor configuration that supports Ignoring user start nodes
-    /// </summary>
-    public interface IIgnoreUserStartNodesConfig
-    {
-        bool IgnoreUserStartNodes { get; set; }
-    }
+    bool IgnoreUserStartNodes { get; set; }
 }

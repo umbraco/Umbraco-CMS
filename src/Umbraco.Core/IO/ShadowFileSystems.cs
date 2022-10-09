@@ -1,34 +1,26 @@
-﻿namespace Umbraco.Cms.Core.IO
+namespace Umbraco.Cms.Core.IO;
+
+// shadow filesystems is definitively ... too convoluted
+internal class ShadowFileSystems : ICompletable
 {
-    // shadow filesystems is definitively ... too convoluted
+    private readonly FileSystems _fileSystems;
+    private bool _completed;
 
-    internal class ShadowFileSystems : ICompletable
+    // invoked by the filesystems when shadowing
+    public ShadowFileSystems(FileSystems fileSystems, string id)
     {
-        private readonly FileSystems _fileSystems;
-        private bool _completed;
+        _fileSystems = fileSystems;
+        Id = id;
 
-        // invoked by the filesystems when shadowing
-        public ShadowFileSystems(FileSystems fileSystems, string id)
-        {
-            _fileSystems = fileSystems;
-            Id = id;
-
-            _fileSystems.BeginShadow(id);
-        }
-
-        // for tests
-        public string Id { get; }
-
-        // invoked by the scope when exiting, if completed
-        public void Complete()
-        {
-            _completed = true;
-        }
-
-        // invoked by the scope when exiting
-        public void Dispose()
-        {
-            _fileSystems.EndShadow(Id, _completed);
-        }
+        _fileSystems.BeginShadow(id);
     }
+
+    // for tests
+    public string Id { get; }
+
+    // invoked by the scope when exiting, if completed
+    public void Complete() => _completed = true;
+
+    // invoked by the scope when exiting
+    public void Dispose() => _fileSystems.EndShadow(Id, _completed);
 }

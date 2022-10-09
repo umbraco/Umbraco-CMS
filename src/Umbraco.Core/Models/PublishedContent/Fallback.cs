@@ -1,75 +1,63 @@
-﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 
-namespace Umbraco.Cms.Core.Models.PublishedContent
+namespace Umbraco.Cms.Core.Models.PublishedContent;
+
+/// <summary>
+///     Manages the built-in fallback policies.
+/// </summary>
+public struct Fallback : IEnumerable<int>
 {
     /// <summary>
-    /// Manages the built-in fallback policies.
+    ///     Do not fallback.
     /// </summary>
-    public struct Fallback : IEnumerable<int>
-    {
-        private readonly int[] _values;
+    public const int None = 0;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Fallback"/> struct with values.
-        /// </summary>
-        private Fallback(int[] values)
-        {
-            _values = values;
-        }
+    private readonly int[] _values;
 
-        /// <summary>
-        /// Gets an ordered set of fallback policies.
-        /// </summary>
-        /// <param name="values"></param>
-        public static Fallback To(params int[] values) => new Fallback(values);
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="Fallback" /> struct with values.
+    /// </summary>
+    private Fallback(int[] values) => _values = values;
 
-        /// <summary>
-        /// Do not fallback.
-        /// </summary>
-        public const int None = 0;
+    /// <summary>
+    ///     Gets an ordered set of fallback policies.
+    /// </summary>
+    /// <param name="values"></param>
+    public static Fallback To(params int[] values) => new(values);
 
-        /// <summary>
-        /// Fallback to default value.
-        /// </summary>
-        public const int DefaultValue = 1;
+    /// <summary>
+    ///     Fallback to default value.
+    /// </summary>
+    public const int DefaultValue = 1;
 
-        /// <summary>
-        /// Gets the fallback to default value policy.
-        /// </summary>
-        public static Fallback ToDefaultValue => new Fallback(new[] { DefaultValue });
+    /// <summary>
+    ///     Fallback to other languages.
+    /// </summary>
+    public const int Language = 2;
 
-        /// <summary>
-        /// Fallback to other languages.
-        /// </summary>
-        public const int Language = 2;
+    /// <summary>
+    ///     Fallback to tree ancestors.
+    /// </summary>
+    public const int Ancestors = 3;
 
-        /// <summary>
-        /// Gets the fallback to language policy.
-        /// </summary>
-        public static Fallback ToLanguage => new Fallback(new[] { Language });
+    /// <summary>
+    ///     Gets the fallback to default value policy.
+    /// </summary>
+    public static Fallback ToDefaultValue => new(new[] { DefaultValue });
 
-        /// <summary>
-        /// Fallback to tree ancestors.
-        /// </summary>
-        public const int Ancestors = 3;
+    /// <summary>
+    ///     Gets the fallback to language policy.
+    /// </summary>
+    public static Fallback ToLanguage => new(new[] { Language });
 
-        /// <summary>
-        /// Gets the fallback to tree ancestors policy.
-        /// </summary>
-        public static Fallback ToAncestors => new Fallback(new[] { Ancestors });
+    /// <summary>
+    ///     Gets the fallback to tree ancestors policy.
+    /// </summary>
+    public static Fallback ToAncestors => new(new[] { Ancestors });
 
-        /// <inheritdoc />
-        public IEnumerator<int> GetEnumerator()
-        {
-            return ((IEnumerable<int>)_values ?? Array.Empty<int>()).GetEnumerator();
-        }
+    /// <inheritdoc />
+    public IEnumerator<int> GetEnumerator() => ((IEnumerable<int>)_values ?? Array.Empty<int>()).GetEnumerator();
 
-        /// <inheritdoc />
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-    }
+    /// <inheritdoc />
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }

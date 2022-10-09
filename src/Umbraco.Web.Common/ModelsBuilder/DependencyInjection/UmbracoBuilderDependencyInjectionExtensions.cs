@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
@@ -81,8 +82,7 @@ public static class UmbracoBuilderDependencyInjectionExtensions
     /// </summary>
     public static IUmbracoBuilder AddModelsBuilder(this IUmbracoBuilder builder)
     {
-        var umbServices =
-            new UniqueServiceDescriptor(typeof(UmbracoServices), typeof(UmbracoServices), ServiceLifetime.Singleton);
+        var umbServices = new UniqueServiceDescriptor(typeof(UmbracoServices), typeof(UmbracoServices), ServiceLifetime.Singleton);
         if (builder.Services.Contains(umbServices))
         {
             // if this ext method is called more than once just exit
@@ -91,43 +91,34 @@ public static class UmbracoBuilderDependencyInjectionExtensions
 
         builder.Services.Add(umbServices);
 
-        builder.AddInMemoryModelsRazorEngine();
+        if (builder.Config.GetRuntimeMode() == RuntimeMode.BackofficeDevelopment)
+        {
+            // Configure services to allow InMemoryAuto mode
+            builder.AddInMemoryModelsRazorEngine();
 
-        // TODO: I feel like we could just do builder.AddNotificationHandler<ModelsBuilderNotificationHandler>() and it
-        // would automatically just register for all implemented INotificationHandler{T}?
-        builder.AddNotificationHandler<TemplateSavingNotification, ModelsBuilderNotificationHandler>();
-        builder.AddNotificationHandler<ServerVariablesParsingNotification, ModelsBuilderNotificationHandler>();
-        builder.AddNotificationHandler<ModelBindingErrorNotification, ModelsBuilderNotificationHandler>();
-        builder.AddNotificationHandler<UmbracoApplicationStartingNotification, AutoModelsNotificationHandler>();
-        builder.AddNotificationHandler<UmbracoRequestEndNotification, AutoModelsNotificationHandler>();
-        builder.AddNotificationHandler<ContentTypeCacheRefresherNotification, AutoModelsNotificationHandler>();
-        builder.AddNotificationHandler<DataTypeCacheRefresherNotification, AutoModelsNotificationHandler>();
+            builder.AddNotificationHandler<ModelBindingErrorNotification, ModelsBuilderNotificationHandler>();
+            builder.AddNotificationHandler<ContentTypeCacheRefresherNotification, OutOfDateModelsStatus>();
+            builder.AddNotificationHandler<DataTypeCacheRefresherNotification, OutOfDateModelsStatus>();
+        }
 
+        if (builder.Config.GetRuntimeMode() != RuntimeMode.Production)
+        {
+            // Configure service to allow models generation
+            builder.AddNotificationHandler<ServerVariablesParsingNotification, ModelsBuilderNotificationHandler>();
+            builder.AddNotificationHandler<TemplateSavingNotification, ModelsBuilderNotificationHandler>();
+
+            builder.AddNotificationHandler<UmbracoApplicationStartingNotification, AutoModelsNotificationHandler>();
+            builder.AddNotificationHandler<UmbracoRequestEndNotification, AutoModelsNotificationHandler>();
+            builder.AddNotificationHandler<ContentTypeCacheRefresherNotification, AutoModelsNotificationHandler>();
+            builder.AddNotificationHandler<DataTypeCacheRefresherNotification, AutoModelsNotificationHandler>();
+        }
+
+        builder.Services.TryAddSingleton<IModelsBuilderDashboardProvider, NoopModelsBuilderDashboardProvider>();
+
+        // Register required services for ModelsBuilderDashboardController
         builder.Services.AddSingleton<ModelsGenerator>();
         builder.Services.AddSingleton<OutOfDateModelsStatus>();
-        builder.AddNotificationHandler<ContentTypeCacheRefresherNotification, OutOfDateModelsStatus>();
-        builder.AddNotificationHandler<DataTypeCacheRefresherNotification, OutOfDateModelsStatus>();
         builder.Services.AddSingleton<ModelsGenerationError>();
-
-        builder.Services.AddSingleton<InMemoryModelFactory>();
-
-        // This is what the community MB would replace, all of the above services are fine to be registered
-        // even if the community MB is in place.
-        builder.Services.AddSingleton<IPublishedModelFactory>(factory =>
-        {
-            ModelsBuilderSettings config = factory.GetRequiredService<IOptions<ModelsBuilderSettings>>().Value;
-            if (config.ModelsMode == ModelsMode.InMemoryAuto)
-            {
-                return factory.GetRequiredService<InMemoryModelFactory>();
-            }
-
-            return factory.CreateDefaultPublishedModelFactory();
-        });
-
-        if (!builder.Services.Any(x => x.ServiceType == typeof(IModelsBuilderDashboardProvider)))
-        {
-            builder.Services.AddUnique<IModelsBuilderDashboardProvider, NoopModelsBuilderDashboardProvider>();
-        }
 
         return builder;
     }
@@ -151,6 +142,23 @@ public static class UmbracoBuilderDependencyInjectionExtensions
                     return recreatedServices.GetRequiredService<IRazorViewEngine>();
                 },
                 s.GetRequiredService<InMemoryModelFactory>()));
+
+        builder.Services.AddSingleton<InMemoryModelFactory>();
+
+        // This is what the community MB would replace, all of the above services are fine to be registered
+        // even if the community MB is in place.
+        builder.Services.AddSingleton<IPublishedModelFactory>(factory =>
+        {
+            ModelsBuilderSettings modelsBuilderSettings = factory.GetRequiredService<IOptions<ModelsBuilderSettings>>().Value;
+            if (modelsBuilderSettings.ModelsMode == ModelsMode.InMemoryAuto)
+            {
+                return factory.GetRequiredService<InMemoryModelFactory>();
+            }
+            else
+            {
+                return factory.CreateDefaultPublishedModelFactory();
+            }
+        });
 
         return builder;
     }

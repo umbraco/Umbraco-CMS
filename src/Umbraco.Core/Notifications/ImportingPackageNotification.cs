@@ -1,16 +1,10 @@
-using Umbraco.Cms.Core.Models.Packaging;
+namespace Umbraco.Cms.Core.Notifications;
 
-namespace Umbraco.Cms.Core.Notifications
+public class ImportingPackageNotification : StatefulNotification, ICancelableNotification
 {
-    public class ImportingPackageNotification : StatefulNotification, ICancelableNotification
-    {
-        public ImportingPackageNotification(string packageName)
-        {
-            PackageName = packageName;        
-        }
+    public ImportingPackageNotification(string packageName) => PackageName = packageName;
 
-        public string PackageName { get; }
+    public string PackageName { get; }
 
-        public bool Cancel { get; set; }
-    }
+    public bool Cancel { get; set; }
 }

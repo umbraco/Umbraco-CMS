@@ -1,14 +1,11 @@
-using System;
-using System.Collections.Generic;
 using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Cms.Core.Persistence.Repositories
-{
-    [Obsolete("This interface will be merged with IMacroRepository in Umbraco 11")]
-    public interface IMacroWithAliasRepository : IMacroRepository
-    {
-        IMacro? GetByAlias(string alias);
+namespace Umbraco.Cms.Core.Persistence.Repositories;
 
-        IEnumerable<IMacro> GetAllByAlias(string[] aliases);
-    }
+[Obsolete("This interface will be merged with IMacroRepository in Umbraco 11")]
+public interface IMacroWithAliasRepository : IMacroRepository
+{
+    IMacro? GetByAlias(string alias);
+
+    IEnumerable<IMacro> GetAllByAlias(string[] aliases);
 }

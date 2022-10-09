@@ -4,7 +4,7 @@ using Umbraco.Cms.Persistence.Sqlite.Mappers;
 namespace Umbraco.Cms.Persistence.Sqlite.Services;
 
 /// <summary>
-/// Implements <see cref="IProviderSpecificMapperFactory"/> for SQLite.
+///     Implements <see cref="IProviderSpecificMapperFactory" /> for SQLite.
 /// </summary>
 public class SqliteSpecificMapperFactory : IProviderSpecificMapperFactory
 {
@@ -12,5 +12,5 @@ public class SqliteSpecificMapperFactory : IProviderSpecificMapperFactory
     public string ProviderName => Constants.ProviderName;
 
     /// <inheritdoc />
-    public NPocoMapperCollection Mappers => new NPocoMapperCollection(() => new[] { new SqlitePocoGuidMapper() });
+    public NPocoMapperCollection Mappers => new(() => new[] { new SqlitePocoGuidMapper() });
 }

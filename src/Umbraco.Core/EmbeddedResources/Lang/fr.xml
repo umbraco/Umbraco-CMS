@@ -390,7 +390,7 @@
     <key alias="anchorInsert">Nom</key>
     <key alias="closeThisWindow">Fermer cette fenêtre</key>
     <key alias="confirmdelete">Êtes-vous certain(e) de vouloir supprimer</key>
-    <key alias="confirmdeleteNumberOfItems"><![CDATA[Êtes-vous certain(e) de vouloir supprimer <b>%0%</b> des <b>%1%</b> éléments]]></key>
+    <key alias="confirmdeleteNumberOfItems"><![CDATA[Êtes-vous certain(e) de vouloir supprimer <strong>%0%</strong> des <strong>%1%</strong> éléments]]></key>
     <key alias="confirmdisable">Êtes-vous certain(e) de vouloir désactiver</key>
     <key alias="confirmlogout">Êtes-vous certain(e)?</key>
     <key alias="confirmSure">Êtes-vous certain(e)?</key>
@@ -799,7 +799,7 @@
       poursuivre. ]]></key>
     <key alias="databaseUpToDate"><![CDATA[Votre base de données est à jour ! Cliquez sur <strong>Suivant</strong> pour poursuivre la configuration]]></key>
     <key alias="defaultUserChangePass"><![CDATA[<strong>Le mot de passe par défaut doit être modifié !</strong>]]></key>
-    <key alias="defaultUserDisabled"><![CDATA[<strong>L'utilisateur par défaut a été désactivé ou n'a pas accès à Umbraco!</strong></p><p>Aucune autre action n'est requise. Cliquez sur <b>Suivant</b> pour poursuivre.]]></key>
+    <key alias="defaultUserDisabled"><![CDATA[<strong>L'utilisateur par défaut a été désactivé ou n'a pas accès à Umbraco!</strong></p><p>Aucune autre action n'est requise. Cliquez sur <strong>Suivant</strong> pour poursuivre.]]></key>
     <key alias="defaultUserPassChanged"><![CDATA[<strong>Le mot de passe par défaut a été modifié avec succès depuis l'installation!</strong></p><p>Aucune autre action n'est requise. Cliquez sur <strong>Suivant</strong> pour poursuivre.]]></key>
     <key alias="defaultUserPasswordChanged">Le mot de passe a été modifié !</key>
     <key alias="greatStart">Pour bien commencer, regardez nos vidéos d'introduction</key>
@@ -2177,12 +2177,12 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
 				   Umbraco est actuellement exécuté en mode debug. Cela signifie que vous pouvez utiliser le profileur de performances intégré pour évaluer les performance lors du rendu des pages.
                 </p>
                 <p>
-                    Si vous souhaitez activer le profileur pour le rendu d'une page spécifique, ajoutez simplement <b>umbDebug=true</b> au querystring lorsque vous demandez la page.
+                    Si vous souhaitez activer le profileur pour le rendu d'une page spécifique, ajoutez simplement <strong>umbDebug=true</strong> au querystring lorsque vous demandez la page.
                 </p>
                 <p>
                     Si vous souhaitez que le profileur soit activé par défaut pour tous les rendus de pages, vous pouvez utiliser le bouton bascule ci-dessous.
 					Cela créera un cookie dans votre browser, qui activera alors le profileur automatiquement.
-                    En d'autres termes, le profileur ne sera activé par défaut que dans <i>votre</i> browser - pas celui des autres.
+                    En d'autres termes, le profileur ne sera activé par défaut que dans <em>votre</em> browser - pas celui des autres.
                 </p>
         ]]>
     </key>

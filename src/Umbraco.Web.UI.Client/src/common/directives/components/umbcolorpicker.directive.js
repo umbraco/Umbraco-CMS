@@ -76,12 +76,16 @@
 (function () {
     'use strict';
 
-    function ColorPickerController($scope, $element, $timeout, assetsService, localizationService) {
+    function ColorPickerController($scope, $element, $timeout, assetsService, localizationService, $attrs) {
 
         const ctrl = this;
 
         let colorPickerInstance = null;
         let labels = {};
+        let options = null;
+
+        ctrl.readonly = false;
+        ctrl.value = null;
 
         ctrl.$onInit = function () {
 
@@ -104,6 +108,20 @@
                 colorPickerInstance.spectrum("set", changes.ngModel.currentValue);
             }
         }
+
+        $attrs.$observe('readonly', (value) => {
+            ctrl.readonly = value !== undefined;
+
+            if (!colorPickerInstance) {
+                return;
+            }
+
+            if (ctrl.readonly) {
+                colorPickerInstance.spectrum('disable');
+            } else {
+                colorPickerInstance.spectrum('enable');
+            }
+        });
 
         function grabElementAndRun() {
 
@@ -149,7 +167,7 @@
             }
 
             //const options = ctrl.options ? ctrl.options : defaultOptions;
-            const options = Utilities.extend(defaultOptions, ctrl.options);
+            options = Utilities.extend(defaultOptions, ctrl.options);
 
             var elem = angular.element(element);
 
@@ -159,6 +177,19 @@
             colorPickerInstance = colorPicker;
 
             if (colorPickerInstance) {
+                
+                if (ctrl.readonly) {
+                    colorPickerInstance.spectrum('disable');
+                }
+
+                const tinyColor = colorPickerInstance.spectrum("get");
+                ctrl.value = getColorString(tinyColor, options.preferredFormat);
+
+                colorPickerInstance.on('change', (e, tinyColor) => {
+                    ctrl.value = getColorString(tinyColor, options.preferredFormat);
+                    $scope.$applyAsync();
+                });
+
                 // destroy the color picker instance when the dom element is removed
                 elem.on('$destroy', function () {
                     colorPickerInstance.spectrum('destroy');
@@ -242,12 +273,31 @@
 
             }
         }
+
+        function getColorString (tinyColor, format) {
+            if (!tinyColor) {
+                return;
+            }
+
+            switch(format) {
+                case 'rgb':
+                  return tinyColor.toRgbString();
+                case 'hsv':
+                  return tinyColor.toHsvString();
+                case 'hsl':
+                    return tinyColor.toHslString();
+                case 'name':
+                    return tinyColor.toName();
+                default:
+                    return tinyColor.toHexString();
+              }
+        }
     }
 
     angular
         .module('umbraco.directives')
         .component('umbColorPicker', {
-            template: '<div class="umb-color-picker"><input type="hidden" /></div>',
+            template: '<div class="flex items-center"><div class="umb-color-picker"><input type="hidden" /></div><small ng-if="$ctrl.readonly">{{ $ctrl.value }}</small></div>',
             controller: ColorPickerController,
             bindings: {
                 ngModel: '<',

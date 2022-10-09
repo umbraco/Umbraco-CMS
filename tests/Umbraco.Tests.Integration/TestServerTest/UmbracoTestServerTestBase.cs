@@ -26,7 +26,6 @@ using Umbraco.Cms.Tests.Integration.DependencyInjection;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Cms.Web.Common.Controllers;
-using Umbraco.Cms.Web.Common.Hosting;
 using Umbraco.Cms.Web.Website.Controllers;
 using Umbraco.Extensions;
 
@@ -41,6 +40,16 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
         protected LinkGenerator LinkGenerator { get; private set; }
 
         protected WebApplicationFactory<UmbracoTestServerTestBase> Factory { get; private set; }
+
+        /// <summary>
+        ///  Hook for altering UmbracoBuilder setup
+        /// </summary>
+        /// <remarks>
+        /// Can also be used for registering test doubles.
+        /// </remarks>
+        protected virtual void CustomTestSetup(IUmbracoBuilder builder)
+        {
+        }
 
         [SetUp]
         public void Setup()
@@ -233,8 +242,10 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
                 .AddWebsite()
                 .AddUmbracoSqlServerSupport()
                 .AddUmbracoSqliteSupport()
-                .AddTestServices(TestHelper) // This is the important one!
-                .Build();
+                .AddTestServices(TestHelper); // This is the important one!
+
+            CustomTestSetup(builder);
+            builder.Build();
         }
 
         /// <summary>
@@ -242,6 +253,7 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
         /// </summary>
         protected virtual void ConfigureTestServices(IServiceCollection services)
         {
+            
         }
 
         protected void Configure(IApplicationBuilder app)

@@ -1,18 +1,17 @@
-﻿namespace Umbraco.Cms.Core.Configuration.UmbracoSettings
+namespace Umbraco.Cms.Core.Configuration.UmbracoSettings;
+
+public interface IImagingAutoFillUploadField
 {
-    public interface IImagingAutoFillUploadField
-    {
-        /// <summary>
-        /// Allow setting internally so we can create a default
-        /// </summary>
-        string Alias { get; }
+    /// <summary>
+    ///     Allow setting internally so we can create a default
+    /// </summary>
+    string Alias { get; }
 
-        string WidthFieldAlias { get; }
+    string WidthFieldAlias { get; }
 
-        string HeightFieldAlias { get; }
+    string HeightFieldAlias { get; }
 
-        string LengthFieldAlias { get; }
+    string LengthFieldAlias { get; }
 
-        string ExtensionFieldAlias { get; }
-    }
+    string ExtensionFieldAlias { get; }
 }

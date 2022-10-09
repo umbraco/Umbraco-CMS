@@ -13,36 +13,36 @@ using Microsoft.Extensions.Hosting.Internal;
 using Microsoft.Extensions.Logging;
 using Moq;
 
-namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Routing
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Routing;
+
+public class TestRouteBuilder : IEndpointRouteBuilder
 {
-    public class TestRouteBuilder : IEndpointRouteBuilder
+    private readonly ServiceProvider _serviceProvider;
+
+    public TestRouteBuilder()
     {
-        private readonly ServiceProvider _serviceProvider;
+        var services = new ServiceCollection();
 
-        public TestRouteBuilder()
-        {
-            var services = new ServiceCollection();
+        var diagnosticListener = new DiagnosticListener("UnitTests");
+        services.AddSingleton<DiagnosticSource>(diagnosticListener);
+        services.AddSingleton(diagnosticListener);
 
-            var diagnosticListener = new DiagnosticListener("UnitTests");
-            services.AddSingleton<DiagnosticSource>(diagnosticListener);
-            services.AddSingleton<DiagnosticListener>(diagnosticListener);
+        services.AddLogging();
+        services.AddMvc();
+        services.AddSingleton<IHostApplicationLifetime>(x =>
+            new ApplicationLifetime(x.GetRequiredService<ILogger<ApplicationLifetime>>()));
+        services.AddSignalR();
+        _serviceProvider = services.BuildServiceProvider();
+    }
 
-            services.AddLogging();
-            services.AddMvc();
-            services.AddSingleton<IHostApplicationLifetime>(x => new ApplicationLifetime(x.GetRequiredService<ILogger<ApplicationLifetime>>()));
-            services.AddSignalR();
-            _serviceProvider = services.BuildServiceProvider();
-        }
+    public ICollection<EndpointDataSource> DataSources { get; } = new List<EndpointDataSource>();
 
-        public ICollection<EndpointDataSource> DataSources { get; } = new List<EndpointDataSource>();
+    public IServiceProvider ServiceProvider => _serviceProvider;
 
-        public IServiceProvider ServiceProvider => _serviceProvider;
-
-        public IApplicationBuilder CreateApplicationBuilder()
-        {
-            var mock = new Mock<IApplicationBuilder>();
-            mock.Setup(x => x.Build()).Returns(httpContext => Task.CompletedTask);
-            return mock.Object;
-        }
+    public IApplicationBuilder CreateApplicationBuilder()
+    {
+        var mock = new Mock<IApplicationBuilder>();
+        mock.Setup(x => x.Build()).Returns(httpContext => Task.CompletedTask);
+        return mock.Object;
     }
 }

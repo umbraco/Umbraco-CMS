@@ -1,10 +1,11 @@
 using Microsoft.Extensions.Configuration;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
 
 namespace Umbraco.Extensions;
 
 /// <summary>
-/// Extension methods for configuration.
+/// Extensions for <see cref="IConfiguration" />.
 /// </summary>
 public static class ConfigurationExtensions
 {
@@ -74,7 +75,11 @@ public static class ConfigurationExtensions
         if (!string.IsNullOrEmpty(connectionString))
         {
             // Replace data directory
-            connectionString = ReplaceDataDirectoryPlaceholder(connectionString);
+            string? dataDirectory = AppDomain.CurrentDomain.GetData(DataDirectoryName)?.ToString();
+            if (!string.IsNullOrEmpty(dataDirectory))
+            {
+                connectionString = connectionString.Replace(DataDirectoryPlaceholder, dataDirectory);
+            }
 
             // Get provider name
             providerName = configuration.GetConnectionStringProviderName(name);
@@ -87,17 +92,13 @@ public static class ConfigurationExtensions
         return connectionString;
     }
 
-    internal static string? ReplaceDataDirectoryPlaceholder(string? connectionString)
-    {
-        if (!string.IsNullOrEmpty(connectionString))
-        {
-            string? dataDirectory = AppDomain.CurrentDomain.GetData(DataDirectoryName)?.ToString();
-            if (!string.IsNullOrEmpty(dataDirectory))
-            {
-                return connectionString.Replace(DataDirectoryPlaceholder, dataDirectory);
-            }
-        }
-
-        return connectionString;
-    }
+    /// <summary>
+    /// Gets the Umbraco runtime mode.
+    /// </summary>
+    /// <param name="configuration">The configuration.</param>
+    /// <returns>
+    /// The Umbraco runtime mode.
+    /// </returns>
+    public static RuntimeMode GetRuntimeMode(this IConfiguration configuration)
+        => configuration.GetValue<RuntimeMode>(Constants.Configuration.ConfigRuntimeMode);
 }

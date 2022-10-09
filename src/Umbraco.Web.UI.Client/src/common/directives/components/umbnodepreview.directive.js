@@ -128,9 +128,11 @@
                 allowOpen: "=?",
                 allowRemove: "=?",
                 allowEdit: "=?",
+                allowChange: "=?",
                 onOpen: "&?",
                 onRemove: "&?",
                 onEdit: "&?",
+                onChange: "&?",
                 openUrl: '=?',
                 editUrl: '=?',
                 removeUrl: '=?'

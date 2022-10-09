@@ -1,11 +1,12 @@
-﻿namespace Umbraco.Cms.Core.Events
-{
-    public interface IEventDefinition
-    {
-        object Sender { get; }
-        object Args { get; }
-        string? EventName { get; }
+namespace Umbraco.Cms.Core.Events;
 
-        void RaiseEvent();
-    }
+public interface IEventDefinition
+{
+    object Sender { get; }
+
+    object Args { get; }
+
+    string? EventName { get; }
+
+    void RaiseEvent();
 }

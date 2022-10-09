@@ -1,10 +1,9 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-namespace Umbraco.Cms.Tests.Common.Builders.Interfaces
+namespace Umbraco.Cms.Tests.Common.Builders.Interfaces;
+
+public interface IWithCreatorIdBuilder
 {
-    public interface IWithCreatorIdBuilder
-    {
-        int? CreatorId { get; set; }
-    }
+    int? CreatorId { get; set; }
 }

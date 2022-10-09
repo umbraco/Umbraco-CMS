@@ -1,0 +1,58 @@
+name: Add issues to review project
+
+on:
+  issues:
+    types:
+      - opened
+
+permissions:
+  contents: read
+
+jobs:
+  get-user-type:
+    runs-on: ubuntu-latest
+    outputs:
+      ignored: ${{ steps.set-output.outputs.ignored }}
+    steps:
+      - name: Install dependencies
+        run: |
+          npm install node-fetch@2
+      - uses: actions/github-script@v5
+        name: "Determing HQ user or not"
+        id: set-output
+        with:
+          script: |
+            const fetch = require('node-fetch');
+            const response = await fetch('https://collaboratorsv2.euwest01.umbraco.io/umbraco/api/users/IsIgnoredUser', {
+              method: 'post',
+              body: JSON.stringify('${{ github.event.issue.user.login }}'),
+              headers: {
+                'Authorization': 'Bearer ${{ secrets.OUR_BOT_API_TOKEN }}',
+                'Content-Type': 'application/json'
+              }
+            });
+
+            var isIgnoredUser = true;
+            try {                
+                if(response.status === 200) {
+                    const data = await response.text();
+                    isIgnoredUser = data === "true";
+                } else {
+                    console.log("Returned data not indicate success:", response.status);
+                }
+            } catch(error) {
+                console.log(error);
+            };
+            core.setOutput("ignored", isIgnoredUser);
+            console.log("Ignored is", isIgnoredUser);
+  add-to-project:
+    permissions:
+      repository-projects: write # for actions/add-to-project
+    if: needs.get-user-type.outputs.ignored == 'false'
+    runs-on: ubuntu-latest
+    needs: [get-user-type]
+    steps:
+      - uses: actions/add-to-project@main
+        with:
+          project-url: https://github.com/orgs/${{ github.repository_owner }}/projects/21
+          github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}

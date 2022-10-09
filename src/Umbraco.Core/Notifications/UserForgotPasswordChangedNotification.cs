@@ -1,9 +1,9 @@
-namespace Umbraco.Cms.Core.Notifications
+namespace Umbraco.Cms.Core.Notifications;
+
+public class UserForgotPasswordChangedNotification : UserNotification
 {
-    public class UserForgotPasswordChangedNotification : UserNotification
+    public UserForgotPasswordChangedNotification(string ipAddress, string affectedUserId, string performingUserId)
+        : base(ipAddress, affectedUserId, performingUserId)
     {
-        public UserForgotPasswordChangedNotification(string ipAddress, string affectedUserId, string performingUserId) : base(ipAddress, affectedUserId, performingUserId)
-        {
-        }
     }
 }

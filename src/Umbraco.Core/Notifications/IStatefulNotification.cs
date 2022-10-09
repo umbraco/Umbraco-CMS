@@ -1,9 +1,6 @@
-using System.Collections.Generic;
+namespace Umbraco.Cms.Core.Notifications;
 
-namespace Umbraco.Cms.Core.Notifications
+public interface IStatefulNotification : INotification
 {
-    public interface IStatefulNotification : INotification
-    {
-        IDictionary<string, object?> State { get; set; }
-    }
+    IDictionary<string, object?> State { get; set; }
 }

@@ -1,10 +1,9 @@
-﻿namespace Umbraco.Cms.Core.Install
+namespace Umbraco.Cms.Core.Install;
+
+public enum FilePermissionTest
 {
-    public enum FilePermissionTest
-    {
-        FolderCreation,
-        FileWritingForPackages,
-        FileWriting,
-        MediaFolderCreation
-    }
+    FolderCreation,
+    FileWritingForPackages,
+    FileWriting,
+    MediaFolderCreation,
 }

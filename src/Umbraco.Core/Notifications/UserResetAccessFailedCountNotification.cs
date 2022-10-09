@@ -1,9 +1,9 @@
-namespace Umbraco.Cms.Core.Notifications
+namespace Umbraco.Cms.Core.Notifications;
+
+public class UserResetAccessFailedCountNotification : UserNotification
 {
-    public class UserResetAccessFailedCountNotification : UserNotification
+    public UserResetAccessFailedCountNotification(string ipAddress, string affectedUserId, string performingUserId)
+        : base(ipAddress, affectedUserId, performingUserId)
     {
-        public UserResetAccessFailedCountNotification(string ipAddress, string affectedUserId, string performingUserId) : base(ipAddress, affectedUserId, performingUserId)
-        {
-        }
     }
 }

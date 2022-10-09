@@ -1,11 +1,10 @@
-namespace Umbraco.Cms.Core.Security
+namespace Umbraco.Cms.Core.Security;
+
+public enum PublicAccessStatus
 {
-    public enum PublicAccessStatus
-    {
-        NotLoggedIn,
-        AccessDenied,
-        NotApproved,
-        LockedOut,
-        AccessAccepted
-    }
+    NotLoggedIn,
+    AccessDenied,
+    NotApproved,
+    LockedOut,
+    AccessAccepted,
 }

@@ -272,6 +272,7 @@
     color: @ui-option-type;
     display: flex;
     justify-content: flex-start;
+    align-items: center;
     clear: both;
     font-weight: normal;
     line-height: 20px;
@@ -287,6 +288,12 @@
 .dropdown-submenu:hover > button {
     color: @ui-option-type-hover;
     background: @ui-option-hover;
+}
+
+.dropdown-menu > li > button:disabled, 
+.dropdown-submenu:hover > button:disabled {
+    color: @ui-option-disabled-type;
+    background: transparent;
 }
 
 .nav-tabs .dropdown-menu {

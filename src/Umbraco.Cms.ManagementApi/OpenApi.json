@@ -1,0 +1,4634 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Umbraco Backoffice API",
+    "description": "This shows all APIs available in this version of Umbraco - Including all the legacy apis that is available for backward compatibility",
+    "version": "All"
+  },
+  "servers": [
+    {
+      "url": "https://localhost:44331"
+    }
+  ],
+  "paths": {
+    "/umbraco/api/v1/upgrade/authorize": {
+      "post": {
+        "tags": [
+          "Upgrade"
+        ],
+        "operationId": "AuthorizeUpgrade_Authorize",
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "428": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/upgrade/settings": {
+      "get": {
+        "tags": [
+          "Upgrade"
+        ],
+        "operationId": "SettingsUpgrade_Settings",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpgradeSettingsViewModel"
+                }
+              }
+            }
+          },
+          "428": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/template/tree/children": {
+      "get": {
+        "tags": [
+          "Template"
+        ],
+        "operationId": "ChildrenTemplateTree_Children",
+        "parameters": [
+          {
+            "name": "parentKey",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            },
+            "x-position": 2
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            },
+            "x-position": 3
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedViewModelOfEntityTreeItemViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/template/tree/items": {
+      "get": {
+        "tags": [
+          "Template"
+        ],
+        "operationId": "ItemsTemplateTree_Items",
+        "parameters": [
+          {
+            "name": "key",
+            "x-originalName": "keys",
+            "in": "query",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "nullable": true,
+              "items": {
+                "type": "string",
+                "format": "guid"
+              }
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/EntityTreeItemViewModel"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/template/tree/root": {
+      "get": {
+        "tags": [
+          "Template"
+        ],
+        "operationId": "RootTemplateTree_Root",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            },
+            "x-position": 1
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedViewModelOfEntityTreeItemViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/trackedReferences/{id}": {
+      "get": {
+        "description": "Used by info tabs on content, media etc. and for the delete and unpublish of single items.\nThis is basically finding parents of relations.\n            ",
+        "operationId": "ForItemTrackedReferences_Get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "int32",
+              "type": "integer"
+            },
+            "x-position": 1
+          },
+          {
+            "in": "query",
+            "name": "skip",
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            },
+            "x-position": 2
+          },
+          {
+            "in": "query",
+            "name": "take",
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            },
+            "x-position": 3
+          },
+          {
+            "in": "query",
+            "name": "filterMustBeIsDependency",
+            "schema": {
+              "nullable": true,
+              "type": "boolean"
+            },
+            "x-position": 4
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedViewModelOfRelationItemViewModel"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "summary": "Gets a page list of tracked references for the current item, so you can see where an item is being used.",
+        "tags": [
+          "TrackedReferences"
+        ]
+      }
+    },
+    "/umbraco/api/v1/trackedReferences/descendants/{parentId}": {
+      "get": {
+        "description": "Used when deleting and unpublishing a single item to check if this item has any descending items that are in any\nkind of relation.\nThis is basically finding the descending items which are children in relations.\n            ",
+        "operationId": "DescendantsTrackedReferences_Descendants",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "parentId",
+            "required": true,
+            "schema": {
+              "format": "int32",
+              "type": "integer"
+            },
+            "x-position": 1
+          },
+          {
+            "in": "query",
+            "name": "skip",
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            },
+            "x-position": 2
+          },
+          {
+            "in": "query",
+            "name": "take",
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            },
+            "x-position": 3
+          },
+          {
+            "in": "query",
+            "name": "filterMustBeIsDependency",
+            "schema": {
+              "nullable": true,
+              "type": "boolean"
+            },
+            "x-position": 4
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedViewModelOfRelationItemViewModel"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "summary": "Gets a page list of the child nodes of the current item used in any kind of relation.",
+        "tags": [
+          "TrackedReferences"
+        ]
+      }
+    },
+    "/umbraco/api/v1/trackedReferences/multiple": {
+      "get": {
+        "description": "Used when bulk deleting content/media and bulk unpublishing content (delete and unpublish on List view).\nThis is basically finding children of relations.\n            ",
+        "operationId": "MultipleTrackedReferences_GetPagedReferencedItems",
+        "parameters": [
+          {
+            "explode": true,
+            "in": "query",
+            "name": "ids",
+            "schema": {
+              "items": {
+                "format": "int32",
+                "type": "integer"
+              },
+              "nullable": true,
+              "type": "array"
+            },
+            "style": "form",
+            "x-position": 1
+          },
+          {
+            "in": "query",
+            "name": "skip",
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            },
+            "x-position": 2
+          },
+          {
+            "in": "query",
+            "name": "take",
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            },
+            "x-position": 3
+          },
+          {
+            "in": "query",
+            "name": "filterMustBeIsDependency",
+            "schema": {
+              "nullable": true,
+              "type": "boolean"
+            },
+            "x-position": 4
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedViewModelOfRelationItemViewModel"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "summary": "Gets a page list of the items used in any kind of relation from selected integer ids.",
+        "tags": [
+          "TrackedReferences"
+        ]
+      }
+    },
+    "/umbraco/api/v1/stylesheet/tree/children": {
+      "get": {
+        "tags": [
+          "Stylesheet"
+        ],
+        "operationId": "ChildrenStylesheetTree_Children",
+        "parameters": [
+          {
+            "name": "path",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 1
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            },
+            "x-position": 2
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            },
+            "x-position": 3
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedViewModelOfFileSystemTreeItemViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/stylesheet/tree/items": {
+      "get": {
+        "tags": [
+          "Stylesheet"
+        ],
+        "operationId": "ItemsStylesheetTree_Items",
+        "parameters": [
+          {
+            "name": "path",
+            "x-originalName": "paths",
+            "in": "query",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "nullable": true,
+              "items": {
+                "type": "string"
+              }
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FileSystemTreeItemViewModel"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/stylesheet/tree/root": {
+      "get": {
+        "tags": [
+          "Stylesheet"
+        ],
+        "operationId": "RootStylesheetTree_Root",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            },
+            "x-position": 1
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedViewModelOfFileSystemTreeItemViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/static-file/tree/children": {
+      "get": {
+        "tags": [
+          "StaticFile"
+        ],
+        "operationId": "ChildrenStaticFileTree_Children",
+        "parameters": [
+          {
+            "name": "path",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 1
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            },
+            "x-position": 2
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            },
+            "x-position": 3
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedViewModelOfFileSystemTreeItemViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/static-file/tree/items": {
+      "get": {
+        "tags": [
+          "StaticFile"
+        ],
+        "operationId": "ItemsStaticFileTree_Items",
+        "parameters": [
+          {
+            "name": "path",
+            "x-originalName": "paths",
+            "in": "query",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "nullable": true,
+              "items": {
+                "type": "string"
+              }
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FileSystemTreeItemViewModel"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/static-file/tree/root": {
+      "get": {
+        "tags": [
+          "StaticFile"
+        ],
+        "operationId": "RootStaticFileTree_Root",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            },
+            "x-position": 1
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedViewModelOfFileSystemTreeItemViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/server/status": {
+      "get": {
+        "tags": [
+          "Server"
+        ],
+        "operationId": "StatusServer_Get",
+        "responses": {
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerStatusViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/server/version": {
+      "get": {
+        "tags": [
+          "Server"
+        ],
+        "operationId": "VersionServer_Get",
+        "responses": {
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/script/tree/children": {
+      "get": {
+        "tags": [
+          "Script"
+        ],
+        "operationId": "ChildrenScriptTree_Children",
+        "parameters": [
+          {
+            "name": "path",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 1
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            },
+            "x-position": 2
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            },
+            "x-position": 3
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedViewModelOfFileSystemTreeItemViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/script/tree/items": {
+      "get": {
+        "tags": [
+          "Script"
+        ],
+        "operationId": "ItemsScriptTree_Items",
+        "parameters": [
+          {
+            "name": "path",
+            "x-originalName": "paths",
+            "in": "query",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "nullable": true,
+              "items": {
+                "type": "string"
+              }
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FileSystemTreeItemViewModel"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/script/tree/root": {
+      "get": {
+        "tags": [
+          "Script"
+        ],
+        "operationId": "RootScriptTree_Root",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            },
+            "x-position": 1
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedViewModelOfFileSystemTreeItemViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/relation-type/tree/items": {
+      "get": {
+        "tags": [
+          "RelationType"
+        ],
+        "operationId": "ItemsRelationTypeTree_Items",
+        "parameters": [
+          {
+            "name": "key",
+            "x-originalName": "keys",
+            "in": "query",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "nullable": true,
+              "items": {
+                "type": "string",
+                "format": "guid"
+              }
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FolderTreeItemViewModel"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/relation-type/tree/root": {
+      "get": {
+        "tags": [
+          "RelationType"
+        ],
+        "operationId": "RootRelationTypeTree_Root",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            },
+            "x-position": 1
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedViewModelOfEntityTreeItemViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/published-cache/collect": {
+      "post": {
+        "tags": [
+          "PublishedCache"
+        ],
+        "operationId": "CollectPublishedCache_Collect",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/published-cache/rebuild": {
+      "post": {
+        "tags": [
+          "PublishedCache"
+        ],
+        "operationId": "RebuildPublishedCache_Collect",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/published-cache/reload": {
+      "post": {
+        "tags": [
+          "PublishedCache"
+        ],
+        "operationId": "ReloadPublishedCache_Reload",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/published-cache/status": {
+      "get": {
+        "tags": [
+          "PublishedCache"
+        ],
+        "operationId": "StatusPublishedCache_Status",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/profiling/status": {
+      "get": {
+        "tags": [
+          "Profiling"
+        ],
+        "operationId": "StatusProfiling_Status",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfilingStatusViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/partial-view/tree/children": {
+      "get": {
+        "tags": [
+          "PartialView"
+        ],
+        "operationId": "ChildrenPartialViewTree_Children",
+        "parameters": [
+          {
+            "name": "path",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 1
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            },
+            "x-position": 2
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            },
+            "x-position": 3
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedViewModelOfFileSystemTreeItemViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/partial-view/tree/items": {
+      "get": {
+        "tags": [
+          "PartialView"
+        ],
+        "operationId": "ItemsPartialViewTree_Items",
+        "parameters": [
+          {
+            "name": "path",
+            "x-originalName": "paths",
+            "in": "query",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "nullable": true,
+              "items": {
+                "type": "string"
+              }
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FileSystemTreeItemViewModel"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/partial-view/tree/root": {
+      "get": {
+        "tags": [
+          "PartialView"
+        ],
+        "operationId": "RootPartialViewTree_Root",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            },
+            "x-position": 1
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedViewModelOfFileSystemTreeItemViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/member-type/tree/items": {
+      "get": {
+        "tags": [
+          "MemberType"
+        ],
+        "operationId": "ItemsMemberTypeTree_Items",
+        "parameters": [
+          {
+            "name": "key",
+            "x-originalName": "keys",
+            "in": "query",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "nullable": true,
+              "items": {
+                "type": "string",
+                "format": "guid"
+              }
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/EntityTreeItemViewModel"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/member-type/tree/root": {
+      "get": {
+        "tags": [
+          "MemberType"
+        ],
+        "operationId": "RootMemberTypeTree_Root",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            },
+            "x-position": 1
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedViewModelOfEntityTreeItemViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/member-group/tree/items": {
+      "get": {
+        "tags": [
+          "MemberGroup"
+        ],
+        "operationId": "ItemsMemberGroupTree_Items",
+        "parameters": [
+          {
+            "name": "key",
+            "x-originalName": "keys",
+            "in": "query",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "nullable": true,
+              "items": {
+                "type": "string",
+                "format": "guid"
+              }
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/EntityTreeItemViewModel"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/member-group/tree/root": {
+      "get": {
+        "tags": [
+          "MemberGroup"
+        ],
+        "operationId": "RootMemberGroupTree_Root",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            },
+            "x-position": 1
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedViewModelOfEntityTreeItemViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/media/tree/children": {
+      "get": {
+        "tags": [
+          "Media"
+        ],
+        "operationId": "ChildrenMediaTree_Children",
+        "parameters": [
+          {
+            "name": "parentKey",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            },
+            "x-position": 2
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            },
+            "x-position": 3
+          },
+          {
+            "name": "dataTypeKey",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": true
+            },
+            "x-position": 4
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedViewModelOfContentTreeItemViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/media/tree/items": {
+      "get": {
+        "tags": [
+          "Media"
+        ],
+        "operationId": "ItemsMediaTree_Items",
+        "parameters": [
+          {
+            "name": "key",
+            "x-originalName": "keys",
+            "in": "query",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "nullable": true,
+              "items": {
+                "type": "string",
+                "format": "guid"
+              }
+            },
+            "x-position": 1
+          },
+          {
+            "name": "dataTypeKey",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": true
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ContentTreeItemViewModel"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/media/tree/root": {
+      "get": {
+        "tags": [
+          "Media"
+        ],
+        "operationId": "RootMediaTree_Root",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            },
+            "x-position": 1
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            },
+            "x-position": 2
+          },
+          {
+            "name": "dataTypeKey",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": true
+            },
+            "x-position": 3
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedViewModelOfContentTreeItemViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/media/recycle-bin/children": {
+      "get": {
+        "tags": [
+          "Media"
+        ],
+        "operationId": "ChildrenMediaRecycleBin_Children",
+        "parameters": [
+          {
+            "name": "parentKey",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            },
+            "x-position": 2
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            },
+            "x-position": 3
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedViewModelOfRecycleBinItemViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/media/recycle-bin/root": {
+      "get": {
+        "tags": [
+          "Media"
+        ],
+        "operationId": "RootMediaRecycleBin_Root",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            },
+            "x-position": 1
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedViewModelOfRecycleBinItemViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/media-type/tree/children": {
+      "get": {
+        "tags": [
+          "MediaType"
+        ],
+        "operationId": "ChildrenMediaTypeTree_Children",
+        "parameters": [
+          {
+            "name": "parentKey",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            },
+            "x-position": 2
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            },
+            "x-position": 3
+          },
+          {
+            "name": "foldersOnly",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "x-position": 4
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedViewModelOfFolderTreeItemViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/media-type/tree/items": {
+      "get": {
+        "tags": [
+          "MediaType"
+        ],
+        "operationId": "ItemsMediaTypeTree_Items",
+        "parameters": [
+          {
+            "name": "key",
+            "x-originalName": "keys",
+            "in": "query",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "nullable": true,
+              "items": {
+                "type": "string",
+                "format": "guid"
+              }
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FolderTreeItemViewModel"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/media-type/tree/root": {
+      "get": {
+        "tags": [
+          "MediaType"
+        ],
+        "operationId": "RootMediaTypeTree_Root",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            },
+            "x-position": 1
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            },
+            "x-position": 2
+          },
+          {
+            "name": "foldersOnly",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "x-position": 3
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedViewModelOfFolderTreeItemViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/install/settings": {
+      "get": {
+        "tags": [
+          "Install"
+        ],
+        "operationId": "SettingsInstall_Settings",
+        "responses": {
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "428": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InstallSettingsViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/install/setup": {
+      "post": {
+        "tags": [
+          "Install"
+        ],
+        "operationId": "SetupInstall_Setup",
+        "requestBody": {
+          "x-name": "installData",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InstallViewModel"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "428": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/install/validateDatabase": {
+      "post": {
+        "tags": [
+          "Install"
+        ],
+        "operationId": "ValidateDatabaseInstall_ValidateDatabase",
+        "requestBody": {
+          "x-name": "viewModel",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DatabaseInstallViewModel"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/language": {
+      "get": {
+        "operationId": "AllLanguage_GetAll",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "skip",
+            "schema": {
+              "format": "int32",
+              "type": "integer"
+            },
+            "x-position": 1
+          },
+          {
+            "in": "query",
+            "name": "take",
+            "schema": {
+              "format": "int32",
+              "type": "integer"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedViewModelOfLanguageViewModel"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "summary": "1\n                Returns all currently configured languages.",
+        "tags": [
+          "Language"
+        ]
+      }
+    },
+    "/umbraco/api/v1/language/{id}": {
+      "delete": {
+        "operationId": "DeleteLanguage_Delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "int32",
+              "type": "integer"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": ""
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "summary": "Deletes a language with a given ID",
+        "tags": [
+          "Language"
+        ]
+      },
+      "get": {
+        "operationId": "ByIdLanguage_ById",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "int32",
+              "type": "integer"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LanguageViewModel"
+                }
+              }
+            },
+            "description": ""
+          },
+          "404": {
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "Language"
+        ]
+      }
+    },
+    "/umbraco/api/v1/language/create": {
+      "post": {
+        "operationId": "CreateLanguage_Create",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LanguageViewModel"
+              }
+            }
+          },
+          "required": true,
+          "x-name": "language",
+          "x-position": 1
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "summary": "Creates or saves a language",
+        "tags": [
+          "Language"
+        ]
+      }
+    },
+    "/umbraco/api/v1/language/update": {
+      "put": {
+        "operationId": "UpdateLanguage_Update",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LanguageViewModel"
+              }
+            }
+          },
+          "required": true,
+          "x-name": "language",
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": ""
+          },
+          "404": {
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "summary": "Updates a language",
+        "tags": [
+          "Language"
+        ]
+      }
+    },
+    "/umbraco/api/v1/examineManagement/indexes": {
+      "get": {
+        "tags": [
+          "ExamineManagement"
+        ],
+        "operationId": "IndexesExamineManagement_Indexes",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedViewModelOfExamineIndexViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/examineManagement/index": {
+      "get": {
+        "tags": [
+          "ExamineManagement"
+        ],
+        "operationId": "IndexExamineManagement_Index",
+        "parameters": [
+          {
+            "name": "indexName",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExamineIndexViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/examineManagement/rebuild": {
+      "post": {
+        "tags": [
+          "ExamineManagement"
+        ],
+        "operationId": "RebuildExamineManagement_Rebuild",
+        "parameters": [
+          {
+            "name": "indexName",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/examineManagement/searchers": {
+      "get": {
+        "tags": [
+          "ExamineManagement"
+        ],
+        "operationId": "SearchersExamineManagement_Searchers",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedViewModelOfSearcherViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/examineManagement/search": {
+      "get": {
+        "tags": [
+          "ExamineManagement"
+        ],
+        "operationId": "SearchExamineManagement_GetSearchResults",
+        "parameters": [
+          {
+            "name": "searcherName",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 1
+          },
+          {
+            "name": "query",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 2
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 3
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 4
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedViewModelOfPagedViewModelOfSearchResultViewModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/help": {
+      "get": {
+        "operationId": "GetHelp_Get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "section",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            },
+            "x-position": 1
+          },
+          {
+            "in": "query",
+            "name": "tree",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            },
+            "x-position": 2
+          },
+          {
+            "in": "query",
+            "name": "skip",
+            "schema": {
+              "format": "int32",
+              "type": "integer"
+            },
+            "x-position": 3
+          },
+          {
+            "in": "query",
+            "name": "take",
+            "schema": {
+              "format": "int32",
+              "type": "integer"
+            },
+            "x-position": 4
+          },
+          {
+            "in": "query",
+            "name": "baseUrl",
+            "schema": {
+              "default": "https://our.umbraco.com",
+              "nullable": true,
+              "type": "string"
+            },
+            "x-position": 5
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedViewModelOfHelpPageViewModel"
+                }
+              }
+            },
+            "description": ""
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "Help"
+        ]
+      }
+    },
+    "/umbraco/api/v1/dictionary/{id}": {
+      "patch": {
+        "operationId": "UpdateDictionary_Update",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "guid",
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "items": {
+                  "$ref": "#/components/schemas/JsonPatchViewModel"
+                },
+                "type": "array"
+              }
+            }
+          },
+          "required": true,
+          "x-name": "updateViewModel",
+          "x-position": 2
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": ""
+          },
+          "404": {
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "Dictionary"
+        ]
+      }
+    },
+    "/umbraco/api/v1/dictionary/{key}": {
+      "delete": {
+        "operationId": "DeleteDictionary_Delete",
+        "parameters": [
+          {
+            "description": "The key of the dictionary item to delete",
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "format": "guid",
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "HttpResponseMessage\n            "
+          },
+          "404": {
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "summary": "Deletes a data type with a given ID",
+        "tags": [
+          "Dictionary"
+        ]
+      },
+      "get": {
+        "operationId": "ByIdDictionary_ByKey",
+        "parameters": [
+          {
+            "description": "The id.\n            ",
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "format": "guid",
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DictionaryViewModel"
+                }
+              }
+            },
+            "description": "The DictionaryDisplay. Returns a not found response when dictionary item does not exist\n            "
+          },
+          "404": {
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "summary": "Gets a dictionary item by guid",
+        "tags": [
+          "Dictionary"
+        ]
+      }
+    },
+    "/umbraco/api/v1/dictionary/create": {
+      "post": {
+        "operationId": "CreateDictionary_Create",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DictionaryItemViewModel"
+              }
+            }
+          },
+          "description": "The viewmodel to pass to the action",
+          "required": true,
+          "x-name": "dictionaryViewModel",
+          "x-position": 1
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "The HttpResponseMessage.\n            "
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "summary": "Creates a new dictionary item",
+        "tags": [
+          "Dictionary"
+        ]
+      }
+    },
+    "/umbraco/api/v1/dictionary/export/{key}": {
+      "get": {
+        "operationId": "ExportDictionary_ExportDictionary",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "format": "guid",
+              "type": "string"
+            },
+            "x-position": 1
+          },
+          {
+            "in": "query",
+            "name": "includeChildren",
+            "schema": {
+              "default": false,
+              "type": "boolean"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": ""
+          },
+          "404": {
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "Dictionary"
+        ]
+      }
+    },
+    "/umbraco/api/v1/dictionary/import": {
+      "post": {
+        "operationId": "ImportDictionary_ImportDictionary",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "file",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            },
+            "x-position": 1
+          },
+          {
+            "in": "query",
+            "name": "parentId",
+            "schema": {
+              "format": "int32",
+              "nullable": true,
+              "type": "integer"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": ""
+          },
+          "404": {
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "Dictionary"
+        ]
+      }
+    },
+    "/umbraco/api/v1/dictionary/upload": {
+      "post": {
+        "operationId": "UploadDictionary_Upload",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "properties": {
+                  "file": {
+                    "format": "binary",
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DictionaryImportViewModel"
+                }
+              }
+            },
+            "description": ""
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "Dictionary"
+        ]
+      }
+    },
+    "/umbraco/api/v1/document/tree/children": {
+      "get": {
+        "tags": [
+          "Document"
+        ],
+        "operationId": "ChildrenDocumentTree_Children",
+        "parameters": [
+          {
+            "name": "parentKey",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            },
+            "x-position": 2
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            },
+            "x-position": 3
+          },
+          {
+            "name": "dataTypeKey",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": true
+            },
+            "x-position": 4
+          },
+          {
+            "name": "culture",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 5
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedViewModelOfDocumentTreeItemViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/document/tree/items": {
+      "get": {
+        "tags": [
+          "Document"
+        ],
+        "operationId": "ItemsDocumentTree_Items",
+        "parameters": [
+          {
+            "name": "key",
+            "x-originalName": "keys",
+            "in": "query",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "nullable": true,
+              "items": {
+                "type": "string",
+                "format": "guid"
+              }
+            },
+            "x-position": 1
+          },
+          {
+            "name": "dataTypeKey",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": true
+            },
+            "x-position": 2
+          },
+          {
+            "name": "culture",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 3
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DocumentTreeItemViewModel"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/document/tree/root": {
+      "get": {
+        "tags": [
+          "Document"
+        ],
+        "operationId": "RootDocumentTree_Root",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            },
+            "x-position": 1
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            },
+            "x-position": 2
+          },
+          {
+            "name": "dataTypeKey",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": true
+            },
+            "x-position": 3
+          },
+          {
+            "name": "culture",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 4
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedViewModelOfDocumentTreeItemViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/document/recycle-bin/children": {
+      "get": {
+        "tags": [
+          "Document"
+        ],
+        "operationId": "ChildrenDocumentRecycleBin_Children",
+        "parameters": [
+          {
+            "name": "parentKey",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            },
+            "x-position": 2
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            },
+            "x-position": 3
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedViewModelOfRecycleBinItemViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/document/recycle-bin/root": {
+      "get": {
+        "tags": [
+          "Document"
+        ],
+        "operationId": "RootDocumentRecycleBin_Root",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            },
+            "x-position": 1
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedViewModelOfRecycleBinItemViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/document-type/tree/children": {
+      "get": {
+        "tags": [
+          "DocumentType"
+        ],
+        "operationId": "ChildrenDocumentTypeTree_Children",
+        "parameters": [
+          {
+            "name": "parentKey",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            },
+            "x-position": 2
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            },
+            "x-position": 3
+          },
+          {
+            "name": "foldersOnly",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "x-position": 4
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedViewModelOfDocumentTypeTreeItemViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/document-type/tree/items": {
+      "get": {
+        "tags": [
+          "DocumentType"
+        ],
+        "operationId": "ItemsDocumentTypeTree_Items",
+        "parameters": [
+          {
+            "name": "key",
+            "x-originalName": "keys",
+            "in": "query",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "nullable": true,
+              "items": {
+                "type": "string",
+                "format": "guid"
+              }
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DocumentTypeTreeItemViewModel"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/document-type/tree/root": {
+      "get": {
+        "tags": [
+          "DocumentType"
+        ],
+        "operationId": "RootDocumentTypeTree_Root",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            },
+            "x-position": 1
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            },
+            "x-position": 2
+          },
+          {
+            "name": "foldersOnly",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "x-position": 3
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedViewModelOfDocumentTypeTreeItemViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/document-blueprint/tree/items": {
+      "get": {
+        "tags": [
+          "DocumentBlueprint"
+        ],
+        "operationId": "ItemsDocumentBlueprintTree_Items",
+        "parameters": [
+          {
+            "name": "key",
+            "x-originalName": "keys",
+            "in": "query",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "nullable": true,
+              "items": {
+                "type": "string",
+                "format": "guid"
+              }
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DocumentBlueprintTreeItemViewModel"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/document-blueprint/tree/root": {
+      "get": {
+        "tags": [
+          "DocumentBlueprint"
+        ],
+        "operationId": "RootDocumentBlueprintTree_Root",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            },
+            "x-position": 1
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedViewModelOfDocumentBlueprintTreeItemViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/dictionary": {
+      "get": {
+        "operationId": "AllDictionary_All",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "skip",
+            "schema": {
+              "format": "int32",
+              "type": "integer"
+            },
+            "x-position": 1
+          },
+          {
+            "in": "query",
+            "name": "take",
+            "schema": {
+              "format": "int32",
+              "type": "integer"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedViewModelOfDictionaryOverviewViewModel"
+                }
+              }
+            },
+            "description": "The IEnumerable`1.\n            "
+          }
+        },
+        "summary": "Retrieves a list with all dictionary items",
+        "tags": [
+          "Dictionary"
+        ]
+      }
+    },
+    "/umbraco/api/v1/dictionary-item/tree/children": {
+      "get": {
+        "tags": [
+          "DictionaryItem"
+        ],
+        "operationId": "ChildrenDictionaryItemTree_Children",
+        "parameters": [
+          {
+            "name": "parentKey",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            },
+            "x-position": 2
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            },
+            "x-position": 3
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedViewModelOfEntityTreeItemViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/dictionary-item/tree/items": {
+      "get": {
+        "tags": [
+          "DictionaryItem"
+        ],
+        "operationId": "ItemsDictionaryItemTree_Items",
+        "parameters": [
+          {
+            "name": "key",
+            "x-originalName": "keys",
+            "in": "query",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "nullable": true,
+              "items": {
+                "type": "string",
+                "format": "guid"
+              }
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FolderTreeItemViewModel"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/dictionary-item/tree/root": {
+      "get": {
+        "tags": [
+          "DictionaryItem"
+        ],
+        "operationId": "RootDictionaryItemTree_Root",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            },
+            "x-position": 1
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedViewModelOfEntityTreeItemViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/analytics": {
+      "get": {
+        "operationId": "GetAnalytics_Get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalyticsLevelViewModel"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "Analytics"
+        ]
+      },
+      "post": {
+        "operationId": "SetAnalytics_SetConsentLevel",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnalyticsLevelViewModel"
+              }
+            }
+          },
+          "required": true,
+          "x-name": "analyticsLevelViewModel",
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "Analytics"
+        ]
+      }
+    },
+    "/umbraco/api/v1/analytics/all": {
+      "get": {
+        "operationId": "AllAnalytics_GetAll",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "skip",
+            "schema": {
+              "format": "int32",
+              "type": "integer"
+            },
+            "x-position": 1
+          },
+          {
+            "in": "query",
+            "name": "take",
+            "schema": {
+              "format": "int32",
+              "type": "integer"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedViewModelOfTelemetryLevel"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "Analytics"
+        ]
+      }
+    },
+    "/umbraco/api/v1/culture": {
+      "get": {
+        "operationId": "AllCulture_GetAll",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "skip",
+            "schema": {
+              "format": "int32",
+              "type": "integer"
+            },
+            "x-position": 1
+          },
+          {
+            "in": "query",
+            "name": "take",
+            "schema": {
+              "format": "int32",
+              "type": "integer"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedViewModelOfCultureViewModel"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "summary": "Returns all cultures available for creating languages.",
+        "tags": [
+          "Culture"
+        ]
+      }
+    },
+    "/umbraco/api/v1/data-type/tree/children": {
+      "get": {
+        "tags": [
+          "DataType"
+        ],
+        "operationId": "ChildrenDataTypeTree_Children",
+        "parameters": [
+          {
+            "name": "parentKey",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            },
+            "x-position": 2
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            },
+            "x-position": 3
+          },
+          {
+            "name": "foldersOnly",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "x-position": 4
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedViewModelOfFolderTreeItemViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/data-type/tree/items": {
+      "get": {
+        "tags": [
+          "DataType"
+        ],
+        "operationId": "ItemsDataTypeTree_Items",
+        "parameters": [
+          {
+            "name": "key",
+            "x-originalName": "keys",
+            "in": "query",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "nullable": true,
+              "items": {
+                "type": "string",
+                "format": "guid"
+              }
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FolderTreeItemViewModel"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/data-type/tree/root": {
+      "get": {
+        "tags": [
+          "DataType"
+        ],
+        "operationId": "RootDataTypeTree_Root",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            },
+            "x-position": 1
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            },
+            "x-position": 2
+          },
+          {
+            "name": "foldersOnly",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "x-position": 3
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedViewModelOfFolderTreeItemViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/modelsBuilder/build": {
+      "post": {
+        "tags": [
+          "ModelsBuilder"
+        ],
+        "operationId": "BuildModelsBuilder_BuildModels",
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "428": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/modelsBuilder": {
+      "get": {
+        "tags": [
+          "ModelsBuilder"
+        ],
+        "operationId": "GetModelsBuilder_GetDashboard",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/modelsBuilder/status": {
+      "get": {
+        "tags": [
+          "ModelsBuilder"
+        ],
+        "operationId": "StatusModelsBuilder_GetModelsOutOfDateStatus",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OutOfDateStatusViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ProblemDetails": {
+        "type": "object",
+        "additionalProperties": {
+          "nullable": true
+        },
+        "properties": {
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "detail": {
+            "type": "string",
+            "nullable": true
+          },
+          "instance": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "UpgradeSettingsViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "currentState": {
+            "type": "string"
+          },
+          "newState": {
+            "type": "string"
+          },
+          "newVersion": {
+            "type": "string"
+          },
+          "oldVersion": {
+            "type": "string"
+          },
+          "reportUrl": {
+            "type": "string"
+          }
+        }
+      },
+      "PagedViewModelOfEntityTreeItemViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EntityTreeItemViewModel"
+            }
+          }
+        }
+      },
+      "EntityTreeItemViewModel": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/TreeItemViewModel"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "key": {
+                "type": "string",
+                "format": "guid"
+              },
+              "isContainer": {
+                "type": "boolean"
+              },
+              "parentKey": {
+                "type": "string",
+                "format": "guid",
+                "nullable": true
+              }
+            }
+          }
+        ]
+      },
+      "TreeItemViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "icon": {
+            "type": "string"
+          },
+          "hasChildren": {
+            "type": "boolean"
+          }
+        }
+      },
+      "PagedViewModelOfFileSystemTreeItemViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FileSystemTreeItemViewModel"
+            }
+          }
+        }
+      },
+      "FileSystemTreeItemViewModel": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/TreeItemViewModel"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "isFolder": {
+                "type": "boolean"
+              }
+            }
+          }
+        ]
+      },
+      "ServerStatusViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "serverStatus": {
+            "$ref": "#/components/schemas/RuntimeLevel"
+          }
+        }
+      },
+      "RuntimeLevel": {
+        "type": "string",
+        "description": "Describes the levels in which the runtime can run.\n            ",
+        "x-enumNames": [
+          "Unknown",
+          "Boot",
+          "Install",
+          "Upgrade",
+          "Run",
+          "BootFailed"
+        ],
+        "enum": [
+          "Unknown",
+          "Boot",
+          "Install",
+          "Upgrade",
+          "Run",
+          "BootFailed"
+        ]
+      },
+      "VersionViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "version": {
+            "type": "string"
+          }
+        }
+      },
+      "FolderTreeItemViewModel": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/EntityTreeItemViewModel"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "isFolder": {
+                "type": "boolean"
+              }
+            }
+          }
+        ]
+      },
+      "ProfilingStatusViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          }
+        }
+      },
+      "PagedViewModelOfContentTreeItemViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ContentTreeItemViewModel"
+            }
+          }
+        }
+      },
+      "ContentTreeItemViewModel": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/EntityTreeItemViewModel"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "noAccess": {
+                "type": "boolean"
+              }
+            }
+          }
+        ]
+      },
+      "PagedViewModelOfRecycleBinItemViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RecycleBinItemViewModel"
+            }
+          }
+        }
+      },
+      "RecycleBinItemViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "key": {
+            "type": "string",
+            "format": "guid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "icon": {
+            "type": "string"
+          },
+          "hasChildren": {
+            "type": "boolean"
+          },
+          "isContainer": {
+            "type": "boolean"
+          },
+          "parentKey": {
+            "type": "string",
+            "format": "guid",
+            "nullable": true
+          }
+        }
+      },
+      "PagedViewModelOfFolderTreeItemViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FolderTreeItemViewModel"
+            }
+          }
+        }
+      },
+      "InstallSettingsViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "user": {
+            "$ref": "#/components/schemas/UserSettingsViewModel"
+          },
+          "databases": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DatabaseSettingsViewModel"
+            }
+          }
+        }
+      },
+      "UserSettingsViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "minCharLength": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "minNonAlphaNumericLength": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "consentLevels": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ConsentLevelViewModel"
+            }
+          }
+        }
+      },
+      "ConsentLevelViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "level": {
+            "$ref": "#/components/schemas/TelemetryLevel"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
+      "TelemetryLevel": {
+        "type": "string",
+        "description": "",
+        "x-enumNames": [
+          "Minimal",
+          "Basic",
+          "Detailed"
+        ],
+        "enum": [
+          "Minimal",
+          "Basic",
+          "Detailed"
+        ]
+      },
+      "DatabaseSettingsViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "sortOrder": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "defaultDatabaseName": {
+            "type": "string"
+          },
+          "providerName": {
+            "type": "string"
+          },
+          "isConfigured": {
+            "type": "boolean"
+          },
+          "requiresServer": {
+            "type": "boolean"
+          },
+          "serverPlaceholder": {
+            "type": "string"
+          },
+          "requiresCredentials": {
+            "type": "boolean"
+          },
+          "supportsIntegratedAuthentication": {
+            "type": "boolean"
+          },
+          "requiresConnectionTest": {
+            "type": "boolean"
+          }
+        }
+      },
+      "InstallViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "user",
+          "database"
+        ],
+        "properties": {
+          "user": {
+            "$ref": "#/components/schemas/UserInstallViewModel"
+          },
+          "database": {
+            "$ref": "#/components/schemas/DatabaseInstallViewModel"
+          },
+          "telemetryLevel": {
+            "$ref": "#/components/schemas/TelemetryLevel"
+          }
+        }
+      },
+      "UserInstallViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "email",
+          "password"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 255,
+            "minLength": 0
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "minLength": 1
+          },
+          "password": {
+            "type": "string",
+            "minLength": 1
+          },
+          "subscribeToNewsletter": {
+            "type": "boolean"
+          }
+        }
+      },
+      "DatabaseInstallViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "providerName"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "minLength": 1
+          },
+          "providerName": {
+            "type": "string",
+            "minLength": 1
+          },
+          "server": {
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "username": {
+            "type": "string",
+            "nullable": true
+          },
+          "password": {
+            "type": "string",
+            "nullable": true
+          },
+          "useIntegratedAuthentication": {
+            "type": "boolean"
+          },
+          "connectionString": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "PagedViewModelOfExamineIndexViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExamineIndexViewModel"
+            }
+          }
+        }
+      },
+      "ExamineIndexViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "healthStatus": {
+            "type": "string",
+            "nullable": true
+          },
+          "isHealthy": {
+            "type": "boolean"
+          },
+          "canRebuild": {
+            "type": "boolean"
+          },
+          "searcherName": {
+            "type": "string"
+          },
+          "documentCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "fieldCount": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "PagedViewModelOfSearcherViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SearcherViewModel"
+            }
+          }
+        }
+      },
+      "SearcherViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "PagedViewModelOfPagedViewModelOfSearchResultViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PagedViewModelOfSearchResultViewModel"
+            }
+          }
+        }
+      },
+      "PagedViewModelOfSearchResultViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SearchResultViewModel"
+            }
+          }
+        }
+      },
+      "SearchResultViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "score": {
+            "type": "number",
+            "format": "float"
+          },
+          "fieldCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "fields": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FieldViewModel"
+            }
+          }
+        }
+      },
+      "FieldViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "values": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "PagedViewModelOfDocumentTreeItemViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DocumentTreeItemViewModel"
+            }
+          }
+        }
+      },
+      "DocumentTreeItemViewModel": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ContentTreeItemViewModel"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "isProtected": {
+                "type": "boolean"
+              },
+              "isPublished": {
+                "type": "boolean"
+              },
+              "isEdited": {
+                "type": "boolean"
+              }
+            }
+          }
+        ]
+      },
+      "PagedViewModelOfDocumentTypeTreeItemViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DocumentTypeTreeItemViewModel"
+            }
+          }
+        }
+      },
+      "DocumentTypeTreeItemViewModel": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/FolderTreeItemViewModel"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "isElement": {
+                "type": "boolean"
+              }
+            }
+          }
+        ]
+      },
+      "DocumentBlueprintTreeItemViewModel": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/EntityTreeItemViewModel"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "documentTypeKey": {
+                "type": "string",
+                "format": "guid"
+              },
+              "documentTypeAlias": {
+                "type": "string"
+              },
+              "documentTypeName": {
+                "type": "string",
+                "nullable": true
+              }
+            }
+          }
+        ]
+      },
+      "PagedViewModelOfDocumentBlueprintTreeItemViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DocumentBlueprintTreeItemViewModel"
+            }
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Analytics"
+    },
+    {
+      "name": "Culture"
+    },
+    {
+      "name": "DataType"
+    },
+    {
+      "name": "Dictionary"
+    },
+    {
+      "name": "DictionaryItem"
+    },
+    {
+      "name": "Document"
+    },
+    {
+      "name": "DocumentBlueprint"
+    },
+    {
+      "name": "DocumentType"
+    },
+    {
+      "name": "ExamineManagement"
+    },
+    {
+      "name": "Help"
+    },
+    {
+      "name": "Install"
+    },
+    {
+      "name": "Language"
+    },
+    {
+      "name": "Media"
+    },
+    {
+      "name": "MediaType"
+    },
+    {
+      "name": "MemberGroup"
+    },
+    {
+      "name": "MemberType"
+    },
+    {
+      "name": "ModelsBuilder"
+    },
+    {
+      "name": "PartialView"
+    },
+    {
+      "name": "Profiling"
+    },
+    {
+      "name": "PublishedCache"
+    },
+    {
+      "name": "Relation"
+    },
+    {
+      "name": "RelationType"
+    },
+    {
+      "name": "Script"
+    },
+    {
+      "name": "Server"
+    },
+    {
+      "name": "StaticFile"
+    },
+    {
+      "name": "Stylesheet"
+    },
+    {
+      "name": "Template"
+    },
+    {
+      "name": "TrackedReferences"
+    },
+    {
+      "name": "Upgrade"
+    }
+  ]
+}

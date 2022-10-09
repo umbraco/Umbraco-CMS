@@ -14,7 +14,7 @@ public class SqliteNullableGuidScalarMapper : ScalarMapper<Guid?>
     {
         if (value is null || value == DBNull.Value)
         {
-            return default(Guid?);
+            return default;
         }
 
         return Guid.TryParse($"{value}", out Guid result)

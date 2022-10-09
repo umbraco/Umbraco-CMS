@@ -1,12 +1,11 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 
-namespace Umbraco.Cms.Core.Dashboards
+namespace Umbraco.Cms.Core.Dashboards;
+
+[DataContract(IsReference = true)]
+public class DashboardSlim : IDashboardSlim
 {
-    [DataContract(IsReference = true)]
-    public class DashboardSlim : IDashboardSlim
-    {
-        public string? Alias { get; set; }
+    public string? Alias { get; set; }
 
-        public string? View { get; set; }
-    }
+    public string? View { get; set; }
 }
