@@ -17,6 +17,10 @@ public sealed class ContentPublishedNotification : EnumerableObjectNotification<
         : base(target, messages)
     {
     }
-
+    public ContentPublishedNotification(IEnumerable<IContent> target, EventMessages messages, bool includeDescandants) : base(target, messages)
+    {
+        includeDescandants = includeDescandants;
+    }
     public IEnumerable<IContent> PublishedEntities => Target;
+    public bool IncludeDescendants { get; set; }
 }
