@@ -59,7 +59,8 @@ public static class BackOfficeAuthBuilderExtensions
                 // Enable authorization code flow with PKCE
                 options
                     .AllowAuthorizationCodeFlow()
-                    .RequireProofKeyForCodeExchange();
+                    .RequireProofKeyForCodeExchange()
+                    .AllowRefreshTokenFlow();
 
                 // Register the encryption and signing credentials.
                 // - see https://documentation.openiddict.com/configuration/encryption-and-signing-credentials.html

@@ -62,6 +62,12 @@ public class BackOfficeAuthenticationController : ManagementApiControllerBase
                         backOfficeClaim.SetDestinations(OpenIddictConstants.Destinations.AccessToken);
                     }
 
+                    if (request.GetScopes().Contains(OpenIddictConstants.Scopes.OfflineAccess))
+                    {
+                        // "offline_access" scope is required to use refresh tokens
+                        backOfficePrincipal.SetScopes(OpenIddictConstants.Scopes.OfflineAccess);
+                    }
+
                     return new SignInResult(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme, backOfficePrincipal);
                 }
             }
