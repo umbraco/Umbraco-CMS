@@ -1,9 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using OpenIddict.Abstractions;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.ManagementApi.Authorization;
+using Umbraco.Cms.ManagementApi.Middleware;
 
 namespace Umbraco.Cms.ManagementApi.DependencyInjection;
 
@@ -91,17 +92,20 @@ public static class BackOfficeAuthBuilderExtensions
                 });
             });
 
-        builder.Services.AddHostedService<ClientIdManager>();
+        builder.Services.AddTransient<IBackOfficeApplicationManager, BackOfficeApplicationManager>();
+        builder.Services.AddSingleton<BackOfficeAuthorizationInitializationMiddleware>();
+
+        builder.Services.AddHostedService<DatabaseManager>();
 
         return builder;
     }
 
-    // TODO: move this somewhere (find an appropriate namespace for it)
-    public class ClientIdManager : IHostedService
+    // TODO: remove this once EF is implemented
+    public class DatabaseManager : IHostedService
     {
         private readonly IServiceProvider _serviceProvider;
 
-        public ClientIdManager(IServiceProvider serviceProvider) => _serviceProvider = serviceProvider;
+        public DatabaseManager(IServiceProvider serviceProvider) => _serviceProvider = serviceProvider;
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
@@ -110,33 +114,9 @@ public static class BackOfficeAuthBuilderExtensions
             DbContext context = scope.ServiceProvider.GetRequiredService<DbContext>();
             await context.Database.EnsureCreatedAsync(cancellationToken);
 
-            IOpenIddictApplicationManager manager = scope.ServiceProvider.GetRequiredService<IOpenIddictApplicationManager>();
-
-            const string backofficeClientId = "umbraco-back-office";
-            if (await manager.FindByClientIdAsync(backofficeClientId, cancellationToken) is null)
-            {
-                await manager.CreateAsync(
-                    new OpenIddictApplicationDescriptor
-                    {
-                        ClientId = backofficeClientId,
-                        // TODO: fix redirect URI + path
-                        // how do we figure out the current backoffice host?
-                        // - wait for first request?
-                        // - use IServerAddressesFeature?
-                        // - put it in config?
-                        // should we support multiple callback URLS (for external apps)?
-                        // check IHostingEnvironment.EnsureApplicationMainUrl
-                        RedirectUris = { new Uri("https://localhost:44331/umbraco/login/callback/") },
-                        Permissions =
-                        {
-                            OpenIddictConstants.Permissions.Endpoints.Authorization,
-                            OpenIddictConstants.Permissions.Endpoints.Token,
-                            OpenIddictConstants.Permissions.GrantTypes.AuthorizationCode,
-                            OpenIddictConstants.Permissions.ResponseTypes.Code
-                        }
-                    },
-                    cancellationToken);
-            }
+            // TODO: append BackOfficeAuthorizationInitializationMiddleware to the application and remove this
+            IBackOfficeApplicationManager backOfficeApplicationManager = scope.ServiceProvider.GetRequiredService<IBackOfficeApplicationManager>();
+            await backOfficeApplicationManager.EnsureBackOfficeApplicationAsync(new Uri("https://localhost:44331/"), cancellationToken);
         }
 
         public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
