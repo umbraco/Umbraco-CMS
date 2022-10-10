@@ -67,7 +67,7 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		type: 'section',
 		alias: 'Umb.Section.Users',
 		name: 'Users',
-		loader: () => import('./backoffice/sections/users/users-section.element'),
+		loader: () => import('../backoffice/sections/users/users-section.element'),
 		meta: {
 			pathname: 'users',
 			weight: 20,
@@ -287,7 +287,7 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		type: 'editor',
 		alias: 'Umb.Editor.User',
 		name: 'User Editor',
-		loader: () => import('./backoffice/editors/user/editor-user.element'),
+		loader: () => import('../backoffice/editors/user/editor-user.element'),
 		meta: {
 			entityType: 'user',
 		},
@@ -296,7 +296,7 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		type: 'editorAction',
 		alias: 'Umb.EditorAction.User.Save',
 		name: 'EditorActionUserSave',
-		loader: () => import('./backoffice/editors/user/actions/editor-action-user-save.element'),
+		loader: () => import('../backoffice/editors/user/actions/editor-action-user-save.element'),
 		meta: {
 			editors: ['Umb.Editor.User'],
 		},
@@ -530,7 +530,7 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		type: 'sectionView',
 		alias: 'Umb.SectionView.Users',
 		name: 'Users Section View',
-		loader: () => import('./backoffice/sections/users/views/users/section-view-users.element'),
+		loader: () => import('../backoffice/sections/users/views/users/section-view-users.element'),
 		meta: {
 			sections: ['Umb.Section.Users'],
 			label: 'Users',
@@ -543,7 +543,7 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		type: 'sectionView',
 		alias: 'Umb.SectionView.UserGroups',
 		name: 'User Groups Section View',
-		loader: () => import('./backoffice/sections/users/views/user-groups/section-view-user-groups.element'),
+		loader: () => import('../backoffice/sections/users/views/user-groups/section-view-user-groups.element'),
 		meta: {
 			sections: ['Umb.Section.Users'],
 			label: 'User Groups',
