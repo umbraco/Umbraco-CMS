@@ -1,5 +1,3 @@
-using System;
-using System.Linq;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -9,7 +7,6 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
@@ -22,9 +19,6 @@ using Umbraco.Cms.Persistence.SqlServer;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Integration.DependencyInjection;
 using Umbraco.Cms.Tests.Integration.Extensions;
-using Umbraco.Cms.Web.Common.FileProviders;
-using Umbraco.Cms.Web.Common.Hosting;
-using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Tests.Integration.Testing;
@@ -160,10 +154,6 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
             .AddUmbracoSqlServerSupport()
             .AddUmbracoSqliteSupport()
             .AddTestServices(TestHelper);
-        
-        builder.Services.AddSingleton<WebRootFileProviderFactory>();
-        builder.Services.AddSingleton<IManifestFileProviderFactory>(factory => factory.GetRequiredService<WebRootFileProviderFactory>());
-        builder.Services.AddSingleton<IGridEditorsConfigFileProviderFactory>(factory => factory.GetRequiredService<WebRootFileProviderFactory>());
 
         if (TestOptions.Mapper)
         {
