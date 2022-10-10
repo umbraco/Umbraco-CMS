@@ -100,15 +100,6 @@ export const entities: Array<Entity> = [
 		icon: 'umb:autofill',
 	},
 	{
-		key: 'dt-4',
-		parentKey: '29d78e6c-c1bf-4c15-b820-d511c237ffae',
-		name: 'Context Example',
-		hasChildren: false,
-		isTrashed: false,
-		type: 'dataType',
-		icon: 'umb:autofill',
-	},
-	{
 		key: 'dt-5',
 		parentKey: '29d78e6c-c1bf-4c15-b820-d511c237ffae',
 		name: 'Content Picker (DataType)',

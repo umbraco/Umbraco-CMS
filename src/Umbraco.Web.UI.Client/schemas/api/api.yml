@@ -194,6 +194,35 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
+  /published-cache/rebuild:
+    post:
+      operationId: PublishedCacheRebuild
+      parameters: []
+      responses:
+        '201':
+          description: 201 response
+        '400':
+          description: 400 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /published-cache/collect:
+    get:
+      operationId: PublishedCacheCollect
+      responses:
+        '200':
+          description: 200 response
+          content:
+            application/json:
+              schema:
+                type: string
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
   /server/status:
     get:
       operationId: GetStatus
@@ -312,6 +341,58 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AllowedSectionsResponse'
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /telemetry/ConsentLevel:
+    get:
+      operationId: GetConsentLevel
+      responses:
+        '200':
+          description: 200 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsentLevelSettings'
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+    post:
+      operationId: PostConsentLevel
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConsentLevelSettings'
+        required: true
+      responses:
+        '201':
+          description: 201 response
+        '400':
+          description: 400 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /telemetry/ConsentLevels:
+    get:
+      operationId: ConsentLevels
+      responses:
+        '200':
+          description: 200 response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
         default:
           description: default response
           content:
@@ -1185,3 +1266,10 @@ components:
             type: string
       required:
         - sections
+    ConsentLevelSettings:
+      type: object
+      properties:
+        telemetryLevel:
+          $ref: '#/components/schemas/ConsentLevel'
+      required:
+        - telemetryLevel

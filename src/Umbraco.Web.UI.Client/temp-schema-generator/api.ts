@@ -4,6 +4,7 @@ import './publishedstatus';
 import './server';
 import './upgrader';
 import './user';
+import './telemetry';
 import './property-editors';
 
 import { api } from '@airtasker/spot';
