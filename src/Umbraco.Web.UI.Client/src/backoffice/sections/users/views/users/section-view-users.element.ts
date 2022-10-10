@@ -1,19 +1,15 @@
 import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
-import { BehaviorSubject, Observable, Subscription } from 'rxjs';
-import { InterfaceColor, InterfaceLook } from '@umbraco-ui/uui-base/lib/types';
-import { IRoute, IRoutingInfo } from 'router-slot';
-import { v4 as uuidv4 } from 'uuid';
+import { BehaviorSubject, Observable } from 'rxjs';
+import type { IRoute, IRoutingInfo } from 'router-slot';
 import { UmbContextProviderMixin } from '../../../../../core/context';
+import type { UmbEditorEntityElement } from '../../../../editors/shared/editor-entity/editor-entity.element';
+
 import './list-view-layouts/table/editor-view-users-table.element';
 import './list-view-layouts/grid/editor-view-users-grid.element';
 import './editor-view-users-selection.element';
 import './editor-view-users-invite.element';
-
-import type { UserDetails, UserEntity } from '../../../../../core/models';
-import type { UmbEditorUserElement } from '../../../../editors/user/editor-user.element';
-import UmbEditorEntityElement from '../../../../editors/shared/editor-entity/editor-entity.element';
 
 @customElement('umb-section-view-users')
 export class UmbSectionViewUsersElement extends UmbContextProviderMixin(LitElement) {
