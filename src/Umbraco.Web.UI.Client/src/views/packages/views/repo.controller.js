@@ -224,6 +224,24 @@
                         vm.loading = false;
                         //set back to null so it can be re-created
                         canceler = null;
+                    })
+                    .catch(function (err) {
+                      canceler = null;
+
+                      if (err) {
+                        // If an abort happened, ignore it since it happened because of a new search
+                        if (err.xhrStatus === 'abort') {
+                          return;
+                        }
+
+                        // Otherwise, show the error
+                        if (err.errorMsg) {
+                          notificationsService.error(err.errorMsg);
+                          return;
+                        }
+                      }
+
+                      console.error(err);
                     });
 
             });
