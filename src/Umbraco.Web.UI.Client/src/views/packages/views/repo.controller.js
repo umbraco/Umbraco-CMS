@@ -216,7 +216,7 @@
                     currSort,
                     "",
                     vm.searchQuery,
-                    canceler)
+                    canceler.promise)
                     .then(function (pack) {
                         vm.packages = pack.packages;
                         vm.pagination.totalPages = Math.ceil(pack.total / vm.pagination.pageSize);
