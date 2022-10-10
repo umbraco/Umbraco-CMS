@@ -52,17 +52,12 @@ export class UmbEditorViewUsersInviteElement extends UmbContextConsumerMixin(Umb
 	private _invitedUser?: UserDetails;
 
 	protected _userStore?: UmbUserStore;
-	private _notificationService?: UmbNotificationService;
 
 	connectedCallback(): void {
 		super.connectedCallback();
 
 		this.consumeContext('umbUserStore', (usersContext: UmbUserStore) => {
 			this._userStore = usersContext;
-		});
-
-		this.consumeContext('umbNotificationService', (service: UmbNotificationService) => {
-			this._notificationService = service;
 		});
 	}
 
@@ -100,7 +95,10 @@ export class UmbEditorViewUsersInviteElement extends UmbContextConsumerMixin(Umb
 	}
 
 	private _goToProfile() {
-		//TODO: navigate to user profile
+		if (!this._invitedUser) return;
+
+		this._closeModal();
+		history.pushState(null, '', '/section/users/view/users/user/' + this._invitedUser?.key); //TODO: URL Should be dynamic
 	}
 
 	private _renderForm() {
