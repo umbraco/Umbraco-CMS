@@ -444,7 +444,7 @@ stages:
           - pwsh: npx playwright install --with-deps
             displayName: Install Playwright
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
-          - pwsh: npm run test --ignore-certificate-errors --output $(Build.ArtifactStagingDirectory)\test-results
+          - pwsh: npm run test --ignore-certificate-errors
             displayName: Run Playwright (Desktop)
             continueOnError: true
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
