@@ -42,7 +42,6 @@ Do this
 		</div>
 	</div>
 </pre>
-
 @example
  **/
 
@@ -63,12 +62,11 @@ Do this
 		var directive = {
 			restrict: "A",
 			link: link
-
 		};
 
 		return directive;
 	}
 
-	angular.module("umbraco.directives").directive("UmbExtendClickArea", ExtendClickAreaDirective);
+	angular.module("umbraco.directives").directive("umbExtendClickArea", ExtendClickAreaDirective);
 
 })();
