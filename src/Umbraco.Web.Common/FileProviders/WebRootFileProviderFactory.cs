@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.FileProviders;
 using Umbraco.Cms.Core.IO;
 
-namespace Umbraco.Cms.Web.BackOffice.FileProviders;
+namespace Umbraco.Cms.Web.Common.FileProviders;
 
 public class WebRootFileProviderFactory : IManifestFileProviderFactory, IGridEditorsConfigFileProviderFactory
 {

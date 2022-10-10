@@ -22,6 +22,7 @@ using Umbraco.Cms.Persistence.SqlServer;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Integration.DependencyInjection;
 using Umbraco.Cms.Tests.Integration.Extensions;
+using Umbraco.Cms.Web.Common.FileProviders;
 using Umbraco.Cms.Web.Common.Hosting;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
@@ -159,6 +160,10 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
             .AddUmbracoSqlServerSupport()
             .AddUmbracoSqliteSupport()
             .AddTestServices(TestHelper);
+        
+        builder.Services.AddSingleton<WebRootFileProviderFactory>();
+        builder.Services.AddSingleton<IManifestFileProviderFactory>(factory => factory.GetRequiredService<WebRootFileProviderFactory>());
+        builder.Services.AddSingleton<IGridEditorsConfigFileProviderFactory>(factory => factory.GetRequiredService<WebRootFileProviderFactory>());
 
         if (TestOptions.Mapper)
         {
