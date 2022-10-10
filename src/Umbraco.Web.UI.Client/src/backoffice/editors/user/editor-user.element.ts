@@ -6,10 +6,10 @@ import { Subscription } from 'rxjs';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { UmbContextProviderMixin, UmbContextConsumerMixin } from '../../../core/context';
 import UmbSectionViewUsersElement from '../../sections/users/views/users/section-view-users.element';
-import '../../property-editors/content-picker/property-editor-content-picker.element';
 import { UmbUserStore } from '../../../core/stores/user/user.store';
 import type { UserDetails } from '../../../core/models';
 import { UmbUserContext } from './user.context';
+import '../../property-editor-uis/content-picker/property-editor-ui-content-picker.element';
 
 import '../shared/editor-entity-layout/editor-entity-layout.element';
 import { getTagLookAndColor } from '../../sections/users/user-extensions';
@@ -180,12 +180,12 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(UmbContextCons
 					<div>
 						<b>Content start nodes</b>
 						<div class="faded-text">Limit the content tree to specific start nodes</div>
-						<umb-property-editor-content-picker></umb-property-editor-content-picker>
+						<umb-property-editor-ui-content-picker></umb-property-editor-ui-content-picker>
 					</div>
 					<div>
 						<b>Media start nodes</b>
 						<div class="faded-text">Limit the media library to specific start nodes</div>
-						<umb-property-editor-content-picker></umb-property-editor-content-picker>
+						<umb-property-editor-ui-content-picker></umb-property-editor-ui-content-picker>
 					</div>
 				</div>
 			</uui-box>

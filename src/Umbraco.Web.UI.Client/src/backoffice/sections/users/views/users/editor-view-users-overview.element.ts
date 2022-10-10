@@ -82,12 +82,6 @@ export class UmbEditorViewUsersOverviewElement extends UmbContextConsumerMixin(L
 	private _usersContext?: UmbSectionViewUsersElement;
 	private _selectionSubscription?: Subscription;
 
-	constructor() {
-		super();
-
-		this.setupHeaderIntersectionObserver();
-	}
-
 	connectedCallback(): void {
 		super.connectedCallback();
 
@@ -105,21 +99,6 @@ export class UmbEditorViewUsersOverviewElement extends UmbContextConsumerMixin(L
 		super.disconnectedCallback();
 
 		this._selectionSubscription?.unsubscribe();
-	}
-
-	public setupHeaderIntersectionObserver() {
-		requestAnimationFrame(() => {
-			const el = this.shadowRoot?.querySelector('#sticky-top');
-
-			if (el) {
-				const options = { threshold: [1] };
-				const callback = (entries: IntersectionObserverEntry[]) =>
-					entries[0].target.classList.toggle('header-shadow', entries[0].intersectionRatio < 1);
-				const observer = new IntersectionObserver(callback, options);
-
-				observer.observe(el);
-			}
-		});
 	}
 
 	private _toggleViewType() {
