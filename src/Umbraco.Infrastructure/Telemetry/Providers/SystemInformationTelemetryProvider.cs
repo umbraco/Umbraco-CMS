@@ -23,6 +23,7 @@ internal class SystemInformationTelemetryProvider : IDetailedTelemetryProvider, 
     private readonly IUmbracoDatabaseFactory _umbracoDatabaseFactory;
     private readonly IUmbracoVersion _version;
     private readonly IServerRoleAccessor _serverRoleAccessor;
+    private readonly RuntimeSettings _runtimeSettings;
 
     [Obsolete($"Use the constructor that does not take an IOptionsMonitor<GlobalSettings> parameter, scheduled for removal in V12")]
     public SystemInformationTelemetryProvider(
@@ -33,8 +34,9 @@ internal class SystemInformationTelemetryProvider : IDetailedTelemetryProvider, 
         IOptionsMonitor<GlobalSettings> globalSettings,
         IHostEnvironment hostEnvironment,
         IUmbracoDatabaseFactory umbracoDatabaseFactory,
-        IServerRoleAccessor serverRoleAccessor)
-        : this(version, localizationService, modelsBuilderSettings, hostingSettings, hostEnvironment, umbracoDatabaseFactory, serverRoleAccessor)
+        IServerRoleAccessor serverRoleAccessor,
+        IOptionsMonitor<RuntimeSettings> runtimeSettings)
+        : this(version, localizationService, modelsBuilderSettings, hostingSettings, hostEnvironment, umbracoDatabaseFactory, serverRoleAccessor, runtimeSettings)
     {
     }
 
@@ -45,13 +47,15 @@ internal class SystemInformationTelemetryProvider : IDetailedTelemetryProvider, 
         IOptionsMonitor<HostingSettings> hostingSettings,
         IHostEnvironment hostEnvironment,
         IUmbracoDatabaseFactory umbracoDatabaseFactory,
-        IServerRoleAccessor serverRoleAccessor)
+        IServerRoleAccessor serverRoleAccessor,
+        IOptionsMonitor<RuntimeSettings> runtimeSettings)
     {
         _version = version;
         _localizationService = localizationService;
         _hostEnvironment = hostEnvironment;
         _umbracoDatabaseFactory = umbracoDatabaseFactory;
         _serverRoleAccessor = serverRoleAccessor;
+        _runtimeSettings = runtimeSettings.CurrentValue;
         _hostingSettings = hostingSettings.CurrentValue;
         _modelsBuilderSettings = modelsBuilderSettings.CurrentValue;
     }
@@ -61,6 +65,8 @@ internal class SystemInformationTelemetryProvider : IDetailedTelemetryProvider, 
     private string ServerFramework => RuntimeInformation.FrameworkDescription;
 
     private string ModelsBuilderMode => _modelsBuilderSettings.ModelsMode.ToString();
+
+    private string RuntimeMode => _runtimeSettings.Mode.ToString();
 
     private string CurrentCulture => Thread.CurrentThread.CurrentCulture.ToString();
 
@@ -81,6 +87,7 @@ internal class SystemInformationTelemetryProvider : IDetailedTelemetryProvider, 
             new(Constants.Telemetry.OsLanguage, CurrentCulture),
             new(Constants.Telemetry.WebServer, CurrentWebServer),
             new(Constants.Telemetry.ModelsBuilderMode, ModelsBuilderMode),
+            new(Constants.Telemetry.RuntimeMode, RuntimeMode),
             new(Constants.Telemetry.AspEnvironment, AspEnvironment), new(Constants.Telemetry.IsDebug, IsDebug),
             new(Constants.Telemetry.DatabaseProvider, DatabaseProvider),
             new(Constants.Telemetry.CurrentServerRole, CurrentServerRole),
@@ -94,8 +101,11 @@ internal class SystemInformationTelemetryProvider : IDetailedTelemetryProvider, 
             new("Umbraco Version", _version.SemanticVersion.ToSemanticStringWithoutBuild()),
             new("Current Culture", CurrentCulture),
             new("Current UI Culture", Thread.CurrentThread.CurrentUICulture.ToString()),
-            new("Current Webserver", CurrentWebServer), new("Models Builder Mode", ModelsBuilderMode),
-            new("Debug Mode", IsDebug.ToString()), new("Database Provider", DatabaseProvider),
+            new("Current Webserver", CurrentWebServer),
+            new("Models Builder Mode", ModelsBuilderMode),
+            new("Runtime Mode", RuntimeMode),
+            new("Debug Mode", IsDebug.ToString()),
+            new("Database Provider", DatabaseProvider),
             new("Current Server Role", CurrentServerRole),
         };
 
