@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function PackagesRepoController($scope, $timeout, ourPackageRepositoryResource, $q, localizationService) {
+    function PackagesRepoController($scope, $timeout, ourPackageRepositoryResource, $q, localizationService, notificationsService) {
 
         var vm = this;
 
@@ -197,18 +197,14 @@
 
 
         var searchDebounced = _.debounce(function (e) {
+          //a canceler exists, so perform the cancelation operation and reset
+          if (canceler) {
+            canceler.resolve();
+          }
 
-            $scope.$apply(function () {
+          canceler = $q.defer();
 
-                //a canceler exists, so perform the cancelation operation and reset
-                if (canceler) {
-                    canceler.resolve();
-                    canceler = $q.defer();
-                }
-                else {
-                    canceler = $q.defer();
-                }
-
+          $scope.$apply(function () {
                 currSort = vm.searchQuery ? "Default" : "Latest";
 
                 ourPackageRepositoryResource.search(vm.pagination.pageNumber - 1,
