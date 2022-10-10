@@ -91,7 +91,7 @@ test.describe('Packages', () => {
     await page.locator('[label-key="general_download"]').isVisible();
     await umbracoUi.goToSection(ConstantHelper.sections.packages);
     await page.locator('[data-element="sub-view-umbCreatedPackages"]').click();
-    await expect(await page.locator("body", {hasText: packageName})).toBeVisible();
+    await expect(await page.locator(".umb-package-list__item-name", {hasText: packageName})).toBeVisible();
 
     // Cleanup
     await umbracoApi.packages.ensureNameNotExists(packageName);
