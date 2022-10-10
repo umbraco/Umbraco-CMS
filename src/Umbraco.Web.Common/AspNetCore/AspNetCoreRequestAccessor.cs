@@ -9,7 +9,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.AspNetCore;
 
-public class AspNetCoreRequestAccessor : IRequestAccessor, INotificationHandler<UmbracoRequestBeginNotification>
+public class AspNetCoreRequestAccessor : IRequestAccessor, INotificationHandler<UmbracoRequestBeginNotification>, IDisposable
 {
     private readonly ISet<string> _applicationUrls = new HashSet<string>();
     private readonly IHttpContextAccessor _httpContextAccessor;
@@ -18,6 +18,7 @@ public class AspNetCoreRequestAccessor : IRequestAccessor, INotificationHandler<
     private object _initLocker = new();
     private bool _isInit;
     private WebRoutingSettings _webRoutingSettings;
+    private readonly IDisposable? _onChangeDisposable;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="AspNetCoreRequestAccessor" /> class.
@@ -28,7 +29,7 @@ public class AspNetCoreRequestAccessor : IRequestAccessor, INotificationHandler<
     {
         _httpContextAccessor = httpContextAccessor;
         _webRoutingSettings = webRoutingSettings.CurrentValue;
-        webRoutingSettings.OnChange(x => _webRoutingSettings = x);
+        _onChangeDisposable = webRoutingSettings.OnChange(x => _webRoutingSettings = x);
     }
 
     /// <summary>
@@ -63,7 +64,7 @@ public class AspNetCoreRequestAccessor : IRequestAccessor, INotificationHandler<
         // see U4-10626 - in some cases we want to reset the application url
         // (this is a simplified version of what was in 7.x)
         // note: should this be optional? is it expensive?
-        if (!(_webRoutingSettings.UmbracoApplicationUrl is null))
+        if (_webRoutingSettings.UmbracoApplicationUrl is not null)
         {
             return new Uri(_webRoutingSettings.UmbracoApplicationUrl);
         }
@@ -96,4 +97,6 @@ public class AspNetCoreRequestAccessor : IRequestAccessor, INotificationHandler<
 
         return request.Form[name];
     }
+
+    public void Dispose() => _onChangeDisposable?.Dispose();
 }
