@@ -1,12 +1,15 @@
-import { css, html, LitElement, nothing } from 'lit';
+import { css, html, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, state } from 'lit/decorators.js';
+import { customElement, query, state } from 'lit/decorators.js';
 import { UmbContextConsumerMixin } from '../../../../../core/context';
-import UmbSectionViewUsersElement from './section-view-users.element';
+import { UmbModalLayoutElement } from '../../../../../core/services/modal/layouts/modal-layout.element';
+import { UmbUserStore } from '../../../../../core/stores/user/user.store';
+import type { UserDetails } from '../../../../../core/models';
+import { UmbNotificationService } from '../../../../../core/services/notification';
 
 export type UsersViewType = 'list' | 'grid';
 @customElement('umb-editor-view-users-invite')
-export class UmbEditorViewUsersInviteElement extends UmbContextConsumerMixin(LitElement) {
+export class UmbEditorViewUsersInviteElement extends UmbContextConsumerMixin(UmbModalLayoutElement) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -27,9 +30,6 @@ export class UmbEditorViewUsersInviteElement extends UmbContextConsumerMixin(Lit
 			uui-input {
 				width: 100%;
 			}
-			#post-invite-buttons {
-				display: flex;
-			}
 			form {
 				display: flex;
 				flex-direction: column;
@@ -45,23 +45,25 @@ export class UmbEditorViewUsersInviteElement extends UmbContextConsumerMixin(Lit
 		`,
 	];
 
+	@query('#invite-form')
+	private _form!: HTMLFormElement;
+
 	@state()
-	private _showPostInvite = false;
+	private _invitedUser?: UserDetails;
 
-	private _usersContext?: UmbSectionViewUsersElement;
-
-	private _invitedUser?: UserItem;
+	protected _userStore?: UmbUserStore;
+	private _notificationService?: UmbNotificationService;
 
 	connectedCallback(): void {
 		super.connectedCallback();
 
-		this.consumeContext('umbUsersContext', (usersContext: UmbSectionViewUsersElement) => {
-			this._usersContext = usersContext;
+		this.consumeContext('umbUserStore', (usersContext: UmbUserStore) => {
+			this._userStore = usersContext;
 		});
-	}
 
-	disconnectedCallback(): void {
-		super.disconnectedCallback();
+		this.consumeContext('umbNotificationService', (service: UmbNotificationService) => {
+			this._notificationService = service;
+		});
 	}
 
 	private _handleSubmit(e: Event) {
@@ -80,12 +82,20 @@ export class UmbEditorViewUsersInviteElement extends UmbContextConsumerMixin(Lit
 		const userGroup = formData.get('userGroup') as string;
 		const message = formData.get('message') as string;
 
-		this._invitedUser = this._usersContext?.inviteUser(name, email, userGroup, message);
-		this._showPostInvite = true;
+		this._userStore?.invite(name, email, message, [userGroup]).then((user) => {
+			this._invitedUser = user;
+		});
+	}
+
+	private _submitForm() {
+		this._form?.requestSubmit();
+	}
+
+	private _closeModal() {
+		this.modalHandler?.close();
 	}
 
 	private _resetForm() {
-		this._showPostInvite = false;
 		this._invitedUser = undefined;
 	}
 
@@ -118,7 +128,6 @@ export class UmbEditorViewUsersInviteElement extends UmbContextConsumerMixin(Lit
 						<uui-label slot="label" for="message" required>Message</uui-label>
 						<uui-textarea id="message" name="message" required></uui-textarea>
 					</uui-form-layout-item>
-					<uui-button style="margin-left: auto" type="submit" label="Send Invite" look="primary"></uui-button>
 				</form>
 			</uui-form>`;
 	}
@@ -129,19 +138,42 @@ export class UmbEditorViewUsersInviteElement extends UmbContextConsumerMixin(Lit
 		return html`<div id="post-invite">
 			<h1><b style="color: var(--uui-color-interactive-emphasis)">${this._invitedUser.name}</b> has been invited</h1>
 			<p>An invitation has been sent to the new user with details about how to log in to Umbraco.</p>
-			<div id="post-invite-buttons">
-				<uui-button label="Invite another user" look="secondary" @click="${this._resetForm}"></uui-button>
-				<uui-button
-					style="margin-left: auto"
-					label="Go to profile"
-					look="primary"
-					@click="${this._goToProfile}"></uui-button>
-			</div>
 		</div>`;
 	}
 
 	render() {
-		return html`<uui-box>${this._showPostInvite ? this._renderPostInvite() : this._renderForm()}</uui-box>`;
+		return html`<uui-dialog-layout>
+			${this._invitedUser ? this._renderPostInvite() : this._renderForm()}
+			${this._invitedUser
+				? html`
+						<uui-button
+							@click=${this._closeModal}
+							style="margin-right: auto"
+							slot="actions"
+							label="Close"
+							look="secondary"></uui-button>
+						<uui-button
+							@click=${this._resetForm}
+							slot="actions"
+							label="Invite another user"
+							look="secondary"></uui-button>
+						<uui-button @click=${this._goToProfile} slot="actions" label="Go to profile" look="primary"></uui-button>
+				  `
+				: html`
+						<uui-button
+							@click=${this._closeModal}
+							style="margin-right: auto"
+							slot="actions"
+							label="Cancel"
+							look="secondary"></uui-button>
+						<uui-button
+							@click="${this._submitForm}"
+							slot="actions"
+							type="submit"
+							label="Send invite"
+							look="primary"></uui-button>
+				  `}
+		</uui-dialog-layout>`;
 	}
 }
 

@@ -1,4 +1,5 @@
 import { rest } from 'msw';
+import { v4 as uuidv4 } from 'uuid';
 import type { UserDetails } from '../../core/models';
 import { umbUsersData } from '../data/users.data';
 
@@ -33,6 +34,34 @@ export const handlers = [
 		console.log('saved', saved);
 
 		return res(ctx.status(200), ctx.json(saved));
+	}),
+
+	rest.post<UserDetails[]>('/umbraco/backoffice/users/invite', async (req, res, ctx) => {
+		const data = await req.json();
+		if (!data) return;
+
+		const newUser: UserDetails = {
+			key: uuidv4(),
+			name: data.name,
+			email: data.email,
+			status: 'invited',
+			language: 'en',
+			updateDate: new Date().toISOString(),
+			createDate: new Date().toISOString(),
+			failedLoginAttempts: 0,
+			parentKey: '',
+			isTrashed: false,
+			hasChildren: false,
+			type: 'user',
+			icon: 'umb:icon-user',
+			userGroup: data.userGroups[0],
+		};
+
+		const invited = umbUsersData.save([newUser]);
+
+		console.log('invited', invited);
+
+		return res(ctx.status(200), ctx.json(invited));
 	}),
 
 	rest.post<Array<string>>('/umbraco/backoffice/users/enable', async (req, res, ctx) => {

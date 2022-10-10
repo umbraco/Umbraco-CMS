@@ -2,6 +2,7 @@ import { BehaviorSubject, map, Observable } from 'rxjs';
 import type { UserDetails, UserEntity } from '../../models';
 import { UmbEntityStore } from '../entity.store';
 import { UmbDataStoreBase } from '../store';
+import { v4 as uuidv4 } from 'uuid';
 
 /**
  * @export
@@ -134,6 +135,25 @@ export class UmbUserStore extends UmbDataStoreBase<UserDetails> {
 			this._entityStore.update(json);
 		} catch (error) {
 			console.error('Save Data Type error', error);
+		}
+	}
+
+	async invite(name: string, email: string, message: string, userGroups: Array<string>): Promise<UserDetails> {
+		// TODO: use Fetcher API.
+		try {
+			const res = await fetch('/umbraco/backoffice/users/invite', {
+				method: 'POST',
+				body: JSON.stringify({ name, email, message, userGroups }),
+				headers: {
+					'Content-Type': 'application/json',
+				},
+			});
+			const json = (await res.json()) as UserDetails[];
+			this.update(json);
+			this._entityStore.update(json);
+			return json[0];
+		} catch (error) {
+			console.error('Invite user error', error);
 		}
 	}
 

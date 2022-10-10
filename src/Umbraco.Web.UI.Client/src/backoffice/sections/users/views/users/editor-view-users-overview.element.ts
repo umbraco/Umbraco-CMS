@@ -10,6 +10,7 @@ import { IRoute } from 'router-slot';
 import { UUIPopoverElement } from '@umbraco-ui/uui';
 import { UmbContextConsumerMixin } from '../../../../../core/context';
 import UmbSectionViewUsersElement from './section-view-users.element';
+import { UmbModalService } from '../../../../../core/services/modal';
 
 export type UsersViewType = 'list' | 'grid';
 @customElement('umb-editor-view-users-overview')
@@ -79,8 +80,25 @@ export class UmbEditorViewUsersOverviewElement extends UmbContextConsumerMixin(L
 	@state()
 	private _selection: Array<string> = [];
 
+	@state()
+	private _routes: IRoute[] = [
+		{
+			path: 'grid',
+			component: () => import('./list-view-layouts/grid/editor-view-users-grid.element'),
+		},
+		{
+			path: 'list',
+			component: () => import('./list-view-layouts/table/editor-view-users-table.element'),
+		},
+		{
+			path: '**',
+			redirectTo: '/section/users/view/users/overview/grid', //TODO: this should be dynamic
+		},
+	];
+
 	private _usersContext?: UmbSectionViewUsersElement;
 	private _selectionSubscription?: Subscription;
+	private _modalService?: UmbModalService;
 
 	connectedCallback(): void {
 		super.connectedCallback();
@@ -92,6 +110,10 @@ export class UmbEditorViewUsersOverviewElement extends UmbContextConsumerMixin(L
 			this._selectionSubscription = this._usersContext?.selection.subscribe((selection: Array<string>) => {
 				this._selection = selection;
 			});
+		});
+
+		this.consumeContext('umbModalService', (modalService: UmbModalService) => {
+			this._modalService = modalService;
 		});
 	}
 
@@ -115,22 +137,6 @@ export class UmbEditorViewUsersOverviewElement extends UmbContextConsumerMixin(L
 		return html`<umb-editor-view-users-selection></umb-editor-view-users-selection>`;
 	}
 
-	@state()
-	private _routes: IRoute[] = [
-		{
-			path: 'grid',
-			component: () => import('./list-view-layouts/grid/editor-view-users-grid.element'),
-		},
-		{
-			path: 'list',
-			component: () => import('./list-view-layouts/table/editor-view-users-table.element'),
-		},
-		{
-			path: '**',
-			redirectTo: '/section/users/view/users/overview/grid', //TODO: this should be dynamic
-		},
-	];
-
 	private _handleTogglePopover(event: PointerEvent) {
 		const composedPath = event.composedPath();
 
@@ -140,13 +146,17 @@ export class UmbEditorViewUsersOverviewElement extends UmbContextConsumerMixin(L
 		}
 	}
 
+	private _showInvite() {
+		const invite = document.createElement('umb-editor-view-users-invite');
+
+		this._modalService?.open(invite, { type: 'dialog' });
+	}
+
 	render() {
 		return html`
 			<div id="sticky-top">
 				<div id="user-list-top-bar">
-					<a href=${'section/users/view/users' + '/invite'}>
-						<uui-button label="Invite user" look="outline"></uui-button>
-					</a>
+					<uui-button @click=${this._showInvite} label="Invite user" look="outline"></uui-button>
 					<uui-input label="search" id="input-search"></uui-input>
 					<div>
 						<uui-popover margin="8">
