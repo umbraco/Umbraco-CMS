@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
@@ -18,7 +19,14 @@ public class UmbracoSystemTextJsonModelBinder : BodyModelBinder
 
     private static IInputFormatter[] GetSystemTextJsonFormatter(ILoggerFactory logger)
     {
-        var jsonOptions = new JsonOptions { JsonSerializerOptions = { Converters = { new JsonStringEnumConverter() } } };
+        var jsonOptions = new JsonOptions
+        {
+            JsonSerializerOptions =
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                Converters = { new JsonStringEnumConverter() },
+            },
+        };
 
         return new IInputFormatter[]
         {
