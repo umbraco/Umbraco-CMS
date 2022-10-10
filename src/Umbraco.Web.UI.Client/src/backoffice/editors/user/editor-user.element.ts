@@ -163,11 +163,11 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(UmbContextCons
 				<div slot="headline">Profile</div>
 				<uui-form-layout-item style="margin-top: 0">
 					<uui-label for="email">Email</uui-label>
-					<uui-input name="email" readonly value=${this._user.email}></uui-input>
+					<uui-input name="email" label="email" readonly value=${this._user.email}></uui-input>
 				</uui-form-layout-item>
 				<uui-form-layout-item style="margin-bottom: 0">
 					<uui-label for="language">Language</uui-label>
-					<uui-select name="language" .options=${this._languages}> </uui-select>
+					<uui-select name="language" label="language" .options=${this._languages}> </uui-select>
 				</uui-form-layout-item>
 			</uui-box>
 			<uui-box>

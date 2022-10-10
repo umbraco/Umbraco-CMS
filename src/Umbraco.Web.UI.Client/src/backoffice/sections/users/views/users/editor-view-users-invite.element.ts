@@ -111,11 +111,11 @@ export class UmbEditorViewUsersInviteElement extends UmbContextConsumerMixin(Umb
 				<form id="invite-form" name="invite-form" @submit="${this._handleSubmit}">
 					<uui-form-layout-item>
 						<uui-label slot="label" for="name" required>Name</uui-label>
-						<uui-input id="name" type="text" name="name" required></uui-input>
+						<uui-input id="name" label="name" type="text" name="name" required></uui-input>
 					</uui-form-layout-item>
 					<uui-form-layout-item>
 						<uui-label slot="label" for="email" required>Email</uui-label>
-						<uui-input id="email" type="email" name="email" required></uui-input>
+						<uui-input id="email" label="email" type="email" name="email" required></uui-input>
 					</uui-form-layout-item>
 					<uui-form-layout-item>
 						<uui-label slot="label" for="userGroup" required>User group</uui-label>
@@ -124,7 +124,7 @@ export class UmbEditorViewUsersInviteElement extends UmbContextConsumerMixin(Umb
 					</uui-form-layout-item>
 					<uui-form-layout-item>
 						<uui-label slot="label" for="message" required>Message</uui-label>
-						<uui-textarea id="message" name="message" required></uui-textarea>
+						<uui-textarea id="message" label="message" name="message" required></uui-textarea>
 					</uui-form-layout-item>
 				</form>
 			</uui-form>`;
