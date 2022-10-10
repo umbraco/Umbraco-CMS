@@ -3,20 +3,20 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Serialization;
 using NSwag.AspNetCore;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.ManagementApi.Configuration;
 using Umbraco.Cms.ManagementApi.DependencyInjection;
+using Umbraco.Cms.ManagementApi.Filters;
 using Umbraco.Cms.Web.Common.ApplicationBuilder;
 using Umbraco.Extensions;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
@@ -75,7 +75,7 @@ public class ManagementApiComposer : IComposer
             options.AddApiVersionParametersWhenVersionNeutral = true;
             options.AssumeDefaultVersionWhenUnspecified = true;
         });
-        services.AddControllers();
+        builder.Services.TryAddEnumerable(ServiceDescriptor.Transient<IApplicationModelProvider, UmbracoManagementApiBehaviorApplicationModelProvider>());
         builder.Services.ConfigureOptions<ConfigureMvcOptions>();
 
         builder.Services.Configure<UmbracoPipelineOptions>(options =>
