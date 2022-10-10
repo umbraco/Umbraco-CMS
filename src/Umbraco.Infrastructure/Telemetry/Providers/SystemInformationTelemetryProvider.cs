@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
@@ -52,12 +52,11 @@ internal class SystemInformationTelemetryProvider : IDetailedTelemetryProvider, 
         _hostEnvironment = hostEnvironment;
         _umbracoDatabaseFactory = umbracoDatabaseFactory;
         _serverRoleAccessor = serverRoleAccessor;
-
         _hostingSettings = hostingSettings.CurrentValue;
         _modelsBuilderSettings = modelsBuilderSettings.CurrentValue;
     }
 
-    private string CurrentWebServer => IsRunningInProcessIIS() ? "IIS" : "Kestrel";
+    private string CurrentWebServer => GetWebServerName();
 
     private string ServerFramework => RuntimeInformation.FrameworkDescription;
 
@@ -100,14 +99,20 @@ internal class SystemInformationTelemetryProvider : IDetailedTelemetryProvider, 
             new("Current Server Role", CurrentServerRole),
         };
 
-    private bool IsRunningInProcessIIS()
+    private string GetWebServerName()
     {
-        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        var processName = Path.GetFileNameWithoutExtension(Process.GetCurrentProcess().ProcessName);
+
+        if (processName.Contains("w3wp"))
         {
-            return false;
+            return "IIS";
         }
 
-        var processName = Path.GetFileNameWithoutExtension(Process.GetCurrentProcess().ProcessName);
-        return processName.Contains("w3wp") || processName.Contains("iisexpress");
+        if (processName.Contains("iisexpress"))
+        {
+            return "IIS Express";
+        }
+
+        return "Kestrel";
     }
 }
