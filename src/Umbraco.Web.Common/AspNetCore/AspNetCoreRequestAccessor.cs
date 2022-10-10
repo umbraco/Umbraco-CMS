@@ -33,16 +33,15 @@ public class AspNetCoreRequestAccessor : IRequestAccessor, INotificationHandler<
     }
 
     /// <summary>
-    ///     This just initializes the application URL on first request attempt
-    ///     TODO: This doesn't belong here, the GetApplicationUrl doesn't belong to IRequestAccessor
-    ///     this should be part of middleware not a lazy init based on an INotification
+    /// <para>
+    /// This is now a NoOp, and is no longer used, instead ApplicationUrlRequestBeginNotificationHandler is used
+    /// </para>
     /// </summary>
+    [Obsolete("This is no longer used, AspNetCoreRequestAccessor will no longer implement INotificationHandler in V12, see ApplicationUrlRequestBeginNotificationHandler instead.")]
     public void Handle(UmbracoRequestBeginNotification notification)
-        => LazyInitializer.EnsureInitialized(ref _hasAppUrl, ref _isInit, ref _initLocker, () =>
-        {
-            GetApplicationUrl();
-            return true;
-        });
+    {
+        // NoOP
+    }
 
     /// <inheritdoc />
     public string GetRequestValue(string name) => GetFormValue(name) ?? GetQueryStringValue(name);
@@ -54,6 +53,17 @@ public class AspNetCoreRequestAccessor : IRequestAccessor, INotificationHandler<
     public Uri? GetRequestUrl() => _httpContextAccessor.HttpContext != null
         ? new Uri(_httpContextAccessor.HttpContext.Request.GetEncodedUrl())
         : null;
+
+    /// <summary>
+    /// Ensure that the ApplicationUrl is set on the first request, this is using a LazyInitializer, so the code will only be run the first time
+    /// </summary>
+    /// TODO: This doesn't belong here, the GetApplicationUrl doesn't belong to IRequestAccessor
+    public void EnsureApplicationUrl() =>
+        LazyInitializer.EnsureInitialized(ref _hasAppUrl, ref _isInit, ref _initLocker, () =>
+        {
+            GetApplicationUrl();
+            return true;
+        });
 
     public Uri? GetApplicationUrl()
     {
