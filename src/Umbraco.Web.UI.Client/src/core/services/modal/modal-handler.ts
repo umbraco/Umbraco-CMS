@@ -1,6 +1,6 @@
-import { UUIDialogElement } from '@umbraco-ui/uui';
-import { UUIModalDialogElement } from '@umbraco-ui/uui-modal-dialog';
-import { UUIModalSidebarElement, UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
+import type { UUIDialogElement } from '@umbraco-ui/uui';
+import type { UUIModalDialogElement } from '@umbraco-ui/uui-modal-dialog';
+import type { UUIModalSidebarElement, UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
 import { v4 as uuidv4 } from 'uuid';
 
 import { UmbModalOptions } from './modal.service';

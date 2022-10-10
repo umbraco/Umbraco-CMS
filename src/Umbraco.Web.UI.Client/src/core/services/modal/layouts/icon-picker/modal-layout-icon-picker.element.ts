@@ -3,10 +3,15 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UmbModalLayoutElement } from '../modal-layout.element';
 
-import '../../../../../backoffice/editors/shared/editor-entity/editor-entity.element';
+import '../../../../../backoffice/editors/shared/editor-entity-layout/editor-entity-layout.element';
+
+export interface UmbModalIconPickerData {
+	multiple: boolean;
+	selection: string[];
+}
 
 @customElement('umb-modal-layout-icon-picker')
-class UmbModalLayoutIconPickerElement extends UmbModalLayoutElement<null> {
+export class UmbModalLayoutIconPickerElement extends UmbModalLayoutElement<UmbModalIconPickerData> {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -108,38 +113,38 @@ class UmbModalLayoutIconPickerElement extends UmbModalLayoutElement<null> {
 
 	@property({ type: Array })
 	iconlist = [
-		'add',
-		'alert',
-		'attachment',
-		'calendar',
-		'check',
-		'clipboard',
-		'code',
-		'colorpicker',
-		'copy',
-		'delete',
-		'document',
-		'download',
-		'edit',
-		'favorite',
-		'folder',
-		'forbidden',
-		'info',
-		'link',
-		'lock',
-		'pause',
-		'picture',
-		'play',
-		'remove',
-		'search',
-		'see',
-		'settings',
-		'subtract',
-		'sync',
-		'unlock',
-		'unsee',
-		'wand',
-		'wrong',
+		'umb:add',
+		'umb:alert',
+		'umb:attachment',
+		'umb:calendar',
+		'umb:check',
+		'umb:clipboard',
+		'umb:code',
+		'umb:colorpicker',
+		'umb:copy',
+		'umb:delete',
+		'umb:document',
+		'umb:download',
+		'umb:edit',
+		'umb:favorite',
+		'umb:folder',
+		'umb:forbidden',
+		'umb:info',
+		'umb:link',
+		'umb:lock',
+		'umb:pause',
+		'umb:picture',
+		'umb:play',
+		'umb:remove',
+		'umb:search',
+		'umb:see',
+		'umb:settings',
+		'umb:subtract',
+		'umb:sync',
+		'umb:unlock',
+		'umb:unsee',
+		'umb:wand',
+		'umb:wrong',
 	];
 
 	@property({ type: Array })
@@ -229,8 +234,7 @@ class UmbModalLayoutIconPickerElement extends UmbModalLayoutElement<null> {
 
 	render() {
 		return html`
-			<umb-editor-entity>
-				<h4 slot="name">Select icon</h4>
+			<umb-editor-entity-layout headline="Select Icon">
 				<div id="container">
 					${this.renderSearchbar()}
 					<hr />
@@ -244,7 +248,7 @@ class UmbModalLayoutIconPickerElement extends UmbModalLayoutElement<null> {
 				<uui-button slot="actions" color="positive" look="primary" @click="${this._save}" label="save">
 					Save
 				</uui-button>
-			</umb-editor-entity>
+			</umb-editor-entity-layout>
 		`;
 	}
 
@@ -296,6 +300,8 @@ class UmbModalLayoutIconPickerElement extends UmbModalLayoutElement<null> {
 		})}`;
 	}
 }
+
+export default UmbModalLayoutIconPickerElement;
 
 declare global {
 	interface HTMLElementTagNameMap {

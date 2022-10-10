@@ -31,7 +31,9 @@
 		"storybook": "npm run wc-analyze && start-storybook -p 6006",
 		"build-storybook": "npm run wc-analyze && build-storybook",
 		"generate:icons": "node ./devops/icons/index.mjs",
-		"wc-analyze": "wca **/*.element.ts --outFile custom-elements.json"
+		"wc-analyze": "wca **/*.element.ts --outFile custom-elements.json",
+		"new-extension": "plop  --plopfile ./devops/plop/plop.mjs",
+		"compile": "tsc"
 	},
 	"engines": {
 		"node": ">=16.0.0 <17",
@@ -86,6 +88,7 @@
 		"msw": "^0.47.4",
 		"msw-storybook-addon": "^1.6.3",
 		"playwright-msw": "^1.0.2",
+		"plop": "^3.1.1",
 		"prettier": "2.7.1",
 		"tiny-glob": "^0.2.9",
 		"typescript": "^4.8.4",

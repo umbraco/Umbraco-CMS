@@ -2,8 +2,8 @@ import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
 
-@customElement('umb-property-editor-text')
-export class UmbPropertyEditorTextElement extends LitElement {
+@customElement('umb-property-editor-ui-number')
+export class UmbPropertyEditorUINumberElement extends LitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -25,14 +25,14 @@ export class UmbPropertyEditorTextElement extends LitElement {
 	}
 
 	render() {
-		return html`<uui-input .value=${this.value} type="text" @input=${this.onInput}></uui-input>`;
+		return html`<uui-input .value=${this.value} type="number" @input=${this.onInput}></uui-input>`;
 	}
 }
 
-export default UmbPropertyEditorTextElement;
+export default UmbPropertyEditorUINumberElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-property-editor-text': UmbPropertyEditorTextElement;
+		'umb-property-editor-ui-number': UmbPropertyEditorUINumberElement;
 	}
 }
