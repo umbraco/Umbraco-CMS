@@ -1,4 +1,5 @@
-import { html, LitElement, nothing } from 'lit';
+import { UUITextStyles } from '@umbraco-ui/uui-css';
+import { css, html, LitElement, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { EMPTY, map, of, Subscription, switchMap } from 'rxjs';
 import { UmbContextConsumerMixin } from '../../../../core/context';
@@ -8,6 +9,25 @@ import { UmbSectionContext } from '../../section.context';
 
 @customElement('umb-section-views')
 export class UmbSectionViewsElement extends UmbContextConsumerMixin(LitElement) {
+	static styles = [
+		UUITextStyles,
+		css`
+			#header {
+				background-color: var(--uui-color-surface);
+				border-bottom: 1px solid var(--uui-color-divider-standalone);
+			}
+
+			uui-tab-group {
+				justify-content: flex-end;
+				--uui-tab-divider: var(--uui-color-divider-standalone);
+			}
+
+			uui-tab-group uui-tab:first-child {
+				border-left: 1px solid var(--uui-color-divider-standalone);
+			}
+		`,
+	];
+
 	@state()
 	private _views: Array<ManifestSectionView> = [];
 
