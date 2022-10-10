@@ -29,10 +29,6 @@ export class UmbSectionViewUsersElement extends UmbContextProviderMixin(LitEleme
 			component: () => import('./editor-view-users-overview.element'),
 		},
 		{
-			path: 'invite',
-			component: () => import('./editor-view-users-invite.element'),
-		},
-		{
 			path: `:entityType/:key`,
 			component: () => import('../../../../editors/shared/editor-entity/editor-entity.element'),
 			setup: (component: HTMLElement, info: IRoutingInfo) => {
