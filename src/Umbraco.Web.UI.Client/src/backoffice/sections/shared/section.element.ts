@@ -20,6 +20,7 @@ export class UmbSectionElement extends UmbContextConsumerMixin(LitElement) {
 			:host {
 				flex: 1 1 auto;
 				height: 100%;
+				display: flex;
 			}
 
 			#header {
