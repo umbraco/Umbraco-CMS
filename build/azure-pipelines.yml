@@ -458,12 +458,26 @@ stages:
           - pwsh: Stop-Process $env:AcceptanceTestProcessId
             condition: eq(variables['Agent.OS'], 'Windows_NT')
             displayName: Stop app (Windows only)
+          - task: PowerShell@2
+            displayName: Check if artifacts folder exists
+            inputs:
+              targetType: inline
+              script: |
+                $MyVariable = Test-Path -Path $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/results
+                Write-Host "##vso[task.setvariable variable=resultFolderExists;]$MyVariable"
+          - task: CopyFiles@2
+            displayName: Prepare artifacts
+            condition: eq(variables.resultFolderExists, 'True')
+            inputs:
+              sourceFolder: $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/results/
+              targetFolder: $(Build.ArtifactStagingDirectory)/playwright
           - task: PublishPipelineArtifact@1
             condition: always()
             displayName: Publish test artifacts
             inputs:
               targetPath: $(Build.ArtifactStagingDirectory)
               artifact: 'E2E artifacts - $(Agent.OS) - Attempt #$(System.JobAttempt)'
+
 
   ###############################################
   ## Release
