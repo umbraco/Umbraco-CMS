@@ -11,10 +11,10 @@ export class UmbSectionContext {
 		name: '',
 		js: '',
 		elementName: '',
+		weight: 0,
 		meta: {
 			label: '',
 			pathname: '',
-			weight: 0,
 		},
 	});
 	public readonly data = this._data.asObservable();

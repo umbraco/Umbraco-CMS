@@ -1,7 +1,6 @@
 import type { ManifestTypes } from '../core/models';
 import { manifests as propertyEditorUIManifests } from './property-editor-ui';
 
-// TODO: consider moving weight from meta to the main part of the manifest. We need it for every extension.
 export const internalManifests: Array<ManifestTypes & { loader: () => Promise<object | HTMLElement> }> = [
 	...propertyEditorUIManifests,
 	{
@@ -10,10 +9,10 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		name: 'Content Section',
 		elementName: 'umb-content-section',
 		loader: () => import('../backoffice/sections/content/content-section.element'),
+		weight: 50,
 		meta: {
 			label: 'Content',
 			pathname: 'content', // TODO: how to we want to support pretty urls?
-			weight: 50,
 		},
 	},
 	{
@@ -22,10 +21,10 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		name: 'Media Section',
 		elementName: 'umb-media-section',
 		loader: () => import('../backoffice/sections/media/media-section.element'),
+		weight: 50,
 		meta: {
 			label: 'Media',
 			pathname: 'media', // TODO: how to we want to support pretty urls?
-			weight: 50,
 		},
 	},
 	{
@@ -34,10 +33,10 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		name: 'Members Section',
 		elementName: 'umb-section-members',
 		loader: () => import('../backoffice/sections/members/section-members.element'),
+		weight: 30,
 		meta: {
 			label: 'Members',
 			pathname: 'members',
-			weight: 30,
 		},
 	},
 	{
@@ -45,10 +44,10 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		alias: 'Umb.Section.Settings',
 		name: 'Settings Section',
 		loader: () => import('../backoffice/sections/settings/settings-section.element'),
+		weight: 20,
 		meta: {
 			label: 'Settings',
 			pathname: 'settings', // TODO: how to we want to support pretty urls?
-			weight: 20,
 		},
 	},
 	{
@@ -57,10 +56,10 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		name: 'Packages Section',
 		elementName: 'umb-packages-section',
 		loader: () => import('../backoffice/sections/packages/packages-section.element'),
+		weight: 20,
 		meta: {
 			label: 'Packages',
 			pathname: 'packages',
-			weight: 20,
 		},
 	},
 	{
@@ -69,11 +68,11 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		name: 'Welcome Dashboard',
 		elementName: 'umb-dashboard-welcome',
 		loader: () => import('../backoffice/dashboards/welcome/dashboard-welcome.element'),
+		weight: 20,
 		meta: {
 			label: 'Welcome',
 			sections: ['Umb.Section.Content'],
 			pathname: 'welcome', // TODO: how to we want to support pretty urls?
-			weight: 20,
 		},
 	},
 	{
@@ -82,11 +81,11 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		name: 'Redirect Management Dashboard',
 		elementName: 'umb-dashboard-redirect-management',
 		loader: () => import('../backoffice/dashboards/redirect-management/dashboard-redirect-management.element'),
+		weight: 10,
 		meta: {
 			label: 'Redirect Management',
 			sections: ['Umb.Section.Content'],
 			pathname: 'redirect-management', // TODO: how to we want to support pretty urls?
-			weight: 10,
 		},
 	},
 	{
@@ -95,11 +94,11 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		name: 'About Settings Dashboard',
 		elementName: 'umb-dashboard-settings-about',
 		loader: () => import('../backoffice/dashboards/settings-about/dashboard-settings-about.element'),
+		weight: 10,
 		meta: {
 			label: 'About',
 			sections: ['Umb.Section.Settings'],
 			pathname: 'about', // TODO: how to we want to support pretty urls?
-			weight: 10,
 		},
 	},
 	{
@@ -108,11 +107,11 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		name: 'Telemetry',
 		elementName: 'umb-dashboard-telemetry',
 		loader: () => import('../backoffice/dashboards/telemetry/dashboard-telemetry.element'),
+		weight: 0,
 		meta: {
 			label: 'Telemetry Data',
 			sections: ['Umb.Section.Settings'],
 			pathname: 'telemetry', // TODO: how do we want to support pretty urls?
-			weight: 0,
 		},
 	},
 	{
@@ -121,11 +120,11 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		name: 'Examine Management Dashboard',
 		elementName: 'umb-dashboard-examine-management',
 		loader: () => import('../backoffice/dashboards/examine-management/dashboard-examine-management.element'),
+		weight: 10,
 		meta: {
 			label: 'Examine Management',
 			sections: ['Umb.Section.Settings'],
 			pathname: 'examine-management', // TODO: how to we want to support pretty urls?
-			weight: 10,
 		},
 	},
 	{
@@ -134,11 +133,11 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		name: 'Models Builder Dashboard',
 		elementName: 'umb-dashboard-models-builder',
 		loader: () => import('../backoffice/dashboards/models-builder/dashboard-models-builder.element'),
+		weight: 10,
 		meta: {
 			label: 'Models Builder',
 			sections: ['Umb.Section.Settings'],
 			pathname: 'models-builder', // TODO: how to we want to support pretty urls?
-			weight: 10,
 		},
 	},
 	{
@@ -147,11 +146,11 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		name: 'Published Status Dashboard',
 		elementName: 'umb-dashboard-published-status',
 		loader: () => import('../backoffice/dashboards/published-status/dashboard-published-status.element'),
+		weight: 9,
 		meta: {
 			label: 'Published Status',
 			sections: ['Umb.Section.Settings'],
 			pathname: 'published-status', // TODO: how to we want to support pretty urls?
-			weight: 9,
 		},
 	},
 	{
@@ -160,11 +159,11 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		name: 'Media Dashboard',
 		elementName: 'umb-dashboard-media-management',
 		loader: () => import('../backoffice/dashboards/media-management/dashboard-media-management.element'),
+		weight: 10,
 		meta: {
 			label: 'Media',
 			sections: ['Umb.Section.Media'],
 			pathname: 'media-management', // TODO: how to we want to support pretty urls?
-			weight: 10,
 		},
 	},
 	{
@@ -173,13 +172,13 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		name: 'Content Editor Edit View',
 		elementName: 'umb-editor-view-node-edit',
 		loader: () => import('../backoffice/editors/shared/node/views/edit/editor-view-node-edit.element'),
+		weight: 100,
 		meta: {
 			// TODO: how do we want to filter where editor views are shown? https://our.umbraco.com/documentation/extending/Content-Apps/#setting-up-the-plugin
 			// this is a temp solution
 			editors: ['Umb.Editor.Document', 'Umb.Editor.Media'],
 			label: 'Info',
 			pathname: 'content',
-			weight: 100,
 			icon: 'document',
 		},
 	},
@@ -189,13 +188,13 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		name: 'Content Editor Info View',
 		elementName: 'umb-editor-view-node-info',
 		loader: () => import('../backoffice/editors/shared/node/views/info/editor-view-node-info.element'),
+		weight: 90,
 		meta: {
 			// TODO: how do we want to filter where editor views are shown? https://our.umbraco.com/documentation/extending/Content-Apps/#setting-up-the-plugin
 			// this is a temp solution
 			editors: ['Umb.Editor.Document', 'Umb.Editor.Media'],
 			label: 'Info',
 			pathname: 'info',
-			weight: 90,
 			icon: 'info',
 		},
 	},
@@ -204,13 +203,13 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		alias: 'Umb.EditorView.DataType.Edit',
 		name: 'Data Type Editor Edit View',
 		loader: () => import('../backoffice/editors/data-type/views/edit/editor-view-data-type-edit.element'),
+		weight: 90,
 		meta: {
 			// TODO: how do we want to filter where editor views are shown? https://our.umbraco.com/documentation/extending/Content-Apps/#setting-up-the-plugin
 			// this is a temp solution
 			editors: ['Umb.Editor.DataType'],
 			label: 'Edit',
 			pathname: 'edit',
-			weight: 90,
 			icon: 'edit',
 		},
 	},
@@ -219,13 +218,13 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		alias: 'Umb.EditorView.DataType.Info',
 		name: 'Data Type Editor Info View',
 		loader: () => import('../backoffice/editors/data-type/views/info/editor-view-data-type-info.element'),
+		weight: 90,
 		meta: {
 			// TODO: how do we want to filter where editor views are shown? https://our.umbraco.com/documentation/extending/Content-Apps/#setting-up-the-plugin
 			// this is a temp solution
 			editors: ['Umb.Editor.DataType'],
 			label: 'Info',
 			pathname: 'info',
-			weight: 90,
 			icon: 'info',
 		},
 	},
@@ -235,13 +234,13 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		name: 'Document Type Editor Design View',
 		elementName: 'umb-editor-view-document-type-design',
 		loader: () => import('../backoffice/editors/document-type/views/editor-view-document-type-design.element'),
+		weight: 90,
 		meta: {
 			// TODO: how do we want to filter where editor views are shown? https://our.umbraco.com/documentation/extending/Content-Apps/#setting-up-the-plugin
 			// this is a temp solution
 			editors: ['Umb.Editor.DocumentType'],
 			label: 'Design',
 			pathname: 'design',
-			weight: 90,
 			icon: 'edit',
 		},
 	},
@@ -251,12 +250,12 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		name: 'Packages Editor Overview View',
 		elementName: 'umb-packages-overview',
 		loader: () => import('../backoffice/sections/packages/packages-overview.element'),
+		weight: 10,
 		meta: {
 			icon: 'document',
 			label: 'Packages',
 			pathname: 'repo',
 			editors: ['Umb.Editor.Packages'],
-			weight: 10,
 		},
 	},
 	{
@@ -265,12 +264,12 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		name: 'Packages Editor Installed View',
 		elementName: 'umb-packages-installed',
 		loader: () => import('../backoffice/sections/packages/packages-installed.element'),
+		weight: 0,
 		meta: {
 			icon: 'document',
 			label: 'Installed',
 			pathname: 'installed',
 			editors: ['Umb.Editor.Packages'],
-			weight: 0,
 		},
 	},
 	{
@@ -298,8 +297,8 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		alias: 'Umb.Tree.DataTypes',
 		name: 'Data Types Tree',
 		loader: () => import('../backoffice/trees/data-types/tree-data-types.element'),
+		weight: 1,
 		meta: {
-			weight: 1,
 			sections: ['Umb.Section.Settings'],
 		},
 	},
@@ -308,8 +307,8 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		alias: 'Umb.Tree.DocumentTypes',
 		name: 'Document Types Tree',
 		loader: () => import('../backoffice/trees/document-types/tree-document-types.element'),
+		weight: 2,
 		meta: {
-			weight: 2,
 			sections: ['Umb.Section.Settings'],
 		},
 	},
@@ -319,8 +318,8 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		name: 'Members Test',
 		elementName: 'umb-dashboard-welcome',
 		loader: () => import('../backoffice/dashboards/welcome/dashboard-welcome.element'),
+		weight: -10,
 		meta: {
-			weight: -10,
 			pathname: 'welcome',
 			sections: ['Umb.Section.Members'],
 		},
@@ -330,8 +329,8 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		alias: 'Umb.Tree.Members',
 		name: 'Members Tree',
 		loader: () => import('../backoffice/trees/members/tree-members.element'),
+		weight: 0,
 		meta: {
-			weight: 0,
 			sections: ['Umb.Section.Members'],
 		},
 	},
@@ -340,8 +339,8 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		alias: 'Umb.Tree.MemberGroups',
 		name: 'Members Groups Tree',
 		loader: () => import('../backoffice/trees/member-groups/tree-member-groups.element'),
+		weight: 1,
 		meta: {
-			weight: 1,
 			sections: ['Umb.Section.Members'],
 		},
 	},
@@ -350,8 +349,8 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		alias: 'Umb.Tree.Extensions',
 		name: 'Extensions Tree',
 		loader: () => import('../backoffice/trees/extensions/tree-extensions.element'),
+		weight: 3,
 		meta: {
-			weight: 3,
 			sections: ['Umb.Section.Settings'],
 		},
 	},
@@ -360,8 +359,8 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		alias: 'Umb.Tree.Media',
 		name: 'Media Tree',
 		loader: () => import('../backoffice/trees/media/tree-media.element'),
+		weight: 100,
 		meta: {
-			weight: 100,
 			sections: ['Umb.Section.Media'],
 		},
 	},
@@ -370,8 +369,8 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		alias: 'Umb.Tree.Content',
 		name: 'Content Tree',
 		loader: () => import('../backoffice/trees/documents/tree-documents.element'),
+		weight: 100,
 		meta: {
-			weight: 100,
 			sections: ['Umb.Section.Content'],
 		},
 	},
@@ -443,11 +442,11 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		alias: 'Umb.TreeItemAction.Document.Create',
 		name: 'Document Tree Item Action Create',
 		loader: () => import('../backoffice/trees/documents/actions/action-document-create.element'),
+		weight: 100,
 		meta: {
 			trees: ['Umb.Tree.Content'],
 			label: 'Create',
 			icon: 'add',
-			weight: 100,
 		},
 	},
 	{
@@ -455,11 +454,11 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		alias: 'Umb.TreeItemAction.Document.Delete',
 		name: 'Document Tree Item Action Delete',
 		loader: () => import('../backoffice/trees/documents/actions/action-document-delete.element'),
+		weight: 100,
 		meta: {
 			trees: ['Umb.Tree.Content'],
 			label: 'Delete',
 			icon: 'delete',
-			weight: 100,
 		},
 	},
 	{
@@ -467,11 +466,11 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		alias: 'Umb.TreeItemAction.Document.Paged',
 		name: 'Document Tree Item Action Paged',
 		loader: () => import('../backoffice/trees/documents/actions/action-document-paged.element'),
+		weight: 100,
 		meta: {
 			trees: ['Umb.Tree.Content'],
 			label: 'Paged',
 			icon: 'favorite',
-			weight: 100,
 		},
 	},
 	{
@@ -479,11 +478,11 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		alias: 'Umb.TreeItemAction.DataType.Create',
 		name: 'Tree Item Action Create',
 		loader: () => import('../backoffice/trees/data-types/actions/action-data-type-create.element'),
+		weight: 100,
 		meta: {
 			trees: ['Umb.Tree.DataTypes'],
 			label: 'Create',
 			icon: 'add',
-			weight: 100,
 		},
 	},
 	{
@@ -491,11 +490,11 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		alias: 'Umb.TreeItemAction.DataType.Delete',
 		name: 'Tree Item Action Delete',
 		loader: () => import('../backoffice/trees/data-types/actions/action-data-type-delete.element'),
+		weight: 100,
 		meta: {
 			trees: ['Umb.Tree.DataTypes'],
 			label: 'Delete',
 			icon: 'delete',
-			weight: 100,
 		},
 	},
 ];
