@@ -92,9 +92,7 @@ export class UmbSectionDashboards extends UmbContextConsumerMixin(LitElement) {
 			?.extensionsOfType('dashboard')
 			.pipe(
 				map((extensions) =>
-					extensions
-						.filter((extension) => extension.meta.sections.includes(this._currentSectionAlias))
-						.sort((a, b) => b.meta.weight - a.meta.weight)
+					extensions.filter((extension) => extension.meta.sections.includes(this._currentSectionAlias))
 				)
 			)
 			.subscribe((dashboards) => {

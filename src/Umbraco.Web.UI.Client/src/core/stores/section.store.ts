@@ -20,9 +20,7 @@ export class UmbSectionStore {
 		this._allowedSection = data.sections;
 		*/
 
-		return this._extensionRegistry
-			?.extensionsOfType('section')
-			.pipe(map((extensions) => extensions.sort((a, b) => b.meta.weight - a.meta.weight)));
+		return this._extensionRegistry?.extensionsOfType('section');
 	}
 
 	public setCurrent(alias: string) {
