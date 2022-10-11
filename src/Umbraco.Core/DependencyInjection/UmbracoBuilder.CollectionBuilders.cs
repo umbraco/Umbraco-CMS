@@ -66,7 +66,7 @@ public static partial class UmbracoBuilderExtensions
     /// </summary>
     /// <typeparam name="T">The type of the manifest filter.</typeparam>
     /// <param name="builder">The Builder.</param>
-    public static IUmbracoBuilder AddManifestFilters<T>(this IUmbracoBuilder builder)
+    public static IUmbracoBuilder AddManifestFilter<T>(this IUmbracoBuilder builder)
         where T : class, IManifestFilter
     {
         builder.ManifestFilters().Append<T>();
