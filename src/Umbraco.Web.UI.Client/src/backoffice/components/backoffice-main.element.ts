@@ -8,11 +8,12 @@ import { Subscription } from 'rxjs';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '../../core/context';
 import { createExtensionElement } from '../../core/extension';
 import type { ManifestSection } from '../../core/models';
+import { UmbObserverMixin } from '../../core/observer';
 import { UmbSectionStore } from '../../core/stores/section.store';
 import { UmbSectionContext } from '../sections/section.context';
 
 @defineElement('umb-backoffice-main')
-export class UmbBackofficeMain extends UmbContextProviderMixin(UmbContextConsumerMixin(LitElement)) {
+export class UmbBackofficeMain extends UmbContextProviderMixin(UmbContextConsumerMixin(UmbObserverMixin(LitElement))) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -35,23 +36,22 @@ export class UmbBackofficeMain extends UmbContextProviderMixin(UmbContextConsume
 	private _routePrefix = 'section/';
 	private _sectionContext?: UmbSectionContext;
 	private _sectionStore?: UmbSectionStore;
-	private _sectionSubscription?: Subscription;
 
 	constructor() {
 		super();
 
 		this.consumeContext('umbSectionStore', (_instance: UmbSectionStore) => {
 			this._sectionStore = _instance;
-			this._useSections();
+			this._observeSections();
 		});
 	}
 
-	private async _useSections() {
-		this._sectionSubscription?.unsubscribe();
+	private async _observeSections() {
+		if (!this._sectionStore) return;
 
-		this._sectionSubscription = this._sectionStore?.getAllowed().subscribe((sections) => {
-			if (!sections) return;
+		this.observe(this._sectionStore?.getAllowed(), (sections) => {
 			this._sections = sections;
+			if (!sections) return;
 			this._createRoutes();
 		});
 	}
@@ -87,11 +87,6 @@ export class UmbBackofficeMain extends UmbContextProviderMixin(UmbContextConsume
 		} else {
 			this._sectionContext.update(section);
 		}
-	}
-
-	disconnectedCallback(): void {
-		super.disconnectedCallback();
-		this._sectionSubscription?.unsubscribe();
 	}
 
 	render() {
