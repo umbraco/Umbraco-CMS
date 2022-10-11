@@ -12,8 +12,8 @@ import type {
 	ManifestEditor,
 	ManifestCustom,
 	ManifestPackageView,
-} from '../models';
-import { createExtensionElement } from './create-extension-element.function';
+} from '../../models';
+import { createExtensionElement } from '../create-extension-element.function';
 
 export type UmbExtensionManifestJSModel = {
 	elementName?: string;
