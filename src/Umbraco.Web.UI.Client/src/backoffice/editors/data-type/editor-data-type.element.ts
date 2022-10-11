@@ -7,16 +7,20 @@ import { UmbContextProviderMixin, UmbContextConsumerMixin } from '../../../core/
 import { UmbNotificationService } from '../../../core/services/notification';
 import { UmbDataTypeStore } from '../../../core/stores/data-type/data-type.store';
 import { UmbNotificationDefaultData } from '../../../core/services/notification/layouts/default';
+import { UmbObserverMixin } from '../../../core/observer';
 import { UmbDataTypeContext } from './data-type.context';
 
 import '../shared/editor-entity-layout/editor-entity-layout.element';
+import { DataTypeDetails } from '../../../mocks/data/data-type.data';
 
 /**
  *  @element umb-editor-data-type
  *  @description - Element for displaying a Data Type Editor
  */
 @customElement('umb-editor-data-type')
-export class UmbEditorDataTypeElement extends UmbContextProviderMixin(UmbContextConsumerMixin(LitElement)) {
+export class UmbEditorDataTypeElement extends UmbContextProviderMixin(
+	UmbContextConsumerMixin(UmbObserverMixin(LitElement))
+) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -42,11 +46,7 @@ export class UmbEditorDataTypeElement extends UmbContextProviderMixin(UmbContext
 	private _saveButtonState?: UUIButtonState;
 
 	private _dataTypeContext?: UmbDataTypeContext;
-	private _dataTypeNameSubscription?: Subscription;
-
 	private _dataTypeStore?: UmbDataTypeStore;
-	private _dataTypeStoreSubscription?: Subscription;
-
 	private _notificationService?: UmbNotificationService;
 
 	constructor() {
@@ -65,13 +65,10 @@ export class UmbEditorDataTypeElement extends UmbContextProviderMixin(UmbContext
 	}
 
 	private _observeDataType() {
-		this._dataTypeStoreSubscription?.unsubscribe();
+		if (!this._dataTypeStore) return;
 
-		// TODO: This should be done in a better way, but for now it works.
-		this._dataTypeStoreSubscription = this._dataTypeStore?.getByKey(this.entityKey).subscribe((dataType) => {
+		this.observe(this._dataTypeStore.getByKey(this.entityKey), (dataType: DataTypeDetails) => {
 			if (!dataType) return; // TODO: Handle nicely if there is no data type.
-
-			this._dataTypeNameSubscription?.unsubscribe();
 
 			if (!this._dataTypeContext) {
 				this._dataTypeContext = new UmbDataTypeContext(dataType);
@@ -80,7 +77,7 @@ export class UmbEditorDataTypeElement extends UmbContextProviderMixin(UmbContext
 				this._dataTypeContext.update(dataType);
 			}
 
-			this._dataTypeNameSubscription = this._dataTypeContext.data.pipe().subscribe((dataType) => {
+			this.observe(this._dataTypeContext.data, (dataType) => {
 				if (dataType && dataType.name !== this._dataTypeName) {
 					this._dataTypeName = dataType.name;
 				}
@@ -118,12 +115,6 @@ export class UmbEditorDataTypeElement extends UmbContextProviderMixin(UmbContext
 				this._dataTypeContext?.update({ name: target.value });
 			}
 		}
-	}
-
-	disconnectedCallback(): void {
-		super.disconnectedCallback();
-		this._dataTypeStoreSubscription?.unsubscribe();
-		this._dataTypeNameSubscription?.unsubscribe();
 	}
 
 	render() {
