@@ -566,13 +566,9 @@ components:
           type: string
         pathname:
           type: string
-        weight:
-          type: number
-          format: float
       required:
         - label
         - pathname
-        - weight
     IManifestSection:
       type: object
       properties:
@@ -590,6 +586,9 @@ components:
           type: string
         name:
           type: string
+        weight:
+          type: number
+          format: float
       required:
         - type
         - meta
@@ -598,15 +597,11 @@ components:
     MetaTree:
       type: object
       properties:
-        weight:
-          type: number
-          format: float
         sections:
           type: array
           items:
             type: string
       required:
-        - weight
         - sections
     IManifestTree:
       type: object
@@ -625,6 +620,9 @@ components:
           type: string
         name:
           type: string
+        weight:
+          type: number
+          format: float
       required:
         - type
         - meta
@@ -654,6 +652,9 @@ components:
           type: string
         name:
           type: string
+        weight:
+          type: number
+          format: float
       required:
         - type
         - meta
@@ -670,14 +671,10 @@ components:
           type: string
         icon:
           type: string
-        weight:
-          type: number
-          format: float
       required:
         - trees
         - label
         - icon
-        - weight
     IManifestTreeItemAction:
       type: object
       properties:
@@ -695,6 +692,9 @@ components:
           type: string
         name:
           type: string
+        weight:
+          type: number
+          format: float
       required:
         - type
         - meta
@@ -792,6 +792,9 @@ components:
           type: string
         name:
           type: string
+        weight:
+          type: number
+          format: float
       required:
         - type
         - meta
@@ -806,15 +809,11 @@ components:
             type: string
         pathname:
           type: string
-        weight:
-          type: number
-          format: float
         label:
           type: string
       required:
         - sections
         - pathname
-        - weight
     IManifestDashboard:
       type: object
       properties:
@@ -832,6 +831,9 @@ components:
           type: string
         name:
           type: string
+        weight:
+          type: number
+          format: float
       required:
         - type
         - meta
@@ -846,9 +848,6 @@ components:
             type: string
         pathname:
           type: string
-        weight:
-          type: number
-          format: float
         label:
           type: string
         icon:
@@ -856,7 +855,6 @@ components:
       required:
         - editors
         - pathname
-        - weight
         - label
         - icon
     IManifestEditorView:
@@ -876,6 +874,9 @@ components:
           type: string
         name:
           type: string
+        weight:
+          type: number
+          format: float
       required:
         - type
         - meta
@@ -907,6 +908,9 @@ components:
           type: string
         name:
           type: string
+        weight:
+          type: number
+          format: float
       required:
         - type
         - meta
@@ -936,6 +940,9 @@ components:
           type: string
         name:
           type: string
+        weight:
+          type: number
+          format: float
       required:
         - type
         - meta
@@ -954,6 +961,9 @@ components:
           type: string
         name:
           type: string
+        weight:
+          type: number
+          format: float
       required:
         - type
         - js
@@ -972,6 +982,9 @@ components:
           type: string
         name:
           type: string
+        weight:
+          type: number
+          format: float
       required:
         - type
         - alias
