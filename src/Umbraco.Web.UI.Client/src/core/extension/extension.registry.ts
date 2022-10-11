@@ -70,6 +70,14 @@ export class UmbExtensionRegistry {
 	extensionsOfType(type: 'custom'): Observable<Array<ManifestCustom>>;
 	extensionsOfType<T extends ManifestTypes>(type: string): Observable<Array<T>>;
 	extensionsOfType(type: string): Observable<Array<ManifestTypes>> {
-		return this.extensions.pipe(map((exts) => exts.filter((ext) => ext.type === type)));
+		return this.extensions.pipe(
+			map((exts) =>
+				exts
+					.filter((ext) => ext.type === type)
+					.sort((a, b) => {
+						return (b.weight || 0) - (a.weight || 0);
+					})
+			)
+		);
 	}
 }
