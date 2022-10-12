@@ -23,6 +23,9 @@ export class UmbBackofficeMain extends UmbContextProviderMixin(UmbContextConsume
 				height: 100%;
 				overflow: hidden;
 			}
+			router-slot {
+				height: 100%;
+			}
 		`,
 	];
 

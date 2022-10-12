@@ -154,6 +154,23 @@ export interface components {
       alias: string;
       name: string;
     };
+    MetaSectionView: {
+      sections: string[];
+      label: string;
+      pathname: string;
+      /** Format: float */
+      weight: number;
+      icon: string;
+    };
+    IManifestSectionView: {
+      /** @enum {string} */
+      type: "sectionView";
+      meta: components["schemas"]["MetaSectionView"];
+      js?: string;
+      elementName?: string;
+      alias: string;
+      name: string;
+    };
     MetaTree: {
       /** Format: float */
       weight: number;
@@ -175,6 +192,35 @@ export interface components {
       /** @enum {string} */
       type: "editor";
       meta: components["schemas"]["MetaEditor"];
+      js?: string;
+      elementName?: string;
+      alias: string;
+      name: string;
+    };
+    MetaEditorAction: {
+      editors: string[];
+    };
+    IManifestEditorAction: {
+      /** @enum {string} */
+      type: "editorAction";
+      meta: components["schemas"]["MetaEditorAction"];
+      js?: string;
+      elementName?: string;
+      alias: string;
+      name: string;
+    };
+    MetaEditorView: {
+      editors: string[];
+      pathname: string;
+      /** Format: float */
+      weight: number;
+      label: string;
+      icon: string;
+    };
+    IManifestEditorView: {
+      /** @enum {string} */
+      type: "editorView";
+      meta: components["schemas"]["MetaEditorView"];
       js?: string;
       elementName?: string;
       alias: string;
@@ -253,23 +299,6 @@ export interface components {
       alias: string;
       name: string;
     };
-    MetaEditorView: {
-      editors: string[];
-      pathname: string;
-      /** Format: float */
-      weight: number;
-      label: string;
-      icon: string;
-    };
-    IManifestEditorView: {
-      /** @enum {string} */
-      type: "editorView";
-      meta: components["schemas"]["MetaEditorView"];
-      js?: string;
-      elementName?: string;
-      alias: string;
-      name: string;
-    };
     MetaPropertyAction: {
       propertyEditors: string[];
     };
@@ -310,12 +339,14 @@ export interface components {
     };
     Manifest:
       | components["schemas"]["IManifestSection"]
+      | components["schemas"]["IManifestSectionView"]
       | components["schemas"]["IManifestTree"]
       | components["schemas"]["IManifestEditor"]
+      | components["schemas"]["IManifestEditorAction"]
+      | components["schemas"]["IManifestEditorView"]
       | components["schemas"]["IManifestTreeItemAction"]
       | components["schemas"]["IManifestPropertyEditorUI"]
       | components["schemas"]["IManifestDashboard"]
-      | components["schemas"]["IManifestEditorView"]
       | components["schemas"]["IManifestPropertyAction"]
       | components["schemas"]["IManifestPackageView"]
       | components["schemas"]["IManifestEntrypoint"]

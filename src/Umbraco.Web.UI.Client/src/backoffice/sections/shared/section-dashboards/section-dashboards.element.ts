@@ -4,20 +4,21 @@ import { customElement, state } from 'lit/decorators.js';
 import { IRoutingInfo } from 'router-slot';
 import { first, map } from 'rxjs';
 
-import { UmbContextConsumerMixin } from '../../../core/context';
-import { createExtensionElement, UmbExtensionRegistry } from '../../../core/extension';
-import { UmbSectionContext } from '../section.context';
-
-import type { ManifestDashboard, ManifestSection } from '../../../core/models';
-import { UmbObserverMixin } from '../../../core/observer';
+import { UmbContextConsumerMixin } from '../../../../core/context';
+import { createExtensionElement, UmbExtensionRegistry } from '../../../../core/extension';
+import { UmbSectionContext } from '../../section.context';
+import type { ManifestDashboard, ManifestSection } from '../../../../core/models';
+import { UmbObserverMixin } from '../../../../core/observer';
 
 @customElement('umb-section-dashboards')
-export class UmbSectionDashboards extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+export class UmbSectionDashboardsElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles = [
 		UUITextStyles,
 		css`
 			:host {
-				display: block;
+				display: flex;
+				flex-direction: column;
+				height: 100%;
 				width: 100%;
 			}
 
@@ -150,10 +151,10 @@ export class UmbSectionDashboards extends UmbContextConsumerMixin(UmbObserverMix
 	}
 }
 
-export default UmbSectionDashboards;
+export default UmbSectionDashboardsElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-section-dashboards': UmbSectionDashboards;
+		'umb-section-dashboards': UmbSectionDashboardsElement;
 	}
 }

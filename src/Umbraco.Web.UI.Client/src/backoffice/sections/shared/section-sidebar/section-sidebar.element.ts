@@ -1,14 +1,15 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbContextConsumerMixin } from '../../../core/context';
-import { UmbSectionContext } from '../section.context';
-import '../../trees/shared/context-menu/tree-context-menu.service';
-import { UmbObserverMixin } from '../../../core/observer';
-import type { ManifestSection } from '../../../core/models';
+import { UmbContextConsumerMixin } from '../../../../core/context';
+import { UmbSectionContext } from '../../section.context';
+import { UmbObserverMixin } from '../../../../core/observer';
+import type { ManifestSection } from '../../../../core/models';
+
+import '../../../trees/shared/context-menu/tree-context-menu.service';
 
 @customElement('umb-section-sidebar')
-export class UmbSectionSidebar extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+export class UmbSectionSidebarElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -71,6 +72,6 @@ export class UmbSectionSidebar extends UmbContextConsumerMixin(UmbObserverMixin(
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-section-sidebar': UmbSectionSidebar;
+		'umb-section-sidebar': UmbSectionSidebarElement;
 	}
 }

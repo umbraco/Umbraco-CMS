@@ -3,15 +3,15 @@ import { html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { map, switchMap, EMPTY, of } from 'rxjs';
 
-import { UmbContextConsumerMixin } from '../../../core/context';
-import { UmbExtensionRegistry } from '../../../core/extension';
-import { UmbSectionContext } from '../section.context';
+import { UmbContextConsumerMixin } from '../../../../core/context';
+import { UmbExtensionRegistry } from '../../../../core/extension';
+import { UmbSectionContext } from '../../section.context';
+import { UmbObserverMixin } from '../../../../core/observer';
 
-import '../../trees/shared/tree-extension.element';
-import { UmbObserverMixin } from '../../../core/observer';
+import '../../../trees/shared/tree-extension.element';
 
 @customElement('umb-section-trees')
-export class UmbSectionTrees extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+export class UmbSectionTreesElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles = [UUITextStyles];
 
 	@state()
@@ -66,10 +66,10 @@ export class UmbSectionTrees extends UmbContextConsumerMixin(UmbObserverMixin(Li
 	}
 }
 
-export default UmbSectionTrees;
+export default UmbSectionTreesElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-section-trees': UmbSectionTrees;
+		'umb-section-trees': UmbSectionTreesElement;
 	}
 }
