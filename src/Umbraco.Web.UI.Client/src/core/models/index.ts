@@ -77,3 +77,16 @@ export interface UserDetails extends UserEntity {
 	failedLoginAttempts: number;
 	userGroup?: string; //TODO Implement this
 }
+
+export interface UserGroupEntity extends Entity {
+	type: 'userGroup';
+}
+
+export interface UserGroupDetails extends UserGroupEntity {
+	key: string;
+	name: string;
+	icon: string;
+	sections?: Array<string>;
+	contentStartNode?: string;
+	mediaStartNode?: string;
+}
