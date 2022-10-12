@@ -19,9 +19,6 @@
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
     <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.7.0" />
     <PackageReference Include="System.Runtime.Caching" Version="7.0.0-rc.2.*" />
-    <PackageReference Include="System.Runtime.Caching" Version="6.0.0" />
-    <!--   Add dependencies that we force an update to, even that we do not use them explicitly and they seems to be taken from the framework instead of from Nuget -->
-    <PackageReference Include="System.Runtime.Caching" Version="7.0.0-rc.1.22426.10" />
   </ItemGroup>
 
   <ItemGroup>
