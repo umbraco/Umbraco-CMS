@@ -14,6 +14,8 @@ import UmbTableElement, {
 	UmbTableSelectedEvent,
 } from '../../../../components/table/table.element';
 
+import './user-group-table-name-column-layout.element';
+
 @customElement('umb-editor-view-user-groups')
 export class UmbEditorViewUserGroupsElement extends UmbContextConsumerMixin(LitElement) {
 	static styles = [
@@ -40,6 +42,7 @@ export class UmbEditorViewUserGroupsElement extends UmbContextConsumerMixin(LitE
 		{
 			name: 'Name',
 			alias: 'userGroupName',
+			elementName: 'umb-user-group-table-name-column-layout',
 		},
 		{
 			name: 'Sections',
@@ -92,7 +95,9 @@ export class UmbEditorViewUserGroupsElement extends UmbContextConsumerMixin(LitE
 				data: [
 					{
 						columnAlias: 'userGroupName',
-						value: userGroup.name,
+						value: {
+							name: userGroup.name,
+						},
 					},
 					{
 						columnAlias: 'userGroupSections',
