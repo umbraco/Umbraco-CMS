@@ -1,6 +1,11 @@
 import '../src/core/context/context-provider.element';
 import '../src/css/custom-properties.css';
+import '../src/backoffice/components/backoffice-modal-container.element';
 import '@umbraco-ui/uui';
+import '@umbraco-ui/uui-modal';
+import '@umbraco-ui/uui-modal-container';
+import '@umbraco-ui/uui-modal-dialog';
+import '@umbraco-ui/uui-modal-sidebar';
 
 import { html } from 'lit-html';
 import { initialize, mswDecorator } from 'msw-storybook-addon';
@@ -18,6 +23,7 @@ import { onUnhandledRequest } from '../src/mocks/browser';
 import { handlers } from '../src/mocks/browser-handlers';
 import { internalManifests } from '../src/temp-internal-manifests';
 import { LitElement } from 'lit';
+import { UmbModalService } from '../src/core/services/modal';
 
 const extensionRegistry = new UmbExtensionRegistry();
 internalManifests.forEach((manifest) => extensionRegistry.register(manifest));
@@ -69,6 +75,13 @@ const propertyEditorConfigStoreProvider = (story) => html`
 	>
 `;
 
+const modalServiceProvider = (story) => html`
+	<umb-context-provider style="display: block; padding: 32px;" key="umbModalService" .value=${new UmbModalService()}>
+		${story()}
+		<umb-backoffice-modal-container></umb-backoffice-modal-container>
+	</umb-context-provider>
+`;
+
 // Initialize MSW
 initialize({ onUnhandledRequest });
 
@@ -82,6 +95,7 @@ export const decorators = [
 	documentTypeStoreProvider,
 	propertyEditorStoreProvider,
 	propertyEditorConfigStoreProvider,
+	modalServiceProvider,
 ];
 
 export const parameters = {

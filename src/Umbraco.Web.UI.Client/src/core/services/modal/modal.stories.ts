@@ -1,12 +1,3 @@
-import '../../../backoffice/components/backoffice-modal-container.element';
-import '../../../backoffice/editors/shared/editor-layout/editor-layout.element';
-import '../../../core/services/modal/layouts/content-picker/modal-layout-content-picker.element';
-import '../../context/context-provider.element';
-import '@umbraco-ui/uui-modal';
-import '@umbraco-ui/uui-modal-container';
-import '@umbraco-ui/uui-modal-dialog';
-import '@umbraco-ui/uui-modal-sidebar';
-
 import { Meta, Story } from '@storybook/web-components';
 import { LitElement } from 'lit';
 import { html } from 'lit-html';
@@ -17,19 +8,12 @@ import { UmbModalService } from './';
 
 export default {
 	title: 'API/Modals',
-	component: 'umb-installer',
-	decorators: [
-		(story) =>
-			html`<umb-context-provider
-				style="display: block; padding: 32px;"
-				key="umbModalService"
-				.value=${new UmbModalService()}>
-				${story()}
-			</umb-context-provider>`,
-	],
-	id: 'installer-page',
+	id: 'umb-modal-service',
 	argTypes: {
-		modalLayout: { control: 'select', options: ['Confirm', 'Content Picker', 'Property Editor UI Picker'] },
+		modalLayout: {
+			control: 'select',
+			options: ['Confirm', 'Content Picker', 'Property Editor UI Picker', 'Icon Picker'],
+		},
 	},
 } as Meta;
 
@@ -58,6 +42,9 @@ export class StoryModalServiceExampleElement extends UmbContextConsumerMixin(Lit
 			case 'Property Editor UI Picker':
 				this._modalService?.propertyEditorUIPicker();
 				break;
+			case 'Icon Picker':
+				this._modalService?.iconPicker();
+				break;
 			default:
 				this._modalService?.confirm({
 					headline: 'Headline',
@@ -77,10 +64,7 @@ export class StoryModalServiceExampleElement extends UmbContextConsumerMixin(Lit
 }
 
 const Template: Story = (props) => {
-	return html`
-		<umb-backoffice-modal-container></umb-backoffice-modal-container>
-		<story-modal-service-example .modalLayout=${props.modalLayout}></story-modal-service-example>
-	`;
+	return html` <story-modal-service-example .modalLayout=${props.modalLayout}></story-modal-service-example> `;
 };
 
 export const Overview = Template.bind({});

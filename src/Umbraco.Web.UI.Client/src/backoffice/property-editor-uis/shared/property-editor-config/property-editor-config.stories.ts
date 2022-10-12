@@ -20,6 +20,6 @@ const data = [
 export const AAAOverview: Story<UmbPropertyEditorConfigElement> = () =>
 	html`<umb-property-editor-config
 		property-editor-alias="Umbraco.TextBox"
-		property-editor-ui-alias="Umb.PropertyEditorUI.Text"
+		property-editor-ui-alias="Umb.PropertyEditorUI.TextBox"
 		.data="${data}"></umb-property-editor-config>`;
 AAAOverview.storyName = 'Overview';
