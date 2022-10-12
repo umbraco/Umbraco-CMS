@@ -102,14 +102,14 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 	},
 	{
 		type: 'dashboard',
-		alias: 'Umb.Dashboard.SettingsAbout',
-		name: 'About Settings Dashboard',
-		elementName: 'umb-dashboard-settings-about',
-		loader: () => import('../backoffice/dashboards/settings-about/dashboard-settings-about.element'),
+		alias: 'Umb.Dashboard.SettingsWelcome',
+		name: 'Welcome Settings Dashboard',
+		elementName: 'umb-dashboard-settings-welcome',
+		loader: () => import('../backoffice/dashboards/settings-welcome/dashboard-settings-welcome.element'),
 		meta: {
-			label: 'About',
+			label: 'Welcome',
 			sections: ['Umb.Section.Settings'],
-			pathname: 'about', // TODO: how to we want to support pretty urls?
+			pathname: 'welcome', // TODO: how to we want to support pretty urls?
 			weight: 10,
 		},
 	},
