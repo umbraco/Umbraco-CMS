@@ -185,6 +185,13 @@
         function closeLightbox() {
             vm.lightbox.show = false;
             vm.lightbox = null;
+            
+            if(previousElement){
+                setTimeout(function(){ 
+                    previousElement.focus();
+                    previousElement = null;
+                  }, 100) 
+            }
             document.activeElement.blur();
         }
 
