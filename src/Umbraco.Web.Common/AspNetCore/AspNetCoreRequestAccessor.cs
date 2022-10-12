@@ -58,7 +58,7 @@ public class AspNetCoreRequestAccessor : IRequestAccessor, INotificationHandler<
     /// Ensure that the ApplicationUrl is set on the first request, this is using a LazyInitializer, so the code will only be run the first time
     /// </summary>
     /// TODO: This doesn't belong here, the GetApplicationUrl doesn't belong to IRequestAccessor
-    public void EnsureApplicationUrl() =>
+    internal void EnsureApplicationUrl() =>
         LazyInitializer.EnsureInitialized(ref _hasAppUrl, ref _isInit, ref _initLocker, () =>
         {
             GetApplicationUrl();
