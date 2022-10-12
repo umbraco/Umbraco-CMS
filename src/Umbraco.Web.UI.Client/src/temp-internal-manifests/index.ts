@@ -293,6 +293,15 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		},
 	},
 	{
+		type: 'editor',
+		alias: 'Umb.Editor.UserGroup',
+		name: 'User Group Editor',
+		loader: () => import('../backoffice/editors/user-group/editor-user-group.element'),
+		meta: {
+			entityType: 'userGroup',
+		},
+	},
+	{
 		type: 'editorAction',
 		alias: 'Umb.EditorAction.User.Save',
 		name: 'EditorActionUserSave',
