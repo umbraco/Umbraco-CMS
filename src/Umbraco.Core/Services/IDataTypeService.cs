@@ -107,8 +107,9 @@ public interface IDataTypeService : IService
     /// </summary>
     /// <param name="copying">The data type that will be copied</param>
     /// <param name="containerId">The container ID under where the data type will be copied</param>
+    /// <param name="userId">The user that did the Copy action</param>
     /// <returns></returns>
     /// <exception cref="NotImplementedException"></exception>
-    Attempt<OperationResult<MoveOperationStatusType, IDataType>?> Copy(IDataType copying, int containerId) => throw new NotImplementedException();
+    Attempt<OperationResult<MoveOperationStatusType, IDataType>?> Copy(IDataType copying, int containerId, int userId = Constants.Security.SuperUserId) => throw new NotImplementedException();
 
 }

@@ -14,6 +14,7 @@ using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace Umbraco.Cms.Core.Services.Implement
 {
@@ -441,34 +442,31 @@ namespace Umbraco.Cms.Core.Services.Implement
             return OperationResult.Attempt.Succeed(MoveOperationStatusType.Success, evtMsgs);
         }
 
-        public Attempt<OperationResult<MoveOperationStatusType, IDataType>?> Copy(IDataType copying, int containerId)
+        public Attempt<OperationResult<MoveOperationStatusType, IDataType>?> Copy(IDataType copying, int containerId, int userId = Constants.Security.SuperUserId)
         {
             var evtMsgs = EventMessagesFactory.Get();
 
             IDataType copy;
-            using (var scope = ScopeProvider.CreateCoreScope())
+            try
             {
-                try
+                if (containerId > 0)
                 {
-                    if (containerId > 0)
+                    var container = GetContainer(containerId);
+                    if (container is null)
                     {
-                        var container = _dataTypeContainerRepository.Get(containerId);
-                        if (container is null)
-                        {
-                            throw new DataOperationException<MoveOperationStatusType>(MoveOperationStatusType.FailedParentNotFound); // causes rollback
-                        }
+                        throw new DataOperationException<MoveOperationStatusType>(MoveOperationStatusType.FailedParentNotFound); // causes rollback
                     }
-                    copy = copying.DeepCloneWithResetIdentities();
+                }
+                copy = copying.DeepCloneWithResetIdentities();
 
-                    copy.Name += " (copy)"; // might not be unique
-                    copy.ParentId = containerId;
-                    _dataTypeRepository.Save(copy);
-                    scope.Complete();
-                }
-                catch (DataOperationException<MoveOperationStatusType> ex)
-                {
-                    return OperationResult.Attempt.Fail<MoveOperationStatusType, IDataType>(ex.Operation, evtMsgs); // causes rollback
-                }
+                copy.Name += " (copy)"; // might not be unique
+                copy.ParentId = containerId;
+
+                Save(copy, userId);
+            }
+            catch (DataOperationException<MoveOperationStatusType> ex)
+            {
+                return OperationResult.Attempt.Fail<MoveOperationStatusType, IDataType>(ex.Operation, evtMsgs); // causes rollback
             }
 
             return OperationResult.Attempt.Succeed(MoveOperationStatusType.Success, evtMsgs, copy);
