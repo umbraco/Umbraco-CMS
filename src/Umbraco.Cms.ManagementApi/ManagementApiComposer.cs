@@ -75,10 +75,11 @@ public class ManagementApiComposer : IComposer
             options.AddApiVersionParametersWhenVersionNeutral = true;
             options.AssumeDefaultVersionWhenUnspecified = true;
         });
-        builder.Services.TryAddEnumerable(ServiceDescriptor.Transient<IApplicationModelProvider, UmbracoManagementApiBehaviorApplicationModelProvider>());
-        builder.Services.ConfigureOptions<ConfigureMvcOptions>();
+        services.AddControllers();
+        services.TryAddEnumerable(ServiceDescriptor.Transient<IApplicationModelProvider, UmbracoManagementApiBehaviorApplicationModelProvider>());
+        services.ConfigureOptions<ConfigureMvcOptions>();
 
-        builder.Services.Configure<UmbracoPipelineOptions>(options =>
+        services.Configure<UmbracoPipelineOptions>(options =>
         {
             options.AddFilter(new UmbracoPipelineFilter(
                 "BackofficeSwagger",
