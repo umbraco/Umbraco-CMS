@@ -94,7 +94,7 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		alias: 'Umb.Dashboard.SettingsWelcome',
 		name: 'Welcome Settings Dashboard',
 		elementName: 'umb-dashboard-settings-welcome',
-		loader: () => import('./backoffice/dashboards/settings-welcome/dashboard-settings-welcome.element'),
+		loader: () => import('../backoffice/dashboards/settings-welcome/dashboard-settings-welcome.element'),
 		meta: {
 			label: 'Welcome',
 			sections: ['Umb.Section.Settings'],
