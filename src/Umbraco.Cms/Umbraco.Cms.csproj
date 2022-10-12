@@ -19,4 +19,14 @@
   <ItemGroup Condition=" '$(Configuration)' == 'Debug' ">
     <ProjectReference Include="..\Umbraco.Cms.ManagementApi\Umbraco.Cms.ManagementApi.csproj" />
   </ItemGroup>
+
+  <!-- Generate appsettings.json schema on build (and before copying to project) -->
+  <PropertyGroup>
+    <JsonSchemaPath>$(MSBuildThisFileDirectory)appsettings-schema.json</JsonSchemaPath>
+    <JsonSchemaProjectPath>$(MSBuildThisFileDirectory)..\JsonSchema\</JsonSchemaProjectPath>
+  </PropertyGroup>
+  <Target Name="GenerateAppsettingsSchema" BeforeTargets="Build" Condition="!Exists('$(JsonSchemaPath)')">
+    <Message Text="Generating appsettings-schema.json because it doesn't exist" Importance="high" />
+    <Exec WorkingDirectory="$(JsonSchemaProjectPath)" Command="dotnet run --configuration Release -- --outputFile &quot;$(JsonSchemaPath)&quot;" />
+  </Target>
 </Project>

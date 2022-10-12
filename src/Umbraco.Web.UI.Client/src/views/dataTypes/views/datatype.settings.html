@@ -8,9 +8,9 @@
 
                 <ng-form name="propertyEditorForm">
 
-                    <div 
-                        ng-model="model.content.selectedEditor" 
-                        name="selectedEditor" 
+                    <div
+                        ng-model="model.content.selectedEditor"
+                        name="selectedEditor"
                         val-require-component
                         class="umb-property-editor--limit-width">
 
@@ -23,7 +23,7 @@
                             ng-click="vm.openPropertyEditorPicker()">
                         </umb-button>
 
-                        <div ng-messages="propertyEditorForm.selectedEditor.$error" show-validation-on-submit>
+                        <div class="help-inline" ng-messages="propertyEditorForm.selectedEditor.$error" show-validation-on-submit>
                             <span ng-message="valRequiredComponent">
                                 <localize key="general_required">Required</localize>
                             </span>
