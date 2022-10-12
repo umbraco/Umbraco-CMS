@@ -6,7 +6,7 @@ import {
   ApprovedColorPickerDataTypeBuilder,
   DataTypeBuilder, BlockListDataType, GridDataTypeBuilder, ContentBuilder
 } from "@umbraco/json-models-builders";
-import {BlockListDataTypeBuilder} from "../../../../../../Umbraco.JsonModels.Builders/lib/builders/dataTypes";
+import {BlockListDataTypeBuilder} from "@umbraco/json-models-builders/dist/lib/builders/dataTypes";
 
 test.describe('BlockListEditor', () => {
 
@@ -276,7 +276,7 @@ test.describe('BlockListEditor', () => {
     await umbracoApi.documentTypes.ensureNameNotExists(elementTypeNameTwo);
     await umbracoApi.dataTypes.ensureNameNotExists(blockListName);
   });
-  
+
   test('can delete a block list editor', async ({page, umbracoApi, umbracoUi}) => {
     const elementTypeName = 'TestElement';
     const elementTypeNameTwo = 'AnotherTestElement';
@@ -299,7 +299,7 @@ test.describe('BlockListEditor', () => {
       .done()
       .build();
     await umbracoApi.dataTypes.save(blockListType);
-    
+
     // Navigates to the block list editor
     await umbracoUi.goToSection(ConstantHelper.sections.settings);
     await page.locator('[data-element="tree-item-dataTypes"]').locator('[data-element="tree-item-expand"]').click();
@@ -307,15 +307,15 @@ test.describe('BlockListEditor', () => {
     // Deletes the block list editor
     await page.locator('[data-element="action-delete"]').click();
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.delete));
-    
+
     // Assert
     await expect(page.locator('[data-element="tree-item-' + blockListName + '"]')).not.toBeVisible();
-    
+
     // Clean
     await umbracoApi.documentTypes.ensureNameNotExists(elementTypeName);
     await umbracoApi.documentTypes.ensureNameNotExists(elementTypeNameTwo);
   });
-  
+
   test('create content using the block list editor', async ({page, umbracoApi, umbracoUi}) => {
     const documentTypeName = 'DocumentName'
     const elementTypeName = 'TestElement';
@@ -378,87 +378,114 @@ test.describe('BlockListEditor', () => {
   });
   
   // Cursed Test
-  // test('create block list datatype with range of blocks', async ({page, umbracoApi, umbracoUi}) => {
-  //   const documentTypeName = 'DocumentName'
-  //   const elementTypeName = 'TestElement';
-  //   const blockListName = 'BlockListTest';
-  //
-  //   const alias = AliasHelper.toAlias(documentTypeName);
-  //   const dataTypeAlias = AliasHelper.toAlias(blockListName);
-  //   const elementAlias = AliasHelper.toAlias(elementTypeName);
-  //
-  //   await umbracoApi.documentTypes.ensureNameNotExists(documentTypeName);
-  //   await umbracoApi.documentTypes.ensureNameNotExists(elementTypeName);
-  //   await umbracoApi.dataTypes.ensureNameNotExists(blockListName);
-  //
-  //   const element = await createElement(umbracoApi, elementTypeName);
-  //
-  //   const dataTypeBlockList = new BlockListDataTypeBuilder()
-  //     .withName(blockListName)
-  //     .addBlock()
-  //       .withContentElementTypeKey(element['key'])
-  //     .done()
-  //     .build();
-  //   const dataType = await umbracoApi.dataTypes.save(dataTypeBlockList);
-  //
-  //   const docType = new DocumentTypeBuilder()
-  //     .withName(documentTypeName)
-  //     .withAlias(alias)
-  //     .withAllowAsRoot(true)
-  //     .addGroup()
-  //       .withName('BlockListGroup')
-  //       .addCustomProperty(dataType['id'])
-  //         .withAlias(dataTypeAlias)
-  //       .done()
-  //     .done()
-  //     .build();
-  //   const generatedDocType = await umbracoApi.documentTypes.save(docType);
-  //   const rootContentNode = new ContentBuilder()
-  //     .withContentTypeAlias(generatedDocType["alias"])
-  //     .withAction("saveNew")
-  //     .addVariant()
-  //       .withName(blockListName)
-  //       .withSave(true)
-  //         .addBlockListProperty()
-  //           .withAlias(dataTypeAlias)
-  //           .addValue()
-  //             .addLayout()
-  //               .addBlockList()
-  //                 .withContentUdi("Idk")
-  //             .done()
-  //           .done()
-  //           .addContentData()
-  //             .withContentTypeKey(element['key'])
-  //             .withUdi("Idk")
-  //             .withTitle("Hej")
-  //             .withBody("Body")
-  //           .done()
-  //         .done()
-  //       .done()
-  //     .done()
-  //     .build();
-  //
-  //   const testContent = await umbracoApi.content.save(rootContentNode);
-  //
-  //   console.log(testContent);
-  //   console.log(rootContentNode);
-  //   console.log(dataType);
-  //   console.log(dataType['alias']);
-  //   console.log(dataType['udi']);
-  //   console.log(dataType['contentData']);
-  //   console.log(dataType['contentUdi']);
-  //   console.log(dataType['key']);
-  //   console.log(element['key']);
-  //   console.log(element);
-  //
-  //   // Adds an element to the block list
-  //   // await expect(page.locator('2262636')).toHaveCount(2);
-  //   // await page.locator('[k'ey="general_add"]').click();
-  //   // await page.locator('[data-element="editor-container"]').locator('[data-element="tree-item-' + elementTypeName + '"]').click();
-  //   // await page.locator('[label-key="buttons_submitChanges"]').click();
-  //   // await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.save));
-  //
-  // });
+  test('create block list datatype with range of blocks', async ({page, umbracoApi, umbracoUi}) => {
+    const documentTypeName = 'DocumentName'
+    const elementTypeName = 'TestElement';
+    const blockListName = 'BlockListTest';
+
+    const alias = AliasHelper.toAlias(documentTypeName);
+    const dataTypeAlias = AliasHelper.toAlias(blockListName);
+    const elementAlias = AliasHelper.toAlias(elementTypeName);
+
+    await umbracoApi.documentTypes.ensureNameNotExists(documentTypeName);
+    await umbracoApi.documentTypes.ensureNameNotExists(elementTypeName);
+    await umbracoApi.dataTypes.ensureNameNotExists(blockListName);
+
+    const element = await createElement(umbracoApi, elementTypeName);
+
+    const dataTypeBlockList = new BlockListDataTypeBuilder()
+      .withName(blockListName)
+      .addBlock()
+        .withContentElementTypeKey(element['key'])
+      .done()
+      .build();
+    const dataType = await umbracoApi.dataTypes.save(dataTypeBlockList);
+
+    const docType = new DocumentTypeBuilder()
+      .withName(documentTypeName)
+      .withAlias(alias)
+      .withAllowAsRoot(true)
+      .addGroup()
+        .withName('BlockListGroup')
+        .addCustomProperty(dataType['id'])
+          .withAlias(dataTypeAlias)
+        .done()
+      .done()
+      .build();
+    const generatedDocType = await umbracoApi.documentTypes.save(docType);
+    
+    
+    const rootContentNode = new ContentBuilder()
+      .withContentTypeAlias(generatedDocType["alias"])
+      .withAction("saveNew")
+      .addVariant()
+        .withName(blockListName)
+        .withSave(true)
+        .addBlockListProperty()
+          .addValue()
+            .addBlockListEntry()
+              .withContentTypeKey(dataType['key'])
+              .appendContentProperties(element.groups[0].properties[0].alias,'Virker det?')
+            .done()
+          .done()
+        .done()
+      .done()
+      .build()
+    const testContent = await umbracoApi.content.save(rootContentNode);
+    
+    
+    // console.log(testContent);
+    console.log(rootContentNode);
+    // console.log(rootContentNode.variants[0].properties[0].alias);
+    console.log(rootContentNode.variants[0]);
+    console.log(rootContentNode.variants[0].properties[0]);
+    console.log(rootContentNode.variants[0].properties);
+    console.log(rootContentNode.variants[0].name);
+    
+    await expect(page.locator('.qw33qk3ttkm3+ktr32')).toBeVisible();
+
+
+    // console.log(rootContentNode);
+    // console.log(dataType);
+    // console.log(dataType['alias']);
+    // console.log(dataType['udi']);
+    // console.log(dataType['contentData']);
+    // console.log(dataType['contentElementTypeKey']);
+    // console.log(dataType['contentUdi']);
+    // console.log(dataType['key']);
+    // console.log(element['key']); 
+    // console.log(element['alias']); 
+    // console.log(element);
+    
+    console.log(element.groups[0].properties[0].alias);
+
+    // console.log(element.groups);
+    // console.log(element['groups']);
+    // console.log(element['properties']); 
+    // console.log(element);
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    // Adds an element to the block list
+    // await expect(page.locator('2262636')).toHaveCount(2);
+    // await page.locator('[k'ey="general_add"]').click();
+    // await page.locator('[data-element="editor-container"]').locator('[data-element="tree-item-' + elementTypeName + '"]').click();
+    // await page.locator('[label-key="buttons_submitChanges"]').click();
+    // await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.save));
+
+  });
 
   //TEST
   //   const blockListType = new BlockListDataTypeBuilder()
