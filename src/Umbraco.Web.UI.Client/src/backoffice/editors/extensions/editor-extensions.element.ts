@@ -29,7 +29,7 @@ export class UmbEditorExtensionsElement extends UmbContextConsumerMixin(UmbObser
 	private _observeExtensions() {
 		if (!this._extensionRegistry) return;
 
-		this.observe(this._extensionRegistry.extensions, (extensions) => {
+		this.observe<Array<ManifestTypes>>(this._extensionRegistry.extensions, (extensions) => {
 			this._extensions = [...extensions]; // TODO: Though, this is a shallow clone, wouldn't we either do a deep clone or no clone at all?
 		});
 	}

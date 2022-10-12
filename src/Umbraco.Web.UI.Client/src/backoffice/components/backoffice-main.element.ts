@@ -49,7 +49,7 @@ export class UmbBackofficeMain extends UmbContextProviderMixin(UmbContextConsume
 	private async _observeSections() {
 		if (!this._sectionStore) return;
 
-		this.observe(this._sectionStore?.getAllowed(), (sections) => {
+		this.observe<ManifestSection[]>(this._sectionStore?.getAllowed(), (sections) => {
 			this._sections = sections;
 			if (!sections) return;
 			this._createRoutes();

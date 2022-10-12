@@ -67,7 +67,7 @@ export class UmbEditorDataTypeElement extends UmbContextProviderMixin(
 	private _observeDataType() {
 		if (!this._dataTypeStore) return;
 
-		this.observe(this._dataTypeStore.getByKey(this.entityKey), (dataType: DataTypeDetails) => {
+		this.observe<DataTypeDetails>(this._dataTypeStore.getByKey(this.entityKey), (dataType) => {
 			if (!dataType) return; // TODO: Handle nicely if there is no data type.
 
 			if (!this._dataTypeContext) {
@@ -77,7 +77,7 @@ export class UmbEditorDataTypeElement extends UmbContextProviderMixin(
 				this._dataTypeContext.update(dataType);
 			}
 
-			this.observe(this._dataTypeContext.data, (dataType) => {
+			this.observe<DataTypeDetails>(this._dataTypeContext.data, (dataType) => {
 				if (dataType && dataType.name !== this._dataTypeName) {
 					this._dataTypeName = dataType.name;
 				}

@@ -34,7 +34,7 @@ export class UmbBackofficeModalContainer extends UmbContextConsumerMixin(UmbObse
 	private _observeModals() {
 		if (!this._modalService) return;
 
-		this.observe(this._modalService.modals, (modals) => {
+		this.observe<UmbModalHandler[]>(this._modalService.modals, (modals) => {
 			this._modals = modals;
 		});
 	}

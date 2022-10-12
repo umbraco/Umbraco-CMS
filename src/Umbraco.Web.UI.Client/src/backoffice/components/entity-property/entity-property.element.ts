@@ -4,7 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 
 import { UmbContextConsumerMixin } from '../../../core/context';
 import { createExtensionElement, UmbExtensionRegistry } from '../../../core/extension';
-import type { ManifestPropertyEditorUI } from '../../../core/models';
+import type { ManifestPropertyEditorUI, ManifestTypes } from '../../../core/models';
 import { UmbObserverMixin } from '../../../core/observer';
 
 import '../../property-actions/shared/property-action-menu/property-action-menu.element';
@@ -133,7 +133,7 @@ export class UmbEntityPropertyElement extends UmbContextConsumerMixin(UmbObserve
 	private _observePropertyEditorUI() {
 		if (!this._extensionRegistry) return;
 
-		this.observe(this._extensionRegistry.getByAlias(this.propertyEditorUIAlias), (manifest) => {
+		this.observe<ManifestTypes>(this._extensionRegistry.getByAlias(this.propertyEditorUIAlias), (manifest) => {
 			if (manifest?.type === 'propertyEditorUI') {
 				this._gotData(manifest);
 			}

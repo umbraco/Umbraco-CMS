@@ -40,7 +40,7 @@ export class UmbBackofficeNotificationContainer extends UmbContextConsumerMixin(
 	private _observeNotifications() {
 		if (!this._notificationService) return;
 
-		this.observe(this._notificationService.notifications, (notifications) => {
+		this.observe<UmbNotificationHandler[]>(this._notificationService.notifications, (notifications) => {
 			this._notifications = notifications;
 		});
 	}
