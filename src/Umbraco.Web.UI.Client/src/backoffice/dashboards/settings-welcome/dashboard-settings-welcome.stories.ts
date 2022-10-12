@@ -11,5 +11,5 @@ export default {
 } as Meta;
 
 export const AAAOverview: Story<UmbDashboardSettingsWelcomeElement> = () =>
-	html` <umb-dashboard-settings-welsome></umb-dashboard-settings-welsome>`;
+	html` <umb-dashboard-settings-welcome></umb-dashboard-settings-welcome>`;
 AAAOverview.storyName = 'Overview';
