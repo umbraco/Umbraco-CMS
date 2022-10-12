@@ -1,14 +1,14 @@
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
-import { Subscription } from 'rxjs';
 
 import { UmbContextConsumerMixin } from '../../core/context';
-import type { TelemetryModel } from '../../core/models';
+import type { PostInstallRequest, TelemetryModel, UmbracoInstaller } from '../../core/models';
+import { UmbObserverMixin } from '../../core/observer';
 import { UmbInstallerContext } from '../installer.context';
 
 @customElement('umb-installer-consent')
-export class UmbInstallerConsentElement extends UmbContextConsumerMixin(LitElement) {
+export class UmbInstallerConsentElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles: CSSResultGroup = [
 		css`
 			:host,
@@ -52,8 +52,6 @@ export class UmbInstallerConsentElement extends UmbContextConsumerMixin(LitEleme
 	private _telemetryFormData?: TelemetryModel['level'];
 
 	private _installerContext?: UmbInstallerContext;
-	private _installerDataSubscription?: Subscription;
-	private _installerSettingsSubscription?: Subscription;
 
 	constructor() {
 		super();
@@ -66,23 +64,19 @@ export class UmbInstallerConsentElement extends UmbContextConsumerMixin(LitEleme
 	}
 
 	private _observeInstallerSettings() {
-		this._installerSettingsSubscription?.unsubscribe();
-		this._installerSettingsSubscription = this._installerContext?.settings.subscribe((settings) => {
+		if (!this._installerContext) return;
+
+		this.observe<UmbracoInstaller>(this._installerContext.settings, (settings) => {
 			this._telemetryLevels = settings.user.consentLevels;
 		});
 	}
 
 	private _observeInstallerData() {
-		this._installerDataSubscription?.unsubscribe();
-		this._installerDataSubscription = this._installerContext?.data.subscribe((data) => {
+		if (!this._installerContext) return;
+
+		this.observe<PostInstallRequest>(this._installerContext.data, (data) => {
 			this._telemetryFormData = data.telemetryLevel;
 		});
-	}
-
-	disconnectedCallback(): void {
-		super.disconnectedCallback();
-		this._installerSettingsSubscription?.unsubscribe();
-		this._installerDataSubscription?.unsubscribe();
 	}
 
 	private _handleChange(e: InputEvent) {

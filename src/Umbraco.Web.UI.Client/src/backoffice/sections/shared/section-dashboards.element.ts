@@ -2,7 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { IRoutingInfo } from 'router-slot';
-import { first, map, Subscription } from 'rxjs';
+import { first, map } from 'rxjs';
 
 import { UmbContextConsumerMixin } from '../../../core/context';
 import { createExtensionElement, UmbExtensionRegistry } from '../../../core/extension';
