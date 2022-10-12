@@ -3,7 +3,6 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { state } from 'lit/decorators.js';
 import { IRoutingInfo } from 'router-slot';
-import { Subscription } from 'rxjs';
 
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '../../core/context';
 import { createExtensionElement } from '../../core/extension';
