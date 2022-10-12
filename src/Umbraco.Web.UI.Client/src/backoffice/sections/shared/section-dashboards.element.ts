@@ -8,10 +8,11 @@ import { UmbContextConsumerMixin } from '../../../core/context';
 import { createExtensionElement, UmbExtensionRegistry } from '../../../core/extension';
 import { UmbSectionContext } from '../section.context';
 
-import type { ManifestDashboard } from '../../../core/models';
+import type { ManifestDashboard, ManifestSection } from '../../../core/models';
+import { UmbObserverMixin } from '../../../core/observer';
 
 @customElement('umb-section-dashboards')
-export class UmbSectionDashboards extends UmbContextConsumerMixin(LitElement) {
+export class UmbSectionDashboards extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -54,10 +55,7 @@ export class UmbSectionDashboards extends UmbContextConsumerMixin(LitElement) {
 	private _currentSectionAlias = '';
 
 	private _extensionRegistry?: UmbExtensionRegistry;
-	private _dashboardsSubscription?: Subscription;
-
 	private _sectionContext?: UmbSectionContext;
-	private _sectionContextSubscription?: Subscription;
 
 	constructor() {
 		super();
@@ -69,39 +67,39 @@ export class UmbSectionDashboards extends UmbContextConsumerMixin(LitElement) {
 
 		this.consumeContext('umbSectionContext', (context: UmbSectionContext) => {
 			this._sectionContext = context;
-			this._useSectionContext();
+			this._observeSectionContext();
 		});
 	}
 
-	private _useSectionContext() {
-		this._sectionContextSubscription?.unsubscribe();
+	private _observeSectionContext() {
+		if (!this._sectionContext) return;
 
-		this._sectionContextSubscription = this._sectionContext?.data.pipe(first()).subscribe((section) => {
+		this.observe<ManifestSection>(this._sectionContext.data.pipe(first()), (section) => {
 			this._currentSectionAlias = section.alias;
 			this._currentSectionPathname = section.meta.pathname;
-			this._useDashboards();
+			this._observeDashboards();
 		});
 	}
 
-	private _useDashboards() {
+	private _observeDashboards() {
 		if (!this._extensionRegistry || !this._currentSectionAlias) return;
 
-		this._dashboardsSubscription?.unsubscribe();
-
-		this._dashboardsSubscription = this._extensionRegistry
-			?.extensionsOfType('dashboard')
-			.pipe(
-				map((extensions) =>
-					extensions
-						.filter((extension) => extension.meta.sections.includes(this._currentSectionAlias))
-						.sort((a, b) => b.meta.weight - a.meta.weight)
-				)
-			)
-			.subscribe((dashboards) => {
+		this.observe<ManifestDashboard[]>(
+			this._extensionRegistry
+				?.extensionsOfType('dashboard')
+				.pipe(
+					map((extensions) =>
+						extensions
+							.filter((extension) => extension.meta.sections.includes(this._currentSectionAlias))
+							.sort((a, b) => b.meta.weight - a.meta.weight)
+					)
+				),
+			(dashboards) => {
 				if (dashboards?.length === 0) return;
 				this._dashboards = dashboards;
 				this._createRoutes();
-			});
+			}
+		);
 	}
 
 	private _createRoutes() {
@@ -140,12 +138,6 @@ export class UmbSectionDashboards extends UmbContextConsumerMixin(LitElement) {
 				  `
 				: nothing}
 		`;
-	}
-
-	disconnectedCallback() {
-		super.disconnectedCallback();
-		this._dashboardsSubscription?.unsubscribe();
-		this._sectionContextSubscription?.unsubscribe();
 	}
 
 	render() {

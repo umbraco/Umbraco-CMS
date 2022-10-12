@@ -1,13 +1,14 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { Subscription } from 'rxjs';
 import { UmbContextConsumerMixin } from '../../../core/context';
 import { UmbSectionContext } from '../section.context';
 import '../../trees/shared/context-menu/tree-context-menu.service';
+import { UmbObserverMixin } from '../../../core/observer';
+import type { ManifestSection } from '../../../core/models';
 
 @customElement('umb-section-sidebar')
-export class UmbSectionSidebar extends UmbContextConsumerMixin(LitElement) {
+export class UmbSectionSidebar extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -34,29 +35,23 @@ export class UmbSectionSidebar extends UmbContextConsumerMixin(LitElement) {
 	private _sectionPathname = '';
 
 	private _sectionContext?: UmbSectionContext;
-	private _sectionContextSubscription?: Subscription;
 
 	constructor() {
 		super();
 
 		this.consumeContext('umbSectionContext', (sectionContext: UmbSectionContext) => {
 			this._sectionContext = sectionContext;
-			this._useSectionContext();
+			this._observeSectionContext();
 		});
 	}
 
-	private _useSectionContext() {
-		this._sectionContextSubscription?.unsubscribe();
+	private _observeSectionContext() {
+		if (!this._sectionContext) return;
 
-		this._sectionContextSubscription = this._sectionContext?.data.subscribe((section) => {
+		this.observe<ManifestSection>(this._sectionContext.data, (section) => {
 			this._sectionLabel = section.meta.label || section.name;
 			this._sectionPathname = section.meta.pathname;
 		});
-	}
-
-	disconnectedCallback(): void {
-		super.disconnectedCallback();
-		this._sectionContextSubscription?.unsubscribe();
 	}
 
 	render() {

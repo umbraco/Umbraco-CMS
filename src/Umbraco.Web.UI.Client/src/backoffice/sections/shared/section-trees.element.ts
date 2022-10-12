@@ -1,26 +1,24 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { map, Subscription, switchMap, EMPTY, of } from 'rxjs';
+import { map, switchMap, EMPTY, of } from 'rxjs';
 
 import { UmbContextConsumerMixin } from '../../../core/context';
 import { UmbExtensionRegistry } from '../../../core/extension';
 import { UmbSectionContext } from '../section.context';
 
 import '../../trees/shared/tree-extension.element';
+import { UmbObserverMixin } from '../../../core/observer';
 
 @customElement('umb-section-trees')
-export class UmbSectionTrees extends UmbContextConsumerMixin(LitElement) {
+export class UmbSectionTrees extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles = [UUITextStyles];
 
 	@state()
 	private _treeAliases: Array<string> = [];
 
 	private _extensionStore?: UmbExtensionRegistry;
-	private _treesSubscription?: Subscription;
-
 	private _sectionContext?: UmbSectionContext;
-	private _sectionContextSubscription?: Subscription;
 
 	constructor() {
 		super();
@@ -28,22 +26,20 @@ export class UmbSectionTrees extends UmbContextConsumerMixin(LitElement) {
 		// TODO: wait for more contexts
 		this.consumeContext('umbExtensionRegistry', (extensionStore: UmbExtensionRegistry) => {
 			this._extensionStore = extensionStore;
-			this._useTrees();
+			this._observeTrees();
 		});
 
 		this.consumeContext('umbSectionContext', (sectionContext: UmbSectionContext) => {
 			this._sectionContext = sectionContext;
-			this._useTrees();
+			this._observeTrees();
 		});
 	}
 
-	private _useTrees() {
+	private _observeTrees() {
 		if (!this._extensionStore || !this._sectionContext) return;
 
-		this._treesSubscription?.unsubscribe();
-
-		this._treesSubscription = this._sectionContext?.data
-			.pipe(
+		this.observe<string[]>(
+			this._sectionContext?.data.pipe(
 				switchMap((section) => {
 					if (!section) return EMPTY;
 
@@ -58,16 +54,11 @@ export class UmbSectionTrees extends UmbContextConsumerMixin(LitElement) {
 						) ?? of([])
 					);
 				})
-			)
-			.subscribe((treeAliases) => {
+			),
+			(treeAliases) => {
 				this._treeAliases = treeAliases;
-			});
-	}
-
-	disconnectedCallback() {
-		super.disconnectedCallback();
-		this._treesSubscription?.unsubscribe();
-		this._sectionContextSubscription?.unsubscribe();
+			}
+		);
 	}
 
 	render() {

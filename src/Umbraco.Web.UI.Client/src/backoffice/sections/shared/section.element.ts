@@ -1,18 +1,20 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { Subscription, map, switchMap, EMPTY, of } from 'rxjs';
+import { map, switchMap, EMPTY, of } from 'rxjs';
 import { UmbContextConsumerMixin } from '../../../core/context';
 import { UmbExtensionRegistry } from '../../../core/extension';
 import { UmbSectionContext } from '../section.context';
-import type { ManifestTree, ManifestEditor } from '../../../core/models';
+import type { ManifestTree } from '../../../core/models';
 
-import '../shared/section-trees.element.ts';
 import { UmbEditorEntityElement } from '../../editors/shared/editor-entity/editor-entity.element';
 import { UmbEntityStore } from '../../../core/stores/entity.store';
+import { UmbObserverMixin } from '../../../core/observer';
+
+import '../shared/section-trees.element.ts';
 
 @customElement('umb-section')
-export class UmbSectionElement extends UmbContextConsumerMixin(LitElement) {
+export class UmbSectionElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -30,14 +32,9 @@ export class UmbSectionElement extends UmbContextConsumerMixin(LitElement) {
 	@state()
 	private _trees?: Array<ManifestTree>;
 
-	private _editors?: Array<ManifestEditor>;
-	private _editorsSubscription?: Subscription;
-
 	private _entityStore?: UmbEntityStore;
-
 	private _sectionContext?: UmbSectionContext;
 	private _extensionRegistry?: UmbExtensionRegistry;
-	private _treesSubscription?: Subscription;
 
 	constructor() {
 		super();
@@ -45,27 +42,25 @@ export class UmbSectionElement extends UmbContextConsumerMixin(LitElement) {
 		// TODO: wait for more contexts
 		this.consumeContext('umbExtensionRegistry', (extensionsRegistry: UmbExtensionRegistry) => {
 			this._extensionRegistry = extensionsRegistry;
-			this._useTrees();
+			this._observeTrees();
 		});
 
 		this.consumeContext('umbSectionContext', (sectionContext: UmbSectionContext) => {
 			this._sectionContext = sectionContext;
-			this._useTrees();
+			this._observeTrees();
 		});
 
 		this.consumeContext('umbEntityStore', (entityStore: UmbEntityStore) => {
 			this._entityStore = entityStore;
-			this._useTrees();
+			this._observeTrees();
 		});
 	}
 
-	private _useTrees() {
+	private _observeTrees() {
 		if (!this._sectionContext || !this._extensionRegistry || !this._entityStore) return;
 
-		this._treesSubscription?.unsubscribe();
-
-		this._treesSubscription = this._sectionContext?.data
-			.pipe(
+		this.observe<ManifestTree[]>(
+			this._sectionContext?.data.pipe(
 				switchMap((section) => {
 					if (!section) return EMPTY;
 
@@ -81,11 +76,12 @@ export class UmbSectionElement extends UmbContextConsumerMixin(LitElement) {
 							) ?? of([])
 					);
 				})
-			)
-			.subscribe((trees) => {
+			),
+			(trees) => {
 				this._trees = trees;
 				this._createRoutes();
-			});
+			}
+		);
 	}
 
 	private _createRoutes() {
@@ -112,12 +108,6 @@ export class UmbSectionElement extends UmbContextConsumerMixin(LitElement) {
 				redirectTo: 'dashboard',
 			},
 		];
-	}
-
-	disconnectedCallback(): void {
-		super.disconnectedCallback();
-		this._treesSubscription?.unsubscribe();
-		this._editorsSubscription?.unsubscribe();
 	}
 
 	render() {
