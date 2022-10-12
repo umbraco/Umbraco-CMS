@@ -1,6 +1,6 @@
 import { BehaviorSubject, ReplaySubject } from 'rxjs';
 
-import type { ManifestSection, ManifestTree } from '../../core/models';
+import type { ManifestSection, ManifestSectionView, ManifestTree } from '../../core/models';
 import { Entity } from '../../mocks/data/entities';
 
 export class UmbSectionContext {
@@ -27,6 +27,10 @@ export class UmbSectionContext {
 	private _activeTreeItem = new ReplaySubject<Entity>(1);
 	public readonly activeTreeItem = this._activeTreeItem.asObservable();
 
+	// TODO: what is the best context to put this in?
+	private _activeView = new ReplaySubject<ManifestSectionView>(1);
+	public readonly activeView = this._activeView.asObservable();
+
 	constructor(section: ManifestSection) {
 		if (!section) return;
 		this._data.next(section);
@@ -47,5 +51,9 @@ export class UmbSectionContext {
 
 	public setActiveTreeItem(treeItem: Entity) {
 		this._activeTreeItem.next(treeItem);
+	}
+
+	public setActiveView(view: ManifestSectionView) {
+		this._activeView.next(view);
 	}
 }

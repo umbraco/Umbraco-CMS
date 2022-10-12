@@ -1,4 +1,5 @@
 import '../editor-layout/editor-layout.element';
+import '../editor-action-extension/editor-action-extension.element';
 
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement, nothing } from 'lit';
@@ -8,7 +9,7 @@ import { map, Subscription } from 'rxjs';
 
 import { UmbContextConsumerMixin } from '../../../../core/context';
 import { createExtensionElement, UmbExtensionRegistry } from '../../../../core/extension';
-import type { ManifestEditorView } from '../../../../core/models';
+import type { ManifestEditorAction, ManifestEditorView } from '../../../../core/models';
 
 /**
  * @element umb-editor-entity-layout
@@ -87,6 +88,9 @@ export class UmbEditorEntityLayout extends UmbContextConsumerMixin(LitElement) {
 	private _editorViews: Array<ManifestEditorView> = [];
 
 	@state()
+	private _editorActions: Array<ManifestEditorAction> = [];
+
+	@state()
 	private _currentView = '';
 
 	@state()
@@ -94,6 +98,7 @@ export class UmbEditorEntityLayout extends UmbContextConsumerMixin(LitElement) {
 
 	private _extensionRegistry?: UmbExtensionRegistry;
 	private _editorViewsSubscription?: Subscription;
+	private _editorActionsSubscription?: Subscription;
 	private _routerFolder = '';
 
 	constructor() {
@@ -101,7 +106,8 @@ export class UmbEditorEntityLayout extends UmbContextConsumerMixin(LitElement) {
 
 		this.consumeContext('umbExtensionRegistry', (extensionRegistry: UmbExtensionRegistry) => {
 			this._extensionRegistry = extensionRegistry;
-			this._useEditorViews();
+			this._observeEditorViews();
+			this._observeEditorActions();
 		});
 	}
 
@@ -111,7 +117,7 @@ export class UmbEditorEntityLayout extends UmbContextConsumerMixin(LitElement) {
 		this._routerFolder = window.location.pathname.split('/view')[0];
 	}
 
-	private _useEditorViews() {
+	private _observeEditorViews() {
 		this._editorViewsSubscription?.unsubscribe();
 
 		this._editorViewsSubscription = this._extensionRegistry
@@ -126,6 +132,17 @@ export class UmbEditorEntityLayout extends UmbContextConsumerMixin(LitElement) {
 			.subscribe((editorViews) => {
 				this._editorViews = editorViews;
 				this._createRoutes();
+			});
+	}
+
+	private _observeEditorActions() {
+		this._editorActionsSubscription?.unsubscribe();
+
+		this._editorActionsSubscription = this._extensionRegistry
+			?.extensionsOfType('editorAction')
+			.pipe(map((extensions) => extensions.filter((extension) => extension.meta.editors.includes(this.alias))))
+			.subscribe((editorActions) => {
+				this._editorActions = editorActions;
 			});
 	}
 
@@ -202,7 +219,12 @@ export class UmbEditorEntityLayout extends UmbContextConsumerMixin(LitElement) {
 
 				<div id="footer" slot="footer">
 					<slot name="footer"></slot>
-					<slot id="actions" name="actions"></slot>
+					<div id="actions">
+						${this._editorActions.map(
+							(action) => html`<umb-editor-action-extension .editorAction=${action}></umb-editor-action-extension>`
+						)}
+						<slot name="actions"></slot>
+					</div>
 				</div>
 			</umb-editor-layout>
 		`;

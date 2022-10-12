@@ -1,4 +1,6 @@
 import type { components } from '../../../schemas/generated-schema';
+import type { UserStatus } from '../../backoffice/sections/users/user-extensions';
+import { Entity } from '../../mocks/data/entities';
 
 export type PostInstallRequest = components['schemas']['InstallSetupRequest'];
 export type StatusResponse = components['schemas']['StatusResponse'];
@@ -19,9 +21,11 @@ export type TelemetryModel = components['schemas']['TelemetryModel'];
 export type ServerStatus = components['schemas']['ServerStatus'];
 export type ManifestTypes = components['schemas']['Manifest'];
 export type ManifestSection = components['schemas']['IManifestSection'];
+export type ManifestSectionView = components['schemas']['IManifestSectionView'];
 export type ManifestTree = components['schemas']['IManifestTree'];
 export type ManifestTreeItemAction = components['schemas']['IManifestTreeItemAction'];
 export type ManifestEditor = components['schemas']['IManifestEditor'];
+export type ManifestEditorAction = components['schemas']['IManifestEditorAction'];
 export type ManifestPropertyEditorUI = components['schemas']['IManifestPropertyEditorUI'];
 export type ManifestDashboard = components['schemas']['IManifestDashboard'];
 export type ManifestEditorView = components['schemas']['IManifestEditorView'];
@@ -43,6 +47,7 @@ export type PropertyEditorConfigDefaultData = components['schemas']['PropertyEdi
 
 export type ManifestElementType =
 	| ManifestSection
+	| ManifestSectionView
 	| ManifestTree
 	| ManifestTreeItemAction
 	| ManifestEditor
@@ -50,7 +55,39 @@ export type ManifestElementType =
 	| ManifestPropertyEditorUI
 	| ManifestDashboard
 	| ManifestEditorView
+	| ManifestEditorAction
 	| ManifestPackageView;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type HTMLElementConstructor<T = HTMLElement> = new (...args: any[]) => T;
+
+// Users
+export interface UserEntity extends Entity {
+	type: 'user';
+}
+
+export interface UserDetails extends UserEntity {
+	email: string;
+	status: UserStatus;
+	language: string;
+	lastLoginDate?: string;
+	lastLockoutDate?: string;
+	lastPasswordChangeDate?: string;
+	updateDate: string;
+	createDate: string;
+	failedLoginAttempts: number;
+	userGroup?: string; //TODO Implement this
+}
+
+export interface UserGroupEntity extends Entity {
+	type: 'userGroup';
+}
+
+export interface UserGroupDetails extends UserGroupEntity {
+	key: string;
+	name: string;
+	icon: string;
+	sections?: Array<string>;
+	contentStartNode?: string;
+	mediaStartNode?: string;
+}

@@ -32,12 +32,14 @@ export class ManifestsPackagesInstalled {
 
 export type Manifest =
 	| IManifestSection
+	| IManifestSectionView
 	| IManifestTree
 	| IManifestEditor
+	| IManifestEditorAction
+	| IManifestEditorView
 	| IManifestTreeItemAction
 	| IManifestPropertyEditorUI
 	| IManifestDashboard
-	| IManifestEditorView
 	| IManifestPropertyAction
 	| IManifestPackageView
 	| IManifestEntrypoint
@@ -45,12 +47,14 @@ export type Manifest =
 
 export type ManifestStandardTypes =
 	| 'section'
+	| 'sectionView'
 	| 'tree'
 	| 'editor'
+	| 'editorView'
+	| 'editorAction'
 	| 'treeItemAction'
 	| 'propertyEditorUI'
 	| 'dashboard'
-	| 'editorView'
 	| 'propertyAction'
 	| 'packageView'
 	| 'entrypoint';
@@ -83,6 +87,14 @@ export interface MetaSection {
 	label: string;
 	pathname: string;
 	weight: number;
+}
+
+export interface MetaSectionView {
+	sections: Array<string>;
+	label: string;
+	pathname: string;
+	weight: number;
+	icon: string;
 }
 
 export interface MetaTree {
@@ -146,6 +158,20 @@ export interface IManifestElement extends IManifest {
 export interface IManifestSection extends IManifestElement {
 	type: 'section';
 	meta: MetaSection;
+}
+
+export interface IManifestSectionView extends IManifestElement {
+	type: 'sectionView';
+	meta: MetaSectionView;
+}
+
+export interface IManifestEditorAction extends IManifestElement {
+	type: 'editorAction';
+	meta: MetaEditorAction;
+}
+
+export interface MetaEditorAction {
+	editors: Array<string>;
 }
 
 export interface IManifestTree extends IManifestElement {

@@ -2,12 +2,12 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { Subscription } from 'rxjs';
-import { UmbContextConsumerMixin } from '../../../core/context';
-import { UmbSectionContext } from '../section.context';
-import '../../trees/shared/context-menu/tree-context-menu.service';
+import { UmbContextConsumerMixin } from '../../../../core/context';
+import { UmbSectionContext } from '../../section.context';
+import '../../../trees/shared/context-menu/tree-context-menu.service';
 
 @customElement('umb-section-sidebar')
-export class UmbSectionSidebar extends UmbContextConsumerMixin(LitElement) {
+export class UmbSectionSidebarElement extends UmbContextConsumerMixin(LitElement) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -76,6 +76,6 @@ export class UmbSectionSidebar extends UmbContextConsumerMixin(LitElement) {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-section-sidebar': UmbSectionSidebar;
+		'umb-section-sidebar': UmbSectionSidebarElement;
 	}
 }
