@@ -247,7 +247,9 @@ export class UmbEditorUserGroupElement extends LitElement {
 	}
 
 	private renderRightColumn() {
-		return html`<uui-box> <div>RIGHT</div> </uui-box>`;
+		return html`<uui-box>
+			<div slot="headline">Users</div>
+		</uui-box>`;
 	}
 
 	// TODO. find a way where we don't have to do this for all editors.
