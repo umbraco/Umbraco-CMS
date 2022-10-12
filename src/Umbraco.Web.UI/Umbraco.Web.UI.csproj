@@ -17,15 +17,6 @@
     <RuntimeHostConfigurationOption Include="System.Globalization.AppLocalIcu" Value="68.2.0.9" Condition="$(RuntimeIdentifier.StartsWith('linux')) or $(RuntimeIdentifier.StartsWith('win')) or ('$(RuntimeIdentifier)' == '' and !$([MSBuild]::IsOSPlatform('osx')))" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Content Update="appsettings.*.json">
-      <DependentUpon>appsettings.json</DependentUpon>
-    </Content>
-    <Content Update="appsettings-schema.*.json">
-      <DependentUpon>appsettings-schema.json</DependentUpon>
-    </Content>
-  </ItemGroup>
-
   <PropertyGroup>
     <!-- Razor files are needed for the backoffice to work correctly -->
     <CopyRazorGenerateFilesToPublishDirectory>true</CopyRazorGenerateFilesToPublishDirectory>
@@ -36,6 +27,15 @@
     <RazorCompileOnBuild>false</RazorCompileOnBuild>
     <RazorCompileOnPublish>false</RazorCompileOnPublish>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Update="appsettings.*.json">
+      <DependentUpon>appsettings.json</DependentUpon>
+    </Content>
+    <Content Update="appsettings-schema.*.json">
+      <DependentUpon>appsettings-schema.json</DependentUpon>
+    </Content>
+  </ItemGroup>
 
   <Target Name="CopyAppsettingsTemplate" BeforeTargets="Build" Condition="!Exists('appsettings.json')">
     <Message Text="Copying appsettings.template.json to appsettings.json because it doesn't exist" Importance="high" />
