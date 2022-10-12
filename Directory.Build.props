@@ -31,7 +31,7 @@
   <PropertyGroup>
     <EnablePackageValidation>true</EnablePackageValidation>
     <!-- TODO: Change to 11.0.0 and remove all CompatibilitySuppressions.xml files when final version shipped -->
-    <PackageValidationBaselineVersion>10.2.0</PackageValidationBaselineVersion>
+    <PackageValidationBaselineVersion>10.2.1</PackageValidationBaselineVersion>
     <EnableStrictModeForCompatibleFrameworksInPackage>true</EnableStrictModeForCompatibleFrameworksInPackage>
     <EnableStrictModeForCompatibleTfms>true</EnableStrictModeForCompatibleTfms>
   </PropertyGroup>
