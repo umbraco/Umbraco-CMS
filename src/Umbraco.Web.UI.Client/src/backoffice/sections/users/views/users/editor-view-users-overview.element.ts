@@ -9,8 +9,8 @@ import './editor-view-users-invite.element';
 import { IRoute } from 'router-slot';
 import { UUIPopoverElement } from '@umbraco-ui/uui';
 import { UmbContextConsumerMixin } from '../../../../../core/context';
-import UmbSectionViewUsersElement from './section-view-users.element';
 import { UmbModalService } from '../../../../../core/services/modal';
+import UmbSectionViewUsersElement from './section-view-users.element';
 
 export type UsersViewType = 'list' | 'grid';
 @customElement('umb-editor-view-users-overview')

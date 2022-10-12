@@ -1,8 +1,8 @@
 import { BehaviorSubject, map, Observable } from 'rxjs';
+import { v4 as uuidv4 } from 'uuid';
 import type { UserDetails, UserEntity, UserGroupDetails } from '../../models';
 import { UmbEntityStore } from '../entity.store';
 import { UmbDataStoreBase } from '../store';
-import { v4 as uuidv4 } from 'uuid';
 
 /**
  * @export
