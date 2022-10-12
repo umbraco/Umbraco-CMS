@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace Umbraco.Cms.ManagementApi.Filters;
 
-public class UmbracoSystemTextJsonModelBinderConvention : Attribute, IActionModelConvention
+public class UmbracoSystemTextJsonModelBinderConvention : IActionModelConvention
 {
     private readonly IModelMetadataProvider _modelMetadataProvider;
 
