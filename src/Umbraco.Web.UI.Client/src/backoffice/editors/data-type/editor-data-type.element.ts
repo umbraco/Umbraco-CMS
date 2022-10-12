@@ -2,16 +2,15 @@ import { UUIButtonState, UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui'
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { Subscription } from 'rxjs';
 import { UmbContextProviderMixin, UmbContextConsumerMixin } from '../../../core/context';
 import { UmbNotificationService } from '../../../core/services/notification';
 import { UmbDataTypeStore } from '../../../core/stores/data-type/data-type.store';
 import { UmbNotificationDefaultData } from '../../../core/services/notification/layouts/default';
 import { UmbObserverMixin } from '../../../core/observer';
+import type { DataTypeDetails } from '../../../mocks/data/data-type.data';
 import { UmbDataTypeContext } from './data-type.context';
 
 import '../shared/editor-entity-layout/editor-entity-layout.element';
-import { DataTypeDetails } from '../../../mocks/data/data-type.data';
 
 /**
  *  @element umb-editor-data-type
