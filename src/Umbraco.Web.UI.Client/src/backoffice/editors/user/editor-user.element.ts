@@ -144,7 +144,7 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(UmbContextCons
 	private _updateUserStatus() {
 		if (!this._user || !this._userStore) return;
 
-		const isDisabled = this._user.status === 'Disabled';
+		const isDisabled = this._user.status === 'disabled';
 		isDisabled ? this._userStore.enableUsers([this._user.key]) : this._userStore.disableUsers([this._user.key]);
 	}
 
@@ -219,13 +219,13 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(UmbContextCons
 				<uui-avatar .name=${this._user?.name || ''}></uui-avatar>
 				<uui-button label="Change photo"></uui-button>
 				<hr />
-				${this._user?.status !== 'Invited'
+				${this._user?.status !== 'invited'
 					? html`
 							<uui-button
 								@click=${this._updateUserStatus}
 								look="primary"
-								color="${this._user.status === 'Disabled' ? 'positive' : 'warning'}"
-								label="${this._user.status === 'Disabled' ? 'Enable' : 'Disable'}"></uui-button>
+								color="${this._user.status === 'disabled' ? 'positive' : 'warning'}"
+								label="${this._user.status === 'disabled' ? 'Enable' : 'Disable'}"></uui-button>
 					  `
 					: nothing}
 				<uui-button @click=${this._deleteUser} look="primary" color="danger" label="Delete User"></uui-button>
@@ -235,7 +235,7 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(UmbContextCons
 						${this._user.status}
 					</uui-tag>
 				</div>
-				${this._user?.status === 'Invited'
+				${this._user?.status === 'invited'
 					? html`
 							<uui-textarea placeholder="Enter a message..."> </uui-textarea>
 							<uui-button look="primary" label="Resend invitation"></uui-button>

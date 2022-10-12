@@ -8,7 +8,7 @@ export class UmbUserTableStatusColumnLayoutElement extends LitElement {
 	value: any;
 
 	render() {
-		return html`${this.value.status && this.value.status !== 'Enabled'
+		return html`${this.value.status && this.value.status !== 'enabled'
 			? html`<uui-tag
 					size="s"
 					look="${getTagLookAndColor(this.value.status).look}"

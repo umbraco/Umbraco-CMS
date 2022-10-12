@@ -1,4 +1,5 @@
 import type { components } from '../../../schemas/generated-schema';
+import type { UserStatus } from '../../backoffice/sections/users/user-extensions';
 import { Entity } from '../../mocks/data/entities';
 
 export type PostInstallRequest = components['schemas']['InstallSetupRequest'];
@@ -67,7 +68,7 @@ export interface UserEntity extends Entity {
 
 export interface UserDetails extends UserEntity {
 	email: string;
-	status: string;
+	status: UserStatus;
 	language: string;
 	lastLoginDate?: string;
 	lastLockoutDate?: string;

@@ -68,7 +68,7 @@ export class UmbUserStore extends UmbDataStoreBase<UserDetails> {
 			const storedUsers = this._items.getValue().filter((user) => enabledKeys.includes(user.key));
 
 			storedUsers.forEach((user) => {
-				user.status = 'Enabled';
+				user.status = 'enabled';
 			});
 
 			this.update(storedUsers);
@@ -92,7 +92,7 @@ export class UmbUserStore extends UmbDataStoreBase<UserDetails> {
 			const storedUsers = this._items.getValue().filter((user) => disabledKeys.includes(user.key));
 
 			storedUsers.forEach((user) => {
-				user.status = 'Disabled';
+				user.status = 'disabled';
 			});
 
 			this.update(storedUsers);
@@ -138,7 +138,7 @@ export class UmbUserStore extends UmbDataStoreBase<UserDetails> {
 		}
 	}
 
-	async invite(name: string, email: string, message: string, userGroups: Array<string>): Promise<UserDetails> {
+	async invite(name: string, email: string, message: string, userGroups: Array<string>): Promise<UserDetails | null> {
 		// TODO: use Fetcher API.
 		try {
 			const res = await fetch('/umbraco/backoffice/users/invite', {
@@ -155,6 +155,8 @@ export class UmbUserStore extends UmbDataStoreBase<UserDetails> {
 		} catch (error) {
 			console.error('Invite user error', error);
 		}
+
+		return null;
 	}
 
 	// public updateUser(user: UserItem) {

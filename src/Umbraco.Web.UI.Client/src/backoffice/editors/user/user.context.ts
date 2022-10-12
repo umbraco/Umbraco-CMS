@@ -13,7 +13,7 @@ export class UmbUserContext {
 		isTrashed: false,
 		email: '',
 		language: '',
-		status: '',
+		status: 'enabled',
 		updateDate: '8/27/2022',
 		createDate: '9/19/2022',
 		failedLoginAttempts: 0,

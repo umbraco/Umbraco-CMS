@@ -7,7 +7,7 @@ import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { UmbContextConsumerMixin } from '../../../../../../../core/context';
 import UmbSectionViewUsersElement from '../../section-view-users.element';
 import { UmbUserStore } from '../../../../../../../core/stores/user/user.store';
-import type { UserEntity } from '../../../../../../../core/models';
+import type { UserDetails, UserEntity } from '../../../../../../../core/models';
 import { getTagLookAndColor } from '../../../../user-extensions';
 
 @customElement('umb-editor-view-users-grid')
@@ -41,7 +41,7 @@ export class UmbEditorViewUsersGridElement extends UmbContextConsumerMixin(LitEl
 	];
 
 	@state()
-	private _users: Array<UserEntity> = [];
+	private _users: Array<UserDetails> = [];
 
 	@state()
 	private _selection: Array<string> = [];
@@ -103,7 +103,7 @@ export class UmbEditorViewUsersGridElement extends UmbContextConsumerMixin(LitEl
 		this._usersContext?.deselect(user.key);
 	}
 
-	private renderUserCard(user: UserEntity) {
+	private renderUserCard(user: UserDetails) {
 		if (!this._userStore) return;
 
 		const statusLook = getTagLookAndColor(user.status);
@@ -117,7 +117,7 @@ export class UmbEditorViewUsersGridElement extends UmbContextConsumerMixin(LitEl
 				@open=${() => this._handleOpenCard(user.key)}
 				@selected=${() => this._selectRowHandler(user)}
 				@unselected=${() => this._deselectRowHandler(user)}>
-				${user.status && user.status !== 'Enabled'
+				${user.status && user.status !== 'enabled'
 					? html`<uui-tag
 							slot="tag"
 							size="s"

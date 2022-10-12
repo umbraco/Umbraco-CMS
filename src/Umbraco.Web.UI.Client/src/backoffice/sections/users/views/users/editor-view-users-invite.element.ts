@@ -78,7 +78,9 @@ export class UmbEditorViewUsersInviteElement extends UmbContextConsumerMixin(Umb
 		const message = formData.get('message') as string;
 
 		this._userStore?.invite(name, email, message, [userGroup]).then((user) => {
-			this._invitedUser = user;
+			if (user) {
+				this._invitedUser = user;
+			}
 		});
 	}
 

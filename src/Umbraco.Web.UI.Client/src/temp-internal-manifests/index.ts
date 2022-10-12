@@ -69,6 +69,7 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		name: 'Users',
 		loader: () => import('../backoffice/sections/users/section-users.element'),
 		meta: {
+			label: 'Users',
 			pathname: 'users',
 			weight: 20,
 		},
