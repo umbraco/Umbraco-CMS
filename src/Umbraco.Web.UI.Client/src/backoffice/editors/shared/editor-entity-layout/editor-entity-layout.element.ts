@@ -98,7 +98,6 @@ export class UmbEditorEntityLayout extends UmbContextConsumerMixin(UmbObserverMi
 	private _routes: Array<IRoute> = [];
 
 	private _extensionRegistry?: UmbExtensionRegistry;
-	private _editorActionsSubscription?: Subscription;
 	private _routerFolder = '';
 
 	constructor() {
