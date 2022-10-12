@@ -16,7 +16,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="appsettings-schema.json" />
     <EmbeddedResource Include="appsettings-schema.json" />
   </ItemGroup>
 </Project>
