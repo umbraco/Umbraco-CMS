@@ -11,11 +11,11 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.ManagementApi.Controllers.Examine;
 
 [ApiVersion("1.0")]
-public class SearcherDetailsExamineController : ExamineControllerBase
+public class SearchExamineController : ExamineControllerBase
 {
     private readonly IExamineManagerService _examineManagerService;
 
-    public SearcherDetailsExamineController(IExamineManagerService examineManagerService) => _examineManagerService = examineManagerService;
+    public SearchExamineController(IExamineManagerService examineManagerService) => _examineManagerService = examineManagerService;
 
     [HttpGet("search/{searcherName}")]
     [MapToApiVersion("1.0")]
