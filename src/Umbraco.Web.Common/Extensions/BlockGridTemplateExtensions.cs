@@ -17,6 +17,19 @@ public static class BlockGridTemplateExtensions
 
     #region Async
 
+    /// <summary>
+    /// Renders a block grid model into a grid layout
+    /// </summary>
+    /// <remarks>
+    /// By default this method uses a set of built-in partial views for rendering the blocks and areas in the grid model.
+    /// These partial views are embedded in the static assets (Umbraco.Cms.StaticAssets), so they won't show up in the
+    /// Views folder on your local disk.
+    ///
+    /// If you need to tweak the grid rendering output, you can copy the partial views from GitHub to your local disk.
+    /// The partial views are found in "/src/Umbraco.Cms.StaticAssets/Views/Partials/blockgrid/" on GitHub and should
+    /// be copied to "Views/Partials/BlockGrid/" on your local disk.
+    /// </remarks>
+    /// <seealso href="https://our.umbraco.com/documentation/Fundamentals/Backoffice/Property-Editors/Built-in-Property-Editors/Block-Editor/Block-Grid-Editor/#1-default-rendering"/>
     public static async Task<IHtmlContent> GetBlockGridHtmlAsync(this IHtmlHelper html, BlockGridModel? model, string template = DefaultTemplate)
     {
         if (model?.Count == 0)
@@ -27,9 +40,11 @@ public static class BlockGridTemplateExtensions
         return await html.PartialAsync(DefaultFolderTemplate(template), model);
     }
 
+    /// <inheritdoc cref="GetBlockGridHtmlAsync(Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper,Umbraco.Cms.Core.Models.Blocks.BlockGridModel?,string)"/>
     public static async Task<IHtmlContent> GetBlockGridHtmlAsync(this IHtmlHelper html, IPublishedProperty property, string template = DefaultTemplate)
         => await GetBlockGridHtmlAsync(html, property.GetValue() as BlockGridModel, template);
 
+    /// <inheritdoc cref="GetBlockGridHtmlAsync(Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper,Umbraco.Cms.Core.Models.Blocks.BlockGridModel?,string)"/>
     public static async Task<IHtmlContent> GetBlockGridHtmlAsync(this IHtmlHelper html, IPublishedContent contentItem, string propertyAlias)
         => await GetBlockGridHtmlAsync(html, contentItem, propertyAlias, DefaultTemplate);
 
@@ -49,6 +64,7 @@ public static class BlockGridTemplateExtensions
 
     #region Sync
 
+    /// <inheritdoc cref="GetBlockGridHtmlAsync(Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper,Umbraco.Cms.Core.Models.Blocks.BlockGridModel?,string)"/>
     public static IHtmlContent GetBlockGridHtml(this IHtmlHelper html, BlockGridModel? model, string template = DefaultTemplate)
     {
         if (model?.Count == 0)
@@ -59,9 +75,11 @@ public static class BlockGridTemplateExtensions
         return html.Partial(DefaultFolderTemplate(template), model);
     }
 
+    /// <inheritdoc cref="GetBlockGridHtmlAsync(Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper,Umbraco.Cms.Core.Models.Blocks.BlockGridModel?,string)"/>
     public static IHtmlContent GetBlockGridHtml(this IHtmlHelper html, IPublishedProperty property, string template = DefaultTemplate)
         => GetBlockGridHtml(html, property.GetValue() as BlockGridModel, template);
 
+    /// <inheritdoc cref="GetBlockGridHtmlAsync(Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper,Umbraco.Cms.Core.Models.Blocks.BlockGridModel?,string)"/>
     public static IHtmlContent GetBlockGridHtml(this IHtmlHelper html, IPublishedContent contentItem, string propertyAlias)
         => GetBlockGridHtml(html, contentItem, propertyAlias, DefaultTemplate);
 
