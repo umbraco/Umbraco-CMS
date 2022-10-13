@@ -1,14 +1,11 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <PropertyGroup>
-    <SchemaFilePath>$(MSBuildThisFileDirectory)..\appsettings-schema.json</SchemaFilePath>
-  </PropertyGroup>
-
   <Target Name="CopyAppsettingsSchema" BeforeTargets="Build">
     <ItemGroup>
-      <SchemaFile Include="$(SchemaFilePath)" />
+      <_SchemaFiles Include="$(MSBuildThisFileDirectory)..\appsettings-schema.json" />
+      <_SchemaFiles Include="$(MSBuildThisFileDirectory)..\appsettings-schema.Umbraco.Cms.json" />
     </ItemGroup>
-    <Message Text="Copying appsettings.json schema file" Importance="high" />
-    <Copy SourceFiles="@(SchemaFile)" DestinationFolder="$(MSBuildProjectDirectory)" SkipUnchangedFiles="true" />
+    <Message Text="Copying appsettings-schema.json and appsettings-schema.Umbraco.Cms.json files" Importance="high" />
+    <Copy SourceFiles="@(_SchemaFiles)" DestinationFolder="$(MSBuildProjectDirectory)" SkipUnchangedFiles="true" />
   </Target>
 
   <Target Name="IncludeAppPluginsContent" BeforeTargets="GetCopyToOutputDirectoryItems;GetCopyToPublishDirectoryItems">

@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project>
   <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <LangVersion>preview</LangVersion>
     <Company>Umbraco HQ</Company>
     <Authors>Umbraco</Authors>
     <Copyright>Copyright © Umbraco $([System.DateTime]::Today.ToString('yyyy'))</Copyright>
@@ -28,8 +30,8 @@
   <!-- Package Validation -->
   <PropertyGroup>
     <EnablePackageValidation>true</EnablePackageValidation>
-    <!-- TODO: Change to 11.0.0 and remove all CompatibilitySupressions.xml files when final version shipped -->
-    <PackageValidationBaselineVersion>10.1.0</PackageValidationBaselineVersion>
+    <!-- TODO: Change to 11.0.0 and remove all CompatibilitySuppressions.xml files when final version shipped -->
+    <PackageValidationBaselineVersion>10.2.1</PackageValidationBaselineVersion>
     <EnableStrictModeForCompatibleFrameworksInPackage>true</EnableStrictModeForCompatibleFrameworksInPackage>
     <EnableStrictModeForCompatibleTfms>true</EnableStrictModeForCompatibleTfms>
   </PropertyGroup>
@@ -45,4 +47,8 @@
   <ItemGroup>
     <Content Include="$(MSBuildThisFileDirectory)icon.png" Pack="true" PackagePath="" Visible="false" />
   </ItemGroup>
+
+  <PropertyGroup>
+    <GitVersionBaseDirectory>$(MSBuildThisFileDirectory)</GitVersionBaseDirectory>
+  </PropertyGroup>
 </Project>

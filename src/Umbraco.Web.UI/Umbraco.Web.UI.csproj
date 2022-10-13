@@ -1,6 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
     <RootNamespace>Umbraco.Cms.Web.UI</RootNamespace>
     <EnablePackageValidation>false</EnablePackageValidation>
   </PropertyGroup>
@@ -28,6 +27,15 @@
     <RazorCompileOnBuild>false</RazorCompileOnBuild>
     <RazorCompileOnPublish>false</RazorCompileOnPublish>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Update="appsettings.*.json">
+      <DependentUpon>appsettings.json</DependentUpon>
+    </Content>
+    <Content Update="appsettings-schema.*.json">
+      <DependentUpon>appsettings-schema.json</DependentUpon>
+    </Content>
+  </ItemGroup>
 
   <Target Name="CopyAppsettingsTemplate" BeforeTargets="Build" Condition="!Exists('appsettings.json')">
     <Message Text="Copying appsettings.template.json to appsettings.json because it doesn't exist" Importance="high" />

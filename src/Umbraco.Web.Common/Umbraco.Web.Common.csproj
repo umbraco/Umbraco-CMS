@@ -3,7 +3,6 @@
     <PackageId>Umbraco.Cms.Web.Common</PackageId>
     <Title>Umbraco CMS - Web</Title>
     <Description>Contains the web assembly needed to run Umbraco CMS.</Description>
-    <TargetFramework>net7.0</TargetFramework>
     <RootNamespace>Umbraco.Cms.Web.Common</RootNamespace>
   </PropertyGroup>
 
@@ -13,10 +12,9 @@
 
   <ItemGroup>
     <PackageReference Include="Dazinator.Extensions.FileProviders" Version="2.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="7.0.0-rc.1.22427.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="7.0.0-rc.1.22427.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="7.0.0-rc.2.*" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="7.0.0-rc.2.*" />
     <PackageReference Include="MiniProfiler.AspNetCore.Mvc" Version="4.2.22" />
-    <PackageReference Include="Serilog.AspNetCore" Version="6.0.1" />
     <PackageReference Include="Smidge.InMemory" Version="4.1.1" />
     <PackageReference Include="Smidge.Nuglify" Version="4.1.1" />
   </ItemGroup>

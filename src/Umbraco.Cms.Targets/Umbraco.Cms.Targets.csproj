@@ -2,7 +2,6 @@
   <PropertyGroup>
     <Title>Umbraco CMS</Title>
     <Description>Installs Umbraco CMS with minimal dependencies in your ASP.NET Core project.</Description>
-    <TargetFramework>net7.0</TargetFramework>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <IncludeSymbols>false</IncludeSymbols>
     <!-- TODO: Enable when final version is shipped (because there's currently no previous version) -->
@@ -17,16 +16,18 @@
 
   <ItemGroup>
     <Content Include="buildTransitive\**" PackagePath="buildTransitive" />
-    <Content Include="$(JsonSchemaPath)" PackagePath="." />
+    <Content Include="$(JsonSchemaPath)" PackagePath="" />
+    <Content Include="$(JsonSchemaCmsPath)" PackagePath="" />
   </ItemGroup>
 
-  <!-- Generate appsettings.json schema on build (and before copying to project) -->
+  <!-- Generate appsettings-schema.json on build (and before copying to project) -->
   <PropertyGroup>
     <JsonSchemaPath>$(MSBuildThisFileDirectory)appsettings-schema.json</JsonSchemaPath>
+    <JsonSchemaCmsPath>$(MSBuildThisFileDirectory)appsettings-schema.Umbraco.Cms.json</JsonSchemaCmsPath>
     <JsonSchemaProjectPath>$(MSBuildThisFileDirectory)..\JsonSchema\</JsonSchemaProjectPath>
   </PropertyGroup>
-  <Target Name="GenerateAppsettingsSchema" BeforeTargets="Build;CopyAppsettingsSchema" Condition="!Exists('$(JsonSchemaPath)')">
-    <Message Text="Generating appsettings-schema.json because it doesn't exist" Importance="high" />
-    <Exec WorkingDirectory="$(JsonSchemaProjectPath)" Command="dotnet run -c Release -o &quot;$(JsonSchemaPath)&quot;" />
+  <Target Name="GenerateAppsettingsSchema" BeforeTargets="Build;CopyAppsettingsSchema" Condition="!Exists('$(JsonSchemaPath)') or !Exists('$(JsonSchemaCmsPath)')">
+    <Message Text="Generating appsettings-schema.json and appsettings-schema.Umbraco.Cms.json because it doesn't exist" Importance="high" />
+    <Exec WorkingDirectory="$(JsonSchemaProjectPath)" Command="dotnet run -c Release --mainOutputFile &quot;$(JsonSchemaPath)&quot; --cmsOutputFile &quot;$(JsonSchemaCmsPath)&quot;" />
   </Target>
 </Project>

@@ -252,6 +252,7 @@ public abstract class UmbracoUserManager<TUser, TPasswordConfig> : UserManager<T
     public async Task<bool> ValidateCredentialsAsync(string username, string password)
     {
         TUser? user = await FindByNameAsync(username);
+
         if (user is null)
         {
             return false;
@@ -263,9 +264,9 @@ public abstract class UmbracoUserManager<TUser, TPasswordConfig> : UserManager<T
                                             typeof(IUserPasswordStore<>));
         }
 
-        var hash = await userPasswordStore.GetPasswordHashAsync(user, CancellationToken.None);
+        var result = await VerifyPasswordAsync(userPasswordStore, user, password);
 
-        return await VerifyPasswordAsync(userPasswordStore, user, password) == PasswordVerificationResult.Success;
+        return result == PasswordVerificationResult.Success || result == PasswordVerificationResult.SuccessRehashNeeded;
     }
 
     public virtual async Task<IList<string>> GetValidTwoFactorProvidersAsync(TUser user)

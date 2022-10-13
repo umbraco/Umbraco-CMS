@@ -1,7 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
-    <OutputType>Exe</OutputType>
     <IsTestProject>true</IsTestProject>
     <RootNamespace>Umbraco.Cms.Tests.UnitTests</RootNamespace>
     <IsPackable>false</IsPackable>
@@ -10,10 +8,10 @@
 
   <ItemGroup>
     <PackageReference Include="AngleSharp" Version="0.17.1" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.2" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.2.1" />
-    <PackageReference Include="System.Data.Odbc" Version="7.0.0-rc.1.22426.10" />
-    <PackageReference Include="System.Data.OleDb" Version="7.0.0-rc.1.22426.10" />
+    <PackageReference Include="System.Data.Odbc" Version="7.0.0-rc.2.*" />
+    <PackageReference Include="System.Data.OleDb" Version="7.0.0-rc.2.*" />
   </ItemGroup>
   
   <ItemGroup>

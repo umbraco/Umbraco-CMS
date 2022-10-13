@@ -1,6 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
     <OutputType>Exe</OutputType>
     <IsPackable>false</IsPackable>
     <EnablePackageValidation>false</EnablePackageValidation>
@@ -9,11 +8,14 @@
   <ItemGroup>
     <PackageReference Include="CommandLineParser" Version="2.9.1" />
     <PackageReference Include="NJsonSchema" Version="10.8.0" />
+    <PackageReference Include="System.Xml.XPath.XmlDocument" Version="4.3.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj" />
-    <PackageReference Include="Umbraco.Deploy.Core" Version="10.0.0" />
-    <PackageReference Include="Umbraco.Forms.Core" Version="10.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="appsettings-schema.json" />
   </ItemGroup>
 </Project>

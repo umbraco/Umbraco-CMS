@@ -197,7 +197,8 @@ function umbRequestHelper($http, $q, notificationsService, eventsService, formHe
                 return $q.reject({
                     errorMsg: result.errorMsg,
                     data: result.data,
-                    status: result.status
+                    status: result.status,
+                    xhrStatus: response.xhrStatus
                 });
             });
 
