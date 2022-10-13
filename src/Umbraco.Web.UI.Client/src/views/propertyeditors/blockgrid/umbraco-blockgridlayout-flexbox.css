@@ -34,3 +34,8 @@
     --umb-block-grid__area-calc: calc(var(--umb-block-grid--area-column-span) / var(--umb-block-grid--area-grid-columns, 1));
     width: calc(var(--umb-block-grid__area-calc) * 100%);
 }
+
+
+.umb-block-grid__actions {
+    clear: both;
+}

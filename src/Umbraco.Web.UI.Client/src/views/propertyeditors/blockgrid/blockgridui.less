@@ -633,8 +633,6 @@ umb-block-grid-block {
     border-radius: @baseBorderRadius;
     box-sizing: border-box;
 
-    clear: both;// needed for layouts using float.
-
     &:hover {
         border-color: transparent;
         > button {
@@ -651,7 +649,6 @@ umb-block-grid-block {
     > button {
         position: relative;
         display: flex;
-        //width: 100%;
         align-items: center;
         justify-content: center;
         
@@ -687,7 +684,7 @@ umb-block-grid-block {
         &.umb-block-grid__clipboard-button {
             margin-left: 0;
             padding: 5px 12px;
-            font-size: 18px;// Align with block action buttons.
+            font-size: 18px;
             border-top-left-radius: 0;
             border-bottom-left-radius: 0;
 
@@ -739,7 +736,6 @@ umb-block-grid-block {
     > button {
         position: relative;
         display: flex;
-        //width: 100%;
         align-items: center;
         justify-content: center;
         
