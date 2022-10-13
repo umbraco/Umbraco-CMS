@@ -56,7 +56,7 @@
 	},
 	"devDependencies": {
 		"@babel/core": "^7.19.3",
-		"@mdx-js/react": "^2.1.4",
+		"@mdx-js/react": "^2.1.5",
 		"@open-wc/testing": "^3.1.6",
 		"@playwright/test": "^1.26.1",
 		"@storybook/addon-a11y": "^6.5.12",
@@ -70,7 +70,7 @@
 		"@types/lodash-es": "^4.17.6",
 		"@types/mocha": "^9.1.1",
 		"@types/uuid": "^8.3.4",
-		"@typescript-eslint/eslint-plugin": "^5.39.0",
+		"@typescript-eslint/eslint-plugin": "^5.40.0",
 		"@typescript-eslint/parser": "^5.39.0",
 		"@web/dev-server-esbuild": "^0.3.1",
 		"@web/test-runner": "^0.14.0",
