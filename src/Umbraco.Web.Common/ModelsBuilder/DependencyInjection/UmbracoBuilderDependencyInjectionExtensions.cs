@@ -140,35 +140,27 @@ public static class UmbracoBuilderDependencyInjectionExtensions
         return builder;
     }
 
+    // See notes in RefreshingRazorViewEngine for information on what this is doing.
     private static IUmbracoBuilder AddInMemoryModelsRazorEngine(this IUmbracoBuilder builder)
     {
-        // See notes in RefreshingRazorViewEngine for information on what this is doing.
+        // We should only add/replace these services when models builder is InMemory, otherwise we'll cause issues.
+        // Since these services expect the ModelsMode to be InMemoryAuto
+        if (builder.Config.GetModelsMode() is ModelsMode.InMemoryAuto)
+        {
+            builder.Services.AddSingleton<UmbracoRazorReferenceManager>();
+            builder.Services.AddSingleton<CompilationOptionsProvider>();
+            builder.Services.AddSingleton<IViewCompilerProvider, UmbracoViewCompilerProvider>();
+            builder.Services.AddSingleton<RuntimeCompilationCacheBuster>();
+            builder.Services.AddSingleton<InMemoryAssemblyLoadContextManager>();
 
-        // copy the current collection, we need to use this later to rebuild a container
-        // to re-create the razor compiler provider
-        builder.Services.AddSingleton<UmbracoRazorReferenceManager>();
-        builder.Services.AddSingleton<CompilationOptionsProvider>();
-        builder.Services.AddSingleton<IViewCompilerProvider, UmbracoViewCompilerProvider>();
-        builder.Services.AddSingleton<RuntimeCompilationCacheBuster>();
-        builder.Services.AddSingleton<InMemoryAssemblyLoadContextManager>();
-
-        builder.Services.AddSingleton<InMemoryModelFactory>();
+            builder.Services.AddSingleton<InMemoryModelFactory>();
+            // Register the factory as IPublishedModelFactory
+            builder.Services.AddSingleton<IPublishedModelFactory, InMemoryModelFactory>();
+            return builder;
+        }
 
         // This is what the community MB would replace, all of the above services are fine to be registered
-        // even if the community MB is in place.
-        builder.Services.AddSingleton<IPublishedModelFactory>(factory =>
-        {
-            ModelsBuilderSettings modelsBuilderSettings = factory.GetRequiredService<IOptions<ModelsBuilderSettings>>().Value;
-            if (modelsBuilderSettings.ModelsMode == ModelsMode.InMemoryAuto)
-            {
-                return factory.GetRequiredService<InMemoryModelFactory>();
-            }
-            else
-            {
-                return factory.CreateDefaultPublishedModelFactory();
-            }
-        });
-
+        builder.Services.AddSingleton<IPublishedModelFactory>(factory => factory.CreateDefaultPublishedModelFactory());
         return builder;
     }
 }
