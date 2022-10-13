@@ -7,7 +7,7 @@ using Umbraco.Cms.Core.Models;
 namespace Umbraco.Cms.Core.Notifications;
 
 /// <summary>
-/// Called while publishing content but before entities are persisted. Cancel to stop the publish.
+/// Called while publishing content but before content has been published. Cancel the operation to prevent the publish.
 /// </summary>
 public sealed class ContentPublishingNotification : CancelableEnumerableObjectNotification<IContent>
 {

@@ -7,7 +7,7 @@ using Umbraco.Cms.Core.Models;
 namespace Umbraco.Cms.Core.Notifications;
 
 /// <summary>
-/// Called when moved content is persisted.
+/// Called after content has been moved.
 /// </summary>
 public sealed class ContentMovedNotification : MovedNotification<IContent>
 {

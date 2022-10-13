@@ -7,7 +7,7 @@ using Umbraco.Cms.Core.Models;
 namespace Umbraco.Cms.Core.Notifications;
 
 /// <summary>
-/// Called while publishing content after entities are persisted.
+/// Called after content has been published.
 /// </summary>
 public sealed class ContentPublishedNotification : EnumerableObjectNotification<IContent>
 {
