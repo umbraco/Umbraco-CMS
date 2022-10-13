@@ -63,6 +63,17 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 		},
 	},
 	{
+		type: 'section',
+		alias: 'Umb.Section.Users',
+		name: 'Users',
+		loader: () => import('../backoffice/sections/users/section-users.element'),
+		weight: 20,
+		meta: {
+			label: 'Users',
+			pathname: 'users',
+		},
+	},
+	{
 		type: 'dashboard',
 		alias: 'Umb.Dashboard.Welcome',
 		name: 'Welcome Dashboard',
@@ -90,15 +101,15 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 	},
 	{
 		type: 'dashboard',
-		alias: 'Umb.Dashboard.SettingsAbout',
-		name: 'About Settings Dashboard',
-		elementName: 'umb-dashboard-settings-about',
-		loader: () => import('../backoffice/dashboards/settings-about/dashboard-settings-about.element'),
+		alias: 'Umb.Dashboard.SettingsWelcome',
+		name: 'Welcome Settings Dashboard',
+		elementName: 'umb-dashboard-settings-welcome',
+		loader: () => import('../backoffice/dashboards/settings-welcome/dashboard-settings-welcome.element'),
 		weight: 10,
 		meta: {
-			label: 'About',
+			label: 'Welcome',
 			sections: ['Umb.Section.Settings'],
-			pathname: 'about', // TODO: how to we want to support pretty urls?
+			pathname: 'welcome', // TODO: how to we want to support pretty urls?
 		},
 	},
 	{
@@ -270,6 +281,33 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 			label: 'Installed',
 			pathname: 'installed',
 			editors: ['Umb.Editor.Packages'],
+		},
+	},
+	{
+		type: 'editor',
+		alias: 'Umb.Editor.User',
+		name: 'User Editor',
+		loader: () => import('../backoffice/editors/user/editor-user.element'),
+		meta: {
+			entityType: 'user',
+		},
+	},
+	{
+		type: 'editor',
+		alias: 'Umb.Editor.UserGroup',
+		name: 'User Group Editor',
+		loader: () => import('../backoffice/editors/user-group/editor-user-group.element'),
+		meta: {
+			entityType: 'userGroup',
+		},
+	},
+	{
+		type: 'editorAction',
+		alias: 'Umb.EditorAction.User.Save',
+		name: 'EditorActionUserSave',
+		loader: () => import('../backoffice/editors/user/actions/editor-action-user-save.element'),
+		meta: {
+			editors: ['Umb.Editor.User'],
 		},
 	},
 	{
@@ -495,6 +533,32 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 			trees: ['Umb.Tree.DataTypes'],
 			label: 'Delete',
 			icon: 'delete',
+		},
+	},
+	{
+		type: 'sectionView',
+		alias: 'Umb.SectionView.Users',
+		name: 'Users Section View',
+		loader: () => import('../backoffice/sections/users/views/users/section-view-users.element'),
+		meta: {
+			sections: ['Umb.Section.Users'],
+			label: 'Users',
+			pathname: 'users',
+			weight: 200,
+			icon: 'umb:user',
+		},
+	},
+	{
+		type: 'sectionView',
+		alias: 'Umb.SectionView.UserGroups',
+		name: 'User Groups Section View',
+		loader: () => import('../backoffice/sections/users/views/user-groups/section-view-user-groups.element'),
+		meta: {
+			sections: ['Umb.Section.Users'],
+			label: 'User Groups',
+			pathname: 'user-groups',
+			weight: 100,
+			icon: 'umb:users',
 		},
 	},
 ];

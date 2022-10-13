@@ -3,14 +3,14 @@ import { html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { map, Subscription, switchMap, EMPTY, of } from 'rxjs';
 
-import { UmbContextConsumerMixin } from '../../../core/context';
-import { UmbExtensionRegistry } from '../../../core/extension';
-import { UmbSectionContext } from '../section.context';
+import { UmbContextConsumerMixin } from '../../../../core/context';
+import { UmbExtensionRegistry } from '../../../../core/extension';
+import { UmbSectionContext } from '../../section.context';
 
-import '../../trees/shared/tree-extension.element';
+import '../../../trees/shared/tree-extension.element';
 
 @customElement('umb-section-trees')
-export class UmbSectionTrees extends UmbContextConsumerMixin(LitElement) {
+export class UmbSectionTreesElement extends UmbContextConsumerMixin(LitElement) {
 	static styles = [UUITextStyles];
 
 	@state()
@@ -74,10 +74,10 @@ export class UmbSectionTrees extends UmbContextConsumerMixin(LitElement) {
 	}
 }
 
-export default UmbSectionTrees;
+export default UmbSectionTreesElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-section-trees': UmbSectionTrees;
+		'umb-section-trees': UmbSectionTreesElement;
 	}
 }

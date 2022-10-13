@@ -2,14 +2,18 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
 
-@customElement('umb-section-layout')
-export class UmbSectionLayout extends LitElement {
+@customElement('umb-section-main')
+export class UmbSectionMainElement extends LitElement {
 	static styles = [
 		UUITextStyles,
 		css`
 			:host {
+				flex: 1 1 auto;
+				height: 100%;
+			}
+			slot {
 				display: flex;
-				width: 100%;
+				flex-direction: column;
 				height: 100%;
 			}
 		`,
@@ -22,6 +26,6 @@ export class UmbSectionLayout extends LitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-section-layout': UmbSectionLayout;
+		'umb-section-main': UmbSectionMainElement;
 	}
 }

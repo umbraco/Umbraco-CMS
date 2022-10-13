@@ -30,7 +30,7 @@ export class UmbEditorLayout extends LitElement {
 			}
 
 			#main {
-				padding: var(--uui-size-6);
+				/* padding: 0 var(--uui-size-6); */
 				display: flex;
 				flex: 1;
 				flex-direction: column;

@@ -8,13 +8,11 @@ export class UmbPackagesEditor extends LitElement {
 	render() {
 		return html`
 			<uui-icon-registry-essential>
-				<umb-section-layout>
-					<umb-section-main>
-						<umb-editor-entity alias="Umb.Editor.Packages">
-							<h1 slot="name">Packages</h1>
-						</umb-editor-entity>
-					</umb-section-main>
-				</umb-section-layout>
+				<umb-section-main>
+					<umb-editor-entity alias="Umb.Editor.Packages">
+						<h1 slot="name">Packages</h1>
+					</umb-editor-entity>
+				</umb-section-main>
 			</uui-icon-registry-essential>
 		`;
 	}
