@@ -24,37 +24,20 @@ public class DefaultUrlProvider : IUrlProvider
     private readonly UriUtility _uriUtility;
     private RequestHandlerSettings _requestSettings;
 
-    [Obsolete("Use ctor with all parameters")]
-    public DefaultUrlProvider(
-        IOptionsMonitor<RequestHandlerSettings> requestSettings,
-        ILogger<DefaultUrlProvider> logger,
-        ISiteDomainMapper siteDomainMapper,
-        IUmbracoContextAccessor umbracoContextAccessor,
-        UriUtility uriUtility)
-        : this(
-            requestSettings,
-            logger,
-            siteDomainMapper,
-            umbracoContextAccessor,
-            uriUtility,
-            StaticServiceProvider.Instance.GetRequiredService<ILocalizationService>())
-    {
-    }
-
-    public DefaultUrlProvider(
-        IOptionsMonitor<RequestHandlerSettings> requestSettings,
-        ILogger<DefaultUrlProvider> logger,
-        ISiteDomainMapper siteDomainMapper,
-        IUmbracoContextAccessor umbracoContextAccessor,
-        UriUtility uriUtility,
-        ILocalizationService localizationService)
-    {
-        _requestSettings = requestSettings.CurrentValue;
-        _logger = logger;
-        _siteDomainMapper = siteDomainMapper;
-        _umbracoContextAccessor = umbracoContextAccessor;
-        _uriUtility = uriUtility;
-        _localizationService = localizationService;
+        public DefaultUrlProvider(
+            IOptionsMonitor<RequestHandlerSettings> requestSettings,
+            ILogger<DefaultUrlProvider> logger,
+            ISiteDomainMapper siteDomainMapper,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            UriUtility uriUtility,
+            ILocalizationService localizationService)
+        {
+            _requestSettings = requestSettings.CurrentValue;
+            _logger = logger;
+            _siteDomainMapper = siteDomainMapper;
+            _umbracoContextAccessor = umbracoContextAccessor;
+            _uriUtility = uriUtility;
+            _localizationService = localizationService;
 
         requestSettings.OnChange(x => _requestSettings = x);
     }

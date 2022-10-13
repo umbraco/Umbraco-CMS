@@ -44,10 +44,10 @@ public class AspNetCoreRequestAccessor : IRequestAccessor, INotificationHandler<
         });
 
     /// <inheritdoc />
-    public string GetRequestValue(string name) => GetFormValue(name) ?? GetQueryStringValue(name);
+    public string? GetRequestValue(string name) => GetFormValue(name) ?? GetQueryStringValue(name);
 
     /// <inheritdoc />
-    public string GetQueryStringValue(string name) => _httpContextAccessor.GetRequiredHttpContext().Request.Query[name];
+    public string? GetQueryStringValue(string name) => _httpContextAccessor.GetRequiredHttpContext().Request.Query[name];
 
     /// <inheritdoc />
     public Uri? GetRequestUrl() => _httpContextAccessor.HttpContext != null

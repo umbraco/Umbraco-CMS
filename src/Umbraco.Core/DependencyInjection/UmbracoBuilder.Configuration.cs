@@ -103,8 +103,6 @@ public static partial class UmbracoBuilderExtensions
             Constants.Configuration.NamedOptions.InstallDefaultData.MemberTypes,
             builder.Config.GetSection($"{Constants.Configuration.ConfigInstallDefaultData}:{Constants.Configuration.NamedOptions.InstallDefaultData.MemberTypes}"));
 
-        builder.Services.Configure<RequestHandlerSettings>(options => options.MergeReplacements(builder.Config));
-
         // TODO: Remove this in V12
         // This is to make the move of the AllowEditInvariantFromNonDefault setting from SecuritySettings to ContentSettings backwards compatible
         // If there is a value in security settings, but no value in content setting we'll use that value, otherwise content settings always wins.

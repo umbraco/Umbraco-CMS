@@ -367,7 +367,7 @@ public class MemberController : ContentControllerBase
             contentItem.IsApproved,
             contentItem.Name);
 
-        IdentityResult created = await _memberManager.CreateAsync(identityMember, contentItem.Password?.NewPassword);
+        IdentityResult created = await _memberManager.CreateAsync(identityMember, contentItem.Password?.NewPassword!);
 
         if (created.Succeeded == false)
         {
@@ -513,8 +513,12 @@ public class MemberController : ContentControllerBase
         }
 
         var needsResync = false;
-
-        MemberIdentityUser identityMember = await _memberManager.FindByIdAsync(contentItem.Id?.ToString());
+            var memberId = contentItem.Id?.ToString();
+            if (memberId is null)
+            {
+                return ValidationProblem("Member was not found");
+            }
+        MemberIdentityUser? identityMember = await _memberManager.FindByIdAsync(memberId);
         if (identityMember == null)
         {
             return ValidationProblem("Member was not found");

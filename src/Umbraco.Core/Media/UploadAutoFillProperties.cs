@@ -8,30 +8,26 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Core.Media;
 
 /// <summary>
-///     Provides methods to manage auto-fill properties for upload fields.
+/// Provides methods to manage auto-fill properties for upload fields.
 /// </summary>
 public class UploadAutoFillProperties
 {
     private readonly IImageDimensionExtractor _imageDimensionExtractor;
-    private readonly IImageUrlGenerator _imageUrlGenerator;
     private readonly ILogger<UploadAutoFillProperties> _logger;
     private readonly MediaFileManager _mediaFileManager;
 
     public UploadAutoFillProperties(
         MediaFileManager mediaFileManager,
         ILogger<UploadAutoFillProperties> logger,
-        IImageUrlGenerator imageUrlGenerator,
         IImageDimensionExtractor imageDimensionExtractor)
     {
         _mediaFileManager = mediaFileManager ?? throw new ArgumentNullException(nameof(mediaFileManager));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _imageUrlGenerator = imageUrlGenerator ?? throw new ArgumentNullException(nameof(imageUrlGenerator));
-        _imageDimensionExtractor =
-            imageDimensionExtractor ?? throw new ArgumentNullException(nameof(imageDimensionExtractor));
+        _imageDimensionExtractor = imageDimensionExtractor ?? throw new ArgumentNullException(nameof(imageDimensionExtractor));
     }
 
     /// <summary>
-    ///     Resets the auto-fill properties of a content item, for a specified auto-fill configuration.
+    /// Resets the auto-fill properties of a content item, for a specified auto-fill configuration.
     /// </summary>
     /// <param name="content">The content item.</param>
     /// <param name="autoFillConfig">The auto-fill configuration.</param>
@@ -39,39 +35,27 @@ public class UploadAutoFillProperties
     /// <param name="segment">Variation segment.</param>
     public void Reset(IContentBase content, ImagingAutoFillUploadField autoFillConfig, string? culture, string? segment)
     {
-        if (content == null)
-        {
-            throw new ArgumentNullException(nameof(content));
-        }
-
-        if (autoFillConfig == null)
-        {
-            throw new ArgumentNullException(nameof(autoFillConfig));
-        }
+        ArgumentNullException.ThrowIfNull(content);
+        ArgumentNullException.ThrowIfNull(autoFillConfig);
 
         ResetProperties(content, autoFillConfig, culture, segment);
     }
 
     /// <summary>
-    ///     Populates the auto-fill properties of a content item, for a specified auto-fill configuration.
+    /// Populates the auto-fill properties of a content item, for a specified auto-fill configuration.
     /// </summary>
     /// <param name="content">The content item.</param>
     /// <param name="autoFillConfig">The auto-fill configuration.</param>
     /// <param name="filepath">The filesystem path to the uploaded file.</param>
-    /// <remarks>The <paramref name="filepath" /> parameter is the path relative to the filesystem.</remarks>
     /// <param name="culture">Variation language.</param>
     /// <param name="segment">Variation segment.</param>
+    /// <remarks>
+    /// The <paramref name="filepath" /> parameter is the path relative to the filesystem.
+    /// </remarks>
     public void Populate(IContentBase content, ImagingAutoFillUploadField autoFillConfig, string filepath, string? culture, string? segment)
     {
-        if (content == null)
-        {
-            throw new ArgumentNullException(nameof(content));
-        }
-
-        if (autoFillConfig == null)
-        {
-            throw new ArgumentNullException(nameof(autoFillConfig));
-        }
+        ArgumentNullException.ThrowIfNull(content);
+        ArgumentNullException.ThrowIfNull(autoFillConfig);
 
         // no file = reset, file = auto-fill
         if (filepath.IsNullOrWhiteSpace())
@@ -101,25 +85,18 @@ public class UploadAutoFillProperties
     }
 
     /// <summary>
-    ///     Populates the auto-fill properties of a content item.
+    /// Populates the auto-fill properties of a content item.
     /// </summary>
     /// <param name="content">The content item.</param>
-    /// <param name="autoFillConfig"></param>
+    /// <param name="autoFillConfig">The automatic fill configuration.</param>
     /// <param name="filepath">The filesystem-relative filepath, or null to clear properties.</param>
     /// <param name="filestream">The stream containing the file data.</param>
     /// <param name="culture">Variation language.</param>
     /// <param name="segment">Variation segment.</param>
     public void Populate(IContentBase content, ImagingAutoFillUploadField autoFillConfig, string filepath, Stream filestream, string culture, string segment)
     {
-        if (content == null)
-        {
-            throw new ArgumentNullException(nameof(content));
-        }
-
-        if (autoFillConfig == null)
-        {
-            throw new ArgumentNullException(nameof(autoFillConfig));
-        }
+        ArgumentNullException.ThrowIfNull(content);
+        ArgumentNullException.ThrowIfNull(autoFillConfig);
 
         // no file = reset, file = auto-fill
         if (filepath.IsNullOrWhiteSpace() || filestream == null)
@@ -134,50 +111,23 @@ public class UploadAutoFillProperties
 
     private static void SetProperties(IContentBase content, ImagingAutoFillUploadField autoFillConfig, Size? size, long? length, string extension, string? culture, string? segment)
     {
-        if (content == null)
-        {
-            throw new ArgumentNullException(nameof(content));
-        }
+        ArgumentNullException.ThrowIfNull(content);
+        ArgumentNullException.ThrowIfNull(autoFillConfig);
 
-        if (autoFillConfig == null)
-        {
-            throw new ArgumentNullException(nameof(autoFillConfig));
-        }
+        void SetProperty(string alias, object? value) => UploadAutoFillProperties.SetProperty(content, alias, value, culture, segment);
 
-        if (!string.IsNullOrWhiteSpace(autoFillConfig.WidthFieldAlias) &&
-            content.Properties.Contains(autoFillConfig.WidthFieldAlias))
-        {
-            content.Properties[autoFillConfig.WidthFieldAlias]!.SetValue(
-                size.HasValue ? size.Value.Width.ToInvariantString() : string.Empty, culture, segment);
-        }
-
-        if (!string.IsNullOrWhiteSpace(autoFillConfig.HeightFieldAlias) &&
-            content.Properties.Contains(autoFillConfig.HeightFieldAlias))
-        {
-            content.Properties[autoFillConfig.HeightFieldAlias]!.SetValue(
-                size.HasValue ? size.Value.Height.ToInvariantString() : string.Empty, culture, segment);
-        }
-
-        if (!string.IsNullOrWhiteSpace(autoFillConfig.LengthFieldAlias) &&
-            content.Properties.Contains(autoFillConfig.LengthFieldAlias))
-        {
-            content.Properties[autoFillConfig.LengthFieldAlias]!.SetValue(length, culture, segment);
-        }
-
-        if (!string.IsNullOrWhiteSpace(autoFillConfig.ExtensionFieldAlias) &&
-            content.Properties.Contains(autoFillConfig.ExtensionFieldAlias))
-        {
-            content.Properties[autoFillConfig.ExtensionFieldAlias]!.SetValue(extension, culture, segment);
-        }
+        SetProperty(autoFillConfig.WidthFieldAlias, size.HasValue ? size.Value.Width.ToInvariantString() : null);
+        SetProperty(autoFillConfig.HeightFieldAlias, size.HasValue ? size.Value.Height.ToInvariantString() : null);
+        SetProperty(autoFillConfig.LengthFieldAlias, length);
+        SetProperty(autoFillConfig.ExtensionFieldAlias, extension);
     }
 
-    private void SetProperties(IContentBase content, ImagingAutoFillUploadField autoFillConfig, string filepath, Stream? filestream, string? culture, string? segment)
+    private void SetProperties(IContentBase content, ImagingAutoFillUploadField autoFillConfig, string filepath, Stream filestream, string? culture, string? segment)
     {
         var extension = (Path.GetExtension(filepath) ?? string.Empty).TrimStart(Constants.CharArrays.Period);
 
-        Size? size = _imageUrlGenerator.IsSupportedImageFormat(extension)
-            ? _imageDimensionExtractor.GetDimensions(filestream) ??
-              (Size?)new Size(Constants.Conventions.Media.DefaultSize, Constants.Conventions.Media.DefaultSize)
+        Size? size = _imageDimensionExtractor.IsSupportedImageFormat(extension)
+            ? _imageDimensionExtractor.GetDimensions(filestream) ?? new Size(Constants.Conventions.Media.DefaultSize, Constants.Conventions.Media.DefaultSize)
             : null;
 
         SetProperties(content, autoFillConfig, size, filestream?.Length, extension, culture, segment);
@@ -185,34 +135,23 @@ public class UploadAutoFillProperties
 
     private static void ResetProperties(IContentBase content, ImagingAutoFillUploadField autoFillConfig, string? culture, string? segment)
     {
-        if (content == null)
-        {
-            throw new ArgumentNullException(nameof(content));
-        }
+        ArgumentNullException.ThrowIfNull(content);
+        ArgumentNullException.ThrowIfNull(autoFillConfig);
 
-        if (autoFillConfig == null)
-        {
-            throw new ArgumentNullException(nameof(autoFillConfig));
-        }
+        void ResetProperty(string alias) => SetProperty(content, alias, null, culture, segment);
 
-        if (content.Properties.Contains(autoFillConfig.WidthFieldAlias))
-        {
-            content.Properties[autoFillConfig.WidthFieldAlias]?.SetValue(string.Empty, culture, segment);
-        }
+        ResetProperty(autoFillConfig.WidthFieldAlias);
+        ResetProperty(autoFillConfig.HeightFieldAlias);
+        ResetProperty(autoFillConfig.LengthFieldAlias);
+        ResetProperty(autoFillConfig.ExtensionFieldAlias);
+    }
 
-        if (content.Properties.Contains(autoFillConfig.HeightFieldAlias))
+    private static void SetProperty(IContentBase content, string alias, object? value, string? culture, string? segment)
+    {
+        if (!string.IsNullOrEmpty(alias) &&
+            content.Properties.TryGetValue(alias, out var property))
         {
-            content.Properties[autoFillConfig.HeightFieldAlias]?.SetValue(string.Empty, culture, segment);
-        }
-
-        if (content.Properties.Contains(autoFillConfig.LengthFieldAlias))
-        {
-            content.Properties[autoFillConfig.LengthFieldAlias]?.SetValue(string.Empty, culture, segment);
-        }
-
-        if (content.Properties.Contains(autoFillConfig.ExtensionFieldAlias))
-        {
-            content.Properties[autoFillConfig.ExtensionFieldAlias]?.SetValue(string.Empty, culture, segment);
+            property.SetValue(value, culture, segment);
         }
     }
 }

@@ -19,18 +19,6 @@ public abstract class BaseHttpHeaderCheck : HealthCheck
     private readonly string _localizedTextPrefix;
     private readonly bool _metaTagOptionAvailable;
 
-    [Obsolete("Use ctor without value.")]
-    protected BaseHttpHeaderCheck(
-        IHostingEnvironment hostingEnvironment,
-        ILocalizedTextService textService,
-        string header,
-        string value,
-        string localizedTextPrefix,
-        bool metaTagOptionAvailable)
-        : this(hostingEnvironment, textService, header, localizedTextPrefix, metaTagOptionAvailable)
-    {
-    }
-
     /// <summary>
     ///     Initializes a new instance of the <see cref="BaseHttpHeaderCheck" /> class.
     /// </summary>
