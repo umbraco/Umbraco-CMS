@@ -265,7 +265,7 @@
                                         <localize key="blockEditor_areasLayoutColumnsHelp">Define how many layout columns that will be available for areas. If not defined, the number of layout columns defined for the entire layout will be used.</localize>
                                     </umb-property-info-button>
                                     <div class="controls">
-                                        <input type="number" name="areaGridColumns" placeholder="{{model.gridColumns}}" ng-model="vm.block.areaGridColumns"/>
+                                        <input type="number" pattern="[0-9]*" min="1" max="100" name="areaGridColumns" placeholder="{{model.gridColumns}}" ng-model="vm.block.areaGridColumns" fix-number />
                                     </div>
                                 </div>
                             </div>
