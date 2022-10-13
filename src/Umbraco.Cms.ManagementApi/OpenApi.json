@@ -1,8 +1,9 @@
 {
+  "x-generator": "NSwag v13.17.0.0 (NJsonSchema v10.8.0.0 (Newtonsoft.Json v13.0.0.0))",
   "openapi": "3.0.0",
   "info": {
     "title": "Umbraco Backoffice API",
-    "description": "This shows all APIs available in this version of Umbraco - Including all the legacy apis that is available for backward compatibility",
+    "description": "This shows all APIs available in this version of Umbraco - Including all the legacy apis that is available for backward compatibility. Testing pipelines, don't merge this in!",
     "version": "All"
   },
   "servers": [
@@ -67,6 +68,194 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/trackedReferences/descendants/{parentId}": {
+      "get": {
+        "tags": [
+          "TrackedReferences"
+        ],
+        "summary": "Gets a page list of the child nodes of the current item used in any kind of relation.",
+        "description": "Used when deleting and unpublishing a single item to check if this item has any descending items that are in any\nkind of relation.\nThis is basically finding the descending items which are children in relations.",
+        "operationId": "DescendantsTrackedReferences_Descendants",
+        "parameters": [
+          {
+            "name": "parentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "x-position": 2
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "x-position": 3
+          },
+          {
+            "name": "filterMustBeIsDependency",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "nullable": true
+            },
+            "x-position": 4
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedViewModelOfRelationItemViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/trackedReferences/{id}": {
+      "get": {
+        "tags": [
+          "TrackedReferences"
+        ],
+        "summary": "Gets a page list of tracked references for the current item, so you can see where an item is being used.",
+        "description": "Used by info tabs on content, media etc. and for the delete and unpublish of single items.\nThis is basically finding parents of relations.",
+        "operationId": "ForItemTrackedReferences_Get",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "x-position": 2
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "x-position": 3
+          },
+          {
+            "name": "filterMustBeIsDependency",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "nullable": true
+            },
+            "x-position": 4
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedViewModelOfRelationItemViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/trackedReferences/multiple": {
+      "get": {
+        "tags": [
+          "TrackedReferences"
+        ],
+        "summary": "Gets a page list of the items used in any kind of relation from selected integer ids.",
+        "description": "Used when bulk deleting content/media and bulk unpublishing content (delete and unpublish on List view).\nThis is basically finding children of relations.",
+        "operationId": "MultipleTrackedReferences_GetPagedReferencedItems",
+        "parameters": [
+          {
+            "name": "ids",
+            "in": "query",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "nullable": true,
+              "items": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            "x-position": 1
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "x-position": 2
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "x-position": 3
+          },
+          {
+            "name": "filterMustBeIsDependency",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "nullable": true
+            },
+            "x-position": 4
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedViewModelOfRelationItemViewModel"
                 }
               }
             }
@@ -206,194 +395,6 @@
             }
           }
         }
-      }
-    },
-    "/umbraco/api/v1/trackedReferences/{id}": {
-      "get": {
-        "description": "Used by info tabs on content, media etc. and for the delete and unpublish of single items.\nThis is basically finding parents of relations.",
-        "operationId": "ForItemTrackedReferences_Get",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "schema": {
-              "format": "int32",
-              "type": "integer"
-            },
-            "x-position": 1
-          },
-          {
-            "in": "query",
-            "name": "skip",
-            "schema": {
-              "format": "int64",
-              "type": "integer"
-            },
-            "x-position": 2
-          },
-          {
-            "in": "query",
-            "name": "take",
-            "schema": {
-              "format": "int64",
-              "type": "integer"
-            },
-            "x-position": 3
-          },
-          {
-            "in": "query",
-            "name": "filterMustBeIsDependency",
-            "schema": {
-              "nullable": true,
-              "type": "boolean"
-            },
-            "x-position": 4
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedViewModelOfRelationItemViewModel"
-                }
-              }
-            },
-            "description": ""
-          }
-        },
-        "summary": "Gets a page list of tracked references for the current item, so you can see where an item is being used.",
-        "tags": [
-          "TrackedReferences"
-        ]
-      }
-    },
-    "/umbraco/api/v1/trackedReferences/descendants/{parentId}": {
-      "get": {
-        "description": "Used when deleting and unpublishing a single item to check if this item has any descending items that are in any\nkind of relation.\nThis is basically finding the descending items which are children in relations.",
-        "operationId": "DescendantsTrackedReferences_Descendants",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "parentId",
-            "required": true,
-            "schema": {
-              "format": "int32",
-              "type": "integer"
-            },
-            "x-position": 1
-          },
-          {
-            "in": "query",
-            "name": "skip",
-            "schema": {
-              "format": "int64",
-              "type": "integer"
-            },
-            "x-position": 2
-          },
-          {
-            "in": "query",
-            "name": "take",
-            "schema": {
-              "format": "int64",
-              "type": "integer"
-            },
-            "x-position": 3
-          },
-          {
-            "in": "query",
-            "name": "filterMustBeIsDependency",
-            "schema": {
-              "nullable": true,
-              "type": "boolean"
-            },
-            "x-position": 4
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedViewModelOfRelationItemViewModel"
-                }
-              }
-            },
-            "description": ""
-          }
-        },
-        "summary": "Gets a page list of the child nodes of the current item used in any kind of relation.",
-        "tags": [
-          "TrackedReferences"
-        ]
-      }
-    },
-    "/umbraco/api/v1/trackedReferences/multiple": {
-      "get": {
-        "description": "Used when bulk deleting content/media and bulk unpublishing content (delete and unpublish on List view).\nThis is basically finding children of relations.",
-        "operationId": "MultipleTrackedReferences_GetPagedReferencedItems",
-        "parameters": [
-          {
-            "explode": true,
-            "in": "query",
-            "name": "ids",
-            "schema": {
-              "items": {
-                "format": "int32",
-                "type": "integer"
-              },
-              "nullable": true,
-              "type": "array"
-            },
-            "style": "form",
-            "x-position": 1
-          },
-          {
-            "in": "query",
-            "name": "skip",
-            "schema": {
-              "format": "int64",
-              "type": "integer"
-            },
-            "x-position": 2
-          },
-          {
-            "in": "query",
-            "name": "take",
-            "schema": {
-              "format": "int64",
-              "type": "integer"
-            },
-            "x-position": 3
-          },
-          {
-            "in": "query",
-            "name": "filterMustBeIsDependency",
-            "schema": {
-              "nullable": true,
-              "type": "boolean"
-            },
-            "x-position": 4
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedViewModelOfRelationItemViewModel"
-                }
-              }
-            },
-            "description": ""
-          }
-        },
-        "summary": "Gets a page list of the items used in any kind of relation from selected integer ids.",
-        "tags": [
-          "TrackedReferences"
-        ]
       }
     },
     "/umbraco/api/v1/stylesheet/tree/children": {
@@ -855,6 +856,109 @@
         }
       }
     },
+    "/umbraco/api/v1/relation/childRelations/{childId}": {
+      "get": {
+        "tags": [
+          "Relation"
+        ],
+        "operationId": "ByChildRelation_ByChild",
+        "parameters": [
+          {
+            "name": "childId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 2
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 3
+          },
+          {
+            "name": "relationTypeAlias",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "",
+              "nullable": true
+            },
+            "x-position": 4
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedViewModelOfRelationViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/relation/{id}": {
+      "get": {
+        "tags": [
+          "Relation"
+        ],
+        "operationId": "ByIdRelation_ById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelationViewModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/umbraco/api/v1/relation-type/tree/items": {
       "get": {
         "tags": [
@@ -1143,6 +1247,78 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PagedViewModelOfFileSystemTreeItemViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/modelsBuilder/build": {
+      "post": {
+        "tags": [
+          "ModelsBuilder"
+        ],
+        "operationId": "BuildModelsBuilder_BuildModels",
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "428": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/modelsBuilder": {
+      "get": {
+        "tags": [
+          "ModelsBuilder"
+        ],
+        "operationId": "GetModelsBuilder_GetDashboard",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/modelsBuilder/status": {
+      "get": {
+        "tags": [
+          "ModelsBuilder"
+        ],
+        "operationId": "StatusModelsBuilder_GetModelsOutOfDateStatus",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OutOfDateStatusViewModel"
                 }
               }
             }
@@ -1745,6 +1921,217 @@
         }
       }
     },
+    "/umbraco/api/v1/language": {
+      "get": {
+        "tags": [
+          "Language"
+        ],
+        "summary": "1\n                Returns all currently configured languages.",
+        "operationId": "AllLanguage_GetAll",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedViewModelOfLanguageViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/language/{id}": {
+      "get": {
+        "tags": [
+          "Language"
+        ],
+        "operationId": "ByIdLanguage_ById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LanguageViewModel"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Language"
+        ],
+        "summary": "Deletes a language with a given ID",
+        "operationId": "DeleteLanguage_Delete",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/language/create": {
+      "post": {
+        "tags": [
+          "Language"
+        ],
+        "summary": "Creates or saves a language",
+        "operationId": "CreateLanguage_Create",
+        "requestBody": {
+          "x-name": "language",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LanguageViewModel"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/language/update": {
+      "put": {
+        "tags": [
+          "Language"
+        ],
+        "summary": "Updates a language",
+        "operationId": "UpdateLanguage_Update",
+        "requestBody": {
+          "x-name": "language",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LanguageViewModel"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "404": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
     "/umbraco/api/v1/install/settings": {
       "get": {
         "tags": [
@@ -1865,215 +2252,82 @@
         }
       }
     },
-    "/umbraco/api/v1/language": {
+    "/umbraco/api/v1/help": {
       "get": {
-        "operationId": "AllLanguage_GetAll",
+        "tags": [
+          "Help"
+        ],
+        "operationId": "GetHelp_Get",
         "parameters": [
           {
+            "name": "section",
             "in": "query",
-            "name": "skip",
             "schema": {
-              "format": "int32",
-              "type": "integer"
+              "type": "string",
+              "nullable": true
             },
             "x-position": 1
           },
           {
+            "name": "tree",
             "in": "query",
-            "name": "take",
             "schema": {
-              "format": "int32",
-              "type": "integer"
+              "type": "string",
+              "nullable": true
             },
             "x-position": 2
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedViewModelOfLanguageViewModel"
-                }
-              }
-            },
-            "description": ""
-          }
-        },
-        "summary": "1\n                Returns all currently configured languages.",
-        "tags": [
-          "Language"
-        ]
-      }
-    },
-    "/umbraco/api/v1/language/{id}": {
-      "delete": {
-        "operationId": "DeleteLanguage_Delete",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "schema": {
-              "format": "int32",
-              "type": "integer"
-            },
-            "x-position": 1
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
           },
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 3
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 4
+          },
+          {
+            "name": "baseUrl",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "https://our.umbraco.com",
+              "nullable": true
+            },
+            "x-position": 5
+          }
+        ],
+        "responses": {
           "400": {
+            "description": "",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
                 }
-              }
-            },
-            "description": ""
-          },
-          "404": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            },
-            "description": ""
-          }
-        },
-        "summary": "Deletes a language with a given ID",
-        "tags": [
-          "Language"
-        ]
-      },
-      "get": {
-        "operationId": "ByIdLanguage_ById",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "schema": {
-              "format": "int32",
-              "type": "integer"
-            },
-            "x-position": 1
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/LanguageViewModel"
-                }
-              }
-            },
-            "description": ""
-          },
-          "404": {
-            "content": {
-              "application/octet-stream": {
-                "schema": {
-                  "format": "binary",
-                  "type": "string"
-                }
-              }
-            },
-            "description": ""
-          }
-        },
-        "tags": [
-          "Language"
-        ]
-      }
-    },
-    "/umbraco/api/v1/language/create": {
-      "post": {
-        "operationId": "CreateLanguage_Create",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/LanguageViewModel"
               }
             }
           },
-          "required": true,
-          "x-name": "language",
-          "x-position": 1
-        },
-        "responses": {
-          "201": {
-            "description": ""
-          },
-          "400": {
+          "200": {
+            "description": "",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/PagedViewModelOfHelpPageViewModel"
                 }
-              }
-            },
-            "description": ""
-          }
-        },
-        "summary": "Creates or saves a language",
-        "tags": [
-          "Language"
-        ]
-      }
-    },
-    "/umbraco/api/v1/language/update": {
-      "put": {
-        "operationId": "UpdateLanguage_Update",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/LanguageViewModel"
               }
             }
-          },
-          "required": true,
-          "x-name": "language",
-          "x-position": 1
-        },
-        "responses": {
-          "200": {
-            "description": ""
-          },
-          "400": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            },
-            "description": ""
-          },
-          "404": {
-            "content": {
-              "application/octet-stream": {
-                "schema": {
-                  "format": "binary",
-                  "type": "string"
-                }
-              }
-            },
-            "description": ""
           }
-        },
-        "summary": "Updates a language",
-        "tags": [
-          "Language"
-        ]
+        }
       }
     },
     "/umbraco/api/v1/examineManagement/indexes": {
@@ -2081,6 +2335,7 @@
         "tags": [
           "ExamineManagement"
         ],
+        "summary": "Get the details for indexers",
         "operationId": "IndexesExamineManagement_Indexes",
         "parameters": [
           {
@@ -2121,6 +2376,8 @@
         "tags": [
           "ExamineManagement"
         ],
+        "summary": "Check if the index has been rebuilt",
+        "description": "This is kind of rudimentary since there's no way we can know that the index has rebuilt, we\nhave a listener for the index op complete so we'll just check if that key is no longer there in the runtime cache",
         "operationId": "IndexExamineManagement_Index",
         "parameters": [
           {
@@ -2162,6 +2419,7 @@
         "tags": [
           "ExamineManagement"
         ],
+        "summary": "Rebuilds the index",
         "operationId": "RebuildExamineManagement_Rebuild",
         "parameters": [
           {
@@ -2204,6 +2462,7 @@
         "tags": [
           "ExamineManagement"
         ],
+        "summary": "Get the details for searchers",
         "operationId": "SearchersExamineManagement_Searchers",
         "parameters": [
           {
@@ -2305,421 +2564,6 @@
             }
           }
         }
-      }
-    },
-    "/umbraco/api/v1/help": {
-      "get": {
-        "operationId": "GetHelp_Get",
-        "parameters": [
-          {
-            "in": "query",
-            "name": "section",
-            "schema": {
-              "nullable": true,
-              "type": "string"
-            },
-            "x-position": 1
-          },
-          {
-            "in": "query",
-            "name": "tree",
-            "schema": {
-              "nullable": true,
-              "type": "string"
-            },
-            "x-position": 2
-          },
-          {
-            "in": "query",
-            "name": "skip",
-            "schema": {
-              "format": "int32",
-              "type": "integer"
-            },
-            "x-position": 3
-          },
-          {
-            "in": "query",
-            "name": "take",
-            "schema": {
-              "format": "int32",
-              "type": "integer"
-            },
-            "x-position": 4
-          },
-          {
-            "in": "query",
-            "name": "baseUrl",
-            "schema": {
-              "default": "https://our.umbraco.com",
-              "nullable": true,
-              "type": "string"
-            },
-            "x-position": 5
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedViewModelOfHelpPageViewModel"
-                }
-              }
-            },
-            "description": ""
-          },
-          "400": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            },
-            "description": ""
-          }
-        },
-        "tags": [
-          "Help"
-        ]
-      }
-    },
-    "/umbraco/api/v1/dictionary/{id}": {
-      "patch": {
-        "operationId": "UpdateDictionary_Update",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "schema": {
-              "format": "guid",
-              "type": "string"
-            },
-            "x-position": 1
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "items": {
-                  "$ref": "#/components/schemas/JsonPatchViewModel"
-                },
-                "type": "array"
-              }
-            }
-          },
-          "required": true,
-          "x-name": "updateViewModel",
-          "x-position": 2
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/octet-stream": {
-                "schema": {
-                  "format": "binary",
-                  "type": "string"
-                }
-              }
-            },
-            "description": ""
-          },
-          "404": {
-            "content": {
-              "application/octet-stream": {
-                "schema": {
-                  "format": "binary",
-                  "type": "string"
-                }
-              }
-            },
-            "description": ""
-          }
-        },
-        "tags": [
-          "Dictionary"
-        ]
-      }
-    },
-    "/umbraco/api/v1/dictionary/{key}": {
-      "delete": {
-        "operationId": "DeleteDictionary_Delete",
-        "parameters": [
-          {
-            "description": "The key of the dictionary item to delete",
-            "in": "path",
-            "name": "key",
-            "required": true,
-            "schema": {
-              "format": "guid",
-              "type": "string"
-            },
-            "x-position": 1
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "HttpResponseMessage\n            "
-          },
-          "404": {
-            "content": {
-              "application/octet-stream": {
-                "schema": {
-                  "format": "binary",
-                  "type": "string"
-                }
-              }
-            },
-            "description": ""
-          }
-        },
-        "summary": "Deletes a data type with a given ID",
-        "tags": [
-          "Dictionary"
-        ]
-      },
-      "get": {
-        "operationId": "ByIdDictionary_ByKey",
-        "parameters": [
-          {
-            "description": "The id.\n            ",
-            "in": "path",
-            "name": "key",
-            "required": true,
-            "schema": {
-              "format": "guid",
-              "type": "string"
-            },
-            "x-position": 1
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DictionaryViewModel"
-                }
-              }
-            },
-            "description": "The DictionaryDisplay. Returns a not found response when dictionary item does not exist\n            "
-          },
-          "404": {
-            "content": {
-              "application/octet-stream": {
-                "schema": {
-                  "format": "binary",
-                  "type": "string"
-                }
-              }
-            },
-            "description": ""
-          }
-        },
-        "summary": "Gets a dictionary item by guid",
-        "tags": [
-          "Dictionary"
-        ]
-      }
-    },
-    "/umbraco/api/v1/dictionary/create": {
-      "post": {
-        "operationId": "CreateDictionary_Create",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/DictionaryItemViewModel"
-              }
-            }
-          },
-          "description": "The viewmodel to pass to the action",
-          "required": true,
-          "x-name": "dictionaryViewModel",
-          "x-position": 1
-        },
-        "responses": {
-          "201": {
-            "content": {
-              "application/octet-stream": {
-                "schema": {
-                  "format": "binary",
-                  "type": "string"
-                }
-              }
-            },
-            "description": "The HttpResponseMessage.\n            "
-          },
-          "400": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            },
-            "description": ""
-          }
-        },
-        "summary": "Creates a new dictionary item",
-        "tags": [
-          "Dictionary"
-        ]
-      }
-    },
-    "/umbraco/api/v1/dictionary/export/{key}": {
-      "get": {
-        "operationId": "ExportDictionary_ExportDictionary",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "key",
-            "required": true,
-            "schema": {
-              "format": "guid",
-              "type": "string"
-            },
-            "x-position": 1
-          },
-          {
-            "in": "query",
-            "name": "includeChildren",
-            "schema": {
-              "default": false,
-              "type": "boolean"
-            },
-            "x-position": 2
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/octet-stream": {
-                "schema": {
-                  "format": "binary",
-                  "type": "string"
-                }
-              }
-            },
-            "description": ""
-          },
-          "404": {
-            "content": {
-              "application/octet-stream": {
-                "schema": {
-                  "format": "binary",
-                  "type": "string"
-                }
-              }
-            },
-            "description": ""
-          }
-        },
-        "tags": [
-          "Dictionary"
-        ]
-      }
-    },
-    "/umbraco/api/v1/dictionary/import": {
-      "post": {
-        "operationId": "ImportDictionary_ImportDictionary",
-        "parameters": [
-          {
-            "in": "query",
-            "name": "file",
-            "schema": {
-              "nullable": true,
-              "type": "string"
-            },
-            "x-position": 1
-          },
-          {
-            "in": "query",
-            "name": "parentId",
-            "schema": {
-              "format": "int32",
-              "nullable": true,
-              "type": "integer"
-            },
-            "x-position": 2
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/octet-stream": {
-                "schema": {
-                  "format": "binary",
-                  "type": "string"
-                }
-              }
-            },
-            "description": ""
-          },
-          "404": {
-            "content": {
-              "application/octet-stream": {
-                "schema": {
-                  "format": "binary",
-                  "type": "string"
-                }
-              }
-            },
-            "description": ""
-          }
-        },
-        "tags": [
-          "Dictionary"
-        ]
-      }
-    },
-    "/umbraco/api/v1/dictionary/upload": {
-      "post": {
-        "operationId": "UploadDictionary_Upload",
-        "requestBody": {
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "properties": {
-                  "file": {
-                    "format": "binary",
-                    "nullable": true,
-                    "type": "string"
-                  }
-                },
-                "type": "object"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DictionaryImportViewModel"
-                }
-              }
-            },
-            "description": ""
-          },
-          "400": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            },
-            "description": ""
-          }
-        },
-        "tags": [
-          "Dictionary"
-        ]
       }
     },
     "/umbraco/api/v1/document/tree/children": {
@@ -3263,43 +3107,380 @@
     },
     "/umbraco/api/v1/dictionary": {
       "get": {
+        "tags": [
+          "Dictionary"
+        ],
+        "summary": "Retrieves a list with all dictionary items",
         "operationId": "AllDictionary_All",
         "parameters": [
           {
-            "in": "query",
             "name": "skip",
+            "in": "query",
             "schema": {
-              "format": "int32",
-              "type": "integer"
+              "type": "integer",
+              "format": "int32"
             },
             "x-position": 1
           },
           {
-            "in": "query",
             "name": "take",
+            "in": "query",
             "schema": {
-              "format": "int32",
-              "type": "integer"
+              "type": "integer",
+              "format": "int32"
             },
             "x-position": 2
           }
         ],
         "responses": {
           "200": {
+            "description": "The IEnumerable`1.\n            ",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PagedViewModelOfDictionaryOverviewViewModel"
                 }
               }
-            },
-            "description": "The IEnumerable`1.\n            "
+            }
           }
-        },
-        "summary": "Retrieves a list with all dictionary items",
+        }
+      }
+    },
+    "/umbraco/api/v1/dictionary/{key}": {
+      "get": {
         "tags": [
           "Dictionary"
-        ]
+        ],
+        "summary": "Gets a dictionary item by guid",
+        "operationId": "ByIdDictionary_ByKey",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "description": "The id.\n            ",
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The DictionaryDisplay. Returns a not found response when dictionary item does not exist\n            ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DictionaryViewModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Dictionary"
+        ],
+        "summary": "Deletes a data type with a given ID",
+        "operationId": "DeleteDictionary_Delete",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "description": "The key of the dictionary item to delete",
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "HttpResponseMessage\n            "
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/dictionary/create": {
+      "post": {
+        "tags": [
+          "Dictionary"
+        ],
+        "summary": "Creates a new dictionary item",
+        "operationId": "CreateDictionary_Create",
+        "requestBody": {
+          "x-name": "dictionaryViewModel",
+          "description": "The viewmodel to pass to the action",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DictionaryItemViewModel"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "201": {
+            "description": "The HttpResponseMessage.\n            ",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/dictionary/export/{key}": {
+      "get": {
+        "tags": [
+          "Dictionary"
+        ],
+        "operationId": "ExportDictionary_ExportDictionary",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "includeChildren",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/dictionary/import": {
+      "post": {
+        "tags": [
+          "Dictionary"
+        ],
+        "operationId": "ImportDictionary_ImportDictionary",
+        "parameters": [
+          {
+            "name": "file",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 1
+          },
+          {
+            "name": "parentId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "nullable": true
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/dictionary/{id}": {
+      "patch": {
+        "tags": [
+          "Dictionary"
+        ],
+        "operationId": "UpdateDictionary_Update",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "updateViewModel",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/JsonPatchViewModel"
+                }
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/dictionary/upload": {
+      "post": {
+        "tags": [
+          "Dictionary"
+        ],
+        "operationId": "UploadDictionary_Upload",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "nullable": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DictionaryImportViewModel"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/umbraco/api/v1/dictionary-item/tree/children": {
@@ -3434,140 +3615,6 @@
             }
           }
         }
-      }
-    },
-    "/umbraco/api/v1/analytics": {
-      "get": {
-        "operationId": "GetAnalytics_Get",
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AnalyticsLevelViewModel"
-                }
-              }
-            },
-            "description": ""
-          }
-        },
-        "tags": [
-          "Analytics"
-        ]
-      },
-      "post": {
-        "operationId": "SetAnalytics_SetConsentLevel",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AnalyticsLevelViewModel"
-              }
-            }
-          },
-          "required": true,
-          "x-name": "analyticsLevelViewModel",
-          "x-position": 1
-        },
-        "responses": {
-          "200": {
-            "description": ""
-          },
-          "400": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            },
-            "description": ""
-          }
-        },
-        "tags": [
-          "Analytics"
-        ]
-      }
-    },
-    "/umbraco/api/v1/analytics/all": {
-      "get": {
-        "operationId": "AllAnalytics_GetAll",
-        "parameters": [
-          {
-            "in": "query",
-            "name": "skip",
-            "schema": {
-              "format": "int32",
-              "type": "integer"
-            },
-            "x-position": 1
-          },
-          {
-            "in": "query",
-            "name": "take",
-            "schema": {
-              "format": "int32",
-              "type": "integer"
-            },
-            "x-position": 2
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedViewModelOfTelemetryLevel"
-                }
-              }
-            },
-            "description": ""
-          }
-        },
-        "tags": [
-          "Analytics"
-        ]
-      }
-    },
-    "/umbraco/api/v1/culture": {
-      "get": {
-        "operationId": "AllCulture_GetAll",
-        "parameters": [
-          {
-            "in": "query",
-            "name": "skip",
-            "schema": {
-              "format": "int32",
-              "type": "integer"
-            },
-            "x-position": 1
-          },
-          {
-            "in": "query",
-            "name": "take",
-            "schema": {
-              "format": "int32",
-              "type": "integer"
-            },
-            "x-position": 2
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedViewModelOfCultureViewModel"
-                }
-              }
-            },
-            "description": ""
-          }
-        },
-        "summary": "Returns all cultures available for creating languages.",
-        "tags": [
-          "Culture"
-        ]
       }
     },
     "/umbraco/api/v1/data-type/tree/children": {
@@ -3722,25 +3769,125 @@
         }
       }
     },
-    "/umbraco/api/v1/modelsBuilder/build": {
-      "post": {
+    "/umbraco/api/v1/culture": {
+      "get": {
         "tags": [
-          "ModelsBuilder"
+          "Culture"
         ],
-        "operationId": "BuildModelsBuilder_BuildModels",
+        "summary": "Returns all cultures available for creating languages.",
+        "operationId": "AllCulture_GetAll",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 2
+          }
+        ],
         "responses": {
-          "201": {
+          "200": {
             "description": "",
             "content": {
-              "application/octet-stream": {
+              "application/json": {
                 "schema": {
-                  "type": "string",
-                  "format": "binary"
+                  "$ref": "#/components/schemas/PagedViewModelOfCultureViewModel"
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/analytics/all": {
+      "get": {
+        "tags": [
+          "Analytics"
+        ],
+        "operationId": "AllAnalytics_GetAll",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
           },
-          "428": {
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedViewModelOfTelemetryLevel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/analytics": {
+      "get": {
+        "tags": [
+          "Analytics"
+        ],
+        "operationId": "GetAnalytics_Get",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalyticsLevelViewModel"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Analytics"
+        ],
+        "operationId": "SetAnalytics_SetConsentLevel",
+        "requestBody": {
+          "x-name": "analyticsLevelViewModel",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnalyticsLevelViewModel"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "400": {
             "description": "",
             "content": {
               "application/json": {
@@ -3749,47 +3896,9 @@
                 }
               }
             }
-          }
-        }
-      }
-    },
-    "/umbraco/api/v1/modelsBuilder": {
-      "get": {
-        "tags": [
-          "ModelsBuilder"
-        ],
-        "operationId": "GetModelsBuilder_GetDashboard",
-        "responses": {
+          },
           "200": {
-            "description": "",
-            "content": {
-              "application/octet-stream": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/umbraco/api/v1/modelsBuilder/status": {
-      "get": {
-        "tags": [
-          "ModelsBuilder"
-        ],
-        "operationId": "StatusModelsBuilder_GetModelsOutOfDateStatus",
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/OutOfDateStatusViewModel"
-                }
-              }
-            }
+            "description": ""
           }
         }
       }
@@ -3844,6 +3953,62 @@
           },
           "reportUrl": {
             "type": "string"
+          }
+        }
+      },
+      "PagedViewModelOfRelationItemViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RelationItemViewModel"
+            }
+          }
+        }
+      },
+      "RelationItemViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "nodeKey": {
+            "type": "string",
+            "format": "guid"
+          },
+          "nodeName": {
+            "type": "string",
+            "nullable": true
+          },
+          "nodeType": {
+            "type": "string",
+            "nullable": true
+          },
+          "contentTypeIcon": {
+            "type": "string",
+            "nullable": true
+          },
+          "contentTypeAlias": {
+            "type": "string",
+            "nullable": true
+          },
+          "contentTypeName": {
+            "type": "string",
+            "nullable": true
+          },
+          "relationTypeName": {
+            "type": "string",
+            "nullable": true
+          },
+          "relationTypeIsBidirectional": {
+            "type": "boolean"
+          },
+          "relationTypeIsDependency": {
+            "type": "boolean"
           }
         }
       },
@@ -3979,6 +4144,64 @@
           }
         }
       },
+      "PagedViewModelOfRelationViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RelationViewModel"
+            }
+          }
+        }
+      },
+      "RelationViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "parentId": {
+            "type": "integer",
+            "readOnly": true,
+            "description": "Gets or sets the Parent Id of the Relation (Source).\n            ",
+            "format": "int32"
+          },
+          "parentName": {
+            "type": "string",
+            "readOnly": true,
+            "description": "Gets or sets the Parent Name of the relation (Source).\n            ",
+            "nullable": true
+          },
+          "childId": {
+            "type": "integer",
+            "readOnly": true,
+            "description": "Gets or sets the Child Id of the Relation (Destination).\n            ",
+            "format": "int32"
+          },
+          "childName": {
+            "type": "string",
+            "readOnly": true,
+            "description": "Gets or sets the Child Name of the relation (Destination).\n            ",
+            "nullable": true
+          },
+          "createDate": {
+            "type": "string",
+            "readOnly": true,
+            "description": "Gets or sets the date when the Relation was created.\n            ",
+            "format": "date-time"
+          },
+          "comment": {
+            "type": "string",
+            "readOnly": true,
+            "description": "Gets or sets a comment for the Relation.\n            ",
+            "nullable": true
+          }
+        }
+      },
       "FolderTreeItemViewModel": {
         "allOf": [
           {
@@ -4003,6 +4226,29 @@
             "type": "boolean"
           }
         }
+      },
+      "OutOfDateStatusViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/OutOfDateType"
+          }
+        }
+      },
+      "OutOfDateType": {
+        "type": "integer",
+        "description": "",
+        "x-enumNames": [
+          "OutOfDate",
+          "Current",
+          "Unknown"
+        ],
+        "enum": [
+          0,
+          1,
+          100
+        ]
       },
       "PagedViewModelOfContentTreeItemViewModel": {
         "type": "object",
@@ -4095,6 +4341,54 @@
             "items": {
               "$ref": "#/components/schemas/FolderTreeItemViewModel"
             }
+          }
+        }
+      },
+      "PagedViewModelOfLanguageViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LanguageViewModel"
+            }
+          }
+        }
+      },
+      "LanguageViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "isoCode"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "isoCode": {
+            "type": "string",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "isDefault": {
+            "type": "boolean"
+          },
+          "isMandatory": {
+            "type": "boolean"
+          },
+          "fallbackLanguageId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
           }
         }
       },
@@ -4284,6 +4578,44 @@
             "type": "boolean"
           },
           "connectionString": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "PagedViewModelOfHelpPageViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HelpPageViewModel"
+            }
+          }
+        }
+      },
+      "HelpPageViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "url": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
             "type": "string",
             "nullable": true
           }
@@ -4537,6 +4869,391 @@
             "items": {
               "$ref": "#/components/schemas/DocumentBlueprintTreeItemViewModel"
             }
+          }
+        }
+      },
+      "PagedViewModelOfDictionaryOverviewViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DictionaryOverviewViewModel"
+            }
+          }
+        }
+      },
+      "DictionaryOverviewViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Gets or sets the key.\n            ",
+            "nullable": true
+          },
+          "key": {
+            "type": "string",
+            "description": "Gets or sets the key.\n            ",
+            "format": "guid"
+          },
+          "level": {
+            "type": "integer",
+            "description": "Gets or sets the level.\n            ",
+            "format": "int32"
+          },
+          "translations": {
+            "type": "array",
+            "description": "Sets the translations.\n            ",
+            "items": {
+              "$ref": "#/components/schemas/DictionaryTranslationOverviewViewModel"
+            }
+          }
+        }
+      },
+      "DictionaryTranslationOverviewViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "displayName": {
+            "type": "string",
+            "description": "Gets or sets the display name.\n            ",
+            "nullable": true
+          },
+          "hasTranslation": {
+            "type": "boolean",
+            "description": "Gets or sets a value indicating whether has translation.\n            "
+          }
+        }
+      },
+      "DictionaryViewModel": {
+        "type": "object",
+        "description": "The dictionary display model\n            ",
+        "additionalProperties": false,
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "parentId": {
+            "type": "string",
+            "description": "Gets or sets the parent id.\n            ",
+            "format": "guid",
+            "nullable": true
+          },
+          "translations": {
+            "type": "array",
+            "description": "Gets or sets the translations.\n            ",
+            "items": {
+              "$ref": "#/components/schemas/DictionaryTranslationViewModel"
+            }
+          },
+          "contentApps": {
+            "type": "array",
+            "description": "Apps for the dictionary item\n            ",
+            "items": {
+              "$ref": "#/components/schemas/ContentApp"
+            }
+          },
+          "notifications": {
+            "type": "array",
+            "description": "This is used to add custom localized messages/strings to the response for the app to use for localized UI purposes.\n            ",
+            "items": {
+              "$ref": "#/components/schemas/BackOfficeNotification"
+            }
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "key": {
+            "type": "string",
+            "description": "Gets or sets the Key for the object\n            ",
+            "format": "guid"
+          },
+          "path": {
+            "type": "string",
+            "description": "The path of the entity\n            "
+          }
+        }
+      },
+      "DictionaryTranslationViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "key": {
+            "type": "string",
+            "format": "guid"
+          },
+          "displayName": {
+            "type": "string",
+            "description": "Gets or sets the display name.\n            ",
+            "nullable": true
+          },
+          "isoCode": {
+            "type": "string",
+            "description": "Gets or sets the ISO code.\n            ",
+            "nullable": true
+          },
+          "translation": {
+            "type": "string",
+            "description": "Gets or sets the translation.\n            "
+          },
+          "languageId": {
+            "type": "integer",
+            "description": "Gets or sets the language id.\n            ",
+            "format": "int32"
+          }
+        }
+      },
+      "ContentApp": {
+        "type": "object",
+        "description": "Represents a content app.\n            ",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Gets the name of the content app.\n            ",
+            "nullable": true
+          },
+          "alias": {
+            "type": "string",
+            "description": "Gets the unique alias of the content app.\n            ",
+            "nullable": true
+          },
+          "weight": {
+            "type": "integer",
+            "description": "Gets or sets the weight of the content app.\n            ",
+            "format": "int32"
+          },
+          "icon": {
+            "type": "string",
+            "description": "Gets the icon of the content app.\n            ",
+            "nullable": true
+          },
+          "view": {
+            "type": "string",
+            "description": "Gets the view for rendering the content app.\n            ",
+            "nullable": true
+          },
+          "viewModel": {
+            "description": "The view model specific to this app\n            ",
+            "nullable": true
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Gets a value indicating whether the app is active.\n            "
+          },
+          "badge": {
+            "description": "Gets or sets the content app badge.\n            ",
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ContentAppBadge"
+              }
+            ]
+          }
+        }
+      },
+      "ContentAppBadge": {
+        "type": "object",
+        "description": "Represents a content app badge\n            ",
+        "additionalProperties": false,
+        "properties": {
+          "count": {
+            "type": "integer",
+            "description": "Gets or sets the number displayed in the badge\n            ",
+            "format": "int32"
+          },
+          "type": {
+            "description": "Gets or sets the type of badge to display\n            ",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ContentAppBadgeType"
+              }
+            ]
+          }
+        }
+      },
+      "ContentAppBadgeType": {
+        "type": "integer",
+        "description": "Represent the content app badge types\n            ",
+        "x-enumNames": [
+          "Default",
+          "Warning",
+          "Alert"
+        ],
+        "enum": [
+          0,
+          1,
+          2
+        ]
+      },
+      "BackOfficeNotification": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "header": {
+            "type": "string",
+            "nullable": true
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "notificationType": {
+            "$ref": "#/components/schemas/NotificationStyle"
+          }
+        }
+      },
+      "NotificationStyle": {
+        "type": "integer",
+        "description": "",
+        "x-enumNames": [
+          "Save",
+          "Info",
+          "Error",
+          "Success",
+          "Warning"
+        ],
+        "enum": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      "DictionaryItemViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "parentId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": true
+          },
+          "key": {
+            "type": "string",
+            "format": "guid"
+          }
+        }
+      },
+      "JsonPatchViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "op": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          },
+          "value": {}
+        }
+      },
+      "DictionaryImportViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "dictionaryItems": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DictionaryItemsImportViewModel"
+            }
+          },
+          "tempFileName": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "DictionaryItemsImportViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "level": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "PagedViewModelOfCultureViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CultureViewModel"
+            }
+          }
+        }
+      },
+      "CultureViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "englishName": {
+            "type": "string"
+          }
+        }
+      },
+      "PagedViewModelOfTelemetryLevel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TelemetryLevel2"
+            }
+          }
+        }
+      },
+      "TelemetryLevel2": {
+        "type": "integer",
+        "description": "",
+        "x-enumNames": [
+          "Minimal",
+          "Basic",
+          "Detailed"
+        ],
+        "enum": [
+          0,
+          1,
+          2
+        ]
+      },
+      "AnalyticsLevelViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "analyticsLevel": {
+            "$ref": "#/components/schemas/TelemetryLevel"
           }
         }
       }
