@@ -8,16 +8,16 @@ using Umbraco.Cms.ManagementApi.ViewModels.ExamineManagement;
 using Umbraco.Cms.ManagementApi.ViewModels.Pagination;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.ManagementApi.Controllers.ExamineManagement;
+namespace Umbraco.Cms.ManagementApi.Controllers.Examine;
 
 [ApiVersion("1.0")]
-public class SearchExamineManagementController : ExamineManagementControllerBase
+public class SearcherDetailsExamineController : ExamineControllerBase
 {
     private readonly IExamineManagerService _examineManagerService;
 
-    public SearchExamineManagementController(IExamineManagerService examineManagerService) => _examineManagerService = examineManagerService;
+    public SearcherDetailsExamineController(IExamineManagerService examineManagerService) => _examineManagerService = examineManagerService;
 
-    [HttpGet("search")]
+    [HttpGet("search/{searcherName}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<PagedViewModel<SearchResultViewModel>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]

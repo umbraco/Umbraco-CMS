@@ -6,20 +6,20 @@ using Umbraco.Cms.ManagementApi.ViewModels.ExamineManagement;
 using Umbraco.Cms.ManagementApi.ViewModels.Pagination;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.ManagementApi.Controllers.ExamineManagement;
+namespace Umbraco.Cms.ManagementApi.Controllers.Examine;
 
 [ApiVersion("1.0")]
-public class SearchersExamineManagementController : ExamineManagementControllerBase
+public class SearcherListExamineController : ExamineControllerBase
 {
     private readonly IExamineManager _examineManager;
 
-    public SearchersExamineManagementController(IExamineManager examineManager) => _examineManager = examineManager;
+    public SearcherListExamineController(IExamineManager examineManager) => _examineManager = examineManager;
 
     /// <summary>
     ///     Get the details for searchers
     /// </summary>
     /// <returns></returns>
-    [HttpGet("searchers")]
+    [HttpGet("searcher")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<SearcherViewModel>), StatusCodes.Status200OK)]
     public async Task<ActionResult<PagedViewModel<SearcherViewModel>>> Searchers(int skip, int take)

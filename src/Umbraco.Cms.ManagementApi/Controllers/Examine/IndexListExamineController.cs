@@ -7,15 +7,15 @@ using Umbraco.Cms.ManagementApi.ViewModels.ExamineManagement;
 using Umbraco.Cms.ManagementApi.ViewModels.Pagination;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.ManagementApi.Controllers.ExamineManagement;
+namespace Umbraco.Cms.ManagementApi.Controllers.Examine;
 
 [ApiVersion("1.0")]
-public class IndexesExamineManagementController : ExamineManagementControllerBase
+public class IndexListExamineController : ExamineControllerBase
 {
     private readonly IExamineManager _examineManager;
     private readonly IExamineIndexViewModelFactory _examineIndexViewModelFactory;
 
-    public IndexesExamineManagementController(
+    public IndexListExamineController(
         IExamineManager examineManager,
         IExamineIndexViewModelFactory examineIndexViewModelFactory)
     {
@@ -27,7 +27,7 @@ public class IndexesExamineManagementController : ExamineManagementControllerBas
     ///     Get the details for indexers
     /// </summary>
     /// <returns></returns>
-    [HttpGet("indexes")]
+    [HttpGet("index")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<ExamineIndexViewModel>), StatusCodes.Status200OK)]
     public async Task<PagedViewModel<ExamineIndexViewModel>> Indexes(int skip, int take)

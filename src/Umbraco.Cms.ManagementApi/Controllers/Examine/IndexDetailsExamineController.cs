@@ -4,15 +4,15 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.ManagementApi.Factories;
 using Umbraco.Cms.ManagementApi.ViewModels.ExamineManagement;
 
-namespace Umbraco.Cms.ManagementApi.Controllers.ExamineManagement;
+namespace Umbraco.Cms.ManagementApi.Controllers.Examine;
 
 [ApiVersion("1.0")]
-public class IndexExamineManagementController : ExamineManagementControllerBase
+public class IndexDetailsExamineController : ExamineControllerBase
 {
     private readonly IExamineIndexViewModelFactory _examineIndexViewModelFactory;
     private readonly IExamineManager _examineManager;
 
-    public IndexExamineManagementController(
+    public IndexDetailsExamineController(
         IExamineIndexViewModelFactory examineIndexViewModelFactory,
         IExamineManager examineManager)
     {
@@ -29,7 +29,7 @@ public class IndexExamineManagementController : ExamineManagementControllerBase
     ///     This is kind of rudimentary since there's no way we can know that the index has rebuilt, we
     ///     have a listener for the index op complete so we'll just check if that key is no longer there in the runtime cache
     /// </remarks>
-    [HttpGet("index")]
+    [HttpGet("index/{indexName}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ExamineIndexViewModel), StatusCodes.Status200OK)]
