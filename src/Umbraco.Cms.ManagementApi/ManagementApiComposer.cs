@@ -60,7 +60,7 @@ public class ManagementApiComposer : IComposer
             options.Title = ApiTitle;
             options.Version = ApiAllName;
             options.DocumentName = ApiAllName;
-            options.Description = "This shows all APIs available in this version of Umbraco - Including all the legacy apis that is available for backward compatibility";
+            options.Description = "This shows all APIs available in this version of Umbraco - Including all the legacy apis that is available for backward compatibility. Testing pipelines, don't merge this in!";
             options.PostProcess = document =>
             {
                 document.Tags = document.Tags.OrderBy(tag => tag.Name).ToList();
