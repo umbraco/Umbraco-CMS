@@ -21,6 +21,7 @@
                         <input type="hidden" name="partialView" ng-model="mandatoryViewValidator" ng-required="!model.macro.node" />
 
                         <button type="button"
+                                id="{{vm.macroPartialViewPickerProperty.alias}}"
                                 class="umb-node-preview-add"
                                 ng-show="!model.macro.node"
                                 ng-click="model.openViewPicker()">
