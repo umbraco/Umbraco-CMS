@@ -90,11 +90,9 @@ export class UmbTreeContextMenuPageActionListElement extends UmbContextConsumerM
 	}
 
 	private _renderActions() {
-		return this._actions
-			.sort((a, b) => a.meta.weight - b.meta.weight)
-			.map((action) => {
-				return html`<umb-tree-item-action-extension .treeAction=${action}></umb-tree-item-action-extension> `;
-			});
+		return this._actions.map((action) => {
+			return html`<umb-tree-item-action-extension .treeAction=${action}></umb-tree-item-action-extension> `;
+		});
 	}
 
 	disconnectedCallback(): void {

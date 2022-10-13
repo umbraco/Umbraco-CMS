@@ -48,14 +48,13 @@ export class UmbSectionTreesElement extends UmbContextConsumerMixin(LitElement) 
 					if (!section) return EMPTY;
 
 					return (
-						this._extensionStore?.extensionsOfType('tree').pipe(
-							map((trees) =>
-								trees
-									.filter((tree) => tree.meta.sections.includes(section.alias))
-									.sort((a, b) => b.meta.weight - a.meta.weight)
-									.map((tree) => tree.alias)
-							)
-						) ?? of([])
+						this._extensionStore
+							?.extensionsOfType('tree')
+							.pipe(
+								map((trees) =>
+									trees.filter((tree) => tree.meta.sections.includes(section.alias)).map((tree) => tree.alias)
+								)
+							) ?? of([])
 					);
 				})
 			)

@@ -122,13 +122,7 @@ export class UmbEditorEntityLayout extends UmbContextConsumerMixin(LitElement) {
 
 		this._editorViewsSubscription = this._extensionRegistry
 			?.extensionsOfType('editorView')
-			.pipe(
-				map((extensions) =>
-					extensions
-						.filter((extension) => extension.meta.editors.includes(this.alias))
-						.sort((a, b) => b.meta.weight - a.meta.weight)
-				)
-			)
+			.pipe(map((extensions) => extensions.filter((extension) => extension.meta.editors.includes(this.alias))))
 			.subscribe((editorViews) => {
 				this._editorViews = editorViews;
 				this._createRoutes();
