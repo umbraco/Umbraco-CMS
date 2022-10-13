@@ -39,35 +39,25 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Li
 	private _dataTypeContext?: UmbDataTypeContext;
 	private _extensionRegistry?: UmbExtensionRegistry;
 	private _propertyEditorStore?: UmbPropertyEditorStore;
+	private _modalService?: UmbModalService;
 
 	private _dataTypeSubscription?: Subscription;
 	private _propertyEditorSubscription?: Subscription;
 	private _propertyEditorUISubscription?: Subscription;
 
-	private _modalService?: UmbModalService;
-
 	constructor() {
 		super();
 
-		// TODO: wait for more contexts
-		this.consumeContext('umbModalService', (modalService) => {
-			this._modalService = modalService;
-		});
-
-		this.consumeContext('umbDataTypeContext', (dataTypeContext) => {
-			this._dataTypeContext = dataTypeContext;
-			this._observeDataType();
-		});
-
-		this.consumeContext('umbPropertyEditorStore', (propertyEditorStore) => {
-			this._propertyEditorStore = propertyEditorStore;
-			this._observeDataType();
-		});
-
-		this.consumeContext('umbExtensionRegistry', (extensionRegistry) => {
-			this._extensionRegistry = extensionRegistry;
-			this._observeDataType();
-		});
+		this.consumeAllContexts(
+			['umbDataTypeContext', 'umbPropertyEditorStore', 'umbExtensionRegistry', 'umbModalService'],
+			(instances) => {
+				this._dataTypeContext = instances[0];
+				this._propertyEditorStore = instances[1];
+				this._extensionRegistry = instances[2];
+				this._modalService = instances[3];
+				this._observeDataType();
+			}
+		);
 	}
 
 	private _observeDataType() {

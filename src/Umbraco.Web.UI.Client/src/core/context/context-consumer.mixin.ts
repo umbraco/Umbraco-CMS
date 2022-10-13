@@ -2,7 +2,8 @@ import type { HTMLElementConstructor } from '../models';
 import { UmbContextConsumer } from './context-consumer';
 
 export declare class UmbContextConsumerInterface {
-	consumeContext(alias: string, callback?: (_instance: any) => void): void;
+	consumeContext(alias: string, callback: (_instance: any) => void): void;
+	consumeAllContexts(contexts: Array<string>, callback: (_instances: Array<any>) => void): void;
 	whenAvailableOrChanged(contextAliases: string[], callback?: () => void): void;
 }
 
@@ -16,37 +17,59 @@ export declare class UmbContextConsumerInterface {
 export const UmbContextConsumerMixin = <T extends HTMLElementConstructor>(superClass: T) => {
 	class UmbContextConsumerClass extends superClass {
 		// all context requesters in the element
-		_consumers: Map<string, UmbContextConsumer> = new Map();
+		_consumers: Map<string, UmbContextConsumer[]> = new Map();
 		// all successfully resolved context requests
 		_resolved: Map<string, unknown> = new Map();
 
 		_attached = false;
 
 		/**
-		 * Setup a subscription for a request on a given context of this component.
+		 * Setup a subscription for a context. The callback is called when the context is resolved.
 		 * @param {string} alias
-		 * @param {method} callback optional callback method called when context is received or when context is detached.
+		 * @param {method} callback Callback method called when context is resolved.
 		 */
-		consumeContext(alias: string, callback?: (_instance: unknown) => void): void {
-			if (this._consumers.has(alias)) return;
-
-			const consumer = new UmbContextConsumer(this, alias, (_instance: any) => {
-				// Do we still have this consumer?
-
-				callback?.(_instance);
-
-				// don't to anything if the context is already resolved
-				if (this._resolved.has(alias) && this._resolved.get(alias) === _instance) return;
-
-				this._resolved.set(alias, _instance);
-				this._consumeContextCallback(alias, _instance);
+		consumeContext(alias: string, callback: (_instance: unknown) => void): void {
+			this._createContextConsumers([alias], (resolvedContexts) => {
+				callback(resolvedContexts[0]);
 			});
+		}
 
-			this._consumers.set(alias, consumer);
+		/**
+		 * Setup a subscription for multiple contexts. The callback is called when all contexts are resolved.
+		 * @param {string} aliases
+		 * @param {method} callback Callback method called when all contexts are resolved.
+		 */
+		consumeAllContexts(_contextAliases: string[], callback: (_instances: unknown[]) => void) {
+			this._createContextConsumers(_contextAliases, (resolvedContexts) => {
+				callback?.(resolvedContexts);
+			});
+		}
 
-			if (this._attached) {
-				consumer.attach();
-			}
+		private _createContextConsumers(aliases: Array<string>, resolvedCallback: (_instances: unknown[]) => void) {
+			aliases.forEach((alias) => {
+				const consumer = new UmbContextConsumer(this, alias, (_instance: any) => {
+					this._resolved.set(alias, _instance);
+
+					//check if all contexts are resolved
+					const resolvedContexts = aliases.map((alias) => this._resolved.get(alias));
+					const allResolved = resolvedContexts.every((context) => context !== undefined);
+
+					if (allResolved) {
+						resolvedCallback(resolvedContexts);
+					}
+				});
+
+				if (this._consumers.has(alias)) {
+					const consumers = this._consumers.get(alias);
+					consumers?.push(consumer);
+				} else {
+					this._consumers.set(alias, [consumer]);
+				}
+
+				if (this._attached) {
+					consumer.attach();
+				}
+			});
 		}
 
 		// TODO: remove requester..
@@ -54,18 +77,14 @@ export const UmbContextConsumerMixin = <T extends HTMLElementConstructor>(superC
 		connectedCallback() {
 			super.connectedCallback?.();
 			this._attached = true;
-			this._consumers.forEach((requester) => requester.attach());
+			this._consumers.forEach((consumers) => consumers.forEach((consumer) => consumer.attach()));
 		}
 
 		disconnectedCallback() {
 			super.disconnectedCallback?.();
 			this._attached = false;
-			this._consumers.forEach((requester) => requester.detach());
+			this._consumers.forEach((consumers) => consumers.forEach((consumer) => consumer.detach()));
 			this._resolved.clear();
-		}
-
-		_consumeContextCallback(_newAlias: string, _newInstance: unknown) {
-			// TODO: do be done.
 		}
 
 		// might return a object, so you can unsubscribe.
