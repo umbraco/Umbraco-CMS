@@ -11,13 +11,13 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.ManagementApi.Controllers.Examine;
 
 [ApiVersion("1.0")]
-public class SearchExamineController : ExamineControllerBase
+public class SearcherSearchExamineController : ExamineControllerBase
 {
     private readonly IExamineManagerService _examineManagerService;
 
-    public SearchExamineController(IExamineManagerService examineManagerService) => _examineManagerService = examineManagerService;
+    public SearcherSearchExamineController(IExamineManagerService examineManagerService) => _examineManagerService = examineManagerService;
 
-    [HttpGet("search/{searcherName}")]
+    [HttpGet("searcher/{searcherName}/search")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<PagedViewModel<SearchResultViewModel>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
