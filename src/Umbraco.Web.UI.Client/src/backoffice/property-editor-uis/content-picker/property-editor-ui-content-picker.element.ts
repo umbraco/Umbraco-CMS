@@ -49,12 +49,10 @@ export class UmbPropertyEditorUIContentPickerElement extends UmbContextConsumerM
 
 	constructor() {
 		super();
-		this.consumeContext('umbModalService', (modalService: UmbModalService) => {
-			this._modalService = modalService;
-		});
 
-		this.consumeContext('umbEntityStore', (entityStore: UmbEntityStore) => {
-			this._entityStore = entityStore;
+		this.consumeAllContexts(['umbEntityStore', 'umbModalService'], (instances) => {
+			this._entityStore = instances['umbEntityStore'];
+			this._modalService = instances['umbModalService'];
 			this._observePickedEntities();
 		});
 	}

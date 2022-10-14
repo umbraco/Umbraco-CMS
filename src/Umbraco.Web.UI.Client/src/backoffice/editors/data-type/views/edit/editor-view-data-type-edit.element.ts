@@ -6,7 +6,6 @@ import { UmbModalService } from '../../../../../core/services/modal';
 
 import { UmbContextConsumerMixin } from '../../../../../core/context';
 import { UmbDataTypeContext } from '../../data-type.context';
-
 import type { DataTypeDetails } from '../../../../../mocks/data/data-type.data';
 import type { UmbExtensionRegistry } from '../../../../../core/extension';
 import type { UmbPropertyEditorStore } from '../../../../../core/stores/property-editor/property-editor.store';
@@ -50,11 +49,11 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Li
 
 		this.consumeAllContexts(
 			['umbDataTypeContext', 'umbPropertyEditorStore', 'umbExtensionRegistry', 'umbModalService'],
-			(instances) => {
-				this._dataTypeContext = instances[0];
-				this._propertyEditorStore = instances[1];
-				this._extensionRegistry = instances[2];
-				this._modalService = instances[3];
+			(result) => {
+				this._dataTypeContext = result['umbDataTypeContext'];
+				this._propertyEditorStore = result['umbPropertyEditorStore'];
+				this._extensionRegistry = result['umbExtensionRegistry'];
+				this._modalService = result['umbModalService'];
 				this._observeDataType();
 			}
 		);

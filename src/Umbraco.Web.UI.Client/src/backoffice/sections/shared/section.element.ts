@@ -62,21 +62,11 @@ export class UmbSectionElement extends UmbContextConsumerMixin(LitElement) {
 	constructor() {
 		super();
 
-		// TODO: wait for more contexts
-		this.consumeContext('umbExtensionRegistry', (extensionsRegistry: UmbExtensionRegistry) => {
-			this._extensionRegistry = extensionsRegistry;
-			this._observeTrees();
-			this._observeViews();
-		});
+		this.consumeAllContexts(['umbExtensionRegistry', 'umbSectionContext', 'umbEntityStore'], (instances) => {
+			this._extensionRegistry = instances['umbExtensionRegistry'];
+			this._sectionContext = instances['umbSectionContext'];
+			this._entityStore = instances['umbEntityStore'];
 
-		this.consumeContext('umbSectionContext', (sectionContext: UmbSectionContext) => {
-			this._sectionContext = sectionContext;
-			this._observeTrees();
-			this._observeViews();
-		});
-
-		this.consumeContext('umbEntityStore', (entityStore: UmbEntityStore) => {
-			this._entityStore = entityStore;
 			this._observeTrees();
 			this._observeViews();
 		});

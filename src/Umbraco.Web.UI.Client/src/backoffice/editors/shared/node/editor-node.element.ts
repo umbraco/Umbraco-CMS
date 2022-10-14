@@ -70,13 +70,10 @@ export class UmbEditorNodeElement extends UmbContextProviderMixin(UmbContextCons
 	constructor() {
 		super();
 
-		this.consumeContext('umbNodeStore', (store: UmbNodeStore) => {
-			this._nodeStore = store;
+		this.consumeAllContexts(['umbNodeStore', 'umbNotificationService'], (instances) => {
+			this._nodeStore = instances['umbNodeStore'];
+			this._notificationService = instances['umbNotificationService'];
 			this._useNode();
-		});
-
-		this.consumeContext('umbNotificationService', (service: UmbNotificationService) => {
-			this._notificationService = service;
 		});
 
 		this.addEventListener('property-value-change', this._onPropertyValueChange);

@@ -49,11 +49,9 @@ export class UmbDashboardPublishedStatusElement extends UmbContextConsumerMixin(
 	constructor() {
 		super();
 
-		this.consumeContext('umbNotificationService', (notificationService: UmbNotificationService) => {
-			this._notificationService = notificationService;
-		});
-		this.consumeContext('umbModalService', (modalService: UmbModalService) => {
-			this._modalService = modalService;
+		this.consumeAllContexts(['umbNotificationService', 'umbModalService'], (instances) => {
+			this._notificationService = instances['umbNotificationService'];
+			this._modalService = instances['umbModalService'];
 		});
 	}
 
