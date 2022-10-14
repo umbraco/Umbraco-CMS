@@ -90,9 +90,7 @@ export class UmbSectionDashboardsElement extends UmbContextConsumerMixin(UmbObse
 				?.extensionsOfType('dashboard')
 				.pipe(
 					map((extensions) =>
-						extensions
-							.filter((extension) => extension.meta.sections.includes(this._currentSectionAlias))
-							.sort((a, b) => b.meta.weight - a.meta.weight)
+						extensions.filter((extension) => extension.meta.sections.includes(this._currentSectionAlias))
 					)
 				),
 			(dashboards) => {

@@ -16,10 +16,10 @@ export const manifestDevelopmentHandler = rest.get(umbracoPath('/manifests'), (_
 					name: 'Custom Section',
 					js: '/src/mocks/App_Plugins/section.js',
 					elementName: 'my-section-custom',
+					weight: 1,
 					meta: {
 						label: 'Custom',
 						pathname: 'my-custom',
-						weight: 1,
 					},
 				},
 				{

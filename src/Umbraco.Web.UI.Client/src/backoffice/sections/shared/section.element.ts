@@ -91,13 +91,7 @@ export class UmbSectionElement extends UmbContextConsumerMixin(UmbObserverMixin(
 					return (
 						this._extensionRegistry
 							?.extensionsOfType('tree')
-							.pipe(
-								map((trees) =>
-									trees
-										.filter((tree) => tree.meta.sections.includes(section.alias))
-										.sort((a, b) => b.meta.weight - a.meta.weight)
-								)
-							) ?? of([])
+							.pipe(map((trees) => trees.filter((tree) => tree.meta.sections.includes(section.alias)))) ?? of([])
 					);
 				})
 			),
