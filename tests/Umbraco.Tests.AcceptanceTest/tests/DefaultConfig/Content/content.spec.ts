@@ -290,6 +290,7 @@ test.describe('Content tests', () => {
     await umbracoUi.setEditorHeaderName(newNodeName);
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.saveAndPublish));
     await umbracoUi.isSuccessNotificationVisible();
+    await page.locator('span:has-text("×")').click();
 
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.rollback));
     // Not a very nice selector, but there's sadly no alternative :(
