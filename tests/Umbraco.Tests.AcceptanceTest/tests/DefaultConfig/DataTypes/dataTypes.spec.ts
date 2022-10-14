@@ -159,6 +159,7 @@ test.describe('DataTypes', () => {
     await umbracoUi.setEditorHeaderName('UrlPickerContent');
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.saveAndPublish));
     await umbracoUi.isSuccessNotificationVisible();
+    await page.locator('span:has-text("×")').click();
     await page.locator('.umb-node-preview-add').click();
 
     // Should really try and find a better way to do this, but umbracoTreeItem tries to click the content pane in the background
