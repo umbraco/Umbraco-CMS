@@ -91,9 +91,6 @@ angular.module("umbraco.directives")
                             scope.contentTypeAlias = "umbracoAutoSelect";
                         }
 
-                        // Add the processed length, as we might be uploading in stages
-                        scope.totalQueued = scope.queue.length + scope.processed.length;
-
                         _processQueueItems();                        
                     }
 
