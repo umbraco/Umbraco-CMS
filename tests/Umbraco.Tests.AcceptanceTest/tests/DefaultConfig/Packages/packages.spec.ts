@@ -89,9 +89,17 @@ test.describe('Packages', () => {
     // Navigate pack to packages and Assert the file is created
     // Waits until the button download is visible
     await page.locator('[label-key="general_download"]').isVisible();
+    // Checks if the packages was created
+    const doesExist = await umbracoApi.packages.doesNameExist(packageName);
+    await expect(doesExist).toBe(true);
     await umbracoUi.goToSection(ConstantHelper.sections.packages);
+    
+    // Needs to wait until the page has loaded and the button is clickable
+    await page.locator('[data-element="sub-view-umbCreatedPackages"]').isVisible();
     await page.locator('[data-element="sub-view-umbCreatedPackages"]').click();
-    await expect(await page.locator("body", {hasText: packageName})).toBeVisible();
+    // Asserts that the package can be found in the table
+    await expect(await page.locator('.table-hover')).toHaveCount(1);
+    await expect(await page.locator('.table-hover').first()).toContainText(packageName);
 
     // Cleanup
     await umbracoApi.packages.ensureNameNotExists(packageName);
