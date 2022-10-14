@@ -255,6 +255,7 @@ test.describe('Modelsbuilder tests', () => {
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.submit));
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.save));
     await umbracoUi.isSuccessNotificationVisible();
+    await page.locator('span:has-text("×")').click();
 
     // Update the template
     await umbracoUi.clickElement(umbracoUi.getTreeItem("settings", ["templates", docTypeName]));
@@ -264,6 +265,7 @@ test.describe('Modelsbuilder tests', () => {
     await editor.type("<p>@Model.Bod")
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.save))
     await umbracoUi.isSuccessNotificationVisible();
+    await page.locator('span:has-text("×")').click();
 
     // Navigate to the content section and update the content
     await umbracoUi.goToSection(ConstantHelper.sections.content);
