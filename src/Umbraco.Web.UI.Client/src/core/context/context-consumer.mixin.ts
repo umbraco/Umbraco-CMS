@@ -3,8 +3,13 @@ import { UmbContextConsumer } from './context-consumer';
 
 export declare class UmbContextConsumerInterface {
 	consumeContext(alias: string, callback: (_instance: any) => void): void;
-	consumeAllContexts(contexts: Array<string>, callback: (_instances: Array<any>) => void): void;
+	consumeAllContexts(contextAliases: string[], callback: (_instances: ResolvedContexts) => void): void;
 	whenAvailableOrChanged(contextAliases: string[], callback?: () => void): void;
+}
+
+// TODO: can we use this aliases to generate the key of this type
+interface ResolvedContexts {
+	[key: string]: any;
 }
 
 /**
@@ -19,7 +24,7 @@ export const UmbContextConsumerMixin = <T extends HTMLElementConstructor>(superC
 		// all context requesters in the element
 		_consumers: Map<string, UmbContextConsumer[]> = new Map();
 		// all successfully resolved context requests
-		_resolved: Map<string, unknown> = new Map();
+		_resolved: Map<string, any> = new Map();
 
 		_attached = false;
 
@@ -28,9 +33,9 @@ export const UmbContextConsumerMixin = <T extends HTMLElementConstructor>(superC
 		 * @param {string} alias
 		 * @param {method} callback Callback method called when context is resolved.
 		 */
-		consumeContext(alias: string, callback: (_instance: unknown) => void): void {
+		consumeContext(alias: string, callback: (_instance: any) => void): void {
 			this._createContextConsumers([alias], (resolvedContexts) => {
-				callback(resolvedContexts[0]);
+				callback(resolvedContexts[alias]);
 			});
 		}
 
@@ -39,23 +44,25 @@ export const UmbContextConsumerMixin = <T extends HTMLElementConstructor>(superC
 		 * @param {string} aliases
 		 * @param {method} callback Callback method called when all contexts are resolved.
 		 */
-		consumeAllContexts(_contextAliases: string[], callback: (_instances: unknown[]) => void) {
+		consumeAllContexts(_contextAliases: Array<string>, callback: (_instances: ResolvedContexts) => void) {
 			this._createContextConsumers(_contextAliases, (resolvedContexts) => {
 				callback?.(resolvedContexts);
 			});
 		}
 
-		private _createContextConsumers(aliases: Array<string>, resolvedCallback: (_instances: unknown[]) => void) {
+		private _createContextConsumers(aliases: Array<string>, resolvedCallback: (_instances: ResolvedContexts) => void) {
 			aliases.forEach((alias) => {
 				const consumer = new UmbContextConsumer(this, alias, (_instance: any) => {
 					this._resolved.set(alias, _instance);
 
+					const result: ResolvedContexts = {};
+
 					//check if all contexts are resolved
-					const resolvedContexts = aliases.map((alias) => this._resolved.get(alias));
+					const resolvedContexts = aliases.map((alias) => (result[alias] = this._resolved.get(alias)));
 					const allResolved = resolvedContexts.every((context) => context !== undefined);
 
 					if (allResolved) {
-						resolvedCallback(resolvedContexts);
+						resolvedCallback(result);
 					}
 				});
 
