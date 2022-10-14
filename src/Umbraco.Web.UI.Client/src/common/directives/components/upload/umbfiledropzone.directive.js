@@ -79,8 +79,15 @@ angular.module("umbraco.directives")
                             });
                         }
 
+                        // Add the processed length, as we might be uploading in stages
+                        scope.totalQueued = scope.queue.length + scope.processed.length;
+
                         // If we have Accepted Media Types, we will ask to choose Media Type, if Choose Media Type returns false, it only had one choice and therefor no reason to
-                        if (scope.acceptedMediatypes && _requestChooseMediaTypeDialog() === false) {
+                        if (scope.acceptedMediatypes) {
+                            if (_requestChooseMediaTypeDialog()) {
+                                return;
+                            }
+
                             scope.contentTypeAlias = "umbracoAutoSelect";
                         }
 
