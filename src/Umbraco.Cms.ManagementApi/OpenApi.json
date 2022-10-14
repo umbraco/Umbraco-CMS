@@ -670,22 +670,22 @@
         ],
         "operationId": "StatusServer_Get",
         "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ServerStatusViewModel"
-                }
-              }
-            }
-          },
           "400": {
             "description": "",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerStatusViewModel"
                 }
               }
             }
@@ -700,22 +700,22 @@
         ],
         "operationId": "VersionServer_Get",
         "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/VersionViewModel"
-                }
-              }
-            }
-          },
           "400": {
             "description": "",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionViewModel"
                 }
               }
             }
@@ -1694,22 +1694,22 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedViewModelOfRecycleBinItemViewModel"
-                }
-              }
-            }
-          },
           "401": {
             "description": "",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedViewModelOfRecycleBinItemViewModel"
                 }
               }
             }
@@ -1746,22 +1746,22 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedViewModelOfRecycleBinItemViewModel"
-                }
-              }
-            }
-          },
           "401": {
             "description": "",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedViewModelOfRecycleBinItemViewModel"
                 }
               }
             }
@@ -1981,16 +1981,6 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/LanguageViewModel"
-                }
-              }
-            }
-          },
           "404": {
             "description": "",
             "content": {
@@ -1998,6 +1988,16 @@
                 "schema": {
                   "type": "string",
                   "format": "binary"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LanguageViewModel"
                 }
               }
             }
@@ -2023,9 +2023,6 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": ""
-          },
           "400": {
             "description": "",
             "content": {
@@ -2045,6 +2042,9 @@
                 }
               }
             }
+          },
+          "200": {
+            "description": ""
           }
         }
       }
@@ -2069,9 +2069,6 @@
           "x-position": 1
         },
         "responses": {
-          "201": {
-            "description": ""
-          },
           "400": {
             "description": "",
             "content": {
@@ -2081,6 +2078,9 @@
                 }
               }
             }
+          },
+          "201": {
+            "description": ""
           }
         }
       }
@@ -2105,8 +2105,16 @@
           "x-position": 1
         },
         "responses": {
-          "200": {
-            "description": ""
+          "404": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
           },
           "400": {
             "description": "",
@@ -2118,16 +2126,8 @@
               }
             }
           },
-          "404": {
-            "description": "",
-            "content": {
-              "application/octet-stream": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary"
-                }
-              }
-            }
+          "200": {
+            "description": ""
           }
         }
       }
@@ -2139,16 +2139,6 @@
         ],
         "operationId": "SettingsInstall_Settings",
         "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InstallSettingsViewModel"
-                }
-              }
-            }
-          },
           "400": {
             "description": "",
             "content": {
@@ -2165,6 +2155,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InstallSettingsViewModel"
                 }
               }
             }
@@ -2191,9 +2191,6 @@
           "x-position": 1
         },
         "responses": {
-          "200": {
-            "description": ""
-          },
           "400": {
             "description": "",
             "content": {
@@ -2213,6 +2210,9 @@
                 }
               }
             }
+          },
+          "200": {
+            "description": ""
           }
         }
       }
@@ -2236,9 +2236,6 @@
           "x-position": 1
         },
         "responses": {
-          "200": {
-            "description": ""
-          },
           "400": {
             "description": "",
             "content": {
@@ -2248,6 +2245,9 @@
                 }
               }
             }
+          },
+          "200": {
+            "description": ""
           }
         }
       }
@@ -2307,6 +2307,16 @@
           }
         ],
         "responses": {
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "200": {
             "description": "",
             "content": {
@@ -2316,71 +2326,17 @@
                 }
               }
             }
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
           }
         }
       }
     },
-    "/umbraco/api/v1/examine/index/{indexName}": {
+    "/umbraco/api/v1/examineManagement/indexes": {
       "get": {
         "tags": [
-          "Examine"
-        ],
-        "summary": "Check if the index has been rebuilt",
-        "description": "This is kind of rudimentary since there's no way we can know that the index has rebuilt, we\nhave a listener for the index op complete so we'll just check if that key is no longer there in the runtime cache",
-        "operationId": "IndexDetailsExamine_Index",
-        "parameters": [
-          {
-            "name": "indexName",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "nullable": true
-            },
-            "x-position": 1
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExamineIndexViewModel"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/umbraco/api/v1/examine/index": {
-      "get": {
-        "tags": [
-          "Examine"
+          "ExamineManagement"
         ],
         "summary": "Get the details for indexers",
-        "operationId": "IndexListExamine_Indexes",
+        "operationId": "IndexesExamineManagement_Indexes",
         "parameters": [
           {
             "name": "skip",
@@ -2415,18 +2371,18 @@
         }
       }
     },
-    "/umbraco/api/v1/examine/index/{indexName}/rebuild": {
-      "post": {
+    "/umbraco/api/v1/examineManagement/index": {
+      "get": {
         "tags": [
-          "Examine"
+          "ExamineManagement"
         ],
-        "summary": "Rebuilds the index",
-        "operationId": "IndexRebuildExamine_Rebuild",
+        "summary": "Check if the index has been rebuilt",
+        "description": "This is kind of rudimentary since there's no way we can know that the index has rebuilt, we\nhave a listener for the index op complete so we'll just check if that key is no longer there in the runtime cache",
+        "operationId": "IndexExamineManagement_Index",
         "parameters": [
           {
             "name": "indexName",
-            "in": "path",
-            "required": true,
+            "in": "query",
             "schema": {
               "type": "string",
               "nullable": true
@@ -2435,6 +2391,58 @@
           }
         ],
         "responses": {
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExamineIndexViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/examineManagement/rebuild": {
+      "post": {
+        "tags": [
+          "ExamineManagement"
+        ],
+        "summary": "Rebuilds the index",
+        "operationId": "RebuildExamineManagement_Rebuild",
+        "parameters": [
+          {
+            "name": "indexName",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "200": {
             "description": "",
             "content": {
@@ -2445,27 +2453,17 @@
                 }
               }
             }
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
           }
         }
       }
     },
-    "/umbraco/api/v1/examine/searcher": {
+    "/umbraco/api/v1/examineManagement/searchers": {
       "get": {
         "tags": [
-          "Examine"
+          "ExamineManagement"
         ],
         "summary": "Get the details for searchers",
-        "operationId": "SearcherListExamine_Searchers",
+        "operationId": "SearchersExamineManagement_Searchers",
         "parameters": [
           {
             "name": "skip",
@@ -2500,17 +2498,16 @@
         }
       }
     },
-    "/umbraco/api/v1/examine/searcher/{searcherName}/search": {
+    "/umbraco/api/v1/examineManagement/search": {
       "get": {
         "tags": [
-          "Examine"
+          "ExamineManagement"
         ],
-        "operationId": "SearcherSearchExamine_GetSearchResults",
+        "operationId": "SearchExamineManagement_GetSearchResults",
         "parameters": [
           {
             "name": "searcherName",
-            "in": "path",
-            "required": true,
+            "in": "query",
             "schema": {
               "type": "string",
               "nullable": true
@@ -2798,22 +2795,22 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedViewModelOfRecycleBinItemViewModel"
-                }
-              }
-            }
-          },
           "401": {
             "description": "",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedViewModelOfRecycleBinItemViewModel"
                 }
               }
             }
@@ -2850,22 +2847,22 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedViewModelOfRecycleBinItemViewModel"
-                }
-              }
-            }
-          },
           "401": {
             "description": "",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedViewModelOfRecycleBinItemViewModel"
                 }
               }
             }
@@ -3890,9 +3887,6 @@
           "x-position": 1
         },
         "responses": {
-          "200": {
-            "description": ""
-          },
           "400": {
             "description": "",
             "content": {
@@ -3902,6 +3896,9 @@
                 }
               }
             }
+          },
+          "200": {
+            "description": ""
           }
         }
       }
@@ -4624,6 +4621,22 @@
           }
         }
       },
+      "PagedViewModelOfExamineIndexViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExamineIndexViewModel"
+            }
+          }
+        }
+      },
       "ExamineIndexViewModel": {
         "type": "object",
         "additionalProperties": false,
@@ -4651,22 +4664,6 @@
           "fieldCount": {
             "type": "integer",
             "format": "int32"
-          }
-        }
-      },
-      "PagedViewModelOfExamineIndexViewModel": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "total": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ExamineIndexViewModel"
-            }
           }
         }
       },
@@ -5288,7 +5285,7 @@
       "name": "DocumentType"
     },
     {
-      "name": "Examine"
+      "name": "ExamineManagement"
     },
     {
       "name": "Help"
