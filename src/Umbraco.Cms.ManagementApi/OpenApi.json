@@ -2330,13 +2330,57 @@
         }
       }
     },
-    "/umbraco/api/v1/examineManagement/indexes": {
+    "/umbraco/api/v1/examine/index/{indexName}": {
       "get": {
         "tags": [
-          "ExamineManagement"
+          "Examine"
+        ],
+        "summary": "Check if the index has been rebuilt",
+        "description": "This is kind of rudimentary since there's no way we can know that the index has rebuilt, we\nhave a listener for the index op complete so we'll just check if that key is no longer there in the runtime cache",
+        "operationId": "IndexDetailsExamine_Index",
+        "parameters": [
+          {
+            "name": "indexName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExamineIndexViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/examine/index": {
+      "get": {
+        "tags": [
+          "Examine"
         ],
         "summary": "Get the details for indexers",
-        "operationId": "IndexesExamineManagement_Indexes",
+        "operationId": "IndexListExamine_Indexes",
         "parameters": [
           {
             "name": "skip",
@@ -2371,60 +2415,18 @@
         }
       }
     },
-    "/umbraco/api/v1/examineManagement/index": {
-      "get": {
-        "tags": [
-          "ExamineManagement"
-        ],
-        "summary": "Check if the index has been rebuilt",
-        "description": "This is kind of rudimentary since there's no way we can know that the index has rebuilt, we\nhave a listener for the index op complete so we'll just check if that key is no longer there in the runtime cache",
-        "operationId": "IndexExamineManagement_Index",
-        "parameters": [
-          {
-            "name": "indexName",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "nullable": true
-            },
-            "x-position": 1
-          }
-        ],
-        "responses": {
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExamineIndexViewModel"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/umbraco/api/v1/examineManagement/rebuild": {
+    "/umbraco/api/v1/examine/index/{indexName}/rebuild": {
       "post": {
         "tags": [
-          "ExamineManagement"
+          "Examine"
         ],
         "summary": "Rebuilds the index",
-        "operationId": "RebuildExamineManagement_Rebuild",
+        "operationId": "IndexRebuildExamine_Rebuild",
         "parameters": [
           {
             "name": "indexName",
-            "in": "query",
+            "in": "path",
+            "required": true,
             "schema": {
               "type": "string",
               "nullable": true
@@ -2457,13 +2459,13 @@
         }
       }
     },
-    "/umbraco/api/v1/examineManagement/searchers": {
+    "/umbraco/api/v1/examine/searcher": {
       "get": {
         "tags": [
-          "ExamineManagement"
+          "Examine"
         ],
         "summary": "Get the details for searchers",
-        "operationId": "SearchersExamineManagement_Searchers",
+        "operationId": "SearcherListExamine_Searchers",
         "parameters": [
           {
             "name": "skip",
@@ -2498,16 +2500,17 @@
         }
       }
     },
-    "/umbraco/api/v1/examineManagement/search": {
+    "/umbraco/api/v1/examine/searcher/{searcherName}/search": {
       "get": {
         "tags": [
-          "ExamineManagement"
+          "Examine"
         ],
-        "operationId": "SearchExamineManagement_GetSearchResults",
+        "operationId": "SearcherSearchExamine_GetSearchResults",
         "parameters": [
           {
             "name": "searcherName",
-            "in": "query",
+            "in": "path",
+            "required": true,
             "schema": {
               "type": "string",
               "nullable": true
@@ -4621,22 +4624,6 @@
           }
         }
       },
-      "PagedViewModelOfExamineIndexViewModel": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "total": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ExamineIndexViewModel"
-            }
-          }
-        }
-      },
       "ExamineIndexViewModel": {
         "type": "object",
         "additionalProperties": false,
@@ -4664,6 +4651,22 @@
           "fieldCount": {
             "type": "integer",
             "format": "int32"
+          }
+        }
+      },
+      "PagedViewModelOfExamineIndexViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExamineIndexViewModel"
+            }
           }
         }
       },
@@ -5285,7 +5288,7 @@
       "name": "DocumentType"
     },
     {
-      "name": "ExamineManagement"
+      "name": "Examine"
     },
     {
       "name": "Help"
