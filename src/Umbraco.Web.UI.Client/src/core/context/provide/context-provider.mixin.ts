@@ -1,4 +1,4 @@
-import type { HTMLElementConstructor } from '../models';
+import type { HTMLElementConstructor } from '../../models';
 import { UmbContextProvider } from './context-provider';
 
 export declare class UmbContextProviderMixinInterface {

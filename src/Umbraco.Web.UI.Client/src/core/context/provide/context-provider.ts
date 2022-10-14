@@ -1,4 +1,4 @@
-import { umbContextRequestEventType, isUmbContextRequestEvent } from './context-request.event';
+import { umbContextRequestEventType, isUmbContextRequestEvent } from '../consume/context-request.event';
 import { UmbContextProvideEventImplementation } from './context-provide.event';
 
 /**

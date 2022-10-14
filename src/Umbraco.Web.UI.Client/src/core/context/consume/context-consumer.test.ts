@@ -1,7 +1,6 @@
 import { expect, oneEvent } from '@open-wc/testing';
-
+import { UmbContextProvider } from '../provide/context-provider';
 import { UmbContextConsumer } from './context-consumer';
-import { UmbContextProvider } from './context-provider';
 import { UmbContextRequestEventImplementation, umbContextRequestEventType } from './context-request.event';
 
 const testContextAlias = 'my-test-context';

@@ -1,5 +1,5 @@
+import { isUmbContextProvideEvent, umbContextProvideEventType } from '../provide/context-provide.event';
 import { UmbContextRequestEventImplementation, UmbContextCallback } from './context-request.event';
-import { isUmbContextProvideEvent, umbContextProvideEventType } from './context-provide.event';
 
 /**
  * @export
