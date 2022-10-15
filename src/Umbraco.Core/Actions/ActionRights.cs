@@ -14,6 +14,12 @@ public class ActionRights : IAction
     /// <inheritdoc cref="IAction.ActionAlias"/>
     public const string ActionAlias = "rights";
 
+    /// <inheritdoc/>
+    public char Letter => ActionLetter;
+
+    /// <inheritdoc/>
+    public string Alias => ActionAlias;
+
     /// <inheritdoc />
     public string Category => Constants.Conventions.PermissionCategories.ContentCategory;
 

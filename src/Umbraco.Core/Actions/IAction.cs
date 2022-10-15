@@ -22,7 +22,7 @@ public interface IAction : IDiscoverable
     /// <summary>
     ///     Gets the letter used to assign a permission (must be unique).
     /// </summary>
-    char Letter => ActionLetter;
+    char Letter { get; }
 
     /// <summary>
     ///     Gets a value indicating whether whether to allow subscribing to notifications for this action
@@ -43,7 +43,7 @@ public interface IAction : IDiscoverable
     ///     Gets the alias for this action (must be unique).
     ///     This is all lower-case because of case sensitive filesystems, see issue: https://github.com/umbraco/Umbraco-CMS/issues/11670.
     /// </summary>
-    string Alias => ActionAlias;
+    string Alias { get; }
 
     /// <summary>
     ///     Gets the category used for this action

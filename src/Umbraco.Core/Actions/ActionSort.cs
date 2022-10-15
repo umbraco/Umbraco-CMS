@@ -14,6 +14,12 @@ public class ActionSort : IAction
     /// <inheritdoc cref="IAction.ActionAlias"/>
     public const string ActionAlias = "sort";
 
+    /// <inheritdoc/>
+    public char Letter => ActionLetter;
+
+    /// <inheritdoc/>
+    public string Alias => ActionAlias;
+
     /// <inheritdoc />
     public string Category => Constants.Conventions.PermissionCategories.StructureCategory;
 

@@ -15,6 +15,12 @@ public class ActionDelete : IAction
     public const string ActionAlias = "delete";
 
     /// <inheritdoc/>
+    public char Letter => ActionLetter;
+
+    /// <inheritdoc/>
+    public string Alias => ActionAlias;
+
+    /// <inheritdoc/>
     public string Category => Constants.Conventions.PermissionCategories.ContentCategory;
 
     /// <inheritdoc/>

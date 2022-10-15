@@ -14,6 +14,12 @@ public class ActionNew : IAction
     /// <inheritdoc cref="IAction.ActionAlias"/>
     public const string ActionAlias = "create";
 
+    /// <inheritdoc/>
+    public char Letter => ActionLetter;
+
+    /// <inheritdoc/>
+    public string Alias => ActionAlias;
+
     /// <inheritdoc />
     public string Icon => "icon-add";
 

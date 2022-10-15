@@ -22,6 +22,12 @@ public class ActionBrowse : IAction
     /// <inheritdoc cref="IAction.ActionAlias" />
     public const string ActionAlias = "browse";
 
+    /// <inheritdoc/>
+    public char Letter => ActionLetter;
+
+    /// <inheritdoc/>
+    public string Alias => ActionAlias;
+
     /// <inheritdoc />
     public bool ShowInNotifier => false;
 

@@ -14,6 +14,12 @@ public class ActionRollback : IAction
     /// <inheritdoc cref="IAction.ActionAlias"/>
     public const string ActionAlias = "rollback";
 
+    /// <inheritdoc/>
+    public char Letter => ActionLetter;
+
+    /// <inheritdoc/>
+    public string Alias => ActionAlias;
+
     /// <inheritdoc />
     public string Category => Constants.Conventions.PermissionCategories.AdministrationCategory;
 

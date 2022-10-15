@@ -14,6 +14,12 @@ public class ActionMove : IAction
     /// <inheritdoc cref="IAction.ActionAlias"/>
     public const string ActionAlias = "move";
 
+    /// <inheritdoc/>
+    public char Letter => ActionLetter;
+
+    /// <inheritdoc/>
+    public string Alias => ActionAlias;
+
     /// <inheritdoc />
     public string Category => Constants.Conventions.PermissionCategories.StructureCategory;
 
