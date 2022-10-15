@@ -3,8 +3,10 @@
 
 using System.Reflection;
 using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
@@ -12,15 +14,17 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 [DefaultPropertyValueConverter(typeof(JsonValueConverter))]
 public class BlockListPropertyValueConverter : PropertyValueConverterBase
 {
+    private readonly IContentTypeService _contentTypeService;
     private readonly BlockEditorConverter _blockConverter;
     private readonly BlockListEditorDataConverter _blockListEditorDataConverter;
     private readonly IProfilingLogger _proflog;
 
-    public BlockListPropertyValueConverter(IProfilingLogger proflog, BlockEditorConverter blockConverter)
+    public BlockListPropertyValueConverter(IProfilingLogger proflog, BlockEditorConverter blockConverter, IContentTypeService contentTypeService)
     {
         _proflog = proflog;
         _blockConverter = blockConverter;
         _blockListEditorDataConverter = new BlockListEditorDataConverter();
+        _contentTypeService = contentTypeService;
     }
 
     /// <inheritdoc />
@@ -29,7 +33,38 @@ public class BlockListPropertyValueConverter : PropertyValueConverterBase
 
     /// <inheritdoc />
     public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
-        => typeof(BlockListModel);
+    {
+        var isSingleBlockMode = IsSingleBlockMode(propertyType.DataType);
+        if (isSingleBlockMode)
+        {
+            BlockListConfiguration.BlockConfiguration? block =
+                ConfigurationEditor.ConfigurationAs<BlockListConfiguration>(propertyType.DataType.Configuration)?.Blocks.FirstOrDefault();
+
+            ModelType? contentElementType = block?.ContentElementTypeKey is Guid contentElementTypeKey && _contentTypeService.Get(contentElementTypeKey) is IContentType contentType ? ModelType.For(contentType.Alias) : null;
+            ModelType? settingsElementType = block?.SettingsElementTypeKey is Guid settingsElementTypeKey && _contentTypeService.Get(settingsElementTypeKey) is IContentType settingsType ? ModelType.For(settingsType.Alias) : null;
+
+            if (contentElementType != null)
+            {
+                if (settingsElementType != null)
+                {
+                    return typeof(BlockListItem<,>).MakeGenericType(contentElementType, settingsElementType);
+                }
+
+                return typeof(BlockListItem<>).MakeGenericType(contentElementType);
+            }
+
+            return typeof(BlockListItem);
+        }
+
+        return typeof(BlockListModel);
+    }
+
+    private bool IsSingleBlockMode(PublishedDataType dataType)
+    {
+        BlockListConfiguration? config =
+            ConfigurationEditor.ConfigurationAs<BlockListConfiguration>(dataType.Configuration);
+        return (config?.UseSingleBlockMode ?? false) && config?.Blocks.Length == 1 && config?.ValidationLimit?.Min == 1 && config?.ValidationLimit?.Max == 1;
+    }
 
     /// <inheritdoc />
     public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
@@ -48,23 +83,25 @@ public class BlockListPropertyValueConverter : PropertyValueConverterBase
         {
             var value = (string?)inter;
 
+            var defaultValue = IsSingleBlockMode(propertyType.DataType) ? null : BlockListModel.Empty;
+
             // Short-circuit on empty values
             if (string.IsNullOrWhiteSpace(value))
             {
-                return BlockListModel.Empty;
+                return defaultValue;
             }
 
             BlockEditorData converted = _blockListEditorDataConverter.Deserialize(value);
             if (converted.BlockValue.ContentData.Count == 0)
             {
-                return BlockListModel.Empty;
+                return defaultValue;
             }
 
             IEnumerable<BlockListLayoutItem>? blockListLayout =
                 converted.Layout?.ToObject<IEnumerable<BlockListLayoutItem>>();
             if (blockListLayout is null)
             {
-                return BlockListModel.Empty;
+                return defaultValue;
             }
 
             // Get configuration
@@ -97,7 +134,7 @@ public class BlockListPropertyValueConverter : PropertyValueConverterBase
             // If there are no content elements, it doesn't matter what is stored in layout
             if (contentPublishedElements.Count == 0)
             {
-                return BlockListModel.Empty;
+                return defaultValue;
             }
 
             // Convert the settings data
@@ -163,7 +200,7 @@ public class BlockListPropertyValueConverter : PropertyValueConverterBase
                 list.Add(layoutRef);
             }
 
-            return new BlockListModel(list);
+            return IsSingleBlockMode(propertyType.DataType) ? list.FirstOrDefault() : new BlockListModel(list);
         }
     }
 
