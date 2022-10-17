@@ -723,6 +723,245 @@
         }
       }
     },
+    "/umbraco/api/v1/search/index/{indexName}": {
+      "get": {
+        "tags": [
+          "Search"
+        ],
+        "summary": "Check if the index has been rebuilt",
+        "description": "This is kind of rudimentary since there's no way we can know that the index has rebuilt, we\nhave a listener for the index op complete so we'll just check if that key is no longer there in the runtime cache",
+        "operationId": "IndexDetailsSearch_Index",
+        "parameters": [
+          {
+            "name": "indexName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IndexViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/search/index": {
+      "get": {
+        "tags": [
+          "Search"
+        ],
+        "summary": "Get the details for indexers",
+        "operationId": "IndexListSearch_Indexes",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedViewModelOfIndexViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/search/index/{indexName}/rebuild": {
+      "post": {
+        "tags": [
+          "Search"
+        ],
+        "summary": "Rebuilds the index",
+        "operationId": "IndexRebuildSearch_Rebuild",
+        "parameters": [
+          {
+            "name": "indexName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/search/searcher": {
+      "get": {
+        "tags": [
+          "Search"
+        ],
+        "summary": "Get the details for searchers",
+        "operationId": "SearcherListSearch_Searchers",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedViewModelOfSearcherViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/api/v1/search/searcher/{searcherName}/search": {
+      "get": {
+        "tags": [
+          "Search"
+        ],
+        "operationId": "SearcherSearchSearch_GetSearchResults",
+        "parameters": [
+          {
+            "name": "searcherName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 1
+          },
+          {
+            "name": "query",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 2
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 3
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 4
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedViewModelOfPagedViewModelOfSearchResultViewModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/umbraco/api/v1/script/tree/children": {
       "get": {
         "tags": [
@@ -2330,242 +2569,6 @@
         }
       }
     },
-    "/umbraco/api/v1/examineManagement/indexes": {
-      "get": {
-        "tags": [
-          "ExamineManagement"
-        ],
-        "summary": "Get the details for indexers",
-        "operationId": "IndexesExamineManagement_Indexes",
-        "parameters": [
-          {
-            "name": "skip",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "x-position": 1
-          },
-          {
-            "name": "take",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "x-position": 2
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedViewModelOfExamineIndexViewModel"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/umbraco/api/v1/examineManagement/index": {
-      "get": {
-        "tags": [
-          "ExamineManagement"
-        ],
-        "summary": "Check if the index has been rebuilt",
-        "description": "This is kind of rudimentary since there's no way we can know that the index has rebuilt, we\nhave a listener for the index op complete so we'll just check if that key is no longer there in the runtime cache",
-        "operationId": "IndexExamineManagement_Index",
-        "parameters": [
-          {
-            "name": "indexName",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "nullable": true
-            },
-            "x-position": 1
-          }
-        ],
-        "responses": {
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExamineIndexViewModel"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/umbraco/api/v1/examineManagement/rebuild": {
-      "post": {
-        "tags": [
-          "ExamineManagement"
-        ],
-        "summary": "Rebuilds the index",
-        "operationId": "RebuildExamineManagement_Rebuild",
-        "parameters": [
-          {
-            "name": "indexName",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "nullable": true
-            },
-            "x-position": 1
-          }
-        ],
-        "responses": {
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "",
-            "content": {
-              "application/octet-stream": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/umbraco/api/v1/examineManagement/searchers": {
-      "get": {
-        "tags": [
-          "ExamineManagement"
-        ],
-        "summary": "Get the details for searchers",
-        "operationId": "SearchersExamineManagement_Searchers",
-        "parameters": [
-          {
-            "name": "skip",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "x-position": 1
-          },
-          {
-            "name": "take",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "x-position": 2
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedViewModelOfSearcherViewModel"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/umbraco/api/v1/examineManagement/search": {
-      "get": {
-        "tags": [
-          "ExamineManagement"
-        ],
-        "operationId": "SearchExamineManagement_GetSearchResults",
-        "parameters": [
-          {
-            "name": "searcherName",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "nullable": true
-            },
-            "x-position": 1
-          },
-          {
-            "name": "query",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "nullable": true
-            },
-            "x-position": 2
-          },
-          {
-            "name": "skip",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "x-position": 3
-          },
-          {
-            "name": "take",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "x-position": 4
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedViewModelOfPagedViewModelOfSearchResultViewModel"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/umbraco/api/v1/document/tree/children": {
       "get": {
         "tags": [
@@ -4144,6 +4147,147 @@
           }
         }
       },
+      "IndexViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "healthStatus": {
+            "type": "string",
+            "nullable": true
+          },
+          "isHealthy": {
+            "type": "boolean"
+          },
+          "canRebuild": {
+            "type": "boolean"
+          },
+          "searcherName": {
+            "type": "string"
+          },
+          "documentCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "fieldCount": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "PagedViewModelOfIndexViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/IndexViewModel"
+            }
+          }
+        }
+      },
+      "PagedViewModelOfSearcherViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SearcherViewModel"
+            }
+          }
+        }
+      },
+      "SearcherViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "PagedViewModelOfPagedViewModelOfSearchResultViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PagedViewModelOfSearchResultViewModel"
+            }
+          }
+        }
+      },
+      "PagedViewModelOfSearchResultViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SearchResultViewModel"
+            }
+          }
+        }
+      },
+      "SearchResultViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "score": {
+            "type": "number",
+            "format": "float"
+          },
+          "fieldCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "fields": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FieldViewModel"
+            }
+          }
+        }
+      },
+      "FieldViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "values": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
       "PagedViewModelOfRelationViewModel": {
         "type": "object",
         "additionalProperties": false,
@@ -4618,147 +4762,6 @@
           "type": {
             "type": "string",
             "nullable": true
-          }
-        }
-      },
-      "PagedViewModelOfExamineIndexViewModel": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "total": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ExamineIndexViewModel"
-            }
-          }
-        }
-      },
-      "ExamineIndexViewModel": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "healthStatus": {
-            "type": "string",
-            "nullable": true
-          },
-          "isHealthy": {
-            "type": "boolean"
-          },
-          "canRebuild": {
-            "type": "boolean"
-          },
-          "searcherName": {
-            "type": "string"
-          },
-          "documentCount": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "fieldCount": {
-            "type": "integer",
-            "format": "int32"
-          }
-        }
-      },
-      "PagedViewModelOfSearcherViewModel": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "total": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/SearcherViewModel"
-            }
-          }
-        }
-      },
-      "SearcherViewModel": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "name": {
-            "type": "string"
-          }
-        }
-      },
-      "PagedViewModelOfPagedViewModelOfSearchResultViewModel": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "total": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PagedViewModelOfSearchResultViewModel"
-            }
-          }
-        }
-      },
-      "PagedViewModelOfSearchResultViewModel": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "total": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/SearchResultViewModel"
-            }
-          }
-        }
-      },
-      "SearchResultViewModel": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "score": {
-            "type": "number",
-            "format": "float"
-          },
-          "fieldCount": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "fields": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/FieldViewModel"
-            }
-          }
-        }
-      },
-      "FieldViewModel": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "values": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
           }
         }
       },
@@ -5285,9 +5288,6 @@
       "name": "DocumentType"
     },
     {
-      "name": "ExamineManagement"
-    },
-    {
       "name": "Help"
     },
     {
@@ -5328,6 +5328,9 @@
     },
     {
       "name": "Script"
+    },
+    {
+      "name": "Search"
     },
     {
       "name": "Server"

@@ -4,20 +4,20 @@ using Lucene.Net.QueryParsers.Classic;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.ManagementApi.Services;
-using Umbraco.Cms.ManagementApi.ViewModels.ExamineManagement;
 using Umbraco.Cms.ManagementApi.ViewModels.Pagination;
+using Umbraco.Cms.ManagementApi.ViewModels.Search;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.ManagementApi.Controllers.ExamineManagement;
+namespace Umbraco.Cms.ManagementApi.Controllers.Search;
 
 [ApiVersion("1.0")]
-public class SearchExamineManagementController : ExamineManagementControllerBase
+public class SearcherSearchSearchController : SearchControllerBase
 {
     private readonly IExamineManagerService _examineManagerService;
 
-    public SearchExamineManagementController(IExamineManagerService examineManagerService) => _examineManagerService = examineManagerService;
+    public SearcherSearchSearchController(IExamineManagerService examineManagerService) => _examineManagerService = examineManagerService;
 
-    [HttpGet("search")]
+    [HttpGet("searcher/{searcherName}/search")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<PagedViewModel<SearchResultViewModel>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]

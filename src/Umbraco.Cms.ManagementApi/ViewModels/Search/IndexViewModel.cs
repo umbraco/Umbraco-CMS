@@ -1,6 +1,6 @@
-﻿namespace Umbraco.Cms.ManagementApi.ViewModels.ExamineManagement;
+﻿namespace Umbraco.Cms.ManagementApi.ViewModels.Search;
 
-public class ExamineIndexViewModel
+public class IndexViewModel
 {
     public string Name { get; init; } = null!;
 
