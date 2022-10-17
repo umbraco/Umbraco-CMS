@@ -6,7 +6,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { query } from 'router-slot';
 
-import { postUserLogin } from '../../core/api/fetcher';
+import { postUserLogin } from '@umbraco-cms/backend-api';
 
 @customElement('umb-login')
 export default class UmbLogin extends LitElement {

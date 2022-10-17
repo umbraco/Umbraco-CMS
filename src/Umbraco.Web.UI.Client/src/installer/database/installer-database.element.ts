@@ -3,8 +3,8 @@ import { css, CSSResultGroup, html, LitElement, nothing } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { Subscription } from 'rxjs';
 
-import { postInstallSetup, postInstallValidateDatabase } from '../../core/api/fetcher';
 import { UmbInstallerContext } from '../installer.context';
+import { postInstallSetup, postInstallValidateDatabase } from '@umbraco-cms/backend-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { UmbracoInstallerDatabaseModel, UmbracoPerformInstallDatabaseConfiguration } from '@umbraco-cms/models';
 

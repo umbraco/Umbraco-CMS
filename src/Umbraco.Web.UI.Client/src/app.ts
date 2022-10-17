@@ -12,8 +12,8 @@ import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
 import type { Guard, IRoute } from 'router-slot/model';
-import { getManifests, getServerStatus } from './core/api/fetcher';
 import { internalManifests } from './temp-internal-manifests';
+import { getManifests, getServerStatus } from '@umbraco-cms/backend-api';
 import { UmbExtensionRegistry } from '@umbraco-cms/extensions-api';
 import { UmbContextProviderMixin } from '@umbraco-cms/context-api';
 

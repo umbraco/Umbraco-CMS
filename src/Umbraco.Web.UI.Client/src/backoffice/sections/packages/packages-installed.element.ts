@@ -4,7 +4,7 @@ import { html, LitElement, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 
-import { getPackagesInstalled } from '../../../core/api/fetcher';
+import { getPackagesInstalled } from '@umbraco-cms/backend-api';
 
 import type { PackageInstalled } from '@umbraco-cms/models';
 

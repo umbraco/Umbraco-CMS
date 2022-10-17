@@ -25,7 +25,6 @@ export const getConsentLevels = fetcher.path('/telemetry/ConsentLevels').method(
 export const getConsentLevel = fetcher.path('/telemetry/ConsentLevel').method('get').create();
 export const postConsentLevel = fetcher.path('/telemetry/ConsentLevel').method('post').create();
 
-
 // Property Editors
 export const getPropertyEditorsList = fetcher.path('/property-editors/list').method('get').create();
 export const getPropertyEditor = fetcher
@@ -40,4 +39,3 @@ export const getPublishedCacheStatus = fetcher.path('/published-cache/status').m
 export const postPublishedCacheReload = fetcher.path('/published-cache/reload').method('post').create();
 export const postPublishedCacheRebuild = fetcher.path('/published-cache/rebuild').method('post').create();
 export const getPublishedCacheCollect = fetcher.path('/published-cache/collect').method('get').create();
-

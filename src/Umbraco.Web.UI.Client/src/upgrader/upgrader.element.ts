@@ -1,12 +1,10 @@
-import '../installer/shared/layout/installer-layout.element';
-import './upgrader-view.element';
-
 import { html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-
-import { getUpgradeSettings, PostUpgradeAuthorize } from '../core/api/fetcher';
-
+import { getUpgradeSettings, PostUpgradeAuthorize } from '@umbraco-cms/backend-api';
 import type { UmbracoUpgrader } from '@umbraco-cms/models';
+
+import '../installer/shared/layout/installer-layout.element';
+import './upgrader-view.element';
 
 /**
  * @element umb-upgrader
