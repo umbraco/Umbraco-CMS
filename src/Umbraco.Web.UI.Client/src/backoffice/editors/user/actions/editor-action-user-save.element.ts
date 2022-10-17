@@ -2,15 +2,12 @@ import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import type { UUIButtonState } from '@umbraco-ui/uui';
-import { Subscription } from 'rxjs';
-import { UUIButtonState } from '@umbraco-ui/uui';
 import type { UmbUserStore } from '../../../../core/stores/user/user.store';
-import { UmbUserContext , UmbUserContext } from '../user.context';
+import type { UmbUserContext } from '../user.context';
 
-import { UmbContextConsumerMixin , UmbContextConsumerMixin } from '../../../../core/context';
-import type { UserEntity } from '../../../../core/models';
-import { UmbNotificationDefaultData } from '../../../../core/services/notification/layouts/default';
-import { UmbNotificationService } from '../../../../core/services/notification';
+import type { UmbNotificationDefaultData } from '../../../../core/services/notification/layouts/default';
+import type { UmbNotificationService } from '../../../../core/services/notification';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
 @customElement('umb-editor-action-user-save')
 export class UmbEditorActionUserSaveElement extends UmbContextConsumerMixin(LitElement) {
