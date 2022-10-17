@@ -2,8 +2,8 @@ import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { Subscription, distinctUntilChanged } from 'rxjs';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { UmbNodeContext } from '../../node.context';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
 @customElement('umb-editor-view-node-info')
 export class UmbEditorViewNodeInfoElement extends UmbContextConsumerMixin(LitElement) {

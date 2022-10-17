@@ -9,8 +9,8 @@ import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
 import { Subscription } from 'rxjs';
-import { UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import { UmbInstallerContext } from './installer.context';
+import { UmbContextProviderMixin } from '@umbraco-cms/context-api';
 
 @customElement('umb-installer')
 export class UmbInstallerElement extends UmbContextProviderMixin(LitElement) {

@@ -4,10 +4,10 @@ import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { EMPTY, of, Subscription, switchMap } from 'rxjs';
 
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { UmbDataTypeStore } from '../../../core/stores/data-type/data-type.store';
 import { UmbExtensionRegistry } from '../../../core/extension';
 import { NodeProperty } from '../../../mocks/data/node.data';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
 import '../entity-property/entity-property.element';
 

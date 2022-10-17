@@ -4,11 +4,11 @@ import { customElement, state } from 'lit/decorators.js';
 import { Subscription } from 'rxjs';
 
 import { UmbModalService } from '../../../../../core/services/modal';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { UmbDataTypeContext } from '../../data-type.context';
 import type { DataTypeDetails } from '../../../../../mocks/data/data-type.data';
 import type { UmbExtensionRegistry } from '../../../../../core/extension';
 import type { UmbPropertyEditorStore } from '../../../../../core/stores/property-editor/property-editor.store';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { ManifestPropertyEditorUI } from '@umbraco-cms/models';
 
 import '../../../../property-editor-uis/shared/property-editor-config/property-editor-config.element';

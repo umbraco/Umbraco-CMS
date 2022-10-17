@@ -2,9 +2,9 @@ import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { Subscription } from 'rxjs';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { UmbUserStore } from '../../../../../core/stores/user/user.store';
 import { UmbSectionViewUsersElement } from './section-view-users.element';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
 @customElement('umb-editor-view-users-selection')
 export class UmbEditorViewUsersSelectionElement extends UmbContextConsumerMixin(LitElement) {

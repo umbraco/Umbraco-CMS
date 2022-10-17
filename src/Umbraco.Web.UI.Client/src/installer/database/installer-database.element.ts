@@ -4,8 +4,8 @@ import { customElement, property, query, state } from 'lit/decorators.js';
 import { Subscription } from 'rxjs';
 
 import { postInstallSetup, postInstallValidateDatabase } from '../../core/api/fetcher';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { UmbInstallerContext } from '../installer.context';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { UmbracoInstallerDatabaseModel, UmbracoPerformInstallDatabaseConfiguration } from '@umbraco-cms/models';
 
 @customElement('umb-installer-database')

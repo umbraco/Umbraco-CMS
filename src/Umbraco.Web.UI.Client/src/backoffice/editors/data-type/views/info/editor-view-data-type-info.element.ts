@@ -3,10 +3,10 @@ import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { Subscription, distinctUntilChanged } from 'rxjs';
 
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { UmbDataTypeContext } from '../../data-type.context';
 
 import type { DataTypeDetails } from '../../../../../mocks/data/data-type.data';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
 @customElement('umb-editor-view-data-type-info')
 export class UmbEditorViewDataTypeInfoElement extends UmbContextConsumerMixin(LitElement) {

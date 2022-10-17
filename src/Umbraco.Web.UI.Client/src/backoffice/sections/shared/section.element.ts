@@ -2,11 +2,11 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { Subscription, map, switchMap, EMPTY, of } from 'rxjs';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { createExtensionElement, UmbExtensionRegistry } from '../../../core/extension';
 import { UmbSectionContext } from '../section.context';
 import { UmbEditorEntityElement } from '../../editors/shared/editor-entity/editor-entity.element';
 import { UmbEntityStore } from '../../../core/stores/entity.store';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { ManifestTree, ManifestSectionView } from '@umbraco-cms/models';
 
 import './section-trees/section-trees.element.ts';

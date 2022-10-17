@@ -1,11 +1,11 @@
 import { LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { Subscription } from 'rxjs';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { Entity } from '../../../mocks/data/entities';
 import { UmbSectionContext } from '../../sections/section.context';
 import { UmbTreeContextMenuPageService } from './context-menu/tree-context-menu-page.service';
 import { UmbTreeContextMenuService } from './context-menu/tree-context-menu.service';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { ManifestTreeItemAction, ManifestTree } from '@umbraco-cms/models';
 
 export type ActionPageEntity = {

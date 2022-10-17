@@ -3,8 +3,8 @@ import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { Subscription } from 'rxjs';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { UmbNotificationService, UmbNotificationHandler } from '../../core/services/notification';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
 @customElement('umb-backoffice-notification-container')
 export class UmbBackofficeNotificationContainer extends UmbContextConsumerMixin(LitElement) {

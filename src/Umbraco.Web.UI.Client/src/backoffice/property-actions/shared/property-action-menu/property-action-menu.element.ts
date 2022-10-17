@@ -2,10 +2,10 @@ import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { Subscription, map } from 'rxjs';
 import { UUITextStyles } from '@umbraco-ui/uui';
-import { UmbContextProviderMixin, UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { UmbExtensionRegistry } from '../../../../core/extension';
 
 import { UmbPropertyActionMenuContext } from './property-action-menu.context';
+import { UmbContextProviderMixin, UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { ManifestPropertyAction } from '@umbraco-cms/models';
 
 import '../property-action/property-action.element';

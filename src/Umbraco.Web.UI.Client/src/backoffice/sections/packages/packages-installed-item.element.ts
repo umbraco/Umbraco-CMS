@@ -2,10 +2,10 @@ import { html, LitElement, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { firstValueFrom, map } from 'rxjs';
 
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { createExtensionElement, UmbExtensionRegistry } from '../../../core/extension';
 
 import type { UmbModalService } from '../../../core/services/modal';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { ManifestPackageView, PackageInstalled } from '@umbraco-cms/models';
 
 @customElement('umb-packages-installed-item')

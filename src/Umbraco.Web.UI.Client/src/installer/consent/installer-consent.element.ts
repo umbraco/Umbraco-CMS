@@ -3,8 +3,8 @@ import { customElement, state } from 'lit/decorators.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import { Subscription } from 'rxjs';
 
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { UmbInstallerContext } from '../installer.context';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { TelemetryModel } from '@umbraco-cms/models';
 
 @customElement('umb-installer-consent')

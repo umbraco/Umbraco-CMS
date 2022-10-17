@@ -9,10 +9,10 @@ import {
 	postPublishedCacheRebuild,
 	getPublishedCacheCollect,
 } from '../../../core/api/fetcher';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { UmbModalService } from '../../../core/services/modal';
 import { UmbNotificationService } from '../../../core/services/notification';
 import { UmbNotificationDefaultData } from '../../../core/services/notification/layouts/default';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
 @customElement('umb-dashboard-published-status')
 export class UmbDashboardPublishedStatusElement extends UmbContextConsumerMixin(LitElement) {

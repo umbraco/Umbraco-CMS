@@ -2,7 +2,6 @@ import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { Subscription } from 'rxjs';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { UmbSectionViewUsersElement } from '../../section-view-users.element';
 import { UmbUserStore } from '../../../../../../../core/stores/user/user.store';
 import {
@@ -14,6 +13,7 @@ import {
 	UmbTableConfig,
 	UmbTableOrderedEvent,
 } from '../../../../../../components/table/table.element';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { UserDetails } from '@umbraco-cms/models';
 
 import './column-layouts/name/user-table-name-column-layout.element';

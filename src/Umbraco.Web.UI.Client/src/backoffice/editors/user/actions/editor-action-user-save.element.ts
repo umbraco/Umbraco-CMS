@@ -2,12 +2,12 @@ import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { UUIButtonState } from '@umbraco-ui/uui';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { UmbUserStore } from '../../../../core/stores/user/user.store';
 import { UmbUserContext } from '../user.context';
 
 import { UmbNotificationDefaultData } from '../../../../core/services/notification/layouts/default';
 import { UmbNotificationService } from '../../../../core/services/notification';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
 @customElement('umb-editor-action-user-save')
 export class UmbEditorActionUserSaveElement extends UmbContextConsumerMixin(LitElement) {

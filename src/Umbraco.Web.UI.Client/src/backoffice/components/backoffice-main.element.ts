@@ -5,10 +5,10 @@ import { state } from 'lit/decorators.js';
 import { IRoutingInfo } from 'router-slot';
 import { Subscription } from 'rxjs';
 
-import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import { createExtensionElement } from '../../core/extension';
 import { UmbSectionStore } from '../../core/stores/section.store';
 import { UmbSectionContext } from '../sections/section.context';
+import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import type { ManifestSection } from '@umbraco-cms/models';
 
 @defineElement('umb-backoffice-main')

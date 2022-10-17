@@ -1,10 +1,10 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { UmbModalService } from '../../../../core/services/modal';
 import { UmbNodeStore } from '../../../../core/stores/node.store';
 import UmbTreeItemActionElement from '../../shared/tree-item-action.element';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
 @customElement('umb-tree-action-document-delete')
 export default class UmbTreeActionDocumentDeleteElement extends UmbContextConsumerMixin(UmbTreeItemActionElement) {

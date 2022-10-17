@@ -1,9 +1,9 @@
 import { html } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import { UmbTreeBase } from '../shared/tree-base.element';
 import { UmbEntityStore } from '../../../core/stores/entity.store';
 import { UmbTreeMemberGroupsDataContext } from './tree-member-groups-data.context';
+import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 
 import '../shared/tree-navigator.element';
 

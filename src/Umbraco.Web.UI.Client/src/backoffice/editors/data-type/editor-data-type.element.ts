@@ -3,11 +3,11 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { Subscription } from 'rxjs';
-import { UmbContextProviderMixin, UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { UmbNotificationService } from '../../../core/services/notification';
 import { UmbDataTypeStore } from '../../../core/stores/data-type/data-type.store';
 import { UmbNotificationDefaultData } from '../../../core/services/notification/layouts/default';
 import { UmbDataTypeContext } from './data-type.context';
+import { UmbContextProviderMixin, UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
 import '../shared/editor-entity-layout/editor-entity-layout.element';
 

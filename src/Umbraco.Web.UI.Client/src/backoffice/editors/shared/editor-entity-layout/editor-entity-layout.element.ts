@@ -7,8 +7,8 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { IRoute, IRoutingInfo, PageComponent, RouterSlot } from 'router-slot';
 import { map, Subscription } from 'rxjs';
 
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { createExtensionElement, UmbExtensionRegistry } from '../../../../core/extension';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { ManifestEditorAction, ManifestEditorView } from '@umbraco-cms/models';
 
 /**
