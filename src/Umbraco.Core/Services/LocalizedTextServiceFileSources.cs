@@ -167,7 +167,7 @@ public class LocalizedTextServiceFileSources
     }
 
     /// <summary>
-    ///     returns all xml sources for all culture files found in the folder
+    ///     Returns all xml sources for all culture files found in the folder.
     /// </summary>
     /// <returns></returns>
     public IDictionary<CultureInfo, Lazy<XDocument>> GetXmlSources() => _xmlSources.Value;
@@ -186,12 +186,9 @@ public class LocalizedTextServiceFileSources
         if (_supplementFileSources is not null)
         {
             // Get only the .xml files and filter out the user defined language files (*.user.xml) that overwrite the default
-            var newLangFiles = _supplementFileSources.Where(x => !x.FileInfo.Name.Contains("user") && x.FileInfo.Name.EndsWith(".xml"));
-
-            foreach (var item in newLangFiles)
-            {
-                result.Add(item.FileInfo);
-            }
+            result.AddRange(_supplementFileSources
+                .Where(x => !x.FileInfo.Name.Contains("user") && x.FileInfo.Name.EndsWith(".xml"))
+                .Select(x => x.FileInfo));
         }
 
         if (_directoryContents.Exists)
@@ -258,7 +255,7 @@ public class LocalizedTextServiceFileSources
 
             foreach (LocalizedTextServiceSupplementaryFileSource supplementaryFile in found)
             {
-                using (var stream = supplementaryFile.FileInfo.CreateReadStream())
+                using (Stream stream = supplementaryFile.FileInfo.CreateReadStream())
                 {
                     XDocument xChildDoc;
                     try

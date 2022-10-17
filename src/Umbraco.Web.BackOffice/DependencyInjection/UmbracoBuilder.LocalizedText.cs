@@ -50,11 +50,17 @@ namespace Umbraco.Extensions
 
             var configLangFileSources = new List<LocalizedTextServiceSupplementaryFileSource>();
 
-            foreach (IFileInfo langFileSource in contentFileProvider.GetDirectoryContents(userConfigLangFolder).Where(x => x.IsDirectory && x.Name.InvariantEquals("lang")))
+            foreach (IFileInfo langFileSource in contentFileProvider.GetDirectoryContents(userConfigLangFolder))
             {
-                foreach (IFileInfo langFile in contentFileProvider.GetDirectoryContents($"{userConfigLangFolder}/{langFileSource.Name}").Where(x => x.Name.InvariantEndsWith(".xml") && x.PhysicalPath != null))
+                if (langFileSource.IsDirectory && langFileSource.Name.InvariantEquals("lang"))
                 {
-                    configLangFileSources.Add(new LocalizedTextServiceSupplementaryFileSource(langFile, true));
+                    foreach (IFileInfo langFile in contentFileProvider.GetDirectoryContents($"{userConfigLangFolder}/{langFileSource.Name}"))
+                    {
+                        if (langFile.Name.InvariantEndsWith(".xml") && langFile.PhysicalPath is not null)
+                        {
+                            configLangFileSources.Add(new LocalizedTextServiceSupplementaryFileSource(langFile, true));
+                        }
+                    }
                 }
             }
 
