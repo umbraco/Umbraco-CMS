@@ -1,19 +1,18 @@
 ﻿using Examine;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Infrastructure.Examine;
-using Umbraco.Cms.ManagementApi.ViewModels.ExamineManagement;
 using Umbraco.Cms.ManagementApi.ViewModels.Pagination;
+using Umbraco.Cms.ManagementApi.ViewModels.Search;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.ManagementApi.Controllers.Examine;
+namespace Umbraco.Cms.ManagementApi.Controllers.Search;
 
 [ApiVersion("1.0")]
-public class SearcherListExamineController : ExamineControllerBase
+public class SearcherListSearchController : SearchControllerBase
 {
     private readonly IExamineManager _examineManager;
 
-    public SearcherListExamineController(IExamineManager examineManager) => _examineManager = examineManager;
+    public SearcherListSearchController(IExamineManager examineManager) => _examineManager = examineManager;
 
     /// <summary>
     ///     Get the details for searchers

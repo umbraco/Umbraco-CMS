@@ -2,21 +2,21 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.ManagementApi.Factories;
-using Umbraco.Cms.ManagementApi.ViewModels.ExamineManagement;
+using Umbraco.Cms.ManagementApi.ViewModels.Search;
 
-namespace Umbraco.Cms.ManagementApi.Controllers.Examine;
+namespace Umbraco.Cms.ManagementApi.Controllers.Search;
 
 [ApiVersion("1.0")]
-public class IndexDetailsExamineController : ExamineControllerBase
+public class IndexDetailsSearchController : SearchControllerBase
 {
-    private readonly IExamineIndexViewModelFactory _examineIndexViewModelFactory;
+    private readonly IIndexViewModelFactory _indexViewModelFactory;
     private readonly IExamineManager _examineManager;
 
-    public IndexDetailsExamineController(
-        IExamineIndexViewModelFactory examineIndexViewModelFactory,
+    public IndexDetailsSearchController(
+        IIndexViewModelFactory indexViewModelFactory,
         IExamineManager examineManager)
     {
-        _examineIndexViewModelFactory = examineIndexViewModelFactory;
+        _indexViewModelFactory = indexViewModelFactory;
         _examineManager = examineManager;
     }
 
@@ -32,12 +32,12 @@ public class IndexDetailsExamineController : ExamineControllerBase
     [HttpGet("index/{indexName}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ExamineIndexViewModel), StatusCodes.Status200OK)]
-    public async Task<ActionResult<ExamineIndexViewModel?>> Index(string indexName)
+    [ProducesResponseType(typeof(IndexViewModel), StatusCodes.Status200OK)]
+    public async Task<ActionResult<IndexViewModel?>> Index(string indexName)
     {
         if (_examineManager.TryGetIndex(indexName, out IIndex? index))
         {
-            return await Task.FromResult(_examineIndexViewModelFactory.Create(index!));
+            return await Task.FromResult(_indexViewModelFactory.Create(index!));
         }
 
         var invalidModelProblem = new ProblemDetails

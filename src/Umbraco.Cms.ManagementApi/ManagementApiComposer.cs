@@ -39,7 +39,7 @@ public class ManagementApiComposer : IComposer
         builder
             .AddNewInstaller()
             .AddUpgrader()
-            .AddExamineManagement()
+            .AddSearchManagement()
             .AddFactories()
             .AddTrees()
             .AddFactories()

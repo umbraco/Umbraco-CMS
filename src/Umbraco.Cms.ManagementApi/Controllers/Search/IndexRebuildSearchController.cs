@@ -5,17 +5,17 @@ using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.New.Cms.Infrastructure.Services;
 
-namespace Umbraco.Cms.ManagementApi.Controllers.Examine;
+namespace Umbraco.Cms.ManagementApi.Controllers.Search;
 
 [ApiVersion("1.0")]
-public class IndexRebuildExamineController : ExamineControllerBase
+public class IndexRebuildSearchController : SearchControllerBase
 {
-    private readonly ILogger<IndexRebuildExamineController> _logger;
+    private readonly ILogger<IndexRebuildSearchController> _logger;
     private readonly IIndexingRebuilderService _indexingRebuilderService;
     private readonly IExamineManager _examineManager;
 
-    public IndexRebuildExamineController(
-        ILogger<IndexRebuildExamineController> logger,
+    public IndexRebuildSearchController(
+        ILogger<IndexRebuildSearchController> logger,
         IIndexingRebuilderService indexingRebuilderService,
         IExamineManager examineManager)
     {
