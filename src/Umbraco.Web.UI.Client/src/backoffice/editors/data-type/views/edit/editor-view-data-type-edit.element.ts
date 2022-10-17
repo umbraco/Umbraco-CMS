@@ -1,7 +1,6 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { Subscription } from 'rxjs';
 import { UmbModalService } from '../../../../../core/services/modal';
 
 import { UmbContextConsumerMixin } from '../../../../../core/context';
@@ -11,11 +10,12 @@ import type { DataTypeDetails } from '../../../../../mocks/data/data-type.data';
 import type { UmbExtensionRegistry } from '../../../../../core/extension';
 import type { UmbPropertyEditorStore } from '../../../../../core/stores/property-editor/property-editor.store';
 import type { ManifestPropertyEditorUI } from '../../../../../core/models';
+import { UmbObserverMixin } from '../../../../../core/observer';
 
 import '../../../../property-editor-uis/shared/property-editor-config/property-editor-config.element';
 
 @customElement('umb-editor-view-data-type-edit')
-export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(LitElement) {
+export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles = [UUITextStyles, css``];
 
 	@state()
@@ -39,11 +39,6 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Li
 	private _dataTypeContext?: UmbDataTypeContext;
 	private _extensionRegistry?: UmbExtensionRegistry;
 	private _propertyEditorStore?: UmbPropertyEditorStore;
-
-	private _dataTypeSubscription?: Subscription;
-	private _propertyEditorSubscription?: Subscription;
-	private _propertyEditorUISubscription?: Subscription;
-
 	private _modalService?: UmbModalService;
 
 	constructor() {
@@ -73,9 +68,7 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Li
 	private _observeDataType() {
 		if (!this._dataTypeContext || !this._propertyEditorStore || !this._extensionRegistry) return;
 
-		this._dataTypeSubscription?.unsubscribe();
-
-		this._dataTypeSubscription = this._dataTypeContext?.data.subscribe((dataType: DataTypeDetails) => {
+		this.observe<DataTypeDetails>(this._dataTypeContext.data, (dataType) => {
 			this._dataType = dataType;
 
 			if (!this._dataType) return;
@@ -95,31 +88,26 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Li
 	}
 
 	private _observePropertyEditorUI(propertyEditorUIAlias: string | null) {
-		if (!propertyEditorUIAlias) return;
+		if (!propertyEditorUIAlias || !this._extensionRegistry) return;
 
-		this._propertyEditorUISubscription?.unsubscribe();
-
-		this._propertyEditorUISubscription = this._extensionRegistry
-			?.getByAlias<ManifestPropertyEditorUI>(propertyEditorUIAlias)
-			.subscribe((propertyEditorUI) => {
+		this.observe<ManifestPropertyEditorUI>(
+			this._extensionRegistry?.getByAlias<ManifestPropertyEditorUI>(propertyEditorUIAlias),
+			(propertyEditorUI) => {
 				this._propertyEditorUIName = propertyEditorUI?.meta.label ?? propertyEditorUI?.name ?? '';
 				this._propertyEditorUIAlias = propertyEditorUI?.alias ?? '';
 				this._propertyEditorUIIcon = propertyEditorUI?.meta?.icon ?? '';
 
 				this._observePropertyEditor(propertyEditorUI?.meta?.propertyEditor ?? '');
-			});
+			}
+		);
 	}
 
 	private _observePropertyEditor(propertyEditorAlias: string | null) {
-		if (!propertyEditorAlias) return;
+		if (!propertyEditorAlias || !this._propertyEditorStore) return;
 
-		this._propertyEditorSubscription?.unsubscribe();
-
-		this._propertyEditorSubscription = this._propertyEditorStore
-			?.getByAlias(propertyEditorAlias)
-			.subscribe((propertyEditor) => {
-				this._propertyEditorAlias = propertyEditor?.alias ?? '';
-			});
+		this.observe(this._propertyEditorStore.getByAlias(propertyEditorAlias), (propertyEditor) => {
+			this._propertyEditorAlias = propertyEditor?.alias ?? '';
+		});
 	}
 
 	private _openPropertyEditorUIPicker() {
@@ -138,13 +126,6 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Li
 	private _selectPropertyEditorUI(propertyEditorUIAlias: string | null) {
 		if (!this._dataType || this._dataType.propertyEditorUIAlias === propertyEditorUIAlias) return;
 		this._dataTypeContext?.update({ propertyEditorUIAlias });
-	}
-
-	disconnectedCallback(): void {
-		super.disconnectedCallback();
-		this._dataTypeSubscription?.unsubscribe();
-		this._propertyEditorSubscription?.unsubscribe();
-		this._propertyEditorUISubscription?.unsubscribe();
 	}
 
 	render() {

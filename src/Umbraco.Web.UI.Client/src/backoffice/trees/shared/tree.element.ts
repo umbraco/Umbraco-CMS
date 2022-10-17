@@ -1,14 +1,15 @@
 import { html, LitElement } from 'lit';
 import { when } from 'lit-html/directives/when.js';
 import { customElement, property, state } from 'lit/decorators.js';
-import { map, Subscription } from 'rxjs';
+import { map } from 'rxjs';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '../../../core/context';
 import { UmbExtensionRegistry } from '../../../core/extension';
 import type { ManifestTree } from '../../../core/models';
+import { UmbObserverMixin } from '../../../core/observer';
 import { UmbTreeContextBase } from '../tree.context';
 
 @customElement('umb-tree')
-export class UmbTreeElement extends UmbContextProviderMixin(UmbContextConsumerMixin(LitElement)) {
+export class UmbTreeElement extends UmbContextProviderMixin(UmbContextConsumerMixin(UmbObserverMixin(LitElement))) {
 	private _alias = '';
 	@property({ type: String, reflect: true })
 	get alias() {
@@ -50,8 +51,6 @@ export class UmbTreeElement extends UmbContextProviderMixin(UmbContextConsumerMi
 
 	private _treeContext?: UmbTreeContextBase;
 	private _extensionRegistry?: UmbExtensionRegistry;
-	private _treeSubscription?: Subscription;
-	private _selectionSubscription?: Subscription;
 
 	constructor() {
 		super();
@@ -62,15 +61,17 @@ export class UmbTreeElement extends UmbContextProviderMixin(UmbContextConsumerMi
 	}
 
 	private _observeTree() {
-		this._treeSubscription?.unsubscribe();
+		if (!this._extensionRegistry || !this.alias) return;
 
-		this._treeSubscription = this._extensionRegistry
-			?.extensionsOfType('tree')
-			.pipe(map((trees) => trees.find((tree) => tree.alias === this.alias)))
-			.subscribe((tree) => {
+		this.observe<ManifestTree>(
+			this._extensionRegistry
+				.extensionsOfType('tree')
+				.pipe(map((trees) => trees.find((tree) => tree.alias === this.alias))),
+			(tree) => {
 				this._tree = tree;
 				this._provideTreeContext();
-			});
+			}
+		);
 	}
 
 	private _provideTreeContext() {
@@ -86,16 +87,12 @@ export class UmbTreeElement extends UmbContextProviderMixin(UmbContextConsumerMi
 	}
 
 	private _observeSelection() {
-		this._selectionSubscription = this._treeContext?.selection.subscribe((selection) => {
+		if (!this._treeContext) return;
+
+		this.observe(this._treeContext.selection, (selection) => {
 			this._selection = selection;
 			this.dispatchEvent(new CustomEvent('change'));
 		});
-	}
-
-	disconnectedCallback(): void {
-		super.disconnectedCallback();
-		this._treeSubscription?.unsubscribe();
-		this._selectionSubscription?.unsubscribe();
 	}
 
 	render() {

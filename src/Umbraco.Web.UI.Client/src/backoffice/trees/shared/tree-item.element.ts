@@ -2,17 +2,19 @@ import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UUIMenuItemEvent } from '@umbraco-ui/uui';
-import { map, Subscription } from 'rxjs';
+import { map } from 'rxjs';
 import { repeat } from 'lit/directives/repeat.js';
 import { UmbContextConsumerMixin } from '../../../core/context';
 import { UmbTreeContextBase } from '../tree.context';
 import { UmbSectionContext } from '../../sections/section.context';
 import { Entity } from '../../../mocks/data/entities';
+import { UmbObserverMixin } from '../../../core/observer';
+import type { ManifestSection } from '../../../core/models';
 import { UmbTreeDataContextBase } from '../tree-data.context';
 import { UmbTreeContextMenuService } from './context-menu/tree-context-menu.service';
 
 @customElement('umb-tree-item')
-export class UmbTreeItem extends UmbContextConsumerMixin(LitElement) {
+export class UmbTreeItem extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles = [UUITextStyles, css``];
 
 	@property({ type: Object, attribute: false })
@@ -40,12 +42,6 @@ export class UmbTreeItem extends UmbContextConsumerMixin(LitElement) {
 	private _treeDataContext?: UmbTreeDataContextBase;
 	private _sectionContext?: UmbSectionContext;
 	private _treeContextMenuService?: UmbTreeContextMenuService;
-
-	private _sectionSubscription?: Subscription;
-	private _childrenSubscription?: Subscription;
-	private _selectableSubscription?: Subscription;
-	private _selectionSubscription?: Subscription;
-	private _activeTreeItemSubscription?: Subscription;
 
 	constructor() {
 		super();
@@ -81,33 +77,36 @@ export class UmbTreeItem extends UmbContextConsumerMixin(LitElement) {
 	}
 
 	private _observeSection() {
-		this._sectionSubscription?.unsubscribe();
+		if (!this._sectionContext) return;
 
-		this._sectionSubscription = this._sectionContext?.data.subscribe((section) => {
+		this.observe<ManifestSection>(this._sectionContext?.data, (section) => {
 			this._href = this._constructPath(section.meta.pathname, this.treeItem.type, this.treeItem.key);
 		});
 	}
 
 	private _observeSelectable() {
-		this._selectableSubscription?.unsubscribe();
-		this._selectableSubscription = this._treeContext?.selectable?.subscribe((value) => {
+		if (!this._treeContext) return;
+
+		this.observe<boolean>(this._treeContext.selectable, (value) => {
 			this._selectable = value;
 		});
 	}
 
 	private _observeSelection() {
-		this._selectionSubscription?.unsubscribe();
-		this._selectionSubscription = this._treeContext?.selection
-			.pipe(map((keys) => keys?.includes(this.treeItem.key)))
-			.subscribe((isSelected) => {
+		if (!this._treeContext) return;
+
+		this.observe<boolean>(
+			this._treeContext.selection.pipe(map((keys) => keys?.includes(this.treeItem.key))),
+			(isSelected) => {
 				this._selected = isSelected;
-			});
+			}
+		);
 	}
 
 	private _observeActiveTreeItem() {
-		this._activeTreeItemSubscription?.unsubscribe();
+		if (!this._sectionContext) return;
 
-		this._activeTreeItemSubscription = this._sectionContext?.activeTreeItem.subscribe((treeItem) => {
+		this.observe<Entity>(this._sectionContext?.activeTreeItem, (treeItem) => {
 			this._isActive = treeItem.key === this.treeItem.key;
 		});
 	}
@@ -123,22 +122,13 @@ export class UmbTreeItem extends UmbContextConsumerMixin(LitElement) {
 
 		this._loading = true;
 
-		this._childrenSubscription?.unsubscribe();
+		if (!this._treeDataContext) return;
 
-		this._childrenSubscription = this._treeDataContext?.childrenChanges(this.treeItem.key).subscribe((items) => {
-			if (items?.length === 0) return;
-			this._childItems = items;
+		this.observe<Entity[]>(this._treeDataContext.childrenChanges(this.treeItem.key), (childItems) => {
+			if (childItems?.length === 0) return;
+			this._childItems = childItems;
 			this._loading = false;
 		});
-	}
-
-	disconnectedCallback(): void {
-		super.disconnectedCallback();
-		this._sectionSubscription?.unsubscribe();
-		this._childrenSubscription?.unsubscribe();
-		this._selectableSubscription?.unsubscribe();
-		this._selectionSubscription?.unsubscribe();
-		this._activeTreeItemSubscription?.unsubscribe();
 	}
 
 	private _renderChildItems() {
