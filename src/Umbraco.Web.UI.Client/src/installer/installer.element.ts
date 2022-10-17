@@ -1,6 +1,6 @@
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbObserverMixin } from '../core/observer';
+import { UmbObserverMixin } from '../core/observable-api';
 import { UmbInstallerContext } from './installer.context';
 import { UmbContextProviderMixin } from '@umbraco-cms/context-api';
 

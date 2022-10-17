@@ -7,7 +7,7 @@ import { repeat } from 'lit/directives/repeat.js';
 import { UmbTreeContextBase } from '../tree.context';
 import { UmbSectionContext } from '../../sections/section.context';
 import { Entity } from '../../../core/mocks/data/entities';
-import { UmbObserverMixin } from '../../../core/observer';
+import { UmbObserverMixin } from '../../../core/observable-api';
 import type { ManifestSection } from '../../../core/models';
 import { UmbTreeDataContextBase } from '../tree-data.context';
 import { UmbTreeContextMenuService } from './context-menu/tree-context-menu.service';

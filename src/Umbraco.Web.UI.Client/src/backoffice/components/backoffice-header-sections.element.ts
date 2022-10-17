@@ -2,7 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { when } from 'lit/directives/when.js';
-import { UmbObserverMixin } from '../../core/observer';
+import { UmbObserverMixin } from '../../core/observable-api';
 import { UmbSectionStore } from '../../core/stores/section.store';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import type { ManifestSection } from '@umbraco-cms/models';

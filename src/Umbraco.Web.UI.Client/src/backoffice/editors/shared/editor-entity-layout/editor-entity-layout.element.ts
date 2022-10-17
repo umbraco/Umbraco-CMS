@@ -4,7 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { IRoute, IRoutingInfo, PageComponent, RouterSlot } from 'router-slot';
 import { map } from 'rxjs';
 
-import { UmbObserverMixin } from '../../../../core/observer';
+import { UmbObserverMixin } from '../../../../core/observable-api';
 import { createExtensionElement, UmbExtensionRegistry } from '@umbraco-cms/extensions-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { ManifestEditorAction, ManifestEditorView } from '@umbraco-cms/models';

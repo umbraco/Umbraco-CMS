@@ -5,7 +5,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { UmbNotificationService } from '../../../core/services/notification';
 import { UmbDataTypeStore } from '../../../core/stores/data-type/data-type.store';
 import { UmbNotificationDefaultData } from '../../../core/services/notification/layouts/default';
-import { UmbObserverMixin } from '../../../core/observer';
+import { UmbObserverMixin } from '../../../core/observable-api';
 import type { DataTypeDetails } from '../../../core/mocks/data/data-type.data';
 import { UmbDataTypeContext } from './data-type.context';
 import { UmbContextProviderMixin, UmbContextConsumerMixin } from '@umbraco-cms/context-api';

@@ -2,7 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
-import { UmbObserverMixin } from '../../core/observer';
+import { UmbObserverMixin } from '../../core/observable-api';
 import type { UmbNotificationService, UmbNotificationHandler } from '../../core/services/notification';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 

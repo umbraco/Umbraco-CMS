@@ -3,7 +3,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { state } from 'lit/decorators.js';
 import { IRoutingInfo } from 'router-slot';
-import { UmbObserverMixin } from '../../core/observer';
+import { UmbObserverMixin } from '../../core/observable-api';
 import { UmbSectionStore } from '../../core/stores/section.store';
 import { UmbSectionContext } from '../sections/section.context';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';

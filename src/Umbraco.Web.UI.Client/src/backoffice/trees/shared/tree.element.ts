@@ -2,7 +2,7 @@ import { html, LitElement } from 'lit';
 import { when } from 'lit-html/directives/when.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
-import { UmbObserverMixin } from '../../../core/observer';
+import { UmbObserverMixin } from '../../../core/observable-api';
 import { UmbTreeContextBase } from '../tree.context';
 import { UmbExtensionRegistry } from '@umbraco-cms/extensions-api';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';

@@ -2,7 +2,7 @@ import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
 import { UUITextStyles } from '@umbraco-ui/uui';
-import { UmbObserverMixin } from '../../../../core/observer';
+import { UmbObserverMixin } from '../../../../core/observable-api';
 import { UmbPropertyActionMenuContext } from './property-action-menu.context';
 import { UmbExtensionRegistry } from '@umbraco-cms/extensions-api';
 

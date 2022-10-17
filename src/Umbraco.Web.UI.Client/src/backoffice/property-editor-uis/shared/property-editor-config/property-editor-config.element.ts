@@ -6,7 +6,7 @@ import {
 	PropertyEditorConfigRef,
 	UmbPropertyEditorConfigStore,
 } from '../../../../core/stores/property-editor-config/property-editor-config.store';
-import { UmbObserverMixin } from '../../../../core/observer';
+import { UmbObserverMixin } from '../../../../core/observable-api';
 import { UmbExtensionRegistry } from '@umbraco-cms/extensions-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { ManifestTypes, PropertyEditorConfigDefaultData, PropertyEditorConfigProperty } from '@umbraco-cms/models';

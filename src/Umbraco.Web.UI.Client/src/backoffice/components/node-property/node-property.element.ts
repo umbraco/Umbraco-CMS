@@ -6,7 +6,7 @@ import { EMPTY, of, switchMap } from 'rxjs';
 
 import { UmbDataTypeStore } from '../../../core/stores/data-type/data-type.store';
 import { NodeProperty } from '../../../core/mocks/data/node.data';
-import { UmbObserverMixin } from '../../../core/observer';
+import { UmbObserverMixin } from '../../../core/observable-api';
 import type { ManifestTypes } from '../../../core/models';
 import { UmbExtensionRegistry } from '@umbraco-cms/extensions-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';

@@ -1,7 +1,7 @@
 import { UUIButtonElement } from '@umbraco-ui/uui';
 import { css, CSSResultGroup, html, LitElement, nothing } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
-import { UmbObserverMixin } from '../../core/observer';
+import { UmbObserverMixin } from '../../core/observable-api';
 import { UmbInstallerContext } from '../installer.context';
 import { postInstallSetup, postInstallValidateDatabase } from '@umbraco-cms/backend-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';

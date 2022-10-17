@@ -4,7 +4,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { distinctUntilChanged } from 'rxjs';
 import type { DocumentTypeEntity } from '../../../../core/mocks/data/document-type.data';
 import { UmbDocumentTypeContext } from '../document-type.context';
-import { UmbObserverMixin } from '../../../../core/observer';
+import { UmbObserverMixin } from '../../../../core/observable-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
 @customElement('umb-editor-view-document-type-design')

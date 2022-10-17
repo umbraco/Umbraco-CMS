@@ -5,7 +5,7 @@ import { IRoutingInfo } from 'router-slot';
 import { first, map } from 'rxjs';
 
 import { UmbSectionContext } from '../../section.context';
-import { UmbObserverMixin } from '../../../../core/observer';
+import { UmbObserverMixin } from '../../../../core/observable-api';
 import { createExtensionElement, UmbExtensionRegistry } from '@umbraco-cms/extensions-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 

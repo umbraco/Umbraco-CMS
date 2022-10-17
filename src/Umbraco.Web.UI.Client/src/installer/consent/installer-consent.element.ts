@@ -1,7 +1,7 @@
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
-import { UmbObserverMixin } from '../../core/observer';
+import { UmbObserverMixin } from '../../core/observable-api';
 import { UmbInstallerContext } from '../installer.context';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { PostInstallRequest, TelemetryModel, UmbracoInstaller } from '@umbraco-cms/models';

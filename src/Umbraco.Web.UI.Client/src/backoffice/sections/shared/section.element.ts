@@ -5,7 +5,7 @@ import { map, switchMap, EMPTY, of } from 'rxjs';
 import { UmbSectionContext } from '../section.context';
 import { UmbEditorEntityElement } from '../../editors/shared/editor-entity/editor-entity.element';
 import { UmbEntityStore } from '../../../core/stores/entity.store';
-import { UmbObserverMixin } from '../../../core/observer';
+import { UmbObserverMixin } from '../../../core/observable-api';
 import { createExtensionElement, UmbExtensionRegistry } from '@umbraco-cms/extensions-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { ManifestTree, ManifestSectionView } from '@umbraco-cms/models';

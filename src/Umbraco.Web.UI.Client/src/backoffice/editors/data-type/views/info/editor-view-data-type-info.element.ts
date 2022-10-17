@@ -4,7 +4,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { distinctUntilChanged } from 'rxjs';
 import { UmbDataTypeContext } from '../../data-type.context';
 import type { DataTypeDetails } from '../../../../../core/mocks/data/data-type.data';
-import { UmbObserverMixin } from '../../../../../core/observer';
+import { UmbObserverMixin } from '../../../../../core/observable-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
 @customElement('umb-editor-view-data-type-info')
