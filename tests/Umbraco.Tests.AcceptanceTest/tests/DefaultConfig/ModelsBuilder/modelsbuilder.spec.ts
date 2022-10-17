@@ -50,7 +50,7 @@ test.describe('Modelsbuilder tests', () => {
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.saveAndPublish));
     await umbracoUi.isSuccessNotificationVisible();
     // Ensure that we can render it on the frontend = we can compile the models and views
-    await umbracoApi.content.verifyRenderedContent("/", "<h1>Hello world!</h1>");
+    await umbracoApi.content.verifyRenderedContent("/", "<h1>Hello world!</h1>", true);
 
     await umbracoApi.content.deleteAllContent();
     await umbracoApi.documentTypes.ensureNameNotExists(docTypeName);
@@ -243,6 +243,7 @@ test.describe('Modelsbuilder tests', () => {
 
     await umbracoApi.content.save(content);
 
+    await page.pause();
     // Navigate to the document type
     await umbracoUi.goToSection(ConstantHelper.sections.settings);
     await umbracoUi.clickElement(umbracoUi.getTreeItem("settings", ["Document Types", docTypeName]));
@@ -272,6 +273,7 @@ test.describe('Modelsbuilder tests', () => {
     await umbracoUi.refreshContentTree();
     await umbracoUi.clickElement(umbracoUi.getTreeItem("content", [contentName]));
     await page.locator("#bod").type("Fancy body text");
+    await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.saveAndPublish))
 
     await umbracoApi.content.verifyRenderedContent("/", "<h1>" + propertyValue + "</h1><p>Fancy body text</p>", true);
 

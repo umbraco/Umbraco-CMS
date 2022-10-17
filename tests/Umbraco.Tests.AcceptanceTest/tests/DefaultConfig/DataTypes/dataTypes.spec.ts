@@ -65,7 +65,7 @@ test.describe('DataTypes', () => {
 
     // Assert
     const expected2 = '<p style="color:FF0000">Lorem ipsum dolor sit amet</p>';
-    await expect(await umbracoApi.content.verifyRenderedContent('/', expected2)).toBeTruthy();
+    await expect(await umbracoApi.content.verifyRenderedContent('/', expected2, true)).toBeTruthy();
 
     // Clean
     await umbracoApi.documentTypes.ensureNameNotExists(name);
@@ -176,7 +176,7 @@ test.describe('DataTypes', () => {
     
     // Testing if the edits match the expected results
     const expected = '<a href="/">UrlPickerContent</a>';
-    await expect(await umbracoApi.content.verifyRenderedContent('/', expected)).toBeTruthy();
+    await expect(await umbracoApi.content.verifyRenderedContent('/', expected, true)).toBeTruthy();
 
     // Clean
     await umbracoApi.documentTypes.ensureNameNotExists(urlPickerDocTypeName);
