@@ -28,6 +28,6 @@
   </PropertyGroup>
   <Target Name="GenerateAppsettingsSchema" BeforeTargets="Build;CopyAppsettingsSchema" Condition="!Exists('$(JsonSchemaPath)') or !Exists('$(JsonSchemaCmsPath)')">
     <Message Text="Generating appsettings-schema.json and appsettings-schema.Umbraco.Cms.json because it doesn't exist" Importance="high" />
-    <Exec WorkingDirectory="$(JsonSchemaProjectPath)" Command="dotnet run -c Release --mainOutputFile &quot;$(JsonSchemaPath)&quot; --cmsOutputFile &quot;$(JsonSchemaCmsPath)&quot;" />
+    <Exec WorkingDirectory="$(JsonSchemaProjectPath)" Command="dotnet run -c Release -- --mainOutputFile &quot;$(JsonSchemaPath)&quot; --cmsOutputFile &quot;$(JsonSchemaCmsPath)&quot;" />
   </Target>
 </Project>
