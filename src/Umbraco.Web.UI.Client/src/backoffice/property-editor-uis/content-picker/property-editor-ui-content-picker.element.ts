@@ -1,15 +1,15 @@
 import { css, html, LitElement, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
-import type { Subscription } from 'rxjs';
 
 import { UmbContextConsumerMixin } from '../../../core/context';
 import type { UmbModalService } from '../../../core/services/modal';
 import type { UmbEntityStore } from '../../../core/stores/entity.store';
 import type { Entity } from '../../../mocks/data/entities';
+import { UmbObserverMixin } from '../../../core/observer';
 
 @customElement('umb-property-editor-ui-content-picker')
-export class UmbPropertyEditorUIContentPickerElement extends UmbContextConsumerMixin(LitElement) {
+export class UmbPropertyEditorUIContentPickerElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -45,7 +45,6 @@ export class UmbPropertyEditorUIContentPickerElement extends UmbContextConsumerM
 
 	private _modalService?: UmbModalService;
 	private _entityStore?: UmbEntityStore;
-	private _pickedEntitiesSubscription?: Subscription;
 
 	constructor() {
 		super();
@@ -58,8 +57,8 @@ export class UmbPropertyEditorUIContentPickerElement extends UmbContextConsumerM
 	}
 
 	private _observePickedEntities() {
-		this._pickedEntitiesSubscription?.unsubscribe();
-		this._pickedEntitiesSubscription = this._entityStore?.getByKeys(this.value).subscribe((entities) => {
+		if (!this._entityStore) return;
+		this.observe<Entity[]>(this._entityStore.getByKeys(this.value), (entities) => {
 			this._items = entities;
 		});
 	}
@@ -91,11 +90,6 @@ export class UmbPropertyEditorUIContentPickerElement extends UmbContextConsumerM
 		this.value = newValue;
 		this._observePickedEntities();
 		this.dispatchEvent(new CustomEvent('property-editor-change', { bubbles: true, composed: true }));
-	}
-
-	disconnectedCallback() {
-		super.disconnectedCallback();
-		this._pickedEntitiesSubscription?.unsubscribe();
 	}
 
 	private _renderItem(item: Entity) {

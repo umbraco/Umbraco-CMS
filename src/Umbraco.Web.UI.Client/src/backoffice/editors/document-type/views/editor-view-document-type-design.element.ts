@@ -1,47 +1,36 @@
 import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
-import { Subscription, distinctUntilChanged } from 'rxjs';
+import { distinctUntilChanged } from 'rxjs';
 import { UmbContextConsumerMixin } from '../../../../core/context';
 import type { DocumentTypeEntity } from '../../../../mocks/data/document-type.data';
 import { UmbDocumentTypeContext } from '../document-type.context';
+import { UmbObserverMixin } from '../../../../core/observer';
 
 @customElement('umb-editor-view-document-type-design')
-export class UmbEditorViewDocumentTypeDesignElement extends UmbContextConsumerMixin(LitElement) {
+export class UmbEditorViewDocumentTypeDesignElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles = [UUITextStyles, css``];
-
-	@property({ type: Object })
-	documentType?: DocumentTypeEntity;
 
 	@state()
 	_documentType?: DocumentTypeEntity;
 
 	private _documentTypeContext?: UmbDocumentTypeContext;
 
-	private _documentTypeSubscription?: Subscription;
-
 	constructor() {
 		super();
 
 		this.consumeContext('umbDocumentTypeContext', (documentTypeContext) => {
 			this._documentTypeContext = documentTypeContext;
-			this._useDocumentType();
+			this._observeDocumentType();
 		});
 	}
 
-	private _useDocumentType() {
-		this._documentTypeSubscription?.unsubscribe();
+	private _observeDocumentType() {
+		if (!this._documentTypeContext) return;
 
-		this._documentTypeSubscription = this._documentTypeContext?.data
-			.pipe(distinctUntilChanged())
-			.subscribe((documentType) => {
-				this._documentType = documentType;
-			});
-	}
-
-	disconnectedCallback(): void {
-		super.disconnectedCallback();
-		this._documentTypeSubscription?.unsubscribe();
+		this.observe<DocumentTypeEntity>(this._documentTypeContext.data.pipe(distinctUntilChanged()), (documentType) => {
+			this._documentType = documentType;
+		});
 	}
 
 	render() {

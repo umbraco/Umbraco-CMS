@@ -2,12 +2,12 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
-import { Subscription } from 'rxjs';
 import { UmbContextConsumerMixin } from '../../core/context';
+import { UmbObserverMixin } from '../../core/observer';
 import { UmbModalHandler, UmbModalService } from '../../core/services/modal';
 
 @customElement('umb-backoffice-modal-container')
-export class UmbBackofficeModalContainer extends UmbContextConsumerMixin(LitElement) {
+export class UmbBackofficeModalContainer extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles: CSSResultGroup = [
 		UUITextStyles,
 		css`
@@ -21,23 +21,22 @@ export class UmbBackofficeModalContainer extends UmbContextConsumerMixin(LitElem
 	private _modals: UmbModalHandler[] = [];
 
 	private _modalService?: UmbModalService;
-	private _modalSubscription?: Subscription;
 
 	constructor() {
 		super();
 
 		this.consumeContext('umbModalService', (modalService: UmbModalService) => {
 			this._modalService = modalService;
-			this._modalSubscription?.unsubscribe();
-			this._modalService?.modals.subscribe((modals: Array<UmbModalHandler>) => {
-				this._modals = modals;
-			});
+			this._observeModals();
 		});
 	}
 
-	disconnectedCallback(): void {
-		super.disconnectedCallback();
-		this._modalSubscription?.unsubscribe();
+	private _observeModals() {
+		if (!this._modalService) return;
+
+		this.observe<UmbModalHandler[]>(this._modalService.modals, (modals) => {
+			this._modals = modals;
+		});
 	}
 
 	render() {

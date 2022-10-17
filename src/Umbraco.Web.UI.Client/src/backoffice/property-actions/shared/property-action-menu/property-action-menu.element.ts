@@ -3,14 +3,17 @@ import '../property-action/property-action.element';
 import { UUITextStyles } from '@umbraco-ui/uui';
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { Subscription, map } from 'rxjs';
+import { map } from 'rxjs';
 import { UmbContextProviderMixin, UmbContextConsumerMixin } from '../../../../core/context';
 import { UmbExtensionRegistry } from '../../../../core/extension';
 import type { ManifestPropertyAction } from '../../../../core/models';
+import { UmbObserverMixin } from '../../../../core/observer';
 import { UmbPropertyActionMenuContext } from './property-action-menu.context';
 
 @customElement('umb-property-action-menu')
-export class UmbPropertyActionMenuElement extends UmbContextProviderMixin(UmbContextConsumerMixin(LitElement)) {
+export class UmbPropertyActionMenuElement extends UmbContextProviderMixin(
+	UmbContextConsumerMixin(UmbObserverMixin(LitElement))
+) {
 	static styles: CSSResultGroup = [
 		UUITextStyles,
 		css`
@@ -54,40 +57,44 @@ export class UmbPropertyActionMenuElement extends UmbContextProviderMixin(UmbCon
 	private _open = false;
 
 	private _extensionRegistry?: UmbExtensionRegistry;
-	private _propertyActionsSubscription?: Subscription;
 	private _propertyActionMenuContext = new UmbPropertyActionMenuContext();
-	private _propertyActionMenuOpenSubscription?: Subscription;
 
 	constructor() {
 		super();
 
-		this._propertyActionMenuOpenSubscription = this._propertyActionMenuContext.isOpen.subscribe((value: boolean) => {
-			this._open = value;
-		});
-
 		this.consumeContext('umbExtensionRegistry', (extensionRegistry: UmbExtensionRegistry) => {
 			this._extensionRegistry = extensionRegistry;
-			this._usePropertyActions();
+			this._observePropertyActions();
 		});
 
 		this.provideContext('umbPropertyActionMenu', this._propertyActionMenuContext);
 	}
 
-	private _usePropertyActions() {
-		this._propertyActionsSubscription?.unsubscribe();
+	connectedCallback(): void {
+		super.connectedCallback();
 
-		this._extensionRegistry
-			?.extensionsOfType('propertyAction')
-			.pipe(
-				map((propertyActions) =>
-					propertyActions.filter((propertyAction) =>
-						propertyAction.meta.propertyEditors.includes(this.propertyEditorUIAlias)
+		this.observe<boolean>(this._propertyActionMenuContext.isOpen, (value) => {
+			this._open = value;
+		});
+	}
+
+	private _observePropertyActions() {
+		if (!this._extensionRegistry) return;
+
+		this.observe<ManifestPropertyAction[]>(
+			this._extensionRegistry
+				.extensionsOfType('propertyAction')
+				.pipe(
+					map((propertyActions) =>
+						propertyActions.filter((propertyAction) =>
+							propertyAction.meta.propertyEditors.includes(this.propertyEditorUIAlias)
+						)
 					)
-				)
-			)
-			.subscribe((extensions) => {
-				this._actions = extensions;
-			});
+				),
+			(propertyActionManifests) => {
+				this._actions = propertyActionManifests;
+			}
+		);
 	}
 
 	private _toggleMenu() {
@@ -98,12 +105,6 @@ export class UmbPropertyActionMenuElement extends UmbContextProviderMixin(UmbCon
 	private _handleClose(event: CustomEvent) {
 		this._open = false;
 		event.stopPropagation();
-	}
-
-	disconnectedCallback() {
-		super.disconnectedCallback();
-		this._propertyActionMenuOpenSubscription?.unsubscribe();
-		this._propertyActionsSubscription?.unsubscribe();
 	}
 
 	render() {

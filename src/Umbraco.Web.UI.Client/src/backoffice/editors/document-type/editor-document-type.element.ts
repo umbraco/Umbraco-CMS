@@ -2,12 +2,13 @@ import { UUIButtonState, UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui'
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { distinctUntilChanged, Subscription } from 'rxjs';
+import { distinctUntilChanged } from 'rxjs';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '../../../core/context';
 import { UmbNotificationService } from '../../../core/services/notification';
 import { UmbDocumentTypeStore } from '../../../core/stores/document-type.store';
 import { DocumentTypeEntity } from '../../../mocks/data/document-type.data';
 import { UmbNotificationDefaultData } from '../../../core/services/notification/layouts/default';
+import { UmbObserverMixin } from '../../../core/observer';
 import { UmbDocumentTypeContext } from './document-type.context';
 
 import '../shared/editor-entity-layout/editor-entity-layout.element';
@@ -17,7 +18,9 @@ import '../shared/editor-entity-layout/editor-entity-layout.element';
 import './views/editor-view-document-type-design.element';
 
 @customElement('umb-editor-document-type')
-export class UmbEditorDocumentTypeElement extends UmbContextProviderMixin(UmbContextConsumerMixin(LitElement)) {
+export class UmbEditorDocumentTypeElement extends UmbContextProviderMixin(
+	UmbContextConsumerMixin(UmbObserverMixin(LitElement))
+) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -47,11 +50,7 @@ export class UmbEditorDocumentTypeElement extends UmbContextProviderMixin(UmbCon
 	private _saveButtonState?: UUIButtonState;
 
 	private _documentTypeContext?: UmbDocumentTypeContext;
-	private _documentTypeContextSubscription?: Subscription;
-
 	private _documentTypeStore?: UmbDocumentTypeStore;
-	private _documentTypeStoreSubscription?: Subscription;
-
 	private _notificationService?: UmbNotificationService;
 
 	constructor() {
@@ -60,36 +59,30 @@ export class UmbEditorDocumentTypeElement extends UmbContextProviderMixin(UmbCon
 		this.consumeAllContexts(['umbDocumentTypeStore', 'umbNotificationService'], (instances) => {
 			this._documentTypeStore = instances['umbDocumentTypeStore'];
 			this._notificationService = instances['umbNotificationService'];
-			this._useDocumentType();
+			this._observeDocumentType();
 		});
 
 		this.provideContext('umbDocumentType', this._documentTypeContext);
 	}
 
-	private _useDocumentType() {
-		this._documentTypeStoreSubscription?.unsubscribe();
+	private _observeDocumentType() {
+		if (!this._documentTypeStore) return;
 
 		// TODO: This should be done in a better way, but for now it works.
-		this._documentTypeStoreSubscription = this._documentTypeStore
-			?.getByKey(this.entityKey)
-			.subscribe((documentType) => {
-				if (!documentType) return; // TODO: Handle nicely if there is no document type
+		this.observe<DocumentTypeEntity>(this._documentTypeStore.getByKey(this.entityKey), (documentType) => {
+			if (!documentType) return; // TODO: Handle nicely if there is no document type
 
-				this._documentTypeContextSubscription?.unsubscribe();
+			if (!this._documentTypeContext) {
+				this._documentTypeContext = new UmbDocumentTypeContext(documentType);
+				this.provideContext('umbDocumentTypeContext', this._documentTypeContext);
+			} else {
+				this._documentTypeContext.update(documentType);
+			}
 
-				if (!this._documentTypeContext) {
-					this._documentTypeContext = new UmbDocumentTypeContext(documentType);
-					this.provideContext('umbDocumentTypeContext', this._documentTypeContext);
-				} else {
-					this._documentTypeContext.update(documentType);
-				}
-
-				this._documentTypeContextSubscription = this._documentTypeContext.data
-					.pipe(distinctUntilChanged())
-					.subscribe((data) => {
-						this._documentType = data;
-					});
+			this.observe<DocumentTypeEntity>(this._documentTypeContext.data.pipe(distinctUntilChanged()), (data) => {
+				this._documentType = data;
 			});
+		});
 	}
 
 	private async _onSave() {
