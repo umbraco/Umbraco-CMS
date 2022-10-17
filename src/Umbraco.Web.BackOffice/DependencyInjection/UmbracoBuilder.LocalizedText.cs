@@ -29,7 +29,7 @@ namespace Umbraco.Extensions
 
 
         /// <summary>
-        ///  Loads the suplimentary localization files from plugins and user config
+        ///  Loads the suplimentary localization files from plugins and user config.
         /// </summary>
         private static IEnumerable<LocalizedTextServiceSupplementaryFileSource> GetSupplementaryFileSources(
             IWebHostEnvironment webHostEnvironment)
@@ -37,10 +37,10 @@ namespace Umbraco.Extensions
             IFileProvider webFileProvider = webHostEnvironment.WebRootFileProvider;
             IFileProvider contentFileProvider = webHostEnvironment.ContentRootFileProvider;
 
-            // gets all langs files in /app_plugins real or virtual locations
+            // Gets all language files in /app_plugins real or virtual locations
             IEnumerable<LocalizedTextServiceSupplementaryFileSource> pluginLangFileSources = GetPluginLanguageFileSources(webFileProvider, Cms.Core.Constants.SystemDirectories.AppPlugins, false);
 
-            // user defined langs that overwrite the default, these should not be used by plugin creators
+            // User defined language files that overwrite the default, these should not be used by plugin creators
             var userConfigLangFolder = Cms.Core.Constants.SystemDirectories.Config
                                             .TrimStart(Cms.Core.Constants.CharArrays.Tilde);
 
