@@ -12,10 +12,6 @@ export class UmbPickerLayoutUserElement extends UmbContextConsumerMixin(UmbModal
 	static styles = [
 		UUITextStyles,
 		css`
-			#sticky-header {
-				position: sticky;
-				top: 0;
-			}
 			uui-input {
 				width: 100%;
 			}
@@ -126,10 +122,8 @@ export class UmbPickerLayoutUserElement extends UmbContextConsumerMixin(UmbModal
 		return html`
 			<umb-editor-entity-layout headline="Select users">
 				<uui-box>
-					<div id="sticky-header">
-						<uui-input></uui-input>
-						<hr />
-					</div>
+					<uui-input></uui-input>
+					<hr />
 					${this._users.map(
 						(item) => html`
 							<div
