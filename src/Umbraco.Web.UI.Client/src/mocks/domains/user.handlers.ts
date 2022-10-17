@@ -1,7 +1,7 @@
 import { rest } from 'msw';
 
 import umbracoPath from '../../core/helpers/umbraco-path';
-import type { AllowedSectionsResponse, UserResponse } from '../../core/models';
+import type { AllowedSectionsResponse, UserResponse } from '@umbraco-cms/models';
 
 let isAuthenticated = false;
 

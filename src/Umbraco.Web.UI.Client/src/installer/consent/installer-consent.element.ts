@@ -4,8 +4,8 @@ import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import { Subscription } from 'rxjs';
 
 import { UmbContextConsumerMixin } from '../../core/context';
-import type { TelemetryModel } from '../../core/models';
 import { UmbInstallerContext } from '../installer.context';
+import type { TelemetryModel } from '@umbraco-cms/models';
 
 @customElement('umb-installer-consent')
 export class UmbInstallerConsentElement extends UmbContextConsumerMixin(LitElement) {

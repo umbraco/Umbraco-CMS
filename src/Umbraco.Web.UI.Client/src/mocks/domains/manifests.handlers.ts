@@ -2,7 +2,7 @@ import { rest } from 'msw';
 
 import umbracoPath from '../../core/helpers/umbraco-path';
 
-import type { ManifestsPackagesInstalledResponse, ManifestsResponse } from '../../core/models';
+import type { ManifestsPackagesInstalledResponse, ManifestsResponse } from '@umbraco-cms/models';
 
 export const manifestDevelopmentHandler = rest.get(umbracoPath('/manifests'), (_req, res, ctx) => {
 	return res(

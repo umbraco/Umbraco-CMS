@@ -6,7 +6,7 @@ import { customElement, state } from 'lit/decorators.js';
 
 import { getUpgradeSettings, PostUpgradeAuthorize } from '../core/api/fetcher';
 
-import type { UmbracoUpgrader } from '../core/models';
+import type { UmbracoUpgrader } from '@umbraco-cms/models';
 
 /**
  * @element umb-upgrader

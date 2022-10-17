@@ -5,7 +5,6 @@ import { Subscription } from 'rxjs';
 import { UmbContextConsumerMixin } from '../../../../../../../core/context';
 import type { UmbSectionViewUsersElement } from '../../section-view-users.element';
 import { UmbUserStore } from '../../../../../../../core/stores/user/user.store';
-import type { UserDetails } from '../../../../../../../core/models';
 import {
 	UmbTableElement,
 	UmbTableColumn,
@@ -15,6 +14,7 @@ import {
 	UmbTableConfig,
 	UmbTableOrderedEvent,
 } from '../../../../../../components/table/table.element';
+import type { UserDetails } from '@umbraco-cms/models';
 
 import './column-layouts/name/user-table-name-column-layout.element';
 import './column-layouts/status/user-table-status-column-layout.element';

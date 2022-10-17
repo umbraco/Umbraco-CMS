@@ -3,8 +3,8 @@ import { customElement, state } from 'lit/decorators.js';
 import { Subscription } from 'rxjs';
 import { UmbContextConsumerMixin } from '../../core/context';
 
-import type { ProblemDetails } from '../../core/models';
 import { UmbInstallerContext } from '../installer.context';
+import type { ProblemDetails } from '@umbraco-cms/models';
 
 @customElement('umb-installer-error')
 export class UmbInstallerErrorElement extends UmbContextConsumerMixin(LitElement) {

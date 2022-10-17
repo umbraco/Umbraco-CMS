@@ -4,8 +4,8 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { map, Subscription } from 'rxjs';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '../../../core/context';
 import { UmbExtensionRegistry } from '../../../core/extension';
-import type { ManifestTree } from '../../../core/models';
 import { UmbTreeContextBase } from '../tree.context';
+import type { ManifestTree } from '@umbraco-cms/models';
 
 @customElement('umb-tree')
 export class UmbTreeElement extends UmbContextProviderMixin(UmbContextConsumerMixin(LitElement)) {

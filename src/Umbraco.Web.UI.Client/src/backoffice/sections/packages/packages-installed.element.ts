@@ -6,7 +6,7 @@ import { repeat } from 'lit/directives/repeat.js';
 
 import { getPackagesInstalled } from '../../../core/api/fetcher';
 
-import type { PackageInstalled } from '../../../core/models';
+import type { PackageInstalled } from '@umbraco-cms/models';
 
 @customElement('umb-packages-installed')
 export class UmbPackagesInstalled extends LitElement {

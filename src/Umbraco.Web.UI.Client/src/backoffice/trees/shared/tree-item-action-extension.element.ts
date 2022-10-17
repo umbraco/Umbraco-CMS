@@ -3,7 +3,7 @@ import { CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 
 import { createExtensionElement } from '../../../core/extension';
-import type { ManifestTreeItemAction } from '../../../core/models';
+import type { ManifestTreeItemAction } from '@umbraco-cms/models';
 
 @customElement('umb-tree-item-action-extension')
 export class UmbTreeItemActionExtensionElement extends LitElement {

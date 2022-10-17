@@ -1,12 +1,11 @@
-import { css, html, LitElement, nothing } from 'lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
+import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { Subscription } from 'rxjs';
+import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
+import { UUIButtonState } from '@umbraco-ui/uui';
 import { UmbContextConsumerMixin } from '../../../../core/context';
 import { UmbUserStore } from '../../../../core/stores/user/user.store';
-import type { UserEntity } from '../../../../core/models';
 import { UmbUserContext } from '../user.context';
-import { UUIButtonState } from '@umbraco-ui/uui';
+
 import { UmbNotificationDefaultData } from '../../../../core/services/notification/layouts/default';
 import { UmbNotificationService } from '../../../../core/services/notification';
 

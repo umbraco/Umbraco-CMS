@@ -7,8 +7,7 @@ import { Subscription } from 'rxjs';
 import { UmbContextConsumerMixin } from '../../../core/context';
 import { UmbExtensionRegistry } from '../../../core/extension';
 import { isManifestElementType } from '../../../core/extension/is-extension.function';
-
-import type { ManifestTypes } from '../../../core/models';
+import type { ManifestTypes } from '@umbraco-cms/models';
 
 @customElement('umb-editor-extensions')
 export class UmbEditorExtensionsElement extends UmbContextConsumerMixin(LitElement) {

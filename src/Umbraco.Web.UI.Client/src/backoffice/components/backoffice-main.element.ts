@@ -7,9 +7,9 @@ import { Subscription } from 'rxjs';
 
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '../../core/context';
 import { createExtensionElement } from '../../core/extension';
-import type { ManifestSection } from '../../core/models';
 import { UmbSectionStore } from '../../core/stores/section.store';
 import { UmbSectionContext } from '../sections/section.context';
+import type { ManifestSection } from '@umbraco-cms/models';
 
 @defineElement('umb-backoffice-main')
 export class UmbBackofficeMain extends UmbContextProviderMixin(UmbContextConsumerMixin(LitElement)) {

@@ -2,14 +2,14 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { Subscription } from 'rxjs';
-import { UmbModalService } from '../../../../../core/services/modal';
 
+import { UmbModalService } from '../../../../../core/services/modal';
 import { UmbContextConsumerMixin } from '../../../../../core/context';
 import { UmbDataTypeContext } from '../../data-type.context';
 import type { DataTypeDetails } from '../../../../../mocks/data/data-type.data';
 import type { UmbExtensionRegistry } from '../../../../../core/extension';
 import type { UmbPropertyEditorStore } from '../../../../../core/stores/property-editor/property-editor.store';
-import type { ManifestPropertyEditorUI } from '../../../../../core/models';
+import type { ManifestPropertyEditorUI } from '@umbraco-cms/models';
 
 import '../../../../property-editor-uis/shared/property-editor-config/property-editor-config.element';
 

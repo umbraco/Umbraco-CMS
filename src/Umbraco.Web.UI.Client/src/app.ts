@@ -17,7 +17,7 @@ import { UmbContextProviderMixin } from './core/context';
 import { UmbExtensionRegistry } from './core/extension';
 import { internalManifests } from './temp-internal-manifests';
 
-import type { ServerStatus } from './core/models';
+import type { ServerStatus } from '@umbraco-cms/models';
 
 @customElement('umb-app')
 export class UmbApp extends UmbContextProviderMixin(LitElement) {

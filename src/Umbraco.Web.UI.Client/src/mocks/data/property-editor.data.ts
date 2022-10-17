@@ -1,6 +1,6 @@
 import { cloneDeep } from 'lodash';
-import type { PropertyEditor } from '../../core/models';
 import { UmbData } from './data';
+import type { PropertyEditor } from '@umbraco-cms/models';
 
 export const data: Array<PropertyEditor> = [
 	{

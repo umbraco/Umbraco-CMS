@@ -4,8 +4,8 @@ import { customElement, query, state } from 'lit/decorators.js';
 import { UmbContextConsumerMixin } from '../../../../../core/context';
 import { UmbModalLayoutElement } from '../../../../../core/services/modal/layouts/modal-layout.element';
 import { UmbUserStore } from '../../../../../core/stores/user/user.store';
-import type { UserDetails } from '../../../../../core/models';
 import { UmbNotificationService } from '../../../../../core/services/notification';
+import type { UserDetails } from '@umbraco-cms/models';
 
 export type UsersViewType = 'list' | 'grid';
 @customElement('umb-editor-view-users-invite')

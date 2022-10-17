@@ -4,8 +4,8 @@ import { customElement, state } from 'lit/decorators.js';
 import { EMPTY, map, of, Subscription, switchMap } from 'rxjs';
 import { UmbContextConsumerMixin } from '../../../../core/context';
 import { UmbExtensionRegistry } from '../../../../core/extension';
-import type { ManifestSectionView } from '../../../../core/models';
 import { UmbSectionContext } from '../../section.context';
+import type { ManifestSectionView } from '@umbraco-cms/models';
 
 @customElement('umb-section-views')
 export class UmbSectionViewsElement extends UmbContextConsumerMixin(LitElement) {

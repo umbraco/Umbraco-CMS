@@ -5,9 +5,9 @@ import { Subscription, map, switchMap, EMPTY, of } from 'rxjs';
 import { UmbContextConsumerMixin } from '../../../core/context';
 import { createExtensionElement, UmbExtensionRegistry } from '../../../core/extension';
 import { UmbSectionContext } from '../section.context';
-import type { ManifestTree, ManifestSectionView } from '../../../core/models';
 import { UmbEditorEntityElement } from '../../editors/shared/editor-entity/editor-entity.element';
 import { UmbEntityStore } from '../../../core/stores/entity.store';
+import type { ManifestTree, ManifestSectionView } from '@umbraco-cms/models';
 
 import './section-trees/section-trees.element.ts';
 import '../shared/section-views/section-views.element.ts';

@@ -6,7 +6,7 @@ import type {
 	ProblemDetails,
 	UmbracoInstaller,
 	UmbracoPerformInstallDatabaseConfiguration,
-} from '../../core/models';
+} from '@umbraco-cms/models';
 
 export const handlers = [
 	rest.get(umbracoPath('/install/settings'), (_req, res, ctx) => {

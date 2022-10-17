@@ -3,7 +3,6 @@ import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { Subscription } from 'rxjs';
 import { UmbContextConsumerMixin } from '../../../../../core/context';
-import type { UserGroupDetails } from '../../../../../core/models';
 import { UmbUserGroupStore } from '../../../../../core/stores/user/user-group.store';
 import UmbTableElement, {
 	UmbTableColumn,
@@ -13,6 +12,7 @@ import UmbTableElement, {
 	UmbTableOrderedEvent,
 	UmbTableSelectedEvent,
 } from '../../../../components/table/table.element';
+import type { UserGroupDetails } from '@umbraco-cms/models';
 
 import './user-group-table-name-column-layout.element';
 

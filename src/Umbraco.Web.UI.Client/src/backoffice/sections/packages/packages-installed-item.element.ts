@@ -5,8 +5,8 @@ import { firstValueFrom, map } from 'rxjs';
 import { UmbContextConsumerMixin } from '../../../core/context';
 import { createExtensionElement, UmbExtensionRegistry } from '../../../core/extension';
 
-import type { ManifestPackageView, PackageInstalled } from '../../../core/models';
 import type { UmbModalService } from '../../../core/services/modal';
+import type { ManifestPackageView, PackageInstalled } from '@umbraco-cms/models';
 
 @customElement('umb-packages-installed-item')
 export class UmbPackagesInstalledItem extends UmbContextConsumerMixin(LitElement) {

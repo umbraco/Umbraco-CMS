@@ -1,5 +1,5 @@
-import type { UserDetails } from '../../core/models';
 import { UmbEntityData } from './entity.data';
+import type { UserDetails } from '@umbraco-cms/models';
 
 // Temp mocked database
 class UmbUsersData extends UmbEntityData<UserDetails> {

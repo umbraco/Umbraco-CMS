@@ -7,8 +7,8 @@ import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { UmbContextConsumerMixin } from '../../../../../../../core/context';
 import UmbSectionViewUsersElement from '../../section-view-users.element';
 import { UmbUserStore } from '../../../../../../../core/stores/user/user.store';
-import type { UserDetails, UserEntity } from '../../../../../../../core/models';
 import { getTagLookAndColor } from '../../../../user-extensions';
+import type { UserDetails, UserEntity } from '@umbraco-cms/models';
 
 @customElement('umb-editor-view-users-grid')
 export class UmbEditorViewUsersGridElement extends UmbContextConsumerMixin(LitElement) {

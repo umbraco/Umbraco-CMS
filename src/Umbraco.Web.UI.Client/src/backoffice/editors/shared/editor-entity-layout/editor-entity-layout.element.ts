@@ -9,7 +9,7 @@ import { map, Subscription } from 'rxjs';
 
 import { UmbContextConsumerMixin } from '../../../../core/context';
 import { createExtensionElement, UmbExtensionRegistry } from '../../../../core/extension';
-import type { ManifestEditorAction, ManifestEditorView } from '../../../../core/models';
+import type { ManifestEditorAction, ManifestEditorView } from '@umbraco-cms/models';
 
 /**
  * @element umb-editor-entity-layout
