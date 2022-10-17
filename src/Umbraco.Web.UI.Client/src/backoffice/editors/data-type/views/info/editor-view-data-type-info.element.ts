@@ -3,7 +3,7 @@ import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { Subscription, distinctUntilChanged } from 'rxjs';
 
-import { UmbContextConsumerMixin } from '../../../../../core/context';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { UmbDataTypeContext } from '../../data-type.context';
 
 import type { DataTypeDetails } from '../../../../../mocks/data/data-type.data';

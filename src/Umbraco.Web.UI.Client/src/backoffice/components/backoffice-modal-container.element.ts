@@ -3,7 +3,7 @@ import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { Subscription } from 'rxjs';
-import { UmbContextConsumerMixin } from '../../core/context';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { UmbModalHandler, UmbModalService } from '../../core/services/modal';
 
 @customElement('umb-backoffice-modal-container')

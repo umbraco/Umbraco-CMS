@@ -9,7 +9,7 @@ import {
 	postPublishedCacheRebuild,
 	getPublishedCacheCollect,
 } from '../../../core/api/fetcher';
-import { UmbContextConsumerMixin } from '../../../core/context';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { UmbModalService } from '../../../core/services/modal';
 import { UmbNotificationService } from '../../../core/services/notification';
 import { UmbNotificationDefaultData } from '../../../core/services/notification/layouts/default';

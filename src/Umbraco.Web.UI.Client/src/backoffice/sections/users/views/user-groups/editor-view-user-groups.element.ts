@@ -2,7 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { Subscription } from 'rxjs';
-import { UmbContextConsumerMixin } from '../../../../../core/context';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { UmbUserGroupStore } from '../../../../../core/stores/user/user-group.store';
 import UmbTableElement, {
 	UmbTableColumn,

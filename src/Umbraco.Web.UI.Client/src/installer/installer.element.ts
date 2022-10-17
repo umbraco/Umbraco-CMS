@@ -9,7 +9,7 @@ import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
 import { Subscription } from 'rxjs';
-import { UmbContextProviderMixin } from '../core/context';
+import { UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import { UmbInstallerContext } from './installer.context';
 
 @customElement('umb-installer')

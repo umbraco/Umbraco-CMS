@@ -1,7 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, LitElement, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbContextProviderMixin } from '../../../../core/context';
+import { UmbContextProviderMixin } from '@umbraco-cms/context-api';
 
 import { ActionPageEntity } from '../tree-item-action.element';
 

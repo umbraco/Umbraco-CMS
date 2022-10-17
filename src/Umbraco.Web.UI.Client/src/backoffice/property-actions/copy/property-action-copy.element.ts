@@ -1,6 +1,6 @@
 import { html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { UmbContextConsumerMixin } from '../../../core/context';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { UmbNotificationDefaultData } from '../../../core/services/notification/layouts/default';
 import type { UmbNotificationService } from '../../../core/services/notification';
 import type { UmbPropertyAction } from '../shared/property-action/property-action.model';

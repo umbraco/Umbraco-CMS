@@ -3,7 +3,7 @@ import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { when } from 'lit/directives/when.js';
 import { Subscription } from 'rxjs';
-import { UmbContextConsumerMixin, UmbContextProviderMixin } from '../../core/context';
+import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import { UmbSectionStore } from '../../core/stores/section.store';
 import type { ManifestSection } from '@umbraco-cms/models';
 

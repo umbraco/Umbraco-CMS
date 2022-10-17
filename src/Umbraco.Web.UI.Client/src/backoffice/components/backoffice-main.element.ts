@@ -5,7 +5,7 @@ import { state } from 'lit/decorators.js';
 import { IRoutingInfo } from 'router-slot';
 import { Subscription } from 'rxjs';
 
-import { UmbContextConsumerMixin, UmbContextProviderMixin } from '../../core/context';
+import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import { createExtensionElement } from '../../core/extension';
 import { UmbSectionStore } from '../../core/stores/section.store';
 import { UmbSectionContext } from '../sections/section.context';

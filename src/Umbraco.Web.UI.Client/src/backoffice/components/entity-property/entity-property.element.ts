@@ -2,7 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement, PropertyValueMap } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { Subscription } from 'rxjs';
-import { UmbContextConsumerMixin } from '../../../core/context';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { createExtensionElement, UmbExtensionRegistry } from '../../../core/extension';
 import type { ManifestPropertyEditorUI } from '@umbraco-cms/models';
 

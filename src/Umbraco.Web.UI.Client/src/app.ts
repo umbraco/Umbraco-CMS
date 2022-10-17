@@ -13,7 +13,7 @@ import { customElement, state } from 'lit/decorators.js';
 
 import type { Guard, IRoute } from 'router-slot/model';
 import { getManifests, getServerStatus } from './core/api/fetcher';
-import { UmbContextProviderMixin } from './core/context';
+import { UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import { UmbExtensionRegistry } from './core/extension';
 import { internalManifests } from './temp-internal-manifests';
 

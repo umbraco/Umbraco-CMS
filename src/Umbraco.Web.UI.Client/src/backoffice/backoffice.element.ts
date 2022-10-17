@@ -17,7 +17,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import type { Subscription } from 'rxjs';
 
-import { UmbContextConsumerMixin, UmbContextProviderMixin } from '../core/context';
+import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import { UmbModalService } from '../core/services/modal';
 import { UmbNotificationService } from '../core/services/notification';
 import { UmbDataTypeStore } from '../core/stores/data-type/data-type.store';

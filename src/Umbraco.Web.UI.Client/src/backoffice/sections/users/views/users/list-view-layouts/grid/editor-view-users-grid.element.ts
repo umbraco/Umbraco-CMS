@@ -4,7 +4,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { Subscription } from 'rxjs';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
-import { UmbContextConsumerMixin } from '../../../../../../../core/context';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import UmbSectionViewUsersElement from '../../section-view-users.element';
 import { UmbUserStore } from '../../../../../../../core/stores/user/user.store';
 import { getTagLookAndColor } from '../../../../user-extensions';

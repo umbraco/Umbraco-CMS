@@ -4,7 +4,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { Subscription } from 'rxjs';
 
 import { UmbModalService } from '../../../../../core/services/modal';
-import { UmbContextConsumerMixin } from '../../../../../core/context';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { UmbDataTypeContext } from '../../data-type.context';
 import type { DataTypeDetails } from '../../../../../mocks/data/data-type.data';
 import type { UmbExtensionRegistry } from '../../../../../core/extension';

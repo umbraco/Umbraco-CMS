@@ -4,7 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { UUIMenuItemEvent } from '@umbraco-ui/uui';
 import { map, Subscription } from 'rxjs';
 import { repeat } from 'lit/directives/repeat.js';
-import { UmbContextConsumerMixin } from '../../../core/context';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { UmbTreeContextBase } from '../tree.context';
 import { UmbSectionContext } from '../../sections/section.context';
 import { Entity } from '../../../mocks/data/entities';

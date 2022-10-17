@@ -1,7 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import { UmbContextConsumerMixin } from '../../../../core/context';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { UmbModalService } from '../../../../core/services/modal';
 import { UmbDataTypeStore } from '../../../../core/stores/data-type/data-type.store';
 import UmbTreeItemActionElement from '../../shared/tree-item-action.element';

@@ -3,7 +3,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { Subscription, distinctUntilChanged } from 'rxjs';
 import { NodeProperty, NodePropertyData } from '../../../../../../mocks/data/node.data';
-import { UmbContextConsumerMixin } from '../../../../../../core/context';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { UmbNodeContext } from '../../node.context';
 
 import '../../../../../components/node-property/node-property.element';

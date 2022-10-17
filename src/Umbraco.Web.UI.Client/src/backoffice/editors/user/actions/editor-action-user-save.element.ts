@@ -2,7 +2,7 @@ import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { UUIButtonState } from '@umbraco-ui/uui';
-import { UmbContextConsumerMixin } from '../../../../core/context';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { UmbUserStore } from '../../../../core/stores/user/user.store';
 import { UmbUserContext } from '../user.context';
 

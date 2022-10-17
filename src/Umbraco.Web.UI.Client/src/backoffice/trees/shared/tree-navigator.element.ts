@@ -3,7 +3,7 @@ import { repeat } from 'lit/directives/repeat.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { Subscription } from 'rxjs';
-import { UmbContextConsumerMixin } from '../../../core/context';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { Entity } from '../../../mocks/data/entities';
 import { UmbTreeDataContextBase } from '../tree-data.context';
 

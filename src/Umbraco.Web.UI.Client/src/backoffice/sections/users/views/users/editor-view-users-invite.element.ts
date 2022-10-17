@@ -1,7 +1,7 @@
 import { css, html, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, query, state } from 'lit/decorators.js';
-import { UmbContextConsumerMixin } from '../../../../../core/context';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { UmbModalLayoutElement } from '../../../../../core/services/modal/layouts/modal-layout.element';
 import { UmbUserStore } from '../../../../../core/stores/user/user.store';
 import { UmbNotificationService } from '../../../../../core/services/notification';

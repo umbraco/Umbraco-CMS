@@ -8,7 +8,7 @@ import './editor-view-users-selection.element';
 import './editor-view-users-invite.element';
 import { IRoute } from 'router-slot';
 import { UUIPopoverElement } from '@umbraco-ui/uui';
-import { UmbContextConsumerMixin } from '../../../../../core/context';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { UmbModalService } from '../../../../../core/services/modal';
 import UmbSectionViewUsersElement from './section-view-users.element';
 

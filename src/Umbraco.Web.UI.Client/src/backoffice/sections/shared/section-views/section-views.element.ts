@@ -2,7 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, LitElement, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { EMPTY, map, of, Subscription, switchMap } from 'rxjs';
-import { UmbContextConsumerMixin } from '../../../../core/context';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { UmbExtensionRegistry } from '../../../../core/extension';
 import { UmbSectionContext } from '../../section.context';
 import type { ManifestSectionView } from '@umbraco-cms/models';
