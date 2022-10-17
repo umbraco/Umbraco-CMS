@@ -302,7 +302,17 @@
 
                 });
             } else {
-                alert("Cannot be edited cause ElementType does not exist.");
+
+              const overlay = {
+                close: () => {
+                  overlayService.close()
+                }
+              };
+
+              localizationService.localize("blockEditor_elementTypeDoesNotExist").then(data => {
+                overlay.content = data;
+                overlayService.open(overlay);
+              });
             }
 
         };
