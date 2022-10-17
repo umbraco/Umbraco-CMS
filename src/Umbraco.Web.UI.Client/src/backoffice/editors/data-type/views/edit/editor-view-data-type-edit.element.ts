@@ -5,10 +5,10 @@ import { UmbModalService } from '../../../../../core/services/modal';
 import { UmbDataTypeContext } from '../../data-type.context';
 import type { DataTypeDetails } from '../../../../../mocks/data/data-type.data';
 import type { UmbPropertyEditorStore } from '../../../../../core/stores/property-editor/property-editor.store';
+import { UmbObserverMixin } from '../../../../../core/observer';
 import type { UmbExtensionRegistry } from '@umbraco-cms/extensions-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { ManifestPropertyEditorUI } from '@umbraco-cms/models';
-import { UmbObserverMixin } from '../../../../../core/observer';
 
 import '../../../../property-editor-uis/shared/property-editor-config/property-editor-config.element';
 

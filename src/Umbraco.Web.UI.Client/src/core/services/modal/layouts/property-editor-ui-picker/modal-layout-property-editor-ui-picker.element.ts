@@ -4,12 +4,12 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { groupBy } from 'lodash';
 import type { UUIInputEvent } from '@umbraco-ui/uui';
+import type { UmbModalHandler } from '../../modal-handler';
+import { UmbObserverMixin } from '../../../../observer';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
-import type { UmbModalHandler } from '../../modal-handler';
 import type { UmbExtensionRegistry } from '@umbraco-cms/extensions-api';
 import type { ManifestPropertyEditorUI } from '@umbraco-cms/models';
-import { UmbObserverMixin } from '../../../../observer';
 
 export interface UmbModalPropertyEditorUIPickerData {
 	selection?: Array<string>;

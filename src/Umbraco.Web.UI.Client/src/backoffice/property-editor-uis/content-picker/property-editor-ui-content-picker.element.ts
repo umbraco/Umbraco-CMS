@@ -5,8 +5,8 @@ import { customElement, property, state } from 'lit/decorators.js';
 import type { UmbModalService } from '../../../core/services/modal';
 import type { UmbEntityStore } from '../../../core/stores/entity.store';
 import type { Entity } from '../../../mocks/data/entities';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { UmbObserverMixin } from '../../../core/observer';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
 @customElement('umb-property-editor-ui-content-picker')
 export class UmbPropertyEditorUIContentPickerElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {

@@ -5,11 +5,11 @@ import { IRoutingInfo } from 'router-slot';
 import { first, map } from 'rxjs';
 
 import { UmbSectionContext } from '../../section.context';
+import { UmbObserverMixin } from '../../../../core/observer';
 import { createExtensionElement, UmbExtensionRegistry } from '@umbraco-cms/extensions-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
 import type { ManifestDashboard, ManifestSection } from '@umbraco-cms/models';
-import { UmbObserverMixin } from '../../../../core/observer';
 
 @customElement('umb-section-dashboards')
 export class UmbSectionDashboardsElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {

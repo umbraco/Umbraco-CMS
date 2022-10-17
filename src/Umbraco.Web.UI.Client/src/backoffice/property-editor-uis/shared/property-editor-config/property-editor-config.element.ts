@@ -2,14 +2,14 @@ import { html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { UmbExtensionRegistry } from '@umbraco-cms/extensions-api';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-import type { ManifestTypes, PropertyEditorConfigDefaultData, PropertyEditorConfigProperty } from '@umbraco-cms/models';
 import {
 	PropertyEditorConfigRef,
 	UmbPropertyEditorConfigStore,
 } from '../../../../core/stores/property-editor-config/property-editor-config.store';
 import { UmbObserverMixin } from '../../../../core/observer';
+import { UmbExtensionRegistry } from '@umbraco-cms/extensions-api';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import type { ManifestTypes, PropertyEditorConfigDefaultData, PropertyEditorConfigProperty } from '@umbraco-cms/models';
 
 import '../../../components/entity-property/entity-property.element';
 

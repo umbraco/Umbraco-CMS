@@ -3,9 +3,9 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { distinctUntilChanged } from 'rxjs';
 import { UmbNodeContext } from '../../node.context';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { UmbObserverMixin } from '../../../../../../core/observer';
 import type { NodeEntity } from '../../../../../../mocks/data/node.data';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
 @customElement('umb-editor-view-node-info')
 export class UmbEditorViewNodeInfoElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
