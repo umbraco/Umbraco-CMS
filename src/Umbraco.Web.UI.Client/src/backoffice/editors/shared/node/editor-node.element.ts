@@ -2,11 +2,12 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
-import { distinctUntilChanged, Subscription } from 'rxjs';
+import { distinctUntilChanged } from 'rxjs';
 import { UmbNodeStore } from '../../../../core/stores/node.store';
 import { NodeEntity } from '../../../../mocks/data/node.data';
 import type { UmbNotificationService } from '../../../../core/services/notification';
 import { UmbNotificationDefaultData } from '../../../../core/services/notification/layouts/default';
+import { UmbObserverMixin } from '../../../../core/observer';
 import { UmbNodeContext } from './node.context';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 
@@ -18,7 +19,9 @@ import './views/edit/editor-view-node-edit.element';
 import './views/info/editor-view-node-info.element';
 
 @customElement('umb-editor-node')
-export class UmbEditorNodeElement extends UmbContextProviderMixin(UmbContextConsumerMixin(LitElement)) {
+export class UmbEditorNodeElement extends UmbContextProviderMixin(
+	UmbContextConsumerMixin(UmbObserverMixin(LitElement))
+) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -60,11 +63,7 @@ export class UmbEditorNodeElement extends UmbContextProviderMixin(UmbContextCons
 	_node?: NodeEntity;
 
 	private _nodeStore?: UmbNodeStore;
-	private _nodeStoreSubscription?: Subscription;
-
 	private _nodeContext?: UmbNodeContext;
-	private _nodeContextSubscription?: Subscription;
-
 	private _notificationService?: UmbNotificationService;
 
 	constructor() {
@@ -100,12 +99,10 @@ export class UmbEditorNodeElement extends UmbContextProviderMixin(UmbContextCons
 	}
 
 	private _useNode() {
-		this._nodeStoreSubscription?.unsubscribe();
+		if (!this._nodeStore) return;
 
-		this._nodeStoreSubscription = this._nodeStore?.getByKey(this.entityKey).subscribe((node) => {
+		this.observe<NodeEntity>(this._nodeStore.getByKey(this.entityKey), (node) => {
 			if (!node) return; // TODO: Handle nicely if there is no node.
-
-			this._nodeContextSubscription?.unsubscribe();
 
 			if (!this._nodeContext) {
 				this._nodeContext = new UmbNodeContext(node);
@@ -114,7 +111,7 @@ export class UmbEditorNodeElement extends UmbContextProviderMixin(UmbContextCons
 				this._nodeContext.update(node);
 			}
 
-			this._nodeContextSubscription = this._nodeContext.data.pipe(distinctUntilChanged()).subscribe((data) => {
+			this.observe<NodeEntity>(this._nodeContext.data.pipe(distinctUntilChanged()), (data) => {
 				this._node = data;
 			});
 		});
@@ -136,13 +133,6 @@ export class UmbEditorNodeElement extends UmbContextProviderMixin(UmbContextCons
 
 	private _onSaveAndPreview() {
 		this._onSave();
-	}
-
-	disconnectedCallback(): void {
-		super.disconnectedCallback();
-		this._nodeStoreSubscription?.unsubscribe();
-		this._nodeContextSubscription?.unsubscribe();
-		delete this._node;
 	}
 
 	// TODO. find a way where we don't have to do this for all editors.

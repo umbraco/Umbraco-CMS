@@ -1,15 +1,16 @@
 import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
-import { map, Subscription } from 'rxjs';
-import { UmbSectionContext } from '../../../sections/section.context';
-import { Entity } from '../../../../mocks/data/entities';
+import { map } from 'rxjs';
 import { UmbExtensionRegistry } from '@umbraco-cms/extensions-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { ManifestTreeItemAction, ManifestTree } from '@umbraco-cms/models';
+import { UmbSectionContext } from '../../../sections/section.context';
+import { Entity } from '../../../../mocks/data/entities';
+import { UmbObserverMixin } from '../../../../core/observer';
 
 @customElement('umb-tree-context-menu-page-action-list')
-export class UmbTreeContextMenuPageActionListElement extends UmbContextConsumerMixin(LitElement) {
+export class UmbTreeContextMenuPageActionListElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -40,10 +41,6 @@ export class UmbTreeContextMenuPageActionListElement extends UmbContextConsumerM
 	private _extensionRegistry?: UmbExtensionRegistry;
 	private _sectionContext?: UmbSectionContext;
 
-	private _treeItemActionsSubscription?: Subscription;
-	private _activeTreeSubscription?: Subscription;
-	private _activeTreeItemSubscription?: Subscription;
-
 	connectedCallback() {
 		super.connectedCallback();
 
@@ -63,28 +60,28 @@ export class UmbTreeContextMenuPageActionListElement extends UmbContextConsumerM
 	private _observeTreeItemActions() {
 		if (!this._extensionRegistry || !this._sectionContext) return;
 
-		this._treeItemActionsSubscription?.unsubscribe();
-
-		this._treeItemActionsSubscription = this._extensionRegistry
-			?.extensionsOfType('treeItemAction')
-			.pipe(map((actions) => actions.filter((action) => action.meta.trees.includes(this._activeTree?.alias || ''))))
-			.subscribe((actions) => {
+		this.observe<ManifestTreeItemAction[]>(
+			this._extensionRegistry
+				.extensionsOfType('treeItemAction')
+				.pipe(map((actions) => actions.filter((action) => action.meta.trees.includes(this._activeTree?.alias || '')))),
+			(actions) => {
 				this._actions = actions;
-			});
+			}
+		);
 	}
 
 	private _observeActiveTree() {
-		this._activeTreeSubscription?.unsubscribe();
+		if (!this._sectionContext) return;
 
-		this._activeTreeSubscription = this._sectionContext?.activeTree.subscribe((tree) => {
+		this.observe(this._sectionContext.activeTree, (tree) => {
 			this._activeTree = tree;
 		});
 	}
 
 	private _observeActiveTreeItem() {
-		this._activeTreeItemSubscription?.unsubscribe();
+		if (!this._sectionContext) return;
 
-		this._activeTreeItemSubscription = this._sectionContext?.activeTreeItem.subscribe((treeItem) => {
+		this.observe(this._sectionContext.activeTreeItem, (treeItem) => {
 			this._activeTreeItem = treeItem;
 		});
 	}
@@ -93,13 +90,6 @@ export class UmbTreeContextMenuPageActionListElement extends UmbContextConsumerM
 		return this._actions.map((action) => {
 			return html`<umb-tree-item-action-extension .treeAction=${action}></umb-tree-item-action-extension> `;
 		});
-	}
-
-	disconnectedCallback(): void {
-		super.disconnectedCallback();
-		this._treeItemActionsSubscription?.unsubscribe();
-		this._activeTreeSubscription?.unsubscribe();
-		this._activeTreeItemSubscription?.unsubscribe();
 	}
 
 	render() {

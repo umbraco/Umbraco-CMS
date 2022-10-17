@@ -15,7 +15,6 @@ import './trees/shared/tree.element';
 import { defineElement } from '@umbraco-ui/uui-base/lib/registration';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
-import type { Subscription } from 'rxjs';
 
 import { UmbModalService } from '../core/services/modal';
 import { UmbNotificationService } from '../core/services/notification';
@@ -51,7 +50,6 @@ export class UmbBackofficeElement extends UmbContextConsumerMixin(UmbContextProv
 	private _umbIconRegistry = new UmbIconStore();
 	private _umbEntityStore = new UmbEntityStore();
 	private _umbSectionStore?: UmbSectionStore;
-	private _currentSectionSubscription?: Subscription;
 
 	constructor() {
 		super();
@@ -74,11 +72,6 @@ export class UmbBackofficeElement extends UmbContextConsumerMixin(UmbContextProv
 			this._umbSectionStore = new UmbSectionStore(extensionRegistry);
 			this.provideContext('umbSectionStore', this._umbSectionStore);
 		});
-	}
-
-	disconnectedCallback(): void {
-		super.disconnectedCallback();
-		this._currentSectionSubscription?.unsubscribe();
 	}
 
 	render() {

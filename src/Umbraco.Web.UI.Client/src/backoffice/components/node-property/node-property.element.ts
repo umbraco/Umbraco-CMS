@@ -2,7 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { customElement, property, state } from 'lit/decorators.js';
-import { EMPTY, of, Subscription, switchMap } from 'rxjs';
+import { EMPTY, of, switchMap } from 'rxjs';
 
 import { UmbDataTypeStore } from '../../../core/stores/data-type/data-type.store';
 import { NodeProperty } from '../../../mocks/data/node.data';
@@ -10,9 +10,11 @@ import { UmbExtensionRegistry } from '@umbraco-cms/extensions-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
 import '../entity-property/entity-property.element';
+import { UmbObserverMixin } from '../../../core/observer';
+import type { ManifestTypes } from '../../../core/models';
 
 @customElement('umb-node-property')
-export class UmbNodePropertyElement extends UmbContextConsumerMixin(LitElement) {
+export class UmbNodePropertyElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -43,7 +45,6 @@ export class UmbNodePropertyElement extends UmbContextConsumerMixin(LitElement) 
 
 	private _extensionRegistry?: UmbExtensionRegistry;
 	private _dataTypeStore?: UmbDataTypeStore;
-	private _dataTypeSubscription?: Subscription;
 
 	constructor() {
 		super();
@@ -58,27 +59,20 @@ export class UmbNodePropertyElement extends UmbContextConsumerMixin(LitElement) 
 	private _observeDataType() {
 		if (!this._dataTypeStore || !this._extensionRegistry || !this._property) return;
 
-		this._dataTypeSubscription?.unsubscribe();
-
-		this._dataTypeSubscription = this._dataTypeStore
-			.getByKey(this._property.dataTypeKey)
-			.pipe(
+		this.observe<ManifestTypes>(
+			this._dataTypeStore.getByKey(this._property.dataTypeKey).pipe(
 				switchMap((dataType) => {
 					if (!dataType?.propertyEditorUIAlias) return EMPTY;
 					this._dataTypeData = dataType.data;
 					return this._extensionRegistry?.getByAlias(dataType.propertyEditorUIAlias) ?? of(null);
 				})
-			)
-			.subscribe((manifest) => {
+			),
+			(manifest) => {
 				if (manifest?.type === 'propertyEditorUI') {
 					this._propertyEditorUIAlias = manifest.alias;
 				}
-			});
-	}
-
-	disconnectedCallback(): void {
-		super.disconnectedCallback();
-		this._dataTypeSubscription?.unsubscribe();
+			}
+		);
 	}
 
 	render() {

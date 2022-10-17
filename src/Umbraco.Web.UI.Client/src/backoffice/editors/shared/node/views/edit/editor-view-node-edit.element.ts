@@ -1,15 +1,16 @@
 import { html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
-import { Subscription, distinctUntilChanged } from 'rxjs';
-import { NodeProperty, NodePropertyData } from '../../../../../../mocks/data/node.data';
+import { distinctUntilChanged } from 'rxjs';
+import { NodeEntity, NodeProperty, NodePropertyData } from '../../../../../../mocks/data/node.data';
 import { UmbNodeContext } from '../../node.context';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
 import '../../../../../components/node-property/node-property.element';
+import { UmbObserverMixin } from '../../../../../../core/observer';
 
 @customElement('umb-editor-view-node-edit')
-export class UmbEditorViewNodeEditElement extends UmbContextConsumerMixin(LitElement) {
+export class UmbEditorViewNodeEditElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles = [UUITextStyles];
 
 	@state()
@@ -19,29 +20,23 @@ export class UmbEditorViewNodeEditElement extends UmbContextConsumerMixin(LitEle
 	_data: NodePropertyData[] = [];
 
 	private _nodeContext?: UmbNodeContext;
-	private _nodeContextSubscription?: Subscription;
 
 	constructor() {
 		super();
 
 		this.consumeContext('umbNodeContext', (nodeContext) => {
 			this._nodeContext = nodeContext;
-			this._useNode();
+			this._observeNode();
 		});
 	}
 
-	private _useNode() {
-		this._nodeContextSubscription?.unsubscribe();
+	private _observeNode() {
+		if (!this._nodeContext) return;
 
-		this._nodeContextSubscription = this._nodeContext?.data.pipe(distinctUntilChanged()).subscribe((node) => {
+		this.observe<NodeEntity>(this._nodeContext.data.pipe(distinctUntilChanged()), (node) => {
 			this._properties = node.properties;
 			this._data = node.data;
 		});
-	}
-
-	disconnectedCallback(): void {
-		super.disconnectedCallback();
-		this._nodeContextSubscription?.unsubscribe();
 	}
 
 	render() {

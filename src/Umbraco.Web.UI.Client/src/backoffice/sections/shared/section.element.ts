@@ -1,19 +1,20 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { Subscription, map, switchMap, EMPTY, of } from 'rxjs';
+import { map, switchMap, EMPTY, of } from 'rxjs';
 import { UmbSectionContext } from '../section.context';
 import { UmbEditorEntityElement } from '../../editors/shared/editor-entity/editor-entity.element';
 import { UmbEntityStore } from '../../../core/stores/entity.store';
 import { createExtensionElement, UmbExtensionRegistry } from '@umbraco-cms/extensions-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { ManifestTree, ManifestSectionView } from '@umbraco-cms/models';
+import { UmbObserverMixin } from '../../../core/observer';
 
 import './section-trees/section-trees.element.ts';
 import '../shared/section-views/section-views.element.ts';
 
 @customElement('umb-section')
-export class UmbSectionElement extends UmbContextConsumerMixin(LitElement) {
+export class UmbSectionElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -53,11 +54,8 @@ export class UmbSectionElement extends UmbContextConsumerMixin(LitElement) {
 	private _views: Array<ManifestSectionView> = [];
 
 	private _entityStore?: UmbEntityStore;
-
 	private _sectionContext?: UmbSectionContext;
 	private _extensionRegistry?: UmbExtensionRegistry;
-	private _treesSubscription?: Subscription;
-	private _viewsSubscription?: Subscription;
 
 	constructor() {
 		super();
@@ -75,10 +73,8 @@ export class UmbSectionElement extends UmbContextConsumerMixin(LitElement) {
 	private _observeTrees() {
 		if (!this._sectionContext || !this._extensionRegistry || !this._entityStore) return;
 
-		this._treesSubscription?.unsubscribe();
-
-		this._treesSubscription = this._sectionContext?.data
-			.pipe(
+		this.observe<ManifestTree[]>(
+			this._sectionContext?.data.pipe(
 				switchMap((section) => {
 					if (!section) return EMPTY;
 
@@ -88,12 +84,13 @@ export class UmbSectionElement extends UmbContextConsumerMixin(LitElement) {
 							.pipe(map((trees) => trees.filter((tree) => tree.meta.sections.includes(section.alias)))) ?? of([])
 					);
 				})
-			)
-			.subscribe((trees) => {
+			),
+			(trees) => {
 				this._trees = trees;
 				if (this._trees.length === 0) return;
 				this._createTreeRoutes();
-			});
+			}
+		);
 	}
 
 	private _createTreeRoutes() {
@@ -125,10 +122,8 @@ export class UmbSectionElement extends UmbContextConsumerMixin(LitElement) {
 	private _observeViews() {
 		if (!this._sectionContext || !this._extensionRegistry || !this._entityStore) return;
 
-		this._viewsSubscription?.unsubscribe();
-
-		this._viewsSubscription = this._sectionContext?.data
-			.pipe(
+		this.observe<ManifestSectionView[]>(
+			this._sectionContext.data.pipe(
 				switchMap((section) => {
 					if (!section) return EMPTY;
 
@@ -144,12 +139,13 @@ export class UmbSectionElement extends UmbContextConsumerMixin(LitElement) {
 							) ?? of([])
 					);
 				})
-			)
-			.subscribe((views) => {
+			),
+			(views) => {
 				this._views = views;
 				if (this._views.length === 0) return;
 				this._createViewRoutes();
-			});
+			}
+		);
 	}
 
 	private _createViewRoutes() {
@@ -168,12 +164,6 @@ export class UmbSectionElement extends UmbContextConsumerMixin(LitElement) {
 			path: '**',
 			redirectTo: 'view/' + this._views?.[0]?.meta.pathname,
 		});
-	}
-
-	disconnectedCallback(): void {
-		super.disconnectedCallback();
-		this._treesSubscription?.unsubscribe();
-		this._viewsSubscription?.unsubscribe();
 	}
 
 	render() {

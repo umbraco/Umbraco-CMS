@@ -1,15 +1,16 @@
-import '../editor-layout/editor-layout.element';
-import '../editor-action-extension/editor-action-extension.element';
-
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { IRoute, IRoutingInfo, PageComponent, RouterSlot } from 'router-slot';
-import { map, Subscription } from 'rxjs';
+import { map } from 'rxjs';
 
 import { createExtensionElement, UmbExtensionRegistry } from '@umbraco-cms/extensions-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { ManifestEditorAction, ManifestEditorView } from '@umbraco-cms/models';
+import { UmbObserverMixin } from '../../../../core/observer';
+
+import '../editor-layout/editor-layout.element';
+import '../editor-action-extension/editor-action-extension.element';
 
 /**
  * @element umb-editor-entity-layout
@@ -24,7 +25,7 @@ import type { ManifestEditorAction, ManifestEditorView } from '@umbraco-cms/mode
  * @extends {UmbContextConsumerMixin(LitElement)}
  */
 @customElement('umb-editor-entity-layout')
-export class UmbEditorEntityLayout extends UmbContextConsumerMixin(LitElement) {
+export class UmbEditorEntityLayout extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -97,8 +98,6 @@ export class UmbEditorEntityLayout extends UmbContextConsumerMixin(LitElement) {
 	private _routes: Array<IRoute> = [];
 
 	private _extensionRegistry?: UmbExtensionRegistry;
-	private _editorViewsSubscription?: Subscription;
-	private _editorActionsSubscription?: Subscription;
 	private _routerFolder = '';
 
 	constructor() {
@@ -118,26 +117,30 @@ export class UmbEditorEntityLayout extends UmbContextConsumerMixin(LitElement) {
 	}
 
 	private _observeEditorViews() {
-		this._editorViewsSubscription?.unsubscribe();
+		if (!this._extensionRegistry) return;
 
-		this._editorViewsSubscription = this._extensionRegistry
-			?.extensionsOfType('editorView')
-			.pipe(map((extensions) => extensions.filter((extension) => extension.meta.editors.includes(this.alias))))
-			.subscribe((editorViews) => {
+		this.observe<ManifestEditorView[]>(
+			this._extensionRegistry
+				.extensionsOfType('editorView')
+				.pipe(map((extensions) => extensions.filter((extension) => extension.meta.editors.includes(this.alias)))),
+			(editorViews) => {
 				this._editorViews = editorViews;
 				this._createRoutes();
-			});
+			}
+		);
 	}
 
 	private _observeEditorActions() {
-		this._editorActionsSubscription?.unsubscribe();
+		if (!this._extensionRegistry) return;
 
-		this._editorActionsSubscription = this._extensionRegistry
-			?.extensionsOfType('editorAction')
-			.pipe(map((extensions) => extensions.filter((extension) => extension.meta.editors.includes(this.alias))))
-			.subscribe((editorActions) => {
+		this.observe(
+			this._extensionRegistry
+				?.extensionsOfType('editorAction')
+				.pipe(map((extensions) => extensions.filter((extension) => extension.meta.editors.includes(this.alias)))),
+			(editorActions) => {
 				this._editorActions = editorActions;
-			});
+			}
+		);
 	}
 
 	private async _createRoutes() {

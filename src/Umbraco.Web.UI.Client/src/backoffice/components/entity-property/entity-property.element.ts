@@ -1,10 +1,10 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement, PropertyValueMap } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { Subscription } from 'rxjs';
 import { createExtensionElement, UmbExtensionRegistry } from '@umbraco-cms/extensions-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-import type { ManifestPropertyEditorUI } from '@umbraco-cms/models';
+import type { ManifestPropertyEditorUI, ManifestTypes } from '@umbraco-cms/models';
+import { UmbObserverMixin } from '../../../core/observer';
 
 import '../../property-actions/shared/property-action-menu/property-action-menu.element';
 import '../../editors/shared/editor-property-layout/editor-property-layout.element';
@@ -15,7 +15,7 @@ import '../../editors/shared/editor-property-layout/editor-property-layout.eleme
  *  The element will also render all Property Actions related to the Property Editor.
  */
 @customElement('umb-entity-property')
-export class UmbEntityPropertyElement extends UmbContextConsumerMixin(LitElement) {
+export class UmbEntityPropertyElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -114,7 +114,6 @@ export class UmbEntityPropertyElement extends UmbContextConsumerMixin(LitElement
 	private _element?: { value?: any; config?: any } & HTMLElement; // TODO: invent interface for propertyEditorUI.
 
 	private _extensionRegistry?: UmbExtensionRegistry;
-	private _propertyEditorUISubscription?: Subscription;
 
 	constructor() {
 		super();
@@ -133,15 +132,11 @@ export class UmbEntityPropertyElement extends UmbContextConsumerMixin(LitElement
 	private _observePropertyEditorUI() {
 		if (!this._extensionRegistry) return;
 
-		this._propertyEditorUISubscription?.unsubscribe();
-
-		this._propertyEditorUISubscription = this._extensionRegistry
-			.getByAlias(this.propertyEditorUIAlias)
-			.subscribe((manifest) => {
-				if (manifest?.type === 'propertyEditorUI') {
-					this._gotData(manifest);
-				}
-			});
+		this.observe<ManifestTypes>(this._extensionRegistry.getByAlias(this.propertyEditorUIAlias), (manifest) => {
+			if (manifest?.type === 'propertyEditorUI') {
+				this._gotData(manifest);
+			}
+		});
 	}
 
 	private _gotData(propertyEditorUIManifest?: ManifestPropertyEditorUI) {
@@ -186,11 +181,6 @@ export class UmbEntityPropertyElement extends UmbContextConsumerMixin(LitElement
 		if (changedProperties.has('config') && this._element) {
 			this._element.config = this.config; // Be aware its duplicated code
 		}
-	}
-
-	disconnectedCallback(): void {
-		super.disconnectedCallback();
-		this._propertyEditorUISubscription?.unsubscribe();
 	}
 
 	render() {

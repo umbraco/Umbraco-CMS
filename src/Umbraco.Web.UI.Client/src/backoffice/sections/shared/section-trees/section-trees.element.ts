@@ -1,26 +1,24 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { map, Subscription, switchMap, EMPTY, of } from 'rxjs';
+import { map, switchMap, EMPTY, of } from 'rxjs';
 
 import { UmbSectionContext } from '../../section.context';
 import { UmbExtensionRegistry } from '@umbraco-cms/extensions-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import { UmbObserverMixin } from '../../../../core/observer';
 
 import '../../../trees/shared/tree-extension.element';
 
 @customElement('umb-section-trees')
-export class UmbSectionTreesElement extends UmbContextConsumerMixin(LitElement) {
+export class UmbSectionTreesElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles = [UUITextStyles];
 
 	@state()
 	private _treeAliases: Array<string> = [];
 
 	private _extensionStore?: UmbExtensionRegistry;
-	private _treesSubscription?: Subscription;
-
 	private _sectionContext?: UmbSectionContext;
-	private _sectionContextSubscription?: Subscription;
 
 	constructor() {
 		super();
@@ -28,17 +26,15 @@ export class UmbSectionTreesElement extends UmbContextConsumerMixin(LitElement) 
 		this.consumeAllContexts(['umbExtensionRegistry', 'umbSectionContext'], (instances) => {
 			this._extensionStore = instances['umbExtensionRegistry'];
 			this._sectionContext = instances['umbSectionContext'];
-			this._useTrees();
+			this._observeTrees();
 		});
 	}
 
-	private _useTrees() {
+	private _observeTrees() {
 		if (!this._extensionStore || !this._sectionContext) return;
 
-		this._treesSubscription?.unsubscribe();
-
-		this._treesSubscription = this._sectionContext?.data
-			.pipe(
+		this.observe<string[]>(
+			this._sectionContext?.data.pipe(
 				switchMap((section) => {
 					if (!section) return EMPTY;
 
@@ -52,16 +48,11 @@ export class UmbSectionTreesElement extends UmbContextConsumerMixin(LitElement) 
 							) ?? of([])
 					);
 				})
-			)
-			.subscribe((treeAliases) => {
+			),
+			(treeAliases) => {
 				this._treeAliases = treeAliases;
-			});
-	}
-
-	disconnectedCallback() {
-		super.disconnectedCallback();
-		this._treesSubscription?.unsubscribe();
-		this._sectionContextSubscription?.unsubscribe();
+			}
+		);
 	}
 
 	render() {

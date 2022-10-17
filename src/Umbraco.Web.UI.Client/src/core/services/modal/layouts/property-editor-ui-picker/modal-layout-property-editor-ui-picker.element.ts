@@ -2,7 +2,6 @@ import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
-import { Subscription } from 'rxjs';
 import { groupBy } from 'lodash';
 import type { UUIInputEvent } from '@umbraco-ui/uui';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
@@ -10,6 +9,7 @@ import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { UmbModalHandler } from '../../modal-handler';
 import type { UmbExtensionRegistry } from '@umbraco-cms/extensions-api';
 import type { ManifestPropertyEditorUI } from '@umbraco-cms/models';
+import { UmbObserverMixin } from '../../../../observer';
 
 export interface UmbModalPropertyEditorUIPickerData {
 	selection?: Array<string>;
@@ -21,7 +21,7 @@ interface GroupedPropertyEditorUIs {
 }
 
 @customElement('umb-modal-layout-property-editor-ui-picker')
-export class UmbModalLayoutPropertyEditorUIPickerElement extends UmbContextConsumerMixin(LitElement) {
+export class UmbModalLayoutPropertyEditorUIPickerElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -105,7 +105,6 @@ export class UmbModalLayoutPropertyEditorUIPickerElement extends UmbContextConsu
 	private _submitLabel = 'Select';
 
 	private _extensionRegistry?: UmbExtensionRegistry;
-	private _propertyEditorUIsSubscription?: Subscription;
 
 	constructor() {
 		super();
@@ -124,14 +123,15 @@ export class UmbModalLayoutPropertyEditorUIPickerElement extends UmbContextConsu
 	}
 
 	private _usePropertyEditorUIs() {
-		if (!this.data) return;
+		if (!this.data || !this._extensionRegistry) return;
 
-		this._propertyEditorUIsSubscription = this._extensionRegistry
-			?.extensionsOfType('propertyEditorUI')
-			.subscribe((propertyEditorUIs) => {
+		this.observe<ManifestPropertyEditorUI[]>(
+			this._extensionRegistry.extensionsOfType('propertyEditorUI'),
+			(propertyEditorUIs) => {
 				this._propertyEditorUIs = propertyEditorUIs;
 				this._groupedPropertyEditorUIs = groupBy(propertyEditorUIs, 'meta.group');
-			});
+			}
+		);
 	}
 
 	private _handleClick(propertyEditorUI: ManifestPropertyEditorUI) {
@@ -163,11 +163,6 @@ export class UmbModalLayoutPropertyEditorUIPickerElement extends UmbContextConsu
 
 	private _submit() {
 		this.modalHandler?.close({ selection: this._selection });
-	}
-
-	disconnectedCallback(): void {
-		super.disconnectedCallback();
-		this._propertyEditorUIsSubscription?.unsubscribe();
 	}
 
 	render() {

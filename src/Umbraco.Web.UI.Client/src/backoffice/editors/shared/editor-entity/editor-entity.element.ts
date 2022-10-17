@@ -6,9 +6,10 @@ import { map } from 'rxjs';
 import { createExtensionElement, UmbExtensionRegistry } from '@umbraco-cms/extensions-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { ManifestEditor } from '@umbraco-cms/models';
+import { UmbObserverMixin } from '../../../../core/observer';
 
 @customElement('umb-editor-entity')
-export class UmbEditorEntityElement extends UmbContextConsumerMixin(LitElement) {
+export class UmbEditorEntityElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -30,7 +31,7 @@ export class UmbEditorEntityElement extends UmbContextConsumerMixin(LitElement) 
 	}
 	public set entityType(value: string) {
 		this._entityType = value;
-		this._useEditors();
+		this._observeEditors();
 	}
 
 	@state()
@@ -43,19 +44,21 @@ export class UmbEditorEntityElement extends UmbContextConsumerMixin(LitElement) 
 
 		this.consumeContext('umbExtensionRegistry', (extensionRegistry: UmbExtensionRegistry) => {
 			this._extensionRegistry = extensionRegistry;
-			this._useEditors();
+			this._observeEditors();
 		});
 	}
 
-	private _useEditors() {
+	private _observeEditors() {
 		if (!this._extensionRegistry) return;
 
-		this._extensionRegistry
-			.extensionsOfType('editor')
-			.pipe(map((editors) => editors.find((editor) => editor.meta.entityType === this.entityType)))
-			.subscribe((editor) => {
+		this.observe<ManifestEditor>(
+			this._extensionRegistry
+				.extensionsOfType('editor')
+				.pipe(map((editors) => editors.find((editor) => editor.meta.entityType === this.entityType))),
+			(editor) => {
 				this._createElement(editor);
-			});
+			}
+		);
 	}
 
 	private async _createElement(editor?: ManifestEditor) {

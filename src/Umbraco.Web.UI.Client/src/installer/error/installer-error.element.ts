@@ -1,13 +1,12 @@
 import { css, CSSResultGroup, html, LitElement, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { Subscription } from 'rxjs';
+import { UmbObserverMixin } from '../../core/observer';
 import { UmbInstallerContext } from '../installer.context';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-
 import type { ProblemDetails } from '@umbraco-cms/models';
 
 @customElement('umb-installer-error')
-export class UmbInstallerErrorElement extends UmbContextConsumerMixin(LitElement) {
+export class UmbInstallerErrorElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles: CSSResultGroup = [
 		css`
 			:host,
@@ -31,7 +30,6 @@ export class UmbInstallerErrorElement extends UmbContextConsumerMixin(LitElement
 	_error?: ProblemDetails;
 
 	private _installerContext?: UmbInstallerContext;
-	private _installStatusSubscription?: Subscription;
 
 	connectedCallback() {
 		super.connectedCallback();
@@ -43,9 +41,9 @@ export class UmbInstallerErrorElement extends UmbContextConsumerMixin(LitElement
 	}
 
 	private _observeInstallStatus() {
-		this._installStatusSubscription?.unsubscribe();
+		if (!this._installerContext) return;
 
-		this._installerContext?.installStatusChanges().subscribe((status) => {
+		this.observe(this._installerContext.installStatusChanges(), (status) => {
 			if (status) {
 				this._error = status;
 			}
@@ -71,11 +69,6 @@ export class UmbInstallerErrorElement extends UmbContextConsumerMixin(LitElement
 				${Object.keys(errors).map((key) => html` <li>${key}: ${(errors[key] as string[]).join(', ')}</li> `)}
 			</ul>
 		`;
-	}
-
-	disconnectedCallback(): void {
-		super.disconnectedCallback();
-		this._installStatusSubscription?.unsubscribe();
 	}
 
 	render() {

@@ -1,15 +1,19 @@
 import { UUIButtonElement } from '@umbraco-ui/uui';
 import { css, CSSResultGroup, html, LitElement, nothing } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
-import { Subscription } from 'rxjs';
-
+import { UmbObserverMixin } from '../../core/observer';
 import { UmbInstallerContext } from '../installer.context';
 import { postInstallSetup, postInstallValidateDatabase } from '@umbraco-cms/backend-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-import type { UmbracoInstallerDatabaseModel, UmbracoPerformInstallDatabaseConfiguration } from '@umbraco-cms/models';
+import type {
+	PostInstallRequest,
+	UmbracoInstaller,
+	UmbracoInstallerDatabaseModel,
+	UmbracoPerformInstallDatabaseConfiguration,
+} from '@umbraco-cms/models';
 
 @customElement('umb-installer-database')
-export class UmbInstallerDatabaseElement extends UmbContextConsumerMixin(LitElement) {
+export class UmbInstallerDatabaseElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles: CSSResultGroup = [
 		css`
 			:host,
@@ -93,8 +97,6 @@ export class UmbInstallerDatabaseElement extends UmbContextConsumerMixin(LitElem
 	private _validationErrorMessage = '';
 
 	private _installerContext?: UmbInstallerContext;
-	private _installerDataSubscription?: Subscription;
-	private _installerSettingsSubscription?: Subscription;
 
 	constructor() {
 		super();
@@ -107,8 +109,9 @@ export class UmbInstallerDatabaseElement extends UmbContextConsumerMixin(LitElem
 	}
 
 	private _observeInstallerSettings() {
-		this._installerSettingsSubscription?.unsubscribe();
-		this._installerSettingsSubscription = this._installerContext?.settings.subscribe((settings) => {
+		if (!this._installerContext) return;
+
+		this.observe<UmbracoInstaller>(this._installerContext.settings, (settings) => {
 			this._databases = settings.databases;
 
 			// If there is an isConfigured database in the databases array then we can skip the database selection step
@@ -121,17 +124,12 @@ export class UmbInstallerDatabaseElement extends UmbContextConsumerMixin(LitElem
 	}
 
 	private _observeInstallerData() {
-		this._installerDataSubscription?.unsubscribe();
-		this._installerDataSubscription = this._installerContext?.data.subscribe((data) => {
+		if (!this._installerContext) return;
+
+		this.observe<PostInstallRequest>(this._installerContext.data, (data) => {
 			this.databaseFormData = data.database ?? {};
 			this._options.forEach((x, i) => (x.selected = data.database?.id === x.value || i === 0));
 		});
-	}
-
-	disconnectedCallback(): void {
-		super.disconnectedCallback();
-		this._installerSettingsSubscription?.unsubscribe();
-		this._installerDataSubscription?.unsubscribe();
 	}
 
 	private _handleChange(e: InputEvent) {
