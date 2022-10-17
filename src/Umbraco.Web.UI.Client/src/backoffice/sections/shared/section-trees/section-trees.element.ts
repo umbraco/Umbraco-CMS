@@ -23,14 +23,9 @@ export class UmbSectionTreesElement extends UmbContextConsumerMixin(UmbObserverM
 	constructor() {
 		super();
 
-		// TODO: wait for more contexts
-		this.consumeContext('umbExtensionRegistry', (extensionStore: UmbExtensionRegistry) => {
-			this._extensionStore = extensionStore;
-			this._observeTrees();
-		});
-
-		this.consumeContext('umbSectionContext', (sectionContext: UmbSectionContext) => {
-			this._sectionContext = sectionContext;
+		this.consumeAllContexts(['umbExtensionRegistry', 'umbSectionContext'], (instances) => {
+			this._extensionStore = instances['umbExtensionRegistry'];
+			this._sectionContext = instances['umbSectionContext'];
 			this._observeTrees();
 		});
 	}

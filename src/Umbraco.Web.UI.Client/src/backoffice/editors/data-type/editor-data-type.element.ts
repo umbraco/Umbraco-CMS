@@ -51,13 +51,10 @@ export class UmbEditorDataTypeElement extends UmbContextProviderMixin(
 	constructor() {
 		super();
 
-		this.consumeContext('umbDataTypeStore', (store: UmbDataTypeStore) => {
-			this._dataTypeStore = store;
+		this.consumeAllContexts(['umbDataTypeStore', 'umbNotificationService'], (instances) => {
+			this._dataTypeStore = instances['umbDataTypeStore'];
+			this._notificationService = instances['umbNotificationService'];
 			this._observeDataType();
-		});
-
-		this.consumeContext('umbNotificationService', (service: UmbNotificationService) => {
-			this._notificationService = service;
 		});
 
 		this.addEventListener('property-value-change', this._onPropertyValueChange);

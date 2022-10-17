@@ -56,13 +56,10 @@ export class UmbEditorDocumentTypeElement extends UmbContextProviderMixin(
 	constructor() {
 		super();
 
-		this.consumeContext('umbDocumentTypeStore', (store: UmbDocumentTypeStore) => {
-			this._documentTypeStore = store;
+		this.consumeAllContexts(['umbDocumentTypeStore', 'umbNotificationService'], (instances) => {
+			this._documentTypeStore = instances['umbDocumentTypeStore'];
+			this._notificationService = instances['umbNotificationService'];
 			this._observeDocumentType();
-		});
-
-		this.consumeContext('umbNotificationService', (service: UmbNotificationService) => {
-			this._notificationService = service;
 		});
 
 		this.provideContext('umbDocumentType', this._documentTypeContext);

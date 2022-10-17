@@ -49,14 +49,9 @@ export class UmbNodePropertyElement extends UmbContextConsumerMixin(UmbObserverM
 	constructor() {
 		super();
 
-		// TODO: solution to know when both contexts are available
-		this.consumeContext('umbDataTypeStore', (_instance: UmbDataTypeStore) => {
-			this._dataTypeStore = _instance;
-			this._observeDataType();
-		});
-
-		this.consumeContext('umbExtensionRegistry', (_instance: UmbExtensionRegistry) => {
-			this._extensionRegistry = _instance;
+		this.consumeAllContexts(['umbDataTypeStore', 'umbExtensionRegistry'], (instances) => {
+			this._extensionRegistry = instances['umbExtensionRegistry'];
+			this._dataTypeStore = instances['umbDataTypeStore'];
 			this._observeDataType();
 		});
 	}

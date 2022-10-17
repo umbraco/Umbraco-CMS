@@ -24,16 +24,10 @@ export class UmbEditorActionUserSaveElement extends UmbContextConsumerMixin(LitE
 	connectedCallback(): void {
 		super.connectedCallback();
 
-		this.consumeContext('umbUserStore', (userStore: UmbUserStore) => {
-			this._userStore = userStore;
-		});
-
-		this.consumeContext('umbUserContext', (userContext: UmbUserContext) => {
-			this._userContext = userContext;
-		});
-
-		this.consumeContext('umbNotificationService', (service: UmbNotificationService) => {
-			this._notificationService = service;
+		this.consumeAllContexts(['umbUserStore', 'umbUserContext', 'umbNotificationService'], (instances) => {
+			this._userStore = instances['umbUserStore'];
+			this._userContext = instances['umbUserContext'];
+			this._notificationService = instances['umbNotificationService'];
 		});
 	}
 

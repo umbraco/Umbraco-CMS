@@ -2,7 +2,7 @@ import { expect, fixture, html } from '@open-wc/testing';
 import { LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
 
-import { UmbContextConsumerMixin } from './context-consumer.mixin';
+import { UmbContextConsumerMixin } from '../consume/context-consumer.mixin';
 import { UmbContextProviderElement } from './context-provider.element';
 
 @customElement('umb-context-test')
