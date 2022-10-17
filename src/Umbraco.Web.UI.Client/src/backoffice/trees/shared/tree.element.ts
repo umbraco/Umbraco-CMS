@@ -2,8 +2,8 @@ import { html, LitElement } from 'lit';
 import { when } from 'lit-html/directives/when.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { map, Subscription } from 'rxjs';
-import { UmbExtensionRegistry } from '../../../core/extension';
 import { UmbTreeContextBase } from '../tree.context';
+import { UmbExtensionRegistry } from '@umbraco-cms/extensions-api';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import type { ManifestTree } from '@umbraco-cms/models';
 

@@ -5,8 +5,8 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { EMPTY, of, Subscription, switchMap } from 'rxjs';
 
 import { UmbDataTypeStore } from '../../../core/stores/data-type/data-type.store';
-import { UmbExtensionRegistry } from '../../../core/extension';
 import { NodeProperty } from '../../../mocks/data/node.data';
+import { UmbExtensionRegistry } from '@umbraco-cms/extensions-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
 import '../entity-property/entity-property.element';

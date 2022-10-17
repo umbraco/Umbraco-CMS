@@ -12,7 +12,7 @@ import { initialize, mswDecorator } from 'msw-storybook-addon';
 import { setCustomElements } from '@storybook/web-components';
 
 import customElementManifests from '../custom-elements.json';
-import { UmbExtensionRegistry } from '../src/core/extension';
+import { UmbExtensionRegistry } from '@umbraco-cms/extensions-api';
 import { UmbDataTypeStore } from '../src/core/stores/data-type/data-type.store';
 import { UmbDocumentTypeStore } from '../src/core/stores/document-type.store';
 import { UmbNodeStore } from '../src/core/stores/node.store';

@@ -2,7 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui';
 import { CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 
-import { createExtensionElement } from '../../../core/extension';
+import { createExtensionElement } from '@umbraco-cms/extensions-api';
 import type { ManifestTreeItemAction } from '@umbraco-cms/models';
 
 @customElement('umb-tree-item-action-extension')

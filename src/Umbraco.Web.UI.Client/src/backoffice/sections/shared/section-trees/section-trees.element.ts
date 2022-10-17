@@ -3,8 +3,8 @@ import { html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { map, Subscription, switchMap, EMPTY, of } from 'rxjs';
 
-import { UmbExtensionRegistry } from '../../../../core/extension';
 import { UmbSectionContext } from '../../section.context';
+import { UmbExtensionRegistry } from '@umbraco-cms/extensions-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
 import '../../../trees/shared/tree-extension.element';

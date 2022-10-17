@@ -4,8 +4,8 @@ import { customElement, state } from 'lit/decorators.js';
 import { IRoutingInfo } from 'router-slot';
 import { first, map, Subscription } from 'rxjs';
 
-import { createExtensionElement, UmbExtensionRegistry } from '../../../../core/extension';
 import { UmbSectionContext } from '../../section.context';
+import { createExtensionElement, UmbExtensionRegistry } from '@umbraco-cms/extensions-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
 import type { ManifestDashboard } from '@umbraco-cms/models';

@@ -6,8 +6,8 @@ import { Subscription } from 'rxjs';
 import { UmbModalService } from '../../../../../core/services/modal';
 import { UmbDataTypeContext } from '../../data-type.context';
 import type { DataTypeDetails } from '../../../../../mocks/data/data-type.data';
-import type { UmbExtensionRegistry } from '../../../../../core/extension';
 import type { UmbPropertyEditorStore } from '../../../../../core/stores/property-editor/property-editor.store';
+import type { UmbExtensionRegistry } from '@umbraco-cms/extensions-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { ManifestPropertyEditorUI } from '@umbraco-cms/models';
 

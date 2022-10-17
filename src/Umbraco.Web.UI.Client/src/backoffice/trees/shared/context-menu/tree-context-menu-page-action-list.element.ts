@@ -2,9 +2,9 @@ import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { map, Subscription } from 'rxjs';
-import { UmbExtensionRegistry } from '../../../../core/extension';
 import { UmbSectionContext } from '../../../sections/section.context';
 import { Entity } from '../../../../mocks/data/entities';
+import { UmbExtensionRegistry } from '@umbraco-cms/extensions-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { ManifestTreeItemAction, ManifestTree } from '@umbraco-cms/models';
 

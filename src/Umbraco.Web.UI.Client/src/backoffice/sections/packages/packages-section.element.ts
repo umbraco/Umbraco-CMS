@@ -4,7 +4,7 @@ import { html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { IRoute, IRoutingInfo } from 'router-slot';
 
-import { UmbExtensionRegistry } from '../../../core/extension';
+import { UmbExtensionRegistry } from '@umbraco-cms/extensions-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
 @customElement('umb-packages-section')

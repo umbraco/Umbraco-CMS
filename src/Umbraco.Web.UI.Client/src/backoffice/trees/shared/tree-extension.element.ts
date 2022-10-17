@@ -1,7 +1,7 @@
 import { CSSResultGroup, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
-import { createExtensionElement } from '../../../core/extension';
+import { createExtensionElement } from '@umbraco-cms/extensions-api';
 import type { ManifestTree } from '@umbraco-cms/models';
 
 import './context-menu/tree-context-menu-page-action-list.element';

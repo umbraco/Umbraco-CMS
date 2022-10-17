@@ -4,8 +4,7 @@ import { html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { Subscription } from 'rxjs';
 
-import { UmbExtensionRegistry } from '../../../core/extension';
-import { isManifestElementType } from '../../../core/extension/is-extension.function';
+import { UmbExtensionRegistry, isManifestElementType } from '@umbraco-cms/extensions-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { ManifestTypes } from '@umbraco-cms/models';
 
