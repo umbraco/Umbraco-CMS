@@ -1,15 +1,11 @@
-﻿using System.Reflection;
-using System.Text;
-using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Services;
+﻿using Umbraco.Cms.Infrastructure.Templates.PartialViews;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_10_3_0;
 
 public class AddBlockGridPartialViews : MigrationBase
 {
+    private readonly IPartialViewPopulator _partialViewPopulator;
     private const string FolderPath = "/Views/Partials/blockgrid";
-    private const string AssemblyPath = "Umbraco.Cms.Core.EmbeddedResources.BlockGrid";
     private static readonly string[] _filesToAdd =
     {
         "areas.cshtml",
@@ -17,45 +13,19 @@ public class AddBlockGridPartialViews : MigrationBase
         "items.cshtml",
     };
 
-    private readonly IFileService _fileService;
-
-    public AddBlockGridPartialViews(IMigrationContext context, IFileService fileService) : base(context)
-    {
-        _fileService = fileService;
-    }
+    public AddBlockGridPartialViews(IMigrationContext context, IPartialViewPopulator partialViewPopulator) : base(context)
+        => _partialViewPopulator = partialViewPopulator;
 
     protected override void Migrate()
     {
-        // Get the files from the embedded resources, just using typeof of anything from the core assembly.
-        Assembly assembly = typeof(Constants).Assembly;
+        var embeddedBasePath = _partialViewPopulator.CoreEmbeddedPath + ".BlockGrid";
 
         foreach (var fileName in _filesToAdd)
         {
-            Stream? content = assembly.GetManifestResourceStream($"{AssemblyPath}.{fileName}");
-            if (content is not null)
-            {
-                var viewPath = $"{FolderPath}/{fileName}";
-
-                // We have to ensure that this is idempotent, so only save the view if it does not already exist
-                // We don't want to overwrite any changes made.
-                IPartialView? existingView = _fileService.GetPartialView(viewPath);
-                if (existingView is null)
-                {
-                    var view = new PartialView(PartialViewType.PartialView, viewPath)
-                    {
-                        Content = GetTextFromStream(content)
-                    };
-
-                    _fileService.SavePartialView(view);
-                }
-            }
+            _partialViewPopulator.CopyPartialViewIfNotExists(
+                _partialViewPopulator.GetCoreAssembly(),
+                $"{embeddedBasePath}.{fileName}",
+                $"{FolderPath}/{fileName}");
         }
-    }
-
-    private string GetTextFromStream(Stream stream)
-    {
-        stream.Seek(0, SeekOrigin.Begin);
-        var streamReader = new StreamReader(stream, Encoding.UTF8);
-        return streamReader.ReadToEnd();
     }
 }

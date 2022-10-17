@@ -23,6 +23,7 @@ using Umbraco.Cms.Infrastructure.Services;
 using Umbraco.Cms.Infrastructure.Services.Implement;
 using Umbraco.Cms.Infrastructure.Telemetry.Providers;
 using Umbraco.Cms.Infrastructure.Templates;
+using Umbraco.Cms.Infrastructure.Templates.PartialViews;
 using Umbraco.Extensions;
 using CacheInstructionService = Umbraco.Cms.Core.Services.Implement.CacheInstructionService;
 
@@ -58,6 +59,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IUserDataService, SystemInformationTelemetryProvider>();
         builder.Services.AddTransient<IUsageInformationService, UsageInformationService>();
         builder.Services.AddSingleton<IEditorConfigurationParser, EditorConfigurationParser>();
+        builder.Services.AddTransient<IPartialViewPopulator, PartialViewPopulator>();
 
         return builder;
     }

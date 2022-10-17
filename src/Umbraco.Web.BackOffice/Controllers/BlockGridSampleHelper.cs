@@ -5,7 +5,7 @@ using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Web.BackOffice.PartialViews;
+using Umbraco.Cms.Infrastructure.Templates.PartialViews;
 using Umbraco.Cms.Web.Common.ActionsResults;
 using Umbraco.Extensions;
 

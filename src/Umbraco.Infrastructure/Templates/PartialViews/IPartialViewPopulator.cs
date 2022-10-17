@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace Umbraco.Cms.Web.BackOffice.PartialViews;
+namespace Umbraco.Cms.Infrastructure.Templates.PartialViews;
 
 /// <summary>
 /// Populates the Partial View file system using other sources, such as RCL.

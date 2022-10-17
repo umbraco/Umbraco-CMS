@@ -4,7 +4,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Cms.Web.BackOffice.PartialViews;
+namespace Umbraco.Cms.Infrastructure.Templates.PartialViews;
 
 /// <inheritdoc />
 internal sealed class PartialViewPopulator : IPartialViewPopulator
