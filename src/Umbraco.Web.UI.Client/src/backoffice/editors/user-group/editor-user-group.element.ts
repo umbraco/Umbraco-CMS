@@ -3,6 +3,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, LitElement, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
+import '../../sections/users/picker.element';
 
 @customElement('umb-editor-user-group')
 export class UmbEditorUserGroupElement extends LitElement {
@@ -186,6 +187,8 @@ export class UmbEditorUserGroupElement extends LitElement {
 				<div>
 					<b>Sections</b>
 					<div class="faded-text">Add sections to give users access</div>
+
+					<umb-picker .picker=${'section'}></umb-picker>
 				</div>
 				<div>
 					<b>Content start nodes</b>
