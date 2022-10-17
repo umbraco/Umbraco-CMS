@@ -81,12 +81,12 @@ export interface IManifest {
 	type: string;
 	alias: string;
 	name: string;
+	weight?: number;
 }
 
 export interface MetaSection {
 	label: string;
 	pathname: string;
-	weight: number;
 }
 
 export interface MetaSectionView {
@@ -98,7 +98,6 @@ export interface MetaSectionView {
 }
 
 export interface MetaTree {
-	weight: number;
 	sections: Array<string>;
 }
 
@@ -110,7 +109,6 @@ export interface MetaTreeItemAction {
 	trees: Array<string>;
 	label: string;
 	icon: string;
-	weight: number;
 }
 export interface MetaPropertyEditorUI {
 	label: string;
@@ -123,14 +121,12 @@ export interface MetaPropertyEditorUI {
 export interface MetaDashboard {
 	sections: string[];
 	pathname: string;
-	weight: number;
 	label?: string;
 }
 
 export interface MetaEditorView {
 	editors: string[];
 	pathname: string;
-	weight: number;
 	label: string;
 	icon: string;
 }
