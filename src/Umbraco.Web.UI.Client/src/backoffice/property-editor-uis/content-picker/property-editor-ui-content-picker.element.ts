@@ -5,7 +5,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import type { UmbModalService } from '../../../core/services/modal';
 import type { UmbEntityStore } from '../../../core/stores/entity.store';
 import type { Entity } from '../../../core/mocks/data/entities';
-import { UmbObserverMixin } from '../../../core/observable-api';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
 @customElement('umb-property-editor-ui-content-picker')

@@ -7,8 +7,8 @@ import { UmbNodeStore } from '../../../../core/stores/node.store';
 import { NodeEntity } from '../../../../core/mocks/data/node.data';
 import type { UmbNotificationService } from '../../../../core/services/notification';
 import { UmbNotificationDefaultData } from '../../../../core/services/notification/layouts/default';
-import { UmbObserverMixin } from '../../../../core/observable-api';
 import { UmbNodeContext } from './node.context';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 
 import '../../shared/editor-entity-layout/editor-entity-layout.element';

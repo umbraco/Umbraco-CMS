@@ -3,8 +3,8 @@ import { repeat } from 'lit/directives/repeat.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { Entity } from '../../../core/mocks/data/entities';
-import { UmbObserverMixin } from '../../../core/observable-api';
 import { UmbTreeDataContextBase } from '../tree-data.context';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
 import './tree-item.element';

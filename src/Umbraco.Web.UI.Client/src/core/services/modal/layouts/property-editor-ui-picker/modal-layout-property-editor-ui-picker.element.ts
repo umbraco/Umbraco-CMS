@@ -5,7 +5,7 @@ import { repeat } from 'lit/directives/repeat.js';
 import { groupBy } from 'lodash';
 import type { UUIInputEvent } from '@umbraco-ui/uui';
 import type { UmbModalHandler } from '../../modal-handler';
-import { UmbObserverMixin } from '../../../../observable-api';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
 import type { UmbExtensionRegistry } from '@umbraco-cms/extensions-api';

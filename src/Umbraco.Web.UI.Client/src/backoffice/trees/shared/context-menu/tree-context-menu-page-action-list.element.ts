@@ -4,7 +4,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
 import { UmbSectionContext } from '../../../sections/section.context';
 import { Entity } from '../../../../core/mocks/data/entities';
-import { UmbObserverMixin } from '../../../../core/observable-api';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbExtensionRegistry } from '@umbraco-cms/extensions-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { ManifestTreeItemAction, ManifestTree } from '@umbraco-cms/models';

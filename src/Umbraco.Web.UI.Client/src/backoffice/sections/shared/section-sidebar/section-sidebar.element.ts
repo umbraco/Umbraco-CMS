@@ -2,8 +2,8 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbSectionContext } from '../../section.context';
-import { UmbObserverMixin } from '../../../../core/observable-api';
-import type { ManifestSection } from '../../../../core/models';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
+import type { ManifestSection } from '@umbraco-cms/models';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
 import '../../../trees/shared/context-menu/tree-context-menu.service';

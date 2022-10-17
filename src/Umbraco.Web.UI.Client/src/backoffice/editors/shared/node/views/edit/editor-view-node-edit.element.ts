@@ -7,7 +7,7 @@ import { UmbNodeContext } from '../../node.context';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
 import '../../../../../components/node-property/node-property.element';
-import { UmbObserverMixin } from '../../../../../../core/observable-api';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 
 @customElement('umb-editor-view-node-edit')
 export class UmbEditorViewNodeEditElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {

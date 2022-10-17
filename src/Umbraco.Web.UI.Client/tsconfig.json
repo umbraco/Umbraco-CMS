@@ -28,6 +28,7 @@
       "@umbraco-cms/backend-api": ["src/core/backend-api"],
       "@umbraco-cms/context-api": ["src/core/context"],
       "@umbraco-cms/extensions-api": ["src/core/extensions-api"],
+      "@umbraco-cms/observable-api": ["src/core/observable-api"],
       "@umbraco-cms/utils": ["src/core/helpers"],
     },
   },

@@ -1,7 +1,7 @@
 import { css, CSSResultGroup, html, LitElement, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbObserverMixin } from '../../core/observable-api';
 import { UmbInstallerContext } from '../installer.context';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { ProblemDetails } from '@umbraco-cms/models';
 

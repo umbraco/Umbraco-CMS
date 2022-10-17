@@ -2,8 +2,8 @@ import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
 import { UUITextStyles } from '@umbraco-ui/uui';
-import { UmbObserverMixin } from '../../../../core/observable-api';
 import { UmbPropertyActionMenuContext } from './property-action-menu.context';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbExtensionRegistry } from '@umbraco-cms/extensions-api';
 
 import { UmbContextProviderMixin, UmbContextConsumerMixin } from '@umbraco-cms/context-api';

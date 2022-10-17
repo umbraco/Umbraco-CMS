@@ -3,8 +3,8 @@ import { customElement, state } from 'lit/decorators.js';
 
 import { UmbContextConsumerMixin } from '../../core/context';
 import type { PostInstallRequest } from '../../core/models';
-import { UmbObserverMixin } from '../../core/observable-api';
 import { UmbInstallerContext } from '../installer.context';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 
 @customElement('umb-installer-user')
 export class UmbInstallerUserElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {

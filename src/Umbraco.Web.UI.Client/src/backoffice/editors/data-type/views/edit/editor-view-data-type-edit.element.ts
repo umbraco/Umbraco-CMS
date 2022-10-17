@@ -5,7 +5,7 @@ import { UmbModalService } from '../../../../../core/services/modal';
 import { UmbDataTypeContext } from '../../data-type.context';
 import type { DataTypeDetails } from '../../../../../core/mocks/data/data-type.data';
 import type { UmbPropertyEditorStore } from '../../../../../core/stores/property-editor/property-editor.store';
-import { UmbObserverMixin } from '../../../../../core/observable-api';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import type { UmbExtensionRegistry } from '@umbraco-cms/extensions-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { ManifestPropertyEditorUI } from '@umbraco-cms/models';
