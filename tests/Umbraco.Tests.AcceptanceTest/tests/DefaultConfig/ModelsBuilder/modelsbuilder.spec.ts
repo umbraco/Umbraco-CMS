@@ -50,7 +50,7 @@ test.describe('Modelsbuilder tests', () => {
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.saveAndPublish));
     await umbracoUi.isSuccessNotificationVisible();
     // Ensure that we can render it on the frontend = we can compile the models and views
-    await umbracoApi.content.verifyRenderedContent("/", "<h1>Hello world!</h1>", true);
+    await umbracoApi.content.verifyRenderedContent("/", "<h1>Hello world!</h1>");
 
     await umbracoApi.content.deleteAllContent();
     await umbracoApi.documentTypes.ensureNameNotExists(docTypeName);
