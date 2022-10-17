@@ -30,7 +30,7 @@ test.describe('Macros', () => {
     await form.locator(".btn-primary").click();
     
     // Adds partial view to macro
-    await page.locator('[label="Macro partial view"]').click();
+    await page.locator('[data-element="property-label-macroPartialViewPickerProperty"]').click();
     await page.locator('[data-element="tree-item-' + partialViewName + '.cshtml"]').click();
     
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.save));

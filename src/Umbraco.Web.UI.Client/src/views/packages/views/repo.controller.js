@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function PackagesRepoController($scope, $timeout, ourPackageRepositoryResource, $q, localizationService) {
+    function PackagesRepoController($scope, $timeout, ourPackageRepositoryResource, $q, localizationService, notificationsService) {
 
         var vm = this;
 
@@ -197,18 +197,14 @@
 
 
         var searchDebounced = _.debounce(function (e) {
+          //a canceler exists, so perform the cancelation operation and reset
+          if (canceler) {
+            canceler.resolve();
+          }
 
-            $scope.$apply(function () {
+          canceler = $q.defer();
 
-                //a canceler exists, so perform the cancelation operation and reset
-                if (canceler) {
-                    canceler.resolve();
-                    canceler = $q.defer();
-                }
-                else {
-                    canceler = $q.defer();
-                }
-
+          $scope.$apply(function () {
                 currSort = vm.searchQuery ? "Default" : "Latest";
 
                 ourPackageRepositoryResource.search(vm.pagination.pageNumber - 1,
@@ -216,7 +212,7 @@
                     currSort,
                     "",
                     vm.searchQuery,
-                    canceler)
+                    canceler.promise)
                     .then(function (pack) {
                         vm.packages = pack.packages;
                         vm.pagination.totalPages = Math.ceil(pack.total / vm.pagination.pageSize);
@@ -224,6 +220,24 @@
                         vm.loading = false;
                         //set back to null so it can be re-created
                         canceler = null;
+                    })
+                    .catch(function (err) {
+                      canceler = null;
+
+                      if (err) {
+                        // If an abort happened, ignore it since it happened because of a new search
+                        if (err.xhrStatus === 'abort') {
+                          return;
+                        }
+
+                        // Otherwise, show the error
+                        if (err.errorMsg) {
+                          notificationsService.error(err.errorMsg);
+                          return;
+                        }
+                      }
+
+                      console.error(err);
                     });
 
             });
