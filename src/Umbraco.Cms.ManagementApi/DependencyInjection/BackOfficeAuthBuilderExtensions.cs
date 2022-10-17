@@ -89,11 +89,12 @@ public static class BackOfficeAuthBuilderExtensions
                 // we may not need it once cookie auth for backoffice is removed - validate and clean up if necessary
                 options.Configure(validationOptions =>
                 {
-                    validationOptions.TokenValidationParameters.AuthenticationType = Constants.Security.BackOfficeAuthenticationType;
+                    validationOptions.TokenValidationParameters.AuthenticationType = Core.Constants.Security.BackOfficeAuthenticationType;
                 });
             });
 
         builder.Services.AddTransient<IBackOfficeApplicationManager, BackOfficeApplicationManager>();
+        builder.Services.AddSingleton<IClientSecretManager, ClientSecretManager>();
         builder.Services.AddSingleton<BackOfficeAuthorizationInitializationMiddleware>();
 
         builder.Services.AddHostedService<DatabaseManager>();
@@ -115,7 +116,7 @@ public static class BackOfficeAuthBuilderExtensions
             DbContext context = scope.ServiceProvider.GetRequiredService<DbContext>();
             await context.Database.EnsureCreatedAsync(cancellationToken);
 
-            // TODO: append BackOfficeAuthorizationInitializationMiddleware to the application and remove this
+            // TODO: add BackOfficeAuthorizationInitializationMiddleware before UseAuthorization (to make it run for unauthorized API requests) and remove this
             IBackOfficeApplicationManager backOfficeApplicationManager = scope.ServiceProvider.GetRequiredService<IBackOfficeApplicationManager>();
             await backOfficeApplicationManager.EnsureBackOfficeApplicationAsync(new Uri("https://localhost:44331/"), cancellationToken);
         }

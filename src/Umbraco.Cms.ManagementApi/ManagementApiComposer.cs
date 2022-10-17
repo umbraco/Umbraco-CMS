@@ -8,10 +8,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using NSwag;
 using NSwag.AspNetCore;
+using NSwag.Generation.Processors.Security;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.ManagementApi.Authorization;
 using Umbraco.Cms.ManagementApi.Configuration;
 using Umbraco.Cms.ManagementApi.DependencyInjection;
 using Umbraco.Cms.Web.Common.ApplicationBuilder;
@@ -64,6 +67,20 @@ public class ManagementApiComposer : IComposer
             {
                 document.Tags = document.Tags.OrderBy(tag => tag.Name).ToList();
             };
+
+            options.AddSecurity("Bearer", Enumerable.Empty<string>(), new OpenApiSecurityScheme
+            {
+                Name = "Umbraco",
+                Type = OpenApiSecuritySchemeType.OAuth2,
+                Description = "Umbraco Authentication",
+                Flow = OpenApiOAuth2Flow.AccessCode,
+                AuthorizationUrl = "/umbraco/api/v1.0/back-office-authentication/authorize",
+                TokenUrl = "/umbraco/api/v1.0/back-office-authentication/token",
+                Scopes = new Dictionary<string, string>(),
+            });
+            // this is documented in OAuth2 setup for swagger, but does not seem to be necessary at the moment.
+            // it is worth try it if operation authentication starts failing.
+            // options.OperationProcessors.Add(new AspNetCoreOperationSecurityScopeProcessor("Bearer"));
         });
 
         services.AddVersionedApiExplorer(options =>
@@ -111,6 +128,7 @@ public class ManagementApiComposer : IComposer
                     {
                         GlobalSettings? settings = provider.GetRequiredService<IOptions<GlobalSettings>>().Value;
                         IHostingEnvironment hostingEnvironment = provider.GetRequiredService<IHostingEnvironment>();
+                        IClientSecretManager clientSecretManager = provider.GetRequiredService<IClientSecretManager>();
                         var officePath = settings.GetBackOfficePath(hostingEnvironment);
                         // serve documents (same as app.UseSwagger())
                         applicationBuilder.UseOpenApi(config =>
@@ -127,6 +145,14 @@ public class ManagementApiComposer : IComposer
                             config.SwaggerRoutes.Add(new SwaggerUi3Route(ApiAllName, swaggerPath));
                             config.OperationsSorter = "alpha";
                             config.TagsSorter = "alpha";
+
+                            config.OAuth2Client = new OAuth2ClientSettings
+                            {
+                                AppName = "Umbraco",
+                                UsePkceWithAuthorizationCodeGrant = true,
+                                ClientId = Constants.OauthClientIds.Swagger,
+                                ClientSecret = clientSecretManager.Get(Constants.OauthClientIds.Swagger)
+                            };
                         });
                     }
                 },
