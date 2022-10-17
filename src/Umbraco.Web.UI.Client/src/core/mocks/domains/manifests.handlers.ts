@@ -1,6 +1,6 @@
 import { rest } from 'msw';
 
-import umbracoPath from '../../core/helpers/umbraco-path';
+import umbracoPath from '../../helpers/umbraco-path';
 
 import type { ManifestsPackagesInstalledResponse, ManifestsResponse } from '@umbraco-cms/models';
 

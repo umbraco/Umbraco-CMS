@@ -5,7 +5,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { EMPTY, of, switchMap } from 'rxjs';
 
 import { UmbDataTypeStore } from '../../../core/stores/data-type/data-type.store';
-import { NodeProperty } from '../../../mocks/data/node.data';
+import { NodeProperty } from '../../../core/mocks/data/node.data';
 import { UmbObserverMixin } from '../../../core/observer';
 import type { ManifestTypes } from '../../../core/models';
 import { UmbExtensionRegistry } from '@umbraco-cms/extensions-api';

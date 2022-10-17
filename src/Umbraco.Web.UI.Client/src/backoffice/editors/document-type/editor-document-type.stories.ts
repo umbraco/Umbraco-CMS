@@ -3,7 +3,7 @@ import './editor-document-type.element';
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit-html';
 
-import { data } from '../../../mocks/data/document-type.data';
+import { data } from '../../../core/mocks/data/document-type.data';
 
 import type { UmbEditorDocumentTypeElement } from './editor-document-type.element';
 

@@ -1,6 +1,6 @@
 import { BehaviorSubject, ReplaySubject } from 'rxjs';
 
-import { Entity } from '../../mocks/data/entities';
+import { Entity } from '../../core/mocks/data/entities';
 import type { ManifestSection, ManifestSectionView, ManifestTree } from '@umbraco-cms/models';
 
 export class UmbSectionContext {

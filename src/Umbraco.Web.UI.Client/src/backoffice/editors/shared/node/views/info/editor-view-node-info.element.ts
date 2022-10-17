@@ -4,7 +4,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { distinctUntilChanged } from 'rxjs';
 import { UmbNodeContext } from '../../node.context';
 import { UmbObserverMixin } from '../../../../../../core/observer';
-import type { NodeEntity } from '../../../../../../mocks/data/node.data';
+import type { NodeEntity } from '../../../../../../core/mocks/data/node.data';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
 @customElement('umb-editor-view-node-info')

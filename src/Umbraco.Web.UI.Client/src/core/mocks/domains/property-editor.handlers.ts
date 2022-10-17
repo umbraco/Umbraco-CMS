@@ -1,12 +1,11 @@
 import { rest } from 'msw';
-import umbracoPath from '../../core/helpers/umbraco-path';
+import umbracoPath from '../../helpers/umbraco-path';
 import { umbPropertyEditorData } from '../data/property-editor.data';
 import type {
 	PropertyEditorsListResponse,
 	PropertyEditorResponse,
 	PropertyEditorConfigResponse,
 } from '@umbraco-cms/models';
-
 
 // TODO: add schema
 export const handlers = [

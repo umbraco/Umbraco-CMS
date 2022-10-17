@@ -2,7 +2,7 @@ import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { distinctUntilChanged } from 'rxjs';
-import type { DocumentTypeEntity } from '../../../../mocks/data/document-type.data';
+import type { DocumentTypeEntity } from '../../../../core/mocks/data/document-type.data';
 import { UmbDocumentTypeContext } from '../document-type.context';
 import { UmbObserverMixin } from '../../../../core/observer';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';

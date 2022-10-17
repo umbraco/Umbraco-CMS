@@ -6,7 +6,7 @@ import { UmbNotificationService } from '../../../core/services/notification';
 import { UmbDataTypeStore } from '../../../core/stores/data-type/data-type.store';
 import { UmbNotificationDefaultData } from '../../../core/services/notification/layouts/default';
 import { UmbObserverMixin } from '../../../core/observer';
-import type { DataTypeDetails } from '../../../mocks/data/data-type.data';
+import type { DataTypeDetails } from '../../../core/mocks/data/data-type.data';
 import { UmbDataTypeContext } from './data-type.context';
 import { UmbContextProviderMixin, UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 

@@ -1,6 +1,6 @@
 import { rest } from 'msw';
 
-import umbracoPath from '../../core/helpers/umbraco-path';
+import umbracoPath from '../../helpers/umbraco-path';
 import type { StatusResponse, VersionResponse } from '@umbraco-cms/models';
 
 export const serverRunningHandler = rest.get(umbracoPath('/server/status'), (_req, res, ctx) => {

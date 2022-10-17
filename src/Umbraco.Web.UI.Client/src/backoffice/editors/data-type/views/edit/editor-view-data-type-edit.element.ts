@@ -3,7 +3,7 @@ import { css, html, LitElement, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbModalService } from '../../../../../core/services/modal';
 import { UmbDataTypeContext } from '../../data-type.context';
-import type { DataTypeDetails } from '../../../../../mocks/data/data-type.data';
+import type { DataTypeDetails } from '../../../../../core/mocks/data/data-type.data';
 import type { UmbPropertyEditorStore } from '../../../../../core/stores/property-editor/property-editor.store';
 import { UmbObserverMixin } from '../../../../../core/observer';
 import type { UmbExtensionRegistry } from '@umbraco-cms/extensions-api';
