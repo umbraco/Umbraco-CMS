@@ -3,7 +3,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Serilog;
-using SixLabors.ImageSharp;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration;
@@ -43,7 +42,6 @@ using Umbraco.Cms.Infrastructure.HealthChecks;
 using Umbraco.Cms.Infrastructure.HostedServices;
 using Umbraco.Cms.Infrastructure.Install;
 using Umbraco.Cms.Infrastructure.Mail;
-using Umbraco.Cms.Infrastructure.Media;
 using Umbraco.Cms.Infrastructure.Migrations;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Migrations.PostMigrations;
@@ -208,12 +206,10 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IBackOfficeExamineSearcher, NoopBackOfficeExamineSearcher>();
 
         builder.Services.AddSingleton<UploadAutoFillProperties>();
+        builder.Services.AddSingleton<IImageDimensionExtractor, NoopImageDimensionExtractor>();
+        builder.Services.AddSingleton<IImageUrlGenerator, NoopImageUrlGenerator>();
 
         builder.Services.AddSingleton<ICronTabParser, NCronTabParser>();
-
-        // Add default ImageSharp configuration and service implementations
-        builder.Services.AddSingleton(Configuration.Default);
-        builder.Services.AddSingleton<IImageDimensionExtractor, ImageSharpDimensionExtractor>();
 
         builder.Services.AddTransient<INodeCountService, NodeCountService>();
         builder.AddInstaller();
