@@ -14,6 +14,7 @@ using Umbraco.Cms.Web.BackOffice.Filters;
 using Umbraco.Cms.Web.BackOffice.Install;
 using Umbraco.Cms.Web.BackOffice.Middleware;
 using Umbraco.Cms.Web.BackOffice.ModelsBuilder;
+using Umbraco.Cms.Web.BackOffice.PartialViews;
 using Umbraco.Cms.Web.BackOffice.Routing;
 using Umbraco.Cms.Web.BackOffice.Security;
 using Umbraco.Cms.Web.BackOffice.Services;
@@ -116,6 +117,8 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IIconService, IconService>();
         builder.Services.AddUnique<IConflictingRouteService, ConflictingRouteService>();
         builder.Services.AddSingleton<UnhandledExceptionLoggerMiddleware>();
+        builder.Services.AddTransient<BlockGridSampleHelper>();
+        builder.Services.AddTransient<IPartialViewPopulator, PartialViewPopulator>();
 
         return builder;
     }
