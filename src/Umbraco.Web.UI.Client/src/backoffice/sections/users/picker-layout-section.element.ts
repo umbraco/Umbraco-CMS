@@ -8,15 +8,15 @@ export class UmbPickerLayoutSectionElement extends UmbModalLayoutElement {
 	static styles = [
 		UUITextStyles,
 		css`
-			.section {
+			.item {
 				color: var(--uui-color-interactive);
 				display: flex;
 				align-items: center;
 				padding: var(--uui-size-2);
-				gap: var(--uui-size-space-2);
+				gap: var(--uui-size-space-4);
 				cursor: pointer;
 			}
-			.section:hover {
+			.item:hover {
 				background-color: var(--uui-color-surface-emphasis);
 				color: var(--uui-color-interactive-emphasis);
 			}
@@ -51,23 +51,23 @@ export class UmbPickerLayoutSectionElement extends UmbModalLayoutElement {
 		},
 	];
 
-	private _handleKeydown(e: KeyboardEvent, sectionKey: string) {
+	private _handleKeydown(e: KeyboardEvent, key: string) {
 		if (e.key === 'Enter') {
-			this._handleSectionClick(sectionKey);
+			this._handleItemClick(key);
 		}
 	}
 
-	private _handleSectionClick(sectionKey: string) {
-		if (this._isSectionSelected(sectionKey)) {
-			this._selection = this._selection.filter((key) => key !== sectionKey);
+	private _handleItemClick(clickedKey: string) {
+		if (this._isSelected(clickedKey)) {
+			this._selection = this._selection.filter((key) => key !== clickedKey);
 		} else {
-			this._selection.push(sectionKey);
+			this._selection.push(clickedKey);
 		}
 		this.requestUpdate('_selection');
 	}
 
-	private _isSectionSelected(sectionKey: string): boolean {
-		return this._selection.includes(sectionKey);
+	private _isSelected(key: string): boolean {
+		return this._selection.includes(key);
 	}
 
 	render() {
@@ -75,13 +75,13 @@ export class UmbPickerLayoutSectionElement extends UmbModalLayoutElement {
 			<umb-editor-entity-layout headline="Select sections">
 				<uui-box>
 					${this.tempData.map(
-						(section) => html`
+						(item) => html`
 							<div
-								@click=${() => this._handleSectionClick(section.key)}
-								@keydown=${(e: KeyboardEvent) => this._handleKeydown(e, section.key)}
-								class="section">
-								<uui-icon name="${this._isSectionSelected(section.key) ? 'check' : 'add'}"></uui-icon>
-								<span>${section.name}</span>
+								@click=${() => this._handleItemClick(item.key)}
+								@keydown=${(e: KeyboardEvent) => this._handleKeydown(e, item.key)}
+								class="item">
+								<uui-icon name="${this._isSelected(item.key) ? 'check' : 'add'}"></uui-icon>
+								<span>${item.name}</span>
 							</div>
 						`
 					)}

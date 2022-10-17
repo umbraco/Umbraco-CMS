@@ -4,6 +4,7 @@ import { UmbContextConsumerMixin } from '../../../core/context';
 import { UmbModalService } from '../../../core/services/modal';
 
 import './picker-layout-section.element';
+import './picker-layout-user.element';
 
 export type PickerLayout = 'section' | 'user' | 'media' | 'content';
 
@@ -29,7 +30,7 @@ export class UmbPickerElement extends UmbContextConsumerMixin(LitElement) {
 			case 'section':
 				return 'umb-picker-layout-section';
 			case 'user':
-				return 'user';
+				return 'umb-picker-layout-user';
 			case 'media':
 				return 'media';
 			case 'content':
@@ -49,9 +50,9 @@ export class UmbPickerElement extends UmbContextConsumerMixin(LitElement) {
 	}
 
 	render() {
-		return html`<uui-button id="add-button" look="placeholder" @click=${this._openPicker} label="open"
-			>Add</uui-button
-		>`;
+		return html`<uui-button id="add-button" look="placeholder" @click=${this._openPicker} label="open">
+			Add
+		</uui-button>`;
 	}
 }
 
