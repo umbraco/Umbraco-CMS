@@ -24,11 +24,11 @@
     "resolveJsonModule": true,
     "baseUrl": ".",
     "paths": {
-      "@umbraco-cms/models": ["./src/core/models"],
-      "@umbraco-cms/backend-api": ["./src/core/backend-api"],
-      "@umbraco-cms/context-api": ["./src/core/context"],
-      "@umbraco-cms/extensions-api": ["./src/core/extension"],
-      "@umbraco-cms/utils": ["./src/core/helpers"],
+      "@umbraco-cms/models": ["src/core/models"],
+      "@umbraco-cms/backend-api": ["src/core/backend-api"],
+      "@umbraco-cms/context-api": ["src/core/context"],
+      "@umbraco-cms/extensions-api": ["src/core/extensions-api"],
+      "@umbraco-cms/utils": ["src/core/helpers"],
     },
   },
   "include": [
