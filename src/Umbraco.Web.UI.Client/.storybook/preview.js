@@ -1,5 +1,5 @@
-import '../src/core/context/context-provider.element';
-import '../src/css/custom-properties.css';
+import '../src/core/context-api/provide/context-provider.element';
+import '../src/core/css/custom-properties.css';
 import '../src/backoffice/components/backoffice-modal-container.element';
 import '@umbraco-ui/uui';
 import '@umbraco-ui/uui-modal';
@@ -12,15 +12,15 @@ import { initialize, mswDecorator } from 'msw-storybook-addon';
 import { setCustomElements } from '@storybook/web-components';
 
 import customElementManifests from '../custom-elements.json';
-import { UmbExtensionRegistry } from '@umbraco-cms/extensions-api';
+import { UmbExtensionRegistry } from '../src/core/extensions-api';
 import { UmbDataTypeStore } from '../src/core/stores/data-type/data-type.store';
 import { UmbDocumentTypeStore } from '../src/core/stores/document-type.store';
 import { UmbNodeStore } from '../src/core/stores/node.store';
 import { UmbPropertyEditorStore } from '../src/core/stores/property-editor/property-editor.store';
 import { UmbPropertyEditorConfigStore } from '../src/core/stores/property-editor-config/property-editor-config.store';
 import { UmbIconStore } from '../src/core/stores/icon/icon.store';
-import { onUnhandledRequest } from '../src/mocks/browser';
-import { handlers } from '../src/mocks/browser-handlers';
+import { onUnhandledRequest } from '../src/core/mocks/browser';
+import { handlers } from '../src/core/mocks/browser-handlers';
 import { internalManifests } from '../src/temp-internal-manifests';
 import { LitElement } from 'lit';
 import { UmbModalService } from '../src/core/services/modal';
