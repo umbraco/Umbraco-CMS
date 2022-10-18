@@ -102,7 +102,14 @@ public static partial class UmbracoBuilderExtensions
         IServiceProvider container)
     {
         IHostingEnvironment hostingEnvironment = container.GetRequiredService<IHostingEnvironment>();
+
+        // TODO: (for >= v13) Rethink whether all language files (.xml and .user.xml) should be located in ~/config/lang
+        // instead of ~/umbraco/config/lang and ~/config/lang.
+        // Currently when extending Umbraco, a new language file that the backoffice will be available in, should be placed
+        // in ~/umbraco/config/lang, while 'user' translation files for overrides are in ~/config/lang (according to our docs).
+        // Such change will be breaking and we would need to document this clearly.
         var subPath = WebPath.Combine(Constants.SystemDirectories.Umbraco, "config", "lang");
+
         var mainLangFolder = new DirectoryInfo(hostingEnvironment.MapPathContentRoot(subPath));
 
         return new LocalizedTextServiceFileSources(
