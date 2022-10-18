@@ -388,7 +388,7 @@ public class DataValueEditor : IDataValueEditor
     {
         if (value is null)
         {
-            Attempt.Succeed<object?>(null);
+            return Attempt.Succeed<object?>(null);
         }
 
         // Ensure empty string and JSON values are converted to null
