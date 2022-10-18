@@ -118,7 +118,6 @@ namespace Umbraco.Cms.Core.Models.Blocks
     /// Represents a layout item with a generic content type for the Block List editor.
     /// </summary>
     /// <typeparam name="T">The type of the content.</typeparam>
-    /// <seealso cref="IPublishedElement" />
     public class BlockGridItem<T> : BlockGridItem
         where T : IPublishedElement
     {
@@ -151,7 +150,6 @@ namespace Umbraco.Cms.Core.Models.Blocks
     /// </summary>
     /// <typeparam name="TContent">The type of the content.</typeparam>
     /// <typeparam name="TSettings">The type of the settings.</typeparam>
-    /// <seealso cref="IPublishedElement" />
     public class BlockGridItem<TContent, TSettings> : BlockGridItem<TContent>
         where TContent : IPublishedElement
         where TSettings : IPublishedElement
