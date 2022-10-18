@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.ComponentModel;
 using Newtonsoft.Json;
 using Umbraco.Cms.Infrastructure.Serialization;
 
@@ -9,6 +10,7 @@ namespace Umbraco.Cms.Core.Models.Blocks;
 /// <summary>
 /// Used for deserializing the block grid layout
 /// </summary>
+[EditorBrowsable(EditorBrowsableState.Never)] // TODO: Remove this for V11/V10.4
 public class BlockGridLayoutItem : IBlockLayoutItem
 {
     [JsonProperty("contentUdi", Required = Required.Always)]

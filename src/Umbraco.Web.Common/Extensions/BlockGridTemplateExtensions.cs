@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.ComponentModel;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Umbraco.Cms.Core.Models.Blocks;
@@ -8,6 +9,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Umbraco.Extensions;
 
+[EditorBrowsable(EditorBrowsableState.Never)]
 public static class BlockGridTemplateExtensions
 {
     public const string DefaultFolder = "blockgrid/";

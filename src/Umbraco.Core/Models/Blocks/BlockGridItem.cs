@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.ComponentModel;
 using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Models.PublishedContent;
 
@@ -9,8 +10,9 @@ namespace Umbraco.Cms.Core.Models.Blocks
     /// <summary>
     /// Represents a layout item for the Block Grid editor.
     /// </summary>
-    /// <seealso cref="Umbraco.Core.Models.Blocks.IBlockReference{Umbraco.Core.Models.PublishedContent.IPublishedElement,Umbraco.Core.Models.PublishedContent.IPublishedElement}" />
+    /// <seealso cref="IBlockReference{TContent,TSettings}" />
     [DataContract(Name = "block", Namespace = "")]
+    [EditorBrowsable(EditorBrowsableState.Never)] // TODO: Remove this for V11/V10.4
     public class BlockGridItem : IBlockReference<IPublishedElement, IPublishedElement>
     {
         /// <summary>
@@ -116,7 +118,6 @@ namespace Umbraco.Cms.Core.Models.Blocks
     /// Represents a layout item with a generic content type for the Block List editor.
     /// </summary>
     /// <typeparam name="T">The type of the content.</typeparam>
-    /// <seealso cref="Umbraco.Core.Models.Blocks.IBlockReference{Umbraco.Core.Models.PublishedContent.IPublishedElement}" />
     public class BlockGridItem<T> : BlockGridItem
         where T : IPublishedElement
     {
@@ -149,7 +150,6 @@ namespace Umbraco.Cms.Core.Models.Blocks
     /// </summary>
     /// <typeparam name="TContent">The type of the content.</typeparam>
     /// <typeparam name="TSettings">The type of the settings.</typeparam>
-    /// <seealso cref="Umbraco.Core.Models.Blocks.IBlockReference{Umbraco.Core.Models.PublishedContent.IPublishedElement}" />
     public class BlockGridItem<TContent, TSettings> : BlockGridItem<TContent>
         where TContent : IPublishedElement
         where TSettings : IPublishedElement
