@@ -1,29 +1,29 @@
 ﻿using Examine;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Examine;
-using Umbraco.Cms.ManagementApi.ViewModels.ExamineManagement;
+using Umbraco.Cms.ManagementApi.ViewModels.Search;
 using Umbraco.New.Cms.Infrastructure.Services;
 
 namespace Umbraco.Cms.ManagementApi.Factories;
 
-public class ExamineIndexViewModelFactory : IExamineIndexViewModelFactory
+public class IndexViewModelFactory : IIndexViewModelFactory
 {
     private readonly IIndexDiagnosticsFactory _indexDiagnosticsFactory;
     private readonly IIndexRebuilder _indexRebuilder;
     private readonly IIndexingRebuilderService _indexingRebuilderService;
 
-    public ExamineIndexViewModelFactory(IIndexDiagnosticsFactory indexDiagnosticsFactory, IIndexRebuilder indexRebuilder, IIndexingRebuilderService indexingRebuilderService)
+    public IndexViewModelFactory(IIndexDiagnosticsFactory indexDiagnosticsFactory, IIndexRebuilder indexRebuilder, IIndexingRebuilderService indexingRebuilderService)
     {
         _indexDiagnosticsFactory = indexDiagnosticsFactory;
         _indexRebuilder = indexRebuilder;
         _indexingRebuilderService = indexingRebuilderService;
     }
 
-    public ExamineIndexViewModel Create(IIndex index)
+    public IndexViewModel Create(IIndex index)
     {
         if (_indexingRebuilderService.IsRebuilding(index.Name))
         {
-            return new ExamineIndexViewModel
+            return new IndexViewModel
             {
                 Name = index.Name,
                 HealthStatus = "Rebuilding",
@@ -37,7 +37,7 @@ public class ExamineIndexViewModelFactory : IExamineIndexViewModelFactory
 
         Attempt<string?> isHealthy = indexDiag.IsHealthy();
 
-        var indexerModel = new ExamineIndexViewModel
+        var indexerModel = new IndexViewModel
         {
             Name = index.Name,
             HealthStatus = isHealthy.Success ? isHealthy.Result ?? "Healthy" : isHealthy.Result ?? "Unhealthy",
