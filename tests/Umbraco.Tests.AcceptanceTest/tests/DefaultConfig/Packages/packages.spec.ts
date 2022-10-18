@@ -88,7 +88,8 @@ test.describe('Packages', () => {
     
     // Navigate pack to packages and Assert the file is created
     // Waits until the button download is visible
-    await page.locator('[label-key="general_download"]').isVisible();
+    await expect(await page.locator('[label-key="general_download"]')).toBeVisible({timeout: 60000});
+    
     // Checks if the packages was created
     const doesExist = await umbracoApi.packages.doesNameExist(packageName);
     await expect(doesExist).toBe(true);
