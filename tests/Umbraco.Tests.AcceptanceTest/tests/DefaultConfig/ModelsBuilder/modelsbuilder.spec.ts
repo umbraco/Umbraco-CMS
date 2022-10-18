@@ -243,7 +243,6 @@ test.describe('Modelsbuilder tests', () => {
 
     await umbracoApi.content.save(content);
 
-    await page.pause();
     // Navigate to the document type
     await umbracoUi.goToSection(ConstantHelper.sections.settings);
     await umbracoUi.clickElement(umbracoUi.getTreeItem("settings", ["Document Types", docTypeName]));
