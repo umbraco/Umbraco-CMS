@@ -1,7 +1,7 @@
 import { rest } from 'msw';
 
-import umbracoPath from '../src/core/utils/umbraco-path';
 import { expect, test } from '../test';
+import { umbracoPath } from '@umbraco-cms/utils';
 import type { ProblemDetails, StatusResponse } from '@umbraco-cms/models';
 
 test.describe('installer tests', () => {

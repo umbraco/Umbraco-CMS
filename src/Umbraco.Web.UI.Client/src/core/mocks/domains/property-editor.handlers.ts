@@ -1,6 +1,6 @@
 import { rest } from 'msw';
-import umbracoPath from '../../utils/umbraco-path';
 import { umbPropertyEditorData } from '../data/property-editor.data';
+import { umbracoPath } from '@umbraco-cms/utils';
 import type {
 	PropertyEditorsListResponse,
 	PropertyEditorResponse,
