@@ -877,6 +877,7 @@
     <key alias="videos">Video</key>
     <key alias="installing">Installazione</key>
     <key alias="avatar">Avatar per</key>
+    <key alias="umbracoBadge">Umbraco</key>
   </area>
   <area alias="colors">
     <key alias="blue">Blu</key>

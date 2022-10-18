@@ -740,6 +740,7 @@
     <key alias="header">Entête</key>
     <key alias="systemField">champ système</key>
     <key alias="lastUpdated">Dernière mise à jour</key>
+    <key alias="umbracoBadge">Umbraco</key>
   </area>
   <area alias="colors">
     <key alias="blue">Bleu</key>

@@ -452,6 +452,7 @@
     <key alias="current">当前</key>
     <key alias="embed">嵌入</key>
     <key alias="selected">已选择</key>
+    <key alias="umbracoBadge">Umbraco</key>
   </area>
   <area alias="colors">
     <key alias="blue">蓝色</key>

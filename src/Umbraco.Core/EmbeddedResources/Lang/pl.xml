@@ -538,6 +538,7 @@
     <key alias="current">bieżący</key>
     <key alias="embed">Osadzony</key>
     <key alias="selected">wybrany</key>
+    <key alias="umbracoBadge">Umbraco</key>
   </area>
   <area alias="colors">
     <key alias="blue">Niebieski</key>

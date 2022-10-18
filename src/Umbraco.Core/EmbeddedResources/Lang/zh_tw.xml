@@ -445,6 +445,7 @@
     <key alias="current">目前</key>
     <key alias="embed">內嵌</key>
     <key alias="selected">選取的</key>
+    <key alias="umbracoBadge">Umbraco</key>
   </area>
   <area alias="colors">
     <key alias="blue">藍</key>

@@ -833,6 +833,7 @@
     <key alias="articles">Artikels</key>
     <key alias="videos">Videos</key>
     <key alias="avatar">Avatar van</key>
+    <key alias="umbracoBadge">Umbraco</key>
   </area>
   <area alias="colors">
     <key alias="blue">Blauw</key>

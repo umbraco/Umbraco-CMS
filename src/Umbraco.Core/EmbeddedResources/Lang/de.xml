@@ -726,6 +726,7 @@
     <key alias="current">Aktuelle(s)</key>
     <key alias="embed">Eingebettet</key>
     <key alias="selected">ausgewählt</key>
+    <key alias="umbracoBadge">Umbraco</key>
   </area>
   <area alias="colors">
     <key alias="blue">Blau</key>

@@ -726,6 +726,7 @@
     <key alias="other">Další</key>
     <key alias="articles">Články</key>
     <key alias="videos">Videa</key>
+    <key alias="umbracoBadge">Umbraco</key>
   </area>
   <area alias="colors">
     <key alias="blue">Modrá</key>

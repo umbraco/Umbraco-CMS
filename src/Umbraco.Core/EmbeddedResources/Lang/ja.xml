@@ -431,6 +431,7 @@
     <key alias="saving">保存...</key>
     <key alias="current">現在</key>
     <key alias="embed">埋め込み</key>
+    <key alias="umbracoBadge">Umbraco</key>
   </area>
   <area alias="colors">
     <key alias="blue">ブルー</key>

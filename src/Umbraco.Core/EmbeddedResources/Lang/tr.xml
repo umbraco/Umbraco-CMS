@@ -751,6 +751,7 @@
     <key alias="other">Diğer</key>
     <key alias="articles">Makaleler</key>
     <key alias="videos">Videolar</key>
+    <key alias="umbracoBadge">Umbraco</key>
   </area>
   <area alias="colors">
     <key alias="blue">Mavi</key>
