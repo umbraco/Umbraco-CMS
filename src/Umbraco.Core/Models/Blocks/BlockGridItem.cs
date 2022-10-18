@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Core.Models.Blocks
     /// <summary>
     /// Represents a layout item for the Block Grid editor.
     /// </summary>
-    /// <seealso cref="IPublishedElement" />
+    /// <seealso cref="IBlockReference{TContent,TSettings}" />
     [DataContract(Name = "block", Namespace = "")]
     [EditorBrowsable(EditorBrowsableState.Never)] // TODO: Remove this for V11/V10.4
     public class BlockGridItem : IBlockReference<IPublishedElement, IPublishedElement>
