@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using Umbraco.Cms.Core.PropertyEditors;
 
 namespace Umbraco.Cms.Core;
@@ -43,6 +44,7 @@ public static partial class Constants
             /// <summary>
             /// Block Grid.
             /// </summary>
+            [EditorBrowsable(EditorBrowsableState.Never)] // TODO: Remove this for V11/V10.4
             public const string BlockGrid = "Umbraco.BlockGrid";
 
                 /// <summary>

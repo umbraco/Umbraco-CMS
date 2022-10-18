@@ -1,11 +1,13 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.ComponentModel;
 using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Core.Models.Blocks;
 
 [DataContract(Name = "area", Namespace = "")]
+[EditorBrowsable(EditorBrowsableState.Never)] // TODO: Remove this for V11/V10.4
 public class BlockGridArea : BlockModelCollection<BlockGridItem>
 {
     /// <summary>
