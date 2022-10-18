@@ -29,7 +29,7 @@
       "@umbraco-cms/context-api": ["src/core/context-api"],
       "@umbraco-cms/extensions-api": ["src/core/extensions-api"],
       "@umbraco-cms/observable-api": ["src/core/observable-api"],
-      "@umbraco-cms/utils": ["src/core/helpers"],
+      "@umbraco-cms/utils": ["src/core/utils"],
     },
   },
   "include": [

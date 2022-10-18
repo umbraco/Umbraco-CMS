@@ -1,5 +1,5 @@
 import { rest } from 'msw';
-import umbracoPath from '../src/core/helpers/umbraco-path';
+import umbracoPath from '../src/core/utils/umbraco-path';
 import { expect, test } from '../test';
 import type { ProblemDetails, StatusResponse } from '@umbraco-cms/models';
 

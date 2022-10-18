@@ -1,6 +1,6 @@
 import { expect, fixture, html } from '@open-wc/testing';
 
-import { defaultA11yConfig } from '../../core/helpers/chai';
+import { defaultA11yConfig } from '../../core/test-utils/chai';
 import { UmbInstallerErrorElement } from './installer-error.element';
 
 // TODO: Write tests
