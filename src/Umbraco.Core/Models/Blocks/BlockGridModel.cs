@@ -2,7 +2,6 @@
 // See LICENSE for more details.
 
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Core.Models.Blocks;
@@ -12,7 +11,6 @@ namespace Umbraco.Cms.Core.Models.Blocks;
 /// </summary>
 /// <seealso cref="ReadOnlyCollection{BlockGridItem}" />
 [DataContract(Name = "blockgrid", Namespace = "")]
-[EditorBrowsable(EditorBrowsableState.Never)] // TODO: Remove this for V11/V10.4
 public class BlockGridModel : BlockModelCollection<BlockGridItem>
 {
     /// <summary>

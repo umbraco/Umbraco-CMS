@@ -174,8 +174,7 @@ public class TypeLoaderTests
     public void GetDataEditors()
     {
         var types = _typeLoader.GetDataEditors();
-        // TODO: Increase this to 42 when BlockGridEditor is re-added
-        Assert.AreEqual(41, types.Count());
+        Assert.AreEqual(42, types.Count());
     }
 
     /// <summary>

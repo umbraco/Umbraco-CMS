@@ -1,10 +1,8 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
@@ -18,9 +16,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 
 /// <summary>
 /// Abstract base class for block grid based editors.
-// /// </summary>
-[HideFromTypeFinder]
-[EditorBrowsable(EditorBrowsableState.Never)]
+/// </summary>
 public abstract class BlockGridPropertyEditorBase : DataEditor
 {
     protected BlockGridPropertyEditorBase(IDataValueEditorFactory dataValueEditorFactory)

@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.ComponentModel;
 using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Models.PublishedContent;
 
@@ -12,7 +11,6 @@ namespace Umbraco.Cms.Core.Models.Blocks
     /// </summary>
     /// <seealso cref="IBlockReference{TContent,TSettings}" />
     [DataContract(Name = "block", Namespace = "")]
-    [EditorBrowsable(EditorBrowsableState.Never)] // TODO: Remove this for V11/V10.4
     public class BlockGridItem : IBlockReference<IPublishedElement, IPublishedElement>
     {
         /// <summary>

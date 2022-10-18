@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.ComponentModel;
 using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.Serialization;
 
@@ -10,7 +9,6 @@ namespace Umbraco.Cms.Core.Models.Blocks;
 /// <summary>
 /// Data converter for the block grid property editor
 /// </summary>
-[EditorBrowsable(EditorBrowsableState.Never)] // TODO: Remove this for V11/V10.4
 public class BlockGridEditorDataConverter : BlockEditorDataConverter
 {
     private readonly IJsonSerializer _jsonSerializer;
