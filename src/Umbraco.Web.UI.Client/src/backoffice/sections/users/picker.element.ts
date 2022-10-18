@@ -7,6 +7,11 @@ import './picker-layout-section.element';
 import './picker-layout-user.element';
 
 export type PickerLayout = 'section' | 'user' | 'media' | 'content';
+export class UmbPickerChangedEvent extends Event {
+	public constructor() {
+		super('changed', { bubbles: true, composed: true });
+	}
+}
 
 @customElement('umb-picker')
 export class UmbPickerElement extends UmbContextConsumerMixin(LitElement) {
@@ -43,9 +48,14 @@ export class UmbPickerElement extends UmbContextConsumerMixin(LitElement) {
 	private _openPicker() {
 		if (!this.picker) return;
 
-		const modalHandler = this._modalService?.open(this.sectionAlias, { type: 'sidebar', size: 'small' });
+		const modalHandler = this._modalService?.open(this.sectionAlias, {
+			data: this.value,
+			type: 'sidebar',
+			size: 'small',
+		});
 		modalHandler?.onClose().then(({ selection }: any) => {
-			console.log('closed', selection);
+			this.value = selection;
+			this.dispatchEvent(new UmbPickerChangedEvent());
 		});
 	}
 

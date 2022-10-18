@@ -69,6 +69,7 @@ export class UmbPickerLayoutUserElement extends UmbContextConsumerMixin(UmbModal
 	connectedCallback(): void {
 		super.connectedCallback();
 
+		this._selection = this.data as unknown as Array<string>; //TODO We need a way to have types on the data
 		this.consumeContext('umbUserStore', (usersContext: UmbUserStore) => {
 			this._userStore = usersContext;
 			this._observeUser();

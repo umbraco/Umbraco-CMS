@@ -3,7 +3,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, LitElement, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
-import '../../sections/users/picker.element';
+import '../../sections/users/picker-user.element';
 
 @customElement('umb-editor-user-group')
 export class UmbEditorUserGroupElement extends LitElement {
@@ -252,7 +252,7 @@ export class UmbEditorUserGroupElement extends LitElement {
 	private renderRightColumn() {
 		return html`<uui-box>
 			<div slot="headline">Users</div>
-			<umb-picker .picker=${'user'}></umb-picker>
+			<umb-picker-user .picker=${'user'}></umb-picker-user>
 		</uui-box>`;
 	}
 
