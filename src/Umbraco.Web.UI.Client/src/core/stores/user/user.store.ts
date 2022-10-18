@@ -43,7 +43,7 @@ export class UmbUserStore extends UmbDataStoreBase<UserDetails> {
 	getByKey(key: string): Observable<UserDetails | null> {
 		// TODO: use Fetcher API.
 		// TODO: only fetch if the data type is not in the store?
-		fetch(`/umbraco/backoffice/users/${key}`)
+		fetch(`/umbraco/backoffice/users/details/${key}`)
 			.then((res) => res.json())
 			.then((data) => {
 				this.update([data]);
@@ -51,6 +51,20 @@ export class UmbUserStore extends UmbDataStoreBase<UserDetails> {
 
 		return this.items.pipe(
 			map((items: Array<UserDetails>) => items.find((node: UserDetails) => node.key === key) || null)
+		);
+	}
+
+	getByKeys(keys: Array<string>): Observable<Array<UserEntity>> {
+		const params = keys.map((key) => `key=${key}`).join('&');
+		fetch(`/umbraco/backoffice/users/getByKeys?${params}`)
+			.then((res) => res.json())
+			.then((data) => {
+				console.log('data', data);
+				this.update([data]);
+			});
+
+		return this.items.pipe(
+			map((items: Array<UserDetails>) => items.filter((node: UserDetails) => keys.includes(node.key)))
 		);
 	}
 
