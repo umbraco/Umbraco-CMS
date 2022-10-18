@@ -14,7 +14,7 @@ export const manifestDevelopmentHandler = rest.get(umbracoPath('/manifests'), (_
 					type: 'section',
 					alias: 'My.Section.Custom',
 					name: 'Custom Section',
-					js: '/src/mocks/App_Plugins/section.js',
+					js: '/App_Plugins/section.js',
 					elementName: 'my-section-custom',
 					weight: 1,
 					meta: {
@@ -26,7 +26,7 @@ export const manifestDevelopmentHandler = rest.get(umbracoPath('/manifests'), (_
 					type: 'propertyEditorUI',
 					alias: 'My.PropertyEditorUI.Custom',
 					name: 'My Custom Property Editor UI',
-					js: '/src/mocks/App_Plugins/property-editor.js',
+					js: '/App_Plugins/property-editor.js',
 					elementName: 'my-property-editor-ui-custom',
 					meta: {
 						label: 'My Custom Property',
@@ -39,13 +39,13 @@ export const manifestDevelopmentHandler = rest.get(umbracoPath('/manifests'), (_
 					type: 'entrypoint',
 					name: 'My Custom Entry Point',
 					alias: 'My.Entrypoint.Custom',
-					js: '/src/mocks/App_Plugins/custom-entrypoint.js',
+					js: '/App_Plugins/custom-entrypoint.js',
 				},
 				{
 					type: 'packageView',
 					alias: 'My.PackageView.Custom',
 					name: 'My Custom Package View',
-					js: '/src/mocks/App_Plugins/package-view.js',
+					js: '/App_Plugins/package-view.js',
 					meta: {
 						packageAlias: 'my.package',
 					},
