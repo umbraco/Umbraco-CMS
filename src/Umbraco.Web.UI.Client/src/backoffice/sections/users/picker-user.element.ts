@@ -1,4 +1,5 @@
-import { html, LitElement } from 'lit';
+import { UUITextStyles } from '@umbraco-ui/uui-css';
+import { css, html, LitElement, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { Subscription } from 'rxjs';
 import { UmbContextConsumerMixin } from '../../../core/context';
@@ -9,14 +10,29 @@ import { UmbPickerChangedEvent } from './picker.element';
 
 @customElement('umb-picker-user')
 export class UmbPickerUserElement extends UmbContextConsumerMixin(LitElement) {
-	private _handleSelection(e: UmbPickerChangedEvent) {
-		console.clear();
-		console.log('handle selection done', e.target.value);
-
-		this._userKeys = e.target.value;
-		console.log('user keys', this._userKeys);
-		this._observeUser();
-	}
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: flex;
+				flex-direction: column;
+				gap: var(--uui-size-space-4);
+			}
+			#user-list {
+				display: flex;
+				flex-direction: column;
+				gap: var(--uui-size-space-4);
+			}
+			.user {
+				display: flex;
+				align-items: center;
+				gap: var(--uui-size-space-2);
+			}
+			.user uui-button {
+				margin-left: auto;
+			}
+		`,
+	];
 
 	@state()
 	private _userKeys: Array<string> = [];
@@ -40,6 +56,16 @@ export class UmbPickerUserElement extends UmbContextConsumerMixin(LitElement) {
 		this._usersSubscription?.unsubscribe();
 	}
 
+	private _handleSelection(e: UmbPickerChangedEvent) {
+		this._userKeys = e.target.value;
+		this._observeUser();
+	}
+
+	private _handleRemove(key: string) {
+		this._userKeys = this._userKeys.filter((k) => k !== key);
+		this._observeUser();
+	}
+
 	private _observeUser() {
 		this._usersSubscription?.unsubscribe();
 		this._usersSubscription = this._userStore?.getByKeys(this._userKeys).subscribe((users) => {
@@ -47,18 +73,27 @@ export class UmbPickerUserElement extends UmbContextConsumerMixin(LitElement) {
 		});
 	}
 
+	private _renderUserList() {
+		if (this._users.length === 0) return nothing;
+
+		return html`<div id="user-list">
+			${this._users.map(
+				(user) => html`
+					<div class="user">
+						<uui-avatar .name=${user.name}></uui-avatar>
+						<div>${user.name}</div>
+						<uui-button @click=${() => this._handleRemove(user.key)} label="remove"></uui-button>
+					</div>
+				`
+			)}
+		</div> `;
+	}
+
 	render() {
-		return html`<umb-picker .picker=${'user'} .value=${this._userKeys} @changed=${this._handleSelection}></umb-picker>
-			<div>
-				${this._users.map(
-					(user) => html`
-						<div>
-							<div>${user.name}</div>
-							<div>${user.key}</div>
-						</div>
-					`
-				)}
-			</div> `;
+		return html`
+			<umb-picker .picker=${'user'} .value=${this._userKeys} @changed=${this._handleSelection}></umb-picker>
+			${this._renderUserList()}
+		`;
 	}
 }
 
