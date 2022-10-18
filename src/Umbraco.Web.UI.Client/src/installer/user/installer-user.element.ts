@@ -1,9 +1,8 @@
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-
-import { UmbContextConsumerMixin } from '../../core/context';
-import type { PostInstallRequest } from '../../core/models';
 import { UmbInstallerContext } from '../installer.context';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import type { PostInstallRequest } from '@umbraco-cms/models';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 
 @customElement('umb-installer-user')
