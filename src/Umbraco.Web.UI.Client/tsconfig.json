@@ -30,6 +30,7 @@
       "@umbraco-cms/extensions-api": ["src/core/extensions-api"],
       "@umbraco-cms/observable-api": ["src/core/observable-api"],
       "@umbraco-cms/utils": ["src/core/utils"],
+      "@umbraco-cms/css/*": ["src/core/css/*"],
     },
   },
   "include": [

@@ -1,4 +1,4 @@
-import './core/css/custom-properties.css';
+import '@umbraco-cms/css/custom-properties.css';
 import 'router-slot';
 
 // TODO: remove these imports when they are part of UUI
