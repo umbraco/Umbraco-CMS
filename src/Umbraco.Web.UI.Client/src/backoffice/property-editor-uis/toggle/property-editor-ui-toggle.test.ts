@@ -1,6 +1,6 @@
 import { expect, fixture, html } from '@open-wc/testing';
-import { defaultA11yConfig } from '../../../core/test-utils/chai';
 import { UmbPropertyEditorUIToggleElement } from './property-editor-ui-toggle.element';
+import { defaultA11yConfig } from '@umbraco-cms/test-utils';
 
 describe('UmbPropertyEditorUIToggleElement', () => {
 	let element: UmbPropertyEditorUIToggleElement;

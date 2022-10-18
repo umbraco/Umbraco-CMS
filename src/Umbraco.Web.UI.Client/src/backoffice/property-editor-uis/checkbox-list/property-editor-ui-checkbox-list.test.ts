@@ -1,6 +1,6 @@
 import { expect, fixture, html } from '@open-wc/testing';
-import { defaultA11yConfig } from '../../../core/test-utils/chai';
 import { UmbPropertyEditorUICheckboxListElement } from './property-editor-ui-checkbox-list.element';
+import { defaultA11yConfig } from '@umbraco-cms/test-utils';
 
 describe('UmbPropertyEditorUICheckboxListElement', () => {
 	let element: UmbPropertyEditorUICheckboxListElement;
