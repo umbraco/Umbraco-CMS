@@ -1,7 +1,9 @@
-﻿using Newtonsoft.Json;
+﻿using System.ComponentModel;
+using Newtonsoft.Json;
 
 namespace Umbraco.Cms.Core.Models.Blocks;
 
+[EditorBrowsable(EditorBrowsableState.Never)] // TODO: Remove this for V11/V10.4
 public class BlockGridLayoutAreaItem
 {
     [JsonProperty("key", NullValueHandling = NullValueHandling.Ignore)]
