@@ -627,7 +627,7 @@ test.describe('Content tests', () => {
     await umbracoUi.clickElement(umbracoUi.getTreeItem("content", [viewMacroName]));
 
     // Insert macro
-    await page.locator('[title="Insert macro"]').click();
+    await page.locator('#mceu_13-button').click();
     await page.locator('.umb-card-grid-item', {hasText: viewMacroName}).click();
     // cy.get('.umb-card-grid-item').contains(viewMacroName).click();
 
@@ -636,7 +636,7 @@ test.describe('Content tests', () => {
     await umbracoUi.isSuccessNotificationVisible();
 
     // Ensure that the view gets rendered correctly
-    const expected = `<p> </p><h1>Acceptance test</h1><p> </p>`;
+    const expected = `<h1>Acceptance test</h1><p> </p>`;
     await expect(await umbracoApi.content.verifyRenderedContent('/', expected, true)).toBeTruthy();
 
     // Cleanup
