@@ -29,6 +29,10 @@
       <Link>UmbracoProject\Views\Partials\grid\%(RecursiveDir)%(Filename)%(Extension)</Link>
       <PackagePath>UmbracoProject\Views\Partials\grid</PackagePath>
     </Content>
+    <Content Include="..\src\Umbraco.Web.UI\Views\Partials\blockgrid\**">
+      <Link>UmbracoProject\Views\Partials\blockgrid\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <PackagePath>UmbracoProject\Views\Partials\blockgrid</PackagePath>
+    </Content>
     <Content Include="..\src\Umbraco.Web.UI\Views\_ViewImports.cshtml">
       <Link>UmbracoProject\Views\_ViewImports.cshtml</Link>
       <PackagePath>UmbracoProject\Views</PackagePath>
