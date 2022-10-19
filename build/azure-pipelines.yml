@@ -506,12 +506,13 @@ stages:
             inputs:
               command: restore
               projects: $(solution)
-          # TODO: Use NuGetCommand instead of DotNetCoreCLI
-          #                - task: NuGetCommand@2
-          #                  displayName: Restore NuGet Packages
-          #                  inputs:
-          #                      restoreSolution: $(solution)
-          #                      feedsToUse: config
+          - task: NuGetCommand@2
+            displayName: NuGet push
+            inputs:
+              command: 'push'
+              packagesToPush: $(Build.ArtifactStagingDirectory)/**/*.nupkg
+              nuGetFeedType: 'external'
+              publishFeedCredentials: 'MyGet - Pre-releases'
   - stage: Deploy_NuGet
     displayName: NuGet release
     dependsOn:
