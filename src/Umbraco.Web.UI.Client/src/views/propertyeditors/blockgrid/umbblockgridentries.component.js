@@ -619,6 +619,7 @@
                     }
                     window.removeEventListener('drag', _onDragMove);
                     window.removeEventListener('dragover', _onDragMove);
+                    document.documentElement.style.setProperty("--umb-block-grid--dragging-mode", 0);
 
                     if(ghostElIndicateForceLeft) {
                         ghostEl.removeChild(ghostElIndicateForceLeft);

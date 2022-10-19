@@ -232,6 +232,7 @@
 
                     appendRuntimeData();
                     init();
+                    startWatches($scope.content);
 
                     syncTreeNode($scope.content, $scope.content.path, true);
 
@@ -565,7 +566,6 @@
             $scope.page.loading = true;
 
             loadContent().then(function () {
-                startWatches($scope.content);
                 $scope.page.loading = false;
             });
         }
