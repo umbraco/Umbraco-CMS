@@ -318,6 +318,11 @@ stages:
             inputs:
               artifact: build_output
               path: $(Build.SourcesDirectory)
+          - task: UseDotNet@2
+            displayName: Use .NET $(dotnetVersion)
+            inputs:
+              version: $(dotnetVersion)
+              includePreviewVersions: $(dotnetIncludePreviewVersions)
           - powershell: sqllocaldb start mssqllocaldb
             displayName: Start localdb (Windows only)
             condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
