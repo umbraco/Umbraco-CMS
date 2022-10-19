@@ -504,11 +504,6 @@ stages:
           - task: NuGetCommand@2
             displayName: NuGet push
             inputs:
-              command: restore
-              projects: $(solution)
-          - task: NuGetCommand@2
-            displayName: NuGet push
-            inputs:
               command: 'push'
               packagesToPush: $(Build.ArtifactStagingDirectory)/**/*.nupkg
               nuGetFeedType: 'external'
