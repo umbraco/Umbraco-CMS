@@ -527,8 +527,10 @@ stages:
           - task: NuGetCommand@2
             displayName: NuGet push
             inputs:
-              command: restore
-              projects: $(solution)
+              command: 'push'
+              packagesToPush: $(Build.ArtifactStagingDirectory)/**/*.nupkg
+              nuGetFeedType: 'external'
+              publishFeedCredentials: 'NuGet - Umbraco.*'
 
   - stage: Upload_API_Docs
     pool:
