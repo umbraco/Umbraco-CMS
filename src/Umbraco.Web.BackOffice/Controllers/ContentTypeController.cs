@@ -571,7 +571,7 @@ public class ContentTypeController : ContentTypeControllerBase<IContentType>
     [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
     public IActionResult Import(string file)
     {
-        var filePath = Path.Combine(_hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.Data), file);
+        var filePath = Path.Combine(_hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempFileUploads), file);
         if (string.IsNullOrEmpty(file) || !System.IO.File.Exists(filePath))
         {
             return NotFound();
@@ -623,10 +623,10 @@ public class ContentTypeController : ContentTypeControllerBase<IContentType>
 
                 if (ext.InvariantEquals("udt"))
                 {
-                    model.TempFileName = Path.Combine(root, fileName);
+                    model.TempFileName = fileName;
 
                     var xd = new XmlDocument { XmlResolver = null };
-                    xd.Load(model.TempFileName);
+                    xd.Load(Path.Combine(root,  fileName));
 
                     model.Alias = xd.DocumentElement?.SelectSingleNode("//DocumentType/Info/Alias")?.FirstChild?.Value;
                     model.Name = xd.DocumentElement?.SelectSingleNode("//DocumentType/Info/Name")?.FirstChild?.Value;
@@ -649,5 +649,19 @@ public class ContentTypeController : ContentTypeControllerBase<IContentType>
         }
 
         return model;
+    }
+
+    [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
+    public ActionResult PostCreateBlockGridSample()
+    {
+        var sampleHelper = new BlockGridSampleHelper(_contentTypeService, _dataTypeService, _backofficeSecurityAccessor);
+        Dictionary<string, Udi>? elementUdisByAlias = sampleHelper.CreateSampleElements(
+            documentTypeSave => PerformPostSave<DocumentTypeDisplay, DocumentTypeSave, PropertyTypeBasic>(
+                documentTypeSave,
+                i => _contentTypeService.Get(i),
+                type => _contentTypeService.Save(type)),
+            out string errorMessage);
+
+        return elementUdisByAlias != null ? Ok(elementUdisByAlias) : ValidationProblem(errorMessage);
     }
 }

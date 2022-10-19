@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Core.Models.Membership;
 public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
 {
     // Custom comparer for enumerable
-    private static readonly DelegateEqualityComparer<IEnumerable<string>> StringEnumerableComparer =
+    private static readonly DelegateEqualityComparer<IEnumerable<string>> _stringEnumerableComparer =
         new(
             (enum1, enum2) => enum1.UnsortedSequenceEqual(enum2),
             enum1 => enum1.GetHashCode());
@@ -22,8 +22,10 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
     private string _alias;
     private string? _icon;
     private string _name;
+    private bool _hasAccessToAllLanguages;
     private IEnumerable<string>? _permissions;
     private List<string> _sectionCollection;
+    private List<int> _languageCollection;
     private int? _startContentId;
     private int? _startMediaId;
 
@@ -36,6 +38,7 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
         _name = string.Empty;
         _shortStringHelper = shortStringHelper;
         _sectionCollection = new List<string>();
+        _languageCollection = new List<int>();
     }
 
     /// <summary>
@@ -47,7 +50,13 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
     /// <param name="permissions"></param>
     /// <param name="icon"></param>
     /// <param name="shortStringHelper"></param>
-    public UserGroup(IShortStringHelper shortStringHelper, int userCount, string? alias, string? name, IEnumerable<string> permissions, string? icon)
+    public UserGroup(
+        IShortStringHelper shortStringHelper,
+        int userCount,
+        string? alias,
+        string? name,
+        IEnumerable<string> permissions,
+        string? icon)
         : this(shortStringHelper)
     {
         UserCount = userCount;
@@ -83,7 +92,8 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
     {
         get => _alias;
         set => SetPropertyValueAndDetectChanges(
-            value.ToCleanString(_shortStringHelper, CleanStringType.Alias | CleanStringType.UmbracoCase), ref _alias!, nameof(Alias));
+            value.ToCleanString(_shortStringHelper, CleanStringType.Alias | CleanStringType.UmbracoCase), ref _alias!,
+            nameof(Alias));
     }
 
     [DataMember]
@@ -91,6 +101,13 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
     {
         get => _name;
         set => SetPropertyValueAndDetectChanges(value, ref _name!, nameof(Name));
+    }
+
+    [DataMember]
+    public bool HasAccessToAllLanguages
+    {
+        get => _hasAccessToAllLanguages;
+        set => SetPropertyValueAndDetectChanges(value, ref _hasAccessToAllLanguages, nameof(HasAccessToAllLanguages));
     }
 
     /// <summary>
@@ -104,7 +121,7 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
     public IEnumerable<string>? Permissions
     {
         get => _permissions;
-        set => SetPropertyValueAndDetectChanges(value, ref _permissions, nameof(Permissions), StringEnumerableComparer);
+        set => SetPropertyValueAndDetectChanges(value, ref _permissions, nameof(Permissions), _stringEnumerableComparer);
     }
 
     public IEnumerable<string> AllowedSections => _sectionCollection;
@@ -126,6 +143,29 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
             _sectionCollection.Add(sectionAlias);
         }
     }
+
+    public IEnumerable<int> AllowedLanguages
+    {
+        get => _languageCollection;
+    }
+
+    public void RemoveAllowedLanguage(int languageId)
+    {
+        if (_languageCollection.Contains(languageId))
+        {
+            _languageCollection.Remove(languageId);
+        }
+    }
+
+    public void AddAllowedLanguage(int languageId)
+    {
+        if (_languageCollection.Contains(languageId) == false)
+        {
+            _languageCollection.Add(languageId);
+        }
+    }
+
+    public void ClearAllowedLanguages() => _languageCollection.Clear();
 
     public void ClearAllowedSections() => _sectionCollection.Clear();
 

@@ -6,12 +6,16 @@ function multiUrlPickerController($scope, localizationService, entityResource, i
         }
     };
 
+    $scope.allowAdd = !$scope.readonly;
+    $scope.allowEdit = !$scope.readonly;
+    $scope.allowRemove = !$scope.readonly;
+
     let removeAllEntriesAction = {
         labelKey: "clipboard_labelForRemoveAllEntries",
         labelTokens: [],
         icon: "icon-trash",
         method: removeAllEntries,
-        isDisabled: true,
+        isDisabled: !$scope.allowRemove,
         useLegacyIcon: false
     };
 
@@ -41,6 +45,7 @@ function multiUrlPickerController($scope, localizationService, entityResource, i
         tolerance: "pointer",
         scroll: true,
         zIndex: 6000,
+        disabled: $scope.readonly,
         update: function () {
             setDirty();
         }
@@ -74,9 +79,10 @@ function multiUrlPickerController($scope, localizationService, entityResource, i
             else {
                 $scope.multiUrlPickerForm.maxCount.$setValidity("maxCount", true);
             }
-            $scope.sortableOptions.disabled = $scope.renderModel.length === 1;
 
-            removeAllEntriesAction.isDisabled = $scope.renderModel.length === 0;
+            $scope.sortableOptions.disabled = $scope.renderModel.length === 1 || $scope.readonly;
+
+            removeAllEntriesAction.isDisabled = $scope.renderModel.length === 0 || $scope.readonly;
             
             //Update value
             $scope.model.value = $scope.renderModel;
@@ -84,6 +90,8 @@ function multiUrlPickerController($scope, localizationService, entityResource, i
     );
 
     $scope.remove = function ($index) {
+        if (!$scope.allowRemove) return;
+
         $scope.renderModel.splice($index, 1);
         
         setDirty();
@@ -96,6 +104,8 @@ function multiUrlPickerController($scope, localizationService, entityResource, i
     };
 
     $scope.openLinkPicker = function (link, $index) {
+        if (!$scope.allowAdd || !$scope.allowEdit) return;
+
         var target = link ? {
             name: link.name,
             anchor: link.queryString,

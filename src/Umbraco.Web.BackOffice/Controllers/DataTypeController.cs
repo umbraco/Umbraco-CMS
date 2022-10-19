@@ -383,6 +383,30 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
         }
 
+        public IActionResult PostCopy(MoveOrCopy copy)
+        {
+            var toCopy = _dataTypeService.GetDataType(copy.Id);
+            if (toCopy is null)
+            {
+                return NotFound();
+            }
+
+            Attempt<OperationResult<MoveOperationStatusType, IDataType>?> result = _dataTypeService.Copy(toCopy, copy.ParentId);
+            if (result.Success)
+            {
+                return Content(toCopy.Path, MediaTypeNames.Text.Plain, Encoding.UTF8);
+            }
+
+            return result.Result?.Result switch
+            {
+                MoveOperationStatusType.FailedParentNotFound => NotFound(),
+                MoveOperationStatusType.FailedCancelledByEvent => ValidationProblem(),
+                MoveOperationStatusType.FailedNotAllowedByPath => ValidationProblem(
+                    _localizedTextService.Localize("moveOrCopy", "notAllowedByPath")),
+                _ => throw new ArgumentOutOfRangeException()
+            };
+        }
+
         public IActionResult PostRenameContainer(int id, string name)
         {
             var currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;

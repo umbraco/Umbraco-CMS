@@ -10,8 +10,8 @@
                               published="link.published"
                               description="link.url + (link.queryString ? link.queryString : '')"
                               sortable="!sortableOptions.disabled"
-                              allow-remove="true"
-                              allow-edit="true"
+                              allow-remove="allowRemove"
+                              allow-edit="allowEdit"
                               on-remove="remove($index)"
                               on-edit="openLinkPicker(link, $index)">
             </umb-node-preview>
@@ -20,7 +20,8 @@
         <button ng-show="!model.config.maxNumber || renderModel.length < model.config.maxNumber"
                 type="button"
                 class="umb-node-preview-add"
-                ng-click="openLinkPicker()">
+                ng-click="openLinkPicker()"
+                ng-disabled="!allowAdd">
             <span class="sr-only">{{ model.label }}:</span>
             <localize key="general_add">Add</localize>
             <span class="sr-only">url</span>

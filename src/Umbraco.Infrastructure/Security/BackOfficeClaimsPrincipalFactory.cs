@@ -6,7 +6,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Core.Security;
 
 /// <summary>
-///     A <see cref="UserClaimsPrincipalFactory{TUser}" for the back office />
+///     A <see cref="UserClaimsPrincipalFactory{TUser}"/> for the back office
 /// </summary>
 public class BackOfficeClaimsPrincipalFactory : UserClaimsPrincipalFactory<BackOfficeIdentityUser>
 {

@@ -7,7 +7,9 @@
  * The controller for listting dictionary items
  */
 function DictionaryListController($scope, $location, dictionaryResource, localizationService, appState, navigationService) {
-    var vm = this;
+
+    const vm = this;
+    
     vm.title = "Dictionary overview";
     vm.loading = false;
     vm.items = [];
@@ -20,11 +22,13 @@ function DictionaryListController($scope, $location, dictionaryResource, localiz
         vm.loading = true;
         
         dictionaryResource.getList()
-            .then(function (data) {
-                vm.items = data;
-                vm.items.forEach(function(item){
-                    item.style = { "paddingLeft": item.level * 10 };
+            .then(data => {
+                let items = data || [];
+                
+                items.forEach(item => {
+                  item.style = { "paddingLeft": item.level * 10 };
                 });
+                vm.items = items;
                 vm.loading = false;
             });
     }
@@ -47,7 +51,7 @@ function DictionaryListController($scope, $location, dictionaryResource, localiz
     vm.createNewItem = createNewItem;
 
     function onInit() {
-        localizationService.localize("dictionaryItem_overviewTitle").then(function (value) {
+        localizationService.localize("dictionaryItem_overviewTitle").then(value => {
             vm.title = value;
         });
 

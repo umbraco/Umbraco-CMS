@@ -8,7 +8,7 @@
      * @param {any} mediaHelper
      * @param {any} angularHelper
      */
-    function umbPropertyFileUploadController($scope, $q, fileManager, mediaHelper, angularHelper) {
+    function umbPropertyFileUploadController($scope, $q, fileManager, mediaHelper, angularHelper, $attrs) {
 
         //NOTE: this component supports multiple files, though currently the uploader does not but perhaps sometime in the future
         // we'd want it to, so i'll leave the multiple file support in place
@@ -19,6 +19,12 @@
         vm.$onChanges = onChanges;
         vm.$postLink = postLink;
         vm.clear = clearFiles;
+
+        vm.readonly = false;
+
+        $attrs.$observe('readonly', (value) => {
+            vm.readonly = value !== undefined;
+        });
 
         /** Clears the file collections when content is saving (if we need to clear) or after saved */
         function clearFiles() {
@@ -261,6 +267,7 @@
          * @param {any} args
          */
         function onFilesSelected(event, args) {
+            if (vm.readonly) return;
 
             if (args.files && args.files.length > 0) {
 
@@ -287,6 +294,8 @@
         }
 
         function isDragover(e, args) {
+            if (vm.readonly) return;
+
             vm.dragover = args.value;
             angularHelper.safeApply($scope);
         }

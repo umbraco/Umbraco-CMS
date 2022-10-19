@@ -26,7 +26,8 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     ValueType = ValueTypes.Text,
     Group = Constants.PropertyEditors.Groups.Media,
     Icon = Constants.Icons.MediaImage,
-    IsDeprecated = false)]
+    IsDeprecated = false,
+    ValueEditorIsReusable = true)]
 public class MediaPickerPropertyEditor : DataEditor
 {
     private readonly IEditorConfigurationParser _editorConfigurationParser;
@@ -52,6 +53,7 @@ public class MediaPickerPropertyEditor : DataEditor
     {
         _ioHelper = ioHelper;
         _editorConfigurationParser = editorConfigurationParser;
+        SupportsReadOnly = true;
     }
 
     /// <inheritdoc />
@@ -69,9 +71,8 @@ public class MediaPickerPropertyEditor : DataEditor
             IJsonSerializer jsonSerializer,
             IIOHelper ioHelper,
             DataEditorAttribute attribute)
-            : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
-        {
-        }
+            : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute) =>
+            SupportsReadOnly = true;
 
         public IEnumerable<UmbracoEntityReference> GetReferences(object? value)
         {
