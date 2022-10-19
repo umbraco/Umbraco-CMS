@@ -7,9 +7,9 @@ import {
 	UmbPropertyEditorConfigStore,
 } from '../../../../core/stores/property-editor-config/property-editor-config.store';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import { UmbExtensionRegistry } from '@umbraco-cms/extensions-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { ManifestTypes, PropertyEditorConfigDefaultData, PropertyEditorConfigProperty } from '@umbraco-cms/models';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
 import '../../../components/entity-property/entity-property.element';
 
@@ -79,7 +79,6 @@ export class UmbPropertyEditorConfigElement extends UmbContextConsumerMixin(UmbO
 	private _propertyEditorUIConfigProperties: Array<PropertyEditorConfigProperty> = [];
 
 	private _propertyEditorConfigStore?: UmbPropertyEditorConfigStore;
-	private _extensionRegistry?: UmbExtensionRegistry;
 
 	constructor() {
 		super();
@@ -88,11 +87,11 @@ export class UmbPropertyEditorConfigElement extends UmbContextConsumerMixin(UmbO
 			this._propertyEditorConfigStore = propertyEditorConfigStore;
 			this._observePropertyEditorConfig();
 		});
+	}
 
-		this.consumeContext('umbExtensionRegistry', (extensionRegistry) => {
-			this._extensionRegistry = extensionRegistry;
-			this._observePropertyEditorUIConfig();
-		});
+	connectedCallback(): void {
+		super.connectedCallback();
+		this._observePropertyEditorUIConfig();
 	}
 
 	private _observePropertyEditorConfig() {
@@ -111,9 +110,9 @@ export class UmbPropertyEditorConfigElement extends UmbContextConsumerMixin(UmbO
 	}
 
 	private _observePropertyEditorUIConfig() {
-		if (!this._extensionRegistry || !this._propertyEditorUIAlias) return;
+		if (!this._propertyEditorUIAlias) return;
 
-		this.observe<ManifestTypes>(this._extensionRegistry.getByAlias(this.propertyEditorUIAlias), (manifest) => {
+		this.observe<ManifestTypes>(umbExtensionsRegistry.getByAlias(this.propertyEditorUIAlias), (manifest) => {
 			if (manifest?.type === 'propertyEditorUI') {
 				this._propertyEditorUIConfigProperties = manifest?.meta.config?.properties || [];
 				this._mergeProperties();

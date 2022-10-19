@@ -5,9 +5,9 @@ import { map } from 'rxjs';
 import { UmbSectionContext } from '../../../sections/section.context';
 import { Entity } from '../../../../core/mocks/data/entities';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import { UmbExtensionRegistry } from '@umbraco-cms/extensions-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { ManifestTreeItemAction, ManifestTree } from '@umbraco-cms/models';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
 @customElement('umb-tree-context-menu-page-action-list')
 export class UmbTreeContextMenuPageActionListElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
@@ -38,16 +38,10 @@ export class UmbTreeContextMenuPageActionListElement extends UmbContextConsumerM
 	@state()
 	private _activeTreeItem?: Entity;
 
-	private _extensionRegistry?: UmbExtensionRegistry;
 	private _sectionContext?: UmbSectionContext;
 
-	connectedCallback() {
-		super.connectedCallback();
-
-		this.consumeContext('umbExtensionRegistry', (extensionRegistry) => {
-			this._extensionRegistry = extensionRegistry;
-			this._observeTreeItemActions();
-		});
+	constructor() {
+		super();
 
 		this.consumeContext('umbSectionContext', (sectionContext) => {
 			this._sectionContext = sectionContext;
@@ -58,10 +52,10 @@ export class UmbTreeContextMenuPageActionListElement extends UmbContextConsumerM
 	}
 
 	private _observeTreeItemActions() {
-		if (!this._extensionRegistry || !this._sectionContext) return;
+		if (!this._sectionContext) return;
 
 		this.observe<ManifestTreeItemAction[]>(
-			this._extensionRegistry
+			umbExtensionsRegistry
 				.extensionsOfType('treeItemAction')
 				.pipe(map((actions) => actions.filter((action) => action.meta.trees.includes(this._activeTree?.alias || '')))),
 			(actions) => {

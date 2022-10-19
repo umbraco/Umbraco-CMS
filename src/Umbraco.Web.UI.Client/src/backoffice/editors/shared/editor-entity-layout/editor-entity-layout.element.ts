@@ -5,7 +5,8 @@ import { IRoute, IRoutingInfo, PageComponent, RouterSlot } from 'router-slot';
 import { map } from 'rxjs';
 
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import { createExtensionElement, UmbExtensionRegistry } from '@umbraco-cms/extensions-api';
+import { createExtensionElement } from '@umbraco-cms/extensions-api';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { ManifestEditorAction, ManifestEditorView } from '@umbraco-cms/models';
 
@@ -97,30 +98,21 @@ export class UmbEditorEntityLayout extends UmbContextConsumerMixin(UmbObserverMi
 	@state()
 	private _routes: Array<IRoute> = [];
 
-	private _extensionRegistry?: UmbExtensionRegistry;
 	private _routerFolder = '';
-
-	constructor() {
-		super();
-
-		this.consumeContext('umbExtensionRegistry', (extensionRegistry: UmbExtensionRegistry) => {
-			this._extensionRegistry = extensionRegistry;
-			this._observeEditorViews();
-			this._observeEditorActions();
-		});
-	}
 
 	connectedCallback(): void {
 		super.connectedCallback();
+
+		this._observeEditorViews();
+		this._observeEditorActions();
+
 		/* TODO: find a way to construct absolute urls */
 		this._routerFolder = window.location.pathname.split('/view')[0];
 	}
 
 	private _observeEditorViews() {
-		if (!this._extensionRegistry) return;
-
 		this.observe<ManifestEditorView[]>(
-			this._extensionRegistry
+			umbExtensionsRegistry
 				.extensionsOfType('editorView')
 				.pipe(map((extensions) => extensions.filter((extension) => extension.meta.editors.includes(this.alias)))),
 			(editorViews) => {
@@ -131,10 +123,8 @@ export class UmbEditorEntityLayout extends UmbContextConsumerMixin(UmbObserverMi
 	}
 
 	private _observeEditorActions() {
-		if (!this._extensionRegistry) return;
-
 		this.observe(
-			this._extensionRegistry
+			umbExtensionsRegistry
 				?.extensionsOfType('editorAction')
 				.pipe(map((extensions) => extensions.filter((extension) => extension.meta.editors.includes(this.alias)))),
 			(editorActions) => {

@@ -7,9 +7,8 @@ import type { UUIInputEvent } from '@umbraco-ui/uui';
 import type { UmbModalHandler } from '../../modal-handler';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-
-import type { UmbExtensionRegistry } from '@umbraco-cms/extensions-api';
 import type { ManifestPropertyEditorUI } from '@umbraco-cms/models';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
 export interface UmbModalPropertyEditorUIPickerData {
 	selection?: Array<string>;
@@ -104,29 +103,20 @@ export class UmbModalLayoutPropertyEditorUIPickerElement extends UmbContextConsu
 	@state()
 	private _submitLabel = 'Select';
 
-	private _extensionRegistry?: UmbExtensionRegistry;
-
-	constructor() {
-		super();
-
-		this.consumeContext('umbExtensionRegistry', (registry) => {
-			this._extensionRegistry = registry;
-			this._usePropertyEditorUIs();
-		});
-	}
-
 	connectedCallback(): void {
 		super.connectedCallback();
 
 		this._selection = this.data?.selection ?? [];
 		this._submitLabel = this.data?.submitLabel ?? this._submitLabel;
+
+		this._usePropertyEditorUIs();
 	}
 
 	private _usePropertyEditorUIs() {
-		if (!this.data || !this._extensionRegistry) return;
+		if (!this.data) return;
 
 		this.observe<ManifestPropertyEditorUI[]>(
-			this._extensionRegistry.extensionsOfType('propertyEditorUI'),
+			umbExtensionsRegistry.extensionsOfType('propertyEditorUI'),
 			(propertyEditorUIs) => {
 				this._propertyEditorUIs = propertyEditorUIs;
 				this._groupedPropertyEditorUIs = groupBy(propertyEditorUIs, 'meta.group');

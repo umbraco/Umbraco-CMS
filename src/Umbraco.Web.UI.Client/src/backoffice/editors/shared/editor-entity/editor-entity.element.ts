@@ -4,7 +4,8 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
 
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import { createExtensionElement, UmbExtensionRegistry } from '@umbraco-cms/extensions-api';
+import { createExtensionElement } from '@umbraco-cms/extensions-api';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { ManifestEditor } from '@umbraco-cms/models';
 
@@ -37,25 +38,22 @@ export class UmbEditorEntityElement extends UmbContextConsumerMixin(UmbObserverM
 	@state()
 	private _element?: any;
 
-	private _extensionRegistry?: UmbExtensionRegistry;
+	private _currentEditorAlias = '';
 
-	constructor() {
-		super();
-
-		this.consumeContext('umbExtensionRegistry', (extensionRegistry: UmbExtensionRegistry) => {
-			this._extensionRegistry = extensionRegistry;
-			this._observeEditors();
-		});
+	connectedCallback(): void {
+		super.connectedCallback();
+		this._observeEditors();
 	}
 
 	private _observeEditors() {
-		if (!this._extensionRegistry) return;
-
 		this.observe<ManifestEditor>(
-			this._extensionRegistry
+			umbExtensionsRegistry
 				.extensionsOfType('editor')
 				.pipe(map((editors) => editors.find((editor) => editor.meta.entityType === this.entityType))),
 			(editor) => {
+				// don't rerender editor if it's the same
+				if (this._currentEditorAlias === editor.alias) return;
+				this._currentEditorAlias = editor.alias;
 				this._createElement(editor);
 			}
 		);

@@ -7,6 +7,7 @@ import { createExtensionElement, UmbExtensionRegistry } from '@umbraco-cms/exten
 
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { ManifestPackageView, PackageInstalled } from '@umbraco-cms/models';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
 @customElement('umb-packages-installed-item')
 export class UmbPackagesInstalledItem extends UmbContextConsumerMixin(LitElement) {
@@ -22,19 +23,18 @@ export class UmbPackagesInstalledItem extends UmbContextConsumerMixin(LitElement
 	constructor() {
 		super();
 
-		this.consumeContext('umbExtensionRegistry', (umbExtensionRegistry: UmbExtensionRegistry) => {
-			this._umbExtensionRegistry = umbExtensionRegistry;
-
-			this.findPackageView(this.package.alias);
-		});
-
 		this.consumeContext('umbModalService', (modalService: UmbModalService) => {
 			this._umbModalService = modalService;
 		});
 	}
 
+	connectedCallback(): void {
+		super.connectedCallback();
+		this.findPackageView(this.package.alias);
+	}
+
 	private async findPackageView(alias: string) {
-		const observable = this._umbExtensionRegistry
+		const observable = umbExtensionsRegistry
 			?.extensionsOfType('packageView')
 			.pipe(map((e) => e.filter((m) => m.meta.packageAlias === alias)));
 

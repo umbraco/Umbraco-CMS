@@ -49,7 +49,6 @@ export class UmbBackofficeElement extends UmbContextConsumerMixin(UmbContextProv
 
 	private _umbIconRegistry = new UmbIconStore();
 	private _umbEntityStore = new UmbEntityStore();
-	private _umbSectionStore?: UmbSectionStore;
 
 	constructor() {
 		super();
@@ -66,12 +65,7 @@ export class UmbBackofficeElement extends UmbContextConsumerMixin(UmbContextProv
 		this.provideContext('umbPropertyEditorConfigStore', new UmbPropertyEditorConfigStore());
 		this.provideContext('umbNotificationService', new UmbNotificationService());
 		this.provideContext('umbModalService', new UmbModalService());
-
-		// TODO: how do we want to handle context aware DI?
-		this.consumeContext('umbExtensionRegistry', (extensionRegistry) => {
-			this._umbSectionStore = new UmbSectionStore(extensionRegistry);
-			this.provideContext('umbSectionStore', this._umbSectionStore);
-		});
+		this.provideContext('umbSectionStore', new UmbSectionStore());
 	}
 
 	render() {

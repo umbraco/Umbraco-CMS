@@ -12,9 +12,9 @@ import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
 import type { Guard, IRoute } from 'router-slot/model';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { internalManifests } from './temp-internal-manifests';
 import { getManifests, getServerStatus } from '@umbraco-cms/backend-api';
-import { UmbExtensionRegistry } from '@umbraco-cms/extensions-api';
 import { UmbContextProviderMixin } from '@umbraco-cms/context-api';
 
 import type { ServerStatus } from '@umbraco-cms/models';
@@ -56,7 +56,6 @@ export class UmbApp extends UmbContextProviderMixin(LitElement) {
 		},
 	];
 
-	private _extensionRegistry = new UmbExtensionRegistry();
 	private _iconRegistry = new UUIIconRegistryEssential();
 	private _serverStatus: ServerStatus = 'running';
 
@@ -67,8 +66,6 @@ export class UmbApp extends UmbContextProviderMixin(LitElement) {
 
 	private async _setup() {
 		this._iconRegistry.attach(this);
-		this.provideContext('umbExtensionRegistry', this._extensionRegistry);
-
 		await this._registerExtensionManifestsFromServer();
 		await this._registerInternalManifests();
 		await this._setInitStatus();
@@ -129,12 +126,12 @@ export class UmbApp extends UmbContextProviderMixin(LitElement) {
 	private async _registerExtensionManifestsFromServer() {
 		const res = await getManifests({});
 		const { manifests } = res.data;
-		manifests.forEach((manifest) => this._extensionRegistry.register(manifest));
+		manifests.forEach((manifest) => umbExtensionsRegistry.register(manifest));
 	}
 
 	private async _registerInternalManifests() {
 		// TODO: where do we get these from?
-		internalManifests.forEach((manifest) => this._extensionRegistry.register(manifest));
+		internalManifests.forEach((manifest) => umbExtensionsRegistry.register(manifest));
 	}
 
 	render() {
