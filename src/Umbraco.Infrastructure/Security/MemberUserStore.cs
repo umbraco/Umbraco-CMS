@@ -673,7 +673,12 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
         var anythingChanged = false;
         updateRoles = false;
 
-        // don't assign anything if nothing has changed as this will trigger the track changes of the model
+        if (identityUser.Properties.Any(x => x.IsDirty()) == true)
+        {
+            anythingChanged = true;
+            member.Properties = identityUser.Properties;
+        }
+
         if (identityUser.IsPropertyDirty(nameof(MemberIdentityUser.LastLoginDateUtc))
             || (member.LastLoginDate != default && identityUser.LastLoginDateUtc.HasValue == false)
             || (identityUser.LastLoginDateUtc.HasValue &&
@@ -682,10 +687,9 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
             anythingChanged = true;
 
             // if the LastLoginDate is being set to MinValue, don't convert it ToLocalTime
-            DateTime dt = identityUser.LastLoginDateUtc == DateTime.MinValue
+            member.LastLoginDate = identityUser.LastLoginDateUtc == DateTime.MinValue
                 ? DateTime.MinValue
-                : identityUser.LastLoginDateUtc?.ToLocalTime() ?? DateTime.MinValue;
-            member.LastLoginDate = dt;
+                : identityUser.LastLoginDateUtc?.ToLocalTime() ?? DateTime.MinValue;;
         }
 
         if (identityUser.IsPropertyDirty(nameof(MemberIdentityUser.LastPasswordChangeDateUtc))

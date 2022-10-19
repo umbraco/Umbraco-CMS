@@ -1,4 +1,5 @@
 using System.Globalization;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Extensions;
 
@@ -20,13 +21,35 @@ public class MemberIdentityUser : UmbracoIdentityUser
     /// <summary>
     ///     Initializes a new instance of the <see cref="MemberIdentityUser" /> class.
     /// </summary>
-    public MemberIdentityUser(int userId) =>
-
-        // use the property setters - they do more than just setting a field
-        Id = UserIdToString(userId);
-
     public MemberIdentityUser()
     {
+        Properties = new PropertyCollection();
+    }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="MemberIdentityUser" /> class.
+    /// </summary>
+    public MemberIdentityUser(int userId)
+    {
+        Id = UserIdToString(userId);
+        Properties = new PropertyCollection();
+    }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="MemberIdentityUser" /> class.
+    /// </summary>
+    public MemberIdentityUser(IPropertyCollection properties)
+    {
+        Properties = properties;
+    }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="MemberIdentityUser" /> class.
+    /// </summary>
+    public MemberIdentityUser(int userId, IPropertyCollection properties)
+    {
+        Id = UserIdToString(userId);
+        Properties = properties;
     }
 
     /// <summary>
@@ -53,6 +76,11 @@ public class MemberIdentityUser : UmbracoIdentityUser
     public string? MemberTypeAlias { get; set; }
 
     /// <summary>
+    ///     Gets or sets the properties of the member
+    /// </summary>
+    public IPropertyCollection Properties { get; set; }
+
+    /// <summary>
     ///     Used to construct a new instance without an identity
     /// </summary>
     public static MemberIdentityUser CreateNew(string username, string email, string memberTypeAlias, bool isApproved,
@@ -65,18 +93,16 @@ public class MemberIdentityUser : UmbracoIdentityUser
 
         var user = new MemberIdentityUser();
         user.DisableChangeTracking();
-        user.UserName = username;
+        user.Id = null!;
+        user.Name = name;
         user.Email = email;
+        user.UserName = username;
         user.MemberTypeAlias = memberTypeAlias;
         user.IsApproved = isApproved;
-        user.Id = null!;
         user.HasIdentity = false;
-        user.Name = name;
         user.EnableChangeTracking();
         return user;
     }
 
     private static string UserIdToString(int userId) => string.Intern(userId.ToString(CultureInfo.InvariantCulture));
-
-    // TODO: Should we support custom member properties for persistence/retrieval?
 }

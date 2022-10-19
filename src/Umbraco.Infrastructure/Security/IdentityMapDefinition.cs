@@ -50,7 +50,7 @@ public class IdentityMapDefinition : IMapDefinition
         mapper.Define<IMember, MemberIdentityUser>(
             (source, context) =>
             {
-                var target = new MemberIdentityUser(source.Id);
+                var target = new MemberIdentityUser(source.Id, source.Properties);
                 target.DisableChangeTracking();
                 return target;
             },
@@ -83,8 +83,7 @@ public class IdentityMapDefinition : IMapDefinition
         target.PasswordConfig = source.PasswordConfiguration;
         target.StartContentIds = source.StartContentIds ?? Array.Empty<int>();
         target.StartMediaIds = source.StartMediaIds ?? Array.Empty<int>();
-        target.Culture =
-            source.GetUserCulture(_textService, _globalSettings).ToString(); // project CultureInfo to string
+        target.Culture = source.GetUserCulture(_textService, _globalSettings).ToString(); // project CultureInfo to string
         target.IsApproved = source.IsApproved;
         target.SecurityStamp = source.SecurityStamp;
         target.LockoutEnd = source.IsLockedOut ? DateTime.MaxValue.ToUniversalTime() : (DateTime?)null;
@@ -112,6 +111,7 @@ public class IdentityMapDefinition : IMapDefinition
         target.CreatedDateUtc = source.CreateDate.ToUniversalTime();
         target.Key = source.Key;
         target.MemberTypeAlias = source.ContentTypeAlias;
+        target.Properties = source.Properties;
 
         // NB: same comments re AutoMapper as per BackOfficeUser
     }
