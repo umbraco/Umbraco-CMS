@@ -6,9 +6,10 @@ import { UmbContextConsumerMixin } from '../../../core/context';
 import type { UserDetails } from '../../../core/models';
 import { UmbModalLayoutElement } from '../../../core/services/modal/layouts/modal-layout.element';
 import { UmbUserStore } from '../../../core/stores/user/user.store';
+import { UmbPickerData } from './picker.element';
 
 @customElement('umb-picker-layout-user')
-export class UmbPickerLayoutUserElement extends UmbContextConsumerMixin(UmbModalLayoutElement) {
+export class UmbPickerLayoutUserElement extends UmbContextConsumerMixin(UmbModalLayoutElement<UmbPickerData>) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -63,13 +64,12 @@ export class UmbPickerLayoutUserElement extends UmbContextConsumerMixin(UmbModal
 	@state()
 	private _users: Array<UserDetails> = [];
 
-	protected _userStore?: UmbUserStore;
-	protected _usersSubscription?: Subscription;
+	private _userStore?: UmbUserStore;
+	private _usersSubscription?: Subscription;
 
 	connectedCallback(): void {
 		super.connectedCallback();
-
-		this._selection = this.data as unknown as Array<string>; //TODO We need a way to have types on the data
+		this._selection = this.data?.selection || [];
 		this.consumeContext('umbUserStore', (usersContext: UmbUserStore) => {
 			this._userStore = usersContext;
 			this._observeUser();
@@ -89,7 +89,7 @@ export class UmbPickerLayoutUserElement extends UmbContextConsumerMixin(UmbModal
 	}
 
 	private _close() {
-		this.modalHandler?.close({ selection: this._selection });
+		this.modalHandler?.close();
 	}
 
 	private _handleKeydown(e: KeyboardEvent, key: string) {
@@ -99,11 +99,16 @@ export class UmbPickerLayoutUserElement extends UmbContextConsumerMixin(UmbModal
 	}
 
 	private _handleItemClick(clickedKey: string) {
-		if (this._isSelected(clickedKey)) {
-			this._selection = this._selection.filter((key) => key !== clickedKey);
+		if (this.data?.multiple) {
+			if (this._isSelected(clickedKey)) {
+				this._selection = this._selection.filter((key) => key !== clickedKey);
+			} else {
+				this._selection.push(clickedKey);
+			}
 		} else {
-			this._selection.push(clickedKey);
+			this._selection = [clickedKey];
 		}
+
 		this.requestUpdate('_selection');
 	}
 

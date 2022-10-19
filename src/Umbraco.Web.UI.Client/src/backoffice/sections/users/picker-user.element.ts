@@ -1,15 +1,14 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html, LitElement, nothing } from 'lit';
+import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { Subscription } from 'rxjs';
-import { UmbContextConsumerMixin } from '../../../core/context';
-import type { UserDetails, UserEntity } from '../../../core/models';
+import type { UserEntity } from '../../../core/models';
 import { UmbUserStore } from '../../../core/stores/user/user.store';
 import './picker.element';
-import { UmbPickerChangedEvent } from './picker.element';
+import UmbPickerElement from './picker.element';
 
 @customElement('umb-picker-user')
-export class UmbPickerUserElement extends UmbContextConsumerMixin(LitElement) {
+export class UmbPickerUserElement extends UmbPickerElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -35,17 +34,14 @@ export class UmbPickerUserElement extends UmbContextConsumerMixin(LitElement) {
 	];
 
 	@state()
-	private _userKeys: Array<string> = [];
-
-	@state()
 	private _users: Array<UserEntity> = [];
 
-	protected _userStore?: UmbUserStore;
-	protected _usersSubscription?: Subscription;
+	private _userStore?: UmbUserStore;
+	private _usersSubscription?: Subscription;
 
 	connectedCallback(): void {
 		super.connectedCallback();
-
+		this.pickerLayout = 'umb-picker-layout-user';
 		this.consumeContext('umbUserStore', (usersContext: UmbUserStore) => {
 			this._userStore = usersContext;
 		});
@@ -56,21 +52,20 @@ export class UmbPickerUserElement extends UmbContextConsumerMixin(LitElement) {
 		this._usersSubscription?.unsubscribe();
 	}
 
-	private _handleSelection(e: UmbPickerChangedEvent) {
-		this._userKeys = e.target.value;
-		this._observeUser();
-	}
-
-	private _handleRemove(key: string) {
-		this._userKeys = this._userKeys.filter((k) => k !== key);
-		this._observeUser();
-	}
-
 	private _observeUser() {
 		this._usersSubscription?.unsubscribe();
-		this._usersSubscription = this._userStore?.getByKeys(this._userKeys).subscribe((users) => {
-			this._users = users;
-		});
+
+		if (this.selection.length > 0) {
+			this._usersSubscription = this._userStore?.getByKeys(this.selection).subscribe((users) => {
+				this._users = users;
+			});
+		} else {
+			this._users = [];
+		}
+	}
+
+	selectionUpdated() {
+		this._observeUser();
 	}
 
 	private _renderUserList() {
@@ -82,18 +77,15 @@ export class UmbPickerUserElement extends UmbContextConsumerMixin(LitElement) {
 					<div class="user">
 						<uui-avatar .name=${user.name}></uui-avatar>
 						<div>${user.name}</div>
-						<uui-button @click=${() => this._handleRemove(user.key)} label="remove"></uui-button>
+						<uui-button @click=${() => this.removeFromSelection(user.key)} label="remove"></uui-button>
 					</div>
 				`
 			)}
 		</div> `;
 	}
 
-	render() {
-		return html`
-			<umb-picker .picker=${'user'} .value=${this._userKeys} @changed=${this._handleSelection}></umb-picker>
-			${this._renderUserList()}
-		`;
+	renderContent() {
+		return html`${this._renderUserList()}`;
 	}
 }
 
