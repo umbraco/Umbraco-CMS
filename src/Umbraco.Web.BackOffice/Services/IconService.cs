@@ -162,27 +162,40 @@ public class IconService : IIconService
     {
         // Iterate through all plugin folders, this is necessary because on Linux we'll get casing issues when
         // we directly try to access {path}/{pluginDirectory.Name}/{Constants.SystemDirectories.PluginIcons}
-        foreach (IFileInfo pluginDirectory in fileProvider.GetDirectoryContents(path).Where(x => x.IsDirectory))
+        foreach (IFileInfo pluginDirectory in fileProvider.GetDirectoryContents(path))
         {
-            // Iterate through the sub directories of each plugin folder
-            // Hard-coding the "backoffice" directory name to gain a better performance when traversing the pluginDirectory directories
-            foreach (IFileInfo subDir1 in fileProvider.GetDirectoryContents($"{path}/{pluginDirectory.Name}").Where(x => x.IsDirectory && x.Name.InvariantEquals("backoffice")))
+            if (!pluginDirectory.IsDirectory)
             {
-                // Iterate through second level sub directories
-                foreach (IFileInfo subDir2 in fileProvider.GetDirectoryContents($"{path}/{pluginDirectory.Name}/{subDir1.Name}").Where(x => x.IsDirectory))
-                {
-                    // Does the directory match the plugin icons folder? (case insensitive for legacy support)
-                    if (!$"/{subDir1.Name}/{subDir2.Name}".InvariantEquals(Constants.SystemDirectories.PluginIcons))
-                    {
-                        continue;
-                    }
+                continue;
+            }
 
-                    // Iterate though the files of the second level sub directory. This should be where the SVG files are located :D
-                    foreach (IFileInfo file in fileProvider.GetDirectoryContents($"{path}/{pluginDirectory.Name}/{subDir1.Name}/{subDir2.Name}"))
+            // Iterate through the sub directories of each plugin folder
+            foreach (IFileInfo subDir1 in fileProvider.GetDirectoryContents($"{path}/{pluginDirectory.Name}"))
+            {
+                // Hard-coding the "backoffice" directory name to gain a better performance when traversing the pluginDirectory directories
+                if (subDir1.IsDirectory && subDir1.Name.InvariantEquals("backoffice"))
+                {
+                    // Iterate through second level sub directories
+                    foreach (IFileInfo subDir2 in fileProvider.GetDirectoryContents($"{path}/{pluginDirectory.Name}/{subDir1.Name}"))
                     {
-                        if (file.Name.InvariantEndsWith(".svg") && file.PhysicalPath != null)
+                        if (!subDir2.IsDirectory)
                         {
-                            yield return new FileInfo(file.PhysicalPath);
+                            continue;
+                        }
+
+                        // Does the directory match the plugin icons folder? (case insensitive for legacy support)
+                        if (!$"/{subDir1.Name}/{subDir2.Name}".InvariantEquals(Constants.SystemDirectories.PluginIcons))
+                        {
+                            continue;
+                        }
+
+                        // Iterate though the files of the second level sub directory. This should be where the SVG files are located :D
+                        foreach (IFileInfo file in fileProvider.GetDirectoryContents($"{path}/{pluginDirectory.Name}/{subDir1.Name}/{subDir2.Name}"))
+                        {
+                            if (file.Name.InvariantEndsWith(".svg") && file.PhysicalPath != null)
+                            {
+                                yield return new FileInfo(file.PhysicalPath);
+                            }
                         }
                     }
                 }

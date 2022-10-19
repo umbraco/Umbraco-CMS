@@ -193,20 +193,23 @@ public class TourController : UmbracoAuthorizedJsonController
         var toursDirName = "tours";
 
         // It is necessary to iterate through the subfolders because on Linux we'll get casing issues when
-        // we directly try to access {path}/{pluginDirectory.Name}/backoffice/tours;
-        // And we InvariantEquals({dirName}) to gain a better performance when looking for the tours folder
-        foreach (IFileInfo subDir in fileProvider.GetDirectoryContents(path).Where(x => x.IsDirectory && x.Name.InvariantEquals(subDirName)))
+        // we try to access {path}/{pluginDirectory.Name}/backoffice/tours directly
+        foreach (IFileInfo subDir in fileProvider.GetDirectoryContents(path))
         {
-            var virtualPath = WebPath.Combine(path, subDir.Name);
-
-            if (subDir.Name.InvariantEquals(toursDirName))
+            // InvariantEquals({dirName}) is used to gain a better performance when looking for the tours folder
+            if (subDir.IsDirectory && subDir.Name.InvariantEquals(subDirName))
             {
-                yield return virtualPath;
-            }
+                var virtualPath = WebPath.Combine(path, subDir.Name);
 
-            foreach (var nested in GetToursFolderPaths(fileProvider, virtualPath, toursDirName))
-            {
-                yield return nested;
+                if (subDir.Name.InvariantEquals(toursDirName))
+                {
+                    yield return virtualPath;
+                }
+
+                foreach (var nested in GetToursFolderPaths(fileProvider, virtualPath, toursDirName))
+                {
+                    yield return nested;
+                }
             }
         }
     }
