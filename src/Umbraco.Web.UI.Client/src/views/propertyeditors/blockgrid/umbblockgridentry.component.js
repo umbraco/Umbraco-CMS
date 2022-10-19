@@ -311,7 +311,8 @@
 
         vm.scaleHandlerKeyUp = function($event) {
 
-            let addCol = 0;
+            
+            let addColIndex = 0;
             let addRow = 0;
 
             switch ($event.originalEvent.key) {
@@ -322,16 +323,23 @@
                     addRow = 1;
                     break;
                 case 'ArrowLeft':
-                    addCol = -1;
+                    addColIndex = -1;
                     break;
                 case 'ArrowRight':
-                    addCol = 1;
+                    addColIndex = 1;
                     break;
             }
 
-            const newColumnSpan = Math.max(vm.layoutEntry.columnSpan + addCol, 1);
-
-            vm.layoutEntry.columnSpan = closestColumnSpanOption(newColumnSpan, vm.layoutEntry.$block.config.columnSpanOptions, gridColumns.length).columnSpan;
+            if(addColIndex !== 0) {
+                if (vm.layoutEntry.$block.config.columnSpanOptions.length > 0) {
+                    const sortOptions = vm.layoutEntry.$block.config.columnSpanOptions.sort((a,b) => (a.columnSpan > b.columnSpan) ? 1 : ((b.columnSpan > a.columnSpan) ? -1 : 0));
+                    const currentColIndex = sortOptions.findIndex(x => x.columnSpan === vm.layoutEntry.columnSpan);
+                    const newColIndex = Math.min(Math.max(currentColIndex + addColIndex, 0), sortOptions.length-1);
+                    vm.layoutEntry.columnSpan = sortOptions[newColIndex].columnSpan;
+                } else {
+                    vm.layoutEntry.columnSpan = vm.layoutColumnsInt;
+                }
+            }
             let newRowSpan = Math.max(vm.layoutEntry.rowSpan + addRow, vm.layoutEntry.$block.config.rowMinSpan || 1);
             if(vm.layoutEntry.$block.config.rowMaxSpan != null) {
                 newRowSpan = Math.min(newRowSpan, vm.layoutEntry.$block.config.rowMaxSpan);
