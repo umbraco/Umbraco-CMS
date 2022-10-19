@@ -1,16 +1,16 @@
-﻿using Umbraco.Cms.Infrastructure.Migrations.PostMigrations;
+using Umbraco.Cms.Infrastructure.Migrations.PostMigrations;
 
-namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_1
+namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_1;
+
+public class ChangeNuCacheJsonFormat : MigrationBase
 {
-    public class ChangeNuCacheJsonFormat : MigrationBase
+    public ChangeNuCacheJsonFormat(IMigrationContext context)
+        : base(context)
     {
-        public ChangeNuCacheJsonFormat(IMigrationContext context) : base(context)
-        { }
-
-        protected override void Migrate()
-        {
-            // nothing - just adding the post-migration
-            Context.AddPostMigration<RebuildPublishedSnapshot>();
-        }
     }
+
+    protected override void Migrate() =>
+
+        // nothing - just adding the post-migration
+        Context.AddPostMigration<RebuildPublishedSnapshot>();
 }

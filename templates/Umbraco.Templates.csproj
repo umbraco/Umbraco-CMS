@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Title>Umbraco CMS - Templates</Title>
+    <Description>Coontains templates for Umbraco CMS.</Description>
+    <PackageType>Template</PackageType>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <IncludeSymbols>false</IncludeSymbols>
+    <NoDefaultExcludes>true</NoDefaultExcludes>
+    <IncludeContentInPack>true</IncludeContentInPack>
+    <ContentTargetFolders>.</ContentTargetFolders>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="UmbracoPackage\**" Exclude="bin;obj" />
+    <Content Include="UmbracoProject\**" Exclude="bin;obj" />
+    <Content Include="..\src\Umbraco.Web.UI\Program.cs">
+      <Link>UmbracoProject\Program.cs</Link>
+      <PackagePath>UmbracoProject</PackagePath>
+    </Content>
+    <Content Include="..\src\Umbraco.Web.UI\Startup.cs">
+      <Link>UmbracoProject\Startup.cs</Link>
+      <PackagePath>UmbracoProject</PackagePath>
+    </Content>
+    <Content Include="..\src\Umbraco.Web.UI\Views\Partials\blocklist\**">
+      <Link>UmbracoProject\Views\Partials\blocklist\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <PackagePath>UmbracoProject\Views\Partials\blocklist</PackagePath>
+    </Content>
+    <Content Include="..\src\Umbraco.Web.UI\Views\Partials\grid\**">
+      <Link>UmbracoProject\Views\Partials\grid\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <PackagePath>UmbracoProject\Views\Partials\grid</PackagePath>
+    </Content>
+    <Content Include="..\src\Umbraco.Web.UI\Views\_ViewImports.cshtml">
+      <Link>UmbracoProject\Views\_ViewImports.cshtml</Link>
+      <PackagePath>UmbracoProject\Views</PackagePath>
+    </Content>
+    <Content Include="..\src\Umbraco.Web.UI\wwwroot\favicon.ico">
+      <Link>UmbracoProject\wwwroot\favicon.ico</Link>
+      <PackagePath>UmbracoProject\wwwroot</PackagePath>
+    </Content>
+  </ItemGroup>
+</Project>

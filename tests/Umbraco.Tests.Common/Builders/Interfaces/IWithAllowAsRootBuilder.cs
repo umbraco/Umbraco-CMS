@@ -1,7 +1,6 @@
-namespace Umbraco.Cms.Tests.Common.Builders.Interfaces
+namespace Umbraco.Cms.Tests.Common.Builders.Interfaces;
+
+public interface IWithAllowAsRootBuilder
 {
-    public interface IWithAllowAsRootBuilder
-    {
-        bool? AllowAsRoot { get; set; }
-    }
+    bool? AllowAsRoot { get; set; }
 }

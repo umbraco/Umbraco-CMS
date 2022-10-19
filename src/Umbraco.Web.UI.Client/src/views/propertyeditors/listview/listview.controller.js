@@ -1,4 +1,4 @@
-function listViewController($scope, $interpolate, $routeParams, $injector, $timeout, currentUserResource, notificationsService, iconHelper, editorState, localizationService, appState, $location, listViewHelper, navigationService, editorService, overlayService, languageResource, mediaHelper, eventsService) {
+function listViewController($scope, $interpolate, $routeParams, $injector, $timeout, currentUserResource, notificationsService, iconHelper, editorState, localizationService, appState, $location, contentEditingHelper, listViewHelper, navigationService, editorService, overlayService, languageResource, mediaHelper, eventsService) {
 
     //this is a quick check to see if we're in create mode, if so just exit - we cannot show children for content
     // that isn't created yet, if we continue this will use the parent id in the route params which isn't what
@@ -67,28 +67,8 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
     $scope.createAllowedButtonSingleWithBlueprints = false;
     $scope.createAllowedButtonMultiWithBlueprints = false;
 
-
     //when this is null, we don't check permissions
-    $scope.currentNodePermissions = null;
-
-    if ($scope.entityType === "content") {
-        //Just ensure we do have an editorState
-        if (editorState.current) {
-            //Fetch current node allowed actions for the current user
-            //This is the current node & not each individual child node in the list
-            var currentUserPermissions = editorState.current.allowedActions;
-
-            //Create a nicer model rather than the funky & hard to remember permissions strings
-            $scope.currentNodePermissions = {
-                "canCopy": _.contains(currentUserPermissions, 'O'), //Magic Char = O
-                "canCreate": _.contains(currentUserPermissions, 'C'), //Magic Char = C
-                "canDelete": _.contains(currentUserPermissions, 'D'), //Magic Char = D
-                "canMove": _.contains(currentUserPermissions, 'M'), //Magic Char = M
-                "canPublish": _.contains(currentUserPermissions, 'U'), //Magic Char = U
-                "canUnpublish": _.contains(currentUserPermissions, 'U') //Magic Char = Z (however UI says it can't be set, so if we can publish 'U' we can unpublish)
-            };
-        }
-    }
+    $scope.currentNodePermissions = $scope.entityType === "content" ? contentEditingHelper.getPermissionsForContent() : null;
 
     //when this is null, we don't check permissions
     $scope.buttonPermissions = null;
@@ -163,12 +143,14 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
             layouts: $scope.model.config.layouts,
             activeLayout: listViewHelper.getLayout($routeParams.id, $scope.model.config.layouts)
         },
-        allowBulkPublish: $scope.entityType === 'content' && $scope.model.config.bulkActionPermissions.allowBulkPublish,
-        allowBulkUnpublish: $scope.entityType === 'content' && $scope.model.config.bulkActionPermissions.allowBulkUnpublish,
-        allowBulkCopy: $scope.entityType === 'content' && $scope.model.config.bulkActionPermissions.allowBulkCopy,
-        allowBulkMove: $scope.entityType !== 'member' && $scope.model.config.bulkActionPermissions.allowBulkMove,
-        allowBulkDelete: $scope.model.config.bulkActionPermissions.allowBulkDelete,
-        cultureName: $routeParams.cculture ? $routeParams.cculture : $routeParams.mculture
+        allowBulkPublish: $scope.entityType === 'content' && $scope.model.config.bulkActionPermissions.allowBulkPublish && !$scope.readonly,
+        allowBulkUnpublish: $scope.entityType === 'content' && $scope.model.config.bulkActionPermissions.allowBulkUnpublish && !$scope.readonly,
+        allowBulkCopy: $scope.entityType === 'content' && $scope.model.config.bulkActionPermissions.allowBulkCopy && !$scope.readonly,
+        allowBulkMove: $scope.entityType !== 'member' && $scope.model.config.bulkActionPermissions.allowBulkMove && !$scope.readonly,
+        allowBulkDelete: $scope.model.config.bulkActionPermissions.allowBulkDelete && !$scope.readonly,
+        allowCreate: !$scope.readonly,
+        cultureName: $routeParams.cculture ? $routeParams.cculture : $routeParams.mculture,
+        readonly: $scope.readonly
     };
     
     _.each($scope.options.includeProperties, function (property) {
@@ -322,6 +304,14 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
                     navigationService.reloadSection(section);
                 }
             }
+        }).catch(function(error){
+          // if someone attempts to add mix listviews across sections (i.e. use a members list view on content types),
+          // a not-supported exception will be most likely be thrown, at least for the default list views - lets be
+          // helpful and show a meaningful error message directly in content/content type UI
+          if(error.data && error.data.ExceptionType && error.data.ExceptionType.indexOf("System.NotSupportedException") > -1) {
+            $scope.viewLoadedError = error.errorMsg + ": " + error.data.ExceptionMessage;
+          }
+          $scope.viewLoaded = true;
         });
     };
 

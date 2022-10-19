@@ -1,9 +1,6 @@
-using System.Threading.Tasks;
+namespace Umbraco.Cms.Core.Security;
 
-namespace Umbraco.Cms.Core.Security
+public interface IPublicAccessChecker
 {
-    public interface IPublicAccessChecker
-    {
-        Task<PublicAccessStatus> HasMemberAccessToContentAsync(int publishedContentId);
-    }
+    Task<PublicAccessStatus> HasMemberAccessToContentAsync(int publishedContentId);
 }

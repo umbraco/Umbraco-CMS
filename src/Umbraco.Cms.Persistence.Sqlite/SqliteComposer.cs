@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.DependencyInjection;
 namespace Umbraco.Cms.Persistence.Sqlite;
 
 /// <summary>
-/// Automatically adds SQLite support to Umbraco when this project is referenced.
+///     Automatically adds SQLite support to Umbraco when this project is referenced.
 /// </summary>
 public class SqliteComposer : IComposer
 {

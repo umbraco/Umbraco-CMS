@@ -13,7 +13,8 @@
                         class="btn-reset umb-media-card-grid--inline-create-button"
                         ng-click="vm.addMediaAt($index, $event)"
                         ng-controller="Umbraco.PropertyEditors.MediaPicker3PropertyEditor.CreateButtonController as inlineCreateButtonCtrl"
-                        ng-mousemove="inlineCreateButtonCtrl.onMouseMove($event)">
+                        ng-mousemove="inlineCreateButtonCtrl.onMouseMove($event)"
+                        ng-disabled="!vm.allowAddMedia">
                         <div class="__plus" ng-style="{'top':inlineCreateButtonCtrl.plusPosY}">
                             <umb-icon icon="icon-add" class="icon"></umb-icon>
                         </div>
@@ -29,7 +30,7 @@
                         <button ng-if="vm.supportCopy" type="button" class="btn-reset __action umb-outline" localize="title" title="actions_copy" ng-click="vm.copyMedia(media); $event.stopPropagation();">
                             <umb-icon icon="icon-documents" class="icon"></umb-icon>
                         </button>
-                        <button type="button" class="btn-reset __action umb-outline" localize="title" title="general_remove" ng-click="vm.removeMedia(media); $event.stopPropagation();">
+                        <button ng-if="vm.allowRemoveMedia" type="button" class="btn-reset __action umb-outline" localize="title" title="general_remove" ng-click="vm.removeMedia(media); $event.stopPropagation();">
                             <umb-icon icon="icon-trash" class="icon"></umb-icon>
                         </button>
                     </div>
@@ -42,7 +43,7 @@
                 id="{{vm.model.alias}}"
                 type="button"
                 class="btn-reset umb-media-card-grid__create-button umb-outline"
-                ng-disabled="!vm.allowAdd"
+                ng-disabled="!vm.allowAddMedia"
                 ng-click="vm.addMediaAt(vm.model.value.length, $event)">
                 <div>
                     <umb-icon icon="icon-add" class="icon large"></umb-icon>

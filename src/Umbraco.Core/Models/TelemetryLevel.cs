@@ -1,12 +1,11 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 
-namespace Umbraco.Cms.Core.Models
+namespace Umbraco.Cms.Core.Models;
+
+[DataContract]
+public enum TelemetryLevel
 {
-    [DataContract]
-    public enum TelemetryLevel
-    {
-        Minimal,
-        Basic,
-        Detailed,
-    }
+    Minimal,
+    Basic,
+    Detailed,
 }

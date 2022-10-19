@@ -7,13 +7,13 @@ using Umbraco.Cms.Infrastructure.Persistence;
 namespace Umbraco.Cms.Persistence.SqlServer.Services;
 
 /// <summary>
-/// Provider metadata for SQL Server LocalDb
+///     Provider metadata for SQL Server LocalDb
 /// </summary>
 [DataContract]
 public class SqlLocalDbDatabaseProviderMetadata : IDatabaseProviderMetadata
 {
     /// <inheritdoc />
-    public Guid Id => new ("05a7e9ed-aa6a-43af-a309-63422c87c675");
+    public Guid Id => new("05a7e9ed-aa6a-43af-a309-63422c87c675");
 
     /// <inheritdoc />
     public int SortOrder => 1;

@@ -1,10 +1,9 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-namespace Umbraco.Cms.Core.Notifications
+namespace Umbraco.Cms.Core.Notifications;
+
+public interface ICancelableNotification : INotification
 {
-    public interface ICancelableNotification : INotification
-    {
-        bool Cancel { get; set; }
-    }
+    bool Cancel { get; set; }
 }

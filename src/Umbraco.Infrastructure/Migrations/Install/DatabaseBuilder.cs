@@ -96,7 +96,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
 
         public bool HasSomeNonDefaultUser()
         {
-            using (var scope = _scopeProvider.CreateCoreScope())
+            using (ICoreScope scope = _scopeProvider.CreateCoreScope())
             {
                 // look for the super user with default password
                 var sql = _scopeAccessor.AmbientScope?.Database.SqlContext.Sql()
@@ -119,7 +119,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
 
         internal bool IsUmbracoInstalled()
         {
-            using (var scope = _scopeProvider.CreateCoreScope(autoComplete: true))
+            using (ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _scopeAccessor.AmbientScope?.Database.IsUmbracoInstalled() ?? false;
             }
@@ -155,28 +155,44 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             var connectionString = providerMeta.GenerateConnectionString(databaseSettings);
             var providerName = databaseSettings.ProviderName ?? providerMeta.ProviderName;
 
-            if (providerMeta.RequiresConnectionTest && !CanConnect(connectionString, providerName!))
+            if (string.IsNullOrEmpty(connectionString) || string.IsNullOrEmpty(providerName) ||
+                (providerMeta.RequiresConnectionTest && !CanConnect(connectionString, providerName)))
             {
                 return false;
             }
 
             if (!isTrialRun)
             {
-                _configManipulator.SaveConnectionString(connectionString!, providerName);
-                Configure(connectionString!, providerName, _globalSettings.CurrentValue.InstallMissingDatabase || providerMeta.ForceCreateDatabase);
+                // File configuration providers use a delay before reloading and triggering changes, so wait
+                using var isChanged = new ManualResetEvent(false);
+                using IDisposable? onChange = _connectionStrings.OnChange((options, name) =>
+                {
+                    // Only watch default named option (CurrentValue)
+                    if (name != Options.DefaultName)
+                    {
+                        return;
+                    }
+
+                    // Signal change
+                    isChanged.Set();
+                });
+
+                // Update configuration and wait for change
+                _configManipulator.SaveConnectionString(connectionString, providerName);
+                if (!isChanged.WaitOne(10_000))
+                {
+                    throw new InstallException("Didn't retrieve updated connection string within 10 seconds, try manual configuration instead.");
+                }
+
+                Configure(_globalSettings.CurrentValue.InstallMissingDatabase || providerMeta.ForceCreateDatabase);
             }
 
             return true;
         }
 
-        private void Configure(string connectionString, string? providerName, bool installMissingDatabase)
+        private void Configure(bool installMissingDatabase)
         {
-            // Update existing connection string
-            var umbracoConnectionString = _connectionStrings.Get(Core.Constants.System.UmbracoConnectionName);
-            umbracoConnectionString.ConnectionString = connectionString;
-            umbracoConnectionString.ProviderName = providerName;
-
-            _databaseFactory.Configure(umbracoConnectionString);
+            _databaseFactory.Configure(_connectionStrings.CurrentValue);
 
             if (installMissingDatabase)
             {

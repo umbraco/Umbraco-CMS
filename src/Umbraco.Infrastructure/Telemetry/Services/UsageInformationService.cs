@@ -1,36 +1,34 @@
-﻿using System.Collections.Generic;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Infrastructure.Telemetry.Interfaces;
 
-namespace Umbraco.Cms.Core.Services
+namespace Umbraco.Cms.Core.Services;
+
+internal class UsageInformationService : IUsageInformationService
 {
-    internal class UsageInformationService : IUsageInformationService
+    private readonly IMetricsConsentService _metricsConsentService;
+    private readonly IEnumerable<IDetailedTelemetryProvider> _providers;
+
+    public UsageInformationService(
+        IMetricsConsentService metricsConsentService,
+        IEnumerable<IDetailedTelemetryProvider> providers)
     {
-        private readonly IMetricsConsentService _metricsConsentService;
-        private readonly IEnumerable<IDetailedTelemetryProvider> _providers;
+        _metricsConsentService = metricsConsentService;
+        _providers = providers;
+    }
 
-        public UsageInformationService(
-            IMetricsConsentService metricsConsentService,
-            IEnumerable<IDetailedTelemetryProvider> providers)
+    public IEnumerable<UsageInformation>? GetDetailed()
+    {
+        if (_metricsConsentService.GetConsentLevel() != TelemetryLevel.Detailed)
         {
-            _metricsConsentService = metricsConsentService;
-            _providers = providers;
+            return null;
         }
 
-        public IEnumerable<UsageInformation>? GetDetailed()
+        var detailedUsageInformation = new List<UsageInformation>();
+        foreach (IDetailedTelemetryProvider provider in _providers)
         {
-            if (_metricsConsentService.GetConsentLevel() != TelemetryLevel.Detailed)
-            {
-                return null;
-            }
-
-            var detailedUsageInformation = new List<UsageInformation>();
-            foreach (IDetailedTelemetryProvider provider in _providers)
-            {
-                detailedUsageInformation.AddRange(provider.GetInformation());
-            }
-
-            return detailedUsageInformation;
+            detailedUsageInformation.AddRange(provider.GetInformation());
         }
+
+        return detailedUsageInformation;
     }
 }

@@ -1,12 +1,11 @@
-﻿namespace Umbraco.Cms.Core.Events
-{
-    /// <summary>
-    /// Event messages factory
-    /// </summary>
-    public interface IEventMessagesFactory
-    {
-        EventMessages Get();
+namespace Umbraco.Cms.Core.Events;
 
-        EventMessages? GetOrDefault();
-    }
+/// <summary>
+///     Event messages factory
+/// </summary>
+public interface IEventMessagesFactory
+{
+    EventMessages Get();
+
+    EventMessages? GetOrDefault();
 }

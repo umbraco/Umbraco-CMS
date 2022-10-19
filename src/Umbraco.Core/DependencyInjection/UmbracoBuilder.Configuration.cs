@@ -17,13 +17,13 @@ public static partial class UmbracoBuilderExtensions
     private static IUmbracoBuilder AddUmbracoOptions<TOptions>(this IUmbracoBuilder builder, Action<OptionsBuilder<TOptions>>? configure = null)
         where TOptions : class
     {
-        var umbracoOptionsAttribute = typeof(TOptions).GetCustomAttribute<UmbracoOptionsAttribute>();
+        UmbracoOptionsAttribute? umbracoOptionsAttribute = typeof(TOptions).GetCustomAttribute<UmbracoOptionsAttribute>();
         if (umbracoOptionsAttribute is null)
         {
             throw new ArgumentException($"{typeof(TOptions)} do not have the UmbracoOptionsAttribute.");
         }
 
-        var optionsBuilder = builder.Services.AddOptions<TOptions>()
+        OptionsBuilder<TOptions>? optionsBuilder = builder.Services.AddOptions<TOptions>()
             .Bind(
                 builder.Config.GetSection(umbracoOptionsAttribute.ConfigurationKey),
                 o => o.BindNonPublicProperties = umbracoOptionsAttribute.BindNonPublicProperties)
@@ -83,9 +83,12 @@ public static partial class UmbracoBuilderExtensions
             .AddUmbracoOptions<LegacyPasswordMigrationSettings>()
             .AddUmbracoOptions<PackageMigrationSettings>()
             .AddUmbracoOptions<ContentDashboardSettings>()
-            .AddUmbracoOptions<HelpPageSettings>();
+            .AddUmbracoOptions<HelpPageSettings>()
+            .AddUmbracoOptions<DataTypesSettings>();
 
+        // Configure connection string and ensure it's updated when the configuration changes
         builder.Services.AddSingleton<IConfigureOptions<ConnectionStrings>, ConfigureConnectionStrings>();
+        builder.Services.AddSingleton<IOptionsChangeTokenSource<ConnectionStrings>, ConfigurationChangeTokenSource<ConnectionStrings>>();
 
         builder.Services.Configure<InstallDefaultDataSettings>(
             Constants.Configuration.NamedOptions.InstallDefaultData.Languages,
@@ -99,6 +102,20 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.Configure<InstallDefaultDataSettings>(
             Constants.Configuration.NamedOptions.InstallDefaultData.MemberTypes,
             builder.Config.GetSection($"{Constants.Configuration.ConfigInstallDefaultData}:{Constants.Configuration.NamedOptions.InstallDefaultData.MemberTypes}"));
+
+        // TODO: Remove this in V12
+        // This is to make the move of the AllowEditInvariantFromNonDefault setting from SecuritySettings to ContentSettings backwards compatible
+        // If there is a value in security settings, but no value in content setting we'll use that value, otherwise content settings always wins.
+        builder.Services.Configure<ContentSettings>(settings =>
+        {
+            var securitySettingsValue = builder.Config.GetSection($"{Constants.Configuration.ConfigSecurity}").GetValue<bool?>(nameof(SecuritySettings.AllowEditInvariantFromNonDefault));
+            var contentSettingsValue = builder.Config.GetSection($"{Constants.Configuration.ConfigContent}").GetValue<bool?>(nameof(ContentSettings.AllowEditInvariantFromNonDefault));
+
+            if (securitySettingsValue is not null && contentSettingsValue is null)
+            {
+                settings.AllowEditInvariantFromNonDefault = securitySettingsValue.Value;
+            }
+        });
 
         return builder;
     }

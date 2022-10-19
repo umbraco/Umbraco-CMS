@@ -501,7 +501,7 @@
     <key alias="databaseUpgradeDone"><![CDATA[数据库已更新到版本 %0%。<br />点击<strong>下一步</strong>继续。]]></key>
     <key alias="databaseUpToDate"><![CDATA[您的数据库已安装！点击<strong>下一步</strong>继续]]></key>
     <key alias="defaultUserChangePass"><![CDATA[<strong>需要修改默认密码！</strong>]]></key>
-    <key alias="defaultUserDisabled"><![CDATA[<strong>默认账户已禁用或无权访问系统！</strong></p><p>点击<b>下一步</b>继续。]]></key>
+    <key alias="defaultUserDisabled"><![CDATA[<strong>默认账户已禁用或无权访问系统！</strong></p><p>点击<strong>下一步</strong>继续。]]></key>
     <key alias="defaultUserPassChanged"><![CDATA[<strong>安装过程中默认用户密码已更改</strong></p><p>点击<strong>下一步</strong>继续。]]></key>
     <key alias="defaultUserPasswordChanged">密码已更改</key>
     <key alias="greatStart">作为入门者，从视频教程开始吧！</key>

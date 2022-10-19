@@ -1,14 +1,13 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-namespace Umbraco.Cms.Tests.Integration.Testing
+namespace Umbraco.Cms.Tests.Integration.Testing;
+
+public interface ITestDatabase
 {
-    public interface ITestDatabase
-    {
-        TestDbMeta AttachEmpty();
+    TestDbMeta AttachEmpty();
 
-        TestDbMeta AttachSchema();
+    TestDbMeta AttachSchema();
 
-        void Detach(TestDbMeta id);
-    }
+    void Detach(TestDbMeta id);
 }

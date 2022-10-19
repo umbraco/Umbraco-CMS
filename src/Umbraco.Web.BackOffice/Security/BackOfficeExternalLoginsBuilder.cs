@@ -1,33 +1,27 @@
-using System;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Umbraco.Cms.Web.BackOffice.Security
+namespace Umbraco.Cms.Web.BackOffice.Security;
+
+/// <summary>
+///     Used to add back office login providers
+/// </summary>
+public class BackOfficeExternalLoginsBuilder
 {
+    private readonly IServiceCollection _services;
+
+    public BackOfficeExternalLoginsBuilder(IServiceCollection services) => _services = services;
+
     /// <summary>
-    /// Used to add back office login providers
+    ///     Add a back office login provider with options
     /// </summary>
-    public class BackOfficeExternalLoginsBuilder
+    /// <param name="loginProviderOptions"></param>
+    /// <param name="build"></param>
+    /// <returns></returns>
+    public BackOfficeExternalLoginsBuilder AddBackOfficeLogin(
+        Action<BackOfficeAuthenticationBuilder> build,
+        Action<BackOfficeExternalLoginProviderOptions>? loginProviderOptions = null)
     {
-        public BackOfficeExternalLoginsBuilder(IServiceCollection services)
-        {
-            _services = services;
-        }
-
-        private readonly IServiceCollection _services;
-
-        /// <summary>
-        /// Add a back office login provider with options
-        /// </summary>
-        /// <param name="loginProviderOptions"></param>
-        /// <param name="build"></param>
-        /// <returns></returns>
-        public BackOfficeExternalLoginsBuilder AddBackOfficeLogin(
-            Action<BackOfficeAuthenticationBuilder> build,
-            Action<BackOfficeExternalLoginProviderOptions>? loginProviderOptions = null)
-        {
-            build(new BackOfficeAuthenticationBuilder(_services, loginProviderOptions));
-            return this;
-        }
+        build(new BackOfficeAuthenticationBuilder(_services, loginProviderOptions));
+        return this;
     }
-
 }

@@ -1,9 +1,8 @@
-using System;
+namespace Umbraco.Cms.Core.Notifications;
 
-namespace Umbraco.Cms.Core.Notifications
-{
-    /// <summary>
-    /// Notification that occurs at the very end of the Umbraco boot process (after all <see cref="IComponent" />s are initialized).
+/// <summary>
+///     Notification that occurs at the very end of the Umbraco boot process (after all <see cref="IComponent" />s are
+/// initialized).
     /// </summary>
     /// <seealso cref="Umbraco.Cms.Core.Notifications.IUmbracoApplicationLifetimeNotification" />
     public class UmbracoApplicationStartingNotification : IUmbracoApplicationLifetimeNotification
@@ -19,15 +18,14 @@ namespace Umbraco.Cms.Core.Notifications
             IsRestarting = isRestarting;
         }
 
-        /// <summary>
-        /// Gets the runtime level.
-        /// </summary>
-        /// <value>
-        /// The runtime level.
-        /// </value>
-        public RuntimeLevel RuntimeLevel { get; }
+    /// <summary>
+    ///     Gets the runtime level.
+    /// </summary>
+    /// <value>
+    ///     The runtime level.
+    /// </value>
+    public RuntimeLevel RuntimeLevel { get; }
 
-        /// <inheritdoc />
-        public bool IsRestarting { get; }
-    }
+    /// <inheritdoc />
+    public bool IsRestarting { get; }
 }

@@ -1,29 +1,26 @@
-﻿using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using Newtonsoft.Json;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0.DataTypes
+namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0.DataTypes;
+
+internal class ListViewPreValueMigrator : DefaultPreValueMigrator
 {
-    class ListViewPreValueMigrator : DefaultPreValueMigrator
+    public override bool CanMigrate(string editorAlias)
+        => editorAlias == "Umbraco.ListView";
+
+    protected override IEnumerable<PreValueDto> GetPreValues(IEnumerable<PreValueDto> preValues) =>
+        preValues.Where(preValue => preValue.Alias != "displayAtTabNumber");
+
+    protected override object? GetPreValueValue(PreValueDto preValue)
     {
-        public override bool CanMigrate(string editorAlias)
-            => editorAlias == "Umbraco.ListView";
-
-        protected override IEnumerable<PreValueDto> GetPreValues(IEnumerable<PreValueDto> preValues)
+        if (preValue.Alias == "pageSize")
         {
-            return preValues.Where(preValue => preValue.Alias != "displayAtTabNumber");
+            return int.TryParse(preValue.Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var i)
+                ? (int?)i
+                : null;
         }
 
-        protected override object? GetPreValueValue(PreValueDto preValue)
-        {
-            if (preValue.Alias == "pageSize")
-            {
-                return int.TryParse(preValue.Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var i) ? (int?)i : null;
-            }
-
-            return preValue.Value?.DetectIsJson() ?? false ? JsonConvert.DeserializeObject(preValue.Value) : preValue.Value;
-        }
+        return preValue.Value?.DetectIsJson() ?? false ? JsonConvert.DeserializeObject(preValue.Value) : preValue.Value;
     }
 }

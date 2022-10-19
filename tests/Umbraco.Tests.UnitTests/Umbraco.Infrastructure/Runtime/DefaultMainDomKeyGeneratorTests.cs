@@ -6,42 +6,41 @@ using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Infrastructure.Runtime;
 using Umbraco.Cms.Tests.UnitTests.AutoFixture;
 
-namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Runtime
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Runtime;
+
+[TestFixture]
+internal class DefaultMainDomKeyGeneratorTests
 {
-    [TestFixture]
-    internal class DefaultMainDomKeyGeneratorTests
+    [Test]
+    [AutoMoqData]
+    public void GenerateKey_WithConfiguredDiscriminatorValue_AltersHash(
+        [Frozen] IHostingEnvironment hostingEnvironment,
+        [Frozen] GlobalSettings globalSettings,
+        [Frozen] IOptionsMonitor<GlobalSettings> globalSettingsMonitor,
+        DefaultMainDomKeyGenerator sut,
+        string aDiscriminator)
     {
-        [Test]
-        [AutoMoqData]
-        public void GenerateKey_WithConfiguredDiscriminatorValue_AltersHash(
-            [Frozen] IHostingEnvironment hostingEnvironment,
-            [Frozen] GlobalSettings globalSettings,
-            [Frozen] IOptionsMonitor<GlobalSettings> globalSettingsMonitor,
-            DefaultMainDomKeyGenerator sut,
-            string aDiscriminator)
-        {
-            var withoutDiscriminator = sut.GenerateKey();
-            globalSettings.MainDomKeyDiscriminator = aDiscriminator;
-            var withDiscriminator = sut.GenerateKey();
+        var withoutDiscriminator = sut.GenerateKey();
+        globalSettings.MainDomKeyDiscriminator = aDiscriminator;
+        var withDiscriminator = sut.GenerateKey();
 
-            Assert.AreNotEqual(withoutDiscriminator, withDiscriminator);
-        }
+        Assert.AreNotEqual(withoutDiscriminator, withDiscriminator);
+    }
 
-        [Test]
-        [AutoMoqData]
-        public void GenerateKey_WithUnchangedDiscriminatorValue_ReturnsSameValue(
-            [Frozen] IHostingEnvironment hostingEnvironment,
-            [Frozen] GlobalSettings globalSettings,
-            [Frozen] IOptionsMonitor<GlobalSettings> globalSettingsMonitor,
-            DefaultMainDomKeyGenerator sut,
-            string aDiscriminator)
-        {
-            globalSettings.MainDomKeyDiscriminator = aDiscriminator;
+    [Test]
+    [AutoMoqData]
+    public void GenerateKey_WithUnchangedDiscriminatorValue_ReturnsSameValue(
+        [Frozen] IHostingEnvironment hostingEnvironment,
+        [Frozen] GlobalSettings globalSettings,
+        [Frozen] IOptionsMonitor<GlobalSettings> globalSettingsMonitor,
+        DefaultMainDomKeyGenerator sut,
+        string aDiscriminator)
+    {
+        globalSettings.MainDomKeyDiscriminator = aDiscriminator;
 
-            var a = sut.GenerateKey();
-            var b = sut.GenerateKey();
+        var a = sut.GenerateKey();
+        var b = sut.GenerateKey();
 
-            Assert.AreEqual(a, b);
-        }
+        Assert.AreEqual(a, b);
     }
 }

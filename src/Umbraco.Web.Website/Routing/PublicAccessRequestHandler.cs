@@ -84,15 +84,25 @@ public class PublicAccessRequestHandler : IPublicAccessRequestHandler
                 switch (publicAccessStatus)
                 {
                     case PublicAccessStatus.NotLoggedIn:
-                        _logger.LogDebug("EnsurePublishedContentAccess: Not logged in, redirect to login page");
-                        routeValues = await SetPublishedContentAsOtherPageAsync(
-                            httpContext, routeValues.PublishedRequest, publicAccessAttempt.Result!.LoginNodeId);
+                        // redirect if this is not the login page
+                        if (publicAccessAttempt.Result!.LoginNodeId != publishedContent.Id)
+                        {
+                            _logger.LogDebug("EnsurePublishedContentAccess: Not logged in, redirect to login page");
+                            routeValues = await SetPublishedContentAsOtherPageAsync(
+                                httpContext, routeValues.PublishedRequest, publicAccessAttempt.Result!.LoginNodeId);
+                        }
+
                         break;
                     case PublicAccessStatus.AccessDenied:
-                        _logger.LogDebug(
-                            "EnsurePublishedContentAccess: Current member has not access, redirect to error page");
-                        routeValues = await SetPublishedContentAsOtherPageAsync(
-                            httpContext, routeValues.PublishedRequest, publicAccessAttempt.Result!.NoAccessNodeId);
+                        // Redirect if this is not the access denied page
+                        if (publicAccessAttempt.Result!.NoAccessNodeId != publishedContent.Id)
+                        {
+                            _logger.LogDebug(
+                                "EnsurePublishedContentAccess: Current member has not access, redirect to error page");
+                            routeValues = await SetPublishedContentAsOtherPageAsync(
+                                httpContext, routeValues.PublishedRequest, publicAccessAttempt.Result!.NoAccessNodeId);
+                        }
+
                         break;
                     case PublicAccessStatus.LockedOut:
                         _logger.LogDebug("Current member is locked out, redirect to error page");

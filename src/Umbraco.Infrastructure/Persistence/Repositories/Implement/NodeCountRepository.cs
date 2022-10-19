@@ -1,4 +1,4 @@
-﻿using System;
+using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
@@ -13,22 +13,20 @@ public class NodeCountRepository : INodeCountRepository
 
     public NodeCountRepository(IScopeAccessor scopeAccessor) => _scopeAccessor = scopeAccessor;
 
-    /// <inheritdoc/>
-
+    /// <inheritdoc />
     public int GetNodeCount(Guid nodeType)
     {
-        var query = _scopeAccessor.AmbientScope?.Database.SqlContext.Sql()
+        Sql<ISqlContext>? query = _scopeAccessor.AmbientScope?.Database.SqlContext.Sql()
             .SelectCount()
             .From<NodeDto>()
             .Where<NodeDto>(x => x.NodeObjectType == nodeType && x.Trashed == false);
 
         return _scopeAccessor.AmbientScope?.Database.ExecuteScalar<int>(query) ?? 0;
-
     }
 
     public int GetMediaCount()
     {
-        var query = _scopeAccessor.AmbientScope?.Database.SqlContext.Sql()
+        Sql<ISqlContext>? query = _scopeAccessor.AmbientScope?.Database.SqlContext.Sql()
             .SelectCount()
             .From<NodeDto>()
             .InnerJoin<ContentDto>()

@@ -11,5 +11,5 @@ public interface IVirtualPageController
     /// <summary>
     ///     Returns the <see cref="IPublishedContent" /> to use as the current page for the request
     /// </summary>
-    IPublishedContent FindContent(ActionExecutingContext actionExecutingContext);
+    IPublishedContent? FindContent(ActionExecutingContext actionExecutingContext);
 }

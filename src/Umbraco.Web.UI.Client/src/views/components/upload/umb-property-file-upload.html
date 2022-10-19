@@ -10,7 +10,9 @@
       ng-hide="vm.files.length > 0">
       <umb-icon icon="icon-page-up" class="icon"></umb-icon>
       <p><localize key="media_clickToUpload">Click to upload</localize></p>
-      <umb-single-file-upload accept-file-ext="vm.acceptFileExt">
+      <umb-single-file-upload
+        accept-file-ext="vm.acceptFileExt"
+        ng-attr-readonly="{{ vm.readonly || undefined }}">
       </umb-single-file-upload>
     </div>
 
@@ -25,7 +27,7 @@
             client-side-data="file.fileData">
           </umb-media-preview>
         </div>
-        <div class="umb-property-file-upload--actions">
+        <div ng-if="!vm.readonly" class="umb-property-file-upload--actions">
           <button
             type="button"
             class="btn btn-link"

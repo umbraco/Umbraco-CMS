@@ -1,10 +1,8 @@
 using System.Data;
 using System.Data.Common;
-using Microsoft.Data.SqlClient;
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.DistributedLocking.Exceptions;
@@ -17,10 +15,10 @@ namespace Umbraco.Cms.Persistence.Sqlite.Services;
 
 public class SqliteDistributedLockingMechanism : IDistributedLockingMechanism
 {
-    private readonly ILogger<SqliteDistributedLockingMechanism> _logger;
-    private readonly Lazy<IScopeAccessor> _scopeAccessor;
     private readonly IOptionsMonitor<ConnectionStrings> _connectionStrings;
     private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
+    private readonly ILogger<SqliteDistributedLockingMechanism> _logger;
+    private readonly Lazy<IScopeAccessor> _scopeAccessor;
 
     public SqliteDistributedLockingMechanism(
         ILogger<SqliteDistributedLockingMechanism> logger,
@@ -36,7 +34,7 @@ public class SqliteDistributedLockingMechanism : IDistributedLockingMechanism
 
     /// <inheritdoc />
     public bool Enabled => _connectionStrings.CurrentValue.IsConnectionStringConfigured() &&
-                           _connectionStrings.CurrentValue.ProviderName == Constants.ProviderName;
+                           string.Equals(_connectionStrings.CurrentValue.ProviderName, Constants.ProviderName, StringComparison.InvariantCultureIgnoreCase);
 
     // With journal_mode=wal we can always read a snapshot.
     public IDistributedLock ReadLock(int lockId, TimeSpan? obtainLockTimeout = null)
@@ -84,7 +82,7 @@ public class SqliteDistributedLockingMechanism : IDistributedLockingMechanism
                         throw new ArgumentOutOfRangeException(nameof(lockType), lockType, @"Unsupported lockType");
                 }
             }
-            catch (SqlException ex) when (ex.Number == 1222)
+            catch (SqliteException ex) when (ex.SqliteErrorCode == SQLitePCL.raw.SQLITE_BUSY)
             {
                 if (LockType == DistributedLockType.ReadLock)
                 {
@@ -101,11 +99,9 @@ public class SqliteDistributedLockingMechanism : IDistributedLockingMechanism
 
         public DistributedLockType LockType { get; }
 
-        public void Dispose()
-        {
+        public void Dispose() =>
             // Mostly no op, cleaned up by completing transaction in scope.
             _parent._logger.LogDebug("Dropped {lockType} for id {id}", LockType, LockId);
-        }
 
         public override string ToString()
             => $"SqliteDistributedLock({LockId})";
@@ -123,7 +119,8 @@ public class SqliteDistributedLockingMechanism : IDistributedLockingMechanism
 
             if (!db.InTransaction)
             {
-                throw new InvalidOperationException("SqliteDistributedLockingMechanism requires a transaction to function.");
+                throw new InvalidOperationException(
+                    "SqliteDistributedLockingMechanism requires a transaction to function.");
             }
         }
 
@@ -140,7 +137,8 @@ public class SqliteDistributedLockingMechanism : IDistributedLockingMechanism
 
             if (!db.InTransaction)
             {
-                throw new InvalidOperationException("SqliteDistributedLockingMechanism requires a transaction to function.");
+                throw new InvalidOperationException(
+                    "SqliteDistributedLockingMechanism requires a transaction to function.");
             }
 
             var query = @$"UPDATE umbracoLock SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id = {LockId}";

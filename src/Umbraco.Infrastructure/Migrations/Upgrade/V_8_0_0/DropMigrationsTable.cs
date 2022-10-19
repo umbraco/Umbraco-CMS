@@ -1,15 +1,17 @@
-﻿namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0
-{
-    public class DropMigrationsTable : MigrationBase
-    {
-        public DropMigrationsTable(IMigrationContext context)
-            : base(context)
-        { }
+namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0;
 
-        protected override void Migrate()
+public class DropMigrationsTable : MigrationBase
+{
+    public DropMigrationsTable(IMigrationContext context)
+        : base(context)
+    {
+    }
+
+    protected override void Migrate()
+    {
+        if (TableExists("umbracoMigration"))
         {
-            if (TableExists("umbracoMigration"))
-                Delete.Table("umbracoMigration").Do();
+            Delete.Table("umbracoMigration").Do();
         }
     }
 }

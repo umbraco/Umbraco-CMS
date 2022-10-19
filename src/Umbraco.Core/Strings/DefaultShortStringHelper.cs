@@ -1,8 +1,5 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Globalization;
-using System.IO;
-using System.Linq;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Extensions;
@@ -143,9 +140,11 @@ namespace Umbraco.Cms.Core.Strings
         public virtual string CleanStringForSafeFileName(string text, string culture)
         {
             if (string.IsNullOrWhiteSpace(text))
+            {
                 return string.Empty;
+            }
 
-            culture = culture ?? "";
+            culture = culture ?? string.Empty;
             text = text.ReplaceMany(Path.GetInvalidFileNameChars(), '-');
 
             var name = Path.GetFileNameWithoutExtension(text);
@@ -153,12 +152,17 @@ namespace Umbraco.Cms.Core.Strings
 
             Debug.Assert(name != null, "name != null");
             if (name.Length > 0)
+            {
                 name = CleanString(name, CleanStringType.FileName, culture);
+            }
+
             Debug.Assert(ext != null, "ext != null");
             if (ext.Length > 0)
+            {
                 ext = CleanString(ext.Substring(1), CleanStringType.FileName, culture);
+            }
 
-            return ext.Length > 0 ? (name + "." + ext) : name;
+            return ext.Length > 0 ? name + "." + ext : name;
         }
 
         #endregion
@@ -190,10 +194,7 @@ namespace Umbraco.Cms.Core.Strings
         /// strings are cleaned up to camelCase and Ascii.</param>
         /// <returns>The clean string.</returns>
         /// <remarks>The string is cleaned in the context of the default culture.</remarks>
-        public string CleanString(string text, CleanStringType stringType)
-        {
-            return CleanString(text, stringType, _config.DefaultCulture, null);
-        }
+        public string CleanString(string text, CleanStringType stringType) => CleanString(text, stringType, _config.DefaultCulture, null);
 
         /// <summary>
         /// Cleans a string, using a specified separator.
@@ -204,10 +205,7 @@ namespace Umbraco.Cms.Core.Strings
         /// <param name="separator">The separator.</param>
         /// <returns>The clean string.</returns>
         /// <remarks>The string is cleaned in the context of the default culture.</remarks>
-        public string CleanString(string text, CleanStringType stringType, char separator)
-        {
-            return CleanString(text, stringType, _config.DefaultCulture, separator);
-        }
+        public string CleanString(string text, CleanStringType stringType, char separator) => CleanString(text, stringType, _config.DefaultCulture, separator);
 
         /// <summary>
         /// Cleans a string in the context of a specified culture.
@@ -239,32 +237,43 @@ namespace Umbraco.Cms.Core.Strings
         protected virtual string CleanString(string text, CleanStringType stringType, string? culture, char? separator)
         {
             // be safe
-            if (text == null) throw new ArgumentNullException(nameof(text));
-            culture = culture ?? "";
+            if (text == null)
+            {
+                throw new ArgumentNullException(nameof(text));
+            }
+
+            culture = culture ?? string.Empty;
 
             // get config
-            var config = _config.For(stringType, culture);
+            DefaultShortStringHelperConfig.Config config = _config.For(stringType, culture);
             stringType = config.StringTypeExtend(stringType);
 
             // apply defaults
             if ((stringType & CleanStringType.CaseMask) == CleanStringType.None)
+            {
                 stringType |= CleanStringType.CamelCase;
+            }
+
             if ((stringType & CleanStringType.CodeMask) == CleanStringType.None)
+            {
                 stringType |= CleanStringType.Ascii;
+            }
 
             // use configured unless specified
             separator = separator ?? config.Separator;
 
             // apply pre-filter
             if (config.PreFilter != null)
+            {
                 text = config.PreFilter(text);
+            }
 
             // apply replacements
             //if (config.Replacements != null)
             //    text = ReplaceMany(text, config.Replacements);
 
             // recode
-            var codeType = stringType & CleanStringType.CodeMask;
+            CleanStringType codeType = stringType & CleanStringType.CodeMask;
             switch (codeType)
             {
                 case CleanStringType.Ascii:
@@ -273,7 +282,11 @@ namespace Umbraco.Cms.Core.Strings
                 case CleanStringType.TryAscii:
                     const char ESC = (char) 27;
                     var ctext = Utf8ToAsciiConverter.ToAsciiString(text, ESC);
-                    if (ctext.Contains(ESC) == false) text = ctext;
+                    if (ctext.Contains(ESC) == false)
+                    {
+                        text = ctext;
+                    }
+
                     break;
                 default:
                     text = RemoveSurrogatePairs(text);
@@ -285,7 +298,9 @@ namespace Umbraco.Cms.Core.Strings
 
             // apply post-filter
             if (config.PostFilter != null)
+            {
                 text = config.PostFilter(text);
+            }
 
             return text;
         }
@@ -323,7 +338,7 @@ namespace Umbraco.Cms.Core.Strings
             int opos = 0, ipos = 0;
             var state = StateBreak;
 
-            culture = culture ?? "";
+            culture = culture ?? string.Empty;
             caseType &= CleanStringType.CaseMask;
 
             // if we apply global ToUpper or ToLower to text here
@@ -364,9 +379,13 @@ namespace Umbraco.Cms.Core.Strings
                         {
                             ipos = i;
                             if (opos > 0 && separator != char.MinValue)
+                            {
                                 output[opos++] = separator;
+                            }
+
                             state = isUpper ? StateUp : StateWord;
                         }
+
                         break;
 
                     // within a term / word
@@ -379,8 +398,11 @@ namespace Umbraco.Cms.Core.Strings
                             ipos = i;
                             state = isTerm ? StateUp : StateBreak;
                             if (state != StateBreak && separator != char.MinValue)
+                            {
                                 output[opos++] = separator;
+                            }
                         }
+
                         break;
 
                     // within a term / acronym
@@ -391,14 +413,19 @@ namespace Umbraco.Cms.Core.Strings
                         {
                             // whether it's part of the acronym depends on whether we're greedy
                             if (isTerm && config.GreedyAcronyms == false)
+                            {
                                 i -= 1; // handle that char again, in another state - not part of the acronym
+                            }
+
                             if (i - ipos > 1) // single-char can't be an acronym
                             {
                                 CopyTerm(input, ipos, output, ref opos, i - ipos, caseType, culture, true);
                                 ipos = i;
                                 state = isTerm ? StateWord : StateBreak;
                                 if (state != StateBreak && separator != char.MinValue)
+                                {
                                     output[opos++] = separator;
+                                }
                             }
                             else if (isTerm)
                             {
@@ -411,6 +438,7 @@ namespace Umbraco.Cms.Core.Strings
                             // keep moving forward as a word
                             state = StateWord;
                         }
+
                         break;
 
                     // within a term / uppercase = could be a word or an acronym
@@ -455,18 +483,19 @@ namespace Umbraco.Cms.Core.Strings
         }
 
         // note: supports surrogate pairs in input string
-        internal void CopyTerm(string input, int ipos, char[] output, ref int opos, int len,
-            CleanStringType caseType, string culture, bool isAcronym)
+        internal void CopyTerm(string input, int ipos, char[] output, ref int opos, int len, CleanStringType caseType, string culture, bool isAcronym)
         {
             var term = input.Substring(ipos, len);
-            var cultureInfo = string.IsNullOrEmpty(culture) ? CultureInfo.InvariantCulture : CultureInfo.GetCultureInfo(culture);
+            CultureInfo cultureInfo = string.IsNullOrEmpty(culture) ? CultureInfo.InvariantCulture : CultureInfo.GetCultureInfo(culture);
 
             if (isAcronym)
             {
                 if ((caseType == CleanStringType.CamelCase && len <= 2 && opos > 0) ||
                         (caseType == CleanStringType.PascalCase && len <= 2) ||
-                        (caseType == CleanStringType.UmbracoCase))
+                        caseType == CleanStringType.UmbracoCase)
+                {
                     caseType = CleanStringType.Unchanged;
+                }
             }
 
             // note: MSDN seems to imply that ToUpper or ToLower preserve the length
@@ -586,7 +615,9 @@ namespace Umbraco.Cms.Core.Strings
         {
             // be safe
             if (text == null)
+            {
                 throw new ArgumentNullException(nameof(text));
+            }
 
             var input = text.ToCharArray();
             var output = new char[input.Length * 2];
@@ -603,7 +634,10 @@ namespace Umbraco.Cms.Core.Strings
                     if (upos == 0)
                     {
                         if (opos > 0)
+                        {
                             output[opos++] = separator;
+                        }
+
                         upos = i + 1;
                     }
                 }
@@ -612,15 +646,24 @@ namespace Umbraco.Cms.Core.Strings
                     if (upos > 0)
                     {
                         if (upos < i && opos > 0)
+                        {
                             output[opos++] = separator;
+                        }
+
                         upos = 0;
                     }
+
                     output[opos++] = a;
                 }
+
                 a = c;
             }
+
             if (a != char.MinValue)
+            {
                 output[opos++] = a;
+            }
+
             return new string(output, 0, opos);
         }
 

@@ -1,16 +1,14 @@
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
-using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Infrastructure.WebAssets;
 
-namespace Umbraco.Cms.Infrastructure.DependencyInjection
+namespace Umbraco.Cms.Infrastructure.DependencyInjection;
+
+public static partial class UmbracoBuilderExtensions
 {
-    public static partial class UmbracoBuilderExtensions
+    internal static IUmbracoBuilder AddWebAssets(this IUmbracoBuilder builder)
     {
-        internal static IUmbracoBuilder AddWebAssets(this IUmbracoBuilder builder)
-        {
-            builder.Services.AddSingleton<BackOfficeWebAssets>();
-            return builder;
-        }
+        builder.Services.AddSingleton<BackOfficeWebAssets>();
+        return builder;
     }
 }

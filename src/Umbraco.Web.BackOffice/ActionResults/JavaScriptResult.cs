@@ -1,13 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 
-namespace Umbraco.Cms.Web.BackOffice.ActionResults
+namespace Umbraco.Cms.Web.BackOffice.ActionResults;
+
+public class JavaScriptResult : ContentResult
 {
-    public class JavaScriptResult : ContentResult
+    public JavaScriptResult(string? script)
     {
-        public JavaScriptResult(string? script)
-        {
-            this.Content = script;
-            this.ContentType = "application/javascript";
-        }
+        Content = script;
+        ContentType = "application/javascript";
     }
 }

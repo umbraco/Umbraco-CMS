@@ -1,15 +1,14 @@
-﻿using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common;
 
-namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete.Index
+namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete.Index;
+
+/// <summary>
+///     Builds a Delete expression.
+/// </summary>
+public interface IDeleteIndexForTableBuilder : IFluentBuilder
 {
     /// <summary>
-    /// Builds a Delete expression.
+    ///     Specifies the table of the index to delete.
     /// </summary>
-    public interface IDeleteIndexForTableBuilder : IFluentBuilder
-    {
-        /// <summary>
-        /// Specifies the table of the index to delete.
-        /// </summary>
-        IExecutableBuilder OnTable(string tableName);
-    }
+    IExecutableBuilder OnTable(string tableName);
 }

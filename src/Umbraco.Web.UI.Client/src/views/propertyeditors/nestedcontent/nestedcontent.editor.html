@@ -1,13 +1,18 @@
 ﻿<div class="umb-pane">
     <div ng-repeat="property in tab.properties" class="umb-nested-content-property-container">
 
-        <umb-property property="property"
-                      property-alias="{{property.propertyAlias}}"
-                      element-key="{{model.key}}"
-                      ng-class="{'umb-nested-content--not-supported': property.notSupported }"
-                      data-element="property-{{property.alias}}">
+        <umb-property 
+            property="property"
+            property-alias="{{property.propertyAlias}}"
+            element-key="{{model.key}}"
+            ng-class="{'umb-nested-content--not-supported': property.notSupported }"
+            data-element="property-{{property.alias}}">
 
-            <umb-property-editor model="property"></umb-property-editor>
+            <umb-property-editor
+                model="property"
+                preview="readonly && !property.supportsReadOnly"
+                ng-attr-readonly="{{readonly  || undefined }}">
+            </umb-property-editor>
 
         </umb-property>
 

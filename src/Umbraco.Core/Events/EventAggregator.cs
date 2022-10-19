@@ -1,117 +1,112 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using Umbraco.Cms.Core.Notifications;
 
-namespace Umbraco.Cms.Core.Events
+namespace Umbraco.Cms.Core.Events;
+
+/// <summary>
+///     A factory method used to resolve all services.
+///     For multiple instances, it will resolve against <see cref="IEnumerable{T}" />.
+/// </summary>
+/// <param name="serviceType">Type of service to resolve.</param>
+/// <returns>An instance of type <paramref name="serviceType" />.</returns>
+public delegate object ServiceFactory(Type serviceType);
+
+/// <summary>
+///     Extensions for <see cref="ServiceFactory" />.
+/// </summary>
+public static class ServiceFactoryExtensions
 {
     /// <summary>
-    /// A factory method used to resolve all services.
-    /// For multiple instances, it will resolve against <see cref="IEnumerable{T}" />.
+    ///     Gets an instance of <typeparamref name="T" />.
     /// </summary>
-    /// <param name="serviceType">Type of service to resolve.</param>
-    /// <returns>An instance of type <paramref name="serviceType" />.</returns>
-    public delegate object ServiceFactory(Type serviceType);
+    /// <typeparam name="T">The type to return.</typeparam>
+    /// <param name="factory">The service factory.</param>
+    /// <returns>The new instance.</returns>
+    public static T GetInstance<T>(this ServiceFactory factory)
+        => (T)factory(typeof(T));
 
-    /// <inheritdoc/>
-    public partial class EventAggregator : IEventAggregator
+    /// <summary>
+    ///     Gets a collection of instances of <typeparamref name="T" />.
+    /// </summary>
+    /// <typeparam name="T">The collection item type to return.</typeparam>
+    /// <param name="factory">The service factory.</param>
+    /// <returns>The new instance collection.</returns>
+    public static IEnumerable<T> GetInstances<T>(this ServiceFactory factory)
+        => (IEnumerable<T>)factory(typeof(IEnumerable<T>));
+}
+
+/// <inheritdoc />
+public partial class EventAggregator : IEventAggregator
+{
+    private readonly ServiceFactory _serviceFactory;
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="EventAggregator" /> class.
+    /// </summary>
+    /// <param name="serviceFactory">The service instance factory.</param>
+    public EventAggregator(ServiceFactory serviceFactory)
+        => _serviceFactory = serviceFactory;
+
+    /// <inheritdoc />
+    public Task PublishAsync<TNotification>(TNotification notification, CancellationToken cancellationToken = default)
+        where TNotification : INotification
     {
-        private readonly ServiceFactory _serviceFactory;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="EventAggregator"/> class.
-        /// </summary>
-        /// <param name="serviceFactory">The service instance factory.</param>
-        public EventAggregator(ServiceFactory serviceFactory)
-            => _serviceFactory = serviceFactory;
-
-        /// <inheritdoc/>
-        public Task PublishAsync<TNotification>(TNotification notification, CancellationToken cancellationToken = default)
-            where TNotification : INotification
+        // TODO: Introduce codegen efficient Guard classes to reduce noise.
+        if (notification == null)
         {
-            // TODO: Introduce codegen efficient Guard classes to reduce noise.
-            if (notification == null)
-            {
-                throw new ArgumentNullException(nameof(notification));
-            }
-
-            PublishNotification(notification);
-            return PublishNotificationAsync(notification, cancellationToken);
+            throw new ArgumentNullException(nameof(notification));
         }
 
-        /// <inheritdoc/>
-        public void Publish<TNotification>(TNotification notification)
-            where TNotification : INotification
-        {
-            // TODO: Introduce codegen efficient Guard classes to reduce noise.
-            if (notification == null)
-            {
-                throw new ArgumentNullException(nameof(notification));
-            }
+        PublishNotification(notification);
+        return PublishNotificationAsync(notification, cancellationToken);
+    }
 
-            PublishNotification(notification);
-            var task = PublishNotificationAsync(notification);
-            if (task is not null)
-            {
-                Task.WaitAll(task);
-            }
+    /// <inheritdoc />
+    public void Publish<TNotification>(TNotification notification)
+        where TNotification : INotification
+    {
+        // TODO: Introduce codegen efficient Guard classes to reduce noise.
+        if (notification == null)
+        {
+            throw new ArgumentNullException(nameof(notification));
         }
 
-        public bool PublishCancelable<TCancelableNotification>(TCancelableNotification notification)
-            where TCancelableNotification : ICancelableNotification
+        PublishNotification(notification);
+        Task task = PublishNotificationAsync(notification);
+        if (task is not null)
         {
-            if (notification == null)
-            {
-                throw new ArgumentNullException(nameof(notification));
-            }
-
-            Publish(notification);
-            return notification.Cancel;
-        }
-
-        public async Task<bool> PublishCancelableAsync<TCancelableNotification>(TCancelableNotification notification)
-            where TCancelableNotification : ICancelableNotification
-        {
-            if (notification is null)
-            {
-                throw new ArgumentNullException(nameof(notification));
-            }
-
-            Task? task = PublishAsync(notification);
-            if (task is not null)
-            {
-                await task;
-            }
-
-            return notification.Cancel;
+            Task.WaitAll(task);
         }
     }
 
-    /// <summary>
-    /// Extensions for <see cref="ServiceFactory"/>.
-    /// </summary>
-    public static class ServiceFactoryExtensions
+    public bool PublishCancelable<TCancelableNotification>(TCancelableNotification notification)
+        where TCancelableNotification : ICancelableNotification
     {
-        /// <summary>
-        /// Gets an instance of <typeparamref name="T"/>.
-        /// </summary>
-        /// <typeparam name="T">The type to return.</typeparam>
-        /// <param name="factory">The service factory.</param>
-        /// <returns>The new instance.</returns>
-        public static T GetInstance<T>(this ServiceFactory factory)
-            => (T)factory(typeof(T));
+        if (notification == null)
+        {
+            throw new ArgumentNullException(nameof(notification));
+        }
 
-        /// <summary>
-        /// Gets a collection of instances of <typeparamref name="T"/>.
-        /// </summary>
-        /// <typeparam name="T">The collection item type to return.</typeparam>
-        /// <param name="factory">The service factory.</param>
-        /// <returns>The new instance collection.</returns>
-        public static IEnumerable<T> GetInstances<T>(this ServiceFactory factory)
-            => (IEnumerable<T>)factory(typeof(IEnumerable<T>));
+        Publish(notification);
+        return notification.Cancel;
+    }
+
+    public async Task<bool> PublishCancelableAsync<TCancelableNotification>(TCancelableNotification notification)
+        where TCancelableNotification : ICancelableNotification
+    {
+        if (notification is null)
+        {
+            throw new ArgumentNullException(nameof(notification));
+        }
+
+        Task? task = PublishAsync(notification);
+        if (task is not null)
+        {
+            await task;
+        }
+
+        return notification.Cancel;
     }
 }
