@@ -1,5 +1,5 @@
 import { map, Observable } from 'rxjs';
-import { NodeEntity } from '../../mocks/data/node.data';
+import { NodeEntity } from '../mocks/data/node.data';
 import { UmbEntityStore } from './entity.store';
 import { UmbDataStoreBase } from './store';
 

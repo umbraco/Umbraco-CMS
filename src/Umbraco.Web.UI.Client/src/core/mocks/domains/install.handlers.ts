@@ -1,12 +1,12 @@
 import { rest } from 'msw';
 
-import umbracoPath from '../../core/helpers/umbraco-path';
+import { umbracoPath } from '@umbraco-cms/utils';
 import type {
 	PostInstallRequest,
 	ProblemDetails,
 	UmbracoInstaller,
 	UmbracoPerformInstallDatabaseConfiguration,
-} from '../../core/models';
+} from '@umbraco-cms/models';
 
 export const handlers = [
 	rest.get(umbracoPath('/install/settings'), (_req, res, ctx) => {

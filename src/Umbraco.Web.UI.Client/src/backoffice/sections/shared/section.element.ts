@@ -2,13 +2,13 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { map, switchMap, EMPTY, of } from 'rxjs';
-import { UmbContextConsumerMixin } from '../../../core/context';
-import { createExtensionElement, UmbExtensionRegistry } from '../../../core/extension';
 import { UmbSectionContext } from '../section.context';
-import type { ManifestTree, ManifestSectionView } from '../../../core/models';
 import { UmbEditorEntityElement } from '../../editors/shared/editor-entity/editor-entity.element';
 import { UmbEntityStore } from '../../../core/stores/entity.store';
-import { UmbObserverMixin } from '../../../core/observer';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
+import { createExtensionElement, UmbExtensionRegistry } from '@umbraco-cms/extensions-api';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import type { ManifestTree, ManifestSectionView } from '@umbraco-cms/models';
 
 import './section-trees/section-trees.element.ts';
 import '../shared/section-views/section-views.element.ts';

@@ -1,12 +1,12 @@
 import { LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { UmbContextConsumerMixin } from '../../../core/context';
-import type { ManifestTreeItemAction, ManifestTree } from '../../../core/models';
-import { UmbObserverMixin } from '../../../core/observer';
-import { Entity } from '../../../mocks/data/entities';
+import { Entity } from '../../../core/mocks/data/entities';
 import { UmbSectionContext } from '../../sections/section.context';
 import { UmbTreeContextMenuPageService } from './context-menu/tree-context-menu-page.service';
 import { UmbTreeContextMenuService } from './context-menu/tree-context-menu.service';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import type { ManifestTreeItemAction, ManifestTree } from '@umbraco-cms/models';
 
 export type ActionPageEntity = {
 	key: string;

@@ -1,8 +1,8 @@
 import { UUITextStyles } from '@umbraco-ui/uui';
 import { CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { createExtensionElement } from '../../../../core/extension';
-import type { ManifestEditorAction } from '../../../../core/models';
+import { createExtensionElement } from '@umbraco-cms/extensions-api';
+import type { ManifestEditorAction } from '@umbraco-cms/models';
 
 @customElement('umb-editor-action-extension')
 export class UmbEditorActionExtensionElement extends LitElement {

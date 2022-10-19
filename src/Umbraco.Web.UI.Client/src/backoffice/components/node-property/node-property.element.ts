@@ -4,14 +4,14 @@ import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { EMPTY, of, switchMap } from 'rxjs';
 
-import { UmbContextConsumerMixin } from '../../../core/context';
 import { UmbDataTypeStore } from '../../../core/stores/data-type/data-type.store';
-import { UmbExtensionRegistry } from '../../../core/extension';
-import { NodeProperty } from '../../../mocks/data/node.data';
+import { NodeProperty } from '../../../core/mocks/data/node.data';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
+import type { ManifestTypes } from '@umbraco-cms/models';
+import { UmbExtensionRegistry } from '@umbraco-cms/extensions-api';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
 import '../entity-property/entity-property.element';
-import { UmbObserverMixin } from '../../../core/observer';
-import type { ManifestTypes } from '../../../core/models';
 
 @customElement('umb-node-property')
 export class UmbNodePropertyElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {

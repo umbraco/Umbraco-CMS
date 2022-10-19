@@ -3,16 +3,16 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
+import { UmbModalService } from '../../../core/services/modal';
+import { UmbNotificationService } from '../../../core/services/notification';
+import { UmbNotificationDefaultData } from '../../../core/services/notification/layouts/default';
 import {
 	getPublishedCacheStatus,
 	postPublishedCacheReload,
 	postPublishedCacheRebuild,
 	getPublishedCacheCollect,
-} from '../../../core/api/fetcher';
-import { UmbContextConsumerMixin } from '../../../core/context';
-import { UmbModalService } from '../../../core/services/modal';
-import { UmbNotificationService } from '../../../core/services/notification';
-import { UmbNotificationDefaultData } from '../../../core/services/notification/layouts/default';
+} from '@umbraco-cms/backend-api';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
 @customElement('umb-dashboard-published-status')
 export class UmbDashboardPublishedStatusElement extends UmbContextConsumerMixin(LitElement) {

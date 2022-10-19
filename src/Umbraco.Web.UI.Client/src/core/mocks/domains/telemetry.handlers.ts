@@ -1,7 +1,7 @@
 import { rest } from 'msw';
 
-import umbracoPath from '../../core/helpers/umbraco-path';
-import type { ConsentLevelSettings, TelemetryModel } from '../../core/models';
+import { umbracoPath } from '@umbraco-cms/utils';
+import type { ConsentLevelSettings, TelemetryModel } from '@umbraco-cms/models';
 
 let telemetryLevel: TelemetryModel['level'] = 'Basic';
 

@@ -1,4 +1,4 @@
-import './css/custom-properties.css';
+import './core/css/custom-properties.css';
 import 'router-slot';
 
 // TODO: remove these imports when they are part of UUI
@@ -12,12 +12,12 @@ import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
 import type { Guard, IRoute } from 'router-slot/model';
-import { getManifests, getServerStatus } from './core/api/fetcher';
-import { UmbContextProviderMixin } from './core/context';
-import { UmbExtensionRegistry } from './core/extension';
 import { internalManifests } from './temp-internal-manifests';
+import { getManifests, getServerStatus } from '@umbraco-cms/backend-api';
+import { UmbExtensionRegistry } from '@umbraco-cms/extensions-api';
+import { UmbContextProviderMixin } from '@umbraco-cms/context-api';
 
-import type { ServerStatus } from './core/models';
+import type { ServerStatus } from '@umbraco-cms/models';
 
 @customElement('umb-app')
 export class UmbApp extends UmbContextProviderMixin(LitElement) {

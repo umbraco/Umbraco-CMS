@@ -3,8 +3,8 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { BehaviorSubject, Observable } from 'rxjs';
 import type { IRoute, IRoutingInfo } from 'router-slot';
-import { UmbContextProviderMixin } from '../../../../../core/context';
 import type { UmbEditorEntityElement } from '../../../../editors/shared/editor-entity/editor-entity.element';
+import { UmbContextProviderMixin } from '@umbraco-cms/context-api';
 
 import './list-view-layouts/table/editor-view-users-table.element';
 import './list-view-layouts/grid/editor-view-users-grid.element';

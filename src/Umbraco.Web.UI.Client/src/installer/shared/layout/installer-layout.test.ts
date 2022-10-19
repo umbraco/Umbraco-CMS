@@ -1,7 +1,7 @@
 import { expect, fixture, html } from '@open-wc/testing';
 
-import { defaultA11yConfig } from '../../../core/helpers/chai';
 import { UmbInstallerLayoutElement } from './installer-layout.element';
+import { defaultA11yConfig } from '@umbraco-cms/test-utils';
 
 // TODO: Write tests
 describe('UmbInstallerLayoutElement', () => {

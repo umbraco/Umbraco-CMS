@@ -1,10 +1,9 @@
 import { css, CSSResultGroup, html, LitElement, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbContextConsumerMixin } from '../../core/context';
-
-import type { ProblemDetails } from '../../core/models';
-import { UmbObserverMixin } from '../../core/observer';
 import { UmbInstallerContext } from '../installer.context';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import type { ProblemDetails } from '@umbraco-cms/models';
 
 @customElement('umb-installer-error')
 export class UmbInstallerErrorElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {

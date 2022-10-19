@@ -1,11 +1,10 @@
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
-
-import { UmbContextConsumerMixin } from '../../core/context';
-import type { PostInstallRequest, TelemetryModel, UmbracoInstaller } from '../../core/models';
-import { UmbObserverMixin } from '../../core/observer';
 import { UmbInstallerContext } from '../installer.context';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import type { PostInstallRequest, TelemetryModel, UmbracoInstaller } from '@umbraco-cms/models';
 
 @customElement('umb-installer-consent')
 export class UmbInstallerConsentElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {

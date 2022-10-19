@@ -2,11 +2,11 @@ import { css, html, LitElement, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 
-import { UmbContextConsumerMixin } from '../../../core/context';
 import type { UmbModalService } from '../../../core/services/modal';
 import type { UmbEntityStore } from '../../../core/stores/entity.store';
-import type { Entity } from '../../../mocks/data/entities';
-import { UmbObserverMixin } from '../../../core/observer';
+import type { Entity } from '../../../core/mocks/data/entities';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
 @customElement('umb-property-editor-ui-content-picker')
 export class UmbPropertyEditorUIContentPickerElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {

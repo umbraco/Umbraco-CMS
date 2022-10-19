@@ -1,5 +1,5 @@
 import { BehaviorSubject, Observable } from 'rxjs';
-import type { UserDetails } from '../../../core/models';
+import type { UserDetails } from '@umbraco-cms/models';
 
 export class UmbUserContext {
 	// TODO: figure out how fine grained we want to make our observables.

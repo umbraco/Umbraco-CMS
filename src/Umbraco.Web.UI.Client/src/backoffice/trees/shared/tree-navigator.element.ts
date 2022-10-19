@@ -2,10 +2,10 @@ import { css, html, LitElement } from 'lit';
 import { repeat } from 'lit/directives/repeat.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbContextConsumerMixin } from '../../../core/context';
-import { Entity } from '../../../mocks/data/entities';
-import { UmbObserverMixin } from '../../../core/observer';
+import { Entity } from '../../../core/mocks/data/entities';
 import { UmbTreeDataContextBase } from '../tree-data.context';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
 import './tree-item.element';
 

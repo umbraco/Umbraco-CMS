@@ -2,11 +2,11 @@ import { html, LitElement } from 'lit';
 import { when } from 'lit-html/directives/when.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
-import { UmbContextConsumerMixin, UmbContextProviderMixin } from '../../../core/context';
-import { UmbExtensionRegistry } from '../../../core/extension';
-import type { ManifestTree } from '../../../core/models';
-import { UmbObserverMixin } from '../../../core/observer';
 import { UmbTreeContextBase } from '../tree.context';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
+import { UmbExtensionRegistry } from '@umbraco-cms/extensions-api';
+import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
+import type { ManifestTree } from '@umbraco-cms/models';
 
 @customElement('umb-tree')
 export class UmbTreeElement extends UmbContextProviderMixin(UmbContextConsumerMixin(UmbObserverMixin(LitElement))) {

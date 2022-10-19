@@ -4,15 +4,16 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { Subscription } from 'rxjs';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
-import { UmbContextProviderMixin, UmbContextConsumerMixin } from '../../../core/context';
-import UmbSectionViewUsersElement from '../../sections/users/views/users/section-view-users.element';
-import { UmbUserStore } from '../../../core/stores/user/user.store';
-import type { UserDetails } from '../../../core/models';
-import { UmbUserContext } from './user.context';
-import '../../property-editor-uis/content-picker/property-editor-ui-content-picker.element';
 
-import '../shared/editor-entity-layout/editor-entity-layout.element';
+import { UmbUserStore } from '../../../core/stores/user/user.store';
 import { getTagLookAndColor } from '../../sections/users/user-extensions';
+import { UmbUserContext } from './user.context';
+import { UmbContextProviderMixin, UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import type { UserDetails } from '@umbraco-cms/models';
+
+import '../../property-editor-uis/content-picker/property-editor-ui-content-picker.element';
+import '../shared/editor-entity-layout/editor-entity-layout.element';
+
 @customElement('umb-editor-user')
 export class UmbEditorUserElement extends UmbContextProviderMixin(UmbContextConsumerMixin(LitElement)) {
 	static styles = [

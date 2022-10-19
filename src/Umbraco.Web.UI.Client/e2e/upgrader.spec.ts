@@ -1,8 +1,7 @@
 import { rest } from 'msw';
-
-import umbracoPath from '../src/core/helpers/umbraco-path';
-import type { ProblemDetails, StatusResponse } from '../src/core/models';
 import { expect, test } from '../test';
+import { umbracoPath } from '@umbraco-cms/utils';
+import type { ProblemDetails, StatusResponse } from '@umbraco-cms/models';
 
 test.describe('upgrader tests', () => {
 	test.beforeEach(async ({ page, worker }) => {

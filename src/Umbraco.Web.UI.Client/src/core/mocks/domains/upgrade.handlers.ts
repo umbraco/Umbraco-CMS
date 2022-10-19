@@ -1,7 +1,7 @@
 import { rest } from 'msw';
 
-import umbracoPath from '../../core/helpers/umbraco-path';
-import type { PostInstallRequest, UmbracoUpgrader } from '../../core/models';
+import { umbracoPath } from '@umbraco-cms/utils';
+import type { PostInstallRequest, UmbracoUpgrader } from '@umbraco-cms/models';
 
 export const handlers = [
 	rest.get(umbracoPath('/upgrade/settings'), (_req, res, ctx) => {

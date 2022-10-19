@@ -4,11 +4,11 @@ import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { Subscription } from 'rxjs';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
-import { UmbContextConsumerMixin } from '../../../../../../../core/context';
 import UmbSectionViewUsersElement from '../../section-view-users.element';
 import { UmbUserStore } from '../../../../../../../core/stores/user/user.store';
-import type { UserDetails, UserEntity } from '../../../../../../../core/models';
 import { getTagLookAndColor } from '../../../../user-extensions';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import type { UserDetails, UserEntity } from '@umbraco-cms/models';
 
 @customElement('umb-editor-view-users-grid')
 export class UmbEditorViewUsersGridElement extends UmbContextConsumerMixin(LitElement) {

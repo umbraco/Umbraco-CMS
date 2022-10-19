@@ -1,4 +1,4 @@
-import type { ManifestTypes } from '../core/models';
+import type { ManifestTypes } from '@umbraco-cms/models';
 
 export const manifests: Array<ManifestTypes & { loader: () => Promise<object | HTMLElement> }> = [
 	{

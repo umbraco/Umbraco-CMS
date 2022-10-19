@@ -16,7 +16,6 @@ import { defineElement } from '@umbraco-ui/uui-base/lib/registration';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 
-import { UmbContextConsumerMixin, UmbContextProviderMixin } from '../core/context';
 import { UmbModalService } from '../core/services/modal';
 import { UmbNotificationService } from '../core/services/notification';
 import { UmbDataTypeStore } from '../core/stores/data-type/data-type.store';
@@ -29,6 +28,7 @@ import { UmbPropertyEditorStore } from '../core/stores/property-editor/property-
 import { UmbIconStore } from '../core/stores/icon/icon.store';
 import { UmbPropertyEditorConfigStore } from '../core/stores/property-editor-config/property-editor-config.store';
 import { UmbUserGroupStore } from '../core/stores/user/user-group.store';
+import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 
 @defineElement('umb-backoffice')
 export class UmbBackofficeElement extends UmbContextConsumerMixin(UmbContextProviderMixin(LitElement)) {

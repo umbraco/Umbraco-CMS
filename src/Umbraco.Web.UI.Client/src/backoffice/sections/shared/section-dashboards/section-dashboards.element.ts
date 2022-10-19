@@ -4,11 +4,12 @@ import { customElement, state } from 'lit/decorators.js';
 import { IRoutingInfo } from 'router-slot';
 import { first, map } from 'rxjs';
 
-import { UmbContextConsumerMixin } from '../../../../core/context';
-import { createExtensionElement, UmbExtensionRegistry } from '../../../../core/extension';
 import { UmbSectionContext } from '../../section.context';
-import type { ManifestDashboard, ManifestSection } from '../../../../core/models';
-import { UmbObserverMixin } from '../../../../core/observer';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
+import { createExtensionElement, UmbExtensionRegistry } from '@umbraco-cms/extensions-api';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+
+import type { ManifestDashboard, ManifestSection } from '@umbraco-cms/models';
 
 @customElement('umb-section-dashboards')
 export class UmbSectionDashboardsElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {

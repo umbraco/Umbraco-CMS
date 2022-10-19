@@ -1,5 +1,5 @@
 import { BehaviorSubject, Observable } from 'rxjs';
-import { DocumentTypeEntity } from '../../../mocks/data/document-type.data';
+import { DocumentTypeEntity } from '../../../core/mocks/data/document-type.data';
 
 export class UmbDocumentTypeContext {
 	// TODO: figure out how fine grained we want to make our observables.

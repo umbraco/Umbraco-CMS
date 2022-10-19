@@ -2,12 +2,10 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { distinctUntilChanged } from 'rxjs';
-
-import { UmbContextConsumerMixin } from '../../../../../core/context';
 import { UmbDataTypeContext } from '../../data-type.context';
-
-import type { DataTypeDetails } from '../../../../../mocks/data/data-type.data';
-import { UmbObserverMixin } from '../../../../../core/observer';
+import type { DataTypeDetails } from '../../../../../core/mocks/data/data-type.data';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
 @customElement('umb-editor-view-data-type-info')
 export class UmbEditorViewDataTypeInfoElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {

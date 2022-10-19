@@ -2,12 +2,12 @@ import { html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { distinctUntilChanged } from 'rxjs';
-import { NodeEntity, NodeProperty, NodePropertyData } from '../../../../../../mocks/data/node.data';
-import { UmbContextConsumerMixin } from '../../../../../../core/context';
+import { NodeEntity, NodeProperty, NodePropertyData } from '../../../../../../core/mocks/data/node.data';
 import { UmbNodeContext } from '../../node.context';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
 import '../../../../../components/node-property/node-property.element';
-import { UmbObserverMixin } from '../../../../../../core/observer';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 
 @customElement('umb-editor-view-node-edit')
 export class UmbEditorViewNodeEditElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {

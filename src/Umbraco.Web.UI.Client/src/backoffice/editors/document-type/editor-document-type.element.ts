@@ -3,13 +3,13 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { distinctUntilChanged } from 'rxjs';
-import { UmbContextConsumerMixin, UmbContextProviderMixin } from '../../../core/context';
 import { UmbNotificationService } from '../../../core/services/notification';
 import { UmbDocumentTypeStore } from '../../../core/stores/document-type.store';
-import { DocumentTypeEntity } from '../../../mocks/data/document-type.data';
+import { DocumentTypeEntity } from '../../../core/mocks/data/document-type.data';
 import { UmbNotificationDefaultData } from '../../../core/services/notification/layouts/default';
-import { UmbObserverMixin } from '../../../core/observer';
 import { UmbDocumentTypeContext } from './document-type.context';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
+import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 
 import '../shared/editor-entity-layout/editor-entity-layout.element';
 
