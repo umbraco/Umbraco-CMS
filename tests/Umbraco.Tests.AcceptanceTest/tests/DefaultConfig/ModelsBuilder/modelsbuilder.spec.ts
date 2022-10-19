@@ -255,6 +255,7 @@ test.describe('Modelsbuilder tests', () => {
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.submit));
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.save));
     await umbracoUi.isSuccessNotificationVisible();
+    await page.locator('span:has-text("×")').click();
 
     // Update the template
     await umbracoUi.clickElement(umbracoUi.getTreeItem("settings", ["templates", docTypeName]));
@@ -264,12 +265,14 @@ test.describe('Modelsbuilder tests', () => {
     await editor.type("<p>@Model.Bod")
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.save))
     await umbracoUi.isSuccessNotificationVisible();
+    await page.locator('span:has-text("×")').click();
 
     // Navigate to the content section and update the content
     await umbracoUi.goToSection(ConstantHelper.sections.content);
     await umbracoUi.refreshContentTree();
     await umbracoUi.clickElement(umbracoUi.getTreeItem("content", [contentName]));
     await page.locator("#bod").type("Fancy body text");
+    await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.saveAndPublish))
 
     await umbracoApi.content.verifyRenderedContent("/", "<h1>" + propertyValue + "</h1><p>Fancy body text</p>", true);
 

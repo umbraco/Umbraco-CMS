@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.ManagementApi.ViewModels.ExamineManagement;
+﻿namespace Umbraco.Cms.ManagementApi.ViewModels.Search;
 
 public class SearcherViewModel
 {

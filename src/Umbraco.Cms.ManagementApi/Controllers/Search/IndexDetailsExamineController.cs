@@ -2,21 +2,21 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.ManagementApi.Factories;
-using Umbraco.Cms.ManagementApi.ViewModels.ExamineManagement;
+using Umbraco.Cms.ManagementApi.ViewModels.Search;
 
-namespace Umbraco.Cms.ManagementApi.Controllers.ExamineManagement;
+namespace Umbraco.Cms.ManagementApi.Controllers.Search;
 
 [ApiVersion("1.0")]
-public class IndexExamineManagementController : ExamineManagementControllerBase
+public class IndexDetailsSearchController : SearchControllerBase
 {
-    private readonly IExamineIndexViewModelFactory _examineIndexViewModelFactory;
+    private readonly IIndexViewModelFactory _indexViewModelFactory;
     private readonly IExamineManager _examineManager;
 
-    public IndexExamineManagementController(
-        IExamineIndexViewModelFactory examineIndexViewModelFactory,
+    public IndexDetailsSearchController(
+        IIndexViewModelFactory indexViewModelFactory,
         IExamineManager examineManager)
     {
-        _examineIndexViewModelFactory = examineIndexViewModelFactory;
+        _indexViewModelFactory = indexViewModelFactory;
         _examineManager = examineManager;
     }
 
@@ -29,15 +29,15 @@ public class IndexExamineManagementController : ExamineManagementControllerBase
     ///     This is kind of rudimentary since there's no way we can know that the index has rebuilt, we
     ///     have a listener for the index op complete so we'll just check if that key is no longer there in the runtime cache
     /// </remarks>
-    [HttpGet("index")]
+    [HttpGet("index/{indexName}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ExamineIndexViewModel), StatusCodes.Status200OK)]
-    public async Task<ActionResult<ExamineIndexViewModel?>> Index(string indexName)
+    [ProducesResponseType(typeof(IndexViewModel), StatusCodes.Status200OK)]
+    public async Task<ActionResult<IndexViewModel?>> Index(string indexName)
     {
         if (_examineManager.TryGetIndex(indexName, out IIndex? index))
         {
-            return await Task.FromResult(_examineIndexViewModelFactory.Create(index!));
+            return await Task.FromResult(_indexViewModelFactory.Create(index!));
         }
 
         var invalidModelProblem = new ProblemDetails

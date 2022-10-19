@@ -5,17 +5,17 @@ using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.New.Cms.Infrastructure.Services;
 
-namespace Umbraco.Cms.ManagementApi.Controllers.ExamineManagement;
+namespace Umbraco.Cms.ManagementApi.Controllers.Search;
 
 [ApiVersion("1.0")]
-public class RebuildExamineManagementController : ExamineManagementControllerBase
+public class IndexRebuildSearchController : SearchControllerBase
 {
-    private readonly ILogger<RebuildExamineManagementController> _logger;
+    private readonly ILogger<IndexRebuildSearchController> _logger;
     private readonly IIndexingRebuilderService _indexingRebuilderService;
     private readonly IExamineManager _examineManager;
 
-    public RebuildExamineManagementController(
-        ILogger<RebuildExamineManagementController> logger,
+    public IndexRebuildSearchController(
+        ILogger<IndexRebuildSearchController> logger,
         IIndexingRebuilderService indexingRebuilderService,
         IExamineManager examineManager)
     {
@@ -29,7 +29,7 @@ public class RebuildExamineManagementController : ExamineManagementControllerBas
     /// </summary>
     /// <param name="indexName"></param>
     /// <returns></returns>
-    [HttpPost("rebuild")]
+    [HttpPost("index/{indexName}/rebuild")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(OkResult), StatusCodes.Status200OK)]
