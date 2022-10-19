@@ -44,15 +44,24 @@ namespace Umbraco.Extensions
             var userConfigLangFolder = Cms.Core.Constants.SystemDirectories.Config
                                             .TrimStart(Cms.Core.Constants.CharArrays.Tilde);
 
-            IEnumerable<LocalizedTextServiceSupplementaryFileSource> userLangFileSources = contentFileProvider.GetDirectoryContents(userConfigLangFolder)
-                    .Where(x => x.IsDirectory && x.Name.InvariantEquals("lang"))
-                    .Select(x => new DirectoryInfo(x.PhysicalPath!))
-                    .SelectMany(x => x.GetFiles("*.user.xml", SearchOption.TopDirectoryOnly))
-                    .Select(x => new LocalizedTextServiceSupplementaryFileSource(x, true));
+            var configLangFileSources = new List<LocalizedTextServiceSupplementaryFileSource>();
 
-            return
-                pluginLangFileSources
-                .Concat(userLangFileSources);
+            foreach (IFileInfo langFileSource in contentFileProvider.GetDirectoryContents(userConfigLangFolder))
+            {
+                if (langFileSource.IsDirectory && langFileSource.Name.InvariantEquals("lang"))
+                {
+                    foreach (IFileInfo langFile in contentFileProvider.GetDirectoryContents($"{userConfigLangFolder}/{langFileSource.Name}"))
+                    {
+                        if (langFile.Name.InvariantEndsWith(".xml") && langFile.PhysicalPath is not null)
+                        {
+                            configLangFileSources.Add(new LocalizedTextServiceSupplementaryFileSource(langFile, true));
+                        }
+                    }
+                }
+            }
+
+            return pluginLangFileSources
+                    .Concat(configLangFileSources);
         }
 
 
@@ -60,7 +69,7 @@ namespace Umbraco.Extensions
         ///  Loads the suplimentary localaization files via the file provider.
         /// </summary>
         /// <remarks>
-        ///  locates all *.xml files in the lang folder of any sub folder of the one provided.
+        ///  Locates all *.xml files in the lang folder of any sub folder of the one provided.
         ///  e.g /app_plugins/plugin-name/lang/*.xml
         /// </remarks>
         private static IEnumerable<LocalizedTextServiceSupplementaryFileSource> GetPluginLanguageFileSources(
@@ -72,21 +81,20 @@ namespace Umbraco.Extensions
 
             foreach (IFileInfo pluginFolder in pluginFolders)
             {
-                // get the full virtual path for the plugin folder
+                // Get the full virtual path for the plugin folder
                 var pluginFolderPath = WebPath.Combine(folder, pluginFolder.Name);
 
-                // loop through the lang folder(s)
+                // Loop through the lang folder(s)
                 //  - there could be multiple on case sensitive file system
                 foreach (var langFolder in GetLangFolderPaths(fileProvider, pluginFolderPath))
                 {
-                    // request all the files out of the path, these will have physicalPath set.
-                    IEnumerable<FileInfo> localizationFiles = fileProvider
+                    // Request all the files out of the path, these will have physicalPath set.
+                    IEnumerable<IFileInfo> localizationFiles = fileProvider
                         .GetDirectoryContents(langFolder)
                         .Where(x => !string.IsNullOrEmpty(x.PhysicalPath))
-                        .Where(x => x.Name.InvariantEndsWith(".xml"))
-                        .Select(x => new FileInfo(x.PhysicalPath!));
+                        .Where(x => x.Name.InvariantEndsWith(".xml"));
 
-                    foreach (FileInfo file in localizationFiles)
+                    foreach (IFileInfo file in localizationFiles)
                     {
                         yield return new LocalizedTextServiceSupplementaryFileSource(file, overwriteCoreKeys);
                     }

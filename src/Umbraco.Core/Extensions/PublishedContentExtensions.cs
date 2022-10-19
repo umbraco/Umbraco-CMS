@@ -25,7 +25,7 @@ public static class PublishedContentExtensions
     ///     The specific culture to get the name for. If null is used the current culture is used (Default is
     ///     null).
     /// </param>
-    public static string? Name(this IPublishedContent content, IVariationContextAccessor? variationContextAccessor, string? culture = null)
+    public static string Name(this IPublishedContent content, IVariationContextAccessor? variationContextAccessor, string? culture = null)
     {
         if (content == null)
         {
@@ -37,7 +37,7 @@ public static class PublishedContentExtensions
         {
             return content.Cultures.TryGetValue(string.Empty, out PublishedCultureInfo? invariantInfos)
                 ? invariantInfos.Name
-                : null;
+                : string.Empty;
         }
 
         // handle context culture for variant
@@ -49,7 +49,7 @@ public static class PublishedContentExtensions
         // get
         return culture != string.Empty && content.Cultures.TryGetValue(culture, out PublishedCultureInfo? infos)
             ? infos.Name
-            : null;
+            : string.Empty;
     }
 
     #endregion
@@ -683,8 +683,8 @@ public static class PublishedContentExtensions
     /// <param name="maxLevel">The level.</param>
     /// <returns>The content or its nearest (in down-top order) ancestor, at a level lesser or equal to the specified level.</returns>
     /// <remarks>May or may not return the content itself depending on its level. May return <c>null</c>.</remarks>
-    public static IPublishedContent? AncestorOrSelf(this IPublishedContent content, int maxLevel) =>
-        content.EnumerateAncestors(true).FirstOrDefault(x => x.Level <= maxLevel);
+    public static IPublishedContent AncestorOrSelf(this IPublishedContent content, int maxLevel) =>
+        content.EnumerateAncestors(true).FirstOrDefault(x => x.Level <= maxLevel) ?? content;
 
     /// <summary>
     ///     Gets the content or its nearest ancestor, of a specified content type.
@@ -693,8 +693,8 @@ public static class PublishedContentExtensions
     /// <param name="contentTypeAlias">The content type.</param>
     /// <returns>The content or its nearest (in down-top order) ancestor, of the specified content type.</returns>
     /// <remarks>May or may not return the content itself depending on its content type. May return <c>null</c>.</remarks>
-    public static IPublishedContent? AncestorOrSelf(this IPublishedContent content, string contentTypeAlias) => content
-        .EnumerateAncestors(true).FirstOrDefault(x => x.ContentType.Alias.InvariantEquals(contentTypeAlias));
+    public static IPublishedContent AncestorOrSelf(this IPublishedContent content, string contentTypeAlias) => content
+        .EnumerateAncestors(true).FirstOrDefault(x => x.ContentType.Alias.InvariantEquals(contentTypeAlias)) ?? content;
 
     /// <summary>
     ///     Gets the content or its nearest ancestor, of a specified content type.
@@ -1012,7 +1012,7 @@ public static class PublishedContentExtensions
     ///         However, if an empty string is specified only invariant children are returned.
     ///     </para>
     /// </remarks>
-    public static IEnumerable<IPublishedContent>? Children(this IPublishedContent content, IVariationContextAccessor? variationContextAccessor, string? culture = null)
+    public static IEnumerable<IPublishedContent> Children(this IPublishedContent content, IVariationContextAccessor? variationContextAccessor, string? culture = null)
     {
         // handle context culture for variant
         if (culture == null)
@@ -1021,9 +1021,9 @@ public static class PublishedContentExtensions
         }
 
         IEnumerable<IPublishedContent>? children = content.ChildrenForAllCultures;
-        return culture == "*"
-            ? children
-            : children?.Where(x => x.IsInvariantOrHasCulture(culture));
+        return (culture == "*"
+            ? children : children?.Where(x => x.IsInvariantOrHasCulture(culture)))
+               ?? Enumerable.Empty<IPublishedContent>();
     }
 
     /// <summary>
@@ -1040,12 +1040,12 @@ public static class PublishedContentExtensions
     /// <remarks>
     ///     <para>Children are sorted by their sortOrder.</para>
     /// </remarks>
-    public static IEnumerable<IPublishedContent>? Children(
+    public static IEnumerable<IPublishedContent> Children(
         this IPublishedContent content,
         IVariationContextAccessor variationContextAccessor,
         Func<IPublishedContent, bool> predicate,
         string? culture = null) =>
-        content.Children(variationContextAccessor, culture)?.Where(predicate);
+        content.Children(variationContextAccessor, culture).Where(predicate);
 
     /// <summary>
     ///     Gets the children of the content, of any of the specified types.
@@ -1058,7 +1058,7 @@ public static class PublishedContentExtensions
     /// </param>
     /// <param name="contentTypeAlias">The content type alias.</param>
     /// <returns>The children of the content, of any of the specified types.</returns>
-    public static IEnumerable<IPublishedContent>? ChildrenOfType(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string? contentTypeAlias, string? culture = null) =>
+    public static IEnumerable<IPublishedContent> ChildrenOfType(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string? contentTypeAlias, string? culture = null) =>
         content.Children(variationContextAccessor, x => x.ContentType.Alias.InvariantEquals(contentTypeAlias), culture);
 
     /// <summary>
@@ -1075,9 +1075,9 @@ public static class PublishedContentExtensions
     /// <remarks>
     ///     <para>Children are sorted by their sortOrder.</para>
     /// </remarks>
-    public static IEnumerable<T>? Children<T>(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string? culture = null)
+    public static IEnumerable<T> Children<T>(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string? culture = null)
         where T : class, IPublishedContent =>
-        content.Children(variationContextAccessor, culture)?.OfType<T>();
+        content.Children(variationContextAccessor, culture).OfType<T>();
 
     public static IPublishedContent? FirstChild(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string? culture = null) =>
         content.Children(variationContextAccessor, culture)?.FirstOrDefault();
@@ -1119,12 +1119,13 @@ public static class PublishedContentExtensions
     /// <remarks>
     ///     <para>Note that in V7 this method also return the content node self.</para>
     /// </remarks>
-    public static IEnumerable<IPublishedContent>? Siblings(
+    public static IEnumerable<IPublishedContent> Siblings(
         this IPublishedContent content,
         IPublishedSnapshot? publishedSnapshot,
         IVariationContextAccessor variationContextAccessor,
         string? culture = null) =>
-        SiblingsAndSelf(content, publishedSnapshot, variationContextAccessor, culture)?.Where(x => x.Id != content.Id);
+        SiblingsAndSelf(content, publishedSnapshot, variationContextAccessor, culture)
+            ?.Where(x => x.Id != content.Id) ?? Enumerable.Empty<IPublishedContent>();
 
     /// <summary>
     ///     Gets the siblings of the content, of a given content type.
@@ -1141,14 +1142,14 @@ public static class PublishedContentExtensions
     /// <remarks>
     ///     <para>Note that in V7 this method also return the content node self.</para>
     /// </remarks>
-    public static IEnumerable<IPublishedContent>? SiblingsOfType(
+    public static IEnumerable<IPublishedContent> SiblingsOfType(
         this IPublishedContent content,
         IPublishedSnapshot? publishedSnapshot,
         IVariationContextAccessor variationContextAccessor,
         string contentTypeAlias,
         string? culture = null) =>
         SiblingsAndSelfOfType(content, publishedSnapshot, variationContextAccessor, contentTypeAlias, culture)
-            ?.Where(x => x.Id != content.Id);
+            ?.Where(x => x.Id != content.Id) ?? Enumerable.Empty<IPublishedContent>();
 
     /// <summary>
     ///     Gets the siblings of the content, of a given content type.
@@ -1165,10 +1166,10 @@ public static class PublishedContentExtensions
     /// <remarks>
     ///     <para>Note that in V7 this method also return the content node self.</para>
     /// </remarks>
-    public static IEnumerable<T>? Siblings<T>(this IPublishedContent content, IPublishedSnapshot? publishedSnapshot, IVariationContextAccessor variationContextAccessor, string? culture = null)
+    public static IEnumerable<T> Siblings<T>(this IPublishedContent content, IPublishedSnapshot? publishedSnapshot, IVariationContextAccessor variationContextAccessor, string? culture = null)
         where T : class, IPublishedContent =>
         SiblingsAndSelf<T>(content, publishedSnapshot, variationContextAccessor, culture)
-            ?.Where(x => x.Id != content.Id);
+            ?.Where(x => x.Id != content.Id) ?? Enumerable.Empty<T>();
 
     /// <summary>
     ///     Gets the siblings of the content including the node itself to indicate the position.
@@ -1203,16 +1204,17 @@ public static class PublishedContentExtensions
     /// </param>
     /// <param name="contentTypeAlias">The content type alias.</param>
     /// <returns>The siblings of the content including the node itself, of the given content type.</returns>
-    public static IEnumerable<IPublishedContent>? SiblingsAndSelfOfType(
+    public static IEnumerable<IPublishedContent> SiblingsAndSelfOfType(
         this IPublishedContent content,
         IPublishedSnapshot? publishedSnapshot,
         IVariationContextAccessor variationContextAccessor,
         string contentTypeAlias,
         string? culture = null) =>
-        content.Parent != null
+        (content.Parent != null
             ? content.Parent.ChildrenOfType(variationContextAccessor, contentTypeAlias, culture)
             : publishedSnapshot?.Content?.GetAtRoot(culture).OfTypes(contentTypeAlias)
-                .WhereIsInvariantOrHasCulture(variationContextAccessor, culture);
+                .WhereIsInvariantOrHasCulture(variationContextAccessor, culture))
+        ?? Enumerable.Empty<IPublishedContent>();
 
     /// <summary>
     ///     Gets the siblings of the content including the node itself to indicate the position, of a given content type.
@@ -1226,16 +1228,17 @@ public static class PublishedContentExtensions
     ///     null)
     /// </param>
     /// <returns>The siblings of the content including the node itself, of the given content type.</returns>
-    public static IEnumerable<T>? SiblingsAndSelf<T>(
+    public static IEnumerable<T> SiblingsAndSelf<T>(
         this IPublishedContent content,
         IPublishedSnapshot? publishedSnapshot,
         IVariationContextAccessor variationContextAccessor,
         string? culture = null)
         where T : class, IPublishedContent =>
-        content.Parent != null
+        (content.Parent != null
             ? content.Parent.Children<T>(variationContextAccessor, culture)
             : publishedSnapshot?.Content?.GetAtRoot(culture).OfType<T>()
-                .WhereIsInvariantOrHasCulture(variationContextAccessor, culture);
+                .WhereIsInvariantOrHasCulture(variationContextAccessor, culture))
+        ?? Enumerable.Empty<T>();
 
     #endregion
 
@@ -1253,7 +1256,7 @@ public static class PublishedContentExtensions
     ///     <see cref="Umbraco.Web.PublishedContentExtensions.AncestorOrSelf(IPublishedContent, int)" /> with <c>maxLevel</c>
     ///     set to 1.
     /// </remarks>
-    public static IPublishedContent? Root(this IPublishedContent content) => content.AncestorOrSelf(1);
+    public static IPublishedContent Root(this IPublishedContent content) => content.AncestorOrSelf(1);
 
     /// <summary>
     ///     Gets the root content (ancestor or self at level 1) for the specified <paramref name="content" /> if it's of the
@@ -1278,16 +1281,16 @@ public static class PublishedContentExtensions
 
     #region Writer and creator
 
-    public static string? GetCreatorName(this IPublishedContent content, IUserService userService)
+    public static string GetCreatorName(this IPublishedContent content, IUserService userService)
     {
         IProfile? user = userService.GetProfileById(content.CreatorId);
-        return user?.Name;
+        return user?.Name ?? string.Empty;
     }
 
-    public static string? GetWriterName(this IPublishedContent content, IUserService userService)
+    public static string GetWriterName(this IPublishedContent content, IUserService userService)
     {
         IProfile? user = userService.GetProfileById(content.WriterId);
-        return user?.Name;
+        return user?.Name ?? string.Empty;
     }
 
     #endregion
