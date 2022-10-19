@@ -50,6 +50,11 @@ export class UmbExtensionRegistry {
 		}
 	}
 
+	isRegistered(alias: string): boolean {
+		const values = this._extensions.getValue();
+		return values.some((ext) => ext.alias === alias);
+	}
+
 	getByAlias<T extends ManifestTypes>(alias: string): Observable<T | null>;
 	getByAlias(alias: string) {
 		// TODO: make pipes prettier/simpler/reuseable
