@@ -10,7 +10,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using NSwag;
 using NSwag.AspNetCore;
-using NSwag.Generation.Processors.Security;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -19,6 +18,7 @@ using Umbraco.Cms.ManagementApi.Configuration;
 using Umbraco.Cms.ManagementApi.DependencyInjection;
 using Umbraco.Cms.Web.Common.ApplicationBuilder;
 using Umbraco.Extensions;
+using Umbraco.New.Cms.Core.Models.Configuration;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Cms.ManagementApi;
@@ -93,6 +93,9 @@ public class ManagementApiComposer : IComposer
         });
         services.AddControllers();
         builder.Services.ConfigureOptions<ConfigureMvcOptions>();
+
+        builder.AddUmbracoOptions<NewBackOfficeSettings>();
+        builder.Services.AddSingleton<IValidateOptions<NewBackOfficeSettings>, NewBackOfficeSettingsValidator>();
 
         builder.Services.Configure<UmbracoPipelineOptions>(options =>
         {

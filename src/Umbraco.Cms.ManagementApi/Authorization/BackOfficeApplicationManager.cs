@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using OpenIddict.Abstractions;
+using Umbraco.New.Cms.Core.Models.Configuration;
 
 namespace Umbraco.Cms.ManagementApi.Authorization;
 
@@ -9,22 +11,25 @@ public class BackOfficeApplicationManager : IBackOfficeApplicationManager
     private readonly IOpenIddictApplicationManager _applicationManager;
     private readonly IWebHostEnvironment _webHostEnvironment;
     private readonly IClientSecretManager _clientSecretManager;
+    private readonly Uri? _backOfficeHost;
 
     public BackOfficeApplicationManager(
         IOpenIddictApplicationManager applicationManager,
         IWebHostEnvironment webHostEnvironment,
-        IClientSecretManager clientSecretManager)
+        IClientSecretManager clientSecretManager,
+        IOptionsMonitor<NewBackOfficeSettings> securitySettingsMonitor)
     {
         _applicationManager = applicationManager;
         _webHostEnvironment = webHostEnvironment;
         _clientSecretManager = clientSecretManager;
+        _backOfficeHost = securitySettingsMonitor.CurrentValue.BackOfficeHost;
     }
 
-    public async Task EnsureBackOfficeApplicationAsync(Uri url, CancellationToken cancellationToken = default)
+    public async Task EnsureBackOfficeApplicationAsync(Uri backOfficeUrl, CancellationToken cancellationToken = default)
     {
-        if (url.IsAbsoluteUri == false)
+        if (backOfficeUrl.IsAbsoluteUri == false)
         {
-            throw new ArgumentException($"Expected an absolute URL, got: {url}", nameof(url));
+            throw new ArgumentException($"Expected an absolute URL, got: {backOfficeUrl}", nameof(backOfficeUrl));
         }
 
         await CreateOrUpdate(
@@ -34,7 +39,7 @@ public class BackOfficeApplicationManager : IBackOfficeApplicationManager
                 ClientId = Constants.OauthClientIds.BackOffice,
                 RedirectUris =
                 {
-                    CallbackUrlFor(url, "/umbraco/login/callback/")
+                    CallbackUrlFor(_backOfficeHost ?? backOfficeUrl, "/umbraco/login/callback/")
                 },
                 Type = OpenIddictConstants.ClientTypes.Public,
                 Permissions =
@@ -66,7 +71,7 @@ public class BackOfficeApplicationManager : IBackOfficeApplicationManager
                     ClientSecret = _clientSecretManager.Get(Constants.OauthClientIds.Swagger),
                     RedirectUris =
                     {
-                        CallbackUrlFor(url, "/umbraco/swagger/oauth2-redirect.html")
+                        CallbackUrlFor(backOfficeUrl, "/umbraco/swagger/oauth2-redirect.html")
                     },
                     Type = OpenIddictConstants.ClientTypes.Confidential,
                     Permissions =

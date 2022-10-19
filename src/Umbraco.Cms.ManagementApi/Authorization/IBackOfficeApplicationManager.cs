@@ -2,5 +2,5 @@
 
 public interface IBackOfficeApplicationManager
 {
-    Task EnsureBackOfficeApplicationAsync(Uri url, CancellationToken cancellationToken = default);
+    Task EnsureBackOfficeApplicationAsync(Uri backOfficeUrl, CancellationToken cancellationToken = default);
 }
