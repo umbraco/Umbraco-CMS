@@ -211,36 +211,6 @@ export const internalManifests: Array<ManifestTypes & { loader: () => Promise<ob
 	},
 	{
 		type: 'editorView',
-		alias: 'Umb.EditorView.DataType.Edit',
-		name: 'Data Type Editor Edit View',
-		loader: () => import('../backoffice/editors/data-type/views/edit/editor-view-data-type-edit.element'),
-		weight: 90,
-		meta: {
-			// TODO: how do we want to filter where editor views are shown? https://our.umbraco.com/documentation/extending/Content-Apps/#setting-up-the-plugin
-			// this is a temp solution
-			editors: ['Umb.Editor.DataType'],
-			label: 'Edit',
-			pathname: 'edit',
-			icon: 'edit',
-		},
-	},
-	{
-		type: 'editorView',
-		alias: 'Umb.EditorView.DataType.Info',
-		name: 'Data Type Editor Info View',
-		loader: () => import('../backoffice/editors/data-type/views/info/editor-view-data-type-info.element'),
-		weight: 90,
-		meta: {
-			// TODO: how do we want to filter where editor views are shown? https://our.umbraco.com/documentation/extending/Content-Apps/#setting-up-the-plugin
-			// this is a temp solution
-			editors: ['Umb.Editor.DataType'],
-			label: 'Info',
-			pathname: 'info',
-			icon: 'info',
-		},
-	},
-	{
-		type: 'editorView',
 		alias: 'Umb.EditorView.DocumentType.Design',
 		name: 'Document Type Editor Design View',
 		elementName: 'umb-editor-view-document-type-design',

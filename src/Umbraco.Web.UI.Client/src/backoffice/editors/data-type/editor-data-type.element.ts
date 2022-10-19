@@ -1,14 +1,13 @@
-import { UUIButtonState, UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
+import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { UmbNotificationService } from '../../../core/services/notification';
 import { UmbDataTypeStore } from '../../../core/stores/data-type/data-type.store';
-import { UmbNotificationDefaultData } from '../../../core/services/notification/layouts/default';
 import type { DataTypeDetails } from '../../../core/mocks/data/data-type.data';
 import { UmbDataTypeContext } from './data-type.context';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextProviderMixin, UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
 import '../shared/editor-entity-layout/editor-entity-layout.element';
 
@@ -41,23 +40,65 @@ export class UmbEditorDataTypeElement extends UmbContextProviderMixin(
 	@state()
 	private _dataTypeName = '';
 
-	@state()
-	private _saveButtonState?: UUIButtonState;
-
 	private _dataTypeContext?: UmbDataTypeContext;
 	private _dataTypeStore?: UmbDataTypeStore;
-	private _notificationService?: UmbNotificationService;
 
 	constructor() {
 		super();
 
-		this.consumeAllContexts(['umbDataTypeStore', 'umbNotificationService'], (instances) => {
+		this._registerExtensions();
+
+		this.consumeAllContexts(['umbDataTypeStore'], (instances) => {
 			this._dataTypeStore = instances['umbDataTypeStore'];
-			this._notificationService = instances['umbNotificationService'];
 			this._observeDataType();
 		});
 
 		this.addEventListener('property-value-change', this._onPropertyValueChange);
+	}
+
+	private _registerExtensions() {
+		const extensions: Array<any> = [
+			{
+				type: 'editorView',
+				alias: 'Umb.EditorView.DataType.Edit',
+				name: 'Data Type Editor Edit View',
+				loader: () => import('./views/edit/editor-view-data-type-edit.element'),
+				weight: 90,
+				meta: {
+					editors: ['Umb.Editor.DataType'],
+					label: 'Edit',
+					pathname: 'edit',
+					icon: 'edit',
+				},
+			},
+			{
+				type: 'editorView',
+				alias: 'Umb.EditorView.DataType.Info',
+				name: 'Data Type Editor Info View',
+				loader: () => import('./views/info/editor-view-data-type-info.element'),
+				weight: 90,
+				meta: {
+					editors: ['Umb.Editor.DataType'],
+					label: 'Info',
+					pathname: 'info',
+					icon: 'info',
+				},
+			},
+			{
+				type: 'editorAction',
+				alias: 'Umb.EditorAction.DataType.Save',
+				name: 'Save Data Type Editor Action',
+				loader: () => import('./actions/editor-action-data-type-save.element'),
+				meta: {
+					editors: ['Umb.Editor.DataType'],
+				},
+			},
+		];
+
+		extensions.forEach((extension) => {
+			if (umbExtensionsRegistry.isRegistered(extension.alias)) return;
+			umbExtensionsRegistry.register(extension);
+		});
 	}
 
 	private _observeDataType() {
@@ -86,22 +127,6 @@ export class UmbEditorDataTypeElement extends UmbContextProviderMixin(
 		this._dataTypeContext?.setPropertyValue(target?.alias, target?.value);
 	};
 
-	private async _onSave() {
-		// TODO: What if store is not present, what if node is not loaded....
-		if (!this._dataTypeStore || !this._dataTypeContext) return;
-
-		try {
-			this._saveButtonState = 'waiting';
-			const dataType = this._dataTypeContext.getData();
-			await this._dataTypeStore.save([dataType]);
-			const data: UmbNotificationDefaultData = { message: 'Data Type Saved' };
-			this._notificationService?.peek('positive', { data });
-			this._saveButtonState = 'success';
-		} catch (error) {
-			this._saveButtonState = 'failed';
-		}
-	}
-
 	// TODO. find a way where we don't have to do this for all editors.
 	private _handleInput(event: UUIInputEvent) {
 		if (event instanceof UUIInputEvent) {
@@ -117,15 +142,6 @@ export class UmbEditorDataTypeElement extends UmbContextProviderMixin(
 		return html`
 			<umb-editor-entity-layout alias="Umb.Editor.DataType">
 				<uui-input id="name" slot="name" .value=${this._dataTypeName} @input="${this._handleInput}"></uui-input>
-				<!-- TODO: these could be extensions points too -->
-				<div slot="actions">
-					<uui-button
-						@click=${this._onSave}
-						look="primary"
-						color="positive"
-						label="Save"
-						.state="${this._saveButtonState}"></uui-button>
-				</div>
 			</umb-editor-entity-layout>
 		`;
 	}
