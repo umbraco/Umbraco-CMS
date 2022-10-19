@@ -14,5 +14,5 @@ public class SendingDashboardsNotification : INotification
 
     public IUmbracoContext UmbracoContext { get; }
 
-    public IEnumerable<Tab<IDashboardSlim>> Dashboards { get; }
+    public IEnumerable<Tab<IDashboardSlim>> Dashboards { get; set; }
 }
