@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Features;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Mail;
@@ -24,7 +25,6 @@ using Umbraco.Cms.Web.BackOffice.Routing;
 using Umbraco.Cms.Web.BackOffice.Security;
 using Umbraco.Cms.Web.BackOffice.Trees;
 using Umbraco.Cms.Web.Common.Attributes;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Cms.Web.Common.Models;
 using Umbraco.Extensions;
 

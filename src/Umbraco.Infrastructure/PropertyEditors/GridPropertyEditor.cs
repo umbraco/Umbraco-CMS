@@ -3,6 +3,7 @@
 
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
@@ -13,7 +14,6 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Infrastructure.Templates;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors
