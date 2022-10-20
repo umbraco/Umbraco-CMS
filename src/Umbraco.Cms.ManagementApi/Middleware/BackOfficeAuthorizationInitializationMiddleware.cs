@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Routing;
-using Umbraco.Cms.ManagementApi.Authorization;
+using Umbraco.New.Cms.Infrastructure.Security;
 
 namespace Umbraco.Cms.ManagementApi.Middleware;
 

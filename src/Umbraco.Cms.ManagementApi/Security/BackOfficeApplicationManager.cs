@@ -2,9 +2,11 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using OpenIddict.Abstractions;
+using Umbraco.New.Cms.Core;
 using Umbraco.New.Cms.Core.Models.Configuration;
+using Umbraco.New.Cms.Infrastructure.Security;
 
-namespace Umbraco.Cms.ManagementApi.Authorization;
+namespace Umbraco.Cms.ManagementApi.Security;
 
 public class BackOfficeApplicationManager : IBackOfficeApplicationManager
 {

@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.ManagementApi.Authorization;
+﻿namespace Umbraco.New.Cms.Core;
 
 // TODO: move this class to Umbraco.Cms.Core as a partial class
 public static class Constants

@@ -1,10 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
-using Umbraco.Cms.ManagementApi.Authorization;
 using Umbraco.Cms.ManagementApi.Middleware;
+using Umbraco.Cms.ManagementApi.Security;
+using Umbraco.New.Cms.Infrastructure.Security;
 
 namespace Umbraco.Cms.ManagementApi.DependencyInjection;
 

@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.ManagementApi.Authorization;
+﻿namespace Umbraco.New.Cms.Infrastructure.Security;
 
 public interface IBackOfficeApplicationManager
 {

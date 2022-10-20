@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.ManagementApi.Authorization;
+﻿namespace Umbraco.Cms.ManagementApi.Security;
 
 public class ClientSecretManager : IClientSecretManager
 {
@@ -13,9 +13,4 @@ public class ClientSecretManager : IClientSecretManager
 
         return _secretsByClientId[clientId];
     }
-}
-
-public interface IClientSecretManager
-{
-    string Get(string clientId);
 }

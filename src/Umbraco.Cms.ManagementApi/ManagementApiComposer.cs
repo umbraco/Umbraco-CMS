@@ -13,11 +13,12 @@ using NSwag.AspNetCore;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
-using Umbraco.Cms.ManagementApi.Authorization;
 using Umbraco.Cms.ManagementApi.Configuration;
 using Umbraco.Cms.ManagementApi.DependencyInjection;
+using Umbraco.Cms.ManagementApi.Security;
 using Umbraco.Cms.Web.Common.ApplicationBuilder;
 using Umbraco.Extensions;
+using Umbraco.New.Cms.Core;
 using Umbraco.New.Cms.Core.Models.Configuration;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
