@@ -5,7 +5,7 @@ using Umbraco.New.Cms.Web.Common.Routing;
 namespace Umbraco.Cms.ManagementApi.Controllers.Relation;
 
 [ApiController]
-[BackOfficeRoute("api/v{version:apiVersion}/relation")]
+[VersionedApiBackOfficeRoute("relation")]
 [OpenApiTag("Relation")]
 [ApiVersion("1.0")]
 // TODO: Implement Authentication

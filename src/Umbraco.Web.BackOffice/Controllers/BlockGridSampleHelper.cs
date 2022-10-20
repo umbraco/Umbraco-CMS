@@ -5,23 +5,31 @@ using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Templates.PartialViews;
 using Umbraco.Cms.Web.Common.ActionsResults;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers;
 
-internal class BlockGridSampleHelper
+// Unfortunately this has to be public to be injected into a controller
+public sealed class BlockGridSampleHelper
 {
     private const string ContainerName = "Umbraco Block Grid Demo";
 
     private readonly IContentTypeService _contentTypeService;
     private readonly IDataTypeService _dataTypeService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
+    private readonly IPartialViewPopulator _partialViewPopulator;
 
-    public BlockGridSampleHelper(IContentTypeService contentTypeService, IDataTypeService dataTypeService, IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+    public BlockGridSampleHelper(
+        IContentTypeService contentTypeService,
+        IDataTypeService dataTypeService,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+        IPartialViewPopulator partialViewPopulator)
     {
         _contentTypeService = contentTypeService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
+        _partialViewPopulator = partialViewPopulator;
         _dataTypeService = dataTypeService;
     }
 
@@ -35,7 +43,7 @@ internal class BlockGridSampleHelper
     /// <param name="createElement">The function that will perform the actual element creation</param>
     /// <param name="errorMessage">If an error occurs, this message will describe that error</param>
     /// <returns>A mapping table between element aliases and the created element UDIs, or null if an error occurs</returns>
-    public Dictionary<string, Udi>? CreateSampleElements(Func<DocumentTypeSave, ActionResult<IContentType?>> createElement, out string errorMessage)
+    internal Dictionary<string, Udi>? CreateSampleElements(Func<DocumentTypeSave, ActionResult<IContentType?>> createElement, out string errorMessage)
     {
         errorMessage = string.Empty;
 
@@ -159,6 +167,26 @@ internal class BlockGridSampleHelper
         }
 
         return elementUdisByAlias;
+    }
+
+    internal void CreateSamplePartialViews()
+    {
+        var embeddedBasePath = $"{_partialViewPopulator.CoreEmbeddedPath}.BlockGrid.Components";
+        var fileSystemBasePath = "/Views/partials/blockgrid/Components";
+        var filesToMove = new[]
+        {
+            "umbBlockGridDemoHeadlineBlock.cshtml",
+            "umbBlockGridDemoImageBlock.cshtml",
+            "umbBlockGridDemoRichTextBlock.cshtml",
+            "umbBlockGridDemoTwoColumnLayoutBlock.cshtml",
+        };
+
+        foreach (var fileName in filesToMove)
+        {
+            var embeddedPath = $"{embeddedBasePath}.{fileName}";
+            var fileSystemPath = $"{fileSystemBasePath}/{fileName}";
+            _partialViewPopulator.CopyPartialViewIfNotExists(_partialViewPopulator.GetCoreAssembly(), embeddedPath, fileSystemPath);
+        }
     }
 
     private EntityContainer? GetOrCreateContainer()
