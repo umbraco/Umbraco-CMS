@@ -30,7 +30,9 @@ import { UmbPropertyEditorConfigStore } from '../core/stores/property-editor-con
 import { UmbUserGroupStore } from '../core/stores/user/user-group.store';
 import { manifests as sectionManifests } from './sections/manifests';
 import { manifests as propertyEditorUIManifests } from './property-editor-uis/manifests';
-
+import { manifests as treeManifests } from './trees/manifests';
+import { manifests as editorManifests } from './editors/manifests';
+import { manifests as propertyActionManifests } from './property-actions/manifests';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import type { ManifestTypes, ManifestWithLoader } from '@umbraco-cms/models';
@@ -59,7 +61,10 @@ export class UmbBackofficeElement extends UmbContextConsumerMixin(UmbContextProv
 		super();
 
 		this._registerExtensions(sectionManifests);
+		this._registerExtensions(treeManifests);
+		this._registerExtensions(editorManifests);
 		this._registerExtensions(propertyEditorUIManifests);
+		this._registerExtensions(propertyActionManifests);
 
 		this._umbIconRegistry.attach(this);
 

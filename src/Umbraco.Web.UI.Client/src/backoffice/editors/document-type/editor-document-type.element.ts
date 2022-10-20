@@ -10,12 +10,10 @@ import { UmbNotificationDefaultData } from '../../../core/services/notification/
 import { UmbDocumentTypeContext } from './document-type.context';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
+import type { ManifestTypes, ManifestWithLoader } from '@umbraco-cms/models';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
 import '../shared/editor-entity-layout/editor-entity-layout.element';
-
-// Lazy load
-// TODO: Make this dynamic, use load-extensions method to loop over extensions for this node.
-import './views/editor-view-document-type-design.element';
 
 @customElement('umb-editor-document-type')
 export class UmbEditorDocumentTypeElement extends UmbContextProviderMixin(
@@ -56,6 +54,8 @@ export class UmbEditorDocumentTypeElement extends UmbContextProviderMixin(
 	constructor() {
 		super();
 
+		this._registerExtensions();
+
 		this.consumeAllContexts(['umbDocumentTypeStore', 'umbNotificationService'], (instances) => {
 			this._documentTypeStore = instances['umbDocumentTypeStore'];
 			this._notificationService = instances['umbNotificationService'];
@@ -63,6 +63,29 @@ export class UmbEditorDocumentTypeElement extends UmbContextProviderMixin(
 		});
 
 		this.provideContext('umbDocumentType', this._documentTypeContext);
+	}
+
+	private _registerExtensions() {
+		const extensions: Array<ManifestWithLoader<ManifestTypes>> = [
+			{
+				type: 'editorView',
+				alias: 'Umb.EditorView.DocumentType.Design',
+				name: 'Document Type Editor Design View',
+				loader: () => import('./views/design/editor-view-document-type-design.element'),
+				weight: 100,
+				meta: {
+					editors: ['Umb.Editor.DocumentType'],
+					label: 'Design',
+					pathname: 'design',
+					icon: 'edit',
+				},
+			},
+		];
+
+		extensions.forEach((extension) => {
+			if (umbExtensionsRegistry.isRegistered(extension.alias)) return;
+			umbExtensionsRegistry.register(extension);
+		});
 	}
 
 	private _observeDocumentType() {
