@@ -1,12 +1,10 @@
-import { UUIButtonState, UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
+import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { distinctUntilChanged } from 'rxjs';
-import { UmbNotificationService } from '../../../core/services/notification';
 import { UmbDocumentTypeStore } from '../../../core/stores/document-type.store';
 import { DocumentTypeEntity } from '../../../core/mocks/data/document-type.data';
-import { UmbNotificationDefaultData } from '../../../core/services/notification/layouts/default';
 import { UmbDocumentTypeContext } from './document-type.context';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
@@ -44,25 +42,18 @@ export class UmbEditorDocumentTypeElement extends UmbContextProviderMixin(
 	@state()
 	private _documentType?: DocumentTypeEntity;
 
-	@state()
-	private _saveButtonState?: UUIButtonState;
-
 	private _documentTypeContext?: UmbDocumentTypeContext;
 	private _documentTypeStore?: UmbDocumentTypeStore;
-	private _notificationService?: UmbNotificationService;
 
 	constructor() {
 		super();
 
 		this._registerExtensions();
 
-		this.consumeAllContexts(['umbDocumentTypeStore', 'umbNotificationService'], (instances) => {
-			this._documentTypeStore = instances['umbDocumentTypeStore'];
-			this._notificationService = instances['umbNotificationService'];
+		this.consumeContext('umbDocumentTypeStore', (instance) => {
+			this._documentTypeStore = instance;
 			this._observeDocumentType();
 		});
-
-		this.provideContext('umbDocumentType', this._documentTypeContext);
 	}
 
 	private _registerExtensions() {
@@ -78,6 +69,15 @@ export class UmbEditorDocumentTypeElement extends UmbContextProviderMixin(
 					label: 'Design',
 					pathname: 'design',
 					icon: 'edit',
+				},
+			},
+			{
+				type: 'editorAction',
+				alias: 'Umb.EditorAction.DocumentType.Save',
+				name: 'Save Document Type Editor Action',
+				loader: () => import('./actions/save/editor-action-document-type-save.element'),
+				meta: {
+					editors: ['Umb.Editor.DocumentType'],
 				},
 			},
 		];
@@ -108,22 +108,6 @@ export class UmbEditorDocumentTypeElement extends UmbContextProviderMixin(
 		});
 	}
 
-	private async _onSave() {
-		// TODO: What if store is not present, what if node is not loaded....
-		if (!this._documentTypeStore) return;
-		if (!this._documentType) return;
-
-		try {
-			this._saveButtonState = 'waiting';
-			await this._documentTypeStore.save([this._documentType]);
-			const data: UmbNotificationDefaultData = { message: 'Document Type Saved' };
-			this._notificationService?.peek('positive', { data });
-			this._saveButtonState = 'success';
-		} catch (error) {
-			this._saveButtonState = 'failed';
-		}
-	}
-
 	// TODO. find a way where we don't have to do this for all editors.
 	private _handleInput(event: UUIInputEvent) {
 		if (event instanceof UUIInputEvent) {
@@ -147,16 +131,6 @@ export class UmbEditorDocumentTypeElement extends UmbContextProviderMixin(
 				</div>
 
 				<div slot="footer">Keyboard Shortcuts</div>
-
-				<!-- TODO: these could be extensions points too -->
-				<div slot="actions">
-					<uui-button
-						@click=${this._onSave}
-						look="primary"
-						color="positive"
-						label="Save"
-						.state="${this._saveButtonState}"></uui-button>
-				</div>
 			</umb-editor-entity-layout>
 		`;
 	}

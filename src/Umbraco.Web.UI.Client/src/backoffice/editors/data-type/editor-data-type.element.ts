@@ -88,7 +88,7 @@ export class UmbEditorDataTypeElement extends UmbContextProviderMixin(
 				type: 'editorAction',
 				alias: 'Umb.EditorAction.DataType.Save',
 				name: 'Save Data Type Editor Action',
-				loader: () => import('./actions/editor-action-data-type-save.element'),
+				loader: () => import('./actions/save/editor-action-data-type-save.element'),
 				meta: {
 					editors: ['Umb.Editor.DataType'],
 				},

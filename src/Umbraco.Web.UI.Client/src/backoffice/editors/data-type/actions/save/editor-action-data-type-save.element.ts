@@ -2,9 +2,9 @@ import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import type { UUIButtonState } from '@umbraco-ui/uui';
-import type { UmbNotificationDefaultData } from '../../../../core/services/notification/layouts/default';
-import type { UmbNotificationService } from '../../../../core/services/notification';
-import { UmbDataTypeContext } from '../data-type.context';
+import type { UmbNotificationDefaultData } from '../../../../../core/services/notification/layouts/default';
+import type { UmbNotificationService } from '../../../../../core/services/notification';
+import { UmbDataTypeContext } from '../../data-type.context';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { UmbDataTypeStore } from 'src/core/stores/data-type/data-type.store';
 
