@@ -5,6 +5,7 @@ using System.Xml.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Dictionary;
@@ -21,6 +22,7 @@ using Umbraco.Cms.Infrastructure.Packaging;
 using Umbraco.Cms.Web.BackOffice.Filters;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 using ContentType = Umbraco.Cms.Core.Models.ContentType;
 
@@ -43,6 +45,7 @@ public class ContentTypeController : ContentTypeControllerBase<IContentType>
     private readonly ILocalizedTextService _localizedTextService;
     private readonly ILogger<ContentTypeController> _logger;
     private readonly PackageDataInstallation _packageDataInstallation;
+    private readonly BlockGridSampleHelper _blockGridSampleHelper;
 
     private readonly PropertyEditorCollection _propertyEditors;
     // TODO: Split this controller apart so that authz is consistent, currently we need to authz each action individually.
@@ -52,6 +55,7 @@ public class ContentTypeController : ContentTypeControllerBase<IContentType>
     private readonly IShortStringHelper _shortStringHelper;
     private readonly IUmbracoMapper _umbracoMapper;
 
+    [Obsolete("Use constructor that takes BlockGridSampleHelper as a parameter")]
     public ContentTypeController(
         ICultureDictionary cultureDictionary,
         IContentTypeService contentTypeService,
@@ -71,30 +75,76 @@ public class ContentTypeController : ContentTypeControllerBase<IContentType>
         IHostingEnvironment hostingEnvironment,
         EditorValidatorCollection editorValidatorCollection,
         PackageDataInstallation packageDataInstallation)
-        : base(
+        : this(
             cultureDictionary,
-            editorValidatorCollection,
             contentTypeService,
             mediaTypeService,
             memberTypeService,
             umbracoMapper,
-            localizedTextService)
+            localizedTextService,
+            serializer,
+            propertyEditors,
+            backofficeSecurityAccessor,
+            dataTypeService,
+            shortStringHelper,
+            fileService,
+            logger,
+            contentService,
+            contentTypeBaseServiceProvider,
+            hostingEnvironment,
+            editorValidatorCollection,
+            packageDataInstallation,
+            StaticServiceProvider.Instance.GetRequiredService<BlockGridSampleHelper>()
+        )
     {
-        _serializer = serializer;
-        _propertyEditors = propertyEditors;
-        _contentTypeService = contentTypeService;
-        _umbracoMapper = umbracoMapper;
-        _backofficeSecurityAccessor = backofficeSecurityAccessor;
-        _dataTypeService = dataTypeService;
-        _shortStringHelper = shortStringHelper;
-        _localizedTextService = localizedTextService;
-        _fileService = fileService;
-        _logger = logger;
-        _contentService = contentService;
-        _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
-        _hostingEnvironment = hostingEnvironment;
-        _packageDataInstallation = packageDataInstallation;
     }
+
+    [ActivatorUtilitiesConstructor]
+    public ContentTypeController(
+           ICultureDictionary cultureDictionary,
+           IContentTypeService contentTypeService,
+           IMediaTypeService mediaTypeService,
+           IMemberTypeService memberTypeService,
+           IUmbracoMapper umbracoMapper,
+           ILocalizedTextService localizedTextService,
+           IEntityXmlSerializer serializer,
+           PropertyEditorCollection propertyEditors,
+           IBackOfficeSecurityAccessor backofficeSecurityAccessor,
+           IDataTypeService dataTypeService,
+           IShortStringHelper shortStringHelper,
+           IFileService fileService,
+           ILogger<ContentTypeController> logger,
+           IContentService contentService,
+           IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
+           IHostingEnvironment hostingEnvironment,
+           EditorValidatorCollection editorValidatorCollection,
+           PackageDataInstallation packageDataInstallation,
+           BlockGridSampleHelper blockGridSampleHelper)
+           : base(
+               cultureDictionary,
+               editorValidatorCollection,
+               contentTypeService,
+               mediaTypeService,
+               memberTypeService,
+               umbracoMapper,
+               localizedTextService)
+        {
+            _serializer = serializer;
+            _propertyEditors = propertyEditors;
+            _contentTypeService = contentTypeService;
+            _umbracoMapper = umbracoMapper;
+            _backofficeSecurityAccessor = backofficeSecurityAccessor;
+            _dataTypeService = dataTypeService;
+            _shortStringHelper = shortStringHelper;
+            _localizedTextService = localizedTextService;
+            _fileService = fileService;
+            _logger = logger;
+            _contentService = contentService;
+            _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
+            _hostingEnvironment = hostingEnvironment;
+            _packageDataInstallation = packageDataInstallation;
+            _blockGridSampleHelper = blockGridSampleHelper;
+        }
 
     [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
     public int GetCount() => _contentTypeService.Count();
@@ -654,13 +704,15 @@ public class ContentTypeController : ContentTypeControllerBase<IContentType>
     [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
     public ActionResult PostCreateBlockGridSample()
     {
-        var sampleHelper = new BlockGridSampleHelper(_contentTypeService, _dataTypeService, _backofficeSecurityAccessor);
-        Dictionary<string, Udi>? elementUdisByAlias = sampleHelper.CreateSampleElements(
+        Dictionary<string, Udi>? elementUdisByAlias = _blockGridSampleHelper.CreateSampleElements(
             documentTypeSave => PerformPostSave<DocumentTypeDisplay, DocumentTypeSave, PropertyTypeBasic>(
                 documentTypeSave,
                 i => _contentTypeService.Get(i),
                 type => _contentTypeService.Save(type)),
             out string errorMessage);
+
+        // Create the partial views if they don't exist
+        _blockGridSampleHelper.CreateSamplePartialViews();
 
         return elementUdisByAlias != null ? Ok(elementUdisByAlias) : ValidationProblem(errorMessage);
     }
