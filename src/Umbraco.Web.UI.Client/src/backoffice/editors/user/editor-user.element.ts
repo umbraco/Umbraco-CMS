@@ -9,10 +9,11 @@ import { UmbUserStore } from '../../../core/stores/user/user.store';
 import { getTagLookAndColor } from '../../sections/users/user-extensions';
 import { UmbUserContext } from './user.context';
 import { UmbContextProviderMixin, UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-import type { UserDetails } from '@umbraco-cms/models';
+import type { ManifestEditorAction, ManifestWithLoader, UserDetails } from '@umbraco-cms/models';
 
 import '../../property-editor-uis/content-picker/property-editor-ui-content-picker.element';
 import '../shared/editor-entity-layout/editor-entity-layout.element';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
 @customElement('umb-editor-user')
 export class UmbEditorUserElement extends UmbContextProviderMixin(UmbContextConsumerMixin(LitElement)) {
@@ -103,6 +104,31 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(UmbContextCons
 	private _userNameSubscription?: Subscription;
 
 	private _languages = []; //TODO Add languages
+
+	constructor() {
+		super();
+
+		this._registerEditorActions();
+	}
+
+	private _registerEditorActions() {
+		const manifests: Array<ManifestWithLoader<ManifestEditorAction>> = [
+			{
+				type: 'editorAction',
+				alias: 'Umb.EditorAction.User.Save',
+				name: 'EditorActionUserSave',
+				loader: () => import('./actions/editor-action-user-save.element'),
+				meta: {
+					editors: ['Umb.Editor.User'],
+				},
+			},
+		];
+
+		manifests.forEach((manifest) => {
+			if (umbExtensionsRegistry.isRegistered(manifest.alias)) return;
+			umbExtensionsRegistry.register(manifest);
+		});
+	}
 
 	connectedCallback(): void {
 		super.connectedCallback();

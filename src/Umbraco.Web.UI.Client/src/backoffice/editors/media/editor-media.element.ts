@@ -1,6 +1,8 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
+import type { ManifestEditorView, ManifestWithLoader } from '@umbraco-cms/models';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
 import '../shared/node/editor-node.element';
 
@@ -22,6 +24,44 @@ export class UmbEditorMediaElement extends LitElement {
 
 	constructor() {
 		super();
+
+		this._registerEditorViews();
+	}
+
+	private _registerEditorViews() {
+		const dashboards: Array<ManifestWithLoader<ManifestEditorView>> = [
+			{
+				type: 'editorView',
+				alias: 'Umb.EditorView.Media.Edit',
+				name: 'Media Editor Edit View',
+				loader: () => import('../shared/node/views/edit/editor-view-node-edit.element'),
+				weight: 200,
+				meta: {
+					editors: ['Umb.Editor.Media'],
+					label: 'Media',
+					pathname: 'media',
+					icon: 'umb:picture',
+				},
+			},
+			{
+				type: 'editorView',
+				alias: 'Umb.EditorView.Media.Info',
+				name: 'Media Editor Info View',
+				loader: () => import('../shared/node/views/info/editor-view-node-info.element'),
+				weight: 100,
+				meta: {
+					editors: ['Umb.Editor.Media'],
+					label: 'Info',
+					pathname: 'info',
+					icon: 'info',
+				},
+			},
+		];
+
+		dashboards.forEach((dashboard) => {
+			if (umbExtensionsRegistry.isRegistered(dashboard.alias)) return;
+			umbExtensionsRegistry.register(dashboard);
+		});
 	}
 
 	render() {

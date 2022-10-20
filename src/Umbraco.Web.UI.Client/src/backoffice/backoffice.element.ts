@@ -28,7 +28,12 @@ import { UmbPropertyEditorStore } from '../core/stores/property-editor/property-
 import { UmbIconStore } from '../core/stores/icon/icon.store';
 import { UmbPropertyEditorConfigStore } from '../core/stores/property-editor-config/property-editor-config.store';
 import { UmbUserGroupStore } from '../core/stores/user/user-group.store';
+import { manifests as sectionManifests } from './sections/manifests';
+import { manifests as propertyEditorUIManifests } from './property-editor-uis/manifests';
+
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
+import type { ManifestTypes, ManifestWithLoader } from '@umbraco-cms/models';
 
 @defineElement('umb-backoffice')
 export class UmbBackofficeElement extends UmbContextConsumerMixin(UmbContextProviderMixin(LitElement)) {
@@ -53,6 +58,9 @@ export class UmbBackofficeElement extends UmbContextConsumerMixin(UmbContextProv
 	constructor() {
 		super();
 
+		this._registerExtensions(sectionManifests);
+		this._registerExtensions(propertyEditorUIManifests);
+
 		this._umbIconRegistry.attach(this);
 
 		this.provideContext('umbEntityStore', this._umbEntityStore);
@@ -66,6 +74,13 @@ export class UmbBackofficeElement extends UmbContextConsumerMixin(UmbContextProv
 		this.provideContext('umbNotificationService', new UmbNotificationService());
 		this.provideContext('umbModalService', new UmbModalService());
 		this.provideContext('umbSectionStore', new UmbSectionStore());
+	}
+
+	private _registerExtensions(manifests: Array<ManifestWithLoader<ManifestTypes>>) {
+		manifests.forEach((manifest) => {
+			if (umbExtensionsRegistry.isRegistered(manifest.alias)) return;
+			umbExtensionsRegistry.register(manifest);
+		});
 	}
 
 	render() {
