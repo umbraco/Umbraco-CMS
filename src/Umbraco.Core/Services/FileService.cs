@@ -33,6 +33,7 @@ public class FileService : RepositoryService, IFileService
     private readonly IShortStringHelper _shortStringHelper;
     private readonly IStylesheetRepository _stylesheetRepository;
     private readonly ITemplateRepository _templateRepository;
+    private static readonly object _scopeLock = new();
 
     public FileService(
         ICoreScopeProvider uowProvider,
@@ -361,8 +362,9 @@ public class FileService : RepositoryService, IFileService
             template.Content = content;
         }
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        lock (_scopeLock)
         {
+            using ICoreScope scope = ScopeProvider.CreateCoreScope();
             var savingEvent = new TemplateSavingNotification(template, eventMessages, true, contentTypeAlias!);
             if (scope.Notifications.PublishCancelable(savingEvent))
             {
