@@ -27,7 +27,8 @@ export class UmbEditorExtensionsElement extends UmbContextConsumerMixin(UmbObser
 	render() {
 		return html`
 			<umb-editor-entity-layout headline="Extensions" alias="Umb.Editor.Extensions">
-				<uui-box headline="Extensions">
+				<uui-box>
+					<p>List of currently loaded extensions</p>
 					<uui-table>
 						<uui-table-head>
 							<uui-table-head-cell>Type</uui-table-head-cell>
