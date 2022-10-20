@@ -295,7 +295,7 @@ public class UmbracoPlan : MigrationPlan
         To<AddUserGroup2LanguageTable>("{D0B3D29D-F4D5-43E3-BA67-9D49256F3266}");
         To<AddHasAccessToAllLanguagesColumn>("{79D8217B-5920-4C0E-8E9A-3CF8FA021882}");
 
-        // To 10.3.0
+        // To 11.0.0/10.4.0
         To<AddBlockGridPartialViews>("{56833770-3B7E-4FD5-A3B6-3416A26A7A3F}");
     }
 }
