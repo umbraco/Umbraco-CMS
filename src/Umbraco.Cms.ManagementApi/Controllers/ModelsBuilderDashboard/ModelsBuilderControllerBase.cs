@@ -5,7 +5,7 @@ using Umbraco.New.Cms.Web.Common.Routing;
 namespace Umbraco.Cms.ManagementApi.Controllers.ModelsBuilderDashboard;
 
 [ApiController]
-[VersionedApiBackOfficeRoute("modelsBuilder")]
+[VersionedApiBackOfficeRoute("models-builder")]
 [OpenApiTag("ModelsBuilder")]
 [ApiVersion("1.0")]
 
