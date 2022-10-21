@@ -12,18 +12,18 @@ using Umbraco.Cms.Web.BackOffice.Security;
 using Umbraco.Extensions;
 using Umbraco.New.Cms.Web.Common.Routing;
 
-namespace Umbraco.Cms.ManagementApi.Controllers.BackOfficeAuthentication;
+namespace Umbraco.Cms.ManagementApi.Controllers.Security;
 
 [ApiController]
-[BackOfficeRoute("api/v{version:apiVersion}/back-office-authentication")]
-[OpenApiTag("BackOfficeAuthentication")]
-public class BackOfficeAuthenticationController : ManagementApiControllerBase
+[VersionedApiBackOfficeRoute(Paths.BackOfficeApiEndpointTemplate)]
+[OpenApiTag("Security")]
+public class BackOfficeController : ManagementApiControllerBase
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IBackOfficeSignInManager _backOfficeSignInManager;
     private readonly IBackOfficeUserManager _backOfficeUserManager;
 
-    public BackOfficeAuthenticationController(IHttpContextAccessor httpContextAccessor, IBackOfficeSignInManager backOfficeSignInManager, IBackOfficeUserManager backOfficeUserManager)
+    public BackOfficeController(IHttpContextAccessor httpContextAccessor, IBackOfficeSignInManager backOfficeSignInManager, IBackOfficeUserManager backOfficeUserManager)
     {
         _httpContextAccessor = httpContextAccessor;
         _backOfficeSignInManager = backOfficeSignInManager;

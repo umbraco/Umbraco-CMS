@@ -54,8 +54,8 @@ public static class BackOfficeAuthBuilderExtensions
             {
                 // Enable the authorization and token endpoints.
                 options
-                    .SetAuthorizationEndpointUris("/umbraco/api/v1.0/back-office-authentication/authorize")
-                    .SetTokenEndpointUris("/umbraco/api/v1.0/back-office-authentication/token");
+                    .SetAuthorizationEndpointUris(Controllers.Security.Paths.BackOfficeApiAuthorizationEndpoint)
+                    .SetTokenEndpointUris(Controllers.Security.Paths.BackOfficeApiTokenEndpoint);
 
                 // Enable authorization code flow with PKCE
                 options

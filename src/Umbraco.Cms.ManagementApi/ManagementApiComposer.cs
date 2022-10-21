@@ -46,7 +46,6 @@ public class ManagementApiComposer : IComposer
             .AddFactories()
             .AddServices()
             .AddMappers()
-            .AddExamineManagement()
             .AddBackOfficeAuthentication();
 
         services.AddApiVersioning(options =>
@@ -75,8 +74,8 @@ public class ManagementApiComposer : IComposer
                 Type = OpenApiSecuritySchemeType.OAuth2,
                 Description = "Umbraco Authentication",
                 Flow = OpenApiOAuth2Flow.AccessCode,
-                AuthorizationUrl = "/umbraco/api/v1.0/back-office-authentication/authorize",
-                TokenUrl = "/umbraco/api/v1.0/back-office-authentication/token",
+                AuthorizationUrl = Controllers.Security.Paths.BackOfficeApiAuthorizationEndpoint,
+                TokenUrl = Controllers.Security.Paths.BackOfficeApiTokenEndpoint,
                 Scopes = new Dictionary<string, string>(),
             });
             // this is documented in OAuth2 setup for swagger, but does not seem to be necessary at the moment.
