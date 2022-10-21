@@ -4,6 +4,7 @@ using Microsoft.Extensions.Hosting;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.ManagementApi.Middleware;
 using Umbraco.Cms.ManagementApi.Security;
+using Umbraco.New.Cms.Infrastructure.HostedServices;
 using Umbraco.New.Cms.Infrastructure.Security;
 
 namespace Umbraco.Cms.ManagementApi.DependencyInjection;
@@ -97,6 +98,7 @@ public static class BackOfficeAuthBuilderExtensions
         builder.Services.AddSingleton<IClientSecretManager, ClientSecretManager>();
         builder.Services.AddSingleton<BackOfficeAuthorizationInitializationMiddleware>();
 
+        builder.Services.AddHostedService<OpenIddictCleanup>();
         builder.Services.AddHostedService<DatabaseManager>();
 
         return builder;
