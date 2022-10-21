@@ -487,8 +487,8 @@
     <key alias="confirmdelete">Sei sicuro di voler eliminare</key>
     <key alias="confirmdisable">Sei sicuro di voler disabilitare</key>
     <key alias="confirmremove">Sei sicuro di voler rimuovere</key>
-    <key alias="confirmremoveusageof"><![CDATA[Sei sicuro di voler rimuovere l'utilizzo di <b>%0%</b>]]></key>
-    <key alias="confirmremovereferenceto"><![CDATA[Sei sicuro di voler rimuovere la referenza a <b>%0%</b>]]></key>
+    <key alias="confirmremoveusageof"><![CDATA[Sei sicuro di voler rimuovere l'utilizzo di <strong>%0%</strong>]]></key>
+    <key alias="confirmremovereferenceto"><![CDATA[Sei sicuro di voler rimuovere la referenza a <strong>%0%</strong>]]></key>
     <key alias="confirmlogout"><![CDATA[Sei sicuro?]]></key>
     <key alias="confirmSure"><![CDATA[Sei sicuro?]]></key>
     <key alias="cut">Taglia</key>
@@ -574,8 +574,8 @@
     <key alias="selectSnippet">Seleziona snippet</key>
     <key alias="variantdeletewarning">
       <![CDATA[Questo cancellerà il nodo e tutte le sue lingue. Se desideri eliminare solo una lingua, dovresti invece non pubblicare il nodo in quella lingua.]]></key>
-    <key alias="propertyuserpickerremovewarning"><![CDATA[Questo rimuoverà l'utente <b>%0%</b>.]]></key>
-    <key alias="userremovewarning"><![CDATA[Questo rimuoverà l'utente <b>%0%</b> dal gruppo <b>%1%</b>]]></key>
+    <key alias="propertyuserpickerremovewarning"><![CDATA[Questo rimuoverà l'utente <strong>%0%</strong>.]]></key>
+    <key alias="userremovewarning"><![CDATA[Questo rimuoverà l'utente <strong>%0%</strong> dal gruppo <strong>%1%</strong>]]></key>
     <key alias="yesRemove">Si, rimuovi</key>
   </area>
   <area alias="dictionary">
@@ -2767,12 +2767,12 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
                     Umbraco attualmente funziona in modalità debug. Ciò significa che puoi utilizzare il profiler delle prestazioni integrato per valutare le prestazioni durante il rendering delle pagine.
                 </p>
                 <p>
-                    Se vuoi attivare il profiler per il rendering di una pagina specifica, aggiungi semplicemente <b>umbDebug=true</b> alla querystring quando richiedi la pagina.
+                    Se vuoi attivare il profiler per il rendering di una pagina specifica, aggiungi semplicemente <strong>umbDebug=true</strong> alla querystring quando richiedi la pagina.
                 </p>
                 <p>
                     Se vuoi che il profiler sia attivato per impostazione predefinita per tutti i rendering di pagina, puoi utilizzare l'interruttore qui sotto.
                     Verrà impostato un cookie nel tuo browser, che quindi attiverà automaticamente il profiler.
-                    In altre parole, il profiler sarà attivo per impostazione predefinita solo nel <i>tuo</i> browser, non in quello di tutti gli altri.
+                    In altre parole, il profiler sarà attivo per impostazione predefinita solo nel <em>tuo</em> browser, non in quello di tutti gli altri.
                 </p>
         ]]>
     </key>
@@ -2781,7 +2781,7 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
     <key alias="reminderDescription">
       <![CDATA[
             <p>
-                Non dovresti mai lasciare che un sito di produzione venga eseguito in modalità debug. La modalità di debug viene disattivata impostando <b>debug="false"</b> nell'elemento <b>&lt;compilation /&gt;</b> nel file web.config.
+                Non dovresti mai lasciare che un sito di produzione venga eseguito in modalità debug. La modalità di debug viene disattivata impostando <strong>debug="false"</strong> nell'elemento <strong>&lt;compilation /&gt;</strong> nel file web.config.
             </p>
         ]]>
     </key>
@@ -2791,7 +2791,7 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
                 Umbraco attualmente non viene eseguito in modalità debug, quindi non è possibile utilizzare il profiler integrato. Questo è come dovrebbe essere per un sito produttivo.
             </p>
             <p>
-                La modalità di debug viene attivata impostando <b>debug="true"</b> nell'elemento <b>&lt;compilation /&gt;</b> in web.config.
+                La modalità di debug viene attivata impostando <strong>debug="true"</strong> nell'elemento <strong>&lt;compilation /&gt;</strong> in web.config.
             </p>
         ]]>
     </key>

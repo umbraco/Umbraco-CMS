@@ -68,16 +68,7 @@ public static class ServiceCollectionExtensions
         services.AddUnique<TService2>(factory => (TImplementing)factory.GetRequiredService<TService1>(), lifetime);
     }
 
-    // TODO(V11): Remove this function.
-    [Obsolete("This method is functionally equivalent to AddSingleton<TImplementing>() please use that instead.")]
-    public static void AddUnique<TImplementing>(this IServiceCollection services)
-        where TImplementing : class
-    {
-        services.RemoveAll<TImplementing>();
-        services.AddSingleton<TImplementing>();
-    }
-
-    /// <summary>
+        /// <summary>
     ///     Adds a service of type <typeparamref name="TService" /> with an implementation factory method to the specified
     ///     <see cref="IServiceCollection" />.
     /// </summary>

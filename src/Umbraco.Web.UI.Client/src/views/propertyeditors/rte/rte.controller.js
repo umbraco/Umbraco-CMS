@@ -15,10 +15,6 @@ angular.module("umbraco")
             if (!editorConfig || Utilities.isString(editorConfig)) {
                 editorConfig = tinyMceService.defaultPrevalues();
             }
-            //make sure there's a max image size
-            if (!editorConfig.maxImageSize && editorConfig.maxImageSize !== 0) {
-                editorConfig.maxImageSize = tinyMceService.defaultPrevalues().maxImageSize;
-            }
 
             var width = editorConfig.dimensions ? parseInt(editorConfig.dimensions.width, 10) || null : null;
             var height = editorConfig.dimensions ? parseInt(editorConfig.dimensions.height, 10) || null : null;
@@ -81,6 +77,7 @@ angular.module("umbraco")
                     //initialize the standard editor functionality for Umbraco
                     tinyMceService.initializeEditor({
                         editor: editor,
+                        toolbar: editorConfig.toolbar,
                         model: $scope.model,
                         currentFormInput: $scope.rteForm.modelValue
                     });
@@ -88,6 +85,10 @@ angular.module("umbraco")
                 };
               
                 Utilities.extend(baseLineConfigObj, standardConfig);
+
+                // Readonly mode
+                baseLineConfigObj.toolbar = $scope.readonly ? false : baseLineConfigObj.toolbar;
+                baseLineConfigObj.readonly = $scope.readonly ? 1 : baseLineConfigObj.readonly;
 
                 // We need to wait for DOM to have rendered before we can find the element by ID.
                 $timeout(function () {

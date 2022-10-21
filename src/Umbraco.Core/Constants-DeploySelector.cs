@@ -12,5 +12,6 @@ public static partial class Constants
         public const string ThisAndDescendants = "this-and-descendants";
         public const string ChildrenOfThis = "children";
         public const string DescendantsOfThis = "descendants";
+        public const string EntitiesOfType = "entities-of-type";
     }
 }

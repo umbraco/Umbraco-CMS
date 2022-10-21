@@ -493,8 +493,8 @@
     <key alias="databaseUpgradeDone"><![CDATA[您的資料庫已經升級至最新版本%0%。<br />點選<strong>下一步</strong>繼續。]]></key>
     <key alias="databaseUpToDate"><![CDATA[目前資料庫是最新的！點選<strong>下一步</strong>繼續設定精靈。]]></key>
     <key alias="defaultUserChangePass"><![CDATA[<strong>預設使用者的密碼必須更改！</strong>]]></key>
-    <key alias="defaultUserDisabled"><![CDATA[<strong>預設使用者已經被暫停或沒有Umbraco的使用權！</strong></p><p>不需更多的操作步驟。點選<b>下一步</b>繼續。]]></key>
-    <key alias="defaultUserPassChanged"><![CDATA[<strong>安裝後預設使用者的密碼已經成功修改！</strong></p><p>不需更多的操作步驟。點選<b>下一步</b>繼續。]]></key>
+    <key alias="defaultUserDisabled"><![CDATA[<strong>預設使用者已經被暫停或沒有Umbraco的使用權！</strong></p><p>不需更多的操作步驟。點選<strong>下一步</strong>繼續。]]></key>
+    <key alias="defaultUserPassChanged"><![CDATA[<strong>安裝後預設使用者的密碼已經成功修改！</strong></p><p>不需更多的操作步驟。點選<strong>下一步</strong>繼續。]]></key>
     <key alias="defaultUserPasswordChanged">密碼已更改</key>
     <key alias="greatStart">作為入門者，從視頻教程開始吧！</key>
     <key alias="None">安裝失敗。</key>

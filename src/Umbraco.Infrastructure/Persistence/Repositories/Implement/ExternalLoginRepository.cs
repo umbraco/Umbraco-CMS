@@ -14,26 +14,13 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
-internal class ExternalLoginRepository : EntityRepositoryBase<int, IIdentityUserLogin>, IExternalLoginRepository, IExternalLoginWithKeyRepository
+internal class ExternalLoginRepository : EntityRepositoryBase<int, IIdentityUserLogin>, IExternalLoginWithKeyRepository
 {
     public ExternalLoginRepository(IScopeAccessor scopeAccessor, AppCaches cache,
         ILogger<ExternalLoginRepository> logger)
         : base(scopeAccessor, cache, logger)
     {
     }
-
-    /// <inheritdoc />
-    [Obsolete("Use method that takes guid as param")]
-    public void DeleteUserLogins(int memberId) => DeleteUserLogins(memberId.ToGuid());
-
-    /// <inheritdoc />
-    [Obsolete("Use method that takes guid as param")]
-    public void Save(int userId, IEnumerable<IExternalLogin> logins) => Save(userId.ToGuid(), logins);
-
-    /// <inheritdoc />
-    [Obsolete("Use method that takes guid as param")]
-    public void Save(int userId, IEnumerable<IExternalLoginToken> tokens) => Save(userId.ToGuid(), tokens);
-
     /// <summary>
     ///     Query for user tokens
     /// </summary>

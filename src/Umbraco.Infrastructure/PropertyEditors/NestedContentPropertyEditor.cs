@@ -25,7 +25,8 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     "nestedcontent",
     ValueType = ValueTypes.Json,
     Group = Constants.PropertyEditors.Groups.Lists,
-    Icon = "icon-thumbnail-list")]
+    Icon = "icon-thumbnail-list",
+    ValueEditorIsReusable = false)]
 public class NestedContentPropertyEditor : DataEditor
 {
     public const string ContentTypeAliasPropertyKey = "ncContentTypeAlias";
@@ -49,6 +50,7 @@ public class NestedContentPropertyEditor : DataEditor
     {
         _ioHelper = ioHelper;
         _editorConfigurationParser = editorConfigurationParser;
+        SupportsReadOnly = true;
     }
 
     #region Pre Value Editor

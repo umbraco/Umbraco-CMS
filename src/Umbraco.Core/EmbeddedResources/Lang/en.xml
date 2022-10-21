@@ -469,10 +469,10 @@
     <key alias="assignDomain">Manage hostnames</key>
     <key alias="closeThisWindow">Close this window</key>
     <key alias="confirmdelete">Are you sure you want to delete</key>
-    <key alias="confirmdeleteNumberOfItems"><![CDATA[Are you sure you want to delete <b>%0%</b> of <b>%1%</b> items]]></key>
+    <key alias="confirmdeleteNumberOfItems"><![CDATA[Are you sure you want to delete <strong>%0%</strong> of <strong>%1%</strong> items]]></key>
     <key alias="confirmdisable">Are you sure you want to disable</key>
     <key alias="confirmremove">Are you sure you want to remove</key>
-    <key alias="confirmremoveusageof"><![CDATA[Are you sure you want to remove the usage of <b>%0%</b>]]></key>
+    <key alias="confirmremoveusageof"><![CDATA[Are you sure you want to remove the usage of <strong>%0%</strong>]]></key>
     <key alias="confirmlogout">Are you sure?</key>
     <key alias="confirmSure">Are you sure?</key>
     <key alias="cut">Cut</key>
@@ -545,6 +545,7 @@
     <key alias="selectMemberGroup">Select member group</key>
     <key alias="selectMemberType">Select member type</key>
     <key alias="selectNode">Select node</key>
+    <key alias="selectLanguages">Select languages</key>
     <key alias="selectSections">Select sections</key>
     <key alias="selectUser">Select user</key>
     <key alias="selectUsers">Select users</key>
@@ -563,8 +564,8 @@
     <key alias="variantdeletewarning">This will delete the node and all its languages. If you only want to delete one
       language, you should unpublish the node in that language instead.
     </key>
-    <key alias="propertyuserpickerremovewarning"><![CDATA[This will remove the user <b>%0%</b>.]]></key>
-    <key alias="userremovewarning"><![CDATA[This will remove the user <b>%0%</b> from the <b>%1%</b> group]]></key>
+    <key alias="propertyuserpickerremovewarning"><![CDATA[This will remove the user <strong>%0%</strong>.]]></key>
+    <key alias="userremovewarning"><![CDATA[This will remove the user <strong>%0%</strong> from the <strong>%1%</strong> group]]></key>
     <key alias="yesRemove">Yes, remove</key>
     <key alias="deleteLayout">You are deleting the layout</key>
     <key alias="deletingALayout">Modifying layout will result in loss of data for any existing content that is based on this configuration.</key>
@@ -578,6 +579,7 @@
     <key alias="parentDoesNotExists">Parent item does not exist.</key>
     <key alias="noItems">There are no dictionary items.</key>
     <key alias="noItemsInFile">There are no dictionary items in this file.</key>
+    <key alias="noItemsFound">There were no dictionary items found.</key>
     <key alias="createNew">Create dictionary item</key>
   </area>
   <area alias="dictionaryItem">
@@ -825,6 +827,7 @@
     <key alias="retry">Retry</key>
     <key alias="rights">Permissions</key>
     <key alias="scheduledPublishing">Scheduled Publishing</key>
+    <key alias="umbracoInfo">Umbraco info</key>
     <key alias="search">Search</key>
     <key alias="searchNoResult">Sorry, we can not find what you are looking for.</key>
     <key alias="noItemsInList">No items have been added</key>
@@ -946,7 +949,7 @@
     <key alias="defaultUserChangePass">
       <![CDATA[<strong>The Default users' password needs to be changed!</strong>]]></key>
     <key alias="defaultUserDisabled">
-      <![CDATA[<strong>The Default user has been disabled or has no access to Umbraco!</strong></p><p>No further actions needs to be taken. Click <b>Next</b> to proceed.]]></key>
+      <![CDATA[<strong>The Default user has been disabled or has no access to Umbraco!</strong></p><p>No further actions needs to be taken. Click <strong>Next</strong> to proceed.]]></key>
     <key alias="defaultUserPassChanged">
       <![CDATA[<strong>The Default user's password has been successfully changed since the installation!</strong></p><p>No further actions needs to be taken. Click <strong>Next</strong> to proceed.]]></key>
     <key alias="defaultUserPasswordChanged">The password is changed!</key>
@@ -1176,7 +1179,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="nodeSelected">has been selected as the root of your new content, click 'ok' below.</key>
     <key alias="noNodeSelected">No node selected yet, please select a node in the list above before clicking 'ok'</key>
     <key alias="notAllowedByContentType">The current node is not allowed under the chosen node because of its type</key>
-    <key alias="notAllowedByPath">The current node cannot be moved to one of its subpages</key>
+    <key alias="notAllowedByPath">The current node cannot be moved to one of its subpages neither can the parent and destination be the same</key>
     <key alias="notAllowedAtRoot">The current node cannot exist at the root</key>
     <key alias="notValid">The action isn't allowed since you have insufficient permissions on 1 or more child
       documents.
@@ -1871,7 +1874,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="historyCleanupKeepAllVersionsNewerThanDays">Keep all versions newer than days</key>
     <key alias="historyCleanupKeepLatestVersionPerDayForDays">Keep latest version per day for days</key>
     <key alias="historyCleanupPreventCleanup">Prevent cleanup</key>
-    <key alias="historyCleanupGloballyDisabled"><![CDATA[<b>NOTE!</b> The cleanup of historically content versions are disabled globally. These settings will not take effect before it is enabled.]]></key>
+    <key alias="historyCleanupEnableCleanup">Enable cleanup</key>
+    <key alias="historyCleanupGloballyDisabled"><![CDATA[<strong>NOTE!</strong> The cleanup of historically content versions are disabled globally. These settings will not take effect before it is enabled.]]></key>
   </area>
   <area alias="languages">
     <key alias="addLanguage">Add language</key>
@@ -2090,6 +2094,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="permissionsGranularHelp">Set permissions for specific nodes</key>
     <key alias="profile">Profile</key>
     <key alias="searchAllChildren">Search all children</key>
+    <key alias="languagesHelp">Limit the languages users have access to edit</key>
     <key alias="sectionsHelp">Add sections to give users access</key>
     <key alias="selectUserGroups">Select user groups</key>
     <key alias="noStartNode">No start node selected</key>
@@ -2271,6 +2276,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="customValidation">Custom validation</key>
     <key alias="entriesShort"><![CDATA[Minimum %0% entries, requires <strong>%1%</strong> more.]]></key>
     <key alias="entriesExceed"><![CDATA[Maximum %0% entries, <strong>%1%</strong> too many.]]></key>
+    <key alias="entriesAreasMismatch">The content amount requirements are not met for one or more areas.</key>
   </area>
   <area alias="healthcheck">
     <!-- The following keys get these tokens passed in:
@@ -2608,12 +2614,12 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
                 Umbraco currently runs in debug mode. This means you can use the built-in performance profiler to assess the performance when rendering pages.
             </p>
             <p>
-                If you want to activate the profiler for a specific page rendering, simply add <b>umbDebug=true</b> to the querystring when requesting the page.
+                If you want to activate the profiler for a specific page rendering, simply add <strong>umbDebug=true</strong> to the querystring when requesting the page.
             </p>
             <p>
                 If you want the profiler to be activated by default for all page renderings, you can use the toggle below.
                 It will set a cookie in your browser, which then activates the profiler automatically.
-                In other words, the profiler will only be active by default in <i>your</i> browser - not everyone else's.
+                In other words, the profiler will only be active by default in <em>your</em> browser - not everyone else's.
             </p>
     ]]>
     </key>
@@ -2622,7 +2628,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="reminderDescription">
       <![CDATA[
         <p>
-            You should never let a production site run in debug mode. Debug mode is turned off by setting <b>Umbraco:CMS:Hosting:Debug</b> to <b>false</b> in appsettings.json, appsettings.{Environment}.json or via an environment variable.
+            You should never let a production site run in debug mode. Debug mode is turned off by setting <strong>Umbraco:CMS:Hosting:Debug</strong> to <strong>false</strong> in appsettings.json, appsettings.{Environment}.json or via an environment variable.
         </p>
     ]]>
     </key>
@@ -2632,7 +2638,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
             Umbraco currently does not run in debug mode, so you can't use the built-in profiler. This is how it should be for a production site.
         </p>
         <p>
-            Debug mode is turned on by setting <b>Umbraco:CMS:Hosting:Debug</b> to <b>true</b> in appsettings.json, appsettings.{Environment}.json or via an environment variable.
+            Debug mode is turned on by setting <strong>Umbraco:CMS:Hosting:Debug</strong> to <strong>true</strong> in appsettings.json, appsettings.{Environment}.json or via an environment variable.
         </p>
     ]]>
     </key>
@@ -2705,7 +2711,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="labelcreateNewElementType">Create new Element Type</key>
     <key alias="labelCustomStylesheet">Custom stylesheet</key>
     <key alias="addCustomStylesheet">Add stylesheet</key>
-    <key alias="headlineEditorAppearance">Editor appearance</key>
+    <key alias="headlineEditorAppearance">Block appearance</key>
     <key alias="headlineDataModels">Data models</key>
     <key alias="headlineCatalogueAppearance">Catalogue appearance</key>
     <key alias="labelBackgroundColor">Background color</key>
@@ -2728,6 +2734,11 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="confirmDeleteBlockTypeNotice">The content of this block will still be present, editing of this content
       will no longer be available and will be shown as unsupported content.
     </key>
+    <key alias="confirmDeleteBlockGroupMessage">
+      <![CDATA[Are you sure you want to delete group <strong>%0%</strong> and all the Block configurations of this?]]></key>
+    <key alias="confirmDeleteBlockGroupNotice">The content of these Blocks will still be present, editing of this content
+      will no longer be available and will be shown as unsupported content.
+    </key>
     <key alias="blockConfigurationOverlayTitle"><![CDATA[Configuration of '%0%']]></key>
     <key alias="elementTypeDoesNotExist">Cannot be edited cause ElementType does not exist.</key>
     <key alias="thumbnail">Thumbnail</key>
@@ -2736,7 +2747,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="tabClipboard">Clipboard</key>
     <key alias="tabBlockSettings">Settings</key>
     <key alias="headlineAdvanced">Advanced</key>
-    <key alias="forceHideContentEditor">Force hide content editor</key>
+    <key alias="forceHideContentEditor">Hide content editor</key>
+    <key alias="forceHideContentEditorHelp">Hide the content edit button and the content editor from the Block Editor overlay</key>
     <key alias="blockHasChanges">You have made changes to this content. Are you sure you want to discard them?</key>
     <key alias="confirmCancelBlockCreationHeadline">Discard creation?</key>
     <key alias="confirmCancelBlockCreationMessage"><![CDATA[Are you sure you want to cancel the creation.]]></key>
@@ -2745,6 +2757,66 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="addBlock">Add content</key>
     <key alias="addThis">Add %0%</key>
     <key alias="propertyEditorNotSupported">Property '%0%' uses editor '%1%' which is not supported in blocks.</key>
+    <key alias="focusParentBlock">Set focus on the container block</key>
+    <key alias="areaIdentification">Identification</key>
+    <key alias="areaValidation">Validation</key>
+    <key alias="areaValidationEntriesShort"><![CDATA[<strong>%0%</strong> must be present atleast <strong>%2%</strong> time(s).]]></key>
+    <key alias="areaValidationEntriesExceed"><![CDATA[<strong>%0%</strong> must maximum be present <strong>%3%</strong> time(s).]]></key>
+    <key alias="areaNumberOfBlocks">Number of blocks</key>
+    <key alias="areaDisallowAllBlocks">Only allow specific block types</key>
+    <key alias="areaAllowedBlocks">Allowed block types</key>
+    <key alias="areaAllowedBlocksHelp">Define the types of blocks that are allowed in this area, and optionally how many of each type that should be present.</key>
+    <key alias="confirmDeleteBlockAreaMessage">Are you sure you want to delete this area?</key>
+    <key alias="confirmDeleteBlockAreaNotice">Any blocks currently created within this area will be deleted.</key>
+    <key alias="layoutOptions">Layout options</key>
+    <key alias="structuralOptions">Structural</key>
+    <key alias="sizeOptions">Size options</key>
+    <key alias="sizeOptionsHelp">Define one or more size options, this enables resizing of the Block</key>
+    <key alias="allowedBlockColumns">Available column spans</key>
+    <key alias="allowedBlockColumnsHelp">Define the different number of columns this block is allowed to span across. This does not prevent Blocks to be placed in Areas of a smaller column span.</key>
+    <key alias="allowedBlockRows">Available row spans</key>
+    <key alias="allowedBlockRowsHelp">Define the range of layout rows this block is allowed to span across.</key>
+    <key alias="allowBlockInRoot">Allow in root</key>
+    <key alias="allowBlockInRootHelp">Make this block available in the root of the layout.</key>
+    <key alias="allowBlockInAreas">Allow in areas</key>
+    <key alias="allowBlockInAreasHelp">Make this block available within other Blocks.</key>
+    <key alias="areas">Areas</key>
+    <key alias="areasLayoutColumns">Grid Columns for Areas</key>
+    <key alias="areasLayoutColumnsHelp">Define how many columns that will be available for areas. If not defined, the number of columns defined for the entire layout will be used.</key>
+    <key alias="areasConfigurations">Areas</key>
+    <key alias="areasConfigurationsHelp">To enable nesting of blocks within this block, define one or more areas for blocks to be nested within. Areas follow their own layout witch is defined by the Grid Columns for Areas. Each Area column span and row span can be adjusted by using the scale-handler in the bottom right corner.</key>
+    <key alias="invalidDropPosition"><![CDATA[<strong>%0%</strong> is not allowed at this spot.]]></key>
+    <key alias="defaultLayoutStylesheet">Default layout stylesheet</key>
+    <key alias="confirmPasteDisallowedNestedBlockHeadline">Disallowed content was rejected</key>
+    <key alias="confirmPasteDisallowedNestedBlockMessage">
+      <![CDATA[The inserted content contained disallowed content, which has not been created. Would you like to keep the rest of this content anyway?]]></key>
+    <key alias="areaAliasHelp">
+      <![CDATA[The alias will be printed by GetBlockGridHTML(), use the alias to target the Element representing this area. Ex. .umb-block-grid__area[data-area-alias="MyAreaAlias"] { ... }]]></key>
+    <key alias="forceLeftLabel">Force placement at left side</key>
+    <key alias="forceRightLabel">Force placement at right side</key>
+    <key alias="unforceLeftLabel">Remove forced placement at left side</key>
+    <key alias="unforceRightLabel">Remove forced placement at right side</key>
+    <key alias="forceLeftButton">Toggle forced placement at left side</key>
+    <key alias="forceRightButton">Toggle forced placement at right side</key>
+    <key alias="scaleHandlerButtonTitle">Drag to scale</key>
+    <key alias="areaCreateLabelTitle">Create Button Label</key>
+    <key alias="areaCreateLabelHelp">Overwrite the label on the create button of this Area.</key>
+    <key alias="showSizeOptions">Show resize options</key>
+    <key alias="showAppearanceOptions">Show catalogue appearance</key>
+    <key alias="addBlockType">Add Block</key>
+    <key alias="addBlockGroup">Add group</key>
+    <key alias="pickSpecificAllowance">Pick group or Block</key>
+    <key alias="allowanceMinimum">Set minimum requirement for this allowance</key>
+    <key alias="allowanceMaximum">Set maximum requirement for this allowance</key>
+    <key alias="block">Block</key>
+    <key alias="tabBlock">Block</key>
+    <key alias="tabBlockTypeSettings">Settings</key>
+    <key alias="tabAreas">Areas</key>
+    <key alias="tabAdvanced">Advanced</key>
+    <key alias="headlineAllowance">Allowance</key>
+    <key alias="getSampleHeadline">Install Sample Configuration</key>
+    <key alias="getSampleDescription"><![CDATA[This will add basic Blocks and help you get started with the Block Grid Editor. You'll get Blocks for Headline, Rich Text, Image, as well as a Two Column Layout. ]]></key>
+    <key alias="getSampleButton">Install</key>
   </area>
   <area alias="contentTemplatesDashboard">
     <key alias="whatHeadline">What are Content Templates?</key>

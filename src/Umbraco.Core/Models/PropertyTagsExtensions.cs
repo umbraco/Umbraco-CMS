@@ -33,7 +33,7 @@ public static class PropertyTagsExtensions
             : dataTypeService.GetDataType(property.PropertyType.DataTypeId)?.Configuration;
         TagConfiguration? configuration = ConfigurationEditor.ConfigurationAs<TagConfiguration>(configurationObject);
 
-        if (configuration?.Delimiter == default && configuration?.Delimiter is not null)
+        if (configuration is not null && configuration.Delimiter == default)
         {
             configuration.Delimiter = tagAttribute.Delimiter;
         }

@@ -17,7 +17,8 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     "Checkbox list",
     "checkboxlist",
     Icon = "icon-bulleted-list",
-    Group = Constants.PropertyEditors.Groups.Lists)]
+    Group = Constants.PropertyEditors.Groups.Lists,
+    ValueEditorIsReusable = true)]
 public class CheckBoxListPropertyEditor : DataEditor
 {
     private readonly IEditorConfigurationParser _editorConfigurationParser;
@@ -47,6 +48,7 @@ public class CheckBoxListPropertyEditor : DataEditor
         _textService = textService;
         _ioHelper = ioHelper;
         _editorConfigurationParser = editorConfigurationParser;
+        SupportsReadOnly = true;
     }
 
     /// <inheritdoc />

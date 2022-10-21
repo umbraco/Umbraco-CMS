@@ -22,6 +22,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
 public class MacroServiceTests : UmbracoIntegrationTest
 {
+    
+    private IMacroService MacroService => GetRequiredService<IMacroService>();
+    
     [SetUp]
     public void SetupTest()
     {
@@ -37,10 +40,6 @@ public class MacroServiceTests : UmbracoIntegrationTest
             scope.Complete();
         }
     }
-
-    [Obsolete(
-        "After merging IMacroWithAliasService interface with IMacroService in Umbraco 11, this should go back to just being GetRequiredService<IMacroService>()")]
-    private IMacroWithAliasService MacroService => GetRequiredService<IMacroService>() as IMacroWithAliasService;
 
     [Test]
     public void Can_Get_By_Alias()

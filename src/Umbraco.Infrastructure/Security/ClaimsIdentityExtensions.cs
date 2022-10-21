@@ -38,9 +38,9 @@ public static class MergeClaimsIdentityExtensions
     {
         foreach (IdentityUserClaim<string> claim in source.Claims
                      .Where(claim => !_ignoredClaims.Contains(claim.ClaimType))
-                     .Where(claim => !destination.HasClaim(claim.ClaimType, claim.ClaimValue)))
+                     .Where(claim => !destination.HasClaim(claim.ClaimType!, claim.ClaimValue!)))
         {
-            destination.AddClaim(new Claim(claim.ClaimType, claim.ClaimValue));
+            destination.AddClaim(new Claim(claim.ClaimType!, claim.ClaimValue!));
         }
     }
 }

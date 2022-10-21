@@ -21,7 +21,8 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     "Content Picker",
     "contentpicker",
     ValueType = ValueTypes.String,
-    Group = Constants.PropertyEditors.Groups.Pickers)]
+    Group = Constants.PropertyEditors.Groups.Pickers,
+    ValueEditorIsReusable = true)]
 public class ContentPickerPropertyEditor : DataEditor
 {
     private readonly IEditorConfigurationParser _editorConfigurationParser;
@@ -44,6 +45,7 @@ public class ContentPickerPropertyEditor : DataEditor
     {
         _ioHelper = ioHelper;
         _editorConfigurationParser = editorConfigurationParser;
+        SupportsReadOnly = true;
     }
 
     protected override IConfigurationEditor CreateConfigurationEditor() =>

@@ -45,8 +45,6 @@
                 position: absolute;
                 top: 22px;
                 left: 25px;
-                width: 30px;
-                height: 30px;
                 z-index: 1;
             }
             .error-container {
@@ -71,10 +69,12 @@
     </head>
     <body>
         <main class="error-container">
-            <img
-                src="/umbraco/assets/img/application/umbraco_logomark_white.svg"
-                class="logo"
-            />
+            <img src="/umbraco/assets/img/application/umbraco_logomark_white.svg"
+                 alt="Umbraco"
+                 width="30"
+                 height="30"
+                 draggable="false"
+                 class="logo" />
             <div class="error">
                 <h1>Boot Failed</h1>
                 <p>
