@@ -7,9 +7,9 @@ using Umbraco.New.Cms.Infrastructure.Services;
 
 namespace Umbraco.Cms.ManagementApi.DependencyInjection;
 
-public static class ExamineManagementBuilderExtensions
+public static class SearchManagementBuilderExtensions
 {
-    internal static IUmbracoBuilder AddExamineManagement(this IUmbracoBuilder builder)
+    internal static IUmbracoBuilder AddSearchManagement(this IUmbracoBuilder builder)
     {
         // Add examine service
         builder.Services.AddTransient<IExamineManagerService, ExamineManagerService>();
@@ -18,7 +18,7 @@ public static class ExamineManagementBuilderExtensions
         // Add factories
         builder.Services.AddTransient<IIndexDiagnosticsFactory, IndexDiagnosticsFactory>();
         builder.Services.AddTransient<IIndexRebuilder, ExamineIndexRebuilder>();
-        builder.Services.AddTransient<IExamineIndexViewModelFactory, ExamineIndexViewModelFactory>();
+        builder.Services.AddTransient<IIndexViewModelFactory, IndexViewModelFactory>();
         return builder;
     }
 }

@@ -40,7 +40,7 @@ public class ManagementApiComposer : IComposer
         builder
             .AddNewInstaller()
             .AddUpgrader()
-            .AddExamineManagement()
+            .AddSearchManagement()
             .AddFactories()
             .AddTrees()
             .AddFactories()
@@ -173,7 +173,7 @@ public class ManagementApiComposer : IComposer
                         endpoints.MapControllers();
 
                         // Serve contract
-                        endpoints.MapGet($"{officePath}/api/openapi.json",async  context =>
+                        endpoints.MapGet($"{officePath}/management/api/openapi.json",async  context =>
                         {
                             await context.Response.SendFileAsync(new EmbeddedFileProvider(this.GetType().Assembly).GetFileInfo("OpenApi.json"));
                         });
