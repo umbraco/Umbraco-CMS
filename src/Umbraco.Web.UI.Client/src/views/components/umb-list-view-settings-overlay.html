@@ -12,7 +12,7 @@
                <umb-box-content>
                     <!-- list view settings -->
                     <umb-property property="preValue" ng-repeat="preValue in model.dataType.preValues">
-                        <umb-property-editor model="preValue" is-pre-value="true"></umb-property-editor>
+                        <umb-property-editor model="preValue" pre-values="vm.dataType.preValues" is-pre-value="true"></umb-property-editor>
                     </umb-property>
                </umb-box-content>
            </umb-box>

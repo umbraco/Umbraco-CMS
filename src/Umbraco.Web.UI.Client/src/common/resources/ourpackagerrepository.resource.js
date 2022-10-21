@@ -57,7 +57,7 @@ function ourPackageRepositoryResource($q, $http, umbDataFormatter, umbRequestHel
             if (canceler) {
                 httpConfig["timeout"] = canceler;
             }
-            
+
             if (category === undefined) {
                 category = "";
             }
@@ -69,8 +69,10 @@ function ourPackageRepositoryResource($q, $http, umbDataFormatter, umbRequestHel
             var order = !orderBy ? "&order=Default" : ("&order=" + orderBy);
 
             return umbRequestHelper.resourcePromise(
-               $http.get(baseurl + "?pageIndex=" + pageIndex + "&pageSize=" + pageSize + "&category=" + category + "&query=" + query + order + "&version=" + Umbraco.Sys.ServerVariables.application.version),
-               httpConfig,
+               $http.get(
+                baseurl + "?pageIndex=" + pageIndex + "&pageSize=" + pageSize + "&category=" + category + "&query=" + query + order + "&version=" + Umbraco.Sys.ServerVariables.application.version,
+                httpConfig
+               ),
                'Failed to query packages');
         }
         

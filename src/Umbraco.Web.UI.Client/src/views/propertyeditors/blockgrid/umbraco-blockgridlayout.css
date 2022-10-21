@@ -1,0 +1,46 @@
+.umb-block-grid__layout-container {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(var(--umb-block-grid--grid-columns, 1), minmax(0, 1fr));
+    grid-gap: 0px;
+    grid-auto-flow: row;
+    grid-auto-rows: minmax(50px, min-content);
+}
+.umb-block-grid__layout-item {
+    position: relative;
+    /* For small devices we scale columnSpan by three, to make everything bigger than 1/3 take full width: */
+    grid-column-end: span min(calc(var(--umb-block-grid--item-column-span, 1) * 3), var(--umb-block-grid--grid-columns));
+    grid-row: span var(--umb-block-grid--item-row-span, 1);
+}
+.umb-block-grid__layout-item[data-force-left] {
+    grid-column-start: 1;
+}
+.umb-block-grid__layout-item[data-force-right] {
+    grid-column-start: calc(1 + var(--umb-block-grid--grid-columns) - var(--umb-block-grid--item-column-span));
+}
+
+
+.umb-block-grid__area-container, .umb-block-grid__block--view::part(area-container) {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(var(--umb-block-grid--area-grid-columns, var(--umb-block-grid--grid-columns, 1)), minmax(0, 1fr));
+    grid-gap: 0px;
+    grid-auto-flow: row;
+    grid-auto-rows: minmax(50px, min-content);
+    width: 100%;
+}
+.umb-block-grid__area {
+    position: relative;
+    /* For small devices we scale columnSpan by three, to make everything bigger than 1/3 take full width: */
+    grid-column-end: span min(calc(var(--umb-block-grid--item-column-span, 1) * 3), var(--umb-block-grid--grid-columns));
+    grid-row: span var(--umb-block-grid--area-row-span, 1);
+}
+
+@media (min-width:1024px) {
+    .umb-block-grid__layout-item {
+        grid-column-end: span var(--umb-block-grid--item-column-span, 1);
+    }
+    .umb-block-grid__area {
+        grid-column-end: span var(--umb-block-grid--area-column-span, 1);
+    }
+}
