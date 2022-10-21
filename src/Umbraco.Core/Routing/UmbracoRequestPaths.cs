@@ -19,6 +19,7 @@ public class UmbracoRequestPaths
     private readonly string _mvcArea;
     private readonly string _previewMvcPath;
     private readonly string _surfaceMvcPath;
+    private readonly string _backOfficeManagementApiPath;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="UmbracoRequestPaths" /> class.
@@ -34,6 +35,7 @@ public class UmbracoRequestPaths
         _mvcArea = globalSettings.Value.GetUmbracoMvcArea(hostingEnvironment);
         _defaultUmbPaths = new List<string> { "/" + _mvcArea, "/" + _mvcArea + "/" };
         _backOfficeMvcPath = "/" + _mvcArea + "/BackOffice/";
+        _backOfficeManagementApiPath = "/" + _mvcArea + "/management/api/";
         _previewMvcPath = "/" + _mvcArea + "/Preview/";
         _surfaceMvcPath = "/" + _mvcArea + "/Surface/";
         _apiMvcPath = "/" + _mvcArea + "/Api/";
@@ -51,6 +53,7 @@ public class UmbracoRequestPaths
     ///         These are def back office:
     ///         /Umbraco/BackOffice     = back office
     ///         /Umbraco/Preview        = back office
+    ///         /Umbraco/Management/Api = back office
     ///     </para>
     ///     <para>
     ///         If it's not any of the above then we cannot determine if it's back office or front-end
@@ -87,6 +90,7 @@ public class UmbracoRequestPaths
 
         // check for special back office paths
         if (urlPath.InvariantStartsWith(_backOfficeMvcPath)
+            || urlPath.InvariantStartsWith(_backOfficeManagementApiPath)
             || urlPath.InvariantStartsWith(_previewMvcPath))
         {
             return true;
