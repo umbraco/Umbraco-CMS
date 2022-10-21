@@ -99,7 +99,7 @@ When the page eventually loads in your web browser, you can follow the installer
 
 Did you read ["Are you sure"](#are-you-sure)?
 
-Do note that this is only required if you want to test out your custom changes in a seperate site (not the one in the Umbraco.Web.UI), if you just want to test you changes you can run the included test site using: `dotnet run` from `src/Umbraco.Web.UI/`
+Do note that this is only required if you want to test out your custom changes in a separate site (not the one in the Umbraco.Web.UI), if you just want to test your changes you can run the included test site using: `dotnet run` from `src/Umbraco.Web.UI/`
 
 You may want to build a set of NuGet packages with your changes, this can be done using the dotnet pack command. 
 
