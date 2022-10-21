@@ -140,6 +140,13 @@
     }
 }
 
+.tox-tinymce-inline {
+  z-index: 999;
+}
+
+.tox-tinymce-fullscreen {
+  position: absolute;
+}
 
 .mce-menu {
     border-radius: 3px;
@@ -169,17 +176,4 @@
 .umb-grid .umb-rte {
     border: 1px solid @gray-8;
     max-width: none;
-}
-
-.mce-fullscreen {
-    position: absolute;
-
-    .mce-in {
-        position: fixed;
-        top: 35px !important;
-    }
-
-    umb-editor__overlay, .umb-editor {
-        position: fixed;
-    }
 }

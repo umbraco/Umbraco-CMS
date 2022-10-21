@@ -55,41 +55,6 @@ public class UmbracoRequestMiddleware : IMiddleware
     /// <summary>
     ///     Initializes a new instance of the <see cref="UmbracoRequestMiddleware" /> class.
     /// </summary>
-    // Obsolete, scheduled for removal in V11
-    [Obsolete("Use constructor that takes an IOptions<UmbracoRequestOptions>")]
-    public UmbracoRequestMiddleware(
-        ILogger<UmbracoRequestMiddleware> logger,
-        IUmbracoContextFactory umbracoContextFactory,
-        IRequestCache requestCache,
-        IEventAggregator eventAggregator,
-        IProfiler profiler,
-        IHostingEnvironment hostingEnvironment,
-        UmbracoRequestPaths umbracoRequestPaths,
-        BackOfficeWebAssets backOfficeWebAssets,
-        IOptionsMonitor<SmidgeOptions> smidgeOptions,
-        IRuntimeState runtimeState,
-        IVariationContextAccessor variationContextAccessor,
-        IDefaultCultureAccessor defaultCultureAccessor)
-        : this(
-            logger,
-            umbracoContextFactory,
-            requestCache,
-            eventAggregator,
-            profiler,
-            hostingEnvironment,
-            umbracoRequestPaths,
-            backOfficeWebAssets,
-            smidgeOptions,
-            runtimeState,
-            variationContextAccessor,
-            defaultCultureAccessor,
-            StaticServiceProvider.Instance.GetRequiredService<IOptions<UmbracoRequestOptions>>())
-    {
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="UmbracoRequestMiddleware" /> class.
-    /// </summary>
     public UmbracoRequestMiddleware(
         ILogger<UmbracoRequestMiddleware> logger,
         IUmbracoContextFactory umbracoContextFactory,

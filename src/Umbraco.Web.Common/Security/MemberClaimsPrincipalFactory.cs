@@ -42,8 +42,9 @@ public class MemberClaimsPrincipalFactory : UserClaimsPrincipalFactory<MemberIde
 
         // And merge claims added to the user, for instance in OnExternalLogin, we need to do this explicitly, since the claims are IdentityClaims, so it's not handled by memberIdentity.
         foreach (Claim claim in user.Claims
-                     .Where(claim => memberIdentity.HasClaim(claim.ClaimType, claim.ClaimValue) is false)
-                     .Select(x => new Claim(x.ClaimType, x.ClaimValue)))
+                     .Where(claim => claim.ClaimType is not null && claim.ClaimValue is not null)
+                     .Where(claim => memberIdentity.HasClaim(claim.ClaimType!, claim.ClaimValue!) is false)
+                     .Select(x => new Claim(x.ClaimType!, x.ClaimValue!)))
         {
             memberIdentity.AddClaim(claim);
         }

@@ -2,7 +2,9 @@
 ## Build
 ############################################
 
-FROM mcr.microsoft.com/dotnet/sdk:6.0.300 AS build
+FROM mcr.microsoft.com/dotnet/nightly/sdk:7.0 AS build
+
+COPY nuget.config .
 
 COPY nuget.config .
 
@@ -20,17 +22,30 @@ RUN dotnet publish --configuration Release --no-build --output /dist
 ## Run
 ############################################
 
-FROM mcr.microsoft.com/dotnet/aspnet:6.0.5 AS run
+FROM mcr.microsoft.com/dotnet/nightly/aspnet:7.0 AS run
 
 WORKDIR /app
 COPY --from=build dist .
 
-ENV ASPNETCORE_URLS="http://0.0.0.0:5000;https://0.0.0.0:5001"
+# Enable console logging in Release mode
+ENV Serilog__WriteTo__0__Name=Async
+ENV Serilog__WriteTo__0__Args__configure__0__Name=Console
+
+# Set unattended install settings
 ENV ConnectionStrings__umbracoDbDSN_ProviderName="Microsoft.Data.Sqlite"
 ENV ConnectionStrings__umbracoDbDSN="Data Source=|DataDirectory|/Umbraco.sqlite.db;Cache=Shared;Foreign Keys=True;Pooling=True"
 ENV Umbraco__CMS__Unattended__InstallUnattended="true"
 ENV Umbraco__CMS__Unattended__UnattendedUserName="Playwright Test"
 ENV Umbraco__CMS__Unattended__UnattendedUserEmail="playwright@umbraco.com"
 ENV Umbraco__CMS__Unattended__UnattendedUserPassword="UmbracoAcceptance123!"
+
+# Custom Umbraco settings
+ENV Umbraco__CMS__Global__VersionCheckPeriod="0"
+ENV Umbraco__CMS__Global__UseHttps="true"
+ENV Umbraco__CMS__HealthChecks__Notification__Enabled="false"
+ENV Umbraco__CMS__KeepAlive__DisableKeepAliveTask="true"
+
+# Set application URL
+ENV ASPNETCORE_URLS="http://0.0.0.0:5000;https://0.0.0.0:5001"
 
 CMD dotnet Playwright.dll

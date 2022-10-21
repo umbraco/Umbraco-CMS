@@ -84,17 +84,9 @@ public class AddTypedLabels : MigrationBase
             .From<PropertyTypeDto>()
             .Where<PropertyTypeDto>(x => x.DataTypeId == Constants.DataTypes.LabelString));
 
-        var intPropertyAliases = new[]
-        {
-            Constants.Conventions.Media.Width, Constants.Conventions.Media.Height,
-            Constants.Conventions.Member.FailedPasswordAttempts,
-        };
-        var bigintPropertyAliases = new[] { Constants.Conventions.Media.Bytes };
-        var dtPropertyAliases = new[]
-        {
-            Constants.Conventions.Member.LastLockoutDate, Constants.Conventions.Member.LastLoginDate,
-            Constants.Conventions.Member.LastPasswordChangeDate,
-        };
+        var intPropertyAliases = new[] { Cms.Core.Constants.Conventions.Media.Width, Cms.Core.Constants.Conventions.Media.Height, "umbracoMemberFailedPasswordAttempts" };
+        var bigintPropertyAliases = new[] { Cms.Core.Constants.Conventions.Media.Bytes };
+        var dtPropertyAliases = new[] { "umbracoMemberLastLockoutDate", "umbracoMemberLastLogin", "umbracoMemberLastPasswordChangeDate" };
 
         var intPropertyTypes = labelPropertyTypes.Where(pt => intPropertyAliases.Contains(pt.Alias)).Select(pt => pt.Id)
             .ToArray();

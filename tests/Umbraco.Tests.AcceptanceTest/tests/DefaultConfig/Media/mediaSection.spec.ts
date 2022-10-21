@@ -29,7 +29,7 @@ test.describe('Media', () => {
             {fileTypeNames: imageName},
             {fileTypeNames: vectorGraphicsName},
             {fileTypeNames: videoName}
-        ]
+        ];
         
         await umbracoApi.media.deleteAllFiles(articleName,audioName,fileName,folderName,imageName,vectorGraphicsName,videoName);
         await umbracoApi.media.ensureNameNotExists(folderToMoveTooName);
@@ -54,7 +54,8 @@ test.describe('Media', () => {
         await page.locator('[label-key="general_submit"]').click();
   
         // Assert
-        await page.waitForTimeout(500);
+        // Needs to wait before refreshing the media tree, otherwise the media files wont be moved to the folder yet
+        await page.waitForTimeout(1000);
         await umbracoUi.refreshMediaTree();
         await page.locator('[data-element="tree-item-' + folderToMoveTooName + '"]').click();
         for (const names of mediaFileTypes) {

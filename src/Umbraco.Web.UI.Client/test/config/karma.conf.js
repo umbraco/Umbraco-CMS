@@ -29,6 +29,7 @@ module.exports = function (config) {
       'lib/umbraco/Extensions.js',
       'node_modules/lazyload-js/LazyLoad.min.js',
       'node_modules/angular-dynamic-locale/dist/tmhDynamicLocale.min.js',
+      'node_modules/sortablejs/Sortable.min.js',
 
       //app bootstrap and loader
       'test/config/app.unit.js',

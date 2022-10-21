@@ -34,14 +34,14 @@ public class DataValueEditorReuseTests
 
         _dataValueEditorFactoryMock
             .Setup(m =>
-                m.Create<BlockEditorPropertyEditor.BlockEditorPropertyValueEditor>(It.IsAny<DataEditorAttribute>()))
-            .Returns(() => new BlockEditorPropertyEditor.BlockEditorPropertyValueEditor(
+                m.Create<BlockListPropertyEditorBase.BlockListEditorPropertyValueEditor>(It.IsAny<DataEditorAttribute>()))
+            .Returns(() => new BlockListPropertyEditorBase.BlockListEditorPropertyValueEditor(
                 new DataEditorAttribute("a", "b", "c"),
                 _propertyEditorCollection,
                 Mock.Of<IDataTypeService>(),
                 Mock.Of<IContentTypeService>(),
                 Mock.Of<ILocalizedTextService>(),
-                Mock.Of<ILogger<BlockEditorPropertyEditor.BlockEditorPropertyValueEditor>>(),
+                Mock.Of<ILogger<BlockListPropertyEditorBase.BlockListEditorPropertyValueEditor>>(),
                 Mock.Of<IShortStringHelper>(),
                 Mock.Of<IJsonSerializer>(),
                 Mock.Of<IIOHelper>(),
@@ -63,7 +63,7 @@ public class DataValueEditorReuseTests
         Assert.NotNull(dataValueEditor2);
         Assert.AreSame(dataValueEditor1, dataValueEditor2);
         _dataValueEditorFactoryMock.Verify(
-            m => m.Create<TextOnlyValueEditor>(It.IsAny<DataEditorAttribute>()), 
+            m => m.Create<TextOnlyValueEditor>(It.IsAny<DataEditorAttribute>()),
             Times.Once);
     }
 
@@ -84,7 +84,7 @@ public class DataValueEditorReuseTests
         Assert.AreEqual("config", ((DataValueEditor)dataValueEditor2).Configuration);
         Assert.AreNotSame(dataValueEditor1, dataValueEditor2);
         _dataValueEditorFactoryMock.Verify(
-            m => m.Create<TextOnlyValueEditor>(It.IsAny<DataEditorAttribute>()), 
+            m => m.Create<TextOnlyValueEditor>(It.IsAny<DataEditorAttribute>()),
             Times.Exactly(2));
     }
 
@@ -104,7 +104,7 @@ public class DataValueEditorReuseTests
         Assert.NotNull(dataValueEditor2);
         Assert.AreNotSame(dataValueEditor1, dataValueEditor2);
         _dataValueEditorFactoryMock.Verify(
-            m => m.Create<BlockEditorPropertyEditor.BlockEditorPropertyValueEditor>(It.IsAny<DataEditorAttribute>()),
+            m => m.Create<BlockListPropertyEditorBase.BlockListEditorPropertyValueEditor>(It.IsAny<DataEditorAttribute>()),
             Times.Exactly(2));
     }
 
@@ -126,7 +126,7 @@ public class DataValueEditorReuseTests
         Assert.AreEqual("config", ((DataValueEditor)dataValueEditor2).Configuration);
         Assert.AreNotSame(dataValueEditor1, dataValueEditor2);
         _dataValueEditorFactoryMock.Verify(
-            m => m.Create<BlockEditorPropertyEditor.BlockEditorPropertyValueEditor>(It.IsAny<DataEditorAttribute>()),
+            m => m.Create<BlockListPropertyEditorBase.BlockListEditorPropertyValueEditor>(It.IsAny<DataEditorAttribute>()),
             Times.Exactly(2));
     }
 }

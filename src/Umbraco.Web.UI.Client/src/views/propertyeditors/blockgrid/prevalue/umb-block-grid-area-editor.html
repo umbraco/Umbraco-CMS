@@ -1,0 +1,35 @@
+<div class="umb-block-grid-area-editor">
+
+    <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
+
+    <div ng-show="vm.loading !== true" class="umb-block-grid-area-editor__grid-wrapper" style="--umb-block-grid--block-grid-columns: {{vm.block.areaGridColumns || vm.rootLayoutColumns}}">
+
+        <umb-block-grid-configuration-area-entry ng-repeat="area in vm.model track by area.key"
+            class="umb-block-grid-area-editor__area"
+            ng-class="{'--isOpen':vm.openArea === area}"
+            area="area"
+            style="
+            --umb-block-grid--grid-column: {{area.columnSpan}};
+            --umb-block-grid--area-column-span: {{area.columnSpan}};
+            --umb-block-grid--area-row-span: {{area.rowSpan}};
+            "
+            ng-click="vm.editArea(area)"
+            on-edit="vm.editArea(area)"
+            on-delete="vm.requestDeleteArea(area)"
+        >
+        </umb-block-grid-configuration-area-entry>
+
+        <button
+            type="button"
+            ng-disabled="vm.disabled"
+            class="btn-reset umb-block-grid-area-editor__create-button umb-outline"
+            ng-click="vm.onNewAreaClick()">
+        <localize key="general_add">Add</localize>
+        </button>
+
+    </div>
+
+</div>
+
+
+
