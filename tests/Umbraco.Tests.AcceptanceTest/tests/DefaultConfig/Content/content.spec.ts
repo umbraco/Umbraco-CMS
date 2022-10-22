@@ -40,6 +40,7 @@ test.describe('Content tests', () => {
     const firstRootNodeName = "1) Home";
     const childNodeName = "1) Child";
     const secondRootNodeName = "2) Home";
+    const saveNode = "saveNew";
 
     await umbracoApi.content.deleteAllContent();
     await umbracoApi.documentTypes.ensureNameNotExists(rootDocTypeName);
@@ -62,7 +63,7 @@ test.describe('Content tests', () => {
     // TODO: Make some constants for actions.
     const rootContentNode = new ContentBuilder()
       .withContentTypeAlias(createdRootDocType.alias)
-      .withAction("saveNew")
+      .withAction(saveNode)
       .addVariant()
         .withName(firstRootNodeName)
         .withSave(true)  // We should probably just default to true...
@@ -73,7 +74,7 @@ test.describe('Content tests', () => {
 
     const secondRootNode = new ContentBuilder()
       .withContentTypeAlias(createdRootDocType.alias)
-      .withAction("saveNew")
+      .withAction(saveNode)
       .addVariant()
         .withName(secondRootNodeName)
         .withSave(true)
@@ -84,7 +85,7 @@ test.describe('Content tests', () => {
 
     const childContentNode = new ContentBuilder()
       .withContentTypeAlias(createdChildDocType.alias)
-      .withAction("saveNew")
+      .withAction(saveNode)
       .withParent(savedRootNode.id)
       .addVariant()
         .withName(childNodeName)
@@ -112,6 +113,7 @@ test.describe('Content tests', () => {
     const firstRootNodeName = "1) Home";
     const childNodeName = "1) Child";
     const secondRootNodeName = "2) Home";
+    const saveNode = "saveNew";
 
     await umbracoApi.content.deleteAllContent();
     await umbracoApi.documentTypes.ensureNameNotExists(rootDocTypeName);
@@ -133,7 +135,7 @@ test.describe('Content tests', () => {
 
     const rootContentNode = new ContentBuilder()
         .withContentTypeAlias(createdRootDocType.alias)
-        .withAction("saveNew")
+      .withAction(saveNode)
         .addVariant()
           .withName(firstRootNodeName)
           .withSave(true)  // We should probably just default to true...
@@ -144,7 +146,7 @@ test.describe('Content tests', () => {
 
     const secondRootNode = new ContentBuilder()
         .withContentTypeAlias(createdRootDocType.alias)
-        .withAction("saveNew")
+      .withAction(saveNode)
         .addVariant()
           .withName(secondRootNodeName)
           .withSave(true)
@@ -155,7 +157,7 @@ test.describe('Content tests', () => {
 
     const childContentNode = new ContentBuilder()
         .withContentTypeAlias(createdChildDocType.alias)
-        .withAction("saveNew")
+      .withAction(saveNode)
         .withParent(savedRootNode.id)
         .addVariant()
           .withName(childNodeName)
@@ -184,6 +186,7 @@ test.describe('Content tests', () => {
     const rootNodeName = "1) Home";
     const firstChildNodeName = "1) Child";
     const secondChildNodeName = "2) Child";
+    const saveNode = "saveNew";
 
     await umbracoApi.content.deleteAllContent();
     await umbracoApi.documentTypes.ensureNameNotExists(rootDocTypeName);
@@ -203,7 +206,7 @@ test.describe('Content tests', () => {
 
     const rootContentNode = new ContentBuilder()
         .withContentTypeAlias(createdRootDocType.alias)
-        .withAction("saveNew")
+        .withAction(saveNode)
         .addVariant()
           .withName(rootNodeName)
           .withSave(true)
@@ -214,7 +217,7 @@ test.describe('Content tests', () => {
     // Add an item under root node
     const firstChildContentNode = new ContentBuilder()
         .withContentTypeAlias(createdChildDocType.alias)
-        .withAction("saveNew")
+        .withAction(saveNode)
         .withParent(createdRootContentNode.id)
         .addVariant()
           .withName(firstChildNodeName)
@@ -226,7 +229,7 @@ test.describe('Content tests', () => {
     // Add a second item under root node
     const secondChildContentNode = new ContentBuilder()
         .withContentTypeAlias(createdChildDocType.alias)
-        .withAction("saveNew")
+        .withAction(saveNode)
         .withParent(createdRootContentNode.id)
         .addVariant()
           .withName(secondChildNodeName)
@@ -357,6 +360,7 @@ test.describe('Content tests', () => {
     const rootDocTypeName = "Test document type";
     const nodeName = "Home";
     const expected = "Unpublished";
+    const saveNode = "saveNew";
 
     await umbracoApi.content.deleteAllContent();
     await umbracoApi.documentTypes.ensureNameNotExists(rootDocTypeName);
@@ -370,7 +374,7 @@ test.describe('Content tests', () => {
 
     const rootContentNode = new ContentBuilder()
       .withContentTypeAlias(generatedRootDocType["alias"])
-      .withAction("saveNew")
+      .withAction(saveNode)
       .addVariant()
         .withName(nodeName)
         .withSave(true)
@@ -395,6 +399,7 @@ test.describe('Content tests', () => {
   test('Preview draft', async ({ page, umbracoApi, umbracoUi }) => {
     const rootDocTypeName = "Test document type";
     const nodeName = "Home";
+    const saveNode = "saveNew";
 
     await umbracoApi.content.deleteAllContent();
     await umbracoApi.documentTypes.ensureNameNotExists(rootDocTypeName);
@@ -408,7 +413,7 @@ test.describe('Content tests', () => {
 
     const rootContentNode = new ContentBuilder()
       .withContentTypeAlias(generatedRootDocType["alias"])
-      .withAction("saveNew")
+      .withAction(saveNode)
         .addVariant()
         .withName(nodeName)
         .withSave(true)
@@ -570,6 +575,7 @@ test.describe('Content tests', () => {
   test('Content with macro in RTE', async ({ page, umbracoApi, umbracoUi }) => {
     const viewMacroName = 'Content with macro in RTE';
     const partialFileName = viewMacroName + '.cshtml';
+    const saveNode = "saveNew";
 
     await umbracoApi.macros.ensureNameNotExists(viewMacroName);
     await umbracoApi.partialViews.ensureMacroFileNameNotExists(partialFileName);
@@ -599,7 +605,7 @@ test.describe('Content tests', () => {
       // Might as wel initally create the content here, the less GUI work during the test the better
     const contentNode = new ContentBuilder()
       .withContentTypeAlias(generatedDocType["alias"])
-      .withAction('saveNew')
+      .withAction(saveNode)
         .addVariant()
           .withName(viewMacroName)
           .withSave(true)
