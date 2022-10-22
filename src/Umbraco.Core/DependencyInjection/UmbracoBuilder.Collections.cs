@@ -273,6 +273,14 @@ public static partial class UmbracoBuilderExtensions
         => builder.WithCollectionBuilder<MediaUrlGeneratorCollectionBuilder>();
 
     /// <summary>
+    /// Gets the backoffice OEmbed Providers collection builder.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
+    [Obsolete("Use EmbedProviders() instead")]
+    public static EmbedProvidersCollectionBuilder OEmbedProviders(this IUmbracoBuilder builder)
+        => EmbedProviders(builder);
+
+    /// <summary>
     /// Gets the backoffice Embed Providers collection builder.
     /// </summary>
     /// <param name="builder">The builder.</param>

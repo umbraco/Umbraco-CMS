@@ -38,4 +38,20 @@ public interface IMemberRepository : IContentRepository<int, IMember>
     /// <param name="query"></param>
     /// <returns></returns>
     int GetCountByQuery(IQuery<IMember>? query);
+
+    /// <summary>
+    ///     Sets a members last login date based on their username
+    /// </summary>
+    /// <param name="username"></param>
+    /// <param name="date"></param>
+    /// <remarks>
+    ///     This is a specialized method because whenever a member logs in, the membership provider requires us to set the
+    ///     'online' which requires
+    ///     updating their login date. This operation must be fast and cannot use database locks which is fine if we are only
+    ///     executing a single query
+    ///     for this data since there won't be any other data contention issues.
+    /// </remarks>
+    [Obsolete(
+        "This is now a NoOp since last login date is no longer an umbraco property, set the date on the IMember directly and Save it instead, scheduled for removal in V11.")]
+    void SetLastLogin(string username, DateTime date);
 }

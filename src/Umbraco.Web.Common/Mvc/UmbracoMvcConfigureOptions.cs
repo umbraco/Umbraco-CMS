@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Web.Common.Filters;
 using Umbraco.Cms.Web.Common.ModelBinders;
-using Umbraco.Cms.Web.Common.Validators;
 
 namespace Umbraco.Cms.Web.Common.Mvc;
 
@@ -19,8 +18,6 @@ public class UmbracoMvcConfigureOptions : IConfigureOptions<MvcOptions>
     public void Configure(MvcOptions options)
     {
         options.ModelBinderProviders.Insert(0, new ContentModelBinderProvider());
-        options.ModelValidatorProviders.Insert(0, new BypassRenderingModelValidatorProvider());
-        options.ModelMetadataDetailsProviders.Add(new BypassRenderingModelValidationMetadataProvider());
         options.Filters.Insert(0, new EnsurePartialViewMacroViewContextFilterAttribute());
     }
 }

@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Core.Media.EmbedProviders;
 /// <summary>
 ///     Embed Provider for SoundCloud the popular online audio distribution platform and music sharing provider.
 /// </summary>
-public class Soundcloud : OEmbedProviderBase
+public class Soundcloud : EmbedProviderBase
 {
     public Soundcloud(IJsonSerializer jsonSerializer)
         : base(jsonSerializer)

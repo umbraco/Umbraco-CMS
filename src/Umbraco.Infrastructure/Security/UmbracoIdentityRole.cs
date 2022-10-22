@@ -6,10 +6,10 @@ namespace Umbraco.Cms.Core.Security;
 
 public class UmbracoIdentityRole : IdentityRole, IRememberBeingDirty
 {
-    private string _id = string.Empty;
-    private string _name = string.Empty;
+    private string? _id;
+    private string? _name;
 
-    public UmbracoIdentityRole(string roleName)
+    public UmbracoIdentityRole(string? roleName)
         : base(roleName)
     {
     }
@@ -26,7 +26,7 @@ public class UmbracoIdentityRole : IdentityRole, IRememberBeingDirty
     }
 
     /// <inheritdoc />
-    public override string Id
+    public override string? Id
     {
         get => _id;
         set
@@ -40,11 +40,11 @@ public class UmbracoIdentityRole : IdentityRole, IRememberBeingDirty
     public override string? Name
     {
         get => _name;
-        set => BeingDirty.SetPropertyValueAndDetectChanges(value, ref _name!, nameof(Name));
+        set => BeingDirty.SetPropertyValueAndDetectChanges(value, ref _name, nameof(Name));
     }
 
     /// <inheritdoc />
-    public override string? NormalizedName { get => base.Name ?? string.Empty; set => base.Name = value; }
+    public override string NormalizedName { get => base.Name; set => base.Name = value; }
 
     /// <summary>
     ///     Gets or sets a value indicating whether returns an Id has been set on this object this will be false if the object
@@ -58,7 +58,7 @@ public class UmbracoIdentityRole : IdentityRole, IRememberBeingDirty
     // model. A good writeup of that is here:
     // https://stackoverflow.com/a/37362173
     // For our purposes currently we won't worry about this.
-    public override string? ConcurrencyStamp { get => base.ConcurrencyStamp; set => base.ConcurrencyStamp = value; }
+    public override string ConcurrencyStamp { get => base.ConcurrencyStamp; set => base.ConcurrencyStamp = value; }
 
     /// <summary>
     ///     Gets the <see cref="BeingDirty" /> for change tracking

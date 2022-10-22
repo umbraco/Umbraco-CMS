@@ -20,7 +20,7 @@ public class BackOfficeErrorDescriber : UmbracoErrorDescriberBase
         Description = _textService.Localize("validation", "duplicateUserGroupName", new[] { role }),
     };
 
-    public override IdentityError InvalidRoleName(string? role) => new()
+    public override IdentityError InvalidRoleName(string role) => new()
     {
         Code = nameof(InvalidRoleName),
         Description = _textService.Localize("validation", "invalidUserGroupName"),
@@ -70,7 +70,7 @@ public class MembersErrorDescriber : UmbracoErrorDescriberBase
         Description = _textService.Localize("validation", "duplicateMemberGroupName", new[] { role }),
     };
 
-    public override IdentityError InvalidRoleName(string? role) => new()
+    public override IdentityError InvalidRoleName(string role) => new()
     {
         Code = nameof(InvalidRoleName),
         Description = _textService.Localize("validation", "invalidMemberGroupName"),

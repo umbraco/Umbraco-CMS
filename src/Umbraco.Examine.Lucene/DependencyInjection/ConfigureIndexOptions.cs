@@ -25,7 +25,7 @@ public sealed class ConfigureIndexOptions : IConfigureNamedOptions<LuceneDirecto
         _settings = settings.Value;
     }
 
-    public void Configure(string? name, LuceneDirectoryIndexOptions options)
+    public void Configure(string name, LuceneDirectoryIndexOptions options)
     {
         switch (name)
         {

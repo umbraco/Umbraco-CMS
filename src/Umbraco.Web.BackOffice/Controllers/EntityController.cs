@@ -472,6 +472,46 @@ public class EntityController : UmbracoAuthorizedJsonController
     }
 
     /// <summary>
+    ///     Get entity URLs by UDIs
+    /// </summary>
+    /// <param name="udis">
+    ///     A list of UDIs to lookup items by
+    /// </param>
+    /// <param name="culture">The culture to fetch the URL for</param>
+    /// <returns>Dictionary mapping Udi -> Url</returns>
+    /// <remarks>
+    ///     We allow for POST because there could be quite a lot of Ids.
+    /// </remarks>
+    [HttpGet]
+    [HttpPost]
+    [Obsolete("Use GetUrlsByIds instead.")]
+    public IDictionary<Udi, string?> GetUrlsByUdis([FromJsonPath] Udi[] udis, string? culture = null)
+    {
+        if (udis == null || !udis.Any())
+        {
+            return new Dictionary<Udi, string?>();
+        }
+
+        var udiEntityType = udis.First().EntityType;
+        UmbracoEntityTypes entityType;
+
+        switch (udiEntityType)
+        {
+            case Constants.UdiEntityType.Document:
+                entityType = UmbracoEntityTypes.Document;
+                break;
+            case Constants.UdiEntityType.Media:
+                entityType = UmbracoEntityTypes.Media;
+                break;
+            default:
+                entityType = (UmbracoEntityTypes)(-1);
+                break;
+        }
+
+        return GetUrlsByIds(udis, entityType, culture);
+    }
+
+    /// <summary>
     ///     Gets the URL of an entity
     /// </summary>
     /// <param name="id">Int id of the entity to fetch URL for</param>
