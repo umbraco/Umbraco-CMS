@@ -20,11 +20,13 @@ test.describe('Content tests', () => {
   const rootDocTypeName = "Test document type";
   const childDocTypeName = "Child test document type";
   const firstRootNodeName = "1) Home";
-  const childNodeName = "1) Child";
   const secondRootNodeName = "2) Home";
+  const firstChildNodeName = "1) Child";
+  const secondChildNodeName = "2) Child";
   const saveNode = "saveNew";
   const defaultContentAlias = "alias";
-  const nodeName = "Home";
+  const homeNodeName = "Home";
+  const aliasText = "text";
 
   async function createSimpleMacro(name, umbracoApi: ApiHelpers){
     const insertMacro = new PartialViewMacroBuilder()
@@ -90,7 +92,7 @@ test.describe('Content tests', () => {
       .withAction(saveNode)
       .withParent(savedRootNode.id)
       .addVariant()
-        .withName(childNodeName)
+      .withName(firstChildNodeName)
         .withSave(true)
       .done()
       .build();
@@ -99,7 +101,7 @@ test.describe('Content tests', () => {
 
     await umbracoUi.refreshContentTree();
 
-    await umbracoUi.clickElement(umbracoUi.getTreeItem(ConstantHelper.sections.content, [firstRootNodeName, childNodeName]), {button: "right", force: true})
+    await umbracoUi.clickElement(umbracoUi.getTreeItem(ConstantHelper.sections.content, [firstRootNodeName, firstChildNodeName]), {button: "right", force: true})
     await umbracoUi.clickElement(umbracoUi.getContextMenuAction(ConstantHelper.actions.copy))
     await page.locator('.umb-pane [data-element="tree-item-' + secondRootNodeName + '"]').click();
     await page.locator('.umb-dialog-footer > .btn-primary').click();
@@ -156,7 +158,7 @@ test.describe('Content tests', () => {
       .withAction(saveNode)
         .withParent(savedRootNode.id)
         .addVariant()
-          .withName(childNodeName)
+        .withName(firstChildNodeName)
           .withSave(true)
         .done()
         .build();
@@ -165,7 +167,7 @@ test.describe('Content tests', () => {
 
     await umbracoUi.refreshContentTree();
 
-    await umbracoUi.clickElement(umbracoUi.getTreeItem(ConstantHelper.sections.content, [firstRootNodeName, childNodeName]), { button: "right", force: true });
+    await umbracoUi.clickElement(umbracoUi.getTreeItem(ConstantHelper.sections.content, [firstRootNodeName, firstChildNodeName]), { button: "right", force: true });
     await umbracoUi.clickElement(umbracoUi.getContextMenuAction(ConstantHelper.actions.move))
     await page.locator('.umb-pane [data-element="tree-item-' + secondRootNodeName + '"]').click()
     await page.locator('[key="actions_move"]').click();
@@ -177,9 +179,6 @@ test.describe('Content tests', () => {
   });
 
   test('Sort content', async ({ page, umbracoApi, umbracoUi }) => {
-    const rootNodeName = "1) Home";
-    const firstChildNodeName = "1) Child";
-    const secondChildNodeName = "2) Child";
 
     await umbracoApi.content.deleteAllContent();
     await umbracoApi.documentTypes.ensureNameNotExists(rootDocTypeName);
@@ -201,7 +200,7 @@ test.describe('Content tests', () => {
         .withContentTypeAlias(createdRootDocType.alias)
         .withAction(saveNode)
         .addVariant()
-          .withName(rootNodeName)
+        .withName(firstRootNodeName)
           .withSave(true)
         .done()
         .build();
@@ -232,7 +231,7 @@ test.describe('Content tests', () => {
     await umbracoApi.content.save(secondChildContentNode);
 
     await umbracoUi.refreshContentTree();
-    await umbracoUi.clickElement(umbracoUi.getTreeItem(ConstantHelper.sections.content, [rootNodeName]), { button: "right", force: true });
+    await umbracoUi.clickElement(umbracoUi.getTreeItem(ConstantHelper.sections.content, [firstRootNodeName]), { button: "right", force: true });
     await umbracoUi.clickElement(umbracoUi.getContextMenuAction(ConstantHelper.actions.sort));
     // Drag'n'drop second child to be the first one.
     await page.locator('.ui-sortable-handle >> text=' + secondChildNodeName).hover();
@@ -254,7 +253,6 @@ test.describe('Content tests', () => {
   test('Rollback content', async ({ page, umbracoApi, umbracoUi }) => {
 
     const initialNodeName = "Home node";
-    const newNodeName = "Home";
 
     await umbracoApi.content.deleteAllContent();
     await umbracoApi.documentTypes.ensureNameNotExists(rootDocTypeName);
@@ -283,7 +281,7 @@ test.describe('Content tests', () => {
     await header.click({ clickCount: 3 })
     await page.keyboard.press('Backspace');
 
-    await umbracoUi.setEditorHeaderName(newNodeName);
+    await umbracoUi.setEditorHeaderName(homeNodeName);
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.saveAndPublish));
     await umbracoUi.isSuccessNotificationVisible();
     await page.locator('span:has-text("×")').click();
@@ -325,7 +323,7 @@ test.describe('Content tests', () => {
     const rootContentNode = new ContentBuilder()
       .withContentTypeAlias(generatedRootDocType[defaultContentAlias])
       .addVariant()
-        .withName(nodeName)
+      .withName(homeNodeName)
         .withSave(true)
       .done()
       .build();
@@ -336,7 +334,7 @@ test.describe('Content tests', () => {
     await umbracoUi.refreshContentTree();
 
     // Access node
-    await umbracoUi.clickElement(umbracoUi.getTreeItem(ConstantHelper.sections.content, [nodeName]));
+    await umbracoUi.clickElement(umbracoUi.getTreeItem(ConstantHelper.sections.content, [homeNodeName]));
 
     // Navigate to Info app
     await page.locator(ConstantHelper.contentApps.info).click();
@@ -366,7 +364,7 @@ test.describe('Content tests', () => {
       .withContentTypeAlias(generatedRootDocType[defaultContentAlias])
       .withAction(saveNode)
       .addVariant()
-        .withName(nodeName)
+      .withName(homeNodeName)
         .withSave(true)
       .done()
       .build();
@@ -377,7 +375,7 @@ test.describe('Content tests', () => {
     await umbracoUi.refreshContentTree();
 
     // Access node
-    await umbracoUi.clickElement(umbracoUi.getTreeItem(ConstantHelper.sections.content, [nodeName]));
+    await umbracoUi.clickElement(umbracoUi.getTreeItem(ConstantHelper.sections.content, [homeNodeName]));
 
     // Assert
     await expect(page.locator('[data-element="node-info-status"]').locator('.umb-badge')).toContainText(expected);
@@ -404,7 +402,7 @@ test.describe('Content tests', () => {
       .withContentTypeAlias(generatedRootDocType[defaultContentAlias])
       .withAction(saveNode)
         .addVariant()
-        .withName(nodeName)
+        .withName(homeNodeName)
         .withSave(true)
       .done()
       .build();
@@ -415,7 +413,7 @@ test.describe('Content tests', () => {
     await umbracoUi.refreshContentTree();
 
     // Access node
-    await umbracoUi.clickElement(umbracoUi.getTreeItem(ConstantHelper.sections.content, [nodeName]));
+    await umbracoUi.clickElement(umbracoUi.getTreeItem(ConstantHelper.sections.content, [homeNodeName]));
 
     // Assert
     await expect(page.locator('[alias="preview"]')).toBeVisible();
@@ -443,7 +441,7 @@ test.describe('Content tests', () => {
     const rootContentNode = new ContentBuilder()
       .withContentTypeAlias(generatedRootDocType[defaultContentAlias])
       .addVariant()
-        .withName(nodeName)
+      .withName(homeNodeName)
         .withSave(true)
       .done()
       .build();
@@ -454,7 +452,7 @@ test.describe('Content tests', () => {
     await umbracoUi.refreshContentTree();
 
     // Access node
-    await umbracoUi.clickElement(umbracoUi.getTreeItem(ConstantHelper.sections.content, [nodeName]));
+    await umbracoUi.clickElement(umbracoUi.getTreeItem(ConstantHelper.sections.content, [homeNodeName]));
 
     // Assert
     await expect(page.locator('[data-element="node-info-status"]').locator('.umb-badge')).toContainText(expected);
@@ -469,6 +467,7 @@ test.describe('Content tests', () => {
     const pickedDocTypeName = 'Picked content document type';
     const pickedDocTypeAlias = AliasHelper.toAlias(pickedDocTypeName);
 
+
     await umbracoApi.content.deleteAllContent();
     await umbracoApi.documentTypes.ensureNameNotExists(pickerDocTypeName);
     await umbracoApi.templates.ensureNameNotExists(pickerDocTypeName);
@@ -481,7 +480,7 @@ test.describe('Content tests', () => {
       .withAllowAsRoot(true)
       .addGroup()
       .addTextBoxProperty()
-      .withAlias('text')
+      .withAlias(aliasText)
       .done()
       .done()
       .build();
@@ -495,7 +494,7 @@ test.describe('Content tests', () => {
         .withSave(true)
         .withPublish(true)
       .addProperty()
-        .withAlias('text')
+      .withAlias(aliasText)
         .withValue('Acceptance test')
       .done()
       .withSave(true)
@@ -583,7 +582,7 @@ test.describe('Content tests', () => {
       .withDefaultTemplate(alias)
       .addGroup()
         .addRichTextProperty()
-          .withAlias('text')
+        .withAlias(aliasText)
         .done()
       .done()
       .build();
