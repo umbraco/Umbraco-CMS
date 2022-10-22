@@ -23,7 +23,6 @@ test.describe('Content tests', () => {
   const childNodeName = "1) Child";
   const secondRootNodeName = "2) Home";
   const saveNode = "saveNew";
-  const contentSection = "content";
   const defaultContentAlias = "alias";
   const nodeName = "Home";
 
@@ -100,7 +99,7 @@ test.describe('Content tests', () => {
 
     await umbracoUi.refreshContentTree();
 
-    await umbracoUi.clickElement(umbracoUi.getTreeItem(contentSection, [firstRootNodeName, childNodeName]), {button: "right", force: true})
+    await umbracoUi.clickElement(umbracoUi.getTreeItem(ConstantHelper.sections.content, [firstRootNodeName, childNodeName]), {button: "right", force: true})
     await umbracoUi.clickElement(umbracoUi.getContextMenuAction(ConstantHelper.actions.copy))
     await page.locator('.umb-pane [data-element="tree-item-' + secondRootNodeName + '"]').click();
     await page.locator('.umb-dialog-footer > .btn-primary').click();
@@ -166,7 +165,7 @@ test.describe('Content tests', () => {
 
     await umbracoUi.refreshContentTree();
 
-    await umbracoUi.clickElement(umbracoUi.getTreeItem(contentSection, [firstRootNodeName, childNodeName]), { button: "right", force: true });
+    await umbracoUi.clickElement(umbracoUi.getTreeItem(ConstantHelper.sections.content, [firstRootNodeName, childNodeName]), { button: "right", force: true });
     await umbracoUi.clickElement(umbracoUi.getContextMenuAction(ConstantHelper.actions.move))
     await page.locator('.umb-pane [data-element="tree-item-' + secondRootNodeName + '"]').click()
     await page.locator('[key="actions_move"]').click();
@@ -233,7 +232,7 @@ test.describe('Content tests', () => {
     await umbracoApi.content.save(secondChildContentNode);
 
     await umbracoUi.refreshContentTree();
-    await umbracoUi.clickElement(umbracoUi.getTreeItem(contentSection, [rootNodeName]), { button: "right", force: true });
+    await umbracoUi.clickElement(umbracoUi.getTreeItem(ConstantHelper.sections.content, [rootNodeName]), { button: "right", force: true });
     await umbracoUi.clickElement(umbracoUi.getContextMenuAction(ConstantHelper.actions.sort));
     // Drag'n'drop second child to be the first one.
     await page.locator('.ui-sortable-handle >> text=' + secondChildNodeName).hover();
@@ -276,7 +275,7 @@ test.describe('Content tests', () => {
     await umbracoApi.content.save(rootContentNode);
 
     await umbracoUi.refreshContentTree();
-    await umbracoUi.clickElement(umbracoUi.getTreeItem(contentSection, [initialNodeName]));
+    await umbracoUi.clickElement(umbracoUi.getTreeItem(ConstantHelper.sections.content, [initialNodeName]));
 
     const header = await page.locator('#headerName')
     // Sadly playwright doesn't have a clear method for inputs :( 
@@ -300,7 +299,7 @@ test.describe('Content tests', () => {
     await umbracoUi.refreshContentTree();
     await expect(page.locator('.umb-badge >> text=Save')).toBeVisible();
     await expect(page.locator('.umb-badge >> text=RollBack')).toBeVisible();
-    const node = await umbracoUi.getTreeItem(contentSection, [initialNodeName])
+    const node = await umbracoUi.getTreeItem(ConstantHelper.sections.content, [initialNodeName])
     await expect(node).toBeVisible();
   });
 
@@ -337,7 +336,7 @@ test.describe('Content tests', () => {
     await umbracoUi.refreshContentTree();
 
     // Access node
-    await umbracoUi.clickElement(umbracoUi.getTreeItem(contentSection, [nodeName]));
+    await umbracoUi.clickElement(umbracoUi.getTreeItem(ConstantHelper.sections.content, [nodeName]));
 
     // Navigate to Info app
     await page.locator(ConstantHelper.contentApps.info).click();
@@ -378,7 +377,7 @@ test.describe('Content tests', () => {
     await umbracoUi.refreshContentTree();
 
     // Access node
-    await umbracoUi.clickElement(umbracoUi.getTreeItem(contentSection, [nodeName]));
+    await umbracoUi.clickElement(umbracoUi.getTreeItem(ConstantHelper.sections.content, [nodeName]));
 
     // Assert
     await expect(page.locator('[data-element="node-info-status"]').locator('.umb-badge')).toContainText(expected);
@@ -416,7 +415,7 @@ test.describe('Content tests', () => {
     await umbracoUi.refreshContentTree();
 
     // Access node
-    await umbracoUi.clickElement(umbracoUi.getTreeItem(contentSection, [nodeName]));
+    await umbracoUi.clickElement(umbracoUi.getTreeItem(ConstantHelper.sections.content, [nodeName]));
 
     // Assert
     await expect(page.locator('[alias="preview"]')).toBeVisible();
@@ -455,7 +454,7 @@ test.describe('Content tests', () => {
     await umbracoUi.refreshContentTree();
 
     // Access node
-    await umbracoUi.clickElement(umbracoUi.getTreeItem(contentSection, [nodeName]));
+    await umbracoUi.clickElement(umbracoUi.getTreeItem(ConstantHelper.sections.content, [nodeName]));
 
     // Assert
     await expect(page.locator('[data-element="node-info-status"]').locator('.umb-badge')).toContainText(expected);
@@ -618,7 +617,7 @@ test.describe('Content tests', () => {
 
     // Enter content
     await umbracoUi.refreshContentTree();
-    await umbracoUi.clickElement(umbracoUi.getTreeItem(contentSection, [viewMacroName]));
+    await umbracoUi.clickElement(umbracoUi.getTreeItem(ConstantHelper.sections.content, [viewMacroName]));
 
     // Insert macro
     await page.locator('[title="Insert macro"]').click();
@@ -701,7 +700,7 @@ test.describe('Content tests', () => {
     // Act
     // Enter content
     await umbracoUi.refreshContentTree();
-    await umbracoUi.clickElement(umbracoUi.getTreeItem(contentSection, [name]));
+    await umbracoUi.clickElement(umbracoUi.getTreeItem(ConstantHelper.sections.content, [name]));
 
     // Click add
     await page.locator(':nth-child(2) > .preview-row > .preview-col > .preview-cell').click(); // Choose 1 column layout.
