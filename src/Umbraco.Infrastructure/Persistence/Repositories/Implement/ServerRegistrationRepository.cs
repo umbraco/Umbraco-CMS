@@ -26,10 +26,11 @@ internal class ServerRegistrationRepository : EntityRepositoryBase<int, IServerR
         DateTime timeoutDate = DateTime.Now.Subtract(staleTimeout);
 
         Database.Update<ServerRegistrationDto>(
-            "SET isActive=0, isSchedulingPublisher=0 WHERE lastNotifiedDate < @timeoutDate", new
+            "SET isActive=@false_, isSchedulingPublisher=@false_ WHERE lastNotifiedDate < @timeoutDate", new
             {
                 /*timeoutDate =*/
                 timeoutDate,
+                false_ = false
             });
         ClearCache();
     }

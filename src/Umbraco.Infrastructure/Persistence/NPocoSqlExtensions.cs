@@ -94,7 +94,7 @@ namespace Umbraco.Extensions
         public static Sql<ISqlContext>.SqlJoinClause<ISqlContext> InnerJoinNested(this Sql<ISqlContext> sql, Sql<ISqlContext> nestedQuery, string alias)
         {
             return new Sql<ISqlContext>.SqlJoinClause<ISqlContext>(sql.Append("INNER JOIN (").Append(nestedQuery)
-                .Append($") [{alias}]"));
+                .Append($") {sql.SqlContext.SqlSyntax.GetQuotedColumnName(alias)}"));
         }
 
         public static Sql<ISqlContext> WhereLike<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object?>> fieldSelector, string likeValue)

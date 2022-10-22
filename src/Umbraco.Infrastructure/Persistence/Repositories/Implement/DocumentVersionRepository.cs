@@ -25,13 +25,13 @@ internal class DocumentVersionRepository : IDocumentVersionRepository
     {
         Sql<ISqlContext>? query = _scopeAccessor.AmbientScope?.SqlContext.Sql();
 
-        query?.Select(@"umbracoDocument.nodeId as contentId,
+        query?.Select(@$"umbracoDocument.nodeId as contentId,
                            umbracoContent.contentTypeId as contentTypeId,
                            umbracoContentVersion.id as versionId,
                            umbracoContentVersion.userId as userId,
                            umbracoContentVersion.versionDate as versionDate,
                            umbracoDocumentVersion.published as currentPublishedVersion,
-                           umbracoContentVersion.[current] as currentDraftVersion,
+                           umbracoContentVersion.{query.SqlContext.SqlSyntax.GetQuotedColumnName("current")} as currentDraftVersion,
                            umbracoContentVersion.preventCleanup as preventCleanup,
                            umbracoUser.userName as username")
             .From<DocumentDto>()
@@ -66,13 +66,13 @@ internal class DocumentVersionRepository : IDocumentVersionRepository
     {
         Sql<ISqlContext>? query = _scopeAccessor.AmbientScope?.SqlContext.Sql();
 
-        query?.Select(@"umbracoDocument.nodeId as contentId,
+        query?.Select(@$"umbracoDocument.nodeId as contentId,
                            umbracoContent.contentTypeId as contentTypeId,
                            umbracoContentVersion.id as versionId,
                            umbracoContentVersion.userId as userId,
                            umbracoContentVersion.versionDate as versionDate,
                            umbracoDocumentVersion.published as currentPublishedVersion,
-                           umbracoContentVersion.[current] as currentDraftVersion,
+                           umbracoContentVersion.{query.SqlContext.SqlSyntax.GetQuotedColumnName("current")} as currentDraftVersion,
                            umbracoContentVersion.preventCleanup as preventCleanup,
                            umbracoUser.userName as username")
             .From<DocumentDto>()
@@ -155,13 +155,13 @@ internal class DocumentVersionRepository : IDocumentVersionRepository
     {
         Sql<ISqlContext>? query = _scopeAccessor.AmbientScope?.SqlContext.Sql();
 
-        query?.Select(@"umbracoDocument.nodeId as contentId,
+        query?.Select(@$"umbracoDocument.nodeId as contentId,
                            umbracoContent.contentTypeId as contentTypeId,
                            umbracoContentVersion.id as versionId,
                            umbracoContentVersion.userId as userId,
                            umbracoContentVersion.versionDate as versionDate,
                            umbracoDocumentVersion.published as currentPublishedVersion,
-                           umbracoContentVersion.[current] as currentDraftVersion,
+                           umbracoContentVersion.{query.SqlContext.SqlSyntax.GetQuotedColumnName("current")} as currentDraftVersion,
                            umbracoContentVersion.preventCleanup as preventCleanup,
                            umbracoUser.userName as username")
             .From<DocumentDto>()

@@ -183,19 +183,19 @@ internal class UserRepository : EntityRepositoryBase<int, IUser>, IUserRepositor
     public IDictionary<UserState, int> GetUserStates()
     {
         // These keys in this query map to the `Umbraco.Core.Models.Membership.UserState` enum
-        var sql = @"SELECT -1 AS [Key], COUNT(id) AS [Value] FROM umbracoUser
+        var sql = @$"SELECT -1 AS {SqlSyntax.GetQuotedColumnName("Key")}, COUNT(id) AS Value FROM umbracoUser
 UNION
-SELECT 0 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 AND userNoConsole = 0 AND lastLoginDate IS NOT NULL
+SELECT 0 AS {SqlSyntax.GetQuotedColumnName("Key")}, COUNT(id) AS Value FROM umbracoUser WHERE userDisabled = @false_ AND userNoConsole = @false_ AND lastLoginDate IS NOT NULL
 UNION
-SELECT 1 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 1
+SELECT 1 AS {SqlSyntax.GetQuotedColumnName("Key")}, COUNT(id) AS Value FROM umbracoUser WHERE userDisabled = @true_
 UNION
-SELECT 2 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userNoConsole = 1
+SELECT 2 AS {SqlSyntax.GetQuotedColumnName("Key")}, COUNT(id) AS Value FROM umbracoUser WHERE userNoConsole = @true_
 UNION
-SELECT 3 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE lastLoginDate IS NULL AND userDisabled = 1 AND invitedDate IS NOT NULL
+SELECT 3 AS {SqlSyntax.GetQuotedColumnName("Key")}, COUNT(id) AS Value FROM umbracoUser WHERE lastLoginDate IS NULL AND userDisabled = @true_ AND invitedDate IS NOT NULL
 UNION
-SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 AND userNoConsole = 0 AND lastLoginDate IS NULL";
+SELECT 4 AS {SqlSyntax.GetQuotedColumnName("Key")}, COUNT(id) AS Value FROM umbracoUser WHERE userDisabled = @false_ AND userNoConsole = @false_ AND lastLoginDate IS NULL";
 
-        Dictionary<int, int>? result = Database.Dictionary<int, int>(sql);
+        Dictionary<int, int>? result = Database.Dictionary<int, int>(sql, new { false_ = false, true_ = true });
 
         return result.ToDictionary(x => (UserState)x.Key, x => x.Value);
     }
@@ -865,7 +865,7 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
             || (excludeUserGroups != null && excludeUserGroups.Length > 0)
             || (userState != null && userState.Length > 0 && userState.Contains(UserState.All) == false))
         {
-            filterSql = SqlContext.Sql();
+            filterSql = SqlContext.Sql("", new { false_ = false, true_ = true });
         }
 
         if (hasCustomFilter)
@@ -906,7 +906,7 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
 
                 if (userState.Contains(UserState.Active))
                 {
-                    sb.Append("(userDisabled = 0 AND userNoConsole = 0 AND lastLoginDate IS NOT NULL)");
+                    sb.Append("(userDisabled = @false_ AND userNoConsole = @false_ AND lastLoginDate IS NOT NULL)");
                     appended = true;
                 }
 
@@ -917,7 +917,7 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
                         sb.Append(" OR ");
                     }
 
-                    sb.Append("(userDisabled = 0 AND userNoConsole = 0 AND lastLoginDate IS NULL)");
+                    sb.Append("(userDisabled = @false_ AND userNoConsole = @false_ AND lastLoginDate IS NULL)");
                     appended = true;
                 }
 
@@ -928,7 +928,7 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
                         sb.Append(" OR ");
                     }
 
-                    sb.Append("(userDisabled = 1)");
+                    sb.Append("(userDisabled = @true_)");
                     appended = true;
                 }
 
@@ -939,7 +939,7 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
                         sb.Append(" OR ");
                     }
 
-                    sb.Append("(userNoConsole = 1)");
+                    sb.Append("(userNoConsole = @true_)");
                     appended = true;
                 }
 
@@ -950,7 +950,7 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
                         sb.Append(" OR ");
                     }
 
-                    sb.Append("(lastLoginDate IS NULL AND userDisabled = 1 AND invitedDate IS NOT NULL)");
+                    sb.Append("(lastLoginDate IS NULL AND userDisabled = @true_ AND invitedDate IS NOT NULL)");
                     appended = true;
                 }
 

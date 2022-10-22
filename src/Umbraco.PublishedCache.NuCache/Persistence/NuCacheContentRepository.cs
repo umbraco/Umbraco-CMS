@@ -72,7 +72,7 @@ public class NuCacheContentRepository : RepositoryBase, INuCacheContentRepositor
         if (content.PublishedState == PublishedState.Unpublishing)
         {
             // if unpublishing, remove published data from table
-            Database.Execute("DELETE FROM cmsContentNu WHERE nodeId=@id AND published=1", new { id = content.Id });
+            Database.Execute("DELETE FROM cmsContentNu WHERE nodeId=@id AND published=@true_", new { id = content.Id, true_ = true });
         }
         else if (content.PublishedState == PublishedState.Publishing)
         {
@@ -135,11 +135,11 @@ public class NuCacheContentRepository : RepositoryBase, INuCacheContentRepositor
             $@"SELECT COUNT(*)
 FROM umbracoNode
 JOIN {Constants.DatabaseSchema.Tables.Document} ON umbracoNode.id={Constants.DatabaseSchema.Tables.Document}.nodeId
-LEFT JOIN cmsContentNu nuEdited ON (umbracoNode.id=nuEdited.nodeId AND nuEdited.published=0)
-LEFT JOIN cmsContentNu nuPublished ON (umbracoNode.id=nuPublished.nodeId AND nuPublished.published=1)
+LEFT JOIN cmsContentNu nuEdited ON (umbracoNode.id=nuEdited.nodeId AND nuEdited.published=@false_)
+LEFT JOIN cmsContentNu nuPublished ON (umbracoNode.id=nuPublished.nodeId AND nuPublished.published=@true_)
 WHERE umbracoNode.nodeObjectType=@objType
-AND nuEdited.nodeId IS NULL OR ({Constants.DatabaseSchema.Tables.Document}.published=1 AND nuPublished.nodeId IS NULL);",
-            new { objType = contentObjectType });
+AND nuEdited.nodeId IS NULL OR ({Constants.DatabaseSchema.Tables.Document}.published=@true_ AND nuPublished.nodeId IS NULL);",
+            new { objType = contentObjectType, false_ = false, true_ = true });
 
         return count == 0;
     }
@@ -153,11 +153,11 @@ AND nuEdited.nodeId IS NULL OR ({Constants.DatabaseSchema.Tables.Document}.publi
         var count = Database.ExecuteScalar<int>(
             @"SELECT COUNT(*)
 FROM umbracoNode
-LEFT JOIN cmsContentNu ON (umbracoNode.id=cmsContentNu.nodeId AND cmsContentNu.published=0)
+LEFT JOIN cmsContentNu ON (umbracoNode.id=cmsContentNu.nodeId AND cmsContentNu.published=@false_)
 WHERE umbracoNode.nodeObjectType=@objType
 AND cmsContentNu.nodeId IS NULL
 ",
-            new { objType = mediaObjectType });
+            new { objType = mediaObjectType, false_ = false });
 
         return count == 0;
     }
@@ -171,11 +171,11 @@ AND cmsContentNu.nodeId IS NULL
         var count = Database.ExecuteScalar<int>(
             @"SELECT COUNT(*)
 FROM umbracoNode
-LEFT JOIN cmsContentNu ON (umbracoNode.id=cmsContentNu.nodeId AND cmsContentNu.published=0)
+LEFT JOIN cmsContentNu ON (umbracoNode.id=cmsContentNu.nodeId AND cmsContentNu.published=@false_)
 WHERE umbracoNode.nodeObjectType=@objType
 AND cmsContentNu.nodeId IS NULL
 ",
-            new { objType = memberObjectType });
+            new { objType = memberObjectType, false_ = false });
 
         return count == 0;
     }
