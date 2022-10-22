@@ -64,16 +64,27 @@ public class LocalizedTextService : ILocalizedTextService
                 XmlSourceToNoAreaDictionary(source));
     }
 
-        /// <summary>
-        /// Initializes with a source of a dictionary of culture -> areas -> sub dictionary of keys/values
-        /// </summary>
-        /// <param name="source"></param>
-        /// <param name="logger"></param>
-        public LocalizedTextService(
-            IDictionary<CultureInfo, Lazy<IDictionary<string, IDictionary<string, string>>>> source,
-            ILogger<LocalizedTextService> logger)
-        {
-            IDictionary<CultureInfo, Lazy<IDictionary<string, IDictionary<string, string>>>> dictionarySource =
+    [Obsolete(
+        "Use other ctor with IDictionary<CultureInfo, Lazy<IDictionary<string, IDictionary<string, string>>>> as input parameter.")]
+    public LocalizedTextService(
+        IDictionary<CultureInfo, IDictionary<string, IDictionary<string, string>>> source,
+        ILogger<LocalizedTextService> logger)
+        : this(
+        source.ToDictionary(x => x.Key, x => new Lazy<IDictionary<string, IDictionary<string, string>>>(() => x.Value)),
+        logger)
+    {
+    }
+
+    /// <summary>
+    ///     Initializes with a source of a dictionary of culture -> areas -> sub dictionary of keys/values
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="logger"></param>
+    public LocalizedTextService(
+        IDictionary<CultureInfo, Lazy<IDictionary<string, IDictionary<string, string>>>> source,
+        ILogger<LocalizedTextService> logger)
+    {
+        IDictionary<CultureInfo, Lazy<IDictionary<string, IDictionary<string, string>>>> dictionarySource =
             source ?? throw new ArgumentNullException(nameof(source));
         _dictionarySourceLazy =
             new Lazy<IDictionary<CultureInfo, Lazy<IDictionary<string, IDictionary<string, string>>>>>(() =>

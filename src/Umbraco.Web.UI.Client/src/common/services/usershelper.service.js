@@ -8,7 +8,7 @@
             { "value": 0, "name": "Active", "key": "Active", "color": "success" },
             { "value": 1, "name": "Disabled", "key": "Disabled", "color": "danger" },
             { "value": 2, "name": "Locked out", "key": "LockedOut", "color": "danger" },
-            { "value": 3, "name": "Invited", "key": "Invited", "color": "primary" },
+            { "value": 3, "name": "Invited", "key": "Invited", "color": "warning" },
             { "value": 4, "name": "Inactive", "key": "Inactive", "color": "warning" }
         ];
 

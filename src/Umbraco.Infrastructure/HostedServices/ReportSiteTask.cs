@@ -40,11 +40,21 @@ public class ReportSiteTask : RecurringHostedServiceBase
     {
     }
 
-        /// <summary>
-        /// Runs the background task to send the anonymous ID
-        /// to telemetry service
-        /// </summary>
-        public override async Task PerformExecuteAsync(object? state){
+    [Obsolete("Use the constructor that takes ITelemetryService instead, scheduled for removal in V11")]
+    public ReportSiteTask(
+        ILogger<ReportSiteTask> logger,
+        IUmbracoVersion umbracoVersion,
+        IOptions<GlobalSettings> globalSettings)
+        : this(logger, StaticServiceProvider.Instance.GetRequiredService<ITelemetryService>())
+    {
+    }
+
+    /// <summary>
+    ///     Runs the background task to send the anonymous ID
+    ///     to telemetry service
+    /// </summary>
+    public override async Task PerformExecuteAsync(object? state)
+    {
         if (_runtimeState.Level is not RuntimeLevel.Run)
         {
             // We probably haven't installed yet, so we can't get telemetry.

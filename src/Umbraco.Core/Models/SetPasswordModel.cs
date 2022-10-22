@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Core.Models;
@@ -12,9 +12,9 @@ public class SetPasswordModel
 
     [Required]
     [DataMember(Name = "password", IsRequired = true)]
-    public required string Password { get; set; }
+    public string? Password { get; set; }
 
     [Required]
     [DataMember(Name = "resetCode", IsRequired = true)]
-    public required string ResetCode { get; set; }
+    public string? ResetCode { get; set; }
 }

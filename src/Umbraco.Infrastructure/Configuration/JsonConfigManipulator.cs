@@ -19,6 +19,11 @@ namespace Umbraco.Cms.Core.Configuration
         private readonly ILogger<JsonConfigManipulator> _logger;
         private readonly object _locker = new object();
 
+        [Obsolete]
+        public JsonConfigManipulator(IConfiguration configuration)
+            : this(configuration, StaticServiceProvider.Instance.GetRequiredService<ILogger<JsonConfigManipulator>>())
+        { }
+
         public JsonConfigManipulator(IConfiguration configuration, ILogger<JsonConfigManipulator> logger)
         {
             _configuration = configuration;
@@ -229,7 +234,7 @@ namespace Umbraco.Cms.Core.Configuration
             {
                 if (provider.Source.FileProvider is PhysicalFileProvider physicalFileProvider)
                 {
-                    var jsonFilePath = Path.Combine(physicalFileProvider.Root, provider.Source.Path!);
+                    var jsonFilePath = Path.Combine(physicalFileProvider.Root, provider.Source.Path);
 
                     try
                     {
@@ -264,7 +269,7 @@ namespace Umbraco.Cms.Core.Configuration
                     return null;
                 }
 
-                var jsonFilePath = Path.Combine(physicalFileProvider.Root, provider.Source.Path!);
+                var jsonFilePath = Path.Combine(physicalFileProvider.Root, provider.Source.Path);
 
                 try
                 {

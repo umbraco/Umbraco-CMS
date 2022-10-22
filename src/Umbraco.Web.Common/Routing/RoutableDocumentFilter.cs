@@ -70,7 +70,7 @@ public sealed class RoutableDocumentFilter : IRoutableDocumentFilter
         return maybeDoc;
     }
 
-    private void EndpointsChanged(object? value)
+    private void EndpointsChanged(object value)
     {
         lock (_routeLocker)
         {

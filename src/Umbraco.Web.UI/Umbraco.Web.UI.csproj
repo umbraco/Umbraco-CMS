@@ -4,11 +4,19 @@
     <EnablePackageValidation>false</EnablePackageValidation>
   </PropertyGroup>
 
-  <Import Project="..\Umbraco.Cms.Targets\buildTransitive\Umbraco.Cms.Targets.props" />
-  <Import Project="..\Umbraco.Cms.Targets\buildTransitive\Umbraco.Cms.Targets.targets" />
+  <Import Project="..\Umbraco.Cms\buildTransitive\Umbraco.Cms.props" />
+  <Import Project="..\Umbraco.Cms\buildTransitive\Umbraco.Cms.targets" />
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Cms\Umbraco.Cms.csproj" />
     <ProjectReference Include="..\Umbraco.Cms.ManagementApi\Umbraco.Cms.ManagementApi.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.5" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="all" />
+    <PackageReference Include="Umbraco.Code" Version="2.0.0" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.ICU.ICU4C.Runtime" Version="68.2.0.9" />
+    <RuntimeHostConfigurationOption Condition="$(RuntimeIdentifier.StartsWith('linux')) Or $(RuntimeIdentifier.StartsWith('win')) Or ('$(RuntimeIdentifier)' == '' And !$([MSBuild]::IsOSPlatform('osx')))" Include="System.Globalization.AppLocalIcu" Value="68.2.0.9" />
   </ItemGroup>
 
   <ItemGroup>
@@ -27,15 +35,6 @@
     <RazorCompileOnBuild>false</RazorCompileOnBuild>
     <RazorCompileOnPublish>false</RazorCompileOnPublish>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Content Update="appsettings.*.json">
-      <DependentUpon>appsettings.json</DependentUpon>
-    </Content>
-    <Content Update="appsettings-schema.*.json">
-      <DependentUpon>appsettings-schema.json</DependentUpon>
-    </Content>
-  </ItemGroup>
 
   <Target Name="CopyAppsettingsTemplate" BeforeTargets="Build" Condition="!Exists('appsettings.json')">
     <Message Text="Copying appsettings.template.json to appsettings.json because it doesn't exist" Importance="high" />

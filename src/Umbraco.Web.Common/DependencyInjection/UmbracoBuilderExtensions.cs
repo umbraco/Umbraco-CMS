@@ -293,6 +293,7 @@ public static partial class UmbracoBuilderExtensions
             .Transient<IApplicationModelProvider, BackOfficeApplicationModelProvider>());
         builder.Services.TryAddEnumerable(ServiceDescriptor
             .Transient<IApplicationModelProvider, VirtualPageApplicationModelProvider>());
+        builder.AddUmbracoImageSharp();
 
         // AspNetCore specific services
         builder.Services.AddUnique<IRequestAccessor, AspNetCoreRequestAccessor>();

@@ -11,11 +11,21 @@ public class ViewHelper : IViewHelper
     private readonly IDefaultViewContentProvider _defaultViewContentProvider;
     private readonly IFileSystem _viewFileSystem;
 
-        public ViewHelper(FileSystems fileSystems, IDefaultViewContentProvider defaultViewContentProvider)
-        {
-            _viewFileSystem = fileSystems.MvcViewsFileSystem ?? throw new ArgumentNullException(nameof(fileSystems));
-            _defaultViewContentProvider = defaultViewContentProvider ?? throw new ArgumentNullException(nameof(defaultViewContentProvider));
-        }[Obsolete("Inject IDefaultViewContentProvider instead")]
+    [Obsolete("Use ctor with all params")]
+    public ViewHelper(IFileSystem viewFileSystem)
+    {
+        _viewFileSystem = viewFileSystem ?? throw new ArgumentNullException(nameof(viewFileSystem));
+        _defaultViewContentProvider = StaticServiceProvider.Instance.GetRequiredService<IDefaultViewContentProvider>();
+    }
+
+    public ViewHelper(FileSystems fileSystems, IDefaultViewContentProvider defaultViewContentProvider)
+    {
+        _viewFileSystem = fileSystems.MvcViewsFileSystem ?? throw new ArgumentNullException(nameof(fileSystems));
+        _defaultViewContentProvider = defaultViewContentProvider ??
+                                      throw new ArgumentNullException(nameof(defaultViewContentProvider));
+    }
+
+    [Obsolete("Inject IDefaultViewContentProvider instead")]
     public static string GetDefaultFileContent(string? layoutPageAlias = null, string? modelClassName = null, string? modelNamespace = null, string? modelNamespaceAlias = null)
     {
         IDefaultViewContentProvider viewContentProvider =

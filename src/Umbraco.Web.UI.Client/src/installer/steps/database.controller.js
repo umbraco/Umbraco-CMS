@@ -29,7 +29,7 @@ angular.module("umbraco.install").controller("Umbraco.Installer.DataBaseControll
 
 
     $scope.validateAndForward = function() {
-        if (!$scope.checking && this.installerForm.$valid)
+        if (!$scope.checking && this.myForm.$valid)
         {
             $scope.checking = true;
             $scope.invalidDbDns = false;

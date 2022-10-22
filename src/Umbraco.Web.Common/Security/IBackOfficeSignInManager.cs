@@ -19,7 +19,7 @@ public interface IBackOfficeSignInManager
 
     Task<ExternalLoginInfo?> GetExternalLoginInfoAsync(string? expectedXsrf = null);
 
-    Task<BackOfficeIdentityUser?> GetTwoFactorAuthenticationUserAsync();
+    Task<BackOfficeIdentityUser> GetTwoFactorAuthenticationUserAsync();
 
     Task<SignInResult> PasswordSignInAsync(string userName, string password, bool isPersistent, bool lockoutOnFailure);
 
@@ -29,7 +29,7 @@ public interface IBackOfficeSignInManager
 
     Task<ClaimsPrincipal> CreateUserPrincipalAsync(BackOfficeIdentityUser user);
 
-    Task<SignInResult> TwoFactorSignInAsync(string provider, string code, bool isPersistent, bool rememberClient);
+    Task<SignInResult> TwoFactorSignInAsync(string? provider, string? code, bool isPersistent, bool rememberClient);
 
     Task<IdentityResult> UpdateExternalAuthenticationTokensAsync(ExternalLoginInfo externalLogin);
 }

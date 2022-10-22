@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Core.Models;
@@ -11,11 +11,11 @@ public class Verify2FACodeModel
 {
     [Required]
     [DataMember(Name = "code", IsRequired = true)]
-    public required string Code { get; set; }
+    public string? Code { get; set; }
 
     [Required]
     [DataMember(Name = "provider", IsRequired = true)]
-    public required string Provider { get; set; }
+    public string? Provider { get; set; }
 
     /// <summary>
     ///     Flag indicating whether the sign-in cookie should persist after the browser is closed.

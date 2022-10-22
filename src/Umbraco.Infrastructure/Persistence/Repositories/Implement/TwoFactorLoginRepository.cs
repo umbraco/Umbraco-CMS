@@ -1,3 +1,4 @@
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Cms.Core;
@@ -42,13 +43,24 @@ internal class TwoFactorLoginRepository : EntityRepositoryBase<int, ITwoFactorLo
 
     public async Task<IEnumerable<ITwoFactorLogin>> GetByUserOrMemberKeyAsync(Guid userOrMemberKey)
     {
-        Sql<ISqlContext> sql = Sql()
-            .Select<TwoFactorLoginDto>()
-            .From<TwoFactorLoginDto>()
-            .Where<TwoFactorLoginDto>(x => x.UserOrMemberKey == userOrMemberKey);
-        List<TwoFactorLoginDto>? dtos = await Database.FetchAsync<TwoFactorLoginDto>(sql);
-        return dtos.WhereNotNull().Select(Map).WhereNotNull();
+        try
+        {
+            Sql<ISqlContext> sql = Sql()
+                .Select<TwoFactorLoginDto>()
+                .From<TwoFactorLoginDto>()
+                .Where<TwoFactorLoginDto>(x => x.UserOrMemberKey == userOrMemberKey);
+            List<TwoFactorLoginDto>? dtos = await Database.FetchAsync<TwoFactorLoginDto>(sql);
+            return dtos.WhereNotNull().Select(Map).WhereNotNull();
+        }
+
+        // TODO (v11): Remove this as the table should always exist when upgrading from 10.x
+        // SQL Server - table doesn't exist, likely upgrading from < 9.3.0.
+        catch (SqlException ex) when (ex.Number == 208 && ex.Message.Contains(TwoFactorLoginDto.TableName))
+        {
+            return Enumerable.Empty<ITwoFactorLogin>();
+        }
     }
+
 
     protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
     {
@@ -130,10 +142,7 @@ internal class TwoFactorLoginRepository : EntityRepositoryBase<int, ITwoFactorLo
 
         return new TwoFactorLogin
         {
-            Id = dto.Id,
-            UserOrMemberKey = dto.UserOrMemberKey,
-            ProviderName = dto.ProviderName,
-            Secret = dto.Secret
+            Id = dto.Id, UserOrMemberKey = dto.UserOrMemberKey, ProviderName = dto.ProviderName, Secret = dto.Secret
         };
     }
 }

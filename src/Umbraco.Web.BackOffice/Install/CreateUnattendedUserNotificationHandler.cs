@@ -75,7 +75,7 @@ public class CreateUnattendedUserNotificationHandler : INotificationAsyncHandler
         using IServiceScope scope = _serviceScopeFactory.CreateScope();
         IBackOfficeUserManager backOfficeUserManager =
             scope.ServiceProvider.GetRequiredService<IBackOfficeUserManager>();
-        BackOfficeIdentityUser? membershipUser =
+        BackOfficeIdentityUser membershipUser =
             await backOfficeUserManager.FindByIdAsync(Constants.Security.SuperUserIdAsString);
         if (membershipUser == null)
         {

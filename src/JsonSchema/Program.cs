@@ -27,23 +27,15 @@ namespace JsonSchema
         private static async Task Execute(Options options)
         {
             var generator = new UmbracoJsonSchemaGenerator();
+            var schema = await generator.Generate();
 
-            var cmsSchema = await generator.GenerateCmsFile();
-            await WriteSchemaToFile(cmsSchema, options.CmsOutputFile);
-
-            var schema = await generator.GenerateMainFile();
-            await WriteSchemaToFile(schema, options.MainOutputFile);
-        }
-
-        private static async Task WriteSchemaToFile(string schema,  string filePath)
-        {
-            var mainPath = Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, filePath));
-            Console.WriteLine("Path to use {0}", mainPath);
-            Directory.CreateDirectory(Path.GetDirectoryName(mainPath)!);
+            var path = Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, options.OutputFile));
+            Console.WriteLine("Path to use {0}", path);
+            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
             Console.WriteLine("Ensured directory exists");
-            await File.WriteAllTextAsync(mainPath, schema);
+            await File.WriteAllTextAsync(path, schema);
 
-            Console.WriteLine("File written at {0}", mainPath);
+            Console.WriteLine("File written at {0}", path);
         }
     }
 }

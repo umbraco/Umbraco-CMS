@@ -1,5 +1,6 @@
 using System.Data;
 using System.Data.Common;
+using Microsoft.Data.SqlClient;
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -82,7 +83,7 @@ public class SqliteDistributedLockingMechanism : IDistributedLockingMechanism
                         throw new ArgumentOutOfRangeException(nameof(lockType), lockType, @"Unsupported lockType");
                 }
             }
-            catch (SqliteException ex) when (ex.SqliteErrorCode == SQLitePCL.raw.SQLITE_BUSY)
+            catch (SqlException ex) when (ex.Number == 1222)
             {
                 if (LockType == DistributedLockType.ReadLock)
                 {

@@ -34,7 +34,7 @@ public abstract class UmbracoErrorDescriberBase : IdentityErrorDescriber
         Description = _textService.Localize("validation", "duplicateUsername", new[] { userName }),
     };
 
-    public override IdentityError InvalidEmail(string? email) => new()
+    public override IdentityError InvalidEmail(string email) => new()
     {
         Code = nameof(InvalidEmail),
         Description = _textService.Localize("validation", "invalidEmail"),
@@ -46,7 +46,7 @@ public abstract class UmbracoErrorDescriberBase : IdentityErrorDescriber
         Description = _textService.Localize("validation", "invalidToken"),
     };
 
-    public override IdentityError InvalidUserName(string? userName) => new()
+    public override IdentityError InvalidUserName(string userName) => new()
     {
         Code = nameof(InvalidUserName),
         Description = _textService.Localize("validation", "invalidUsername"),

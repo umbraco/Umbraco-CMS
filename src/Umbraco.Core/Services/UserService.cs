@@ -333,8 +333,13 @@ internal class UserService : RepositoryService, IUserService
         }
     }
 
+    // explicit implementation because we don't need it now but due to the way that the members membership provider is put together
+    // this method must exist in this service as an implementation (legacy)
+    void IMembershipMemberService<IUser>.SetLastLogin(string username, DateTime date) => _logger.LogWarning(
+        "This method is not implemented. Using membership providers users is not advised, use ASP.NET Identity instead. See issue #9224 for more information.");
+
     /// <summary>
-    /// Saves an <see cref="IUser" />
+    ///     Saves an <see cref="IUser" />
     /// </summary>
     /// <param name="entity"><see cref="IUser" /> to Save</param>
     public void Save(IUser entity)

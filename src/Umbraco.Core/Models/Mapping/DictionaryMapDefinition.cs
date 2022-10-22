@@ -45,7 +45,9 @@ public class DictionaryMapDefinition : IMapDefinition
     {
         mapper.Define<IDictionaryItem, EntityBasic>((source, context) => new EntityBasic(), Map);
         mapper.Define<IDictionaryItem, DictionaryDisplay>((source, context) => new DictionaryDisplay(), Map);
-        mapper.Define<IDictionaryItem, DictionaryOverviewDisplay>((source, context) => new DictionaryOverviewDisplay(), Map);
+        mapper.Define<IDictionaryItem, DictionaryOverviewDisplay>(
+            (source, context) => new DictionaryOverviewDisplay(),
+            Map);
     }
 
     // Umbraco.Code.MapAll -ParentId -Path -Trashed -Udi -Icon

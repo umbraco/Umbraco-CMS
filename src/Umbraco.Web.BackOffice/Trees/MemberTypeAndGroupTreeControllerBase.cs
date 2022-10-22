@@ -33,6 +33,21 @@ public abstract class MemberTypeAndGroupTreeControllerBase : TreeController
         _memberTypeService = memberTypeService;
     }
 
+    [Obsolete("Use ctor injecting IMemberTypeService")]
+    protected MemberTypeAndGroupTreeControllerBase(
+        ILocalizedTextService localizedTextService,
+        UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
+        IMenuItemCollectionFactory menuItemCollectionFactory,
+        IEventAggregator eventAggregator)
+        : this(
+            localizedTextService,
+            umbracoApiControllerTypeCollection,
+            menuItemCollectionFactory,
+            eventAggregator,
+            StaticServiceProvider.Instance.GetRequiredService<IMemberTypeService>())
+    {
+    }
+
     public IMenuItemCollectionFactory MenuItemCollectionFactory { get; }
 
     protected override ActionResult<TreeNodeCollection> GetTreeNodes(string id, FormCollection queryStrings)

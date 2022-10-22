@@ -23,9 +23,9 @@ parameters:
     default: false
 
 variables:
-  nodeVersion: 16.17.0
-  dotnetVersion: 7.x
-  dotnetIncludePreviewVersions: true
+  nodeVersion: 14.18.1
+  dotnetVersion: 6.x
+  dotnetIncludePreviewVersions: false
   solution: umbraco.sln
   buildConfiguration: Release
   UMBRACO__CMS__GLOBAL__ID: 00000000-0000-0000-0000-000000000042
@@ -72,6 +72,7 @@ stages:
             displayName: Use .NET $(dotnetVersion)
             inputs:
               version: $(dotnetVersion)
+              performMultiLevelLookup: true
               includePreviewVersions: $(dotnetIncludePreviewVersions)
           - task: DotNetCoreCLI@2
             displayName: Run dotnet restore
@@ -110,7 +111,7 @@ stages:
                   }
                 }
 
-                dotnet pack $(solution) --configuration $(buildConfiguration) --no-build --output $(Build.ArtifactStagingDirectory)/nupkg
+                dotnet pack $(solution) --configuration $(buildConfiguration) -p:BuildProjectReferences=false --output $(Build.ArtifactStagingDirectory)/nupkg
           - script: |
               sha="$(Build.SourceVersion)"
               sha=${sha:0:7}
@@ -245,6 +246,7 @@ stages:
             displayName: Use .NET $(dotnetVersion)
             inputs:
               version: $(dotnetVersion)
+              performMultiLevelLookup: true
               includePreviewVersions: $(dotnetIncludePreviewVersions)
           - task: DotNetCoreCLI@2
             displayName: Run dotnet test
@@ -281,6 +283,7 @@ stages:
             displayName: Use .NET $(dotnetVersion)
             inputs:
               version: $(dotnetVersion)
+              performMultiLevelLookup: true
               includePreviewVersions: $(dotnetIncludePreviewVersions)
           - task: DotNetCoreCLI@2
             displayName: Run dotnet test
@@ -358,7 +361,6 @@ stages:
               dockerImageName: umbraco-linux
             Windows:
               vmImage: 'windows-latest'
-              DOTNET_GENERATE_ASPNET_CERTIFICATE: true # Automatically generate HTTPS development certificate on Windows
               # Enable console logging in Release mode
               Serilog__WriteTo__0__Name: Async
               Serilog__WriteTo__0__Args__configure__0__Name: Console
@@ -412,6 +414,7 @@ stages:
             displayName: Use .NET $(dotnetVersion)
             inputs:
               version: $(dotnetVersion)
+              performMultiLevelLookup: true
               includePreviewVersions: $(dotnetIncludePreviewVersions)
           - pwsh: |
               $sha = 'g$(Build.SourceVersion)'.substring(0, 8)
@@ -499,14 +502,11 @@ stages:
           - task: NuGetCommand@2
             displayName: NuGet push
             inputs:
-              command: restore
-              projects: $(solution)
-          # TODO: Use NuGetCommand instead of DotNetCoreCLI
-          #                - task: NuGetCommand@2
-          #                  displayName: Restore NuGet Packages
-          #                  inputs:
-          #                      restoreSolution: $(solution)
-          #                      feedsToUse: config
+              command: 'push'
+              packagesToPush: $(Build.ArtifactStagingDirectory)/**/*.nupkg
+              nuGetFeedType: 'external'
+              publishFeedCredentials: 'MyGet - Pre-releases'
+
   - stage: Deploy_NuGet
     displayName: NuGet release
     dependsOn:
@@ -526,8 +526,10 @@ stages:
           - task: NuGetCommand@2
             displayName: NuGet push
             inputs:
-              command: restore
-              projects: $(solution)
+              command: 'push'
+              packagesToPush: $(Build.ArtifactStagingDirectory)/**/*.nupkg
+              nuGetFeedType: 'external'
+              publishFeedCredentials: 'NuGet - Umbraco.*'
 
   - stage: Upload_API_Docs
     pool:

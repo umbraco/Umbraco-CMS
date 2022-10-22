@@ -48,7 +48,6 @@ test.describe('DataTypes', () => {
     // Save
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.saveAndPublish));
     await umbracoUi.isSuccessNotificationVisible();
-    await page.locator('span:has-text("×")').click();
 
     // Assert
     const expected = `<p style="color:000000" > Lorem ipsum dolor sit amet </p>`;
@@ -159,7 +158,6 @@ test.describe('DataTypes', () => {
     await umbracoUi.setEditorHeaderName('UrlPickerContent');
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.saveAndPublish));
     await umbracoUi.isSuccessNotificationVisible();
-    await page.locator('span:has-text("×")').click();
     await page.locator('.umb-node-preview-add').click();
 
     // Should really try and find a better way to do this, but umbracoTreeItem tries to click the content pane in the background

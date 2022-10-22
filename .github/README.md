@@ -31,8 +31,7 @@ The documentation for Umbraco CMS can be found [on Our Umbraco](https://our.umbr
 
 Our friendly community is available 24/7 at the community hub, we call ["Our Umbraco"](https://our.umbraco.com/). Our Umbraco features forums for questions and answers, documentation, downloadable plugins for Umbraco, and a rich collection of community resources.
 
-Besides "Our", we all support each other in our [Community Discord Server](https://discord.gg/umbraco) and on Twitter: [Umbraco HQ](https://twitter.com/umbraco), [Release Updates](https://twitter.com/umbracoproject), [#umbraco](https://twitter.com/hashtag/umbraco)
-
+Besides "Our", we all support each other also via Twitter: [Umbraco HQ](https://twitter.com/umbraco), [Release Updates](https://twitter.com/umbracoproject), [#umbraco](https://twitter.com/hashtag/umbraco)
 
 
 ## Contributing

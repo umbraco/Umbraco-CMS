@@ -84,7 +84,7 @@ public abstract class UmbracoUserStore<TUser, TRole>
     }
 
     /// <inheritdoc />
-    public override Task<TUser?> FindByIdAsync(string userId, CancellationToken cancellationToken = default) =>
+    public override Task<TUser> FindByIdAsync(string userId, CancellationToken cancellationToken = default) =>
         FindUserAsync(userId, cancellationToken);
 
     /// <summary>
@@ -96,11 +96,11 @@ public abstract class UmbracoUserStore<TUser, TRole>
         throw new NotImplementedException();
 
     /// <inheritdoc />
-    public override Task<string?> GetNormalizedEmailAsync(TUser user, CancellationToken cancellationToken)
+    public override Task<string> GetNormalizedEmailAsync(TUser user, CancellationToken cancellationToken)
         => GetEmailAsync(user, cancellationToken);
 
     /// <inheritdoc />
-    public override Task<string?> GetNormalizedUserNameAsync(TUser user, CancellationToken cancellationToken = default)
+    public override Task<string> GetNormalizedUserNameAsync(TUser user, CancellationToken cancellationToken = default)
         => GetUserNameAsync(user, cancellationToken);
 
     /// <summary>
@@ -221,15 +221,15 @@ public abstract class UmbracoUserStore<TUser, TRole>
     public override Task ReplaceClaimAsync(TUser user, Claim claim, Claim newClaim, CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
     /// <inheritdoc />
-    public override Task SetNormalizedEmailAsync(TUser user, string? normalizedEmail, CancellationToken cancellationToken)
+    public override Task SetNormalizedEmailAsync(TUser user, string normalizedEmail, CancellationToken cancellationToken)
         => SetEmailAsync(user, normalizedEmail, cancellationToken);
 
     /// <inheritdoc />
-    public override Task SetNormalizedUserNameAsync(TUser user, string? normalizedName, CancellationToken cancellationToken = default)
+    public override Task SetNormalizedUserNameAsync(TUser user, string normalizedName, CancellationToken cancellationToken = default)
         => SetUserNameAsync(user, normalizedName, cancellationToken);
 
     /// <inheritdoc />
-    public override async Task SetPasswordHashAsync(TUser user, string? passwordHash, CancellationToken cancellationToken = default)
+    public override async Task SetPasswordHashAsync(TUser user, string passwordHash, CancellationToken cancellationToken = default)
     {
         await base.SetPasswordHashAsync(user, passwordHash, cancellationToken);
         user.LastPasswordChangeDateUtc = DateTime.UtcNow;
@@ -247,7 +247,7 @@ public abstract class UmbracoUserStore<TUser, TRole>
     /// </summary>
     /// <inheritdoc />
     [EditorBrowsable(EditorBrowsableState.Never)]
-    protected override Task<IdentityUserToken<string>?> FindTokenAsync(TUser user, string loginProvider, string name, CancellationToken cancellationToken) => throw new NotImplementedException();
+    protected override Task<IdentityUserToken<string>> FindTokenAsync(TUser user, string loginProvider, string name, CancellationToken cancellationToken) => throw new NotImplementedException();
 
     /// <summary>
     ///     Not supported in Umbraco, see comments above on GetTokenAsync, RemoveTokenAsync, SetTokenAsync

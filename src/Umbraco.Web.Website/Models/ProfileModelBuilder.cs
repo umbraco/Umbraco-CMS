@@ -51,7 +51,7 @@ public class ProfileModelBuilder : MemberModelBuilderBase
             ? null
             : await memberManager.GetUserAsync(_httpContextAccessor.HttpContext.User);
 
-        if (member?.Email is null || member?.UserName is null)
+        if (member == null)
         {
             return null;
         }

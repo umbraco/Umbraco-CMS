@@ -111,7 +111,7 @@ public class UmbExternalLoginController : SurfaceController
 
             if (result == SignInResult.TwoFactorRequired)
             {
-                MemberIdentityUser? attemptedUser =
+                MemberIdentityUser attemptedUser =
                     await _memberManager.FindByLoginAsync(loginInfo.LoginProvider, loginInfo.ProviderKey);
                 if (attemptedUser == null!)
                 {
@@ -218,7 +218,7 @@ public class UmbExternalLoginController : SurfaceController
     [HttpGet]
     public async Task<IActionResult> ExternalLinkLoginCallback(string returnUrl)
     {
-        MemberIdentityUser? user = await _memberManager.GetUserAsync(User);
+        MemberIdentityUser user = await _memberManager.GetUserAsync(User);
         string? loginProvider = null;
         var errors = new List<string>();
         if (user == null!)
@@ -272,20 +272,10 @@ public class UmbExternalLoginController : SurfaceController
             returnUrl = Request.GetEncodedPathAndQuery();
         }
 
-        var userId = User.Identity?.GetUserId();
-        if (userId is null)
-        {
-            return CurrentUmbracoPage();
-        }
-
-        MemberIdentityUser? user = await _memberManager.FindByIdAsync(userId);
-
-        if (user is null)
-        {
-            return CurrentUmbracoPage();
-        }
+        MemberIdentityUser user = await _memberManager.FindByIdAsync(User.Identity?.GetUserId());
 
         IdentityResult result = await _memberManager.RemoveLoginAsync(user, provider, providerKey);
+
         if (result.Succeeded)
         {
             await _memberSignInManager.SignInAsync(user, false);
@@ -293,7 +283,6 @@ public class UmbExternalLoginController : SurfaceController
         }
 
         AddModelErrors(result);
-
         return CurrentUmbracoPage();
     }
 }
