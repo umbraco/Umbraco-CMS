@@ -318,6 +318,7 @@ test.describe('Content tests', () => {
     const nodeName = "Home";
     const labelName = "Name";
     const contentSection = "content";
+    const defaultContentAlias = "alias";
 
     await umbracoApi.documentTypes.ensureNameNotExists(rootDocTypeName);
     await umbracoApi.content.deleteAllContent();
@@ -335,7 +336,7 @@ test.describe('Content tests', () => {
     const generatedRootDocType = await umbracoApi.documentTypes.save(rootDocType)
 
     const rootContentNode = new ContentBuilder()
-      .withContentTypeAlias(generatedRootDocType["alias"])
+      .withContentTypeAlias(generatedRootDocType[defaultContentAlias])
       .addVariant()
         .withName(nodeName)
         .withSave(true)
@@ -366,6 +367,7 @@ test.describe('Content tests', () => {
     const expected = "Unpublished";
     const saveNode = "saveNew";
     const contentSection = "content";
+    const defaultContentAlias = "alias";
 
     await umbracoApi.content.deleteAllContent();
     await umbracoApi.documentTypes.ensureNameNotExists(rootDocTypeName);
@@ -378,7 +380,7 @@ test.describe('Content tests', () => {
     const generatedRootDocType = await umbracoApi.documentTypes.save(rootDocType);
 
     const rootContentNode = new ContentBuilder()
-      .withContentTypeAlias(generatedRootDocType["alias"])
+      .withContentTypeAlias(generatedRootDocType[defaultContentAlias])
       .withAction(saveNode)
       .addVariant()
         .withName(nodeName)
@@ -406,6 +408,7 @@ test.describe('Content tests', () => {
     const nodeName = "Home";
     const saveNode = "saveNew";
     const contentSection = "content";
+    const defaultContentAlias = "alias";
 
     await umbracoApi.content.deleteAllContent();
     await umbracoApi.documentTypes.ensureNameNotExists(rootDocTypeName);
@@ -418,7 +421,7 @@ test.describe('Content tests', () => {
     const generatedRootDocType = await umbracoApi.documentTypes.save(rootDocType);
 
     const rootContentNode = new ContentBuilder()
-      .withContentTypeAlias(generatedRootDocType["alias"])
+      .withContentTypeAlias(generatedRootDocType[defaultContentAlias])
       .withAction(saveNode)
         .addVariant()
         .withName(nodeName)
@@ -448,6 +451,7 @@ test.describe('Content tests', () => {
     const nodeName = "Home";
     const expected = "Published";
     const contentSection = "content";
+    const defaultContentAlias = "alias";
 
     await umbracoApi.content.deleteAllContent();
     await umbracoApi.documentTypes.ensureNameNotExists(rootDocTypeName);
@@ -460,7 +464,7 @@ test.describe('Content tests', () => {
     const generatedRootDocType = await umbracoApi.documentTypes.save(rootDocType);
 
     const rootContentNode = new ContentBuilder()
-      .withContentTypeAlias(generatedRootDocType["alias"])
+      .withContentTypeAlias(generatedRootDocType[defaultContentAlias])
       .addVariant()
         .withName(nodeName)
         .withSave(true)
@@ -487,6 +491,7 @@ test.describe('Content tests', () => {
     const pickerDocTypeAlias = AliasHelper.toAlias(pickerDocTypeName);
     const pickedDocTypeName = 'Picked content document type';
     const pickedDocTypeAlias = AliasHelper.toAlias(pickedDocTypeName);
+    const defaultContentAlias = "alias";
 
     await umbracoApi.content.deleteAllContent();
     await umbracoApi.documentTypes.ensureNameNotExists(pickerDocTypeName);
@@ -507,7 +512,7 @@ test.describe('Content tests', () => {
 
     const generatedType = await  umbracoApi.documentTypes.save(pickedDocType)
     const pickedContentNode = new ContentBuilder()
-      .withContentTypeAlias(generatedType["alias"])
+      .withContentTypeAlias(generatedType[defaultContentAlias])
       .withAction("publishNew")
       .addVariant()
         .withName('Content to pick')
@@ -584,6 +589,7 @@ test.describe('Content tests', () => {
     const partialFileName = viewMacroName + '.cshtml';
     const saveNode = "saveNew";
     const contentSection = "content";
+    const defaultContentAlias = "alias";
 
     await umbracoApi.macros.ensureNameNotExists(viewMacroName);
     await umbracoApi.partialViews.ensureMacroFileNameNotExists(partialFileName);
@@ -612,7 +618,7 @@ test.describe('Content tests', () => {
     const generatedDocType = await umbracoApi.documentTypes.save(docType)
       // Might as wel initally create the content here, the less GUI work during the test the better
     const contentNode = new ContentBuilder()
-      .withContentTypeAlias(generatedDocType["alias"])
+      .withContentTypeAlias(generatedDocType[defaultContentAlias])
       .withAction(saveNode)
         .addVariant()
           .withName(viewMacroName)
@@ -665,6 +671,7 @@ test.describe('Content tests', () => {
     const macroName = 'Grid macro';
     const macroFileName = macroName + '.cshtml';
     const contentSection = "content";
+    const defaultContentAlias = "alias";
 
     await umbracoApi.dataTypes.ensureNameNotExists(name);
     await umbracoApi.documentTypes.ensureNameNotExists(name);
@@ -700,7 +707,7 @@ test.describe('Content tests', () => {
 
     const generatedDocType = await umbracoApi.documentTypes.save(docType);
     const contentNode = new ContentBuilder()
-      .withContentTypeAlias(generatedDocType["alias"])
+      .withContentTypeAlias(generatedDocType[defaultContentAlias])
       .addVariant()
         .withName(name)
         .withSave(true)
