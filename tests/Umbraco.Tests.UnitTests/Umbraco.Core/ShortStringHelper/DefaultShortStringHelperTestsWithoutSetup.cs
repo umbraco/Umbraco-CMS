@@ -18,7 +18,7 @@ public class DefaultShortStringHelperTestsWithoutSetup
     {
         var requestHandlerSettings = new RequestHandlerSettings
         {
-            CharCollection = Array.Empty<CharItem>(),
+            UserDefinedCharCollection = Array.Empty<CharItem>(),
             EnableDefaultCharReplacements = false,
             ConvertUrlsToAscii = "false",
         };
@@ -47,7 +47,7 @@ public class DefaultShortStringHelperTestsWithoutSetup
     {
         var requestHandlerSettings = new RequestHandlerSettings
         {
-            CharCollection = Array.Empty<CharItem>(),
+            UserDefinedCharCollection = Array.Empty<CharItem>(),
             EnableDefaultCharReplacements = false,
             ConvertUrlsToAscii = "false",
         };
@@ -383,7 +383,7 @@ public class DefaultShortStringHelperTestsWithoutSetup
     {
         var requestHandlerSettings = new RequestHandlerSettings
         {
-            CharCollection = Array.Empty<CharItem>(),
+            UserDefinedCharCollection = Array.Empty<CharItem>(),
             EnableDefaultCharReplacements = false,
             ConvertUrlsToAscii = "false",
         };

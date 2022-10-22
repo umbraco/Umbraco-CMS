@@ -108,6 +108,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.New.Cms.Infrastruct
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.New.Cms.Web.Common", "src\Umbraco.New.Cms.Web.Common\Umbraco.New.Cms.Web.Common.csproj", "{5ED13EC6-399E-49D5-9D26-86501729B08D}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Cms.Targets", "src\Umbraco.Cms.Targets\Umbraco.Cms.Targets.csproj", "{B51C10FC-FD20-451E-90DD-A117133403DF}"
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E5D4B5F9-6CCE-46CE-8985-9A350445F92B}"
 	ProjectSection(SolutionItems) = preProject
 		.artifactignore = .artifactignore
@@ -151,6 +153,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "styles", "styles", "{EA628A
 	ProjectSection(SolutionItems) = preProject
 		build\csharp-docs\umbracotemplate\styles\main.css = build\csharp-docs\umbracotemplate\styles\main.css
 	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Cms.Imaging.ImageSharp", "src\Umbraco.Cms.Imaging.ImageSharp\Umbraco.Cms.Imaging.ImageSharp.csproj", "{C280181E-597B-4AA5-82E7-D7017E928749}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -298,6 +302,18 @@ Global
 		{5ED13EC6-399E-49D5-9D26-86501729B08D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5ED13EC6-399E-49D5-9D26-86501729B08D}.SkipTests|Any CPU.ActiveCfg = Debug|Any CPU
 		{5ED13EC6-399E-49D5-9D26-86501729B08D}.SkipTests|Any CPU.Build.0 = Debug|Any CPU
+		{B51C10FC-FD20-451E-90DD-A117133403DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B51C10FC-FD20-451E-90DD-A117133403DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B51C10FC-FD20-451E-90DD-A117133403DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B51C10FC-FD20-451E-90DD-A117133403DF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B51C10FC-FD20-451E-90DD-A117133403DF}.SkipTests|Any CPU.ActiveCfg = Debug|Any CPU
+		{B51C10FC-FD20-451E-90DD-A117133403DF}.SkipTests|Any CPU.Build.0 = Debug|Any CPU
+		{C280181E-597B-4AA5-82E7-D7017E928749}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C280181E-597B-4AA5-82E7-D7017E928749}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C280181E-597B-4AA5-82E7-D7017E928749}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C280181E-597B-4AA5-82E7-D7017E928749}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C280181E-597B-4AA5-82E7-D7017E928749}.SkipTests|Any CPU.ActiveCfg = Debug|Any CPU
+		{C280181E-597B-4AA5-82E7-D7017E928749}.SkipTests|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
