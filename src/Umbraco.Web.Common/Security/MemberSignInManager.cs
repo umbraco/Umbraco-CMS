@@ -159,8 +159,8 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
     }
 
     public override AuthenticationProperties ConfigureExternalAuthenticationProperties(
-        string provider,
-        string redirectUrl,
+        string? provider,
+        string? redirectUrl,
         string? userId = null)
     {
         // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs
@@ -213,7 +213,7 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
         }
 
         // Now we need to perform the auto-link, so first we need to lookup/create a user with the email address
-        MemberIdentityUser? autoLinkUser = await UserManager.FindByEmailAsync(email);
+        MemberIdentityUser? autoLinkUser = await UserManager.FindByEmailAsync(email!);
         if (autoLinkUser != null)
         {
             try
@@ -244,7 +244,7 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
             throw new InvalidOperationException("The Name value cannot be null");
         }
 
-        autoLinkUser = MemberIdentityUser.CreateNew(email, email, autoLinkOptions.DefaultMemberTypeAlias, autoLinkOptions.DefaultIsApproved, name);
+        autoLinkUser = MemberIdentityUser.CreateNew(email!, email!, autoLinkOptions.DefaultMemberTypeAlias, autoLinkOptions.DefaultIsApproved, name);
 
         foreach (var userGroup in autoLinkOptions.DefaultMemberGroups)
         {

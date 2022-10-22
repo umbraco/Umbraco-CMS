@@ -76,7 +76,6 @@ public class UmbracoDatabase : Database, IUmbracoDatabase
     private void Init()
     {
         EnableSqlTrace = EnableSqlTraceDefault;
-        NPocoDatabaseExtensions.ConfigureNPocoBulkExtensions();
 
         if (_mapperCollection != null)
         {

@@ -2,7 +2,9 @@
 ## Build
 ############################################
 
-FROM mcr.microsoft.com/dotnet/sdk:6.0.401 AS build
+FROM mcr.microsoft.com/dotnet/nightly/sdk:7.0 AS build
+
+COPY nuget.config .
 
 COPY nuget.config .
 
@@ -20,7 +22,7 @@ RUN dotnet publish --configuration Release --no-build --output /dist
 ## Run
 ############################################
 
-FROM mcr.microsoft.com/dotnet/aspnet:6.0.9 AS run
+FROM mcr.microsoft.com/dotnet/nightly/aspnet:7.0 AS run
 
 WORKDIR /app
 COPY --from=build dist .

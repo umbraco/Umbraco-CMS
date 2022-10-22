@@ -1,4 +1,4 @@
-using System.Runtime.Serialization;
+﻿using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Models.Entities;
 
 namespace Umbraco.Cms.Core.Models;
@@ -22,14 +22,7 @@ public class RelationType : EntityBase, IRelationTypeWithIsDependency
     {
     }
 
-    [Obsolete("Use ctor with isDependency parameter")]
-    public RelationType(string name, string alias, bool isBidrectional, Guid? parentObjectType, Guid? childObjectType)
-        : this(name, alias, isBidrectional, parentObjectType, childObjectType, false)
-    {
-    }
-
-    public RelationType(string? name, string? alias, bool isBidrectional, Guid? parentObjectType, Guid? childObjectType, bool isDependency)
-    {
+        public RelationType(string? name, string? alias, bool isBidrectional, Guid? parentObjectType, Guid? childObjectType, bool isDependency){
         if (name == null)
         {
             throw new ArgumentNullException(nameof(name));
