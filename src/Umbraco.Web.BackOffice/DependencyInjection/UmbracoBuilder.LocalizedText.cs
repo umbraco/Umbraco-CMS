@@ -1,6 +1,8 @@
+using System.IO;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
@@ -42,20 +44,30 @@ namespace Umbraco.Extensions
             // gets all langs files in /app_plugins real or virtual locations
             IEnumerable<LocalizedTextServiceSupplementaryFileSource> pluginLangFileSources = GetPluginLanguageFileSources(webFileProvider, Cms.Core.Constants.SystemDirectories.AppPlugins, false);
 
-            // user defined langs that overwrite the default, these should not be used by plugin creators
+            // user defined language files that overwrite the default, these should not be used by plugin creators
             var userConfigLangFolder = Cms.Core.Constants.SystemDirectories.Config
                                             .TrimStart(Cms.Core.Constants.CharArrays.Tilde);
 
-            IEnumerable<LocalizedTextServiceSupplementaryFileSource> userLangFileSources = contentFileProvider.GetDirectoryContents(userConfigLangFolder)
-                    .Where(x => x.IsDirectory && x.Name.InvariantEquals("lang"))
-                    .Select(x => new DirectoryInfo(x.PhysicalPath))
-                    .SelectMany(x => x.GetFiles("*.user.xml", SearchOption.TopDirectoryOnly))
-                    .Select(x => new LocalizedTextServiceSupplementaryFileSource(x, true));
+            var configLangFileSources = new List<LocalizedTextServiceSupplementaryFileSource>();
+
+            foreach (IFileInfo langFileSource in contentFileProvider.GetDirectoryContents(userConfigLangFolder))
+            {
+                if (langFileSource.IsDirectory && langFileSource.Name.InvariantEquals("lang"))
+                {
+                    foreach (IFileInfo langFile in contentFileProvider.GetDirectoryContents($"{userConfigLangFolder}/{langFileSource.Name}"))
+                    {
+                        if (langFile.Name.InvariantEndsWith(".xml") && langFile.PhysicalPath is not null)
+                        {
+                            configLangFileSources.Add(new LocalizedTextServiceSupplementaryFileSource(langFile, true));
+                        }
+                    }
+                }
+            }
 
             return
                 localPluginFileSources
                 .Concat(pluginLangFileSources)
-                .Concat(userLangFileSources);
+                .Concat(configLangFileSources);
         }
 
 
@@ -83,13 +95,12 @@ namespace Umbraco.Extensions
                 foreach (var langFolder in GetLangFolderPaths(fileProvider, pluginFolderPath))
                 {
                     // request all the files out of the path, these will have physicalPath set.
-                    IEnumerable<FileInfo> localizationFiles = fileProvider
+                    IEnumerable<IFileInfo> localizationFiles = fileProvider
                         .GetDirectoryContents(langFolder)
                         .Where(x => !string.IsNullOrEmpty(x.PhysicalPath))
-                        .Where(x => x.Name.InvariantEndsWith(".xml"))
-                        .Select(x => new FileInfo(x.PhysicalPath));
+                        .Where(x => x.Name.InvariantEndsWith(".xml"));
 
-                    foreach (FileInfo file in localizationFiles)
+                    foreach (IFileInfo file in localizationFiles)
                     {
                         yield return new LocalizedTextServiceSupplementaryFileSource(file, overwriteCoreKeys);
                     }

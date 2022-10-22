@@ -30,11 +30,9 @@ test.describe('Relation Types', () => {
     await page.selectOption('select[name="relationType-child"]', {label: "Media"});
     await form.locator('[name="relationType-isdependency"]').last().click({force: true});
     await form.locator('.btn-primary').click();
+    await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.save))
+    await umbracoUi.isSuccessNotificationVisible();
     
-    await page.waitForNavigation();
-
-    expect(page.url()).toContain("#/settings/relationTypes/edit/");
-
     //Clean up
     await umbracoApi.relationTypes.ensureNameNotExists(name);
   });
