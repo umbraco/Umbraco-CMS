@@ -6,6 +6,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(Constants.DatabaseSchema.Tables.UserGroup2App)]
 [ExplicitColumns]
+[PrimaryKey("userGroupId, app", AutoIncrement = false)]
 public class UserGroup2AppDto
 {
     [Column("userGroupId")]

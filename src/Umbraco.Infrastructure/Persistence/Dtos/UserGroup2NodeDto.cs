@@ -6,6 +6,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(TableName)]
 [ExplicitColumns]
+[PrimaryKey("userGroupId, nodeId", AutoIncrement = false)]
 internal class UserGroup2NodeDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.UserGroup2Node;

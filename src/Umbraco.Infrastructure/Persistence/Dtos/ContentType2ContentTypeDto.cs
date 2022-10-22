@@ -6,6 +6,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(Constants.DatabaseSchema.Tables.ElementTypeTree)]
 [ExplicitColumns]
+[PrimaryKey("parentContentTypeId, childContentTypeId", AutoIncrement = false)]
 internal class ContentType2ContentTypeDto
 {
     [Column("parentContentTypeId")]

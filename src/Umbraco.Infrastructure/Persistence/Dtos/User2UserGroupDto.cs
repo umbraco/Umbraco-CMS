@@ -6,6 +6,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(Constants.DatabaseSchema.Tables.User2UserGroup)]
 [ExplicitColumns]
+[PrimaryKey("userId, userGroupId", AutoIncrement = false)]
 public class User2UserGroupDto
 {
     [Column("userId")]

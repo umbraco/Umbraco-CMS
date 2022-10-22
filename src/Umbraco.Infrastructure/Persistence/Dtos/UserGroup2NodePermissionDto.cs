@@ -6,6 +6,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(Constants.DatabaseSchema.Tables.UserGroup2NodePermission)]
 [ExplicitColumns]
+[PrimaryKey("userGroupId, nodeId, permission", AutoIncrement = false)]
 internal class UserGroup2NodePermissionDto
 {
     [Column("userGroupId")]
