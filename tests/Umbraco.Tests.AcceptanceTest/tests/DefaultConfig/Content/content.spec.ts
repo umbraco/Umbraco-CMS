@@ -16,7 +16,17 @@ test.describe('Content tests', () => {
     await page.waitForTimeout(1000);
     await umbracoApi.login();
   });
-  
+
+  const rootDocTypeName = "Test document type";
+  const childDocTypeName = "Child test document type";
+  const firstRootNodeName = "1) Home";
+  const childNodeName = "1) Child";
+  const secondRootNodeName = "2) Home";
+  const saveNode = "saveNew";
+  const contentSection = "content";
+  const defaultContentAlias = "alias";
+  const nodeName = "Home";
+
   async function createSimpleMacro(name, umbracoApi: ApiHelpers){
     const insertMacro = new PartialViewMacroBuilder()
       .withName(name)
@@ -35,13 +45,6 @@ test.describe('Content tests', () => {
   }
 
   test('Copy content', async ({ page, umbracoApi, umbracoUi }) => {
-    const rootDocTypeName = "Test document type";
-    const childDocTypeName = "Child test document type";
-    const firstRootNodeName = "1) Home";
-    const childNodeName = "1) Child";
-    const secondRootNodeName = "2) Home";
-    const saveNode = "saveNew";
-    const contentSection = "content";
 
     await umbracoApi.content.deleteAllContent();
     await umbracoApi.documentTypes.ensureNameNotExists(rootDocTypeName);
@@ -108,13 +111,6 @@ test.describe('Content tests', () => {
   });
 
   test('Move content', async ({ page, umbracoApi, umbracoUi }) => {
-    const rootDocTypeName = "Test document type";
-    const childDocTypeName = "Child test document type";
-    const firstRootNodeName = "1) Home";
-    const childNodeName = "1) Child";
-    const secondRootNodeName = "2) Home";
-    const saveNode = "saveNew";
-    const contentSection = "content";
 
     await umbracoApi.content.deleteAllContent();
     await umbracoApi.documentTypes.ensureNameNotExists(rootDocTypeName);
@@ -182,13 +178,9 @@ test.describe('Content tests', () => {
   });
 
   test('Sort content', async ({ page, umbracoApi, umbracoUi }) => {
-    const rootDocTypeName = "Test document type";
-    const childDocTypeName = "Child test document type";
     const rootNodeName = "1) Home";
     const firstChildNodeName = "1) Child";
     const secondChildNodeName = "2) Child";
-    const saveNode = "saveNew";
-    const contentSection = "content";
 
     await umbracoApi.content.deleteAllContent();
     await umbracoApi.documentTypes.ensureNameNotExists(rootDocTypeName);
@@ -261,10 +253,9 @@ test.describe('Content tests', () => {
   });
 
   test('Rollback content', async ({ page, umbracoApi, umbracoUi }) => {
-    const rootDocTypeName = "Test document type";
+
     const initialNodeName = "Home node";
     const newNodeName = "Home";
-    const contentSection = "content";
 
     await umbracoApi.content.deleteAllContent();
     await umbracoApi.documentTypes.ensureNameNotExists(rootDocTypeName);
@@ -314,11 +305,8 @@ test.describe('Content tests', () => {
   });
 
   test('View audit trail', async ({ page, umbracoApi, umbracoUi }) => {
-    const rootDocTypeName = "Test document type";
-    const nodeName = "Home";
+
     const labelName = "Name";
-    const contentSection = "content";
-    const defaultContentAlias = "alias";
 
     await umbracoApi.documentTypes.ensureNameNotExists(rootDocTypeName);
     await umbracoApi.content.deleteAllContent();
@@ -362,12 +350,8 @@ test.describe('Content tests', () => {
   });
 
   test('Save draft', async ({ page, umbracoApi, umbracoUi }) => {
-    const rootDocTypeName = "Test document type";
-    const nodeName = "Home";
+
     const expected = "Unpublished";
-    const saveNode = "saveNew";
-    const contentSection = "content";
-    const defaultContentAlias = "alias";
 
     await umbracoApi.content.deleteAllContent();
     await umbracoApi.documentTypes.ensureNameNotExists(rootDocTypeName);
@@ -404,11 +388,8 @@ test.describe('Content tests', () => {
   });  
 
   test('Preview draft', async ({ page, umbracoApi, umbracoUi }) => {
-    const rootDocTypeName = "Test document type";
-    const nodeName = "Home";
-    const saveNode = "saveNew";
-    const contentSection = "content";
-    const defaultContentAlias = "alias";
+
+    
 
     await umbracoApi.content.deleteAllContent();
     await umbracoApi.documentTypes.ensureNameNotExists(rootDocTypeName);
@@ -447,11 +428,8 @@ test.describe('Content tests', () => {
   });  
 
   test('Publish draft', async ({ page, umbracoApi, umbracoUi }) => {
-    const rootDocTypeName = "Test document type";
-    const nodeName = "Home";
+
     const expected = "Published";
-    const contentSection = "content";
-    const defaultContentAlias = "alias";
 
     await umbracoApi.content.deleteAllContent();
     await umbracoApi.documentTypes.ensureNameNotExists(rootDocTypeName);
@@ -491,7 +469,6 @@ test.describe('Content tests', () => {
     const pickerDocTypeAlias = AliasHelper.toAlias(pickerDocTypeName);
     const pickedDocTypeName = 'Picked content document type';
     const pickedDocTypeAlias = AliasHelper.toAlias(pickedDocTypeName);
-    const defaultContentAlias = "alias";
 
     await umbracoApi.content.deleteAllContent();
     await umbracoApi.documentTypes.ensureNameNotExists(pickerDocTypeName);
@@ -587,9 +564,6 @@ test.describe('Content tests', () => {
   test('Content with macro in RTE', async ({ page, umbracoApi, umbracoUi }) => {
     const viewMacroName = 'Content with macro in RTE';
     const partialFileName = viewMacroName + '.cshtml';
-    const saveNode = "saveNew";
-    const contentSection = "content";
-    const defaultContentAlias = "alias";
 
     await umbracoApi.macros.ensureNameNotExists(viewMacroName);
     await umbracoApi.partialViews.ensureMacroFileNameNotExists(partialFileName);
@@ -670,8 +644,6 @@ test.describe('Content tests', () => {
     const name = 'Content with macro in grid';
     const macroName = 'Grid macro';
     const macroFileName = macroName + '.cshtml';
-    const contentSection = "content";
-    const defaultContentAlias = "alias";
 
     await umbracoApi.dataTypes.ensureNameNotExists(name);
     await umbracoApi.documentTypes.ensureNameNotExists(name);
