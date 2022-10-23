@@ -219,6 +219,16 @@
   display: none !important
 }
 
+/* Sticky sub header with correct focus ordering */
+.umb-listview .umb-listview__container {
+  display: flex;
+  flex-direction: column;
+}
+
+.umb-listview .umb-listview__container .umb-editor-sub-header {
+  order: -1;
+}
+
 /* ---------- LAYOUTS ---------- */
 
 .list-view-layout {
