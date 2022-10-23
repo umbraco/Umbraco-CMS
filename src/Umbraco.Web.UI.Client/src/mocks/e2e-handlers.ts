@@ -10,6 +10,7 @@ import { handlers as userHandlers } from './domains/user.handlers';
 import { handlers as telemetryHandlers } from './domains/telemetry.handlers';
 import { handlers as treeHandlers } from './domains/entity.handlers';
 import { handlers as propertyEditorHandlers } from './domains/property-editor.handlers';
+import { handlers as examineManagementHandlers } from './domains/examine-management.handlers';
 
 export const handlers = [
 	serverHandlers.serverRunningHandler,
@@ -26,4 +27,5 @@ export const handlers = [
 	...publishedStatusHandlers,
 	...treeHandlers,
 	...propertyEditorHandlers,
+	...examineManagementHandlers,
 ];

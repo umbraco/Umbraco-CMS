@@ -399,6 +399,140 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
+  /examine/index:
+    get:
+      operationId: getIndexers
+      responses:
+        '200':
+          description: 200 response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Indexer'
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /examine/index/{indexName}:
+    get:
+      operationId: getIndex
+      parameters:
+        - name: indexName
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 200 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Indexer'
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /examine/searchers:
+    get:
+      operationId: getSearchers
+      responses:
+        '200':
+          description: 200 response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Searcher'
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /examine/index/{indexName}/rebuild:
+    post:
+      operationId: postIndexRebuild
+      parameters:
+        - name: indexName
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          description: 201 response
+        '400':
+          description: 400 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /examine/searchers/{searcherName}/{searchQuery}:
+    get:
+      operationId: getSearchSearchers
+      parameters:
+        - name: searcherName
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: searchQuery
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 200 response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SearchResult'
+        '400':
+          description: 400 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /examine/index/{indexName}/{searchQuery}:
+    get:
+      operationId: getSearchIndex
+      parameters:
+        - name: indexName
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: searchQuery
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 200 response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SearchResult'
+        '400':
+          description: 400 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
 components:
   schemas:
     ConsentLevel:
@@ -1292,3 +1426,98 @@ components:
           $ref: '#/components/schemas/ConsentLevel'
       required:
         - telemetryLevel
+    Health:
+      type: string
+      enum:
+        - Healthy
+        - Unhealthy
+    ProviderProperties:
+      type: object
+      properties:
+        CommitCount:
+          type: number
+          format: float
+        DefaultAnalyzer:
+          type: string
+        DocumentCount:
+          type: number
+          format: float
+        FieldCount:
+          type: number
+          format: float
+        LuceneDirectory:
+          type: string
+        LuceneIndexFolder:
+          type: string
+        DirectoryFactory:
+          type: string
+        EnableDefaultEventHandler:
+          type: boolean
+        PublishedValuesOnly:
+          type: boolean
+        SupportProtectedContent:
+          type: boolean
+        IncludeFields:
+          type: array
+          items:
+            type: string
+      required:
+        - CommitCount
+        - DefaultAnalyzer
+        - DocumentCount
+        - FieldCount
+        - LuceneDirectory
+        - LuceneIndexFolder
+        - DirectoryFactory
+        - EnableDefaultEventHandler
+        - PublishedValuesOnly
+        - SupportProtectedContent
+    Indexer:
+      type: object
+      properties:
+        name:
+          type: string
+        canRebuild:
+          type: boolean
+        healthStatus:
+          $ref: '#/components/schemas/Health'
+        isHealthy:
+          type: boolean
+        providerProperties:
+          $ref: '#/components/schemas/ProviderProperties'
+      required:
+        - name
+        - canRebuild
+        - healthStatus
+        - isHealthy
+        - providerProperties
+    Searcher:
+      type: object
+      properties:
+        name:
+          type: string
+        providerProperties:
+          type: array
+          items:
+            type: string
+      required:
+        - name
+        - providerProperties
+    SearchResult:
+      type: object
+      properties:
+        id:
+          type: number
+          format: float
+        name:
+          type: string
+        fields:
+          type: object
+        score:
+          type: number
+          format: float
+      required:
+        - id
+        - name
+        - fields
+        - score

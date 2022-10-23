@@ -74,6 +74,24 @@ export interface paths {
   "/telemetry/ConsentLevels": {
     get: operations["ConsentLevels"];
   };
+  "/examine/index": {
+    get: operations["getIndexers"];
+  };
+  "/examine/index/{indexName}": {
+    get: operations["getIndex"];
+  };
+  "/examine/searchers": {
+    get: operations["getSearchers"];
+  };
+  "/examine/index/{indexName}/rebuild": {
+    post: operations["postIndexRebuild"];
+  };
+  "/examine/searchers/{searcherName}/{searchQuery}": {
+    get: operations["getSearchSearchers"];
+  };
+  "/examine/index/{indexName}/{searchQuery}": {
+    get: operations["getSearchIndex"];
+  };
 }
 
 export interface components {
@@ -436,6 +454,43 @@ export interface components {
     };
     ConsentLevelSettings: {
       telemetryLevel: components["schemas"]["ConsentLevel"];
+    };
+    /** @enum {string} */
+    Health: "Healthy" | "Unhealthy";
+    ProviderProperties: {
+      /** Format: float */
+      CommitCount: number;
+      DefaultAnalyzer: string;
+      /** Format: float */
+      DocumentCount: number;
+      /** Format: float */
+      FieldCount: number;
+      LuceneDirectory: string;
+      LuceneIndexFolder: string;
+      DirectoryFactory: string;
+      EnableDefaultEventHandler: boolean;
+      PublishedValuesOnly: boolean;
+      SupportProtectedContent: boolean;
+      IncludeFields?: string[];
+    };
+    Indexer: {
+      name: string;
+      canRebuild: boolean;
+      healthStatus: components["schemas"]["Health"];
+      isHealthy: boolean;
+      providerProperties: components["schemas"]["ProviderProperties"];
+    };
+    Searcher: {
+      name: string;
+      providerProperties: string[];
+    };
+    SearchResult: {
+      /** Format: float */
+      id: number;
+      name: string;
+      fields: { [key: string]: unknown };
+      /** Format: float */
+      score: number;
     };
   };
 }
@@ -824,6 +879,120 @@ export interface operations {
       };
       /** default response */
       default: {
+        content: {
+          "application/json": components["schemas"]["ProblemDetails"];
+        };
+      };
+    };
+  };
+  getIndexers: {
+    responses: {
+      /** 200 response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["Indexer"][];
+        };
+      };
+      /** default response */
+      default: {
+        content: {
+          "application/json": components["schemas"]["ProblemDetails"];
+        };
+      };
+    };
+  };
+  getIndex: {
+    parameters: {
+      path: {
+        indexName: string;
+      };
+    };
+    responses: {
+      /** 200 response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["Indexer"];
+        };
+      };
+      /** default response */
+      default: {
+        content: {
+          "application/json": components["schemas"]["ProblemDetails"];
+        };
+      };
+    };
+  };
+  getSearchers: {
+    responses: {
+      /** 200 response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["Searcher"][];
+        };
+      };
+      /** default response */
+      default: {
+        content: {
+          "application/json": components["schemas"]["ProblemDetails"];
+        };
+      };
+    };
+  };
+  postIndexRebuild: {
+    parameters: {
+      path: {
+        indexName: string;
+      };
+    };
+    responses: {
+      /** 201 response */
+      201: unknown;
+      /** 400 response */
+      400: {
+        content: {
+          "application/json": components["schemas"]["ProblemDetails"];
+        };
+      };
+    };
+  };
+  getSearchSearchers: {
+    parameters: {
+      path: {
+        searcherName: string;
+        searchQuery: string;
+      };
+    };
+    responses: {
+      /** 200 response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["SearchResult"][];
+        };
+      };
+      /** 400 response */
+      400: {
+        content: {
+          "application/json": components["schemas"]["ProblemDetails"];
+        };
+      };
+    };
+  };
+  getSearchIndex: {
+    parameters: {
+      path: {
+        indexName: string;
+        searchQuery: string;
+      };
+    };
+    responses: {
+      /** 200 response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["SearchResult"][];
+        };
+      };
+      /** 400 response */
+      400: {
         content: {
           "application/json": components["schemas"]["ProblemDetails"];
         };

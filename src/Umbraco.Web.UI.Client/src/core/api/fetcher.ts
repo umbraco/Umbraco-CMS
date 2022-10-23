@@ -25,6 +25,15 @@ export const getConsentLevels = fetcher.path('/telemetry/ConsentLevels').method(
 export const getConsentLevel = fetcher.path('/telemetry/ConsentLevel').method('get').create();
 export const postConsentLevel = fetcher.path('/telemetry/ConsentLevel').method('post').create();
 
+export const getIndexers = fetcher.path('/examine/index').method('get').create();
+export const getSearchers = fetcher.path('/examine/searchers').method('get').create();
+export const getIndex = fetcher.path('/examine/index/{indexName}').method('get').create();
+export const postIndexRebuild = fetcher.path('/examine/index/{indexName}/rebuild').method('post').create();
+export const getSearchResultFromIndex = fetcher.path('/examine/index/{indexName}/{searchQuery}').method('get').create();
+export const getSearchResultFromSearchers = fetcher
+	.path('/examine/searchers/{searcherName}/{searchQuery}')
+	.method('get')
+	.create();
 
 // Property Editors
 export const getPropertyEditorsList = fetcher.path('/property-editors/list').method('get').create();
@@ -36,8 +45,8 @@ export const getPropertyEditorConfig = fetcher
 	.path('/property-editors/property-editor/config/{propertyEditorAlias}')
 	.method('get')
 	.create();
+
 export const getPublishedCacheStatus = fetcher.path('/published-cache/status').method('get').create();
 export const postPublishedCacheReload = fetcher.path('/published-cache/reload').method('post').create();
 export const postPublishedCacheRebuild = fetcher.path('/published-cache/rebuild').method('post').create();
 export const getPublishedCacheCollect = fetcher.path('/published-cache/collect').method('get').create();
-

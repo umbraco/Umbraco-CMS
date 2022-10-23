@@ -12,6 +12,7 @@ import { handlers as telemetryHandlers } from './domains/telemetry.handlers';
 import { handlers as propertyEditorHandlers } from './domains/property-editor.handlers';
 import { handlers as usersHandlers } from './domains/users.handlers';
 import { handlers as userGroupsHandlers } from './domains/user-groups.handlers';
+import { handlers as examineManagementHandlers } from './domains/examine-management.handlers';
 
 const handlers = [
 	serverHandlers.serverVersionHandler,
@@ -28,6 +29,7 @@ const handlers = [
 	...publishedStatusHandlers,
 	...usersHandlers,
 	...userGroupsHandlers,
+	...examineManagementHandlers,
 ];
 
 switch (import.meta.env.VITE_UMBRACO_INSTALL_STATUS) {

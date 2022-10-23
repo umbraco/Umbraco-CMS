@@ -6,6 +6,7 @@ import './upgrader';
 import './user';
 import './telemetry';
 import './property-editors';
+import './examine-management';
 
 import { api } from '@airtasker/spot';
 
