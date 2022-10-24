@@ -33,7 +33,6 @@ public class FileService : RepositoryService, IFileService
     private readonly IShortStringHelper _shortStringHelper;
     private readonly IStylesheetRepository _stylesheetRepository;
     private readonly ITemplateRepository _templateRepository;
-    private static readonly object _scopeLock = new();
 
     public FileService(
         ICoreScopeProvider uowProvider,
@@ -362,27 +361,23 @@ public class FileService : RepositoryService, IFileService
             template.Content = content;
         }
 
-
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
-        var savingEvent = new TemplateSavingNotification(template, eventMessages, true, contentTypeAlias!);
-        if (scope.Notifications.PublishCancelable(savingEvent))
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
-            scope.Complete();
-            return OperationResult.Attempt.Fail<OperationResultType, ITemplate>(
-                OperationResultType.FailedCancelledByEvent, eventMessages, template);
-        }
+            var savingEvent = new TemplateSavingNotification(template, eventMessages, true, contentTypeAlias!);
+            if (scope.Notifications.PublishCancelable(savingEvent))
+            {
+                scope.Complete();
+                return OperationResult.Attempt.Fail<OperationResultType, ITemplate>(
+                    OperationResultType.FailedCancelledByEvent, eventMessages, template);
+            }
 
-        // This lock prevents a SQLite locking issue, for more info see: https://github.com/umbraco/Umbraco-CMS/pull/13246
-        lock (_scopeLock)
-        {
             _templateRepository.Save(template);
+            scope.Notifications.Publish(
+                new TemplateSavedNotification(template, eventMessages).WithStateFrom(savingEvent));
+
+            Audit(AuditType.Save, userId, template.Id, UmbracoObjectTypes.Template.GetName());
+            scope.Complete();
         }
-
-        scope.Notifications.Publish(
-            new TemplateSavedNotification(template, eventMessages).WithStateFrom(savingEvent));
-
-        Audit(AuditType.Save, userId, template.Id, UmbracoObjectTypes.Template.GetName());
-        scope.Complete();
 
         return OperationResult.Attempt.Succeed<OperationResultType, ITemplate>(
             OperationResultType.Success,
