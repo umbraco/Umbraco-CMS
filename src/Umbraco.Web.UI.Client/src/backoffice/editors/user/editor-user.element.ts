@@ -5,11 +5,11 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { Subscription } from 'rxjs';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { UmbContextProviderMixin, UmbContextConsumerMixin } from '../../../core/context';
-import UmbSectionViewUsersElement from '../../sections/users/views/users/section-view-users.element';
 import { UmbUserStore } from '../../../core/stores/user/user.store';
 import type { UserDetails } from '../../../core/models';
 import { UmbUserContext } from './user.context';
 import '../../property-editor-uis/content-picker/property-editor-ui-content-picker.element';
+import '../../sections/users/picker-user-group.element';
 
 import '../shared/editor-entity-layout/editor-entity-layout.element';
 import { getTagLookAndColor } from '../../sections/users/user-extensions';
@@ -176,6 +176,7 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(UmbContextCons
 					<div>
 						<b>Groups</b>
 						<div class="faded-text">Add groups to assign access and permissions</div>
+						<umb-picker-user-group></umb-picker-user-group>
 					</div>
 					<div>
 						<b>Content start nodes</b>
