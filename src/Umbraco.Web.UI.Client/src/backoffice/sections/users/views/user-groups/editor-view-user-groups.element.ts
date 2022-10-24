@@ -73,16 +73,14 @@ export class UmbEditorViewUserGroupsElement extends UmbContextConsumerMixin(LitE
 
 		this.consumeContext('umbUserGroupStore', (userStore: UmbUserGroupStore) => {
 			this._userGroupStore = userStore;
-			this._observeUsers();
+			this._observeUserGroups();
 		});
 	}
 
-	private _observeUsers() {
+	private _observeUserGroups() {
 		this._userGroupsSubscription?.unsubscribe();
 		this._userGroupsSubscription = this._userGroupStore?.getAll().subscribe((userGroups) => {
 			this._userGroups = userGroups;
-			console.log('user groups', userGroups);
-
 			this._createTableItems(this._userGroups);
 		});
 	}

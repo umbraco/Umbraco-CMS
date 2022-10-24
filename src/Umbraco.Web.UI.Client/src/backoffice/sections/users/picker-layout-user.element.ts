@@ -70,13 +70,13 @@ export class UmbPickerLayoutUserElement extends UmbContextConsumerMixin(UmbModal
 	connectedCallback(): void {
 		super.connectedCallback();
 		this._selection = this.data?.selection || [];
-		this.consumeContext('umbUserStore', (usersContext: UmbUserStore) => {
-			this._userStore = usersContext;
-			this._observeUser();
+		this.consumeContext('umbUserStore', (userStore: UmbUserStore) => {
+			this._userStore = userStore;
+			this._observeUsers();
 		});
 	}
 
-	private _observeUser() {
+	private _observeUsers() {
 		this._usersSubscription?.unsubscribe();
 
 		this._usersSubscription = this._userStore?.getAll().subscribe((users) => {
