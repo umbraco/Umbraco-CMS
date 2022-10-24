@@ -1765,8 +1765,8 @@ internal class DatabaseDataCreator
         // For languages we support the installation of records that are additional to the default installed data.
         // We can do this as they are specified by ISO code, which is enough to fully detail them. All other customizable install data is
         // specified by GUID, and hence we only know about the set that are installed by default.
-        InstallDefaultDataSettings languageInstallDefaultDataSettings = _installDefaultDataSettings.Get(Constants.Configuration.NamedOptions.InstallDefaultData.Languages);
-        if (languageInstallDefaultDataSettings.InstallData == InstallDefaultDataOption.Values)
+        InstallDefaultDataSettings? languageInstallDefaultDataSettings = _installDefaultDataSettings.Get(Constants.Configuration.NamedOptions.InstallDefaultData.Languages);
+        if (languageInstallDefaultDataSettings != null && languageInstallDefaultDataSettings.InstallData == InstallDefaultDataOption.Values)
         {
             CreateSpecifiedlLanguageData(languageInstallDefaultDataSettings.Values, DefaultIsoCode);
         }
