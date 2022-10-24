@@ -7,10 +7,15 @@ namespace Umbraco.Cms.Core.Deploy;
 public sealed class DeployContextCache : DictionaryCache
 {
     /// <summary>
+    /// The prefix added to the <see cref="IDeployContext" /> item keys.
+    /// </summary>
+    public const string Prefix = "ContextCache.";
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="DeployContextCache" /> class.
     /// </summary>
     /// <param name="deployContext">The deploy context.</param>
     public DeployContextCache(IDeployContext deployContext)
-        : base(deployContext.Items, "ContextCache.")
+        : base(deployContext.Items, Prefix)
     { }
 }
