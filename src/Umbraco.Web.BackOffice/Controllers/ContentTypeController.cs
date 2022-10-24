@@ -101,7 +101,7 @@ public class ContentTypeController : ContentTypeControllerBase<IContentType>
     {
     }
 
-    [ActivatorUtilitiesConstructor]
+    [Obsolete("Please use constructor that takes an ICoreScopeProvider")]
     public ContentTypeController(
            ICultureDictionary cultureDictionary,
            IContentTypeService contentTypeService,
@@ -122,6 +122,52 @@ public class ContentTypeController : ContentTypeControllerBase<IContentType>
            EditorValidatorCollection editorValidatorCollection,
            PackageDataInstallation packageDataInstallation,
            BlockGridSampleHelper blockGridSampleHelper)
+        : this(
+            cultureDictionary,
+            contentTypeService,
+            mediaTypeService,
+            memberTypeService,
+            umbracoMapper,
+            localizedTextService,
+            serializer,
+            propertyEditors,
+            backofficeSecurityAccessor,
+            dataTypeService,
+            shortStringHelper,
+            fileService,
+            logger,
+            contentService,
+            contentTypeBaseServiceProvider,
+            hostingEnvironment,
+            editorValidatorCollection,
+            packageDataInstallation,
+            blockGridSampleHelper,
+            StaticServiceProvider.Instance.GetRequiredService<ICoreScopeProvider>())
+        {
+        }
+
+    [ActivatorUtilitiesConstructor]
+    public ContentTypeController(
+           ICultureDictionary cultureDictionary,
+           IContentTypeService contentTypeService,
+           IMediaTypeService mediaTypeService,
+           IMemberTypeService memberTypeService,
+           IUmbracoMapper umbracoMapper,
+           ILocalizedTextService localizedTextService,
+           IEntityXmlSerializer serializer,
+           PropertyEditorCollection propertyEditors,
+           IBackOfficeSecurityAccessor backofficeSecurityAccessor,
+           IDataTypeService dataTypeService,
+           IShortStringHelper shortStringHelper,
+           IFileService fileService,
+           ILogger<ContentTypeController> logger,
+           IContentService contentService,
+           IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
+           IHostingEnvironment hostingEnvironment,
+           EditorValidatorCollection editorValidatorCollection,
+           PackageDataInstallation packageDataInstallation,
+           BlockGridSampleHelper blockGridSampleHelper,
+           ICoreScopeProvider coreScopeProvider)
            : base(
                cultureDictionary,
                editorValidatorCollection,
@@ -146,6 +192,7 @@ public class ContentTypeController : ContentTypeControllerBase<IContentType>
             _hostingEnvironment = hostingEnvironment;
             _packageDataInstallation = packageDataInstallation;
             _blockGridSampleHelper = blockGridSampleHelper;
+            _coreScopeProvider = coreScopeProvider;
         }
 
     [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
