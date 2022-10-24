@@ -16,6 +16,7 @@ public class DatabaseSchemaCreatorFactory
 {
     private readonly IEventAggregator _eventAggregator;
     private readonly IOptionsMonitor<InstallDefaultDataSettings> _installDefaultDataSettings;
+    private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
     private readonly ILogger<DatabaseSchemaCreator> _logger;
     private readonly ILoggerFactory _loggerFactory;
     private readonly IUmbracoVersion _umbracoVersion;
@@ -31,20 +32,34 @@ public class DatabaseSchemaCreatorFactory
     {
     }
 
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in V12.")]
     public DatabaseSchemaCreatorFactory(
         ILogger<DatabaseSchemaCreator> logger,
         ILoggerFactory loggerFactory,
         IUmbracoVersion umbracoVersion,
         IEventAggregator eventAggregator,
         IOptionsMonitor<InstallDefaultDataSettings> installDefaultDataSettings)
+        : this(logger, loggerFactory, umbracoVersion, eventAggregator, installDefaultDataSettings,
+            StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<GlobalSettings>>())
+    {
+    }
+
+    public DatabaseSchemaCreatorFactory(
+        ILogger<DatabaseSchemaCreator> logger,
+        ILoggerFactory loggerFactory,
+        IUmbracoVersion umbracoVersion,
+        IEventAggregator eventAggregator,
+        IOptionsMonitor<InstallDefaultDataSettings> installDefaultDataSettings,
+        IOptionsMonitor<GlobalSettings> globalSettings)
     {
         _logger = logger;
         _loggerFactory = loggerFactory;
         _umbracoVersion = umbracoVersion;
         _eventAggregator = eventAggregator;
         _installDefaultDataSettings = installDefaultDataSettings;
+        _globalSettings = globalSettings;
     }
 
     public DatabaseSchemaCreator Create(IUmbracoDatabase? database) => new DatabaseSchemaCreator(database, _logger,
-        _loggerFactory, _umbracoVersion, _eventAggregator, _installDefaultDataSettings);
+        _loggerFactory, _umbracoVersion, _eventAggregator, _installDefaultDataSettings, _globalSettings);
 }

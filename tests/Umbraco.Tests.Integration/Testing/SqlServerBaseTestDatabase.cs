@@ -101,9 +101,12 @@ public abstract class SqlServerBaseTestDatabase : BaseTestDatabase
 
             using (var transaction = database.GetTransaction())
             {
-                var options =
+                var installDefaultDataSettings =
                     new TestOptionsMonitor<InstallDefaultDataSettings>(
                         new InstallDefaultDataSettings { InstallData = InstallDefaultDataOption.All });
+                var globalSettings =
+                    new TestOptionsMonitor<GlobalSettings>(
+                        new GlobalSettings());
 
                 var schemaCreator = new DatabaseSchemaCreator(
                     database,
@@ -111,7 +114,8 @@ public abstract class SqlServerBaseTestDatabase : BaseTestDatabase
                     _loggerFactory,
                     new UmbracoVersion(),
                     Mock.Of<IEventAggregator>(),
-                    options);
+                    installDefaultDataSettings,
+                    globalSettings);
 
                 schemaCreator.InitializeDatabaseSchema();
 

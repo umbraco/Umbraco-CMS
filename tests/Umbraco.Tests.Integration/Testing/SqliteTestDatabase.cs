@@ -116,9 +116,12 @@ public class SqliteTestDatabase : BaseTestDatabase, ITestDatabase
 
         using var transaction = database.GetTransaction();
 
-        var options =
+        var installDefaultDataSettings =
             new TestOptionsMonitor<InstallDefaultDataSettings>(
                 new InstallDefaultDataSettings { InstallData = InstallDefaultDataOption.All });
+        var globalSettings =
+            new TestOptionsMonitor<GlobalSettings>(
+                new GlobalSettings());
 
         var schemaCreator = new DatabaseSchemaCreator(
             database,
@@ -126,7 +129,8 @@ public class SqliteTestDatabase : BaseTestDatabase, ITestDatabase
             _loggerFactory,
             new UmbracoVersion(),
             Mock.Of<IEventAggregator>(),
-            options);
+            installDefaultDataSettings,
+            globalSettings);
 
         schemaCreator.InitializeDatabaseSchema();
         transaction.Complete();

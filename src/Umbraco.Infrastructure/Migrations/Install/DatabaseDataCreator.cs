@@ -1,3 +1,4 @@
+using System.Globalization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NPoco;
@@ -28,16 +29,22 @@ internal class DatabaseDataCreator
     };
 
     private readonly IOptionsMonitor<InstallDefaultDataSettings> _installDefaultDataSettings;
+    private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
     private readonly ILogger<DatabaseDataCreator> _logger;
     private readonly IUmbracoVersion _umbracoVersion;
 
-    public DatabaseDataCreator(IDatabase database, ILogger<DatabaseDataCreator> logger, IUmbracoVersion umbracoVersion,
-        IOptionsMonitor<InstallDefaultDataSettings> installDefaultDataSettings)
+    public DatabaseDataCreator(
+        IDatabase database,
+        ILogger<DatabaseDataCreator> logger,
+        IUmbracoVersion umbracoVersion,
+        IOptionsMonitor<InstallDefaultDataSettings> installDefaultDataSettings,
+        IOptionsMonitor<GlobalSettings> globalSettings)
     {
         _database = database;
         _logger = logger;
         _umbracoVersion = umbracoVersion;
         _installDefaultDataSettings = installDefaultDataSettings;
+        _globalSettings = globalSettings;
     }
 
     /// <summary>
@@ -1745,13 +1752,46 @@ internal class DatabaseDataCreator
         }
     }
 
-    private void CreateLanguageData() =>
+    private void CreateLanguageData()
+    {
+        const string DefaultIsoCode = "en-US";
         ConditionalInsert(
             Constants.Configuration.NamedOptions.InstallDefaultData.Languages,
             "en-us",
-            new LanguageDto { Id = 1, IsoCode = "en-US", CultureName = "English (United States)", IsDefault = true },
+            new LanguageDto { Id = 1, IsoCode = DefaultIsoCode, CultureName = "English (United States)", IsDefault = true },
             Constants.DatabaseSchema.Tables.Language,
             "id");
+
+        // For languages we support the installation of records that are additional to the default installed data.
+        // We can do this as they are specified by ISO code, which is enough to fully detail them. All other customizable install data is
+        // specified by GUID, and hence we only know about the set that are installed by default).
+        InstallDefaultDataSettings languageInstallDefaultDataSettings = _installDefaultDataSettings.Get(Constants.Configuration.NamedOptions.InstallDefaultData.Languages);
+        if (languageInstallDefaultDataSettings.InstallData == InstallDefaultDataOption.Values)
+        {
+            CreateSpecifiedlLanguageData(languageInstallDefaultDataSettings.Values, DefaultIsoCode);
+        }
+    }
+
+    private void CreateSpecifiedlLanguageData(IList<string> isoCodes, string defaultIsoCode)
+    {
+        foreach (var isoCode in isoCodes.Where(x => !string.Equals(x, defaultIsoCode, StringComparison.OrdinalIgnoreCase)))
+        {
+            var culture = new CultureInfo(isoCode);
+            var dto = new LanguageDto
+            {
+                IsoCode = culture.Name,
+                CultureName = culture.DisplayName,
+                IsDefault = IsDefaultLanguage(culture),
+            };
+            _database.Insert(Constants.DatabaseSchema.Tables.Language, "id", true, dto);
+        }
+    }
+
+    private bool IsDefaultLanguage(CultureInfo culture) =>
+        string.Equals(
+            culture.Name,
+            _globalSettings.CurrentValue.DefaultUILanguage,
+            StringComparison.OrdinalIgnoreCase);
 
     private void CreateContentChildTypeData()
     {

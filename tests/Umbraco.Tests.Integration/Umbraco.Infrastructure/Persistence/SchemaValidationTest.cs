@@ -33,7 +33,9 @@ public class SchemaValidationTest : UmbracoIntegrationTest
                 UmbracoVersion,
                 EventAggregator,
                 Mock.Of<IOptionsMonitor<InstallDefaultDataSettings>>(x =>
-                    x.CurrentValue == new InstallDefaultDataSettings()));
+                    x.CurrentValue == new InstallDefaultDataSettings()),
+                Mock.Of<IOptionsMonitor<GlobalSettings>>(x =>
+                    x.CurrentValue == new GlobalSettings()));
             schema.InitializeDatabaseSchema();
             result = schema.ValidateSchema(DatabaseSchemaCreator._orderedTables);
         }

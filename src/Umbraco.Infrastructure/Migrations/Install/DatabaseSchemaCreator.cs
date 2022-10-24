@@ -88,6 +88,7 @@ public class DatabaseSchemaCreator
 
     private readonly IUmbracoDatabase _database;
     private readonly IOptionsMonitor<InstallDefaultDataSettings> _defaultDataCreationSettings;
+    private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
     private readonly IEventAggregator _eventAggregator;
     private readonly ILogger<DatabaseSchemaCreator> _logger;
     private readonly ILoggerFactory _loggerFactory;
@@ -105,6 +106,7 @@ public class DatabaseSchemaCreator
     {
     }
 
+    [Obsolete("Please use constructor taking all parameters. Scheduled for removal in V12.")]
     public DatabaseSchemaCreator(
         IUmbracoDatabase? database,
         ILogger<DatabaseSchemaCreator> logger,
@@ -112,6 +114,19 @@ public class DatabaseSchemaCreator
         IUmbracoVersion umbracoVersion,
         IEventAggregator eventAggregator,
         IOptionsMonitor<InstallDefaultDataSettings> defaultDataCreationSettings)
+        : this(database, logger, loggerFactory, umbracoVersion, eventAggregator, defaultDataCreationSettings,
+            StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<GlobalSettings>>())
+    {
+    }
+
+    public DatabaseSchemaCreator(
+        IUmbracoDatabase? database,
+        ILogger<DatabaseSchemaCreator> logger,
+        ILoggerFactory loggerFactory,
+        IUmbracoVersion umbracoVersion,
+        IEventAggregator eventAggregator,
+        IOptionsMonitor<InstallDefaultDataSettings> defaultDataCreationSettings,
+        IOptionsMonitor<GlobalSettings> globalSettings)
     {
         _database = database ?? throw new ArgumentNullException(nameof(database));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -119,6 +134,7 @@ public class DatabaseSchemaCreator
         _umbracoVersion = umbracoVersion ?? throw new ArgumentNullException(nameof(umbracoVersion));
         _eventAggregator = eventAggregator;
         _defaultDataCreationSettings = defaultDataCreationSettings;
+        _globalSettings = globalSettings;
 
         if (_database?.SqlContext?.SqlSyntax == null)
         {
@@ -178,7 +194,8 @@ public class DatabaseSchemaCreator
             var dataCreation = new DatabaseDataCreator(
                 _database, _loggerFactory.CreateLogger<DatabaseDataCreator>(),
                 _umbracoVersion,
-                _defaultDataCreationSettings);
+                _defaultDataCreationSettings,
+                _globalSettings);
             foreach (Type table in _orderedTables)
             {
                 CreateTable(false, table, dataCreation);
@@ -455,7 +472,8 @@ public class DatabaseSchemaCreator
                 _database,
                 _loggerFactory.CreateLogger<DatabaseDataCreator>(),
                 _umbracoVersion,
-                _defaultDataCreationSettings));
+                _defaultDataCreationSettings,
+                _globalSettings));
     }
 
     /// <summary>

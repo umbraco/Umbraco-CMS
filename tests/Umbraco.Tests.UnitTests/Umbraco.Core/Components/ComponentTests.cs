@@ -63,7 +63,8 @@ public class ComponentTests
                 loggerFactory,
                 new UmbracoVersion(),
                 Mock.Of<IEventAggregator>(),
-                Mock.Of<IOptionsMonitor<InstallDefaultDataSettings>>()),
+                Mock.Of<IOptionsMonitor<InstallDefaultDataSettings>>(),
+                Mock.Of<IOptionsMonitor<GlobalSettings>>()),
             mapperCollection);
 
         var fs = new FileSystems(
