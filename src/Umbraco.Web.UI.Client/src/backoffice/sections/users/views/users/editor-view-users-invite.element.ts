@@ -5,7 +5,7 @@ import { UmbContextConsumerMixin } from '../../../../../core/context';
 import { UmbModalLayoutElement } from '../../../../../core/services/modal/layouts/modal-layout.element';
 import { UmbUserStore } from '../../../../../core/stores/user/user.store';
 import type { UserDetails } from '../../../../../core/models';
-import { UmbNotificationService } from '../../../../../core/services/notification';
+import '../../picker-user-group.element';
 
 export type UsersViewType = 'list' | 'grid';
 @customElement('umb-editor-view-users-invite')
@@ -122,7 +122,7 @@ export class UmbEditorViewUsersInviteElement extends UmbContextConsumerMixin(Umb
 					<uui-form-layout-item>
 						<uui-label slot="label" for="userGroup" required>User group</uui-label>
 						<span slot="description">Add groups to assign access and permissions</span>
-						<b>ADD USER GROUP PICKER HERE</b>
+						<umb-picker-user-group></umb-picker-user-group>
 					</uui-form-layout-item>
 					<uui-form-layout-item>
 						<uui-label slot="label" for="message" required>Message</uui-label>
