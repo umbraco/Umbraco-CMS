@@ -1,6 +1,6 @@
 import { body, defaultResponse, endpoint, pathParams, request, response, String } from '@airtasker/spot';
 import { ProblemDetails } from './models';
-import { Indexer, Searcher, SearchResult } from '../src/mocks/data/examine.data';
+import { Indexer, Searcher, SearchResult } from '../src/core/mocks/data/examine.data';
 
 @endpoint({
 	method: 'GET',
