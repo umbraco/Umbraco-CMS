@@ -24,12 +24,19 @@ export class UmbPickerLayoutUserGroupElement extends UmbContextConsumerMixin(Umb
 			}
 			.item {
 				color: var(--uui-color-interactive);
-				display: flex;
+				display: grid;
+				grid-template-columns: var(--uui-size-8) 1fr;
+				height: var(--uui-size-8);
 				align-items: center;
 				padding: var(--uui-size-2);
 				gap: var(--uui-size-space-5);
 				cursor: pointer;
-				position: relative;
+			}
+			.item uui-icon {
+				height: 100%;
+				width: 100%;
+				box-sizing: border-box;
+				display: flex;
 			}
 			.item:hover {
 				background-color: var(--uui-color-surface-emphasis);
@@ -37,6 +44,16 @@ export class UmbPickerLayoutUserGroupElement extends UmbContextConsumerMixin(Umb
 			}
 			.item:hover .selected-checkbox {
 				border-color: var(--uui-color-surface-emphasis);
+			}
+			.selected-checkbox {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				background-color: var(--uui-color-selected);
+				color: var(--uui-color-selected-contrast);
+				padding: var(--uui-size-1);
+				border-radius: var(--uui-size-2);
+				border: 2px solid var(--uui-color-surface);
 			}
 		`,
 	];
@@ -98,6 +115,17 @@ export class UmbPickerLayoutUserGroupElement extends UmbContextConsumerMixin(Umb
 		return this._selection.includes(key);
 	}
 
+	private _renderCheckbox() {
+		return html`
+			<div class="selected-checkbox">
+				<uui-icon name="check"></uui-icon>
+			</div>
+		`;
+	}
+	private _renderIcon(item: UserGroupDetails) {
+		return this._isSelected(item.key) ? this._renderCheckbox() : html`<uui-icon .name=${item.icon}></uui-icon>`;
+	}
+
 	render() {
 		return html`
 			<umb-editor-entity-layout headline="Select users">
@@ -110,7 +138,8 @@ export class UmbPickerLayoutUserGroupElement extends UmbContextConsumerMixin(Umb
 								@click=${() => this._handleItemClick(item.key)}
 								@keydown=${(e: KeyboardEvent) => this._handleKeydown(e, item.key)}
 								class="item">
-								${item.name}
+								${this._renderIcon(item)}
+								<span>${item.name}</span>
 							</div>
 						`
 					)}
