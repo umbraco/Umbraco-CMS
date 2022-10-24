@@ -11,7 +11,7 @@ import { UmbNotificationService } from '../../../core/services/notification';
 import { UmbNotificationDefaultData } from '../../../core/services/notification/layouts/default';
 import { UmbModalLayoutElement } from '../../../core/services/modal/layouts/modal-layout.element';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-import { getIndex, postIndexRebuild, getSearchResultFromIndex } from '@umbraco-cms/backend-api';
+import { getIndex, postIndexRebuild } from '@umbraco-cms/backend-api';
 
 @customElement('examine-management-index')
 export class UmbDashboardExamineManagementIndexElement extends UmbContextConsumerMixin(LitElement) {
@@ -135,7 +135,7 @@ export class UmbDashboardExamineManagementIndexElement extends UmbContextConsume
 			try {
 				const res = await getSearchResultFromIndex({
 					indexName: this._indexData.name,
-					searchQuery: this._searchInput.value,
+					query: this._searchInput.value,
 				});
 				this._searchResults = res.data as SearchResult[];
 				console.log(this._searchResults);

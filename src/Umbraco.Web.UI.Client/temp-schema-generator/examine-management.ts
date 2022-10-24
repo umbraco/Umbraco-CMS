@@ -1,12 +1,21 @@
-import { body, defaultResponse, endpoint, pathParams, request, response, String } from '@airtasker/spot';
+import { body, defaultResponse, endpoint, pathParams, queryParams, request, response, String } from '@airtasker/spot';
 import { ProblemDetails } from './models';
 import { Indexer, Searcher, SearchResult } from '../src/core/mocks/data/examine.data';
 
 @endpoint({
 	method: 'GET',
-	path: '/examine/index',
+	path: '/search/index',
 })
 export class getIndexers {
+	@request
+	request(
+		@queryParams
+		queryParams: {
+			skip: number;
+			take: number;
+		}
+	) {}
+
 	@response({ status: 200 })
 	success(@body body: Indexer[]) {}
 
@@ -16,7 +25,7 @@ export class getIndexers {
 
 @endpoint({
 	method: 'GET',
-	path: '/examine/index/:indexName',
+	path: '/search/index/:indexName',
 })
 export class getIndex {
 	@request
@@ -35,20 +44,8 @@ export class getIndex {
 }
 
 @endpoint({
-	method: 'GET',
-	path: '/examine/searchers',
-})
-export class getSearchers {
-	@response({ status: 200 })
-	success(@body body: Searcher[]) {}
-
-	@defaultResponse
-	default(@body body: ProblemDetails) {}
-}
-
-@endpoint({
 	method: 'POST',
-	path: '/examine/index/:indexName/rebuild',
+	path: '/search/index/:indexName/rebuild',
 })
 export class postIndexRebuild {
 	@request
@@ -67,7 +64,28 @@ export class postIndexRebuild {
 
 @endpoint({
 	method: 'GET',
-	path: '/examine/searchers/:searcherName/:searchQuery',
+	path: '/search/searcher',
+})
+export class getSearchers {
+	@request
+	request(
+		@queryParams
+		queryParams: {
+			skip: number;
+			take: number;
+		}
+	) {}
+
+	@response({ status: 200 })
+	success(@body body: Searcher[]) {}
+
+	@defaultResponse
+	default(@body body: ProblemDetails) {}
+}
+
+@endpoint({
+	method: 'GET',
+	path: '/search/searcher/:searcherName',
 })
 export class getSearchSearchers {
 	@request
@@ -75,28 +93,11 @@ export class getSearchSearchers {
 		@pathParams
 		pathParams: {
 			searcherName: String;
-			searchQuery: String;
-		}
-	) {}
-
-	@response({ status: 200 })
-	success(@body body: SearchResult[]) {}
-
-	@response({ status: 400 })
-	badRequest(@body body: ProblemDetails) {}
-}
-
-@endpoint({
-	method: 'GET',
-	path: '/examine/index/:indexName/:searchQuery',
-})
-export class getSearchIndex {
-	@request
-	request(
-		@pathParams
-		pathParams: {
-			indexName: String;
-			searchQuery: String;
+		},
+		@queryParams
+		queryParams: {
+			query: String;
+			take: number;
 		}
 	) {}
 

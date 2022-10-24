@@ -25,15 +25,11 @@ export const getConsentLevels = fetcher.path('/telemetry/ConsentLevels').method(
 export const getConsentLevel = fetcher.path('/telemetry/ConsentLevel').method('get').create();
 export const postConsentLevel = fetcher.path('/telemetry/ConsentLevel').method('post').create();
 
-export const getIndexers = fetcher.path('/examine/index').method('get').create();
-export const getSearchers = fetcher.path('/examine/searchers').method('get').create();
-export const getIndex = fetcher.path('/examine/index/{indexName}').method('get').create();
-export const postIndexRebuild = fetcher.path('/examine/index/{indexName}/rebuild').method('post').create();
-export const getSearchResultFromIndex = fetcher.path('/examine/index/{indexName}/{searchQuery}').method('get').create();
-export const getSearchResultFromSearchers = fetcher
-	.path('/examine/searchers/{searcherName}/{searchQuery}')
-	.method('get')
-	.create();
+export const getIndexers = fetcher.path('/search/index').method('get').create();
+export const getIndex = fetcher.path('/search/index/{indexName}').method('get').create();
+export const postIndexRebuild = fetcher.path('/search/index/{indexName}/rebuild').method('post').create();
+export const getSearchers = fetcher.path('/search/searcher').method('get').create();
+export const getSearchResultFromSearchers = fetcher.path('/search/searcher/{searcherName}').method('get').create();
 
 // Property Editors
 export const getPropertyEditorsList = fetcher.path('/property-editors/list').method('get').create();

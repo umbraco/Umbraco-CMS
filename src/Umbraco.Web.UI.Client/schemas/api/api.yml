@@ -399,9 +399,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
-  /examine/index:
+  /search/index:
     get:
       operationId: getIndexers
+      parameters:
+        - name: skip
+          in: query
+          required: true
+          schema:
+            type: number
+            format: float
+        - name: take
+          in: query
+          required: true
+          schema:
+            type: number
+            format: float
       responses:
         '200':
           description: 200 response
@@ -417,7 +430,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
-  /examine/index/{indexName}:
+  /search/index/{indexName}:
     get:
       operationId: getIndex
       parameters:
@@ -439,25 +452,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
-  /examine/searchers:
-    get:
-      operationId: getSearchers
-      responses:
-        '200':
-          description: 200 response
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Searcher'
-        default:
-          description: default response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-  /examine/index/{indexName}/rebuild:
+  /search/index/{indexName}/rebuild:
     post:
       operationId: postIndexRebuild
       parameters:
@@ -475,20 +470,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
-  /examine/searchers/{searcherName}/{searchQuery}:
+  /search/searcher:
     get:
-      operationId: getSearchSearchers
+      operationId: getSearchers
       parameters:
-        - name: searcherName
-          in: path
+        - name: skip
+          in: query
           required: true
           schema:
-            type: string
-        - name: searchQuery
-          in: path
+            type: number
+            format: float
+        - name: take
+          in: query
           required: true
           schema:
-            type: string
+            type: number
+            format: float
       responses:
         '200':
           description: 200 response
@@ -497,27 +494,33 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/SearchResult'
-        '400':
-          description: 400 response
+                  $ref: '#/components/schemas/Searcher'
+        default:
+          description: default response
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
-  /examine/index/{indexName}/{searchQuery}:
+  /search/searcher/{searcherName}:
     get:
-      operationId: getSearchIndex
+      operationId: getSearchSearchers
       parameters:
-        - name: indexName
+        - name: searcherName
           in: path
           required: true
           schema:
             type: string
-        - name: searchQuery
-          in: path
+        - name: query
+          in: query
           required: true
           schema:
             type: string
+        - name: take
+          in: query
+          required: true
+          schema:
+            type: number
+            format: float
       responses:
         '200':
           description: 200 response

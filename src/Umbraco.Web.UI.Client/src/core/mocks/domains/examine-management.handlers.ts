@@ -4,14 +4,17 @@ import { Indexer, Searcher, getIndexByName, getIndexers, SearchResult, searchRes
 import { umbracoPath } from '@umbraco-cms/utils';
 
 export const handlers = [
-	rest.get(umbracoPath('/examine/index'), (_req, res, ctx) => {
+	rest.get(umbracoPath('/search/index'), (_req, res, ctx) => {
 		return res(
 			// Respond with a 200 status code
 			ctx.status(200),
 			ctx.json<Indexer[]>(getIndexers())
 		);
 	}),
-	rest.get(umbracoPath('/examine/index/:indexName'), (_req, res, ctx) => {
+
+	rest.get(umbracoPath('/search/index/:indexName'), (_req, res, ctx) => {
+		const query = _req.url.searchParams.get('query');
+		debugger;
 		const indexName = _req.params.indexName as string;
 		if (!indexName) return;
 
@@ -22,17 +25,8 @@ export const handlers = [
 			return res(ctx.status(404));
 		}
 	}),
-	rest.get(umbracoPath('/examine/searchers'), (_req, res, ctx) => {
-		return res(
-			ctx.status(200),
-			ctx.json<Searcher[]>([
-				{ name: 'ExternalSearcher', providerProperties: ['Cake'] },
-				{ name: 'InternalSearcher', providerProperties: ['Panda'] },
-				{ name: 'InternalMemberSearcher', providerProperties: ['Bamboo?'] },
-			])
-		);
-	}),
-	rest.post(umbracoPath('/examine/index/:indexName/rebuild'), async (_req, res, ctx) => {
+
+	rest.post(umbracoPath('/search/index/:indexName/rebuild'), async (_req, res, ctx) => {
 		await new Promise((resolve) => setTimeout(resolve, (Math.random() + 1) * 1000)); // simulate a delay of 1-2 seconds
 
 		const indexName = _req.params.indexName as string;
@@ -46,7 +40,22 @@ export const handlers = [
 		}
 	}),
 
-	rest.get(umbracoPath('/examine/index/:indexName/:searchQuery'), (_req, res, ctx) => {
+	rest.get(umbracoPath('/search/searcher'), (_req, res, ctx) => {
+		return res(
+			ctx.status(200),
+			ctx.json<Searcher[]>([
+				{ name: 'ExternalSearcher', providerProperties: ['Cake'] },
+				{ name: 'InternalSearcher', providerProperties: ['Panda'] },
+				{ name: 'InternalMemberSearcher', providerProperties: ['Bamboo?'] },
+			])
+		);
+	}),
+
+	/*
+	rest.get(umbracoPath('/search/index/:indexName'), (_req, res, ctx) => {
+		const query = _req.url.searchParams.get('query');
+		debugger;
+
 		const indexName = _req.params.indexName as string;
 		const searchQuery = _req.params.searchQuery as string;
 		if (!indexName || !searchQuery) return;
@@ -58,8 +67,12 @@ export const handlers = [
 			return res(ctx.status(404));
 		}
 	}),
+	*/
 
-	rest.get(umbracoPath('/examine/searchers/:searcherName/:searchQuery'), (_req, res, ctx) => {
+	rest.get(umbracoPath('/search/searcher/:searcherName'), (_req, res, ctx) => {
+		const query = _req.url.searchParams.get('query');
+		const take = _req.url.searchParams.get('take');
+
 		const searcherName = _req.params.searcherName as string;
 		const searchQuery = _req.params.searchQuery as string;
 		if (!searcherName || !searchQuery) return;

@@ -74,23 +74,20 @@ export interface paths {
   "/telemetry/ConsentLevels": {
     get: operations["ConsentLevels"];
   };
-  "/examine/index": {
+  "/search/index": {
     get: operations["getIndexers"];
   };
-  "/examine/index/{indexName}": {
+  "/search/index/{indexName}": {
     get: operations["getIndex"];
   };
-  "/examine/searchers": {
-    get: operations["getSearchers"];
-  };
-  "/examine/index/{indexName}/rebuild": {
+  "/search/index/{indexName}/rebuild": {
     post: operations["postIndexRebuild"];
   };
-  "/examine/searchers/{searcherName}/{searchQuery}": {
-    get: operations["getSearchSearchers"];
+  "/search/searcher": {
+    get: operations["getSearchers"];
   };
-  "/examine/index/{indexName}/{searchQuery}": {
-    get: operations["getSearchIndex"];
+  "/search/searcher/{searcherName}": {
+    get: operations["getSearchSearchers"];
   };
 }
 
@@ -886,6 +883,12 @@ export interface operations {
     };
   };
   getIndexers: {
+    parameters: {
+      query: {
+        skip: number;
+        take: number;
+      };
+    };
     responses: {
       /** 200 response */
       200: {
@@ -922,22 +925,6 @@ export interface operations {
       };
     };
   };
-  getSearchers: {
-    responses: {
-      /** 200 response */
-      200: {
-        content: {
-          "application/json": components["schemas"]["Searcher"][];
-        };
-      };
-      /** default response */
-      default: {
-        content: {
-          "application/json": components["schemas"]["ProblemDetails"];
-        };
-      };
-    };
-  };
   postIndexRebuild: {
     parameters: {
       path: {
@@ -955,33 +942,36 @@ export interface operations {
       };
     };
   };
-  getSearchSearchers: {
+  getSearchers: {
     parameters: {
-      path: {
-        searcherName: string;
-        searchQuery: string;
+      query: {
+        skip: number;
+        take: number;
       };
     };
     responses: {
       /** 200 response */
       200: {
         content: {
-          "application/json": components["schemas"]["SearchResult"][];
+          "application/json": components["schemas"]["Searcher"][];
         };
       };
-      /** 400 response */
-      400: {
+      /** default response */
+      default: {
         content: {
           "application/json": components["schemas"]["ProblemDetails"];
         };
       };
     };
   };
-  getSearchIndex: {
+  getSearchSearchers: {
     parameters: {
       path: {
-        indexName: string;
-        searchQuery: string;
+        searcherName: string;
+      };
+      query: {
+        query: string;
+        take: number;
       };
     };
     responses: {
