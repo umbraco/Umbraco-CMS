@@ -1,4 +1,5 @@
 using Umbraco.Cms.Core.Models;
+using static Umbraco.Cms.Core.Models.GridValue;
 
 namespace Umbraco.Cms.Core.Deploy;
 
@@ -37,7 +38,8 @@ public interface IGridCellValueConnector
     /// Note that
     /// </remarks>
     [Obsolete("Use the overload accepting IContextCache instead. This overload will be removed in a future version.")]
-    string? GetValue(GridValue.GridControl gridControl, ICollection<ArtifactDependency> dependencies);
+    string? GetValue(GridValue.GridControl gridControl, ICollection<ArtifactDependency> dependencies)
+        => GetValue(gridControl, dependencies, PassThroughCache.Instance);
 
     /// <summary>
     /// Gets the value to be deployed from the control value as a string.
@@ -48,8 +50,7 @@ public interface IGridCellValueConnector
     /// <returns>
     /// The grid cell value to be deployed.
     /// </returns>
-    string? GetValue(GridValue.GridControl gridControl, ICollection<ArtifactDependency> dependencies, IContextCache contextCache)
-        => GetValue(gridControl, dependencies);
+    string? GetValue(GridValue.GridControl gridControl, ICollection<ArtifactDependency> dependencies, IContextCache contextCache);
 
     /// <summary>
     /// Allows you to modify the value of a control being deployed.
@@ -60,7 +61,8 @@ public interface IGridCellValueConnector
     /// The SetValue method is used to modify the value of the <paramref name="gridControl" />.
     /// </remarks>
     [Obsolete("Use the overload accepting IContextCache instead. This overload will be removed in a future version.")]
-    void SetValue(GridValue.GridControl gridControl);
+    void SetValue(GridValue.GridControl gridControl)
+        => SetValue(gridControl, PassThroughCache.Instance);
 
     /// <summary>
     /// Allows you to modify the value of a control being deployed.
@@ -71,6 +73,5 @@ public interface IGridCellValueConnector
     /// Follows the pattern of the property value connectors (<see cref="IValueConnector" />).
     /// The SetValue method is used to modify the value of the <paramref name="gridControl" />.
     /// </remarks>
-    void SetValue(GridValue.GridControl gridControl, IContextCache contextCache)
-        => SetValue(gridControl);
+    void SetValue(GridValue.GridControl gridControl, IContextCache contextCache);
 }

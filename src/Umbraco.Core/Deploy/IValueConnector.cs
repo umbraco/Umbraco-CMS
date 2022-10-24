@@ -30,7 +30,8 @@ public interface IValueConnector
     /// The deploy property value.
     /// </returns>
     [Obsolete("Use the overload accepting IContextCache instead. This overload will be removed in a future version.")]
-    string? ToArtifact(object? value, IPropertyType propertyType, ICollection<ArtifactDependency> dependencies);
+    string? ToArtifact(object? value, IPropertyType propertyType, ICollection<ArtifactDependency> dependencies)
+        => ToArtifact(value, propertyType, dependencies, PassThroughCache.Instance);
 
     /// <summary>
     /// Gets the deploy property value corresponding to a content property value, and gather dependencies.
@@ -42,8 +43,7 @@ public interface IValueConnector
     /// <returns>
     /// The deploy property value.
     /// </returns>
-    string? ToArtifact(object? value, IPropertyType propertyType, ICollection<ArtifactDependency> dependencies, IContextCache contextCache)
-        => ToArtifact(value, propertyType, dependencies);
+    string? ToArtifact(object? value, IPropertyType propertyType, ICollection<ArtifactDependency> dependencies, IContextCache contextCache);
 
     /// <summary>
     /// Gets the content property value corresponding to a deploy property value.
@@ -55,7 +55,8 @@ public interface IValueConnector
     /// The content property value.
     /// </returns>
     [Obsolete("Use the overload accepting IContextCache instead. This overload will be removed in a future version.")]
-    object? FromArtifact(string? value, IPropertyType propertyType, object? currentValue);
+    object? FromArtifact(string? value, IPropertyType propertyType, object? currentValue)
+        => FromArtifact(value, propertyType, currentValue, PassThroughCache.Instance);
 
     /// <summary>
     /// Gets the content property value corresponding to a deploy property value.
@@ -67,6 +68,5 @@ public interface IValueConnector
     /// <returns>
     /// The content property value.
     /// </returns>
-    object? FromArtifact(string? value, IPropertyType propertyType, object? currentValue, IContextCache contextCache)
-        => FromArtifact(value, propertyType, currentValue);
+    object? FromArtifact(string? value, IPropertyType propertyType, object? currentValue, IContextCache contextCache);
 }

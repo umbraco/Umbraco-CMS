@@ -28,7 +28,8 @@ public interface IDataTypeConfigurationConnector
     /// The artifact configuration value.
     /// </returns>
     [Obsolete("Use the overload accepting IContextCache instead. This overload will be removed in a future version.")]
-    string? ToArtifact(IDataType dataType, ICollection<ArtifactDependency> dependencies);
+    string? ToArtifact(IDataType dataType, ICollection<ArtifactDependency> dependencies)
+        => ToArtifact(dataType, dependencies, PassThroughCache.Instance);
 
     /// <summary>
     /// Gets the artifact configuration value corresponding to a data type configuration and gather dependencies.
@@ -39,8 +40,7 @@ public interface IDataTypeConfigurationConnector
     /// <returns>
     /// The artifact configuration value.
     /// </returns>
-    string? ToArtifact(IDataType dataType, ICollection<ArtifactDependency> dependencies, IContextCache contextCache)
-        => ToArtifact(dataType, dependencies);
+    string? ToArtifact(IDataType dataType, ICollection<ArtifactDependency> dependencies, IContextCache contextCache);
 
     /// <summary>
     /// Gets the data type configuration corresponding to an artifact configuration value.
@@ -51,7 +51,8 @@ public interface IDataTypeConfigurationConnector
     /// The data type configuration.
     /// </returns>
     [Obsolete("Use the overload accepting IContextCache instead. This overload will be removed in a future version.")]
-    object? FromArtifact(IDataType dataType, string? configuration);
+    object? FromArtifact(IDataType dataType, string? configuration)
+        => FromArtifact(dataType, configuration, PassThroughCache.Instance);
 
     /// <summary>
     /// Gets the data type configuration corresponding to an artifact configuration value.
@@ -62,6 +63,5 @@ public interface IDataTypeConfigurationConnector
     /// <returns>
     /// The data type configuration.
     /// </returns>
-    object? FromArtifact(IDataType dataType, string? configuration, IContextCache contextCache)
-        => FromArtifact(dataType, configuration);
+    object? FromArtifact(IDataType dataType, string? configuration, IContextCache contextCache);
 }

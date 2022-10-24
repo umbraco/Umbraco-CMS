@@ -16,7 +16,8 @@ public interface IServiceConnector : IDiscoverable
     /// The corresponding artifact, or null.
     /// </returns>
     [Obsolete("Use the overload accepting IContextCache instead. This overload will be removed in a future version.")]
-    IArtifact? GetArtifact(Udi udi);
+    IArtifact? GetArtifact(Udi udi)
+        => GetArtifact(udi, PassThroughCache.Instance);
 
     /// <summary>
     /// Gets an artifact.
@@ -26,8 +27,7 @@ public interface IServiceConnector : IDiscoverable
     /// <returns>
     /// The corresponding artifact, or null.
     /// </returns>
-    IArtifact? GetArtifact(Udi udi, IContextCache contextCache)
-        => GetArtifact(udi);
+    IArtifact? GetArtifact(Udi udi, IContextCache contextCache);
 
     /// <summary>
     /// Gets an artifact.
@@ -37,7 +37,8 @@ public interface IServiceConnector : IDiscoverable
     /// The corresponding artifact.
     /// </returns>
     [Obsolete("Use the overload accepting IContextCache instead. This overload will be removed in a future version.")]
-    IArtifact GetArtifact(object entity);
+    IArtifact GetArtifact(object entity)
+        => GetArtifact(entity, PassThroughCache.Instance);
 
     /// <summary>
     /// Gets an artifact.
@@ -47,8 +48,7 @@ public interface IServiceConnector : IDiscoverable
     /// <returns>
     /// The corresponding artifact.
     /// </returns>
-    IArtifact GetArtifact(object entity, IContextCache contextCache)
-        => GetArtifact(entity);
+    IArtifact GetArtifact(object entity, IContextCache contextCache);
 
     /// <summary>
     /// Initializes processing for an artifact.
