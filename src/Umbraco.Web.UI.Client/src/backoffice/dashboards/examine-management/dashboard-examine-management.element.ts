@@ -2,17 +2,16 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, state, query } from 'lit/decorators.js';
 
-import '../examine-management/dashboard-examine-management-index.element';
-import '../examine-management/dashboard-examine-management-searcher.element';
+import { Indexer, Searcher } from '../../../core/mocks/data/examine.data';
 
-import { getIndexers, getSearchers } from '../../../core/api/fetcher';
-
-import { Indexer, Searcher } from '../../../mocks/data/examine.data';
-
-import { UmbContextConsumerMixin } from '../../../core/context';
 import { UmbModalService } from '../../../core/services/modal';
 import { UmbNotificationService } from '../../../core/services/notification';
 import { UmbNotificationDefaultData } from '../../../core/services/notification/layouts/default';
+import { getIndexers, getSearchers } from '@umbraco-cms/backend-api';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+
+import '../examine-management/dashboard-examine-management-index.element';
+import '../examine-management/dashboard-examine-management-searcher.element';
 
 type ExaminePageType = 'Index' | 'Searcher';
 

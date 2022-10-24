@@ -3,15 +3,15 @@ import { css, html, LitElement } from 'lit';
 import { customElement, query, state, property } from 'lit/decorators.js';
 
 import { UUIButtonState } from '@umbraco-ui/uui';
-import { getIndex, postIndexRebuild, getSearchResultFromIndex } from '../../../core/api/fetcher';
 
-import { Indexer, SearchResult } from '../../../mocks/data/examine.data';
+import { Indexer, SearchResult } from '../../../core/mocks/data/examine.data';
 
-import { UmbContextConsumerMixin } from '../../../core/context';
 import { UmbModalService } from '../../../core/services/modal';
 import { UmbNotificationService } from '../../../core/services/notification';
 import { UmbNotificationDefaultData } from '../../../core/services/notification/layouts/default';
 import { UmbModalLayoutElement } from '../../../core/services/modal/layouts/modal-layout.element';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import { getIndex, postIndexRebuild, getSearchResultFromIndex } from '@umbraco-cms/backend-api';
 
 @customElement('examine-management-index')
 export class UmbDashboardExamineManagementIndexElement extends UmbContextConsumerMixin(LitElement) {

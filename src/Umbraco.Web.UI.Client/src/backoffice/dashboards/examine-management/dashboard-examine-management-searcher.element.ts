@@ -1,17 +1,17 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, query, state, property } from 'lit/decorators.js';
-
 import { UUIButtonState } from '@umbraco-ui/uui';
-import { getSearchResultFromSearchers } from '../../../core/api/fetcher';
 
-import { SearchResult } from '../../../mocks/data/examine.data';
+import { SearchResult } from '../../../core/mocks/data/examine.data';
 
-import { UmbContextConsumerMixin } from '../../../core/context';
 import { UmbModalService } from '../../../core/services/modal';
 import { UmbNotificationService } from '../../../core/services/notification';
 import { UmbNotificationDefaultData } from '../../../core/services/notification/layouts/default';
 import '../../../core/services/modal/layouts/fields-viewer/fields-viewer.element';
+
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import { getSearchResultFromSearchers } from '@umbraco-cms/backend-api';
 
 @customElement('examine-management-searchers')
 export class UmbDashboardExamineManagementSearcherElement extends UmbContextConsumerMixin(LitElement) {
