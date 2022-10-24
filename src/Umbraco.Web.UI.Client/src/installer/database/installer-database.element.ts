@@ -1,17 +1,16 @@
 import { UUIButtonElement } from '@umbraco-ui/uui';
 import { css, CSSResultGroup, html, LitElement, nothing } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
-
-import { postInstallSetup, postInstallValidateDatabase } from '../../core/api/fetcher';
-import { UmbContextConsumerMixin } from '../../core/context';
+import { UmbInstallerContext } from '../installer.context';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
+import { postInstallSetup, postInstallValidateDatabase } from '@umbraco-cms/backend-api';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type {
 	PostInstallRequest,
 	UmbracoInstaller,
 	UmbracoInstallerDatabaseModel,
 	UmbracoPerformInstallDatabaseConfiguration,
-} from '../../core/models';
-import { UmbObserverMixin } from '../../core/observer';
-import { UmbInstallerContext } from '../installer.context';
+} from '@umbraco-cms/models';
 
 @customElement('umb-installer-database')
 export class UmbInstallerDatabaseElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {

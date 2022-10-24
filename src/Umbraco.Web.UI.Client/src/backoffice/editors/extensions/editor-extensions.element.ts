@@ -1,12 +1,9 @@
 import { html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-
-import { UmbContextConsumerMixin } from '../../../core/context';
-import { UmbExtensionRegistry } from '../../../core/extension';
-import { isManifestElementType } from '../../../core/extension/is-extension.function';
-
-import type { ManifestTypes } from '../../../core/models';
-import { UmbObserverMixin } from '../../../core/observer';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
+import { UmbExtensionRegistry, isManifestElementType } from '@umbraco-cms/extensions-api';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import type { ManifestTypes } from '@umbraco-cms/models';
 
 import '../shared/editor-entity-layout/editor-entity-layout.element';
 

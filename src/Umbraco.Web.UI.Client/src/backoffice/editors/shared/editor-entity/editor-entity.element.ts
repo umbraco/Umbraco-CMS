@@ -2,11 +2,11 @@ import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
-import type { ManifestEditor } from '../../../../core/models';
 
-import { UmbContextConsumerMixin } from '../../../../core/context';
-import { createExtensionElement, UmbExtensionRegistry } from '../../../../core/extension';
-import { UmbObserverMixin } from '../../../../core/observer';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
+import { createExtensionElement, UmbExtensionRegistry } from '@umbraco-cms/extensions-api';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import type { ManifestEditor } from '@umbraco-cms/models';
 
 @customElement('umb-editor-entity')
 export class UmbEditorEntityElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {

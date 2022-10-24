@@ -2,12 +2,12 @@ import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
-import type { ManifestTreeItemAction, ManifestTree } from '../../../../core/models';
-import { UmbExtensionRegistry } from '../../../../core/extension';
-import { UmbContextConsumerMixin } from '../../../../core/context';
 import { UmbSectionContext } from '../../../sections/section.context';
-import { Entity } from '../../../../mocks/data/entities';
-import { UmbObserverMixin } from '../../../../core/observer';
+import { Entity } from '../../../../core/mocks/data/entities';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
+import { UmbExtensionRegistry } from '@umbraco-cms/extensions-api';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import type { ManifestTreeItemAction, ManifestTree } from '@umbraco-cms/models';
 
 @customElement('umb-tree-context-menu-page-action-list')
 export class UmbTreeContextMenuPageActionListElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {

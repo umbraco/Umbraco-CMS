@@ -1,8 +1,8 @@
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbObserverMixin } from '../core/observer';
-import { UmbContextProviderMixin } from '../core/context';
 import { UmbInstallerContext } from './installer.context';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
+import { UmbContextProviderMixin } from '@umbraco-cms/context-api';
 
 import './consent/installer-consent.element';
 import './database/installer-database.element';

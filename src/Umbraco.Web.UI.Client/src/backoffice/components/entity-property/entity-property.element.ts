@@ -1,11 +1,10 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement, PropertyValueMap } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-
-import { UmbContextConsumerMixin } from '../../../core/context';
-import { createExtensionElement, UmbExtensionRegistry } from '../../../core/extension';
-import type { ManifestPropertyEditorUI, ManifestTypes } from '../../../core/models';
-import { UmbObserverMixin } from '../../../core/observer';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
+import { createExtensionElement, UmbExtensionRegistry } from '@umbraco-cms/extensions-api';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import type { ManifestPropertyEditorUI, ManifestTypes } from '@umbraco-cms/models';
 
 import '../../property-actions/shared/property-action-menu/property-action-menu.element';
 import '../../editors/shared/editor-property-layout/editor-property-layout.element';

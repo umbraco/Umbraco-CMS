@@ -1,11 +1,11 @@
 import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, property, state } from 'lit/decorators.js';
+import { customElement, state } from 'lit/decorators.js';
 import { distinctUntilChanged } from 'rxjs';
-import { UmbContextConsumerMixin } from '../../../../core/context';
-import type { DocumentTypeEntity } from '../../../../mocks/data/document-type.data';
+import type { DocumentTypeEntity } from '../../../../core/mocks/data/document-type.data';
 import { UmbDocumentTypeContext } from '../document-type.context';
-import { UmbObserverMixin } from '../../../../core/observer';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
 @customElement('umb-editor-view-document-type-design')
 export class UmbEditorViewDocumentTypeDesignElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {

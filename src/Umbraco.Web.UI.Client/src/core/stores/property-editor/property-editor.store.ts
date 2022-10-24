@@ -1,6 +1,6 @@
 import { map, Observable } from 'rxjs';
 import type { PropertyEditor } from '../../models';
-import { getPropertyEditorsList, getPropertyEditor } from '../../api/fetcher';
+import { getPropertyEditorsList, getPropertyEditor } from '../../backend-api/fetcher';
 import { UmbDataStoreBase } from '../store';
 
 /**

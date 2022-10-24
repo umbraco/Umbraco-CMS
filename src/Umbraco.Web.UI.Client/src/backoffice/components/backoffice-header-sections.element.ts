@@ -2,11 +2,10 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { when } from 'lit/directives/when.js';
-
-import { UmbContextConsumerMixin, UmbContextProviderMixin } from '../../core/context';
-import type { ManifestSection } from '../../core/models';
-import { UmbObserverMixin } from '../../core/observer';
 import { UmbSectionStore } from '../../core/stores/section.store';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
+import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
+import type { ManifestSection } from '@umbraco-cms/models';
 
 @customElement('umb-backoffice-header-sections')
 export class UmbBackofficeHeaderSections extends UmbContextProviderMixin(

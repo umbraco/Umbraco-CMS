@@ -1,5 +1,5 @@
-import { map, Observable, ReplaySubject } from 'rxjs';
-import { UmbExtensionRegistry } from '../extension';
+import { Observable, ReplaySubject } from 'rxjs';
+import { UmbExtensionRegistry } from '@umbraco-cms/extensions-api';
 
 // TODO: maybe this should be named something else than store?
 export class UmbSectionStore {

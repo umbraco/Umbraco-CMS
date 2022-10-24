@@ -1,7 +1,7 @@
 import { rest } from 'msw';
 import { v4 as uuidv4 } from 'uuid';
-import type { UserDetails } from '../../core/models';
 import { umbUsersData } from '../data/users.data';
+import type { UserDetails } from '@umbraco-cms/models';
 
 // TODO: add schema
 export const handlers = [

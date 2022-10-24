@@ -1,7 +1,7 @@
 import { BehaviorSubject, Observable, ReplaySubject } from 'rxjs';
 
-import { getInstallSettings, postInstallSetup } from '../core/api/fetcher';
-import type { PostInstallRequest, ProblemDetails, UmbracoInstaller } from '../core/models';
+import { getInstallSettings, postInstallSetup } from '@umbraco-cms/backend-api';
+import type { PostInstallRequest, ProblemDetails, UmbracoInstaller } from '@umbraco-cms/models';
 
 /**
  * Context API for the installer

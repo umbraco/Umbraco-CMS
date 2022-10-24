@@ -4,14 +4,14 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { UUIMenuItemEvent } from '@umbraco-ui/uui';
 import { map } from 'rxjs';
 import { repeat } from 'lit/directives/repeat.js';
-import { UmbContextConsumerMixin } from '../../../core/context';
 import { UmbTreeContextBase } from '../tree.context';
 import { UmbSectionContext } from '../../sections/section.context';
-import { Entity } from '../../../mocks/data/entities';
-import { UmbObserverMixin } from '../../../core/observer';
+import { Entity } from '../../../core/mocks/data/entities';
 import type { ManifestSection } from '../../../core/models';
 import { UmbTreeDataContextBase } from '../tree-data.context';
 import { UmbTreeContextMenuService } from './context-menu/tree-context-menu.service';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
 @customElement('umb-tree-item')
 export class UmbTreeItem extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {

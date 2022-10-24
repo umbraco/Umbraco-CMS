@@ -1,0 +1,5 @@
+@import '@umbraco-ui/uui-css/dist/uui-css.css';
+
+:root {
+	--uui-color-positive: #1c874c;
+}

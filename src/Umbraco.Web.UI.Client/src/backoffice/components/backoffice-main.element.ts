@@ -3,13 +3,12 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { state } from 'lit/decorators.js';
 import { IRoutingInfo } from 'router-slot';
-
-import { UmbContextConsumerMixin, UmbContextProviderMixin } from '../../core/context';
-import { createExtensionElement } from '../../core/extension';
-import type { ManifestSection } from '../../core/models';
-import { UmbObserverMixin } from '../../core/observer';
 import { UmbSectionStore } from '../../core/stores/section.store';
 import { UmbSectionContext } from '../sections/section.context';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
+import { createExtensionElement } from '@umbraco-cms/extensions-api';
+import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
+import type { ManifestSection } from '@umbraco-cms/models';
 
 @defineElement('umb-backoffice-main')
 export class UmbBackofficeMain extends UmbContextProviderMixin(UmbContextConsumerMixin(UmbObserverMixin(LitElement))) {

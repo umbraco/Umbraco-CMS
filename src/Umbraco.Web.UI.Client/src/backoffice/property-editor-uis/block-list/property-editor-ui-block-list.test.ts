@@ -1,6 +1,6 @@
 import { expect, fixture, html } from '@open-wc/testing';
-import { defaultA11yConfig } from '../../../core/helpers/chai';
 import { UmbPropertyEditorUIBlockListElement } from './property-editor-ui-block-list.element';
+import { defaultA11yConfig } from '@umbraco-cms/test-utils';
 
 describe('UmbPropertyEditorUIBlockListElement', () => {
 	let element: UmbPropertyEditorUIBlockListElement;

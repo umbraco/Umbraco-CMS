@@ -1,9 +1,7 @@
 import { rest } from 'msw';
 // import dashboardMediaManagementStories from '../../backoffice/dashboards/media-management/dashboard-media-management.stories';
-
-import umbracoPath from '../../core/helpers/umbraco-path';
-
 import { Indexer, Searcher, getIndexByName, getIndexers, SearchResult, searchResFromIndex } from '../data/examine.data';
+import { umbracoPath } from '@umbraco-cms/utils';
 
 export const handlers = [
 	rest.get(umbracoPath('/examine/index'), (_req, res, ctx) => {

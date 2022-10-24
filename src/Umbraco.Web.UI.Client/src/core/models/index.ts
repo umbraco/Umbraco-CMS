@@ -1,6 +1,6 @@
 import type { components } from '../../../schemas/generated-schema';
 import type { UserStatus } from '../../backoffice/sections/users/user-extensions';
-import { Entity } from '../../mocks/data/entities';
+import { Entity } from '../mocks/data/entities';
 
 export type PostInstallRequest = components['schemas']['InstallSetupRequest'];
 export type StatusResponse = components['schemas']['StatusResponse'];

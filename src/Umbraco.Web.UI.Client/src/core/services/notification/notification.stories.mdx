@@ -4,7 +4,7 @@ import { Meta } from '@storybook/addon-docs';
 
 # Notifications
 
-Notifications appear in the bottom right corner of the Backoffice. There are two types of notifications: "Peek" and "Stay". 
+Notifications appear in the bottom right corner of the Backoffice. There are two types of notifications: "Peek" and "Stay".
 
 **Peek notifications**
 Goes away automatically and should be used as feedback on user actions.
@@ -20,21 +20,20 @@ The UmbNotification service can be used to open notifications.
 
 ```ts
 import { html, LitElement } from 'lit';
-import { UmbContextConsumerMixin } from './core/context';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { UmbNotificationService } from './core/services/notification';
 
 class MyElement extends UmbContextConsumerMixin(LitElement) {
+	private _notificationService?: UmbNotificationService;
 
-  private _notificationService?: UmbNotificationService;
+	constructor() {
+		super();
 
-  constructor () {
-    super();
-
-    this.consumeContext('umbNotificationService', (notificationService) => {
-      this._notificationService = notificationService;
-      // notificationService is now ready to be used
-    });
-  }
+		this.consumeContext('umbNotificationService', (notificationService) => {
+			this._notificationService = notificationService;
+			// notificationService is now ready to be used
+		});
+	}
 }
 ```
 
@@ -45,34 +44,33 @@ A notification is opened by calling one of the helper methods on the UmbNotifica
 ```ts
 import { html, LitElement } from 'lit';
 import { state } from 'lit/decorators.js';
-import { UmbContextConsumerMixin } from './core/context';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { UmbNotificationService, UmbNotificationDefaultData } from './core/services/notification';
 
 class MyElement extends UmbContextConsumerMixin(LitElement) {
+	private _notificationService?: UmbNotificationService;
 
-  private _notificationService?: UmbNotificationService;
+	constructor() {
+		super();
 
-  constructor () {
-    super();
+		this.consumeContext('umbNotificationService', (notificationService) => {
+			this._notificationService = notificationService;
+			// notificationService is now ready to be used
+		});
+	}
 
-    this.consumeContext('umbNotificationService', (notificationService) => {
-      this._notificationService = notificationService;
-      // notificationService is now ready to be used
-    });
-  }
+	private _handleClick() {
+		const data: UmbNotificationDefaultData = { headline: 'Look at this', message: 'Something good happened' };
+		const notificationHandler = this._notificationService?.peek('positive', { data });
 
-  private _handleClick () {
-    const data: UmbNotificationDefaultData = { headline: 'Look at this', message: 'Something good happened' };
-    const notificationHandler = this._notificationService?.peek('positive', { data });
+		notificationHandler.onClose().then(() => {
+			// if you need any logic when the notification is closed you can run it here
+		});
+	}
 
-    notificationHandler.onClose().then(() => {
-      // if you need any logic when the notification is closed you can run it here
-    });
-  }
-
-  render() {
-    return html`<button @click="${this._handleClick}">Open Notification</button>`;
-  }
+	render() {
+		return html`<button @click="${this._handleClick}">Open Notification</button>`;
+	}
 }
 ```
 
@@ -89,35 +87,33 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import type { UmbNotificationHandler } from './core/services/notification';
 
 export interface UmbNotificationCustomData {
-  headline: string;
-  user: {
-    name: string;
-  }
+	headline: string;
+	user: {
+		name: string;
+	};
 }
 
 export class UmbNotificationLayoutCustom extends LitElement {
-  static styles = [
-    UUITextStyles
-  ];
+	static styles = [UUITextStyles];
 
-  @property({ attribute: false })
-  public notificationHandler: UmbNotificationHandler;
+	@property({ attribute: false })
+	public notificationHandler: UmbNotificationHandler;
 
-  @property({ type: Object })
-  public data: UmbNotificationCustomData;
+	@property({ type: Object })
+	public data: UmbNotificationCustomData;
 
-  private _handleConfirm () {
-    this.notificationHandler.close(true);
-  }
+	private _handleConfirm() {
+		this.notificationHandler.close(true);
+	}
 
-  render() {
-    return html`
-      <uui-toast-notification-layout headline="${this.data.headline}" class="uui-text">
-        ${this.data.user.name}
-        <uui-button slot="actions" @click="${this._handleConfirm}" label="Confirm">Confirm</uui-button>
-      </uui-toast-notification-layout>
-    `;
-  }
+	render() {
+		return html`
+			<uui-toast-notification-layout headline="${this.data.headline}" class="uui-text">
+				${this.data.user.name}
+				<uui-button slot="actions" @click="${this._handleConfirm}" label="Confirm">Confirm</uui-button>
+			</uui-toast-notification-layout>
+		`;
+	}
 }
 ```
 
@@ -125,49 +121,49 @@ export class UmbNotificationLayoutCustom extends LitElement {
 
 ```ts
 import { html, LitElement } from 'lit';
-import { UmbContextInjectMixin } from './core/context';
+import { UmbContextInjectMixin } from '@umbraco-cms/context-api';
 import type { UmbNotificationService, UmbNotificationOptions } from './core/services/notification';
 import type { UmbNotificationCustomData } from './custom-notification-layout';
 
 class MyElement extends LitElement {
+	private _notificationService?: UmbNotificationService;
 
-  private _notificationService?: UmbNotificationService;
+	constructor() {
+		super();
 
-  constructor () {
-    super();
+		this.consumeContext('umbNotificationService', (notificationService) => {
+			this._notificationService = notificationService;
+			// notificationService is now ready to be used
+		});
+	}
 
-    this.consumeContext('umbNotificationService', (notificationService) => {
-      this._notificationService = notificationService;
-      // notificationService is now ready to be used
-    });
-  }
+	private _handleClick() {
+		const options: UmbNotificationOptions<UmbNotificationCustomData> = {
+			elementName: 'umb-notification-layout-custom',
+			data: {
+				headline: 'Attention',
+				user: { name: 'Peter Parker' },
+			},
+		};
 
-  private _handleClick () {
-    const options: UmbNotificationOptions<UmbNotificationCustomData> = {
-      elementName: 'umb-notification-layout-custom',
-      data: {
-        headline: 'Attention',
-        user: { name: 'Peter Parker' }
-      }
-    };
+		const notificationHandler = this._notificationService?.stay('default', options);
 
-    const notificationHandler = this._notificationService?.stay('default', options);
+		notificationHandler.onClose().then((result) => {
+			if (result) {
+				console.log('He agreed!');
+			}
+		});
+	}
 
-    notificationHandler.onClose().then((result) => {
-      if (result) {
-        console.log('He agreed!');
-      }
-    });
-  }
-
-  render() {
-    return html`<button @click="${this._handleClick}">Open Notification</button>`;
-  }
+	render() {
+		return html`<button @click="${this._handleClick}">Open Notification</button>`;
+	}
 }
 ```
 
 ## Best practices
-* Keep messages in notifications short and friendly.
-* Only use headlines when you need extra attention to the notification
-* If a custom notification layout is only used in one module keep the files layout files local to that module.
-* If a custom notification will be used across the project. Create it as a layout in the notification folder and add a helper method to the UmbNotificationService.
+
+- Keep messages in notifications short and friendly.
+- Only use headlines when you need extra attention to the notification
+- If a custom notification layout is only used in one module keep the files layout files local to that module.
+- If a custom notification will be used across the project. Create it as a layout in the notification folder and add a helper method to the UmbNotificationService.
