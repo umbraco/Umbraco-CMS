@@ -252,7 +252,7 @@ export class UmbEditorUserGroupElement extends LitElement {
 	private renderRightColumn() {
 		return html`<uui-box>
 			<div slot="headline">Users</div>
-			<umb-picker-user .picker=${'user'}></umb-picker-user>
+			<umb-picker-user></umb-picker-user>
 		</uui-box>`;
 	}
 
