@@ -107,6 +107,7 @@ export class UmbDashboardExamineManagementSearcherElement extends UmbContextCons
 			const res = await getSearchResultFromSearchers({
 				searcherName: this.searcherName,
 				query: this._searchInput.value,
+				take: 100,
 			});
 			this._searchResults = res.data as SearchResult[];
 		} catch (e) {

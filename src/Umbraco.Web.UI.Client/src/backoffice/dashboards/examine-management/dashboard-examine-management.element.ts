@@ -80,7 +80,7 @@ export class UmbDashboardExamineManagementElement extends UmbContextConsumerMixi
 
 	private async _getIndexers() {
 		try {
-			const indexers = await getIndexers({});
+			const indexers = await getIndexers({ skip: 0, take: 3 });
 			this._indexers = indexers.data as Indexer[];
 		} catch (e) {
 			if (e instanceof getIndexers.Error) {
@@ -93,7 +93,7 @@ export class UmbDashboardExamineManagementElement extends UmbContextConsumerMixi
 
 	private async _getSearchers() {
 		try {
-			const searchers = await getSearchers({});
+			const searchers = await getSearchers({ skip: 0, take: 3 });
 			this._searchers = searchers.data as Searcher[];
 		} catch (e) {
 			if (e instanceof getSearchers.Error) {

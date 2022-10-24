@@ -11,7 +11,7 @@ import { UmbNotificationService } from '../../../core/services/notification';
 import { UmbNotificationDefaultData } from '../../../core/services/notification/layouts/default';
 import { UmbModalLayoutElement } from '../../../core/services/modal/layouts/modal-layout.element';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-import { getIndex, postIndexRebuild } from '@umbraco-cms/backend-api';
+import { getIndex, getSearchResultFromSearchers, postIndexRebuild } from '@umbraco-cms/backend-api';
 
 @customElement('examine-management-index')
 export class UmbDashboardExamineManagementIndexElement extends UmbContextConsumerMixin(LitElement) {
@@ -133,14 +133,15 @@ export class UmbDashboardExamineManagementIndexElement extends UmbContextConsume
 	private async _onSearch() {
 		if (this._searchInput.value.length) {
 			try {
-				const res = await getSearchResultFromIndex({
-					indexName: this._indexData.name,
+				const res = await getSearchResultFromSearchers({
+					searcherName: this._indexData.name,
 					query: this._searchInput.value,
+					take: 100,
 				});
 				this._searchResults = res.data as SearchResult[];
 				console.log(this._searchResults);
 			} catch (e) {
-				if (e instanceof getSearchResultFromIndex.Error) {
+				if (e instanceof getSearchResultFromSearchers.Error) {
 					const error = e.getActualType();
 					const data: UmbNotificationDefaultData = { message: error.data.detail ?? 'Could not fetch search results' };
 					this._notificationService?.peek('danger', { data });

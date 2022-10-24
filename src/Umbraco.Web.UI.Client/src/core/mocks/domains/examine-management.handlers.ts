@@ -14,7 +14,6 @@ export const handlers = [
 
 	rest.get(umbracoPath('/search/index/:indexName'), (_req, res, ctx) => {
 		const query = _req.url.searchParams.get('query');
-		debugger;
 		const indexName = _req.params.indexName as string;
 		if (!indexName) return;
 
@@ -74,18 +73,12 @@ export const handlers = [
 		const take = _req.url.searchParams.get('take');
 
 		const searcherName = _req.params.searcherName as string;
-		const searchQuery = _req.params.searchQuery as string;
-		if (!searcherName || !searchQuery) return;
+
+		if (!searcherName || !query) return;
 
 		//const searcherFound = getIndexByName(indexName);
 		if (searcherName) {
-			return res(
-				ctx.status(200),
-				ctx.json<SearchResult[]>([
-					{ id: 1, name: 'Home', fields: { __Key: 'Stuff' }, score: 10 },
-					{ id: 2, score: 5, name: 'NotHome', fields: { __Key: 'Stuff' } },
-				])
-			);
+			return res(ctx.status(200), ctx.json<SearchResult[]>(searchResFromIndex()));
 		} else {
 			return res(ctx.status(404));
 		}
