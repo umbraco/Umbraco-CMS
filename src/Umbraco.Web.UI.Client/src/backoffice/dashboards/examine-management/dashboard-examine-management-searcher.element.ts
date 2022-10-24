@@ -61,10 +61,12 @@ export class UmbDashboardExamineManagementSearcherElement extends UmbContextCons
 			button {
 				background: none;
 				border: none;
-				font-style: italic;
-				color: var(--uui-color-positive-emphasis);
 				text-decoration: underline;
 				cursor: pointer;
+			}
+			button.bright {
+				font-style: italic;
+				color: var(--uui-color-positive-emphasis);
 			}
 		`,
 	];
@@ -116,6 +118,11 @@ export class UmbDashboardExamineManagementSearcherElement extends UmbContextCons
 		}
 	}
 
+	private _onNameClick() {
+		const data: UmbNotificationDefaultData = { message: 'TODO: Open editor for this' }; //TODO
+		this._notificationService?.peek('warning', { data });
+	}
+
 	render() {
 		return html`<uui-box headline="${this.searcherName}">
 			<p><strong>Search tools</strong></p>
@@ -143,9 +150,10 @@ export class UmbDashboardExamineManagementSearcherElement extends UmbContextCons
 				${this._searchResults?.map((rowData) => {
 					return html`<uui-table-row>
 						<uui-table-cell> ${rowData.id} </uui-table-cell>
-						<uui-table-cell> ${rowData.name} </uui-table-cell>
+						<uui-table-cell><button @click="${this._onNameClick}">${rowData.name}</button></uui-table-cell>
 						<uui-table-cell>
 							<button
+								class="bright"
 								@click="${() =>
 									this._modalService?.open('umb-modal-layout-fields-viewer', {
 										type: 'sidebar',

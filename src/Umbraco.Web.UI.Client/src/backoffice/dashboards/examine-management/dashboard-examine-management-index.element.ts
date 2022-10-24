@@ -180,6 +180,11 @@ export class UmbDashboardExamineManagementIndexElement extends UmbContextConsume
 		}
 	}
 
+	private _onNameClick() {
+		const data: UmbNotificationDefaultData = { message: 'TODO: Open editor for this' }; // TODO
+		this._notificationService?.peek('warning', { data });
+	}
+
 	render() {
 		if (this._indexData) {
 			return html`<uui-box headline="${this.indexName}">
@@ -226,7 +231,7 @@ export class UmbDashboardExamineManagementIndexElement extends UmbContextConsume
 				${this._searchResults?.map((rowData) => {
 					return html`<uui-table-row>
 						<uui-table-cell> ${rowData.id} </uui-table-cell>
-						<uui-table-cell><button>${rowData.name}</button></uui-table-cell>
+						<uui-table-cell><button @click="${this._onNameClick}">${rowData.name}</button></uui-table-cell>
 						<uui-table-cell>
 							<button
 								class="bright"
