@@ -150,8 +150,8 @@ internal class RelationRepository : EntityRepositoryBase<int, IRelation>, IRelat
 
     public void DeleteByParent(int parentId, params string[] relationTypeAliases)
     {
-        // HACK: SQLite - hard to replace this without provider specific repositories/another ORM.
-        if (Database.DatabaseType.IsSqlite())
+        // HACK: SQLite/PostgreSQL - hard to replace this without provider specific repositories/another ORM.
+        if (Database.DatabaseType.IsSqlite() || Database.DatabaseType.IsPostgresql())
         {
             Sql<ISqlContext>? query = Sql().Append(@"delete from umbracoRelation");
 

@@ -12,4 +12,8 @@ internal static class NPocoDatabaseTypeExtensions
     [Obsolete("Usage of this method indicates a code smell.")]
     public static bool IsSqlite(this DatabaseType databaseType)
         => databaseType is SQLiteDatabaseType;
+
+    [Obsolete("Usage of this method indicates a code smell.")]
+    public static bool IsPostgresql(this DatabaseType databaseType)
+        => databaseType is PostgreSQLDatabaseType;
 }
