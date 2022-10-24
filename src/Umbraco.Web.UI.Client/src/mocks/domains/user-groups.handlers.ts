@@ -12,6 +12,14 @@ export const handlers = [
 
 		return res(ctx.status(200), ctx.json(response));
 	}),
+
+	rest.get('/umbraco/backoffice/user-groups/getByKeys', (req, res, ctx) => {
+		const keys = req.url.searchParams.getAll('key');
+		if (keys.length === 0) return;
+		const userGroups = fakeData.filter((x) => keys.includes(x.key));
+
+		return res(ctx.status(200), ctx.json(userGroups));
+	}),
 ];
 
 const fakeData: Array<UserGroupDetails> = [
@@ -34,7 +42,7 @@ const fakeData: Array<UserGroupDetails> = [
 		isTrashed: false,
 	},
 	{
-		key: '20000000-0000-0000-0000-000000000000',
+		key: '30000000-0000-0000-0000-000000000000',
 		name: 'Sensitive Data',
 		icon: 'umb:lock',
 		parentKey: '',
@@ -43,7 +51,7 @@ const fakeData: Array<UserGroupDetails> = [
 		isTrashed: false,
 	},
 	{
-		key: '20000000-0000-0000-0000-000000000000',
+		key: '40000000-0000-0000-0000-000000000000',
 		name: 'Translators',
 		icon: 'umb:globe',
 		parentKey: '',
@@ -52,7 +60,7 @@ const fakeData: Array<UserGroupDetails> = [
 		isTrashed: false,
 	},
 	{
-		key: '20000000-0000-0000-0000-000000000000',
+		key: '50000000-0000-0000-0000-000000000000',
 		name: 'Writers',
 		icon: 'umb:edit',
 		parentKey: '',

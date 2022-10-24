@@ -3,7 +3,9 @@ import { customElement, property } from 'lit/decorators.js';
 import { UmbContextConsumerMixin } from '../../../core/context';
 import { UmbModalOptions, UmbModalService } from '../../../core/services/modal';
 
+//TODO: These should probably be imported dynamically.
 import './picker-layout-section.element';
+import './picker-layout-user-group.element';
 import './picker-layout-user.element';
 
 export interface UmbPickerData {
