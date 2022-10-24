@@ -1,6 +1,8 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Routing;
@@ -19,12 +21,18 @@ public class UmbracoRequestPaths
     private readonly string _mvcArea;
     private readonly string _previewMvcPath;
     private readonly string _surfaceMvcPath;
-    private readonly string _backOfficeManagementApiPath;
+    private readonly IOptions<UmbracoRequestPathsOptions> _umbracoRequestPathsOptions;
+
+    [Obsolete("Use constructor that takes IOptions<UmbracoRequestPathsOptions> - Will be removed in Umbraco 13")]
+    public UmbracoRequestPaths(IOptions<GlobalSettings> globalSettings, IHostingEnvironment hostingEnvironment)
+        : this(globalSettings, hostingEnvironment, StaticServiceProvider.Instance.GetRequiredService<IOptions<UmbracoRequestPathsOptions>>())
+    {
+    }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="UmbracoRequestPaths" /> class.
     /// </summary>
-    public UmbracoRequestPaths(IOptions<GlobalSettings> globalSettings, IHostingEnvironment hostingEnvironment)
+    public UmbracoRequestPaths(IOptions<GlobalSettings> globalSettings, IHostingEnvironment hostingEnvironment, IOptions<UmbracoRequestPathsOptions> umbracoRequestPathsOptions)
     {
         var applicationPath = hostingEnvironment.ApplicationVirtualPath;
         _appPath = applicationPath.TrimStart(Constants.CharArrays.ForwardSlash);
@@ -35,11 +43,11 @@ public class UmbracoRequestPaths
         _mvcArea = globalSettings.Value.GetUmbracoMvcArea(hostingEnvironment);
         _defaultUmbPaths = new List<string> { "/" + _mvcArea, "/" + _mvcArea + "/" };
         _backOfficeMvcPath = "/" + _mvcArea + "/BackOffice/";
-        _backOfficeManagementApiPath = "/" + _mvcArea + "/management/api/";
         _previewMvcPath = "/" + _mvcArea + "/Preview/";
         _surfaceMvcPath = "/" + _mvcArea + "/Surface/";
         _apiMvcPath = "/" + _mvcArea + "/Api/";
         _installPath = hostingEnvironment.ToAbsolute(Constants.SystemDirectories.Install);
+        _umbracoRequestPathsOptions = umbracoRequestPathsOptions;
     }
 
     /// <summary>
@@ -90,7 +98,6 @@ public class UmbracoRequestPaths
 
         // check for special back office paths
         if (urlPath.InvariantStartsWith(_backOfficeMvcPath)
-            || urlPath.InvariantStartsWith(_backOfficeManagementApiPath)
             || urlPath.InvariantStartsWith(_previewMvcPath))
         {
             return true;
@@ -101,6 +108,11 @@ public class UmbracoRequestPaths
             || urlPath.InvariantStartsWith(_apiMvcPath))
         {
             return false;
+        }
+
+        if (_umbracoRequestPathsOptions.Value.IsBackOfficeRequest(urlPath))
+        {
+            return true;
         }
 
         // if its none of the above, we will have to try to detect if it's a PluginController route, we can detect this by
