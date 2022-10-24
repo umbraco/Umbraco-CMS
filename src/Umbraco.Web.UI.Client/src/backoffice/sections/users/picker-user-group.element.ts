@@ -27,6 +27,9 @@ export class UmbPickerUserGroupElement extends UmbPickerElement {
 				align-items: center;
 				gap: var(--uui-size-space-2);
 			}
+			.user-group uui-button {
+				margin-left: auto;
+			}
 		`,
 	];
 
@@ -70,7 +73,14 @@ export class UmbPickerUserGroupElement extends UmbPickerElement {
 		if (this._userGroups.length === 0) return nothing;
 
 		return html`<div id="user-list">
-			${this._userGroups.map((userGroup) => html` <div class="user-group">${userGroup.name}</div> `)}
+			${this._userGroups.map(
+				(userGroup) => html`
+					<div class="user-group">
+						<div>${userGroup.name}</div>
+						<uui-button @click=${() => this.removeFromSelection(userGroup.key)} label="remove"></uui-button>
+					</div>
+				`
+			)}
 		</div> `;
 	}
 
