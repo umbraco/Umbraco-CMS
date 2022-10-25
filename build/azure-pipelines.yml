@@ -318,6 +318,11 @@ stages:
             inputs:
               artifact: build_output
               path: $(Build.SourcesDirectory)
+          - task: UseDotNet@2
+            displayName: Use .NET $(dotnetVersion)
+            inputs:
+              version: $(dotnetVersion)
+              includePreviewVersions: $(dotnetIncludePreviewVersions)
           - powershell: sqllocaldb start mssqllocaldb
             displayName: Start localdb (Windows only)
             condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
@@ -499,14 +504,10 @@ stages:
           - task: NuGetCommand@2
             displayName: NuGet push
             inputs:
-              command: restore
-              projects: $(solution)
-          # TODO: Use NuGetCommand instead of DotNetCoreCLI
-          #                - task: NuGetCommand@2
-          #                  displayName: Restore NuGet Packages
-          #                  inputs:
-          #                      restoreSolution: $(solution)
-          #                      feedsToUse: config
+              command: 'push'
+              packagesToPush: $(Build.ArtifactStagingDirectory)/**/*.nupkg
+              nuGetFeedType: 'external'
+              publishFeedCredentials: 'MyGet - Pre-releases'
   - stage: Deploy_NuGet
     displayName: NuGet release
     dependsOn:
@@ -526,8 +527,10 @@ stages:
           - task: NuGetCommand@2
             displayName: NuGet push
             inputs:
-              command: restore
-              projects: $(solution)
+              command: 'push'
+              packagesToPush: $(Build.ArtifactStagingDirectory)/**/*.nupkg
+              nuGetFeedType: 'external'
+              publishFeedCredentials: 'NuGet - Umbraco.*'
 
   - stage: Upload_API_Docs
     pool:
