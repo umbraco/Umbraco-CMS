@@ -6,19 +6,19 @@ using Umbraco.Cms.ManagementApi.Services.Paging;
 using Umbraco.Cms.ManagementApi.ViewModels.Pagination;
 using Umbraco.Cms.ManagementApi.ViewModels.Tree;
 
-namespace Umbraco.Cms.ManagementApi.Controllers.DictionaryItem.Tree;
+namespace Umbraco.Cms.ManagementApi.Controllers.Dictionary.Tree;
 
-public class ChildrenDictionaryItemTreeController : DictionaryItemTreeControllerBase
+public class RootDictionaryTreeController : DictionaryTreeControllerBase
 {
-    public ChildrenDictionaryItemTreeController(IEntityService entityService, ILocalizationService localizationService)
+    public RootDictionaryTreeController(IEntityService entityService, ILocalizationService localizationService)
         : base(entityService, localizationService)
     {
     }
 
-    [HttpGet("children")]
+    [HttpGet("root")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<EntityTreeItemViewModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<EntityTreeItemViewModel>>> Children(Guid parentKey, int skip = 0, int take = 100)
+    public async Task<ActionResult<PagedViewModel<EntityTreeItemViewModel>>> Root(int skip = 0, int take = 100)
     {
         if (PaginationService.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize, out ProblemDetails? error) == false)
         {
@@ -28,7 +28,7 @@ public class ChildrenDictionaryItemTreeController : DictionaryItemTreeController
         IDictionaryItem[] dictionaryItems = PaginatedDictionaryItems(
             pageNumber,
             pageSize,
-            LocalizationService.GetDictionaryItemChildren(parentKey),
+            LocalizationService.GetRootDictionaryItems(),
             out var totalItems);
 
         EntityTreeItemViewModel[] viewModels = MapTreeItemViewModels(null, dictionaryItems);

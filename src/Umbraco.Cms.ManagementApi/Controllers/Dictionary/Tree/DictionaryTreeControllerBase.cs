@@ -7,17 +7,17 @@ using Umbraco.Cms.ManagementApi.Controllers.Tree;
 using Umbraco.Cms.ManagementApi.ViewModels.Tree;
 using Umbraco.New.Cms.Web.Common.Routing;
 
-namespace Umbraco.Cms.ManagementApi.Controllers.DictionaryItem.Tree;
+namespace Umbraco.Cms.ManagementApi.Controllers.Dictionary.Tree;
 
 [ApiVersion("1.0")]
 [ApiController]
-[VersionedApiBackOfficeRoute($"tree/{Constants.UdiEntityType.DictionaryItem}")]
-[OpenApiTag(nameof(Constants.UdiEntityType.DictionaryItem))]
-// NOTE: at the moment dictionary items aren't supported by EntityService, so we have little use of the
+[VersionedApiBackOfficeRoute($"tree/dictionary")]
+[OpenApiTag("Dictionary")]
+// NOTE: at the moment dictionary items (renamed to dictionary tree) aren't supported by EntityService, so we have little use of the
 // tree controller base. We'll keep it though, in the hope that we can mend EntityService.
-public class DictionaryItemTreeControllerBase : EntityTreeControllerBase<EntityTreeItemViewModel>
+public class DictionaryTreeControllerBase : EntityTreeControllerBase<EntityTreeItemViewModel>
 {
-    public DictionaryItemTreeControllerBase(IEntityService entityService, ILocalizationService localizationService)
+    public DictionaryTreeControllerBase(IEntityService entityService, ILocalizationService localizationService)
         : base(entityService) =>
         LocalizationService = localizationService;
 

@@ -4,11 +4,11 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.ManagementApi.ViewModels.Tree;
 
-namespace Umbraco.Cms.ManagementApi.Controllers.DictionaryItem.Tree;
+namespace Umbraco.Cms.ManagementApi.Controllers.Dictionary.Tree;
 
-public class ItemsDictionaryItemTreeController : DictionaryItemTreeControllerBase
+public class ItemsDictionaryTreeController : DictionaryTreeControllerBase
 {
-    public ItemsDictionaryItemTreeController(IEntityService entityService, ILocalizationService localizationService)
+    public ItemsDictionaryTreeController(IEntityService entityService, ILocalizationService localizationService)
         : base(entityService, localizationService)
     {
     }

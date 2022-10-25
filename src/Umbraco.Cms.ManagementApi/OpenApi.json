@@ -3486,12 +3486,12 @@
         }
       }
     },
-    "/umbraco/management/api/v1/tree/dictionary-item/children": {
+    "/umbraco/management/api/v1/tree/dictionary/children": {
       "get": {
         "tags": [
-          "DictionaryItem"
+          "Dictionary"
         ],
-        "operationId": "ChildrenDictionaryItemTree_Children",
+        "operationId": "ChildrenDictionaryTree_Children",
         "parameters": [
           {
             "name": "parentKey",
@@ -3537,12 +3537,12 @@
         }
       }
     },
-    "/umbraco/management/api/v1/tree/dictionary-item/item": {
+    "/umbraco/management/api/v1/tree/dictionary/item": {
       "get": {
         "tags": [
-          "DictionaryItem"
+          "Dictionary"
         ],
-        "operationId": "ItemsDictionaryItemTree_Items",
+        "operationId": "ItemsDictionaryTree_Items",
         "parameters": [
           {
             "name": "key",
@@ -3578,12 +3578,12 @@
         }
       }
     },
-    "/umbraco/management/api/v1/tree/dictionary-item/root": {
+    "/umbraco/management/api/v1/tree/dictionary/root": {
       "get": {
         "tags": [
-          "DictionaryItem"
+          "Dictionary"
         ],
-        "operationId": "RootDictionaryItemTree_Root",
+        "operationId": "RootDictionaryTree_Root",
         "parameters": [
           {
             "name": "skip",
@@ -5271,9 +5271,6 @@
     },
     {
       "name": "Dictionary"
-    },
-    {
-      "name": "DictionaryItem"
     },
     {
       "name": "Document"
