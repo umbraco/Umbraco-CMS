@@ -11,7 +11,7 @@ public class GetAnalyticsController : AnalyticsControllerBase
 
     public GetAnalyticsController(IMetricsConsentService metricsConsentService) => _metricsConsentService = metricsConsentService;
 
-    [HttpGet]
+    [HttpGet("current")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(AnalyticsLevelViewModel), StatusCodes.Status200OK)]
     public async Task<AnalyticsLevelViewModel> Get() => await Task.FromResult(new AnalyticsLevelViewModel { AnalyticsLevel = _metricsConsentService.GetConsentLevel() });

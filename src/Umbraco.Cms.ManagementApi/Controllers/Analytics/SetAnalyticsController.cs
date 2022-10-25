@@ -12,7 +12,7 @@ public class SetAnalyticsController : AnalyticsControllerBase
 
     public SetAnalyticsController(IMetricsConsentService metricsConsentService) => _metricsConsentService = metricsConsentService;
 
-    [HttpPost]
+    [HttpPost("current")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status200OK)]
