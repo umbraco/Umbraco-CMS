@@ -2218,7 +2218,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="areaDisallowAllBlocks">Tillad kun specifikke blok-typer</key>
     <key alias="areaAllowedBlocks">Tilladte blok-typer</key>
     <key alias="areaAllowedBlocksHelp">Vælg de blok-typer, der er tilladt i dette område, og evt. også hvor mange af hver type, redaktørerne skal tilføje til området.</key>
-    <key alias="areaAllowedBlocksEmpty">All block-typer tilladt for i områder kan oprettes.</key>
+    <key alias="areaAllowedBlocksEmpty">Når denne er tom er alle block-typer tilladt for områder tilladt.</key>
     <key alias="confirmDeleteBlockAreaMessage">Er du sikker på, at du vil slette dette område?</key>
     <key alias="confirmDeleteBlockAreaNotice">Alle blokke, der er oprettet i dette område, vil blive slettet.</key>
     <key alias="layoutOptions">Layout-opsætning</key>
@@ -2257,8 +2257,8 @@ Mange hilsner fra Umbraco robotten
     <key alias="addBlockType">Tilføj Blok</key>
     <key alias="addBlockGroup">Tilføj gruppe</key>
     <key alias="pickSpecificAllowance">Tilføj gruppe eller block</key>
-    <key alias="allowanceMinimum">Sæt minimum krav for denne tilladelse</key>
-    <key alias="allowanceMaximum">Set maksimum krav for denne tilladelse</key>
+    <key alias="allowanceMinimum">Sæt minimum krav</key>
+    <key alias="allowanceMaximum">Sæt maksimum krav</key>
     <key alias="block">Blok</key>
     <key alias="tabBlock">Blok</key>
     <key alias="tabBlockTypeSettings">Indstillinger</key>
