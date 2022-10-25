@@ -5,9 +5,6 @@ import {ContentBuilder, DocumentTypeBuilder} from "@umbraco/json-models-builders
 test.describe('Recycle bin', () => {
 
   test.beforeEach(async ({page, umbracoApi}) => {
-    // TODO: REMOVE THIS WHEN SQLITE IS FIXED
-    // Wait so we don't bombard the API
-    await page.waitForTimeout(1000);
     await umbracoApi.login();
   });
 

@@ -6,7 +6,7 @@ namespace Umbraco.Cms.ManagementApi.Controllers.Profiling;
 
 [ApiVersion("1.0")]
 [ApiController]
-[BackOfficeRoute("api/v{version:apiVersion}/profiling")]
+[VersionedApiBackOfficeRoute("profiling")]
 [OpenApiTag("Profiling")]
 public class ProfilingControllerBase : ManagementApiControllerBase
 {

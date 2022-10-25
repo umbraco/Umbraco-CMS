@@ -2050,6 +2050,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="disabled">Disable User</key>
     <key alias="documentType">Document Type</key>
     <key alias="editors">Editor</key>
+    <key alias="emailRequired">Required - enter an email address for this user</key>
     <key alias="excerptField">Excerpt field</key>
     <key alias="failedPasswordAttempts">Failed login attempts</key>
     <key alias="goToProfile">Go to user profile</key>
@@ -2069,6 +2070,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="mediastartnodes">Media start nodes</key>
     <key alias="mediastartnodeshelp">Limit the media library to specific start nodes</key>
     <key alias="modules">Sections</key>
+    <key alias="nameRequired">Required - enter a name for this user</key>
     <key alias="noConsole">Disable Umbraco Access</key>
     <key alias="noLogin">has not logged in yet</key>
     <key alias="oldPassword">Old password</key>
