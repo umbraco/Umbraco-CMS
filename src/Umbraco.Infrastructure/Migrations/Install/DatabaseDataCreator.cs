@@ -1,5 +1,4 @@
 using System.Globalization;
-using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NPoco;
@@ -1756,11 +1755,11 @@ internal class DatabaseDataCreator
     private void CreateLanguageData()
     {
         // Create the single language that's specified as the default UI language (by default, this is en-US).
-        var defaultCulture = new CultureInfo(_globalSettings.CurrentValue.DefaultUILanguage);
+        var defaultCulture = CultureInfo.GetCultureInfo(_globalSettings.CurrentValue.DefaultUILanguage);
         ConditionalInsert(
             Constants.Configuration.NamedOptions.InstallDefaultData.Languages,
-            _globalSettings.CurrentValue.DefaultUILanguage,
-            new LanguageDto { Id = 1, IsoCode = defaultCulture.Name, CultureName = defaultCulture.DisplayName, IsDefault = true },
+            defaultCulture.Name,
+            new LanguageDto { Id = 1, IsoCode = defaultCulture.Name, CultureName = defaultCulture.EnglishName, IsDefault = true },
             Constants.DatabaseSchema.Tables.Language,
             "id");
     }
