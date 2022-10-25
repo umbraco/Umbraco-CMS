@@ -65,7 +65,6 @@ public static partial class Constants
         {
             public static class InstallDefaultData
             {
-                [Obsolete("No longer used. Will be removed in V12.")]
                 public const string Languages = "Languages";
 
                 public const string DataTypes = "DataTypes";

@@ -1757,14 +1757,12 @@ internal class DatabaseDataCreator
     {
         // Create the single language that's specified as the default UI language (by default, this is en-US).
         var defaultCulture = new CultureInfo(_globalSettings.CurrentValue.DefaultUILanguage);
-        var dto = new LanguageDto
-        {
-            Id = 1,
-            IsoCode = defaultCulture.Name,
-            CultureName = defaultCulture.DisplayName,
-            IsDefault = true,
-        };
-        _database.Insert(Constants.DatabaseSchema.Tables.Language, "id", false, dto);
+        ConditionalInsert(
+            Constants.Configuration.NamedOptions.InstallDefaultData.Languages,
+            "en-us",
+            new LanguageDto { Id = 1, IsoCode = defaultCulture.Name, CultureName = defaultCulture.DisplayName, IsDefault = true },
+            Constants.DatabaseSchema.Tables.Language,
+            "id");
     }
 
     private void CreateContentChildTypeData()
