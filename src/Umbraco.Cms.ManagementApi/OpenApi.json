@@ -82,7 +82,7 @@
         ],
         "summary": "Gets a page list of the child nodes of the current item used in any kind of relation.",
         "description": "Used when deleting and unpublishing a single item to check if this item has any descending items that are in any\nkind of relation.\nThis is basically finding the descending items which are children in relations.",
-        "operationId": "DescendantsTrackedReferences_Descendants",
+        "operationId": "DescendantsTrackedReference_Descendants",
         "parameters": [
           {
             "name": "parentId",
@@ -143,7 +143,7 @@
         ],
         "summary": "Gets a page list of tracked references for the current item, so you can see where an item is being used.",
         "description": "Used by info tabs on content, media etc. and for the delete and unpublish of single items.\nThis is basically finding parents of relations.",
-        "operationId": "ForItemTrackedReferences_Get",
+        "operationId": "ByIdTrackedReference_Get",
         "parameters": [
           {
             "name": "id",
@@ -197,14 +197,14 @@
         }
       }
     },
-    "/umbraco/management/api/v1/tracked-reference/multiple": {
+    "/umbraco/management/api/v1/tracked-reference/item": {
       "get": {
         "tags": [
           "Tracked Reference"
         ],
         "summary": "Gets a page list of the items used in any kind of relation from selected integer ids.",
         "description": "Used when bulk deleting content/media and bulk unpublishing content (delete and unpublish on List view).\nThis is basically finding children of relations.",
-        "operationId": "MultipleTrackedReferences_GetPagedReferencedItems",
+        "operationId": "ItemsTrackedReference_GetPagedReferencedItems",
         "parameters": [
           {
             "name": "ids",
