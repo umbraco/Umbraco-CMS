@@ -3845,7 +3845,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedViewModelOfTelemetryLevel"
+                  "$ref": "#/components/schemas/PagedViewModelOfAnalyticsLevelViewModel"
                 }
               }
             }
@@ -5221,7 +5221,7 @@
           }
         }
       },
-      "PagedViewModelOfTelemetryLevel": {
+      "PagedViewModelOfAnalyticsLevelViewModel": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
@@ -5232,24 +5232,10 @@
           "items": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/TelemetryLevel2"
+              "$ref": "#/components/schemas/AnalyticsLevelViewModel"
             }
           }
         }
-      },
-      "TelemetryLevel2": {
-        "type": "integer",
-        "description": "",
-        "x-enumNames": [
-          "Minimal",
-          "Basic",
-          "Detailed"
-        ],
-        "enum": [
-          0,
-          1,
-          2
-        ]
       },
       "AnalyticsLevelViewModel": {
         "type": "object",
