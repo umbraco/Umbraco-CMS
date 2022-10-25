@@ -94,6 +94,7 @@ public class ManagementApiComposer : IComposer
         services.AddControllers();
         builder.Services.ConfigureOptions<ConfigureMvcOptions>();
 
+        // TODO: when this is moved to core, make the AddUmbracoOptions extension private again and remove core InternalsVisibleTo for Umbraco.Cms.ManagementApi
         builder.AddUmbracoOptions<NewBackOfficeSettings>();
         builder.Services.AddSingleton<IValidateOptions<NewBackOfficeSettings>, NewBackOfficeSettingsValidator>();
 

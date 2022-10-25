@@ -3,7 +3,7 @@ using Umbraco.Cms.Core.Configuration.Models.Validation;
 
 namespace Umbraco.New.Cms.Core.Models.Configuration;
 
-/// TODO: merge this class with relevant existing settings validators from Core and clean up
+// TODO: merge this class with relevant existing settings validators from Core and clean up
 public class NewBackOfficeSettingsValidator : ConfigurationValidatorBase, IValidateOptions<NewBackOfficeSettings>
 {
     public ValidateOptionsResult Validate(string? name, NewBackOfficeSettings options)
