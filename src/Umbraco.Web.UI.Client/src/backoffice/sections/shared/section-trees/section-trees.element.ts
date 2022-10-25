@@ -5,8 +5,8 @@ import { map, switchMap, EMPTY, of } from 'rxjs';
 
 import { UmbSectionContext } from '../../section.context';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import { UmbExtensionRegistry } from '@umbraco-cms/extensions-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
 import '../../../trees/shared/tree-extension.element';
 
@@ -17,21 +17,19 @@ export class UmbSectionTreesElement extends UmbContextConsumerMixin(UmbObserverM
 	@state()
 	private _treeAliases: Array<string> = [];
 
-	private _extensionStore?: UmbExtensionRegistry;
 	private _sectionContext?: UmbSectionContext;
 
 	constructor() {
 		super();
 
-		this.consumeAllContexts(['umbExtensionRegistry', 'umbSectionContext'], (instances) => {
-			this._extensionStore = instances['umbExtensionRegistry'];
-			this._sectionContext = instances['umbSectionContext'];
+		this.consumeContext('umbSectionContext', (instance) => {
+			this._sectionContext = instance;
 			this._observeTrees();
 		});
 	}
 
 	private _observeTrees() {
-		if (!this._extensionStore || !this._sectionContext) return;
+		if (!this._sectionContext) return;
 
 		this.observe<string[]>(
 			this._sectionContext?.data.pipe(
@@ -39,7 +37,7 @@ export class UmbSectionTreesElement extends UmbContextConsumerMixin(UmbObserverM
 					if (!section) return EMPTY;
 
 					return (
-						this._extensionStore
+						umbExtensionsRegistry
 							?.extensionsOfType('tree')
 							.pipe(
 								map((trees) =>

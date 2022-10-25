@@ -2,9 +2,10 @@ import { html, LitElement, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { firstValueFrom, map } from 'rxjs';
 
-import type { UmbModalService } from '../../../core/services/modal';
-import { createExtensionElement, UmbExtensionRegistry } from '@umbraco-cms/extensions-api';
+import type { UmbModalService } from '../../../../../core/services/modal';
+import { createExtensionElement } from '@umbraco-cms/extensions-api';
 
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { ManifestPackageView, PackageInstalled } from '@umbraco-cms/models';
 
@@ -16,25 +17,23 @@ export class UmbPackagesInstalledItem extends UmbContextConsumerMixin(LitElement
 	@state()
 	private _packageView?: ManifestPackageView;
 
-	private _umbExtensionRegistry?: UmbExtensionRegistry;
 	private _umbModalService?: UmbModalService;
 
 	constructor() {
 		super();
-
-		this.consumeContext('umbExtensionRegistry', (umbExtensionRegistry: UmbExtensionRegistry) => {
-			this._umbExtensionRegistry = umbExtensionRegistry;
-
-			this.findPackageView(this.package.alias);
-		});
 
 		this.consumeContext('umbModalService', (modalService: UmbModalService) => {
 			this._umbModalService = modalService;
 		});
 	}
 
+	connectedCallback(): void {
+		super.connectedCallback();
+		this.findPackageView(this.package.alias);
+	}
+
 	private async findPackageView(alias: string) {
-		const observable = this._umbExtensionRegistry
+		const observable = umbExtensionsRegistry
 			?.extensionsOfType('packageView')
 			.pipe(map((e) => e.filter((m) => m.meta.packageAlias === alias)));
 
@@ -83,7 +82,7 @@ export class UmbPackagesInstalledItem extends UmbContextConsumerMixin(LitElement
 	}
 
 	private _onClick() {
-		window.history.pushState({}, '', `/section/packages/details/${this.package.id}`);
+		window.history.pushState({}, '', `/section/packages/view/installed/package/${this.package.id}`);
 	}
 }
 

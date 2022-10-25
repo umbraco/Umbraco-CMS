@@ -77,7 +77,7 @@ export class UmbModalLayoutContentPickerElement extends UmbModalLayoutElement<Um
 					<uui-input></uui-input>
 					<hr />
 					<umb-tree
-						alias="Umb.Tree.Content"
+						alias="Umb.Tree.Documents"
 						@change=${this._handleSelectionChange}
 						.selection=${this._selection}
 						selectable></umb-tree>

@@ -6,9 +6,9 @@ import { UmbDataTypeContext } from '../../data-type.context';
 import type { DataTypeDetails } from '../../../../../core/mocks/data/data-type.data';
 import type { UmbPropertyEditorStore } from '../../../../../core/stores/property-editor/property-editor.store';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import type { UmbExtensionRegistry } from '@umbraco-cms/extensions-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { ManifestPropertyEditorUI } from '@umbraco-cms/models';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
 import '../../../../property-editor-uis/shared/property-editor-config/property-editor-config.element';
 
@@ -35,27 +35,22 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Um
 	private _data: Array<any> = [];
 
 	private _dataTypeContext?: UmbDataTypeContext;
-	private _extensionRegistry?: UmbExtensionRegistry;
 	private _propertyEditorStore?: UmbPropertyEditorStore;
 	private _modalService?: UmbModalService;
 
 	constructor() {
 		super();
 
-		this.consumeAllContexts(
-			['umbDataTypeContext', 'umbPropertyEditorStore', 'umbExtensionRegistry', 'umbModalService'],
-			(result) => {
-				this._dataTypeContext = result['umbDataTypeContext'];
-				this._propertyEditorStore = result['umbPropertyEditorStore'];
-				this._extensionRegistry = result['umbExtensionRegistry'];
-				this._modalService = result['umbModalService'];
-				this._observeDataType();
-			}
-		);
+		this.consumeAllContexts(['umbDataTypeContext', 'umbPropertyEditorStore', 'umbModalService'], (result) => {
+			this._dataTypeContext = result['umbDataTypeContext'];
+			this._propertyEditorStore = result['umbPropertyEditorStore'];
+			this._modalService = result['umbModalService'];
+			this._observeDataType();
+		});
 	}
 
 	private _observeDataType() {
-		if (!this._dataTypeContext || !this._propertyEditorStore || !this._extensionRegistry) return;
+		if (!this._dataTypeContext || !this._propertyEditorStore) return;
 
 		this.observe<DataTypeDetails>(this._dataTypeContext.data, (dataType) => {
 			this._dataType = dataType;
@@ -77,10 +72,10 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Um
 	}
 
 	private _observePropertyEditorUI(propertyEditorUIAlias: string | null) {
-		if (!propertyEditorUIAlias || !this._extensionRegistry) return;
+		if (!propertyEditorUIAlias) return;
 
 		this.observe<ManifestPropertyEditorUI>(
-			this._extensionRegistry?.getByAlias<ManifestPropertyEditorUI>(propertyEditorUIAlias),
+			umbExtensionsRegistry.getByAlias<ManifestPropertyEditorUI>(propertyEditorUIAlias),
 			(propertyEditorUI) => {
 				this._propertyEditorUIName = propertyEditorUI?.meta.label ?? propertyEditorUI?.name ?? '';
 				this._propertyEditorUIAlias = propertyEditorUI?.alias ?? '';

@@ -1,7 +1,8 @@
 import { html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import { UmbExtensionRegistry, isManifestElementType } from '@umbraco-cms/extensions-api';
+import { isManifestElementType } from '@umbraco-cms/extensions-api';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { ManifestTypes } from '@umbraco-cms/models';
 
@@ -12,29 +13,22 @@ export class UmbEditorExtensionsElement extends UmbContextConsumerMixin(UmbObser
 	@state()
 	private _extensions: Array<ManifestTypes> = [];
 
-	private _extensionRegistry?: UmbExtensionRegistry;
-
-	constructor() {
-		super();
-
-		this.consumeContext('umbExtensionRegistry', (_instance: UmbExtensionRegistry) => {
-			this._extensionRegistry = _instance;
-			this._observeExtensions();
-		});
+	connectedCallback(): void {
+		super.connectedCallback();
+		this._observeExtensions();
 	}
 
 	private _observeExtensions() {
-		if (!this._extensionRegistry) return;
-
-		this.observe<Array<ManifestTypes>>(this._extensionRegistry.extensions, (extensions) => {
-			this._extensions = [...extensions]; // TODO: Though, this is a shallow clone, wouldn't we either do a deep clone or no clone at all?
+		this.observe<Array<ManifestTypes>>(umbExtensionsRegistry.extensions, (extensions) => {
+			this._extensions = [...extensions];
 		});
 	}
 
 	render() {
 		return html`
 			<umb-editor-entity-layout headline="Extensions" alias="Umb.Editor.Extensions">
-				<uui-box headline="Extensions">
+				<uui-box>
+					<p>List of currently loaded extensions</p>
 					<uui-table>
 						<uui-table-head>
 							<uui-table-head-cell>Type</uui-table-head-cell>

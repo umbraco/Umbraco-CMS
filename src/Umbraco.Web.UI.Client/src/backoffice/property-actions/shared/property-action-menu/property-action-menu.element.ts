@@ -4,10 +4,9 @@ import { map } from 'rxjs';
 import { UUITextStyles } from '@umbraco-ui/uui';
 import { UmbPropertyActionMenuContext } from './property-action-menu.context';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import { UmbExtensionRegistry } from '@umbraco-cms/extensions-api';
-
 import { UmbContextProviderMixin, UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { ManifestPropertyAction } from '@umbraco-cms/models';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
 import '../property-action/property-action.element';
 
@@ -57,33 +56,20 @@ export class UmbPropertyActionMenuElement extends UmbContextProviderMixin(
 	@state()
 	private _open = false;
 
-	private _extensionRegistry?: UmbExtensionRegistry;
 	private _propertyActionMenuContext = new UmbPropertyActionMenuContext();
-
-	constructor() {
-		super();
-
-		this.consumeContext('umbExtensionRegistry', (extensionRegistry: UmbExtensionRegistry) => {
-			this._extensionRegistry = extensionRegistry;
-			this._observePropertyActions();
-		});
-
-		this.provideContext('umbPropertyActionMenu', this._propertyActionMenuContext);
-	}
 
 	connectedCallback(): void {
 		super.connectedCallback();
 
-		this.observe<boolean>(this._propertyActionMenuContext.isOpen, (value) => {
-			this._open = value;
-		});
+		this._observePropertyActions();
+		this._observePropertyActionMenuOpenState();
+
+		this.provideContext('umbPropertyActionMenu', this._propertyActionMenuContext);
 	}
 
 	private _observePropertyActions() {
-		if (!this._extensionRegistry) return;
-
 		this.observe<ManifestPropertyAction[]>(
-			this._extensionRegistry
+			umbExtensionsRegistry
 				.extensionsOfType('propertyAction')
 				.pipe(
 					map((propertyActions) =>
@@ -98,8 +84,13 @@ export class UmbPropertyActionMenuElement extends UmbContextProviderMixin(
 		);
 	}
 
+	private _observePropertyActionMenuOpenState() {
+		this.observe<boolean>(this._propertyActionMenuContext.isOpen, (value) => {
+			this._open = value;
+		});
+	}
+
 	private _toggleMenu() {
-		//this._open = !this._open;
 		this._open ? this._propertyActionMenuContext.close() : this._propertyActionMenuContext.open();
 	}
 

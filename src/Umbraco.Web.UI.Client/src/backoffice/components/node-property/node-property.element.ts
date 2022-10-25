@@ -8,7 +8,7 @@ import { UmbDataTypeStore } from '../../../core/stores/data-type/data-type.store
 import { NodeProperty } from '../../../core/mocks/data/node.data';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import type { ManifestTypes } from '@umbraco-cms/models';
-import { UmbExtensionRegistry } from '@umbraco-cms/extensions-api';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
 import '../entity-property/entity-property.element';
@@ -43,28 +43,26 @@ export class UmbNodePropertyElement extends UmbContextConsumerMixin(UmbObserverM
 	@state()
 	private _dataTypeData?: any;
 
-	private _extensionRegistry?: UmbExtensionRegistry;
 	private _dataTypeStore?: UmbDataTypeStore;
 
 	constructor() {
 		super();
 
-		this.consumeAllContexts(['umbDataTypeStore', 'umbExtensionRegistry'], (instances) => {
-			this._extensionRegistry = instances['umbExtensionRegistry'];
-			this._dataTypeStore = instances['umbDataTypeStore'];
+		this.consumeContext('umbDataTypeStore', (instance) => {
+			this._dataTypeStore = instance;
 			this._observeDataType();
 		});
 	}
 
 	private _observeDataType() {
-		if (!this._dataTypeStore || !this._extensionRegistry || !this._property) return;
+		if (!this._dataTypeStore || !this._property) return;
 
 		this.observe<ManifestTypes>(
 			this._dataTypeStore.getByKey(this._property.dataTypeKey).pipe(
 				switchMap((dataType) => {
 					if (!dataType?.propertyEditorUIAlias) return EMPTY;
 					this._dataTypeData = dataType.data;
-					return this._extensionRegistry?.getByAlias(dataType.propertyEditorUIAlias) ?? of(null);
+					return umbExtensionsRegistry.getByAlias(dataType.propertyEditorUIAlias) ?? of(null);
 				})
 			),
 			(manifest) => {

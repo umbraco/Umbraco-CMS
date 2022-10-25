@@ -4,9 +4,9 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
 import { UmbTreeContextBase } from '../tree.context';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import { UmbExtensionRegistry } from '@umbraco-cms/extensions-api';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import type { ManifestTree } from '@umbraco-cms/models';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
 @customElement('umb-tree')
 export class UmbTreeElement extends UmbContextProviderMixin(UmbContextConsumerMixin(UmbObserverMixin(LitElement))) {
@@ -50,21 +50,17 @@ export class UmbTreeElement extends UmbContextProviderMixin(UmbContextConsumerMi
 	private _tree?: ManifestTree;
 
 	private _treeContext?: UmbTreeContextBase;
-	private _extensionRegistry?: UmbExtensionRegistry;
 
-	constructor() {
-		super();
-		this.consumeContext('umbExtensionRegistry', (extensionRegistry) => {
-			this._extensionRegistry = extensionRegistry;
-			this._observeTree();
-		});
+	connectedCallback(): void {
+		super.connectedCallback();
+		this._observeTree();
 	}
 
 	private _observeTree() {
-		if (!this._extensionRegistry || !this.alias) return;
+		if (!this.alias) return;
 
 		this.observe<ManifestTree>(
-			this._extensionRegistry
+			umbExtensionsRegistry
 				.extensionsOfType('tree')
 				.pipe(map((trees) => trees.find((tree) => tree.alias === this.alias))),
 			(tree) => {
