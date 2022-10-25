@@ -16,7 +16,7 @@ public interface IDataTypeService : IService
     IReadOnlyDictionary<Udi, IEnumerable<string>> GetReferences(int id);
 
     Attempt<OperationResult<OperationResultType, EntityContainer>?> CreateContainer(int parentId, Guid key, string name, int userId = Constants.Security.SuperUserId);
-
+    
     Attempt<OperationResult?> SaveContainer(EntityContainer container, int userId = Constants.Security.SuperUserId);
 
     EntityContainer? GetContainer(int containerId);
@@ -100,6 +100,9 @@ public interface IDataTypeService : IService
     IEnumerable<IDataType> GetByEditorAlias(string propertyEditorAlias);
 
     Attempt<OperationResult<MoveOperationStatusType>?> Move(IDataType toMove, int parentId);
+
+    [Obsolete("Use the method which specifies the userId parameter")]
+    Attempt<OperationResult<MoveOperationStatusType, IDataType>?> Copy(IDataType copying, int containerId) => Copy(copying, containerId, Constants.Security.SuperUserId);
 
     /// <summary>
     /// Copies the give <see cref="IDataType"/> to a given container
