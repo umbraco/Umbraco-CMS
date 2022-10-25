@@ -4,6 +4,18 @@
 
     <div class="umb-block-grid__wrapper" ng-style="vm.editorWrapperStyles">
 
+        <umb-editor-sub-header ng-if="vm.sortMode" appearance="blue">
+            <umb-editor-sub-header-content-right>
+                <umb-button
+                    type="button"
+                    icon="icon-delete"
+                    button-style="primary"
+                    label-key="blockEditor_actionExitSortMode"
+                    action="vm.exitSortMode()">
+                </umb-button>
+            </umb-editor-sub-header-content-right>
+        </umb-editor-sub-header>
+
         <div ng-if="vm.loading !== true">
 
             <umb-block-grid-root

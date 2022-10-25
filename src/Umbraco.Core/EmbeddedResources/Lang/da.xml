@@ -2268,6 +2268,8 @@ Mange hilsner fra Umbraco robotten
     <key alias="getSampleHeadline">Installer demo konfiguration</key>
     <key alias="getSampleDescription"><![CDATA[Dette tilføjer basale og hjælper dig til at komme igang med Block Grid Editor.<br/>Dette indeholder Blokke for Overskrift, Beriget-Tekst, Billede og To-Koloners-Layout.]]></key>
     <key alias="getSampleButton">Installer</key>
+    <key alias="actionEnterSortMode">Sortings tilstand</key>
+    <key alias="actionExitSortMode">Afslut sortings tilstand</key>
   </area>
   <area alias="contentTemplatesDashboard">
     <key alias="whatHeadline">Hvad er Indholdsskabeloner?</key>

@@ -2920,6 +2920,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="getSampleHeadline">Install Sample Configuration</key>
     <key alias="getSampleDescription"><![CDATA[This will add basic Blocks and help you get started with the Block Grid Editor. You'll get Blocks for Headline, Rich Text, Image, as well as a Two Column Layout.]]></key>
     <key alias="getSampleButton">Install</key>
+    <key alias="actionEnterSortMode">Sort mode</key>
+    <key alias="actionExitSortMode">End sort mode</key>
   </area>
   <area alias="contentTemplatesDashboard">
     <key alias="whatHeadline">What are Content Templates?</key>

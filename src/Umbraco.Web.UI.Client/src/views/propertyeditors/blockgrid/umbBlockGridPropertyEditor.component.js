@@ -14,6 +14,9 @@
     }
 
 
+    const DefaultViewFolderPath = "views/propertyeditors/blockgrid/blockgridentryeditors/";
+
+
     /**
      * @ngdoc directive
      * @name umbraco.directives.directive:umbBlockGridPropertyEditor
@@ -46,6 +49,9 @@
         var modelObject;
 
         // Property actions:
+        var propertyActions = null;
+        var enterSortModeAction = null;
+        var exitSortModeAction = null;
         var copyAllBlocksAction = null;
         var deleteAllBlocksAction = null;
 
@@ -107,6 +113,8 @@
         vm.options = {
             createFlow: false
         };
+        vm.sortMode = false;
+        vm.sortModeView = DefaultViewFolderPath + "gridblock/gridblock.editor.html";;
 
         localizationService.localizeMany(["grid_addElement", "content_createEmpty", "blockEditor_addThis"]).then(function (data) {
             vm.labels.grid_addElement = data[0];
@@ -177,6 +185,21 @@
                 scopeOfExistence = vm.umbElementEditorContent.getScope();
             }
 
+            enterSortModeAction = {
+                labelKey: 'blockEditor_actionEnterSortMode',
+                labelTokens: [],
+                icon: 'navigation-vertical',
+                method: enableSortMode,
+                isDisabled: false
+            };
+            exitSortModeAction = {
+                labelKey: 'blockEditor_actionExitSortMode',
+                labelTokens: [],
+                icon: 'navigation-vertical',
+                method: enableSortMode,
+                isDisabled: false
+            };
+
             copyAllBlocksAction = {
                 labelKey: "clipboard_labelForCopyAllEntries",
                 labelTokens: [vm.model.label],
@@ -193,7 +216,8 @@
                 isDisabled: true
             };
 
-            var propertyActions = [
+            propertyActions = [
+                enterSortModeAction,
                 copyAllBlocksAction,
                 deleteAllBlocksAction
             ];
@@ -375,12 +399,10 @@
 
         function applyDefaultViewForBlock(block) {
 
-            var defaultViewFolderPath = "views/propertyeditors/blockgrid/blockgridentryeditors/";
-
             if (block.config.unsupported === true) {
-                block.view = defaultViewFolderPath + "unsupportedblock/unsupportedblock.editor.html";
+                block.view = DefaultViewFolderPath + "unsupportedblock/unsupportedblock.editor.html";
             } else {
-                block.view = defaultViewFolderPath + "gridblock/gridblock.editor.html";
+                block.view = DefaultViewFolderPath + "gridblock/gridblock.editor.html";
             }
 
         }
@@ -1252,6 +1274,17 @@
             if (vm.propertyForm) {
                 vm.propertyForm.$setDirty();
             }
+        }
+
+        function enableSortMode() {
+            vm.sortMode = true;
+            propertyActions.splice(propertyActions.indexOf(enterSortModeAction), 1, exitSortModeAction);
+        }
+        vm.exitSortMode = exitSortMode;
+        function exitSortMode() {
+
+            vm.sortMode = false;
+            propertyActions.splice(propertyActions.indexOf(exitSortModeAction), 1, enterSortModeAction);
         }
 
         function onAmountOfBlocksChanged() {
