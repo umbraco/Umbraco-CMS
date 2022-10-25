@@ -176,7 +176,10 @@ export class UmbSectionElement extends UmbContextConsumerMixin(UmbObserverMixin(
 				: nothing}
 			<umb-section-main>
 				${this._views.length > 0 ? html`<umb-section-views></umb-section-views>` : nothing}
-				<router-slot id="router-slot" .routes="${this._routes}"></router-slot>
+				${this._routes.length > 0
+					? html` <router-slot id="router-slot" .routes="${this._routes}"></router-slot> `
+					: nothing}
+				<slot></slot>
 			</umb-section-main>
 		`;
 	}

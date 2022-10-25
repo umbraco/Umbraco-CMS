@@ -82,4 +82,22 @@ export const manifests: Array<ManifestWithLoader<ManifestEditor>> = [
 			entityType: 'userGroup',
 		},
 	},
+	{
+		type: 'editor',
+		alias: 'Umb.Editor.Package',
+		name: 'Package Editor',
+		loader: () => import('./package/editor-package.element'),
+		meta: {
+			entityType: 'package',
+		},
+	},
+	{
+		type: 'editor',
+		alias: 'Umb.Editor.PackageBuilder',
+		name: 'Package Builder Editor',
+		loader: () => import('./package-builder/editor-package-builder.element'),
+		meta: {
+			entityType: 'packageBuilder',
+		},
+	},
 ];

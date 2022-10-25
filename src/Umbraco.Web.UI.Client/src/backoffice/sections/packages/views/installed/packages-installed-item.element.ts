@@ -2,12 +2,12 @@ import { html, LitElement, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { firstValueFrom, map } from 'rxjs';
 
-import type { UmbModalService } from '../../../core/services/modal';
-import { createExtensionElement, UmbExtensionRegistry } from '@umbraco-cms/extensions-api';
+import type { UmbModalService } from '../../../../../core/services/modal';
+import { createExtensionElement } from '@umbraco-cms/extensions-api';
 
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { ManifestPackageView, PackageInstalled } from '@umbraco-cms/models';
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
 @customElement('umb-packages-installed-item')
 export class UmbPackagesInstalledItem extends UmbContextConsumerMixin(LitElement) {
@@ -17,7 +17,6 @@ export class UmbPackagesInstalledItem extends UmbContextConsumerMixin(LitElement
 	@state()
 	private _packageView?: ManifestPackageView;
 
-	private _umbExtensionRegistry?: UmbExtensionRegistry;
 	private _umbModalService?: UmbModalService;
 
 	constructor() {
@@ -83,7 +82,7 @@ export class UmbPackagesInstalledItem extends UmbContextConsumerMixin(LitElement
 	}
 
 	private _onClick() {
-		window.history.pushState({}, '', `/section/packages/details/${this.package.id}`);
+		window.history.pushState({}, '', `/section/packages/view/installed/package/${this.package.id}`);
 	}
 }
 

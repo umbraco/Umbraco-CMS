@@ -12,7 +12,6 @@ import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
 import type { Guard, IRoute } from 'router-slot/model';
-import { internalManifests } from './temp-internal-manifests';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { getManifests, getServerStatus } from '@umbraco-cms/backend-api';
 import { UmbContextProviderMixin } from '@umbraco-cms/context-api';
@@ -67,7 +66,6 @@ export class UmbApp extends UmbContextProviderMixin(LitElement) {
 	private async _setup() {
 		this._iconRegistry.attach(this);
 		await this._registerExtensionManifestsFromServer();
-		await this._registerInternalManifests();
 		await this._setInitStatus();
 		this._redirect();
 	}
@@ -127,11 +125,6 @@ export class UmbApp extends UmbContextProviderMixin(LitElement) {
 		const res = await getManifests({});
 		const { manifests } = res.data;
 		manifests.forEach((manifest) => umbExtensionsRegistry.register(manifest));
-	}
-
-	private async _registerInternalManifests() {
-		// TODO: where do we get these from?
-		internalManifests.forEach((manifest) => umbExtensionsRegistry.register(manifest));
 	}
 
 	render() {

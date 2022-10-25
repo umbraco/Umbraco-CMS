@@ -52,8 +52,7 @@ export const manifests: Array<ManifestWithLoader<ManifestSection>> = [
 		type: 'section',
 		alias: 'Umb.Section.Packages',
 		name: 'Packages Section',
-		elementName: 'umb-packages-section',
-		loader: () => import('./packages/packages-section.element'),
+		loader: () => import('./packages/section-packages.element'),
 		weight: 200,
 		meta: {
 			label: 'Packages',
