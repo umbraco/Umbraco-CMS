@@ -11,7 +11,7 @@ namespace Umbraco.Cms.ManagementApi.Controllers.DictionaryItem.Tree;
 
 [ApiVersion("1.0")]
 [ApiController]
-[VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.DictionaryItem}/tree")]
+[VersionedApiBackOfficeRoute($"tree/{Constants.UdiEntityType.DictionaryItem}")]
 [OpenApiTag(nameof(Constants.UdiEntityType.DictionaryItem))]
 // NOTE: at the moment dictionary items aren't supported by EntityService, so we have little use of the
 // tree controller base. We'll keep it though, in the hope that we can mend EntityService.

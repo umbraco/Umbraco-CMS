@@ -12,8 +12,8 @@ namespace Umbraco.Cms.ManagementApi.Controllers.DocumentBlueprint.Tree;
 
 [ApiVersion("1.0")]
 [ApiController]
-[VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.DocumentBlueprint}/tree")]
-[OpenApiTag(nameof(Constants.UdiEntityType.DocumentBlueprint))]
+[VersionedApiBackOfficeRoute($"tree/{Constants.UdiEntityType.DocumentBlueprint}")]
+[OpenApiTag("Document Blueprint")]
 public class DocumentBlueprintTreeControllerBase : EntityTreeControllerBase<DocumentBlueprintTreeItemViewModel>
 {
     private readonly IContentTypeService _contentTypeService;

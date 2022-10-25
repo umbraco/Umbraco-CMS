@@ -9,8 +9,8 @@ namespace Umbraco.Cms.ManagementApi.Controllers.StaticFile.Tree;
 
 [ApiVersion("1.0")]
 [ApiController]
-[VersionedApiBackOfficeRoute("static-file/tree")]
-[OpenApiTag("StaticFile")]
+[VersionedApiBackOfficeRoute("tree/static-file")]
+[OpenApiTag("Static File")]
 public class StaticFileTreeControllerBase : FileSystemTreeControllerBase
 {
     private static readonly string[] _allowedRootFolders = { "App_Plugins", "wwwroot" };
