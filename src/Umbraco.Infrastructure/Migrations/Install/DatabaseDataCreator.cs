@@ -1759,7 +1759,7 @@ internal class DatabaseDataCreator
         var defaultCulture = new CultureInfo(_globalSettings.CurrentValue.DefaultUILanguage);
         ConditionalInsert(
             Constants.Configuration.NamedOptions.InstallDefaultData.Languages,
-            "en-us",
+            _globalSettings.CurrentValue.DefaultUILanguage,
             new LanguageDto { Id = 1, IsoCode = defaultCulture.Name, CultureName = defaultCulture.DisplayName, IsDefault = true },
             Constants.DatabaseSchema.Tables.Language,
             "id");
