@@ -2218,6 +2218,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="areaDisallowAllBlocks">Tillad kun specifikke blok-typer</key>
     <key alias="areaAllowedBlocks">Tilladte blok-typer</key>
     <key alias="areaAllowedBlocksHelp">Vælg de blok-typer, der er tilladt i dette område, og evt. også hvor mange af hver type, redaktørerne skal tilføje til området.</key>
+    <key alias="areaAllowedBlocksEmpty">All block-typer tilladt for i områder kan oprettes.</key>
     <key alias="confirmDeleteBlockAreaMessage">Er du sikker på, at du vil slette dette område?</key>
     <key alias="confirmDeleteBlockAreaNotice">Alle blokke, der er oprettet i dette område, vil blive slettet.</key>
     <key alias="layoutOptions">Layout-opsætning</key>
