@@ -46,12 +46,6 @@ public class InstallDefaultDataSettings
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         For languages, the values provided should be the ISO codes for the languages to be included or excluded, e.g.
-    ///         "en-US".
-    ///         If removing the single default language, ensure that a different one is created via some other means (such
-    ///         as a restore from Umbraco Deploy schema data).
-    ///     </para>
-    ///     <para>
     ///         For data types, the values provided should be the Guid values used by Umbraco for the data type, listed at:
     ///         <see cref="Constants.DataTypes" />
     ///         Some data types - such as the string label - cannot be excluded from install as they are required for core
