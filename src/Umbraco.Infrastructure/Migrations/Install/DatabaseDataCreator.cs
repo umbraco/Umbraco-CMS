@@ -1767,7 +1767,7 @@ internal class DatabaseDataCreator
                 var dto = new LanguageDto
                 {
                     IsoCode = culture.Name,
-                    CultureName = culture.DisplayName,
+                    CultureName = culture.EnglishName,
                     IsDefault = isDefault
                 };
                 _database.Insert(Constants.DatabaseSchema.Tables.Language, "id", true, dto);
@@ -1777,8 +1777,7 @@ internal class DatabaseDataCreator
         else
         {
             // Conditionally insert the default language.
-            string isoCode = "en-US";
-            if (TryCreateCulture(isoCode, out CultureInfo? culture))
+            if (TryCreateCulture("en-US", out CultureInfo? culture))
             {
                 ConditionalInsert(
                     Constants.Configuration.NamedOptions.InstallDefaultData.Languages,
