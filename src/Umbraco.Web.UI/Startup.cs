@@ -1,3 +1,4 @@
+#if (!MinimalHostingModel)
 namespace Umbraco.Cms.Web.UI
 {
     public class Startup
@@ -67,3 +68,4 @@ namespace Umbraco.Cms.Web.UI
         }
     }
 }
+#endif

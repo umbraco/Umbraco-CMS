@@ -25,6 +25,10 @@
       "longName": "minimal-gitignore",
       "shortName": ""
     },
+    "MinimalHostingModel": {
+      "longName": "minimal-hosting-model",
+      "shortName": ""
+    },
     "ConnectionString": {
       "longName": "connection-string",
       "shortName": ""

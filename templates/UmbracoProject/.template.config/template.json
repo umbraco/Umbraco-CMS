@@ -26,6 +26,12 @@
           "exclude": [
             ".gitignore"
           ]
+        },
+        {
+          "condition": "(MinimalHostingModel)",
+          "exclude": [
+            "Startup.cs"
+          ]
         }
       ]
     }
@@ -78,6 +84,13 @@
     "MinimalGitignore": {
       "displayName": "Minimal .gitignore",
       "description": "Whether to only include minimal (Umbraco specific) rules in the .gitignore.",
+      "type": "parameter",
+      "datatype": "bool",
+      "defaultValue": "false"
+    },
+    "MinimalHostingModel": {
+      "displayName": "Minimal hosting model",
+      "description": "Replaces Program.cs and Startup.cs with a single simpler Program.cs.",
       "type": "parameter",
       "datatype": "bool",
       "defaultValue": "false"
