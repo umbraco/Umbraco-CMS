@@ -73,7 +73,7 @@ export class UmbPickerElement extends UmbContextConsumerMixin(LitElement) {
 	}
 
 	render() {
-		return html`${this.renderButton()} ${this.renderContent()}`;
+		return html`${this.renderContent()}${this.renderButton()}`;
 	}
 }
 
