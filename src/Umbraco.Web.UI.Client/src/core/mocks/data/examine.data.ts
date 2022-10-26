@@ -47,36 +47,8 @@ export interface ProviderProperties {
 export interface SearchResult {
 	id: number;
 	name: string;
-	fields: {}; //DocumentKeyFields;
+	fields: {};
 	score: number;
-}
-
-export interface DocumentKeyFields {
-	__Icon: string;
-	__IndexType: string;
-	__Key: string;
-	__NodeId: number;
-	__NodeTypeAlias: string;
-	__Path: number;
-	__Published: string;
-	__VariesByCulture: string;
-	createDate: number;
-	creatorId: number;
-	creatorName: string;
-	icon: string;
-	id: number;
-	image: DocumentImageFieldKeys[];
-	level: number;
-	nodeName: string;
-	nodeType: number;
-	parentID: number;
-	path: number;
-	sortOrder: number;
-	templateID: number;
-	updateDate: number;
-	urlName: string;
-	writerID: number;
-	writerName: string;
 }
 
 export default interface DocumentImageFieldKeys {
