@@ -130,7 +130,7 @@ export class UmbPickerLayoutUserGroupElement extends UmbContextConsumerMixin(Umb
 
 	render() {
 		return html`
-			<umb-editor-entity-layout headline="Select users">
+			<umb-editor-entity-layout headline="Select user groups">
 				<uui-box>
 					<uui-input></uui-input>
 					<hr />

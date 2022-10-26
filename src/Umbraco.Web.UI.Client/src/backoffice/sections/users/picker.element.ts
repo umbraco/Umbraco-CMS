@@ -51,7 +51,6 @@ export class UmbPickerElement extends UmbContextConsumerMixin(LitElement) {
 				this.value = data.selection;
 				this.selectionUpdated();
 			}
-			console.log('modal closed', data);
 		});
 	}
 

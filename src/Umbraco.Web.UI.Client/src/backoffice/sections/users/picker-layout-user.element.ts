@@ -22,6 +22,12 @@ export class UmbPickerLayoutUserElement extends UmbContextConsumerMixin(UmbModal
 				border-bottom: 1px solid var(--uui-color-divider);
 				margin: 16px 0;
 			}
+			#user-list {
+				display: flex;
+				flex-direction: column;
+				gap: var(--uui-size-1);
+				font-size: 1rem;
+			}
 			.item {
 				color: var(--uui-color-interactive);
 				display: flex;
@@ -35,26 +41,19 @@ export class UmbPickerLayoutUserElement extends UmbContextConsumerMixin(UmbModal
 				background-color: var(--uui-color-surface-emphasis);
 				color: var(--uui-color-interactive-emphasis);
 			}
-			.item:hover .selected-checkbox {
-				border-color: var(--uui-color-surface-emphasis);
-			}
-			.selected-checkbox {
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				border-radius: var(--uui-size-1);
+			.item.selected {
 				background-color: var(--uui-color-selected);
 				color: var(--uui-color-selected-contrast);
-				padding: var(--uui-size-1);
-				box-sizing: border-box;
-				position: absolute;
-				bottom: 0;
-				left: 28px;
-				border: 2px solid var(--uui-color-surface);
+				border-radius: var(--uui-size-2);
 			}
 			uui-avatar {
-				width: var(--uui-size-14);
-				height: var(--uui-size-14);
+				border: 2px solid var(--uui-color-surface);
+			}
+			.item:hover uui-avatar {
+				border-color: var(--uui-color-surface-emphasis);
+			}
+			.item.selected uui-avatar {
+				border-color: var(--uui-color-selected-contrast);
 			}
 		`,
 	];
@@ -116,32 +115,25 @@ export class UmbPickerLayoutUserElement extends UmbContextConsumerMixin(UmbModal
 		return this._selection.includes(key);
 	}
 
-	private _renderCheckbox() {
-		return html`
-			<div class="selected-checkbox">
-				<uui-icon name="check"></uui-icon>
-			</div>
-		`;
-	}
-
 	render() {
 		return html`
 			<umb-editor-entity-layout headline="Select users">
 				<uui-box>
 					<uui-input></uui-input>
 					<hr />
-					${this._users.map(
-						(item) => html`
-							<div
-								@click=${() => this._handleItemClick(item.key)}
-								@keydown=${(e: KeyboardEvent) => this._handleKeydown(e, item.key)}
-								class="item">
-								<uui-avatar .name=${item.name}></uui-avatar>
-								${this._isSelected(item.key) ? this._renderCheckbox() : nothing}
-								<span>${item.name}</span>
-							</div>
-						`
-					)}
+					<div id="user-list">
+						${this._users.map(
+							(item) => html`
+								<div
+									@click=${() => this._handleItemClick(item.key)}
+									@keydown=${(e: KeyboardEvent) => this._handleKeydown(e, item.key)}
+									class=${this._isSelected(item.key) ? 'item selected' : 'item'}>
+									<uui-avatar .name=${item.name}></uui-avatar>
+									<span>${item.name}</span>
+								</div>
+							`
+						)}
+					</div>
 				</uui-box>
 				<div slot="actions">
 					<uui-button label="Close" @click=${this._close}></uui-button>
