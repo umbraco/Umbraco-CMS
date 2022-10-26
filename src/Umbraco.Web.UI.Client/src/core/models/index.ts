@@ -79,7 +79,7 @@ export interface UserDetails extends UserEntity {
 	updateDate: string;
 	createDate: string;
 	failedLoginAttempts: number;
-	userGroup?: string; //TODO Implement this
+	userGroups: Array<string>; //TODO Implement this
 }
 
 export interface UserGroupEntity extends Entity {

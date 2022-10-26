@@ -67,6 +67,7 @@ export class UmbPickerUserGroupElement extends UmbPickerElement {
 
 	selectionUpdated() {
 		this._observeUserGroups();
+		this.dispatchEvent(new CustomEvent('change', { bubbles: true, composed: true }));
 	}
 
 	private _renderUserGroupList() {

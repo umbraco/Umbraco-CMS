@@ -44,6 +44,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '8/27/2022',
 		createDate: '9/19/2022',
 		failedLoginAttempts: 52,
+		userGroups: [],
 	},
 	{
 		key: '7c9c5510-a7b6-43fd-a2d1-51de0009eabf',
@@ -62,6 +63,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '12/2/2021',
 		createDate: '9/17/2022',
 		failedLoginAttempts: 717,
+		userGroups: [],
 	},
 	{
 		key: 'fa3cca42-3b65-4fce-9e9b-5b09ca44f536',
@@ -80,6 +82,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '9/4/2022',
 		createDate: '8/7/2022',
 		failedLoginAttempts: 873,
+		userGroups: [],
 	},
 	{
 		key: '381383ef-8d81-455c-bcbc-5e95a5cdc897',
@@ -98,6 +101,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '9/14/2022',
 		createDate: '2/20/2022',
 		failedLoginAttempts: 786,
+		userGroups: [],
 	},
 	{
 		key: 'e3dcaf95-7d55-42e6-a023-ce179523bf48',
@@ -116,6 +120,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '5/8/2022',
 		createDate: '1/12/2022',
 		failedLoginAttempts: 884,
+		userGroups: [],
 	},
 	{
 		key: '05d0356e-051f-4d00-8b56-24667deab75d',
@@ -134,6 +139,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '12/31/2021',
 		createDate: '10/2/2022',
 		failedLoginAttempts: 527,
+		userGroups: [],
 	},
 	{
 		key: 'ac906ed0-d8e0-4ca5-8f03-d817ce31fb7e',
@@ -152,6 +158,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '1/19/2022',
 		createDate: '7/3/2022',
 		failedLoginAttempts: 324,
+		userGroups: [],
 	},
 	{
 		key: '6e34346d-639e-4538-a2cc-9a8a6ba40545',
@@ -170,6 +177,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '3/12/2022',
 		createDate: '3/6/2022',
 		failedLoginAttempts: 937,
+		userGroups: [],
 	},
 	{
 		key: '978c1d59-0814-404d-a4c4-b5abceb4b1b6',
@@ -188,6 +196,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '1/30/2022',
 		createDate: '12/13/2021',
 		failedLoginAttempts: 804,
+		userGroups: [],
 	},
 	{
 		key: '98d36a68-9b74-435f-8790-d177726f6fed',
@@ -206,6 +215,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '4/9/2022',
 		createDate: '6/18/2022',
 		failedLoginAttempts: 458,
+		userGroups: [],
 	},
 	{
 		key: 'bf6b7fbe-d3e7-4ca8-9b6d-7daca03c2411',
@@ -221,6 +231,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '9/11/2022',
 		createDate: '6/18/2022',
 		failedLoginAttempts: 532,
+		userGroups: [],
 	},
 	{
 		key: 'cf1d90af-5b77-4e00-98be-145214443c24',
@@ -236,6 +247,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '11/7/2021',
 		createDate: '12/30/2021',
 		failedLoginAttempts: 800,
+		userGroups: [],
 	},
 	{
 		key: '11e6ddc8-33e3-461b-8147-155eac339978',
@@ -254,6 +266,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '11/10/2021',
 		createDate: '8/1/2022',
 		failedLoginAttempts: 182,
+		userGroups: [],
 	},
 	{
 		key: 'fb651643-3f2b-4b8e-ab96-a4f3fa15303a',
@@ -272,6 +285,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '7/19/2022',
 		createDate: '5/12/2022',
 		failedLoginAttempts: 426,
+		userGroups: [],
 	},
 	{
 		key: '1e329702-50d3-4176-b5db-9315ac6ac2a3',
@@ -290,6 +304,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '9/20/2022',
 		createDate: '3/15/2022',
 		failedLoginAttempts: 327,
+		userGroups: [],
 	},
 	{
 		key: '1fead0fa-8d19-4153-abb0-980c18973d21',
@@ -308,6 +323,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '10/15/2021',
 		createDate: '2/14/2022',
 		failedLoginAttempts: 469,
+		userGroups: [],
 	},
 	{
 		key: 'd273cd7c-cbd4-4535-83d1-921b9c1255b3',
@@ -326,6 +342,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '7/18/2022',
 		createDate: '8/24/2022',
 		failedLoginAttempts: 737,
+		userGroups: [],
 	},
 	{
 		key: 'e2f0b261-8900-41a3-b80c-6a54e55da4a7',
@@ -341,6 +358,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '7/16/2022',
 		createDate: '1/5/2022',
 		failedLoginAttempts: 721,
+		userGroups: [],
 	},
 	{
 		key: '54ff0b22-f419-47c0-a6a0-85a2ba43a300',
@@ -359,6 +377,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '12/17/2021',
 		createDate: '12/7/2021',
 		failedLoginAttempts: 351,
+		userGroups: [],
 	},
 	{
 		key: '2b8dfa33-3dea-407e-8bcc-038f903ec37c',
@@ -377,6 +396,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '11/12/2021',
 		createDate: '5/24/2022',
 		failedLoginAttempts: 182,
+		userGroups: [],
 	},
 	{
 		key: 'd0244fdc-4b68-4a71-a11b-7c047503ba38',
@@ -395,6 +415,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '12/16/2021',
 		createDate: '11/27/2021',
 		failedLoginAttempts: 212,
+		userGroups: [],
 	},
 	{
 		key: '0934aae0-d565-4087-87ea-171c23ed012c',
@@ -413,6 +434,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '4/14/2022',
 		createDate: '6/5/2022',
 		failedLoginAttempts: 825,
+		userGroups: [],
 	},
 	{
 		key: '1e244947-6fb6-4c34-8e22-87d14e1002b4',
@@ -431,6 +453,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '2/26/2022',
 		createDate: '7/18/2022',
 		failedLoginAttempts: 10,
+		userGroups: [],
 	},
 	{
 		key: 'e6539e00-e4e7-4b09-a8ba-2bb5026b1842',
@@ -449,6 +472,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '4/27/2022',
 		createDate: '11/10/2021',
 		failedLoginAttempts: 774,
+		userGroups: [],
 	},
 	{
 		key: '2fa83b80-d938-472f-b4f0-a480c342bfdc',
@@ -467,6 +491,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '9/5/2022',
 		createDate: '9/6/2022',
 		failedLoginAttempts: 538,
+		userGroups: [],
 	},
 	{
 		key: '2f40ba2c-36f4-45f9-94ff-2ee01be3a83f',
@@ -485,6 +510,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '12/9/2021',
 		createDate: '12/10/2021',
 		failedLoginAttempts: 766,
+		userGroups: [],
 	},
 	{
 		key: 'ff5c07f1-9628-4f1a-b416-46e9669ff261',
@@ -503,6 +529,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '5/18/2022',
 		createDate: '12/31/2021',
 		failedLoginAttempts: 903,
+		userGroups: [],
 	},
 	{
 		key: '188a2fed-c3f1-4e2f-8e96-1a930f2dbeaa',
@@ -521,6 +548,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '2/23/2022',
 		createDate: '7/10/2022',
 		failedLoginAttempts: 348,
+		userGroups: [],
 	},
 	{
 		key: '7651d063-7a6a-4ccf-a14f-a4123e4e0154',
@@ -539,6 +567,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '12/19/2021',
 		createDate: '5/2/2022',
 		failedLoginAttempts: 774,
+		userGroups: [],
 	},
 	{
 		key: 'd8798556-96e1-4a4b-bc61-29baad622d1d',
@@ -557,6 +586,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '5/22/2022',
 		createDate: '5/6/2022',
 		failedLoginAttempts: 912,
+		userGroups: [],
 	},
 	{
 		key: 'd0633a4e-7532-4a36-be2e-5befe8a46f66',
@@ -575,6 +605,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '4/5/2022',
 		createDate: '6/6/2022',
 		failedLoginAttempts: 261,
+		userGroups: [],
 	},
 	{
 		key: 'af784e2b-02bf-4d75-b199-0fa92bd1a12c',
@@ -593,6 +624,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '7/13/2022',
 		createDate: '9/18/2022',
 		failedLoginAttempts: 589,
+		userGroups: [],
 	},
 	{
 		key: '0a25512d-a7d2-429b-9e92-ebc3cae5ca19',
@@ -611,6 +643,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '8/26/2022',
 		createDate: '10/31/2021',
 		failedLoginAttempts: 323,
+		userGroups: [],
 	},
 	{
 		key: 'aadb0afb-b42e-4b84-9889-91f177b4f03f',
@@ -629,6 +662,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '8/28/2022',
 		createDate: '4/26/2022',
 		failedLoginAttempts: 300,
+		userGroups: [],
 	},
 	{
 		key: 'd8f5122b-06c7-4253-9358-0ffb673fd6fa',
@@ -647,6 +681,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '2/3/2022',
 		createDate: '6/9/2022',
 		failedLoginAttempts: 39,
+		userGroups: [],
 	},
 	{
 		key: 'f81d21b6-c2bd-455c-9614-80c6f0ca7aba',
@@ -665,6 +700,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '5/25/2022',
 		createDate: '8/6/2022',
 		failedLoginAttempts: 826,
+		userGroups: [],
 	},
 	{
 		key: 'e5d98b85-6d9b-40b4-8237-cf98db0a6331',
@@ -683,6 +719,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '8/29/2022',
 		createDate: '8/2/2022',
 		failedLoginAttempts: 619,
+		userGroups: [],
 	},
 	{
 		key: 'bb96eeb6-2f4c-4eda-a277-91077b0219b0',
@@ -701,6 +738,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '2/4/2022',
 		createDate: '10/18/2021',
 		failedLoginAttempts: 191,
+		userGroups: [],
 	},
 	{
 		key: '56a2d315-0cc5-4b0d-9ae3-8a7b7326e531',
@@ -719,6 +757,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '10/21/2021',
 		createDate: '9/1/2022',
 		failedLoginAttempts: 45,
+		userGroups: [],
 	},
 	{
 		key: 'dddae890-939e-48fd-89da-90631be9401f',
@@ -737,6 +776,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '3/9/2022',
 		createDate: '3/23/2022',
 		failedLoginAttempts: 936,
+		userGroups: [],
 	},
 	{
 		key: '96359df7-74a3-4eff-a729-40eac9a85fcc',
@@ -755,6 +795,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '10/17/2021',
 		createDate: '4/14/2022',
 		failedLoginAttempts: 843,
+		userGroups: [],
 	},
 	{
 		key: 'af74ab26-81f2-4c51-8867-24acc7021c3c',
@@ -773,6 +814,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '1/13/2022',
 		createDate: '4/1/2022',
 		failedLoginAttempts: 262,
+		userGroups: [],
 	},
 	{
 		key: '81648dc6-93d5-468d-8fac-fcdd0fb854cd',
@@ -791,6 +833,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '3/27/2022',
 		createDate: '8/3/2022',
 		failedLoginAttempts: 606,
+		userGroups: [],
 	},
 	{
 		key: '1c8fd6b4-ccd4-4bc3-9cde-bb705e2618aa',
@@ -806,6 +849,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '1/24/2022',
 		createDate: '7/11/2022',
 		failedLoginAttempts: 234,
+		userGroups: [],
 	},
 	{
 		key: 'dd26e22b-bcab-449f-8a35-ae63be90e8c6',
@@ -824,6 +868,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '4/12/2022',
 		createDate: '7/7/2022',
 		failedLoginAttempts: 62,
+		userGroups: [],
 	},
 	{
 		key: '08b5e626-20e6-486d-a289-baa5b49ee360',
@@ -842,6 +887,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '8/31/2022',
 		createDate: '7/8/2022',
 		failedLoginAttempts: 34,
+		userGroups: [],
 	},
 	{
 		key: '064981b2-f8e4-4a25-a16e-1fe3441ae0a0',
@@ -857,6 +903,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '7/31/2022',
 		createDate: '2/19/2022',
 		failedLoginAttempts: 279,
+		userGroups: [],
 	},
 	{
 		key: '0c221634-03be-4e69-9399-350c1da61641',
@@ -875,6 +922,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '6/23/2022',
 		createDate: '8/1/2022',
 		failedLoginAttempts: 227,
+		userGroups: [],
 	},
 	{
 		key: 'e26f1576-483e-4132-a25a-1eaddf63f40d',
@@ -893,6 +941,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '8/17/2022',
 		createDate: '10/31/2021',
 		failedLoginAttempts: 85,
+		userGroups: [],
 	},
 	{
 		key: '7032b5ea-467a-43aa-9a23-33f195cfa0a0',
@@ -911,6 +960,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '10/26/2021',
 		createDate: '7/30/2022',
 		failedLoginAttempts: 198,
+		userGroups: [],
 	},
 	{
 		key: '57bb4927-a7a7-4dc9-af48-f418f1c0fbc6',
@@ -929,6 +979,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '3/14/2022',
 		createDate: '10/19/2021',
 		failedLoginAttempts: 387,
+		userGroups: [],
 	},
 	{
 		key: 'd5bb1d61-1201-43b8-b3df-2bd9b4bf1269',
@@ -944,6 +995,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '11/30/2021',
 		createDate: '3/4/2022',
 		failedLoginAttempts: 150,
+		userGroups: [],
 	},
 	{
 		key: '3e711421-bdc3-411e-909c-ba7230396266',
@@ -959,6 +1011,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '1/12/2022',
 		createDate: '4/22/2022',
 		failedLoginAttempts: 455,
+		userGroups: [],
 	},
 	{
 		key: '2c0806e0-a7dc-46bd-a4c1-85a7d0799c56',
@@ -977,6 +1030,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '1/17/2022',
 		createDate: '4/9/2022',
 		failedLoginAttempts: 427,
+		userGroups: [],
 	},
 	{
 		key: '5fc52879-4684-44b1-9c39-63fc47d85587',
@@ -995,6 +1049,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '1/2/2022',
 		createDate: '7/1/2022',
 		failedLoginAttempts: 951,
+		userGroups: [],
 	},
 	{
 		key: '0daeefb8-8f39-4d63-be8e-eef0239b418c',
@@ -1013,6 +1068,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '3/7/2022',
 		createDate: '6/19/2022',
 		failedLoginAttempts: 371,
+		userGroups: [],
 	},
 	{
 		key: 'f34d019d-af85-4579-b510-b0e5a27c05ab',
@@ -1031,6 +1087,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '2/11/2022',
 		createDate: '2/21/2022',
 		failedLoginAttempts: 5,
+		userGroups: [],
 	},
 	{
 		key: 'acab2dd7-baae-40ef-b272-96ec50e633f7',
@@ -1049,6 +1106,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '8/11/2022',
 		createDate: '3/12/2022',
 		failedLoginAttempts: 243,
+		userGroups: [],
 	},
 	{
 		key: '8e3c0364-0c2a-451e-a65d-7c46cfba2436',
@@ -1064,6 +1122,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '3/8/2022',
 		createDate: '10/8/2021',
 		failedLoginAttempts: 381,
+		userGroups: [],
 	},
 	{
 		key: '0548a79d-a767-450c-9823-e170284347e9',
@@ -1082,6 +1141,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '7/27/2022',
 		createDate: '9/30/2022',
 		failedLoginAttempts: 27,
+		userGroups: [],
 	},
 	{
 		key: 'd97f31cd-939d-4686-b282-e6613c930ce9',
@@ -1100,6 +1160,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '10/22/2021',
 		createDate: '12/9/2021',
 		failedLoginAttempts: 807,
+		userGroups: [],
 	},
 	{
 		key: '160614dd-5749-4a74-878e-ac82e8cfe21b',
@@ -1118,6 +1179,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '4/9/2022',
 		createDate: '6/29/2022',
 		failedLoginAttempts: 334,
+		userGroups: [],
 	},
 	{
 		key: '3a1a9869-d103-40fb-98ac-4cce9e16ac17',
@@ -1136,6 +1198,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '7/14/2022',
 		createDate: '2/4/2022',
 		failedLoginAttempts: 129,
+		userGroups: [],
 	},
 	{
 		key: '174fd2e2-ac91-4eae-a366-2fe7e4322d88',
@@ -1154,6 +1217,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '4/18/2022',
 		createDate: '8/16/2022',
 		failedLoginAttempts: 450,
+		userGroups: [],
 	},
 	{
 		key: '762844a8-b64e-473a-ba50-f2cb446c8e93',
@@ -1169,6 +1233,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '12/2/2021',
 		createDate: '12/14/2021',
 		failedLoginAttempts: 189,
+		userGroups: [],
 	},
 	{
 		key: '46f28ab6-06ca-4d9f-93e4-742218ed5dca',
@@ -1187,6 +1252,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '9/10/2022',
 		createDate: '5/12/2022',
 		failedLoginAttempts: 359,
+		userGroups: [],
 	},
 	{
 		key: 'b55ca6f9-2fd3-4e0d-a222-6df52db14007',
@@ -1205,6 +1271,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '6/16/2022',
 		createDate: '11/29/2021',
 		failedLoginAttempts: 956,
+		userGroups: [],
 	},
 	{
 		key: 'a5c7ea42-3257-48fe-9497-f684e6cdebaa',
@@ -1223,6 +1290,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '2/12/2022',
 		createDate: '1/3/2022',
 		failedLoginAttempts: 533,
+		userGroups: [],
 	},
 	{
 		key: '4f9da285-8b73-4f74-9e54-50d04f1441a0',
@@ -1241,6 +1309,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '12/31/2021',
 		createDate: '1/31/2022',
 		failedLoginAttempts: 621,
+		userGroups: [],
 	},
 	{
 		key: '4054205f-6d9d-4bea-b1b2-29168dead18d',
@@ -1256,6 +1325,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '8/30/2022',
 		createDate: '1/16/2022',
 		failedLoginAttempts: 211,
+		userGroups: [],
 	},
 	{
 		key: '1574526d-614b-41f4-abb4-4066fac8815c',
@@ -1274,6 +1344,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '12/30/2021',
 		createDate: '1/19/2022',
 		failedLoginAttempts: 78,
+		userGroups: [],
 	},
 	{
 		key: '745e0d21-44a6-4df1-81a0-d796ff7e6801',
@@ -1289,6 +1360,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '7/16/2022',
 		createDate: '10/23/2021',
 		failedLoginAttempts: 790,
+		userGroups: [],
 	},
 	{
 		key: 'e0fc930c-6ed5-4064-a039-9e2c3b0dc644',
@@ -1307,6 +1379,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '5/8/2022',
 		createDate: '9/20/2022',
 		failedLoginAttempts: 10,
+		userGroups: [],
 	},
 	{
 		key: '0f36289e-abce-4fa9-a524-49664389c2ef',
@@ -1325,6 +1398,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '10/16/2021',
 		createDate: '1/13/2022',
 		failedLoginAttempts: 417,
+		userGroups: [],
 	},
 	{
 		key: 'c7a02de0-2eb6-461d-8036-e163b12ef2b5',
@@ -1343,6 +1417,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '11/12/2021',
 		createDate: '4/4/2022',
 		failedLoginAttempts: 214,
+		userGroups: [],
 	},
 	{
 		key: 'dfa94377-3eb7-4318-804c-892f125cdb65',
@@ -1361,6 +1436,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '2/9/2022',
 		createDate: '4/14/2022',
 		failedLoginAttempts: 735,
+		userGroups: [],
 	},
 	{
 		key: '34114a3c-b6a9-41e4-ad65-377abb1f2fbd',
@@ -1379,6 +1455,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '12/6/2021',
 		createDate: '6/25/2022',
 		failedLoginAttempts: 480,
+		userGroups: [],
 	},
 	{
 		key: 'c9a62d42-9b32-441b-b758-283526c749b1',
@@ -1397,6 +1474,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '5/11/2022',
 		createDate: '5/19/2022',
 		failedLoginAttempts: 828,
+		userGroups: [],
 	},
 	{
 		key: '4c54110a-5768-4979-adf0-c8e52a2ae6a6',
@@ -1415,6 +1493,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '5/19/2022',
 		createDate: '5/5/2022',
 		failedLoginAttempts: 840,
+		userGroups: [],
 	},
 	{
 		key: '86bdee19-c4a6-412c-9c38-173232993952',
@@ -1433,6 +1512,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '12/31/2021',
 		createDate: '1/13/2022',
 		failedLoginAttempts: 588,
+		userGroups: [],
 	},
 	{
 		key: '0961184f-5b1a-4e21-b598-c2e4fda4b498',
@@ -1451,6 +1531,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '5/11/2022',
 		createDate: '10/12/2021',
 		failedLoginAttempts: 639,
+		userGroups: [],
 	},
 	{
 		key: '7cc8803f-9c20-44aa-9399-d4ec5e52e008',
@@ -1469,6 +1550,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '4/4/2022',
 		createDate: '1/25/2022',
 		failedLoginAttempts: 912,
+		userGroups: [],
 	},
 	{
 		key: '61ec70a3-6a8d-42fe-88f3-c866328c4a9c',
@@ -1479,6 +1561,7 @@ export const data: Array<UserDetails> = [
 		icon: 'umb:user',
 		name: 'Dasi Ughi',
 		email: 'dughi2a@vimeo.com',
+		language: 'Danish',
 		status: 'disabled',
 		lastLoginDate: '10/14/2021',
 		lastLockoutDate: '1/11/2022',
@@ -1486,7 +1569,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '10/31/2021',
 		createDate: '7/2/2022',
 		failedLoginAttempts: 494,
-		language: 'Danish',
+		userGroups: [],
 	},
 	{
 		key: '21bbdd96-ea8d-463c-8d10-fd6d016bf4e0',
@@ -1505,6 +1588,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '12/1/2021',
 		createDate: '10/26/2021',
 		failedLoginAttempts: 258,
+		userGroups: [],
 	},
 	{
 		key: 'f897a981-0452-4c06-b875-dab80109051b',
@@ -1523,6 +1607,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '4/16/2022',
 		createDate: '3/17/2022',
 		failedLoginAttempts: 103,
+		userGroups: [],
 	},
 	{
 		key: '1f8d4217-3037-444e-b91a-0e18f20b3919',
@@ -1541,6 +1626,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '11/26/2021',
 		createDate: '6/5/2022',
 		failedLoginAttempts: 211,
+		userGroups: [],
 	},
 	{
 		key: 'f4449cde-ef12-4068-9f13-6104d281e494',
@@ -1559,6 +1645,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '2/23/2022',
 		createDate: '8/22/2022',
 		failedLoginAttempts: 208,
+		userGroups: [],
 	},
 	{
 		key: 'ac75e813-22bc-4d42-8f98-a4ba6f19bdf8',
@@ -1577,6 +1664,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '2/14/2022',
 		createDate: '1/30/2022',
 		failedLoginAttempts: 75,
+		userGroups: [],
 	},
 	{
 		key: 'ba9caf4c-aeee-48e8-a7d7-3ff2239c0186',
@@ -1595,6 +1683,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '5/26/2022',
 		createDate: '4/30/2022',
 		failedLoginAttempts: 40,
+		userGroups: [],
 	},
 	{
 		key: '924e087c-b0b5-4c59-a8b8-a71ad112c4b0',
@@ -1613,6 +1702,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '5/5/2022',
 		createDate: '9/25/2022',
 		failedLoginAttempts: 710,
+		userGroups: [],
 	},
 	{
 		key: '909154d4-5c84-461d-b256-552f358a0d68',
@@ -1631,6 +1721,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '7/29/2022',
 		createDate: '2/7/2022',
 		failedLoginAttempts: 730,
+		userGroups: [],
 	},
 	{
 		key: '284e7d5a-1b10-4814-a5fd-da17180c1753',
@@ -1646,6 +1737,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '1/27/2022',
 		createDate: '3/7/2022',
 		failedLoginAttempts: 250,
+		userGroups: [],
 	},
 	{
 		key: '91205c6e-3be9-47fc-b5f3-01c89306dcd5',
@@ -1664,6 +1756,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '8/14/2022',
 		createDate: '11/17/2021',
 		failedLoginAttempts: 360,
+		userGroups: [],
 	},
 	{
 		key: 'da108699-76d9-4691-9dbd-c11a16cf3514',
@@ -1682,6 +1775,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '6/13/2022',
 		createDate: '7/19/2022',
 		failedLoginAttempts: 397,
+		userGroups: [],
 	},
 	{
 		key: '7469307b-a87b-49b9-8dab-100d7d7e31d0',
@@ -1700,6 +1794,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '10/20/2021',
 		createDate: '10/24/2021',
 		failedLoginAttempts: 104,
+		userGroups: [],
 	},
 	{
 		key: 'cc7c8bbb-580f-445e-8af5-c3bf14b4a560',
@@ -1718,6 +1813,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '6/20/2022',
 		createDate: '11/5/2021',
 		failedLoginAttempts: 78,
+		userGroups: [],
 	},
 	{
 		key: '1c75ef97-b3f2-4194-b109-fd5c82efe9de',
@@ -1736,6 +1832,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '4/30/2022',
 		createDate: '9/25/2022',
 		failedLoginAttempts: 887,
+		userGroups: [],
 	},
 	{
 		key: 'a010a09d-2e23-4403-806c-16fcfe70fcd4',
@@ -1754,6 +1851,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '7/18/2022',
 		createDate: '4/12/2022',
 		failedLoginAttempts: 477,
+		userGroups: [],
 	},
 	{
 		key: '8c9bfaac-098f-43a4-91ee-a9eaf5dfe5ea',
@@ -1772,6 +1870,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '8/9/2022',
 		createDate: '7/24/2022',
 		failedLoginAttempts: 160,
+		userGroups: [],
 	},
 	{
 		key: 'ecb0ced9-c1c1-486d-a317-5f2b320859bd',
@@ -1790,6 +1889,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '4/14/2022',
 		createDate: '11/16/2021',
 		failedLoginAttempts: 932,
+		userGroups: [],
 	},
 ];
 

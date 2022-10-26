@@ -181,6 +181,21 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(
 		history.pushState(null, '', '/section/users/view/users/overview');
 	}
 
+	// TODO. find a way where we don't have to do this for all editors.
+	private _handleInput(event: UUIInputEvent) {
+		if (event instanceof UUIInputEvent) {
+			const target = event.composedPath()[0] as UUIInputElement;
+
+			if (typeof target?.value === 'string') {
+				this._updateProperty('name', target.value);
+			}
+		}
+	}
+
+	private _updateProperty(propertyName: string, value: string) {
+		this._userContext?.update({ [propertyName]: value });
+	}
+
 	private renderLeftColumn() {
 		if (!this._user) return nothing;
 
@@ -201,7 +216,8 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(
 					<div>
 						<b>Groups</b>
 						<div class="faded-text">Add groups to assign access and permissions</div>
-						<umb-picker-user-group></umb-picker-user-group>
+						<umb-picker-user-group
+							@change=${(e: any) => this._updateProperty('userGroups', e.target.selection)}></umb-picker-user-group>
 					</div>
 					<div>
 						<b>Content start nodes</b>
@@ -297,17 +313,6 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(
 				</div>
 			</div>
 		</uui-box>`;
-	}
-
-	// TODO. find a way where we don't have to do this for all editors.
-	private _handleInput(event: UUIInputEvent) {
-		if (event instanceof UUIInputEvent) {
-			const target = event.composedPath()[0] as UUIInputElement;
-
-			if (typeof target?.value === 'string') {
-				this._userContext?.update({ name: target.value });
-			}
-		}
 	}
 
 	render() {
