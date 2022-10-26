@@ -8,9 +8,6 @@ test.describe('Packages', () => {
   const rootDocTypeName = "Test document type";
   const nodeName = "1) Home";
   test.beforeEach(async ({page, umbracoApi}) => {
-    // TODO: REMOVE THIS WHEN SQLITE IS FIXED
-    // Wait so we don't bombard the API
-    await page.waitForTimeout(1000);
     await umbracoApi.login();
   });
 
