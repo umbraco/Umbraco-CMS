@@ -114,7 +114,7 @@
             createFlow: false
         };
         vm.sortMode = false;
-        vm.sortModeView = DefaultViewFolderPath + "gridblock/gridblock.editor.html";;
+        vm.sortModeView = DefaultViewFolderPath + "gridsortblock/gridsortblock.editor.html";;
 
         localizationService.localizeMany(["grid_addElement", "content_createEmpty", "blockEditor_addThis"]).then(function (data) {
             vm.labels.grid_addElement = data[0];
@@ -187,16 +187,14 @@
 
             enterSortModeAction = {
                 labelKey: 'blockEditor_actionEnterSortMode',
-                labelTokens: [],
                 icon: 'navigation-vertical',
                 method: enableSortMode,
                 isDisabled: false
             };
             exitSortModeAction = {
                 labelKey: 'blockEditor_actionExitSortMode',
-                labelTokens: [],
                 icon: 'navigation-vertical',
-                method: enableSortMode,
+                method: exitSortMode,
                 isDisabled: false
             };
 
@@ -210,7 +208,6 @@
 
             deleteAllBlocksAction = {
                 labelKey: 'clipboard_labelForRemoveAllEntries',
-                labelTokens: [],
                 icon: 'trash',
                 method: requestDeleteAllBlocks,
                 isDisabled: true
@@ -1279,12 +1276,18 @@
         function enableSortMode() {
             vm.sortMode = true;
             propertyActions.splice(propertyActions.indexOf(enterSortModeAction), 1, exitSortModeAction);
+            if (vm.umbProperty) {
+                vm.umbProperty.setPropertyActions(propertyActions);
+            }
         }
+
         vm.exitSortMode = exitSortMode;
         function exitSortMode() {
-
             vm.sortMode = false;
             propertyActions.splice(propertyActions.indexOf(exitSortModeAction), 1, enterSortModeAction);
+            if (vm.umbProperty) {
+                vm.umbProperty.setPropertyActions(propertyActions);
+            }
         }
 
         function onAmountOfBlocksChanged() {
