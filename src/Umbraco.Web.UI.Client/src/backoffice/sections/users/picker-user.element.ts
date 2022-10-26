@@ -1,14 +1,14 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { Subscription } from 'rxjs';
 import type { UserEntity } from '../../../core/models';
 import { UmbUserStore } from '../../../core/stores/user/user.store';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbPickerElement } from './picker.element';
 import './picker.element';
 
 @customElement('umb-picker-user')
-export class UmbPickerUserElement extends UmbPickerElement {
+export class UmbPickerUserElement extends UmbObserverMixin(UmbPickerElement) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -37,7 +37,6 @@ export class UmbPickerUserElement extends UmbPickerElement {
 	private _users: Array<UserEntity> = [];
 
 	private _userStore?: UmbUserStore;
-	private _usersSubscription?: Subscription;
 
 	connectedCallback(): void {
 		super.connectedCallback();
@@ -47,18 +46,9 @@ export class UmbPickerUserElement extends UmbPickerElement {
 		});
 	}
 
-	disconnectedCallback(): void {
-		super.disconnectedCallback();
-		this._usersSubscription?.unsubscribe();
-	}
-
 	private _observeUser() {
-		this._usersSubscription?.unsubscribe();
-
-		if (this.value.length > 0) {
-			this._usersSubscription = this._userStore?.getByKeys(this.value).subscribe((users) => {
-				this._users = users;
-			});
+		if (this.value.length > 0 && this._userStore) {
+			this.observe<Array<UserEntity>>(this._userStore.getByKeys(this.value), (users) => (this._users = users));
 		} else {
 			this._users = [];
 		}

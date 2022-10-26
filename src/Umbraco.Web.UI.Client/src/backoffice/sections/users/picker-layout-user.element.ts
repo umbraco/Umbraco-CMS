@@ -1,15 +1,17 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { Subscription } from 'rxjs';
 import { UmbModalLayoutElement } from '../../../core/services/modal/layouts/modal-layout.element';
 import { UmbUserStore } from '../../../core/stores/user/user.store';
 import { UmbPickerData } from './picker.element';
 import type { UserDetails } from '@umbraco-cms/models';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 
 @customElement('umb-picker-layout-user')
-export class UmbPickerLayoutUserElement extends UmbContextConsumerMixin(UmbModalLayoutElement<UmbPickerData>) {
+export class UmbPickerLayoutUserElement extends UmbContextConsumerMixin(
+	UmbObserverMixin(UmbModalLayoutElement<UmbPickerData>)
+) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -64,7 +66,6 @@ export class UmbPickerLayoutUserElement extends UmbContextConsumerMixin(UmbModal
 	private _users: Array<UserDetails> = [];
 
 	private _userStore?: UmbUserStore;
-	private _usersSubscription?: Subscription;
 
 	connectedCallback(): void {
 		super.connectedCallback();
@@ -76,11 +77,8 @@ export class UmbPickerLayoutUserElement extends UmbContextConsumerMixin(UmbModal
 	}
 
 	private _observeUsers() {
-		this._usersSubscription?.unsubscribe();
-
-		this._usersSubscription = this._userStore?.getAll().subscribe((users) => {
-			this._users = users;
-		});
+		if (!this._userStore) return;
+		this.observe<Array<UserDetails>>(this._userStore.getAll(), (users) => (this._users = users));
 	}
 
 	private _submit() {

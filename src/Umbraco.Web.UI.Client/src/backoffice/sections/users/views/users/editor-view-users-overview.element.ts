@@ -1,13 +1,13 @@
 import { css, html, LitElement, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
-import { Subscription } from 'rxjs';
 import { IRoute } from 'router-slot';
 import { UUIPopoverElement } from '@umbraco-ui/uui';
 
 import { UmbModalService } from '../../../../../core/services/modal';
 import type { UmbSectionViewUsersElement } from './section-view-users.element';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 
 import './list-view-layouts/table/editor-view-users-table.element';
 import './list-view-layouts/grid/editor-view-users-grid.element';
@@ -16,7 +16,7 @@ import './editor-view-users-invite.element';
 
 export type UsersViewType = 'list' | 'grid';
 @customElement('umb-editor-view-users-overview')
-export class UmbEditorViewUsersOverviewElement extends UmbContextConsumerMixin(LitElement) {
+export class UmbEditorViewUsersOverviewElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -99,7 +99,6 @@ export class UmbEditorViewUsersOverviewElement extends UmbContextConsumerMixin(L
 	];
 
 	private _usersContext?: UmbSectionViewUsersElement;
-	private _selectionSubscription?: Subscription;
 	private _modalService?: UmbModalService;
 
 	connectedCallback(): void {
@@ -107,11 +106,7 @@ export class UmbEditorViewUsersOverviewElement extends UmbContextConsumerMixin(L
 
 		this.consumeContext('umbUsersContext', (usersContext: UmbSectionViewUsersElement) => {
 			this._usersContext = usersContext;
-
-			this._selectionSubscription?.unsubscribe();
-			this._selectionSubscription = this._usersContext?.selection.subscribe((selection: Array<string>) => {
-				this._selection = selection;
-			});
+			this._observeSelection();
 		});
 
 		this.consumeContext('umbModalService', (modalService: UmbModalService) => {
@@ -119,10 +114,9 @@ export class UmbEditorViewUsersOverviewElement extends UmbContextConsumerMixin(L
 		});
 	}
 
-	disconnectedCallback(): void {
-		super.disconnectedCallback();
-
-		this._selectionSubscription?.unsubscribe();
+	private _observeSelection() {
+		if (!this._usersContext) return;
+		this.observe<Array<string>>(this._usersContext.selection, (selection) => (this._selection = selection));
 	}
 
 	private _toggleViewType() {

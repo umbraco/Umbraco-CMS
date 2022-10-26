@@ -1,14 +1,14 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { Subscription } from 'rxjs';
 import { UmbUserGroupStore } from '../../../core/stores/user/user-group.store';
 import './picker.element';
-import UmbPickerElement from './picker.element';
+import { UmbPickerElement } from './picker.element';
 import type { UserGroupEntity } from '@umbraco-cms/models';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 
 @customElement('umb-picker-user-group')
-export class UmbPickerUserGroupElement extends UmbPickerElement {
+export class UmbPickerUserGroupElement extends UmbObserverMixin(UmbPickerElement) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -37,7 +37,6 @@ export class UmbPickerUserGroupElement extends UmbPickerElement {
 	private _userGroups: Array<UserGroupEntity> = [];
 
 	private _userGroupStore?: UmbUserGroupStore;
-	private _userGroupsSubscription?: Subscription;
 
 	connectedCallback(): void {
 		super.connectedCallback();
@@ -48,18 +47,12 @@ export class UmbPickerUserGroupElement extends UmbPickerElement {
 		});
 	}
 
-	disconnectedCallback(): void {
-		super.disconnectedCallback();
-		this._userGroupsSubscription?.unsubscribe();
-	}
-
 	private _observeUserGroups() {
-		this._userGroupsSubscription?.unsubscribe();
-
-		if (this.value.length > 0) {
-			this._userGroupsSubscription = this._userGroupStore?.getByKeys(this.value).subscribe((userGroups) => {
-				this._userGroups = userGroups;
-			});
+		if (this.value.length > 0 && this._userGroupStore) {
+			this.observe<Array<UserGroupEntity>>(
+				this._userGroupStore.getByKeys(this.value),
+				(userGroups) => (this._userGroups = userGroups)
+			);
 		} else {
 			this._userGroups = [];
 		}

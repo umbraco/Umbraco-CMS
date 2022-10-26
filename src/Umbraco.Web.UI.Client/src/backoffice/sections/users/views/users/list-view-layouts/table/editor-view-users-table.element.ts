@@ -1,7 +1,6 @@
 import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
-import { Subscription } from 'rxjs';
 import type { UmbSectionViewUsersElement } from '../../section-view-users.element';
 import { UmbUserStore } from '../../../../../../../core/stores/user/user.store';
 import {
@@ -15,12 +14,13 @@ import {
 } from '../../../../../../components/table/table.element';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { UserDetails } from '@umbraco-cms/models';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 
 import './column-layouts/name/user-table-name-column-layout.element';
 import './column-layouts/status/user-table-status-column-layout.element';
 
 @customElement('umb-editor-view-users-table')
-export class UmbEditorViewUsersTableElement extends UmbContextConsumerMixin(LitElement) {
+export class UmbEditorViewUsersTableElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -70,8 +70,6 @@ export class UmbEditorViewUsersTableElement extends UmbContextConsumerMixin(LitE
 
 	private _userStore?: UmbUserStore;
 	private _usersContext?: UmbSectionViewUsersElement;
-	private _usersSubscription?: Subscription;
-	private _selectionSubscription?: Subscription;
 
 	connectedCallback(): void {
 		super.connectedCallback();
@@ -88,15 +86,16 @@ export class UmbEditorViewUsersTableElement extends UmbContextConsumerMixin(LitE
 	}
 
 	private _observeUsers() {
-		this._usersSubscription?.unsubscribe();
-		this._usersSubscription = this._userStore?.getAll().subscribe((users) => {
+		if (!this._userStore) return;
+		this.observe<Array<UserDetails>>(this._userStore.getAll(), (users) => {
 			this._users = users;
 			this._createTableItems(this._users);
 		});
 	}
 
 	private _observeSelection() {
-		this._selectionSubscription = this._usersContext?.selection.subscribe((selection: Array<string>) => {
+		if (!this._usersContext) return;
+		this.observe(this._usersContext.selection, (selection) => {
 			if (this._selection === selection) return;
 			this._selection = selection;
 		});
@@ -116,7 +115,7 @@ export class UmbEditorViewUsersTableElement extends UmbContextConsumerMixin(LitE
 					},
 					{
 						columnAlias: 'userGroup',
-						value: user.userGroup,
+						value: user.userGroups,
 					},
 					{
 						columnAlias: 'userLastLogin',
@@ -152,13 +151,6 @@ export class UmbEditorViewUsersTableElement extends UmbContextConsumerMixin(LitE
 		const orderingColumn = table.orderingColumn;
 		const orderingDesc = table.orderingDesc;
 		console.log(`fetch users, order column: ${orderingColumn}, desc: ${orderingDesc}`);
-	}
-
-	disconnectedCallback(): void {
-		super.disconnectedCallback();
-
-		this._usersSubscription?.unsubscribe();
-		this._selectionSubscription?.unsubscribe();
 	}
 
 	render() {
