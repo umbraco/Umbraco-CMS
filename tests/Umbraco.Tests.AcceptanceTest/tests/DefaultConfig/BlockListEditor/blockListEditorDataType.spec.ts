@@ -258,7 +258,7 @@ test.describe('BlockListEditorDataType', () => {
     await page.locator('[data-element="tree-item-css"]').locator('[data-element="tree-item-expand"]').click();
     await page.locator('.umb-tree-item__label', {hasText: stylesheetName + '.css'}).click();
     // Changes editor size
-    await page.locator('[id="editorSize"]').selectOption({value: "large"});
+    await page.locator('[id="blockEditorSize"]').selectOption({value: "large"});
     // Adds element type as settings model
     await page.locator('[key="blockEditor_addSettingsElementType"]').click();
     await page.locator('[data-element="tree-item-' + elementNameTwo + '"]').click();
