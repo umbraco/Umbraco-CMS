@@ -27,6 +27,11 @@ export class UmbPickerUserGroupElement extends UmbObserverMixin(UmbPickerElement
 				align-items: center;
 				gap: var(--uui-size-space-2);
 			}
+			.user-group div {
+				display: flex;
+				align-items: center;
+				gap: var(--uui-size-4);
+			}
 			.user-group uui-button {
 				margin-left: auto;
 			}
@@ -70,7 +75,10 @@ export class UmbPickerUserGroupElement extends UmbObserverMixin(UmbPickerElement
 			${this._userGroups.map(
 				(userGroup) => html`
 					<div class="user-group">
-						<div>${userGroup.name}</div>
+						<div>
+							<uui-icon .name=${userGroup.icon}></uui-icon>
+							<span>${userGroup.name}</span>
+						</div>
 						<uui-button @click=${() => this.removeFromSelection(userGroup.key)} label="remove"></uui-button>
 					</div>
 				`

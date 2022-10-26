@@ -24,7 +24,7 @@ export class UmbPickerLayoutUserElement extends UmbContextConsumerMixin(
 				border-bottom: 1px solid var(--uui-color-divider);
 				margin: 16px 0;
 			}
-			#user-list {
+			#item-list {
 				display: flex;
 				flex-direction: column;
 				gap: var(--uui-size-1);
@@ -39,23 +39,26 @@ export class UmbPickerLayoutUserElement extends UmbContextConsumerMixin(
 				cursor: pointer;
 				position: relative;
 			}
-			.item:hover {
-				background-color: var(--uui-color-surface-emphasis);
-				color: var(--uui-color-interactive-emphasis);
-			}
 			.item.selected {
 				background-color: var(--uui-color-selected);
 				color: var(--uui-color-selected-contrast);
 				border-radius: var(--uui-size-2);
 			}
-			uui-avatar {
-				border: 2px solid var(--uui-color-surface);
+			.item:not(.selected):hover {
+				background-color: var(--uui-color-surface-emphasis);
+				color: var(--uui-color-interactive-emphasis);
+			}
+			.item.selected:hover {
+				background-color: var(--uui-color-selected-emphasis);
 			}
 			.item:hover uui-avatar {
 				border-color: var(--uui-color-surface-emphasis);
 			}
 			.item.selected uui-avatar {
 				border-color: var(--uui-color-selected-contrast);
+			}
+			uui-avatar {
+				border: 2px solid var(--uui-color-surface);
 			}
 		`,
 	];
@@ -119,7 +122,7 @@ export class UmbPickerLayoutUserElement extends UmbContextConsumerMixin(
 				<uui-box>
 					<uui-input></uui-input>
 					<hr />
-					<div id="user-list">
+					<div id="item-list">
 						${this._users.map(
 							(item) => html`
 								<div

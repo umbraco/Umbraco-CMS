@@ -20,44 +20,42 @@ export class UmbPickerLayoutUserGroupElement extends UmbContextConsumerMixin(
 			uui-input {
 				width: 100%;
 			}
-
 			hr {
 				border: none;
 				border-bottom: 1px solid var(--uui-color-divider);
 				margin: 16px 0;
 			}
+			#item-list {
+				display: flex;
+				flex-direction: column;
+				gap: var(--uui-size-1);
+			}
 			.item {
 				color: var(--uui-color-interactive);
 				display: grid;
 				grid-template-columns: var(--uui-size-8) 1fr;
-				height: var(--uui-size-8);
-				align-items: center;
-				padding: var(--uui-size-2);
+				padding: var(--uui-size-4) var(--uui-size-2);
 				gap: var(--uui-size-space-5);
+				align-items: center;
 				cursor: pointer;
 			}
-			.item uui-icon {
-				height: 100%;
-				width: 100%;
-				box-sizing: border-box;
-				display: flex;
+			.item.selected {
+				background-color: var(--uui-color-selected);
+				color: var(--uui-color-selected-contrast);
+				border-radius: var(--uui-size-2);
 			}
-			.item:hover {
+			.item:not(.selected):hover {
 				background-color: var(--uui-color-surface-emphasis);
 				color: var(--uui-color-interactive-emphasis);
 			}
-			.item:hover .selected-checkbox {
-				border-color: var(--uui-color-surface-emphasis);
+			.item.selected:hover {
+				background-color: var(--uui-color-selected-emphasis);
 			}
-			.selected-checkbox {
+			.item uui-icon {
+				width: 100%;
+				box-sizing: border-box;
 				display: flex;
-				align-items: center;
-				justify-content: center;
-				background-color: var(--uui-color-selected);
-				color: var(--uui-color-selected-contrast);
-				padding: var(--uui-size-1);
-				border-radius: var(--uui-size-2);
-				border: 2px solid var(--uui-color-surface);
+				height: fit-content;
 			}
 		`,
 	];
@@ -118,34 +116,25 @@ export class UmbPickerLayoutUserGroupElement extends UmbContextConsumerMixin(
 		return this._selection.includes(key);
 	}
 
-	private _renderCheckbox() {
-		return html`
-			<div class="selected-checkbox">
-				<uui-icon name="check"></uui-icon>
-			</div>
-		`;
-	}
-	private _renderIcon(item: UserGroupDetails) {
-		return this._isSelected(item.key) ? this._renderCheckbox() : html`<uui-icon .name=${item.icon}></uui-icon>`;
-	}
-
 	render() {
 		return html`
 			<umb-editor-entity-layout headline="Select user groups">
 				<uui-box>
 					<uui-input></uui-input>
 					<hr />
-					${this._userGroups.map(
-						(item) => html`
-							<div
-								@click=${() => this._handleItemClick(item.key)}
-								@keydown=${(e: KeyboardEvent) => this._handleKeydown(e, item.key)}
-								class="item">
-								${this._renderIcon(item)}
-								<span>${item.name}</span>
-							</div>
-						`
-					)}
+					<div id="item-list">
+						${this._userGroups.map(
+							(item) => html`
+								<div
+									@click=${() => this._handleItemClick(item.key)}
+									@keydown=${(e: KeyboardEvent) => this._handleKeydown(e, item.key)}
+									class=${this._isSelected(item.key) ? 'item selected' : 'item'}>
+									<uui-icon .name=${item.icon}></uui-icon>
+									<span>${item.name}</span>
+								</div>
+							`
+						)}
+					</div>
 				</uui-box>
 				<div slot="actions">
 					<uui-button label="Close" @click=${this._close}></uui-button>
