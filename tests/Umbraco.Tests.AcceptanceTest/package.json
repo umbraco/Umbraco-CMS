@@ -18,7 +18,7 @@
     "prompt": "^1.2.0"
   },
   "dependencies": {
-    "@umbraco/json-models-builders": "^1.0.0",
+    "@umbraco/json-models-builders": "^1.0.2",
     "@umbraco/playwright-testhelpers": "^1.0.11",
     "camelize": "^1.0.0",
     "faker": "^4.1.0",
