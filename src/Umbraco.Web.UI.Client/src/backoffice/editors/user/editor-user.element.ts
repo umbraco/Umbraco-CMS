@@ -2,7 +2,6 @@ import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import { css, html, LitElement, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
-import { Subscription } from 'rxjs';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 
 import { UmbUserStore } from '../../../core/stores/user/user.store';
@@ -11,13 +10,16 @@ import { UmbUserContext } from './user.context';
 import { UmbContextProviderMixin, UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import type { ManifestEditorAction, ManifestWithLoader, UserDetails } from '@umbraco-cms/models';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 
 import '../../property-editor-uis/content-picker/property-editor-ui-content-picker.element';
 import '../../sections/users/picker-user-group.element';
 import '../shared/editor-entity-layout/editor-entity-layout.element';
 
 @customElement('umb-editor-user')
-export class UmbEditorUserElement extends UmbContextProviderMixin(UmbContextConsumerMixin(LitElement)) {
+export class UmbEditorUserElement extends UmbContextProviderMixin(
+	UmbContextConsumerMixin(UmbObserverMixin(LitElement))
+) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -99,11 +101,7 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(UmbContextCons
 	entityKey = '';
 
 	protected _userStore?: UmbUserStore;
-	protected _usersSubscription?: Subscription;
 	private _userContext?: UmbUserContext;
-
-	private _userNameSubscription?: Subscription;
-
 	private _languages = []; //TODO Add languages
 
 	constructor() {
@@ -141,9 +139,9 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(UmbContextCons
 	}
 
 	private _observeUser() {
-		this._usersSubscription?.unsubscribe();
+		if (!this._userStore) return;
 
-		this._usersSubscription = this._userStore?.getByKey(this.entityKey).subscribe((user) => {
+		this.observe(this._userStore.getByKey(this.entityKey), (user) => {
 			this._user = user;
 			if (!this._user) return;
 
@@ -154,19 +152,18 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(UmbContextCons
 				this._userContext.update(this._user);
 			}
 
-			this._userNameSubscription = this._userContext.data.subscribe((user) => {
-				if (user && user.name !== this._userName) {
-					this._userName = user.name;
-				}
-			});
+			this._observeUserName();
 		});
 	}
 
-	disconnectedCallback(): void {
-		super.disconnectedCallback();
+	private _observeUserName() {
+		if (!this._userContext) return;
 
-		this._usersSubscription?.unsubscribe();
-		this._userNameSubscription?.unsubscribe();
+		this.observe(this._userContext.data, (user) => {
+			if (user.name !== this._userName) {
+				this._userName = user.name;
+			}
+		});
 	}
 
 	private _updateUserStatus() {
