@@ -3,13 +3,12 @@ import { css, html, LitElement, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { IRoutingInfo } from 'router-slot';
 import { first, map } from 'rxjs';
-
 import { UmbSectionContext } from '../../section.context';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import { createExtensionElement, UmbExtensionRegistry } from '@umbraco-cms/extensions-api';
+import { createExtensionElement } from '@umbraco-cms/extensions-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-
 import type { ManifestDashboard, ManifestSection } from '@umbraco-cms/models';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
 @customElement('umb-section-dashboards')
 export class UmbSectionDashboardsElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
@@ -55,17 +54,10 @@ export class UmbSectionDashboardsElement extends UmbContextConsumerMixin(UmbObse
 	private _currentSectionPathname = '';
 
 	private _currentSectionAlias = '';
-
-	private _extensionRegistry?: UmbExtensionRegistry;
 	private _sectionContext?: UmbSectionContext;
 
 	constructor() {
 		super();
-
-		// TODO: wait for more contexts
-		this.consumeContext('umbExtensionRegistry', (_instance: UmbExtensionRegistry) => {
-			this._extensionRegistry = _instance;
-		});
 
 		this.consumeContext('umbSectionContext', (context: UmbSectionContext) => {
 			this._sectionContext = context;
@@ -84,10 +76,10 @@ export class UmbSectionDashboardsElement extends UmbContextConsumerMixin(UmbObse
 	}
 
 	private _observeDashboards() {
-		if (!this._extensionRegistry || !this._currentSectionAlias) return;
+		if (!this._currentSectionAlias) return;
 
 		this.observe<ManifestDashboard[]>(
-			this._extensionRegistry
+			umbExtensionsRegistry
 				?.extensionsOfType('dashboard')
 				.pipe(
 					map((extensions) =>

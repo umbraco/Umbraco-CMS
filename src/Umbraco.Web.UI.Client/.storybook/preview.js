@@ -21,7 +21,6 @@ import { UmbPropertyEditorConfigStore } from '../src/core/stores/property-editor
 import { UmbIconStore } from '../src/core/stores/icon/icon.store';
 import { onUnhandledRequest } from '../src/core/mocks/browser';
 import { handlers } from '../src/core/mocks/browser-handlers';
-import { internalManifests } from '../src/temp-internal-manifests';
 import { LitElement } from 'lit';
 import { UmbModalService } from '../src/core/services/modal';
 

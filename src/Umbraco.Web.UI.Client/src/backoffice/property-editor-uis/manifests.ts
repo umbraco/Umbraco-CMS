@@ -1,11 +1,11 @@
-import type { ManifestTypes } from '@umbraco-cms/models';
+import type { ManifestPropertyEditorUI, ManifestWithLoader } from '@umbraco-cms/models';
 
-export const manifests: Array<ManifestTypes & { loader: () => Promise<object | HTMLElement> }> = [
+export const manifests: Array<ManifestWithLoader<ManifestPropertyEditorUI>> = [
 	{
 		type: 'propertyEditorUI',
 		alias: 'Umb.PropertyEditorUI.BlockList',
 		name: 'Block List Property Editor UI',
-		loader: () => import('../backoffice/property-editor-uis/block-list/property-editor-ui-block-list.element'),
+		loader: () => import('./block-list/property-editor-ui-block-list.element'),
 		meta: {
 			label: 'Block List',
 			icon: 'umb:thumbnail-list',
@@ -17,7 +17,7 @@ export const manifests: Array<ManifestTypes & { loader: () => Promise<object | H
 		type: 'propertyEditorUI',
 		alias: 'Umb.PropertyEditorUI.Toggle',
 		name: 'Toggle Property Editor UI',
-		loader: () => import('../backoffice/property-editor-uis/toggle/property-editor-ui-toggle.element'),
+		loader: () => import('./toggle/property-editor-ui-toggle.element'),
 		meta: {
 			label: 'Toggle',
 			icon: 'umb:checkbox',
@@ -29,7 +29,7 @@ export const manifests: Array<ManifestTypes & { loader: () => Promise<object | H
 		type: 'propertyEditorUI',
 		alias: 'Umb.PropertyEditorUI.CheckboxList',
 		name: 'Checkbox List Property Editor UI',
-		loader: () => import('../backoffice/property-editor-uis/checkbox-list/property-editor-ui-checkbox-list.element'),
+		loader: () => import('./checkbox-list/property-editor-ui-checkbox-list.element'),
 		meta: {
 			label: 'Checkbox List',
 			icon: 'umb:bulleted-list',
@@ -41,7 +41,7 @@ export const manifests: Array<ManifestTypes & { loader: () => Promise<object | H
 		type: 'propertyEditorUI',
 		alias: 'Umb.PropertyEditorUI.TextBox',
 		name: 'Text Property Editor UI',
-		loader: () => import('../backoffice/property-editor-uis/text-box/property-editor-ui-text-box.element'),
+		loader: () => import('./text-box/property-editor-ui-text-box.element'),
 		meta: {
 			label: 'Text',
 			icon: 'umb:edit',
@@ -53,7 +53,7 @@ export const manifests: Array<ManifestTypes & { loader: () => Promise<object | H
 		type: 'propertyEditorUI',
 		alias: 'Umb.PropertyEditorUI.Textarea',
 		name: 'Textarea Property Editor UI',
-		loader: () => import('../backoffice/property-editor-uis/textarea/property-editor-ui-textarea.element'),
+		loader: () => import('./textarea/property-editor-ui-textarea.element'),
 		meta: {
 			label: 'Textarea',
 			icon: 'umb:edit',
@@ -75,7 +75,7 @@ export const manifests: Array<ManifestTypes & { loader: () => Promise<object | H
 		type: 'propertyEditorUI',
 		alias: 'Umb.PropertyEditorUI.Number',
 		name: 'Number Property Editor UI',
-		loader: () => import('../backoffice/property-editor-uis/number/property-editor-ui-number.element'),
+		loader: () => import('./number/property-editor-ui-number.element'),
 		meta: {
 			label: 'Number',
 			icon: 'umb:autofill',
@@ -87,7 +87,7 @@ export const manifests: Array<ManifestTypes & { loader: () => Promise<object | H
 		type: 'propertyEditorUI',
 		alias: 'Umb.PropertyEditorUI.ContentPicker',
 		name: 'Content Picker Property Editor UI',
-		loader: () => import('../backoffice/property-editor-uis/content-picker/property-editor-ui-content-picker.element'),
+		loader: () => import('./content-picker/property-editor-ui-content-picker.element'),
 		meta: {
 			label: 'Content Picker',
 			propertyEditor: 'Umbraco.ContentPicker',
@@ -99,7 +99,7 @@ export const manifests: Array<ManifestTypes & { loader: () => Promise<object | H
 		type: 'propertyEditorUI',
 		alias: 'Umb.PropertyEditorUI.IconPicker',
 		name: 'Icon Picker Property Editor UI',
-		loader: () => import('../backoffice/property-editor-uis/icon-picker/property-editor-ui-icon-picker.element'),
+		loader: () => import('./icon-picker/property-editor-ui-icon-picker.element'),
 		meta: {
 			label: 'Icon Picker',
 			propertyEditor: 'Umbraco.IconPicker',

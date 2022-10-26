@@ -15,6 +15,8 @@ export class UmbDashboardRedirectManagementElement extends LitElement {
 	}
 }
 
+export default UmbDashboardRedirectManagementElement;
+
 declare global {
 	interface HTMLElementTagNameMap {
 		'umb-dashboard-redirect-management': UmbDashboardRedirectManagementElement;

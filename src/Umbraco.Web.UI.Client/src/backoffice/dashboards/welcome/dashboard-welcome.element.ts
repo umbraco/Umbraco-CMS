@@ -16,6 +16,8 @@ export class UmbDashboardWelcomeElement extends LitElement {
 	}
 }
 
+export default UmbDashboardWelcomeElement;
+
 declare global {
 	interface HTMLElementTagNameMap {
 		'umb-dashboard-welcome': UmbDashboardWelcomeElement;

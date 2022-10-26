@@ -1,28 +1,20 @@
-import './packages-installed-item.element';
-
 import { html, LitElement, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
-
 import { getPackagesInstalled } from '@umbraco-cms/backend-api';
-
 import type { PackageInstalled } from '@umbraco-cms/models';
 
-@customElement('umb-packages-installed')
-export class UmbPackagesInstalled extends LitElement {
+import './packages-installed-item.element';
+
+@customElement('umb-packages-installed-overview')
+export class UmbPackagesInstalledOverviewElement extends LitElement {
 	@state()
 	private _installedPackages: PackageInstalled[] = [];
 
 	@state()
 	private _errorMessage = '';
 
-	constructor() {
-		super();
-	}
-
-	connectedCallback(): void {
-		super.connectedCallback();
-
+	firstUpdated() {
 		this._loadInstalledPackages();
 	}
 
@@ -46,26 +38,23 @@ export class UmbPackagesInstalled extends LitElement {
 	}
 
 	render() {
-		return html`
-			<uui-box headline="Installed packages">
-				${this._errorMessage ? html`<uui-error-message>${this._errorMessage}</uui-error-message>` : nothing}
-
-				<uui-ref-list>
-					${repeat(
-						this._installedPackages,
-						(item) => item.id,
-						(item) => html`<umb-packages-installed-item .package=${item}></umb-packages-installed-item>`
-					)}
-				</uui-ref-list>
-			</uui-box>
-		`;
+		return html`<uui-box headline="Installed packages">
+			${this._errorMessage ? html`<uui-error-message>${this._errorMessage}</uui-error-message>` : nothing}
+			<uui-ref-list>
+				${repeat(
+					this._installedPackages,
+					(item) => item.id,
+					(item) => html`<umb-packages-installed-item .package=${item}></umb-packages-installed-item>`
+				)}
+			</uui-ref-list>
+		</uui-box>`;
 	}
 }
 
-export default UmbPackagesInstalled;
+export default UmbPackagesInstalledOverviewElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-packages-installed': UmbPackagesInstalled;
+		'umb-packages-installed': UmbPackagesInstalledOverviewElement;
 	}
 }
