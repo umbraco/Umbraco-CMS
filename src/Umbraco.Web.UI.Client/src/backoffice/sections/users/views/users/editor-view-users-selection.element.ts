@@ -1,13 +1,13 @@
 import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
-import { Subscription } from 'rxjs';
 import type { UmbUserStore } from '../../../../../core/stores/user/user.store';
 import { UmbSectionViewUsersElement } from './section-view-users.element';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 
 @customElement('umb-editor-view-users-selection')
-export class UmbEditorViewUsersSelectionElement extends UmbContextConsumerMixin(LitElement) {
+export class UmbEditorViewUsersSelectionElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -31,9 +31,7 @@ export class UmbEditorViewUsersSelectionElement extends UmbContextConsumerMixin(
 	private _totalUsers = 0;
 
 	private _usersContext?: UmbSectionViewUsersElement;
-	private _selectionSubscription?: Subscription;
 	private _userStore?: UmbUserStore;
-	private _totalUsersSubscription?: Subscription;
 
 	connectedCallback(): void {
 		super.connectedCallback();
@@ -49,23 +47,13 @@ export class UmbEditorViewUsersSelectionElement extends UmbContextConsumerMixin(
 	}
 
 	private _observeSelection() {
-		this._selectionSubscription?.unsubscribe();
-		this._selectionSubscription = this._usersContext?.selection.subscribe((selection: Array<string>) => {
-			this._selection = selection;
-		});
+		if (!this._usersContext) return;
+		this.observe<Array<string>>(this._usersContext.selection, (selection) => (this._selection = selection));
 	}
 
 	private _observeTotalUsers() {
-		this._totalUsersSubscription?.unsubscribe();
-		this._userStore?.totalUsers.subscribe((totalUsers: number) => {
-			this._totalUsers = totalUsers;
-		});
-	}
-
-	disconnectedCallback(): void {
-		super.disconnectedCallback();
-		this._selectionSubscription?.unsubscribe();
-		this._totalUsersSubscription?.unsubscribe();
+		if (!this._userStore) return;
+		this.observe<number>(this._userStore.totalUsers, (totalUsers) => (this._totalUsers = totalUsers));
 	}
 
 	private _handleClearSelection() {

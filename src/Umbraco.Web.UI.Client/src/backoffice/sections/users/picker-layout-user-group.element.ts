@@ -1,17 +1,19 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { Subscription } from 'rxjs';
 
 import { UmbModalLayoutElement } from '../../../core/services/modal/layouts/modal-layout.element';
 import { UmbUserGroupStore } from '../../../core/stores/user/user-group.store';
 import { UmbPickerData } from './picker.element';
 
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import type { UserGroupDetails } from '@umbraco-cms/models';
 
 @customElement('umb-picker-layout-user-group')
-export class UmbPickerLayoutUserGroupElement extends UmbContextConsumerMixin(UmbModalLayoutElement<UmbPickerData>) {
+export class UmbPickerLayoutUserGroupElement extends UmbContextConsumerMixin(
+	UmbObserverMixin(UmbModalLayoutElement<UmbPickerData>)
+) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -66,7 +68,6 @@ export class UmbPickerLayoutUserGroupElement extends UmbContextConsumerMixin(Umb
 	private _userGroups: Array<UserGroupDetails> = [];
 
 	private _userGroupStore?: UmbUserGroupStore;
-	private _userGroupsSubscription?: Subscription;
 
 	connectedCallback(): void {
 		super.connectedCallback();
@@ -78,11 +79,11 @@ export class UmbPickerLayoutUserGroupElement extends UmbContextConsumerMixin(Umb
 	}
 
 	private _observeUserGroups() {
-		this._userGroupsSubscription?.unsubscribe();
-
-		this._userGroupsSubscription = this._userGroupStore?.getAll().subscribe((userGroups) => {
-			this._userGroups = userGroups;
-		});
+		if (!this._userGroupStore) return;
+		this.observe<Array<UserGroupDetails>>(
+			this._userGroupStore.getAll(),
+			(userGroups) => (this._userGroups = userGroups)
+		);
 	}
 
 	private _submit() {

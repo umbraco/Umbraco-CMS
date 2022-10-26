@@ -2,16 +2,16 @@ import { css, html, LitElement, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
-import { Subscription } from 'rxjs';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import type { UmbSectionViewUsersElement } from '../../section-view-users.element';
 import { UmbUserStore } from '../../../../../../../core/stores/user/user.store';
 import { getTagLookAndColor } from '../../../../user-extensions';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { UserDetails, UserEntity } from '@umbraco-cms/models';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 
 @customElement('umb-editor-view-users-grid')
-export class UmbEditorViewUsersGridElement extends UmbContextConsumerMixin(LitElement) {
+export class UmbEditorViewUsersGridElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -48,42 +48,26 @@ export class UmbEditorViewUsersGridElement extends UmbContextConsumerMixin(LitEl
 
 	private _userStore?: UmbUserStore;
 	private _usersContext?: UmbSectionViewUsersElement;
-	private _usersSubscription?: Subscription;
-	private _selectionSubscription?: Subscription;
 
-	connectedCallback(): void {
-		super.connectedCallback();
+	constructor() {
+		super();
 
-		this.consumeContext('umbUserStore', (userStore: UmbUserStore) => {
-			this._userStore = userStore;
+		this.consumeAllContexts(['umbUserStore', 'umbUsersContext'], (instances) => {
+			this._userStore = instances['umbUserStore'];
+			this._usersContext = instances['umbUsersContext'];
 			this._observeUsers();
-		});
-
-		this.consumeContext('umbUsersContext', (usersContext: UmbSectionViewUsersElement) => {
-			this._usersContext = usersContext;
 			this._observeSelection();
 		});
 	}
 
 	private _observeUsers() {
-		this._usersSubscription?.unsubscribe();
-		this._usersSubscription = this._userStore?.getAll().subscribe((users) => {
-			this._users = users;
-		});
+		if (!this._userStore) return;
+		this.observe<Array<UserDetails>>(this._userStore.getAll(), (users) => (this._users = users));
 	}
 
 	private _observeSelection() {
-		this._selectionSubscription?.unsubscribe();
-		this._selectionSubscription = this._usersContext?.selection.subscribe((selection: Array<string>) => {
-			this._selection = selection;
-		});
-	}
-
-	disconnectedCallback(): void {
-		super.disconnectedCallback();
-
-		this._usersSubscription?.unsubscribe();
-		this._selectionSubscription?.unsubscribe();
+		if (!this._usersContext) return;
+		this.observe<Array<string>>(this._usersContext.selection, (selection) => (this._selection = selection));
 	}
 
 	private _isSelected(key: string) {
