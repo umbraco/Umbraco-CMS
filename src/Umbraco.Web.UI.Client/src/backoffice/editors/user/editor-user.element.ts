@@ -206,33 +206,34 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(
 					<uui-input name="email" label="email" readonly value=${this._user.email}></uui-input>
 				</uui-form-layout-item>
 				<uui-form-layout-item style="margin-bottom: 0">
-					<uui-label for="language">Language</uui-label>
+					<uui-label for="language">Language - DOESN'T WORK YET</uui-label>
 					<uui-select name="language" label="language" .options=${this._languages}> </uui-select>
 				</uui-form-layout-item>
 			</uui-box>
 			<uui-box>
+				<div slot="headline">Assign access</div>
 				<div id="assign-access">
-					<div slot="headline">Assign access</div>
 					<div>
 						<b>Groups</b>
 						<div class="faded-text">Add groups to assign access and permissions</div>
 						<umb-picker-user-group
-							@change=${(e: any) => this._updateProperty('userGroups', e.target.selection)}></umb-picker-user-group>
+							.value=${this._user.userGroups}
+							@change=${(e: any) => this._updateProperty('userGroups', e.target.value)}></umb-picker-user-group>
 					</div>
 					<div>
-						<b>Content start nodes</b>
+						<b>Content start nodes - DOESN'T WORK YET</b>
 						<div class="faded-text">Limit the content tree to specific start nodes</div>
 						<umb-property-editor-ui-content-picker></umb-property-editor-ui-content-picker>
 					</div>
 					<div>
-						<b>Media start nodes</b>
+						<b>Media start nodes - DOESN'T WORK YET</b>
 						<div class="faded-text">Limit the media library to specific start nodes</div>
 						<umb-property-editor-ui-content-picker></umb-property-editor-ui-content-picker>
 					</div>
 				</div>
 			</uui-box>
 			<uui-box>
-				<div slot="headline">Access</div>
+				<div slot="headline">Access - DOESN'T WORK YET</div>
 				<div slot="header" class="faded-text">
 					Based on the assigned groups and start nodes, the user has access to the following nodes
 				</div>

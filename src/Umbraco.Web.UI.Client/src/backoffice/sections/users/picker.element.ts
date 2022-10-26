@@ -16,7 +16,7 @@ export interface UmbPickerData {
 @customElement('umb-picker')
 export class UmbPickerElement extends UmbContextConsumerMixin(LitElement) {
 	@property({ type: Array })
-	public selection: Array<string> = [];
+	public value: Array<string> = [];
 
 	protected pickerLayout?: string;
 	protected pickerOptions: UmbModalOptions<UmbPickerData> = {
@@ -43,12 +43,12 @@ export class UmbPickerElement extends UmbContextConsumerMixin(LitElement) {
 			...this.pickerOptions,
 			data: {
 				...this.pickerOptions.data,
-				selection: [...this.selection],
+				selection: [...this.value],
 			},
 		});
 		modalHandler?.onClose().then((data: UmbPickerData) => {
 			if (data) {
-				this.selection = data.selection;
+				this.value = data.selection;
 				this.selectionUpdated();
 			}
 			console.log('modal closed', data);
@@ -56,7 +56,7 @@ export class UmbPickerElement extends UmbContextConsumerMixin(LitElement) {
 	}
 
 	protected removeFromSelection(key: string) {
-		this.selection = this.selection.filter((k) => k !== key);
+		this.value = this.value.filter((k) => k !== key);
 		this.selectionUpdated();
 	}
 

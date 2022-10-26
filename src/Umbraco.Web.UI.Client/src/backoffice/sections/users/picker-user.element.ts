@@ -55,8 +55,8 @@ export class UmbPickerUserElement extends UmbPickerElement {
 	private _observeUser() {
 		this._usersSubscription?.unsubscribe();
 
-		if (this.selection.length > 0) {
-			this._usersSubscription = this._userStore?.getByKeys(this.selection).subscribe((users) => {
+		if (this.value.length > 0) {
+			this._usersSubscription = this._userStore?.getByKeys(this.value).subscribe((users) => {
 				this._users = users;
 			});
 		} else {
