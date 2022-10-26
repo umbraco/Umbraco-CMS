@@ -429,7 +429,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedViewModelOfTelemetryLevel"
+                  "$ref": "#/components/schemas/PagedViewModelOfTelemetryLevelViewModel"
                 }
               }
             }
@@ -4085,35 +4085,21 @@
           "items": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/TelemetryLevel"
+              "$ref": "#/components/schemas/TelemetryLevelViewModel"
             }
           }
         }
-      },
-      "TelemetryLevel": {
-        "type": "integer",
-        "description": "",
-        "x-enumNames": [
-          "Minimal",
-          "Basic",
-          "Detailed"
-        ],
-        "enum": [
-          0,
-          1,
-          2
-        ]
       },
       "TelemetryLevelViewModel": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
           "telemetryLevel": {
-            "$ref": "#/components/schemas/TelemetryLevel2"
+            "$ref": "#/components/schemas/TelemetryLevel"
           }
         }
       },
-      "TelemetryLevel2": {
+      "TelemetryLevel": {
         "type": "string",
         "description": "",
         "x-enumNames": [
@@ -4629,7 +4615,7 @@
         "additionalProperties": false,
         "properties": {
           "level": {
-            "$ref": "#/components/schemas/TelemetryLevel2"
+            "$ref": "#/components/schemas/TelemetryLevel"
           },
           "description": {
             "type": "string"
@@ -4692,7 +4678,7 @@
             "$ref": "#/components/schemas/DatabaseInstallViewModel"
           },
           "telemetryLevel": {
-            "$ref": "#/components/schemas/TelemetryLevel2"
+            "$ref": "#/components/schemas/TelemetryLevel"
           }
         }
       },
