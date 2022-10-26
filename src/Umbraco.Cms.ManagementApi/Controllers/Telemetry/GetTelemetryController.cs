@@ -11,7 +11,7 @@ public class GetTelemetryController : TelemetryControllerBase
 
     public GetTelemetryController(IMetricsConsentService metricsConsentService) => _metricsConsentService = metricsConsentService;
 
-    [HttpGet("current")]
+    [HttpGet("level")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(TelemetryLevelViewModel), StatusCodes.Status200OK)]
     public async Task<TelemetryLevelViewModel> Get() => await Task.FromResult(new TelemetryLevelViewModel { TelemetryLevel = _metricsConsentService.GetConsentLevel() });

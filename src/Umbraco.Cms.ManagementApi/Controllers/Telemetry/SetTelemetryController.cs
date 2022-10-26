@@ -11,7 +11,7 @@ public class SetTelemetryController : TelemetryControllerBase
 
     public SetTelemetryController(IMetricsConsentService metricsConsentService) => _metricsConsentService = metricsConsentService;
 
-    [HttpPost("current")]
+    [HttpPost("level")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status200OK)]

@@ -437,7 +437,7 @@
         }
       }
     },
-    "/umbraco/management/api/v1/telemetry/current": {
+    "/umbraco/management/api/v1/telemetry/level": {
       "get": {
         "tags": [
           "Telemetry"
