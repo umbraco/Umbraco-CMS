@@ -23,5 +23,9 @@ public static class StaticServiceProvider
     /// </summary>
     [Obsolete("Use Umbraco.Cms.Core.DependencyInjection.StaticServiceProvider directly instead")]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public static IServiceProvider Instance { get; set; } = Core.DependencyInjection.StaticServiceProvider.Instance;
+    public static IServiceProvider Instance
+    {
+        get => Core.DependencyInjection.StaticServiceProvider.Instance;
+        set => Core.DependencyInjection.StaticServiceProvider.Instance = value;
+    }
 }
