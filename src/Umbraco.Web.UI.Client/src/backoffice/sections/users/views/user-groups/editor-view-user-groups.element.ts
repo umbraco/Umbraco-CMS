@@ -3,14 +3,15 @@ import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { Subscription } from 'rxjs';
 import { UmbUserGroupStore } from '../../../../../core/stores/user/user-group.store';
-import UmbTableElement, {
+import type {
+	UmbTableElement,
 	UmbTableColumn,
 	UmbTableConfig,
 	UmbTableDeselectedEvent,
 	UmbTableItem,
 	UmbTableOrderedEvent,
 	UmbTableSelectedEvent,
-} from '../../../../components/table/table.element';
+} from '../../../../components/table';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { UserGroupDetails } from '@umbraco-cms/models';
 

@@ -2,11 +2,13 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { Subscription } from 'rxjs';
-import { UmbContextConsumerMixin } from '../../../core/context';
-import type { UserGroupDetails } from '../../../core/models';
+
 import { UmbModalLayoutElement } from '../../../core/services/modal/layouts/modal-layout.element';
 import { UmbUserGroupStore } from '../../../core/stores/user/user-group.store';
 import { UmbPickerData } from './picker.element';
+
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import type { UserGroupDetails } from '@umbraco-cms/models';
 
 @customElement('umb-picker-layout-user-group')
 export class UmbPickerLayoutUserGroupElement extends UmbContextConsumerMixin(UmbModalLayoutElement<UmbPickerData>) {
