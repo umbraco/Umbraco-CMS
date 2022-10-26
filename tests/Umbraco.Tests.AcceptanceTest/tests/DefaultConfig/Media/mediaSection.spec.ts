@@ -4,9 +4,6 @@ import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 test.describe('Media', () => {
 
     test.beforeEach(async ({page, umbracoApi, umbracoUi}) => {
-        // TODO: REMOVE THIS WHEN SQLITE IS FIXED
-        // Wait so we don't bombard the API
-        await page.waitForTimeout(1000);
         await umbracoApi.login();
         await umbracoUi.goToSection(ConstantHelper.sections.media);
         await umbracoApi.media.deleteAllMedia()
@@ -29,7 +26,7 @@ test.describe('Media', () => {
             {fileTypeNames: imageName},
             {fileTypeNames: vectorGraphicsName},
             {fileTypeNames: videoName}
-        ]
+        ];
         
         await umbracoApi.media.deleteAllFiles(articleName,audioName,fileName,folderName,imageName,vectorGraphicsName,videoName);
         await umbracoApi.media.ensureNameNotExists(folderToMoveTooName);
@@ -54,7 +51,8 @@ test.describe('Media', () => {
         await page.locator('[label-key="general_submit"]').click();
   
         // Assert
-        await page.waitForTimeout(500);
+        // Needs to wait before refreshing the media tree, otherwise the media files wont be moved to the folder yet
+        await page.waitForTimeout(1000);
         await umbracoUi.refreshMediaTree();
         await page.locator('[data-element="tree-item-' + folderToMoveTooName + '"]').click();
         for (const names of mediaFileTypes) {

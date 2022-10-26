@@ -21,7 +21,7 @@ public class ValidateDatabaseInstallController : InstallControllerBase
         _mapper = mapper;
     }
 
-    [HttpPost("validateDatabase")]
+    [HttpPost("validate-database")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status200OK)]

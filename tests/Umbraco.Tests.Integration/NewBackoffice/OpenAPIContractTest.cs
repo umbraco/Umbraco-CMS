@@ -38,7 +38,7 @@ internal sealed class OpenAPIContractTest : UmbracoTestServerTestBase
 
         var officePath = GlobalSettings.GetBackOfficePath(HostingEnvironment);
 
-        var urlToContract = $"{officePath}/api/openapi.json";
+        var urlToContract = $"{officePath}/management/api/openapi.json";
         var swaggerPath = $"{officePath}/swagger/All/swagger.json";
         var apiContract = JObject.Parse(await Client.GetStringAsync(urlToContract));
 
@@ -57,6 +57,6 @@ internal sealed class OpenAPIContractTest : UmbracoTestServerTestBase
             mergedContract.Remove(key);
         }
 
-        Assert.AreEqual(originalGeneratedContract, mergedContract, $"Generated API do not respect the contract:{Environment.NewLine}Expected:{Environment.NewLine}{originalGeneratedContract.ToString(Formatting.Indented)}{Environment.NewLine}{Environment.NewLine}Actual:{Environment.NewLine}{mergedContract.ToString(Formatting.Indented)}");
+        Assert.AreEqual(originalGeneratedContract.ToString(Formatting.Indented), mergedContract.ToString(Formatting.Indented), $"Generated API do not respect the contract.");
     }
 }

@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Core.Services;
 /// <summary>
 ///     Represents the Macro Service, which is an easy access to operations involving <see cref="IMacro" />
 /// </summary>
-internal class MacroService : RepositoryService, IMacroWithAliasService
+internal class MacroService : RepositoryService, IMacroService
 {
     private readonly IAuditRepository _auditRepository;
     private readonly IMacroRepository _macroRepository;
@@ -34,7 +34,7 @@ internal class MacroService : RepositoryService, IMacroWithAliasService
     /// <returns>An <see cref="IMacro" /> object</returns>
     public IMacro? GetByAlias(string alias)
     {
-        if (_macroRepository is not IMacroWithAliasRepository macroWithAliasRepository)
+        if (_macroRepository is not IMacroRepository macroWithAliasRepository)
         {
             return GetAll().FirstOrDefault(x => x.Alias == alias);
         }
@@ -65,7 +65,7 @@ internal class MacroService : RepositoryService, IMacroWithAliasService
 
     public IEnumerable<IMacro> GetAll(params string[] aliases)
     {
-        if (_macroRepository is not IMacroWithAliasRepository macroWithAliasRepository)
+        if (_macroRepository is not IMacroRepository macroWithAliasRepository)
         {
             var hashset = new HashSet<string>(aliases);
             return GetAll().Where(x => hashset.Contains(x.Alias));

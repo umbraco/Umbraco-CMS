@@ -240,7 +240,7 @@ function dependencies() {
         {
             "name": "signalr",
             "src":  [
-                "./node_modules/@microsoft/signalr/dist/browser/signalr.min.js",
+                "./node_modules/@microsoft/signalr/dist/browser/signalr.min.js"
             ],
             "base": "./node_modules/@microsoft/signalr/dist/browser"
         },
@@ -258,7 +258,9 @@ function dependencies() {
                 "./node_modules/tinymce/tinymce.min.js",
                 "./node_modules/tinymce/plugins/**",
                 "./node_modules/tinymce/skins/**",
-                "./node_modules/tinymce/themes/**"
+                "./node_modules/tinymce/themes/**",
+                "./node_modules/tinymce/models/**",
+                "./node_modules/tinymce/icons/**"
             ],
             "base": "./node_modules/tinymce"
         },
@@ -289,6 +291,11 @@ function dependencies() {
                 "./node_modules/@umbraco-ui/uui-css/dist/uui-text.css"
             ],
             "base": "./node_modules/@umbraco-ui"
+        },
+        {
+            "name": "sortablejs",
+            "src":  ["./node_modules/sortablejs/Sortable.min.js"],
+            "base": "./node_modules/sortablejs"
         }
     ];
 

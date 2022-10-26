@@ -442,6 +442,12 @@ namespace Umbraco.Cms.Core.Services.Implement
             return OperationResult.Attempt.Succeed(MoveOperationStatusType.Success, evtMsgs);
         }
 
+        [Obsolete("Use the method which specifies the userId parameter")]
+        public Attempt<OperationResult<MoveOperationStatusType, IDataType>?> Copy(IDataType copying, int containerId)
+        {
+            return Copy(copying, containerId, Constants.Security.SuperUserId);
+        }
+
         public Attempt<OperationResult<MoveOperationStatusType, IDataType>?> Copy(IDataType copying, int containerId, int userId = Constants.Security.SuperUserId)
         {
             var evtMsgs = EventMessagesFactory.Get();
