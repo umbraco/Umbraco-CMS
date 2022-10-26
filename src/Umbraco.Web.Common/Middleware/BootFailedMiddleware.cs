@@ -1,3 +1,4 @@
+using System.Net.Mime;
 using System.Text;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -51,6 +52,7 @@ public class BootFailedMiddleware : IMiddleware
                 // Print a nice error page
                 context.Response.Clear();
                 context.Response.StatusCode = 500;
+                context.Response.ContentType = MediaTypeNames.Text.Html;
 
                 IFileInfo? fileInfo = GetBootErrorFileInfo();
                 if (fileInfo is not null)
