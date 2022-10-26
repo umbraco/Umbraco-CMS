@@ -9,7 +9,7 @@ namespace Umbraco.Cms.ManagementApi.Controllers.PartialView.Tree;
 
 [ApiVersion("1.0")]
 [ApiController]
-[VersionedApiBackOfficeRoute($"tree/{Constants.UdiEntityType.PartialView}")]
+[VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/{Constants.UdiEntityType.PartialView}")]
 [OpenApiTag("Partial View")]
 public class PartialViewTreeControllerBase : FileSystemTreeControllerBase
 {

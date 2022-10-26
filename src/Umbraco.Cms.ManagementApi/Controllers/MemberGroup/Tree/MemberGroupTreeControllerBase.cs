@@ -12,7 +12,7 @@ namespace Umbraco.Cms.ManagementApi.Controllers.MemberGroup.Tree;
 
 [ApiVersion("1.0")]
 [ApiController]
-[VersionedApiBackOfficeRoute($"tree/{Constants.UdiEntityType.MemberGroup}")]
+[VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/{Constants.UdiEntityType.MemberGroup}")]
 [OpenApiTag("Member Group")]
 public class MemberGroupTreeControllerBase : EntityTreeControllerBase<EntityTreeItemViewModel>
 {

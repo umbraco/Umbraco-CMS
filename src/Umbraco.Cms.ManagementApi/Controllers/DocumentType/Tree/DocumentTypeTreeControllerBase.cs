@@ -12,7 +12,7 @@ namespace Umbraco.Cms.ManagementApi.Controllers.DocumentType.Tree;
 
 [ApiVersion("1.0")]
 [ApiController]
-[VersionedApiBackOfficeRoute($"tree/{Constants.UdiEntityType.DocumentType}")]
+[VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/{Constants.UdiEntityType.DocumentType}")]
 [OpenApiTag("Document Type")]
 public class DocumentTypeTreeControllerBase : FolderTreeControllerBase<DocumentTypeTreeItemViewModel>
 {

@@ -12,7 +12,7 @@ namespace Umbraco.Cms.ManagementApi.Controllers.MediaType.Tree;
 
 [ApiVersion("1.0")]
 [ApiController]
-[VersionedApiBackOfficeRoute($"tree/{Constants.UdiEntityType.MediaType}")]
+[VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/{Constants.UdiEntityType.MediaType}")]
 [OpenApiTag("Media Type")]
 public class MediaTypeTreeControllerBase : FolderTreeControllerBase<FolderTreeItemViewModel>
 {

@@ -9,7 +9,7 @@ namespace Umbraco.Cms.ManagementApi.Controllers.Script.Tree;
 
 [ApiVersion("1.0")]
 [ApiController]
-[VersionedApiBackOfficeRoute($"tree/{Constants.UdiEntityType.Script}")]
+[VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/{Constants.UdiEntityType.Script}")]
 [OpenApiTag(nameof(Constants.UdiEntityType.Script))]
 public class ScriptTreeControllerBase : FileSystemTreeControllerBase
 {

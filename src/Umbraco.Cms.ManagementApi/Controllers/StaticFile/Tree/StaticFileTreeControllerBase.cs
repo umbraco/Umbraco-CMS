@@ -9,7 +9,7 @@ namespace Umbraco.Cms.ManagementApi.Controllers.StaticFile.Tree;
 
 [ApiVersion("1.0")]
 [ApiController]
-[VersionedApiBackOfficeRoute("tree/static-file")]
+[VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/static-file")]
 [OpenApiTag("Static File")]
 public class StaticFileTreeControllerBase : FileSystemTreeControllerBase
 {

@@ -14,7 +14,7 @@ namespace Umbraco.Cms.ManagementApi.Controllers.Media.RecycleBin;
 
 [ApiVersion("1.0")]
 [ApiController]
-[VersionedApiBackOfficeRoute($"recycle-bin/{Constants.UdiEntityType.Media}")]
+[VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.RecycleBin}/{Constants.UdiEntityType.Media}")]
 [RequireMediaTreeRootAccess]
 [ProducesResponseType(StatusCodes.Status401Unauthorized)]
 [OpenApiTag(nameof(Constants.UdiEntityType.Media))]

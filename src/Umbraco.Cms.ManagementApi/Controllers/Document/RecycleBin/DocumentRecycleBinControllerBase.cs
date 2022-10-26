@@ -14,7 +14,7 @@ namespace Umbraco.Cms.ManagementApi.Controllers.Document.RecycleBin;
 
 [ApiVersion("1.0")]
 [ApiController]
-[VersionedApiBackOfficeRoute($"recycle-bin/{Constants.UdiEntityType.Document}")]
+[VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.RecycleBin}/{Constants.UdiEntityType.Document}")]
 [RequireDocumentTreeRootAccess]
 [ProducesResponseType(StatusCodes.Status401Unauthorized)]
 [OpenApiTag(nameof(Constants.UdiEntityType.Document))]

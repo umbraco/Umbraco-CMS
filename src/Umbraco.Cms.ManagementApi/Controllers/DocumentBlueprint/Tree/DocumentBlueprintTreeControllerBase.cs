@@ -12,7 +12,7 @@ namespace Umbraco.Cms.ManagementApi.Controllers.DocumentBlueprint.Tree;
 
 [ApiVersion("1.0")]
 [ApiController]
-[VersionedApiBackOfficeRoute($"tree/{Constants.UdiEntityType.DocumentBlueprint}")]
+[VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/{Constants.UdiEntityType.DocumentBlueprint}")]
 [OpenApiTag("Document Blueprint")]
 public class DocumentBlueprintTreeControllerBase : EntityTreeControllerBase<DocumentBlueprintTreeItemViewModel>
 {
