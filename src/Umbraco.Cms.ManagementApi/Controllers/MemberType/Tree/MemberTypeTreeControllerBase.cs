@@ -12,8 +12,8 @@ namespace Umbraco.Cms.ManagementApi.Controllers.MemberType.Tree;
 
 [ApiVersion("1.0")]
 [ApiController]
-[VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.MemberType}/tree")]
-[OpenApiTag(nameof(Constants.UdiEntityType.MemberType))]
+[VersionedApiBackOfficeRoute($"tree/{Constants.UdiEntityType.MemberType}")]
+[OpenApiTag("Member Type")]
 public class MemberTypeTreeControllerBase : EntityTreeControllerBase<EntityTreeItemViewModel>
 {
     public MemberTypeTreeControllerBase(IEntityService entityService)

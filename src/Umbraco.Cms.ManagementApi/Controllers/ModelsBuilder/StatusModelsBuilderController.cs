@@ -5,7 +5,7 @@ using Umbraco.Cms.Infrastructure.ModelsBuilder;
 using Umbraco.Cms.ManagementApi.ViewModels.ModelsBuilderDashboard;
 using Umbraco.New.Cms.Core.Models;
 
-namespace Umbraco.Cms.ManagementApi.Controllers.ModelsBuilderDashboard;
+namespace Umbraco.Cms.ManagementApi.Controllers.ModelsBuilder;
 
 public class StatusModelsBuilderController : ModelsBuilderControllerBase
 {

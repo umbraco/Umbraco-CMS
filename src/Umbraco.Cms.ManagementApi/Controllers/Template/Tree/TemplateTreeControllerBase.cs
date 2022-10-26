@@ -12,7 +12,7 @@ namespace Umbraco.Cms.ManagementApi.Controllers.Template.Tree;
 
 [ApiVersion("1.0")]
 [ApiController]
-[VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.Template}/tree")]
+[VersionedApiBackOfficeRoute($"tree/{Constants.UdiEntityType.Template}")]
 [OpenApiTag(nameof(Constants.UdiEntityType.Template))]
 public class TemplateTreeControllerBase : EntityTreeControllerBase<EntityTreeItemViewModel>
 {

@@ -16,7 +16,7 @@ namespace Umbraco.Cms.ManagementApi.Controllers.Document.Tree;
 
 [ApiVersion("1.0")]
 [ApiController]
-[VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.Document}/tree")]
+[VersionedApiBackOfficeRoute($"tree/{Constants.UdiEntityType.Document}")]
 [OpenApiTag(nameof(Constants.UdiEntityType.Document))]
 public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBase<DocumentTreeItemViewModel>
 {
