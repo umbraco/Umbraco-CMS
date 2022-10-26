@@ -92,7 +92,7 @@ public class ManagementApiComposer : IComposer
                             IHostingEnvironment hostingEnvironment = httpContext.RequestServices.GetRequiredService<IHostingEnvironment>();
                             var officePath = settings.GetBackOfficePath(hostingEnvironment);
 
-                            return httpContext.Request.Path.Value?.StartsWith($"{officePath}/api/") ?? false;
+                            return httpContext.Request.Path.Value?.StartsWith($"{officePath}/management/api/") ?? false;
                         },
                         innerBuilder =>
                         {
