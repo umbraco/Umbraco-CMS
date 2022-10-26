@@ -75,17 +75,17 @@
         }
       }
     },
-    "/umbraco/management/api/v1/tracked-reference/descendants/{parentId}": {
+    "/umbraco/management/api/v1/tracked-reference/{id}": {
       "get": {
         "tags": [
           "Tracked Reference"
         ],
-        "summary": "Gets a page list of the child nodes of the current item used in any kind of relation.",
-        "description": "Used when deleting and unpublishing a single item to check if this item has any descending items that are in any\nkind of relation.\nThis is basically finding the descending items which are children in relations.",
-        "operationId": "DescendantsTrackedReference_Descendants",
+        "summary": "Gets a page list of tracked references for the current item, so you can see where an item is being used.",
+        "description": "Used by info tabs on content, media etc. and for the delete and unpublish of single items.\nThis is basically finding parents of relations.",
+        "operationId": "ByIdTrackedReference_Get",
         "parameters": [
           {
-            "name": "parentId",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -136,17 +136,17 @@
         }
       }
     },
-    "/umbraco/management/api/v1/tracked-reference/{id}": {
+    "/umbraco/management/api/v1/tracked-reference/descendants/{parentId}": {
       "get": {
         "tags": [
           "Tracked Reference"
         ],
-        "summary": "Gets a page list of tracked references for the current item, so you can see where an item is being used.",
-        "description": "Used by info tabs on content, media etc. and for the delete and unpublish of single items.\nThis is basically finding parents of relations.",
-        "operationId": "ByIdTrackedReference_Get",
+        "summary": "Gets a page list of the child nodes of the current item used in any kind of relation.",
+        "description": "Used when deleting and unpublishing a single item to check if this item has any descending items that are in any\nkind of relation.\nThis is basically finding the descending items which are children in relations.",
+        "operationId": "DescendantsTrackedReference_Descendants",
         "parameters": [
           {
-            "name": "id",
+            "name": "parentId",
             "in": "path",
             "required": true,
             "schema": {
@@ -393,6 +393,99 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/telemetry": {
+      "get": {
+        "tags": [
+          "Telemetry"
+        ],
+        "operationId": "AllTelemetry_GetAll",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedViewModelOfTelemetryLevel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/telemetry/current": {
+      "get": {
+        "tags": [
+          "Telemetry"
+        ],
+        "operationId": "GetTelemetry_Get",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TelemetryLevelViewModel"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Telemetry"
+        ],
+        "operationId": "SetTelemetry_SetConsentLevel",
+        "requestBody": {
+          "x-name": "telemetryLevelViewModel",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TelemetryLevelViewModel"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": ""
           }
         }
       }
@@ -3812,99 +3905,6 @@
           }
         }
       }
-    },
-    "/umbraco/management/api/v1/telemetry": {
-      "get": {
-        "tags": [
-          "Telemetry"
-        ],
-        "operationId": "AllAnalytics_GetAll",
-        "parameters": [
-          {
-            "name": "skip",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "x-position": 1
-          },
-          {
-            "name": "take",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "x-position": 2
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedViewModelOfTelemetryLevel"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/umbraco/management/api/v1/telemetry/current": {
-      "get": {
-        "tags": [
-          "Telemetry"
-        ],
-        "operationId": "GetAnalytics_Get",
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AnalyticsLevelViewModel"
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "Telemetry"
-        ],
-        "operationId": "SetAnalytics_SetConsentLevel",
-        "requestBody": {
-          "x-name": "analyticsLevelViewModel",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AnalyticsLevelViewModel"
-              }
-            }
-          },
-          "required": true,
-          "x-position": 1
-        },
-        "responses": {
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": ""
-          }
-        }
-      }
     }
   },
   "components": {
@@ -4073,6 +4073,59 @@
             "type": "boolean"
           }
         }
+      },
+      "PagedViewModelOfTelemetryLevel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TelemetryLevel"
+            }
+          }
+        }
+      },
+      "TelemetryLevel": {
+        "type": "integer",
+        "description": "",
+        "x-enumNames": [
+          "Minimal",
+          "Basic",
+          "Detailed"
+        ],
+        "enum": [
+          0,
+          1,
+          2
+        ]
+      },
+      "TelemetryLevelViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "telemetryLevel": {
+            "$ref": "#/components/schemas/TelemetryLevel2"
+          }
+        }
+      },
+      "TelemetryLevel2": {
+        "type": "string",
+        "description": "",
+        "x-enumNames": [
+          "Minimal",
+          "Basic",
+          "Detailed"
+        ],
+        "enum": [
+          "Minimal",
+          "Basic",
+          "Detailed"
+        ]
       },
       "PagedViewModelOfFileSystemTreeItemViewModel": {
         "type": "object",
@@ -4576,26 +4629,12 @@
         "additionalProperties": false,
         "properties": {
           "level": {
-            "$ref": "#/components/schemas/TelemetryLevel"
+            "$ref": "#/components/schemas/TelemetryLevel2"
           },
           "description": {
             "type": "string"
           }
         }
-      },
-      "TelemetryLevel": {
-        "type": "string",
-        "description": "",
-        "x-enumNames": [
-          "Minimal",
-          "Basic",
-          "Detailed"
-        ],
-        "enum": [
-          "Minimal",
-          "Basic",
-          "Detailed"
-        ]
       },
       "DatabaseSettingsViewModel": {
         "type": "object",
@@ -4653,7 +4692,7 @@
             "$ref": "#/components/schemas/DatabaseInstallViewModel"
           },
           "telemetryLevel": {
-            "$ref": "#/components/schemas/TelemetryLevel"
+            "$ref": "#/components/schemas/TelemetryLevel2"
           }
         }
       },
@@ -5218,45 +5257,6 @@
           },
           "englishName": {
             "type": "string"
-          }
-        }
-      },
-      "PagedViewModelOfTelemetryLevel": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "total": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/TelemetryLevel2"
-            }
-          }
-        }
-      },
-      "TelemetryLevel2": {
-        "type": "integer",
-        "description": "",
-        "x-enumNames": [
-          "Minimal",
-          "Basic",
-          "Detailed"
-        ],
-        "enum": [
-          0,
-          1,
-          2
-        ]
-      },
-      "AnalyticsLevelViewModel": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "analyticsLevel": {
-            "$ref": "#/components/schemas/TelemetryLevel"
           }
         }
       }

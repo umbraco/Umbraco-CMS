@@ -3,9 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.ManagementApi.ViewModels.Pagination;
 
-namespace Umbraco.Cms.ManagementApi.Controllers.Analytics;
+namespace Umbraco.Cms.ManagementApi.Controllers.Telemetry;
 
-public class AllAnalyticsController : AnalyticsControllerBase
+public class AllTelemetryController : TelemetryControllerBase
 {
     [HttpGet]
     [MapToApiVersion("1.0")]
