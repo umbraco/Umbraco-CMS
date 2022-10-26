@@ -1,4 +1,12 @@
 <style>
+    @keyframes umb-icon-jump {
+        10% { transform: rotate(0deg); }
+        10% { transform: rotate(2deg); }
+        20% { transform: rotate(358deg); }
+        30% { transform: rotate(1deg); }
+        40% { transform: rotate(359deg); }
+        50% { transform: rotate(0deg); }
+    }
 
     .umb-icon {
         display: inline-block;
@@ -6,16 +14,7 @@
         height: 1em;
         flex-shrink: 0;
 
-        @keyframes umb-icon-jump {
-            10% { transform: rotate(0deg); }
-            10% { transform: rotate(2deg); }
-            20% { transform: rotate(358deg); }
-            30% { transform: rotate(1deg); }
-            40% { transform: rotate(359deg); }
-            50% { transform: rotate(0deg); }
-        }
         animation: umb-icon-jump 2s;
-        
     }
 
     .umb-icon svg {
@@ -25,7 +24,7 @@
         animation: inherit;
     }
 
-    .blockelement-gridblock-editor {
+    .blockelement-gridsortblock-editor {
         position: relative;
         border-radius: 3px;
         height: 100%;/* Add this to fill the cell fully */
@@ -34,7 +33,7 @@
         background-color: white;
     }
     
-    .blockelement-gridblock-editor > button {
+    .blockelement-gridsortblock-editor > button {
         position: relative;
         display: flex;
         align-items: center;
@@ -49,16 +48,16 @@
         border: none;
         transition: border-color 120ms, background-color 120ms;
     }
-    .blockelement-gridblock-editor > button:hover {
+    .blockelement-gridsortblock-editor > button:hover {
         color: #2152A3;
     }
-    .blockelement-gridblock-editor .icon {
+    .blockelement-gridsortblock-editor .icon {
         font-size: 22px;
         margin-right: 10px;
         display: inline-block;
     }
 
-    .blockelement-gridblock-editor > button > span {
+    .blockelement-gridsortblock-editor > button > span {
         position: relative;
         display: inline-block;
         padding-top:2px;
@@ -66,7 +65,7 @@
     }
 </style>
 
-<div class="blockelement-gridblock-editor" ng-class="{ '--active': block.active, '--error': parentForm.$invalid && valFormManager.isShowingValidation() }">
+<div class="blockelement-gridsortblock-editor" ng-class="{ '--active': block.active, '--error': parentForm.$invalid && valFormManager.isShowingValidation() }">
     <button type="button"
         ng-click="block.showContent ? block.edit() : null"
         ng-focus="block.focus"
