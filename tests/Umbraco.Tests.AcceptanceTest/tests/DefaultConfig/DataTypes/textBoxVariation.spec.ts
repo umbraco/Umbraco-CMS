@@ -5,9 +5,6 @@ import {ContentBuilder, DocumentTypeBuilder, DomainBuilder} from "@umbraco/json-
 test.describe('Vary by culture for TextBox', () => {
 
     test.beforeEach(async ({page, umbracoApi, umbracoUi}) => {
-        // TODO: REMOVE THIS WHEN SQLITE IS FIXED
-        // Wait so we don't bombard the API
-        await page.waitForTimeout(1000);
         await umbracoApi.login();
     });
     
