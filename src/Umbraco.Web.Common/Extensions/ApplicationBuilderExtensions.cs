@@ -12,6 +12,7 @@ using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Logging.Serilog.Enrichers;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.ApplicationBuilder;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Cms.Web.Common.Middleware;
 using Umbraco.Cms.Web.Common.Plugins;
 
@@ -27,6 +28,20 @@ public static class ApplicationBuilderExtensions
     /// </summary>
     public static IUmbracoApplicationBuilder UseUmbraco(this IApplicationBuilder app)
         => new UmbracoApplicationBuilder(app);
+
+    /// <summary>
+    ///     Configures and use services required for using Umbraco
+    /// </summary>
+    /// <remarks>
+    ///     To be used with the new ASP.NET Core 6.0 minimal hosting model.
+    /// </remarks>
+    public static IUmbracoApplicationBuilder UseUmbraco(this WebApplication app)
+    {
+        StaticServiceProvider.Instance = app.Services;
+        app.Services.GetRequiredService<IRuntimeState>().DetermineRuntimeLevel();
+
+        return new UmbracoApplicationBuilder(app);
+    }
 
     /// <summary>
     ///     Returns true if Umbraco <see cref="IRuntimeState" /> is greater than <see cref="RuntimeLevel.BootFailed" />
