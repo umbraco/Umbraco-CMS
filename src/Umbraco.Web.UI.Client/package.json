@@ -75,7 +75,7 @@
 		"@web/dev-server-esbuild": "^0.3.3",
 		"@web/dev-server-import-maps": "^0.0.7",
 		"@web/test-runner": "^0.15.0",
-		"@web/test-runner-playwright": "^0.8.10",
+		"@web/test-runner-playwright": "^0.9.0",
 		"babel-loader": "^8.2.5",
 		"eslint": "^8.25.0",
 		"eslint-config-prettier": "^8.5.0",
