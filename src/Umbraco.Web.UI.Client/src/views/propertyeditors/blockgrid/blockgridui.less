@@ -22,9 +22,13 @@
     position: relative;
     &:hover {
         /*z-index: 3;*/
+
+        > ng-form > .umb-block-grid__block--context {
+            z-index: 4;
+        }
+
         > ng-form > .umb-block-grid__block--inline-create-button, 
         > ng-form > .umb-block-grid__block--validation-border,
-        > ng-form > .umb-block-grid__block--context,
         > ng-form > .umb-block-grid__block--actions,
         > ng-form > .umb-block-grid__force-left,
         > ng-form > .umb-block-grid__force-right {
@@ -293,9 +297,19 @@ ng-form.ng-invalid > .umb-block-grid__block:not(.--active) > .umb-block-grid__bl
     top: -20px;
     right: 0;
     font-size: 12px;
-    z-index: 2;
+    z-index: 4;
     display: var(--umb-block-grid--block-ui-display, flex);
     justify-content: end;
+
+    /** prevent interaction with inline-create button just beneath the context-bar: */
+    ::after {
+        content: '';
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        height: 12px;
+    }
 
     .__context-bar {
         padding: 0 9px;
@@ -588,7 +602,7 @@ umb-block-grid-block {
 .umb-block-grid__block--inline-create-button {
     top: 0px;
     position: absolute;
-    z-index: 1;
+    z-index: 1; /** overwritten for the first one of an area. */
 
     /** Avoid showing inline-create in dragging-mode */
     opacity: calc(1 - var(--umb-block-grid--dragging-mode, 0));
@@ -939,6 +953,8 @@ umb-block-grid-block {
 .umb-block-grid__layout-container .umb-block-grid__layout-item:not([depth='0']):first-of-type .umb-block-grid__block--inline-create-button.--above {
     /* Move first above inline create button slightly up, to avoid collision with others*/
     margin-top: -7px;
+
+    z-index:4;
 }
 
 .umb-block-grid__not-allowed-box {
