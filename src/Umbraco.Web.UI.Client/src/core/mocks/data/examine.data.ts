@@ -47,7 +47,7 @@ export interface ProviderProperties {
 export interface SearchResult {
 	id: number;
 	name: string;
-	fields: {};
+	fields: any;
 	score: number;
 }
 
