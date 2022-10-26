@@ -1,17 +1,10 @@
-import { map, Observable, ReplaySubject } from 'rxjs';
-import { UmbExtensionRegistry } from '../extension';
+import { Observable, ReplaySubject } from 'rxjs';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
 // TODO: maybe this should be named something else than store?
 export class UmbSectionStore {
-	private _extensionRegistry: UmbExtensionRegistry;
-
 	private _currentAlias: ReplaySubject<string> = new ReplaySubject(1);
 	public readonly currentAlias: Observable<string> = this._currentAlias.asObservable();
-
-	// TODO: how do we want to handle DI in contexts?
-	constructor(extensionRegistry: UmbExtensionRegistry) {
-		this._extensionRegistry = extensionRegistry;
-	}
 
 	public getAllowed() {
 		// TODO: implemented allowed filtering
@@ -20,9 +13,7 @@ export class UmbSectionStore {
 		this._allowedSection = data.sections;
 		*/
 
-		return this._extensionRegistry
-			?.extensionsOfType('section')
-			.pipe(map((extensions) => extensions.sort((a, b) => b.meta.weight - a.meta.weight)));
+		return umbExtensionsRegistry.extensionsOfType('section');
 	}
 
 	public setCurrent(alias: string) {

@@ -2,12 +2,12 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
-import { Subscription } from 'rxjs';
-import { UmbContextConsumerMixin } from '../../core/context';
 import type { UmbNotificationService, UmbNotificationHandler } from '../../core/services/notification';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
 @customElement('umb-backoffice-notification-container')
-export class UmbBackofficeNotificationContainer extends UmbContextConsumerMixin(LitElement) {
+export class UmbBackofficeNotificationContainer extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles: CSSResultGroup = [
 		UUITextStyles,
 		css`
@@ -27,28 +27,22 @@ export class UmbBackofficeNotificationContainer extends UmbContextConsumerMixin(
 	private _notifications: UmbNotificationHandler[] = [];
 
 	private _notificationService?: UmbNotificationService;
-	private _notificationSubscription?: Subscription;
 
 	constructor() {
 		super();
 
 		this.consumeContext('umbNotificationService', (notificationService: UmbNotificationService) => {
 			this._notificationService = notificationService;
-			this._useNotifications();
+			this._observeNotifications();
 		});
 	}
 
-	private _useNotifications() {
-		this._notificationSubscription?.unsubscribe();
+	private _observeNotifications() {
+		if (!this._notificationService) return;
 
-		this._notificationService?.notifications.subscribe((notifications: Array<UmbNotificationHandler>) => {
+		this.observe<UmbNotificationHandler[]>(this._notificationService.notifications, (notifications) => {
 			this._notifications = notifications;
 		});
-	}
-
-	disconnectedCallback(): void {
-		super.disconnectedCallback();
-		this._notificationSubscription?.unsubscribe();
 	}
 
 	render() {

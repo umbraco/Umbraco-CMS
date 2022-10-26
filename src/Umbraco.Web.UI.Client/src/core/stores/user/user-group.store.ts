@@ -1,8 +1,7 @@
-import { BehaviorSubject, map, Observable } from 'rxjs';
-import type { UserDetails, UserEntity, UserGroupDetails, UserGroupEntity } from '../../models';
+import { map, Observable } from 'rxjs';
 import { UmbEntityStore } from '../entity.store';
 import { UmbDataStoreBase } from '../store';
-import { v4 as uuidv4 } from 'uuid';
+import type { UserGroupDetails, UserGroupEntity } from '@umbraco-cms/models';
 
 /**
  * @export

@@ -2,14 +2,15 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { when } from 'lit/directives/when.js';
-import { Subscription } from 'rxjs';
-
-import { UmbContextConsumerMixin, UmbContextProviderMixin } from '../../core/context';
-import type { ManifestSection } from '../../core/models';
 import { UmbSectionStore } from '../../core/stores/section.store';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
+import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
+import type { ManifestSection } from '@umbraco-cms/models';
 
 @customElement('umb-backoffice-header-sections')
-export class UmbBackofficeHeaderSections extends UmbContextProviderMixin(UmbContextConsumerMixin(LitElement)) {
+export class UmbBackofficeHeaderSections extends UmbContextProviderMixin(
+	UmbContextConsumerMixin(UmbObserverMixin(LitElement))
+) {
 	static styles: CSSResultGroup = [
 		UUITextStyles,
 		css`
@@ -53,16 +54,13 @@ export class UmbBackofficeHeaderSections extends UmbContextProviderMixin(UmbCont
 
 	private _sectionStore?: UmbSectionStore;
 
-	private _sectionSubscription?: Subscription;
-	private _currentSectionSubscription?: Subscription;
-
 	constructor() {
 		super();
 
 		this.consumeContext('umbSectionStore', (sectionStore: UmbSectionStore) => {
 			this._sectionStore = sectionStore;
-			this._useSections();
-			this._useCurrentSection();
+			this._observeSections();
+			this._observeCurrentSection();
 		});
 	}
 
@@ -89,26 +87,21 @@ export class UmbBackofficeHeaderSections extends UmbContextProviderMixin(UmbCont
 		this._open = false;
 	}
 
-	private _useSections() {
-		this._sectionSubscription?.unsubscribe();
+	private _observeSections() {
+		if (!this._sectionStore) return;
 
-		this._sectionSubscription = this._sectionStore?.getAllowed().subscribe((allowedSections) => {
+		this.observe<ManifestSection[]>(this._sectionStore?.getAllowed(), (allowedSections) => {
 			this._sections = allowedSections;
 			this._visibleSections = this._sections;
 		});
 	}
 
-	private _useCurrentSection() {
-		this._currentSectionSubscription?.unsubscribe();
+	private _observeCurrentSection() {
+		if (!this._sectionStore) return;
 
-		this._currentSectionSubscription = this._sectionStore?.currentAlias.subscribe((currentSectionAlias) => {
+		this.observe<string>(this._sectionStore.currentAlias, (currentSectionAlias) => {
 			this._currentSectionAlias = currentSectionAlias;
 		});
-	}
-
-	disconnectedCallback(): void {
-		super.disconnectedCallback();
-		this._sectionSubscription?.unsubscribe();
 	}
 
 	private _renderSections() {

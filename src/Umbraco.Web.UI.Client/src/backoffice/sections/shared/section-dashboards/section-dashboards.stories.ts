@@ -1,12 +1,12 @@
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit-html';
-import { internalManifests } from '../../../../temp-internal-manifests';
-import type { ManifestSection } from '../../../../core/models';
+import { manifests } from '../../manifests';
 import { UmbSectionContext } from '../../section.context';
 import type { UmbSectionDashboardsElement } from './section-dashboards.element';
+import type { ManifestSection } from '@umbraco-cms/models';
 import './section-dashboards.element';
 
-const contentSectionManifest = internalManifests.find((m) => m.alias === 'Umb.Section.Content') as ManifestSection;
+const contentSectionManifest = manifests.find((m) => m.alias === 'Umb.Section.Content') as ManifestSection;
 
 export default {
 	title: 'Sections/Shared/Section Dashboards',

@@ -2,14 +2,13 @@ import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
-import { Subscription } from 'rxjs';
 import { groupBy } from 'lodash';
 import type { UUIInputEvent } from '@umbraco-ui/uui';
-import { UmbContextConsumerMixin } from '../../../../context';
-
 import type { UmbModalHandler } from '../../modal-handler';
-import type { UmbExtensionRegistry } from '../../../../extension';
-import type { ManifestPropertyEditorUI } from '../../../../models';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import type { ManifestPropertyEditorUI } from '@umbraco-cms/models';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
 export interface UmbModalPropertyEditorUIPickerData {
 	selection?: Array<string>;
@@ -21,7 +20,7 @@ interface GroupedPropertyEditorUIs {
 }
 
 @customElement('umb-modal-layout-property-editor-ui-picker')
-export class UmbModalLayoutPropertyEditorUIPickerElement extends UmbContextConsumerMixin(LitElement) {
+export class UmbModalLayoutPropertyEditorUIPickerElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -104,34 +103,25 @@ export class UmbModalLayoutPropertyEditorUIPickerElement extends UmbContextConsu
 	@state()
 	private _submitLabel = 'Select';
 
-	private _extensionRegistry?: UmbExtensionRegistry;
-	private _propertyEditorUIsSubscription?: Subscription;
-
-	constructor() {
-		super();
-
-		this.consumeContext('umbExtensionRegistry', (registry) => {
-			this._extensionRegistry = registry;
-			this._usePropertyEditorUIs();
-		});
-	}
-
 	connectedCallback(): void {
 		super.connectedCallback();
 
 		this._selection = this.data?.selection ?? [];
 		this._submitLabel = this.data?.submitLabel ?? this._submitLabel;
+
+		this._usePropertyEditorUIs();
 	}
 
 	private _usePropertyEditorUIs() {
 		if (!this.data) return;
 
-		this._propertyEditorUIsSubscription = this._extensionRegistry
-			?.extensionsOfType('propertyEditorUI')
-			.subscribe((propertyEditorUIs) => {
+		this.observe<ManifestPropertyEditorUI[]>(
+			umbExtensionsRegistry.extensionsOfType('propertyEditorUI'),
+			(propertyEditorUIs) => {
 				this._propertyEditorUIs = propertyEditorUIs;
 				this._groupedPropertyEditorUIs = groupBy(propertyEditorUIs, 'meta.group');
-			});
+			}
+		);
 	}
 
 	private _handleClick(propertyEditorUI: ManifestPropertyEditorUI) {
@@ -163,11 +153,6 @@ export class UmbModalLayoutPropertyEditorUIPickerElement extends UmbContextConsu
 
 	private _submit() {
 		this.modalHandler?.close({ selection: this._selection });
-	}
-
-	disconnectedCallback(): void {
-		super.disconnectedCallback();
-		this._propertyEditorUIsSubscription?.unsubscribe();
 	}
 
 	render() {

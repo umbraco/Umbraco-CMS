@@ -1,6 +1,6 @@
 import { expect, fixture, html } from '@open-wc/testing';
-import { defaultA11yConfig } from '../../../core/helpers/chai';
 import { UmbPropertyEditorUIIconPickerElement } from './property-editor-ui-icon-picker.element';
+import { defaultA11yConfig } from '@umbraco-cms/test-utils';
 
 describe('UmbPropertyEditorUIIconPickerElement', () => {
 	let element: UmbPropertyEditorUIIconPickerElement;

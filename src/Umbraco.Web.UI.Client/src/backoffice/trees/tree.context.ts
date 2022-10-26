@@ -1,5 +1,5 @@
 import { BehaviorSubject, Observable } from 'rxjs';
-import type { ManifestTree } from '../../core/models';
+import type { ManifestTree } from '@umbraco-cms/models';
 
 export interface UmbTreeContext {
 	tree: ManifestTree;

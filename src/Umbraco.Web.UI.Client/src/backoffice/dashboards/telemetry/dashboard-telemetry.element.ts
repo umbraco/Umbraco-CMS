@@ -1,11 +1,9 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
-
 import { customElement, state } from 'lit/decorators.js';
-
-import type { TelemetryModel } from '../../../core/models';
-import { getConsentLevel, getConsentLevels, postConsentLevel } from '../../../core/api/fetcher';
+import { getConsentLevel, getConsentLevels, postConsentLevel } from '@umbraco-cms/backend-api';
+import type { TelemetryModel } from '@umbraco-cms/models';
 
 export type SettingOption = 'Minimal' | 'Basic' | 'Detailed';
 

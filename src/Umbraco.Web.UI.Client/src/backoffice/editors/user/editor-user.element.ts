@@ -4,15 +4,18 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { Subscription } from 'rxjs';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
-import { UmbContextProviderMixin, UmbContextConsumerMixin } from '../../../core/context';
+
 import { UmbUserStore } from '../../../core/stores/user/user.store';
-import type { UserDetails } from '../../../core/models';
+import { getTagLookAndColor } from '../../sections/users/user-extensions';
 import { UmbUserContext } from './user.context';
+import { UmbContextProviderMixin, UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
+import type { ManifestEditorAction, ManifestWithLoader, UserDetails } from '@umbraco-cms/models';
+
 import '../../property-editor-uis/content-picker/property-editor-ui-content-picker.element';
 import '../../sections/users/picker-user-group.element';
-
 import '../shared/editor-entity-layout/editor-entity-layout.element';
-import { getTagLookAndColor } from '../../sections/users/user-extensions';
+
 @customElement('umb-editor-user')
 export class UmbEditorUserElement extends UmbContextProviderMixin(UmbContextConsumerMixin(LitElement)) {
 	static styles = [
@@ -102,6 +105,31 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(UmbContextCons
 	private _userNameSubscription?: Subscription;
 
 	private _languages = []; //TODO Add languages
+
+	constructor() {
+		super();
+
+		this._registerEditorActions();
+	}
+
+	private _registerEditorActions() {
+		const manifests: Array<ManifestWithLoader<ManifestEditorAction>> = [
+			{
+				type: 'editorAction',
+				alias: 'Umb.EditorAction.User.Save',
+				name: 'EditorActionUserSave',
+				loader: () => import('./actions/editor-action-user-save.element'),
+				meta: {
+					editors: ['Umb.Editor.User'],
+				},
+			},
+		];
+
+		manifests.forEach((manifest) => {
+			if (umbExtensionsRegistry.isRegistered(manifest.alias)) return;
+			umbExtensionsRegistry.register(manifest);
+		});
+	}
 
 	connectedCallback(): void {
 		super.connectedCallback();

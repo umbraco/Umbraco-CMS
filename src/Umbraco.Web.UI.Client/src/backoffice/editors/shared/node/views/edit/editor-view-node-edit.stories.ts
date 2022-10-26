@@ -3,7 +3,7 @@ import './editor-view-node-edit.element';
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit-html';
 
-import { data } from '../../../../../../mocks/data/node.data';
+import { data } from '../../../../../../core/mocks/data/node.data';
 import { UmbNodeContext } from '../../node.context';
 
 import type { UmbEditorViewNodeEditElement } from './editor-view-node-edit.element';

@@ -1,14 +1,13 @@
-import { css, html, LitElement, nothing } from 'lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
+import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { Subscription } from 'rxjs';
-import { UmbContextConsumerMixin } from '../../../../core/context';
-import { UmbUserStore } from '../../../../core/stores/user/user.store';
-import type { UserEntity } from '../../../../core/models';
-import { UmbUserContext } from '../user.context';
-import { UUIButtonState } from '@umbraco-ui/uui';
-import { UmbNotificationDefaultData } from '../../../../core/services/notification/layouts/default';
-import { UmbNotificationService } from '../../../../core/services/notification';
+import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
+import type { UUIButtonState } from '@umbraco-ui/uui';
+import type { UmbUserStore } from '../../../../core/stores/user/user.store';
+import type { UmbUserContext } from '../user.context';
+
+import type { UmbNotificationDefaultData } from '../../../../core/services/notification/layouts/default';
+import type { UmbNotificationService } from '../../../../core/services/notification';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
 @customElement('umb-editor-action-user-save')
 export class UmbEditorActionUserSaveElement extends UmbContextConsumerMixin(LitElement) {
@@ -24,16 +23,10 @@ export class UmbEditorActionUserSaveElement extends UmbContextConsumerMixin(LitE
 	connectedCallback(): void {
 		super.connectedCallback();
 
-		this.consumeContext('umbUserStore', (userStore: UmbUserStore) => {
-			this._userStore = userStore;
-		});
-
-		this.consumeContext('umbUserContext', (userContext: UmbUserContext) => {
-			this._userContext = userContext;
-		});
-
-		this.consumeContext('umbNotificationService', (service: UmbNotificationService) => {
-			this._notificationService = service;
+		this.consumeAllContexts(['umbUserStore', 'umbUserContext', 'umbNotificationService'], (instances) => {
+			this._userStore = instances['umbUserStore'];
+			this._userContext = instances['umbUserContext'];
+			this._notificationService = instances['umbNotificationService'];
 		});
 	}
 

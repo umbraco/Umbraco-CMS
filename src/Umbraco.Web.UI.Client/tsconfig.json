@@ -21,7 +21,18 @@
     "forceConsistentCasingInFileNames": true,
     "useDefineForClassFields": false,
     "skipLibCheck": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "baseUrl": ".",
+    "paths": {
+      "@umbraco-cms/models": ["src/core/models"],
+      "@umbraco-cms/backend-api": ["src/core/backend-api"],
+      "@umbraco-cms/context-api": ["src/core/context-api"],
+      "@umbraco-cms/extensions-api": ["src/core/extensions-api"],
+      "@umbraco-cms/extensions-registry": ["src/core/extensions-registry"],
+      "@umbraco-cms/observable-api": ["src/core/observable-api"],
+      "@umbraco-cms/utils": ["src/core/utils"],
+      "@umbraco-cms/test-utils": ["src/core/test-utils"]
+    },
   },
   "include": [
     "src/**/*.ts",

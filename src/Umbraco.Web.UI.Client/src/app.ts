@@ -1,4 +1,4 @@
-import './css/custom-properties.css';
+import './core/css/custom-properties.css';
 import 'router-slot';
 
 // TODO: remove these imports when they are part of UUI
@@ -12,12 +12,11 @@ import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
 import type { Guard, IRoute } from 'router-slot/model';
-import { getManifests, getServerStatus } from './core/api/fetcher';
-import { UmbContextProviderMixin } from './core/context';
-import { UmbExtensionRegistry } from './core/extension';
-import { internalManifests } from './temp-internal-manifests';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
+import { getManifests, getServerStatus } from '@umbraco-cms/backend-api';
+import { UmbContextProviderMixin } from '@umbraco-cms/context-api';
 
-import type { ServerStatus } from './core/models';
+import type { ServerStatus } from '@umbraco-cms/models';
 
 @customElement('umb-app')
 export class UmbApp extends UmbContextProviderMixin(LitElement) {
@@ -56,7 +55,6 @@ export class UmbApp extends UmbContextProviderMixin(LitElement) {
 		},
 	];
 
-	private _extensionRegistry = new UmbExtensionRegistry();
 	private _iconRegistry = new UUIIconRegistryEssential();
 	private _serverStatus: ServerStatus = 'running';
 
@@ -67,10 +65,7 @@ export class UmbApp extends UmbContextProviderMixin(LitElement) {
 
 	private async _setup() {
 		this._iconRegistry.attach(this);
-		this.provideContext('umbExtensionRegistry', this._extensionRegistry);
-
 		await this._registerExtensionManifestsFromServer();
-		await this._registerInternalManifests();
 		await this._setInitStatus();
 		this._redirect();
 	}
@@ -129,12 +124,7 @@ export class UmbApp extends UmbContextProviderMixin(LitElement) {
 	private async _registerExtensionManifestsFromServer() {
 		const res = await getManifests({});
 		const { manifests } = res.data;
-		manifests.forEach((manifest) => this._extensionRegistry.register(manifest));
-	}
-
-	private async _registerInternalManifests() {
-		// TODO: where do we get these from?
-		internalManifests.forEach((manifest) => this._extensionRegistry.register(manifest));
+		manifests.forEach((manifest) => umbExtensionsRegistry.register(manifest));
 	}
 
 	render() {

@@ -1,12 +1,12 @@
 import { LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { Subscription } from 'rxjs';
-import { UmbContextConsumerMixin } from '../../../core/context';
-import type { ManifestTreeItemAction, ManifestTree } from '../../../core/models';
-import { Entity } from '../../../mocks/data/entities';
+import { Entity } from '../../../core/mocks/data/entities';
 import { UmbSectionContext } from '../../sections/section.context';
 import { UmbTreeContextMenuPageService } from './context-menu/tree-context-menu-page.service';
 import { UmbTreeContextMenuService } from './context-menu/tree-context-menu.service';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import type { ManifestTreeItemAction, ManifestTree } from '@umbraco-cms/models';
 
 export type ActionPageEntity = {
 	key: string;
@@ -14,7 +14,7 @@ export type ActionPageEntity = {
 };
 
 @customElement('umb-tree-item-action')
-export default class UmbTreeItemActionElement extends UmbContextConsumerMixin(LitElement) {
+export default class UmbTreeItemActionElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	@property({ attribute: false })
 	public treeAction?: ManifestTreeItemAction;
 
@@ -27,10 +27,6 @@ export default class UmbTreeItemActionElement extends UmbContextConsumerMixin(Li
 	protected _sectionContext?: UmbSectionContext;
 	protected _treeContextMenuService?: UmbTreeContextMenuService;
 	protected _actionPageService?: UmbTreeContextMenuPageService;
-
-	protected _actionPageSubscription?: Subscription;
-	protected _activeTreeSubscription?: Subscription;
-	protected _activeTreeItemSubscription?: Subscription;
 
 	connectedCallback() {
 		super.connectedCallback();
@@ -47,35 +43,32 @@ export default class UmbTreeItemActionElement extends UmbContextConsumerMixin(Li
 
 		this.consumeContext('umbTreeContextMenuPageService', (actionPageService: UmbTreeContextMenuPageService) => {
 			this._actionPageService = actionPageService;
+			this._observeEntity();
+		});
+	}
 
-			this._actionPageSubscription?.unsubscribe();
-			this._actionPageService?.entity.subscribe((entity: ActionPageEntity) => {
-				this._entity = entity;
-			});
+	private _observeEntity() {
+		if (!this._actionPageService) return;
+
+		this.observe<ActionPageEntity>(this._actionPageService.entity, (entity) => {
+			this._entity = entity;
 		});
 	}
 
 	private _observeActiveTree() {
-		this._activeTreeSubscription?.unsubscribe();
+		if (!this._sectionContext) return;
 
-		this._activeTreeSubscription = this._sectionContext?.activeTree.subscribe((tree) => {
+		this.observe<ManifestTree>(this._sectionContext.activeTree, (tree) => {
 			this._activeTree = tree;
 		});
 	}
 
 	private _observeActiveTreeItem() {
-		this._activeTreeItemSubscription?.unsubscribe();
+		if (!this._sectionContext) return;
 
-		this._activeTreeItemSubscription = this._sectionContext?.activeTreeItem.subscribe((treeItem) => {
+		this.observe<Entity>(this._sectionContext.activeTreeItem, (treeItem) => {
 			this._activeTreeItem = treeItem;
 		});
-	}
-
-	disconnectCallback() {
-		super.disconnectedCallback();
-		this._actionPageSubscription?.unsubscribe();
-		this._activeTreeSubscription?.unsubscribe();
-		this._activeTreeItemSubscription?.unsubscribe();
 	}
 }
 

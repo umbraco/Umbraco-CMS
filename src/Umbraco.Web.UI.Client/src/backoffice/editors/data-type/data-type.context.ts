@@ -1,5 +1,5 @@
 import { BehaviorSubject, Observable } from 'rxjs';
-import { DataTypeDetails } from '../../../mocks/data/data-type.data';
+import { DataTypeDetails } from '../../../core/mocks/data/data-type.data';
 
 export class UmbDataTypeContext {
 	// TODO: figure out how fine grained we want to make our observables.

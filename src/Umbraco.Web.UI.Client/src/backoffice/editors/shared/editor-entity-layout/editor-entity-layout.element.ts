@@ -1,15 +1,17 @@
-import '../editor-layout/editor-layout.element';
-import '../editor-action-extension/editor-action-extension.element';
-
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { IRoute, IRoutingInfo, PageComponent, RouterSlot } from 'router-slot';
-import { map, Subscription } from 'rxjs';
+import { map } from 'rxjs';
 
-import { UmbContextConsumerMixin } from '../../../../core/context';
-import { createExtensionElement, UmbExtensionRegistry } from '../../../../core/extension';
-import type { ManifestEditorAction, ManifestEditorView } from '../../../../core/models';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
+import { createExtensionElement } from '@umbraco-cms/extensions-api';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import type { ManifestEditorAction, ManifestEditorView } from '@umbraco-cms/models';
+
+import '../editor-layout/editor-layout.element';
+import '../editor-action-extension/editor-action-extension.element';
 
 /**
  * @element umb-editor-entity-layout
@@ -24,7 +26,7 @@ import type { ManifestEditorAction, ManifestEditorView } from '../../../../core/
  * @extends {UmbContextConsumerMixin(LitElement)}
  */
 @customElement('umb-editor-entity-layout')
-export class UmbEditorEntityLayout extends UmbContextConsumerMixin(LitElement) {
+export class UmbEditorEntityLayout extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -96,54 +98,39 @@ export class UmbEditorEntityLayout extends UmbContextConsumerMixin(LitElement) {
 	@state()
 	private _routes: Array<IRoute> = [];
 
-	private _extensionRegistry?: UmbExtensionRegistry;
-	private _editorViewsSubscription?: Subscription;
-	private _editorActionsSubscription?: Subscription;
 	private _routerFolder = '';
-
-	constructor() {
-		super();
-
-		this.consumeContext('umbExtensionRegistry', (extensionRegistry: UmbExtensionRegistry) => {
-			this._extensionRegistry = extensionRegistry;
-			this._observeEditorViews();
-			this._observeEditorActions();
-		});
-	}
 
 	connectedCallback(): void {
 		super.connectedCallback();
+
+		this._observeEditorViews();
+		this._observeEditorActions();
+
 		/* TODO: find a way to construct absolute urls */
 		this._routerFolder = window.location.pathname.split('/view')[0];
 	}
 
 	private _observeEditorViews() {
-		this._editorViewsSubscription?.unsubscribe();
-
-		this._editorViewsSubscription = this._extensionRegistry
-			?.extensionsOfType('editorView')
-			.pipe(
-				map((extensions) =>
-					extensions
-						.filter((extension) => extension.meta.editors.includes(this.alias))
-						.sort((a, b) => b.meta.weight - a.meta.weight)
-				)
-			)
-			.subscribe((editorViews) => {
+		this.observe<ManifestEditorView[]>(
+			umbExtensionsRegistry
+				.extensionsOfType('editorView')
+				.pipe(map((extensions) => extensions.filter((extension) => extension.meta.editors.includes(this.alias)))),
+			(editorViews) => {
 				this._editorViews = editorViews;
 				this._createRoutes();
-			});
+			}
+		);
 	}
 
 	private _observeEditorActions() {
-		this._editorActionsSubscription?.unsubscribe();
-
-		this._editorActionsSubscription = this._extensionRegistry
-			?.extensionsOfType('editorAction')
-			.pipe(map((extensions) => extensions.filter((extension) => extension.meta.editors.includes(this.alias))))
-			.subscribe((editorActions) => {
+		this.observe(
+			umbExtensionsRegistry
+				?.extensionsOfType('editorAction')
+				.pipe(map((extensions) => extensions.filter((extension) => extension.meta.editors.includes(this.alias)))),
+			(editorActions) => {
 				this._editorActions = editorActions;
-			});
+			}
+		);
 	}
 
 	private async _createRoutes() {

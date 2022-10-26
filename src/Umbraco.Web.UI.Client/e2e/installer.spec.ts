@@ -1,9 +1,8 @@
 import { rest } from 'msw';
 
-import umbracoPath from '../src/core/helpers/umbraco-path';
 import { expect, test } from '../test';
-
-import type { ProblemDetails, StatusResponse } from '../src/core/models';
+import { umbracoPath } from '@umbraco-cms/utils';
+import type { ProblemDetails, StatusResponse } from '@umbraco-cms/models';
 
 test.describe('installer tests', () => {
 	test.beforeEach(async ({ page, worker }) => {

@@ -1,13 +1,15 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
-import { Subscription } from 'rxjs';
-import { UmbContextConsumerMixin } from '../../../../core/context';
-import { UmbExtensionRegistry } from '../../../../core/extension';
-import { UmbPropertyEditorConfigStore } from '../../../../core/stores/property-editor-config/property-editor-config.store';
-
-import type { PropertyEditorConfigDefaultData, PropertyEditorConfigProperty } from '../../../../core/models';
+import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
+import {
+	PropertyEditorConfigRef,
+	UmbPropertyEditorConfigStore,
+} from '../../../../core/stores/property-editor-config/property-editor-config.store';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import type { ManifestTypes, PropertyEditorConfigDefaultData, PropertyEditorConfigProperty } from '@umbraco-cms/models';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
 import '../../../components/entity-property/entity-property.element';
 
@@ -16,7 +18,7 @@ import '../../../components/entity-property/entity-property.element';
  *  @description - Element for displaying the configuration for a Property Editor and Property Editor UI.
  */
 @customElement('umb-property-editor-config')
-export class UmbPropertyEditorConfigElement extends UmbContextConsumerMixin(LitElement) {
+export class UmbPropertyEditorConfigElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles = [UUITextStyles];
 
 	/**
@@ -77,10 +79,6 @@ export class UmbPropertyEditorConfigElement extends UmbContextConsumerMixin(LitE
 	private _propertyEditorUIConfigProperties: Array<PropertyEditorConfigProperty> = [];
 
 	private _propertyEditorConfigStore?: UmbPropertyEditorConfigStore;
-	private _propertyEditorConfigSubscription?: Subscription;
-
-	private _extensionRegistry?: UmbExtensionRegistry;
-	private _propertyEditorUIConfigSubscription?: Subscription;
 
 	constructor() {
 		super();
@@ -89,35 +87,32 @@ export class UmbPropertyEditorConfigElement extends UmbContextConsumerMixin(LitE
 			this._propertyEditorConfigStore = propertyEditorConfigStore;
 			this._observePropertyEditorConfig();
 		});
+	}
 
-		this.consumeContext('umbExtensionRegistry', (extensionRegistry) => {
-			this._extensionRegistry = extensionRegistry;
-			this._observePropertyEditorUIConfig();
-		});
+	connectedCallback(): void {
+		super.connectedCallback();
+		this._observePropertyEditorUIConfig();
 	}
 
 	private _observePropertyEditorConfig() {
 		if (!this._propertyEditorConfigStore || !this._propertyEditorAlias) return;
 
-		this._propertyEditorConfigSubscription?.unsubscribe();
-
-		this._propertyEditorConfigSubscription = this._propertyEditorConfigStore
-			?.getByAlias(this.propertyEditorAlias)
-			.subscribe((propertyEditorConfig) => {
+		this.observe<PropertyEditorConfigRef>(
+			this._propertyEditorConfigStore.getByAlias(this.propertyEditorAlias),
+			(propertyEditorConfig) => {
 				if (!propertyEditorConfig) return;
 				this._propertyEditorConfigProperties = propertyEditorConfig?.config?.properties || [];
 				this._mergeProperties();
 				this._propertyEditorConfigDefaultData = propertyEditorConfig?.config?.defaultData || [];
 				this._mergeDefaultData();
-			});
+			}
+		);
 	}
 
 	private _observePropertyEditorUIConfig() {
-		if (!this._extensionRegistry || !this._propertyEditorUIAlias) return;
+		if (!this._propertyEditorUIAlias) return;
 
-		this._propertyEditorUIConfigSubscription?.unsubscribe();
-
-		this._extensionRegistry?.getByAlias(this.propertyEditorUIAlias).subscribe((manifest) => {
+		this.observe<ManifestTypes>(umbExtensionsRegistry.getByAlias(this.propertyEditorUIAlias), (manifest) => {
 			if (manifest?.type === 'propertyEditorUI') {
 				this._propertyEditorUIConfigProperties = manifest?.meta.config?.properties || [];
 				this._mergeProperties();
@@ -139,12 +134,6 @@ export class UmbPropertyEditorConfigElement extends UmbContextConsumerMixin(LitE
 		const value = this.data.find((data) => data.alias === property.alias)?.value;
 		const defaultValue = this._configDefaultData?.find((data) => data.alias === property.alias)?.value;
 		return value || defaultValue || null;
-	}
-
-	disconnectedCallback(): void {
-		super.disconnectedCallback();
-		this._propertyEditorConfigSubscription?.unsubscribe();
-		this._propertyEditorUIConfigSubscription?.unsubscribe();
 	}
 
 	render() {

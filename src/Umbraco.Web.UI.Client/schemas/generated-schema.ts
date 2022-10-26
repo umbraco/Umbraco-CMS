@@ -142,8 +142,6 @@ export interface components {
     MetaSection: {
       label: string;
       pathname: string;
-      /** Format: float */
-      weight: number;
     };
     IManifestSection: {
       /** @enum {string} */
@@ -153,6 +151,8 @@ export interface components {
       elementName?: string;
       alias: string;
       name: string;
+      /** Format: float */
+      weight?: number;
     };
     MetaSectionView: {
       sections: string[];
@@ -170,10 +170,10 @@ export interface components {
       elementName?: string;
       alias: string;
       name: string;
+      /** Format: float */
+      weight?: number;
     };
     MetaTree: {
-      /** Format: float */
-      weight: number;
       sections: string[];
     };
     IManifestTree: {
@@ -184,6 +184,8 @@ export interface components {
       elementName?: string;
       alias: string;
       name: string;
+      /** Format: float */
+      weight?: number;
     };
     MetaEditor: {
       entityType: string;
@@ -196,6 +198,8 @@ export interface components {
       elementName?: string;
       alias: string;
       name: string;
+      /** Format: float */
+      weight?: number;
     };
     MetaEditorAction: {
       editors: string[];
@@ -208,12 +212,12 @@ export interface components {
       elementName?: string;
       alias: string;
       name: string;
+      /** Format: float */
+      weight?: number;
     };
     MetaEditorView: {
       editors: string[];
       pathname: string;
-      /** Format: float */
-      weight: number;
       label: string;
       icon: string;
     };
@@ -225,13 +229,13 @@ export interface components {
       elementName?: string;
       alias: string;
       name: string;
+      /** Format: float */
+      weight?: number;
     };
     MetaTreeItemAction: {
       trees: string[];
       label: string;
       icon: string;
-      /** Format: float */
-      weight: number;
     };
     IManifestTreeItemAction: {
       /** @enum {string} */
@@ -241,6 +245,8 @@ export interface components {
       elementName?: string;
       alias: string;
       name: string;
+      /** Format: float */
+      weight?: number;
     };
     PropertyEditorConfigProperty: {
       label: string;
@@ -282,12 +288,12 @@ export interface components {
       elementName?: string;
       alias: string;
       name: string;
+      /** Format: float */
+      weight?: number;
     };
     MetaDashboard: {
       sections: string[];
       pathname: string;
-      /** Format: float */
-      weight: number;
       label?: string;
     };
     IManifestDashboard: {
@@ -298,6 +304,8 @@ export interface components {
       elementName?: string;
       alias: string;
       name: string;
+      /** Format: float */
+      weight?: number;
     };
     MetaPropertyAction: {
       propertyEditors: string[];
@@ -310,6 +318,8 @@ export interface components {
       elementName?: string;
       alias: string;
       name: string;
+      /** Format: float */
+      weight?: number;
     };
     MetaPackageView: {
       packageAlias: string;
@@ -322,6 +332,8 @@ export interface components {
       elementName?: string;
       alias: string;
       name: string;
+      /** Format: float */
+      weight?: number;
     };
     IManifestEntrypoint: {
       /** @enum {string} */
@@ -329,6 +341,8 @@ export interface components {
       js: string;
       alias: string;
       name: string;
+      /** Format: float */
+      weight?: number;
     };
     IManifestCustom: {
       /** @enum {string} */
@@ -336,6 +350,8 @@ export interface components {
       meta?: { [key: string]: unknown };
       alias: string;
       name: string;
+      /** Format: float */
+      weight?: number;
     };
     Manifest:
       | components["schemas"]["IManifestSection"]

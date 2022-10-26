@@ -1,45 +1,36 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { Subscription, distinctUntilChanged } from 'rxjs';
-
-import { UmbContextConsumerMixin } from '../../../../../core/context';
+import { distinctUntilChanged } from 'rxjs';
 import { UmbDataTypeContext } from '../../data-type.context';
-
-import type { DataTypeDetails } from '../../../../../mocks/data/data-type.data';
+import type { DataTypeDetails } from '../../../../../core/mocks/data/data-type.data';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
 @customElement('umb-editor-view-data-type-info')
-export class UmbEditorViewDataTypeInfoElement extends UmbContextConsumerMixin(LitElement) {
+export class UmbEditorViewDataTypeInfoElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles = [UUITextStyles, css``];
 
 	@state()
 	_dataType?: DataTypeDetails;
 
 	private _dataTypeContext?: UmbDataTypeContext;
-	private _dataTypeSubscription?: Subscription;
 
 	constructor() {
 		super();
 
 		this.consumeContext('umbDataTypeContext', (dataTypeContext) => {
 			this._dataTypeContext = dataTypeContext;
-			this._useDataType();
+			this._observeDataType();
 		});
 	}
 
-	private _useDataType() {
-		this._dataTypeSubscription?.unsubscribe();
+	private _observeDataType() {
+		if (!this._dataTypeContext) return;
 
-		this._dataTypeSubscription = this._dataTypeContext?.data
-			.pipe(distinctUntilChanged())
-			.subscribe((dataType: DataTypeDetails) => {
-				this._dataType = dataType;
-			});
-	}
-
-	disconnectedCallback(): void {
-		super.disconnectedCallback();
-		this._dataTypeSubscription?.unsubscribe();
+		this.observe<DataTypeDetails>(this._dataTypeContext.data.pipe(distinctUntilChanged()), (dataType) => {
+			this._dataType = dataType;
+		});
 	}
 
 	render() {

@@ -1,13 +1,13 @@
-import { UUIButtonState, UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
+import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { Subscription } from 'rxjs';
-import { UmbContextProviderMixin, UmbContextConsumerMixin } from '../../../core/context';
-import { UmbNotificationService } from '../../../core/services/notification';
 import { UmbDataTypeStore } from '../../../core/stores/data-type/data-type.store';
-import { UmbNotificationDefaultData } from '../../../core/services/notification/layouts/default';
+import type { DataTypeDetails } from '../../../core/mocks/data/data-type.data';
 import { UmbDataTypeContext } from './data-type.context';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
+import { UmbContextProviderMixin, UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
 import '../shared/editor-entity-layout/editor-entity-layout.element';
 
@@ -16,7 +16,9 @@ import '../shared/editor-entity-layout/editor-entity-layout.element';
  *  @description - Element for displaying a Data Type Editor
  */
 @customElement('umb-editor-data-type')
-export class UmbEditorDataTypeElement extends UmbContextProviderMixin(UmbContextConsumerMixin(LitElement)) {
+export class UmbEditorDataTypeElement extends UmbContextProviderMixin(
+	UmbContextConsumerMixin(UmbObserverMixin(LitElement))
+) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -38,40 +40,72 @@ export class UmbEditorDataTypeElement extends UmbContextProviderMixin(UmbContext
 	@state()
 	private _dataTypeName = '';
 
-	@state()
-	private _saveButtonState?: UUIButtonState;
-
 	private _dataTypeContext?: UmbDataTypeContext;
-	private _dataTypeNameSubscription?: Subscription;
-
 	private _dataTypeStore?: UmbDataTypeStore;
-	private _dataTypeStoreSubscription?: Subscription;
-
-	private _notificationService?: UmbNotificationService;
 
 	constructor() {
 		super();
 
-		this.consumeContext('umbDataTypeStore', (store: UmbDataTypeStore) => {
-			this._dataTypeStore = store;
-			this._observeDataType();
-		});
+		this._registerExtensions();
 
-		this.consumeContext('umbNotificationService', (service: UmbNotificationService) => {
-			this._notificationService = service;
+		this.consumeAllContexts(['umbDataTypeStore'], (instances) => {
+			this._dataTypeStore = instances['umbDataTypeStore'];
+			this._observeDataType();
 		});
 
 		this.addEventListener('property-value-change', this._onPropertyValueChange);
 	}
 
+	private _registerExtensions() {
+		const extensions: Array<any> = [
+			{
+				type: 'editorView',
+				alias: 'Umb.EditorView.DataType.Edit',
+				name: 'Data Type Editor Edit View',
+				loader: () => import('./views/edit/editor-view-data-type-edit.element'),
+				weight: 90,
+				meta: {
+					editors: ['Umb.Editor.DataType'],
+					label: 'Edit',
+					pathname: 'edit',
+					icon: 'edit',
+				},
+			},
+			{
+				type: 'editorView',
+				alias: 'Umb.EditorView.DataType.Info',
+				name: 'Data Type Editor Info View',
+				loader: () => import('./views/info/editor-view-data-type-info.element'),
+				weight: 90,
+				meta: {
+					editors: ['Umb.Editor.DataType'],
+					label: 'Info',
+					pathname: 'info',
+					icon: 'info',
+				},
+			},
+			{
+				type: 'editorAction',
+				alias: 'Umb.EditorAction.DataType.Save',
+				name: 'Save Data Type Editor Action',
+				loader: () => import('./actions/save/editor-action-data-type-save.element'),
+				meta: {
+					editors: ['Umb.Editor.DataType'],
+				},
+			},
+		];
+
+		extensions.forEach((extension) => {
+			if (umbExtensionsRegistry.isRegistered(extension.alias)) return;
+			umbExtensionsRegistry.register(extension);
+		});
+	}
+
 	private _observeDataType() {
-		this._dataTypeStoreSubscription?.unsubscribe();
+		if (!this._dataTypeStore) return;
 
-		// TODO: This should be done in a better way, but for now it works.
-		this._dataTypeStoreSubscription = this._dataTypeStore?.getByKey(this.entityKey).subscribe((dataType) => {
+		this.observe<DataTypeDetails>(this._dataTypeStore.getByKey(this.entityKey), (dataType) => {
 			if (!dataType) return; // TODO: Handle nicely if there is no data type.
-
-			this._dataTypeNameSubscription?.unsubscribe();
 
 			if (!this._dataTypeContext) {
 				this._dataTypeContext = new UmbDataTypeContext(dataType);
@@ -80,7 +114,7 @@ export class UmbEditorDataTypeElement extends UmbContextProviderMixin(UmbContext
 				this._dataTypeContext.update(dataType);
 			}
 
-			this._dataTypeNameSubscription = this._dataTypeContext.data.pipe().subscribe((dataType) => {
+			this.observe<DataTypeDetails>(this._dataTypeContext.data, (dataType) => {
 				if (dataType && dataType.name !== this._dataTypeName) {
 					this._dataTypeName = dataType.name;
 				}
@@ -93,22 +127,6 @@ export class UmbEditorDataTypeElement extends UmbContextProviderMixin(UmbContext
 		this._dataTypeContext?.setPropertyValue(target?.alias, target?.value);
 	};
 
-	private async _onSave() {
-		// TODO: What if store is not present, what if node is not loaded....
-		if (!this._dataTypeStore || !this._dataTypeContext) return;
-
-		try {
-			this._saveButtonState = 'waiting';
-			const dataType = this._dataTypeContext.getData();
-			await this._dataTypeStore.save([dataType]);
-			const data: UmbNotificationDefaultData = { message: 'Data Type Saved' };
-			this._notificationService?.peek('positive', { data });
-			this._saveButtonState = 'success';
-		} catch (error) {
-			this._saveButtonState = 'failed';
-		}
-	}
-
 	// TODO. find a way where we don't have to do this for all editors.
 	private _handleInput(event: UUIInputEvent) {
 		if (event instanceof UUIInputEvent) {
@@ -120,25 +138,10 @@ export class UmbEditorDataTypeElement extends UmbContextProviderMixin(UmbContext
 		}
 	}
 
-	disconnectedCallback(): void {
-		super.disconnectedCallback();
-		this._dataTypeStoreSubscription?.unsubscribe();
-		this._dataTypeNameSubscription?.unsubscribe();
-	}
-
 	render() {
 		return html`
 			<umb-editor-entity-layout alias="Umb.Editor.DataType">
 				<uui-input id="name" slot="name" .value=${this._dataTypeName} @input="${this._handleInput}"></uui-input>
-				<!-- TODO: these could be extensions points too -->
-				<div slot="actions">
-					<uui-button
-						@click=${this._onSave}
-						look="primary"
-						color="positive"
-						label="Save"
-						.state="${this._saveButtonState}"></uui-button>
-				</div>
 			</umb-editor-entity-layout>
 		`;
 	}

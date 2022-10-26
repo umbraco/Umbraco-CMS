@@ -2,13 +2,15 @@ import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
-import type { ManifestEditor } from '../../../../core/models';
 
-import { UmbContextConsumerMixin } from '../../../../core/context';
-import { createExtensionElement, UmbExtensionRegistry } from '../../../../core/extension';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
+import { createExtensionElement } from '@umbraco-cms/extensions-api';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import type { ManifestEditor } from '@umbraco-cms/models';
 
 @customElement('umb-editor-entity')
-export class UmbEditorEntityElement extends UmbContextConsumerMixin(LitElement) {
+export class UmbEditorEntityElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -30,32 +32,31 @@ export class UmbEditorEntityElement extends UmbContextConsumerMixin(LitElement) 
 	}
 	public set entityType(value: string) {
 		this._entityType = value;
-		this._useEditors();
+		this._observeEditors();
 	}
 
 	@state()
 	private _element?: any;
 
-	private _extensionRegistry?: UmbExtensionRegistry;
+	private _currentEditorAlias = '';
 
-	constructor() {
-		super();
-
-		this.consumeContext('umbExtensionRegistry', (extensionRegistry: UmbExtensionRegistry) => {
-			this._extensionRegistry = extensionRegistry;
-			this._useEditors();
-		});
+	connectedCallback(): void {
+		super.connectedCallback();
+		this._observeEditors();
 	}
 
-	private _useEditors() {
-		if (!this._extensionRegistry) return;
-
-		this._extensionRegistry
-			.extensionsOfType('editor')
-			.pipe(map((editors) => editors.find((editor) => editor.meta.entityType === this.entityType)))
-			.subscribe((editor) => {
+	private _observeEditors() {
+		this.observe<ManifestEditor>(
+			umbExtensionsRegistry
+				.extensionsOfType('editor')
+				.pipe(map((editors) => editors.find((editor) => editor.meta.entityType === this.entityType))),
+			(editor) => {
+				// don't rerender editor if it's the same
+				if (this._currentEditorAlias === editor.alias) return;
+				this._currentEditorAlias = editor.alias;
 				this._createElement(editor);
-			});
+			}
+		);
 	}
 
 	private async _createElement(editor?: ManifestEditor) {

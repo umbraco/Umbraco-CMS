@@ -2,10 +2,10 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, LitElement, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { EMPTY, map, of, Subscription, switchMap } from 'rxjs';
-import { UmbContextConsumerMixin } from '../../../../core/context';
-import { UmbExtensionRegistry } from '../../../../core/extension';
-import type { ManifestSectionView } from '../../../../core/models';
 import { UmbSectionContext } from '../../section.context';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import type { ManifestSectionView } from '@umbraco-cms/models';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
 @customElement('umb-section-views')
 export class UmbSectionViewsElement extends UmbContextConsumerMixin(LitElement) {
@@ -37,19 +37,12 @@ export class UmbSectionViewsElement extends UmbContextConsumerMixin(LitElement) 
 	@state()
 	private _activeView?: ManifestSectionView;
 
-	private _extensionRegistry?: UmbExtensionRegistry;
 	private _sectionContext?: UmbSectionContext;
 	private _viewsSubscription?: Subscription;
 	private _activeViewSubscription?: Subscription;
 
 	constructor() {
 		super();
-
-		// TODO: wait for more contexts
-		this.consumeContext('umbExtensionRegistry', (extensionsRegistry: UmbExtensionRegistry) => {
-			this._extensionRegistry = extensionsRegistry;
-			this._observeViews();
-		});
 
 		this.consumeContext('umbSectionContext', (sectionContext: UmbSectionContext) => {
 			this._sectionContext = sectionContext;
@@ -65,7 +58,7 @@ export class UmbSectionViewsElement extends UmbContextConsumerMixin(LitElement) 
 	}
 
 	private _observeViews() {
-		if (!this._sectionContext || !this._extensionRegistry) return;
+		if (!this._sectionContext) return;
 
 		this._viewsSubscription?.unsubscribe();
 
@@ -75,7 +68,7 @@ export class UmbSectionViewsElement extends UmbContextConsumerMixin(LitElement) 
 					if (!section) return EMPTY;
 
 					return (
-						this._extensionRegistry
+						umbExtensionsRegistry
 							?.extensionsOfType('sectionView')
 							.pipe(
 								map((views) =>

@@ -1,14 +1,15 @@
 import { html, LitElement } from 'lit';
 import { when } from 'lit-html/directives/when.js';
 import { customElement, property, state } from 'lit/decorators.js';
-import { map, Subscription } from 'rxjs';
-import { UmbContextConsumerMixin, UmbContextProviderMixin } from '../../../core/context';
-import { UmbExtensionRegistry } from '../../../core/extension';
-import type { ManifestTree } from '../../../core/models';
+import { map } from 'rxjs';
 import { UmbTreeContextBase } from '../tree.context';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
+import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
+import type { ManifestTree } from '@umbraco-cms/models';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
 @customElement('umb-tree')
-export class UmbTreeElement extends UmbContextProviderMixin(UmbContextConsumerMixin(LitElement)) {
+export class UmbTreeElement extends UmbContextProviderMixin(UmbContextConsumerMixin(UmbObserverMixin(LitElement))) {
 	private _alias = '';
 	@property({ type: String, reflect: true })
 	get alias() {
@@ -49,28 +50,24 @@ export class UmbTreeElement extends UmbContextProviderMixin(UmbContextConsumerMi
 	private _tree?: ManifestTree;
 
 	private _treeContext?: UmbTreeContextBase;
-	private _extensionRegistry?: UmbExtensionRegistry;
-	private _treeSubscription?: Subscription;
-	private _selectionSubscription?: Subscription;
 
-	constructor() {
-		super();
-		this.consumeContext('umbExtensionRegistry', (extensionRegistry) => {
-			this._extensionRegistry = extensionRegistry;
-			this._observeTree();
-		});
+	connectedCallback(): void {
+		super.connectedCallback();
+		this._observeTree();
 	}
 
 	private _observeTree() {
-		this._treeSubscription?.unsubscribe();
+		if (!this.alias) return;
 
-		this._treeSubscription = this._extensionRegistry
-			?.extensionsOfType('tree')
-			.pipe(map((trees) => trees.find((tree) => tree.alias === this.alias)))
-			.subscribe((tree) => {
+		this.observe<ManifestTree>(
+			umbExtensionsRegistry
+				.extensionsOfType('tree')
+				.pipe(map((trees) => trees.find((tree) => tree.alias === this.alias))),
+			(tree) => {
 				this._tree = tree;
 				this._provideTreeContext();
-			});
+			}
+		);
 	}
 
 	private _provideTreeContext() {
@@ -86,16 +83,12 @@ export class UmbTreeElement extends UmbContextProviderMixin(UmbContextConsumerMi
 	}
 
 	private _observeSelection() {
-		this._selectionSubscription = this._treeContext?.selection.subscribe((selection) => {
+		if (!this._treeContext) return;
+
+		this.observe(this._treeContext.selection, (selection) => {
 			this._selection = selection;
 			this.dispatchEvent(new CustomEvent('change'));
 		});
-	}
-
-	disconnectedCallback(): void {
-		super.disconnectedCallback();
-		this._treeSubscription?.unsubscribe();
-		this._selectionSubscription?.unsubscribe();
 	}
 
 	render() {

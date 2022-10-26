@@ -1,73 +1,56 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { map, Subscription, switchMap, EMPTY, of } from 'rxjs';
+import { map, switchMap, EMPTY, of } from 'rxjs';
 
-import { UmbContextConsumerMixin } from '../../../../core/context';
-import { UmbExtensionRegistry } from '../../../../core/extension';
 import { UmbSectionContext } from '../../section.context';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
 import '../../../trees/shared/tree-extension.element';
 
 @customElement('umb-section-trees')
-export class UmbSectionTreesElement extends UmbContextConsumerMixin(LitElement) {
+export class UmbSectionTreesElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles = [UUITextStyles];
 
 	@state()
 	private _treeAliases: Array<string> = [];
 
-	private _extensionStore?: UmbExtensionRegistry;
-	private _treesSubscription?: Subscription;
-
 	private _sectionContext?: UmbSectionContext;
-	private _sectionContextSubscription?: Subscription;
 
 	constructor() {
 		super();
 
-		// TODO: wait for more contexts
-		this.consumeContext('umbExtensionRegistry', (extensionStore: UmbExtensionRegistry) => {
-			this._extensionStore = extensionStore;
-			this._useTrees();
-		});
-
-		this.consumeContext('umbSectionContext', (sectionContext: UmbSectionContext) => {
-			this._sectionContext = sectionContext;
-			this._useTrees();
+		this.consumeContext('umbSectionContext', (instance) => {
+			this._sectionContext = instance;
+			this._observeTrees();
 		});
 	}
 
-	private _useTrees() {
-		if (!this._extensionStore || !this._sectionContext) return;
+	private _observeTrees() {
+		if (!this._sectionContext) return;
 
-		this._treesSubscription?.unsubscribe();
-
-		this._treesSubscription = this._sectionContext?.data
-			.pipe(
+		this.observe<string[]>(
+			this._sectionContext?.data.pipe(
 				switchMap((section) => {
 					if (!section) return EMPTY;
 
 					return (
-						this._extensionStore?.extensionsOfType('tree').pipe(
-							map((trees) =>
-								trees
-									.filter((tree) => tree.meta.sections.includes(section.alias))
-									.sort((a, b) => b.meta.weight - a.meta.weight)
-									.map((tree) => tree.alias)
-							)
-						) ?? of([])
+						umbExtensionsRegistry
+							?.extensionsOfType('tree')
+							.pipe(
+								map((trees) =>
+									trees.filter((tree) => tree.meta.sections.includes(section.alias)).map((tree) => tree.alias)
+								)
+							) ?? of([])
 					);
 				})
-			)
-			.subscribe((treeAliases) => {
+			),
+			(treeAliases) => {
 				this._treeAliases = treeAliases;
-			});
-	}
-
-	disconnectedCallback() {
-		super.disconnectedCallback();
-		this._treesSubscription?.unsubscribe();
-		this._sectionContextSubscription?.unsubscribe();
+			}
+		);
 	}
 
 	render() {

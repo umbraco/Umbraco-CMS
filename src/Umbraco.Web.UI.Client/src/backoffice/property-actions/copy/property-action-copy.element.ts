@@ -1,9 +1,9 @@
 import { html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { UmbContextConsumerMixin } from '../../../core/context';
 import type { UmbNotificationDefaultData } from '../../../core/services/notification/layouts/default';
 import type { UmbNotificationService } from '../../../core/services/notification';
 import type { UmbPropertyAction } from '../shared/property-action/property-action.model';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
 @customElement('umb-property-action-copy')
 export class UmbPropertyActionCopyElement extends UmbContextConsumerMixin(LitElement) implements UmbPropertyAction {
