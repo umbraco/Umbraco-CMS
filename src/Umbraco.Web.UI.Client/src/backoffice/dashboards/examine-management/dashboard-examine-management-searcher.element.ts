@@ -1,7 +1,6 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, query, state, property } from 'lit/decorators.js';
-import { UUIButtonState } from '@umbraco-ui/uui';
 
 import { SearchResult } from '../../../core/mocks/data/examine.data';
 

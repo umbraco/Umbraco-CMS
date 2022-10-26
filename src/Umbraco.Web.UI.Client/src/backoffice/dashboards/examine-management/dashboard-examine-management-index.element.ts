@@ -9,7 +9,7 @@ import { Indexer, SearchResult } from '../../../core/mocks/data/examine.data';
 import { UmbModalService } from '../../../core/services/modal';
 import { UmbNotificationService } from '../../../core/services/notification';
 import { UmbNotificationDefaultData } from '../../../core/services/notification/layouts/default';
-import { UmbModalLayoutElement } from '../../../core/services/modal/layouts/modal-layout.element';
+
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { getIndex, getSearchResultFromSearchers, postIndexRebuild } from '@umbraco-cms/backend-api';
 
