@@ -116,6 +116,38 @@ public class CurrentUserController : UmbracoAuthorizedJsonController
     {
     }
 
+    [Obsolete("This constructor is obsolete and will be removed in v11, use constructor with all values")]
+    public CurrentUserController(
+       MediaFileManager mediaFileManager,
+       IOptionsSnapshot<ContentSettings> contentSettings,
+       IHostingEnvironment hostingEnvironment,
+       IImageUrlGenerator imageUrlGenerator,
+       IBackOfficeSecurityAccessor backofficeSecurityAccessor,
+       IUserService userService,
+       IUmbracoMapper umbracoMapper,
+       IBackOfficeUserManager backOfficeUserManager,
+       ILocalizedTextService localizedTextService,
+       AppCaches appCaches,
+       IShortStringHelper shortStringHelper,
+       IPasswordChanger<BackOfficeIdentityUser> passwordChanger,
+       IUserDataService userDataService) : this(
+        mediaFileManager,
+        StaticServiceProvider.Instance.GetRequiredService<IOptionsSnapshot<ContentSettings>>(),
+        hostingEnvironment,
+        imageUrlGenerator,
+        backofficeSecurityAccessor,
+        userService,
+        umbracoMapper,
+        backOfficeUserManager,
+        localizedTextService,
+        appCaches,
+        shortStringHelper,
+        passwordChanger,
+        userDataService,
+        StaticServiceProvider.Instance.GetRequiredService<IContentService>())
+    {
+    }
+
 
     /// <summary>
     ///     Returns permissions for all nodes passed in for the current user
