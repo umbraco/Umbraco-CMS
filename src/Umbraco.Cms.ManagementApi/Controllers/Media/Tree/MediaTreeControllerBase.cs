@@ -15,7 +15,7 @@ namespace Umbraco.Cms.ManagementApi.Controllers.Media.Tree;
 
 [ApiVersion("1.0")]
 [ApiController]
-[VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.Media}/tree")]
+[VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/{Constants.UdiEntityType.Media}")]
 [OpenApiTag(nameof(Constants.UdiEntityType.Media))]
 public class MediaTreeControllerBase : UserStartNodeTreeControllerBase<ContentTreeItemViewModel>
 {

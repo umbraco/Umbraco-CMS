@@ -9,7 +9,7 @@ namespace Umbraco.Cms.ManagementApi.Controllers.Stylesheet.Tree;
 
 [ApiVersion("1.0")]
 [ApiController]
-[VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.Stylesheet}/tree")]
+[VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/{Constants.UdiEntityType.Stylesheet}")]
 [OpenApiTag(nameof(Constants.UdiEntityType.Stylesheet))]
 public class StylesheetTreeControllerBase : FileSystemTreeControllerBase
 {

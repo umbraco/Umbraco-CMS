@@ -12,8 +12,8 @@ namespace Umbraco.Cms.ManagementApi.Controllers.DataType.Tree;
 
 [ApiVersion("1.0")]
 [ApiController]
-[VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.DataType}/tree")]
-[OpenApiTag(nameof(Constants.UdiEntityType.DataType))]
+[VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/{Constants.UdiEntityType.DataType}")]
+[OpenApiTag("Data Type")]
 public class DataTypeTreeControllerBase : FolderTreeControllerBase<FolderTreeItemViewModel>
 {
     private readonly IDataTypeService _dataTypeService;

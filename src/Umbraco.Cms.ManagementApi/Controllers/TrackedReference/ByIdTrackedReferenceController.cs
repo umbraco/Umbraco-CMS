@@ -7,14 +7,14 @@ using Umbraco.Cms.ManagementApi.ViewModels.Pagination;
 using Umbraco.Cms.ManagementApi.ViewModels.TrackedReferences;
 using Umbraco.New.Cms.Core.Models;
 
-namespace Umbraco.Cms.ManagementApi.Controllers.TrackedReferences;
+namespace Umbraco.Cms.ManagementApi.Controllers.TrackedReference;
 
-public class ForItemTrackedReferencesController : TrackedReferencesControllerBase
+public class ByIdTrackedReferenceController : TrackedReferenceControllerBase
 {
     private readonly ITrackedReferencesService _trackedReferencesService;
     private readonly IUmbracoMapper _umbracoMapper;
 
-    public ForItemTrackedReferencesController(ITrackedReferencesService trackedReferencesService, IUmbracoMapper umbracoMapper)
+    public ByIdTrackedReferenceController(ITrackedReferencesService trackedReferencesService, IUmbracoMapper umbracoMapper)
     {
         _trackedReferencesService = trackedReferencesService;
         _umbracoMapper = umbracoMapper;
