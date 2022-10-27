@@ -1,19 +1,5 @@
 <style>
 
-    .umb-icon {
-        display: inline-block;
-        width: 1em;
-        height: 1em;
-        flex-shrink: 0;
-    }
-
-    .umb-icon svg {
-        width: 100%;
-        height: 100%;
-        fill: currentColor;
-        animation: inherit;
-    }
-
     .blockelement-gridinlineblock-editor {
         position: relative;
         border-radius: 3px;
@@ -41,7 +27,7 @@
     .blockelement-gridinlineblock-editor > button:hover {
         color: #2152A3;
     }
-    .blockelement-gridinlineblock-editor .icon {
+    .blockelement-gridinlineblock-editor > button > .icon {
         font-size: 22px;
         margin-right: 10px;
         display: inline-block;
@@ -62,6 +48,7 @@
     <button type="button"
         ng-click="block.edit()"
         ng-focus="block.focus"
+        class="blockelement-gridinlineblock-label"
         val-server-property-class="">
         <umb-icon icon="{{block.content.icon}}" class="icon"></umb-icon>
         <span>{{block.label}}</span>
@@ -71,7 +58,7 @@
         ng-if="vm.property"
         model="vm.property"
         preview="api.internal.readonly"
-        ng-attr-readonly="api.internal.readonly || undefined">
+        ng-attr-readonly="{{api.internal.readonly || undefined}}">
     </umb-property-editor>
 
     <slot name="area-container" part="area-container"></slot>
