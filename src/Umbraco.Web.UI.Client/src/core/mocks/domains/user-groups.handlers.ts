@@ -13,6 +13,15 @@ export const handlers = [
 		return res(ctx.status(200), ctx.json(response));
 	}),
 
+	rest.get('/umbraco/backoffice/user-groups/details/:key', (req, res, ctx) => {
+		const key = req.params.key as string;
+		if (!key) return;
+
+		const userGroup = fakeData.find((x) => x.key === key);
+
+		return res(ctx.status(200), ctx.json(userGroup));
+	}),
+
 	rest.get('/umbraco/backoffice/user-groups/getByKeys', (req, res, ctx) => {
 		const keys = req.url.searchParams.getAll('key');
 		if (keys.length === 0) return;
@@ -31,6 +40,7 @@ const fakeData: Array<UserGroupDetails> = [
 		type: 'userGroup',
 		hasChildren: false,
 		isTrashed: false,
+		sections: [],
 	},
 	{
 		key: '20000000-0000-0000-0000-000000000000',
@@ -40,6 +50,7 @@ const fakeData: Array<UserGroupDetails> = [
 		type: 'userGroup',
 		hasChildren: false,
 		isTrashed: false,
+		sections: [],
 	},
 	{
 		key: '30000000-0000-0000-0000-000000000000',
@@ -49,6 +60,7 @@ const fakeData: Array<UserGroupDetails> = [
 		type: 'userGroup',
 		hasChildren: false,
 		isTrashed: false,
+		sections: [],
 	},
 	{
 		key: '40000000-0000-0000-0000-000000000000',
@@ -58,6 +70,7 @@ const fakeData: Array<UserGroupDetails> = [
 		type: 'userGroup',
 		hasChildren: false,
 		isTrashed: false,
+		sections: [],
 	},
 	{
 		key: '50000000-0000-0000-0000-000000000000',
@@ -67,5 +80,6 @@ const fakeData: Array<UserGroupDetails> = [
 		type: 'userGroup',
 		hasChildren: false,
 		isTrashed: false,
+		sections: [],
 	},
 ];

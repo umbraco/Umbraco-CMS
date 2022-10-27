@@ -37,12 +37,12 @@ export class UmbPickerLayoutUserGroupElement extends UmbContextConsumerMixin(
 				padding: var(--uui-size-4) var(--uui-size-2);
 				gap: var(--uui-size-space-5);
 				align-items: center;
+				border-radius: var(--uui-size-2);
 				cursor: pointer;
 			}
 			.item.selected {
 				background-color: var(--uui-color-selected);
 				color: var(--uui-color-selected-contrast);
-				border-radius: var(--uui-size-2);
 			}
 			.item:not(.selected):hover {
 				background-color: var(--uui-color-surface-emphasis);

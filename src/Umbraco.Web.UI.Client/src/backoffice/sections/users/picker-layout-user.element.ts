@@ -38,11 +38,11 @@ export class UmbPickerLayoutUserElement extends UmbContextConsumerMixin(
 				gap: var(--uui-size-space-5);
 				cursor: pointer;
 				position: relative;
+				border-radius: var(--uui-size-2);
 			}
 			.item.selected {
 				background-color: var(--uui-color-selected);
 				color: var(--uui-color-selected-contrast);
-				border-radius: var(--uui-size-2);
 			}
 			.item:not(.selected):hover {
 				background-color: var(--uui-color-surface-emphasis);

@@ -90,7 +90,7 @@ export interface UserGroupDetails extends UserGroupEntity {
 	key: string;
 	name: string;
 	icon: string;
-	sections?: Array<string>;
+	sections: Array<string>;
 	contentStartNode?: string;
 	mediaStartNode?: string;
 }

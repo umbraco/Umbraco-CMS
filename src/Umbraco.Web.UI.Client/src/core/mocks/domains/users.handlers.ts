@@ -62,7 +62,7 @@ export const handlers = [
 			hasChildren: false,
 			type: 'user',
 			icon: 'umb:icon-user',
-			userGroup: data.userGroups[0],
+			userGroups: data.userGroups,
 		};
 
 		const invited = umbUsersData.save([newUser]);

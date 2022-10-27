@@ -1,12 +1,20 @@
 import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html, LitElement } from 'lit';
+import { css, html, LitElement, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import '../../sections/users/picker-user.element';
+import '../../sections/users/picker-section.element';
+import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
+import { UmbUserGroupStore } from 'src/core/stores/user/user-group.store';
+import type { UserGroupDetails } from '@umbraco-cms/models';
+import { UmbUserGroupContext } from './user-group.context';
 
 @customElement('umb-editor-user-group')
-export class UmbEditorUserGroupElement extends LitElement {
+export class UmbEditorUserGroupElement extends UmbContextProviderMixin(
+	UmbContextConsumerMixin(UmbObserverMixin(LitElement))
+) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -64,11 +72,14 @@ export class UmbEditorUserGroupElement extends LitElement {
 		`,
 	];
 
-	@state()
-	private _userName = '';
-
 	@property({ type: String })
 	entityKey = '';
+
+	@state()
+	private _userGroup?: UserGroupDetails | null;
+
+	private _userGroupStore?: UmbUserGroupStore;
+	private _userGroupContext?: UmbUserGroupContext;
 
 	defaultPermissions: Array<{
 		name: string;
@@ -181,14 +192,47 @@ export class UmbEditorUserGroupElement extends LitElement {
 		},
 	];
 
+	connectedCallback(): void {
+		super.connectedCallback();
+
+		this.consumeContext('umbUserGroupStore', (userGroupContext: UmbUserGroupStore) => {
+			this._userGroupStore = userGroupContext;
+			this._observeUser();
+		});
+	}
+
+	private _observeUser() {
+		if (!this._userGroupStore) return;
+
+		this.observe(this._userGroupStore.getByKey(this.entityKey), (userGroup) => {
+			this._userGroup = userGroup;
+			if (!this._userGroup) return;
+
+			if (!this._userGroupContext) {
+				this._userGroupContext = new UmbUserGroupContext(this._userGroup);
+				this.provideContext('umbUserContext', this._userGroupContext);
+			} else {
+				this._userGroupContext.update(this._userGroup);
+			}
+		});
+	}
+
+	private _updateProperty(propertyName: string, value: string) {
+		this._userGroupContext?.update({ [propertyName]: value });
+	}
+
 	private renderLeftColumn() {
+		if (!this._userGroup) return nothing;
+
 		return html` <uui-box>
 				<div slot="headline">Assign access</div>
 				<div>
 					<b>Sections</b>
 					<div class="faded-text">Add sections to give users access</div>
 
-					<umb-picker .picker=${'section'}></umb-picker>
+					<umb-picker-section
+						.value=${this._userGroup.sections}
+						@change=${(e: any) => this._updateProperty('sections', e.target.value)}></umb-picker-section>
 				</div>
 				<div>
 					<b>Content start nodes</b>
@@ -266,9 +310,11 @@ export class UmbEditorUserGroupElement extends LitElement {
 	}
 
 	render() {
+		if (!this._userGroup) return nothing;
+
 		return html`
 			<umb-editor-entity-layout alias="Umb.Editor.UserGroup">
-				<uui-input id="name" slot="name" .value=${this._userName} @input="${this._handleInput}"></uui-input>
+				<uui-input id="name" slot="name" .value=${this._userGroup.name} @input="${this._handleInput}"></uui-input>
 				<div id="main">
 					<div id="left-column">${this.renderLeftColumn()}</div>
 					<div id="right-column">${this.renderRightColumn()}</div>
