@@ -79,7 +79,10 @@ export class UmbPickerUserGroupElement extends UmbObserverMixin(UmbPickerElement
 							<uui-icon .name=${userGroup.icon}></uui-icon>
 							<span>${userGroup.name}</span>
 						</div>
-						<uui-button @click=${() => this.removeFromSelection(userGroup.key)} label="remove"></uui-button>
+						<uui-button
+							@click=${() => this.removeFromSelection(userGroup.key)}
+							label="remove"
+							color="danger"></uui-button>
 					</div>
 				`
 			)}

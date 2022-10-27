@@ -67,7 +67,7 @@ export class UmbPickerUserElement extends UmbObserverMixin(UmbPickerElement) {
 					<div class="user">
 						<uui-avatar .name=${user.name}></uui-avatar>
 						<div>${user.name}</div>
-						<uui-button @click=${() => this.removeFromSelection(user.key)} label="remove"></uui-button>
+						<uui-button @click=${() => this.removeFromSelection(user.key)} label="remove" color="danger"></uui-button>
 					</div>
 				`
 			)}
