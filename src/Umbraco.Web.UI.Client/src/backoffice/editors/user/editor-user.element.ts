@@ -74,7 +74,6 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(
 			#assign-access {
 				display: flex;
 				flex-direction: column;
-				gap: var(--uui-size-space-4);
 			}
 		`,
 	];
@@ -192,7 +191,7 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(
 				<umb-editor-property-layout label="Email">
 					<uui-input slot="editor" name="email" label="email" readonly value=${this._user.email}></uui-input>
 				</umb-editor-property-layout>
-				<umb-editor-property-layout label="Language - DOESN'T WORK">
+				<umb-editor-property-layout label="Language">
 					<uui-select slot="editor" name="language" label="language" .options=${this._languages}> </uui-select>
 				</umb-editor-property-layout>
 			</uui-box>
@@ -205,21 +204,19 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(
 							.value=${this._user.userGroups}
 							@change=${(e: any) => this._updateProperty('userGroups', e.target.value)}></umb-picker-user-group>
 					</umb-editor-property-layout>
-					<hr />
 					<umb-editor-property-layout
-						label="Content start node - DOESN'T WORK"
+						label="Content start node"
 						description="Limit the content tree to specific start nodes">
 						<umb-property-editor-ui-content-picker slot="editor"></umb-property-editor-ui-content-picker>
 					</umb-editor-property-layout>
-					<hr />
 					<umb-editor-property-layout
-						label="Media start nodes - DOESN'T WORK"
+						label="Media start nodes"
 						description="Limit the media library to specific start nodes">
 						<umb-property-editor-ui-content-picker slot="editor"></umb-property-editor-ui-content-picker>
 					</umb-editor-property-layout>
 				</div>
 			</uui-box>
-			<uui-box headline="Access - DOESN'T WORK YET">
+			<uui-box headline="Access">
 				<div slot="header" class="faded-text">
 					Based on the assigned groups and start nodes, the user has access to the following nodes
 				</div>
