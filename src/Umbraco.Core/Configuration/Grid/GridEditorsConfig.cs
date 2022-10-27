@@ -63,17 +63,25 @@ internal class GridEditorsConfig : IGridEditorsConfig
             List<IGridEditorConfig> GetResult()
             {
                 var editors = new List<IGridEditorConfig>();
-
-                IFileProvider? gridEditorsConfigFileProvider = _gridEditorsConfigFileProviderFactory.Create();
-
-                if (gridEditorsConfigFileProvider is null)
-                {
-                    throw new ArgumentNullException(nameof(gridEditorsConfigFileProvider));
-                }
-
                 var configPath = Constants.SystemDirectories.Config.TrimStart(Constants.CharArrays.Tilde);
-                IEnumerable<IFileInfo> configFiles = GetConfigFiles(gridEditorsConfigFileProvider, configPath);
-                IFileInfo? gridConfig = configFiles.FirstOrDefault();
+
+                // Get physical file if it exists
+                var configPhysicalDirPath = _hostingEnvironment.MapPathContentRoot(configPath);
+                var physicalFileProvider = new PhysicalFileProvider(configPhysicalDirPath);
+                IFileInfo? gridConfig = GetConfigFile(physicalFileProvider, string.Empty);
+
+                // If there is no physical file, check in RCLs
+                if (gridConfig is null)
+                {
+                    IFileProvider? compositeFileProvider = _gridEditorsConfigFileProviderFactory.Create();
+
+                    if (compositeFileProvider is null)
+                    {
+                        throw new ArgumentNullException(nameof(compositeFileProvider));
+                    }
+
+                    gridConfig = GetConfigFile(compositeFileProvider, configPath);
+                }
 
                 if (gridConfig is not null)
                 {
@@ -128,7 +136,7 @@ internal class GridEditorsConfig : IGridEditorsConfig
         }
     }
 
-    private IEnumerable<IFileInfo> GetConfigFiles(IFileProvider fileProvider, string path)
+    private static IFileInfo? GetConfigFile(IFileProvider fileProvider, string path)
     {
         IEnumerable<IFileInfo> contents = fileProvider.GetDirectoryContents(path);
 
@@ -136,8 +144,10 @@ internal class GridEditorsConfig : IGridEditorsConfig
         {
             if (file.Name.InvariantEquals("grid.editors.config.js") && file.PhysicalPath != null)
             {
-                yield return file;
+                return file;
             }
         }
+
+        return null;
     }
 }
