@@ -8,9 +8,6 @@ const tabsDocTypeAlias = AliasHelper.toAlias(tabsDocTypeName);
 test.describe('Tabs', () => {
   
   test.beforeEach(async ({ umbracoApi, page }) => {
-    // TODO: REMOVE THIS WHEN SQLITE IS FIXED
-    // Wait so we don't bombard the API
-    await page.waitForTimeout(1000);
     await umbracoApi.login();
   });
 
