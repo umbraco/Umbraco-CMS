@@ -40,7 +40,7 @@ export class UmbEditorViewUsersOverviewElement extends UmbContextConsumerMixin(U
 
 			#user-list-top-bar {
 				padding: var(--uui-size-space-4) var(--uui-size-space-6);
-				background-color: var(--uui-color-surface-alt);
+				background-color: var(--uui-color-background);
 				display: flex;
 				justify-content: space-between;
 				white-space: nowrap;
