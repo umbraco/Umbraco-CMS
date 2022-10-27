@@ -49,6 +49,7 @@ public class CurrentUserController : UmbracoAuthorizedJsonController
     private readonly IUmbracoMapper _umbracoMapper;
     private readonly IUserDataService _userDataService;
     private readonly IUserService _userService;
+    private readonly IContentService _contentService;
 
     [ActivatorUtilitiesConstructor]
     public CurrentUserController(
@@ -64,7 +65,8 @@ public class CurrentUserController : UmbracoAuthorizedJsonController
         AppCaches appCaches,
         IShortStringHelper shortStringHelper,
         IPasswordChanger<BackOfficeIdentityUser> passwordChanger,
-        IUserDataService userDataService)
+        IUserDataService userDataService,
+        IContentService contentService)
     {
         _mediaFileManager = mediaFileManager;
         _contentSettings = contentSettings.Value;
@@ -79,24 +81,64 @@ public class CurrentUserController : UmbracoAuthorizedJsonController
         _shortStringHelper = shortStringHelper;
         _passwordChanger = passwordChanger;
         _userDataService = userDataService;
+        _contentService = contentService;
     }
 
-        /// <summary>
-        /// Returns permissions for all nodes passed in for the current user
-        /// </summary>
-        /// <param name="nodeIds"></param>
-        /// <returns></returns>
-        [HttpPost]
-        public Dictionary<int, string[]> GetPermissions(int[] nodeIds)
-        {
-            EntityPermissionCollection permissions = _userService
-            .GetPermissions(_backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser, nodeIds);
+
+
+    [Obsolete("This constructor is obsolete and will be removed in v12, use constructor with all values")]
+    public CurrentUserController(
+       MediaFileManager mediaFileManager,
+       IOptionsSnapshot<ContentSettings> contentSettings,
+       IHostingEnvironment hostingEnvironment,
+       IImageUrlGenerator imageUrlGenerator,
+       IBackOfficeSecurityAccessor backofficeSecurityAccessor,
+       IUserService userService,
+       IUmbracoMapper umbracoMapper,
+       IBackOfficeUserManager backOfficeUserManager,
+       ILocalizedTextService localizedTextService,
+       AppCaches appCaches,
+       IShortStringHelper shortStringHelper,
+       IPasswordChanger<BackOfficeIdentityUser> passwordChanger,
+       IUserDataService userDataService) : this(
+        mediaFileManager,
+        StaticServiceProvider.Instance.GetRequiredService<IOptionsSnapshot<ContentSettings>>(),
+        hostingEnvironment,
+        imageUrlGenerator,
+        backofficeSecurityAccessor,
+        userService,
+        umbracoMapper,
+        backOfficeUserManager,
+        localizedTextService,
+        appCaches,
+        shortStringHelper,
+        passwordChanger,
+        userDataService,
+        StaticServiceProvider.Instance.GetRequiredService<IContentService>())
+    {
+    }
+
+
+    /// <summary>
+    ///     Returns permissions for all nodes passed in for the current user
+    /// </summary>
+    /// <param name="nodeIds"></param>
+    /// <returns></returns>
+    [HttpPost]
+    public Dictionary<int, string[]> GetPermissions(int[] nodeIds)
+    {
+
+        var nodes = _contentService.GetByIds(nodeIds);
 
         var permissionsDictionary = new Dictionary<int, string[]>();
-        foreach (var nodeId in nodeIds)
+        foreach (var node in nodes)
         {
-            var aggregatePerms = permissions.GetAllPermissions(nodeId).ToArray();
-            permissionsDictionary.Add(nodeId, aggregatePerms);
+            // Pull the full inherited permissions for each node passed in
+            var aggregatePerms = _userService
+                .GetPermissionsForPath(_backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser, node.Path)
+                .GetAllPermissions()
+                .ToArray();
+            permissionsDictionary.Add(node.Id, aggregatePerms);
         }
 
         return permissionsDictionary;
