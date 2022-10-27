@@ -14,7 +14,6 @@ import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 
 import '../../property-editor-uis/content-picker/property-editor-ui-content-picker.element';
 import '../../sections/users/picker-user-group.element';
-import '../shared/editor-entity-layout/editor-entity-layout.element';
 
 @customElement('umb-editor-user')
 export class UmbEditorUserElement extends UmbContextProviderMixin(
@@ -76,17 +75,6 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(
 				display: flex;
 				flex-direction: column;
 				gap: var(--uui-size-space-4);
-			}
-			.access-content {
-				margin-top: var(--uui-size-space-1);
-				margin-bottom: var(--uui-size-space-4);
-				display: flex;
-				align-items: center;
-				line-height: 1;
-				gap: var(--uui-size-space-3);
-			}
-			.access-content > span {
-				align-self: end;
 			}
 		`,
 	];
@@ -201,54 +189,50 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(
 
 		return html` <uui-box>
 				<div slot="headline">Profile</div>
-				<uui-form-layout-item style="margin-top: 0">
-					<uui-label for="email">Email</uui-label>
-					<uui-input name="email" label="email" readonly value=${this._user.email}></uui-input>
-				</uui-form-layout-item>
-				<uui-form-layout-item style="margin-bottom: 0">
-					<uui-label for="language">Language - DOESN'T WORK YET</uui-label>
-					<uui-select name="language" label="language" .options=${this._languages}> </uui-select>
-				</uui-form-layout-item>
+				<umb-editor-property-layout label="Email">
+					<uui-input slot="editor" name="email" label="email" readonly value=${this._user.email}></uui-input>
+				</umb-editor-property-layout>
+				<umb-editor-property-layout label="Language - DOESN'T WORK">
+					<uui-select slot="editor" name="language" label="language" .options=${this._languages}> </uui-select>
+				</umb-editor-property-layout>
 			</uui-box>
 			<uui-box>
 				<div slot="headline">Assign access</div>
 				<div id="assign-access">
-					<div>
-						<b>Groups</b>
-						<div class="faded-text">Add groups to assign access and permissions</div>
+					<umb-editor-property-layout label="Groups" description="Add groups to assign access and permissions">
 						<umb-picker-user-group
+							slot="editor"
 							.value=${this._user.userGroups}
 							@change=${(e: any) => this._updateProperty('userGroups', e.target.value)}></umb-picker-user-group>
-					</div>
-					<div>
-						<b>Content start nodes - DOESN'T WORK YET</b>
-						<div class="faded-text">Limit the content tree to specific start nodes</div>
-						<umb-property-editor-ui-content-picker></umb-property-editor-ui-content-picker>
-					</div>
-					<div>
-						<b>Media start nodes - DOESN'T WORK YET</b>
-						<div class="faded-text">Limit the media library to specific start nodes</div>
-						<umb-property-editor-ui-content-picker></umb-property-editor-ui-content-picker>
-					</div>
+					</umb-editor-property-layout>
+					<hr />
+					<umb-editor-property-layout
+						label="Content start node - DOESN'T WORK"
+						description="Limit the content tree to specific start nodes">
+						<umb-property-editor-ui-content-picker slot="editor"></umb-property-editor-ui-content-picker>
+					</umb-editor-property-layout>
+					<hr />
+					<umb-editor-property-layout
+						label="Media start nodes - DOESN'T WORK"
+						description="Limit the media library to specific start nodes">
+						<umb-property-editor-ui-content-picker slot="editor"></umb-property-editor-ui-content-picker>
+					</umb-editor-property-layout>
 				</div>
 			</uui-box>
-			<uui-box>
-				<div slot="headline">Access - DOESN'T WORK YET</div>
+			<uui-box headline="Access - DOESN'T WORK YET">
 				<div slot="header" class="faded-text">
 					Based on the assigned groups and start nodes, the user has access to the following nodes
 				</div>
 
 				<b>Content</b>
-				<div class="access-content">
-					<uui-icon name="folder"></uui-icon>
-					<span>Content Root</span>
-				</div>
-
+				<uui-ref-node name="Content Root">
+					<uui-icon slot="icon" name="folder"></uui-icon>
+				</uui-ref-node>
+				<hr />
 				<b>Media</b>
-				<div class="access-content">
-					<uui-icon name="folder"></uui-icon>
-					<span>Media Root</span>
-				</div>
+				<uui-ref-node name="Media Root">
+					<uui-icon slot="icon" name="folder"></uui-icon>
+				</uui-ref-node>
 			</uui-box>`;
 	}
 

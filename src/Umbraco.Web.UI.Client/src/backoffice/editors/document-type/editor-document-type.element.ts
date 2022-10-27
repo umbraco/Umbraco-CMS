@@ -12,8 +12,6 @@ import type { ManifestTypes, ManifestWithLoader } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import '../../property-editor-uis/icon-picker/property-editor-ui-icon-picker.element';
 
-import '../shared/editor-entity-layout/editor-entity-layout.element';
-
 @customElement('umb-editor-document-type')
 export class UmbEditorDocumentTypeElement extends UmbContextProviderMixin(
 	UmbContextConsumerMixin(UmbObserverMixin(LitElement))
