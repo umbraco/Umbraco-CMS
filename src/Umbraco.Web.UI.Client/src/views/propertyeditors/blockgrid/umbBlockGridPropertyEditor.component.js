@@ -335,10 +335,10 @@
                     }
                 }
 
-                // if no columnSpan, then we set one:
-                if (!layoutEntry.columnSpan) {
+                // if no columnSpan or no columnSpanOptions configured, then we set(or rewrite) one:
+                if (!layoutEntry.columnSpan || block.config.columnSpanOptions.length === 0) {
 
-                    const contextColumns = getContextColumns(parentBlock, areaKey)
+                    const contextColumns = getContextColumns(parentBlock, areaKey);
 
                     if (block.config.columnSpanOptions.length > 0) {
                         // set columnSpan to minimum allowed span for this BlockType:
