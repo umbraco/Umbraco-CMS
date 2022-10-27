@@ -3,13 +3,14 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, LitElement, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
+import { UmbUserGroupContext } from './user-group.context';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import '../../sections/users/picker-user.element';
 import '../../sections/users/picker-section.element';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import { UmbUserGroupStore } from 'src/core/stores/user/user-group.store';
-import type { UserGroupDetails } from '@umbraco-cms/models';
-import { UmbUserGroupContext } from './user-group.context';
+import type { ManifestEditorAction, ManifestWithLoader, UserGroupDetails } from '@umbraco-cms/models';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
 @customElement('umb-editor-user-group')
 export class UmbEditorUserGroupElement extends UmbContextProviderMixin(
@@ -192,6 +193,31 @@ export class UmbEditorUserGroupElement extends UmbContextProviderMixin(
 		},
 	];
 
+	constructor() {
+		super();
+
+		this._registerEditorActions();
+	}
+
+	private _registerEditorActions() {
+		const manifests: Array<ManifestWithLoader<ManifestEditorAction>> = [
+			{
+				type: 'editorAction',
+				alias: 'Umb.EditorAction.UserGroup.Save',
+				name: 'EditorActionUserGroupSave',
+				loader: () => import('./actions/editor-action-user-group-save.element'),
+				meta: {
+					editors: ['Umb.Editor.UserGroup'],
+				},
+			},
+		];
+
+		manifests.forEach((manifest) => {
+			if (umbExtensionsRegistry.isRegistered(manifest.alias)) return;
+			umbExtensionsRegistry.register(manifest);
+		});
+	}
+
 	connectedCallback(): void {
 		super.connectedCallback();
 
@@ -210,7 +236,7 @@ export class UmbEditorUserGroupElement extends UmbContextProviderMixin(
 
 			if (!this._userGroupContext) {
 				this._userGroupContext = new UmbUserGroupContext(this._userGroup);
-				this.provideContext('umbUserContext', this._userGroupContext);
+				this.provideContext('umbUserGroupContext', this._userGroupContext);
 			} else {
 				this._userGroupContext.update(this._userGroup);
 			}
@@ -226,36 +252,30 @@ export class UmbEditorUserGroupElement extends UmbContextProviderMixin(
 
 		return html` <uui-box>
 				<div slot="headline">Assign access</div>
-				<div>
-					<b>Sections</b>
-					<div class="faded-text">Add sections to give users access</div>
-
+				<umb-editor-property-layout label="Sections" description="Add sections to give users access">
 					<umb-picker-section
+						slot="editor"
 						.value=${this._userGroup.sections}
 						@change=${(e: any) => this._updateProperty('sections', e.target.value)}></umb-picker-section>
-				</div>
-				<div>
-					<b>Content start nodes</b>
-					<div class="faded-text">Limit the content tree to specific start nodes</div>
-					<umb-property-editor-ui-content-picker></umb-property-editor-ui-content-picker>
-				</div>
-				<div>
-					<b>Media start nodes</b>
-					<div class="faded-text">Limit the media library to specific start nodes</div>
-					<umb-property-editor-ui-content-picker></umb-property-editor-ui-content-picker>
-				</div>
-
-				<b>Content</b>
-				<div class="access-content">
-					<uui-icon name="folder"></uui-icon>
-					<span>Content Root</span>
-				</div>
-
-				<b>Media</b>
-				<div class="access-content">
-					<uui-icon name="folder"></uui-icon>
-					<span>Media Root</span>
-				</div>
+				</umb-editor-property-layout>
+				<umb-editor-property-layout
+					label="Content start nodes"
+					description="Limit the content tree to specific start nodes">
+					<uui-ref-node slot="editor" name="Content Root" border>
+						<uui-icon slot="icon" name="folder"></uui-icon>
+						<uui-button slot="actions" label="change"></uui-button>
+						<uui-button slot="actions" label="remove" color="danger"></uui-button>
+					</uui-ref-node>
+				</umb-editor-property-layout>
+				<umb-editor-property-layout
+					label="Media start nodes"
+					description="Limit the media library to specific start nodes">
+					<uui-ref-node slot="editor" name="Media Root" border>
+						<uui-icon slot="icon" name="folder"></uui-icon>
+						<uui-button slot="actions" label="change"></uui-button>
+						<uui-button slot="actions" label="remove" color="danger"></uui-button>
+					</uui-ref-node>
+				</umb-editor-property-layout>
 			</uui-box>
 
 			<uui-box>

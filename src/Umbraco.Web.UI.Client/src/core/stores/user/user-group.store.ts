@@ -58,4 +58,22 @@ export class UmbUserGroupStore extends UmbDataStoreBase<UserGroupDetails> {
 			map((items: Array<UserGroupDetails>) => items.filter((node: UserGroupDetails) => keys.includes(node.key)))
 		);
 	}
+
+	async save(userGroups: Array<UserGroupDetails>): Promise<void> {
+		// TODO: use Fetcher API.
+		try {
+			const res = await fetch('/umbraco/backoffice/user-groups/save', {
+				method: 'POST',
+				body: JSON.stringify(userGroups),
+				headers: {
+					'Content-Type': 'application/json',
+				},
+			});
+			const json = await res.json();
+			this.update(json);
+			this._entityStore.update(json);
+		} catch (error) {
+			console.error('Save Data Type error', error);
+		}
+	}
 }
