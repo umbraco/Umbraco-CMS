@@ -15,7 +15,9 @@ import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { UserGroupDetails } from '@umbraco-cms/models';
 
 import './user-group-table-name-column-layout.element';
+import './user-group-table-sections-column-layout.element';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
 @customElement('umb-editor-view-user-groups')
 export class UmbEditorViewUserGroupsElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
@@ -48,6 +50,7 @@ export class UmbEditorViewUserGroupsElement extends UmbContextConsumerMixin(UmbO
 		{
 			name: 'Sections',
 			alias: 'userGroupSections',
+			elementName: 'umb-user-group-table-sections-column-layout',
 		},
 		{
 			name: 'Content start node',

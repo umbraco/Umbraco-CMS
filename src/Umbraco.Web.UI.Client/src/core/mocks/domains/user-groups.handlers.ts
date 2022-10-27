@@ -31,7 +31,7 @@ export const handlers = [
 		return res(ctx.status(200), ctx.json(userGroups));
 	}),
 
-	rest.post<Array<UserGroupDetails>>('/umbraco/backoffice/users/save', async (req, res, ctx) => {
+	rest.post<Array<UserGroupDetails>>('/umbraco/backoffice/user-groups/save', async (req, res, ctx) => {
 		const data = await req.json();
 		if (!data) return;
 
