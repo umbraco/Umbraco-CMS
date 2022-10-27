@@ -1768,7 +1768,7 @@ internal class DatabaseDataCreator
                 {
                     IsoCode = culture.Name,
                     CultureName = culture.EnglishName,
-                    IsDefault = isDefault
+                    IsDefault = isDefault,
                 };
                 _database.Insert(Constants.DatabaseSchema.Tables.Language, "id", true, dto);
                 isDefault = false;
