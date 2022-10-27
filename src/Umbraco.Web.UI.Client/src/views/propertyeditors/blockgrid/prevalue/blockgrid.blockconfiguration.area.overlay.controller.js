@@ -25,6 +25,8 @@
             value: {min:vm.area.minAllowed, max:vm.area.maxAllowed}
         }
 
+        $scope.$watch('model.area.alias', $scope.model.updateTitle);
+
         vm.submit = function() {
             if ($scope.model && $scope.model.submit) {
 

@@ -130,14 +130,18 @@
         vm.openAreaOverlay = function (area) {
 
             // TODO: use the right localization key:
-            localizationService.localize("blockEditor_blockConfigurationOverlayTitle", [area.alias]).then(function (localized) {
+            localizationService.localize("blockEditor_blockConfigurationOverlayTitle").then(function (localized) {
 
                 var clonedAreaData = Utilities.copy(area);
                 vm.openArea = area;
 
+                function updateTitle() {
+                    overlayModel.title = localizationService.tokenReplace(localized, [clonedAreaData.alias]);
+                }
+
                 var overlayModel = {
                     area: clonedAreaData,
-                    title: localized,
+                    updateTitle: updateTitle,
                     allBlockTypes: vm.allBlockTypes,
                     allBlockGroups: vm.allBlockGroups,
                     loadedElementTypes: vm.loadedElementTypes,
@@ -153,6 +157,8 @@
                         vm.openArea = null;
                     }
                 };
+
+                updateTitle();
 
                 // open property settings editor
                 editorService.open(overlayModel);
