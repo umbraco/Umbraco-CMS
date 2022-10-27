@@ -106,8 +106,8 @@ internal class GridEditorsConfig : IGridEditorsConfig
                 else
                 {
                     IFileProvider configFileProvider = new EmbeddedFileProvider(GetType().Assembly, "Umbraco.Cms.Core.EmbeddedResources.Grid");
-                    IFileInfo embeddedConfig = configFileProvider.GetDirectoryContents(string.Empty)
-                                    .Where(x => !x.IsDirectory && x.Name.InvariantEquals("grid.editors.config.js")).First();
+                    IFileInfo embeddedConfig = configFileProvider
+                        .GetDirectoryContents(string.Empty).First(x => !x.IsDirectory && x.Name.InvariantEquals("grid.editors.config.js"));
 
                     using Stream stream = embeddedConfig.CreateReadStream();
                     using var reader = new StreamReader(stream, Encoding.UTF8);
@@ -115,7 +115,7 @@ internal class GridEditorsConfig : IGridEditorsConfig
                     editors.AddRange(_jsonSerializer.Deserialize<IEnumerable<GridEditor>>(sourceString)!);
                 }
 
-                // add manifest editors, skip duplicates
+                // Add manifest editors, skip duplicates
                 foreach (GridEditor gridEditor in _manifestParser.CombinedManifest.GridEditors)
                 {
                     if (editors.Contains(gridEditor) == false)
@@ -139,15 +139,6 @@ internal class GridEditorsConfig : IGridEditorsConfig
     private static IFileInfo? GetConfigFile(IFileProvider fileProvider, string path)
     {
         IEnumerable<IFileInfo> contents = fileProvider.GetDirectoryContents(path);
-
-        foreach (IFileInfo file in contents)
-        {
-            if (file.Name.InvariantEquals("grid.editors.config.js") && file.PhysicalPath != null)
-            {
-                return file;
-            }
-        }
-
-        return null;
+        return contents.FirstOrDefault(file => file.Name.InvariantEquals("grid.editors.config.js") && file.PhysicalPath is not null);
     }
 }
