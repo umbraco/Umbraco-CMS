@@ -84,24 +84,37 @@ public class ManagementApiComposer : IComposer
                 "BackofficeSwagger",
                 applicationBuilder =>
                 {
-                    applicationBuilder.UseExceptionHandler(exceptionBuilder => exceptionBuilder.Run(async context =>
-                    {
-                        Exception? exception = context.Features.Get<IExceptionHandlerPathFeature>()?.Error;
-                        if (exception is null)
+                    // Only use the API exception handler when we are requesting an API
+                    applicationBuilder.UseWhen(
+                        httpContext =>
                         {
-                            return;
-                        }
+                            GlobalSettings? settings = httpContext.RequestServices.GetRequiredService<IOptions<GlobalSettings>>().Value;
+                            IHostingEnvironment hostingEnvironment = httpContext.RequestServices.GetRequiredService<IHostingEnvironment>();
+                            var officePath = settings.GetBackOfficePath(hostingEnvironment);
 
-                        var response = new ProblemDetails
+                            return httpContext.Request.Path.Value?.StartsWith($"{officePath}/management/api/") ?? false;
+                        },
+                        innerBuilder =>
                         {
-                            Title = exception.Message,
-                            Detail = exception.StackTrace,
-                            Status = StatusCodes.Status500InternalServerError,
-                            Instance = exception.GetType().Name,
-                            Type = "Error",
-                        };
-                        await context.Response.WriteAsJsonAsync(response);
-                    }));
+                            innerBuilder.UseExceptionHandler(exceptionBuilder => exceptionBuilder.Run(async context =>
+                            {
+                                Exception? exception = context.Features.Get<IExceptionHandlerPathFeature>()?.Error;
+                                if (exception is null)
+                                {
+                                    return;
+                                }
+
+                                var response = new ProblemDetails
+                                {
+                                    Title = exception.Message,
+                                    Detail = exception.StackTrace,
+                                    Status = StatusCodes.Status500InternalServerError,
+                                    Instance = exception.GetType().Name,
+                                    Type = "Error",
+                                };
+                                await context.Response.WriteAsJsonAsync(response);
+                            }));
+                        });
                 },
                 applicationBuilder =>
                 {
@@ -144,7 +157,7 @@ public class ManagementApiComposer : IComposer
                         endpoints.MapControllers();
 
                         // Serve contract
-                        endpoints.MapGet($"{officePath}/api/openapi.json",async  context =>
+                        endpoints.MapGet($"{officePath}/management/api/openapi.json",async  context =>
                         {
                             await context.Response.SendFileAsync(new EmbeddedFileProvider(this.GetType().Assembly).GetFileInfo("OpenApi.json"));
                         });

@@ -12,7 +12,7 @@
     }
   ],
   "paths": {
-    "/umbraco/api/v1/upgrade/authorize": {
+    "/umbraco/management/api/v1/upgrade/authorize": {
       "post": {
         "tags": [
           "Upgrade"
@@ -45,7 +45,7 @@
         }
       }
     },
-    "/umbraco/api/v1/upgrade/settings": {
+    "/umbraco/management/api/v1/upgrade/settings": {
       "get": {
         "tags": [
           "Upgrade"
@@ -75,75 +75,14 @@
         }
       }
     },
-    "/umbraco/api/v1/trackedReferences/descendants/{parentId}": {
+    "/umbraco/management/api/v1/tracked-reference/{id}": {
       "get": {
         "tags": [
-          "TrackedReferences"
-        ],
-        "summary": "Gets a page list of the child nodes of the current item used in any kind of relation.",
-        "description": "Used when deleting and unpublishing a single item to check if this item has any descending items that are in any\nkind of relation.\nThis is basically finding the descending items which are children in relations.",
-        "operationId": "DescendantsTrackedReferences_Descendants",
-        "parameters": [
-          {
-            "name": "parentId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "x-position": 1
-          },
-          {
-            "name": "skip",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            },
-            "x-position": 2
-          },
-          {
-            "name": "take",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            },
-            "x-position": 3
-          },
-          {
-            "name": "filterMustBeIsDependency",
-            "in": "query",
-            "schema": {
-              "type": "boolean",
-              "nullable": true
-            },
-            "x-position": 4
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedViewModelOfRelationItemViewModel"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/umbraco/api/v1/trackedReferences/{id}": {
-      "get": {
-        "tags": [
-          "TrackedReferences"
+          "Tracked Reference"
         ],
         "summary": "Gets a page list of tracked references for the current item, so you can see where an item is being used.",
         "description": "Used by info tabs on content, media etc. and for the delete and unpublish of single items.\nThis is basically finding parents of relations.",
-        "operationId": "ForItemTrackedReferences_Get",
+        "operationId": "ByIdTrackedReference_Get",
         "parameters": [
           {
             "name": "id",
@@ -197,14 +136,75 @@
         }
       }
     },
-    "/umbraco/api/v1/trackedReferences/multiple": {
+    "/umbraco/management/api/v1/tracked-reference/descendants/{parentId}": {
       "get": {
         "tags": [
-          "TrackedReferences"
+          "Tracked Reference"
+        ],
+        "summary": "Gets a page list of the child nodes of the current item used in any kind of relation.",
+        "description": "Used when deleting and unpublishing a single item to check if this item has any descending items that are in any\nkind of relation.\nThis is basically finding the descending items which are children in relations.",
+        "operationId": "DescendantsTrackedReference_Descendants",
+        "parameters": [
+          {
+            "name": "parentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "x-position": 2
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "x-position": 3
+          },
+          {
+            "name": "filterMustBeIsDependency",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "nullable": true
+            },
+            "x-position": 4
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedViewModelOfRelationItemViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/tracked-reference/item": {
+      "get": {
+        "tags": [
+          "Tracked Reference"
         ],
         "summary": "Gets a page list of the items used in any kind of relation from selected integer ids.",
         "description": "Used when bulk deleting content/media and bulk unpublishing content (delete and unpublish on List view).\nThis is basically finding children of relations.",
-        "operationId": "MultipleTrackedReferences_GetPagedReferencedItems",
+        "operationId": "ItemsTrackedReference_GetPagedReferencedItems",
         "parameters": [
           {
             "name": "ids",
@@ -263,7 +263,7 @@
         }
       }
     },
-    "/umbraco/api/v1/template/tree/children": {
+    "/umbraco/management/api/v1/tree/template/children": {
       "get": {
         "tags": [
           "Template"
@@ -314,7 +314,7 @@
         }
       }
     },
-    "/umbraco/api/v1/template/tree/items": {
+    "/umbraco/management/api/v1/tree/template/item": {
       "get": {
         "tags": [
           "Template"
@@ -355,7 +355,7 @@
         }
       }
     },
-    "/umbraco/api/v1/template/tree/root": {
+    "/umbraco/management/api/v1/tree/template/root": {
       "get": {
         "tags": [
           "Template"
@@ -397,7 +397,100 @@
         }
       }
     },
-    "/umbraco/api/v1/stylesheet/tree/children": {
+    "/umbraco/management/api/v1/telemetry": {
+      "get": {
+        "tags": [
+          "Telemetry"
+        ],
+        "operationId": "AllTelemetry_GetAll",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedViewModelOfTelemetryLevelViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/telemetry/level": {
+      "get": {
+        "tags": [
+          "Telemetry"
+        ],
+        "operationId": "GetTelemetry_Get",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TelemetryLevelViewModel"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Telemetry"
+        ],
+        "operationId": "SetTelemetry_SetConsentLevel",
+        "requestBody": {
+          "x-name": "telemetryLevelViewModel",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TelemetryLevelViewModel"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/tree/stylesheet/children": {
       "get": {
         "tags": [
           "Stylesheet"
@@ -448,7 +541,7 @@
         }
       }
     },
-    "/umbraco/api/v1/stylesheet/tree/items": {
+    "/umbraco/management/api/v1/tree/stylesheet/item": {
       "get": {
         "tags": [
           "Stylesheet"
@@ -488,7 +581,7 @@
         }
       }
     },
-    "/umbraco/api/v1/stylesheet/tree/root": {
+    "/umbraco/management/api/v1/tree/stylesheet/root": {
       "get": {
         "tags": [
           "Stylesheet"
@@ -530,10 +623,10 @@
         }
       }
     },
-    "/umbraco/api/v1/static-file/tree/children": {
+    "/umbraco/management/api/v1/tree/static-file/children": {
       "get": {
         "tags": [
-          "StaticFile"
+          "Static File"
         ],
         "operationId": "ChildrenStaticFileTree_Children",
         "parameters": [
@@ -581,10 +674,10 @@
         }
       }
     },
-    "/umbraco/api/v1/static-file/tree/items": {
+    "/umbraco/management/api/v1/tree/static-file/item": {
       "get": {
         "tags": [
-          "StaticFile"
+          "Static File"
         ],
         "operationId": "ItemsStaticFileTree_Items",
         "parameters": [
@@ -621,10 +714,10 @@
         }
       }
     },
-    "/umbraco/api/v1/static-file/tree/root": {
+    "/umbraco/management/api/v1/tree/static-file/root": {
       "get": {
         "tags": [
-          "StaticFile"
+          "Static File"
         ],
         "operationId": "RootStaticFileTree_Root",
         "parameters": [
@@ -663,7 +756,7 @@
         }
       }
     },
-    "/umbraco/api/v1/server/status": {
+    "/umbraco/management/api/v1/server/status": {
       "get": {
         "tags": [
           "Server"
@@ -693,7 +786,7 @@
         }
       }
     },
-    "/umbraco/api/v1/server/version": {
+    "/umbraco/management/api/v1/server/version": {
       "get": {
         "tags": [
           "Server"
@@ -723,7 +816,7 @@
         }
       }
     },
-    "/umbraco/api/v1/search/index/{indexName}": {
+    "/umbraco/management/api/v1/search/index/{indexName}": {
       "get": {
         "tags": [
           "Search"
@@ -767,7 +860,7 @@
         }
       }
     },
-    "/umbraco/api/v1/search/index": {
+    "/umbraco/management/api/v1/search/index": {
       "get": {
         "tags": [
           "Search"
@@ -808,7 +901,7 @@
         }
       }
     },
-    "/umbraco/api/v1/search/index/{indexName}/rebuild": {
+    "/umbraco/management/api/v1/search/index/{indexName}/rebuild": {
       "post": {
         "tags": [
           "Search"
@@ -852,7 +945,7 @@
         }
       }
     },
-    "/umbraco/api/v1/search/searcher": {
+    "/umbraco/management/api/v1/search/searcher": {
       "get": {
         "tags": [
           "Search"
@@ -893,7 +986,7 @@
         }
       }
     },
-    "/umbraco/api/v1/search/searcher/{searcherName}/search": {
+    "/umbraco/management/api/v1/search/searcher/{searcherName}/search": {
       "get": {
         "tags": [
           "Search"
@@ -962,7 +1055,7 @@
         }
       }
     },
-    "/umbraco/api/v1/script/tree/children": {
+    "/umbraco/management/api/v1/tree/script/children": {
       "get": {
         "tags": [
           "Script"
@@ -1013,7 +1106,7 @@
         }
       }
     },
-    "/umbraco/api/v1/script/tree/items": {
+    "/umbraco/management/api/v1/tree/script/item": {
       "get": {
         "tags": [
           "Script"
@@ -1053,7 +1146,7 @@
         }
       }
     },
-    "/umbraco/api/v1/script/tree/root": {
+    "/umbraco/management/api/v1/tree/script/root": {
       "get": {
         "tags": [
           "Script"
@@ -1095,7 +1188,7 @@
         }
       }
     },
-    "/umbraco/api/v1/relation/childRelations/{childId}": {
+    "/umbraco/management/api/v1/relation/child-relation/{childId}": {
       "get": {
         "tags": [
           "Relation"
@@ -1155,7 +1248,7 @@
         }
       }
     },
-    "/umbraco/api/v1/relation/{id}": {
+    "/umbraco/management/api/v1/relation/{id}": {
       "get": {
         "tags": [
           "Relation"
@@ -1198,10 +1291,10 @@
         }
       }
     },
-    "/umbraco/api/v1/relation-type/tree/items": {
+    "/umbraco/management/api/v1/tree/relation-type/item": {
       "get": {
         "tags": [
-          "RelationType"
+          "Relation Type"
         ],
         "operationId": "ItemsRelationTypeTree_Items",
         "parameters": [
@@ -1239,10 +1332,10 @@
         }
       }
     },
-    "/umbraco/api/v1/relation-type/tree/root": {
+    "/umbraco/management/api/v1/tree/relation-type/root": {
       "get": {
         "tags": [
-          "RelationType"
+          "Relation Type"
         ],
         "operationId": "RootRelationTypeTree_Root",
         "parameters": [
@@ -1281,10 +1374,10 @@
         }
       }
     },
-    "/umbraco/api/v1/published-cache/collect": {
+    "/umbraco/management/api/v1/published-cache/collect": {
       "post": {
         "tags": [
-          "PublishedCache"
+          "Published Cache"
         ],
         "operationId": "CollectPublishedCache_Collect",
         "responses": {
@@ -1294,10 +1387,10 @@
         }
       }
     },
-    "/umbraco/api/v1/published-cache/rebuild": {
+    "/umbraco/management/api/v1/published-cache/rebuild": {
       "post": {
         "tags": [
-          "PublishedCache"
+          "Published Cache"
         ],
         "operationId": "RebuildPublishedCache_Collect",
         "responses": {
@@ -1307,10 +1400,10 @@
         }
       }
     },
-    "/umbraco/api/v1/published-cache/reload": {
+    "/umbraco/management/api/v1/published-cache/reload": {
       "post": {
         "tags": [
-          "PublishedCache"
+          "Published Cache"
         ],
         "operationId": "ReloadPublishedCache_Reload",
         "responses": {
@@ -1320,10 +1413,10 @@
         }
       }
     },
-    "/umbraco/api/v1/published-cache/status": {
+    "/umbraco/management/api/v1/published-cache/status": {
       "get": {
         "tags": [
-          "PublishedCache"
+          "Published Cache"
         ],
         "operationId": "StatusPublishedCache_Status",
         "responses": {
@@ -1340,7 +1433,7 @@
         }
       }
     },
-    "/umbraco/api/v1/profiling/status": {
+    "/umbraco/management/api/v1/profiling/status": {
       "get": {
         "tags": [
           "Profiling"
@@ -1360,10 +1453,10 @@
         }
       }
     },
-    "/umbraco/api/v1/partial-view/tree/children": {
+    "/umbraco/management/api/v1/tree/partial-view/children": {
       "get": {
         "tags": [
-          "PartialView"
+          "Partial View"
         ],
         "operationId": "ChildrenPartialViewTree_Children",
         "parameters": [
@@ -1411,10 +1504,10 @@
         }
       }
     },
-    "/umbraco/api/v1/partial-view/tree/items": {
+    "/umbraco/management/api/v1/tree/partial-view/item": {
       "get": {
         "tags": [
-          "PartialView"
+          "Partial View"
         ],
         "operationId": "ItemsPartialViewTree_Items",
         "parameters": [
@@ -1451,10 +1544,10 @@
         }
       }
     },
-    "/umbraco/api/v1/partial-view/tree/root": {
+    "/umbraco/management/api/v1/tree/partial-view/root": {
       "get": {
         "tags": [
-          "PartialView"
+          "Partial View"
         ],
         "operationId": "RootPartialViewTree_Root",
         "parameters": [
@@ -1493,10 +1586,10 @@
         }
       }
     },
-    "/umbraco/api/v1/modelsBuilder/build": {
+    "/umbraco/management/api/v1/models-builder/build": {
       "post": {
         "tags": [
-          "ModelsBuilder"
+          "Models Builder"
         ],
         "operationId": "BuildModelsBuilder_BuildModels",
         "responses": {
@@ -1524,10 +1617,10 @@
         }
       }
     },
-    "/umbraco/api/v1/modelsBuilder": {
+    "/umbraco/management/api/v1/models-builder/dashboard": {
       "get": {
         "tags": [
-          "ModelsBuilder"
+          "Models Builder"
         ],
         "operationId": "GetModelsBuilder_GetDashboard",
         "responses": {
@@ -1545,10 +1638,10 @@
         }
       }
     },
-    "/umbraco/api/v1/modelsBuilder/status": {
+    "/umbraco/management/api/v1/models-builder/status": {
       "get": {
         "tags": [
-          "ModelsBuilder"
+          "Models Builder"
         ],
         "operationId": "StatusModelsBuilder_GetModelsOutOfDateStatus",
         "responses": {
@@ -1565,10 +1658,10 @@
         }
       }
     },
-    "/umbraco/api/v1/member-type/tree/items": {
+    "/umbraco/management/api/v1/tree/member-type/item": {
       "get": {
         "tags": [
-          "MemberType"
+          "Member Type"
         ],
         "operationId": "ItemsMemberTypeTree_Items",
         "parameters": [
@@ -1606,10 +1699,10 @@
         }
       }
     },
-    "/umbraco/api/v1/member-type/tree/root": {
+    "/umbraco/management/api/v1/tree/member-type/root": {
       "get": {
         "tags": [
-          "MemberType"
+          "Member Type"
         ],
         "operationId": "RootMemberTypeTree_Root",
         "parameters": [
@@ -1648,10 +1741,10 @@
         }
       }
     },
-    "/umbraco/api/v1/member-group/tree/items": {
+    "/umbraco/management/api/v1/tree/member-group/item": {
       "get": {
         "tags": [
-          "MemberGroup"
+          "Member Group"
         ],
         "operationId": "ItemsMemberGroupTree_Items",
         "parameters": [
@@ -1689,10 +1782,10 @@
         }
       }
     },
-    "/umbraco/api/v1/member-group/tree/root": {
+    "/umbraco/management/api/v1/tree/member-group/root": {
       "get": {
         "tags": [
-          "MemberGroup"
+          "Member Group"
         ],
         "operationId": "RootMemberGroupTree_Root",
         "parameters": [
@@ -1731,7 +1824,7 @@
         }
       }
     },
-    "/umbraco/api/v1/media/tree/children": {
+    "/umbraco/management/api/v1/tree/media/children": {
       "get": {
         "tags": [
           "Media"
@@ -1792,7 +1885,7 @@
         }
       }
     },
-    "/umbraco/api/v1/media/tree/items": {
+    "/umbraco/management/api/v1/tree/media/item": {
       "get": {
         "tags": [
           "Media"
@@ -1843,7 +1936,7 @@
         }
       }
     },
-    "/umbraco/api/v1/media/tree/root": {
+    "/umbraco/management/api/v1/tree/media/root": {
       "get": {
         "tags": [
           "Media"
@@ -1895,7 +1988,7 @@
         }
       }
     },
-    "/umbraco/api/v1/media/recycle-bin/children": {
+    "/umbraco/management/api/v1/recycle-bin/media/children": {
       "get": {
         "tags": [
           "Media"
@@ -1956,7 +2049,7 @@
         }
       }
     },
-    "/umbraco/api/v1/media/recycle-bin/root": {
+    "/umbraco/management/api/v1/recycle-bin/media/root": {
       "get": {
         "tags": [
           "Media"
@@ -2008,10 +2101,10 @@
         }
       }
     },
-    "/umbraco/api/v1/media-type/tree/children": {
+    "/umbraco/management/api/v1/tree/media-type/children": {
       "get": {
         "tags": [
-          "MediaType"
+          "Media Type"
         ],
         "operationId": "ChildrenMediaTypeTree_Children",
         "parameters": [
@@ -2068,10 +2161,10 @@
         }
       }
     },
-    "/umbraco/api/v1/media-type/tree/items": {
+    "/umbraco/management/api/v1/tree/media-type/item": {
       "get": {
         "tags": [
-          "MediaType"
+          "Media Type"
         ],
         "operationId": "ItemsMediaTypeTree_Items",
         "parameters": [
@@ -2109,10 +2202,10 @@
         }
       }
     },
-    "/umbraco/api/v1/media-type/tree/root": {
+    "/umbraco/management/api/v1/tree/media-type/root": {
       "get": {
         "tags": [
-          "MediaType"
+          "Media Type"
         ],
         "operationId": "RootMediaTypeTree_Root",
         "parameters": [
@@ -2160,7 +2253,7 @@
         }
       }
     },
-    "/umbraco/api/v1/language": {
+    "/umbraco/management/api/v1/language": {
       "get": {
         "tags": [
           "Language"
@@ -2201,7 +2294,7 @@
         }
       }
     },
-    "/umbraco/api/v1/language/{id}": {
+    "/umbraco/management/api/v1/language/{id}": {
       "get": {
         "tags": [
           "Language"
@@ -2288,7 +2381,7 @@
         }
       }
     },
-    "/umbraco/api/v1/language/create": {
+    "/umbraco/management/api/v1/language/create": {
       "post": {
         "tags": [
           "Language"
@@ -2324,7 +2417,7 @@
         }
       }
     },
-    "/umbraco/api/v1/language/update": {
+    "/umbraco/management/api/v1/language/update": {
       "put": {
         "tags": [
           "Language"
@@ -2371,7 +2464,7 @@
         }
       }
     },
-    "/umbraco/api/v1/install/settings": {
+    "/umbraco/management/api/v1/install/settings": {
       "get": {
         "tags": [
           "Install"
@@ -2411,7 +2504,7 @@
         }
       }
     },
-    "/umbraco/api/v1/install/setup": {
+    "/umbraco/management/api/v1/install/setup": {
       "post": {
         "tags": [
           "Install"
@@ -2456,7 +2549,7 @@
         }
       }
     },
-    "/umbraco/api/v1/install/validateDatabase": {
+    "/umbraco/management/api/v1/install/validate-database": {
       "post": {
         "tags": [
           "Install"
@@ -2491,7 +2584,7 @@
         }
       }
     },
-    "/umbraco/api/v1/help": {
+    "/umbraco/management/api/v1/help": {
       "get": {
         "tags": [
           "Help"
@@ -2569,7 +2662,7 @@
         }
       }
     },
-    "/umbraco/api/v1/document/tree/children": {
+    "/umbraco/management/api/v1/tree/document/children": {
       "get": {
         "tags": [
           "Document"
@@ -2639,7 +2732,7 @@
         }
       }
     },
-    "/umbraco/api/v1/document/tree/items": {
+    "/umbraco/management/api/v1/tree/document/item": {
       "get": {
         "tags": [
           "Document"
@@ -2699,7 +2792,7 @@
         }
       }
     },
-    "/umbraco/api/v1/document/tree/root": {
+    "/umbraco/management/api/v1/tree/document/root": {
       "get": {
         "tags": [
           "Document"
@@ -2760,7 +2853,7 @@
         }
       }
     },
-    "/umbraco/api/v1/document/recycle-bin/children": {
+    "/umbraco/management/api/v1/recycle-bin/document/children": {
       "get": {
         "tags": [
           "Document"
@@ -2821,7 +2914,7 @@
         }
       }
     },
-    "/umbraco/api/v1/document/recycle-bin/root": {
+    "/umbraco/management/api/v1/recycle-bin/document/root": {
       "get": {
         "tags": [
           "Document"
@@ -2873,10 +2966,10 @@
         }
       }
     },
-    "/umbraco/api/v1/document-type/tree/children": {
+    "/umbraco/management/api/v1/tree/document-type/children": {
       "get": {
         "tags": [
-          "DocumentType"
+          "Document Type"
         ],
         "operationId": "ChildrenDocumentTypeTree_Children",
         "parameters": [
@@ -2933,10 +3026,10 @@
         }
       }
     },
-    "/umbraco/api/v1/document-type/tree/items": {
+    "/umbraco/management/api/v1/tree/document-type/item": {
       "get": {
         "tags": [
-          "DocumentType"
+          "Document Type"
         ],
         "operationId": "ItemsDocumentTypeTree_Items",
         "parameters": [
@@ -2974,10 +3067,10 @@
         }
       }
     },
-    "/umbraco/api/v1/document-type/tree/root": {
+    "/umbraco/management/api/v1/tree/document-type/root": {
       "get": {
         "tags": [
-          "DocumentType"
+          "Document Type"
         ],
         "operationId": "RootDocumentTypeTree_Root",
         "parameters": [
@@ -3025,10 +3118,10 @@
         }
       }
     },
-    "/umbraco/api/v1/document-blueprint/tree/items": {
+    "/umbraco/management/api/v1/tree/document-blueprint/item": {
       "get": {
         "tags": [
-          "DocumentBlueprint"
+          "Document Blueprint"
         ],
         "operationId": "ItemsDocumentBlueprintTree_Items",
         "parameters": [
@@ -3066,10 +3159,10 @@
         }
       }
     },
-    "/umbraco/api/v1/document-blueprint/tree/root": {
+    "/umbraco/management/api/v1/tree/document-blueprint/root": {
       "get": {
         "tags": [
-          "DocumentBlueprint"
+          "Document Blueprint"
         ],
         "operationId": "RootDocumentBlueprintTree_Root",
         "parameters": [
@@ -3108,7 +3201,7 @@
         }
       }
     },
-    "/umbraco/api/v1/dictionary": {
+    "/umbraco/management/api/v1/dictionary": {
       "get": {
         "tags": [
           "Dictionary"
@@ -3149,7 +3242,7 @@
         }
       }
     },
-    "/umbraco/api/v1/dictionary/{key}": {
+    "/umbraco/management/api/v1/dictionary/{key}": {
       "get": {
         "tags": [
           "Dictionary"
@@ -3230,7 +3323,7 @@
         }
       }
     },
-    "/umbraco/api/v1/dictionary/create": {
+    "/umbraco/management/api/v1/dictionary/create": {
       "post": {
         "tags": [
           "Dictionary"
@@ -3275,7 +3368,7 @@
         }
       }
     },
-    "/umbraco/api/v1/dictionary/export/{key}": {
+    "/umbraco/management/api/v1/dictionary/export/{key}": {
       "get": {
         "tags": [
           "Dictionary"
@@ -3328,7 +3421,7 @@
         }
       }
     },
-    "/umbraco/api/v1/dictionary/import": {
+    "/umbraco/management/api/v1/dictionary/import": {
       "post": {
         "tags": [
           "Dictionary"
@@ -3381,7 +3474,7 @@
         }
       }
     },
-    "/umbraco/api/v1/dictionary/{id}": {
+    "/umbraco/management/api/v1/dictionary/{id}": {
       "patch": {
         "tags": [
           "Dictionary"
@@ -3440,7 +3533,7 @@
         }
       }
     },
-    "/umbraco/api/v1/dictionary/upload": {
+    "/umbraco/management/api/v1/dictionary/upload": {
       "post": {
         "tags": [
           "Dictionary"
@@ -3486,12 +3579,12 @@
         }
       }
     },
-    "/umbraco/api/v1/dictionary-item/tree/children": {
+    "/umbraco/management/api/v1/tree/dictionary/children": {
       "get": {
         "tags": [
-          "DictionaryItem"
+          "Dictionary"
         ],
-        "operationId": "ChildrenDictionaryItemTree_Children",
+        "operationId": "ChildrenDictionaryTree_Children",
         "parameters": [
           {
             "name": "parentKey",
@@ -3537,12 +3630,12 @@
         }
       }
     },
-    "/umbraco/api/v1/dictionary-item/tree/items": {
+    "/umbraco/management/api/v1/tree/dictionary/item": {
       "get": {
         "tags": [
-          "DictionaryItem"
+          "Dictionary"
         ],
-        "operationId": "ItemsDictionaryItemTree_Items",
+        "operationId": "ItemsDictionaryTree_Items",
         "parameters": [
           {
             "name": "key",
@@ -3578,12 +3671,12 @@
         }
       }
     },
-    "/umbraco/api/v1/dictionary-item/tree/root": {
+    "/umbraco/management/api/v1/tree/dictionary/root": {
       "get": {
         "tags": [
-          "DictionaryItem"
+          "Dictionary"
         ],
-        "operationId": "RootDictionaryItemTree_Root",
+        "operationId": "RootDictionaryTree_Root",
         "parameters": [
           {
             "name": "skip",
@@ -3620,10 +3713,10 @@
         }
       }
     },
-    "/umbraco/api/v1/data-type/tree/children": {
+    "/umbraco/management/api/v1/tree/data-type/children": {
       "get": {
         "tags": [
-          "DataType"
+          "Data Type"
         ],
         "operationId": "ChildrenDataTypeTree_Children",
         "parameters": [
@@ -3680,10 +3773,10 @@
         }
       }
     },
-    "/umbraco/api/v1/data-type/tree/items": {
+    "/umbraco/management/api/v1/tree/data-type/item": {
       "get": {
         "tags": [
-          "DataType"
+          "Data Type"
         ],
         "operationId": "ItemsDataTypeTree_Items",
         "parameters": [
@@ -3721,10 +3814,10 @@
         }
       }
     },
-    "/umbraco/api/v1/data-type/tree/root": {
+    "/umbraco/management/api/v1/tree/data-type/root": {
       "get": {
         "tags": [
-          "DataType"
+          "Data Type"
         ],
         "operationId": "RootDataTypeTree_Root",
         "parameters": [
@@ -3772,7 +3865,7 @@
         }
       }
     },
-    "/umbraco/api/v1/culture": {
+    "/umbraco/management/api/v1/culture": {
       "get": {
         "tags": [
           "Culture"
@@ -3809,99 +3902,6 @@
                 }
               }
             }
-          }
-        }
-      }
-    },
-    "/umbraco/api/v1/analytics/all": {
-      "get": {
-        "tags": [
-          "Analytics"
-        ],
-        "operationId": "AllAnalytics_GetAll",
-        "parameters": [
-          {
-            "name": "skip",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "x-position": 1
-          },
-          {
-            "name": "take",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "x-position": 2
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedViewModelOfTelemetryLevel"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/umbraco/api/v1/analytics": {
-      "get": {
-        "tags": [
-          "Analytics"
-        ],
-        "operationId": "GetAnalytics_Get",
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AnalyticsLevelViewModel"
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "Analytics"
-        ],
-        "operationId": "SetAnalytics_SetConsentLevel",
-        "requestBody": {
-          "x-name": "analyticsLevelViewModel",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AnalyticsLevelViewModel"
-              }
-            }
-          },
-          "required": true,
-          "x-position": 1
-        },
-        "responses": {
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": ""
           }
         }
       }
@@ -4073,6 +4073,45 @@
             "type": "boolean"
           }
         }
+      },
+      "PagedViewModelOfTelemetryLevelViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TelemetryLevelViewModel"
+            }
+          }
+        }
+      },
+      "TelemetryLevelViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "telemetryLevel": {
+            "$ref": "#/components/schemas/TelemetryLevel"
+          }
+        }
+      },
+      "TelemetryLevel": {
+        "type": "string",
+        "description": "",
+        "x-enumNames": [
+          "Minimal",
+          "Basic",
+          "Detailed"
+        ],
+        "enum": [
+          "Minimal",
+          "Basic",
+          "Detailed"
+        ]
       },
       "PagedViewModelOfFileSystemTreeItemViewModel": {
         "type": "object",
@@ -4582,20 +4621,6 @@
             "type": "string"
           }
         }
-      },
-      "TelemetryLevel": {
-        "type": "string",
-        "description": "",
-        "x-enumNames": [
-          "Minimal",
-          "Basic",
-          "Detailed"
-        ],
-        "enum": [
-          "Minimal",
-          "Basic",
-          "Detailed"
-        ]
       },
       "DatabaseSettingsViewModel": {
         "type": "object",
@@ -5220,72 +5245,27 @@
             "type": "string"
           }
         }
-      },
-      "PagedViewModelOfTelemetryLevel": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "total": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/TelemetryLevel2"
-            }
-          }
-        }
-      },
-      "TelemetryLevel2": {
-        "type": "integer",
-        "description": "",
-        "x-enumNames": [
-          "Minimal",
-          "Basic",
-          "Detailed"
-        ],
-        "enum": [
-          0,
-          1,
-          2
-        ]
-      },
-      "AnalyticsLevelViewModel": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "analyticsLevel": {
-            "$ref": "#/components/schemas/TelemetryLevel"
-          }
-        }
       }
     }
   },
   "tags": [
     {
-      "name": "Analytics"
-    },
-    {
       "name": "Culture"
     },
     {
-      "name": "DataType"
+      "name": "Data Type"
     },
     {
       "name": "Dictionary"
     },
     {
-      "name": "DictionaryItem"
-    },
-    {
       "name": "Document"
     },
     {
-      "name": "DocumentBlueprint"
+      "name": "Document Blueprint"
     },
     {
-      "name": "DocumentType"
+      "name": "Document Type"
     },
     {
       "name": "Help"
@@ -5300,31 +5280,31 @@
       "name": "Media"
     },
     {
-      "name": "MediaType"
+      "name": "Media Type"
     },
     {
-      "name": "MemberGroup"
+      "name": "Member Group"
     },
     {
-      "name": "MemberType"
+      "name": "Member Type"
     },
     {
-      "name": "ModelsBuilder"
+      "name": "Models Builder"
     },
     {
-      "name": "PartialView"
+      "name": "Partial View"
     },
     {
       "name": "Profiling"
     },
     {
-      "name": "PublishedCache"
+      "name": "Published Cache"
     },
     {
       "name": "Relation"
     },
     {
-      "name": "RelationType"
+      "name": "Relation Type"
     },
     {
       "name": "Script"
@@ -5336,16 +5316,19 @@
       "name": "Server"
     },
     {
-      "name": "StaticFile"
+      "name": "Static File"
     },
     {
       "name": "Stylesheet"
     },
     {
+      "name": "Telemetry"
+    },
+    {
       "name": "Template"
     },
     {
-      "name": "TrackedReferences"
+      "name": "Tracked Reference"
     },
     {
       "name": "Upgrade"

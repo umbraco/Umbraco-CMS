@@ -6,8 +6,8 @@ namespace Umbraco.Cms.ManagementApi.Controllers.PublishedCache;
 
 [ApiVersion("1.0")]
 [ApiController]
-[BackOfficeRoute("api/v{version:apiVersion}/published-cache")]
-[OpenApiTag("PublishedCache")]
+[VersionedApiBackOfficeRoute("published-cache")]
+[OpenApiTag("Published Cache")]
 public class PublishedCacheControllerBase : ManagementApiControllerBase
 {
 }
