@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Core.Configuration.Models;
 ///     Matches MailKit.Security.SecureSocketOptions and defined locally to avoid having to take
 ///     a dependency on this external library into Umbraco.Core.
 /// </summary>
-/// <seealso cref="http://www.mimekit.net/docs/html/T_MailKit_Security_SecureSocketOptions.htm" />
+/// <seealso href="http://www.mimekit.net/docs/html/T_MailKit_Security_SecureSocketOptions.htm" />
 public enum SecureSocketOptions
 {
     /// <summary>
