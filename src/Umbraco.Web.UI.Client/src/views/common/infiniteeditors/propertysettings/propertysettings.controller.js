@@ -199,6 +199,7 @@
 
         function submitOnEnter(event) {
             if(event && event.keyCode === 13) {
+                event.preventDefault();
                 submit();
             }
         }
