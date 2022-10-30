@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
@@ -25,16 +26,19 @@ using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Validation;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Web.BackOffice.Authorization;
 using Umbraco.Cms.Web.BackOffice.Filters;
 using Umbraco.Cms.Web.BackOffice.ModelBinders;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers;
@@ -49,7 +53,6 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers;
 [ParameterSwapControllerActionSelector(nameof(GetChildren), "id", typeof(int), typeof(Guid), typeof(Udi))]
 public class MediaController : ContentControllerBase
 {
-    private static readonly Semaphore _postAddFileSemaphore = new(1, 1);
     private readonly AppCaches _appCaches;
     private readonly IAuthorizationService _authorizationService;
     private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
@@ -66,7 +69,9 @@ public class MediaController : ContentControllerBase
     private readonly IShortStringHelper _shortStringHelper;
     private readonly ISqlContext _sqlContext;
     private readonly IUmbracoMapper _umbracoMapper;
+    private readonly ICoreScopeProvider _coreScopeProvider;
 
+    [Obsolete("Please use constructor that takes an ICoreScopeProvider")]
     public MediaController(
         ICultureDictionary cultureDictionary,
         ILoggerFactory loggerFactory,
@@ -91,6 +96,40 @@ public class MediaController : ContentControllerBase
         IJsonSerializer serializer,
         IAuthorizationService authorizationService,
         AppCaches appCaches)
+        : this(cultureDictionary, loggerFactory, shortStringHelper, eventMessages, localizedTextService,
+            contentSettings, mediaTypeService, mediaService, entityService, backofficeSecurityAccessor, umbracoMapper,
+            dataTypeService, sqlContext, contentTypeBaseServiceProvider, relationService, propertyEditors,
+            mediaFileManager, mediaUrlGenerators, hostingEnvironment, imageUrlGenerator, serializer,
+            authorizationService, appCaches, StaticServiceProvider.Instance.GetRequiredService<ICoreScopeProvider>())
+    {
+    }
+
+    [ActivatorUtilitiesConstructor]
+    public MediaController(
+        ICultureDictionary cultureDictionary,
+        ILoggerFactory loggerFactory,
+        IShortStringHelper shortStringHelper,
+        IEventMessagesFactory eventMessages,
+        ILocalizedTextService localizedTextService,
+        IOptionsSnapshot<ContentSettings> contentSettings,
+        IMediaTypeService mediaTypeService,
+        IMediaService mediaService,
+        IEntityService entityService,
+        IBackOfficeSecurityAccessor backofficeSecurityAccessor,
+        IUmbracoMapper umbracoMapper,
+        IDataTypeService dataTypeService,
+        ISqlContext sqlContext,
+        IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
+        IRelationService relationService,
+        PropertyEditorCollection propertyEditors,
+        MediaFileManager mediaFileManager,
+        MediaUrlGeneratorCollection mediaUrlGenerators,
+        IHostingEnvironment hostingEnvironment,
+        IImageUrlGenerator imageUrlGenerator,
+        IJsonSerializer serializer,
+        IAuthorizationService authorizationService,
+        AppCaches appCaches,
+        ICoreScopeProvider coreScopeProvider)
         : base(cultureDictionary, loggerFactory, shortStringHelper, eventMessages, localizedTextService, serializer)
     {
         _shortStringHelper = shortStringHelper;
@@ -113,6 +152,7 @@ public class MediaController : ContentControllerBase
         _imageUrlGenerator = imageUrlGenerator;
         _authorizationService = authorizationService;
         _appCaches = appCaches;
+        _coreScopeProvider = coreScopeProvider;
     }
 
     /// <summary>
@@ -575,7 +615,7 @@ public class MediaController : ContentControllerBase
     public async Task<IActionResult> PostAddFile([FromForm] string path, [FromForm] string currentFolder,
         [FromForm] string contentTypeAlias, List<IFormFile> file)
     {
-        await _postAddFileSemaphore.WaitOneAsync();
+        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         var root = _hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempFileUploads);
         //ensure it exists
         Directory.CreateDirectory(root);
@@ -583,7 +623,7 @@ public class MediaController : ContentControllerBase
         //must have a file
         if (file.Count == 0)
         {
-            _postAddFileSemaphore.Release();
+            scope.Complete();
             return NotFound();
         }
 
@@ -591,14 +631,14 @@ public class MediaController : ContentControllerBase
         ActionResult<int?>? parentIdResult = await GetParentIdAsIntAsync(currentFolder, true);
         if (!(parentIdResult?.Result is null))
         {
-            _postAddFileSemaphore.Release();
+            scope.Complete();
             return parentIdResult.Result;
         }
 
         var parentId = parentIdResult?.Value;
         if (!parentId.HasValue)
         {
-            _postAddFileSemaphore.Release();
+            scope.Complete();
             return NotFound("The passed id doesn't exist");
         }
 
@@ -610,7 +650,7 @@ public class MediaController : ContentControllerBase
             if (!IsFolderCreationAllowedHere(parentId.Value))
             {
                 AddCancelMessage(tempFiles, _localizedTextService.Localize("speechBubbles", "folderUploadNotAllowed"));
-                _postAddFileSemaphore.Release();
+                scope.Complete();
                 return Ok(tempFiles);
             }
 
@@ -644,7 +684,7 @@ public class MediaController : ContentControllerBase
                     //if the media root is null, something went wrong, we'll abort
                     if (mediaRoot == null)
                     {
-                        _postAddFileSemaphore.Release();
+                        scope.Complete();
                         return Problem(
                             "The folder: " + folderName + " could not be used for storing images, its ID: " + parentId +
                             " returned null");
@@ -815,12 +855,12 @@ public class MediaController : ContentControllerBase
             KeyValuePair<string, StringValues> origin = HttpContext.Request.Query.First(x => x.Key == "origin");
             if (origin.Value == "blueimp")
             {
-                _postAddFileSemaphore.Release();
+                scope.Complete();
                 return new JsonResult(tempFiles); //Don't output the angular xsrf stuff, blue imp doesn't like that
             }
         }
 
-        _postAddFileSemaphore.Release();
+        scope.Complete();
         return Ok(tempFiles);
     }
 
