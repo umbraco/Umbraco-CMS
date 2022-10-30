@@ -1,0 +1,25 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Preview.SA11YAccessiblityChecker>
+
+@if (Model != null)
+{
+    var sallyJs = "/sa11y/dist/js/sa11y.esm.js";
+    var langJs = "/sa11y/dist/js/lang/" + Model.LanguageJS + ".js";
+    var customChecks = "/sa11y/dist/js/sa11y-custom-checks.esm.js";
+    <link rel="stylesheet" href="~/sa11y/dist/css/sa11y.min.css" />
+
+    <script type="module">
+        import { Sa11y, Lang } from '@sallyJs';
+        import Sa11yLang from '@langJs';
+
+        // Optional: Custom checks
+        import CustomChecks from '@customChecks';
+
+        // Set translations
+        Lang.addI18n(Sa11yLang.strings);
+
+        // Instantiate
+        const sa11y = new Sa11y({
+            customChecks: new CustomChecks, // Optional
+        });
+    </script>
+}

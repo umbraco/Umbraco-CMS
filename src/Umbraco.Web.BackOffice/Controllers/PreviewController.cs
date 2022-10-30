@@ -129,6 +129,7 @@ public class PreviewController : Controller
     [Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]
     public ActionResult Frame(int id, string culture)
     {
+        // Accessiblity checker does not work in canvas designer mode, this is due to the fact that the canvas designer is a page in a page.
         TempData.Add("CanvasDesigner", "true");
         EnterPreview(id);
 
