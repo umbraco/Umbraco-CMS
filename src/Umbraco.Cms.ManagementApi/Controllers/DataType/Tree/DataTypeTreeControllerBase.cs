@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using NSwag.Annotations;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -13,7 +12,7 @@ namespace Umbraco.Cms.ManagementApi.Controllers.DataType.Tree;
 [ApiVersion("1.0")]
 [ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/{Constants.UdiEntityType.DataType}")]
-[OpenApiTag("Data Type")]
+[ApiExplorerSettings(GroupName = "Data Type")]
 public class DataTypeTreeControllerBase : FolderTreeControllerBase<FolderTreeItemViewModel>
 {
     private readonly IDataTypeService _dataTypeService;

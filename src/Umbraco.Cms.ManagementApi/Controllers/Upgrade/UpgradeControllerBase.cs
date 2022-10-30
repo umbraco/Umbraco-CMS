@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using NSwag.Annotations;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.ManagementApi.Filters;
 using Umbraco.New.Cms.Web.Common.Routing;
@@ -11,7 +10,7 @@ namespace Umbraco.Cms.ManagementApi.Controllers.Upgrade;
 [ApiController]
 [RequireRuntimeLevel(RuntimeLevel.Upgrade)]
 [VersionedApiBackOfficeRoute("upgrade")]
-[OpenApiTag("Upgrade")]
+[ApiExplorerSettings(GroupName = "Upgrade")]
 public abstract class UpgradeControllerBase : ManagementApiControllerBase
 {
 
