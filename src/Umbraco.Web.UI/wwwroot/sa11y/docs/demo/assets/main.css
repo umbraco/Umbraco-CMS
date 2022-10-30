@@ -1,0 +1,67 @@
+.background-image {
+    padding: 20px;
+    background: #000 url(https://www.transparenttextures.com/patterns/subtle-grey.png) repeat
+}
+
+h2:not(.example h2, .accordion-header),
+h3:not(.example h3, .accordion-header) {
+    margin-top: 40px;
+}
+
+.navbar {
+    padding-top: 60px;
+    padding-bottom: 40px;
+}
+
+main ul li {
+    margin-bottom: 10px;
+}
+
+code {
+    color: #a50053;
+}
+main a {
+    color: rgb(0, 0, 175);
+}
+.responsive-iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+}
+
+#sa11y-dev-mode {
+    width: 180px;
+    margin: 0 auto;
+    border-bottom-left-radius: 0.25em;
+    border-bottom-right-radius: 0.25em;
+}
+
+.example {
+    position: relative;
+    padding: 30px;
+    border: 2px dashed rgb(158, 158, 158);
+    background: rgb(236, 236, 236);
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+blockquote {
+    font-size: 1.25rem;
+    border-left: 0.5rem solid rgba(0, 123, 255, .54);
+    color: #3d3d3d;
+    background-color: #e2efff;
+    line-height: 1.6;
+    margin: 0.8rem auto;
+    position: relative;
+    padding: 20px;
+    width: 100%;
+}
+
+footer {
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+}

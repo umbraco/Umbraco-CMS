@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<!-- saved from url=(0043)custom.html -->
+<html lang="fr">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Demo page for Sa11y">
+    <meta name="author" content="Adam Chaboryk">
+    <title>Autre - Sa11y</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+    <meta name="theme-color" content="#7952b3">
+    <link rel="shortcut icon" type="image/jpg" href="../assets/favicon.ico"/>
+    <link href="../assets/main.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../assets/css/sa11y.min.css"/>
+</head>
+<body>
+  <header>
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
+      <div class="container">
+        <span class="navbar-brand mb-0 h1">Démo Sa11y<span id="v" class="badge bg-info text-dark">2.2.0</span></span>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+          <ul class="navbar-nav ms-auto mb-2 mb-md-0">
+            <li class="nav-item">
+              <a class="nav-link" href="index.html">Tout</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="toggleable.html">Basculable</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="custom.html">Chèques personnalisés</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="other.html">Autre</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="errors.html">les erreurs</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="warnings.html">Avertissements</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="pass.html">Bon</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <div class="container">
+      <div class="p-5 mb-3 rounded text-center">
+        <h1>Autre</h1>
+      </div>
+    </div>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-2">
+          <div id="list-example" class="list-group sticky-top">
+            <strong class="mt-1 mb-2">Sur cette page:</strong>
+            <a class="list-group-item list-group-item-action" href="#list-item-0">Langue de la page</a>
+            <a class="list-group-item list-group-item-action" href="#list-item-1">Audio et vidéo</a>
+            <a class="list-group-item list-group-item-action" href="#list-item-2">Widget Twitter</a>
+            <a class="list-group-item list-group-item-action" href="#list-item-3">cadres</a>
+            <a class="list-group-item list-group-item-action" href="#list-item-4">Détection des changements d'URL</a>
+          </div>
+        </div>
+
+        <div class="col-md-10">
+          <div data-spy="scroll" data-target="#list-example" data-offset="0" class="scrollspy-example">
+
+            <h2 id="list-item-0">Langue de la page</h2>
+            <p>Vérifie la présence de l' <kbd>lang</kbd>attribut sur la <kbd>&lt;html&gt;</kbd>balise. Si l'attribut est manquant, une bannière d'erreur sera ajoutée en haut de la page.</p>
+
+            <hr class="mt-5">
+
+            <h2 id="list-item-1">Audio et vidéo</h2>
+            <p>Cette condition est destinée à agir comme un rappel amical. Les vidéos recevront un avertissement pour s'assurer que les sous-titres sont disponibles. L'audio recevra un avertissement pour s'assurer que le podcast/audio a une transcription. Cette condition ne teste <strong>pas</strong> si les sous-titres ou les transcriptions sont présents. Personnalisez cette condition en ajoutant vos propres sources de diffusion multimédia.</p>
+
+            <h3>Vidéos</h3>
+            <div class="row">
+              <div class="col-md-4">
+                <div class="example h-100">
+                  <h4>iFrame avec source vidéo</h4>
+                  <div class="ratio ratio-16x9">
+
+                    <iframe class="embed-responsive" width="560" height="315"
+                    src="https://www.youtube.com/embed/HgzGwKwLmgM" title="Queen - Don't stop me now." frameborder="0"
+                    allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen></iframe>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="example h-100">
+                  <h4>La vidéo n'a pas d' <code>&lt;track&gt;</code>élément</h4>
+                  <div class="ratio ratio-16x9">
+
+				<video width="320" height="240" controls="" class="">
+                      <source src="https://www.w3schools.com/html/movie.mp4" type="video/mp4">
+                      <source src="https://www.w3schools.com/html/movie.ogg" type="video/ogg">
+                      Votre navigateur ne prend pas en charge la balise vidéo.
+                    </video>
+                  </div>
+                  <p class="text-center"><small>Source vidéo&nbsp;: W3Schools</small></p>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="example h-100">
+                  <h4>La vidéo a un <code>&lt;track&gt;</code>élément</h4>
+                  <div class="ratio ratio-16x9">
+                    <video width="300" controls="" src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/friday.mp4">
+                      <track default="" kind="captions" srclang="en" src="../assets/friday.vtt">
+                      Désolé, votre navigateur ne prend pas en charge les vidéos intégrées.
+                    </video>
+                  </div>
+                  <p class="text-center"><small>Source vidéo : MDN WebDocs</small></p>
+                </div>
+              </div>
+            </div>
+
+            <h3>l'audio</h3>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="example h-100">
+                  <h4>iFrame avec source audio</h4>
+                  <div class="ratio ratio-16x9">
+
+                    <iframe title="SoundCloud widget" width="100%" height="300" scrolling="no" frameborder="no"
+                    allow="autoplay"
+                    src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/158888399&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"></iframe>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="example h-100">
+                  <h4><code>&lt;audio&gt;</code>la source</h4>
+
+				<audio controls="" class="">
+                    <source src="https://www.w3schools.com/html/horse.ogg" type="audio/ogg">
+                    <source src="https://www.w3schools.com/html/horse.mp3" type="audio/mpeg">
+                    Votre navigateur ne supporte pas l'élément audio.
+                  </audio>
+                  <p class="text-center"><small>Video Source: W3Schools</small></p>
+                </div>
+              </div>
+            </div>
+
+            <hr class="mt-5">
+
+            <h2 id="list-item-2">Widget Twitter</h2>
+            <p>Cette condition vise à encourager les utilisateurs à optimiser le widget Twitter par défaut pour l'accessibilité et la convivialité. Cette condition peut être utile dans les grandes organisations (comme une université ou un collège) où il existe de nombreux canaux de médias sociaux. Cette condition n'est pas basée sur WCAG 2.0, mais est fortement recommandée.</p>
+            <div class="row">
+              <div class="col-md-4">
+                <div class="example">
+                  <h3 class="h5">Widget Twitter par défaut</h3>
+                  <a class="twitter-timeline" title="Tweets by TwitterDev" data-height="300" data-width="330"
+                  href="https://twitter.com/TwitterDev?ref_src=twsrc%5Etfw"><span class="sr-only">Tweets by
+                    TwitterDev</span></a>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="example">
+                  <h3 class="h5">Widget Twitter optimisé</h3>
+                  <a data-tweet-limit="1" title="Tweets by TwitterDev" class="twitter-timeline"
+                    data-chrome="nofooter noheader" href="https://twitter.com/TwitterDev?ref_src=twsrc%5Etfw"><span
+                      class="sr-only">Tweets by
+                      TwitterDev</span></a>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="example">
+                  <h3 class="h5">Autre widget Twitter</h3>
+                  <a href="https://twitter.com/intent/tweet?button_hashtag=LoveTwitter&ref_src=twsrc%5Etfw"
+                    class="twitter-hashtag-button" data-show-count="false">Tweet #LoveTwitter</a>
+                </div>
+              </div>
+            </div>
+
+            <hr class="mt-5">
+
+            <h2 id="list-item-3" class="pt-3">iFrames générales</h2>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="example h-100">
+                  <h3 class="h5">Missing title on iFrame</h3>
+
+
+				          <iframe loading="lazy" width="100%" height="315" src="./other_files/yMDOin3yWhU.html" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen="" class=""></iframe>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="example h-100">
+                  <h3 class="h5">Generic iFrame Warning</h3>
+                  <iframe loading="lazy" width="100%" height="315" src="https://www.youtube.com/embed/yMDOin3yWhU"
+                    frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen></iframe>
+                </div>
+              </div>
+            </div>
+
+            <hr class="mt-5">
+
+            <h2 id="list-item-4" class="pt-3">Detecting URL changes</h2>
+            <p>This is not a ruleset. This is a demo of a nifty feature to find errors or warnings after detecting a URL
+
+				change on the same page. For example, single page applications (SPA). A non-descript link will be appended
+              to the page 1 second after the page is fully loaded. It will not recieve an error flag initially.</p>
+            <p><strong>To test:</strong> Wait for the "click here" link to load. Then click on any of the sidebar
+              navigation links. It will then get flagged as an error.</p>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="example text-center">
+                  <p id="demo"><a href="#">click here</a></p>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="example text-center">
+                  <p id="demo2"><a href="#">learn more</a></p>
+                </div>
+              </div>
+            </div>
+
+            <script src="./other_files/sdk.js" async="" crossorigin="anonymous"></script><script>
+              window.addEventListener('load', (event) => {
+                const myTimeout = setTimeout(test, 1000);
+                const myTimeout2 = setTimeout(test2, 6000);
+
+                function test() {
+                  document.getElementById("demo").innerHTML = `<a href="#">click here</a>`;
+                }
+
+                function test2() {
+                  document.getElementById("demo2").innerHTML = `<a href="#">learn more</a>`;
+                }
+              });
+            </script>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <footer class="sa11y-ignore d-flex flex-wrap bg-dark text-white justify-content-between align-items-center py-5 mt-5">
+    <div class="container">
+      <span class="text-muted">This footer area is ignored. If a content editor can't fix it, don't scan it. <a href="#">link</a> will be ignored.</span>
+    </div>
+  </footer>
+
+  <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"
+    integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous">
+  </script>
+  <script async="" defer="" crossorigin="anonymous"
+    src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v11.0" nonce="erE7GmIs"></script>
+
+
+<!--To easily switch between production and development mode.-->
+<script type="module" src="../script.js"></script>
+</body>
+
+</html>

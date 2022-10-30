@@ -1,0 +1,22 @@
+name: "Deploy to NPM"
+
+on:
+  release:
+    types: [created]
+
+jobs:
+    release:
+        name: release
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v3
+            - name: Setup node
+              uses: actions/setup-node@v3
+              with:
+                  node-version: 17.x
+                  registry-url: https://registry.npmjs.org
+            - name: Publish to NPM 📦
+              run: npm publish --access public
+              env:
+                  NODE_AUTH_TOKEN: ${{secrets.NPM_AUTH_TOKEN}}

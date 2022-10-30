@@ -1,0 +1,1224 @@
+<!DOCTYPE html>
+<!-- saved from url=(0043)custom.html -->
+<html lang="fr">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Demo page for Sa11y">
+  <meta name="author" content="Adam Chaboryk">
+  <title>Tout - Sa11y</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+  <meta name="theme-color" content="#7952b3">
+  <link rel="shortcut icon" type="image/jpg" href="../assets/favicon.ico"/>
+  <link href="../assets/main.css" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/sa11y.min.css"/>
+</head>
+
+<body>
+  <header>
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
+      <div class="container">
+        <span class="navbar-brand mb-0 h1">Démo Sa11y <span id="v" class="badge bg-info text-dark">2.2.0</span></span>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse"
+          aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+          <ul class="navbar-nav ms-auto mb-2 mb-md-0">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="index.html">Tout</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="toggleable.html">Basculable</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="custom.html">Chèques personnalisés</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="other.html">Autre</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="errors.html">les erreurs</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="warnings.html">Avertissements</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="pass.html">Bon</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </header>
+  <main>
+    <div class="container">
+      <p class="alert bg-danger text-white mb-3" lang="en"><i class="bi bi-translate"></i> <strong>Please note:</strong> the demo pages are automatic translations. Sa11y (the interface) was professionally translated only. You can improve the translation with a pull request.</p>
+
+      <div class="p-3 mb-3 rounded text-center">
+        <h2>Tout</h2>
+        <p class="lead">Eh bien, presque tout. Juste une page avec beaucoup d'erreurs et d'avertissements. 🤠</p>
+      </div>
+    </div>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-2">
+          <div id="list-example" class="list-group sticky-top">
+            <strong class="mt-1 mb-2">Sur cette page:</strong>
+            <a class="list-group-item list-group-item-action" href="#list-item-1">Rubriques</a>
+            <a class="list-group-item list-group-item-action" href="#list-item-2">Images</a>
+            <a class="list-group-item list-group-item-action" href="#list-item-3">Liens</a>
+            <a class="list-group-item list-group-item-action" href="#list-item-4">Tables</a>
+            <a class="list-group-item list-group-item-action" href="#list-item-5">Autres issues</a>
+          </div>
+        </div>
+
+        <div class="col-md-10">
+          <h2 id="list-item-1">Rubriques</h2>
+
+          <h3>Rubriques vides</h3>
+          <div class="example">
+
+
+
+            <h3></h3>
+          </div>
+
+          <h3>Rubriques ignorées</h3>
+          <div class="example">
+
+
+
+            <h5>Cela devrait être un titre 4&nbsp;!</h5>
+          </div>
+
+          <h3>Les titres trop longs</h3>
+          <div class="example">
+
+
+
+            <h4>Un titre est-il vraiment un titre s'il s'agit d'une longue phrase&nbsp;? Ou un auteur de contenu se
+              contente-t-il d'une esthétique visuelle&nbsp;? Les titres de plus de 160 caractères seront signalés comme
+              un avertissement.</h4>
+          </div>
+
+          <h3 class="visually-hidden">En-tête intentionnellement caché</h3>
+
+          <h3>Blocs de citations utilisés comme titres</h3>
+          <p>Si un bloc de citation est inférieur à 25 caractères, il sera signalé comme un avertissement.</p>
+          <div class="example">
+
+
+
+            <blockquote >À propos de l'équipe</blockquote>
+            <blockquote>"Être ou ne pas être, telle est la question."</blockquote>
+          </div>
+
+          <h3>L'en-tête vide contient une image décorative</h3>
+          <div class="example">
+
+
+
+            <h4 >
+
+
+              <img src="../assets/placeholder.svg" alt="" width="100" ></h4>
+          </div>
+
+          <h3>Le titre contient une image sans texte alternatif</h3>
+          <div class="example">
+
+
+
+            <h4 >
+
+
+              <img src="../assets/placeholder.svg" width="100" ></h4>
+          </div>
+
+          <h3>Le titre contient une image avec un texte alternatif</h3>
+          <div class="example">
+            <h4>
+
+
+              <img src="../assets/placeholder.svg" alt="Une belle place." width="100"></h4>
+          </div>
+
+          <h3>Texte en gras utilisé comme titre</h3>
+          <p>À la recherche de<code><strong class="text-danger">&lt;p&gt;&lt;strong&gt;</strong>Some text<strong
+                class="text-danger">&lt;/strong&gt;&lt;/p&gt;</strong></code></p>
+          <div class="example">
+
+
+
+            <p ><strong>À propos de nous</strong></p>
+            <p>La douleur elle-même est l'amour de la douleur, les principaux problèmes écologiques, mais je donne ce
+              genre de temps pour tomber, de sorte que de grandes douleurs et douleurs. Tristesse d'élite Il y avait
+              aussi le choix du chocolat dans l'article, pas le principal. Le stress de la vie est le résultat du dessin
+              animé. Egestas macenas frémit pour apaiser la maladie du lion.
+            </p>
+          </div>
+
+          <div class="example">
+            <p><strong>Cela ne devrait pas être signalé car c'est long et pas nécessairement un titre. Il pourrait
+                simplement s'agir d'un gros bloc de texte en gras. Il fait plus de 120 caractères.</strong></p>
+            <p>La douleur elle-même est l'amour de la douleur, les principaux problèmes écologiques, mais je donne ce
+              genre de temps pour tomber, de sorte que de grandes douleurs et douleurs. Tristesse d'élite Il y avait
+              aussi le choix du chocolat dans l'article, pas le principal. Le stress de la vie est le résultat du dessin
+              animé. Egestas macenas frémit pour apaiser la maladie du lion.
+            </p>
+          </div>
+
+          <h3>Texte en gras utilisé comme titre avec des sauts de ligne</h3>
+          <p>À la recherche de quelque chose comme... Cette vérification a été conçue pour être quelque peu indulgente
+            afin d'éviter trop d'avertissements.
+            <code><strong class="text-danger">&lt;p&gt;&lt;strong&gt;</strong>Fake
+              heading<strong class="text-danger">&lt;br&gt;&lt;/strong&gt;</strong> Followed by some
+              text.&lt;/p&gt;</code></p>
+
+          <h4>Avertissement</h4>
+          <div class="example">
+
+
+
+            <p><strong >Ce sera signalé ! </strong><br>Parce que c'est un paragraphe assez substantiel. La
+              douleur elle-même est l'amour de la douleur, les principaux problèmes écologiques, mais je donne ce genre
+              de temps pour tomber, de sorte que de grandes douleurs et douleurs. Tristesse d'élite La douleur elle-même
+              est l'amour de la douleur, les principaux problèmes écologiques, mais je donne ce genre de temps pour
+              tomber, de sorte que de grandes douleurs et douleurs. Tristesse d'élite Il y avait aussi le choix du
+              chocolat dans l'article, pas le principal. Le stress de la vie est le résultat du dessin animé. Egestas
+              macenas frémit pour apaiser la maladie du lion.</p>
+          </div>
+
+          <h4>Passer</h4>
+          <div class="example">
+            <p><strong>À propos de nous</strong><br> Ne sera pas signalé car il s'agit d'un petit paragraphe. La douleur
+              elle-même est l'amour de la douleur, les principaux problèmes écologiques, mais je donne ce genre de temps
+              pour tomber, de sorte que de grandes douleurs et douleurs. Tristesse d'élite</p>
+          </div>
+
+          <div class="example">
+            <p>
+              <strong>Adresse</strong><br>
+              105, rue Bond <br>
+              Toronto, ON <br>
+              M5B 2K3</p>
+          </div>
+
+          <div class="example">
+            <p><strong>Cela ne sera pas signalé non plus car ce texte en gras est long et n'est pas nécessairement un
+                titre. Il pourrait simplement s'agir d'un gros bloc de texte en gras. Il fait plus de 120 caractères.
+              </strong><br>La douleur elle-même est l'amour de la douleur, les principaux problèmes écologiques, mais je
+              donne ce genre de temps pour tomber, de sorte que de grandes douleurs et douleurs. Tristesse d'élite La
+              douleur elle-même est l'amour de la douleur, les principaux problèmes écologiques, mais je donne ce genre
+              de temps pour tomber, de sorte que de grandes douleurs et douleurs. Tristesse d'élite Il y avait aussi le
+              choix du chocolat dans l'article, pas le principal. Le stress de la vie est le résultat du dessin animé.
+              Egestas macenas frémit pour apaiser la maladie du lion.</p>
+          </div>
+
+          <hr class="mt-5">
+          <h2 id="list-item-2">Images</h2>
+
+          <h3>Images sans liens</h3>
+          <h4>Passer</h4>
+
+          <div class="row">
+            <div class="col-md-3 d-flex">
+              <div class="card mb-4 shadow-sm flex-fill">
+
+
+
+                <img src="../assets/placeholder.svg" width="100%"
+                  alt="De grandes montagnes de sable dans le désert namibien.">
+                <div class="card-body">
+                  <p class="card-text">1. L'image contient du texte alternatif.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <h4>Mises en garde</h4>
+          <div class="row">
+            <div class="col-md-3 d-flex">
+              <div class="card mb-4 shadow-sm flex-fill">
+
+
+
+                <img src="../assets/placeholder.svg" width="100%" alt="Une image d'un oiseau." >
+                <div class="card-body">
+                  <p class="card-text">2&nbsp;: Le texte alternatif contient un mot vide suspect.</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3 d-flex">
+              <div class="card mb-4 shadow-sm flex-fill">
+
+
+
+                <img src="../assets/placeholder.svg" width="100%" alt="" >
+                <div class="card-body">
+                  <p class="card-text">3. L'image est décorative.</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3 d-flex">
+              <div class="card mb-4 shadow-sm flex-fill">
+
+
+
+                <img src="../assets/placeholder.svg" width="100%" alt=" " >
+                <div class="card-body">
+                  <p class="card-text">4. L'image est décorative en utilisant un espace vide (alt=" ").</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3 d-flex">
+              <div class="card mb-4 shadow-sm flex-fill">
+
+
+
+                <img src="../assets/placeholder.svg" width="100%"
+                  alt="Les zèbres sont plusieurs espèces d'équidés africains (famille des chevaux) unis par leur pelage rayé noir et blanc distinctif.  Leurs rayures se déclinent en différents motifs, uniques à chaque individu.  Ce sont généralement des animaux sociaux qui vivent dans de petits harems ou de grands troupeaux.  Contrairement à leurs plus proches parents, les chevaux et les ânes, les zèbres n'ont jamais été véritablement domestiqués.  Source : Wikipédia."
+                  >
+                <div class="card-body">
+                  <p class="card-text">5&nbsp;: Le texte alternatif est trop long.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <h4>les erreurs</h4>
+          <div class="row">
+            <div class="col-md-3 d-flex">
+              <div class="card mb-4 shadow-sm flex-fill">
+
+
+
+                <img src="../assets/placeholder.svg" width="100%" >
+                <div class="card-body">
+                  <p class="card-text">6&nbsp;: Texte alternatif manquant.</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3 d-flex">
+              <div class="card mb-4 shadow-sm flex-fill">
+
+
+
+                <img src="../assets/placeholder.svg" width="100%" alt="oiseau.jpg" >
+                <div class="card-body">
+                  <p class="card-text">7&nbsp;: Le texte alternatif a une extension de fichier.</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3 d-flex">
+              <div class="card mb-4 shadow-sm flex-fill">
+
+
+
+                <img src="../assets/placeholder.svg" width="100%" alt="image" >
+                <div class="card-body">
+                  <p class="card-text">8&nbsp;:&nbsp;Le texte alternatif contient un texte d'espace réservé.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <h3>Images hyperliées</h3>
+          <h4>Passer</h4>
+          <div class="row">
+            <div class="col-md-3 d-flex">
+              <div class="card mb-4 shadow-sm flex-fill text-center">
+
+
+
+                <a href="#">
+                  <img src="../assets/placeholder.svg" width="100%" alt="" class="w-100"><span
+                    class="text-center lead">En savoir plus sur les Tigres</span></a>
+                <div class="card-body">
+                  <p class="card-text">9 : Image hyperliée avec un texte alternatif nul, mais avec un texte de lien
+                    environnant sous l'image.</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3 d-flex">
+              <div class="card mb-4 shadow-sm flex-fill text-center">
+
+
+
+                <a href="#"><span class="text-center lead">En savoir plus sur les Tigres</span><img
+                    src="../assets/placeholder.svg" width="100%" alt="" class="w-100"></a>
+                <div class="card-body">
+                  <p class="card-text">10&nbsp;: Image hyperliée avec un texte alternatif nul, mais avec un texte de
+                    lien environnant au-dessus de l'image.</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3 d-flex">
+              <div class="card mb-4 shadow-sm flex-fill">
+                <figure>
+
+
+
+                  <img src="../assets/placeholder.svg" alt="Texte alternatif pour la figure." width="100%">
+                  <figcaption class="bg-info p-1 text-center small">Texte de la légende de la figure.
+                  </figcaption>
+                </figure>
+                <div class="card-body">
+                  <p class="card-text">11&nbsp;: Image de la figure avec un texte alternatif et un texte de légende
+                    différents.</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3 d-flex">
+              <div class="card mb-4 shadow-sm flex-fill">
+                <figure>
+
+
+
+                  <img src="../assets/placeholder.svg" alt="deux zèbres noir et blanc" width="100%">
+                </figure>
+                <div class="card-body">
+                  <p class="card-text">12 : Image de la figure sans légende.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <h4>Mises en garde</h4>
+          <div class="row">
+            <div class="col-md-3 d-flex">
+              <div class="card mb-4 shadow-sm flex-fill">
+
+
+
+                <a href="#">
+                  <img src="../assets/placeholder.svg" width="100%"
+                    alt="De grandes montagnes de sable dans le désert namibien." class="w-100"></a>
+                <div class="card-body">
+                  <p class="card-text">13 : Image hyperliée avec texte alternatif.</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3 d-flex">
+              <div class="card mb-4 shadow-sm flex-fill">
+
+
+
+                <a href="#"><img src="../assets/placeholder.svg" width="100%" alt="Une image d'un oiseau."
+                    class="w-100"></a>
+                <div class="card-body">
+                  <p class="card-text">14 : L'image hyperliée a un texte alternatif qui contient un mot vide.</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3 d-flex">
+              <div class="card mb-4 shadow-sm flex-fill">
+
+
+
+                <a href="#"><img src="../assets/placeholder.svg" width="100%"
+                    alt="Les zèbres sont plusieurs espèces d'équidés africains (famille des chevaux) unis par leur pelage rayé noir et blanc distinctif.  Leurs rayures se déclinent en différents motifs, uniques à chaque individu.  Ce sont généralement des animaux sociaux qui vivent dans de petits harems ou de grands troupeaux.  Contrairement à leurs plus proches parents, les chevaux et les ânes, les zèbres n'ont jamais été vraiment domestiqués.  Source : Wikipédia."
+                    class="w-100"></a>
+                <div class="card-body">
+                  <p class="card-text">15&nbsp;: Image en lien hypertexte trop longue.</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3 d-flex">
+              <div class="card mb-4 shadow-sm flex-fill text-center">
+
+
+
+                <a href="#">
+                  <img src="../assets/placeholder.svg" alt="Répare-le à nouveau Tony&nbsp;!" width="100%"
+                    class="w-100"><span class="text-center lead">En savoir plus sur Fiat.</span></a>
+                <div class="card-body">
+                  <p class="card-text">16 : Image hyperliée contenant à la fois du texte alternatif et du texte de lien.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3 d-flex">
+              <div class="card mb-4 shadow-sm flex-fill text-center">
+                <figure aria-describedby="caption-attachment-28">
+
+
+
+                  <img src="../assets/placeholder.svg" alt="" width="100%" >
+                  <figcaption class="bg-info p-1 text-center small">Fig. 1 : Désert namibien (Source : inconnue)
+                  </figcaption>
+                </figure>
+                <div class="card-body">
+                  <p class="card-text">17 : Image décorative dans un élément &lt;figure&gt;.</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3 d-flex">
+              <div class="card mb-4 shadow-sm flex-fill">
+                <figure>
+
+
+
+                  <img src="../assets/placeholder.svg" alt="deux zèbres" width="100%" >
+                  <figcaption class="bg-info p-1 text-center small">Deux zèbres</figcaption>
+                </figure>
+                <div class="card-body">
+                  <p class="card-text">18&nbsp;: L'élément de la figure comporte un texte alternatif et un texte de
+                    légende en double.</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3 d-flex">
+              <div class="card mb-4 shadow-sm flex-fill">
+
+
+
+                <a href="#">
+                  <figure>
+                    <img src="../assets/placeholder.svg" alt="deux zèbres noir et blanc" width="100%" >
+                  </figure>
+                </a>
+                <div class="card-body">
+                  <p class="card-text">19&nbsp;: Élément de figure hyperlié sans légende.</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3 d-flex">
+              <div class="card mb-4 shadow-sm flex-fill">
+
+
+
+                <a href="#">
+                  <figure>
+                    <img src="../assets/placeholder.svg" alt="deux zèbres noir et blanc" width="100%" >
+                    <figcaption class="bg-info text-center small text-dark">Photo en noir et blanc de deux zèbres.
+                    </figcaption>
+                  </figure>
+                </a>
+                <div class="card-body">
+                  <p class="card-text">20&nbsp;: Élément de figure hyperlié avec légende de la figure.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <h4>les erreurs</h4>
+          <div class="row">
+            <div class="col-md-3 d-flex">
+              <div class="card mb-4 shadow-sm flex-fill">
+
+
+
+                <a href="#"><img src="../assets/placeholder.svg" width="100%" class="w-100"></a>
+                <div class="card-body">
+                  <p class="card-text">21&nbsp;: Texte alternatif manquant dans l'image hyperliée.</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3 d-flex">
+              <div class="card mb-4 shadow-sm flex-fill">
+
+
+
+                <a href="#"><img src="../assets/placeholder.svg" width="100%" alt="" class="w-100"></a>
+                <div class="card-body">
+                  <p class="card-text">22 : Image hyperliée qui est décorative.</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3 d-flex">
+              <div class="card mb-4 shadow-sm flex-fill">
+
+
+
+                <a href="#"><img src="../assets/placeholder.svg" width="100%" alt=" " class="w-100"></a>
+                <div class="card-body">
+                  <p class="card-text">23&nbsp;: Image hyperliée qui est décorative en utilisant un espace vide (alt="
+                    ").</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3 d-flex">
+              <div class="card mb-4 shadow-sm flex-fill text-center">
+
+
+
+                <a href="#"><img src="../assets/placeholder.svg" width="100%" class="w-100"><span
+                    class="text-center lead">En savoir plus sur les dahlias</span></a>
+                <div class="card-body">
+                  <p class="card-text">24&nbsp;: Image hyperliée avec alt manquante et contient le texte du lien
+                    environnant.</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3 d-flex">
+              <div class="card mb-4 shadow-sm flex-fill">
+
+
+
+                <a href="#"><img src="../assets/placeholder.svg" width="100%" alt="image" ></a>
+                <div class="card-body">
+                  <p class="card-text">25 : L'image hyperliée a un texte alternatif contenant un texte d'espace réservé.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3 d-flex">
+              <div class="card mb-4 shadow-sm flex-fill text-center">
+
+
+
+                <a href="#" aria-hidden="true"><img src="../assets/placeholder.svg" alt="" width="100%"
+                    class="w-100"></a>
+                <div class="card-body">
+                  <p class="card-text">26&nbsp;: Image hyperliée où l'ancre a aria-hidden="true".</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <h4>Autre</h4>
+          <div class="row">
+            <div class="col-md-3 d-flex">
+              <div class="card mb-4 shadow-sm flex-fill text-center">
+                <a href="#" aria-hidden="true" tabindex="-1"><img src="../assets/placeholder.svg" alt="" width="100%"
+                    class="w-100"></a>
+                <div class="card-body">
+                  <p class="card-text">27&nbsp;: Image hyperliée où l'ancre a aria-hidden="true" et tabindex="-1"</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3 d-flex">
+              <div class="card mb-4 shadow-sm flex-fill text-center">
+
+
+
+                <a href="#"><img src="../assets/placeholder.svg" alt="" width="100%" class="w-100">
+                  <h6 >En savoir plus sur les îles Canaries</h6>
+                </a>
+
+
+
+                <div class="card-body">
+                  <p class="card-text">28&nbsp;: L'image hyperliée contient un en-tête ignoré. L'erreur est ajoutée
+                    après le lien hypertexte pour empêcher le bouton d'imbrication dans le lien hypertexte.</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3 d-flex">
+              <div class="card mb-4 shadow-sm flex-fill text-center">
+
+
+
+                <a href="#" target="_blank" ><img src="../assets/placeholder.svg"
+                    alt="Répare-le à nouveau Tony&nbsp;!" width="100%" class="w-100"></a>
+
+
+
+                <div class="card-body">
+                  <p class="card-text">29&nbsp;: L'image hyperliée s'ouvre dans un nouvel onglet.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3 d-flex">
+              <div class="card mb-4 shadow-sm flex-fill text-center">
+
+
+
+                <a href="#" target="_blank" ><img src="../assets/placeholder.svg"
+                    alt="Deux zèbres.  S'ouvre dans un nouvel onglet." width="100%" class="w-100"></a>
+
+
+                <div class="card-body">
+                  <p class="card-text">30&nbsp;: L'image hyperliée s'ouvre dans un nouvel onglet. Le texte alternatif
+                    indique que le lien s'ouvre dans une nouvelle fenêtre.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3 d-flex">
+              <div class="card mb-4 shadow-sm flex-fill">
+
+
+
+                <a href="#">
+                  <img src="../assets/placeholder.svg" width="100%" alt="test" class="w-100">
+                  <noscript>asdfg</noscript>
+                </a>
+                <div class="card-body">
+                  <p class="card-text">31&nbsp;:&nbsp;Tests de bogues. Ignorer les balises &lt;noscript&gt;.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <hr class="mt-5">
+          <h2 id="list-item-3">Liens</h2>
+          <h3>Mots vides partiels</h3>
+
+          <h4>les erreurs</h4>
+          <p>L'utilisation de l'un des mots ci-dessus seul entraînera une erreur car il n'est pas assez descriptif.</p>
+          <div class="example">
+            <div class="row text-center">
+              <div class="col-md-4">
+                <a href="#" class="btn btn-primary">cette page</a>
+
+              </div>
+              <div class="col-md-4">
+                <a href="#" class="btn btn-primary">Cette page »</a>
+
+              </div>
+              <div class="col-md-4">
+                <a href="#" class="btn btn-primary">En savoir plus &gt;</a>
+
+              </div>
+            </div>
+          </div>
+
+          <h4>Passer</h4>
+          <p>Cependant, s'il est utilisé avec du texte supplémentaire, il ne sera pas signalé comme une erreur.</p>
+          <div class="example">
+            <a href="#" class="btn btn-primary">En savoir plus sur Sa11y</a>
+          </div>
+
+
+          <h3>Mots vides partiels avec exclusions</h3>
+          <p>Parfois, un thème de site Web peut automatiquement ajouter du texte à un lien. Par exemple, "(Lien
+            externe)" sera ignoré, ce qui signalera correctement ce lien comme une erreur car il n'est pas assez
+            descriptif.</p>
+          <div class="example">
+            <a href="#">
+              en savoir plus
+              <span class="sr-only-example bg-info text-dark rounded p-1">(Lien externe)</span></a>
+
+          </div>
+
+          <h3>Hyperliens vides</h3>
+          <div class="example">
+            <ul>
+              <li>Lien hypertexte vide&nbsp;:<a href="#" ></a>
+
+
+              </li>
+              <li>Lien hypertexte vide avec espace&nbsp;:<a href="#" > </a>
+
+
+              </li>
+              <li>Caractère unique : <a href="#" >.</a>
+
+
+              </li>
+              <li>Espace non-cassant:<a href="#" >&nbsp;</a>
+
+
+              </li>
+            </ul>
+          </div>
+
+          <h3>Hyperliens vides avec des enfants</h3>
+          <div class="example">
+            <ul>
+              <li>Lien hypertexte vide avec police d'icône&nbsp;:<a href="#" ><i
+                    class="bi bi-emoji-smile-fill"></i></a>
+
+
+              </li>
+              <li>Lien hypertexte vide avec police d'icône (ouvre un nouvel onglet)&nbsp;:<a href="#" target="_blank"
+                  ><i class="bi bi-emoji-smile-fill"></i></a>
+
+
+
+
+
+              </li>
+              <li>Lien hypertexte vide avec SVG&nbsp;:<a href="#" ><svg xmlns="http://www.w3.org/2000/svg"
+                    width="16" height="16" fill="currentColor" class="bi bi-filetype-svg" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd"
+                      d="M14 4.5V14a2 2 0 0 1-2 2v-1a1 1 0 0 0 1-1V4.5h-2A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v9H2V2a2 2 0 0 1 2-2h5.5L14 4.5ZM0 14.841a1.13 1.13 0 0 0 .401.823c.13.108.288.192.478.252.19.061.411.091.665.091.338 0 .624-.053.858-.158.237-.105.416-.252.54-.44a1.17 1.17 0 0 0 .187-.656c0-.224-.045-.41-.135-.56a1 1 0 0 0-.375-.357 2.027 2.027 0 0 0-.565-.21l-.621-.144a.97.97 0 0 1-.405-.176.37.37 0 0 1-.143-.299c0-.156.061-.284.184-.384.125-.101.296-.152.513-.152.143 0 .266.023.37.068a.625.625 0 0 1 .245.181.56.56 0 0 1 .12.258h.75a1.092 1.092 0 0 0-.199-.566 1.21 1.21 0 0 0-.5-.41 1.813 1.813 0 0 0-.78-.152c-.293 0-.552.05-.776.15-.225.099-.4.24-.528.421-.127.182-.19.395-.19.639 0 .201.04.376.123.524.082.149.199.27.351.367.153.095.332.167.54.213l.618.144c.207.049.36.113.462.193a.387.387 0 0 1 .153.326.512.512 0 0 1-.085.29.559.559 0 0 1-.256.193c-.111.047-.249.07-.413.07-.117 0-.224-.013-.32-.04a.837.837 0 0 1-.248-.115.578.578 0 0 1-.255-.384H0Zm4.575 1.09h.952l1.327-3.999h-.879l-.887 3.138H5.05l-.897-3.138h-.917l1.339 4Zm5.483-3.293c.076.152.123.316.14.492h-.776a.797.797 0 0 0-.096-.249.689.689 0 0 0-.17-.19.707.707 0 0 0-.237-.126.963.963 0 0 0-.3-.044c-.284 0-.506.1-.664.302-.157.2-.235.484-.235.85v.497c0 .235.033.44.097.616a.881.881 0 0 0 .305.413.87.87 0 0 0 .518.146.965.965 0 0 0 .457-.097.67.67 0 0 0 .273-.263c.06-.11.09-.23.09-.364v-.254h-.823v-.59h1.576v.798c0 .193-.032.377-.096.55a1.29 1.29 0 0 1-.293.457 1.37 1.37 0 0 1-.495.314c-.198.074-.43.111-.698.111a1.98 1.98 0 0 1-.752-.132 1.447 1.447 0 0 1-.534-.377 1.58 1.58 0 0 1-.319-.58 2.482 2.482 0 0 1-.105-.745v-.507c0-.36.066-.677.199-.949.134-.271.329-.482.583-.633.256-.152.564-.228.926-.228.238 0 .45.033.635.1.188.066.348.158.48.275.134.117.238.253.314.407Z">
+                    </path>
+                  </svg></a>
+
+
+              </li>
+              <li>Lien hypertexte vide avec SVG (ouvre un nouvel onglet)&nbsp;:<a href="#" target="_blank" ><svg
+                    xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                    class="bi bi-filetype-svg" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd"
+                      d="M14 4.5V14a2 2 0 0 1-2 2v-1a1 1 0 0 0 1-1V4.5h-2A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v9H2V2a2 2 0 0 1 2-2h5.5L14 4.5ZM0 14.841a1.13 1.13 0 0 0 .401.823c.13.108.288.192.478.252.19.061.411.091.665.091.338 0 .624-.053.858-.158.237-.105.416-.252.54-.44a1.17 1.17 0 0 0 .187-.656c0-.224-.045-.41-.135-.56a1 1 0 0 0-.375-.357 2.027 2.027 0 0 0-.565-.21l-.621-.144a.97.97 0 0 1-.405-.176.37.37 0 0 1-.143-.299c0-.156.061-.284.184-.384.125-.101.296-.152.513-.152.143 0 .266.023.37.068a.625.625 0 0 1 .245.181.56.56 0 0 1 .12.258h.75a1.092 1.092 0 0 0-.199-.566 1.21 1.21 0 0 0-.5-.41 1.813 1.813 0 0 0-.78-.152c-.293 0-.552.05-.776.15-.225.099-.4.24-.528.421-.127.182-.19.395-.19.639 0 .201.04.376.123.524.082.149.199.27.351.367.153.095.332.167.54.213l.618.144c.207.049.36.113.462.193a.387.387 0 0 1 .153.326.512.512 0 0 1-.085.29.559.559 0 0 1-.256.193c-.111.047-.249.07-.413.07-.117 0-.224-.013-.32-.04a.837.837 0 0 1-.248-.115.578.578 0 0 1-.255-.384H0Zm4.575 1.09h.952l1.327-3.999h-.879l-.887 3.138H5.05l-.897-3.138h-.917l1.339 4Zm5.483-3.293c.076.152.123.316.14.492h-.776a.797.797 0 0 0-.096-.249.689.689 0 0 0-.17-.19.707.707 0 0 0-.237-.126.963.963 0 0 0-.3-.044c-.284 0-.506.1-.664.302-.157.2-.235.484-.235.85v.497c0 .235.033.44.097.616a.881.881 0 0 0 .305.413.87.87 0 0 0 .518.146.965.965 0 0 0 .457-.097.67.67 0 0 0 .273-.263c.06-.11.09-.23.09-.364v-.254h-.823v-.59h1.576v.798c0 .193-.032.377-.096.55a1.29 1.29 0 0 1-.293.457 1.37 1.37 0 0 1-.495.314c-.198.074-.43.111-.698.111a1.98 1.98 0 0 1-.752-.132 1.447 1.447 0 0 1-.534-.377 1.58 1.58 0 0 1-.319-.58 2.482 2.482 0 0 1-.105-.745v-.507c0-.36.066-.677.199-.949.134-.271.329-.482.583-.633.256-.152.564-.228.926-.228.238 0 .45.033.635.1.188.066.348.158.48.275.134.117.238.253.314.407Z">
+                    </path>
+                  </svg></a>
+
+
+
+
+
+              </li>
+            </ul>
+          </div>
+
+          <h3>Liens hypertexte vides avec un nom accessible via l'attribut title</h3>
+          <div class="example">
+            <ul>
+              <li>Lien hypertexte vide avec titre&nbsp;:<a href="#" title="Passer"></a></li>
+              <li>Lien hypertexte vide avec espace et titre&nbsp;:<a href="#" title="Passer"> </a></li>
+              <li>Espace insécable et titre&nbsp;:<a href="#" title="Passer">&nbsp;</a></li>
+              <li>Lien hypertexte vide avec police d'icône et titre&nbsp;:<a href="#" title="Ballon"><i
+                    class="bi bi-emoji-smile-fill"></i></a></li>
+              <li>Lien hypertexte vide avec police d'icône (ouvre un nouvel onglet) et titre&nbsp;:<a href="#"
+                  target="_blank" title="Ballon (Ouvre un nouvel onglet)" ><i
+                    class="bi bi-emoji-smile-fill"></i></a>
+
+              </li>
+              <li>Lien hypertexte vide avec SVG et titre&nbsp;:<a href="#" title="SVG"><svg
+                    xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                    class="bi bi-filetype-svg" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd"
+                      d="M14 4.5V14a2 2 0 0 1-2 2v-1a1 1 0 0 0 1-1V4.5h-2A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v9H2V2a2 2 0 0 1 2-2h5.5L14 4.5ZM0 14.841a1.13 1.13 0 0 0 .401.823c.13.108.288.192.478.252.19.061.411.091.665.091.338 0 .624-.053.858-.158.237-.105.416-.252.54-.44a1.17 1.17 0 0 0 .187-.656c0-.224-.045-.41-.135-.56a1 1 0 0 0-.375-.357 2.027 2.027 0 0 0-.565-.21l-.621-.144a.97.97 0 0 1-.405-.176.37.37 0 0 1-.143-.299c0-.156.061-.284.184-.384.125-.101.296-.152.513-.152.143 0 .266.023.37.068a.625.625 0 0 1 .245.181.56.56 0 0 1 .12.258h.75a1.092 1.092 0 0 0-.199-.566 1.21 1.21 0 0 0-.5-.41 1.813 1.813 0 0 0-.78-.152c-.293 0-.552.05-.776.15-.225.099-.4.24-.528.421-.127.182-.19.395-.19.639 0 .201.04.376.123.524.082.149.199.27.351.367.153.095.332.167.54.213l.618.144c.207.049.36.113.462.193a.387.387 0 0 1 .153.326.512.512 0 0 1-.085.29.559.559 0 0 1-.256.193c-.111.047-.249.07-.413.07-.117 0-.224-.013-.32-.04a.837.837 0 0 1-.248-.115.578.578 0 0 1-.255-.384H0Zm4.575 1.09h.952l1.327-3.999h-.879l-.887 3.138H5.05l-.897-3.138h-.917l1.339 4Zm5.483-3.293c.076.152.123.316.14.492h-.776a.797.797 0 0 0-.096-.249.689.689 0 0 0-.17-.19.707.707 0 0 0-.237-.126.963.963 0 0 0-.3-.044c-.284 0-.506.1-.664.302-.157.2-.235.484-.235.85v.497c0 .235.033.44.097.616a.881.881 0 0 0 .305.413.87.87 0 0 0 .518.146.965.965 0 0 0 .457-.097.67.67 0 0 0 .273-.263c.06-.11.09-.23.09-.364v-.254h-.823v-.59h1.576v.798c0 .193-.032.377-.096.55a1.29 1.29 0 0 1-.293.457 1.37 1.37 0 0 1-.495.314c-.198.074-.43.111-.698.111a1.98 1.98 0 0 1-.752-.132 1.447 1.447 0 0 1-.534-.377 1.58 1.58 0 0 1-.319-.58 2.482 2.482 0 0 1-.105-.745v-.507c0-.36.066-.677.199-.949.134-.271.329-.482.583-.633.256-.152.564-.228.926-.228.238 0 .45.033.635.1.188.066.348.158.48.275.134.117.238.253.314.407Z">
+                    </path>
+                  </svg></a></li>
+              <li>Lien hypertexte vide avec SVG (ouvre un nouvel onglet)&nbsp;:<a href="#" target="_blank"
+                  title="SVG (ouvre une nouvelle fenêtre)" ><svg xmlns="http://www.w3.org/2000/svg" width="16"
+                    height="16" fill="currentColor" class="bi bi-filetype-svg" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd"
+                      d="M14 4.5V14a2 2 0 0 1-2 2v-1a1 1 0 0 0 1-1V4.5h-2A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v9H2V2a2 2 0 0 1 2-2h5.5L14 4.5ZM0 14.841a1.13 1.13 0 0 0 .401.823c.13.108.288.192.478.252.19.061.411.091.665.091.338 0 .624-.053.858-.158.237-.105.416-.252.54-.44a1.17 1.17 0 0 0 .187-.656c0-.224-.045-.41-.135-.56a1 1 0 0 0-.375-.357 2.027 2.027 0 0 0-.565-.21l-.621-.144a.97.97 0 0 1-.405-.176.37.37 0 0 1-.143-.299c0-.156.061-.284.184-.384.125-.101.296-.152.513-.152.143 0 .266.023.37.068a.625.625 0 0 1 .245.181.56.56 0 0 1 .12.258h.75a1.092 1.092 0 0 0-.199-.566 1.21 1.21 0 0 0-.5-.41 1.813 1.813 0 0 0-.78-.152c-.293 0-.552.05-.776.15-.225.099-.4.24-.528.421-.127.182-.19.395-.19.639 0 .201.04.376.123.524.082.149.199.27.351.367.153.095.332.167.54.213l.618.144c.207.049.36.113.462.193a.387.387 0 0 1 .153.326.512.512 0 0 1-.085.29.559.559 0 0 1-.256.193c-.111.047-.249.07-.413.07-.117 0-.224-.013-.32-.04a.837.837 0 0 1-.248-.115.578.578 0 0 1-.255-.384H0Zm4.575 1.09h.952l1.327-3.999h-.879l-.887 3.138H5.05l-.897-3.138h-.917l1.339 4Zm5.483-3.293c.076.152.123.316.14.492h-.776a.797.797 0 0 0-.096-.249.689.689 0 0 0-.17-.19.707.707 0 0 0-.237-.126.963.963 0 0 0-.3-.044c-.284 0-.506.1-.664.302-.157.2-.235.484-.235.85v.497c0 .235.033.44.097.616a.881.881 0 0 0 .305.413.87.87 0 0 0 .518.146.965.965 0 0 0 .457-.097.67.67 0 0 0 .273-.263c.06-.11.09-.23.09-.364v-.254h-.823v-.59h1.576v.798c0 .193-.032.377-.096.55a1.29 1.29 0 0 1-.293.457 1.37 1.37 0 0 1-.495.314c-.198.074-.43.111-.698.111a1.98 1.98 0 0 1-.752-.132 1.447 1.447 0 0 1-.534-.377 1.58 1.58 0 0 1-.319-.58 2.482 2.482 0 0 1-.105-.745v-.507c0-.36.066-.677.199-.949.134-.271.329-.482.583-.633.256-.152.564-.228.926-.228.238 0 .45.033.635.1.188.066.348.158.48.275.134.117.238.253.314.407Z">
+                    </path>
+                  </svg></a>
+
+              </li>
+            </ul>
+          </div>
+
+          <h3>Meilleures pratiques en matière de texte de lien</h3>
+          <h4>Mots vides</h4>
+          <p>Le lien contient&nbsp;: "cliquez ici", "&gt;", "&lt;"</p>
+          <div class="example text-center">
+            <div class="row">
+              <div class="col-md-4">
+                <a href="#">Cliquez ici pour voir nos programmes</a>
+
+              </div>
+              <div class="col-md-4">
+                <a href="#" >Suivant &gt;</a>
+
+
+
+              </div>
+              <div class="col-md-4">
+                <a href="#" >&lt; Précédent</a>
+
+
+
+              </div>
+            </div>
+          </div>
+          <h4>URL longues</h4>
+          <p>Seules les URL longues seront signalées.</p>
+          <div class="example text-center">
+            <div class="row">
+              <div class="col-md-6">
+                <a href="https://sa11y.netlify.app/developers/custom-checks/"
+                  >https://sa11y.netlify.app/developers/custom-checks/</a>
+
+
+
+              </div>
+              <div class="col-md-6">
+                <a href="https://sa11y.netlify.app/">https://sa11y.netlify.app</a>
+              </div>
+            </div>
+          </div>
+
+          <h3>Liens hypertextes avec ARIA</h3>
+          <h4>Label ARIA</h4>
+          <ul>
+            <li><strong>Code:</strong> <code>&lt;a href="#" <strong class="text-danger">aria-label="Learn more about
+                  Sa11y"</strong>&gt;Learn more&lt;/a&gt;</code></li>
+            <li><strong>Résultat attendu :</strong> En savoir plus sur Sa11y</li>
+          </ul>
+          <div class="example">
+
+
+
+            <a href="#" aria-label="En savoir plus sur Sa11y" class="btn btn-primary">Apprendre encore plus</a>
+          </div>
+
+          <h4>Enfant labellisé ARIA</h4>
+          <ul>
+            <li><strong>Code:</strong> <code>&lt;a href="#"&gt;Learn more &lt;span <strong
+                  class="text-danger">aria-label="about Sa11y"</strong>&gt;&lt;/span&gt;&lt;/a&gt;</code></li>
+            <li><strong>Résultat attendu :</strong> En savoir plus sur Sa11y</li>
+          </ul>
+          <div class="example">
+
+
+
+            <a href="#" class="btn btn-primary">Apprendre encore plus<span aria-label="à propos de Sa11y"></span></a>
+          </div>
+
+          <h4>Plusieurs enfants labellisés ARIA</h4>
+          <ul>
+            <li><strong>Code:</strong> <code>&lt;a href="#"&gt;Learn more &lt;span <strong
+                  class="text-danger">aria-label="about Sa11y"</strong>&gt;&lt;/span&gt; &lt;i <strong
+                  class="text-danger">aria-label="(External)"</strong> class="bi
+                bi-box-arrow-up-right"&gt;&lt;/i&gt;&lt;/a&gt;</code></li>
+            <li><strong>Résultat attendu&nbsp;:</strong> En savoir plus sur Sa11y (externe)</li>
+          </ul>
+          <div class="example">
+
+
+
+            <a href="#" class="btn btn-primary">Apprendre encore plus<span aria-label="à propos de Sa11y"></span> <i
+                aria-label="(Externe)" class="bi bi-box-arrow-up-right"></i></a>
+          </div>
+
+          <h4>Attribut ARIA-labelledby unique</h4>
+          <span hidden="" id="app">apples</span>
+          <ul>
+            <li><strong>Pièce d'identité:</strong> <code>&lt;span id="app"&gt;apples&lt;/span&gt;</code></li>
+            <li><strong>Code:</strong> <code>&lt;a href="#" <strong
+                  class="text-danger">aria-labelledby="app"</strong>&gt;Learn more&lt;/a&gt;</code></li>
+            <li><strong>Résultat attendu :</strong> pommes</li>
+          </ul>
+          <div class="example">
+
+
+
+            <a href="#" class="btn btn-primary" aria-labelledby="app">Apprendre encore plus</a>
+          </div>
+
+          <h4>Plusieurs attributs ARIA labelledby</h4>
+          <span hidden="" id="ban">and bananas</span>
+          <ul>
+            <li><strong>ID de référence :</strong> lui-même, <code>&lt;span id="app"&gt;apples&lt;/span&gt;</code>,
+              <code>x</code>qui n'existe pas,<code>&lt;span id="ban"&gt;bananas&lt;/span&gt;</code></li>
+            <li><strong>Code:</strong> <code>&lt;a href="#" <strong class="text-danger">id="self" aria-labelledby="self
+                  app x ban"</strong>&gt;Learn more about&lt;/a&gt;</code></li>
+            <li><strong>Résultat attendu :</strong> En savoir plus sur les pommes et les bananes</li>
+          </ul>
+          <div class="example">
+
+
+
+            <a href="#" class="btn btn-primary" id="self" aria-labelledby="self app x ban">En savoir plus sur</a>
+          </div>
+
+          <h4>Enfant avec des attributs ARIA-labelledby</h4>
+          <ul>
+            <li><strong>ID de référence :</strong> <code>&lt;span id="app"&gt;apples&lt;/span&gt;</code> ,
+              <code>x</code>
+              qui n'existe pas,<code>&lt;span id="ban"&gt;bananas&lt;/span&gt;</code></li>
+            <li><strong>Code:</strong> <code>&lt;a href="#"&gt;Learn more &lt;span <strong
+                  class="text-danger">aria-labelledby="app x ban"</strong>&gt;&lt;/span&gt;&lt;/a&gt;</code></li>
+            <li><strong>Résultat attendu :</strong> En savoir plus sur les pommes et les bananes</li>
+          </ul>
+          <div class="example">
+
+
+
+            <a href="#" class="btn btn-primary">En savoir plus sur<span aria-labelledby="app x ban"></span></a>
+          </div>
+
+          <h4>ARIA Caché</h4>
+          <ul>
+            <li><strong>Code:</strong> <code>&lt;a href="#" <strong
+                  class="text-danger">aria-hidden="true"</strong>&gt;Learn more&lt;/a&gt;</code></li>
+            <li><strong>Résultat attendu:</strong></li>
+          </ul>
+          <div class="example">
+            <a href="#" class="btn btn-primary" aria-hidden="true">Apprendre encore plus</a>
+          </div>
+
+          <hr class="mt-5">
+          <h2 id="list-item-4">les tables</h2>
+          <h3>Tableau approprié</h3>
+          <div class="example">
+            <table class="table pt-3 bg-light">
+              <tbody>
+                <tr class="table-primary">
+                  <th>Nom de l'événement</th>
+                  <th>Temps</th>
+                  <th>Emplacement</th>
+                </tr>
+                <tr>
+                  <td>Discours d'ouverture</td>
+                  <td>09H00</td>
+                  <td>Salle</td>
+                </tr>
+                <tr>
+                  <td>Déjeuner</td>
+                  <td>12h00</td>
+                  <td>Chambre Skyline</td>
+                </tr>
+                <tr>
+                  <td>Dîner de clôture</td>
+                  <td>17H00</td>
+                  <td>Chambre métropolitaine</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>En-têtes de tableau manquants</h3>
+          <div class="example">
+
+
+
+            <table class="table bg-light">
+              <tbody>
+                <tr class="table-primary">
+                  <td>Nom de l'événement</td>
+                  <td>Temps</td>
+                  <td>Emplacement</td>
+                </tr>
+                <tr>
+                  <td>Discours d'ouverture</td>
+                  <td>09H00</td>
+                  <td>Salle</td>
+                </tr>
+                <tr>
+                  <td>Déjeuner</td>
+                  <td>12h00</td>
+                  <td>Chambre Skyline</td>
+                </tr>
+                <tr>
+                  <td>Dîner de clôture</td>
+                  <td>17H00</td>
+                  <td>Chambre métropolitaine</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>Tableau avec en-tête vide</h3>
+          <div class="example">
+            <table class="table bg-light">
+              <tbody>
+                <tr class="table-primary">
+                  <th >
+                  </th>
+                  <th>Temps</th>
+                  <th>Emplacement</th>
+                </tr>
+                <tr>
+                  <td>Discours d'ouverture</td>
+                  <td>09H00</td>
+                  <td>Salle</td>
+                </tr>
+                <tr>
+                  <td>Déjeuner</td>
+                  <td>12h00</td>
+                  <td>Chambre Skyline</td>
+                </tr>
+                <tr>
+                  <td>Dîner de clôture</td>
+                  <td>17H00</td>
+                  <td>Chambre métropolitaine</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>Tableau avec en-têtes sémantiques</h3>
+          <div class="example">
+            <table class="table bg-light">
+              <tbody>
+                <tr class="table-primary">
+                  <th>
+
+
+
+                    <h4 style="font-size:1.2em!important" >Événement</h4>
+                  </th>
+                  <th>
+
+
+
+                    <h4 style="font-size:1.2em!important" >Temps</h4>
+                  </th>
+                  <th>
+
+
+
+                    <h4 style="font-size:1.2em!important" >Emplacement</h4>
+                  </th>
+                </tr>
+                <tr>
+                  <td>Discours d'ouverture</td>
+                  <td>09H00</td>
+                  <td>Salle</td>
+                </tr>
+
+                <tr>
+                  <td>Déjeuner</td>
+                  <td>12h00</td>
+                  <td>Chambre Skyline
+                    <p><strong>faux titre</strong></p>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td>Dîner de clôture</td>
+                  <td>17H00</td>
+                  <td>Chambre métropolitaine</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <hr class="mt-5">
+          <h2 id="list-item-5">Autres issues</h2>
+
+          <h3>PDF</h3>
+          <p>Un avertissement est ajouté à tous les hyperliens qui ont une <kbd>.pdf</kbd>extension de fichier. Une
+            icône d'avertissement n'est ajoutée qu'au premier PDF détecté sur la page pour éviter de submerger un auteur
+            de contenu. Tous les autres liens PDF sont mis en évidence visuellement.</p>
+          <div class="example">
+            <div class="ml-5">
+              <ul>
+                <li>Télécharger le <a href="#.pdf" >dossier d'admission <span class="sr-only">(PDF)</span></a>
+
+
+
+                </li>
+                <li><a href="#.pdf" >Plan de cours <span class="sr-only">(PDF)</span></a></li>
+                <li><a href="#.pdf" >Aide -mémoire <span class="sr-only">(PDF)</span></a></li>
+              </ul>
+            </div>
+          </div>
+
+          <h3>Texte en majuscule</h3>
+          <p>Cet avertissement vise à décourager l'utilisation de texte en majuscules. Ce n'est <strong>pas</strong> une
+            exigence WCAG 2.1, mais c'est une pratique déconseillée pour la lisibilité. Deuxièmement, certains mots en
+            majuscules peuvent être confondus avec un acronyme et être affichés caractère par caractère avec un lecteur
+            d'écran. Cette condition utilise une expression régulière pour rechercher des mots majuscules d'au moins 3
+            caractères, mais elle ne sera indiquée comme avertissement que si au moins 5 mots majuscules dans un élément
+            sont trouvés. Il vérifie uniquement les mots en majuscules dans les éléments suivants&nbsp;: h1, h2, h3, h4,
+            h5, h6, p, li, span, blockquote.</p>
+          <div class="example">
+            <p>PAR EXEMPLE, CECI SERA SIGNALÉ
+
+
+              .</p>
+            <p>PAR EXEMPLE, cela NE SERA PAS signalé.</p>
+            <ul>
+              <li>Le TEXTE EN MAJUSCULES DANS LES PUCES
+
+
+                sera également signalé.</li>
+            </ul>
+          </div>
+
+          <h3>Texte souligné</h3>
+          <p>Cet avertissement vise à décourager l'utilisation de texte souligné car il est facilement confondu avec des
+            liens. Cette condition vérifie le texte souligné créé avec le balisage &lt;u&gt; et les styles CSS dans les
+            éléments suivants&nbsp;: h1, h2, h3, h4, h5, h6, p, li, span, blockquote.</p>
+
+          <div class="row">
+            <div class="col-md-4">
+              <div class="example h-100">
+
+
+
+                <p style="text-decoration-line: underline;" >Cela sera signalé.</p>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="example h-100">
+                <p>
+
+
+                  <u >&lt;u&gt;souligné&lt;/u&gt;</u> de cette manière sera signalé.</p>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="example h-100">
+                <ul>
+
+
+
+                  <li style="text-decoration: coral underline" >Le texte souligné dans les listes sera également
+                    signalé.
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-6">
+              <div class="example h-100">
+
+
+
+                <h4 style="text-decoration:1px solid black underline" >Cette rubrique sera signalée.</h4>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="example h-100">
+                <p><a href="#" style="text-decoration: underline coral">Le texte lié</a> ne sera pas signalé.</p>
+              </div>
+            </div>
+          </div>
+
+          <h3>Listes non sémantiques</h3>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="example h-100">
+
+
+
+                <p >a) Parfois, les gens créent manuellement une liste <br>
+                  b) en utilisant de faux préfixes de liste <br>
+                  c) au lieu d'utiliser une liste sémantique.</p>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="example h-100">
+
+
+
+                <p >1. Bananes</p>
+                <p>2. Poires</p>
+                <p>3. Pommes</p>
+              </div>
+            </div>
+          </div>
+
+          <h3>ID en double</h3>
+          <div class="example">
+            <p><span id="duplicate" class="bg-info p-1 rounded">L' élément 1</span> et l' <span id="duplicate"
+                class="bg-info p-1 rounded">élément 2</span>
+
+
+              ont le même <kbd>id</kbd>attribut.</p>
+          </div>
+          <h3>Subscript and superscript formatting</h3>
+          <div class="example">
+            <p>A subscript or superscript <sub>is a character that is set slightly below or above the normal line of type, respectively. It is usually smaller than the rest of the text. Subscripts appear at or below the baseline, while superscripts are above. Wikipedia.</sub></p>
+            <p>A subscript or superscript <sup>is a character that is set slightly below or above the normal line of type, respectively. It is usually smaller than the rest of the text. Subscripts appear at or below the baseline, while superscripts are above. Wikipedia.</sup></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <footer class="sa11y-ignore d-flex flex-wrap bg-dark text-white justify-content-between align-items-center py-5 mt-5">
+    <div class="container">
+      <span class="text-muted">This footer area is ignored. If a content editor can't fix it, don't scan it. <a
+          href="#">link</a> will be ignored.</span>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous">
+  </script>
+
+ <!-- Sa11y -->
+  <script type="module" src="../script.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Toggleable checks - Sa11y Demo</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+  <meta name="theme-color" content="#7952b3">
+  <link rel="shortcut icon" type="image/jpg" href="../assets/favicon.ico"/>
+  <link href="../assets/main.css" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/sa11y.min.css"/>
+</head>
+
+<body>
+  <header>
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
+      <div class="container">
+        <span class="navbar-brand mb-0 h1">Sa11y Demo <span id="v" class="badge bg-info text-dark"></span></span>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse"
+          aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+          <ul class="navbar-nav ms-auto mb-2 mb-md-0">
+            <li class="nav-item">
+              <a class="nav-link" href="index.html">Everything</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="toggleable.html">Toggleable</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="custom.html">Custom checks</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="other.html">Other</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="errors.html">Errors</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="warnings.html">Warnings</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="pass.html">Good</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </header>
+  <main>
+    <div class="container">
+      <div class="p-5 mb-3 rounded text-center">
+        <h1>Toggleable checks</h1>
+        <p class="lead">Toggleable checks can be enabled via <strong>Settings</strong> tab.</p>
+      </div>
+    </div>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-2">
+          <div id="list-example" class="list-group sticky-top">
+            <strong class="mt-1 mb-2">On this page:</strong>
+            <a class="list-group-item list-group-item-action" href="#list-item-1">Contrast</a>
+            <a class="list-group-item list-group-item-action" href="#list-item-2">Inputs</a>
+            <a class="list-group-item list-group-item-action" href="#list-item-3">Links (Advanced)</a>
+          </div>
+        </div>
+
+        <div class="col-md-10">
+          <h2 id="list-item-1">Contrast</h2>
+
+          <h3>Normal text</h3>
+          <div class="example">
+            <div class="row">
+              <div class="col-md-6">
+                <p style="color: coral">This colour fails at normal size.</p>
+              </div>
+              <div class="col-md-6">
+                <p style="color: aqua">
+                  <script>
+                    document.write("Generated via document.write()")
+                  </script>
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <h3>Large text</h3>
+          <div class="example">
+            <h4 style="color:coral;font-size:1.5em">This colour also fails at a large size.</h4>
+          </div>
+
+          <h3>Text input</h3>
+          <div class="example">
+            <label for="contrastinput">Name</label>
+            <input id="contrastinput" type="text" style="color:coral">
+          </div>
+
+          <h3>Background images</h3>
+          <div class="example">
+            <h4 class="background-image white" style="color:white">Text on background image requires manual review</h4>
+          </div>
+
+          <hr class="mt-5">
+
+          <h2 id="list-item-2">Inputs</h2>
+
+          <h3>Errors</h3>
+          <h4>Hidden inputs</h4>
+          <input type="text" hidden/>
+
+          <h4>Input without a label or missing <code>id</code></h4>
+          <div class="example">
+            <input type="text" />
+          </div>
+
+          <h4>Input with ID although label does not have a <code>for</code> attribute</h4>
+          <div class="example">
+            <label>Name</label>
+            <input type="text" id="asdfg" />
+          </div>
+
+          <h4>Implicit labels without text</h4>
+          <p><code>&lt;label&gt;&lt;input type="text"/&gt;&lt;label&gt;</code></p>
+          <div class="example">
+            <label>
+              <input type="text" />
+            </label>
+          </div>
+
+          <h4><code>&lt;textarea&gt;</code> without label</h4>
+          <div class="example">
+            <label>Feedback</label>
+            <textarea rows="2" cols="50"></textarea>
+          </div>
+
+          <h4><code>&lt;select&gt;</code> without label</h4>
+          <div class="example">
+            <label>Choose a car:</label>
+            <select name="cars">
+              <option value="volvo">Volvo</option>
+              <option value="saab">Saab</option>
+              <option value="mercedes">Mercedes</option>
+              <option value="audi">Audi</option>
+            </select>
+          </div>
+
+          <h4>Input where <code>type="image"</code> does not have accessible name</h4>
+          <div class="example">
+            <label for="q">Search:</label>
+            <input type="text" id="q"><input type="image" alt=" " width="20"
+              src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Vector_search_icon.svg/1280px-Vector_search_icon.svg.png">
+          </div>
+
+          <h3>Warnings</h3>
+          <h4>Input is using title, aria-label or aria-labelledby attribute</h4>
+          <div class="example">
+            <div class="row">
+              <div class="col-md-4">
+                <h5>aria-label</h5>
+                <input aria-label="First name" id="vv" type="text" />
+              </div>
+              <div class="col-md-4">
+                <h5>aria-labelledby</h5>
+                <input aria-labelledby="vv" type="text" />
+              </div>
+              <div class="col-md-4">
+                <h5>title</h5>
+                <input type="text" title="Phone number">
+              </div>
+            </div>
+          </div>
+
+          <h4>Input that is <code>type='reset'</code></h4>
+          <div class="example">
+            <input type="reset" />
+          </div>
+
+          <h3>Pass</h3>
+          <h4>Input has <code>id</code> and label has corresponding <code>for</code> attribute</h4>
+          <div class="example">
+            <div class="row">
+              <div class="col-md-6">
+                <input type="text" id="asd" /><br>
+                <label for="asd">Label after input</label>
+              </div>
+              <div class="col-md-6">
+                <label for="asdfgh">Label before input</label>
+                <input type="text" id="asdfgh" />
+              </div>
+            </div>
+          </div>
+
+          <h4>Input that is <code>type='submit'</code> or <code>type='button'</code></h4>
+          <div class="example">
+            <div class="row">
+              <div class="col-md-6">
+                <h5>Submit</h5>
+                <input type="submit" />
+              </div>
+              <div class="col-md-6">
+                <h5>Button</h5>
+                <input type="button" value="Input Button" />
+              </div>
+            </div>
+          </div>
+
+          <h3>Implicit label has text</h3>
+          <code>&lt;label&gt;First name: &lt;input type="text"/&gt;&lt;label&gt;</code>
+          <div class="example">
+            <label>
+              First name:
+              <input type="text" />
+            </label>
+          </div>
+
+          <h3><code>&lt;textarea&gt;</code> has label</h3>
+          <div class="example">
+            <label for="review">Review:</label><br>
+            <textarea id="review" rows="2" cols="50"></textarea>
+          </div>
+
+          <hr class="mt-5">
+          <h2 id="list-item-3">Links (Advanced)</h2>
+          <h3>Links that open in a new tab without warning</h3>
+          <div class="example">
+            <ul>
+              <li>Plain text: <a href="#" target="_blank">Feedback</a></li>
+              <li>ARIA label: <a href="#" target="_blank" aria-label="Bootstrap"><i
+                    class="bi bi-bootstrap-fill"></i></a></li>
+              <li>Empty link with title attribute: <a href="#" title="Shop" target="_blank"><i
+                    class="bi bi-shop"></i></a></li>
+            </ul>
+          </div>
+
+          <h3>Links that open in a new tab with a warning</h3>
+          <div class="example">
+            <ul>
+              <li>Plain text: <a href="#" target="_blank">Feedback (opens new tab)</a></li>
+              <li>ARIA label: <a href="#" target="_blank" aria-label="Bootstrap (Opens new tab)"><i
+                    class="bi bi-bootstrap-fill"></i></a></li>
+              <li>Child with ARIA label: <a href="#" target="_blank">Feedback <i aria-label="(Opens new tab)"
+                    class="bi bi-box-arrow-up-right"></i></a></li>
+              <li>Empty link with title attribute: <a href="#" title="Shop (Opens new tab)" target="_blank"><i
+                    class="bi bi-shop"></i></a></li>
+            </ul>
+          </div>
+
+          <h3>Links with identical names should have equivalent purpose</h3>
+
+          <div class="row">
+            <div class="col-md-4">
+              <div class="example">
+                <p>Same link name and location:
+                  <a href="https://www.google.com">Google</a> and <a href="https://www.google.com">Google</a></p>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="example">
+                <p>Same link name but different locations:
+                  <a href="https://www.bing.com">Bing</a> and <a href="https://www.duckduckgo.com">Bing</a></p>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="example">
+                <p>Same link name but different locations:
+                  <a href="https://www.github.com" aria-label="GitHub"><i class="bi bi-github"></i></a> and <a
+                    href="https://bitbucket.org/" aria-label="GitHub"><i class="bi bi-github"></i></a></p>
+              </div>
+            </div>
+          </div>
+
+          <h3>Links to files without warning</h3>
+          <div class="row">
+            <div class="col-md-4">
+              <div class="example">
+                <a href="#asd.zip">Branding assets</a>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="example">
+                <a href="#asd.zip">Branding assets (.zip)</a>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="example">
+                <a href="#asd.zip">Branding assets <i aria-label="(.zip)" class="bi bi-file-earmark-zip"></i></a>
+              </div>
+            </div>
+          </div>
+
+
+        </div>
+      </div>
+    </div>
+  </main>
+  <footer class="sa11y-ignore d-flex flex-wrap bg-dark text-white justify-content-between align-items-center py-5 mt-5">
+    <div class="container">
+      <span class="text-muted">This footer area is ignored. If a content editor can't fix it, don't scan it. <a
+          href="#">link</a> will be ignored.</span>
+    </div>
+  </footer>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"
+    integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous">
+  </script>
+
+ <!-- Sa11y -->
+  <script type="module" src="../script.js"></script>
+</body>
+
+</html>

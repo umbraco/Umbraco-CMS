@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="ua">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Інший - Sa11y Демо</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+  <meta name="theme-color" content="#7952b3">
+  <link rel="shortcut icon" type="image/jpg" href="../assets/favicon.ico"/>
+  <link href="../assets/main.css" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/sa11y.min.css"/>
+</head>
+<body>
+  <header>
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
+      <div class="container">
+        <span class="navbar-brand mb-0 h1">Sa11y Демо <span id="v" class="badge bg-info text-dark"></span></span>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse"
+          aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+          <ul class="navbar-nav ms-auto mb-2 mb-md-0">
+            <li class="nav-item">
+              <a class="nav-link" href="index.html">Все</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="toggleable.html">Можливість перемикання</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="custom.html">Індивідуальні чеки</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="other.html">Інший</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="errors.html">Помилки</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="warnings.html">Попередження</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="pass.html">добре</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </header>
+  <main>
+    <div class="container">
+      <div class="p-5 mb-3 rounded text-center">
+        <h1>Інший</h1>
+      </div>
+    </div>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-2">
+          <div id="list-example" class="list-group sticky-top">
+            <strong class="mt-1 mb-2">На цій сторінці:</strong>
+            <a class="list-group-item list-group-item-action" href="#list-item-0">Мова сторінки</a>
+            <a class="list-group-item list-group-item-action" href="#list-item-1">Аудіо та відео</a>
+            <a class="list-group-item list-group-item-action" href="#list-item-2">Віджети Twitter</a>
+            <a class="list-group-item list-group-item-action" href="#list-item-3">рами</a>
+            <a class="list-group-item list-group-item-action" href="#list-item-4">Виявлення змін URL</a>
+          </div>
+        </div>
+
+        <div class="col-md-10">
+          <div data-spy="scroll" data-target="#list-example" data-offset="0" class="scrollspy-example">
+
+            <h2 id="list-item-0">Мова сторінки</h2>
+            <p>Перевіряє наявність <kbd>lang</kbd>атрибута на <kbd>&lt;html&gt;</kbd>тегу. Якщо атрибут відсутній, банер про помилку буде додано у верхній частині сторінки.</p>
+
+            <hr class="mt-5">
+
+            <h2 id="list-item-1">Аудіо та відео</h2>
+            <p>Ця умова покликана діяти як дружнє нагадування. Відео отримають попередження, щоб забезпечити доступність субтитрів. Аудіо отримає попередження, щоб переконатися, що подкаст/аудіо має розшифровку. Ця умова <strong>не</strong> перевіряє наявність субтитрів чи стенограм. Налаштуйте цю умову, додавши власні джерела потокового медіа.</p>
+
+            <h3>Відео</h3>
+            <div class="row">
+              <div class="col-md-4">
+                <div class="example h-100">
+                  <h4>iFrame з джерелом відео</h4>
+                  <div class="ratio ratio-16x9">
+
+				<iframe class="embed-responsive" width="560" height="315" src="https://www.youtube.com/embed/HgzGwKwLmgM" title="Королева - Не зупиняй мене зараз." frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="example h-100">
+                  <h4>Відео не має <code>&lt;track&gt;</code>елемента</h4>
+                  <div class="ratio ratio-16x9">
+
+				<video width="320" height="240" controls="" class="">
+                      <source src="https://www.w3schools.com/html/movie.mp4" type="video/mp4">
+                      <source src="https://www.w3schools.com/html/movie.ogg" type="video/ogg">
+                      Ваш браузер не підтримує тег відео.
+                    </video>
+                  </div>
+                  <p class="text-center"><small>Джерело відео: W3Schools</small></p>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="example h-100">
+                  <h4>Відео має <code>&lt;track&gt;</code>елемент</h4>
+                  <div class="ratio ratio-16x9">
+                    <video width="300" controls="" src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/friday.mp4">
+                      <track default="" kind="captions" srclang="en" src="friday.vtt">
+                      На жаль, ваш браузер не підтримує вбудовані відео.
+                    </video>
+                  </div>
+                  <p class="text-center"><small>Джерело відео: MDN WebDocs</small></p>
+                </div>
+              </div>
+            </div>
+
+            <h3>Аудіо</h3>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="example h-100">
+                  <h4>iFrame з джерелом звуку</h4>
+                  <div class="ratio ratio-16x9">
+
+				<iframe title="Віджет SoundCloud" width="100%" height="300" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/158888399&amp;color=%23ff5500&amp;auto_play=false&amp;hide_related=false&amp;show_comments=true&amp;show_user=true&amp;show_reposts=false&amp;show_teaser=true&amp;visual=true" class=""></iframe>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="example h-100">
+                  <h4><code>&lt;audio&gt;</code>джерело</h4>
+
+				<audio controls="" class="">
+                    <source src="https://www.w3schools.com/html/horse.ogg" type="audio/ogg">
+                    <source src="https://www.w3schools.com/html/horse.mp3" type="audio/mpeg">
+                    Ваш браузер не підтримує елемент аудіо.
+                  </audio>
+                  <p class="text-center"><small>Джерело відео: W3Schools</small></p>
+                </div>
+              </div>
+            </div>
+
+            <hr class="mt-5">
+
+            <h2 id="list-item-2">Віджети Twitter</h2>
+            <p>Ця умова має на меті спонукати користувачів оптимізувати віджет Twitter за замовчуванням для доступності та зручності використання. Ця умова може бути корисною у великих організаціях (наприклад, університеті чи коледжі), де є багато каналів соціальних мереж. Ця умова не базується на WCAG 2.0, однак настійно рекомендується.</p>
+            <div class="row">
+              <div class="col-md-4">
+                <div class="example">
+                  <h3 class="h5">Віджет Twitter за замовчуванням</h3>
+                  <a class="twitter-timeline" title="Tweets by TwitterDev" data-height="300" data-width="330"
+                    href="https://twitter.com/TwitterDev?ref_src=twsrc%5Etfw"><span class="sr-only">Tweets by
+                      TwitterDev</span></a>
+
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="example">
+                  <h3 class="h5">Оптимізований віджет Twitter</h3>
+                  <a data-tweet-limit="1" title="Tweets by TwitterDev" class="twitter-timeline"
+                    data-chrome="nofooter noheader" href="https://twitter.com/TwitterDev?ref_src=twsrc%5Etfw"><span
+                      class="sr-only">Tweets by
+                      TwitterDev</span></a>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="example">
+                  <h3 class="h5">Інший віджет Twitter</h3>
+                  <a href="https://twitter.com/intent/tweet?button_hashtag=LoveTwitter&ref_src=twsrc%5Etfw"
+                  class="twitter-hashtag-button" data-show-count="false">Tweet #LoveTwitter</a>
+                </div>
+              </div>
+            </div>
+
+            <hr class="mt-5">
+
+            <h2 id="list-item-3" class="pt-3">Загальні iFrames</h2>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="example h-100">
+                  <h3 class="h5">Відсутня назва на iFrame</h3>
+
+
+				<iframe loading="lazy" width="100%" height="315" src="https://www.youtube.com/embed/yMDOin3yWhU" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen="" class=""></iframe>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="example h-100">
+                  <h3 class="h5">Загальне попередження iFrame</h3>
+                  <div class="fb-page" data-href="https://www.facebook.com/facebook" data-tabs="timeline" data-width=""
+                    data-height="300" data-small-header="false" data-adapt-container-width="true"
+                    data-hide-cover="false" data-show-facepile="true">
+                    <blockquote cite="https://www.facebook.com/facebook" class="fb-xfbml-parse-ignore"><a
+                        href="https://www.facebook.com/facebook">Facebook</a></blockquote>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <hr class="mt-5">
+
+            <h2 id="list-item-4" class="pt-3">Виявлення змін URL</h2>
+            <p>Це не набір правил. Це демонстрація чудової функції для пошуку помилок або попереджень після виявлення
+
+				 зміни URL-адреси на тій самій сторінці. Наприклад, односторінкові програми (SPA). Посилання без опису буде додано до сторінки через 1 секунду після повного завантаження сторінки. Спочатку він не отримає позначку про помилку.</p>
+            <p><strong>Щоб перевірити:</strong> дочекайтеся завантаження посилання «натисніть тут». Потім натисніть будь-яке з навігаційних посилань бічної панелі. Тоді це буде позначено як помилка.</p>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="example text-center">
+                  <p id="demo"><a href="#">натисніть тут</a></p>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="example text-center">
+                  <p id="demo2"><a href="#">вчи більше</a></p>
+                </div>
+              </div>
+            </div>
+
+            <script src="https://connect.facebook.net/en_US/sdk.js?hash=9a7cc94fb3e552a3ed0a32c345bb6b76" async="" crossorigin="anonymous"></script><script>
+              window.addEventListener('load', (event) => {
+                const myTimeout = setTimeout(test, 1000);
+                const myTimeout2 = setTimeout(test2, 6000);
+
+                function test() {
+                  document.getElementById("demo").innerHTML = `<a href="#">click here</a>`;
+                }
+
+                function test2() {
+                  document.getElementById("demo2").innerHTML = `<a href="#">learn more</a>`;
+                }
+              });
+            </script>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <footer class="sa11y-ignore d-flex flex-wrap bg-dark text-white justify-content-between align-items-center py-5 mt-5">
+    <div class="container">
+      <span class="text-muted">Ця область нижнього колонтитула ігнорується. Якщо редактор вмісту не може це виправити, не скануйте його. <a href="#">посилання</a> буде проігноровано.</span>
+    </div>
+  </footer>
+  <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"
+    integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous">
+  </script>
+  <script async="" defer="" crossorigin="anonymous"
+    src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v11.0" nonce="erE7GmIs"></script>
+
+ <!-- Sa11y -->
+  <script type="module" src="../script.js"></script>
+
+</body>
+
+</html>

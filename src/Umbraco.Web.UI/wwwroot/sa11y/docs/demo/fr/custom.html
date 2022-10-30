@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<!-- saved from url=(0043)custom.html -->
+<html lang="fr">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Demo page for Sa11y">
+    <meta name="author" content="Adam Chaboryk">
+    <title>Custom checks - Sa11y</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+    <meta name="theme-color" content="#7952b3">
+    <link rel="shortcut icon" type="image/jpg" href="../assets/favicon.ico"/>
+    <link href="../assets/main.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../assets/css/sa11y.min.css"/>
+</head>
+<body>
+  <header>
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
+      <div class="container">
+        <span class="navbar-brand mb-0 h1">Démo Sa11y <span id="v" class="badge bg-info text-dark">2.2.0</span></span>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Basculer la navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+          <ul class="navbar-nav ms-auto mb-2 mb-md-0">
+            <li class="nav-item">
+              <a class="nav-link" href="index.html">Tout</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="toggleable.html">Basculable</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="custom.html">Chèques personnalisés</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="other.html">Autre</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="errors.html">les erreurs</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="warnings.html">Avertissements</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="pass.html">Bon</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <div class="col-lg-8 mx-auto p-3 py-md-5">
+    <main>
+      <h1>Chèques personnalisés</h1>
+      <p class="fs-5 col-md-8">Démo de chèques personnalisés. Découvrez <a href="https://sa11y.netlify.app/developers/custom-checks/">comment créer des chèques personnalisés.</a></p>
+      <hr class="col-3 col-md-2 mb-5">
+
+      <h2>Chèques destinés à être personnalisés via des accessoires</h2>
+
+      <h3>Rechercher des liens spécifiques</h3>
+      <p>Personnalisez cette condition pour créer une erreur pour tous les liens pointant vers un environnement de développement. Cela ne
+         détecte <strong>pas</strong> les liens morts (404). À l' aide <a href="https://www.w3schools.com/cssref/css_selectors.asp">de W3Schools CSS Selector Reference,</a> personnalisez cette condition pour ajouter la vôtre.</p>
+      <div class="example">
+        <p class="ml-5">Par exemple, un lien hypertexte absolu renvoyant par erreur à un environnement de développement ou de test&nbsp;: <a href="https://www.dev.example.com/" >À propos de example.com</a>
+
+        </p>
+      </div>
+
+      <hr class="mt-5">
+      <h2>Exemples de chèques personnalisés</h2>
+      <h3>Utilisation excessive d'un composant sur une page</h3>
+      <div class="example">
+        <section class="alert alert-primary sa11y-announcement-component" aria-label="Annonce"><i class="bi bi-megaphone-fill"></i>Il s'agit d'un composant d'annonce&nbsp;!</section>
+
+				<section class="alert alert-primary sa11y-announcement-component" aria-label="Annonce"><i class="bi bi-megaphone-fill"></i>Ceci est un autre élément d'annonce&nbsp;!</section>
+      </div>
+
+      <h3>Le composant accordéon contient un formulaire</h3>
+      <div class="example">
+
+				<div class="accordion sa11y-accordion-example" id="accordion">
+          <div class="accordion-item">
+            <h4 class="accordion-header" id="flush-headingOne"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">Contactez-nous!</button></h4>
+            <div id="flush-collapseOne" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordion">
+              <div class="accordion-body">
+                <form>
+                  <div class="p-3"><label for="name">Nom de famille</label> <input type="text" id="name"></div>
+                  <div class="p-3"><label for="lname">Prénom</label> <input type="text" id="lname"></div>
+                  <div class="p-3"><input class="btn btn-primary" type="submit" value="Soumettre" disabled="disabled">
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+  <footer class="sa11y-ignore d-flex flex-wrap bg-dark text-white justify-content-between align-items-center py-5 mt-5">
+    <div class="container">
+      <span class="text-muted">Cette zone de pied de page est ignorée. Si un éditeur de contenu ne peut pas le réparer, ne le scannez pas. <a href="#">lien</a> sera ignoré.</span>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous">
+  </script>
+
+ <!-- Sa11y -->
+  <script type="module" src="../script.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<!-- saved from url=(0043)custom.html -->
+<html lang="fr">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Demo page for Sa11y">
+    <meta name="author" content="Adam Chaboryk">
+    <title>Basculable - Sa11y</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+    <meta name="theme-color" content="#7952b3">
+    <link rel="shortcut icon" type="image/jpg" href="../assets/favicon.ico"/>
+    <link href="../assets/main.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../assets/css/sa11y.min.css"/>
+</head>
+<body>
+  <header>
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
+      <div class="container">
+        <span class="navbar-brand mb-0 h1">Démo Sa11y <span id="v" class="badge bg-info text-dark">2.2.0</span></span>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+          <ul class="navbar-nav ms-auto mb-2 mb-md-0">
+            <li class="nav-item">
+              <a class="nav-link" href="index.html">Tout</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="toggleable.html">Basculable</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="custom.html">Chèques personnalisés</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="other.html">Autre</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="errors.html">les erreurs</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="warnings.html">Avertissements</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="pass.html">Bon</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </header>
+  <main>
+    <div class="container">
+      <div class="p-5 mb-3 rounded text-center">
+        <h1>Contrôles basculables</h1>
+        <p class="lead">Les vérifications basculantes peuvent être activées via l'onglet <strong>Paramètres .</strong></p>
+      </div>
+    </div>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-2">
+          <div id="list-example" class="list-group sticky-top">
+            <strong class="mt-1 mb-2">Sur cette page:</strong>
+            <a class="list-group-item list-group-item-action" href="#list-item-1">Contraste</a>
+            <a class="list-group-item list-group-item-action" href="#list-item-2">Contributions</a>
+            <a class="list-group-item list-group-item-action" href="#list-item-3">Liens (Avancé)</a>
+          </div>
+        </div>
+
+        <div class="col-md-10">
+          <h2 id="list-item-1">Contraste</h2>
+
+          <h3>Texte normal</h3>
+          <div class="example">
+            <div class="row">
+              <div class="col-md-6">
+
+				<p style="color: coral">Cette couleur échoue à la taille normale.</p>
+              </div>
+              <div class="col-md-6">
+
+				<p style="color: aqua">
+                  <script>
+                    document.write("Generated via document.write()")
+                  </script>Généré via document.write()
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <h3>Grand texte</h3>
+          <div class="example">
+
+				<h4 style="color:coral;font-size:1.5em">Cette couleur échoue également à une grande taille.</h4>
+          </div>
+
+          <h3>Saisie de texte</h3>
+          <div class="example">
+            <label for="contrastinput">Nom</label>
+
+				<input id="contrastinput" type="text" style="color:coral">
+          </div>
+
+          <h3>Images d'arrière-plan</h3>
+          <div class="example">
+
+				<h4 class="background-image white" style="color:white">Le texte sur l'image d'arrière-plan nécessite une révision manuelle</h4>
+          </div>
+
+          <hr class="mt-5">
+
+          <h2 id="list-item-2">Contributions</h2>
+
+          <h3>les erreurs</h3>
+          <h4>Entrée sans étiquette ou manquante<code>id</code></h4>
+          <div class="example">
+            <input type="text" >
+
+          </div>
+
+          <h4>Entrée avec ID bien que l'étiquette n'ait pas d' <code>for</code>attribut</h4>
+          <div class="example">
+            <label>Nom</label>
+            <input type="text" id="asdfg" >
+
+          </div>
+
+          <h4>Libellés implicites sans texte</h4>
+          <p><code>&lt;label&gt;&lt;input type="text"/&gt;&lt;label&gt;</code></p>
+          <div class="example">
+            <label>
+              <input type="text" >
+
+            </label>
+          </div>
+
+          <h4><code>&lt;textarea&gt;</code>sans étiquette</h4>
+          <div class="example">
+            <label>Retour</label>
+            <textarea rows="2" cols="50" ></textarea>
+
+          </div>
+
+          <h4><code>&lt;select&gt;</code>sans étiquette</h4>
+          <div class="example">
+            <label>Choisissez une voiture&nbsp;:</label>
+            <select name="cars" >
+              <option value="volvo">VOLVO</option>
+              <option value="saab">Saab</option>
+              <option value="mercedes">Mercedes</option>
+              <option value="audi">Audi</option>
+            </select>
+
+          </div>
+
+          <h4>Entrée où <code>type="image"</code>n'a pas de nom accessible</h4>
+          <div class="example">
+            <label for="q">Recherche:</label>
+            <input type="text" id="q"><input type="image" alt=" " width="20" src="./Contrôles basculables - Démo Sa11y_files/1280px-Vector_search_icon.svg.png" >
+
+          </div>
+
+          <h3>Avertissements</h3>
+          <h4>L'entrée utilise l'attribut title, aria-label ou aria-labelledby</h4>
+          <div class="example">
+            <div class="row">
+              <div class="col-md-4">
+                <h5>label-aria</h5>
+                <input aria-label="Prénom" id="vv" type="text" >
+
+              </div>
+              <div class="col-md-4">
+                <h5>aria-labelledby</h5>
+                <input aria-labelledby="vv" type="text" >
+
+              </div>
+              <div class="col-md-4">
+                <h5>Titre</h5>
+                <input type="text" title="Numéro de téléphone" >
+
+              </div>
+            </div>
+          </div>
+
+          <h4>Entrée qui est<code>type='reset'</code></h4>
+          <div class="example">
+            <input type="reset" >
+
+          </div>
+
+          <h3>Passer</h3>
+          <h4>L'entrée a <code>id</code>et l'étiquette a l' <code>for</code>attribut correspondant</h4>
+          <div class="example">
+            <div class="row">
+              <div class="col-md-6">
+                <input type="text" id="asd"><br>
+                <label for="asd">Étiquette après saisie</label>
+              </div>
+              <div class="col-md-6">
+                <label for="asdfgh">Étiquette avant la saisie</label>
+                <input type="text" id="asdfgh">
+              </div>
+            </div>
+          </div>
+
+          <h4>Entrée qui est <code>type='submit'</code>ou<code>type='button'</code></h4>
+          <div class="example">
+            <div class="row">
+              <div class="col-md-6">
+                <h5>Soumettre</h5>
+                <input type="submit">
+              </div>
+              <div class="col-md-6">
+                <h5>Bouton</h5>
+                <input type="button" value="Bouton d&#39;entrée">
+              </div>
+            </div>
+          </div>
+
+          <h3>L'étiquette implicite contient du texte</h3>
+          <code>&lt;label&gt;First name: &lt;input type="text"/&gt;&lt;label&gt;</code>
+          <div class="example">
+            <label>
+              Prénom:
+              <input type="text">
+            </label>
+          </div>
+
+          <h3><code>&lt;textarea&gt;</code>a une étiquette</h3>
+          <div class="example">
+            <label for="review">La revue:</label><br>
+            <textarea id="review" rows="2" cols="50"></textarea>
+          </div>
+
+          <hr class="mt-5">
+          <h2 id="list-item-3">Liens (Avancé)</h2>
+          <h3>Liens qui s'ouvrent dans un nouvel onglet sans avertissement</h3>
+          <div class="example">
+            <ul>
+              <li>Texte brut&nbsp;: <a href="#" target="_blank" >commentaires</a>
+				</li>
+              <li>Label ARIA :
+				<a href="#" target="_blank" aria-label="Amorcer" ><i class="bi bi-bootstrap-fill"></i></a>
+				</li>
+              <li>Lien vide avec l'attribut title&nbsp;:<a href="#" title="Boutique" target="_blank" ><i class="bi bi-shop"></i></a>
+				</li>
+            </ul>
+          </div>
+
+          <h3>Liens qui s'ouvrent dans un nouvel onglet avec un avertissement</h3>
+          <div class="example">
+            <ul>
+              <li>Texte brut&nbsp;: <a href="#" target="_blank">Commentaires (ouvre un nouvel onglet)</a></li>
+              <li>Label ARIA :
+				<a href="#" target="_blank" aria-label="Bootstrap (Ouvre un nouvel onglet)"><i class="bi bi-bootstrap-fill"></i></a></li>
+              <li>Enfant labellisé ARIA :
+				 <a href="#" target="_blank">Retour d'expérience<i aria-label="(Ouvre un nouvel onglet)" class="bi bi-box-arrow-up-right"></i></a></li>
+              <li>Lien vide avec l'attribut title&nbsp;:<a href="#" title="Boutique (Ouvre un nouvel onglet)" target="_blank"><i class="bi bi-shop"></i></a></li>
+            </ul>
+          </div>
+
+          <h3>Les liens avec des noms identiques doivent avoir un objectif équivalent</h3>
+
+          <div class="row">
+            <div class="col-md-4">
+              <div class="example">
+                <p>Même nom et emplacement du lien&nbsp;:
+                   <a href="https://www.google.com/">Google</a> et <a href="https://www.google.com/">Google</a></p>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="example">
+                <p>Même nom de lien mais emplacements différents :
+                   <a href="https://www.bing.com/">Bing</a> et <a href="https://www.duckduckgo.com/" >Bing</a>
+				</p>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="example">
+                <p>Même nom de lien mais emplacements différents&nbsp;:
+
+				<a href="https://www.github.com/" aria-label="GitHub"><i class="bi bi-github"></i></a>et
+				<a href="https://bitbucket.org/" aria-label="GitHub" ><i class="bi bi-github"></i></a>
+				</p>
+              </div>
+            </div>
+          </div>
+
+          <h3>Liens vers des fichiers sans avertissement</h3>
+          <div class="row">
+            <div class="col-md-4">
+              <div class="example">
+
+				<a href="#asd.zip" >Actifs de marque</a>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="example">
+                <a href="#asd.zip">Éléments de marque (.zip)</a>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="example">
+
+				<a href="#asd.zip">Actifs de marque<i aria-label="(.Zip *: français)" class="bi bi-file-earmark-zip"></i></a>
+              </div>
+            </div>
+          </div>
+
+
+        </div>
+      </div>
+    </div>
+  </main>
+  <footer class="sa11y-ignore d-flex flex-wrap bg-dark text-white justify-content-between align-items-center py-5 mt-5">
+    <div class="container">
+      <span class="text-muted">Cette zone de pied de page est ignorée. Si un éditeur de contenu ne peut pas le réparer, ne le scannez pas. <a href="#">lien</a> sera ignoré.</span>
+    </div>
+  </footer>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous">
+  </script>
+
+ <!-- Sa11y -->
+  <script type="module" src="../script.js"></script>
+</body>
+
+</html>

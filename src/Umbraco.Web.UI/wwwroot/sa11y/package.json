@@ -1,0 +1,90 @@
+{
+  "_from": "sa11y",
+  "_id": "sa11y@2.3.5",
+  "_inBundle": false,
+  "_integrity": "sha512-6qTcl2HStVSpT5EgRCKuJapJrlLDUEBmz5zHRFHtOnW56Zl8K8Usmoget5ZmvjPDm7i1G30hjst+Sbizyuy9jA==",
+  "_location": "/sa11y",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "tag",
+    "registry": true,
+    "raw": "sa11y",
+    "name": "sa11y",
+    "escapedName": "sa11y",
+    "rawSpec": "",
+    "saveSpec": null,
+    "fetchSpec": "latest"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/sa11y/-/sa11y-2.3.5.tgz",
+  "_shasum": "2bbb62acc84c086c9ea344c6a8e21b32105f1e74",
+  "_spec": "sa11y",
+  "_where": "C:\\GitRoot\\Umbraco\\v11\\src\\Umbraco.Web.UI.Client",
+  "author": {
+    "name": "Adam Chaboryk, Toronto Metropolitan University"
+  },
+  "bugs": {
+    "url": "https://github.com/ryersondmp/sa11y/issues"
+  },
+  "bundleDependencies": false,
+  "dependencies": {
+    "tippy.js": "^6.3.7"
+  },
+  "deprecated": false,
+  "description": "Sa11y is an accessibility quality assurance tool that visually highlights common accessibility and usability issues. Geared towards content authors, Sa11y straightforwardly identifies errors or warnings at the source with a simple tooltip on how to fix them.",
+  "devDependencies": {
+    "@babel/core": "^7.14.6",
+    "@babel/preset-env": "^7.14.7",
+    "@rollup/plugin-babel": "^5.3.0",
+    "@rollup/plugin-node-resolve": "^13.0.0",
+    "@rollup/plugin-replace": "^3.0.0",
+    "autoprefixer": "^10.2.6",
+    "caniuse-lite": "^1.0.30001418",
+    "cssnano": "^5.0.6",
+    "eslint": "^7.30.0",
+    "eslint-config-airbnb": "^18.2.1",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.23.4",
+    "light-server": "^2.9.1",
+    "postcss": "^8.3.10",
+    "rimraf": "^3.0.2",
+    "rollup": "^2.52.7",
+    "rollup-plugin-import-css": "^3.0.2",
+    "rollup-plugin-sass": "^1.2.9",
+    "rollup-plugin-scss": "^3.0.0",
+    "rollup-plugin-terser": "^7.0.2",
+    "sass": "^1.35.1",
+    "stylelint": "^13.13.1",
+    "stylelint-config-standard": "^20.0.0",
+    "stylelint-order": "^4.1.0",
+    "stylelint-scss": "^3.19.0"
+  },
+  "email": "adam.chaboryk@ryerson.ca",
+  "homepage": "https://sa11y.netlify.app",
+  "keywords": [
+    "Sa11y",
+    "a11y",
+    "javascript",
+    "accessibility"
+  ],
+  "license": "GPL-2.0-or-later",
+  "main": "./index.js",
+  "name": "sa11y",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ryersondmp/sa11y.git"
+  },
+  "scripts": {
+    "build": "rimraf dist && node ./node_modules/rollup/dist/bin/rollup -c rollup.config.js",
+    "lint": "npm run lint:css && npm run lint:js",
+    "lint:css": "stylelint --config .stylelintrc.json -s scss \"src/scss/**/*.scss\"",
+    "lint:js": "node ./node_modules/eslint/bin/eslint.js src",
+    "serve": "npm run build && node ./docs.js && light-server -p 8080 -b localhost -s ./ -w \"src/**/* # npm run build && node ./docs.js # reload\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "types": "./types/sa11y.d.ts",
+  "version": "2.3.5"
+}
