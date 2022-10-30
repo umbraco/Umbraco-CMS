@@ -129,11 +129,11 @@ public class PreviewController : Controller
     [Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]
     public ActionResult Frame(int id, string culture)
     {
+        TempData.Add("CanvasDesigner", "true");
         EnterPreview(id);
 
         // use a numeric URL because content may not be in cache and so .Url would fail
         var query = culture.IsNullOrWhiteSpace() ? string.Empty : $"?culture={culture}";
-
         return RedirectPermanent($"../../{id}{query}");
     }
 
@@ -141,7 +141,6 @@ public class PreviewController : Controller
     {
         IUser? user = _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
         _cookieManager.SetCookieValue(Constants.Web.PreviewCookieName, "preview");
-
         return new EmptyResult();
     }
 

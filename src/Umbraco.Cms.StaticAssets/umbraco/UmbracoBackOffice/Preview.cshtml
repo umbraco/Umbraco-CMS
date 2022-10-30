@@ -30,8 +30,6 @@
     var returnToPreviewDescription = LocalizedTextService.Localize("preview", "returnToPreviewDescription");
     var returnToPreviewAcceptButton = LocalizedTextService.Localize("preview", "returnToPreviewAcceptButton");
     var returnToPreviewDeclineButton = LocalizedTextService.Localize("preview", "returnToPreviewDeclineButton");
-
-    TempData.Add("CanvasDesigner", true);
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -114,6 +112,4 @@
 
 </body>
 </html>
-@{
-    TempData.Remove("CanvasDesigner");
-}
+
