@@ -82,12 +82,5 @@ public class RequestHandlerSettings
     /// <summary>
     ///     Add additional character replacements, or override defaults
     /// </summary>
-    [Obsolete(
-        "Use the GetCharReplacements extension method in the Umbraco.Extensions namespace instead. Scheduled for removal in V11")]
-    public IEnumerable<IChar> CharCollection { get; set; } = DefaultCharCollection;
-
-    /// <summary>
-    ///     Add additional character replacements, or override defaults
-    /// </summary>
     public IEnumerable<CharItem>? UserDefinedCharCollection { get; set; }
 }

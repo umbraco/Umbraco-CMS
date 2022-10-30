@@ -1,67 +1,47 @@
 <Project Sdk="Microsoft.NET.Sdk.Razor">
-
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <Title>Umbraco CMS - Static assets</Title>
+    <Description>Contains the static assets needed to run Umbraco CMS.</Description>
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
-    <PackageId>Umbraco.Cms.StaticAssets</PackageId>
-    <Description>Contains the static assets that is required to run Umbraco CMS.</Description>
     <StaticWebAssetBasePath>/</StaticWebAssetBasePath>
   </PropertyGroup>
-
-  <ItemGroup>
-    <None Include="buildTransitive\**\*.*">
-      <Pack>true</Pack>
-      <PackagePath>buildTransitive</PackagePath>
-    </None>
-  </ItemGroup>
 
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Umbraco.Web.BackOffice\Umbraco.Web.BackOffice.csproj" PrivateAssets="All" />
-    <ProjectReference Include="..\Umbraco.Web.Website\Umbraco.Web.Website.csproj" PrivateAssets="All" />
+    <ProjectReference Include="..\Umbraco.Web.BackOffice\Umbraco.Web.BackOffice.csproj" />
+    <ProjectReference Include="..\Umbraco.Web.Website\Umbraco.Web.Website.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
-    <BellePath>$(ProjectDir)wwwroot/umbraco</BellePath>
+    <BellePath>$(ProjectDir)wwwroot\umbraco</BellePath>
   </PropertyGroup>
 
-  <Target Name="CheckPreconditions" BeforeTargets="Build">
-    <Message Text="-CheckPreconditions-" Importance="high" />
-    <Message Text="BellePath:       $(BellePath)" Importance="high" />
-
-    <!-- Build Belle, if building is Visual Studio and the build folder does not exist yet -->
-    <Message Text="Skip Belle because UmbracoBuild is '$(UmbracoBuild)' (this is not Visual Studio)." Importance="High" Condition="'$(UmbracoBuild)' != ''" />
-    <Message Text="Skip Belle because $(BellePath) exists." Importance="High" Condition="Exists('$(BellePath)')" />
-    <Message Text="Build Belle because UmbracoBuild is empty (this is Visual Studio), and $(BellePath) does not exist." Importance="High" Condition="!Exists('$(BellePath)') and '$(UmbracoBuild)' == ''" />
-    <CallTarget Targets="BelleBuild" Condition="!Exists('$(BellePath)') and '$(UmbracoBuild)' == ''" />
+  <Target Name="BuildBellePreconditions" BeforeTargets="Build">
+    <Message Text="Skip BuildBelle target because UmbracoBuild is '$(UmbracoBuild)' (this is not Visual Studio)" Importance="high" Condition="'$(UmbracoBuild)' != ''" />
+    <Message Text="Skip BuildBelle target because '$(BellePath)' already exists" Importance="high" Condition="Exists('$(BellePath)')" />
+    <Message Text="Call BuildBelle target because UmbracoBuild is empty (this is Visual Studio) and '$(BellePath)' doesn't exist" Importance="high" Condition="'$(UmbracoBuild)' == '' and !Exists('$(BellePath)')" />
+    <CallTarget Targets="BuildBelle" Condition="'$(UmbracoBuild)' == '' and !Exists('$(BellePath)')" />
+  </Target>
+  
+  <Target Name="BuildBelle">
+    <Exec WorkingDirectory="$(ProjectDir)..\Umbraco.Web.UI.Client\" Command="npm ci --no-fund --no-audit --prefer-offline" />
+    <Exec WorkingDirectory="$(ProjectDir)..\Umbraco.Web.UI.Client\" Command="npm run build:skip-tests" />
   </Target>
 
-
-  <Target Name="BelleBuild">
-    <Exec WorkingDirectory="$(ProjectDir)/../Umbraco.Web.UI.Client/" Command="npm ci --no-fund --no-audit --prefer-offline" />
-    <Exec WorkingDirectory="$(ProjectDir)/../Umbraco.Web.UI.Client/" Command="npm run build:skip-tests" />
+  <Target Name="CleanBellePreconditions" AfterTargets="Clean" Condition="'$(UmbracoBuild)' == ''">
+    <Message Text="Skip CleanBelle target because '$(BellePath)' doesn't exist" Importance="high" Condition="!Exists('$(BellePath)')" />
+    <Message Text="Skip CleanBelle target because preserve.belle marker file exists" Importance="high" Condition="Exists('$(BellePath)') and Exists('$(SolutionDir)preserve.belle')" />
+    <Message Text="Call CleanBelle target because '$(BellePath)' exists and preserve.belle marker file doesn't exist" Importance="high" Condition="Exists('$(BellePath)') and !Exists('$(SolutionDir)preserve.belle')" />
+    <CallTarget Targets="CleanBelle" Condition="Exists('$(BellePath)') and !Exists('$(SolutionDir)preserve.belle')" />
   </Target>
-
-  <!-- Clean Belle when cleaning and rebuilding, but only in Visual Studio -->
-  <Target Name="CleanPreconditions" AfterTargets="Clean" Condition="'$(UmbracoBuild)' == ''">
-    <Message Text="-CleanPreconditions-" Importance="high" />
-    <Message Text="Nothing to clean, as $(BellePath) does not exist." Importance="High" Condition="!Exists('$(BellePath)')" />
-    <Message Text="Not cleaning (found src/preserve.belle)." Importance="High" Condition="Exists('$(BellePath)') and Exists('$(SolutionDir)preserve.belle')" />
-    <Message Text="Remove $(BellePath)." Importance="High" Condition="Exists('$(BellePath)') and !Exists('$(SolutionDir)preserve.belle')" />
+  
+  <Target Name="CleanBelle">
     <ItemGroup>
       <BelleLib Include="$(BellePath)" />
     </ItemGroup>
-    <RemoveDir Directories="@(BelleLib)" Condition="Exists('$(BellePath)') and !Exists('$(SolutionDir)preserve.belle')" />
+    <RemoveDir Directories="@(BelleLib)" />
   </Target>
-
-
-  <!--
-      The set of files to publish is generated really early and doesn't currently account for files added by targets e.g. BeforeBuild.
-      A fix was put in place in Web SDK to update for wwwwroot in case someone runs npm build etc in a target, we're borrowing their trick.
-      https://github.com/dotnet/sdk/blob/e2b2b1a4ac56c955b84d62fe71cda3b6f258b42b/src/WebSdk/Publish/Targets/ComputeTargets/Microsoft.NET.Sdk.Publish.ComputeFiles.targets
-   -->
-
 </Project>

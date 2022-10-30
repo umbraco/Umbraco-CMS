@@ -376,7 +376,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         },
                         {
                             "currentUserApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<CurrentUserController>(
-                                controller => controller.PostChangePassword(new ChangingPasswordModel()))
+                                controller => controller.PostSetAvatar(new List<IFormFile>()))
                         },
                         {
                             "entityApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<EntityController>(
@@ -416,7 +416,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         },
                         {
                             "memberTypeApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<MemberTypeController>(
-                                controller => controller.GetAllTypes())
+                                controller => controller.GetById(0))
                         },
                         {
                             "memberTypeQueryApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<MemberTypeQueryController>(
@@ -569,7 +569,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         {"minimumPasswordNonAlphaNum", _memberPasswordConfigurationSettings.GetMinNonAlphaNumericChars()},
                         {"sanitizeTinyMce", _globalSettings.SanitizeTinyMce},
                         {"dataTypesCanBeChanged", _dataTypesSettings.CanBeChanged.ToString()},
-                        {"allowEditInvariantFromNonDefault", _securitySettings.AllowEditInvariantFromNonDefault},
+                        {"allowEditInvariantFromNonDefault", _contentSettings.AllowEditInvariantFromNonDefault},
                     }
                 },
                 {

@@ -28,31 +28,8 @@ public static class RequestHandlerSettingsExtension
             return RequestHandlerSettings.DefaultCharCollection;
         }
 
-        return MergeUnique(
-            requestHandlerSettings.UserDefinedCharCollection,
-            RequestHandlerSettings.DefaultCharCollection);
-    }
-
-    /// <summary>
     ///     Merges CharCollection and UserDefinedCharCollection, prioritizing UserDefinedCharCollection.
-    /// </summary>
-    internal static void MergeReplacements(
-        this RequestHandlerSettings requestHandlerSettings,
-        IConfiguration configuration)
-    {
-        var sectionKey = $"{Constants.Configuration.ConfigRequestHandler}:";
-
-        IEnumerable<CharItem> charCollection = GetReplacements(
-            configuration,
-            $"{sectionKey}{nameof(RequestHandlerSettings.CharCollection)}");
-
-        IEnumerable<CharItem> userDefinedCharCollection = GetReplacements(
-            configuration,
-            $"{sectionKey}{nameof(requestHandlerSettings.UserDefinedCharCollection)}");
-
-        IEnumerable<CharItem> mergedCollection = MergeUnique(userDefinedCharCollection, charCollection);
-
-        requestHandlerSettings.UserDefinedCharCollection = mergedCollection;
+        return MergeUnique(requestHandlerSettings.UserDefinedCharCollection, RequestHandlerSettings.DefaultCharCollection);
     }
 
     private static IEnumerable<CharItem> GetReplacements(IConfiguration configuration, string key)
@@ -64,6 +41,12 @@ public static class RequestHandlerSettingsExtension
         {
             var @char = section.GetValue<string>(nameof(CharItem.Char));
             var replacement = section.GetValue<string>(nameof(CharItem.Replacement));
+
+            if (@char is null || replacement is null)
+            {
+                continue;
+            }
+
             replacements.Add(new CharItem { Char = @char, Replacement = replacement });
         }
 

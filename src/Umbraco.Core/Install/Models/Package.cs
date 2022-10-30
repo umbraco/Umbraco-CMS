@@ -1,7 +1,8 @@
-using System.Runtime.Serialization;
+﻿using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Core.Install.Models;
 
+[Obsolete("This is no longer used, instead PackageDefinition and InstalledPackage is used")]
 [DataContract(Name = "package")]
 public class Package
 {

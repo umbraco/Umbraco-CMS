@@ -71,7 +71,7 @@ public abstract class UmbracoIdentityUser : IdentityUser, IRememberBeingDirty
     // model. A good writeup of that is here:
     // https://stackoverflow.com/a/37362173
     // For our purposes currently we won't worry about this.
-    public override string ConcurrencyStamp { get => base.ConcurrencyStamp; set => base.ConcurrencyStamp = value; }
+    public override string? ConcurrencyStamp { get => base.ConcurrencyStamp; set => base.ConcurrencyStamp = value; }
 
     /// <summary>
     ///     Gets or sets last login date
@@ -85,7 +85,7 @@ public abstract class UmbracoIdentityUser : IdentityUser, IRememberBeingDirty
     /// <summary>
     ///     Gets or sets email
     /// </summary>
-    public override string Email
+    public override string? Email
     {
         get => _email;
         set => BeingDirty.SetPropertyValueAndDetectChanges(value, ref _email!, nameof(Email));
@@ -247,7 +247,7 @@ public abstract class UmbracoIdentityUser : IdentityUser, IRememberBeingDirty
     /// <summary>
     ///     Gets or sets user name
     /// </summary>
-    public override string UserName
+    public override string? UserName
     {
         get => _userName;
         set => BeingDirty.SetPropertyValueAndDetectChanges(value, ref _userName!, nameof(UserName));

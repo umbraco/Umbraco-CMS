@@ -1,0 +1,977 @@
+@import "../../../less/variables.less";
+@import "../../../less/mixins.less";
+@import "../../../less/buttons.less";
+@import "../../../less/accessibility/sr-only.less";
+@import "../../../less/components/umb-icon.less";
+
+@umb-block-grid__item_minimum_height: 48px;
+
+.umb-block-grid {
+    padding-bottom:10px;
+}
+
+.umb-block-grid .umb-load-indicator {
+    margin-bottom:20px;
+}
+
+.umb-block-grid {
+    position: relative;
+}
+
+.umb-block-grid__layout-item {
+    position: relative;
+    &:hover {
+        z-index: 3;
+/*
+        > .umb-block-grid__force-left,
+        > .umb-block-grid__force-right {
+            z-index: 4;
+        }
+        */
+    }
+}
+
+.umb-block-grid__block--validation-border {
+    display:none;
+}
+ng-form.ng-invalid-val-server-match-settings > .umb-block-grid__block:not(.--active) > .umb-block-grid__block--validation-border, 
+ng-form.ng-invalid-val-server-match-content > .umb-block-grid__block:not(.--active) > .umb-block-grid__block--validation-border {
+    display: block;
+    position: absolute;
+    inset: 0;
+    border-radius: 3px;
+    border: 1px solid @formErrorText;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, .7), inset 0 0 0 1px rgba(255, 255, 255, .7);
+    /* TODO: not working cause we are in a shadow DOM: */
+    .show-validation-type-warning & {
+        border-color: @formWarningText;
+    }
+    pointer-events: none;
+}
+
+/*.umb-block-grid__block--validation-badge {
+    display:none;
+}
+ng-form.ng-invalid-val-server-match-settings > .umb-block-grid__block:not(.--active) > .umb-block-grid__block--validation-badge, 
+ng-form.ng-invalid-val-server-match-content > .umb-block-grid__block:not(.--active) > .umb-block-grid__block--validation-badge {
+    display:block;
+    text-align: center;
+    position: absolute;
+    top: -9px;
+    right: -9px;
+    min-width: 10px;
+    color: @white;
+    border: 2px solid @white;
+    border-radius: 50%;
+    font-size: 10px;
+    font-weight: bold;
+    padding: 2px;
+    line-height: 10px;
+    background-color: @formErrorText;
+    .show-validation-type-warning & {
+        background-color: @formWarningText;
+    }
+    font-weight: 900;
+    pointer-events: none;
+
+    animation-duration: 1.4s;
+    animation-iteration-count: infinite;
+    animation-name: blockelement-inlineblock-editor--badge-bounce;
+    animation-timing-function: ease;
+    @keyframes blockelement-inlineblock-editor--badge-bounce {
+        0%   { transform: translateY(0); }
+        20%  { transform: translateY(-4px); }
+        40%  { transform: translateY(0); }
+        55%  { transform: translateY(-2px); }
+        70%  { transform: translateY(0); }
+        100% { transform: translateY(0); }
+    }
+}
+*/
+
+.umb-block-grid__block {
+    position: relative;
+    width: 100%;
+    height: 100%;
+
+    --umb-block-grid__block--show-ui: 0;// Publicly available.
+    --umb-block-grid--hint-area-ui: 0;
+
+    &::after {
+        content: '';
+        position: absolute;
+        z-index: 1;
+        pointer-events: none;
+        display: none;
+        inset: 0;
+        border: 1px solid transparent;
+        border-radius: 3px;
+        box-shadow: 0 0 0 1px rgba(255, 255, 255, .7), inset 0 0 0 1px rgba(255, 255, 255, .7);
+        
+        transition: border-color 240ms ease-in;
+    }
+
+    > .umb-block-grid__block--actions {
+        opacity: 0;
+        transition: opacity 120ms;
+    }
+    > .umb-block-grid__force-left,
+    > .umb-block-grid__force-right {
+        opacity: 0;
+        transition: opacity 120ms;
+    }
+    > .umb-block-grid__block--context {
+        opacity: 0;
+        transition: opacity 120ms;
+    }
+    > umb-block-grid-block > umb-block-grid-entries > .umb-block-grid__block--context {
+        opacity: 0;
+        transition: opacity 120ms;
+    }
+
+    &:hover,
+    &:focus,
+    &:focus-within {
+
+        --umb-block-grid--hint-area-ui: 1;
+
+        &::after {
+            /*border-color: @blueDark;*/
+            display: var(--umb-block-grid--block-ui-display, block);
+            animation: umb-block-grid__block__border-pulse 400ms ease-in-out alternate infinite;
+            @keyframes umb-block-grid__block__border-pulse {
+                0%   { border-color: rgba(@blueDark, 1); }
+                100% { border-color: rgba(@blueDark, 0.66); }
+            }
+        }
+    }
+    &.--active {
+        &::after {
+            display: block;
+            border-color: @pinkLight;
+            animation: none;
+        }
+        
+        > .umb-block-grid__block--context {
+            .__context-bar {
+                background-color: @ui-active-border;
+                color: @ui-active-type;
+            }
+        }
+    }
+
+    &.--scale-mode {
+        &::after {
+            display: block;
+
+            z-index: 10;
+            cursor: nwse-resize;
+            pointer-events: all;
+
+            transition: background-color 240ms ease-in;
+            animation: umb-block-grid__scalebox__pulse 400ms ease-in-out alternate infinite;
+            @keyframes umb-block-grid__scalebox__pulse {
+                0%   { background-color: rgba(@blueMidLight, 0.33); }
+                100% { background-color: rgba(@blueMidLight, 0.22); }
+            }
+        }
+
+        > .umb-block-grid__block--context {
+            opacity: 1;
+        }
+        > .umb-block-grid__scale-handler {
+            opacity: 1;
+        }
+        > .umb-block-grid__scale-label {
+            opacity: 1;
+        }
+        > .umb-block-grid__force-left,
+        > .umb-block-grid__force-right {
+            opacity: 1;
+        }
+    }
+    
+    /** make sure to hide child block ui: */
+    &.--hovering-area:not(.--block-ui-visible) {
+        &::after {
+            display: none;
+        }
+        > .umb-block-grid__scale-handler {
+            display: none;
+        }
+        > .umb-block-grid__block--context {
+            display: none;
+        }
+        > .umb-block-grid__block--actions {
+            display: none;
+        }
+        > .umb-block-grid__force-left, 
+        > .umb-block-grid__force-right {
+            display: none;
+        }
+    }
+    &.--block-ui-visible {
+        > .umb-block-grid__block--context {
+            /* take full width to prevent interaction with elements behind.*/
+            left: 0;
+        }
+        .umb-block-grid__area-container, .umb-block-grid__block--view::part(area-container) {
+            --umb-block-grid--block-ui-display: none;
+            .umb-block-grid__layout-item {
+                pointer-events: none;
+            }
+            .umb-block-grid__block {
+                pointer-events: none;
+            }
+        }
+    }
+    
+    &.--hovering-area.--block-ui-visible:hover,
+    &.--hovering-area.--block-ui-visible:focus,
+    &.--hovering-area.--block-ui-visible:focus-within,
+
+    &:not(.--hovering-area):hover,
+    &:not(.--hovering-area):focus,
+    &:not(.--hovering-area):focus-within,
+    &.--active {
+
+        /** Avoid displaying hover when dragging-mode */
+        --umb-block-grid--block_ui-opacity: calc(1 - var(--umb-block-grid--dragging-mode, 0));
+        
+        > .umb-block-grid__block--context {
+            opacity: var(--umb-block-grid--block_ui-opacity);
+        }
+        &:not(.--scale-mode) {
+            > .umb-block-grid__block--actions {
+                opacity: var(--umb-block-grid--block_ui-opacity);
+            }
+    
+            > umb-block-grid-block > umb-block-grid-entries > .umb-block-grid__layout-container > .umb-block-grid__area-actions {
+                opacity: var(--umb-block-grid--block_ui-opacity);
+            }
+        }
+        
+        > .umb-block-grid__scale-handler {
+            opacity: var(--umb-block-grid--block_ui-opacity);
+        }
+        > .umb-block-grid__force-left, 
+        > .umb-block-grid__force-right {
+            opacity: var(--umb-block-grid--block_ui-opacity);
+        }
+    }
+
+    /*
+    &.--show-validation {
+        ng-form.ng-invalid-val-server-match-content > & {
+            border: 2px solid @formErrorText;
+            border-radius: @baseBorderRadius;
+        }
+    }
+    */
+}
+
+ng-form.ng-invalid > .umb-block-grid__block:not(.--active) > .umb-block-grid__block--actions {
+    opacity: 1;
+}
+/*
+ng-form.ng-invalid > .umb-block-grid__block:not(.--active) > .umb-block-grid__block--context {
+    opacity: 1;
+}
+*/
+
+.umb-block-grid__block--view {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.umb-block-grid__block--context {
+    position: absolute;
+    top: -20px;
+    right: 0;
+    font-size: 12px;
+    z-index: 2;
+    display: var(--umb-block-grid--block-ui-display, flex);
+    justify-content: end;
+
+    .__context-bar {
+        padding: 0 9px;
+        padding-top: 1px;
+        background-color: #3544B1;
+        color: white;
+        border-top-left-radius: 3px;
+        border-top-right-radius: 3px;
+        display: inline-block;
+        .action {
+            color: currentColor;
+            font-size: 12px;
+        }
+        .__divider {
+            display: inline-block;
+            margin: 0 3px;
+        }
+        .__label {
+            display: inline-flex;
+            align-items: center;
+            padding: 0;
+            font-weight: 700;
+            user-select: none;
+    
+            .icon {
+                font-size: 22px;
+                margin-right: 5px;
+                display: inline-block;
+            }
+        }
+    }
+}
+
+.umb-block-grid__block--actions {
+    position: absolute;
+    top: 0px;
+    padding-top:10px;/** set to make sure programmatic scrolling gets the top of the block into view. */
+
+    right: 10px;
+
+    /*
+    If child block, it can be hidden if a parents sets: --umb-block-grid--block-ui-display: none;
+    */
+    display: var(--umb-block-grid--block-ui-display, flex);
+    opacity: 1;
+    z-index:3;
+    
+    font-size: 0;
+    background-color: rgba(255, 255, 255, .96);
+    border-radius: 16px;
+    align-items: center;
+    padding: 0 5px;
+    margin-top:10px;
+
+    .action {
+        color: @ui-action-discreet-type;
+        font-size: 18px;
+        padding: 5px;
+        &:hover {
+            color: @ui-action-discreet-type-hover;
+        }
+    }
+
+    .action {
+        position: relative;
+        display: inline-block;
+ 
+        &.--error {
+            color: @errorBackground;
+            /** TODO: warning color class does not work in shadowDOM. */
+            .show-validation-type-warning & {
+                color: @warningBackground;
+            }
+        }
+
+        > .__error-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            min-width: 8px;
+            color: @white;
+            background-color: @ui-active-type;
+            border: 2px solid @white;
+            border-radius: 50%;
+            font-size: 8px;
+            font-weight: bold;
+            padding: 2px;
+            line-height: 8px;
+            background-color: @errorBackground;
+            .show-validation-type-warning & {
+                background-color: @warningBackground;
+            }
+            display: none;
+            font-weight: 900;
+        }
+        &.--error > .__error-badge {
+            display: block;
+
+            animation-duration: 1.4s;
+            animation-iteration-count: infinite;
+            animation-name: umb-block-grid__action--badge-bounce;
+            animation-timing-function: ease;
+            @keyframes umb-block-grid__action--badge-bounce {
+                0%   { transform: translateY(0); }
+                20%  { transform: translateY(-4px); }
+                40%  { transform: translateY(0); }
+                55%  { transform: translateY(-2px); }
+                70%  { transform: translateY(0); }
+                100% { transform: translateY(0); }
+            }
+
+        }
+    }
+}
+
+.umb-block-grid__force-left,
+.umb-block-grid__force-right {
+    position: absolute;
+    z-index: 2;
+    top: 50%;
+    height: 30px;
+    width: 15px;
+    margin-top:-15px;
+    background-color: transparent;
+    color: @blueDark;
+    border: 1px solid rgba(255, 255, 255, .2);
+    font-size: 12px;
+    padding: 0;
+    cursor: pointer;
+    box-sizing: border-box;
+    border-radius: 8px;
+    display: var(--umb-block-grid--block-ui-display, flex);
+    justify-content: center;
+    align-items: center;
+    pointer-events: all;
+
+    opacity: 0;
+    transition: background-color 120ms, border-color 120ms, color 120ms, opacity 120ms;
+
+    .icon {
+        position: relative;
+        display: inline-block;
+        pointer-events: none;
+        opacity: 0;
+        transition: transform 120ms ease-in-out, opacity 120ms;
+        ::before {
+            content: '';
+            position: absolute;
+            background-color:currentColor;
+            width:2px;
+            height: 8px;
+            top: 2px;
+            transition: transform 120ms ease-in-out;
+        }
+    }
+
+    &:hover {
+        opacity: 1;
+        color: @blueDark;
+        background-color: @white;
+    }
+    &:hover,
+    &.--active {
+        .icon {
+            opacity: 1;
+            transform: translateX(0);
+            ::before {
+                transform: translateX(0);
+            }
+        }
+    }
+
+    &.--active {
+        background-color: @blueDark;
+        color: white;
+        &:hover {
+            color: white;
+        }
+    }
+}
+
+.umb-block-grid__force-left {
+    left: 0;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    .icon {
+        transform: translateX(3px);
+        ::before {
+            left: 2px;
+            transform: translateX(-3px);
+        }
+    }
+    &:hover,
+    &.--active {
+        border-left-color: @blueDark;
+    }
+}
+.umb-block-grid__force-right {
+    right: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    .icon {
+        margin-right: 1px;
+        transform: translateX(-3px);
+        ::before {
+            right: 2px;
+            transform: translateX(3px);
+        }
+    }
+    &:hover,
+    &.--active {
+        border-right-color: @blueDark;
+    }
+}
+
+/*
+umb-block-grid-block {
+
+    > div {
+        position: relative;
+        width: 100%;
+        min-height: @umb-block-grid__item_minimum_height;
+        background-color: @white;
+        border-radius: @baseBorderRadius;
+        box-sizing: border-box;
+    }
+
+}
+*/
+
+/*
+.blockelement__draggable-element {
+    cursor: grab;
+}
+*/
+
+
+.umb-block-grid__scale-handler {
+    cursor: nwse-resize;
+    position: absolute;
+    display: var(--umb-block-grid--block-ui-display, block);
+    Z-index:10;
+    bottom: -4px;
+    right: -4px;
+    width:8px;
+    height:8px;
+    padding: 0;
+    background-color: white;
+    border: @blueDark solid 1px;
+    opacity: 0;
+    transition: opacity 120ms;
+}
+.umb-block-grid__scale-handler:focus {
+    opacity: 1;
+}
+.umb-block-grid__scale-handler::after {
+    content: '';
+    position: absolute;
+    inset: -10px;
+    background-color: rgba(0,0,0,0);
+}
+
+.umb-block-grid__scale-handler:focus + .umb-block-grid__scale-label,
+.umb-block-grid__scale-handler:hover + .umb-block-grid__scale-label {
+    opacity: 1;
+}
+
+
+.umb-block-grid__scale-label {
+    position: absolute;
+    display: block;
+    left: 100%;
+    margin-left: 6px;
+    margin-top: 6px;
+    z-index: 2;
+
+    background-color: white;
+    color: black;
+    font-size: 12px;
+    padding: 0px 6px;
+    border-radius: 3px;
+    opacity: 0;
+    transition: opacity 120ms;
+
+    pointer-events: none;
+    white-space: nowrap;
+}
+
+
+.umb-block-grid__block--inline-create-button {
+    top: 0px;
+    position: absolute;
+    z-index: 1;
+
+    /** Avoid showing inline-create in dragging-mode */
+    opacity: calc(1 - var(--umb-block-grid--dragging-mode, 0));
+}
+.umb-block-grid__block--inline-create-button.--above {
+    left: 0;
+    width: 100%;
+}
+.umb-block-grid__block--inline-create-button.--above.--at-root {
+    /* If at root, and full-width then become 40px wider: */
+    --calc: clamp(0, calc(var(--umb-block-grid--item-column-span) - (var(--umb-block-grid--grid-columns)-1)), 1);
+    left: calc(-20px * var(--calc));
+    width: calc(100% + 40px * var(--calc));
+}
+.umb-block-grid__block--inline-create-button.--after {
+    right: 1px;
+}
+.umb-block-grid__block--inline-create-button.--after.--detector {
+    width: 10px;
+    margin-right: -10px;
+    height: 100%;
+    z-index: 0;
+}
+.umb-block-grid__block--inline-create-button.--after.--at-root {
+    /* If at root, and full-width then move a little out to the right: */
+    --calc: clamp(0, calc(var(--umb-block-grid--item-column-span) - (var(--umb-block-grid--grid-columns)-1)), 1);
+    right: calc(-2px * var(--calc));
+}
+.umb-block-grid__block--inline-create-button.--after.--hide {
+    /** If at right side, hide, but do still act on mouseOver so we can reevaluate if it should be shown again.*/
+    opacity: 0;
+    cursor: move !important;
+}
+.umb-block-grid__block--inline-create-button.--after.--hide > * {
+    pointer-events: none;
+}
+
+.umb-block-grid__block--after-inline-create-button {
+    z-index:2;
+    width: 100%;
+    /* Move inline create button slightly up, to avoid collision with others*/
+    margin-bottom: -7px;
+    margin-top: -13px;
+}
+
+
+
+.umb-block-grid__actions {
+    display:flex;
+    border: 1px dashed @ui-action-discreet-border;
+    border-radius: @baseBorderRadius;
+    box-sizing: border-box;
+
+    &:hover {
+        border-color: transparent;
+        > button {
+
+            border-color: @ui-action-discreet-border;
+
+            &.umb-block-grid__clipboard-button {
+                opacity: 1;
+            }
+        }
+        
+    }
+
+    > button {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        
+        color: @ui-action-discreet-type;
+        font-weight: bold;
+        margin: -1px;
+        padding: 5px 15px;
+
+        border: 1px dashed transparent;
+        border-radius: @baseBorderRadius;
+        box-sizing: border-box;
+        
+        &:not([disabled]):hover {
+            color: @ui-action-discreet-type-hover;
+            border-color: @ui-action-discreet-border-hover;
+            text-decoration: none;
+            z-index: 1;
+        }
+
+        &[disabled],
+        &[disabled]:hover {
+            color: @gray-7;
+            border-color: @gray-7;
+            cursor: default;
+        }
+
+        &.umb-block-grid__create-button {
+            flex-grow: 1;
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+    
+        &.umb-block-grid__clipboard-button {
+            margin-left: 0;
+            padding: 5px 12px;
+            font-size: 18px;
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+
+            opacity: 0;
+            &:hover, &:focus {
+                opacity: 1;
+            }
+
+            &.--jump {
+
+                @keyframes umb-block-grid__jump-clipboard-button {
+                    0% { opacity: 0; }
+                    10% { opacity: 1; }
+                    90% { opacity: 1; }
+                    100% { opacity: 0; }
+                }
+                animation: umb-block-grid__jump-clipboard-button 2s;
+
+                i{
+                    @keyframes umb-block-grid__jump-clipboard-button-i {
+                        10% { transform: scale(1); }
+                        10% { transform: scale(1.33); }
+                        20% { transform: scale(.82); }
+                        30% { transform: scale(1.24); }
+                        40% { transform: scale(.94); }
+                        50% { transform: scale(1); }
+                    }
+                    animation: umb-block-grid__jump-clipboard-button-i 2s;
+                }
+            }
+            
+        }
+    }
+}
+
+.umb-block-grid__area-actions {
+    grid-column: span var(--umb-block-grid--area-column-span);
+    opacity: calc(var(--umb-block-grid--hint-area-ui, 0) * .5 + var(--umb-block-grid--show-area-ui, 0));
+    transition: opacity 120ms;
+
+    &:focus, 
+    &:focus-within {
+        opacity: 1;
+    }
+    &.--highlight {
+        opacity: 1;
+    }
+
+    > button {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        
+        /* TODO: dont use --umb-text-color, its temporary to inherit UI */
+        color: var(--umb-text-color, @ui-action-discreet-type);
+        font-weight: bold;
+        padding: 5px 15px;
+
+        /* TODO: dont use --umb-text-color, its temporary to inherit UI */
+        border: 1px dashed var(--umb-text-color, @ui-action-discreet-border);
+        border-radius: @baseBorderRadius;
+        box-sizing: border-box;
+
+        width: 100%;
+        height: 100%;
+        
+        &:hover {
+            color: var(--umb-text-color, @ui-action-discreet-type-hover);
+            border-color: var(--umb-text-color, @ui-action-discreet-border-hover);
+            text-decoration: none;
+            z-index: 1;
+        }
+    }
+}
+
+
+/** make sure block with areas stay on top, so they don't look like they are 'not-allowed'*/
+/*
+.umb-block-grid__layout-container.--droppable-indication {
+    .umb-block-grid__area-actions {
+        display: none;
+    }
+}
+*/
+
+.umb-block-grid__layout-item-placeholder {
+    background: transparent;
+    border-radius: 3px;
+
+    border: solid 1px;
+    border-color: rgba(@blueDark, .5);
+    border-radius: 3px;
+
+    height: 100%;
+}
+
+.umb-block-grid__layout-item-placeholder > * {
+    display: none;
+}
+.umb-block-grid__layout-item-placeholder::before {
+    content: '';
+    position:absolute;
+    z-index:1;
+    inset: 0;
+    border-radius: 3px;
+    background-color: white;
+}
+.umb-block-grid__layout-item-placeholder::after {
+    content: '';
+    position:absolute;
+    z-index:1;
+    inset: 0;
+    border-radius: 3px;
+
+    transition: background-color 240ms ease-in;
+    animation: umb-block-grid__placeholder__pulse 400ms ease-in-out alternate infinite;
+    @keyframes umb-block-grid__placeholder__pulse {
+        0%   { background-color: rgba(@blueMidLight, 0.33); }
+        100% { background-color: rgba(@blueMidLight, 0.22); }
+    }
+}
+.umb-block-grid__layout-item-placeholder .indicateForceLeft, 
+.umb-block-grid__layout-item-placeholder .indicateForceRight {
+    position:absolute;
+
+    z-index: 2;
+    height: 100%;
+    width: 15px;
+
+    background-color: @blueDark;
+
+    background-position: center center;
+    background-repeat: no-repeat;
+    display: block !important;
+
+    animation: umb-block-grid__indicateForce__pulse 400ms ease-in-out alternate infinite;
+}
+
+.umb-block-grid__layout-item-placeholder .indicateForceLeft {
+    left:0;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='8' height='10'><polygon points='0,0 2,0 2,5 6,1 6,9 2,5 2,10 0,10' style='fill:white;'/></svg>");
+}
+.umb-block-grid__layout-item-placeholder .indicateForceRight {
+    right:0;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='8' height='10'><polygon points='8,0 6,0 6,5 2,1 2,9 6,5 6,10 8,10' style='fill:white;'/></svg>");
+}
+
+@keyframes umb-block-grid__indicateForce__pulse {
+    0%   { background-color: rgba(@blueDark, 1); }
+    100% { background-color: rgba(@blueDark, 0.5); }
+}
+
+
+.umb-block-grid__area {
+    position: relative;
+    --umb-block-grid--show-area-ui: 0;
+}
+.umb-block-grid__area:focus,
+.umb-block-grid__area:focus-within,
+.umb-block-grid__area:hover {
+    --umb-block-grid--show-area-ui: 1;
+}
+.umb-block-grid__area::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    /* Moved slightly in to align with the inline-create button, which is moved slightly in to avoid collision with other create buttons. */
+    top:2px;
+    bottom: 2px;
+    border-radius: 3px;
+    border: 1px solid rgba(@gray-5, 0.3);
+    pointer-events: none;
+    opacity: var(--umb-block-grid--show-area-ui, 0);
+    transition: opacity 240ms;
+}
+.umb-block-grid__area.--highlight::after {
+    /** Avoid displaying highlight when in dragging-mode */
+    opacity: calc(1 - var(--umb-block-grid--dragging-mode, 0));
+    border-color: @blueDark;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, .7), inset 0 0 0 1px rgba(255, 255, 255, .7);
+}
+.umb-block-grid__area:has( .umb-block-grid__layout-item-placeholder )::after {
+    opacity: 1;
+    border-color: @blueDark;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, .7), inset 0 0 0 1px rgba(255, 255, 255, .7);
+
+    /* Moved back to edge for this case */
+    top: 0;
+    bottom: 0;
+
+    animation: umb-block-grid__area-after__border-pulse 400ms ease-in-out alternate infinite;
+    @keyframes umb-block-grid__area-after__border-pulse {
+        0%   { border-color: rgba(@blueDark, 1); }
+        100% { border-color: rgba(@blueDark, 0.66); }
+    }
+}
+
+.umb-block-grid__scalebox-backdrop {
+    position: absolute;
+    top:0;
+    left:0;
+    bottom:0;
+    right:0;
+    z-index: 1;
+    cursor: nwse-resize;
+}
+/*
+.umb-block-grid__scalebox {
+    position: absolute;
+    top:0;
+    left:0;
+    z-index: 10;
+    cursor: nwse-resize;
+
+    transition: background-color 240ms ease-in;
+    animation: umb-block-grid__scalebox__pulse 400ms ease-in-out alternate infinite;
+    @keyframes umb-block-grid__scalebox__pulse {
+        0%   { background-color: rgba(@blueMidLight, 0.33); }
+        100% { background-color: rgba(@blueMidLight, 0.22); }
+    }
+}
+*/
+
+
+
+
+/*
+.umb-block-grid__layout-container {
+    
+}
+*/
+
+
+/** make sure block with areas stay on top, so they don't look like they are 'not-allowed'*/
+.umb-block-grid__layout-container.--not-allowing-drop {
+    .umb-block-grid__layout-item.--has-areas {
+        z-index: 2;
+    }
+}
+
+.umb-block-grid__layout-container .umb-block-grid__layout-item:not([depth='0']):first-of-type .umb-block-grid__block--inline-create-button.--above {
+    /* Move first above inline create button slightly up, to avoid collision with others*/
+    margin-top: -7px;
+}
+
+.umb-block-grid__not-allowed-box {
+    position: absolute;
+    inset: 0;
+    z-index:1;
+    border: 1px solid @red;
+    pointer-events: none;
+    cursor: no-drop;
+
+    animation: umb-block-grid__not-allowed-box__pulse 400ms ease-in-out alternate infinite;
+    @keyframes umb-block-grid__not-allowed-box__pulse {
+        0%   { background-color: rgba(@red, 0.33); }
+        100% { background-color: rgba(@red, 0.22); }
+    }
+}
+
+
+.show-validation umb-block-grid-entries.--invalid {
+    border: 2px solid @errorBackground;
+    border-radius: 3px;
+
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, .2), inset 0 0 0 1px rgba(255, 255, 255, .2);
+}
+
+.umb-block-grid__entries-validation-message {
+    padding: 3px 6px;
+    user-select: none;
+
+    border-radius: 6px;
+    color: @errorBackground;
+}
+
+.show-validation .umb-block-grid__entries-validation-message {
+    background-color: @errorBackground;
+    color: @errorText;
+    border-radius: 0;
+    border-top: 1px solid rgba(255, 255, 255, .2);
+}

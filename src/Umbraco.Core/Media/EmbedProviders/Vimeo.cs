@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Core.Media.EmbedProviders;
 /// <summary>
 ///     Embed Provider for Vimeo the popular online video hosting, sharing, and services platform provider.
 /// </summary>
-public class Vimeo : EmbedProviderBase
+public class Vimeo : OEmbedProviderBase
 {
     public Vimeo(IJsonSerializer jsonSerializer)
         : base(jsonSerializer)

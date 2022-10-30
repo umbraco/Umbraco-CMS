@@ -260,6 +260,11 @@ public class DictionaryController : BackOfficeNotificationsController
             return ValidationProblem(_localizedTextService.Localize("dictionary", "itemDoesNotExists"));
         }
 
+        if(dictionaryItem.ParentId == null && move.ParentId == Constants.System.Root)
+        {
+            return ValidationProblem(_localizedTextService.Localize("moveOrCopy", "notAllowedByPath"));
+        }
+
         IDictionaryItem? parent = _localizationService.GetDictionaryItemById(move.ParentId);
         if (parent == null)
         {
@@ -274,6 +279,11 @@ public class DictionaryController : BackOfficeNotificationsController
         }
         else
         {
+            if (dictionaryItem.ParentId == parent.Key)
+            {
+                return ValidationProblem(_localizedTextService.Localize("moveOrCopy", "notAllowedByPath"));
+            }
+
             dictionaryItem.ParentId = parent.Key;
             if (dictionaryItem.Key == parent.ParentId)
             {

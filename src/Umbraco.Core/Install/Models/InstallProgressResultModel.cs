@@ -1,10 +1,11 @@
-using System.Runtime.Serialization;
+﻿using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Core.Install.Models;
 
 /// <summary>
 ///     Returned to the UI for each installation step that is completed
 /// </summary>
+[Obsolete("Will no longer be required with the new backoffice API")]
 [DataContract(Name = "result", Namespace = "")]
 public class InstallProgressResultModel
 {

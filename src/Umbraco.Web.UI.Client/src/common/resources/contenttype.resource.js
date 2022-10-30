@@ -432,15 +432,13 @@ function contentTypeResource($q, $http, umbRequestHelper, umbDataFormatter, loca
                 throw "args.id cannot be null";
             }
 
-            var promise = localizationService.localize("contentType_moveFailed");
-
             return umbRequestHelper.resourcePromise(
                 $http.post(umbRequestHelper.getApiUrl("contentTypeApiBaseUrl", "PostMove"),
                     {
                         parentId: args.parentId,
                         id: args.id
                     }, { responseType: 'text' }),
-                promise);
+              'Failed to move content type');
         },
 
         /**

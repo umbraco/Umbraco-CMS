@@ -29,6 +29,7 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
     /// error, etc... and the end-user refreshes the installer then we cannot show the user screen because they've already entered that information so instead we'll
     /// display a simple continue installation view.
     /// </remarks>
+    [Obsolete("Will be replace with a new step with the new backoffice")]
     [InstallSetupStep(InstallationType.NewInstall, "User", 20, "")]
     public class NewInstallStep : InstallSetupStep<UserModel>
     {
@@ -208,30 +209,29 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
             }
 
             ConnectionStrings? umbracoConnectionString = _connectionStrings.CurrentValue;
-
             var isConnectionStringConfigured = umbracoConnectionString.IsConnectionStringConfigured();
             if (isConnectionStringConfigured)
             {
                 installState = (installState | InstallState.ConnectionStringConfigured) & ~InstallState.Unknown;
-            }
 
-            DbProviderFactory? factory = _dbProviderFactoryCreator.CreateFactory(umbracoConnectionString.ProviderName);
-            var isConnectionAvailable = isConnectionStringConfigured && DbConnectionExtensions.IsConnectionAvailable(umbracoConnectionString.ConnectionString, factory);
-            if (isConnectionAvailable)
-            {
-                installState = (installState | InstallState.CanConnect) & ~InstallState.Unknown;
-            }
+                DbProviderFactory? factory = _dbProviderFactoryCreator.CreateFactory(umbracoConnectionString.ProviderName);
+                var isConnectionAvailable = isConnectionStringConfigured && DbConnectionExtensions.IsConnectionAvailable(umbracoConnectionString.ConnectionString, factory);
+                if (isConnectionAvailable)
+                {
+                    installState = (installState | InstallState.CanConnect) & ~InstallState.Unknown;
+                }
 
-            var isUmbracoInstalled = isConnectionAvailable && _databaseBuilder.IsUmbracoInstalled();
-            if (isUmbracoInstalled)
-            {
-                installState = (installState | InstallState.UmbracoInstalled) & ~InstallState.Unknown;
-            }
+                var isUmbracoInstalled = isConnectionAvailable && _databaseBuilder.IsUmbracoInstalled();
+                if (isUmbracoInstalled)
+                {
+                    installState = (installState | InstallState.UmbracoInstalled) & ~InstallState.Unknown;
+                }
 
-            var hasSomeNonDefaultUser = isUmbracoInstalled && _databaseBuilder.HasSomeNonDefaultUser();
-            if (hasSomeNonDefaultUser)
-            {
-                installState = (installState | InstallState.HasNonDefaultUser) & ~InstallState.Unknown;
+                var hasSomeNonDefaultUser = isUmbracoInstalled && _databaseBuilder.HasSomeNonDefaultUser();
+                if (hasSomeNonDefaultUser)
+                {
+                    installState = (installState | InstallState.HasNonDefaultUser) & ~InstallState.Unknown;
+                }
             }
 
             return installState;

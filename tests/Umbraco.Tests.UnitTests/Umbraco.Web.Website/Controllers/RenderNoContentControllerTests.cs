@@ -11,6 +11,7 @@ using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Tests.Common;
 using Umbraco.Cms.Web.Website.Controllers;
 using Umbraco.Cms.Web.Website.Models;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Website.Controllers;
 
@@ -37,7 +38,7 @@ public class RenderNoContentControllerTests
     [Test]
     public void Renders_View_When_No_Content_Published()
     {
-        const string umbracoPathSetting = "~/umbraco";
+        const string umbracoPathSetting = Constants.System.DefaultUmbracoPath;
         const string umbracoPath = "/umbraco";
         const string viewPath = "~/config/splashes/NoNodes.cshtml";
         var mockUmbracoContext = new Mock<IUmbracoContext>();
@@ -50,7 +51,6 @@ public class RenderNoContentControllerTests
 
         var globalSettings = new TestOptionsSnapshot<GlobalSettings>(new GlobalSettings
         {
-            UmbracoPath = umbracoPathSetting,
             NoNodesViewPath = viewPath,
         });
         var controller = new RenderNoContentController(new TestUmbracoContextAccessor(mockUmbracoContext.Object), globalSettings, mockHostingEnvironment.Object);
