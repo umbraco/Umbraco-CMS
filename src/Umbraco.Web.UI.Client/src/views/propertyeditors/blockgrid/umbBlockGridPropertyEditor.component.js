@@ -47,6 +47,7 @@
 
         var unsubscribe = [];
         var modelObject;
+        var gridRootEl;
 
         // Property actions:
         var propertyActions = null;
@@ -122,8 +123,22 @@
             vm.labels.blockEditor_addThis = data[2]
         });
 
+        vm.onAppendProxyProperty = (event) => {
+            event.stopPropagation();
+            gridRootEl.appendChild(event.detail.property);
+            event.detail.connectedCallback();
+        };
+        vm.onRemoveProxyProperty = (event) => {
+            event.stopPropagation();
+            gridRootEl.removeChild(event.detail.property);
+        };
+
         vm.$onInit = function() {
 
+            gridRootEl = $element[0].querySelector('umb-block-grid-root');
+
+            $element[0].addEventListener("UmbBlockGrid_AppendProperty", vm.onAppendProxyProperty);
+            $element[0].addEventListener("UmbBlockGrid_RemoveProperty", vm.onRemoveProxyProperty);
 
             //listen for form validation changes
             vm.valFormManager.onValidationStatusChanged(function (evt, args) {
@@ -242,7 +257,6 @@
             modelObject.update(vm.model.value, $scope);
             onLoaded();
         }
-
 
 
         function onLoaded() {
@@ -1314,6 +1328,10 @@
         unsubscribe.push($scope.$watch(() => vm.layout.length, onAmountOfBlocksChanged));
 
         $scope.$on("$destroy", function () {
+
+            $element[0].removeEventListener("UmbBlockGrid_AppendProperty", vm.onAppendProxyProperty);
+            $element[0].removeEventListener("UmbBlockGrid_RemoveProperty", vm.onRemoveProxyProperty);
+
             for (const subscription of unsubscribe) {
                 subscription();
             }

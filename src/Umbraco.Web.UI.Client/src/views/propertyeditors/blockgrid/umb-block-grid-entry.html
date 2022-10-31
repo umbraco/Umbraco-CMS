@@ -29,6 +29,11 @@
                               parent-form="vm.blockForm"
                               style="--umb-block-grid--area-grid-columns: {{vm.areaGridColumns}}"
                               >
+            <slot
+                ng-repeat="proxyProp in vm.proxyProperties track by proxyProp.slotName"
+                name="{{proxyProp.slotName}}"
+                slot="{{proxyProp.slotName}}">
+            </slot>
             <umb-block-grid-entries 
                 slot="area-container"
                 ng-repeat="areaEntry in vm.layoutEntry.areas track by areaEntry.key"

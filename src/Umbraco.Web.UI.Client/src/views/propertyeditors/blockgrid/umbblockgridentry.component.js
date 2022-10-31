@@ -99,8 +99,24 @@
         vm.isScaleMode = false;
         vm.layoutColumnsInt = 0;
         vm.hideInlineCreateAfter = true;
+        
+        vm.proxyProperties = [];
+        vm.onAppendProxyProperty = (event) => {
+            vm.proxyProperties.push({
+                slotName: event.detail.slotName
+            });
+        };
+        vm.onRemoveProxyProperty = (event) => {
+            const index = vm.proxyProperties.findIndex(x => x.slotName === event.detail.slotName);
+            if(index !== -1) {
+                vm.proxyProperties.splice(index, 1);
+            }
+        };
 
         vm.$onInit = function() {
+
+            $element[0].addEventListener("UmbBlockGrid_AppendProperty", vm.onAppendProxyProperty);
+            $element[0].addEventListener("UmbBlockGrid_RemoveProperty", vm.onRemoveProxyProperty);
 
             vm.childDepth = parseInt(vm.depth) + 1;
 
@@ -377,6 +393,10 @@
         }
 
         $scope.$on("$destroy", function () {
+
+            $element[0].removeEventListener("UmbBlockGrid_AppendProperty", vm.onAppendProxyProperty);
+            $element[0].removeEventListener("UmbBlockGrid_RemoveProperty", vm.onRemoveProxyProperty);
+
             for (const subscription of unsubscribe) {
                 subscription();
             }
