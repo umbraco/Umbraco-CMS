@@ -26,7 +26,7 @@ namespace Umbraco.Cms.ManagementApi;
 public class ManagementApiComposer : IComposer
 {
     private const string ApiTitle = "Umbraco Backoffice API";
-    private const string ApiAllName = "All";
+    private const string ApiDefaultDocumentName = "v1";
 
     private ApiVersion DefaultApiVersion => new(1, 0);
 
@@ -58,7 +58,14 @@ public class ManagementApiComposer : IComposer
 
         services.AddSwaggerGen(swaggerGenOptions =>
         {
-            swaggerGenOptions.SwaggerDoc("v1", new OpenApiInfo { Title = ApiTitle, Version = DefaultApiVersion.ToString() });
+            swaggerGenOptions.SwaggerDoc(
+                ApiDefaultDocumentName,
+                new OpenApiInfo
+                {
+                    Title = ApiTitle,
+                    Version = DefaultApiVersion.ToString(),
+                    Description = "This shows all APIs available in this version of Umbraco - including all the legacy apis that are available for backward compatibility"
+                });
 
             swaggerGenOptions.DocInclusionPredicate((_, api) => !string.IsNullOrWhiteSpace(api.GroupName));
 
@@ -171,7 +178,7 @@ public class ManagementApiComposer : IComposer
                         });
                         applicationBuilder.UseSwaggerUI(swaggerUiOptions =>
                         {
-                            swaggerUiOptions.SwaggerEndpoint($"{officePath}/swagger/v1/swagger.json", $"{ApiTitle} {DefaultApiVersion}");
+                            swaggerUiOptions.SwaggerEndpoint($"{officePath}/swagger/{ApiDefaultDocumentName}/swagger.json", $"{ApiTitle} {DefaultApiVersion}");
                             swaggerUiOptions.RoutePrefix = $"{officePath.TrimStart(Core.Constants.CharArrays.ForwardSlash)}/swagger";
 
                             swaggerUiOptions.OAuthClientId(Constants.OauthClientIds.Swagger);
