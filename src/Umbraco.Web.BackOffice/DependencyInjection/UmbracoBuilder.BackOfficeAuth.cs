@@ -105,206 +105,328 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IAuthorizationHandler, MediaPermissionsQueryStringHandler>();
         builder.Services.AddSingleton<IAuthorizationHandler, DenyLocalLoginHandler>();
 
-        builder.Services.AddAuthorization(o =>
-        {
-            CreatePolicies(o, backOfficeAuthenticationScheme);
-        });
+        builder.Services.AddAuthorization(o => CreatePolicies(o, backOfficeAuthenticationScheme));
     }
 
-    // TODO: create the correct policies for new backoffice auth
     private static void CreatePolicies(AuthorizationOptions options, string backOfficeAuthenticationScheme)
     {
-        void AddPolicy(string policyName, params IAuthorizationRequirement[] requirements)
+        options.AddPolicy(AuthorizationPolicies.MediaPermissionByResource, policy =>
         {
-            options.AddPolicy(policyName, policy =>
-            {
-                policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
-                // TODO: use constant OpenIddictServerAspNetCoreDefaults.AuthenticationScheme instead of magic string
-                policy.AuthenticationSchemes.Add("OpenIddict.Validation.AspNetCore");
-                foreach (IAuthorizationRequirement requirement in requirements)
-                {
-                    policy.Requirements.Add(requirement);
-                }
-            });
-        }
+            policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
+            policy.Requirements.Add(new MediaPermissionsResourceRequirement());
+        });
 
-        AddPolicy(AuthorizationPolicies.MediaPermissionByResource, new MediaPermissionsResourceRequirement());
+        options.AddPolicy(AuthorizationPolicies.MediaPermissionPathById, policy =>
+        {
+            policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
+            policy.Requirements.Add(new MediaPermissionsQueryStringRequirement("id"));
+        });
 
-        AddPolicy(AuthorizationPolicies.MediaPermissionPathById, new MediaPermissionsQueryStringRequirement("id"));
+        options.AddPolicy(AuthorizationPolicies.ContentPermissionByResource, policy =>
+        {
+            policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
+            policy.Requirements.Add(new ContentPermissionsResourceRequirement());
+        });
 
-        AddPolicy(AuthorizationPolicies.ContentPermissionByResource, new ContentPermissionsResourceRequirement());
+        options.AddPolicy(AuthorizationPolicies.ContentPermissionEmptyRecycleBin, policy =>
+        {
+            policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
+            policy.Requirements.Add(new ContentPermissionsQueryStringRequirement(Constants.System.RecycleBinContent,
+                ActionDelete.ActionLetter));
+        });
 
-        AddPolicy(
-            AuthorizationPolicies.ContentPermissionEmptyRecycleBin,
-            new ContentPermissionsQueryStringRequirement(Constants.System.RecycleBinContent, ActionDelete.ActionLetter));
+        options.AddPolicy(AuthorizationPolicies.ContentPermissionAdministrationById, policy =>
+        {
+            policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
+            policy.Requirements.Add(new ContentPermissionsQueryStringRequirement(ActionRights.ActionLetter));
+            policy.Requirements.Add(
+                new ContentPermissionsQueryStringRequirement(ActionRights.ActionLetter, "contentId"));
+        });
 
-        AddPolicy(
-            AuthorizationPolicies.ContentPermissionAdministrationById,
-            new ContentPermissionsQueryStringRequirement(ActionRights.ActionLetter),
-            new ContentPermissionsQueryStringRequirement(ActionRights.ActionLetter, "contentId"));
+        options.AddPolicy(AuthorizationPolicies.ContentPermissionProtectById, policy =>
+        {
+            policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
+            policy.Requirements.Add(new ContentPermissionsQueryStringRequirement(ActionProtect.ActionLetter));
+            policy.Requirements.Add(
+                new ContentPermissionsQueryStringRequirement(ActionProtect.ActionLetter, "contentId"));
+        });
 
-        AddPolicy(
-            AuthorizationPolicies.ContentPermissionProtectById,
-            new ContentPermissionsQueryStringRequirement(ActionProtect.ActionLetter),
-            new ContentPermissionsQueryStringRequirement(ActionProtect.ActionLetter, "contentId"));
+        options.AddPolicy(AuthorizationPolicies.ContentPermissionRollbackById, policy =>
+        {
+            policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
+            policy.Requirements.Add(new ContentPermissionsQueryStringRequirement(ActionRollback.ActionLetter));
+            policy.Requirements.Add(
+                new ContentPermissionsQueryStringRequirement(ActionRollback.ActionLetter, "contentId"));
+        });
 
-        AddPolicy(
-            AuthorizationPolicies.ContentPermissionRollbackById,
-            new ContentPermissionsQueryStringRequirement(ActionRollback.ActionLetter),
-            new ContentPermissionsQueryStringRequirement(ActionRollback.ActionLetter, "contentId"));
+        options.AddPolicy(AuthorizationPolicies.ContentPermissionPublishById, policy =>
+        {
+            policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
+            policy.Requirements.Add(new ContentPermissionsQueryStringRequirement(ActionPublish.ActionLetter));
+        });
 
-        AddPolicy(
-            AuthorizationPolicies.ContentPermissionPublishById,
-            new ContentPermissionsQueryStringRequirement(ActionPublish.ActionLetter));
+        options.AddPolicy(AuthorizationPolicies.ContentPermissionBrowseById, policy =>
+        {
+            policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
+            policy.Requirements.Add(new ContentPermissionsQueryStringRequirement(ActionBrowse.ActionLetter));
+            policy.Requirements.Add(
+                new ContentPermissionsQueryStringRequirement(ActionBrowse.ActionLetter, "contentId"));
+        });
 
-        AddPolicy(
-            AuthorizationPolicies.ContentPermissionBrowseById,
-            new ContentPermissionsQueryStringRequirement(ActionBrowse.ActionLetter),
-            new ContentPermissionsQueryStringRequirement(ActionBrowse.ActionLetter, "contentId"));
+        options.AddPolicy(AuthorizationPolicies.ContentPermissionDeleteById, policy =>
+        {
+            policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
+            policy.Requirements.Add(new ContentPermissionsQueryStringRequirement(ActionDelete.ActionLetter));
+        });
 
-        AddPolicy(
-            AuthorizationPolicies.ContentPermissionDeleteById,
-            new ContentPermissionsQueryStringRequirement(ActionDelete.ActionLetter));
+        options.AddPolicy(AuthorizationPolicies.BackOfficeAccess, policy =>
+        {
+            policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
+            policy.Requirements.Add(new BackOfficeRequirement());
+        });
 
-        AddPolicy(AuthorizationPolicies.BackOfficeAccess, new BackOfficeRequirement());
+        options.AddPolicy(AuthorizationPolicies.BackOfficeAccessWithoutApproval, policy =>
+        {
+            policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
+            policy.Requirements.Add(new BackOfficeRequirement(false));
+        });
 
-        AddPolicy(AuthorizationPolicies.BackOfficeAccessWithoutApproval, new BackOfficeRequirement(false));
+        options.AddPolicy(AuthorizationPolicies.AdminUserEditsRequireAdmin, policy =>
+        {
+            policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
+            policy.Requirements.Add(new AdminUsersRequirement());
+            policy.Requirements.Add(new AdminUsersRequirement("userIds"));
+        });
 
-        AddPolicy(
-            AuthorizationPolicies.AdminUserEditsRequireAdmin,
-            new AdminUsersRequirement(),
-            new AdminUsersRequirement("userIds"));
+        options.AddPolicy(AuthorizationPolicies.UserBelongsToUserGroupInRequest, policy =>
+        {
+            policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
+            policy.Requirements.Add(new UserGroupRequirement());
+            policy.Requirements.Add(new UserGroupRequirement("userGroupIds"));
+        });
 
-        AddPolicy(
-            AuthorizationPolicies.UserBelongsToUserGroupInRequest,
-            new UserGroupRequirement(),
-            new UserGroupRequirement("userGroupIds"));
+        options.AddPolicy(AuthorizationPolicies.DenyLocalLoginIfConfigured, policy =>
+        {
+            policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
+            policy.Requirements.Add(new DenyLocalLoginRequirement());
+        });
 
-        AddPolicy(AuthorizationPolicies.DenyLocalLoginIfConfigured, new DenyLocalLoginRequirement());
+        options.AddPolicy(AuthorizationPolicies.SectionAccessContent, policy =>
+        {
+            policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
+            policy.Requirements.Add(new SectionRequirement(Constants.Applications.Content));
+        });
 
-        AddPolicy(AuthorizationPolicies.SectionAccessContent, new SectionRequirement(Constants.Applications.Content));
+        options.AddPolicy(AuthorizationPolicies.SectionAccessContentOrMedia, policy =>
+        {
+            policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
+            policy.Requirements.Add(
+                new SectionRequirement(Constants.Applications.Content, Constants.Applications.Media));
+        });
 
-        AddPolicy(
-            AuthorizationPolicies.SectionAccessContentOrMedia,
-            new SectionRequirement(Constants.Applications.Content, Constants.Applications.Media));
+        options.AddPolicy(AuthorizationPolicies.SectionAccessUsers, policy =>
+        {
+            policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
+            policy.Requirements.Add(new SectionRequirement(Constants.Applications.Users));
+        });
 
-        AddPolicy(AuthorizationPolicies.SectionAccessUsers, new SectionRequirement(Constants.Applications.Users));
+        options.AddPolicy(AuthorizationPolicies.SectionAccessForTinyMce, policy =>
+        {
+            policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
+            policy.Requirements.Add(new SectionRequirement(
+                Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members));
+        });
 
-        AddPolicy(
-            AuthorizationPolicies.SectionAccessForTinyMce,
-            new SectionRequirement(Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members));
+        options.AddPolicy(AuthorizationPolicies.SectionAccessMedia, policy =>
+        {
+            policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
+            policy.Requirements.Add(new SectionRequirement(Constants.Applications.Media));
+        });
 
-        AddPolicy(AuthorizationPolicies.SectionAccessMedia, new SectionRequirement(Constants.Applications.Media));
+        options.AddPolicy(AuthorizationPolicies.SectionAccessMembers, policy =>
+        {
+            policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
+            policy.Requirements.Add(new SectionRequirement(Constants.Applications.Members));
+        });
 
-        AddPolicy(AuthorizationPolicies.SectionAccessMembers, new SectionRequirement(Constants.Applications.Members));
+        options.AddPolicy(AuthorizationPolicies.SectionAccessPackages, policy =>
+        {
+            policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
+            policy.Requirements.Add(new SectionRequirement(Constants.Applications.Packages));
+        });
 
-        AddPolicy(AuthorizationPolicies.SectionAccessPackages, new SectionRequirement(Constants.Applications.Packages));
-
-        AddPolicy(AuthorizationPolicies.SectionAccessSettings, new SectionRequirement(Constants.Applications.Settings));
+        options.AddPolicy(AuthorizationPolicies.SectionAccessSettings, policy =>
+        {
+            policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
+            policy.Requirements.Add(new SectionRequirement(Constants.Applications.Settings));
+        });
 
         // We will not allow the tree to render unless the user has access to any of the sections that the tree gets rendered
         // this is not ideal but until we change permissions to be tree based (not section) there's not much else we can do here.
-        AddPolicy(
-            AuthorizationPolicies.SectionAccessForContentTree,
-            new SectionRequirement(
-                Constants.Applications.Content,
-                Constants.Applications.Media,
-                Constants.Applications.Users,
-                Constants.Applications.Settings,
-                Constants.Applications.Packages,
-                Constants.Applications.Members));
-
-        AddPolicy(
-            AuthorizationPolicies.SectionAccessForMediaTree,
-            new SectionRequirement(
-                Constants.Applications.Content,
-                Constants.Applications.Media,
-                Constants.Applications.Users,
-                Constants.Applications.Settings,
-                Constants.Applications.Packages,
-                Constants.Applications.Members));
-
-        AddPolicy(
-            AuthorizationPolicies.SectionAccessForMemberTree,
-            new SectionRequirement(
-                Constants.Applications.Content,
-                Constants.Applications.Media,
-                Constants.Applications.Members));
+        options.AddPolicy(AuthorizationPolicies.SectionAccessForContentTree, policy =>
+        {
+            policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
+            policy.Requirements.Add(new SectionRequirement(
+                Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Users,
+                Constants.Applications.Settings, Constants.Applications.Packages, Constants.Applications.Members));
+        });
+        options.AddPolicy(AuthorizationPolicies.SectionAccessForMediaTree, policy =>
+        {
+            policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
+            policy.Requirements.Add(new SectionRequirement(
+                Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Users,
+                Constants.Applications.Settings, Constants.Applications.Packages, Constants.Applications.Members));
+        });
+        options.AddPolicy(AuthorizationPolicies.SectionAccessForMemberTree, policy =>
+        {
+            policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
+            policy.Requirements.Add(new SectionRequirement(
+                Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members));
+        });
 
         // Permission is granted to this policy if the user has access to any of these sections: Content, media, settings, developer, members
-        AddPolicy(
-            AuthorizationPolicies.SectionAccessForDataTypeReading,
-            new SectionRequirement(
-                Constants.Applications.Content,
-                Constants.Applications.Media,
-                Constants.Applications.Members,
-                Constants.Applications.Settings,
-                Constants.Applications.Packages));
+        options.AddPolicy(AuthorizationPolicies.SectionAccessForDataTypeReading, policy =>
+        {
+            policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
+            policy.Requirements.Add(new SectionRequirement(
+                Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members,
+                Constants.Applications.Settings, Constants.Applications.Packages));
+        });
 
-        AddPolicy(AuthorizationPolicies.TreeAccessDocuments, new TreeRequirement(Constants.Trees.Content));
+        options.AddPolicy(AuthorizationPolicies.TreeAccessDocuments, policy =>
+        {
+            policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
+            policy.Requirements.Add(new TreeRequirement(Constants.Trees.Content));
+        });
 
-        AddPolicy(AuthorizationPolicies.TreeAccessUsers, new TreeRequirement(Constants.Trees.Users));
+        options.AddPolicy(AuthorizationPolicies.TreeAccessUsers, policy =>
+        {
+            policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
+            policy.Requirements.Add(new TreeRequirement(Constants.Trees.Users));
+        });
 
-        AddPolicy(AuthorizationPolicies.TreeAccessPartialViews, new TreeRequirement(Constants.Trees.PartialViews));
+        options.AddPolicy(AuthorizationPolicies.TreeAccessPartialViews, policy =>
+        {
+            policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
+            policy.Requirements.Add(new TreeRequirement(Constants.Trees.PartialViews));
+        });
 
-        AddPolicy(AuthorizationPolicies.TreeAccessPartialViewMacros, new TreeRequirement(Constants.Trees.PartialViewMacros));
+        options.AddPolicy(AuthorizationPolicies.TreeAccessPartialViewMacros, policy =>
+        {
+            policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
+            policy.Requirements.Add(new TreeRequirement(Constants.Trees.PartialViewMacros));
+        });
 
-        AddPolicy(AuthorizationPolicies.TreeAccessPackages, new TreeRequirement(Constants.Trees.Packages));
+        options.AddPolicy(AuthorizationPolicies.TreeAccessPackages, policy =>
+        {
+            policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
+            policy.Requirements.Add(new TreeRequirement(Constants.Trees.Packages));
+        });
 
-        AddPolicy(AuthorizationPolicies.TreeAccessLogs, new TreeRequirement(Constants.Trees.LogViewer));
+        options.AddPolicy(AuthorizationPolicies.TreeAccessLogs, policy =>
+        {
+            policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
+            policy.Requirements.Add(new TreeRequirement(Constants.Trees.LogViewer));
+        });
 
-        AddPolicy(AuthorizationPolicies.TreeAccessDataTypes, new TreeRequirement(Constants.Trees.DataTypes));
+        options.AddPolicy(AuthorizationPolicies.TreeAccessDataTypes, policy =>
+        {
+            policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
+            policy.Requirements.Add(new TreeRequirement(Constants.Trees.DataTypes));
+        });
 
-        AddPolicy(AuthorizationPolicies.TreeAccessTemplates, new TreeRequirement(Constants.Trees.Templates));
+        options.AddPolicy(AuthorizationPolicies.TreeAccessTemplates, policy =>
+        {
+            policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
+            policy.Requirements.Add(new TreeRequirement(Constants.Trees.Templates));
+        });
 
-        AddPolicy(AuthorizationPolicies.TreeAccessMemberTypes, new TreeRequirement(Constants.Trees.MemberTypes));
+        options.AddPolicy(AuthorizationPolicies.TreeAccessMemberTypes, policy =>
+        {
+            policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
+            policy.Requirements.Add(new TreeRequirement(Constants.Trees.MemberTypes));
+        });
 
-        AddPolicy(AuthorizationPolicies.TreeAccessRelationTypes, new TreeRequirement(Constants.Trees.RelationTypes));
+        options.AddPolicy(AuthorizationPolicies.TreeAccessRelationTypes, policy =>
+        {
+            policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
+            policy.Requirements.Add(new TreeRequirement(Constants.Trees.RelationTypes));
+        });
 
-        AddPolicy(AuthorizationPolicies.TreeAccessDocumentTypes, new TreeRequirement(Constants.Trees.DocumentTypes));
+        options.AddPolicy(AuthorizationPolicies.TreeAccessDocumentTypes, policy =>
+        {
+            policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
+            policy.Requirements.Add(new TreeRequirement(Constants.Trees.DocumentTypes));
+        });
 
-        AddPolicy(AuthorizationPolicies.TreeAccessMemberGroups, new TreeRequirement(Constants.Trees.MemberGroups));
+        options.AddPolicy(AuthorizationPolicies.TreeAccessMemberGroups, policy =>
+        {
+            policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
+            policy.Requirements.Add(new TreeRequirement(Constants.Trees.MemberGroups));
+        });
 
-        AddPolicy(AuthorizationPolicies.TreeAccessMediaTypes, new TreeRequirement(Constants.Trees.MediaTypes));
+        options.AddPolicy(AuthorizationPolicies.TreeAccessMediaTypes, policy =>
+        {
+            policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
+            policy.Requirements.Add(new TreeRequirement(Constants.Trees.MediaTypes));
+        });
 
-        AddPolicy(AuthorizationPolicies.TreeAccessMacros, new TreeRequirement(Constants.Trees.Macros));
+        options.AddPolicy(AuthorizationPolicies.TreeAccessMacros, policy =>
+        {
+            policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
+            policy.Requirements.Add(new TreeRequirement(Constants.Trees.Macros));
+        });
 
-        AddPolicy(AuthorizationPolicies.TreeAccessLanguages, new TreeRequirement(Constants.Trees.Languages));
+        options.AddPolicy(AuthorizationPolicies.TreeAccessLanguages, policy =>
+        {
+            policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
+            policy.Requirements.Add(new TreeRequirement(Constants.Trees.Languages));
+        });
 
-        AddPolicy(AuthorizationPolicies.TreeAccessDictionary, new TreeRequirement(Constants.Trees.Dictionary));
+        options.AddPolicy(AuthorizationPolicies.TreeAccessDictionary, policy =>
+        {
+            policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
+            policy.Requirements.Add(new TreeRequirement(Constants.Trees.Dictionary));
+        });
 
-        AddPolicy(
-            AuthorizationPolicies.TreeAccessDictionaryOrTemplates,
-            new TreeRequirement(Constants.Trees.Dictionary, Constants.Trees.Templates));
+        options.AddPolicy(AuthorizationPolicies.TreeAccessDictionaryOrTemplates, policy =>
+        {
+            policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
+            policy.Requirements.Add(new TreeRequirement(Constants.Trees.Dictionary, Constants.Trees.Templates));
+        });
 
-        AddPolicy(
-            AuthorizationPolicies.TreeAccessDocumentsOrDocumentTypes,
-            new TreeRequirement(Constants.Trees.DocumentTypes, Constants.Trees.Content));
+        options.AddPolicy(AuthorizationPolicies.TreeAccessDocumentsOrDocumentTypes, policy =>
+        {
+            policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
+            policy.Requirements.Add(new TreeRequirement(Constants.Trees.DocumentTypes, Constants.Trees.Content));
+        });
 
-        AddPolicy(
-            AuthorizationPolicies.TreeAccessMediaOrMediaTypes,
-            new TreeRequirement(Constants.Trees.MediaTypes, Constants.Trees.Media));
+        options.AddPolicy(AuthorizationPolicies.TreeAccessMediaOrMediaTypes, policy =>
+        {
+            policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
+            policy.Requirements.Add(new TreeRequirement(Constants.Trees.MediaTypes, Constants.Trees.Media));
+        });
 
-        AddPolicy(
-            AuthorizationPolicies.TreeAccessMembersOrMemberTypes,
-            new TreeRequirement(Constants.Trees.MemberTypes, Constants.Trees.Members));
+        options.AddPolicy(AuthorizationPolicies.TreeAccessMembersOrMemberTypes, policy =>
+        {
+            policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
+            policy.Requirements.Add(new TreeRequirement(Constants.Trees.MemberTypes, Constants.Trees.Members));
+        });
 
-        AddPolicy(
-            AuthorizationPolicies.TreeAccessAnySchemaTypes,
-            new TreeRequirement(
-                Constants.Trees.DataTypes,
-                Constants.Trees.DocumentTypes,
-                Constants.Trees.MediaTypes,
-                Constants.Trees.MemberTypes));
+        options.AddPolicy(AuthorizationPolicies.TreeAccessAnySchemaTypes, policy =>
+        {
+            policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
+            policy.Requirements.Add(new TreeRequirement(Constants.Trees.DataTypes, Constants.Trees.DocumentTypes,
+                Constants.Trees.MediaTypes, Constants.Trees.MemberTypes));
+        });
 
-        AddPolicy(
-            AuthorizationPolicies.TreeAccessAnyContentOrTypes,
-            new TreeRequirement(
-                Constants.Trees.DocumentTypes,
-                Constants.Trees.Content,
-                Constants.Trees.MediaTypes,
-                Constants.Trees.Media,
-                Constants.Trees.MemberTypes,
-                Constants.Trees.Members));
+        options.AddPolicy(AuthorizationPolicies.TreeAccessAnyContentOrTypes, policy =>
+        {
+            policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
+            policy.Requirements.Add(new TreeRequirement(
+                Constants.Trees.DocumentTypes, Constants.Trees.Content,
+                Constants.Trees.MediaTypes, Constants.Trees.Media,
+                Constants.Trees.MemberTypes, Constants.Trees.Members));
+        });
     }
 }

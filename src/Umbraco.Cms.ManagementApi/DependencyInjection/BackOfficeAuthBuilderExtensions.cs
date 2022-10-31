@@ -1,9 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using OpenIddict.Validation.AspNetCore;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.ManagementApi.Middleware;
 using Umbraco.Cms.ManagementApi.Security;
+using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.New.Cms.Infrastructure.HostedServices;
 using Umbraco.New.Cms.Infrastructure.Security;
 
@@ -38,6 +42,7 @@ public static class BackOfficeAuthBuilderExtensions
     private static IUmbracoBuilder AddOpenIddict(this IUmbracoBuilder builder)
     {
         builder.Services.AddAuthentication();
+        builder.Services.AddAuthorization(CreatePolicies);
 
         builder.Services.AddOpenIddict()
 
@@ -85,13 +90,6 @@ public static class BackOfficeAuthBuilderExtensions
 
                 // Register the ASP.NET Core host.
                 options.UseAspNetCore();
-
-                // TODO: this is a workaround to make validated principals be perceived as explicit backoffice users by ClaimsPrincipalExtensions.GetUmbracoIdentity
-                // we may not need it once cookie auth for backoffice is removed - validate and clean up if necessary
-                options.Configure(validationOptions =>
-                {
-                    validationOptions.TokenValidationParameters.AuthenticationType = Core.Constants.Security.BackOfficeAuthenticationType;
-                });
             });
 
         builder.Services.AddTransient<IBackOfficeApplicationManager, BackOfficeApplicationManager>();
@@ -124,5 +122,25 @@ public static class BackOfficeAuthBuilderExtensions
         }
 
         public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+    }
+
+    // TODO: move this to an appropriate location and implement the policy scheme that should be used for the new management APIs
+    private static void CreatePolicies(AuthorizationOptions options)
+    {
+        void AddPolicy(string policyName, string claimType, params string[] allowedClaimValues)
+        {
+            options.AddPolicy($"New{policyName}", policy =>
+            {
+                policy.AuthenticationSchemes.Add(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
+                policy.RequireClaim(claimType, allowedClaimValues);
+            });
+        }
+
+        // NOTE: these are ONLY sample policies that allow us to test the new management APIs
+        AddPolicy(AuthorizationPolicies.SectionAccessContent, Constants.Security.AllowedApplicationsClaimType, Constants.Applications.Content);
+        AddPolicy(AuthorizationPolicies.SectionAccessForContentTree, Constants.Security.AllowedApplicationsClaimType, Constants.Applications.Content);
+        AddPolicy(AuthorizationPolicies.SectionAccessForMediaTree, Constants.Security.AllowedApplicationsClaimType, Constants.Applications.Media);
+        AddPolicy(AuthorizationPolicies.SectionAccessMedia, Constants.Security.AllowedApplicationsClaimType, Constants.Applications.Media);
+        AddPolicy(AuthorizationPolicies.SectionAccessContentOrMedia, Constants.Security.AllowedApplicationsClaimType, Constants.Applications.Content, Constants.Applications.Media);
     }
 }
