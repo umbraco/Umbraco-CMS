@@ -78,6 +78,19 @@ export class UmbSectionSettingsElement extends LitElement {
 					pathname: 'telemetry',
 				},
 			},
+			{
+				type: 'dashboard',
+				alias: 'Umb.Dashboard.HealthCheck',
+				name: 'Health Check',
+				elementName: 'umb-dashboard-health-check',
+				loader: () => import('../../dashboards/health-check/dashboard-health-check.element'),
+				weight: 200,
+				meta: {
+					label: 'Health Check',
+					sections: ['Umb.Section.Settings'],
+					pathname: 'healthcheck',
+				},
+			},
 		];
 
 		dashboards.forEach((dashboard) => {
