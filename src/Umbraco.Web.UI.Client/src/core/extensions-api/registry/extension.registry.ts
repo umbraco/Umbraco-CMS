@@ -18,18 +18,6 @@ import type {
 } from '../../models';
 import { createExtensionElement } from '../create-extension-element.function';
 
-export type UmbExtensionManifestJSModel = {
-	elementName?: string;
-};
-
-// TODO: add to schema
-export type ManifestBase = {
-	alias: string;
-	name: string;
-	js?: string | (() => Promise<unknown>);
-	elementName?: string;
-};
-
 export class UmbExtensionRegistry {
 	private _extensions = new BehaviorSubject<Array<ManifestTypes>>([]);
 	public readonly extensions = this._extensions.asObservable();
