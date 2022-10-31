@@ -54,10 +54,6 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Um
 
 			if (!this._dataType) return;
 
-			if (this._dataType.propertyEditorModelAlias !== this._propertyEditorModelAlias) {
-				this._observePropertyEditorModel(this._dataType.propertyEditorModelAlias);
-			}
-
 			if (this._dataType.propertyEditorUIAlias !== this._propertyEditorUIAlias) {
 				this._observePropertyEditorUI(this._dataType.propertyEditorUIAlias);
 			}
@@ -77,18 +73,11 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Um
 				this._propertyEditorUIName = propertyEditorUI?.meta.label ?? propertyEditorUI?.name ?? '';
 				this._propertyEditorUIAlias = propertyEditorUI?.alias ?? '';
 				this._propertyEditorUIIcon = propertyEditorUI?.meta?.icon ?? '';
+				this._propertyEditorModelAlias = propertyEditorUI?.meta?.propertyEditorModel ?? '';
 
-				this._observePropertyEditorModel(propertyEditorUI?.meta?.propertyEditorModel ?? '');
+				this._dataTypeContext?.update({ propertyEditorModelAlias: this._propertyEditorModelAlias });
 			}
 		);
-	}
-
-	private _observePropertyEditorModel(propertyEditorModelAlias: string | null) {
-		if (!propertyEditorModelAlias) return;
-
-		this.observe(umbExtensionsRegistry.getByAlias(propertyEditorModelAlias), (propertyEditorModel) => {
-			this._propertyEditorModelAlias = propertyEditorModel?.alias ?? '';
-		});
 	}
 
 	private _openPropertyEditorUIPicker() {
@@ -107,6 +96,7 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Um
 	private _selectPropertyEditorUI(propertyEditorUIAlias: string | null) {
 		if (!this._dataType || this._dataType.propertyEditorUIAlias === propertyEditorUIAlias) return;
 		this._dataTypeContext?.update({ propertyEditorUIAlias });
+		this._observePropertyEditorUI(propertyEditorUIAlias);
 	}
 
 	render() {
