@@ -6,6 +6,7 @@ import type {
 	ManifestEntrypoint,
 	ManifestPropertyAction,
 	ManifestPropertyEditorUI,
+	ManifestPropertyEditorModel,
 	ManifestSection,
 	ManifestSectionView,
 	ManifestTree,
