@@ -152,7 +152,6 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Um
 				? html`
 						<uui-box headline="Config">
 							<umb-property-editor-config
-								property-editor-model-alias="${this._propertyEditorModelAlias}"
 								property-editor-ui-alias="${this._propertyEditorUIAlias}"
 								.data="${this._data}"></umb-property-editor-config>
 						</uui-box>

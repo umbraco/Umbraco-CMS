@@ -18,24 +18,6 @@ export class UmbPropertyEditorConfigElement extends UmbContextConsumerMixin(UmbO
 	static styles = [UUITextStyles];
 
 	/**
-	 * Property Editor Model Alias. The element will render configuration for a Property Editor Model with this alias.
-	 * @type {string}
-	 * @attr
-	 * @default ''
-	 */
-	private _propertyEditorModelAlias = '';
-	@property({ type: String, attribute: 'property-editor-model-alias' })
-	public get propertyEditorModelAlias(): string {
-		return this._propertyEditorModelAlias;
-	}
-	public set propertyEditorModelAlias(value: string) {
-		const oldVal = this._propertyEditorModelAlias;
-		this._propertyEditorModelAlias = value;
-		this.requestUpdate('propertyEditorModelAlias', oldVal);
-		this._observePropertyEditorModelConfig();
-	}
-
-	/**
 	 * Property Editor UI Alias. The element will render configuration for a Property Editor UI with this alias.
 	 * @type {string}
 	 * @attr
@@ -74,33 +56,28 @@ export class UmbPropertyEditorConfigElement extends UmbContextConsumerMixin(UmbO
 	private _propertyEditorModelConfigProperties: Array<PropertyEditorConfigProperty> = [];
 	private _propertyEditorUIConfigProperties: Array<PropertyEditorConfigProperty> = [];
 
-	connectedCallback(): void {
-		super.connectedCallback();
-		this._observePropertyEditorModelConfig();
-		this._observePropertyEditorUIConfig();
-	}
-
-	private _observePropertyEditorModelConfig() {
-		if (!this._propertyEditorModelAlias) return;
-
-		this.observe<ManifestTypes>(umbExtensionsRegistry.getByAlias(this.propertyEditorModelAlias), (manifest) => {
-			if (manifest?.type === 'propertyEditorModel') {
-				this._propertyEditorModelConfigProperties = manifest?.meta.config?.properties || [];
-				this._mergeConfigProperties();
-				this._propertyEditorModelConfigDefaultData = manifest?.meta.config?.defaultData || [];
-				this._mergeConfigDefaultData();
-			}
-		});
-	}
-
 	private _observePropertyEditorUIConfig() {
 		if (!this._propertyEditorUIAlias) return;
 
 		this.observe<ManifestTypes>(umbExtensionsRegistry.getByAlias(this.propertyEditorUIAlias), (manifest) => {
 			if (manifest?.type === 'propertyEditorUI') {
+				this._observePropertyEditorModelConfig(manifest.meta.propertyEditorModel);
 				this._propertyEditorUIConfigProperties = manifest?.meta.config?.properties || [];
-				this._mergeConfigProperties();
 				this._propertyEditorUIConfigDefaultData = manifest?.meta.config?.defaultData || [];
+				this._mergeConfigProperties();
+				this._mergeConfigDefaultData();
+			}
+		});
+	}
+
+	private _observePropertyEditorModelConfig(propertyEditorModelAlias?: string) {
+		if (!propertyEditorModelAlias) return;
+
+		this.observe<ManifestTypes>(umbExtensionsRegistry.getByAlias(propertyEditorModelAlias), (manifest) => {
+			if (manifest?.type === 'propertyEditorModel') {
+				this._propertyEditorModelConfigProperties = manifest?.meta.config?.properties || [];
+				this._propertyEditorModelConfigDefaultData = manifest?.meta.config?.defaultData || [];
+				this._mergeConfigProperties();
 				this._mergeConfigDefaultData();
 			}
 		});
@@ -117,6 +94,9 @@ export class UmbPropertyEditorConfigElement extends UmbContextConsumerMixin(UmbO
 		];
 	}
 
+	/**
+	 * Get the stored value for a property. It will render the default value from the configuration if no value is stored in the database.
+	 */
 	private _getValue(property: PropertyEditorConfigProperty) {
 		const value = this.data.find((data) => data.alias === property.alias)?.value;
 		const defaultValue = this._configDefaultData?.find((data) => data.alias === property.alias)?.value;
