@@ -62,13 +62,18 @@ internal class GridEditorsConfig : IGridEditorsConfig
         {
             List<IGridEditorConfig> GetResult()
             {
+                IFileInfo? gridConfig = null;
                 var editors = new List<IGridEditorConfig>();
                 var configPath = Constants.SystemDirectories.Config.TrimStart(Constants.CharArrays.Tilde);
 
                 // Get physical file if it exists
                 var configPhysicalDirPath = _hostingEnvironment.MapPathContentRoot(configPath);
-                var physicalFileProvider = new PhysicalFileProvider(configPhysicalDirPath);
-                IFileInfo? gridConfig = GetConfigFile(physicalFileProvider, string.Empty);
+
+                if (Directory.Exists(configPhysicalDirPath) == true)
+                {
+                    var physicalFileProvider = new PhysicalFileProvider(configPhysicalDirPath);
+                    gridConfig = GetConfigFile(physicalFileProvider, string.Empty);
+                }
 
                 // If there is no physical file, check in RCLs
                 if (gridConfig is null)
@@ -107,7 +112,8 @@ internal class GridEditorsConfig : IGridEditorsConfig
                 {
                     IFileProvider configFileProvider = new EmbeddedFileProvider(GetType().Assembly, "Umbraco.Cms.Core.EmbeddedResources.Grid");
                     IFileInfo embeddedConfig = configFileProvider
-                        .GetDirectoryContents(string.Empty).First(x => !x.IsDirectory && x.Name.InvariantEquals("grid.editors.config.js"));
+                        .GetDirectoryContents(string.Empty)
+                        .First(x => !x.IsDirectory && x.Name.InvariantEquals("grid.editors.config.js"));
 
                     using Stream stream = embeddedConfig.CreateReadStream();
                     using var reader = new StreamReader(stream, Encoding.UTF8);
