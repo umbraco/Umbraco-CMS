@@ -9,7 +9,7 @@ public class UnPublishedContentPropertyCacheCompressionOptions : IPropertyCacheC
 {
     public bool IsCompressed(IReadOnlyContentBase content, IPropertyType propertyType, IDataEditor dataEditor, bool published)
     {
-        if (!published && propertyType.SupportsPublishing && propertyType.ValueStorageType == ValueStorageType.Ntext)
+        if (!published && propertyType.SupportsPublishing && propertyType.ValueStorageType is ValueStorageType.Ntext or ValueStorageType.Nvarchar)
         {
             // Only compress non published content that supports publishing and the property is text
             return true;
