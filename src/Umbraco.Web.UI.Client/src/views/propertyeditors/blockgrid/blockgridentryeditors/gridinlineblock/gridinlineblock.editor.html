@@ -54,15 +54,6 @@
         <span>{{block.label}}</span>
     </button>
 
-    <!--
-    <umb-property-editor
-        ng-if="vm.property"
-        model="vm.property"
-        preview="api.internal.readonly"
-        ng-attr-readonly="{{api.internal.readonly || undefined}}">
-    </umb-property-editor>
-    -->
-
     <slot name="{{vm.propertySlotName}}"></slot>
 
     <slot name="area-container" part="area-container"></slot>
