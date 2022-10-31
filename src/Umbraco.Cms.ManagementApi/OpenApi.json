@@ -816,6 +816,46 @@
         }
       }
     },
+    "/umbraco/management/api/v1/security/back-office/authorize": {
+      "get": {
+        "tags": [
+          "Security"
+        ],
+        "operationId": "BackOffice_AuthorizeGET",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Security"
+        ],
+        "operationId": "BackOffice_AuthorizePOST",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/umbraco/management/api/v1/search/index/{indexName}": {
       "get": {
         "tags": [
@@ -5246,8 +5286,26 @@
           }
         }
       }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "oauth2",
+        "description": "Umbraco Authentication",
+        "name": "Umbraco",
+        "flows": {
+          "authorizationCode": {
+            "authorizationUrl": "/umbraco/management/api/v1.0/security/back-office/authorize",
+            "tokenUrl": "/umbraco/management/api/v1.0/security/back-office/token"
+          }
+        }
+      }
     }
   },
+  "security": [
+    {
+      "Bearer": []
+    }
+  ],
   "tags": [
     {
       "name": "Culture"
@@ -5311,6 +5369,9 @@
     },
     {
       "name": "Search"
+    },
+    {
+      "name": "Security"
     },
     {
       "name": "Server"
