@@ -73,6 +73,7 @@ export class UmbExtensionRegistry {
 	extensionsOfType(type: 'editorView'): Observable<Array<ManifestEditorView>>;
 	extensionsOfType(type: 'editorAction'): Observable<Array<ManifestEditorAction>>;
 	extensionsOfType(type: 'propertyEditorUI'): Observable<Array<ManifestPropertyEditorUI>>;
+	extensionsOfType(type: 'propertyEditorModel'): Observable<Array<ManifestPropertyEditorModel>>;
 	extensionsOfType(type: 'propertyAction'): Observable<Array<ManifestPropertyAction>>;
 	extensionsOfType(type: 'packageView'): Observable<Array<ManifestPackageView>>;
 	extensionsOfType(type: 'entrypoint'): Observable<Array<ManifestEntrypoint>>;
