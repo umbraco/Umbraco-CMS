@@ -28,9 +28,6 @@ export * from '../extensions-registry/models';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type HTMLElementConstructor<T = HTMLElement> = new (...args: any[]) => T;
 
-// TODO: couldn't we make loader optional on all manifests? and not just the internal ones?
-export type ManifestWithLoader<T> = T & { loader: () => Promise<object | HTMLElement> };
-
 // Users
 export interface UserEntity extends Entity {
 	type: 'user';

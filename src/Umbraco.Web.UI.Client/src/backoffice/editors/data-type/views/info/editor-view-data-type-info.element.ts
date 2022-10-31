@@ -46,7 +46,7 @@ export class UmbEditorViewDataTypeInfoElement extends UmbContextConsumerMixin(Um
 				<umb-editor-property-layout
 					label="Property Editor Alias
 ">
-					<div slot="editor">${this._dataType?.propertyEditorAlias}</div>
+					<div slot="editor">${this._dataType?.propertyEditorModelAlias}</div>
 				</umb-editor-property-layout>
 
 				<umb-editor-property-layout

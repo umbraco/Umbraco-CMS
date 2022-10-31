@@ -22,7 +22,7 @@ export * from './dashboard.models';
 export * from './property-action.models';
 export * from './package-view.models';
 
-export type Manifest =
+export type ManifestTypes =
 	| ManifestSection
 	| ManifestSectionView
 	| ManifestTree
@@ -89,3 +89,6 @@ export interface ManifestEntrypoint extends ManifestBase {
 	type: 'entrypoint';
 	js: string;
 }
+
+// TODO: couldn't we make loader optional on all manifests? and not just the internal ones?
+export type ManifestWithLoader<T> = T & { loader: () => Promise<object | HTMLElement> };

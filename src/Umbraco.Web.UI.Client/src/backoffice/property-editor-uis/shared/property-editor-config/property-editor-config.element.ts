@@ -2,10 +2,6 @@ import { html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import {
-	PropertyEditorConfigRef,
-	UmbPropertyEditorConfigStore,
-} from '../../../../core/stores/property-editor-config/property-editor-config.store';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { ManifestTypes, PropertyEditorConfigDefaultData, PropertyEditorConfigProperty } from '@umbraco-cms/models';
@@ -15,28 +11,28 @@ import '../../../components/entity-property/entity-property.element';
 
 /**
  *  @element umb-property-editor-config
- *  @description - Element for displaying the configuration for a Property Editor and Property Editor UI.
+ *  @description - Element for displaying the configuration for a Property Editor based on a Property Editor UI Alias and a Property Editor Model alias.
  */
 @customElement('umb-property-editor-config')
 export class UmbPropertyEditorConfigElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles = [UUITextStyles];
 
 	/**
-	 * Property Editor Alias. The element will render configuration for a Property Editor with this alias.
+	 * Property Editor Model Alias. The element will render configuration for a Property Editor Model with this alias.
 	 * @type {string}
 	 * @attr
 	 * @default ''
 	 */
-	private _propertyEditorAlias = '';
-	@property({ type: String, attribute: 'property-editor-alias' })
-	public get propertyEditorAlias(): string {
-		return this._propertyEditorAlias;
+	private _propertyEditorModelAlias = '';
+	@property({ type: String, attribute: 'property-editor-model-alias' })
+	public get propertyEditorModelAlias(): string {
+		return this._propertyEditorModelAlias;
 	}
-	public set propertyEditorAlias(value: string) {
-		const oldVal = this._propertyEditorAlias;
-		this._propertyEditorAlias = value;
-		this.requestUpdate('propertyEditorAlias', oldVal);
-		this._observePropertyEditorConfig();
+	public set propertyEditorModelAlias(value: string) {
+		const oldVal = this._propertyEditorModelAlias;
+		this._propertyEditorModelAlias = value;
+		this.requestUpdate('propertyEditorModelAlias', oldVal);
+		this._observePropertyEditorModelConfig();
 	}
 
 	/**
@@ -70,43 +66,31 @@ export class UmbPropertyEditorConfigElement extends UmbContextConsumerMixin(UmbO
 	@state()
 	private _properties: Array<PropertyEditorConfigProperty> = [];
 
-	private _propertyEditorConfigDefaultData: Array<PropertyEditorConfigDefaultData> = [];
+	private _propertyEditorModelConfigDefaultData: Array<PropertyEditorConfigDefaultData> = [];
 	private _propertyEditorUIConfigDefaultData: Array<PropertyEditorConfigDefaultData> = [];
 
 	private _configDefaultData?: Array<PropertyEditorConfigDefaultData>;
 
-	private _propertyEditorConfigProperties: Array<PropertyEditorConfigProperty> = [];
+	private _propertyEditorModelConfigProperties: Array<PropertyEditorConfigProperty> = [];
 	private _propertyEditorUIConfigProperties: Array<PropertyEditorConfigProperty> = [];
-
-	private _propertyEditorConfigStore?: UmbPropertyEditorConfigStore;
-
-	constructor() {
-		super();
-
-		this.consumeContext('umbPropertyEditorConfigStore', (propertyEditorConfigStore) => {
-			this._propertyEditorConfigStore = propertyEditorConfigStore;
-			this._observePropertyEditorConfig();
-		});
-	}
 
 	connectedCallback(): void {
 		super.connectedCallback();
+		this._observePropertyEditorModelConfig();
 		this._observePropertyEditorUIConfig();
 	}
 
-	private _observePropertyEditorConfig() {
-		if (!this._propertyEditorConfigStore || !this._propertyEditorAlias) return;
+	private _observePropertyEditorModelConfig() {
+		if (!this._propertyEditorModelAlias) return;
 
-		this.observe<PropertyEditorConfigRef>(
-			this._propertyEditorConfigStore.getByAlias(this.propertyEditorAlias),
-			(propertyEditorConfig) => {
-				if (!propertyEditorConfig) return;
-				this._propertyEditorConfigProperties = propertyEditorConfig?.config?.properties || [];
-				this._mergeProperties();
-				this._propertyEditorConfigDefaultData = propertyEditorConfig?.config?.defaultData || [];
-				this._mergeDefaultData();
+		this.observe<ManifestTypes>(umbExtensionsRegistry.getByAlias(this.propertyEditorModelAlias), (manifest) => {
+			if (manifest?.type === 'propertyEditorModel') {
+				this._propertyEditorModelConfigProperties = manifest?.meta.config?.properties || [];
+				this._mergeConfigProperties();
+				this._propertyEditorModelConfigDefaultData = manifest?.meta.config?.defaultData || [];
+				this._mergeConfigDefaultData();
 			}
-		);
+		});
 	}
 
 	private _observePropertyEditorUIConfig() {
@@ -115,19 +99,22 @@ export class UmbPropertyEditorConfigElement extends UmbContextConsumerMixin(UmbO
 		this.observe<ManifestTypes>(umbExtensionsRegistry.getByAlias(this.propertyEditorUIAlias), (manifest) => {
 			if (manifest?.type === 'propertyEditorUI') {
 				this._propertyEditorUIConfigProperties = manifest?.meta.config?.properties || [];
-				this._mergeProperties();
+				this._mergeConfigProperties();
 				this._propertyEditorUIConfigDefaultData = manifest?.meta.config?.defaultData || [];
-				this._mergeDefaultData();
+				this._mergeConfigDefaultData();
 			}
 		});
 	}
 
-	private _mergeProperties() {
-		this._properties = [...this._propertyEditorConfigProperties, ...this._propertyEditorUIConfigProperties];
+	private _mergeConfigProperties() {
+		this._properties = [...this._propertyEditorModelConfigProperties, ...this._propertyEditorUIConfigProperties];
 	}
 
-	private _mergeDefaultData() {
-		this._configDefaultData = [...this._propertyEditorConfigDefaultData, ...this._propertyEditorUIConfigDefaultData];
+	private _mergeConfigDefaultData() {
+		this._configDefaultData = [
+			...this._propertyEditorModelConfigDefaultData,
+			...this._propertyEditorUIConfigDefaultData,
+		];
 	}
 
 	private _getValue(property: PropertyEditorConfigProperty) {

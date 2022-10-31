@@ -4,7 +4,6 @@ import { customElement, state } from 'lit/decorators.js';
 import { UmbModalService } from '../../../../../core/services/modal';
 import { UmbDataTypeContext } from '../../data-type.context';
 import type { DataTypeDetails } from '../../../../../core/mocks/data/data-type.data';
-import type { UmbPropertyEditorStore } from '../../../../../core/stores/property-editor/property-editor.store';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { ManifestPropertyEditorUI } from '@umbraco-cms/models';
@@ -29,36 +28,34 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Um
 	private _propertyEditorUIAlias = '';
 
 	@state()
-	private _propertyEditorAlias = '';
+	private _propertyEditorModelAlias = '';
 
 	@state()
 	private _data: Array<any> = [];
 
 	private _dataTypeContext?: UmbDataTypeContext;
-	private _propertyEditorStore?: UmbPropertyEditorStore;
 	private _modalService?: UmbModalService;
 
 	constructor() {
 		super();
 
-		this.consumeAllContexts(['umbDataTypeContext', 'umbPropertyEditorStore', 'umbModalService'], (result) => {
+		this.consumeAllContexts(['umbDataTypeContext', 'umbModalService'], (result) => {
 			this._dataTypeContext = result['umbDataTypeContext'];
-			this._propertyEditorStore = result['umbPropertyEditorStore'];
 			this._modalService = result['umbModalService'];
 			this._observeDataType();
 		});
 	}
 
 	private _observeDataType() {
-		if (!this._dataTypeContext || !this._propertyEditorStore) return;
+		if (!this._dataTypeContext) return;
 
 		this.observe<DataTypeDetails>(this._dataTypeContext.data, (dataType) => {
 			this._dataType = dataType;
 
 			if (!this._dataType) return;
 
-			if (this._dataType.propertyEditorAlias !== this._propertyEditorAlias) {
-				this._observePropertyEditor(this._dataType.propertyEditorAlias);
+			if (this._dataType.propertyEditorModelAlias !== this._propertyEditorModelAlias) {
+				this._observePropertyEditorModel(this._dataType.propertyEditorModelAlias);
 			}
 
 			if (this._dataType.propertyEditorUIAlias !== this._propertyEditorUIAlias) {
@@ -81,16 +78,16 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Um
 				this._propertyEditorUIAlias = propertyEditorUI?.alias ?? '';
 				this._propertyEditorUIIcon = propertyEditorUI?.meta?.icon ?? '';
 
-				this._observePropertyEditor(propertyEditorUI?.meta?.propertyEditor ?? '');
+				this._observePropertyEditorModel(propertyEditorUI?.meta?.propertyEditorModel ?? '');
 			}
 		);
 	}
 
-	private _observePropertyEditor(propertyEditorAlias: string | null) {
-		if (!propertyEditorAlias || !this._propertyEditorStore) return;
+	private _observePropertyEditorModel(propertyEditorModelAlias: string | null) {
+		if (!propertyEditorModelAlias) return;
 
-		this.observe(this._propertyEditorStore.getByAlias(propertyEditorAlias), (propertyEditor) => {
-			this._propertyEditorAlias = propertyEditor?.alias ?? '';
+		this.observe(umbExtensionsRegistry.getByAlias(propertyEditorModelAlias), (propertyEditorModel) => {
+			this._propertyEditorModelAlias = propertyEditorModel?.alias ?? '';
 		});
 	}
 
@@ -129,7 +126,7 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Um
 								slot="editor"
 								name=${this._propertyEditorUIName}
 								alias=${this._propertyEditorUIAlias}
-								property-editor-alias=${this._propertyEditorAlias}
+								property-editor-model-alias=${this._propertyEditorModelAlias}
 								border>
 								<uui-icon name="${this._propertyEditorUIIcon}" slot="icon"></uui-icon>
 								<uui-action-bar slot="actions">
@@ -151,11 +148,11 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Um
 
 	private _renderConfig() {
 		return html`
-			${this._propertyEditorAlias && this._propertyEditorUIAlias
+			${this._propertyEditorModelAlias && this._propertyEditorUIAlias
 				? html`
 						<uui-box headline="Config">
 							<umb-property-editor-config
-								property-editor-alias="${this._propertyEditorAlias}"
+								property-editor-model-alias="${this._propertyEditorModelAlias}"
 								property-editor-ui-alias="${this._propertyEditorUIAlias}"
 								.data="${this._data}"></umb-property-editor-config>
 						</uui-box>
