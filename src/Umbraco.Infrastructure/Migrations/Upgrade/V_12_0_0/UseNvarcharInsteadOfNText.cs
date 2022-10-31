@@ -10,7 +10,8 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_12_0_0;
 
 public class UseNvarcharInsteadOfNText : MigrationBase
 {
-    public UseNvarcharInsteadOfNText(IMigrationContext context) : base(context)
+    public UseNvarcharInsteadOfNText(IMigrationContext context)
+        : base(context)
     {
     }
 
@@ -27,7 +28,9 @@ public class UseNvarcharInsteadOfNText : MigrationBase
         var columns = SqlSyntax.GetColumnsInSchema(Context.Database).ToList();
         AddColumnIfNotExists<PropertyDataDto>(columns, "textValue");
 
-        // Copy over data NPOCO doesn't support this for some insane reason, so we'll have to do it like so:
+        // Copy over data NPOCO doesn't support this for some insane reason, so we'll have to do it like so
+        // While we're add it we'll also set all the old values to be NULL since it's recommended here:
+        // https://learn.microsoft.com/en-us/sql/t-sql/data-types/ntext-text-and-image-transact-sql?view=sql-server-ver16#remarks
         StringBuilder queryBuilder = new StringBuilder()
             .AppendLine($"UPDATE {Constants.DatabaseSchema.Tables.PropertyData}")
             .AppendLine("SET")
@@ -37,20 +40,10 @@ public class UseNvarcharInsteadOfNText : MigrationBase
         Sql<ISqlContext> copyDataQuery = Database.SqlContext.Sql(queryBuilder.ToString());
         Database.Execute(copyDataQuery);
 
-        // Set old column to null
-        // var setToNullQuery = Database.SqlContext.Sql()
-        //     .Update<TempPropertyDataDto>(u => u.Set(x => x.OldTextValue, null));
-        // Database.Execute(setToNullQuery);
-
         // Delete old column
-        Delete.Column("oldTextValue").FromTable(Constants.DatabaseSchema.Tables.PropertyData).Do();
-    }
-
-    private class TempPropertyDataDto : PropertyDataDto
-    {
-        [Column("oldTextValue")]
-        [NullSetting(NullSetting = NullSettings.Null)]
-        [SpecialDbType(SpecialDbTypes.NTEXT)]
-        public string? OldTextValue { get; set; }
+        Delete
+            .Column("oldTextValue")
+            .FromTable(Constants.DatabaseSchema.Tables.PropertyData)
+            .Do();
     }
 }
