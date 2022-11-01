@@ -1,5 +1,19 @@
 <style>
 
+    .umb-icon {
+        display: inline-block;
+        width: 1em;
+        height: 1em;
+        flex-shrink: 0;
+    }
+
+    .umb-icon svg {
+        width: 100%;
+        height: 100%;
+        fill: currentColor;
+        animation: inherit;
+    }
+
     .blockelement-gridinlineblock-editor {
         position: relative;
         border-radius: 3px;
@@ -9,43 +23,50 @@
         background-color: white;
     }
     
-    .blockelement-gridinlineblock-editor > button {
+    .blockelement-gridinlineblock-editor > .blockelement-gridinlineblock-label {
         position: relative;
         display: flex;
         align-items: center;
         width: 100%;
         min-height: 48px;
-        cursor: pointer;
         color: #1b264f;
         background-color: white;
         text-align: left;
         padding: 0 20px;
         user-select: none;
         border: none;
-        transition: border-color 120ms, background-color 120ms;
+        box-sizing: border-box;
     }
-    .blockelement-gridinlineblock-editor > button:hover {
-        color: #2152A3;
-    }
-    .blockelement-gridinlineblock-editor > button > .icon {
+    .blockelement-gridinlineblock-editor > .blockelement-gridinlineblock-label > .icon {
         font-size: 22px;
         margin-right: 10px;
         display: inline-block;
     }
-
-    .blockelement-gridinlineblock-editor > button > span {
+    .blockelement-gridinlineblock-editor > .blockelement-gridinlineblock-label > span {
         position: relative;
         display: inline-block;
         padding-top:2px;
         padding-bottom:2px;
     }
+
+    .blockelement-gridinlineblock-editor > button {
+        cursor: pointer;
+        transition: border-color 120ms, background-color 120ms;
+    }
+    .blockelement-gridinlineblock-editor > button:hover {
+        color: #2152A3;
+    }
+    
+
 </style>
 
 <div 
     class="blockelement-gridinlineblock-editor"
     ng-controller="Umbraco.PropertyEditors.BlockEditor.GridInlineBlockEditor as vm"
     ng-class="{ '--active': block.active, '--error': parentForm.$invalid && valFormManager.isShowingValidation() }">
-    <button type="button"
+    <button 
+        ng-if="!block.config.forceHideContentEditorInOverlay"
+        type="button"
         ng-click="block.edit()"
         ng-focus="block.focus"
         class="blockelement-gridinlineblock-label"
@@ -53,6 +74,13 @@
         <umb-icon icon="{{block.content.icon}}" class="icon"></umb-icon>
         <span>{{block.label}}</span>
     </button>
+    <div 
+        ng-if="block.config.forceHideContentEditorInOverlay"
+        class="blockelement-gridinlineblock-label"
+        val-server-property-class="">
+        <umb-icon icon="{{block.content.icon}}" class="icon"></umb-icon>
+        <span>{{block.label}}</span>
+    </div>
 
     <slot name="{{vm.propertySlotName}}"></slot>
 

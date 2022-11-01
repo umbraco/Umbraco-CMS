@@ -12,10 +12,26 @@
             vm.property = $scope.block.content.variants[0].tabs[0]?.properties[0];
 
             if (vm.property) {
-                vm.propertySlotName = "umbBlockGridProxy_" +vm.property.alias + "_" + String.CreateGuid();
+                vm.propertySlotName = "umbBlockGridProxy_" + vm.property.alias + "_" + String.CreateGuid();
                 
                 propertyEditorElement = $('<div slot="{{vm.propertySlotName}}"></div>');
-                propertyEditorElement.html(`<umb-property-editor model="vm.property" preview="$scope.api.internal.readonly" ng-attr-readonly="{{$scope.api.internal.readonly || undefined}}"></umb-property-editor>`);
+                propertyEditorElement.html(
+                    `
+                    <umb-property
+                        data-element="grid-block-property-{{vm.property.alias}}"
+                        property="vm.property"
+                        node="$scope.block.content"
+                        hide-label="true">
+                    
+                        <umb-property-editor 
+                            model="vm.property" 
+                            preview="$scope.api.internal.readonly" 
+                            ng-attr-readonly="{{$scope.api.internal.readonly || undefined}}">
+                        </umb-property-editor>
+
+                    </umb-property>
+                    `
+                );
 
                 const connectedCallback = () => {$compile(propertyEditorElement)($scope)};
 
