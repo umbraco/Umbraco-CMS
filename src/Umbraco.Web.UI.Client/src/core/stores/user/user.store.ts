@@ -58,7 +58,7 @@ export class UmbUserStore extends UmbDataStoreBase<UserDetails> {
 		fetch(`/umbraco/backoffice/users/getByKeys?${params}`)
 			.then((res) => res.json())
 			.then((data) => {
-				this.update([data]);
+				this.update(data);
 			});
 
 		return this.items.pipe(

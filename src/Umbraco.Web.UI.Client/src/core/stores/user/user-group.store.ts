@@ -51,7 +51,7 @@ export class UmbUserGroupStore extends UmbDataStoreBase<UserGroupDetails> {
 		fetch(`/umbraco/backoffice/user-groups/getByKeys?${params}`)
 			.then((res) => res.json())
 			.then((data) => {
-				this.update([data]);
+				this.update(data);
 			});
 
 		return this.items.pipe(

@@ -47,11 +47,11 @@ export class UmbPickerUserElement extends UmbObserverMixin(UmbPickerElement) {
 	}
 
 	private _observeUser() {
-		if (this.value.length > 0 && this._userStore) {
-			this.observe<Array<UserEntity>>(this._userStore.getByKeys(this.value), (users) => (this._users = users));
-		} else {
-			this._users = [];
-		}
+		if (!this._userStore) return;
+
+		this.observe<Array<UserEntity>>(this._userStore.getByKeys(this.value), (users) => {
+			this._users = users;
+		});
 	}
 
 	selectionUpdated() {
