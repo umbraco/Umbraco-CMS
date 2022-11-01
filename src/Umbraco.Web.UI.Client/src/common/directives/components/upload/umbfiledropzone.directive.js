@@ -46,6 +46,7 @@ angular.module("umbraco.directives")
           scope.processing = [];
           scope.processed = [];
           scope.totalMessages = 0;
+          // TODO - Make configurable in appsettings
           scope.batchSize = 10;
           scope.processingCount = 0;
 
