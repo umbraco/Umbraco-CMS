@@ -192,7 +192,7 @@ public class IconService : IIconService
                         // Iterate though the files of the second level sub directory. This should be where the SVG files are located :D
                         foreach (IFileInfo file in fileProvider.GetDirectoryContents($"{path}/{pluginDirectory.Name}/{subDir1.Name}/{subDir2.Name}"))
                         {
-                            if (file.Name.InvariantEndsWith(".svg") && file.PhysicalPath != null)
+                            if (file.Name.InvariantEndsWith(".svg") && !string.IsNullOrEmpty(file.PhysicalPath))
                             {
                                 yield return new FileInfo(file.PhysicalPath);
                             }

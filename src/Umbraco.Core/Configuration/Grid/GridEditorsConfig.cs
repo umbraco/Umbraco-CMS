@@ -145,6 +145,6 @@ internal class GridEditorsConfig : IGridEditorsConfig
     private static IFileInfo? GetConfigFile(IFileProvider fileProvider, string path)
     {
         IEnumerable<IFileInfo> contents = fileProvider.GetDirectoryContents(path);
-        return contents.FirstOrDefault(file => file.Name.InvariantEquals("grid.editors.config.js") && file.PhysicalPath is not null);
+        return contents.FirstOrDefault(file => file.Name.InvariantEquals("grid.editors.config.js") && !string.IsNullOrEmpty(file.PhysicalPath));
     }
 }
