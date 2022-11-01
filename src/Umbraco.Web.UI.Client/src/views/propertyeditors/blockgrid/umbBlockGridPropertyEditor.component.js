@@ -130,7 +130,8 @@
         };
         vm.onRemoveProxyProperty = (event) => {
             event.stopPropagation();
-            gridRootEl.removeChild(event.detail.property);
+            const el = gridRootEl.querySelector(`:scope > [slot='${event.detail.slotName}']`);
+            gridRootEl.removeChild(el);
         };
 
         vm.$onInit = function() {
@@ -413,7 +414,7 @@
             if (block.config.unsupported === true) {
                 block.view = DefaultViewFolderPath + "unsupportedblock/unsupportedblock.editor.html";
             } else {
-                block.view = DefaultViewFolderPath + "gridblock/gridblock.editor.html";
+                block.view = DefaultViewFolderPath + "gridinlineblock/gridinlineblock.editor.html";
             }
 
         }

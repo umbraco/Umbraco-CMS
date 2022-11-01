@@ -31,6 +31,7 @@
                               >
             <slot
                 ng-repeat="proxyProp in vm.proxyProperties track by proxyProp.slotName"
+                data-is-property-editor-proxy
                 name="{{proxyProp.slotName}}"
                 slot="{{proxyProp.slotName}}">
             </slot>

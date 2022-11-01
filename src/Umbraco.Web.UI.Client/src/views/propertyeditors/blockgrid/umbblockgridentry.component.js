@@ -99,17 +99,25 @@
         vm.isScaleMode = false;
         vm.layoutColumnsInt = 0;
         vm.hideInlineCreateAfter = true;
-        
+
         vm.proxyProperties = [];
         vm.onAppendProxyProperty = (event) => {
-            vm.proxyProperties.push({
-                slotName: event.detail.slotName
-            });
+            // Only insert a proxy slot for the direct Block of this entry (as all the blocks share the same ShadowDom though they are slotted into each other when nested through areas.)
+            if (event.detail.contentUdi === vm.layoutEntry.contentUdi) {
+                vm.proxyProperties.push({
+                    slotName: event.detail.slotName
+                });
+                $scope.$evalAsync();
+            }
         };
         vm.onRemoveProxyProperty = (event) => {
-            const index = vm.proxyProperties.findIndex(x => x.slotName === event.detail.slotName);
-            if(index !== -1) {
-                vm.proxyProperties.splice(index, 1);
+            // Only react to proxies from the direct Block of this entry:
+            if (event.detail.contentUdi === vm.layoutEntry.contentUdi) {
+                const index = vm.proxyProperties.findIndex(x => x.slotName === event.detail.slotName);
+                if(index !== -1) {
+                    vm.proxyProperties.splice(index, 1);
+                }
+                $scope.$evalAsync();
             }
         };
 

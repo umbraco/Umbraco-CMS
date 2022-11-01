@@ -22,7 +22,7 @@
                         property="vm.property"
                         node="$scope.block.content"
                         hide-label="true">
-                    
+
                         <umb-property-editor 
                             model="vm.property" 
                             preview="$scope.api.internal.readonly" 
@@ -34,8 +34,8 @@
                 );
 
                 const connectedCallback = () => {$compile(propertyEditorElement)($scope)};
-
-                const event = new CustomEvent("UmbBlockGrid_AppendProperty", {composed: true, bubbles: true, detail: {'property': propertyEditorElement[0], 'slotName': vm.propertySlotName, 'connectedCallback':connectedCallback}});
+                
+                const event = new CustomEvent("UmbBlockGrid_AppendProperty", {composed: true, bubbles: true, detail: {'property': propertyEditorElement[0], 'contentUdi': $scope.block.layout.contentUdi, 'slotName': vm.propertySlotName, 'connectedCallback':connectedCallback}});
                 
                 $element[0].dispatchEvent(event);
                 
@@ -44,7 +44,7 @@
 
         vm.$onDestroy = function() {
             if (vm.property) {
-                const event = new CustomEvent("UmbBlockGrid_RemoveProperty", {composed: true, bubbles: true, detail: {'property': propertyEditorElement, 'slotName': vm.propertySlotName}});
+                const event = new CustomEvent("UmbBlockGrid_RemoveProperty", {composed: true, bubbles: true, detail: {'slotName': vm.propertySlotName}});
                 $element[0].dispatchEvent(event);
             }
         }

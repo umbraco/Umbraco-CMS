@@ -76,6 +76,7 @@
 
         vm.movingLayoutEntry = null;
         vm.layoutColumnsInt = 0;
+        vm.containedPropertyEditorProxies = [];
 
         vm.$onInit = function () {
             initializeSortable();
@@ -210,6 +211,12 @@
 
             var nextSibling;
 
+            function _removePropertyProxy(eventTarget, slotName) {
+                const event = new CustomEvent("UmbBlockGrid_RemoveProperty", {composed: true, bubbles: true, detail: {'slotName': slotName}});
+                eventTarget.dispatchEvent(event);
+                console.log(eventTarget, event);
+            }
+
             // Borrowed concept from, its not identical as more has been implemented: https://github.com/SortableJS/angular-legacy-sortablejs/blob/master/angular-legacy-sortable.js
             function _sync(evt) {
 
@@ -222,8 +229,17 @@
                     const prevEntries = fromCtrl.entries;
                     const syncEntry = prevEntries[oldIndex];
 
-                    // Perform the transfer:
+                    // Make sure Property Editor Proxies are destroyed, as we need to establish new when moving context:
 
+
+                    // unregister all property editor proxies via events:
+                    console.log("containedPropertyEditorProxies", fromCtrl.containedPropertyEditorProxies)
+                    fromCtrl.containedPropertyEditorProxies.forEach(slotName => {
+                        console.log(evt.from, slotName)
+                        _removePropertyProxy(evt.from, slotName);
+                    });
+                    
+                    // Perform the transfer:
                     if (Sortable.active && Sortable.active.lastPullMode === 'clone') {
                         syncEntry = Utilities.copy(syncEntry);
                         prevEntries.splice(Sortable.utils.index(evt.clone, sortable.options.draggable), 0, prevEntries.splice(oldIndex, 1)[0]);
@@ -231,7 +247,6 @@
                     else {
                         prevEntries.splice(oldIndex, 1);
                     }
-                    
                     vm.entries.splice(newIndex, 0, syncEntry);
 
                     const contextColumns = vm.blockEditorApi.internal.getContextColumns(vm.parentBlock, vm.areaKey);
@@ -261,6 +276,7 @@
 
             function _indication(contextVM, movingEl) {
 
+                // Remove old indication:
                 if(_lastIndicationContainerVM !== contextVM && _lastIndicationContainerVM !== null) {
                     _lastIndicationContainerVM.hideNotAllowed();
                     _lastIndicationContainerVM.revertIndicateDroppable();
@@ -269,7 +285,7 @@
                 
                 if(contextVM.acceptBlock(movingEl.dataset.contentElementTypeKey) === true) {
                     _lastIndicationContainerVM.hideNotAllowed();
-                    _lastIndicationContainerVM.indicateDroppable();// This block is accepted to we will indicate a good drop.
+                    _lastIndicationContainerVM.indicateDroppable();// This block is accepted so we will indicate a good drop.
                     return true;
                 }
 
@@ -577,6 +593,7 @@
                     vm.movingLayoutEntry.$block.__scope.$evalAsync();// needed for the block to be updated
 
                     ghostEl = evt.item;
+                    vm.containedPropertyEditorProxies = Array.from(ghostEl.querySelectorAll('slot[data-is-property-editor-proxy]')).map(x => x.getAttribute('name'));
 
                     targetRect = evt.to.getBoundingClientRect();
                     ghostRect = ghostEl.getBoundingClientRect();
@@ -643,6 +660,7 @@
                     ghostRect = null;
                     ghostEl = null;
                     relatedEl = null;
+                    vm.containedPropertyEditorProxies = [];
                 }
             });
 
