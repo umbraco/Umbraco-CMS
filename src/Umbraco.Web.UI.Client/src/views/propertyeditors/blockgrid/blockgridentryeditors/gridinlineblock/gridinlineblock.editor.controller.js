@@ -24,21 +24,6 @@
                 $element[0].dispatchEvent(event);
                 
             }
-
-            const host =  $element[0].getRootNode();
-
-            for (const stylesheet of document.styleSheets) {
-
-                if(stylesheet.href !== null && stylesheet.type === "text/css") {
-
-                    const styleEl = document.createElement('link');
-                    styleEl.setAttribute('rel', 'stylesheet');
-                    styleEl.setAttribute('type', stylesheet.type);
-                    styleEl.setAttribute('href', stylesheet.href);
-
-                    host.appendChild(styleEl);
-                }
-            }
         }
 
         vm.$onDestroy = function() {
