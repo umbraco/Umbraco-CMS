@@ -37,6 +37,8 @@ namespace Umbraco.Extensions
             IFileProvider webFileProvider = webHostEnvironment.WebRootFileProvider;
             IFileProvider contentFileProvider = webHostEnvironment.ContentRootFileProvider;
 
+            IEnumerable<LocalizedTextServiceSupplementaryFileSource> localPluginFileSources = GetPluginLanguageFileSources(contentFileProvider, Cms.Core.Constants.SystemDirectories.AppPlugins, false);
+
             // Gets all language files in /app_plugins real or virtual locations
             IEnumerable<LocalizedTextServiceSupplementaryFileSource> pluginLangFileSources = GetPluginLanguageFileSources(webFileProvider, Cms.Core.Constants.SystemDirectories.AppPlugins, false);
 
@@ -60,7 +62,8 @@ namespace Umbraco.Extensions
                 }
             }
 
-            return pluginLangFileSources
+            return localPluginFileSources
+                    .Concat(pluginLangFileSources)
                     .Concat(configLangFileSources);
         }
 
