@@ -29,7 +29,7 @@ public class BackOfficeApplicationManager : IBackOfficeApplicationManager
 
     public async Task EnsureBackOfficeApplicationAsync(Uri backOfficeUrl, CancellationToken cancellationToken = default)
     {
-        if (backOfficeUrl.IsAbsoluteUri == false)
+        if (backOfficeUrl.IsAbsoluteUri is false)
         {
             throw new ArgumentException($"Expected an absolute URL, got: {backOfficeUrl}", nameof(backOfficeUrl));
         }
