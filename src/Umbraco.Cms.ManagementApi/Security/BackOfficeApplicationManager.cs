@@ -113,7 +113,7 @@ public class BackOfficeApplicationManager : IBackOfficeApplicationManager
         var identifier = clientDescriptor.ClientId ??
                          throw new ApplicationException($"ClientId is missing for application: {clientDescriptor.DisplayName ?? "(no name)"}");
         var client = await _applicationManager.FindByClientIdAsync(identifier, cancellationToken);
-        if (client == null)
+        if (client is null)
         {
             await _applicationManager.CreateAsync(clientDescriptor, cancellationToken);
         }
