@@ -167,7 +167,7 @@ public abstract class UmbracoIntegrationTestBase
                 // New DB + Schema
                 var newSchemaDbMeta = db.AttachSchema();
 
-                s_fixtureDbMeta = newSchemaDbMeta; 
+                s_fixtureDbMeta = newSchemaDbMeta;
                 // Add teardown callback
                 AddOnTestTearDown(() => db.Detach(newSchemaDbMeta));
 
