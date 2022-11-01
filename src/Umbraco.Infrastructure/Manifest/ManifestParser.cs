@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
@@ -283,19 +284,43 @@ public class ManifestParser : IManifestParser
         return text;
     }
 
-    // Gets all manifest files (recursively)
-    private IEnumerable<IFileInfo> GetManifestFiles(IFileProvider fileProvider, string path)
+    // Gets all manifest files
+    private static IEnumerable<IFileInfo> GetManifestFiles(IFileProvider fileProvider, string path)
     {
-        IEnumerable<IFileInfo> pluginFolders = fileProvider.GetDirectoryContents(path).Where(x => x.IsDirectory);
+        var manifestFiles = new List<IFileInfo>();
+        IEnumerable<IFileInfo> pluginFolders = fileProvider.GetDirectoryContents(path);
 
         foreach (IFileInfo pluginFolder in pluginFolders)
         {
-            foreach (IFileInfo file in fileProvider.GetDirectoryContents($"{path}/{pluginFolder.Name}"))
+            if (!pluginFolder.IsDirectory)
             {
-                if (file.Name.InvariantEquals("package.manifest") && file.PhysicalPath != null)
+                continue;
+            }
+
+            manifestFiles.AddRange(GetNestedManifestFiles(fileProvider, $"{path}/{pluginFolder.Name}"));
+        }
+
+        return manifestFiles;
+    }
+
+    // Helper method to get all nested package.manifest files (recursively)
+    private static IEnumerable<IFileInfo> GetNestedManifestFiles(IFileProvider fileProvider, string path)
+    {
+        foreach (IFileInfo file in fileProvider.GetDirectoryContents(path))
+        {
+            if (file.IsDirectory)
+            {
+                var virtualPath = WebPath.Combine(path, file.Name);
+
+                // Recursively find nested package.manifest files
+                foreach (IFileInfo nested in GetNestedManifestFiles(fileProvider, virtualPath))
                 {
-                    yield return file;
+                    yield return nested;
                 }
+            }
+            else if (file.Name.InvariantEquals("package.manifest") && !string.IsNullOrEmpty(file.PhysicalPath))
+            {
+                yield return file;
             }
         }
     }
