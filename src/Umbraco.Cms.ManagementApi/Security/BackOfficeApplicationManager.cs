@@ -126,7 +126,7 @@ public class BackOfficeApplicationManager : IBackOfficeApplicationManager
     private async Task Delete(string identifier, CancellationToken cancellationToken)
     {
         var client = await _applicationManager.FindByClientIdAsync(identifier, cancellationToken);
-        if (client == null)
+        if (client is null)
         {
             return;
         }
