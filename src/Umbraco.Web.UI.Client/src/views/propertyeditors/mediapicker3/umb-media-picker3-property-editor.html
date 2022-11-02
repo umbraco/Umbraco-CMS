@@ -59,6 +59,12 @@
                             <umb-progress-circle percentage="{{media.uploadProgress}}" width="100"></umb-progress-circle>
                         </div>
 
+                        <img 
+                            ng-if="media.dataURL"
+                            ng-src="{{media.dataURL}}"
+                            title="{{vm.media.name}}"
+                            alt="{{vm.media.name}}" />
+
                         <button type="button" class="btn-reset __info">
                             <div class="__name" ng-bind="media.name"></div>
                         </button>

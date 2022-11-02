@@ -142,16 +142,19 @@
 
         };
 
-        vm.files = [];
-
         function handleFiles (files, event, invalidFiles) {
             files.forEach(file => {
                 const tempMediaEntry = {
                     key: String.CreateGuid(),
                     name: file.name,
-                    uploadProgress: 0
+                    uploadProgress: 0,
+                    dataURL: ''
                 };
-                vm.files.push(tempMediaEntry);
+
+                Upload.base64DataUrl(file).then(function(url) {    
+                    tempMediaEntry.dataURL = url;
+                });
+
                 vm.model.value.push(tempMediaEntry);
                 _upload(file, tempMediaEntry);
             });
