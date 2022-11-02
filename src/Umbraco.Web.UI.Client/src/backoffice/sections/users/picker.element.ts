@@ -1,12 +1,13 @@
 import { html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { UmbModalOptions, UmbModalService } from '../../../core/services/modal';
+import { UmbModalOptions, UmbModalService, UmbModalType } from '../../../core/services/modal';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
 //TODO: These should probably be imported dynamically.
 import './picker-layout-section.element';
 import './picker-layout-user-group.element';
 import './picker-layout-user.element';
+import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
 
 export interface UmbPickerData {
 	multiple: boolean;
@@ -18,15 +19,16 @@ export class UmbPickerElement extends UmbContextConsumerMixin(LitElement) {
 	@property({ type: Array })
 	public value: Array<string> = [];
 
+	@property({ type: Boolean })
+	public multiple = true;
+
+	@property({ type: String })
+	public type: UmbModalType = 'sidebar';
+
+	@property({ type: String })
+	public size: UUIModalSidebarSize = 'small';
+
 	protected pickerLayout?: string;
-	protected pickerOptions: UmbModalOptions<UmbPickerData> = {
-		type: 'sidebar',
-		size: 'small',
-		data: {
-			multiple: true,
-			selection: [],
-		},
-	};
 	private _modalService?: UmbModalService;
 
 	constructor() {
@@ -40,10 +42,11 @@ export class UmbPickerElement extends UmbContextConsumerMixin(LitElement) {
 		if (!this.pickerLayout) return;
 
 		const modalHandler = this._modalService?.open(this.pickerLayout, {
-			...this.pickerOptions,
+			type: this.type,
+			size: this.size,
 			data: {
-				...this.pickerOptions.data,
-				selection: [...this.value],
+				multiple: this.multiple,
+				selection: this.value,
 			},
 		});
 		modalHandler?.onClose().then((data: UmbPickerData) => {

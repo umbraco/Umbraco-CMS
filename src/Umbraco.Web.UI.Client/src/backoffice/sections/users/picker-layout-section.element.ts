@@ -1,12 +1,12 @@
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbModalLayoutElement } from '../../../core/services/modal/layouts/modal-layout.element';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbPickerData } from './picker.element';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-import { ManifestSection } from '@umbraco-cms/models';
+import type { ManifestSection } from '@umbraco-cms/models';
 
 @customElement('umb-picker-layout-section')
 export class UmbPickerLayoutSectionElement extends UmbContextConsumerMixin(
