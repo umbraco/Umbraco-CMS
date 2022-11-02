@@ -178,7 +178,6 @@ public class TourController : UmbracoAuthorizedJsonController
             {
                 IEnumerable<IFileInfo> tourFiles = fileProvider
                     .GetDirectoryContents(subDir)
-                    .Where(x => !string.IsNullOrEmpty(x.PhysicalPath))
                     .Where(x => x.Name.InvariantEndsWith(".json"));
 
                 foreach (IFileInfo file in tourFiles)

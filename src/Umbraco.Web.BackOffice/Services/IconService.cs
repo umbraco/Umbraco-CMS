@@ -100,6 +100,7 @@ public class IconService : IIconService
         }
     }
 
+    // TODO: Refactor to return IEnumerable<FileInfo>
     private IEnumerable<FileInfo> GetAllIconsFiles()
     {
         var icons = new HashSet<FileInfo>(new CaseInsensitiveFileInfoComparer());
@@ -192,6 +193,9 @@ public class IconService : IIconService
                         // Iterate though the files of the second level sub directory. This should be where the SVG files are located :D
                         foreach (IFileInfo file in fileProvider.GetDirectoryContents($"{path}/{pluginDirectory.Name}/{subDir1.Name}/{subDir2.Name}"))
                         {
+                            // TODO: Refactor to work with IFileInfo, then we can also remove the .PhysicalPath check
+                            // as this won't work for files that aren't located on a physical file system
+                            // (e.g. embedded resource, Azure Blob Storage, etc.)
                             if (file.Name.InvariantEndsWith(".svg") && !string.IsNullOrEmpty(file.PhysicalPath))
                             {
                                 yield return new FileInfo(file.PhysicalPath);

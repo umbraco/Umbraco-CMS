@@ -54,7 +54,7 @@ namespace Umbraco.Extensions
                 {
                     foreach (IFileInfo langFile in contentFileProvider.GetDirectoryContents($"{userConfigLangFolder}/{langFileSource.Name}"))
                     {
-                        if (langFile.Name.InvariantEndsWith(".xml") && langFile.PhysicalPath is not null)
+                        if (langFile.Name.InvariantEndsWith(".xml"))
                         {
                             configLangFileSources.Add(new LocalizedTextServiceSupplementaryFileSource(langFile, true));
                         }
@@ -91,10 +91,9 @@ namespace Umbraco.Extensions
                 //  - there could be multiple on case sensitive file system
                 foreach (var langFolder in GetLangFolderPaths(fileProvider, pluginFolderPath))
                 {
-                    // Request all the files out of the path, these will have physicalPath set.
+                    // Request all the files out of the path
                     IEnumerable<IFileInfo> localizationFiles = fileProvider
                         .GetDirectoryContents(langFolder)
-                        .Where(x => !string.IsNullOrEmpty(x.PhysicalPath))
                         .Where(x => x.Name.InvariantEndsWith(".xml"));
 
                     foreach (IFileInfo file in localizationFiles)

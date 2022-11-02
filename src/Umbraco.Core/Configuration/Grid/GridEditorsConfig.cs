@@ -143,8 +143,6 @@ internal class GridEditorsConfig : IGridEditorsConfig
     private static IFileInfo? GetConfigFile(IFileProvider fileProvider, string path)
     {
         IFileInfo fileInfo = fileProvider.GetFileInfo($"{path}/grid.editors.config.js");
-        return fileInfo.Exists && fileInfo.PhysicalPath.IsNullOrWhiteSpace() == false
-            ? fileInfo
-            : null;
+        return fileInfo.Exists ? fileInfo : null;
     }
 }
