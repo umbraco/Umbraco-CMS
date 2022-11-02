@@ -5,6 +5,8 @@ import { UmbModalLayoutElement } from '../../../../../core/services/modal/layout
 import { UmbUserStore } from '../../../../../core/stores/user/user.store';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { UserDetails } from '@umbraco-cms/models';
+import '../../picker-user-group.element';
+import UmbPickerUserGroupElement from '../../picker-user-group.element';
 
 export type UsersViewType = 'list' | 'grid';
 @customElement('umb-editor-view-users-invite')
@@ -71,12 +73,17 @@ export class UmbEditorViewUsersInviteElement extends UmbContextConsumerMixin(Umb
 
 		const formData = new FormData(form);
 
+		console.log('formData', formData);
+
 		const name = formData.get('name') as string;
 		const email = formData.get('email') as string;
-		const userGroup = formData.get('userGroup') as string;
+		//TODO: How should we handle pickers forms?
+		const userGroupPicker = form.querySelector('#userGroups') as UmbPickerUserGroupElement;
+		const userGroups = userGroupPicker?.value || [];
+
 		const message = formData.get('message') as string;
 
-		this._userStore?.invite(name, email, message, [userGroup]).then((user) => {
+		this._userStore?.invite(name, email, message, userGroups).then((user) => {
 			if (user) {
 				this._invitedUser = user;
 			}
@@ -119,9 +126,9 @@ export class UmbEditorViewUsersInviteElement extends UmbContextConsumerMixin(Umb
 						<uui-input id="email" label="email" type="email" name="email" required></uui-input>
 					</uui-form-layout-item>
 					<uui-form-layout-item>
-						<uui-label slot="label" for="userGroup" required>User group</uui-label>
+						<uui-label slot="label" for="userGroups" required>User group</uui-label>
 						<span slot="description">Add groups to assign access and permissions</span>
-						<umb-picker-user-group></umb-picker-user-group>
+						<umb-picker-user-group id="userGroups" name="userGroups"></umb-picker-user-group>
 					</uui-form-layout-item>
 					<uui-form-layout-item>
 						<uui-label slot="label" for="message" required>Message</uui-label>
