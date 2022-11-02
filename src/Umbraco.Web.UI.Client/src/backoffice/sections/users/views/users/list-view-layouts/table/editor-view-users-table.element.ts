@@ -83,8 +83,10 @@ export class UmbEditorViewUsersTableElement extends UmbContextConsumerMixin(UmbO
 			this._userStore = instances['umbUserStore'];
 			this._userGroupStore = instances['umbUserGroupStore'];
 			this._usersContext = instances['umbUsersContext'];
+			console.log('userGroups', this._userGroupStore);
+
+			this._observeUserGroups(); //Note: observeUserGroups has to be before observeUsers in order to get the user group names.
 			this._observeUsers();
-			this._observeUserGroups();
 			this._observeSelection();
 		});
 	}
