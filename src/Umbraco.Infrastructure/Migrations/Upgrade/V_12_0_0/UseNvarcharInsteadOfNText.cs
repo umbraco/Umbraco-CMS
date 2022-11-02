@@ -18,6 +18,11 @@ public class UseNvarcharInsteadOfNText : MigrationBase
 
     protected override void Migrate()
     {
+        MigrateNtextColumn<ContentNuDto>("data", Constants.DatabaseSchema.Tables.NodeData, x => x.Data);
+        MigrateNtextColumn<CacheInstructionDto>("jsonInstruction", Constants.DatabaseSchema.Tables.CacheInstruction, x => x.Instructions);
+        MigrateNtextColumn<DataTypeDto>("config", Constants.DatabaseSchema.Tables.DataType, x => x.Configuration);
+        MigrateNtextColumn<ExternalLoginDto>("userData", Constants.DatabaseSchema.Tables.ExternalLogin, x => x.UserData);
+        MigrateNtextColumn<UserDto>("tourData", Constants.DatabaseSchema.Tables.User, x => x.TourData);
         MigrateNtextColumn<PropertyDataDto>("textValue", Constants.DatabaseSchema.Tables.PropertyData, x => x.TextValue);
     }
 
