@@ -171,6 +171,7 @@
                 })
                 .success(function (data, status, headers, config) {
                     tempMediaEntry.tmpLocation = data.tmpLocation;
+                    updateMediaEntryData(tempMediaEntry);
                 })
                 .error(function(evt, status, headers, config) {
                     console.log("error", file);
