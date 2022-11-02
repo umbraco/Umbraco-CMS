@@ -207,12 +207,16 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(
 					<umb-editor-property-layout
 						label="Content start node"
 						description="Limit the content tree to specific start nodes">
-						<umb-property-editor-ui-content-picker slot="editor"></umb-property-editor-ui-content-picker>
+						<umb-property-editor-ui-content-picker
+							@property-editor-change=${(e: any) => console.log(e.target)}
+							slot="editor"></umb-property-editor-ui-content-picker>
 					</umb-editor-property-layout>
 					<umb-editor-property-layout
 						label="Media start nodes"
 						description="Limit the media library to specific start nodes">
-						<umb-property-editor-ui-content-picker slot="editor"></umb-property-editor-ui-content-picker>
+						<umb-property-editor-ui-content-picker
+							slot="editor"
+							@property-editor-change=${(e: any) => console.log(e.target)}></umb-property-editor-ui-content-picker>
 					</umb-editor-property-layout>
 				</div>
 			</uui-box>

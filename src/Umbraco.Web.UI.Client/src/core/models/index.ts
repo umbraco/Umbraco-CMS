@@ -79,7 +79,9 @@ export interface UserDetails extends UserEntity {
 	updateDate: string;
 	createDate: string;
 	failedLoginAttempts: number;
-	userGroups: Array<string>; //TODO Implement this
+	userGroups: Array<string>;
+	contentStartNode?: string;
+	mediaStartNode?: string;
 }
 
 export interface UserGroupEntity extends Entity {
