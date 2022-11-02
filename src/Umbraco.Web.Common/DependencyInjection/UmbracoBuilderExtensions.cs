@@ -147,9 +147,10 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.TryAddEnumerable(ServiceDescriptor
             .Singleton<IDatabaseProviderMetadata, CustomConnectionStringDatabaseProviderMetadata>());
 
-        builder.Services.AddSingleton<WebRootFileProviderFactory>();
-        builder.Services.AddSingleton<IManifestFileProviderFactory>(factory => factory.GetRequiredService<WebRootFileProviderFactory>());
-        builder.Services.AddSingleton<IGridEditorsConfigFileProviderFactory>(factory => factory.GetRequiredService<WebRootFileProviderFactory>());
+        // WebRootFileProviderFactory is just a wrapper around the IWebHostEnvironment.WebRootFileProvider,
+        // therefore no need to register it as singleton
+        builder.Services.AddSingleton<IManifestFileProviderFactory, WebRootFileProviderFactory>();
+        builder.Services.AddSingleton<IGridEditorsConfigFileProviderFactory, WebRootFileProviderFactory>();
 
         // Must be added here because DbProviderFactories is netstandard 2.1 so cannot exist in Infra for now
         builder.Services.AddSingleton<IDbProviderFactoryCreator>(factory => new DbProviderFactoryCreator(
