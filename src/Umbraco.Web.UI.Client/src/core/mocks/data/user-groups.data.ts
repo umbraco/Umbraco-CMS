@@ -10,7 +10,7 @@ class UmbUserGroupsData extends UmbEntityData<UserGroupDetails> {
 
 export const data: Array<UserGroupDetails> = [
 	{
-		key: '10000000-0000-0000-0000-000000000000',
+		key: 'c630d49e-4e7b-42ea-b2bc-edc0edacb6b1',
 		name: 'Administrators',
 		icon: 'umb:medal',
 		parentKey: '',
@@ -20,7 +20,7 @@ export const data: Array<UserGroupDetails> = [
 		sections: [],
 	},
 	{
-		key: '20000000-0000-0000-0000-000000000000',
+		key: '9a9ad4e9-3b5b-4fe7-b0d9-e301b9675949',
 		name: 'Editors',
 		icon: 'umb:tools',
 		parentKey: '',
@@ -30,7 +30,7 @@ export const data: Array<UserGroupDetails> = [
 		sections: [],
 	},
 	{
-		key: '30000000-0000-0000-0000-000000000000',
+		key: 'b847398a-6875-4d7a-9f6d-231256b81471',
 		name: 'Sensitive Data',
 		icon: 'umb:lock',
 		parentKey: '',
@@ -40,7 +40,7 @@ export const data: Array<UserGroupDetails> = [
 		sections: [],
 	},
 	{
-		key: '40000000-0000-0000-0000-000000000000',
+		key: '2668f09b-320c-48a7-a78a-95047026ec0e',
 		name: 'Translators',
 		icon: 'umb:globe',
 		parentKey: '',
@@ -50,7 +50,7 @@ export const data: Array<UserGroupDetails> = [
 		sections: [],
 	},
 	{
-		key: '50000000-0000-0000-0000-000000000000',
+		key: '397f3a8b-4ca3-4b01-9dd3-94e5c9eaa9b2',
 		name: 'Writers',
 		icon: 'umb:edit',
 		parentKey: '',
