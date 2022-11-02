@@ -27,6 +27,11 @@ public class UseNvarcharInsteadOfNText : MigrationBase
 
     private void MigrateNtextColumn<TDto>(string columnName, string tableName, Expression<Func<TDto, object?>> fieldSelector, bool nullable = true)
     {
+        if (ColumnType(tableName, columnName) is null or not "ntext")
+        {
+            return;
+        }
+
         var oldColumnName = $"Old{columnName}";
 
         // Rename the column so we can create the new one and copy over the data.
