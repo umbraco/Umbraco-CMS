@@ -3,6 +3,7 @@ using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using NSwag.Annotations;
 using OpenIddict.Abstractions;
 using OpenIddict.Server.AspNetCore;
 using Umbraco.Cms.Core;
@@ -15,7 +16,7 @@ namespace Umbraco.Cms.ManagementApi.Controllers.Security;
 
 [ApiController]
 [VersionedApiBackOfficeRoute(Paths.BackOfficeApiEndpointTemplate)]
-[ApiExplorerSettings(GroupName = "Security")]
+[OpenApiTag("Security")]
 public class BackOfficeController : ManagementApiControllerBase
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
