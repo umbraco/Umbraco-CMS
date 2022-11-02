@@ -1,6 +1,39 @@
+<style>
+    .my-dropzone {
+        height: 100px; 
+        background-color: purple;
+    }
+
+    .my-dropzone.drag-over {
+        background: blue;
+    }
+
+    .temp-media-card {
+        border-radius: 3px;
+        cursor: pointer;
+        display: inline-block;
+        overflow: hidden;
+        position: relative;
+        transition: box-shadow .12s;
+        width: 100%;
+    }
+</style>
+
 <div class="umb-mediapicker3">
 
     <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
+
+    <h3>Value</h3>
+    <pre>{{ vm.model.value | json }}</pre>
+
+    <div 
+        class="my-dropzone"
+        ngf-drop
+        ng-model="vm.filesHolder"
+        ngf-change="vm.handleFiles($files, $event, $invalidFiles)"
+        ngf-drag-over-class="'drag-over'">
+        My dropzone
+    </div>
 
     <div class="umb-media-card-grid" ng-class="{'--singleMode':(vm.validationLimit.max === 1 && vm.model.value.length <= 1)}">
 
@@ -20,7 +53,26 @@
                         </div>
                 </button>
 
+                <div ng-if="!media.mediaKey" class="umb-media-card">
+                    <div class="__showcase">
+                        <div ng-if="media.uploadProgress < 100" class="__upload-progress">
+                            <umb-progress-circle percentage="{{media.uploadProgress}}" width="100"></umb-progress-circle>
+                        </div>
+
+                        <button type="button" class="btn-reset __info">
+                            <div class="__name" ng-bind="media.name"></div>
+                        </button>
+
+                        <div class="__actions">
+                            <button ng-if="vm.allowRemoveMedia" type="button" class="btn-reset __action umb-outline" localize="title" title="general_remove" ng-click="vm.removeMedia(media); $event.stopPropagation();">
+                                <umb-icon icon="icon-trash" class="icon"></umb-icon>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
                 <umb-media-card
+                    ng-if="media.mediaKey"
                     media-key="media.mediaKey"
                     on-name-clicked="vm.editMedia(media, $index, $event)"
                     ng-class="{'--active': vm.activeMediaEntry === media}"

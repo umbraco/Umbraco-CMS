@@ -28,7 +28,7 @@
             }
         });
 
-    function MediaPicker3Controller($scope, editorService, clipboardService, localizationService, overlayService, userService, entityResource, $attrs) {
+    function MediaPicker3Controller($scope, editorService, clipboardService, localizationService, overlayService, userService, entityResource, $attrs, umbRequestHelper, Upload) {
 
         var unsubscribe = [];
 
@@ -46,6 +46,8 @@
         vm.allowAddMedia = true;
         vm.allowRemoveMedia = true;
         vm.allowEditMedia = true;
+
+        vm.handleFiles = handleFiles;
 
         vm.addMediaAt = addMediaAt;
         vm.editMedia = editMedia;
@@ -139,6 +141,39 @@
             });
 
         };
+
+        vm.files = [];
+
+        function handleFiles (files, event, invalidFiles) {
+            files.forEach(file => {
+                const tempMediaEntry = {
+                    key: String.CreateGuid(),
+                    name: file.name,
+                    uploadProgress: 0
+                };
+                vm.files.push(tempMediaEntry);
+                vm.model.value.push(tempMediaEntry);
+                _upload(file, tempMediaEntry);
+            });
+        };
+
+        function _upload(file, tempMediaEntry) {
+            Upload.upload({ 
+                    url: umbRequestHelper.getApiUrl("tinyMceApiBaseUrl", "UploadImage"),
+                    file: file
+                })
+                .progress(function(evt) {
+                    var progressPercentage = parseInt(100.0 * evt.loaded / evt.total, 10);
+                    tempMediaEntry.uploadProgress = progressPercentage;
+                })
+                .success(function (data, status, headers, config) {
+                    console.log("success", file, data);
+                    tempMediaEntry.tmpLocation = data.tmpLocation;
+                })
+                .error(function(evt, status, headers, config) {
+                    console.log("error", file);
+                });
+        }
 
         function onServerValueChanged(newVal, oldVal) {
             if(newVal === null || !Array.isArray(newVal)) {
@@ -430,7 +465,7 @@
 
         vm.sortableOptions = {
             cursor: "grabbing",
-            handle: "umb-media-card",
+            handle: "umb-media-card, .umb-media-card",
             cancel: "input,textarea,select,option",
             classes: ".umb-media-card--dragging",
             distance: 5,
