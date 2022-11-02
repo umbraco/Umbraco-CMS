@@ -2,10 +2,9 @@
 using System.Text;
 using NPoco;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.Column;
 using Umbraco.Cms.Infrastructure.Persistence;
-using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_12_0_0;
 
@@ -19,14 +18,14 @@ public class UseNvarcharInsteadOfNText : MigrationBase
     protected override void Migrate()
     {
         MigrateNtextColumn<ContentNuDto>("data", Constants.DatabaseSchema.Tables.NodeData, x => x.Data);
-        MigrateNtextColumn<CacheInstructionDto>("jsonInstruction", Constants.DatabaseSchema.Tables.CacheInstruction, x => x.Instructions);
+        MigrateNtextColumn<CacheInstructionDto>("jsonInstruction", Constants.DatabaseSchema.Tables.CacheInstruction, x => x.Instructions, false);
         MigrateNtextColumn<DataTypeDto>("config", Constants.DatabaseSchema.Tables.DataType, x => x.Configuration);
         MigrateNtextColumn<ExternalLoginDto>("userData", Constants.DatabaseSchema.Tables.ExternalLogin, x => x.UserData);
         MigrateNtextColumn<UserDto>("tourData", Constants.DatabaseSchema.Tables.User, x => x.TourData);
         MigrateNtextColumn<PropertyDataDto>("textValue", Constants.DatabaseSchema.Tables.PropertyData, x => x.TextValue);
     }
 
-    private void MigrateNtextColumn<TDto>(string columnName, string tableName, Expression<Func<TDto, object?>> fieldSelector)
+    private void MigrateNtextColumn<TDto>(string columnName, string tableName, Expression<Func<TDto, object?>> fieldSelector, bool nullable = true)
     {
         var oldColumnName = $"Old{columnName}";
 
@@ -38,9 +37,25 @@ public class UseNvarcharInsteadOfNText : MigrationBase
             .Do();
 
         // Create new column with the correct type
-        // This should change between every column migration, so we'll request it each time.
-        var columns = SqlSyntax.GetColumnsInSchema(Context.Database).ToList();
-        AddColumnIfNotExists<TDto>(columns, columnName);
+        // This is pretty ugly, but we have to do ti this way because the CacheInstruction.Instruction column doesn't support nullable.
+        // So we have to populate with some temporary placeholder value before we copy over the actual data.
+        ICreateColumnOptionBuilder builder = Create
+            .Column(columnName)
+            .OnTable(tableName)
+            .AsCustom("nvarchar(max)");
+
+        if (nullable is false)
+        {
+            builder
+                .NotNullable()
+                .WithDefaultValue("Placeholder");
+        }
+        else
+        {
+            builder.Nullable();
+        }
+
+        builder.Do();
 
         // Copy over data NPOCO doesn't support this for some reason, so we'll have to do it like so
         // While we're add it we'll also set all the old values to be NULL since it's recommended here:
@@ -48,8 +63,12 @@ public class UseNvarcharInsteadOfNText : MigrationBase
         StringBuilder queryBuilder = new StringBuilder()
             .AppendLine($"UPDATE {tableName}")
             .AppendLine("SET")
-            .AppendLine($"\t{SqlSyntax.GetFieldNameForUpdate(fieldSelector)} = {SqlSyntax.GetQuotedTableName(tableName)}.{SqlSyntax.GetQuotedColumnName(oldColumnName)},")
-            .AppendLine($"\t{SqlSyntax.GetQuotedColumnName(oldColumnName)} = NULL");
+            .Append($"\t{SqlSyntax.GetFieldNameForUpdate(fieldSelector)} = {SqlSyntax.GetQuotedTableName(tableName)}.{SqlSyntax.GetQuotedColumnName(oldColumnName)}");
+
+        if (nullable)
+        {
+            queryBuilder.AppendLine($"\n,\t{SqlSyntax.GetQuotedColumnName(oldColumnName)} = NULL");
+        }
 
         Sql<ISqlContext> copyDataQuery = Database.SqlContext.Sql(queryBuilder.ToString());
         Database.Execute(copyDataQuery);
