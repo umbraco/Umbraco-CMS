@@ -13,11 +13,12 @@ import {
 	UmbTableOrderedEvent,
 } from '../../../../../../components/table/table.element';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-import type { UserDetails } from '@umbraco-cms/models';
+import type { UserDetails, UserGroupDetails, UserGroupEntity } from '@umbraco-cms/models';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 
 import './column-layouts/name/user-table-name-column-layout.element';
 import './column-layouts/status/user-table-status-column-layout.element';
+import { UmbUserGroupStore } from 'src/core/stores/user/user-group.store';
 
 @customElement('umb-editor-view-users-table')
 export class UmbEditorViewUsersTableElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
@@ -68,19 +69,22 @@ export class UmbEditorViewUsersTableElement extends UmbContextConsumerMixin(UmbO
 	@state()
 	private _selection: Array<string> = [];
 
+	@state()
+	private _userGroups: Array<UserGroupEntity> = [];
+
 	private _userStore?: UmbUserStore;
+	private _userGroupStore?: UmbUserGroupStore;
 	private _usersContext?: UmbSectionViewUsersElement;
 
 	connectedCallback(): void {
 		super.connectedCallback();
 
-		this.consumeContext('umbUserStore', (userStore: UmbUserStore) => {
-			this._userStore = userStore;
+		this.consumeAllContexts(['umbUserStore', 'umbUserGroupStore', 'umbUsersContext'], (instances) => {
+			this._userStore = instances['umbUserStore'];
+			this._userGroupStore = instances['umbUserGroupStore'];
+			this._usersContext = instances['umbUsersContext'];
 			this._observeUsers();
-		});
-
-		this.consumeContext('umbUsersContext', (usersContext: UmbSectionViewUsersElement) => {
-			this._usersContext = usersContext;
+			this._observeUserGroups();
 			this._observeSelection();
 		});
 	}
@@ -101,6 +105,22 @@ export class UmbEditorViewUsersTableElement extends UmbContextConsumerMixin(UmbO
 		});
 	}
 
+	private _observeUserGroups() {
+		if (!this._userGroupStore) return;
+		this.observe<Array<UserGroupDetails>>(
+			this._userGroupStore.getAll(),
+			(userGroups) => (this._userGroups = userGroups)
+		);
+	}
+
+	private _getUserGroupNames(keys: Array<string>) {
+		return keys
+			.map((key: string) => {
+				return this._userGroups.find((x) => x.key === key)?.name;
+			})
+			.join(', ');
+	}
+
 	private _createTableItems(users: Array<UserDetails>) {
 		this._tableItems = users.map((user) => {
 			return {
@@ -115,7 +135,7 @@ export class UmbEditorViewUsersTableElement extends UmbContextConsumerMixin(UmbO
 					},
 					{
 						columnAlias: 'userGroup',
-						value: user.userGroups,
+						value: this._getUserGroupNames(user.userGroups),
 					},
 					{
 						columnAlias: 'userLastLogin',
