@@ -53,7 +53,7 @@ export class UmbUserStore extends UmbDataStoreBase<UserDetails> {
 		);
 	}
 
-	getByKeys(keys: Array<string>): Observable<Array<UserEntity>> {
+	getByKeys(keys: Array<string>): Observable<Array<UserDetails>> {
 		const params = keys.map((key) => `key=${key}`).join('&');
 		fetch(`/umbraco/backoffice/users/getByKeys?${params}`)
 			.then((res) => res.json())

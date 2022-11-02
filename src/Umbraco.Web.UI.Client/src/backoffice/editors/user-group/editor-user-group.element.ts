@@ -316,7 +316,7 @@ export class UmbEditorUserGroupElement extends UmbContextProviderMixin(
 	private renderRightColumn() {
 		return html`<uui-box>
 			<div slot="headline">Users</div>
-			<umb-picker-user></umb-picker-user>
+			<umb-picker-user @change=${(e: any) => console.log('USER PICKER NOT IMPLEMENTED')}></umb-picker-user>
 		</uui-box>`;
 	}
 

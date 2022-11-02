@@ -56,6 +56,7 @@ export class UmbPickerUserElement extends UmbObserverMixin(UmbPickerElement) {
 
 	selectionUpdated() {
 		this._observeUser();
+		this.dispatchEvent(new CustomEvent('change', { bubbles: true, composed: true }));
 	}
 
 	private _renderUserList() {
