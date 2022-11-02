@@ -17,6 +17,12 @@ public class UseNvarcharInsteadOfNText : MigrationBase
 
     protected override void Migrate()
     {
+        // We don't need to run this migration for SQLite, since ntext is not a thing there, text is just text.
+        if (DatabaseType == DatabaseType.SQLite)
+        {
+            return;
+        }
+
         MigrateNtextColumn<ContentNuDto>("data", Constants.DatabaseSchema.Tables.NodeData, x => x.Data);
         MigrateNtextColumn<CacheInstructionDto>("jsonInstruction", Constants.DatabaseSchema.Tables.CacheInstruction, x => x.Instructions, false);
         MigrateNtextColumn<DataTypeDto>("config", Constants.DatabaseSchema.Tables.DataType, x => x.Configuration);
