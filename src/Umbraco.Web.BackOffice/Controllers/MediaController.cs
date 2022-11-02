@@ -1,12 +1,10 @@
 using System.Globalization;
-using System.Net;
 using System.Net.Mime;
 using System.Text;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
@@ -35,10 +33,8 @@ using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Web.BackOffice.Authorization;
 using Umbraco.Cms.Web.BackOffice.Filters;
 using Umbraco.Cms.Web.BackOffice.ModelBinders;
-using Umbraco.Cms.Web.Common.ActionsResults;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers;
@@ -54,7 +50,6 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers;
 public class MediaController : ContentControllerBase
 {
     private readonly AppCaches _appCaches;
-    private readonly IIOHelper _ioHelper;
     private readonly IAuthorizationService _authorizationService;
     private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
     private readonly ContentSettings _contentSettings;
@@ -95,60 +90,6 @@ public class MediaController : ContentControllerBase
         IJsonSerializer serializer,
         IAuthorizationService authorizationService,
         AppCaches appCaches)
-        : this(
-            cultureDictionary,
-            loggerFactory,
-            shortStringHelper,
-            eventMessages,
-            localizedTextService,
-            contentSettings,
-            mediaTypeService,
-            mediaService,
-            entityService,
-            backofficeSecurityAccessor,
-            umbracoMapper,
-            dataTypeService,
-            sqlContext,
-            contentTypeBaseServiceProvider,
-            relationService,
-            propertyEditors,
-            mediaFileManager,
-            mediaUrlGenerators,
-            hostingEnvironment,
-            imageUrlGenerator,
-            serializer,
-            authorizationService,
-            appCaches,
-            StaticServiceProvider.Instance.GetRequiredService<IIOHelper>())
-    {
-    }
-
-    [ActivatorUtilitiesConstructor]
-    public MediaController(
-        ICultureDictionary cultureDictionary,
-        ILoggerFactory loggerFactory,
-        IShortStringHelper shortStringHelper,
-        IEventMessagesFactory eventMessages,
-        ILocalizedTextService localizedTextService,
-        IOptionsSnapshot<ContentSettings> contentSettings,
-        IMediaTypeService mediaTypeService,
-        IMediaService mediaService,
-        IEntityService entityService,
-        IBackOfficeSecurityAccessor backofficeSecurityAccessor,
-        IUmbracoMapper umbracoMapper,
-        IDataTypeService dataTypeService,
-        ISqlContext sqlContext,
-        IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
-        IRelationService relationService,
-        PropertyEditorCollection propertyEditors,
-        MediaFileManager mediaFileManager,
-        MediaUrlGeneratorCollection mediaUrlGenerators,
-        IHostingEnvironment hostingEnvironment,
-        IImageUrlGenerator imageUrlGenerator,
-        IJsonSerializer serializer,
-        IAuthorizationService authorizationService,
-        AppCaches appCaches,
-        IIOHelper ioHelper)
         : base(cultureDictionary, loggerFactory, shortStringHelper, eventMessages, localizedTextService, serializer)
     {
         _shortStringHelper = shortStringHelper;
@@ -171,7 +112,6 @@ public class MediaController : ContentControllerBase
         _imageUrlGenerator = imageUrlGenerator;
         _authorizationService = authorizationService;
         _appCaches = appCaches;
-        _ioHelper = ioHelper;
     }
 
     /// <summary>
@@ -1075,70 +1015,6 @@ public class MediaController : ContentControllerBase
                 Alias = rel.ContentTypeAlias
             })
         };
-    }
-
-    [HttpPost]
-    public async Task<IActionResult> UploadImage(List<IFormFile> file)
-    {
-        // Create an unique folder path to help with concurrent users to avoid filename clash
-        var imageTempPath =
-            _hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempImageUploads + "/" + Guid.NewGuid());
-
-        // Ensure image temp path exists
-        if (Directory.Exists(imageTempPath) == false)
-        {
-            Directory.CreateDirectory(imageTempPath);
-        }
-
-        // Must have a file
-        if (file.Count == 0)
-        {
-            return NotFound();
-        }
-
-        // Should only have one file
-        if (file.Count > 1)
-        {
-            return new UmbracoProblemResult("Only one file can be uploaded at a time", HttpStatusCode.BadRequest);
-        }
-
-        IFormFile formFile = file.First();
-
-        // Really we should only have one file per request to this endpoint
-        //  var file = result.FileData[0];
-        var fileName = formFile.FileName.Trim(new[] { '\"' }).TrimEnd();
-        var safeFileName = fileName.ToSafeFileName(_shortStringHelper);
-        var ext = safeFileName.Substring(safeFileName.LastIndexOf('.') + 1).ToLowerInvariant();
-
-        if (_contentSettings.IsFileAllowedForUpload(ext) == false ||
-            _imageUrlGenerator.IsSupportedImageFormat(ext) == false)
-        {
-            // Throw some error - to say can't upload this IMG type
-            return new UmbracoProblemResult("This is not an image filetype extension that is approved", HttpStatusCode.BadRequest);
-        }
-
-        var newFilePath = imageTempPath + Path.DirectorySeparatorChar + safeFileName;
-        var relativeNewFilePath = GetRelativePath(newFilePath);
-
-        await using (FileStream stream = System.IO.File.Create(newFilePath))
-        {
-            await formFile.CopyToAsync(stream);
-        }
-
-        return Ok(new { tmpLocation = relativeNewFilePath });
-    }
-
-    // Use private method istead of _ioHelper.GetRelativePath as that is relative for the webroot and not the content root.
-    private string GetRelativePath(string path)
-    {
-        if (path.IsFullPath())
-        {
-            var rootDirectory = _hostingEnvironment.MapPathContentRoot("~");
-            var relativePath = _ioHelper.PathStartsWith(path, rootDirectory) ? path[rootDirectory.Length..] : path;
-            path = relativePath;
-        }
-
-        return PathUtility.EnsurePathIsApplicationRootPrefixed(path);
     }
 
     #region GetChildren
