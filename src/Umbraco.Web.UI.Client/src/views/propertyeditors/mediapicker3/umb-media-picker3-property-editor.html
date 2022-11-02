@@ -65,7 +65,7 @@
                             title="{{vm.media.name}}"
                             alt="{{vm.media.name}}" />
 
-                        <button type="button" class="btn-reset __info">
+                        <button type="button" class="btn-reset __info" ng-click="vm.editMedia(media, $index, $event)">
                             <div class="__name" ng-bind="media.name"></div>
                         </button>
 

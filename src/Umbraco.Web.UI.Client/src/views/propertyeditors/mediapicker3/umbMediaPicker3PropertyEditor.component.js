@@ -170,7 +170,6 @@
                     tempMediaEntry.uploadProgress = progressPercentage;
                 })
                 .success(function (data, status, headers, config) {
-                    console.log("success", file, data);
                     tempMediaEntry.tmpLocation = data.tmpLocation;
                 })
                 .error(function(evt, status, headers, config) {
