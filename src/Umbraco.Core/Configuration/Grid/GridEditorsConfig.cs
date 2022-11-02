@@ -111,9 +111,7 @@ internal class GridEditorsConfig : IGridEditorsConfig
                 else
                 {
                     IFileProvider configFileProvider = new EmbeddedFileProvider(GetType().Assembly, "Umbraco.Cms.Core.EmbeddedResources.Grid");
-                    IFileInfo embeddedConfig = configFileProvider
-                        .GetDirectoryContents(string.Empty)
-                        .First(x => !x.IsDirectory && x.Name.InvariantEquals("grid.editors.config.js"));
+                    IFileInfo embeddedConfig = configFileProvider.GetFileInfo("grid.editors.config.js");
 
                     using Stream stream = embeddedConfig.CreateReadStream();
                     using var reader = new StreamReader(stream, Encoding.UTF8);
@@ -144,7 +142,9 @@ internal class GridEditorsConfig : IGridEditorsConfig
 
     private static IFileInfo? GetConfigFile(IFileProvider fileProvider, string path)
     {
-        IEnumerable<IFileInfo> contents = fileProvider.GetDirectoryContents(path);
-        return contents.FirstOrDefault(file => file.Name.InvariantEquals("grid.editors.config.js") && !string.IsNullOrEmpty(file.PhysicalPath));
+        IFileInfo fileInfo = fileProvider.GetFileInfo($"{path}/grid.editors.config.js");
+        return fileInfo.Exists && fileInfo.PhysicalPath.IsNullOrWhiteSpace() == false
+            ? fileInfo
+            : null;
     }
 }
