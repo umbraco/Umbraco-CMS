@@ -3361,6 +3361,63 @@
             }
           }
         }
+      },
+      "patch": {
+        "tags": [
+          "Dictionary"
+        ],
+        "operationId": "UpdateDictionary_Update",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "updateViewModel",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/JsonPatchViewModel"
+                }
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/umbraco/management/api/v1/dictionary/create": {
@@ -3488,65 +3545,6 @@
             "x-position": 2
           }
         ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/octet-stream": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "",
-            "content": {
-              "application/octet-stream": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/umbraco/management/api/v1/dictionary/{id}": {
-      "patch": {
-        "tags": [
-          "Dictionary"
-        ],
-        "operationId": "UpdateDictionary_Update",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "guid"
-            },
-            "x-position": 1
-          }
-        ],
-        "requestBody": {
-          "x-name": "updateViewModel",
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/JsonPatchViewModel"
-                }
-              }
-            }
-          },
-          "required": true,
-          "x-position": 2
-        },
         "responses": {
           "200": {
             "description": "",
@@ -5291,7 +5289,6 @@
       "Bearer": {
         "type": "oauth2",
         "description": "Umbraco Authentication",
-        "name": "Umbraco",
         "flows": {
           "authorizationCode": {
             "authorizationUrl": "/umbraco/management/api/v1.0/security/back-office/authorize",

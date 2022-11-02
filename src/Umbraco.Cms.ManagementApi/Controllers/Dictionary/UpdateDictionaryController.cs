@@ -40,13 +40,13 @@ public class UpdateDictionaryController : DictionaryControllerBase
         _systemTextJsonSerializer = systemTextJsonSerializer;
     }
 
-    [HttpPatch("{id:Guid}")]
+    [HttpPatch("{key:Guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ContentResult), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(NotFoundResult), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Update(Guid id, JsonPatchViewModel[] updateViewModel)
+    public async Task<IActionResult> Update(Guid key, JsonPatchViewModel[] updateViewModel)
     {
-        IDictionaryItem? dictionaryItem = _localizationService.GetDictionaryItemById(id);
+        IDictionaryItem? dictionaryItem = _localizationService.GetDictionaryItemById(key);
 
         if (dictionaryItem is null)
         {
