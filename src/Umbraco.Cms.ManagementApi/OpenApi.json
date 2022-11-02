@@ -35,7 +35,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CultureViewModelPagedViewModel"
+                  "$ref": "#/components/schemas/PagedCulture"
                 }
               }
             }
@@ -90,7 +90,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/FolderTreeItemViewModelPagedViewModel"
+                  "$ref": "#/components/schemas/PagedFolderTreeItem"
                 }
               }
             }
@@ -124,7 +124,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/FolderTreeItemViewModel"
+                    "$ref": "#/components/schemas/FolderTreeItem"
                   }
                 }
               }
@@ -172,7 +172,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/FolderTreeItemViewModelPagedViewModel"
+                  "$ref": "#/components/schemas/PagedFolderTreeItem"
                 }
               }
             }
@@ -209,7 +209,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DictionaryOverviewViewModelPagedViewModel"
+                  "$ref": "#/components/schemas/PagedDictionaryOverview"
                 }
               }
             }
@@ -239,7 +239,7 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "$ref": "#/components/schemas/JsonPatchViewModel"
+                  "$ref": "#/components/schemas/JsonPatch"
                 }
               }
             }
@@ -291,7 +291,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DictionaryViewModel"
+                  "$ref": "#/components/schemas/Dictionary"
                 }
               }
             }
@@ -349,7 +349,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/DictionaryItemViewModel"
+                "$ref": "#/components/schemas/DictionaryItem"
               }
             }
           }
@@ -419,7 +419,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NotFoundObjectResult"
+                  "$ref": "#/components/schemas/NotFoundResult"
                 }
               }
             }
@@ -487,7 +487,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DictionaryImportViewModel"
+                  "$ref": "#/components/schemas/DictionaryImport"
                 }
               }
             }
@@ -544,7 +544,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/EntityTreeItemViewModelPagedViewModel"
+                  "$ref": "#/components/schemas/PagedEntityTreeItem"
                 }
               }
             }
@@ -578,7 +578,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/FolderTreeItemViewModel"
+                    "$ref": "#/components/schemas/FolderTreeItem"
                   }
                 }
               }
@@ -618,7 +618,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/EntityTreeItemViewModelPagedViewModel"
+                  "$ref": "#/components/schemas/PagedEntityTreeItem"
                 }
               }
             }
@@ -652,7 +652,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/DocumentBlueprintTreeItemViewModel"
+                    "$ref": "#/components/schemas/DocumentBlueprintTreeItem"
                   }
                 }
               }
@@ -692,7 +692,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DocumentBlueprintTreeItemViewModelPagedViewModel"
+                  "$ref": "#/components/schemas/PagedDocumentBlueprintTreeItem"
                 }
               }
             }
@@ -747,7 +747,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DocumentTypeTreeItemViewModelPagedViewModel"
+                  "$ref": "#/components/schemas/PagedDocumentTypeTreeItem"
                 }
               }
             }
@@ -781,7 +781,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/DocumentTypeTreeItemViewModel"
+                    "$ref": "#/components/schemas/DocumentTypeTreeItem"
                   }
                 }
               }
@@ -829,7 +829,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DocumentTypeTreeItemViewModelPagedViewModel"
+                  "$ref": "#/components/schemas/PagedDocumentTypeTreeItem"
                 }
               }
             }
@@ -886,7 +886,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RecycleBinItemViewModelPagedViewModel"
+                  "$ref": "#/components/schemas/PagedRecycleBinItem"
                 }
               }
             }
@@ -935,7 +935,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RecycleBinItemViewModelPagedViewModel"
+                  "$ref": "#/components/schemas/PagedRecycleBinItem"
                 }
               }
             }
@@ -997,7 +997,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DocumentTreeItemViewModelPagedViewModel"
+                  "$ref": "#/components/schemas/PagedDocumentTreeItem"
                 }
               }
             }
@@ -1046,7 +1046,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/DocumentTreeItemViewModel"
+                    "$ref": "#/components/schemas/DocumentTreeItem"
                   }
                 }
               }
@@ -1101,7 +1101,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DocumentTreeItemViewModelPagedViewModel"
+                  "$ref": "#/components/schemas/PagedDocumentTreeItem"
                 }
               }
             }
@@ -1170,7 +1170,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HelpPageViewModelPagedViewModel"
+                  "$ref": "#/components/schemas/PagedHelpPage"
                 }
               }
             }
@@ -1209,7 +1209,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/InstallSettingsViewModel"
+                  "$ref": "#/components/schemas/InstallSettings"
                 }
               }
             }
@@ -1226,7 +1226,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/InstallViewModel"
+                "$ref": "#/components/schemas/Install"
               }
             }
           }
@@ -1267,7 +1267,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/DatabaseInstallViewModel"
+                "$ref": "#/components/schemas/DatabaseInstall"
               }
             }
           }
@@ -1318,7 +1318,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/LanguageViewModelPagedViewModel"
+                  "$ref": "#/components/schemas/PagedLanguage"
                 }
               }
             }
@@ -1358,7 +1358,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/LanguageViewModel"
+                  "$ref": "#/components/schemas/Language"
                 }
               }
             }
@@ -1416,7 +1416,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/LanguageViewModel"
+                "$ref": "#/components/schemas/Language"
               }
             }
           }
@@ -1447,7 +1447,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/LanguageViewModel"
+                "$ref": "#/components/schemas/Language"
               }
             }
           }
@@ -1526,7 +1526,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/FolderTreeItemViewModelPagedViewModel"
+                  "$ref": "#/components/schemas/PagedFolderTreeItem"
                 }
               }
             }
@@ -1560,7 +1560,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/FolderTreeItemViewModel"
+                    "$ref": "#/components/schemas/FolderTreeItem"
                   }
                 }
               }
@@ -1608,7 +1608,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/FolderTreeItemViewModelPagedViewModel"
+                  "$ref": "#/components/schemas/PagedFolderTreeItem"
                 }
               }
             }
@@ -1665,7 +1665,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RecycleBinItemViewModelPagedViewModel"
+                  "$ref": "#/components/schemas/PagedRecycleBinItem"
                 }
               }
             }
@@ -1714,7 +1714,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RecycleBinItemViewModelPagedViewModel"
+                  "$ref": "#/components/schemas/PagedRecycleBinItem"
                 }
               }
             }
@@ -1769,7 +1769,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ContentTreeItemViewModelPagedViewModel"
+                  "$ref": "#/components/schemas/PagedContentTreeItem"
                 }
               }
             }
@@ -1811,7 +1811,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/ContentTreeItemViewModel"
+                    "$ref": "#/components/schemas/ContentTreeItem"
                   }
                 }
               }
@@ -1859,7 +1859,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ContentTreeItemViewModelPagedViewModel"
+                  "$ref": "#/components/schemas/PagedContentTreeItem"
                 }
               }
             }
@@ -1893,7 +1893,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/EntityTreeItemViewModel"
+                    "$ref": "#/components/schemas/EntityTreeItem"
                   }
                 }
               }
@@ -1933,7 +1933,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/EntityTreeItemViewModelPagedViewModel"
+                  "$ref": "#/components/schemas/PagedEntityTreeItem"
                 }
               }
             }
@@ -1967,7 +1967,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/EntityTreeItemViewModel"
+                    "$ref": "#/components/schemas/EntityTreeItem"
                   }
                 }
               }
@@ -2007,7 +2007,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/EntityTreeItemViewModelPagedViewModel"
+                  "$ref": "#/components/schemas/PagedEntityTreeItem"
                 }
               }
             }
@@ -2055,7 +2055,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CreatedResult"
+                  "$ref": "#/components/schemas/ModelsBuilder"
                 }
               }
             }
@@ -2074,7 +2074,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/OutOfDateStatusViewModel"
+                  "$ref": "#/components/schemas/OutOfDateStatus"
                 }
               }
             }
@@ -2120,7 +2120,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/FileSystemTreeItemViewModelPagedViewModel"
+                  "$ref": "#/components/schemas/PagedFileSystemTreeItem"
                 }
               }
             }
@@ -2153,7 +2153,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/FileSystemTreeItemViewModel"
+                    "$ref": "#/components/schemas/FileSystemTreeItem"
                   }
                 }
               }
@@ -2193,7 +2193,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/FileSystemTreeItemViewModelPagedViewModel"
+                  "$ref": "#/components/schemas/PagedFileSystemTreeItem"
                 }
               }
             }
@@ -2212,7 +2212,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProfilingStatusViewModel"
+                  "$ref": "#/components/schemas/ProfilingStatus"
                 }
               }
             }
@@ -2301,7 +2301,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/FolderTreeItemViewModel"
+                    "$ref": "#/components/schemas/FolderTreeItem"
                   }
                 }
               }
@@ -2341,7 +2341,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/EntityTreeItemViewModelPagedViewModel"
+                  "$ref": "#/components/schemas/PagedEntityTreeItem"
                 }
               }
             }
@@ -2371,7 +2371,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RelationViewModel"
+                  "$ref": "#/components/schemas/Relation"
                 }
               }
             }
@@ -2435,7 +2435,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RelationViewModelPagedViewModel"
+                  "$ref": "#/components/schemas/PagedRelation"
                 }
               }
             }
@@ -2481,7 +2481,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/FileSystemTreeItemViewModelPagedViewModel"
+                  "$ref": "#/components/schemas/PagedFileSystemTreeItem"
                 }
               }
             }
@@ -2514,7 +2514,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/FileSystemTreeItemViewModel"
+                    "$ref": "#/components/schemas/FileSystemTreeItem"
                   }
                 }
               }
@@ -2554,7 +2554,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/FileSystemTreeItemViewModelPagedViewModel"
+                  "$ref": "#/components/schemas/PagedFileSystemTreeItem"
                 }
               }
             }
@@ -2591,7 +2591,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/IndexViewModelPagedViewModel"
+                  "$ref": "#/components/schemas/PagedIndex"
                 }
               }
             }
@@ -2630,7 +2630,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/IndexViewModel"
+                  "$ref": "#/components/schemas/Index"
                 }
               }
             }
@@ -2706,7 +2706,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SearcherViewModelPagedViewModel"
+                  "$ref": "#/components/schemas/PagedSearcher"
                 }
               }
             }
@@ -2758,7 +2758,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SearchResultViewModelPagedViewModelPagedViewModel"
+                  "$ref": "#/components/schemas/PagedPaged"
                 }
               }
             }
@@ -2819,7 +2819,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ServerStatusViewModel"
+                  "$ref": "#/components/schemas/ServerStatus"
                 }
               }
             }
@@ -2848,7 +2848,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/VersionViewModel"
+                  "$ref": "#/components/schemas/Version"
                 }
               }
             }
@@ -2894,7 +2894,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/FileSystemTreeItemViewModelPagedViewModel"
+                  "$ref": "#/components/schemas/PagedFileSystemTreeItem"
                 }
               }
             }
@@ -2927,7 +2927,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/FileSystemTreeItemViewModel"
+                    "$ref": "#/components/schemas/FileSystemTreeItem"
                   }
                 }
               }
@@ -2967,7 +2967,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/FileSystemTreeItemViewModelPagedViewModel"
+                  "$ref": "#/components/schemas/PagedFileSystemTreeItem"
                 }
               }
             }
@@ -3013,7 +3013,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/FileSystemTreeItemViewModelPagedViewModel"
+                  "$ref": "#/components/schemas/PagedFileSystemTreeItem"
                 }
               }
             }
@@ -3046,7 +3046,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/FileSystemTreeItemViewModel"
+                    "$ref": "#/components/schemas/FileSystemTreeItem"
                   }
                 }
               }
@@ -3086,7 +3086,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/FileSystemTreeItemViewModelPagedViewModel"
+                  "$ref": "#/components/schemas/PagedFileSystemTreeItem"
                 }
               }
             }
@@ -3123,7 +3123,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/TelemetryLevelViewModelPagedViewModel"
+                  "$ref": "#/components/schemas/PagedTelemetry"
                 }
               }
             }
@@ -3142,7 +3142,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/TelemetryLevelViewModel"
+                  "$ref": "#/components/schemas/Telemetry"
                 }
               }
             }
@@ -3157,7 +3157,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TelemetryLevelViewModel"
+                "$ref": "#/components/schemas/Telemetry"
               }
             }
           }
@@ -3218,7 +3218,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/EntityTreeItemViewModelPagedViewModel"
+                  "$ref": "#/components/schemas/PagedEntityTreeItem"
                 }
               }
             }
@@ -3252,7 +3252,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/EntityTreeItemViewModel"
+                    "$ref": "#/components/schemas/EntityTreeItem"
                   }
                 }
               }
@@ -3292,7 +3292,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/EntityTreeItemViewModelPagedViewModel"
+                  "$ref": "#/components/schemas/PagedEntityTreeItem"
                 }
               }
             }
@@ -3345,7 +3345,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RelationItemViewModelPagedViewModel"
+                  "$ref": "#/components/schemas/PagedRelationItem"
                 }
               }
             }
@@ -3398,7 +3398,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RelationItemViewModelPagedViewModel"
+                  "$ref": "#/components/schemas/PagedRelationItem"
                 }
               }
             }
@@ -3453,7 +3453,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RelationItemViewModelPagedViewModel"
+                  "$ref": "#/components/schemas/PagedRelationItem"
                 }
               }
             }
@@ -3504,7 +3504,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UpgradeSettingsViewModel"
+                  "$ref": "#/components/schemas/UpgradeSettings"
                 }
               }
             }
@@ -3653,7 +3653,7 @@
         "type": "integer",
         "format": "int32"
       },
-      "ConsentLevelViewModel": {
+      "ConsentLevel": {
         "type": "object",
         "properties": {
           "level": {
@@ -3874,7 +3874,7 @@
         },
         "additionalProperties": false
       },
-      "ContentTreeItemViewModel": {
+      "ContentTreeItem": {
         "type": "object",
         "properties": {
           "name": {
@@ -3906,23 +3906,6 @@
           },
           "noAccess": {
             "type": "boolean"
-          }
-        },
-        "additionalProperties": false
-      },
-      "ContentTreeItemViewModelPagedViewModel": {
-        "type": "object",
-        "properties": {
-          "total": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ContentTreeItemViewModel"
-            },
-            "nullable": true
           }
         },
         "additionalProperties": false
@@ -3962,7 +3945,7 @@
         },
         "additionalProperties": false
       },
-      "CultureViewModel": {
+      "Culture": {
         "type": "object",
         "properties": {
           "name": {
@@ -3971,23 +3954,6 @@
           },
           "englishName": {
             "type": "string",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "CultureViewModelPagedViewModel": {
-        "type": "object",
-        "properties": {
-          "total": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CultureViewModel"
-            },
             "nullable": true
           }
         },
@@ -4054,7 +4020,7 @@
         },
         "additionalProperties": false
       },
-      "DatabaseInstallViewModel": {
+      "DatabaseInstall": {
         "required": [
           "id",
           "providerName"
@@ -4095,7 +4061,7 @@
         },
         "additionalProperties": false
       },
-      "DatabaseSettingsViewModel": {
+      "DatabaseSettings": {
         "type": "object",
         "properties": {
           "id": {
@@ -4140,139 +4106,7 @@
         },
         "additionalProperties": false
       },
-      "DictionaryImportViewModel": {
-        "type": "object",
-        "properties": {
-          "dictionaryItems": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/DictionaryItemsImportViewModel"
-            },
-            "nullable": true
-          },
-          "tempFileName": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "DictionaryItemViewModel": {
-        "type": "object",
-        "properties": {
-          "parentId": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "key": {
-            "type": "string",
-            "format": "uuid"
-          }
-        },
-        "additionalProperties": false
-      },
-      "DictionaryItemsImportViewModel": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "nullable": true
-          },
-          "level": {
-            "type": "integer",
-            "format": "int32"
-          }
-        },
-        "additionalProperties": false
-      },
-      "DictionaryOverviewViewModel": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "nullable": true
-          },
-          "key": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "level": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "translations": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/DictionaryTranslationOverviewViewModel"
-            },
-            "nullable": true,
-            "readOnly": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "DictionaryOverviewViewModelPagedViewModel": {
-        "type": "object",
-        "properties": {
-          "total": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/DictionaryOverviewViewModel"
-            },
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "DictionaryTranslationOverviewViewModel": {
-        "type": "object",
-        "properties": {
-          "displayName": {
-            "type": "string",
-            "nullable": true
-          },
-          "hasTranslation": {
-            "type": "boolean"
-          }
-        },
-        "additionalProperties": false
-      },
-      "DictionaryTranslationViewModel": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "key": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "displayName": {
-            "type": "string",
-            "nullable": true
-          },
-          "isoCode": {
-            "type": "string",
-            "nullable": true
-          },
-          "translation": {
-            "type": "string",
-            "nullable": true
-          },
-          "languageId": {
-            "type": "integer",
-            "format": "int32"
-          }
-        },
-        "additionalProperties": false
-      },
-      "DictionaryViewModel": {
+      "Dictionary": {
         "required": [
           "name"
         ],
@@ -4286,7 +4120,7 @@
           "translations": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/DictionaryTranslationViewModel"
+              "$ref": "#/components/schemas/DictionaryTranslation"
             },
             "nullable": true
           },
@@ -4320,7 +4154,122 @@
         },
         "additionalProperties": false
       },
-      "DocumentBlueprintTreeItemViewModel": {
+      "DictionaryImport": {
+        "type": "object",
+        "properties": {
+          "dictionaryItems": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DictionaryItemsImport"
+            },
+            "nullable": true
+          },
+          "tempFileName": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "DictionaryItem": {
+        "type": "object",
+        "properties": {
+          "parentId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "key": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "additionalProperties": false
+      },
+      "DictionaryItemsImport": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "level": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "DictionaryOverview": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "key": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "level": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "translations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DictionaryTranslationOverview"
+            },
+            "nullable": true,
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "DictionaryTranslation": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "key": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "displayName": {
+            "type": "string",
+            "nullable": true
+          },
+          "isoCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "translation": {
+            "type": "string",
+            "nullable": true
+          },
+          "languageId": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "DictionaryTranslationOverview": {
+        "type": "object",
+        "properties": {
+          "displayName": {
+            "type": "string",
+            "nullable": true
+          },
+          "hasTranslation": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "DocumentBlueprintTreeItem": {
         "type": "object",
         "properties": {
           "name": {
@@ -4365,24 +4314,7 @@
         },
         "additionalProperties": false
       },
-      "DocumentBlueprintTreeItemViewModelPagedViewModel": {
-        "type": "object",
-        "properties": {
-          "total": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/DocumentBlueprintTreeItemViewModel"
-            },
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "DocumentTreeItemViewModel": {
+      "DocumentTreeItem": {
         "type": "object",
         "properties": {
           "name": {
@@ -4427,24 +4359,7 @@
         },
         "additionalProperties": false
       },
-      "DocumentTreeItemViewModelPagedViewModel": {
-        "type": "object",
-        "properties": {
-          "total": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/DocumentTreeItemViewModel"
-            },
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "DocumentTypeTreeItemViewModel": {
+      "DocumentTypeTreeItem": {
         "type": "object",
         "properties": {
           "name": {
@@ -4483,24 +4398,7 @@
         },
         "additionalProperties": false
       },
-      "DocumentTypeTreeItemViewModelPagedViewModel": {
-        "type": "object",
-        "properties": {
-          "total": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/DocumentTypeTreeItemViewModel"
-            },
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "EntityTreeItemViewModel": {
+      "EntityTreeItem": {
         "type": "object",
         "properties": {
           "name": {
@@ -4528,23 +4426,6 @@
           "parentKey": {
             "type": "string",
             "format": "uuid",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "EntityTreeItemViewModelPagedViewModel": {
-        "type": "object",
-        "properties": {
-          "total": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/EntityTreeItemViewModel"
-            },
             "nullable": true
           }
         },
@@ -4618,6 +4499,23 @@
           },
           "eventHandlerType": {
             "$ref": "#/components/schemas/Type"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Field": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "values": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -4756,24 +4654,7 @@
         },
         "additionalProperties": false
       },
-      "FieldViewModel": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "nullable": true
-          },
-          "values": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "FileSystemTreeItemViewModel": {
+      "FileSystemTreeItem": {
         "type": "object",
         "properties": {
           "name": {
@@ -4801,24 +4682,7 @@
         },
         "additionalProperties": false
       },
-      "FileSystemTreeItemViewModelPagedViewModel": {
-        "type": "object",
-        "properties": {
-          "total": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/FileSystemTreeItemViewModel"
-            },
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "FolderTreeItemViewModel": {
+      "FolderTreeItem": {
         "type": "object",
         "properties": {
           "name": {
@@ -4854,23 +4718,6 @@
         },
         "additionalProperties": false
       },
-      "FolderTreeItemViewModelPagedViewModel": {
-        "type": "object",
-        "properties": {
-          "total": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/FolderTreeItemViewModel"
-            },
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
       "GenericParameterAttributes": {
         "enum": [
           0,
@@ -4885,7 +4732,7 @@
         "type": "integer",
         "format": "int32"
       },
-      "HelpPageViewModel": {
+      "HelpPage": {
         "type": "object",
         "properties": {
           "name": {
@@ -4907,23 +4754,6 @@
         },
         "additionalProperties": false
       },
-      "HelpPageViewModelPagedViewModel": {
-        "type": "object",
-        "properties": {
-          "total": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/HelpPageViewModel"
-            },
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
       "ICustomAttributeProvider": {
         "type": "object",
         "additionalProperties": false
@@ -4932,7 +4762,7 @@
         "type": "object",
         "additionalProperties": false
       },
-      "IndexViewModel": {
+      "Index": {
         "type": "object",
         "properties": {
           "name": {
@@ -4965,40 +4795,7 @@
         },
         "additionalProperties": false
       },
-      "IndexViewModelPagedViewModel": {
-        "type": "object",
-        "properties": {
-          "total": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/IndexViewModel"
-            },
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "InstallSettingsViewModel": {
-        "type": "object",
-        "properties": {
-          "user": {
-            "$ref": "#/components/schemas/UserSettingsViewModel"
-          },
-          "databases": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/DatabaseSettingsViewModel"
-            },
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "InstallViewModel": {
+      "Install": {
         "required": [
           "database",
           "user"
@@ -5006,13 +4803,29 @@
         "type": "object",
         "properties": {
           "user": {
-            "$ref": "#/components/schemas/UserInstallViewModel"
+            "$ref": "#/components/schemas/UserInstall"
           },
           "database": {
-            "$ref": "#/components/schemas/DatabaseInstallViewModel"
+            "$ref": "#/components/schemas/DatabaseInstall"
           },
           "telemetryLevel": {
             "$ref": "#/components/schemas/TelemetryLevel"
+          }
+        },
+        "additionalProperties": false
+      },
+      "InstallSettings": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "$ref": "#/components/schemas/UserSettings"
+          },
+          "databases": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DatabaseSettings"
+            },
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -5021,7 +4834,7 @@
         "type": "object",
         "additionalProperties": false
       },
-      "JsonPatchViewModel": {
+      "JsonPatch": {
         "type": "object",
         "properties": {
           "op": {
@@ -5038,7 +4851,7 @@
         },
         "additionalProperties": false
       },
-      "LanguageViewModel": {
+      "Language": {
         "required": [
           "isoCode"
         ],
@@ -5065,23 +4878,6 @@
           "fallbackLanguageId": {
             "type": "integer",
             "format": "int32",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "LanguageViewModelPagedViewModel": {
-        "type": "object",
-        "properties": {
-          "total": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/LanguageViewModel"
-            },
             "nullable": true
           }
         },
@@ -5472,6 +5268,46 @@
         },
         "additionalProperties": false
       },
+      "ModelsBuilder": {
+        "type": "object",
+        "properties": {
+          "mode": {
+            "$ref": "#/components/schemas/ModelsMode"
+          },
+          "canGenerate": {
+            "type": "boolean"
+          },
+          "outOfDateModels": {
+            "type": "boolean"
+          },
+          "lastError": {
+            "type": "string",
+            "nullable": true
+          },
+          "version": {
+            "type": "string",
+            "nullable": true
+          },
+          "modelsNamespace": {
+            "type": "string",
+            "nullable": true
+          },
+          "trackingOutOfDateModels": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ModelsMode": {
+        "enum": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
       "Module": {
         "type": "object",
         "properties": {
@@ -5533,37 +5369,6 @@
         },
         "additionalProperties": false
       },
-      "NotFoundObjectResult": {
-        "type": "object",
-        "properties": {
-          "value": {
-            "nullable": true
-          },
-          "formatters": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/IOutputFormatter"
-            },
-            "nullable": true
-          },
-          "contentTypes": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "nullable": true
-          },
-          "declaredType": {
-            "$ref": "#/components/schemas/Type"
-          },
-          "statusCode": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
       "NotFoundResult": {
         "type": "object",
         "properties": {
@@ -5595,7 +5400,7 @@
         },
         "additionalProperties": false
       },
-      "OutOfDateStatusViewModel": {
+      "OutOfDateStatus": {
         "type": "object",
         "properties": {
           "status": {
@@ -5612,6 +5417,329 @@
         ],
         "type": "integer",
         "format": "int32"
+      },
+      "PagedContentTreeItem": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ContentTreeItem"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PagedCulture": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Culture"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PagedDictionaryOverview": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DictionaryOverview"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PagedDocumentBlueprintTreeItem": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DocumentBlueprintTreeItem"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PagedDocumentTreeItem": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DocumentTreeItem"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PagedDocumentTypeTreeItem": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DocumentTypeTreeItem"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PagedEntityTreeItem": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EntityTreeItem"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PagedFileSystemTreeItem": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FileSystemTreeItem"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PagedFolderTreeItem": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FolderTreeItem"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PagedHelpPage": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HelpPage"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PagedIndex": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Index"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PagedLanguage": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Language"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PagedPaged": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PagedSearchResult"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PagedRecycleBinItem": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RecycleBinItem"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PagedRelation": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Relation"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PagedRelationItem": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RelationItem"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PagedSearchResult": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SearchResult"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PagedSearcher": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Searcher"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PagedTelemetry": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Telemetry"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
       },
       "ParameterAttributes": {
         "enum": [
@@ -5727,7 +5855,7 @@
         },
         "additionalProperties": { }
       },
-      "ProfilingStatusViewModel": {
+      "ProfilingStatus": {
         "type": "object",
         "properties": {
           "enabled": {
@@ -5814,7 +5942,7 @@
         },
         "additionalProperties": false
       },
-      "RecycleBinItemViewModel": {
+      "RecycleBinItem": {
         "type": "object",
         "properties": {
           "key": {
@@ -5847,24 +5975,37 @@
         },
         "additionalProperties": false
       },
-      "RecycleBinItemViewModelPagedViewModel": {
+      "Relation": {
         "type": "object",
         "properties": {
-          "total": {
+          "parentId": {
             "type": "integer",
-            "format": "int64"
+            "format": "int32"
           },
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/RecycleBinItemViewModel"
-            },
+          "parentName": {
+            "type": "string",
+            "nullable": true
+          },
+          "childId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "childName": {
+            "type": "string",
+            "nullable": true
+          },
+          "createDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "comment": {
+            "type": "string",
             "nullable": true
           }
         },
         "additionalProperties": false
       },
-      "RelationItemViewModel": {
+      "RelationItem": {
         "type": "object",
         "properties": {
           "nodeKey": {
@@ -5900,70 +6041,6 @@
           },
           "relationTypeIsDependency": {
             "type": "boolean"
-          }
-        },
-        "additionalProperties": false
-      },
-      "RelationItemViewModelPagedViewModel": {
-        "type": "object",
-        "properties": {
-          "total": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/RelationItemViewModel"
-            },
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "RelationViewModel": {
-        "type": "object",
-        "properties": {
-          "parentId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "parentName": {
-            "type": "string",
-            "nullable": true
-          },
-          "childId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "childName": {
-            "type": "string",
-            "nullable": true
-          },
-          "createDate": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "comment": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "RelationViewModelPagedViewModel": {
-        "type": "object",
-        "properties": {
-          "total": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/RelationViewModel"
-            },
-            "nullable": true
           }
         },
         "additionalProperties": false
@@ -6007,7 +6084,7 @@
         },
         "additionalProperties": false
       },
-      "SearchResultViewModel": {
+      "SearchResult": {
         "type": "object",
         "properties": {
           "id": {
@@ -6026,69 +6103,18 @@
           "fields": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/FieldViewModel"
+              "$ref": "#/components/schemas/Field"
             },
             "nullable": true
           }
         },
         "additionalProperties": false
       },
-      "SearchResultViewModelPagedViewModel": {
-        "type": "object",
-        "properties": {
-          "total": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/SearchResultViewModel"
-            },
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "SearchResultViewModelPagedViewModelPagedViewModel": {
-        "type": "object",
-        "properties": {
-          "total": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/SearchResultViewModelPagedViewModel"
-            },
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "SearcherViewModel": {
+      "Searcher": {
         "type": "object",
         "properties": {
           "name": {
             "type": "string",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "SearcherViewModelPagedViewModel": {
-        "type": "object",
-        "properties": {
-          "total": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/SearcherViewModel"
-            },
             "nullable": true
           }
         },
@@ -6103,7 +6129,7 @@
         "type": "integer",
         "format": "int32"
       },
-      "ServerStatusViewModel": {
+      "ServerStatus": {
         "type": "object",
         "properties": {
           "serverStatus": {
@@ -6125,16 +6151,7 @@
         },
         "additionalProperties": false
       },
-      "TelemetryLevel": {
-        "enum": [
-          0,
-          1,
-          2
-        ],
-        "type": "integer",
-        "format": "int32"
-      },
-      "TelemetryLevelViewModel": {
+      "Telemetry": {
         "type": "object",
         "properties": {
           "telemetryLevel": {
@@ -6143,22 +6160,14 @@
         },
         "additionalProperties": false
       },
-      "TelemetryLevelViewModelPagedViewModel": {
-        "type": "object",
-        "properties": {
-          "total": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/TelemetryLevelViewModel"
-            },
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
+      "TelemetryLevel": {
+        "enum": [
+          0,
+          1,
+          2
+        ],
+        "type": "integer",
+        "format": "int32"
       },
       "Type": {
         "type": "object",
@@ -6848,7 +6857,7 @@
         },
         "additionalProperties": false
       },
-      "UpgradeSettingsViewModel": {
+      "UpgradeSettings": {
         "type": "object",
         "properties": {
           "currentState": {
@@ -6875,7 +6884,7 @@
         },
         "additionalProperties": false
       },
-      "UserInstallViewModel": {
+      "UserInstall": {
         "required": [
           "email",
           "name",
@@ -6904,7 +6913,7 @@
         },
         "additionalProperties": false
       },
-      "UserSettingsViewModel": {
+      "UserSettings": {
         "type": "object",
         "properties": {
           "minCharLength": {
@@ -6918,14 +6927,14 @@
           "consentLevels": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/ConsentLevelViewModel"
+              "$ref": "#/components/schemas/ConsentLevel"
             },
             "nullable": true
           }
         },
         "additionalProperties": false
       },
-      "VersionViewModel": {
+      "Version": {
         "type": "object",
         "properties": {
           "version": {

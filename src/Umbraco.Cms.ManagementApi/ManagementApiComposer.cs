@@ -109,6 +109,8 @@ public class ManagementApiComposer : IComposer
             });
 
             swaggerGenOptions.DocumentFilter<MimeTypeDocumentFilter>();
+
+            swaggerGenOptions.CustomSchemaIds(SchemaIdGenerator.Generate);
         });
 
         services.AddVersionedApiExplorer(options =>
