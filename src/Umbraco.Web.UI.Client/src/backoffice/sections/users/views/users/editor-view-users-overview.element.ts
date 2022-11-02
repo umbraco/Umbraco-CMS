@@ -13,6 +13,7 @@ import './list-view-layouts/table/editor-view-users-table.element';
 import './list-view-layouts/grid/editor-view-users-grid.element';
 import './editor-view-users-selection.element';
 import './editor-view-users-invite.element';
+import './editor-view-users-create.element';
 
 export type UsersViewType = 'list' | 'grid';
 @customElement('umb-editor-view-users-overview')
@@ -83,6 +84,9 @@ export class UmbEditorViewUsersOverviewElement extends UmbContextConsumerMixin(U
 	private _selection: Array<string> = [];
 
 	@state()
+	private isCloud = false; //NOTE: Used to show either invite or create user buttons and views.
+
+	@state()
 	private _routes: IRoute[] = [
 		{
 			path: 'grid',
@@ -142,17 +146,24 @@ export class UmbEditorViewUsersOverviewElement extends UmbContextConsumerMixin(U
 		}
 	}
 
-	private _showInvite() {
-		const invite = document.createElement('umb-editor-view-users-invite');
-
-		this._modalService?.open(invite, { type: 'dialog' });
+	private _showInviteOrCreate() {
+		let modal = undefined;
+		if (this.isCloud) {
+			modal = document.createElement('umb-editor-view-users-invite');
+		} else {
+			modal = document.createElement('umb-editor-view-users-create');
+		}
+		this._modalService?.open(modal, { type: 'dialog' });
 	}
 
 	render() {
 		return html`
 			<div id="sticky-top">
 				<div id="user-list-top-bar">
-					<uui-button @click=${this._showInvite} label="Invite user" look="outline"></uui-button>
+					<uui-button
+						@click=${this._showInviteOrCreate}
+						label=${this.isCloud ? 'Invite' : 'Create' + ' user'}
+						look="outline"></uui-button>
 					<uui-input label="search" id="input-search"></uui-input>
 					<div>
 						<uui-popover margin="8">

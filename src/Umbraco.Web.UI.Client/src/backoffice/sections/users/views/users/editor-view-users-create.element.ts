@@ -7,10 +7,11 @@ import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { UserDetails } from '@umbraco-cms/models';
 import '../../picker-user-group.element';
 import UmbPickerUserGroupElement from '../../picker-user-group.element';
+import { UUIInputPasswordElement } from '@umbraco-ui/uui';
 
 export type UsersViewType = 'list' | 'grid';
-@customElement('umb-editor-view-users-invite')
-export class UmbEditorViewUsersInviteElement extends UmbContextConsumerMixin(UmbModalLayoutElement) {
+@customElement('umb-editor-view-users-create')
+export class UmbEditorViewUsersCreateElement extends UmbContextConsumerMixin(UmbModalLayoutElement) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -28,7 +29,8 @@ export class UmbEditorViewUsersInviteElement extends UmbContextConsumerMixin(Umb
 				display: flex;
 				flex-direction: column;
 			}
-			uui-input {
+			uui-input,
+			uui-input-password {
 				width: 100%;
 			}
 			form {
@@ -49,7 +51,7 @@ export class UmbEditorViewUsersInviteElement extends UmbContextConsumerMixin(Umb
 	private _form!: HTMLFormElement;
 
 	@state()
-	private _invitedUser?: UserDetails;
+	private _createdUser?: UserDetails;
 
 	protected _userStore?: UmbUserStore;
 
@@ -80,13 +82,19 @@ export class UmbEditorViewUsersInviteElement extends UmbContextConsumerMixin(Umb
 		const userGroupPicker = form.querySelector('#userGroups') as UmbPickerUserGroupElement;
 		const userGroups = userGroupPicker?.value || [];
 
-		const message = formData.get('message') as string;
-
-		this._userStore?.invite(name, email, message, userGroups).then((user) => {
+		this._userStore?.invite(name, email, '', userGroups).then((user) => {
 			if (user) {
-				this._invitedUser = user;
+				this._createdUser = user;
 			}
 		});
+	}
+
+	private _copyPassword() {
+		const passwordInput = this.shadowRoot?.querySelector('#password') as UUIInputPasswordElement;
+		if (!passwordInput || typeof passwordInput.value !== 'string') return;
+
+		navigator.clipboard.writeText(passwordInput.value);
+		alert('Password copied to clipboard');
 	}
 
 	private _submitForm() {
@@ -98,21 +106,21 @@ export class UmbEditorViewUsersInviteElement extends UmbContextConsumerMixin(Umb
 	}
 
 	private _resetForm() {
-		this._invitedUser = undefined;
+		this._createdUser = undefined;
 	}
 
 	private _goToProfile() {
-		if (!this._invitedUser) return;
+		if (!this._createdUser) return;
 
 		this._closeModal();
-		history.pushState(null, '', '/section/users/view/users/user/' + this._invitedUser?.key); //TODO: URL Should be dynamic
+		history.pushState(null, '', '/section/users/view/users/user/' + this._createdUser?.key); //TODO: URL Should be dynamic
 	}
 
 	private _renderForm() {
-		return html` <h1>Invite user</h1>
+		return html` <h1>Create user</h1>
 			<p style="margin-top: 0">
-				Invite new users to give them access to Umbraco. An invite email will be sent to the user with information on
-				how to log in to Umbraco. Invites last for 72 hours.
+				Create new users to give them access to Umbraco. When a user is created a password will be generated that you
+				can share with the user.
 			</p>
 			<uui-form>
 				<form id="form" name="form" @submit="${this._handleSubmit}">
@@ -129,27 +137,34 @@ export class UmbEditorViewUsersInviteElement extends UmbContextConsumerMixin(Umb
 						<span slot="description">Add groups to assign access and permissions</span>
 						<umb-picker-user-group id="userGroups" name="userGroups"></umb-picker-user-group>
 					</uui-form-layout-item>
-					<uui-form-layout-item>
-						<uui-label slot="label" for="message" required>Message</uui-label>
-						<uui-textarea id="message" label="message" name="message" required></uui-textarea>
-					</uui-form-layout-item>
 				</form>
 			</uui-form>`;
 	}
 
-	private _renderPostInvite() {
-		if (!this._invitedUser) return nothing;
+	private _renderPostCreate() {
+		if (!this._createdUser) return nothing;
 
 		return html`<div>
-			<h1><b style="color: var(--uui-color-interactive-emphasis)">${this._invitedUser.name}</b> has been invited</h1>
-			<p>An invitation has been sent to the new user with details about how to log in to Umbraco.</p>
+			<h1><b style="color: var(--uui-color-interactive-emphasis)">${this._createdUser.name}</b> has been created</h1>
+			<p>The new user has successfully been created. To log in to Umbraco use the password below</p>
+
+			<uui-label for="password">Password</uui-label>
+			<uui-input-password
+				id="password"
+				label="password"
+				name="password"
+				value="${'PUT GENERATED PASSWORD HERE'}"
+				readonly>
+				<!-- The button should be placed in the append part of the input, but that doesn't work with password inputs for now. -->
+				<uui-button slot="prepend" compact label="copy" @click=${this._copyPassword}></uui-button>
+			</uui-input-password>
 		</div>`;
 	}
 
 	render() {
 		return html`<uui-dialog-layout>
-			${this._invitedUser ? this._renderPostInvite() : this._renderForm()}
-			${this._invitedUser
+			${this._createdUser ? this._renderPostCreate() : this._renderForm()}
+			${this._createdUser
 				? html`
 						<uui-button
 							@click=${this._closeModal}
@@ -160,7 +175,7 @@ export class UmbEditorViewUsersInviteElement extends UmbContextConsumerMixin(Umb
 						<uui-button
 							@click=${this._resetForm}
 							slot="actions"
-							label="Invite another user"
+							label="Create another user"
 							look="secondary"></uui-button>
 						<uui-button @click=${this._goToProfile} slot="actions" label="Go to profile" look="primary"></uui-button>
 				  `
@@ -175,17 +190,17 @@ export class UmbEditorViewUsersInviteElement extends UmbContextConsumerMixin(Umb
 							@click="${this._submitForm}"
 							slot="actions"
 							type="submit"
-							label="Send invite"
+							label="Create user"
 							look="primary"></uui-button>
 				  `}
 		</uui-dialog-layout>`;
 	}
 }
 
-export default UmbEditorViewUsersInviteElement;
+export default UmbEditorViewUsersCreateElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-editor-view-users-invite': UmbEditorViewUsersInviteElement;
+		'umb-editor-view-users-create': UmbEditorViewUsersCreateElement;
 	}
 }
