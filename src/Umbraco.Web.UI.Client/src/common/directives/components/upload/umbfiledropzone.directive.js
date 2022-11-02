@@ -151,17 +151,22 @@ angular.module("umbraco.directives")
                                     //Check if its the common "too large file" exception
                                     if (evt.InnerException.StackTrace &&
                                         evt.InnerException.StackTrace.indexOf("ValidateRequestEntityLength") > 0) {
-                                        file.messages.push({ message: "File too large to upload", type: "Error" });
+                                        file.messages.push({ message: "File too large to upload", type: "Error", header: "Error" });
                                     }
+                                } else if (status === 413) {
+                                    file.messages.push({ message: "File too large to upload", type: "Error", header: "Error" });
                                 } else if (evt.Message) {
-                                    file.messages.push({message: evt.Message, type: "Error"});
+                                    file.messages.push({message: evt.Message, type: "Error", header: "Error"});
                                 } else if (evt && typeof evt === "string") {
-                                    file.messages.push({message: evt, type: "Error"});
+                                    file.messages.push({message: evt, type: "Error", header: "Error"});
+                                } else if (status === 404) {
+                                  // If file not found, server will return a 404 and display this message
+                                  file.messages.push({ message: "File not found", type: "Error", header: "Error" });
+                                } else if (status !== 200) {
+                                    file.messages.push({ message: "An unknown error occurred", type: "Error", header: "Error" });
                                 }
-                                // If file not found, server will return a 404 and display this message
-                                if (status === 404) {
-                                    file.messages.push({message: "File not found", type: "Error"});
-                                }
+
+                                scope.processed.push(file);
                                 scope.currentFile = undefined;
                                 _processQueueItems();
                             });
