@@ -28,7 +28,7 @@ public class MediaPickerThreeController : ContentControllerBase
     private readonly IHostingEnvironment _hostingEnvironment;
     private readonly ContentSettings _contentSettings;
     private readonly IImageUrlGenerator _imageUrlGenerator;
-    private readonly IOHelper _ioHelper;
+    private readonly IIOHelper _ioHelper;
 
     public MediaPickerThreeController(
         ICultureDictionary cultureDictionary,
@@ -40,7 +40,7 @@ public class MediaPickerThreeController : ContentControllerBase
         IHostingEnvironment hostingEnvironment,
         IOptionsSnapshot<ContentSettings> contentSettings,
         IImageUrlGenerator imageUrlGenerator,
-        IOHelper ioHelper)
+        IIOHelper ioHelper)
         : base(cultureDictionary, loggerFactory, shortStringHelper, eventMessages, localizedTextService, serializer)
     {
         _hostingEnvironment = hostingEnvironment;
