@@ -160,7 +160,7 @@ public class IconService : IIconService
     /// <returns>A collection of <see cref="FileInfo"/> representing the found SVG icon files.</returns>
     private static IEnumerable<FileInfo> GetIconsFiles(IFileProvider fileProvider, string path)
     {
-        // Iterate through all plugin folders, this is necessary because on Linux we'll get casing issues when
+        // Iterate through all plugin folders and their subfolders, this is necessary because on Linux we'll get casing issues when
         // we directly try to access {path}/{pluginDirectory.Name}/{Constants.SystemDirectories.PluginIcons}
         foreach (IFileInfo pluginDirectory in fileProvider.GetDirectoryContents(path))
         {
@@ -169,13 +169,13 @@ public class IconService : IIconService
                 continue;
             }
 
-            // Iterate through the sub directories of each plugin folder
+            // Iterate through the sub directories of each plugin folder in order to support case insensitive paths (for Linux)
             foreach (IFileInfo subDir1 in fileProvider.GetDirectoryContents($"{path}/{pluginDirectory.Name}"))
             {
                 // Hard-coding the "backoffice" directory name to gain a better performance when traversing the pluginDirectory directories
                 if (subDir1.IsDirectory && subDir1.Name.InvariantEquals("backoffice"))
                 {
-                    // Iterate through second level sub directories
+                    // Iterate through second level sub directories in order to support case insensitive paths (for Linux)
                     foreach (IFileInfo subDir2 in fileProvider.GetDirectoryContents($"{path}/{pluginDirectory.Name}/{subDir1.Name}"))
                     {
                         if (!subDir2.IsDirectory)

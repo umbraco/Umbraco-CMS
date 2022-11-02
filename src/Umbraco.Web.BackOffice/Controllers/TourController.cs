@@ -25,10 +25,13 @@ public class TourController : UmbracoAuthorizedJsonController
     private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
     private readonly IContentTypeService _contentTypeService;
     private readonly TourFilterCollection _filters;
-    private readonly IHostingEnvironment _hostingEnvironment;
     private readonly IWebHostEnvironment _webHostEnvironment;
     private readonly TourSettings _tourSettings;
 
+    // IHostingEnvironment is still injected as when removing it, the number of
+    // parameters matches with the obsolete ctor and the two ctors become ambiguous
+    // [ActivatorUtilitiesConstructor] won't solve the problem in this case
+    // IHostingEnvironment can be removed when the obsolete ctor is removed
     [ActivatorUtilitiesConstructor]
     public TourController(
         TourFilterCollection filters,
@@ -39,7 +42,6 @@ public class TourController : UmbracoAuthorizedJsonController
         IWebHostEnvironment webHostEnvironment)
     {
         _filters = filters;
-        _hostingEnvironment = hostingEnvironment;
         _tourSettings = tourSettings.Value;
         _backofficeSecurityAccessor = backofficeSecurityAccessor;
         _contentTypeService = contentTypeService;
@@ -190,7 +192,7 @@ public class TourController : UmbracoAuthorizedJsonController
     private static IEnumerable<string> GetToursFolderPaths(IFileProvider fileProvider, string path, string subDirName)
     {
         // Hard-coding the "tours" directory name to gain a better performance when traversing the sub directories
-        var toursDirName = "tours";
+        const string toursDirName = "tours";
 
         // It is necessary to iterate through the subfolders because on Linux we'll get casing issues when
         // we try to access {path}/{pluginDirectory.Name}/backoffice/tours directly
