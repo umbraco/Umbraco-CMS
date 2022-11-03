@@ -138,21 +138,28 @@ public class MediaTypeController : ContentTypeControllerBase<IMediaType>
     /// /// <param name="alias">Alias of the media type</param>
     /// <returns></returns>
     [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaTypes)]
-    public ActionResult<MediaTypeDisplay?> GetByAlias(string alias)
+    public ActionResult<IEnumerable<MediaTypeDisplay>> GetByAlias(string[] aliases)
     {
-        if (string.IsNullOrEmpty(alias))
+        if (aliases.Length < 1)
         {
             return NotFound();
         }
 
-        IMediaType? mediaType = _mediaTypeService.Get(alias);
-        if (mediaType == null)
+        var mediaTypeDisplays = new List<MediaTypeDisplay>();
+
+        foreach (var alias in aliases)
         {
-            return NotFound();
+            IMediaType? mediaType = _mediaTypeService.Get(alias);
+
+            MediaTypeDisplay? mediaTypeDisplay = _umbracoMapper.Map<IMediaType, MediaTypeDisplay>(mediaType);
+
+            if (mediaTypeDisplay is not null)
+            {
+                mediaTypeDisplays.Add(mediaTypeDisplay);
+            }
         }
 
-        MediaTypeDisplay? mediaTypeDisplay = _umbracoMapper.Map<IMediaType, MediaTypeDisplay>(mediaType);
-        return mediaTypeDisplay;
+        return mediaTypeDisplays;
     }
 
     /// <summary>
