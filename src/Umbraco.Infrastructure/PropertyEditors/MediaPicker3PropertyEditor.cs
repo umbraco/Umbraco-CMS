@@ -1,7 +1,9 @@
 using System.Runtime.Serialization;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
@@ -37,7 +39,8 @@ public class MediaPicker3PropertyEditor : DataEditor
         IDataValueEditorFactory dataValueEditorFactory,
         IIOHelper ioHelper,
         EditorType type = EditorType.PropertyValue)
-        : this(dataValueEditorFactory, ioHelper, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>(), type)
+        : this(dataValueEditorFactory, ioHelper,
+            StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>(), type)
     {
     }
 
@@ -67,7 +70,15 @@ public class MediaPicker3PropertyEditor : DataEditor
     internal class MediaPicker3PropertyValueEditor : DataValueEditor, IDataValueReference
     {
         private readonly IDataTypeService _dataTypeService;
+        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IJsonSerializer _jsonSerializer;
+        private readonly IShortStringHelper _shortStringHelper;
+        private readonly MediaFileManager _mediaFileManager;
+        private readonly IMediaService _mediaService;
+        private readonly MediaUrlGeneratorCollection _mediaUrlGenerators;
+        private readonly IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
+        private readonly ILogger<MediaPicker3PropertyEditor> _logger;
+
 
         public MediaPicker3PropertyValueEditor(
             ILocalizedTextService localizedTextService,
@@ -75,11 +86,24 @@ public class MediaPicker3PropertyEditor : DataEditor
             IJsonSerializer jsonSerializer,
             IIOHelper ioHelper,
             DataEditorAttribute attribute,
-            IDataTypeService dataTypeService)
+            IDataTypeService dataTypeService,
+            IHostingEnvironment hostingEnvironment,
+            MediaFileManager mediaFileManager,
+            IMediaService mediaService,
+            MediaUrlGeneratorCollection mediaUrlGenerators,
+            IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
+            ILogger<MediaPicker3PropertyEditor> logger)
             : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
         {
             _jsonSerializer = jsonSerializer;
             _dataTypeService = dataTypeService;
+            _hostingEnvironment = hostingEnvironment;
+            _mediaFileManager = mediaFileManager;
+            _mediaService = mediaService;
+            _mediaUrlGenerators = mediaUrlGenerators;
+            _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
+            _logger = logger;
+            _shortStringHelper = shortStringHelper;
         }
 
         /// <remarks>
@@ -118,6 +142,7 @@ public class MediaPicker3PropertyEditor : DataEditor
         {
             if (editorValue.Value is JArray dtos)
             {
+                dtos = PersistTempImages(dtos);
                 // Clean up redundant/default data
                 foreach (JObject? dto in dtos.Values<JObject>())
                 {
@@ -150,7 +175,7 @@ public class MediaPicker3PropertyEditor : DataEditor
                             Key = Guid.NewGuid(),
                             MediaKey = guidUdi.Guid,
                             Crops = Enumerable.Empty<ImageCropperValue.ImageCropperCrop>(),
-                            FocalPoint = new ImageCropperValue.ImageCropperFocalPoint { Left = 0.5m, Top = 0.5m },
+                            FocalPoint = new ImageCropperValue.ImageCropperFocalPoint {Left = 0.5m, Top = 0.5m},
                         };
                     }
                 }
@@ -170,6 +195,121 @@ public class MediaPicker3PropertyEditor : DataEditor
             }
         }
 
+        private JArray PersistTempImages(JArray jArray)
+        {
+            var result = new JArray();
+            foreach (var dto in jArray.Values<JObject>())
+            {
+                TempImageDto? tempImageDto = _jsonSerializer.Deserialize<TempImageDto>(dto!.ToString());
+
+                // If it has a temporary location, we have to persist it
+                if (string.IsNullOrWhiteSpace(tempImageDto?.TmpLocation))
+                {
+                    result.Add(dto);
+                    continue;
+                }
+
+                var tmpImgPath = tempImageDto!.TmpLocation;
+                var absoluteTempImagePath = _hostingEnvironment.MapPathContentRoot(tmpImgPath);
+                var fileName = Path.GetFileName(absoluteTempImagePath);
+                var safeFileName = fileName.ToSafeFileName(_shortStringHelper);
+
+                var mediaItemName = safeFileName.ToFriendlyName();
+                GuidUdi udi;
+
+                IMedia mediaFile = _mediaService.CreateMedia(mediaItemName, Constants.System.Root, Constants.Conventions.MediaTypes.Image, Constants.Security.SuperUserId);
+
+                var fileInfo = new FileInfo(absoluteTempImagePath);
+
+                FileStream? fileStream = fileInfo.OpenReadWithRetry();
+                if (fileStream == null)
+                {
+                    throw new InvalidOperationException("Could not acquire file stream");
+                }
+
+                using (fileStream)
+                {
+                    mediaFile.SetValue(_mediaFileManager, _mediaUrlGenerators, _shortStringHelper, _contentTypeBaseServiceProvider, Constants.Conventions.Media.File, safeFileName, fileStream);
+                }
+
+                _mediaService.Save(mediaFile, Constants.Security.SuperUserId);
+
+                udi = mediaFile.GetUdi();
+                var mediaDto = new MediaWithCropsDto()
+                {
+                    Key = tempImageDto.Key,
+                    MediaKey = mediaFile.GetUdi().Guid,
+                    Crops = tempImageDto.Crops,
+                    FocalPoint = tempImageDto.FocalPoint
+                };
+
+                result.Add(JObject.Parse(_jsonSerializer.Serialize(mediaDto)));
+
+                // // // Add the UDI to the img element as new data attribute
+                // // img.SetAttributeValue("data-udi", udi.ToString());
+                //
+                // // Get the new persisted image URL
+                // _umbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext? umbracoContext);
+                // IPublishedContent? mediaTyped = umbracoContext?.Media?.GetById(udi.Guid);
+                // if (mediaTyped == null)
+                // {
+                //     throw new PanicException(
+                //         $"Could not find media by id {udi.Guid} or there was no UmbracoContext available.");
+                // }
+                //
+                // var location = mediaTyped.Url(_publishedUrlProvider);
+                //
+                // // Find the width & height attributes as we need to set the imageprocessor QueryString
+                // var width = img.GetAttributeValue("width", int.MinValue);
+                // var height = img.GetAttributeValue("height", int.MinValue);
+                //
+                // if (width != int.MinValue && height != int.MinValue)
+                // {
+                //     location = imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(location)
+                //     {
+                //         ImageCropMode = ImageCropMode.Max, Width = width, Height = height,
+                //     });
+                // }
+                //
+                // img.SetAttributeValue("src", location);
+                //
+                // // Remove the data attribute (so we do not re-process this)
+                // img.Attributes.Remove(TemporaryImageDataAttribute);
+
+                // Delete folder & image now its saved in media
+                // The folder should contain one image - as a unique guid folder created
+                // for each image uploaded from TinyMceController
+                var folderName = Path.GetDirectoryName(absoluteTempImagePath);
+                try
+                {
+                    if (folderName is not null)
+                    {
+                        Directory.Delete(folderName, true);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Could not delete temp file or folder {FileName}", absoluteTempImagePath);
+                }
+            }
+
+            return result!;
+        }
+
+        [DataContract]
+        internal class TempImageDto
+        {
+            [DataMember(Name = "key")] public Guid Key { get; set; }
+
+            [DataMember(Name = "name")] public string Name { get; set; } = null!;
+
+            [DataMember(Name = "tmpLocation")] public string TmpLocation { get; set; } = null!;
+
+            [DataMember(Name = "crops")] public IEnumerable<ImageCropperValue.ImageCropperCrop>? Crops { get; set; }
+
+            [DataMember(Name = "focalPoint")] public ImageCropperValue.ImageCropperFocalPoint? FocalPoint { get; set; }
+        }
+
         /// <summary>
         ///     Model/DTO that represents the JSON that the MediaPicker3 stores.
         /// </summary>
@@ -182,11 +322,9 @@ public class MediaPicker3PropertyEditor : DataEditor
             [DataMember(Name = "mediaKey")]
             public Guid MediaKey { get; set; }
 
-            [DataMember(Name = "crops")]
-            public IEnumerable<ImageCropperValue.ImageCropperCrop>? Crops { get; set; }
+            [DataMember(Name = "crops")] public IEnumerable<ImageCropperValue.ImageCropperCrop>? Crops { get; set; }
 
-            [DataMember(Name = "focalPoint")]
-            public ImageCropperValue.ImageCropperFocalPoint? FocalPoint { get; set; }
+            [DataMember(Name = "focalPoint")] public ImageCropperValue.ImageCropperFocalPoint? FocalPoint { get; set; }
 
             /// <summary>
             ///     Removes redundant crop data/default focal point.
