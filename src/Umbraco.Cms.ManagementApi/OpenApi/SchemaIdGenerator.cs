@@ -16,7 +16,7 @@ internal static class SchemaIdGenerator
         var name = SanitizedTypeName(type);
         if (type.IsGenericType)
         {
-            // append the generic type names
+            // append the generic type names, ultimately turning i.e. "PagedViewModel<RelationItemViewModel>" into "PagedRelationItem"
             name += string.Join(string.Empty, type.GenericTypeArguments.Select(SanitizedTypeName));
         }
 
