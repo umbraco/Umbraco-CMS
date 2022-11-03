@@ -1,0 +1,86 @@
+﻿using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Extensions;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Extensions;
+
+namespace Umbraco.Cms.Core.Services;
+
+public class TemporaryImageService : ITemporaryImageService
+{
+    private readonly IShortStringHelper _shortStringHelper;
+    private readonly MediaFileManager _mediaFileManager;
+    private readonly IMediaService _mediaService;
+    private readonly MediaUrlGeneratorCollection _mediaUrlGenerators;
+    private readonly IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
+    private readonly IHostEnvironment _hostingEnvironment;
+    private readonly ILogger<TemporaryImageService> _logger;
+    private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
+
+    public TemporaryImageService(
+        IShortStringHelper shortStringHelper,
+        MediaFileManager mediaFileManager,
+        IMediaService mediaService,
+        MediaUrlGeneratorCollection mediaUrlGenerators,
+        IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
+        IHostEnvironment hostingEnvironment,
+        ILogger<TemporaryImageService> logger,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+    {
+        _shortStringHelper = shortStringHelper;
+        _mediaFileManager = mediaFileManager;
+        _mediaService = mediaService;
+        _mediaUrlGenerators = mediaUrlGenerators;
+        _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
+        _hostingEnvironment = hostingEnvironment;
+        _logger = logger;
+        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
+    }
+
+    public IMedia Save(string temporaryLocation)
+    {
+        var userId = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? Constants.Security.SuperUserId;
+        var absoluteTempImagePath = _hostingEnvironment.MapPathContentRoot(temporaryLocation);
+        var fileName = Path.GetFileName(absoluteTempImagePath);
+        var safeFileName = fileName.ToSafeFileName(_shortStringHelper);
+
+        var mediaItemName = safeFileName.ToFriendlyName();
+
+        IMedia mediaFile = _mediaService.CreateMedia(mediaItemName, Constants.System.Root, Constants.Conventions.MediaTypes.Image, userId);
+
+        var fileInfo = new FileInfo(absoluteTempImagePath);
+
+        FileStream? fileStream = fileInfo.OpenReadWithRetry();
+        if (fileStream is null)
+        {
+            throw new InvalidOperationException("Could not acquire file stream");
+        }
+
+        using (fileStream)
+        {
+            mediaFile.SetValue(_mediaFileManager, _mediaUrlGenerators, _shortStringHelper, _contentTypeBaseServiceProvider, Constants.Conventions.Media.File, safeFileName, fileStream);
+        }
+
+        _mediaService.Save(mediaFile, userId);
+
+        // Delete temp file now that we have persisted it
+        var folderName = Path.GetDirectoryName(absoluteTempImagePath);
+        try
+        {
+            if (folderName is not null)
+            {
+                Directory.Delete(folderName, true);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Could not delete temp file or folder {FileName}", absoluteTempImagePath);
+        }
+
+        return mediaFile;
+    }
+}
