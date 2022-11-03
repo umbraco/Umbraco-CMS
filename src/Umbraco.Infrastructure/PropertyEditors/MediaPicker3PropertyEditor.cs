@@ -184,9 +184,12 @@ public class MediaPicker3PropertyEditor : DataEditor
             var result = new JArray();
             foreach (JObject? dto in jArray.Values<JObject>())
             {
-                TempImageDto? tempImageDto = _jsonSerializer.Deserialize<TempImageDto>(dto!.ToString());
+                if (dto is null)
+                {
+                    continue;
+                }
 
-                if (string.IsNullOrWhiteSpace(tempImageDto?.TmpLocation))
+                if (!dto.TryGetValue("tmpLocation", out JToken? temporaryLocation))
                 {
                     // If it does not have a temporary path, it can be an already saved image or not-yet uploaded temp-image, check for media-key
                     if (dto.TryGetValue("mediaKey", out _))
@@ -197,39 +200,23 @@ public class MediaPicker3PropertyEditor : DataEditor
                     continue;
                 }
 
-                IMedia mediaFile = _temporaryImageService.Save(tempImageDto.TmpLocation);
-
-                var mediaDto = new MediaWithCropsDto
+                var temporaryLocationString = temporaryLocation.Value<string>();
+                if (temporaryLocationString is null)
                 {
-                    Key = tempImageDto.Key,
-                    MediaKey = mediaFile.GetUdi().Guid,
-                    Crops = tempImageDto.Crops,
-                    FocalPoint = tempImageDto.FocalPoint,
-                };
+                    continue;
+                }
 
-                result.Add(JObject.Parse(_jsonSerializer.Serialize(mediaDto)));
+                IMedia mediaFile = _temporaryImageService.Save(temporaryLocationString);
+
+                MediaWithCropsDto? mediaDto = _jsonSerializer.Deserialize<MediaWithCropsDto>(dto.ToString());
+                if (mediaDto is not null)
+                {
+                    mediaDto.MediaKey = mediaFile.GetUdi().Guid;
+                    result.Add(JObject.Parse(_jsonSerializer.Serialize(mediaDto)));
+                }
             }
 
             return result;
-        }
-
-        [DataContract]
-        internal class TempImageDto
-        {
-            [DataMember(Name = "key")]
-            public Guid Key { get; set; }
-
-            [DataMember(Name = "name")]
-            public string Name { get; set; } = null!;
-
-            [DataMember(Name = "tmpLocation")]
-            public string TmpLocation { get; set; } = null!;
-
-            [DataMember(Name = "crops")]
-            public IEnumerable<ImageCropperValue.ImageCropperCrop>? Crops { get; set; }
-
-            [DataMember(Name = "focalPoint")]
-            public ImageCropperValue.ImageCropperFocalPoint? FocalPoint { get; set; }
         }
 
         /// <summary>
