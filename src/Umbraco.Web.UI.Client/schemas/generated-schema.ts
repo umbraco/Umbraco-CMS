@@ -452,9 +452,7 @@ export interface components {
     ConsentLevelSettings: {
       telemetryLevel: components["schemas"]["ConsentLevel"];
     };
-    /** @enum {string} */
-    Health: "Healthy" | "Unhealthy";
-    ProviderProperties: {
+    ProviderPropertiesModel: {
       /** Format: float */
       CommitCount: number;
       DefaultAnalyzer: string;
@@ -470,22 +468,26 @@ export interface components {
       SupportProtectedContent: boolean;
       IncludeFields?: string[];
     };
-    Indexer: {
+    IndexModel: {
       name: string;
       canRebuild: boolean;
-      healthStatus: components["schemas"]["Health"];
+      healthStatus: string;
       isHealthy: boolean;
-      providerProperties: components["schemas"]["ProviderProperties"];
+      providerProperties: components["schemas"]["ProviderPropertiesModel"];
     };
-    Searcher: {
+    SearcherModel: {
       name: string;
-      providerProperties: string[];
+      providerProperties: components["schemas"]["ProviderPropertiesModel"];
     };
-    SearchResult: {
+    FieldViewModel: {
+      name: string;
+      values: string[];
+    };
+    SearchResultsModel: {
       /** Format: float */
       id: number;
       name: string;
-      fields: { [key: string]: unknown };
+      fields: components["schemas"]["FieldViewModel"][];
       /** Format: float */
       score: number;
     };
@@ -893,7 +895,7 @@ export interface operations {
       /** 200 response */
       200: {
         content: {
-          "application/json": components["schemas"]["Indexer"][];
+          "application/json": components["schemas"]["IndexModel"][];
         };
       };
       /** default response */
@@ -914,7 +916,7 @@ export interface operations {
       /** 200 response */
       200: {
         content: {
-          "application/json": components["schemas"]["Indexer"];
+          "application/json": components["schemas"]["IndexModel"];
         };
       };
       /** default response */
@@ -953,7 +955,7 @@ export interface operations {
       /** 200 response */
       200: {
         content: {
-          "application/json": components["schemas"]["Searcher"][];
+          "application/json": components["schemas"]["SearcherModel"][];
         };
       };
       /** default response */
@@ -978,7 +980,7 @@ export interface operations {
       /** 200 response */
       200: {
         content: {
-          "application/json": components["schemas"]["SearchResult"][];
+          "application/json": components["schemas"]["SearchResultsModel"][];
         };
       };
       /** 400 response */

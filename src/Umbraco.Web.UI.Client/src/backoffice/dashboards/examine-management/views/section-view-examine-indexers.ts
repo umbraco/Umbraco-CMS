@@ -1,27 +1,28 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
-import { customElement, query, state, property } from 'lit/decorators.js';
+import { customElement, state, property } from 'lit/decorators.js';
 
 import { UUIButtonState } from '@umbraco-ui/uui';
+import { IndexModel } from '../examine-extension';
 
-import { Indexer, SearchResult } from '../../../core/mocks/data/examine.data';
-
-import { UmbModalService } from '../../../core/services/modal';
-import { UmbNotificationService } from '../../../core/services/notification';
-import { UmbNotificationDefaultData } from '../../../core/services/notification/layouts/default';
-
+import { UmbModalService } from '../../../../core/services/modal';
+import { UmbNotificationService } from '../../../../core/services/notification';
+import { UmbNotificationDefaultData } from '../../../../core/services/notification/layouts/default';
+import { getIndex, postIndexRebuild } from '@umbraco-cms/backend-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-import { getIndex, getSearchResultFromSearchers, postIndexRebuild } from '@umbraco-cms/backend-api';
+import './section-view-examine-searchers';
 
-@customElement('examine-management-index')
-export class UmbDashboardExamineManagementIndexElement extends UmbContextConsumerMixin(LitElement) {
+@customElement('umb-dashboard-examine-index')
+export class UmbDashboardExamineIndexElement extends UmbContextConsumerMixin(LitElement) {
 	static styles = [
 		UUITextStyles,
 		css`
 			:host {
 				display: block;
 			}
-			uui-box + uui-box {
+
+			uui-box,
+			umb-dashboard-examine-searcher {
 				margin-top: var(--uui-size-space-5);
 			}
 
@@ -83,16 +84,10 @@ export class UmbDashboardExamineManagementIndexElement extends UmbContextConsume
 	indexName!: string;
 
 	@state()
-	private _searchResults?: SearchResult[];
-
-	@state()
 	private _buttonState?: UUIButtonState = undefined;
 
-	@query('#search')
-	private _searchInput!: HTMLInputElement;
-
 	@state()
-	private _indexData!: Indexer;
+	private _indexData!: IndexModel;
 
 	private _notificationService?: UmbNotificationService;
 	private _modalService?: UmbModalService;
@@ -100,7 +95,7 @@ export class UmbDashboardExamineManagementIndexElement extends UmbContextConsume
 	private async _getIndexData() {
 		try {
 			const index = await getIndex({ indexName: this.indexName });
-			this._indexData = index.data as Indexer;
+			this._indexData = index.data as IndexModel;
 		} catch (e) {
 			if (e instanceof getIndex.Error) {
 				const error = e.getActualType();
@@ -124,30 +119,6 @@ export class UmbDashboardExamineManagementIndexElement extends UmbContextConsume
 	connectedCallback(): void {
 		super.connectedCallback();
 		this._getIndexData();
-	}
-
-	private _onKeyPress(e: KeyboardEvent) {
-		if (e.key == 'Enter') this._onSearch();
-	}
-
-	private async _onSearch() {
-		if (this._searchInput.value.length) {
-			try {
-				const res = await getSearchResultFromSearchers({
-					searcherName: this._indexData.name,
-					query: this._searchInput.value,
-					take: 100,
-				});
-				this._searchResults = res.data as SearchResult[];
-				console.log(this._searchResults);
-			} catch (e) {
-				if (e instanceof getSearchResultFromSearchers.Error) {
-					const error = e.getActualType();
-					const data: UmbNotificationDefaultData = { message: error.data.detail ?? 'Could not fetch search results' };
-					this._notificationService?.peek('danger', { data });
-				}
-			}
-		} else this._searchResults = undefined;
 	}
 
 	private async _onRebuildHandler() {
@@ -181,14 +152,9 @@ export class UmbDashboardExamineManagementIndexElement extends UmbContextConsume
 		}
 	}
 
-	private _onNameClick() {
-		const data: UmbNotificationDefaultData = { message: 'TODO: Open editor for this' }; // TODO
-		this._notificationService?.peek('warning', { data });
-	}
-
 	render() {
 		if (this._indexData) {
-			return html`<uui-box headline="${this.indexName}">
+			return html` <uui-box headline="${this.indexName}">
 					<p>
 						<strong>Health Status</strong><br />
 						The health status of the ${this._indexData.name} and if it can be read
@@ -203,54 +169,9 @@ export class UmbDashboardExamineManagementIndexElement extends UmbContextConsume
 						${this._indexData.healthStatus}
 					</div>
 				</uui-box>
-				<uui-box headline="Search">
-					<p>Search the ${this._indexData.name} and view the results</p>
-					<div class="flex">
-						<uui-input
-							id="search"
-							placeholder="Type to filter..."
-							label="Type to filter"
-							@keypress="${this._onKeyPress}">
-						</uui-input>
-						<uui-button color="positive" look="primary" label="Search" @click=${this._onSearch}> Search </uui-button>
-					</div>
-					${this.renderSearchResults()}
-				</uui-box>
+				<umb-dashboard-examine-searcher searcherName="${this.indexName}"></umb-dashboard-examine-searcher>
 				${this.renderPropertyList()} ${this.renderTools()}`;
-		} else return;
-	}
-
-	private renderSearchResults() {
-		if (this._searchResults?.length) {
-			return html` <uui-table class="search">
-				<uui-table-head>
-					<uui-table-head-cell style="width:0px">Id</uui-table-head-cell>
-					<uui-table-head-cell>Name</uui-table-head-cell>
-					<uui-table-head-cell style="width:0; min-width:100px;">Fields</uui-table-head-cell>
-					<uui-table-head-cell style="width:0px">Score</uui-table-head-cell>
-				</uui-table-head>
-				${this._searchResults?.map((rowData) => {
-					return html`<uui-table-row>
-						<uui-table-cell> ${rowData.id} </uui-table-cell>
-						<uui-table-cell><button @click="${this._onNameClick}">${rowData.name}</button></uui-table-cell>
-						<uui-table-cell>
-							<button
-								class="bright"
-								@click="${() =>
-									this._modalService?.open('umb-modal-layout-fields-viewer', {
-										type: 'sidebar',
-										size: 'medium',
-										data: { document: rowData, values: rowData.fields },
-									})}">
-								(${Object.keys(rowData.fields).length} fields)
-							</button>
-						</uui-table-cell>
-						<uui-table-cell> ${rowData.score} </uui-table-cell>
-					</uui-table-row>`;
-				})}
-			</uui-table>`;
-		}
-		return;
+		} else return html`<a href="/section/settings/dashboard/examine-management">&larr; Back to overview</a>`;
 	}
 
 	private renderPropertyList() {
@@ -283,8 +204,10 @@ export class UmbDashboardExamineManagementIndexElement extends UmbContextConsume
 	}
 }
 
+export default UmbDashboardExamineIndexElement;
+
 declare global {
 	interface HTMLElementTagNameMap {
-		'examine-management-index': UmbDashboardExamineManagementIndexElement;
+		'umb-dashboard-examine-index': UmbDashboardExamineIndexElement;
 	}
 }

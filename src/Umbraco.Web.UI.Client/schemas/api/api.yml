@@ -423,7 +423,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Indexer'
+                  $ref: '#/components/schemas/IndexModel'
         default:
           description: default response
           content:
@@ -445,7 +445,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Indexer'
+                $ref: '#/components/schemas/IndexModel'
         default:
           description: default response
           content:
@@ -494,7 +494,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Searcher'
+                  $ref: '#/components/schemas/SearcherModel'
         default:
           description: default response
           content:
@@ -529,7 +529,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/SearchResult'
+                  $ref: '#/components/schemas/SearchResultsModel'
         '400':
           description: 400 response
           content:
@@ -1429,12 +1429,7 @@ components:
           $ref: '#/components/schemas/ConsentLevel'
       required:
         - telemetryLevel
-    Health:
-      type: string
-      enum:
-        - Healthy
-        - Unhealthy
-    ProviderProperties:
+    ProviderPropertiesModel:
       type: object
       properties:
         CommitCount:
@@ -1475,7 +1470,7 @@ components:
         - EnableDefaultEventHandler
         - PublishedValuesOnly
         - SupportProtectedContent
-    Indexer:
+    IndexModel:
       type: object
       properties:
         name:
@@ -1483,30 +1478,40 @@ components:
         canRebuild:
           type: boolean
         healthStatus:
-          $ref: '#/components/schemas/Health'
+          type: string
         isHealthy:
           type: boolean
         providerProperties:
-          $ref: '#/components/schemas/ProviderProperties'
+          $ref: '#/components/schemas/ProviderPropertiesModel'
       required:
         - name
         - canRebuild
         - healthStatus
         - isHealthy
         - providerProperties
-    Searcher:
+    SearcherModel:
       type: object
       properties:
         name:
           type: string
         providerProperties:
+          $ref: '#/components/schemas/ProviderPropertiesModel'
+      required:
+        - name
+        - providerProperties
+    FieldViewModel:
+      type: object
+      properties:
+        name:
+          type: string
+        values:
           type: array
           items:
             type: string
       required:
         - name
-        - providerProperties
-    SearchResult:
+        - values
+    SearchResultsModel:
       type: object
       properties:
         id:
@@ -1515,7 +1520,9 @@ components:
         name:
           type: string
         fields:
-          type: object
+          type: array
+          items:
+            $ref: '#/components/schemas/FieldViewModel'
         score:
           type: number
           format: float

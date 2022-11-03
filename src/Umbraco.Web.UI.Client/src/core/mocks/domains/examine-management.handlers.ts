@@ -1,19 +1,19 @@
 import { rest } from 'msw';
-// import dashboardMediaManagementStories from '../../backoffice/dashboards/media-management/dashboard-media-management.stories';
-import { Indexer, Searcher, getIndexByName, getIndexers, SearchResult, searchResFromIndex } from '../data/examine.data';
+import { searchResultMockData, getIndexByName, getIndexers } from '../data/examine.data';
+import {
+	IndexModel,
+	SearcherModel,
+	SearchResultsModel,
+} from 'src/backoffice/dashboards/examine-management/examine-extension';
+
 import { umbracoPath } from '@umbraco-cms/utils';
-
-const test = '/search/index/:indexName';
-
-// use a regex to replace :indexName with {indexName}
-const regex = new RegExp(test.replace(/:[^/]+/g, '([^/]+)'));
 
 export const handlers = [
 	rest.get(umbracoPath('/search/index'), (_req, res, ctx) => {
 		return res(
 			// Respond with a 200 status code
 			ctx.status(200),
-			ctx.json<Indexer[]>(getIndexers())
+			ctx.json<IndexModel[]>(getIndexers())
 		);
 	}),
 
@@ -25,7 +25,7 @@ export const handlers = [
 
 		const indexFound = getIndexByName(indexName);
 		if (indexFound) {
-			return res(ctx.status(200), ctx.json<Indexer>(indexFound));
+			return res(ctx.status(200), ctx.json<IndexModel>(indexFound));
 		} else {
 			return res(ctx.status(404));
 		}
@@ -49,31 +49,13 @@ export const handlers = [
 	rest.get(umbracoPath('/search/searcher'), (_req, res, ctx) => {
 		return res(
 			ctx.status(200),
-			ctx.json<Searcher[]>([
+			ctx.json<SearcherModel[]>([
 				{ name: 'ExternalSearcher', providerProperties: ['Cake'] },
 				{ name: 'InternalSearcher', providerProperties: ['Panda'] },
 				{ name: 'InternalMemberSearcher', providerProperties: ['Bamboo?'] },
 			])
 		);
 	}),
-
-	/*
-	rest.get(umbracoPath('/search/index/:indexName'), (_req, res, ctx) => {
-		const query = _req.url.searchParams.get('query');
-		debugger;
-
-		const indexName = _req.params.indexName as string;
-		const searchQuery = _req.params.searchQuery as string;
-		if (!indexName || !searchQuery) return;
-
-		const indexFound = getIndexByName(indexName);
-		if (indexFound) {
-			return res(ctx.status(200), ctx.json<SearchResult[]>(searchResFromIndex()));
-		} else {
-			return res(ctx.status(404));
-		}
-	}),
-	*/
 
 	// TODO: when using the umbracoPath helper you have to write parameters like {indexName}. MSW wants parameters as :indexName
 	rest.get('/umbraco/backoffice/search/searcher/:searcherName', (_req, res, ctx) => {
@@ -86,7 +68,7 @@ export const handlers = [
 
 		//const searcherFound = getIndexByName(indexName);
 		if (searcherName) {
-			return res(ctx.status(200), ctx.json<SearchResult[]>(searchResFromIndex()));
+			return res(ctx.status(200), ctx.json<SearchResultsModel[]>(searchResultMockData));
 		} else {
 			return res(ctx.status(404));
 		}

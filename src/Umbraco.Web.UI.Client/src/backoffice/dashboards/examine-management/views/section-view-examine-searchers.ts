@@ -1,26 +1,27 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
-import { customElement, query, state, property } from 'lit/decorators.js';
+import { customElement, state, query, property } from 'lit/decorators.js';
 
-import { SearchResult } from '../../../core/mocks/data/examine.data';
+import { UmbModalService } from '../../../../core/services/modal';
+import { UmbNotificationService } from '../../../../core/services/notification';
+import { UmbNotificationDefaultData } from '../../../../core/services/notification/layouts/default';
 
-import { UmbModalService } from '../../../core/services/modal';
-import { UmbNotificationService } from '../../../core/services/notification';
-import { UmbNotificationDefaultData } from '../../../core/services/notification/layouts/default';
-import '../../../core/services/modal/layouts/fields-viewer/fields-viewer.element';
+import { SearchResultsModel } from '../examine-extension';
 
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-import { getSearchResultFromSearchers } from '@umbraco-cms/backend-api';
+import { getSearchResults } from '@umbraco-cms/backend-api';
 
-@customElement('examine-management-searchers')
-export class UmbDashboardExamineManagementSearcherElement extends UmbContextConsumerMixin(LitElement) {
+import '../../../../core/services/modal/layouts/fields-viewer/fields-viewer.element';
+
+@customElement('umb-dashboard-examine-searcher')
+export class UmbDashboardExamineSearcherElement extends UmbContextConsumerMixin(LitElement) {
 	static styles = [
 		UUITextStyles,
 		css`
 			:host {
 				display: block;
 			}
-			uui-box + uui-box {
+			uui-box {
 				margin-top: var(--uui-size-space-5);
 			}
 
@@ -57,12 +58,6 @@ export class UmbDashboardExamineManagementSearcherElement extends UmbContextCons
 				padding-right: var(--uui-size-space-5);
 			}
 
-			button {
-				background: none;
-				border: none;
-				text-decoration: underline;
-				cursor: pointer;
-			}
 			button.bright {
 				font-style: italic;
 				color: var(--uui-color-positive-emphasis);
@@ -70,17 +65,17 @@ export class UmbDashboardExamineManagementSearcherElement extends UmbContextCons
 		`,
 	];
 
+	private _notificationService?: UmbNotificationService;
+	private _modalService?: UmbModalService;
+
 	@property()
 	searcherName!: string;
 
 	@state()
-	private _searchResults?: SearchResult[];
+	private _searchResults?: SearchResultsModel[];
 
-	@query('#search')
+	@query('#search-input')
 	private _searchInput!: HTMLInputElement;
-
-	private _notificationService?: UmbNotificationService;
-	private _modalService?: UmbModalService;
 
 	constructor() {
 		super();
@@ -92,25 +87,26 @@ export class UmbDashboardExamineManagementSearcherElement extends UmbContextCons
 		});
 	}
 
-	connectedCallback(): void {
-		super.connectedCallback();
+	private _onNameClick() {
+		const data: UmbNotificationDefaultData = { message: 'TODO: Open editor for this' }; // TODO
+		this._notificationService?.peek('warning', { data });
 	}
 
 	private _onKeyPress(e: KeyboardEvent) {
-		if (e.key == 'Enter') this._onSearch();
+		e.key == 'Enter' ? this._onSearch() : undefined;
 	}
 
 	private async _onSearch() {
 		if (!this._searchInput.value.length) return;
 		try {
-			const res = await getSearchResultFromSearchers({
+			const res = await getSearchResults({
 				searcherName: this.searcherName,
 				query: this._searchInput.value,
 				take: 100,
 			});
-			this._searchResults = res.data as SearchResult[];
+			this._searchResults = res.data as SearchResultsModel[];
 		} catch (e) {
-			if (e instanceof getSearchResultFromSearchers.Error) {
+			if (e instanceof getSearchResults.Error) {
 				const error = e.getActualType();
 				const data: UmbNotificationDefaultData = { message: error.data.detail ?? 'Could not fetch search results' };
 				this._notificationService?.peek('danger', { data });
@@ -118,24 +114,22 @@ export class UmbDashboardExamineManagementSearcherElement extends UmbContextCons
 		}
 	}
 
-	private _onNameClick() {
-		const data: UmbNotificationDefaultData = { message: 'TODO: Open editor for this' }; //TODO
-		this._notificationService?.peek('warning', { data });
-	}
-
 	render() {
-		return html`<uui-box headline="${this.searcherName}">
-			<p><strong>Search tools</strong></p>
-			<div class="flex">
-				<uui-input
-					id="search"
-					placeholder="Type to search"
-					label="Type to search"
-					@keydown="${this._onKeyPress}"></uui-input>
-				<uui-button label="search" look="primary" color="positive" @click="${this._onSearch}">Search</uui-button>
-			</div>
-			${this.renderSearchResults()}
-		</uui-box>`;
+		return html`
+			<uui-box headline="Search">
+				<p>Search the ${this.searcherName} and view the results</p>
+				<div class="flex">
+					<uui-input
+						id="search-input"
+						placeholder="Type to filter..."
+						label="Type to filter"
+						@keypress=${this._onKeyPress}>
+					</uui-input>
+					<uui-button color="positive" look="primary" label="Search" @click="${this._onSearch}"> Search </uui-button>
+				</div>
+				${this.renderSearchResults()}
+			</uui-box>
+		`;
 	}
 
 	private renderSearchResults() {
@@ -171,8 +165,11 @@ export class UmbDashboardExamineManagementSearcherElement extends UmbContextCons
 		return;
 	}
 }
+
+export default UmbDashboardExamineSearcherElement;
+
 declare global {
 	interface HTMLElementTagNameMap {
-		'examine-management-searchers': UmbDashboardExamineManagementSearcherElement;
+		'umb-dashboard-examine-searcher': UmbDashboardExamineSearcherElement;
 	}
 }

@@ -1,64 +1,24 @@
+import {
+	IndexModel,
+	SearchResultsModel,
+	SearcherModel,
+} from 'src/backoffice/dashboards/examine-management/examine-extension';
+
 export function getIndexByName(indexName: string) {
 	return Indexers.find((index) => {
 		return index.name.toLocaleLowerCase() == indexName.toLocaleLowerCase();
 	});
 }
 
-export function getIndexers() {
+export function getIndexers(): IndexModel[] {
 	return Indexers;
 }
 
-export function searchResFromIndex() {
-	return ResultsFromIndex;
+export function getSearchResultsMockData(): SearchResultsModel[] {
+	return searchResultMockData;
 }
 
-export interface Searcher {
-	name: string;
-	providerProperties: string[];
-}
-
-export interface Indexer {
-	name: string;
-	canRebuild: boolean;
-	healthStatus: Health;
-	isHealthy: boolean;
-	providerProperties: ProviderProperties;
-}
-
-export interface IndexDisplay {
-	name: string;
-	healthStatus: Health;
-}
-
-export interface ProviderProperties {
-	CommitCount: number;
-	DefaultAnalyzer: string;
-	DocumentCount: number;
-	FieldCount: number;
-	LuceneDirectory: string;
-	LuceneIndexFolder: string;
-	DirectoryFactory: string;
-	EnableDefaultEventHandler: boolean;
-	PublishedValuesOnly: boolean;
-	SupportProtectedContent: boolean;
-	IncludeFields?: string[];
-}
-
-export interface SearchResult {
-	id: number;
-	name: string;
-	fields: any;
-	score: number;
-}
-
-export default interface DocumentImageFieldKeys {
-	key: string;
-	mediaKey: string;
-}
-
-type Health = 'Healthy' | 'Unhealthy';
-
-const Indexers: Indexer[] = [
+const Indexers: IndexModel[] = [
 	{
 		name: 'ExternalIndex',
 		canRebuild: true,
@@ -120,69 +80,69 @@ const Indexers: Indexer[] = [
 	},
 ];
 
-const ResultsFromIndex: SearchResult[] = [
+export const searchResultMockData: SearchResultsModel[] = [
 	{
 		id: 1,
 		name: 'Home',
-		fields: {
-			__Icon: 'icon-document',
-			__IndexType: 'content',
-			__Key: '903wyrqwjf-33wrefef-wefwef3-erw',
-			__NodeId: 1059,
-			__NodeTypeAlias: 'Home',
-			__Path: -1.345,
-			__Published: 'y',
-			__VariesByCulture: 'n',
-			createDate: 30752539,
-			creatorId: -1,
-			creatorName: 'Lone',
-			icon: 'icon-document',
-			id: 1059,
-			image: [{ key: '34343-3wdsw-sd35-3s', mediaKey: 'afewr-q5-23rd-3red' }],
-			level: 1,
-			nodeName: 'Just a picture',
-			nodeType: 1056,
-			parentID: -1,
-			path: -3.325,
-			sortOrder: 1,
-			templateID: 1055,
-			updateDate: 9573024532945,
-			urlName: 'just-a-picture',
-			writerID: -1,
-			writerName: 'Lone',
-		},
 		score: 1,
+		fields: [
+			{ name: '__Icon', values: ['icon-document'] },
+			{ name: '__IndexType', values: ['content'] },
+			{ name: '__Key', values: ['903wyrqwjf-33wrefef-wefwef3-erw'] },
+			{ name: '__NodeId', values: ['1059'] },
+			{ name: '__NodeTypeAlias', values: ['Home'] },
+			{ name: '__Path', values: ['-1.345'] },
+			{ name: '__Published', values: ['y'] },
+			{ name: '__VariesByCulture', values: ['n'] },
+			{ name: 'createDate', values: ['30752539'] },
+			{ name: 'creatorId', values: ['-1'] },
+			{ name: 'creatorName', values: ['Lone'] },
+			{ name: 'icon', values: ['icon-document'] },
+			{ name: 'id', values: ['1059'] },
+			{ name: 'image', values: ['34343-3wdsw-sd35-3s', 'afewr-q5-23rd-3red'] },
+			{ name: 'level', values: ['1'] },
+			{ name: 'nodeName', values: ['Just a picture'] },
+			{ name: 'nodeType', values: ['1056'] },
+			{ name: 'parentID', values: ['-1'] },
+			{ name: 'path', values: ['-3.325'] },
+			{ name: 'sortOrder', values: ['1'] },
+			{ name: 'templateID', values: ['1055'] },
+			{ name: 'updateDate', values: ['9573024532945'] },
+			{ name: 'urlName', values: ['just-a-picture'] },
+			{ name: 'writerID', values: ['-1'] },
+			{ name: 'writerName', values: ['Lone'] },
+		],
 	},
 	{
 		id: 2,
-		name: 'NotHome',
-		score: 0.1,
-		fields: {
-			__Icon: 'icon-document',
-			__IndexType: 'content',
-			__Key: '903wyrqwjf-33wrefef-wefwef3-erw',
-			__NodeId: 1059,
-			__NodeTypeAlias: 'Home',
-			__Path: -1.345,
-			__Published: 'y',
-			__VariesByCulture: 'n',
-			createDate: 30752539,
-			creatorId: -1,
-			creatorName: 'Lone',
-			icon: 'icon-document',
-			id: 1059,
-			image: [{ key: '34343-3wdsw-sd35-3s', mediaKey: 'afewr-q5-23rd-3red' }],
-			level: 1,
-			nodeName: 'Just a picture',
-			nodeType: 1056,
-			parentID: -1,
-			path: -3.325,
-			sortOrder: 1,
-			templateID: 1055,
-			updateDate: 9573024532945,
-			urlName: 'just-a-picture',
-			writerID: -1,
-			writerName: 'Lone',
-		},
+		name: 'Dojo',
+		score: 0.9,
+		fields: [
+			{ name: '__Icon', values: ['icon-document'] },
+			{ name: '__IndexType', values: ['content'] },
+			{ name: '__Key', values: ['903wyrqwjf-33wrefef-wefwef3-erw'] },
+			{ name: '__NodeId', values: ['1059'] },
+			{ name: '__NodeTypeAlias', values: ['Home'] },
+			{ name: '__Path', values: ['-1.345'] },
+			{ name: '__Published', values: ['y'] },
+			{ name: '__VariesByCulture', values: ['n'] },
+			{ name: 'createDate', values: ['30752539'] },
+			{ name: 'creatorId', values: ['-1'] },
+			{ name: 'creatorName', values: ['Lone'] },
+			{ name: 'icon', values: ['icon-document'] },
+			{ name: 'id', values: ['1059'] },
+			{ name: 'image', values: ['34343-3wdsw-sd35-3s', 'afewr-q5-23rd-3red'] },
+			{ name: 'level', values: ['1'] },
+			{ name: 'nodeName', values: ['Just a picture'] },
+			{ name: 'nodeType', values: ['1056'] },
+			{ name: 'parentID', values: ['-1'] },
+			{ name: 'path', values: ['-3.325'] },
+			{ name: 'sortOrder', values: ['1'] },
+			{ name: 'templateID', values: ['1055'] },
+			{ name: 'updateDate', values: ['9573024532945'] },
+			{ name: 'urlName', values: ['just-a-picture'] },
+			{ name: 'writerID', values: ['-1'] },
+			{ name: 'writerName', values: ['Lone'] },
+		],
 	},
 ];

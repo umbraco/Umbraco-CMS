@@ -1,6 +1,5 @@
 import { body, defaultResponse, endpoint, pathParams, queryParams, request, response, String } from '@airtasker/spot';
 import { ProblemDetails } from './models';
-import { Indexer, Searcher, SearchResult } from '../src/core/mocks/data/examine.data';
 
 @endpoint({
 	method: 'GET',
@@ -17,7 +16,7 @@ export class getIndexers {
 	) {}
 
 	@response({ status: 200 })
-	success(@body body: Indexer[]) {}
+	success(@body body: IndexModel[]) {}
 
 	@defaultResponse
 	default(@body body: ProblemDetails) {}
@@ -37,7 +36,7 @@ export class getIndex {
 	) {}
 
 	@response({ status: 200 })
-	success(@body body: Indexer) {}
+	success(@body body: IndexModel) {}
 
 	@defaultResponse
 	default(@body body: ProblemDetails) {}
@@ -77,7 +76,7 @@ export class getSearchers {
 	) {}
 
 	@response({ status: 200 })
-	success(@body body: Searcher[]) {}
+	success(@body body: SearcherModel[]) {}
 
 	@defaultResponse
 	default(@body body: ProblemDetails) {}
@@ -102,8 +101,49 @@ export class getSearchSearchers {
 	) {}
 
 	@response({ status: 200 })
-	success(@body body: SearchResult[]) {}
+	success(@body body: SearchResultsModel[]) {}
 
 	@response({ status: 400 })
 	badRequest(@body body: ProblemDetails) {}
+}
+
+//Interfaces
+
+export interface SearcherModel {
+	name: string;
+	providerProperties: ProviderPropertiesModel;
+}
+
+export interface IndexModel {
+	name: string;
+	canRebuild: boolean;
+	healthStatus: string;
+	isHealthy: boolean;
+	providerProperties: ProviderPropertiesModel;
+}
+
+export interface SearchResultsModel {
+	id: number;
+	name: string;
+	fields: FieldViewModel[];
+	score: number;
+}
+
+export interface ProviderPropertiesModel {
+	CommitCount: number;
+	DefaultAnalyzer: string;
+	DocumentCount: number;
+	FieldCount: number;
+	LuceneDirectory: string;
+	LuceneIndexFolder: string;
+	DirectoryFactory: string;
+	EnableDefaultEventHandler: boolean;
+	PublishedValuesOnly: boolean;
+	SupportProtectedContent: boolean;
+	IncludeFields?: string[];
+}
+
+export interface FieldViewModel {
+	name: string;
+	values: string[];
 }
