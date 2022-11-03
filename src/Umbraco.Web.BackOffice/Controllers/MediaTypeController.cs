@@ -135,6 +135,8 @@ public class MediaTypeController : ContentTypeControllerBase<IMediaType>
     /// <summary>
     ///     Returns a media type by alias
     /// </summary>
+    /// /// <param name="alias">Alias of the media type</param>
+    /// <returns></returns>
     [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaTypes)]
     public ActionResult<MediaTypeDisplay?> GetByAlias(string alias)
     {
