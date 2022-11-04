@@ -32,8 +32,14 @@
                     </umb-property>
                     `
                 );
+                
+                $element[0].addEventListener('umb-rte-focus', onRteFocus);
+                $element[0].addEventListener('umb-rte-blur', onRteBlur);
 
-                const connectedCallback = () => {$compile(propertyEditorElement)($scope)};
+                const connectedCallback = () => {
+                    
+                    $compile(propertyEditorElement)($scope)
+                };
                 
                 const event = new CustomEvent("UmbBlockGrid_AppendProperty", {composed: true, bubbles: true, detail: {'property': propertyEditorElement[0], 'contentUdi': $scope.block.layout.contentUdi, 'slotName': vm.propertySlotName, 'connectedCallback':connectedCallback}});
                 
@@ -42,11 +48,22 @@
             }
         }
 
+        function onRteFocus() {
+            $element[0].classList.add('umb-block-grid--force-focus');
+        }
+        function onRteBlur() {
+            $element[0].classList.remove('umb-block-grid--force-focus');
+        }
+
         vm.$onDestroy = function() {
             if (vm.property) {
                 const event = new CustomEvent("UmbBlockGrid_RemoveProperty", {composed: true, bubbles: true, detail: {'slotName': vm.propertySlotName}});
                 $element[0].dispatchEvent(event);
             }
+
+            $element[0].removeEventListener('umb-rte-focus', onRteFocus);
+            $element[0].removeEventListener('umb-rte-blur', onRteBlur);
+            propertyEditorElement = null;
         }
 
     }
