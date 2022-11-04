@@ -1,5 +1,6 @@
 <style>
 
+
     .umb-icon {
         display: inline-block;
         width: 1em;
@@ -36,6 +37,7 @@
         user-select: none;
         border: none;
         box-sizing: border-box;
+        transition: min-height 120ms;
     }
     .blockelement-gridinlineblock-editor > .blockelement-gridinlineblock-label > .icon {
         font-size: 22px;
@@ -56,6 +58,18 @@
     .blockelement-gridinlineblock-editor > button:hover {
         color: #2152A3;
     }
+
+
+    :host .blockelement-gridinlineblock-editor > .blockelement-gridinlineblock-label {
+        min-height: 0;
+        height: 0;
+        overflow: hidden;
+    }
+    :host(:focus) .blockelement-gridinlineblock-editor > .blockelement-gridinlineblock-label,
+    :host(:focus-within) .blockelement-gridinlineblock-editor > .blockelement-gridinlineblock-label {
+        min-height: 48px;
+        height: auto;
+    }
     
 
 </style>
@@ -64,6 +78,7 @@
     class="blockelement-gridinlineblock-editor"
     ng-controller="Umbraco.PropertyEditors.BlockEditor.GridInlineBlockEditor as vm"
     ng-class="{ '--active': block.active, '--error': parentForm.$invalid && valFormManager.isShowingValidation() }">
+    
     <button 
         ng-if="!block.config.forceHideContentEditorInOverlay"
         type="button"

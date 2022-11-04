@@ -2851,6 +2851,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="headlineAdvanced">Advanced</key>
     <key alias="forceHideContentEditor">Hide content editor</key>
     <key alias="forceHideContentEditorHelp">Hide the content edit button and the content editor from the Block Editor overlay</key>
+    <key alias="girdInlineEditing">Inline editing</key>
+    <key alias="girdInlineEditingHelp">Enables inline editing for the first Property. Additional properties can be edited in the overlay.</key>
     <key alias="blockHasChanges">You have made changes to this content. Are you sure you want to discard them?</key>
     <key alias="confirmCancelBlockCreationHeadline">Discard creation?</key>
     <key alias="confirmCancelBlockCreationMessage"><![CDATA[Are you sure you want to cancel the creation.]]></key>

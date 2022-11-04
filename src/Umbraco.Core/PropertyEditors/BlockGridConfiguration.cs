@@ -82,6 +82,9 @@ public class BlockGridConfiguration
         [DataMember(Name ="editorSize")]
         public string? EditorSize { get; set; }
 
+        [DataMember(Name ="inlineEditing")]
+        public bool InlineEditing { get; set; }
+
         [DataMember(Name ="forceHideContentEditorInOverlay")]
         public bool ForceHideContentEditorInOverlay { get; set; }
 

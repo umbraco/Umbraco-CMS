@@ -60,7 +60,7 @@
         padding-bottom:2px;
     }
 
-    slot[name='area-container'] {
+    div[part='area-container'] {
         grid-gap: 10px;
         padding: 10px;
     }
@@ -80,6 +80,6 @@
         <span>{{block.label}}</span>
     </button>
 
-    <slot name="area-container" part="area-container" ng-if="block.layout.areas.length > 0"></slot>
+    <umb-block-grid-render-area-slot ng-if="block.layout.areas.length > 0"></umb-block-grid-render-area-slots>
 
 </div>

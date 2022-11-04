@@ -413,8 +413,10 @@
 
             if (block.config.unsupported === true) {
                 block.view = DefaultViewFolderPath + "unsupportedblock/unsupportedblock.editor.html";
-            } else {
+            } else if (block.config.inlineEditing) {
                 block.view = DefaultViewFolderPath + "gridinlineblock/gridinlineblock.editor.html";
+            } else {
+                block.view = DefaultViewFolderPath + "gridblock/gridblock.editor.html";
             }
 
         }

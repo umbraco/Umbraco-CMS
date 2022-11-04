@@ -2201,6 +2201,8 @@ Mange hilsner fra Umbraco robotten
     <key alias="headlineAdvanced">Avanceret</key>
     <key alias="forceHideContentEditor">Skjul indholdseditoren</key>
     <key alias="forceHideContentEditorHelp">Skjul indholds redigerings knappen samt indholdseditoren i Blok Redigerings vinduet</key>
+    <key alias="girdInlineEditing">Direkte redigering</key>
+    <key alias="girdInlineEditingHelp">Tilføjer direkte redigering a det første felt. Yderligere felter optræder kun i redigerings vinduet.</key>
     <key alias="blockHasChanges">Du har lavet ændringer til dette indhold. Er du sikker på at du vil kassere dem?</key>
     <key alias="confirmCancelBlockCreationHeadline">Annuller oprettelse?</key>
     <key alias="confirmCancelBlockCreationMessage"><![CDATA[Er du sikker på at du vil annullere oprettelsen.]]></key>
