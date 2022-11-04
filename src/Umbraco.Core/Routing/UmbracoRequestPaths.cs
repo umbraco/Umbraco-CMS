@@ -51,6 +51,7 @@ public class UmbracoRequestPaths
     ///         These are def back office:
     ///         /Umbraco/BackOffice     = back office
     ///         /Umbraco/Preview        = back office
+    ///         /Umbraco/Management/Api = back office
     ///     </para>
     ///     <para>
     ///         If it's not any of the above then we cannot determine if it's back office or front-end
