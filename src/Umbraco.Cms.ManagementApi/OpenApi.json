@@ -3644,11 +3644,11 @@
       },
       "CallingConventions": {
         "enum": [
-          1,
-          2,
-          3,
-          32,
-          64
+          "Standard",
+          "VarArgs",
+          "Any",
+          "HasThis",
+          "ExplicitThis"
         ],
         "type": "integer",
         "format": "int32"
@@ -3848,9 +3848,9 @@
       },
       "ContentAppBadgeType": {
         "enum": [
-          0,
-          1,
-          2
+          "default",
+          "warning",
+          "alert"
         ],
         "type": "integer",
         "format": "int32"
@@ -4433,9 +4433,10 @@
       },
       "EventAttributes": {
         "enum": [
-          0,
-          512,
-          1024
+          "None",
+          "SpecialName",
+          "RTSpecialName",
+          "ReservedMask"
         ],
         "type": "integer",
         "format": "int32"
@@ -4522,25 +4523,25 @@
       },
       "FieldAttributes": {
         "enum": [
-          0,
-          1,
-          2,
-          3,
-          4,
-          5,
-          6,
-          7,
-          16,
-          32,
-          64,
-          128,
-          256,
-          512,
-          1024,
-          4096,
-          8192,
-          32768,
-          38144
+          "PrivateScope",
+          "Private",
+          "FamANDAssem",
+          "Assembly",
+          "Family",
+          "FamORAssem",
+          "Public",
+          "FieldAccessMask",
+          "Static",
+          "InitOnly",
+          "Literal",
+          "NotSerialized",
+          "HasFieldRVA",
+          "SpecialName",
+          "RTSpecialName",
+          "HasFieldMarshal",
+          "PinvokeImpl",
+          "HasDefault",
+          "ReservedMask"
         ],
         "type": "integer",
         "format": "int32"
@@ -4720,14 +4721,14 @@
       },
       "GenericParameterAttributes": {
         "enum": [
-          0,
-          1,
-          2,
-          3,
-          4,
-          8,
-          16,
-          28
+          "None",
+          "Covariant",
+          "Contravariant",
+          "VarianceMask",
+          "ReferenceTypeConstraint",
+          "NotNullableValueTypeConstraint",
+          "DefaultConstructorConstraint",
+          "SpecialConstraintMask"
         ],
         "type": "integer",
         "format": "int32"
@@ -4885,9 +4886,9 @@
       },
       "LayoutKind": {
         "enum": [
-          0,
-          2,
-          3
+          "Sequential",
+          "Explicit",
+          "Auto"
         ],
         "type": "integer",
         "format": "int32"
@@ -4934,43 +4935,45 @@
       },
       "MemberTypes": {
         "enum": [
-          1,
-          2,
-          4,
-          8,
-          16,
-          32,
-          64,
-          128,
-          191
+          "Constructor",
+          "Event",
+          "Field",
+          "Method",
+          "Property",
+          "TypeInfo",
+          "Custom",
+          "NestedType",
+          "All"
         ],
         "type": "integer",
         "format": "int32"
       },
       "MethodAttributes": {
         "enum": [
-          0,
-          1,
-          2,
-          3,
-          4,
-          5,
-          6,
-          7,
-          8,
-          16,
-          32,
-          64,
-          128,
-          256,
-          512,
-          1024,
-          2048,
-          4096,
-          8192,
-          16384,
-          32768,
-          53248
+          "ReuseSlot",
+          "PrivateScope",
+          "Private",
+          "FamANDAssem",
+          "Assembly",
+          "Family",
+          "FamORAssem",
+          "Public",
+          "MemberAccessMask",
+          "UnmanagedExport",
+          "Static",
+          "Final",
+          "Virtual",
+          "HideBySig",
+          "NewSlot",
+          "VtableLayoutMask",
+          "CheckAccessOnOverride",
+          "Abstract",
+          "SpecialName",
+          "RTSpecialName",
+          "PinvokeImpl",
+          "HasSecurity",
+          "RequireSecObject",
+          "ReservedMask"
         ],
         "type": "integer",
         "format": "int32"
@@ -5109,20 +5112,23 @@
       },
       "MethodImplAttributes": {
         "enum": [
-          0,
-          1,
-          2,
-          3,
-          4,
-          8,
-          16,
-          32,
-          64,
-          128,
-          256,
-          512,
-          4096,
-          65535
+          "IL",
+          "Managed",
+          "Native",
+          "OPTIL",
+          "Runtime",
+          "CodeTypeMask",
+          "Unmanaged",
+          "ManagedMask",
+          "NoInlining",
+          "ForwardRef",
+          "Synchronized",
+          "NoOptimization",
+          "PreserveSig",
+          "AggressiveInlining",
+          "AggressiveOptimization",
+          "InternalCall",
+          "MaxMethodImplVal"
         ],
         "type": "integer",
         "format": "int32"
@@ -5300,10 +5306,10 @@
       },
       "ModelsMode": {
         "enum": [
-          0,
-          1,
-          2,
-          3
+          "Nothing",
+          "InMemoryAuto",
+          "SourceCodeManual",
+          "SourceCodeAuto"
         ],
         "type": "integer",
         "format": "int32"
@@ -5381,11 +5387,11 @@
       },
       "NotificationStyle": {
         "enum": [
-          0,
-          1,
-          2,
-          3,
-          4
+          "Save",
+          "Info",
+          "Error",
+          "Success",
+          "Warning"
         ],
         "type": "integer",
         "format": "int32"
@@ -5411,9 +5417,9 @@
       },
       "OutOfDateType": {
         "enum": [
-          0,
-          1,
-          100
+          "OutOfDate",
+          "Current",
+          "Unknown"
         ],
         "type": "integer",
         "format": "int32"
@@ -5743,17 +5749,17 @@
       },
       "ParameterAttributes": {
         "enum": [
-          0,
-          1,
-          2,
-          4,
-          8,
-          16,
-          4096,
-          8192,
-          16384,
-          32768,
-          61440
+          "None",
+          "In",
+          "Out",
+          "Lcid",
+          "Retval",
+          "Optional",
+          "HasDefault",
+          "HasFieldMarshal",
+          "Reserved3",
+          "Reserved4",
+          "ReservedMask"
         ],
         "type": "integer",
         "format": "int32"
@@ -5866,14 +5872,14 @@
       },
       "PropertyAttributes": {
         "enum": [
-          0,
-          512,
-          1024,
-          4096,
-          8192,
-          16384,
-          32768,
-          62464
+          "None",
+          "SpecialName",
+          "RTSpecialName",
+          "HasDefault",
+          "Reserved2",
+          "Reserved3",
+          "Reserved4",
+          "ReservedMask"
         ],
         "type": "integer",
         "format": "int32"
@@ -6056,12 +6062,12 @@
       },
       "RuntimeLevel": {
         "enum": [
-          0,
-          1,
-          2,
-          3,
-          100,
-          -1
+          "Unknown",
+          "Boot",
+          "Install",
+          "Upgrade",
+          "Run",
+          "BootFailed"
         ],
         "type": "integer",
         "format": "int32"
@@ -6122,9 +6128,9 @@
       },
       "SecurityRuleSet": {
         "enum": [
-          0,
-          1,
-          2
+          "None",
+          "Level1",
+          "Level2"
         ],
         "type": "integer",
         "format": "int32"
@@ -6162,9 +6168,9 @@
       },
       "TelemetryLevel": {
         "enum": [
-          0,
-          1,
-          2
+          "Minimal",
+          "Basic",
+          "Detailed"
         ],
         "type": "integer",
         "format": "int32"
@@ -6463,32 +6469,38 @@
       },
       "TypeAttributes": {
         "enum": [
-          0,
-          1,
-          2,
-          3,
-          4,
-          5,
-          6,
-          7,
-          8,
-          16,
-          24,
-          32,
-          128,
-          256,
-          1024,
-          2048,
-          4096,
-          8192,
-          16384,
-          65536,
-          131072,
-          196608,
-          262144,
-          264192,
-          1048576,
-          12582912
+          "NotPublic",
+          "AutoLayout",
+          "AnsiClass",
+          "Class",
+          "Public",
+          "NestedPublic",
+          "NestedPrivate",
+          "NestedFamily",
+          "NestedAssembly",
+          "NestedFamANDAssem",
+          "NestedFamORAssem",
+          "VisibilityMask",
+          "SequentialLayout",
+          "ExplicitLayout",
+          "LayoutMask",
+          "Interface",
+          "ClassSemanticsMask",
+          "Abstract",
+          "Sealed",
+          "SpecialName",
+          "RTSpecialName",
+          "Import",
+          "Serializable",
+          "WindowsRuntime",
+          "UnicodeClass",
+          "AutoClass",
+          "CustomFormatClass",
+          "StringFormatMask",
+          "HasSecurity",
+          "ReservedMask",
+          "BeforeFieldInit",
+          "CustomFormatMask"
         ],
         "type": "integer",
         "format": "int32"
