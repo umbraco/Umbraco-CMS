@@ -231,9 +231,11 @@ public class MediaPicker3PropertyEditor : DataEditor
             [DataMember(Name = "mediaKey")]
             public Guid MediaKey { get; set; }
 
-            [DataMember(Name = "crops")] public IEnumerable<ImageCropperValue.ImageCropperCrop>? Crops { get; set; }
+            [DataMember(Name = "crops")]
+            public IEnumerable<ImageCropperValue.ImageCropperCrop>? Crops { get; set; }
 
-            [DataMember(Name = "focalPoint")] public ImageCropperValue.ImageCropperFocalPoint? FocalPoint { get; set; }
+            [DataMember(Name = "focalPoint")]
+            public ImageCropperValue.ImageCropperFocalPoint? FocalPoint { get; set; }
 
             /// <summary>
             ///     Removes redundant crop data/default focal point.
