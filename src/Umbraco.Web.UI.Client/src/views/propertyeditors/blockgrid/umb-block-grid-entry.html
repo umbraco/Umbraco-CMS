@@ -36,8 +36,8 @@
                 slot="{{proxyProp.slotName}}">
             </slot>
             <umb-block-grid-entries 
-                slot="area-container"
                 ng-repeat="areaEntry in vm.layoutEntry.areas track by areaEntry.key"
+                slot="{{::areaEntry.$config.alias}}"
                 class="umb-block-grid__area"
                 ng-class="{'--highlight': areaEntry.$highlight}"
                 data-area-col-span="{{::areaEntry.$config.columnSpan}}"
