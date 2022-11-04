@@ -466,9 +466,11 @@
             block.showCopy = vm.supportCopy && block.config.contentElementTypeKey != null;
 
             block.blockUiVisibility = false;
-            block.showBlockUI = function () {
+            block.showBlockUI = () => {
                 delete block.__timeout;
-                shadowRoot.querySelector('*[data-element-udi="'+block.layout.contentUdi+'"] .umb-block-grid__block > .umb-block-grid__block--context').scrollIntoView({block: "nearest", inline: "nearest", behavior: "smooth"});
+                $timeout(() => {
+                    shadowRoot.querySelector('*[data-element-udi="'+block.layout.contentUdi+'"] > ng-form > .umb-block-grid__block > .umb-block-grid__block--context').scrollIntoView({block: "nearest", inline: "nearest", behavior: "smooth"});
+                }, 100);
                 block.blockUiVisibility = true;
             };
             block.onMouseLeave = function () {
