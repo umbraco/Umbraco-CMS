@@ -109,6 +109,7 @@ public class ManagementApiComposer : IComposer
             });
 
             swaggerGenOptions.DocumentFilter<MimeTypeDocumentFilter>();
+            swaggerGenOptions.SchemaFilter<EnumSchemaFilter>();
 
             swaggerGenOptions.CustomSchemaIds(SchemaIdGenerator.Generate);
         });
