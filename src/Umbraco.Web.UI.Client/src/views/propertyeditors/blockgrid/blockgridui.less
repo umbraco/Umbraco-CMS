@@ -762,13 +762,11 @@ umb-block-grid-block {
         align-items: center;
         justify-content: center;
         
-        /* TODO: dont use --umb-text-color, its temporary to inherit UI */
-        color: var(--umb-text-color, @ui-action-discreet-type);
+        color: var(--umb-block-grid--text-color, @ui-action-discreet-type);
         font-weight: bold;
         padding: 5px 15px;
 
-        /* TODO: dont use --umb-text-color, its temporary to inherit UI */
-        border: 1px dashed var(--umb-text-color, @ui-action-discreet-border);
+        border: 1px dashed var(--umb-block-grid--text-color, @ui-action-discreet-border);
         border-radius: @baseBorderRadius;
         box-sizing: border-box;
 
@@ -776,8 +774,8 @@ umb-block-grid-block {
         height: 100%;
         
         &:hover {
-            color: var(--umb-text-color, @ui-action-discreet-type-hover);
-            border-color: var(--umb-text-color, @ui-action-discreet-border-hover);
+            color: var(--umb-block-grid--text-color-hover, @ui-action-discreet-type-hover);
+            border-color: var(--umb-block-grid--text-color-hover, @ui-action-discreet-border-hover);
             text-decoration: none;
             z-index: 1;
         }

@@ -6,6 +6,8 @@
         var unsubscribe = [];
 
         const bc = this;
+
+        bc.hasImage = false;
         
         $scope.$watch("block.data.image", function(newValue, oldValue) {
             if (newValue !== oldValue) {
@@ -15,9 +17,12 @@
 
         bc.retrieveMedia = function() {
 
+            bc.hasImage = false;
+
             if($scope.block.data.image && $scope.block.data.image.length > 0) {
                 mediaResource.getById($scope.block.data.image[0].mediaKey).then(function (mediaEntity) {
                     
+                    bc.hasImage = true;
                     var mediaPath = mediaEntity.mediaLink;
 
                     //set a property on the 'scope' for the returned media object
