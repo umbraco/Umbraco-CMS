@@ -95,6 +95,8 @@ public class ManagementApiComposer : IComposer
 
             swaggerGenOptions.AddSecurityRequirement(new OpenApiSecurityRequirement
             {
+                // this weird looking construct works because OpenApiSecurityRequirement
+                // is a specialization of Dictionary<,>
                 {
                     new OpenApiSecurityScheme
                     {
