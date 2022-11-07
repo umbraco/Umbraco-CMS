@@ -1,115 +1,114 @@
-<style>
-    .my-dropzone {
-        height: 100px; 
-        background-color: purple;
-    }
-
-    .my-dropzone.drag-over {
-        background: blue;
-    }
-
-    .temp-media-card {
-        border-radius: 3px;
-        cursor: pointer;
-        display: inline-block;
-        overflow: hidden;
-        position: relative;
-        transition: box-shadow .12s;
-        width: 100%;
-    }
-</style>
-
 <div class="umb-mediapicker3">
 
     <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
-
-    <h3>Value</h3>
-    <pre>{{ vm.model.value | json }}</pre>
 
     <div 
         class="my-dropzone"
         ngf-drop
         ng-model="vm.filesHolder"
         ngf-change="vm.handleFiles($files, $event, $invalidFiles)"
-        ngf-drag-over-class="'drag-over'">
-        My dropzone
-    </div>
+        ngf-drag-over-class="'drag-over'"
+        ngf-multiple="true"
+        ngf-allow-dir="true"
+        ngf-pattern="{{ vm.serverFileExtensionsPattern }}"
+        ngf-max-size="{{ vm.maxFileSize }}">
 
-    <div class="umb-media-card-grid" ng-class="{'--singleMode':(vm.validationLimit.max === 1 && vm.model.value.length <= 1)}">
+        <div class="drop-overlay">Drop files</div>
 
-        <div style="display:contents;" ui-sortable="vm.sortableOptions" ng-model="vm.model.value" ng-if="vm.loading !== true">
+        <div class="umb-media-card-grid" ng-class="{'--singleMode':(vm.validationLimit.max === 1 && vm.model.value.length <= 1)}">
 
-            <div ng-repeat="media in vm.model.value track by media.key" class="umb-media-card-grid__cell">
+            <div style="display:contents;" ui-sortable="vm.sortableOptions" ng-model="vm.model.value" ng-if="vm.loading !== true">
 
-                <button type="button"
-                        ng-if="vm.loading !== true && vm.allowAdd && ((vm.singleMode === true && vm.model.value.length === 0) || vm.singleMode === false)"
-                        class="btn-reset umb-media-card-grid--inline-create-button"
-                        ng-click="vm.addMediaAt($index, $event)"
-                        ng-controller="Umbraco.PropertyEditors.MediaPicker3PropertyEditor.CreateButtonController as inlineCreateButtonCtrl"
-                        ng-mousemove="inlineCreateButtonCtrl.onMouseMove($event)"
-                        ng-disabled="!vm.allowAddMedia">
-                        <div class="__plus" ng-style="{'top':inlineCreateButtonCtrl.plusPosY}">
-                            <umb-icon icon="icon-add" class="icon"></umb-icon>
+                <div ng-repeat="media in vm.model.value track by media.key" class="umb-media-card-grid__cell">
+
+                    <button type="button"
+                            ng-if="vm.loading !== true && vm.allowAdd && ((vm.singleMode === true && vm.model.value.length === 0) || vm.singleMode === false)"
+                            class="btn-reset umb-media-card-grid--inline-create-button"
+                            ng-click="vm.addMediaAt($index, $event)"
+                            ng-controller="Umbraco.PropertyEditors.MediaPicker3PropertyEditor.CreateButtonController as inlineCreateButtonCtrl"
+                            ng-mousemove="inlineCreateButtonCtrl.onMouseMove($event)"
+                            ng-disabled="!vm.allowAddMedia">
+                            <div class="__plus" ng-style="{'top':inlineCreateButtonCtrl.plusPosY}">
+                                <umb-icon icon="icon-add" class="icon"></umb-icon>
+                            </div>
+                    </button>
+
+                    <div ng-if="!media.mediaKey" class="umb-media-card">
+                        <div class="__showcase">
+                            <div ng-if="media.uploadProgress < 100" class="__upload-progress">
+                                <umb-progress-circle percentage="{{media.uploadProgress}}" width="100"></umb-progress-circle>
+                            </div>
+
+                            <img 
+                                ng-if="media.dataURL"
+                                ng-src="{{media.dataURL}}"
+                                title="{{vm.media.name}}"
+                                alt="{{vm.media.name}}" />
+
+                            <button type="button" class="btn-reset __info" ng-click="vm.editMedia(media, $index, $event)">
+                                <div class="__name" ng-bind="media.name"></div>
+                            </button>
+
+                            <div class="__actions">
+                                <button ng-if="vm.allowRemoveMedia" type="button" class="btn-reset __action umb-outline" localize="title" title="general_remove" ng-click="vm.removeMedia(media); $event.stopPropagation();">
+                                    <umb-icon icon="icon-trash" class="icon"></umb-icon>
+                                </button>
+                            </div>
                         </div>
-                </button>
+                    </div>
 
-                <div ng-if="!media.mediaKey" class="umb-media-card">
-                    <div class="__showcase">
-                        <div ng-if="media.uploadProgress < 100" class="__upload-progress">
-                            <umb-progress-circle percentage="{{media.uploadProgress}}" width="100"></umb-progress-circle>
-                        </div>
-
-                        <img 
-                            ng-if="media.dataURL"
-                            ng-src="{{media.dataURL}}"
-                            title="{{vm.media.name}}"
-                            alt="{{vm.media.name}}" />
-
-                        <button type="button" class="btn-reset __info" ng-click="vm.editMedia(media, $index, $event)">
-                            <div class="__name" ng-bind="media.name"></div>
-                        </button>
-
+                    <umb-media-card
+                        ng-if="media.mediaKey"
+                        media-key="media.mediaKey"
+                        on-name-clicked="vm.editMedia(media, $index, $event)"
+                        ng-class="{'--active': vm.activeMediaEntry === media}"
+                        has-error="vm.propertyForm.maxCount.$valid === false && $index >= vm.validationLimit.max"
+                        allowed-types="vm.allowedTypes">
                         <div class="__actions">
+                            <button ng-if="vm.supportCopy" type="button" class="btn-reset __action umb-outline" localize="title" title="actions_copy" ng-click="vm.copyMedia(media); $event.stopPropagation();">
+                                <umb-icon icon="icon-documents" class="icon"></umb-icon>
+                            </button>
                             <button ng-if="vm.allowRemoveMedia" type="button" class="btn-reset __action umb-outline" localize="title" title="general_remove" ng-click="vm.removeMedia(media); $event.stopPropagation();">
                                 <umb-icon icon="icon-trash" class="icon"></umb-icon>
                             </button>
                         </div>
-                    </div>
+                    </umb-media-card>
+
                 </div>
+            </div>
 
-                <umb-media-card
-                    ng-if="media.mediaKey"
-                    media-key="media.mediaKey"
-                    on-name-clicked="vm.editMedia(media, $index, $event)"
-                    ng-class="{'--active': vm.activeMediaEntry === media}"
-                    has-error="vm.propertyForm.maxCount.$valid === false && $index >= vm.validationLimit.max"
-                    allowed-types="vm.allowedTypes">
-                    <div class="__actions">
-                        <button ng-if="vm.supportCopy" type="button" class="btn-reset __action umb-outline" localize="title" title="actions_copy" ng-click="vm.copyMedia(media); $event.stopPropagation();">
-                            <umb-icon icon="icon-documents" class="icon"></umb-icon>
-                        </button>
-                        <button ng-if="vm.allowRemoveMedia" type="button" class="btn-reset __action umb-outline" localize="title" title="general_remove" ng-click="vm.removeMedia(media); $event.stopPropagation();">
-                            <umb-icon icon="icon-trash" class="icon"></umb-icon>
-                        </button>
+            <button ng-if="vm.loading !== true && ((vm.singleMode === true && vm.model.value.length === 0) || vm.singleMode !== true)"
+                    id="{{vm.model.alias}}"
+                    type="button"
+                    class="btn-reset umb-media-card-grid__create-button umb-outline"
+                    ng-disabled="!vm.allowAddMedia"
+                    ng-click="vm.addMediaAt(vm.model.value.length, $event)">
+                    <div>
+                        <umb-icon icon="icon-add" class="icon large"></umb-icon>
+                        <localize key="general_add">Add</localize>
                     </div>
-                </umb-media-card>
+            </button>
 
+        </div>
+    </div>
+
+    <div class="invalid-files-list">
+        <div ng-repeat="file in vm.invalidFiles" class="file">
+            <div class="file-description">
+                <div>
+                    <span>{{ file.name }}</span>
+                    <span ng-if="file.messages.length > 0 || file.$error" class="file-messages">
+                    <span class="errorMessage color-red" ng-repeat="message in file.messages">{{message.header}}: {{message.message}}</span>
+                    <span ng-if="file.$errorMessages.pattern" class="errorMessage color-red"><localize key="media_disallowedFileType"></localize></span>
+                    <span ng-if="file.$errorMessages.maxSize" class="errorMessage color-red"><localize key="media_maxFileSize"></localize> "{{vm.maxFileSize}}"</span>
+                    </span>
+                </div>
             </div>
         </div>
-
-        <button ng-if="vm.loading !== true && ((vm.singleMode === true && vm.model.value.length === 0) || vm.singleMode !== true)"
-                id="{{vm.model.alias}}"
-                type="button"
-                class="btn-reset umb-media-card-grid__create-button umb-outline"
-                ng-disabled="!vm.allowAddMedia"
-                ng-click="vm.addMediaAt(vm.model.value.length, $event)">
-                <div>
-                    <umb-icon icon="icon-add" class="icon large"></umb-icon>
-                    <localize key="general_add">Add</localize>
-                </div>
-        </button>
-
     </div>
+
+    <h3>Value</h3>
+    <pre>{{ vm.model.value | json }}</pre>
 
     <input type="hidden" name="modelValue" ng-model="vm.model.value" val-server="value" />
     <input type="hidden" name="minCount" ng-model="vm.model.value" val-server="minCount" />

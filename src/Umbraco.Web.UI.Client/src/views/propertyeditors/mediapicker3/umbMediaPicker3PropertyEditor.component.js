@@ -28,7 +28,7 @@
             }
         });
 
-    function MediaPicker3Controller($scope, editorService, clipboardService, localizationService, overlayService, userService, entityResource, $attrs, umbRequestHelper, Upload) {
+    function MediaPicker3Controller($scope, editorService, clipboardService, localizationService, overlayService, userService, entityResource, $attrs, umbRequestHelper, Upload, mediaHelper, mediaTypeHelper, mediaTypeResource) {
 
         var unsubscribe = [];
 
@@ -38,6 +38,12 @@
 
         var vm = this;
 
+        const umbracoSettings = Umbraco.Sys.ServerVariables.umbracoSettings;
+        const allowedUploadFiles = mediaHelper.formatFileTypes(umbracoSettings.allowedUploadFiles);
+        const allowedImageFileTypes = mediaHelper.formatFileTypes(umbracoSettings.imageFileTypes);
+        const disallowedUploadFiles = umbracoSettings.disallowedUploadFiles !== '' ? mediaHelper.formatFileTypes(umbracoSettings.disallowedUploadFiles).split(',').map(fileExtension => `!${fileExtension}`).join(',') : '';
+        vm.serverFileExtensionsPattern = `${allowedUploadFiles},${allowedImageFileTypes},${disallowedUploadFiles}`;
+        vm.maxFileSize = umbracoSettings.maxFileSize !== '' ? `${umbracoSettings.maxFileSize} KB` : '';
         vm.loading = true;
 
         vm.activeMediaEntry = null;
@@ -72,7 +78,6 @@
         });
 
         vm.$onInit = function() {
-
             vm.validationLimit = vm.model.config.validationLimit || {};
             // If single-mode we only allow 1 item as the maximum:
             if(vm.model.config.multiple === false) {
@@ -81,6 +86,10 @@
             vm.model.config.crops = vm.model.config.crops || [];
             vm.singleMode = vm.validationLimit.max === 1;
             vm.allowedTypes = vm.model.config.filter ? vm.model.config.filter.split(",") : null;
+
+            mediaTypeResource.getByAlias(vm.allowedTypes).then(mediaTypes => {
+                vm.allowedMediaTypes = mediaTypes;
+            });
 
             copyAllMediasAction = {
                 labelKey: "clipboard_labelForCopyAllEntries",
@@ -143,12 +152,35 @@
         };
 
         function handleFiles (files, event, invalidFiles) {
+            vm.invalidFiles = [...invalidFiles];
+
             files.forEach(file => {
+                const uploadFileExtensions = files.map(file => mediaHelper.getFileExtension(file.name));
+                const matchedMediaTypes = mediaTypeHelper.getTypeAcceptingFileExtensions(vm.allowedMediaTypes, uploadFileExtensions);
+
+                /*
+                let mediaTypeAlias = '';
+                
+                if (matchedMediaTypes.length === 0) {
+                    console.log('Error, this file type is not allowed');
+                    return;
+                };
+    
+                if (matchedMediaTypes.length === 1) {
+                    mediaTypeAlias = matchedMediaTypes[0].alias;
+                };
+    
+                if (matchedMediaTypes.length > 1) {
+                    console.log('we need to prompt here');
+                };
+                */
+
                 const tempMediaEntry = {
                     key: String.CreateGuid(),
                     name: file.name,
                     uploadProgress: 0,
                     dataURL: ''
+                    //mediaTypeAlias
                 };
 
                 Upload.base64DataUrl(file).then(function(url) {    
@@ -161,7 +193,7 @@
         };
 
         function _upload(file, tempMediaEntry) {
-            Upload.upload({ 
+            Upload.upload({
                     url: umbRequestHelper.getApiUrl("tinyMceApiBaseUrl", "UploadImage"),
                     file: file
                 })
