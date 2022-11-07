@@ -5,6 +5,7 @@
             '--not-allowing-drop': vm.showNotAllowedUI,
             '--droppable-indication': vm.droppableIndication
         }"
+        umb-block-grid-sorter="vm.sorterOptions"
     >
         <umb-block-grid-entry ng-repeat="layoutEntry in vm.entries track by layoutEntry.$block.key"
             class="umb-block-grid__layout-item"
