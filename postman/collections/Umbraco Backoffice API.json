@@ -55,10 +55,12 @@
 											}
 										],
 										"url": {
-											"raw": "{{baseUrl}}/umbraco/management/api/v1/upgrade/authorize",
+											"raw": "https://localhost:44331/umbraco/management/api/v1/upgrade/authorize",
+											"protocol": "https",
 											"host": [
-												"{{baseUrl}}"
+												"localhost"
 											],
+											"port": "44331",
 											"path": [
 												"umbraco",
 												"management",
@@ -201,10 +203,12 @@
 											}
 										],
 										"url": {
-											"raw": "{{baseUrl}}/umbraco/management/api/v1/upgrade/settings",
+											"raw": "https://localhost:44331/umbraco/management/api/v1/upgrade/settings",
+											"protocol": "https",
 											"host": [
-												"{{baseUrl}}"
+												"localhost"
 											],
+											"port": "44331",
 											"path": [
 												"umbraco",
 												"management",

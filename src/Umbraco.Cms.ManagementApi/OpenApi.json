@@ -263,6 +263,26 @@
         }
       }
     },
+    "/umbraco/management/api/v1/test": {
+      "get": {
+        "tags": [
+          "Test"
+        ],
+        "operationId": "Test_Get",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TelemetryLevelViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/umbraco/management/api/v1/tree/template/children": {
       "get": {
         "tags": [
@@ -4053,6 +4073,29 @@
           }
         }
       },
+      "TelemetryLevelViewModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "telemetryLevel": {
+            "$ref": "#/components/schemas/TelemetryLevel"
+          }
+        }
+      },
+      "TelemetryLevel": {
+        "type": "string",
+        "description": "",
+        "x-enumNames": [
+          "Minimal",
+          "Basic",
+          "Detailed"
+        ],
+        "enum": [
+          "Minimal",
+          "Basic",
+          "Detailed"
+        ]
+      },
       "PagedViewModelOfEntityTreeItemViewModel": {
         "type": "object",
         "additionalProperties": false,
@@ -4127,29 +4170,6 @@
             }
           }
         }
-      },
-      "TelemetryLevelViewModel": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "telemetryLevel": {
-            "$ref": "#/components/schemas/TelemetryLevel"
-          }
-        }
-      },
-      "TelemetryLevel": {
-        "type": "string",
-        "description": "",
-        "x-enumNames": [
-          "Minimal",
-          "Basic",
-          "Detailed"
-        ],
-        "enum": [
-          "Minimal",
-          "Basic",
-          "Detailed"
-        ]
       },
       "PagedViewModelOfFileSystemTreeItemViewModel": {
         "type": "object",
@@ -5384,6 +5404,9 @@
     },
     {
       "name": "Template"
+    },
+    {
+      "name": "Test"
     },
     {
       "name": "Tracked Reference"
