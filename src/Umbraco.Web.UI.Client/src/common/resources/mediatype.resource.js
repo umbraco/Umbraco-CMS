@@ -111,6 +111,16 @@ function mediaTypeResource($q, $http, umbRequestHelper, umbDataFormatter, locali
                'Failed to retrieve content type');
         },
 
+        getByAlias: function (aliases) {
+            return umbRequestHelper.resourcePromise(
+               $http.get(
+                   umbRequestHelper.getApiUrl(
+                       "mediaTypeApiBaseUrl",
+                       "getByAlias",
+                       [{ aliases: aliases }])),
+               'Failed to retrieve media types');
+        },
+
         getAll: function () {
 
             return umbRequestHelper.resourcePromise(
