@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "2a8ff1cc-a278-45b7-bc28-d050fcad8ec7",
-		"name": "FailsNowQuestionMark",
+		"name": "Umbraco Management API",
 		"description": "This shows all APIs available in this version of Umbraco - Including all the legacy apis that is available for backward compatibility",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_uid": "17446886-2a8ff1cc-a278-45b7-bc28-d050fcad8ec7"
@@ -10173,6 +10173,37 @@
 				}
 			],
 			"id": "d9e36c74-3da2-46ab-ab7e-93df33b629d8"
+		},
+		{
+			"name": "TestTwo",
+			"item": [
+				{
+					"name": "Test Get",
+					"id": "22e646d5-0fcb-456b-ab32-332538224652",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/umbraco/management/api/v1/testTwo",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"umbraco",
+								"management",
+								"api",
+								"v1",
+								"testTwo"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"id": "79c306fb-9113-469c-b8ba-5926e799ab93"
 		}
 	],
 	"auth": {

@@ -283,6 +283,26 @@
         }
       }
     },
+    "/umbraco/management/api/v1/testTwo": {
+      "get": {
+        "tags": [
+          "TestTwo"
+        ],
+        "operationId": "TestTwo_Get",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TelemetryLevelViewModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/umbraco/management/api/v1/tree/template/children": {
       "get": {
         "tags": [
@@ -5309,6 +5329,7 @@
       "Bearer": {
         "type": "oauth2",
         "description": "Umbraco Authentication",
+        "name": "Umbraco",
         "flows": {
           "authorizationCode": {
             "authorizationUrl": "/umbraco/management/api/v1.0/security/back-office/authorize",
@@ -5407,6 +5428,9 @@
     },
     {
       "name": "Test"
+    },
+    {
+      "name": "TestTwo"
     },
     {
       "name": "Tracked Reference"
