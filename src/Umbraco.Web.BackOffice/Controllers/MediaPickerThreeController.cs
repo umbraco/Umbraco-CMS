@@ -50,7 +50,7 @@ public class MediaPickerThreeController : ContentControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> UploadImage(List<IFormFile> file)
+    public async Task<IActionResult> UploadMedia(List<IFormFile> file)
     {
         // Create an unique folder path to help with concurrent users to avoid filename clash
         var imageTempPath =
