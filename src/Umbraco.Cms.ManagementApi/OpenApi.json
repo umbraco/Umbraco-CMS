@@ -5329,7 +5329,6 @@
       "Bearer": {
         "type": "oauth2",
         "description": "Umbraco Authentication",
-        "name": "Umbraco",
         "flows": {
           "authorizationCode": {
             "authorizationUrl": "/umbraco/management/api/v1.0/security/back-office/authorize",
