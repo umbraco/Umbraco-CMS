@@ -16,4 +16,3 @@ files[] = {"path":"OpenApi.json","metaData":{}}
 
 [relations.apiDefinition.metaData]
 type = openapi:3
-rootFiles[] = OpenApi.json
