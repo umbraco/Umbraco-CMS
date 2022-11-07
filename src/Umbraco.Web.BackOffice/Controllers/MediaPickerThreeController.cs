@@ -54,7 +54,7 @@ public class MediaPickerThreeController : ContentControllerBase
     {
         // Create an unique folder path to help with concurrent users to avoid filename clash
         var imageTempPath =
-            _hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempImageUploads + "/" + Guid.NewGuid());
+            _hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempFileUploads + "/" + Guid.NewGuid());
 
         // Ensure image temp path exists
         if (Directory.Exists(imageTempPath) == false)
