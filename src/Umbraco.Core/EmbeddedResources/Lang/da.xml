@@ -2258,7 +2258,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="addAppearanceOptions">Tilføj katalog udseende</key>
     <key alias="addBlockType">Tilføj Blok</key>
     <key alias="addBlockGroup">Tilføj gruppe</key>
-    <key alias="pickSpecificAllowance">Tilføj gruppe eller block</key>
+    <key alias="pickSpecificAllowance">Tilføj gruppe eller Blok</key>
     <key alias="allowanceMinimum">Sæt minimum krav</key>
     <key alias="allowanceMaximum">Sæt maksimum krav</key>
     <key alias="block">Blok</key>
@@ -2272,6 +2272,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="getSampleButton">Installer</key>
     <key alias="actionEnterSortMode">Sortings tilstand</key>
     <key alias="actionExitSortMode">Afslut sortings tilstand</key>
+    <key alias="areaAliasIsNotUnique">Dette område alias skal være unikt sammenlignet med andre områder af denne Blok.</key>
   </area>
   <area alias="contentTemplatesDashboard">
     <key alias="whatHeadline">Hvad er Indholdsskabeloner?</key>

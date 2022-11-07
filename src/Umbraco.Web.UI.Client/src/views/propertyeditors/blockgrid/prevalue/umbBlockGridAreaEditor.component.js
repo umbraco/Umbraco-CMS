@@ -139,7 +139,12 @@
                     overlayModel.title = localizationService.tokenReplace(localized, [clonedAreaData.alias]);
                 }
 
+                const areaIndex = vm.model.indexOf(area);
+                const otherAreas = [...vm.model];
+                otherAreas.splice(areaIndex, 1);
+
                 var overlayModel = {
+                    otherAreaAliases: otherAreas.map(x => x.alias),
                     area: clonedAreaData,
                     updateTitle: updateTitle,
                     allBlockTypes: vm.allBlockTypes,
