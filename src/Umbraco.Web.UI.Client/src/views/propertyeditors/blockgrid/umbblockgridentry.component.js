@@ -181,6 +181,8 @@
         // Block sizing functionality:
         let layoutContainer = null;
         let gridColumns = null;
+        let columnGap = 0;
+        let rowGap = 0;
         let gridRows = null;
         let scaleBoxBackdropEl = null;
 
@@ -209,12 +211,22 @@
 
             const computedStyles = window.getComputedStyle(layoutContainer);
 
+
+            columnGap = Number(computedStyles.columnGap.split("px")[0]) || 0;
+            rowGap = Number(computedStyles.rowGap.split("px")[0]) || 0;
+
             gridColumns = computedStyles.gridTemplateColumns.trim().split("px").map(x => Number(x));
             gridRows = computedStyles.gridTemplateRows.trim().split("px").map(x => Number(x));
 
             // remove empties:
             gridColumns = gridColumns.filter(n => n > 0);
             gridRows = gridRows.filter(n => n > 0);
+
+            // add gaps:
+            const gridColumnsLen = gridColumns.length;
+            gridColumns = gridColumns.map((n, i) => gridColumnsLen === i ? n : n + columnGap);
+            const gridRowsLen = gridRows.length;
+            gridRows = gridRows.map((n, i) => gridRowsLen === i ? n : n + rowGap);
 
             // ensure all columns are there.
             // This will also ensure handling non-css-grid mode,
