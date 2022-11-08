@@ -82,13 +82,15 @@ angular.module("umbraco.directives")
               });
             }
 
-            // If we have Accepted Media Types, we will ask to choose Media Type, if Choose Media Type returns false, it only had one choice and therefor no reason to
+            // If we have Accepted Media Types, we will ask to choose Media Type, if
+            // Choose Media Type returns false, it only had one choice and therefor no reason to
             if (scope.acceptedMediatypes && _requestChooseMediaTypeDialog() === false) {
               scope.contentTypeAlias = "umbracoAutoSelect";
             }
 
-            // Add the processed length, as we might be uploading in stages
-            scope.totalQueued = scope.queue.length + scope.processed.length;
+            // Add all of the processing and processed files to account for uploading
+            // files in stages (dragging files X at a time into the dropzone).
+            scope.totalQueued = scope.queue.length + scope.processingCount + scope.processed.length;
 
             _processQueueItems();
           }
