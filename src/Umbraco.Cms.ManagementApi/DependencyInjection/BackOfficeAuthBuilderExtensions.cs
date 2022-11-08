@@ -93,7 +93,6 @@ public static class BackOfficeAuthBuilderExtensions
             });
 
         builder.Services.AddTransient<IBackOfficeApplicationManager, BackOfficeApplicationManager>();
-        builder.Services.AddSingleton<IClientSecretManager, ClientSecretManager>();
         builder.Services.AddSingleton<BackOfficeAuthorizationInitializationMiddleware>();
 
         builder.Services.AddHostedService<OpenIddictCleanup>();
