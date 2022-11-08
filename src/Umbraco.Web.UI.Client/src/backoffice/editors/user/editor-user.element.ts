@@ -194,6 +194,7 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(
 				</uui-ref-node>
 			`;
 
+		//TODO Render the name of the content start node instead of it's key.
 		return repeat(
 			this._user.contentStartNodes,
 			(node) => node,
