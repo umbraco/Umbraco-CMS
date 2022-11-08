@@ -361,6 +361,7 @@
     <key alias="memberHasPassword">The member already has a password set</key>
     <key alias="memberLockoutNotEnabled">Lockout is not enabled for this member</key>
     <key alias="memberNotInGroup">The member is not in group '%0%'</key>
+    <key alias="2fa">Two-Factor Authentication</key>
   </area>
   <area alias="contentType">
     <key alias="copyFailed">Failed to copy content type</key>
