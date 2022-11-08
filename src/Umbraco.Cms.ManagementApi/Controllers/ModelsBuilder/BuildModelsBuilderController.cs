@@ -8,7 +8,7 @@ using Umbraco.Cms.Infrastructure.ModelsBuilder;
 using Umbraco.Cms.Infrastructure.ModelsBuilder.Building;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.ManagementApi.Controllers.ModelsBuilderDashboard;
+namespace Umbraco.Cms.ManagementApi.Controllers.ModelsBuilder;
 
 public class BuildModelsBuilderController : ModelsBuilderControllerBase
 {
