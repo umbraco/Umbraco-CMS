@@ -112,12 +112,15 @@ function mediaTypeResource($q, $http, umbRequestHelper, umbDataFormatter, locali
         },
 
         getByAlias: function (aliases) {
+            var aliasesQuery = "";
+            aliases.forEach(alias => aliasesQuery += `aliases=${alias}&`);
+
             return umbRequestHelper.resourcePromise(
                $http.get(
                    umbRequestHelper.getApiUrl(
                        "mediaTypeApiBaseUrl",
                        "getByAlias",
-                       [{ aliases: aliases }])),
+                       aliasesQuery)),
                'Failed to retrieve media types');
         },
 
