@@ -2,20 +2,10 @@ import { html, TemplateResult, css } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement } from 'lit/decorators.js';
 import { UmbModalLayoutElement } from '../modal-layout.element';
-
-export interface UmbModalFieldsViewerData {
-	document: UmbModalDocumentData;
-	values: object;
-}
-
-export interface UmbModalDocumentData {
-	id: number;
-	name: string;
-	score: number;
-}
+import { SearchResultsModel } from 'src/backoffice/dashboards/examine-management/examine-extension';
 
 @customElement('umb-modal-layout-fields-viewer')
-export class UmbModalLayoutFieldsViewerElement extends UmbModalLayoutElement<UmbModalFieldsViewerData> {
+export class UmbModalLayoutFieldsViewerElement extends UmbModalLayoutElement<SearchResultsModel> {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -47,29 +37,24 @@ export class UmbModalLayoutFieldsViewerElement extends UmbModalLayoutElement<Umb
 		`,
 	];
 
-	private _isIteratable(check: any) {
-		if (typeof check[Symbol.iterator] == 'function' && typeof check != 'string') return true;
-		else return false;
-	}
-
 	private _handleClose() {
 		this.modalHandler?.close();
 	}
 
 	render() {
-		if (this.data?.values) {
+		if (this.data) {
 			return html`
-				<uui-dialog-layout class="uui-text" headline="${this.data.document.name}">
+				<uui-dialog-layout class="uui-text" headline="${this.data.name}">
 					<uui-scroll-container id="icon-selection">
 						<uui-table>
 							<uui-table-head>
 								<uui-table-head-cell> Field </uui-table-head-cell>
 								<uui-table-head-cell> Value </uui-table-head-cell>
 							</uui-table-head>
-							${Object.entries(this.data?.values).map((cell) => {
+							${Object.values(this.data.fields).map((cell) => {
 								return html`<uui-table-row>
-									<uui-table-cell> ${cell[0]} </uui-table-cell>
-									<uui-table-cell> ${JSON.stringify(cell[1]).replace(/,/g, ', ')} </uui-table-cell>
+									<uui-table-cell> ${cell.name} </uui-table-cell>
+									<uui-table-cell> ${cell.values.join(', ')} </uui-table-cell>
 								</uui-table-row>`;
 							})}
 						</uui-table>

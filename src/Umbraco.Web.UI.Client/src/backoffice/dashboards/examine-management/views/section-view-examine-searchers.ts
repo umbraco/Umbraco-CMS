@@ -6,12 +6,18 @@ import { UmbModalService } from '../../../../core/services/modal';
 import { UmbNotificationService } from '../../../../core/services/notification';
 import { UmbNotificationDefaultData } from '../../../../core/services/notification/layouts/default';
 
-import { SearchResultsModel } from '../examine-extension';
+import { FieldViewModel, SearchResultsModel } from '../examine-extension';
 
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { getSearchResults } from '@umbraco-cms/backend-api';
 
 import '../../../../core/services/modal/layouts/fields-viewer/fields-viewer.element';
+import '../../../../core/services/modal/layouts/fields-viewer/fields-settings.element';
+
+interface ExposedField {
+	name: string;
+	exposed: boolean;
+}
 
 @customElement('umb-dashboard-examine-searcher')
 export class UmbDashboardExamineSearcherElement extends UmbContextConsumerMixin(LitElement) {
@@ -62,6 +68,12 @@ export class UmbDashboardExamineSearcherElement extends UmbContextConsumerMixin(
 				font-style: italic;
 				color: var(--uui-color-positive-emphasis);
 			}
+
+			.field-adder {
+				width: 0;
+				line-height: 0;
+				cursor: pointer;
+			}
 		`,
 	];
 
@@ -73,6 +85,9 @@ export class UmbDashboardExamineSearcherElement extends UmbContextConsumerMixin(
 
 	@state()
 	private _searchResults?: SearchResultsModel[];
+
+	@state()
+	private _fields?: ExposedField[];
 
 	@query('#search-input')
 	private _searchInput!: HTMLInputElement;
@@ -105,6 +120,7 @@ export class UmbDashboardExamineSearcherElement extends UmbContextConsumerMixin(
 				take: 100,
 			});
 			this._searchResults = res.data as SearchResultsModel[];
+			this._updateFieldFilter();
 		} catch (e) {
 			if (e instanceof getSearchResults.Error) {
 				const error = e.getActualType();
@@ -112,6 +128,34 @@ export class UmbDashboardExamineSearcherElement extends UmbContextConsumerMixin(
 				this._notificationService?.peek('danger', { data });
 			}
 		}
+	}
+
+	private _updateFieldFilter() {
+		this._searchResults?.map((result) => {
+			const fieldNames = result.fields.map((field) => {
+				return { name: field.name, exposed: false };
+			});
+
+			this._fields = fieldNames.map((field, i) => {
+				return this._fields
+					? this._fields[i].name == field.name
+						? { name: this._fields[i].name, exposed: this._fields[i].exposed }
+						: field
+					: field;
+			});
+		});
+	}
+
+	private _onFieldFilterClick() {
+		const modalHandler = this._modalService?.open('umb-modal-layout-fields-settings', {
+			type: 'sidebar',
+			size: 'small',
+			data: { ...this._fields },
+		});
+		modalHandler?.onClose().then(({ fields } = {}) => {
+			if (!fields) return;
+			this._fields = fields;
+		});
 	}
 
 	render() {
@@ -136,33 +180,65 @@ export class UmbDashboardExamineSearcherElement extends UmbContextConsumerMixin(
 		if (this._searchResults?.length) {
 			return html` <uui-table class="search">
 				<uui-table-head>
-					<uui-table-head-cell style="width:0px">Id</uui-table-head-cell>
+					<uui-table-head-cell style="width:0">Score</uui-table-head-cell>
+					<uui-table-head-cell style="width:0">Id</uui-table-head-cell>
 					<uui-table-head-cell>Name</uui-table-head-cell>
-					<uui-table-head-cell style="width:0; min-width:100px;">Fields</uui-table-head-cell>
-					<uui-table-head-cell style="width:0px">Score</uui-table-head-cell>
+					<uui-table-head-cell style="width:200px;">Fields</uui-table-head-cell>
+					${this.renderHeadCells()}
+					<uui-table-head-cell class="field-adder" @click="${this._onFieldFilterClick}">
+						<uui-icon-registry-essential>
+							<uui-tag look="secondary">
+								<uui-icon name="add"></uui-icon>
+							</uui-tag>
+						</uui-icon-registry-essential>
+					</uui-table-head-cell>
 				</uui-table-head>
 				${this._searchResults?.map((rowData) => {
 					return html`<uui-table-row>
+						<uui-table-cell> ${rowData.score} </uui-table-cell>
 						<uui-table-cell> ${rowData.id} </uui-table-cell>
-						<uui-table-cell><button @click="${this._onNameClick}">${rowData.name}</button></uui-table-cell>
 						<uui-table-cell>
-							<button
+							<uui-button look="secondary" label="Open editor for this document" @click="${this._onNameClick}">
+								${rowData.name}
+							</uui-button>
+						</uui-table-cell>
+						<uui-table-cell>
+							<uui-button
 								class="bright"
+								look="secondary"
+								label="Open sidebar to see all fields"
 								@click="${() =>
 									this._modalService?.open('umb-modal-layout-fields-viewer', {
 										type: 'sidebar',
 										size: 'medium',
-										data: { document: rowData, values: rowData.fields },
+										data: { ...rowData },
 									})}">
-								(${Object.keys(rowData.fields).length} fields)
-							</button>
+								${Object.keys(rowData.fields).length} fields
+							</uui-button>
 						</uui-table-cell>
-						<uui-table-cell> ${rowData.score} </uui-table-cell>
+						${this.renderBodyCells(rowData.fields)}
+						<uui-table-cell></uui-table-cell>
 					</uui-table-row>`;
 				})}
 			</uui-table>`;
 		}
 		return;
+	}
+
+	renderHeadCells() {
+		return html`${this._fields?.map((field) => {
+			return field.exposed ? html`<uui-table-head-cell>${field.name}</uui-table-head-cell>` : html``;
+		})}`;
+	}
+
+	renderBodyCells(cellData: FieldViewModel[]) {
+		return html`${this._fields?.map((field) => {
+			return cellData.map((option) => {
+				return option.name == field.name && field.exposed
+					? html`<uui-table-cell>${option.values}</uui-table-cell>`
+					: ``;
+			});
+		})}`;
 	}
 }
 

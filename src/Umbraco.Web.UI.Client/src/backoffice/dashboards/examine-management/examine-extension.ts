@@ -1,6 +1,6 @@
 export interface SearcherModel {
 	name: string;
-	providerProperties: string[]; //TODO
+	providerProperties: unknown; //TODO
 }
 
 export interface IndexModel {
