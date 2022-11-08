@@ -33,7 +33,8 @@ public class UseNvarcharInsteadOfNText : MigrationBase
 
     private void MigrateNtextColumn<TDto>(string columnName, string tableName, Expression<Func<TDto, object?>> fieldSelector, bool nullable = true)
     {
-        if (ColumnType(tableName, columnName) is null or not "ntext")
+        var columnType = ColumnType(tableName, columnName);
+        if (columnType is null || columnType.Equals("ntext", StringComparison.InvariantCultureIgnoreCase) is false)
         {
             return;
         }
