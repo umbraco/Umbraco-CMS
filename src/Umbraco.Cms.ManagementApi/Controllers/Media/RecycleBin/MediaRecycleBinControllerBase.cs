@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using NSwag.Annotations;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -14,10 +13,10 @@ namespace Umbraco.Cms.ManagementApi.Controllers.Media.RecycleBin;
 
 [ApiVersion("1.0")]
 [ApiController]
-[VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.Media}/recycle-bin")]
+[VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.RecycleBin}/{Constants.UdiEntityType.Media}")]
 [RequireMediaTreeRootAccess]
 [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-[OpenApiTag(nameof(Constants.UdiEntityType.Media))]
+[ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Media))]
 public class MediaRecycleBinControllerBase : RecycleBinControllerBase<RecycleBinItemViewModel>
 {
     public MediaRecycleBinControllerBase(IEntityService entityService)
