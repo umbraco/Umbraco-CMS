@@ -20,7 +20,7 @@ public class EFDatabaseSchemaCreator : IDatabaseSchemaCreator
         _databaseDataCreator = databaseDataCreator;
     }
 
-    public async Task InitializeDatabaseSchema()
+    public async Task InitializeDatabaseSchema(bool includeData = true)
     {
         try
         {
@@ -30,15 +30,17 @@ public class EFDatabaseSchemaCreator : IDatabaseSchemaCreator
                 //TODO transaction cannot work with SQLite
                 //using (var transaction = await db.Database.BeginTransactionAsync())
                 {
-                    await db.Database.
-                        MigrateAsync();
+
+                    await db.Database.MigrateAsync();
 
                    // await transaction.CommitAsync();
                 }
             });
 
-
-            await _databaseDataCreator.SeedDataAsync();
+            if (includeData)
+            {
+                await _databaseDataCreator.SeedDataAsync();
+            }
         }
         catch (Exception e)
         {

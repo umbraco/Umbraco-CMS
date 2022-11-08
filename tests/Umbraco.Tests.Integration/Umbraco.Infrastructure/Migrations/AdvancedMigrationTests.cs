@@ -93,12 +93,12 @@ public class AdvancedMigrationTests : UmbracoIntegrationTest
     [Test]
     public void CreateKeysAndIndexesOfTDto()
     {
-        if (BaseTestDatabase.IsSqlite())
-        {
-            // TODO: Think about this for future migrations.
-            Assert.Ignore("Can't add / drop keys in SQLite.");
-            return;
-        }
+        // if (BaseTestDatabase.IsSqlite())
+        // {
+        //     // TODO: Think about this for future migrations.
+        //     Assert.Ignore("Can't add / drop keys in SQLite.");
+        //     return;
+        // }
 
         var builder = Mock.Of<IMigrationBuilder>();
         Mock.Get(builder)
@@ -135,12 +135,12 @@ public class AdvancedMigrationTests : UmbracoIntegrationTest
     [Test]
     public void CreateKeysAndIndexes()
     {
-        if (BaseTestDatabase.IsSqlite())
-        {
-            // TODO: Think about this for future migrations.
-            Assert.Ignore("Can't add / drop keys in SQLite.");
-            return;
-        }
+        // if (BaseTestDatabase.IsSqlite())
+        // {
+        //     // TODO: Think about this for future migrations.
+        //     Assert.Ignore("Can't add / drop keys in SQLite.");
+        //     return;
+        // }
 
         var builder = Mock.Of<IMigrationBuilder>();
         Mock.Get(builder)

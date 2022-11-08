@@ -86,10 +86,8 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
                     
                     services.AddUmbracoEFCore(Configuration, (options, configuration) =>
                     {
-
-                        var meta = s_dbInstance.Current;
-                        var connectionString = meta?.ConnectionString;
-                        var providerName = meta?.Provider;
+                        var connectionString = s_connectionStrings?.ConnectionString;
+                        var providerName = s_connectionStrings?.ProviderName;
                         
                         if (!connectionString.IsNullOrWhiteSpace())
                         {

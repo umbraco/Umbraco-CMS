@@ -22,7 +22,8 @@ public interface IDatabaseSchemaCreator
     ///     Initializes the database by creating the umbraco db schema.
     /// </summary>
     /// <remarks>This needs to execute as part of a transaction.</remarks>
-    Task InitializeDatabaseSchema();
+    Task InitializeDatabaseSchema(bool includeData = true);
+
 }
 
 /// <summary>
@@ -158,7 +159,7 @@ public class DatabaseSchemaCreator : IDatabaseSchemaCreator
     ///     Initializes the database by creating the umbraco db schema.
     /// </summary>
     /// <remarks>This needs to execute as part of a transaction.</remarks>
-    public Task InitializeDatabaseSchema()
+    public Task InitializeDatabaseSchema(bool includeData = false)
     {
         if (!_database.InTransaction)
         {
@@ -177,7 +178,7 @@ public class DatabaseSchemaCreator : IDatabaseSchemaCreator
                 _defaultDataCreationSettings);
             foreach (Type table in _orderedTables)
             {
-                CreateTable(false, table, dataCreation);
+                CreateTable(false, table, dataCreation, includeData);
             }
         }
 
@@ -453,7 +454,7 @@ public class DatabaseSchemaCreator : IDatabaseSchemaCreator
                 _database,
                 _loggerFactory.CreateLogger<DatabaseDataCreator>(),
                 _umbracoVersion,
-                _defaultDataCreationSettings));
+                _defaultDataCreationSettings), true);
     }
 
     /// <summary>
@@ -471,7 +472,7 @@ public class DatabaseSchemaCreator : IDatabaseSchemaCreator
     ///     not do anything if the parameter is <c>false</c>.
     ///     This need to execute as part of a transaction.
     /// </remarks>
-    internal void CreateTable(bool overwrite, Type modelType, DatabaseDataCreator dataCreation)
+    internal void CreateTable(bool overwrite, Type modelType, DatabaseDataCreator dataCreation, bool includeData)
     {
         if (!_database.InTransaction)
         {
@@ -513,7 +514,10 @@ public class DatabaseSchemaCreator : IDatabaseSchemaCreator
         //Call the NewTable-event to trigger the insert of base/default data
         //OnNewTable(tableName, _db, e, _logger);
 
-        dataCreation.InitializeBaseData(tableName);
+        if (includeData)
+        {
+            dataCreation.InitializeBaseData(tableName);
+        }
 
         if (SqlSyntax.SupportsIdentityInsert() && tableDefinition.Columns.Any(x => x.IsIdentity))
         {

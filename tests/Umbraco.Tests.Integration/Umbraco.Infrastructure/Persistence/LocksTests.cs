@@ -257,11 +257,11 @@ public class LocksTests : UmbracoIntegrationTest
     [Test]
     public void DeadLockTest()
     {
-        if (BaseTestDatabase.IsSqlite())
-        {
-            Assert.Ignore("This test doesn't work with Microsoft.Data.Sqlite - SELECT * FROM sys.dm_tran_locks;");
-            return;
-        }
+        // if (BaseTestDatabase.IsSqlite())
+        // {
+        //     Assert.Ignore("This test doesn't work with Microsoft.Data.Sqlite - SELECT * FROM sys.dm_tran_locks;");
+        //     return;
+        // }
 
         Exception e1 = null, e2 = null;
         AutoResetEvent ev1 = new(false), ev2 = new(false);
@@ -350,11 +350,11 @@ public class LocksTests : UmbracoIntegrationTest
     [Test]
     public void NoDeadLockTest()
     {
-        if (BaseTestDatabase.IsSqlite())
-        {
-            Assert.Ignore("This test doesn't work with Microsoft.Data.Sqlite - SELECT * FROM sys.dm_tran_locks;");
-            return;
-        }
+        // if (BaseTestDatabase.IsSqlite())
+        // {
+        //     Assert.Ignore("This test doesn't work with Microsoft.Data.Sqlite - SELECT * FROM sys.dm_tran_locks;");
+        //     return;
+        // }
 
 
         Exception e1 = null, e2 = null;
@@ -386,11 +386,11 @@ public class LocksTests : UmbracoIntegrationTest
     [Test]
     public void Throws_When_Lock_Timeout_Is_Exceeded_Read()
     {
-        if (BaseTestDatabase.IsSqlite())
-        {
-            // Reader reads snapshot, isolated from the writer.
-            Assert.Ignore("Doesn't apply to SQLite with journal_mode=wal");
-        }
+        // if (BaseTestDatabase.IsSqlite())
+        // {
+        //     // Reader reads snapshot, isolated from the writer.
+        //     Assert.Ignore("Doesn't apply to SQLite with journal_mode=wal");
+        // }
 
         using (ExecutionContext.SuppressFlow())
         {
@@ -498,11 +498,11 @@ public class LocksTests : UmbracoIntegrationTest
     [Test]
     public void Read_Lock_Waits_For_Write_Lock()
     {
-        if (BaseTestDatabase.IsSqlite())
-        {
-            // Reader reads snapshot, isolated from the writer.
-            Assert.Ignore("Doesn't apply to SQLite with journal_mode=wal");
-        }
+        // if (BaseTestDatabase.IsSqlite())
+        // {
+        //     // Reader reads snapshot, isolated from the writer.
+        //     Assert.Ignore("Doesn't apply to SQLite with journal_mode=wal");
+        // }
 
         var locksCompleted = 0;
 

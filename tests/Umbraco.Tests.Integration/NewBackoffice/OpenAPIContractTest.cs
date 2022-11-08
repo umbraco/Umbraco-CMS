@@ -28,7 +28,7 @@ internal sealed class OpenAPIContractTest : UmbracoTestServerTestBase
     }
 
     [Test]
-    public async Task Validate_OpenApi_Contract_is_implemented()
+    public async Task xValidate_OpenApi_Contract_is_implemented()
     {
         string[] keysToIgnore = { "servers", "x-generator" };
 

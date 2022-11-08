@@ -53,7 +53,7 @@ public class GlobalSetupTeardown
     [OneTimeTearDown]
     public void TearDown()
     {
-        BaseTestDatabase.Instance?.TearDown();
+        //BaseTestDatabase.Instance?.TearDown();
 
         Console.WriteLine("TOTAL TESTS DURATION: {0}", _stopwatch.Elapsed);
     }
