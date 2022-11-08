@@ -206,9 +206,7 @@
                 nextItem.mediaTypeAlias = mediaTypeAlias;
                 _upload(nextItem);
             }, () => {
-                nextItem.tempMediaEntry.error = 'pattern';
-                nextItem.tempMediaEntry.errorMessages = { pattern: true };
-                vm.invalidEntries.push(nextItem.tempMediaEntry);
+                _handleInvalidTempMediaEntry(nextItem.tempMediaEntry, { type: 'pattern' });
                 _processQueue();
             });
         }
@@ -252,14 +250,21 @@
                     _processQueue();
                 })
                 .error(function(error) {
-                    queueItem.tempMediaEntry.error = 'server';
-                    tempMediaEntry.errorMessages = {
-                        server: true
-                    };
-                    tempMediaEntry.serverErrorMessage = error.Message;
-                    vm.invalidEntries.push(tempMediaEntry);
+                    _handleInvalidTempMediaEntry(queueItem.tempMediaEntry, { type: 'server', message: error.Message });                    
                     _processQueue();
                 });
+        }
+
+        function _handleInvalidTempMediaEntry (tempMediaEntry, error) {
+            tempMediaEntry.error = true;
+            tempMediaEntry.errorType = {};
+            tempMediaEntry.errorType[error.type] = true;
+            tempMediaEntry.errorText = error.message;
+            
+            // we didn't catch the wrong file type in the client side validation so we need to remove the value again
+            const index = vm.model.value.findIndex(mediaEntry => mediaEntry.key === tempMediaEntry.key);
+            vm.model.value.splice(index, 1);
+            vm.invalidEntries.push(tempMediaEntry);
         }
 
         function _chooseMediaTypeDialog(mediaTypes) {
