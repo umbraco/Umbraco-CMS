@@ -185,7 +185,7 @@
         let rowGap = 0;
         let gridRows = null;
         let scaleBoxBackdropEl = null;
-
+        let raf = null;
 
         function getNewSpans(startX, startY, endX, endY) {
 
@@ -207,7 +207,7 @@
             return {'columnSpan': newColumnSpan, 'rowSpan': newRowSpan, 'startCol': blockStartCol, 'startRow': blockStartRow};
         }
 
-        function updateGridLayoutData(layoutContainerRect, layoutItemRect) {
+        function updateGridLayoutData(layoutContainerRect, layoutItemRect, updateRowTemplate) {
 
             const computedStyles = window.getComputedStyle(layoutContainer);
 
@@ -217,6 +217,11 @@
 
             gridColumns = computedStyles.gridTemplateColumns.trim().split("px").map(x => Number(x));
             gridRows = computedStyles.gridTemplateRows.trim().split("px").map(x => Number(x));
+
+            // We use this code to lock the templateRows, while scaling. otherwise scaling Rows is too crazy.
+            if(updateRowTemplate) {
+                layoutContainer.style.gridTemplateRows = computedStyles.gridTemplateRows;
+            }
 
             // remove empties:
             gridColumns = gridColumns.filter(n => n > 0);
@@ -280,7 +285,7 @@
 
             const layoutContainerRect = layoutContainer.getBoundingClientRect();
             const layoutItemRect = $element[0].getBoundingClientRect();
-            updateGridLayoutData(layoutContainerRect, layoutItemRect);
+            updateGridLayoutData(layoutContainerRect, layoutItemRect, true);
 
             
             scaleBoxBackdropEl = document.createElement('div');
@@ -292,7 +297,6 @@
 
             const layoutContainerRect = layoutContainer.getBoundingClientRect();
             const layoutItemRect = $element[0].getBoundingClientRect();
-            updateGridLayoutData(layoutContainerRect, layoutItemRect);
 
 
             const startX = layoutItemRect.left - layoutContainerRect.left;
@@ -301,6 +305,18 @@
             const endY = e.clientY - layoutContainerRect.top;
 
             const newSpans = getNewSpans(startX, startY, endX, endY);
+
+            const updateRowTemplate = vm.layoutEntry.columnSpan !== newSpans.columnSpan;
+
+            if(updateRowTemplate) {
+                // If we like to update we need to first remove the lock, make the browser render onces and then update.
+                layoutContainer.style.gridTemplateRows = "";
+            }
+            cancelAnimationFrame(raf);
+            raf = requestAnimationFrame(() => {
+                // As mentioned above we need to wait until the browser has rendered DOM without the lock of gridTemplateRows.
+                updateGridLayoutData(layoutContainerRect, layoutItemRect, updateRowTemplate);
+            })
 
             // update as we go:
             vm.layoutEntry.columnSpan = newSpans.columnSpan;
@@ -311,7 +327,11 @@
 
         vm.onMouseUp = function(e) {
 
+            cancelAnimationFrame(raf);
             vm.isScaleMode = false;
+
+            // release the lock of gridTemplateRows:
+            layoutContainer.style.gridTemplateRows = "";
 
             const layoutContainerRect = layoutContainer.getBoundingClientRect();
             const layoutItemRect = $element[0].getBoundingClientRect();
