@@ -2,11 +2,13 @@
 // See LICENSE for more details.
 
 using System.Reflection;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
@@ -18,6 +20,9 @@ public class BlockListPropertyValueConverter : PropertyValueConverterBase
     private readonly BlockEditorConverter _blockConverter;
     private readonly BlockListEditorDataConverter _blockListEditorDataConverter;
     private readonly IProfilingLogger _proflog;
+
+    [Obsolete("Use the constructor with the IContentTypeService")]
+    public BlockListPropertyValueConverter(IProfilingLogger proflog, BlockEditorConverter blockConverter) : this(proflog, blockConverter, StaticServiceProvider.Instance.GetRequiredService<IContentTypeService>()) { }
 
     public BlockListPropertyValueConverter(IProfilingLogger proflog, BlockEditorConverter blockConverter, IContentTypeService contentTypeService)
     {
