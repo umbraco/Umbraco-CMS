@@ -49,13 +49,23 @@
                                 ng-src="{{media.dataURL}}"
                                 title="{{vm.media.name}}"
                                 alt="{{vm.media.name}}" />
-
-                            <button type="button" class="btn-reset __info" ng-click="vm.editMedia(media, $index, $event)">
+                            
+                            <button 
+                                type="button" 
+                                class="btn-reset __info" 
+                                ng-click="vm.editMedia(media, $index, $event)" 
+                                ng-disabled="media.uploadProgress < 100">
                                 <div class="__name" ng-bind="media.name"></div>
                             </button>
 
                             <div class="__actions">
-                                <button ng-if="vm.allowRemoveMedia" type="button" class="btn-reset __action umb-outline" localize="title" title="general_remove" ng-click="vm.removeMedia(media); $event.stopPropagation();">
+                                <button 
+                                    ng-if="vm.allowRemoveMedia" 
+                                    type="button" class="btn-reset __action umb-outline" 
+                                    localize="title" 
+                                    title="general_remove" 
+                                    ng-click="vm.removeMedia(media); $event.stopPropagation();" 
+                                    ng-disabled="media.uploadProgress < 100">
                                     <umb-icon icon="icon-trash" class="icon"></umb-icon>
                                 </button>
                             </div>
