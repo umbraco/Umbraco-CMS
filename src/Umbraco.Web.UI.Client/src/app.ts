@@ -16,7 +16,7 @@ import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { getManifests, getServerStatus } from '@umbraco-cms/backend-api';
 import { UmbContextProviderMixin } from '@umbraco-cms/context-api';
 
-import type { ServerStatus } from '@umbraco-cms/models';
+import type { ManifestTypes, ServerStatus } from '@umbraco-cms/models';
 
 @customElement('umb-app')
 export class UmbApp extends UmbContextProviderMixin(LitElement) {
@@ -123,7 +123,7 @@ export class UmbApp extends UmbContextProviderMixin(LitElement) {
 
 	private async _registerExtensionManifestsFromServer() {
 		const res = await getManifests({});
-		const { manifests } = res.data;
+		const { manifests } = res.data as unknown as { manifests: ManifestTypes[] };
 		manifests.forEach((manifest) => umbExtensionsRegistry.register(manifest));
 	}
 

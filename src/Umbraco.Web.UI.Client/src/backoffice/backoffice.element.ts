@@ -1,5 +1,4 @@
 //TODO: we need to figure out what components should be available for extensions and load them upfront
-import './components/ref-property-editor-ui/ref-property-editor-ui.element';
 import './components/backoffice-header.element';
 import './components/backoffice-main.element';
 import './components/backoffice-modal-container.element';
@@ -24,11 +23,10 @@ import { UmbNodeStore } from '../core/stores/node.store';
 import { UmbSectionStore } from '../core/stores/section.store';
 import { UmbEntityStore } from '../core/stores/entity.store';
 import { UmbUserStore } from '../core/stores/user/user.store';
-import { UmbPropertyEditorStore } from '../core/stores/property-editor/property-editor.store';
 import { UmbIconStore } from '../core/stores/icon/icon.store';
-import { UmbPropertyEditorConfigStore } from '../core/stores/property-editor-config/property-editor-config.store';
 import { UmbUserGroupStore } from '../core/stores/user/user-group.store';
 import { manifests as sectionManifests } from './sections/manifests';
+import { manifests as propertyEditorModelManifests } from './property-editor-models/manifests';
 import { manifests as propertyEditorUIManifests } from './property-editor-uis/manifests';
 import { manifests as treeManifests } from './trees/manifests';
 import { manifests as editorManifests } from './editors/manifests';
@@ -63,6 +61,7 @@ export class UmbBackofficeElement extends UmbContextConsumerMixin(UmbContextProv
 		this._registerExtensions(sectionManifests);
 		this._registerExtensions(treeManifests);
 		this._registerExtensions(editorManifests);
+		this._registerExtensions(propertyEditorModelManifests);
 		this._registerExtensions(propertyEditorUIManifests);
 		this._registerExtensions(propertyActionManifests);
 
@@ -74,14 +73,12 @@ export class UmbBackofficeElement extends UmbContextConsumerMixin(UmbContextProv
 		this.provideContext('umbDocumentTypeStore', new UmbDocumentTypeStore(this._umbEntityStore));
 		this.provideContext('umbUserStore', new UmbUserStore(this._umbEntityStore));
 		this.provideContext('umbUserGroupStore', new UmbUserGroupStore(this._umbEntityStore));
-		this.provideContext('umbPropertyEditorStore', new UmbPropertyEditorStore());
-		this.provideContext('umbPropertyEditorConfigStore', new UmbPropertyEditorConfigStore());
 		this.provideContext('umbNotificationService', new UmbNotificationService());
 		this.provideContext('umbModalService', new UmbModalService());
 		this.provideContext('umbSectionStore', new UmbSectionStore());
 	}
 
-	private _registerExtensions(manifests: Array<ManifestWithLoader<ManifestTypes>>) {
+	private _registerExtensions(manifests: Array<ManifestWithLoader<ManifestTypes>> | Array<ManifestTypes>) {
 		manifests.forEach((manifest) => {
 			if (umbExtensionsRegistry.isRegistered(manifest.alias)) return;
 			umbExtensionsRegistry.register(manifest);

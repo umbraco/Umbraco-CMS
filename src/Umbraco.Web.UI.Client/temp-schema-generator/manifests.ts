@@ -1,7 +1,5 @@
 import { body, defaultResponse, endpoint, response } from '@airtasker/spot';
-
 import { ProblemDetails } from './models';
-import { PropertyEditorConfig } from './property-editors';
 
 @endpoint({ method: 'GET', path: '/manifests' })
 export class Manifests {
@@ -30,37 +28,8 @@ export class ManifestsPackagesInstalled {
 	default(@body body: ProblemDetails) {}
 }
 
-export type Manifest =
-	| IManifestSection
-	| IManifestSectionView
-	| IManifestTree
-	| IManifestEditor
-	| IManifestEditorAction
-	| IManifestEditorView
-	| IManifestTreeItemAction
-	| IManifestPropertyEditorUI
-	| IManifestDashboard
-	| IManifestPropertyAction
-	| IManifestPackageView
-	| IManifestEntrypoint
-	| IManifestCustom;
-
-export type ManifestStandardTypes =
-	| 'section'
-	| 'sectionView'
-	| 'tree'
-	| 'editor'
-	| 'editorView'
-	| 'editorAction'
-	| 'treeItemAction'
-	| 'propertyEditorUI'
-	| 'dashboard'
-	| 'propertyAction'
-	| 'packageView'
-	| 'entrypoint';
-
 export interface ManifestsResponse {
-	manifests: Manifest[];
+	manifests: {}[];
 }
 
 export interface ManifestsPackagesInstalledResponse {
@@ -75,142 +44,4 @@ export interface PackageInstalled {
 	hasMigrations: boolean;
 	hasPendingMigrations: boolean;
 	plans: {}[];
-}
-
-export interface IManifest {
-	type: string;
-	alias: string;
-	name: string;
-	weight?: number;
-}
-
-export interface MetaSection {
-	label: string;
-	pathname: string;
-}
-
-export interface MetaSectionView {
-	sections: Array<string>;
-	label: string;
-	pathname: string;
-	weight: number;
-	icon: string;
-}
-
-export interface MetaTree {
-	sections: Array<string>;
-}
-
-export interface MetaEditor {
-	entityType: string;
-}
-
-export interface MetaTreeItemAction {
-	trees: Array<string>;
-	label: string;
-	icon: string;
-}
-export interface MetaPropertyEditorUI {
-	label: string;
-	propertyEditor: string;
-	icon: string;
-	group: string;
-	config?: PropertyEditorConfig;
-}
-
-export interface MetaDashboard {
-	sections: string[];
-	pathname: string;
-	label?: string;
-}
-
-export interface MetaEditorView {
-	editors: string[];
-	pathname: string;
-	label: string;
-	icon: string;
-}
-
-export interface MetaPropertyAction {
-	propertyEditors: string[];
-}
-
-export interface MetaPackageView {
-	packageAlias: string;
-}
-
-export interface IManifestCustom extends IManifest {
-	type: 'custom';
-	meta?: {};
-}
-
-export interface IManifestElement extends IManifest {
-	type: ManifestStandardTypes;
-	js?: string;
-	elementName?: string;
-	meta?: {};
-}
-
-export interface IManifestSection extends IManifestElement {
-	type: 'section';
-	meta: MetaSection;
-}
-
-export interface IManifestSectionView extends IManifestElement {
-	type: 'sectionView';
-	meta: MetaSectionView;
-}
-
-export interface IManifestEditorAction extends IManifestElement {
-	type: 'editorAction';
-	meta: MetaEditorAction;
-}
-
-export interface MetaEditorAction {
-	editors: Array<string>;
-}
-
-export interface IManifestTree extends IManifestElement {
-	type: 'tree';
-	meta: MetaTree;
-}
-
-export interface IManifestEditor extends IManifestElement {
-	type: 'editor';
-	meta: MetaEditor;
-}
-
-export interface IManifestTreeItemAction extends IManifestElement {
-	type: 'treeItemAction';
-	meta: MetaTreeItemAction;
-}
-
-export interface IManifestPropertyEditorUI extends IManifestElement {
-	type: 'propertyEditorUI';
-	meta: MetaPropertyEditorUI;
-}
-
-export interface IManifestDashboard extends IManifestElement {
-	type: 'dashboard';
-	meta: MetaDashboard;
-}
-
-export interface IManifestEditorView extends IManifestElement {
-	type: 'editorView';
-	meta: MetaEditorView;
-}
-
-export interface IManifestPropertyAction extends IManifestElement {
-	type: 'propertyAction';
-	meta: MetaPropertyAction;
-}
-
-export interface IManifestPackageView extends IManifestElement {
-	type: 'packageView';
-	meta: MetaPackageView;
-}
-
-export interface IManifestEntrypoint extends IManifest {
-	type: 'entrypoint';
-	js: string;
 }

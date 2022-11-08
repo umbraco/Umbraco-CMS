@@ -11,7 +11,7 @@ export class UmbDataTypeContext {
 		hasChildren: false,
 		parentKey: '',
 		isTrashed: false,
-		propertyEditorAlias: '',
+		propertyEditorModelAlias: '',
 		propertyEditorUIAlias: '',
 		data: [],
 	});

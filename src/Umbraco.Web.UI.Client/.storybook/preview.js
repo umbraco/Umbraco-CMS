@@ -1,6 +1,3 @@
-import '../src/core/context-api/provide/context-provider.element';
-import '../src/core/css/custom-properties.css';
-import '../src/backoffice/components/backoffice-modal-container.element';
 import '@umbraco-ui/uui';
 import '@umbraco-ui/uui-modal';
 import '@umbraco-ui/uui-modal-container';
@@ -12,20 +9,27 @@ import { initialize, mswDecorator } from 'msw-storybook-addon';
 import { setCustomElements } from '@storybook/web-components';
 
 import customElementManifests from '../custom-elements.json';
-import { UmbExtensionRegistry } from '../src/core/extensions-api';
 import { UmbDataTypeStore } from '../src/core/stores/data-type/data-type.store';
 import { UmbDocumentTypeStore } from '../src/core/stores/document-type.store';
 import { UmbNodeStore } from '../src/core/stores/node.store';
-import { UmbPropertyEditorStore } from '../src/core/stores/property-editor/property-editor.store';
-import { UmbPropertyEditorConfigStore } from '../src/core/stores/property-editor-config/property-editor-config.store';
 import { UmbIconStore } from '../src/core/stores/icon/icon.store';
 import { onUnhandledRequest } from '../src/core/mocks/browser';
 import { handlers } from '../src/core/mocks/browser-handlers';
 import { LitElement } from 'lit';
 import { UmbModalService } from '../src/core/services/modal';
 
-const extensionRegistry = new UmbExtensionRegistry();
-internalManifests.forEach((manifest) => extensionRegistry.register(manifest));
+import { manifests as sectionManifests } from '../src/backoffice/sections/manifests';
+import { manifests as propertyEditorModelManifests } from '../src/backoffice/property-editor-models/manifests';
+import { manifests as propertyEditorUIManifests } from '../src/backoffice/property-editor-uis/manifests';
+import { manifests as treeManifests } from '../src/backoffice/trees/manifests';
+import { manifests as editorManifests } from '../src/backoffice/editors/manifests';
+import { manifests as propertyActionManifests } from '../src/backoffice/property-actions/manifests';
+
+import { umbExtensionsRegistry } from '../src/core/extensions-registry';
+
+import '../src/core/context-api/provide/context-provider.element';
+import '../src/core/css/custom-properties.css';
+import '../src/backoffice/components/backoffice-modal-container.element';
 
 class UmbStoryBookElement extends LitElement {
 	_umbIconStore = new UmbIconStore();
@@ -33,6 +37,20 @@ class UmbStoryBookElement extends LitElement {
 	constructor() {
 		super();
 		this._umbIconStore.attach(this);
+
+		this._registerExtensions(sectionManifests);
+		this._registerExtensions(treeManifests);
+		this._registerExtensions(editorManifests);
+		this._registerExtensions(propertyEditorModelManifests);
+		this._registerExtensions(propertyEditorUIManifests);
+		this._registerExtensions(propertyActionManifests);
+	}
+
+	_registerExtensions(manifests) {
+		manifests.forEach((manifest) => {
+			if (umbExtensionsRegistry.isRegistered(manifest.alias)) return;
+			umbExtensionsRegistry.register(manifest);
+		});
 	}
 
 	render() {
@@ -44,10 +62,6 @@ customElements.define('umb-storybook', UmbStoryBookElement);
 
 const storybookProvider = (story) => html` <umb-storybook>${story()}</umb-storybook> `;
 
-const extensionRegistryProvider = (story) => html`
-	<umb-context-provider key="umbExtensionRegistry" .value=${extensionRegistry}>${story()}</umb-context-provider>
-`;
-
 const nodeStoreProvider = (story) => html`
 	<umb-context-provider key="umbNodeStore" .value=${new UmbNodeStore()}>${story()}</umb-context-provider>
 `;
@@ -58,18 +72,6 @@ const dataTypeStoreProvider = (story) => html`
 
 const documentTypeStoreProvider = (story) => html`
 	<umb-context-provider key="umbDocumentTypeStore" .value=${new UmbDocumentTypeStore()}
-		>${story()}</umb-context-provider
-	>
-`;
-
-const propertyEditorStoreProvider = (story) => html`
-	<umb-context-provider key="umbPropertyEditorStore" .value=${new UmbPropertyEditorStore()}
-		>${story()}</umb-context-provider
-	>
-`;
-
-const propertyEditorConfigStoreProvider = (story) => html`
-	<umb-context-provider key="umbPropertyEditorConfigStore" .value=${new UmbPropertyEditorConfigStore()}
 		>${story()}</umb-context-provider
 	>
 `;
@@ -88,12 +90,9 @@ initialize({ onUnhandledRequest });
 export const decorators = [
 	mswDecorator,
 	storybookProvider,
-	extensionRegistryProvider,
 	nodeStoreProvider,
 	dataTypeStoreProvider,
 	documentTypeStoreProvider,
-	propertyEditorStoreProvider,
-	propertyEditorConfigStoreProvider,
 	modalServiceProvider,
 ];
 

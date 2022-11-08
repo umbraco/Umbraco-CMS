@@ -4,13 +4,13 @@ import { customElement, state } from 'lit/decorators.js';
 import { UmbModalService } from '../../../../../core/services/modal';
 import { UmbDataTypeContext } from '../../data-type.context';
 import type { DataTypeDetails } from '../../../../../core/mocks/data/data-type.data';
-import type { UmbPropertyEditorStore } from '../../../../../core/stores/property-editor/property-editor.store';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { ManifestPropertyEditorUI } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
 import '../../../../property-editor-uis/shared/property-editor-config/property-editor-config.element';
+import '../../../../components/ref-property-editor-ui/ref-property-editor-ui.element';
 
 @customElement('umb-editor-view-data-type-edit')
 export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
@@ -29,37 +29,31 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Um
 	private _propertyEditorUIAlias = '';
 
 	@state()
-	private _propertyEditorAlias = '';
+	private _propertyEditorModelAlias = '';
 
 	@state()
 	private _data: Array<any> = [];
 
 	private _dataTypeContext?: UmbDataTypeContext;
-	private _propertyEditorStore?: UmbPropertyEditorStore;
 	private _modalService?: UmbModalService;
 
 	constructor() {
 		super();
 
-		this.consumeAllContexts(['umbDataTypeContext', 'umbPropertyEditorStore', 'umbModalService'], (result) => {
+		this.consumeAllContexts(['umbDataTypeContext', 'umbModalService'], (result) => {
 			this._dataTypeContext = result['umbDataTypeContext'];
-			this._propertyEditorStore = result['umbPropertyEditorStore'];
 			this._modalService = result['umbModalService'];
 			this._observeDataType();
 		});
 	}
 
 	private _observeDataType() {
-		if (!this._dataTypeContext || !this._propertyEditorStore) return;
+		if (!this._dataTypeContext) return;
 
 		this.observe<DataTypeDetails>(this._dataTypeContext.data, (dataType) => {
 			this._dataType = dataType;
 
 			if (!this._dataType) return;
-
-			if (this._dataType.propertyEditorAlias !== this._propertyEditorAlias) {
-				this._observePropertyEditor(this._dataType.propertyEditorAlias);
-			}
 
 			if (this._dataType.propertyEditorUIAlias !== this._propertyEditorUIAlias) {
 				this._observePropertyEditorUI(this._dataType.propertyEditorUIAlias);
@@ -80,18 +74,11 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Um
 				this._propertyEditorUIName = propertyEditorUI?.meta.label ?? propertyEditorUI?.name ?? '';
 				this._propertyEditorUIAlias = propertyEditorUI?.alias ?? '';
 				this._propertyEditorUIIcon = propertyEditorUI?.meta?.icon ?? '';
+				this._propertyEditorModelAlias = propertyEditorUI?.meta?.propertyEditorModel ?? '';
 
-				this._observePropertyEditor(propertyEditorUI?.meta?.propertyEditor ?? '');
+				this._dataTypeContext?.update({ propertyEditorModelAlias: this._propertyEditorModelAlias });
 			}
 		);
-	}
-
-	private _observePropertyEditor(propertyEditorAlias: string | null) {
-		if (!propertyEditorAlias || !this._propertyEditorStore) return;
-
-		this.observe(this._propertyEditorStore.getByAlias(propertyEditorAlias), (propertyEditor) => {
-			this._propertyEditorAlias = propertyEditor?.alias ?? '';
-		});
 	}
 
 	private _openPropertyEditorUIPicker() {
@@ -110,6 +97,7 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Um
 	private _selectPropertyEditorUI(propertyEditorUIAlias: string | null) {
 		if (!this._dataType || this._dataType.propertyEditorUIAlias === propertyEditorUIAlias) return;
 		this._dataTypeContext?.update({ propertyEditorUIAlias });
+		this._observePropertyEditorUI(propertyEditorUIAlias);
 	}
 
 	render() {
@@ -129,7 +117,7 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Um
 								slot="editor"
 								name=${this._propertyEditorUIName}
 								alias=${this._propertyEditorUIAlias}
-								property-editor-alias=${this._propertyEditorAlias}
+								property-editor-model-alias=${this._propertyEditorModelAlias}
 								border>
 								<uui-icon name="${this._propertyEditorUIIcon}" slot="icon"></uui-icon>
 								<uui-action-bar slot="actions">
@@ -151,11 +139,10 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Um
 
 	private _renderConfig() {
 		return html`
-			${this._propertyEditorAlias && this._propertyEditorUIAlias
+			${this._propertyEditorModelAlias && this._propertyEditorUIAlias
 				? html`
 						<uui-box headline="Config">
 							<umb-property-editor-config
-								property-editor-alias="${this._propertyEditorAlias}"
 								property-editor-ui-alias="${this._propertyEditorUIAlias}"
 								.data="${this._data}"></umb-property-editor-config>
 						</uui-box>

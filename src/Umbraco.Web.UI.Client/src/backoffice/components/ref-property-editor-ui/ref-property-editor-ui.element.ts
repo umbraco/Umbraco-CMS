@@ -29,8 +29,8 @@ export class UmbRefPropertyEditorUIElement extends UUIRefNodeElement {
 	 * @attr
 	 * @default ''
 	 */
-	@property({ type: String, attribute: 'property-editor-alias' })
-	propertyEditorAlias = '';
+	@property({ type: String, attribute: 'property-editor-model-alias' })
+	propertyEditorModelAlias = '';
 
 	protected renderDetail() {
 		const details: string[] = [];
@@ -39,9 +39,8 @@ export class UmbRefPropertyEditorUIElement extends UUIRefNodeElement {
 			details.push(this.alias);
 		}
 
-		// TODO: show message when there is no property editor data model
-		if (this.propertyEditorAlias !== '') {
-			details.push(this.propertyEditorAlias);
+		if (this.propertyEditorModelAlias !== '') {
+			details.push(this.propertyEditorModelAlias);
 		} else {
 			details.push('Property Editor Missing');
 		}
