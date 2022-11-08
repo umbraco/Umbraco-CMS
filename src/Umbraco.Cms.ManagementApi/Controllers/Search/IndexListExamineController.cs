@@ -29,13 +29,13 @@ public class IndexListSearchController : SearchControllerBase
     [HttpGet("index")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<IndexViewModel>), StatusCodes.Status200OK)]
-    public async Task<PagedViewModel<IndexViewModel>> Indexes(int skip, int take)
+    public Task<PagedViewModel<IndexViewModel>> Indexes(int skip, int take)
     {
         IndexViewModel[] indexes = _examineManager.Indexes
             .Select(_indexViewModelFactory.Create)
             .OrderBy(indexModel => indexModel.Name.TrimEnd("Indexer")).ToArray();
 
         var viewModel = new PagedViewModel<IndexViewModel> { Items = indexes.Skip(skip).Take(take), Total = indexes.Length };
-        return viewModel;
+        return Task.FromResult(viewModel);
     }
 }
