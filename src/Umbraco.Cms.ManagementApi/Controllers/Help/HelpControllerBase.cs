@@ -1,12 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using NSwag.Annotations;
 using Umbraco.New.Cms.Web.Common.Routing;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.Help;
 
 [ApiController]
 [VersionedApiBackOfficeRoute("help")]
-[OpenApiTag("Help")]
+[ApiExplorerSettings(GroupName = "Help")]
 [ApiVersion("1.0")]
 public abstract class HelpControllerBase : ManagementApiControllerBase
 {
