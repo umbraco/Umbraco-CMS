@@ -9,8 +9,9 @@ import '../../sections/users/picker-user.element';
 import '../../sections/users/picker-section.element';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import { UmbUserGroupStore } from 'src/core/stores/user/user-group.store';
-import type { ManifestEditorAction, ManifestWithLoader, UserGroupDetails } from '@umbraco-cms/models';
+import type { ManifestEditorAction, ManifestWithLoader, UserDetails, UserGroupDetails } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
+import { UmbUserStore } from 'src/core/stores/user/user.store';
 
 @customElement('umb-editor-user-group')
 export class UmbEditorUserGroupElement extends UmbContextProviderMixin(
@@ -79,7 +80,11 @@ export class UmbEditorUserGroupElement extends UmbContextProviderMixin(
 	@state()
 	private _userGroup?: UserGroupDetails | null;
 
+	@state()
+	private _userKeys: Array<string> = [];
+
 	private _userGroupStore?: UmbUserGroupStore;
+	private _userStore?: UmbUserStore;
 	private _userGroupContext?: UmbUserGroupContext;
 
 	defaultPermissions: Array<{
@@ -221,13 +226,20 @@ export class UmbEditorUserGroupElement extends UmbContextProviderMixin(
 	connectedCallback(): void {
 		super.connectedCallback();
 
-		this.consumeContext('umbUserGroupStore', (userGroupContext: UmbUserGroupStore) => {
-			this._userGroupStore = userGroupContext;
-			this._observeUser();
+		this.consumeContext('umbUserGroupStore', (userGroupStore: UmbUserGroupStore) => {
+			this._userGroupStore = userGroupStore;
+			this._observeUserGroup();
+		});
+
+		this.consumeContext('umbUserStore', (userStore: UmbUserStore) => {
+			this._userStore = userStore;
+			console.log('users updated');
+
+			this._observeUsers();
 		});
 	}
 
-	private _observeUser() {
+	private _observeUserGroup() {
 		if (!this._userGroupStore) return;
 
 		this.observe(this._userGroupStore.getByKey(this.entityKey), (userGroup) => {
@@ -240,6 +252,15 @@ export class UmbEditorUserGroupElement extends UmbContextProviderMixin(
 			} else {
 				this._userGroupContext.update(this._userGroup);
 			}
+		});
+	}
+
+	private _observeUsers() {
+		if (!this._userStore) return;
+
+		// TODO: Create method to only get users from this userGroup
+		this.observe(this._userStore.getAll(), (users: Array<UserDetails>) => {
+			this._userKeys = users.filter((user) => user.userGroups.includes(this.entityKey)).map((user) => user.key);
 		});
 	}
 
@@ -316,7 +337,9 @@ export class UmbEditorUserGroupElement extends UmbContextProviderMixin(
 	private renderRightColumn() {
 		return html`<uui-box>
 			<div slot="headline">Users</div>
-			<umb-picker-user @change=${(e: any) => console.log('USER PICKER NOT IMPLEMENTED')}></umb-picker-user>
+			<umb-picker-user
+				@change=${(e: any) => console.log('USER PICKER NOT IMPLEMENTED')}
+				.value=${this._userKeys}></umb-picker-user>
 		</uui-box>`;
 	}
 
