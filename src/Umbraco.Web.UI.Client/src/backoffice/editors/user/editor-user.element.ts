@@ -180,7 +180,7 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(
 		}
 	}
 
-	private _updateProperty(propertyName: string, value: string) {
+	private _updateProperty(propertyName: string, value: unknown) {
 		this._userContext?.update({ [propertyName]: value });
 	}
 

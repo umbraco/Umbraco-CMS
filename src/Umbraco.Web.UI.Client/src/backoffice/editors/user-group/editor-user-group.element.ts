@@ -264,8 +264,31 @@ export class UmbEditorUserGroupElement extends UmbContextProviderMixin(
 		});
 	}
 
-	private _updateProperty(propertyName: string, value: string) {
+	private _updateProperty(propertyName: string, value: unknown) {
 		this._userGroupContext?.update({ [propertyName]: value });
+	}
+
+	private _updatePermission(permission: { name: string; description: string; value: boolean }) {
+		if (!this._userGroupContext) return;
+
+		const checkValue = this._checkPermission(permission);
+		const selectedPermissions = this._userGroupContext.getData().permissions;
+
+		let newPermissions = [];
+		if (checkValue === false) {
+			newPermissions = [...selectedPermissions, permission.name];
+			console.log('add permission', newPermissions);
+		} else {
+			newPermissions = selectedPermissions.filter((p) => p !== permission.name);
+			console.log('remove permission', newPermissions);
+		}
+		this._updateProperty('permissions', newPermissions);
+	}
+
+	private _checkPermission(permission: { name: string; description: string; value: boolean }) {
+		if (!this._userGroupContext) return false;
+
+		return this._userGroupContext.getData().permissions.includes(permission.name);
 	}
 
 	private renderLeftColumn() {
@@ -312,10 +335,8 @@ export class UmbEditorUserGroupElement extends UmbContextProviderMixin(
 									(permission) => html`
 										<div class="default-permission">
 											<uui-toggle
-												.checked=${permission.value}
-												@change=${(e: Event) => {
-													permission.value = (e.target as HTMLInputElement).checked;
-												}}></uui-toggle>
+												.checked=${this._checkPermission(permission)}
+												@change=${() => this._updatePermission(permission)}></uui-toggle>
 											<div class="permission-info">
 												<b>${permission.name}</b>
 												<span class="faded-text">${permission.description}</span>

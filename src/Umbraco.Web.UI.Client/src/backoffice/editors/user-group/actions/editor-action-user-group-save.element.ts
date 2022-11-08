@@ -37,7 +37,7 @@ export class UmbEditorActionUserGroupSaveElement extends UmbContextConsumerMixin
 			this._saveButtonState = 'waiting';
 			const user = this._userGroupContext.getData();
 			await this._userGroupStore.save([user]);
-			const notificationData: UmbNotificationDefaultData = { message: 'User Saved' };
+			const notificationData: UmbNotificationDefaultData = { message: 'User Group Saved' };
 			this._notificationService?.peek('positive', { data: notificationData });
 			this._saveButtonState = 'success';
 		} catch (error) {
