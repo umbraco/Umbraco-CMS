@@ -42,7 +42,8 @@
         const allowedUploadFiles = mediaHelper.formatFileTypes(umbracoSettings.allowedUploadFiles);
         const allowedImageFileTypes = mediaHelper.formatFileTypes(umbracoSettings.imageFileTypes);
         const disallowedUploadFiles = umbracoSettings.disallowedUploadFiles !== '' ? mediaHelper.formatFileTypes(umbracoSettings.disallowedUploadFiles).split(',').map(fileExtension => `!${fileExtension}`).join(',') : '';
-        vm.serverFileExtensionsPattern = `${allowedUploadFiles},${allowedImageFileTypes},${disallowedUploadFiles}`;
+        vm.serverFileExtensionsPattern = `${allowedUploadFiles},${allowedImageFileTypes}`;
+        console.log(vm.serverFileExtensionsPattern);
         vm.maxFileSize = umbracoSettings.maxFileSize !== '' ? `${umbracoSettings.maxFileSize} KB` : '';
         vm.loading = true;
 
@@ -59,6 +60,7 @@
         vm.editMedia = editMedia;
         vm.removeMedia = removeMedia;
         vm.copyMedia = copyMedia;
+        vm.allowDir = true;
 
         vm.labels = {};
 
@@ -86,10 +88,6 @@
             vm.model.config.crops = vm.model.config.crops || [];
             vm.singleMode = vm.validationLimit.max === 1;
             vm.allowedTypes = vm.model.config.filter ? vm.model.config.filter.split(",") : null;
-
-            mediaTypeResource.getByAlias(vm.allowedTypes).then(mediaTypes => {
-                vm.allowedMediaTypes = mediaTypes;
-            });
 
             copyAllMediasAction = {
                 labelKey: "clipboard_labelForCopyAllEntries",
@@ -146,68 +144,153 @@
                 vm.allowEdit = hasAccessToMedia;
                 vm.allowAdd = hasAccessToMedia;
 
-                vm.loading = false;
+                mediaTypeResource.getByAlias(vm.allowedTypes).then(mediaTypes => {
+                    vm.allowedMediaTypes = mediaTypes;
+                    vm.loading = false;
+                });
             });
-
         };
 
+        vm.queue = [];
+        vm.invalidEntries = [];
+
         function handleFiles (files, event, invalidFiles) {
-            vm.invalidFiles = [...invalidFiles];
-
-            files.forEach(file => {
-                const uploadFileExtensions = files.map(file => mediaHelper.getFileExtension(file.name));
-                const matchedMediaTypes = mediaTypeHelper.getTypeAcceptingFileExtensions(vm.allowedMediaTypes, uploadFileExtensions);
-
-                /*
-                let mediaTypeAlias = '';
-                
-                if (matchedMediaTypes.length === 0) {
-                    console.log('Error, this file type is not allowed');
-                    return;
-                };
-    
-                if (matchedMediaTypes.length === 1) {
-                    mediaTypeAlias = matchedMediaTypes[0].alias;
-                };
-    
-                if (matchedMediaTypes.length > 1) {
-                    console.log('we need to prompt here');
-                };
-                */
-
-                const tempMediaEntry = {
-                    key: String.CreateGuid(),
+            vm.invalidEntries = invalidFiles.map(file => {
+                return {
                     name: file.name,
+                    key: String.CreateGuid(),
+                    error: file.$error,
+                    errorMessages: file.$errorMessages
+                }
+            });
+
+            const queueItems = files.map(file => {
+                const tempMediaEntry = {
+                    name: file.name,
+                    key: String.CreateGuid(),
                     uploadProgress: 0,
                     dataURL: ''
-                    //mediaTypeAlias
                 };
 
+                /*
                 Upload.base64DataUrl(file).then(function(url) {    
                     tempMediaEntry.dataURL = url;
                 });
+                */
 
-                vm.model.value.push(tempMediaEntry);
-                _upload(file, tempMediaEntry);
+                return {
+                    tempMediaEntry: tempMediaEntry,
+                    file: file
+                };
             });
+
+            // angular complains about "Illegal invocation" if the file is part of the model.value
+            // so we have to keep them separate
+            queueItems.forEach(queueItem => vm.model.value.push(queueItem.tempMediaEntry));
+
+            _queueItems(queueItems);
+            _processQueue();
         };
 
-        function _upload(file, tempMediaEntry) {
+        function _queueItems (queueItems) {
+            vm.queue = [...vm.queue, ...queueItems];
+        }
+
+        function _processQueue () {
+            const nextItem = vm.queue.shift();
+
+            // queue is empty
+            if (!nextItem) return;
+
+            _getMatchedMediaType(nextItem.file).then(mediaTypeAlias => {
+                nextItem.mediaTypeAlias = mediaTypeAlias;
+                _upload(nextItem);
+            }, () => {
+                nextItem.tempMediaEntry.error = 'pattern';
+                nextItem.tempMediaEntry.errorMessages = { pattern: true };
+                vm.invalidEntries.push(nextItem.tempMediaEntry);
+                _processQueue();
+            });
+        }
+
+        function _getMatchedMediaType(file) {
+            return new Promise((resolve, reject) => {
+                const uploadFileExtension = mediaHelper.getFileExtension(file.name);
+                const matchedMediaTypes = mediaTypeHelper.getTypeAcceptingFileExtensions(vm.allowedMediaTypes, [uploadFileExtension]);
+                
+                if (matchedMediaTypes.length === 0) {
+                    reject();
+                };
+    
+                if (matchedMediaTypes.length === 1) {
+                    resolve(matchedMediaTypes[0].alias);
+                    return
+                };
+    
+                if (matchedMediaTypes.length > 1) {
+                    _chooseMediaTypeDialog(matchedMediaTypes)
+                    .then((selectedMediaType) => {
+                        resolve(selectedMediaType.alias);
+                    }, () => {
+                        reject();
+                    });
+                };
+            });
+        }
+
+        function _upload(queueItem) {
             Upload.upload({
-                    url: umbRequestHelper.getApiUrl("tinyMceApiBaseUrl", "UploadImage"),
-                    file: file
+                    url: umbRequestHelper.getApiUrl("mediaPickerThreeBaseUrl", "uploadMedia"),
+                    file: queueItem.file
                 })
                 .progress(function(evt) {
                     var progressPercentage = parseInt(100.0 * evt.loaded / evt.total, 10);
-                    tempMediaEntry.uploadProgress = progressPercentage;
+                    queueItem.tempMediaEntry.uploadProgress = progressPercentage;
                 })
-                .success(function (data, status, headers, config) {
-                    tempMediaEntry.tmpLocation = data.tmpLocation;
-                    updateMediaEntryData(tempMediaEntry);
+                .success(function (data) {
+                    updateMediaEntryData(queueItem.tempMediaEntry);
+                    _processQueue();
                 })
-                .error(function(evt, status, headers, config) {
-                    console.log("error", file);
+                .error(function(error) {
+                    queueItem.tempMediaEntry.error = 'server';
+                    tempMediaEntry.errorMessages = {
+                        server: true
+                    };
+                    tempMediaEntry.serverErrorMessage = error.Message;
+                    vm.invalidEntries.push(tempMediaEntry);
+                    _processQueue();
                 });
+        }
+
+        function _chooseMediaTypeDialog(mediaTypes) {
+            return new Promise((resolve, reject) => {
+                localizationService.localizeMany(["defaultdialogs_selectMediaType", "mediaType_autoPickMediaType"]).then(function (translations) {
+                    const autoSelect = {
+                        alias: "umbracoAutoSelect",
+                        name: translations[1],
+                        icon: "icon-wand"
+                    };
+
+                    mediaTypes.push(autoSelect);
+    
+                    const dialog = {
+                        view: "itempicker",
+                        filter: mediaTypes.length > 8,
+                        availableItems: mediaTypes,
+                        submit: function (model) {
+                            resolve(model.selectedItem.alias);
+                            overlayService.close();
+                        },
+                        close: function () {
+                            reject();
+                            overlayService.close();
+                        }
+                    };
+    
+                    dialog.title = translations[0];
+                    overlayService.open(dialog);
+                });
+            });
         }
 
         function onServerValueChanged(newVal, oldVal) {
