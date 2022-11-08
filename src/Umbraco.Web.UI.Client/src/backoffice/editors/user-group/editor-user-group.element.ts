@@ -280,8 +280,8 @@ export class UmbEditorUserGroupElement extends UmbContextProviderMixin(
 						@change=${(e: any) => this._updateProperty('sections', e.target.value)}></umb-picker-section>
 				</umb-editor-property-layout>
 				<umb-editor-property-layout
-					label="Content start nodes"
-					description="Limit the content tree to specific start nodes">
+					label="Content start node"
+					description="Limit the content tree to a specific start node">
 					<uui-ref-node slot="editor" name="Content Root" border>
 						<uui-icon slot="icon" name="folder"></uui-icon>
 						<uui-button slot="actions" label="change"></uui-button>
@@ -289,8 +289,8 @@ export class UmbEditorUserGroupElement extends UmbContextProviderMixin(
 					</uui-ref-node>
 				</umb-editor-property-layout>
 				<umb-editor-property-layout
-					label="Media start nodes"
-					description="Limit the media library to specific start nodes">
+					label="Media start node"
+					description="Limit the media library to a specific start node">
 					<uui-ref-node slot="editor" name="Media Root" border>
 						<uui-icon slot="icon" name="folder"></uui-icon>
 						<uui-button slot="actions" label="change"></uui-button>

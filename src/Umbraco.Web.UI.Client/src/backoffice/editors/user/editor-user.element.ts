@@ -4,6 +4,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 
+import { repeat } from 'lit-html/directives/repeat.js';
 import { UmbUserStore } from '../../../core/stores/user/user.store';
 import { getTagLookAndColor } from '../../sections/users/user-extensions';
 import { UmbUserContext } from './user.context';
@@ -183,6 +184,29 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(
 		this._userContext?.update({ [propertyName]: value });
 	}
 
+	private _renderContentStartNodes() {
+		if (!this._user) return;
+
+		if (this._user.contentStartNodes.length < 1)
+			return html`
+				<uui-ref-node name="Content Root">
+					<uui-icon slot="icon" name="folder"></uui-icon>
+				</uui-ref-node>
+			`;
+
+		return repeat(
+			this._user.contentStartNodes,
+			(node) => node,
+			(node) => {
+				return html`
+					<uui-ref-node name=${node}>
+						<uui-icon slot="icon" name="folder"></uui-icon>
+					</uui-ref-node>
+				`;
+			}
+		);
+	}
+
 	private renderLeftColumn() {
 		if (!this._user) return nothing;
 
@@ -225,9 +249,7 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(
 				</div>
 
 				<b>Content</b>
-				<uui-ref-node name="Content Root">
-					<uui-icon slot="icon" name="folder"></uui-icon>
-				</uui-ref-node>
+				${this._renderContentStartNodes()}
 				<hr />
 				<b>Media</b>
 				<uui-ref-node name="Media Root">
