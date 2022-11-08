@@ -277,10 +277,8 @@ export class UmbEditorUserGroupElement extends UmbContextProviderMixin(
 		let newPermissions = [];
 		if (checkValue === false) {
 			newPermissions = [...selectedPermissions, permission.name];
-			console.log('add permission', newPermissions);
 		} else {
 			newPermissions = selectedPermissions.filter((p) => p !== permission.name);
-			console.log('remove permission', newPermissions);
 		}
 		this._updateProperty('permissions', newPermissions);
 	}
