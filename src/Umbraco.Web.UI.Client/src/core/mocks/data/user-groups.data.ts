@@ -18,6 +18,7 @@ export const data: Array<UserGroupDetails> = [
 		hasChildren: false,
 		isTrashed: false,
 		sections: [],
+		permissions: [],
 	},
 	{
 		key: '9a9ad4e9-3b5b-4fe7-b0d9-e301b9675949',
@@ -28,6 +29,7 @@ export const data: Array<UserGroupDetails> = [
 		hasChildren: false,
 		isTrashed: false,
 		sections: [],
+		permissions: [],
 	},
 	{
 		key: 'b847398a-6875-4d7a-9f6d-231256b81471',
@@ -38,6 +40,7 @@ export const data: Array<UserGroupDetails> = [
 		hasChildren: false,
 		isTrashed: false,
 		sections: [],
+		permissions: [],
 	},
 	{
 		key: '2668f09b-320c-48a7-a78a-95047026ec0e',
@@ -48,6 +51,7 @@ export const data: Array<UserGroupDetails> = [
 		hasChildren: false,
 		isTrashed: false,
 		sections: [],
+		permissions: [],
 	},
 	{
 		key: '397f3a8b-4ca3-4b01-9dd3-94e5c9eaa9b2',
@@ -58,6 +62,7 @@ export const data: Array<UserGroupDetails> = [
 		hasChildren: false,
 		isTrashed: false,
 		sections: [],
+		permissions: [],
 	},
 ];
 
