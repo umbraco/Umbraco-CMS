@@ -1,6 +1,6 @@
 import { html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { UmbModalOptions, UmbModalService, UmbModalType } from '../../../core/services/modal';
+import { UmbModalService, UmbModalType } from '../../../core/services/modal';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
 //TODO: These should probably be imported dynamically.

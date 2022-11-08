@@ -80,8 +80,8 @@ export interface UserDetails extends UserEntity {
 	createDate: string;
 	failedLoginAttempts: number;
 	userGroups: Array<string>;
-	contentStartNode?: string;
-	mediaStartNode?: string;
+	contentStartNodes: Array<string>;
+	mediaStartNodes: Array<string>;
 }
 
 export interface UserGroupEntity extends Entity {
