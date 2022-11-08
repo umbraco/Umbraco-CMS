@@ -172,11 +172,12 @@
                     dataURL: ''
                 };
 
-                /*
-                Upload.base64DataUrl(file).then(function(url) {    
-                    tempMediaEntry.dataURL = url;
-                });
-                */
+
+                if (file.type.includes('image')) {
+                    Upload.base64DataUrl(file).then(function(url) {    
+                        tempMediaEntry.dataURL = url;
+                    });
+                }
 
                 return {
                     tempMediaEntry: tempMediaEntry,
