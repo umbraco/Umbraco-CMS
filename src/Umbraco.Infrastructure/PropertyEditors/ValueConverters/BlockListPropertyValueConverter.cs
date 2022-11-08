@@ -43,7 +43,7 @@ public class BlockListPropertyValueConverter : PropertyValueConverterBase
             ModelType? contentElementType = block?.ContentElementTypeKey is Guid contentElementTypeKey && _contentTypeService.Get(contentElementTypeKey) is IContentType contentType ? ModelType.For(contentType.Alias) : null;
             ModelType? settingsElementType = block?.SettingsElementTypeKey is Guid settingsElementTypeKey && _contentTypeService.Get(settingsElementTypeKey) is IContentType settingsType ? ModelType.For(settingsType.Alias) : null;
 
-            if (contentElementType != null)
+            if (contentElementType is not null)
             {
                 if (settingsElementType != null)
                 {
