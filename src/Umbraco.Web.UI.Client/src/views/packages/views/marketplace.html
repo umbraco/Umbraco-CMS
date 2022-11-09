@@ -3,11 +3,11 @@
   ng-controller="Umbraco.Editors.Packages.MarketplaceController as vm"
 >
   <iframe
+    ng-if="vm.marketplaceUrl"
     ng-src="{{ vm.marketplaceUrl }}"
     class="umb-marketplace-view"
     title="Umbraco Marketplace"
     allowfullscreen
     allow="geolocation; autoplay; clipboard-write; encrypted-media"
-    ng-on-load="vm.onLoad($event)"
   ></iframe>
 </div>
