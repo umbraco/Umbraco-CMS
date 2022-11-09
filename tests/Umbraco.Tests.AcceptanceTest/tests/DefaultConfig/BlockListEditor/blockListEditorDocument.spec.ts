@@ -41,6 +41,9 @@ test.describe('BlockListEditorDocument', () => {
     await page.locator('[title="Create a new configuration of Block List"]').click();
     await page.locator('[id="dataTypeName"]').fill(blockListName);
     await page.locator('[data-element="editor-data-type-settings"]').locator('[label-key=' + ConstantHelper.buttons.submit + ']').click();
+    // Checks to be sure that the clicked button is not visible
+    await expect(page.locator('[data-element="editor-data-type-settings"]').locator('[label-key=' + ConstantHelper.buttons.submit + ']')).not.toBeVisible();
+    // Checks to ensure that the button is visible
     await expect(page.locator('[name="propertySettingsForm"]').locator('[label-key=' + ConstantHelper.buttons.submit + ']')).toBeVisible();
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.submit));
     
