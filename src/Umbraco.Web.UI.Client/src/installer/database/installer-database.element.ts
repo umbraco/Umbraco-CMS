@@ -183,7 +183,7 @@ export class UmbInstallerDatabaseElement extends UmbContextConsumerMixin(UmbObse
 			// Validate connection
 			const selectedDatabase = this._databases.find((x) => x.id === id);
 
-			if (!selectedDatabase) {
+			if (!selectedDatabase || !selectedDatabase.providerName || !selectedDatabase.id) {
 				this._validationErrorMessage = 'No database selected';
 				this._installButton.state = 'failed';
 				return;
@@ -205,7 +205,7 @@ export class UmbInstallerDatabaseElement extends UmbContextConsumerMixin(UmbObse
 							password,
 							server,
 							useIntegratedAuthentication,
-							providerName: selectedDatabase.providerName!,
+							providerName: selectedDatabase.providerName,
 						};
 					}
 					await InstallResource.postUmbracoManagementApiV1InstallValidateDatabase({ requestBody: databaseDetails });
@@ -231,7 +231,7 @@ export class UmbInstallerDatabaseElement extends UmbContextConsumerMixin(UmbObse
 				name,
 				useIntegratedAuthentication,
 				connectionString,
-				providerName: selectedDatabase.providerName!,
+				providerName: selectedDatabase.providerName,
 			};
 
 			this._installerContext?.appendData({ database });
