@@ -42,7 +42,7 @@
         const allowedUploadFiles = mediaHelper.formatFileTypes(umbracoSettings.allowedUploadFiles);
         const allowedImageFileTypes = mediaHelper.formatFileTypes(umbracoSettings.imageFileTypes);
         const disallowedUploadFiles = umbracoSettings.disallowedUploadFiles !== '' ? mediaHelper.formatFileTypes(umbracoSettings.disallowedUploadFiles).split(',').map(fileExtension => `!${fileExtension}`).join(',') : '';
-        vm.serverFileExtensionsPattern = `${allowedUploadFiles},${allowedImageFileTypes}`;
+        vm.serverFileExtensionsPattern = `${allowedUploadFiles},${allowedImageFileTypes},${disallowedUploadFiles}`;
         console.log(vm.serverFileExtensionsPattern);
         vm.maxFileSize = umbracoSettings.maxFileSize !== '' ? `${umbracoSettings.maxFileSize} KB` : '';
         vm.loading = true;
