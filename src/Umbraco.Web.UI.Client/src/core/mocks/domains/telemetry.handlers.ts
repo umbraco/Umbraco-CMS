@@ -31,7 +31,7 @@ export const handlers = [
 		);
 	}),
 
-	rest.post<Telemetry>(umbracoPath('/telemetry/ConsentLevel'), async (_req, res, ctx) => {
+	rest.post<Telemetry>(umbracoPath('/telemetry/level'), async (_req, res, ctx) => {
 		const newLevel = (await _req.json<Telemetry>()).telemetryLevel;
 		if (newLevel) {
 			telemetryLevel = newLevel;

@@ -41,9 +41,11 @@ export class UmbDashboardTelemetryElement extends LitElement {
 			this._telemetryLevels = consentLevels.items ?? [];
 		} catch (e) {
 			if (e instanceof ApiError) {
-				this._errorMessage = e.message;
+				const error = e.body as ProblemDetails;
+				this._errorMessage = error.detail;
 			}
 		}
+
 		try {
 			const consentSetting = await TelemetryResource.getUmbracoManagementApiV1TelemetryLevel();
 			this._telemetryFormData = consentSetting.telemetryLevel ?? TelemetryLevel.BASIC;
@@ -83,20 +85,20 @@ export class UmbDashboardTelemetryElement extends LitElement {
 	}
 
 	private get _selectedTelemetryIndex() {
-		return this._telemetryLevels?.findIndex((x) => x === this._telemetryFormData) ?? 0;
+		return this._telemetryLevels.findIndex((x) => x.telemetryLevel === this._telemetryFormData) ?? 0;
 	}
 
 	private get _selectedTelemetry() {
-		return this._telemetryLevels?.find((x) => x === this._telemetryFormData) ?? this._telemetryLevels[0];
+		return this._telemetryLevels.find((x) => x.telemetryLevel === this._telemetryFormData) ?? this._telemetryLevels[1];
 	}
 
 	private get _selectedTelemetryDescription() {
-		switch (this._selectedTelemetry) {
-			case 'Minimal':
+		switch (this._selectedTelemetry.telemetryLevel) {
+			case TelemetryLevel.MINIMAL:
 				return 'We will only send an anonymized site ID to let us know that the site exists.';
-			case 'Basic':
+			case TelemetryLevel.BASIC:
 				return 'We will send an anonymized site ID, Umbraco version, and packages installed.';
-			case 'Detailed':
+			case TelemetryLevel.DETAILED:
 				return `We will send:<ul>
 				<li>Anonymized site ID, Umbraco version, and packages installed.</li>
 				<li>Number of: Root nodes, Content nodes, Macros, Media, Document Types, Templates, Languages, Domains, User Group, Users, Members, and Property Editors in use.</li>
@@ -123,7 +125,7 @@ export class UmbDashboardTelemetryElement extends LitElement {
 				min="1"
 				max=${this._telemetryLevels.length}
 				hide-step-values></uui-slider>
-			<h2>${this._selectedTelemetry}</h2>
+			<h2>${this._selectedTelemetry.telemetryLevel}</h2>
 			<p>${unsafeHTML(this._selectedTelemetryDescription)}</p>
 		`;
 	}
@@ -147,6 +149,7 @@ export class UmbDashboardTelemetryElement extends LitElement {
 						Save
 					</uui-button>
 				</div>
+				${this._errorMessage ? html`<p class="error">${this._errorMessage}</p>` : ''}
 			</uui-box>
 		`;
 	}
