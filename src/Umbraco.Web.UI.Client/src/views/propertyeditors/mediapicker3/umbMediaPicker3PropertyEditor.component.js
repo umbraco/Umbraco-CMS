@@ -236,7 +236,7 @@
                 if (matchedMediaTypes.length > 1) {
                     _chooseMediaTypeDialog(matchedMediaTypes)
                     .then((selectedMediaType) => {
-                        resolve(selectedMediaType.alias);
+                        resolve(selectedMediaType);
                     }, () => {
                         reject();
                     });
