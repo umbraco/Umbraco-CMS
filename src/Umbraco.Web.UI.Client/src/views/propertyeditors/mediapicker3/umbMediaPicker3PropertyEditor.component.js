@@ -278,15 +278,7 @@
 
         function _chooseMediaTypeDialog(mediaTypes) {
             return new Promise((resolve, reject) => {
-                localizationService.localizeMany(["defaultdialogs_selectMediaType", "mediaType_autoPickMediaType"]).then(function (translations) {
-                    const autoSelect = {
-                        alias: "umbracoAutoSelect",
-                        name: translations[1],
-                        icon: "icon-wand"
-                    };
-
-                    mediaTypes.push(autoSelect);
-    
+                localizationService.localizeMany(["defaultdialogs_selectMediaType", "mediaType_autoPickMediaType"]).then(function (translations) {    
                     const dialog = {
                         view: "itempicker",
                         filter: mediaTypes.length > 8,
