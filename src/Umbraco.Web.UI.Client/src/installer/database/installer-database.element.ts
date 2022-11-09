@@ -283,7 +283,7 @@ export class UmbInstallerDatabaseElement extends UmbContextConsumerMixin(UmbObse
 		}
 
 		result.push(
-			this._renderDatabaseName(this.databaseFormData.providerName ?? this._selectedDatabase.defaultDatabaseName)
+			this._renderDatabaseName(this.databaseFormData.name ?? this._selectedDatabase.defaultDatabaseName ?? 'umbraco')
 		);
 
 		if (this._selectedDatabase.requiresCredentials) {

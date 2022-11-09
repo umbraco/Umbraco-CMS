@@ -93,13 +93,13 @@ export const handlers = [
 	}),
 
 	rest.post(umbracoPath('/install/setup'), async (req, res, ctx) => {
-		await new Promise((resolve) => setTimeout(resolve, (Math.random() + 1) * 1000)); // simulate a delay of 1-2 seconds
 		const body = await req.json<Install>();
 
 		if (body.database?.name === 'fail') {
 			return res(
 				// Respond with a 200 status code
 				ctx.status(400),
+				ctx.delay(1000),
 				ctx.json<ProblemDetails>({
 					type: 'validation',
 					status: 400,
