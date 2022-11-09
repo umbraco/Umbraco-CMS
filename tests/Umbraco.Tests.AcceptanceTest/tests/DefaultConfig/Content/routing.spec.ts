@@ -20,7 +20,6 @@ test.describe('Routing', () => {
   });
 
   test.afterEach(async ({page, umbracoApi}) => {
-    await umbracoApi.login();
     await umbracoApi.content.deleteAllContent();
     await umbracoApi.documentTypes.ensureNameNotExists(rootDocTypeName);
     await umbracoApi.languages.ensureCultureNotExists(danishCulture);
