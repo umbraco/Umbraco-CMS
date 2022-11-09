@@ -6,13 +6,9 @@ import { customElement, state } from 'lit/decorators.js';
 import { UmbModalService } from '../../../core/services/modal';
 import { UmbNotificationService } from '../../../core/services/notification';
 import { UmbNotificationDefaultData } from '../../../core/services/notification/layouts/default';
-import {
-	getPublishedCacheStatus,
-	postPublishedCacheReload,
-	postPublishedCacheRebuild,
-	getPublishedCacheCollect,
-} from '@umbraco-cms/backend-api';
+
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import { ApiError, ProblemDetails, PublishedCacheResource } from '@umbraco-cms/backend-api';
 
 @customElement('umb-dashboard-published-status')
 export class UmbDashboardPublishedStatusElement extends UmbContextConsumerMixin(LitElement) {
@@ -64,12 +60,12 @@ export class UmbDashboardPublishedStatusElement extends UmbContextConsumerMixin(
 
 	private async _getPublishedStatus() {
 		try {
-			const { data } = await getPublishedCacheStatus({});
+			const data = await PublishedCacheResource.getUmbracoManagementApiV1PublishedCacheStatus();
 			this._publishedStatusText = data;
 		} catch (e) {
-			if (e instanceof getPublishedCacheStatus.Error) {
-				const error = e.getActualType();
-				const data: UmbNotificationDefaultData = { message: error.data.detail ?? 'Something went wrong' };
+			if (e instanceof ApiError) {
+				const error = e.body as ProblemDetails
+				const data: UmbNotificationDefaultData = { message: error.detail ?? 'Something went wrong' };
 				this._notificationService?.peek('danger', { data });
 			}
 		}
@@ -85,16 +81,16 @@ export class UmbDashboardPublishedStatusElement extends UmbContextConsumerMixin(
 		this._buttonStateReload = 'waiting';
 		this._buttonState = 'waiting';
 		try {
-			await postPublishedCacheReload({});
+			await PublishedCacheResource.postUmbracoManagementApiV1PublishedCacheReload();
 			this._buttonStateReload = 'success';
 			this._getPublishedStatus();
 			this._buttonState = 'success';
 		} catch (e) {
 			this._buttonStateReload = 'failed';
 			this._buttonState = 'failed';
-			if (e instanceof postPublishedCacheReload.Error) {
-				const error = e.getActualType();
-				const data: UmbNotificationDefaultData = { message: error.data.detail ?? 'Something went wrong' };
+			if (e instanceof ApiError) {
+				const error = e.body as ProblemDetails;
+				const data: UmbNotificationDefaultData = { message: error.detail ?? 'Something went wrong' };
 				this._notificationService?.peek('danger', { data });
 			}
 		}
@@ -115,13 +111,13 @@ export class UmbDashboardPublishedStatusElement extends UmbContextConsumerMixin(
 	private async _rebuildDatabaseCache() {
 		this._buttonStateRebuild = 'waiting';
 		try {
-			await postPublishedCacheRebuild({});
+			await PublishedCacheResource.postUmbracoManagementApiV1PublishedCacheRebuild();
 			this._buttonStateRebuild = 'success';
 		} catch (e) {
 			this._buttonStateRebuild = 'failed';
-			if (e instanceof postPublishedCacheRebuild.Error) {
-				const error = e.getActualType();
-				const data: UmbNotificationDefaultData = { message: error.data.detail ?? 'Something went wrong' };
+			if (e instanceof ApiError) {
+				const error = e.body as ProblemDetails;
+				const data: UmbNotificationDefaultData = { message: error.detail ?? 'Something went wrong' };
 				this._notificationService?.peek('danger', { data });
 			}
 		}
@@ -141,12 +137,12 @@ export class UmbDashboardPublishedStatusElement extends UmbContextConsumerMixin(
 	//Collect
 	private async _cacheCollect() {
 		try {
-			await getPublishedCacheCollect({});
+			await PublishedCacheResource.postUmbracoManagementApiV1PublishedCacheCollect();
 			this._buttonStateCollect = 'success';
 		} catch (e) {
 			this._buttonStateCollect = 'failed';
-			if (e instanceof getPublishedCacheCollect.Error) {
-				const error = e.getActualType();
+			if (e instanceof ApiError) {
+				const error = e.body as ProblemDetails;
 				const data: UmbNotificationDefaultData = { message: error.data.detail ?? 'Something went wrong' };
 				this._notificationService?.peek('danger', { data });
 			}
