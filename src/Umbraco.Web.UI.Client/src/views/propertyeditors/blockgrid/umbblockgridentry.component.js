@@ -429,8 +429,6 @@
             const layoutContainerRect = layoutContainer.getBoundingClientRect();
             const layoutItemRect = $element[0].getBoundingClientRect();
 
-            console.log("mouseOverInlineCreateAbove", layoutItemRect.left, " > ", layoutContainerRect.left + 5)
-
             if(layoutItemRect.left > layoutContainerRect.left + 5) {
                 vm.hideInlineCreateAbove = true;
                 vm.inlineCreateAboveWidth = "";
