@@ -1,10 +1,9 @@
-import { html, LitElement } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
-import { getUpgradeSettings, PostUpgradeAuthorize } from '@umbraco-cms/backend-api';
-import type { UmbracoUpgrader } from '@umbraco-cms/models';
-
 import '../installer/shared/layout/installer-layout.element';
 import './upgrader-view.element';
+
+import { html, LitElement } from 'lit';
+import { customElement, state } from 'lit/decorators.js';
+import { ApiError, ProblemDetails, UpgradeResource, UpgradeSettings } from '@umbraco-cms/backend-api';
 
 /**
  * @element umb-upgrader
@@ -12,7 +11,7 @@ import './upgrader-view.element';
 @customElement('umb-upgrader')
 export class UmbUpgrader extends LitElement {
 	@state()
-	private upgradeSettings?: UmbracoUpgrader;
+	private upgradeSettings?: UpgradeSettings;
 
 	@state()
 	private fetching = true;
@@ -43,12 +42,12 @@ export class UmbUpgrader extends LitElement {
 		this.fetching = true;
 
 		try {
-			const { data } = await getUpgradeSettings({});
-
+			const data = await UpgradeResource.getUmbracoManagementApiV1UpgradeSettings();
 			this.upgradeSettings = data;
 		} catch (e) {
-			if (e instanceof getUpgradeSettings.Error) {
-				this.errorMessage = e.data.detail;
+			if (e instanceof ApiError) {
+				const error = e.body as ProblemDetails;
+				this.errorMessage = error.detail;
 			}
 		}
 
@@ -61,13 +60,13 @@ export class UmbUpgrader extends LitElement {
 		this.upgrading = true;
 
 		try {
-			await PostUpgradeAuthorize({});
+			await UpgradeResource.postUmbracoManagementApiV1UpgradeAuthorize();
 			history.pushState(null, '', '/');
 		} catch (e) {
-			if (e instanceof PostUpgradeAuthorize.Error) {
-				const error = e.getActualType();
-				if (error.status === 400) {
-					this.errorMessage = error.data.detail || 'Unknown error, please try again';
+			if (e instanceof ApiError) {
+				const error = e.body as ProblemDetails;
+				if (e.status === 400) {
+					this.errorMessage = error.detail || 'Unknown error, please try again';
 				}
 			} else {
 				this.errorMessage = 'Unknown error, please try again';
