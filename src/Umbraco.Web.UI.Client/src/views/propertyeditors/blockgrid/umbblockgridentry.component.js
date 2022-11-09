@@ -92,7 +92,9 @@
 
     function BlockGridEntryController($scope, $element, $timeout) {
 
-        var updateInlineCreateTimeout;
+        let updateInlineCreateTimeout;
+        let updateInlineCreateRaf;
+
         const unsubscribe = [];
         const vm = this;
         vm.areaGridColumns = '';
@@ -140,8 +142,12 @@
             vm.layoutColumnsInt = parseInt(vm.layoutColumns, 10);
 
             unsubscribe.push(vm.layoutEntry.$block.__scope.$watch(() => vm.layoutEntry.$block.index, (newVal, oldVal) => {
-                cancelAnimationFrame(raf);
-                raf = requestAnimationFrame(updateInlineCreate);
+                cancelAnimationFrame(updateInlineCreateRaf);
+                updateInlineCreateRaf = requestAnimationFrame(updateInlineCreate);
+            }));
+            unsubscribe.push(vm.layoutEntry.$block.__scope.$watch(() => vm.layoutEntry.columnSpan, (newVal, oldVal) => {
+                cancelAnimationFrame(updateInlineCreateRaf);
+                updateInlineCreateRaf = requestAnimationFrame(updateInlineCreate);
             }));
 
             updateInlineCreateTimeout = $timeout(updateInlineCreate, 500);
