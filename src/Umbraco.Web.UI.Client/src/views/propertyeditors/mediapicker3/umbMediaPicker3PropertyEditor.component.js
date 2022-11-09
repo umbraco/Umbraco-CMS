@@ -219,15 +219,20 @@
             return new Promise((resolve, reject) => {
                 const uploadFileExtension = mediaHelper.getFileExtension(file.name);
                 const matchedMediaTypes = mediaTypeHelper.getTypeAcceptingFileExtensions(vm.allowedMediaTypes, [uploadFileExtension]);
-                const matchedMediaTypesNoFile = matchedMediaTypes.filter(mediaType => mediaType.alias !== "File");
                 
                 if (matchedMediaTypes.length === 0) {
                     reject();
                     return;
                 };
                 
+                if (matchedMediaTypes.length === 1) {
+                    resolve(matchedMediaTypes[0].alias);
+                    return;
+                };
+
                 // when we get all media types, the "File" media type will always show up because it accepts all file extensions.
                 // If we don't remove it from the list we will always show the picker.
+                const matchedMediaTypesNoFile = matchedMediaTypes.filter(mediaType => mediaType.alias !== "File");
                 if (matchedMediaTypesNoFile.length === 1) {
                     resolve(matchedMediaTypesNoFile[0].alias);
                     return;
