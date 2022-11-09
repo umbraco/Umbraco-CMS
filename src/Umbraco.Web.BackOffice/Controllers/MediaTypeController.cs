@@ -137,7 +137,7 @@ public class MediaTypeController : ContentTypeControllerBase<IMediaType>
     /// </summary>
     /// /// <param name="alias">Alias of the media type</param>
     /// <returns></returns>
-    public IEnumerable<MediaTypeDisplay> GetFiltered([FromQuery] string[] aliases)
+    public IEnumerable<MediaTypeDisplay> GetAllFiltered([FromQuery] string[] aliases)
     {
         if (aliases.Length < 1)
         {
