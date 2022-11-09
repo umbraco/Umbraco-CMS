@@ -27,6 +27,7 @@ public static partial class Constants
         public const string ConfigHostingDebug = ConfigHostingPrefix + "Debug";
         public const string ConfigCustomErrorsMode = ConfigCustomErrorsPrefix + "Mode";
         public const string ConfigActiveDirectory = ConfigPrefix + "ActiveDirectory";
+        public const string ConfigMarketplace = ConfigPrefix + "Marketplace";
         public const string ConfigLegacyPasswordMigration = ConfigPrefix + "LegacyPasswordMigration";
         public const string ConfigContent = ConfigPrefix + "Content";
         public const string ConfigCoreDebug = ConfigCorePrefix + "Debug";

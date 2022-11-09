@@ -4,9 +4,7 @@
   function MarketplaceController($sce) {
 
     var vm = this;
-    var marketplaceUrl = new URL('https://dev.marketplace.umbraco.com');
-    marketplaceUrl.searchParams.set('umbversion', Umbraco.Sys.ServerVariables.application.version);
-    marketplaceUrl.searchParams.set('style', 'backoffice');
+    var marketplaceUrl = new URL(Umbraco.Sys.ServerVariables.umbracoUrls.marketplaceUrl);
 
     function init() {
       vm.marketplaceUrl = $sce.trustAsResourceUrl(marketplaceUrl.toString());
