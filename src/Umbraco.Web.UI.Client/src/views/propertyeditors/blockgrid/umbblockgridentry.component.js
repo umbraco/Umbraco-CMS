@@ -98,6 +98,8 @@
         vm.isHoveringArea = false;
         vm.isScaleMode = false;
         vm.layoutColumnsInt = 0;
+        vm.inlineCreateAboveWidth = "";
+        vm.hideInlineCreateAbove = true;
         vm.hideInlineCreateAfter = true;
 
         vm.proxyProperties = [];
@@ -407,10 +409,38 @@
         }
 
 
+        vm.clickInlineCreateAbove = function($event) {
+            if(vm.hideInlineCreateAbove === false) {
+                vm.blockEditorApi.requestShowCreate(vm.parentBlock, vm.areaKey, vm.index, $event);
+            }
+        }
         vm.clickInlineCreateAfter = function($event) {
             if(vm.hideInlineCreateAfter === false) {
                 vm.blockEditorApi.requestShowCreate(vm.parentBlock, vm.areaKey, vm.index+1, $event, {'fitInRow': true});
             }
+        }
+        vm.mouseOverInlineCreateAbove = function() {
+
+            layoutContainer = $element[0].closest('.umb-block-grid__layout-container');
+            if(!layoutContainer) {
+                return;
+            }
+
+            const layoutContainerRect = layoutContainer.getBoundingClientRect();
+            const layoutItemRect = $element[0].getBoundingClientRect();
+
+            console.log("mouseOverInlineCreateAbove", layoutItemRect.left, " > ", layoutContainerRect.left + 5)
+
+            if(layoutItemRect.left > layoutContainerRect.left + 5) {
+                vm.hideInlineCreateAbove = true;
+                vm.inlineCreateAboveWidth = "";
+                return;
+            }
+
+            vm.inlineCreateAboveWidth = layoutContainerRect.width + "px";
+            vm.hideInlineCreateAbove = false;
+            vm.blockEditorApi.internal.showAreaHighlight(vm.parentBlock, vm.areaKey);
+
         }
         vm.mouseOverInlineCreateAfter = function() {
 

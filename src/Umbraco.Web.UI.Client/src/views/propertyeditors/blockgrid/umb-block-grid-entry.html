@@ -1,11 +1,17 @@
 <uui-button-inline-create
-    ng-if="!vm.blockEditorApi.readonly"
+    ng-if="!vm.blockEditorApi.readonly && !vm.hideInlineCreateAbove"
     class="umb-block-grid__block--inline-create-button --above"
+    style="width: {{vm.inlineCreateAboveWidth}};"
     ng-class="{'--at-root': vm.depth === '0'}"
-    ng-click="vm.blockEditorApi.requestShowCreate(vm.parentBlock, vm.areaKey, vm.index, $event)"
-    ng-mouseover="vm.blockEditorApi.internal.showAreaHighlight(vm.parentBlock, vm.areaKey)"
+    ng-click="vm.clickInlineCreateAbove()"
+    ng-mouseover="vm.mouseOverInlineCreateAbove()"
     ng-mouseleave="vm.blockEditorApi.internal.hideAreaHighlight(vm.parentBlock, vm.areaKey)">
 </uui-button-inline-create>
+<div ng-if="vm.hideInlineCreateAbove"
+    class="umb-block-grid__block--inline-create-button --above --detector"
+    style="width: {{vm.inlineCreateAboveWidth}};"
+    ng-mouseover="vm.mouseOverInlineCreateAbove()">
+</div>
 
 <ng-form name="vm.blockForm" val-server-match="{ 'contains' : { 'valServerMatchContent': vm.layoutEntry.$block.content.key, 'valServerMatchSettings': vm.layoutEntry.$block.settings.key } }">
     <div
