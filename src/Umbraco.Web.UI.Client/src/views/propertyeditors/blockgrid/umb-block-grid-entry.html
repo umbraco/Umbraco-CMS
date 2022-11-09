@@ -4,13 +4,12 @@
     style="width: {{vm.inlineCreateAboveWidth}};"
     ng-class="{'--at-root': vm.depth === '0'}"
     ng-click="vm.clickInlineCreateAbove()"
-    ng-mouseover="vm.mouseOverInlineCreateAbove()"
-    ng-mouseleave="vm.blockEditorApi.internal.hideAreaHighlight(vm.parentBlock, vm.areaKey)">
+    ng-mouseover="vm.mouseOverInlineCreate()"
+    ng-mouseleave="vm.mouseOutInlineCreate()">
 </uui-button-inline-create>
 <div ng-if="vm.hideInlineCreateAbove"
     class="umb-block-grid__block--inline-create-button --above --detector"
-    style="width: {{vm.inlineCreateAboveWidth}};"
-    ng-mouseover="vm.mouseOverInlineCreateAbove()">
+    style="width: {{vm.inlineCreateAboveWidth}};">
 </div>
 
 <ng-form name="vm.blockForm" val-server-match="{ 'contains' : { 'valServerMatchContent': vm.layoutEntry.$block.content.key, 'valServerMatchSettings': vm.layoutEntry.$block.settings.key } }">
@@ -191,10 +190,10 @@
     class="umb-block-grid__block--inline-create-button --after"
     ng-class="{'--at-root': vm.depth === '0'}"
     ng-click="vm.clickInlineCreateAfter($event)"
-    ng-mouseover="vm.mouseOverInlineCreateAfter()"
-    ng-mouseleave="vm.blockEditorApi.internal.hideAreaHighlight(vm.parentBlock, vm.areaKey)"
+    ng-mouseover="vm.mouseOverInlineCreate()"
+    ng-mouseleave="vm.mouseOutInlineCreate()"
     vertical>
 </uui-button-inline-create>
 <div ng-if="vm.hideInlineCreateAfter"
-    class="umb-block-grid__block--inline-create-button --after --detector" ng-mouseover="vm.mouseOverInlineCreateAfter()">
+    class="umb-block-grid__block--inline-create-button --after --detector">
 </div>

@@ -90,8 +90,9 @@
         }
     );
 
-    function BlockGridEntryController($scope, $element) {
+    function BlockGridEntryController($scope, $element, $timeout) {
 
+        var updateInlineCreateTimeout;
         const unsubscribe = [];
         const vm = this;
         vm.areaGridColumns = '';
@@ -136,13 +137,21 @@
                 vm.areaGridColumns = vm.blockEditorApi.internal.gridColumns.toString();
             }
 
-            vm.layoutColumnsInt = parseInt(vm.layoutColumns, 10)
+            vm.layoutColumnsInt = parseInt(vm.layoutColumns, 10);
+
+            unsubscribe.push(vm.layoutEntry.$block.__scope.$watch(() => vm.layoutEntry.$block.index, (newVal, oldVal) => {
+                cancelAnimationFrame(raf);
+                raf = requestAnimationFrame(updateInlineCreate);
+            }));
+
+            updateInlineCreateTimeout = $timeout(updateInlineCreate, 500);
 
             $scope.$evalAsync();
         }
         unsubscribe.push($scope.$watch("depth", (newVal, oldVal) => {
             vm.childDepth = parseInt(vm.depth) + 1;
         }));
+        
         /**
          * We want to only show the validation errors on the specific Block, not the parent blocks.
          * So we need to avoid having a Block as the parent to the Block Form.
@@ -419,8 +428,14 @@
                 vm.blockEditorApi.requestShowCreate(vm.parentBlock, vm.areaKey, vm.index+1, $event, {'fitInRow': true});
             }
         }
-        vm.mouseOverInlineCreateAbove = function() {
-
+        vm.mouseOverInlineCreate = function() {
+            vm.blockEditorApi.internal.showAreaHighlight(vm.parentBlock, vm.areaKey);
+        }
+        vm.mouseOutInlineCreate = function() {
+            vm.blockEditorApi.internal.hideAreaHighlight(vm.parentBlock, vm.areaKey);
+        }
+        
+        function updateInlineCreate() {
             layoutContainer = $element[0].closest('.umb-block-grid__layout-container');
             if(!layoutContainer) {
                 return;
@@ -428,39 +443,36 @@
 
             const layoutContainerRect = layoutContainer.getBoundingClientRect();
             const layoutItemRect = $element[0].getBoundingClientRect();
+
+            if(layoutContainerRect.width === 0) {
+                $timeout.cancel(updateInlineCreateTimeout);
+                vm.hideInlineCreateAbove = true;
+                vm.hideInlineCreateAfter = true;
+                vm.inlineCreateAboveWidth = "";
+                $scope.$evalAsync();
+                updateInlineCreateTimeout = $timeout(updateInlineCreate, 500);
+                return;
+            }
+
+            if(layoutItemRect.right > layoutContainerRect.right - 5) {
+                vm.hideInlineCreateAfter = true;
+            } else {
+                vm.hideInlineCreateAfter = false;
+            }
 
             if(layoutItemRect.left > layoutContainerRect.left + 5) {
                 vm.hideInlineCreateAbove = true;
                 vm.inlineCreateAboveWidth = "";
-                return;
+            } else {
+                vm.inlineCreateAboveWidth = layoutContainerRect.width + "px";
+                vm.hideInlineCreateAbove = false;
             }
-
-            vm.inlineCreateAboveWidth = layoutContainerRect.width + "px";
-            vm.hideInlineCreateAbove = false;
-            vm.blockEditorApi.internal.showAreaHighlight(vm.parentBlock, vm.areaKey);
-
-        }
-        vm.mouseOverInlineCreateAfter = function() {
-
-            layoutContainer = $element[0].closest('.umb-block-grid__layout-container');
-            if(!layoutContainer) {
-                return;
-            }
-
-            const layoutContainerRect = layoutContainer.getBoundingClientRect();
-            const layoutItemRect = $element[0].getBoundingClientRect();
-
-            if(layoutItemRect.right > layoutContainerRect.right - 5) {
-                vm.hideInlineCreateAfter = true;
-                return;
-            }
-
-            vm.hideInlineCreateAfter = false;
-            vm.blockEditorApi.internal.showAreaHighlight(vm.parentBlock, vm.areaKey);
-
+            $scope.$evalAsync();
         }
 
         $scope.$on("$destroy", function () {
+
+            $timeout.cancel(updateInlineCreateTimeout);
 
             $element[0].removeEventListener("UmbBlockGrid_AppendProperty", vm.onAppendProxyProperty);
             $element[0].removeEventListener("UmbBlockGrid_RemoveProperty", vm.onRemoveProxyProperty);
