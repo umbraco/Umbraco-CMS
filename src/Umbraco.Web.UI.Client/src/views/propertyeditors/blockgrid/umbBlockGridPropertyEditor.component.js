@@ -816,6 +816,8 @@
         vm.requestShowCreate = requestShowCreate;
         function requestShowCreate(parentBlock, areaKey, createIndex, mouseEvent, options) {
 
+            vm.hideAreaHighlight(parentBlock, areaKey);
+
             if (vm.blockTypePickerIsOpen === true) {
                 return;
             }
