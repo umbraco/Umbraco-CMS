@@ -156,22 +156,25 @@
 
         function handleFiles (files, event, invalidFiles) {
             vm.invalidEntries = invalidFiles.map(file => {
-                return {
-                    name: file.name,
+                const tempMediaEntry = {
                     key: String.CreateGuid(),
-                    error: file.$error,
-                    errorMessages: file.$errorMessages
-                }
+                    name: file.name
+                };
+
+                tempMediaEntry.error = true;
+                tempMediaEntry.errorType = {};
+                tempMediaEntry.errorType[file.$error] = true;
+
+                return tempMediaEntry;
             });
 
             const queueItems = files.map(file => {
                 const tempMediaEntry = {
-                    name: file.name,
                     key: String.CreateGuid(),
+                    name: file.name,
                     uploadProgress: 0,
                     dataURL: ''
                 };
-
 
                 if (file.type.includes('image')) {
                     Upload.base64DataUrl(file).then(function(url) {    

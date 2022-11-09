@@ -115,7 +115,7 @@
                     <span ng-if="invalidEntry.error" class="file-messages">
                         <span ng-if="invalidEntry.errorType.pattern" class="errorMessage color-red"><localize key="media_disallowedFileType"></localize></span>
                         <span ng-if="invalidEntry.errorType.maxSize" class="errorMessage color-red"><localize key="media_maxFileSize"></localize> "{{vm.maxFileSize}}"</span>
-                        <span ng-if="invalidEntry.errorType.server" class="errorMessage color-red">{{ file.errorText }}</span>
+                        <span ng-if="invalidEntry.errorType.server" class="errorMessage color-red">{{ invalidEntry.errorText }}</span>
                     </span>
                 </div>
             </div>
