@@ -1,7 +1,5 @@
+import { Install, InstallResource, InstallSettings, ProblemDetails, TelemetryLevel } from '@umbraco-cms/backend-api';
 import { BehaviorSubject, Observable, ReplaySubject } from 'rxjs';
-
-import { getInstallSettings, postInstallSetup } from '@umbraco-cms/backend-api';
-import type { PostInstallRequest, ProblemDetails, UmbracoInstaller } from '@umbraco-cms/models';
 
 /**
  * Context API for the installer
@@ -9,16 +7,17 @@ import type { PostInstallRequest, ProblemDetails, UmbracoInstaller } from '@umbr
  * @class UmbInstallerContext
  */
 export class UmbInstallerContext {
-	private _data = new BehaviorSubject<PostInstallRequest>({
+	private _data = new BehaviorSubject<Install>({
 		user: { name: '', email: '', password: '', subscribeToNewsletter: false },
-		telemetryLevel: 'Basic',
+		database: { id: '', providerName: '' },
+		telemetryLevel: TelemetryLevel.BASIC,
 	});
 	public readonly data = this._data.asObservable();
 
 	private _currentStep = new BehaviorSubject<number>(1);
 	public readonly currentStep = this._currentStep.asObservable();
 
-	private _settings = new ReplaySubject<UmbracoInstaller>();
+	private _settings = new ReplaySubject<InstallSettings>();
 	public readonly settings = this._settings.asObservable();
 
 	private _installStatus = new ReplaySubject<ProblemDetails | null>(1);
@@ -82,7 +81,7 @@ export class UmbInstallerContext {
 	 * @param {Partial<PostInstallRequest>} data
 	 * @memberof UmbInstallerContext
 	 */
-	public appendData(data: Partial<PostInstallRequest>): void {
+	public appendData(data: Partial<Install>): void {
 		this._data.next({ ...this.getData(), ...data });
 	}
 
@@ -92,7 +91,7 @@ export class UmbInstallerContext {
 	 * @return {*}  {PostInstallRequest}
 	 * @memberof UmbInstallerContext
 	 */
-	public getData(): PostInstallRequest {
+	public getData(): Install {
 		return this._data.getValue();
 	}
 
@@ -104,7 +103,7 @@ export class UmbInstallerContext {
 	 */
 	public requestInstall() {
 		// TODO: The post install will probably return a user in the future, so we have to set that context somewhere to let the client know that it is authenticated
-		return postInstallSetup(this.getData());
+		return InstallResource.postUmbracoManagementApiV1InstallSetup({ requestBody: this.getData() });
 	}
 
 	/**
@@ -123,8 +122,8 @@ export class UmbInstallerContext {
 	 * @memberof UmbInstallerContext
 	 */
 	private _loadInstallerSettings() {
-		getInstallSettings({}).then(({ data }) => {
-			this._settings.next(data);
+		InstallResource.getUmbracoManagementApiV1InstallSettings().then((installSettings) => {
+			this._settings.next(installSettings);
 		});
 	}
 }

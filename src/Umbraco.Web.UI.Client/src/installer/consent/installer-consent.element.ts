@@ -1,10 +1,11 @@
+import { ConsentLevel, Install, InstallSettings, Telemetry, TelemetryLevel } from '@umbraco-cms/backend-api';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
+
 import { UmbInstallerContext } from '../installer.context';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-import type { PostInstallRequest, TelemetryModel, UmbracoInstaller } from '@umbraco-cms/models';
 
 @customElement('umb-installer-consent')
 export class UmbInstallerConsentElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
@@ -45,10 +46,10 @@ export class UmbInstallerConsentElement extends UmbContextConsumerMixin(UmbObser
 	];
 
 	@state()
-	private _telemetryLevels: TelemetryModel[] = [];
+	private _telemetryLevels: ConsentLevel[] = [];
 
 	@state()
-	private _telemetryFormData?: TelemetryModel['level'];
+	private _telemetryFormData?: Telemetry['telemetryLevel'];
 
 	private _installerContext?: UmbInstallerContext;
 
@@ -65,15 +66,15 @@ export class UmbInstallerConsentElement extends UmbContextConsumerMixin(UmbObser
 	private _observeInstallerSettings() {
 		if (!this._installerContext) return;
 
-		this.observe<UmbracoInstaller>(this._installerContext.settings, (settings) => {
-			this._telemetryLevels = settings.user.consentLevels;
+		this.observe<InstallSettings>(this._installerContext.settings, (settings) => {
+			this._telemetryLevels = settings.user?.consentLevels ?? [];
 		});
 	}
 
 	private _observeInstallerData() {
 		if (!this._installerContext) return;
 
-		this.observe<PostInstallRequest>(this._installerContext.data, (data) => {
+		this.observe<Install>(this._installerContext.data, (data) => {
 			this._telemetryFormData = data.telemetryLevel;
 		});
 	}
@@ -82,7 +83,7 @@ export class UmbInstallerConsentElement extends UmbContextConsumerMixin(UmbObser
 		const target = e.target as HTMLInputElement;
 
 		const value: { [key: string]: string } = {};
-		value[target.name] = this._telemetryLevels[parseInt(target.value) - 1].level;
+		value[target.name] = this._telemetryLevels[parseInt(target.value) - 1].level ?? TelemetryLevel.BASIC;
 		this._installerContext?.appendData(value);
 	}
 
