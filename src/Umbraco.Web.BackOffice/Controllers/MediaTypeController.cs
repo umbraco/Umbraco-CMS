@@ -137,11 +137,11 @@ public class MediaTypeController : ContentTypeControllerBase<IMediaType>
     /// </summary>
     /// /// <param name="alias">Alias of the media type</param>
     /// <returns></returns>
-    public ActionResult<IEnumerable<MediaTypeDisplay>> GetByAlias([FromQuery] string[] aliases)
+    public IEnumerable<MediaTypeDisplay> GetFiltered([FromQuery] string[] aliases)
     {
         if (aliases.Length < 1)
         {
-            return NotFound();
+            return _mediaTypeService.GetAll().Select(_umbracoMapper.Map<IMediaType, MediaTypeDisplay>).WhereNotNull();
         }
 
         var mediaTypeDisplays = new List<MediaTypeDisplay>();
