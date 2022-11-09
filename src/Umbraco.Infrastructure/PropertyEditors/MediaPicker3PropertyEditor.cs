@@ -125,7 +125,10 @@ public class MediaPicker3PropertyEditor : DataEditor
         {
             if (editorValue.Value is JArray dtos)
             {
-                dtos = PersistTempImages(dtos);
+                if (editorValue.DataTypeConfiguration is MediaPicker3Configuration configuration)
+                {
+                    dtos = PersistTempImages(dtos, configuration);
+                }
 
                 // Clean up redundant/default data
                 foreach (JObject? dto in dtos.Values<JObject>())
@@ -179,7 +182,7 @@ public class MediaPicker3PropertyEditor : DataEditor
             }
         }
 
-        private JArray PersistTempImages(JArray jArray)
+        private JArray PersistTempImages(JArray jArray, MediaPicker3Configuration mediaPicker3Configuration)
         {
             var result = new JArray();
             foreach (JObject? dto in jArray.Values<JObject>())
@@ -206,13 +209,15 @@ public class MediaPicker3PropertyEditor : DataEditor
                     continue;
                 }
 
-                IMedia mediaFile = _temporaryImageService.Save(temporaryLocationString);
-
-                MediaWithCropsDto? mediaDto = _jsonSerializer.Deserialize<MediaWithCropsDto>(dto.ToString());
-                if (mediaDto is not null)
+                if (mediaPicker3Configuration.StartNodeId is GuidUdi startNodeUdi)
                 {
-                    mediaDto.MediaKey = mediaFile.GetUdi().Guid;
-                    result.Add(JObject.Parse(_jsonSerializer.Serialize(mediaDto)));
+                    IMedia mediaFile = _temporaryImageService.Save(temporaryLocationString, startNodeUdi.Guid);
+                    MediaWithCropsDto? mediaDto = _jsonSerializer.Deserialize<MediaWithCropsDto>(dto.ToString());
+                    if (mediaDto is not null)
+                    {
+                        mediaDto.MediaKey = mediaFile.GetUdi().Guid;
+                        result.Add(JObject.Parse(_jsonSerializer.Serialize(mediaDto)));
+                    }
                 }
             }
 

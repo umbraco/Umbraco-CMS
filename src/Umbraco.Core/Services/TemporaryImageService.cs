@@ -41,7 +41,7 @@ public class TemporaryImageService : ITemporaryImageService
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
-    public IMedia Save(string temporaryLocation)
+    public IMedia Save(string temporaryLocation, Guid? startNode)
     {
         var userId = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? Constants.Security.SuperUserId;
         var absoluteTempImagePath = _hostingEnvironment.MapPathContentRoot(temporaryLocation);
@@ -50,7 +50,15 @@ public class TemporaryImageService : ITemporaryImageService
 
         var mediaItemName = safeFileName.ToFriendlyName();
 
-        IMedia mediaFile = _mediaService.CreateMedia(mediaItemName, Constants.System.Root, Constants.Conventions.MediaTypes.Image, userId);
+        IMedia mediaFile;
+        if (startNode is null)
+        {
+            mediaFile = _mediaService.CreateMedia(mediaItemName, Constants.System.Root, Constants.Conventions.MediaTypes.Image, userId);
+        }
+        else
+        {
+            mediaFile = _mediaService.CreateMedia(mediaItemName, startNode.Value, Constants.Conventions.MediaTypes.Image, userId);
+        }
 
         var fileInfo = new FileInfo(absoluteTempImagePath);
 
