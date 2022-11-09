@@ -1,33 +1,46 @@
 import { rest } from 'msw';
 
 import { umbracoPath } from '@umbraco-cms/utils';
-import type { ConsentLevelSettings, TelemetryModel } from '@umbraco-cms/models';
+import { PagedTelemetry, Telemetry, TelemetryLevel } from '@umbraco-cms/backend-api';
 
-let telemetryLevel: TelemetryModel['level'] = 'Basic';
+let telemetryLevel = TelemetryLevel.BASIC;
 
 export const handlers = [
-	rest.get(umbracoPath('/telemetry/ConsentLevel'), (_req, res, ctx) => {
+	rest.get(umbracoPath('/telemetry/level'), (_req, res, ctx) => {
 		return res(
 			// Respond with a 200 status code
 			ctx.status(200),
-			ctx.json<ConsentLevelSettings>({
+			ctx.json<Telemetry>({
 				telemetryLevel,
 			})
 		);
 	}),
-	rest.get(umbracoPath('/telemetry/ConsentLevels'), (_req, res, ctx) => {
+
+	rest.get(umbracoPath('/telemetry'), (_req, res, ctx) => {
 		return res(
 			// Respond with a 200 status code
 			ctx.status(200),
-			ctx.json<TelemetryModel['level'][]>(['Minimal', 'Basic', 'Detailed'])
+			ctx.json<PagedTelemetry>({
+				total: 3,
+				items: [
+					{ telemetryLevel: TelemetryLevel.MINIMAL },
+					{ telemetryLevel: TelemetryLevel.BASIC },
+					{ telemetryLevel: TelemetryLevel.DETAILED },
+				],
+			})
 		);
 	}),
 
-	rest.post<ConsentLevelSettings>(umbracoPath('/telemetry/ConsentLevel'), async (_req, res, ctx) => {
-		telemetryLevel = (await _req.json<ConsentLevelSettings>()).telemetryLevel;
-		return res(
-			// Respond with a 200 status code
-			ctx.status(201)
-		);
+	rest.post<Telemetry>(umbracoPath('/telemetry/ConsentLevel'), async (_req, res, ctx) => {
+		const newLevel = (await _req.json<Telemetry>()).telemetryLevel;
+		if (newLevel) {
+			telemetryLevel = newLevel;
+			return res(
+				// Respond with a 200 status code
+				ctx.status(200)
+			);
+		} else {
+			return res(ctx.status(400));
+		}
 	}),
 ];
