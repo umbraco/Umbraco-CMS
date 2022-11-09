@@ -86,6 +86,9 @@
                 areaKey: "<",
                 propertyEditorForm: "<?",
                 depth: "@"
+            },
+            require: {
+                umbBlockGridEntries: "?^^umbBlockGridEntries"
             }
         }
     );
@@ -141,14 +144,8 @@
 
             vm.layoutColumnsInt = parseInt(vm.layoutColumns, 10);
 
-            unsubscribe.push(vm.layoutEntry.$block.__scope.$watch(() => vm.layoutEntry.$block.index, (newVal, oldVal) => {
-                cancelAnimationFrame(updateInlineCreateRaf);
-                updateInlineCreateRaf = requestAnimationFrame(updateInlineCreate);
-            }));
-            unsubscribe.push(vm.layoutEntry.$block.__scope.$watch(() => vm.layoutEntry.columnSpan, (newVal, oldVal) => {
-                cancelAnimationFrame(updateInlineCreateRaf);
-                updateInlineCreateRaf = requestAnimationFrame(updateInlineCreate);
-            }));
+            unsubscribe.push(vm.layoutEntry.$block.__scope.$watch(() => vm.layoutEntry.$block.index, visualUpdateCallback));
+            unsubscribe.push($scope.$on("blockGridEditorVisualUpdate", (evt, data) => {if(data.areaKey === vm.areaKey) { visualUpdateCallback()}}));
 
             updateInlineCreateTimeout = $timeout(updateInlineCreate, 500);
 
@@ -157,6 +154,11 @@
         unsubscribe.push($scope.$watch("depth", (newVal, oldVal) => {
             vm.childDepth = parseInt(vm.depth) + 1;
         }));
+
+        function visualUpdateCallback() {
+            cancelAnimationFrame(updateInlineCreateRaf);
+            updateInlineCreateRaf = requestAnimationFrame(updateInlineCreate);
+        }
         
         /**
          * We want to only show the validation errors on the specific Block, not the parent blocks.
@@ -376,6 +378,8 @@
             // Update block size:
             vm.layoutEntry.columnSpan = newSpans.columnSpan;
             vm.layoutEntry.rowSpan = newSpans.rowSpan;
+
+            vm.umbBlockGridEntries.notifyVisualUpdate();
             vm.blockEditorApi.internal.setDirty();
             $scope.$evalAsync();
         }
@@ -419,6 +423,7 @@
             }
             vm.layoutEntry.rowSpan = newRowSpan;
 
+            vm.umbBlockGridEntries.notifyVisualUpdate();
             vm.blockEditorApi.internal.setDirty();
             $event.originalEvent.stopPropagation();
         }

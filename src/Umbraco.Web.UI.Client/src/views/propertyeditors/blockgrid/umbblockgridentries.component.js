@@ -94,7 +94,6 @@
             vm.layoutColumnsInt = parseInt(vm.layoutColumns, 10);
         }));
 
-
         function onLocalAmountOfBlocksChanged() {
 
             if (vm.entriesForm && vm.areaConfig) {
@@ -152,6 +151,12 @@
 
                 $element.toggleClass("--invalid", vm.invalidAmount);
             }
+        }
+
+
+        vm.notifyVisualUpdate = function () {
+            console.log("notifyVisualUpdate")
+            $scope.$broadcast("blockGridEditorVisualUpdate", {areaKey: vm.areaKey});
         }
 
         vm.acceptBlock = function(contentTypeKey) {
