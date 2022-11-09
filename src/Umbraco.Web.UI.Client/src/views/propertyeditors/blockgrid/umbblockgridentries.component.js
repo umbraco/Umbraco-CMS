@@ -155,7 +155,6 @@
 
 
         vm.notifyVisualUpdate = function () {
-            console.log("notifyVisualUpdate")
             $scope.$broadcast("blockGridEditorVisualUpdate", {areaKey: vm.areaKey});
         }
 
@@ -238,7 +237,6 @@
 
 
                     // unregister all property editor proxies via events:
-                    console.log("containedPropertyEditorProxies", fromCtrl.containedPropertyEditorProxies)
                     fromCtrl.containedPropertyEditorProxies.forEach(slotName => {
                         console.log(evt.from, slotName)
                         _removePropertyProxy(evt.from, slotName);
