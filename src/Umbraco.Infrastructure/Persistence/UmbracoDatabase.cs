@@ -92,6 +92,43 @@ namespace Umbraco.Cms.Infrastructure.Persistence
             {
                 Mappers.AddRange(_mapperCollection);
             }
+
+            InitCommandTimeout();
+        }
+
+        // https://github.com/umbraco/Umbraco-CMS/issues/13354
+        // This sets the Database Command to connectionString Connection Timeout /  Connect Timeout
+        // This could be better, ideally the UmbracoDatabaseFactory.CreateDatabase() function would set this based on a setting (global or connectionstring setting)
+        private void InitCommandTimeout()
+        {
+            if (this.Connection != null && this.Connection.ConnectionTimeout > 0)
+            {
+                this.CommandTimeout = this.Connection.ConnectionTimeout;
+            }
+            else // get from _connectionString
+            {
+                var connectionParser = new DbConnectionStringBuilder
+                {
+                    ConnectionString = ConnectionString
+                };
+
+                if (connectionParser.ContainsKey("connection timeout"))
+                {
+                    if (int.TryParse(connectionParser["connection timeout"].ToString(), out int connectionTimeout))
+                    {
+                        _logger.LogInformation($"Setting Command Timeout to value configured in connectionstring Connection Timeout : {connectionTimeout} seconds");
+                        this.CommandTimeout = connectionTimeout;
+                    }
+                }
+                else if (connectionParser.ContainsKey("connect timeout"))
+                {
+                    if (int.TryParse(connectionParser["connect timeout"].ToString(), out int connectionTimeout))
+                    {
+                        _logger.LogInformation($"Setting Command Timeout to value configured in connectionstring Connect Timeout : {connectionTimeout} seconds");
+                        this.CommandTimeout = connectionTimeout;
+                    }
+                }
+            }
         }
 
         #endregion
