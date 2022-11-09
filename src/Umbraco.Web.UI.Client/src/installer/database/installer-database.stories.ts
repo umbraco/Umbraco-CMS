@@ -1,13 +1,13 @@
 import './installer-database.element';
 
 import { Meta, Story } from '@storybook/web-components';
-import { InstallSettings } from '@umbraco-cms/backend-api';
 import { html } from 'lit-html';
 import { rest } from 'msw';
 
 import { installerContextProvider } from '../shared/utils.story-helpers';
 
 import type { UmbInstallerDatabaseElement } from './installer-database.element';
+import { InstallSettings } from '@umbraco-cms/backend-api';
 export default {
 	title: 'Apps/Installer/Steps',
 	component: 'umb-installer-database',

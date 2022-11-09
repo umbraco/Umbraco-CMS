@@ -1,20 +1,19 @@
-import {
-  ApiError,
-  DatabaseInstall,
-  DatabaseSettings,
-  Install,
-  InstallResource,
-  InstallSettings,
-  ProblemDetails,
-} from '@umbraco-cms/backend-api';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UUIButtonElement } from '@umbraco-ui/uui';
 import { css, CSSResultGroup, html, LitElement, nothing } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
-import { data } from 'src/core/mocks/data/node.data';
 
 import { UmbInstallerContext } from '../installer.context';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import {
+	ApiError,
+	DatabaseInstall,
+	DatabaseSettings,
+	Install,
+	InstallResource,
+	InstallSettings,
+	ProblemDetails,
+} from '@umbraco-cms/backend-api';
 
 @customElement('umb-installer-database')
 export class UmbInstallerDatabaseElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {

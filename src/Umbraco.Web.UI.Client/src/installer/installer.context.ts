@@ -1,5 +1,5 @@
-import { Install, InstallResource, InstallSettings, ProblemDetails, TelemetryLevel } from '@umbraco-cms/backend-api';
 import { BehaviorSubject, Observable, ReplaySubject } from 'rxjs';
+import { Install, InstallResource, InstallSettings, ProblemDetails, TelemetryLevel } from '@umbraco-cms/backend-api';
 
 /**
  * Context API for the installer

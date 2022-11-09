@@ -1,6 +1,6 @@
+import { rest } from 'msw';
 import { DatabaseInstall, Install, InstallSettings, ProblemDetails, TelemetryLevel } from '@umbraco-cms/backend-api';
 import { umbracoPath } from '@umbraco-cms/utils';
-import { rest } from 'msw';
 
 export const handlers = [
 	rest.get(umbracoPath('/install/settings'), (_req, res, ctx) => {

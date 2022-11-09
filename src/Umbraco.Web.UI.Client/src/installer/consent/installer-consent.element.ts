@@ -1,11 +1,11 @@
-import { ConsentLevel, Install, InstallSettings, Telemetry, TelemetryLevel } from '@umbraco-cms/backend-api';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 
 import { UmbInstallerContext } from '../installer.context';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import { ConsentLevel, Install, InstallSettings, Telemetry, TelemetryLevel } from '@umbraco-cms/backend-api';
 
 @customElement('umb-installer-consent')
 export class UmbInstallerConsentElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {

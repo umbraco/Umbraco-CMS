@@ -1,10 +1,10 @@
+import { css, CSSResultGroup, html, LitElement } from 'lit';
+import { customElement, state } from 'lit/decorators.js';
+import { UmbInstallerContext } from '../installer.context';
 import { Install } from '@umbraco-cms/backend-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import { css, CSSResultGroup, html, LitElement } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
 
-import { UmbInstallerContext } from '../installer.context';
 
 @customElement('umb-installer-user')
 export class UmbInstallerUserElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
