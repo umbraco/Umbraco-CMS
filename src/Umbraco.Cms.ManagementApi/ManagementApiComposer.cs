@@ -59,6 +59,7 @@ public class ManagementApiComposer : IComposer
 
         services.AddSwaggerGen(swaggerGenOptions =>
         {
+            swaggerGenOptions.CustomOperationIds(e => e.ActionDescriptor.RouteValues["action"]);
             swaggerGenOptions.SwaggerDoc(
                 ApiDefaultDocumentName,
                 new OpenApiInfo
