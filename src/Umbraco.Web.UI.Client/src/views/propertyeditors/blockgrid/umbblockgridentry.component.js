@@ -44,21 +44,23 @@
     }
     
     function closestColumnSpanOption(target, map, max) {
-        const result = map.reduce((a, b) => {
-            if (a.columnSpan > max) {
-                return b;
+        if(map.length > 0) {
+            const result = map.reduce((a, b) => {
+                if (a.columnSpan > max) {
+                    return b;
+                }
+                let aDiff = Math.abs(a.columnSpan - target);
+                let bDiff = Math.abs(b.columnSpan - target);
+        
+                if (aDiff === bDiff) {
+                    return a.columnSpan < b.columnSpan ? a : b;
+                } else {
+                    return bDiff < aDiff ? b : a;
+                }
+            });
+            if(result) {
+                return result;
             }
-            let aDiff = Math.abs(a.columnSpan - target);
-            let bDiff = Math.abs(b.columnSpan - target);
-    
-            if (aDiff === bDiff) {
-                return a.columnSpan < b.columnSpan ? a : b;
-            } else {
-                return bDiff < aDiff ? b : a;
-            }
-        });
-        if(result) {
-            return result;
         }
         return max;
     }
