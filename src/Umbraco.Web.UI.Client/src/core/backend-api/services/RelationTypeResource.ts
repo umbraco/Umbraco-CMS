@@ -14,7 +14,7 @@ export class RelationTypeResource {
      * @returns FolderTreeItem Success
      * @throws ApiError
      */
-    public static getUmbracoManagementApiV1TreeRelationTypeItem({
+    public static items({
         key,
     }: {
         key?: Array<string>,
@@ -32,7 +32,7 @@ export class RelationTypeResource {
      * @returns PagedEntityTreeItem Success
      * @throws ApiError
      */
-    public static getUmbracoManagementApiV1TreeRelationTypeRoot({
+    public static root({
         skip,
         take = 100,
     }: {

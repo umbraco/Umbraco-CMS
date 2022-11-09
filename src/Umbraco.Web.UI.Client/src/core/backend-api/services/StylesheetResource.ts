@@ -14,7 +14,7 @@ export class StylesheetResource {
      * @returns PagedFileSystemTreeItem Success
      * @throws ApiError
      */
-    public static getUmbracoManagementApiV1TreeStylesheetChildren({
+    public static children({
         path,
         skip,
         take = 100,
@@ -38,7 +38,7 @@ export class StylesheetResource {
      * @returns FileSystemTreeItem Success
      * @throws ApiError
      */
-    public static getUmbracoManagementApiV1TreeStylesheetItem({
+    public static items({
         path,
     }: {
         path?: Array<string>,
@@ -56,7 +56,7 @@ export class StylesheetResource {
      * @returns PagedFileSystemTreeItem Success
      * @throws ApiError
      */
-    public static getUmbracoManagementApiV1TreeStylesheetRoot({
+    public static root({
         skip,
         take = 100,
     }: {

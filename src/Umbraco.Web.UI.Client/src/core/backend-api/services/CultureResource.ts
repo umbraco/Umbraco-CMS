@@ -13,7 +13,7 @@ export class CultureResource {
      * @returns PagedCulture Success
      * @throws ApiError
      */
-    public static getUmbracoManagementApiV1Culture({
+    public static getAll({
         skip,
         take,
     }: {

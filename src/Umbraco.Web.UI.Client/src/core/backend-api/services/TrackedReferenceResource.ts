@@ -13,7 +13,7 @@ export class TrackedReferenceResource {
      * @returns PagedRelationItem Success
      * @throws ApiError
      */
-    public static getUmbracoManagementApiV1TrackedReference({
+    public static get({
         id,
         skip,
         take,
@@ -42,7 +42,7 @@ export class TrackedReferenceResource {
      * @returns PagedRelationItem Success
      * @throws ApiError
      */
-    public static getUmbracoManagementApiV1TrackedReferenceDescendants({
+    public static descendants({
         parentId,
         skip,
         take,
@@ -71,7 +71,7 @@ export class TrackedReferenceResource {
      * @returns PagedRelationItem Success
      * @throws ApiError
      */
-    public static getUmbracoManagementApiV1TrackedReferenceItem({
+    public static getPagedReferencedItems({
         ids,
         skip,
         take,

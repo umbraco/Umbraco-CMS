@@ -5,7 +5,7 @@
 import type { FolderTreeItem } from './FolderTreeItem';
 
 export type PagedFolderTreeItem = {
-    total?: number;
-    items?: Array<FolderTreeItem> | null;
+    total: number;
+    items: Array<FolderTreeItem>;
 };
 

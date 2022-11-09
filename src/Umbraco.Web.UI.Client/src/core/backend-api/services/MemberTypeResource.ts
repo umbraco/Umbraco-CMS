@@ -14,7 +14,7 @@ export class MemberTypeResource {
      * @returns EntityTreeItem Success
      * @throws ApiError
      */
-    public static getUmbracoManagementApiV1TreeMemberTypeItem({
+    public static items({
         key,
     }: {
         key?: Array<string>,
@@ -32,7 +32,7 @@ export class MemberTypeResource {
      * @returns PagedEntityTreeItem Success
      * @throws ApiError
      */
-    public static getUmbracoManagementApiV1TreeMemberTypeRoot({
+    public static root({
         skip,
         take = 100,
     }: {

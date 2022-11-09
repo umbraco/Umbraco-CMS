@@ -5,7 +5,7 @@
 import type { HelpPage } from './HelpPage';
 
 export type PagedHelpPage = {
-    total?: number;
-    items?: Array<HelpPage> | null;
+    total: number;
+    items: Array<HelpPage>;
 };
 

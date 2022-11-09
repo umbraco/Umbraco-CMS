@@ -5,7 +5,7 @@
 import type { FileSystemTreeItem } from './FileSystemTreeItem';
 
 export type PagedFileSystemTreeItem = {
-    total?: number;
-    items?: Array<FileSystemTreeItem> | null;
+    total: number;
+    items: Array<FileSystemTreeItem>;
 };
 

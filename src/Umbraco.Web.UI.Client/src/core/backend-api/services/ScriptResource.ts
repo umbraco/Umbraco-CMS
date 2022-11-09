@@ -14,7 +14,7 @@ export class ScriptResource {
      * @returns PagedFileSystemTreeItem Success
      * @throws ApiError
      */
-    public static getUmbracoManagementApiV1TreeScriptChildren({
+    public static children({
         path,
         skip,
         take = 100,
@@ -38,7 +38,7 @@ export class ScriptResource {
      * @returns FileSystemTreeItem Success
      * @throws ApiError
      */
-    public static getUmbracoManagementApiV1TreeScriptItem({
+    public static items({
         path,
     }: {
         path?: Array<string>,
@@ -56,7 +56,7 @@ export class ScriptResource {
      * @returns PagedFileSystemTreeItem Success
      * @throws ApiError
      */
-    public static getUmbracoManagementApiV1TreeScriptRoot({
+    public static root({
         skip,
         take = 100,
     }: {

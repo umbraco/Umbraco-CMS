@@ -13,7 +13,7 @@ export class ProfilingResource {
      * @returns ProfilingStatus Success
      * @throws ApiError
      */
-    public static getUmbracoManagementApiV1ProfilingStatus(): CancelablePromise<ProfilingStatus> {
+    public static status(): CancelablePromise<ProfilingStatus> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/profiling/status',

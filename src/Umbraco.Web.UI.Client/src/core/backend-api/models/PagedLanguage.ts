@@ -5,7 +5,7 @@
 import type { Language } from './Language';
 
 export type PagedLanguage = {
-    total?: number;
-    items?: Array<Language> | null;
+    total: number;
+    items: Array<Language>;
 };
 

@@ -14,7 +14,7 @@ export class DocumentBlueprintResource {
      * @returns DocumentBlueprintTreeItem Success
      * @throws ApiError
      */
-    public static getUmbracoManagementApiV1TreeDocumentBlueprintItem({
+    public static items({
         key,
     }: {
         key?: Array<string>,
@@ -32,7 +32,7 @@ export class DocumentBlueprintResource {
      * @returns PagedDocumentBlueprintTreeItem Success
      * @throws ApiError
      */
-    public static getUmbracoManagementApiV1TreeDocumentBlueprintRoot({
+    public static root({
         skip,
         take = 100,
     }: {

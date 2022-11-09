@@ -14,7 +14,7 @@ export class RelationResource {
      * @returns Relation Success
      * @throws ApiError
      */
-    public static getUmbracoManagementApiV1Relation({
+    public static byId({
         id,
     }: {
         id: number,
@@ -35,7 +35,7 @@ export class RelationResource {
      * @returns PagedRelation Success
      * @throws ApiError
      */
-    public static getUmbracoManagementApiV1RelationChildRelation({
+    public static byChild({
         childId,
         skip,
         take,

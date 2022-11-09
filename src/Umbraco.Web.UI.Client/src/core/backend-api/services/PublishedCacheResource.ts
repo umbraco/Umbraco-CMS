@@ -11,7 +11,7 @@ export class PublishedCacheResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static postUmbracoManagementApiV1PublishedCacheCollect(): CancelablePromise<any> {
+    public static collect(): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/published-cache/collect',
@@ -22,7 +22,7 @@ export class PublishedCacheResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static postUmbracoManagementApiV1PublishedCacheRebuild(): CancelablePromise<any> {
+    public static rebuild(): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/published-cache/rebuild',
@@ -33,7 +33,7 @@ export class PublishedCacheResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static postUmbracoManagementApiV1PublishedCacheReload(): CancelablePromise<any> {
+    public static reload(): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/published-cache/reload',
@@ -44,7 +44,7 @@ export class PublishedCacheResource {
      * @returns string Success
      * @throws ApiError
      */
-    public static getUmbracoManagementApiV1PublishedCacheStatus(): CancelablePromise<string> {
+    public static status(): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/published-cache/status',

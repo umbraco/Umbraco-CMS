@@ -5,7 +5,7 @@
 import type { Relation } from './Relation';
 
 export type PagedRelation = {
-    total?: number;
-    items?: Array<Relation> | null;
+    total: number;
+    items: Array<Relation>;
 };
 

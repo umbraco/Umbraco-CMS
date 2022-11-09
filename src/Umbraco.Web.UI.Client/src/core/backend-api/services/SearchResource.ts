@@ -17,7 +17,7 @@ export class SearchResource {
      * @returns PagedIndex Success
      * @throws ApiError
      */
-    public static getUmbracoManagementApiV1SearchIndex({
+    public static indexes({
         skip,
         take,
     }: {
@@ -38,7 +38,7 @@ export class SearchResource {
      * @returns Index Success
      * @throws ApiError
      */
-    public static getUmbracoManagementApiV1SearchIndex1({
+    public static index({
         indexName,
     }: {
         indexName: string,
@@ -59,7 +59,7 @@ export class SearchResource {
      * @returns OkResult Success
      * @throws ApiError
      */
-    public static postUmbracoManagementApiV1SearchIndexRebuild({
+    public static rebuild({
         indexName,
     }: {
         indexName: string,
@@ -80,7 +80,7 @@ export class SearchResource {
      * @returns PagedSearcher Success
      * @throws ApiError
      */
-    public static getUmbracoManagementApiV1SearchSearcher({
+    public static searchers({
         skip,
         take,
     }: {
@@ -101,7 +101,7 @@ export class SearchResource {
      * @returns PagedPaged Success
      * @throws ApiError
      */
-    public static getUmbracoManagementApiV1SearchSearcherSearch({
+    public static getSearchResults({
         searcherName,
         query,
         skip,

@@ -14,7 +14,7 @@ export class DataTypeResource {
      * @returns PagedFolderTreeItem Success
      * @throws ApiError
      */
-    public static getUmbracoManagementApiV1TreeDataTypeChildren({
+    public static children({
         parentKey,
         skip,
         take = 100,
@@ -41,7 +41,7 @@ export class DataTypeResource {
      * @returns FolderTreeItem Success
      * @throws ApiError
      */
-    public static getUmbracoManagementApiV1TreeDataTypeItem({
+    public static items({
         key,
     }: {
         key?: Array<string>,
@@ -59,7 +59,7 @@ export class DataTypeResource {
      * @returns PagedFolderTreeItem Success
      * @throws ApiError
      */
-    public static getUmbracoManagementApiV1TreeDataTypeRoot({
+    public static root({
         skip,
         take = 100,
         foldersOnly = false,

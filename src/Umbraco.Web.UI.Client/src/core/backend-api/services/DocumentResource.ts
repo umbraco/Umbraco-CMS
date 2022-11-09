@@ -15,7 +15,7 @@ export class DocumentResource {
      * @returns PagedRecycleBinItem Success
      * @throws ApiError
      */
-    public static getUmbracoManagementApiV1RecycleBinDocumentChildren({
+    public static children({
         parentKey,
         skip,
         take = 100,
@@ -42,7 +42,7 @@ export class DocumentResource {
      * @returns PagedRecycleBinItem Success
      * @throws ApiError
      */
-    public static getUmbracoManagementApiV1RecycleBinDocumentRoot({
+    public static root({
         skip,
         take = 100,
     }: {
@@ -66,7 +66,7 @@ export class DocumentResource {
      * @returns PagedDocumentTreeItem Success
      * @throws ApiError
      */
-    public static getUmbracoManagementApiV1TreeDocumentChildren({
+    public static children1({
         parentKey,
         skip,
         take = 100,
@@ -96,7 +96,7 @@ export class DocumentResource {
      * @returns DocumentTreeItem Success
      * @throws ApiError
      */
-    public static getUmbracoManagementApiV1TreeDocumentItem({
+    public static items({
         key,
         dataTypeKey,
         culture,
@@ -120,7 +120,7 @@ export class DocumentResource {
      * @returns PagedDocumentTreeItem Success
      * @throws ApiError
      */
-    public static getUmbracoManagementApiV1TreeDocumentRoot({
+    public static root1({
         skip,
         take = 100,
         dataTypeKey,

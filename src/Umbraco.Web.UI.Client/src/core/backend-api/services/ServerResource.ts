@@ -14,7 +14,7 @@ export class ServerResource {
      * @returns ServerStatus Success
      * @throws ApiError
      */
-    public static getUmbracoManagementApiV1ServerStatus(): CancelablePromise<ServerStatus> {
+    public static get(): CancelablePromise<ServerStatus> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/server/status',
@@ -28,7 +28,7 @@ export class ServerResource {
      * @returns Version Success
      * @throws ApiError
      */
-    public static getUmbracoManagementApiV1ServerVersion(): CancelablePromise<Version> {
+    public static get1(): CancelablePromise<Version> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/server/version',

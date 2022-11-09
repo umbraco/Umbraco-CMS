@@ -15,7 +15,7 @@ export class MediaResource {
      * @returns PagedRecycleBinItem Success
      * @throws ApiError
      */
-    public static getUmbracoManagementApiV1RecycleBinMediaChildren({
+    public static children({
         parentKey,
         skip,
         take = 100,
@@ -42,7 +42,7 @@ export class MediaResource {
      * @returns PagedRecycleBinItem Success
      * @throws ApiError
      */
-    public static getUmbracoManagementApiV1RecycleBinMediaRoot({
+    public static root({
         skip,
         take = 100,
     }: {
@@ -66,7 +66,7 @@ export class MediaResource {
      * @returns PagedContentTreeItem Success
      * @throws ApiError
      */
-    public static getUmbracoManagementApiV1TreeMediaChildren({
+    public static children1({
         parentKey,
         skip,
         take = 100,
@@ -93,7 +93,7 @@ export class MediaResource {
      * @returns ContentTreeItem Success
      * @throws ApiError
      */
-    public static getUmbracoManagementApiV1TreeMediaItem({
+    public static items({
         key,
         dataTypeKey,
     }: {
@@ -114,7 +114,7 @@ export class MediaResource {
      * @returns PagedContentTreeItem Success
      * @throws ApiError
      */
-    public static getUmbracoManagementApiV1TreeMediaRoot({
+    public static root1({
         skip,
         take = 100,
         dataTypeKey,

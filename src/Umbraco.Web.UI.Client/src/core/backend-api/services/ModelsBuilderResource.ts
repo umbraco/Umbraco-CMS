@@ -15,7 +15,7 @@ export class ModelsBuilderResource {
      * @returns CreatedResult Created
      * @throws ApiError
      */
-    public static postUmbracoManagementApiV1ModelsBuilderBuild(): CancelablePromise<CreatedResult> {
+    public static buildModels(): CancelablePromise<CreatedResult> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/models-builder/build',
@@ -29,7 +29,7 @@ export class ModelsBuilderResource {
      * @returns ModelsBuilder Success
      * @throws ApiError
      */
-    public static getUmbracoManagementApiV1ModelsBuilderDashboard(): CancelablePromise<ModelsBuilder> {
+    public static getDashboard(): CancelablePromise<ModelsBuilder> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/models-builder/dashboard',
@@ -40,7 +40,7 @@ export class ModelsBuilderResource {
      * @returns OutOfDateStatus Success
      * @throws ApiError
      */
-    public static getUmbracoManagementApiV1ModelsBuilderStatus(): CancelablePromise<OutOfDateStatus> {
+    public static getModelsOutOfDateStatus(): CancelablePromise<OutOfDateStatus> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/models-builder/status',

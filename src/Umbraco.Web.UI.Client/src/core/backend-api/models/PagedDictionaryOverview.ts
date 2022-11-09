@@ -5,7 +5,7 @@
 import type { DictionaryOverview } from './DictionaryOverview';
 
 export type PagedDictionaryOverview = {
-    total?: number;
-    items?: Array<DictionaryOverview> | null;
+    total: number;
+    items: Array<DictionaryOverview>;
 };
 

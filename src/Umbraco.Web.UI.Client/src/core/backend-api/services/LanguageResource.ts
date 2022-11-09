@@ -14,7 +14,7 @@ export class LanguageResource {
      * @returns PagedLanguage Success
      * @throws ApiError
      */
-    public static getUmbracoManagementApiV1Language({
+    public static getAll({
         skip,
         take,
     }: {
@@ -35,7 +35,7 @@ export class LanguageResource {
      * @returns Language Success
      * @throws ApiError
      */
-    public static getUmbracoManagementApiV1Language1({
+    public static byId({
         id,
     }: {
         id: number,
@@ -56,7 +56,7 @@ export class LanguageResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static deleteUmbracoManagementApiV1Language({
+    public static delete({
         id,
     }: {
         id: number,
@@ -78,7 +78,7 @@ export class LanguageResource {
      * @returns any Created
      * @throws ApiError
      */
-    public static postUmbracoManagementApiV1LanguageCreate({
+    public static create({
         requestBody,
     }: {
         requestBody?: Language,
@@ -98,7 +98,7 @@ export class LanguageResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static putUmbracoManagementApiV1LanguageUpdate({
+    public static update({
         requestBody,
     }: {
         requestBody?: Language,

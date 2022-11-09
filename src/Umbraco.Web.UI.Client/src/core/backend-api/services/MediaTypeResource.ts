@@ -14,7 +14,7 @@ export class MediaTypeResource {
      * @returns PagedFolderTreeItem Success
      * @throws ApiError
      */
-    public static getUmbracoManagementApiV1TreeMediaTypeChildren({
+    public static children({
         parentKey,
         skip,
         take = 100,
@@ -41,7 +41,7 @@ export class MediaTypeResource {
      * @returns FolderTreeItem Success
      * @throws ApiError
      */
-    public static getUmbracoManagementApiV1TreeMediaTypeItem({
+    public static items({
         key,
     }: {
         key?: Array<string>,
@@ -59,7 +59,7 @@ export class MediaTypeResource {
      * @returns PagedFolderTreeItem Success
      * @throws ApiError
      */
-    public static getUmbracoManagementApiV1TreeMediaTypeRoot({
+    public static root({
         skip,
         take = 100,
         foldersOnly = false,

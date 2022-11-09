@@ -13,7 +13,7 @@ export class HelpResource {
      * @returns PagedHelpPage Success
      * @throws ApiError
      */
-    public static getUmbracoManagementApiV1Help({
+    public static get({
         section,
         tree,
         skip,

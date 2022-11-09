@@ -14,7 +14,7 @@ export class TemplateResource {
      * @returns PagedEntityTreeItem Success
      * @throws ApiError
      */
-    public static getUmbracoManagementApiV1TreeTemplateChildren({
+    public static children({
         parentKey,
         skip,
         take = 100,
@@ -38,7 +38,7 @@ export class TemplateResource {
      * @returns EntityTreeItem Success
      * @throws ApiError
      */
-    public static getUmbracoManagementApiV1TreeTemplateItem({
+    public static items({
         key,
     }: {
         key?: Array<string>,
@@ -56,7 +56,7 @@ export class TemplateResource {
      * @returns PagedEntityTreeItem Success
      * @throws ApiError
      */
-    public static getUmbracoManagementApiV1TreeTemplateRoot({
+    public static root({
         skip,
         take = 100,
     }: {

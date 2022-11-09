@@ -5,7 +5,7 @@
 import type { DocumentTreeItem } from './DocumentTreeItem';
 
 export type PagedDocumentTreeItem = {
-    total?: number;
-    items?: Array<DocumentTreeItem> | null;
+    total: number;
+    items: Array<DocumentTreeItem>;
 };
 

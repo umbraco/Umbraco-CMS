@@ -14,7 +14,7 @@ export class DocumentTypeResource {
      * @returns PagedDocumentTypeTreeItem Success
      * @throws ApiError
      */
-    public static getUmbracoManagementApiV1TreeDocumentTypeChildren({
+    public static children({
         parentKey,
         skip,
         take = 100,
@@ -41,7 +41,7 @@ export class DocumentTypeResource {
      * @returns DocumentTypeTreeItem Success
      * @throws ApiError
      */
-    public static getUmbracoManagementApiV1TreeDocumentTypeItem({
+    public static items({
         key,
     }: {
         key?: Array<string>,
@@ -59,7 +59,7 @@ export class DocumentTypeResource {
      * @returns PagedDocumentTypeTreeItem Success
      * @throws ApiError
      */
-    public static getUmbracoManagementApiV1TreeDocumentTypeRoot({
+    public static root({
         skip,
         take = 100,
         foldersOnly = false,

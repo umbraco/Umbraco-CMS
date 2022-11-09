@@ -5,7 +5,7 @@
 import type { Telemetry } from './Telemetry';
 
 export type PagedTelemetry = {
-    total?: number;
-    items?: Array<Telemetry> | null;
+    total: number;
+    items: Array<Telemetry>;
 };
 

@@ -5,7 +5,7 @@
 import type { DocumentBlueprintTreeItem } from './DocumentBlueprintTreeItem';
 
 export type PagedDocumentBlueprintTreeItem = {
-    total?: number;
-    items?: Array<DocumentBlueprintTreeItem> | null;
+    total: number;
+    items: Array<DocumentBlueprintTreeItem>;
 };
 

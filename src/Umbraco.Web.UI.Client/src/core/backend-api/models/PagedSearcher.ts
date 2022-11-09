@@ -5,7 +5,7 @@
 import type { Searcher } from './Searcher';
 
 export type PagedSearcher = {
-    total?: number;
-    items?: Array<Searcher> | null;
+    total: number;
+    items: Array<Searcher>;
 };
 

@@ -5,7 +5,7 @@
 import type { RecycleBinItem } from './RecycleBinItem';
 
 export type PagedRecycleBinItem = {
-    total?: number;
-    items?: Array<RecycleBinItem> | null;
+    total: number;
+    items: Array<RecycleBinItem>;
 };
 

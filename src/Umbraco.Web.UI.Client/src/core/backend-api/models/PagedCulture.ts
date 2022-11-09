@@ -5,7 +5,7 @@
 import type { Culture } from './Culture';
 
 export type PagedCulture = {
-    total?: number;
-    items?: Array<Culture> | null;
+    total: number;
+    items: Array<Culture>;
 };
 

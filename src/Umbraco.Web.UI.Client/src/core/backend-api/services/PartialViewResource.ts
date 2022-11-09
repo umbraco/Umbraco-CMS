@@ -14,7 +14,7 @@ export class PartialViewResource {
      * @returns PagedFileSystemTreeItem Success
      * @throws ApiError
      */
-    public static getUmbracoManagementApiV1TreePartialViewChildren({
+    public static children({
         path,
         skip,
         take = 100,
@@ -38,7 +38,7 @@ export class PartialViewResource {
      * @returns FileSystemTreeItem Success
      * @throws ApiError
      */
-    public static getUmbracoManagementApiV1TreePartialViewItem({
+    public static items({
         path,
     }: {
         path?: Array<string>,
@@ -56,7 +56,7 @@ export class PartialViewResource {
      * @returns PagedFileSystemTreeItem Success
      * @throws ApiError
      */
-    public static getUmbracoManagementApiV1TreePartialViewRoot({
+    public static root({
         skip,
         take = 100,
     }: {

@@ -14,7 +14,7 @@ export class TelemetryResource {
      * @returns PagedTelemetry Success
      * @throws ApiError
      */
-    public static getUmbracoManagementApiV1Telemetry({
+    public static getAll({
         skip,
         take,
     }: {
@@ -35,7 +35,7 @@ export class TelemetryResource {
      * @returns Telemetry Success
      * @throws ApiError
      */
-    public static getUmbracoManagementApiV1TelemetryLevel(): CancelablePromise<Telemetry> {
+    public static get(): CancelablePromise<Telemetry> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/telemetry/level',
@@ -46,7 +46,7 @@ export class TelemetryResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static postUmbracoManagementApiV1TelemetryLevel({
+    public static setConsentLevel({
         requestBody,
     }: {
         requestBody?: Telemetry,

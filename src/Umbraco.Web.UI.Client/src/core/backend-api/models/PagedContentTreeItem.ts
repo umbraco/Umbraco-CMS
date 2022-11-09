@@ -5,7 +5,7 @@
 import type { ContentTreeItem } from './ContentTreeItem';
 
 export type PagedContentTreeItem = {
-    total?: number;
-    items?: Array<ContentTreeItem> | null;
+    total: number;
+    items: Array<ContentTreeItem>;
 };
 

@@ -5,7 +5,7 @@
 import type { PagedSearchResult } from './PagedSearchResult';
 
 export type PagedPaged = {
-    total?: number;
-    items?: Array<PagedSearchResult> | null;
+    total: number;
+    items: Array<PagedSearchResult>;
 };
 

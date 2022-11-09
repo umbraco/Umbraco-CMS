@@ -21,7 +21,7 @@ export class DictionaryResource {
      * @returns PagedDictionaryOverview Success
      * @throws ApiError
      */
-    public static getUmbracoManagementApiV1Dictionary({
+    public static all({
         skip,
         take,
     }: {
@@ -42,7 +42,7 @@ export class DictionaryResource {
      * @returns ContentResult Success
      * @throws ApiError
      */
-    public static patchUmbracoManagementApiV1Dictionary({
+    public static update({
         id,
         requestBody,
     }: {
@@ -67,7 +67,7 @@ export class DictionaryResource {
      * @returns Dictionary Success
      * @throws ApiError
      */
-    public static getUmbracoManagementApiV1Dictionary1({
+    public static byKey({
         key,
     }: {
         key: string,
@@ -88,7 +88,7 @@ export class DictionaryResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static deleteUmbracoManagementApiV1Dictionary({
+    public static delete({
         key,
     }: {
         key: string,
@@ -109,7 +109,7 @@ export class DictionaryResource {
      * @returns CreatedResult Created
      * @throws ApiError
      */
-    public static postUmbracoManagementApiV1DictionaryCreate({
+    public static create({
         requestBody,
     }: {
         requestBody?: DictionaryItem,
@@ -129,7 +129,7 @@ export class DictionaryResource {
      * @returns binary Success
      * @throws ApiError
      */
-    public static getUmbracoManagementApiV1DictionaryExport({
+    public static exportDictionary({
         key,
         includeChildren = false,
     }: {
@@ -155,7 +155,7 @@ export class DictionaryResource {
      * @returns ContentResult Success
      * @throws ApiError
      */
-    public static postUmbracoManagementApiV1DictionaryImport({
+    public static importDictionary({
         file,
         parentId,
     }: {
@@ -179,7 +179,7 @@ export class DictionaryResource {
      * @returns DictionaryImport Success
      * @throws ApiError
      */
-    public static postUmbracoManagementApiV1DictionaryUpload({
+    public static upload({
         requestBody,
     }: {
         requestBody?: any,
@@ -198,7 +198,7 @@ export class DictionaryResource {
      * @returns PagedEntityTreeItem Success
      * @throws ApiError
      */
-    public static getUmbracoManagementApiV1TreeDictionaryChildren({
+    public static children({
         parentKey,
         skip,
         take = 100,
@@ -222,7 +222,7 @@ export class DictionaryResource {
      * @returns FolderTreeItem Success
      * @throws ApiError
      */
-    public static getUmbracoManagementApiV1TreeDictionaryItem({
+    public static items({
         key,
     }: {
         key?: Array<string>,
@@ -240,7 +240,7 @@ export class DictionaryResource {
      * @returns PagedEntityTreeItem Success
      * @throws ApiError
      */
-    public static getUmbracoManagementApiV1TreeDictionaryRoot({
+    public static root({
         skip,
         take = 100,
     }: {
