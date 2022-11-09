@@ -155,7 +155,7 @@
         vm.invalidEntries = [];
 
         function handleFiles (files, event, invalidFiles) {
-            vm.invalidEntries = invalidFiles.map(file => {
+            const invalidEntries = invalidFiles.map(file => {
                 const tempMediaEntry = {
                     key: String.CreateGuid(),
                     name: file.name
@@ -167,6 +167,8 @@
 
                 return tempMediaEntry;
             });
+
+            vm.invalidEntries = [...invalidEntries, ...vm.invalidEntries]
 
             const queueItems = files.map(file => {
                 const tempMediaEntry = {
