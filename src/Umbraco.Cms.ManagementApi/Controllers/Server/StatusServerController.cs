@@ -16,6 +16,6 @@ public class StatusServerController : ServerControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ServerStatusViewModel), StatusCodes.Status200OK)]
-    public async Task<ActionResult<ServerStatusViewModel>> Get() =>
+    public async Task<ActionResult<ServerStatusViewModel>> Status() =>
         await Task.FromResult(new ServerStatusViewModel { ServerStatus = _runtimeState.Level });
 }
