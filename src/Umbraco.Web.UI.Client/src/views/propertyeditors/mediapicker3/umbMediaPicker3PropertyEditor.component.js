@@ -250,6 +250,7 @@
                     queueItem.tempMediaEntry.uploadProgress = progressPercentage;
                 })
                 .success(function (data) {
+                    queueItem.tempMediaEntry.tmpLocation = data.tmpLocation;
                     updateMediaEntryData(queueItem.tempMediaEntry);
                     _processQueue();
                 })
