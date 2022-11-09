@@ -37,7 +37,7 @@ export class UmbDashboardTelemetryElement extends LitElement {
 
 	private async _setup() {
 		try {
-			const consentLevels = await TelemetryResource.getUmbracoManagementApiV1Telemetry({});
+			const consentLevels = await TelemetryResource.getAll({});
 			this._telemetryLevels = consentLevels.items ?? [];
 		} catch (e) {
 			if (e instanceof ApiError) {
@@ -47,7 +47,7 @@ export class UmbDashboardTelemetryElement extends LitElement {
 		}
 
 		try {
-			const consentSetting = await TelemetryResource.getUmbracoManagementApiV1TelemetryLevel();
+			const consentSetting = await TelemetryResource.get();
 			this._telemetryFormData = consentSetting.telemetryLevel ?? TelemetryLevel.BASIC;
 		} catch (e) {
 			if (e instanceof ApiError) {
@@ -60,7 +60,7 @@ export class UmbDashboardTelemetryElement extends LitElement {
 	private _handleSubmit = async (e: CustomEvent<SubmitEvent>) => {
 		e.stopPropagation();
 		try {
-			await TelemetryResource.postUmbracoManagementApiV1TelemetryLevel({
+			await TelemetryResource.setConsentLevel({
 				requestBody: { telemetryLevel: this._telemetryFormData },
 			});
 		} catch (e) {

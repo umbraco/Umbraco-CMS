@@ -208,7 +208,7 @@ export class UmbInstallerDatabaseElement extends UmbContextConsumerMixin(UmbObse
 							providerName: selectedDatabase.providerName,
 						};
 					}
-					await InstallResource.postUmbracoManagementApiV1InstallValidateDatabase({ requestBody: databaseDetails });
+					await InstallResource.validateDatabase({ requestBody: databaseDetails });
 				} catch (e) {
 					if (e instanceof ApiError) {
 						const error = e.body as ProblemDetails;
@@ -241,7 +241,7 @@ export class UmbInstallerDatabaseElement extends UmbContextConsumerMixin(UmbObse
 		this._installerContext
 			.requestInstall()
 			.then(() => this._handleFulfilled())
-			.catch((error) => this._handleRejected(error));
+			.catch((error: unknown) => this._handleRejected(error));
 	};
 
 	private _handleFulfilled() {

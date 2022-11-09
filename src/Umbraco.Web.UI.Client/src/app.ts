@@ -78,7 +78,7 @@ export class UmbApp extends UmbContextProviderMixin(LitElement) {
 
 	private async _setInitStatus() {
 		try {
-			const serverStatus = await ServerResource.getUmbracoManagementApiV1ServerStatus();
+			const serverStatus = await ServerResource.status();
 			if (serverStatus.serverStatus) {
 				this._runtimeLevel = serverStatus.serverStatus;
 			}

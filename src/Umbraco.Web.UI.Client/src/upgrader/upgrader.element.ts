@@ -42,7 +42,7 @@ export class UmbUpgrader extends LitElement {
 		this.fetching = true;
 
 		try {
-			const data = await UpgradeResource.getUmbracoManagementApiV1UpgradeSettings();
+			const data = await UpgradeResource.settings();
 			this.upgradeSettings = data;
 		} catch (e) {
 			if (e instanceof ApiError) {
@@ -60,7 +60,7 @@ export class UmbUpgrader extends LitElement {
 		this.upgrading = true;
 
 		try {
-			await UpgradeResource.postUmbracoManagementApiV1UpgradeAuthorize();
+			await UpgradeResource.authorize();
 			history.pushState(null, '', '/');
 		} catch (e) {
 			if (e instanceof ApiError) {

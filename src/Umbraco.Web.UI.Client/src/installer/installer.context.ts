@@ -103,7 +103,7 @@ export class UmbInstallerContext {
 	 */
 	public requestInstall() {
 		// TODO: The post install will probably return a user in the future, so we have to set that context somewhere to let the client know that it is authenticated
-		return InstallResource.postUmbracoManagementApiV1InstallSetup({ requestBody: this.getData() });
+		return InstallResource.setup({ requestBody: this.getData() });
 	}
 
 	/**
@@ -122,7 +122,7 @@ export class UmbInstallerContext {
 	 * @memberof UmbInstallerContext
 	 */
 	private _loadInstallerSettings() {
-		InstallResource.getUmbracoManagementApiV1InstallSettings().then((installSettings) => {
+		InstallResource.settings().then((installSettings) => {
 			this._settings.next(installSettings);
 		});
 	}
