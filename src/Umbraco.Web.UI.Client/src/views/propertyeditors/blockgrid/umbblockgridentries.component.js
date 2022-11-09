@@ -666,6 +666,8 @@
                     ghostEl = null;
                     relatedEl = null;
                     vm.containedPropertyEditorProxies = [];
+
+                    vm.notifyVisualUpdate();
                 }
             });
 
