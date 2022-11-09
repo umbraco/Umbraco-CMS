@@ -23,11 +23,11 @@
         // Remove the listener once we know the iframe is loaded
         window.removeEventListener("message", onMessage);
 
-        onLoaded();
+        onMarketplaceLoaded();
       }
     }
 
-    function onLoaded() {
+    function onMarketplaceLoaded() {
       console.log('Marketplace is loaded - we need to do something here');
     }
   }
