@@ -2,7 +2,8 @@ import { rest } from 'msw';
 
 import { umbracoPath } from '@umbraco-cms/utils';
 
-import type { ManifestsPackagesInstalledResponse, ManifestsResponse } from '@umbraco-cms/models';
+interface ManifestsResponse extends Record<string, any> {}
+interface ManifestsPackagesInstalledResponse extends ManifestsResponse {}
 
 export const manifestDevelopmentHandler = rest.get(umbracoPath('/manifests'), (_req, res, ctx) => {
 	return res(
