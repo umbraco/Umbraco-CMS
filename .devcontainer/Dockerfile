@@ -1,4 +1,4 @@
-# [Choice] .NET version: 6.0, 3.1, 6.0-bullseye, 3.1-bullseye, 6.0-focal, 3.1-focal
+RU# [Choice] .NET version: 6.0, 3.1, 6.0-bullseye, 3.1-bullseye, 6.0-focal, 3.1-focal
 ARG VARIANT=6.0-bullseye
 FROM mcr.microsoft.com/vscode/devcontainers/dotnet:0-${VARIANT}
 
@@ -26,3 +26,4 @@ RUN if [ "${NODE_VERSION}" != "none" ]; then su vscode -c "umask 0002 && . /usr/
 # Generate and trust a local developer certificate for Kestrel
 # This is needed for Kestrel to bind on https
 RUN dotnet dev-certs https --trust
+RUN curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin
