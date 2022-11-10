@@ -100,7 +100,7 @@ ng-form.ng-invalid-val-server-match-content > .umb-block-grid__block:not(.--acti
     width: 100%;
     height: 100%;
 
-    --umb-block-grid__block--show-ui: 0;// Publicly available.
+    --umb-block-grid--block-ui-opacity: 0;
     --umb-block-grid--hint-area-ui: 0;
 
     &::after {
@@ -217,18 +217,21 @@ ng-form.ng-invalid-val-server-match-content > .umb-block-grid__block:not(.--acti
         }
     }
     &.--block-ui-visible {
+
         > .umb-block-grid__block--context {
             /* take full width to prevent interaction with elements behind.*/
             left: 0;
         }
         .umb-block-grid__area-container, .umb-block-grid__block--view::part(area-container) {
             --umb-block-grid--block-ui-display: none;
-            .umb-block-grid__layout-item {
-                pointer-events: none;
-            }
-            .umb-block-grid__block {
-                pointer-events: none;
-            }
+            pointer-events: none;
+        }
+        .umb-block-grid__layout-item {
+            pointer-events: none;
+        }
+        .umb-block-grid__block {
+            pointer-events: none;
+            --umb-block-grid--block-ui-opacity: 0;
         }
     }
     
@@ -242,27 +245,27 @@ ng-form.ng-invalid-val-server-match-content > .umb-block-grid__block:not(.--acti
     &.--active {
 
         /** Avoid displaying hover when dragging-mode */
-        --umb-block-grid--block_ui-opacity: calc(1 - var(--umb-block-grid--dragging-mode, 0));
+        --umb-block-grid--block-ui-opacity: calc(1 - var(--umb-block-grid--dragging-mode, 0));
         
         > .umb-block-grid__block--context {
-            opacity: var(--umb-block-grid--block_ui-opacity);
+            opacity: var(--umb-block-grid--block-ui-opacity);
         }
         &:not(.--scale-mode) {
             > .umb-block-grid__block--actions {
-                opacity: var(--umb-block-grid--block_ui-opacity);
+                opacity: var(--umb-block-grid--block-ui-opacity);
             }
     
             > umb-block-grid-block > umb-block-grid-entries > .umb-block-grid__layout-container > .umb-block-grid__area-actions {
-                opacity: var(--umb-block-grid--block_ui-opacity);
+                opacity: var(--umb-block-grid--block-ui-opacity);
             }
         }
         
         > .umb-block-grid__scale-handler {
-            opacity: var(--umb-block-grid--block_ui-opacity);
+            opacity: var(--umb-block-grid--block-ui-opacity);
         }
         > .umb-block-grid__force-left, 
         > .umb-block-grid__force-right {
-            opacity: var(--umb-block-grid--block_ui-opacity);
+            opacity: var(--umb-block-grid--block-ui-opacity);
         }
     }
 
