@@ -180,8 +180,7 @@ test.describe('BlockListEditorDataType', () => {
       .withMimeType(mimeType)
     const testImage = await umbracoApi.media.saveFile(mediaItem, mediaFile)
     // Finds the image path so we are able to locate where the image is located in the wwwroot
-    const imagePath = testImage.mediaLink.replace('/media/', '').replace('/' + fileName, '');
-
+    const imagePath = testImage.mediaLink.replace('/media/', '').replace('/umbraco.png', '');
     const stylesheet = new StylesheetBuilder()
       .withVirtualPath("/css/")
       .withFileType("stylesheets")
