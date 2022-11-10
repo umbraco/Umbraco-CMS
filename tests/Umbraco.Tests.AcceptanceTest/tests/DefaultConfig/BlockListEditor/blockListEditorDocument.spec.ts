@@ -35,6 +35,8 @@ test.describe('BlockListEditorDocument', () => {
 
     // Adds a group with a BlockList editor
     await umbracoUi.goToAddEditor(groupName, blockListName);
+    // Waits until the selector is visible
+    await expect(page.locator('[data-element="datatype-Block List]')).toBeVisible();
     await umbracoUi.clickDataElementByElementName('datatype-Block List');
 
     // Creates new BlockList editor
