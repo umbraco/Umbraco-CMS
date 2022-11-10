@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
@@ -24,7 +25,7 @@ using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Cms.ManagementApi;
 
-public class ManagementApiComposer : IComposer
+public partial class ManagementApiComposer : IComposer
 {
     private const string ApiTitle = "Umbraco Backoffice API";
     private const string ApiDefaultDocumentName = "v1";
@@ -59,7 +60,27 @@ public class ManagementApiComposer : IComposer
 
         services.AddSwaggerGen(swaggerGenOptions =>
         {
-            swaggerGenOptions.CustomOperationIds(e => e.ActionDescriptor.RouteValues["action"]);
+            swaggerGenOptions.CustomOperationIds(e =>
+            {
+                var httpMethod = e.HttpMethod?.ToLower().ToFirstUpper();
+                var controller = e.ActionDescriptor.RouteValues["controller"] ?? "Operation";
+                var action = e.ActionDescriptor.RouteValues["action"];
+
+                var relativePath = e.RelativePath ?? controller;
+
+                // Remove the prefixed base path with version, e.g. /umbraco/management/api/v1/tracked-reference/{id} => tracked-reference/{id}
+                var unprefixedRelativePath = VersionPrefixRegex().Replace(relativePath, string.Empty);
+
+                // Remove template placeholders, e.g. tracked-reference/{id} => tracked-reference/Id
+                var formattedOperationId = TemplatePlaceholdersRegex().Replace(unprefixedRelativePath, m => $"By{m.Groups[1].Value.ToFirstUpper()}");
+
+                // Remove dashes (-) and slashes (/) and convert the following letter to uppercase with
+                // the word "By" in front, e.g. tracked-reference/Id => TrackedReferenceById
+                formattedOperationId = ToCamelCaseRegex().Replace(formattedOperationId, m => m.Groups[1].Value.ToUpper());
+
+                // Return the operation ID with the formatted http method verb in front, e.g. GetTrackedReferenceById
+                return $"{httpMethod}{formattedOperationId.ToFirstUpper()}";
+            });
             swaggerGenOptions.SwaggerDoc(
                 ApiDefaultDocumentName,
                 new OpenApiInfo
@@ -210,11 +231,20 @@ public class ManagementApiComposer : IComposer
                         // Serve contract
                         endpoints.MapGet($"{officePath}/management/api/openapi.json",async  context =>
                         {
-                            await context.Response.SendFileAsync(new EmbeddedFileProvider(this.GetType().Assembly).GetFileInfo("OpenApi.json"));
+                            await context.Response.SendFileAsync(new EmbeddedFileProvider(GetType().Assembly).GetFileInfo("OpenApi.json"));
                         });
                     });
                 }
             ));
         });
     }
+
+    [GeneratedRegex(".*?\\/v[1-9]+/")]
+    private static partial Regex VersionPrefixRegex();
+
+    [GeneratedRegex("\\{(.*?)\\}")]
+    private static partial Regex TemplatePlaceholdersRegex();
+
+    [GeneratedRegex("[\\/\\-](\\w{1})")]
+    private static partial Regex ToCamelCaseRegex();
 }
