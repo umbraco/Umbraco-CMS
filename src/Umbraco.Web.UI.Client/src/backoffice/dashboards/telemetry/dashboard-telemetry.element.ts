@@ -37,7 +37,7 @@ export class UmbDashboardTelemetryElement extends LitElement {
 
 	private async _setup() {
 		try {
-			const consentLevels = await TelemetryResource.getAll({});
+			const consentLevels = await TelemetryResource.getTelemetry({});
 			this._telemetryLevels = consentLevels.items ?? [];
 		} catch (e) {
 			if (e instanceof ApiError) {
@@ -47,7 +47,7 @@ export class UmbDashboardTelemetryElement extends LitElement {
 		}
 
 		try {
-			const consentSetting = await TelemetryResource.get();
+			const consentSetting = await TelemetryResource.getTelemetryLevel();
 			this._telemetryFormData = consentSetting.telemetryLevel ?? TelemetryLevel.BASIC;
 		} catch (e) {
 			if (e instanceof ApiError) {
@@ -60,7 +60,7 @@ export class UmbDashboardTelemetryElement extends LitElement {
 	private _handleSubmit = async (e: CustomEvent<SubmitEvent>) => {
 		e.stopPropagation();
 		try {
-			await TelemetryResource.setConsentLevel({
+			await TelemetryResource.postTelemetryLevel({
 				requestBody: { telemetryLevel: this._telemetryFormData },
 			});
 		} catch (e) {

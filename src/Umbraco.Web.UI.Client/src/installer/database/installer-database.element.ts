@@ -208,7 +208,7 @@ export class UmbInstallerDatabaseElement extends UmbContextConsumerMixin(UmbObse
 							providerName: selectedDatabase.providerName,
 						};
 					}
-					await InstallResource.validateDatabase({ requestBody: databaseDetails });
+					await InstallResource.postInstallValidateDatabase({ requestBody: databaseDetails });
 				} catch (e) {
 					if (e instanceof ApiError) {
 						const error = e.body as ProblemDetails;

@@ -103,7 +103,7 @@ export class UmbInstallerContext {
 	 */
 	public requestInstall() {
 		// TODO: The post install will probably return a user in the future, so we have to set that context somewhere to let the client know that it is authenticated
-		return InstallResource.setup({ requestBody: this.getData() });
+		return InstallResource.postInstallSetup({ requestBody: this.getData() });
 	}
 
 	/**
@@ -122,7 +122,7 @@ export class UmbInstallerContext {
 	 * @memberof UmbInstallerContext
 	 */
 	private _loadInstallerSettings() {
-		InstallResource.settings().then((installSettings) => {
+		InstallResource.getInstallSettings().then((installSettings) => {
 			this._settings.next(installSettings);
 		});
 	}

@@ -60,7 +60,7 @@ export class UmbDashboardPublishedStatusElement extends UmbContextConsumerMixin(
 
 	private async _getPublishedStatus() {
 		try {
-			const data = await PublishedCacheResource.status();
+			const data = await PublishedCacheResource.getPublishedCacheStatus();
 			this._publishedStatusText = data;
 		} catch (e) {
 			if (e instanceof ApiError) {
@@ -81,7 +81,7 @@ export class UmbDashboardPublishedStatusElement extends UmbContextConsumerMixin(
 		this._buttonStateReload = 'waiting';
 		this._buttonState = 'waiting';
 		try {
-			await PublishedCacheResource.reload();
+			await PublishedCacheResource.postPublishedCacheReload();
 			this._buttonStateReload = 'success';
 			this._getPublishedStatus();
 			this._buttonState = 'success';
@@ -111,7 +111,7 @@ export class UmbDashboardPublishedStatusElement extends UmbContextConsumerMixin(
 	private async _rebuildDatabaseCache() {
 		this._buttonStateRebuild = 'waiting';
 		try {
-			await PublishedCacheResource.rebuild();
+			await PublishedCacheResource.postPublishedCacheRebuild();
 			this._buttonStateRebuild = 'success';
 		} catch (e) {
 			this._buttonStateRebuild = 'failed';
@@ -137,7 +137,7 @@ export class UmbDashboardPublishedStatusElement extends UmbContextConsumerMixin(
 	//Collect
 	private async _cacheCollect() {
 		try {
-			await PublishedCacheResource.collect();
+			await PublishedCacheResource.postPublishedCacheCollect();
 			this._buttonStateCollect = 'success';
 		} catch (e) {
 			this._buttonStateCollect = 'failed';
