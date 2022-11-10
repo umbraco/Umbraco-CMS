@@ -184,30 +184,24 @@ export class UmbInstallerDatabaseElement extends UmbContextConsumerMixin(UmbObse
 			const selectedDatabase = this._databases.find((x) => x.id === id);
 
 			if (!selectedDatabase || !selectedDatabase.providerName || !selectedDatabase.id) {
-				this._validationErrorMessage = 'No database selected';
+				this._validationErrorMessage = 'No valid database selected';
 				this._installButton.state = 'failed';
 				return;
 			}
 
-			if (selectedDatabase?.requiresConnectionTest) {
+			if (selectedDatabase.requiresConnectionTest) {
 				try {
-					let databaseDetails: DatabaseInstall = {
-						id: '0',
-						providerName: '',
+					const databaseDetails: DatabaseInstall = {
+						id,
+						username,
+						password,
+						server,
+						useIntegratedAuthentication,
+						name,
+						connectionString,
+						providerName: selectedDatabase.providerName,
 					};
 
-					if (connectionString) {
-						databaseDetails.connectionString = connectionString;
-					} else {
-						databaseDetails = {
-							id,
-							username,
-							password,
-							server,
-							useIntegratedAuthentication,
-							providerName: selectedDatabase.providerName,
-						};
-					}
 					await InstallResource.postInstallValidateDatabase({ requestBody: databaseDetails });
 				} catch (e) {
 					if (e instanceof ApiError) {
@@ -318,7 +312,7 @@ export class UmbInstallerDatabaseElement extends UmbContextConsumerMixin(UmbObse
 			.value=${value}
 			id="database-name"
 			name="name"
-			label="Data name"
+			label="Database name"
 			@input=${this._handleChange}
 			placeholder="umbraco"
 			required
