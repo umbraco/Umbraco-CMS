@@ -157,8 +157,8 @@ test.describe('BlockListEditorDataType', () => {
     const stylesheetName = 'TestStyleSheet';
 
     const imageName = "Umbraco";
-    const umbracoFileValue = {"src": "umbraco.png"};
-    const fileName = "umbraco.png";
+    const umbracoFileValue = {"src": "Umbraco.png"};
+    const fileName = "Umbraco.png";
     const path = fileName;
     const mimeType = "image/png";
 
