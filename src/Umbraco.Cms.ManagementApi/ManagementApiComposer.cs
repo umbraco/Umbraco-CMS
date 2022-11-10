@@ -62,17 +62,20 @@ public partial class ManagementApiComposer : IComposer
         {
             swaggerGenOptions.CustomOperationIds(e =>
             {
-                var httpMethod = e.HttpMethod?.ToLower().ToFirstUpper();
-                var controller = e.ActionDescriptor.RouteValues["controller"] ?? "Operation";
-                var action = e.ActionDescriptor.RouteValues["action"];
+                var relativePath = e.RelativePath;
 
-                var relativePath = e.RelativePath ?? controller;
+                if (string.IsNullOrWhiteSpace(relativePath))
+                {
+                    throw new Exception($"There is no relative path for controller action {e.ActionDescriptor.RouteValues["controller"]}");
+                }
+
+                var httpMethod = e.HttpMethod?.ToLower().ToFirstUpper() ?? "Get";
 
                 // Remove the prefixed base path with version, e.g. /umbraco/management/api/v1/tracked-reference/{id} => tracked-reference/{id}
                 var unprefixedRelativePath = VersionPrefixRegex().Replace(relativePath, string.Empty);
 
-                // Remove template placeholders, e.g. tracked-reference/{id} => tracked-reference/Id
-                var formattedOperationId = TemplatePlaceholdersRegex().Replace(unprefixedRelativePath, m => $"By{m.Groups[1].Value.ToFirstUpper()}");
+                // Remove template placeholders, e.g. tracked-reference/{id} => tracked-reference
+                var formattedOperationId = TemplatePlaceholdersRegex().Replace(unprefixedRelativePath, string.Empty);
 
                 // Remove dashes (-) and slashes (/) and convert the following letter to uppercase with
                 // the word "By" in front, e.g. tracked-reference/Id => TrackedReferenceById
@@ -245,6 +248,6 @@ public partial class ManagementApiComposer : IComposer
     [GeneratedRegex("\\{(.*?)\\}")]
     private static partial Regex TemplatePlaceholdersRegex();
 
-    [GeneratedRegex("[\\/\\-](\\w{1})")]
+    [GeneratedRegex("[\\/\\-](\\w?)")]
     private static partial Regex ToCamelCaseRegex();
 }

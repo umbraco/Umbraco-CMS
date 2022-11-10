@@ -227,7 +227,7 @@
         "tags": [
           "Dictionary"
         ],
-        "operationId": "PatchDictionaryById",
+        "operationId": "PatchDictionary",
         "parameters": [
           {
             "name": "id",
@@ -280,7 +280,7 @@
         "tags": [
           "Dictionary"
         ],
-        "operationId": "GetDictionaryByKey",
+        "operationId": "GetDictionary",
         "parameters": [
           {
             "name": "key",
@@ -319,7 +319,7 @@
         "tags": [
           "Dictionary"
         ],
-        "operationId": "DeleteDictionaryByKey",
+        "operationId": "DeleteDictionary",
         "parameters": [
           {
             "name": "key",
@@ -392,7 +392,7 @@
         "tags": [
           "Dictionary"
         ],
-        "operationId": "GetDictionaryExportByKey",
+        "operationId": "GetDictionaryExport",
         "parameters": [
           {
             "name": "key",
@@ -1361,7 +1361,7 @@
         "tags": [
           "Language"
         ],
-        "operationId": "GetLanguageById",
+        "operationId": "GetLanguage",
         "parameters": [
           {
             "name": "id",
@@ -1400,7 +1400,7 @@
         "tags": [
           "Language"
         ],
-        "operationId": "DeleteLanguageById",
+        "operationId": "DeleteLanguage",
         "parameters": [
           {
             "name": "id",
@@ -2413,7 +2413,7 @@
         "tags": [
           "Relation"
         ],
-        "operationId": "GetRelationById",
+        "operationId": "GetRelation",
         "parameters": [
           {
             "name": "id",
@@ -2454,7 +2454,7 @@
         "tags": [
           "Relation"
         ],
-        "operationId": "GetRelationChildRelationByChildId",
+        "operationId": "GetRelationChildRelation",
         "parameters": [
           {
             "name": "childId",
@@ -2669,7 +2669,7 @@
         "tags": [
           "Search"
         ],
-        "operationId": "GetSearchIndexByIndexName",
+        "operationId": "GetSearchIndex",
         "parameters": [
           {
             "name": "indexName",
@@ -2709,7 +2709,7 @@
         "tags": [
           "Search"
         ],
-        "operationId": "PostSearchIndexByIndexNameRebuild",
+        "operationId": "PostSearchIndexRebuild",
         "parameters": [
           {
             "name": "indexName",
@@ -2787,7 +2787,7 @@
         "tags": [
           "Search"
         ],
-        "operationId": "GetSearchSearcherBySearcherNameSearch",
+        "operationId": "GetSearchSearcherSearch",
         "parameters": [
           {
             "name": "searcherName",
@@ -3390,7 +3390,7 @@
         "tags": [
           "Tracked Reference"
         ],
-        "operationId": "GetTrackedReferenceById",
+        "operationId": "GetTrackedReference",
         "parameters": [
           {
             "name": "id",
@@ -3444,7 +3444,7 @@
         "tags": [
           "Tracked Reference"
         ],
-        "operationId": "GetTrackedReferenceDescendantsByParentId",
+        "operationId": "GetTrackedReferenceDescendants",
         "parameters": [
           {
             "name": "parentId",
