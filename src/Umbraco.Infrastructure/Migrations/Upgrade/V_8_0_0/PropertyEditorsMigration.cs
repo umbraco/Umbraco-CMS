@@ -4,6 +4,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0;
 
+[Obsolete("This is not used anymore and will be removed in Umbraco 13")]
 public class PropertyEditorsMigration : MigrationBase
 {
     public PropertyEditorsMigration(IMigrationContext context)
