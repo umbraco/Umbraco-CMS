@@ -14,7 +14,7 @@ export class DataTypeResource {
      * @returns PagedFolderTreeItem Success
      * @throws ApiError
      */
-    public static children({
+    public static getTreeDataTypeChildren({
         parentKey,
         skip,
         take = 100,
@@ -41,7 +41,7 @@ export class DataTypeResource {
      * @returns FolderTreeItem Success
      * @throws ApiError
      */
-    public static items({
+    public static getTreeDataTypeItem({
         key,
     }: {
         key?: Array<string>,
@@ -59,7 +59,7 @@ export class DataTypeResource {
      * @returns PagedFolderTreeItem Success
      * @throws ApiError
      */
-    public static root({
+    public static getTreeDataTypeRoot({
         skip,
         take = 100,
         foldersOnly = false,

@@ -15,7 +15,7 @@ export class DocumentResource {
      * @returns PagedRecycleBinItem Success
      * @throws ApiError
      */
-    public static children({
+    public static getRecycleBinDocumentChildren({
         parentKey,
         skip,
         take = 100,
@@ -42,7 +42,7 @@ export class DocumentResource {
      * @returns PagedRecycleBinItem Success
      * @throws ApiError
      */
-    public static root({
+    public static getRecycleBinDocumentRoot({
         skip,
         take = 100,
     }: {
@@ -66,7 +66,7 @@ export class DocumentResource {
      * @returns PagedDocumentTreeItem Success
      * @throws ApiError
      */
-    public static children1({
+    public static getTreeDocumentChildren({
         parentKey,
         skip,
         take = 100,
@@ -96,7 +96,7 @@ export class DocumentResource {
      * @returns DocumentTreeItem Success
      * @throws ApiError
      */
-    public static items({
+    public static getTreeDocumentItem({
         key,
         dataTypeKey,
         culture,
@@ -120,7 +120,7 @@ export class DocumentResource {
      * @returns PagedDocumentTreeItem Success
      * @throws ApiError
      */
-    public static root1({
+    public static getTreeDocumentRoot({
         skip,
         take = 100,
         dataTypeKey,

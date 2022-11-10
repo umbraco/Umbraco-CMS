@@ -14,7 +14,7 @@ export class TemplateResource {
      * @returns PagedEntityTreeItem Success
      * @throws ApiError
      */
-    public static children({
+    public static getTreeTemplateChildren({
         parentKey,
         skip,
         take = 100,
@@ -38,7 +38,7 @@ export class TemplateResource {
      * @returns EntityTreeItem Success
      * @throws ApiError
      */
-    public static items({
+    public static getTreeTemplateItem({
         key,
     }: {
         key?: Array<string>,
@@ -56,7 +56,7 @@ export class TemplateResource {
      * @returns PagedEntityTreeItem Success
      * @throws ApiError
      */
-    public static root({
+    public static getTreeTemplateRoot({
         skip,
         take = 100,
     }: {

@@ -15,7 +15,7 @@ export class MediaResource {
      * @returns PagedRecycleBinItem Success
      * @throws ApiError
      */
-    public static children({
+    public static getRecycleBinMediaChildren({
         parentKey,
         skip,
         take = 100,
@@ -42,7 +42,7 @@ export class MediaResource {
      * @returns PagedRecycleBinItem Success
      * @throws ApiError
      */
-    public static root({
+    public static getRecycleBinMediaRoot({
         skip,
         take = 100,
     }: {
@@ -66,7 +66,7 @@ export class MediaResource {
      * @returns PagedContentTreeItem Success
      * @throws ApiError
      */
-    public static children1({
+    public static getTreeMediaChildren({
         parentKey,
         skip,
         take = 100,
@@ -93,7 +93,7 @@ export class MediaResource {
      * @returns ContentTreeItem Success
      * @throws ApiError
      */
-    public static items({
+    public static getTreeMediaItem({
         key,
         dataTypeKey,
     }: {
@@ -114,7 +114,7 @@ export class MediaResource {
      * @returns PagedContentTreeItem Success
      * @throws ApiError
      */
-    public static root1({
+    public static getTreeMediaRoot({
         skip,
         take = 100,
         dataTypeKey,

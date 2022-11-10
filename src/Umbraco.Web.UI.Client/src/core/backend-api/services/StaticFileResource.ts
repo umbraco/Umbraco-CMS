@@ -14,7 +14,7 @@ export class StaticFileResource {
      * @returns PagedFileSystemTreeItem Success
      * @throws ApiError
      */
-    public static children({
+    public static getTreeStaticFileChildren({
         path,
         skip,
         take = 100,
@@ -38,7 +38,7 @@ export class StaticFileResource {
      * @returns FileSystemTreeItem Success
      * @throws ApiError
      */
-    public static items({
+    public static getTreeStaticFileItem({
         path,
     }: {
         path?: Array<string>,
@@ -56,7 +56,7 @@ export class StaticFileResource {
      * @returns PagedFileSystemTreeItem Success
      * @throws ApiError
      */
-    public static root({
+    public static getTreeStaticFileRoot({
         skip,
         take = 100,
     }: {

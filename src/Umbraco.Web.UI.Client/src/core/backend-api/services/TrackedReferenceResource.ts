@@ -13,7 +13,7 @@ export class TrackedReferenceResource {
      * @returns PagedRelationItem Success
      * @throws ApiError
      */
-    public static get({
+    public static getTrackedReferenceById({
         id,
         skip,
         take,
@@ -42,7 +42,7 @@ export class TrackedReferenceResource {
      * @returns PagedRelationItem Success
      * @throws ApiError
      */
-    public static descendants({
+    public static getTrackedReferenceDescendantsByParentId({
         parentId,
         skip,
         take,
@@ -71,7 +71,7 @@ export class TrackedReferenceResource {
      * @returns PagedRelationItem Success
      * @throws ApiError
      */
-    public static getPagedReferencedItems({
+    public static getTrackedReferenceItem({
         ids,
         skip,
         take,

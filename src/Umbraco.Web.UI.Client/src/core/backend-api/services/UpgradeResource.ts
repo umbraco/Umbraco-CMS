@@ -13,7 +13,7 @@ export class UpgradeResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static authorize(): CancelablePromise<any> {
+    public static postUpgradeAuthorize(): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/upgrade/authorize',
@@ -28,7 +28,7 @@ export class UpgradeResource {
      * @returns UpgradeSettings Success
      * @throws ApiError
      */
-    public static settings(): CancelablePromise<UpgradeSettings> {
+    public static getUpgradeSettings(): CancelablePromise<UpgradeSettings> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/upgrade/settings',

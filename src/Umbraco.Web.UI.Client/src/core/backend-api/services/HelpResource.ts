@@ -13,7 +13,7 @@ export class HelpResource {
      * @returns PagedHelpPage Success
      * @throws ApiError
      */
-    public static get({
+    public static getHelp({
         section,
         tree,
         skip,

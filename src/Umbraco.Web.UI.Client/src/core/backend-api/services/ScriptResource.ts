@@ -14,7 +14,7 @@ export class ScriptResource {
      * @returns PagedFileSystemTreeItem Success
      * @throws ApiError
      */
-    public static children({
+    public static getTreeScriptChildren({
         path,
         skip,
         take = 100,
@@ -38,7 +38,7 @@ export class ScriptResource {
      * @returns FileSystemTreeItem Success
      * @throws ApiError
      */
-    public static items({
+    public static getTreeScriptItem({
         path,
     }: {
         path?: Array<string>,
@@ -56,7 +56,7 @@ export class ScriptResource {
      * @returns PagedFileSystemTreeItem Success
      * @throws ApiError
      */
-    public static root({
+    public static getTreeScriptRoot({
         skip,
         take = 100,
     }: {

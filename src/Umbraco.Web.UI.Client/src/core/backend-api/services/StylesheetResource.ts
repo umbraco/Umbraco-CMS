@@ -14,7 +14,7 @@ export class StylesheetResource {
      * @returns PagedFileSystemTreeItem Success
      * @throws ApiError
      */
-    public static children({
+    public static getTreeStylesheetChildren({
         path,
         skip,
         take = 100,
@@ -38,7 +38,7 @@ export class StylesheetResource {
      * @returns FileSystemTreeItem Success
      * @throws ApiError
      */
-    public static items({
+    public static getTreeStylesheetItem({
         path,
     }: {
         path?: Array<string>,
@@ -56,7 +56,7 @@ export class StylesheetResource {
      * @returns PagedFileSystemTreeItem Success
      * @throws ApiError
      */
-    public static root({
+    public static getTreeStylesheetRoot({
         skip,
         take = 100,
     }: {

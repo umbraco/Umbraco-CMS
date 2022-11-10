@@ -14,7 +14,7 @@ export class RelationTypeResource {
      * @returns FolderTreeItem Success
      * @throws ApiError
      */
-    public static items({
+    public static getTreeRelationTypeItem({
         key,
     }: {
         key?: Array<string>,
@@ -32,7 +32,7 @@ export class RelationTypeResource {
      * @returns PagedEntityTreeItem Success
      * @throws ApiError
      */
-    public static root({
+    public static getTreeRelationTypeRoot({
         skip,
         take = 100,
     }: {

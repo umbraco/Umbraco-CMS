@@ -14,7 +14,7 @@ export class MemberTypeResource {
      * @returns EntityTreeItem Success
      * @throws ApiError
      */
-    public static items({
+    public static getTreeMemberTypeItem({
         key,
     }: {
         key?: Array<string>,
@@ -32,7 +32,7 @@ export class MemberTypeResource {
      * @returns PagedEntityTreeItem Success
      * @throws ApiError
      */
-    public static root({
+    public static getTreeMemberTypeRoot({
         skip,
         take = 100,
     }: {

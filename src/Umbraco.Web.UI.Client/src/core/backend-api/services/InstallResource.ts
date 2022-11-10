@@ -15,7 +15,7 @@ export class InstallResource {
      * @returns InstallSettings Success
      * @throws ApiError
      */
-    public static settings(): CancelablePromise<InstallSettings> {
+    public static getInstallSettings(): CancelablePromise<InstallSettings> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/install/settings',
@@ -30,7 +30,7 @@ export class InstallResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static setup({
+    public static postInstallSetup({
         requestBody,
     }: {
         requestBody?: Install,
@@ -51,7 +51,7 @@ export class InstallResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static validateDatabase({
+    public static postInstallValidateDatabase({
         requestBody,
     }: {
         requestBody?: DatabaseInstall,

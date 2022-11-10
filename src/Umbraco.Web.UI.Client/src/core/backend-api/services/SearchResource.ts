@@ -17,7 +17,7 @@ export class SearchResource {
      * @returns PagedIndex Success
      * @throws ApiError
      */
-    public static indexes({
+    public static getSearchIndex({
         skip,
         take,
     }: {
@@ -38,7 +38,7 @@ export class SearchResource {
      * @returns Index Success
      * @throws ApiError
      */
-    public static index({
+    public static getSearchIndexByIndexName({
         indexName,
     }: {
         indexName: string,
@@ -59,7 +59,7 @@ export class SearchResource {
      * @returns OkResult Success
      * @throws ApiError
      */
-    public static rebuild({
+    public static postSearchIndexByIndexNameRebuild({
         indexName,
     }: {
         indexName: string,
@@ -80,7 +80,7 @@ export class SearchResource {
      * @returns PagedSearcher Success
      * @throws ApiError
      */
-    public static searchers({
+    public static getSearchSearcher({
         skip,
         take,
     }: {
@@ -101,7 +101,7 @@ export class SearchResource {
      * @returns PagedPaged Success
      * @throws ApiError
      */
-    public static getSearchResults({
+    public static getSearchSearcherBySearcherNameSearch({
         searcherName,
         query,
         skip,

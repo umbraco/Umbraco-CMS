@@ -14,7 +14,7 @@ export class LanguageResource {
      * @returns PagedLanguage Success
      * @throws ApiError
      */
-    public static getAll({
+    public static getLanguage({
         skip,
         take,
     }: {
@@ -35,7 +35,7 @@ export class LanguageResource {
      * @returns Language Success
      * @throws ApiError
      */
-    public static byId({
+    public static getLanguageById({
         id,
     }: {
         id: number,
@@ -56,7 +56,7 @@ export class LanguageResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static delete({
+    public static deleteLanguageById({
         id,
     }: {
         id: number,
@@ -78,7 +78,7 @@ export class LanguageResource {
      * @returns any Created
      * @throws ApiError
      */
-    public static create({
+    public static postLanguageCreate({
         requestBody,
     }: {
         requestBody?: Language,
@@ -98,7 +98,7 @@ export class LanguageResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static update({
+    public static putLanguageUpdate({
         requestBody,
     }: {
         requestBody?: Language,

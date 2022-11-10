@@ -14,7 +14,7 @@ export class MediaTypeResource {
      * @returns PagedFolderTreeItem Success
      * @throws ApiError
      */
-    public static children({
+    public static getTreeMediaTypeChildren({
         parentKey,
         skip,
         take = 100,
@@ -41,7 +41,7 @@ export class MediaTypeResource {
      * @returns FolderTreeItem Success
      * @throws ApiError
      */
-    public static items({
+    public static getTreeMediaTypeItem({
         key,
     }: {
         key?: Array<string>,
@@ -59,7 +59,7 @@ export class MediaTypeResource {
      * @returns PagedFolderTreeItem Success
      * @throws ApiError
      */
-    public static root({
+    public static getTreeMediaTypeRoot({
         skip,
         take = 100,
         foldersOnly = false,

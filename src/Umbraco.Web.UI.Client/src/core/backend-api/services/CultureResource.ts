@@ -13,7 +13,7 @@ export class CultureResource {
      * @returns PagedCulture Success
      * @throws ApiError
      */
-    public static getAll({
+    public static getCulture({
         skip,
         take,
     }: {

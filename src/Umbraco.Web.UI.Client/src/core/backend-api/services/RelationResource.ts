@@ -14,7 +14,7 @@ export class RelationResource {
      * @returns Relation Success
      * @throws ApiError
      */
-    public static byId({
+    public static getRelationById({
         id,
     }: {
         id: number,
@@ -35,7 +35,7 @@ export class RelationResource {
      * @returns PagedRelation Success
      * @throws ApiError
      */
-    public static byChild({
+    public static getRelationChildRelationByChildId({
         childId,
         skip,
         take,

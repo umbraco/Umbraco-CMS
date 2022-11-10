@@ -14,7 +14,7 @@ export class DocumentTypeResource {
      * @returns PagedDocumentTypeTreeItem Success
      * @throws ApiError
      */
-    public static children({
+    public static getTreeDocumentTypeChildren({
         parentKey,
         skip,
         take = 100,
@@ -41,7 +41,7 @@ export class DocumentTypeResource {
      * @returns DocumentTypeTreeItem Success
      * @throws ApiError
      */
-    public static items({
+    public static getTreeDocumentTypeItem({
         key,
     }: {
         key?: Array<string>,
@@ -59,7 +59,7 @@ export class DocumentTypeResource {
      * @returns PagedDocumentTypeTreeItem Success
      * @throws ApiError
      */
-    public static root({
+    public static getTreeDocumentTypeRoot({
         skip,
         take = 100,
         foldersOnly = false,

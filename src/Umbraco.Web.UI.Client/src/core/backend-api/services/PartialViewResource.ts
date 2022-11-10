@@ -14,7 +14,7 @@ export class PartialViewResource {
      * @returns PagedFileSystemTreeItem Success
      * @throws ApiError
      */
-    public static children({
+    public static getTreePartialViewChildren({
         path,
         skip,
         take = 100,
@@ -38,7 +38,7 @@ export class PartialViewResource {
      * @returns FileSystemTreeItem Success
      * @throws ApiError
      */
-    public static items({
+    public static getTreePartialViewItem({
         path,
     }: {
         path?: Array<string>,
@@ -56,7 +56,7 @@ export class PartialViewResource {
      * @returns PagedFileSystemTreeItem Success
      * @throws ApiError
      */
-    public static root({
+    public static getTreePartialViewRoot({
         skip,
         take = 100,
     }: {

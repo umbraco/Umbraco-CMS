@@ -21,7 +21,7 @@ export class DictionaryResource {
      * @returns PagedDictionaryOverview Success
      * @throws ApiError
      */
-    public static all({
+    public static getDictionary({
         skip,
         take,
     }: {
@@ -42,7 +42,7 @@ export class DictionaryResource {
      * @returns ContentResult Success
      * @throws ApiError
      */
-    public static update({
+    public static patchDictionaryById({
         id,
         requestBody,
     }: {
@@ -67,7 +67,7 @@ export class DictionaryResource {
      * @returns Dictionary Success
      * @throws ApiError
      */
-    public static byKey({
+    public static getDictionaryByKey({
         key,
     }: {
         key: string,
@@ -88,7 +88,7 @@ export class DictionaryResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static delete({
+    public static deleteDictionaryByKey({
         key,
     }: {
         key: string,
@@ -109,7 +109,7 @@ export class DictionaryResource {
      * @returns CreatedResult Created
      * @throws ApiError
      */
-    public static create({
+    public static postDictionaryCreate({
         requestBody,
     }: {
         requestBody?: DictionaryItem,
@@ -129,7 +129,7 @@ export class DictionaryResource {
      * @returns binary Success
      * @throws ApiError
      */
-    public static exportDictionary({
+    public static getDictionaryExportByKey({
         key,
         includeChildren = false,
     }: {
@@ -155,7 +155,7 @@ export class DictionaryResource {
      * @returns ContentResult Success
      * @throws ApiError
      */
-    public static importDictionary({
+    public static postDictionaryImport({
         file,
         parentId,
     }: {
@@ -179,7 +179,7 @@ export class DictionaryResource {
      * @returns DictionaryImport Success
      * @throws ApiError
      */
-    public static upload({
+    public static postDictionaryUpload({
         requestBody,
     }: {
         requestBody?: any,
@@ -198,7 +198,7 @@ export class DictionaryResource {
      * @returns PagedEntityTreeItem Success
      * @throws ApiError
      */
-    public static children({
+    public static getTreeDictionaryChildren({
         parentKey,
         skip,
         take = 100,
@@ -222,7 +222,7 @@ export class DictionaryResource {
      * @returns FolderTreeItem Success
      * @throws ApiError
      */
-    public static items({
+    public static getTreeDictionaryItem({
         key,
     }: {
         key?: Array<string>,
@@ -240,7 +240,7 @@ export class DictionaryResource {
      * @returns PagedEntityTreeItem Success
      * @throws ApiError
      */
-    public static root({
+    public static getTreeDictionaryRoot({
         skip,
         take = 100,
     }: {

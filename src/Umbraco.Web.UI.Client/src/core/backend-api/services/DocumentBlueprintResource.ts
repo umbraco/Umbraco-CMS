@@ -14,7 +14,7 @@ export class DocumentBlueprintResource {
      * @returns DocumentBlueprintTreeItem Success
      * @throws ApiError
      */
-    public static items({
+    public static getTreeDocumentBlueprintItem({
         key,
     }: {
         key?: Array<string>,
@@ -32,7 +32,7 @@ export class DocumentBlueprintResource {
      * @returns PagedDocumentBlueprintTreeItem Success
      * @throws ApiError
      */
-    public static root({
+    public static getTreeDocumentBlueprintRoot({
         skip,
         take = 100,
     }: {
