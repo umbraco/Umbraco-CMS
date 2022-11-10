@@ -74,8 +74,8 @@ public partial class ManagementApiComposer : IComposer
                 // Remove the prefixed base path with version, e.g. /umbraco/management/api/v1/tracked-reference/{id} => tracked-reference/{id}
                 var unprefixedRelativePath = VersionPrefixRegex().Replace(relativePath, string.Empty);
 
-                // Remove template placeholders, e.g. tracked-reference/{id} => tracked-reference
-                var formattedOperationId = TemplatePlaceholdersRegex().Replace(unprefixedRelativePath, string.Empty);
+                // Remove template placeholders, e.g. tracked-reference/{id} => tracked-reference/Id
+                var formattedOperationId = TemplatePlaceholdersRegex().Replace(unprefixedRelativePath, m => $"By{m.Groups[1].Value.ToFirstUpper()}");
 
                 // Remove dashes (-) and slashes (/) and convert the following letter to uppercase with
                 // the word "By" in front, e.g. tracked-reference/Id => TrackedReferenceById
@@ -232,7 +232,7 @@ public partial class ManagementApiComposer : IComposer
                         endpoints.MapControllers();
 
                         // Serve contract
-                        endpoints.MapGet($"{officePath}/management/api/openapi.json",async  context =>
+                        endpoints.MapGet($"{officePath}/management/api/openapi.json", async context =>
                         {
                             await context.Response.SendFileAsync(new EmbeddedFileProvider(GetType().Assembly).GetFileInfo("OpenApi.json"));
                         });
@@ -245,9 +245,9 @@ public partial class ManagementApiComposer : IComposer
     [GeneratedRegex(".*?\\/v[1-9]+/")]
     private static partial Regex VersionPrefixRegex();
 
-    [GeneratedRegex("\\{(.*?)\\}")]
+    [GeneratedRegex("\\{(.*?)\\:?\\}")]
     private static partial Regex TemplatePlaceholdersRegex();
 
-    [GeneratedRegex("[\\/\\-](\\w?)")]
+    [GeneratedRegex("[\\/\\-](\\w{1})")]
     private static partial Regex ToCamelCaseRegex();
 }
