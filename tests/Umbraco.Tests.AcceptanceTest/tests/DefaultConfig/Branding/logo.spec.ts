@@ -11,9 +11,5 @@ test.describe('Umbraco Logo Information', () => {
   test('Check Umbraco Logo Info Displays', async ({ page }) => {
     await page.locator('.umb-app-header__logo').click();
     await expect(page.locator('.umb-app-header__logo-modal').last()).not.toBeVisible();
-    console.log("Logging Agent:OSVariation");
-    console.log(process.env.AgentOsVariation);
-    console.log("Logging Agent:OS");
-    console.log(process.env.AgentOs);
   });
 });

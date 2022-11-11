@@ -453,8 +453,7 @@ stages:
             env:
               CI: true
               CommitId: $(Build.SourceVersion)
-              AgentOs: $(variables['Agent.OS'])
-              AgentOsVariation: $Agent.OS
+              AgentOs: $(Agent.OS)
           - pwsh: |
               docker logs $(dockerImageName) > $(Build.ArtifactStagingDirectory)/playwright.log 2>&1
               docker stop $(dockerImageName)
