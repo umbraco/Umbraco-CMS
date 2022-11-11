@@ -356,21 +356,18 @@
                 // TODO: ensure Areas are ordered like the area configuration is.
 
 
+                const contextColumns = getContextColumns(parentBlock, areaKey);
+
                 // if no columnSpan or no columnSpanOptions configured, then we set(or rewrite) one:
-                if (!layoutEntry.columnSpan || block.config.columnSpanOptions.length === 0) {
-
-                    const contextColumns = getContextColumns(parentBlock, areaKey);
-
+                if (!layoutEntry.columnSpan || layoutEntry.columnSpan > contextColumns || block.config.columnSpanOptions.length === 0) {
                     if (block.config.columnSpanOptions.length > 0) {
-                        // set columnSpan to minimum allowed span for this BlockType:
-                        const minimumColumnSpan = block.config.columnSpanOptions.reduce((prev, option) => Math.min(prev, option.columnSpan), vm.gridColumns);
-
-                        // If minimumColumnSpan is larger than contextColumns, then we will make it fit within context anyway:
-                        layoutEntry.columnSpan = Math.min(minimumColumnSpan, contextColumns)
+                        // Find greatest columnSpanOption within contextColumns, or fallback to contextColumns.
+                        layoutEntry.columnSpan = block.config.columnSpanOptions.filter(option => option.columnSpan <= contextColumns).reduce((prev, option) => Math.max(prev, option.columnSpan), 0) || contextColumns;
                     } else {
                         layoutEntry.columnSpan = contextColumns;
                     }
                 }
+
                 // if no rowSpan, then we set one:
                 if (!layoutEntry.rowSpan) {
                     layoutEntry.rowSpan = 1;
