@@ -7,10 +7,6 @@
     ng-mouseover="vm.mouseOverInlineCreate()"
     ng-mouseleave="vm.mouseOutInlineCreate()">
 </uui-button-inline-create>
-<div ng-if="vm.hideInlineCreateAbove"
-    class="umb-block-grid__block--inline-create-button --above --detector"
-    style="width: {{vm.inlineCreateAboveWidth}};">
-</div>
 
 <ng-form name="vm.blockForm" val-server-match="{ 'contains' : { 'valServerMatchContent': vm.layoutEntry.$block.content.key, 'valServerMatchSettings': vm.layoutEntry.$block.settings.key } }">
     <div
@@ -194,6 +190,3 @@
     ng-mouseleave="vm.mouseOutInlineCreate()"
     vertical>
 </uui-button-inline-create>
-<div ng-if="vm.hideInlineCreateAfter"
-    class="umb-block-grid__block--inline-create-button --after --detector">
-</div>
