@@ -1,10 +1,16 @@
 <style>
+    @keyframes umb-icon-jump {
+        0%, 100% { transform: rotate(6deg); }
+        50% { transform: rotate(-6deg); }
+    }
 
     .umb-icon {
         display: inline-block;
         width: 1em;
         height: 1em;
         flex-shrink: 0;
+
+        animation: umb-icon-jump 1s infinite ease-in-out;
     }
 
     .umb-icon svg {
@@ -14,7 +20,7 @@
         animation: inherit;
     }
 
-    .blockelement-gridblock-editor {
+    .blockelement-gridsortblock-editor {
         position: relative;
         border-radius: 3px;
         height: 100%;/* Add this to fill the cell fully */
@@ -23,7 +29,7 @@
         background-color: white;
     }
     
-    .blockelement-gridblock-editor > button {
+    .blockelement-gridsortblock-editor > button {
         position: relative;
         display: flex;
         align-items: center;
@@ -38,22 +44,22 @@
         border: none;
         transition: border-color 120ms, background-color 120ms;
     }
-    .blockelement-gridblock-editor > button:hover {
+    .blockelement-gridsortblock-editor > button:hover {
         color: #2152A3;
     }
-    .blockelement-gridblock-editor .icon {
+    .blockelement-gridsortblock-editor .icon {
         font-size: 22px;
         margin-right: 10px;
         display: inline-block;
     }
 
-    .blockelement-gridblock-editor > button > span {
+    .blockelement-gridsortblock-editor > button > span {
         position: relative;
         display: inline-block;
         padding-top:2px;
         padding-bottom:2px;
     }
-    
+
     :host {
         --inherited--column-gap: var(--umb-block-grid--column-gap, 10px);
         --inherited--row-gap: var(--umb-block-grid--row-gap, 10px);
@@ -72,7 +78,7 @@
 
 </style>
 
-<div class="blockelement-gridblock-editor" ng-class="{ '--active': block.active, '--error': parentForm.$invalid && valFormManager.isShowingValidation() }">
+<div class="blockelement-gridsortblock-editor" ng-class="{ '--active': block.active, '--error': parentForm.$invalid && valFormManager.isShowingValidation() }">
     <button type="button"
         ng-click="block.showContent ? block.edit() : null"
         ng-focus="block.focus"
