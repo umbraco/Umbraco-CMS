@@ -2,7 +2,7 @@ import { rest } from 'msw';
 
 import { expect, test } from '../test';
 import { umbracoPath } from '@umbraco-cms/utils';
-import type { ProblemDetails, StatusResponse } from '@umbraco-cms/models';
+import { ProblemDetails, RuntimeLevel, ServerStatus } from '@umbraco-cms/backend-api';
 
 test.describe('installer tests', () => {
 	test.beforeEach(async ({ page, worker }) => {
@@ -12,8 +12,8 @@ test.describe('installer tests', () => {
 				return res(
 					// Respond with a 200 status code
 					ctx.status(200),
-					ctx.json<StatusResponse>({
-						serverStatus: 'must-install',
+					ctx.json<ServerStatus>({
+						serverStatus: RuntimeLevel.INSTALL,
 					})
 				);
 			})

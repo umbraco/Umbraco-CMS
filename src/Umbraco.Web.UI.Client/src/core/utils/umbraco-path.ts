@@ -1,7 +1,4 @@
-import { Path } from 'msw';
-
-import type { paths } from '../../../schemas/generated-schema';
-
-export function umbracoPath(path: keyof paths): Path {
-	return `/umbraco/backoffice${path}`;
+import type { Path } from 'msw';
+export function umbracoPath(path: string): Path {
+	return `/umbraco/management/api/v1${path}`;
 }
