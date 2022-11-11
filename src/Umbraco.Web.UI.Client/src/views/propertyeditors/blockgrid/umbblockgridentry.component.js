@@ -205,6 +205,7 @@
         let columnGap = 0;
         let rowGap = 0;
         let gridRows = null;
+        let lockedGridRows = 0;
         let scaleBoxBackdropEl = null;
         let raf = null;
 
@@ -239,14 +240,15 @@
             gridColumns = computedStyles.gridTemplateColumns.trim().split("px").map(x => Number(x));
             gridRows = computedStyles.gridTemplateRows.trim().split("px").map(x => Number(x));
 
-            // We use this code to lock the templateRows, while scaling. otherwise scaling Rows is too crazy.
-            if(updateRowTemplate) {
-                layoutContainer.style.gridTemplateRows = computedStyles.gridTemplateRows;
-            }
-
             // remove empties:
             gridColumns = gridColumns.filter(n => n > 0);
             gridRows = gridRows.filter(n => n > 0);
+
+            // We use this code to lock the templateRows, while scaling. otherwise scaling Rows is too crazy.
+            if(updateRowTemplate || gridRows.length > lockedGridRows) {
+                lockedGridRows = gridRows.length;
+                layoutContainer.style.gridTemplateRows = computedStyles.gridTemplateRows;
+            }
 
             // add gaps:
             const gridColumnsLen = gridColumns.length;
@@ -285,6 +287,8 @@
 
             // add a few extra rows, so there is something to extend too.
             // Add extra options for the ability to extend beyond current content:
+            gridRows.push(50);
+            gridRows.push(50);
             gridRows.push(50);
             gridRows.push(50);
             gridRows.push(50);
@@ -377,6 +381,7 @@
             layoutContainer = null;
             gridColumns = null;
             gridRows = null;
+            lockedGridRows = 0;
             scaleBoxBackdropEl = null;
  
             // Update block size:
