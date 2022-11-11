@@ -245,6 +245,7 @@
                 })
                 .progress(function(evt) {
                     var progressPercentage = parseInt(100.0 * evt.loaded / evt.total, 10);
+                    mediaEntry.uploadProgress = progressPercentage;
                     _emit('uploadProgress', { mediaEntry, progressPercentage });
                 })
                 .success(function (data) {
@@ -269,7 +270,7 @@
             if (!nextItem) return;
 
             _getMatchedMediaType(nextItem.file).then(mediaTypeAlias => {
-                nextItem.mediaTypeAlias = mediaTypeAlias;
+                nextItem.mediaEntry.mediaTypeAlias = mediaTypeAlias;
                 _upload(nextItem);
             }, () => {
                 _rejectMediaEntry(nextItem.mediaEntry, { type: 'pattern', message: translations.disallowedFileType });

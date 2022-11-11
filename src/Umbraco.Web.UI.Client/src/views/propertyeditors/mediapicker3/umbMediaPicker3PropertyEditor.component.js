@@ -93,7 +93,6 @@
     
             mediaUploader.on('mediaEntryAccepted', _handleMediaEntryAccepted);
             mediaUploader.on('mediaEntryRejected', _handleMediaEntryRejected);
-            mediaUploader.on('uploadProgress', _handleMediaUploadProgress);
             mediaUploader.on('uploadSuccess', _handleMediaUploadSuccess);
 
             copyAllMediasAction = {
@@ -173,10 +172,6 @@
                 vm.model.value.splice(index, 1);
             }
             vm.invalidEntries.push(data.mediaEntry);
-        }
-
-        function _handleMediaUploadProgress (event, data) {
-            data.mediaEntry.uploadProgress = data.progressPercentage;
         }
 
         function _handleMediaUploadSuccess (event, data) {
