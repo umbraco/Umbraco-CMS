@@ -490,7 +490,7 @@
                 vm.hideInlineCreateAbove = true;
                 vm.inlineCreateAboveWidth = "";
             } else {
-                vm.inlineCreateAboveWidth = getComputedStyle($element[0]).width + "px";
+                vm.inlineCreateAboveWidth = getComputedStyle(layoutContainer).width;
                 vm.hideInlineCreateAbove = false;
             }
             $scope.$evalAsync();
