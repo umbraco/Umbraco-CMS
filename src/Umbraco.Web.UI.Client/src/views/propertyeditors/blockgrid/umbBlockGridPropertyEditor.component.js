@@ -357,16 +357,19 @@
 
 
                 const contextColumns = getContextColumns(parentBlock, areaKey);
+                const relevantColumnSpanOptions = block.config.columnSpanOptions.filter(option => option.columnSpan <= contextColumns);
 
                 // if no columnSpan or no columnSpanOptions configured, then we set(or rewrite) one:
                 if (!layoutEntry.columnSpan || layoutEntry.columnSpan > contextColumns || block.config.columnSpanOptions.length === 0) {
                     if (block.config.columnSpanOptions.length > 0) {
                         // Find greatest columnSpanOption within contextColumns, or fallback to contextColumns.
-                        layoutEntry.columnSpan = block.config.columnSpanOptions.filter(option => option.columnSpan <= contextColumns).reduce((prev, option) => Math.max(prev, option.columnSpan), 0) || contextColumns;
+                        layoutEntry.columnSpan = relevantColumnSpanOptions.reduce((prev, option) => Math.max(prev, option.columnSpan), 0) || contextColumns;
                     } else {
                         layoutEntry.columnSpan = contextColumns;
                     }
                 }
+
+                // TODO: Check that columnSpanOption still is available or equal contextColumns
 
                 // if no rowSpan, then we set one:
                 if (!layoutEntry.rowSpan) {
