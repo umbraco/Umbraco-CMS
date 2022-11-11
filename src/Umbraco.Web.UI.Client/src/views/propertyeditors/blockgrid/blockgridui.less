@@ -539,7 +539,7 @@ ng-form.ng-invalid > .umb-block-grid__block:not(.--active) > .umb-block-grid__bl
     left: 0;
     width: 100%;
 
-    top: calc(var(--umb-block-grid--row-gap, 0) * -0.5);
+    top: calc(var(--umb-block-grid--row-gap, 0px) * -0.5);
 }
 .umb-block-grid__layout-item:first-of-type .umb-block-grid__block--inline-create-button.--above {
     /* Do not use row-gap if the first one. */
@@ -559,7 +559,7 @@ ng-form.ng-invalid > .umb-block-grid__block:not(.--active) > .umb-block-grid__bl
 }
 
 .umb-block-grid__block--inline-create-button.--after {
-    right: calc(1px - var(--umb-block-grid--column-gap, 0) * 0.5);
+    right: calc(1px - (var(--umb-block-grid--column-gap, 0px) * 0.5));
 }
 .umb-block-grid__block--inline-create-button.--after.--detector {
     width: 10px;
