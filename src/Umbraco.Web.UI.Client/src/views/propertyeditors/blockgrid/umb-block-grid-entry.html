@@ -169,7 +169,7 @@
         </button>
 
         <button 
-            ng-if="::!vm.blockEditorApi.readonly && (vm.layoutEntry.$block.config.columnSpanOptions.length > 1 || (vm.layoutEntry.$block.config.rowMinSpan && vm.layoutEntry.$block.config.rowMaxSpan && vm.layoutEntry.$block.config.rowMaxSpan !== vm.layoutEntry.$block.config.rowMinSpan))" 
+            ng-if="::!vm.blockEditorApi.readonly && vm.canScale" 
             type="button"
             title="@blockEditor_scaleHandlerButtonTitle"
             localize="title"
@@ -177,7 +177,7 @@
             ng-mousedown="vm.scaleHandlerMouseDown($event)"
             ng-keyup="vm.scaleHandlerKeyUp($event)">
         </button>
-        <div ng-if="::!vm.blockEditorApi.readonly && (vm.layoutEntry.$block.config.columnSpanOptions.length > 1 || (vm.layoutEntry.$block.config.rowMinSpan && vm.layoutEntry.$block.config.rowMaxSpan && vm.layoutEntry.$block.config.rowMaxSpan !== vm.layoutEntry.$block.config.rowMinSpan))" 
+        <div ng-if="::!vm.blockEditorApi.readonly && vm.canScale" 
             class="umb-block-grid__scale-label">
             {{vm.layoutEntry.columnSpan}} x {{vm.layoutEntry.rowSpan}}
         </div>

@@ -109,6 +109,7 @@
         vm.inlineCreateAboveWidth = "";
         vm.hideInlineCreateAbove = true;
         vm.hideInlineCreateAfter = true;
+        vm.canScale = false;
 
         vm.proxyProperties = [];
         vm.onAppendProxyProperty = (event) => {
@@ -146,6 +147,11 @@
 
             vm.layoutColumnsInt = parseInt(vm.layoutColumns, 10);
 
+            const hasColumnSpanOptions = vm.layoutEntry.$block.config.columnSpanOptions.length > 1;
+            const hasRelevantColumnSpanOptions = hasColumnSpanOptions && vm.layoutEntry.$block.config.columnSpanOptions.filter(x => x.columnSpan <= vm.layoutColumnsInt).length > 1;
+            const hasRowSpanOptions = vm.layoutEntry.$block.config.rowMinSpan && vm.layoutEntry.$block.config.rowMaxSpan && vm.layoutEntry.$block.config.rowMaxSpan !== vm.layoutEntry.$block.config.rowMinSpan;
+            vm.canScale = (hasRelevantColumnSpanOptions || hasRowSpanOptions);
+            
             unsubscribe.push(vm.layoutEntry.$block.__scope.$watch(() => vm.layoutEntry.$block.index, visualUpdateCallback));
             unsubscribe.push($scope.$on("blockGridEditorVisualUpdate", (evt, data) => {if(data.areaKey === vm.areaKey) { visualUpdateCallback()}}));
 
