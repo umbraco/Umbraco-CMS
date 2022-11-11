@@ -62,7 +62,7 @@
                 return result;
             }
         }
-        return max;
+        return null;
     }
 
 
@@ -147,8 +147,8 @@
 
             vm.layoutColumnsInt = parseInt(vm.layoutColumns, 10);
 
-            const hasColumnSpanOptions = vm.layoutEntry.$block.config.columnSpanOptions.length > 1;
-            const hasRelevantColumnSpanOptions = hasColumnSpanOptions && vm.layoutEntry.$block.config.columnSpanOptions.filter(x => x.columnSpan <= vm.layoutColumnsInt).length > 1;
+            vm.relevantColumnSpanOptions = vm.layoutEntry.$block.config.columnSpanOptions.filter(x => x.columnSpan <= vm.layoutColumnsInt).sort((a,b) => (a.columnSpan > b.columnSpan) ? 1 : ((b.columnSpan > a.columnSpan) ? -1 : 0));
+            const hasRelevantColumnSpanOptions = vm.relevantColumnSpanOptions.length > 1;
             const hasRowSpanOptions = vm.layoutEntry.$block.config.rowMinSpan && vm.layoutEntry.$block.config.rowMaxSpan && vm.layoutEntry.$block.config.rowMaxSpan !== vm.layoutEntry.$block.config.rowMinSpan;
             vm.canScale = (hasRelevantColumnSpanOptions || hasRowSpanOptions);
             
@@ -225,7 +225,8 @@
             let newColumnSpan = Math.max(blockEndCol-blockStartCol, 1);
 
             // Find nearest allowed Column:
-            newColumnSpan = closestColumnSpanOption(newColumnSpan , vm.layoutEntry.$block.config.columnSpanOptions, gridColumns.length - blockStartCol).columnSpan;
+            const bestColumnSpanOption = closestColumnSpanOption(newColumnSpan , vm.relevantColumnSpanOptions, vm.layoutColumnsInt - blockStartCol)
+            newColumnSpan = bestColumnSpanOption ? bestColumnSpanOption.columnSpan : vm.layoutColumnsInt;
 
             let newRowSpan = Math.round(Math.max(blockEndRow-blockStartRow, vm.layoutEntry.$block.config.rowMinSpan || 1));
             if(vm.layoutEntry.$block.config.rowMaxSpan != null) {
@@ -423,8 +424,8 @@
             }
 
             if(addColIndex !== 0) {
-                if (vm.layoutEntry.$block.config.columnSpanOptions.length > 0) {
-                    const sortOptions = vm.layoutEntry.$block.config.columnSpanOptions.sort((a,b) => (a.columnSpan > b.columnSpan) ? 1 : ((b.columnSpan > a.columnSpan) ? -1 : 0));
+                if (vm.relevantColumnSpanOptions.length > 0) {
+                    const sortOptions = vm.relevantColumnSpanOptions;
                     const currentColIndex = sortOptions.findIndex(x => x.columnSpan === vm.layoutEntry.columnSpan);
                     const newColIndex = Math.min(Math.max(currentColIndex + addColIndex, 0), sortOptions.length-1);
                     vm.layoutEntry.columnSpan = sortOptions[newColIndex].columnSpan;
