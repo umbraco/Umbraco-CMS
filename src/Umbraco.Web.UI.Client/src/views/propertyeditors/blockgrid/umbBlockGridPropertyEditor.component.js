@@ -13,6 +13,28 @@
         return null;
     }
 
+    function closestColumnSpanOption(target, map, max) {
+        if(map.length > 0) {
+            const result = map.reduce((a, b) => {
+                if (a.columnSpan > max) {
+                    return b;
+                }
+                let aDiff = Math.abs(a.columnSpan - target);
+                let bDiff = Math.abs(b.columnSpan - target);
+        
+                if (aDiff === bDiff) {
+                    return a.columnSpan < b.columnSpan ? a : b;
+                } else {
+                    return bDiff < aDiff ? b : a;
+                }
+            });
+            if(result) {
+                return result;
+            }
+        }
+        return null;
+    }
+
 
     const DefaultViewFolderPath = "views/propertyeditors/blockgrid/blockgridentryeditors/";
 
@@ -353,23 +375,30 @@
                     }
                 }
 
-                // TODO: ensure Areas are ordered like the area configuration is.
+                // Ensure Areas are ordered like the area configuration is:
+                layoutEntry.areas.sort((left, right) => {
+                    return block.config.areas?.findIndex(config => config.key === left.key) < block.config.areas?.findIndex(config => config.key === right.key) ? -1 : 1;
+                });
 
 
                 const contextColumns = getContextColumns(parentBlock, areaKey);
                 const relevantColumnSpanOptions = block.config.columnSpanOptions.filter(option => option.columnSpan <= contextColumns);
 
                 // if no columnSpan or no columnSpanOptions configured, then we set(or rewrite) one:
-                if (!layoutEntry.columnSpan || layoutEntry.columnSpan > contextColumns || block.config.columnSpanOptions.length === 0) {
-                    if (block.config.columnSpanOptions.length > 0) {
+                if (!layoutEntry.columnSpan || layoutEntry.columnSpan > contextColumns || relevantColumnSpanOptions.length === 0) {
+                    if (relevantColumnSpanOptions.length > 0) {
                         // Find greatest columnSpanOption within contextColumns, or fallback to contextColumns.
                         layoutEntry.columnSpan = relevantColumnSpanOptions.reduce((prev, option) => Math.max(prev, option.columnSpan), 0) || contextColumns;
                     } else {
                         layoutEntry.columnSpan = contextColumns;
                     }
+                } else {
+                    // Check that columnSpanOption still is available or equal contextColumns, or find closest option fitting:
+                    if (relevantColumnSpanOptions.find(option => option.columnSpan === layoutEntry.columnSpan) === undefined || layoutEntry.columnSpan !== contextColumns) {
+                        console.log(layoutEntry.columnSpan, closestColumnSpanOption(layoutEntry.columnSpan, relevantColumnSpanOptions, contextColumns)?.columnSpan || contextColumns);
+                        layoutEntry.columnSpan = closestColumnSpanOption(layoutEntry.columnSpan, relevantColumnSpanOptions, contextColumns)?.columnSpan || contextColumns;
+                    }
                 }
-
-                // TODO: Check that columnSpanOption still is available or equal contextColumns
 
                 // if no rowSpan, then we set one:
                 if (!layoutEntry.rowSpan) {
