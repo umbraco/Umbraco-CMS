@@ -164,6 +164,7 @@
 
         function _handleMediaEntryAccepted (event, data) {
             vm.model.value.push(data.mediaEntry);
+            setDirty();
         }
 
         function _handleMediaEntryRejected (event, data) {
@@ -173,6 +174,7 @@
                 vm.model.value.splice(index, 1);
             }
             vm.invalidEntries.push(data.mediaEntry);
+            setDirty();
         }
 
         function _handleMediaUploadSuccess (event, data) {
