@@ -292,17 +292,18 @@
 
         vm.scaleHandlerMouseDown = function($event) {
             $event.originalEvent.preventDefault();
+            
+            layoutContainer = $element[0].closest('.umb-block-grid__layout-container');
+            if(!layoutContainer) {
+                console.error($element[0], 'could not find parent layout-container');
+                return;
+            }
+
             vm.isScaleMode = true;
             
             window.addEventListener('mousemove', vm.onMouseMove);
             window.addEventListener('mouseup', vm.onMouseUp);
             window.addEventListener('mouseleave', vm.onMouseUp);
-
-
-            layoutContainer = $element[0].closest('.umb-block-grid__layout-container');
-            if(!layoutContainer) {
-                console.error($element[0], 'could not find parent layout-container');
-            }
 
             const layoutContainerRect = layoutContainer.getBoundingClientRect();
             const layoutItemRect = $element[0].getBoundingClientRect();
@@ -349,10 +350,12 @@
         vm.onMouseUp = function(e) {
 
             cancelAnimationFrame(raf);
-            vm.isScaleMode = false;
 
-            // release the lock of gridTemplateRows:
-            layoutContainer.style.gridTemplateRows = "";
+            // Remove listeners:
+            window.removeEventListener('mousemove', vm.onMouseMove);
+            window.removeEventListener('mouseup', vm.onMouseUp);
+            window.removeEventListener('mouseleave', vm.onMouseUp);
+
 
             const layoutContainerRect = layoutContainer.getBoundingClientRect();
             const layoutItemRect = $element[0].getBoundingClientRect();
@@ -364,12 +367,11 @@
 
             const newSpans = getNewSpans(startX, startY, endX, endY);
 
-            // Remove listeners:
-            window.removeEventListener('mousemove', vm.onMouseMove);
-            window.removeEventListener('mouseup', vm.onMouseUp);
-            window.removeEventListener('mouseleave', vm.onMouseUp);
 
+            // release the lock of gridTemplateRows:
             layoutContainer.removeChild(scaleBoxBackdropEl);
+            layoutContainer.style.gridTemplateRows = "";
+            vm.isScaleMode = false;
 
             // Clean up variables:
             layoutContainer = null;
