@@ -218,7 +218,6 @@
             function _removePropertyProxy(eventTarget, slotName) {
                 const event = new CustomEvent("UmbBlockGrid_RemoveProperty", {composed: true, bubbles: true, detail: {'slotName': slotName}});
                 eventTarget.dispatchEvent(event);
-                console.log(eventTarget, event);
             }
 
             // Borrowed concept from, its not identical as more has been implemented: https://github.com/SortableJS/angular-legacy-sortablejs/blob/master/angular-legacy-sortable.js
@@ -238,7 +237,6 @@
 
                     // unregister all property editor proxies via events:
                     fromCtrl.containedPropertyEditorProxies.forEach(slotName => {
-                        console.log(evt.from, slotName)
                         _removePropertyProxy(evt.from, slotName);
                     });
                     
