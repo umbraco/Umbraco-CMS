@@ -1,13 +1,5 @@
 <style>
 
-    :host {
-        position: relative;
-        border-radius: 3px;
-        height: 100%;/* Add this to fill the cell fully */
-        box-sizing: border-box;
-        //border: 1px solid #BBBABF;
-    }
-    
     .text {
         position: relative;
         display: block;
@@ -31,4 +23,3 @@
 
 <div class="text" ng-click="block.edit()" ng-focus="block.focus" ng-bind-html="block.data.richText" style="margin: 0 20px;">
 </div>
-<slot name="area-container" part="area-container"></slot>
