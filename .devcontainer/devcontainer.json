@@ -13,6 +13,14 @@
 		"omnisharp.enableRoslynAnalyzers": true
 	},
 
+	"features": {
+		// Workaround until the image is updated to include the latest version of .NET Core - .NET7
+		// https://github.com/devcontainers/templates/issues/38#issuecomment-1310803259		
+		"ghcr.io/devcontainers/features/dotnet:1": {
+			"version": "7"
+		}
+	},
+
 	// Add the IDs of extensions you want installed when the container is created.
 	"extensions": [
 		"ms-dotnettools.csharp"
