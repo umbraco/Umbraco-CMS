@@ -55,46 +55,6 @@ ng-form.ng-invalid-val-server-match-content > .umb-block-grid__block:not(.--acti
     pointer-events: none;
 }
 
-/*.umb-block-grid__block--validation-badge {
-    display:none;
-}
-ng-form.ng-invalid-val-server-match-settings > .umb-block-grid__block:not(.--active) > .umb-block-grid__block--validation-badge, 
-ng-form.ng-invalid-val-server-match-content > .umb-block-grid__block:not(.--active) > .umb-block-grid__block--validation-badge {
-    display:block;
-    text-align: center;
-    position: absolute;
-    top: -9px;
-    right: -9px;
-    min-width: 10px;
-    color: @white;
-    border: 2px solid @white;
-    border-radius: 50%;
-    font-size: 10px;
-    font-weight: bold;
-    padding: 2px;
-    line-height: 10px;
-    background-color: @formErrorText;
-    .show-validation-type-warning & {
-        background-color: @formWarningText;
-    }
-    font-weight: 900;
-    pointer-events: none;
-
-    animation-duration: 1.4s;
-    animation-iteration-count: infinite;
-    animation-name: blockelement-inlineblock-editor--badge-bounce;
-    animation-timing-function: ease;
-    @keyframes blockelement-inlineblock-editor--badge-bounce {
-        0%   { transform: translateY(0); }
-        20%  { transform: translateY(-4px); }
-        40%  { transform: translateY(0); }
-        55%  { transform: translateY(-2px); }
-        70%  { transform: translateY(0); }
-        100% { transform: translateY(0); }
-    }
-}
-*/
-
 .umb-block-grid__block {
     position: relative;
     width: 100%;
@@ -268,25 +228,11 @@ ng-form.ng-invalid-val-server-match-content > .umb-block-grid__block:not(.--acti
             opacity: var(--umb-block-grid--block-ui-opacity);
         }
     }
-
-    /*
-    &.--show-validation {
-        ng-form.ng-invalid-val-server-match-content > & {
-            border: 2px solid @formErrorText;
-            border-radius: @baseBorderRadius;
-        }
-    }
-    */
 }
 
 ng-form.ng-invalid > .umb-block-grid__block:not(.--active) > .umb-block-grid__block--actions {
     opacity: 1;
 }
-/*
-ng-form.ng-invalid > .umb-block-grid__block:not(.--active) > .umb-block-grid__block--context {
-    opacity: 1;
-}
-*/
 
 .umb-block-grid__block--view {
     height: 100%;
@@ -527,27 +473,6 @@ ng-form.ng-invalid > .umb-block-grid__block:not(.--active) > .umb-block-grid__bl
         border-right-color: @blueDark;
     }
 }
-
-/*
-umb-block-grid-block {
-
-    > div {
-        position: relative;
-        width: 100%;
-        min-height: @umb-block-grid__item_minimum_height;
-        background-color: @white;
-        border-radius: @baseBorderRadius;
-        box-sizing: border-box;
-    }
-
-}
-*/
-
-/*
-.blockelement__draggable-element {
-    cursor: grab;
-}
-*/
 
 
 .umb-block-grid__scale-handler {
@@ -798,16 +723,6 @@ umb-block-grid-block {
     }
 }
 
-
-/** make sure block with areas stay on top, so they don't look like they are 'not-allowed'*/
-/*
-.umb-block-grid__layout-container.--droppable-indication {
-    .umb-block-grid__area-actions {
-        display: none;
-    }
-}
-*/
-
 .umb-block-grid__layout-item-placeholder {
     background: transparent;
     border-radius: 3px;
@@ -889,9 +804,8 @@ umb-block-grid-block {
     content: '';
     position: absolute;
     inset: 0;
-    /* Moved slightly in to align with the inline-create button, which is moved slightly in to avoid collision with other create buttons. */
-    top:2px;
-    bottom: 2px;
+    top:0;
+    bottom: 0;
     border-radius: 3px;
     border: 1px solid rgba(@gray-5, 0.3);
     pointer-events: none;
@@ -900,6 +814,9 @@ umb-block-grid-block {
     z-index:3;
 }
 .umb-block-grid__area.--highlight::after {
+    /* Moved slightly in to align with the inline-create button, which is moved slightly in to avoid collision with other create buttons. */
+    top:2px;
+    bottom: 2px;
     /** Avoid displaying highlight when in dragging-mode */
     opacity: calc(1 - var(--umb-block-grid--dragging-mode, 0));
     border-color: @blueDark;
@@ -930,31 +847,10 @@ umb-block-grid-block {
     z-index: 1;
     cursor: nwse-resize;
 }
-/*
-.umb-block-grid__scalebox {
-    position: absolute;
-    top:0;
-    left:0;
-    z-index: 10;
-    cursor: nwse-resize;
-
-    transition: background-color 240ms ease-in;
-    animation: umb-block-grid__scalebox__pulse 400ms ease-in-out alternate infinite;
-    @keyframes umb-block-grid__scalebox__pulse {
-        0%   { background-color: rgba(@blueMidLight, 0.33); }
-        100% { background-color: rgba(@blueMidLight, 0.22); }
-    }
-}
-*/
 
 
 
 
-/*
-.umb-block-grid__layout-container {
-    
-}
-*/
 
 
 /** make sure block with areas stay on top, so they don't look like they are 'not-allowed'*/
