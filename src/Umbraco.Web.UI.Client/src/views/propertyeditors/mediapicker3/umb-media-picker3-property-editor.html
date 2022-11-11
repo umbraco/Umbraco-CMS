@@ -8,7 +8,8 @@
         ngf-change="vm.handleFiles($files, $invalidFiles)"
         ngf-drag-over-class="'drag-over'"
         ngf-multiple="{{vm.model.config.multiple}}"
-        ngf-allow-dir="{{ vm.allowDir }}">
+        ngf-allow-dir="{{ vm.allowDir }}"
+        ng-disabled="vm.readonly">
 
         <div class="drop-overlay">Drop files</div>
 

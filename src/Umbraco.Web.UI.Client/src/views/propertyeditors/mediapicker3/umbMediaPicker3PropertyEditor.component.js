@@ -157,6 +157,7 @@
         };
 
         function handleFiles (files, invalidFiles) {
+            if (vm.readonly) return;
             const allFiles = [...files, ...invalidFiles];
             mediaUploader.requestUpload(allFiles);
         };
