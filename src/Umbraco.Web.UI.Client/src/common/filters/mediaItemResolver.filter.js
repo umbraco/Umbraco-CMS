@@ -43,8 +43,8 @@
   angular.module("umbraco.filters").factory("mediaItemResolverFilterService", mediaItemResolverFilterService);
 
 
-  // Filter to take a node id and grab it's name instead
-  // Usage: {{ pickerAlias | ncNodeName }}
+  // Filter loads Media Item Model from a Media Key.
+  // Usage: {{ myMediaProperty[0].mediaKey | mediaItemResolver }}
   angular.module("umbraco.filters").filter("mediaItemResolver", function (mediaItemResolverFilterService) {
 
     mediaItemResolverFilter.$stateful = true;
