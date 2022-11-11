@@ -248,7 +248,7 @@
                     _emit('uploadProgress', { mediaEntry, progressPercentage });
                 })
                 .success(function (data) {
-                    _emit('uploadSuccess', { mediaEntry, data });
+                    _emit('uploadSuccess', { mediaEntry, ...data });
                     _processQueue();
                 })
                 .error(function(error) {

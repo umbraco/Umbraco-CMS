@@ -180,8 +180,9 @@
         }
 
         function _handleMediaUploadSuccess (event, data) {
-            data.mediaEntry.tmpLocation = data.tmpLocation;
-            updateMediaEntryData(data.mediaEntry);
+            const mediaEntry = vm.model.value.find(mediaEntry => mediaEntry.key === data.mediaEntry.key);
+            mediaEntry.tmpLocation = data.tmpLocation;
+            updateMediaEntryData(mediaEntry);
         }
 
         function onServerValueChanged(newVal, oldVal) {
