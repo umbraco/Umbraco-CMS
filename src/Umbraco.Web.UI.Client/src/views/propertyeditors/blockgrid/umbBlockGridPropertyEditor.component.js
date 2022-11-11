@@ -59,6 +59,8 @@
         var liveEditing = true;
 
         var shadowRoot;
+        var firstLayoutContainer;
+
 
         var vm = this;
 
@@ -277,6 +279,7 @@
 
             window.requestAnimationFrame(() => {
                 shadowRoot = $element[0].querySelector('umb-block-grid-root').shadowRoot;
+                firstLayoutContainer = shadowRoot.querySelector('.umb-block-grid__layout-container');
             })
 
         }
@@ -1311,6 +1314,21 @@
             }
         }
 
+        vm.startDraggingMode = startDraggingMode;
+        function startDraggingMode() {
+
+            document.documentElement.style.setProperty("--umb-block-grid--dragging-mode", 1);
+            firstLayoutContainer.style.minHeight = firstLayoutContainer.getBoundingClientRect().height + "px";
+            
+        }
+        vm.exitDraggingMode = exitDraggingMode;
+        function exitDraggingMode() {
+
+            document.documentElement.style.setProperty("--umb-block-grid--dragging-mode", 0);
+            firstLayoutContainer.style.minHeight = "";
+            
+        }
+
         function onAmountOfBlocksChanged() {
 
             // enable/disable property actions
@@ -1342,6 +1360,9 @@
             for (const subscription of unsubscribe) {
                 subscription();
             }
+
+            firstLayoutContainer = null;
+            gridRootEl = null;
         });
     }
 

@@ -576,6 +576,10 @@
                 forceAutoScrollFallback: true,
 
                 onStart: function (evt) {
+                    
+                    // TODO: This does not work correctly jet with SortableJS. With the replacement we should be able to call this before DOM is changed.
+                    vm.blockEditorApi.internal.startDraggingMode();
+
                     nextSibling = evt.from === evt.item.parentNode ? evt.item.nextSibling : evt.clone.nextSibling;
 
                     var contextVM = vm;
@@ -607,8 +611,6 @@
                     window.addEventListener('drag', _onDragMove);
                     window.addEventListener('dragover', _onDragMove);
 
-                    document.documentElement.style.setProperty("--umb-block-grid--dragging-mode", 1);
-
                     $scope.$evalAsync();
                 },
                 // Called by any change to the list (add / update / remove)
@@ -639,7 +641,7 @@
                     }
                     window.removeEventListener('drag', _onDragMove);
                     window.removeEventListener('dragover', _onDragMove);
-                    document.documentElement.style.setProperty("--umb-block-grid--dragging-mode", 0);
+                    vm.blockEditorApi.internal.exitDraggingMode();
 
                     if(ghostElIndicateForceLeft) {
                         ghostEl.removeChild(ghostElIndicateForceLeft);
