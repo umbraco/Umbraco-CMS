@@ -28,7 +28,9 @@
             }
         });
 
-    function MediaPicker3Controller($scope, editorService, clipboardService, localizationService, overlayService, userService, entityResource, $attrs, umbRequestHelper, Upload, mediaHelper, mediaTypeHelper, mediaTypeResource) {
+    function MediaPicker3Controller($scope, editorService, clipboardService, localizationService, overlayService, userService, entityResource, $attrs, umbRequestHelper, $injector) {
+
+        const mediaUploader = $injector.instantiate(Utilities.MediaUploader);
 
         var unsubscribe = [];
 
@@ -38,12 +40,6 @@
 
         var vm = this;
 
-        const umbracoSettings = Umbraco.Sys.ServerVariables.umbracoSettings;
-        const allowedUploadFiles = mediaHelper.formatFileTypes(umbracoSettings.allowedUploadFiles);
-        const allowedImageFileTypes = mediaHelper.formatFileTypes(umbracoSettings.imageFileTypes);
-        const disallowedUploadFiles = umbracoSettings.disallowedUploadFiles !== '' ? mediaHelper.formatFileTypes(umbracoSettings.disallowedUploadFiles).split(',').map(fileExtension => `!${fileExtension}`).join(',') : '';
-        vm.serverFileExtensionsPattern = `${allowedUploadFiles},${allowedImageFileTypes},${disallowedUploadFiles}`;
-        vm.maxFileSize = umbracoSettings.maxFileSize !== '' ? `${umbracoSettings.maxFileSize} KB` : '';
         vm.loading = true;
 
         vm.activeMediaEntry = null;
@@ -54,6 +50,8 @@
         vm.allowEditMedia = true;
 
         vm.handleFiles = handleFiles;
+
+        vm.invalidEntries = [];
 
         vm.addMediaAt = addMediaAt;
         vm.editMedia = editMedia;
@@ -87,6 +85,16 @@
             vm.model.config.crops = vm.model.config.crops || [];
             vm.singleMode = vm.validationLimit.max === 1;
             vm.allowedTypes = vm.model.config.filter ? vm.model.config.filter.split(",") : null;
+
+            const uploaderOptions = {
+                uploadURL: umbRequestHelper.getApiUrl("mediaPickerThreeBaseUrl", "uploadMedia"),
+                allowedMediaTypeAliases: vm.allowedTypes
+            };
+    
+            mediaUploader.on('mediaEntryAccepted', _handleMediaEntryAccepted);
+            mediaUploader.on('mediaEntryRejected', _handleMediaEntryRejected);
+            mediaUploader.on('uploadProgress', _handleMediaUploadProgress);
+            mediaUploader.on('uploadSuccess', _handleMediaUploadSuccess);
 
             copyAllMediasAction = {
                 labelKey: "clipboard_labelForCopyAllEntries",
@@ -143,166 +151,37 @@
                 vm.allowEdit = hasAccessToMedia;
                 vm.allowAdd = hasAccessToMedia;
 
-                mediaTypeResource.getAllFiltered(vm.allowedTypes).then(mediaTypes => {
-                    vm.allowedMediaTypes = mediaTypes;
+                mediaUploader.init(uploaderOptions).then(() => {
                     vm.loading = false;
                 });
             });
         };
 
-        vm.queue = [];
-        vm.invalidEntries = [];
-
-        function handleFiles (files, event, invalidFiles) {
-            const invalidEntries = invalidFiles.map(file => {
-                const tempMediaEntry = {
-                    key: String.CreateGuid(),
-                    name: file.name
-                };
-
-                tempMediaEntry.error = true;
-                tempMediaEntry.errorType = {};
-                tempMediaEntry.errorType[file.$error] = true;
-
-                return tempMediaEntry;
-            });
-
-            vm.invalidEntries = [...invalidEntries, ...vm.invalidEntries]
-
-            const queueItems = files.map(file => {
-                const tempMediaEntry = {
-                    key: String.CreateGuid(),
-                    name: file.name,
-                    uploadProgress: 0,
-                    dataURL: ''
-                };
-
-                if (file.type.includes('image')) {
-                    Upload.base64DataUrl(file).then(function(url) {    
-                        tempMediaEntry.dataURL = url;
-                    });
-                }
-
-                return {
-                    tempMediaEntry: tempMediaEntry,
-                    file: file
-                };
-            });
-
-            // angular complains about "Illegal invocation" if the file is part of the model.value
-            // so we have to keep them separate
-            queueItems.forEach(queueItem => vm.model.value.push(queueItem.tempMediaEntry));
-
-            _queueItems(queueItems);
-            _processQueue();
+        function handleFiles (files, invalidFiles) {
+            const allFiles = [...files, ...invalidFiles];
+            mediaUploader.requestUpload(allFiles);
         };
 
-        function _queueItems (queueItems) {
-            vm.queue = [...vm.queue, ...queueItems];
+        function _handleMediaEntryAccepted (event, data) {
+            vm.model.value.push(data.mediaEntry);
         }
 
-        function _processQueue () {
-            const nextItem = vm.queue.shift();
-
-            // queue is empty
-            if (!nextItem) return;
-
-            _getMatchedMediaType(nextItem.file).then(mediaTypeAlias => {
-                nextItem.mediaTypeAlias = mediaTypeAlias;
-                _upload(nextItem);
-            }, () => {
-                _handleInvalidTempMediaEntry(nextItem.tempMediaEntry, { type: 'pattern' });
-                _processQueue();
-            });
+        function _handleMediaEntryRejected (event, data) {
+            // we need to make sure the media entry hasn't been accepted earlier in process
+            const index = vm.model.value.findIndex(mediaEntry => mediaEntry.key === data.mediaEntry.key);
+            if (index !== -1) {
+                vm.model.value.splice(index, 1);
+            }
+            vm.invalidEntries.push(data.mediaEntry);
         }
 
-        function _getMatchedMediaType(file) {
-            return new Promise((resolve, reject) => {
-                const uploadFileExtension = mediaHelper.getFileExtension(file.name);
-                const matchedMediaTypes = mediaTypeHelper.getTypeAcceptingFileExtensions(vm.allowedMediaTypes, [uploadFileExtension]);
-                
-                if (matchedMediaTypes.length === 0) {
-                    reject();
-                    return;
-                };
-                
-                if (matchedMediaTypes.length === 1) {
-                    resolve(matchedMediaTypes[0].alias);
-                    return;
-                };
-
-                // when we get all media types, the "File" media type will always show up because it accepts all file extensions.
-                // If we don't remove it from the list we will always show the picker.
-                const matchedMediaTypesNoFile = matchedMediaTypes.filter(mediaType => mediaType.alias !== "File");
-                if (matchedMediaTypesNoFile.length === 1) {
-                    resolve(matchedMediaTypesNoFile[0].alias);
-                    return;
-                };
-    
-                if (matchedMediaTypes.length > 1) {
-                    _chooseMediaTypeDialog(matchedMediaTypes)
-                    .then((selectedMediaType) => {
-                        resolve(selectedMediaType);
-                    }, () => {
-                        reject();
-                    });
-                };
-            });
+        function _handleMediaUploadProgress (event, data) {
+            data.mediaEntry.uploadProgress = data.progressPercentage;
         }
 
-        function _upload(queueItem) {
-            Upload.upload({
-                    url: umbRequestHelper.getApiUrl("mediaPickerThreeBaseUrl", "uploadMedia"),
-                    file: queueItem.file
-                })
-                .progress(function(evt) {
-                    var progressPercentage = parseInt(100.0 * evt.loaded / evt.total, 10);
-                    queueItem.tempMediaEntry.uploadProgress = progressPercentage;
-                })
-                .success(function (data) {
-                    queueItem.tempMediaEntry.tmpLocation = data.tmpLocation;
-                    updateMediaEntryData(queueItem.tempMediaEntry);
-                    _processQueue();
-                })
-                .error(function(error) {
-                    _handleInvalidTempMediaEntry(queueItem.tempMediaEntry, { type: 'server', message: error.Message });                    
-                    _processQueue();
-                });
-        }
-
-        function _handleInvalidTempMediaEntry (tempMediaEntry, error) {
-            tempMediaEntry.error = true;
-            tempMediaEntry.errorType = {};
-            tempMediaEntry.errorType[error.type] = true;
-            tempMediaEntry.errorText = error.message;
-            
-            // we didn't catch the wrong file type in the client side validation so we need to remove the value again
-            const index = vm.model.value.findIndex(mediaEntry => mediaEntry.key === tempMediaEntry.key);
-            vm.model.value.splice(index, 1);
-            vm.invalidEntries.push(tempMediaEntry);
-        }
-
-        function _chooseMediaTypeDialog(mediaTypes) {
-            return new Promise((resolve, reject) => {
-                localizationService.localizeMany(["defaultdialogs_selectMediaType", "mediaType_autoPickMediaType"]).then(function (translations) {    
-                    const dialog = {
-                        view: "itempicker",
-                        filter: mediaTypes.length > 8,
-                        availableItems: mediaTypes,
-                        submit: function (model) {
-                            resolve(model.selectedItem.alias);
-                            overlayService.close();
-                        },
-                        close: function () {
-                            reject();
-                            overlayService.close();
-                        }
-                    };
-    
-                    dialog.title = translations[0];
-                    overlayService.open(dialog);
-                });
-            });
+        function _handleMediaUploadSuccess (event, data) {
+            data.mediaEntry.tmpLocation = data.tmpLocation;
+            updateMediaEntryData(data.mediaEntry);
         }
 
         function onServerValueChanged(newVal, oldVal) {
