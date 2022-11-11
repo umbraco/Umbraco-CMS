@@ -353,6 +353,9 @@
                     }
                 }
 
+                // TODO: ensure Areas are ordered like the area configuration is.
+
+
                 // if no columnSpan or no columnSpanOptions configured, then we set(or rewrite) one:
                 if (!layoutEntry.columnSpan || block.config.columnSpanOptions.length === 0) {
 
