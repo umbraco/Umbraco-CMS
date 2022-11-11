@@ -40,6 +40,9 @@ public class BlockGridConfiguration
         [DataMember(Name ="columnSpanOptions")]
         public BlockGridColumnSpanOption[] ColumnSpanOptions { get; set; }  = Array.Empty<BlockGridColumnSpanOption>();
 
+        [DataMember(Name ="rowMinSpan")]
+        public int? RowMinSpan { get; set; }
+
         [DataMember(Name ="rowMaxSpan")]
         public int? RowMaxSpan { get; set; }
 
@@ -81,6 +84,9 @@ public class BlockGridConfiguration
 
         [DataMember(Name ="editorSize")]
         public string? EditorSize { get; set; }
+
+        [DataMember(Name ="inlineEditing")]
+        public bool InlineEditing { get; set; }
 
         [DataMember(Name ="forceHideContentEditorInOverlay")]
         public bool ForceHideContentEditorInOverlay { get; set; }
