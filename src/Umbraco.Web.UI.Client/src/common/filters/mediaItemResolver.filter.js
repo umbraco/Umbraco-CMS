@@ -19,7 +19,9 @@
         if(mediaKeysRequest.indexOf(key) === -1) {
           mediaKeysRequest.push(key);
           mediaResource.getById(key).then(function (mediaItem) {
-            mediaItemCache.push(mediaItem);
+            if(mediaItem) {
+              mediaItemCache.push(mediaItem);
+            }
           });
         }
 
