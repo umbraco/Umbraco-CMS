@@ -1048,7 +1048,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 .ToArray();
 
             // First delete all auto-relations for this entity
-            RelationRepository.DeleteByParent(entity.Id, relationTypeAliases); //Constants.Conventions.RelationTypes.AutomaticRelationTypes);
+            RelationRepository.DeleteByParent(entity.Id, relationTypeAliases);
 
             if (trackedRelations.Count == 0)
             {
