@@ -6,6 +6,7 @@
         <umb-button action="vm.setupSample()" button-style="primary" state="vm.sampleButtonState" label-key="blockEditor_getSampleButton" type="button"></umb-button>
     </div>
 
+    
     <div class="umb-block-card-group">
 
         <div class="umb-block-card-grid" ui-sortable="vm.blockSortableOptions" ng-model="model.value">
@@ -30,9 +31,14 @@
                 </div>
             </umb-block-card>
 
-            <button id="{{model.alias}}" type="button" class="btn-reset __add-button" ng-click="vm.openAddDialog()">
+            <uui-button id="{{model.alias}}" look="{{(model.value.length === 0 && vm.blockGroups.length === 0) ? 'primary' : 'placeholder'}}" color="primary" ng-click="vm.openAddDialog()">
                 <localize key="blockEditor_addBlockType">Add Block</localize>
-            </button>
+            </uui-button>
+
+            <uui-button ng-if="!vm.showSampleDataCTA && model.value.length === 0 && vm.blockGroups.length === 0" look="placeholder" color="primary" ng-click="vm.setupSample()">
+                <localize key="blockEditor_getSampleHeadline">Install demo Blocks</localize>
+            </uui-button>
+
         </div>
 
     </div>
@@ -82,9 +88,9 @@
                     </div>
                 </umb-block-card>
 
-                <button type="button" class="btn-reset __add-button" ng-click="vm.openAddDialog(blockGroup.key)">
+                <uui-button id="{{model.alias}}" look="placeholder" color="primary" ng-click="vm.openAddDialog(blockGroup.key)">
                     <localize key="blockEditor_addBlockType">Add Block</localize>
-                </button>
+                </uui-button>
             </div>
 
         </div>

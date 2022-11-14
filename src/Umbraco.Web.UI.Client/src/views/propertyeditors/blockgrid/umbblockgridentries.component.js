@@ -76,6 +76,7 @@
 
         vm.movingLayoutEntry = null;
         vm.layoutColumnsInt = 0;
+        vm.containedPropertyEditorProxies = [];
 
         vm.$onInit = function () {
             initializeSortable();
@@ -92,7 +93,6 @@
         unsubscribe.push($scope.$watch("layoutColumns", (newVal, oldVal) => {
             vm.layoutColumnsInt = parseInt(vm.layoutColumns, 10);
         }));
-
 
         function onLocalAmountOfBlocksChanged() {
 
@@ -153,6 +153,11 @@
             }
         }
 
+
+        vm.notifyVisualUpdate = function () {
+            $scope.$broadcast("blockGridEditorVisualUpdate", {areaKey: vm.areaKey});
+        }
+
         vm.acceptBlock = function(contentTypeKey) {
             return vm.blockEditorApi.internal.isElementTypeKeyAllowedAt(vm.parentBlock, vm.areaKey, contentTypeKey);
         }
@@ -210,6 +215,11 @@
 
             var nextSibling;
 
+            function _removePropertyProxy(eventTarget, slotName) {
+                const event = new CustomEvent("UmbBlockGrid_RemoveProperty", {composed: true, bubbles: true, detail: {'slotName': slotName}});
+                eventTarget.dispatchEvent(event);
+            }
+
             // Borrowed concept from, its not identical as more has been implemented: https://github.com/SortableJS/angular-legacy-sortablejs/blob/master/angular-legacy-sortable.js
             function _sync(evt) {
 
@@ -222,8 +232,15 @@
                     const prevEntries = fromCtrl.entries;
                     const syncEntry = prevEntries[oldIndex];
 
-                    // Perform the transfer:
+                    // Make sure Property Editor Proxies are destroyed, as we need to establish new when moving context:
 
+
+                    // unregister all property editor proxies via events:
+                    fromCtrl.containedPropertyEditorProxies.forEach(slotName => {
+                        _removePropertyProxy(evt.from, slotName);
+                    });
+                    
+                    // Perform the transfer:
                     if (Sortable.active && Sortable.active.lastPullMode === 'clone') {
                         syncEntry = Utilities.copy(syncEntry);
                         prevEntries.splice(Sortable.utils.index(evt.clone, sortable.options.draggable), 0, prevEntries.splice(oldIndex, 1)[0]);
@@ -231,7 +248,6 @@
                     else {
                         prevEntries.splice(oldIndex, 1);
                     }
-                    
                     vm.entries.splice(newIndex, 0, syncEntry);
 
                     const contextColumns = vm.blockEditorApi.internal.getContextColumns(vm.parentBlock, vm.areaKey);
@@ -261,6 +277,7 @@
 
             function _indication(contextVM, movingEl) {
 
+                // Remove old indication:
                 if(_lastIndicationContainerVM !== contextVM && _lastIndicationContainerVM !== null) {
                     _lastIndicationContainerVM.hideNotAllowed();
                     _lastIndicationContainerVM.revertIndicateDroppable();
@@ -269,7 +286,7 @@
                 
                 if(contextVM.acceptBlock(movingEl.dataset.contentElementTypeKey) === true) {
                     _lastIndicationContainerVM.hideNotAllowed();
-                    _lastIndicationContainerVM.indicateDroppable();// This block is accepted to we will indicate a good drop.
+                    _lastIndicationContainerVM.indicateDroppable();// This block is accepted so we will indicate a good drop.
                     return true;
                 }
 
@@ -557,6 +574,10 @@
                 forceAutoScrollFallback: true,
 
                 onStart: function (evt) {
+                    
+                    // TODO: This does not work correctly jet with SortableJS. With the replacement we should be able to call this before DOM is changed.
+                    vm.blockEditorApi.internal.startDraggingMode();
+
                     nextSibling = evt.from === evt.item.parentNode ? evt.item.nextSibling : evt.clone.nextSibling;
 
                     var contextVM = vm;
@@ -577,6 +598,7 @@
                     vm.movingLayoutEntry.$block.__scope.$evalAsync();// needed for the block to be updated
 
                     ghostEl = evt.item;
+                    vm.containedPropertyEditorProxies = Array.from(ghostEl.querySelectorAll('slot[data-is-property-editor-proxy]')).map(x => x.getAttribute('name'));
 
                     targetRect = evt.to.getBoundingClientRect();
                     ghostRect = ghostEl.getBoundingClientRect();
@@ -586,8 +608,6 @@
 
                     window.addEventListener('drag', _onDragMove);
                     window.addEventListener('dragover', _onDragMove);
-
-                    document.documentElement.style.setProperty("--umb-block-grid--dragging-mode", 1);
 
                     $scope.$evalAsync();
                 },
@@ -619,7 +639,7 @@
                     }
                     window.removeEventListener('drag', _onDragMove);
                     window.removeEventListener('dragover', _onDragMove);
-                    document.documentElement.style.setProperty("--umb-block-grid--dragging-mode", 0);
+                    vm.blockEditorApi.internal.exitDraggingMode();
 
                     if(ghostElIndicateForceLeft) {
                         ghostEl.removeChild(ghostElIndicateForceLeft);
@@ -643,6 +663,9 @@
                     ghostRect = null;
                     ghostEl = null;
                     relatedEl = null;
+                    vm.containedPropertyEditorProxies = [];
+
+                    vm.notifyVisualUpdate();
                 }
             });
 
