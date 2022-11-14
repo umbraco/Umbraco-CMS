@@ -3,6 +3,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0.DataTypes;
 /// <summary>
 ///     Defines a service migrating preValues.
 /// </summary>
+[Obsolete("This is not used anymore and will be removed in Umbraco 13")]
 public interface IPreValueMigrator
 {
     /// <summary>
