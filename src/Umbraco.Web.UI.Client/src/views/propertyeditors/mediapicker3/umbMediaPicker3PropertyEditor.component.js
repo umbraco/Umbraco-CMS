@@ -92,12 +92,12 @@
                 uploadURL: umbRequestHelper.getApiUrl("mediaPickerThreeBaseUrl", "uploadMedia"),
                 allowedMediaTypeAliases: vm.allowedTypes
             };
-    
-            mediaUploader.on('mediaEntryAccepted', _handleMediaEntryAccepted);
-            mediaUploader.on('mediaEntryRejected', _handleMediaEntryRejected);
-            mediaUploader.on('queueStarted', _handleMediaQueueStarted);
-            mediaUploader.on('uploadSuccess', _handleMediaUploadSuccess);
-            mediaUploader.on('queueCompleted', _handleMediaQueueCompleted);
+
+            unsubscribe.push(mediaUploader.on('mediaEntryAccepted', _handleMediaEntryAccepted));
+            unsubscribe.push(mediaUploader.on('mediaEntryRejected', _handleMediaEntryRejected));
+            unsubscribe.push(mediaUploader.on('queueStarted', _handleMediaQueueStarted));
+            unsubscribe.push(mediaUploader.on('uploadSuccess', _handleMediaUploadSuccess));
+            unsubscribe.push(mediaUploader.on('queueCompleted', _handleMediaQueueCompleted));
 
             copyAllMediasAction = {
                 labelKey: "clipboard_labelForCopyAllEntries",
@@ -183,6 +183,8 @@
 
         function _handleMediaUploadSuccess (event, data) {
             const mediaEntry = vm.model.value.find(mediaEntry => mediaEntry.key === data.mediaEntry.key);
+            if (!mediaEntry) return;
+
             mediaEntry.tmpLocation = data.tmpLocation;
             updateMediaEntryData(mediaEntry);
         }

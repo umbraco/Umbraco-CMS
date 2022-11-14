@@ -20,7 +20,8 @@
                 stylesheet: "@",
                 blockEditorApi: "<",
                 propertyEditorForm: "<?",
-                entries: "<"
+                entries: "<",
+                loading: "<"
             }
         }
     );
@@ -41,6 +42,7 @@
                     }
                 </style>
                 <div 
+                    ng-if="vm.loading !== true"
                     class="umb-block-grid"
                     ng-class="{'show-validation': vm.blockEditorApi.internal.showValidation}"
                     data-grid-columns="${vm.gridColumns}"

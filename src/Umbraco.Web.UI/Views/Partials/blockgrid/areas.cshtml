@@ -8,12 +8,6 @@
      style="--umb-block-grid--area-grid-columns: @(Model.AreaGridColumns?.ToString() ?? Model.GridColumns?.ToString() ?? "12");">
     @foreach (var area in Model.Areas)
     {
-        <div class="umb-block-grid__area"
-         data-area-col-span="@area.ColumnSpan"
-         data-area-row-span="@area.RowSpan"
-         data-area-alias="@area.Alias"
-         style="--umb-block-grid--grid-columns: @area.ColumnSpan;--umb-block-grid--area-column-span: @area.ColumnSpan; --umb-block-grid--area-row-span: @area.RowSpan;">
-            @await Html.GetBlockGridItemsHtmlAsync(area)
-        </div>
+        @await Html.GetBlockGridItemAreaHtmlAsync(area)
     }
 </div>
