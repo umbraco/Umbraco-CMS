@@ -1,5 +1,5 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html, nothing } from 'lit';
+import { css, html, nothing, PropertyValueMap } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import type { UserEntity } from '../../../core/models';
 import { UmbUserStore } from '../../../core/stores/user/user.store';
@@ -41,13 +41,22 @@ export class UmbPickerUserElement extends UmbObserverMixin(UmbPickerElement) {
 	connectedCallback(): void {
 		super.connectedCallback();
 		this.pickerLayout = 'umb-picker-layout-user';
-		this.consumeContext('umbUserStore', (usersContext: UmbUserStore) => {
-			this._userStore = usersContext;
+		this.consumeContext('umbUserStore', (userStore: UmbUserStore) => {
+			this._userStore = userStore;
+			this._observeUser();
 		});
+	}
+
+	protected updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+		super.updated(_changedProperties);
+		if (_changedProperties.has('value')) {
+			this._observeUser(); // TODO: This works, but it makes the value change twice.
+		}
 	}
 
 	private _observeUser() {
 		if (!this._userStore) return;
+
 		this.observe<Array<UserEntity>>(this._userStore.getByKeys(this.value), (users) => {
 			this._users = users;
 		});

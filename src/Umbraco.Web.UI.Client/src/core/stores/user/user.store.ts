@@ -92,7 +92,6 @@ export class UmbUserStore extends UmbDataStoreBase<UserDetails> {
 
 	async updateUserGroup(userKeys: Array<string>, userGroup: string): Promise<void> {
 		// TODO: use Fetcher API.
-
 		try {
 			const res = await fetch('/umbraco/backoffice/users/updateUserGroup', {
 				method: 'POST',

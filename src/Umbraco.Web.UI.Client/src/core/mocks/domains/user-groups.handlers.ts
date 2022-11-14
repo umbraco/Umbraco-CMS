@@ -36,9 +36,6 @@ export const handlers = [
 		if (!data) return;
 
 		const saved = umbUserGroupsData.save(data);
-
-		console.log('saved', saved);
-
 		return res(ctx.status(200), ctx.json(saved));
 	}),
 ];

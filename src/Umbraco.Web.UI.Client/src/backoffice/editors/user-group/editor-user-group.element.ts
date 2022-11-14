@@ -266,6 +266,11 @@ export class UmbEditorUserGroupElement extends UmbContextProviderMixin(
 		});
 	}
 
+	private _updateUserKeys(userKeys: Array<string>) {
+		this._userKeys = userKeys;
+		this._updateProperty('users', this._userKeys);
+	}
+
 	private _updateProperty(propertyName: string, value: unknown) {
 		this._userGroupContext?.update({ [propertyName]: value });
 	}
@@ -359,8 +364,8 @@ export class UmbEditorUserGroupElement extends UmbContextProviderMixin(
 		return html`<uui-box>
 			<div slot="headline">Users</div>
 			<umb-picker-user
-				@change=${(e: Event) => this._updateProperty('users', e.target.value)}
-				.value=${this._userGroupContext?.getData().users || []}></umb-picker-user>
+				@change=${(e: Event) => this._updateUserKeys((e.target as any).value)}
+				.value=${this._userKeys || []}></umb-picker-user>
 		</uui-box>`;
 	}
 

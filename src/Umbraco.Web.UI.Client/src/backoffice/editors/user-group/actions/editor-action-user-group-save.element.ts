@@ -44,8 +44,6 @@ export class UmbEditorActionUserGroupSaveElement extends UmbContextConsumerMixin
 			const userGroup = this._userGroupContext.getData();
 			await this._userGroupStore.save([userGroup]);
 			if (this._userStore && userGroup.users) {
-				console.log('update', userGroup.users);
-
 				await this._userStore.updateUserGroup(userGroup.users, userGroup.key);
 			}
 
