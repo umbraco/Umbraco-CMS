@@ -418,7 +418,7 @@ internal class CollectibleRuntimeViewCompiler : IViewCompiler
         }
 
         PortableExecutableReference inMemoryAutoReference = MetadataReference.CreateFromFile(_loadContextManager.ModelsAssemblyLocation);
-        compilation.AddReferences(inMemoryAutoReference);
+        compilation = compilation.AddReferences(inMemoryAutoReference);
         return compilation;
     }
 
