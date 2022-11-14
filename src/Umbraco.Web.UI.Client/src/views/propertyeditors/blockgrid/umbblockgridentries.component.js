@@ -85,7 +85,8 @@
             vm.sorterOptions = {
                 identifier: "BlockGridEditor_"+vm.blockEditorApi.internal.uniqueEditorKey,
                 itemSelector: ".umb-block-grid__layout-item",
-                listSelector: ".umb-block-grid__layout-container"
+                listSelector: ".umb-block-grid__layout-container",
+                model: vm.entries
             }
 
             // TODO: implement this:
@@ -601,6 +602,7 @@
                 dragoverBubble: true,
                 emptyInsertThreshold: 40,
 
+                // TODO: make custom page scrolling.
                 scrollSensitivity: 50,
                 scrollSpeed: 16,
                 scroll: true,

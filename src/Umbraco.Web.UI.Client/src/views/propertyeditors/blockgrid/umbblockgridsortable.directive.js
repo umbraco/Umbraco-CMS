@@ -39,23 +39,18 @@
 
     function UmbBlockGridSorter() {
 
-        var identifier
+        // scope.config.identifier
+        // scope.config.model
 
-        function link(scope, el, attr, ctrl) {
+        function link(scope, element) {
 
             const vm = this;
 
-            const element = el[0];
-            /*let container = current.closest('.umb-editor-container');
-
-            if (!container) {
-                console.error("Could not initialize umb block grid sorter.")
+            const containerEl = element[0].closest('.umb-block-grid__layout-container');
+            if (!containerEl) {
+                console.error("Could not initialize umb block grid sorter.", element[0])
                 return;
-            }*/
-
-            console.log(scope.model);
-
-            //identifier = attr;
+            }
 
             element['umbBlockGridSorter:controller'] = () => {
                 return vm;
@@ -69,7 +64,7 @@
         var directive = {
             restrict: 'A',
             scope: {
-                model: '=umbBlockGridSorter'
+                config: '=umbBlockGridSorter'
             },
             link: link
         };
