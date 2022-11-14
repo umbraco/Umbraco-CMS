@@ -18,6 +18,12 @@
 		// https://github.com/devcontainers/templates/issues/38#issuecomment-1310803259		
 		"ghcr.io/devcontainers/features/dotnet:1": {
 			"version": "7"
+		},
+
+		// Adds SSH support to the container
+		// Allowing the Github CLI `gh codespace ssh` to work
+		"ghcr.io/devcontainers/features/sshd:1": {
+			"version": "latest"
 		}
 	},
 
