@@ -19,6 +19,19 @@ VITE_UMBRACO_INSTALL_STATUS=must-install
 
 ## Environments
 
+### Development
+
+The development environment is the default environment and is used when running `npm run dev`. All API calls are mocked and the Umbraco backoffice is served from the `src` folder.
+
+### Run against a local Umbraco instance
+
+Create a `.env.local` file and set the following variables:
+
+```bash
+VITE_UMBRACO_API_URL=http://localhost:5000 # This will be the URL to your Umbraco instance
+VITE_UMBRACO_USE_MSW=off # Indicate that you want all API calls to bypass MSW (mock-service-worker)
+```
+
 ### Static website
 
 See the Main branch in action here as an [Azure Static Web App](https://ashy-bay-09f36a803.1.azurestaticapps.net/). The deploy runs automatically every time the `main` branch is updated. It uses mocked responses from the Umbraco API to simulate the site just like the local development environment.

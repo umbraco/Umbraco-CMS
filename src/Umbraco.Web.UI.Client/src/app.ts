@@ -64,7 +64,7 @@ export class UmbApp extends UmbContextProviderMixin(LitElement) {
 	async connectedCallback() {
 		super.connectedCallback();
 
-		OpenAPI.BASE = '';
+		OpenAPI.BASE = import.meta.env.VITE_UMBRACO_USE_MSW === 'on' ? '' : import.meta.env.VITE_UMBRACO_API_URL;
 		OpenAPI.WITH_CREDENTIALS = true;
 
 		await this._setInitStatus();
