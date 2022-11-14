@@ -22,6 +22,10 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
         if (!$scope.model.value.mode) {
             $scope.model.value.mode = "classic";
         }
+        else if ($scope.model.value.mode === 'distraction-free') {
+            // Due to legacy reasons, the older 'distraction-free' mode is kept and remapped to 'inline'
+            $scope.model.value.mode = 'inline';
+        }
 
         tinyMceService.configuration().then(function(config){
             $scope.tinyMceConfig = config;
