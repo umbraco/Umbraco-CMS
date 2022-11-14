@@ -262,8 +262,6 @@ export class UmbEditorUserGroupElement extends UmbContextProviderMixin(
 			if (!this._userKeys && users.length > 0) {
 				this._userKeys = users.filter((user) => user.userGroups.includes(this.entityKey)).map((user) => user.key);
 				this._updateProperty('users', this._userKeys);
-
-				console.log('users', this._userKeys);
 			}
 		});
 	}
@@ -370,8 +368,6 @@ export class UmbEditorUserGroupElement extends UmbContextProviderMixin(
 	private _handleInput(event: UUIInputEvent) {
 		if (event instanceof UUIInputEvent) {
 			const target = event.composedPath()[0] as UUIInputElement;
-
-			console.log('input', target.value);
 		}
 	}
 
