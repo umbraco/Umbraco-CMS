@@ -190,6 +190,7 @@
             });
 
             _addItemsToQueue(validBatch);
+            _emit('queueStarted');
             _processQueue();
         }
 
@@ -267,7 +268,10 @@
             const nextItem = queue.shift();
 
             // queue is empty
-            if (!nextItem) return;
+            if (!nextItem) {
+                _emit('queueCompleted');
+                return;
+            }
 
             _getMatchedMediaType(nextItem.file).then(mediaTypeAlias => {
                 nextItem.mediaEntry.mediaTypeAlias = mediaTypeAlias;
