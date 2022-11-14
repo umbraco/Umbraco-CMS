@@ -17,7 +17,8 @@
             controller: MediaPicker3Controller,
             controllerAs: "vm",
             bindings: {
-                model: "="
+                model: "=",
+                node: "="
             },
             require: {
                 propertyForm: "^form",
