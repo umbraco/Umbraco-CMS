@@ -34,9 +34,9 @@
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locallAdd	"forwardPorts": [9000, 5000, 25],
 
-	// Use OnCreateCommand to run commands after the container is created
+	
 	// This is used in the prebuilds - so dotnet build (nuget restore and node stuff) is done
-	"onCreateCommand": "dotnet build umbraco.sln",
+	"updateContentCommand": "dotnet build umbraco.sln",
 
 	// [Optional] To reuse of your local HTTPS dev cert:
 	//
