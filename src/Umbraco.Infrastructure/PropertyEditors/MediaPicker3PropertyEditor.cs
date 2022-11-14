@@ -209,16 +209,16 @@ public class MediaPicker3PropertyEditor : DataEditor
                     continue;
                 }
 
-                if (mediaPicker3Configuration.StartNodeId is GuidUdi startNodeUdi)
+                GuidUdi? startNodeGuid = mediaPicker3Configuration.StartNodeId as GuidUdi ?? null;
+                IMedia mediaFile = _temporaryImageService.Save(temporaryLocationString, startNodeGuid?.Guid);
+                MediaWithCropsDto? mediaDto = _jsonSerializer.Deserialize<MediaWithCropsDto>(dto.ToString());
+                if (mediaDto is null)
                 {
-                    IMedia mediaFile = _temporaryImageService.Save(temporaryLocationString, startNodeUdi.Guid);
-                    MediaWithCropsDto? mediaDto = _jsonSerializer.Deserialize<MediaWithCropsDto>(dto.ToString());
-                    if (mediaDto is not null)
-                    {
-                        mediaDto.MediaKey = mediaFile.GetUdi().Guid;
-                        result.Add(JObject.Parse(_jsonSerializer.Serialize(mediaDto)));
-                    }
+                    continue;
                 }
+
+                mediaDto.MediaKey = mediaFile.GetUdi().Guid;
+                result.Add(JObject.Parse(_jsonSerializer.Serialize(mediaDto)));
             }
 
             return result;
