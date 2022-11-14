@@ -1,14 +1,13 @@
 import { expect, test as base } from '@playwright/test';
 import { createWorkerFixture } from 'playwright-msw';
+import type { MockServiceWorker } from 'playwright-msw';
 
 import { handlers } from './src/core/mocks/e2e-handlers';
-
-import type { MockServiceWorker } from 'playwright-msw';
 
 const test = base.extend<{
 	worker: MockServiceWorker;
 }>({
-	worker: createWorkerFixture(...handlers),
+	worker: createWorkerFixture(handlers),
 	page: async ({ page }, use) => {
 		// Set is-authenticated in sessionStorage to true
 		await page.addInitScript(`window.sessionStorage.setItem('is-authenticated', 'true');`);
