@@ -343,22 +343,21 @@
         }
 
         function on(name, callback) {
-            if (typeof callback === 'function') {
-                events[name] = events[name] || [];
-                events[name].push(callback);
-            }
-        }
+            if (typeof callback !== 'function') return;
 
-        function off(name, callback) {
-            if (!events[name]) return;
-            events[name] = events[name].filter(cb => cb !== callback);
+            const unsubscribe = function () {
+                events[name] = events[name].filter(cb => cb !== callback);
+            }
+
+            events[name] = events[name] || [];
+            events[name].push(callback);
+            return unsubscribe;
         }
     
         return {
             init,
             requestUpload,
-            on,
-            off
+            on
         }
     }
 
