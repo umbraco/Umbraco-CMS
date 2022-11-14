@@ -21,7 +21,6 @@
 .umb-block-grid__layout-item {
     position: relative;
     &:hover {
-        /*z-index: 3;*/
 
         > ng-form > .umb-block-grid__block--context {
             z-index: 4;
@@ -55,52 +54,12 @@ ng-form.ng-invalid-val-server-match-content > .umb-block-grid__block:not(.--acti
     pointer-events: none;
 }
 
-/*.umb-block-grid__block--validation-badge {
-    display:none;
-}
-ng-form.ng-invalid-val-server-match-settings > .umb-block-grid__block:not(.--active) > .umb-block-grid__block--validation-badge, 
-ng-form.ng-invalid-val-server-match-content > .umb-block-grid__block:not(.--active) > .umb-block-grid__block--validation-badge {
-    display:block;
-    text-align: center;
-    position: absolute;
-    top: -9px;
-    right: -9px;
-    min-width: 10px;
-    color: @white;
-    border: 2px solid @white;
-    border-radius: 50%;
-    font-size: 10px;
-    font-weight: bold;
-    padding: 2px;
-    line-height: 10px;
-    background-color: @formErrorText;
-    .show-validation-type-warning & {
-        background-color: @formWarningText;
-    }
-    font-weight: 900;
-    pointer-events: none;
-
-    animation-duration: 1.4s;
-    animation-iteration-count: infinite;
-    animation-name: blockelement-inlineblock-editor--badge-bounce;
-    animation-timing-function: ease;
-    @keyframes blockelement-inlineblock-editor--badge-bounce {
-        0%   { transform: translateY(0); }
-        20%  { transform: translateY(-4px); }
-        40%  { transform: translateY(0); }
-        55%  { transform: translateY(-2px); }
-        70%  { transform: translateY(0); }
-        100% { transform: translateY(0); }
-    }
-}
-*/
-
 .umb-block-grid__block {
     position: relative;
     width: 100%;
     height: 100%;
 
-    --umb-block-grid__block--show-ui: 0;// Publicly available.
+    --umb-block-grid--block-ui-opacity: 0;
     --umb-block-grid--hint-area-ui: 0;
 
     &::after {
@@ -142,7 +101,6 @@ ng-form.ng-invalid-val-server-match-content > .umb-block-grid__block:not(.--acti
         --umb-block-grid--hint-area-ui: 1;
 
         &::after {
-            /*border-color: @blueDark;*/
             display: var(--umb-block-grid--block-ui-display, block);
             animation: umb-block-grid__block__border-pulse 400ms ease-in-out alternate infinite;
             @keyframes umb-block-grid__block__border-pulse {
@@ -217,18 +175,21 @@ ng-form.ng-invalid-val-server-match-content > .umb-block-grid__block:not(.--acti
         }
     }
     &.--block-ui-visible {
+
         > .umb-block-grid__block--context {
             /* take full width to prevent interaction with elements behind.*/
             left: 0;
         }
         .umb-block-grid__area-container, .umb-block-grid__block--view::part(area-container) {
             --umb-block-grid--block-ui-display: none;
-            .umb-block-grid__layout-item {
-                pointer-events: none;
-            }
-            .umb-block-grid__block {
-                pointer-events: none;
-            }
+            pointer-events: none;
+        }
+        .umb-block-grid__layout-item {
+            pointer-events: none;
+        }
+        .umb-block-grid__block {
+            pointer-events: none;
+            --umb-block-grid--block-ui-opacity: 0;
         }
     }
     
@@ -242,48 +203,34 @@ ng-form.ng-invalid-val-server-match-content > .umb-block-grid__block:not(.--acti
     &.--active {
 
         /** Avoid displaying hover when dragging-mode */
-        --umb-block-grid--block_ui-opacity: calc(1 - var(--umb-block-grid--dragging-mode, 0));
+        --umb-block-grid--block-ui-opacity: calc(1 - var(--umb-block-grid--dragging-mode, 0));
         
         > .umb-block-grid__block--context {
-            opacity: var(--umb-block-grid--block_ui-opacity);
+            opacity: var(--umb-block-grid--block-ui-opacity);
         }
         &:not(.--scale-mode) {
             > .umb-block-grid__block--actions {
-                opacity: var(--umb-block-grid--block_ui-opacity);
+                opacity: var(--umb-block-grid--block-ui-opacity);
             }
     
             > umb-block-grid-block > umb-block-grid-entries > .umb-block-grid__layout-container > .umb-block-grid__area-actions {
-                opacity: var(--umb-block-grid--block_ui-opacity);
+                opacity: var(--umb-block-grid--block-ui-opacity);
             }
         }
         
         > .umb-block-grid__scale-handler {
-            opacity: var(--umb-block-grid--block_ui-opacity);
+            opacity: var(--umb-block-grid--block-ui-opacity);
         }
         > .umb-block-grid__force-left, 
         > .umb-block-grid__force-right {
-            opacity: var(--umb-block-grid--block_ui-opacity);
+            opacity: var(--umb-block-grid--block-ui-opacity);
         }
     }
-
-    /*
-    &.--show-validation {
-        ng-form.ng-invalid-val-server-match-content > & {
-            border: 2px solid @formErrorText;
-            border-radius: @baseBorderRadius;
-        }
-    }
-    */
 }
 
 ng-form.ng-invalid > .umb-block-grid__block:not(.--active) > .umb-block-grid__block--actions {
     opacity: 1;
 }
-/*
-ng-form.ng-invalid > .umb-block-grid__block:not(.--active) > .umb-block-grid__block--context {
-    opacity: 1;
-}
-*/
 
 .umb-block-grid__block--view {
     height: 100%;
@@ -525,27 +472,6 @@ ng-form.ng-invalid > .umb-block-grid__block:not(.--active) > .umb-block-grid__bl
     }
 }
 
-/*
-umb-block-grid-block {
-
-    > div {
-        position: relative;
-        width: 100%;
-        min-height: @umb-block-grid__item_minimum_height;
-        background-color: @white;
-        border-radius: @baseBorderRadius;
-        box-sizing: border-box;
-    }
-
-}
-*/
-
-/*
-.blockelement__draggable-element {
-    cursor: grab;
-}
-*/
-
 
 .umb-block-grid__scale-handler {
     cursor: nwse-resize;
@@ -610,6 +536,12 @@ umb-block-grid-block {
 .umb-block-grid__block--inline-create-button.--above {
     left: 0;
     width: 100%;
+
+    top: calc(var(--umb-block-grid--row-gap, 0px) * -0.5);
+}
+.umb-block-grid__layout-item:first-of-type .umb-block-grid__block--inline-create-button.--above {
+    /* Do not use row-gap if the first one. */
+    top: 0;
 }
 .umb-block-grid__block--inline-create-button.--above.--at-root {
     /* If at root, and full-width then become 40px wider: */
@@ -617,14 +549,9 @@ umb-block-grid-block {
     left: calc(-20px * var(--calc));
     width: calc(100% + 40px * var(--calc));
 }
+
 .umb-block-grid__block--inline-create-button.--after {
-    right: 1px;
-}
-.umb-block-grid__block--inline-create-button.--after.--detector {
-    width: 10px;
-    margin-right: -10px;
-    height: 100%;
-    z-index: 0;
+    right: calc(1px - (var(--umb-block-grid--column-gap, 0px) * 0.5));
 }
 .umb-block-grid__block--inline-create-button.--after.--at-root {
     /* If at root, and full-width then move a little out to the right: */
@@ -782,16 +709,6 @@ umb-block-grid-block {
     }
 }
 
-
-/** make sure block with areas stay on top, so they don't look like they are 'not-allowed'*/
-/*
-.umb-block-grid__layout-container.--droppable-indication {
-    .umb-block-grid__area-actions {
-        display: none;
-    }
-}
-*/
-
 .umb-block-grid__layout-item-placeholder {
     background: transparent;
     border-radius: 3px;
@@ -873,9 +790,8 @@ umb-block-grid-block {
     content: '';
     position: absolute;
     inset: 0;
-    /* Moved slightly in to align with the inline-create button, which is moved slightly in to avoid collision with other create buttons. */
-    top:2px;
-    bottom: 2px;
+    top:0;
+    bottom: 0;
     border-radius: 3px;
     border: 1px solid rgba(@gray-5, 0.3);
     pointer-events: none;
@@ -884,6 +800,9 @@ umb-block-grid-block {
     z-index:3;
 }
 .umb-block-grid__area.--highlight::after {
+    /* Moved slightly in to align with the inline-create button, which is moved slightly in to avoid collision with other create buttons. */
+    top:2px;
+    bottom: 2px;
     /** Avoid displaying highlight when in dragging-mode */
     opacity: calc(1 - var(--umb-block-grid--dragging-mode, 0));
     border-color: @blueDark;
@@ -914,31 +833,10 @@ umb-block-grid-block {
     z-index: 1;
     cursor: nwse-resize;
 }
-/*
-.umb-block-grid__scalebox {
-    position: absolute;
-    top:0;
-    left:0;
-    z-index: 10;
-    cursor: nwse-resize;
-
-    transition: background-color 240ms ease-in;
-    animation: umb-block-grid__scalebox__pulse 400ms ease-in-out alternate infinite;
-    @keyframes umb-block-grid__scalebox__pulse {
-        0%   { background-color: rgba(@blueMidLight, 0.33); }
-        100% { background-color: rgba(@blueMidLight, 0.22); }
-    }
-}
-*/
 
 
 
 
-/*
-.umb-block-grid__layout-container {
-    
-}
-*/
 
 
 /** make sure block with areas stay on top, so they don't look like they are 'not-allowed'*/
@@ -949,7 +847,7 @@ umb-block-grid-block {
 }
 
 .umb-block-grid__layout-container .umb-block-grid__layout-item:not([depth='0']):first-of-type .umb-block-grid__block--inline-create-button.--above {
-    /* Move first above inline create button slightly up, to avoid collision with others*/
+    /* Move the above inline create button slightly down, to avoid collision with others*/
     margin-top: -7px;
 
     z-index:4;

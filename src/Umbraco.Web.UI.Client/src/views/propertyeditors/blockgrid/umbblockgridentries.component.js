@@ -68,55 +68,18 @@
 
         const unsubscribe = [];
         const vm = this;
+        vm.showNotAllowedUI = false;
         vm.invalidAmount = false;
         vm.areaConfig = null;
         vm.locallyAvailableBlockTypes = 0;
         vm.invalidBlockTypes = [];
 
-        
-
-
-        // TODO: clean up:
-        vm.showNotAllowedUI = false;
         vm.movingLayoutEntry = null;
         vm.layoutColumnsInt = 0;
         vm.containedPropertyEditorProxies = [];
 
-
-
         vm.$onInit = function () {
-
-            
-            vm.sorterOptions = {
-                identifier: "BlockGridEditor_"+vm.blockEditorApi.internal.uniqueEditorKey,
-                itemSelector: ".umb-block-grid__layout-item",
-                listSelector: ".umb-block-grid__layout-container"
-            }
-
-            // TODO: implement this:
-            function onBlockMoveAwayCallback(slotName) {
-                const event = new CustomEvent("UmbBlockGrid_RemoveProperty", {composed: true, bubbles: true, detail: {'slotName': slotName}});
-                eventTarget.dispatchEvent(event);
-            }
-
-            // TODO: implement show not allowed:
-            // TODO: implement hide not allowed:
-
-            function onStart(listEntry) {
-                // TODO: remove forceLeft/right
-                // gather: containedPropertyEditorProxies
-
-                document.documentElement.style.setProperty("--umb-block-grid--dragging-mode", 1);
-            }
-
-            function onEnd(listEntry) {
-                
-
-                document.documentElement.style.setProperty("--umb-block-grid--dragging-mode", 0);
-            }
-
-
-            //initializeSortable();
+            initializeSortable();
 
             if(vm.parentBlock) {
                 vm.areaConfig = vm.parentBlock.config.areas.find(area => area.key === vm.areaKey);
@@ -130,7 +93,6 @@
         unsubscribe.push($scope.$watch("layoutColumns", (newVal, oldVal) => {
             vm.layoutColumnsInt = parseInt(vm.layoutColumns, 10);
         }));
-
 
         function onLocalAmountOfBlocksChanged() {
 
@@ -192,12 +154,14 @@
         }
 
 
-        // good to keep:
+        vm.notifyVisualUpdate = function () {
+            $scope.$broadcast("blockGridEditorVisualUpdate", {areaKey: vm.areaKey});
+        }
+
         vm.acceptBlock = function(contentTypeKey) {
             return vm.blockEditorApi.internal.isElementTypeKeyAllowedAt(vm.parentBlock, vm.areaKey, contentTypeKey);
         }
 
-        // TODO: get rid of this: parse a store to the Sorter..
         vm.getLayoutEntryByIndex = function(index) {
             return vm.blockEditorApi.internal.getLayoutEntryByIndex(vm.parentBlock, vm.areaKey, index);
         }
@@ -227,7 +191,7 @@
         }
 
         function initializeSortable() {
-            /*
+
             const gridLayoutContainerEl = $element[0].querySelector('.umb-block-grid__layout-container');
             var _lastIndicationContainerVM = null;
 
@@ -243,24 +207,18 @@
             var ghostElIndicateForceRight = null;
 
             var approvedContainerEl = null;
-            */
 
             // Setup DOM method for communication between sortables:
-            /*
             gridLayoutContainerEl['Sortable:controller'] = () => {
                 return vm;
             };
 
             var nextSibling;
-            */
 
-            /*
             function _removePropertyProxy(eventTarget, slotName) {
                 const event = new CustomEvent("UmbBlockGrid_RemoveProperty", {composed: true, bubbles: true, detail: {'slotName': slotName}});
                 eventTarget.dispatchEvent(event);
-                console.log(eventTarget, event);
             }
-            */
 
             // Borrowed concept from, its not identical as more has been implemented: https://github.com/SortableJS/angular-legacy-sortablejs/blob/master/angular-legacy-sortable.js
             function _sync(evt) {
@@ -278,9 +236,7 @@
 
 
                     // unregister all property editor proxies via events:
-                    console.log("containedPropertyEditorProxies", fromCtrl.containedPropertyEditorProxies)
                     fromCtrl.containedPropertyEditorProxies.forEach(slotName => {
-                        console.log(evt.from, slotName)
                         _removePropertyProxy(evt.from, slotName);
                     });
                     
@@ -618,6 +574,10 @@
                 forceAutoScrollFallback: true,
 
                 onStart: function (evt) {
+                    
+                    // TODO: This does not work correctly jet with SortableJS. With the replacement we should be able to call this before DOM is changed.
+                    vm.blockEditorApi.internal.startDraggingMode();
+
                     nextSibling = evt.from === evt.item.parentNode ? evt.item.nextSibling : evt.clone.nextSibling;
 
                     var contextVM = vm;
@@ -649,8 +609,6 @@
                     window.addEventListener('drag', _onDragMove);
                     window.addEventListener('dragover', _onDragMove);
 
-                    document.documentElement.style.setProperty("--umb-block-grid--dragging-mode", 1);
-
                     $scope.$evalAsync();
                 },
                 // Called by any change to the list (add / update / remove)
@@ -681,7 +639,7 @@
                     }
                     window.removeEventListener('drag', _onDragMove);
                     window.removeEventListener('dragover', _onDragMove);
-                    document.documentElement.style.setProperty("--umb-block-grid--dragging-mode", 0);
+                    vm.blockEditorApi.internal.exitDraggingMode();
 
                     if(ghostElIndicateForceLeft) {
                         ghostEl.removeChild(ghostElIndicateForceLeft);
@@ -706,11 +664,12 @@
                     ghostEl = null;
                     relatedEl = null;
                     vm.containedPropertyEditorProxies = [];
+
+                    vm.notifyVisualUpdate();
                 }
             });
 
             $scope.$on('$destroy', function () {
-                // TODO: remove this:
                 sortable.destroy();
                 for (const subscription of unsubscribe) {
                     subscription();

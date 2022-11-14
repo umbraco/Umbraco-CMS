@@ -60,13 +60,20 @@
         padding-bottom:2px;
     }
 
-    div[part='area-container'] {
-        grid-gap: 10px;
-        padding: 10px;
+    :host {
+        --inherited--column-gap: var(--umb-block-grid--column-gap, 10px);
+        --inherited--row-gap: var(--umb-block-grid--row-gap, 10px);
+        --inherited--areas-column-gap: var(--umb-block-grid--areas-column-gap, 10px);
+        --inherited--areas-row-gap: var(--umb-block-grid--areas-row-gap, 10px);
     }
 
-    ::slotted(*) {
-        gap: 10px;
+    [part='area-container'] {
+        box-sizing: border-box;
+        padding: 10px;
+        --umb-block-grid--column-gap: var(--inherited--column-gap, 10px);
+        --umb-block-grid--row-gap: var(--inherited--row-gap, 10px);
+        --umb-block-grid--areas-column-gap: var(--inherited--areas-column-gap, 10px);
+        --umb-block-grid--areas-row-gap: var(--inherited--areas-row-gap, 10px);
     }
 
 </style>
@@ -80,6 +87,6 @@
         <span>{{block.label}}</span>
     </button>
 
-    <umb-block-grid-render-area-slot ng-if="block.layout.areas.length > 0"></umb-block-grid-render-area-slots>
+    <umb-block-grid-render-area-slots ng-if="block.layout.areas.length > 0"></umb-block-grid-render-area-slots>
 
 </div>

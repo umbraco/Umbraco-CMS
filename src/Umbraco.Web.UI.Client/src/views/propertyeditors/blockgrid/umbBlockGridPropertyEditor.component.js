@@ -13,6 +13,28 @@
         return null;
     }
 
+    function closestColumnSpanOption(target, map, max) {
+        if(map.length > 0) {
+            const result = map.reduce((a, b) => {
+                if (a.columnSpan > max) {
+                    return b;
+                }
+                let aDiff = Math.abs(a.columnSpan - target);
+                let bDiff = Math.abs(b.columnSpan - target);
+        
+                if (aDiff === bDiff) {
+                    return a.columnSpan < b.columnSpan ? a : b;
+                } else {
+                    return bDiff < aDiff ? b : a;
+                }
+            });
+            if(result) {
+                return result;
+            }
+        }
+        return null;
+    }
+
 
     const DefaultViewFolderPath = "views/propertyeditors/blockgrid/blockgridentryeditors/";
 
@@ -59,6 +81,8 @@
         var liveEditing = true;
 
         var shadowRoot;
+        var firstLayoutContainer;
+
 
         var vm = this;
 
@@ -277,6 +301,7 @@
 
             window.requestAnimationFrame(() => {
                 shadowRoot = $element[0].querySelector('umb-block-grid-root').shadowRoot;
+                firstLayoutContainer = shadowRoot.querySelector('.umb-block-grid__layout-container');
             })
 
         }
@@ -350,21 +375,31 @@
                     }
                 }
 
+                // Ensure Areas are ordered like the area configuration is:
+                layoutEntry.areas.sort((left, right) => {
+                    return block.config.areas?.findIndex(config => config.key === left.key) < block.config.areas?.findIndex(config => config.key === right.key) ? -1 : 1;
+                });
+
+
+                const contextColumns = getContextColumns(parentBlock, areaKey);
+                const relevantColumnSpanOptions = block.config.columnSpanOptions.filter(option => option.columnSpan <= contextColumns);
+
                 // if no columnSpan or no columnSpanOptions configured, then we set(or rewrite) one:
-                if (!layoutEntry.columnSpan || block.config.columnSpanOptions.length === 0) {
-
-                    const contextColumns = getContextColumns(parentBlock, areaKey);
-
-                    if (block.config.columnSpanOptions.length > 0) {
-                        // set columnSpan to minimum allowed span for this BlockType:
-                        const minimumColumnSpan = block.config.columnSpanOptions.reduce((prev, option) => Math.min(prev, option.columnSpan), vm.gridColumns);
-
-                        // If minimumColumnSpan is larger than contextColumns, then we will make it fit within context anyway:
-                        layoutEntry.columnSpan = Math.min(minimumColumnSpan, contextColumns)
+                if (!layoutEntry.columnSpan || layoutEntry.columnSpan > contextColumns || relevantColumnSpanOptions.length === 0) {
+                    if (relevantColumnSpanOptions.length > 0) {
+                        // Find greatest columnSpanOption within contextColumns, or fallback to contextColumns.
+                        layoutEntry.columnSpan = relevantColumnSpanOptions.reduce((prev, option) => Math.max(prev, option.columnSpan), 0) || contextColumns;
                     } else {
                         layoutEntry.columnSpan = contextColumns;
                     }
+                } else {
+                    // Check that columnSpanOption still is available or equal contextColumns, or find closest option fitting:
+                    if (relevantColumnSpanOptions.find(option => option.columnSpan === layoutEntry.columnSpan) === undefined || layoutEntry.columnSpan !== contextColumns) {
+                        console.log(layoutEntry.columnSpan, closestColumnSpanOption(layoutEntry.columnSpan, relevantColumnSpanOptions, contextColumns)?.columnSpan || contextColumns);
+                        layoutEntry.columnSpan = closestColumnSpanOption(layoutEntry.columnSpan, relevantColumnSpanOptions, contextColumns)?.columnSpan || contextColumns;
+                    }
                 }
+
                 // if no rowSpan, then we set one:
                 if (!layoutEntry.rowSpan) {
                     layoutEntry.rowSpan = 1;
@@ -815,6 +850,8 @@
 
         vm.requestShowCreate = requestShowCreate;
         function requestShowCreate(parentBlock, areaKey, createIndex, mouseEvent, options) {
+
+            vm.hideAreaHighlight(parentBlock, areaKey);
 
             if (vm.blockTypePickerIsOpen === true) {
                 return;
@@ -1309,6 +1346,21 @@
             }
         }
 
+        vm.startDraggingMode = startDraggingMode;
+        function startDraggingMode() {
+
+            document.documentElement.style.setProperty("--umb-block-grid--dragging-mode", 1);
+            firstLayoutContainer.style.minHeight = firstLayoutContainer.getBoundingClientRect().height + "px";
+            
+        }
+        vm.exitDraggingMode = exitDraggingMode;
+        function exitDraggingMode() {
+
+            document.documentElement.style.setProperty("--umb-block-grid--dragging-mode", 0);
+            firstLayoutContainer.style.minHeight = "";
+            
+        }
+
         function onAmountOfBlocksChanged() {
 
             // enable/disable property actions
@@ -1340,6 +1392,9 @@
             for (const subscription of unsubscribe) {
                 subscription();
             }
+
+            firstLayoutContainer = null;
+            gridRootEl = null;
         });
     }
 
