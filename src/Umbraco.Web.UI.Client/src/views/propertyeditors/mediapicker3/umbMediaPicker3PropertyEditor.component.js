@@ -29,9 +29,10 @@
             }
         });
 
-    function MediaPicker3Controller($scope, editorService, clipboardService, localizationService, overlayService, userService, entityResource, $attrs, umbRequestHelper, $injector) {
+    function MediaPicker3Controller($scope, editorService, clipboardService, localizationService, overlayService, userService, entityResource, $attrs, umbRequestHelper, $injector, uploadTracker) {
 
         const mediaUploader = $injector.instantiate(Utilities.MediaUploader);
+        let uploadInProgress = false;
 
         var unsubscribe = [];
 
@@ -94,7 +95,9 @@
     
             mediaUploader.on('mediaEntryAccepted', _handleMediaEntryAccepted);
             mediaUploader.on('mediaEntryRejected', _handleMediaEntryRejected);
+            mediaUploader.on('queueStarted', _handleMediaQueueStarted);
             mediaUploader.on('uploadSuccess', _handleMediaUploadSuccess);
+            mediaUploader.on('queueCompleted', _handleMediaQueueCompleted);
 
             copyAllMediasAction = {
                 labelKey: "clipboard_labelForCopyAllEntries",
@@ -182,6 +185,16 @@
             const mediaEntry = vm.model.value.find(mediaEntry => mediaEntry.key === data.mediaEntry.key);
             mediaEntry.tmpLocation = data.tmpLocation;
             updateMediaEntryData(mediaEntry);
+        }
+
+        function _handleMediaQueueStarted () {
+            uploadInProgress = true;
+            uploadTracker.uploadStarted(vm.node.key);
+        }
+
+        function _handleMediaQueueCompleted () {
+            uploadInProgress = false;
+            uploadTracker.uploadEnded(vm.node.key);
         }
 
         function onServerValueChanged(newVal, oldVal) {
@@ -512,6 +525,10 @@
         $scope.$on("$destroy", function () {
             for (const subscription of unsubscribe) {
                 subscription();
+            }
+
+            if (uploadInProgress) {
+                uploadTracker.uploadEnded(vm.node.key);
             }
         });
     }

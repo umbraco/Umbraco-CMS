@@ -5,7 +5,7 @@
         appState, contentResource, entityResource, navigationService, notificationsService, contentAppHelper,
         serverValidationManager, contentEditingHelper, localizationService, formHelper, umbRequestHelper,
         editorState, $http, eventsService, overlayService, $location, localStorageService, treeService,
-        $exceptionHandler) {
+        $exceptionHandler, uploadTracker) {
 
         var evts = [];
         var infiniteMode = $scope.infiniteModel && $scope.infiniteModel.infiniteMode;
@@ -181,6 +181,10 @@
                     loadBreadcrumb();
                     syncTreeNode($scope.content, $scope.content.path);
                 }
+            }));
+
+            evts.push(eventsService.on("uploadTracker.uploadsInProgressChanged", function (name, args) {
+                $scope.page.uploadsInProgress = args.uploadsInProgress.filter(x => x.entityKey === $scope.content.key).length > 0;
             }));
 
             evts.push(eventsService.on("rte.file.uploading", function () {
