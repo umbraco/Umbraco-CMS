@@ -395,7 +395,6 @@
                 } else {
                     // Check that columnSpanOption still is available or equal contextColumns, or find closest option fitting:
                     if (relevantColumnSpanOptions.find(option => option.columnSpan === layoutEntry.columnSpan) === undefined || layoutEntry.columnSpan !== contextColumns) {
-                        console.log(layoutEntry.columnSpan, closestColumnSpanOption(layoutEntry.columnSpan, relevantColumnSpanOptions, contextColumns)?.columnSpan || contextColumns);
                         layoutEntry.columnSpan = closestColumnSpanOption(layoutEntry.columnSpan, relevantColumnSpanOptions, contextColumns)?.columnSpan || contextColumns;
                     }
                 }
