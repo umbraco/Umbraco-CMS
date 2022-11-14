@@ -63,6 +63,8 @@ export const handlers = [
 			type: 'user',
 			icon: 'umb:icon-user',
 			userGroups: data.userGroups,
+			contentStartNodes: [],
+			mediaStartNodes: [],
 		};
 
 		const invited = umbUsersData.save([newUser]);
@@ -85,9 +87,18 @@ export const handlers = [
 		const data = await req.json();
 		if (!data) return;
 
-		const disabledKeys = umbUsersData.disable(data);
+		const enabledKeys = umbUsersData.disable(data);
 
-		return res(ctx.status(200), ctx.json(disabledKeys));
+		return res(ctx.status(200), ctx.json(enabledKeys));
+	}),
+
+	rest.post<Array<string>>('/umbraco/backoffice/users/updateUserGroup', async (req, res, ctx) => {
+		const data = await req.json();
+		if (!data) return;
+
+		const userKeys = umbUsersData.updateUserGroup(data.userKeys, data.userGroupKey);
+
+		return res(ctx.status(200), ctx.json(userKeys));
 	}),
 
 	rest.post<Array<string>>('/umbraco/backoffice/users/delete', async (req, res, ctx) => {

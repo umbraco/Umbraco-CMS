@@ -7,6 +7,20 @@ class UmbUsersData extends UmbEntityData<UserDetails> {
 		super(data);
 	}
 
+	updateUserGroup(keys: string[], userGroup: string) {
+		this.data.forEach((user) => {
+			if (keys.includes(user.key)) {
+				user.userGroups = [...user.userGroups, userGroup];
+			} else {
+				user.userGroups = user.userGroups.filter((group) => group !== userGroup);
+			}
+
+			this.updateData(user);
+		});
+
+		return this.data.map((user) => user.key);
+	}
+
 	enable(keys: string[]) {
 		const users = this.data.filter((user) => keys.includes(user.key));
 		users.forEach((user) => {
@@ -68,7 +82,7 @@ export const data: Array<UserDetails> = [
 		createDate: '3/13/2022',
 		failedLoginAttempts: 946,
 		userGroups: [
-			'b847398a-6875-4d7a-9f6d-231256b81471',
+			'b847398a-6875-4d7a-9f6d-231256b81471-OLD',
 			'9a9ad4e9-3b5b-4fe7-b0d9-e301b9675949',
 			'c630d49e-4e7b-42ea-b2bc-edc0edacb6b1',
 		],
@@ -119,7 +133,7 @@ export const data: Array<UserDetails> = [
 		failedLoginAttempts: 728,
 		userGroups: [
 			'c630d49e-4e7b-42ea-b2bc-edc0edacb6b1',
-			'b847398a-6875-4d7a-9f6d-231256b81471',
+			'b847398a-6875-4d7a-9f6d-231256b81471-OLD',
 			'2668f09b-320c-48a7-a78a-95047026ec0e',
 		],
 	},
@@ -142,7 +156,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '3/20/2022',
 		createDate: '12/22/2021',
 		failedLoginAttempts: 57,
-		userGroups: ['b847398a-6875-4d7a-9f6d-231256b81471', '9a9ad4e9-3b5b-4fe7-b0d9-e301b9675949'],
+		userGroups: ['b847398a-6875-4d7a-9f6d-231256b81471-OLD', '9a9ad4e9-3b5b-4fe7-b0d9-e301b9675949'],
 	},
 	{
 		key: 'd9cbd4cd-6950-42b2-be57-1f5829c6dd19',
@@ -163,7 +177,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '1/9/2022',
 		createDate: '3/21/2022',
 		failedLoginAttempts: 336,
-		userGroups: ['397f3a8b-4ca3-4b01-9dd3-94e5c9eaa9b2', 'b847398a-6875-4d7a-9f6d-231256b81471'],
+		userGroups: ['397f3a8b-4ca3-4b01-9dd3-94e5c9eaa9b2', 'b847398a-6875-4d7a-9f6d-231256b81471-OLD'],
 	},
 	{
 		key: '515b2c5c-c195-43f2-8e52-4733572030c7',
@@ -186,7 +200,7 @@ export const data: Array<UserDetails> = [
 		failedLoginAttempts: 197,
 		userGroups: [
 			'2668f09b-320c-48a7-a78a-95047026ec0e',
-			'b847398a-6875-4d7a-9f6d-231256b81471',
+			'b847398a-6875-4d7a-9f6d-231256b81471-OLD',
 			'c630d49e-4e7b-42ea-b2bc-edc0edacb6b1',
 			'9a9ad4e9-3b5b-4fe7-b0d9-e301b9675949',
 			'397f3a8b-4ca3-4b01-9dd3-94e5c9eaa9b2',
@@ -260,7 +274,7 @@ export const data: Array<UserDetails> = [
 		userGroups: [
 			'2668f09b-320c-48a7-a78a-95047026ec0e',
 			'c630d49e-4e7b-42ea-b2bc-edc0edacb6b1',
-			'b847398a-6875-4d7a-9f6d-231256b81471',
+			'b847398a-6875-4d7a-9f6d-231256b81471-OLD',
 		],
 	},
 	{
@@ -306,7 +320,7 @@ export const data: Array<UserDetails> = [
 		userGroups: [
 			'9a9ad4e9-3b5b-4fe7-b0d9-e301b9675949',
 			'2668f09b-320c-48a7-a78a-95047026ec0e',
-			'b847398a-6875-4d7a-9f6d-231256b81471',
+			'b847398a-6875-4d7a-9f6d-231256b81471-OLD',
 		],
 	},
 	{
@@ -328,7 +342,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '7/10/2022',
 		createDate: '3/16/2022',
 		failedLoginAttempts: 52,
-		userGroups: ['b847398a-6875-4d7a-9f6d-231256b81471', '2668f09b-320c-48a7-a78a-95047026ec0e'],
+		userGroups: ['b847398a-6875-4d7a-9f6d-231256b81471-OLD', '2668f09b-320c-48a7-a78a-95047026ec0e'],
 	},
 	{
 		key: 'a5e5bbe4-acb4-4c40-b15a-eab510338620',
@@ -351,7 +365,7 @@ export const data: Array<UserDetails> = [
 		failedLoginAttempts: 988,
 		userGroups: [
 			'c630d49e-4e7b-42ea-b2bc-edc0edacb6b1',
-			'b847398a-6875-4d7a-9f6d-231256b81471',
+			'b847398a-6875-4d7a-9f6d-231256b81471-OLD',
 			'397f3a8b-4ca3-4b01-9dd3-94e5c9eaa9b2',
 		],
 	},
@@ -420,7 +434,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '10/22/2022',
 		createDate: '3/1/2022',
 		failedLoginAttempts: 229,
-		userGroups: ['9a9ad4e9-3b5b-4fe7-b0d9-e301b9675949', 'b847398a-6875-4d7a-9f6d-231256b81471'],
+		userGroups: ['9a9ad4e9-3b5b-4fe7-b0d9-e301b9675949', 'b847398a-6875-4d7a-9f6d-231256b81471-OLD'],
 	},
 	{
 		key: 'caf10593-3710-4417-af3d-7015f88f5fe3',
@@ -493,7 +507,7 @@ export const data: Array<UserDetails> = [
 		createDate: '11/15/2021',
 		failedLoginAttempts: 7,
 		userGroups: [
-			'b847398a-6875-4d7a-9f6d-231256b81471',
+			'b847398a-6875-4d7a-9f6d-231256b81471-OLD',
 			'2668f09b-320c-48a7-a78a-95047026ec0e',
 			'397f3a8b-4ca3-4b01-9dd3-94e5c9eaa9b2',
 		],
@@ -518,7 +532,7 @@ export const data: Array<UserDetails> = [
 		createDate: '12/12/2021',
 		failedLoginAttempts: 178,
 		userGroups: [
-			'b847398a-6875-4d7a-9f6d-231256b81471',
+			'b847398a-6875-4d7a-9f6d-231256b81471-OLD',
 			'c630d49e-4e7b-42ea-b2bc-edc0edacb6b1',
 			'397f3a8b-4ca3-4b01-9dd3-94e5c9eaa9b2',
 		],
@@ -547,7 +561,7 @@ export const data: Array<UserDetails> = [
 			'397f3a8b-4ca3-4b01-9dd3-94e5c9eaa9b2',
 			'9a9ad4e9-3b5b-4fe7-b0d9-e301b9675949',
 			'c630d49e-4e7b-42ea-b2bc-edc0edacb6b1',
-			'b847398a-6875-4d7a-9f6d-231256b81471',
+			'b847398a-6875-4d7a-9f6d-231256b81471-OLD',
 		],
 	},
 	{
@@ -572,7 +586,7 @@ export const data: Array<UserDetails> = [
 		userGroups: [
 			'397f3a8b-4ca3-4b01-9dd3-94e5c9eaa9b2',
 			'2668f09b-320c-48a7-a78a-95047026ec0e',
-			'b847398a-6875-4d7a-9f6d-231256b81471',
+			'b847398a-6875-4d7a-9f6d-231256b81471-OLD',
 		],
 	},
 	{
@@ -597,7 +611,7 @@ export const data: Array<UserDetails> = [
 		userGroups: [
 			'2668f09b-320c-48a7-a78a-95047026ec0e',
 			'c630d49e-4e7b-42ea-b2bc-edc0edacb6b1',
-			'b847398a-6875-4d7a-9f6d-231256b81471',
+			'b847398a-6875-4d7a-9f6d-231256b81471-OLD',
 		],
 	},
 	{
@@ -691,7 +705,7 @@ export const data: Array<UserDetails> = [
 		createDate: '4/18/2022',
 		failedLoginAttempts: 750,
 		userGroups: [
-			'b847398a-6875-4d7a-9f6d-231256b81471',
+			'b847398a-6875-4d7a-9f6d-231256b81471-OLD',
 			'397f3a8b-4ca3-4b01-9dd3-94e5c9eaa9b2',
 			'c630d49e-4e7b-42ea-b2bc-edc0edacb6b1',
 			'9a9ad4e9-3b5b-4fe7-b0d9-e301b9675949',
@@ -720,7 +734,7 @@ export const data: Array<UserDetails> = [
 			'c630d49e-4e7b-42ea-b2bc-edc0edacb6b1',
 			'2668f09b-320c-48a7-a78a-95047026ec0e',
 			'9a9ad4e9-3b5b-4fe7-b0d9-e301b9675949',
-			'b847398a-6875-4d7a-9f6d-231256b81471',
+			'b847398a-6875-4d7a-9f6d-231256b81471-OLD',
 		],
 	},
 	{
@@ -744,7 +758,7 @@ export const data: Array<UserDetails> = [
 		failedLoginAttempts: 602,
 		userGroups: [
 			'c630d49e-4e7b-42ea-b2bc-edc0edacb6b1',
-			'b847398a-6875-4d7a-9f6d-231256b81471',
+			'b847398a-6875-4d7a-9f6d-231256b81471-OLD',
 			'9a9ad4e9-3b5b-4fe7-b0d9-e301b9675949',
 			'2668f09b-320c-48a7-a78a-95047026ec0e',
 		],
@@ -768,7 +782,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '8/7/2022',
 		createDate: '7/5/2022',
 		failedLoginAttempts: 867,
-		userGroups: ['c630d49e-4e7b-42ea-b2bc-edc0edacb6b1', 'b847398a-6875-4d7a-9f6d-231256b81471'],
+		userGroups: ['c630d49e-4e7b-42ea-b2bc-edc0edacb6b1', 'b847398a-6875-4d7a-9f6d-231256b81471-OLD'],
 	},
 	{
 		key: 'f4bee7c8-7a94-4937-8e6e-ceb55c9ec8b4',
@@ -789,7 +803,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '9/15/2022',
 		createDate: '12/13/2021',
 		failedLoginAttempts: 269,
-		userGroups: ['c630d49e-4e7b-42ea-b2bc-edc0edacb6b1', 'b847398a-6875-4d7a-9f6d-231256b81471'],
+		userGroups: ['c630d49e-4e7b-42ea-b2bc-edc0edacb6b1', 'b847398a-6875-4d7a-9f6d-231256b81471-OLD'],
 	},
 	{
 		key: '3ccfeec3-1c96-4205-ae90-3297702d0d59',
@@ -836,7 +850,7 @@ export const data: Array<UserDetails> = [
 		createDate: '8/11/2022',
 		failedLoginAttempts: 615,
 		userGroups: [
-			'b847398a-6875-4d7a-9f6d-231256b81471',
+			'b847398a-6875-4d7a-9f6d-231256b81471-OLD',
 			'9a9ad4e9-3b5b-4fe7-b0d9-e301b9675949',
 			'c630d49e-4e7b-42ea-b2bc-edc0edacb6b1',
 		],
@@ -907,7 +921,7 @@ export const data: Array<UserDetails> = [
 			'397f3a8b-4ca3-4b01-9dd3-94e5c9eaa9b2',
 			'9a9ad4e9-3b5b-4fe7-b0d9-e301b9675949',
 			'c630d49e-4e7b-42ea-b2bc-edc0edacb6b1',
-			'b847398a-6875-4d7a-9f6d-231256b81471',
+			'b847398a-6875-4d7a-9f6d-231256b81471-OLD',
 		],
 	},
 	{
@@ -983,7 +997,7 @@ export const data: Array<UserDetails> = [
 		userGroups: [
 			'9a9ad4e9-3b5b-4fe7-b0d9-e301b9675949',
 			'397f3a8b-4ca3-4b01-9dd3-94e5c9eaa9b2',
-			'b847398a-6875-4d7a-9f6d-231256b81471',
+			'b847398a-6875-4d7a-9f6d-231256b81471-OLD',
 		],
 	},
 	{
@@ -1031,7 +1045,7 @@ export const data: Array<UserDetails> = [
 		createDate: '6/5/2022',
 		failedLoginAttempts: 197,
 		userGroups: [
-			'b847398a-6875-4d7a-9f6d-231256b81471',
+			'b847398a-6875-4d7a-9f6d-231256b81471-OLD',
 			'9a9ad4e9-3b5b-4fe7-b0d9-e301b9675949',
 			'c630d49e-4e7b-42ea-b2bc-edc0edacb6b1',
 		],
@@ -1057,7 +1071,7 @@ export const data: Array<UserDetails> = [
 		failedLoginAttempts: 264,
 		userGroups: [
 			'9a9ad4e9-3b5b-4fe7-b0d9-e301b9675949',
-			'b847398a-6875-4d7a-9f6d-231256b81471',
+			'b847398a-6875-4d7a-9f6d-231256b81471-OLD',
 			'c630d49e-4e7b-42ea-b2bc-edc0edacb6b1',
 		],
 	},
@@ -1105,7 +1119,7 @@ export const data: Array<UserDetails> = [
 			'2668f09b-320c-48a7-a78a-95047026ec0e',
 			'397f3a8b-4ca3-4b01-9dd3-94e5c9eaa9b2',
 			'c630d49e-4e7b-42ea-b2bc-edc0edacb6b1',
-			'b847398a-6875-4d7a-9f6d-231256b81471',
+			'b847398a-6875-4d7a-9f6d-231256b81471-OLD',
 		],
 	},
 	{
@@ -1155,7 +1169,7 @@ export const data: Array<UserDetails> = [
 		failedLoginAttempts: 543,
 		userGroups: [
 			'2668f09b-320c-48a7-a78a-95047026ec0e',
-			'b847398a-6875-4d7a-9f6d-231256b81471',
+			'b847398a-6875-4d7a-9f6d-231256b81471-OLD',
 			'c630d49e-4e7b-42ea-b2bc-edc0edacb6b1',
 		],
 	},
@@ -1179,7 +1193,7 @@ export const data: Array<UserDetails> = [
 		createDate: '5/9/2022',
 		failedLoginAttempts: 343,
 		userGroups: [
-			'b847398a-6875-4d7a-9f6d-231256b81471',
+			'b847398a-6875-4d7a-9f6d-231256b81471-OLD',
 			'c630d49e-4e7b-42ea-b2bc-edc0edacb6b1',
 			'2668f09b-320c-48a7-a78a-95047026ec0e',
 		],
@@ -1206,7 +1220,7 @@ export const data: Array<UserDetails> = [
 		userGroups: [
 			'2668f09b-320c-48a7-a78a-95047026ec0e',
 			'397f3a8b-4ca3-4b01-9dd3-94e5c9eaa9b2',
-			'b847398a-6875-4d7a-9f6d-231256b81471',
+			'b847398a-6875-4d7a-9f6d-231256b81471-OLD',
 		],
 	},
 	{
@@ -1230,7 +1244,7 @@ export const data: Array<UserDetails> = [
 		failedLoginAttempts: 838,
 		userGroups: [
 			'c630d49e-4e7b-42ea-b2bc-edc0edacb6b1',
-			'b847398a-6875-4d7a-9f6d-231256b81471',
+			'b847398a-6875-4d7a-9f6d-231256b81471-OLD',
 			'2668f09b-320c-48a7-a78a-95047026ec0e',
 		],
 	},
@@ -1274,7 +1288,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '2/19/2022',
 		createDate: '2/16/2022',
 		failedLoginAttempts: 62,
-		userGroups: ['397f3a8b-4ca3-4b01-9dd3-94e5c9eaa9b2', 'b847398a-6875-4d7a-9f6d-231256b81471'],
+		userGroups: ['397f3a8b-4ca3-4b01-9dd3-94e5c9eaa9b2', 'b847398a-6875-4d7a-9f6d-231256b81471-OLD'],
 	},
 	{
 		key: '59f1023c-7ce6-4c78-a1ee-dcb4625b9281',
@@ -1413,7 +1427,7 @@ export const data: Array<UserDetails> = [
 		createDate: '7/13/2022',
 		failedLoginAttempts: 326,
 		userGroups: [
-			'b847398a-6875-4d7a-9f6d-231256b81471',
+			'b847398a-6875-4d7a-9f6d-231256b81471-OLD',
 			'9a9ad4e9-3b5b-4fe7-b0d9-e301b9675949',
 			'397f3a8b-4ca3-4b01-9dd3-94e5c9eaa9b2',
 		],
@@ -1440,7 +1454,7 @@ export const data: Array<UserDetails> = [
 		userGroups: [
 			'c630d49e-4e7b-42ea-b2bc-edc0edacb6b1',
 			'397f3a8b-4ca3-4b01-9dd3-94e5c9eaa9b2',
-			'b847398a-6875-4d7a-9f6d-231256b81471',
+			'b847398a-6875-4d7a-9f6d-231256b81471-OLD',
 		],
 	},
 	{
@@ -1465,7 +1479,7 @@ export const data: Array<UserDetails> = [
 		userGroups: [
 			'397f3a8b-4ca3-4b01-9dd3-94e5c9eaa9b2',
 			'9a9ad4e9-3b5b-4fe7-b0d9-e301b9675949',
-			'b847398a-6875-4d7a-9f6d-231256b81471',
+			'b847398a-6875-4d7a-9f6d-231256b81471-OLD',
 		],
 	},
 	{
@@ -1487,7 +1501,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '12/14/2021',
 		createDate: '4/1/2022',
 		failedLoginAttempts: 485,
-		userGroups: ['2668f09b-320c-48a7-a78a-95047026ec0e', 'b847398a-6875-4d7a-9f6d-231256b81471'],
+		userGroups: ['2668f09b-320c-48a7-a78a-95047026ec0e', 'b847398a-6875-4d7a-9f6d-231256b81471-OLD'],
 	},
 	{
 		key: 'b7f7b275-f62d-44ba-a6b0-0e7e83fe4e49',
@@ -1511,7 +1525,7 @@ export const data: Array<UserDetails> = [
 		userGroups: [
 			'9a9ad4e9-3b5b-4fe7-b0d9-e301b9675949',
 			'c630d49e-4e7b-42ea-b2bc-edc0edacb6b1',
-			'b847398a-6875-4d7a-9f6d-231256b81471',
+			'b847398a-6875-4d7a-9f6d-231256b81471-OLD',
 		],
 	},
 	{
@@ -1536,7 +1550,7 @@ export const data: Array<UserDetails> = [
 		userGroups: [
 			'9a9ad4e9-3b5b-4fe7-b0d9-e301b9675949',
 			'397f3a8b-4ca3-4b01-9dd3-94e5c9eaa9b2',
-			'b847398a-6875-4d7a-9f6d-231256b81471',
+			'b847398a-6875-4d7a-9f6d-231256b81471-OLD',
 		],
 	},
 	{
@@ -1560,7 +1574,7 @@ export const data: Array<UserDetails> = [
 		failedLoginAttempts: 474,
 		userGroups: [
 			'c630d49e-4e7b-42ea-b2bc-edc0edacb6b1',
-			'b847398a-6875-4d7a-9f6d-231256b81471',
+			'b847398a-6875-4d7a-9f6d-231256b81471-OLD',
 			'9a9ad4e9-3b5b-4fe7-b0d9-e301b9675949',
 			'397f3a8b-4ca3-4b01-9dd3-94e5c9eaa9b2',
 			'2668f09b-320c-48a7-a78a-95047026ec0e',
@@ -1587,7 +1601,7 @@ export const data: Array<UserDetails> = [
 		failedLoginAttempts: 991,
 		userGroups: [
 			'c630d49e-4e7b-42ea-b2bc-edc0edacb6b1',
-			'b847398a-6875-4d7a-9f6d-231256b81471',
+			'b847398a-6875-4d7a-9f6d-231256b81471-OLD',
 			'2668f09b-320c-48a7-a78a-95047026ec0e',
 		],
 	},
@@ -1638,7 +1652,7 @@ export const data: Array<UserDetails> = [
 		failedLoginAttempts: 260,
 		userGroups: [
 			'2668f09b-320c-48a7-a78a-95047026ec0e',
-			'b847398a-6875-4d7a-9f6d-231256b81471',
+			'b847398a-6875-4d7a-9f6d-231256b81471-OLD',
 			'c630d49e-4e7b-42ea-b2bc-edc0edacb6b1',
 		],
 	},
@@ -1661,7 +1675,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '4/21/2022',
 		createDate: '9/25/2022',
 		failedLoginAttempts: 722,
-		userGroups: ['b847398a-6875-4d7a-9f6d-231256b81471', '2668f09b-320c-48a7-a78a-95047026ec0e'],
+		userGroups: ['b847398a-6875-4d7a-9f6d-231256b81471-OLD', '2668f09b-320c-48a7-a78a-95047026ec0e'],
 	},
 	{
 		key: '0cccec0d-d7c4-47bc-97b0-bd55dca42dd7',
@@ -1785,7 +1799,7 @@ export const data: Array<UserDetails> = [
 		failedLoginAttempts: 508,
 		userGroups: [
 			'397f3a8b-4ca3-4b01-9dd3-94e5c9eaa9b2',
-			'b847398a-6875-4d7a-9f6d-231256b81471',
+			'b847398a-6875-4d7a-9f6d-231256b81471-OLD',
 			'c630d49e-4e7b-42ea-b2bc-edc0edacb6b1',
 		],
 	},
@@ -1811,7 +1825,7 @@ export const data: Array<UserDetails> = [
 		userGroups: [
 			'c630d49e-4e7b-42ea-b2bc-edc0edacb6b1',
 			'9a9ad4e9-3b5b-4fe7-b0d9-e301b9675949',
-			'b847398a-6875-4d7a-9f6d-231256b81471',
+			'b847398a-6875-4d7a-9f6d-231256b81471-OLD',
 		],
 	},
 	{
@@ -1860,7 +1874,7 @@ export const data: Array<UserDetails> = [
 		failedLoginAttempts: 368,
 		userGroups: [
 			'9a9ad4e9-3b5b-4fe7-b0d9-e301b9675949',
-			'b847398a-6875-4d7a-9f6d-231256b81471',
+			'b847398a-6875-4d7a-9f6d-231256b81471-OLD',
 			'397f3a8b-4ca3-4b01-9dd3-94e5c9eaa9b2',
 		],
 	},
@@ -1884,7 +1898,7 @@ export const data: Array<UserDetails> = [
 		createDate: '5/25/2022',
 		failedLoginAttempts: 982,
 		userGroups: [
-			'b847398a-6875-4d7a-9f6d-231256b81471',
+			'b847398a-6875-4d7a-9f6d-231256b81471-OLD',
 			'2668f09b-320c-48a7-a78a-95047026ec0e',
 			'c630d49e-4e7b-42ea-b2bc-edc0edacb6b1',
 		],
@@ -1932,7 +1946,7 @@ export const data: Array<UserDetails> = [
 		userGroups: [
 			'2668f09b-320c-48a7-a78a-95047026ec0e',
 			'9a9ad4e9-3b5b-4fe7-b0d9-e301b9675949',
-			'b847398a-6875-4d7a-9f6d-231256b81471',
+			'b847398a-6875-4d7a-9f6d-231256b81471-OLD',
 			'c630d49e-4e7b-42ea-b2bc-edc0edacb6b1',
 		],
 	},
@@ -1979,7 +1993,7 @@ export const data: Array<UserDetails> = [
 		userGroups: [
 			'9a9ad4e9-3b5b-4fe7-b0d9-e301b9675949',
 			'397f3a8b-4ca3-4b01-9dd3-94e5c9eaa9b2',
-			'b847398a-6875-4d7a-9f6d-231256b81471',
+			'b847398a-6875-4d7a-9f6d-231256b81471-OLD',
 			'c630d49e-4e7b-42ea-b2bc-edc0edacb6b1',
 		],
 	},
@@ -2004,7 +2018,7 @@ export const data: Array<UserDetails> = [
 		failedLoginAttempts: 975,
 		userGroups: [
 			'9a9ad4e9-3b5b-4fe7-b0d9-e301b9675949',
-			'b847398a-6875-4d7a-9f6d-231256b81471',
+			'b847398a-6875-4d7a-9f6d-231256b81471-OLD',
 			'c630d49e-4e7b-42ea-b2bc-edc0edacb6b1',
 			'397f3a8b-4ca3-4b01-9dd3-94e5c9eaa9b2',
 		],
@@ -2029,7 +2043,7 @@ export const data: Array<UserDetails> = [
 		createDate: '6/30/2022',
 		failedLoginAttempts: 357,
 		userGroups: [
-			'b847398a-6875-4d7a-9f6d-231256b81471',
+			'b847398a-6875-4d7a-9f6d-231256b81471-OLD',
 			'397f3a8b-4ca3-4b01-9dd3-94e5c9eaa9b2',
 			'c630d49e-4e7b-42ea-b2bc-edc0edacb6b1',
 		],
@@ -2055,7 +2069,7 @@ export const data: Array<UserDetails> = [
 		failedLoginAttempts: 482,
 		userGroups: [
 			'2668f09b-320c-48a7-a78a-95047026ec0e',
-			'b847398a-6875-4d7a-9f6d-231256b81471',
+			'b847398a-6875-4d7a-9f6d-231256b81471-OLD',
 			'c630d49e-4e7b-42ea-b2bc-edc0edacb6b1',
 			'9a9ad4e9-3b5b-4fe7-b0d9-e301b9675949',
 		],
@@ -2157,7 +2171,7 @@ export const data: Array<UserDetails> = [
 		userGroups: [
 			'c630d49e-4e7b-42ea-b2bc-edc0edacb6b1',
 			'397f3a8b-4ca3-4b01-9dd3-94e5c9eaa9b2',
-			'b847398a-6875-4d7a-9f6d-231256b81471',
+			'b847398a-6875-4d7a-9f6d-231256b81471-OLD',
 			'2668f09b-320c-48a7-a78a-95047026ec0e',
 		],
 	},
@@ -2210,7 +2224,7 @@ export const data: Array<UserDetails> = [
 			'9a9ad4e9-3b5b-4fe7-b0d9-e301b9675949',
 			'c630d49e-4e7b-42ea-b2bc-edc0edacb6b1',
 			'397f3a8b-4ca3-4b01-9dd3-94e5c9eaa9b2',
-			'b847398a-6875-4d7a-9f6d-231256b81471',
+			'b847398a-6875-4d7a-9f6d-231256b81471-OLD',
 		],
 	},
 	{
@@ -2260,7 +2274,7 @@ export const data: Array<UserDetails> = [
 		userGroups: [
 			'2668f09b-320c-48a7-a78a-95047026ec0e',
 			'c630d49e-4e7b-42ea-b2bc-edc0edacb6b1',
-			'b847398a-6875-4d7a-9f6d-231256b81471',
+			'b847398a-6875-4d7a-9f6d-231256b81471-OLD',
 			'9a9ad4e9-3b5b-4fe7-b0d9-e301b9675949',
 		],
 	},
@@ -2283,7 +2297,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '6/4/2022',
 		createDate: '7/19/2022',
 		failedLoginAttempts: 881,
-		userGroups: ['b847398a-6875-4d7a-9f6d-231256b81471', '9a9ad4e9-3b5b-4fe7-b0d9-e301b9675949'],
+		userGroups: ['b847398a-6875-4d7a-9f6d-231256b81471-OLD', '9a9ad4e9-3b5b-4fe7-b0d9-e301b9675949'],
 	},
 	{
 		key: '33806fc1-d4a9-4ddb-8d57-3c087ea1f489',
@@ -2355,7 +2369,7 @@ export const data: Array<UserDetails> = [
 		createDate: '8/26/2022',
 		failedLoginAttempts: 538,
 		userGroups: [
-			'b847398a-6875-4d7a-9f6d-231256b81471',
+			'b847398a-6875-4d7a-9f6d-231256b81471-OLD',
 			'2668f09b-320c-48a7-a78a-95047026ec0e',
 			'9a9ad4e9-3b5b-4fe7-b0d9-e301b9675949',
 		],
@@ -2382,7 +2396,7 @@ export const data: Array<UserDetails> = [
 		userGroups: [
 			'397f3a8b-4ca3-4b01-9dd3-94e5c9eaa9b2',
 			'9a9ad4e9-3b5b-4fe7-b0d9-e301b9675949',
-			'b847398a-6875-4d7a-9f6d-231256b81471',
+			'b847398a-6875-4d7a-9f6d-231256b81471-OLD',
 			'c630d49e-4e7b-42ea-b2bc-edc0edacb6b1',
 		],
 	},
@@ -2405,7 +2419,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '8/21/2022',
 		createDate: '7/31/2022',
 		failedLoginAttempts: 58,
-		userGroups: ['c630d49e-4e7b-42ea-b2bc-edc0edacb6b1', 'b847398a-6875-4d7a-9f6d-231256b81471'],
+		userGroups: ['c630d49e-4e7b-42ea-b2bc-edc0edacb6b1', 'b847398a-6875-4d7a-9f6d-231256b81471-OLD'],
 	},
 	{
 		key: '365fd725-81c7-48f0-be68-4dbcf15f1ca9',
@@ -2426,7 +2440,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '8/15/2022',
 		createDate: '3/14/2022',
 		failedLoginAttempts: 788,
-		userGroups: ['2668f09b-320c-48a7-a78a-95047026ec0e', 'b847398a-6875-4d7a-9f6d-231256b81471'],
+		userGroups: ['2668f09b-320c-48a7-a78a-95047026ec0e', 'b847398a-6875-4d7a-9f6d-231256b81471-OLD'],
 	},
 	{
 		key: 'b6028623-995e-4eee-8142-723141030692',

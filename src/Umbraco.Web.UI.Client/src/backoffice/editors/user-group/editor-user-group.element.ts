@@ -81,7 +81,7 @@ export class UmbEditorUserGroupElement extends UmbContextProviderMixin(
 	private _userGroup?: UserGroupDetails | null;
 
 	@state()
-	private _userKeys: Array<string> = [];
+	private _userKeys?: Array<string>;
 
 	private _userGroupStore?: UmbUserGroupStore;
 	private _userStore?: UmbUserStore;
@@ -233,8 +233,6 @@ export class UmbEditorUserGroupElement extends UmbContextProviderMixin(
 
 		this.consumeContext('umbUserStore', (userStore: UmbUserStore) => {
 			this._userStore = userStore;
-			console.log('users updated');
-
 			this._observeUsers();
 		});
 	}
@@ -259,8 +257,14 @@ export class UmbEditorUserGroupElement extends UmbContextProviderMixin(
 		if (!this._userStore) return;
 
 		// TODO: Create method to only get users from this userGroup
+		// TODO: Find a better way to only call this once at the start
 		this.observe(this._userStore.getAll(), (users: Array<UserDetails>) => {
-			this._userKeys = users.filter((user) => user.userGroups.includes(this.entityKey)).map((user) => user.key);
+			if (!this._userKeys && users.length > 0) {
+				this._userKeys = users.filter((user) => user.userGroups.includes(this.entityKey)).map((user) => user.key);
+				this._updateProperty('users', this._userKeys);
+
+				console.log('users', this._userKeys);
+			}
 		});
 	}
 
@@ -357,8 +361,8 @@ export class UmbEditorUserGroupElement extends UmbContextProviderMixin(
 		return html`<uui-box>
 			<div slot="headline">Users</div>
 			<umb-picker-user
-				@change=${(e: any) => console.log('USER PICKER NOT IMPLEMENTED')}
-				.value=${this._userKeys}></umb-picker-user>
+				@change=${(e: Event) => this._updateProperty('users', e.target.value)}
+				.value=${this._userGroupContext?.getData().users || []}></umb-picker-user>
 		</uui-box>`;
 	}
 

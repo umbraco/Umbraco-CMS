@@ -7,6 +7,7 @@ import type { UmbNotificationService } from '../../../../core/services/notificat
 import { UmbUserGroupContext } from '../user-group.context';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { UmbUserGroupStore } from 'src/core/stores/user/user-group.store';
+import { UmbUserStore } from 'src/core/stores/user/user.store';
 
 @customElement('umb-editor-action-user-group-save')
 export class UmbEditorActionUserGroupSaveElement extends UmbContextConsumerMixin(LitElement) {
@@ -16,17 +17,22 @@ export class UmbEditorActionUserGroupSaveElement extends UmbContextConsumerMixin
 	private _saveButtonState?: UUIButtonState;
 
 	private _userGroupStore?: UmbUserGroupStore;
+	private _userStore?: UmbUserStore;
 	private _userGroupContext?: UmbUserGroupContext;
 	private _notificationService?: UmbNotificationService;
 
 	connectedCallback(): void {
 		super.connectedCallback();
 
-		this.consumeAllContexts(['umbUserGroupStore', 'umbUserGroupContext', 'umbNotificationService'], (instances) => {
-			this._userGroupStore = instances['umbUserGroupStore'];
-			this._userGroupContext = instances['umbUserGroupContext'];
-			this._notificationService = instances['umbNotificationService'];
-		});
+		this.consumeAllContexts(
+			['umbUserGroupStore', 'umbUserStore', 'umbUserGroupContext', 'umbNotificationService'],
+			(instances) => {
+				this._userGroupStore = instances['umbUserGroupStore'];
+				this._userStore = instances['umbUserStore'];
+				this._userGroupContext = instances['umbUserGroupContext'];
+				this._notificationService = instances['umbNotificationService'];
+			}
+		);
 	}
 
 	private async _handleSave() {
@@ -35,12 +41,20 @@ export class UmbEditorActionUserGroupSaveElement extends UmbContextConsumerMixin
 
 		try {
 			this._saveButtonState = 'waiting';
-			const user = this._userGroupContext.getData();
-			await this._userGroupStore.save([user]);
+			const userGroup = this._userGroupContext.getData();
+			await this._userGroupStore.save([userGroup]);
+			if (this._userStore && userGroup.users) {
+				console.log('update', userGroup.users);
+
+				await this._userStore.updateUserGroup(userGroup.users, userGroup.key);
+			}
+
 			const notificationData: UmbNotificationDefaultData = { message: 'User Group Saved' };
 			this._notificationService?.peek('positive', { data: notificationData });
 			this._saveButtonState = 'success';
 		} catch (error) {
+			const notificationData: UmbNotificationDefaultData = { message: 'User Group Save Failed' };
+			this._notificationService?.peek('danger', { data: notificationData });
 			this._saveButtonState = 'failed';
 		}
 	}
