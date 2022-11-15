@@ -1,7 +1,13 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { healthGroups, HealthCheckGroup, HealthType } from '../../../core/mocks/data/health-check.data';
+import {
+	healthGroups,
+	HealthCheckGroup,
+	HealthType,
+	HealthCheckData,
+	HealthCheck,
+} from '../../../core/mocks/data/health-check.data';
 
 @customElement('umb-dashboard-health-check')
 export class UmbDashboardHealthCheckElement extends LitElement {
@@ -14,7 +20,7 @@ export class UmbDashboardHealthCheckElement extends LitElement {
 			uui-box p:first-child {
 				margin-block-start: 0;
 			}
-			.flex {
+			.group-wrapper {
 				display: flex;
 				flex-wrap: wrap;
 				margin-inline: -5px;
@@ -30,7 +36,7 @@ export class UmbDashboardHealthCheckElement extends LitElement {
 				margin-top: 0;
 			}
 
-			.mini-box {
+			.group-box {
 				flex-basis: 20%;
 				min-width: 150px;
 				max-width: calc(20% - 10px);
@@ -58,9 +64,10 @@ export class UmbDashboardHealthCheckElement extends LitElement {
 			.warning {
 				color: var(--uui-color-warning);
 			}
-			.postive {
+			.positive {
 				color: var(--uui-color-positive);
 			}
+
 			button {
 				background: none;
 				border: none;
@@ -68,53 +75,60 @@ export class UmbDashboardHealthCheckElement extends LitElement {
 				cursor: pointer;
 				margin-bottom: var(--uui-size-space-5);
 			}
+
+			section:not(:first-child) {
+				padding-top: var(--uui-size-space-5);
+				margin-top: var(--uui-size-space-5);
+				border-top: 1px solid var(--uui-color-divider-standalone);
+			}
+
+			section p {
+				margin: 0;
+			}
+			uui-button {
+				margin-block-start: 1em;
+			}
 		`,
 	];
 
 	@state()
-	private healthGroup = healthGroups;
+	private _healthGroups: HealthCheckGroup[] = healthGroups;
 
 	@state()
-	private currentView?: HealthCheckGroup;
+	private _currentView?: HealthCheckGroup;
+
+	private getChecksOfGroup(group: HealthCheckGroup) {
+		const res = { success: 0, warning: 0, error: 0 };
+		group.checks.map((category) => {
+			category.data?.map((data) => {
+				data.resultType == 'Success'
+					? (res.success += 1)
+					: data.resultType == 'Warning'
+					? (res.warning += 1)
+					: (res.error += 1);
+			});
+		});
+		return res;
+	}
 
 	render() {
-		return !this.currentView ? this.renderOverview() : this.renderGroup(this.currentView);
+		return !this._currentView ? this.renderOverview() : this.renderGroup(this._currentView);
 	}
 
 	renderOverview() {
 		return html`
 			<uui-box>
-				<div class="headline" slot="headline">
-					Health Check
-					<uui-button look="primary" color="positive" label="Check health on all groups">Check All Groups</uui-button>
-				</div>
-				<p>
-					The health checker evaluates various areas of your site for best practice settings, configuration, potential
-					problems, etc. You can easily fix problems by pressing a button. You can add your own health checks, have a
-					look at
-					<a href="https://our.umbraco.com/documentation/Extending/Health-Check/">
-						the documentation for more information
-					</a>
-					about custom health checks.<br />
-				</p>
-				<div class="flex">
-					${this.healthGroup.map((group) => {
-						const res = { success: 0, warning: 0, error: 0 };
-						const status = group.checks.map((item) => {
-							return item.data?.resultType;
-						});
-						if (status.length) {
-							res.success = status.filter((s) => s == 'Success').length;
-							res.warning = status.filter((s) => s == 'Warning').length;
-							res.error = status.filter((s) => s == 'Error').length;
-						}
-						return html`<uui-box class="mini-box" @click="${() => (this.currentView = group)}">
+				<div class="headline" slot="headline">Health Check</div>
+				<div class="group-wrapper">
+					${this._healthGroups.map((group) => {
+						const checksOfGroup = this.getChecksOfGroup(group);
+						return html` <uui-box class="group-box" @click="${() => (this._currentView = group)}">
 							${group.name}
 							<br />
 							<uui-icon-registry-essential>
-								${res.success ? this.renderTags('Success', res.success) : ''}
-								${res.warning ? this.renderTags('Warning', res.warning) : ''}
-								${res.error ? this.renderTags('Error', res.error) : ''}
+								${checksOfGroup.success ? this.renderTags('Success', checksOfGroup.success) : ''}
+								${checksOfGroup.warning ? this.renderTags('Warning', checksOfGroup.warning) : ''}
+								${checksOfGroup.error ? this.renderTags('Error', checksOfGroup.error) : ''}
 							</uui-icon-registry-essential></uui-box
 						>`;
 					})}
@@ -127,43 +141,35 @@ export class UmbDashboardHealthCheckElement extends LitElement {
 		return html` <uui-tag
 			color="${type == 'Success' ? 'positive' : type == 'Warning' ? 'warning' : 'danger'}"
 			look="secondary">
-			<uui-icon name="${type == 'Success' ? 'check' : type == 'Warning' ? 'warning' : 'wrong'}"></uui-icon>${amount}
+			${this.renderIcon(type)}${amount}
 		</uui-tag>`;
+	}
+
+	private renderIcon(type: HealthType) {
+		return html`<uui-icon
+			class="${type == 'Success' ? 'positive' : type == 'Warning' ? 'warning' : 'danger'}"
+			name="${type == 'Success' ? 'check' : type == 'Warning' ? 'alert' : 'remove'}"></uui-icon>`;
 	}
 
 	renderGroup(group: HealthCheckGroup) {
 		return html`
-			<button @click="${() => (this.currentView = undefined)}">&larr; Back to overview</button>
+			<button @click="${() => (this._currentView = undefined)}">&larr; Back to overview</button>
 			<uui-box>
-				<div class="headline" slot="headline">
-					Configuration
-					<uui-button color="positive" look="primary">Check group</uui-button>
-				</div>
+				<div class="headline" slot="headline">Configuration</div>
 				${group.checks.map((item) => {
 					if (item.data) {
 						return html`<uui-box headline="${item.name}">
 							<p>${item.description}</p>
-							<div class="data">
-								<uui-icon-registry-essential>
-									<p>
-										<uui-icon
-											name="${item.data.resultType == 'Success'
-												? 'check'
-												: item.data.resultType == 'Warning'
-												? 'warning'
-												: 'wrong'}"
-											class="${item.data.resultType == 'Success'
-												? 'positive'
-												: item.data.resultType == 'Warning'
-												? 'warning'
-												: 'danger'}"></uui-icon>
-										${item.data.message}
-									</p>
-									${!item.data.readMoreLink
-										? html`<uui-button color="default" look="primary">Read More</uui-button>`
-										: ``}
-								</uui-icon-registry-essential>
-							</div>
+							<uui-icon-registry-essential>
+								<div class="data">
+									${item.data.map((res) => {
+										return html` <section>
+											<p>${this.renderIcon(res.resultType)} ${res.message}</p>
+											${res.readMoreLink ? html`<uui-button color="default" look="primary">Read more</uui-button>` : ''}
+										</section>`;
+									})}
+								</div>
+							</uui-icon-registry-essential>
 						</uui-box>`;
 					}
 					return html`<uui-box headline="${item.name}">
