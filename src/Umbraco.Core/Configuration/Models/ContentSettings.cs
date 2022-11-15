@@ -201,7 +201,7 @@ public class ContentSettings
     /// <summary>
     ///     Gets or sets a value for the collection of file extensions that are allowed for upload.
     /// </summary>
-    public IEnumerable<string> AllowedUploadFiles { get; set; } = Array.Empty<string>();
+    public string[] AllowedUploadFiles { get; set; } = Array.Empty<string>();
 
     /// <summary>
     ///     Gets or sets a value indicating whether deprecated property editors should be shown.
@@ -249,4 +249,15 @@ public class ContentSettings
     /// </summary>
     [DefaultValue(StaticAllowEditInvariantFromNonDefault)]
     public bool AllowEditInvariantFromNonDefault { get; set; } = StaticAllowEditInvariantFromNonDefault;
+
+    /// <summary>
+    ///     Gets or sets a value for the collection of file extensions that are allowed for upload.
+    /// </summary>
+    public string[] AllowedUploadedFileExtensions { get; set; } = Array.Empty<string>();
+
+    /// <summary>
+    ///     Gets or sets a value for the collection of file extensions that are disallowed for upload.
+    /// </summary>
+    [DefaultValue(StaticDisallowedUploadFiles)]
+    public string[] DisAllowedUploadedFileExtensions { get; set; } = StaticDisallowedUploadFiles.Split(',');
 }
