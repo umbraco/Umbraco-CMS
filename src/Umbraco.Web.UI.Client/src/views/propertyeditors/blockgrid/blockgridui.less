@@ -745,36 +745,6 @@ ng-form.ng-invalid > .umb-block-grid__block:not(.--active) > .umb-block-grid__bl
         100% { background-color: rgba(@blueMidLight, 0.22); }
     }
 }
-.umb-block-grid__layout-item-placeholder .indicateForceLeft, 
-.umb-block-grid__layout-item-placeholder .indicateForceRight {
-    position:absolute;
-
-    z-index: 2;
-    height: 100%;
-    width: 15px;
-
-    background-color: @blueDark;
-
-    background-position: center center;
-    background-repeat: no-repeat;
-    display: block !important;
-
-    animation: umb-block-grid__indicateForce__pulse 400ms ease-in-out alternate infinite;
-}
-
-.umb-block-grid__layout-item-placeholder .indicateForceLeft {
-    left:0;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='8' height='10'><polygon points='0,0 2,0 2,5 6,1 6,9 2,5 2,10 0,10' style='fill:white;'/></svg>");
-}
-.umb-block-grid__layout-item-placeholder .indicateForceRight {
-    right:0;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='8' height='10'><polygon points='8,0 6,0 6,5 2,1 2,9 6,5 6,10 8,10' style='fill:white;'/></svg>");
-}
-
-@keyframes umb-block-grid__indicateForce__pulse {
-    0%   { background-color: rgba(@blueDark, 1); }
-    100% { background-color: rgba(@blueDark, 0.5); }
-}
 
 
 .umb-block-grid__area {
