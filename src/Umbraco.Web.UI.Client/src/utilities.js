@@ -306,7 +306,7 @@
                 };
     
                 if (matchedMediaTypes.length > 1) {
-                    _chooseMediaTypeDialog(matchedMediaTypes)
+                    _chooseMediaTypeDialog(matchedMediaTypes, file)
                     .then((selectedMediaType) => {
                         resolve(selectedMediaType);
                     }, () => {
@@ -316,7 +316,7 @@
             });
         }
 
-        function _chooseMediaTypeDialog(mediaTypes) {
+        function _chooseMediaTypeDialog(mediaTypes, file) {
             return new Promise((resolve, reject) => {
                 const dialog = {
                     view: "itempicker",
@@ -333,6 +333,7 @@
                 };
 
                 dialog.title = translations.selectMediaTypeDialogTitle;
+                dialog.subtitle = file.name;
                 overlayService.open(dialog);
             });
         }
