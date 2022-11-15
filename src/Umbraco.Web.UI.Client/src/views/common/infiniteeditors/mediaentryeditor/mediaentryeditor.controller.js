@@ -45,8 +45,8 @@ angular.module("umbraco")
             function updateMedia() {
 
                 if (!vm.mediaEntry.mediaKey) {
-                    vm.imageSrc = vm.mediaEntry.dataURL;
-                    vm.fileSrc = vm.mediaEntry.dataURL;
+                    vm.imageSrc = vm.mediaEntry.$dataURL;
+                    vm.fileSrc = vm.mediaEntry.$dataURL;
                     vm.loading = false;
                     vm.hasDimensions = false;
                     vm.isCroppable = false;
