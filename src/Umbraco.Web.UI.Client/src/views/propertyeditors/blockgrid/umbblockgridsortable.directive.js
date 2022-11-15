@@ -343,8 +343,6 @@
                         foundElDragRect = sameRow.dragRect;
                         lastDistance = Math.abs(distance);
                         placeAfter = dragX > centerX;
-
-                        console.log(foundEl, centerX, placeAfter)
                     }
                 });
 
@@ -409,6 +407,8 @@
                     let verticalDirection = false;
                     
                     // TODO: move calculations out so they can be persisted a bit longer?
+
+                    /** We need some data about the grid to figure out if there is room to be placed next to the found element */
                     const approvedContainerComputedStyles = getComputedStyle(currentContainerElement);
                     const gridColumnGap = Number(approvedContainerComputedStyles.columnGap.split("px")[0]) || 0;
                     const gridColumnNumber = parseInt(approvedContainerComputedStyles.getPropertyValue("--umb-block-grid--grid-columns"), 10);
@@ -437,7 +437,9 @@
                     const relatedStartX = foundElDragRect.left - currentContainerRect.left;
                     const relatedStartCol = Math.round(getInterpolatedIndexOfPositionInWeightMap(relatedStartX, approvedContainerGridColumns));
 
+                    // If the found related element does not have enough room after which for the current element, then we go vertical mode:
                     if(relatedStartCol + foundElColumns + currentElementColumns > gridColumnNumber) {
+                        // TODO: Check is there a case where placeAfter = false where we would like to check the previous element in this case?
                         verticalDirection = true;
                     }
                     
