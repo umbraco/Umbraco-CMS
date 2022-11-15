@@ -127,7 +127,7 @@ public class MediaPicker3PropertyEditor : DataEditor
             {
                 if (editorValue.DataTypeConfiguration is MediaPicker3Configuration configuration)
                 {
-                    dtos = PersistTempImages(dtos, configuration);
+                    dtos = PersistTempMedia(dtos, configuration);
                 }
 
                 // Clean up redundant/default data
@@ -182,7 +182,7 @@ public class MediaPicker3PropertyEditor : DataEditor
             }
         }
 
-        private JArray PersistTempImages(JArray jArray, MediaPicker3Configuration mediaPicker3Configuration)
+        private JArray PersistTempMedia(JArray jArray, MediaPicker3Configuration mediaPicker3Configuration)
         {
             var result = new JArray();
             foreach (JObject? dto in jArray.Values<JObject>())

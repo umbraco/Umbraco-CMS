@@ -81,7 +81,7 @@ public class MediaPickerThreeController : ContentControllerBase
         var safeFileName = fileName.ToSafeFileName(ShortStringHelper);
         var ext = safeFileName.Substring(safeFileName.LastIndexOf('.') + 1).ToLowerInvariant();
 
-        if (_contentSettings.IsFileAllowedForUpload(ext) == false || _imageUrlGenerator.IsSupportedImageFormat(ext) == false)
+        if (_contentSettings.IsFileAllowedForUpload(ext) == false)
         {
             // Throw some error - to say can't upload this IMG type
             return new UmbracoProblemResult("This is not an image filetype extension that is approved", HttpStatusCode.BadRequest);
