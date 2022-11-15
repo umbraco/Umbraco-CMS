@@ -106,11 +106,11 @@ export class UmbEditorViewUserGroupsElement extends UmbContextConsumerMixin(UmbO
 					},
 					{
 						columnAlias: 'userGroupContentStartNode',
-						value: userGroup.contentStartNode,
+						value: userGroup.contentStartNode || 'Content root',
 					},
 					{
 						columnAlias: 'userGroupMediaStartNode',
-						value: userGroup.mediaStartNode,
+						value: userGroup.mediaStartNode || 'Media root',
 					},
 				],
 			};
