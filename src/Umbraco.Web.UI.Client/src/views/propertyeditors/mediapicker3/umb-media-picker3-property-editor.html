@@ -36,17 +36,17 @@
                     <div ng-if="!media.mediaKey" class="umb-media-card">
                         <div class="__showcase">
 
-                            <div ng-if="media.uploadProgress < 100" class="__upload-progress-container">
+                            <div ng-if="media.$uploadProgress < 100" class="__upload-progress-container">
                                 <div  class="__upload-progress">
-                                    <umb-progress-bar class="__upload-progress-bar" percentage="{{media.uploadProgress}}"></umb-progress-bar>
-                                    <div class="__upload-progress-label" ng-if="media.uploadProgress === 0">Waiting...</div>
-                                    <div class="__upload-progress-label" ng-if="media.uploadProgress > 0">{{media.uploadProgress}}%</div>
+                                    <umb-progress-bar class="__upload-progress-bar" percentage="{{media.$uploadProgress}}"></umb-progress-bar>
+                                    <div class="__upload-progress-label" ng-if="media.$uploadProgress === 0">Waiting...</div>
+                                    <div class="__upload-progress-label" ng-if="media.$uploadProgress > 0">{{media.$uploadProgress}}%</div>
                                 </div>
                             </div>
 
                             <img 
-                                ng-if="media.dataURL"
-                                ng-src="{{media.dataURL}}"
+                                ng-if="media.$dataURL"
+                                ng-src="{{media.$dataURL}}"
                                 title="{{vm.media.name}}"
                                 alt="{{vm.media.name}}" />
                             
@@ -54,7 +54,7 @@
                                 type="button" 
                                 class="btn-reset __info" 
                                 ng-click="vm.editMedia(media, $index, $event)" 
-                                ng-disabled="media.uploadProgress < 100">
+                                ng-disabled="media.$uploadProgress < 100">
                                 <div class="__name" ng-bind="media.name"></div>
                             </button>
 
@@ -65,7 +65,7 @@
                                     localize="title" 
                                     title="general_remove" 
                                     ng-click="vm.removeMedia(media); $event.stopPropagation();" 
-                                    ng-disabled="media.uploadProgress < 100">
+                                    ng-disabled="media.$uploadProgress < 100">
                                     <umb-icon icon="icon-trash" class="icon"></umb-icon>
                                 </button>
                             </div>

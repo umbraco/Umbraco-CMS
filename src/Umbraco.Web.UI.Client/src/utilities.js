@@ -215,13 +215,13 @@
                 const mediaEntry = {
                     key: String.CreateGuid(),
                     name: file.name,
-                    uploadProgress: 0,
-                    dataURL: ''
+                    $uploadProgress: 0,
+                    $dataURL: ''
                 };
 
                 if (file.type.includes('image')) {
                     Upload.base64DataUrl(file).then(function(url) {    
-                        mediaEntry.dataURL = url;
+                        mediaEntry.$dataURL = url;
                     });
                 }
 
@@ -246,8 +246,7 @@
                 })
                 .progress(function(evt) {
                     var progressPercentage = parseInt(100.0 * evt.loaded / evt.total, 10);
-                    mediaEntry.uploadProgress = progressPercentage;
-                    _emit('uploadProgress', { mediaEntry, progressPercentage });
+                    mediaEntry.$uploadProgress = progressPercentage;
                 })
                 .success(function (data) {
                     _emit('uploadSuccess', { mediaEntry, ...data });
