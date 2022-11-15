@@ -74,45 +74,9 @@
         vm.locallyAvailableBlockTypes = 0;
         vm.invalidBlockTypes = [];
 
-        // TODO: clean up:
-        vm.showNotAllowedUI = false;
-        vm.movingLayoutEntry = null;
-        vm.layoutColumnsInt = 0;
-        vm.containedPropertyEditorProxies = [];
-
         vm.$onInit = function () {
 
-            vm.sorterOptions = {
-                identifier: "BlockGridEditor_"+vm.blockEditorApi.internal.uniqueEditorKey,
-                itemSelector: ".umb-block-grid__layout-item",
-                listSelector: ".umb-block-grid__layout-container",
-                model: vm.entries
-            }
-
-            // TODO: implement this:
-            function onBlockMoveAwayCallback(slotName) {
-                const event = new CustomEvent("UmbBlockGrid_RemoveProperty", {composed: true, bubbles: true, detail: {'slotName': slotName}});
-                eventTarget.dispatchEvent(event);
-            }
-
-            // TODO: implement show not allowed:
-            // TODO: implement hide not allowed:
-
-            function onStart(listEntry) {
-                // TODO: remove forceLeft/right
-                // gather: containedPropertyEditorProxies
-
-                document.documentElement.style.setProperty("--umb-block-grid--dragging-mode", 1);
-            }
-
-            function onEnd(listEntry) {
-                
-
-                document.documentElement.style.setProperty("--umb-block-grid--dragging-mode", 0);
-            }
-
-
-            //initializeSortable();
+            initializeSorter();
 
             if(vm.parentBlock) {
                 vm.areaConfig = vm.parentBlock.config.areas.find(area => area.key === vm.areaKey);
@@ -122,10 +86,6 @@
             
             unsubscribe.push($scope.$watch('vm.entries', onLocalAmountOfBlocksChanged, true));
         };
-
-        unsubscribe.push($scope.$watch("layoutColumns", (newVal, oldVal) => {
-            vm.layoutColumnsInt = parseInt(vm.layoutColumns, 10);
-        }));
 
         function onLocalAmountOfBlocksChanged() {
 
@@ -224,6 +184,89 @@
             $scope.$evalAsync();
         }
 
+
+
+
+
+
+        // NEW CODE:
+
+
+
+        // TODO: clean up:
+        vm.layoutColumnsInt = 0;// Maybe not used by anything..
+        vm.showNotAllowedUI = false;
+        vm.movingLayoutEntry = null;
+        vm.containedPropertyEditorProxies = [];
+
+        function removeAllContainedPropertyEditorProxies() {
+            vm.containedPropertyEditorProxies.forEach(slotName => {
+                removePropertyEditorProxies(slotName);
+            });
+        }
+        function removePropertyEditorProxies(slotName) {
+            const event = new CustomEvent("UmbBlockGrid_RemoveProperty", {composed: true, bubbles: true, detail: {'slotName': slotName}});
+            $element[0].dispatchEvent(event);
+        }
+
+
+
+
+        function initializeSorter() {
+
+            // Maybe not used by anything:
+            unsubscribe.push($scope.$watch("layoutColumns", (newVal, oldVal) => {
+                vm.layoutColumnsInt = parseInt(vm.layoutColumns, 10);
+            }));
+
+            vm.sorterOptions = {
+                dataTransferResolver: (dataTransfer, item) => {dataTransfer.setData("text/plain", item.$block.label)}, 
+                compareElementToModel: (el, modelEntry) => modelEntry.contentUdi === el.dataset.elementUdi,
+                querySelectModelToElement: (container, modelEntry) => container.querySelector(`[data-element-udi='${modelEntry.contentUdi}']`),
+                identifier: "BlockGridEditor_"+vm.blockEditorApi.internal.uniqueEditorKey,
+                containerSelector: ".umb-block-grid__layout-container",
+                ignorerSelector: "a, img",
+                itemSelector: ".umb-block-grid__layout-item",
+                draggableSelector: ".umb-block-grid__block--view",
+                placeholderClass: "umb-block-grid__layout-item-placeholder",
+                ghostClass: ".umb-block-grid__layout-item-ghost",
+                listSelector: ".umb-block-grid__layout-container",
+                items: vm.entries,
+                onStart: onSortStart,
+                onEnd: onSortEnd,
+                onSync: onSortSync
+            }
+
+            // TODO: implement show not allowed:
+            // TODO: implement hide not allowed:
+        }
+
+        function onSortStart(item) {
+            // TODO: remove forceLeft/right
+            // gather: containedPropertyEditorProxies
+            //vm.containedPropertyEditorProxies = Array.from(ghostEl.querySelectorAll('slot[data-is-property-editor-proxy]')).map(x => x.getAttribute('name'));
+
+            document.documentElement.style.setProperty("--umb-block-grid--dragging-mode", 1);
+        }
+
+        function onSortEnd(item) {
+            document.documentElement.style.setProperty("--umb-block-grid--dragging-mode", 0);
+        }
+
+        function onSortSync() {
+            //$scope.$evalAsync();
+        }
+
+
+
+
+
+
+
+
+        // OLD CODE:
+
+        
         function initializeSortable() {
 
             const gridLayoutContainerEl = $element[0].querySelector('.umb-block-grid__layout-container');

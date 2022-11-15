@@ -714,6 +714,7 @@ ng-form.ng-invalid > .umb-block-grid__block:not(.--active) > .umb-block-grid__bl
     background: transparent;
     border-radius: 3px;
 
+    box-sizing: border-box;
     border: solid 1px;
     border-color: rgba(@blueDark, .5);
     border-radius: 3px;
@@ -721,9 +722,11 @@ ng-form.ng-invalid > .umb-block-grid__block:not(.--active) > .umb-block-grid__bl
     height: 100%;
 }
 
+
 .umb-block-grid__layout-item-placeholder > * {
     display: none;
 }
+
 .umb-block-grid__layout-item-placeholder::before {
     content: '';
     position:absolute;
@@ -731,6 +734,7 @@ ng-form.ng-invalid > .umb-block-grid__block:not(.--active) > .umb-block-grid__bl
     inset: 0;
     border-radius: 3px;
     background-color: white;
+    pointer-events:none;
 }
 .umb-block-grid__layout-item-placeholder::after {
     content: '';
@@ -738,6 +742,7 @@ ng-form.ng-invalid > .umb-block-grid__block:not(.--active) > .umb-block-grid__bl
     z-index:1;
     inset: 0;
     border-radius: 3px;
+    pointer-events:none;
 
     transition: background-color 240ms ease-in;
     animation: umb-block-grid__placeholder__pulse 400ms ease-in-out alternate infinite;
@@ -746,6 +751,7 @@ ng-form.ng-invalid > .umb-block-grid__block:not(.--active) > .umb-block-grid__bl
         100% { background-color: rgba(@blueMidLight, 0.22); }
     }
 }
+
 
 
 .umb-block-grid__area {
