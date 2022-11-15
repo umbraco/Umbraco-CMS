@@ -54,7 +54,14 @@
 			"protocol": "https",
 			"onAutoForward": "notify"
 		}
-	}
+	},
+	"customizations": {
+		"codespaces": {
+		  "openFiles": [
+			".github/codespaces-readme.md"
+		  ]
+		}
+	  }
 
 	// [Optional] To reuse of your local HTTPS dev cert:
 	//
