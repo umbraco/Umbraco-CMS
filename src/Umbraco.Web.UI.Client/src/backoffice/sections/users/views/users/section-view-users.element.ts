@@ -4,15 +4,20 @@ import { customElement, state } from 'lit/decorators.js';
 import { BehaviorSubject, Observable } from 'rxjs';
 import type { IRoute, IRoutingInfo } from 'router-slot';
 import type { UmbEditorEntityElement } from '../../../../editors/shared/editor-entity/editor-entity.element';
-import { UmbContextProviderMixin } from '@umbraco-cms/context-api';
+import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 
 import './list-view-layouts/table/editor-view-users-table.element';
 import './list-view-layouts/grid/editor-view-users-grid.element';
 import './editor-view-users-selection.element';
 import './editor-view-users-invite.element';
+import type { UserDetails } from '@umbraco-cms/models';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
+import { UmbUserStore } from 'src/core/stores/user/user.store';
 
 @customElement('umb-section-view-users')
-export class UmbSectionViewUsersElement extends UmbContextProviderMixin(LitElement) {
+export class UmbSectionViewUsersElement extends UmbContextProviderMixin(
+	UmbContextConsumerMixin(UmbObserverMixin(LitElement))
+) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -43,8 +48,13 @@ export class UmbSectionViewUsersElement extends UmbContextProviderMixin(LitEleme
 		},
 	];
 
+	private _userStore?: UmbUserStore;
+
 	private _selection: BehaviorSubject<Array<string>> = new BehaviorSubject(<Array<string>>[]);
 	public readonly selection: Observable<Array<string>> = this._selection.asObservable();
+
+	private _users: BehaviorSubject<Array<UserDetails>> = new BehaviorSubject(<Array<UserDetails>>[]);
+	public readonly users: Observable<Array<UserDetails>> = this._users.asObservable();
 
 	private _search: BehaviorSubject<string> = new BehaviorSubject('');
 	public readonly search: Observable<string> = this._search.asObservable();
@@ -52,13 +62,30 @@ export class UmbSectionViewUsersElement extends UmbContextProviderMixin(LitEleme
 	constructor() {
 		super();
 
+		this.consumeAllContexts(['umbUserStore', 'umbUserGroupStore', 'umbUsersContext'], (instances) => {
+			this._userStore = instances['umbUserStore'];
+			this._observeUsers();
+		});
 		this.provideContext('umbUsersContext', this);
+	}
+
+	private _observeUsers() {
+		if (!this._userStore) return;
+
+		if (this._search.getValue()) {
+			this.observe<Array<UserDetails>>(this._userStore.getByName(this._search.getValue()), (users) =>
+				this._users.next(users)
+			);
+		} else {
+			this.observe<Array<UserDetails>>(this._userStore.getAll(), (users) => this._users.next(users));
+		}
 	}
 
 	public setSearch(value: string) {
 		if (!value) value = '';
 
 		this._search.next(value);
+		this._observeUsers();
 		this.requestUpdate('search');
 	}
 

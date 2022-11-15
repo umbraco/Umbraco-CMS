@@ -48,36 +48,28 @@ export class UmbEditorViewUsersGridElement extends UmbContextConsumerMixin(UmbOb
 	private _selection: Array<string> = [];
 
 	@state()
-	private _search = '';
-
-	@state()
 	private _userGroups: Array<UserGroupEntity> = [];
 
-	private _userStore?: UmbUserStore;
 	private _userGroupStore?: UmbUserGroupStore;
 	private _usersContext?: UmbSectionViewUsersElement;
 
 	constructor() {
 		super();
 
-		this.consumeAllContexts(['umbUserStore', 'umbUserGroupStore', 'umbUsersContext'], (instances) => {
-			this._userStore = instances['umbUserStore'];
+		this.consumeAllContexts(['umbUserGroupStore', 'umbUsersContext'], (instances) => {
 			this._userGroupStore = instances['umbUserGroupStore'];
 			this._usersContext = instances['umbUsersContext'];
 			this._observeUsers();
 			this._observeUserGroups();
 			this._observeSelection();
-			this._observeSearch();
 		});
 	}
 
 	private _observeUsers() {
-		if (!this._userStore) return;
-		if (this._search) {
-			this.observe<Array<UserDetails>>(this._userStore.getByName(this._search), (users) => (this._users = users));
-		} else {
-			this.observe<Array<UserDetails>>(this._userStore.getAll(), (users) => (this._users = users));
-		}
+		if (!this._usersContext) return;
+		this.observe<Array<UserDetails>>(this._usersContext.users, (users) => {
+			this._users = users;
+		});
 	}
 
 	private _observeUserGroups() {
@@ -91,14 +83,6 @@ export class UmbEditorViewUsersGridElement extends UmbContextConsumerMixin(UmbOb
 	private _observeSelection() {
 		if (!this._usersContext) return;
 		this.observe<Array<string>>(this._usersContext.selection, (selection) => (this._selection = selection));
-	}
-
-	private _observeSearch() {
-		if (!this._usersContext) return;
-		this.observe<string>(this._usersContext.search, (search) => {
-			this._search = search;
-			this._observeUsers();
-		});
 	}
 
 	private _isSelected(key: string) {
@@ -127,7 +111,7 @@ export class UmbEditorViewUsersGridElement extends UmbContextConsumerMixin(UmbOb
 	}
 
 	private renderUserCard(user: UserDetails) {
-		if (!this._userStore) return;
+		if (!this._usersContext) return;
 
 		const statusLook = getTagLookAndColor(user.status);
 

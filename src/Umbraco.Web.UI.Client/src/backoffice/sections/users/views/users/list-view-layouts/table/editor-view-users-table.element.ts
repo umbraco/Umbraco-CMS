@@ -72,30 +72,26 @@ export class UmbEditorViewUsersTableElement extends UmbContextConsumerMixin(UmbO
 	@state()
 	private _userGroups: Array<UserGroupEntity> = [];
 
-	private _userStore?: UmbUserStore;
 	private _userGroupStore?: UmbUserGroupStore;
 	private _usersContext?: UmbSectionViewUsersElement;
 
-	connectedCallback(): void {
-		super.connectedCallback();
+	constructor() {
+		super();
 
-		this.consumeAllContexts(['umbUserStore', 'umbUserGroupStore', 'umbUsersContext'], (instances) => {
-			this._userStore = instances['umbUserStore'];
+		this.consumeAllContexts(['umbUserGroupStore', 'umbUsersContext'], (instances) => {
 			this._userGroupStore = instances['umbUserGroupStore'];
 			this._usersContext = instances['umbUsersContext'];
-			console.log('userGroups', this._userGroupStore);
-
-			this._observeUserGroups(); //Note: observeUserGroups has to be before observeUsers in order to get the user group names.
 			this._observeUsers();
+			this._observeUserGroups();
 			this._observeSelection();
 		});
 	}
 
 	private _observeUsers() {
-		if (!this._userStore) return;
-		this.observe<Array<UserDetails>>(this._userStore.getAll(), (users) => {
+		if (!this._usersContext) return;
+		this.observe<Array<UserDetails>>(this._usersContext.users, (users) => {
 			this._users = users;
-			this._createTableItems(this._users);
+			// this._createTableItems(this._users);
 		});
 	}
 
@@ -109,10 +105,10 @@ export class UmbEditorViewUsersTableElement extends UmbContextConsumerMixin(UmbO
 
 	private _observeUserGroups() {
 		if (!this._userGroupStore) return;
-		this.observe<Array<UserGroupDetails>>(
-			this._userGroupStore.getAll(),
-			(userGroups) => (this._userGroups = userGroups)
-		);
+		this.observe<Array<UserGroupDetails>>(this._userGroupStore.getAll(), (userGroups) => {
+			this._userGroups = userGroups;
+			this._createTableItems(this._users);
+		});
 	}
 
 	private _getUserGroupNames(keys: Array<string>) {

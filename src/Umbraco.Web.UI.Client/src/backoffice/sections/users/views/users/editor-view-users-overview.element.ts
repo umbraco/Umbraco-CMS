@@ -87,9 +87,6 @@ export class UmbEditorViewUsersOverviewElement extends UmbContextConsumerMixin(U
 	private isCloud = false; //NOTE: Used to show either invite or create user buttons and views.
 
 	@state()
-	private _search = '';
-
-	@state()
 	private _routes: IRoute[] = [
 		{
 			path: 'grid',
@@ -108,7 +105,7 @@ export class UmbEditorViewUsersOverviewElement extends UmbContextConsumerMixin(U
 	private _usersContext?: UmbSectionViewUsersElement;
 	private _modalService?: UmbModalService;
 	private _inputTimer: any;
-	private _inputTimerAmount = 1000;
+	private _inputTimerAmount = 750;
 
 	connectedCallback(): void {
 		super.connectedCallback();
@@ -116,7 +113,6 @@ export class UmbEditorViewUsersOverviewElement extends UmbContextConsumerMixin(U
 		this.consumeContext('umbUsersContext', (usersContext: UmbSectionViewUsersElement) => {
 			this._usersContext = usersContext;
 			this._observeSelection();
-			this._observeSearch();
 		});
 
 		this.consumeContext('umbModalService', (modalService: UmbModalService) => {
@@ -127,11 +123,6 @@ export class UmbEditorViewUsersOverviewElement extends UmbContextConsumerMixin(U
 	private _observeSelection() {
 		if (!this._usersContext) return;
 		this.observe<Array<string>>(this._usersContext.selection, (selection) => (this._selection = selection));
-	}
-
-	private _observeSearch() {
-		if (!this._usersContext) return;
-		this.observe<string>(this._usersContext.search, (search) => (this._search = search));
 	}
 
 	private _toggleViewType() {
