@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
     /// </summary>
     [DataEditor(
         Constants.PropertyEditors.Aliases.Grid,
-        "Grid layout",
+        "Grid layout (legacy)",
         "grid",
         HideLabel = true,
         ValueType = ValueTypes.Json,

@@ -1,3 +1,6 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
@@ -30,7 +33,7 @@ Single block mode requires a maximum of one available block, and an amount set t
     public string? MaxPropertyWidth { get; set; }
 
     [DataContract]
-    public class BlockConfiguration
+    public class BlockConfiguration : IBlockConfiguration
     {
         [DataMember(Name = "backgroundColor")]
         public string? BackgroundColor { get; set; }

@@ -1,14 +1,25 @@
 angular.module("umbraco")
 .controller("Umbraco.Editors.BlockPickerController",
-    function ($scope, localizationService) {
+    function ($scope, localizationService, $filter) {
 
+        var unsubscribe = [];
         var vm = this;
 
         vm.navigation = [];
 
-        vm.filter = {
-            searchTerm: ''
-        };
+        vm.filterSearchTerm = '';
+        vm.filteredItems = [];
+
+        // Ensure groupKey value, as we need it to be present for the filtering logic.
+        $scope.model.availableItems.forEach(item => {
+            item.blockConfigModel.groupKey = item.blockConfigModel.groupKey || null;
+        });
+
+        unsubscribe.push($scope.$watch('vm.filterSearchTerm', updateFiltering));
+
+        function updateFiltering() {
+            vm.filteredItems = $filter('umbCmsBlockCard')($scope.model.availableItems, vm.filterSearchTerm);
+        }
 
         localizationService.localizeMany(["blockEditor_tabCreateEmpty", "blockEditor_tabClipboard"]).then(
             function (data) {
@@ -74,6 +85,10 @@ angular.module("umbraco")
                 $scope.model.close($scope.model);
             }
         };
+
+        $scope.$on('$destroy', function () {
+            unsubscribe.forEach(u => { u(); });
+        });
 
     }
 );

@@ -11,9 +11,6 @@ import {
 test.describe('Content tests', () => {
 
   test.beforeEach(async ({page, umbracoApi}) => {
-    // TODO: REMOVE THIS WHEN SQLITE IS FIXED
-    // Wait so we don't bombard the API
-    await page.waitForTimeout(1000);
     await umbracoApi.login();
   });
   
@@ -290,11 +287,14 @@ test.describe('Content tests', () => {
     await umbracoUi.setEditorHeaderName(newNodeName);
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.saveAndPublish));
     await umbracoUi.isSuccessNotificationVisible();
+    await page.locator('span:has-text("×")').click();
 
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.rollback));
     // Not a very nice selector, but there's sadly no alternative :(
     await page.locator('.-selectable.cursor-pointer').first().click();
-    // Sadly can't use the button by label key here since there's another one in the DOM 
+    // Sadly can't use the button by label key here since there's another one in the DOM
+    const helpText = await page.locator('[key="rollback_diffHelp"]');
+    await expect(helpText).toBeVisible();
     await page.locator('[action="vm.rollback()"]').click();
 
     await umbracoUi.refreshContentTree();
@@ -663,10 +663,10 @@ test.describe('Content tests', () => {
       .build();
 
     const alias = AliasHelper.toAlias(name);
-    
+
     // Save grid and get the ID
     const dataType = await umbracoApi.dataTypes.save(grid)
-    
+
     // Create a document type using the data type
     const docType = new DocumentTypeBuilder()
       .withName(name)
@@ -690,7 +690,7 @@ test.describe('Content tests', () => {
       .build();
 
     await umbracoApi.content.save(contentNode);
-    
+
     // Ugly wait but we have to wait for cache to rebuild
     await page.waitForTimeout(1000);
 
@@ -719,7 +719,7 @@ test.describe('Content tests', () => {
     // Save and publish
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.saveAndPublish));
     await umbracoUi.isSuccessNotificationVisible();
-    
+
     const expected = `
     <div class="umb-grid">
       <div class="grid-section">
