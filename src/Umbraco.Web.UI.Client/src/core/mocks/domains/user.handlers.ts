@@ -1,7 +1,6 @@
 import { rest } from 'msw';
 
 import { umbracoPath } from '@umbraco-cms/utils';
-import type { AllowedSectionsResponse, UserResponse } from '@umbraco-cms/models';
 
 let isAuthenticated = false;
 
@@ -38,7 +37,7 @@ export const handlers = [
 		// If authenticated, return a mocked user details
 		return res(
 			ctx.status(200),
-			ctx.json<UserResponse>({
+			ctx.json({
 				username: 'admin',
 				role: 'administrator',
 			})
@@ -48,7 +47,7 @@ export const handlers = [
 	rest.get(umbracoPath('/user/sections'), (_req, res, ctx) => {
 		return res(
 			ctx.status(200),
-			ctx.json<AllowedSectionsResponse>({
+			ctx.json({
 				sections: ['Umb.Section.Content', 'Umb.Section.Media', 'Umb.Section.Settings', 'My.Section.Custom'],
 			})
 		);

@@ -15,5 +15,5 @@ export const AAAOverview: Story<UmbRefPropertyEditorUIElement> = () =>
 	html` <umb-ref-property-editor-ui
 		name="Custom Property Editor UI"
 		alias="Umb.PropertyEditorUI.CustomUI"
-		property-editor-alias="Umbraco.Custom"></umb-ref-property-editor-ui>`;
+		property-editor-model-alias="Umbraco.Custom"></umb-ref-property-editor-ui>`;
 AAAOverview.storyName = 'Overview';

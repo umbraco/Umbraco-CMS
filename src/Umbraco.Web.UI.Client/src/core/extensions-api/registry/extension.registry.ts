@@ -6,6 +6,7 @@ import type {
 	ManifestEntrypoint,
 	ManifestPropertyAction,
 	ManifestPropertyEditorUI,
+	ManifestPropertyEditorModel,
 	ManifestSection,
 	ManifestSectionView,
 	ManifestTree,
@@ -16,18 +17,6 @@ import type {
 	ManifestPackageView,
 } from '../../models';
 import { createExtensionElement } from '../create-extension-element.function';
-
-export type UmbExtensionManifestJSModel = {
-	elementName?: string;
-};
-
-// TODO: add to schema
-export type ManifestBase = {
-	alias: string;
-	name: string;
-	js?: string | (() => Promise<unknown>);
-	elementName?: string;
-};
 
 export class UmbExtensionRegistry {
 	private _extensions = new BehaviorSubject<Array<ManifestTypes>>([]);
@@ -73,6 +62,7 @@ export class UmbExtensionRegistry {
 	extensionsOfType(type: 'editorView'): Observable<Array<ManifestEditorView>>;
 	extensionsOfType(type: 'editorAction'): Observable<Array<ManifestEditorAction>>;
 	extensionsOfType(type: 'propertyEditorUI'): Observable<Array<ManifestPropertyEditorUI>>;
+	extensionsOfType(type: 'propertyEditorModel'): Observable<Array<ManifestPropertyEditorModel>>;
 	extensionsOfType(type: 'propertyAction'): Observable<Array<ManifestPropertyAction>>;
 	extensionsOfType(type: 'packageView'): Observable<Array<ManifestPackageView>>;
 	extensionsOfType(type: 'entrypoint'): Observable<Array<ManifestEntrypoint>>;
