@@ -223,6 +223,8 @@
                     Upload.base64DataUrl(file).then(function(url) {    
                         mediaEntry.$dataURL = url;
                     });
+                } else {
+                    mediaEntry.$extension = mediaHelper.getFileExtension(file.name);
                 }
 
                 return {
@@ -272,8 +274,9 @@
                 return;
             }
 
-            _getMatchedMediaType(nextItem.file).then(mediaTypeAlias => {
-                nextItem.mediaEntry.mediaTypeAlias = mediaTypeAlias;
+            _getMatchedMediaType(nextItem.file).then(mediaType => {
+                nextItem.mediaEntry.mediaTypeAlias = mediaType.alias;
+                nextItem.mediaEntry.$icon = mediaType.icon;
                 _upload(nextItem);
             }, () => {
                 _rejectMediaEntry(nextItem.mediaEntry, { type: 'pattern', message: translations.disallowedFileType });
@@ -322,7 +325,7 @@
                     filter: mediaTypes.length > 8,
                     availableItems: mediaTypes,
                     submit: function (model) {
-                        resolve(model.selectedItem.alias);
+                        resolve(model.selectedItem);
                         overlayService.close();
                     },
                     close: function () {
