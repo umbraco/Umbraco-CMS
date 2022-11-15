@@ -210,7 +210,8 @@ public class MediaPicker3PropertyEditor : DataEditor
                 }
 
                 GuidUdi? startNodeGuid = mediaPicker3Configuration.StartNodeId as GuidUdi ?? null;
-                IMedia mediaFile = _temporaryImageService.Save(temporaryLocationString, startNodeGuid?.Guid);
+                JToken? mediaTypeAlias = dto.GetValue("mediaTypeAlias");
+                IMedia mediaFile = _temporaryImageService.Save(temporaryLocationString, startNodeGuid?.Guid, mediaTypeAlias?.Value<string>());
                 MediaWithCropsDto? mediaDto = _jsonSerializer.Deserialize<MediaWithCropsDto>(dto.ToString());
                 if (mediaDto is null)
                 {
