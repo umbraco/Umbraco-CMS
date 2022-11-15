@@ -37,6 +37,23 @@
 	
 	// This is used in the prebuilds - so dotnet build (nuget restore and node stuff) is done
 	"updateContentCommand": "dotnet build umbraco.sln",
+	"portsAttributes": {
+		"5000": {
+			"label": "SMTP4Dev",
+			"protocol": "http",
+			"onAutoForward": "notify"
+		},
+		"9000": {
+			"label": "Umbraco HTTP",
+			"protocol": "http",
+			"onAutoForward": "notify"
+		},
+		"44331": {
+			"label": "Umbraco HTTPS",
+			"protocol": "https",
+			"onAutoForward": "notify"
+		}
+	}
 
 	// [Optional] To reuse of your local HTTPS dev cert:
 	//
