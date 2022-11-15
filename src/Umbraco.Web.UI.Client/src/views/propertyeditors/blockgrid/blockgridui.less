@@ -672,6 +672,7 @@ ng-form.ng-invalid > .umb-block-grid__block:not(.--active) > .umb-block-grid__bl
 
 .umb-block-grid__area-actions {
     grid-column: span var(--umb-block-grid--area-column-span);
+    flex-grow: 1;
     opacity: calc(var(--umb-block-grid--hint-area-ui, 0) * .5 + var(--umb-block-grid--show-area-ui, 0));
     transition: opacity 120ms;
 
@@ -779,6 +780,9 @@ ng-form.ng-invalid > .umb-block-grid__block:not(.--active) > .umb-block-grid__bl
 
 .umb-block-grid__area {
     position: relative;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
     --umb-block-grid--show-area-ui: 0;
 }
 .umb-block-grid__area:focus,
@@ -822,6 +826,9 @@ ng-form.ng-invalid > .umb-block-grid__block:not(.--active) > .umb-block-grid__bl
         0%   { border-color: rgba(@blueDark, 1); }
         100% { border-color: rgba(@blueDark, 0.66); }
     }
+}
+.umb-block-grid__area > ng-form {
+    display: contents;
 }
 
 .umb-block-grid__scalebox-backdrop {
