@@ -295,7 +295,7 @@
                 };
                 
                 if (matchedMediaTypes.length === 1) {
-                    resolve(matchedMediaTypes[0].alias);
+                    resolve(matchedMediaTypes[0]);
                     return;
                 };
 
@@ -303,7 +303,7 @@
                 // If we don't remove it from the list we will always show the picker.
                 const matchedMediaTypesNoFile = matchedMediaTypes.filter(mediaType => mediaType.alias !== "File");
                 if (matchedMediaTypesNoFile.length === 1) {
-                    resolve(matchedMediaTypesNoFile[0].alias);
+                    resolve(matchedMediaTypesNoFile[0]);
                     return;
                 };
     
