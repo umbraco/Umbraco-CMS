@@ -2,7 +2,7 @@
 
 namespace Umbraco.Cms.Core.Services;
 
-public interface ITemporaryImageService
+public interface ITemporaryMediaService
 {
     public IMedia Save(string temporaryLocation, Guid? startNode, string? mediaTypeAlias);
 }

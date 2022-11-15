@@ -10,7 +10,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
-public class TemporaryImageService : ITemporaryImageService
+public class TemporaryMediaService : ITemporaryMediaService
 {
     private readonly IShortStringHelper _shortStringHelper;
     private readonly MediaFileManager _mediaFileManager;
@@ -18,17 +18,17 @@ public class TemporaryImageService : ITemporaryImageService
     private readonly MediaUrlGeneratorCollection _mediaUrlGenerators;
     private readonly IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
     private readonly IHostEnvironment _hostingEnvironment;
-    private readonly ILogger<TemporaryImageService> _logger;
+    private readonly ILogger<TemporaryMediaService> _logger;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
-    public TemporaryImageService(
+    public TemporaryMediaService(
         IShortStringHelper shortStringHelper,
         MediaFileManager mediaFileManager,
         IMediaService mediaService,
         MediaUrlGeneratorCollection mediaUrlGenerators,
         IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
         IHostEnvironment hostingEnvironment,
-        ILogger<TemporaryImageService> logger,
+        ILogger<TemporaryMediaService> logger,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
         _shortStringHelper = shortStringHelper;

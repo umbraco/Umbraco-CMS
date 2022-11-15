@@ -71,7 +71,7 @@ public class MediaPicker3PropertyEditor : DataEditor
     {
         private readonly IDataTypeService _dataTypeService;
         private readonly IJsonSerializer _jsonSerializer;
-        private readonly ITemporaryImageService _temporaryImageService;
+        private readonly ITemporaryMediaService _temporaryMediaService;
 
 
         public MediaPicker3PropertyValueEditor(
@@ -81,12 +81,12 @@ public class MediaPicker3PropertyEditor : DataEditor
             IIOHelper ioHelper,
             DataEditorAttribute attribute,
             IDataTypeService dataTypeService,
-            ITemporaryImageService temporaryImageService)
+            ITemporaryMediaService temporaryMediaService)
             : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
         {
             _jsonSerializer = jsonSerializer;
             _dataTypeService = dataTypeService;
-            _temporaryImageService = temporaryImageService;
+            _temporaryMediaService = temporaryMediaService;
         }
 
         /// <remarks>
@@ -211,7 +211,7 @@ public class MediaPicker3PropertyEditor : DataEditor
 
                 GuidUdi? startNodeGuid = mediaPicker3Configuration.StartNodeId as GuidUdi ?? null;
                 JToken? mediaTypeAlias = dto.GetValue("mediaTypeAlias");
-                IMedia mediaFile = _temporaryImageService.Save(temporaryLocationString, startNodeGuid?.Guid, mediaTypeAlias?.Value<string>());
+                IMedia mediaFile = _temporaryMediaService.Save(temporaryLocationString, startNodeGuid?.Guid, mediaTypeAlias?.Value<string>());
                 MediaWithCropsDto? mediaDto = _jsonSerializer.Deserialize<MediaWithCropsDto>(dto.ToString());
                 if (mediaDto is null)
                 {
