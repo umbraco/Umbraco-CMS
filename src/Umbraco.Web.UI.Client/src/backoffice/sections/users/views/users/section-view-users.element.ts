@@ -46,10 +46,20 @@ export class UmbSectionViewUsersElement extends UmbContextProviderMixin(LitEleme
 	private _selection: BehaviorSubject<Array<string>> = new BehaviorSubject(<Array<string>>[]);
 	public readonly selection: Observable<Array<string>> = this._selection.asObservable();
 
+	private _search: BehaviorSubject<string> = new BehaviorSubject('');
+	public readonly search: Observable<string> = this._search.asObservable();
+
 	constructor() {
 		super();
 
 		this.provideContext('umbUsersContext', this);
+	}
+
+	public setSearch(value: string) {
+		if (!value) value = '';
+
+		this._search.next(value);
+		this.requestUpdate('search');
 	}
 
 	public setSelection(value: Array<string>) {

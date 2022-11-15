@@ -87,6 +87,9 @@ export class UmbEditorViewUsersOverviewElement extends UmbContextConsumerMixin(U
 	private isCloud = false; //NOTE: Used to show either invite or create user buttons and views.
 
 	@state()
+	private _search = '';
+
+	@state()
 	private _routes: IRoute[] = [
 		{
 			path: 'grid',
@@ -104,6 +107,8 @@ export class UmbEditorViewUsersOverviewElement extends UmbContextConsumerMixin(U
 
 	private _usersContext?: UmbSectionViewUsersElement;
 	private _modalService?: UmbModalService;
+	private _inputTimer: any;
+	private _inputTimerAmount = 1000;
 
 	connectedCallback(): void {
 		super.connectedCallback();
@@ -111,6 +116,7 @@ export class UmbEditorViewUsersOverviewElement extends UmbContextConsumerMixin(U
 		this.consumeContext('umbUsersContext', (usersContext: UmbSectionViewUsersElement) => {
 			this._usersContext = usersContext;
 			this._observeSelection();
+			this._observeSearch();
 		});
 
 		this.consumeContext('umbModalService', (modalService: UmbModalService) => {
@@ -121,6 +127,11 @@ export class UmbEditorViewUsersOverviewElement extends UmbContextConsumerMixin(U
 	private _observeSelection() {
 		if (!this._usersContext) return;
 		this.observe<Array<string>>(this._usersContext.selection, (selection) => (this._selection = selection));
+	}
+
+	private _observeSearch() {
+		if (!this._usersContext) return;
+		this.observe<string>(this._usersContext.search, (search) => (this._search = search));
 	}
 
 	private _toggleViewType() {
@@ -146,6 +157,18 @@ export class UmbEditorViewUsersOverviewElement extends UmbContextConsumerMixin(U
 		}
 	}
 
+	private _updateSearch(event: InputEvent) {
+		const target = event.target as HTMLInputElement;
+		const search = target.value || '';
+		clearTimeout(this._inputTimer);
+		this._inputTimer = setTimeout(() => this._refreshUsers(search), this._inputTimerAmount);
+	}
+
+	private _refreshUsers(search: string) {
+		if (!this._usersContext) return;
+		this._usersContext.setSearch(search);
+	}
+
 	private _showInviteOrCreate() {
 		let modal = undefined;
 		if (this.isCloud) {
@@ -164,7 +187,7 @@ export class UmbEditorViewUsersOverviewElement extends UmbContextConsumerMixin(U
 						@click=${this._showInviteOrCreate}
 						label=${this.isCloud ? 'Invite' : 'Create' + ' user'}
 						look="outline"></uui-button>
-					<uui-input label="search" id="input-search"></uui-input>
+					<uui-input @input=${this._updateSearch} label="search" id="input-search"></uui-input>
 					<div>
 						<uui-popover margin="8">
 							<uui-button @click=${this._handleTogglePopover} slot="trigger" label="status">

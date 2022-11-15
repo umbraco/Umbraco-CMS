@@ -66,6 +66,24 @@ export class UmbUserStore extends UmbDataStoreBase<UserDetails> {
 		);
 	}
 
+	getByName(name: string): Observable<Array<UserDetails>> {
+		name = name.trim();
+		name = name.toLocaleLowerCase();
+
+		const params = `name=${name}`;
+		fetch(`/umbraco/backoffice/users/getByName?${params}`)
+			.then((res) => res.json())
+			.then((data) => {
+				this.update(data);
+			});
+
+		return this.items.pipe(
+			map((items: Array<UserDetails>) =>
+				items.filter((node: UserDetails) => node.name.toLocaleLowerCase().includes(name))
+			)
+		);
+	}
+
 	async enableUsers(userKeys: Array<string>): Promise<void> {
 		// TODO: use Fetcher API.
 		try {
