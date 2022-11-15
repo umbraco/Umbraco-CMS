@@ -11,7 +11,9 @@
         ngf-allow-dir="{{ vm.allowDir }}"
         ng-disabled="vm.readonly">
 
-        <div class="drop-overlay">Drop files</div>
+        <div class="drop-overlay">
+            <localize key="media_dragAndDropYourFilesIntoTheArea"></localize>
+        </div>
 
         <div class="umb-media-card-grid" ng-class="{'--singleMode':(vm.validationLimit.max === 1 && vm.model.value.length <= 1)}">
 
