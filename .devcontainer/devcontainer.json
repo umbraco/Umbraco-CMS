@@ -51,7 +51,7 @@
 		"44331": {
 			"label": "Umbraco HTTPS",
 			"protocol": "https",
-			"onAutoForward": "openBrowser"
+			"onAutoForward": "notify"
 		}
 	}
 
