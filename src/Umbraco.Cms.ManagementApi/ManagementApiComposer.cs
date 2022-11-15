@@ -1,4 +1,3 @@
-using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
@@ -25,7 +24,7 @@ using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Cms.ManagementApi;
 
-public partial class ManagementApiComposer : IComposer
+public class ManagementApiComposer : IComposer
 {
     private const string ApiTitle = "Umbraco Backoffice API";
     private const string ApiDefaultDocumentName = "v1";
@@ -72,14 +71,14 @@ public partial class ManagementApiComposer : IComposer
                 var httpMethod = e.HttpMethod?.ToLower().ToFirstUpper() ?? "Get";
 
                 // Remove the prefixed base path with version, e.g. /umbraco/management/api/v1/tracked-reference/{id} => tracked-reference/{id}
-                var unprefixedRelativePath = VersionPrefixRegex().Replace(relativePath, string.Empty);
+                var unprefixedRelativePath = OperationIdRegexes.VersionPrefixRegex().Replace(relativePath, string.Empty);
 
                 // Remove template placeholders, e.g. tracked-reference/{id} => tracked-reference/Id
-                var formattedOperationId = TemplatePlaceholdersRegex().Replace(unprefixedRelativePath, m => $"By{m.Groups[1].Value.ToFirstUpper()}");
+                var formattedOperationId = OperationIdRegexes.TemplatePlaceholdersRegex().Replace(unprefixedRelativePath, m => $"By{m.Groups[1].Value.ToFirstUpper()}");
 
                 // Remove dashes (-) and slashes (/) and convert the following letter to uppercase with
                 // the word "By" in front, e.g. tracked-reference/Id => TrackedReferenceById
-                formattedOperationId = ToCamelCaseRegex().Replace(formattedOperationId, m => m.Groups[1].Value.ToUpper());
+                formattedOperationId = OperationIdRegexes.ToCamelCaseRegex().Replace(formattedOperationId, m => m.Groups[1].Value.ToUpper());
 
                 // Return the operation ID with the formatted http method verb in front, e.g. GetTrackedReferenceById
                 return $"{httpMethod}{formattedOperationId.ToFirstUpper()}";
@@ -241,13 +240,4 @@ public partial class ManagementApiComposer : IComposer
             ));
         });
     }
-
-    [GeneratedRegex(".*?\\/v[1-9]+/")]
-    private static partial Regex VersionPrefixRegex();
-
-    [GeneratedRegex("\\{(.*?)\\:?\\}")]
-    private static partial Regex TemplatePlaceholdersRegex();
-
-    [GeneratedRegex("[\\/\\-](\\w{1})")]
-    private static partial Regex ToCamelCaseRegex();
 }
