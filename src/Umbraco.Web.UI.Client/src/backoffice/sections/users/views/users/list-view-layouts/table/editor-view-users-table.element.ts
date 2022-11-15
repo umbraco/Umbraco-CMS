@@ -91,7 +91,7 @@ export class UmbEditorViewUsersTableElement extends UmbContextConsumerMixin(UmbO
 		if (!this._usersContext) return;
 		this.observe<Array<UserDetails>>(this._usersContext.users, (users) => {
 			this._users = users;
-			// this._createTableItems(this._users);
+			this._createTableItems(this._users);
 		});
 	}
 
