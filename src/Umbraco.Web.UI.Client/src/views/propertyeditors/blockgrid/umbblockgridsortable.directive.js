@@ -514,7 +514,7 @@
                     }
                 }
 
-                let newIndex = vm.items.length-1;
+                let newIndex = vm.items.length;
                 if(nextEl) {
                     // We had a reference element, we want to get the index of it.
                     // This is problem if a item is being moved forward?
