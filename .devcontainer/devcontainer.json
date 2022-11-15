@@ -36,7 +36,7 @@
 
 	
 	// This is used in the prebuilds - so dotnet build (nuget restore and node stuff) is done
-	"updateContentCommand": "dotnet build umbraco.sln",
+	"updateContentCommand": "dotnet build umbraco.sln && dotnet dev-certs https --trust",
 	"portsAttributes": {
 		"5000": {
 			"label": "SMTP4Dev",
