@@ -29,14 +29,15 @@
 
 	// Add the IDs of extensions you want installed when the container is created.
 	"extensions": [
-		"ms-dotnettools.csharp"
+		"ms-dotnettools.csharp",
+		"alexcvzz.vscode-sqlite"
 	],
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locallAdd	"forwardPorts": [9000, 5000, 25],
 
 	
 	// This is used in the prebuilds - so dotnet build (nuget restore and node stuff) is done
-	"updateContentCommand": "dotnet build umbraco.sln && dotnet dev-certs https --trust",
+	"updateContentCommand": "dotnet build umbraco.sln && dotnet dev-certs https --trust  && sudo apt-get update && sudo apt install sqlite3",
 	"portsAttributes": {
 		"5000": {
 			"label": "SMTP4Dev",
