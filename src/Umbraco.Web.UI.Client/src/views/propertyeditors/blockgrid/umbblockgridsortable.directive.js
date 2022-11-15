@@ -90,10 +90,15 @@
                 containerEl['umbBlockGridSorter:vm'] = () => {
                     return vm;
                 };
+                containerEl.addEventListener('dragover', preventDragOver);
 
                 observer.observe(containerEl, {childList: true, subtree: false});
             }
             init();
+
+            function preventDragOver(e) {
+                e.preventDefault()
+            }
 
             function setupItem(element) {
                 if(vm.elements.indexOf(element) !== -1) {
@@ -157,9 +162,10 @@
             let fromContainerVM = vm;
 
             let rqaId = null;
-            let currentElement = null;
             let currentItem = null;
-            let currentRect = null;
+            let currentElement = null;
+            let currentDragElement = null;
+            let currentDragRect = null;
             let dragX = 0;
             let dragY = 0;
 
@@ -174,10 +180,10 @@
 
                 console.log("handleDragStart", element.dataset.elementUdi);
 
-                //const dragElement = element.querySelector(scope.config.draggableSelector);
                 //const dragElementRect = dragElement.getBoundingClientRect();
 
                 currentElement = element;
+                currentDragElement = element.querySelector(scope.config.draggableSelector);
                 currentItem = vm.items.find(entry => scope.config.compareElementToModel(element, entry));
 
                 if (scope.config.dataTransferResolver) {
@@ -232,9 +238,11 @@
                 rqaId = null
                 currentItem = null;
                 currentElement = null;
-                currentRect = null;
+                currentDragElement = null;
+                currentDragRect = null;
                 dragX = 0;
                 dragY = 0;
+                
             }
 
             function handleDragMove(event) {
@@ -254,8 +262,8 @@
                     dragX = clientX;
                     dragY = clientY;
                     
-                    currentRect = currentElement.getBoundingClientRect();
-                    const insideCurrentRect = isWithinRect(dragX, dragY, currentRect, 0);
+                    currentDragRect = currentDragElement.getBoundingClientRect();
+                    const insideCurrentRect = isWithinRect(dragX, dragY, currentDragRect, 0);
                     if (!insideCurrentRect) {
                         if(rqaId === null) {
                             rqaId = requestAnimationFrame(moveCurrentElement);
@@ -279,8 +287,8 @@
                 }
                 */
                 
-                currentRect = currentElement.getBoundingClientRect();
-                const insideCurrentRect = isWithinRect(dragX, dragY, currentRect);
+                currentDragRect = currentDragElement.getBoundingClientRect();
+                const insideCurrentRect = isWithinRect(dragX, dragY, currentDragRect);
                 if (insideCurrentRect) {
                     return;
                 }
@@ -315,20 +323,28 @@
                     const elRect = el.getBoundingClientRect();
                     // gather elements on the same row.
                     if(dragY >= elRect.top && dragY <= elRect.bottom && el !== currentElement) {
-                        elementsInSameRow.push({el: el, rect:elRect});
+                        const dragElement = el.querySelector(scope.config.draggableSelector);
+                        const dragElementRect = dragElement.getBoundingClientRect();
+                        elementsInSameRow.push({el:el, elRect:elRect, dragRect:dragElementRect});
                     }
                 }
 
                 let lastDistance = 99999;
                 let foundEl = null;
+                let foundElRect = null;
+                let foundElDragRect = null;
                 let placeAfter = false;
                 elementsInSameRow.forEach( sameRow => {
-                    const centerX = (sameRow.rect.left + (sameRow.rect.width*.5));
+                    const centerX = (sameRow.dragRect.left + (sameRow.dragRect.width*.5));
                     let distance = Math.abs(dragX - centerX);
                     if(distance < lastDistance) {
                         foundEl = sameRow.el;
+                        foundElRect = sameRow.elRect;
+                        foundElDragRect = sameRow.dragRect;
                         lastDistance = Math.abs(distance);
                         placeAfter = dragX > centerX;
+
+                        console.log(foundEl, centerX, placeAfter)
                     }
                 });
 
@@ -346,11 +362,10 @@
                     //let newIndex = containerElements.indexOf(foundRelatedEl);
                     //let foundItem = vm.items.find(entry => scope.config.compareElementToModel(foundEl, entry));
 
-                    const foundElRect = foundEl.getBoundingClientRect();
 
                     // Ghost is already on same line and we are not hovering the related element?
-                    const currentRectCenterY = currentRect.top + (currentRect.height*.5);
-                    const isInsideFound = isWithinRect(dragX, dragY, foundElRect, 0);
+                    const currentRectCenterY = currentDragRect.top + (currentDragRect.height*.5);
+                    const isInsideFound = isWithinRect(dragX, dragY, foundElDragRect, 0);
                     
 
                     /*
@@ -376,9 +391,10 @@
                     }
                     */
                     
-                    if (currentRectCenterY > foundElRect.top && currentRectCenterY < foundElRect.bottom && !isInsideFound) {
+                    if (currentRectCenterY > foundElDragRect.top && currentRectCenterY < foundElDragRect.bottom && !isInsideFound) {
                         // Note: during conversion i'm not sure why I have written this line..
                         // TODO: check what this has of impact.
+                        console.error("This case, why?")
                         return;
                     }
 
@@ -394,13 +410,14 @@
                     
                     // TODO: move calculations out so they can be persisted a bit longer?
                     const approvedContainerComputedStyles = getComputedStyle(currentContainerElement);
+                    const gridColumnGap = Number(approvedContainerComputedStyles.columnGap.split("px")[0]) || 0;
                     const gridColumnNumber = parseInt(approvedContainerComputedStyles.getPropertyValue("--umb-block-grid--grid-columns"), 10);
 
-                    const relatedColumns = parseInt(foundEl.dataset.colSpan, 10);
-                    const ghostColumns = parseInt(currentElement.dataset.colSpan, 10);
+                    const foundElColumns = parseInt(foundEl.dataset.colSpan, 10);
+                    const currentElementColumns = parseInt(currentElement.dataset.colSpan, 10);
 
                     // Get grid template:
-                    const approvedContainerGridColumns = approvedContainerComputedStyles.gridTemplateColumns.trim().split("px").map(x => Number(x)).filter(n => n > 0);
+                    const approvedContainerGridColumns = approvedContainerComputedStyles.gridTemplateColumns.trim().split("px").map(x => Number(x)).filter(n => n > 0).map((n, i, list) => list.length === i ? n : n + gridColumnGap);
 
                     // ensure all columns are there.
                     // This will also ensure handling non-css-grid mode,
@@ -417,15 +434,15 @@
                     }
 
 
-                    const relatedStartX = foundElRect.left - currentContainerRect.left;
+                    const relatedStartX = foundElDragRect.left - currentContainerRect.left;
                     const relatedStartCol = Math.round(getInterpolatedIndexOfPositionInWeightMap(relatedStartX, approvedContainerGridColumns));
 
-                    if(relatedStartCol + relatedColumns + ghostColumns > gridColumnNumber) {
+                    if(relatedStartCol + foundElColumns + currentElementColumns > gridColumnNumber) {
                         verticalDirection = true;
                     }
                     
                     if (verticalDirection) {
-                        placeAfter = (dragY > foundElRect.top + (foundElRect.height*.5));
+                        placeAfter = (dragY > foundElDragRect.top + (foundElDragRect.height*.5));
                     }
 
                     const foundElIndex = orderedContainerElements.indexOf(foundEl);
@@ -533,8 +550,14 @@
 
             scope.$on('$destroy', () => {
                 console.log("On Destroy sortable")
+
+                containerEl['umbBlockGridSorter:vm'] = null
+                containerEl.removeEventListener('dragover', preventDragOver);
+
                 // Destroy!
                 // Considering story all elements, and run through to clean up.
+
+                containerEl = null;
             });
         }
 
