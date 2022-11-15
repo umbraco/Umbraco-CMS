@@ -54,7 +54,7 @@
         function link(scope, element) {
 
 
-            const observer = new MutationObserver(function(mutations) {
+            let observer = new MutationObserver(function(mutations) {
                 mutations.forEach(function(mutation) {
                     mutation.addedNodes.forEach(function(addedNode) {
                         if (addedNode.matches && addedNode.matches(scope.config.itemSelector)) {
@@ -70,14 +70,14 @@
             });
 
 
-            const vm = {};
+            let vm = {};
 
             // TODO: Actually not used for anything at this point of time when im writting this:
             vm.elements = [];
             vm.items = scope.config.items;
 
 
-            const containerEl = element[0].closest(scope.config.containerSelector);
+            let containerEl = element[0].closest(scope.config.containerSelector);
             if (!containerEl) {
                 console.error("Could not initialize umb block grid sorter.", element[0])
                 return;
@@ -159,7 +159,6 @@
 
             let currentContainerElement = containerEl;
             let currentContainerVM = vm;
-            let fromContainerVM = vm;
 
             let rqaId = null;
             let currentItem = null;
@@ -178,9 +177,7 @@
                 element.addEventListener('drag', handleDragMove);
                 element.addEventListener('dragend', handleDragEnd);
 
-                console.log("handleDragStart", element.dataset.elementUdi);
-
-                //const dragElementRect = dragElement.getBoundingClientRect();
+                //console.log("handleDragStart", element.dataset.elementUdi);
 
                 currentElement = element;
                 currentDragElement = element.querySelector(scope.config.draggableSelector);
@@ -203,10 +200,6 @@
                 requestAnimationFrame(() => {
                     element.classList.add(scope.config.placeholderClass);
                 });
-                
-
-                //draggableRect = dragElement.getBoundingClientRect();
-
 
             }
             
@@ -220,8 +213,7 @@
 
                 element.classList.remove(scope.config.placeholderClass);
 
-                console.log("handleDragEnd", currentContainerVM !== fromContainerVM)
-                currentContainerVM.sync(currentElement, fromContainerVM);
+                currentContainerVM.sync(currentElement, vm);
 
                 if (scope.config.onEnd) {
                     scope.config.onEnd(currentItem);
@@ -233,7 +225,6 @@
 
                 currentContainerElement = containerEl;
                 currentContainerVM = vm;
-                fromContainerVM = vm;
 
                 rqaId = null
                 currentItem = null;
@@ -366,33 +357,33 @@
                     const isInsideFound = isWithinRect(dragX, dragY, foundElDragRect, 0);
                     
 
-                    /*
-                    TODO:
-                    if (isInsideFound && foundRelatedEl.classList.contains('--has-areas')) {
+                    // TODO: find another more generic way to do this.
+                    if (isInsideFound && foundEl.classList.contains('--has-areas')) {
                         // If mouse is on top of an area, then make that the new approvedContainer?
-                        const blockView = foundRelatedEl.querySelector('.umb-block-grid__block--view');
+                        const blockView = foundEl.querySelector('.umb-block-grid__block--view');// TODO: I guess we could skip this line.
                         const subLayouts = blockView.querySelectorAll('.umb-block-grid__layout-container');
                         for (const subLayout of subLayouts) {
                             const subLayoutRect = subLayout.getBoundingClientRect();
-                            const hasItems = subLayout.querySelector('.umb-block-grid__layout-item:not(.umb-block-grid__layout-item-placeholder)');
+                            const hasItems = subLayout.querySelector('.umb-block-grid__layout-item:not(.'+scope.config.placeholderClass+')');
                             // gather elements on the same row.
                             if(!hasItems && isWithinRect(dragX, dragY, subLayoutRect, 20) || hasItems && isWithinRect(dragX, dragY, subLayoutRect, -10)) {
                                 
-                                var subVm = subLayout['Sortable:controller']();
-                                if(subVm.sortGroupIdentifier === vm.sortGroupIdentifier) {
+                                var subVm = subLayout['umbBlockGridSorter:vm']();
+                                // TODO: check acceptance, maybe combine with indication or acceptable?.
+                                //if(subVm.sortGroupIdentifier === vm.sortGroupIdentifier) {
                                     currentContainerElement = subLayout;
-                                    _moveGhostElement();
+                                    currentContainerVM = subVm;
+                                    moveCurrentElement();
                                     return;
-                                }
+                                //}
                             }
                         }
                     }
-                    */
                     
                     if (currentRectCenterY > foundElDragRect.top && currentRectCenterY < foundElDragRect.bottom && !isInsideFound) {
                         // Note: during conversion i'm not sure why I have written this line..
                         // TODO: check what this has of impact.
-                        console.error("This case, why?")
+                        console.error("This case, why?, I havent seen this happen. So I think this should be removed.")
                         return;
                     }
 
@@ -532,8 +523,6 @@
 
                 vm.items.splice(newIndex, 0, movingItem);
 
-                console.log("synced", movingItem, " to ", vm.items)
-
                 if(fromVm !== vm) {
                     fromVm.notifySync(movingItem);
                 }
@@ -559,7 +548,10 @@
                 // Destroy!
                 // Considering story all elements, and run through to clean up.
 
+                observer.disconnect();
+                observer = null;
                 containerEl = null;
+                vm = null;
             });
         }
 
