@@ -190,20 +190,6 @@
         vm.mouseLeaveArea = function() {
             vm.isHoveringArea = false;
         }
-        vm.toggleForceLeft = function() {
-            vm.layoutEntry.forceLeft = !vm.layoutEntry.forceLeft;
-            if(vm.layoutEntry.forceLeft) {
-                vm.layoutEntry.forceRight = false;
-            }
-            vm.blockEditorApi.internal.setDirty();
-        }
-        vm.toggleForceRight = function() {
-            vm.layoutEntry.forceRight = !vm.layoutEntry.forceRight;
-            if(vm.layoutEntry.forceRight) {
-                vm.layoutEntry.forceLeft = false;
-            }
-            vm.blockEditorApi.internal.setDirty();
-        }
 
         // Block sizing functionality:
         let layoutContainer = null;
