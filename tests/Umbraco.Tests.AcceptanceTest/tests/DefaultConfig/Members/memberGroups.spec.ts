@@ -3,7 +3,7 @@ import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 test.describe('Packages', () => {
 
   test.beforeEach(async ({ page, umbracoApi }, testInfo) => {
-    await umbracoApi.report.report(testInfo)
+    await umbracoApi.report.report(testInfo);
     await umbracoApi.login();
   });
 

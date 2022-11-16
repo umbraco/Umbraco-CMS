@@ -5,7 +5,7 @@ import {ContentBuilder, DocumentTypeBuilder, DomainBuilder} from "@umbraco/json-
 test.describe('Vary by culture for TextBox', () => {
 
     test.beforeEach(async ({ page, umbracoApi }, testInfo) => {
-        await umbracoApi.report.report(testInfo)
+        await umbracoApi.report.report(testInfo);
         await umbracoApi.login();
     });
     

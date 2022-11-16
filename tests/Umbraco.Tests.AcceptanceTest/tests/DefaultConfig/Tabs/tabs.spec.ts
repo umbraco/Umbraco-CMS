@@ -8,7 +8,7 @@ const tabsDocTypeAlias = AliasHelper.toAlias(tabsDocTypeName);
 test.describe('Tabs', () => {
 
   test.beforeEach(async ({ page, umbracoApi }, testInfo) => {
-    await umbracoApi.report.report(testInfo)
+    await umbracoApi.report.report(testInfo);
     await umbracoApi.login();
   });
 

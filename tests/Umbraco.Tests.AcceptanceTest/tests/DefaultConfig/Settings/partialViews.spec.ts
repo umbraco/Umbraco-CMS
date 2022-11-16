@@ -5,7 +5,7 @@ import {PartialViewBuilder} from "@umbraco/json-models-builders";
 test.describe('Partial Views', () => {
 
   test.beforeEach(async ({ page, umbracoApi }, testInfo) => {
-    await umbracoApi.report.report(testInfo)
+    await umbracoApi.report.report(testInfo);
     await umbracoApi.login();
   });
 

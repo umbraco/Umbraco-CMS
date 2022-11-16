@@ -12,7 +12,7 @@ test.describe('Routing', () => {
   const rootDocTypeName = "Test document type";
 
   test.beforeEach(async ({ page, umbracoApi }, testInfo) => {
-    await umbracoApi.report.report(testInfo)
+    await umbracoApi.report.report(testInfo);
     await umbracoApi.login();
     await umbracoApi.content.deleteAllContent();
     await umbracoApi.documentTypes.ensureNameNotExists(rootDocTypeName);

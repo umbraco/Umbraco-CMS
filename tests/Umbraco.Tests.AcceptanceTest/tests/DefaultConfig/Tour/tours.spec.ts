@@ -4,7 +4,7 @@ import {test} from '@umbraco/playwright-testhelpers';
 test.describe('Tours', () => {
   const timeout = 60000;
   test.beforeEach(async ({ page, umbracoApi }, testInfo) => {
-    await umbracoApi.report.report(testInfo)
+    await umbracoApi.report.report(testInfo);
     await umbracoApi.login();
     await resetTourData(umbracoApi);
   });

@@ -4,7 +4,7 @@ import {DocumentTypeBuilder} from "@umbraco/json-models-builders";
 
 test.describe('Document types', () => {
   test.beforeEach(async ({ page, umbracoApi }, testInfo) => {
-    await umbracoApi.report.report(testInfo)
+    await umbracoApi.report.report(testInfo);
     await umbracoApi.login();
   });
 
