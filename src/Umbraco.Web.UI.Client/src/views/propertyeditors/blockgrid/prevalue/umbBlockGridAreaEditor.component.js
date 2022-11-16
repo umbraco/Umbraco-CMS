@@ -56,15 +56,32 @@
 
         function initializeSortable() {
 
-            const gridLayoutContainerEl = $element[0].querySelector('.umb-block-grid-area-editor__grid-wrapper');
+            function _sync(evt) {
 
-            const sortable = Sortable.create(gridLayoutContainerEl, {
+                const oldIndex = evt.oldIndex,
+                      newIndex = evt.newIndex;
+
+                vm.model.splice(newIndex, 0, vm.model.splice(oldIndex, 1)[0]);
+                
+            }
+
+            const gridContainerEl = $element[0].querySelector('.umb-block-grid-area-editor__grid-wrapper');
+
+            const sortable = Sortable.create(gridContainerEl, {
                 sort: true,  // sorting inside list
                 animation: 150,  // ms, animation speed moving items when sorting, `0` — without animation
                 easing: "cubic-bezier(1, 0, 0, 1)", // Easing for animation. Defaults to null. See https://easings.net/ for examples.
                 cancel: '',
                 draggable: ".umb-block-grid-area-editor__area",  // Specifies which items inside the element should be draggable
-                ghostClass: "umb-block-grid-area-editor__area-placeholder"
+                ghostClass: "umb-block-grid-area-editor__area-placeholder",
+                onAdd: function (evt) {
+                    _sync(evt);
+                    $scope.$evalAsync();
+                },
+                onUpdate: function (evt) {
+                    _sync(evt);
+                    $scope.$evalAsync();
+                }
             });
 
             // TODO: setDirty if sort has happend.
@@ -130,14 +147,23 @@
         vm.openAreaOverlay = function (area) {
 
             // TODO: use the right localization key:
-            localizationService.localize("blockEditor_blockConfigurationOverlayTitle", [area.alias]).then(function (localized) {
+            localizationService.localize("blockEditor_blockConfigurationOverlayTitle").then(function (localized) {
 
                 var clonedAreaData = Utilities.copy(area);
                 vm.openArea = area;
 
+                function updateTitle() {
+                    overlayModel.title = localizationService.tokenReplace(localized, [clonedAreaData.alias]);
+                }
+
+                const areaIndex = vm.model.indexOf(area);
+                const otherAreas = [...vm.model];
+                otherAreas.splice(areaIndex, 1);
+
                 var overlayModel = {
+                    otherAreaAliases: otherAreas.map(x => x.alias),
                     area: clonedAreaData,
-                    title: localized,
+                    updateTitle: updateTitle,
                     allBlockTypes: vm.allBlockTypes,
                     allBlockGroups: vm.allBlockGroups,
                     loadedElementTypes: vm.loadedElementTypes,
@@ -153,6 +179,8 @@
                         vm.openArea = null;
                     }
                 };
+
+                updateTitle();
 
                 // open property settings editor
                 editorService.open(overlayModel);

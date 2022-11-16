@@ -53,6 +53,23 @@
         padding-top:2px;
         padding-bottom:2px;
     }
+    
+    :host {
+        --inherited--column-gap: var(--umb-block-grid--column-gap, 10px);
+        --inherited--row-gap: var(--umb-block-grid--row-gap, 10px);
+        --inherited--areas-column-gap: var(--umb-block-grid--areas-column-gap, 10px);
+        --inherited--areas-row-gap: var(--umb-block-grid--areas-row-gap, 10px);
+    }
+
+    [part='area-container'] {
+        box-sizing: border-box;
+        padding: 10px;
+        --umb-block-grid--column-gap: var(--inherited--column-gap, 10px);
+        --umb-block-grid--row-gap: var(--inherited--row-gap, 10px);
+        --umb-block-grid--areas-column-gap: var(--inherited--areas-column-gap, 10px);
+        --umb-block-grid--areas-row-gap: var(--inherited--areas-row-gap, 10px);
+    }
+
 </style>
 
 <div class="blockelement-gridblock-editor" ng-class="{ '--active': block.active, '--error': parentForm.$invalid && valFormManager.isShowingValidation() }">
@@ -64,6 +81,6 @@
         <span>{{block.label}}</span>
     </button>
 
-    <slot name="area-container" part="area-container"></slot>
+    <umb-block-grid-render-area-slots ng-if="block.layout.areas.length > 0"></umb-block-grid-render-area-slots>
 
 </div>
