@@ -25,12 +25,6 @@ public class BlockGridLayoutItem : IBlockLayoutItem
     [JsonProperty("rowSpan", NullValueHandling = NullValueHandling.Ignore)]
     public int? RowSpan { get; set; }
 
-    [JsonProperty("forceLeft")]
-    public bool ForceLeft { get; set; }
-
-    [JsonProperty("forceRight")]
-    public bool ForceRight { get; set; }
-
     [JsonProperty("areas", NullValueHandling = NullValueHandling.Ignore)]
     public BlockGridLayoutAreaItem[] Areas { get; set; } = Array.Empty<BlockGridLayoutAreaItem>();
 }
