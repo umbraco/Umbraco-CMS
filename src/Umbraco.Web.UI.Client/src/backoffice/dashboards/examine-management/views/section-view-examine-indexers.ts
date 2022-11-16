@@ -180,6 +180,7 @@ export class UmbDashboardExamineIndexElement extends UmbContextConsumerMixin(Lit
 			<p>Lists the properties of the ${this._indexData.name}</p>
 			<uui-table class="info">
 				${Object.entries(this._indexData).map((entry) => {
+					//TODO: This should be providerProperties showing up here
 					return html`<uui-table-row>
 						<uui-table-cell style="width:0px; font-weight: bold;"> ${entry[0]} </uui-table-cell>
 						<uui-table-cell> ${JSON.stringify(entry[1]).replace(/,/g, ', ')} </uui-table-cell>

@@ -270,6 +270,7 @@ export class UmbDashboardExamineSearcherElement extends UmbContextConsumerMixin(
 							<span>${field.name}</span>
 							<uui-button
 								look="secondary"
+								label="Close field ${field.name}"
 								compact
 								@click="${() => {
 									this._exposedFields = this._exposedFields?.map((f) => {
