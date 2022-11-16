@@ -62,7 +62,7 @@ export class UmbDashboardExamineSearcherElement extends UmbContextConsumerMixin(
 				padding-bottom: 0;
 			}
 
-			uui-table-cell:not(:last-child) {
+			uui-table-cell {
 				min-width: 100px;
 			}
 
@@ -72,15 +72,40 @@ export class UmbDashboardExamineSearcherElement extends UmbContextConsumerMixin(
 			}
 
 			.field-adder {
-				width: 0;
 				line-height: 0;
 				cursor: pointer;
+				vertical-align: top;
+				background: transparent;
+				border: none;
 			}
 
-			.table-container {
+			.table-container uui-scroll-container {
 				padding-bottom: var(--uui-size-space-4);
 				max-width: calc(-336px + 100vw);
 				overflow-x: scroll;
+				flex: 1;
+			}
+
+			.table-container {
+				display: flex;
+				align-items: flex-start;
+			}
+			uui-tag {
+				margin-block: var(--uui-size-5, 15px);
+			}
+
+			.exposed-head-field uui-button {
+				align-items: center;
+				font-weight: normal;
+				font-size: 10px;
+				height: 10px;
+				width: 10px;
+				margin-top: -5px;
+			}
+
+			.exposed-head-field-container {
+				display: flex;
+				justify-content: space-between;
 			}
 		`,
 	];
@@ -188,58 +213,75 @@ export class UmbDashboardExamineSearcherElement extends UmbContextConsumerMixin(
 
 	private renderSearchResults() {
 		if (this._searchResults?.length) {
-			return html` <uui-scroll-container class="table-container">
-				<uui-table class="search">
-					<uui-table-head>
-						<uui-table-head-cell style="width:0">Score</uui-table-head-cell>
-						<uui-table-head-cell style="width:0">Id</uui-table-head-cell>
-						<uui-table-head-cell>Name</uui-table-head-cell>
-						<uui-table-head-cell>Fields</uui-table-head-cell>
-						${this.renderHeadCells()}
-						<uui-table-head-cell style="width:0;" class="field-adder" @click="${this._onFieldFilterClick}">
-							<uui-icon-registry-essential>
-								<uui-tag look="secondary">
-									<uui-icon name="add"></uui-icon>
-								</uui-tag>
-							</uui-icon-registry-essential>
-						</uui-table-head-cell>
-					</uui-table-head>
-					${this._searchResults?.map((rowData) => {
-						return html`<uui-table-row>
-							<uui-table-cell> ${rowData.score} </uui-table-cell>
-							<uui-table-cell> ${rowData.id} </uui-table-cell>
-							<uui-table-cell>
-								<uui-button look="secondary" label="Open editor for this document" @click="${this._onNameClick}">
-									Document
-								</uui-button>
-							</uui-table-cell>
-							<uui-table-cell>
-								<uui-button
-									class="bright"
-									look="secondary"
-									label="Open sidebar to see all fields"
-									@click="${() =>
-										this._modalService?.open('umb-modal-layout-fields-viewer', {
-											type: 'sidebar',
-											size: 'medium',
-											data: { ...rowData },
-										})}">
-									${rowData.fields ? Object.keys(rowData.fields).length : ''} fields
-								</uui-button>
-							</uui-table-cell>
-							${rowData.fields ? this.renderBodyCells(rowData.fields) : ''}
-							<uui-table-cell></uui-table-cell>
-						</uui-table-row>`;
-					})}
-				</uui-table>
-			</uui-scroll-container>`;
+			return html`<div class="table-container">
+				<uui-scroll-container>
+					<uui-table class="search">
+						<uui-table-head>
+							<uui-table-head-cell style="width:0">Score</uui-table-head-cell>
+							<uui-table-head-cell style="width:0">Id</uui-table-head-cell>
+							<uui-table-head-cell>Name</uui-table-head-cell>
+							<uui-table-head-cell>Fields</uui-table-head-cell>
+							${this.renderHeadCells()}
+						</uui-table-head>
+						${this._searchResults?.map((rowData) => {
+							return html`<uui-table-row>
+								<uui-table-cell> ${rowData.score} </uui-table-cell>
+								<uui-table-cell> ${rowData.id} </uui-table-cell>
+								<uui-table-cell>
+									<uui-button look="secondary" label="Open editor for this document" @click="${this._onNameClick}">
+										Document
+									</uui-button>
+								</uui-table-cell>
+								<uui-table-cell>
+									<uui-button
+										class="bright"
+										look="secondary"
+										label="Open sidebar to see all fields"
+										@click="${() =>
+											this._modalService?.open('umb-modal-layout-fields-viewer', {
+												type: 'sidebar',
+												size: 'medium',
+												data: { ...rowData },
+											})}">
+										${rowData.fields ? Object.keys(rowData.fields).length : ''} fields
+									</uui-button>
+								</uui-table-cell>
+								${rowData.fields ? this.renderBodyCells(rowData.fields) : ''}
+							</uui-table-row>`;
+						})}
+					</uui-table>
+				</uui-scroll-container>
+				<button class="field-adder" @click="${this._onFieldFilterClick}">
+					<uui-icon-registry-essential>
+						<uui-tag look="secondary">
+							<uui-icon name="add"></uui-icon>
+						</uui-tag>
+					</uui-icon-registry-essential>
+				</button>
+			</div>`;
 		}
 		return;
 	}
 
 	renderHeadCells() {
 		return html`${this._exposedFields?.map((field) => {
-			return field.exposed ? html`<uui-table-head-cell>${field.name}</uui-table-head-cell>` : html``;
+			return field.exposed
+				? html`<uui-table-head-cell class="exposed-head-field">
+						<div class="exposed-head-field-container">
+							<span>${field.name}</span>
+							<uui-button
+								look="secondary"
+								compact
+								@click="${() => {
+									this._exposedFields = this._exposedFields?.map((f) => {
+										return f.name == field.name ? { name: f.name, exposed: false } : f;
+									});
+								}}"
+								>x</uui-button
+							>
+						</div>
+				  </uui-table-head-cell>`
+				: html``;
 		})}`;
 	}
 
