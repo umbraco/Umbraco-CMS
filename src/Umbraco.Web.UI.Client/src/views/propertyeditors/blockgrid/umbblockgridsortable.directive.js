@@ -58,8 +58,7 @@
         // Take over native auto scroll
         /* TODOS:
             Take over native auto scroll
-            Indicate not allowed drop
-
+            
             replace on Area config
             remove sortableJS dependency.
         */
@@ -202,8 +201,8 @@
                 event.dataTransfer.setDragImage(currentDragElement, mouseOffsetX, mouseOffsetY);
 
                 // We must wait one frame before changing the look of the block.
-                // TODO: should this be cancelable?
-                requestAnimationFrame(() => {
+                rqaId = requestAnimationFrame(() => {// It should be okay to use the same refId, as the move does not or is okay not to happen on first frame/drag-move.
+                    rqaId = null;
                     element.classList.remove(config.ghostClass);
                     element.classList.add(config.placeholderClass);
                 });
@@ -278,12 +277,6 @@
                 if(!currentElement) {
                     return;
                 }
-                /*
-                if(!currentContainerElement) {
-                    console.error("Cancel cause had no currentContainerElement", currentContainerElement)
-                    return;
-                }
-                */
                 
                 const currentElementRect = currentElement.getBoundingClientRect();
                 const insideCurrentRect = isWithinRect(dragX, dragY, currentElementRect);
@@ -386,7 +379,6 @@
                             if(isWithinRect(dragX, dragY, subBoundaryRect, subOffsetEdge)) {
                                 
                                 var subVm = subLayoutEl['umbBlockGridSorter:vm']();
-                                // TODO: check acceptance, maybe combine with indication or acceptable?.
                                 if(subVm.identifier === vm.identifier) {
                                     currentContainerElement = subLayoutEl;
                                     currentContainerVM = subVm;
@@ -407,6 +399,12 @@
                     let verticalDirection = false;
                     
                     // TODO: move calculations out so they can be persisted a bit longer?
+                    // TODO: move this into a external method:
+                    /* If moved to a function, then these props:
+                    currentContainerElement
+                    foundEl
+                    currentElement
+                    */
 
                     /** We need some data about the grid to figure out if there is room to be placed next to the found element */
                     const approvedContainerComputedStyles = getComputedStyle(currentContainerElement);
@@ -433,8 +431,6 @@
                         }
                     }
 
-
-
                     let offsetPlacement = 0;
                     /* If placeholder is in this same line, we want to assume that it will offset the placement of the found element, 
                     which provides more potential space for the item to drop at.
@@ -452,6 +448,8 @@
                         // TODO: Check is there a case where placeAfter = false where we would like to check the previous element in this case?
                         verticalDirection = true;
                     }
+
+                    // END OF possible External function.
                     
                     if (verticalDirection) {
                         placeAfter = (dragY > foundElDragRect.top + (foundElDragRect.height*.5));
