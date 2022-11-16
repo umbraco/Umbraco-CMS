@@ -62,12 +62,8 @@ export class UmbDashboardExamineSearcherElement extends UmbContextConsumerMixin(
 				padding-bottom: 0;
 			}
 
-			uui-radio-group {
-				display: flex;
-			}
-
-			uui-radio {
-				padding-right: var(--uui-size-space-5);
+			uui-table-cell:not(:last-child) {
+				min-width: 100px;
 			}
 
 			button.bright {
@@ -251,7 +247,7 @@ export class UmbDashboardExamineSearcherElement extends UmbContextConsumerMixin(
 		return html`${this._exposedFields?.map((slot) => {
 			return cellData.map((field) => {
 				return slot.exposed && field.name == slot.name
-					? html`<uui-table-cell>${field.values}</uui-table-cell>`
+					? html`<uui-table-cell clip-text>${field.values}</uui-table-cell>`
 					: html``;
 			});
 		})}`;
