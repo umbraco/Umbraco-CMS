@@ -456,7 +456,6 @@
                     const foundElIndex = orderedContainerElements.indexOf(foundEl);
                     const placeAt = (placeAfter ? foundElIndex+1 : foundElIndex);
 
-                    console.log("move", placeAt, orderedContainerElements.length, placeAfter ? " AFTER" : " before")
                     move(orderedContainerElements, placeAt);
 
                     return;
