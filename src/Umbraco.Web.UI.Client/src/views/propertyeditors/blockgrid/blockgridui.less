@@ -188,7 +188,8 @@ ng-form.ng-invalid-val-server-match-content > .umb-block-grid__block:not(.--acti
     &.--active {
 
         /** Avoid displaying hover when dragging-mode */
-        --umb-block-grid--block-ui-opacity: calc(1 - var(--umb-block-grid--dragging-mode, 0));
+        --umb-block-grid--block-ui-opacity--condition: var(--umb-block-grid--dragging-mode) 0;
+        --umb-block-grid--block-ui-opacity: var(--umb-block-grid--block-ui-opacity--code, 0);
         
         > .umb-block-grid__block--context {
             opacity: var(--umb-block-grid--block-ui-opacity);
@@ -412,7 +413,9 @@ ng-form.ng-invalid > .umb-block-grid__block:not(.--active) > .umb-block-grid__bl
     z-index: 1; /** overwritten for the first one of an area. */
 
     /** Avoid showing inline-create in dragging-mode */
-    opacity: calc(1 - var(--umb-block-grid--dragging-mode, 0));
+
+    --umb-block-grid__block--inline-create-button-display--condition: var(--umb-block-grid--dragging-mode) none;
+    display: var(--umb-block-grid__block--inline-create-button-display--condition);
 }
 .umb-block-grid__block--inline-create-button.--above {
     left: 0;
@@ -456,7 +459,8 @@ ng-form.ng-invalid > .umb-block-grid__block:not(.--active) > .umb-block-grid__bl
     margin-top: -13px;
 
     /** Avoid showing last-inline-create in dragging-mode */
-    opacity: calc(1 - var(--umb-block-grid--dragging-mode, 0));
+    --umb-block-grid__block--last-inline-create-button-display--condition: var(--umb-block-grid--dragging-mode) none;
+    display: var(--umb-block-grid__block--last-inline-create-button-display--condition);
 }
 
 
@@ -647,7 +651,9 @@ ng-form.ng-invalid > .umb-block-grid__block:not(.--active) > .umb-block-grid__bl
     height: 100%;
     display: flex;
     flex-direction: column;
-    --umb-block-grid--show-area-ui: var(--umb-block-grid--dragging-mode, 0);
+
+    --umb-block-grid__area--show-area-ui--condition: var(--umb-block-grid--dragging-mode) 1;
+    --umb-block-grid--show-area-ui: var(--umb-block-grid__area--show-area-ui--condition, 0);
 }
 .umb-block-grid__area:focus,
 .umb-block-grid__area:focus-within,
@@ -671,10 +677,9 @@ ng-form.ng-invalid > .umb-block-grid__block:not(.--active) > .umb-block-grid__bl
     /* Moved slightly in to align with the inline-create button, which is moved slightly in to avoid collision with other create buttons. */
     top:2px;
     bottom: 2px;
-    /** Avoid displaying highlight when in dragging-mode */
-    opacity: calc(1 - var(--umb-block-grid--dragging-mode, 0));
     border-color: @blueDark;
     box-shadow: 0 0 0 1px rgba(255, 255, 255, .7), inset 0 0 0 1px rgba(255, 255, 255, .7);
+
 }
 .umb-block-grid__area:has( .umb-block-grid__layout-item-placeholder )::after {
     opacity: 1;

@@ -1348,14 +1348,14 @@
         vm.startDraggingMode = startDraggingMode;
         function startDraggingMode() {
 
-            document.documentElement.style.setProperty("--umb-block-grid--dragging-mode", 1);
+            document.documentElement.style.setProperty("--umb-block-grid--dragging-mode", ' ');
             firstLayoutContainer.style.minHeight = firstLayoutContainer.getBoundingClientRect().height + "px";
             
         }
         vm.exitDraggingMode = exitDraggingMode;
         function exitDraggingMode() {
 
-            document.documentElement.style.setProperty("--umb-block-grid--dragging-mode", 0);
+            document.documentElement.style.setProperty("--umb-block-grid--dragging-mode", 'initial');
             firstLayoutContainer.style.minHeight = "";
             
         }

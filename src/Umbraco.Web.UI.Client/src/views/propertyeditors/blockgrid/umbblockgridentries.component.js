@@ -214,11 +214,11 @@
             // Gather containedPropertyEditorProxies from this element.
             vm.containedPropertyEditorProxies = Array.from(data.element.querySelectorAll('slot[data-is-property-editor-proxy]')).map(x => x.getAttribute('name'));
 
-            document.documentElement.style.setProperty("--umb-block-grid--dragging-mode", 1);
+            vm.blockEditorApi.internal.startDraggingMode();
         }
 
         function onSortEnd() {
-            document.documentElement.style.setProperty("--umb-block-grid--dragging-mode", 0);
+            vm.blockEditorApi.internal.exitDraggingMode();
             vm.containedPropertyEditorProxies = [];
             $scope.$evalAsync();
         }
