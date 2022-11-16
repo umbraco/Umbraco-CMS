@@ -1,29 +1,23 @@
-import {
-	IndexModel,
-	SearchResultsModel,
-	SearcherModel,
-} from 'src/backoffice/dashboards/examine-management/examine-extension';
+import { Index, PagedIndex, SearchResult } from '@umbraco-cms/backend-api';
 
 export function getIndexByName(indexName: string) {
 	return Indexers.find((index) => {
-		return index.name.toLocaleLowerCase() == indexName.toLocaleLowerCase();
+		if (index.name) return index.name.toLocaleLowerCase() == indexName.toLocaleLowerCase();
+		else return undefined;
 	});
 }
 
-export function getIndexers(): IndexModel[] {
-	return Indexers;
-}
-
-export function getSearchResultsMockData(): SearchResultsModel[] {
+export function getSearchResultsMockData(): SearchResult[] {
 	return searchResultMockData;
 }
 
-const Indexers: IndexModel[] = [
+export const Indexers: Index[] = [
 	{
 		name: 'ExternalIndex',
 		canRebuild: true,
 		healthStatus: 'Healthy',
 		isHealthy: true,
+		/*
 		providerProperties: {
 			CommitCount: 0,
 			DefaultAnalyzer: 'StandardAnalyzer',
@@ -36,13 +30,14 @@ const Indexers: IndexModel[] = [
 			EnableDefaultEventHandler: true,
 			PublishedValuesOnly: true,
 			SupportProtectedContent: false,
-		},
+		},*/
 	},
 	{
 		name: 'InternalIndex',
 		canRebuild: true,
 		healthStatus: 'Healthy',
 		isHealthy: true,
+		/*
 		providerProperties: {
 			CommitCount: 0,
 			DefaultAnalyzer: 'CultureInvariantWhitespaceAnalyzer',
@@ -57,12 +52,14 @@ const Indexers: IndexModel[] = [
 			SupportProtectedContent: true,
 			IncludeFields: ['id', 'nodeName', 'updateDate', 'loginName', 'email', '__Key'],
 		},
+		*/
 	},
 	{
 		name: 'MemberIndex',
 		canRebuild: true,
 		healthStatus: 'Healthy',
 		isHealthy: true,
+		/*
 		providerProperties: {
 			CommitCount: 0,
 			DefaultAnalyzer: 'CultureInvariantWhitespaceAnalyzer',
@@ -77,13 +74,18 @@ const Indexers: IndexModel[] = [
 			PublishedValuesOnly: false,
 			SupportProtectedContent: false,
 		},
+		*/
 	},
 ];
 
-export const searchResultMockData: SearchResultsModel[] = [
+export const PagedIndexers: PagedIndex = {
+	items: Indexers,
+	total: 0,
+};
+
+export const searchResultMockData: SearchResult[] = [
 	{
-		id: 1,
-		name: 'Home',
+		id: '1',
 		score: 1,
 		fields: [
 			{ name: '__Icon', values: ['icon-document'] },
@@ -114,8 +116,7 @@ export const searchResultMockData: SearchResultsModel[] = [
 		],
 	},
 	{
-		id: 2,
-		name: 'Dojo',
+		id: '2',
 		score: 0.9,
 		fields: [
 			{ name: '__Icon', values: ['icon-document'] },

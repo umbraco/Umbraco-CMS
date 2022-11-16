@@ -6,8 +6,6 @@ import { customElement, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { query } from 'router-slot';
 
-import { postUserLogin } from '@umbraco-cms/backend-api';
-
 @customElement('umb-login')
 export default class UmbLogin extends LitElement {
 	static styles: CSSResultGroup = [
@@ -42,10 +40,10 @@ export default class UmbLogin extends LitElement {
 	};
 
 	private async _login(username: string, password: string, persist: boolean) {
+		// TODO: Move login to new login app
 		this._loggingIn = true;
 
 		try {
-			await postUserLogin({ username, password, persist });
 			this._loggingIn = false;
 			let { redirectTo } = query();
 			if (!redirectTo) {

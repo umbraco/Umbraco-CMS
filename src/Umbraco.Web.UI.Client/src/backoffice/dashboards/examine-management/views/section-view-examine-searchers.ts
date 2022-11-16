@@ -6,10 +6,16 @@ import { UmbModalService } from '../../../../core/services/modal';
 import { UmbNotificationService } from '../../../../core/services/notification';
 import { UmbNotificationDefaultData } from '../../../../core/services/notification/layouts/default';
 
-import { FieldViewModel, SearchResultsModel } from '../examine-extension';
-
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-import { getSearchResults } from '@umbraco-cms/backend-api';
+
+import {
+	ApiError,
+	ProblemDetails,
+	SearchResult,
+	SearchResource,
+	Field,
+	PagedSearchResult,
+} from '@umbraco-cms/backend-api';
 
 import '../../../../core/services/modal/layouts/fields-viewer/fields-viewer.element';
 import '../../../../core/services/modal/layouts/fields-viewer/fields-settings.element';
@@ -84,7 +90,7 @@ export class UmbDashboardExamineSearcherElement extends UmbContextConsumerMixin(
 	searcherName!: string;
 
 	@state()
-	private _searchResults?: SearchResultsModel[];
+	private _searchResults?: SearchResult[];
 
 	@state()
 	private _fields?: ExposedField[];
@@ -114,17 +120,18 @@ export class UmbDashboardExamineSearcherElement extends UmbContextConsumerMixin(
 	private async _onSearch() {
 		if (!this._searchInput.value.length) return;
 		try {
-			const res = await getSearchResults({
+			const res = await SearchResource.getSearchSearcherBySearcherNameSearch({
 				searcherName: this.searcherName,
 				query: this._searchInput.value,
 				take: 100,
 			});
-			this._searchResults = res.data as SearchResultsModel[];
+			const pagedSearchResults = res.items as PagedSearchResult[];
+			this._searchResults = pagedSearchResults[0].items;
 			this._updateFieldFilter();
 		} catch (e) {
-			if (e instanceof getSearchResults.Error) {
-				const error = e.getActualType();
-				const data: UmbNotificationDefaultData = { message: error.data.detail ?? 'Could not fetch search results' };
+			if (e instanceof ApiError) {
+				const error = e as ProblemDetails;
+				const data: UmbNotificationDefaultData = { message: error.message ?? 'Could not fetch search results' };
 				this._notificationService?.peek('danger', { data });
 			}
 		}
@@ -132,11 +139,12 @@ export class UmbDashboardExamineSearcherElement extends UmbContextConsumerMixin(
 
 	private _updateFieldFilter() {
 		this._searchResults?.map((result) => {
-			const fieldNames = result.fields.map((field) => {
-				return { name: field.name, exposed: false };
+			const fieldNames = result.fields?.map((field) => {
+				if (field.name) return { name: field.name, exposed: false } as ExposedField;
+				return { name: '', exposed: false };
 			});
 
-			this._fields = fieldNames.map((field, i) => {
+			this._fields = fieldNames?.map((field, i) => {
 				return this._fields
 					? this._fields[i].name == field.name
 						? { name: this._fields[i].name, exposed: this._fields[i].exposed }
@@ -199,7 +207,7 @@ export class UmbDashboardExamineSearcherElement extends UmbContextConsumerMixin(
 						<uui-table-cell> ${rowData.id} </uui-table-cell>
 						<uui-table-cell>
 							<uui-button look="secondary" label="Open editor for this document" @click="${this._onNameClick}">
-								${rowData.name}
+								Document
 							</uui-button>
 						</uui-table-cell>
 						<uui-table-cell>
@@ -213,10 +221,10 @@ export class UmbDashboardExamineSearcherElement extends UmbContextConsumerMixin(
 										size: 'medium',
 										data: { ...rowData },
 									})}">
-								${Object.keys(rowData.fields).length} fields
+								${rowData.fields ? Object.keys(rowData.fields).length : ''} fields
 							</uui-button>
 						</uui-table-cell>
-						${this.renderBodyCells(rowData.fields)}
+						${rowData.fields ? this.renderBodyCells(rowData.fields) : ''}
 						<uui-table-cell></uui-table-cell>
 					</uui-table-row>`;
 				})}
@@ -231,12 +239,12 @@ export class UmbDashboardExamineSearcherElement extends UmbContextConsumerMixin(
 		})}`;
 	}
 
-	renderBodyCells(cellData: FieldViewModel[]) {
-		return html`${this._fields?.map((field) => {
-			return cellData.map((option) => {
-				return option.name == field.name && field.exposed
-					? html`<uui-table-cell>${option.values}</uui-table-cell>`
-					: ``;
+	renderBodyCells(cellData: Field[]) {
+		return html`${this._fields?.map((slot) => {
+			return cellData.map((field) => {
+				return slot.exposed && field.name == slot.name
+					? html`<uui-table-cell>${field.values}</uui-table-cell>`
+					: html``;
 			});
 		})}`;
 	}

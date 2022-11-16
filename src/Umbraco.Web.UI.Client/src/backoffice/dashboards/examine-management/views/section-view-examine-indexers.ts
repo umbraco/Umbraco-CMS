@@ -2,15 +2,15 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, state, property } from 'lit/decorators.js';
 
-import { UUIButtonState } from '@umbraco-ui/uui';
-import { IndexModel } from '../examine-extension';
+import { UUIButtonState } from '@umbraco-ui/uui-button';
 
 import { UmbModalService } from '../../../../core/services/modal';
 import { UmbNotificationService } from '../../../../core/services/notification';
 import { UmbNotificationDefaultData } from '../../../../core/services/notification/layouts/default';
-import { getIndex, postIndexRebuild } from '@umbraco-cms/backend-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import './section-view-examine-searchers';
+
+import { ApiError, ProblemDetails, Index, SearchResource } from '@umbraco-cms/backend-api';
 
 @customElement('umb-dashboard-examine-index')
 export class UmbDashboardExamineIndexElement extends UmbContextConsumerMixin(LitElement) {
@@ -87,19 +87,19 @@ export class UmbDashboardExamineIndexElement extends UmbContextConsumerMixin(Lit
 	private _buttonState?: UUIButtonState = undefined;
 
 	@state()
-	private _indexData!: IndexModel;
+	private _indexData!: Index;
 
 	private _notificationService?: UmbNotificationService;
 	private _modalService?: UmbModalService;
 
 	private async _getIndexData() {
 		try {
-			const index = await getIndex({ indexName: this.indexName });
-			this._indexData = index.data as IndexModel;
+			const index = await SearchResource.getSearchIndexByIndexName({ indexName: this.indexName });
+			this._indexData = index as Index;
 		} catch (e) {
-			if (e instanceof getIndex.Error) {
-				const error = e.getActualType();
-				const data: UmbNotificationDefaultData = { message: error.data.detail ?? 'Could not fetch index' };
+			if (e instanceof ApiError) {
+				const error = e as ProblemDetails;
+				const data: UmbNotificationDefaultData = { message: error.message ?? 'Could not fetch index' };
 				this._notificationService?.peek('danger', { data });
 			}
 		}
@@ -139,17 +139,18 @@ export class UmbDashboardExamineIndexElement extends UmbContextConsumerMixin(Lit
 	}
 	private async _rebuild() {
 		this._buttonState = 'waiting';
-		try {
-			await postIndexRebuild({ indexName: this._indexData.name });
-			this._buttonState = 'success';
-		} catch (e) {
-			this._buttonState = 'failed';
-			if (e instanceof postIndexRebuild.Error) {
-				const error = e.getActualType();
-				const data: UmbNotificationDefaultData = { message: error.data.detail ?? 'Rebuild error' };
-				this._notificationService?.peek('danger', { data });
+		if (this._indexData.name)
+			try {
+				await SearchResource.postSearchIndexByIndexNameRebuild({ indexName: this._indexData.name });
+				this._buttonState = 'success';
+			} catch (e) {
+				this._buttonState = 'failed';
+				if (e instanceof ApiError) {
+					const error = e.body as ProblemDetails;
+					const data: UmbNotificationDefaultData = { message: error.data.detail ?? 'Rebuild error' };
+					this._notificationService?.peek('danger', { data });
+				}
 			}
-		}
 	}
 
 	render() {
@@ -171,14 +172,14 @@ export class UmbDashboardExamineIndexElement extends UmbContextConsumerMixin(Lit
 				</uui-box>
 				<umb-dashboard-examine-searcher searcherName="${this.indexName}"></umb-dashboard-examine-searcher>
 				${this.renderPropertyList()} ${this.renderTools()}`;
-		} else return html`<a href="/section/settings/dashboard/examine-management">&larr; Back to overview</a>`;
+		} else return html``;
 	}
 
 	private renderPropertyList() {
 		return html`<uui-box headline="Index info">
 			<p>Lists the properties of the ${this._indexData.name}</p>
 			<uui-table class="info">
-				${Object.entries(this._indexData.providerProperties).map((entry) => {
+				${Object.entries(this._indexData).map((entry) => {
 					return html`<uui-table-row>
 						<uui-table-cell style="width:0px; font-weight: bold;"> ${entry[0]} </uui-table-cell>
 						<uui-table-cell> ${JSON.stringify(entry[1]).replace(/,/g, ', ')} </uui-table-cell>

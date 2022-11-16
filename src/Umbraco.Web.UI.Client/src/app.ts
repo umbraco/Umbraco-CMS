@@ -1,22 +1,19 @@
 import './core/css/custom-properties.css';
+import '@umbraco-ui/uui-modal';
+import '@umbraco-ui/uui-modal-container';
+import '@umbraco-ui/uui-modal-dialog';
+import '@umbraco-ui/uui-modal-sidebar';
 import 'router-slot';
 
 // TODO: remove these imports when they are part of UUI
-import '@umbraco-ui/uui-modal';
-import '@umbraco-ui/uui-modal-sidebar';
-import '@umbraco-ui/uui-modal-container';
-import '@umbraco-ui/uui-modal-dialog';
+import type { Guard, IRoute } from 'router-slot/model';
 
 import { UUIIconRegistryEssential } from '@umbraco-ui/uui';
 import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
-import type { Guard, IRoute } from 'router-slot/model';
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-import { getManifests, getServerStatus } from '@umbraco-cms/backend-api';
+import { OpenAPI, RuntimeLevel, ServerResource } from '@umbraco-cms/backend-api';
 import { UmbContextProviderMixin } from '@umbraco-cms/context-api';
-
-import type { ManifestTypes, ServerStatus } from '@umbraco-cms/models';
 
 @customElement('umb-app')
 export class UmbApp extends UmbContextProviderMixin(LitElement) {
@@ -56,40 +53,51 @@ export class UmbApp extends UmbContextProviderMixin(LitElement) {
 	];
 
 	private _iconRegistry = new UUIIconRegistryEssential();
-	private _serverStatus: ServerStatus = 'running';
+	private _runtimeLevel = RuntimeLevel.UNKNOWN;
 
 	constructor() {
 		super();
+
 		this._setup();
+	}
+
+	async connectedCallback() {
+		super.connectedCallback();
+
+		OpenAPI.BASE = import.meta.env.VITE_UMBRACO_USE_MSW === 'on' ? '' : import.meta.env.VITE_UMBRACO_API_URL;
+		OpenAPI.WITH_CREDENTIALS = true;
+
+		await this._setInitStatus();
+		await this._registerExtensionManifestsFromServer();
+		this._redirect();
 	}
 
 	private async _setup() {
 		this._iconRegistry.attach(this);
-		await this._registerExtensionManifestsFromServer();
-		await this._setInitStatus();
-		this._redirect();
 	}
 
 	private async _setInitStatus() {
 		try {
-			const { data } = await getServerStatus({});
-			this._serverStatus = data.serverStatus;
+			const serverStatus = await ServerResource.getServerStatus();
+			if (serverStatus.serverStatus) {
+				this._runtimeLevel = serverStatus.serverStatus;
+			}
 		} catch (error) {
 			console.log(error);
 		}
 	}
 
 	private _redirect() {
-		switch (this._serverStatus) {
-			case 'must-install':
+		switch (this._runtimeLevel) {
+			case RuntimeLevel.INSTALL:
 				history.replaceState(null, '', '/install');
 				break;
 
-			case 'must-upgrade':
+			case RuntimeLevel.UPGRADE:
 				history.replaceState(null, '', '/upgrade');
 				break;
 
-			case 'running': {
+			case RuntimeLevel.RUN: {
 				const pathname =
 					window.location.pathname === '/install' || window.location.pathname === '/upgrade'
 						? '/'
@@ -97,6 +105,9 @@ export class UmbApp extends UmbContextProviderMixin(LitElement) {
 				history.replaceState(null, '', pathname);
 				break;
 			}
+
+			default:
+				throw new Error(`Unsupported runtime level: ${this._runtimeLevel}`);
 		}
 	}
 
@@ -122,9 +133,10 @@ export class UmbApp extends UmbContextProviderMixin(LitElement) {
 	}
 
 	private async _registerExtensionManifestsFromServer() {
-		const res = await getManifests({});
-		const { manifests } = res.data as unknown as { manifests: ManifestTypes[] };
-		manifests.forEach((manifest) => umbExtensionsRegistry.register(manifest));
+		// TODO: Implement once manifest endpoint exists
+		// const res = await getManifests({});
+		// const { manifests } = res.data as unknown as { manifests: ManifestTypes[] };
+		// manifests.forEach((manifest) => umbExtensionsRegistry.register(manifest));
 	}
 
 	render() {

@@ -2,13 +2,12 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
-import { IndexModel, SearcherModel } from '../examine-extension';
-
 import { UmbModalService } from '../../../../core/services/modal';
 import { UmbNotificationService } from '../../../../core/services/notification';
 import { UmbNotificationDefaultData } from '../../../../core/services/notification/layouts/default';
-import { getIndexers, getSearchers } from '@umbraco-cms/backend-api';
+
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import { ApiError, ProblemDetails, Searcher, Index, PagedIndex, SearchResource } from '@umbraco-cms/backend-api';
 
 @customElement('umb-dashboard-examine-overview')
 export class UmbDashboardExamineOverviewElement extends UmbContextConsumerMixin(LitElement) {
@@ -56,21 +55,21 @@ export class UmbDashboardExamineOverviewElement extends UmbContextConsumerMixin(
 	];
 
 	@state()
-	private _indexers?: IndexModel[];
+	private _indexers?: Index[];
 
 	@state()
-	private _searchers?: SearcherModel[];
+	private _searchers?: Searcher[];
 
 	private _notificationService?: UmbNotificationService;
 	private _modalService?: UmbModalService;
 
 	private async _getIndexers() {
 		try {
-			const indexers = await getIndexers({ skip: 0, take: 3 });
-			this._indexers = indexers.data as IndexModel[];
+			const indexers = await SearchResource.getSearchIndex({ skip: 0, take: 3 });
+			this._indexers = indexers.items as Index[];
 		} catch (e) {
-			if (e instanceof getIndexers.Error) {
-				const error = e.getActualType();
+			if (e instanceof ApiError) {
+				const error = e.body as ProblemDetails;
 				const data: UmbNotificationDefaultData = { message: error.data.detail ?? 'Could not fetch indexers' };
 				this._notificationService?.peek('danger', { data });
 			}
@@ -79,11 +78,11 @@ export class UmbDashboardExamineOverviewElement extends UmbContextConsumerMixin(
 
 	private async _getSearchers() {
 		try {
-			const searchers = await getSearchers({ skip: 0, take: 3 });
-			this._searchers = searchers.data as SearcherModel[];
+			const searchers = await SearchResource.getSearchSearcher({ skip: 0, take: 3 });
+			this._searchers = searchers.items as Searcher[];
 		} catch (e) {
-			if (e instanceof getSearchers.Error) {
-				const error = e.getActualType();
+			if (e instanceof ApiError) {
+				const error = e.body as ProblemDetails;
 				const data: UmbNotificationDefaultData = { message: error.data.detail ?? 'Could not fetch searchers' };
 				this._notificationService?.peek('danger', { data });
 			}
