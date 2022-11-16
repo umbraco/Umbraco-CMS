@@ -1,8 +1,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
 using NJsonSchema.Generation;
-
-namespace Umbraco.JsonSchema.Core;
 
 /// <inheritdoc />
 public class UmbracoJsonSchemaGenerator : JsonSchemaGenerator
@@ -17,7 +16,6 @@ public class UmbracoJsonSchemaGenerator : JsonSchemaGenerator
             DefaultReferenceTypeNullHandling = ReferenceTypeNullHandling.NotNull,
             GenerateExamples = true,
             IgnoreObsoleteProperties = true,
-            SchemaNameGenerator = new NamespacePrefixedSchemaNameGenerator(),
             SerializerSettings = new JsonSerializerSettings()
             {
                 ContractResolver = new WritablePropertiesOnlyResolver()
@@ -25,5 +23,13 @@ public class UmbracoJsonSchemaGenerator : JsonSchemaGenerator
         })
     {
         Settings.SerializerSettings.Converters.Add(new StringEnumConverter());
+    }
+
+    /// <inheritdoc />
+    private class WritablePropertiesOnlyResolver : DefaultContractResolver
+    {
+        /// <inheritdoc />
+        protected override IList<JsonProperty> CreateProperties(Type type, MemberSerialization memberSerialization)
+            => base.CreateProperties(type, memberSerialization).Where(p => p.Writable).ToList();
     }
 }

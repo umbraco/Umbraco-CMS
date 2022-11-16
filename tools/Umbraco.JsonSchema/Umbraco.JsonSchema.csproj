@@ -7,10 +7,10 @@
 
   <ItemGroup>
     <PackageReference Include="CommandLineParser" Version="2.9.1" />
+    <PackageReference Include="NJsonSchema" Version="10.8.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Umbraco.Core\Umbraco.Core.csproj" />
-    <ProjectReference Include="..\Umbraco.JsonSchema.Core\Umbraco.JsonSchema.Core.csproj" />
   </ItemGroup>
 </Project>

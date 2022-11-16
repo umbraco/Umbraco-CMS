@@ -1,5 +1,4 @@
 using CommandLine;
-using Umbraco.JsonSchema.Core;
 
 await Parser.Default.ParseArguments<Options>(args).WithParsedAsync(async options =>
 {
