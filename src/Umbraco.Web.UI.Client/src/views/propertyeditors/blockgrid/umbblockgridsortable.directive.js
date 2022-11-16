@@ -218,9 +218,7 @@
                     console.error("ALREADY USING THIS. IF THIS NOT SEEN THEN NOT RELEVANT")
                     return;
                 }
-
-                document.addEventListener('touchmove', handleAutoScroll);
-                document.addEventListener('mousemove', handleAutoScroll);
+                
                 document.addEventListener('drag', handleDragMove);
                 document.addEventListener('dragend', handleDragEnd);
 
@@ -258,13 +256,11 @@
 
                 //event?.stopPropagation();
 
-                stopAutoScroll();
-                document.removeEventListener('touchmove', handleAutoScroll);
-                document.removeEventListener('mousemove', handleAutoScroll);
                 document.removeEventListener('drag', handleDragMove);
                 document.removeEventListener('dragend', handleDragEnd);
                 currentElement.classList.remove(config.placeholderClass);
 
+                stopAutoScroll();
                 removeAllowIndication();
 
                 currentContainerVM.sync(currentElement, vm);
@@ -295,7 +291,8 @@
                 if(!currentElement) {
                     return;
                 }
-                //event.stopPropagation();
+                event.stopPropagation();
+                event.preventDefault();
 
                 const clientX = (event.touches ? event.touches[0] : event).clientX;
                 const clientY = (event.touches ? event.touches[1] : event).clientY;
@@ -306,6 +303,8 @@
                     }
                     dragX = clientX;
                     dragY = clientY;
+
+                    handleAutoScroll(dragX, dragY);
                     
                     currentDragRect = currentDragElement.getBoundingClientRect();
                     const insideCurrentRect = isWithinRect(dragX, dragY, currentDragRect, 0);
@@ -652,51 +651,41 @@
             let autoScrollX = 0;
             let autoScrollY = 0;
 
-            function handleAutoScroll(event) {
+            function handleAutoScroll(clientX, clientY) {
+                console.log("handleAutoScroll")
 
-                event.preventDefault();
-
-                const clientX = (event.touches ? event.touches[0] : event).clientX;
-                const clientY = (event.touches ? event.touches[1] : event).clientY;
-                if(clientX !== 0 && clientY !== 0) {
-
-                    console.log("handleAutoScroll")
-
-                    let scrollRect = null;
-                    if (scrollElement) {
-                        autoScrollEl = scrollElement;
-                        scrollRect = scrollElement.getBoundingClientRect();
-                    } else {
-                        autoScrollEl = document.scrollingElement || document.documentElement;
-                        scrollRect = {top: 0,
-                            left: 0,
-                            bottom: window.innerHeight,
-                            right: window.innerWidth,
-                            height: window.innerHeight,
-                            width: window.innerWidth
-                        }
+                let scrollRect = null;
+                if (scrollElement) {
+                    autoScrollEl = scrollElement;
+                    scrollRect = scrollElement.getBoundingClientRect();
+                } else {
+                    autoScrollEl = document.scrollingElement || document.documentElement;
+                    scrollRect = {top: 0,
+                        left: 0,
+                        bottom: window.innerHeight,
+                        right: window.innerWidth,
+                        height: window.innerHeight,
+                        width: window.innerWidth
                     }
+                }
 
-                    const scrollWidth = autoScrollEl.scrollWidth;
-                    const scrollHeight = autoScrollEl.scrollHeight;
-                    const canScrollX = scrollRect.width < scrollWidth;
-                    const canScrollY = scrollRect.height < scrollHeight;
-                    const scrollPosX = autoScrollEl.scrollLeft;
-                    const scrollPosY = autoScrollEl.scrollTop;
+                const scrollWidth = autoScrollEl.scrollWidth;
+                const scrollHeight = autoScrollEl.scrollHeight;
+                const canScrollX = scrollRect.width < scrollWidth;
+                const canScrollY = scrollRect.height < scrollHeight;
+                const scrollPosX = autoScrollEl.scrollLeft;
+                const scrollPosY = autoScrollEl.scrollTop;
 
-                    cancelAnimationFrame(autoScrollRAF)
+                cancelAnimationFrame(autoScrollRAF)
 
-                    console.log(autoScrollEl, "canScrollY", canScrollY)
+                console.log(autoScrollEl, "canScrollY", canScrollY)
 
-                    if(canScrollX || canScrollY) {
+                if(canScrollX || canScrollY) {
 
-                        autoScrollX = (Math.abs(scrollRect.right - clientX) <= autoScrollSensitivity && scrollPosX + scrollRect.width < scrollWidth) - (Math.abs(scrollRect.left - clientX) <= autoScrollSensitivity && !!scrollPosX);
-                        autoScrollY = (Math.abs(scrollRect.bottom - clientY) <= autoScrollSensitivity && scrollPosY + scrollRect.height < scrollHeight) - (Math.abs(scrollRect.top - clientY) <= autoScrollSensitivity && !!scrollPosY);
-                        console.log(autoScrollX, autoScrollY)
-                        autoScrollRAF = requestAnimationFrame(performAutoScroll);
-                    }
-
-                    
+                    autoScrollX = (Math.abs(scrollRect.right - clientX) <= autoScrollSensitivity && scrollPosX + scrollRect.width < scrollWidth) - (Math.abs(scrollRect.left - clientX) <= autoScrollSensitivity && !!scrollPosX);
+                    autoScrollY = (Math.abs(scrollRect.bottom - clientY) <= autoScrollSensitivity && scrollPosY + scrollRect.height < scrollHeight) - (Math.abs(scrollRect.top - clientY) <= autoScrollSensitivity && !!scrollPosY);
+                    console.log(autoScrollX, autoScrollY)
+                    autoScrollRAF = requestAnimationFrame(performAutoScroll);
                 }
             }
             function performAutoScroll() {
