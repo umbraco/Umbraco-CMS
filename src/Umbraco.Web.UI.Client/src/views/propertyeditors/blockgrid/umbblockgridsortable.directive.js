@@ -54,9 +54,11 @@
         containerSelector: "ol", // Used for connecting with others
         ignorerSelector: "a, img, iframe",
         itemSelector: "li",
-        draggableSelector: "[draggable]",
-        placeholderClass: "umb-drag-placeholder",
+        placeholderClass: "umb-drag-placeholder"
+        
+        /*,
         ghostClass: "umb-drag-ghost"
+        */
     }
 
 
@@ -97,7 +99,7 @@
 
             let scrollElement = null;
 
-            let containerEl = config.containerSelector ? element[0].closest(config.containerSelector) : containerEl[0];
+            let containerEl = config.containerSelector ? element[0].closest(config.containerSelector) : element[0];
             if (!containerEl) {
                 console.error("Could not initialize umb block grid sorter.", element[0])
                 return;
@@ -124,7 +126,7 @@
 
                 setupIgnorerElements(element);
 
-                const dragElement = element.querySelector(config.draggableSelector);
+                const dragElement = config.draggableSelector ? element.querySelector(config.draggableSelector) : element;
                 dragElement.draggable = true;
                 dragElement.addEventListener('dragstart', handleDragStart);
             }
@@ -133,7 +135,7 @@
 
                 destroyIgnorerElements(element);
 
-                const dragElement = element.querySelector(config.draggableSelector);
+                const dragElement = config.draggableSelector ? element.querySelector(config.draggableSelector) : element;
                 dragElement.removeEventListener('dragstart', handleDragStart);
             }
 
@@ -182,17 +184,12 @@
                 }
 
                 const element = event.target.closest(config.itemSelector);
-
-                if(currentElement === element) {
-                    console.error("ALREADY USING THIS. IF THIS NOT SEEN THEN NOT RELEVANT")
-                    return;
-                }
                 
                 document.addEventListener('drag', handleDragMove);
                 document.addEventListener('dragend', handleDragEnd);
 
                 currentElement = element;
-                currentDragElement = element.querySelector(config.draggableSelector);
+                currentDragElement = config.draggableSelector ? element.querySelector(config.draggableSelector) : element;
                 currentDragRect = currentDragElement.getBoundingClientRect();
                 currentItem = vm.getItemOfElement(element);
 
@@ -212,7 +209,7 @@
                 // We must wait one frame before changing the look of the block.
                 rqaId = requestAnimationFrame(() => {// It should be okay to use the same refId, as the move does not or is okay not to happen on first frame/drag-move.
                     rqaId = null;
-                    element.classList.remove(config.ghostClass);
+                    //element.classList.remove(config.ghostClass);
                     element.classList.add(config.placeholderClass);
                 });
 
@@ -335,7 +332,7 @@
                     const elRect = el.getBoundingClientRect();
                     // gather elements on the same row.
                     if(dragY >= elRect.top && dragY <= elRect.bottom) {
-                        const dragElement = el.querySelector(config.draggableSelector);
+                        const dragElement = config.draggableSelector ? el.querySelector(config.draggableSelector) : el;
                         const dragElementRect = dragElement.getBoundingClientRect();
                         elementsInSameRow.push({el:el, elRect:elRect, dragRect:dragElementRect});
                         if(el !== currentElement) {
