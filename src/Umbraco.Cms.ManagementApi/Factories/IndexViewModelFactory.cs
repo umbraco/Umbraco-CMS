@@ -47,8 +47,8 @@ public class IndexViewModelFactory : IIndexViewModelFactory
             }
             else
             {
-                var t = property.Value.GetType();
-                properties[property.Key] = t.IsClass && !t.IsArray ? property.Value?.ToString() : property.Value;
+                var propertyType = property.Value.GetType();
+                properties[property.Key] = propertyType.IsClass && !propertyType.IsArray ? property.Value?.ToString() : property.Value;
             }
         }
 
