@@ -266,7 +266,7 @@
             // Create Model Object, to manage our data for this Block Editor.
             modelObject = blockEditorService.createModelObject(vm.model.value, vm.model.editor, vm.model.config.blocks, scopeOfExistence, $scope);
 
-            $q.all([modelObject.load(), assetsService.loadJs('lib/sortablejs/Sortable.min.js', $scope)]).then(onLoaded);
+            modelObject.load().then(onLoaded);
 
         };
 

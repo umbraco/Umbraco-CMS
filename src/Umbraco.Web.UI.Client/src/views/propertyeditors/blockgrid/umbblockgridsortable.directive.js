@@ -64,13 +64,7 @@
 
 
     function UmbBlockGridSorter() {
-
-
-        /* TODOS:
-            replace on Area config
-            remove sortableJS dependency.
-        */
-
+        
         function link(scope, element) {
 
 
