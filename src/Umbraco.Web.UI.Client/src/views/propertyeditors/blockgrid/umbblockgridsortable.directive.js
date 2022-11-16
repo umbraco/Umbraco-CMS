@@ -37,6 +37,43 @@
 
 
 
+    function getParentScrollElement(el, includeSelf) {
+        // skip to window
+        if (!el || !el.getBoundingClientRect) return null;
+        var elem = el;
+        var gotSelf = false;
+    
+        while(elem) {
+            
+            // we don't need to get elem css if it isn't even overflowing in the first place (performance)
+            if (elem.clientWidth < elem.scrollWidth || elem.clientHeight < elem.scrollHeight) {
+                var elemCSS = getComputedStyle(elem);
+
+                if (
+                    elem.clientHeight < elem.scrollHeight && (elemCSS.overflowY == 'auto' || elemCSS.overflowY == 'scroll')
+                    ||
+                    elem.clientWidth < elem.scrollWidth && (elemCSS.overflowX == 'auto' || elemCSS.overflowX == 'scroll')
+                ) {
+                    if (!elem.getBoundingClientRect || elem === document.body) return null;
+                    if (gotSelf || includeSelf) return elem;
+                    gotSelf = true;
+                }
+            }
+
+            if(elem.parentNode === document) {
+                return null;
+            } else if(elem.parentNode instanceof DocumentFragment) {
+                elem = elem.parentNode.host;
+            } else {
+                elem = elem.parentNode;
+            }
+        }
+    
+        return null;
+    }
+ 
+
+
 
     const DefaultConfig = {
         compareElementToModel: (el, modelEntry) => modelEntry.contentUdi === el.dataset.elementUdi,
@@ -58,7 +95,7 @@
         // Take over native auto scroll
         /* TODOS:
             Take over native auto scroll
-            
+
             replace on Area config
             remove sortableJS dependency.
         */
@@ -89,6 +126,7 @@
             vm.items = config.items;
             vm.identifier = config.identifier;
 
+            let scrollElement = null;
 
             let containerEl = config.containerSelector ? element[0].closest(config.containerSelector) : containerEl[0];
             if (!containerEl) {
@@ -170,14 +208,21 @@
 
                 event.stopPropagation();
 
+                if(!scrollElement) {
+                    scrollElement = getParentScrollElement(containerEl, true);
+                }
+
                 const element = event.target.closest(config.itemSelector);
 
                 if(currentElement === element) {
                     console.error("ALREADY USING THIS. IF THIS NOT SEEN THEN NOT RELEVANT")
                     return;
                 }
-                window.addEventListener('drag', handleDragMove);
-                window.addEventListener('dragend', handleDragEnd);
+
+                document.addEventListener('touchmove', handleAutoScroll);
+                document.addEventListener('mousemove', handleAutoScroll);
+                document.addEventListener('drag', handleDragMove);
+                document.addEventListener('dragend', handleDragEnd);
 
                 currentElement = element;
                 currentDragElement = element.querySelector(config.draggableSelector);
@@ -211,10 +256,13 @@
             
             function handleDragEnd(event) {
 
-                event.stopPropagation();
+                //event?.stopPropagation();
 
-                window.removeEventListener('drag', handleDragMove);
-                window.removeEventListener('dragend', handleDragEnd);
+                stopAutoScroll();
+                document.removeEventListener('touchmove', handleAutoScroll);
+                document.removeEventListener('mousemove', handleAutoScroll);
+                document.removeEventListener('drag', handleDragMove);
+                document.removeEventListener('dragend', handleDragEnd);
                 currentElement.classList.remove(config.placeholderClass);
 
                 removeAllowIndication();
@@ -247,7 +295,7 @@
                 if(!currentElement) {
                     return;
                 }
-                event.stopPropagation();
+                //event.stopPropagation();
 
                 const clientX = (event.touches ? event.touches[0] : event).clientX;
                 const clientY = (event.touches ? event.touches[1] : event).clientY;
@@ -596,6 +644,73 @@
 
 
 
+
+            let autoScrollRAF;
+            let autoScrollEl;
+            const autoScrollSensitivity = 50;
+            const autoScrollSpeed = 16;
+            let autoScrollX = 0;
+            let autoScrollY = 0;
+
+            function handleAutoScroll(event) {
+
+                event.preventDefault();
+
+                const clientX = (event.touches ? event.touches[0] : event).clientX;
+                const clientY = (event.touches ? event.touches[1] : event).clientY;
+                if(clientX !== 0 && clientY !== 0) {
+
+                    console.log("handleAutoScroll")
+
+                    let scrollRect = null;
+                    if (scrollElement) {
+                        autoScrollEl = scrollElement;
+                        scrollRect = scrollElement.getBoundingClientRect();
+                    } else {
+                        autoScrollEl = document.scrollingElement || document.documentElement;
+                        scrollRect = {top: 0,
+                            left: 0,
+                            bottom: window.innerHeight,
+                            right: window.innerWidth,
+                            height: window.innerHeight,
+                            width: window.innerWidth
+                        }
+                    }
+
+                    const scrollWidth = autoScrollEl.scrollWidth;
+                    const scrollHeight = autoScrollEl.scrollHeight;
+                    const canScrollX = scrollRect.width < scrollWidth;
+                    const canScrollY = scrollRect.height < scrollHeight;
+                    const scrollPosX = autoScrollEl.scrollLeft;
+                    const scrollPosY = autoScrollEl.scrollTop;
+
+                    cancelAnimationFrame(autoScrollRAF)
+
+                    console.log(autoScrollEl, "canScrollY", canScrollY)
+
+                    if(canScrollX || canScrollY) {
+
+                        autoScrollX = (Math.abs(scrollRect.right - clientX) <= autoScrollSensitivity && scrollPosX + scrollRect.width < scrollWidth) - (Math.abs(scrollRect.left - clientX) <= autoScrollSensitivity && !!scrollPosX);
+                        autoScrollY = (Math.abs(scrollRect.bottom - clientY) <= autoScrollSensitivity && scrollPosY + scrollRect.height < scrollHeight) - (Math.abs(scrollRect.top - clientY) <= autoScrollSensitivity && !!scrollPosY);
+                        console.log(autoScrollX, autoScrollY)
+                        autoScrollRAF = requestAnimationFrame(performAutoScroll);
+                    }
+
+                    
+                }
+            }
+            function performAutoScroll() {
+                autoScrollEl.scrollLeft += autoScrollX * autoScrollSpeed;
+                autoScrollEl.scrollTop += autoScrollY * autoScrollSpeed;
+                autoScrollRAF = requestAnimationFrame(performAutoScroll);
+            }
+            function stopAutoScroll() {
+                autoScrollRAF = cancelAnimationFrame(performAutoScroll);
+            }
+
+
+
+
             vm.notifySync = function(data) {
                 if(config.onSync) {
                     config.onSync(data);
@@ -623,6 +738,10 @@
             scope.$on('$destroy', () => {
                 console.log("On Destroy sortable")
 
+                if(currentElement) {
+                    handleDragEnd()
+                }
+
                 _lastIndicationContainerVM = null;
 
                 containerEl['umbBlockGridSorter:vm'] = null
@@ -634,6 +753,7 @@
                 observer.disconnect();
                 observer = null;
                 containerEl = null;
+                scrollElement = null;
                 vm = null;
             });
         }
