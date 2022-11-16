@@ -142,7 +142,7 @@ public static partial class UmbracoBuilderExtensions
 
             if (disallowedUploadedFileExtensionsValue is null && disallowedUploadFilesValue is not null)
             {
-                settings.AllowedUploadedFileExtensions = disallowedUploadFilesValue;
+                settings.DisallowedUploadedFileExtensions = disallowedUploadFilesValue;
             }
         });
         return builder;
