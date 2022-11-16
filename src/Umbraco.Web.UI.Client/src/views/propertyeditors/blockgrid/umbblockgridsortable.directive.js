@@ -43,7 +43,7 @@
         querySelectModelToElement: (container, modelEntry) => container.querySelector(`[data-element-udi='${modelEntry.contentUdi}']`),
         identifier: "UmbBlockGridSorter",
         containerSelector: "ol", // Used for connecting with others
-        ignorerSelector: "a, img",
+        ignorerSelector: "a, img, iframe",
         itemSelector: "li",
         draggableSelector: "[draggable]",
         placeholderClass: "umb-drag-placeholder",
@@ -87,9 +87,8 @@
 
             const config = {...DefaultConfig, ...scope.config};
 
-            // TODO: Actually not used for anything at this point of time when im writting this:
-            vm.elements = [];
             vm.items = config.items;
+            vm.identifier = config.identifier;
 
 
             let containerEl = config.containerSelector ? element[0].closest(config.containerSelector) : containerEl[0];
@@ -116,14 +115,6 @@
             }
 
             function setupItem(element) {
-                if(vm.elements.indexOf(element) !== -1) {
-                    console.error("DOES THIS EVER HAPPEN if so we can keep the elements list.")
-                    return;
-                }
-
-                //console.log("setupItem", element.dataset.elementUdi, element.className)
-
-                vm.elements.push(element);
 
                 setupIgnorerElements(element);
 
@@ -133,15 +124,6 @@
             }
 
             function destroyItem(element) {
-                const elementIndex = vm.elements.indexOf(element);
-                if(elementIndex === -1) {
-                    console.error("DOES THIS EVER HAPPEN if so we can keep the elements list.")
-                    return
-                }
-
-                //console.log("destroyItem", element.dataset.elementUdi, element.className)
-
-                vm.elements.splice(elementIndex, 1);
 
                 destroyIgnorerElements(element);
 
@@ -187,19 +169,21 @@
 
             function handleDragStart(event) {
 
-
                 event.stopPropagation();
 
                 const element = event.target.closest(config.itemSelector);
-                element.addEventListener('drag', handleDragMove);
-                element.addEventListener('dragend', handleDragEnd);
 
-                //console.log("handleDragStart", element.dataset.elementUdi);
+                if(currentElement === element) {
+                    console.error("ALREADY USING THIS. IF THIS NOT SEEN THEN NOT RELEVANT")
+                    return;
+                }
+                window.addEventListener('drag', handleDragMove);
+                window.addEventListener('dragend', handleDragEnd);
 
                 currentElement = element;
                 currentDragElement = element.querySelector(config.draggableSelector);
                 currentDragRect = currentDragElement.getBoundingClientRect();
-                currentItem = vm.items.find(entry => config.compareElementToModel(element, entry));
+                currentItem = vm.getItemOfElement(element);
 
                 const mouseOffsetX = Math.round(event.clientX - currentDragRect.left); //x position within the element.
                 const mouseOffsetY = Math.round(event.clientY - currentDragRect.top);  //y position within the element.
@@ -211,14 +195,14 @@
                 }
 
                 if (config.onStart) {
-                    config.onStart(currentItem);
+                    config.onStart({item: currentItem, element: currentElement});
                 }
 
                 
                 event.dataTransfer.setDragImage(currentDragElement, mouseOffsetX, mouseOffsetY);
 
                 // We must wait one frame before changing the look of the block.
-                // TODO: should this be cancelable
+                // TODO: should this be cancelable?
                 requestAnimationFrame(() => {
                     element.classList.remove(config.ghostClass);
                     element.classList.add(config.placeholderClass);
@@ -230,16 +214,16 @@
 
                 event.stopPropagation();
 
-                const element = event.target.closest(config.itemSelector);
-                element.removeEventListener('drag', handleDragMove);
-                element.removeEventListener('dragend', handleDragEnd);
+                window.removeEventListener('drag', handleDragMove);
+                window.removeEventListener('dragend', handleDragEnd);
+                currentElement.classList.remove(config.placeholderClass);
 
-                element.classList.remove(config.placeholderClass);
+                removeAllowIndication();
 
                 currentContainerVM.sync(currentElement, vm);
 
                 if (config.onEnd) {
-                    config.onEnd(currentItem);
+                    config.onEnd({item: currentItem, element: currentElement});
                 }
 
                 if(rqaId) {
@@ -317,13 +301,12 @@
                 // if empty we will be move likely to accept an item (add 20px to the bounding box)
                 // If we have items we must be 10 within the container to accept the move.
                 const offsetEdge = currentContainerHasItems ? -10 : 20;
-                if(isWithinRect(dragX, dragY, currentBoundaryRect, offsetEdge)) {
-                    // we are good...
-                } else if (config.containerSelector) {
+                if(!isWithinRect(dragX, dragY, currentBoundaryRect, offsetEdge)) {
+                    // we are outside the current container boundary, so lets see if there is a parent we can move.
                     var parentContainer = currentContainerElement.parentNode.closest(config.containerSelector);
                     if(parentContainer) {
                         const parentContainerVM = parentContainer['umbBlockGridSorter:vm']();
-                        if(parentContainerVM.sortGroupIdentifier === vm.sortGroupIdentifier) {
+                        if(parentContainerVM.identifier === vm.identifier) {
                             currentContainerElement = parentContainer;
                             currentContainerVM = parentContainerVM;
                         }
@@ -332,13 +315,17 @@
 
 
 
+               
+                // We want to retrieve the children of the container, every time to ensure we got the right order and index
+                const orderedContainerElements = Array.from(currentContainerElement.children);
+
                 var currentContainerRect = currentContainerElement.getBoundingClientRect();
                 
 
                 // gather elements on the same row.
                 let elementsInSameRow = [];
                 let placeholderIsInThisRow = false;
-                for (const el of currentContainerVM.elements) {
+                for (const el of orderedContainerElements) {
                     const elRect = el.getBoundingClientRect();
                     // gather elements on the same row.
                     if(dragY >= elRect.top && dragY <= elRect.bottom) {
@@ -372,9 +359,6 @@
                 if (foundEl === currentElement) {
                     return;
                 }
-               
-                // We want to retrive the children of the container, everytime to ensure we got the right order and index
-                const orderedContainerElements = Array.from(currentContainerElement.children);
 
                 if (foundEl) {
 
@@ -403,23 +387,22 @@
                                 
                                 var subVm = subLayoutEl['umbBlockGridSorter:vm']();
                                 // TODO: check acceptance, maybe combine with indication or acceptable?.
-                                //if(subVm.sortGroupIdentifier === vm.sortGroupIdentifier) {
+                                if(subVm.identifier === vm.identifier) {
                                     currentContainerElement = subLayoutEl;
                                     currentContainerVM = subVm;
                                     moveCurrentElement();
                                     return;
-                                //}
+                                }
                             }
                         }
                     }
                     
-                    /*
-                    TODO: Make indication / accept flow..
-                    const containerVM = currentContainerElement['Sortable:controller']();
-                    if(_indication(containerVM, currentElement) === false) {
+                    
+                    // Indication if drop is good:
+                    if(updateAllowIndication(currentContainerVM, currentItem) === false) {
                         return;
                     }
-                    */
+                    
 
                     let verticalDirection = false;
                     
@@ -481,15 +464,13 @@
 
                     return;
                 }
+                // We skipped the above part cause we are above or below container:
 
-                /*
-                TODO: Implement indication / accept flow when not within container.
-                // If above or below container, we will go first or last.
-                const containerVM = currentContainerElement['Sortable:controller']();
-                if(_indication(containerVM, currentElement) === false) {
+                // Indication if drop is good:
+                if(updateAllowIndication(currentContainerVM, currentItem) === false) {
                     return;
                 }
-                */
+                
                 if(dragY < currentContainerRect.top) {
                     move(orderedContainerElements, 0);
                 } else if(dragY > currentContainerRect.bottom) {
@@ -518,11 +499,17 @@
 
 
             /** Removes an element from container and returns its items-data entry */
-            vm.removeElement = function (element) {
+            vm.getItemOfElement = function (element) {
                 if(!element) {
                     return null;
                 }
-                const oldIndex = vm.items.findIndex(entry => config.compareElementToModel(element, entry));
+                return vm.items.find(entry => config.compareElementToModel(element, entry));
+            }
+            vm.removeItem = function (item) {
+                if(!item) {
+                    return null;
+                }
+                const oldIndex = vm.items.indexOf(item);
                 if(oldIndex !== -1) {
                     return vm.items.splice(oldIndex, 1)[0];
                 }
@@ -531,8 +518,14 @@
 
             vm.sync = function(element, fromVm) {
 
-                const movingItem = fromVm.removeElement(element);
+                const movingItem = fromVm.getItemOfElement(element);
                 if(!movingItem) {
+                    return;
+                }
+                if(vm.notifyRequestDrop({item: movingItem}) === false) {
+                    return;
+                }
+                if(!fromVm.removeItem(movingItem)) {
                     return;
                 }
 
@@ -557,26 +550,82 @@
                     newIndex = vm.items.findIndex(entry => config.compareElementToModel(nextEl, entry));
                 }
 
+                if(vm.items.indexOf(movingItem) === newIndex) {
+                    console.error("WE DID NOT DO ANYTHING CAUSE YOU WHERE ALREADY HERE.")
+                    return;
+                }
                 vm.items.splice(newIndex, 0, movingItem);
 
+                const eventData = {item: movingItem, fromController:fromVm, toController:vm};
                 if(fromVm !== vm) {
-                    fromVm.notifySync(movingItem);
+                    fromVm.notifySync(eventData);
                 }
-                vm.notifySync(movingItem);
-            }
-
-            vm.notifySync = function(movingItem) {
-                if(config.onSync) {
-                    config.onSync(movingItem);
-                }
+                vm.notifySync(eventData);
             }
 
             
 
 
 
+
+
+            var _lastIndicationContainerVM = null;
+            function updateAllowIndication(contextVM, item) {
+
+                // Remove old indication:
+                if(_lastIndicationContainerVM !== null && _lastIndicationContainerVM !== contextVM) {
+                    _lastIndicationContainerVM.notifyAllowed();
+                }
+                _lastIndicationContainerVM = contextVM;
+                
+                if(contextVM.notifyRequestDrop({item: item}) === true) {
+                    contextVM.notifyAllowed();
+                    return true;
+                }
+
+                contextVM.notifyDisallowed();// This block is not accepted to we will indicate that its not allowed.
+                return false;
+            }
+            function removeAllowIndication() {
+
+                // Remove old indication:
+                if(_lastIndicationContainerVM !== null) {
+                    _lastIndicationContainerVM.notifyAllowed();
+                }
+                _lastIndicationContainerVM = null;
+            }
+
+
+
+
+            vm.notifySync = function(data) {
+                if(config.onSync) {
+                    config.onSync(data);
+                }
+            }
+            vm.notifyDisallowed = function() {
+                if(config.onDisallowed) {
+                    config.onDisallowed();
+                }
+            }
+            vm.notifyAllowed = function() {
+                if(config.onAllowed) {
+                    config.onAllowed();
+                }
+            }
+            vm.notifyRequestDrop = function(data) {
+                if(config.onRequestDrop) {
+                    return config.onRequestDrop(data);
+                }
+                return true;
+            }
+
+
+
             scope.$on('$destroy', () => {
                 console.log("On Destroy sortable")
+
+                _lastIndicationContainerVM = null;
 
                 containerEl['umbBlockGridSorter:vm'] = null
                 containerEl.removeEventListener('dragover', preventDragOver);
