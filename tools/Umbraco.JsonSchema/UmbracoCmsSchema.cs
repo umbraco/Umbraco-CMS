@@ -3,14 +3,14 @@ using Umbraco.Cms.Core.Configuration.Models;
 
 internal class UmbracoCmsSchema
 {
-    public UmbracoDefinition? Umbraco { get; set; }
+    public UmbracoDefinition Umbraco { get; set; } = null!;
 
     /// <summary>
     /// Configuration container for all Umbraco products.
     /// </summary>
     public class UmbracoDefinition
     {
-        public UmbracoCmsDefinition? CMS { get; set; }
+        public UmbracoCmsDefinition CMS { get; set; } = null!;
     }
 
     /// <summary>
@@ -18,62 +18,62 @@ internal class UmbracoCmsSchema
     /// </summary>
     public class UmbracoCmsDefinition
     {
-        public ContentSettings? Content { get; set; }
+        public ContentSettings Content { get; set; } = null!;
 
-        public CoreDebugSettings? Debug { get; set; }
+        public CoreDebugSettings Debug { get; set; } = null!;
 
-        public ExceptionFilterSettings? ExceptionFilter { get; set; }
+        public ExceptionFilterSettings ExceptionFilter { get; set; } = null!;
 
-        public ModelsBuilderSettings? ModelsBuilder { get; set; }
+        public ModelsBuilderSettings ModelsBuilder { get; set; } = null!;
 
-        public GlobalSettings? Global { get; set; }
+        public GlobalSettings Global { get; set; } = null!;
 
-        public HealthChecksSettings? HealthChecks { get; set; }
+        public HealthChecksSettings HealthChecks { get; set; } = null!;
 
-        public HostingSettings? Hosting { get; set; }
+        public HostingSettings Hosting { get; set; } = null!;
 
-        public ImagingSettings? Imaging { get; set; }
+        public ImagingSettings Imaging { get; set; } = null!;
 
-        public IndexCreatorSettings? Examine { get; set; }
+        public IndexCreatorSettings Examine { get; set; } = null!;
 
-        public KeepAliveSettings? KeepAlive { get; set; }
+        public KeepAliveSettings KeepAlive { get; set; } = null!;
 
-        public LoggingSettings? Logging { get; set; }
+        public LoggingSettings Logging { get; set; } = null!;
 
-        public NuCacheSettings? NuCache { get; set; }
+        public NuCacheSettings NuCache { get; set; } = null!;
 
-        public RequestHandlerSettings? RequestHandler { get; set; }
+        public RequestHandlerSettings RequestHandler { get; set; } = null!;
 
-        public RuntimeSettings? Runtime { get; set; }
+        public RuntimeSettings Runtime { get; set; } = null!;
 
-        public SecuritySettings? Security { get; set; }
+        public SecuritySettings Security { get; set; } = null!;
 
-        public TourSettings? Tours { get; set; }
+        public TourSettings Tours { get; set; } = null!;
 
-        public TypeFinderSettings? TypeFinder { get; set; }
+        public TypeFinderSettings TypeFinder { get; set; } = null!;
 
-        public WebRoutingSettings? WebRouting { get; set; }
+        public WebRoutingSettings WebRouting { get; set; } = null!;
 
-        public UmbracoPluginSettings? Plugins { get; set; }
+        public UmbracoPluginSettings Plugins { get; set; } = null!;
 
-        public UnattendedSettings? Unattended { get; set; }
+        public UnattendedSettings Unattended { get; set; } = null!;
 
-        public RichTextEditorSettings? RichTextEditor { get; set; }
+        public RichTextEditorSettings RichTextEditor { get; set; } = null!;
 
-        public RuntimeMinificationSettings? RuntimeMinification { get; set; }
+        public RuntimeMinificationSettings RuntimeMinification { get; set; } = null!;
 
-        public BasicAuthSettings? BasicAuth { get; set; }
+        public BasicAuthSettings BasicAuth { get; set; } = null!;
 
-        public PackageMigrationSettings? PackageMigration { get; set; }
+        public PackageMigrationSettings PackageMigration { get; set; } = null!;
 
-        public LegacyPasswordMigrationSettings? LegacyPasswordMigration { get; set; }
+        public LegacyPasswordMigrationSettings LegacyPasswordMigration { get; set; } = null!;
 
-        public ContentDashboardSettings? ContentDashboard { get; set; }
+        public ContentDashboardSettings ContentDashboard { get; set; } = null!;
 
-        public HelpPageSettings? HelpPage { get; set; }
+        public HelpPageSettings HelpPage { get; set; } = null!;
 
-        public InstallDefaultDataSettings? DefaultDataCreation { get; set; }
+        public InstallDefaultDataSettings DefaultDataCreation { get; set; } = null!;
 
-        public DataTypesSettings? DataTypes { get; set; }
+        public DataTypesSettings DataTypes { get; set; } = null!;
     }
 }
