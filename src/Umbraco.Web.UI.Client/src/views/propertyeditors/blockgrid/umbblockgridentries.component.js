@@ -2,6 +2,7 @@
     "use strict";
 
 
+    // Utils:
 
     function getInterpolatedIndexOfPositionInWeightMap(target, weights) {
         const map = [0];
@@ -166,8 +167,58 @@
 
 
 
+        function resolveVerticalDirection(data) {
+
+            /** We need some data about the grid to figure out if there is room to be placed next to the found element */
+            const approvedContainerComputedStyles = getComputedStyle(data.containerElement);
+            const gridColumnGap = Number(approvedContainerComputedStyles.columnGap.split("px")[0]) || 0;
+            const gridColumnNumber = parseInt(approvedContainerComputedStyles.getPropertyValue("--umb-block-grid--grid-columns"), 10);
+
+            const foundElColumns = parseInt(data.relatedElement.dataset.colSpan, 10);
+            const currentElementColumns = parseInt(data.element.dataset.colSpan, 10);
+
+            // Get grid template:
+            const approvedContainerGridColumns = approvedContainerComputedStyles.gridTemplateColumns.trim().split("px").map(x => Number(x)).filter(n => n > 0).map((n, i, list) => list.length === i ? n : n + gridColumnGap);
+
+            // ensure all columns are there.
+            // This will also ensure handling non-css-grid mode,
+            // use container width divided by amount of columns( or the item width divided by its amount of columnSpan)
+            let amountOfColumnsInWeightMap = approvedContainerGridColumns.length;
+            const amountOfUnknownColumns = gridColumnNumber-amountOfColumnsInWeightMap;
+            if(amountOfUnknownColumns > 0) {
+                let accumulatedValue = getAccumulatedValueOfIndex(amountOfColumnsInWeightMap, approvedContainerGridColumns) || 0;
+                const layoutWidth = data.containerRect.width;
+                const missingColumnWidth = (layoutWidth-accumulatedValue)/amountOfUnknownColumns;
+                while(amountOfColumnsInWeightMap++ < gridColumnNumber) {
+                    approvedContainerGridColumns.push(missingColumnWidth);
+                }
+            }
+
+            let offsetPlacement = 0;
+            /* If placeholder is in this same line, we want to assume that it will offset the placement of the found element, 
+            which provides more potential space for the item to drop at.
+            This is relevant in this calculation where we look at the space to determine if its a vertical or horizontal drop in relation to the found element.
+            */
+            if(data.placeholderIsInThisRow && data.elementRect.left < data.relatedRect.left) {
+                offsetPlacement = -(data.elementRect.width + gridColumnGap);
+            }
+
+            const relatedStartX = Math.max(data.relatedRect.left - data.containerRect.left + offsetPlacement, 0);
+            const relatedStartCol = Math.round(getInterpolatedIndexOfPositionInWeightMap(relatedStartX, approvedContainerGridColumns));
+
+            // If the found related element does not have enough room after which for the current element, then we go vertical mode:
+            return (relatedStartCol + foundElColumns + currentElementColumns > gridColumnNumber);
+
+            // TODO: Check is there a case where placeAfter = false where we would like to check the previous element in this case?
+            
+        }
+
+
+
+
         function initializeSorter() {
             vm.sorterOptions = {
+                resolveVerticalDirection: resolveVerticalDirection,
                 dataTransferResolver: (dataTransfer, item) => {dataTransfer.setData("text/plain", item.$block.label)}, // (Optional) Append OS data to the moved item.
                 compareElementToModel: (el, modelEntry) => modelEntry.contentUdi === el.dataset.elementUdi,
                 querySelectModelToElement: (container, modelEntry) => container.querySelector(`[data-element-udi='${modelEntry.contentUdi}']`),

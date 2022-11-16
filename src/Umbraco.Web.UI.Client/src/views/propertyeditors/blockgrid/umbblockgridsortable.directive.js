@@ -2,34 +2,6 @@
     'use strict';
 
 
-    // Utils:
-
-    function getInterpolatedIndexOfPositionInWeightMap(target, weights) {
-        const map = [0];
-        weights.reduce((a, b, i) => { return map[i+1] = a+b; }, 0);
-        const foundValue = map.reduce((a, b) => {
-            let aDiff = Math.abs(a - target);
-            let bDiff = Math.abs(b - target);
-    
-            if (aDiff === bDiff) {
-                return a < b ? a : b;
-            } else {
-                return bDiff < aDiff ? b : a;
-            }
-        })
-        const foundIndex = map.indexOf(foundValue);
-        const targetDiff = (target-foundValue);
-        let interpolatedIndex = foundIndex;
-        if (targetDiff < 0 && foundIndex === 0) {
-            // Don't adjust.
-        } else if (targetDiff > 0 && foundIndex === map.length-1) {
-            // Don't adjust.
-        } else {
-            const foundInterpolationWeight = weights[targetDiff >= 0 ? foundIndex : foundIndex-1];
-            interpolatedIndex += foundInterpolationWeight === 0 ? interpolatedIndex : (targetDiff/foundInterpolationWeight)
-        }
-        return interpolatedIndex;
-    }
 
     function isWithinRect(x, y, rect, modifier) {
         return (x > rect.left - modifier && x < rect.right + modifier && y > rect.top - modifier && y < rect.bottom + modifier);
@@ -92,10 +64,7 @@
     function UmbBlockGridSorter() {
 
 
-        // Take over native auto scroll
         /* TODOS:
-            Take over native auto scroll
-
             replace on Area config
             remove sortableJS dependency.
         */
@@ -443,60 +412,16 @@
                     }
                     
 
-                    let verticalDirection = false;
-                    
-                    // TODO: move calculations out so they can be persisted a bit longer?
-                    // TODO: move this into a external method:
-                    /* If moved to a function, then these props:
-                    currentContainerElement
-                    foundEl
-                    currentElement
-                    */
-
-                    /** We need some data about the grid to figure out if there is room to be placed next to the found element */
-                    const approvedContainerComputedStyles = getComputedStyle(currentContainerElement);
-                    const gridColumnGap = Number(approvedContainerComputedStyles.columnGap.split("px")[0]) || 0;
-                    const gridColumnNumber = parseInt(approvedContainerComputedStyles.getPropertyValue("--umb-block-grid--grid-columns"), 10);
-
-                    const foundElColumns = parseInt(foundEl.dataset.colSpan, 10);
-                    const currentElementColumns = parseInt(currentElement.dataset.colSpan, 10);
-
-                    // Get grid template:
-                    const approvedContainerGridColumns = approvedContainerComputedStyles.gridTemplateColumns.trim().split("px").map(x => Number(x)).filter(n => n > 0).map((n, i, list) => list.length === i ? n : n + gridColumnGap);
-
-                    // ensure all columns are there.
-                    // This will also ensure handling non-css-grid mode,
-                    // use container width divided by amount of columns( or the item width divided by its amount of columnSpan)
-                    let amountOfColumnsInWeightMap = approvedContainerGridColumns.length;
-                    const amountOfUnknownColumns = gridColumnNumber-amountOfColumnsInWeightMap;
-                    if(amountOfUnknownColumns > 0) {
-                        let accumulatedValue = getAccumulatedValueOfIndex(amountOfColumnsInWeightMap, approvedContainerGridColumns) || 0;
-                        const layoutWidth = currentContainerRect.width;
-                        const missingColumnWidth = (layoutWidth-accumulatedValue)/amountOfUnknownColumns;
-                        while(amountOfColumnsInWeightMap++ < gridColumnNumber) {
-                            approvedContainerGridColumns.push(missingColumnWidth);
-                        }
-                    }
-
-                    let offsetPlacement = 0;
-                    /* If placeholder is in this same line, we want to assume that it will offset the placement of the found element, 
-                    which provides more potential space for the item to drop at.
-                    This is relevant in this calculation where we look at the space to determine if its a vertical or horizontal drop in relation to the found element.
-                    */
-                    if(placeholderIsInThisRow && currentElementRect.left < foundElDragRect.left) {
-                        offsetPlacement = -(currentElementRect.width + gridColumnGap);
-                    }
-
-                    const relatedStartX = Math.max(foundElDragRect.left - currentContainerRect.left + offsetPlacement, 0);
-                    const relatedStartCol = Math.round(getInterpolatedIndexOfPositionInWeightMap(relatedStartX, approvedContainerGridColumns));
-
-                    // If the found related element does not have enough room after which for the current element, then we go vertical mode:
-                    if(relatedStartCol + foundElColumns + currentElementColumns > gridColumnNumber) {
-                        // TODO: Check is there a case where placeAfter = false where we would like to check the previous element in this case?
-                        verticalDirection = true;
-                    }
-
-                    // END OF possible External function.
+                    let verticalDirection = scope.config.resolveVerticalDirection ? scope.config.resolveVerticalDirection({
+                        containerElement: currentContainerElement,
+                        containerRect: currentContainerRect,
+                        item: currentItem,
+                        element: currentElement,
+                        elementRect: currentElementRect,
+                        relatedElement: foundEl,
+                        relatedRect: foundElDragRect,
+                        placeholderIsInThisRow: placeholderIsInThisRow
+                    }) : true;
                     
                     if (verticalDirection) {
                         placeAfter = (dragY > foundElDragRect.top + (foundElDragRect.height*.5));
@@ -652,7 +577,6 @@
             let autoScrollY = 0;
 
             function handleAutoScroll(clientX, clientY) {
-                console.log("handleAutoScroll")
 
                 let scrollRect = null;
                 if (scrollElement) {
@@ -676,15 +600,12 @@
                 const scrollPosX = autoScrollEl.scrollLeft;
                 const scrollPosY = autoScrollEl.scrollTop;
 
-                cancelAnimationFrame(autoScrollRAF)
-
-                console.log(autoScrollEl, "canScrollY", canScrollY)
+                cancelAnimationFrame(autoScrollRAF);
 
                 if(canScrollX || canScrollY) {
 
                     autoScrollX = (Math.abs(scrollRect.right - clientX) <= autoScrollSensitivity && scrollPosX + scrollRect.width < scrollWidth) - (Math.abs(scrollRect.left - clientX) <= autoScrollSensitivity && !!scrollPosX);
                     autoScrollY = (Math.abs(scrollRect.bottom - clientY) <= autoScrollSensitivity && scrollPosY + scrollRect.height < scrollHeight) - (Math.abs(scrollRect.top - clientY) <= autoScrollSensitivity && !!scrollPosY);
-                    console.log(autoScrollX, autoScrollY)
                     autoScrollRAF = requestAnimationFrame(performAutoScroll);
                 }
             }
@@ -725,7 +646,6 @@
 
 
             scope.$on('$destroy', () => {
-                console.log("On Destroy sortable")
 
                 if(currentElement) {
                     handleDragEnd()
