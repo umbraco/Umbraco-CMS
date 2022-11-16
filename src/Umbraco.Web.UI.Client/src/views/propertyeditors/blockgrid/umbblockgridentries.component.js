@@ -74,6 +74,9 @@
         vm.locallyAvailableBlockTypes = 0;
         vm.invalidBlockTypes = [];
 
+        vm.showNotAllowedUI = false;
+        let currentContainedPropertyEditorProxies = [];
+
         vm.$onInit = function () {
 
             initializeSorter();
@@ -146,27 +149,12 @@
             }
         }
 
-
-        vm.notifyVisualUpdate = function () {
+        function notifyVisualUpdate() {
             $scope.$broadcast("blockGridEditorVisualUpdate", {areaKey: vm.areaKey});
         }
 
-        vm.acceptBlock = function(contentTypeKey) {
-            return vm.blockEditorApi.internal.isElementTypeKeyAllowedAt(vm.parentBlock, vm.areaKey, contentTypeKey);
-        }
-
-
-
-
-
-
-        // NEW CODE:
-
-        vm.showNotAllowedUI = false;
-        vm.containedPropertyEditorProxies = [];
-
         function removeAllContainedPropertyEditorProxies() {
-            vm.containedPropertyEditorProxies.forEach(slotName => {
+            currentContainedPropertyEditorProxies.forEach(slotName => {
                 removePropertyEditorProxies(slotName);
             });
         }
@@ -179,12 +167,6 @@
 
 
         function initializeSorter() {
-
-            // Maybe not used by anything:
-            /*unsubscribe.push($scope.$watch("layoutColumns", (newVal, oldVal) => {
-                vm.layoutColumnsInt = parseInt(vm.layoutColumns, 10);
-            }));*/
-
             vm.sorterOptions = {
                 dataTransferResolver: (dataTransfer, item) => {dataTransfer.setData("text/plain", item.$block.label)}, // (Optional) Append OS data to the moved item.
                 compareElementToModel: (el, modelEntry) => modelEntry.contentUdi === el.dataset.elementUdi,
@@ -205,21 +187,18 @@
                 onAllowed: onSortAllowed,
                 onRequestDrop: onSortRequestDrop
             }
-
-            // TODO: implement show not allowed:
-            // TODO: implement hide not allowed:
         }
 
         function onSortStart(data) {
             // Gather containedPropertyEditorProxies from this element.
-            vm.containedPropertyEditorProxies = Array.from(data.element.querySelectorAll('slot[data-is-property-editor-proxy]')).map(x => x.getAttribute('name'));
-
+            currentContainedPropertyEditorProxies = Array.from(data.element.querySelectorAll('slot[data-is-property-editor-proxy]')).map(x => x.getAttribute('name'));
             vm.blockEditorApi.internal.startDraggingMode();
         }
 
         function onSortEnd() {
             vm.blockEditorApi.internal.exitDraggingMode();
-            vm.containedPropertyEditorProxies = [];
+            currentContainedPropertyEditorProxies = [];
+            notifyVisualUpdate();
             $scope.$evalAsync();
         }
 
