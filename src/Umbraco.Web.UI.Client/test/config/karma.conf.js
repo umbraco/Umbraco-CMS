@@ -28,7 +28,7 @@ module.exports = function (config) {
       'node_modules/moment/min/moment-with-locales.js',
       'lib/umbraco/Extensions.js',
       'node_modules/lazyload-js/LazyLoad.min.js',
-      'node_modules/angular-dynamic-locale/dist/tmhDynamicLocale.min.js'
+      'node_modules/angular-dynamic-locale/dist/tmhDynamicLocale.min.js',
 
       //app bootstrap and loader
       'test/config/app.unit.js',
