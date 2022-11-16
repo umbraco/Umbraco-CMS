@@ -226,12 +226,10 @@
                 identifier: "BlockGridEditor_"+vm.blockEditorApi.internal.uniqueEditorKey,
                 boundarySelector: ".umb-block-grid__area", // (Optional) Used for extended boundary between containers.
                 containerSelector: ".umb-block-grid__layout-container", // Used for connecting with others
-                ignorerSelector: "a, img",
                 itemSelector: ".umb-block-grid__layout-item",
                 draggableSelector: ".umb-block-grid__block--view",
                 placeholderClass: "umb-block-grid__layout-item-placeholder",
                 ghostClass: "umb-block-grid__layout-item-ghost",
-                listSelector: ".umb-block-grid__layout-container",
                 items: vm.entries,
                 onStart: onSortStart,
                 onEnd: onSortEnd,

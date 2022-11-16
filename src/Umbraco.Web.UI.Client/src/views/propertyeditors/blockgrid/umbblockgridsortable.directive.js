@@ -37,16 +37,26 @@
 
 
 
-    function UmbBlockGridSorter() {
 
-        // scope.config.identifier
-        // scope.config.items
+    const DefaultConfig = {
+        compareElementToModel: (el, modelEntry) => modelEntry.contentUdi === el.dataset.elementUdi,
+        querySelectModelToElement: (container, modelEntry) => container.querySelector(`[data-element-udi='${modelEntry.contentUdi}']`),
+        identifier: "UmbBlockGridSorter",
+        containerSelector: "ol", // Used for connecting with others
+        ignorerSelector: "a, img",
+        itemSelector: "li",
+        draggableSelector: "[draggable]",
+        placeholderClass: "umb-drag-placeholder",
+        ghostClass: "umb-drag-ghost"
+    }
+
+
+
+    function UmbBlockGridSorter() {
 
 
         // Take over native auto scroll
         /* TODOS:
-            Transfer to another container
-
             Take over native auto scroll
             Indicate not allowed drop
         */
@@ -72,12 +82,14 @@
 
             let vm = {};
 
+            const config = {...DefaultConfig, ...scope.config};
+
             // TODO: Actually not used for anything at this point of time when im writting this:
             vm.elements = [];
-            vm.items = scope.config.items;
+            vm.items = config.items;
 
 
-            let containerEl = scope.config.containerSelector ? element[0].closest(scope.config.containerSelector) : containerEl[0];
+            let containerEl = config.containerSelector ? element[0].closest(config.containerSelector) : containerEl[0];
             if (!containerEl) {
                 console.error("Could not initialize umb block grid sorter.", element[0])
                 return;
@@ -111,7 +123,7 @@
 
                 setupIgnorerElements(element);
 
-                const dragElement = element.querySelector(scope.config.draggableSelector);
+                const dragElement = element.querySelector(config.draggableSelector);
                 dragElement.draggable = true;
                 dragElement.addEventListener('dragstart', handleDragStart);
             }
@@ -128,17 +140,17 @@
 
                 destroyIgnorerElements(element);
 
-                const dragElement = element.querySelector(scope.config.draggableSelector);
+                const dragElement = element.querySelector(config.draggableSelector);
                 dragElement.removeEventListener('dragstart', handleDragStart);
             }
 
             function setupIgnorerElements(element) {
-                scope.config.ignorerSelector.split(',').forEach(function (criteria) {
+                config.ignorerSelector.split(',').forEach(function (criteria) {
                     element.querySelectorAll(criteria.trim()).forEach(setupPreventEvent);
                 });
             }
             function destroyIgnorerElements(element) {
-                scope.config.ignorerSelector.split(',').forEach(function (criteria) {
+                config.ignorerSelector.split(',').forEach(function (criteria) {
                     element.querySelectorAll(criteria.trim()).forEach(destroyPreventEvent);
                 });
             }
@@ -173,28 +185,28 @@
 
                 event.stopPropagation();
 
-                const element = event.target.closest(scope.config.itemSelector);
+                const element = event.target.closest(config.itemSelector);
                 element.addEventListener('drag', handleDragMove);
                 element.addEventListener('dragend', handleDragEnd);
 
                 //console.log("handleDragStart", element.dataset.elementUdi);
 
                 currentElement = element;
-                currentDragElement = element.querySelector(scope.config.draggableSelector);
+                currentDragElement = element.querySelector(config.draggableSelector);
                 currentDragRect = currentDragElement.getBoundingClientRect();
-                currentItem = vm.items.find(entry => scope.config.compareElementToModel(element, entry));
+                currentItem = vm.items.find(entry => config.compareElementToModel(element, entry));
 
                 const mouseOffsetX = Math.round(event.clientX - currentDragRect.left); //x position within the element.
                 const mouseOffsetY = Math.round(event.clientY - currentDragRect.top);  //y position within the element.
                 element.style.transformOrigin = `${Math.round((mouseOffsetX/currentDragRect.width)*100)}% ${Math.round((mouseOffsetY/currentDragRect.height)*100)}%`;
-                element.classList.add(scope.config.ghostClass);
+                element.classList.add(config.ghostClass);
 
-                if (scope.config.dataTransferResolver) {
-                    scope.config.dataTransferResolver(event.dataTransfer, currentItem);
+                if (config.dataTransferResolver) {
+                    config.dataTransferResolver(event.dataTransfer, currentItem);
                 }
 
-                if (scope.config.onStart) {
-                    scope.config.onStart(currentItem);
+                if (config.onStart) {
+                    config.onStart(currentItem);
                 }
 
                 
@@ -203,8 +215,8 @@
                 // We must wait one frame before changing the look of the block.
                 // TODO: should this be cancelable
                 requestAnimationFrame(() => {
-                    element.classList.remove(scope.config.ghostClass);
-                    element.classList.add(scope.config.placeholderClass);
+                    element.classList.remove(config.ghostClass);
+                    element.classList.add(config.placeholderClass);
                 });
 
             }
@@ -213,16 +225,16 @@
 
                 event.stopPropagation();
 
-                const element = event.target.closest(scope.config.itemSelector);
+                const element = event.target.closest(config.itemSelector);
                 element.removeEventListener('drag', handleDragMove);
                 element.removeEventListener('dragend', handleDragEnd);
 
-                element.classList.remove(scope.config.placeholderClass);
+                element.classList.remove(config.placeholderClass);
 
                 currentContainerVM.sync(currentElement, vm);
 
-                if (scope.config.onEnd) {
-                    scope.config.onEnd(currentItem);
+                if (config.onEnd) {
+                    config.onEnd(currentItem);
                 }
 
                 if(rqaId) {
@@ -284,14 +296,14 @@
                 }
                 */
                 
-                currentDragRect = currentDragElement.getBoundingClientRect();
-                const insideCurrentRect = isWithinRect(dragX, dragY, currentDragRect);
+                const currentElementRect = currentElement.getBoundingClientRect();
+                const insideCurrentRect = isWithinRect(dragX, dragY, currentElementRect);
                 if (insideCurrentRect) {
                     return;
                 }
 
                 // If we have a boundarySelector, try it, if we didn't get anything fall back to currentContainerElement.
-                var currentBoundaryElement = (scope.config.boundarySelector ? currentContainerElement.closest(scope.config.boundarySelector) : currentContainerElement) || currentContainerElement;
+                var currentBoundaryElement = (config.boundarySelector ? currentContainerElement.closest(config.boundarySelector) : currentContainerElement) || currentContainerElement;
 
                 var currentBoundaryRect = currentBoundaryElement.getBoundingClientRect();
                 
@@ -302,8 +314,8 @@
                 const offsetEdge = currentContainerHasItems ? -10 : 20;
                 if(isWithinRect(dragX, dragY, currentBoundaryRect, offsetEdge)) {
                     // we are good...
-                } else if (scope.config.containerSelector) {
-                    var parentContainer = currentContainerElement.parentNode.closest(scope.config.containerSelector);
+                } else if (config.containerSelector) {
+                    var parentContainer = currentContainerElement.parentNode.closest(config.containerSelector);
                     if(parentContainer) {
                         const parentContainerVM = parentContainer['umbBlockGridSorter:vm']();
                         if(parentContainerVM.sortGroupIdentifier === vm.sortGroupIdentifier) {
@@ -320,13 +332,17 @@
 
                 // gather elements on the same row.
                 let elementsInSameRow = [];
+                let placeholderIsInThisRow = false;
                 for (const el of currentContainerVM.elements) {
                     const elRect = el.getBoundingClientRect();
                     // gather elements on the same row.
-                    if(dragY >= elRect.top && dragY <= elRect.bottom && el !== currentElement) {
-                        const dragElement = el.querySelector(scope.config.draggableSelector);
+                    if(dragY >= elRect.top && dragY <= elRect.bottom) {
+                        const dragElement = el.querySelector(config.draggableSelector);
                         const dragElementRect = dragElement.getBoundingClientRect();
                         elementsInSameRow.push({el:el, elRect:elRect, dragRect:dragElementRect});
+                        if(el !== currentElement) {
+                            placeholderIsInThisRow = true;
+                        }
                     }
                 }
 
@@ -347,11 +363,10 @@
                     }
                 });
 
-                /*
+                // If we are on top or closest to our self, we should not do anything.
                 if (foundEl === currentElement) {
                     return;
                 }
-                */
                
                 // We want to retrive the children of the container, everytime to ensure we got the right order and index
                 const orderedContainerElements = Array.from(currentContainerElement.children);
@@ -359,26 +374,24 @@
                 if (foundEl) {
 
                     //let newIndex = containerElements.indexOf(foundRelatedEl);
-                    //let foundItem = vm.items.find(entry => scope.config.compareElementToModel(foundEl, entry));
+                    //let foundItem = vm.items.find(entry => config.compareElementToModel(foundEl, entry));
 
-
-                    // Ghost is already on same line and we are not hovering the related element?
-                    const currentRectCenterY = currentDragRect.top + (currentDragRect.height*.5);
                     const isInsideFound = isWithinRect(dragX, dragY, foundElDragRect, 0);
                     
-
-                    // TODO: find another more generic way to do this.
+                    // If we are inside the found element, lets look for sub containers.
+                    // use the itemHasNestedContainersResolver, if not configured fallback to looking for the existence of a container via DOM.
                     if (isInsideFound && 
-                        scope.config.itemHasNestedContainersResolver ? scope.config.itemHasNestedContainersResolver(foundEl) : foundEl.querySelector(scope.config.containerSelector)) {
-                        // If mouse is on top of an area, then make that the new approvedContainer?
-                        const blockView = foundEl.querySelector('.umb-block-grid__block--view');// TODO: I guess we could skip this line.
-                        const subLayouts = blockView.querySelectorAll('.umb-block-grid__layout-container');
+                        config.itemHasNestedContainersResolver ? config.itemHasNestedContainersResolver(foundEl) : foundEl.querySelector(config.containerSelector)) {
+                        
+                        // Find all sub containers:
+                        const subLayouts = foundEl.querySelectorAll(config.containerSelector);
                         for (const subLayoutEl of subLayouts) {
 
-                            var subBoundaryElement = (scope.config.boundarySelector ? subLayoutEl.closest(scope.config.boundarySelector) : subLayoutEl) || subLayoutEl;
+                            // Use boundary element or fallback to container element.
+                            var subBoundaryElement = (config.boundarySelector ? subLayoutEl.closest(config.boundarySelector) : subLayoutEl) || subLayoutEl;
                             var subBoundaryRect = subBoundaryElement.getBoundingClientRect();
 
-                            const subContainerHasItems = subLayoutEl.querySelector('.umb-block-grid__layout-item:not(.'+scope.config.placeholderClass+')');
+                            const subContainerHasItems = subLayoutEl.querySelector(config.itemSelector+':not(.'+config.placeholderClass+')');
                             // gather elements on the same row.
                             const subOffsetEdge = subContainerHasItems ? -10 : 20;
                             if(isWithinRect(dragX, dragY, subBoundaryRect, subOffsetEdge)) {
@@ -395,13 +408,6 @@
                         }
                     }
                     
-                    if (currentRectCenterY > foundElDragRect.top && currentRectCenterY < foundElDragRect.bottom && !isInsideFound) {
-                        // Note: during conversion i'm not sure why I have written this line..
-                        // TODO: check what this has of impact.
-                        console.error("This case, why?, I havent seen this happen. So I think this should be removed.")
-                        return;
-                    }
-
                     /*
                     TODO: Make indication / accept flow..
                     const containerVM = currentContainerElement['Sortable:controller']();
@@ -440,7 +446,17 @@
                     }
 
 
-                    const relatedStartX = foundElDragRect.left - currentContainerRect.left;
+
+                    let offsetPlacement = 0;
+                    /* If placeholder is in this same line, we want to assume that it will offset the placement of the found element, 
+                    which provides more potential space for the item to drop at.
+                    This is relevant in this calculation where we look at the space to determine if its a vertical or horizontal drop in relation to the found element.
+                    */
+                    if(placeholderIsInThisRow && currentElementRect.left < foundElDragRect.left) {
+                        offsetPlacement = -(currentElementRect.width + gridColumnGap);
+                    }
+
+                    const relatedStartX = Math.max(foundElDragRect.left - currentContainerRect.left + offsetPlacement, 0);
                     const relatedStartCol = Math.round(getInterpolatedIndexOfPositionInWeightMap(relatedStartX, approvedContainerGridColumns));
 
                     // If the found related element does not have enough room after which for the current element, then we go vertical mode:
@@ -490,8 +506,8 @@
                     currentContainerElement.appendChild(currentElement);
                 }
 
-                if(scope.config.onChange) {
-                    scope.config.onChange();
+                if(config.onChange) {
+                    config.onChange();
                 }
             }
 
@@ -501,7 +517,7 @@
                 if(!element) {
                     return null;
                 }
-                const oldIndex = vm.items.findIndex(entry => scope.config.compareElementToModel(element, entry));
+                const oldIndex = vm.items.findIndex(entry => config.compareElementToModel(element, entry));
                 if(oldIndex !== -1) {
                     return vm.items.splice(oldIndex, 1)[0];
                 }
@@ -523,7 +539,7 @@
                 let nextEl;
                 let loopEl = element;
                 while(loopEl = loopEl.nextElementSibling) {
-                    if(loopEl.matches && loopEl.matches(scope.config.itemSelector)) {
+                    if(loopEl.matches && loopEl.matches(config.itemSelector)) {
                         nextEl = loopEl;
                         break;
                     }
@@ -533,7 +549,7 @@
                 if(nextEl) {
                     // We had a reference element, we want to get the index of it.
                     // This is problem if a item is being moved forward?
-                    newIndex = vm.items.findIndex(entry => scope.config.compareElementToModel(nextEl, entry));
+                    newIndex = vm.items.findIndex(entry => config.compareElementToModel(nextEl, entry));
                 }
 
                 vm.items.splice(newIndex, 0, movingItem);
@@ -545,8 +561,8 @@
             }
 
             vm.notifySync = function(movingItem) {
-                if(scope.config.onSync) {
-                    scope.config.onSync(movingItem);
+                if(config.onSync) {
+                    config.onSync(movingItem);
                 }
             }
 
