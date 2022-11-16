@@ -24,10 +24,9 @@
   <PropertyGroup>
     <JsonSchemaPath>$(MSBuildThisFileDirectory)appsettings-schema.json</JsonSchemaPath>
     <JsonSchemaCmsPath>$(MSBuildThisFileDirectory)appsettings-schema.Umbraco.Cms.json</JsonSchemaCmsPath>
-    <JsonSchemaProjectPath>$(MSBuildThisFileDirectory)..\JsonSchema\</JsonSchemaProjectPath>
   </PropertyGroup>
-  <Target Name="GenerateAppsettingsSchema" BeforeTargets="Build;CopyAppsettingsSchema" Condition="!Exists('$(JsonSchemaPath)') or !Exists('$(JsonSchemaCmsPath)')">
-    <Message Text="Generating appsettings-schema.json and appsettings-schema.Umbraco.Cms.json because it doesn't exist" Importance="high" />
-    <Exec WorkingDirectory="$(JsonSchemaProjectPath)" Command="dotnet run -c Release -- --mainOutputFile &quot;$(JsonSchemaPath)&quot; --cmsOutputFile &quot;$(JsonSchemaCmsPath)&quot;" />
+  <Target Name="GenerateAppsettingsSchema" BeforeTargets="Build;CopyAppsettingsSchema" Condition="!Exists('$(JsonSchemaCmsPath)')">
+    <Message Text="Generating $(JsonSchemaCmsPath) because it doesn't exist" Importance="high" />
+    <Exec WorkingDirectory="$(MSBuildThisFileDirectory)..\..\tools\Umbraco.JsonSchema" Command="dotnet run --configuration $(Configuration) -- --outputFile &quot;$(JsonSchemaCmsPath)&quot;" />
   </Target>
 </Project>

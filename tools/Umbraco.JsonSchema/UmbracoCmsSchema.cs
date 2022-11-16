@@ -1,20 +1,22 @@
-// Copyright (c) Umbraco.
-// See LICENSE for more details.
-
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 
-namespace JsonSchema;
-
-internal class AppSettings
+internal class UmbracoCmsSchema
 {
-    // ReSharper disable once InconsistentNaming
-    public CmsDefinition? CMS { get; set; }
+    public UmbracoDefinition? Umbraco { get; set; }
 
     /// <summary>
-    /// Configurations for the Umbraco CMS
+    /// Configuration container for all Umbraco products.
     /// </summary>
-    public class CmsDefinition
+    public class UmbracoDefinition
+    {
+        public UmbracoCmsDefinition? CMS { get; set; }
+    }
+
+    /// <summary>
+    /// Configuration of Umbraco CMS.
+    /// </summary>
+    public class UmbracoCmsDefinition
     {
         public ContentSettings? Content { get; set; }
 
@@ -73,7 +75,5 @@ internal class AppSettings
         public InstallDefaultDataSettings? DefaultDataCreation { get; set; }
 
         public DataTypesSettings? DataTypes { get; set; }
-
-        public LicensesSettings? Licenses { get; set; }
     }
 }
