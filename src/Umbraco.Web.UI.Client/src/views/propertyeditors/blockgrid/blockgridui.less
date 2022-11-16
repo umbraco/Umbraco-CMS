@@ -647,7 +647,7 @@ ng-form.ng-invalid > .umb-block-grid__block:not(.--active) > .umb-block-grid__bl
     height: 100%;
     display: flex;
     flex-direction: column;
-    --umb-block-grid--show-area-ui: 0;
+    --umb-block-grid--show-area-ui: var(--umb-block-grid--dragging-mode, 0);
 }
 .umb-block-grid__area:focus,
 .umb-block-grid__area:focus-within,
