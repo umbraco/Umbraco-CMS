@@ -45,4 +45,9 @@
     <Message Text="Generating $(_UmbracoCmsJsonSchemaReference) because it doesn't exist" Importance="high" />
     <Exec WorkingDirectory="$(MSBuildThisFileDirectory)..\..\tools\Umbraco.JsonSchema" Command="dotnet run --configuration $(Configuration) -- --outputFile &quot;$(MSBuildThisFileDirectory)$(_UmbracoCmsJsonSchemaReference)&quot;" />
   </Target>
+
+  <!-- Remove generated JSON schema on clean -->
+  <Target Name="RemoveAppsettingsSchema" AfterTargets="Clean" Condition="Exists('$(_UmbracoCmsJsonSchemaReference)')">
+    <Delete Files="$(_UmbracoCmsJsonSchemaReference)" />
+  </Target>
 </Project>
