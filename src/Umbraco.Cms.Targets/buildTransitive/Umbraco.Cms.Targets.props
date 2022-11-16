@@ -9,4 +9,8 @@
     <Using Include="Umbraco.Cms.Core.DependencyInjection" />
     <Using Include="Umbraco.Extensions" />
   </ItemGroup>
+  <ItemGroup>
+    <UmbracoJsonSchemaReferences Include="https://json.schemastore.org/appsettings.json" />
+    <UmbracoJsonSchemaFiles Include="$(MSBuildThisFileDirectory)..\appsettings-schema.Umbraco.Cms.json" />
+  </ItemGroup>
 </Project>
