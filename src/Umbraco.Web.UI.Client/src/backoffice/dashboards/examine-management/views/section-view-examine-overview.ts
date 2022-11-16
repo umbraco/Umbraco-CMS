@@ -7,7 +7,7 @@ import { UmbNotificationService } from '../../../../core/services/notification';
 import { UmbNotificationDefaultData } from '../../../../core/services/notification/layouts/default';
 
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-import { ApiError, ProblemDetails, Searcher, Index, PagedIndex, SearchResource } from '@umbraco-cms/backend-api';
+import { ApiError, ProblemDetails, Searcher, Index, SearchResource } from '@umbraco-cms/backend-api';
 
 @customElement('umb-dashboard-examine-overview')
 export class UmbDashboardExamineOverviewElement extends UmbContextConsumerMixin(LitElement) {
@@ -65,12 +65,12 @@ export class UmbDashboardExamineOverviewElement extends UmbContextConsumerMixin(
 
 	private async _getIndexers() {
 		try {
-			const indexers = await SearchResource.getSearchIndex({ skip: 0, take: 3 });
+			const indexers = await SearchResource.getSearchIndex({});
 			this._indexers = indexers.items as Index[];
 		} catch (e) {
 			if (e instanceof ApiError) {
-				const error = e.body as ProblemDetails;
-				const data: UmbNotificationDefaultData = { message: error.data.detail ?? 'Could not fetch indexers' };
+				const error = e as ProblemDetails;
+				const data: UmbNotificationDefaultData = { message: error.message ?? 'Could not fetch indexers' };
 				this._notificationService?.peek('danger', { data });
 			}
 		}
@@ -78,12 +78,12 @@ export class UmbDashboardExamineOverviewElement extends UmbContextConsumerMixin(
 
 	private async _getSearchers() {
 		try {
-			const searchers = await SearchResource.getSearchSearcher({ skip: 0, take: 3 });
+			const searchers = await SearchResource.getSearchSearcher({});
 			this._searchers = searchers.items as Searcher[];
 		} catch (e) {
 			if (e instanceof ApiError) {
-				const error = e.body as ProblemDetails;
-				const data: UmbNotificationDefaultData = { message: error.data.detail ?? 'Could not fetch searchers' };
+				const error = e as ProblemDetails;
+				const data: UmbNotificationDefaultData = { message: error.message ?? 'Could not fetch searchers' };
 				this._notificationService?.peek('danger', { data });
 			}
 		}

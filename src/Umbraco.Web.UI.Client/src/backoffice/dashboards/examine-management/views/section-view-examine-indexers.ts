@@ -146,8 +146,8 @@ export class UmbDashboardExamineIndexElement extends UmbContextConsumerMixin(Lit
 			} catch (e) {
 				this._buttonState = 'failed';
 				if (e instanceof ApiError) {
-					const error = e.body as ProblemDetails;
-					const data: UmbNotificationDefaultData = { message: error.data.detail ?? 'Rebuild error' };
+					const error = e as ProblemDetails;
+					const data: UmbNotificationDefaultData = { message: error.message ?? 'Rebuild error' };
 					this._notificationService?.peek('danger', { data });
 				}
 			}

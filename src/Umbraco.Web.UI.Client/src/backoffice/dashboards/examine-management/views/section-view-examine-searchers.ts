@@ -150,7 +150,6 @@ export class UmbDashboardExamineSearcherElement extends UmbContextConsumerMixin(
 			const res = await SearchResource.getSearchSearcherBySearcherNameSearch({
 				searcherName: this.searcherName,
 				query: this._searchInput.value,
-				take: 100,
 			});
 			const pagedSearchResults = res.items as PagedSearchResult[];
 			this._searchResults = pagedSearchResults[0].items;
