@@ -133,6 +133,18 @@ public static partial class UmbracoBuilderExtensions
                 settings.AllowedUploadedFileExtensions = allowedUploadFilesValue;
             }
         });
+
+        // TODO: Remove this in V13
+        builder.Services.Configure<ContentSettings>(settings =>
+        {
+            var disallowedUploadedFileExtensionsValue = builder.Config.GetSection($"{Constants.Configuration.ConfigContent}:{nameof(ContentSettings.DisallowedUploadedFileExtensions)}").Get<string[]>();
+            var disallowedUploadFilesValue = builder.Config.GetSection($"{Constants.Configuration.ConfigContent}:{nameof(ContentSettings.DisallowedUploadFiles)}").Get<string[]>();
+
+            if (disallowedUploadedFileExtensionsValue is null && disallowedUploadFilesValue is not null)
+            {
+                settings.AllowedUploadedFileExtensions = disallowedUploadFilesValue;
+            }
+        });
         return builder;
     }
 }
