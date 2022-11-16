@@ -59,6 +59,9 @@
         /* TODOS:
             Take over native auto scroll
             Indicate not allowed drop
+
+            replace on Area config
+            remove sortableJS dependency.
         */
 
         function link(scope, element) {
@@ -114,6 +117,7 @@
 
             function setupItem(element) {
                 if(vm.elements.indexOf(element) !== -1) {
+                    console.error("DOES THIS EVER HAPPEN if so we can keep the elements list.")
                     return;
                 }
 
@@ -131,6 +135,7 @@
             function destroyItem(element) {
                 const elementIndex = vm.elements.indexOf(element);
                 if(elementIndex === -1) {
+                    console.error("DOES THIS EVER HAPPEN if so we can keep the elements list.")
                     return
                 }
 
