@@ -6,6 +6,7 @@
 	"service": "app",
 	"workspaceFolder": "/workspace",
 	
+	
 	// Set *default* container specific settings.json values on container create.
 	"settings": {		
 		"omnisharp.defaultLaunchSolution": "umbraco.sln",
@@ -38,6 +39,12 @@
 	
 	// This is used in the prebuilds - so dotnet build (nuget restore and node stuff) is done
 	"updateContentCommand": "dotnet build umbraco.sln && dotnet dev-certs https --trust  && sudo apt-get update && sudo apt install sqlite3",
+
+	// Port needed to help discover SMTP4Dev
+	"forwardPorts": [
+		5000
+	],
+
 	"portsAttributes": {
 		"5000": {
 			"label": "SMTP4Dev",
@@ -61,7 +68,7 @@
 			".github/codespaces-readme.md"
 		  ]
 		}
-	  }
+	}
 
 	// [Optional] To reuse of your local HTTPS dev cert:
 	//
