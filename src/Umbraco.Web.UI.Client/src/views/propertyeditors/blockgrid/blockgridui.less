@@ -573,6 +573,9 @@ ng-form.ng-invalid > .umb-block-grid__block:not(.--active) > .umb-block-grid__bl
     /* Move inline create button slightly up, to avoid collision with others*/
     margin-bottom: -7px;
     margin-top: -13px;
+
+    /** Avoid showing last-inline-create in dragging-mode */
+    opacity: calc(1 - var(--umb-block-grid--dragging-mode, 0));
 }
 
 
