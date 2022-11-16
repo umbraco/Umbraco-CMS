@@ -32,11 +32,6 @@
     }
 
 
-    function isWithinRect(x, y, rect, modifier) {
-        return (x > rect.left - modifier && x < rect.right + modifier && y > rect.top - modifier && y < rect.bottom + modifier);
-    }
-
-
 
     /**
      * @ngdoc directive
@@ -150,6 +145,8 @@
             }
         }
 
+        // Used by umb block grid entries component, to trigger other blocks to update.
+        vm.notifyVisualUpdate = notifyVisualUpdate;
         function notifyVisualUpdate() {
             $scope.$broadcast("blockGridEditorVisualUpdate", {areaKey: vm.areaKey});
         }
