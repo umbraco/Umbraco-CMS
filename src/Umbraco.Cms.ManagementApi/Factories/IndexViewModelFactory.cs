@@ -39,16 +39,16 @@ public class IndexViewModelFactory : IIndexViewModelFactory
 
         var properties = new Dictionary<string, object?>();
 
-        foreach (var p in indexDiag.Metadata)
+        foreach (var property in indexDiag.Metadata)
         {
-            if (p.Value is null)
+            if (property.Value is null)
             {
-                properties[p.Key] = null;
+                properties[property.Key] = null;
             }
             else
             {
-                var t = p.Value.GetType();
-                properties[p.Key] = t.IsClass && !t.IsArray ? p.Value?.ToString() : p.Value;
+                var t = property.Value.GetType();
+                properties[property.Key] = t.IsClass && !t.IsArray ? property.Value?.ToString() : property.Value;
             }
         }
 
