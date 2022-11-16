@@ -2,7 +2,7 @@
 
     <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
 
-    <div ng-show="vm.loading !== true" 
+    <div ng-if="vm.loading !== true" 
         class="umb-block-grid-area-editor__grid-wrapper"
         style="--umb-block-grid--block-grid-columns: {{vm.block.areaGridColumns || vm.rootLayoutColumns}}"
         umb-block-grid-sorter="::vm.sorterOptions">
@@ -10,12 +10,15 @@
         <umb-block-grid-configuration-area-entry ng-repeat="area in vm.model track by area.key"
             class="umb-block-grid-area-editor__area"
             ng-class="{'--isOpen':vm.openArea === area}"
-            area="area"
+            data-area-key="{{area.key}}"
+            data-col-span="{{area.columnSpan}}"
+            data-row-span="{{area.rowSpan}}"
             style="
             --umb-block-grid--grid-column: {{area.columnSpan}};
             --umb-block-grid--area-column-span: {{area.columnSpan}};
             --umb-block-grid--area-row-span: {{area.rowSpan}};
             "
+            area="area"
             ng-click="vm.editArea(area)"
             on-edit="vm.editArea(area)"
             on-delete="vm.requestDeleteArea(area)"

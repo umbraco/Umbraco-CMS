@@ -84,8 +84,8 @@
 
             vm.sorterOptions = {
                 resolveVerticalDirection: resolveVerticalDirection,
-                compareElementToModel: (el, modelEntry) => modelEntry.contentUdi === el.dataset.elementUdi,
-                querySelectModelToElement: (container, modelEntry) => container.querySelector(`[data-element-udi='${modelEntry.contentUdi}']`),
+                compareElementToModel: (el, modelEntry) => modelEntry.key === el.dataset.areaKey,
+                querySelectModelToElement: (container, modelEntry) => container.querySelector(`[data-area-key='${modelEntry.key}']`),
                 itemHasNestedContainersResolver: () => false,// We never have nested in this case.
                 containerSelector: ".umb-block-grid-area-editor__grid-wrapper",
                 itemSelector: ".umb-block-grid-area-editor__area",
@@ -96,7 +96,7 @@
 
             function onSortSync(data) {
                 $scope.$evalAsync();
-                // TODO: setDirty
+                setDirty();
             }
 
             function resolveVerticalDirection(data) {
