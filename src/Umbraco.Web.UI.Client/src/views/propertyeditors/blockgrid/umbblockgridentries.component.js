@@ -194,9 +194,8 @@
 
 
         // TODO: clean up:
-        vm.layoutColumnsInt = 0;// Maybe not used by anything..
+        //vm.layoutColumnsInt = 0;// Maybe not used by anything..
         vm.showNotAllowedUI = false;
-        vm.movingLayoutEntry = null;
         vm.containedPropertyEditorProxies = [];
 
         function removeAllContainedPropertyEditorProxies() {
@@ -215,21 +214,23 @@
         function initializeSorter() {
 
             // Maybe not used by anything:
-            unsubscribe.push($scope.$watch("layoutColumns", (newVal, oldVal) => {
+            /*unsubscribe.push($scope.$watch("layoutColumns", (newVal, oldVal) => {
                 vm.layoutColumnsInt = parseInt(vm.layoutColumns, 10);
-            }));
+            }));*/
 
             vm.sorterOptions = {
-                dataTransferResolver: (dataTransfer, item) => {dataTransfer.setData("text/plain", item.$block.label)}, 
+                dataTransferResolver: (dataTransfer, item) => {dataTransfer.setData("text/plain", item.$block.label)}, // (Optional) Append OS data to the moved item.
                 compareElementToModel: (el, modelEntry) => modelEntry.contentUdi === el.dataset.elementUdi,
                 querySelectModelToElement: (container, modelEntry) => container.querySelector(`[data-element-udi='${modelEntry.contentUdi}']`),
+                itemHasNestedContainersResolver: (foundEl) => foundEl.classList.contains('--has-areas'), // (Optional) improve performance for recognizing if an items has inner containers.
                 identifier: "BlockGridEditor_"+vm.blockEditorApi.internal.uniqueEditorKey,
-                containerSelector: ".umb-block-grid__layout-container",
+                boundarySelector: ".umb-block-grid__area", // (Optional) Used for extended boundary between containers.
+                containerSelector: ".umb-block-grid__layout-container", // Used for connecting with others
                 ignorerSelector: "a, img",
                 itemSelector: ".umb-block-grid__layout-item",
                 draggableSelector: ".umb-block-grid__block--view",
                 placeholderClass: "umb-block-grid__layout-item-placeholder",
-                ghostClass: ".umb-block-grid__layout-item-ghost",
+                ghostClass: "umb-block-grid__layout-item-ghost",
                 listSelector: ".umb-block-grid__layout-container",
                 items: vm.entries,
                 onStart: onSortStart,

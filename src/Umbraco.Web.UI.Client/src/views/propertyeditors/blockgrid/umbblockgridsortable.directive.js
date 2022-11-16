@@ -77,7 +77,7 @@
             vm.items = scope.config.items;
 
 
-            let containerEl = element[0].closest(scope.config.containerSelector);
+            let containerEl = scope.config.containerSelector ? element[0].closest(scope.config.containerSelector) : containerEl[0];
             if (!containerEl) {
                 console.error("Could not initialize umb block grid sorter.", element[0])
                 return;
@@ -181,7 +181,13 @@
 
                 currentElement = element;
                 currentDragElement = element.querySelector(scope.config.draggableSelector);
+                currentDragRect = currentDragElement.getBoundingClientRect();
                 currentItem = vm.items.find(entry => scope.config.compareElementToModel(element, entry));
+
+                const mouseOffsetX = Math.round(event.clientX - currentDragRect.left); //x position within the element.
+                const mouseOffsetY = Math.round(event.clientY - currentDragRect.top);  //y position within the element.
+                element.style.transformOrigin = `${Math.round((mouseOffsetX/currentDragRect.width)*100)}% ${Math.round((mouseOffsetY/currentDragRect.height)*100)}%`;
+                element.classList.add(scope.config.ghostClass);
 
                 if (scope.config.dataTransferResolver) {
                     scope.config.dataTransferResolver(event.dataTransfer, currentItem);
@@ -191,13 +197,13 @@
                     scope.config.onStart(currentItem);
                 }
 
-                //const mouseOffsetX = Math.round(event.clientX - dragElementRect.left); //x position within the element.
-                //const mouseOffsetY = Math.round(event.clientY - dragElementRect.top);  //y position within the element.
-                //event.dataTransfer.setDragImage(dragElement, mouseOffsetX, mouseOffsetY);
+                
+                event.dataTransfer.setDragImage(currentDragElement, mouseOffsetX, mouseOffsetY);
 
                 // We must wait one frame before changing the look of the block.
                 // TODO: should this be cancelable
                 requestAnimationFrame(() => {
+                    element.classList.remove(scope.config.ghostClass);
                     element.classList.add(scope.config.placeholderClass);
                 });
 
@@ -284,28 +290,32 @@
                     return;
                 }
 
-                var currentContainerRect = currentContainerElement.getBoundingClientRect();
+                // If we have a boundarySelector, try it, if we didn't get anything fall back to currentContainerElement.
+                var currentBoundaryElement = (scope.config.boundarySelector ? currentContainerElement.closest(scope.config.boundarySelector) : currentContainerElement) || currentContainerElement;
 
+                var currentBoundaryRect = currentBoundaryElement.getBoundingClientRect();
                 
                 const currentContainerHasItems = currentContainerVM.items.filter(x => x !== currentItem).length > 0;
 
                 // if empty we will be move likely to accept an item (add 20px to the bounding box)
                 // If we have items we must be 10 within the container to accept the move.
-                if(
-                    !currentContainerHasItems && isWithinRect(dragX, dragY, currentContainerRect, 20) || 
-                    currentContainerHasItems && isWithinRect(dragX, dragY, currentContainerRect, -10)) {
+                const offsetEdge = currentContainerHasItems ? -10 : 20;
+                if(isWithinRect(dragX, dragY, currentBoundaryRect, offsetEdge)) {
                     // we are good...
-                } else {
+                } else if (scope.config.containerSelector) {
                     var parentContainer = currentContainerElement.parentNode.closest(scope.config.containerSelector);
                     if(parentContainer) {
                         const parentContainerVM = parentContainer['umbBlockGridSorter:vm']();
                         if(parentContainerVM.sortGroupIdentifier === vm.sortGroupIdentifier) {
-                            currentContainerRect = currentContainerElement.getBoundingClientRect();
                             currentContainerElement = parentContainer;
                             currentContainerVM = parentContainerVM;
                         }
                     }
                 }
+
+
+
+                var currentContainerRect = currentContainerElement.getBoundingClientRect();
                 
 
                 // gather elements on the same row.
@@ -358,20 +368,25 @@
                     
 
                     // TODO: find another more generic way to do this.
-                    if (isInsideFound && foundEl.classList.contains('--has-areas')) {
+                    if (isInsideFound && 
+                        scope.config.itemHasNestedContainersResolver ? scope.config.itemHasNestedContainersResolver(foundEl) : foundEl.querySelector(scope.config.containerSelector)) {
                         // If mouse is on top of an area, then make that the new approvedContainer?
                         const blockView = foundEl.querySelector('.umb-block-grid__block--view');// TODO: I guess we could skip this line.
                         const subLayouts = blockView.querySelectorAll('.umb-block-grid__layout-container');
-                        for (const subLayout of subLayouts) {
-                            const subLayoutRect = subLayout.getBoundingClientRect();
-                            const hasItems = subLayout.querySelector('.umb-block-grid__layout-item:not(.'+scope.config.placeholderClass+')');
+                        for (const subLayoutEl of subLayouts) {
+
+                            var subBoundaryElement = (scope.config.boundarySelector ? subLayoutEl.closest(scope.config.boundarySelector) : subLayoutEl) || subLayoutEl;
+                            var subBoundaryRect = subBoundaryElement.getBoundingClientRect();
+
+                            const subContainerHasItems = subLayoutEl.querySelector('.umb-block-grid__layout-item:not(.'+scope.config.placeholderClass+')');
                             // gather elements on the same row.
-                            if(!hasItems && isWithinRect(dragX, dragY, subLayoutRect, 20) || hasItems && isWithinRect(dragX, dragY, subLayoutRect, -10)) {
+                            const subOffsetEdge = subContainerHasItems ? -10 : 20;
+                            if(isWithinRect(dragX, dragY, subBoundaryRect, subOffsetEdge)) {
                                 
-                                var subVm = subLayout['umbBlockGridSorter:vm']();
+                                var subVm = subLayoutEl['umbBlockGridSorter:vm']();
                                 // TODO: check acceptance, maybe combine with indication or acceptable?.
                                 //if(subVm.sortGroupIdentifier === vm.sortGroupIdentifier) {
-                                    currentContainerElement = subLayout;
+                                    currentContainerElement = subLayoutEl;
                                     currentContainerVM = subVm;
                                     moveCurrentElement();
                                     return;
@@ -441,6 +456,7 @@
                     const foundElIndex = orderedContainerElements.indexOf(foundEl);
                     const placeAt = (placeAfter ? foundElIndex+1 : foundElIndex);
 
+                    console.log("move", placeAt, orderedContainerElements.length, placeAfter ? " AFTER" : " before")
                     move(orderedContainerElements, placeAt);
 
                     return;
