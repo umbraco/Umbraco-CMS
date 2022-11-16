@@ -261,5 +261,5 @@ public class ContentSettings
     ///     Gets or sets a value for the collection of file extensions that are disallowed for upload.
     /// </summary>
     [DefaultValue(StaticDisallowedUploadFiles)]
-    public string[] DisAllowedUploadedFileExtensions { get; set; } = StaticDisallowedUploadFiles.Split(',');
+    public string[] DisallowedUploadedFileExtensions { get; set; } = StaticDisallowedUploadFiles.Split(',');
 }
