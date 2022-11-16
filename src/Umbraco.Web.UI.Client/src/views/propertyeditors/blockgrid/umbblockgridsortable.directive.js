@@ -196,11 +196,6 @@
                 currentDragRect = currentDragElement.getBoundingClientRect();
                 currentItem = vm.getItemOfElement(element);
 
-                const mouseOffsetX = Math.round(event.clientX - currentDragRect.left); //x position within the element.
-                const mouseOffsetY = Math.round(event.clientY - currentDragRect.top);  //y position within the element.
-                element.style.transformOrigin = `${Math.round((mouseOffsetX/currentDragRect.width)*100)}% ${Math.round((mouseOffsetY/currentDragRect.height)*100)}%`;
-                element.classList.add(config.ghostClass);
-
                 if (config.dataTransferResolver) {
                     config.dataTransferResolver(event.dataTransfer, currentItem);
                 }
@@ -209,7 +204,9 @@
                     config.onStart({item: currentItem, element: currentElement});
                 }
 
-                
+                const mouseOffsetX = event.clientX - currentDragRect.left; //x position within the element.
+                const mouseOffsetY = event.clientY - currentDragRect.top;  //y position within the element.
+
                 event.dataTransfer.setDragImage(currentDragElement, mouseOffsetX, mouseOffsetY);
 
                 // We must wait one frame before changing the look of the block.
