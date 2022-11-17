@@ -14,12 +14,6 @@
     grid-column-end: span min(calc(var(--umb-block-grid--item-column-span, 1) * 3), var(--umb-block-grid--grid-columns));
     grid-row: span var(--umb-block-grid--item-row-span, 1);
 }
-.umb-block-grid__layout-item[data-force-left] {
-    grid-column-start: 1;
-}
-.umb-block-grid__layout-item[data-force-right] {
-    grid-column-start: calc(1 + var(--umb-block-grid--grid-columns) - var(--umb-block-grid--item-column-span));
-}
 
 
 .umb-block-grid__area-container, .umb-block-grid__block--view::part(area-container) {
