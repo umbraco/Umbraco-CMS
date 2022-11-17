@@ -1,23 +1,18 @@
 import { html } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import { UmbEntityStore } from '../../../core/stores/entity.store';
 import { UmbTreeBase } from '../shared/tree-base.element';
-import { UmbTreeDocumentTypesDataContext } from './tree-document-types-data.context';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 
 import '../shared/tree-navigator.element';
+import { UmbDocumentTypeStore } from 'src/core/stores/document-type/document-type.store';
 
 @customElement('umb-tree-document-types')
 export class UmbTreeDocumentTypes extends UmbContextConsumerMixin(UmbContextProviderMixin(UmbTreeBase)) {
 	constructor() {
 		super();
 
-		this.consumeContext('umbEntityStore', (entityStore: UmbEntityStore) => {
-			this._entityStore = entityStore;
-			if (!this._entityStore) return;
-
-			this._treeDataContext = new UmbTreeDocumentTypesDataContext(this._entityStore);
-			this.provideContext('umbTreeDataContext', this._treeDataContext);
+		this.consumeContext('umbDocumentTypeStore', (store: UmbDocumentTypeStore) => {
+			this.provideContext('umbTreeStore', store);
 		});
 	}
 

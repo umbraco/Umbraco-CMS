@@ -14,6 +14,7 @@ import { handlers as userGroupsHandlers } from './domains/user-groups.handlers';
 
 // treeHandlers
 import { handlers as treeDataTypeHandlers } from './domains/tree-data-type.handlers';
+import { handlers as treeDocumentTypeHandlers } from './domains/tree-document-type.handlers';
 
 const handlers = [
 	serverHandlers.serverVersionHandler,
@@ -31,6 +32,7 @@ const handlers = [
 	...userGroupsHandlers,
 
 	...treeDataTypeHandlers,
+	...treeDocumentTypeHandlers,
 ];
 
 switch (import.meta.env.VITE_UMBRACO_INSTALL_STATUS) {

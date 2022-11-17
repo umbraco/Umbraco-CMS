@@ -1,9 +1,10 @@
 import { map, Observable } from 'rxjs';
-import { DocumentTypeDetails } from '../../mocks/data/document-type.data';
 import { UmbEntityStore } from '../entity.store';
 import { UmbDataStoreBase } from '../store';
+import { ApiError, DocumentTypeResource, DocumentTypeTreeItem, ProblemDetails } from '@umbraco-cms/backend-api';
+import type { DocumentTypeDetails } from '@umbraco-cms/models';
 
-export class UmbDocumentTypeStore extends UmbDataStoreBase<DocumentTypeDetails> {
+export class UmbDocumentTypeStore extends UmbDataStoreBase<DocumentTypeDetails | DocumentTypeTreeItem> {
 	private _entityStore: UmbEntityStore;
 
 	constructor(entityStore: UmbEntityStore) {
@@ -11,7 +12,7 @@ export class UmbDocumentTypeStore extends UmbDataStoreBase<DocumentTypeDetails> 
 		this._entityStore = entityStore;
 	}
 
-	getByKey(key: string): Observable<DocumentTypeDetails | null> {
+	getByKey(key: string): Observable<DocumentTypeDetails | DocumentTypeTreeItem | null> {
 		// TODO: use Fetcher API.
 		// TODO: only fetch if the data type is not in the store?
 		fetch(`/umbraco/backoffice/document-type/${key}`)
@@ -21,10 +22,7 @@ export class UmbDocumentTypeStore extends UmbDataStoreBase<DocumentTypeDetails> 
 			});
 
 		return this.items.pipe(
-			map(
-				(documentTypes: Array<DocumentTypeDetails>) =>
-					documentTypes.find((documentType: DocumentTypeDetails) => documentType.key === key) || null
-			)
+			map((documentTypes) => documentTypes.find((documentType) => documentType.key === key) || null)
 		);
 	}
 
@@ -44,5 +42,43 @@ export class UmbDocumentTypeStore extends UmbDataStoreBase<DocumentTypeDetails> 
 		} catch (error) {
 			console.error('Save Document Type error', error);
 		}
+	}
+
+	getTreeRoot(): Observable<Array<DocumentTypeTreeItem>> {
+		DocumentTypeResource.getTreeDocumentTypeRoot({}).then(
+			(res) => {
+				this.update(res.items);
+			},
+			(e) => {
+				if (e instanceof ApiError) {
+					const error = e.body as ProblemDetails;
+					if (e.status === 400) {
+						console.log(error.detail);
+					}
+				}
+			}
+		);
+
+		return this.items.pipe(map((items) => items.filter((item) => item.parentKey === null)));
+	}
+
+	getTreeItemChildren(key: string): Observable<Array<DocumentTypeTreeItem>> {
+		DocumentTypeResource.getTreeDocumentTypeChildren({
+			parentKey: key,
+		}).then(
+			(res) => {
+				this.update(res.items);
+			},
+			(e) => {
+				if (e instanceof ApiError) {
+					const error = e.body as ProblemDetails;
+					if (e.status === 400) {
+						console.log(error.detail);
+					}
+				}
+			}
+		);
+
+		return this.items.pipe(map((items) => items.filter((item) => item.parentKey === key)));
 	}
 }

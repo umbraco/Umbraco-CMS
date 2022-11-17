@@ -79,7 +79,7 @@ export class UmbDataTypeStore extends UmbDataStoreBase<DataTypeDetails | FolderT
 		this._entityStore.update(data);
 	}
 
-	getTreeRoot(): Observable<Array<DataTypeDetails | FolderTreeItem>> {
+	getTreeRoot(): Observable<Array<FolderTreeItem>> {
 		DataTypeResource.getTreeDataTypeRoot({}).then(
 			(res) => {
 				this.update(res.items);
@@ -97,7 +97,7 @@ export class UmbDataTypeStore extends UmbDataStoreBase<DataTypeDetails | FolderT
 		return this.items.pipe(map((items) => items.filter((item) => item.parentKey === null)));
 	}
 
-	getTreeItemChildren(key: string): Observable<Array<DataTypeDetails | FolderTreeItem>> {
+	getTreeItemChildren(key: string): Observable<Array<FolderTreeItem>> {
 		DataTypeResource.getTreeDataTypeChildren({
 			parentKey: key,
 		}).then(
