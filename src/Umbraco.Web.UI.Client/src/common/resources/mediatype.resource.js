@@ -121,6 +121,22 @@ function mediaTypeResource($q, $http, umbRequestHelper, umbDataFormatter, locali
                'Failed to retrieve all content types');
         },
 
+        getAllFiltered: function (aliases) {
+            var aliasesQuery = "";
+
+            if (aliases && aliases.length > 0) {
+                aliases.forEach(alias => aliasesQuery += `aliases=${alias}&`);
+            }
+
+            return umbRequestHelper.resourcePromise(
+               $http.get(
+                   umbRequestHelper.getApiUrl(
+                       "mediaTypeApiBaseUrl",
+                       "getAllFiltered",
+                       aliasesQuery)),
+               'Failed to retrieve media types');
+        },
+
         getScaffold: function (parentId) {
 
             return umbRequestHelper.resourcePromise(
