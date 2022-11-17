@@ -2756,7 +2756,9 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="tabBlockSettings">Settings</key>
     <key alias="headlineAdvanced">Advanced</key>
     <key alias="forceHideContentEditor">Hide content editor</key>
-    <key alias="forceHideContentEditorHelp">Hide the content edit button and the content editor from the Block Editor overlay</key>
+    <key alias="forceHideContentEditorHelp">Hide the content edit button and the content editor from the Block Editor overlay.</key>
+    <key alias="girdInlineEditing">Inline editing</key>
+    <key alias="girdInlineEditingHelp">Enables inline editing for the first Property. Additional properties can be edited in the overlay.</key>
     <key alias="blockHasChanges">You have made changes to this content. Are you sure you want to discard them?</key>
     <key alias="confirmCancelBlockCreationHeadline">Discard creation?</key>
     <key alias="confirmCancelBlockCreationMessage"><![CDATA[Are you sure you want to cancel the creation.]]></key>
@@ -2788,6 +2790,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="allowBlockInRootHelp">Make this block available in the root of the layout.</key>
     <key alias="allowBlockInAreas">Allow in areas</key>
     <key alias="allowBlockInAreasHelp">Make this block available within other Blocks.</key>
+    <key alias="areaAllowedBlocksEmpty">When empty all Blocks allowed for Areas can be created.</key>
     <key alias="areas">Areas</key>
     <key alias="areasLayoutColumns">Grid Columns for Areas</key>
     <key alias="areasLayoutColumnsHelp">Define how many columns that will be available for areas. If not defined, the number of columns defined for the entire layout will be used.</key>
@@ -2800,12 +2803,6 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
       <![CDATA[The inserted content contained disallowed content, which has not been created. Would you like to keep the rest of this content anyway?]]></key>
     <key alias="areaAliasHelp">
       <![CDATA[The alias will be printed by GetBlockGridHTML(), use the alias to target the Element representing this area. Ex. .umb-block-grid__area[data-area-alias="MyAreaAlias"] { ... }]]></key>
-    <key alias="forceLeftLabel">Force placement at left side</key>
-    <key alias="forceRightLabel">Force placement at right side</key>
-    <key alias="unforceLeftLabel">Remove forced placement at left side</key>
-    <key alias="unforceRightLabel">Remove forced placement at right side</key>
-    <key alias="forceLeftButton">Toggle forced placement at left side</key>
-    <key alias="forceRightButton">Toggle forced placement at right side</key>
     <key alias="scaleHandlerButtonTitle">Drag to scale</key>
     <key alias="areaCreateLabelTitle">Create Button Label</key>
     <key alias="areaCreateLabelHelp">Overwrite the label on the create button of this Area.</key>
@@ -2814,17 +2811,20 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="addBlockType">Add Block</key>
     <key alias="addBlockGroup">Add group</key>
     <key alias="pickSpecificAllowance">Pick group or Block</key>
-    <key alias="allowanceMinimum">Set minimum requirement for this allowance</key>
-    <key alias="allowanceMaximum">Set maximum requirement for this allowance</key>
+    <key alias="allowanceMinimum">Set a minimum requirement</key>
+    <key alias="allowanceMaximum">Set a maximum requirement</key>
     <key alias="block">Block</key>
     <key alias="tabBlock">Block</key>
     <key alias="tabBlockTypeSettings">Settings</key>
     <key alias="tabAreas">Areas</key>
     <key alias="tabAdvanced">Advanced</key>
-    <key alias="headlineAllowance">Allowance</key>
+    <key alias="headlineAllowance">Permissions</key>
     <key alias="getSampleHeadline">Install Sample Configuration</key>
     <key alias="getSampleDescription"><![CDATA[This will add basic Blocks and help you get started with the Block Grid Editor. You'll get Blocks for Headline, Rich Text, Image, as well as a Two Column Layout. ]]></key>
     <key alias="getSampleButton">Install</key>
+    <key alias="actionEnterSortMode">Sort mode</key>
+    <key alias="actionExitSortMode">End sort mode</key>
+    <key alias="areaAliasIsNotUnique">This Areas Alias must be unique compared to the other Areas of this Block.</key>
   </area>
   <area alias="contentTemplatesDashboard">
     <key alias="whatHeadline">What are Content Templates?</key>

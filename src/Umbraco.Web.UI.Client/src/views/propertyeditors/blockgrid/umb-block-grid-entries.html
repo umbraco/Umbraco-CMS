@@ -14,8 +14,6 @@
             data-element-udi="{{layoutEntry.contentUdi}}"
             data-col-span="{{layoutEntry.columnSpan}}"
             data-row-span="{{layoutEntry.rowSpan}}"
-            ng-attr-data-force-left="{{layoutEntry.forceLeft || undefined}}"
-            ng-attr-data-force-right="{{layoutEntry.forceRight || undefined}}"
             style="
             --umb-block-grid--item-column-span: {{layoutEntry.columnSpan}};
             --umb-block-grid--item-row-span: {{layoutEntry.rowSpan}};
@@ -60,7 +58,7 @@
 
     <uui-button-inline-create
         ng-if="!vm.blockEditorApi.readonly && vm.depth !== '0' && !(vm.entries.length === 0 || !vm.entriesForm.areaMinCount.$valid)"
-        class="umb-block-grid__block--after-inline-create-button"
+        class="umb-block-grid__block--last-inline-create-button"
         ng-mouseover="vm.blockEditorApi.internal.showAreaHighlight(vm.parentBlock, vm.areaKey)"
         ng-mouseleave="vm.blockEditorApi.internal.hideAreaHighlight(vm.parentBlock, vm.areaKey)"
         ng-click="vm.blockEditorApi.requestShowCreate(vm.parentBlock, vm.areaKey, vm.entries.length, $event)">
@@ -119,7 +117,7 @@
                         key="{{(invalidBlockType.amount < invalidBlockType.minRequirement) ? 'blockEditor_areaValidationEntriesShort' : 'blockEditor_areaValidationEntriesExceed'}}"
                         tokens="[invalidBlockType.name, invalidBlockType.amount, invalidBlockType.minRequirement, invalidBlockType.maxRequirement]"
                         watch-tokens="true"
-                        >%0% must be present between %2% – %3% times.</localize>
+                        >%0% must be present between %2%–%3% times.</localize>
                 </div>
             </div>
             <span ng-message="valServer" ng-bind-html="vm.entriesForm.areaTypeRequirements.errorMsg"></span>

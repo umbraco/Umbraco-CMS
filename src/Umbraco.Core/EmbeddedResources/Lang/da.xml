@@ -2201,6 +2201,8 @@ Mange hilsner fra Umbraco robotten
     <key alias="headlineAdvanced">Avanceret</key>
     <key alias="forceHideContentEditor">Skjul indholdseditoren</key>
     <key alias="forceHideContentEditorHelp">Skjul indholds redigerings knappen samt indholdseditoren i Blok Redigerings vinduet</key>
+    <key alias="girdInlineEditing">Direkte redigering</key>
+    <key alias="girdInlineEditingHelp">Tilføjer direkte redigering a det første felt. Yderligere felter optræder kun i redigerings vinduet.</key>
     <key alias="blockHasChanges">Du har lavet ændringer til dette indhold. Er du sikker på at du vil kassere dem?</key>
     <key alias="confirmCancelBlockCreationHeadline">Annuller oprettelse?</key>
     <key alias="confirmCancelBlockCreationMessage"><![CDATA[Er du sikker på at du vil annullere oprettelsen.]]></key>
@@ -2218,6 +2220,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="areaDisallowAllBlocks">Tillad kun specifikke blok-typer</key>
     <key alias="areaAllowedBlocks">Tilladte blok-typer</key>
     <key alias="areaAllowedBlocksHelp">Vælg de blok-typer, der er tilladt i dette område, og evt. også hvor mange af hver type, redaktørerne skal tilføje til området.</key>
+    <key alias="areaAllowedBlocksEmpty">Når denne er tom er alle block-typer tilladt for områder tilladt.</key>
     <key alias="confirmDeleteBlockAreaMessage">Er du sikker på, at du vil slette dette område?</key>
     <key alias="confirmDeleteBlockAreaNotice">Alle blokke, der er oprettet i dette område, vil blive slettet.</key>
     <key alias="layoutOptions">Layout-opsætning</key>
@@ -2241,12 +2244,6 @@ Mange hilsner fra Umbraco robotten
       <![CDATA[Det indsatte indhold bestod af ikke tilladt del-indhold, disse dele er blevet afvist. Vil du beholde det resterene alligevel?]]></key>
     <key alias="areaAliasHelp">
       <![CDATA[Dette alias skrives ud via GetBlockGridHTML(), brug aliaset til at fange det element der repræsentere dette område. F.eks.. .umb-block-grid__area[data-area-alias="MitOmraadeAlias"] { ... }]]></key>
-    <key alias="forceLeftLabel">Påtving placering i venstre side</key>
-    <key alias="forceRightLabel">Påtving placering i højre side</key>
-    <key alias="unforceLeftLabel">Fjern påtvungen placering i venstre side</key>
-    <key alias="unforceRightLabel">Fjern påtvungen placering i højre side</key>
-    <key alias="forceLeftButton">Skift påtvungen placering i venstre side</key>
-    <key alias="forceRightButton">Skift påtvungen placering i højre side</key>
     <key alias="scaleHandlerButtonTitle">Træk for at skalere</key>
     <key alias="areaCreateLabelTitle">Tilføj indhold label</key>
     <key alias="areaCreateLabelHelp">Overskriv labellen for tilføj indholds knappen i dette område.</key>
@@ -2255,9 +2252,9 @@ Mange hilsner fra Umbraco robotten
     <key alias="addAppearanceOptions">Tilføj katalog udseende</key>
     <key alias="addBlockType">Tilføj Blok</key>
     <key alias="addBlockGroup">Tilføj gruppe</key>
-    <key alias="pickSpecificAllowance">Tilføj gruppe eller block</key>
-    <key alias="allowanceMinimum">Sæt minimum krav for denne tilladelse</key>
-    <key alias="allowanceMaximum">Set maksimum krav for denne tilladelse</key>
+    <key alias="pickSpecificAllowance">Tilføj gruppe eller Blok</key>
+    <key alias="allowanceMinimum">Sæt minimum krav</key>
+    <key alias="allowanceMaximum">Sæt maksimum krav</key>
     <key alias="block">Blok</key>
     <key alias="tabBlock">Blok</key>
     <key alias="tabBlockTypeSettings">Indstillinger</key>
@@ -2267,6 +2264,9 @@ Mange hilsner fra Umbraco robotten
     <key alias="getSampleHeadline">Installer demo konfiguration</key>
     <key alias="getSampleDescription"><![CDATA[Dette tilføjer basale og hjælper dig til at komme igang med Block Grid Editor.<br/>Dette indeholder Blokke for Overskrift, Beriget-Tekst, Billede og To-Koloners-Layout.]]></key>
     <key alias="getSampleButton">Installer</key>
+    <key alias="actionEnterSortMode">Sortings tilstand</key>
+    <key alias="actionExitSortMode">Afslut sortings tilstand</key>
+    <key alias="areaAliasIsNotUnique">Dette område alias skal være unikt sammenlignet med andre områder af denne Blok.</key>
   </area>
   <area alias="contentTemplatesDashboard">
     <key alias="whatHeadline">Hvad er Indholdsskabeloner?</key>
