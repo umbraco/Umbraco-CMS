@@ -342,6 +342,6 @@ export default UmbEditorUserElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-editor-view-users-user-details': UmbEditorUserElement;
+		'umb-editor-user': UmbEditorUserElement;
 	}
 }
