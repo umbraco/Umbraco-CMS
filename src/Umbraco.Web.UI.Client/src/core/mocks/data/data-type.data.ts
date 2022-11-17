@@ -1,5 +1,6 @@
 import { Entity } from './entities';
 import { UmbEntityData } from './entity.data';
+import { FolderTreeItem } from '@umbraco-cms/backend-api';
 
 export interface DataTypeEntity extends Entity {
 	type: 'dataType';
