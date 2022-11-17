@@ -12,7 +12,7 @@ export const handlers = [
 		const keys = req.params.keys as string;
 		if (!keys) return;
 
-		const items = umbMemberTypeData.getTreeItem(keys);
+		const items = umbMemberTypeData.getTreeItem(keys.split(','));
 
 		return res(ctx.status(200), ctx.json(items));
 	}),
