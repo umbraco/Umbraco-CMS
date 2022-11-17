@@ -196,11 +196,13 @@ public class ContentSettings
     ///     Gets or sets a value for the collection of file extensions that are disallowed for upload.
     /// </summary>
     [DefaultValue(StaticDisallowedUploadFiles)]
+    [Obsolete("Please use DisAllowedUploadedFileExtensions instead, scheduled for removal in V13")]
     public IEnumerable<string> DisallowedUploadFiles { get; set; } = StaticDisallowedUploadFiles.Split(',');
 
     /// <summary>
     ///     Gets or sets a value for the collection of file extensions that are allowed for upload.
     /// </summary>
+    [Obsolete("Please use AllowedUploadedFileExtensions instead, scheduled for removal in V13")]
     public IEnumerable<string> AllowedUploadFiles { get; set; } = Array.Empty<string>();
 
     /// <summary>
@@ -249,4 +251,15 @@ public class ContentSettings
     /// </summary>
     [DefaultValue(StaticAllowEditInvariantFromNonDefault)]
     public bool AllowEditInvariantFromNonDefault { get; set; } = StaticAllowEditInvariantFromNonDefault;
+
+    /// <summary>
+    ///     Gets or sets a value for the collection of file extensions that are allowed for upload.
+    /// </summary>
+    public string[] AllowedUploadedFileExtensions { get; set; } = Array.Empty<string>();
+
+    /// <summary>
+    ///     Gets or sets a value for the collection of file extensions that are disallowed for upload.
+    /// </summary>
+    [DefaultValue(StaticDisallowedUploadFiles)]
+    public string[] DisallowedUploadedFileExtensions { get; set; } = StaticDisallowedUploadFiles.Split(',');
 }
