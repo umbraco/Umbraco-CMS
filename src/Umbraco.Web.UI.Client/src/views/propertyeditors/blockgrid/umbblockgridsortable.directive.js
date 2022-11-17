@@ -1,17 +1,6 @@
 (function () {
     'use strict';
 
-
-/*
-    function userAgent(pattern) {
-        if (typeof window !== 'undefined' && window.navigator) {
-            return !!navigator.userAgent.match(pattern);
-        }
-    }
-    const FireFox = userAgent(/firefox/i);
-
-*/
-
     function isWithinRect(x, y, rect, modifier) {
         return (x > rect.left - modifier && x < rect.right + modifier && y > rect.top - modifier && y < rect.bottom + modifier);
     }
@@ -186,13 +175,14 @@
             function handleDragStart(event) {
 
                 event.stopPropagation();
-                //event.dataTransfer.effectAllowed = "move";// copyMove when we enhance the drag with clipboard data.
+                //event.dataTransfer.effectAllowed = "copyMove";// copyMove when we enhance the drag with clipboard data.
                 
                 if(!scrollElement) {
                     scrollElement = getParentScrollElement(containerEl, true);
                 }
                 
                 const element = event.target;//.closest(config.itemSelector);
+                element.style.transform = 'translateZ(0)';
                 window.addEventListener('dragover', handleDragMove);
                 window.addEventListener('dragend', handleDragEnd);
                 
@@ -203,27 +193,26 @@
                 
                 if (config.dataTransferResolver) {
                     config.dataTransferResolver(event.dataTransfer, currentItem);
-                } else {
-                    event.dataTransfer.setData("text/plain", element.innerText);
                 }
 
                 if (config.onStart) {
                     config.onStart({item: currentItem, element: currentElement});
                 }
                 
-                //if(!FireFox) {
-                    const clientX = (event.touches ? event.touches[0] : event).clientX;
-                    const clientY = (event.touches ? event.touches[1] : event).clientY;
-                    const mouseOffsetX = clientX - currentDragRect.left; //x position within the element.
-                    const mouseOffsetY = clientY - currentDragRect.top;  //y position within the element.
-                    // temp test with using shadowRoot..
-                    const elToSnapshot = currentDragElement.shadowRoot.querySelector("div > *:not(style)");
-                    event.dataTransfer.setDragImage(elToSnapshot, mouseOffsetX, mouseOffsetY);
-                //}
+                /*
+                const clientX = (event.touches ? event.touches[0] : event).clientX;
+                const clientY = (event.touches ? event.touches[1] : event).clientY;
+                const mouseOffsetX = clientX - currentDragRect.left; //x position within the element.
+                const mouseOffsetY = clientY - currentDragRect.top;  //y position within the element.
+                // temp test with using shadowRoot..
+                const elToSnapshot = currentDragElement.shadowRoot.querySelector("div > *:not(style)");
+                event.dataTransfer.setDragImage(elToSnapshot, mouseOffsetX, mouseOffsetY);
+                */
 
                 // We must wait one frame before changing the look of the block.
                 rqaId = requestAnimationFrame(() => {// It should be okay to use the same refId, as the move does not or is okay not to happen on first frame/drag-move.
                     rqaId = null;
+                    currentElement.style.transform = '';
                     currentElement.classList.add(config.placeholderClass);
                 });
                 
