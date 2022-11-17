@@ -5,7 +5,7 @@ import type { DocumentTypeDetails } from '@umbraco-cms/models';
 export const data: Array<DocumentTypeDetails> = [
 	{
 		name: 'Document Type 1',
-		type: 'documentType',
+		type: 'document-type',
 		hasChildren: false,
 		key: 'd81c7957-153c-4b5a-aa6f-b434a4964624',
 		isContainer: false,
@@ -19,7 +19,7 @@ export const data: Array<DocumentTypeDetails> = [
 	},
 	{
 		name: 'Document Type 2',
-		type: 'documentType',
+		type: 'document-type',
 		hasChildren: false,
 		key: 'a99e4018-3ffc-486b-aa76-eecea9593d17',
 		isContainer: false,
