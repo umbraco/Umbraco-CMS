@@ -4,11 +4,11 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { Entity } from '../../../core/mocks/data/entities';
-import { UmbTreeDataContextBase } from '../tree-data.context';
 import { UmbTreeContext } from '../tree.context';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { ManifestTree } from '@umbraco-cms/models';
+import { UmbDataStore } from 'src/core/stores/store';
 
 import './tree-item.element';
 
@@ -25,14 +25,13 @@ export class UmbTreeNavigator extends UmbContextConsumerMixin(UmbObserverMixin(L
 	@state()
 	private _tree?: ManifestTree;
 
-	private _treeDataContext?: UmbTreeDataContextBase;
+	private _treeStore?: UmbDataStore<unknown>;
 
 	constructor() {
 		super();
 
-		this.consumeContext('umbTreeDataContext', (treeDataContext) => {
-			this._treeDataContext = treeDataContext;
-			this._observeTreeRoot();
+		this.consumeContext('umbTreeStore', (treeStore) => {
+			this._treeStore = treeStore;
 		});
 
 		this.consumeContext('umbTreeContext', (treeContext: UmbTreeContext) => {
@@ -40,12 +39,16 @@ export class UmbTreeNavigator extends UmbContextConsumerMixin(UmbObserverMixin(L
 		});
 	}
 
+	private _onShowRoot() {
+		this._observeTreeRoot();
+	}
+
 	private _observeTreeRoot() {
-		if (!this._treeDataContext?.rootChanges?.()) return;
+		if (!this._treeStore?.getTreeRoot) return;
 
 		this._loading = true;
 
-		this.observe<Entity[]>(this._treeDataContext.rootChanges(), (rootItems) => {
+		this.observe<Entity[]>(this._treeStore.getTreeRoot(), (rootItems) => {
 			if (rootItems?.length === 0) return;
 			this._items = rootItems;
 			this._loading = false;
@@ -54,7 +57,10 @@ export class UmbTreeNavigator extends UmbContextConsumerMixin(UmbObserverMixin(L
 
 	render() {
 		// TODO: how do we know if a tree has children?
-		return html`<uui-menu-item label="${ifDefined(this._tree?.meta.label)}" has-children>
+		return html`<uui-menu-item
+			label="${ifDefined(this._tree?.meta.label)}"
+			@show-children=${this._onShowRoot}
+			has-children>
 			<uui-icon slot="icon" name="${ifDefined(this._tree?.meta.icon)}"></uui-icon>
 			${this._renderRootItems()}
 		</uui-menu-item>`;
