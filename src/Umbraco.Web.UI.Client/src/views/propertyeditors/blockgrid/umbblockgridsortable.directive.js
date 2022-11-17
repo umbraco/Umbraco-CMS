@@ -127,19 +127,24 @@
             function setupItem(element) {
 
                 setupIgnorerElements(element);
-
+                /*
                 const dragElement = config.draggableSelector ? element.querySelector(config.draggableSelector) : element;
-
                 dragElement.draggable = true;
                 dragElement.addEventListener('dragstart', handleDragStart);
+                */
+                element.draggable = true;
+                element.addEventListener('dragstart', handleDragStart);
             }
 
             function destroyItem(element) {
 
                 destroyIgnorerElements(element);
 
+                /*
                 const dragElement = config.draggableSelector ? element.querySelector(config.draggableSelector) : element;
                 dragElement.removeEventListener('dragstart', handleDragStart);
+                */
+                element.removeEventListener('dragstart', handleDragStart);
             }
 
             function setupIgnorerElements(element) {
@@ -187,7 +192,7 @@
                     scrollElement = getParentScrollElement(containerEl, true);
                 }
                 
-                const element = event.target.closest(config.itemSelector);
+                const element = event.target;//.closest(config.itemSelector);
                 window.addEventListener('dragover', handleDragMove);
                 window.addEventListener('dragend', handleDragEnd);
                 
@@ -213,7 +218,6 @@
                     const mouseOffsetY = clientY - currentDragRect.top;  //y position within the element.
                     // temp test with using shadowRoot..
                     const elToSnapshot = currentDragElement.shadowRoot.querySelector("div > *:not(style)");
-                    console.log(elToSnapshot)
                     event.dataTransfer.setDragImage(elToSnapshot, mouseOffsetX, mouseOffsetY);
                 //}
 
