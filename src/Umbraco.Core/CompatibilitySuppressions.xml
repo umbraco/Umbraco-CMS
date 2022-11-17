@@ -42,4 +42,32 @@
     <Right>lib/net7.0/Umbraco.Core.dll</Right>
     <IsBaselineSuppression>true</IsBaselineSuppression>
   </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Models.Blocks.BlockGridItem.ForceLeft.get</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Models.Blocks.BlockGridItem.ForceLeft.set</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Models.Blocks.BlockGridItem.ForceRight.get</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Models.Blocks.BlockGridItem.ForceRight.set</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
 </Suppressions>

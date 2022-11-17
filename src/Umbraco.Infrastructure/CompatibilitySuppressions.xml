@@ -14,4 +14,32 @@
     <Right>lib/net7.0/Umbraco.Infrastructure.dll</Right>
     <IsBaselineSuppression>true</IsBaselineSuppression>
   </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Models.Blocks.BlockGridLayoutItem.ForceLeft.get</Target>
+    <Left>lib/net7.0/Umbraco.Infrastructure.dll</Left>
+    <Right>lib/net7.0/Umbraco.Infrastructure.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Models.Blocks.BlockGridLayoutItem.ForceLeft.set</Target>
+    <Left>lib/net7.0/Umbraco.Infrastructure.dll</Left>
+    <Right>lib/net7.0/Umbraco.Infrastructure.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Models.Blocks.BlockGridLayoutItem.ForceRight.get</Target>
+    <Left>lib/net7.0/Umbraco.Infrastructure.dll</Left>
+    <Right>lib/net7.0/Umbraco.Infrastructure.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Models.Blocks.BlockGridLayoutItem.ForceRight.set</Target>
+    <Left>lib/net7.0/Umbraco.Infrastructure.dll</Left>
+    <Right>lib/net7.0/Umbraco.Infrastructure.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
 </Suppressions>
