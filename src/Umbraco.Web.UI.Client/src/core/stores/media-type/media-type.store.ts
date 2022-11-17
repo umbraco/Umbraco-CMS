@@ -1,5 +1,4 @@
 import { map, Observable } from 'rxjs';
-import { UmbEntityStore } from '../entity.store';
 import { UmbDataStoreBase } from '../store';
 import { MediaTypeResource, ApiError, ProblemDetails, PagedFolderTreeItem } from '@umbraco-cms/backend-api';
 import type { MediaTypeDetails } from '@umbraco-cms/models';
@@ -11,13 +10,6 @@ import type { MediaTypeDetails } from '@umbraco-cms/models';
  * @description - Data Store for Media Types
  */
 export class UmbMediaTypeStore extends UmbDataStoreBase<MediaTypeDetails | PagedFolderTreeItem> {
-	private _entityStore: UmbEntityStore;
-
-	constructor(entityStore: UmbEntityStore) {
-		super();
-		this._entityStore = entityStore;
-	}
-
 	getTreeRoot(): Observable<Array<PagedFolderTreeItem>> {
 		MediaTypeResource.getTreeMediaTypeRoot({}).then(
 			(res) => {

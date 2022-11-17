@@ -1,5 +1,4 @@
 import { map, Observable } from 'rxjs';
-import { UmbEntityStore } from '../entity.store';
 import { UmbDataStoreBase } from '../store';
 import type { MediaDetails } from '@umbraco-cms/models';
 import { ApiError, ContentTreeItem, MediaResource, ProblemDetails } from '@umbraco-cms/backend-api';
@@ -11,13 +10,6 @@ import { ApiError, ContentTreeItem, MediaResource, ProblemDetails } from '@umbra
  * @description - Data Store for Media
  */
 export class UmbMediaStore extends UmbDataStoreBase<MediaDetails | ContentTreeItem> {
-	private _entityStore: UmbEntityStore;
-
-	constructor(entityStore: UmbEntityStore) {
-		super();
-		this._entityStore = entityStore;
-	}
-
 	getTreeRoot(): Observable<Array<ContentTreeItem>> {
 		MediaResource.getTreeMediaRoot({}).then(
 			(res) => {

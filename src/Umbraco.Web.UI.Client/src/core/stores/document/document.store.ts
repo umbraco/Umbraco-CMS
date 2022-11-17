@@ -1,5 +1,4 @@
 import { map, Observable } from 'rxjs';
-import { UmbEntityStore } from '../entity.store';
 import { UmbDataStoreBase } from '../store';
 import type { DocumentDetails } from '@umbraco-cms/models';
 import { ApiError, DocumentResource, DocumentTreeItem, FolderTreeItem, ProblemDetails } from '@umbraco-cms/backend-api';
@@ -11,13 +10,6 @@ import { ApiError, DocumentResource, DocumentTreeItem, FolderTreeItem, ProblemDe
  * @description - Data Store for Documents
  */
 export class UmbDocumentStore extends UmbDataStoreBase<DocumentDetails | DocumentTreeItem> {
-	private _entityStore: UmbEntityStore;
-
-	constructor(entityStore: UmbEntityStore) {
-		super();
-		this._entityStore = entityStore;
-	}
-
 	getTreeRoot(): Observable<Array<DocumentTreeItem>> {
 		DocumentResource.getTreeDocumentRoot({}).then(
 			(res) => {

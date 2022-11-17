@@ -1,5 +1,4 @@
 import { map, Observable } from 'rxjs';
-import { UmbEntityStore } from '../entity.store';
 import { UmbDataStoreBase } from '../store';
 import { ApiError, DocumentTypeResource, DocumentTypeTreeItem, ProblemDetails } from '@umbraco-cms/backend-api';
 import type { DocumentTypeDetails } from '@umbraco-cms/models';
@@ -11,13 +10,6 @@ import type { DocumentTypeDetails } from '@umbraco-cms/models';
  * @description - Data Store for Document Types
  */
 export class UmbDocumentTypeStore extends UmbDataStoreBase<DocumentTypeDetails | DocumentTypeTreeItem> {
-	private _entityStore: UmbEntityStore;
-
-	constructor(entityStore: UmbEntityStore) {
-		super();
-		this._entityStore = entityStore;
-	}
-
 	getByKey(key: string): Observable<DocumentTypeDetails | DocumentTypeTreeItem | null> {
 		// TODO: use Fetcher API.
 		// TODO: only fetch if the data type is not in the store?

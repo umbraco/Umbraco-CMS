@@ -73,16 +73,16 @@ export class UmbBackofficeElement extends UmbContextConsumerMixin(UmbContextProv
 		this._umbIconRegistry.attach(this);
 
 		this.provideContext('umbEntityStore', this._umbEntityStore);
-		this.provideContext('umbDocumentStore', new UmbDocumentStore(this._umbEntityStore));
-		this.provideContext('umbMediaStore', new UmbMediaStore(this._umbEntityStore));
+		this.provideContext('umbDocumentStore', new UmbDocumentStore());
+		this.provideContext('umbMediaStore', new UmbMediaStore());
 		this.provideContext('umbNodeStore', new UmbNodeStore(this._umbEntityStore));
-		this.provideContext('umbDataTypeStore', new UmbDataTypeStore(this._umbEntityStore));
-		this.provideContext('umbDocumentTypeStore', new UmbDocumentTypeStore(this._umbEntityStore));
-		this.provideContext('umbMediaTypeStore', new UmbMediaTypeStore(this._umbEntityStore));
-		this.provideContext('umbMemberTypeStore', new UmbMemberTypeStore(this._umbEntityStore));
+		this.provideContext('umbDataTypeStore', new UmbDataTypeStore());
+		this.provideContext('umbDocumentTypeStore', new UmbDocumentTypeStore());
+		this.provideContext('umbMediaTypeStore', new UmbMediaTypeStore());
+		this.provideContext('umbMemberTypeStore', new UmbMemberTypeStore());
 		this.provideContext('umbUserStore', new UmbUserStore(this._umbEntityStore));
 		this.provideContext('umbUserGroupStore', new UmbUserGroupStore(this._umbEntityStore));
-		this.provideContext('umbMemberGroupStore', new UmbMemberGroupStore(this._umbEntityStore));
+		this.provideContext('umbMemberGroupStore', new UmbMemberGroupStore());
 		this.provideContext('umbNotificationService', new UmbNotificationService());
 		this.provideContext('umbModalService', new UmbModalService());
 		this.provideContext('umbSectionStore', new UmbSectionStore());

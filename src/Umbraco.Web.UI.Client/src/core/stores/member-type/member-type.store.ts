@@ -1,5 +1,4 @@
 import { map, Observable } from 'rxjs';
-import { UmbEntityStore } from '../entity.store';
 import { UmbDataStoreBase } from '../store';
 import { MemberTypeResource, ApiError, EntityTreeItem, ProblemDetails } from '@umbraco-cms/backend-api';
 import type { MemberTypeDetails } from '@umbraco-cms/models';
@@ -11,13 +10,6 @@ import type { MemberTypeDetails } from '@umbraco-cms/models';
  * @description - Data Store for Member Types
  */
 export class UmbMemberTypeStore extends UmbDataStoreBase<MemberTypeDetails | EntityTreeItem> {
-	private _entityStore: UmbEntityStore;
-
-	constructor(entityStore: UmbEntityStore) {
-		super();
-		this._entityStore = entityStore;
-	}
-
 	getTreeRoot(): Observable<Array<EntityTreeItem>> {
 		MemberTypeResource.getTreeMemberTypeRoot({}).then(
 			(res) => {
