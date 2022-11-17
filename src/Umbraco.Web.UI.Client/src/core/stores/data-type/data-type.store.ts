@@ -2,6 +2,7 @@ import { map, Observable } from 'rxjs';
 import { UmbEntityStore } from '../entity.store';
 import { UmbDataStoreBase } from '../store';
 import type { DataTypeDetails } from '@umbraco-cms/models';
+import { ApiError, DataTypeResource, FolderTreeItem, ProblemDetails } from '@umbraco-cms/backend-api';
 
 /**
  * @export
@@ -9,7 +10,7 @@ import type { DataTypeDetails } from '@umbraco-cms/models';
  * @extends {UmbDataStoreBase<DataTypeDetails>}
  * @description - Data Store for Data Types
  */
-export class UmbDataTypeStore extends UmbDataStoreBase<DataTypeDetails> {
+export class UmbDataTypeStore extends UmbDataStoreBase<DataTypeDetails | FolderTreeItem> {
 	private _entityStore: UmbEntityStore;
 
 	constructor(entityStore: UmbEntityStore) {
@@ -23,7 +24,7 @@ export class UmbDataTypeStore extends UmbDataStoreBase<DataTypeDetails> {
 	 * @return {*}  {(Observable<DataTypeDetails | null>)}
 	 * @memberof UmbDataTypeStore
 	 */
-	getByKey(key: string): Observable<DataTypeDetails | null> {
+	getByKey(key: string): Observable<DataTypeDetails | FolderTreeItem | null> {
 		// TODO: use Fetcher API.
 		// TODO: only fetch if the data type is not in the store?
 		fetch(`/umbraco/backoffice/data-type/details/${key}`)
@@ -32,9 +33,7 @@ export class UmbDataTypeStore extends UmbDataStoreBase<DataTypeDetails> {
 				this.update(data);
 			});
 
-		return this.items.pipe(
-			map((dataTypes: Array<DataTypeDetails>) => dataTypes.find((node: DataTypeDetails) => node.key === key) || null)
-		);
+		return this.items.pipe(map((dataTypes) => dataTypes.find((dataType) => dataType.key === key) || null));
 	}
 
 	/**
@@ -78,5 +77,43 @@ export class UmbDataTypeStore extends UmbDataStoreBase<DataTypeDetails> {
 		const data = await res.json();
 		this.update(data);
 		this._entityStore.update(data);
+	}
+
+	getTreeRoot(): Observable<Array<DataTypeDetails | FolderTreeItem>> {
+		DataTypeResource.getTreeDataTypeRoot({}).then(
+			(res) => {
+				this.update(res.items);
+			},
+			(e) => {
+				if (e instanceof ApiError) {
+					const error = e.body as ProblemDetails;
+					if (e.status === 400) {
+						console.log(error.detail);
+					}
+				}
+			}
+		);
+
+		return this.items.pipe(map((items) => items.filter((item) => item.parentKey === null)));
+	}
+
+	getTreeItemChildren(key: string): Observable<Array<DataTypeDetails | FolderTreeItem>> {
+		DataTypeResource.getTreeDataTypeChildren({
+			parentKey: key,
+		}).then(
+			(res) => {
+				this.update(res.items);
+			},
+			(e) => {
+				if (e instanceof ApiError) {
+					const error = e.body as ProblemDetails;
+					if (e.status === 400) {
+						console.log(error.detail);
+					}
+				}
+			}
+		);
+
+		return this.items.pipe(map((items) => items.filter((item) => item.parentKey === key)));
 	}
 }
