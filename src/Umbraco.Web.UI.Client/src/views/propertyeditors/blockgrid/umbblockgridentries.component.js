@@ -277,7 +277,6 @@
 
 
 
-
         $scope.$on('$destroy', function () {
             for (const subscription of unsubscribe) {
                 subscription();
