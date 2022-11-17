@@ -1,6 +1,11 @@
-import { Entity } from '../mocks/data/entities';
-
 import type { UserStatus } from '../../backoffice/sections/users/user-extensions';
+import {
+	ContentTreeItem,
+	DocumentTreeItem,
+	DocumentTypeTreeItem,
+	EntityTreeItem,
+	FolderTreeItem,
+} from '@umbraco-cms/backend-api';
 
 // Extension Manifests
 export * from '../extensions-registry/models';
@@ -9,6 +14,16 @@ export * from '../extensions-registry/models';
 export type HTMLElementConstructor<T = HTMLElement> = new (...args: any[]) => T;
 
 // Users
+export interface Entity {
+	key: string;
+	name: string;
+	icon: string;
+	type: string;
+	hasChildren: boolean;
+	parentKey: string;
+	isTrashed: boolean;
+}
+
 export interface UserEntity extends Entity {
 	type: 'user';
 }
@@ -37,4 +52,69 @@ export interface UserGroupDetails extends UserGroupEntity {
 	sections?: Array<string>;
 	contentStartNode?: string;
 	mediaStartNode?: string;
+}
+
+// Data Types
+export interface DataTypeDetails extends FolderTreeItem {
+	key: string; // TODO: Remove this when the backend is fixed
+	propertyEditorModelAlias: string | null;
+	propertyEditorUIAlias: string | null;
+	data: Array<DataTypePropertyData>;
+}
+
+export interface DataTypePropertyData {
+	alias: string;
+	value: any;
+}
+
+// Document Types
+export interface DocumentTypeDetails extends DocumentTypeTreeItem {
+	key: string; // TODO: Remove this when the backend is fixed
+	alias: string;
+	properties: [];
+}
+
+export interface MemberTypeDetails extends EntityTreeItem {
+	key: string; // TODO: Remove this when the backend is fixed
+	alias: string;
+	properties: [];
+}
+
+// Content
+export interface ContentProperty {
+	alias: string;
+	label: string;
+	description: string;
+	dataTypeKey: string;
+}
+
+export interface ContentPropertyData {
+	alias: string;
+	value: any;
+}
+
+// Documents
+export interface DocumentDetails extends DocumentTreeItem {
+	key: string; // TODO: Remove this when the backend is fixed
+	properties: Array<ContentProperty>;
+	data: Array<ContentPropertyData>;
+	variants: Array<any>; // TODO: define variant data
+	//layout?: any; // TODO: define layout type - make it non-optional
+}
+
+// Media
+export interface MediaDetails extends ContentTreeItem {
+	key: string; // TODO: Remove this when the backend is fixed
+	properties: Array<ContentProperty>;
+	data: Array<ContentPropertyData>;
+	variants: Array<any>; // TODO: define variant data
+	//layout?: any; // TODO: define layout type - make it non-optional
+}
+
+// Media Types
+
+export interface MediaTypeDetails extends EntityTreeItem {
+	key: string; // TODO: Remove this when the backend is fixed
+	alias: string;
+	properties: [];
 }
