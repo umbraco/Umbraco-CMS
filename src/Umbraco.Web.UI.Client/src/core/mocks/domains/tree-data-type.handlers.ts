@@ -3,7 +3,7 @@ import { umbDataTypeData } from '../data/data-type.data';
 
 // TODO: add schema
 export const handlers = [
-	rest.get('/umbraco/management/api/v1/data-type/tree/root', (req, res, ctx) => {
+	rest.get('/umbraco/management/api/v1/tree/data-type/root', (req, res, ctx) => {
 		const rootItems = umbDataTypeData.getTreeRoot();
 		const response = {
 			total: rootItems.length,
@@ -12,7 +12,7 @@ export const handlers = [
 		return res(ctx.status(200), ctx.json(response));
 	}),
 
-	rest.get('/umbraco/management/api/v1/data-type/tree/children', (req, res, ctx) => {
+	rest.get('/umbraco/management/api/v1/tree/data-type/children', (req, res, ctx) => {
 		const key = req.params.key as string;
 		if (!key) return;
 
@@ -26,7 +26,7 @@ export const handlers = [
 		return res(ctx.status(200), ctx.json(response));
 	}),
 
-	rest.get('/umbraco/management/api/v1/data-type/tree/item', (req, res, ctx) => {
+	rest.get('/umbraco/management/api/v1/tree/data-type/item', (req, res, ctx) => {
 		const keys = req.params.keys as string;
 		if (!keys) return;
 
