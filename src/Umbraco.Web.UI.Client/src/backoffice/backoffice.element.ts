@@ -18,7 +18,7 @@ import { css, html, LitElement } from 'lit';
 import { UmbModalService } from '../core/services/modal';
 import { UmbNotificationService } from '../core/services/notification';
 import { UmbDataTypeStore } from '../core/stores/data-type/data-type.store';
-import { UmbDocumentTypeStore } from '../core/stores/document-type.store';
+import { UmbDocumentTypeStore } from '../core/stores/document-type/document-type.store';
 import { UmbNodeStore } from '../core/stores/node.store';
 import { UmbSectionStore } from '../core/stores/section.store';
 import { UmbEntityStore } from '../core/stores/entity.store';
