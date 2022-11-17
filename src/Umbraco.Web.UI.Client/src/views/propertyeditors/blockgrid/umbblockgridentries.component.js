@@ -203,9 +203,6 @@
             var dragY = 0;
             var dragOffsetX = 0;
 
-            var ghostElIndicateForceLeft = null;
-            var ghostElIndicateForceRight = null;
-
             var approvedContainerEl = null;
 
             // Setup DOM method for communication between sortables:
@@ -261,12 +258,6 @@
                         }
                     } else {
                         syncEntry.columnSpan = contextColumns;
-                    }
-
-                    if(syncEntry.columnSpan === contextColumns) {
-                        // If we are full width, then reset forceLeft/right.
-                        syncEntry.forceLeft = false;
-                        syncEntry.forceRight = false;
                     }
                     
                 }
@@ -399,55 +390,40 @@
                     }
 
                     let verticalDirection = false;
-                    if (ghostEl.dataset.forceLeft) {
-                        placeAfter = true;
-                    } else if (ghostEl.dataset.forceRight) {
-                        placeAfter = true;
-                    } else {
+                    
+                    // TODO: move calculations out so they can be persisted a bit longer?
+                    //const approvedContainerRect = approvedContainerEl.getBoundingClientRect();
+                    const approvedContainerComputedStyles = getComputedStyle(approvedContainerEl);
+                    const gridColumnNumber = parseInt(approvedContainerComputedStyles.getPropertyValue("--umb-block-grid--grid-columns"), 10);
 
-                        // if the related element is forceLeft and we are in the left side, we will set vertical direction, to correct placeAfter.
-                        if (foundRelatedEl.dataset.forceLeft && placeAfter === false) {
-                            verticalDirection = true;
-                        } else 
-                        // if the related element is forceRight and we are in the right side, we will set vertical direction, to correct placeAfter.
-                        if (foundRelatedEl.dataset.forceRight && placeAfter === true) {
-                            verticalDirection = true;
-                        } else {
+                    const relatedColumns = parseInt(foundRelatedEl.dataset.colSpan, 10);
+                    const ghostColumns = parseInt(ghostEl.dataset.colSpan, 10);
 
-                            // TODO: move calculations out so they can be persisted a bit longer?
-                            //const approvedContainerRect = approvedContainerEl.getBoundingClientRect();
-                            const approvedContainerComputedStyles = getComputedStyle(approvedContainerEl);
-                            const gridColumnNumber = parseInt(approvedContainerComputedStyles.getPropertyValue("--umb-block-grid--grid-columns"), 10);
+                    // Get grid template:
+                    const approvedContainerGridColumns = approvedContainerComputedStyles.gridTemplateColumns.trim().split("px").map(x => Number(x)).filter(n => n > 0);
 
-                            const relatedColumns = parseInt(foundRelatedEl.dataset.colSpan, 10);
-                            const ghostColumns = parseInt(ghostEl.dataset.colSpan, 10);
-
-                            // Get grid template:
-                            const approvedContainerGridColumns = approvedContainerComputedStyles.gridTemplateColumns.trim().split("px").map(x => Number(x)).filter(n => n > 0);
-
-                            // ensure all columns are there.
-                            // This will also ensure handling non-css-grid mode,
-                            // use container width divided by amount of columns( or the item width divided by its amount of columnSpan)
-                            let amountOfColumnsInWeightMap = approvedContainerGridColumns.length;
-                            const amountOfUnknownColumns = gridColumnNumber-amountOfColumnsInWeightMap;
-                            if(amountOfUnknownColumns > 0) {
-                                let accumulatedValue = getAccumulatedValueOfIndex(amountOfColumnsInWeightMap, approvedContainerGridColumns) || 0;
-                                const layoutWidth = approvedContainerRect.width;
-                                const missingColumnWidth = (layoutWidth-accumulatedValue)/amountOfUnknownColumns;
-                                while(amountOfColumnsInWeightMap++ < gridColumnNumber) {
-                                    approvedContainerGridColumns.push(missingColumnWidth);
-                                }
-                            }
-
-
-                            const relatedStartX = foundRelatedElRect.left - approvedContainerRect.left;
-                            const relatedStartCol = Math.round(getInterpolatedIndexOfPositionInWeightMap(relatedStartX, approvedContainerGridColumns));
-
-                            if(relatedStartCol + relatedColumns + ghostColumns > gridColumnNumber) {
-                                verticalDirection = true;
-                            }
+                    // ensure all columns are there.
+                    // This will also ensure handling non-css-grid mode,
+                    // use container width divided by amount of columns( or the item width divided by its amount of columnSpan)
+                    let amountOfColumnsInWeightMap = approvedContainerGridColumns.length;
+                    const amountOfUnknownColumns = gridColumnNumber-amountOfColumnsInWeightMap;
+                    if(amountOfUnknownColumns > 0) {
+                        let accumulatedValue = getAccumulatedValueOfIndex(amountOfColumnsInWeightMap, approvedContainerGridColumns) || 0;
+                        const layoutWidth = approvedContainerRect.width;
+                        const missingColumnWidth = (layoutWidth-accumulatedValue)/amountOfUnknownColumns;
+                        while(amountOfColumnsInWeightMap++ < gridColumnNumber) {
+                            approvedContainerGridColumns.push(missingColumnWidth);
                         }
                     }
+
+
+                    const relatedStartX = foundRelatedElRect.left - approvedContainerRect.left;
+                    const relatedStartCol = Math.round(getInterpolatedIndexOfPositionInWeightMap(relatedStartX, approvedContainerGridColumns));
+
+                    if(relatedStartCol + relatedColumns + ghostColumns > gridColumnNumber) {
+                        verticalDirection = true;
+                    }
+                    
                     if (verticalDirection) {
                         placeAfter = (dragY > foundRelatedElRect.top + (foundRelatedElRect.height*.5));
                     }
@@ -502,56 +478,6 @@
                             rqaId = requestAnimationFrame(_moveGhostElement);
                         }
                     }
-
-                    
-                    if(vm.movingLayoutEntry.columnSpan !== vm.layoutColumnsInt) {
-                        
-                        const oldForceLeft = vm.movingLayoutEntry.forceLeft;
-                        const oldForceRight = vm.movingLayoutEntry.forceRight;
-
-                        var newValue = (dragX < targetRect.left);
-                        if(newValue !== oldForceLeft) {
-                            vm.movingLayoutEntry.forceLeft = newValue;
-                            if(oldForceRight) {
-                                vm.movingLayoutEntry.forceRight = false;
-                                if(ghostElIndicateForceRight) {
-                                    ghostEl.removeChild(ghostElIndicateForceRight);
-                                    ghostElIndicateForceRight = null;
-                                }
-                            }
-                            vm.blockEditorApi.internal.setDirty();
-                            vm.movingLayoutEntry.$block.__scope.$evalAsync();// needed for the block to be updated
-                            $scope.$evalAsync();
-
-                            // Append element for indication, as angularJS lost connection:
-                            if(newValue === true) {
-                                ghostElIndicateForceLeft = document.createElement("div");
-                                ghostElIndicateForceLeft.className = "indicateForceLeft";
-                                ghostEl.appendChild(ghostElIndicateForceLeft);
-                            } else if(ghostElIndicateForceLeft) {
-                                ghostEl.removeChild(ghostElIndicateForceLeft);
-                                ghostElIndicateForceLeft = null;
-                            }
-                        }
-
-                        newValue = (dragX > targetRect.right) && (vm.movingLayoutEntry.forceLeft !== true);
-                        if(newValue !== oldForceRight) {
-                            vm.movingLayoutEntry.forceRight = newValue;
-                            vm.blockEditorApi.internal.setDirty();
-                            vm.movingLayoutEntry.$block.__scope.$evalAsync();// needed for the block to be updated
-                            $scope.$evalAsync();
-
-                            // Append element for indication, as angularJS lost connection:
-                            if(newValue === true) {
-                                ghostElIndicateForceRight = document.createElement("div");
-                                ghostElIndicateForceRight.className = "indicateForceRight";
-                                ghostEl.appendChild(ghostElIndicateForceRight);
-                            } else if(ghostElIndicateForceRight) {
-                                ghostEl.removeChild(ghostElIndicateForceRight);
-                                ghostElIndicateForceRight = null;
-                            }
-                        }
-                    }
                 }
             }
 
@@ -589,13 +515,6 @@
                     
                     const oldIndex = evt.oldIndex;
                     vm.movingLayoutEntry = contextVM.getLayoutEntryByIndex(oldIndex);
-                    if(vm.movingLayoutEntry.forceLeft ||  vm.movingLayoutEntry.forceRight) {
-                        // if one of these where true before, then we made a change here:
-                        vm.blockEditorApi.internal.setDirty();
-                    }
-                    vm.movingLayoutEntry.forceLeft = false;
-                    vm.movingLayoutEntry.forceRight = false;
-                    vm.movingLayoutEntry.$block.__scope.$evalAsync();// needed for the block to be updated
 
                     ghostEl = evt.item;
                     vm.containedPropertyEditorProxies = Array.from(ghostEl.querySelectorAll('slot[data-is-property-editor-proxy]')).map(x => x.getAttribute('name'));
@@ -640,15 +559,6 @@
                     window.removeEventListener('drag', _onDragMove);
                     window.removeEventListener('dragover', _onDragMove);
                     vm.blockEditorApi.internal.exitDraggingMode();
-
-                    if(ghostElIndicateForceLeft) {
-                        ghostEl.removeChild(ghostElIndicateForceLeft);
-                        ghostElIndicateForceLeft = null;
-                    }
-                    if(ghostElIndicateForceRight) {
-                        ghostEl.removeChild(ghostElIndicateForceRight);
-                        ghostElIndicateForceRight = null;
-                    }
 
                     // ensure not-allowed indication is removed.
                     if(_lastIndicationContainerVM) {
