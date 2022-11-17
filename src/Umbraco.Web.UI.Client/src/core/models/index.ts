@@ -121,3 +121,8 @@ export interface MediaTypeDetails extends EntityTreeItem {
 	alias: string;
 	properties: [];
 }
+
+// Member Groups
+export interface MemberGroupDetails extends EntityTreeItem {
+	key: string; // TODO: Remove this when the backend is fixed
+}

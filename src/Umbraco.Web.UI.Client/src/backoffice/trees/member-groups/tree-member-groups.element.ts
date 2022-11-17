@@ -1,10 +1,8 @@
 import { html } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { UmbTreeBase } from '../shared/tree-base.element';
-import { UmbEntityStore } from '../../../core/stores/entity.store';
-import { UmbTreeMemberGroupsDataContext } from './tree-member-groups-data.context';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
-
+import { UmbMemberGroupStore } from 'src/core/stores/member-group/member-group.store';
 import '../shared/tree-navigator.element';
 
 @customElement('umb-tree-member-groups')
@@ -12,12 +10,8 @@ export class UmbTreeMemberGroups extends UmbContextProviderMixin(UmbContextConsu
 	constructor() {
 		super();
 
-		this.consumeContext('umbEntityStore', (entityStore: UmbEntityStore) => {
-			this._entityStore = entityStore;
-			if (!this._entityStore || !this.tree) return;
-
-			this._treeDataContext = new UmbTreeMemberGroupsDataContext(this._entityStore);
-			this.provideContext('umbTreeDataContext', this._treeDataContext);
+		this.consumeContext('umbMemberGroupStore', (store: UmbMemberGroupStore) => {
+			this.provideContext('umbTreeStore', store);
 		});
 	}
 
