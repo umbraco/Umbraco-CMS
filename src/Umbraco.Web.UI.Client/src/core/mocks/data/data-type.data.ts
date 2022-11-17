@@ -98,6 +98,18 @@ class UmbDataTypeData extends UmbEntityData<DataTypeDetails> {
 	constructor() {
 		super(data);
 	}
+
+	getTreeRoot(): Array<FolderTreeItem> {
+		return this.data.filter((item) => item.parentKey === null);
+	}
+
+	getTreeItemChildren(key: string): Array<FolderTreeItem> {
+		return this.data.filter((item) => item.parentKey === key);
+	}
+
+	getTreeItem(keys: Array<string>): Array<FolderTreeItem> {
+		return this.data.filter((item) => keys.includes(item.key ?? ''));
+	}
 }
 
 export const umbDataTypeData = new UmbDataTypeData();
