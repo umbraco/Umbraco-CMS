@@ -1,16 +1,17 @@
 import { UmbData } from './data';
-import { EntityTreeItem } from '@umbraco-cms/backend-api';
+import { EntityTreeItem, PagedEntityTreeItem } from '@umbraco-cms/backend-api';
 import type { MemberTypeDetails } from '@umbraco-cms/models';
 
 export const data: Array<MemberTypeDetails> = [
 	{
-		key: 'd59be02f-1df9-4228-aa1e-01917d806cda',
-		isContainer: false,
-		parentKey: null,
-		name: 'Member',
+		name: 'Member Type 1',
 		type: 'member-type',
 		icon: 'icon-user',
 		hasChildren: false,
+		key: 'd59be02f-1df9-4228-aa1e-01917d806cda',
+		isContainer: false,
+		parentKey: null,
+		isTrashed: false,
 		alias: 'memberType1',
 		properties: [],
 	},
@@ -22,12 +23,16 @@ class UmbMemberTypeData extends UmbData<MemberTypeDetails> {
 		super(data);
 	}
 
-	getTreeRoot(): Array<EntityTreeItem> {
-		return this.data.filter((item) => item.parentKey === null);
+	getTreeRoot(): PagedEntityTreeItem {
+		const items = this.data.filter((item) => item.parentKey === null);
+		const total = items.length;
+		return { items, total };
 	}
 
-	getTreeItemChildren(key: string): Array<EntityTreeItem> {
-		return this.data.filter((item) => item.parentKey === key);
+	getTreeItemChildren(key: string): PagedEntityTreeItem {
+		const items = this.data.filter((item) => item.parentKey === key);
+		const total = items.length;
+		return { items, total };
 	}
 
 	getTreeItem(keys: Array<string>): Array<EntityTreeItem> {

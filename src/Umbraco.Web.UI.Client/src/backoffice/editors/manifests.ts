@@ -39,6 +39,15 @@ export const manifests: Array<ManifestWithLoader<ManifestEditor>> = [
 	},
 	{
 		type: 'editor',
+		alias: 'Umb.Editor.MemberType',
+		name: 'Member Type Editor',
+		loader: () => import('./member-type/editor-member-type.element'),
+		meta: {
+			entityType: 'member-type',
+		},
+	},
+	{
+		type: 'editor',
 		alias: 'Umb.Editor.Extensions',
 		name: 'Extensions Editor',
 		loader: () => import('./extensions/editor-extensions.element'),
