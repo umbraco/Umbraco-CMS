@@ -65,7 +65,7 @@ export class UmbDashboardExamineOverviewElement extends UmbContextConsumerMixin(
 
 	private async _getIndexers() {
 		try {
-			const indexers = await SearchResource.getSearchIndex({});
+			const indexers = await SearchResource.getSearchIndex({ take: 9999, skip: 0 });
 			this._indexers = indexers.items as Index[];
 		} catch (e) {
 			if (e instanceof ApiError) {
@@ -78,7 +78,7 @@ export class UmbDashboardExamineOverviewElement extends UmbContextConsumerMixin(
 
 	private async _getSearchers() {
 		try {
-			const searchers = await SearchResource.getSearchSearcher({});
+			const searchers = await SearchResource.getSearchSearcher({ take: 9999, skip: 0 });
 			this._searchers = searchers.items as Searcher[];
 		} catch (e) {
 			if (e instanceof ApiError) {

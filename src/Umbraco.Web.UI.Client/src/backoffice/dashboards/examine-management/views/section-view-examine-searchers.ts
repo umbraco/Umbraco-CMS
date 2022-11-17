@@ -20,8 +20,8 @@ import {
 import '../../../../core/services/modal/layouts/fields-viewer/fields-viewer.element';
 import '../../../../core/services/modal/layouts/fields-viewer/fields-settings.element';
 
-interface ExposedField {
-	name: string;
+interface ExposedSearchResultField {
+	name?: string | null;
 	exposed: boolean;
 }
 
@@ -94,7 +94,7 @@ export class UmbDashboardExamineSearcherElement extends UmbContextConsumerMixin(
 				margin-block: var(--uui-size-5, 15px);
 			}
 
-			.exposed-head-field uui-button {
+			.exposed-field uui-button {
 				align-items: center;
 				font-weight: normal;
 				font-size: 10px;
@@ -103,7 +103,7 @@ export class UmbDashboardExamineSearcherElement extends UmbContextConsumerMixin(
 				margin-top: -5px;
 			}
 
-			.exposed-head-field-container {
+			.exposed-field-container {
 				display: flex;
 				justify-content: space-between;
 			}
@@ -120,7 +120,7 @@ export class UmbDashboardExamineSearcherElement extends UmbContextConsumerMixin(
 	private _searchResults?: SearchResult[];
 
 	@state()
-	private _exposedFields?: ExposedField[];
+	private _exposedFields?: ExposedSearchResultField[];
 
 	@query('#search-input')
 	private _searchInput!: HTMLInputElement;
@@ -150,6 +150,8 @@ export class UmbDashboardExamineSearcherElement extends UmbContextConsumerMixin(
 			const res = await SearchResource.getSearchSearcherBySearcherNameSearch({
 				searcherName: this.searcherName,
 				query: this._searchInput.value,
+				take: 9999,
+				skip: 0,
 			});
 			const pagedSearchResults = res.items as PagedSearchResult[];
 			this._searchResults = pagedSearchResults[0].items;
@@ -164,19 +166,23 @@ export class UmbDashboardExamineSearcherElement extends UmbContextConsumerMixin(
 	}
 
 	private _updateFieldFilter() {
-		this._searchResults?.map((result) => {
-			const fieldNames = result.fields?.map((field) => {
-				if (field.name) return { name: field.name, exposed: false } as ExposedField;
-				return { name: '', exposed: false };
+		this._searchResults?.map((doc) => {
+			const document = doc.fields?.filter((field) => {
+				return field.name?.toUpperCase() != 'NODENAME';
 			});
+			if (document) {
+				const newFieldNames = document.map((field) => {
+					return field.name;
+				});
 
-			this._exposedFields = fieldNames?.map((field, i) => {
-				return this._exposedFields
-					? this._exposedFields[i].name == field.name
-						? { name: this._exposedFields[i].name, exposed: this._exposedFields[i].exposed }
-						: field
-					: field;
-			});
+				this._exposedFields = this._exposedFields
+					? this._exposedFields.filter((field) => {
+							return { name: field.name, exposed: field.exposed };
+					  })
+					: newFieldNames?.map((name) => {
+							return { name, exposed: false };
+					  });
+			}
 		});
 	}
 
@@ -228,7 +234,10 @@ export class UmbDashboardExamineSearcherElement extends UmbContextConsumerMixin(
 								<uui-table-cell> ${rowData.id} </uui-table-cell>
 								<uui-table-cell>
 									<uui-button look="secondary" label="Open editor for this document" @click="${this._onNameClick}">
-										Document
+										${rowData.fields?.find((field) => {
+											if (field.name?.toUpperCase() == 'NODENAME') return field.values;
+											else return;
+										})?.values}
 									</uui-button>
 								</uui-table-cell>
 								<uui-table-cell>
@@ -265,8 +274,8 @@ export class UmbDashboardExamineSearcherElement extends UmbContextConsumerMixin(
 	renderHeadCells() {
 		return html`${this._exposedFields?.map((field) => {
 			return field.exposed
-				? html`<uui-table-head-cell class="exposed-head-field">
-						<div class="exposed-head-field-container">
+				? html`<uui-table-head-cell class="exposed-field">
+						<div class="exposed-field-container">
 							<span>${field.name}</span>
 							<uui-button
 								look="secondary"
