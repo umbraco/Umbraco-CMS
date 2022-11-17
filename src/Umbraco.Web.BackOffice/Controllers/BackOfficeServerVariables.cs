@@ -529,6 +529,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                           "propertyTypeApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<PropertyTypeController>(
                               controller => controller.HasValues(string.Empty))
                         },
+                        {
+                            "mediaPickerThreeBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<MediaPickerThreeController>(
+                                controller => controller.UploadMedia(null!))
+                        },
                     }
                 },
                 {
@@ -543,11 +547,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         },
                         {
                             "disallowedUploadFiles",
-                            string.Join(",", _contentSettings.DisallowedUploadFiles)
+                            string.Join(",", _contentSettings.DisallowedUploadedFileExtensions)
                         },
                         {
                             "allowedUploadFiles",
-                            string.Join(",", _contentSettings.AllowedUploadFiles)
+                            string.Join(",", _contentSettings.AllowedUploadedFileExtensions)
                         },
                         {
                             "maxFileSize",
