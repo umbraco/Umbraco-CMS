@@ -6,7 +6,7 @@ describe('UmbEditorUserGroupElement', () => {
 	let element: UmbEditorUserGroupElement;
 
 	beforeEach(async () => {
-		element = await fixture(html` <umb-editor-user></umb-editor-user> `);
+		element = await fixture(html` <umb-editor-user-group></umb-editor-user-group> `);
 	});
 
 	it('is defined with its own instance', () => {

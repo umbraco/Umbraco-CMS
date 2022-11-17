@@ -14,10 +14,6 @@ describe('UmbEditorUserElement', () => {
 		expect(element).to.be.instanceOf(UmbEditorUserElement);
 	});
 
-	it('fails', () => {
-		expect(2).to.equal('foo');
-	});
-
 	it('passes the a11y audit', async () => {
 		await expect(element).shadowDom.to.be.accessible(defaultA11yConfig);
 	});
