@@ -1,6 +1,6 @@
 import { rest } from 'msw';
-
-import { DataTypeDetails, umbDataTypeData } from '../data/data-type.data';
+import { umbDataTypeData } from '../data/data-type.data';
+import type { DataTypeDetails } from '@umbraco-cms/models';
 
 // TODO: add schema
 export const handlers = [

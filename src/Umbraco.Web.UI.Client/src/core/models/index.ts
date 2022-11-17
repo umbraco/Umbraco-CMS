@@ -57,6 +57,7 @@ export interface UserGroupDetails extends UserGroupEntity {
 // Data Types
 export interface DataTypeDetails extends FolderTreeItem {
 	key: string; // TODO: Remove this when the backend is fixed
+	isTrashed: boolean; // TODO: remove only temp part of refactor
 	propertyEditorModelAlias: string | null;
 	propertyEditorUIAlias: string | null;
 	data: Array<DataTypePropertyData>;

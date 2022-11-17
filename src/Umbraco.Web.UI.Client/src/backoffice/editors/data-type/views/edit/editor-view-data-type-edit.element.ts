@@ -3,10 +3,9 @@ import { css, html, LitElement, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbModalService } from '../../../../../core/services/modal';
 import { UmbDataTypeContext } from '../../data-type.context';
-import type { DataTypeDetails } from '../../../../../core/mocks/data/data-type.data';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-import type { ManifestPropertyEditorUI } from '@umbraco-cms/models';
+import type { ManifestPropertyEditorUI, DataTypeDetails } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
 import '../../../../property-editor-uis/shared/property-editor-config/property-editor-config.element';
