@@ -12,6 +12,9 @@ import { handlers as telemetryHandlers } from './domains/telemetry.handlers';
 import { handlers as usersHandlers } from './domains/users.handlers';
 import { handlers as userGroupsHandlers } from './domains/user-groups.handlers';
 
+// treeHandlers
+import { handlers as treeDataTypeHandlers } from './domains/tree-data-type.handlers';
+
 const handlers = [
 	serverHandlers.serverVersionHandler,
 	...contentHandlers,
@@ -26,6 +29,8 @@ const handlers = [
 	...publishedStatusHandlers,
 	...usersHandlers,
 	...userGroupsHandlers,
+
+	...treeDataTypeHandlers,
 ];
 
 switch (import.meta.env.VITE_UMBRACO_INSTALL_STATUS) {
