@@ -2,11 +2,19 @@
     'use strict';
 
 
+/*
+    function userAgent(pattern) {
+        if (typeof window !== 'undefined' && window.navigator) {
+            return !!navigator.userAgent.match(pattern);
+        }
+    }
+    const FireFox = userAgent(/firefox/i);
+
+*/
 
     function isWithinRect(x, y, rect, modifier) {
         return (x > rect.left - modifier && x < rect.right + modifier && y > rect.top - modifier && y < rect.bottom + modifier);
     }
-
 
 
     function getParentScrollElement(el, includeSelf) {
@@ -106,7 +114,7 @@
                 containerEl['umbBlockGridSorter:vm'] = () => {
                     return vm;
                 };
-                containerEl.addEventListener('dragover', preventDragOver);
+                //containerEl.addEventListener('dragover', preventDragOver);
 
                 observer.observe(containerEl, {childList: true, subtree: false});
             }
@@ -121,6 +129,7 @@
                 setupIgnorerElements(element);
 
                 const dragElement = config.draggableSelector ? element.querySelector(config.draggableSelector) : element;
+
                 dragElement.draggable = true;
                 dragElement.addEventListener('dragstart', handleDragStart);
             }
@@ -172,40 +181,48 @@
             function handleDragStart(event) {
 
                 event.stopPropagation();
-
+                //event.dataTransfer.effectAllowed = "move";// copyMove when we enhance the drag with clipboard data.
+                
                 if(!scrollElement) {
                     scrollElement = getParentScrollElement(containerEl, true);
                 }
-
-                const element = event.target.closest(config.itemSelector);
                 
-                document.addEventListener('drag', handleDragMove);
-                document.addEventListener('dragend', handleDragEnd);
-
+                const element = event.target.closest(config.itemSelector);
+                window.addEventListener('dragover', handleDragMove);
+                window.addEventListener('dragend', handleDragEnd);
+                
                 currentElement = element;
-                currentDragElement = config.draggableSelector ? element.querySelector(config.draggableSelector) : element;
+                currentDragElement = config.draggableSelector ? currentElement.querySelector(config.draggableSelector) : currentElement;
                 currentDragRect = currentDragElement.getBoundingClientRect();
-                currentItem = vm.getItemOfElement(element);
-
+                currentItem = vm.getItemOfElement(currentElement);
+                
                 if (config.dataTransferResolver) {
                     config.dataTransferResolver(event.dataTransfer, currentItem);
+                } else {
+                    event.dataTransfer.setData("text/plain", element.innerText);
                 }
 
                 if (config.onStart) {
                     config.onStart({item: currentItem, element: currentElement});
                 }
-
-                const mouseOffsetX = event.clientX - currentDragRect.left; //x position within the element.
-                const mouseOffsetY = event.clientY - currentDragRect.top;  //y position within the element.
-
-                event.dataTransfer.setDragImage(currentDragElement, mouseOffsetX, mouseOffsetY);
+                
+                //if(!FireFox) {
+                    const clientX = (event.touches ? event.touches[0] : event).clientX;
+                    const clientY = (event.touches ? event.touches[1] : event).clientY;
+                    const mouseOffsetX = clientX - currentDragRect.left; //x position within the element.
+                    const mouseOffsetY = clientY - currentDragRect.top;  //y position within the element.
+                    // temp test with using shadowRoot..
+                    const elToSnapshot = currentDragElement.shadowRoot.querySelector("div > *:not(style)");
+                    console.log(elToSnapshot)
+                    event.dataTransfer.setDragImage(elToSnapshot, mouseOffsetX, mouseOffsetY);
+                //}
 
                 // We must wait one frame before changing the look of the block.
                 rqaId = requestAnimationFrame(() => {// It should be okay to use the same refId, as the move does not or is okay not to happen on first frame/drag-move.
                     rqaId = null;
-                    //element.classList.remove(config.ghostClass);
-                    element.classList.add(config.placeholderClass);
+                    currentElement.classList.add(config.placeholderClass);
                 });
+                
 
             }
             
@@ -213,8 +230,8 @@
 
                 //event?.stopPropagation();
 
-                document.removeEventListener('drag', handleDragMove);
-                document.removeEventListener('dragend', handleDragEnd);
+                window.removeEventListener('dragover', handleDragMove);
+                window.removeEventListener('dragend', handleDragEnd);
                 currentElement.classList.remove(config.placeholderClass);
 
                 stopAutoScroll();
@@ -248,12 +265,12 @@
                 if(!currentElement) {
                     return;
                 }
-                event.stopPropagation();
-                event.preventDefault();
+                //event.stopPropagation();
 
                 const clientX = (event.touches ? event.touches[0] : event).clientX;
                 const clientY = (event.touches ? event.touches[1] : event).clientY;
                 if(clientX !== 0 && clientY !== 0) {
+
 
                     if(dragX === clientX && dragY === clientY) {
                         return;
