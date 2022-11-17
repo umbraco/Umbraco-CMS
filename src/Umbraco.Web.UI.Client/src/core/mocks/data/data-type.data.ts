@@ -1,12 +1,9 @@
-import { Entity } from './entities';
 import { UmbEntityData } from './entity.data';
 import { FolderTreeItem } from '@umbraco-cms/backend-api';
 
-export interface DataTypeEntity extends Entity {
-	type: 'dataType';
-}
-
-export interface DataTypeDetails extends DataTypeEntity {
+export interface DataTypeDetails extends FolderTreeItem {
+	key: string; // TODO: remove when server is fixed
+	isTrashed: boolean; // TODO: remove only temp part of refactor
 	propertyEditorModelAlias: string | null;
 	propertyEditorUIAlias: string | null;
 	data: Array<DataTypePropertyData>;

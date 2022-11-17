@@ -116,7 +116,7 @@ export class UmbEditorDataTypeElement extends UmbContextProviderMixin(
 
 			this.observe<DataTypeDetails>(this._dataTypeContext.data, (dataType) => {
 				if (dataType && dataType.name !== this._dataTypeName) {
-					this._dataTypeName = dataType.name;
+					this._dataTypeName = dataType.name ?? '';
 				}
 			});
 		});
