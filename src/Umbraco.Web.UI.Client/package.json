@@ -56,9 +56,9 @@
 		"uuid": "^9.0.0"
 	},
 	"devDependencies": {
-		"@babel/core": "^7.19.6",
+		"@babel/core": "^7.20.2",
 		"@mdx-js/react": "^2.1.5",
-		"@open-wc/testing": "^3.1.6",
+		"@open-wc/testing": "^3.1.7",
 		"@playwright/test": "^1.27.1",
 		"@storybook/addon-a11y": "^6.5.13",
 		"@storybook/addon-actions": "^6.5.13",
@@ -67,7 +67,7 @@
 		"@storybook/builder-vite": "^0.2.5",
 		"@storybook/mdx2-csf": "^0.0.3",
 		"@storybook/web-components": "^6.5.13",
-		"@types/chai": "^4.3.1",
+		"@types/chai": "^4.3.4",
 		"@types/lodash-es": "^4.17.6",
 		"@types/mocha": "^9.1.1",
 		"@types/uuid": "^8.3.4",
@@ -78,7 +78,7 @@
 		"@web/test-runner": "^0.15.0",
 		"@web/test-runner-playwright": "^0.9.0",
 		"babel-loader": "^9.1.0",
-		"eslint": "^8.25.0",
+		"eslint": "^8.27.0",
 		"eslint-config-prettier": "^8.5.0",
 		"eslint-import-resolver-typescript": "^3.5.2",
 		"eslint-plugin-import": "^2.26.0",
@@ -96,7 +96,7 @@
 		"tiny-glob": "^0.2.9",
 		"typescript": "^4.8.4",
 		"vite": "^3.2.3",
-		"vite-plugin-static-copy": "^0.9.0",
+		"vite-plugin-static-copy": "^0.12.0",
 		"vite-tsconfig-paths": "^3.5.2",
 		"web-component-analyzer": "^2.0.0-next.4"
 	},

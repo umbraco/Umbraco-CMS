@@ -3,12 +3,13 @@
 /* eslint-disable */
 
 export type Index = {
-    name?: string | null;
+    name: string;
     healthStatus?: string | null;
-    readonly isHealthy?: boolean;
-    canRebuild?: boolean;
+    readonly isHealthy: boolean;
+    canRebuild: boolean;
     searcherName?: string | null;
-    documentCount?: number;
-    fieldCount?: number;
+    documentCount: number;
+    fieldCount: number;
+    providerProperties?: Record<string, any> | null;
 };
 
