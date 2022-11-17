@@ -8,6 +8,8 @@ export const manifests: Array<ManifestWithLoader<ManifestTree>> = [
 		loader: () => import('./extensions/tree-extensions.element'),
 		weight: 400,
 		meta: {
+			label: 'Extensions',
+			icon: 'umb:favorite',
 			sections: ['Umb.Section.Settings'],
 		},
 	},
@@ -18,6 +20,8 @@ export const manifests: Array<ManifestWithLoader<ManifestTree>> = [
 		loader: () => import('./data-types/tree-data-types.element'),
 		weight: 300,
 		meta: {
+			label: 'Data Types',
+			icon: 'umb:folder',
 			sections: ['Umb.Section.Settings'],
 		},
 	},
@@ -28,6 +32,8 @@ export const manifests: Array<ManifestWithLoader<ManifestTree>> = [
 		loader: () => import('./document-types/tree-document-types.element'),
 		weight: 200,
 		meta: {
+			label: 'Document Types',
+			icon: 'umb:folder',
 			sections: ['Umb.Section.Settings'],
 		},
 	},
@@ -38,6 +44,8 @@ export const manifests: Array<ManifestWithLoader<ManifestTree>> = [
 		loader: () => import('./members/tree-members.element'),
 		weight: 0,
 		meta: {
+			label: 'Members',
+			icon: 'umb:folder',
 			sections: ['Umb.Section.Members'],
 		},
 	},
@@ -48,6 +56,8 @@ export const manifests: Array<ManifestWithLoader<ManifestTree>> = [
 		loader: () => import('./member-groups/tree-member-groups.element'),
 		weight: 1,
 		meta: {
+			label: 'Member Groups',
+			icon: 'umb:folder',
 			sections: ['Umb.Section.Members'],
 		},
 	},
@@ -58,6 +68,8 @@ export const manifests: Array<ManifestWithLoader<ManifestTree>> = [
 		loader: () => import('./media/tree-media.element'),
 		weight: 100,
 		meta: {
+			label: 'Media',
+			icon: 'umb:folder',
 			sections: ['Umb.Section.Media'],
 		},
 	},
@@ -68,6 +80,8 @@ export const manifests: Array<ManifestWithLoader<ManifestTree>> = [
 		loader: () => import('./documents/tree-documents.element'),
 		weight: 100,
 		meta: {
+			label: 'Documents',
+			icon: 'umb:folder',
 			sections: ['Umb.Section.Content'],
 		},
 	},
