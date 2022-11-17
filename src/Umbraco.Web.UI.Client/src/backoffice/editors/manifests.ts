@@ -16,7 +16,7 @@ export const manifests: Array<ManifestWithLoader<ManifestEditor>> = [
 		name: 'Member Group Editor',
 		loader: () => import('./member-group/editor-member-group.element'),
 		meta: {
-			entityType: 'memberGroup',
+			entityType: 'member-group',
 		},
 	},
 	{
@@ -25,7 +25,7 @@ export const manifests: Array<ManifestWithLoader<ManifestEditor>> = [
 		name: 'Data Type Editor',
 		loader: () => import('./data-type/editor-data-type.element'),
 		meta: {
-			entityType: 'dataType',
+			entityType: 'data-type',
 		},
 	},
 	{
@@ -34,7 +34,7 @@ export const manifests: Array<ManifestWithLoader<ManifestEditor>> = [
 		name: 'Document Type Editor',
 		loader: () => import('./document-type/editor-document-type.element'),
 		meta: {
-			entityType: 'documentType',
+			entityType: 'document-type',
 		},
 	},
 	{
@@ -43,7 +43,7 @@ export const manifests: Array<ManifestWithLoader<ManifestEditor>> = [
 		name: 'Extensions Editor',
 		loader: () => import('./extensions/editor-extensions.element'),
 		meta: {
-			entityType: 'extensionsList',
+			entityType: 'extensions-list',
 		},
 	},
 	{
@@ -79,7 +79,7 @@ export const manifests: Array<ManifestWithLoader<ManifestEditor>> = [
 		name: 'User Group Editor',
 		loader: () => import('./user-group/editor-user-group.element'),
 		meta: {
-			entityType: 'userGroup',
+			entityType: 'user-group',
 		},
 	},
 	{
@@ -97,7 +97,7 @@ export const manifests: Array<ManifestWithLoader<ManifestEditor>> = [
 		name: 'Package Builder Editor',
 		loader: () => import('./package-builder/editor-package-builder.element'),
 		meta: {
-			entityType: 'packageBuilder',
+			entityType: 'package-builder',
 		},
 	},
 ];
