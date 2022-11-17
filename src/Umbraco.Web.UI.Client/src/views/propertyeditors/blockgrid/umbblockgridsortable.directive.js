@@ -620,7 +620,8 @@
                 autoScrollRAF = requestAnimationFrame(performAutoScroll);
             }
             function stopAutoScroll() {
-                autoScrollRAF = cancelAnimationFrame(performAutoScroll);
+                cancelAnimationFrame(autoScrollRAF);
+                autoScrollRAF = null;
             }
 
 
