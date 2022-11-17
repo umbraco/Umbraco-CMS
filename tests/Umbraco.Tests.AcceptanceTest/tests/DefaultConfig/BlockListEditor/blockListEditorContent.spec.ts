@@ -14,7 +14,8 @@ test.describe('BlockListEditorContent', () => {
   // Won't work if I use the to alias for the elementAlias
   const elementAlias = 'testElement';
   
-  test.beforeEach(async ({page, umbracoApi, umbracoUi}) => {
+  test.beforeEach(async ({page, umbracoApi, umbracoUi}, testInfo) => {
+    await umbracoApi.report.report(testInfo);
     await umbracoApi.login();
     await umbracoApi.documentTypes.ensureNameNotExists(documentName);
     await umbracoApi.documentTypes.ensureNameNotExists(elementName);

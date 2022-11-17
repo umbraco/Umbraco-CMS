@@ -3,7 +3,8 @@ import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {TemplateBuilder} from "@umbraco/json-models-builders";
 
 test.describe('Templates', () => {
-  test.beforeEach(async ({page, umbracoApi}) => {
+  test.beforeEach(async ({ page, umbracoApi }, testInfo) => {
+    await umbracoApi.report.report(testInfo);
     await umbracoApi.login();
   });
 
