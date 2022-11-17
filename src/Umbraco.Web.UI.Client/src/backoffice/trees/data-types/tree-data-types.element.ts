@@ -1,13 +1,12 @@
 import { html } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import { UmbEntityStore } from '../../../core/stores/entity.store';
 import { UmbTreeBase } from '../shared/tree-base.element';
-import { UmbTreeDataTypesDataContext } from './tree-data-types-data.context';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import type { ManifestTreeItemAction, ManifestWithLoader } from '@umbraco-cms/models';
 
 import '../shared/tree-navigator.element';
+import { UmbDataTypeStore } from 'src/core/stores/data-type/data-type.store';
 
 @customElement('umb-tree-data-types')
 export class UmbTreeDataTypesElement extends UmbContextProviderMixin(UmbContextConsumerMixin(UmbTreeBase)) {
@@ -16,12 +15,8 @@ export class UmbTreeDataTypesElement extends UmbContextProviderMixin(UmbContextC
 
 		this._registerTreeItemActions();
 
-		this.consumeContext('umbEntityStore', (entityStore: UmbEntityStore) => {
-			this._entityStore = entityStore;
-			if (!this._entityStore) return;
-
-			this._treeDataContext = new UmbTreeDataTypesDataContext(this._entityStore);
-			this.provideContext('umbTreeDataContext', this._treeDataContext);
+		this.consumeContext('umbDataTypeStore', (dataTypeStore: UmbDataTypeStore) => {
+			this.provideContext('umbTreeStore', dataTypeStore);
 		});
 	}
 
