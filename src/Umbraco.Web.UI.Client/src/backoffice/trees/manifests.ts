@@ -6,7 +6,7 @@ export const manifests: Array<ManifestWithLoader<ManifestTree>> = [
 		alias: 'Umb.Tree.Extensions',
 		name: 'Extensions Tree',
 		loader: () => import('./extensions/tree-extensions.element'),
-		weight: 400,
+		weight: 500,
 		meta: {
 			label: 'Extensions',
 			icon: 'umb:favorite',
@@ -18,9 +18,21 @@ export const manifests: Array<ManifestWithLoader<ManifestTree>> = [
 		alias: 'Umb.Tree.DocumentTypes',
 		name: 'Document Types Tree',
 		loader: () => import('./document-types/tree-document-types.element'),
-		weight: 300,
+		weight: 400,
 		meta: {
 			label: 'Document Types',
+			icon: 'umb:folder',
+			sections: ['Umb.Section.Settings'],
+		},
+	},
+	{
+		type: 'tree',
+		alias: 'Umb.Tree.MediaTypes',
+		name: 'Media Types Tree',
+		loader: () => import('./media-types/tree-media-types.element'),
+		weight: 300,
+		meta: {
+			label: 'Media Types',
 			icon: 'umb:folder',
 			sections: ['Umb.Section.Settings'],
 		},

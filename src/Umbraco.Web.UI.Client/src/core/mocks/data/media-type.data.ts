@@ -1,0 +1,57 @@
+import { UmbEntityData } from './entity.data';
+import { FolderTreeItem, PagedFolderTreeItem } from '@umbraco-cms/backend-api';
+import type { MediaTypeDetails } from '@umbraco-cms/models';
+
+export const data: Array<MediaTypeDetails> = [
+	{
+		name: 'Media Type 1',
+		type: 'media-type',
+		hasChildren: false,
+		key: 'c5159663-eb82-43ee-bd23-e42dc5e71db6',
+		isContainer: false,
+		parentKey: null,
+		isFolder: false,
+		isTrashed: false,
+		icon: '',
+		alias: 'mediaType1',
+		properties: [],
+	},
+	{
+		name: 'Media Type 2',
+		type: 'media-type',
+		hasChildren: false,
+		key: '22da1b0b-c310-4730-9912-c30b3eb9802e',
+		isContainer: false,
+		parentKey: null,
+		isFolder: false,
+		isTrashed: false,
+		icon: '',
+		alias: 'mediaType2',
+		properties: [],
+	},
+];
+
+// Temp mocked database
+class UmbMediaTypeData extends UmbEntityData<MediaTypeDetails> {
+	constructor() {
+		super(data);
+	}
+
+	getTreeRoot(): PagedFolderTreeItem {
+		const items = this.data.filter((item) => item.parentKey === null);
+		const total = items.length;
+		return { items, total };
+	}
+
+	getTreeItemChildren(key: string): PagedFolderTreeItem {
+		const items = this.data.filter((item) => item.parentKey === key);
+		const total = items.length;
+		return { items, total };
+	}
+
+	getTreeItem(keys: Array<string>): Array<FolderTreeItem> {
+		return this.data.filter((item) => keys.includes(item.key ?? ''));
+	}
+}
+
+export const umbMediaTypeData = new UmbMediaTypeData();
