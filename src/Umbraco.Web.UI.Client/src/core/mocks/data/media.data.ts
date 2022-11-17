@@ -4,12 +4,14 @@ import type { MediaDetails } from '@umbraco-cms/models';
 
 export const data: Array<MediaDetails> = [
 	{
-		key: 'f2f81a40-c989-4b6b-84e2-057cecd3adc1',
 		name: 'Media 1',
 		type: 'media',
 		icon: 'picture',
-		parentKey: 'c0858d71-52be-4bb2-822f-42fa0c9a1ea5',
 		hasChildren: false,
+		key: 'f2f81a40-c989-4b6b-84e2-057cecd3adc1',
+		isContainer: false,
+		parentKey: null,
+		noAccess: false,
 		properties: [
 			{
 				alias: 'myMediaHeadline',
@@ -27,12 +29,14 @@ export const data: Array<MediaDetails> = [
 		variants: [],
 	},
 	{
-		key: '69431027-8867-45bf-a93b-72bbdabfb177',
-		type: 'media',
 		name: 'Media 2',
+		type: 'media',
 		icon: 'picture',
-		parentKey: 'c0858d71-52be-4bb2-822f-42fa0c9a1ea5',
 		hasChildren: false,
+		key: '69431027-8867-45bf-a93b-72bbdabfb177',
+		isContainer: false,
+		parentKey: null,
+		noAccess: false,
 		properties: [
 			{
 				alias: 'myMediaDescription',
@@ -52,7 +56,7 @@ export const data: Array<MediaDetails> = [
 ];
 
 // Temp mocked database
-class UmbDataTypeData extends UmbData<MediaDetails> {
+class UmbMediaData extends UmbData<MediaDetails> {
 	constructor() {
 		super(data);
 	}
@@ -64,14 +68,14 @@ class UmbDataTypeData extends UmbData<MediaDetails> {
 	}
 
 	getTreeItemChildren(key: string): PagedContentTreeItem {
-		const items = this.data.filter((item) => item.key === null);
+		const items = this.data.filter((item) => item.key === key);
 		const total = items.length;
 		return { items, total };
 	}
 
 	getTreeItem(keys: Array<string>): Array<ContentTreeItem> {
-		return this.data.filter((item) => keys.includes(item.key ?? ''));
+		return this.data.filter((item) => keys.includes(item.key));
 	}
 }
 
-export const umbDataTypeData = new UmbDataTypeData();
+export const umbMediaData = new UmbMediaData();

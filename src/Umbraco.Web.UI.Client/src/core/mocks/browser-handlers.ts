@@ -14,6 +14,7 @@ import { handlers as userGroupsHandlers } from './domains/user-groups.handlers';
 
 // treeHandlers
 import { handlers as treeDocumentHandlers } from './domains/tree-document.handlers';
+import { handlers as treeMediaHandlers } from './domains/tree-media.handlers';
 import { handlers as treeDataTypeHandlers } from './domains/tree-data-type.handlers';
 import { handlers as treeDocumentTypeHandlers } from './domains/tree-document-type.handlers';
 
@@ -33,6 +34,7 @@ const handlers = [
 	...userGroupsHandlers,
 
 	...treeDocumentHandlers,
+	...treeMediaHandlers,
 	...treeDataTypeHandlers,
 	...treeDocumentTypeHandlers,
 ];

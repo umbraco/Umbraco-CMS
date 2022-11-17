@@ -48,7 +48,7 @@ class UmbDocumentTypeData extends UmbEntityData<DocumentTypeDetails> {
 	}
 
 	getTreeItem(keys: Array<string>): Array<DocumentTypeTreeItem> {
-		return this.data.filter((item) => keys.includes(item.key ?? ''));
+		return this.data.filter((item) => keys.includes(item.key));
 	}
 }
 

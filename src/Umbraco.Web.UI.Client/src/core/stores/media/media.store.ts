@@ -1,16 +1,16 @@
 import { map, Observable } from 'rxjs';
 import { UmbEntityStore } from '../entity.store';
 import { UmbDataStoreBase } from '../store';
-import type { DocumentDetails } from '@umbraco-cms/models';
-import { ApiError, DocumentResource, DocumentTreeItem, FolderTreeItem, ProblemDetails } from '@umbraco-cms/backend-api';
+import type { MediaDetails } from '@umbraco-cms/models';
+import { ApiError, ContentTreeItem, MediaResource, ProblemDetails } from '@umbraco-cms/backend-api';
 
 /**
  * @export
- * @class UmbDocumentStore
- * @extends {UmbDocumentStoreBase<DocumentDetails | DocumentTreeItem>}
- * @description - Data Store for Documents
+ * @class UmbMediaStore
+ * @extends {UmbMediaStoreBase<MediaDetails | MediaTreeItem>}
+ * @description - Data Store for Media
  */
-export class UmbDocumentStore extends UmbDataStoreBase<DocumentDetails | DocumentTreeItem> {
+export class UmbMediaStore extends UmbDataStoreBase<MediaDetails | ContentTreeItem> {
 	private _entityStore: UmbEntityStore;
 
 	constructor(entityStore: UmbEntityStore) {
@@ -18,8 +18,8 @@ export class UmbDocumentStore extends UmbDataStoreBase<DocumentDetails | Documen
 		this._entityStore = entityStore;
 	}
 
-	getTreeRoot(): Observable<Array<DocumentTreeItem>> {
-		DocumentResource.getTreeDocumentRoot({}).then(
+	getTreeRoot(): Observable<Array<ContentTreeItem>> {
+		MediaResource.getTreeMediaRoot({}).then(
 			(res) => {
 				this.update(res.items);
 			},
@@ -36,8 +36,8 @@ export class UmbDocumentStore extends UmbDataStoreBase<DocumentDetails | Documen
 		return this.items.pipe(map((items) => items.filter((item) => item.parentKey === null)));
 	}
 
-	getTreeItemChildren(key: string): Observable<Array<FolderTreeItem>> {
-		DocumentResource.getTreeDocumentChildren({
+	getTreeItemChildren(key: string): Observable<Array<ContentTreeItem>> {
+		MediaResource.getTreeMediaChildren({
 			parentKey: key,
 		}).then(
 			(res) => {
