@@ -273,7 +273,7 @@
     <key alias="childItems" version="7.0">Eitemau blentyn</key>
     <key alias="target" version="7.0">Targed</key>
     <key alias="scheduledPublishServerTime">Mae hyn yn trawsnewid at yr amser ganlynol ar y gweinydd:</key>
-    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank" rel="noopener">Beth mae hyn yn golygu?</a>]]></key>
+    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://docs.umbraco.com/umbraco-cms/fundamentals/data/scheduled-publishing#timezones" target="_blank" rel="noopener">Beth mae hyn yn golygu?</a>]]></key>
     <key alias="nestedContentDeleteItem">Ydych chi'n sicr eich bod eisiau dileu'r eitem yma?</key>
     <key alias="nestedContentEditorNotSupported">Mae'r priodwedd %0% yn defnyddio'r golygydd %1% sydd ddim yn cyd-fynd â Chynnwys Amnyth.</key>
     <key alias="nestedContentDeleteAllItems">Wyt ti'n siŵr fod ti eisiau dileu pob eitem?</key>
@@ -2461,7 +2461,7 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
     <key alias="helpText">
       <![CDATA[
             <p>Mae'r gwiriwr iechyd yn gwerthuso gwahanol rannau o'ch gwefan ar gyfer gosodiadau arfer gorau, cyfluniad, problemau posibl, ac ati. Gallwch chi drwsio problemau yn hawdd trwy wasgu botwm.
-            Gallwch chi ychwanegu eich gwiriadau iechyd eich hun, edrych ar <a href="https://our.umbraco.com/documentation/Extending/Healthcheck/" target="_blank" rel="noopener" class="btn-link -underline">y ddogfennaeth i gael mwy o wybodaeth</a> am wiriadau iechyd arferu.</p>
+            Gallwch chi ychwanegu eich gwiriadau iechyd eich hun, edrych ar <a href="https://docs.umbraco.com/umbraco-cms/extending/health-check" target="_blank" rel="noopener" class="btn-link -underline">y ddogfennaeth i gael mwy o wybodaeth</a> am wiriadau iechyd arferu.</p>
             ]]>
     </key>
     <key alias="tls12HealthCheckSuccess">Eich wefan gallu defnyddio y protocol gwarchodaeth TLS 1.2 wrth wneud cysylltiadau allanol i endpoints HTTPS</key>
@@ -2739,7 +2739,7 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
     <key alias="more">Ddarganfod fwy</key>
     <key alias="bulletPointOne">
       <![CDATA[
-            Darllenwch fwy am weithio efo'r eitemau yn yr adran Gosodiadau <a class="btn-link -underline" href="https://our.umbraco.com/documentation/Getting-Started/Backoffice/Sections/" target="_blank" rel="noopener">fewn yr adran Dogfennaeth</a> o Our Umbraco
+            Darllenwch fwy am weithio efo'r eitemau yn yr adran Gosodiadau <a class="btn-link -underline" href="https://docs.umbraco.com/umbraco-cms/fundamentals/backoffice/sections/" target="_blank" rel="noopener">fewn yr adran Dogfennaeth</a> o Our Umbraco
         ]]>
     </key>
     <key alias="bulletPointTwo">
