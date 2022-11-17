@@ -2921,7 +2921,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="tabBlockTypeSettings">Settings</key>
     <key alias="tabAreas">Areas</key>
     <key alias="tabAdvanced">Advanced</key>
-    <key alias="headlineAllowance">permissions</key>
+    <key alias="headlineAllowance">Permissions</key>
     <key alias="getSampleHeadline">Install Sample Configuration</key>
     <key alias="getSampleDescription"><![CDATA[This will add basic Blocks and help you get started with the Block Grid Editor. You'll get Blocks for Headline, Rich Text, Image, as well as a Two Column Layout.]]></key>
     <key alias="getSampleButton">Install</key>
