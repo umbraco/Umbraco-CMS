@@ -39,20 +39,8 @@ export const manifests: Array<ManifestWithLoader<ManifestTree>> = [
 	},
 	{
 		type: 'tree',
-		alias: 'Umb.Tree.Members',
-		name: 'Members Tree',
-		loader: () => import('./members/tree-members.element'),
-		weight: 0,
-		meta: {
-			label: 'Members',
-			icon: 'umb:folder',
-			sections: ['Umb.Section.Members'],
-		},
-	},
-	{
-		type: 'tree',
 		alias: 'Umb.Tree.MemberGroups',
-		name: 'Members Groups Tree',
+		name: 'Member Groups Tree',
 		loader: () => import('./member-groups/tree-member-groups.element'),
 		weight: 1,
 		meta: {
