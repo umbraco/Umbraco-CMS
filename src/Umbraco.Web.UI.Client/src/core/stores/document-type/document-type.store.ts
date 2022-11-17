@@ -4,6 +4,12 @@ import { UmbDataStoreBase } from '../store';
 import { ApiError, DocumentTypeResource, DocumentTypeTreeItem, ProblemDetails } from '@umbraco-cms/backend-api';
 import type { DocumentTypeDetails } from '@umbraco-cms/models';
 
+/**
+ * @export
+ * @class UmbDocumentTypeStore
+ * @extends {UmbDataStoreBase<DocumentTypeDetails | DocumentTypeTreeItem>}
+ * @description - Data Store for Document Types
+ */
 export class UmbDocumentTypeStore extends UmbDataStoreBase<DocumentTypeDetails | DocumentTypeTreeItem> {
 	private _entityStore: UmbEntityStore;
 

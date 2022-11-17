@@ -7,7 +7,7 @@ import { ApiError, DataTypeResource, FolderTreeItem, ProblemDetails } from '@umb
 /**
  * @export
  * @class UmbDataTypeStore
- * @extends {UmbDataStoreBase<DataTypeDetails>}
+ * @extends {UmbDataStoreBase<DataTypeDetails | FolderTreeItem>}
  * @description - Data Store for Data Types
  */
 export class UmbDataTypeStore extends UmbDataStoreBase<DataTypeDetails | FolderTreeItem> {
