@@ -1,5 +1,6 @@
 import { Entity } from './entities';
 import { UmbEntityData } from './entity.data';
+import { DocumentTypeTreeItem } from '@umbraco-cms/backend-api';
 
 export interface DocumentTypeEntity extends Entity {
 	key: string;
@@ -41,6 +42,18 @@ export const data: Array<DocumentTypeEntity> = [
 class UmbDocumentTypeData extends UmbEntityData<DocumentTypeEntity> {
 	constructor() {
 		super(data);
+	}
+
+	getTreeRoot(): Array<DocumentTypeTreeItem> {
+		return this.data.filter((item) => item.parentKey === null);
+	}
+
+	getTreeItemChildren(key: string): Array<DocumentTypeTreeItem> {
+		return this.data.filter((item) => item.parentKey === key);
+	}
+
+	getTreeItem(keys: Array<string>): Array<DocumentTypeTreeItem> {
+		return this.data.filter((item) => keys.includes(item.key ?? ''));
 	}
 }
 
