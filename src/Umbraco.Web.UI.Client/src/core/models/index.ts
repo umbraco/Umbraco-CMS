@@ -98,6 +98,7 @@ export interface ContentPropertyData {
 // Documents
 export interface DocumentDetails extends DocumentTreeItem {
 	key: string; // TODO: Remove this when the backend is fixed
+	isTrashed: boolean; // TODO: remove only temp part of refactor
 	properties: Array<ContentProperty>;
 	data: Array<ContentPropertyData>;
 	variants: Array<any>; // TODO: define variant data

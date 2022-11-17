@@ -13,6 +13,7 @@ import { handlers as usersHandlers } from './domains/users.handlers';
 import { handlers as userGroupsHandlers } from './domains/user-groups.handlers';
 
 // treeHandlers
+import { handlers as treeDocumentHandlers } from './domains/tree-document.handlers';
 import { handlers as treeDataTypeHandlers } from './domains/tree-data-type.handlers';
 import { handlers as treeDocumentTypeHandlers } from './domains/tree-document-type.handlers';
 
@@ -31,6 +32,7 @@ const handlers = [
 	...usersHandlers,
 	...userGroupsHandlers,
 
+	...treeDocumentHandlers,
 	...treeDataTypeHandlers,
 	...treeDocumentTypeHandlers,
 ];

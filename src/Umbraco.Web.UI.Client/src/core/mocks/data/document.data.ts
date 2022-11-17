@@ -4,38 +4,27 @@ import type { DocumentDetails } from '@umbraco-cms/models';
 
 export const data: Array<DocumentDetails> = [
 	{
-		key: 'f2f81a40-c989-4b6b-84e2-057cecd3adc1',
-		name: 'Media 1',
-		type: 'media',
-		icon: 'picture',
-		parentKey: 'c0858d71-52be-4bb2-822f-42fa0c9a1ea5',
+		name: 'Document 1',
+		type: 'document',
+		icon: 'document',
 		hasChildren: false,
+		key: '74e4008a-ea4f-4793-b924-15e02fd380d1',
+		isContainer: false,
+		parentKey: null,
+		noAccess: false,
+		isProtected: false,
+		isPublished: false,
+		isEdited: false,
+		isTrashed: false,
 		properties: [
 			{
-				alias: 'myMediaHeadline',
-				label: 'Media Headline',
+				alias: 'myHeadline',
+				label: 'Headline',
 				description: 'Text string property',
 				dataTypeKey: 'dt-1',
 			},
-		],
-		data: [
 			{
-				alias: 'myMediaHeadline',
-				value: 'The daily life at Umbraco HQ',
-			},
-		],
-		variants: [],
-	},
-	{
-		key: '69431027-8867-45bf-a93b-72bbdabfb177',
-		type: 'media',
-		name: 'Media 2',
-		icon: 'picture',
-		parentKey: 'c0858d71-52be-4bb2-822f-42fa0c9a1ea5',
-		hasChildren: false,
-		properties: [
-			{
-				alias: 'myMediaDescription',
+				alias: 'myDescription',
 				label: 'Description',
 				description: 'Textarea property',
 				dataTypeKey: 'dt-2',
@@ -43,11 +32,126 @@ export const data: Array<DocumentDetails> = [
 		],
 		data: [
 			{
-				alias: 'myMediaDescription',
+				alias: 'myHeadline',
+				value: 'The daily life at Umbraco HQ',
+			},
+			{
+				alias: 'myDescription',
 				value: 'Every day, a rabbit in a military costume greets me at the front door',
 			},
 		],
-		variants: [],
+		variants: [{ name: 'fake data' }],
+		/*
+    // Concept for node layout, separation of design from config and data.
+    layout: [
+      {
+        type: 'group',
+        children: [
+          {
+            type: 'property',
+            alias: 'myHeadline'
+          },
+          {
+            type: 'property',
+            alias: 'myDescription'
+          }
+        ]
+      }
+    ],
+    */
+	},
+	{
+		name: 'Document 2',
+		type: 'document',
+		icon: 'favorite',
+		hasChildren: false,
+		key: '74e4008a-ea4f-4793-b924-15e02fd380d2',
+		isContainer: false,
+		parentKey: null,
+		noAccess: false,
+		isProtected: false,
+		isPublished: false,
+		isEdited: false,
+		isTrashed: false,
+		properties: [
+			{
+				alias: 'myHeadline',
+				label: 'Text string label',
+				description: 'this is a text string property',
+				dataTypeKey: 'dt-1',
+			},
+			{
+				alias: 'myDescription',
+				label: 'Textarea label',
+				description: 'This is the a textarea property',
+				dataTypeKey: 'dt-2',
+			},
+			{
+				alias: 'myExternalEditor',
+				label: 'My JS Property Editor',
+				description: 'This is the a external property',
+				dataTypeKey: 'dt-3',
+			},
+			{
+				alias: 'myContentPicker',
+				label: 'Content Picker',
+				description: 'This is a content picker',
+				dataTypeKey: 'dt-5',
+			},
+		],
+		data: [
+			{
+				alias: 'myHeadline',
+				value: 'Is it all just fun and curling and scary rabbits?',
+			},
+			{
+				alias: 'myDescription',
+				value:
+					"So no, there's not confetti every day. And no, there's not champagne every week or a crazy rabbit running around 🐰",
+			},
+			{
+				alias: 'myExternalEditor',
+				value: 'Tex lkasdfkljdfsa 1',
+			},
+			{
+				alias: 'myContextExampleEditor',
+				value: '',
+			},
+			{
+				alias: 'myContentPicker',
+				value: '',
+			},
+		],
+		variants: [{ name: 'Variant 1' }],
+	},
+	{
+		name: 'Document 3',
+		type: 'document',
+		icon: 'document',
+		hasChildren: false,
+		key: 'cdd30288-2d1c-41b4-89a9-61647b4a10d5',
+		isContainer: false,
+		parentKey: null,
+		noAccess: false,
+		isProtected: false,
+		isPublished: false,
+		isEdited: false,
+		isTrashed: false,
+		properties: [
+			{
+				alias: 'myDescription',
+				label: 'Description',
+				description: 'Textarea property',
+				dataTypeKey: 'dt-2',
+			},
+		],
+		data: [
+			{
+				alias: 'myDescription',
+				value: 'Every day, a rabbit in a military costume greets me at the front door',
+			},
+		],
+		variants: [{ name: 'Variant 1' }],
 	},
 ];
 
