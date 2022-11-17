@@ -76,7 +76,7 @@
             navigationService.hideDialog();
         }
 
-        function addDomain() { 
+        function addDomain() {
             vm.domains.push({
                 name: '',
                 lang: vm.defaultLanguage
