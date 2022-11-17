@@ -2,7 +2,7 @@ import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { distinctUntilChanged } from 'rxjs';
-import type { DocumentTypeEntity } from '../../../../../core/mocks/data/document-type.data';
+import type { DocumentTypeDetails } from '../../../../../core/mocks/data/document-type.data';
 import { UmbDocumentTypeContext } from '../../document-type.context';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
@@ -12,7 +12,7 @@ export class UmbEditorViewDocumentTypeDesignElement extends UmbContextConsumerMi
 	static styles = [UUITextStyles, css``];
 
 	@state()
-	_documentType?: DocumentTypeEntity;
+	_documentType?: DocumentTypeDetails;
 
 	private _documentTypeContext?: UmbDocumentTypeContext;
 
@@ -28,7 +28,7 @@ export class UmbEditorViewDocumentTypeDesignElement extends UmbContextConsumerMi
 	private _observeDocumentType() {
 		if (!this._documentTypeContext) return;
 
-		this.observe<DocumentTypeEntity>(this._documentTypeContext.data.pipe(distinctUntilChanged()), (documentType) => {
+		this.observe<DocumentTypeDetails>(this._documentTypeContext.data.pipe(distinctUntilChanged()), (documentType) => {
 			this._documentType = documentType;
 		});
 	}

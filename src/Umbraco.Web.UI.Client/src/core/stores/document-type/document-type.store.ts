@@ -1,9 +1,9 @@
 import { map, Observable } from 'rxjs';
-import { DocumentTypeEntity } from '../../mocks/data/document-type.data';
+import { DocumentTypeDetails } from '../../mocks/data/document-type.data';
 import { UmbEntityStore } from '../entity.store';
 import { UmbDataStoreBase } from '../store';
 
-export class UmbDocumentTypeStore extends UmbDataStoreBase<DocumentTypeEntity> {
+export class UmbDocumentTypeStore extends UmbDataStoreBase<DocumentTypeDetails> {
 	private _entityStore: UmbEntityStore;
 
 	constructor(entityStore: UmbEntityStore) {
@@ -11,7 +11,7 @@ export class UmbDocumentTypeStore extends UmbDataStoreBase<DocumentTypeEntity> {
 		this._entityStore = entityStore;
 	}
 
-	getByKey(key: string): Observable<DocumentTypeEntity | null> {
+	getByKey(key: string): Observable<DocumentTypeDetails | null> {
 		// TODO: use Fetcher API.
 		// TODO: only fetch if the data type is not in the store?
 		fetch(`/umbraco/backoffice/document-type/${key}`)
@@ -22,13 +22,13 @@ export class UmbDocumentTypeStore extends UmbDataStoreBase<DocumentTypeEntity> {
 
 		return this.items.pipe(
 			map(
-				(documentTypes: Array<DocumentTypeEntity>) =>
-					documentTypes.find((documentType: DocumentTypeEntity) => documentType.key === key) || null
+				(documentTypes: Array<DocumentTypeDetails>) =>
+					documentTypes.find((documentType: DocumentTypeDetails) => documentType.key === key) || null
 			)
 		);
 	}
 
-	async save(documentTypes: Array<DocumentTypeEntity>) {
+	async save(documentTypes: Array<DocumentTypeDetails>) {
 		// TODO: use Fetcher API.
 		try {
 			const res = await fetch('/umbraco/backoffice/document-type/save', {

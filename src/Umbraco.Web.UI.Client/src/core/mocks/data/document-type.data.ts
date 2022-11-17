@@ -1,19 +1,8 @@
-import { Entity } from './entities';
 import { UmbEntityData } from './entity.data';
 import { DocumentTypeTreeItem } from '@umbraco-cms/backend-api';
+import type { DocumentTypeDetails } from '@umbraco-cms/models';
 
-export interface DocumentTypeEntity extends Entity {
-	key: string;
-	name: string;
-	alias: string;
-	type: string;
-	parentKey: string;
-	isTrashed: boolean;
-	hasChildren: boolean;
-	properties: [];
-}
-
-export const data: Array<DocumentTypeEntity> = [
+export const data: Array<DocumentTypeDetails> = [
 	{
 		key: 'd81c7957-153c-4b5a-aa6f-b434a4964624',
 		name: 'Document Type 1',
@@ -39,7 +28,7 @@ export const data: Array<DocumentTypeEntity> = [
 ];
 
 // Temp mocked database
-class UmbDocumentTypeData extends UmbEntityData<DocumentTypeEntity> {
+class UmbDocumentTypeData extends UmbEntityData<DocumentTypeDetails> {
 	constructor() {
 		super(data);
 	}
