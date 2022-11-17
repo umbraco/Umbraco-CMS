@@ -347,18 +347,18 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         plugins.push("autoresize");
 
         var modeInline = false;
-        var toolbar = args.toolbar.join(" ");
+        var toolbarActions = args.toolbar.join(" ");
+        var toolbar = toolbarActions;
+        var quickbar = toolbarActions;
 
         // Based on mode set
         // classic = Theme: modern, inline: false
         // inline = Theme: modern, inline: true,
-        // distraction-free = Theme: inlite, inline: true
-        if (args.mode === "inline") {
-          modeInline = true;
-        }
-        else if (args.mode === "distraction-free") {
+        // distraction-free = Same as inline - kept for legacy reasons due to older versions of Umbraco having this as a mode
+        if (args.mode === "inline" || args.mode === 'distraction-free') {
           modeInline = true;
           toolbar = false;
+          plugins.push('quickbars');
         }
 
         //create a baseline Config to extend upon
@@ -379,6 +379,8 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
           //this would be for a theme other than inlite
           toolbar: toolbar,
+          quickbars_insert_toolbar: quickbar,
+          quickbars_selection_toolbar: quickbar,
 
           body_class: "umb-rte",
 

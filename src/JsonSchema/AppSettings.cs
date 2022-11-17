@@ -12,11 +12,12 @@ internal class AppSettings
     public CmsDefinition? CMS { get; set; }
 
     /// <summary>
-    ///     Configurations for the Umbraco CMS
+    /// Configurations for the Umbraco CMS
     /// </summary>
     public class CmsDefinition
     {
         public ContentSettings? Content { get; set; }
+
         public CoreDebugSettings? Debug { get; set; }
 
         public ExceptionFilterSettings? ExceptionFilter { get; set; }
@@ -37,7 +38,7 @@ internal class AppSettings
 
         public LoggingSettings? Logging { get; set; }
 
-                public NuCacheSettings? NuCache { get; set; }
+        public NuCacheSettings? NuCache { get; set; }
 
         public RequestHandlerSettings? RequestHandler { get; set; }
 
@@ -49,7 +50,7 @@ internal class AppSettings
 
         public TypeFinderSettings? TypeFinder { get; set; }
 
-                public WebRoutingSettings? WebRouting { get; set; }
+        public WebRoutingSettings? WebRouting { get; set; }
 
         public UmbracoPluginSettings? Plugins { get; set; }
 
@@ -72,5 +73,7 @@ internal class AppSettings
         public InstallDefaultDataSettings? DefaultDataCreation { get; set; }
 
         public DataTypesSettings? DataTypes { get; set; }
+
+        public LicensesSettings? Licenses { get; set; }
     }
 }
