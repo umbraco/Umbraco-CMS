@@ -842,7 +842,6 @@ public class CodeFileController : BackOfficeNotificationsController
         // Otherwise check the filesystem abstraction to see if the folder exists
         // Since this is used for delete, it presumably exists if we're trying to delete it
         return fileSystem.DirectoryExists(path);
-
     }
 
     // this is an internal class for passing stylesheet data from the client to the controller while editing
