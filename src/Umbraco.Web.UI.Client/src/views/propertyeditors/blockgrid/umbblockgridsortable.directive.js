@@ -332,13 +332,15 @@
                 let elementsInSameRow = [];
                 let placeholderIsInThisRow = false;
                 for (const el of orderedContainerElements) {
-                    //const elRect = el.getBoundingClientRect();
-                    const dragElement = config.draggableSelector ? el.querySelector(config.draggableSelector) : el;
-                    const dragElementRect = dragElement.getBoundingClientRect();
+                    const elRect = el.getBoundingClientRect();
                     // gather elements on the same row.
-                    if(dragY >= dragElementRect.top && dragY <= dragElementRect.bottom) {
-                        elementsInSameRow.push({el:el, dragRect:dragElementRect});
-                        if(el === currentElement) {
+                    if(dragY >= elRect.top && dragY <= elRect.bottom) {
+
+                        const dragElement = config.draggableSelector ? el.querySelector(config.draggableSelector) : el;
+                        const dragElementRect = dragElement.getBoundingClientRect();
+                        if(el !== currentElement) {
+                            elementsInSameRow.push({el:el, dragRect:dragElementRect});
+                        } else {
                             placeholderIsInThisRow = true;
                         }
                     }
