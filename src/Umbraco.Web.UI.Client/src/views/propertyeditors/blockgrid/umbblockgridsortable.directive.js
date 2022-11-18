@@ -531,7 +531,7 @@
                 // find next valid element (This assumes the next element in DOM is presented in items-data, aka. only moving one item between each sync)
                 let nextEl;
                 let loopEl = element;
-                while(loopEl = loopEl.nextElementSibling) {
+                while((loopEl = loopEl.nextElementSibling)) {
                     if(loopEl.matches && loopEl.matches(config.itemSelector)) {
                         nextEl = loopEl;
                         break;

@@ -31,6 +31,14 @@
         return interpolatedIndex;
     }
 
+    function getAccumulatedValueOfIndex(index, weights) {
+        let i = 0, len = Math.min(index, weights.length), calc = 0;
+        while(i<len) {
+            calc += weights[i++];
+        }
+        return calc;
+    }
+
     function TransferProperties(fromObject, toObject) {
         for (var p in fromObject) {
             toObject[p] = fromObject[p];
