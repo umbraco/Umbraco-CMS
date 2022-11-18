@@ -517,7 +517,6 @@
                     return false;
                 }
                 if(vm.notifyRequestDrop({item: movingItem}) === false) {
-                    console.error("was not allowed for drop on this location.")
                     return false;
                 }
                 if(fromVm.removeItem(movingItem) === null) {
