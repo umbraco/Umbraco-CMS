@@ -110,7 +110,7 @@ public class MemberController : ContentControllerBase
         _twoFactorLoginService = twoFactorLoginService;
     }
 
-    [Obsolete("Use other ctor - Will be removed in Umbraco 13")]
+    [Obsolete("Use constructor that also takes an ITwoFactorLoginService. Scheduled for removal in V13")]
     public MemberController(
         ICultureDictionary cultureDictionary,
         ILoggerFactory loggerFactory,

@@ -57,7 +57,7 @@ public class MemberTabsAndPropertiesMapper : TabsAndPropertiesMapper<IMember>
         _twoFactorLoginService = twoFactorLoginService ?? throw new ArgumentNullException(nameof(twoFactorLoginService));
     }
 
-    [Obsolete("Use other ctor - Will be removed in Umbraco 13")]
+    [Obsolete("Use constructor that also takes an ITwoFactorLoginService. Scheduled for removal in V13")]
     public MemberTabsAndPropertiesMapper(
         ICultureDictionary cultureDictionary,
         IBackOfficeSecurityAccessor backofficeSecurityAccessor,
