@@ -4,8 +4,8 @@
 import type { Index } from '../models/Index';
 import type { OkResult } from '../models/OkResult';
 import type { PagedIndex } from '../models/PagedIndex';
-import type { PagedPaged } from '../models/PagedPaged';
 import type { PagedSearcher } from '../models/PagedSearcher';
+import type { PagedSearchResult } from '../models/PagedSearchResult';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -98,7 +98,7 @@ export class SearchResource {
     }
 
     /**
-     * @returns PagedPaged Success
+     * @returns PagedSearchResult Success
      * @throws ApiError
      */
     public static getSearchSearcherBySearcherNameSearch({
@@ -111,7 +111,7 @@ export class SearchResource {
         query?: string,
         skip?: number,
         take?: number,
-    }): CancelablePromise<PagedPaged> {
+    }): CancelablePromise<PagedSearchResult> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/search/searcher/{searcherName}/search',

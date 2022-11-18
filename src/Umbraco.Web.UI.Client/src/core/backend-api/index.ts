@@ -79,7 +79,6 @@ export type { PagedFolderTreeItem } from './models/PagedFolderTreeItem';
 export type { PagedHelpPage } from './models/PagedHelpPage';
 export type { PagedIndex } from './models/PagedIndex';
 export type { PagedLanguage } from './models/PagedLanguage';
-export type { PagedPaged } from './models/PagedPaged';
 export type { PagedRecycleBinItem } from './models/PagedRecycleBinItem';
 export type { PagedRelation } from './models/PagedRelation';
 export type { PagedRelationItem } from './models/PagedRelationItem';
