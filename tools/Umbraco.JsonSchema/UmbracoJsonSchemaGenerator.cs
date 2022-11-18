@@ -14,6 +14,7 @@ public class UmbracoJsonSchemaGenerator : JsonSchemaGenerator
         {
             AlwaysAllowAdditionalObjectProperties = true,
             DefaultReferenceTypeNullHandling = ReferenceTypeNullHandling.NotNull,
+            FlattenInheritanceHierarchy = true,
             IgnoreObsoleteProperties = true,
             SerializerSettings = new JsonSerializerSettings()
             {
