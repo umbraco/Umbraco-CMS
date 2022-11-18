@@ -4,7 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { UUIMenuItemEvent } from '@umbraco-ui/uui';
 import { map } from 'rxjs';
 import { repeat } from 'lit/directives/repeat.js';
-import { UmbTreeContextBase } from '../tree.context';
+import type { UmbTreeContextBase } from '../tree.context';
 import { UmbSectionContext } from '../../sections/section.context';
 import { Entity } from '../../../core/mocks/data/entities';
 import type { ManifestSection } from '../../../core/models';
@@ -49,7 +49,7 @@ export class UmbTreeItem extends UmbContextConsumerMixin(UmbObserverMixin(LitEle
 		this.consumeContext('umbTreeContext', (treeContext: UmbTreeContextBase) => {
 			this._treeContext = treeContext;
 			this._observeSelectable();
-			this._observeSelection();
+			this._observeIsSelected();
 		});
 
 		this.consumeContext('umbTreeStore', (store: UmbDataStore<unknown>) => {
@@ -69,11 +69,19 @@ export class UmbTreeItem extends UmbContextConsumerMixin(UmbObserverMixin(LitEle
 
 	connectedCallback(): void {
 		super.connectedCallback();
-		this.addEventListener('selected', (e) => {
-			e.stopPropagation();
-			this._treeContext?.select(this.treeItem.key);
-			this.dispatchEvent(new CustomEvent('change', { composed: true, bubbles: true }));
-		});
+
+		this.addEventListener('selected', this._handleSelectedItem);
+		this.addEventListener('unselected', this._handleDeselectedItem);
+	}
+
+	private _handleSelectedItem(event: Event) {
+		event.stopPropagation();
+		this._treeContext?.select(this.treeItem.key);
+	}
+
+	private _handleDeselectedItem(event: Event) {
+		event.stopPropagation();
+		this._treeContext?.deselect(this.treeItem.key);
 	}
 
 	private _observeSection() {
@@ -92,7 +100,7 @@ export class UmbTreeItem extends UmbContextConsumerMixin(UmbObserverMixin(LitEle
 		});
 	}
 
-	private _observeSelection() {
+	private _observeIsSelected() {
 		if (!this._treeContext) return;
 
 		this.observe<boolean>(

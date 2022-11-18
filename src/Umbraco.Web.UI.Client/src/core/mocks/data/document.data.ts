@@ -197,7 +197,7 @@ class UmbDocumentData extends UmbData<DocumentDetails> {
 		return { items, total };
 	}
 
-	getTreeItem(keys: Array<string>): Array<DocumentTreeItem> {
+	getTreeItems(keys: Array<string>): Array<DocumentTreeItem> {
 		return this.data.filter((item) => keys.includes(item.key ?? ''));
 	}
 }

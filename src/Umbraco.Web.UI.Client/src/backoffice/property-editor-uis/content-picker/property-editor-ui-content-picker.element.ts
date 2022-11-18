@@ -3,10 +3,10 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 
 import type { UmbModalService } from '../../../core/services/modal';
-import type { UmbEntityStore } from '../../../core/stores/entity.store';
 import type { Entity } from '../../../core/mocks/data/entities';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import { UmbDocumentStore } from 'src/core/stores/document/document.store';
 
 @customElement('umb-property-editor-ui-content-picker')
 export class UmbPropertyEditorUIContentPickerElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
@@ -44,29 +44,30 @@ export class UmbPropertyEditorUIContentPickerElement extends UmbContextConsumerM
 	private _items: Array<Entity> = [];
 
 	private _modalService?: UmbModalService;
-	private _entityStore?: UmbEntityStore;
+	private _documentStore?: UmbDocumentStore;
 
 	constructor() {
 		super();
 
-		this.consumeAllContexts(['umbEntityStore', 'umbModalService'], (instances) => {
-			this._entityStore = instances['umbEntityStore'];
+		this.consumeAllContexts(['umbDocumentStore', 'umbModalService'], (instances) => {
+			this._documentStore = instances['umbDocumentStore'];
 			this._modalService = instances['umbModalService'];
-			this._observePickedEntities();
+			this._observePickedDocuments();
 		});
 	}
 
-	private _observePickedEntities() {
-		if (!this._entityStore) return;
-		this.observe<Entity[]>(this._entityStore.getByKeys(this.value), (entities) => {
-			this._items = entities;
+	private _observePickedDocuments() {
+		if (!this._documentStore) return;
+		// TODO: consider changing this to the list data endpoint when it is available
+		this.observe<Entity[]>(this._documentStore.getTreeItems(this.value), (items) => {
+			this._items = items;
 		});
 	}
 
 	private _openPicker() {
 		const modalHandler = this._modalService?.contentPicker({ multiple: true, selection: this.value });
 		modalHandler?.onClose().then(({ selection }: any) => {
-			this._setValue([...this.value, ...selection]);
+			this._setValue([...selection]);
 		});
 	}
 
@@ -88,7 +89,7 @@ export class UmbPropertyEditorUIContentPickerElement extends UmbContextConsumerM
 
 	private _setValue(newValue: Array<string>) {
 		this.value = newValue;
-		this._observePickedEntities();
+		this._observePickedDocuments();
 		this.dispatchEvent(new CustomEvent('property-editor-change', { bubbles: true, composed: true }));
 	}
 

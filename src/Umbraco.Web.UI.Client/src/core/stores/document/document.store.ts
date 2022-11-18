@@ -47,4 +47,26 @@ export class UmbDocumentStore extends UmbDataStoreBase<DocumentDetails | Documen
 
 		return this.items.pipe(map((items) => items.filter((item) => item.parentKey === key)));
 	}
+
+	getTreeItems(keys: Array<string>): Observable<Array<FolderTreeItem>> {
+		if (keys.length > 0) {
+			DocumentResource.getTreeDocumentItem({
+				key: keys,
+			}).then(
+				(items) => {
+					this.update(items);
+				},
+				(e) => {
+					if (e instanceof ApiError) {
+						const error = e.body as ProblemDetails;
+						if (e.status === 400) {
+							console.log(error.detail);
+						}
+					}
+				}
+			);
+		}
+
+		return this.items.pipe(map((items) => items.filter((item) => keys.includes(item.key ?? ''))));
+	}
 }

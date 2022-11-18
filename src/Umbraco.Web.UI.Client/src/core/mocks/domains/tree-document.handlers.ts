@@ -16,10 +16,10 @@ export const handlers = [
 	}),
 
 	rest.get('/umbraco/management/api/v1/tree/document/item', (req, res, ctx) => {
-		const keys = req.params.keys as string;
+		const keys = req.url.searchParams.getAll('key');
 		if (!keys) return;
 
-		const items = umbDocumentData.getTreeItem(keys.split(','));
+		const items = umbDocumentData.getTreeItems(keys);
 
 		return res(ctx.status(200), ctx.json(items));
 	}),
