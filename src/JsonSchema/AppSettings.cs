@@ -91,6 +91,8 @@ namespace JsonSchema
                 public InstallDefaultDataSettings? DefaultDataCreation { get; set; }
 
                 public DataTypesSettings? DataTypes { get; set; }
+
+                public MarketplaceSettings? Marketplace { get; set; }
             }
 
             /// <summary>
