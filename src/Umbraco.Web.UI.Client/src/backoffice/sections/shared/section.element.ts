@@ -54,15 +54,13 @@ export class UmbSectionElement extends UmbContextConsumerMixin(UmbObserverMixin(
 	@state()
 	private _views: Array<ManifestSectionView> = [];
 
-	private _entityStore?: UmbEntityStore;
 	private _sectionContext?: UmbSectionContext;
 
 	constructor() {
 		super();
 
-		this.consumeAllContexts(['umbSectionContext', 'umbEntityStore'], (instances) => {
+		this.consumeAllContexts(['umbSectionContext'], (instances) => {
 			this._sectionContext = instances['umbSectionContext'];
-			this._entityStore = instances['umbEntityStore'];
 
 			this._observeTrees();
 			this._observeViews();
@@ -70,7 +68,7 @@ export class UmbSectionElement extends UmbContextConsumerMixin(UmbObserverMixin(
 	}
 
 	private _observeTrees() {
-		if (!this._sectionContext || !this._entityStore) return;
+		if (!this._sectionContext) return;
 
 		this.observe<ManifestTree[]>(
 			this._sectionContext?.data.pipe(
@@ -119,7 +117,7 @@ export class UmbSectionElement extends UmbContextConsumerMixin(UmbObserverMixin(
 	}
 
 	private _observeViews() {
-		if (!this._sectionContext || !this._entityStore) return;
+		if (!this._sectionContext) return;
 
 		this.observe<ManifestSectionView[]>(
 			this._sectionContext.data.pipe(
