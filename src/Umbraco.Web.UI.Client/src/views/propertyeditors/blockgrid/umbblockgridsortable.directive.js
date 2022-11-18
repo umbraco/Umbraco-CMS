@@ -182,7 +182,7 @@
                 }
                 
                 const element = event.target;//.closest(config.itemSelector);
-                element.style.transform = 'translateZ(0)';
+                element.style.transform = 'translateZ(0)';// Solves problem with FireFox and ShadowDom in the drag-image.
                 window.addEventListener('dragover', handleDragMove);
                 window.addEventListener('dragend', handleDragEnd);
                 
