@@ -12,6 +12,7 @@ import { UmbTreeDataContextBase } from '../tree-data.context';
 import { UmbTreeContextMenuService } from './context-menu/tree-context-menu.service';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import { UmbDataStore } from 'src/core/stores/store';
 
 @customElement('umb-tree-item')
 export class UmbTreeItem extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
@@ -39,7 +40,7 @@ export class UmbTreeItem extends UmbContextConsumerMixin(UmbObserverMixin(LitEle
 	private _isActive = false;
 
 	private _treeContext?: UmbTreeContextBase;
-	private _treeDataContext?: UmbTreeDataContextBase;
+	private _treeStore?: UmbDataStore<unknown>;
 	private _sectionContext?: UmbSectionContext;
 	private _treeContextMenuService?: UmbTreeContextMenuService;
 
@@ -52,8 +53,8 @@ export class UmbTreeItem extends UmbContextConsumerMixin(UmbObserverMixin(LitEle
 			this._observeSelection();
 		});
 
-		this.consumeContext('umbTreeDataContext', (treeDataContext: UmbTreeDataContextBase) => {
-			this._treeDataContext = treeDataContext;
+		this.consumeContext('umbTreeStore', (store: UmbDataStore<unknown>) => {
+			this._treeStore = store;
 		});
 
 		this.consumeContext('umbSectionContext', (sectionContext: UmbSectionContext) => {
@@ -119,12 +120,15 @@ export class UmbTreeItem extends UmbContextConsumerMixin(UmbObserverMixin(LitEle
 	private _onShowChildren(event: UUIMenuItemEvent) {
 		event.stopPropagation();
 		if (this._childItems.length > 0) return;
+		this._observeChildren();
+	}
+
+	private _observeChildren() {
+		if (!this._treeStore?.getTreeItemChildren) return;
 
 		this._loading = true;
 
-		if (!this._treeDataContext) return;
-
-		this.observe<Entity[]>(this._treeDataContext.childrenChanges(this.treeItem.key), (childItems) => {
+		this.observe<Entity[]>(this._treeStore.getTreeItemChildren(this.treeItem.key), (childItems) => {
 			if (childItems?.length === 0) return;
 			this._childItems = childItems;
 			this._loading = false;
