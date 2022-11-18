@@ -2827,7 +2827,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedPaged"
+                  "$ref": "#/components/schemas/PagedSearchResult"
                 }
               }
             }
@@ -4854,11 +4854,18 @@
         "additionalProperties": false
       },
       "Index": {
+        "required": [
+          "canRebuild",
+          "documentCount",
+          "fieldCount",
+          "isHealthy",
+          "name"
+        ],
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "minLength": 1,
+            "type": "string"
           },
           "healthStatus": {
             "type": "string",
@@ -4882,6 +4889,11 @@
           "fieldCount": {
             "type": "integer",
             "format": "int32"
+          },
+          "providerProperties": {
+            "type": "object",
+            "additionalProperties": {},
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -5749,26 +5761,6 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Language"
-            }
-          }
-        },
-        "additionalProperties": false
-      },
-      "PagedPaged": {
-        "required": [
-          "items",
-          "total"
-        ],
-        "type": "object",
-        "properties": {
-          "total": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PagedSearchResult"
             }
           }
         },

@@ -3,7 +3,8 @@ import {expect} from "@playwright/test";
 import {ScriptBuilder} from "@umbraco/json-models-builders";
 
 test.describe('Scripts', () => {
-  test.beforeEach(async ({ page, umbracoApi }) => {
+  test.beforeEach(async ({ page, umbracoApi }, testInfo) => {
+    await umbracoApi.report.report(testInfo);
     await umbracoApi.login();
   });
 

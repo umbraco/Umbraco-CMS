@@ -5,7 +5,8 @@ test.describe('System Information', () => {
   const enCulture = "en-US";
   const dkCulture = "da-DK";
 
-  test.beforeEach(async ({page, umbracoApi}) => {
+  test.beforeEach(async ({ page, umbracoApi }, testInfo) => {
+    await umbracoApi.report.report(testInfo);
     await umbracoApi.login();
     await umbracoApi.users.setCurrentLanguage(enCulture);
   });

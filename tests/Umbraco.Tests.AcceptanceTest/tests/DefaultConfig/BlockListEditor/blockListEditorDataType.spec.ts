@@ -10,7 +10,8 @@ test.describe('BlockListEditorDataType', () => {
   
   const elementAlias = AliasHelper.toAlias(elementName);
   
-  test.beforeEach(async ({page, umbracoApi, umbracoUi}) => {
+  test.beforeEach(async ({page, umbracoApi, umbracoUi}, testInfo) => {
+    await umbracoApi.report.report(testInfo);
     await umbracoApi.login();
     await umbracoApi.documentTypes.ensureNameNotExists(documentName);
     await umbracoApi.dataTypes.ensureNameNotExists(blockListName);
