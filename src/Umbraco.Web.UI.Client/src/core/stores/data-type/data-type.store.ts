@@ -46,7 +46,6 @@ export class UmbDataTypeStore extends UmbDataStoreBase<DataTypeDetails | FolderT
 			});
 			const json = await res.json();
 			this.update(json);
-			this._entityStore.update(json);
 		} catch (error) {
 			console.error('Save Data Type error', error);
 		}
@@ -68,7 +67,6 @@ export class UmbDataTypeStore extends UmbDataStoreBase<DataTypeDetails | FolderT
 		});
 		const data = await res.json();
 		this.update(data);
-		this._entityStore.update(data);
 	}
 
 	getTreeRoot(): Observable<Array<FolderTreeItem>> {
