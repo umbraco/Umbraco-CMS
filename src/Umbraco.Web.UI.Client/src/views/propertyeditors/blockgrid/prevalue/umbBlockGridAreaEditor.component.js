@@ -60,7 +60,7 @@
             controller: BlockGridAreaController,
             controllerAs: "vm",
             bindings: {
-                model: "=",
+                model: "<",
                 block: "<",
                 allBlockTypes: "<",
                 allBlockGroups: "<",
