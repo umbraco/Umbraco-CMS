@@ -36,7 +36,6 @@ export class UmbDocumentTypeStore extends UmbDataStoreBase<DocumentTypeDetails |
 			});
 			const json = await res.json();
 			this.update(json);
-			this._entityStore.update(json);
 		} catch (error) {
 			console.error('Save Document Type error', error);
 		}

@@ -1,7 +1,5 @@
 import { BehaviorSubject, map, Observable } from 'rxjs';
-import { v4 as uuidv4 } from 'uuid';
-import type { UserDetails, UserEntity } from '../../models';
-import { UmbEntityStore } from '../entity.store';
+import type { UserDetails } from '../../models';
 import { UmbDataStoreBase } from '../store';
 
 /**
@@ -11,15 +9,8 @@ import { UmbDataStoreBase } from '../store';
  * @description - Data Store for Users
  */
 export class UmbUserStore extends UmbDataStoreBase<UserDetails> {
-	private _entityStore: UmbEntityStore;
-
 	private _totalUsers: BehaviorSubject<number> = new BehaviorSubject(0);
 	public readonly totalUsers: Observable<number> = this._totalUsers.asObservable();
-
-	constructor(entityStore: UmbEntityStore) {
-		super();
-		this._entityStore = entityStore;
-	}
 
 	getAll(): Observable<Array<UserDetails>> {
 		// TODO: use Fetcher API.
@@ -72,7 +63,6 @@ export class UmbUserStore extends UmbDataStoreBase<UserDetails> {
 			});
 
 			this.update(storedUsers);
-			this._entityStore.update(storedUsers);
 		} catch (error) {
 			console.error('Enable Users failed', error);
 		}
@@ -96,7 +86,6 @@ export class UmbUserStore extends UmbDataStoreBase<UserDetails> {
 			});
 
 			this.update(storedUsers);
-			this._entityStore.update(storedUsers);
 		} catch (error) {
 			console.error('Disable Users failed', error);
 		}
@@ -114,7 +103,6 @@ export class UmbUserStore extends UmbDataStoreBase<UserDetails> {
 			});
 			const deletedKeys = await res.json();
 			this.delete(deletedKeys);
-			this._entityStore.delete(deletedKeys);
 		} catch (error) {
 			console.error('Delete Users failed', error);
 		}
@@ -132,7 +120,6 @@ export class UmbUserStore extends UmbDataStoreBase<UserDetails> {
 			});
 			const json = await res.json();
 			this.update(json);
-			this._entityStore.update(json);
 		} catch (error) {
 			console.error('Save Data Type error', error);
 		}
@@ -150,7 +137,6 @@ export class UmbUserStore extends UmbDataStoreBase<UserDetails> {
 			});
 			const json = (await res.json()) as UserDetails[];
 			this.update(json);
-			this._entityStore.update(json);
 			return json[0];
 		} catch (error) {
 			console.error('Invite user error', error);
