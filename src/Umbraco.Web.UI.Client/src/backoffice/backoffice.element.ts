@@ -80,8 +80,8 @@ export class UmbBackofficeElement extends UmbContextConsumerMixin(UmbContextProv
 		this.provideContext('umbDocumentTypeStore', new UmbDocumentTypeStore());
 		this.provideContext('umbMediaTypeStore', new UmbMediaTypeStore());
 		this.provideContext('umbMemberTypeStore', new UmbMemberTypeStore());
-		this.provideContext('umbUserStore', new UmbUserStore(this._umbEntityStore));
-		this.provideContext('umbUserGroupStore', new UmbUserGroupStore(this._umbEntityStore));
+		this.provideContext('umbUserStore', new UmbUserStore());
+		this.provideContext('umbUserGroupStore', new UmbUserGroupStore());
 		this.provideContext('umbMemberGroupStore', new UmbMemberGroupStore());
 		this.provideContext('umbNotificationService', new UmbNotificationService());
 		this.provideContext('umbModalService', new UmbModalService());
