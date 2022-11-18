@@ -4,7 +4,7 @@ import { customElement, property } from 'lit/decorators.js';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import type { ManifestEditorView, ManifestWithLoader } from '@umbraco-cms/models';
 
-import '../shared/node/editor-node.element';
+import '../shared/editor-content/editor-node.element';
 
 @customElement('umb-editor-document')
 export class UmbEditorDocumentElement extends LitElement {
@@ -34,7 +34,7 @@ export class UmbEditorDocumentElement extends LitElement {
 				type: 'editorView',
 				alias: 'Umb.EditorView.Document.Edit',
 				name: 'Document Editor Edit View',
-				loader: () => import('../shared/node/views/edit/editor-view-node-edit.element'),
+				loader: () => import('../shared/editor-content/views/edit/editor-view-node-edit.element'),
 				weight: 200,
 				meta: {
 					editors: ['Umb.Editor.Document'],
@@ -47,7 +47,7 @@ export class UmbEditorDocumentElement extends LitElement {
 				type: 'editorView',
 				alias: 'Umb.EditorView.Document.Info',
 				name: 'Document Editor Info View',
-				loader: () => import('../shared/node/views/info/editor-view-node-info.element'),
+				loader: () => import('../shared/editor-content/views/info/editor-view-node-info.element'),
 				weight: 100,
 				meta: {
 					editors: ['Umb.Editor.Document'],
