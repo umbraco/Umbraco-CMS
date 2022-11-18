@@ -17,12 +17,12 @@ export const Indexers: Index[] = [
 		canRebuild: true,
 		healthStatus: 'Healthy',
 		isHealthy: true,
-		/*
+		documentCount: 0,
+		fieldCount: 0,
 		providerProperties: {
 			CommitCount: 0,
 			DefaultAnalyzer: 'StandardAnalyzer',
-			DocumentCount: 0,
-			FieldCount: 0,
+
 			LuceneDirectory: 'SimpleFSDirectory',
 			LuceneIndexFolder: '/ /umbraco /data /temp /examineindexes /externalindex',
 			DirectoryFactory:
@@ -30,19 +30,18 @@ export const Indexers: Index[] = [
 			EnableDefaultEventHandler: true,
 			PublishedValuesOnly: true,
 			SupportProtectedContent: false,
-		},*/
+		},
 	},
 	{
 		name: 'InternalIndex',
 		canRebuild: true,
 		healthStatus: 'Healthy',
 		isHealthy: true,
-		/*
+		documentCount: 0,
+		fieldCount: 0,
 		providerProperties: {
 			CommitCount: 0,
 			DefaultAnalyzer: 'CultureInvariantWhitespaceAnalyzer',
-			DocumentCount: 0,
-			FieldCount: 0,
 			LuceneDirectory: 'SimpleFSDirectory',
 			LuceneIndexFolder: '/ /umbraco /data /temp /examineindexes /internalindex',
 			DirectoryFactory:
@@ -52,29 +51,26 @@ export const Indexers: Index[] = [
 			SupportProtectedContent: true,
 			IncludeFields: ['id', 'nodeName', 'updateDate', 'loginName', 'email', '__Key'],
 		},
-		*/
 	},
 	{
 		name: 'MemberIndex',
 		canRebuild: true,
 		healthStatus: 'Healthy',
 		isHealthy: true,
-		/*
+		fieldCount: 0,
+		documentCount: 0,
 		providerProperties: {
 			CommitCount: 0,
 			DefaultAnalyzer: 'CultureInvariantWhitespaceAnalyzer',
 			DirectoryFactory:
 				'Umbraco.Cms.Infrastructure.Examine.ConfigurationEnabledDirectoryFactory, Umbraco.Examine.Lucene, Version=10.2.0.0, Culture=neutral, PublicKeyToken=null',
-			DocumentCount: 0,
 			EnableDefaultEventHandler: true,
-			FieldCount: 0,
 			IncludeFields: ['id', 'nodeName', 'updateDate', 'loginName', 'email', '__Key'],
 			LuceneDirectory: 'SimpleFSDirectory',
 			LuceneIndexFolder: '/ /umbraco /data /temp /examineindexes /membersindex',
 			PublishedValuesOnly: false,
 			SupportProtectedContent: false,
 		},
-		*/
 	},
 ];
 

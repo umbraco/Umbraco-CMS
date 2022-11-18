@@ -2,7 +2,7 @@ import { rest } from 'msw';
 import { searchResultMockData, getIndexByName, PagedIndexers } from '../data/examine.data';
 
 import { umbracoPath } from '@umbraco-cms/utils';
-import { Index, PagedIndex, PagedPaged, PagedSearcher, SearchResult } from '@umbraco-cms/backend-api';
+import { Index, PagedIndex, PagedSearcher, PagedSearchResult, SearchResult } from '@umbraco-cms/backend-api';
 
 export const handlers = [
 	rest.get(umbracoPath('/search/index'), (_req, res, ctx) => {
@@ -64,14 +64,9 @@ export const handlers = [
 		if (searcherName) {
 			return res(
 				ctx.status(200),
-				ctx.json<PagedPaged>({
+				ctx.json<PagedSearchResult>({
 					total: 0,
-					items: [
-						{
-							total: 0,
-							items: searchResultMockData,
-						},
-					],
+					items: searchResultMockData,
 				})
 			);
 		} else {

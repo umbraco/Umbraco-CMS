@@ -153,8 +153,7 @@ export class UmbDashboardExamineSearcherElement extends UmbContextConsumerMixin(
 				take: 9999,
 				skip: 0,
 			});
-			const pagedSearchResults = res.items as PagedSearchResult[];
-			this._searchResults = pagedSearchResults[0].items;
+			this._searchResults = res.items as SearchResult[];
 			this._updateFieldFilter();
 		} catch (e) {
 			if (e instanceof ApiError) {
