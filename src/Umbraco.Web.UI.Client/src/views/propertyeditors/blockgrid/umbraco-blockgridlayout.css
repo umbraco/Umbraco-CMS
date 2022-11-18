@@ -35,7 +35,7 @@
 
 @media (min-width:1024px) {
     .umb-block-grid__layout-item {
-        grid-column-end: span var(--umb-block-grid--item-column-span, 1);
+        grid-column-end: span min(var(--umb-block-grid--item-column-span, 1), var(--umb-block-grid--grid-columns));
     }
     .umb-block-grid__area {
         grid-column-end: span var(--umb-block-grid--area-column-span, 1);
