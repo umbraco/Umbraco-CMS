@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Core.Configuration.Models;
 public class MarketplaceSettings
 {
     /// <summary>
-    ///     Gets or sets a value for the Active Directory domain.
+    /// Gets or sets the additional parameters that are sent to the Marketplace.
     /// </summary>
     public Dictionary<string, string> AdditionalParameters { get; set; } = new ();
 }
