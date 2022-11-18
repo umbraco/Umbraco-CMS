@@ -8,14 +8,7 @@ import { UmbNotificationDefaultData } from '../../../../core/services/notificati
 
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
-import {
-	ApiError,
-	ProblemDetails,
-	SearchResult,
-	SearchResource,
-	Field,
-	PagedSearchResult,
-} from '@umbraco-cms/backend-api';
+import { ApiError, ProblemDetails, SearchResult, SearchResource, Field } from '@umbraco-cms/backend-api';
 
 import '../../../../core/services/modal/layouts/fields-viewer/fields-viewer.element';
 import '../../../../core/services/modal/layouts/fields-viewer/fields-settings.element';
@@ -81,7 +74,7 @@ export class UmbDashboardExamineSearcherElement extends UmbContextConsumerMixin(
 
 			.table-container uui-scroll-container {
 				padding-bottom: var(--uui-size-space-4);
-				max-width: calc(-336px + 100vw);
+				max-width: 100%;
 				overflow-x: scroll;
 				flex: 1;
 			}

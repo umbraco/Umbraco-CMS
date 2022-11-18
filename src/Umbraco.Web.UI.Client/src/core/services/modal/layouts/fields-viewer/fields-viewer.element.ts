@@ -22,10 +22,14 @@ export class UmbModalLayoutFieldsViewerElement extends UmbModalLayoutElement<Sea
 				padding: var(--uui-size-space-5);
 				box-sizing: border-box;
 			}
+
+			span {
+				display: block;
+				padding-right: var(--uui-size-space-5);
+			}
+
 			uui-scroll-container {
 				line-height: 0;
-				display: grid;
-				grid-template-columns: repeat(auto-fit, minmax(40px, auto));
 				overflow-y: scroll;
 				max-height: 100%;
 				min-height: 0;
@@ -47,18 +51,20 @@ export class UmbModalLayoutFieldsViewerElement extends UmbModalLayoutElement<Sea
 			return html`
 				<uui-dialog-layout class="uui-text" headline="${this.data.name}">
 					<uui-scroll-container id="field-viewer">
-						<uui-table>
-							<uui-table-head>
-								<uui-table-head-cell> Field </uui-table-head-cell>
-								<uui-table-head-cell> Value </uui-table-head-cell>
-							</uui-table-head>
-							${Object.values(this.data.fields).map((cell) => {
-								return html`<uui-table-row>
-									<uui-table-cell> ${cell.name} </uui-table-cell>
-									<uui-table-cell> ${cell.values.join(', ')} </uui-table-cell>
-								</uui-table-row>`;
-							})}
-						</uui-table>
+						<span>
+							<uui-table>
+								<uui-table-head>
+									<uui-table-head-cell> Field </uui-table-head-cell>
+									<uui-table-head-cell> Value </uui-table-head-cell>
+								</uui-table-head>
+								${Object.values(this.data.fields).map((cell) => {
+									return html`<uui-table-row>
+										<uui-table-cell> ${cell.name} </uui-table-cell>
+										<uui-table-cell> ${cell.values.join(', ')} </uui-table-cell>
+									</uui-table-row>`;
+								})}
+							</uui-table>
+						</span>
 					</uui-scroll-container>
 					<div>
 						<uui-button look="primary" @click="${this._handleClose}">Close</uui-button>

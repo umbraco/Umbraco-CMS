@@ -29,13 +29,12 @@ export class UmbModalLayoutFieldsSettingsElement extends UmbModalLayoutElement<U
 			}
 
 			uui-scroll-container {
-				line-height: 0;
-				display: grid;
-				grid-template-columns: repeat(auto-fit, minmax(40px, auto));
 				overflow-y: scroll;
 				max-height: 100%;
 				min-height: 0;
+				flex: 1;
 			}
+
 			div {
 				margin-top: var(--uui-size-space-5);
 				display: flex;
