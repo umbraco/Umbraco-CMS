@@ -199,8 +199,10 @@
                 let accumulatedValue = getAccumulatedValueOfIndex(amountOfColumnsInWeightMap, approvedContainerGridColumns) || 0;
                 const layoutWidth = data.containerRect.width;
                 const missingColumnWidth = (layoutWidth-accumulatedValue)/amountOfUnknownColumns;
-                while(amountOfColumnsInWeightMap++ < gridColumnNumber) {
-                    approvedContainerGridColumns.push(missingColumnWidth);
+                if(missingColumnWidth > 0) {
+                    while(amountOfColumnsInWeightMap++ < gridColumnNumber) {
+                        approvedContainerGridColumns.push(missingColumnWidth);
+                    }
                 }
             }
 
