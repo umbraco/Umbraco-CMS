@@ -229,7 +229,6 @@
                 draggableSelector: ".umb-block-grid__block--view",
                 placeholderClass: "umb-block-grid__layout-item-placeholder",
                 ghostClass: "umb-block-grid__layout-item-ghost",
-                items: vm.entries,
                 onStart: onSortStart,
                 onEnd: onSortEnd,
                 onSync: onSortSync,

@@ -81,7 +81,6 @@
 
             const config = {...DefaultConfig, ...scope.config};
 
-            vm.items = config.items;
             vm.identifier = config.identifier;
 
             let scrollElement = null;
@@ -220,9 +219,9 @@
                     // Sync could not succeed, might be because item is not allowed here.
 
                     // Lets move the Element back to where it came from:
-                    const movingItemIndex = vm.items.indexOf(currentItem);
-                    if(movingItemIndex < vm.items.length-1) {
-                        const afterItem = vm.items[movingItemIndex+1];
+                    const movingItemIndex = scope.model.indexOf(currentItem);
+                    if(movingItemIndex < scope.model.length-1) {
+                        const afterItem = scope.model[movingItemIndex+1];
                         const afterEl = config.querySelectModelToElement(containerEl, afterItem);
                         containerEl.insertBefore(currentElement, afterEl);
                     } else {
@@ -302,7 +301,7 @@
 
                 var currentBoundaryRect = currentBoundaryElement.getBoundingClientRect();
                 
-                const currentContainerHasItems = currentContainerVM.items.filter(x => x !== currentItem).length > 0;
+                const currentContainerHasItems = currentContainerVM.hasOtherItemsThan(currentItem);
 
                 // if empty we will be move likely to accept an item (add 20px to the bounding box)
                 // If we have items we must be 10 within the container to accept the move.
@@ -367,9 +366,6 @@
                 }
 
                 if (foundEl) {
-
-                    //let newIndex = containerElements.indexOf(foundRelatedEl);
-                    //let foundItem = vm.items.find(entry => config.compareElementToModel(foundEl, entry));
 
                     const isInsideFound = isWithinRect(dragX, dragY, foundElDragRect, 0);
                     
@@ -495,17 +491,21 @@
                 if(!element) {
                     return null;
                 }
-                return vm.items.find(entry => config.compareElementToModel(element, entry));
+                return scope.model.find(entry => config.compareElementToModel(element, entry));
             }
             vm.removeItem = function (item) {
                 if(!item) {
                     return null;
                 }
-                const oldIndex = vm.items.indexOf(item);
+                const oldIndex = scope.model.indexOf(item);
                 if(oldIndex !== -1) {
-                    return vm.items.splice(oldIndex, 1)[0];
+                    return scope.model.splice(oldIndex, 1)[0];
                 }
                 return null;
+            }
+
+            vm.hasOtherItemsThan = function(item) {
+                return scope.model.filter(x => x !== item).length > 0;
             }
 
             vm.sync = function(element, fromVm) {
@@ -538,14 +538,14 @@
                     }
                 }
 
-                let newIndex = vm.items.length;
+                let newIndex = scope.model.length;
                 if(nextEl) {
                     // We had a reference element, we want to get the index of it.
                     // This is problem if a item is being moved forward?
-                    newIndex = vm.items.findIndex(entry => config.compareElementToModel(nextEl, entry));
+                    newIndex = scope.model.findIndex(entry => config.compareElementToModel(nextEl, entry));
                 }
 
-                vm.items.splice(newIndex, 0, movingItem);
+                scope.model.splice(newIndex, 0, movingItem);
 
                 const eventData = {item: movingItem, fromController:fromVm, toController:vm};
                 if(fromVm !== vm) {
@@ -691,7 +691,8 @@
         var directive = {
             restrict: 'A',
             scope: {
-                config: '=umbBlockGridSorter'
+                config: '=umbBlockGridSorter',
+                model: '=umbBlockGridSorterModel'
             },
             link: link
         };

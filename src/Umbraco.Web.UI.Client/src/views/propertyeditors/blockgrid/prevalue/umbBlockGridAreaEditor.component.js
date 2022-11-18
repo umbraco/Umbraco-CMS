@@ -90,7 +90,6 @@
                 containerSelector: ".umb-block-grid-area-editor__grid-wrapper",
                 itemSelector: ".umb-block-grid-area-editor__area",
                 placeholderClass: "umb-block-grid-area-editor__area-placeholder",
-                items: vm.model,
                 onSync: onSortSync
             }
 
