@@ -135,14 +135,10 @@
                 });
             }
             function setupPreventEvent(element) {
-                element.addEventListener('dragstart', preventEvent);
+                element.draggable = false
             }
             function destroyPreventEvent(element) {
-                element.removeEventListener('dragstart', preventEvent);
-            }
-            function preventEvent(event) {
-                event.preventDefault();
-                event.stopPropagation();
+                element.removeAttribute('draggable');
             }
 
 
@@ -342,14 +338,14 @@
                         const dragElement = config.draggableSelector ? el.querySelector(config.draggableSelector) : el;
                         const dragElementRect = dragElement.getBoundingClientRect();
                         elementsInSameRow.push({el:el, elRect:elRect, dragRect:dragElementRect});
-                        if(el !== currentElement) {
+                        if(el === currentElement) {
                             placeholderIsInThisRow = true;
                         }
                     }
                 }
 
                 let lastDistance = 99999;
-                let foundEl = null;
+                let foundEl = null; 
                 let foundElRect = null;
                 let foundElDragRect = null;
                 let placeAfter = false;
@@ -411,7 +407,6 @@
                     if(updateAllowIndication(currentContainerVM, currentItem) === false) {
                         return;
                     }
-                    
 
                     let verticalDirection = scope.config.resolveVerticalDirection ? scope.config.resolveVerticalDirection({
                         containerElement: currentContainerElement,
@@ -427,6 +422,31 @@
                     
                     if (verticalDirection) {
                         placeAfter = (dragY > foundElDragRect.top + (foundElDragRect.height*.5));
+                    }
+
+                    if(verticalDirection) {
+
+                        let el;
+                        if(placeAfter === false) {
+                            let lastLeft = foundElDragRect.left;
+                            elementsInSameRow.findIndex((x) => {
+                                if(x.dragRect.left < lastLeft) {
+                                    lastLeft = x.dragRect.left;
+                                    el = x.el; 
+                                }
+                            });
+                        } else {
+                            let lastRight = foundElDragRect.right;
+                            elementsInSameRow.findIndex((x) => {
+                                if(x.dragRect.right > lastRight) {
+                                    lastRight = x.dragRect.right;
+                                    el = x.el; 
+                                }
+                            });
+                        }
+                        if(el) {
+                            foundEl = el;
+                        }
                     }
 
                     const foundElIndex = orderedContainerElements.indexOf(foundEl);
@@ -659,9 +679,6 @@
 
                 containerEl['umbBlockGridSorter:vm'] = null
                 containerEl.removeEventListener('dragover', preventDragOver);
-
-                // Destroy!
-                // Considering story all elements, and run through to clean up.
 
                 observer.disconnect();
                 observer = null;

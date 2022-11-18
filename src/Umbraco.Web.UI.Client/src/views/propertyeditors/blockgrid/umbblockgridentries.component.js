@@ -171,8 +171,13 @@
             const gridColumnGap = Number(approvedContainerComputedStyles.columnGap.split("px")[0]) || 0;
             const gridColumnNumber = parseInt(approvedContainerComputedStyles.getPropertyValue("--umb-block-grid--grid-columns"), 10);
 
+
             const foundElColumns = parseInt(data.relatedElement.dataset.colSpan, 10);
-            const currentElementColumns = parseInt(data.element.dataset.colSpan, 10);
+            const currentElementColumns = data.item.columnSpan;
+
+            if(gridColumnNumber >= foundElColumns) {
+                return true;
+            }
 
             // Get grid template:
             const approvedContainerGridColumns = approvedContainerComputedStyles.gridTemplateColumns.trim().split("px").map(x => Number(x)).filter(n => n > 0).map((n, i, list) => list.length === i ? n : n + gridColumnGap);
