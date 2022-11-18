@@ -75,6 +75,7 @@ internal class AppSettings
         public DataTypesSettings? DataTypes { get; set; }
 
         public LicensesSettings? Licenses { get; set; }
+
         public MarketplaceSettings? Marketplace { get; set; }
     }
 }
