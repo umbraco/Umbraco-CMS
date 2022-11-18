@@ -139,7 +139,7 @@
                 const relatedStartCol = Math.round(getInterpolatedIndexOfPositionInWeightMap(relatedStartX, approvedContainerGridColumns));
     
                 // If the found related element does not have enough room after which for the current element, then we go vertical mode:
-                return (relatedStartCol + foundElColumns + currentElementColumns > gridColumnNumber);
+                return (relatedStartCol + (data.horizontalPlaceAfter ? foundElColumns : 0) + currentElementColumns > gridColumnNumber);
                 
             }
     
