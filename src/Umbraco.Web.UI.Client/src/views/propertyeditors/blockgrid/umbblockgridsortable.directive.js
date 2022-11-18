@@ -48,14 +48,10 @@
         compareElementToModel: (el, modelEntry) => modelEntry.contentUdi === el.dataset.elementUdi,
         querySelectModelToElement: (container, modelEntry) => container.querySelector(`[data-element-udi='${modelEntry.contentUdi}']`),
         identifier: "UmbBlockGridSorter",
-        containerSelector: "ol", // Used for connecting with others
+        containerSelector: "ol", // To find container and to connect with others.
         ignorerSelector: "a, img, iframe",
         itemSelector: "li",
         placeholderClass: "umb-drag-placeholder"
-        
-        /*,
-        ghostClass: "umb-drag-ghost"
-        */
     }
 
 
@@ -103,7 +99,7 @@
                 containerEl['umbBlockGridSorter:vm'] = () => {
                     return vm;
                 };
-                //containerEl.addEventListener('dragover', preventDragOver);
+                containerEl.addEventListener('dragover', preventDragOver);
 
                 observer.observe(containerEl, {childList: true, subtree: false});
             }
@@ -116,11 +112,7 @@
             function setupItem(element) {
 
                 setupIgnorerElements(element);
-                /*
-                const dragElement = config.draggableSelector ? element.querySelector(config.draggableSelector) : element;
-                dragElement.draggable = true;
-                dragElement.addEventListener('dragstart', handleDragStart);
-                */
+
                 element.draggable = true;
                 element.addEventListener('dragstart', handleDragStart);
             }
@@ -129,10 +121,6 @@
 
                 destroyIgnorerElements(element);
 
-                /*
-                const dragElement = config.draggableSelector ? element.querySelector(config.draggableSelector) : element;
-                dragElement.removeEventListener('dragstart', handleDragStart);
-                */
                 element.removeEventListener('dragstart', handleDragStart);
             }
 
@@ -174,22 +162,29 @@
 
             function handleDragStart(event) {
 
+                if(currentElement) {
+                    handleDragEnd();
+                }
+
                 event.stopPropagation();
-                //event.dataTransfer.effectAllowed = "copyMove";// copyMove when we enhance the drag with clipboard data.
+                event.dataTransfer.effectAllowed = "move";// copyMove when we enhance the drag with clipboard data.
+                event.dataTransfer.dropEffect = "none";// visual feedback when dropped.
                 
                 if(!scrollElement) {
                     scrollElement = getParentScrollElement(containerEl, true);
                 }
                 
-                const element = event.target;//.closest(config.itemSelector);
-                element.style.transform = 'translateZ(0)';// Solves problem with FireFox and ShadowDom in the drag-image.
-                window.addEventListener('dragover', handleDragMove);
-                window.addEventListener('dragend', handleDragEnd);
+                const element = event.target.closest(config.itemSelector);
                 
                 currentElement = element;
                 currentDragElement = config.draggableSelector ? currentElement.querySelector(config.draggableSelector) : currentElement;
                 currentDragRect = currentDragElement.getBoundingClientRect();
                 currentItem = vm.getItemOfElement(currentElement);
+                if(!currentItem) {
+                    console.error("Could not find item related to this element.")
+                }
+
+                currentElement.style.transform = 'translateZ(0)';// Solves problem with FireFox and ShadowDom in the drag-image.
                 
                 if (config.dataTransferResolver) {
                     config.dataTransferResolver(event.dataTransfer, currentItem);
@@ -198,16 +193,9 @@
                 if (config.onStart) {
                     config.onStart({item: currentItem, element: currentElement});
                 }
-                
-                /*
-                const clientX = (event.touches ? event.touches[0] : event).clientX;
-                const clientY = (event.touches ? event.touches[1] : event).clientY;
-                const mouseOffsetX = clientX - currentDragRect.left; //x position within the element.
-                const mouseOffsetY = clientY - currentDragRect.top;  //y position within the element.
-                // temp test with using shadowRoot..
-                const elToSnapshot = currentDragElement.shadowRoot.querySelector("div > *:not(style)");
-                event.dataTransfer.setDragImage(elToSnapshot, mouseOffsetX, mouseOffsetY);
-                */
+
+                window.addEventListener('dragover', handleDragMove);
+                window.addEventListener('dragend', handleDragEnd);
 
                 // We must wait one frame before changing the look of the block.
                 rqaId = requestAnimationFrame(() => {// It should be okay to use the same refId, as the move does not or is okay not to happen on first frame/drag-move.
@@ -216,21 +204,37 @@
                     currentElement.classList.add(config.placeholderClass);
                 });
                 
-
             }
             
-            function handleDragEnd(event) {
+            function handleDragEnd() {
 
-                //event?.stopPropagation();
+                if(!currentElement) {
+                    return;
+                }
 
                 window.removeEventListener('dragover', handleDragMove);
                 window.removeEventListener('dragend', handleDragEnd);
+                currentElement.style.transform = '';
                 currentElement.classList.remove(config.placeholderClass);
 
                 stopAutoScroll();
                 removeAllowIndication();
 
-                currentContainerVM.sync(currentElement, vm);
+                if(currentContainerVM.sync(currentElement, vm) === false) {
+                    // Sync could not succeed, might be because item is not allowed here.
+
+                    // Lets move the Element back to where it came from:
+                    const movingItemIndex = vm.items.indexOf(currentItem);
+                    if(movingItemIndex < vm.items.length-1) {
+                        const afterItem = vm.items[movingItemIndex+1];
+                        const afterEl = config.querySelectModelToElement(containerEl, afterItem);
+                        containerEl.insertBefore(currentElement, afterEl);
+                    } else {
+                        containerEl.appendChild(currentElement);
+                    }
+
+                    currentContainerVM = vm;
+                }
 
                 if (config.onEnd) {
                     config.onEnd({item: currentItem, element: currentElement});
@@ -258,7 +262,6 @@
                 if(!currentElement) {
                     return;
                 }
-                //event.stopPropagation();
 
                 const clientX = (event.touches ? event.touches[0] : event).clientX;
                 const clientY = (event.touches ? event.touches[1] : event).clientY;
@@ -488,13 +491,16 @@
 
                 const movingItem = fromVm.getItemOfElement(element);
                 if(!movingItem) {
-                    return;
+                    console.error("Could not find item of sync item")
+                    return false;
                 }
                 if(vm.notifyRequestDrop({item: movingItem}) === false) {
-                    return;
+                    console.error("was not allowed for drop on this location.")
+                    return false;
                 }
-                if(!fromVm.removeItem(movingItem)) {
-                    return;
+                if(fromVm.removeItem(movingItem) === null) {
+                    console.error("Sync could not remove item")
+                    return false;
                 }
 
                 /** Find next element, to then find the index of that element in items-data, to use as a safe reference to where the item will go in our items-data.
@@ -518,10 +524,6 @@
                     newIndex = vm.items.findIndex(entry => config.compareElementToModel(nextEl, entry));
                 }
 
-                if(vm.items.indexOf(movingItem) === newIndex) {
-                    console.error("WE DID NOT DO ANYTHING CAUSE YOU WHERE ALREADY HERE.")
-                    return;
-                }
                 vm.items.splice(newIndex, 0, movingItem);
 
                 const eventData = {item: movingItem, fromController:fromVm, toController:vm};
@@ -529,6 +531,8 @@
                     fromVm.notifySync(eventData);
                 }
                 vm.notifySync(eventData);
+
+                return true;
             }
 
             
