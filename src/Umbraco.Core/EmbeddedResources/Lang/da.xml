@@ -1263,6 +1263,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="media">Mediearkiv</key>
     <key alias="member">Medlemmer</key>
     <key alias="packages">Pakker</key>
+    <key alias="marketplace">Marketplace</key>
     <key alias="newsletters">Nyhedsbreve</key>
     <key alias="settings">Indstillinger</key>
     <key alias="statistics">Statistik</key>

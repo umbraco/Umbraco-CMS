@@ -1477,6 +1477,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="member">Members</key>
     <key alias="newsletters">Newsletters</key>
     <key alias="packages">Packages</key>
+    <key alias="marketplace">Marketplace</key>
     <key alias="settings">Settings</key>
     <key alias="statistics">Statistics</key>
     <key alias="translation">Translation</key>
