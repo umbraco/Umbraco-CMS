@@ -204,10 +204,8 @@
             const relatedStartCol = Math.round(getInterpolatedIndexOfPositionInWeightMap(relatedStartX, approvedContainerGridColumns));
 
             // If the found related element does not have enough room after which for the current element, then we go vertical mode:
-            return (relatedStartCol + foundElColumns + currentElementColumns > gridColumnNumber);
-
-            // TODO: Check is there a case where placeAfter = false where we would like to check the previous element in this case?
-            
+            return (relatedStartCol + (data.horizontalPlaceAfter ? foundElColumns : 0) + currentElementColumns > gridColumnNumber);
+            // If placed after we include the foundColumns, otherwise er keep it out.
         }
 
 

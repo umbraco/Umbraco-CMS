@@ -421,7 +421,8 @@
                         elementRect: currentElementRect,
                         relatedElement: foundEl,
                         relatedRect: foundElDragRect,
-                        placeholderIsInThisRow: placeholderIsInThisRow
+                        placeholderIsInThisRow: placeholderIsInThisRow,
+                        horizontalPlaceAfter: placeAfter
                     }) : true;
                     
                     if (verticalDirection) {
