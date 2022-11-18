@@ -175,7 +175,7 @@
             const foundElColumns = parseInt(data.relatedElement.dataset.colSpan, 10);
             const currentElementColumns = data.item.columnSpan;
 
-            if(gridColumnNumber >= foundElColumns) {
+            if(currentElementColumns >= gridColumnNumber) {
                 return true;
             }
 
@@ -210,7 +210,6 @@
 
             // If the found related element does not have enough room after which for the current element, then we go vertical mode:
             return (relatedStartCol + (data.horizontalPlaceAfter ? foundElColumns : 0) + currentElementColumns > gridColumnNumber);
-            // If placed after we include the foundColumns, otherwise er keep it out.
         }
 
 

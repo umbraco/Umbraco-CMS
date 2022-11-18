@@ -107,7 +107,11 @@
                 const gridColumnNumber = vm.rootLayoutColumns;
     
                 const foundElColumns = parseInt(data.relatedElement.dataset.colSpan, 10);
-                const currentElementColumns = parseInt(data.element.dataset.colSpan, 10);
+                const currentElementColumns = data.item.columnSpan;
+
+                if(currentElementColumns >= gridColumnNumber) {
+                    return true;
+                }
     
                 // Get grid template:
                 const approvedContainerGridColumns = approvedContainerComputedStyles.gridTemplateColumns.trim().split("px").map(x => Number(x)).filter(n => n > 0).map((n, i, list) => list.length === i ? n : n + gridColumnGap);

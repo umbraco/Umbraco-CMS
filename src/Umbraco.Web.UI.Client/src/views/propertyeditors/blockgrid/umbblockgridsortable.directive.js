@@ -332,12 +332,12 @@
                 let elementsInSameRow = [];
                 let placeholderIsInThisRow = false;
                 for (const el of orderedContainerElements) {
-                    const elRect = el.getBoundingClientRect();
+                    //const elRect = el.getBoundingClientRect();
+                    const dragElement = config.draggableSelector ? el.querySelector(config.draggableSelector) : el;
+                    const dragElementRect = dragElement.getBoundingClientRect();
                     // gather elements on the same row.
-                    if(dragY >= elRect.top && dragY <= elRect.bottom) {
-                        const dragElement = config.draggableSelector ? el.querySelector(config.draggableSelector) : el;
-                        const dragElementRect = dragElement.getBoundingClientRect();
-                        elementsInSameRow.push({el:el, elRect:elRect, dragRect:dragElementRect});
+                    if(dragY >= dragElementRect.top && dragY <= dragElementRect.bottom) {
+                        elementsInSameRow.push({el:el, dragRect:dragElementRect});
                         if(el === currentElement) {
                             placeholderIsInThisRow = true;
                         }
@@ -346,7 +346,6 @@
 
                 let lastDistance = 99999;
                 let foundEl = null; 
-                let foundElRect = null;
                 let foundElDragRect = null;
                 let placeAfter = false;
                 elementsInSameRow.forEach( sameRow => {
@@ -354,7 +353,6 @@
                     let distance = Math.abs(dragX - centerX);
                     if(distance < lastDistance) {
                         foundEl = sameRow.el;
-                        foundElRect = sameRow.elRect;
                         foundElDragRect = sameRow.dragRect;
                         lastDistance = Math.abs(distance);
                         placeAfter = dragX > centerX;
