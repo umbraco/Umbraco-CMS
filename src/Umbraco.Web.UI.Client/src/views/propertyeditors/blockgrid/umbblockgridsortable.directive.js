@@ -176,7 +176,8 @@
                 currentDragRect = currentDragElement.getBoundingClientRect();
                 currentItem = vm.getItemOfElement(currentElement);
                 if(!currentItem) {
-                    console.error("Could not find item related to this element.")
+                    console.error("Could not find item related to this element.");
+                    return;
                 }
 
                 currentElement.style.transform = 'translateZ(0)';// Solves problem with FireFox and ShadowDom in the drag-image.
