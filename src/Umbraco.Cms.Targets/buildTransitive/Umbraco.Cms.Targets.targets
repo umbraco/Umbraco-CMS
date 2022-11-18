@@ -15,12 +15,6 @@
     <Copy SourceFiles="@(UmbracoJsonSchemaFiles)" DestinationFolder="$(MSBuildProjectDirectory)" SkipUnchangedFiles="true" />
   </Target>
 
-  <!-- Remove copied JSON schema files from the project directory -->
-  <Target Name="RemoveUmbracoJsonSchemaFiles" BeforeTargets="Clean">
-    <Message Text="Removing JSON schema files from project directory: @(UmbracoJsonSchemaFiles->'%(Filename)%(Extension)')" Importance="high" />
-    <Delete Files="@(UmbracoJsonSchemaFiles->'$(MSBuildProjectDirectory)\%(Filename)%(Extension)')" />
-  </Target>
-
   <!-- Add references to the JSON schema in the project directory -->
   <UsingTask TaskName="JsonSchemaAddReferences" AssemblyFile="$(MSBuildThisFileDirectory)..\tasks\netstandard2.0\Umbraco.JsonSchema.Extensions.dll" />
   <Target Name="AddUmbracoJsonSchemaReferences" BeforeTargets="Build" DependsOnTargets="CopyUmbracoJsonSchemaFiles">
