@@ -31,6 +31,7 @@ export class UmbModalLayoutFieldsViewerElement extends UmbModalLayoutElement<Sea
 				min-height: 0;
 			}
 			div {
+				margin-top: var(--uui-size-space-5);
 				display: flex;
 				flex-direction: row-reverse;
 			}
@@ -45,7 +46,7 @@ export class UmbModalLayoutFieldsViewerElement extends UmbModalLayoutElement<Sea
 		if (this.data) {
 			return html`
 				<uui-dialog-layout class="uui-text" headline="${this.data.name}">
-					<uui-scroll-container id="icon-selection">
+					<uui-scroll-container id="field-viewer">
 						<uui-table>
 							<uui-table-head>
 								<uui-table-head-cell> Field </uui-table-head-cell>

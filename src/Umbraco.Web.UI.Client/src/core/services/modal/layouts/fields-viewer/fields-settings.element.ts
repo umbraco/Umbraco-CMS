@@ -15,7 +15,8 @@ export class UmbModalLayoutFieldsSettingsElement extends UmbModalLayoutElement<U
 		css`
 			:host {
 				display: relative;
-			} /*
+			}
+
 			uui-dialog-layout {
 				display: flex;
 				flex-direction: column;
@@ -26,6 +27,7 @@ export class UmbModalLayoutFieldsSettingsElement extends UmbModalLayoutElement<U
 				padding: var(--uui-size-space-5);
 				box-sizing: border-box;
 			}
+
 			uui-scroll-container {
 				line-height: 0;
 				display: grid;
@@ -33,8 +35,9 @@ export class UmbModalLayoutFieldsSettingsElement extends UmbModalLayoutElement<U
 				overflow-y: scroll;
 				max-height: 100%;
 				min-height: 0;
-			}*/
+			}
 			div {
+				margin-top: var(--uui-size-space-5);
 				display: flex;
 				flex-direction: row-reverse;
 			}
@@ -65,17 +68,19 @@ export class UmbModalLayoutFieldsSettingsElement extends UmbModalLayoutElement<U
 		if (this._fields) {
 			return html`
 				<uui-dialog-layout headline="Show fields">
-					<uui-scroll-container id="icon-selection">
-						${Object.values(this._fields).map((field, index) => {
-							return html`<uui-toggle
-									name="${field.name}"
-									label="${field.name}"
-									.checked="${field.exposed}"
-									@change="${() => {
-										this._fields ? (this._fields[index].exposed = !field.exposed) : '';
-									}}"></uui-toggle>
-								<br />`;
-						})}
+					<uui-scroll-container id="field-settings">
+						<span>
+							${Object.values(this._fields).map((field, index) => {
+								return html`<uui-toggle
+										name="${field.name}"
+										label="${field.name}"
+										.checked="${field.exposed}"
+										@change="${() => {
+											this._fields ? (this._fields[index].exposed = !field.exposed) : '';
+										}}"></uui-toggle>
+									<br />`;
+							})}
+						</span>
 					</uui-scroll-container>
 					<div>
 						<uui-button look="primary" label="Close sidebar" @click="${this._handleClose}">Close</uui-button>
