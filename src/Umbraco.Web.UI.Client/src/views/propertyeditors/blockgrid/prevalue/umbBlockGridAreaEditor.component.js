@@ -94,7 +94,7 @@
                 onSync: onSortSync
             }
 
-            function onSortSync(data) {
+            function onSortSync() {
                 $scope.$evalAsync();
                 setDirty();
             }
