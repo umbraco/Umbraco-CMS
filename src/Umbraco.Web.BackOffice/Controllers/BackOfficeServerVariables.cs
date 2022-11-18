@@ -595,11 +595,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         },
                         {
                             "disallowedUploadFiles",
-                            string.Join(",", _contentSettings.DisallowedUploadFiles)
+                            string.Join(",", _contentSettings.DisallowedUploadedFileExtensions)
                         },
                         {
                             "allowedUploadFiles",
-                            string.Join(",", _contentSettings.AllowedUploadFiles)
+                            string.Join(",", _contentSettings.AllowedUploadedFileExtensions)
                         },
                         {
                             "maxFileSize",

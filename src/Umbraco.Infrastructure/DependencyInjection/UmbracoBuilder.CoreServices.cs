@@ -296,18 +296,7 @@ public static partial class UmbracoBuilderExtensions
 
     private static IUmbracoBuilder AddPreValueMigrators(this IUmbracoBuilder builder)
     {
-        builder.WithCollectionBuilder<PreValueMigratorCollectionBuilder>()
-            .Append<RenamingPreValueMigrator>()
-            .Append<RichTextPreValueMigrator>()
-            .Append<UmbracoSliderPreValueMigrator>()
-            .Append<MediaPickerPreValueMigrator>()
-            .Append<ContentPickerPreValueMigrator>()
-            .Append<NestedContentPreValueMigrator>()
-            .Append<DecimalPreValueMigrator>()
-            .Append<ListViewPreValueMigrator>()
-            .Append<DropDownFlexiblePreValueMigrator>()
-            .Append<ValueListPreValueMigrator>()
-            .Append<MarkdownEditorPreValueMigrator>();
+        builder.WithCollectionBuilder<PreValueMigratorCollectionBuilder>();
 
         return builder;
     }

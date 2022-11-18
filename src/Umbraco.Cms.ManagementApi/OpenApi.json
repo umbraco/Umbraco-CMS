@@ -11,6 +11,7 @@
         "tags": [
           "Culture"
         ],
+        "operationId": "GetCulture",
         "parameters": [
           {
             "name": "skip",
@@ -48,6 +49,7 @@
         "tags": [
           "Data Type"
         ],
+        "operationId": "GetTreeDataTypeChildren",
         "parameters": [
           {
             "name": "parentKey",
@@ -103,6 +105,7 @@
         "tags": [
           "Data Type"
         ],
+        "operationId": "GetTreeDataTypeItem",
         "parameters": [
           {
             "name": "key",
@@ -138,6 +141,7 @@
         "tags": [
           "Data Type"
         ],
+        "operationId": "GetTreeDataTypeRoot",
         "parameters": [
           {
             "name": "skip",
@@ -185,6 +189,7 @@
         "tags": [
           "Dictionary"
         ],
+        "operationId": "GetDictionary",
         "parameters": [
           {
             "name": "skip",
@@ -222,6 +227,7 @@
         "tags": [
           "Dictionary"
         ],
+        "operationId": "PatchDictionaryById",
         "parameters": [
           {
             "name": "id",
@@ -274,6 +280,7 @@
         "tags": [
           "Dictionary"
         ],
+        "operationId": "GetDictionaryByKey",
         "parameters": [
           {
             "name": "key",
@@ -312,6 +319,7 @@
         "tags": [
           "Dictionary"
         ],
+        "operationId": "DeleteDictionaryByKey",
         "parameters": [
           {
             "name": "key",
@@ -345,6 +353,7 @@
         "tags": [
           "Dictionary"
         ],
+        "operationId": "PostDictionaryCreate",
         "requestBody": {
           "content": {
             "application/json": {
@@ -383,6 +392,7 @@
         "tags": [
           "Dictionary"
         ],
+        "operationId": "GetDictionaryExportByKey",
         "parameters": [
           {
             "name": "key",
@@ -432,6 +442,7 @@
         "tags": [
           "Dictionary"
         ],
+        "operationId": "PostDictionaryImport",
         "parameters": [
           {
             "name": "file",
@@ -478,8 +489,9 @@
         "tags": [
           "Dictionary"
         ],
+        "operationId": "PostDictionaryUpload",
         "requestBody": {
-          "content": { }
+          "content": {}
         },
         "responses": {
           "200": {
@@ -510,6 +522,7 @@
         "tags": [
           "Dictionary"
         ],
+        "operationId": "GetTreeDictionaryChildren",
         "parameters": [
           {
             "name": "parentKey",
@@ -557,6 +570,7 @@
         "tags": [
           "Dictionary"
         ],
+        "operationId": "GetTreeDictionaryItem",
         "parameters": [
           {
             "name": "key",
@@ -592,6 +606,7 @@
         "tags": [
           "Dictionary"
         ],
+        "operationId": "GetTreeDictionaryRoot",
         "parameters": [
           {
             "name": "skip",
@@ -631,6 +646,7 @@
         "tags": [
           "Document Blueprint"
         ],
+        "operationId": "GetTreeDocumentBlueprintItem",
         "parameters": [
           {
             "name": "key",
@@ -666,6 +682,7 @@
         "tags": [
           "Document Blueprint"
         ],
+        "operationId": "GetTreeDocumentBlueprintRoot",
         "parameters": [
           {
             "name": "skip",
@@ -705,6 +722,7 @@
         "tags": [
           "Document Type"
         ],
+        "operationId": "GetTreeDocumentTypeChildren",
         "parameters": [
           {
             "name": "parentKey",
@@ -760,6 +778,7 @@
         "tags": [
           "Document Type"
         ],
+        "operationId": "GetTreeDocumentTypeItem",
         "parameters": [
           {
             "name": "key",
@@ -795,6 +814,7 @@
         "tags": [
           "Document Type"
         ],
+        "operationId": "GetTreeDocumentTypeRoot",
         "parameters": [
           {
             "name": "skip",
@@ -842,6 +862,7 @@
         "tags": [
           "Document"
         ],
+        "operationId": "GetRecycleBinDocumentChildren",
         "parameters": [
           {
             "name": "parentKey",
@@ -899,6 +920,7 @@
         "tags": [
           "Document"
         ],
+        "operationId": "GetRecycleBinDocumentRoot",
         "parameters": [
           {
             "name": "skip",
@@ -948,6 +970,7 @@
         "tags": [
           "Document"
         ],
+        "operationId": "GetTreeDocumentChildren",
         "parameters": [
           {
             "name": "parentKey",
@@ -1010,6 +1033,7 @@
         "tags": [
           "Document"
         ],
+        "operationId": "GetTreeDocumentItem",
         "parameters": [
           {
             "name": "key",
@@ -1060,6 +1084,7 @@
         "tags": [
           "Document"
         ],
+        "operationId": "GetTreeDocumentRoot",
         "parameters": [
           {
             "name": "skip",
@@ -1114,6 +1139,7 @@
         "tags": [
           "Help"
         ],
+        "operationId": "GetHelp",
         "parameters": [
           {
             "name": "section",
@@ -1183,6 +1209,7 @@
         "tags": [
           "Install"
         ],
+        "operationId": "GetInstallSettings",
         "responses": {
           "400": {
             "description": "Bad Request",
@@ -1222,6 +1249,7 @@
         "tags": [
           "Install"
         ],
+        "operationId": "PostInstallSetup",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1263,6 +1291,7 @@
         "tags": [
           "Install"
         ],
+        "operationId": "PostInstallValidateDatabase",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1294,6 +1323,7 @@
         "tags": [
           "Language"
         ],
+        "operationId": "GetLanguage",
         "parameters": [
           {
             "name": "skip",
@@ -1331,6 +1361,7 @@
         "tags": [
           "Language"
         ],
+        "operationId": "GetLanguageById",
         "parameters": [
           {
             "name": "id",
@@ -1369,6 +1400,7 @@
         "tags": [
           "Language"
         ],
+        "operationId": "DeleteLanguageById",
         "parameters": [
           {
             "name": "id",
@@ -1412,6 +1444,7 @@
         "tags": [
           "Language"
         ],
+        "operationId": "PostLanguageCreate",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1443,6 +1476,7 @@
         "tags": [
           "Language"
         ],
+        "operationId": "PutLanguageUpdate",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1484,6 +1518,7 @@
         "tags": [
           "Media Type"
         ],
+        "operationId": "GetTreeMediaTypeChildren",
         "parameters": [
           {
             "name": "parentKey",
@@ -1539,6 +1574,7 @@
         "tags": [
           "Media Type"
         ],
+        "operationId": "GetTreeMediaTypeItem",
         "parameters": [
           {
             "name": "key",
@@ -1574,6 +1610,7 @@
         "tags": [
           "Media Type"
         ],
+        "operationId": "GetTreeMediaTypeRoot",
         "parameters": [
           {
             "name": "skip",
@@ -1621,6 +1658,7 @@
         "tags": [
           "Media"
         ],
+        "operationId": "GetRecycleBinMediaChildren",
         "parameters": [
           {
             "name": "parentKey",
@@ -1678,6 +1716,7 @@
         "tags": [
           "Media"
         ],
+        "operationId": "GetRecycleBinMediaRoot",
         "parameters": [
           {
             "name": "skip",
@@ -1727,6 +1766,7 @@
         "tags": [
           "Media"
         ],
+        "operationId": "GetTreeMediaChildren",
         "parameters": [
           {
             "name": "parentKey",
@@ -1782,6 +1822,7 @@
         "tags": [
           "Media"
         ],
+        "operationId": "GetTreeMediaItem",
         "parameters": [
           {
             "name": "key",
@@ -1825,6 +1866,7 @@
         "tags": [
           "Media"
         ],
+        "operationId": "GetTreeMediaRoot",
         "parameters": [
           {
             "name": "skip",
@@ -1872,6 +1914,7 @@
         "tags": [
           "Member Group"
         ],
+        "operationId": "GetTreeMemberGroupItem",
         "parameters": [
           {
             "name": "key",
@@ -1907,6 +1950,7 @@
         "tags": [
           "Member Group"
         ],
+        "operationId": "GetTreeMemberGroupRoot",
         "parameters": [
           {
             "name": "skip",
@@ -1946,6 +1990,7 @@
         "tags": [
           "Member Type"
         ],
+        "operationId": "GetTreeMemberTypeItem",
         "parameters": [
           {
             "name": "key",
@@ -1981,6 +2026,7 @@
         "tags": [
           "Member Type"
         ],
+        "operationId": "GetTreeMemberTypeRoot",
         "parameters": [
           {
             "name": "skip",
@@ -2020,6 +2066,7 @@
         "tags": [
           "Models Builder"
         ],
+        "operationId": "PostModelsBuilderBuild",
         "responses": {
           "201": {
             "description": "Created",
@@ -2049,6 +2096,7 @@
         "tags": [
           "Models Builder"
         ],
+        "operationId": "GetModelsBuilderDashboard",
         "responses": {
           "200": {
             "description": "Success",
@@ -2068,6 +2116,7 @@
         "tags": [
           "Models Builder"
         ],
+        "operationId": "GetModelsBuilderStatus",
         "responses": {
           "200": {
             "description": "Success",
@@ -2087,6 +2136,7 @@
         "tags": [
           "Partial View"
         ],
+        "operationId": "GetTreePartialViewChildren",
         "parameters": [
           {
             "name": "path",
@@ -2133,6 +2183,7 @@
         "tags": [
           "Partial View"
         ],
+        "operationId": "GetTreePartialViewItem",
         "parameters": [
           {
             "name": "path",
@@ -2167,6 +2218,7 @@
         "tags": [
           "Partial View"
         ],
+        "operationId": "GetTreePartialViewRoot",
         "parameters": [
           {
             "name": "skip",
@@ -2206,6 +2258,7 @@
         "tags": [
           "Profiling"
         ],
+        "operationId": "GetProfilingStatus",
         "responses": {
           "200": {
             "description": "Success",
@@ -2225,6 +2278,7 @@
         "tags": [
           "Published Cache"
         ],
+        "operationId": "PostPublishedCacheCollect",
         "responses": {
           "200": {
             "description": "Success"
@@ -2237,6 +2291,7 @@
         "tags": [
           "Published Cache"
         ],
+        "operationId": "PostPublishedCacheRebuild",
         "responses": {
           "200": {
             "description": "Success"
@@ -2249,6 +2304,7 @@
         "tags": [
           "Published Cache"
         ],
+        "operationId": "PostPublishedCacheReload",
         "responses": {
           "200": {
             "description": "Success"
@@ -2261,6 +2317,7 @@
         "tags": [
           "Published Cache"
         ],
+        "operationId": "GetPublishedCacheStatus",
         "responses": {
           "200": {
             "description": "Success",
@@ -2280,6 +2337,7 @@
         "tags": [
           "Relation Type"
         ],
+        "operationId": "GetTreeRelationTypeItem",
         "parameters": [
           {
             "name": "key",
@@ -2315,6 +2373,7 @@
         "tags": [
           "Relation Type"
         ],
+        "operationId": "GetTreeRelationTypeRoot",
         "parameters": [
           {
             "name": "skip",
@@ -2354,6 +2413,7 @@
         "tags": [
           "Relation"
         ],
+        "operationId": "GetRelationById",
         "parameters": [
           {
             "name": "id",
@@ -2394,6 +2454,7 @@
         "tags": [
           "Relation"
         ],
+        "operationId": "GetRelationChildRelationByChildId",
         "parameters": [
           {
             "name": "childId",
@@ -2448,6 +2509,7 @@
         "tags": [
           "Script"
         ],
+        "operationId": "GetTreeScriptChildren",
         "parameters": [
           {
             "name": "path",
@@ -2494,6 +2556,7 @@
         "tags": [
           "Script"
         ],
+        "operationId": "GetTreeScriptItem",
         "parameters": [
           {
             "name": "path",
@@ -2528,6 +2591,7 @@
         "tags": [
           "Script"
         ],
+        "operationId": "GetTreeScriptRoot",
         "parameters": [
           {
             "name": "skip",
@@ -2567,6 +2631,7 @@
         "tags": [
           "Search"
         ],
+        "operationId": "GetSearchIndex",
         "parameters": [
           {
             "name": "skip",
@@ -2604,6 +2669,7 @@
         "tags": [
           "Search"
         ],
+        "operationId": "GetSearchIndexByIndexName",
         "parameters": [
           {
             "name": "indexName",
@@ -2643,6 +2709,7 @@
         "tags": [
           "Search"
         ],
+        "operationId": "PostSearchIndexByIndexNameRebuild",
         "parameters": [
           {
             "name": "indexName",
@@ -2682,6 +2749,7 @@
         "tags": [
           "Search"
         ],
+        "operationId": "GetSearchSearcher",
         "parameters": [
           {
             "name": "skip",
@@ -2719,6 +2787,7 @@
         "tags": [
           "Search"
         ],
+        "operationId": "GetSearchSearcherBySearcherNameSearch",
         "parameters": [
           {
             "name": "searcherName",
@@ -2758,7 +2827,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedPaged"
+                  "$ref": "#/components/schemas/PagedSearchResult"
                 }
               }
             }
@@ -2781,6 +2850,7 @@
         "tags": [
           "Security"
         ],
+        "operationId": "GetSecurityBackOfficeAuthorize",
         "responses": {
           "200": {
             "description": "Success"
@@ -2791,6 +2861,7 @@
         "tags": [
           "Security"
         ],
+        "operationId": "PostSecurityBackOfficeAuthorize",
         "responses": {
           "200": {
             "description": "Success"
@@ -2803,6 +2874,7 @@
         "tags": [
           "Server"
         ],
+        "operationId": "GetServerStatus",
         "responses": {
           "400": {
             "description": "Bad Request",
@@ -2832,6 +2904,7 @@
         "tags": [
           "Server"
         ],
+        "operationId": "GetServerVersion",
         "responses": {
           "400": {
             "description": "Bad Request",
@@ -2861,6 +2934,7 @@
         "tags": [
           "Static File"
         ],
+        "operationId": "GetTreeStaticFileChildren",
         "parameters": [
           {
             "name": "path",
@@ -2907,6 +2981,7 @@
         "tags": [
           "Static File"
         ],
+        "operationId": "GetTreeStaticFileItem",
         "parameters": [
           {
             "name": "path",
@@ -2941,6 +3016,7 @@
         "tags": [
           "Static File"
         ],
+        "operationId": "GetTreeStaticFileRoot",
         "parameters": [
           {
             "name": "skip",
@@ -2980,6 +3056,7 @@
         "tags": [
           "Stylesheet"
         ],
+        "operationId": "GetTreeStylesheetChildren",
         "parameters": [
           {
             "name": "path",
@@ -3026,6 +3103,7 @@
         "tags": [
           "Stylesheet"
         ],
+        "operationId": "GetTreeStylesheetItem",
         "parameters": [
           {
             "name": "path",
@@ -3060,6 +3138,7 @@
         "tags": [
           "Stylesheet"
         ],
+        "operationId": "GetTreeStylesheetRoot",
         "parameters": [
           {
             "name": "skip",
@@ -3099,6 +3178,7 @@
         "tags": [
           "Telemetry"
         ],
+        "operationId": "GetTelemetry",
         "parameters": [
           {
             "name": "skip",
@@ -3136,6 +3216,7 @@
         "tags": [
           "Telemetry"
         ],
+        "operationId": "GetTelemetryLevel",
         "responses": {
           "200": {
             "description": "Success",
@@ -3153,6 +3234,7 @@
         "tags": [
           "Telemetry"
         ],
+        "operationId": "PostTelemetryLevel",
         "requestBody": {
           "content": {
             "application/json": {
@@ -3184,6 +3266,7 @@
         "tags": [
           "Template"
         ],
+        "operationId": "GetTreeTemplateChildren",
         "parameters": [
           {
             "name": "parentKey",
@@ -3231,6 +3314,7 @@
         "tags": [
           "Template"
         ],
+        "operationId": "GetTreeTemplateItem",
         "parameters": [
           {
             "name": "key",
@@ -3266,6 +3350,7 @@
         "tags": [
           "Template"
         ],
+        "operationId": "GetTreeTemplateRoot",
         "parameters": [
           {
             "name": "skip",
@@ -3305,6 +3390,7 @@
         "tags": [
           "Tracked Reference"
         ],
+        "operationId": "GetTrackedReferenceById",
         "parameters": [
           {
             "name": "id",
@@ -3358,6 +3444,7 @@
         "tags": [
           "Tracked Reference"
         ],
+        "operationId": "GetTrackedReferenceDescendantsByParentId",
         "parameters": [
           {
             "name": "parentId",
@@ -3411,6 +3498,7 @@
         "tags": [
           "Tracked Reference"
         ],
+        "operationId": "GetTrackedReferenceItem",
         "parameters": [
           {
             "name": "ids",
@@ -3466,6 +3554,7 @@
         "tags": [
           "Upgrade"
         ],
+        "operationId": "PostUpgradeAuthorize",
         "responses": {
           "200": {
             "description": "Success"
@@ -3498,6 +3587,7 @@
         "tags": [
           "Upgrade"
         ],
+        "operationId": "GetUpgradeSettings",
         "responses": {
           "200": {
             "description": "Success",
@@ -4764,11 +4854,18 @@
         "additionalProperties": false
       },
       "Index": {
+        "required": [
+          "canRebuild",
+          "documentCount",
+          "fieldCount",
+          "isHealthy",
+          "name"
+        ],
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "minLength": 1,
+            "type": "string"
           },
           "healthStatus": {
             "type": "string",
@@ -4792,6 +4889,11 @@
           "fieldCount": {
             "type": "integer",
             "format": "int32"
+          },
+          "providerProperties": {
+            "type": "object",
+            "additionalProperties": {},
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -5425,6 +5527,10 @@
         "format": "int32"
       },
       "PagedContentTreeItem": {
+        "required": [
+          "items",
+          "total"
+        ],
         "type": "object",
         "properties": {
           "total": {
@@ -5435,13 +5541,16 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ContentTreeItem"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
       },
       "PagedCulture": {
+        "required": [
+          "items",
+          "total"
+        ],
         "type": "object",
         "properties": {
           "total": {
@@ -5452,13 +5561,16 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Culture"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
       },
       "PagedDictionaryOverview": {
+        "required": [
+          "items",
+          "total"
+        ],
         "type": "object",
         "properties": {
           "total": {
@@ -5469,13 +5581,16 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DictionaryOverview"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
       },
       "PagedDocumentBlueprintTreeItem": {
+        "required": [
+          "items",
+          "total"
+        ],
         "type": "object",
         "properties": {
           "total": {
@@ -5486,13 +5601,16 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DocumentBlueprintTreeItem"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
       },
       "PagedDocumentTreeItem": {
+        "required": [
+          "items",
+          "total"
+        ],
         "type": "object",
         "properties": {
           "total": {
@@ -5503,13 +5621,16 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DocumentTreeItem"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
       },
       "PagedDocumentTypeTreeItem": {
+        "required": [
+          "items",
+          "total"
+        ],
         "type": "object",
         "properties": {
           "total": {
@@ -5520,13 +5641,16 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DocumentTypeTreeItem"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
       },
       "PagedEntityTreeItem": {
+        "required": [
+          "items",
+          "total"
+        ],
         "type": "object",
         "properties": {
           "total": {
@@ -5537,13 +5661,16 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/EntityTreeItem"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
       },
       "PagedFileSystemTreeItem": {
+        "required": [
+          "items",
+          "total"
+        ],
         "type": "object",
         "properties": {
           "total": {
@@ -5554,13 +5681,16 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/FileSystemTreeItem"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
       },
       "PagedFolderTreeItem": {
+        "required": [
+          "items",
+          "total"
+        ],
         "type": "object",
         "properties": {
           "total": {
@@ -5571,13 +5701,16 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/FolderTreeItem"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
       },
       "PagedHelpPage": {
+        "required": [
+          "items",
+          "total"
+        ],
         "type": "object",
         "properties": {
           "total": {
@@ -5588,13 +5721,16 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/HelpPage"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
       },
       "PagedIndex": {
+        "required": [
+          "items",
+          "total"
+        ],
         "type": "object",
         "properties": {
           "total": {
@@ -5605,13 +5741,16 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Index"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
       },
       "PagedLanguage": {
+        "required": [
+          "items",
+          "total"
+        ],
         "type": "object",
         "properties": {
           "total": {
@@ -5622,30 +5761,16 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Language"
-            },
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "PagedPaged": {
-        "type": "object",
-        "properties": {
-          "total": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PagedSearchResult"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
       },
       "PagedRecycleBinItem": {
+        "required": [
+          "items",
+          "total"
+        ],
         "type": "object",
         "properties": {
           "total": {
@@ -5656,13 +5781,16 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/RecycleBinItem"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
       },
       "PagedRelation": {
+        "required": [
+          "items",
+          "total"
+        ],
         "type": "object",
         "properties": {
           "total": {
@@ -5673,13 +5801,16 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Relation"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
       },
       "PagedRelationItem": {
+        "required": [
+          "items",
+          "total"
+        ],
         "type": "object",
         "properties": {
           "total": {
@@ -5690,13 +5821,16 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/RelationItem"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
       },
       "PagedSearchResult": {
+        "required": [
+          "items",
+          "total"
+        ],
         "type": "object",
         "properties": {
           "total": {
@@ -5707,13 +5841,16 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/SearchResult"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
       },
       "PagedSearcher": {
+        "required": [
+          "items",
+          "total"
+        ],
         "type": "object",
         "properties": {
           "total": {
@@ -5724,13 +5861,16 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Searcher"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
       },
       "PagedTelemetry": {
+        "required": [
+          "items",
+          "total"
+        ],
         "type": "object",
         "properties": {
           "total": {
@@ -5741,8 +5881,7 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Telemetry"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
@@ -5859,7 +5998,7 @@
             "nullable": true
           }
         },
-        "additionalProperties": { }
+        "additionalProperties": {}
       },
       "ProfilingStatus": {
         "type": "object",
@@ -6965,7 +7104,7 @@
           "authorizationCode": {
             "authorizationUrl": "/umbraco/management/api/v1.0/security/back-office/authorize",
             "tokenUrl": "/umbraco/management/api/v1.0/security/back-office/token",
-            "scopes": { }
+            "scopes": {}
           }
         }
       }
@@ -6973,7 +7112,7 @@
   },
   "security": [
     {
-      "OAuth": [ ]
+      "OAuth": []
     }
   ]
 }

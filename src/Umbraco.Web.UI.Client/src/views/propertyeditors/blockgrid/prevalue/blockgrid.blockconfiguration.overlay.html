@@ -200,7 +200,7 @@
                     <div class="umb-group-panel umb-block-grid-block-configuration__umb-group-panel">
 
                         <div class="umb-group-panel__header">
-                            <localize key="blockEditor_headlineAllowance">Allowance</localize>
+                            <localize key="blockEditor_headlineAllowance">Permissions</localize>
                         </div>
 
                         <div class="umb-group-panel__content">
@@ -355,12 +355,25 @@
                                 </div>
                             </div>
 
+                            <!-- inlineEditing -->
+                            <div class="control-group umb-control-group -no-border">
+                                <div class="umb-el-wrap">
+                                    <label ng-attr-disabled="{{(vm.block.view !== null) || undefined}}" class="control-label" for="inlineEditing"><localize key="blockEditor_gridInlineEditing">Inline editing</localize></label>
+                                    <umb-property-info-button ng-if="vm.block.view === null" button-title-key="general_readMore">
+                                        <localize key="blockEditor_gridInlineEditingHelp">Hide the content edit button and the content editor from the Block Editor overlay.</localize>
+                                    </umb-property-info-button>
+                                    <div class="controls">
+                                        <umb-toggle checked="(vm.block.view === null ? vm.block.inlineEditing : false)" disabled="vm.block.view !== null" on-click="vm.block.inlineEditing = vm.block.inlineEditing != true"></umb-toggle>
+                                    </div>
+                                </div>
+                            </div>
+
                             <!-- forceHideContentEditorInOverlay -->
                             <div class="control-group umb-control-group -no-border">
                                 <div class="umb-el-wrap">
                                     <label class="control-label" for="forceHideContentEditorInOverlay"><localize key="blockEditor_forceHideContentEditor">Hide content editor</localize></label>
                                     <umb-property-info-button button-title-key="general_readMore">
-                                        <localize key="blockEditor_forceHideContentEditorHelp">Define the range of layout rows this block is allowed to span across.</localize>
+                                        <localize key="blockEditor_forceHideContentEditorHelp">Hide the content edit button and the content editor from the Block Editor overlay.</localize>
                                     </umb-property-info-button>
                                     <div class="controls">
                                         <umb-toggle checked="vm.block.forceHideContentEditorInOverlay" on-click="vm.block.forceHideContentEditorInOverlay = vm.block.forceHideContentEditorInOverlay != true"></umb-toggle>

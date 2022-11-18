@@ -76,6 +76,7 @@
 
         vm.movingLayoutEntry = null;
         vm.layoutColumnsInt = 0;
+        vm.containedPropertyEditorProxies = [];
 
         vm.$onInit = function () {
             initializeSortable();
@@ -92,7 +93,6 @@
         unsubscribe.push($scope.$watch("layoutColumns", (newVal, oldVal) => {
             vm.layoutColumnsInt = parseInt(vm.layoutColumns, 10);
         }));
-
 
         function onLocalAmountOfBlocksChanged() {
 
@@ -153,6 +153,11 @@
             }
         }
 
+
+        vm.notifyVisualUpdate = function () {
+            $scope.$broadcast("blockGridEditorVisualUpdate", {areaKey: vm.areaKey});
+        }
+
         vm.acceptBlock = function(contentTypeKey) {
             return vm.blockEditorApi.internal.isElementTypeKeyAllowedAt(vm.parentBlock, vm.areaKey, contentTypeKey);
         }
@@ -198,9 +203,6 @@
             var dragY = 0;
             var dragOffsetX = 0;
 
-            var ghostElIndicateForceLeft = null;
-            var ghostElIndicateForceRight = null;
-
             var approvedContainerEl = null;
 
             // Setup DOM method for communication between sortables:
@@ -209,6 +211,11 @@
             };
 
             var nextSibling;
+
+            function _removePropertyProxy(eventTarget, slotName) {
+                const event = new CustomEvent("UmbBlockGrid_RemoveProperty", {composed: true, bubbles: true, detail: {'slotName': slotName}});
+                eventTarget.dispatchEvent(event);
+            }
 
             // Borrowed concept from, its not identical as more has been implemented: https://github.com/SortableJS/angular-legacy-sortablejs/blob/master/angular-legacy-sortable.js
             function _sync(evt) {
@@ -222,8 +229,15 @@
                     const prevEntries = fromCtrl.entries;
                     const syncEntry = prevEntries[oldIndex];
 
-                    // Perform the transfer:
+                    // Make sure Property Editor Proxies are destroyed, as we need to establish new when moving context:
 
+
+                    // unregister all property editor proxies via events:
+                    fromCtrl.containedPropertyEditorProxies.forEach(slotName => {
+                        _removePropertyProxy(evt.from, slotName);
+                    });
+                    
+                    // Perform the transfer:
                     if (Sortable.active && Sortable.active.lastPullMode === 'clone') {
                         syncEntry = Utilities.copy(syncEntry);
                         prevEntries.splice(Sortable.utils.index(evt.clone, sortable.options.draggable), 0, prevEntries.splice(oldIndex, 1)[0]);
@@ -231,7 +245,6 @@
                     else {
                         prevEntries.splice(oldIndex, 1);
                     }
-                    
                     vm.entries.splice(newIndex, 0, syncEntry);
 
                     const contextColumns = vm.blockEditorApi.internal.getContextColumns(vm.parentBlock, vm.areaKey);
@@ -246,12 +259,6 @@
                     } else {
                         syncEntry.columnSpan = contextColumns;
                     }
-
-                    if(syncEntry.columnSpan === contextColumns) {
-                        // If we are full width, then reset forceLeft/right.
-                        syncEntry.forceLeft = false;
-                        syncEntry.forceRight = false;
-                    }
                     
                 }
                 else {
@@ -261,6 +268,7 @@
 
             function _indication(contextVM, movingEl) {
 
+                // Remove old indication:
                 if(_lastIndicationContainerVM !== contextVM && _lastIndicationContainerVM !== null) {
                     _lastIndicationContainerVM.hideNotAllowed();
                     _lastIndicationContainerVM.revertIndicateDroppable();
@@ -269,7 +277,7 @@
                 
                 if(contextVM.acceptBlock(movingEl.dataset.contentElementTypeKey) === true) {
                     _lastIndicationContainerVM.hideNotAllowed();
-                    _lastIndicationContainerVM.indicateDroppable();// This block is accepted to we will indicate a good drop.
+                    _lastIndicationContainerVM.indicateDroppable();// This block is accepted so we will indicate a good drop.
                     return true;
                 }
 
@@ -382,55 +390,40 @@
                     }
 
                     let verticalDirection = false;
-                    if (ghostEl.dataset.forceLeft) {
-                        placeAfter = true;
-                    } else if (ghostEl.dataset.forceRight) {
-                        placeAfter = true;
-                    } else {
+                    
+                    // TODO: move calculations out so they can be persisted a bit longer?
+                    //const approvedContainerRect = approvedContainerEl.getBoundingClientRect();
+                    const approvedContainerComputedStyles = getComputedStyle(approvedContainerEl);
+                    const gridColumnNumber = parseInt(approvedContainerComputedStyles.getPropertyValue("--umb-block-grid--grid-columns"), 10);
 
-                        // if the related element is forceLeft and we are in the left side, we will set vertical direction, to correct placeAfter.
-                        if (foundRelatedEl.dataset.forceLeft && placeAfter === false) {
-                            verticalDirection = true;
-                        } else 
-                        // if the related element is forceRight and we are in the right side, we will set vertical direction, to correct placeAfter.
-                        if (foundRelatedEl.dataset.forceRight && placeAfter === true) {
-                            verticalDirection = true;
-                        } else {
+                    const relatedColumns = parseInt(foundRelatedEl.dataset.colSpan, 10);
+                    const ghostColumns = parseInt(ghostEl.dataset.colSpan, 10);
 
-                            // TODO: move calculations out so they can be persisted a bit longer?
-                            //const approvedContainerRect = approvedContainerEl.getBoundingClientRect();
-                            const approvedContainerComputedStyles = getComputedStyle(approvedContainerEl);
-                            const gridColumnNumber = parseInt(approvedContainerComputedStyles.getPropertyValue("--umb-block-grid--grid-columns"), 10);
+                    // Get grid template:
+                    const approvedContainerGridColumns = approvedContainerComputedStyles.gridTemplateColumns.trim().split("px").map(x => Number(x)).filter(n => n > 0);
 
-                            const relatedColumns = parseInt(foundRelatedEl.dataset.colSpan, 10);
-                            const ghostColumns = parseInt(ghostEl.dataset.colSpan, 10);
-
-                            // Get grid template:
-                            const approvedContainerGridColumns = approvedContainerComputedStyles.gridTemplateColumns.trim().split("px").map(x => Number(x)).filter(n => n > 0);
-
-                            // ensure all columns are there.
-                            // This will also ensure handling non-css-grid mode,
-                            // use container width divided by amount of columns( or the item width divided by its amount of columnSpan)
-                            let amountOfColumnsInWeightMap = approvedContainerGridColumns.length;
-                            const amountOfUnknownColumns = gridColumnNumber-amountOfColumnsInWeightMap;
-                            if(amountOfUnknownColumns > 0) {
-                                let accumulatedValue = getAccumulatedValueOfIndex(amountOfColumnsInWeightMap, approvedContainerGridColumns) || 0;
-                                const layoutWidth = approvedContainerRect.width;
-                                const missingColumnWidth = (layoutWidth-accumulatedValue)/amountOfUnknownColumns;
-                                while(amountOfColumnsInWeightMap++ < gridColumnNumber) {
-                                    approvedContainerGridColumns.push(missingColumnWidth);
-                                }
-                            }
-
-
-                            const relatedStartX = foundRelatedElRect.left - approvedContainerRect.left;
-                            const relatedStartCol = Math.round(getInterpolatedIndexOfPositionInWeightMap(relatedStartX, approvedContainerGridColumns));
-
-                            if(relatedStartCol + relatedColumns + ghostColumns > gridColumnNumber) {
-                                verticalDirection = true;
-                            }
+                    // ensure all columns are there.
+                    // This will also ensure handling non-css-grid mode,
+                    // use container width divided by amount of columns( or the item width divided by its amount of columnSpan)
+                    let amountOfColumnsInWeightMap = approvedContainerGridColumns.length;
+                    const amountOfUnknownColumns = gridColumnNumber-amountOfColumnsInWeightMap;
+                    if(amountOfUnknownColumns > 0) {
+                        let accumulatedValue = getAccumulatedValueOfIndex(amountOfColumnsInWeightMap, approvedContainerGridColumns) || 0;
+                        const layoutWidth = approvedContainerRect.width;
+                        const missingColumnWidth = (layoutWidth-accumulatedValue)/amountOfUnknownColumns;
+                        while(amountOfColumnsInWeightMap++ < gridColumnNumber) {
+                            approvedContainerGridColumns.push(missingColumnWidth);
                         }
                     }
+
+
+                    const relatedStartX = foundRelatedElRect.left - approvedContainerRect.left;
+                    const relatedStartCol = Math.round(getInterpolatedIndexOfPositionInWeightMap(relatedStartX, approvedContainerGridColumns));
+
+                    if(relatedStartCol + relatedColumns + ghostColumns > gridColumnNumber) {
+                        verticalDirection = true;
+                    }
+                    
                     if (verticalDirection) {
                         placeAfter = (dragY > foundRelatedElRect.top + (foundRelatedElRect.height*.5));
                     }
@@ -485,56 +478,6 @@
                             rqaId = requestAnimationFrame(_moveGhostElement);
                         }
                     }
-
-                    
-                    if(vm.movingLayoutEntry.columnSpan !== vm.layoutColumnsInt) {
-                        
-                        const oldForceLeft = vm.movingLayoutEntry.forceLeft;
-                        const oldForceRight = vm.movingLayoutEntry.forceRight;
-
-                        var newValue = (dragX < targetRect.left);
-                        if(newValue !== oldForceLeft) {
-                            vm.movingLayoutEntry.forceLeft = newValue;
-                            if(oldForceRight) {
-                                vm.movingLayoutEntry.forceRight = false;
-                                if(ghostElIndicateForceRight) {
-                                    ghostEl.removeChild(ghostElIndicateForceRight);
-                                    ghostElIndicateForceRight = null;
-                                }
-                            }
-                            vm.blockEditorApi.internal.setDirty();
-                            vm.movingLayoutEntry.$block.__scope.$evalAsync();// needed for the block to be updated
-                            $scope.$evalAsync();
-
-                            // Append element for indication, as angularJS lost connection:
-                            if(newValue === true) {
-                                ghostElIndicateForceLeft = document.createElement("div");
-                                ghostElIndicateForceLeft.className = "indicateForceLeft";
-                                ghostEl.appendChild(ghostElIndicateForceLeft);
-                            } else if(ghostElIndicateForceLeft) {
-                                ghostEl.removeChild(ghostElIndicateForceLeft);
-                                ghostElIndicateForceLeft = null;
-                            }
-                        }
-
-                        newValue = (dragX > targetRect.right) && (vm.movingLayoutEntry.forceLeft !== true);
-                        if(newValue !== oldForceRight) {
-                            vm.movingLayoutEntry.forceRight = newValue;
-                            vm.blockEditorApi.internal.setDirty();
-                            vm.movingLayoutEntry.$block.__scope.$evalAsync();// needed for the block to be updated
-                            $scope.$evalAsync();
-
-                            // Append element for indication, as angularJS lost connection:
-                            if(newValue === true) {
-                                ghostElIndicateForceRight = document.createElement("div");
-                                ghostElIndicateForceRight.className = "indicateForceRight";
-                                ghostEl.appendChild(ghostElIndicateForceRight);
-                            } else if(ghostElIndicateForceRight) {
-                                ghostEl.removeChild(ghostElIndicateForceRight);
-                                ghostElIndicateForceRight = null;
-                            }
-                        }
-                    }
                 }
             }
 
@@ -557,6 +500,10 @@
                 forceAutoScrollFallback: true,
 
                 onStart: function (evt) {
+                    
+                    // TODO: This does not work correctly jet with SortableJS. With the replacement we should be able to call this before DOM is changed.
+                    vm.blockEditorApi.internal.startDraggingMode();
+
                     nextSibling = evt.from === evt.item.parentNode ? evt.item.nextSibling : evt.clone.nextSibling;
 
                     var contextVM = vm;
@@ -568,15 +515,9 @@
                     
                     const oldIndex = evt.oldIndex;
                     vm.movingLayoutEntry = contextVM.getLayoutEntryByIndex(oldIndex);
-                    if(vm.movingLayoutEntry.forceLeft ||  vm.movingLayoutEntry.forceRight) {
-                        // if one of these where true before, then we made a change here:
-                        vm.blockEditorApi.internal.setDirty();
-                    }
-                    vm.movingLayoutEntry.forceLeft = false;
-                    vm.movingLayoutEntry.forceRight = false;
-                    vm.movingLayoutEntry.$block.__scope.$evalAsync();// needed for the block to be updated
 
                     ghostEl = evt.item;
+                    vm.containedPropertyEditorProxies = Array.from(ghostEl.querySelectorAll('slot[data-is-property-editor-proxy]')).map(x => x.getAttribute('name'));
 
                     targetRect = evt.to.getBoundingClientRect();
                     ghostRect = ghostEl.getBoundingClientRect();
@@ -586,8 +527,6 @@
 
                     window.addEventListener('drag', _onDragMove);
                     window.addEventListener('dragover', _onDragMove);
-
-                    document.documentElement.style.setProperty("--umb-block-grid--dragging-mode", 1);
 
                     $scope.$evalAsync();
                 },
@@ -619,16 +558,7 @@
                     }
                     window.removeEventListener('drag', _onDragMove);
                     window.removeEventListener('dragover', _onDragMove);
-                    document.documentElement.style.setProperty("--umb-block-grid--dragging-mode", 0);
-
-                    if(ghostElIndicateForceLeft) {
-                        ghostEl.removeChild(ghostElIndicateForceLeft);
-                        ghostElIndicateForceLeft = null;
-                    }
-                    if(ghostElIndicateForceRight) {
-                        ghostEl.removeChild(ghostElIndicateForceRight);
-                        ghostElIndicateForceRight = null;
-                    }
+                    vm.blockEditorApi.internal.exitDraggingMode();
 
                     // ensure not-allowed indication is removed.
                     if(_lastIndicationContainerVM) {
@@ -643,6 +573,9 @@
                     ghostRect = null;
                     ghostEl = null;
                     relatedEl = null;
+                    vm.containedPropertyEditorProxies = [];
+
+                    vm.notifyVisualUpdate();
                 }
             });
 
