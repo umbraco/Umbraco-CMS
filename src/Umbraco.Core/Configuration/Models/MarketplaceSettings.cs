@@ -4,7 +4,7 @@
 namespace Umbraco.Cms.Core.Configuration.Models;
 
 /// <summary>
-///     Typed configuration options for marketplace.
+/// Configuration options for the Marketplace.
 /// </summary>
 [UmbracoOptions(Constants.Configuration.ConfigMarketplace)]
 public class MarketplaceSettings
