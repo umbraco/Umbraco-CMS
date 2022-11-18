@@ -253,6 +253,19 @@
         function onSortSync(data) {
             if (data.fromController !== data.toController) {
                 removeAllContainedPropertyEditorProxies(); 
+
+                const contextColumns = vm.blockEditorApi.internal.getContextColumns(vm.parentBlock, vm.areaKey);
+
+                // if colSpan is lower than contextColumns, and we do have some columnSpanOptions:
+                if (data.item.columnSpan < contextColumns && data.item.$block.config.columnSpanOptions.length > 0) {
+                    // then check if the colSpan is a columnSpanOption, if NOT then reset to contextColumns.
+                    const found = data.item.$block.config.columnSpanOptions.find(option => option.columnSpan === data.item.columnSpan);
+                    if(!found) {
+                        data.item.columnSpan = contextColumns;
+                    }
+                } else {
+                    data.item.columnSpan = contextColumns;
+                }
             }
             $scope.$evalAsync();
             vm.blockEditorApi.internal.setDirty();
