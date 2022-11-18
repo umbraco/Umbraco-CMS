@@ -60,7 +60,7 @@
         }
     );
 
-    function BlockGridEntriesController($element, $scope, $timeout) {
+    function BlockGridEntriesController($element, $scope) {
 
         const unsubscribe = [];
         const vm = this;

@@ -64,7 +64,7 @@
             }
         });
 
-    function BlockGridAreaController($scope, $element, assetsService, localizationService, editorService, overlayService) {
+    function BlockGridAreaController($scope, localizationService, editorService, overlayService) {
 
         var unsubscribe = [];
 
