@@ -4,7 +4,6 @@ import { customElement, state } from 'lit/decorators.js';
 import { map, switchMap, EMPTY, of } from 'rxjs';
 import { UmbSectionContext } from '../section.context';
 import { UmbEditorEntityElement } from '../../editors/shared/editor-entity/editor-entity.element';
-import { UmbEntityStore } from '../../../core/stores/entity.store';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
