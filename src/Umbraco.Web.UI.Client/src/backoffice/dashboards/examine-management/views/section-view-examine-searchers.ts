@@ -120,11 +120,9 @@ export class UmbDashboardExamineSearcherElement extends UmbContextConsumerMixin(
 
 	constructor() {
 		super();
-		this.consumeContext('umbNotificationService', (notificationService: UmbNotificationService) => {
-			this._notificationService = notificationService;
-		});
-		this.consumeContext('umbModalService', (modalService: UmbModalService) => {
-			this._modalService = modalService;
+		this.consumeAllContexts(['umbNotificationService', 'umbModalService'], (instances) => {
+			this._notificationService = instances['umbNotificationService'];
+			this._modalService = instances['umbModalService'];
 		});
 	}
 
@@ -160,7 +158,7 @@ export class UmbDashboardExamineSearcherElement extends UmbContextConsumerMixin(
 	private _updateFieldFilter() {
 		this._searchResults?.map((doc) => {
 			const document = doc.fields?.filter((field) => {
-				return field.name?.toUpperCase() != 'NODENAME';
+				return field.name?.toUpperCase() !== 'NODENAME';
 			});
 			if (document) {
 				const newFieldNames = document.map((field) => {
@@ -227,7 +225,7 @@ export class UmbDashboardExamineSearcherElement extends UmbContextConsumerMixin(
 								<uui-table-cell>
 									<uui-button look="secondary" label="Open editor for this document" @click="${this._onNameClick}">
 										${rowData.fields?.find((field) => {
-											if (field.name?.toUpperCase() == 'NODENAME') return field.values;
+											if (field.name?.toUpperCase() === 'NODENAME') return field.values;
 											else return;
 										})?.values}
 									</uui-button>

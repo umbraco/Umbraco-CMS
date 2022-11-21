@@ -94,11 +94,9 @@ export class UmbDashboardExamineOverviewElement extends UmbContextConsumerMixin(
 		this._getIndexers();
 		this._getSearchers();
 
-		this.consumeContext('umbNotificationService', (notificationService: UmbNotificationService) => {
-			this._notificationService = notificationService;
-		});
-		this.consumeContext('umbModalService', (modalService: UmbModalService) => {
-			this._modalService = modalService;
+		this.consumeAllContexts(['umbNotificationService', 'umbModalService'], (instances) => {
+			this._notificationService = instances['umbNotificationService'];
+			this._modalService = instances['umbModalService'];
 		});
 	}
 
@@ -137,7 +135,7 @@ export class UmbDashboardExamineOverviewElement extends UmbContextConsumerMixin(
 							</uui-icon-essentials>
 						</uui-table-cell>
 						<uui-table-cell>
-							<a href="/section/settings/dashboard/examine-management/index/${index.name}">${index.name}</a>
+							<a href="${window.location.href.replace(/\/+$/, '')}/index/${index.name}">${index.name}</a>
 						</uui-table-cell>
 					</uui-table-row>
 				`;
@@ -159,7 +157,7 @@ export class UmbDashboardExamineOverviewElement extends UmbContextConsumerMixin(
 									</uui-icon>
 								</uui-icon-essentials>
 							</uui-table-cell>
-						<uui-table-cell><a href="/section/settings/dashboard/examine-management/searcher/${searcher.name}">${searcher.name}</a>
+						<uui-table-cell><a href="${window.location.href.replace(/\/+$/, '')}/searcher/${searcher.name}">${searcher.name}</a>
 					</uui-table-cell>
 					</uui-table-row>`;
 				})}

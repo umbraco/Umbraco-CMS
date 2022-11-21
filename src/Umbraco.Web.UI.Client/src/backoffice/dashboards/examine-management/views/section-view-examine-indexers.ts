@@ -108,11 +108,9 @@ export class UmbDashboardExamineIndexElement extends UmbContextConsumerMixin(Lit
 	constructor() {
 		super();
 
-		this.consumeContext('umbNotificationService', (notificationService: UmbNotificationService) => {
-			this._notificationService = notificationService;
-		});
-		this.consumeContext('umbModalService', (modalService: UmbModalService) => {
-			this._modalService = modalService;
+		this.consumeAllContexts(['umbNotificationService', 'umbModalService'], (instances) => {
+			this._notificationService = instances['umbNotificationService'];
+			this._modalService = instances['umbModalService'];
 		});
 	}
 
@@ -191,7 +189,7 @@ export class UmbDashboardExamineIndexElement extends UmbContextConsumerMixin(Lit
 					? Object.entries(this._indexData.providerProperties).map((entry) => {
 							return html`<uui-table-row>
 								<uui-table-cell style="width:0px; font-weight: bold;"> ${entry[0]} </uui-table-cell>
-								<uui-table-cell clip-text> ${JSON.stringify(entry[1]).replace(/,/g, ', ')} </uui-table-cell>
+								<uui-table-cell clip-text> ${entry[1]} </uui-table-cell>
 							</uui-table-row>`;
 					  })
 					: ''}
