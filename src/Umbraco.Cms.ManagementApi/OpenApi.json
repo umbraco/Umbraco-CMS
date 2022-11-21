@@ -892,22 +892,22 @@
           }
         ],
         "responses": {
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
           "200": {
             "description": "Success",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PagedRecycleBinItem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -942,22 +942,22 @@
           }
         ],
         "responses": {
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
           "200": {
             "description": "Success",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PagedRecycleBinItem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -1181,6 +1181,16 @@
           }
         ],
         "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedHelpPage"
+                }
+              }
+            }
+          },
           "400": {
             "description": "Bad Request",
             "content": {
@@ -1190,13 +1200,121 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/indexer": {
+      "get": {
+        "tags": [
+          "Indexer"
+        ],
+        "operationId": "GetIndexer",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
           },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
           "200": {
             "description": "Success",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedHelpPage"
+                  "$ref": "#/components/schemas/PagedIndex"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/indexer/{indexName}": {
+      "get": {
+        "tags": [
+          "Indexer"
+        ],
+        "operationId": "GetIndexerByIndexName",
+        "parameters": [
+          {
+            "name": "indexName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Index"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/indexer/{indexName}/rebuild": {
+      "post": {
+        "tags": [
+          "Indexer"
+        ],
+        "operationId": "PostIndexerByIndexNameRebuild",
+        "parameters": [
+          {
+            "name": "indexName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -1211,6 +1329,16 @@
         ],
         "operationId": "GetInstallSettings",
         "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InstallSettings"
+                }
+              }
+            }
+          },
           "400": {
             "description": "Bad Request",
             "content": {
@@ -1227,16 +1355,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InstallSettings"
                 }
               }
             }
@@ -1260,6 +1378,9 @@
           }
         },
         "responses": {
+          "200": {
+            "description": "Success"
+          },
           "400": {
             "description": "Bad Request",
             "content": {
@@ -1279,9 +1400,6 @@
                 }
               }
             }
-          },
-          "200": {
-            "description": "Success"
           }
         }
       }
@@ -1302,6 +1420,9 @@
           }
         },
         "responses": {
+          "200": {
+            "description": "Success"
+          },
           "400": {
             "description": "Bad Request",
             "content": {
@@ -1311,9 +1432,6 @@
                 }
               }
             }
-          },
-          "200": {
-            "description": "Success"
           }
         }
       }
@@ -1374,22 +1492,22 @@
           }
         ],
         "responses": {
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/NotFoundResult"
-                }
-              }
-            }
-          },
           "200": {
             "description": "Success",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Language"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundResult"
                 }
               }
             }
@@ -1413,6 +1531,9 @@
           }
         ],
         "responses": {
+          "200": {
+            "description": "Success"
+          },
           "400": {
             "description": "Bad Request",
             "content": {
@@ -1432,9 +1553,6 @@
                 }
               }
             }
-          },
-          "200": {
-            "description": "Success"
           }
         }
       }
@@ -1455,6 +1573,9 @@
           }
         },
         "responses": {
+          "201": {
+            "description": "Created"
+          },
           "400": {
             "description": "Bad Request",
             "content": {
@@ -1464,9 +1585,6 @@
                 }
               }
             }
-          },
-          "201": {
-            "description": "Created"
           }
         }
       }
@@ -1487,15 +1605,8 @@
           }
         },
         "responses": {
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/NotFoundResult"
-                }
-              }
-            }
+          "200": {
+            "description": "Success"
           },
           "400": {
             "description": "Bad Request",
@@ -1507,8 +1618,15 @@
               }
             }
           },
-          "200": {
-            "description": "Success"
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundResult"
+                }
+              }
+            }
           }
         }
       }
@@ -1688,22 +1806,22 @@
           }
         ],
         "responses": {
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
           "200": {
             "description": "Success",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PagedRecycleBinItem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -1738,22 +1856,22 @@
           }
         ],
         "responses": {
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
           "200": {
             "description": "Success",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PagedRecycleBinItem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -2626,130 +2744,12 @@
         }
       }
     },
-    "/umbraco/management/api/v1/search/index": {
+    "/umbraco/management/api/v1/searcher": {
       "get": {
         "tags": [
-          "Search"
+          "Searcher"
         ],
-        "operationId": "GetSearchIndex",
-        "parameters": [
-          {
-            "name": "skip",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          },
-          {
-            "name": "take",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedIndex"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/umbraco/management/api/v1/search/index/{indexName}": {
-      "get": {
-        "tags": [
-          "Search"
-        ],
-        "operationId": "GetSearchIndexByIndexName",
-        "parameters": [
-          {
-            "name": "indexName",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Index"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/umbraco/management/api/v1/search/index/{indexName}/rebuild": {
-      "post": {
-        "tags": [
-          "Search"
-        ],
-        "operationId": "PostSearchIndexByIndexNameRebuild",
-        "parameters": [
-          {
-            "name": "indexName",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/OkResult"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/umbraco/management/api/v1/search/searcher": {
-      "get": {
-        "tags": [
-          "Search"
-        ],
-        "operationId": "GetSearchSearcher",
+        "operationId": "GetSearcher",
         "parameters": [
           {
             "name": "skip",
@@ -2782,12 +2782,12 @@
         }
       }
     },
-    "/umbraco/management/api/v1/search/searcher/{searcherName}/search": {
+    "/umbraco/management/api/v1/searcher/{searcherName}/query": {
       "get": {
         "tags": [
-          "Search"
+          "Searcher"
         ],
-        "operationId": "GetSearchSearcherBySearcherNameSearch",
+        "operationId": "GetSearcherBySearcherNameQuery",
         "parameters": [
           {
             "name": "searcherName",
@@ -2798,7 +2798,7 @@
             }
           },
           {
-            "name": "query",
+            "name": "term",
             "in": "query",
             "schema": {
               "type": "string"
@@ -2876,22 +2876,22 @@
         ],
         "operationId": "GetServerStatus",
         "responses": {
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
           "200": {
             "description": "Success",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ServerStatus"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -2906,22 +2906,22 @@
         ],
         "operationId": "GetServerVersion",
         "responses": {
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
           "200": {
             "description": "Success",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Version"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -3245,6 +3245,9 @@
           }
         },
         "responses": {
+          "200": {
+            "description": "Success"
+          },
           "400": {
             "description": "Bad Request",
             "content": {
@@ -3254,9 +3257,6 @@
                 }
               }
             }
-          },
-          "200": {
-            "description": "Success"
           }
         }
       }
