@@ -77,7 +77,7 @@
             });
 
 
-            let vm = {};
+            const vm = {};
 
             const config = {...DefaultConfig, ...scope.config};
 
