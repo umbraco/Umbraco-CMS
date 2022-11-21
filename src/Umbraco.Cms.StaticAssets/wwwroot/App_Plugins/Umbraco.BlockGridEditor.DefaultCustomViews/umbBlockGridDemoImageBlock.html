@@ -66,11 +66,22 @@
         transition: opacity 120ms;
     }
 
+    .is-trashed {
+        background-color: #d42054 !important;
+        color:white !important;
+    }
+    .is-trashed .file-name {
+        opacity: 1;
+    }
+
 </style>
 
-<button type="button" ng-click="block.edit()" ng-focus="block.focus">
+<button type="button" ng-click="block.edit()" ng-focus="block.focus" ng-class="{'is-trashed': mediaItem.trashed}">
     {{mediaItem = (block.data.image[0].mediaKey | mediaItemResolver); ""}}
-    <img ng-if="mediaItem !== null && (mediaItem.mediaLink.indexOf('svg') === -1)" ng-src="{{mediaItem.mediaLink}}" alt="{{mediaItem.name}}" />
-    <umb-icon ng-if="mediaItem !== null && (mediaItem.mediaLink.indexOf('svg') !== -1)" icon="{{mediaItem.contentType.icon}} color-black" class="icon"></umb-icon>
-    <span ng-if="mediaItem !== null && mediaItem.name" class="file-name">{{mediaItem.name}}</span>
+    <img ng-if="mediaItem !== null && (mediaItem.mediaLink.indexOf('jpg') !== -1 || mediaItem.mediaLink.indexOf('png') !== -1 || mediaItem.mediaLink.indexOf('webp') !== -1 || mediaItem.mediaLink.indexOf('gif') !== -1) && !mediaItem.trashed" ng-src="{{mediaItem.mediaLink}}" alt="{{mediaItem.name}}" />
+    <umb-icon ng-if="mediaItem !== null && mediaItem.mediaLink.indexOf('jpg') === -1 && mediaItem.mediaLink.indexOf('png') === -1 && mediaItem.mediaLink.indexOf('webp') === -1 && mediaItem.mediaLink.indexOf('gif') === -1 || mediaItem.trashed" icon="{{mediaItem.contentType.icon}}" class="icon"></umb-icon>
+    <span ng-if="mediaItem !== null && mediaItem.name" class="file-name">
+        <span ng-if="mediaItem.trashed"><localize key="mediaPicker_trashed">Trashed</localize>:</span>
+        {{mediaItem.name}}
+    </span>
 </button>
