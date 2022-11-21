@@ -179,73 +179,6 @@
 
                     </div>
 
-
-
-                    <div class="umb-group-panel">
-
-                        <div class="umb-group-panel__header">
-                            <localize key="blockEditor_headlineCatalogueAppearance">Catalogue appearance</localize>
-                        </div>
-
-                        <div class="umb-group-panel__content">
-
-                            <button ng-if="!vm.showAppearanceOptions" type="button" class="btn-reset __settings-input --noValue umb-outline" style="height: 80px;" ng-click="vm.showAppearanceOptions = true">
-                                <localize key="blockEditor_showAppearanceOptions">Show catalogue appearance</localize>
-                            </button>
-
-                            <!-- backgroundColor -->
-                            <div ng-if="vm.showAppearanceOptions" class="control-group umb-control-group -no-border">
-                                <div class="umb-el-wrap">
-                                    <label class="control-label" for="backgroundColor"><localize key="blockEditor_labelBackgroundColor">Background Color</localize></label>
-                                    <div class="controls">
-                                        <umb-color-picker
-                                            ng-model="vm.block.backgroundColor"
-                                            options="vm.colorPickerOptions"
-                                            on-change="vm.changeBackgroundColor(color)">
-                                        </umb-color-picker>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- iconColor -->
-                            <div ng-if="vm.showAppearanceOptions" class="control-group umb-control-group -no-border">
-                                <div class="umb-el-wrap">
-                                    <label class="control-label" for="iconColor"><localize key="blockEditor_labelIconColor">Icon Color</localize></label>
-                                    <div class="controls">
-                                        <umb-color-picker
-                                            ng-model="vm.block.iconColor"
-                                            options="vm.colorPickerOptions"
-                                            on-change="vm.changeIconColor(color)">
-                                        </umb-color-picker>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- thumbnail -->
-                            <div ng-if="vm.showAppearanceOptions" class="control-group umb-control-group -no-border">
-                                <div class="umb-el-wrap">
-                                    <label class="control-label" for="iconcolor"><localize key="blockEditor_thumbnail">Thumbnail</localize></label>
-                                    <div class="controls">
-                                        <div class="__settings-input --hasValue" ng-if="vm.block.thumbnail !== null" >
-
-                                            <umb-node-preview icon="'icon-document'" name="vm.block.thumbnail"></umb-node-preview>
-                                            <div class="__control-actions">
-                                                <button type="button" class="btn-reset __control-actions-btn --remove umb-outline" ng-click="vm.removeThumbnailForBlock(vm.block)">
-                                                    <umb-icon icon="icon-wrong" class="icon"></umb-icon>
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <button type="button" class="btn-reset __settings-input --noValue --hideText umb-outline" ng-if="vm.block.thumbnail === null" ng-click="vm.addThumbnailForBlock(vm.block)">
-                                            <localize key="blockEditor_addThumbnail">Add thumbnail</localize>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>
-
-                    </div>
-
                 </div>
 
                 <div ng-if="vm.activeTab.alias === 'areas'">
@@ -379,6 +312,70 @@
                                     </umb-property-info-button>
                                     <div class="controls">
                                         <umb-toggle checked="vm.block.forceHideContentEditorInOverlay" on-click="vm.block.forceHideContentEditorInOverlay = vm.block.forceHideContentEditorInOverlay != true"></umb-toggle>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                    <div class="umb-group-panel">
+
+                        <div class="umb-group-panel__header">
+                            <localize key="blockEditor_headlineCatalogueAppearance">Catalogue appearance</localize>
+                        </div>
+
+                        <div class="umb-group-panel__content">
+
+                            <button ng-if="!vm.showAppearanceOptions" type="button" class="btn-reset __settings-input --noValue umb-outline" style="height: 80px;" ng-click="vm.showAppearanceOptions = true">
+                                <localize key="blockEditor_showAppearanceOptions">Show catalogue appearance</localize>
+                            </button>
+
+                            <!-- backgroundColor -->
+                            <div ng-if="vm.showAppearanceOptions" class="control-group umb-control-group -no-border">
+                                <div class="umb-el-wrap">
+                                    <label class="control-label" for="backgroundColor"><localize key="blockEditor_labelBackgroundColor">Background Color</localize></label>
+                                    <div class="controls">
+                                        <umb-color-picker
+                                            ng-model="vm.block.backgroundColor"
+                                            options="vm.colorPickerOptions"
+                                            on-change="vm.changeBackgroundColor(color)">
+                                        </umb-color-picker>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- iconColor -->
+                            <div ng-if="vm.showAppearanceOptions" class="control-group umb-control-group -no-border">
+                                <div class="umb-el-wrap">
+                                    <label class="control-label" for="iconColor"><localize key="blockEditor_labelIconColor">Icon Color</localize></label>
+                                    <div class="controls">
+                                        <umb-color-picker
+                                            ng-model="vm.block.iconColor"
+                                            options="vm.colorPickerOptions"
+                                            on-change="vm.changeIconColor(color)">
+                                        </umb-color-picker>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- thumbnail -->
+                            <div ng-if="vm.showAppearanceOptions" class="control-group umb-control-group -no-border">
+                                <div class="umb-el-wrap">
+                                    <label class="control-label" for="iconcolor"><localize key="blockEditor_thumbnail">Thumbnail</localize></label>
+                                    <div class="controls">
+                                        <div class="__settings-input --hasValue" ng-if="vm.block.thumbnail !== null" >
+
+                                            <umb-node-preview icon="'icon-document'" name="vm.block.thumbnail"></umb-node-preview>
+                                            <div class="__control-actions">
+                                                <button type="button" class="btn-reset __control-actions-btn --remove umb-outline" ng-click="vm.removeThumbnailForBlock(vm.block)">
+                                                    <umb-icon icon="icon-wrong" class="icon"></umb-icon>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="btn-reset __settings-input --noValue --hideText umb-outline" ng-if="vm.block.thumbnail === null" ng-click="vm.addThumbnailForBlock(vm.block)">
+                                            <localize key="blockEditor_addThumbnail">Add thumbnail</localize>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
