@@ -61,14 +61,24 @@ public class ManagementApiComposer : IComposer
         {
             swaggerGenOptions.CustomOperationIds(e =>
             {
+                var httpMethod = e.HttpMethod?.ToLower().ToFirstUpper() ?? "Get";
+
+                // if the route info "Name" is supplied we'll use this explicitly as the operation ID
+                // - usage example: [HttpGet("my-api/route}", Name = "MyCustomRoute")]
+                if (string.IsNullOrWhiteSpace(e.ActionDescriptor.AttributeRouteInfo?.Name) == false)
+                {
+                    var explicitOperationId = e.ActionDescriptor.AttributeRouteInfo!.Name;
+                    return explicitOperationId.InvariantStartsWith(httpMethod)
+                        ? explicitOperationId
+                        : $"{httpMethod}{explicitOperationId}";
+                }
+
                 var relativePath = e.RelativePath;
 
                 if (string.IsNullOrWhiteSpace(relativePath))
                 {
                     throw new Exception($"There is no relative path for controller action {e.ActionDescriptor.RouteValues["controller"]}");
                 }
-
-                var httpMethod = e.HttpMethod?.ToLower().ToFirstUpper() ?? "Get";
 
                 // Remove the prefixed base path with version, e.g. /umbraco/management/api/v1/tracked-reference/{id} => tracked-reference/{id}
                 var unprefixedRelativePath = OperationIdRegexes.VersionPrefixRegex().Replace(relativePath, string.Empty);
