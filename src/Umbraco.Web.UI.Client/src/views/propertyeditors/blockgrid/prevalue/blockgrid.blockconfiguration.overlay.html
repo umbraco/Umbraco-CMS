@@ -15,9 +15,9 @@
 
             <umb-editor-container>
 
-                <div ng-if="vm.activeTab.alias === 'block'" class="form-vertical umb-block-grid-block-configuration-layout">
+                <div ng-if="vm.activeTab.alias === 'block'" class="form-vertical">
 
-                    <div class="umb-group-panel umb-block-grid-block-configuration__umb-group-panel">
+                    <div class="umb-group-panel">
 
                         <div class="umb-group-panel__header">
                             <localize key="general_General">General</localize>
@@ -80,9 +80,59 @@
                     </div>
 
 
+
+
+                    <div class="umb-group-panel">
+
+                        <div class="umb-group-panel__header">
+                            <localize key="blockEditor_headlineAllowance">Permissions</localize>
+                        </div>
+
+                        <div class="umb-group-panel__content">
+
+                            <!-- allowAtRoot -->
+                            <div class="control-group umb-control-group -no-border">
+                                <div class="umb-el-wrap">
+                                    <label class="control-label" for="allowAtRoot"><localize key="blockEditor_allowBlockInRoot">Allow in root</localize></label>
+                                    <umb-property-info-button button-title-key="general_readMore">
+                                        <localize key="blockEditor_allowBlockInRootHelp">Make this block available in the root of the layout.</localize>
+                                    </umb-property-info-button>
+                                    <div class="controls">
+                                        <umb-toggle
+                                            input-id="allowAtRoot"
+                                            checked="vm.block.allowAtRoot"
+                                            on-click="vm.block.allowAtRoot = !vm.block.allowAtRoot || false">
+                                        </umb-toggle>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <!-- allowInAreas -->
+                            <div class="control-group umb-control-group -no-border">
+                                <div class="umb-el-wrap">
+                                    <label class="control-label" for="allowInAreas"><localize key="blockEditor_allowBlockInAreas">Allow in areas</localize></label>
+                                    <umb-property-info-button button-title-key="general_readMore">
+                                        <localize key="blockEditor_allowBlockInAreasHelp">Make this block available within other Blocks.</localize>
+                                    </umb-property-info-button>
+                                    <div class="controls">
+                                        <umb-toggle
+                                            input-id="allowInAreas"
+                                            checked="vm.block.allowInAreas"
+                                            on-click="vm.block.allowInAreas = !vm.block.allowInAreas || false">
+                                        </umb-toggle>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
                     
 
-                    <div class="umb-group-panel umb-block-grid-block-configuration__umb-group-panel">
+                    <div class="umb-group-panel">
 
                         <div class="umb-group-panel__header">
                             <div>
@@ -131,7 +181,7 @@
 
 
 
-                    <div class="umb-group-panel umb-block-grid-block-configuration__umb-group-panel">
+                    <div class="umb-group-panel">
 
                         <div class="umb-group-panel__header">
                             <localize key="blockEditor_headlineCatalogueAppearance">Catalogue appearance</localize>
@@ -196,59 +246,11 @@
 
                     </div>
 
-
-                    <div class="umb-group-panel umb-block-grid-block-configuration__umb-group-panel">
-
-                        <div class="umb-group-panel__header">
-                            <localize key="blockEditor_headlineAllowance">Permissions</localize>
-                        </div>
-
-                        <div class="umb-group-panel__content">
-
-                            <!-- allowAtRoot -->
-                            <div class="control-group umb-control-group -no-border">
-                                <div class="umb-el-wrap">
-                                    <label class="control-label" for="allowAtRoot"><localize key="blockEditor_allowBlockInRoot">Allow in root</localize></label>
-                                    <umb-property-info-button button-title-key="general_readMore">
-                                        <localize key="blockEditor_allowBlockInRootHelp">Make this block available in the root of the layout.</localize>
-                                    </umb-property-info-button>
-                                    <div class="controls">
-                                        <umb-toggle
-                                            input-id="allowAtRoot"
-                                            checked="vm.block.allowAtRoot"
-                                            on-click="vm.block.allowAtRoot = !vm.block.allowAtRoot || false">
-                                        </umb-toggle>
-                                    </div>
-                                </div>
-                            </div>
-
-
-                            <!-- allowInAreas -->
-                            <div class="control-group umb-control-group -no-border">
-                                <div class="umb-el-wrap">
-                                    <label class="control-label" for="allowInAreas"><localize key="blockEditor_allowBlockInAreas">Allow in areas</localize></label>
-                                    <umb-property-info-button button-title-key="general_readMore">
-                                        <localize key="blockEditor_allowBlockInAreasHelp">Make this block available within other Blocks.</localize>
-                                    </umb-property-info-button>
-                                    <div class="controls">
-                                        <umb-toggle
-                                            input-id="allowInAreas"
-                                            checked="vm.block.allowInAreas"
-                                            on-click="vm.block.allowInAreas = !vm.block.allowInAreas || false">
-                                        </umb-toggle>
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>
-
-                    </div>
-
                 </div>
 
                 <div ng-if="vm.activeTab.alias === 'areas'">
 
-                    <div class="umb-group-panel umb-block-grid-block-configuration__umb-group-panel --span-two-cols">
+                    <div class="umb-group-panel">
 
 
                         <div class="umb-group-panel__header">
@@ -288,7 +290,7 @@
                 </div>
 
                 <div ng-if="vm.activeTab.alias === 'advance'">
-                    <div class="umb-group-panel umb-block-grid-block-configuration__umb-group-panel">
+                    <div class="umb-group-panel">
 
                         <div class="umb-group-panel__header">
                             <localize key="blockEditor_headlineAdvanced">Advanced</localize>
