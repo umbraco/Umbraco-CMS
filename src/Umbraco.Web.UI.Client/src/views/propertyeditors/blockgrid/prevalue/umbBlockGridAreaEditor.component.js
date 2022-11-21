@@ -164,7 +164,6 @@
         }
 
         vm.requestDeleteArea = function (area) {
-            // TODO: Translations
             localizationService.localizeMany(["general_delete", "blockEditor_confirmDeleteBlockAreaMessage", "blockEditor_confirmDeleteBlockAreaNotice"]).then(function (data) {
                 overlayService.confirmDelete({
                     title: data[0],
@@ -216,8 +215,6 @@
 
         vm.openArea = null;
         vm.openAreaOverlay = function (area) {
-
-            // TODO: use the right localization key:
             localizationService.localize("blockEditor_blockConfigurationOverlayTitle").then(function (localized) {
 
                 var clonedAreaData = Utilities.copy(area);

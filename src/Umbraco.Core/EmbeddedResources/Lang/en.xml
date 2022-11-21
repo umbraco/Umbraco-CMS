@@ -2817,6 +2817,9 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="actionEnterSortMode">Sort mode</key>
     <key alias="actionExitSortMode">End sort mode</key>
     <key alias="areaAliasIsNotUnique">This Areas Alias must be unique compared to the other Areas of this Block.</key>
+    <key alias="configureArea">Configure area</key>
+    <key alias="deleteArea">Delete area</key>
+    <key alias="addColumnSpanOption">Add spanning %0% columns option</key>
   </area>
   <area alias="contentTemplatesDashboard">
     <key alias="whatHeadline">What are Content Templates?</key>

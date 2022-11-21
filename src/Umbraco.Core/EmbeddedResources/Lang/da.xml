@@ -2268,6 +2268,9 @@ Mange hilsner fra Umbraco robotten
     <key alias="actionEnterSortMode">Sortings tilstand</key>
     <key alias="actionExitSortMode">Afslut sortings tilstand</key>
     <key alias="areaAliasIsNotUnique">Dette område alias skal være unikt sammenlignet med andre områder af denne Blok.</key>
+    <key alias="configureArea">Konfigurer område</key>
+    <key alias="deleteArea">Slet område</key>
+    <key alias="addColumnSpanOption">Tilføj mulighed for %0% koloner</key>
   </area>
   <area alias="contentTemplatesDashboard">
     <key alias="whatHeadline">Hvad er Indholdsskabeloner?</key>
