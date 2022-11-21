@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Umbraco.New.Cms.Web.Common.Routing;
 
-namespace Umbraco.Cms.ManagementApi.Controllers.Search;
+namespace Umbraco.Cms.ManagementApi.Controllers.Searcher;
 
 [ApiController]
 [VersionedApiBackOfficeRoute("searcher")]

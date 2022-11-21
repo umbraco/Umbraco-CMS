@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.ManagementApi.Factories;
 using Umbraco.Cms.ManagementApi.ViewModels.Search;
 
-namespace Umbraco.Cms.ManagementApi.Controllers.Index;
+namespace Umbraco.Cms.ManagementApi.Controllers.Indexer;
 
 [ApiVersion("1.0")]
 public class DetailsIndexerController : IndexerControllerBase

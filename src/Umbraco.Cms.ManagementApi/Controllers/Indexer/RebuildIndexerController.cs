@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.New.Cms.Infrastructure.Services;
 
-namespace Umbraco.Cms.ManagementApi.Controllers.Index;
+namespace Umbraco.Cms.ManagementApi.Controllers.Indexer;
 
 [ApiVersion("1.0")]
 public class RebuildIndexerController : IndexerControllerBase

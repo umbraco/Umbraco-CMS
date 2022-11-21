@@ -5,7 +5,7 @@ using Umbraco.Cms.ManagementApi.ViewModels.Pagination;
 using Umbraco.Cms.ManagementApi.ViewModels.Search;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.ManagementApi.Controllers.Search;
+namespace Umbraco.Cms.ManagementApi.Controllers.Searcher;
 
 [ApiVersion("1.0")]
 public class AllSearcherController : SearcherControllerBase
