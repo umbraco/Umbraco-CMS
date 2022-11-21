@@ -101,32 +101,40 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         // This could be better, ideally the UmbracoDatabaseFactory.CreateDatabase() function would set this based on a setting (global or connectionstring setting)
         private void InitCommandTimeout()
         {
-            if (this.Connection != null && this.Connection.ConnectionTimeout > 0)
+            if (CommandTimeout != 0)
             {
-                this.CommandTimeout = this.Connection.ConnectionTimeout;
+                // CommandTimeout configured elsewhere, so we'll skip
+                return;
             }
-            else // get from _connectionString
-            {
-                var connectionParser = new DbConnectionStringBuilder
-                {
-                    ConnectionString = ConnectionString
-                };
 
-                if (connectionParser.ContainsKey("connection timeout"))
+            if (Connection is not null && Connection.ConnectionTimeout > 0)
+            {
+                CommandTimeout = Connection.ConnectionTimeout;
+                return;
+            }
+
+            // get from ConnectionString
+            var connectionParser = new DbConnectionStringBuilder
+            {
+                ConnectionString = ConnectionString
+            };
+
+            if (connectionParser.TryGetValue("connection timeout", out var connectionTimeoutString))
+            {
+                if (int.TryParse(connectionTimeoutString.ToString(), out var connectionTimeout))
                 {
-                    if (int.TryParse(connectionParser["connection timeout"].ToString(), out int connectionTimeout))
-                    {
-                        _logger.LogInformation($"Setting Command Timeout to value configured in connectionstring Connection Timeout : {connectionTimeout} seconds");
-                        this.CommandTimeout = connectionTimeout;
-                    }
+                    _logger.LogTrace("Setting Command Timeout to value configured in connectionstring Connection Timeout : {TimeOut} seconds", connectionTimeout);
+                    CommandTimeout = connectionTimeout;
+                    return;
                 }
-                else if (connectionParser.ContainsKey("connect timeout"))
+            }
+
+            if (connectionParser.TryGetValue("connect timeout", out var connectTimeoutString))
+            {
+                if (int.TryParse(connectTimeoutString.ToString(), out var connectionTimeout))
                 {
-                    if (int.TryParse(connectionParser["connect timeout"].ToString(), out int connectionTimeout))
-                    {
-                        _logger.LogInformation($"Setting Command Timeout to value configured in connectionstring Connect Timeout : {connectionTimeout} seconds");
-                        this.CommandTimeout = connectionTimeout;
-                    }
+                    _logger.LogTrace("Setting Command Timeout to value configured in connectionstring Connect Timeout : {TimeOut} seconds", connectionTimeout);
+                    CommandTimeout = connectionTimeout;
                 }
             }
         }
