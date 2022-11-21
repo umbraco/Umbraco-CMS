@@ -324,6 +324,14 @@
             $scope.subButtons = buttons.subButtons;
             $scope.page.showPreviewButton = true;
 
+            const activeVariant = _.find($scope.content.variants, v => v.language && v.language.culture === $scope.culture);
+            if(activeVariant){
+                $scope.page.showPreviewButton = canPreviewVariant(activeVariant);
+            }
+        }
+
+        function canPreviewVariant(variant) {
+            return variant.state !== "NotCreated";
         }
 
         /** Syncs the content item to it's tree node - this occurs on first load and after saving */
@@ -938,22 +946,25 @@
         };
 
         $scope.preview = function (content) {
-            // Chromes popup blocker will kick in if a window is opened
-            // without the initial scoped request. This trick will fix that.
-            //
-            var previewWindow = $window.open('preview/?init=true', 'umbpreview');
 
-            // Build the correct path so both /#/ and #/ work.
-            var query = 'id=' + content.id;
-            if ($scope.culture) {
-                query += "#?culture=" + $scope.culture;
+            const openPreviewWindow = () => {
+                // Chromes popup blocker will kick in if a window is opened
+                // without the initial scoped request. This trick will fix that.
+                //
+                const previewWindow = $window.open('preview/?init=true', 'umbpreview');
+
+                // Build the correct path so both /#/ and #/ work.
+                let query = 'id=' + content.id;
+                if ($scope.culture) {
+                   query += "#?culture=" + $scope.culture;
+                }
+                previewWindow.location.href = Umbraco.Sys.ServerVariables.umbracoSettings.umbracoPath + '/preview/?' + query;
             }
-            var redirect = Umbraco.Sys.ServerVariables.umbracoSettings.umbracoPath + '/preview/?' + query;
 
             //The user cannot save if they don't have access to do that, in which case we just want to preview
             //and that's it otherwise they'll get an unauthorized access message
             if (!_.contains(content.allowedActions, "A")) {
-                previewWindow.location.href = redirect;
+                openPreviewWindow();
             }
             else {
                 var selectedVariant = $scope.content.variants[0];
@@ -967,10 +978,12 @@
                     }
                 }
 
-                //ensure the save flag is set
+                //reset save flag for all variants
+                $scope.content.variants.forEach(variant => variant.save = false);
+                //ensure the save flag is set for the active variant
                 selectedVariant.save = true;
                 performSave({ saveMethod: $scope.saveMethod(), action: "save" }).then(function (data) {
-                    previewWindow.location.href = redirect;
+                    openPreviewWindow()
                 }, function (err) {
                     //validation issues ....
                 });
@@ -1029,6 +1042,10 @@
         $scope.appAnchorChanged = function (app, anchor) {
             //send an event downwards
             $scope.$broadcast("editors.apps.appAnchorChanged", { app: app, anchor: anchor });
+        };
+
+        $scope.variantChanged = function (variant, culture, segment) {
+            $scope.page.showPreviewButton = canPreviewVariant(variant) ;
         };
 
         // methods for infinite editing

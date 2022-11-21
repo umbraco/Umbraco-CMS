@@ -13,6 +13,7 @@
             segment: "<",
             onSelectApp: "&?",
             onSelectAppAnchor: "&?",
+            onSelectVariant: "&?",
             onBack: "&?",
             showBack: "<?"
         },
@@ -234,6 +235,10 @@
                 //update the editors collection
                 insertVariantEditor(editorIndex, variant);                
             }            
+
+            if(vm.onSelectVariant) {
+                vm.onSelectVariant({"variant": variant, "culture": variantCulture, "segment": variantSegment});
+            }
         }
 
         /**
