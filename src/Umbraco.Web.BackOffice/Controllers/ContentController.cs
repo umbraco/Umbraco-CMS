@@ -2924,12 +2924,27 @@ public class ContentController : ContentControllerBase
             }
         }
 
-        IEnumerable<ContentVersionMeta>? results = _contentVersionService.GetPagedContentVersions(
+        ContentVersionMeta[]? results = _contentVersionService.GetPagedContentVersions(
             contentId,
             pageNumber - 1,
             pageSize,
             out var totalRecords,
-            culture);
+            culture)?.ToArray();
+
+        // flag the draft version as having pending changes (or not)
+        ContentVersionMeta? draftVersion = results?.FirstOrDefault(r => r.CurrentDraftVersion);
+        if (draftVersion != null)
+        {
+            IContent? current = _contentService.GetById(contentId);
+            if (current != null)
+            {
+                // draft has pending changes if it is marked as edited at root level (for culture invariant request)
+                // or specifically marked as edited in the requested culture
+                draftVersion.HasPendingChanges = culture == null
+                    ? current.Edited
+                    : current.EditedCultures?.InvariantContains(culture) == true;
+            }
+        }
 
         var model = new PagedResult<ContentVersionMeta>(totalRecords, pageNumber, pageSize) { Items = results };
 

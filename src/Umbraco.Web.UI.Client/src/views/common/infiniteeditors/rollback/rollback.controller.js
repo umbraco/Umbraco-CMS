@@ -12,6 +12,8 @@
         vm.close = close;
         vm.pinVersion = pinVersion;
         vm.goToPage = goToPage;
+        vm.canRollback = canRollback;
+        vm.draftVersionHasPendingChanges = false;
         vm.paginationCount = { from: 0, to: 0, total: 0 };
 
         //////////
@@ -73,11 +75,13 @@
             getVersions();
         }
 
+        function canRollback(version) {
+            return !version.currentDraftVersion && (!version.currentPublishedVersion || vm.draftVersionHasPendingChanges === true);
+        }
+
         function changeVersion(version) {
 
-            const canRollback = !version.currentDraftVersion && !version.currentPublishedVersion;
-
-            if (canRollback === false) {
+            if (canRollback(version) === false) {
                 return;
             }
 
@@ -131,11 +135,21 @@
 
                     // get current backoffice user and format dates
                     userService.getCurrentUser().then(function (currentUser) {
-                        vm.previousVersions = data.items.map(version => {
-                            var timestampFormatted = dateHelper.getLocalDate(version.versionDate, currentUser.locale, 'LLL');
-                            version.displayValue = timestampFormatted;
-                            return version;
-                        });
+                        // figure out if the current draft version has pending changes, as this decides whether or not
+                        // the current draft version can be rolled back to the previously published version
+                        const draftVersion = data.items.find(version => version.currentDraftVersion === true);
+                        if(draftVersion) {
+                            vm.draftVersionHasPendingChanges = draftVersion.hasPendingChanges;
+                        }
+
+                        vm.previousVersions = data.items
+                            // we don't ever want to show the draft version in the rollback list
+                            .filter(version => version !== draftVersion)
+                            .map(version => {
+                                var timestampFormatted = dateHelper.getLocalDate(version.versionDate, currentUser.locale, 'LLL');
+                                version.displayValue = timestampFormatted;
+                                return version;
+                            });
                     });
                 });
         }
