@@ -227,6 +227,7 @@
 
         function initializeSorter() {
             vm.sorterOptions = {
+                ownerVM: vm,
                 resolveVerticalDirection: resolveVerticalDirection,
                 dataTransferResolver: (dataTransfer, item) => {dataTransfer.setData("text/plain", item.$block.label)}, // (Optional) Append OS data to the moved item.
                 compareElementToModel: (el, modelEntry) => modelEntry.contentUdi === el.dataset.elementUdi,
@@ -241,6 +242,7 @@
                 ghostClass: "umb-block-grid__layout-item-ghost",
                 onStart: onSortStart,
                 onEnd: onSortEnd,
+                onContainerChange: onSortContainerChange,
                 onSync: onSortSync,
                 onDisallowed: onSortDisallowed,
                 onAllowed: onSortAllowed,
@@ -248,7 +250,10 @@
             }
         }
 
+        var currentItemColumnSpanTarget;
         function onSortStart(data) {
+            currentItemColumnSpanTarget = data.item.columnSpan;
+
             // Gather containedPropertyEditorProxies from this element.
             currentContainedPropertyEditorProxies = Array.from(data.element.querySelectorAll('slot[data-is-property-editor-proxy]')).map(x => x.getAttribute('name'));
             vm.blockEditorApi.internal.startDraggingMode();
@@ -261,22 +266,31 @@
             $scope.$evalAsync();
         }
 
+        function getColumnSpanForContext(currentColumnSpan, columnSpanOptions, contextColumns) {
+            if (columnSpanOptions.length > 0) {
+                const availableOptions = columnSpanOptions.filter(option => option.columnSpan <= contextColumns);
+                if(availableOptions.length > 0) {
+                    const closestColumnSpan = availableOptions.map(x => x.columnSpan).reduce(
+                        (prev, curr) => {
+                            return Math.abs(curr - currentColumnSpan) < Math.abs(prev - currentColumnSpan) ? curr : prev
+                        }, 99999
+                    );
+                    if(closestColumnSpan) {
+                        return closestColumnSpan;
+                    }
+                }
+            }
+            return contextColumns;
+        }
+
+        function onSortContainerChange(data) {
+            const contextColumns = vm.blockEditorApi.internal.getContextColumns(data.ownerVM.parentBlock, data.ownerVM.areaKey);
+            data.item.columnSpan = getColumnSpanForContext(currentItemColumnSpanTarget, data.item.$block.config.columnSpanOptions, contextColumns);
+        }
+
         function onSortSync(data) {
             if (data.fromController !== data.toController) {
-                removeAllContainedPropertyEditorProxies(); 
-
-                const contextColumns = vm.blockEditorApi.internal.getContextColumns(vm.parentBlock, vm.areaKey);
-
-                // if colSpan is lower than contextColumns, and we do have some columnSpanOptions:
-                if (data.item.columnSpan < contextColumns && data.item.$block.config.columnSpanOptions.length > 0) {
-                    // then check if the colSpan is a columnSpanOption, if NOT then reset to contextColumns.
-                    const found = data.item.$block.config.columnSpanOptions.find(option => option.columnSpan === data.item.columnSpan);
-                    if(!found) {
-                        data.item.columnSpan = contextColumns;
-                    }
-                } else {
-                    data.item.columnSpan = contextColumns;
-                }
+                removeAllContainedPropertyEditorProxies();
             }
             $scope.$evalAsync();
             vm.blockEditorApi.internal.setDirty();
