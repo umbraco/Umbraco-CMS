@@ -82,6 +82,7 @@
             const config = {...DefaultConfig, ...scope.config};
 
             vm.identifier = config.identifier;
+            vm.ownerVM = config.ownerVM || null;
 
             let scrollElement = null;
 
@@ -219,6 +220,11 @@
                 if(currentContainerVM.sync(currentElement, vm) === false) {
                     // Sync could not succeed, might be because item is not allowed here.
 
+                    currentContainerVM = vm;
+                    if (config.onContainerChange) {
+                        config.onContainerChange({item: currentItem, element: currentElement, ownerVM: currentContainerVM.ownerVM});
+                    }
+
                     // Lets move the Element back to where it came from:
                     const movingItemIndex = scope.model.indexOf(currentItem);
                     if(movingItemIndex < scope.model.length-1) {
@@ -229,7 +235,6 @@
                         containerEl.appendChild(currentElement);
                     }
 
-                    currentContainerVM = vm;
                 }
 
                 if (config.onEnd) {
@@ -315,6 +320,9 @@
                         if(parentContainerVM.identifier === vm.identifier) {
                             currentContainerElement = parentContainer;
                             currentContainerVM = parentContainerVM;
+                            if (config.onContainerChange) {
+                                config.onContainerChange({item: currentItem, element: currentElement, ownerVM: currentContainerVM.ownerVM});
+                            }
                         }
                     }
                 }
@@ -392,6 +400,9 @@
                                 if(subVm.identifier === vm.identifier) {
                                     currentContainerElement = subLayoutEl;
                                     currentContainerVM = subVm;
+                                    if (config.onContainerChange) {
+                                        config.onContainerChange({item: currentItem, element: currentElement, ownerVM: currentContainerVM.ownerVM});
+                                    }
                                     moveCurrentElement();
                                     return;
                                 }
@@ -482,7 +493,7 @@
                 }
 
                 if(config.onChange) {
-                    config.onChange();
+                    config.onChange({element: currentElement, item: currentItem, ownerVM: currentContainerVM.ownerVM});
                 }
             }
 
