@@ -28,6 +28,7 @@ export class UmbSectionDashboardsElement extends UmbContextConsumerMixin(UmbObse
 			}
 
 			#scroll-container {
+				width: calc(-300px + 100vw);
 				height: calc(100vh - 70px - 60px); // TODO: This is a temporary fix to get scrolling to work
 				// changed it so the height is correct but the fix is still not ideal. the 70px and 60px are the height of the blue top bar and the dashboard menu. Need a better solution still.
 			}
