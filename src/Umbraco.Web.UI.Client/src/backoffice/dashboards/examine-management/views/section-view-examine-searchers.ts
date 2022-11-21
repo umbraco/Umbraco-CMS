@@ -2,16 +2,14 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, state, query, property } from 'lit/decorators.js';
 
-import { UmbModalService } from '../../../../core/services/modal';
-import { UmbNotificationService } from '../../../../core/services/notification';
-import { UmbNotificationDefaultData } from '../../../../core/services/notification/layouts/default';
+import { UmbModalService, UmbNotificationService, UmbNotificationDefaultData } from '@umbraco-cms/services';
 
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
 import { ApiError, ProblemDetails, SearchResult, SearchResource, Field } from '@umbraco-cms/backend-api';
 
-import '../../../../core/services/modal/layouts/fields-viewer/fields-viewer.element';
-import '../../../../core/services/modal/layouts/fields-viewer/fields-settings.element';
+import './modal-views/fields-viewer.element';
+import './modal-views/fields-settings.element';
 
 interface ExposedSearchResultField {
 	name?: string | null;

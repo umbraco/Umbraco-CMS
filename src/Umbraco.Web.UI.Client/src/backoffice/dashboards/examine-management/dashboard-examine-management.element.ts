@@ -1,4 +1,4 @@
-import { html, LitElement, css } from 'lit';
+import { html, LitElement, css, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { IRoute, IRoutingInfo, path } from 'router-slot';
 
@@ -59,7 +59,7 @@ export class UmbDashboardExamineManagementElement extends UmbContextConsumerMixi
 	render() {
 		return html` ${this.backbutton
 				? html` <a href="/section/settings/dashboard/examine-management/"> &larr; Back to overview </a> `
-				: ``}
+				: nothing}
 			<router-slot @changestate="${this._onRouteChange}" .routes=${this._routes}></router-slot>`;
 	}
 }

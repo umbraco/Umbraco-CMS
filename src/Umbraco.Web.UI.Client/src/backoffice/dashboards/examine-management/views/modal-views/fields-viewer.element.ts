@@ -1,7 +1,7 @@
-import { html, TemplateResult, css } from 'lit';
+import { html, css } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement } from 'lit/decorators.js';
-import { UmbModalLayoutElement } from '../modal-layout.element';
+import { UmbModalLayoutElement } from '@umbraco-cms/services';
 import { SearchResultsModel } from 'src/backoffice/dashboards/examine-management/examine-extension';
 
 @customElement('umb-modal-layout-fields-viewer')

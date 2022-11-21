@@ -1,7 +1,7 @@
 import { html, css } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbModalLayoutElement } from '../modal-layout.element';
+import { UmbModalLayoutElement } from '@umbraco-cms/services';
 
 export interface UmbModalFieldsSettingsData {
 	name: string;
