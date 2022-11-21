@@ -108,7 +108,7 @@ export class UmbPickerLayoutSectionElement extends UmbContextConsumerMixin(
 		return html`
 			<umb-editor-entity-layout headline="Select sections">
 				<uui-box>
-					<uui-input></uui-input>
+					<uui-input label="search"></uui-input>
 					<hr />
 					<div id="item-list">
 						${this._sections.map(

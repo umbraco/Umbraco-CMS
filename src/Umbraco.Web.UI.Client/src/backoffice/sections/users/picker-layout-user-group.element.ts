@@ -120,7 +120,7 @@ export class UmbPickerLayoutUserGroupElement extends UmbContextConsumerMixin(
 		return html`
 			<umb-editor-entity-layout headline="Select user groups">
 				<uui-box>
-					<uui-input></uui-input>
+					<uui-input label="search"></uui-input>
 					<hr />
 					<div id="item-list">
 						${this._userGroups.map(
