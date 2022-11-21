@@ -423,7 +423,7 @@ ng-form.ng-invalid > .umb-block-grid__block:not(.--active) > .umb-block-grid__bl
 }
 .umb-block-grid__block--inline-create-button.--above {
     left: 0;
-    width: 100%;
+    width: var(--umb-block-grid-editor--inline-create-width, 100%);
 
     top: calc(var(--umb-block-grid--row-gap, 0px) * -0.5);
 }
@@ -435,7 +435,7 @@ ng-form.ng-invalid > .umb-block-grid__block:not(.--active) > .umb-block-grid__bl
     /* If at root, and full-width then become 40px wider: */
     --calc: clamp(0, calc(var(--umb-block-grid--item-column-span) - (var(--umb-block-grid--grid-columns)-1)), 1);
     left: calc(-20px * var(--calc));
-    width: calc(100% + 40px * var(--calc));
+    width: calc(var(--umb-block-grid-editor--inline-create-width, 100%) + 40px * var(--calc));
 }
 
 .umb-block-grid__block--inline-create-button.--after {
