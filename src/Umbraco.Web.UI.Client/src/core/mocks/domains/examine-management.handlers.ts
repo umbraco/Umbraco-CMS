@@ -13,7 +13,6 @@ export const handlers = [
 		);
 	}),
 
-	// TODO: when using the umbracoPath helper you have to write parameters like {indexName}. MSW wants parameters as :indexName
 	rest.get(umbracoPath('/search/index/:indexName'), (_req, res, ctx) => {
 		const indexName = _req.params.indexName as string;
 
@@ -27,7 +26,6 @@ export const handlers = [
 		}
 	}),
 
-	// TODO: when using the umbracoPath helper you have to write parameters like {indexName}. MSW wants parameters as :indexName
 	rest.post(umbracoPath('/search/index/:indexName/rebuild'), async (_req, res, ctx) => {
 		await new Promise((resolve) => setTimeout(resolve, (Math.random() + 1) * 1000)); // simulate a delay of 1-2 seconds
 
@@ -52,7 +50,6 @@ export const handlers = [
 		);
 	}),
 
-	// TODO: when using the umbracoPath helper you have to write parameters like {indexName}. MSW wants parameters as :indexName
 	rest.get(umbracoPath('/search/searcher/:searcherName/search'), (_req, res, ctx) => {
 		const query = _req.url.searchParams.get('query');
 		const take = _req.url.searchParams.get('take');
