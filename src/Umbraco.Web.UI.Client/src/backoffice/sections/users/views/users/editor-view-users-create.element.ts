@@ -46,6 +46,10 @@ export class UmbEditorViewUsersCreateElement extends UmbContextConsumerMixin(Umb
 			uui-textarea {
 				--uui-textarea-min-height: 100px;
 			}
+			/* TODO: Style below is to fix a11y contrast issue, find a proper solution */
+			[slot='description'] {
+				color: black;
+			}
 		`,
 	];
 
