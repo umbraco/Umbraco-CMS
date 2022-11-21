@@ -95,7 +95,7 @@ export class UmbDashboardExamineIndexElement extends UmbContextConsumerMixin(Lit
 	private async _getIndexData() {
 		try {
 			const index = await SearchResource.getSearchIndexByIndexName({ indexName: this.indexName });
-			this._indexData = index as Index;
+			this._indexData = index;
 		} catch (e) {
 			if (e instanceof ApiError) {
 				const error = e as ProblemDetails;
