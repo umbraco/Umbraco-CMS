@@ -11,6 +11,7 @@ import { handlers as telemetryHandlers } from './domains/telemetry.handlers';
 import { handlers as treeHandlers } from './domains/entity.handlers';
 
 import { handlers as examineManagementHandlers } from './domains/examine-management.handlers';
+import { handlers as modelsBuilderHandlers } from './domains/modelsbuilder.handlers';
 
 export const handlers = [
 	serverHandlers.serverRunningHandler,
@@ -27,4 +28,5 @@ export const handlers = [
 	...publishedStatusHandlers,
 	...treeHandlers,
 	...examineManagementHandlers,
+	...modelsBuilderHandlers,
 ];
