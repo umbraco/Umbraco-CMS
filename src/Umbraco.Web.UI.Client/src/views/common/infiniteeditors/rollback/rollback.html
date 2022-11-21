@@ -45,9 +45,9 @@
                             <div class="umb-table umb-table--condensed">
 
                                 <div class="umb-table-body">
-                                    <div class="umb-table-row umb-outline"
+                                    <div class="umb-table-row umb-outline -selectable cursor-pointer"
                                         ng-repeat="version in vm.previousVersions track by version.versionId"
-                                        ng-class="{'-selectable cursor-pointer': (vm.canRollback(version)),'-selected': version.versionId === vm.previousVersion.versionId }"
+                                        ng-class="{'-selected': version.versionId === vm.previousVersion.versionId }"
                                         ng-click="vm.changeVersion(version)">
                                         <div class="umb-table-cell dn"></div>
                                         <div class="umb-table-cell black">

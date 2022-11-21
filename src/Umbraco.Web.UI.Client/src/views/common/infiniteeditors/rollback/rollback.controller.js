@@ -12,7 +12,6 @@
         vm.close = close;
         vm.pinVersion = pinVersion;
         vm.goToPage = goToPage;
-        vm.canRollback = canRollback;
         vm.paginationCount = { from: 0, to: 0, total: 0 };
 
         //////////
