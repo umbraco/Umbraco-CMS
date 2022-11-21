@@ -5,7 +5,7 @@ import UmbEditorViewUsersInviteElement from './editor-view-users-invite.element'
 describe('UmbEditorViewUsersInviteElement', () => {
 	let element: UmbEditorViewUsersInviteElement;
 	beforeEach(async () => {
-		element = await fixture(html`<umb-editor-view-users-invite></umb-editor-view-users-invi>`);
+		element = await fixture(html`<umb-editor-view-users-invite></umb-editor-view-users-invite>`);
 	});
 
 	it('is defined with its own instance', () => {

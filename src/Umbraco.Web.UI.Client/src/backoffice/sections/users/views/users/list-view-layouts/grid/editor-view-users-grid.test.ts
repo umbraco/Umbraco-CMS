@@ -1,15 +1,15 @@
 import { expect, fixture, html } from '@open-wc/testing';
 import { defaultA11yConfig } from '@umbraco-cms/test-utils';
-import UmbEditorViewUsersCreateElement from './editor-view-users-create.element';
+import UmbEditorViewUsersGridElement from './editor-view-users-grid.element';
 
 describe('UmbEditorViewUsersCreateElement', () => {
-	let element: UmbEditorViewUsersCreateElement;
+	let element: UmbEditorViewUsersGridElement;
 	beforeEach(async () => {
-		element = await fixture(html`<umb-editor-view-users-create></umb-editor-view-users-create>`);
+		element = await fixture(html`<umb-editor-view-users-grid></umb-editor-view-users-grid>`);
 	});
 
 	it('is defined with its own instance', () => {
-		expect(element).to.be.instanceOf(UmbEditorViewUsersCreateElement);
+		expect(element).to.be.instanceOf(UmbEditorViewUsersGridElement);
 	});
 
 	it('passes the a11y audit', async () => {
