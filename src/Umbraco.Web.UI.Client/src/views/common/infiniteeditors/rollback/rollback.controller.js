@@ -95,6 +95,7 @@
                 vm.loadingDiff = true;
                 const culture = $scope.model.node.variants.length > 1 ? vm.currentVersion.language.culture : null;
 
+                vm.previousVersion = null;
                 contentResource.getRollbackVersion(version.versionId, culture)
                     .then(function(data) {
                         vm.previousVersion = data;
