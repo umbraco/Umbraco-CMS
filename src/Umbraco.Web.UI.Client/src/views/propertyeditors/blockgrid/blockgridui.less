@@ -223,8 +223,8 @@ ng-form.ng-invalid > .umb-block-grid__block:not(.--active) > .umb-block-grid__bl
 
 .umb-block-grid__block--context {
     position: absolute;
-    top: -20px;
-    right: 0;
+    top: -21px;
+    right: -1px;
     font-size: 12px;
     z-index: 4;
     display: var(--umb-block-grid--block-ui-display, flex);
@@ -245,6 +245,9 @@ ng-form.ng-invalid > .umb-block-grid__block:not(.--active) > .umb-block-grid__bl
         padding-top: 1px;
         background-color: #3544B1;
         color: white;
+        border-top: rgba(255, 255, 255, .7) 1px solid;
+        border-left: rgba(255, 255, 255, .7) 1px solid;
+        border-right: rgba(255, 255, 255, .7) 1px solid;
         border-top-left-radius: 3px;
         border-top-right-radius: 3px;
         display: inline-block;
@@ -367,6 +370,7 @@ ng-form.ng-invalid > .umb-block-grid__block:not(.--active) > .umb-block-grid__bl
     padding: 0;
     background-color: white;
     border: @blueDark solid 1px;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, .7);
     opacity: 0;
     transition: opacity 120ms;
 }
