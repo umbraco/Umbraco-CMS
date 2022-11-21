@@ -1,5 +1,6 @@
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0.DataTypes;
 
+[Obsolete("This is not used anymore and will be removed in Umbraco 13")]
 public abstract class PreValueMigratorBase : IPreValueMigrator
 {
     public abstract bool CanMigrate(string editorAlias);

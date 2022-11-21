@@ -1,7 +1,9 @@
 using System.Runtime.Serialization;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
@@ -37,7 +39,8 @@ public class MediaPicker3PropertyEditor : DataEditor
         IDataValueEditorFactory dataValueEditorFactory,
         IIOHelper ioHelper,
         EditorType type = EditorType.PropertyValue)
-        : this(dataValueEditorFactory, ioHelper, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>(), type)
+        : this(dataValueEditorFactory, ioHelper,
+            StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>(), type)
     {
     }
 
@@ -68,6 +71,8 @@ public class MediaPicker3PropertyEditor : DataEditor
     {
         private readonly IDataTypeService _dataTypeService;
         private readonly IJsonSerializer _jsonSerializer;
+        private readonly ITemporaryMediaService _temporaryMediaService;
+
 
         public MediaPicker3PropertyValueEditor(
             ILocalizedTextService localizedTextService,
@@ -75,11 +80,13 @@ public class MediaPicker3PropertyEditor : DataEditor
             IJsonSerializer jsonSerializer,
             IIOHelper ioHelper,
             DataEditorAttribute attribute,
-            IDataTypeService dataTypeService)
+            IDataTypeService dataTypeService,
+            ITemporaryMediaService temporaryMediaService)
             : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
         {
             _jsonSerializer = jsonSerializer;
             _dataTypeService = dataTypeService;
+            _temporaryMediaService = temporaryMediaService;
         }
 
         /// <remarks>
@@ -118,6 +125,11 @@ public class MediaPicker3PropertyEditor : DataEditor
         {
             if (editorValue.Value is JArray dtos)
             {
+                if (editorValue.DataTypeConfiguration is MediaPicker3Configuration configuration)
+                {
+                    dtos = PersistTempMedia(dtos, configuration);
+                }
+
                 // Clean up redundant/default data
                 foreach (JObject? dto in dtos.Values<JObject>())
                 {
@@ -150,7 +162,7 @@ public class MediaPicker3PropertyEditor : DataEditor
                             Key = Guid.NewGuid(),
                             MediaKey = guidUdi.Guid,
                             Crops = Enumerable.Empty<ImageCropperValue.ImageCropperCrop>(),
-                            FocalPoint = new ImageCropperValue.ImageCropperFocalPoint { Left = 0.5m, Top = 0.5m },
+                            FocalPoint = new ImageCropperValue.ImageCropperFocalPoint {Left = 0.5m, Top = 0.5m},
                         };
                     }
                 }
@@ -168,6 +180,49 @@ public class MediaPicker3PropertyEditor : DataEditor
                     }
                 }
             }
+        }
+
+        private JArray PersistTempMedia(JArray jArray, MediaPicker3Configuration mediaPicker3Configuration)
+        {
+            var result = new JArray();
+            foreach (JObject? dto in jArray.Values<JObject>())
+            {
+                if (dto is null)
+                {
+                    continue;
+                }
+
+                if (!dto.TryGetValue("tmpLocation", out JToken? temporaryLocation))
+                {
+                    // If it does not have a temporary path, it can be an already saved image or not-yet uploaded temp-image, check for media-key
+                    if (dto.TryGetValue("mediaKey", out _))
+                    {
+                        result.Add(dto);
+                    }
+
+                    continue;
+                }
+
+                var temporaryLocationString = temporaryLocation.Value<string>();
+                if (temporaryLocationString is null)
+                {
+                    continue;
+                }
+
+                GuidUdi? startNodeGuid = mediaPicker3Configuration.StartNodeId as GuidUdi ?? null;
+                JToken? mediaTypeAlias = dto.GetValue("mediaTypeAlias");
+                IMedia mediaFile = _temporaryMediaService.Save(temporaryLocationString, startNodeGuid?.Guid, mediaTypeAlias?.Value<string>());
+                MediaWithCropsDto? mediaDto = _jsonSerializer.Deserialize<MediaWithCropsDto>(dto.ToString());
+                if (mediaDto is null)
+                {
+                    continue;
+                }
+
+                mediaDto.MediaKey = mediaFile.GetUdi().Guid;
+                result.Add(JObject.Parse(_jsonSerializer.Serialize(mediaDto)));
+            }
+
+            return result;
         }
 
         /// <summary>

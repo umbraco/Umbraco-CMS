@@ -19,7 +19,7 @@ public class QuerySearcherController : SearcherControllerBase
 
     [HttpGet("{searcherName}/query")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(PagedViewModel<PagedViewModel<SearchResultViewModel>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagedViewModel<SearchResultViewModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<PagedViewModel<SearchResultViewModel>>> Query(string searcherName, string? term, int skip, int take)
     {

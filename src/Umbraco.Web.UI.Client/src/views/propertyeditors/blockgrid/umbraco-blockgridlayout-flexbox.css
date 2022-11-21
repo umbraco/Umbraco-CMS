@@ -10,18 +10,6 @@
     --umb-block-grid__layout-item-calc: calc(var(--umb-block-grid--item-column-span) / var(--umb-block-grid--grid-columns));
     width: calc(var(--umb-block-grid__layout-item-calc) * 100%);
 }
-.umb-block-grid__layout-item[data-force-left] {
-    align-self: flex-start;
-}
-.umb-block-grid__layout-item[data-force-left]::before {
-    content: '';
-    flex-basis: 100%;
-    height: 0;
-}
-.umb-block-grid__layout-item[data-force-right] {
-    margin-left: auto;
-    align-self: flex-end;
-}
 
 
 .umb-block-grid__area-container, .umb-block-grid__block--view::part(area-container) {
