@@ -47,7 +47,5 @@ public class ContentVersionMeta
 
     public string? Username { get; }
 
-    public bool HasPendingChanges { get; set; }
-
     public override string ToString() => $"ContentVersionMeta(versionId: {VersionId}, versionDate: {VersionDate:s}";
 }

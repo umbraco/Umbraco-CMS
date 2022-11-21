@@ -13,7 +13,6 @@
         vm.pinVersion = pinVersion;
         vm.goToPage = goToPage;
         vm.canRollback = canRollback;
-        vm.draftVersionHasPendingChanges = false;
         vm.paginationCount = { from: 0, to: 0, total: 0 };
 
         //////////
@@ -76,7 +75,7 @@
         }
 
         function canRollback(version) {
-            return !version.currentDraftVersion && (!version.currentPublishedVersion || vm.draftVersionHasPendingChanges === true);
+            return !version.currentDraftVersion;
         }
 
         function changeVersion(version) {
@@ -103,8 +102,11 @@
                         vm.previousVersion.displayValue = version.displayValue + ' - ' + version.username;
                         createDiff(vm.currentVersion, vm.previousVersion);
 
+                        const changed = (part) => part.added || part.removed;
+                        vm.diffHasChanges = vm.diff.name.some(changed) || vm.diff.properties.some((property) => property.diff.some(changed));
+
                         vm.loadingDiff = false;
-                        vm.rollbackButtonDisabled = false;
+                        vm.rollbackButtonDisabled = !vm.diffHasChanges;
                     }, function () {
                         vm.loadingDiff = false;
                     });
@@ -135,16 +137,9 @@
 
                     // get current backoffice user and format dates
                     userService.getCurrentUser().then(function (currentUser) {
-                        // figure out if the current draft version has pending changes, as this decides whether or not
-                        // the current draft version can be rolled back to the previously published version
-                        const draftVersion = data.items.find(version => version.currentDraftVersion === true);
-                        if(draftVersion) {
-                            vm.draftVersionHasPendingChanges = draftVersion.hasPendingChanges;
-                        }
-
                         vm.previousVersions = data.items
                             // we don't ever want to show the draft version in the rollback list
-                            .filter(version => version !== draftVersion)
+                            .filter(version => version.currentDraftVersion === false)
                             .map(version => {
                                 var timestampFormatted = dateHelper.getLocalDate(version.versionDate, currentUser.locale, 'LLL');
                                 version.displayValue = timestampFormatted;
@@ -187,7 +182,7 @@
                         // copy existing properties, so it doesn't manipulate existing properties on page
                         oldProperty = Utilities.copy(oldProperty);
                         property = Utilities.copy(property);
-                        
+
                         // we have to make properties storing values as object into strings (Grid, nested content, etc.)
                         if (property.value instanceof Object) {
                             property.value = JSON.stringify(property.value, null, 1);
@@ -202,14 +197,14 @@
                         // diff requires a string
                         property.value = property.value ? property.value + '' : '';
                         oldProperty.value = oldProperty.value ? oldProperty.value + '' : '';
-                        
+
                         const diffProperty = {
                             'alias': property.alias,
                             'label': property.label,
                             'diff': property.isObject ? Diff.diffJson(property.value, oldProperty.value) : Diff.diffWords(property.value, oldProperty.value),
                             'isObject': property.isObject || oldProperty.isObject
                         };
-                        
+
                         vm.diff.properties.push(diffProperty);
                     }
                 });

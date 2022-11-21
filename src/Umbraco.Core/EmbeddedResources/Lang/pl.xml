@@ -881,7 +881,6 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
     <key alias="reset">Resetuj</key>
   </area>
   <area alias="rollback">
-    <key alias="currentVersion">Aktualna wersja</key>
     <key alias="diffHelp"><![CDATA[Tu pokazane są różnice pomiędzy bieżącą oraz wybraną wersją <br/><del>Czerwony</del> tekst nie będzie pokazany w wybranej wersji, <ins>zielony tekst został dodany</ins>]]></key>
     <key alias="documentRolledBack">Dokument został przywrócony</key>
     <key alias="htmlHelp">Tu widać wybraną wersję jako html, jeżeli chcesz zobaczyć różnicę pomiędzy 2 wersjami w tym samym czasie, użyj podglądu różnic</key>
