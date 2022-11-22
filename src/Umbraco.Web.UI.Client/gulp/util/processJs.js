@@ -22,7 +22,8 @@ module.exports = function (files, out) {
 
     // check for js errors
     task = task.pipe(eslint({
-      warnFileIgnored: true
+      warnFileIgnored: true,
+      quiet: true
     }));
     // outputs the lint results to the console
     task = task.pipe(eslint.format());
