@@ -2,7 +2,7 @@
 <language alias="de" intName="German (DE)" localName="Deutsch (DE)" lcid="7" culture="de-DE">
   <creator>
     <name>The Umbraco community</name>
-    <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
+    <link>https://docs.umbraco.com/umbraco-cms/extending/language-files</link>
   </creator>
   <area alias="actions">
     <key alias="assigndomain">Kulturen und Hostnamen</key>
@@ -271,7 +271,7 @@
     <key alias="scheduledPublishServerTime">Dies führt zur folgenden Zeit auf dem Server:</key>
     <key alias="scheduledPublishDocumentation">
       <![CDATA[
-    	<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank" rel="noopener">Was bedeutet dies?</a>
+    	<a href="https://docs.umbraco.com/umbraco-cms/fundamentals/data/scheduled-publishing#timezones" target="_blank" rel="noopener">Was bedeutet dies?</a>
     ]]>
     </key>
     <key alias="nestedContentDeleteItem">Wollen Sie dieses Element wirklich entfernen?</key>
