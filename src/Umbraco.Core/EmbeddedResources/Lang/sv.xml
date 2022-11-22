@@ -2,7 +2,7 @@
 <language alias="sv" intName="Swedish" localName="Svenska" lcid="29" culture="sv-SE">
   <creator>
     <name>The Umbraco community</name>
-    <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
+    <link>https://docs.umbraco.com/umbraco-cms/extending/language-files</link>
   </creator>
   <area alias="apps">
     <key alias="umbContent">Innehåll</key>

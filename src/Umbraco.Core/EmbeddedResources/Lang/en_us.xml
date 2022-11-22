@@ -2,7 +2,7 @@
 <language alias="en_us" intName="English (US)" localName="English (US)" lcid="" culture="en-US">
   <creator>
     <name>The Umbraco community</name>
-    <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
+    <link>https://docs.umbraco.com/umbraco-cms/extending/language-files</link>
   </creator>
   <area alias="actions">
     <key alias="assigndomain">Culture and Hostnames</key>
@@ -277,7 +277,7 @@
     <key alias="target" version="7.0">Target</key>
     <key alias="scheduledPublishServerTime">This translates to the following time on the server:</key>
     <key alias="scheduledPublishDocumentation">
-      <![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank" rel="noopener">What does this mean?</a>]]></key>
+      <![CDATA[<a href="https://docs.umbraco.com/umbraco-cms/fundamentals/data/scheduled-publishing#timezones" target="_blank" rel="noopener">What does this mean?</a>]]></key>
     <key alias="nestedContentDeleteItem">Are you sure you want to delete this item?</key>
     <key alias="nestedContentDeleteAllItems">Are you sure you want to delete all items?</key>
     <key alias="nestedContentEditorNotSupported">Property %0% uses editor %1% which is not supported by Nested
@@ -2479,7 +2479,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="helpText">
       <![CDATA[
         <p>The health checker evaluates various areas of your site for best practice settings, configuration, potential problems, etc. You can easily fix problems by pressing a button.
-        You can add your own health checks, have a look at <a href="https://our.umbraco.com/documentation/Extending/Healthcheck/" target="_blank" rel="noopener" class="btn-link -underline">the documentation for more information</a> about custom health checks.</p>
+        You can add your own health checks, have a look at <a href="https://docs.umbraco.com/umbraco-cms/extending/health-check" target="_blank" rel="noopener" class="btn-link -underline">the documentation for more information</a> about custom health checks.</p>
         ]]>
     </key>
   </area>
@@ -2768,7 +2768,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="more">Find out more</key>
     <key alias="bulletPointOne">
       <![CDATA[
-            Read more about working with the items in Settings <a class="btn-link -underline" href="https://our.umbraco.com/documentation/Getting-Started/Backoffice/Sections/" target="_blank" rel="noopener">in the Documentation section</a> of Our Umbraco
+            Read more about working with the items in Settings <a class="btn-link -underline" href="https://docs.umbraco.com/umbraco-cms/fundamentals/backoffice/sections/" target="_blank" rel="noopener">in the Documentation section</a> of Our Umbraco
         ]]>
     </key>
     <key alias="bulletPointTwo">
