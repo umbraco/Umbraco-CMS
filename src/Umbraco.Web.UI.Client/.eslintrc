@@ -22,7 +22,9 @@
             "rules": {
                 "no-extra-semi": "off",
                 "no-mixed-spaces-and-tabs": "off",
-                "no-unused-vars": "warn",
+                "no-unused-vars": "off",
+                "no-control-regex": "off",
+                "no-self-assign": "warn",
                 "no-useless-escape": "warn",
                 "no-extra-boolean-cast": "warn",
                 "no-prototype-builtins": "warn"
@@ -43,7 +45,15 @@
                 "ActiveXObject": "readonly",
                 "Bloodhound": "readonly",
                 "Diff": "readonly",
-                "moment": "readonly"
+                "moment": "readonly",
+                "signalR": "readonly",
+                "Markdown": "readonly",
+                "Sortable": "readonly",
+                "noUiSlider": "readonly",
+                "ClipboardJS": "readonly",
+                "anime": "readonly",
+                "flatpickr": "readonly",
+                "FlatpickrInstance": "readonly"
             }
         }
     ]
