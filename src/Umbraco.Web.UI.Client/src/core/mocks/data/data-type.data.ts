@@ -6,7 +6,7 @@ export interface DataTypeEntity extends Entity {
 }
 
 export interface DataTypeDetails extends DataTypeEntity {
-	propertyEditorAlias: string | null;
+	propertyEditorModelAlias: string | null;
 	propertyEditorUIAlias: string | null;
 	data: Array<DataTypePropertyData>;
 }
@@ -25,7 +25,7 @@ export const data: Array<DataTypeDetails> = [
 		isTrashed: false,
 		hasChildren: false,
 		icon: 'umb:autofill',
-		propertyEditorAlias: 'Umbraco.TextBox',
+		propertyEditorModelAlias: 'Umbraco.TextBox',
 		propertyEditorUIAlias: 'Umb.PropertyEditorUI.TextBox',
 		data: [
 			{
@@ -42,7 +42,7 @@ export const data: Array<DataTypeDetails> = [
 		isTrashed: false,
 		hasChildren: false,
 		icon: 'umb:autofill',
-		propertyEditorAlias: 'Umbraco.TextArea',
+		propertyEditorModelAlias: 'Umbraco.TextArea',
 		propertyEditorUIAlias: 'Umb.PropertyEditorUI.Textarea',
 		data: [
 			{
@@ -63,7 +63,7 @@ export const data: Array<DataTypeDetails> = [
 		isTrashed: false,
 		hasChildren: false,
 		icon: 'umb:autofill',
-		propertyEditorAlias: 'Umbraco.Custom',
+		propertyEditorModelAlias: 'Umbraco.Custom',
 		propertyEditorUIAlias: 'My.PropertyEditorUI.Custom',
 		data: [],
 	},
@@ -75,7 +75,7 @@ export const data: Array<DataTypeDetails> = [
 		isTrashed: false,
 		hasChildren: false,
 		icon: 'umb:autofill',
-		propertyEditorAlias: 'Umbraco.ContentPicker',
+		propertyEditorModelAlias: 'Umbraco.ContentPicker',
 		propertyEditorUIAlias: 'Umb.PropertyEditorUI.ContentPicker',
 		data: [],
 	},
@@ -87,7 +87,7 @@ export const data: Array<DataTypeDetails> = [
 		isTrashed: false,
 		hasChildren: false,
 		icon: 'umb:autofill',
-		propertyEditorAlias: '',
+		propertyEditorModelAlias: '',
 		propertyEditorUIAlias: '',
 		data: [],
 	},

@@ -31,7 +31,7 @@ export const handlers = [
 		);
 	}),
 
-	rest.get(umbracoPath('/published-cache/collect'), (_req, res, ctx) => {
+	rest.post(umbracoPath('/published-cache/collect'), (_req, res, ctx) => {
 		return res(
 			// Respond with a 200 status code
 			ctx.status(200)

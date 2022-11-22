@@ -1,8 +1,7 @@
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
-
-import type { UmbracoUpgrader } from '@umbraco-cms/models';
+import { UpgradeSettings } from '@umbraco-cms/backend-api';
 
 /**
  * @element umb-upgrader-view
@@ -33,7 +32,7 @@ export class UmbUpgraderView extends LitElement {
 	errorMessage = '';
 
 	@property({ type: Object, reflect: true })
-	settings?: UmbracoUpgrader;
+	settings?: UpgradeSettings;
 
 	private _renderLayout() {
 		return html`

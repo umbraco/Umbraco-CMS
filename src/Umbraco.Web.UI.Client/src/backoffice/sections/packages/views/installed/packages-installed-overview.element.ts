@@ -1,15 +1,13 @@
 import { html, LitElement, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
-import { getPackagesInstalled } from '@umbraco-cms/backend-api';
-import type { PackageInstalled } from '@umbraco-cms/models';
 
 import './packages-installed-item.element';
 
 @customElement('umb-packages-installed-overview')
 export class UmbPackagesInstalledOverviewElement extends LitElement {
 	@state()
-	private _installedPackages: PackageInstalled[] = [];
+	private _installedPackages: any[] = []; // TODO: Use real type
 
 	@state()
 	private _errorMessage = '';
@@ -24,17 +22,18 @@ export class UmbPackagesInstalledOverviewElement extends LitElement {
 	private async _loadInstalledPackages() {
 		this._errorMessage = '';
 
-		try {
-			const {
-				data: { packages },
-			} = await getPackagesInstalled({});
-			this._installedPackages = packages;
-		} catch (e) {
-			if (e instanceof getPackagesInstalled.Error) {
-				const error = e.getActualType();
-				this._errorMessage = error.data.detail ?? 'An error occurred while loading the installed packages';
-			}
-		}
+		// TODO: Implement when API is ready
+		// try {
+		// 	const {
+		// 		data: { packages },
+		// 	} = await getPackagesInstalled({});
+		// 	this._installedPackages = packages;
+		// } catch (e) {
+		// 	if (e instanceof getPackagesInstalled.Error) {
+		// 		const error = e.getActualType();
+		// 		this._errorMessage = error.data.detail ?? 'An error occurred while loading the installed packages';
+		// 	}
+		// }
 	}
 
 	render() {
