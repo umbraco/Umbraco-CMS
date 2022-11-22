@@ -75,5 +75,9 @@ internal class UmbracoCmsSchema
         public InstallDefaultDataSettings DefaultDataCreation { get; set; } = null!;
 
         public DataTypesSettings DataTypes { get; set; } = null!;
+
+        public LicensesSettings Licenses { get; set; } = null!;
+
+        public MarketplaceSettings Marketplace { get; set; } = null!;
     }
 }

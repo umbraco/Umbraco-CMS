@@ -241,7 +241,6 @@
                 infiniteMode: true,
                 noTemplate: true,
                 isElement: true,
-                noTemplate: true,
                 submit: function (model) {
                     loadElementTypes().then( function () {
                         callback(model.documentTypeKey);
@@ -288,7 +287,7 @@
                         title: data,
                         openAreas: openAreas,
                         view: "views/propertyeditors/blockgrid/prevalue/blockgrid.blockconfiguration.overlay.html",
-                        size: "large",
+                        size: "medium",
                         submit: function(overlayModel) {
                             loadElementTypes()// lets load elementType again, to ensure we are up to date.
                             TransferProperties(overlayModel.block, block);// transfer properties back to block object. (Doing this cause we dont know if block object is added to model jet, therefor we cant use index or replace the object.)

@@ -1,28 +1,5 @@
 .umb-block-grid-block-configuration-overlay {
 
-    .umb-block-grid-block-configuration-layout {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        
-        grid-gap: 0 20px;
-        grid-auto-flow: row;
-        grid-auto-rows: minmax(50px, auto);
-
-        
-    }
-      
-
-    .umb-block-grid-block-configuration__umb-group-panel {
-        @media (max-width: 1024px) {
-            grid-column: span 2;
-        }
-        &.--span-two-cols {
-            grid-column: span 2;
-        }
-        &.--span-two-rows {
-            grid-row: span 2;
-        }
-    }
 
     .umb-node-preview {
         flex-grow: 1;
