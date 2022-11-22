@@ -8,24 +8,24 @@ using Umbraco.Cms.ManagementApi.ViewModels.Pagination;
 using Umbraco.Cms.ManagementApi.ViewModels.Search;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.ManagementApi.Controllers.Search;
+namespace Umbraco.Cms.ManagementApi.Controllers.Searcher;
 
 [ApiVersion("1.0")]
-public class SearcherSearchSearchController : SearchControllerBase
+public class QuerySearcherController : SearcherControllerBase
 {
     private readonly IExamineManagerService _examineManagerService;
 
-    public SearcherSearchSearchController(IExamineManagerService examineManagerService) => _examineManagerService = examineManagerService;
+    public QuerySearcherController(IExamineManagerService examineManagerService) => _examineManagerService = examineManagerService;
 
-    [HttpGet("searcher/{searcherName}/search")]
+    [HttpGet("{searcherName}/query")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<SearchResultViewModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<PagedViewModel<SearchResultViewModel>>> GetSearchResults(string searcherName, string? query, int skip, int take)
+    public async Task<ActionResult<PagedViewModel<SearchResultViewModel>>> Query(string searcherName, string? term, int skip, int take)
     {
-        query = query?.Trim();
+        term = term?.Trim();
 
-        if (query.IsNullOrWhiteSpace())
+        if (term.IsNullOrWhiteSpace())
         {
             return new PagedViewModel<SearchResultViewModel>();
         }
@@ -50,7 +50,7 @@ public class SearcherSearchSearchController : SearchControllerBase
         {
             results = searcher
                 .CreateQuery()
-                .NativeQuery(query)
+                .NativeQuery(term)
                 .Execute(QueryOptions.SkipTake(skip, take));
         }
         catch (ParseException)
