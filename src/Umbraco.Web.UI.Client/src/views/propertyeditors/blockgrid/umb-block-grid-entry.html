@@ -1,7 +1,7 @@
 <uui-button-inline-create
     ng-if="!vm.blockEditorApi.readonly && !vm.hideInlineCreateAbove"
     class="umb-block-grid__block--inline-create-button --above"
-    style="width: {{vm.inlineCreateAboveWidth}};"
+    style="--umb-block-grid-editor--inline-create-width: {{vm.inlineCreateAboveWidth}};"
     ng-class="{'--at-root': vm.depth === '0'}"
     ng-click="vm.clickInlineCreateAbove()"
     ng-mouseover="vm.mouseOverInlineCreate()"

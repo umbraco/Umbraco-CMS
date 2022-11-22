@@ -71,7 +71,11 @@
         min-height: 48px;
         height: auto;
     }
-    
+
+    .blockelement-gridinlineblock-editor > slot {
+        --umb-block-grid--inline-editor--pointer-events--condition: var(--umb-block-grid--dragging-mode) none;
+        pointer-events: var(--umb-block-grid--inline-editor--pointer-events--condition, auto);
+    }
 
 </style>
 
@@ -100,6 +104,6 @@
 
     <slot name="{{vm.propertySlotName}}"></slot>
 
-    <umb-block-grid-render-area-slots></umb-block-grid-render-area-slots>
+    <umb-block-grid-render-area-slots ng-if="block.layout.areas.length > 0"></umb-block-grid-render-area-slots>
 
 </div>
