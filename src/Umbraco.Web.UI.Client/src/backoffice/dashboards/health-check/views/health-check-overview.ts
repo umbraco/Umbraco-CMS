@@ -18,16 +18,12 @@ export class UmbDashboardHealthCheckOverviewElement extends UmbContextConsumerMi
 			}
 
 			.group-wrapper {
-				display: flex;
-				flex-wrap: wrap;
-				margin-inline: -5px;
+				display: grid;
+				gap: var(--uui-size-space-4);
+				grid-template-columns: repeat(auto-fit, minmax(250px, auto));
 			}
 
 			a {
-				flex-basis: 20%;
-				min-width: 150px;
-				max-width: calc(20% - 10px);
-				margin: 5px;
 				text-align: center;
 				font-weight: bold;
 				cursor: pointer;
