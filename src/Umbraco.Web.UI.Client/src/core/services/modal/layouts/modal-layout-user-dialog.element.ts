@@ -3,8 +3,8 @@ import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { UmbModalHandler } from '@umbraco-cms/services';
 
-@customElement('umb-modal-layout-user-settings')
-export class UmbModalLayoutUserSettingsElement extends LitElement {
+@customElement('umb-modal-layout-user-dialog')
+export class UmbModalLayoutUserDialogElement extends LitElement {
 	static styles: CSSResultGroup = [
 		UUITextStyles,
 		css`
@@ -57,6 +57,6 @@ export class UmbModalLayoutUserSettingsElement extends LitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-modal-layout-user-settings': UmbModalLayoutUserSettingsElement;
+		'umb-modal-layout-user-dialog': UmbModalLayoutUserDialogElement;
 	}
 }
