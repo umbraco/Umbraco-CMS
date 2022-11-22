@@ -2,7 +2,7 @@
 var config = require('../config');
 var gulp = require('gulp');
 
-var eslint = require('gulp-eslint');
+var eslint = require('gulp-eslint-new');
 var babel = require("gulp-babel");
 var sort = require('gulp-sort');
 var concat = require('gulp-concat');
@@ -21,7 +21,9 @@ module.exports = function (files, out) {
     var task = gulp.src(files);
 
     // check for js errors
-    task = task.pipe(eslint());
+    task = task.pipe(eslint({
+      warnFileIgnored: true
+    }));
     // outputs the lint results to the console
     task = task.pipe(eslint.format());
 
