@@ -139,7 +139,7 @@
             createFlow: false
         };
         vm.sortMode = false;
-        vm.sortModeView = DefaultViewFolderPath + "gridsortblock/gridsortblock.editor.html";;
+        vm.sortModeView = DefaultViewFolderPath + "gridsortblock/gridsortblock.editor.html";
 
         localizationService.localizeMany(["grid_addElement", "content_createEmpty", "blockEditor_addThis"]).then(function (data) {
             vm.labels.grid_addElement = data[0];
@@ -266,13 +266,13 @@
             // Create Model Object, to manage our data for this Block Editor.
             modelObject = blockEditorService.createModelObject(vm.model.value, vm.model.editor, vm.model.config.blocks, scopeOfExistence, $scope);
 
-            $q.all([modelObject.load(), assetsService.loadJs('lib/sortablejs/Sortable.min.js', $scope)]).then(onLoaded);
+            modelObject.load().then(onLoaded);
 
         };
 
         // Called when we save the value, the server may return an updated data and our value is re-synced
         // we need to deal with that here so that our model values are all in sync so we basically re-initialize.
-        function onServerValueChanged(newVal, oldVal) {
+        function onServerValueChanged(newVal) {
 
             // We need to ensure that the property model value is an object, this is needed for modelObject to receive a reference and keep that updated.
             if (typeof newVal !== 'object' || newVal === null) {// testing if we have null or undefined value or if the value is set to another type than Object.
@@ -757,7 +757,7 @@
         function deleteAllBlocks() {
             while(vm.layout.length) {
                 deleteBlock(vm.layout[0].$block);
-            };
+            }
         }
 
         function activateBlock(blockObject) {
@@ -777,8 +777,8 @@
             */
 
             var wasNotActiveBefore = blockObject.active !== true;
-
-	        // don't open the editor overlay if block has hidden its content editor in overlays and we are requesting to open content, not settings.
+            
+            // don't open the editor overlay if block has hidden its content editor in overlays and we are requesting to open content, not settings.
             if (openSettings !== true && blockObject.hideContentInOverlay === true) {
                 return;
             }
@@ -994,7 +994,7 @@
             // open block picker overlay
             editorService.open(blockPickerModel);
 
-        };
+        }
         function userFlowWhenBlockWasCreated(parentBlock, areaKey, createIndex) {
             var blockObject;
             
@@ -1127,7 +1127,7 @@
             localizationService.localize("clipboard_labelForArrayOfItemsFrom", [vm.model.label, contentNodeName]).then(function (localizedLabel) {
                 clipboardService.copyArray(clipboardService.TYPES.BLOCK, aliases, elementTypesToCopy, localizedLabel, contentNodeIcon || "icon-thumbnail-list", vm.model.id);
             });
-        };
+        }
 
         function gatherNestedBlocks(block) {
             const nested = [];
@@ -1349,14 +1349,14 @@
         vm.startDraggingMode = startDraggingMode;
         function startDraggingMode() {
 
-            document.documentElement.style.setProperty("--umb-block-grid--dragging-mode", 1);
+            document.documentElement.style.setProperty("--umb-block-grid--dragging-mode", ' ');
             firstLayoutContainer.style.minHeight = firstLayoutContainer.getBoundingClientRect().height + "px";
             
         }
         vm.exitDraggingMode = exitDraggingMode;
         function exitDraggingMode() {
 
-            document.documentElement.style.setProperty("--umb-block-grid--dragging-mode", 0);
+            document.documentElement.style.setProperty("--umb-block-grid--dragging-mode", 'initial');
             firstLayoutContainer.style.minHeight = "";
             
         }

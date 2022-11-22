@@ -25,9 +25,7 @@
             }
         });
 
-    function BlockGridColumnController($scope) {
-
-        //var unsubscribe = [];
+    function BlockGridColumnController() {
 
         var vm = this;
 
@@ -57,12 +55,6 @@
                 vm.propertyForm.$setDirty();
             }
         }
-        
-        /*$scope.$on("$destroy", function () {
-            for (const subscription of unsubscribe) {
-                subscription();
-            }
-        });*/
         
     }
 

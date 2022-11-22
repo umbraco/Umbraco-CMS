@@ -2801,7 +2801,6 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="areaCreateLabelTitle">Create Button Label</key>
     <key alias="areaCreateLabelHelp">Overwrite the label on the create button of this Area.</key>
     <key alias="showSizeOptions">Show resize options</key>
-    <key alias="showAppearanceOptions">Show catalogue appearance</key>
     <key alias="addBlockType">Add Block</key>
     <key alias="addBlockGroup">Add group</key>
     <key alias="pickSpecificAllowance">Pick group or Block</key>
@@ -2819,6 +2818,9 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="actionEnterSortMode">Sort mode</key>
     <key alias="actionExitSortMode">End sort mode</key>
     <key alias="areaAliasIsNotUnique">This Areas Alias must be unique compared to the other Areas of this Block.</key>
+    <key alias="configureArea">Configure area</key>
+    <key alias="deleteArea">Delete area</key>
+    <key alias="addColumnSpanOption">Add spanning %0% columns option</key>
   </area>
   <area alias="contentTemplatesDashboard">
     <key alias="whatHeadline">What are Content Templates?</key>
