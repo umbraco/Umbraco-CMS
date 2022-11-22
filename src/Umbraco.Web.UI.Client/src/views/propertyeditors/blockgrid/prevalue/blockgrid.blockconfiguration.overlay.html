@@ -327,12 +327,8 @@
 
                         <div class="umb-group-panel__content">
 
-                            <button ng-if="!vm.showAppearanceOptions" type="button" class="btn-reset __settings-input --noValue umb-outline" style="height: 80px;" ng-click="vm.showAppearanceOptions = true">
-                                <localize key="blockEditor_showAppearanceOptions">Show catalogue appearance</localize>
-                            </button>
-
                             <!-- backgroundColor -->
-                            <div ng-if="vm.showAppearanceOptions" class="control-group umb-control-group -no-border">
+                            <div class="control-group umb-control-group -no-border">
                                 <div class="umb-el-wrap">
                                     <label class="control-label" for="backgroundColor"><localize key="blockEditor_labelBackgroundColor">Background Color</localize></label>
                                     <div class="controls">
@@ -346,7 +342,7 @@
                             </div>
 
                             <!-- iconColor -->
-                            <div ng-if="vm.showAppearanceOptions" class="control-group umb-control-group -no-border">
+                            <div class="control-group umb-control-group -no-border">
                                 <div class="umb-el-wrap">
                                     <label class="control-label" for="iconColor"><localize key="blockEditor_labelIconColor">Icon Color</localize></label>
                                     <div class="controls">
@@ -360,7 +356,7 @@
                             </div>
 
                             <!-- thumbnail -->
-                            <div ng-if="vm.showAppearanceOptions" class="control-group umb-control-group -no-border">
+                            <div class="control-group umb-control-group -no-border">
                                 <div class="umb-el-wrap">
                                     <label class="control-label" for="iconcolor"><localize key="blockEditor_thumbnail">Thumbnail</localize></label>
                                     <div class="controls">

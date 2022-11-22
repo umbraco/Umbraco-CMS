@@ -2902,7 +2902,6 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="areaCreateLabelTitle">Create Button Label</key>
     <key alias="areaCreateLabelHelp">Overwrite the label on the create button of this Area.</key>
     <key alias="showSizeOptions">Show resize options</key>
-    <key alias="showAppearanceOptions">Show catalogue appearance</key>
     <key alias="addBlockType">Add Block</key>
     <key alias="addBlockGroup">Add group</key>
     <key alias="pickSpecificAllowance">Pick group or Block</key>
