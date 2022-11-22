@@ -22,16 +22,18 @@ module.exports = function (files, out) {
 
     // check for js errors
     task = task.pipe(eslint({
-      warnFileIgnored: true,
+      warnIgnored: true,
       quiet: true
     }));
     // outputs the lint results to the console
     task = task.pipe(eslint.format());
+    // fail after all errors have been discovered
+    task = task.pipe(eslint.failAfterError());
 
     // sort files in stream by path or any custom sort comparator
     task = task.pipe(babel())
         .pipe(sort());
-    
+
     //in production, embed the templates
     if(config.compile.current.embedtemplates === true) {
         task = task.pipe(embedTemplates({ basePath: "./src/", minimize: { loose: true } }));
