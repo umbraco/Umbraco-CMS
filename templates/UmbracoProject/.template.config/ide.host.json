@@ -13,19 +13,18 @@
     },
     {
       "id": "UseHttpsRedirect",
-      "isVisible": true
-    },
-    {
-      "id": "SkipRestore",
-      "isVisible": true
+      "isVisible": true,
+      "persistenceScope": "templateGroup"
     },
     {
       "id": "ExcludeGitignore",
-      "isVisible": true
+      "isVisible": true,
+      "persistenceScope": "templateGroup"
     },
     {
       "id": "MinimalGitignore",
-      "isVisible": true
+      "isVisible": true,
+      "persistenceScope": "templateGroup"
     },
     {
       "id": "ConnectionString",
@@ -37,7 +36,8 @@
     },
     {
       "id": "DevelopmentDatabaseType",
-      "isVisible": true
+      "isVisible": true,
+      "persistenceScope": "templateGroup"
     },
     {
       "id": "UnattendedUserName",
@@ -53,10 +53,6 @@
     },
     {
       "id": "NoNodesViewPath",
-      "isVisible": true
-    },
-    {
-      "id": "PackageProjectName",
       "isVisible": true
     }
   ]
