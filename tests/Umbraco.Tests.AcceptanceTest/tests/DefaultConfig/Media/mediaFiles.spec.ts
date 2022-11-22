@@ -3,7 +3,8 @@ import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 
 test.describe('media File Types', () => {
 
-    test.beforeEach(async ({page, umbracoApi, umbracoUi}) => {
+    test.beforeEach(async ({page, umbracoApi, umbracoUi}, testInfo) => {
+        await umbracoApi.report.report(testInfo);
         await umbracoApi.login();
         await umbracoUi.goToSection(ConstantHelper.sections.media);
         await umbracoApi.media.deleteAllMedia();

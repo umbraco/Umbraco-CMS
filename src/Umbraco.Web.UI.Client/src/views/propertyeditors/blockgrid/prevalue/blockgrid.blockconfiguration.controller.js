@@ -38,12 +38,12 @@
         "groupKey": null
     };
 
-
     function BlockConfigurationController($scope, $element, $http, elementTypeResource, overlayService, localizationService, editorService, eventsService, udiService, dataTypeResource, umbRequestHelper) {
 
         var unsubscribe = [];
-
-        var vm = this;
+        
+        const vm = this;
+        
         vm.openBlock = null;
         vm.showSampleDataCTA = false;
 
@@ -57,6 +57,7 @@
             if (blockGroupModel.value == null) {
                 blockGroupModel.value = [];
             }
+            
             vm.blockGroups = blockGroupModel.value;
 
             if (!$scope.model.value) {
@@ -72,12 +73,10 @@
             });
 
             loadElementTypes();
-
         }
 
-
         function loadElementTypes() {
-            return elementTypeResource.getAll().then(function (elementTypes) {
+            return elementTypeResource.getAll().then(elementTypes => {
                 vm.elementTypes = elementTypes;
             });
         }
@@ -90,6 +89,7 @@
                 }
             }
         }
+        
         unsubscribe.push(eventsService.on("editors.documentType.saved", updateUsedElementTypes));
 
         function removeReferencesToElementTypeKey(contentElementTypeKey) {
@@ -134,25 +134,27 @@
 
         vm.removeBlockByIndex = function (index) {
             const blockType = $scope.model.value[index];
-            if(blockType) {
+            if (blockType) {
                 $scope.model.value.splice(index, 1);
                 removeReferencesToElementTypeKey(blockType.contentElementTypeKey);
             }
         };
 
         const defaultOptions = {
-            axis: '',
             tolerance: "pointer",
             opacity: 0.7,
             scroll: true
         };
+
         vm.groupSortableOptions = {
-            ...defaultOptions, 
+            ...defaultOptions,
+            axis: 'y',
             handle: '.__handle',
             items: ".umb-block-card-group",
             cursor: "grabbing",
             placeholder: 'umb-block-card-group --sortable-placeholder'
         };
+
         vm.blockSortableOptions = {
             ...defaultOptions, 
             "ui-floating": true,
@@ -169,7 +171,6 @@
                 }
             }
         };
-
 
         vm.getAvailableElementTypes = function () {
             return vm.elementTypes.filter(function (type) {
@@ -201,18 +202,18 @@
                         if (node.metaData.isElement === true) {
                             var key = udiService.getKey(node.udi);
                             // If a Block with this ElementType as content already exists, we will emit it as a possible option.
-                            return $scope.model.value.find(function (entry) {
+                            return $scope.model.value.find(function(entry) {
                                 return key === entry.contentElementTypeKey;
                             });
                         }
                         return true;
                     },
                     filterCssClass: "not-allowed",
-                    select: function (node) {
+                    select: function(node) {
                         vm.addBlockFromElementTypeKey(udiService.getKey(node.udi), groupKey);
                         editorService.close();
                     },
-                    close: function () {
+                    close: function() {
                         editorService.close();
                     },
                     extraActions: [
@@ -242,13 +243,13 @@
                 noTemplate: true,
                 isElement: true,
                 noTemplate: true,
-                submit: function (model) {
-                    loadElementTypes().then( function () {
+                submit: function(model) {
+                    loadElementTypes().then(function() {
                         callback(model.documentTypeKey);
                     });
                     editorService.close();
                 },
-                close: function () {
+                close: function() {
                     editorService.close();
                 }
             };
@@ -262,24 +263,19 @@
             $scope.model.value.push(blockType);
 
             vm.openBlockOverlay(blockType);
-
         };
-
-
-
-
 
         vm.openBlockOverlay = function (block, openAreas) {
 
             var elementType = vm.getElementTypeByKey(block.contentElementTypeKey);
-
-            if(elementType) {
+            
+            if (elementType) {
                 localizationService.localize("blockEditor_blockConfigurationOverlayTitle", [elementType.name]).then(function (data) {
 
                     var clonedBlockData = Utilities.copy(block);
                     vm.openBlock = block;
 
-                    var overlayModel = {
+                    const overlayModel = {
                         block: clonedBlockData,
                         allBlockTypes: $scope.model.value,
                         allBlockGroups: vm.blockGroups,
@@ -306,14 +302,24 @@
 
                 });
             } else {
-                alert("Cannot be edited cause ElementType does not exist.");
+
+              const overlay = {
+                close: () => {
+                  overlayService.close()
+                }
+              };
+
+              localizationService.localize("blockEditor_elementTypeDoesNotExist").then(data => {
+                overlay.content = data;
+                overlayService.open(overlay);
+              });
             }
 
         };
 
 
         vm.requestRemoveGroup = function(blockGroup) {
-            if(blockGroup.key) {
+            if (blockGroup.key) {
                 localizationService.localizeMany(["general_delete", "blockEditor_confirmDeleteBlockGroupMessage", "blockEditor_confirmDeleteBlockGroupNotice"]).then(function (data) {
                     overlayService.confirmDelete({
                         title: data[0],
@@ -355,10 +361,8 @@
             }
         }
 
-
-
         dataTypeResource.getAll().then(function(dataTypes) {
-            if(dataTypes.filter(x => x.alias === "Umbraco.BlockGrid").length === 0) {
+            if (dataTypes.filter(x => x.alias === "Umbraco.BlockGrid").length === 0) {
                 vm.showSampleDataCTA = true;
             }
         });

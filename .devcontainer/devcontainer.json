@@ -25,21 +25,22 @@
 		// Allowing the Github CLI `gh codespace ssh` to work
 		"ghcr.io/devcontainers/features/sshd:1": {
 			"version": "latest"
-		}
+		},
+
+		// Adds SQLite feature from apt install
+		// Also adds the SQLite VSCode extension
+		"ghcr.io/warrenbuckley/sqlite-codespace-feature/sqlite:1": {}
 	},
 
 	// Add the IDs of extensions you want installed when the container is created.
 	"extensions": [
-		"ms-dotnettools.csharp",
-		"alexcvzz.vscode-sqlite"
+		"ms-dotnettools.csharp"
 	],
-
-	// Use 'forwardPorts' to make a list of ports inside the container available locallAdd	"forwardPorts": [9000, 5000, 25],
-
 	
 	// This is used in the prebuilds - so dotnet build (nuget restore and node stuff) is done
-	"updateContentCommand": "dotnet build umbraco.sln && dotnet dev-certs https --trust  && sudo apt-get update && sudo apt install sqlite3",
+	"updateContentCommand": "dotnet build umbraco.sln && dotnet dev-certs https --trust",
 
+	// Use 'forwardPorts' to make a list of ports inside the container available locallAdd	"forwardPorts": [9000, 5000, 25],
 	// Port needed to help discover SMTP4Dev
 	"forwardPorts": [
 		5000
