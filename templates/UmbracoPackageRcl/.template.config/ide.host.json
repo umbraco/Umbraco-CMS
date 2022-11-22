@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json.schemastore.org/ide.host.json",
+  "order": 0,
+  "icon": "../../icon.png",
+  "description": {
+    "id": "UmbracoPackageRcl",
+    "text": "Umbraco Package RCL - An empty Umbraco package/plugin (Razor Class Library)."
+  },
+  "symbolInfo": [
+    {
+      "id": "UmbracoVersion",
+      "isVisible": true
+    },
+    {
+      "id": "SupportPagesAndViews",
+      "isVisible": true,
+      "persistenceScope": "templateGroup"
+    }
+  ]
+}
