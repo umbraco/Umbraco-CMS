@@ -29,7 +29,7 @@
 
 		// Adds SQLite feature from apt install
 		// Also adds the SQLite VSCode extension
-		"ghcr.io/warrenbuckley/sqlite-codespace-feature/sqlite:1": {}
+		"ghcr.io/warrenbuckley/codespace-features/sqlite:1": {}
 	},
 
 	// Add the IDs of extensions you want installed when the container is created.
