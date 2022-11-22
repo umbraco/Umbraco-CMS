@@ -79,7 +79,7 @@
         });
 
         _.each(model.config.contentTypes, function (contentType) {
-            contentType.nameExp = !!contentType.nameTemplate
+            contentType.nameExp = contentType.nameTemplate
                 ? $interpolate(contentType.nameTemplate)
                 : undefined;
         });

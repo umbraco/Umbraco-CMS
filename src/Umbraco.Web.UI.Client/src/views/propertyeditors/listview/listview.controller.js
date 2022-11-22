@@ -154,7 +154,7 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
     };
     
     _.each($scope.options.includeProperties, function (property) {
-        property.nameExp = !!property.nameTemplate
+        property.nameExp = property.nameTemplate
             ? $interpolate(property.nameTemplate)
             : undefined;
     });
