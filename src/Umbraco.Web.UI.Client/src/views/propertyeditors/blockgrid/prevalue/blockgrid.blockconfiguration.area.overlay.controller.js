@@ -25,7 +25,7 @@
             value: {min:vm.area.minAllowed, max:vm.area.maxAllowed}
         }
 
-        unsubscribe.push($scope.$watch('vm.area.alias', (newVal, oldVal) => {
+        unsubscribe.push($scope.$watch('vm.area.alias', (newVal) => {
             $scope.model.updateTitle();
             if($scope.blockGridBlockConfigurationAreaForm.alias) {
                 $scope.blockGridBlockConfigurationAreaForm.alias.$setValidity("alias", $scope.model.otherAreaAliases.indexOf(newVal) === -1);
