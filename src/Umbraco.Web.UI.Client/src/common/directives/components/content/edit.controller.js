@@ -323,15 +323,6 @@
             $scope.defaultButton = buttons.defaultButton;
             $scope.subButtons = buttons.subButtons;
             $scope.page.showPreviewButton = true;
-
-            const activeVariant = _.find($scope.content.variants, v => v.language && v.language.culture === $scope.culture);
-            if(activeVariant){
-                $scope.page.showPreviewButton = canPreviewVariant(activeVariant);
-            }
-        }
-
-        function canPreviewVariant(variant) {
-            return variant.state !== "NotCreated";
         }
 
         /** Syncs the content item to it's tree node - this occurs on first load and after saving */
@@ -1042,10 +1033,6 @@
         $scope.appAnchorChanged = function (app, anchor) {
             //send an event downwards
             $scope.$broadcast("editors.apps.appAnchorChanged", { app: app, anchor: anchor });
-        };
-
-        $scope.variantChanged = function (variant, culture, segment) {
-            $scope.page.showPreviewButton = canPreviewVariant(variant) ;
         };
 
         // methods for infinite editing
