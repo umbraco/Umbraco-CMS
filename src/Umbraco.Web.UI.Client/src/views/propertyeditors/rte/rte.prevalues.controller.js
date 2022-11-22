@@ -112,10 +112,6 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
                     icon.name = "icon-settings-alt";
                     icon.isCustom = true;
                     break;
-                case "umbmacro":
-                    icon.name = "icon-settings-alt";
-                    icon.isCustom = true;
-                    break;
                 default:
                     icon.name = alias;
                     icon.isCustom = false;
@@ -124,7 +120,7 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
             return icon;
         }
 
-        var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
+        var unsubscribe = $scope.$on("formSubmitting", function () {
 
             var commands = _.where($scope.tinyMceConfig.commands, {selected: true});
             $scope.model.value.toolbar = _.pluck(commands, "alias");

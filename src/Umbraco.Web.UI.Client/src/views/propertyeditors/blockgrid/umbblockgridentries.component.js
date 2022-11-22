@@ -227,7 +227,7 @@
                 if (gridLayoutContainerEl !== evt.from) {
                     const fromCtrl = evt.from['Sortable:controller']();
                     const prevEntries = fromCtrl.entries;
-                    const syncEntry = prevEntries[oldIndex];
+                    let syncEntry = prevEntries[oldIndex];
 
                     // Make sure Property Editor Proxies are destroyed, as we need to establish new when moving context:
 

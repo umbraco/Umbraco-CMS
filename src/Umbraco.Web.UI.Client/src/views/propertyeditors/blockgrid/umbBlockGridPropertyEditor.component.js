@@ -166,16 +166,16 @@
             $element[0].addEventListener("UmbBlockGrid_RemoveProperty", vm.onRemoveProxyProperty);
 
             //listen for form validation changes
-            vm.valFormManager.onValidationStatusChanged(function (evt, args) {
+            vm.valFormManager.onValidationStatusChanged(function () {
                 vm.showValidation = vm.valFormManager.showValidation;
             });
             //listen for the forms saving event
-            unsubscribe.push($scope.$on("formSubmitting", function (ev, args) {
+            unsubscribe.push($scope.$on("formSubmitting", function () {
                 vm.showValidation = true;
             }));
 
             //listen for the forms saved event
-            unsubscribe.push($scope.$on("formSubmitted", function (ev, args) {
+            unsubscribe.push($scope.$on("formSubmitted", function () {
                 vm.showValidation = false;
             }));
 
@@ -875,7 +875,7 @@
 
         }
         vm.requestShowClipboard = requestShowClipboard;
-        function requestShowClipboard(parentBlock, areaKey, createIndex, mouseEvent) {
+        function requestShowClipboard(parentBlock, areaKey, createIndex) {
             showCreateDialog(parentBlock, areaKey, createIndex, true);
         }
 
@@ -983,7 +983,7 @@
                 }
             };
 
-            blockPickerModel.clickClearClipboard = function ($event) {
+            blockPickerModel.clickClearClipboard = function () {
                 clipboardService.clearEntriesOfType(clipboardService.TYPES.ELEMENT_TYPE, availableContentTypesAliases);
                 clipboardService.clearEntriesOfType(clipboardService.TYPES.BLOCK, availableContentTypesAliases);
             };
@@ -1021,10 +1021,11 @@
         function updateClipboard(firstTime) {
 
             var oldAmount = vm.clipboardItems.length;
+            var entriesForPaste;
 
             vm.clipboardItems = [];
 
-            var entriesForPaste = clipboardService.retrieveEntriesOfType(clipboardService.TYPES.ELEMENT_TYPE, vm.availableContentTypesAliases);
+            entriesForPaste = clipboardService.retrieveEntriesOfType(clipboardService.TYPES.ELEMENT_TYPE, vm.availableContentTypesAliases);
             entriesForPaste.forEach(function (entry) {
                 var pasteEntry = {
                     type: clipboardService.TYPES.ELEMENT_TYPE,
@@ -1045,7 +1046,7 @@
                 vm.clipboardItems.push(pasteEntry);
             });
 
-            var entriesForPaste = clipboardService.retrieveEntriesOfType(clipboardService.TYPES.BLOCK, vm.availableContentTypesAliases);
+            entriesForPaste = clipboardService.retrieveEntriesOfType(clipboardService.TYPES.BLOCK, vm.availableContentTypesAliases);
             entriesForPaste.forEach(function (entry) {
                 var pasteEntry = {
                     type: clipboardService.TYPES.BLOCK,
