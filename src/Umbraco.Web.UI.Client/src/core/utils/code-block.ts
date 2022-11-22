@@ -4,13 +4,11 @@ import { customElement } from 'lit/decorators.js';
 
 /**
  *  A simple styled box for showing code-based error messages.
- *  max-height is 500px
- *
- *  @slot the message
+ *  @slot the full message
  *
  */
-@customElement('uui-error-box')
-export class UUIErrorBox extends LitElement {
+@customElement('uui-code-block')
+export class UUICodeBlock extends LitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -20,7 +18,7 @@ export class UUIErrorBox extends LitElement {
 			}
 
 			#container {
-				border: 2px solid var(--uui-color-divider-emphasis);
+				border: 1px solid var(--uui-color-divider-emphasis);
 				color: var(--uui-color-text-alt);
 				background-color: var(--uui-color-divider-standalone);
 				padding: var(--uui-size-space-2);
@@ -29,17 +27,8 @@ export class UUIErrorBox extends LitElement {
 			}
 			:host uui-scroll-container {
 				max-height: 500px;
-			}
-
-			pre {
-				display: inline-block;
-				overflow-wrap: break-word;
-				word-wrap: break-word;
-				word-break: break-all;
-				line-break: strict;
-				hyphens: none;
-				-webkit-hyphens: none;
-				-moz-hyphens: none;
+				overflow-y: auto;
+				overflow-wrap: anywhere;
 			}
 		`,
 	];
@@ -47,7 +36,7 @@ export class UUIErrorBox extends LitElement {
 	render() {
 		return html`<div id="container">
 			<uui-scroll-container>
-				<pre><slot></slot></pre>
+				<slot></slot>
 			</uui-scroll-container>
 		</div> `;
 	}
@@ -55,6 +44,6 @@ export class UUIErrorBox extends LitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'uui-error-box': UUIErrorBox;
+		'uui-code-block': UUICodeBlock;
 	}
 }

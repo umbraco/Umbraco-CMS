@@ -11,10 +11,11 @@ import {
 	CreatedResult,
 	ModelsBuilder,
 	ModelsBuilderResource,
+	ModelsMode,
 	ProblemDetails,
 } from '@umbraco-cms/backend-api';
 
-import 'src/core/utils/errorbox';
+import 'src/core/utils/code-block';
 
 @customElement('umb-dashboard-models-builder')
 export class UmbDashboardModelsBuilderElement extends UmbContextConsumerMixin(LitElement) {
@@ -24,17 +25,7 @@ export class UmbDashboardModelsBuilderElement extends UmbContextConsumerMixin(Li
 			.headline {
 				display: flex;
 				justify-content: space-between;
-				align-items: center;
-			}
-
-			p {
-				margin-block-start: 0;
-				margin-block-end: var(--uui-size-space-4);
-			}
-
-			.models-description p {
-				padding-bottom: var(--uui-size-space-1);
-				margin-bottom: var(--uui-size-space-1);
+				align-items: flex-start;
 			}
 
 			.models-description ul {
@@ -43,10 +34,18 @@ export class UmbDashboardModelsBuilderElement extends UmbContextConsumerMixin(Li
 				padding-left: var(--uui-size-layout-1);
 			}
 
+			span.out-of-date {
+				display: block;
+				padding-block-end: var(--uui-size-space-4);
+			}
+
 			.error {
-				padding-top: var(--uui-size-space-5);
 				font-weight: bold;
 				color: var(--uui-color-danger);
+			}
+
+			p.models-actions {
+				margin-bottom: 0;
 			}
 		`,
 	];
@@ -92,6 +91,7 @@ export class UmbDashboardModelsBuilderElement extends UmbContextConsumerMixin(Li
 		try {
 			const createdResult = await ModelsBuilderResource.postModelsBuilderBuild();
 			this._createdResult = createdResult;
+			this._getDashboardData();
 			return true;
 		} catch (e) {
 			if (e instanceof ApiError) {
@@ -122,36 +122,66 @@ export class UmbDashboardModelsBuilderElement extends UmbContextConsumerMixin(Li
 	render() {
 		return html`
 			<uui-box>
-				<div class="headline" slot="headline">
-					<strong>Models Builder</strong>
+				<div class="headline">
+					<h1>Models Builder</h1>
 					<uui-button .state="${this._buttonStateReload}" look="secondary" @click="${this._onDashboardReload}">
 						Reload
 					</uui-button>
 				</div>
 				<p>Version: ${this._modelsBuilder?.version}</p>
-
 				<div class="models-description">
-					<p>${unsafeHTML(this._modelsBuilder?.modelsNamespace)}</p>
+					<p>ModelsBuilder is enabled with the following configuration:</p>
+					<ul>
+						${this._modelsBuilder?.mode
+							? html`<li>
+									The <strong>ModelsMode</strong> is '${this._modelsBuilder.mode}'. ${this.renderModelsMode()}
+							  </li> `
+							: nothing}
+						${this._modelsBuilder?.modelsNamespace
+							? html`<li>The <strong>models namespace</strong> is ${this._modelsBuilder.modelsNamespace}.</li>`
+							: nothing}
+						${this._modelsBuilder?.trackingOutOfDateModels === true
+							? html`<li>Tracking of <strong>out-of-date models</strong> is enabled.</li>`
+							: this._modelsBuilder?.trackingOutOfDateModels === false
+							? html`<li>Tracking of <strong>out-of-date models</strong> is not enabled.</li>`
+							: nothing}
+					</ul>
 				</div>
-
-				${this._modelsBuilder?.outOfDateModels === true
-					? html`<p>Models are <strong>out of date</strong></p>`
-					: nothing}
-				${this._modelsBuilder?.canGenerate === true
-					? html` <uui-button
-							.state="${this._buttonStateBuild}"
-							look="primary"
-							label="Generate models"
-							@click="${this._onGenerateModels}">
-							Generate models
-					  </uui-button>`
-					: nothing}
+				<p class="models-actions">
+					${this._modelsBuilder?.outOfDateModels === true
+						? html`<span class="out-of-date">Models are <strong>out-of-date</strong></span>`
+						: nothing}
+					${this._modelsBuilder?.canGenerate === true
+						? html` <uui-button
+								.state="${this._buttonStateBuild}"
+								look="primary"
+								label="Generate models"
+								@click="${this._onGenerateModels}">
+								Generate models
+						  </uui-button>`
+						: nothing}
+				</p>
 				${this._modelsBuilder?.lastError
 					? html`<p class="error">Last generation failed with the following error:</p>
-							<uui-error-box>${this._modelsBuilder.lastError}</uui-error-box>`
+							<uui-code-block>${this._modelsBuilder.lastError}</uui-code-block>`
 					: nothing}
 			</uui-box>
 		`;
+	}
+
+	renderModelsMode() {
+		switch (this._modelsBuilder?.mode) {
+			case ModelsMode.IN_MEMORY_AUTO:
+				return 'Strongly typed models are re-generated on startup and anytime schema changes (i.e. Content Type) are made. No recompilation necessary but the generated models are not available to code outside of Razor.';
+			case ModelsMode.SOURCE_CODE_MANUAL:
+				return 'Strongly typed models are generated on demand. Recompilation is necessary and models are available to all CSharp code.';
+			case ModelsMode.SOURCE_CODE_AUTO:
+				return 'Strong typed models are generated on demand and anytime schema changes (i.e. Content Type) are made. Recompilation is necessary and models are available to all CSharp code.';
+			case ModelsMode.NOTHING:
+				return 'Strongly typed models are not generated. All content and cache will operate from instance of IPublishedContent only.';
+			default:
+				return;
+		}
 	}
 }
 
