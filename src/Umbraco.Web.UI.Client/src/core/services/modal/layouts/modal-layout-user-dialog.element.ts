@@ -1,7 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { UmbModalHandler } from '@umbraco-cms/services';
+import { UmbModalHandler, UmbModalService } from '@umbraco-cms/services';
 import type { UserDetails } from '@umbraco-cms/models';
 import { UmbUserStore } from 'src/core/stores/user/user.store';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
@@ -36,11 +36,13 @@ export class UmbModalLayoutUserDialogElement extends UmbContextConsumerMixin(Umb
 	private _currentUser?: UserDetails;
 
 	private _userStore?: UmbUserStore;
+	private _modalService?: UmbModalService;
 
 	constructor() {
 		super();
-		this.consumeAllContexts(['umbUserStore'], (instances) => {
+		this.consumeAllContexts(['umbUserStore', 'umbModalService'], (instances) => {
 			this._userStore = instances['umbUserStore'];
+			this._modalService = instances['umbModalService'];
 			this._observeCurrentUser();
 		});
 	}
@@ -63,6 +65,11 @@ export class UmbModalLayoutUserDialogElement extends UmbContextConsumerMixin(Umb
 		this._close();
 	}
 
+	private _changePassword() {
+		if (!this._modalService) return;
+		this._modalService.changePassword();
+	}
+
 	render() {
 		return html`
 			<umb-editor-entity-layout headline="${this._currentUser?.name || ''}">
@@ -70,7 +77,7 @@ export class UmbModalLayoutUserDialogElement extends UmbContextConsumerMixin(Umb
 					<uui-box>
 						<b slot="headline">Your profile</b>
 						<uui-button look="primary" @click=${this._edit}>Edit</uui-button>
-						<uui-button look="primary" color="danger">Logout</uui-button>
+						<uui-button look="primary" @click=${this._changePassword}>Change password</uui-button>
 					</uui-box>
 					<uui-box>
 						<b slot="headline">External login providers</b>
@@ -80,6 +87,7 @@ export class UmbModalLayoutUserDialogElement extends UmbContextConsumerMixin(Umb
 				</div>
 				<div slot="actions">
 					<uui-button @click=${this._close} look="secondary">Close</uui-button>
+					<uui-button look="primary" color="danger">Logout</uui-button>
 				</div>
 			</umb-editor-entity-layout>
 		`;

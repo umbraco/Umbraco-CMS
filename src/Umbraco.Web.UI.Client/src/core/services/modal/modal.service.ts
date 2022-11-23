@@ -3,6 +3,7 @@ import './layouts/confirm/modal-layout-confirm.element';
 import './layouts/content-picker/modal-layout-content-picker.element';
 import './layouts/property-editor-ui-picker/modal-layout-property-editor-ui-picker.element';
 import './layouts/modal-layout-user-dialog.element';
+import './layouts/modal-layout-change-password.element';
 
 import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
 import { BehaviorSubject, Observable } from 'rxjs';
@@ -77,6 +78,16 @@ export class UmbModalService {
 	 */
 	public userSettings(): UmbModalHandler {
 		return this.open('umb-modal-layout-user-dialog', { type: 'sidebar', size: 'small' });
+	}
+
+	/**
+	 * Opens the user settings sidebar modal
+	 * @public
+	 * @return {*}  {UmbModalHandler}
+	 * @memberof UmbModalService
+	 */
+	public changePassword(): UmbModalHandler {
+		return this.open('umb-modal-layout-change-password', { type: 'dialog' });
 	}
 
 	/**

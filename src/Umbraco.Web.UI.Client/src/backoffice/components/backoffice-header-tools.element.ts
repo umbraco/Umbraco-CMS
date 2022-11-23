@@ -1,10 +1,10 @@
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-import { UserDetails } from '@umbraco-cms/models';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import { UmbModalService } from '@umbraco-cms/services';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import type { UserDetails } from '@umbraco-cms/models';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
+import { UmbModalService } from '@umbraco-cms/services';
 import { UmbUserStore } from 'src/core/stores/user/user.store';
 
 @customElement('umb-backoffice-header-tools')
