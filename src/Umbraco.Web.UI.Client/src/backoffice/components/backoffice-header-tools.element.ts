@@ -24,6 +24,12 @@ export class UmbBackofficeHeaderTools extends UmbContextConsumerMixin(UmbObserve
 		`,
 	];
 
+	@state()
+	private _currentUser?: UserDetails;
+
+	private _userStore?: UmbUserStore;
+	private _modalService?: UmbModalService;
+
 	constructor() {
 		super();
 		this.consumeAllContexts(['umbUserStore', 'umbModalService'], (instances) => {
@@ -44,12 +50,6 @@ export class UmbBackofficeHeaderTools extends UmbContextConsumerMixin(UmbObserve
 	private _handleUserClick() {
 		this._modalService?.userSettings();
 	}
-
-	@state()
-	private _currentUser?: UserDetails;
-
-	private _userStore?: UmbUserStore;
-	private _modalService?: UmbModalService;
 
 	render() {
 		return html`

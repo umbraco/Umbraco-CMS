@@ -14,9 +14,12 @@ import type { ManifestEditorAction, ManifestWithLoader, UserDetails } from '@umb
 import '../../property-editor-uis/content-picker/property-editor-ui-content-picker.element';
 import '../shared/editor-entity-layout/editor-entity-layout.element';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 
 @customElement('umb-editor-user')
-export class UmbEditorUserElement extends UmbContextProviderMixin(UmbContextConsumerMixin(LitElement)) {
+export class UmbEditorUserElement extends UmbContextProviderMixin(
+	UmbContextConsumerMixin(UmbObserverMixin(LitElement))
+) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -92,6 +95,9 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(UmbContextCons
 	private _user?: UserDetails | null;
 
 	@state()
+	private _currentUser?: UserDetails | null;
+
+	@state()
 	private _userName = '';
 
 	@property({ type: String })
@@ -107,8 +113,42 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(UmbContextCons
 
 	constructor() {
 		super();
-
+		this.consumeAllContexts(['umbUserStore'], (instances) => {
+			this._userStore = instances['umbUserStore'];
+			this._observeCurrentUser();
+			this._observeUser();
+		});
 		this._registerEditorActions();
+	}
+
+	private async _observeCurrentUser() {
+		if (!this._userStore) return;
+
+		this.observe<UserDetails>(this._userStore.currentUser, (currentUser) => {
+			this._currentUser = currentUser;
+		});
+	}
+
+	private async _observeUser() {
+		if (!this._userStore) return;
+
+		this.observe<UserDetails>(this._userStore.getByKey(this.entityKey), (user) => {
+			this._user = user;
+			if (!this._user) return;
+
+			if (!this._userContext) {
+				this._userContext = new UmbUserContext(this._user);
+				this.provideContext('umbUserContext', this._userContext);
+			} else {
+				this._userContext.update(this._user);
+			}
+
+			this._userNameSubscription = this._userContext.data.subscribe((user) => {
+				if (user && user.name !== this._userName) {
+					this._userName = user.name;
+				}
+			});
+		});
 	}
 
 	private _registerEditorActions() {
@@ -139,28 +179,6 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(UmbContextCons
 		});
 	}
 
-	private _observeUser() {
-		this._usersSubscription?.unsubscribe();
-
-		this._usersSubscription = this._userStore?.getByKey(this.entityKey).subscribe((user) => {
-			this._user = user;
-			if (!this._user) return;
-
-			if (!this._userContext) {
-				this._userContext = new UmbUserContext(this._user);
-				this.provideContext('umbUserContext', this._userContext);
-			} else {
-				this._userContext.update(this._user);
-			}
-
-			this._userNameSubscription = this._userContext.data.subscribe((user) => {
-				if (user && user.name !== this._userName) {
-					this._userName = user.name;
-				}
-			});
-		});
-	}
-
 	disconnectedCallback(): void {
 		super.disconnectedCallback();
 
@@ -181,6 +199,19 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(UmbContextCons
 		this._userStore.deleteUsers([this._user.key]);
 
 		history.pushState(null, '', '/section/users/view/users/overview');
+	}
+
+	private _renderActionButtons() {
+		return html` ${this._user?.status !== 'invited'
+				? html`
+						<uui-button
+							@click=${this._updateUserStatus}
+							look="primary"
+							color="${this._user!.status === 'disabled' ? 'positive' : 'warning'}"
+							label="${this._user!.status === 'disabled' ? 'Enable' : 'Disable'}"></uui-button>
+				  `
+				: nothing}
+			<uui-button @click=${this._deleteUser} look="primary" color="danger" label="Delete User"></uui-button>`;
 	}
 
 	private renderLeftColumn() {
@@ -246,16 +277,7 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(UmbContextCons
 				<uui-avatar .name=${this._user?.name || ''}></uui-avatar>
 				<uui-button label="Change photo"></uui-button>
 				<hr />
-				${this._user?.status !== 'invited'
-					? html`
-							<uui-button
-								@click=${this._updateUserStatus}
-								look="primary"
-								color="${this._user.status === 'disabled' ? 'positive' : 'warning'}"
-								label="${this._user.status === 'disabled' ? 'Enable' : 'Disable'}"></uui-button>
-					  `
-					: nothing}
-				<uui-button @click=${this._deleteUser} look="primary" color="danger" label="Delete User"></uui-button>
+				${this._currentUser?.key !== this._user.key ? this._renderActionButtons() : nothing}
 				<div>
 					<b>Status:</b>
 					<uui-tag look="${ifDefined(statusLook?.look)}" color="${ifDefined(statusLook?.color)}">
