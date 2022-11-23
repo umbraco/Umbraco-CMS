@@ -137,14 +137,7 @@ export class UmbDashboardModelsBuilderElement extends UmbContextConsumerMixin(Li
 									The <strong>ModelsMode</strong> is '${this._modelsBuilder.mode}'. ${this.renderModelsMode()}
 							  </li> `
 							: nothing}
-						${this._modelsBuilder?.modelsNamespace
-							? html`<li>The <strong>models namespace</strong> is ${this._modelsBuilder.modelsNamespace}.</li>`
-							: nothing}
-						${this._modelsBuilder?.trackingOutOfDateModels === true
-							? html`<li>Tracking of <strong>out-of-date models</strong> is enabled.</li>`
-							: this._modelsBuilder?.trackingOutOfDateModels === false
-							? html`<li>Tracking of <strong>out-of-date models</strong> is not enabled.</li>`
-							: nothing}
+						${this.renderList()}
 					</ul>
 				</div>
 				<p class="models-actions">
@@ -167,6 +160,20 @@ export class UmbDashboardModelsBuilderElement extends UmbContextConsumerMixin(Li
 					: nothing}
 			</uui-box>
 		`;
+	}
+
+	private renderList() {
+		if (this._modelsBuilder?.mode !== ModelsMode.NOTHING) {
+			return html`${this._modelsBuilder?.modelsNamespace
+				? html`<li>The <strong>models namespace</strong> is ${this._modelsBuilder.modelsNamespace}.</li>`
+				: nothing}
+			${this._modelsBuilder?.trackingOutOfDateModels === true
+				? html`<li>Tracking of <strong>out-of-date models</strong> is enabled.</li>`
+				: this._modelsBuilder?.trackingOutOfDateModels === false
+				? html`<li>Tracking of <strong>out-of-date models</strong> is not enabled.</li>`
+				: nothing}`;
+		}
+		return nothing;
 	}
 
 	renderModelsMode() {
