@@ -3,6 +3,8 @@ import '@umbraco-ui/uui-modal';
 import '@umbraco-ui/uui-modal-container';
 import '@umbraco-ui/uui-modal-dialog';
 import '@umbraco-ui/uui-modal-sidebar';
+import '@umbraco-ui/uui-color-swatch';
+import '@umbraco-ui/uui-color-swatches';
 import 'router-slot';
 
 // TODO: remove these imports when they are part of UUI

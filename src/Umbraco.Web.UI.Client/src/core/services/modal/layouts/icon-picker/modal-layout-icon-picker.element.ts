@@ -1,7 +1,14 @@
+import type { UUIColorSwatchesEvent } from '@umbraco-ui/uui-color-swatches';
+
 import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UmbModalLayoutElement } from '../modal-layout.element';
+
+import icons from 'public-assets/icons/icons.json';
+
+import '@umbraco-ui/uui-color-swatch';
+import '@umbraco-ui/uui-color-swatches';
 
 import '../../../../../backoffice/editors/shared/editor-entity-layout/editor-entity-layout.element';
 
@@ -112,7 +119,8 @@ export class UmbModalLayoutIconPickerElement extends UmbModalLayoutElement<UmbMo
 	];
 
 	@property({ type: Array })
-	iconlist = [
+	iconlist = icons.map((icon) => icon.name);
+	/*iconlist = [
 		'umb:add',
 		'umb:alert',
 		'umb:attachment',
@@ -145,7 +153,7 @@ export class UmbModalLayoutIconPickerElement extends UmbModalLayoutElement<UmbMo
 		'umb:unsee',
 		'umb:wand',
 		'umb:wrong',
-	];
+	];*/
 
 	@property({ type: Array })
 	iconlistFiltered: Array<string>;
@@ -239,7 +247,9 @@ export class UmbModalLayoutIconPickerElement extends UmbModalLayoutElement<UmbMo
 					${this.renderSearchbar()}
 					<hr />
 
-					<div id="palette">${this.renderPalette()}</div>
+					<uui-color-swatches
+						.swatches="${this.colorlist}"
+						@change="${(e: UUIColorSwatchesEvent) => (this._currentColor = e.target.value)}"></uui-color-swatches>
 
 					<hr />
 					<uui-scroll-container id="icon-selection">${this.renderIconSelection()}</uui-scroll-container>
