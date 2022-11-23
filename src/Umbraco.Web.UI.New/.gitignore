@@ -1,0 +1,6 @@
+umbraco/[Dd]ata
+umbraco/[Ll]ogs
+umbraco/[Mm]odels
+appsettings.json
+appsettings.Development.json
+appsettings.Local.json
