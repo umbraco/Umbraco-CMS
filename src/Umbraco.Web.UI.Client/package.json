@@ -10,7 +10,8 @@
     "build:dev": "gulp buildDev",
     "dev": "gulp dev",
     "fastdev": "gulp fastdev",
-    "watch": "gulp watch"
+    "watch": "gulp watch",
+    "lint": "eslint src"
   },
   "engines": {
     "node": ">=16.17",
@@ -60,13 +61,14 @@
     "@babel/preset-env": "7.19.1",
     "autoprefixer": "10.4.4",
     "cssnano": "5.1.13",
+    "eslint": "8.28.0",
     "gulp": "4.0.2",
     "gulp-angular-embed-templates": "2.3.0",
     "gulp-babel": "8.0.0",
     "gulp-clean-css": "4.3.0",
     "gulp-cli": "2.3.0",
     "gulp-concat": "2.6.1",
-    "gulp-eslint": "6.0.0",
+    "gulp-eslint-new": "1.7.0",
     "gulp-imagemin": "7.1.0",
     "gulp-less": "5.0.0",
     "gulp-minify": "3.1.0",
