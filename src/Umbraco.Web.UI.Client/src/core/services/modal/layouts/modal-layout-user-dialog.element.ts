@@ -1,10 +1,14 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, CSSResultGroup, html, LitElement } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import { UmbModalHandler } from '@umbraco-cms/services';
+import type { UserDetails } from '@umbraco-cms/models';
+import { UmbUserStore } from 'src/core/stores/user/user.store';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
 @customElement('umb-modal-layout-user-dialog')
-export class UmbModalLayoutUserDialogElement extends LitElement {
+export class UmbModalLayoutUserDialogElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles: CSSResultGroup = [
 		UUITextStyles,
 		css`
@@ -28,17 +32,44 @@ export class UmbModalLayoutUserDialogElement extends LitElement {
 	@property({ attribute: false })
 	modalHandler?: UmbModalHandler;
 
+	@state()
+	private _currentUser?: UserDetails;
+
+	private _userStore?: UmbUserStore;
+
+	constructor() {
+		super();
+		this.consumeAllContexts(['umbUserStore'], (instances) => {
+			this._userStore = instances['umbUserStore'];
+			this._observeCurrentUser();
+		});
+	}
+
+	private async _observeCurrentUser() {
+		if (!this._userStore) return;
+
+		this.observe<UserDetails>(this._userStore.currentUser, (currentUser) => {
+			this._currentUser = currentUser;
+		});
+	}
+
 	private _close() {
 		this.modalHandler?.close();
 	}
 
+	private _edit() {
+		if (!this._currentUser) return;
+		history.pushState(null, '', '/section/users/view/users/user/' + this._currentUser.key); //TODO Change to a tag with href and make dynamic
+		this._close();
+	}
+
 	render() {
 		return html`
-			<umb-editor-entity-layout headline="USER NAME">
+			<umb-editor-entity-layout headline="${this._currentUser?.name || ''}">
 				<div id="main">
 					<uui-box>
 						<b slot="headline">Your profile</b>
-						<uui-button look="primary">Edit</uui-button>
+						<uui-button look="primary" @click=${this._edit}>Edit</uui-button>
 						<uui-button look="primary" color="danger">Logout</uui-button>
 					</uui-box>
 					<uui-box>
