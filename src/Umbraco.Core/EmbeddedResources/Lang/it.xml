@@ -1530,9 +1530,7 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
   </area>
   <area alias="rollback">
     <key alias="changes">Modifiche</key>
-    <key alias="created">Creato</key>
     <key alias="headline">Seleziona una versione da confrontare con la versione corrente</key>
-    <key alias="currentVersion"><![CDATA[Versione corrente]]></key>
     <key alias="diffHelp">
       <![CDATA[Qui vengono mostrate le differenze tra la versione corrente e la versione selezionata<br />Il testo <del>in rosso</del> non verrà mostrato nella versione selezionata, <ins>quello in verde verrà aggiunto</ins>]]></key>
     <key alias="documentRolledBack"><![CDATA[Il documento è stato riportato alla versione scelta.]]></key>
