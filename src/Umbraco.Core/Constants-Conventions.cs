@@ -276,15 +276,16 @@ public static partial class Constants
             public const string RelateParentMediaFolderOnDeleteAlias = "relateParentMediaFolderOnDelete";
 
             /// <summary>
-            ///     Returns the types of relations that are automatically tracked
+            ///     Returns the types of relations that are automatically tracked.
             /// </summary>
             /// <remarks>
             ///     Developers should not manually use these relation types since they will all be cleared whenever an entity
             ///     (content, media or member) is saved since they are auto-populated based on property values.
             /// </remarks>
+            [Obsolete("This is no longer used, and will be removed in v12")]
             public static string[] AutomaticRelationTypes { get; } = { RelatedMediaAlias, RelatedDocumentAlias };
 
-            // TODO: return a list of built in types so we can use that to prevent deletion in the uI
+            // TODO: return a list of built in types so we can use that to prevent deletion in the UI
         }
 
         public static class Udi

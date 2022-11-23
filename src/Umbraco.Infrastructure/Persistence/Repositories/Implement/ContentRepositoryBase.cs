@@ -1042,8 +1042,13 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             var trackedRelations = new List<UmbracoEntityReference>();
             trackedRelations.AddRange(_dataValueReferenceFactories.GetAllReferences(entity.Properties, PropertyEditors));
 
+            var relationTypeAliases = trackedRelations
+                .Select(x => x.RelationTypeAlias)
+                .Distinct()
+                .ToArray();
+
             // First delete all auto-relations for this entity
-            RelationRepository.DeleteByParent(entity.Id, Constants.Conventions.RelationTypes.AutomaticRelationTypes);
+            RelationRepository.DeleteByParent(entity.Id, relationTypeAliases);
 
             if (trackedRelations.Count == 0)
             {
@@ -1055,7 +1060,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 .ToDictionary(x => (Udi)x!, x => x!.Guid);
 
             // lookup in the DB all INT ids for the GUIDs and chuck into a dictionary
-            var keyToIds = Database.Fetch<NodeIdKey>(Sql().Select<NodeDto>(x => x.NodeId, x => x.UniqueId).From<NodeDto>().WhereIn<NodeDto>(x => x.UniqueId, udiToGuids.Values))
+            var keyToIds = Database.Fetch<NodeIdKey>(Sql()
+                .Select<NodeDto>(x => x.NodeId, x => x.UniqueId)
+                .From<NodeDto>()
+                .WhereIn<NodeDto>(x => x.UniqueId, udiToGuids.Values))
                 .ToDictionary(x => x.UniqueId, x => x.NodeId);
 
             var allRelationTypes = RelationTypeRepository.GetMany(Array.Empty<int>())?
