@@ -28,7 +28,8 @@
 	"scripts": {
 		"dev": "vite",
 		"build": "tsc && vite build --mode staging",
-		"build:production": "tsc && vite build",
+		"build:for:static": "tsc && vite build",
+		"build:for:backoffice": "tsc && vite build -c vite.element.config.ts",
 		"preview": "vite preview --open",
 		"test": "web-test-runner --coverage",
 		"test:watch": "web-test-runner --watch",
