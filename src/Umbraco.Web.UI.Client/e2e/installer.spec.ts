@@ -1,8 +1,8 @@
 import { rest } from 'msw';
 
-import { expect, test } from '../test';
 import { umbracoPath } from '@umbraco-cms/utils';
 import { ProblemDetails, RuntimeLevel, ServerStatus } from '@umbraco-cms/backend-api';
+import { expect, test } from './test';
 
 test.describe('installer tests', () => {
 	test.beforeEach(async ({ page, worker }) => {

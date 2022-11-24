@@ -4,6 +4,7 @@ import '@umbraco-ui/uui-modal-container';
 import '@umbraco-ui/uui-modal-dialog';
 import '@umbraco-ui/uui-modal-sidebar';
 import 'router-slot';
+import 'element-internals-polyfill';
 
 // TODO: remove these imports when they are part of UUI
 import type { Guard, IRoute } from 'router-slot/model';

@@ -3,6 +3,16 @@
 	"license": "MIT",
 	"private": true,
 	"version": "0.0.0",
+	"type": "module",
+	"main": "dist/main.js",
+	"exports": {
+		".": "./dist/main.js"
+	},
+	"types": "types/src/app.d.ts",
+	"files": [
+		"dist",
+		"types"
+	],
 	"repository": {
 		"url": "https://github.com/umbraco/Umbraco.CMS.Backoffice",
 		"type": "git"
@@ -18,7 +28,8 @@
 	"scripts": {
 		"dev": "vite",
 		"build": "tsc && vite build --mode staging",
-		"build:production": "tsc && vite build",
+		"build:for:static": "tsc && vite build",
+		"build:for:backoffice": "tsc && vite build -c vite.element.config.ts",
 		"preview": "vite preview --open",
 		"test": "web-test-runner --coverage",
 		"test:watch": "web-test-runner --watch",
