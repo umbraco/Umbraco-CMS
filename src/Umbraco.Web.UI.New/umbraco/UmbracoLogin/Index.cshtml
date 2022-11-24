@@ -1,10 +1,31 @@
 <!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Umbraco</title>
 
-<html>
-<head>
-    <title></title>
-</head>
+        <link rel="stylesheet" href="https://unpkg.com/blocks.css/dist/blocks.min.css" />
+
+        <style>
+            body {
+                display: grid;
+                place-content: center;
+            }
+        </style>
+    </head>
 <body>
-TODO Start New Backoffice Login
+<div class="wrapper div">
+    <h1>Umbraco login universe</h1>
+    <button type="button" id="login" class="block">LOGIN</button>
+
+    <script>
+    !(function () {
+        const button = document.getElementById("login");
+        button.addEventListener('click', () => {
+            sessionStorage.setItem('is-authenticated', 'true');
+            window.location = '/umbraco';
+        });
+    })();
+    </script>
+</div>
 </body>
 </html>
