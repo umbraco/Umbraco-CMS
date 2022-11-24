@@ -15,6 +15,7 @@ import '../../property-editor-uis/content-picker/property-editor-ui-content-pick
 import '../shared/editor-entity-layout/editor-entity-layout.element';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
+import { UmbModalService } from '@umbraco-cms/services';
 
 @customElement('umb-editor-user')
 export class UmbEditorUserElement extends UmbContextProviderMixin(
@@ -103,9 +104,10 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(
 	@property({ type: String })
 	entityKey = '';
 
-	protected _userStore?: UmbUserStore;
-	protected _usersSubscription?: Subscription;
+	private _userStore?: UmbUserStore;
+	private _usersSubscription?: Subscription;
 	private _userContext?: UmbUserContext;
+	private _modalService?: UmbModalService;
 
 	private _userNameSubscription?: Subscription;
 
@@ -113,8 +115,10 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(
 
 	constructor() {
 		super();
-		this.consumeAllContexts(['umbUserStore'], (instances) => {
+		this.consumeAllContexts(['umbUserStore', 'umbModalService'], (instances) => {
 			this._userStore = instances['umbUserStore'];
+			this._modalService = instances['umbModalService'];
+
 			this._observeCurrentUser();
 			this._observeUser();
 		});
@@ -201,7 +205,14 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(
 		history.pushState(null, '', '/section/users/view/users/overview');
 	}
 
+	private _changePassword() {
+		this._modalService?.changePassword();
+	}
+
 	private _renderActionButtons() {
+		if (this._currentUser?.key === this._user?.key)
+			return html` <uui-button @click=${this._changePassword} look="primary" label="Change password"></uui-button> `;
+
 		return html` ${this._user?.status !== 'invited'
 				? html`
 						<uui-button
@@ -277,7 +288,7 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(
 				<uui-avatar .name=${this._user?.name || ''}></uui-avatar>
 				<uui-button label="Change photo"></uui-button>
 				<hr />
-				${this._currentUser?.key !== this._user.key ? this._renderActionButtons() : nothing}
+				${this._renderActionButtons()}
 				<div>
 					<b>Status:</b>
 					<uui-tag look="${ifDefined(statusLook?.look)}" color="${ifDefined(statusLook?.color)}">

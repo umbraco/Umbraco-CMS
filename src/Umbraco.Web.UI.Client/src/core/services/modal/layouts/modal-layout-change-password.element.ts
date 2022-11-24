@@ -1,5 +1,5 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, CSSResultGroup, html, LitElement } from 'lit';
+import { css, CSSResultGroup, html, LitElement, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UmbModalHandler, UmbModalService } from '@umbraco-cms/services';
 import type { UserDetails } from '@umbraco-cms/models';
@@ -32,30 +32,50 @@ export class UmbModalLayoutChangePasswordElement extends UmbContextConsumerMixin
 	@property({ attribute: false })
 	modalHandler?: UmbModalHandler;
 
+	@state()
+	private _requireOldPassword = false; //TODO: Implement check to see if current user is an admin.
+
 	private _close() {
 		this.modalHandler?.close();
 	}
 
-	private _handleSubmit(e: Event) {
+	private _handleSubmit(e: SubmitEvent) {
 		e.preventDefault();
-		console.log('IMPLEMENT SUBMIT');
+
+		const form = e.target as HTMLFormElement;
+		if (!form) return;
+
+		const isValid = form.checkValidity();
+		if (!isValid) return;
+
+		const formData = new FormData(form);
+
+		const oldPassword = formData.get('oldPassword') as string;
+		const newPassword = formData.get('newPassword') as string;
+		const confirmPassword = formData.get('confirmPassword') as string;
+		console.log('IMPLEMENT SUBMIT', { oldPassword, newPassword, confirmPassword });
 		this._close();
+	}
+
+	private _renderOldPasswordInput() {
+		return html`
+			<uui-form-layout-item style="margin-bottom: var(--uui-size-layout-2)">
+				<uui-label id="oldPasswordLabel" for="oldPpassword" slot="label" required>Old password</uui-label>
+				<uui-input-password
+					id="oldPassword"
+					name="oldPassword"
+					required
+					required-message="Old password is required"></uui-input-password>
+			</uui-form-layout-item>
+		`;
 	}
 
 	render() {
 		return html`
-			<uui-dialog-layout class="uui-text" .headline=${this.data?.headline || null}>
+			<uui-dialog-layout class="uui-text" headline="Change password">
 				<uui-form>
 					<form id="LoginForm" name="login" @submit="${this._handleSubmit}">
-						<uui-form-layout-item>
-							<uui-label id="oldPasswordLabel" for="oldPpassword" slot="label" required>Old password</uui-label>
-							<uui-input-password
-								id="oldPassword"
-								name="oldPassword"
-								required
-								required-message="Old password is required"></uui-input-password>
-						</uui-form-layout-item>
-						<br />
+						${this._requireOldPassword ? this._renderOldPasswordInput() : nothing}
 						<uui-form-layout-item>
 							<uui-label id="newPasswordLabel" for="newPassword" slot="label" required>New password</uui-label>
 							<uui-input-password
