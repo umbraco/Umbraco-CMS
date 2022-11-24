@@ -185,9 +185,9 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             // the whole CASE fragment in ORDER BY due to it not being detected by NPoco
             var sqlText = InsertBefore(sql.SQL, "FROM",
 
-                // when invariant, ie 'variations' does not have the culture flag (value 1), use the global 'published' flag on pcv.id,
+                // when invariant, ie 'variations' does not have the culture flag (value 1), it should be safe to simply use the published flag on umbracoDocument,
                 // otherwise check if there's a version culture variation for the lang, via ccv.id
-                ", (CASE WHEN (ctype.variations & 1) = 0 THEN (CASE WHEN pcv.id IS NULL THEN 0 ELSE 1 END) ELSE (CASE WHEN ccvp.id IS NULL THEN 0 ELSE 1 END) END) AS ordering "); // trailing space is important!
+                $", (CASE WHEN (ctype.variations & 1) = 0 THEN ({SqlSyntax.GetFieldName<DocumentDto>(x => x.Published)}) ELSE (CASE WHEN ccvp.id IS NULL THEN 0 ELSE 1 END) END) AS ordering "); // trailing space is important!
 
             sql = Sql(sqlText, sql.Arguments);
 
