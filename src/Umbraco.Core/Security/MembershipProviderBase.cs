@@ -965,7 +965,7 @@ namespace Umbraco.Core.Security
         protected string GetCurrentRequestIpAddress()
         {
             var httpContext = HttpContext.Current == null ? (HttpContextBase) null : new HttpContextWrapper(HttpContext.Current);
-            return httpContext.GetCurrentRequestIpAddress();
+            return httpContext?.GetCurrentRequestIpAddress();
         }
 
     }
