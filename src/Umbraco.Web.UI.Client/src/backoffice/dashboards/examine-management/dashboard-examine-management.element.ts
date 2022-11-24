@@ -53,7 +53,7 @@ export class UmbDashboardExamineManagementElement extends UmbContextConsumerMixi
 	}
 
 	private get backbutton(): boolean {
-		return !(this._currentPath && this._currentPath.endsWith('examine-management/'));
+		return !(this._currentPath?.endsWith('examine-management/'));
 	}
 
 	render() {
