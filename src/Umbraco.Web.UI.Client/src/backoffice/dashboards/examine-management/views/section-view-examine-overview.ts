@@ -5,7 +5,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { UmbModalService, UmbNotificationService, UmbNotificationDefaultData } from '@umbraco-cms/services';
 
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-import { ApiError, ProblemDetails, Searcher, Index, SearchResource } from '@umbraco-cms/backend-api';
+import { ApiError, ProblemDetails, Searcher, Index, IndexerResource, SearcherResource } from '@umbraco-cms/backend-api';
 
 @customElement('umb-dashboard-examine-overview')
 export class UmbDashboardExamineOverviewElement extends UmbContextConsumerMixin(LitElement) {
@@ -63,7 +63,7 @@ export class UmbDashboardExamineOverviewElement extends UmbContextConsumerMixin(
 
 	private async _getIndexers() {
 		try {
-			const indexers = await SearchResource.getSearchIndex({ take: 9999, skip: 0 });
+			const indexers = await IndexerResource.getIndexer({ take: 9999, skip: 0 });
 			this._indexers = indexers.items;
 		} catch (e) {
 			if (e instanceof ApiError) {
@@ -76,7 +76,7 @@ export class UmbDashboardExamineOverviewElement extends UmbContextConsumerMixin(
 
 	private async _getSearchers() {
 		try {
-			const searchers = await SearchResource.getSearchSearcher({ take: 9999, skip: 0 });
+			const searchers = await SearcherResource.getSearcher({ take: 9999, skip: 0 });
 			this._searchers = searchers.items;
 		} catch (e) {
 			if (e instanceof ApiError) {

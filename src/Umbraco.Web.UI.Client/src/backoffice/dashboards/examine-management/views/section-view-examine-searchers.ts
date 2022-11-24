@@ -6,7 +6,7 @@ import { UmbModalService, UmbNotificationService, UmbNotificationDefaultData } f
 
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
-import { ApiError, ProblemDetails, SearchResult, SearchResource, Field } from '@umbraco-cms/backend-api';
+import { ApiError, ProblemDetails, SearchResult, SearcherResource, Field } from '@umbraco-cms/backend-api';
 
 import './modal-views/fields-viewer.element';
 import './modal-views/fields-settings.element';
@@ -136,9 +136,9 @@ export class UmbDashboardExamineSearcherElement extends UmbContextConsumerMixin(
 	private async _onSearch() {
 		if (!this._searchInput.value.length) return;
 		try {
-			const res = await SearchResource.getSearchSearcherBySearcherNameSearch({
+			const res = await SearcherResource.getSearcherBySearcherNameQuery({
 				searcherName: this.searcherName,
-				query: this._searchInput.value,
+				term: this._searchInput.value,
 				take: 9999,
 				skip: 0,
 			});

@@ -1,15 +1,15 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html, LitElement } from 'lit';
-import { customElement, state, property } from 'lit/decorators.js';
+import {UUITextStyles} from '@umbraco-ui/uui-css/lib';
+import {css, html, LitElement} from 'lit';
+import {customElement, property, state} from 'lit/decorators.js';
 
-import { UUIButtonState } from '@umbraco-ui/uui-button';
+import {UUIButtonState} from '@umbraco-ui/uui-button';
 
-import { UmbModalService, UmbNotificationService, UmbNotificationDefaultData } from '@umbraco-cms/services';
+import {UmbModalService, UmbNotificationDefaultData, UmbNotificationService} from '@umbraco-cms/services';
 
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import {UmbContextConsumerMixin} from '@umbraco-cms/context-api';
 import './section-view-examine-searchers';
 
-import { ApiError, ProblemDetails, Index, SearchResource } from '@umbraco-cms/backend-api';
+import {ApiError, Index, IndexerResource, ProblemDetails} from '@umbraco-cms/backend-api';
 
 @customElement('umb-dashboard-examine-index')
 export class UmbDashboardExamineIndexElement extends UmbContextConsumerMixin(LitElement) {
@@ -93,8 +93,7 @@ export class UmbDashboardExamineIndexElement extends UmbContextConsumerMixin(Lit
 
 	private async _getIndexData() {
 		try {
-			const index = await SearchResource.getSearchIndexByIndexName({ indexName: this.indexName });
-			this._indexData = index;
+			this._indexData = await IndexerResource.getIndexerByIndexName({indexName: this.indexName});
 		} catch (e) {
 			if (e instanceof ApiError) {
 				const error = e as ProblemDetails;
@@ -138,7 +137,7 @@ export class UmbDashboardExamineIndexElement extends UmbContextConsumerMixin(Lit
 		this._buttonState = 'waiting';
 		if (this._indexData.name)
 			try {
-				await SearchResource.postSearchIndexByIndexNameRebuild({ indexName: this._indexData.name });
+				await IndexerResource.postIndexerByIndexNameRebuild({ indexName: this._indexData.name });
 				this._buttonState = 'success';
 			} catch (e) {
 				this._buttonState = 'failed';
