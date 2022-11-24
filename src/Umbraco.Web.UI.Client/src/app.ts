@@ -122,7 +122,7 @@ export class UmbApp extends UmbContextProviderMixin(LitElement) {
 				return true;
 			}
 
-			let returnPath = '/login';
+			let returnPath = 'login';
 
 			if (redirectTo) {
 				returnPath += `?redirectTo=${redirectTo}`;
