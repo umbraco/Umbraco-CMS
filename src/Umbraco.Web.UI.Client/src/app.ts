@@ -118,7 +118,8 @@ export class UmbApp extends UmbContextProviderMixin(LitElement) {
 	}
 
 	private _isAuthorized(): boolean {
-		return sessionStorage.getItem('is-authenticated') === 'true';
+		return true; // TODO: Return true for now, until new login page is up and running
+		//return sessionStorage.getItem('is-authenticated') === 'true';
 	}
 
 	private _isAuthorizedGuard(redirectTo?: string): Guard {
