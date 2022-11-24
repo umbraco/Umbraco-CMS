@@ -2,7 +2,7 @@
     "use strict";
 
     function UserEditController($scope, eventsService, $q, $location, $routeParams, formHelper, usersResource, twoFactorLoginResource,
-        userService, contentEditingHelper, localizationService, mediaHelper, Upload, umbRequestHelper,
+        userService, contentEditingHelper, localizationService, dateHelper, mediaHelper, Upload, umbRequestHelper,
         usersHelper, authResource, dateHelper, editorService, overlayService, externalLoginInfoService) {
 
         var currentLoggedInUser = null;
@@ -108,23 +108,6 @@
                 vm.hasTwoFactorProviders = providers.length > 0;
               });
             });
-        }
-
-        function getLocalDate(date, culture, format) {
-            if (date) {
-                var dateVal;
-                var serverOffset = Umbraco.Sys.ServerVariables.application.serverTimeOffset;
-                var localOffset = new Date().getTimezoneOffset();
-                var serverTimeNeedsOffsetting = (-serverOffset !== localOffset);
-
-                if (serverTimeNeedsOffsetting) {
-                    dateVal = dateHelper.convertToLocalMomentTime(date, serverOffset);
-                } else {
-                    dateVal = moment(date, "YYYY-MM-DD HH:mm:ss");
-                }
-
-                return dateVal.locale(culture).format(format);
-            }
         }
 
         function toggleChangePassword() {
@@ -571,11 +554,11 @@
             userService.getCurrentUser().then(function (currentUser) {
                 currentLoggedInUser = currentUser;
 
-                user.formattedLastLogin = getLocalDate(user.lastLoginDate, currentUser.locale, "LLL");
-                user.formattedLastLockoutDate = getLocalDate(user.lastLockoutDate, currentUser.locale, "LLL");
-                user.formattedCreateDate = getLocalDate(user.createDate, currentUser.locale, "LLL");
-                user.formattedUpdateDate = getLocalDate(user.updateDate, currentUser.locale, "LLL");
-                user.formattedLastPasswordChangeDate = getLocalDate(user.lastPasswordChangeDate, currentUser.locale, "LLL");
+                user.formattedLastLogin = dateHelper.getLocalDate(user.lastLoginDate, currentUser.locale, "LLL");
+                user.formattedLastLockoutDate = dateHelper.getLocalDate(user.lastLockoutDate, currentUser.locale, "LLL");
+                user.formattedCreateDate = dateHelper.getLocalDate(user.createDate, currentUser.locale, "LLL");
+                user.formattedUpdateDate = dateHelper.getLocalDate(user.updateDate, currentUser.locale, "LLL");
+                user.formattedLastPasswordChangeDate = dateHelper.getLocalDate(user.lastPasswordChangeDate, currentUser.locale, "LLL");
             });
         }
 
