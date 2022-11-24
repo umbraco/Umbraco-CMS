@@ -152,19 +152,14 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
 
         if (ordering.OrderBy.InvariantEquals("published"))
         {
-            // no culture = can only work on the global 'published' flag
+            // no culture, assume invariant and simply order by published.
             if (ordering.Culture.IsNullOrWhiteSpace())
             {
-                // see notes in ApplyOrdering: the field MUST be selected + aliased, and we cannot have
-                // the whole CASE fragment in ORDER BY due to it not being detected by NPoco
-                sql = Sql(InsertBefore(sql, "FROM", ", (CASE WHEN pcv.id IS NULL THEN 0 ELSE 1 END) AS ordering "),
-                    sql.Arguments);
-                return "ordering";
+                return SqlSyntax.GetFieldName<DocumentDto>(x => x.Published);
             }
 
             // invariant: left join will yield NULL and we must use pcv to determine published
             // variant: left join may yield NULL or something, and that determines published
-
 
             Sql<ISqlContext> joins = Sql()
                 .InnerJoin<ContentTypeDto>("ctype").On<ContentDto, ContentTypeDto>(
