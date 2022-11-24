@@ -59,7 +59,7 @@
 		"@babel/core": "^7.20.2",
 		"@mdx-js/react": "^2.1.5",
 		"@open-wc/testing": "^3.1.7",
-		"@playwright/test": "^1.28.0",
+		"@playwright/test": "^1.28.1",
 		"@storybook/addon-a11y": "^6.5.13",
 		"@storybook/addon-actions": "^6.5.13",
 		"@storybook/addon-essentials": "^6.5.13",
