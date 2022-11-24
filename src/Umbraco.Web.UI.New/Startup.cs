@@ -49,6 +49,15 @@ namespace Umbraco.Cms.Web.UI
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+
+                Console.WriteLine(@"Enabling CORS in development mode");
+                app.UseCors(u =>
+                {
+                    u.AllowCredentials();
+                    u.AllowAnyMethod();
+                    u.AllowAnyHeader();
+                    u.WithOrigins(new[] { "http://127.0.0.1:5173", "http://localhost:5173" });
+                });
             }
 #if (UseHttpsRedirect)
 
