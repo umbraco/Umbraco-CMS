@@ -1,5 +1,5 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import {css, html, LitElement, nothing} from 'lit';
+import { css, html, LitElement, nothing } from 'lit';
 import { customElement, state, query, property } from 'lit/decorators.js';
 
 import { UmbModalService, UmbNotificationService, UmbNotificationDefaultData } from '@umbraco-cms/services';
@@ -10,7 +10,6 @@ import { ApiError, ProblemDetails, SearchResult, SearcherResource, Field } from 
 
 import './modal-views/fields-viewer.element';
 import './modal-views/fields-settings.element';
-import {UUIButtonState} from "@umbraco-ui/uui";
 
 interface ExposedSearchResultField {
 	name?: string | null;
