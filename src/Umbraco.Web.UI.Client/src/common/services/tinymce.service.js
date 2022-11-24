@@ -139,6 +139,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         }
 
         promises.push(stylesheetResource.getRulesByName(val).then(function (rules) {
+          var split;
           rules.forEach(function (rule) {
             var r = {};
             r.title = rule.name;
@@ -151,12 +152,12 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
               r.attributes = { id: rule.selector.substring(1) };
             }
             else if (rule.selector[0] !== "." && rule.selector.indexOf(".") > -1) {
-              var split = rule.selector.split(".");
+              split = rule.selector.split(".");
               r.block = split[0];
               r.classes = rule.selector.substring(rule.selector.indexOf(".") + 1).replace(/\./g, " ");
             }
             else if (rule.selector[0] != "#" && rule.selector.indexOf("#") > -1) {
-              var split = rule.selector.split("#");
+              split = rule.selector.split("#");
               r.block = split[0];
               r.classes = rule.selector.substring(rule.selector.indexOf("#") + 1);
             }
