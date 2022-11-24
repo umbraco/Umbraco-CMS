@@ -1,10 +1,9 @@
+import { UUIButtonState } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import { customElement, state } from 'lit/decorators.js';
 import { ApiError, ProblemDetails, Telemetry, TelemetryLevel, TelemetryResource } from '@umbraco-cms/backend-api';
-
-export type SettingOption = 'Minimal' | 'Basic' | 'Detailed';
 
 @customElement('umb-dashboard-telemetry')
 export class UmbDashboardTelemetryElement extends LitElement {
@@ -26,13 +25,16 @@ export class UmbDashboardTelemetryElement extends LitElement {
 	@state()
 	private _errorMessage = '';
 
+	@state()
+	private _buttonState: UUIButtonState | undefined = undefined;
+
 	constructor() {
 		super();
 	}
 
-	connectedCallback(): void {
+	async connectedCallback() {
 		super.connectedCallback();
-		this._setup();
+		await this._setup();
 	}
 
 	private async _setup() {
@@ -59,11 +61,14 @@ export class UmbDashboardTelemetryElement extends LitElement {
 
 	private _handleSubmit = async (e: CustomEvent<SubmitEvent>) => {
 		e.stopPropagation();
+		this._buttonState = 'waiting';
 		try {
 			await TelemetryResource.postTelemetryLevel({
 				requestBody: { telemetryLevel: this._telemetryFormData },
 			});
+			this._buttonState = 'success';
 		} catch (e) {
+			this._buttonState = 'failed';
 			if (e instanceof ApiError) {
 				const error = e.body as ProblemDetails;
 				if (e.status === 400) {
@@ -74,10 +79,6 @@ export class UmbDashboardTelemetryElement extends LitElement {
 			}
 		}
 	};
-
-	disconnectedCallback(): void {
-		super.disconnectedCallback();
-	}
 
 	private _handleChange(e: InputEvent) {
 		const target = e.target as HTMLInputElement;
@@ -145,7 +146,7 @@ export class UmbDashboardTelemetryElement extends LitElement {
 						will be fully anonymized.
 					</p>
 					${this._renderSettingSlider()}
-					<uui-button look="primary" color="positive" label="Save telemetry settings" @click="${this._handleSubmit}">
+					<uui-button look="primary" color="positive" label="Save telemetry settings" @click="${this._handleSubmit}" .state=${this._buttonState}>
 						Save
 					</uui-button>
 				</div>
