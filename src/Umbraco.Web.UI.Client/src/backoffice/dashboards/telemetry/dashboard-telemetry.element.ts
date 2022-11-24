@@ -37,7 +37,7 @@ export class UmbDashboardTelemetryElement extends LitElement {
 
 	private async _setup() {
 		try {
-			const consentLevels = await TelemetryResource.getTelemetry({});
+			const consentLevels = await TelemetryResource.getTelemetry({skip: 0, take: 3});
 			this._telemetryLevels = consentLevels.items ?? [];
 		} catch (e) {
 			if (e instanceof ApiError) {
