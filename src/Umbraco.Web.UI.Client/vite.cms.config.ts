@@ -10,6 +10,10 @@ export default defineConfig({
 			formats: ['es'],
 			fileName: 'main',
 		},
+		outDir: '../Umbraco.Cms.StaticAssets/wwwroot/umbraco',
+		emptyOutDir: true,
 		sourcemap: true,
 	},
+	base: '/umbraco/',
+	mode: 'production'
 });
