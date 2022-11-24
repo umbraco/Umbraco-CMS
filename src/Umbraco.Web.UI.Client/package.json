@@ -43,9 +43,9 @@
 		"generate:api-dev": "openapi --input http://localhost:9000/umbraco/swagger/v1/swagger.json --output src/core/backend-api --postfix Resource --useOptions",
 		"storybook": "npm run wc-analyze && start-storybook -p 6006",
 		"build-storybook": "npm run wc-analyze && build-storybook",
-		"generate:icons": "node ./devops/icons/index.mjs",
+		"generate:icons": "node ./devops/icons/index.js",
 		"wc-analyze": "wca **/*.element.ts --outFile custom-elements.json",
-		"new-extension": "plop  --plopfile ./devops/plop/plop.mjs",
+		"new-extension": "plop  --plopfile ./devops/plop/plop.js",
 		"compile": "tsc"
 	},
 	"engines": {
