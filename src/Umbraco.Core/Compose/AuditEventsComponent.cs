@@ -79,7 +79,7 @@ namespace Umbraco.Core.Compose
             get
             {
                 var httpContext = HttpContext.Current == null ? (HttpContextBase) null : new HttpContextWrapper(HttpContext.Current);
-                var ip = httpContext.GetCurrentRequestIpAddress();
+                var ip = httpContext?.GetCurrentRequestIpAddress();
                 if (ip == null || ip.ToLowerInvariant().StartsWith("unknown")) ip = "";
                 return ip;
             }
