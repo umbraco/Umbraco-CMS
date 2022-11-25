@@ -48,7 +48,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.VisualStudio.SlowCheetah" Version="4.0.8" PrivateAssets="all" />
   </ItemGroup>
-  <Target Name="GetTransformedTemplateJsonPackageFiles" BeforeTargets="_GetPackageFiles">
+  <Target Name="GetTransformedTemplateJsonPackageFiles" BeforeTargets="GenerateNuspec" AfterTargets="GetBuildVersion;GetUmbracoBuildVersion">
     <WriteLinesToFile File="$(IntermediateOutputPath)template.json" Lines="{&quot;symbols&quot;:{&quot;UmbracoVersion&quot;:{&quot;defaultValue&quot;:&quot;$(PackageVersion)&quot;}}}" Overwrite="true" />
     <ItemGroup>
       <_TemplateJsonFiles Include="**\.template.config\template.json" Exclude="bin\**;obj\**" />
@@ -56,6 +56,7 @@
     <MakeDir Directories="@(_TemplateJsonFiles->'$(IntermediateOutputPath)%(RelativeDir)')" />
     <SlowCheetah.TransformTask Source="@(_TemplateJsonFiles)" Transform="$(IntermediateOutputPath)template.json" Destination="$(IntermediateOutputPath)%(RelativeDir)%(Filename)%(Extension)" />
     <ItemGroup>
+      <_PackageFiles Remove="**\.template.config\template.json" />
       <_PackageFiles Include="@(_TemplateJsonFiles->'$(IntermediateOutputPath)%(RelativeDir)%(Filename)%(Extension)')">
         <PackagePath>%(RelativeDir)</PackagePath>
       </_PackageFiles>
