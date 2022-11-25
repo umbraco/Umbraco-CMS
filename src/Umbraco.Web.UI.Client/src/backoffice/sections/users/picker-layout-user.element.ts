@@ -1,17 +1,14 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html, nothing } from 'lit';
+import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbModalLayoutElement } from '../../../core/services/modal/layouts/modal-layout.element';
 import { UmbUserStore } from '../../../core/stores/user/user.store';
-import { UmbPickerData } from './picker.element';
+import { UmbPickerLayoutElement } from './picker-layout.element';
 import type { UserDetails } from '@umbraco-cms/models';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 
 @customElement('umb-picker-layout-user')
-export class UmbPickerLayoutUserElement extends UmbContextConsumerMixin(
-	UmbObserverMixin(UmbModalLayoutElement<UmbPickerData>)
-) {
+export class UmbPickerLayoutUserElement extends UmbContextConsumerMixin(UmbObserverMixin(UmbPickerLayoutElement)) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -62,8 +59,6 @@ export class UmbPickerLayoutUserElement extends UmbContextConsumerMixin(
 			}
 		`,
 	];
-	@state()
-	private _selection: Array<string> = [];
 
 	@state()
 	private _users: Array<UserDetails> = [];
@@ -72,7 +67,6 @@ export class UmbPickerLayoutUserElement extends UmbContextConsumerMixin(
 
 	connectedCallback(): void {
 		super.connectedCallback();
-		this._selection = this.data?.selection || [];
 		this.consumeContext('umbUserStore', (userStore: UmbUserStore) => {
 			this._userStore = userStore;
 			this._observeUsers();
@@ -82,38 +76,6 @@ export class UmbPickerLayoutUserElement extends UmbContextConsumerMixin(
 	private _observeUsers() {
 		if (!this._userStore) return;
 		this.observe<Array<UserDetails>>(this._userStore.getAll(), (users) => (this._users = users));
-	}
-
-	private _submit() {
-		this.modalHandler?.close({ selection: this._selection });
-	}
-
-	private _close() {
-		this.modalHandler?.close();
-	}
-
-	private _handleKeydown(e: KeyboardEvent, key: string) {
-		if (e.key === 'Enter') {
-			this._handleItemClick(key);
-		}
-	}
-
-	private _handleItemClick(clickedKey: string) {
-		if (this.data?.multiple) {
-			if (this._isSelected(clickedKey)) {
-				this._selection = this._selection.filter((key) => key !== clickedKey);
-			} else {
-				this._selection.push(clickedKey);
-			}
-		} else {
-			this._selection = [clickedKey];
-		}
-
-		this.requestUpdate('_selection');
-	}
-
-	private _isSelected(key: string): boolean {
-		return this._selection.includes(key);
 	}
 
 	render() {
