@@ -33,6 +33,10 @@ export class UmbModalLayoutUserDialogElement extends UmbContextConsumerMixin(Umb
 				flex-direction: column;
 				gap: var(--uui-size-space-3);
 			}
+			umb-external-login-provider-extension:not(:last-child) {
+				margin-bottom: var(--uui-size-space-3);
+				display: block;
+			}
 		`,
 	];
 
