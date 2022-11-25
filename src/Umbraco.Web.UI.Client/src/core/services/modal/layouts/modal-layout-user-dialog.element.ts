@@ -2,10 +2,12 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UmbModalHandler, UmbModalService } from '@umbraco-cms/services';
-import type { UserDetails } from '@umbraco-cms/models';
+import type { ManifestExternalLoginProvider, UserDetails } from '@umbraco-cms/models';
 import { UmbUserStore } from 'src/core/stores/user/user.store';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
+import '../../../../backoffice/external-login-providers/external-login-provider-extension.element';
 
 @customElement('umb-modal-layout-user-dialog')
 export class UmbModalLayoutUserDialogElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
@@ -35,6 +37,9 @@ export class UmbModalLayoutUserDialogElement extends UmbContextConsumerMixin(Umb
 	@state()
 	private _currentUser?: UserDetails;
 
+	@state()
+	private _externalLoginProviders: Array<ManifestExternalLoginProvider> = [];
+
 	private _userStore?: UmbUserStore;
 	private _modalService?: UmbModalService;
 
@@ -45,6 +50,8 @@ export class UmbModalLayoutUserDialogElement extends UmbContextConsumerMixin(Umb
 			this._modalService = instances['umbModalService'];
 			this._observeCurrentUser();
 		});
+
+		this._observeExternalLoginProviders();
 	}
 
 	private async _observeCurrentUser() {
@@ -53,6 +60,16 @@ export class UmbModalLayoutUserDialogElement extends UmbContextConsumerMixin(Umb
 		this.observe<UserDetails>(this._userStore.currentUser, (currentUser) => {
 			this._currentUser = currentUser;
 		});
+	}
+
+	private _observeExternalLoginProviders() {
+		this.observe<ManifestExternalLoginProvider[]>(
+			umbExtensionsRegistry.extensionsOfType('externalLoginProvider'),
+			(loginProvider) => {
+				this._externalLoginProviders = loginProvider;
+				console.log('loginProvider', loginProvider);
+			}
+		);
 	}
 
 	private _close() {
@@ -84,6 +101,14 @@ export class UmbModalLayoutUserDialogElement extends UmbContextConsumerMixin(Umb
 						<uui-button look="primary">Edit your Umbraco ID profile</uui-button>
 						<uui-button look="primary">Change your Umbraco ID password</uui-button>
 					</uui-box>
+
+					<div>
+						${this._externalLoginProviders.map(
+							(provider) =>
+								html`<umb-external-login-provider-extension
+									.externalLoginProvider=${provider}></umb-external-login-provider-extension>`
+						)}
+					</div>
 				</div>
 				<div slot="actions">
 					<uui-button @click=${this._close} look="secondary">Close</uui-button>

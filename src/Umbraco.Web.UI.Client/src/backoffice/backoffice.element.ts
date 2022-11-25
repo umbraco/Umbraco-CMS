@@ -31,6 +31,7 @@ import { manifests as propertyEditorUIManifests } from './property-editor-uis/ma
 import { manifests as treeManifests } from './trees/manifests';
 import { manifests as editorManifests } from './editors/manifests';
 import { manifests as propertyActionManifests } from './property-actions/manifests';
+import { manifests as externalLoginProviderManifests } from './external-login-providers/manifests';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import type { ManifestTypes, ManifestWithLoader } from '@umbraco-cms/models';
@@ -64,6 +65,7 @@ export class UmbBackofficeElement extends UmbContextConsumerMixin(UmbContextProv
 		this._registerExtensions(propertyEditorModelManifests);
 		this._registerExtensions(propertyEditorUIManifests);
 		this._registerExtensions(propertyActionManifests);
+		this._registerExtensions(externalLoginProviderManifests);
 
 		this._umbIconRegistry.attach(this);
 
