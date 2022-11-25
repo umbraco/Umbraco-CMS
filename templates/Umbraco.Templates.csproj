@@ -8,6 +8,7 @@
     <NoDefaultExcludes>true</NoDefaultExcludes>
     <IncludeContentInPack>true</IncludeContentInPack>
     <ContentTargetFolders>.</ContentTargetFolders>
+    <NoWarn>NU5128</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
@@ -42,4 +43,22 @@
       <PackagePath>UmbracoProject\wwwroot</PackagePath>
     </Content>
   </ItemGroup>
+
+  <!-- Transform template.json files with the default UmbracoVersion value set to the current build version -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.VisualStudio.SlowCheetah" Version="4.0.8" PrivateAssets="all" />
+  </ItemGroup>
+  <Target Name="GetTransformedTemplateJsonPackageFiles" BeforeTargets="_GetPackageFiles">
+    <WriteLinesToFile File="$(IntermediateOutputPath)template.json" Lines="{&quot;symbols&quot;:{&quot;UmbracoVersion&quot;:{&quot;defaultValue&quot;:&quot;$(PackageVersion)&quot;}}}" Overwrite="true" />
+    <ItemGroup>
+      <_TemplateJsonFiles Include="**\.template.config\template.json" Exclude="bin\**;obj\**" />
+    </ItemGroup>
+    <MakeDir Directories="@(_TemplateJsonFiles->'$(IntermediateOutputPath)%(RelativeDir)')" />
+    <SlowCheetah.TransformTask Source="@(_TemplateJsonFiles)" Transform="$(IntermediateOutputPath)template.json" Destination="$(IntermediateOutputPath)%(RelativeDir)%(Filename)%(Extension)" />
+    <ItemGroup>
+      <_PackageFiles Include="@(_TemplateJsonFiles->'$(IntermediateOutputPath)%(RelativeDir)%(Filename)%(Extension)')">
+        <PackagePath>%(RelativeDir)</PackagePath>
+      </_PackageFiles>
+    </ItemGroup>
+  </Target>
 </Project>
