@@ -3,11 +3,11 @@ import { css, html, nothing, PropertyValueMap } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import type { UserEntity } from '../../../core/models';
 import { UmbUserStore } from '../../../core/stores/user/user.store';
-import { UmbPickerElement } from './picker.element';
+import { UmbPicker } from './picker';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 
 @customElement('umb-picker-user')
-export class UmbPickerUserElement extends UmbObserverMixin(UmbPickerElement) {
+export class UmbPickerUserElement extends UmbObserverMixin(UmbPicker) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -86,8 +86,6 @@ export class UmbPickerUserElement extends UmbObserverMixin(UmbPickerElement) {
 		return html`${this._renderUserList()}`;
 	}
 }
-
-export default UmbPickerUserElement;
 
 declare global {
 	interface HTMLElementTagNameMap {

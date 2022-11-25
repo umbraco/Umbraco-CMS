@@ -1,14 +1,14 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbPickerLayoutElement } from './picker-layout.element';
+import { UmbPickerLayout } from './picker-layout';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import type { ManifestSection } from '@umbraco-cms/models';
 
 @customElement('umb-picker-layout-section')
-export class UmbPickerLayoutSectionElement extends UmbContextConsumerMixin(UmbObserverMixin(UmbPickerLayoutElement)) {
+export class UmbPickerLayoutSectionElement extends UmbContextConsumerMixin(UmbObserverMixin(UmbPickerLayout)) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -94,8 +94,6 @@ export class UmbPickerLayoutSectionElement extends UmbContextConsumerMixin(UmbOb
 		`;
 	}
 }
-
-export default UmbPickerLayoutSectionElement;
 
 declare global {
 	interface HTMLElementTagNameMap {

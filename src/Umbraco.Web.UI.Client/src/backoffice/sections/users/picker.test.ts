@@ -1,15 +1,15 @@
 import { expect, fixture, html } from '@open-wc/testing';
-import UmbPickerElement from './picker.element';
+import { UmbPicker } from './picker';
 import { defaultA11yConfig } from '@umbraco-cms/test-utils';
 
 describe('UmbPickerElement', () => {
-	let element: UmbPickerElement;
+	let element: UmbPicker;
 	beforeEach(async () => {
 		element = await fixture(html`<umb-picker></umb-picker>`);
 	});
 
 	it('is defined with its own instance', () => {
-		expect(element).to.be.instanceOf(UmbPickerElement);
+		expect(element).to.be.instanceOf(UmbPicker);
 	});
 
 	it('passes the a11y audit', async () => {

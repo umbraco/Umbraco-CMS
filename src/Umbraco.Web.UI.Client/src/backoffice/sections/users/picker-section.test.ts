@@ -1,6 +1,6 @@
 import { expect, fixture, html } from '@open-wc/testing';
+import { UmbPickerSectionElement } from './picker-section.element';
 import { defaultA11yConfig } from '@umbraco-cms/test-utils';
-import UmbPickerSectionElement from './picker-section.element';
 
 describe('UmbPickerSectionElement', () => {
 	let element: UmbPickerSectionElement;

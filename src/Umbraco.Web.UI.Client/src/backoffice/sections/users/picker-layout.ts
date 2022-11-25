@@ -1,14 +1,9 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html, nothing } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
+import { state } from 'lit/decorators.js';
 import { UmbModalLayoutElement } from '../../../core/services/modal/layouts/modal-layout.element';
-import { UmbUserStore } from '../../../core/stores/user/user.store';
-import { UmbPickerData } from './picker.element';
-import type { UserDetails } from '@umbraco-cms/models';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 
-export class UmbPickerLayoutElement extends UmbModalLayoutElement<UmbPickerData> {
+import { UmbPickerData } from './picker';
+
+export class UmbPickerLayout extends UmbModalLayoutElement<UmbPickerData> {
 	@state()
 	private _selection: Array<string> = [];
 

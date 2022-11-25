@@ -14,7 +14,7 @@ export interface UmbPickerData {
 	selection: Array<string>;
 }
 
-export class UmbPickerElement extends UmbContextConsumerMixin(LitElement) {
+export class UmbPicker extends UmbContextConsumerMixin(LitElement) {
 	@property({ type: Array })
 	public value: Array<string> = [];
 

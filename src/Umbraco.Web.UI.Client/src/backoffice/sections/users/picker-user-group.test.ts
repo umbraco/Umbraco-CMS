@@ -1,6 +1,6 @@
 import { expect, fixture, html } from '@open-wc/testing';
+import { UmbPickerUserGroupElement } from './picker-user-group.element';
 import { defaultA11yConfig } from '@umbraco-cms/test-utils';
-import UmbPickerUserGroupElement from './picker-user-group.element';
 
 describe('UmbPickerLayoutUserGroupElement', () => {
 	let element: UmbPickerUserGroupElement;
