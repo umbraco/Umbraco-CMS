@@ -90,7 +90,7 @@ export class UmbEditorViewUsersGridElement extends UmbContextConsumerMixin(UmbOb
 
 	//TODO How should we handle url stuff?
 	private _handleOpenCard(key: string) {
-		history.pushState(null, '', '/section/users/view/users/user/' + key); //TODO Change to a tag with href and make dynamic
+		history.pushState(null, '', 'section/users/view/users/user/' + key); //TODO Change to a tag with href and make dynamic
 	}
 
 	private _selectRowHandler(user: UserEntity) {

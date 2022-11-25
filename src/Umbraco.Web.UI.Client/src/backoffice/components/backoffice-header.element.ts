@@ -43,7 +43,7 @@ export class UmbBackofficeHeader extends LitElement {
 		return html`
 			<div id="appHeader">
 				<uui-button id="logo" look="primary" label="Umbraco" compact>
-					<img src="/umbraco_logomark_white.svg" alt="Umbraco" />
+					<img src="umbraco_logomark_white.svg" alt="Umbraco" />
 				</uui-button>
 
 				<umb-backoffice-header-sections id="sections"></umb-backoffice-header-sections>

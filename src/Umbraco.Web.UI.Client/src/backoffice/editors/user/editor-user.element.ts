@@ -166,7 +166,7 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(
 
 		this._userStore.deleteUsers([this._user.key]);
 
-		history.pushState(null, '', '/section/users/view/users/overview');
+		history.pushState(null, '', 'section/users/view/users/overview');
 	}
 
 	// TODO. find a way where we don't have to do this for all editors.
