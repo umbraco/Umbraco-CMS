@@ -158,6 +158,8 @@ export class UmbEditorViewUsersGridElement extends UmbContextConsumerMixin(UmbOb
 	}
 }
 
+export default UmbEditorViewUsersGridElement;
+
 declare global {
 	interface HTMLElementTagNameMap {
 		'umb-editor-view-users-grid': UmbEditorViewUsersGridElement;
