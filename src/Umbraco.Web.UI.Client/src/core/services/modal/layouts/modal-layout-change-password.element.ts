@@ -14,17 +14,15 @@ export class UmbModalLayoutChangePasswordElement extends UmbContextConsumerMixin
 		css`
 			:host {
 				display: block;
+				width: 400px;
 			}
-			:host,
-			umb-editor-entity-layout {
+			uui-input-password {
 				width: 100%;
-				height: 100%;
 			}
-			#main {
-				padding: var(--uui-size-space-5);
+			#actions {
 				display: flex;
-				flex-direction: column;
-				gap: var(--uui-size-space-3);
+				justify-content: flex-end;
+				margin-top: var(--uui-size-layout-2);
 			}
 		`,
 	];
@@ -95,8 +93,10 @@ export class UmbModalLayoutChangePasswordElement extends UmbContextConsumerMixin
 								required-message="Confirm password is required"></uui-input-password>
 						</uui-form-layout-item>
 
-						<uui-button @click=${this._close} label="Cancel" look="secondary"></uui-button>
-						<uui-button type="submit" label="Confirm" look="primary" color="positive"></uui-button>
+						<div id="actions">
+							<uui-button @click=${this._close} label="Cancel"></uui-button>
+							<uui-button type="submit" label="Confirm" look="primary" color="positive"></uui-button>
+						</div>
 					</form>
 				</uui-form>
 			</uui-dialog-layout>
