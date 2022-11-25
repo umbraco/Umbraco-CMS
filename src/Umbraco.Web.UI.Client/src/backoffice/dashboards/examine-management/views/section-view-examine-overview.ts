@@ -155,7 +155,7 @@ export class UmbDashboardExamineOverviewElement extends UmbContextConsumerMixin(
 	}
 
 	private renderSearchersList() {
-		if (this._loadingIndexers) return html`<uui-loader></uui-loader>`;
+		if (this._loadingSearchers) return html`<uui-loader></uui-loader>`;
 		if (!this._searchers) return nothing;
 		return html`
 			<uui-table class="overview2">
