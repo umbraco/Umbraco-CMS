@@ -3,10 +3,9 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, query, state } from 'lit/decorators.js';
 import { UmbModalLayoutElement } from '../../../../../core/services/modal/layouts/modal-layout.element';
 import { UmbUserStore } from '../../../../../core/stores/user/user.store';
+import { UmbPickerUserGroupElement } from '../../picker-user-group.element';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { UserDetails } from '@umbraco-cms/models';
-import '../../picker-user-group.element';
-import UmbPickerUserGroupElement from '../../picker-user-group.element';
 
 export type UsersViewType = 'list' | 'grid';
 @customElement('umb-editor-view-users-invite')

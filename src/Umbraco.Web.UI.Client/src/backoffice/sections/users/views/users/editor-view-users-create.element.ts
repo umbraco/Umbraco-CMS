@@ -4,10 +4,9 @@ import { customElement, query, state } from 'lit/decorators.js';
 import { UUIInputPasswordElement } from '@umbraco-ui/uui';
 import { UmbModalLayoutElement } from '../../../../../core/services/modal/layouts/modal-layout.element';
 import { UmbUserStore } from '../../../../../core/stores/user/user.store';
+import { UmbPickerUserGroupElement } from '../../picker-user-group.element';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { UserDetails } from '@umbraco-cms/models';
-import UmbPickerUserGroupElement from '../../picker-user-group.element';
-import '../../picker-user-group.element';
 import { UmbNotificationService } from 'src/core/services/notification';
 import { UmbNotificationDefaultData } from 'src/core/services/notification/layouts/default';
 
