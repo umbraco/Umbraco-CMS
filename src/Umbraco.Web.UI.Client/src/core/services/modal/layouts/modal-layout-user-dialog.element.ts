@@ -28,6 +28,11 @@ export class UmbModalLayoutUserDialogElement extends UmbContextConsumerMixin(Umb
 				flex-direction: column;
 				gap: var(--uui-size-space-3);
 			}
+			#umbraco-id-buttons {
+				display: flex;
+				flex-direction: column;
+				gap: var(--uui-size-space-3);
+			}
 		`,
 	];
 
@@ -98,17 +103,17 @@ export class UmbModalLayoutUserDialogElement extends UmbContextConsumerMixin(Umb
 					</uui-box>
 					<uui-box>
 						<b slot="headline">External login providers</b>
-						<uui-button look="primary">Edit your Umbraco ID profile</uui-button>
-						<uui-button look="primary">Change your Umbraco ID password</uui-button>
-					</uui-box>
-
-					<div>
+						<div id="umbraco-id-buttons">
+							<uui-button look="primary">Edit your Umbraco ID profile</uui-button>
+							<uui-button look="primary">Change your Umbraco ID password</uui-button>
+						</div>
+						<br />
 						${this._externalLoginProviders.map(
 							(provider) =>
 								html`<umb-external-login-provider-extension
 									.externalLoginProvider=${provider}></umb-external-login-provider-extension>`
 						)}
-					</div>
+					</uui-box>
 				</div>
 				<div slot="actions">
 					<uui-button @click=${this._close} look="secondary">Close</uui-button>
