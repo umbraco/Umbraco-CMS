@@ -121,13 +121,12 @@ public class TagsPropertyEditor : DataEditor
                     throw new NotSupportedException($"Value \"{tagConfiguration.StorageType}\" is not a valid TagsStorageType.");
             }
 
-            return from tag in tags
-                   select new Tag
-                   {
-                       Group = tagConfiguration.Group,
-                       Text = tag,
-                       LanguageId = languageId
-                   };
+            return tags.Select(x => new Tag
+            {
+                Group = tagConfiguration.Group,
+                Text = x,
+                LanguageId = languageId,
+            });
         }
 
 
