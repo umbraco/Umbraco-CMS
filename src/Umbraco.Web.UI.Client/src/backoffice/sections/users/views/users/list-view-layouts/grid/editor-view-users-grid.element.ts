@@ -4,7 +4,6 @@ import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import type { UmbSectionViewUsersElement } from '../../section-view-users.element';
-import { UmbUserStore } from '../../../../../../../core/stores/user/user.store';
 import { getTagLookAndColor } from '../../../../user-extensions';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { UserDetails, UserEntity, UserGroupDetails, UserGroupEntity } from '@umbraco-cms/models';
@@ -158,8 +157,6 @@ export class UmbEditorViewUsersGridElement extends UmbContextConsumerMixin(UmbOb
 		`;
 	}
 }
-
-export default UmbEditorViewUsersGridElement;
 
 declare global {
 	interface HTMLElementTagNameMap {

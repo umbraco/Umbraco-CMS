@@ -2,7 +2,6 @@ import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import type { UmbSectionViewUsersElement } from '../../section-view-users.element';
-import { UmbUserStore } from '../../../../../../../core/stores/user/user.store';
 import {
 	UmbTableElement,
 	UmbTableColumn,

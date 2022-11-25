@@ -1,6 +1,6 @@
 import { expect, fixture, html } from '@open-wc/testing';
+import { UmbEditorViewUsersGridElement } from './editor-view-users-grid.element';
 import { defaultA11yConfig } from '@umbraco-cms/test-utils';
-import UmbEditorViewUsersGridElement from './editor-view-users-grid.element';
 
 describe('UmbEditorViewUsersCreateElement', () => {
 	let element: UmbEditorViewUsersGridElement;
