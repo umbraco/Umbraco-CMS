@@ -2,7 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
-import { UmbModalService, UmbNotificationService, UmbNotificationDefaultData } from '@umbraco-cms/services';
+import { UmbNotificationService, UmbNotificationDefaultData } from '@umbraco-cms/services';
 
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { ApiError, ProblemDetails, Searcher, Index, IndexerResource, SearcherResource } from '@umbraco-cms/backend-api';
