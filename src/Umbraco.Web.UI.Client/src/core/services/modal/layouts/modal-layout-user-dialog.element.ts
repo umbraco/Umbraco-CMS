@@ -124,13 +124,12 @@ export class UmbModalLayoutUserDialogElement extends UmbContextConsumerMixin(Umb
 									.externalLoginProvider=${provider}></umb-external-login-provider-extension>`
 						)}
 					</uui-box>
-					<uui-box>
-						<b slot="headline">User Dashboards</b>
+					<div>
 						${this._userDashboards.map(
 							(provider) =>
 								html`<umb-user-dashboard-extension .userDashboard=${provider}></umb-user-dashboard-extension>`
 						)}
-					</uui-box>
+					</div>
 				</div>
 				<div slot="actions">
 					<uui-button @click=${this._close} look="secondary">Close</uui-button>
