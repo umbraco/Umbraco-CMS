@@ -90,7 +90,8 @@
   </area>
   <area alias="assignDomain">
     <key alias="permissionDenied">Permission denied.</key>
-    <key alias="addNew">Add new Domain</key>
+    <key alias="addNew">Add new domain</key>
+    <key alias="addCurrent">Add current domain</key>
     <key alias="remove">remove</key>
     <key alias="invalidNode">Invalid node.</key>
     <key alias="invalidDomain">One or more domains have an invalid format.</key>
