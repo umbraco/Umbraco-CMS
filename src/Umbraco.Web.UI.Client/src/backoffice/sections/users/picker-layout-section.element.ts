@@ -1,17 +1,14 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbModalLayoutElement } from '../../../core/services/modal/layouts/modal-layout.element';
-import { UmbPickerData } from './picker.element';
+import { UmbPickerLayoutElement } from './picker-layout.element';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import type { ManifestSection } from '@umbraco-cms/models';
 
 @customElement('umb-picker-layout-section')
-export class UmbPickerLayoutSectionElement extends UmbContextConsumerMixin(
-	UmbObserverMixin(UmbModalLayoutElement<UmbPickerData>)
-) {
+export class UmbPickerLayoutSectionElement extends UmbContextConsumerMixin(UmbObserverMixin(UmbPickerLayoutElement)) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -59,9 +56,6 @@ export class UmbPickerLayoutSectionElement extends UmbContextConsumerMixin(
 	];
 
 	@state()
-	private _selection: Array<string> = [];
-
-	@state()
 	private _sections: Array<ManifestSection> = [];
 
 	connectedCallback(): void {
@@ -71,37 +65,6 @@ export class UmbPickerLayoutSectionElement extends UmbContextConsumerMixin(
 		});
 	}
 
-	private _submit() {
-		this.modalHandler?.close({ selection: this._selection });
-	}
-
-	private _close() {
-		this.modalHandler?.close();
-	}
-
-	private _handleKeydown(e: KeyboardEvent, alias: string) {
-		if (e.key === 'Enter') {
-			this._handleItemClick(alias);
-		}
-	}
-
-	private _handleItemClick(clickedAlias: string) {
-		if (this.data?.multiple) {
-			if (this._isSelected(clickedAlias)) {
-				this._selection = this._selection.filter((alias) => alias !== clickedAlias);
-			} else {
-				this._selection.push(clickedAlias);
-			}
-		} else {
-			this._selection = [clickedAlias];
-		}
-
-		this.requestUpdate('_selection');
-	}
-
-	private _isSelected(alias: string): boolean {
-		return this._selection.includes(alias);
-	}
 	//todo: save section aliasess in array
 
 	render() {
