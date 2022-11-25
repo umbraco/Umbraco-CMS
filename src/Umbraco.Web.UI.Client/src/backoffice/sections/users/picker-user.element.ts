@@ -3,9 +3,8 @@ import { css, html, nothing, PropertyValueMap } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import type { UserEntity } from '../../../core/models';
 import { UmbUserStore } from '../../../core/stores/user/user.store';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbPickerElement } from './picker.element';
-import './picker.element';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 
 @customElement('umb-picker-user')
 export class UmbPickerUserElement extends UmbObserverMixin(UmbPickerElement) {

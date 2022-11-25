@@ -2,7 +2,6 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbUserGroupStore } from '../../../core/stores/user/user-group.store';
-import './picker.element';
 import { UmbPickerElement } from './picker.element';
 import type { UserGroupEntity } from '@umbraco-cms/models';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';

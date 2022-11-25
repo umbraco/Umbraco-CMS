@@ -14,7 +14,6 @@ export interface UmbPickerData {
 	selection: Array<string>;
 }
 
-@customElement('umb-picker')
 export class UmbPickerElement extends UmbContextConsumerMixin(LitElement) {
 	@property({ type: Array })
 	public value: Array<string> = [];
@@ -77,13 +76,5 @@ export class UmbPickerElement extends UmbContextConsumerMixin(LitElement) {
 
 	render() {
 		return html`${this.renderContent()}${this.renderButton()}`;
-	}
-}
-
-export default UmbPickerElement;
-
-declare global {
-	interface HTMLElementTagNameMap {
-		'umb-picker': UmbPickerElement;
 	}
 }
