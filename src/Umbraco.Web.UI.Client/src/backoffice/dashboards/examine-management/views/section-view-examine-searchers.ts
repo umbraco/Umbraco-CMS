@@ -209,6 +209,12 @@ export class UmbDashboardExamineSearcherElement extends UmbContextConsumerMixin(
 		`;
 	}
 
+	// Find the field named 'nodeName' and return its value if it exists in the fields array
+	private getSearchResultNodeName(searchResult: SearchResult): string {
+		const nodeNameField = searchResult.fields?.find((field) => field.name?.toUpperCase() === 'NODENAME');
+		return nodeNameField?.values?.join(', ') ?? '';
+	}
+
 	private renderSearchResults() {
 		if (this._searchLoading) return html`<uui-loader></uui-loader>`;
 		if (!this._searchResults) return nothing;
@@ -231,10 +237,7 @@ export class UmbDashboardExamineSearcherElement extends UmbContextConsumerMixin(
 							<uui-table-cell> ${rowData.id} </uui-table-cell>
 							<uui-table-cell>
 								<uui-button look="secondary" label="Open editor for this document" @click="${this._onNameClick}">
-									${rowData.fields?.find((field) => {
-										if (field.name?.toUpperCase() === 'NODENAME') return field.values;
-										else return;
-									})?.values}
+									${this.getSearchResultNodeName(rowData)}
 								</uui-button>
 							</uui-table-cell>
 							<uui-table-cell>
@@ -246,7 +249,7 @@ export class UmbDashboardExamineSearcherElement extends UmbContextConsumerMixin(
 										this._modalService?.open('umb-modal-layout-fields-viewer', {
 											type: 'sidebar',
 											size: 'medium',
-											data: { ...rowData },
+											data: { ...rowData, name: this.getSearchResultNodeName(rowData) },
 										})}">
 									${rowData.fields ? Object.keys(rowData.fields).length : ''} fields
 								</uui-button>
