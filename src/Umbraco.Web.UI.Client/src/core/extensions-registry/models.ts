@@ -10,6 +10,7 @@ import type { ManifestDashboard } from './dashboard.models';
 import type { ManifestPropertyAction } from './property-action.models';
 import type { ManifestPackageView } from './package-view.models';
 import type { ManifestExternalLoginProvider } from './external-login-provider.models';
+import { ManifestUserDashboard } from './user-dashboard.models';
 
 export * from './section.models';
 export * from './section-view.models';
@@ -23,6 +24,7 @@ export * from './dashboard.models';
 export * from './property-action.models';
 export * from './package-view.models';
 export * from './external-login-provider.models';
+export * from './user-dashboard.models';
 
 export type ManifestTypes =
 	| ManifestSection
@@ -39,7 +41,8 @@ export type ManifestTypes =
 	| ManifestPackageView
 	| ManifestEntrypoint
 	| ManifestCustom
-	| ManifestExternalLoginProvider;
+	| ManifestExternalLoginProvider
+	| ManifestUserDashboard;
 
 export type ManifestStandardTypes =
 	| 'section'
@@ -55,7 +58,8 @@ export type ManifestStandardTypes =
 	| 'propertyAction'
 	| 'packageView'
 	| 'entrypoint'
-	| 'externalLoginProvider';
+	| 'externalLoginProvider'
+	| 'userDashboard';
 
 export type ManifestElementType =
 	| ManifestSection
