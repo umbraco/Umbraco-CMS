@@ -2,7 +2,7 @@
 <language alias="zh" intName="Chinese (Simple)" localName="中文（简体，中国）" lcid="0804" culture="zh-CN">
   <creator>
     <name>黄仁祥(wanddy@163.com)</name>
-    <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
+    <link>https://docs.umbraco.com/umbraco-cms/extending/language-files</link>
   </creator>
   <area alias="actions">
     <key alias="assigndomain">管理主机名</key>
@@ -147,7 +147,7 @@
     <key alias="childItems" version="7.0">子项</key>
     <key alias="target" version="7.0">目标</key>
     <key alias="scheduledPublishServerTime">这将转换到服务器上的以下时间:</key>
-    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank" rel="noopener">这是什么意思？</a>]]></key>
+    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://docs.umbraco.com/umbraco-cms/fundamentals/data/scheduled-publishing#timezones" target="_blank" rel="noopener">这是什么意思？</a>]]></key>
   </area>
   <area alias="media">
     <key alias="clickToUpload">点击上传</key>

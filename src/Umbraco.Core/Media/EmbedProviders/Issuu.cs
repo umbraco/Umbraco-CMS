@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Core.Media.EmbedProviders;
 /// <summary>
 ///     Embed Provider for Issuu the popular platform to create interactive flipbooks, social media posts, GIFs, and more from a single piece of static content.
 /// </summary>
-public class Issuu : EmbedProviderBase
+public class Issuu : OEmbedProviderBase
 {
     public Issuu(IJsonSerializer jsonSerializer)
         : base(jsonSerializer)

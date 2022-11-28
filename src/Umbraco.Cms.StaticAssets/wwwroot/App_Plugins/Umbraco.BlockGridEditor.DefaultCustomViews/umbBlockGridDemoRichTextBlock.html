@@ -1,0 +1,25 @@
+<style>
+
+    .text {
+        position: relative;
+        display: block;
+        cursor: pointer;
+        background-color: transparent;
+        text-align: left;
+        user-select: none;
+        border: none;
+        padding: 0;
+        height: 100%;
+        padding-top: 1px;
+        margin-top: -1px;
+        transition: border-color 120ms, background-color 120ms;
+
+        font-family: 'Lato';
+        font-weight: 300;
+        line-height: 1.5;
+    }
+
+</style>
+
+<div class="text" ng-click="block.edit()" ng-focus="block.focus" ng-bind-html="block.data.richText" style="margin: 0 20px;">
+</div>

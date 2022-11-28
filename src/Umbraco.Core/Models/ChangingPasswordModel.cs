@@ -11,7 +11,7 @@ public class ChangingPasswordModel
     ///     The password value
     /// </summary>
     [DataMember(Name = "newPassword")]
-    public string? NewPassword { get; set; }
+    public required string NewPassword { get; set; }
 
     /// <summary>
     ///     The old password - used to change a password when: EnablePasswordRetrieval = false

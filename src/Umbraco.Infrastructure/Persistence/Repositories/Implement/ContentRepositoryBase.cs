@@ -1042,8 +1042,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             var trackedRelations = new List<UmbracoEntityReference>();
             trackedRelations.AddRange(_dataValueReferenceFactories.GetAllReferences(entity.Properties, PropertyEditors));
 
+            var relationTypeAliases = GetAutomaticRelationTypesAliases(entity.Properties, PropertyEditors).ToArray();
+
             // First delete all auto-relations for this entity
-            RelationRepository.DeleteByParent(entity.Id, Constants.Conventions.RelationTypes.AutomaticRelationTypes);
+            RelationRepository.DeleteByParent(entity.Id, relationTypeAliases);
 
             if (trackedRelations.Count == 0)
             {
@@ -1055,7 +1057,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 .ToDictionary(x => (Udi)x!, x => x!.Guid);
 
             // lookup in the DB all INT ids for the GUIDs and chuck into a dictionary
-            var keyToIds = Database.Fetch<NodeIdKey>(Sql().Select<NodeDto>(x => x.NodeId, x => x.UniqueId).From<NodeDto>().WhereIn<NodeDto>(x => x.UniqueId, udiToGuids.Values))
+            var keyToIds = Database.Fetch<NodeIdKey>(Sql()
+                .Select<NodeDto>(x => x.NodeId, x => x.UniqueId)
+                .From<NodeDto>()
+                .WhereIn<NodeDto>(x => x.UniqueId, udiToGuids.Values))
                 .ToDictionary(x => x.UniqueId, x => x.NodeId);
 
             var allRelationTypes = RelationTypeRepository.GetMany(Array.Empty<int>())?
@@ -1083,6 +1088,31 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             // Save bulk relations
             RelationRepository.SaveBulk(toSave);
+        }
+
+        private IEnumerable<string> GetAutomaticRelationTypesAliases(
+            IPropertyCollection properties,
+            PropertyEditorCollection propertyEditors)
+        {
+            var automaticRelationTypesAliases = new HashSet<string>(Constants.Conventions.RelationTypes.AutomaticRelationTypes);
+
+            foreach (IProperty property in properties)
+            {
+                if (propertyEditors.TryGet(property.PropertyType.PropertyEditorAlias, out IDataEditor? editor) is false )
+                {
+                    continue;
+                }
+
+                if (editor.GetValueEditor() is IDataValueReference reference)
+                {
+                    foreach (var alias in reference.GetAutomaticRelationTypesAliases())
+                    {
+                        automaticRelationTypesAliases.Add(alias);
+                    }
+                }
+            }
+
+            return automaticRelationTypesAliases;
         }
 
         /// <summary>

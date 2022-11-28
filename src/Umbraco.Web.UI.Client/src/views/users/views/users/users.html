@@ -321,9 +321,9 @@
                         <umb-control-group label="@general_name" label-for="name" required="true">
                             <input type="text" name="name" id="name" localize="placeholder" placeholder="@placeholders_entername" class="input-block-level" ng-model="vm.newUser.name"
                                    umb-auto-focus required val-server-field="Name" />
-                            <span ng-messages="addUserForm.name.$error" show-validation-on-submit >
-                                <span class="help-inline" ng-message="required"><localize key="general_required">Required</localize></span>
-                                <span class="help-inline" ng-message="valServerField">{{addUserForm.name.errorMsg}}</span>
+                            <span ng-messages="addUserForm.name.$error" show-validation-on-submit>
+                              <span class="help-inline" ng-message="required"><localize key="user_nameRequired">Required</localize></span>
+                              <span class="help-inline" ng-message="valServerField">{{addUserForm.name.errorMsg}}</span>
                             </span>
 
                         </umb-control-group>
@@ -341,10 +341,10 @@
                         <umb-control-group label="@general_email" label-for="email" required="true">
                             <input type="email" name="email" id="email" localize="placeholder" placeholder="@placeholders_enteremail" class="input-block-level"
                                    ng-model="vm.newUser.email" required val-email val-server-field="Email" />
-                            <span ng-messages="addUserForm.email.$error" show-validation-on-submit >
-                                <span class="help-inline" ng-message="required"><localize key="general_required">Required</localize></span>
-                                <span class="help-inline" ng-message="valEmail"><localize key="validation_invalidEmail">Invalid email</localize></span>
-                                <span class="help-inline" ng-message="valServerField">{{addUserForm.email.errorMsg}}</span>
+                            <span ng-messages="addUserForm.email.$error" show-validation-on-submit>
+                              <span class="help-inline" ng-message="required"><localize key="user_emailRequired">Required</localize></span>
+                              <span class="help-inline" ng-message="valEmail"><localize key="validation_invalidEmail">Invalid email</localize></span>
+                              <span class="help-inline" ng-message="valServerField">{{addUserForm.email.errorMsg}}</span>
                             </span>
                         </umb-control-group>
 

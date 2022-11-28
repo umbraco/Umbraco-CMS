@@ -1,4 +1,5 @@
 using Umbraco.Cms.Core.Models;
+using Umbraco.New.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -50,6 +51,15 @@ public interface ILocalizationService : IService
     IDictionaryItem? GetDictionaryItemById(Guid id);
 
     /// <summary>
+    ///     Gets a collection of <see cref="IDictionaryItem" /> by their <see cref="Guid" /> ids
+    /// </summary>
+    /// <param name="ids">Ids of the <see cref="IDictionaryItem" /></param>
+    /// <returns>
+    ///     A collection of <see cref="IDictionaryItem" />
+    /// </returns>
+    IEnumerable<IDictionaryItem> GetDictionaryItemsByIds(params Guid[] ids) => Array.Empty<IDictionaryItem>();
+
+    /// <summary>
     ///     Gets a <see cref="IDictionaryItem" /> by its key
     /// </summary>
     /// <param name="key">Key of the <see cref="IDictionaryItem" /></param>
@@ -57,6 +67,15 @@ public interface ILocalizationService : IService
     ///     <see cref="IDictionaryItem" />
     /// </returns>
     IDictionaryItem? GetDictionaryItemByKey(string key);
+
+    /// <summary>
+    ///     Gets a collection of <see cref="IDictionaryItem" /> by their keys
+    /// </summary>
+    /// <param name="keys">Keys of the <see cref="IDictionaryItem" /></param>
+    /// <returns>
+    ///     A collection of <see cref="IDictionaryItem" />
+    /// </returns>
+    IEnumerable<IDictionaryItem> GetDictionaryItemsByKeys(params string[] keys) => Array.Empty<IDictionaryItem>();
 
     /// <summary>
     ///     Gets a list of children for a <see cref="IDictionaryItem" />
@@ -175,4 +194,10 @@ public interface ILocalizationService : IService
     /// </summary>
     /// <returns>The full dictionary key map.</returns>
     Dictionary<string, Guid> GetDictionaryItemKeyMap();
+
+    PagedModel<ILanguage> GetAllLanguagesPaged(int skip, int take)
+    {
+        ILanguage[] all = GetAllLanguages().Skip(skip).Take(take).ToArray();
+        return new PagedModel<ILanguage>(all.Length, all);
+    }
 }

@@ -60,12 +60,8 @@ internal class FileNameTests
 
     [Test]
     [AutoMoqData]
-    public void PreviewViewExists(
-        [Frozen] IOptions<GlobalSettings> globalSettings,
-        PreviewController sut)
+    public void PreviewViewExists(PreviewController sut)
     {
-        globalSettings.Value.UmbracoPath = "/";
-
         var viewResult = sut.Index() as ViewResult;
         var fileName = GetViewName(viewResult);
 
@@ -77,13 +73,11 @@ internal class FileNameTests
     [Test]
     [AutoMoqData]
     public async Task BackOfficeDefaultExists(
-        [Frozen] IOptions<GlobalSettings> globalSettings,
         [Frozen] IHostingEnvironment hostingEnvironment,
         [Frozen] ITempDataDictionary tempDataDictionary,
         [Frozen] IRuntimeState runtimeState,
         BackOfficeController sut)
     {
-        globalSettings.Value.UmbracoPath = "/";
         Mock.Get(hostingEnvironment).Setup(x => x.ToAbsolute("/")).Returns("http://localhost/");
         Mock.Get(hostingEnvironment).SetupGet(x => x.ApplicationVirtualPath).Returns("/");
         Mock.Get(runtimeState).Setup(x => x.Level).Returns(RuntimeLevel.Run);

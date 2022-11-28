@@ -70,7 +70,7 @@ internal class MediaPrependBasePathFileProvider : IFileProvider
         if (TryMapSubPath(subpath, out PathString newPath))
         {
             // KJA changed: use explicit newPath.Value instead of implicit newPath string operator (which calls ToString())
-            IFileInfo? result = _underlyingFileProvider.GetFileInfo(newPath.Value);
+            IFileInfo? result = _underlyingFileProvider.GetFileInfo(newPath.Value!);
             return result;
         }
 
@@ -84,7 +84,7 @@ internal class MediaPrependBasePathFileProvider : IFileProvider
         if (TryMapSubPath(filter, out PathString newPath))
         {
             // KJA changed: use explicit newPath.Value instead of implicit newPath string operator (which calls ToString())
-            IChangeToken? result = _underlyingFileProvider.Watch(newPath.Value);
+            IChangeToken? result = _underlyingFileProvider.Watch(newPath.Value!);
             return result;
         }
 
