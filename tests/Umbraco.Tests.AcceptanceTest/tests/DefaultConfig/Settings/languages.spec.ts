@@ -2,10 +2,8 @@ import {test, ApiHelpers, UiHelpers, ConstantHelper} from '@umbraco/playwright-t
 import {expect} from "@playwright/test";
 
 test.describe('Languages', () => {
-  test.beforeEach(async ({ page, umbracoApi }) => {
-    // TODO: REMOVE THIS WHEN SQLITE IS FIXED
-    // Wait so we don't bombard the API
-    await page.waitForTimeout(1000);
+  test.beforeEach(async ({ page, umbracoApi }, testInfo) => {
+    await umbracoApi.report.report(testInfo);
     await umbracoApi.login();
   });
 

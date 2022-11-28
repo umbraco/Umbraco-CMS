@@ -7,6 +7,7 @@ namespace Umbraco.Cms.Core.Media.Exif;
 /// </summary>
 /// <seealso cref="System.Exception" />
 [Serializable]
+[Obsolete("This is not used anymore and will be removed in Umbraco 13")]
 public class NotValidJPEGFileException : Exception
 {
     /// <summary>

@@ -23,7 +23,7 @@
             </li>
             <li class="umb-content-grid__details-item" ng-repeat="property in contentProperties">
                 <div class="umb-content-grid__details-label">{{ property.header }}:</div>
-                <div class="umb-content-grid__details-value">{{ item[property.alias] }}</div>
+                <div class="umb-content-grid__details-value">{{ item[property.alias].expression ? item[property.alias].expression({value: item[property.alias].value}) : item[property.alias] }}</div>
             </li>
         </ul>
 

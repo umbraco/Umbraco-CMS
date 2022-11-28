@@ -89,8 +89,6 @@ angular.module("umbraco.directives")
 								var xy = cropperHelper.alignToCoordinates(p, scope.center, {width: scope.width, height: scope.height});
 								p.top = xy.top;
 								p.left = xy.left;
-							}else{
-
 							}
 
 							p.position = "absolute";

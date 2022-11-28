@@ -126,7 +126,12 @@ public class BackOfficeSessionIdValidator
         }
 
         var userId = currentIdentity.GetUserId();
-        BackOfficeIdentityUser? user = await _userManager.FindByIdAsync(userId);
+        if (userId is null)
+        {
+            return false;
+        }
+
+        var user = await _userManager.FindByIdAsync(userId);
         if (user == null)
         {
             return false;

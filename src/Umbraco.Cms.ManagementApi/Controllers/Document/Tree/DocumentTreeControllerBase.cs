@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using NSwag.Annotations;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
@@ -16,8 +15,8 @@ namespace Umbraco.Cms.ManagementApi.Controllers.Document.Tree;
 
 [ApiVersion("1.0")]
 [ApiController]
-[VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.Document}/tree")]
-[OpenApiTag(nameof(Constants.UdiEntityType.Document))]
+[VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/{Constants.UdiEntityType.Document}")]
+[ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Document))]
 public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBase<DocumentTreeItemViewModel>
 {
     private readonly IPublicAccessService _publicAccessService;

@@ -23,13 +23,14 @@ namespace Umbraco.Cms.Core.PropertyEditors
     /// </summary>
     [DataEditor(
         Constants.PropertyEditors.Aliases.Grid,
-        "Grid layout",
+        "Grid layout (legacy)",
         "grid",
         HideLabel = true,
         ValueType = ValueTypes.Json,
         Icon = "icon-layout",
         Group = Constants.PropertyEditors.Groups.RichContent,
-        ValueEditorIsReusable = false)]
+        ValueEditorIsReusable = false,
+        IsDeprecated = true)]
     public class GridPropertyEditor : DataEditor
     {
         private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
