@@ -33,7 +33,7 @@ public class LoggingSettings
         var dir = Directory;
         if (dir.StartsWith("~/"))
         {
-            hostEnvironment.MapPathContentRoot(dir);
+            return hostEnvironment.MapPathContentRoot(dir);
         }
 
         return dir;
