@@ -36,7 +36,9 @@ export class UUICodeBlock extends LitElement {
 	render() {
 		return html`<div id="container">
 			<uui-scroll-container>
-				<pre><slot></slot></pre>
+				<pre>
+					<slot></slot>
+				</pre>
 			</uui-scroll-container>
 		</div> `;
 	}

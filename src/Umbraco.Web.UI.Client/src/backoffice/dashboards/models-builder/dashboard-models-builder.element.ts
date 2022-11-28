@@ -141,10 +141,10 @@ export class UmbDashboardModelsBuilderElement extends UmbContextConsumerMixin(Li
 					</ul>
 				</div>
 				<p class="models-actions">
-					${this._modelsBuilder?.outOfDateModels === true
+					${this._modelsBuilder?.outOfDateModels
 						? html`<span class="out-of-date">Models are <strong>out-of-date</strong></span>`
 						: nothing}
-					${this._modelsBuilder?.canGenerate === true
+					${this._modelsBuilder?.canGenerate
 						? html` <uui-button
 								.state="${this._buttonStateBuild}"
 								look="primary"
