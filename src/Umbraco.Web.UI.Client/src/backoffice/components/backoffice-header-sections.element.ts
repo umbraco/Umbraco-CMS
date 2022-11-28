@@ -112,7 +112,7 @@ export class UmbBackofficeHeaderSections extends UmbContextProviderMixin(
 						<uui-tab
 							@click="${this._handleTabClick}"
 							?active="${this._currentSectionAlias === section.alias}"
-							href="${`/section/${section.meta.pathname}`}"
+							href="${`section/${section.meta.pathname}`}"
 							label="${section.meta.label || section.name}"
 							data-alias="${section.alias}"></uui-tab>
 					`

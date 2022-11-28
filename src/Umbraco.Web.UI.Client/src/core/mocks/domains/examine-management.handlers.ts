@@ -5,7 +5,7 @@ import { umbracoPath } from '@umbraco-cms/utils';
 import { Index, PagedIndex, PagedSearcher, PagedSearchResult } from '@umbraco-cms/backend-api';
 
 export const handlers = [
-	rest.get(umbracoPath('/search/index'), (_req, res, ctx) => {
+	rest.get(umbracoPath('/indexer'), (_req, res, ctx) => {
 		return res(
 			// Respond with a 200 status code
 			ctx.status(200),
@@ -13,7 +13,7 @@ export const handlers = [
 		);
 	}),
 
-	rest.get(umbracoPath('/search/index/:indexName'), (_req, res, ctx) => {
+	rest.get(umbracoPath('/indexer/:indexName'), (_req, res, ctx) => {
 		const indexName = _req.params.indexName as string;
 
 		if (!indexName) return;
@@ -26,7 +26,7 @@ export const handlers = [
 		}
 	}),
 
-	rest.post(umbracoPath('/search/index/:indexName/rebuild'), async (_req, res, ctx) => {
+	rest.post(umbracoPath('/indexer/:indexName/rebuild'), async (_req, res, ctx) => {
 		await new Promise((resolve) => setTimeout(resolve, (Math.random() + 1) * 1000)); // simulate a delay of 1-2 seconds
 
 		const indexName = _req.params.indexName as string;
@@ -40,7 +40,7 @@ export const handlers = [
 		}
 	}),
 
-	rest.get(umbracoPath('/search/searcher'), (_req, res, ctx) => {
+	rest.get(umbracoPath('/searcher'), (_req, res, ctx) => {
 		return res(
 			ctx.status(200),
 			ctx.json<PagedSearcher>({
@@ -50,8 +50,8 @@ export const handlers = [
 		);
 	}),
 
-	rest.get(umbracoPath('/search/searcher/:searcherName/search'), (_req, res, ctx) => {
-		const query = _req.url.searchParams.get('query');
+	rest.get(umbracoPath('/searcher/:searcherName/query'), (_req, res, ctx) => {
+		const query = _req.url.searchParams.get('term');
 		const take = _req.url.searchParams.get('take');
 
 		const searcherName = _req.params.searcherName as string;

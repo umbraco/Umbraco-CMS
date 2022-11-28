@@ -1,15 +1,15 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html, LitElement } from 'lit';
-import { customElement, state, property } from 'lit/decorators.js';
+import {UUITextStyles} from '@umbraco-ui/uui-css/lib';
+import {css, html, LitElement, nothing} from 'lit';
+import {customElement, property, state} from 'lit/decorators.js';
 
-import { UUIButtonState } from '@umbraco-ui/uui-button';
+import {UUIButtonState} from '@umbraco-ui/uui-button';
 
-import { UmbModalService, UmbNotificationService, UmbNotificationDefaultData } from '@umbraco-cms/services';
+import {UmbModalService, UmbNotificationDefaultData, UmbNotificationService} from '@umbraco-cms/services';
 
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import {UmbContextConsumerMixin} from '@umbraco-cms/context-api';
 import './section-view-examine-searchers';
 
-import { ApiError, ProblemDetails, Index, SearchResource } from '@umbraco-cms/backend-api';
+import {ApiError, Index, IndexerResource, ProblemDetails} from '@umbraco-cms/backend-api';
 
 @customElement('umb-dashboard-examine-index')
 export class UmbDashboardExamineIndexElement extends UmbContextConsumerMixin(LitElement) {
@@ -86,23 +86,13 @@ export class UmbDashboardExamineIndexElement extends UmbContextConsumerMixin(Lit
 	private _buttonState?: UUIButtonState = undefined;
 
 	@state()
-	private _indexData!: Index;
+	private _indexData?: Index;
+
+	@state()
+	private _loading = true;
 
 	private _notificationService?: UmbNotificationService;
 	private _modalService?: UmbModalService;
-
-	private async _getIndexData() {
-		try {
-			const index = await SearchResource.getSearchIndexByIndexName({ indexName: this.indexName });
-			this._indexData = index;
-		} catch (e) {
-			if (e instanceof ApiError) {
-				const error = e as ProblemDetails;
-				const data: UmbNotificationDefaultData = { message: error.message ?? 'Could not fetch index' };
-				this._notificationService?.peek('danger', { data });
-			}
-		}
-	}
 
 	constructor() {
 		super();
@@ -113,9 +103,25 @@ export class UmbDashboardExamineIndexElement extends UmbContextConsumerMixin(Lit
 		});
 	}
 
-	connectedCallback(): void {
+	private async _getIndexData() {
+		try {
+			this._indexData = await IndexerResource.getIndexerByIndexName({indexName: this.indexName});
+			if (!this._indexData?.isHealthy) {
+				this._buttonState = 'waiting';
+			}
+		} catch (e) {
+			if (e instanceof ApiError) {
+				const error = e as ProblemDetails;
+				const data: UmbNotificationDefaultData = { message: error.message ?? 'Could not fetch index' };
+				this._notificationService?.peek('danger', { data });
+			}
+		}
+		this._loading = false;
+	}
+
+	async connectedCallback() {
 		super.connectedCallback();
-		this._getIndexData();
+		await this._getIndexData();
 	}
 
 	private async _onRebuildHandler() {
@@ -136,45 +142,56 @@ export class UmbDashboardExamineIndexElement extends UmbContextConsumerMixin(Lit
 	}
 	private async _rebuild() {
 		this._buttonState = 'waiting';
-		if (this._indexData.name)
-			try {
-				await SearchResource.postSearchIndexByIndexNameRebuild({ indexName: this._indexData.name });
-				this._buttonState = 'success';
-			} catch (e) {
-				this._buttonState = 'failed';
-				if (e instanceof ApiError) {
-					const error = e as ProblemDetails;
-					const data: UmbNotificationDefaultData = { message: error.message ?? 'Rebuild error' };
-					this._notificationService?.peek('danger', { data });
-				}
+		try {
+			await IndexerResource.postIndexerByIndexNameRebuild({ indexName: this.indexName });
+			this._buttonState = 'success';
+			await this._getIndexData();
+		} catch (e) {
+			this._buttonState = 'failed';
+			if (e instanceof ApiError) {
+				const error = e as ProblemDetails;
+				const data: UmbNotificationDefaultData = { message: error.message ?? 'Rebuild error' };
+				this._notificationService?.peek('danger', { data });
 			}
+		}
 	}
 
 	render() {
-		if (this._indexData) {
-			return html` <uui-box headline="${this.indexName}">
-					<p>
-						<strong>Health Status</strong><br />
-						The health status of the ${this._indexData.name} and if it can be read
-					</p>
-					<div>
-						<uui-icon-essentials>
-							<uui-icon
-								name=${this._indexData.isHealthy ? `check` : `wrong`}
-								class=${this._indexData.isHealthy ? 'positive' : 'danger'}>
-							</uui-icon>
-						</uui-icon-essentials>
-						${this._indexData.healthStatus}
-					</div>
-				</uui-box>
-				<umb-dashboard-examine-searcher searcherName="${this.indexName}"></umb-dashboard-examine-searcher>
-				${this.renderPropertyList()} ${this.renderTools()}`;
-		} else return html``;
+		if (!this._indexData || this._loading) return html`
+			<uui-loader-bar></uui-loader-bar>`;
+
+		return html`
+			<uui-box headline="${this.indexName}">
+				<p>
+					<strong>Health Status</strong><br/>
+					The health status of the ${this.indexName} and if it can be read
+				</p>
+				<div>
+					<uui-icon-essentials>
+						<uui-icon
+							name=${this._indexData.isHealthy ? `check` : `wrong`}
+							class=${this._indexData.isHealthy ? 'positive' : 'danger'}>
+						</uui-icon>
+					</uui-icon-essentials>
+					${this._indexData.healthStatus}
+				</div>
+			</uui-box>
+			${this.renderIndexSearch()}
+			${this.renderPropertyList()}
+			${this.renderTools()}
+		`;
+	}
+
+	private renderIndexSearch() {
+		if (!this._indexData || !this._indexData.isHealthy) return nothing;
+		return html`<umb-dashboard-examine-searcher searcherName="${this.indexName}"></umb-dashboard-examine-searcher>`;
 	}
 
 	private renderPropertyList() {
+		if (!this._indexData) return nothing;
+
 		return html`<uui-box headline="Index info">
-			<p>Lists the properties of the ${this._indexData.name}</p>
+			<p>Lists the properties of the ${this.indexName}</p>
 			<uui-table class="info">
 				<uui-table-row>
 					<uui-table-cell style="width:0px; font-weight: bold;"> documentCount </uui-table-cell>
@@ -187,7 +204,7 @@ export class UmbDashboardExamineIndexElement extends UmbContextConsumerMixin(Lit
 				${this._indexData.providerProperties
 					? Object.entries(this._indexData.providerProperties).map((entry) => {
 							return html`<uui-table-row>
-								<uui-table-cell style="width:0px; font-weight: bold;"> ${entry[0]} </uui-table-cell>
+								<uui-table-cell style="width:0; font-weight: bold;"> ${entry[0]} </uui-table-cell>
 								<uui-table-cell clip-text> ${entry[1]} </uui-table-cell>
 							</uui-table-row>`;
 					  })
@@ -198,13 +215,13 @@ export class UmbDashboardExamineIndexElement extends UmbContextConsumerMixin(Lit
 
 	private renderTools() {
 		return html` <uui-box headline="Tools">
-			<p>Tools to manage the ${this._indexData.name}</p>
+			<p>Tools to manage the ${this.indexName}</p>
 			<uui-button
 				color="danger"
 				look="primary"
 				.state="${this._buttonState}"
 				@click="${this._onRebuildHandler}"
-				.disabled="${!this._indexData?.canRebuild}"
+				.disabled="${!this._indexData?.canRebuild ?? true}"
 				label="Rebuild index">
 				Rebuild
 			</uui-button>

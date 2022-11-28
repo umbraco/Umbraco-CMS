@@ -1,12 +1,12 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html, LitElement } from 'lit';
+import { css, html, LitElement, nothing } from 'lit';
 import { customElement, state, query, property } from 'lit/decorators.js';
 
 import { UmbModalService, UmbNotificationService, UmbNotificationDefaultData } from '@umbraco-cms/services';
 
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
-import { ApiError, ProblemDetails, SearchResult, SearchResource, Field } from '@umbraco-cms/backend-api';
+import { ApiError, ProblemDetails, SearchResult, SearcherResource, Field } from '@umbraco-cms/backend-api';
 
 import './modal-views/fields-viewer.element';
 import './modal-views/fields-settings.element';
@@ -113,6 +113,9 @@ export class UmbDashboardExamineSearcherElement extends UmbContextConsumerMixin(
 	@state()
 	private _exposedFields?: ExposedSearchResultField[];
 
+	@state()
+	private _searchLoading = false;
+
 	@query('#search-input')
 	private _searchInput!: HTMLInputElement;
 
@@ -135,11 +138,12 @@ export class UmbDashboardExamineSearcherElement extends UmbContextConsumerMixin(
 
 	private async _onSearch() {
 		if (!this._searchInput.value.length) return;
+		this._searchLoading = true;
 		try {
-			const res = await SearchResource.getSearchSearcherBySearcherNameSearch({
+			const res = await SearcherResource.getSearcherBySearcherNameQuery({
 				searcherName: this.searcherName,
-				query: this._searchInput.value,
-				take: 9999,
+				term: this._searchInput.value,
+				take: 100,
 				skip: 0,
 			});
 			this._searchResults = res.items;
@@ -151,6 +155,7 @@ export class UmbDashboardExamineSearcherElement extends UmbContextConsumerMixin(
 				this._notificationService?.peek('danger', { data });
 			}
 		}
+		this._searchLoading = false;
 	}
 
 	private _updateFieldFilter() {
@@ -204,59 +209,64 @@ export class UmbDashboardExamineSearcherElement extends UmbContextConsumerMixin(
 		`;
 	}
 
+	// Find the field named 'nodeName' and return its value if it exists in the fields array
+	private getSearchResultNodeName(searchResult: SearchResult): string {
+		const nodeNameField = searchResult.fields?.find((field) => field.name?.toUpperCase() === 'NODENAME');
+		return nodeNameField?.values?.join(', ') ?? '';
+	}
+
 	private renderSearchResults() {
-		if (this._searchResults?.length) {
-			return html`<div class="table-container">
-				<uui-scroll-container>
-					<uui-table class="search">
-						<uui-table-head>
-							<uui-table-head-cell style="width:0">Score</uui-table-head-cell>
-							<uui-table-head-cell style="width:0">Id</uui-table-head-cell>
-							<uui-table-head-cell>Name</uui-table-head-cell>
-							<uui-table-head-cell>Fields</uui-table-head-cell>
-							${this.renderHeadCells()}
-						</uui-table-head>
-						${this._searchResults?.map((rowData) => {
-							return html`<uui-table-row>
-								<uui-table-cell> ${rowData.score} </uui-table-cell>
-								<uui-table-cell> ${rowData.id} </uui-table-cell>
-								<uui-table-cell>
-									<uui-button look="secondary" label="Open editor for this document" @click="${this._onNameClick}">
-										${rowData.fields?.find((field) => {
-											if (field.name?.toUpperCase() === 'NODENAME') return field.values;
-											else return;
-										})?.values}
-									</uui-button>
-								</uui-table-cell>
-								<uui-table-cell>
-									<uui-button
-										class="bright"
-										look="secondary"
-										label="Open sidebar to see all fields"
-										@click="${() =>
-											this._modalService?.open('umb-modal-layout-fields-viewer', {
-												type: 'sidebar',
-												size: 'medium',
-												data: { ...rowData },
-											})}">
-										${rowData.fields ? Object.keys(rowData.fields).length : ''} fields
-									</uui-button>
-								</uui-table-cell>
-								${rowData.fields ? this.renderBodyCells(rowData.fields) : ''}
-							</uui-table-row>`;
-						})}
-					</uui-table>
-				</uui-scroll-container>
-				<button class="field-adder" @click="${this._onFieldFilterClick}">
-					<uui-icon-registry-essential>
-						<uui-tag look="secondary">
-							<uui-icon name="add"></uui-icon>
-						</uui-tag>
-					</uui-icon-registry-essential>
-				</button>
-			</div>`;
+		if (this._searchLoading) return html`<uui-loader></uui-loader>`;
+		if (!this._searchResults) return nothing;
+		if (!this._searchResults.length) {
+			return html`<p>No results found</p>`;
 		}
-		return;
+		return html`<div class="table-container">
+			<uui-scroll-container>
+				<uui-table class="search">
+					<uui-table-head>
+						<uui-table-head-cell style="width:0">Score</uui-table-head-cell>
+						<uui-table-head-cell style="width:0">Id</uui-table-head-cell>
+						<uui-table-head-cell>Name</uui-table-head-cell>
+						<uui-table-head-cell>Fields</uui-table-head-cell>
+						${this.renderHeadCells()}
+					</uui-table-head>
+					${this._searchResults?.map((rowData) => {
+						return html`<uui-table-row>
+							<uui-table-cell> ${rowData.score} </uui-table-cell>
+							<uui-table-cell> ${rowData.id} </uui-table-cell>
+							<uui-table-cell>
+								<uui-button look="secondary" label="Open editor for this document" @click="${this._onNameClick}">
+									${this.getSearchResultNodeName(rowData)}
+								</uui-button>
+							</uui-table-cell>
+							<uui-table-cell>
+								<uui-button
+									class="bright"
+									look="secondary"
+									label="Open sidebar to see all fields"
+									@click="${() =>
+										this._modalService?.open('umb-modal-layout-fields-viewer', {
+											type: 'sidebar',
+											size: 'medium',
+											data: { ...rowData, name: this.getSearchResultNodeName(rowData) },
+										})}">
+									${rowData.fields ? Object.keys(rowData.fields).length : ''} fields
+								</uui-button>
+							</uui-table-cell>
+							${rowData.fields ? this.renderBodyCells(rowData.fields) : ''}
+						</uui-table-row>`;
+					})}
+				</uui-table>
+			</uui-scroll-container>
+			<button class="field-adder" @click="${this._onFieldFilterClick}">
+				<uui-icon-registry-essential>
+					<uui-tag look="secondary">
+						<uui-icon name="add"></uui-icon>
+					</uui-tag>
+				</uui-icon-registry-essential>
+			</button>
+		</div>`;
 	}
 
 	renderHeadCells() {
