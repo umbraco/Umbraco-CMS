@@ -1042,10 +1042,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             var trackedRelations = new List<UmbracoEntityReference>();
             trackedRelations.AddRange(_dataValueReferenceFactories.GetAllReferences(entity.Properties, PropertyEditors));
 
-            var relationTypeAliases = trackedRelations
-                .Select(x => x.RelationTypeAlias)
-                .Distinct()
-                .ToArray();
+            var relationTypeAliases = GetAutomaticRelationTypesAliases(entity.Properties, PropertyEditors).ToArray();
 
             // First delete all auto-relations for this entity
             RelationRepository.DeleteByParent(entity.Id, relationTypeAliases);
@@ -1091,6 +1088,31 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             // Save bulk relations
             RelationRepository.SaveBulk(toSave);
+        }
+
+        private IEnumerable<string> GetAutomaticRelationTypesAliases(
+            IPropertyCollection properties,
+            PropertyEditorCollection propertyEditors)
+        {
+            var automaticRelationTypesAliases = new HashSet<string>(Constants.Conventions.RelationTypes.AutomaticRelationTypes);
+
+            foreach (IProperty property in properties)
+            {
+                if (propertyEditors.TryGet(property.PropertyType.PropertyEditorAlias, out IDataEditor? editor) is false )
+                {
+                    continue;
+                }
+
+                if (editor.GetValueEditor() is IDataValueReference reference)
+                {
+                    foreach (var alias in reference.GetAutomaticRelationTypesAliases())
+                    {
+                        automaticRelationTypesAliases.Add(alias);
+                    }
+                }
+            }
+
+            return automaticRelationTypesAliases;
         }
 
         /// <summary>
