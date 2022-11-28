@@ -133,15 +133,15 @@ export class UmbEditorViewUsersCreateElement extends UmbContextConsumerMixin(Umb
 			<uui-form>
 				<form id="form" name="form" @submit="${this._handleSubmit}">
 					<uui-form-layout-item>
-						<uui-label slot="label" for="name" required>Name</uui-label>
+						<uui-label id="nameLabel" slot="label" for="name" required>Name</uui-label>
 						<uui-input id="name" label="name" type="text" name="name" required></uui-input>
 					</uui-form-layout-item>
 					<uui-form-layout-item>
-						<uui-label slot="label" for="email" required>Email</uui-label>
+						<uui-label id="emailLabel" slot="label" for="email" required>Email</uui-label>
 						<uui-input id="email" label="email" type="email" name="email" required></uui-input>
 					</uui-form-layout-item>
 					<uui-form-layout-item>
-						<uui-label slot="label" for="userGroups" required>User group</uui-label>
+						<uui-label id="userGroupsLabel" slot="label" for="userGroups" required>User group</uui-label>
 						<span slot="description">Add groups to assign access and permissions</span>
 						<umb-picker-user-group id="userGroups" name="userGroups"></umb-picker-user-group>
 					</uui-form-layout-item>
