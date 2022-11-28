@@ -36,6 +36,7 @@ import { manifests as userDashboards } from './user-dashboards/manifests';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import type { ManifestTypes, ManifestWithLoader } from '@umbraco-cms/models';
+import { UmbHistoryService } from 'src/core/services/history';
 
 @defineElement('umb-backoffice')
 export class UmbBackofficeElement extends UmbContextConsumerMixin(UmbContextProviderMixin(LitElement)) {
@@ -78,6 +79,7 @@ export class UmbBackofficeElement extends UmbContextConsumerMixin(UmbContextProv
 		this.provideContext('umbUserStore', new UmbUserStore(this._umbEntityStore));
 		this.provideContext('umbUserGroupStore', new UmbUserGroupStore(this._umbEntityStore));
 		this.provideContext('umbNotificationService', new UmbNotificationService());
+		this.provideContext('umbHistoryService', new UmbHistoryService());
 		this.provideContext('umbModalService', new UmbModalService());
 		this.provideContext('umbSectionStore', new UmbSectionStore());
 	}
