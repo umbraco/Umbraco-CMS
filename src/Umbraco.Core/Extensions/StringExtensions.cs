@@ -83,18 +83,19 @@ public static class StringExtensions
             return fileName;
         }
 
-        var lastIndex = fileName.LastIndexOf('.');
+        var spanFileName = fileName.AsSpan();
+        var lastIndex = spanFileName.LastIndexOf('.');
         if (lastIndex > 0)
         {
-            var ext = fileName.Substring(lastIndex);
+            var ext = spanFileName[lastIndex..];
 
             // file extensions cannot contain whitespace
-            if (ext.Contains(" "))
+            if (ext.Contains(' '))
             {
                 return fileName;
             }
 
-            return string.Format("{0}", fileName.Substring(0, fileName.IndexOf(ext, StringComparison.Ordinal)));
+            return new string(spanFileName[..lastIndex]);
         }
 
         return fileName;
