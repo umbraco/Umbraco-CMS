@@ -122,7 +122,7 @@ export class UmbSectionDashboardsElement extends UmbContextConsumerMixin(UmbObse
 							${this._dashboards.map(
 								(dashboard) => html`
 									<uui-tab
-										href="${`/section/${this._currentSectionPathname}/dashboard/${dashboard.meta.pathname}`}"
+										href="${`section/${this._currentSectionPathname}/dashboard/${dashboard.meta.pathname}`}"
 										label=${dashboard.meta.label || dashboard.name}
 										?active="${dashboard.meta.pathname === this._currentDashboardPathname}"></uui-tab>
 								`

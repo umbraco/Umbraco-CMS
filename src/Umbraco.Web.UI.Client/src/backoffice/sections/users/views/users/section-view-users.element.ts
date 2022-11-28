@@ -39,7 +39,7 @@ export class UmbSectionViewUsersElement extends UmbContextProviderMixin(LitEleme
 		},
 		{
 			path: '**',
-			redirectTo: '/section/users/view/users/overview', //TODO: this should be dynamic
+			redirectTo: 'section/users/view/users/overview', //TODO: this should be dynamic
 		},
 	];
 

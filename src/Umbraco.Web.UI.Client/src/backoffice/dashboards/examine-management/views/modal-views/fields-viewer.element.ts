@@ -1,11 +1,11 @@
-import { html, css } from 'lit';
+import { html, css, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement } from 'lit/decorators.js';
 import { UmbModalLayoutElement } from '@umbraco-cms/services';
-import { SearchResultsModel } from 'src/backoffice/dashboards/examine-management/examine-extension';
+import { SearchResult } from '@umbraco-cms/backend-api';
 
 @customElement('umb-modal-layout-fields-viewer')
-export class UmbModalLayoutFieldsViewerElement extends UmbModalLayoutElement<SearchResultsModel> {
+export class UmbModalLayoutFieldsViewerElement extends UmbModalLayoutElement<SearchResult & { name: string }> {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -47,31 +47,31 @@ export class UmbModalLayoutFieldsViewerElement extends UmbModalLayoutElement<Sea
 	}
 
 	render() {
-		if (this.data) {
-			return html`
-				<uui-dialog-layout class="uui-text" headline="${this.data.name}">
-					<uui-scroll-container id="field-viewer">
-						<span>
-							<uui-table>
-								<uui-table-head>
-									<uui-table-head-cell> Field </uui-table-head-cell>
-									<uui-table-head-cell> Value </uui-table-head-cell>
-								</uui-table-head>
-								${Object.values(this.data.fields).map((cell) => {
-									return html`<uui-table-row>
-										<uui-table-cell> ${cell.name} </uui-table-cell>
-										<uui-table-cell> ${cell.values.join(', ')} </uui-table-cell>
-									</uui-table-row>`;
-								})}
-							</uui-table>
-						</span>
-					</uui-scroll-container>
-					<div>
-						<uui-button look="primary" @click="${this._handleClose}">Close</uui-button>
-					</div>
-				</uui-dialog-layout>
-			`;
-		} else return html``;
+		if (!this.data) return nothing;
+
+		return html`
+			<uui-dialog-layout class="uui-text" headline="${this.data.name}">
+				<uui-scroll-container id="field-viewer">
+					<span>
+						<uui-table>
+							<uui-table-head>
+								<uui-table-head-cell> Field </uui-table-head-cell>
+								<uui-table-head-cell> Value </uui-table-head-cell>
+							</uui-table-head>
+							${Object.values(this.data.fields ?? []).map((cell) => {
+								return html`<uui-table-row>
+									<uui-table-cell> ${cell.name} </uui-table-cell>
+									<uui-table-cell> ${cell.values?.join(', ')} </uui-table-cell>
+								</uui-table-row>`;
+							})}
+						</uui-table>
+					</span>
+				</uui-scroll-container>
+				<div>
+					<uui-button look="primary" @click="${this._handleClose}">Close</uui-button>
+				</div>
+			</uui-dialog-layout>
+		`;
 	}
 }
 
