@@ -1,6 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, CSSResultGroup, html, LitElement } from 'lit';
+import { css, CSSResultGroup, html, LitElement, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
+import { UmbHistoryItem, UmbHistoryService } from '../../history';
 import { UmbModalHandler, UmbModalService } from '@umbraco-cms/services';
 import type { ManifestExternalLoginProvider, ManifestUserDashboard, UserDetails } from '@umbraco-cms/models';
 import { UmbUserStore } from 'src/core/stores/user/user.store';
@@ -38,6 +39,33 @@ export class UmbModalLayoutUserDialogElement extends UmbContextConsumerMixin(Umb
 				margin-bottom: var(--uui-size-space-3);
 				display: block;
 			}
+			#recent-history {
+				display: flex;
+				flex-direction: column;
+				gap: var(--uui-size-space-3);
+			}
+			#recent-history-items {
+				display: flex;
+				flex-direction: column;
+				gap: var(--uui-size-space-2);
+			}
+			.history-item {
+				color: inherit;
+				text-decoration: none;
+			}
+			.history-item-name-separator {
+				margin: 0 var(--uui-size-space-1);
+			}
+			.history-item-path,
+			.history-item-name-separator {
+				opacity: 0.4;
+			}
+			.history-item-name,
+			.history-item-path {
+				text-overflow: ellipsis;
+				overflow: hidden;
+				white-space: nowrap;
+			}
 		`,
 	];
 
@@ -53,27 +81,25 @@ export class UmbModalLayoutUserDialogElement extends UmbContextConsumerMixin(Umb
 	@state()
 	private _userDashboards: Array<ManifestUserDashboard> = [];
 
+	@state()
+	private _history: Array<UmbHistoryItem> = [];
+
 	private _userStore?: UmbUserStore;
 	private _modalService?: UmbModalService;
+	private _historyService?: UmbHistoryService;
 
 	constructor() {
 		super();
-		this.consumeAllContexts(['umbUserStore', 'umbModalService'], (instances) => {
+		this.consumeAllContexts(['umbUserStore', 'umbModalService', 'umbHistoryService'], (instances) => {
 			this._userStore = instances['umbUserStore'];
 			this._modalService = instances['umbModalService'];
+			this._historyService = instances['umbHistoryService'];
 			this._observeCurrentUser();
+			this._observeHistory();
 		});
 
 		this._observeExternalLoginProviders();
 		this._observeUserDashboards();
-	}
-
-	private async _observeCurrentUser() {
-		if (!this._userStore) return;
-
-		this.observe<UserDetails>(this._userStore.currentUser, (currentUser) => {
-			this._currentUser = currentUser;
-		});
 	}
 
 	private _observeExternalLoginProviders() {
@@ -83,6 +109,21 @@ export class UmbModalLayoutUserDialogElement extends UmbContextConsumerMixin(Umb
 				this._externalLoginProviders = loginProvider;
 			}
 		);
+	}
+
+	private async _observeCurrentUser() {
+		if (!this._userStore) return;
+
+		this.observe<UserDetails>(this._userStore.currentUser, (currentUser) => {
+			this._currentUser = currentUser;
+		});
+	}
+	private async _observeHistory() {
+		if (!this._historyService) return;
+
+		this.observe<Array<UmbHistoryItem>>(this._historyService.history, (history) => {
+			this._history = history;
+		});
 	}
 
 	private _observeUserDashboards() {
@@ -107,6 +148,30 @@ export class UmbModalLayoutUserDialogElement extends UmbContextConsumerMixin(Umb
 		this._modalService.changePassword();
 	}
 
+	private _renderHistoryItem(item: UmbHistoryItem) {
+		if (typeof item.label === 'string') {
+			return html`<a class="history-item" href="${item.path}">
+				<div class="history-item-name">${item.label}</div>
+			</a>`;
+		}
+		if (Array.isArray(item.label)) {
+			console.log('hallo', item);
+
+			return html`
+				<a class="history-item" href=${item.path}>
+					<div>
+						${item.label.map((name, index) => {
+							return html`<span class="history-item-name">${name}</span
+								><span class="history-item-name-separator">${index < item.label.length - 1 ? '>' : nothing}</span>`;
+						})}
+					</div>
+				</a>
+			`;
+		}
+
+		return nothing;
+	}
+
 	render() {
 		return html`
 			<umb-editor-entity-layout headline="${this._currentUser?.name || ''}">
@@ -129,6 +194,10 @@ export class UmbModalLayoutUserDialogElement extends UmbContextConsumerMixin(Umb
 							(provider) =>
 								html`<umb-user-dashboard-extension .userDashboard=${provider}></umb-user-dashboard-extension>`
 						)}
+					</div>
+					<div id="recent-history">
+						<b>Recent History</b>
+						<div id="recent-history-items">${this._history.map((item) => html`${this._renderHistoryItem(item)}`)}</div>
 					</div>
 				</div>
 				<div slot="actions">
