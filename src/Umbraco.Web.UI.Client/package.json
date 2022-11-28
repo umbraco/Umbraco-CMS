@@ -84,7 +84,7 @@
 		"@types/mocha": "^10.0.0",
 		"@types/uuid": "^8.3.4",
 		"@typescript-eslint/eslint-plugin": "^5.44.0",
-		"@typescript-eslint/parser": "^5.44.0",
+		"@typescript-eslint/parser": "^5.45.0",
 		"@web/dev-server-esbuild": "^0.3.3",
 		"@web/dev-server-import-maps": "^0.0.7",
 		"@web/test-runner": "^0.15.0",
