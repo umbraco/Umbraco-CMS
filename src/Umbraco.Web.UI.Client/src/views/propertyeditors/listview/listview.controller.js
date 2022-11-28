@@ -682,7 +682,7 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
             }
 
             if (e.nameExp) {
-                if (/{{\s*\w+\|\w+\s*}}/.test(e.nameTemplate)) {
+                if (/{{.*\s*\w+\s*\|\s*\w+\s*.*}}/.test(e.nameTemplate)) { //check whether the name template has a filter
                     value = {
                       value,
                       expression: e.nameExp
