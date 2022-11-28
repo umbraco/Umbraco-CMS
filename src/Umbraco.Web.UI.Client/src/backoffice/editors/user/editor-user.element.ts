@@ -16,6 +16,7 @@ import '../shared/editor-entity-layout/editor-entity-layout.element';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbModalService } from '@umbraco-cms/services';
+import { umbHistoryService } from 'src/core/services/history';
 
 @customElement('umb-editor-user')
 export class UmbEditorUserElement extends UmbContextProviderMixin(
@@ -115,6 +116,7 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(
 
 	constructor() {
 		super();
+
 		this.consumeAllContexts(['umbUserStore', 'umbModalService'], (instances) => {
 			this._userStore = instances['umbUserStore'];
 			this._modalService = instances['umbModalService'];
@@ -139,6 +141,8 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(
 		this.observe<UserDetails>(this._userStore.getByKey(this.entityKey), (user) => {
 			this._user = user;
 			if (!this._user) return;
+
+			umbHistoryService.push({ label: ['Users', user.name], path: 'section/users/view/users/user/' + user.key });
 
 			if (!this._userContext) {
 				this._userContext = new UmbUserContext(this._user);

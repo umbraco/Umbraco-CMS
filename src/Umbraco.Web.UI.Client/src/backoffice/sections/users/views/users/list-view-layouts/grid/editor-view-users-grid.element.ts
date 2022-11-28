@@ -9,6 +9,7 @@ import { UmbUserStore } from '../../../../../../../core/stores/user/user.store';
 import { getTagLookAndColor } from '../../../../user-extensions';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { UserDetails, UserEntity } from '@umbraco-cms/models';
+import { umbHistoryService } from 'src/core/services/history';
 
 @customElement('umb-editor-view-users-grid')
 export class UmbEditorViewUsersGridElement extends UmbContextConsumerMixin(LitElement) {
@@ -53,6 +54,7 @@ export class UmbEditorViewUsersGridElement extends UmbContextConsumerMixin(LitEl
 
 	connectedCallback(): void {
 		super.connectedCallback();
+		umbHistoryService.push({ label: 'Users grid', path: 'section/users/view/users/overview/grid' });
 
 		this.consumeContext('umbUserStore', (userStore: UmbUserStore) => {
 			this._userStore = userStore;

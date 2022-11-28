@@ -18,6 +18,7 @@ import type { UserDetails } from '@umbraco-cms/models';
 
 import './column-layouts/name/user-table-name-column-layout.element';
 import './column-layouts/status/user-table-status-column-layout.element';
+import { umbHistoryService } from 'src/core/services/history';
 
 @customElement('umb-editor-view-users-table')
 export class UmbEditorViewUsersTableElement extends UmbContextConsumerMixin(LitElement) {
@@ -75,6 +76,7 @@ export class UmbEditorViewUsersTableElement extends UmbContextConsumerMixin(LitE
 
 	connectedCallback(): void {
 		super.connectedCallback();
+		umbHistoryService.push({ label: 'Users list', path: 'section/users/view/users/overview/list' });
 
 		this.consumeContext('umbUserStore', (userStore: UmbUserStore) => {
 			this._userStore = userStore;
