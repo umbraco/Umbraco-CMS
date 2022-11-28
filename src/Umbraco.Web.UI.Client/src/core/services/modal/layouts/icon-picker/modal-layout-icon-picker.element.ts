@@ -53,7 +53,7 @@ export class UmbModalLayoutIconPickerElement extends UmbModalLayoutElement<UmbMo
 			#icon-selection {
 				line-height: 0;
 				display: grid;
-				grid-template-columns: repeat(auto-fit, minmax(40px, auto));
+				grid-template-columns: repeat(auto-fit, minmax(40px, 40px));
 				overflow-y: scroll;
 				max-height: 100%;
 				min-height: 0;
