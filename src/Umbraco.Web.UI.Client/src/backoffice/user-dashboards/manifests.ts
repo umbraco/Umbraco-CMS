@@ -1,6 +1,6 @@
-import type { ManifestExternalLoginProvider, ManifestWithLoader } from '@umbraco-cms/models';
+import type { ManifestUserDashboard, ManifestWithLoader } from '@umbraco-cms/models';
 
-export const manifests: Array<ManifestWithLoader<ManifestExternalLoginProvider>> = [
+export const manifests: Array<ManifestWithLoader<ManifestUserDashboard>> = [
 	{
 		type: 'userDashboard',
 		alias: 'Umb.UserDashboard.Test',
