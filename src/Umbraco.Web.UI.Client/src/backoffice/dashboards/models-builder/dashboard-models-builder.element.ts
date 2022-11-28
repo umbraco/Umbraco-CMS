@@ -1,11 +1,8 @@
+import { UUIButtonState } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement, nothing } from 'lit';
-import { state, customElement } from 'lit/decorators.js';
-import { unsafeHTML } from 'lit/directives/unsafe-html.js';
+import { customElement, state } from 'lit/decorators.js';
 
-import { UUIButtonState } from '@umbraco-ui/uui';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-import { UmbNotificationService, UmbNotificationDefaultData } from '@umbraco-cms/services';
 import {
 	ApiError,
 	CreatedResult,
@@ -14,8 +11,8 @@ import {
 	ModelsMode,
 	ProblemDetails,
 } from '@umbraco-cms/backend-api';
-
-import '@umbraco-cms/utils';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import { UmbNotificationDefaultData, UmbNotificationService } from '@umbraco-cms/services';
 
 @customElement('umb-dashboard-models-builder')
 export class UmbDashboardModelsBuilderElement extends UmbContextConsumerMixin(LitElement) {
