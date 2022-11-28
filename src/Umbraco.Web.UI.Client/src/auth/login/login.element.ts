@@ -47,7 +47,7 @@ export default class UmbLogin extends LitElement {
 			this._loggingIn = false;
 			let { redirectTo } = query();
 			if (!redirectTo) {
-				redirectTo = '/section';
+				redirectTo = 'section';
 			}
 			sessionStorage.setItem('is-authenticated', 'true');
 			history.pushState(null, '', redirectTo);

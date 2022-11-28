@@ -1,11 +1,11 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html, LitElement } from 'lit';
+import { css, html, LitElement, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
-import { UmbModalService, UmbNotificationService, UmbNotificationDefaultData } from '@umbraco-cms/services';
+import { UmbNotificationService, UmbNotificationDefaultData } from '@umbraco-cms/services';
 
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-import { ApiError, ProblemDetails, Searcher, Index, SearchResource } from '@umbraco-cms/backend-api';
+import { ApiError, ProblemDetails, Searcher, Index, IndexerResource, SearcherResource } from '@umbraco-cms/backend-api';
 
 @customElement('umb-dashboard-examine-overview')
 export class UmbDashboardExamineOverviewElement extends UmbContextConsumerMixin(LitElement) {
@@ -58,12 +58,32 @@ export class UmbDashboardExamineOverviewElement extends UmbContextConsumerMixin(
 	@state()
 	private _searchers?: Searcher[];
 
+	@state()
+	private _loadingIndexers = false;
+
+	@state()
+	private _loadingSearchers = false;
+
 	private _notificationService?: UmbNotificationService;
-	private _modalService?: UmbModalService;
+
+	constructor() {
+		super();
+
+		this.consumeAllContexts(['umbNotificationService'], (instances) => {
+			this._notificationService = instances['umbNotificationService'];
+		});
+	}
+
+	connectedCallback() {
+		super.connectedCallback();
+		this._getIndexers();
+		this._getSearchers();
+	}
 
 	private async _getIndexers() {
+		this._loadingIndexers = true;
 		try {
-			const indexers = await SearchResource.getSearchIndex({ take: 9999, skip: 0 });
+			const indexers = await IndexerResource.getIndexer({ take: 9999, skip: 0 });
 			this._indexers = indexers.items;
 		} catch (e) {
 			if (e instanceof ApiError) {
@@ -72,11 +92,13 @@ export class UmbDashboardExamineOverviewElement extends UmbContextConsumerMixin(
 				this._notificationService?.peek('danger', { data });
 			}
 		}
+		this._loadingIndexers = false;
 	}
 
 	private async _getSearchers() {
+		this._loadingSearchers = true;
 		try {
-			const searchers = await SearchResource.getSearchSearcher({ take: 9999, skip: 0 });
+			const searchers = await SearcherResource.getSearcher({ take: 9999, skip: 0 });
 			this._searchers = searchers.items;
 		} catch (e) {
 			if (e instanceof ApiError) {
@@ -85,17 +107,7 @@ export class UmbDashboardExamineOverviewElement extends UmbContextConsumerMixin(
 				this._notificationService?.peek('danger', { data });
 			}
 		}
-	}
-
-	constructor() {
-		super();
-		this._getIndexers();
-		this._getSearchers();
-
-		this.consumeAllContexts(['umbNotificationService', 'umbModalService'], (instances) => {
-			this._notificationService = instances['umbNotificationService'];
-			this._modalService = instances['umbModalService'];
-		});
+		this._loadingSearchers = false;
 	}
 
 	render() {
@@ -118,7 +130,8 @@ export class UmbDashboardExamineOverviewElement extends UmbContextConsumerMixin(
 	}
 
 	private renderIndexersList() {
-		if (!this._indexers) return;
+		if (this._loadingIndexers) return html`<uui-loader></uui-loader>`;
+		if (!this._indexers) return nothing;
 		return html` <uui-table class="overview">
 			${this._indexers.map((index) => {
 				return html`
@@ -142,7 +155,8 @@ export class UmbDashboardExamineOverviewElement extends UmbContextConsumerMixin(
 	}
 
 	private renderSearchersList() {
-		if (!this._searchers) return html`<span class="not-found-message">No searchers were found</span>`;
+		if (this._loadingSearchers) return html`<uui-loader></uui-loader>`;
+		if (!this._searchers) return nothing;
 		return html`
 			<uui-table class="overview2">
 				${this._searchers.map((searcher) => {
