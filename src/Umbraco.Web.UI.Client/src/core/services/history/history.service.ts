@@ -8,7 +8,7 @@ export type UmbHistoryItem = {
 	icon?: string;
 };
 
-export class UmbHistoryService {
+class UmbHistoryService {
 	private _history: BehaviorSubject<Array<UmbHistoryItem>> = new BehaviorSubject(<Array<UmbHistoryItem>>[
 		{ label: 'Users grid', path: 'section/users/view/users/overview/grid' },
 		{ label: ['User', 'Nat Linnane'], path: 'section/users/view/users/user/50f184d4-71f3-4a43-b8be-7a36340fbd0d' },
@@ -43,3 +43,5 @@ export class UmbHistoryService {
 		this._history.next([]);
 	}
 }
+
+export const umbHistoryService = new UmbHistoryService();

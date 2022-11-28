@@ -1,7 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, CSSResultGroup, html, LitElement, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { UmbHistoryItem, UmbHistoryService } from '../../history';
+import { UmbHistoryItem, umbHistoryService } from '../../history';
 import { UmbModalHandler, UmbModalService } from '@umbraco-cms/services';
 import type { ManifestExternalLoginProvider, ManifestUserDashboard, UserDetails } from '@umbraco-cms/models';
 import { UmbUserStore } from 'src/core/stores/user/user.store';
@@ -86,19 +86,17 @@ export class UmbModalLayoutUserDialogElement extends UmbContextConsumerMixin(Umb
 
 	private _userStore?: UmbUserStore;
 	private _modalService?: UmbModalService;
-	private _historyService?: UmbHistoryService;
 
 	constructor() {
 		super();
-		this.consumeAllContexts(['umbUserStore', 'umbModalService', 'umbHistoryService'], (instances) => {
+		this.consumeAllContexts(['umbUserStore', 'umbModalService'], (instances) => {
 			this._userStore = instances['umbUserStore'];
 			this._modalService = instances['umbModalService'];
-			this._historyService = instances['umbHistoryService'];
 			this._observeCurrentUser();
-			this._observeHistory();
 		});
 
 		this._observeExternalLoginProviders();
+		this._observeHistory();
 		this._observeUserDashboards();
 	}
 
@@ -119,9 +117,7 @@ export class UmbModalLayoutUserDialogElement extends UmbContextConsumerMixin(Umb
 		});
 	}
 	private async _observeHistory() {
-		if (!this._historyService) return;
-
-		this.observe<Array<UmbHistoryItem>>(this._historyService.history, (history) => {
+		this.observe<Array<UmbHistoryItem>>(umbHistoryService.history, (history) => {
 			this._history = history;
 		});
 	}
