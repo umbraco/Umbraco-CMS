@@ -2545,6 +2545,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="block">Blok</key>
     <key alias="tabBlock">Blokken</key>
     <key alias="tabBlockTypeSettings">Instellingen</key>
+    <key alias="allowBlockInAreasHelp">Maak dit blok standaard beschikbaar binnen de gebieden van andere blokken (behalve wanneer expliciete rechten zijn gezet voor deze gebieden).</key>
     <key alias="areas">Gebieden</key>
     <key alias="tabAreas">Gebieden</key>
     <key alias="tabAdvanced">Geadvanceerd</key>
