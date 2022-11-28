@@ -15,7 +15,7 @@ import {
 	ProblemDetails,
 } from '@umbraco-cms/backend-api';
 
-import 'src/core/utils/code-block';
+import '@umbraco-cms/utils';
 
 @customElement('umb-dashboard-models-builder')
 export class UmbDashboardModelsBuilderElement extends UmbContextConsumerMixin(LitElement) {
