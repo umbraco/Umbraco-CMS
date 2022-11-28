@@ -33,9 +33,6 @@ export interface UserGroupEntity extends Entity {
 }
 
 export interface UserGroupDetails extends UserGroupEntity {
-	key: string;
-	name: string;
-	icon: string;
 	sections: Array<string>;
 	contentStartNode?: string;
 	mediaStartNode?: string;
