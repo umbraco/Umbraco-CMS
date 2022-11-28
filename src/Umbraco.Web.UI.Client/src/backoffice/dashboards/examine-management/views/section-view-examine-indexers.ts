@@ -10,6 +10,7 @@ import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import './section-view-examine-searchers';
 
 import { ApiError, ProblemDetails, Index, SearchResource } from '@umbraco-cms/backend-api';
+import { umbHistoryService } from 'src/core/services/history';
 
 @customElement('umb-dashboard-examine-index')
 export class UmbDashboardExamineIndexElement extends UmbContextConsumerMixin(LitElement) {
@@ -95,6 +96,10 @@ export class UmbDashboardExamineIndexElement extends UmbContextConsumerMixin(Lit
 		try {
 			const index = await SearchResource.getSearchIndexByIndexName({ indexName: this.indexName });
 			this._indexData = index;
+			umbHistoryService.push({
+				label: ['Settings', 'Examine Management', this._indexData.name],
+				path: 'section/settings/dashboard/examine-management/index/ExternalIndex/' + this._indexData.name,
+			});
 		} catch (e) {
 			if (e instanceof ApiError) {
 				const error = e as ProblemDetails;

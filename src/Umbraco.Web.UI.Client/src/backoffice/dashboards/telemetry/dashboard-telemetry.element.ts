@@ -3,6 +3,7 @@ import { css, html, LitElement } from 'lit';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import { customElement, state } from 'lit/decorators.js';
 import { ApiError, ProblemDetails, Telemetry, TelemetryLevel, TelemetryResource } from '@umbraco-cms/backend-api';
+import { umbHistoryService } from 'src/core/services/history';
 
 export type SettingOption = 'Minimal' | 'Basic' | 'Detailed';
 
@@ -28,6 +29,10 @@ export class UmbDashboardTelemetryElement extends LitElement {
 
 	constructor() {
 		super();
+		umbHistoryService.push({
+			label: ['Settings', 'Telemetry Data'],
+			path: 'section/settings/dashboard/telemetry',
+		});
 	}
 
 	connectedCallback(): void {

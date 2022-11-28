@@ -15,6 +15,7 @@ import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { UserGroupDetails } from '@umbraco-cms/models';
 
 import './user-group-table-name-column-layout.element';
+import { umbHistoryService } from 'src/core/services/history';
 
 @customElement('umb-editor-view-user-groups')
 export class UmbEditorViewUserGroupsElement extends UmbContextConsumerMixin(LitElement) {
@@ -70,19 +71,18 @@ export class UmbEditorViewUserGroupsElement extends UmbContextConsumerMixin(LitE
 
 	connectedCallback(): void {
 		super.connectedCallback();
+		umbHistoryService.push({ label: 'User groups', path: 'section/users/view/user-groups' });
 
-		this.consumeContext('umbUserGroupStore', (userStore: UmbUserGroupStore) => {
-			this._userGroupStore = userStore;
-			this._observeUsers();
+		this.consumeContext('umbUserGroupStore', (userGroupStore: UmbUserGroupStore) => {
+			this._userGroupStore = userGroupStore;
+			this._observeUserGroups();
 		});
 	}
 
-	private _observeUsers() {
+	private _observeUserGroups() {
 		this._userGroupsSubscription?.unsubscribe();
 		this._userGroupsSubscription = this._userGroupStore?.getAll().subscribe((userGroups) => {
 			this._userGroups = userGroups;
-			console.log('user groups', userGroups);
-
 			this._createTableItems(this._userGroups);
 		});
 	}

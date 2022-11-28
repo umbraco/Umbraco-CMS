@@ -1,6 +1,7 @@
 import { html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { IRoute, IRoutingInfo } from 'router-slot';
+import { umbHistoryService } from 'src/core/services/history';
 import { UmbEditorEntityElement } from '../../../../editors/shared/editor-entity/editor-entity.element';
 
 @customElement('umb-section-view-packages-installed')
@@ -25,6 +26,11 @@ export class UmbSectionViewPackagesInstalledElement extends LitElement {
 			redirectTo: '/section/packages/view/installed/overview', //TODO: this should be dynamic
 		},
 	];
+
+	constructor() {
+		super();
+		umbHistoryService.push({ label: ['Packages', 'Installed'], path: 'section/packages/view/installed/overview' });
+	}
 
 	render() {
 		return html`<router-slot .routes=${this._routes}></router-slot>`;

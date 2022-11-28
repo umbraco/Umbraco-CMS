@@ -6,6 +6,7 @@ import { UmbDashboardExamineIndexElement } from './views/section-view-examine-in
 import { UmbDashboardExamineSearcherElement } from './views/section-view-examine-searchers';
 
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import { umbHistoryService } from 'src/core/services/history';
 
 @customElement('umb-dashboard-examine-management')
 export class UmbDashboardExamineManagementElement extends UmbContextConsumerMixin(LitElement) {
@@ -47,6 +48,17 @@ export class UmbDashboardExamineManagementElement extends UmbContextConsumerMixi
 
 	@state()
 	private _currentPath?: string;
+
+	/**
+	 *
+	 */
+	constructor() {
+		super();
+		umbHistoryService.push({
+			label: ['Settings', 'Examine Management'],
+			path: 'section/settings/dashboard/examine-management',
+		});
+	}
 
 	private _onRouteChange() {
 		this._currentPath = path();
