@@ -133,6 +133,35 @@ public class MediaTypeController : ContentTypeControllerBase<IMediaType>
     }
 
     /// <summary>
+    ///     Returns a media type by alias
+    /// </summary>
+    /// /// <param name="alias">Alias of the media type</param>
+    /// <returns></returns>
+    public IEnumerable<MediaTypeDisplay> GetAllFiltered([FromQuery] string[] aliases)
+    {
+        if (aliases.Length < 1)
+        {
+            return _mediaTypeService.GetAll().Select(_umbracoMapper.Map<IMediaType, MediaTypeDisplay>).WhereNotNull();
+        }
+
+        var mediaTypeDisplays = new List<MediaTypeDisplay>();
+
+        foreach (var alias in aliases)
+        {
+            IMediaType? mediaType = _mediaTypeService.Get(alias);
+
+            MediaTypeDisplay? mediaTypeDisplay = _umbracoMapper.Map<IMediaType, MediaTypeDisplay>(mediaType);
+
+            if (mediaTypeDisplay is not null)
+            {
+                mediaTypeDisplays.Add(mediaTypeDisplay);
+            }
+        }
+
+        return mediaTypeDisplays;
+    }
+
+    /// <summary>
     ///     Deletes a media type with a given ID
     /// </summary>
     /// <param name="id"></param>

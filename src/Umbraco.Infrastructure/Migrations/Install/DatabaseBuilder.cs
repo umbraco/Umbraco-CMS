@@ -96,7 +96,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
 
         public bool HasSomeNonDefaultUser()
         {
-            using (var scope = _scopeProvider.CreateCoreScope())
+            using (ICoreScope scope = _scopeProvider.CreateCoreScope())
             {
                 // look for the super user with default password
                 var sql = _scopeAccessor.AmbientScope?.Database.SqlContext.Sql()
@@ -119,7 +119,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
 
         internal bool IsUmbracoInstalled()
         {
-            using (var scope = _scopeProvider.CreateCoreScope(autoComplete: true))
+            using (ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _scopeAccessor.AmbientScope?.Database.IsUmbracoInstalled() ?? false;
             }

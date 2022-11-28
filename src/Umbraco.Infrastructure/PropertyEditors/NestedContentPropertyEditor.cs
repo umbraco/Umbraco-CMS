@@ -21,12 +21,13 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 [DataEditor(
     Constants.PropertyEditors.Aliases.NestedContent,
-    "Nested Content",
+    "Nested Content (legacy)",
     "nestedcontent",
     ValueType = ValueTypes.Json,
     Group = Constants.PropertyEditors.Groups.Lists,
     Icon = "icon-thumbnail-list",
-    ValueEditorIsReusable = false)]
+    ValueEditorIsReusable = false,
+    IsDeprecated = true)]
 public class NestedContentPropertyEditor : DataEditor
 {
     public const string ContentTypeAliasPropertyKey = "ncContentTypeAlias";
