@@ -101,7 +101,7 @@ preserve.belle
 /tests/Umbraco.Tests.UnitTests/[Uu]mbraco/[Dd]ata/TEMP/
 
 # Ignore auto-generated schema
-/src/Umbraco.Cms.Targets/appsettings-schema.json
+/src/Umbraco.Cms.Targets/tasks/
 /src/Umbraco.Cms.Targets/appsettings-schema.*.json
 /src/Umbraco.Web.UI/appsettings-schema.json
 /src/Umbraco.Web.UI/appsettings-schema.*.json
