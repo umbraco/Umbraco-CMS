@@ -50,39 +50,6 @@ export class UmbModalLayoutIconPickerElement extends UmbModalLayoutElement<UmbMo
 				padding-left: 6px;
 			}
 
-			input[type='radio'] {
-				display: none;
-				position: absolute;
-			}
-
-			#palette {
-				display: flex;
-				flex-wrap: wrap;
-			}
-
-			#palette .colorspot {
-				box-sizing: border-box;
-				line-height: 0;
-				padding: 4px;
-				margin: 5px 5px 5px 0;
-				height: 25px;
-				width: 25px;
-				display: inline-block;
-				border-radius: 5px;
-			}
-
-			#palette .checkmark {
-				height: 100%;
-				width: 100%;
-				display: none;
-				color: white;
-				background-color: rgba(0, 0, 0, 0.2);
-				border-radius: 100%;
-			}
-			#palette input[type='radio']:checked ~ .checkmark {
-				display: block;
-			}
-
 			#icon-selection {
 				line-height: 0;
 				display: grid;
@@ -105,15 +72,14 @@ export class UmbModalLayoutIconPickerElement extends UmbModalLayoutElement<UmbMo
 				display: inline-block;
 			}
 
-			/*#icon-selection input[type='radio']:checked ~ .icon {
-				background-color: rgba(0, 0, 0, 0.1);
-				border: 1px solid #ffeeee;
-			}*/
-
 			#icon-selection .icon:focus,
 			#icon-selection .icon:hover,
 			#icon-selection .icon.selected {
 				background-color: rgba(0, 0, 0, 0.1);
+			}
+
+			uui-button {
+				margin-left: var(--uui-size-space-4);
 			}
 		`,
 	];
@@ -188,15 +154,6 @@ export class UmbModalLayoutIconPickerElement extends UmbModalLayoutElement<UmbMo
 	@state()
 	private _currentIcon: string;
 
-	private _changeIconColor(e: { target: HTMLInputElement; type: any; key: unknown }) {
-		if (e.type == 'click') {
-			this._currentColor = e.target.id;
-		} else if (e.type == 'keyup' && e.key == 'Enter') {
-			e.target.children[0].setAttribute('checked', 'true');
-			this._currentColor = e.target.children[0].id;
-		}
-	}
-
 	private _changeIcon(e: { target: HTMLInputElement; type: any; key: unknown }) {
 		if (e.type == 'click' || (e.type == 'keyup' && e.key == 'Enter')) {
 			this._currentIcon = e.target.id;
@@ -211,9 +168,6 @@ export class UmbModalLayoutIconPickerElement extends UmbModalLayoutElement<UmbMo
 		}
 	}
 
-	private _setBackground(color: string) {
-		return 'background-color: ' + color;
-	}
 	private _setColor(color: string) {
 		return 'color: ' + color;
 	}
@@ -270,28 +224,6 @@ export class UmbModalLayoutIconPickerElement extends UmbModalLayoutElement<UmbMo
 			id="searchbar">
 			<uui-icon name="search" slot="prepend" id="searchbar_icon"></uui-icon>
 		</uui-input>`;
-	}
-
-	renderPalette() {
-		return html`${this.colorlist.map((color) => {
-			return html`<label
-				@keyup="${this._changeIconColor}"
-				tabindex="0"
-				for="${color}"
-				class="colorspot"
-				.style="${this._setBackground(color)}">
-				<input
-					type="radio"
-					name="color"
-					label="${color}"
-					@click="${this._changeIconColor}"
-					id="${color}"
-					?checked="${color === this._currentColor ? true : false}" />
-				<span class="checkmark">
-					<uui-icon name="check"></uui-icon>
-				</span>
-			</label>`;
-		})}`;
 	}
 
 	renderIconSelection() {
