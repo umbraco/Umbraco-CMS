@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Core.Configuration.Models;
 public class LoggingSettings
 {
     internal const string StaticMaxLogAge = "1.00:00:00"; // TimeSpan.FromHours(24);
-    internal const string StaticLoggingDirectory = Constants.SystemDirectories.LogFiles;
+    internal const string StaticDirectory = Constants.SystemDirectories.LogFiles;
 
     /// <summary>
     ///     Gets or sets a value for the maximum age of a log file.
@@ -25,12 +25,12 @@ public class LoggingSettings
     /// <summary>
     ///     Gets or sets the folder to use for log files
     /// </summary>
-    [DefaultValue(StaticLoggingDirectory)]
-    public string LoggingDirectory { get; set; } = StaticLoggingDirectory;
+    [DefaultValue(StaticDirectory)]
+    public string Directory { get; set; } = StaticDirectory;
 
     public string GetAbsoluteLoggingPath(IHostEnvironment hostEnvironment)
     {
-        var dir = LoggingDirectory;
+        var dir = Directory;
         if (dir.StartsWith("~/"))
         {
             hostEnvironment.MapPathContentRoot(dir);

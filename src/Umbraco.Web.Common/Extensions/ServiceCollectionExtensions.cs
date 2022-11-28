@@ -89,8 +89,8 @@ public static class ServiceCollectionExtensions
 
         var umbracoFileConfiguration = new UmbracoFileConfiguration(configuration);
 
-        services.TryAddSingleton(x => umbracoFileConfiguration);
-        services.TryAddSingleton(x => loggingConfig);
+        services.TryAddSingleton(umbracoFileConfiguration);
+        services.TryAddSingleton(loggingConfig);
         services.TryAddSingleton<ILogEventEnricher, ApplicationIdEnricher>();
 
         ///////////////////////////////////////////////
