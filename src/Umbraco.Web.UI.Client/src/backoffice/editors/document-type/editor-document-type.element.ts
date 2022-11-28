@@ -10,6 +10,7 @@ import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import type { ManifestTypes, ManifestWithLoader } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
+import { UmbModalService } from '@umbraco-cms/services';
 
 import '../shared/editor-entity-layout/editor-entity-layout.element';
 
@@ -45,13 +46,16 @@ export class UmbEditorDocumentTypeElement extends UmbContextProviderMixin(
 	private _documentTypeContext?: UmbDocumentTypeContext;
 	private _documentTypeStore?: UmbDocumentTypeStore;
 
+	private _modalService?: UmbModalService;
+
 	constructor() {
 		super();
 
 		this._registerExtensions();
 
-		this.consumeContext('umbDocumentTypeStore', (instance) => {
-			this._documentTypeStore = instance;
+		this.consumeAllContexts(['umbDocumentTypeStore', 'umbModalService'], (instances) => {
+			this._documentTypeStore = instances['umbDocumentTypeStore'];
+			this._modalService = instances['umbModalService'];
 			this._observeDocumentType();
 		});
 	}
@@ -119,10 +123,16 @@ export class UmbEditorDocumentTypeElement extends UmbContextProviderMixin(
 		}
 	}
 
+	private _handleIconClick() {
+		this._modalService?.iconPicker();
+	}
+
 	render() {
 		return html`
 			<umb-editor-entity-layout alias="Umb.Editor.DocumentType">
-				<div slot="icon">Icon</div>
+				<div slot="icon">
+					<uui-button @click=${this._handleIconClick}>Icon</uui-button>
+				</div>
 
 				<div slot="name">
 					<uui-input id="name" .value=${this._documentType?.name} @input="${this._handleInput}">
