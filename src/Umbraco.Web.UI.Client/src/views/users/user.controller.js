@@ -2,7 +2,7 @@
     "use strict";
 
     function UserEditController($scope, eventsService, $q, $location, $routeParams, formHelper, usersResource, twoFactorLoginResource,
-        userService, contentEditingHelper, localizationService, dateHelper, mediaHelper, Upload, umbRequestHelper,
+        userService, contentEditingHelper, localizationService, mediaHelper, Upload, umbRequestHelper,
         usersHelper, authResource, dateHelper, editorService, overlayService, externalLoginInfoService) {
 
         var currentLoggedInUser = null;
