@@ -127,7 +127,7 @@ namespace Umbraco.Extensions
         /// <param name="loggingConfiguration"></param>
         /// <param name="minimumLevel">The log level you wish the JSON file to collect - default is Verbose (highest)</param>
         /// <param name="retainedFileCount">The number of days to keep log files. Default is set to null which means all logs are kept</param>
-        [Obsolete("Will be removed in the Umbraco 13.")]
+        [Obsolete("Will be removed in Umbraco 13.")]
         public static LoggerConfiguration OutputDefaultTextFile(
             this LoggerConfiguration logConfig,
             Umbraco.Cms.Core.Hosting.IHostingEnvironment hostingEnvironment,
@@ -222,7 +222,7 @@ namespace Umbraco.Extensions
         /// <param name="minimumLevel">The log level you wish the JSON file to collect - default is Verbose (highest)</param>
         /// <param name="hostingEnvironment"></param>
         /// <param name="retainedFileCount">The number of days to keep log files. Default is set to null which means all logs are kept</param>
-        [Obsolete("Will be removed in the Umbraco 13.")]
+        [Obsolete("Will be removed in Umbraco 13.")]
         public static LoggerConfiguration OutputDefaultJsonFile(
             this LoggerConfiguration logConfig,
             Umbraco.Cms.Core.Hosting.IHostingEnvironment hostingEnvironment,
