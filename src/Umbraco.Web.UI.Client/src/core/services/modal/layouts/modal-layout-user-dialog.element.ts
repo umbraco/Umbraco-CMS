@@ -56,12 +56,11 @@ export class UmbModalLayoutUserDialogElement extends UmbContextConsumerMixin(Umb
 			.history-item-name-separator {
 				margin: 0 var(--uui-size-space-1);
 			}
-			.history-item-path,
+
 			.history-item-name-separator {
 				opacity: 0.4;
 			}
-			.history-item-name,
-			.history-item-path {
+			.history-item-name {
 				text-overflow: ellipsis;
 				overflow: hidden;
 				white-space: nowrap;
