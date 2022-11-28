@@ -50,4 +50,12 @@
   <Target Name="RemoveAppsettingsSchema" AfterTargets="Clean" Condition="Exists('$(_UmbracoCmsJsonSchemaReference)')">
     <Delete Files="$(_UmbracoCmsJsonSchemaReference)" />
   </Target>
+
+  <!-- Create and pack empty file to add TFM dependency -->
+  <Target Name="PackTargetFrameworkFile" BeforeTargets="Build">
+    <WriteLinesToFile File="$(IntermediateOutputPath)_._" />
+    <ItemGroup>
+      <None Include="$(IntermediateOutputPath)_._" Pack="true" PackagePath="lib\$(TargetFramework)" />
+    </ItemGroup>
+  </Target>
 </Project>
