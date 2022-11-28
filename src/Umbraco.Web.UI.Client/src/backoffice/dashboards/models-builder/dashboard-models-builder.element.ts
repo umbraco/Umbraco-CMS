@@ -3,14 +3,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
-import {
-	ApiError,
-	CreatedResult,
-	ModelsBuilder,
-	ModelsBuilderResource,
-	ModelsMode,
-	ProblemDetails,
-} from '@umbraco-cms/backend-api';
+import { ApiError, ModelsBuilder, ModelsBuilderResource, ModelsMode, ProblemDetails } from '@umbraco-cms/backend-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { UmbNotificationDefaultData, UmbNotificationService } from '@umbraco-cms/services';
 
@@ -53,13 +46,18 @@ export class UmbDashboardModelsBuilderElement extends UmbContextConsumerMixin(Li
 	private _modelsBuilder?: ModelsBuilder;
 
 	@state()
-	private _createdResult?: CreatedResult;
-
-	@state()
 	private _buttonStateBuild: UUIButtonState = undefined;
 
 	@state()
 	private _buttonStateReload: UUIButtonState = undefined;
+
+	constructor() {
+		super();
+		this._getDashboardData();
+		this.consumeAllContexts(['umbNotificationService'], (instances) => {
+			this._notificationService = instances['umbNotificationService'];
+		});
+	}
 
 	private async _getDashboardData() {
 		try {
@@ -86,8 +84,7 @@ export class UmbDashboardModelsBuilderElement extends UmbContextConsumerMixin(Li
 
 	private async _postGenerateModels() {
 		try {
-			const createdResult = await ModelsBuilderResource.postModelsBuilderBuild();
-			this._createdResult = createdResult;
+			await ModelsBuilderResource.postModelsBuilderBuild();
 			this._getDashboardData();
 			return true;
 		} catch (e) {
@@ -100,14 +97,6 @@ export class UmbDashboardModelsBuilderElement extends UmbContextConsumerMixin(Li
 			}
 			return false;
 		}
-	}
-
-	constructor() {
-		super();
-		this._getDashboardData();
-		this.consumeAllContexts(['umbNotificationService'], (instances) => {
-			this._notificationService = instances['umbNotificationService'];
-		});
 	}
 
 	private async _onDashboardReload() {
