@@ -1,8 +1,9 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.Text.RegularExpressions;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.HealthChecks;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
@@ -67,20 +68,25 @@ public static class ContentServiceExtensions
     public static IEnumerable<string> GetAnchorValuesFromRTEs(this IContentService contentService, int id, string? culture = "*")
     {
         var result = new List<string>();
+
+        //TODO : remove this hack : contentProperty.GetValue(culture) always return null when culture variable is "*"
+        if (culture == "*")
+        {
+            culture = string.Empty;
+        }
+
         IContent? content = contentService.GetById(id);
+
+        var propertyTypesWithRTE = new string[] { Constants.PropertyEditors.Aliases.TinyMce, Constants.PropertyEditors.Aliases.BlockList, Constants.PropertyEditors.Aliases.BlockGrid };
 
         if (content is not null)
         {
-            foreach (IProperty contentProperty in content.Properties)
+            foreach (IProperty contentProperty in content.Properties.Where(s => propertyTypesWithRTE.Contains(s.PropertyType.PropertyEditorAlias)))
             {
-                if (contentProperty.PropertyType.PropertyEditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases
-                        .TinyMce))
+                var value = contentProperty.GetValue(culture)?.ToString();
+                if (!string.IsNullOrEmpty(value))
                 {
-                    var value = contentProperty.GetValue(culture)?.ToString();
-                    if (!string.IsNullOrEmpty(value))
-                    {
-                        result.AddRange(contentService.GetAnchorValuesFromRTEContent(value));
-                    }
+                    result.AddRange(contentService.GetAnchorValuesFromRTEContent(value));
                 }
             }
         }
@@ -93,7 +99,8 @@ public static class ContentServiceExtensions
         string rteContent)
     {
         var result = new List<string>();
-        MatchCollection matches = AnchorRegex.Matches(rteContent);
+        var rteUnescaped = Regex.Unescape(rteContent);
+        MatchCollection matches = AnchorRegex.Matches(rteUnescaped);
         foreach (Match match in matches)
         {
             result.Add(match.Value.Split(Constants.CharArrays.DoubleQuote)[1]);
