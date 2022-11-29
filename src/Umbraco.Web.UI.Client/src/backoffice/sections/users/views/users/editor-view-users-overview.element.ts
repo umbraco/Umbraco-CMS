@@ -4,7 +4,6 @@ import { customElement, state } from 'lit/decorators.js';
 import { IRoute } from 'router-slot';
 import { UUIPopoverElement } from '@umbraco-ui/uui';
 
-import { UmbModalService } from '../../../../../core/services/modal';
 import type { UmbSectionViewUsersElement } from './section-view-users.element';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
@@ -14,6 +13,7 @@ import './list-view-layouts/grid/editor-view-users-grid.element';
 import './editor-view-users-selection.element';
 import './editor-view-users-invite.element';
 import './editor-view-users-create.element';
+import { UmbModalService } from '@umbraco-cms/services';
 
 export type UsersViewType = 'list' | 'grid';
 @customElement('umb-editor-view-users-overview')

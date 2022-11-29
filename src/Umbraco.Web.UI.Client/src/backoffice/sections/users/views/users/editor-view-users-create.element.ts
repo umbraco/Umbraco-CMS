@@ -2,12 +2,11 @@ import { css, html, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, query, state } from 'lit/decorators.js';
 import { UUIInputPasswordElement } from '@umbraco-ui/uui';
-import { UmbModalLayoutElement } from '../../../../../core/services/modal/layouts/modal-layout.element';
-import { UmbUserStore } from '../../../../../core/stores/user/user.store';
 import { UmbPickerUserGroupElement } from '../../picker-user-group.element';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { UserDetails } from '@umbraco-cms/models';
-import { UmbNotificationDefaultData, UmbNotificationService } from '@umbraco-cms/services';
+import { UmbModalLayoutElement, UmbNotificationDefaultData, UmbNotificationService } from '@umbraco-cms/services';
+import { UmbUserStore } from '@umbraco-cms/stores/user/user.store';
 
 export type UsersViewType = 'list' | 'grid';
 @customElement('umb-editor-view-users-create')

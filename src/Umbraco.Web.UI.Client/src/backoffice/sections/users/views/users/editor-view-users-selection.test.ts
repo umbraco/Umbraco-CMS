@@ -1,6 +1,6 @@
 import { expect, fixture, html } from '@open-wc/testing';
-import { defaultA11yConfig } from '@umbraco-cms/test-utils';
 import UmbEditorViewUsersSelectionElement from './editor-view-users-selection.element';
+import { defaultA11yConfig } from '@umbraco-cms/test-utils';
 
 describe('UmbEditorViewUsersSelectionElement', () => {
 	let element: UmbEditorViewUsersSelectionElement;

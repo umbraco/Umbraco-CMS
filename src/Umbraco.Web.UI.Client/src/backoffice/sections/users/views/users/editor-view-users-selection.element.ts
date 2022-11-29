@@ -1,10 +1,10 @@
 import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
-import type { UmbUserStore } from '../../../../../core/stores/user/user.store';
 import { UmbSectionViewUsersElement } from './section-view-users.element';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
+import { UmbUserStore } from '@umbraco-cms/stores/user/user.store';
 
 @customElement('umb-editor-view-users-selection')
 export class UmbEditorViewUsersSelectionElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
