@@ -1,12 +1,7 @@
 <style>
 
     :host {
-        position: relative;
-        border-radius: 3px;
-        height: 100%;/* Add this to fill the cell fully */
         min-height: 160px;
-        box-sizing: border-box;
-        //border: 1px solid #BBBABF;
     }
     
     button > * {
@@ -31,7 +26,7 @@
         overflow:hidden;
     }
     button:hover {
-        color: #2152A3;// TODO: Set right colors:
+        color: #2152A3;
     }
     img {
         object-fit: cover;
@@ -67,24 +62,26 @@
         bottom: 0;
         right: 0;
 
-        opacity: var(--umb-block-grid__block--show-ui, 0);
+        opacity: var(--umb-block-grid--block-ui-opacity, 0);
         transition: opacity 120ms;
     }
-    /*
-    :host(:focus-within) .file-name, 
-    :host(:hover) .file-name {
+
+    .is-trashed {
+        background-color: #d42054 !important;
+        color:white !important;
+    }
+    .is-trashed .file-name {
         opacity: 1;
     }
-    */
 
 </style>
-<script>
-    <!-- TODO: what can we do? -->
-</script>
 
-<button ng-controller="Umbraco.PropertyEditors.BlockEditor.MediaBlockEditor as bc" type="button" ng-click="block.edit()" ng-focus="block.focus">
-    <img ng-if="bc.isImage || bc.fileExtension === 'svg'" ng-src="{{bc.imageSource}}" alt="{{bc.mediaName}}" />
-    <umb-icon ng-if="!bc.isImage && bc.fileExtension !== 'svg'" icon="{{bc.icon}} color-black" class="icon"></umb-icon>
-    <span ng-if="bc.mediaName" class="file-name">{{bc.mediaName}}</span>
+<button type="button" ng-click="block.edit()" ng-focus="block.focus" ng-class="{'is-trashed': mediaItem.trashed}">
+    {{mediaItem = (block.data.image[0].mediaKey | mediaItemResolver); ""}}
+    <img ng-if="mediaItem !== null && (mediaItem.mediaLink.indexOf('jpg') !== -1 || mediaItem.mediaLink.indexOf('png') !== -1 || mediaItem.mediaLink.indexOf('webp') !== -1 || mediaItem.mediaLink.indexOf('gif') !== -1) && !mediaItem.trashed" ng-src="{{mediaItem.mediaLink}}" alt="{{mediaItem.name}}" />
+    <umb-icon ng-if="mediaItem !== null && mediaItem.mediaLink.indexOf('jpg') === -1 && mediaItem.mediaLink.indexOf('png') === -1 && mediaItem.mediaLink.indexOf('webp') === -1 && mediaItem.mediaLink.indexOf('gif') === -1 || mediaItem.trashed" icon="{{mediaItem.contentType.icon}}" class="icon"></umb-icon>
+    <span ng-if="mediaItem !== null && mediaItem.name" class="file-name">
+        <span ng-if="mediaItem.trashed"><localize key="mediaPicker_trashed">Trashed</localize>:</span>
+        {{mediaItem.name}}
+    </span>
 </button>
-<slot name="area-container" part="area-container"></slot>
