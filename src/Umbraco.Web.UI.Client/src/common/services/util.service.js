@@ -62,7 +62,7 @@ function dateHelper() {
 
     return {
 
-        convertToServerStringTime: function (momentLocal, serverOffsetMinutes, format) {
+        convertToServerStringTime: function (momentLocal, serverOffsetMinutes, format = "YYYY-MM-DD HH:mm:ss") {
 
             //get the formatted offset time in HH:mm (server time offset is in minutes)
             var formattedOffset = (serverOffsetMinutes > 0 ? "+" : "-") +
@@ -72,10 +72,10 @@ function dateHelper() {
                     .format('HH:mm');
 
             var server = moment.utc(momentLocal).utcOffset(formattedOffset);
-            return server.format(format ? format : "YYYY-MM-DD HH:mm:ss");
+            return server.format(format);
         },
 
-        convertToLocalMomentTime: function (strVal, serverOffsetMinutes) {
+        convertToLocalMomentTime: function (strVal, serverOffsetMinutes, format = "YYYY-MM-DDTHH:mm:ss") {
 
             //get the formatted offset time in HH:mm (server time offset is in minutes)
             var formattedOffset = (serverOffsetMinutes > 0 ? "+" : "-") +
@@ -90,10 +90,10 @@ function dateHelper() {
             //to load the date as UTC so it's not changed, otherwise load it normally
             var isoFormat;
             if (strVal.indexOf("T") > -1 && strVal.endsWith("Z")) {
-                isoFormat = moment.utc(strVal).format("YYYY-MM-DDTHH:mm:ss") + formattedOffset;
+                isoFormat = moment.utc(strVal).format(format) + formattedOffset;
             }
             else {
-                isoFormat = moment(strVal).format("YYYY-MM-DDTHH:mm:ss") + formattedOffset;
+                isoFormat = moment(strVal).format(format) + formattedOffset;
             }
 
             //create a moment with the iso format which will include the offset with the correct time
@@ -101,7 +101,7 @@ function dateHelper() {
             return moment.parseZone(isoFormat).local();
         },
 
-        getLocalDate: function (date, culture, format) {
+        getLocalDate: function (date, culture, format, parsingFormat = "YYYY-MM-DD HH:mm:ss") {
             if (date) {
                 var dateVal;
                 var serverOffset = Umbraco.Sys.ServerVariables.application.serverTimeOffset;
@@ -110,7 +110,7 @@ function dateHelper() {
                 if (serverTimeNeedsOffsetting) {
                     dateVal = this.convertToLocalMomentTime(date, serverOffset);
                 } else {
-                    dateVal = moment(date, 'YYYY-MM-DD HH:mm:ss');
+                    dateVal = moment(date, parsingFormat);
                 }
                 return dateVal.locale(culture).format(format);
             }
