@@ -14,14 +14,14 @@ namespace Umbraco.Cms.Web.Common.DependencyInjection;
 ///     obsolete.
 ///     Keep in mind, every time this is used, the code becomes basically untestable.
 /// </remarks>
-[Obsolete("Use Umbraco.Cms.Core.DependencyInjection.StaticServiceProvider directly instead")]
+[Obsolete("Use Umbraco.Cms.Core.DependencyInjection.StaticServiceProvider directly instead - this is scheduled for removal in v13")]
 [EditorBrowsable(EditorBrowsableState.Never)]
 public static class StaticServiceProvider
 {
     /// <summary>
     ///     The service locator.
     /// </summary>
-    [Obsolete("Use Umbraco.Cms.Core.DependencyInjection.StaticServiceProvider directly instead")]
+    [Obsolete("Use Umbraco.Cms.Core.DependencyInjection.StaticServiceProvider directly instead- this is scheduled for removal in v13")]
     [EditorBrowsable(EditorBrowsableState.Never)]
     public static IServiceProvider Instance
     {
