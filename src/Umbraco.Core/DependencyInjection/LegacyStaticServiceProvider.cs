@@ -1,6 +1,7 @@
+using System;
 using System.ComponentModel;
 
-namespace Umbraco.Cms.Core.DependencyInjection;
+namespace Umbraco.Cms.Web.Common.DependencyInjection;
 
 /// <summary>
 ///     Service locator for internal (umbraco cms) only purposes. Should only be used if no other ways exist.
@@ -13,12 +14,18 @@ namespace Umbraco.Cms.Core.DependencyInjection;
 ///     obsolete.
 ///     Keep in mind, every time this is used, the code becomes basically untestable.
 /// </remarks>
+[Obsolete("Use Umbraco.Cms.Core.DependencyInjection.StaticServiceProvider directly instead - this is scheduled for removal in v13")]
 [EditorBrowsable(EditorBrowsableState.Never)]
 public static class StaticServiceProvider
 {
     /// <summary>
     ///     The service locator.
     /// </summary>
+    [Obsolete("Use Umbraco.Cms.Core.DependencyInjection.StaticServiceProvider directly instead- this is scheduled for removal in v13")]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public static IServiceProvider Instance { get; set; } = null!; // This is set doing startup and will always exists after that
+    public static IServiceProvider Instance
+    {
+        get => Core.DependencyInjection.StaticServiceProvider.Instance;
+        set => Core.DependencyInjection.StaticServiceProvider.Instance = value;
+    }
 }
