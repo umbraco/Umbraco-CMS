@@ -110,6 +110,12 @@
             });
         }
         
+        /**
+         * @ngdoc function
+         * @function    
+         *
+         * @deprecated
+         */
         function getLocalDate(date, culture, format) {
             return dateHelper.getLocaleDate(date, culture, format);
         }
