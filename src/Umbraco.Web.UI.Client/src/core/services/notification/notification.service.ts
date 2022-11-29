@@ -68,7 +68,7 @@ export class UmbNotificationService {
 		color: UmbNotificationColor,
 		options: UmbNotificationOptions<UmbNotificationData>
 	): UmbNotificationHandler {
-		return this._open({ ...options, color });
+		return this._open({ color, ...options });
 	}
 
 	/**
