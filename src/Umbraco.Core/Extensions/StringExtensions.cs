@@ -1239,7 +1239,7 @@ public static class StringExtensions
     /// <summary>
     ///     Turns an null-or-whitespace string into a null string.
     /// </summary>
-    public static string? NullOrWhiteSpaceAsNull(this string text)
+    public static string? NullOrWhiteSpaceAsNull(this string? text)
         => string.IsNullOrWhiteSpace(text) ? null : text;
 
     /// <summary>

@@ -4,7 +4,8 @@ import {PartialViewMacroBuilder} from "@umbraco/json-models-builders";
 
 test.describe('Partial View Macro Files', () => {
 
-    test.beforeEach(async ({page, umbracoApi}) => {
+    test.beforeEach(async ({ page, umbracoApi }, testInfo) => {
+        await umbracoApi.report.report(testInfo);
         await umbracoApi.login();
     });
 

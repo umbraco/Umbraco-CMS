@@ -7,7 +7,8 @@ test.describe('Packages', () => {
   const packageName = "TestPackage";
   const rootDocTypeName = "Test document type";
   const nodeName = "1) Home";
-  test.beforeEach(async ({page, umbracoApi}) => {
+  test.beforeEach(async ({ page, umbracoApi }, testInfo) => {
+    await umbracoApi.report.report(testInfo);
     await umbracoApi.login();
   });
 
