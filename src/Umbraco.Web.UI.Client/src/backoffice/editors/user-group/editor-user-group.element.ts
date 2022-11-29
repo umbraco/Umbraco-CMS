@@ -226,13 +226,10 @@ export class UmbEditorUserGroupElement extends UmbContextProviderMixin(
 	connectedCallback(): void {
 		super.connectedCallback();
 
-		this.consumeContext('umbUserGroupStore', (userGroupStore: UmbUserGroupStore) => {
-			this._userGroupStore = userGroupStore;
+		this.consumeAllContexts(['umbUserGroupStore', 'umbUserStore'], (instance) => {
+			this._userGroupStore = instance['umbUserGroupStore'];
+			this._userStore = instance['umbUserStore'];
 			this._observeUserGroup();
-		});
-
-		this.consumeContext('umbUserStore', (userStore: UmbUserStore) => {
-			this._userStore = userStore;
 			this._observeUsers();
 		});
 	}
