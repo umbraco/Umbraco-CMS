@@ -34,6 +34,10 @@ export class UmbEditorDocumentTypeElement extends UmbContextProviderMixin(
 			#alias {
 				padding: 0 var(--uui-size-space-3);
 			}
+
+			#icon {
+				font-size: calc(var(--uui-size-layout-3) / 2);
+			}
 		`,
 	];
 
@@ -42,6 +46,12 @@ export class UmbEditorDocumentTypeElement extends UmbContextProviderMixin(
 
 	@state()
 	private _documentType?: DocumentTypeEntity;
+
+	@state()
+	private _icon = {
+		color: '#000000',
+		name: 'umb:document-dashed-line',
+	};
 
 	private _documentTypeContext?: UmbDocumentTypeContext;
 	private _documentTypeStore?: UmbDocumentTypeStore;
@@ -123,15 +133,21 @@ export class UmbEditorDocumentTypeElement extends UmbContextProviderMixin(
 		}
 	}
 
-	private _handleIconClick() {
-		this._modalService?.iconPicker();
+	private async _handleIconClick() {
+		const modalHandler = this._modalService?.iconPicker();
+
+		modalHandler?.onClose().then((saved) => {
+			if (saved) this._icon = { color: saved.color, name: saved.icon };
+		});
 	}
 
 	render() {
 		return html`
 			<umb-editor-entity-layout alias="Umb.Editor.DocumentType">
 				<div slot="icon">
-					<uui-button @click=${this._handleIconClick}>Icon</uui-button>
+					<uui-button id="icon" @click=${this._handleIconClick} compact>
+						<uui-icon name="${this._icon.name}" style="color: ${this._icon.color}"></uui-icon>
+					</uui-button>
 				</div>
 
 				<div slot="name">

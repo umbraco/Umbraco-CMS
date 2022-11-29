@@ -81,6 +81,10 @@ export class UmbModalLayoutIconPickerElement extends UmbModalLayoutElement<UmbMo
 			uui-button {
 				margin-left: var(--uui-size-space-4);
 			}
+
+			uui-color-swatches {
+				margin: -0.75rem;
+			}
 		`,
 	];
 
@@ -200,7 +204,6 @@ export class UmbModalLayoutIconPickerElement extends UmbModalLayoutElement<UmbMo
 				<div id="container">
 					${this.renderSearchbar()}
 					<hr />
-
 					<uui-color-swatches
 						.swatches="${this.colorlist}"
 						@change="${(e: UUIColorSwatchesEvent) => (this._currentColor = e.target.value)}"></uui-color-swatches>
