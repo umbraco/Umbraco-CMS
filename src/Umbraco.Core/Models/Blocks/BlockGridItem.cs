@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Core.Models.Blocks
     /// <summary>
     /// Represents a layout item for the Block Grid editor.
     /// </summary>
-    /// <seealso cref="Umbraco.Core.Models.Blocks.IBlockReference{Umbraco.Core.Models.PublishedContent.IPublishedElement,Umbraco.Core.Models.PublishedContent.IPublishedElement}" />
+    /// <seealso cref="IBlockReference{TContent,TSettings}" />
     [DataContract(Name = "block", Namespace = "")]
     public class BlockGridItem : IBlockReference<IPublishedElement, IPublishedElement>
     {
@@ -82,18 +82,6 @@ namespace Umbraco.Cms.Core.Models.Blocks
         public int ColumnSpan { get; set; }
 
         /// <summary>
-        /// Forcing the item to be located in the left side.
-        /// </summary>
-        [DataMember(Name = "forceLeft")]
-        public bool ForceLeft { get; set; }
-
-        /// <summary>
-        /// Forcing the item to be located in the right side.
-        /// </summary>
-        [DataMember(Name = "forceRight")]
-        public bool ForceRight { get; set; }
-
-        /// <summary>
         /// The grid areas within this item
         /// </summary>
         [DataMember(Name = "areas")]
@@ -116,7 +104,6 @@ namespace Umbraco.Cms.Core.Models.Blocks
     /// Represents a layout item with a generic content type for the Block List editor.
     /// </summary>
     /// <typeparam name="T">The type of the content.</typeparam>
-    /// <seealso cref="Umbraco.Core.Models.Blocks.IBlockReference{Umbraco.Core.Models.PublishedContent.IPublishedElement}" />
     public class BlockGridItem<T> : BlockGridItem
         where T : IPublishedElement
     {
@@ -149,7 +136,6 @@ namespace Umbraco.Cms.Core.Models.Blocks
     /// </summary>
     /// <typeparam name="TContent">The type of the content.</typeparam>
     /// <typeparam name="TSettings">The type of the settings.</typeparam>
-    /// <seealso cref="Umbraco.Core.Models.Blocks.IBlockReference{Umbraco.Core.Models.PublishedContent.IPublishedElement}" />
     public class BlockGridItem<TContent, TSettings> : BlockGridItem<TContent>
         where TContent : IPublishedElement
         where TSettings : IPublishedElement

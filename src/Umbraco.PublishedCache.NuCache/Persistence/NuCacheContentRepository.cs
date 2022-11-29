@@ -486,7 +486,7 @@ WHERE cmsContentNu.nodeId IN (
         Guid mediaObjectType = Constants.ObjectTypes.Media;
 
         // remove all - if anything fails the transaction will rollback
-        if (contentTypeIds == null || contentTypeIds.Count == 0)
+        if (contentTypeIds is null || contentTypeIds.Count == 0)
         {
             // must support SQL-CE
             Database.Execute(
@@ -513,7 +513,7 @@ WHERE cmsContentNu.nodeId IN (
 
         // insert back - if anything fails the transaction will rollback
         IQuery<IMedia> query = SqlContext.Query<IMedia>();
-        if (contentTypeIds != null && contentTypeIds.Count > 0)
+        if (contentTypeIds is not null && contentTypeIds.Count > 0)
         {
             query = query.WhereIn(x => x.ContentTypeId, contentTypeIds); // assume number of ctypes won't blow IN(...)
         }
@@ -526,9 +526,9 @@ WHERE cmsContentNu.nodeId IN (
             // the tree is locked, counting and comparing to total is safe
             IEnumerable<IMedia> descendants =
                 _mediaRepository.GetPage(query, pageIndex++, groupSize, out total, null, Ordering.By("Path"));
-            var items = descendants.Select(m => GetDto(m, false, serializer)).ToList();
+            var items = descendants.Select(m => GetDto(m, false, serializer)).ToArray();
             Database.BulkInsertRecords(items);
-            processed += items.Count;
+            processed += items.Length;
         }
         while (processed < total);
     }

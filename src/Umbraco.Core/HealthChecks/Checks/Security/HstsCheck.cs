@@ -3,6 +3,7 @@
 
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.HealthChecks.Checks.Security;
 
@@ -16,6 +17,11 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks.Security;
     Group = "Security")]
 public class HstsCheck : BaseHttpHeaderCheck
 {
+    private const string LocalizationPrefix = "hSTS";
+
+    private readonly IHostingEnvironment _hostingEnvironment;
+    private readonly ILocalizedTextService _textService;
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="HstsCheck" /> class.
     /// </summary>
@@ -27,10 +33,56 @@ public class HstsCheck : BaseHttpHeaderCheck
     ///     but then you should include subdomains and I wouldn't suggest to do that for Umbraco-sites.
     /// </remarks>
     public HstsCheck(IHostingEnvironment hostingEnvironment, ILocalizedTextService textService)
-        : base(hostingEnvironment, textService, "Strict-Transport-Security", "hSTS", true)
+        : base(hostingEnvironment, textService, "Strict-Transport-Security", LocalizationPrefix, true)
     {
+        _hostingEnvironment = hostingEnvironment;
+        _textService = textService;
     }
 
     /// <inheritdoc />
     protected override string ReadMoreLink => Constants.HealthChecks.DocumentationLinks.Security.HstsCheck;
+
+    /// <inheritdoc />
+    public override async Task<IEnumerable<HealthCheckStatus>> GetStatus() =>
+        new HealthCheckStatus[] { await CheckForHeader() };
+
+    /// <summary>
+    /// The health check task.
+    /// </summary>
+    /// <returns>A <see cref="Task{HealthCheckStatus}"/> with the result type reversed on localhost.</returns>
+    protected new async Task<HealthCheckStatus> CheckForHeader()
+    {
+        HealthCheckStatus checkHeaderResult = await base.CheckForHeader();
+
+        var isLocalhost = _hostingEnvironment.ApplicationMainUrl?.Host.ToLowerInvariant() == "localhost";
+
+        // when not on localhost, the header should exist.
+        if (!isLocalhost)
+        {
+            return checkHeaderResult;
+        }
+
+        string message;
+        StatusResultType statusResultType;
+
+        // on localhost the header should not exist, so invert the status.
+        if (checkHeaderResult.ResultType == StatusResultType.Success)
+        {
+            statusResultType = StatusResultType.Error;
+
+            message = _textService.Localize("healthcheck", $"{LocalizationPrefix}CheckHeaderFoundOnLocalhost");
+        }
+        else
+        {
+            statusResultType = StatusResultType.Success;
+
+            message = _textService.Localize("healthcheck", $"{LocalizationPrefix}CheckHeaderNotFoundOnLocalhost");
+        }
+
+        return new HealthCheckStatus(message)
+        {
+            ResultType = statusResultType,
+            ReadMoreLink = ReadMoreLink,
+        };
+    }
 }

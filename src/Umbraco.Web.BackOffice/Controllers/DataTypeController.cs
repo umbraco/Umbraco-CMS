@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -391,7 +392,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return NotFound();
             }
 
-            Attempt<OperationResult<MoveOperationStatusType, IDataType>?> result = _dataTypeService.Copy(toCopy, copy.ParentId);
+            var currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
+            Attempt<OperationResult<MoveOperationStatusType, IDataType>?> result = _dataTypeService.Copy(toCopy, copy.ParentId, currentUser?.Id ?? Constants.Security.SuperUserId);
             if (result.Success)
             {
                 return Content(toCopy.Path, MediaTypeNames.Text.Plain, Encoding.UTF8);

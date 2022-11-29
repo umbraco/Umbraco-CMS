@@ -97,13 +97,13 @@ function multiUrlPickerController($scope, localizationService, entityResource, i
         setDirty();
     };
 
-    $scope.clear = function ($index) {
+    $scope.clear = function () {
       $scope.renderModel = [];
 
       setDirty();
     };
 
-    $scope.openLinkPicker = function (link, $index) {
+    $scope.openLinkPicker = function (link) {
         if (!$scope.allowAdd || !$scope.allowEdit) return;
 
         var target = link ? {
@@ -153,7 +153,7 @@ function multiUrlPickerController($scope, localizationService, entityResource, i
                             link.trashed = data.trashed;
 
                             if (link.trashed) {
-                                item.url = vm.labels.general_recycleBin;
+                                link.url = vm.labels.general_recycleBin;
                             }
                         });
                     } else {

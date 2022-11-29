@@ -1,13 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using NSwag.Annotations;
 using Umbraco.New.Cms.Web.Common.Routing;
 
 namespace Umbraco.Cms.ManagementApi.Controllers.PublishedCache;
 
 [ApiVersion("1.0")]
 [ApiController]
-[BackOfficeRoute("api/v{version:apiVersion}/published-cache")]
-[OpenApiTag("PublishedCache")]
+[VersionedApiBackOfficeRoute("published-cache")]
+[ApiExplorerSettings(GroupName = "Published Cache")]
 public class PublishedCacheControllerBase : ManagementApiControllerBase
 {
 }

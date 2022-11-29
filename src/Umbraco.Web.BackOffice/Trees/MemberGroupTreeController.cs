@@ -20,8 +20,7 @@ public class MemberGroupTreeController : MemberTypeAndGroupTreeControllerBase
 {
     private readonly IMemberGroupService _memberGroupService;
 
-    [
-        ActivatorUtilitiesConstructor]
+    [ActivatorUtilitiesConstructor]
     public MemberGroupTreeController(
         ILocalizedTextService localizedTextService,
         UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
