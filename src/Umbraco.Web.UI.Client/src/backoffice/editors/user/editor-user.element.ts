@@ -2,9 +2,9 @@ import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import { css, html, LitElement, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
-import { ifDefined } from 'lit-html/directives/if-defined.js';
+import { ifDefined } from 'lit/directives/if-defined.js';
 
-import { repeat } from 'lit-html/directives/repeat.js';
+import { repeat } from 'lit/directives/repeat.js';
 import { UmbUserStore } from '../../../core/stores/user/user.store';
 import { getTagLookAndColor } from '../../sections/users/user-extensions';
 import { UmbUserContext } from './user.context';
