@@ -373,7 +373,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             {
                 Message =
                     "The database configuration failed with the following message: " + ex.Message +
-                    $"\n Please check log file for additional information (can be found in '{Constants.SystemDirectories.LogFiles}')",
+                    $"\n Please check log file for additional information (can be found in '{nameof(LoggingSettings)}.{nameof(LoggingSettings.Directory)}')",
                 Success = false,
                 Percentage = "90"
             };
