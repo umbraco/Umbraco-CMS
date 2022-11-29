@@ -20,6 +20,12 @@ public class UserGroupDto
     [PrimaryKeyColumn(IdentitySeed = 6)]
     public int Id { get; set; }
 
+    // TODO: Add index
+    [Column("uniqueId")]
+    [NullSetting(NullSetting = NullSettings.NotNull)]
+    [Constraint(Default = SystemMethods.NewGuid)]
+    public Guid UniqueId { get; set; }
+
     [Column("userGroupAlias")]
     [Length(200)]
     [Index(IndexTypes.UniqueNonClustered, Name = "IX_umbracoUserGroup_userGroupAlias")]
