@@ -1,10 +1,10 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing, PropertyValueMap } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import type { UserEntity } from '../../../core/models';
-import { UmbUserStore } from '../../../core/stores/user/user.store';
 import { UmbPicker } from './picker';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
+import type { UserEntity } from '@umbraco-cms/models';
+import { UmbUserStore } from '@umbraco-cms/stores/user/user.store';
 
 @customElement('umb-picker-user')
 export class UmbPickerUserElement extends UmbObserverMixin(UmbPicker) {

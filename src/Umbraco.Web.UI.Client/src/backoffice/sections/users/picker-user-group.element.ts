@@ -1,10 +1,10 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbUserGroupStore } from '../../../core/stores/user/user-group.store';
 import { UmbPicker } from './picker';
 import type { UserGroupEntity } from '@umbraco-cms/models';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
+import { UmbUserGroupStore } from '@umbraco-cms/stores/user/user-group.store';
 
 @customElement('umb-picker-user-group')
 export class UmbPickerUserGroupElement extends UmbObserverMixin(UmbPicker) {

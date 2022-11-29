@@ -1,7 +1,6 @@
 import { state } from 'lit/decorators.js';
-import { UmbModalLayoutElement } from '../../../core/services/modal/layouts/modal-layout.element';
-
 import { UmbPickerData } from './picker';
+import { UmbModalLayoutElement } from '@umbraco-cms/services';
 
 export class UmbPickerLayout extends UmbModalLayoutElement<UmbPickerData> {
 	@state()
