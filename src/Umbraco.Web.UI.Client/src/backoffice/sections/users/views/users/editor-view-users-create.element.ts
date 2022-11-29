@@ -7,8 +7,7 @@ import { UmbUserStore } from '../../../../../core/stores/user/user.store';
 import { UmbPickerUserGroupElement } from '../../picker-user-group.element';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { UserDetails } from '@umbraco-cms/models';
-import { UmbNotificationService } from 'src/core/services/notification';
-import { UmbNotificationDefaultData } from 'src/core/services/notification/layouts/default';
+import { UmbNotificationDefaultData, UmbNotificationService } from '@umbraco-cms/services';
 
 export type UsersViewType = 'list' | 'grid';
 @customElement('umb-editor-view-users-create')

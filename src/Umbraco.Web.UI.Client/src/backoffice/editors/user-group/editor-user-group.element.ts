@@ -5,13 +5,13 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { UmbUserGroupContext } from './user-group.context';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import '../../sections/users/picker-user.element';
-import '../../sections/users/picker-section.element';
+import '@umbraco-cms/sections/users/picker-user.element';
+import '@umbraco-cms/sections/users/picker-section.element';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
-import { UmbUserGroupStore } from 'src/core/stores/user/user-group.store';
 import type { ManifestEditorAction, ManifestWithLoader, UserDetails, UserGroupDetails } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-import { UmbUserStore } from 'src/core/stores/user/user.store';
+import { UmbUserGroupStore } from '@umbraco-cms/stores/user/user-group.store';
+import { UmbUserStore } from '@umbraco-cms/stores/user/user.store';
 
 @customElement('umb-editor-user-group')
 export class UmbEditorUserGroupElement extends UmbContextProviderMixin(

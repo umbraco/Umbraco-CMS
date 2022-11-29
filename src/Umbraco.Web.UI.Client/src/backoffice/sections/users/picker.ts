@@ -1,13 +1,14 @@
 import { html, LitElement } from 'lit';
 import { property } from 'lit/decorators.js';
 import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
-import { UmbModalService, UmbModalType } from '../../../core/services/modal';
+// import { UmbModalService, UmbModalType } from '../../../core/services/modal';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
 //TODO: These should probably be imported dynamically.
 import './picker-layout-section.element';
 import './picker-layout-user-group.element';
 import './picker-layout-user.element';
+import { UmbModalService, UmbModalType } from '@umbraco-cms/services';
 
 export interface UmbPickerData {
 	multiple: boolean;

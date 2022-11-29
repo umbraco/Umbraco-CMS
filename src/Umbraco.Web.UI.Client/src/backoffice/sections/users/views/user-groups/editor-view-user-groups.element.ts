@@ -1,22 +1,22 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbUserGroupStore } from '../../../../../core/stores/user/user-group.store';
-import type {
-	UmbTableElement,
+import {
 	UmbTableColumn,
 	UmbTableConfig,
 	UmbTableDeselectedEvent,
+	UmbTableElement,
 	UmbTableItem,
 	UmbTableOrderedEvent,
 	UmbTableSelectedEvent,
-} from '../../../../components/table';
+} from '@umbraco-cms/components/table';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { UserGroupDetails } from '@umbraco-cms/models';
 
 import './user-group-table-name-column-layout.element';
 import './user-group-table-sections-column-layout.element';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
+import { UmbUserGroupStore } from '@umbraco-cms/stores/user/user-group.store';
 
 @customElement('umb-editor-view-user-groups')
 export class UmbEditorViewUserGroupsElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
