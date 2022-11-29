@@ -258,9 +258,10 @@ ng-form.ng-invalid > .umb-block-grid__block:not(.--active) > .umb-block-grid__bl
             position: absolute;
             left: 0;
             bottom: -1px;
-            height: 1px;
             width: 1px;
-            background-color: inherit;
+            border-top: 1px solid @blueDark;
+            box-sizing: border-box;
+            background: none;
         }
         &::after {
             content: '';
@@ -269,7 +270,10 @@ ng-form.ng-invalid > .umb-block-grid__block:not(.--active) > .umb-block-grid__bl
             bottom: -2px;
             height: 2px;
             width: 2px;
-            background-color: inherit;
+            border-top: 1px solid @blueDark;
+            border-right: 1px solid @blueDark;
+            box-sizing: border-box;
+            background: none;
         }
 
         .action {
