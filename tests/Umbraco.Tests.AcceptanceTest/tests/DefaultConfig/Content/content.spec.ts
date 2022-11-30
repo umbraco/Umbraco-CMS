@@ -553,8 +553,9 @@ test.describe('Content tests', () => {
 
     // Save and publish
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.saveAndPublish));
-    await umbracoUi.isSuccessNotificationVisible();
-
+    // Added additional time because it could fail on pipeline because it's not saving fast enough
+    await umbracoUi.isSuccessNotificationVisible({timeout:20000});
+    
     // Assert
     const expectedContent = '<p>Acceptance test</p>'
     await expect(await umbracoApi.content.verifyRenderedContent('/contentpickercontent', expectedContent, true)).toBeTruthy();
