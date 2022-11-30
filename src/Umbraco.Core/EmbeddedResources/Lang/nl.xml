@@ -2563,7 +2563,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="addBlockType">Voeg Blok toe</key>
     <key alias="addBlockGroup">Voeg groep toep</key>
     <key alias="pickSpecificAllowance">Selecteer groep of Blok</key>
-    <key alias="allowanceMinimum">Set een minimale vereiste</key>
+    <key alias="allowanceMinimum">Zet een minimale vereiste</key>
     <key alias="areas">Gebieden</key>
     <key alias="tabAreas">Gebieden</key>
     <key alias="tabAdvanced">Geadvanceerd</key>
