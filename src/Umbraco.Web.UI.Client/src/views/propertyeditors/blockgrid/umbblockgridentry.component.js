@@ -159,7 +159,7 @@
 
             $scope.$evalAsync();
         }
-        unsubscribe.push($scope.$watch("depth", (newVal, oldVal) => {
+        unsubscribe.push($scope.$watch("depth", () => {
             vm.childDepth = parseInt(vm.depth) + 1;
         }));
 

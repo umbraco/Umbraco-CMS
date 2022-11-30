@@ -26,15 +26,6 @@
     <RazorCompileOnBuild>false</RazorCompileOnBuild>
     <RazorCompileOnPublish>false</RazorCompileOnPublish>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Content Update="appsettings.*.json">
-      <DependentUpon>appsettings.json</DependentUpon>
-    </Content>
-    <Content Update="appsettings-schema.*.json">
-      <DependentUpon>appsettings-schema.json</DependentUpon>
-    </Content>
-  </ItemGroup>
   
   <Import Project="..\PACKAGE_PROJECT_NAME_FROM_TEMPLATE\build\PACKAGE_PROJECT_NAME_FROM_TEMPLATE.targets" Condition="'$(PackageProjectName)' != ''" />
   <ItemGroup Condition="'$(PackageProjectName)' != ''">
