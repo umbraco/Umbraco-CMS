@@ -382,32 +382,27 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
 
         /** Method used for selecting a node */
         function select(text, id, entity) {
-            // we do not need to query the server in case a root (id < 0)
-            // or an entity was provided
-            if (id < 0 || !!entity) {
-                if (vm.multiPicker) {
-                    multiSelectItem(entity ? entity : getRootEntity(id, text));
-                }
-                else {
-                    if (entity) {
-                        $scope.model.selection.push(entity);
-                    } else {
-                        $scope.model.selection.push(getRootEntity(id, text));
-                    }
-                    $scope.model.submit($scope.model);
-                }
+            // we do not need to query the server in case an entity is provided
+            if (entity) {
+              applySelect(entity);
             }
+            // nor do we need to query if a root entity was selected (id < 0)
+            else if (id < 0) {
+              applySelect(entity || getRootEntity(id, text));
+            }
+            // otherwise we have to get it from the server
             else {
-
-              // otherwise we have to get it from the server
               entityResource.getById(id, vm.entityType).then(function (ent) {
-                  if (vm.multiPicker) {
-                      multiSelectItem(ent);
-                  } else {
-                      $scope.model.selection.push(ent);
-                      $scope.model.submit($scope.model);
-                  }
+                  applySelect(ent);
               });
+            }
+        }
+
+        /** Method used to apply the selected entity to selections and submit the form if need-be **/
+        function applySelect(entity) {
+            multiSelectItem(entity);
+            if (!vm.multiPicker) {
+              $scope.model.submit($scope.model);
             }
         }
 
