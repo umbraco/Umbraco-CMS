@@ -108,7 +108,7 @@ function dateHelper() {
                 const localOffset = new Date().getTimezoneOffset();
                 const serverTimeNeedsOffsetting = -serverOffset !== localOffset;
                 if (serverTimeNeedsOffsetting) {
-                    dateVal = this.convertToLocalMomentTime(date, serverOffset);
+                    dateVal = this.convertToLocalMomentTime(date, serverOffset, format);
                 } else {
                     dateVal = moment(date, parsingFormat);
                 }
