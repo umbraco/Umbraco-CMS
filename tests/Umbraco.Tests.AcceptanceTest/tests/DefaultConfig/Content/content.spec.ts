@@ -11,9 +11,6 @@ import {
 test.describe('Content tests', () => {
 
   test.beforeEach(async ({page, umbracoApi}) => {
-    // TODO: REMOVE THIS WHEN SQLITE IS FIXED
-    // Wait so we don't bombard the API
-    await page.waitForTimeout(1000);
     await umbracoApi.login();
   });
   
@@ -274,6 +271,7 @@ test.describe('Content tests', () => {
         .addVariant()
           .withName(initialNodeName)
           .withSave(true)
+          .withPublish(true)
         .done()
         .build();
     await umbracoApi.content.save(rootContentNode);
@@ -288,17 +286,20 @@ test.describe('Content tests', () => {
     await page.keyboard.press('Backspace');
 
     await umbracoUi.setEditorHeaderName(newNodeName);
-    await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.saveAndPublish));
+    await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.save));
     await umbracoUi.isSuccessNotificationVisible();
+    await page.locator('span:has-text("×")').click();
 
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.rollback));
     // Not a very nice selector, but there's sadly no alternative :(
     await page.locator('.-selectable.cursor-pointer').first().click();
-    // Sadly can't use the button by label key here since there's another one in the DOM 
+    // Sadly can't use the button by label key here since there's another one in the DOM
+    const helpText = await page.locator('[key="rollback_diffHelp"]');
+    await expect(helpText).toBeVisible();
     await page.locator('[action="vm.rollback()"]').click();
 
     await umbracoUi.refreshContentTree();
-    await expect(page.locator('.umb-badge >> text=Save')).toBeVisible();
+    await expect(page.locator('.umb-badge >> text=Save')).toHaveCount(2);
     await expect(page.locator('.umb-badge >> text=RollBack')).toBeVisible();
     const node = await umbracoUi.getTreeItem("content", [initialNodeName])
     await expect(node).toBeVisible();
@@ -552,8 +553,9 @@ test.describe('Content tests', () => {
 
     // Save and publish
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.saveAndPublish));
-    await umbracoUi.isSuccessNotificationVisible();
-
+    // Added additional time because it could fail on pipeline because it's not saving fast enough
+    await umbracoUi.isSuccessNotificationVisible({timeout:20000});
+    
     // Assert
     const expectedContent = '<p>Acceptance test</p>'
     await expect(await umbracoApi.content.verifyRenderedContent('/contentpickercontent', expectedContent, true)).toBeTruthy();
@@ -663,10 +665,10 @@ test.describe('Content tests', () => {
       .build();
 
     const alias = AliasHelper.toAlias(name);
-    
+
     // Save grid and get the ID
     const dataType = await umbracoApi.dataTypes.save(grid)
-    
+
     // Create a document type using the data type
     const docType = new DocumentTypeBuilder()
       .withName(name)
@@ -690,7 +692,7 @@ test.describe('Content tests', () => {
       .build();
 
     await umbracoApi.content.save(contentNode);
-    
+
     // Ugly wait but we have to wait for cache to rebuild
     await page.waitForTimeout(1000);
 
@@ -719,7 +721,7 @@ test.describe('Content tests', () => {
     // Save and publish
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.saveAndPublish));
     await umbracoUi.isSuccessNotificationVisible();
-    
+
     const expected = `
     <div class="umb-grid">
       <div class="grid-section">

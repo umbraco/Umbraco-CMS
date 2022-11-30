@@ -714,22 +714,24 @@ public class PublishedRouter : IPublishedRouter
 
             // TODO: We need to limit altTemplate to only allow templates that are assigned to the current document type!
             // if the template isn't assigned to the document type we should log a warning and return 404
-            var templateId = request.PublishedContent.TemplateId;
-            ITemplate? template = GetTemplate(templateId);
-            request.SetTemplate(template);
-            if (template != null)
+            if (request.PublishedContent.TemplateId is int templateId && templateId != default)
             {
-                if (_logger.IsEnabled(LogLevel.Debug))
+                ITemplate? template = GetTemplate(templateId);
+                request.SetTemplate(template);
+                if (template != null)
                 {
-                    _logger.LogDebug(
-                        "FindTemplate: Running with template id={TemplateId} alias={TemplateAlias}",
-                        template.Id,
-                        template.Alias);
+                    if (_logger.IsEnabled(LogLevel.Debug))
+                    {
+                        _logger.LogDebug(
+                            "FindTemplate: Running with template id={TemplateId} alias={TemplateAlias}",
+                            template.Id,
+                            template.Alias);
+                    }
                 }
-            }
-            else
-            {
-                _logger.LogWarning("FindTemplate: Could not find template with id {TemplateId}", templateId);
+                else
+                {
+                    _logger.LogWarning("FindTemplate: Could not find template with id {TemplateId}", templateId);
+                }
             }
         }
         else

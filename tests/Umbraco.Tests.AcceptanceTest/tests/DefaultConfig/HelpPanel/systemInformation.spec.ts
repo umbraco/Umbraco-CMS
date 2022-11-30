@@ -6,9 +6,6 @@ test.describe('System Information', () => {
   const dkCulture = "da-DK";
 
   test.beforeEach(async ({page, umbracoApi}) => {
-    // TODO: REMOVE THIS WHEN SQLITE IS FIXED
-    // Wait so we don't bombard the API
-    await page.waitForTimeout(1000);
     await umbracoApi.login();
     await umbracoApi.users.setCurrentLanguage(enCulture);
   });
@@ -17,7 +14,7 @@ test.describe('System Information', () => {
     await umbracoApi.users.setCurrentLanguage(enCulture);
   });
 
-  async function openSystemInformation(page: Page, umbracoUi : UiHelpers) {
+  async function openSystemInformation(page: Page, umbracoUi: UiHelpers) {
     //We have to wait for page to load, if the site is slow
     await umbracoUi.clickElement(umbracoUi.getGlobalHelp());
     await expect(page.locator('.umb-help-list-item').last()).toBeVisible();
@@ -49,4 +46,4 @@ test.describe('System Information', () => {
     // Close the help panel
     await page.locator('.umb-button__content').last().click();
   });
-  });
+});

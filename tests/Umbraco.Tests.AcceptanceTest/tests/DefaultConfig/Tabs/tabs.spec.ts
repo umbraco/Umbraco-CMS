@@ -8,9 +8,6 @@ const tabsDocTypeAlias = AliasHelper.toAlias(tabsDocTypeName);
 test.describe('Tabs', () => {
   
   test.beforeEach(async ({ umbracoApi, page }) => {
-    // TODO: REMOVE THIS WHEN SQLITE IS FIXED
-    // Wait so we don't bombard the API
-    await page.waitForTimeout(1000);
     await umbracoApi.login();
   });
 
@@ -451,6 +448,60 @@ test.describe('Tabs', () => {
     await expect(await page.locator('[title="aTab 2"]').first()).toBeVisible();
   });
 
+  test('Drags and drops a property in a tab', async ({umbracoUi, umbracoApi, page}) => {
+    await umbracoApi.documentTypes.ensureNameNotExists(tabsDocTypeName);
+    const tabsDocType = new DocumentTypeBuilder()
+      .withName(tabsDocTypeName)
+      .withAlias(tabsDocTypeAlias)
+      .withAllowAsRoot(true)
+      .withDefaultTemplate(tabsDocTypeAlias)
+      .addTab()
+        .withName('Tab 1')
+        .addGroup()
+          .withName('Tab group')
+          .addUrlPickerProperty()
+            .withAlias("urlPicker")
+            .withLabel('UrlPickerOne')
+          .done()
+        .done()
+      .done()
+      .addTab()
+        .withName('Tab 2')
+        .addGroup()
+          .withName('Tab group tab 2')
+          .addUrlPickerProperty()
+            .withAlias('urlPickerTabTwo')
+            .withLabel('UrlPickerTabTwo')
+          .done()
+          .addUrlPickerProperty()
+            .withAlias('urlPickerTwo')
+            .withLabel('UrlPickerTwo')
+          .done()
+        .done()
+      .done()
+      .build();
+    await umbracoApi.documentTypes.save(tabsDocType);
+    await openDocTypeFolder(umbracoUi, page);
+    await page.locator('[alias="reorder"]').click();
+    await page.locator('.umb-group-builder__tab').last().click();
+    
+    // Drag and drop property from tab 2 into tab 1
+    await page.locator('.umb-group-builder__property-meta > .flex > .icon >> nth=1').last().hover();
+    await page.mouse.down();
+    await page.locator('.umb-group-builder__tab >> nth=1').hover({force:true});
+    await page.waitForTimeout(500);
+    await page.locator('[data-element="group-Tab group"]').hover({force:true});
+    await page.mouse.up();
+    
+    // Stop reordering and save
+    await page.locator('[alias="reorder"]').click();
+    await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.save));
+    
+    // Assert
+    await umbracoUi.isSuccessNotificationVisible();
+    await expect(await page.locator('[title="urlPickerTabTwo"]')).toBeVisible();
+  });
+  
   test('Drags and drops a group and converts to tab', async ({umbracoUi, umbracoApi, page}) => {
     await umbracoApi.documentTypes.ensureNameNotExists(tabsDocTypeName);
     const tabsDocType = new DocumentTypeBuilder()
@@ -496,7 +547,7 @@ test.describe('Tabs', () => {
     await page.waitForTimeout(2000);
     await page.mouse.up();
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.save));
-    //Assert
+    // Assert
     await umbracoUi.isSuccessNotificationVisible();
     await expect(await page.locator('[title="tabGroup"]').first()).toBeVisible();
   });
