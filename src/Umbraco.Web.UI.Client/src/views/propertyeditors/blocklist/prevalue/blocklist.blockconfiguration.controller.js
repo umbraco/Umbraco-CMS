@@ -152,7 +152,6 @@
                 infiniteMode: true,
                 noTemplate: true,
                 isElement: true,
-                noTemplate: true,
                 submit: function (model) {
                     loadElementTypes().then(() => {
                         callback(model.documentTypeKey);
