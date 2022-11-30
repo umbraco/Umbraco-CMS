@@ -1,62 +1,67 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Core.Composing
+namespace Umbraco.Cms.Core.Composing;
+
+/// <summary>
+///     Represents the collection of <see cref="IComponent" /> implementations.
+/// </summary>
+public class ComponentCollection : BuilderCollectionBase<IComponent>
 {
-    /// <summary>
-    /// Represents the collection of <see cref="IComponent"/> implementations.
-    /// </summary>
-    public class ComponentCollection : BuilderCollectionBase<IComponent>
+    private const int LogThresholdMilliseconds = 100;
+    private readonly ILogger<ComponentCollection> _logger;
+
+    private readonly IProfilingLogger _profilingLogger;
+
+    public ComponentCollection(Func<IEnumerable<IComponent>> items, IProfilingLogger profilingLogger, ILogger<ComponentCollection> logger)
+        : base(items)
     {
-        private const int LogThresholdMilliseconds = 100;
+        _profilingLogger = profilingLogger;
+        _logger = logger;
+    }
 
-        private readonly IProfilingLogger _profilingLogger;
-        private readonly ILogger<ComponentCollection> _logger;
-
-        public ComponentCollection(Func<IEnumerable<IComponent>> items, IProfilingLogger profilingLogger, ILogger<ComponentCollection> logger)
-            : base(items)
+    public void Initialize()
+    {
+        using (_profilingLogger.DebugDuration<ComponentCollection>(
+                   $"Initializing. (log components when >{LogThresholdMilliseconds}ms)", "Initialized."))
         {
-            _profilingLogger = profilingLogger;
-            _logger = logger;
-        }
-
-        public void Initialize()
-        {
-            using (_profilingLogger.DebugDuration<ComponentCollection>($"Initializing. (log components when >{LogThresholdMilliseconds}ms)", "Initialized."))
+            foreach (IComponent component in this)
             {
-                foreach (var component in this)
+                Type componentType = component.GetType();
+                using (_profilingLogger.DebugDuration<ComponentCollection>(
+                    $"Initializing {componentType.FullName}.",
+                    $"Initialized {componentType.FullName}.",
+                    thresholdMilliseconds: LogThresholdMilliseconds))
                 {
-                    var componentType = component.GetType();
-                    using (_profilingLogger.DebugDuration<ComponentCollection>($"Initializing {componentType.FullName}.", $"Initialized {componentType.FullName}.", thresholdMilliseconds: LogThresholdMilliseconds))
-                    {
-                        component.Initialize();
-                    }
+                    component.Initialize();
                 }
             }
         }
+    }
 
-        public void Terminate()
+    public void Terminate()
+    {
+        using (_profilingLogger.DebugDuration<ComponentCollection>(
+                   $"Terminating. (log components when >{LogThresholdMilliseconds}ms)", "Terminated."))
         {
-            using (_profilingLogger.DebugDuration<ComponentCollection>($"Terminating. (log components when >{LogThresholdMilliseconds}ms)", "Terminated."))
+            // terminate components in reverse order
+            foreach (IComponent component in this.Reverse())
             {
-                foreach (var component in this.Reverse()) // terminate components in reverse order
+                Type componentType = component.GetType();
+                using (_profilingLogger.DebugDuration<ComponentCollection>(
+                    $"Terminating {componentType.FullName}.",
+                    $"Terminated {componentType.FullName}.",
+                    thresholdMilliseconds: LogThresholdMilliseconds))
                 {
-                    var componentType = component.GetType();
-                    using (_profilingLogger.DebugDuration<ComponentCollection>($"Terminating {componentType.FullName}.", $"Terminated {componentType.FullName}.", thresholdMilliseconds: LogThresholdMilliseconds))
+                    try
                     {
-                        try
-                        {
-                            component.Terminate();
-                            component.DisposeIfDisposable();
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.LogError(ex, "Error while terminating component {ComponentType}.", componentType.FullName);
-                        }
+                        component.Terminate();
+                        component.DisposeIfDisposable();
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Error while terminating component {ComponentType}.", componentType.FullName);
                     }
                 }
             }

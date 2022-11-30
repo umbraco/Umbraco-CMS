@@ -16,7 +16,7 @@
                   label-key="general_edit" ng-if="vm.canEditProfile" type="button">
                 </umb-button>
 
-                <umb-button action="vm.togglePasswordFields()" alias="changePassword" button-style="action"
+                <umb-button action="vm.toggleChangePassword()" alias="changePassword" button-style="action"
                   label="Change password" label-key="general_changePassword" ng-if="!vm.denyLocalLogin" type="button">
                 </umb-button>
 
@@ -89,29 +89,6 @@
             </umb-control-group>
           </umb-box-content>
         </umb-box>
-      </div>
-
-      <div ng-if="vm.showPasswordFields && !vm.denyLocalLogin">
-
-        <h5>
-          <localize key="general_changePassword">Change password</localize>
-        </h5>
-
-        <form class="block-form" name="passwordForm" ng-submit="vm.changePassword()" novalidate val-form-manager>
-
-          <change-password config="vm.changePasswordModel.config" password-values="vm.changePasswordModel.value">
-          </change-password>
-
-          <umb-button action="vm.togglePasswordFields()" button-style="cancel" label="Back" label-key="general_back"
-            type="button">
-          </umb-button>
-
-          <umb-button button-style="success" label="Change password" label-key="general_changePassword"
-            state="changePasswordButtonState" type="submit">
-          </umb-button>
-
-        </form>
-
       </div>
 
       <div class="umb-control-group" ng-if="vm.dashboard.length > 0">

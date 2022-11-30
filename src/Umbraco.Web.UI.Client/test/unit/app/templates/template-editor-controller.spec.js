@@ -1,4 +1,4 @@
-﻿(function() {
+(function() {
     "use strict";
 
     describe("templates editor controller",
@@ -26,6 +26,7 @@
                     getCursorPosition: function() {},
                     getValue: function() {},
                     setValue: function() {},
+                    setReadOnly: function () { },
                     focus: function() {},
                     clearSelection: function() {},
                     navigateFileStart: function() {},

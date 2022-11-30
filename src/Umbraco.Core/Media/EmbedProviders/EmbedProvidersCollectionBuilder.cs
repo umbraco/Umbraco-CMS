@@ -1,9 +1,8 @@
-﻿using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Composing;
 
-namespace Umbraco.Cms.Core.Media.EmbedProviders
+namespace Umbraco.Cms.Core.Media.EmbedProviders;
+
+public class EmbedProvidersCollectionBuilder : OrderedCollectionBuilderBase<EmbedProvidersCollectionBuilder, EmbedProvidersCollection, IEmbedProvider>
 {
-    public class EmbedProvidersCollectionBuilder : OrderedCollectionBuilderBase<EmbedProvidersCollectionBuilder, EmbedProvidersCollection, IEmbedProvider>
-    {
-        protected override EmbedProvidersCollectionBuilder This => this;
-    }
+    protected override EmbedProvidersCollectionBuilder This => this;
 }

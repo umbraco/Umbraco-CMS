@@ -62,7 +62,7 @@
         width: 28px;
         height: 28px;
         margin-left: -18px;
-        margin-top: -18px - 8px;
+        margin-top: (-18px - 8px);
         border-radius: 3em;
         font-size: 14px;
         border: 2px solid @blueMid;
@@ -130,8 +130,10 @@
 }
 
 .umb-media-card-grid__create-button.--disabled,
-.umb-media-card-grid__create-button.--disabled:hover {
+.umb-media-card-grid__create-button.--disabled:hover,
+.umb-media-card-grid__create-button[disabled],
+.umb-media-card-grid__create-button[disabled]:hover {
     color: @gray-7;
     border-color: @gray-7;
-    cursor: default;
+    cursor: not-allowed;
 }

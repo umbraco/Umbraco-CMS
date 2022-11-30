@@ -1,40 +1,30 @@
-using System.Collections.Generic;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 
-namespace Umbraco.Cms.Web.Common.Localization
+namespace Umbraco.Cms.Web.Common.Localization;
+
+/// <summary>
+///     Custom Umbraco options configuration for <see cref="RequestLocalizationOptions" />
+/// </summary>
+public class UmbracoRequestLocalizationOptions : IConfigureOptions<RequestLocalizationOptions>
 {
+    private readonly GlobalSettings _globalSettings;
+
     /// <summary>
-    /// Custom Umbraco options configuration for <see cref="RequestLocalizationOptions"/>
+    ///     Initializes a new instance of the <see cref="UmbracoRequestLocalizationOptions" /> class.
     /// </summary>
-    public class UmbracoRequestLocalizationOptions : IConfigureOptions<RequestLocalizationOptions>
+    public UmbracoRequestLocalizationOptions(IOptions<GlobalSettings> globalSettings) =>
+        _globalSettings = globalSettings.Value;
+
+    /// <inheritdoc />
+    public void Configure(RequestLocalizationOptions options)
     {
-        private GlobalSettings _globalSettings;
+        // set the default culture to what is in config
+        options.DefaultRequestCulture = new RequestCulture(_globalSettings.DefaultUILanguage);
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="UmbracoRequestLocalizationOptions"/> class.
-        /// </summary>
-        public UmbracoRequestLocalizationOptions(IOptions<GlobalSettings> globalSettings)
-        {
-            _globalSettings = globalSettings.Value;
-        }
-
-        /// <inheritdoc/>
-        public void Configure(RequestLocalizationOptions options)
-        {
-            // set the default culture to what is in config
-            options.DefaultRequestCulture = new RequestCulture(_globalSettings.DefaultUILanguage);
-
-            // add a custom provider
-            if (options.RequestCultureProviders == null)
-            {
-                options.RequestCultureProviders = new List<IRequestCultureProvider>();
-            }
-
-            options.RequestCultureProviders.Insert(0, new UmbracoBackOfficeIdentityCultureProvider(options));
-            options.RequestCultureProviders.Insert(1, new UmbracoPublishedContentCultureProvider(options));
-        }
+        options.RequestCultureProviders.Insert(0, new UmbracoBackOfficeIdentityCultureProvider(options));
+        options.RequestCultureProviders.Insert(1, new UmbracoPublishedContentCultureProvider(options));
     }
 }

@@ -1,10 +1,9 @@
-﻿namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.Constraint
+namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.Constraint;
+
+public interface ICreateConstraintOnTableBuilder : IFluentBuilder
 {
-    public interface ICreateConstraintOnTableBuilder : IFluentBuilder
-    {
-        /// <summary>
-        /// Specifies the table name.
-        /// </summary>
-        ICreateConstraintColumnsBuilder OnTable(string tableName);
-    }
+    /// <summary>
+    ///     Specifies the table name.
+    /// </summary>
+    ICreateConstraintColumnsBuilder OnTable(string tableName);
 }

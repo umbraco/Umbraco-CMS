@@ -14,7 +14,8 @@ namespace Umbraco.Cms.Core.Persistence
     internal static class DatabaseDebugHelper
     {
         private const int CommandsSize = 100;
-        private static readonly Queue<Tuple<string, WeakReference<IDbCommand>>> Commands = new Queue<Tuple<string, WeakReference<IDbCommand>>>();
+        private static readonly Queue<Tuple<string, WeakReference<IDbCommand>>> Commands =
+ new Queue<Tuple<string, WeakReference<IDbCommand>>>();
 
         public static void SetCommand(IDbCommand command, string context)
         {
@@ -122,7 +123,8 @@ namespace Umbraco.Cms.Core.Persistence
                         //var rdr = objTarget as DbDataReader;
                         try
                         {
-                            var commandProp = objTarget.GetType().GetProperty("Command", BindingFlags.Instance | BindingFlags.NonPublic);
+                            var commandProp =
+ objTarget.GetType().GetProperty("Command", BindingFlags.Instance | BindingFlags.NonPublic);
                             if (commandProp == null)
                                 throw new Exception($"panic: failed to get Command property of {objTarget.GetType().FullName}.");
                             cmd = commandProp.GetValue(objTarget, null) as DbCommand;

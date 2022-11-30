@@ -1,7 +1,6 @@
-namespace Umbraco.Cms.Core.Net
+namespace Umbraco.Cms.Core.Net;
+
+public interface IUserAgentProvider
 {
-    public interface IUserAgentProvider
-    {
-        string? GetUserAgent();
-    }
+    string? GetUserAgent();
 }

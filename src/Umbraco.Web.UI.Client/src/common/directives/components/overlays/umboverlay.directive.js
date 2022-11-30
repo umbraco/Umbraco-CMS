@@ -342,8 +342,7 @@ Opens an overlay to show a custom YSOD. </br>
                             if (clickableElements.indexOf(activeElementType) >= 0) {
                                 // don't do anything, let the browser Enter key handle this
                             } else if (activeElementType === "TEXTAREA" && !submitOnEnter) {
-
-
+                              // don't do anything
                             } else if (submitOnEnter && submitOnEnterValue === "false") {
                                 // don't do anything
                             } else {

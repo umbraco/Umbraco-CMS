@@ -3,10 +3,9 @@
 
 using System;
 
-namespace Umbraco.Cms.Tests.Common.Builders.Interfaces
+namespace Umbraco.Cms.Tests.Common.Builders.Interfaces;
+
+public interface IWithLastPasswordChangeDateBuilder
 {
-    public interface IWithLastPasswordChangeDateBuilder
-    {
-        DateTime? LastPasswordChangeDate { get; set; }
-    }
+    DateTime? LastPasswordChangeDate { get; set; }
 }

@@ -2,16 +2,15 @@
     "use strict";
 
     function LanguagesEditController($scope, $q, $timeout, $location, $routeParams, overlayService, navigationService, notificationsService, localizationService, languageResource, contentEditingHelper, formHelper, eventsService) {
-
         var vm = this;
 
-        vm.page = {};
-        vm.showBackButton = true;
+        vm.isNew = false;
+        vm.initIsDefault = false;
+
         vm.language = {};
         vm.availableCultures = null;
         vm.breadcrumbs = [];
         vm.labels = {};
-        vm.initIsDefault = false;
         vm.showDefaultLanguageInfo = false;
         vm.save = save;
         vm.back = back;
@@ -19,126 +18,99 @@
         vm.toggleMandatory = toggleMandatory;
         vm.toggleDefault = toggleDefault;
 
-        var currCulture = null;
-        
+        var initCulture = null;
+
         function init() {
-
-            // localize labels
-            var labelKeys = [
-                "treeHeaders_languages",
-                "languages_mandatoryLanguage",
-                "languages_mandatoryLanguageHelp",
-                "languages_defaultLanguage",
-                "languages_defaultLanguageHelp",
-                "languages_addLanguage",
-                "languages_noFallbackLanguageOption",
-                "languages_fallbackLanguageDescription",
-                "languages_fallbackLanguage",
-                "defaultdialogs_confirmSure",
-                "defaultdialogs_editlanguage"
-            ];
-
-            localizationService.localizeMany(labelKeys).then(function (values) {
-                vm.labels.languages = values[0];
-                vm.labels.mandatoryLanguage = values[1];
-                vm.labels.mandatoryLanguageHelp = values[2];
-                vm.labels.defaultLanguage = values[3];
-                vm.labels.defaultLanguageHelp = values[4];
-                vm.labels.addLanguage = values[5];
-                vm.labels.noFallbackLanguageOption = values[6];
-                vm.labels.areYouSure = values[9];
-                vm.labels.editLanguage = values[10];
-
-                $scope.properties = {
-                    fallbackLanguage: {
-                        alias: "fallbackLanguage",
-                        description: values[7],
-                        label: values[8]
-                    }
-                };
-
-                if ($routeParams.create) {
-                    vm.page.name = vm.labels.addLanguage;
-                    $scope.$emit("$changeTitle", vm.labels.addLanguage);
-                }
-            });
-
             vm.loading = true;
 
             var promises = [];
 
-            //load all culture/languages
-            promises.push(languageResource.getCultures().then(function (culturesDictionary) {
-                var cultures = [];
-                Object.entries(culturesDictionary).forEach(function ([key, value]) {
-                    cultures.push({
-                        name: key,
-                        displayName: value
-                    });
-                });
-                vm.availableCultures = cultures;
+            // Localize labels
+            promises.push(localizationService.localizeMany([
+                "treeHeaders_languages",
+                "languages_addLanguage",
+                "defaultdialogs_confirmSure",
+                "defaultdialogs_editlanguage"
+            ]).then(function (values) {
+                vm.labels.languages = values[0];
+                vm.labels.addLanguage = values[1];
+                vm.labels.areYouSure = values[2];
+                vm.labels.editLanguage = values[3];
+
+                if ($routeParams.create) {
+                    vm.isNew = true;
+                    vm.language.name = vm.labels.addLanguage;
+                }
             }));
 
-            //load all possible fallback languages
+            // Load all culture/languages
+            promises.push(languageResource.getCultures().then(function (culturesDictionary) {
+                vm.availableCultures = culturesDictionary;
+            }));
+
+            // Load all possible fallback languages
             promises.push(languageResource.getAll().then(function (languages) {
                 vm.availableLanguages = languages.filter(function (l) {
                     return $routeParams.id != l.id;
                 });
-                vm.loading = false;
             }));
 
             if (!$routeParams.create) {
-
-                promises.push(languageResource.getById($routeParams.id).then(function(lang) {
+                promises.push(languageResource.getById($routeParams.id).then(function (lang) {
                     vm.language = lang;
 
-                    vm.page.name = vm.language.name;
-                    $scope.$emit("$changeTitle", vm.labels.editLanguage + ": " + vm.page.name);
-                    /* we need to store the initial default state so we can disable the toggle if it is the default.
-                    we need to prevent from not having a default language. */
+                    // We need to store the initial default state so we can disable the toggle if it is the default.
+                    // We need to prevent from not having a default language.
                     vm.initIsDefault = Utilities.copy(vm.language.isDefault);
 
                     makeBreadcrumbs();
 
-                    //store to check if we are changing the lang culture
-                    currCulture = vm.language.culture;
+                    // Store to check if we are changing the lang culture
+                    initCulture = vm.language.culture;
                 }));
             }
 
-            $q.all(promises, function () {
+            $q.all(promises).then(function () {
+                if ($routeParams.create) {
+                    $scope.$emit("$changeTitle", vm.labels.addLanguage);
+                } else {
+                    $scope.$emit("$changeTitle", vm.labels.editLanguage + ": " + vm.language.name);
+                }
+
                 vm.loading = false;
             });
 
+            // Activate tree node
             $timeout(function () {
-                navigationService.syncTree({ tree: "languages", path: "-1" });
+                navigationService.syncTree({ tree: $routeParams.tree, path: [-1], activate: true });
             });
         }
 
         function save() {
+            // Set new language name to culture name
+            if (vm.isNew && vm.language.culture && vm.availableCultures) {
+                vm.language.name = vm.availableCultures[vm.language.culture];
+            }
 
             if (formHelper.submitForm({ scope: $scope })) {
-                vm.page.saveButtonState = "busy";
+                vm.saveButtonState = "busy";
 
-                //check if the culture is being changed
-                if (currCulture && vm.language.culture !== currCulture) {
-
-                    const changeCultureAlert = {
+                // Check if the culture is being changed
+                if (initCulture && vm.language.culture !== initCulture) {
+                    overlayService.open({
                         title: vm.labels.areYouSure,
                         view: "views/languages/overlays/change.html",
                         submitButtonLabelKey: "general_continue",
-                        submit: function (model) {
+                        submit: function () {
                             saveLanguage();
                             overlayService.close();
                         },
                         close: function () {
                             overlayService.close();
-                            vm.page.saveButtonState = "init";
+                            vm.saveButtonState = "init";
                         }
-                    };
-
-                    overlayService.open(changeCultureAlert);
-                }
-                else {
+                    });
+                } else {
                     saveLanguage();
                 }
             }
@@ -146,26 +118,28 @@
 
         function saveLanguage() {
             languageResource.save(vm.language).then(function (lang) {
-
                 formHelper.resetForm({ scope: $scope });
 
                 vm.language = lang;
-                vm.page.saveButtonState = "success";
+                vm.saveButtonState = "success";
+
+                $scope.$emit("$changeTitle", vm.labels.editLanguage + ": " + vm.language.name);
+
                 localizationService.localize("speechBubbles_languageSaved").then(function (value) {
                     notificationsService.success(value);
                 });
 
-                // emit event when language is created or updated/saved
-                var args = { language: lang, isNew: $routeParams.create ? true : false };
-                eventsService.emit("editors.languages.languageSaved", args);
+                // Emit event when language is created or updated/saved
+                eventsService.emit("editors.languages.languageSaved", {
+                    language: lang,
+                    isNew: vm.isNew
+                });
 
-                back();
-
+                vm.isNew = false;
             }, function (err) {
-                vm.page.saveButtonState = "error";
+                vm.saveButtonState = "error";
                 formHelper.resetForm({ scope: $scope, hasErrors: true });
                 formHelper.handleError(err);
-
             });
         }
 
@@ -182,8 +156,7 @@
         }
 
         function toggleDefault() {
-
-            // it shouldn't be possible to uncheck the default language
+            // It shouldn't be possible to uncheck the default language
             if (vm.initIsDefault) {
                 return;
             }
@@ -209,9 +182,7 @@
         }
 
         init();
-
     }
 
     angular.module("umbraco").controller("Umbraco.Editors.Languages.EditController", LanguagesEditController);
-
 })();

@@ -1,5 +1,3 @@
-using System;
-using System.IO;
 using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -46,7 +44,7 @@ namespace Umbraco.Extensions
             IConfiguration configuration,
             out UmbracoFileConfiguration umbFileConfiguration)
         {
-            global::Serilog.Debugging.SelfLog.Enable(msg => System.Diagnostics.Debug.WriteLine(msg));
+            Serilog.Debugging.SelfLog.Enable(msg => System.Diagnostics.Debug.WriteLine(msg));
 
             //Set this environment variable - so that it can be used in external config file
             //add key="serilog:write-to:RollingFile.pathFormat" value="%BASEDIR%\logs\log.txt" />
@@ -75,8 +73,7 @@ namespace Umbraco.Extensions
                 rollingInterval: umbracoFileConfiguration.RollingInterval,
                 flushToDiskInterval: umbracoFileConfiguration.FlushToDiskInterval,
                 rollOnFileSizeLimit: umbracoFileConfiguration.RollOnFileSizeLimit,
-                retainedFileCountLimit: umbracoFileConfiguration.RetainedFileCountLimit
-            );
+                retainedFileCountLimit: umbracoFileConfiguration.RetainedFileCountLimit);
 
             return logConfig;
         }
@@ -93,7 +90,7 @@ namespace Umbraco.Extensions
             ILoggingConfiguration loggingConfiguration,
             UmbracoFileConfiguration umbracoFileConfiguration)
         {
-            global::Serilog.Debugging.SelfLog.Enable(msg => System.Diagnostics.Debug.WriteLine(msg));
+            Serilog.Debugging.SelfLog.Enable(msg => System.Diagnostics.Debug.WriteLine(msg));
 
             //Set this environment variable - so that it can be used in external config file
             //add key="serilog:write-to:RollingFile.pathFormat" value="%BASEDIR%\logs\log.txt" />
@@ -117,8 +114,7 @@ namespace Umbraco.Extensions
                 rollingInterval: umbracoFileConfiguration.RollingInterval,
                 flushToDiskInterval: umbracoFileConfiguration.FlushToDiskInterval,
                 rollOnFileSizeLimit: umbracoFileConfiguration.RollOnFileSizeLimit,
-                retainedFileCountLimit: umbracoFileConfiguration.RetainedFileCountLimit
-            );
+                retainedFileCountLimit: umbracoFileConfiguration.RetainedFileCountLimit);
 
             return logConfig;
         }
@@ -137,7 +133,8 @@ namespace Umbraco.Extensions
         {
             //Main .txt logfile - in similar format to older Log4Net output
             //Ends with ..txt as Date is inserted before file extension substring
-            logConfig.WriteTo.File(Path.Combine(hostingEnvironment.MapPathContentRoot(Cms.Core.Constants.SystemDirectories.LogFiles),  $"UmbracoTraceLog.{Environment.MachineName}..txt"),
+            logConfig.WriteTo.File(
+                Path.Combine(hostingEnvironment.MapPathContentRoot(Cms.Core.Constants.SystemDirectories.LogFiles),  $"UmbracoTraceLog.{Environment.MachineName}..txt"),
                 shared: true,
                 rollingInterval: RollingInterval.Day,
                 restrictedToMinimumLevel: minimumLevel,
@@ -162,8 +159,7 @@ namespace Umbraco.Extensions
             RollingInterval rollingInterval = RollingInterval.Day,
             bool rollOnFileSizeLimit = false,
             int? retainedFileCountLimit = 31,
-            Encoding? encoding = null
-   )
+            Encoding? encoding = null)
         {
             formatter ??= new CompactJsonFormatter();
 
@@ -197,15 +193,19 @@ namespace Umbraco.Extensions
         /// <param name="logConfig">A Serilog LoggerConfiguration</param>
         /// <param name="loggingConfiguration">The logging configuration</param>
         /// <param name="minimumLevel">The log level you wish the JSON file to collect - default is Verbose (highest)</param>
+        /// <param name="hostingEnvironment"></param>
         /// <param name="retainedFileCount">The number of days to keep log files. Default is set to null which means all logs are kept</param>
         public static LoggerConfiguration OutputDefaultJsonFile(
             this LoggerConfiguration logConfig,
             Umbraco.Cms.Core.Hosting.IHostingEnvironment hostingEnvironment,
-            ILoggingConfiguration loggingConfiguration, LogEventLevel minimumLevel = LogEventLevel.Verbose, int? retainedFileCount = null)
+            ILoggingConfiguration loggingConfiguration,
+            LogEventLevel minimumLevel = LogEventLevel.Verbose,
+            int? retainedFileCount = null)
         {
             // .clef format (Compact log event format, that can be imported into local SEQ & will make searching/filtering logs easier)
             // Ends with ..txt as Date is inserted before file extension substring
-            logConfig.WriteTo.File(new CompactJsonFormatter(),
+            logConfig.WriteTo.File(
+                new CompactJsonFormatter(),
                 Path.Combine(hostingEnvironment.MapPathContentRoot(Cms.Core.Constants.SystemDirectories.LogFiles) ,$"UmbracoTraceLog.{Environment.MachineName}..json"),
                 shared: true,
                 rollingInterval: RollingInterval.Day, // Create a new JSON file every day

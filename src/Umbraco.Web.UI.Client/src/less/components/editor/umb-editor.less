@@ -52,7 +52,7 @@
 @step: 60px;
 
 .level-loop (@i) when (@i > 0) {
-    @x: @i * @step;
+    @x: (@i * @step);
     .umb-editor--level@{i} {
         transform: translateX(@x);
     }
@@ -61,7 +61,7 @@
         right:@x;
     }
 
-    .level-loop(@i - 1);
+    .level-loop((@i - 1));
 }
 
 .level-loop(@iterations);
@@ -88,7 +88,7 @@
         }
     }
 
-    .create-editor-sizes(@iterator + 1);
+    .create-editor-sizes((@iterator + 1));
 }
 
 .create-editor-sizes();

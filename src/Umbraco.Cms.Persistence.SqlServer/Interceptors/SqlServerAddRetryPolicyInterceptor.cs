@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using NPoco;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Infrastructure.Persistence.FaultHandling;
+using Umbraco.Cms.Persistence.SqlServer.FaultHandling;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Persistence.SqlServer.Interceptors;

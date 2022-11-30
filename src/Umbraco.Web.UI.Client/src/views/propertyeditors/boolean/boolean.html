@@ -9,7 +9,8 @@
                     show-labels="{{model.config.showLabels}}"
                     label-position="right"
                     label-on="{{model.config.labelOn}}"
-                    label-off="{{model.config.labelOff}}">
+                    label-off="{{model.config.labelOff}}"
+                    ng-attr-readonly="{{readonly || undefined}}">
         </umb-toggle>
 
         <input type="hidden" name="modelValue" ng-model="renderModel.value" />

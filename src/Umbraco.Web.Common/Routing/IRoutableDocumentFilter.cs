@@ -1,7 +1,6 @@
-﻿namespace Umbraco.Cms.Web.Common.Routing
+namespace Umbraco.Cms.Web.Common.Routing;
+
+public interface IRoutableDocumentFilter
 {
-    public interface IRoutableDocumentFilter
-    {
-        bool IsDocumentRequest(string absPath);
-    }
+    bool IsDocumentRequest(string absPath);
 }

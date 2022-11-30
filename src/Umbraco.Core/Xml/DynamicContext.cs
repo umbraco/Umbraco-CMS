@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Xml;
+﻿using System.Xml;
 using System.Xml.XPath;
 using System.Xml.Xsl;
 
@@ -66,16 +64,25 @@ namespace Umbraco.Cms.Core.Xml
             object xml = table.Add(XmlNamespaces.Xml);
             object xmlns = table.Add(XmlNamespaces.XmlNs);
 
-            if (context == null) return;
+            if (context == null)
+            {
+                return;
+            }
 
             foreach (string prefix in context)
             {
                 var uri = context.LookupNamespace(prefix);
                 // Use fast object reference comparison to omit forbidden namespace declarations.
                 if (Equals(uri, xml) || Equals(uri, xmlns))
+                {
                     continue;
+                }
+
                 if (uri == null)
+                {
                     continue;
+                }
+
                 base.AddNamespace(prefix, uri);
             }
         }
@@ -87,10 +94,8 @@ namespace Umbraco.Cms.Core.Xml
         /// <summary>
         /// Implementation equal to <see cref="XsltContext"/>.
         /// </summary>
-        public override int CompareDocument(string baseUri, string nextbaseUri)
-        {
-            return String.Compare(baseUri, nextbaseUri, false, System.Globalization.CultureInfo.InvariantCulture);
-        }
+        public override int CompareDocument(string baseUri, string nextbaseUri) =>
+            String.Compare(baseUri, nextbaseUri, false, System.Globalization.CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Same as <see cref="XmlNamespaceManager"/>.
@@ -187,7 +192,11 @@ namespace Umbraco.Cms.Core.Xml
         /// <exception cref="ArgumentNullException">The <paramref name="value"/> is null.</exception>
         public void AddVariable(string name, object value)
         {
-            if (value == null) throw new ArgumentNullException("value");
+            if (value == null)
+            {
+                throw new ArgumentNullException("value");
+            }
+
             _variables[name] = new DynamicVariable(name, value);
         }
 
@@ -203,7 +212,7 @@ namespace Umbraco.Cms.Core.Xml
         {
             IXsltContextVariable var;
             _variables.TryGetValue(name, out var!);
-            return var!;
+            return var;
         }
 
         #endregion Variable Handling Code
@@ -215,8 +224,8 @@ namespace Umbraco.Cms.Core.Xml
         /// </summary>
         internal class DynamicVariable : IXsltContextVariable
         {
-            readonly string _name;
-            readonly object _value;
+            private readonly string _name;
+            private readonly object _value;
 
             #region Public Members
 
@@ -234,13 +243,21 @@ namespace Umbraco.Cms.Core.Xml
                 _value = value;
 
                 if (value is string)
+                {
                     _type = XPathResultType.String;
+                }
                 else if (value is bool)
+                {
                     _type = XPathResultType.Boolean;
+                }
                 else if (value is XPathNavigator)
+                {
                     _type = XPathResultType.Navigator;
+                }
                 else if (value is XPathNodeIterator)
+                {
                     _type = XPathResultType.NodeSet;
+                }
                 else
                 {
                     // Try to convert to double (native XPath numeric type)
@@ -284,7 +301,7 @@ namespace Umbraco.Cms.Core.Xml
                 get { return _type; }
             }
 
-            readonly XPathResultType _type;
+            private readonly XPathResultType _type;
 
             object IXsltContextVariable.Evaluate(XsltContext context)
             {

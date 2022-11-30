@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Models.PublishedContent
@@ -15,31 +13,18 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
     {
         private readonly IVariationContextAccessor? _variationContextAccessor;
 
-        protected PublishedContentBase(IVariationContextAccessor? variationContextAccessor)
-        {
-            _variationContextAccessor = variationContextAccessor;
-        }
-
-        #region ContentType
+        protected PublishedContentBase(IVariationContextAccessor? variationContextAccessor) => _variationContextAccessor = variationContextAccessor;
 
         public abstract IPublishedContentType ContentType { get; }
 
-        #endregion
-
-        #region PublishedElement
-
         /// <inheritdoc />
         public abstract Guid Key { get; }
-
-        #endregion
-
-        #region PublishedContent
 
         /// <inheritdoc />
         public abstract int Id { get; }
 
         /// <inheritdoc />
-        public virtual string? Name => this.Name(_variationContextAccessor);
+        public virtual string Name => this.Name(_variationContextAccessor);
 
         /// <inheritdoc />
         public virtual string? UrlSegment => this.UrlSegment(_variationContextAccessor);
@@ -80,29 +65,19 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         /// <inheritdoc />
         public abstract bool IsPublished(string? culture = null);
 
-        #endregion
-
-        #region Tree
-
         /// <inheritdoc />
         public abstract IPublishedContent? Parent { get; }
 
         /// <inheritdoc />
-        public virtual IEnumerable<IPublishedContent>? Children => this.Children(_variationContextAccessor);
+        public virtual IEnumerable<IPublishedContent> Children => this.Children(_variationContextAccessor);
 
         /// <inheritdoc />
         public abstract IEnumerable<IPublishedContent> ChildrenForAllCultures { get; }
-
-        #endregion
-
-        #region Properties
 
         /// <inheritdoc cref="IPublishedElement.Properties"/>
         public abstract IEnumerable<IPublishedProperty> Properties { get; }
 
         /// <inheritdoc cref="IPublishedElement.GetProperty(string)"/>
         public abstract IPublishedProperty? GetProperty(string alias);
-
-        #endregion
     }
 }

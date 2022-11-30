@@ -1,17 +1,14 @@
-using System;
-using System.Collections.Generic;
 using Umbraco.Cms.Core.Composing;
 
-namespace Umbraco.Cms.Core.Trees
-{
-    /// <summary>
-    /// Represents the collection of section trees.
-    /// </summary>
-    public class TreeCollection : BuilderCollectionBase<Tree>
-    {
+namespace Umbraco.Cms.Core.Trees;
 
-        public TreeCollection(Func<IEnumerable<Tree>> items) : base(items)
-        {
-        }
+/// <summary>
+///     Represents the collection of section trees.
+/// </summary>
+public class TreeCollection : BuilderCollectionBase<Tree>
+{
+    public TreeCollection(Func<IEnumerable<Tree>> items)
+        : base(items)
+    {
     }
 }

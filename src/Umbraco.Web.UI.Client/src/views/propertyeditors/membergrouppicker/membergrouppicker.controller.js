@@ -2,7 +2,7 @@
 //with a specified callback, this callback will receive an object with a selection on it
 function memberGroupPicker($scope, editorService, memberGroupResource, localizationService, overlayService){
 
-    var vm = this;
+    const vm = this;
 
     vm.openMemberGroupPicker = openMemberGroupPicker;
     vm.remove = remove;
@@ -13,17 +13,19 @@ function memberGroupPicker($scope, editorService, memberGroupResource, localizat
         return str.replace(rgxtrim, '');
     }
 
-    var removeAllEntriesAction = {
-        labelKey: 'clipboard_labelForRemoveAllEntries',
-        labelTokens: [],
-        icon: 'trash',
-        method: removeAllEntries,
-        isDisabled: true
-    };
-
     $scope.renderModel = [];
-    $scope.allowRemove = true;
+    $scope.allowRemove = !$scope.readonly;
+    $scope.allowAdd = !$scope.readonly;
     $scope.groupIds = [];
+
+    let removeAllEntriesAction = {
+        labelKey: "clipboard_labelForRemoveAllEntries",
+        labelTokens: [],
+        icon: "icon-trash",
+        method: removeAllEntries,
+        isDisabled: !$scope.allowRemove,
+        useLegacyIcon: false
+    };
 
     if ($scope.model.config && $scope.umbProperty) {
         $scope.umbProperty.setPropertyActions([
@@ -38,7 +40,7 @@ function memberGroupPicker($scope, editorService, memberGroupResource, localizat
             $scope.renderModel = groups;
         });
 
-        removeAllEntriesAction.isDisabled = groupIds.length === 0;
+        removeAllEntriesAction.isDisabled = groupIds.length === 0 || !$scope.allowRemove;
     }
 
     function setDirty() {
@@ -47,7 +49,13 @@ function memberGroupPicker($scope, editorService, memberGroupResource, localizat
         }
     }
 
-    function openMemberGroupPicker() {
+    function openMemberGroupPicker($event) {
+        if (!$scope.allowAdd) {
+            $event.preventDefault();
+            $event.stopPropagation();
+            return;
+        }
+
         var memberGroupPicker = {
             multiPicker: true,
             submit: function (model) {
@@ -62,7 +70,7 @@ function memberGroupPicker($scope, editorService, memberGroupResource, localizat
                 // figure out which groups are new and fetch them
                 var newGroupIds = _.difference(selectedGroupIds, currIds);
 
-                removeAllEntriesAction.isDisabled = currIds.length === 0 && newGroupIds.length === 0;
+                removeAllEntriesAction.isDisabled = (currIds.length === 0 && newGroupIds.length === 0) || !$scope.allowRemove;
 
                 if (newGroupIds && newGroupIds.length) {
                     memberGroupResource.getByIds(newGroupIds).then(function (groups) {
@@ -84,15 +92,19 @@ function memberGroupPicker($scope, editorService, memberGroupResource, localizat
     }
 
     function remove(index) {
+        if (!$scope.allowRemove) return;
+
         $scope.renderModel.splice(index, 1);
 
         var currIds = renderModelIds();
-        removeAllEntriesAction.isDisabled = currIds.length === 0;
+        removeAllEntriesAction.isDisabled = currIds.length === 0 || !$scope.allowRemove;
 
         setDirty();
     }
 
     function clear() {
+        if (!$scope.allowRemove) return;
+
         $scope.renderModel = [];
         removeAllEntriesAction.isDisabled = true;
 
@@ -100,6 +112,8 @@ function memberGroupPicker($scope, editorService, memberGroupResource, localizat
     }
 
     function removeAllEntries() {
+        if (!$scope.allowRemove) return;
+
         localizationService.localizeMany(["content_nestedContentDeleteAllItems", "general_delete"]).then(data => {
             overlayService.confirmDelete({
                 title: data[1],

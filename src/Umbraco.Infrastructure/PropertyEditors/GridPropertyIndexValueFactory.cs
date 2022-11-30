@@ -1,9 +1,6 @@
 ﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -30,17 +27,17 @@ namespace Umbraco.Cms.Core.PropertyEditors
             {
                 try
                 {
-                    var gridVal = JsonConvert.DeserializeObject<GridValue>(rawVal);
+                    GridValue? gridVal = JsonConvert.DeserializeObject<GridValue>(rawVal);
 
                     //get all values and put them into a single field (using JsonPath)
                     var sb = new StringBuilder();
-                    foreach (var row in gridVal!.Sections.SelectMany(x => x.Rows))
+                    foreach (GridValue.GridRow row in gridVal!.Sections.SelectMany(x => x.Rows))
                     {
                         var rowName = row.Name;
 
-                        foreach (var control in row.Areas.SelectMany(x => x.Controls))
+                        foreach (GridValue.GridControl control in row.Areas.SelectMany(x => x.Controls))
                         {
-                            var controlVal = control.Value;
+                            JToken? controlVal = control.Value;
 
                             if (controlVal?.Type == JTokenType.String)
                             {
@@ -54,7 +51,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                             }
                             else if (controlVal is JContainer jc)
                             {
-                                foreach (var s in jc.Descendants().Where(t => t.Type == JTokenType.String))
+                                foreach (JToken s in jc.Descendants().Where(t => t.Type == JTokenType.String))
                                 {
                                     sb.Append(s.Value<string>());
                                     sb.Append(" ");

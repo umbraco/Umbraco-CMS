@@ -17,7 +17,8 @@
             controller: MediaPicker3Controller,
             controllerAs: "vm",
             bindings: {
-                model: "="
+                model: "=",
+                node: "="
             },
             require: {
                 propertyForm: "^form",
@@ -28,13 +29,16 @@
             }
         });
 
-    function MediaPicker3Controller($scope, editorService, clipboardService, localizationService, overlayService, userService, entityResource) {
+    function MediaPicker3Controller($scope, editorService, clipboardService, localizationService, overlayService, userService, entityResource, $attrs, umbRequestHelper, $injector, uploadTracker) {
+
+        const mediaUploader = $injector.instantiate(Utilities.MediaUploader);
+        let uploadInProgress = false;
 
         var unsubscribe = [];
 
         // Property actions:
-        var copyAllMediasAction = null;
-        var removeAllMediasAction = null;
+        let copyAllMediasAction = null;
+        let removeAllMediasAction = null;
 
         var vm = this;
 
@@ -43,10 +47,19 @@
         vm.activeMediaEntry = null;
         vm.supportCopy = clipboardService.isSupported();
 
+        vm.allowAddMedia = true;
+        vm.allowRemoveMedia = true;
+        vm.allowEditMedia = true;
+
+        vm.handleFiles = handleFiles;
+
+        vm.invalidEntries = [];
+
         vm.addMediaAt = addMediaAt;
         vm.editMedia = editMedia;
         vm.removeMedia = removeMedia;
         vm.copyMedia = copyMedia;
+        vm.allowDir = true;
 
         vm.labels = {};
 
@@ -55,8 +68,17 @@
             vm.labels.content_createEmpty = data[1];
         });
 
-        vm.$onInit = function() {
+        $attrs.$observe('readonly', (value) => {
+            vm.readonly = value !== undefined;
 
+            vm.allowAddMedia = !vm.readonly;
+            vm.allowRemoveMedia = !vm.readonly;
+            vm.allowEditMedia = !vm.readonly;
+
+            vm.sortableOptions.disabled = vm.readonly;
+        });
+
+        vm.$onInit = function() {
             vm.validationLimit = vm.model.config.validationLimit || {};
             // If single-mode we only allow 1 item as the maximum:
             if(vm.model.config.multiple === false) {
@@ -66,20 +88,33 @@
             vm.singleMode = vm.validationLimit.max === 1;
             vm.allowedTypes = vm.model.config.filter ? vm.model.config.filter.split(",") : null;
 
+            const uploaderOptions = {
+                uploadURL: umbRequestHelper.getApiUrl("mediaPickerThreeBaseUrl", "uploadMedia"),
+                allowedMediaTypeAliases: vm.allowedTypes
+            };
+
+            unsubscribe.push(mediaUploader.on('mediaEntryAccepted', _handleMediaEntryAccepted));
+            unsubscribe.push(mediaUploader.on('mediaEntryRejected', _handleMediaEntryRejected));
+            unsubscribe.push(mediaUploader.on('queueStarted', _handleMediaQueueStarted));
+            unsubscribe.push(mediaUploader.on('uploadSuccess', _handleMediaUploadSuccess));
+            unsubscribe.push(mediaUploader.on('queueCompleted', _handleMediaQueueCompleted));
+
             copyAllMediasAction = {
                 labelKey: "clipboard_labelForCopyAllEntries",
                 labelTokens: [vm.model.label],
-                icon: "documents",
+                icon: "icon-documents",
                 method: requestCopyAllMedias,
-                isDisabled: true
+                isDisabled: true,
+                useLegacyIcon: false
             };
 
             removeAllMediasAction = {
-                labelKey: 'clipboard_labelForRemoveAllEntries',
+                labelKey: "clipboard_labelForRemoveAllEntries",
                 labelTokens: [],
-                icon: 'trash',
+                icon: "icon-trash",
                 method: requestRemoveAllMedia,
-                isDisabled: true
+                isDisabled: true,
+                useLegacyIcon: false
             };
 
             var propertyActions = [];
@@ -119,10 +154,50 @@
                 vm.allowEdit = hasAccessToMedia;
                 vm.allowAdd = hasAccessToMedia;
 
-                vm.loading = false;
+                mediaUploader.init(uploaderOptions).then(() => {
+                    vm.loading = false;
+                });
             });
-
         };
+
+        function handleFiles (files, invalidFiles) {
+            if (vm.readonly) return;
+            const allFiles = [...files, ...invalidFiles];
+            mediaUploader.requestUpload(allFiles);
+        };
+
+        function _handleMediaEntryAccepted (event, data) {
+            vm.model.value.push(data.mediaEntry);
+            setDirty();
+        }
+
+        function _handleMediaEntryRejected (event, data) {
+            // we need to make sure the media entry hasn't been accepted earlier in process
+            const index = vm.model.value.findIndex(mediaEntry => mediaEntry.key === data.mediaEntry.key);
+            if (index !== -1) {
+                vm.model.value.splice(index, 1);
+            }
+            vm.invalidEntries.push(data.mediaEntry);
+            setDirty();
+        }
+
+        function _handleMediaUploadSuccess (event, data) {
+            const mediaEntry = vm.model.value.find(mediaEntry => mediaEntry.key === data.mediaEntry.key);
+            if (!mediaEntry) return;
+
+            mediaEntry.tmpLocation = data.tmpLocation;
+            updateMediaEntryData(mediaEntry);
+        }
+
+        function _handleMediaQueueStarted () {
+            uploadInProgress = true;
+            uploadTracker.uploadStarted(vm.node.key);
+        }
+
+        function _handleMediaQueueCompleted () {
+            uploadInProgress = false;
+            uploadTracker.uploadEnded(vm.node.key);
+        }
 
         function onServerValueChanged(newVal, oldVal) {
             if(newVal === null || !Array.isArray(newVal)) {
@@ -144,6 +219,8 @@
         }
 
         function addMediaAt(createIndex, $event) {
+            if (!vm.allowAddMedia) return;
+
             var mediaPicker = {
                 startNodeId: vm.model.config.startNodeId,
                 startNodeIsVirtual: vm.model.config.startNodeIsVirtual,
@@ -203,6 +280,7 @@
 
         // To be used by infinite editor. (defined here cause we need configuration from property editor)
         function changeMediaFor(mediaEntry, onSuccess) {
+            if (!vm.allowAddMedia) return;
 
             var mediaPicker = {
                 startNodeId: vm.model.config.startNodeId,
@@ -224,6 +302,8 @@
                     if (onSuccess) {
                         onSuccess();
                     }
+
+                    setDirty();
                 },
                 close: function () {
                     editorService.close();
@@ -238,12 +318,15 @@
         }
 
         function resetCrop(cropEntry) {
+            if (!vm.allowEditMedia) return;
+
             Object.assign(cropEntry, vm.model.config.crops.find( c => c.alias === cropEntry.alias));
             cropEntry.coordinates = null;
             setDirty();
         }
 
         function updateMediaEntryData(mediaEntry) {
+            if (!vm.allowEditMedia) return;
 
             mediaEntry.crops = mediaEntry.crops || [];
             mediaEntry.focalPoint = mediaEntry.focalPoint || {
@@ -263,14 +346,21 @@
         }
 
         function removeMedia(media) {
+            if (!vm.allowRemoveMedia) return;
+
             var index = vm.model.value.indexOf(media);
             if (index !== -1) {
                 vm.model.value.splice(index, 1);
             }
+
+            setDirty();
         }
 
         function deleteAllMedias() {
+            if (!vm.allowRemoveMedia) return;
+
             vm.model.value = [];
+            setDirty();
         }
 
         function setActiveMedia(mediaEntryOrNull) {
@@ -278,6 +368,7 @@
         }
 
         function editMedia(mediaEntry, options, $event) {
+            if (!vm.allowEditMedia) return;
 
             if($event)
             $event.stopPropagation();
@@ -370,6 +461,7 @@
         }
 
         function requestPasteFromClipboard(createIndex, pasteEntry, pasteType) {
+            if (!vm.allowAddMedia) return;
 
             if (pasteEntry === undefined) {
                 return false;
@@ -402,12 +494,13 @@
 
         vm.sortableOptions = {
             cursor: "grabbing",
-            handle: "umb-media-card",
+            handle: "umb-media-card, .umb-media-card",
             cancel: "input,textarea,select,option",
             classes: ".umb-media-card--dragging",
             distance: 5,
             tolerance: "pointer",
             scroll: true,
+            disabled: vm.readonly,
             update: function (ev, ui) {
                 setDirty();
             }
@@ -420,7 +513,7 @@
                 copyAllMediasAction.isDisabled = vm.model.value.length === 0;
             }
             if (removeAllMediasAction) {
-                removeAllMediasAction.isDisabled = vm.model.value.length === 0;
+                removeAllMediasAction.isDisabled = vm.model.value.length === 0 || !vm.allowRemoveMedia;
             }
 
             // validate limits:
@@ -434,11 +527,15 @@
             }
         }
 
-        unsubscribe.push($scope.$watch(() => vm.model.value.length, onAmountOfMediaChanged));
+        unsubscribe.push($scope.$watch(() => vm.model.value?.length || 0, onAmountOfMediaChanged));
 
         $scope.$on("$destroy", function () {
             for (const subscription of unsubscribe) {
                 subscription();
+            }
+
+            if (uploadInProgress) {
+                uploadTracker.uploadEnded(vm.node.key);
             }
         });
     }

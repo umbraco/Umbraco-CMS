@@ -1,11 +1,10 @@
-using System;
 using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Install.Models;
 
 namespace Umbraco.Cms.Infrastructure.Persistence;
 
 /// <summary>
-/// Provider metadata for custom connection string setup.
+///     Provider metadata for custom connection string setup.
 /// </summary>
 [DataContract]
 public class CustomConnectionStringDatabaseProviderMetadata : IDatabaseProviderMetadata

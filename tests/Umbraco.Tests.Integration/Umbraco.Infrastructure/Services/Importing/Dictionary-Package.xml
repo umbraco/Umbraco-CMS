@@ -17,7 +17,7 @@
     </DictionaryItem>
   </DictionaryItems>
   <Languages>
-    <Language Id="2" CultureAlias="nb-NO" FriendlyName="Norwegian" />
+    <Language Id="2" CultureAlias="nb-NO" FriendlyName="Norwegian Bokmål (Norway)" />
     <Language Id="3" CultureAlias="en-GB" FriendlyName="English (United Kingdom)" />
   </Languages>
 </umbPackage>

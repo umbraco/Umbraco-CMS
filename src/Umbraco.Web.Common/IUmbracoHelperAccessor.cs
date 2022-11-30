@@ -1,9 +1,8 @@
 using System.Diagnostics.CodeAnalysis;
 
-namespace Umbraco.Cms.Web.Common
+namespace Umbraco.Cms.Web.Common;
+
+public interface IUmbracoHelperAccessor
 {
-    public interface IUmbracoHelperAccessor
-    {
-        bool TryGetUmbracoHelper([MaybeNullWhen(false)] out UmbracoHelper umbracoHelper);
-    }
+    bool TryGetUmbracoHelper([MaybeNullWhen(false)] out UmbracoHelper umbracoHelper);
 }

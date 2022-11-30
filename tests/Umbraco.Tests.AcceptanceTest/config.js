@@ -20,7 +20,7 @@ const properties = [
 ];
 
 
-const configPath = './cypress.env.json'
+const configPath = './.env'
 
 console.log("Configure your test enviroment")
 
@@ -29,13 +29,9 @@ prompt.start();
 prompt.get(properties, function (error, result) {
     if (error) { return onError(error); }
 
-var fileContent = `{
-    "username": "${result.username}",
-    "password": "${result.password}"${
-        result.baseUrl && `,
-    "baseUrl": "${result.baseUrl}"`
-    }
-}`;
+var fileContent = `UMBRACO_USER_LOGIN=${result.username}
+UMBRACO_USER_PASSWORD=${result.password}
+URL=${result.baseUrl || "https://localhost:44331"}`;
 
     fs.writeFile(configPath, fileContent, function (error) {
         if (error) return console.error(error);

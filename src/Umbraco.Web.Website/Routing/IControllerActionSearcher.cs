@@ -1,16 +1,12 @@
-using System;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Controllers;
 
-namespace Umbraco.Cms.Web.Website.Routing
+namespace Umbraco.Cms.Web.Website.Routing;
+
+public interface IControllerActionSearcher
 {
-    public interface IControllerActionSearcher
-    {
+    ControllerActionDescriptor? Find<T>(HttpContext httpContext, string? controller, string? action);
 
-        ControllerActionDescriptor? Find<T>(HttpContext httpContext, string? controller, string? action);
-
-        ControllerActionDescriptor? Find<T>(HttpContext httpContext, string? controller, string? action, string? area)
-                    => Find<T>(httpContext, controller, action);
-
-    }
+    ControllerActionDescriptor? Find<T>(HttpContext httpContext, string? controller, string? action, string? area)
+        => Find<T>(httpContext, controller, action);
 }

@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Web.Common.Mvc;

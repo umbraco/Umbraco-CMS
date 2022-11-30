@@ -1,20 +1,27 @@
-﻿using System;
-using System.IO;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.FileProviders.Physical;
 
-namespace Umbraco.Cms.Core.Services
+namespace Umbraco.Cms.Core.Services;
+
+public class LocalizedTextServiceSupplementaryFileSource
 {
-    public class LocalizedTextServiceSupplementaryFileSource
+    [Obsolete("Use other ctor. Will be removed in Umbraco 12")]
+    public LocalizedTextServiceSupplementaryFileSource(FileInfo file, bool overwriteCoreKeys)
+        : this(new PhysicalFileInfo(file), overwriteCoreKeys)
     {
-
-        public LocalizedTextServiceSupplementaryFileSource(FileInfo file, bool overwriteCoreKeys)
-        {
-            if (file == null) throw new ArgumentNullException("file");
-
-            File = file;
-            OverwriteCoreKeys = overwriteCoreKeys;
-        }
-
-        public FileInfo File { get; private set; }
-        public bool OverwriteCoreKeys { get; private set; }
     }
+
+    public LocalizedTextServiceSupplementaryFileSource(IFileInfo file, bool overwriteCoreKeys)
+    {
+        FileInfo = file ?? throw new ArgumentNullException(nameof(file));
+        File = file is PhysicalFileInfo && file.PhysicalPath is not null ? new FileInfo(file.PhysicalPath) : null!;
+        OverwriteCoreKeys = overwriteCoreKeys;
+    }
+
+    [Obsolete("Use FileInfo instead. Will be removed in Umbraco 12")]
+    public FileInfo File { get; }
+
+    public IFileInfo FileInfo { get; }
+
+    public bool OverwriteCoreKeys { get; }
 }

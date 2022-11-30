@@ -42,6 +42,12 @@
             }
         });
 
+        $scope.$watchCollection('vm.model.variants', (newValue) => {
+            if (newValue && newValue.length > 0) {
+                vm.allowUpdate = newValue[0].allowedActions.includes('A');
+            }
+        });
+
         function getScope() {
             return $scope;
         }

@@ -10,52 +10,52 @@ using NUnit.Framework;
 using Umbraco.Cms.Web.BackOffice.Authorization;
 using Umbraco.Cms.Web.BackOffice.Security;
 
-namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization;
+
+public class DenyLocalLoginHandlerTests
 {
-    public class DenyLocalLoginHandlerTests
+    [Test]
+    public async Task With_Deny_Local_Login_Is_Not_Authorized()
     {
-        [Test]
-        public async Task With_Deny_Local_Login_Is_Not_Authorized()
-        {
-            AuthorizationHandlerContext authHandlerContext = CreateAuthorizationHandlerContext();
-            DenyLocalLoginHandler sut = CreateHandler(denyLocalLogin: true);
+        var authHandlerContext = CreateAuthorizationHandlerContext();
+        var sut = CreateHandler(true);
 
-            await sut.HandleAsync(authHandlerContext);
+        await sut.HandleAsync(authHandlerContext);
 
-            Assert.IsFalse(authHandlerContext.HasSucceeded);
-        }
+        Assert.IsFalse(authHandlerContext.HasSucceeded);
+    }
 
-        [Test]
-        public async Task Without_Deny_Local_Login_Is_Authorized()
-        {
-            AuthorizationHandlerContext authHandlerContext = CreateAuthorizationHandlerContext();
-            DenyLocalLoginHandler sut = CreateHandler();
+    [Test]
+    public async Task Without_Deny_Local_Login_Is_Authorized()
+    {
+        var authHandlerContext = CreateAuthorizationHandlerContext();
+        var sut = CreateHandler();
 
-            await sut.HandleAsync(authHandlerContext);
+        await sut.HandleAsync(authHandlerContext);
 
-            Assert.IsTrue(authHandlerContext.HasSucceeded);
-        }
+        Assert.IsTrue(authHandlerContext.HasSucceeded);
+    }
 
-        private static AuthorizationHandlerContext CreateAuthorizationHandlerContext()
-        {
-            var requirement = new DenyLocalLoginRequirement();
-            var user = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>()));
-            object resource = new object();
-            return new AuthorizationHandlerContext(new List<IAuthorizationRequirement> { requirement }, user, resource);
-        }
+    private static AuthorizationHandlerContext CreateAuthorizationHandlerContext()
+    {
+        var requirement = new DenyLocalLoginRequirement();
+        var user = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>()));
+        var resource = new object();
+        return new AuthorizationHandlerContext(new List<IAuthorizationRequirement> { requirement }, user, resource);
+    }
 
-        private DenyLocalLoginHandler CreateHandler(bool denyLocalLogin = false)
-        {
-            Mock<IBackOfficeExternalLoginProviders> mockBackOfficeExternalLoginProviders = CreateMockBackOfficeExternalLoginProviders(denyLocalLogin);
+    private DenyLocalLoginHandler CreateHandler(bool denyLocalLogin = false)
+    {
+        var mockBackOfficeExternalLoginProviders = CreateMockBackOfficeExternalLoginProviders(denyLocalLogin);
 
-            return new DenyLocalLoginHandler(mockBackOfficeExternalLoginProviders.Object);
-        }
+        return new DenyLocalLoginHandler(mockBackOfficeExternalLoginProviders.Object);
+    }
 
-        private static Mock<IBackOfficeExternalLoginProviders> CreateMockBackOfficeExternalLoginProviders(bool denyLocalLogin)
-        {
-            var mockBackOfficeExternalLoginProviders = new Mock<IBackOfficeExternalLoginProviders>();
-            mockBackOfficeExternalLoginProviders.Setup(x => x.HasDenyLocalLogin()).Returns(denyLocalLogin);
-            return mockBackOfficeExternalLoginProviders;
-        }
+    private static Mock<IBackOfficeExternalLoginProviders> CreateMockBackOfficeExternalLoginProviders(
+        bool denyLocalLogin)
+    {
+        var mockBackOfficeExternalLoginProviders = new Mock<IBackOfficeExternalLoginProviders>();
+        mockBackOfficeExternalLoginProviders.Setup(x => x.HasDenyLocalLogin()).Returns(denyLocalLogin);
+        return mockBackOfficeExternalLoginProviders;
     }
 }

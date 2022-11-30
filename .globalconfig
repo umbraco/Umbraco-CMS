@@ -50,6 +50,7 @@ dotnet_analyzer_diagnostic.category-StyleCop.CSharp.LayoutRules.severity = sugge
 
 dotnet_diagnostic.SA1636.severity = none # SA1636: File header copyright text should match
 dotnet_diagnostic.SA1101.severity = none # PrefixLocalCallsWithThis - stylecop appears to be ignoring dotnet_style_qualification_for_*
+dotnet_diagnostic.SA1309.severity = none # FieldNamesMustNotBeginWithUnderscore
 
 dotnet_diagnostic.SA1503.severity = warning # BracesMustNotBeOmitted
 dotnet_diagnostic.SA1117.severity = warning # ParametersMustBeOnSameLineOrSeparateLines
@@ -70,8 +71,8 @@ dotnet_diagnostic.SA1132.severity = warning # DoNotCombineFields
 dotnet_diagnostic.SA1134.severity = warning # AttributesMustNotShareLine
 dotnet_diagnostic.SA1106.severity = warning # CodeMustNotContainEmptyStatements
 dotnet_diagnostic.SA1312.severity = warning # VariableNamesMustBeginWithLowerCaseLetter
-dotnet_diagnostic.SA1303.severity = warning # ConstFieldNamesMustBeginWithUpperCaseLetter
 dotnet_diagnostic.SA1310.severity = warning # FieldNamesMustNotContainUnderscore
+dotnet_diagnostic.SA1303.severity = warning # ConstFieldNamesMustBeginWithUpperCaseLetter
 dotnet_diagnostic.SA1130.severity = warning # UseLambdaSyntax
 dotnet_diagnostic.SA1405.severity = warning # DebugAssertMustProvideMessageText
 dotnet_diagnostic.SA1205.severity = warning # PartialElementsMustDeclareAccess

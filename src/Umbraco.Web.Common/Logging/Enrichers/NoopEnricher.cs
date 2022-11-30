@@ -4,7 +4,7 @@ using Serilog.Events;
 namespace Umbraco.Cms.Web.Common.Logging.Enrichers;
 
 /// <summary>
-/// NoOp but useful for tricks to avoid disposal of the global logger.
+///     NoOp but useful for tricks to avoid disposal of the global logger.
 /// </summary>
 internal class NoopEnricher : ILogEventEnricher
 {

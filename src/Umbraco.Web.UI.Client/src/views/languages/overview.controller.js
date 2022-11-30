@@ -1,8 +1,7 @@
 (function () {
     "use strict";
 
-    function LanguagesOverviewController($location, $timeout, navigationService, localizationService, languageResource, eventsService, overlayService,$scope) {
-
+    function LanguagesOverviewController($q, $timeout, $location, $routeParams, navigationService, localizationService, languageResource, eventsService, overlayService, $scope) {
         var vm = this;
 
         vm.page = {};
@@ -12,7 +11,6 @@
         vm.addLanguage = addLanguage;
         vm.editLanguage = editLanguage;
         vm.deleteLanguage = deleteLanguage;
-
         vm.getLanguageById = function(id) {
             for (var i = 0; i < vm.languages.length; i++) {
                 if (vm.languages[i].id === id) {
@@ -24,34 +22,28 @@
         };
 
         function init() {
-
             vm.loading = true;
 
-            // localize labels
-            var labelKeys = [
-                "treeHeaders_languages",
-                "general_mandatory",
-                "general_default",
-                "languages_fallsbackToLabel"
-            ];
+            var promises = [];
 
-            localizationService.localizeMany(labelKeys).then(function (values) {
-                vm.labels.languages = values[0];
-                vm.labels.mandatory = values[1];
-                vm.labels.general = values[2];
-                vm.labels.fallsbackTo = values[3];
-                // set page name
-                vm.page.name = vm.labels.languages;
-                $scope.$emit("$changeTitle", vm.labels.languages);
-            });
+            // Localize labels
+            promises.push(localizationService.localize("treeHeaders_languages").then(function (value) {
+                vm.page.name = value;
+                $scope.$emit("$changeTitle", value);
+            }));
 
-            languageResource.getAll().then(function (languages) {
+            // Load all languages
+            promises.push(languageResource.getAll().then(function (languages) {
                 vm.languages = languages;
+            }));
+
+            $q.all(promises).then(function () {
                 vm.loading = false;
             });
 
+            // Activate tree node
             $timeout(function () {
-                navigationService.syncTree({ tree: "languages", path: "-1" });
+                navigationService.syncTree({ tree: $routeParams.tree, path: [-1], activate: true });
             });
         }
 
@@ -66,7 +58,6 @@
         }
 
         function deleteLanguage(language, event) {
-
             const dialog = {
                 view: "views/languages/overlays/delete.html",
                 language: language,
@@ -94,24 +85,21 @@
             language.deleteButtonState = "busy";
 
             languageResource.deleteById(language.id).then(function () {
+                // Emit event when language is deleted
+                eventsService.emit("editors.languages.languageDeleted", {
+                    language: language
+                });
 
-                // emit event
-                var args = { language: language };
-                eventsService.emit("editors.languages.languageDeleted", args);
-
-                // remove from list
+                // Remove from list
                 var index = vm.languages.indexOf(language);
                 vm.languages.splice(index, 1);
-
-            }, function (err) {
+            }, function () {
                 language.deleteButtonState = "error";
             });
         }
 
         init();
-
     }
 
     angular.module("umbraco").controller("Umbraco.Editors.Languages.OverviewController", LanguagesOverviewController);
-
 })();

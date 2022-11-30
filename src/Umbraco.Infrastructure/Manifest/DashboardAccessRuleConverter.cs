@@ -1,46 +1,57 @@
-﻿using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.Dashboards;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Infrastructure.Serialization;
 
-namespace Umbraco.Cms.Core.Manifest
+namespace Umbraco.Cms.Core.Manifest;
+
+/// <summary>
+///     Implements a json read converter for <see cref="IAccessRule" />.
+/// </summary>
+internal class DashboardAccessRuleConverter : JsonReadConverter<IAccessRule>
 {
-    /// <summary>
-    /// Implements a json read converter for <see cref="IAccessRule"/>.
-    /// </summary>
-    internal class DashboardAccessRuleConverter : JsonReadConverter<IAccessRule>
+    /// <inheritdoc />
+    protected override IAccessRule Create(Type objectType, string path, JObject jObject) => new AccessRule();
+
+    /// <inheritdoc />
+    protected override void Deserialize(JObject jobject, IAccessRule target, JsonSerializer serializer)
     {
-        /// <inheritdoc />
-        protected override IAccessRule Create(Type objectType, string path, JObject jObject)
+        // see Create above, target is either DataEditor (parameter) or ConfiguredDataEditor (property)
+        if (!(target is AccessRule accessRule))
         {
-            return new AccessRule();
+            throw new PanicException("panic.");
         }
 
-        /// <inheritdoc />
-        protected override void Deserialize(JObject jobject, IAccessRule target, JsonSerializer serializer)
+        GetRule(accessRule, jobject, "grant", AccessRuleType.Grant);
+        GetRule(accessRule, jobject, "deny", AccessRuleType.Deny);
+        GetRule(accessRule, jobject, "grantBySection", AccessRuleType.GrantBySection);
+
+        if (accessRule.Type == AccessRuleType.Unknown)
         {
-            // see Create above, target is either DataEditor (parameter) or ConfiguredDataEditor (property)
+            throw new InvalidOperationException("Rule is not defined.");
+        }
+    }
 
-            if (!(target is AccessRule accessRule))
-                throw new PanicException("panic.");
-
-            GetRule(accessRule, jobject, "grant", AccessRuleType.Grant);
-            GetRule(accessRule, jobject, "deny", AccessRuleType.Deny);
-            GetRule(accessRule, jobject, "grantBySection", AccessRuleType.GrantBySection);
-
-            if (accessRule.Type == AccessRuleType.Unknown) throw new InvalidOperationException("Rule is not defined.");
+    private void GetRule(AccessRule rule, JObject jobject, string name, AccessRuleType type)
+    {
+        JToken? token = jobject[name];
+        if (token == null)
+        {
+            return;
         }
 
-        private void GetRule(AccessRule rule, JObject jobject, string name, AccessRuleType type)
+        if (rule.Type != AccessRuleType.Unknown)
         {
-            var token = jobject[name];
-            if (token == null) return;
-            if (rule.Type != AccessRuleType.Unknown) throw new InvalidOperationException("Multiple definition of a rule.");
-            if (token.Type != JTokenType.String) throw new InvalidOperationException("Rule value is not a string.");
-            rule.Type = type;
-            rule.Value = token.Value<string>();
+            throw new InvalidOperationException("Multiple definition of a rule.");
         }
+
+        if (token.Type != JTokenType.String)
+        {
+            throw new InvalidOperationException("Rule value is not a string.");
+        }
+
+        rule.Type = type;
+        rule.Value = token.Value<string>();
     }
 }
