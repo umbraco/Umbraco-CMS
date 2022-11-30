@@ -28,7 +28,7 @@
             }
         });
 
-    function BlockListController($scope, $timeout, editorService, clipboardService, localizationService, overlayService, blockEditorService, udiService, serverValidationManager, angularHelper, eventsService, $attrs) {
+    function BlockListController($scope, $timeout, $interpolate, editorService, clipboardService, localizationService, overlayService, blockEditorService, udiService, serverValidationManager, angularHelper, eventsService, $attrs) {
 
         var unsubscribe = [];
         var modelObject;
@@ -506,7 +506,7 @@
 
         }
         vm.requestShowClipboard = requestShowClipboard;
-        function requestShowClipboard(createIndex, mouseEvent) {
+        function requestShowClipboard(createIndex) {
             showCreateDialog(createIndex, true);
         }
 
@@ -586,7 +586,7 @@
                 var blockObject = vm.layout[createIndex].$block;
                 if (inlineEditing === true) {
                     blockObject.activate();
-                } else if (inlineEditing === false && blockObject.hideContentInOverlay !== true) {
+                } else if (inlineEditing === false && blockObject.hideContentInOverlay !== true && blockObject.content.variants[0].tabs[0]?.properties.length > 0) {
                     vm.options.createFlow = true;
                     blockObject.edit();
                     vm.options.createFlow = false;
@@ -617,10 +617,10 @@
                         pasteEntry.blockConfigModel = modelObject.getBlockConfiguration(scaffold.contentTypeKey);
                     }
                 }
-                blockPickerModel.clipboardItems.push(pasteEntry);
+                vm.clipboardItems.push(pasteEntry);
             });
 
-            var entriesForPaste = clipboardService.retrieveEntriesOfType(clipboardService.TYPES.BLOCK, vm.availableContentTypesAliases);
+            entriesForPaste = clipboardService.retrieveEntriesOfType(clipboardService.TYPES.BLOCK, vm.availableContentTypesAliases);
             entriesForPaste.forEach(function (entry) {
                 var pasteEntry = {
                     type: clipboardService.TYPES.BLOCK,

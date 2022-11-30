@@ -64,6 +64,8 @@
                 setActiveVariant();
             } else if (changes.segment && !changes.segment.isFirstChange() && changes.segment.currentValue !== changes.segment.previousValue) {
                 setActiveVariant();
+            } else if (changes.content) {
+                setActiveVariant();
             }
         }
 

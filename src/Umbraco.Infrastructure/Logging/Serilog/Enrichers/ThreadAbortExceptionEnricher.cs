@@ -38,9 +38,9 @@ public class ThreadAbortExceptionEnricher : ILogEventEnricher
         }
     }
 
-    private static bool IsTimeoutThreadAbortException(Exception exception)
+    private static bool IsTimeoutThreadAbortException(Exception? exception)
     {
-        if (!(exception is ThreadAbortException abort))
+        if (exception is null || !(exception is ThreadAbortException abort))
         {
             return false;
         }
@@ -76,7 +76,7 @@ public class ThreadAbortExceptionEnricher : ILogEventEnricher
 
         // dump if configured, or if stacktrace contains Monitor.ReliableEnter
         var dump = _coreDebugSettings.DumpOnTimeoutThreadAbort ||
-                   IsMonitorEnterThreadAbortException(logEvent.Exception);
+                   IsMonitorEnterThreadAbortException(logEvent.Exception!);
 
         // dump if it is ok to dump (might have a cap on number of dump...)
         dump &= MiniDump.OkToDump(_hostingEnvironment);

@@ -2,10 +2,10 @@
 // See LICENSE for more details.
 
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
@@ -18,7 +18,8 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     "Textarea",
     "textarea",
     ValueType = ValueTypes.Text,
-    Icon = "icon-application-window-alt")]
+    Icon = "icon-application-window-alt",
+    ValueEditorIsReusable = true)]
 public class TextAreaPropertyEditor : DataEditor
 {
     private readonly IEditorConfigurationParser _editorConfigurationParser;

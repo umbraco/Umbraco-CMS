@@ -77,7 +77,7 @@
 (function() {
     'use strict';
 
-    function LightboxDirective() {
+    function LightboxDirective(focusLockService) {
 
         function link(scope, el, attr, ctrl) {
 
@@ -88,6 +88,9 @@
 
                 el.appendTo("body");
 
+                
+                focusLockService.addInertAttribute();
+
                 // clean up
                 scope.$on('$destroy', function() {
                     // unbind watchers
@@ -95,6 +98,9 @@
                         eventBindings[e]();
                     }
                     
+                    focusLockService.removeInertAttribute();
+
+                    document.getElementsByClassName("umb-lightbox__close")[0].blur();
                     el.remove();
                 });
             }
@@ -125,6 +131,7 @@
             scope.close = function() {
                 if(scope.onClose) {
                     scope.onClose();
+                    focusLockService.removeInertAttribute();
                 }
             };
 

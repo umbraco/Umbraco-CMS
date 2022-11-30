@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Core.Media.EmbedProviders;
 /// <summary>
 ///     Embed Provider for Dailymotion the popular online video-sharing platform.
 /// </summary>
-public class DailyMotion : EmbedProviderBase
+public class DailyMotion : OEmbedProviderBase
 {
     public DailyMotion(IJsonSerializer jsonSerializer)
         : base(jsonSerializer)

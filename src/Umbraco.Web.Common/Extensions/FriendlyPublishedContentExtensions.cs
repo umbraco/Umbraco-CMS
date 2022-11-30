@@ -4,12 +4,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Extensions;
 
@@ -330,7 +330,7 @@ public static class FriendlyPublishedContentExtensions
     ///         However, if an empty string is specified only invariant children are returned.
     ///     </para>
     /// </remarks>
-    public static IEnumerable<IPublishedContent>? Children(this IPublishedContent content, string? culture = null)
+    public static IEnumerable<IPublishedContent> Children(this IPublishedContent content, string? culture = null)
         => content.Children(VariationContextAccessor, culture);
 
     /// <summary>

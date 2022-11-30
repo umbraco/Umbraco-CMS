@@ -2,13 +2,13 @@
 // See LICENSE for more details.
 
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
@@ -21,7 +21,8 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     "Content Picker",
     "contentpicker",
     ValueType = ValueTypes.String,
-    Group = Constants.PropertyEditors.Groups.Pickers)]
+    Group = Constants.PropertyEditors.Groups.Pickers,
+    ValueEditorIsReusable = true)]
 public class ContentPickerPropertyEditor : DataEditor
 {
     private readonly IEditorConfigurationParser _editorConfigurationParser;
