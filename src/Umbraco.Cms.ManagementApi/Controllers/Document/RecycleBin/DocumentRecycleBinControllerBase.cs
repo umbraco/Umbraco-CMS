@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using NSwag.Annotations;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -14,10 +13,10 @@ namespace Umbraco.Cms.ManagementApi.Controllers.Document.RecycleBin;
 
 [ApiVersion("1.0")]
 [ApiController]
-[VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.Document}/recycle-bin")]
+[VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.RecycleBin}/{Constants.UdiEntityType.Document}")]
 [RequireDocumentTreeRootAccess]
 [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-[OpenApiTag(nameof(Constants.UdiEntityType.Document))]
+[ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Document))]
 public class DocumentRecycleBinControllerBase : RecycleBinControllerBase<RecycleBinItemViewModel>
 {
     public DocumentRecycleBinControllerBase(IEntityService entityService)

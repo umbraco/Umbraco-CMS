@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using NSwag.Annotations;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
@@ -15,8 +15,8 @@ namespace Umbraco.Cms.ManagementApi.Controllers.Media.Tree;
 
 [ApiVersion("1.0")]
 [ApiController]
-[VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.Media}/tree")]
-[OpenApiTag(nameof(Constants.UdiEntityType.Media))]
+[VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/{Constants.UdiEntityType.Media}")]
+[ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Media))]
 public class MediaTreeControllerBase : UserStartNodeTreeControllerBase<ContentTreeItemViewModel>
 {
     private readonly AppCaches _appCaches;

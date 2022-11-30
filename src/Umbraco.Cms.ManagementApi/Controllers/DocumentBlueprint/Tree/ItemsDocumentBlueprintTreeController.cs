@@ -13,7 +13,7 @@ public class ItemsDocumentBlueprintTreeController : DocumentBlueprintTreeControl
     {
     }
 
-    [HttpGet("items")]
+    [HttpGet("item")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<DocumentBlueprintTreeItemViewModel>), StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<DocumentBlueprintTreeItemViewModel>>> Items([FromQuery(Name = "key")] Guid[] keys)

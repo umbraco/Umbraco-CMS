@@ -1,9 +1,10 @@
 angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.RTEController",
-        function ($scope, $q, assetsService, $timeout, tinyMceService, angularHelper, tinyMceAssets) {
+        function ($scope, $q, assetsService, $timeout, tinyMceService, angularHelper, tinyMceAssets, $element) {
 
             // TODO: A lot of the code below should be shared between the grid rte and the normal rte
 
+            var unsubscribe = [];
             $scope.isLoading = true;
 
             //To id the html textarea we need to use the datetime ticks because we can have multiple rte's per a single property alias
@@ -19,9 +20,9 @@ angular.module("umbraco")
             var width = editorConfig.dimensions ? parseInt(editorConfig.dimensions.width, 10) || null : null;
             var height = editorConfig.dimensions ? parseInt(editorConfig.dimensions.height, 10) || null : null;
 
-            $scope.containerWidth = editorConfig.mode === "distraction-free" ? (width ? width : "auto") : "auto";
-            $scope.containerHeight = editorConfig.mode === "distraction-free" ? (height ? height : "auto") : "auto";
-            $scope.containerOverflow = editorConfig.mode === "distraction-free" ? (height ? "auto" : "inherit") : "inherit";
+            $scope.containerWidth = "auto";
+            $scope.containerHeight = "auto";
+            $scope.containerOverflow = "inherit";
 
             var promises = [];
 
@@ -73,6 +74,12 @@ angular.module("umbraco")
                             $scope.isLoading = false;
                         });
                     });
+                    tinyMceEditor.on("focus", function () {
+                        $element[0].dispatchEvent(new CustomEvent('umb-rte-focus', {composed: true, bubbles: true}));
+                    });
+                    tinyMceEditor.on("blur", function () {
+                        $element[0].dispatchEvent(new CustomEvent('umb-rte-blur', {composed: true, bubbles: true}));
+                    });
 
                     //initialize the standard editor functionality for Umbraco
                     tinyMceService.initializeEditor({
@@ -96,11 +103,11 @@ angular.module("umbraco")
                 }, 150);
 
                 //listen for formSubmitting event (the result is callback used to remove the event subscription)
-                var unsubscribe = $scope.$on("formSubmitting", function () {
+                unsubscribe.push($scope.$on("formSubmitting", function () {
                     if (tinyMceEditor !== undefined && tinyMceEditor != null && !$scope.isLoading) {
                         $scope.model.value = tinyMceEditor.getContent();
                     }
-                });
+                }));
 
                 $scope.focus = function () {
                     tinyMceEditor.focus();
@@ -110,8 +117,13 @@ angular.module("umbraco")
                 // NOTE: this is very important otherwise if this is part of a modal, the listener still exists because the dom
                 // element might still be there even after the modal has been hidden.
                 $scope.$on('$destroy', function () {
-                    unsubscribe();
+                    for (var i = 0; i < unsubscribe.length; i++) {
+                        unsubscribe[i]();
+                    }
                     if (tinyMceEditor !== undefined && tinyMceEditor != null) {
+                        if($element) {
+                            $element[0]?.dispatchEvent(new CustomEvent('blur', {composed: true, bubbles: true}));
+                        }
                         tinyMceEditor.destroy()
                     }
                 });

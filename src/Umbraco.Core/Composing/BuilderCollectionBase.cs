@@ -10,9 +10,8 @@ public abstract class BuilderCollectionBase<TItem> : IBuilderCollection<TItem>
 {
     private readonly LazyReadOnlyCollection<TItem> _items;
 
-    /// Initializes a new instance of the
-    /// <see cref="BuilderCollectionBase{TItem}" />
-    /// with items.
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="BuilderCollectionBase{TItem}" /> with items.
     /// </summary>
     /// <param name="items">The items.</param>
     public BuilderCollectionBase(Func<IEnumerable<TItem>> items) => _items = new LazyReadOnlyCollection<TItem>(items);
