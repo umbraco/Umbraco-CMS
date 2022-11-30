@@ -11,7 +11,8 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     EditorType.PropertyValue | EditorType.MacroParameter,
     "Decimal",
     "decimal",
-    ValueType = ValueTypes.Decimal)]
+    ValueType = ValueTypes.Decimal,
+    ValueEditorIsReusable = true)]
 public class DecimalPropertyEditor : DataEditor
 {
     /// <summary>
@@ -19,9 +20,8 @@ public class DecimalPropertyEditor : DataEditor
     /// </summary>
     public DecimalPropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory)
-        : base(dataValueEditorFactory)
-    {
-    }
+        : base(dataValueEditorFactory) =>
+        SupportsReadOnly = true;
 
     /// <inheritdoc />
     protected override IDataValueEditor CreateValueEditor()

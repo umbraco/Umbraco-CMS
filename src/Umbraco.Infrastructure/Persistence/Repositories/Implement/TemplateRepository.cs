@@ -1,8 +1,10 @@
 using System.Text;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -24,17 +26,26 @@ internal class TemplateRepository : EntityRepositoryBase<int, ITemplate>, ITempl
 {
     private readonly IIOHelper _ioHelper;
     private readonly IShortStringHelper _shortStringHelper;
-    private readonly IViewHelper _viewHelper;
     private readonly IFileSystem? _viewsFileSystem;
+    private readonly IViewHelper _viewHelper;
+    private readonly IOptionsMonitor<RuntimeSettings> _runtimeSettings;
 
-    public TemplateRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<TemplateRepository> logger,
-        FileSystems fileSystems, IIOHelper ioHelper, IShortStringHelper shortStringHelper, IViewHelper viewHelper)
+    public TemplateRepository(
+        IScopeAccessor scopeAccessor,
+        AppCaches cache,
+        ILogger<TemplateRepository> logger,
+        FileSystems fileSystems,
+        IIOHelper ioHelper,
+        IShortStringHelper shortStringHelper,
+        IViewHelper viewHelper,
+        IOptionsMonitor<RuntimeSettings> runtimeSettings)
         : base(scopeAccessor, cache, logger)
     {
         _ioHelper = ioHelper;
         _shortStringHelper = shortStringHelper;
         _viewsFileSystem = fileSystems.MvcViewsFileSystem;
         _viewHelper = viewHelper;
+        _runtimeSettings = runtimeSettings;
     }
 
     public Stream GetFileContentStream(string filepath)
@@ -421,8 +432,12 @@ internal class TemplateRepository : EntityRepositoryBase<int, ITemplate>, ITempl
         template.Id = nodeDto.NodeId; //Set Id on entity to ensure an Id is set
         template.Path = nodeDto.Path;
 
-        //now do the file work
-        SaveFile(template);
+        // Only save file when not in production runtime mode
+        if (_runtimeSettings.CurrentValue.Mode != RuntimeMode.Production)
+        {
+            //now do the file work
+            SaveFile(template);
+        }
 
         template.ResetDirtyProperties();
 
@@ -476,8 +491,12 @@ internal class TemplateRepository : EntityRepositoryBase<int, ITemplate>, ITempl
         IEnumerable<IUmbracoEntity> axisDefs = GetAxisDefinitions(dto);
         template.IsMasterTemplate = axisDefs.Any(x => x.ParentId == dto.NodeId);
 
-        //now do the file work
-        SaveFile((Template)entity, originalAlias);
+        // Only save file when not in production runtime mode
+        if (_runtimeSettings.CurrentValue.Mode != RuntimeMode.Production)
+        {
+            //now do the file work
+            SaveFile((Template)entity, originalAlias);
+        }
 
         entity.ResetDirtyProperties();
 

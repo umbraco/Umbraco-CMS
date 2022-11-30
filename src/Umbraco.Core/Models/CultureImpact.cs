@@ -18,7 +18,8 @@ public sealed class CultureImpact
     /// </summary>
     /// <param name="culture">The culture code.</param>
     /// <param name="isDefault">A value indicating whether the culture is the default culture.</param>
-    private CultureImpact(string? culture, bool isDefault = false)
+    /// <param name="allowEditInvariantFromNonDefault">A value indicating if publishing invariant properties from non-default language.</param>
+    internal CultureImpact(string? culture, bool isDefault = false, bool allowEditInvariantFromNonDefault = false)
     {
         if (culture != null && culture.IsNullOrWhiteSpace())
         {
@@ -33,6 +34,8 @@ public sealed class CultureImpact
         }
 
         ImpactsOnlyDefaultCulture = isDefault;
+
+        AllowEditInvariantFromNonDefault = allowEditInvariantFromNonDefault;
     }
 
     [Flags]
@@ -102,7 +105,7 @@ public sealed class CultureImpact
     /// </summary>
     public bool ImpactsAlsoInvariantProperties => !ImpactsOnlyInvariantCulture &&
                                                   !ImpactsAllCultures &&
-                                                  ImpactsOnlyDefaultCulture;
+                                                  (ImpactsOnlyDefaultCulture || AllowEditInvariantFromNonDefault);
 
     public Behavior CultureBehavior
     {
@@ -142,7 +145,8 @@ public sealed class CultureImpact
     /// <param name="savingCultures"></param>
     /// <param name="defaultCulture"></param>
     /// <returns></returns>
-    public static string? GetCultureForInvariantErrors(IContent? content, string?[] savingCultures, string? defaultCulture)
+    public static string? GetCultureForInvariantErrors(IContent? content, string?[] savingCultures,
+        string? defaultCulture)
     {
         if (content == null)
         {
@@ -178,6 +182,8 @@ public sealed class CultureImpact
     /// </summary>
     /// <param name="culture">The culture code.</param>
     /// <param name="isDefault">A value indicating whether the culture is the default culture.</param>
+    /// <param name="allowEditInvariantFromNonDefault">A value indicating if publishing invariant properties from non-default language.</param>
+    [Obsolete("Use ICultureImpactService instead.")]
     public static CultureImpact Explicit(string? culture, bool isDefault)
     {
         if (culture == null)
@@ -205,13 +211,15 @@ public sealed class CultureImpact
     /// <param name="culture">The culture code.</param>
     /// <param name="isDefault">A value indicating whether the culture is the default culture.</param>
     /// <param name="content">The content item.</param>
+    /// <param name="allowEditInvariantFromNonDefault">A value indicating if publishing invariant properties from non-default language.</param>
     /// <remarks>
     ///     <para>Validates that the culture is compatible with the variation.</para>
     /// </remarks>
+    [Obsolete("Use ICultureImpactService instead, scheduled for removal in V12")]
     public static CultureImpact? Create(string culture, bool isDefault, IContent content)
     {
         // throws if not successful
-        TryCreate(culture, isDefault, content.ContentType.Variations, true, out CultureImpact? impact);
+        TryCreate(culture, isDefault, content.ContentType.Variations, true, false, out CultureImpact? impact);
         return impact;
     }
 
@@ -223,12 +231,16 @@ public sealed class CultureImpact
     /// <param name="isDefault">A value indicating whether the culture is the default culture.</param>
     /// <param name="variation">A content variation.</param>
     /// <param name="throwOnFail">A value indicating whether to throw if the impact cannot be created.</param>
+    /// <param name="editInvariantFromNonDefault">A value indicating if publishing invariant properties from non-default language.</param>
     /// <param name="impact">The impact if it could be created, otherwise null.</param>
     /// <returns>A value indicating whether the impact could be created.</returns>
     /// <remarks>
     ///     <para>Validates that the culture is compatible with the variation.</para>
     /// </remarks>
-    internal static bool TryCreate(string culture, bool isDefault, ContentVariation variation, bool throwOnFail, out CultureImpact? impact)
+    // Remove this once Create() can be removed (V12), this already lives in CultureImpactFactory
+    [Obsolete("Please use the CultureImpactFactory instead, scheduled for removal in v12")]
+    internal static bool TryCreate(string culture, bool isDefault, ContentVariation variation, bool throwOnFail,
+        bool editInvariantFromNonDefault, out CultureImpact? impact)
     {
         impact = null;
 
@@ -305,7 +317,10 @@ public sealed class CultureImpact
         }
 
         // return specific impact
-        impact = new CultureImpact(culture, isDefault);
+        impact = new CultureImpact(culture, isDefault, editInvariantFromNonDefault);
         return true;
     }
+
+
+    public bool AllowEditInvariantFromNonDefault { get; }
 }

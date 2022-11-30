@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
@@ -56,10 +57,13 @@ public class TemplateRepositoryTest : UmbracoIntegrationTest
     private IHostingEnvironment HostingEnvironment => GetRequiredService<IHostingEnvironment>();
 
     private FileSystems FileSystems => GetRequiredService<FileSystems>();
+
     private IViewHelper ViewHelper => GetRequiredService<IViewHelper>();
 
+    private IOptionsMonitor<RuntimeSettings> RuntimeSettings => GetRequiredService<IOptionsMonitor<RuntimeSettings>>();
+
     private ITemplateRepository CreateRepository(IScopeProvider provider) =>
-        new TemplateRepository((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<TemplateRepository>(), FileSystems, IOHelper, ShortStringHelper, ViewHelper);
+        new TemplateRepository((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<TemplateRepository>(), FileSystems, IOHelper, ShortStringHelper, ViewHelper, RuntimeSettings);
 
     [Test]
     public void Can_Instantiate_Repository()

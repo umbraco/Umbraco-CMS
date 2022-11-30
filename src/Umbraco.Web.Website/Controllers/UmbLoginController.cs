@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Security;
@@ -8,7 +9,6 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Web.Common.ActionsResults;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Cms.Web.Common.Filters;
 using Umbraco.Cms.Web.Common.Models;
 using Umbraco.Cms.Web.Common.Security;
@@ -39,28 +39,6 @@ public class UmbLoginController : SurfaceController
         _signInManager = signInManager;
         _memberManager = memberManager;
         _twoFactorLoginService = twoFactorLoginService;
-    }
-
-    [Obsolete("Use ctor with all params")]
-    public UmbLoginController(
-        IUmbracoContextAccessor umbracoContextAccessor,
-        IUmbracoDatabaseFactory databaseFactory,
-        ServiceContext services,
-        AppCaches appCaches,
-        IProfilingLogger profilingLogger,
-        IPublishedUrlProvider publishedUrlProvider,
-        IMemberSignInManager signInManager)
-        : this(
-            umbracoContextAccessor,
-            databaseFactory,
-            services,
-            appCaches,
-            profilingLogger,
-            publishedUrlProvider,
-            signInManager,
-            StaticServiceProvider.Instance.GetRequiredService<IMemberManager>(),
-            StaticServiceProvider.Instance.GetRequiredService<ITwoFactorLoginService>())
-    {
     }
 
     [HttpPost]
@@ -103,7 +81,7 @@ public class UmbLoginController : SurfaceController
 
         if (result.RequiresTwoFactor)
         {
-            MemberIdentityUser attemptedUser = await _memberManager.FindByNameAsync(model.Username);
+            MemberIdentityUser? attemptedUser = await _memberManager.FindByNameAsync(model.Username);
             if (attemptedUser == null!)
             {
                 return new ValidationErrorResult(

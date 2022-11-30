@@ -28,9 +28,9 @@
                       ng-if="vm.tab.inherited">
             </umb-icon>
             <ng-form name="tabNameForm" data-element="tab-name">
-                <div class="umb-group-builder__tab-name" ng-if="vm.tab.inherited" title="{{vm.tab.alias}}">{{ vm.tab.name }}</div>
+                <div class="umb-group-builder__tab-name" ng-if="vm.tab.inherited || !vm.isOpen" title="{{vm.tab.alias}}">{{ vm.tab.name }}</div>
                 <input
-                    ng-if="!vm.tab.inherited"
+                    ng-if="!vm.tab.inherited && vm.isOpen"
                     class="umb-group-builder__group-title-input"
                     data-element="tab-name-field"
                     type="text"
@@ -40,7 +40,7 @@
                     title="{{vm.tab.alias}}"
                     ng-model="vm.tab.name"
                     ng-class="{'-placeholder': vm.tab.name == ''}"
-                    ng-disabled="!vm.isOpen || vm.allowChangeName === false"
+                    ng-disabled="vm.allowChangeName === false"
                     ng-change="vm.changeName()"
                     umb-auto-focus
                     umb-auto-resize

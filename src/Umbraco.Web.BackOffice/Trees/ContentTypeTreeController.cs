@@ -180,10 +180,10 @@ public class ContentTypeTreeController : TreeController, ISearchableTree
 
             menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
 
-                //no move action if this is a child doc type
+            // No move action if this is a child doc type
             if (parent == null)
             {
-                menu.Items.Add<ActionDelete>(LocalizedTextService, hasSeparator: true, opensDialog: true, useLegacyIcon: false);
+                menu.Items.Add<ActionMove>(LocalizedTextService, hasSeparator: true, opensDialog: true, useLegacyIcon: false);
             }
 
             menu.Items.Add<ActionCopy>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);

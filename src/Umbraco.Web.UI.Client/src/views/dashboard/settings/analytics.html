@@ -2,7 +2,7 @@
   <umb-box>
     <umb-box-content>
       <h3 class="bold">
-        <localize key="analytics_consentForAnalytics">Consent for analytics</localize>
+        <localize key="analytics_consentForAnalytics">Consent for telemetry data</localize>
       </h3>
       <div class="umb-healthcheck-help-text">
         <localize key="analytics_analyticsDescription">
@@ -13,7 +13,7 @@
           <br>
           <br>We <b>WILL NOT</b> collect any personal data such as content, code, user information, and all data will be fully anonymized.
         </localize>
-        <div ng-if="!vm.loading" style="padding-left: 12px;padding-top: 50px; padding-bottom: 50px; width: 25%">
+        <div ng-if="!vm.loading" style="padding-left: 12px; padding-top: 50px; padding-bottom: 50px; width: 280px;">
           <umb-range-slider
             ng-model="vm.val"
             on-setup="vm.setup(slider)"
@@ -23,29 +23,24 @@
         </div>
 
         <div ng-if="vm.sliderVal === 'Minimal'">
-          <b>{{vm.sliderVal}}</b>
-          <br>
           <localize key="analytics_minimalLevelDescription">We'll only send an anonymous site ID to let us know that the
             site exists.
           </localize>
         </div>
         <div ng-if="vm.sliderVal === 'Basic'">
-          <b>{{vm.sliderVal}}</b>
-          <br>
           <localize key="analytics_basicLevelDescription">We'll send site ID, umbraco version and packages installed
           </localize>
         </div>
         <div ng-if="vm.sliderVal === 'Detailed'">
-          <b>{{vm.sliderVal}}</b>
-          <br>
           <localize key="analytics_detailedLevelDescription">
-                  We will send:
-            <br>- Anonymized site ID, umbraco version, and packages installed.
-            <br>- Number of: Root nodes, Content nodes, Macros, Media, Document Types, Templates, Languages, Domains, User Group, Users, Members, and Property Editors in use.
-            <br>- System information: Webserver, server OS, server framework, server OS language, and database provider.
-            <br>- Configuration settings: Modelsbuilder mode, if custom Umbraco path exists, ASP environment, and if you are in debug mode.
-            <br>
-            <br><i>We might change what we send on the Detailed level in the future. If so, it will be listed above.
+            We will send:
+            <ul>
+              <li>Anonymized site ID, umbraco version, and packages installed.</li>
+              <li>Number of: Root nodes, Content nodes, Macros, Media, Document Types, Templates, Languages, Domains, User Group, Users, Members, and Property Editors in use.</li>
+              <li>System information: Webserver, server OS, server framework, server OS language, and database provider.</li>
+              <li>Configuration settings: Modelsbuilder mode, if custom Umbraco path exists, ASP environment, and if you are in debug mode.</li>
+            </ul>
+            <i>We might change what we send on the Detailed level in the future. If so, it will be listed above.
             <br>By choosing "Detailed" you agree to current and future anonymized information being collected.</i>
           </localize>
         </div>

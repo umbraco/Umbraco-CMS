@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.IO;
@@ -12,8 +13,8 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace Umbraco.Cms.Core.Services.Implement
 {
@@ -396,6 +397,11 @@ namespace Umbraco.Cms.Core.Services.Implement
         public Attempt<OperationResult<MoveOperationStatusType>?> Move(IDataType toMove, int parentId)
         {
             EventMessages evtMsgs = EventMessagesFactory.Get();
+            if (toMove.ParentId == parentId)
+            {
+                return OperationResult.Attempt.Fail(MoveOperationStatusType.FailedNotAllowedByPath, evtMsgs);
+            }
+
             var moveInfo = new List<MoveEventInfo<IDataType>>();
 
             using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -434,6 +440,42 @@ namespace Umbraco.Cms.Core.Services.Implement
             }
 
             return OperationResult.Attempt.Succeed(MoveOperationStatusType.Success, evtMsgs);
+        }
+
+        [Obsolete("Use the method which specifies the userId parameter")]
+        public Attempt<OperationResult<MoveOperationStatusType, IDataType>?> Copy(IDataType copying, int containerId)
+        {
+            return Copy(copying, containerId, Constants.Security.SuperUserId);
+        }
+
+        public Attempt<OperationResult<MoveOperationStatusType, IDataType>?> Copy(IDataType copying, int containerId, int userId = Constants.Security.SuperUserId)
+        {
+            var evtMsgs = EventMessagesFactory.Get();
+
+            IDataType copy;
+            try
+            {
+                if (containerId > 0)
+                {
+                    var container = GetContainer(containerId);
+                    if (container is null)
+                    {
+                        throw new DataOperationException<MoveOperationStatusType>(MoveOperationStatusType.FailedParentNotFound); // causes rollback
+                    }
+                }
+                copy = copying.DeepCloneWithResetIdentities();
+
+                copy.Name += " (copy)"; // might not be unique
+                copy.ParentId = containerId;
+
+                Save(copy, userId);
+            }
+            catch (DataOperationException<MoveOperationStatusType> ex)
+            {
+                return OperationResult.Attempt.Fail<MoveOperationStatusType, IDataType>(ex.Operation, evtMsgs); // causes rollback
+            }
+
+            return OperationResult.Attempt.Succeed(MoveOperationStatusType.Success, evtMsgs, copy);
         }
 
         /// <summary>

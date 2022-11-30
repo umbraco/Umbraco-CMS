@@ -303,23 +303,22 @@ public static class ContentRepositoryExtensions
         //  if the content type varies, everything is ok because some properties may be invariant
         if (!content.ContentType.SupportsPropertyVariation(impact.Culture, "*", true))
         {
-            throw new NotSupportedException(
-                $"Culture \"{impact.Culture}\" is not supported by content type \"{content.ContentType.Alias}\" with variation \"{content.ContentType.Variations}\".");
+            throw new NotSupportedException($"Culture \"{impact.Culture}\" is not supported by content type \"{content.ContentType.Alias}\" with variation \"{content.ContentType.Variations}\".");
         }
 
         // set names
         if (impact.ImpactsAllCultures)
         {
             // does NOT contain the invariant culture
-            foreach (var c in content.AvailableCultures)
+            foreach (var culture in content.AvailableCultures)
             {
-                var name = content.GetCultureName(c);
+                var name = content.GetCultureName(culture);
                 if (string.IsNullOrWhiteSpace(name))
                 {
                     return false;
                 }
 
-                content.SetPublishInfo(c, name, DateTime.Now);
+                content.SetPublishInfo(culture, name, DateTime.Now);
             }
         }
         else if (impact.ImpactsOnlyInvariantCulture)
@@ -328,7 +327,6 @@ public static class ContentRepositoryExtensions
             {
                 return false;
             }
-
             // PublishName set by repository - nothing to do here
         }
         else if (impact.ImpactsExplicitCulture)
@@ -352,7 +350,7 @@ public static class ContentRepositoryExtensions
 
             // maybe the specified culture did not impact the invariant culture, so PublishValues
             // above would skip it, yet it *also* impacts invariant properties
-            if (impact.ImpactsAlsoInvariantProperties)
+            if (impact.ImpactsAlsoInvariantProperties && (property.PropertyType.VariesByCulture() is false || impact.ImpactsOnlyDefaultCulture))
             {
                 property.PublishValues(null);
             }

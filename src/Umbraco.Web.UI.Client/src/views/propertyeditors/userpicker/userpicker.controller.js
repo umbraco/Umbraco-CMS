@@ -1,12 +1,15 @@
 function userPickerController($scope, iconHelper, editorService, overlayService, entityResource) {
 
+    var vm = this;
+
     function trim(str, chr) {
         var rgxtrim = (!chr) ? new RegExp('^\\s+|\\s+$', 'g') : new RegExp('^' + chr + '+|' + chr + '+$', 'g');
         return str.replace(rgxtrim, '');
     }
 
     $scope.renderModel = [];
-    $scope.allowRemove = true;
+    $scope.allowRemove = !$scope.readonly;
+    $scope.allowAdd = !$scope.readonly;
 
     var multiPicker = $scope.model.config.multiPicker && $scope.model.config.multiPicker !== '0' ? true : false;
 
@@ -17,6 +20,7 @@ function userPickerController($scope, iconHelper, editorService, overlayService,
     }
 
     $scope.openUserPicker = function () {
+        if (!$scope.allowAdd) return;
 
         var currentSelection = [];
         var userPicker = {
@@ -39,6 +43,8 @@ function userPickerController($scope, iconHelper, editorService, overlayService,
     };
 
     $scope.remove = function (index) {
+        if (!$scope.allowRemove) return;
+
         const dialog = {
             view: "views/propertyeditors/userpicker/overlays/remove.html",
             username: $scope.renderModel[index].name,
@@ -60,6 +66,8 @@ function userPickerController($scope, iconHelper, editorService, overlayService,
     };
 
     $scope.add = function (item) {
+        if (!$scope.allowAdd) return;
+
         var currIds = _.map($scope.renderModel, function (i) {
             if ($scope.model.config.idType === "udi") {
                 return i.udi;
@@ -79,6 +87,8 @@ function userPickerController($scope, iconHelper, editorService, overlayService,
     };
 
     $scope.clear = function() {
+        if (!$scope.allowRemove) return;
+        
         $scope.renderModel = [];
         setDirty();
     };

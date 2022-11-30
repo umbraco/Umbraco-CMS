@@ -5,12 +5,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Security;
@@ -81,29 +81,6 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
     {
     }
 
-    [Obsolete("Use non obsolete ctor")]
-    public BackOfficeUserStore(
-        ICoreScopeProvider scopeProvider,
-        IUserService userService,
-        IEntityService entityService,
-        IExternalLoginService externalLoginService,
-        IOptions<GlobalSettings> globalSettings,
-        IUmbracoMapper mapper,
-        BackOfficeErrorDescriber describer,
-        AppCaches appCaches)
-        : this(
-            scopeProvider,
-            userService,
-            entityService,
-            StaticServiceProvider.Instance.GetRequiredService<IExternalLoginWithKeyService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IOptionsSnapshot<GlobalSettings>>(),
-            mapper,
-            describer,
-            appCaches,
-            StaticServiceProvider.Instance.GetRequiredService<ITwoFactorLoginService>())
-    {
-    }
-
     /// <inheritdoc />
     public Task<bool> ValidateSessionIdAsync(string? userId, string? sessionId)
     {
@@ -140,12 +117,17 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
             throw new ArgumentNullException(nameof(user));
         }
 
-        // the password must be 'something' it could be empty if authenticating
-        // with an external provider so we'll just generate one and prefix it, the
-        // prefix will help us determine if the password hasn't actually been specified yet.
-        // this will hash the guid with a salt so should be nicely random
-        var aspHasher = new PasswordHasher<BackOfficeIdentityUser>();
-        var emptyPasswordValue = Constants.Security.EmptyPasswordPrefix +
+        if (user.Email is null || user.UserName is null)
+            {
+                throw new InvalidOperationException("Email and UserName is required.");
+            }
+
+            // the password must be 'something' it could be empty if authenticating
+            // with an external provider so we'll just generate one and prefix it, the
+            // prefix will help us determine if the password hasn't actually been specified yet.
+            // this will hash the guid with a salt so should be nicely random
+            var aspHasher = new PasswordHasher<BackOfficeIdentityUser>();
+            var emptyPasswordValue = Constants.Security.EmptyPasswordPrefix +
                                  aspHasher.HashPassword(user, Guid.NewGuid().ToString("N"));
 
         var userEntity = new User(_globalSettings, user.Name, user.Email, user.UserName, emptyPasswordValue)
@@ -278,16 +260,14 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
     }
 
     /// <inheritdoc />
-    public override Task<BackOfficeIdentityUser> FindByNameAsync(
-        string userName,
-        CancellationToken cancellationToken = default)
+    public override Task<BackOfficeIdentityUser?> FindByNameAsync(string userName, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
         ThrowIfDisposed();
         IUser? user = _userService.GetByUsername(userName);
         if (user == null)
         {
-            return Task.FromResult((BackOfficeIdentityUser)null!);
+            return Task.FromResult<BackOfficeIdentityUser?>(null);
         }
 
         BackOfficeIdentityUser? result = AssignLoginsCallback(_mapper.Map<BackOfficeIdentityUser>(user));
@@ -296,7 +276,7 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
     }
 
     /// <inheritdoc />
-    protected override Task<BackOfficeIdentityUser> FindUserAsync(string userId, CancellationToken cancellationToken)
+    protected override Task<BackOfficeIdentityUser?> FindUserAsync(string userId, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         ThrowIfDisposed();
@@ -311,7 +291,7 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
     }
 
     /// <inheritdoc />
-    public override Task<BackOfficeIdentityUser> FindByEmailAsync(
+    public override Task<BackOfficeIdentityUser?> FindByEmailAsync(
         string email,
         CancellationToken cancellationToken = default)
     {
@@ -322,11 +302,11 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
             ? null
             : _mapper.Map<BackOfficeIdentityUser>(user);
 
-        return Task.FromResult(AssignLoginsCallback(result))!;
+        return Task.FromResult(AssignLoginsCallback(result));
     }
 
     /// <inheritdoc />
-    public override async Task SetPasswordHashAsync(BackOfficeIdentityUser user, string passwordHash, CancellationToken cancellationToken = default)
+    public override async Task SetPasswordHashAsync(BackOfficeIdentityUser user, string? passwordHash, CancellationToken cancellationToken = default)
     {
         await base.SetPasswordHashAsync(user, passwordHash, cancellationToken);
 
@@ -428,7 +408,7 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
     ///     tracking ORMs like EFCore.
     /// </remarks>
     /// <inheritdoc />
-    public override Task SetTokenAsync(BackOfficeIdentityUser user, string loginProvider, string name, string value, CancellationToken cancellationToken)
+    public override Task SetTokenAsync(BackOfficeIdentityUser user, string loginProvider, string name, string? value, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         ThrowIfDisposed();
@@ -440,28 +420,35 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
 
         IIdentityUserToken? token = user.LoginTokens.FirstOrDefault(x =>
             x.LoginProvider.InvariantEquals(loginProvider) && x.Name.InvariantEquals(name));
-        if (token == null)
+
+        // We have to remove token and then re-add to ensure that LoginTokens are dirty, which is required for them to save
+        // This is because we're using an observable collection, which only cares about added/removed items.
+        if (token is not null)
         {
-            user.LoginTokens.Add(new IdentityUserToken(loginProvider, name, value, user.Id));
+            // The token hasn't changed, so there's no reason for us to re-add it.
+            if (token.Value == value)
+            {
+                return Task.CompletedTask;
+            }
+
+            user.LoginTokens.Remove(token);
         }
-        else
-        {
-            token.Value = value;
-        }
+
+        user.LoginTokens.Add(new IdentityUserToken(loginProvider, name, value, user.Id));
 
         return Task.CompletedTask;
     }
 
     /// <inheritdoc />
-    protected override async Task<IdentityUserLogin<string>> FindUserLoginAsync(string userId, string loginProvider, string providerKey, CancellationToken cancellationToken)
+    protected override async Task<IdentityUserLogin<string>?> FindUserLoginAsync(string userId, string loginProvider, string providerKey, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         ThrowIfDisposed();
 
-        BackOfficeIdentityUser user = await FindUserAsync(userId, cancellationToken);
-        if (user is null || user.Id is null)
+        BackOfficeIdentityUser? user = await FindUserAsync(userId, cancellationToken);
+        if (user?.Id is null)
         {
-            return null!;
+            return null;
         }
 
         IList<UserLoginInfo> logins = await GetLoginsAsync(user, cancellationToken);
@@ -469,7 +456,7 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
             logins.FirstOrDefault(x => x.ProviderKey == providerKey && x.LoginProvider == loginProvider);
         if (found == null)
         {
-            return null!;
+            return null;
         }
 
         return new IdentityUserLogin<string>
@@ -482,7 +469,7 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
     }
 
     /// <inheritdoc />
-    protected override Task<IdentityUserLogin<string>> FindUserLoginAsync(string loginProvider, string providerKey, CancellationToken cancellationToken)
+    protected override Task<IdentityUserLogin<string>?> FindUserLoginAsync(string loginProvider, string providerKey, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         ThrowIfDisposed();
@@ -490,11 +477,11 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
         var logins = _externalLoginService.Find(loginProvider, providerKey).ToList();
         if (logins.Count == 0)
         {
-            return Task.FromResult((IdentityUserLogin<string>)null!);
+            return Task.FromResult<IdentityUserLogin<string>?>(null);
         }
 
         IIdentityUserLogin found = logins[0];
-        return Task.FromResult(new IdentityUserLogin<string>
+        return Task.FromResult<IdentityUserLogin<string>?>(new IdentityUserLogin<string>
         {
             LoginProvider = found.LoginProvider,
             ProviderKey = found.ProviderKey,
@@ -504,30 +491,33 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
     }
 
     /// <inheritdoc />
-    protected override Task<IdentityRole<string>> FindRoleAsync(
+    protected override Task<IdentityRole<string>?> FindRoleAsync(
         string normalizedRoleName,
         CancellationToken cancellationToken)
     {
         IUserGroup? group = _userService.GetUserGroupByAlias(normalizedRoleName);
-        if (group == null)
+        if (group?.Name is null)
         {
-            return Task.FromResult((IdentityRole<string>)null!);
+            return Task.FromResult<IdentityRole<string>?>(null);
         }
 
-        return Task.FromResult(new IdentityRole<string>(group.Name) { Id = group.Alias });
+        return Task.FromResult<IdentityRole<string>?>(new IdentityRole<string>(group.Name)
+        {
+            Id = group.Alias,
+        });
     }
 
     /// <inheritdoc />
-    protected override async Task<IdentityUserRole<string>> FindUserRoleAsync(string userId, string roleId, CancellationToken cancellationToken)
+    protected override async Task<IdentityUserRole<string>?> FindUserRoleAsync(string userId, string roleId, CancellationToken cancellationToken)
     {
-        BackOfficeIdentityUser user = await FindUserAsync(userId, cancellationToken);
+        BackOfficeIdentityUser? user = await FindUserAsync(userId, cancellationToken);
         if (user == null)
         {
             return null!;
         }
 
         IdentityUserRole<string>? found = user.Roles.FirstOrDefault(x => x.RoleId.InvariantEquals(roleId));
-        return found!;
+        return found;
     }
 
     private BackOfficeIdentityUser? AssignLoginsCallback(BackOfficeIdentityUser? user)
@@ -599,7 +589,7 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
             && user.Email != identityUser.Email && identityUser.Email.IsNullOrWhiteSpace() == false)
         {
             anythingChanged = true;
-            user.Email = identityUser.Email;
+            user.Email = identityUser.Email!;
         }
 
         if (identityUser.IsPropertyDirty(nameof(BackOfficeIdentityUser.AccessFailedCount))
@@ -631,7 +621,7 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
             && user.Username != identityUser.UserName && identityUser.UserName.IsNullOrWhiteSpace() == false)
         {
             anythingChanged = true;
-            user.Username = identityUser.UserName;
+            user.Username = identityUser.UserName!;
         }
 
         if (identityUser.IsPropertyDirty(nameof(BackOfficeIdentityUser.PasswordHash))
@@ -704,12 +694,11 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
     }
 
     /// <summary>
-    ///     Overridden to support Umbraco's own data storage requirements
+    /// Overridden to support Umbraco's own data storage requirements
     /// </summary>
     /// <remarks>
-    ///     The base class's implementation of this calls into FindTokenAsync, RemoveUserTokenAsync and AddUserTokenAsync, both
-    ///     methods will only work with ORMs that are change
-    ///     tracking ORMs like EFCore.
+    /// The base class's implementation of this calls into FindTokenAsync, RemoveUserTokenAsync and AddUserTokenAsync, both methods will only work with ORMs that are change
+    /// tracking ORMs like EFCore.
     /// </remarks>
     /// <inheritdoc />
     public override Task RemoveTokenAsync(BackOfficeIdentityUser user, string loginProvider, string name, CancellationToken cancellationToken)

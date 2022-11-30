@@ -4,6 +4,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Hosting;
@@ -12,7 +13,6 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 using ComponentCollection = Umbraco.Cms.Core.Composing.ComponentCollection;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
@@ -169,12 +169,9 @@ public class CoreRuntime : IRuntime
         // Acquire the main domain - if this fails then anything that should be registered with MainDom will not operate
         AcquireMainDom();
 
-        // TODO (V10): Remove this obsoleted notification publish.
-        await _eventAggregator.PublishAsync(new UmbracoApplicationMainDomAcquiredNotification(), cancellationToken);
-
         // Notify for unattended install
-        await _eventAggregator.PublishAsync(new RuntimeUnattendedInstallNotification(), cancellationToken);
-        DetermineRuntimeLevel();
+            await _eventAggregator.PublishAsync(new RuntimeUnattendedInstallNotification(), cancellationToken);
+            DetermineRuntimeLevel();
 
         if (!State.UmbracoCanBoot())
         {
@@ -212,13 +209,8 @@ public class CoreRuntime : IRuntime
                 break;
         }
 
-        // TODO (V10): Remove this obsoleted notification publish
-        await _eventAggregator.PublishAsync(
-            new UmbracoApplicationComponentsInstallingNotification(State.Level),
-            cancellationToken);
-
         // Initialize the components
-        _components.Initialize();
+            _components.Initialize();
 
         await _eventAggregator.PublishAsync(
             new UmbracoApplicationStartingNotification(State.Level, isRestarting),

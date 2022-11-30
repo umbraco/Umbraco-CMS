@@ -8,6 +8,14 @@ angular.module('umbraco.services')
         // this is used so that we know when to go and get the user's remaining seconds directly.
         var lastServerTimeoutSet = null;
 
+        eventsService.on("editors.languages.languageSaved", () => {
+            service.refreshCurrentUser();
+        });
+
+        eventsService.on("editors.userGroups.userGroupSaved", () => {
+            service.refreshCurrentUser();
+        });
+
         function openLoginDialog(isTimedOut) {
             //broadcast a global event that the user is no longer logged in
             const args = { isTimedOut: isTimedOut };
@@ -158,7 +166,7 @@ angular.module('umbraco.services')
             }
         });
 
-        return {
+        const service = {
 
             /** Internal method to display the login dialog */
             _showLoginDialog: function () {
@@ -291,5 +299,7 @@ angular.module('umbraco.services')
                 return emailMarketingResource.postAddUserToEmailMarketing(user);
             }
         };
+
+        return service;
 
     });

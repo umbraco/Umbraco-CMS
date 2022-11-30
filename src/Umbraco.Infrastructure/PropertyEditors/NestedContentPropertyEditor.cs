@@ -5,13 +5,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
@@ -21,11 +21,13 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 [DataEditor(
     Constants.PropertyEditors.Aliases.NestedContent,
-    "Nested Content",
+    "Nested Content (legacy)",
     "nestedcontent",
     ValueType = ValueTypes.Json,
     Group = Constants.PropertyEditors.Groups.Lists,
-    Icon = "icon-thumbnail-list")]
+    Icon = "icon-thumbnail-list",
+    ValueEditorIsReusable = false,
+    IsDeprecated = true)]
 public class NestedContentPropertyEditor : DataEditor
 {
     public const string ContentTypeAliasPropertyKey = "ncContentTypeAlias";
@@ -49,6 +51,7 @@ public class NestedContentPropertyEditor : DataEditor
     {
         _ioHelper = ioHelper;
         _editorConfigurationParser = editorConfigurationParser;
+        SupportsReadOnly = true;
     }
 
     #region Pre Value Editor

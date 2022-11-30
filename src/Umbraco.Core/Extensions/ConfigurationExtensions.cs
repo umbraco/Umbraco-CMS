@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 
 namespace Umbraco.Extensions;
@@ -101,4 +102,6 @@ public static class ConfigurationExtensions
     /// </returns>
     public static RuntimeMode GetRuntimeMode(this IConfiguration configuration)
         => configuration.GetValue<RuntimeMode>(Constants.Configuration.ConfigRuntimeMode);
+
+    public static ModelsMode GetModelsMode(this IConfiguration configuration) => (configuration.GetSection(Constants.Configuration.ConfigModelsBuilder).Get<ModelsBuilderSettings>() ?? new ModelsBuilderSettings()).ModelsMode;
 }
