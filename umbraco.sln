@@ -158,6 +158,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Cms.Imaging.ImageSh
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{05878304-40EB-4F84-B40B-91BDB70DE094}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Cms.ContentApi", "src\Umbraco.Cms.ContentApi\Umbraco.Cms.ContentApi.csproj", "{9AA3D21F-81A9-4F27-85D1-CE850B59DC2D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -316,6 +318,12 @@ Global
 		{C280181E-597B-4AA5-82E7-D7017E928749}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C280181E-597B-4AA5-82E7-D7017E928749}.SkipTests|Any CPU.ActiveCfg = Debug|Any CPU
 		{C280181E-597B-4AA5-82E7-D7017E928749}.SkipTests|Any CPU.Build.0 = Debug|Any CPU
+		{9AA3D21F-81A9-4F27-85D1-CE850B59DC2D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9AA3D21F-81A9-4F27-85D1-CE850B59DC2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9AA3D21F-81A9-4F27-85D1-CE850B59DC2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9AA3D21F-81A9-4F27-85D1-CE850B59DC2D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9AA3D21F-81A9-4F27-85D1-CE850B59DC2D}.SkipTests|Any CPU.ActiveCfg = Debug|Any CPU
+		{9AA3D21F-81A9-4F27-85D1-CE850B59DC2D}.SkipTests|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
