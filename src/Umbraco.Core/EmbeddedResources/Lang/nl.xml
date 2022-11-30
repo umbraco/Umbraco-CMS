@@ -2552,7 +2552,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="areasConfigurations">Gebieden</key>
     <key alias="areasConfigurationsHelp">Om het nesten van blokken binnen-in dit blok toe te staan, definieer een of meer gebieden voor blokken om binnenin te nesten. Gebieden volgen hun eigen lay-out welke gedefinieerd is bij de Grid Kolommen voor Gebieden. Elk Gebied kolombreedte can worden gewijzigd door het gebruik van de schaal in de hoek rechtsonderin </key>
     <key alias="invalidDropPosition"><![CDATA[<strong>%0%</strong> is niet toegestaan op deze locatie.]]></key>
-    <key alias="defaultLayoutStylesheet">Default layout stylesheet</key>
+    <key alias="defaultLayoutStylesheet">Standaard lay-out stylesheet</key>
     <key alias="confirmPasteDisallowedNestedBlockHeadline">Niet-toegestane content is geweigerd</key>
     <key alias="confirmPasteDisallowedNestedBlockMessage">
       <![CDATA[De toegevoegde content bevat niet-toegestaande content, welke niet is aangemaakt. Wil je de rest van de content bewaren?]]></key>
