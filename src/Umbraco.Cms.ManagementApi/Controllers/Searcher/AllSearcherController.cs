@@ -5,23 +5,23 @@ using Umbraco.Cms.ManagementApi.ViewModels.Pagination;
 using Umbraco.Cms.ManagementApi.ViewModels.Search;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.ManagementApi.Controllers.Search;
+namespace Umbraco.Cms.ManagementApi.Controllers.Searcher;
 
 [ApiVersion("1.0")]
-public class SearcherListSearchController : SearchControllerBase
+public class AllSearcherController : SearcherControllerBase
 {
     private readonly IExamineManager _examineManager;
 
-    public SearcherListSearchController(IExamineManager examineManager) => _examineManager = examineManager;
+    public AllSearcherController(IExamineManager examineManager) => _examineManager = examineManager;
 
     /// <summary>
     ///     Get the details for searchers
     /// </summary>
     /// <returns></returns>
-    [HttpGet("searcher")]
+    [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<SearcherViewModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<SearcherViewModel>>> Searchers(int skip, int take)
+    public async Task<ActionResult<PagedViewModel<SearcherViewModel>>> All(int skip, int take)
     {
         var searchers = new List<SearcherViewModel>(
             _examineManager.RegisteredSearchers.Select(searcher => new SearcherViewModel { Name = searcher.Name })

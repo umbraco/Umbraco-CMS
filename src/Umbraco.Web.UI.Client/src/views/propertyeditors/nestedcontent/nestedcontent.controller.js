@@ -79,7 +79,7 @@
         });
 
         _.each(model.config.contentTypes, function (contentType) {
-            contentType.nameExp = !!contentType.nameTemplate
+            contentType.nameExp = contentType.nameTemplate
                 ? $interpolate(contentType.nameTemplate)
                 : undefined;
         });
@@ -626,7 +626,7 @@
             // Enforce min items if we only have one scaffold type
             var modelWasChanged = false;
             if (vm.nodes.length < vm.minItems && vm.scaffolds.length === 1) {
-                for (var i = vm.nodes.length; i < model.config.minItems; i++) {
+                for (var ii = vm.nodes.length; ii < model.config.minItems; ii++) {
                     addNode(vm.scaffolds[0].contentTypeAlias);
                 }
                 modelWasChanged = true;

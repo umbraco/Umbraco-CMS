@@ -255,7 +255,7 @@ public class BackOfficeController : UmbracoController
     [AllowAnonymous]
     public async Task<Dictionary<string, Dictionary<string, string>>> LocalizedText(string? culture = null)
     {
-        CultureInfo? cultureInfo;
+        CultureInfo? cultureInfo = null;
         if (string.IsNullOrWhiteSpace(culture))
         {
             // Force authentication to occur since this is not an authorized endpoint, we need this to get a user.
@@ -264,9 +264,12 @@ public class BackOfficeController : UmbracoController
             // It's entirely likely for a user to have a different culture in the backoffice, than their system.
             IIdentity? user = authenticationResult.Principal?.Identity;
 
-            cultureInfo = authenticationResult.Succeeded && user is not null
-                ? user.GetCulture()
-                : CultureInfo.GetCultureInfo(_globalSettings.DefaultUILanguage);
+            if (authenticationResult.Succeeded && user is not null)
+            {
+                cultureInfo = user.GetCulture();
+            }
+
+            cultureInfo ??= CultureInfo.GetCultureInfo(_globalSettings.DefaultUILanguage);
         }
         else
         {

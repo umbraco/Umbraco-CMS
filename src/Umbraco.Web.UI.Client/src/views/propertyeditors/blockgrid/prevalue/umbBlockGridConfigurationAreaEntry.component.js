@@ -2,9 +2,7 @@
     "use strict";
 
     /**
-     * 
      * Note for new backoffice: there is a lot of similarities between the Area configuration and the Block entry, as they both share Grid scaling features.
-     * TODO: Can we already as part of this PR make it shared as a dictionary or something?
      */
 
 
@@ -100,6 +98,13 @@
 
         function updateGridLayoutData() {
 
+            if(!layoutContainer) {
+                layoutContainer = $element[0].closest('.umb-block-grid-area-editor__grid-wrapper');
+                if(!layoutContainer) {
+                    console.error($element[0], 'could not find area-container');
+                }
+            }
+
             const computedStyles = window.getComputedStyle(layoutContainer);
 
             gridColumns = computedStyles.gridTemplateColumns.trim().split("px").map(x => Number(x));
@@ -125,12 +130,6 @@
             window.addEventListener('mousemove', vm.onMouseMove);
             window.addEventListener('mouseup', vm.onMouseUp);
             window.addEventListener('mouseleave', vm.onMouseUp);
-
-
-            layoutContainer = $element[0].closest('.umb-block-grid-area-editor__grid-wrapper');
-            if(!layoutContainer) {
-                console.error($element[0], 'could not find area-container');
-            }
 
             updateGridLayoutData();
 
@@ -217,6 +216,8 @@
 
         vm.scaleHandlerKeyUp = function($event) {
 
+            updateGridLayoutData();
+
             let addCol = 0;
             let addRow = 0;
 
@@ -236,7 +237,7 @@
             }
 
             // Todo: Ensure value fit with configuration.
-            vm.area.columnSpan = Math.max(vm.area.columnSpan + addCol, 1);
+            vm.area.columnSpan = Math.min(Math.max(vm.area.columnSpan + addCol, 1), gridColumns.length);
             vm.area.rowSpan = Math.max(vm.area.rowSpan + addRow, 1);
 
             $event.originalEvent.stopPropagation();

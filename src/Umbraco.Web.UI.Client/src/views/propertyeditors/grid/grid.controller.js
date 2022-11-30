@@ -46,7 +46,7 @@ angular.module("umbraco")
                 helper: "clone",
                 forcePlaceholderSize: true,
                 tolerance: "pointer",
-                zIndex: 999999999999999999,
+                zIndex: '999999999999999999',
                 scrollSensitivity: 100,
                 disabled: $scope.readonly,
                 cursorAt: {
@@ -119,7 +119,7 @@ angular.module("umbraco")
                 connectWith: ".umb-cell-inner",
                 forcePlaceholderSize: true,
                 tolerance: "pointer",
-                zIndex: 999999999999999999,
+                zIndex: '999999999999999999',
                 scrollSensitivity: 100,
                 disabled: $scope.readonly,
                 cursorAt: {
@@ -956,7 +956,7 @@ angular.module("umbraco")
                     });
                     // setup nametemplate
 
-                    value.nameExp = !!value.nameTemplate
+                    value.nameExp = value.nameTemplate
                         ? $interpolate(value.nameTemplate)
                         : undefined;
                 });

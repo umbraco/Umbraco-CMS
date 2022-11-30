@@ -130,7 +130,7 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
     $scope.options = {
         useInfiniteEditor: $scope.model.config.useInfiniteEditor === true,
         pageSize: $scope.model.config.pageSize ? $scope.model.config.pageSize : 10,
-        pageNumber: (listParamsForCurrent && $routeParams.page && Number($routeParams.page) != NaN && Number($routeParams.page) > 0) ? $routeParams.page : 1,
+        pageNumber: (listParamsForCurrent && $routeParams.page && !isNaN($routeParams.page) && Number($routeParams.page) > 0) ? $routeParams.page : 1,
         filter: (listParamsForCurrent && $routeParams.filter ? $routeParams.filter : '').trim(),
         orderBy: (listParamsForCurrent && $routeParams.orderBy ? $routeParams.orderBy : $scope.model.config.orderBy ? $scope.model.config.orderBy : 'VersionDate').trim(),
         orderDirection: (listParamsForCurrent && $routeParams.orderDirection ? $routeParams.orderDirection : $scope.model.config.orderDirection ? $scope.model.config.orderDirection : "desc").trim(),
@@ -154,7 +154,7 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
     };
     
     _.each($scope.options.includeProperties, function (property) {
-        property.nameExp = !!property.nameTemplate
+        property.nameExp = property.nameTemplate
             ? $interpolate(property.nameTemplate)
             : undefined;
     });
@@ -682,9 +682,18 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
             }
 
             if (e.nameExp) {
-                var newValue = e.nameExp({ value });
-                if (newValue && (newValue = newValue.trim())) {
-                    value = newValue;
+                if (/{{.*\s*\w+\s*\|\s*\w+\s*.*}}/.test(e.nameTemplate)) { //check whether the name template has a filter
+                    value = {
+                      value,
+                      expression: e.nameExp
+                    };
+                }
+                else {
+                    var newValue = e.nameExp({ value });
+
+                    if (newValue && (newValue = newValue.trim())) {
+                      value = newValue;
+                    }
                 }
             }
 

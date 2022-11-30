@@ -186,7 +186,7 @@ function dateTimePickerController($scope, angularHelper, dateHelper, validationM
             }
             else {
                 //create a normal moment , no offset required
-                var dateVal = $scope.model.value ? moment($scope.model.value, "YYYY-MM-DD HH:mm:ss") : moment();
+                dateVal = $scope.model.value ? moment($scope.model.value, "YYYY-MM-DD HH:mm:ss") : moment();
             }
             $scope.model.datetimePickerValue = dateVal.format($scope.model.config.format);
         }

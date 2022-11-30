@@ -43,7 +43,6 @@
         var unsubscribe = [];
         
         const vm = this;
-        
         vm.openBlock = null;
         vm.showSampleDataCTA = false;
 
@@ -57,7 +56,6 @@
             if (blockGroupModel.value == null) {
                 blockGroupModel.value = [];
             }
-            
             vm.blockGroups = blockGroupModel.value;
 
             if (!$scope.model.value) {
@@ -89,14 +87,13 @@
                 }
             }
         }
-        
         unsubscribe.push(eventsService.on("editors.documentType.saved", updateUsedElementTypes));
 
         function removeReferencesToElementTypeKey(contentElementTypeKey) {
             // Clean up references to this one:
             $scope.model.value.forEach(blockType => {
                 blockType.areas.forEach(area => {
-                    area.specifiedAllowance = area.specifiedAllowance?.filter(allowance => 
+                    area.specifiedAllowance = area.specifiedAllowance?.filter(allowance =>
                         allowance.elementTypeKey !== contentElementTypeKey
                     ) || [];
                 });
@@ -107,7 +104,7 @@
             // Clean up references to this one:
             $scope.model.value.forEach(blockType => {
                 blockType.areas.forEach(area => {
-                    area.specifiedAllowance = area.specifiedAllowance?.filter(allowance => 
+                    area.specifiedAllowance = area.specifiedAllowance?.filter(allowance =>
                         allowance.groupKey !== groupKey
                     ) || [];
                 });
@@ -156,7 +153,7 @@
         };
 
         vm.blockSortableOptions = {
-            ...defaultOptions, 
+            ...defaultOptions,
             "ui-floating": true,
             connectWith: ".umb-block-card-grid",
             items: "umb-block-card",
@@ -242,7 +239,6 @@
                 infiniteMode: true,
                 noTemplate: true,
                 isElement: true,
-                noTemplate: true,
                 submit: function(model) {
                     loadElementTypes().then(function() {
                         callback(model.documentTypeKey);
@@ -284,11 +280,11 @@
                         title: data,
                         openAreas: openAreas,
                         view: "views/propertyeditors/blockgrid/prevalue/blockgrid.blockconfiguration.overlay.html",
-                        size: "large",
+                        size: "medium",
                         submit: function(overlayModel) {
                             loadElementTypes()// lets load elementType again, to ensure we are up to date.
                             TransferProperties(overlayModel.block, block);// transfer properties back to block object. (Doing this cause we dont know if block object is added to model jet, therefor we cant use index or replace the object.)
-                            
+
                             overlayModel.close();
                         },
                         close: function() {
@@ -338,7 +334,7 @@
 
                                         return false;
                                     } else {
-                                        return true; 
+                                        return true;
                                     }
                                 }
                             );
@@ -360,7 +356,6 @@
                 });
             }
         }
-
         dataTypeResource.getAll().then(function(dataTypes) {
             if (dataTypes.filter(x => x.alias === "Umbraco.BlockGrid").length === 0) {
                 vm.showSampleDataCTA = true;
@@ -383,7 +378,7 @@
                             };
                             vm.blockGroups.push(sampleGroup);
                         }
-    
+
                         function initSampleBlock(udi, groupKey, options) {
                             const key = udiService.getKey(udi);
                             if ($scope.model.value.find(X => X.contentElementTypeKey === key) === undefined) {
@@ -391,7 +386,7 @@
                                 $scope.model.value.push(blockType);
                             }
                         }
-    
+
                         initSampleBlock(data.umbBlockGridDemoHeadlineBlock, sampleGroup.key, {"label": "Headline ({{headline | truncate:true:36}})", "view": "~/App_Plugins/Umbraco.BlockGridEditor.DefaultCustomViews/umbBlockGridDemoHeadlineBlock.html"});
                         initSampleBlock(data.umbBlockGridDemoImageBlock, sampleGroup.key, {"label": "Image", "view": "~/App_Plugins/Umbraco.BlockGridEditor.DefaultCustomViews/umbBlockGridDemoImageBlock.html"});
                         initSampleBlock(data.umbBlockGridDemoRichTextBlock, sampleGroup.key, { "label": "Rich Text  ({{richText | ncRichText | truncate:true:36}})", "view": "~/App_Plugins/Umbraco.BlockGridEditor.DefaultCustomViews/umbBlockGridDemoRichTextBlock.html"});
@@ -416,10 +411,10 @@
                             }
                         ];
                         initSampleBlock(data.umbBlockGridDemoTwoColumnLayoutBlock, sampleGroup.key, {"label": "Two Column Layout", "view": "~/App_Plugins/Umbraco.BlockGridEditor.DefaultCustomViews/umbBlockGridDemoTwoColumnLayoutBlock.html", "allowInAreas": false, "areas": twoColumnLayoutAreas});
-    
+
                         vm.showSampleDataCTA = false;
                     });
-                    
+
                 });
         }
 
