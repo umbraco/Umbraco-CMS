@@ -32,7 +32,7 @@ test.describe('Templates', () => {
     // which causes the save event to fire if we've added something to the header field, causing errors.
     await page.waitForTimeout(500);
 
-    await umbracoUi.getEditorHeaderName(name)
+    await umbracoUi.getEditorHeaderName(name);
     // Save
     // We must drop focus for the auto save event to occur.
     await page.focus('.btn-success');
@@ -43,7 +43,7 @@ test.describe('Templates', () => {
     // Now that the auto save event has finished we can save
     // and there wont be any duplicates or file in use errors.
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.save));
-    
+
     // Assert
     await umbracoUi.isSuccessNotificationVisible();
     // For some reason cy.umbracoErrorNotification tries to click the element which is not possible
@@ -63,14 +63,17 @@ test.describe('Templates', () => {
     await umbracoUi.navigateToTemplate(name);
 
     // Edit
+    // We select the template so it does not auto save.
+    await page.locator('.ace_content').click();
+    await page.waitForTimeout(1000);
     await page.locator('.ace_content').type(edit);
     await expect(await page.locator('.ace_content')).toBeVisible();
     await expect(await page.locator('.btn-success')).toBeVisible();
-
+    
     // Navigate away
     await umbracoUi.goToSection(ConstantHelper.sections.content);
     await umbracoUi.waitForTreeLoad(ConstantHelper.sections.content);
-
+    
     // Click stay button
     await page.locator('umb-button[label="Stay"] button:enabled').click();
 
@@ -90,7 +93,11 @@ test.describe('Templates', () => {
     await umbracoApi.templates.saveTemplate(template);
 
     await umbracoUi.navigateToTemplate(name);
+    
     // Edit
+    // We select the template so it does not auto save.
+    await page.locator('.ace_content').click();
+    await page.waitForTimeout(1000);
     await page.locator('.ace_content').type(edit);
     await expect(await page.locator('.ace_content')).toBeVisible();
     await expect(await page.locator('.btn-success')).toBeVisible();
