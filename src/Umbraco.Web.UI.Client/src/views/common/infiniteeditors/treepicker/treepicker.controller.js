@@ -360,11 +360,16 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
                     $scope.model.select(args.node);
                 }
                 else {
-                    select(args.node.name, args.node.id);
+                    // If this is a container, construct a base entity to return immediately
+                    let entity = undefined;
+                    if (args.node.nodeType === "container") {
+                        entity = args.node;
+                        entity.metaData.IsContainer = true; // mimic the server response from the EntityController
+                    }
+                    select(args.node.name, args.node.id, entity);
                     //toggle checked state
-                    args.node.selected = args.node.selected === true ? false : true;
+                    args.node.selected = !args.node.selected;
                 }
-
             }
         }
 
