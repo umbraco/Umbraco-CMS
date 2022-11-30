@@ -196,7 +196,7 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
                         {
                             var filter = Utilities.fromJson($scope.model.filter);
                             $scope.model.filter = function (node){ return _.isMatch(node.metaData, filter);};
-                        }            
+                        }
                         else
                         {
                             //convert to object
