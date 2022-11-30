@@ -577,7 +577,7 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
                                             isSearchResult: true
                                         },
                                         hasChildren: false,
-                                        parent: () => parent                                        
+                                        parent: () => parent
                                     });
                                 }
                             });
@@ -605,12 +605,12 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
             performFiltering(results);
 
             //now actually remove all filtered items so they are not even displayed
-            results = results.filter(item => !item.filtered);          
+            results = results.filter(item => !item.filtered);
             vm.searchInfo.results = results;
 
             //sync with the curr selected results
             vm.searchInfo.results.forEach(result => {
-                var exists = $scope.model.selection.find(item => result.id === item.id);               
+                var exists = $scope.model.selection.find(item => result.id === item.id);
                 if (exists) {
                     result.selected = true;
                 }
