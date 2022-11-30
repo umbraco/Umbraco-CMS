@@ -14,10 +14,10 @@
   </ItemGroup>
 
   <!-- Create and pack empty file to add TFM dependency -->
-  <Target Name="PackTargetFrameworkFile" BeforeTargets="Build">
+  <Target Name="GetTargetFrameworkPackageFiles" BeforeTargets="GenerateNuspec">
     <WriteLinesToFile File="$(IntermediateOutputPath)_._" />
     <ItemGroup>
-      <None Include="$(IntermediateOutputPath)_._" Pack="true" PackagePath="lib\$(TargetFramework)" />
+      <_PackageFiles Include="$(IntermediateOutputPath)_._" PackagePath="lib\$(TargetFramework)" />
     </ItemGroup>
   </Target>
 </Project>
