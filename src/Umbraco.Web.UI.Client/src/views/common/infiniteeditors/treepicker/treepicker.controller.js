@@ -364,7 +364,11 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
                     let entity = undefined;
                     if (args.node.nodeType === "container") {
                         entity = args.node;
-                        entity.metaData.IsContainer = true; // mimic the server response from the EntityController
+
+                        // mimic the server response from the EntityController
+                        entity.id = parseInt(entity.id, 10);
+                        entity.metaData.IsContainer = true;
+                        // end-mimic
                     }
                     select(args.node.name, args.node.id, entity);
                     //toggle checked state
