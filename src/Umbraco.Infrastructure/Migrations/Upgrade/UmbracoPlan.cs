@@ -2,25 +2,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_10_0_0;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_10_2_0;
-<<<<<<< HEAD
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_11_1_0;
-using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0;
-using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_1;
-using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_1_0;
-using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_10_0;
-using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_15_0;
-using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_17_0;
-using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_6_0;
-using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_7_0;
-using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_9_0;
-using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_0_0;
-using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_1_0;
-using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_2_0;
-using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_3_0;
-using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_4_0;
-using Umbraco.Extensions;
-=======
->>>>>>> f7b42a50cce87d18a23c9a8a11e98c75d30f4bb2
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 
@@ -91,19 +73,18 @@ public class UmbracoPlan : MigrationPlan
         To<AddMemberPropertiesAsColumns>("{B7E0D53C-2B0E-418B-AB07-2DDE486E225F}");
 
         // TO 10.2.0
-        To<TablesIndexesImprovement>("{1187192D-EDB5-4619-955D-91D48D738871}");
         To<AddUserGroup2LanguageTable>("{D0B3D29D-F4D5-43E3-BA67-9D49256F3266}");
         To<AddHasAccessToAllLanguagesColumn>("{79D8217B-5920-4C0E-8E9A-3CF8FA021882}");
 
-<<<<<<< HEAD
-        // TO 10.3.0
-        To<AddComputedNodeColumns>("{929d82f7-a693-4433-a110-f906ae637681}");
-=======
         // To 10.3.0
         To<V_10_3_0.AddBlockGridPartialViews>("{56833770-3B7E-4FD5-A3B6-3416A26A7A3F}");
 
         // To 10.4.0
         To<V_10_4_0.AddBlockGridPartialViews>("{3F5D492A-A3DB-43F9-A73E-9FEE3B180E6C}");
->>>>>>> f7b42a50cce87d18a23c9a8a11e98c75d30f4bb2
+
+
+        // TO 11.1.0
+        To<TablesIndexesImprovement>("{1187192D-EDB5-4619-955D-91D48D738871}");
+        To<AddComputedNodeColumns>("{929d82f7-a693-4433-a110-f906ae637681}");
     }
 }
