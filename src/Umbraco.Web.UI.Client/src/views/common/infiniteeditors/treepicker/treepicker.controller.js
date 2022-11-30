@@ -314,6 +314,15 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
             }
         }
 
+        function getRootEntity(id, name) {
+          return {
+            icon: "icon-folder",
+            alias: null,
+            id,
+            name
+          };
+        }
+
         //wires up selection
         function nodeSelectHandler(args) {
             args.event.preventDefault();
