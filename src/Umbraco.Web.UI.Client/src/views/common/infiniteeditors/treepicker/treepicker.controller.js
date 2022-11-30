@@ -408,20 +408,18 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
 
         function multiSelectItem(item) {
 
-            var found = false;
-            var foundIndex = 0;
-
-            if ($scope.model.selection.length > 0) {
-                for (var i = 0; $scope.model.selection.length > i; i++) {
-                    var selectedItem = $scope.model.selection[i];
-                    if (selectedItem.id === parseInt(item.id)) {
-                        found = true;
-                        foundIndex = i;
-                    }
-                }
+            if (!vm.multiPicker) {
+              $scope.model.selection.length = 0;
+              hideSearch();
             }
 
-            if (found) {
+            var foundIndex = -1;
+
+            if ($scope.model.selection.length) {
+                foundIndex = $scope.model.selection.findIndex(ent => ent.id === parseInt(item.id, 10));
+            }
+
+            if (foundIndex !== -1) {
                 $scope.model.selection.splice(foundIndex, 1);
             }
             else {
