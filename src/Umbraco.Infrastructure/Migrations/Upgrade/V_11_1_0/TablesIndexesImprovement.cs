@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_11_1_0;
@@ -59,8 +59,8 @@ public class TablesIndexesImprovement : MigrationBase
         DeleteIndex<ContentNuDto>(contentNuDtoPublishedIdIndex);
         CreateIndex<ContentNuDto>(contentNuDtoPublishedIdIndex);
 
-        var nodeDtoParentIdNodeObjectTypeIndex = $"IX_{NodeDto.TableName}_parentId_nodeObjectType";
-        DeleteIndex<NodeDto>(nodeDtoParentIdNodeObjectTypeIndex);
-        CreateIndex<NodeDto>(nodeDtoParentIdNodeObjectTypeIndex);
+        var nodeDtoParentIdIndex = $"IX_{NodeDto.TableName}_ParentId";
+        DeleteIndex<NodeDto>(nodeDtoParentIdIndex);
+        CreateIndex<NodeDto>(nodeDtoParentIdIndex);
     }
 }
