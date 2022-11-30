@@ -108,7 +108,16 @@ public class NuCacheContentRepository : RepositoryBase, INuCacheContentRepositor
             | ContentCacheDataSerializerEntityType.Media
             | ContentCacheDataSerializerEntityType.Member);
 
-        if(contentTypeIds != null)
+        // If contentTypeIds, mediaTypeIds and memberTypeIds are null, truncate table as all records will be deleted (as these 3 are the only types in the table). SQL Server Only
+        if ((contentTypeIds == null || !contentTypeIds.Any())
+              && (mediaTypeIds == null || !mediaTypeIds.Any())
+              && (memberTypeIds == null || !memberTypeIds.Any())
+              && Database.DatabaseType.IsSqlServer())
+        {
+                Database.Execute($"TRUNCATE TABLE cmsContentNu");
+        }
+
+        if (contentTypeIds != null)
         {
             RebuildContentDbCache(serializer, _nucacheSettings.Value.SqlPageSize, contentTypeIds);
         }
