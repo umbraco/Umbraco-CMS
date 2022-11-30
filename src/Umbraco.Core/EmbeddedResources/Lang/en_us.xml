@@ -2901,7 +2901,6 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="areasLayoutColumns">Grid Columns for Areas</key>
     <key alias="areasLayoutColumnsHelp">Define how many columns that will be available for areas. If not defined, the number of columns defined for the entire layout will be used.</key>
     <key alias="areasConfigurations">Areas</key>
-    <key alias="areasConfigurationsHelp">To enable nesting of blocks within this block, define one or more areas for blocks to be nested within. Areas follow their own layout which is defined by the Grid Columns for Areas. Each Area column span and row span can be adjusted by using the scale-handler in the bottom right corner.</key>
     <key alias="areasConfigurationsHelp">To enable the nesting of blocks within this block, define one or more areas. Areas follow the layout defined by their own grid column configuration. The 'column span' and 'row span' for each area can be adjusted by using the scale-handler box in the bottom right hand corner of the selected area.</key>
     <key alias="invalidDropPosition"><![CDATA[<strong>%0%</strong> is not allowed at this spot.]]></key>
     <key alias="defaultLayoutStylesheet">Default layout stylesheet</key>
