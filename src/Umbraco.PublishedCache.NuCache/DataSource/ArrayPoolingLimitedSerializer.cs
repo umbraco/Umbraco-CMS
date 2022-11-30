@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
     {
         private readonly StringPool _internPool = new StringPool();
 
-        public string? ReadString(Stream stream, bool intern = false)
+        public string ReadString(Stream stream, bool intern = false)
         {
             unchecked
             {
@@ -25,7 +25,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
 
                 if (sz == int.MinValue)
                 {
-                    return null;
+                    return string.Empty;
                 }
 
                 if (!(sz >= 0 && sz <= int.MaxValue))
