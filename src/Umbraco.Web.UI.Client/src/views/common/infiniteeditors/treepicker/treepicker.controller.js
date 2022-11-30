@@ -370,7 +370,10 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
                         entity.metaData.IsContainer = true;
                         // end-mimic
                     }
+
+                    // apply the item to the model
                     select(args.node.name, args.node.id, entity);
+
                     //toggle checked state
                     args.node.selected = !args.node.selected;
                 }
