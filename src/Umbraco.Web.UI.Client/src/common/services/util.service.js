@@ -65,20 +65,20 @@ function dateHelper() {
         convertToServerStringTime: function (momentLocal, serverOffsetMinutes, format = "YYYY-MM-DD HH:mm:ss") {
 
             //get the formatted offset time in HH:mm (server time offset is in minutes)
-            var formattedOffset = (serverOffsetMinutes > 0 ? "+" : "-") +
+            const formattedOffset = (serverOffsetMinutes > 0 ? "+" : "-") +
                 moment()
                     .startOf('day')
                     .minutes(Math.abs(serverOffsetMinutes))
                     .format('HH:mm');
 
-            var server = moment.utc(momentLocal).utcOffset(formattedOffset);
+            const server = moment.utc(momentLocal).utcOffset(formattedOffset);
             return server.format(format);
         },
 
         convertToLocalMomentTime: function (strVal, serverOffsetMinutes, format = "YYYY-MM-DDTHH:mm:ss") {
 
             //get the formatted offset time in HH:mm (server time offset is in minutes)
-            var formattedOffset = (serverOffsetMinutes > 0 ? "+" : "-") +
+            const formattedOffset = (serverOffsetMinutes > 0 ? "+" : "-") +
                 moment()
                     .startOf('day')
                     .minutes(Math.abs(serverOffsetMinutes))
@@ -88,7 +88,7 @@ function dateHelper() {
             //otherwise known as https://en.wikipedia.org/wiki/ISO_8601. This is the default format returned from the server
             //since that is the default formatter for newtonsoft.json. When it is in this format, we need to tell moment
             //to load the date as UTC so it's not changed, otherwise load it normally
-            var isoFormat;
+            let isoFormat;
             if (strVal.indexOf("T") > -1 && strVal.endsWith("Z")) {
                 isoFormat = moment.utc(strVal).format(format) + formattedOffset;
             }
@@ -103,10 +103,10 @@ function dateHelper() {
 
         getLocalDate: function (date, culture, format, parsingFormat = "YYYY-MM-DD HH:mm:ss") {
             if (date) {
-                var dateVal;
-                var serverOffset = Umbraco.Sys.ServerVariables.application.serverTimeOffset;
-                var localOffset = new Date().getTimezoneOffset();
-                var serverTimeNeedsOffsetting = -serverOffset !== localOffset;
+                let dateVal;
+                const serverOffset = Umbraco.Sys.ServerVariables.application.serverTimeOffset;
+                const localOffset = new Date().getTimezoneOffset();
+                const serverTimeNeedsOffsetting = -serverOffset !== localOffset;
                 if (serverTimeNeedsOffsetting) {
                     dateVal = this.convertToLocalMomentTime(date, serverOffset);
                 } else {
