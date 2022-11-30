@@ -375,61 +375,32 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
 
         /** Method used for selecting a node */
         function select(text, id, entity) {
-            //if we get the root, we just return a constructed entity, no need for server data
-            if (id < 0) {
-
-                var rootNode = {
-                    alias: null,
-                    icon: "icon-folder",
-                    id: id,
-                    name: text
-                };
-
+            // we do not need to query the server in case a root (id < 0)
+            // or an entity was provided
+            if (id < 0 || !!entity) {
                 if (vm.multiPicker) {
-                    if (entity) {
-                        multiSelectItem(entity);
-                    }
-                    else {
-                        multiSelectItem(rootNode);
-                    }
+                    multiSelectItem(entity ? entity : getRootEntity(id, text));
                 }
                 else {
-                    $scope.model.selection.push(rootNode);
+                    if (entity) {
+                        $scope.model.selection.push(entity);
+                    } else {
+                        $scope.model.selection.push(getRootEntity(id, text));
+                    }
                     $scope.model.submit($scope.model);
                 }
             }
             else {
 
-                if (vm.multiPicker) {
-
-                    if (entity) {
-                        multiSelectItem(entity);
-                    }
-                    else {
-                        //otherwise we have to get it from the server
-                        entityResource.getById(id, vm.entityType).then(function (ent) {
-                            multiSelectItem(ent);
-                        });
-                    }
-
-                }
-                else {
-
-                    hideSearch();
-
-                    //if an entity has been passed in, use it
-                    if (entity) {
-                        $scope.model.selection.push(entity);
-                        $scope.model.submit($scope.model);
-                    }
-                    else {
-                        //otherwise we have to get it from the server
-                        entityResource.getById(id, vm.entityType).then(function (ent) {
-                            $scope.model.selection.push(ent);
-                            $scope.model.submit($scope.model);
-                        });
-                    }
-                }
+              // otherwise we have to get it from the server
+              entityResource.getById(id, vm.entityType).then(function (ent) {
+                  if (vm.multiPicker) {
+                      multiSelectItem(ent);
+                  } else {
+                      $scope.model.selection.push(ent);
+                      $scope.model.submit($scope.model);
+                  }
+              });
             }
         }
 
