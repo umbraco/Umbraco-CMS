@@ -1,11 +1,16 @@
 using System.Globalization;
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.Headless;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
-internal class ContentPickerValueConverter : PropertyValueConverterBase
+internal class ContentPickerValueConverter : PropertyValueConverterBase, IHeadlessPropertyValueConverter
 {
     private static readonly List<string> PropertiesToExclude = new()
     {
@@ -14,9 +19,28 @@ internal class ContentPickerValueConverter : PropertyValueConverterBase
     };
 
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
+    private readonly IPublishedUrlProvider _publishedUrlProvider;
+    private readonly IHeadlessContentNameProvider _headlessContentNameProvider;
 
-    public ContentPickerValueConverter(IPublishedSnapshotAccessor publishedSnapshotAccessor) =>
+    [Obsolete("Use constructor that takes all parameters, scheduled for removal in V14")]
+    public ContentPickerValueConverter(IPublishedSnapshotAccessor publishedSnapshotAccessor)
+        : this(
+            publishedSnapshotAccessor,
+            StaticServiceProvider.Instance.GetRequiredService<IPublishedUrlProvider>(),
+            StaticServiceProvider.Instance.GetRequiredService<IHeadlessContentNameProvider>())
+    {
+
+    }
+
+    public ContentPickerValueConverter(
+        IPublishedSnapshotAccessor publishedSnapshotAccessor,
+        IPublishedUrlProvider publishedUrlProvider,
+        IHeadlessContentNameProvider headlessContentNameProvider)
+    {
         _publishedSnapshotAccessor = publishedSnapshotAccessor;
+        _publishedUrlProvider = publishedUrlProvider;
+        _headlessContentNameProvider = headlessContentNameProvider;
+    }
 
     public override bool IsConverter(IPublishedPropertyType propertyType)
         => propertyType.EditorAlias.Equals(Constants.PropertyEditors.Aliases.ContentPicker);
@@ -63,6 +87,35 @@ internal class ContentPickerValueConverter : PropertyValueConverterBase
 
     public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
     {
+        IPublishedContent? content = GetContent(propertyType, inter);
+        return content ?? inter;
+    }
+
+    public override object? ConvertIntermediateToXPath(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+    {
+        if (inter == null)
+        {
+            return null;
+        }
+
+        return inter.ToString();
+    }
+
+    public Type GetHeadlessPropertyValueType(IPublishedPropertyType propertyType) => typeof(HeadlessLink);
+
+    public object? ConvertIntermediateToHeadlessObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+    {
+        IPublishedContent? content = GetContent(propertyType, inter);
+        if (content == null)
+        {
+            return null;
+        }
+
+        return new HeadlessLink(content.Url(_publishedUrlProvider), _headlessContentNameProvider.GetName(content), null, content.Key, content.ContentType.Alias, LinkType.Content);
+    }
+
+    private IPublishedContent? GetContent(IPublishedPropertyType propertyType, object? inter)
+    {
         if (inter == null)
         {
             return null;
@@ -96,16 +149,6 @@ internal class ContentPickerValueConverter : PropertyValueConverterBase
             }
         }
 
-        return inter;
-    }
-
-    public override object? ConvertIntermediateToXPath(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
-    {
-        if (inter == null)
-        {
-            return null;
-        }
-
-        return inter.ToString();
+        return null;
     }
 }

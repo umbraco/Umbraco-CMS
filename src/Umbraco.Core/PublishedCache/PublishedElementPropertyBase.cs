@@ -214,11 +214,32 @@ internal class PublishedElementPropertyBase : PublishedPropertyBase
         }
     }
 
+    public override object? GetHeadlessValue(string? culture = null, string? segment = null)
+    {
+        GetCacheLevels(out PropertyCacheLevel cacheLevel, out PropertyCacheLevel referenceCacheLevel);
+
+        lock (_locko)
+        {
+            CacheValues cacheValues = GetCacheValues(cacheLevel);
+            if (cacheValues.HeadlessObjectInitialized)
+            {
+                return cacheValues.HeadlessObjectValue;
+            }
+
+            cacheValues.HeadlessObjectValue =
+                PropertyType.ConvertInterToHeadlessObject(Element, referenceCacheLevel, GetInterValue(), IsPreviewing);
+            cacheValues.HeadlessObjectInitialized = true;
+            return cacheValues.HeadlessObjectValue;
+        }
+    }
+
     protected class CacheValues
     {
         public bool ObjectInitialized;
         public object? ObjectValue;
         public bool XPathInitialized;
         public object? XPathValue;
+        public bool HeadlessObjectInitialized;
+        public object? HeadlessObjectValue;
     }
 }

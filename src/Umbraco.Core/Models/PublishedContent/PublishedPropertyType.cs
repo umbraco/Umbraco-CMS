@@ -282,6 +282,22 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         }
 
         /// <inheritdoc />
+        public object? ConvertInterToHeadlessObject(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+        {
+            if (!_initialized)
+            {
+                Initialize();
+            }
+
+            // use the converter if any, else just return the inter value
+            return _converter != null
+                ? _converter is IHeadlessPropertyValueConverter headlessConverter
+                    ? headlessConverter.ConvertIntermediateToHeadlessObject(owner, this, referenceCacheLevel, inter, preview)
+                    : _converter.ConvertIntermediateToObject(owner, this, referenceCacheLevel, inter, preview)
+                : inter;
+        }
+
+        /// <inheritdoc />
         public Type ModelClrType
         {
             get

@@ -310,6 +310,31 @@ internal class Property : PublishedPropertyBase
         }
     }
 
+    public override object? GetHeadlessValue(string? culture = null, string? segment = null)
+    {
+        _content.VariationContextAccessor.ContextualizeVariation(_variations, _content.Id, ref culture, ref segment);
+
+        object? value;
+        lock (_locko)
+        {
+            CacheValue cacheValues = GetCacheValues(PropertyType.CacheLevel).For(culture, segment);
+
+            // initial reference cache level always is .Content
+            const PropertyCacheLevel initialCacheLevel = PropertyCacheLevel.Element;
+
+            if (cacheValues.HeadlessObjectInitialized)
+            {
+                return cacheValues.HeadlessObjectValue;
+            }
+
+            cacheValues.HeadlessObjectValue = PropertyType.ConvertInterToHeadlessObject(_content, initialCacheLevel, GetInterValue(culture, segment), _isPreviewing);
+            cacheValues.HeadlessObjectInitialized = true;
+            value = cacheValues.HeadlessObjectValue;
+        }
+
+        return value;
+    }
+
     #region Classes
 
     private class CacheValue
@@ -321,6 +346,10 @@ internal class Property : PublishedPropertyBase
         public bool XPathInitialized { get; set; }
 
         public object? XPathValue { get; set; }
+
+        public bool HeadlessObjectInitialized { get; set; }
+
+        public object? HeadlessObjectValue { get; set; }
     }
 
     private class CacheValues : CacheValue

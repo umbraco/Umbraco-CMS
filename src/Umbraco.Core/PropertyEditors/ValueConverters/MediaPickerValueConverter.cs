@@ -1,6 +1,10 @@
 using System.Collections;
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.Headless;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
@@ -9,21 +13,43 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 ///     The media picker property value converter.
 /// </summary>
 [DefaultPropertyValueConverter]
-public class MediaPickerValueConverter : PropertyValueConverterBase
+public class MediaPickerValueConverter : PropertyValueConverterBase, IHeadlessPropertyValueConverter
 {
     // hard-coding "image" here but that's how it works at UI level too
     private const string ImageTypeAlias = "image";
 
-    private readonly IPublishedModelFactory _publishedModelFactory;
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
+    private readonly IPublishedUrlProvider _publishedUrlProvider;
+    private readonly IPublishedValueFallback _publishedValueFallback;
+    private readonly IHeadlessContentNameProvider _headlessContentNameProvider;
 
+    [Obsolete("Use constructor that takes all parameters, scheduled for removal in V14")]
     public MediaPickerValueConverter(
         IPublishedSnapshotAccessor publishedSnapshotAccessor,
         IPublishedModelFactory publishedModelFactory)
+        : this(
+            publishedSnapshotAccessor,
+            publishedModelFactory,
+            StaticServiceProvider.Instance.GetRequiredService<IPublishedUrlProvider>(),
+            StaticServiceProvider.Instance.GetRequiredService<IPublishedValueFallback>(),
+            StaticServiceProvider.Instance.GetRequiredService<IHeadlessContentNameProvider>())
+    {
+    }
+
+    public MediaPickerValueConverter(
+        IPublishedSnapshotAccessor publishedSnapshotAccessor,
+        // annoyingly not even ActivatorUtilitiesConstructor can fix ambiguous constructor exceptions.
+        // we need to keep this unused parameter, at least until the other constructor is removed
+        IPublishedModelFactory publishedModelFactory,
+        IPublishedUrlProvider publishedUrlProvider,
+        IPublishedValueFallback publishedValueFallback,
+        IHeadlessContentNameProvider headlessContentNameProvider)
     {
         _publishedSnapshotAccessor = publishedSnapshotAccessor ??
                                      throw new ArgumentNullException(nameof(publishedSnapshotAccessor));
-        _publishedModelFactory = publishedModelFactory;
+        _publishedUrlProvider = publishedUrlProvider;
+        _publishedValueFallback = publishedValueFallback;
+        _headlessContentNameProvider = headlessContentNameProvider;
     }
 
     public override bool IsConverter(IPublishedPropertyType propertyType) =>
@@ -99,6 +125,43 @@ public class MediaPickerValueConverter : PropertyValueConverterBase
         }
 
         return source;
+    }
+
+    public Type GetHeadlessPropertyValueType(IPublishedPropertyType propertyType)
+        => IsMultipleDataType(propertyType.DataType)
+            ? typeof(IEnumerable<HeadlessMedia>)
+            : typeof(HeadlessMedia);
+
+    public object? ConvertIntermediateToHeadlessObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+    {
+        var isMultiple = IsMultipleDataType(propertyType.DataType);
+
+        HeadlessMedia ToHeadlessMedia(IPublishedContent media)
+        {
+            var customProperties = media
+                .Properties
+                .Where(p => p.Alias.StartsWith("umbraco") == false)
+                .ToDictionary(p => p.Alias, p => p.GetHeadlessValue());
+
+            return new HeadlessMedia(media.Key,
+                _headlessContentNameProvider.GetName(media),
+                media.ContentType.Alias, _publishedUrlProvider.GetMediaUrl(media, UrlMode.Relative), media.Value<string>(_publishedValueFallback, Constants.Conventions.Media.Extension), media.Value<int?>(_publishedValueFallback, Constants.Conventions.Media.Width), media.Value<int?>(_publishedValueFallback, Constants.Conventions.Media.Height), customProperties);
+        }
+
+        // NOTE: eventually we might implement this explicitly instead of piggybacking on the default object conversion. however, this only happens once per cache rebuild,
+        // and the performance gain from an explicit implementation is negligible, so... at least for the time being this will do just fine.
+        var converted = ConvertIntermediateToObject(owner, propertyType, referenceCacheLevel, inter, preview);
+        if (isMultiple && converted is IEnumerable<IPublishedContent> items)
+        {
+            return items.Select(ToHeadlessMedia);
+        }
+
+        if (isMultiple == false && converted is IPublishedContent item)
+        {
+            return ToHeadlessMedia(item);
+        }
+
+        return null;
     }
 
     private object? FirstOrDefault(IList mediaItems) => mediaItems.Count == 0 ? null : mediaItems[0];

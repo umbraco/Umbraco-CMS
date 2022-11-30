@@ -8,7 +8,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
 [DefaultPropertyValueConverter]
-public class MemberPickerValueConverter : PropertyValueConverterBase
+public class MemberPickerValueConverter : PropertyValueConverterBase, IHeadlessPropertyValueConverter
 {
     private readonly IMemberService _memberService;
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
@@ -101,4 +101,10 @@ public class MemberPickerValueConverter : PropertyValueConverterBase
 
         return source;
     }
+
+    public Type GetHeadlessPropertyValueType(IPublishedPropertyType propertyType) => typeof(string);
+
+    // member picker is unsupported for headless output to avoid leaking member data by accident.
+    public object? ConvertIntermediateToHeadlessObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+        => "(unsupported)";
 }

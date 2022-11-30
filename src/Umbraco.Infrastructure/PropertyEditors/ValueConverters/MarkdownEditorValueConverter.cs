@@ -5,11 +5,12 @@ using HeyRed.MarkdownSharp;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Templates;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
 [DefaultPropertyValueConverter]
-public class MarkdownEditorValueConverter : PropertyValueConverterBase
+public class MarkdownEditorValueConverter : PropertyValueConverterBase, IHeadlessPropertyValueConverter
 {
     private readonly HtmlLocalLinkParser _localLinkParser;
     private readonly HtmlUrlParser _urlParser;
@@ -58,4 +59,17 @@ public class MarkdownEditorValueConverter : PropertyValueConverterBase
 
         // source should come from ConvertSource and be a string (or null) already
         inter?.ToString() ?? string.Empty;
+
+    public Type GetHeadlessPropertyValueType(IPublishedPropertyType propertyType) => typeof(string);
+
+    public object ConvertIntermediateToHeadlessObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+    {
+        if (inter is not string markdownString || markdownString.IsNullOrWhiteSpace())
+        {
+            return string.Empty;
+        }
+
+        var mark = new Markdown();
+        return mark.Transform(markdownString);
+    }
 }

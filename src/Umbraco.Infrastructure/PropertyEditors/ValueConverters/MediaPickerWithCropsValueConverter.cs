@@ -1,31 +1,53 @@
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.Headless;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
 [DefaultPropertyValueConverter]
-public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase
+public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, IHeadlessPropertyValueConverter
 {
     private readonly IJsonSerializer _jsonSerializer;
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
     private readonly IPublishedUrlProvider _publishedUrlProvider;
     private readonly IPublishedValueFallback _publishedValueFallback;
+    private readonly IHeadlessContentNameProvider _headlessContentNameProvider;
 
+    [Obsolete("Use constructor that takes all parameters, scheduled for removal in V14")]
     public MediaPickerWithCropsValueConverter(
         IPublishedSnapshotAccessor publishedSnapshotAccessor,
         IPublishedUrlProvider publishedUrlProvider,
         IPublishedValueFallback publishedValueFallback,
         IJsonSerializer jsonSerializer)
+        : this(
+            publishedSnapshotAccessor,
+            publishedUrlProvider,
+            publishedValueFallback,
+            jsonSerializer,
+            StaticServiceProvider.Instance.GetRequiredService<IHeadlessContentNameProvider>()
+        )
+    {
+    }
+
+    public MediaPickerWithCropsValueConverter(
+        IPublishedSnapshotAccessor publishedSnapshotAccessor,
+        IPublishedUrlProvider publishedUrlProvider,
+        IPublishedValueFallback publishedValueFallback,
+        IJsonSerializer jsonSerializer,
+        IHeadlessContentNameProvider headlessContentNameProvider)
     {
         _publishedSnapshotAccessor = publishedSnapshotAccessor ??
                                      throw new ArgumentNullException(nameof(publishedSnapshotAccessor));
         _publishedUrlProvider = publishedUrlProvider;
         _publishedValueFallback = publishedValueFallback;
         _jsonSerializer = jsonSerializer;
+        _headlessContentNameProvider = headlessContentNameProvider;
     }
 
     public override bool IsConverter(IPublishedPropertyType propertyType) =>
@@ -94,6 +116,46 @@ public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase
         }
 
         return isMultiple ? mediaItems : mediaItems.FirstOrDefault();
+    }
+
+    public Type GetHeadlessPropertyValueType(IPublishedPropertyType propertyType)
+        => IsMultipleDataType(propertyType.DataType)
+            ? typeof(IEnumerable<HeadlessMediaWithCrops>)
+            : typeof(HeadlessMediaWithCrops);
+
+    public object? ConvertIntermediateToHeadlessObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+    {
+        var isMultiple = IsMultipleDataType(propertyType.DataType);
+
+        HeadlessMediaWithCrops ToHeadlessMedia(MediaWithCrops media)
+        {
+            var customProperties = media
+                .Properties
+                .Where(p => p.Alias.StartsWith("umbraco") == false)
+                .ToDictionary(p => p.Alias, p => p.GetHeadlessValue());
+
+            return new HeadlessMediaWithCrops(media.Content.Key,
+                _headlessContentNameProvider.GetName(media.Content),
+                media.ContentType.Alias, media.LocalCrops.Src ?? string.Empty, media.Value<string>(_publishedValueFallback, Constants.Conventions.Media.Extension), media.Value<int?>(_publishedValueFallback, Constants.Conventions.Media.Width), media.Value<int?>(_publishedValueFallback, Constants.Conventions.Media.Height), customProperties)
+            {
+                FocalPoint = media.LocalCrops.FocalPoint,
+                Crops = media.LocalCrops.Crops
+            };
+        }
+
+        // NOTE: eventually we might implement this explicitly instead of piggybacking on the default object conversion. however, this only happens once per cache rebuild,
+        // and the performance gain from an explicit implementation is negligible, so... at least for the time being this will do just fine.
+        var converted = ConvertIntermediateToObject(owner, propertyType, referenceCacheLevel, inter, preview);
+        if (isMultiple && converted is IEnumerable<MediaWithCrops> mediasWithCrops)
+        {
+            return mediasWithCrops.Select(ToHeadlessMedia);
+        }
+        if (isMultiple == false && converted is MediaWithCrops mediaWithCrops)
+        {
+            return ToHeadlessMedia(mediaWithCrops);
+        }
+
+        return isMultiple ? Array.Empty<HeadlessMedia>() : null;
     }
 
     private bool IsMultipleDataType(PublishedDataType dataType) =>

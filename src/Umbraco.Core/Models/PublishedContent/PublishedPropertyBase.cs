@@ -47,6 +47,9 @@ public abstract class PublishedPropertyBase : IPublishedProperty
     /// <inheritdoc />
     public abstract object? GetXPathValue(string? culture = null, string? segment = null);
 
+    /// <inheritdoc />
+    public abstract object? GetHeadlessValue(string? culture = null, string? segment = null);
+
     // validates the cache level
     private static void ValidateCacheLevel(PropertyCacheLevel cacheLevel, bool validateUnknown)
     {

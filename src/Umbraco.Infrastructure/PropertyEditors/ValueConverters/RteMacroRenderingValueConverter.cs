@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 ///     used dynamically.
 /// </summary>
 [DefaultPropertyValueConverter]
-public class RteMacroRenderingValueConverter : SimpleTinyMceValueConverter
+public class RteMacroRenderingValueConverter : SimpleTinyMceValueConverter, IHeadlessPropertyValueConverter
 {
     private readonly HtmlImageSourceParser _imageSourceParser;
     private readonly HtmlLocalLinkParser _linkParser;
@@ -50,6 +50,11 @@ public class RteMacroRenderingValueConverter : SimpleTinyMceValueConverter
 
         return new HtmlEncodedString(converted ?? string.Empty);
     }
+
+    public Type GetHeadlessPropertyValueType(IPublishedPropertyType propertyType) => typeof(string);
+
+    public object? ConvertIntermediateToHeadlessObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+        => Convert(inter, preview) ?? string.Empty;
 
     // NOT thread-safe over a request because it modifies the
     // global UmbracoContext.Current.InPreviewMode status. So it

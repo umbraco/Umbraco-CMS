@@ -22,6 +22,7 @@ public class RawValueProperty : PublishedPropertyBase
     private readonly Lazy<object?> _objectValue;
     private readonly object _sourceValue; // the value in the db
     private readonly Lazy<object?> _xpathValue;
+    private readonly Lazy<object?> _headlessValue;
 
     public RawValueProperty(IPublishedPropertyType propertyType, IPublishedElement content, object sourceValue, bool isPreviewing = false)
         : base(propertyType, PropertyCacheLevel.Unknown) // cache level is ignored
@@ -39,6 +40,8 @@ public class RawValueProperty : PublishedPropertyBase
             PropertyType.ConvertInterToObject(content, PropertyCacheLevel.Unknown, interValue?.Value, isPreviewing));
         _xpathValue = new Lazy<object?>(() =>
             PropertyType.ConvertInterToXPath(content, PropertyCacheLevel.Unknown, interValue?.Value, isPreviewing));
+        _headlessValue = new Lazy<object?>(() =>
+            PropertyType.ConvertInterToHeadlessObject(content, PropertyCacheLevel.Unknown, interValue?.Value, isPreviewing));
     }
 
     // RawValueProperty does not (yet?) support variants,
@@ -57,4 +60,7 @@ public class RawValueProperty : PublishedPropertyBase
 
     public override object? GetXPathValue(string? culture = null, string? segment = null)
         => string.IsNullOrEmpty(culture) & string.IsNullOrEmpty(segment) ? _xpathValue.Value : null;
+
+    public override object? GetHeadlessValue(string? culture = null, string? segment = null)
+        => string.IsNullOrEmpty(culture) & string.IsNullOrEmpty(segment) ? _headlessValue.Value : null;
 }

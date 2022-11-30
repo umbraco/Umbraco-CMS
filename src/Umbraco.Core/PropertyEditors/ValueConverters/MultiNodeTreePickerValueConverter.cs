@@ -1,9 +1,13 @@
 using System.Globalization;
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.Headless;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
@@ -12,7 +16,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 ///     The multi node tree picker property editor value converter.
 /// </summary>
 [DefaultPropertyValueConverter(typeof(MustBeStringValueConverter))]
-public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase
+public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase, IHeadlessPropertyValueConverter
 {
     private static readonly List<string> PropertiesToExclude = new()
     {
@@ -23,16 +27,36 @@ public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase
     private readonly IMemberService _memberService;
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+    private readonly IPublishedUrlProvider _publishedUrlProvider;
+    private readonly IHeadlessContentNameProvider _headlessContentNameProvider;
 
+    [Obsolete("Use constructor that takes all parameters, scheduled for removal in V14")]
     public MultiNodeTreePickerValueConverter(
         IPublishedSnapshotAccessor publishedSnapshotAccessor,
         IUmbracoContextAccessor umbracoContextAccessor,
         IMemberService memberService)
+        : this(
+            publishedSnapshotAccessor,
+            umbracoContextAccessor,
+            memberService,
+            StaticServiceProvider.Instance.GetRequiredService<IPublishedUrlProvider>(),
+            StaticServiceProvider.Instance.GetRequiredService<IHeadlessContentNameProvider>())
+    {
+    }
+
+    public MultiNodeTreePickerValueConverter(
+        IPublishedSnapshotAccessor publishedSnapshotAccessor,
+        IUmbracoContextAccessor umbracoContextAccessor,
+        IMemberService memberService,
+        IPublishedUrlProvider publishedUrlProvider,
+        IHeadlessContentNameProvider headlessContentNameProvider)
     {
         _publishedSnapshotAccessor = publishedSnapshotAccessor ??
                                      throw new ArgumentNullException(nameof(publishedSnapshotAccessor));
         _umbracoContextAccessor = umbracoContextAccessor;
         _memberService = memberService;
+        _publishedUrlProvider = publishedUrlProvider;
+        _headlessContentNameProvider = headlessContentNameProvider;
     }
 
     public override bool IsConverter(IPublishedPropertyType propertyType) =>
@@ -154,6 +178,44 @@ public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase
         }
 
         return source;
+    }
+
+    public Type GetHeadlessPropertyValueType(IPublishedPropertyType propertyType) => IsSingleNodePicker(propertyType)
+        ? typeof(HeadlessLink)
+        : typeof(IEnumerable<HeadlessLink>);
+
+    public object? ConvertIntermediateToHeadlessObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+    {
+        object? DefaultValue() => IsSingleNodePicker(propertyType) ? null : Array.Empty<HeadlessLink>();
+
+        if (inter is not IEnumerable<Udi> udis)
+        {
+            return DefaultValue();
+        }
+
+        IPublishedSnapshot publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
+        IEnumerable<IPublishedContent> items = udis.OfType<GuidUdi>().Select(udi => udi.EntityType switch
+        {
+            Constants.UdiEntityType.Document => publishedSnapshot.Content?.GetById(udi.Guid),
+            Constants.UdiEntityType.Media => publishedSnapshot.Media?.GetById(udi.Guid),
+            _ => null
+        }).WhereNotNull().ToArray();
+
+        if (items.Any() == false)
+        {
+            return DefaultValue();
+        }
+
+        HeadlessLink ToLink(IPublishedContent item) =>
+            new HeadlessLink(
+                item.Url(_publishedUrlProvider, mode: UrlMode.Relative),
+                _headlessContentNameProvider.GetName(item),
+                null,
+                item.Key,
+                item.ContentType.Alias,
+                item.ItemType == PublishedItemType.Media ? LinkType.Media : LinkType.Content);
+
+        return IsSingleNodePicker(propertyType) ? ToLink(items.First()) : items.Select(ToLink);
     }
 
     private static bool IsSingleNodePicker(IPublishedPropertyType propertyType) =>

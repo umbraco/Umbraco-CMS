@@ -4,6 +4,7 @@
 using System.Globalization;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Umbraco.Cms.Core.Headless;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Extensions;
 
@@ -13,7 +14,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 ///     Represents a value converter for the image cropper value editor.
 /// </summary>
 [DefaultPropertyValueConverter(typeof(JsonValueConverter))]
-public class ImageCropperValueConverter : PropertyValueConverterBase
+public class ImageCropperValueConverter : PropertyValueConverterBase, IHeadlessPropertyValueConverter
 {
     private static readonly JsonSerializerSettings _imageCropperValueJsonSerializerSettings = new()
     {
@@ -65,4 +66,11 @@ public class ImageCropperValueConverter : PropertyValueConverterBase
 
         return value;
     }
+
+    public Type GetHeadlessPropertyValueType(IPublishedPropertyType propertyType) => typeof(HeadlessImageCropperValue);
+
+    public object? ConvertIntermediateToHeadlessObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+        => inter is ImageCropperValue {Src: { }} imageCropperValue
+            ? new HeadlessImageCropperValue(imageCropperValue.Src, imageCropperValue.FocalPoint, imageCropperValue.Crops)
+            : null;
 }

@@ -11,6 +11,7 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Handlers;
+using Umbraco.Cms.Core.Headless;
 using Umbraco.Cms.Core.HealthChecks.NotificationMethods;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Install;
@@ -218,6 +219,12 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
 
         builder.Services.AddTransient<IFireAndForgetRunner, FireAndForgetRunner>();
+
+        builder.Services.AddSingleton<IHeadlessPropertyMapper, HeadlessPropertyMapper>();
+        builder.Services.AddSingleton<IHeadlessElementBuilder, HeadlessElementBuilder>();
+        builder.Services.AddSingleton<IHeadlessContentBuilder, HeadlessContentBuilder>();
+        builder.Services.AddSingleton<IHeadlessContentNameProvider, HeadlessContentNameProvider>();
+
         return builder;
     }
 
