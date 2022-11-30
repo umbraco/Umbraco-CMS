@@ -113,11 +113,11 @@ public class NuCacheContentRepository : RepositoryBase, INuCacheContentRepositor
               && (mediaTypeIds == null || !mediaTypeIds.Any())
               && (memberTypeIds == null || !memberTypeIds.Any()))
         {
-            if (Database.DatabaseType.IsSqlServer())
+            if (Database.DatabaseType == DatabaseType.SqlServer2012)
             {
                 Database.Execute($"TRUNCATE TABLE cmsContentNu");
             }
-            if(Database.DatabaseType.IsSqlLite())
+            if(Database.DatabaseType == DatabaseType.SQLite)
             {
                 Database.Execute($"DELETE FROM cmsContentNu");
             }
