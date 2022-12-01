@@ -9,40 +9,40 @@ test.describe('Vary by culture for TextBox', () => {
         await umbracoApi.login();
     });
     
-    // test('create documentType with vary by culture with UI with a textbox property which also has vary by culture', async ({page, umbracoApi, umbracoUi}) => {
-    //     const documentTypeName = 'Test Document';
-    //     const textBoxPropertyName = 'TestBox';
-    //     const groupName = 'textBoxGroup';
-    //
-    //     await umbracoApi.documentTypes.ensureNameNotExists(documentTypeName);
-    //     await umbracoApi.templates.ensureNameNotExists(documentTypeName);
-    //
-    //     await umbracoUi.goToSection(ConstantHelper.sections.settings);
-    //
-    //     // Creates document with a template
-    //     await umbracoUi.createNewDocumentTypeWithTemplate();
-    //
-    //     // Updates permission for document
-    //     await umbracoUi.updateDocumentPermissionsToAllowCultureVariant();
-    //
-    //     await umbracoUi.setEditorHeaderName(documentTypeName);
-    //
-    //     // Adds a group with a TextBox editor
-    //     await umbracoUi.goToAddEditor(groupName,textBoxPropertyName);
-    //     await page.locator('[data-element="datatype-Textbox"]').click();
-    //     await page.locator('[data-element="datatypeconfig-Textstring"]').click();
-    //     await page.locator('[data-element="button-submit"]').click();
-    //
-    //     // Saves the document
-    //     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.save));
-    //
-    //     // Assert
-    //     await expect(page.locator('.umb-notifications__notifications > .alert-success')).toBeVisible();
-    //
-    //     // Clean
-    //     await umbracoApi.documentTypes.ensureNameNotExists(documentTypeName);
-    //     await umbracoApi.templates.ensureNameNotExists(documentTypeName);
-    // });
+    test('create documentType with vary by culture with UI with a textbox property which also has vary by culture', async ({page, umbracoApi, umbracoUi}) => {
+        const documentTypeName = 'Test Document';
+        const textBoxPropertyName = 'TestBox';
+        const groupName = 'textBoxGroup';
+
+        await umbracoApi.documentTypes.ensureNameNotExists(documentTypeName);
+        await umbracoApi.templates.ensureNameNotExists(documentTypeName);
+
+        await umbracoUi.goToSection(ConstantHelper.sections.settings);
+
+        // Creates document with a template
+        await umbracoUi.createNewDocumentTypeWithTemplate();
+
+        // Updates permission for document
+        await umbracoUi.updateDocumentPermissionsToAllowCultureVariant();
+
+        await umbracoUi.setEditorHeaderName(documentTypeName);
+
+        // Adds a group with a TextBox editor
+        await umbracoUi.goToAddEditor(groupName,textBoxPropertyName);
+        await page.locator('[data-element="datatype-Textbox"]').click();
+        await page.locator('[data-element="datatypeconfig-Textstring"]').click();
+        await page.locator('[data-element="button-submit"]').click();
+
+        // Saves the document
+        await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.save));
+
+        // Assert
+        await expect(page.locator('.umb-notifications__notifications > .alert-success')).toBeVisible();
+
+        // Clean
+        await umbracoApi.documentTypes.ensureNameNotExists(documentTypeName);
+        await umbracoApi.templates.ensureNameNotExists(documentTypeName);
+    });
 
     test('create content with two languages with different text', async ({page, umbracoApi, umbracoUi}) => {
         const documentName = "Test Document";
