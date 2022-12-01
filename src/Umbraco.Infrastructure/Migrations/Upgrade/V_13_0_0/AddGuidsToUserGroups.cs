@@ -1,5 +1,6 @@
 ﻿using NPoco;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
@@ -25,8 +26,37 @@ public class AddGuidsToUserGroups : MigrationBase
             AddColumnIfNotExists<UserGroupDto>(columns, "uniqueId");
         }
 
+        // This is really ugly, but we have to disable foreign keys to be able to drop the table.
+        // However, this MUST be done outside a transaction, which is quite problematic,
+        // This means we have to manually commit the transaction, to then disable FKs, and then start a new transaction.
+        Database.Execute("COMMIT;");
+        Database.Execute("PRAGMA foreign_keys=off;");
+        Database.Execute("BEGIN TRANSACTION;");
+
+
+        try
+        {
+            MigrateColumnSqlite();
+        }
+        catch
+        {
+            // Something went wrong, so we want to roll back, but more importantly, we still want to enable foreign keys
+            // And start a new transaction for good measure (since scope expects this).
+            Database.Execute("ROLLBACK;");
+            Database.Execute("PRAGMA foreign_keys=on;");
+            Database.Execute("BEGIN TRANSACTION;");
+            throw;
+        }
+
+        // No error, we good, commit and enable foreign keys
+        Database.Execute("COMMIT;");
+        Database.Execute("PRAGMA foreign_keys=on;");
+        Database.Execute("BEGIN TRANSACTION;");
+    }
+
+    private void MigrateColumnSqlite()
+    {
         // Rename the table to something that's unlikely to conflict with custom tables
-        var tableName = Constants.DatabaseSchema.Tables.UserGroup;
         Rename
             .Table(Constants.DatabaseSchema.Tables.UserGroup)
             .To(OldTableName)
@@ -49,7 +79,7 @@ public class AddGuidsToUserGroups : MigrationBase
         // Now we can create the table again with all the right columns and then migrate the data
         Create.Table<UserGroupDto>().Do();
 
-        // SQLite doesn't really seem to support defaulting some columns, so we'll have to fetch all and then re-save.
+        // SQLite doesn't really seem to support defaulting to a random GUID, so we'll have to fetch all and then re-save.
         IEnumerable<UserGroupDto> groups = Database.Fetch<OldUserGroupDto>().Select(x => new UserGroupDto
         {
             Id = x.Id,
@@ -73,16 +103,7 @@ public class AddGuidsToUserGroups : MigrationBase
             Database.Insert(Constants.DatabaseSchema.Tables.UserGroup, "id", false, group);
         }
 
-        Delete
-            .ForeignKey("FK_startContentId_umbracoNode_id")
-            .OnTable(OldTableName)
-            .Do();
-
-        Delete
-            .ForeignKey("FK_startMediaId_umbracoNode_id")
-            .OnTable(OldTableName)
-            .Do();
-        // // Finally we can remove the old table.
+        // Finally we can remove the old table.
         Delete.Table(OldTableName).Do();
     }
 
