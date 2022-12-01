@@ -10,7 +10,7 @@ export class UmbDashboardModelsBuilderElement extends LitElement {
 	constructor() {
 		super();
 		umbHistoryService.push({
-			label: ['Settings', 'Models Builder'],
+			label: ['Models Builder', 'Settings'],
 			path: 'section/settings/dashboard/models-builder',
 		});
 	}

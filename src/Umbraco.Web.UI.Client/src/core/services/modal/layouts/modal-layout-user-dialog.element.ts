@@ -47,20 +47,31 @@ export class UmbModalLayoutUserDialogElement extends UmbContextConsumerMixin(Umb
 			#recent-history-items {
 				display: flex;
 				flex-direction: column;
-				gap: var(--uui-size-space-2);
+				gap: var(--uui-size-space-4);
 			}
 			.history-item {
-				color: inherit;
+				display: grid;
+				grid-template-columns: 32px 1fr;
+				grid-template-rows: 1fr;
+				color: var(--uui-color-interactive);
 				text-decoration: none;
 			}
-			.history-item-name-separator {
-				margin: 0 var(--uui-size-space-1);
+			.history-item uui-icon {
+				margin-top: 2px;
 			}
-
-			.history-item-name-separator {
-				opacity: 0.4;
+			.history-item:hover {
+				color: var(--uui-color-interactive-emphasis);
 			}
-			.history-item-name {
+			.history-item > div {
+				color: inherit;
+				text-decoration: none;
+				display: flex;
+				flex-direction: column;
+				line-height: 1.4em;
+			}
+			.history-item > div > span {
+				font-size: var(--uui-size-4);
+				opacity: 0.5;
 				text-overflow: ellipsis;
 				overflow: hidden;
 				white-space: nowrap;
@@ -144,27 +155,25 @@ export class UmbModalLayoutUserDialogElement extends UmbContextConsumerMixin(Umb
 	}
 
 	private _renderHistoryItem(item: UmbHistoryItem) {
-		if (typeof item.label === 'string') {
-			return html`<a class="history-item" href="${item.path}">
-				<div class="history-item-name">${item.label}</div>
-			</a>`;
-		}
-		if (Array.isArray(item.label)) {
-			console.log('hallo', item);
-
-			return html`
-				<a class="history-item" href=${item.path}>
-					<div>
-						${item.label.map((name, index) => {
-							return html`<span class="history-item-name">${name}</span
-								><span class="history-item-name-separator">${index < item.label.length - 1 ? '>' : nothing}</span>`;
-						})}
-					</div>
-				</a>
-			`;
-		}
-
-		return nothing;
+		return html`
+			<a href=${item.path} class="history-item">
+				<uui-icon name="umb:link"></uui-icon>
+				<div>
+					<b>${Array.isArray(item.label) ? item.label[0] : item.label}</b>
+					<span>
+						${Array.isArray(item.label)
+							? item.label.map((label, index) => {
+									if (index === 0) return;
+									return html`
+										<span>${label}</span>
+										${index !== item.label.length - 1 ? html`<span>${'>'}</span>` : nothing}
+									`;
+							  })
+							: nothing}
+					</span>
+				</div>
+			</a>
+		`;
 	}
 
 	render() {
@@ -190,10 +199,12 @@ export class UmbModalLayoutUserDialogElement extends UmbContextConsumerMixin(Umb
 								html`<umb-user-dashboard-extension .userDashboard=${provider}></umb-user-dashboard-extension>`
 						)}
 					</div>
-					<div id="recent-history">
-						<b>Recent History</b>
-						<div id="recent-history-items">${this._history.map((item) => html`${this._renderHistoryItem(item)}`)}</div>
-					</div>
+					<uui-box>
+						<b slot="headline">Recent History</b>
+						<div id="recent-history-items">
+							${this._history.reverse().map((item) => html` ${this._renderHistoryItem(item)} `)}
+						</div>
+					</uui-box>
 				</div>
 				<div slot="actions">
 					<uui-button @click=${this._close} look="secondary">Close</uui-button>

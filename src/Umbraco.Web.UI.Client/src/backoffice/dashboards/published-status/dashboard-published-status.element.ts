@@ -46,7 +46,7 @@ export class UmbDashboardPublishedStatusElement extends UmbContextConsumerMixin(
 	constructor() {
 		super();
 		umbHistoryService.push({
-			label: ['Settings', 'Published Status'],
+			label: ['Published Status', 'Settings'],
 			path: 'section/settings/dashboard/published-status',
 		});
 

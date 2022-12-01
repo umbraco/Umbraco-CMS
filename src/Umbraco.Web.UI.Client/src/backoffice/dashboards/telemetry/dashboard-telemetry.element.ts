@@ -30,7 +30,7 @@ export class UmbDashboardTelemetryElement extends LitElement {
 	constructor() {
 		super();
 		umbHistoryService.push({
-			label: ['Settings', 'Telemetry Data'],
+			label: ['Telemetry Data', 'Settings'],
 			path: 'section/settings/dashboard/telemetry',
 		});
 	}

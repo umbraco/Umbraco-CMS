@@ -97,7 +97,7 @@ export class UmbDashboardExamineIndexElement extends UmbContextConsumerMixin(Lit
 			const index = await SearchResource.getSearchIndexByIndexName({ indexName: this.indexName });
 			this._indexData = index;
 			umbHistoryService.push({
-				label: ['Settings', 'Examine Management', this._indexData.name],
+				label: [this._indexData.name, 'Settings', 'Examine Management'],
 				path: 'section/settings/dashboard/examine-management/index/ExternalIndex/' + this._indexData.name,
 			});
 		} catch (e) {

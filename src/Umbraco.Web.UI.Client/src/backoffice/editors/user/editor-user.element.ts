@@ -142,7 +142,7 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(
 			this._user = user;
 			if (!this._user) return;
 
-			umbHistoryService.push({ label: ['Users', user.name], path: 'section/users/view/users/user/' + user.key });
+			umbHistoryService.push({ label: [user.name, 'Users'], path: 'section/users/view/users/user/' + user.key });
 
 			if (!this._userContext) {
 				this._userContext = new UmbUserContext(this._user);

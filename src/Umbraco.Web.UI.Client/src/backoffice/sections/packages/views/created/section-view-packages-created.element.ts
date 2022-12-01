@@ -29,7 +29,7 @@ export class UmbSectionViewPackagesCreatedElement extends LitElement {
 
 	constructor() {
 		super();
-		umbHistoryService.push({ label: ['Packages', 'Created'], path: 'section/packages/view/created/overview' });
+		umbHistoryService.push({ label: ['Created', 'Packages'], path: 'section/packages/view/created/overview' });
 	}
 
 	render() {

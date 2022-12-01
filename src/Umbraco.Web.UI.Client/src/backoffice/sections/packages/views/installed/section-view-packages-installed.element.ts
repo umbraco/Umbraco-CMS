@@ -29,7 +29,7 @@ export class UmbSectionViewPackagesInstalledElement extends LitElement {
 
 	constructor() {
 		super();
-		umbHistoryService.push({ label: ['Packages', 'Installed'], path: 'section/packages/view/installed/overview' });
+		umbHistoryService.push({ label: ['Installed', 'Packages'], path: 'section/packages/view/installed/overview' });
 	}
 
 	render() {

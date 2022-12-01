@@ -55,7 +55,7 @@ export class UmbDashboardExamineManagementElement extends UmbContextConsumerMixi
 	constructor() {
 		super();
 		umbHistoryService.push({
-			label: ['Settings', 'Examine Management'],
+			label: ['Examine Management', 'Settings'],
 			path: 'section/settings/dashboard/examine-management',
 		});
 	}
