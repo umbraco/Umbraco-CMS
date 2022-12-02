@@ -1,3 +1,5 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
@@ -15,6 +17,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Api.Management.Configuration;
 using Umbraco.Cms.Api.Management.DependencyInjection;
+using Umbraco.Cms.Api.Management.Json;
 using Umbraco.Cms.Api.Management.OpenApi;
 using Umbraco.Cms.Web.Common.ApplicationBuilder;
 using Umbraco.Extensions;
@@ -158,7 +161,18 @@ public class ManagementApiComposer : IComposer
             options.AddApiVersionParametersWhenVersionNeutral = true;
             options.AssumeDefaultVersionWhenUnspecified = true;
         });
-        services.AddControllers();
+        services.AddControllers()
+            .AddJsonOptions(options =>
+            {
+                // any generic JSON options go here
+            })
+            .AddJsonOptions("BackOffice", options =>
+            {
+                // all back-office specific JSON options go here
+                options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                options.JsonSerializerOptions.Converters.Add(new JsonObjectConverter());
+            });
         builder.Services.ConfigureOptions<ConfigureMvcOptions>();
 
         // TODO: when this is moved to core, make the AddUmbracoOptions extension private again and remove core InternalsVisibleTo for Umbraco.Cms.Api.Management
