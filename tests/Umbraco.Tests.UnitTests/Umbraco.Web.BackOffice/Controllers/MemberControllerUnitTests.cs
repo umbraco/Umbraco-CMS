@@ -74,7 +74,8 @@ public class MemberControllerUnitTests
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IPasswordChanger<MemberIdentityUser> passwordChanger,
         IOptions<GlobalSettings> globalSettings,
-        IUser user)
+        IUser user,
+        ITwoFactorLoginService twoFactorLoginService)
     {
         // arrange
         SetupMemberTestData(out var fakeMemberData, out _, ContentSaveAction.SaveNew);
@@ -86,7 +87,8 @@ public class MemberControllerUnitTests
             dataTypeService,
             backOfficeSecurityAccessor,
             passwordChanger,
-            globalSettings);
+            globalSettings,
+            twoFactorLoginService);
         sut.ModelState.AddModelError("key", "Invalid model state");
 
         Mock.Get(umbracoMembersUserManager)
@@ -118,7 +120,8 @@ public class MemberControllerUnitTests
         IBackOfficeSecurity backOfficeSecurity,
         IPasswordChanger<MemberIdentityUser> passwordChanger,
         IOptions<GlobalSettings> globalSettings,
-        IUser user)
+        IUser user,
+        ITwoFactorLoginService twoFactorLoginService)
     {
         // arrange
         var member = SetupMemberTestData(out var fakeMemberData, out var memberDisplay, ContentSaveAction.SaveNew);
@@ -147,7 +150,8 @@ public class MemberControllerUnitTests
             dataTypeService,
             backOfficeSecurityAccessor,
             passwordChanger,
-            globalSettings);
+            globalSettings,
+            twoFactorLoginService);
 
         // act
         var result = await sut.PostSave(fakeMemberData);
@@ -170,7 +174,8 @@ public class MemberControllerUnitTests
         IBackOfficeSecurity backOfficeSecurity,
         IPasswordChanger<MemberIdentityUser> passwordChanger,
         IOptions<GlobalSettings> globalSettings,
-        IUser user)
+        IUser user,
+        ITwoFactorLoginService twoFactorLoginService)
     {
         // arrange
         var member = SetupMemberTestData(out var fakeMemberData, out var memberDisplay, ContentSaveAction.SaveNew);
@@ -199,7 +204,8 @@ public class MemberControllerUnitTests
             dataTypeService,
             backOfficeSecurityAccessor,
             passwordChanger,
-            globalSettings);
+            globalSettings,
+            twoFactorLoginService);
 
         // act
         var result = await sut.PostSave(fakeMemberData);
@@ -222,7 +228,8 @@ public class MemberControllerUnitTests
         IBackOfficeSecurity backOfficeSecurity,
         IPasswordChanger<MemberIdentityUser> passwordChanger,
         IOptions<GlobalSettings> globalSettings,
-        IUser user)
+        IUser user,
+        ITwoFactorLoginService twoFactorLoginService)
     {
         // arrange
         var member = SetupMemberTestData(out var fakeMemberData, out var memberDisplay, ContentSaveAction.Save);
@@ -261,7 +268,8 @@ public class MemberControllerUnitTests
             dataTypeService,
             backOfficeSecurityAccessor,
             passwordChanger,
-            globalSettings);
+            globalSettings,
+            twoFactorLoginService);
 
         // act
         var result = await sut.PostSave(fakeMemberData);
@@ -284,7 +292,8 @@ public class MemberControllerUnitTests
         IBackOfficeSecurity backOfficeSecurity,
         IPasswordChanger<MemberIdentityUser> passwordChanger,
         IOptions<GlobalSettings> globalSettings,
-        IUser user)
+        IUser user,
+        ITwoFactorLoginService twoFactorLoginService)
     {
         // arrange
         var member = SetupMemberTestData(out var fakeMemberData, out _, ContentSaveAction.Save);
@@ -319,7 +328,8 @@ public class MemberControllerUnitTests
             dataTypeService,
             backOfficeSecurityAccessor,
             passwordChanger,
-            globalSettings);
+            globalSettings,
+            twoFactorLoginService);
 
         // act
         var result = await sut.PostSave(fakeMemberData);
@@ -374,7 +384,8 @@ public class MemberControllerUnitTests
         IBackOfficeSecurity backOfficeSecurity,
         IPasswordChanger<MemberIdentityUser> passwordChanger,
         IOptions<GlobalSettings> globalSettings,
-        IUser user)
+        IUser user,
+        ITwoFactorLoginService twoFactorLoginService)
     {
         // arrange
         var member = SetupMemberTestData(out var fakeMemberData, out _, ContentSaveAction.SaveNew);
@@ -402,7 +413,8 @@ public class MemberControllerUnitTests
             dataTypeService,
             backOfficeSecurityAccessor,
             passwordChanger,
-            globalSettings);
+            globalSettings,
+            twoFactorLoginService);
 
         // act
         var result = sut.PostSave(fakeMemberData).Result;
@@ -426,7 +438,8 @@ public class MemberControllerUnitTests
         IBackOfficeSecurity backOfficeSecurity,
         IPasswordChanger<MemberIdentityUser> passwordChanger,
         IOptions<GlobalSettings> globalSettings,
-        IUser user)
+        IUser user,
+        ITwoFactorLoginService twoFactorLoginService)
     {
         // arrange
         var roleName = "anyrole";
@@ -469,7 +482,8 @@ public class MemberControllerUnitTests
             dataTypeService,
             backOfficeSecurityAccessor,
             passwordChanger,
-            globalSettings);
+            globalSettings,
+            twoFactorLoginService);
 
         // act
         var result = await sut.PostSave(fakeMemberData);
@@ -508,7 +522,8 @@ public class MemberControllerUnitTests
         IDataTypeService dataTypeService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IPasswordChanger<MemberIdentityUser> passwordChanger,
-        IOptions<GlobalSettings> globalSettings)
+        IOptions<GlobalSettings> globalSettings,
+        ITwoFactorLoginService twoFactorLoginService)
     {
         var httpContextAccessor = new HttpContextAccessor();
 
@@ -558,7 +573,8 @@ public class MemberControllerUnitTests
                 memberGroupService,
                 mockPasswordConfig.Object,
                 contentTypeBaseServiceProvider.Object,
-                propertyEditorCollection));
+                propertyEditorCollection,
+                twoFactorLoginService));
 
         var map = new MapDefinitionCollection(() => new List<IMapDefinition>
         {
@@ -607,7 +623,8 @@ public class MemberControllerUnitTests
             backOfficeSecurityAccessor,
             new ConfigurationEditorJsonSerializer(),
             passwordChanger,
-            scopeProvider);
+            scopeProvider,
+            twoFactorLoginService);
     }
 
     /// <summary>
@@ -696,6 +713,11 @@ public class MemberControllerUnitTests
                         {
                             Alias =
                                 $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}lockedOut",
+                        },
+                        new()
+                        {
+                            Alias =
+                                $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}twoFactorEnabled",
                         },
                         new()
                         {

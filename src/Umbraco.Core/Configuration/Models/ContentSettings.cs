@@ -152,7 +152,7 @@ public class ContentSettings
     internal const string StaticMacroErrors = "Inline";
     internal const string StaticDisallowedUploadFiles = "ashx,aspx,ascx,config,cshtml,vbhtml,asmx,air,axd,xamlx";
     internal const bool StaticShowDeprecatedPropertyEditors = false;
-    internal const string StaticLoginBackgroundImage = "assets/img/login.jpg";
+    internal const string StaticLoginBackgroundImage = "assets/img/login.svg";
     internal const string StaticLoginLogoImage = "assets/img/application/umbraco_logo_white.svg";
     internal const bool StaticHideBackOfficeLogo = false;
     internal const bool StaticDisableDeleteWhenReferenced = false;

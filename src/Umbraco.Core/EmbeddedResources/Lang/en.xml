@@ -345,6 +345,7 @@
     <key alias="createNewMember">Create a new member</key>
     <key alias="allMembers">All Members</key>
     <key alias="memberGroupNoProperties">Member groups have no additional properties for editing.</key>
+    <key alias="2fa">Two-Factor Authentication</key>
   </area>
   <area alias="contentType">
     <key alias="copyFailed">Failed to copy content type</key>
@@ -2783,7 +2784,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="allowBlockInRoot">Allow in root</key>
     <key alias="allowBlockInRootHelp">Make this block available in the root of the layout.</key>
     <key alias="allowBlockInAreas">Allow in areas</key>
-    <key alias="allowBlockInAreasHelp">Make this block available within other Blocks.</key>
+    <key alias="allowBlockInAreasHelp">Make this block available by default within the areas of other Blocks (unless explicit permissions are set for these areas).</key>
     <key alias="areaAllowedBlocksEmpty">When empty all Blocks allowed for Areas can be created.</key>
     <key alias="areas">Areas</key>
     <key alias="areasLayoutColumns">Grid Columns for Areas</key>

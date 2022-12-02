@@ -299,6 +299,9 @@
                         case '_umb_lockedOut':
                             saveModel.isLockedOut = prop.value;
                             break;
+                        case '_umb_twoFactorEnabled':
+                            saveModel.isTwoFactorEnabled = prop.value;
+                            break;
                     }
                 });
 
