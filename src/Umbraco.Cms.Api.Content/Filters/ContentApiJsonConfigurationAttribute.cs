@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace Umbraco.Cms.ContentApi.Filters;
+namespace Umbraco.Cms.Api.Content.Filters;
 
 public class ContentApiJsonConfigurationAttribute : TypeFilterAttribute
 {

@@ -158,7 +158,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Cms.Imaging.ImageSh
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{05878304-40EB-4F84-B40B-91BDB70DE094}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Cms.ContentApi", "src\Umbraco.Cms.ContentApi\Umbraco.Cms.ContentApi.csproj", "{9AA3D21F-81A9-4F27-85D1-CE850B59DC2D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Cms.Api.Content", "src\Umbraco.Cms.Api.Content\Umbraco.Cms.Api.Content.csproj", "{9AA3D21F-81A9-4F27-85D1-CE850B59DC2D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

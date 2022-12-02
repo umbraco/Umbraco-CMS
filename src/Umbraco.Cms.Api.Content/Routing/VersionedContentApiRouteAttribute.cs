@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core;
 
-namespace Umbraco.Cms.ContentApi.Routing;
+namespace Umbraco.Cms.Api.Content.Routing;
 
 public class VersionedContentApiRouteAttribute : BackOfficeRouteAttribute
 {

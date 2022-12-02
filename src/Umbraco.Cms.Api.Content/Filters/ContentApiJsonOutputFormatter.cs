@@ -2,7 +2,7 @@
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc.Formatters;
 
-namespace Umbraco.Cms.ContentApi.Filters;
+namespace Umbraco.Cms.Api.Content.Filters;
 
 public class ContentApiJsonOutputFormatter : SystemTextJsonOutputFormatter
 {

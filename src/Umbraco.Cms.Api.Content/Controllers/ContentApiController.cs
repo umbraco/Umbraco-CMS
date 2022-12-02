@@ -1,12 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.ContentApi.Filters;
-using Umbraco.Cms.ContentApi.Routing;
+using Umbraco.Cms.Api.Content.Filters;
+using Umbraco.Cms.Api.Content.Routing;
 using Umbraco.Cms.Core.Headless;
 using Umbraco.Cms.Core.PublishedCache;
 
-namespace Umbraco.Cms.ContentApi.Controllers;
+namespace Umbraco.Cms.Api.Content.Controllers;
 
 [ContentApiJsonConfiguration]
 [VersionedContentApiRoute("query")]
