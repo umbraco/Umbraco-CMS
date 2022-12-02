@@ -20,11 +20,11 @@ internal sealed class OpenAPIContractTest : UmbracoTestServerTestBase
     {
         builder.AddMvcAndRazor(mvcBuilder =>
         {
-            // Adds Umbraco.Cms.ManagementApi
-            mvcBuilder.AddApplicationPart(typeof(ManagementApi.Controllers.Install.InstallControllerBase).Assembly);
+            // Adds Umbraco.Cms.Api.Management
+            mvcBuilder.AddApplicationPart(typeof(Api.Management.Controllers.Install.InstallControllerBase).Assembly);
         });
 
-        new ManagementApi.ManagementApiComposer().Compose(builder);
+        new Api.Management.ManagementApiComposer().Compose(builder);
     }
 
     [Test]
