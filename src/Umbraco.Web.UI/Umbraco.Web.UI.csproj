@@ -9,7 +9,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Cms.ContentApi\Umbraco.Cms.ContentApi.csproj" />
     <ProjectReference Include="..\Umbraco.Cms\Umbraco.Cms.csproj" />
-    <ProjectReference Include="..\Umbraco.Cms.ManagementApi\Umbraco.Cms.ManagementApi.csproj" />
+    <ProjectReference Include="..\Umbraco.Cms.Api.Management\Umbraco.Cms.Api.Management.csproj" />
   </ItemGroup>
 
   <ItemGroup>
