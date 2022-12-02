@@ -210,14 +210,21 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(
 	}
 
 	private _changePassword() {
-		this._modalService?.changePassword();
+		this._modalService?.changePassword({ requireOldPassword: this._isCurrentUserAdmin === false });
+	}
+
+	private get _isCurrentUserAdmin(): boolean {
+		//TODO: Find a way to figure out if current user is in the admin group
+		const adminUserGroupKey = '10000000-0000-0000-0000-000000000000';
+		return this._currentUser?.userGroup === adminUserGroupKey;
 	}
 
 	private _renderActionButtons() {
-		const adminUserGroupKey = '10000000-0000-0000-0000-000000000000';
+		if (!this._user) return;
+
 		const buttons: TemplateResult[] = [];
 
-		if (this._currentUser?.userGroup !== adminUserGroupKey) return nothing;
+		if (this._isCurrentUserAdmin === false) return nothing;
 
 		if (this._user?.status !== 'invited')
 			buttons.push(
@@ -225,8 +232,8 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(
 					<uui-button
 						@click=${this._updateUserStatus}
 						look="primary"
-						color="${this._user!.status === 'disabled' ? 'positive' : 'warning'}"
-						label="${this._user!.status === 'disabled' ? 'Enable' : 'Disable'}"></uui-button>
+						color="${this._user.status === 'disabled' ? 'positive' : 'warning'}"
+						label="${this._user.status === 'disabled' ? 'Enable' : 'Disable'}"></uui-button>
 				`
 			);
 

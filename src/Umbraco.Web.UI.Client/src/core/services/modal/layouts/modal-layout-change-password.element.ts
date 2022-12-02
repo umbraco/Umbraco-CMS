@@ -7,6 +7,10 @@ import { UmbUserStore } from 'src/core/stores/user/user.store';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
+export interface UmbModalChangePasswordData {
+	requireOldPassword: boolean;
+}
+
 @customElement('umb-modal-layout-change-password')
 export class UmbModalLayoutChangePasswordElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles: CSSResultGroup = [
@@ -30,8 +34,8 @@ export class UmbModalLayoutChangePasswordElement extends UmbContextConsumerMixin
 	@property({ attribute: false })
 	modalHandler?: UmbModalHandler;
 
-	@state()
-	private _requireOldPassword = false; //TODO: Implement check to see if current user is an admin.
+	@property()
+	data?: UmbModalChangePasswordData;
 
 	private _close() {
 		this.modalHandler?.close();
@@ -73,7 +77,7 @@ export class UmbModalLayoutChangePasswordElement extends UmbContextConsumerMixin
 			<uui-dialog-layout class="uui-text" headline="Change password">
 				<uui-form>
 					<form id="LoginForm" name="login" @submit="${this._handleSubmit}">
-						${this._requireOldPassword ? this._renderOldPasswordInput() : nothing}
+						${this.data?.requireOldPassword ? this._renderOldPasswordInput() : nothing}
 						<uui-form-layout-item>
 							<uui-label id="newPasswordLabel" for="newPassword" slot="label" required>New password</uui-label>
 							<uui-input-password

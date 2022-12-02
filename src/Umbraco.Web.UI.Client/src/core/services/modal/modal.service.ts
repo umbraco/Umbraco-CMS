@@ -13,6 +13,7 @@ import type { UmbModalConfirmData } from './layouts/confirm/modal-layout-confirm
 import type { UmbModalContentPickerData } from './layouts/content-picker/modal-layout-content-picker.element';
 import type { UmbModalPropertyEditorUIPickerData } from './layouts/property-editor-ui-picker/modal-layout-property-editor-ui-picker.element';
 import { UmbModalHandler } from './';
+import { UmbModalChangePasswordData } from './layouts/modal-layout-change-password.element';
 
 export type UmbModelType = 'dialog' | 'sidebar';
 
@@ -86,8 +87,8 @@ export class UmbModalService {
 	 * @return {*}  {UmbModalHandler}
 	 * @memberof UmbModalService
 	 */
-	public changePassword(): UmbModalHandler {
-		return this.open('umb-modal-layout-change-password', { type: 'dialog' });
+	public changePassword(data: UmbModalChangePasswordData): UmbModalHandler {
+		return this.open('umb-modal-layout-change-password', { data, type: 'dialog' });
 	}
 
 	/**
