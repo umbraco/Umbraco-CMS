@@ -80,6 +80,12 @@ public static class BackOfficeAuthBuilderExtensions
                 options
                     .UseAspNetCore()
                     .EnableAuthorizationEndpointPassthrough();
+
+                // Enable reference tokens
+                // - see https://documentation.openiddict.com/configuration/token-storage.html
+                options
+                    .UseReferenceAccessTokens()
+                    .UseReferenceRefreshTokens();
             })
 
             // Register the OpenIddict validation components.
