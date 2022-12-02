@@ -44,6 +44,7 @@ export const data: Array<UserDetails> = [
 		updateDate: '8/27/2022',
 		createDate: '9/19/2022',
 		failedLoginAttempts: 52,
+		userGroup: '10000000-0000-0000-0000-000000000000',
 	},
 	{
 		key: '7c9c5510-a7b6-43fd-a2d1-51de0009eabf',

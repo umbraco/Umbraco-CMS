@@ -1,5 +1,5 @@
 import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
-import { css, html, LitElement, nothing } from 'lit';
+import { css, html, LitElement, nothing, TemplateResult } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { Subscription } from 'rxjs';
@@ -214,19 +214,34 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(
 	}
 
 	private _renderActionButtons() {
-		if (this._currentUser?.key === this._user?.key)
-			return html` <uui-button @click=${this._changePassword} look="primary" label="Change password"></uui-button> `;
+		const adminUserGroupKey = '10000000-0000-0000-0000-000000000000';
+		const buttons: TemplateResult[] = [];
 
-		return html` ${this._user?.status !== 'invited'
-				? html`
-						<uui-button
-							@click=${this._updateUserStatus}
-							look="primary"
-							color="${this._user!.status === 'disabled' ? 'positive' : 'warning'}"
-							label="${this._user!.status === 'disabled' ? 'Enable' : 'Disable'}"></uui-button>
-				  `
-				: nothing}
-			<uui-button @click=${this._deleteUser} look="primary" color="danger" label="Delete User"></uui-button>`;
+		if (this._currentUser?.userGroup !== adminUserGroupKey) return nothing;
+
+		if (this._user?.status !== 'invited')
+			buttons.push(
+				html`
+					<uui-button
+						@click=${this._updateUserStatus}
+						look="primary"
+						color="${this._user!.status === 'disabled' ? 'positive' : 'warning'}"
+						label="${this._user!.status === 'disabled' ? 'Enable' : 'Disable'}"></uui-button>
+				`
+			);
+
+		if (this._currentUser?.key !== this._user?.key)
+			buttons.push(html` <uui-button
+				@click=${this._deleteUser}
+				look="primary"
+				color="danger"
+				label="Delete User"></uui-button>`);
+
+		buttons.push(
+			html` <uui-button @click=${this._changePassword} look="primary" label="Change password"></uui-button> `
+		);
+
+		return buttons;
 	}
 
 	private renderLeftColumn() {
