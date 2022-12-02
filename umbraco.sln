@@ -100,7 +100,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NewBackoffice", "NewBackoff
 		.github\New BackOffice - README.md = .github\New BackOffice - README.md
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Cms.ManagementApi", "src\Umbraco.Cms.ManagementApi\Umbraco.Cms.ManagementApi.csproj", "{0946531B-F06D-415B-A4E3-6CBFF5DB1C12}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Cms.Api.Management", "src\Umbraco.Cms.Api.Management\Umbraco.Cms.Api.Management.csproj", "{0946531B-F06D-415B-A4E3-6CBFF5DB1C12}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.New.Cms.Core", "src\Umbraco.New.Cms.Core\Umbraco.New.Cms.Core.csproj", "{CBCE0A1E-BF29-49A6-9581-EAB3587D823A}"
 EndProject
