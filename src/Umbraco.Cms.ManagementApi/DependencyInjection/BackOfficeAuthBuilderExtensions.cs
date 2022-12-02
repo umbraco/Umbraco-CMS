@@ -96,6 +96,10 @@ public static class BackOfficeAuthBuilderExtensions
 
                 // Register the ASP.NET Core host.
                 options.UseAspNetCore();
+
+                // Enable token entry validation
+                // - see https://documentation.openiddict.com/configuration/token-storage.html#enabling-token-entry-validation-at-the-api-level
+                options.EnableTokenEntryValidation();
             });
 
         builder.Services.AddTransient<IBackOfficeApplicationManager, BackOfficeApplicationManager>();
