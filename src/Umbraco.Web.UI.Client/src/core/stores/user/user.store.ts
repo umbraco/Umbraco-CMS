@@ -1,4 +1,4 @@
-import { BehaviorSubject, map, Observable, ReplaySubject, Subject } from 'rxjs';
+import { BehaviorSubject, map, Observable } from 'rxjs';
 import type { UserDetails } from '../../models';
 import { UmbEntityStore } from '../entity.store';
 import { UmbDataStoreBase } from '../store';
@@ -15,20 +15,9 @@ export class UmbUserStore extends UmbDataStoreBase<UserDetails> {
 	private _totalUsers: BehaviorSubject<number> = new BehaviorSubject(0);
 	public readonly totalUsers: Observable<number> = this._totalUsers.asObservable();
 
-	private _currentUser: Subject<UserDetails> = new ReplaySubject<UserDetails>();
-	public readonly currentUser: Observable<UserDetails> = this._currentUser.asObservable();
-
 	constructor(entityStore: UmbEntityStore) {
 		super();
 		this._entityStore = entityStore;
-
-		//TODO: Temp code to get the first user as the current user. Replace when login is implemented.
-		const subscription = this.getAll().subscribe((response) => {
-			if (response.length > 0) {
-				this._currentUser.next(response[0]);
-				subscription.unsubscribe();
-			}
-		});
 	}
 
 	getAll(): Observable<Array<UserDetails>> {

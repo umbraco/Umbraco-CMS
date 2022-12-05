@@ -5,7 +5,7 @@ import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { UserDetails } from '@umbraco-cms/models';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbModalService } from '@umbraco-cms/services';
-import { UmbUserStore } from 'src/core/stores/user/user.store';
+import { umbCurrentUserService } from 'src/core/services/current-user';
 
 @customElement('umb-backoffice-header-tools')
 export class UmbBackofficeHeaderTools extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
@@ -27,22 +27,18 @@ export class UmbBackofficeHeaderTools extends UmbContextConsumerMixin(UmbObserve
 	@state()
 	private _currentUser?: UserDetails;
 
-	private _userStore?: UmbUserStore;
 	private _modalService?: UmbModalService;
 
 	constructor() {
 		super();
 		this.consumeAllContexts(['umbUserStore', 'umbModalService'], (instances) => {
-			this._userStore = instances['umbUserStore'];
 			this._modalService = instances['umbModalService'];
 			this._observeCurrentUser();
 		});
 	}
 
 	private async _observeCurrentUser() {
-		if (!this._userStore) return;
-
-		this.observe<UserDetails>(this._userStore.currentUser, (currentUser) => {
+		this.observe<UserDetails>(umbCurrentUserService.currentUser, (currentUser) => {
 			this._currentUser = currentUser;
 		});
 	}

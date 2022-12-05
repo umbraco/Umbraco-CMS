@@ -17,6 +17,7 @@ import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbModalService } from '@umbraco-cms/services';
 import { umbHistoryService } from 'src/core/services/history';
+import { umbCurrentUserService } from 'src/core/services/current-user';
 
 @customElement('umb-editor-user')
 export class UmbEditorUserElement extends UmbContextProviderMixin(
@@ -130,7 +131,7 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(
 	private async _observeCurrentUser() {
 		if (!this._userStore) return;
 
-		this.observe<UserDetails>(this._userStore.currentUser, (currentUser) => {
+		this.observe<UserDetails>(umbCurrentUserService.currentUser, (currentUser) => {
 			this._currentUser = currentUser;
 		});
 	}

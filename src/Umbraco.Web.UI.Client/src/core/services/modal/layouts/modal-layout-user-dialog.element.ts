@@ -2,6 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, CSSResultGroup, html, LitElement, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UmbHistoryItem, umbHistoryService } from '../../history';
+import { umbCurrentUserService } from '../../current-user';
 import { UmbModalHandler, UmbModalService } from '@umbraco-cms/services';
 import type { ManifestExternalLoginProvider, ManifestUserDashboard, UserDetails } from '@umbraco-cms/models';
 import { UmbUserStore } from 'src/core/stores/user/user.store';
@@ -94,17 +95,15 @@ export class UmbModalLayoutUserDialogElement extends UmbContextConsumerMixin(Umb
 	@state()
 	private _history: Array<UmbHistoryItem> = [];
 
-	private _userStore?: UmbUserStore;
 	private _modalService?: UmbModalService;
 
 	constructor() {
 		super();
-		this.consumeAllContexts(['umbUserStore', 'umbModalService'], (instances) => {
-			this._userStore = instances['umbUserStore'];
+		this.consumeAllContexts(['umbModalService'], (instances) => {
 			this._modalService = instances['umbModalService'];
-			this._observeCurrentUser();
 		});
 
+		this._observeCurrentUser();
 		this._observeExternalLoginProviders();
 		this._observeHistory();
 		this._observeUserDashboards();
@@ -120,9 +119,7 @@ export class UmbModalLayoutUserDialogElement extends UmbContextConsumerMixin(Umb
 	}
 
 	private async _observeCurrentUser() {
-		if (!this._userStore) return;
-
-		this.observe<UserDetails>(this._userStore.currentUser, (currentUser) => {
+		this.observe<UserDetails>(umbCurrentUserService.currentUser, (currentUser) => {
 			this._currentUser = currentUser;
 		});
 	}
@@ -144,14 +141,17 @@ export class UmbModalLayoutUserDialogElement extends UmbContextConsumerMixin(Umb
 	}
 
 	private _edit() {
+		console.log('Hello', this._currentUser);
 		if (!this._currentUser) return;
+
 		history.pushState(null, '', '/section/users/view/users/user/' + this._currentUser.key); //TODO Change to a tag with href and make dynamic
 		this._close();
 	}
 
 	private _changePassword() {
 		if (!this._modalService) return;
-		this._modalService.changePassword();
+
+		this._modalService.changePassword({ requireOldPassword: umbCurrentUserService.isAdmin });
 	}
 
 	private _renderHistoryItem(item: UmbHistoryItem) {
@@ -174,6 +174,10 @@ export class UmbModalLayoutUserDialogElement extends UmbContextConsumerMixin(Umb
 				</div>
 			</a>
 		`;
+	}
+
+	private _logout() {
+		umbCurrentUserService.logout();
 	}
 
 	render() {
@@ -208,7 +212,7 @@ export class UmbModalLayoutUserDialogElement extends UmbContextConsumerMixin(Umb
 				</div>
 				<div slot="actions">
 					<uui-button @click=${this._close} look="secondary">Close</uui-button>
-					<uui-button look="primary" color="danger">Logout</uui-button>
+					<uui-button @click=${this._logout} look="primary" color="danger">Logout</uui-button>
 				</div>
 			</umb-editor-entity-layout>
 		`;
