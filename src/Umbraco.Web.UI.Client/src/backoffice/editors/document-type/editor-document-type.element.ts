@@ -137,7 +137,8 @@ export class UmbEditorDocumentTypeElement extends UmbContextProviderMixin(
 		const modalHandler = this._modalService?.iconPicker();
 
 		modalHandler?.onClose().then((saved) => {
-			if (saved) this._icon = { color: saved.color, name: saved.icon };
+			if (saved) this._documentTypeContext?.update({ icon: saved.icon });
+			// TODO save color as well and update styling on the icon that shows up
 		});
 	}
 
@@ -146,7 +147,9 @@ export class UmbEditorDocumentTypeElement extends UmbContextProviderMixin(
 			<umb-editor-entity-layout alias="Umb.Editor.DocumentType">
 				<div slot="icon">
 					<uui-button id="icon" @click=${this._handleIconClick} compact>
-						<uui-icon name="${this._icon.name}" style="color: ${this._icon.color}"></uui-icon>
+						<uui-icon
+							name="${this._documentType?.icon || 'umb:document-dashed-line'}"
+							style="color: ${this._icon.color}"></uui-icon>
 					</uui-button>
 				</div>
 
