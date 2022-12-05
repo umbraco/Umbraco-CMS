@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
@@ -587,7 +588,7 @@ public class MemberControllerUnitTests
             It.IsAny<bool>(),
             It.IsAny<bool>()) == Mock.Of<ICoreScope>());
 
-        _mapper = new UmbracoMapper(map, scopeProvider);
+        _mapper = new UmbracoMapper(map, scopeProvider, NullLogger<UmbracoMapper>.Instance);
 
         return new MemberController(
             new DefaultCultureDictionary(
