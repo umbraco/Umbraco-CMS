@@ -3,7 +3,8 @@
     <umb-color-picker
         ng-model="vm.color"
         options="vm.options"
-        on-change="vm.selectColor(color)">
+        on-change="vm.selectColor(color)"
+        ng-attr-readonly="{{ readonly || undefined }}">
     </umb-color-picker>
 
     <input type="hidden" name="selectedColor" ng-model="model.selectedColor" val-property-validator="validateMandatory" />

@@ -17,5 +17,6 @@ public class PropertyTypeParameterEditor : DataEditor
 
         // don't publish the id for a property type, publish its alias
         DefaultConfiguration.Add("publishBy", "alias");
+        SupportsReadOnly = true;
     }
 }

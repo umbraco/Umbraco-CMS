@@ -3,7 +3,7 @@
 
 using System;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Persistence.SqlServer;
 
 namespace Umbraco.Cms.Tests.Integration.Testing;
 

@@ -1,5 +1,4 @@
 using System.Globalization;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -10,7 +9,6 @@ using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Models.Mapping;
@@ -34,48 +32,12 @@ public class ContentTypeMapDefinition : IMapDefinition
     private readonly IShortStringHelper _shortStringHelper;
     private ContentSettings _contentSettings;
 
-    [Obsolete("Use ctor with all params injected")]
-    public ContentTypeMapDefinition(
-        CommonMapper commonMapper,
-        PropertyEditorCollection propertyEditors,
-        IDataTypeService dataTypeService,
-        IFileService fileService,
-        IContentTypeService contentTypeService,
-        IMediaTypeService mediaTypeService,
+    public ContentTypeMapDefinition(CommonMapper commonMapper, PropertyEditorCollection propertyEditors,
+        IDataTypeService dataTypeService, IFileService fileService,
+        IContentTypeService contentTypeService, IMediaTypeService mediaTypeService,
         IMemberTypeService memberTypeService,
-        ILoggerFactory loggerFactory,
-        IShortStringHelper shortStringHelper,
-        IOptions<GlobalSettings> globalSettings,
-        IHostingEnvironment hostingEnvironment)
-        : this(
-            commonMapper,
-            propertyEditors,
-            dataTypeService,
-            fileService,
-            contentTypeService,
-            mediaTypeService,
-            memberTypeService,
-            loggerFactory,
-            shortStringHelper,
-            globalSettings,
-            hostingEnvironment,
-            StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<ContentSettings>>())
-    {
-    }
-
-    public ContentTypeMapDefinition(
-        CommonMapper commonMapper,
-        PropertyEditorCollection propertyEditors,
-        IDataTypeService dataTypeService,
-        IFileService fileService,
-        IContentTypeService contentTypeService,
-        IMediaTypeService mediaTypeService,
-        IMemberTypeService memberTypeService,
-        ILoggerFactory loggerFactory,
-        IShortStringHelper shortStringHelper,
-        IOptions<GlobalSettings> globalSettings,
-        IHostingEnvironment hostingEnvironment,
-        IOptionsMonitor<ContentSettings> contentSettings)
+        ILoggerFactory loggerFactory, IShortStringHelper shortStringHelper, IOptions<GlobalSettings> globalSettings,
+        IHostingEnvironment hostingEnvironment, IOptionsMonitor<ContentSettings> contentSettings)
     {
         _commonMapper = commonMapper;
         _propertyEditors = propertyEditors;
@@ -92,32 +54,6 @@ public class ContentTypeMapDefinition : IMapDefinition
 
         _contentSettings = contentSettings.CurrentValue;
         contentSettings.OnChange(x => _contentSettings = x);
-    }
-
-    public static Udi? MapContentTypeUdi(IContentTypeComposition source)
-    {
-        if (source == null)
-        {
-            return null;
-        }
-
-        string udiType;
-        switch (source)
-        {
-            case IMemberType _:
-                udiType = Constants.UdiEntityType.MemberType;
-                break;
-            case IMediaType _:
-                udiType = Constants.UdiEntityType.MediaType;
-                break;
-            case IContentType _:
-                udiType = Constants.UdiEntityType.DocumentType;
-                break;
-            default:
-                throw new PanicException($"Source is of type {source.GetType()} which isn't supported here");
-        }
-
-        return Udi.Create(udiType, source.Key);
     }
 
     public void DefineMaps(IUmbracoMapper mapper)
@@ -171,7 +107,52 @@ public class ContentTypeMapDefinition : IMapDefinition
             (source, context) => new MemberPropertyTypeDisplay(), Map);
     }
 
-    private static void MapHistoryCleanup(DocumentTypeSave source, IContentTypeWithHistoryCleanup target)
+    public static Udi? MapContentTypeUdi(IContentTypeComposition source)
+    {
+        if (source == null)
+        {
+            return null;
+        }
+
+        string udiType;
+        switch (source)
+        {
+            case IMemberType _:
+                udiType = Constants.UdiEntityType.MemberType;
+                break;
+            case IMediaType _:
+                udiType = Constants.UdiEntityType.MediaType;
+                break;
+            case IContentType _:
+                udiType = Constants.UdiEntityType.DocumentType;
+                break;
+            default:
+                throw new PanicException($"Source is of type {source.GetType()} which isn't supported here");
+        }
+
+        return Udi.Create(udiType, source.Key);
+    }
+
+    // no MapAll - take care
+    private void Map(DocumentTypeSave source, IContentType target, MapperContext context)
+    {
+        MapSaveToTypeBase<DocumentTypeSave, PropertyTypeBasic>(source, target, context);
+        MapComposition(source, target, alias => _contentTypeService.Get(alias));
+
+        MapHistoryCleanup(source, target);
+
+        target.AllowedTemplates = source.AllowedTemplates?
+            .Where(x => x != null)
+            .Select(_fileService.GetTemplate)
+            .WhereNotNull()
+            .ToArray();
+
+        target.SetDefaultTemplate(source.DefaultTemplate == null
+            ? null
+            : _fileService.GetTemplate(source.DefaultTemplate));
+    }
+
+    private static void MapHistoryCleanup(DocumentTypeSave source, IContentType target)
     {
         // If source history cleanup is null we don't have to map all properties
         if (source.HistoryCleanup is null)
@@ -248,28 +229,6 @@ public class ContentTypeMapDefinition : IMapDefinition
     }
 
     // no MapAll - take care
-    private void Map(DocumentTypeSave source, IContentType target, MapperContext context)
-    {
-        MapSaveToTypeBase<DocumentTypeSave, PropertyTypeBasic>(source, target, context);
-        MapComposition(source, target, alias => _contentTypeService.Get(alias));
-
-        if (target is IContentTypeWithHistoryCleanup targetWithHistoryCleanup)
-        {
-            MapHistoryCleanup(source, targetWithHistoryCleanup);
-        }
-
-        target.AllowedTemplates = source.AllowedTemplates?
-            .Where(x => x != null)
-            .Select(_fileService.GetTemplate)
-            .WhereNotNull()
-            .ToArray();
-
-        target.SetDefaultTemplate(source.DefaultTemplate == null
-            ? null
-            : _fileService.GetTemplate(source.DefaultTemplate));
-    }
-
-    // no MapAll - take care
     private void Map(MediaTypeSave source, IMediaType target, MapperContext context)
     {
         MapSaveToTypeBase<MediaTypeSave, PropertyTypeBasic>(source, target, context);
@@ -303,7 +262,7 @@ public class ContentTypeMapDefinition : IMapDefinition
     {
         MapTypeToDisplayBase<DocumentTypeDisplay, PropertyTypeDisplay>(source, target);
 
-        if (source is IContentTypeWithHistoryCleanup sourceWithHistoryCleanup)
+        if (source is IContentType sourceWithHistoryCleanup)
         {
             target.HistoryCleanup = new HistoryCleanupViewModel
             {
@@ -316,13 +275,14 @@ public class ContentTypeMapDefinition : IMapDefinition
                     _contentSettings.ContentVersionCleanupPolicy.KeepAllVersionsNewerThanDays,
                 GlobalKeepLatestVersionPerDayForDays =
                     _contentSettings.ContentVersionCleanupPolicy.KeepLatestVersionPerDayForDays,
-                GlobalEnableCleanup = _contentSettings.ContentVersionCleanupPolicy.EnableCleanup,
+                GlobalEnableCleanup = _contentSettings.ContentVersionCleanupPolicy.EnableCleanup
             };
         }
 
         target.AllowCultureVariant = source.VariesByCulture();
         target.AllowSegmentVariant = source.VariesBySegment();
         target.ContentApps = _commonMapper.GetContentAppsForEntity(source);
+        target.Variations = source.Variations;
 
         // sync templates
         if (source.AllowedTemplates is not null)
@@ -419,6 +379,7 @@ public class ContentTypeMapDefinition : IMapDefinition
             ? string.Empty
             : _hostingEnvironment.ToAbsolute("~/umbraco/images/thumbnails/" + source.Thumbnail);
         target.UpdateDate = source.UpdateDate;
+        target.Variations = source.Variations;
     }
 
     // no MapAll - uses the IContentTypeBase map method, which has MapAll
@@ -493,7 +454,8 @@ public class ContentTypeMapDefinition : IMapDefinition
             source, target, context);
 
     // Umbraco.Code.MapAll -CreateDate -UpdateDate -DeleteDate -Key -PropertyTypes
-    private static void Map(PropertyGroupBasic<MemberPropertyTypeBasic> source, PropertyGroup target, MapperContext context)
+    private static void Map(PropertyGroupBasic<MemberPropertyTypeBasic> source, PropertyGroup target,
+        MapperContext context)
     {
         if (source.Id > 0)
         {
@@ -751,6 +713,7 @@ public class ContentTypeMapDefinition : IMapDefinition
         target.AllowedContentTypes = source.AllowedContentTypes?.OrderBy(c => c.SortOrder).Select(x => x.Id.Value);
         target.CompositeContentTypes = source.ContentTypeComposition.Select(x => x.Alias);
         target.LockedCompositeContentTypes = MapLockedCompositions(source);
+        target.Variations = source.Variations;
     }
 
     // no MapAll - relies on the non-generic method
@@ -794,6 +757,7 @@ public class ContentTypeMapDefinition : IMapDefinition
             : _hostingEnvironment.ToAbsolute("~/umbraco/images/thumbnails/" + source.Thumbnail);
         target.Trashed = source.Trashed;
         target.Udi = source.Udi;
+        target.Variations = source.Variations;
     }
 
     // no MapAll - relies on the non-generic method
@@ -932,7 +896,8 @@ public class ContentTypeMapDefinition : IMapDefinition
         }
     }
 
-    private static void MapComposition(ContentTypeSave source, IContentTypeComposition target, Func<string, IContentTypeComposition?> getContentType)
+    private static void MapComposition(ContentTypeSave source, IContentTypeComposition target,
+        Func<string, IContentTypeComposition?> getContentType)
     {
         var current = target.CompositionAliases().ToArray();
         IEnumerable<string> proposed = source.CompositeContentTypes;

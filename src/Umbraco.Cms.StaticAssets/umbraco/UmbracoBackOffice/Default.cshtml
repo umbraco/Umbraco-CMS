@@ -1,4 +1,4 @@
-﻿@using Microsoft.Extensions.Options;
+@using Microsoft.Extensions.Options;
 @using System.Globalization
 @using Umbraco.Cms.Core
 @using Umbraco.Cms.Core.Configuration
@@ -88,7 +88,7 @@
         <!-- help dialog controller by the help button - this also forces the backoffice UI to shift 400px  -->
         <umb-drawer data-element="drawer" ng-if="drawer.show" model="drawer.model" view="drawer.view"></umb-drawer>
 
-        <umb-search ng-if="search.show" on-close="closeSearch()"></umb-search>
+        <umb-search ng-attr-umb-focus-lock="true" ng-if="search.show" on-close="closeSearch()"></umb-search>
 
     </div>
 

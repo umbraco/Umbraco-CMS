@@ -8,8 +8,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -20,7 +22,6 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.BackOffice.Filters;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
@@ -381,6 +382,31 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+        }
+
+        public IActionResult PostCopy(MoveOrCopy copy)
+        {
+            var toCopy = _dataTypeService.GetDataType(copy.Id);
+            if (toCopy is null)
+            {
+                return NotFound();
+            }
+
+            var currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
+            Attempt<OperationResult<MoveOperationStatusType, IDataType>?> result = _dataTypeService.Copy(toCopy, copy.ParentId, currentUser?.Id ?? Constants.Security.SuperUserId);
+            if (result.Success)
+            {
+                return Content(toCopy.Path, MediaTypeNames.Text.Plain, Encoding.UTF8);
+            }
+
+            return result.Result?.Result switch
+            {
+                MoveOperationStatusType.FailedParentNotFound => NotFound(),
+                MoveOperationStatusType.FailedCancelledByEvent => ValidationProblem(),
+                MoveOperationStatusType.FailedNotAllowedByPath => ValidationProblem(
+                    _localizedTextService.Localize("moveOrCopy", "notAllowedByPath")),
+                _ => throw new ArgumentOutOfRangeException()
+            };
         }
 
         public IActionResult PostRenameContainer(int id, string name)

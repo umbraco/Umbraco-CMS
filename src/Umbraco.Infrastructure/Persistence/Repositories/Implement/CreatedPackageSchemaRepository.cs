@@ -652,10 +652,13 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
             // the media file path is different from the URL and is specifically
             // extracted using the property editor for this media file and the current media file system.
             Stream mediaStream = _mediaFileManager.GetFile(media, out var mediaFilePath);
-            xmlMedia.Add(new XAttribute("mediaFilePath", mediaFilePath!));
+            if (mediaFilePath is not null)
+            {
+                xmlMedia.Add(new XAttribute("mediaFilePath", mediaFilePath));
 
-            // add the stream to our outgoing stream
-            mediaStreams.Add(mediaFilePath!, mediaStream);
+                // add the stream to our outgoing stream
+                mediaStreams.Add(mediaFilePath, mediaStream);
+            }
         }
 
         IEnumerable<IMedia> medias = _mediaService.GetByIds(definition.MediaUdis);

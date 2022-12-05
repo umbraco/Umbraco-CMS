@@ -2,9 +2,9 @@
 // See LICENSE for more details.
 
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
@@ -17,7 +17,8 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     "listview",
     HideLabel = true,
     Group = Constants.PropertyEditors.Groups.Lists,
-    Icon = Constants.Icons.ListView)]
+    Icon = Constants.Icons.ListView,
+    ValueEditorIsReusable = true)]
 public class ListViewPropertyEditor : DataEditor
 {
     private readonly IEditorConfigurationParser _editorConfigurationParser;
@@ -40,6 +41,7 @@ public class ListViewPropertyEditor : DataEditor
     {
         _iioHelper = iioHelper;
         _editorConfigurationParser = editorConfigurationParser;
+        SupportsReadOnly = true;
     }
 
     /// <inheritdoc />

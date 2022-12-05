@@ -27,6 +27,7 @@ public class MultipleContentPickerParameterEditor : DataEditor
         DefaultConfiguration.Add("multiPicker", "1");
         DefaultConfiguration.Add("minNumber", 0);
         DefaultConfiguration.Add("maxNumber", 0);
+        SupportsReadOnly = true;
     }
 
     protected override IDataValueEditor CreateValueEditor() =>

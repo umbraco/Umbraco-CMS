@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Xml.Linq;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -31,6 +31,12 @@ public interface IDataValueEditor
     ///     Gets a value indicating whether to display the associated label.
     /// </summary>
     bool HideLabel { get; }
+
+    /// <summary>
+    /// Gets a value indicating whether the IDataValueEditor supports readonly mode
+    /// </summary>
+    bool SupportsReadOnly => false;
+
 
     /// <summary>
     ///     Gets the validators to use to validate the edited value.

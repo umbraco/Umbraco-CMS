@@ -1,7 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
@@ -11,7 +11,8 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     "Eye Dropper Color Picker",
     "eyedropper",
     Icon = "icon-colorpicker",
-    Group = Constants.PropertyEditors.Groups.Pickers)]
+    Group = Constants.PropertyEditors.Groups.Pickers,
+    ValueEditorIsReusable = true)]
 public class EyeDropperColorPickerPropertyEditor : DataEditor
 {
     private readonly IEditorConfigurationParser _editorConfigurationParser;
@@ -36,6 +37,7 @@ public class EyeDropperColorPickerPropertyEditor : DataEditor
     {
         _ioHelper = ioHelper;
         _editorConfigurationParser = editorConfigurationParser;
+        SupportsReadOnly = true;
     }
 
     /// <inheritdoc />

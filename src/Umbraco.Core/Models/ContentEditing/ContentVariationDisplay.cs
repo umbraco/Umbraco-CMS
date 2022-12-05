@@ -13,7 +13,11 @@ public class ContentVariantDisplay : ITabbedContent<ContentPropertyDisplay>, ICo
     {
         Tabs = new List<Tab<ContentPropertyDisplay>>();
         Notifications = new List<BackOfficeNotification>();
+        AllowedActions = Enumerable.Empty<string>();
     }
+
+    [DataMember(Name = "allowedActions", IsRequired = true)]
+    public IEnumerable<string> AllowedActions { get; set; }
 
     [DataMember(Name = "name", IsRequired = true)]
     public string? Name { get; set; }

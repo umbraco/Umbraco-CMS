@@ -20,6 +20,7 @@ internal class DataEditorConverter : JsonReadConverter<IDataEditor>
     private readonly IJsonSerializer _jsonSerializer;
     private readonly IShortStringHelper _shortStringHelper;
     private readonly ILocalizedTextService _textService;
+    private const string SupportsReadOnly = "supportsReadOnly";
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="DataEditorConverter" /> class.
@@ -108,6 +109,11 @@ internal class DataEditorConverter : JsonReadConverter<IDataEditor>
         if (jobject["editor"] == null)
         {
             throw new InvalidOperationException("Missing 'editor' value.");
+        }
+
+        if (jobject.Property(SupportsReadOnly) is null)
+        {
+            jobject[SupportsReadOnly] = false;
         }
 
         // explicitly assign a value editor of type ValueEditor
@@ -202,6 +208,11 @@ internal class DataEditorConverter : JsonReadConverter<IDataEditor>
             // move the 'view' property
             jobject["editor"] = new JObject { ["view"] = jobject["view"] };
             jobject.Property("view")?.Remove();
+        }
+
+        if (jobject.Property(SupportsReadOnly) is null)
+        {
+            jobject[SupportsReadOnly] = false;
         }
 
         // in the manifest, default configuration is named 'config', rename

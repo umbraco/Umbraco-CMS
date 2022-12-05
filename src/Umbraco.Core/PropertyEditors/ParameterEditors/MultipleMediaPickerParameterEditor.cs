@@ -22,8 +22,11 @@ public class MultipleMediaPickerParameterEditor : DataEditor
     /// </summary>
     public MultipleMediaPickerParameterEditor(
         IDataValueEditorFactory dataValueEditorFactory)
-        : base(dataValueEditorFactory) =>
+        : base(dataValueEditorFactory)
+    {
         DefaultConfiguration.Add("multiPicker", "1");
+        SupportsReadOnly = true;
+    }
 
     protected override IDataValueEditor CreateValueEditor() =>
         DataValueEditorFactory.Create<MultipleMediaPickerPropertyValueEditor>(Attribute!);

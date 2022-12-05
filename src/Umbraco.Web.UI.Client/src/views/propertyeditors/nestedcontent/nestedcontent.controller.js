@@ -65,11 +65,13 @@
             }
         });
 
-    function NestedContentController($scope, $interpolate, $filter, serverValidationManager, contentResource, localizationService, iconHelper, clipboardService, eventsService, overlayService) {
+    function NestedContentController($scope, $interpolate, $filter, serverValidationManager, contentResource, localizationService, iconHelper, clipboardService, eventsService, overlayService, $attrs) {
 
         const vm = this;
         
         var model = $scope.$parent.$parent.model;
+
+        vm.readonly = false;
 
         var contentTypeAliases = [];
         _.each(model.config.contentTypes, function (contentType) {
@@ -77,9 +79,20 @@
         });
 
         _.each(model.config.contentTypes, function (contentType) {
-            contentType.nameExp = !!contentType.nameTemplate
+            contentType.nameExp = contentType.nameTemplate
                 ? $interpolate(contentType.nameTemplate)
                 : undefined;
+        });
+
+        $attrs.$observe('readonly', value => {
+            vm.readonly = value !== undefined;
+
+            vm.allowRemove = !vm.readonly;
+            vm.allowAdd = !vm.readonly;
+
+            vm.sortableOptions.disabled = vm.readonly;
+
+            removeAllEntriesAction.isDisabled = vm.readonly;
         });
 
         vm.nodes = [];
@@ -406,6 +419,7 @@
             opacity: 0.7,
             tolerance: "pointer",
             scroll: true,
+            disabled: vm.readOnly,
             start: function (ev, ui) {
                 updateModel();
                 // Yea, yea, we shouldn't modify the dom, sue me
@@ -612,7 +626,7 @@
             // Enforce min items if we only have one scaffold type
             var modelWasChanged = false;
             if (vm.nodes.length < vm.minItems && vm.scaffolds.length === 1) {
-                for (var i = vm.nodes.length; i < model.config.minItems; i++) {
+                for (var ii = vm.nodes.length; ii < model.config.minItems; ii++) {
                     addNode(vm.scaffolds[0].contentTypeAlias);
                 }
                 modelWasChanged = true;
@@ -728,7 +742,7 @@
 
         function updatePropertyActionStates() {
             copyAllEntriesAction.isDisabled = !model.value || !model.value.length;
-            removeAllEntriesAction.isDisabled = copyAllEntriesAction.isDisabled;
+            removeAllEntriesAction.isDisabled = copyAllEntriesAction.isDisabled || vm.readonly;
         }
 
         var propertyActions = [

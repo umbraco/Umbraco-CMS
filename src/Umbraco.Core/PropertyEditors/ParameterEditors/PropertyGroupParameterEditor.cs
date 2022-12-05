@@ -17,5 +17,6 @@ public class PropertyGroupParameterEditor : DataEditor
 
         // don't publish the id for a property group, publish it's alias (which is actually just it's lower cased name)
         DefaultConfiguration.Add("publishBy", "alias");
+        SupportsReadOnly = true;
     }
 }

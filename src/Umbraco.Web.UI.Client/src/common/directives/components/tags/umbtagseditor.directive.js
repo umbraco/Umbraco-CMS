@@ -23,7 +23,7 @@
             }
         });
 
-    function umbTagsEditorController($rootScope, assetsService, umbRequestHelper, angularHelper, $timeout, $element) {
+    function umbTagsEditorController($rootScope, assetsService, umbRequestHelper, angularHelper, $timeout, $element, $attrs) {
 
         let vm = this;
 
@@ -48,6 +48,11 @@
         vm.tagToAdd = "";
         vm.promptIsVisible = "-1";
         vm.viewModel = [];
+        vm.readonly = false;
+
+        $attrs.$observe('readonly', (value) => {
+            vm.readonly = value !== undefined;
+        });
 
         function onInit() {
             vm.inputId = vm.inputId || "t" + String.CreateGuid();

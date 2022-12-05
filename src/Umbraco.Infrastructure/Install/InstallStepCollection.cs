@@ -4,6 +4,7 @@ using Umbraco.Cms.Infrastructure.Install.InstallSteps;
 
 namespace Umbraco.Cms.Infrastructure.Install;
 
+[Obsolete("This will be replaced with an ordered collection with the new backoffice")]
 public sealed class InstallStepCollection
 {
     private readonly InstallHelper _installHelper;
@@ -17,9 +18,12 @@ public sealed class InstallStepCollection
         InstallSetupStep[] a = installerSteps.ToArray();
         _orderedInstallerSteps = new InstallSetupStep[]
         {
-            a.OfType<NewInstallStep>().First(), a.OfType<UpgradeStep>().First(),
-            a.OfType<FilePermissionsStep>().First(), a.OfType<TelemetryIdentifierStep>().First(),
-            a.OfType<DatabaseConfigureStep>().First(), a.OfType<DatabaseInstallStep>().First(),
+            a.OfType<NewInstallStep>().First(),
+            a.OfType<UpgradeStep>().First(),
+            a.OfType<FilePermissionsStep>().First(),
+            a.OfType<TelemetryIdentifierStep>().First(),
+            a.OfType<DatabaseConfigureStep>().First(),
+            a.OfType<DatabaseInstallStep>().First(),
             a.OfType<DatabaseUpgradeStep>().First(),
 
             // TODO: Add these back once we have a compatible Starter kit

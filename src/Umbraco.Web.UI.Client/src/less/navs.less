@@ -290,6 +290,12 @@
     background: @ui-option-hover;
 }
 
+.dropdown-menu > li > button:disabled, 
+.dropdown-submenu:hover > button:disabled {
+    color: @ui-option-disabled-type;
+    background: transparent;
+}
+
 .nav-tabs .dropdown-menu {
   .border-radius(0 0 3px 3px); // remove the top rounded corners here since there is a hard edge above the menu
 }

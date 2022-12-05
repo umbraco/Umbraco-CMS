@@ -1,4 +1,4 @@
-using Umbraco.Cms.Core.Configuration;
+﻿using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Install.Models;
 using Umbraco.Cms.Core.Semver;
 using Umbraco.Cms.Core.Services;
@@ -8,6 +8,7 @@ namespace Umbraco.Cms.Core.Install.InstallSteps
     /// <summary>
     /// This step is purely here to show the button to commence the upgrade
     /// </summary>
+    [Obsolete("Will be replace with a new step with the new backoffice")]
     [InstallSetupStep(InstallationType.Upgrade, "Upgrade", "upgrade", 1, "Upgrading Umbraco to the latest and greatest version.")]
     public class UpgradeStep : InstallSetupStep<object>
     {

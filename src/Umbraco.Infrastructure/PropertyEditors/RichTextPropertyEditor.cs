@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
@@ -14,7 +15,6 @@ using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Infrastructure.Macros;
 using Umbraco.Cms.Infrastructure.Templates;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
@@ -29,7 +29,8 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     ValueType = ValueTypes.Text,
     HideLabel = false,
     Group = Constants.PropertyEditors.Groups.RichContent,
-    Icon = "icon-browser-window")]
+    Icon = "icon-browser-window",
+    ValueEditorIsReusable = true)]
 public class RichTextPropertyEditor : DataEditor
 {
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
@@ -62,13 +63,6 @@ public class RichTextPropertyEditor : DataEditor
             macroParameterParser,
             StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
     {
-        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
-        _imageSourceParser = imageSourceParser;
-        _localLinkParser = localLinkParser;
-        _pastedImages = pastedImages;
-        _ioHelper = ioHelper;
-        _imageUrlGenerator = imageUrlGenerator;
-        _macroParameterParser = macroParameterParser;
     }
 
     [Obsolete("Use the constructor which takes an IHtmlMacroParameterParser instead")]
@@ -116,6 +110,7 @@ public class RichTextPropertyEditor : DataEditor
         _imageUrlGenerator = imageUrlGenerator;
         _macroParameterParser = macroParameterParser;
         _editorConfigurationParser = editorConfigurationParser;
+        SupportsReadOnly = true;
     }
 
     public override IPropertyIndexValueFactory PropertyIndexValueFactory => new RichTextPropertyIndexValueFactory();

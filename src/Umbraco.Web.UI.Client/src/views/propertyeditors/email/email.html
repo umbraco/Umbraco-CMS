@@ -7,7 +7,8 @@
                class="umb-property-editor umb-textstring textstring"
                val-email
                ng-required="model.config.IsRequired || model.validation.mandatory"
-               val-server="value" />
+               val-server="value"
+               ng-readonly="readonly" />
 
         <div ng-messages="emailFieldForm.textbox.$error" show-validation-on-submit>
             <p class="help-inline" ng-message="required">{{mandatoryMessage}}</p>
