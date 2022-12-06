@@ -61,17 +61,14 @@ public class UmbracoRouteValueTransformerTests
             new NullLogger<UmbracoRouteValueTransformer>(),
             ctx,
             router ?? Mock.Of<IPublishedRouter>(),
-            GetGlobalSettings(),
-            TestHelper.GetHostingEnvironment(),
             state,
             routeValuesFactory ?? Mock.Of<IUmbracoRouteValuesFactory>(),
             filter ?? Mock.Of<IRoutableDocumentFilter>(x => x.IsDocumentRequest(It.IsAny<string>()) == true),
             Mock.Of<IDataProtectionProvider>(),
             Mock.Of<IControllerActionSearcher>(),
-            Mock.Of<IEventAggregator>(),
             publicAccessRequestHandler.Object,
-            umbracoVirtualPageRoute.Object);
-
+            Mock.Of<IUmbracoVirtualPageRoute>()
+            );
         return transformer;
     }
 
