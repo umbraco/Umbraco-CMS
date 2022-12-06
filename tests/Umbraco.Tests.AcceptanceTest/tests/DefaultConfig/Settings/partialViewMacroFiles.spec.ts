@@ -34,10 +34,10 @@ test.describe('Partial View Macro Files', () => {
         await umbracoUi.setEditorHeaderName(name);
 
         //Save
-        await page.locator('.btn-success').click();
+        await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.save));
 
         //Assert
-        await umbracoUi.isSuccessNotificationVisible();
+        await umbracoUi.isSuccessNotificationVisible({timeout:10000});
 
         //Clean up
         await cleanup(umbracoApi, name);
@@ -54,12 +54,12 @@ test.describe('Partial View Macro Files', () => {
 
         // Type name
         await umbracoUi.setEditorHeaderName(name);
-
+        
         // Save
-        await page.locator('.btn-success').click();
+        await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.save));
 
         // Assert
-        await umbracoUi.isSuccessNotificationVisible();
+        await umbracoUi.isSuccessNotificationVisible({timeout:10000});
 
         // Clean
         await cleanup(umbracoApi, name);
@@ -81,10 +81,10 @@ test.describe('Partial View Macro Files', () => {
         await umbracoUi.setEditorHeaderName(name);
 
         // Save
-        await page.locator('.btn-success').click();
+        await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.save));
 
         // Assert
-        await umbracoUi.isSuccessNotificationVisible();
+        await umbracoUi.isSuccessNotificationVisible({timeout:10000});
 
         // Clean
         await cleanup(umbracoApi, name);
@@ -144,7 +144,7 @@ test.describe('Partial View Macro Files', () => {
         await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.save));
 
         // Assert
-        await umbracoUi.isSuccessNotificationVisible();
+        await umbracoUi.isSuccessNotificationVisible({timeout:10000});
 
         await cleanup(umbracoApi, name);
     });
