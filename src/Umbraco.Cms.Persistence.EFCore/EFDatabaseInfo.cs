@@ -20,24 +20,7 @@ public class EFDatabaseInfo : DatabaseInfoBase
         _umbracoDbContextFactory = umbracoDbContextFactory;
         _logger = logger;
     }
-    // await _dbContextFactory.ExecuteWithContextAsync(async db =>
-        // {
-        //     // We know umbraco is installed if any migrations have been executed
-        //     try
-        //     {
-        //         if (await db.Database.CanConnectAsync())
-        //         {
-        //             return (await db.Database.GetAppliedMigrationsAsync()).Any();
-        //         }
-        //     }
-        //     catch (InvalidOperationException e)
-        //     {
-        //         _logger.LogDebug(e, "Assume database is not configured, and thereby Umbraco is not installed");
-        //     }
-        //
-        //     return ;
-        // });
-        //
+
     protected override async Task<DatabaseState> GetConfiguredStateAsync()
     {
         return await _umbracoDbContextFactory.ExecuteWithContextAsync(async db =>

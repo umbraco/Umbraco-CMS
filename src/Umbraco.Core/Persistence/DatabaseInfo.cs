@@ -26,14 +26,13 @@ public abstract class DatabaseInfoBase : IDatabaseInfo
     };
 
     public bool IsConfigured => !_connectionStrings.CurrentValue.ConnectionString.IsNullOrWhiteSpace() && !_connectionStrings.CurrentValue.ProviderName.IsNullOrWhiteSpace();
+
     public async Task<DatabaseState> GetStateAsync()
     {
         if (!IsConfigured)
         {
             return DatabaseState.NotConfigured;
         }
-
-
 
         return await GetConfiguredStateAsync();
 
