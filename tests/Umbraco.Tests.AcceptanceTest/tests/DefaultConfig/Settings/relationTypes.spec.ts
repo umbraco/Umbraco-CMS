@@ -3,10 +3,8 @@ import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 
 test.describe('Relation Types', () => {
 
-  test.beforeEach(async ({page, umbracoApi}) => {
-    // TODO: REMOVE THIS WHEN SQLITE IS FIXED
-    // Wait so we don't bombard the API
-    await page.waitForTimeout(1000);
+  test.beforeEach(async ({ page, umbracoApi }, testInfo) => {
+    await umbracoApi.report.report(testInfo);
     await umbracoApi.login();
   });
 
@@ -30,11 +28,9 @@ test.describe('Relation Types', () => {
     await page.selectOption('select[name="relationType-child"]', {label: "Media"});
     await form.locator('[name="relationType-isdependency"]').last().click({force: true});
     await form.locator('.btn-primary').click();
+    await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.save))
+    await umbracoUi.isSuccessNotificationVisible();
     
-    await page.waitForNavigation();
-
-    expect(page.url()).toContain("#/settings/relationTypes/edit/");
-
     //Clean up
     await umbracoApi.relationTypes.ensureNameNotExists(name);
   });

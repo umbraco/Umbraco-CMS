@@ -1,0 +1,15 @@
+<div 
+    class="umb-block-grid-column-editor"
+    style="--umb-block-grid--gridColumns: {{vm.gridColumns}}"
+>
+    <div class="__grid-box"></div>
+    <umb-block-grid-column-editor-option 
+        ng-repeat="colN in vm.emptyGridColumnArray track by $index"
+        column-span-option="(vm.block.columnSpanOptions | filter : {'columnSpan':colN} : true)[0]"
+        column="colN"
+        on-click-add="vm.addSpanOption(colN)"
+        on-click-remove="vm.removeSpanOption(colN)"
+        style="--umb-block-grid--columnN: {{colN}}"
+        >
+    </umb-block-grid-column-editor-option>
+</div>

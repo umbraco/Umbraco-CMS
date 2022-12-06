@@ -1,0 +1,49 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!-- Automatically nest files (this needs to be in this file, because the props file is imported too early) -->
+  <ItemGroup>
+    <Content Update="appsettings.*.json">
+      <DependentUpon>appsettings.json</DependentUpon>
+    </Content>
+    <Content Update="appsettings-schema.*.json">
+      <DependentUpon>appsettings-schema.json</DependentUpon>
+    </Content>
+  </ItemGroup>
+  
+  <!-- Copy JSON schema files into the project directory -->
+  <Target Name="CopyUmbracoJsonSchemaFiles" BeforeTargets="Build">
+    <Message Text="Copying JSON schema files into project directory: @(UmbracoJsonSchemaFiles->'%(Filename)%(Extension)')" Importance="high" />
+    <Copy SourceFiles="@(UmbracoJsonSchemaFiles)" DestinationFolder="$(MSBuildProjectDirectory)" SkipUnchangedFiles="true" />
+  </Target>
+
+  <!-- Add references to the JSON schema in the project directory -->
+  <UsingTask TaskName="JsonSchemaAddReferences" AssemblyFile="$(MSBuildThisFileDirectory)..\tasks\netstandard2.0\Umbraco.JsonSchema.Extensions.dll" />
+  <Target Name="AddUmbracoJsonSchemaReferences" BeforeTargets="Build" DependsOnTargets="CopyUmbracoJsonSchemaFiles">
+    <ItemGroup>
+      <!-- Include references to JSON schema files that are copied into the project directory (if they aren't already referenced and didn't opt-out) -->
+      <UmbracoJsonSchemaReferences Include="@(UmbracoJsonSchemaFiles->'%(Filename)%(Extension)#')" Exclude="@(UmbracoJsonSchemaReferences)" Condition="'%(UmbracoJsonSchemaFiles.Reference)' != 'false'" />
+    </ItemGroup>
+    <Message Text="Adding JSON schema references to appsettings-schema.json: @(UmbracoJsonSchemaReferences)" Importance="high" />
+    <JsonSchemaAddReferences JsonSchemaFile="$(MSBuildProjectDirectory)\appsettings-schema.json" References="@(UmbracoJsonSchemaReferences)" />
+  </Target>
+
+  <!-- Include App_Plugins content in output/publish directories -->
+  <Target Name="IncludeAppPluginsContent" BeforeTargets="GetCopyToOutputDirectoryItems;GetCopyToPublishDirectoryItems">
+    <ItemGroup>
+      <_AppPluginsFiles Include="App_Plugins\**" />
+      <ContentWithTargetPath Include="@(_AppPluginsFiles)" Exclude="@(ContentWithTargetPath)" TargetPath="%(Identity)" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    </ItemGroup>
+  </Target>
+
+  <!-- Include Umbraco folder content in output/publish directories -->
+  <Target Name="IncludeUmbracoFolderContent" BeforeTargets="GetCopyToOutputDirectoryItems;GetCopyToPublishDirectoryItems">
+    <ItemGroup>
+      <_UmbracoFolderFiles Include="umbraco\config\**" />
+      <_UmbracoFolderFiles Include="umbraco\PartialViewMacros\**" />
+      <_UmbracoFolderFiles Include="umbraco\UmbracoBackOffice\**" />
+      <_UmbracoFolderFiles Include="umbraco\UmbracoInstall\**" />
+      <_UmbracoFolderFiles Include="umbraco\UmbracoWebsite\**" />
+      <_UmbracoFolderFiles Include="umbraco\Licenses\**" />
+      <ContentWithTargetPath Include="@(_UmbracoFolderFiles)" Exclude="@(ContentWithTargetPath)" TargetPath="%(Identity)" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    </ItemGroup>
+  </Target>
+</Project>

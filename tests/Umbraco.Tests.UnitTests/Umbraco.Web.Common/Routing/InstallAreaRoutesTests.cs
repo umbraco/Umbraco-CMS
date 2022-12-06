@@ -81,8 +81,8 @@ public class InstallAreaRoutesTests
         var route = endpoints.DataSources.First();
         Assert.AreEqual(1, route.Endpoints.Count);
 
-        var routeEndpoint = (RouteEndpoint)route.Endpoints[0];
-        Assert.AreEqual("install/{controller?}/{action?}", routeEndpoint.RoutePattern.RawText);
+        var endpoint = (RouteEndpoint)route.Endpoints[0];
+        Assert.AreEqual("install/{controller?}/{action?}", endpoint.RoutePattern.RawText);
     }
 
     private InstallAreaRoutes GetInstallAreaRoutes(RuntimeLevel level) =>

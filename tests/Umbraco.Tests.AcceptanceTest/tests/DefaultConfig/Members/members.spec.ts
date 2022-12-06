@@ -2,10 +2,8 @@ import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 
 test.describe('Packages', () => {
 
-  test.beforeEach(async ({page, umbracoApi}) => {
-    // TODO: REMOVE THIS WHEN SQLITE IS FIXED
-    // Wait so we don't bombard the API
-    await page.waitForTimeout(1000);
+  test.beforeEach(async ({ page, umbracoApi }, testInfo) => {
+    await umbracoApi.report.report(testInfo);
     await umbracoApi.login();
   });
 
@@ -16,7 +14,7 @@ test.describe('Packages', () => {
     const passwordTimeout = 20000;
     await umbracoApi.members.ensureEmailNotExists(email);
     await umbracoUi.goToSection(ConstantHelper.sections.member);
-    await umbracoUi.clickElement(umbracoUi.getTreeItem("member", ["Members"]), { button: "right"});
+    await umbracoUi.clickElement(umbracoUi.getTreeItem(ConstantHelper.sections.member, ["Members"]), { button: "right"});
     await umbracoUi.clickElement(umbracoUi.getContextMenuAction(ConstantHelper.actions.create));
     await umbracoUi.clickElement(page.locator('.menu-label').first());
 

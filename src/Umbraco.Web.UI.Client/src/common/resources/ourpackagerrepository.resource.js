@@ -2,8 +2,9 @@
     * @ngdoc service
     * @name umbraco.resources.ourPackageRepositoryResource
     * @description handles data for package installations
+    * @deprecated This resource is deprecated and will be removed in future versions. Umbraco no longer supports the Our Umbraco repository.
     **/
-function ourPackageRepositoryResource($q, $http, umbDataFormatter, umbRequestHelper) {
+function ourPackageRepositoryResource($http, umbRequestHelper) {
 
     var baseurl = Umbraco.Sys.ServerVariables.umbracoUrls.packagesRestApiBaseUrl;
 
@@ -57,7 +58,7 @@ function ourPackageRepositoryResource($q, $http, umbDataFormatter, umbRequestHel
             if (canceler) {
                 httpConfig["timeout"] = canceler;
             }
-            
+
             if (category === undefined) {
                 category = "";
             }
@@ -69,8 +70,10 @@ function ourPackageRepositoryResource($q, $http, umbDataFormatter, umbRequestHel
             var order = !orderBy ? "&order=Default" : ("&order=" + orderBy);
 
             return umbRequestHelper.resourcePromise(
-               $http.get(baseurl + "?pageIndex=" + pageIndex + "&pageSize=" + pageSize + "&category=" + category + "&query=" + query + order + "&version=" + Umbraco.Sys.ServerVariables.application.version),
-               httpConfig,
+               $http.get(
+                baseurl + "?pageIndex=" + pageIndex + "&pageSize=" + pageSize + "&category=" + category + "&query=" + query + order + "&version=" + Umbraco.Sys.ServerVariables.application.version,
+                httpConfig
+               ),
                'Failed to query packages');
         }
         

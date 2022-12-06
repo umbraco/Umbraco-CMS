@@ -5,10 +5,8 @@ test.describe('System Information', () => {
   const enCulture = "en-US";
   const dkCulture = "da-DK";
 
-  test.beforeEach(async ({page, umbracoApi}) => {
-    // TODO: REMOVE THIS WHEN SQLITE IS FIXED
-    // Wait so we don't bombard the API
-    await page.waitForTimeout(1000);
+  test.beforeEach(async ({ page, umbracoApi }, testInfo) => {
+    await umbracoApi.report.report(testInfo);
     await umbracoApi.login();
     await umbracoApi.users.setCurrentLanguage(enCulture);
   });

@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Install.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
@@ -14,7 +15,6 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Persistence;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 using HttpResponseMessage = System.Net.Http.HttpResponseMessage;
@@ -209,30 +209,29 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
             }
 
             ConnectionStrings? umbracoConnectionString = _connectionStrings.CurrentValue;
-
             var isConnectionStringConfigured = umbracoConnectionString.IsConnectionStringConfigured();
             if (isConnectionStringConfigured)
             {
                 installState = (installState | InstallState.ConnectionStringConfigured) & ~InstallState.Unknown;
-            }
 
-            DbProviderFactory? factory = _dbProviderFactoryCreator.CreateFactory(umbracoConnectionString.ProviderName);
-            var isConnectionAvailable = isConnectionStringConfigured && DbConnectionExtensions.IsConnectionAvailable(umbracoConnectionString.ConnectionString, factory);
-            if (isConnectionAvailable)
-            {
-                installState = (installState | InstallState.CanConnect) & ~InstallState.Unknown;
-            }
+                DbProviderFactory? factory = _dbProviderFactoryCreator.CreateFactory(umbracoConnectionString.ProviderName);
+                var isConnectionAvailable = isConnectionStringConfigured && DbConnectionExtensions.IsConnectionAvailable(umbracoConnectionString.ConnectionString, factory);
+                if (isConnectionAvailable)
+                {
+                    installState = (installState | InstallState.CanConnect) & ~InstallState.Unknown;
+                }
 
-            var isUmbracoInstalled = isConnectionAvailable && _databaseBuilder.IsUmbracoInstalled();
-            if (isUmbracoInstalled)
-            {
-                installState = (installState | InstallState.UmbracoInstalled) & ~InstallState.Unknown;
-            }
+                var isUmbracoInstalled = isConnectionAvailable && _databaseBuilder.IsUmbracoInstalled();
+                if (isUmbracoInstalled)
+                {
+                    installState = (installState | InstallState.UmbracoInstalled) & ~InstallState.Unknown;
+                }
 
-            var hasSomeNonDefaultUser = isUmbracoInstalled && _databaseBuilder.HasSomeNonDefaultUser();
-            if (hasSomeNonDefaultUser)
-            {
-                installState = (installState | InstallState.HasNonDefaultUser) & ~InstallState.Unknown;
+                var hasSomeNonDefaultUser = isUmbracoInstalled && _databaseBuilder.HasSomeNonDefaultUser();
+                if (hasSomeNonDefaultUser)
+                {
+                    installState = (installState | InstallState.HasNonDefaultUser) & ~InstallState.Unknown;
+                }
             }
 
             return installState;

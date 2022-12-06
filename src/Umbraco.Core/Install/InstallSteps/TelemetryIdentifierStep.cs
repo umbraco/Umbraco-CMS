@@ -3,9 +3,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Install.Models;
 using Umbraco.Cms.Core.Telemetry;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Core.Install.InstallSteps;
 
@@ -29,20 +29,11 @@ public class TelemetryIdentifierStep : InstallSetupStep<object>
         _siteIdentifierService = siteIdentifierService;
     }
 
-    [Obsolete("Use constructor that takes GlobalSettings and ISiteIdentifierService")]
-    public TelemetryIdentifierStep(
-        ILogger<TelemetryIdentifierStep> logger,
-        IOptions<GlobalSettings> globalSettings,
-        IConfigManipulator configManipulator)
-        : this(globalSettings, StaticServiceProvider.Instance.GetRequiredService<ISiteIdentifierService>())
-    {
-    }
-
-    public override Task<InstallSetupResult?> ExecuteAsync(object model)
-    {
-        _siteIdentifierService.TryCreateSiteIdentifier(out _);
-        return Task.FromResult<InstallSetupResult?>(null);
-    }
+        public override Task<InstallSetupResult?> ExecuteAsync(object model)
+        {
+            _siteIdentifierService.TryCreateSiteIdentifier(out _);
+            return Task.FromResult<InstallSetupResult?>(null);
+        }
 
     public override bool RequiresExecution(object model)
     {

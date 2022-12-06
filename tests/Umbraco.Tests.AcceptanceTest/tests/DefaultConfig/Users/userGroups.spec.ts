@@ -9,10 +9,8 @@ test.describe('User groups', () => {
     await page.locator('[data-element="sub-view-userGroups"]').click();
   }
 
-  test.beforeEach(async ({ umbracoApi, page }) => {
-    // TODO: REMOVE THIS WHEN SQLITE IS FIXED
-    // Wait so we don't bombard the API
-    await page.waitForTimeout(1000);
+  test.beforeEach(async ({ page, umbracoApi }, testInfo) => {
+    await umbracoApi.report.report(testInfo);
     await umbracoApi.login();
   });
 

@@ -307,7 +307,6 @@ namespace Umbraco.Cms.Core.DependencyInjection
                 factory.GetRequiredService<IEventMessagesFactory>(),
                 factory.GetRequiredService<IExternalLoginWithKeyRepository>()
             ));
-            Services.AddUnique<IExternalLoginService>(factory => factory.GetRequiredService<ExternalLoginService>());
             Services.AddUnique<IExternalLoginWithKeyService>(factory => factory.GetRequiredService<ExternalLoginService>());
             Services.AddUnique<ILocalizedTextService>(factory => new LocalizedTextService(
                 factory.GetRequiredService<Lazy<LocalizedTextServiceFileSources>>(),
@@ -325,6 +324,8 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IDataTypeUsageService, DataTypeUsageService>();
 
             Services.AddUnique<ICultureImpactFactory>(provider => new CultureImpactFactory(provider.GetRequiredService<IOptionsMonitor<ContentSettings>>()));
+            Services.AddUnique<IDictionaryService, DictionaryService>();
+            Services.AddUnique<ITemporaryMediaService, TemporaryMediaService>();
         }
     }
 }

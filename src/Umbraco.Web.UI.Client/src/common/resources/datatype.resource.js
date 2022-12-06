@@ -428,8 +428,7 @@ function dataTypeResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
         renameContainer: function (id, name) {
             return umbRequestHelper.resourcePromise(
-                $http.post
-                    (umbRequestHelper.getApiUrl(
+                $http.post(umbRequestHelper.getApiUrl(
                         "dataTypeApiBaseUrl",
                         "PostRenameContainer",
                         { id: id, name: encodeURIComponent(name) })),

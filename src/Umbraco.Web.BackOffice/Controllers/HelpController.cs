@@ -6,8 +6,8 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Web.Common.Attributes;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers;
 
@@ -17,12 +17,6 @@ public class HelpController : UmbracoAuthorizedJsonController
     private static HttpClient? _httpClient;
     private readonly ILogger<HelpController> _logger;
     private HelpPageSettings? _helpPageSettings;
-
-    [Obsolete("Use constructor that takes IOptions<HelpPageSettings>")]
-    public HelpController(ILogger<HelpController> logger)
-        : this(logger, StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<HelpPageSettings>>())
-    {
-    }
 
     [ActivatorUtilitiesConstructor]
     public HelpController(
