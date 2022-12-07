@@ -2,22 +2,23 @@ import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import { css, html, LitElement, nothing, TemplateResult } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
-import { Subscription } from 'rxjs';
-import { ifDefined } from 'lit-html/directives/if-defined.js';
+import { ifDefined } from 'lit/directives/if-defined.js';
 
-import { UmbUserStore } from '../../../core/stores/user/user.store';
+import { repeat } from 'lit/directives/repeat.js';
 import { getTagLookAndColor } from '../../sections/users/user-extensions';
 import { UmbUserContext } from './user.context';
 import { UmbContextProviderMixin, UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { ManifestEditorAction, ManifestWithLoader, UserDetails } from '@umbraco-cms/models';
 
 import '../../property-editor-uis/content-picker/property-editor-ui-content-picker.element';
+import '@umbraco-cms/sections/users/picker-user-group.element';
+import { UmbUserStore } from '@umbraco-cms/stores/user/user.store';
+import { umbHistoryService } from 'src/core/services/history';
+import { umbCurrentUserService } from 'src/core/services/current-user';
+import { UmbModalService } from '@umbraco-cms/services';
 import '../shared/editor-entity-layout/editor-entity-layout.element';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import { UmbModalService } from '@umbraco-cms/services';
-import { umbHistoryService } from 'src/core/services/history';
-import { umbCurrentUserService } from 'src/core/services/current-user';
 
 @customElement('umb-editor-user')
 export class UmbEditorUserElement extends UmbContextProviderMixin(
@@ -78,18 +79,6 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(
 			#assign-access {
 				display: flex;
 				flex-direction: column;
-				gap: var(--uui-size-space-4);
-			}
-			.access-content {
-				margin-top: var(--uui-size-space-1);
-				margin-bottom: var(--uui-size-space-4);
-				display: flex;
-				align-items: center;
-				line-height: 1;
-				gap: var(--uui-size-space-3);
-			}
-			.access-content > span {
-				align-self: end;
 			}
 		`,
 	];
@@ -107,11 +96,8 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(
 	entityKey = '';
 
 	private _userStore?: UmbUserStore;
-	private _usersSubscription?: Subscription;
 	private _userContext?: UmbUserContext;
 	private _modalService?: UmbModalService;
-
-	private _userNameSubscription?: Subscription;
 
 	private _languages = []; //TODO Add languages
 
@@ -122,9 +108,9 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(
 			this._userStore = instances['umbUserStore'];
 			this._modalService = instances['umbModalService'];
 
-			this._observeCurrentUser();
 			this._observeUser();
 		});
+		this._observeCurrentUser();
 		this._registerEditorActions();
 	}
 
@@ -152,11 +138,17 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(
 				this._userContext.update(this._user);
 			}
 
-			this._userNameSubscription = this._userContext.data.subscribe((user) => {
-				if (user && user.name !== this._userName) {
-					this._userName = user.name;
-				}
-			});
+			this._observeUserName();
+		});
+	}
+
+	private _observeUserName() {
+		if (!this._userContext) return;
+
+		this.observe(this._userContext.data, (user) => {
+			if (user.name !== this._userName) {
+				this._userName = user.name;
+			}
 		});
 	}
 
@@ -179,22 +171,6 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(
 		});
 	}
 
-	connectedCallback(): void {
-		super.connectedCallback();
-
-		this.consumeContext('umbUserStore', (usersContext: UmbUserStore) => {
-			this._userStore = usersContext;
-			this._observeUser();
-		});
-	}
-
-	disconnectedCallback(): void {
-		super.disconnectedCallback();
-
-		this._usersSubscription?.unsubscribe();
-		this._userNameSubscription?.unsubscribe();
-	}
-
 	private _updateUserStatus() {
 		if (!this._user || !this._userStore) return;
 
@@ -210,14 +186,47 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(
 		history.pushState(null, '', 'section/users/view/users/overview');
 	}
 
-	private _changePassword() {
-		this._modalService?.changePassword({ requireOldPassword: this._isCurrentUserAdmin === false });
+	// TODO. find a way where we don't have to do this for all editors.
+	private _handleInput(event: UUIInputEvent) {
+		if (event instanceof UUIInputEvent) {
+			const target = event.composedPath()[0] as UUIInputElement;
+
+			if (typeof target?.value === 'string') {
+				this._updateProperty('name', target.value);
+			}
+		}
 	}
 
-	private get _isCurrentUserAdmin(): boolean {
-		//TODO: Find a way to figure out if current user is in the admin group
-		const adminUserGroupKey = '10000000-0000-0000-0000-000000000000';
-		return this._currentUser?.userGroup === adminUserGroupKey;
+	private _updateProperty(propertyName: string, value: unknown) {
+		this._userContext?.update({ [propertyName]: value });
+	}
+
+	private _renderContentStartNodes() {
+		if (!this._user) return;
+
+		if (this._user.contentStartNodes.length < 1)
+			return html`
+				<uui-ref-node name="Content Root">
+					<uui-icon slot="icon" name="folder"></uui-icon>
+				</uui-ref-node>
+			`;
+
+		//TODO Render the name of the content start node instead of it's key.
+		return repeat(
+			this._user.contentStartNodes,
+			(node) => node,
+			(node) => {
+				return html`
+					<uui-ref-node name=${node}>
+						<uui-icon slot="icon" name="folder"></uui-icon>
+					</uui-ref-node>
+				`;
+			}
+		);
+	}
+
+	private _changePassword() {
+		this._modalService?.changePassword({ requireOldPassword: umbCurrentUserService.isAdmin === false });
 	}
 
 	private _renderActionButtons() {
@@ -225,7 +234,7 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(
 
 		const buttons: TemplateResult[] = [];
 
-		if (this._isCurrentUserAdmin === false) return nothing;
+		if (umbCurrentUserService.isAdmin === false) return nothing;
 
 		if (this._user?.status !== 'invited')
 			buttons.push(
@@ -257,51 +266,49 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(
 
 		return html` <uui-box>
 				<div slot="headline">Profile</div>
-				<uui-form-layout-item style="margin-top: 0">
-					<uui-label for="email">Email</uui-label>
-					<uui-input name="email" label="email" readonly value=${this._user.email}></uui-input>
-				</uui-form-layout-item>
-				<uui-form-layout-item style="margin-bottom: 0">
-					<uui-label for="language">Language</uui-label>
-					<uui-select name="language" label="language" .options=${this._languages}> </uui-select>
-				</uui-form-layout-item>
+				<umb-editor-property-layout label="Email">
+					<uui-input slot="editor" name="email" label="email" readonly value=${this._user.email}></uui-input>
+				</umb-editor-property-layout>
+				<umb-editor-property-layout label="Language">
+					<uui-select slot="editor" name="language" label="language" .options=${this._languages}> </uui-select>
+				</umb-editor-property-layout>
 			</uui-box>
 			<uui-box>
+				<div slot="headline">Assign access</div>
 				<div id="assign-access">
-					<div slot="headline">Assign access</div>
-					<div>
-						<b>Groups</b>
-						<div class="faded-text">Add groups to assign access and permissions</div>
-					</div>
-					<div>
-						<b>Content start nodes</b>
-						<div class="faded-text">Limit the content tree to specific start nodes</div>
-						<umb-property-editor-ui-content-picker></umb-property-editor-ui-content-picker>
-					</div>
-					<div>
-						<b>Media start nodes</b>
-						<div class="faded-text">Limit the media library to specific start nodes</div>
-						<umb-property-editor-ui-content-picker></umb-property-editor-ui-content-picker>
-					</div>
+					<umb-editor-property-layout label="Groups" description="Add groups to assign access and permissions">
+						<umb-picker-user-group
+							slot="editor"
+							.value=${this._user.userGroups}
+							@change=${(e: any) => this._updateProperty('userGroups', e.target.value)}></umb-picker-user-group>
+					</umb-editor-property-layout>
+					<umb-editor-property-layout
+						label="Content start node"
+						description="Limit the content tree to specific start nodes">
+						<umb-property-editor-ui-content-picker
+							.value=${this._user.contentStartNodes}
+							@property-editor-change=${(e: any) => this._updateProperty('contentStartNodes', e.target.value)}
+							slot="editor"></umb-property-editor-ui-content-picker>
+					</umb-editor-property-layout>
+					<umb-editor-property-layout
+						label="Media start nodes"
+						description="Limit the media library to specific start nodes">
+						<b slot="editor">NEED MEDIA PICKER</b>
+					</umb-editor-property-layout>
 				</div>
 			</uui-box>
-			<uui-box>
-				<div slot="headline">Access</div>
+			<uui-box headline="Access">
 				<div slot="header" class="faded-text">
 					Based on the assigned groups and start nodes, the user has access to the following nodes
 				</div>
 
 				<b>Content</b>
-				<div class="access-content">
-					<uui-icon name="folder"></uui-icon>
-					<span>Content Root</span>
-				</div>
-
+				${this._renderContentStartNodes()}
+				<hr />
 				<b>Media</b>
-				<div class="access-content">
-					<uui-icon name="folder"></uui-icon>
-					<span>Media Root</span>
-				</div>
+				<uui-ref-node name="Media Root">
+					<uui-icon slot="icon" name="folder"></uui-icon>
+				</uui-ref-node>
 			</uui-box>`;
 	}
 
@@ -360,17 +367,6 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(
 		</uui-box>`;
 	}
 
-	// TODO. find a way where we don't have to do this for all editors.
-	private _handleInput(event: UUIInputEvent) {
-		if (event instanceof UUIInputEvent) {
-			const target = event.composedPath()[0] as UUIInputElement;
-
-			if (typeof target?.value === 'string') {
-				this._userContext?.update({ name: target.value });
-			}
-		}
-	}
-
 	render() {
 		if (!this._user) return html`User not found`;
 
@@ -390,6 +386,6 @@ export default UmbEditorUserElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-editor-view-users-user-details': UmbEditorUserElement;
+		'umb-editor-user': UmbEditorUserElement;
 	}
 }

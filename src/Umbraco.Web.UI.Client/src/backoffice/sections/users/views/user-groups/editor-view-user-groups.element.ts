@@ -1,24 +1,26 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { Subscription } from 'rxjs';
-import { UmbUserGroupStore } from '../../../../../core/stores/user/user-group.store';
-import UmbTableElement, {
+import {
 	UmbTableColumn,
 	UmbTableConfig,
 	UmbTableDeselectedEvent,
+	UmbTableElement,
 	UmbTableItem,
 	UmbTableOrderedEvent,
 	UmbTableSelectedEvent,
-} from '../../../../components/table/table.element';
+} from '@umbraco-cms/components/table';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { UserGroupDetails } from '@umbraco-cms/models';
 
 import './user-group-table-name-column-layout.element';
+import './user-group-table-sections-column-layout.element';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
+import { UmbUserGroupStore } from '@umbraco-cms/stores/user/user-group.store';
 import { umbHistoryService } from 'src/core/services/history';
 
 @customElement('umb-editor-view-user-groups')
-export class UmbEditorViewUserGroupsElement extends UmbContextConsumerMixin(LitElement) {
+export class UmbEditorViewUserGroupsElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -48,6 +50,7 @@ export class UmbEditorViewUserGroupsElement extends UmbContextConsumerMixin(LitE
 		{
 			name: 'Sections',
 			alias: 'userGroupSections',
+			elementName: 'umb-user-group-table-sections-column-layout',
 		},
 		{
 			name: 'Content start node',
@@ -66,8 +69,6 @@ export class UmbEditorViewUserGroupsElement extends UmbContextConsumerMixin(LitE
 	private _selection: Array<string> = [];
 
 	private _userGroupStore?: UmbUserGroupStore;
-	private _userGroupsSubscription?: Subscription;
-	private _selectionSubscription?: Subscription;
 
 	connectedCallback(): void {
 		super.connectedCallback();
@@ -80,8 +81,9 @@ export class UmbEditorViewUserGroupsElement extends UmbContextConsumerMixin(LitE
 	}
 
 	private _observeUserGroups() {
-		this._userGroupsSubscription?.unsubscribe();
-		this._userGroupsSubscription = this._userGroupStore?.getAll().subscribe((userGroups) => {
+		if (!this._userGroupStore) return;
+
+		this.observe<UserGroupDetails[]>(this._userGroupStore.getAll(), (userGroups) => {
 			this._userGroups = userGroups;
 			this._createTableItems(this._userGroups);
 		});
@@ -105,11 +107,11 @@ export class UmbEditorViewUserGroupsElement extends UmbContextConsumerMixin(LitE
 					},
 					{
 						columnAlias: 'userGroupContentStartNode',
-						value: userGroup.contentStartNode,
+						value: userGroup.contentStartNode || 'Content root',
 					},
 					{
 						columnAlias: 'userGroupMediaStartNode',
-						value: userGroup.mediaStartNode,
+						value: userGroup.mediaStartNode || 'Media root',
 					},
 				],
 			};
@@ -131,13 +133,6 @@ export class UmbEditorViewUserGroupsElement extends UmbContextConsumerMixin(LitE
 		const orderingColumn = table.orderingColumn;
 		const orderingDesc = table.orderingDesc;
 		console.log(`fetch users, order column: ${orderingColumn}, desc: ${orderingDesc}`);
-	}
-
-	disconnectedCallback(): void {
-		super.disconnectedCallback();
-
-		this._userGroupsSubscription?.unsubscribe();
-		this._selectionSubscription?.unsubscribe();
 	}
 
 	render() {

@@ -8,7 +8,7 @@ import type { ManifestTreeItemAction, ManifestWithLoader } from '@umbraco-cms/mo
 
 import '../shared/tree-navigator.element';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-@customElement('umb-tree-document')
+@customElement('umb-tree-documents')
 export class UmbTreeDocumentElement extends UmbContextProviderMixin(UmbContextConsumerMixin(UmbTreeBase)) {
 	constructor() {
 		super();

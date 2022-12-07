@@ -31,7 +31,10 @@ export class UmbTreeElement extends UmbContextProviderMixin(UmbContextConsumerMi
 		const oldVal = this._selectable;
 		this._selectable = newVal;
 		this.requestUpdate('selectable', oldVal);
-		this._treeContext?.setSelectable(newVal);
+		if (newVal && this._treeContext) {
+			this._treeContext?.setSelectable(newVal);
+			this._observeSelection();
+		}
 	}
 
 	private _selection: Array<string> = [];

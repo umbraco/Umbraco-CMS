@@ -15,10 +15,10 @@ import type { UmbModalPropertyEditorUIPickerData } from './layouts/property-edit
 import { UmbModalHandler } from './';
 import { UmbModalChangePasswordData } from './layouts/modal-layout-change-password.element';
 
-export type UmbModelType = 'dialog' | 'sidebar';
+export type UmbModalType = 'dialog' | 'sidebar';
 
 export interface UmbModalOptions<UmbModalData> {
-	type?: UmbModelType;
+	type?: UmbModalType;
 	size?: UUIModalSidebarSize;
 	data?: UmbModalData;
 }

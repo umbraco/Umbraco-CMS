@@ -18,6 +18,7 @@ export default {
 						'@umbraco-cms/observable-api': './src/core/observable-api/index.ts',
 						'@umbraco-cms/utils': './src/core/utils/index.ts',
 						'@umbraco-cms/test-utils': './src/core/test-utils/index.ts',
+						'@umbraco-cms/extensions-registry': './src/core/extensions-registry/index.ts',
 					},
 				},
 			},

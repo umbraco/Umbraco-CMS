@@ -22,8 +22,8 @@ class UmbCurrentUserService {
 
 	public get isAdmin(): boolean {
 		//TODO: Find a way to figure out if current user is in the admin group
-		const adminUserGroupKey = '10000000-0000-0000-0000-000000000000';
-		return this._currentUser.getValue()?.userGroup === adminUserGroupKey;
+		const adminUserGroupKey = 'c630d49e-4e7b-42ea-b2bc-edc0edacb6b1';
+		return this._currentUser.getValue()?.userGroups.includes(adminUserGroupKey);
 	}
 }
 

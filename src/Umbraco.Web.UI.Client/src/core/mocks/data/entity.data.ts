@@ -15,6 +15,9 @@ export class UmbEntityData<T extends Entity> extends UmbData<T> {
 	getByKey(key: string) {
 		return this.data.find((item) => item.key === key);
 	}
+	getByKeys(keys: Array<string>) {
+		return this.data.filter((item) => keys.includes(item.key));
+	}
 
 	save(saveItems: Array<T>) {
 		saveItems.forEach((saveItem) => {
