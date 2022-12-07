@@ -207,7 +207,7 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(
 
 		this._userStore.deleteUsers([this._user.key]);
 
-		history.pushState(null, '', '/section/users/view/users/overview');
+		history.pushState(null, '', 'section/users/view/users/overview');
 	}
 
 	private _changePassword() {

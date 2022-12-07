@@ -23,7 +23,7 @@ export class UmbSectionViewPackagesCreatedElement extends LitElement {
 		},
 		{
 			path: '**',
-			redirectTo: '/section/packages/view/created/overview', //TODO: this should be dynamic
+			redirectTo: 'section/packages/view/created/overview', //TODO: this should be dynamic
 		},
 	];
 

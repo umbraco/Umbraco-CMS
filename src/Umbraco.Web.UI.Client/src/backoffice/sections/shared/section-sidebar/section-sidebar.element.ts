@@ -59,7 +59,7 @@ export class UmbSectionSidebarElement extends UmbContextConsumerMixin(UmbObserve
 		return html`
 			<umb-tree-context-menu-service>
 				<uui-scroll-container>
-					<a href="${`/section/${this._sectionPathname}`}">
+					<a href="${`section/${this._sectionPathname}`}">
 						<h3>${this._sectionLabel}</h3>
 					</a>
 

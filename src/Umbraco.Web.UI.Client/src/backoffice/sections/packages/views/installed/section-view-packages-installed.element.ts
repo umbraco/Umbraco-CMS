@@ -23,7 +23,7 @@ export class UmbSectionViewPackagesInstalledElement extends LitElement {
 		},
 		{
 			path: '**',
-			redirectTo: '/section/packages/view/installed/overview', //TODO: this should be dynamic
+			redirectTo: 'section/packages/view/installed/overview', //TODO: this should be dynamic
 		},
 	];
 

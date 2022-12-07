@@ -5,6 +5,7 @@ import './components/backoffice-modal-container.element';
 import './components/backoffice-notification-container.element';
 import './components/node-property/node-property.element';
 import './components/table/table.element';
+import './components/shared/code-block.element';
 import './sections/shared/section-main/section-main.element';
 import './sections/shared/section-sidebar/section-sidebar.element';
 import './sections/shared/section.element';

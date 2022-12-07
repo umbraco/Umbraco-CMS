@@ -9,7 +9,7 @@ export default class UmbTreeActionDataTypeCreateElement extends UmbTreeItemActio
 
 	// TODO: how do we handle the href?
 	private _constructUrl() {
-		return `/section/settings/${this._activeTreeItem?.type}/${this._activeTreeItem?.key}/view/edit?create=true`;
+		return `section/settings/${this._activeTreeItem?.type}/${this._activeTreeItem?.key}/view/edit?create=true`;
 	}
 
 	// TODO: change to href. This is a temporary solution to get the link to work. For some reason query params gets removed when using href.

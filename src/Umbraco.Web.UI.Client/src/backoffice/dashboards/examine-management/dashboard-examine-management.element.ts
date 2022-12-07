@@ -65,12 +65,12 @@ export class UmbDashboardExamineManagementElement extends UmbContextConsumerMixi
 	}
 
 	private get backbutton(): boolean {
-		return this._currentPath != '/section/settings/dashboard/examine-management/' || !this._currentPath ? true : false;
+		return !(this._currentPath?.endsWith('examine-management/'));
 	}
 
 	render() {
 		return html` ${this.backbutton
-				? html` <a href="/section/settings/dashboard/examine-management/"> &larr; Back to overview </a> `
+				? html` <a href="section/settings/dashboard/examine-management"> &larr; Back to overview </a> `
 				: nothing}
 			<router-slot @changestate="${this._onRouteChange}" .routes=${this._routes}></router-slot>`;
 	}

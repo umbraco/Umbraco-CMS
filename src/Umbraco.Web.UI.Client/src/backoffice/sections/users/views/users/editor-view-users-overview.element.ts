@@ -92,7 +92,7 @@ export class UmbEditorViewUsersOverviewElement extends UmbContextConsumerMixin(L
 		},
 		{
 			path: '**',
-			redirectTo: '/section/users/view/users/overview/grid', //TODO: this should be dynamic
+			redirectTo: 'section/users/view/users/overview/grid', //TODO: this should be dynamic
 		},
 	];
 
@@ -127,8 +127,8 @@ export class UmbEditorViewUsersOverviewElement extends UmbContextConsumerMixin(L
 		const isList = window.location.pathname.split('/').pop() === 'list';
 
 		isList
-			? history.pushState(null, '', '/section/users/view/users/overview/grid')
-			: history.pushState(null, '', '/section/users/view/users/overview/list');
+			? history.pushState(null, '', 'section/users/view/users/overview/grid')
+			: history.pushState(null, '', 'section/users/view/users/overview/list');
 	}
 
 	private _renderSelection() {
