@@ -98,7 +98,7 @@ export class UmbEditorViewUsersOverviewElement extends UmbContextConsumerMixin(U
 		},
 		{
 			path: '**',
-			redirectTo: 'section/users/view/users/overview/grid', //TODO: this should be dynamic
+			redirectTo: 'grid',
 		},
 	];
 
