@@ -1,4 +1,4 @@
-import { expect, fixture, html } from '@open-wc/testing';
+import { expect } from '@open-wc/testing';
 import { InterfaceColor, InterfaceLook } from '@umbraco-ui/uui-base/lib/types';
 
 import type { UserStatus } from './user-extensions';
