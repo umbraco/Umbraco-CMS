@@ -3,6 +3,7 @@
 
 using System.ComponentModel.DataAnnotations;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
@@ -68,17 +69,66 @@ public class TagsPropertyEditor : DataEditor
     protected override IConfigurationEditor CreateConfigurationEditor() =>
         new TagConfigurationEditor(_validators, _ioHelper, _localizedTextService, _editorConfigurationParser);
 
-    internal class TagPropertyValueEditor : DataValueEditor
+    internal class TagPropertyValueEditor : DataValueEditor, IDataValueTags
     {
+        private readonly IDataTypeService _dataTypeService;
+
         public TagPropertyValueEditor(
             ILocalizedTextService localizedTextService,
             IShortStringHelper shortStringHelper,
             IJsonSerializer jsonSerializer,
             IIOHelper ioHelper,
-            DataEditorAttribute attribute)
+            DataEditorAttribute attribute,
+            IDataTypeService dataTypeService)
             : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
         {
+            _dataTypeService = dataTypeService;
         }
+
+        /// <inheritdoc />
+        public IEnumerable<ITag> GetTags(object? value, object? dataTypeConfiguration, int? languageId)
+        {
+            var strValue = value?.ToString();
+            if (string.IsNullOrWhiteSpace(strValue)) return Enumerable.Empty<ITag>();
+
+            var tagConfiguration = ConfigurationEditor.ConfigurationAs<TagConfiguration>(dataTypeConfiguration) ?? new TagConfiguration();
+
+            if (tagConfiguration.Delimiter == default)
+                tagConfiguration.Delimiter = ',';
+
+            IEnumerable<string> tags;
+
+            switch (tagConfiguration.StorageType)
+            {
+                case TagsStorageType.Csv:
+                    tags = strValue.Split(new[] { tagConfiguration.Delimiter }, StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim());
+                    break;
+
+                case TagsStorageType.Json:
+                    try
+                    {
+                        tags = JsonConvert.DeserializeObject<string[]>(strValue)?.Select(x => x.Trim()) ?? Enumerable.Empty<string>();
+                    }
+                    catch (JsonException)
+                    {
+                        //cannot parse, malformed
+                        tags = Enumerable.Empty<string>();
+                    }
+
+                    break;
+
+                default:
+                    throw new NotSupportedException($"Value \"{tagConfiguration.StorageType}\" is not a valid TagsStorageType.");
+            }
+
+            return tags.Select(x => new Tag
+            {
+                Group = tagConfiguration.Group,
+                Text = x,
+                LanguageId = languageId,
+            });
+        }
+
 
         /// <inheritdoc />
         public override IValueRequiredValidator RequiredValidator => new RequiredJsonValueValidator();
@@ -93,14 +143,33 @@ public class TagsPropertyEditor : DataEditor
                 return null;
             }
 
+            var tagConfiguration = editorValue.DataTypeConfiguration as TagConfiguration ?? new TagConfiguration();
+            if (tagConfiguration.Delimiter == default)
+                tagConfiguration.Delimiter = ',';
+
+            string[] trimmedTags = Array.Empty<string>();
+
             if (editorValue.Value is JArray json)
             {
-                return json.HasValues ? json.Select(x => x.Value<string>()) : null;
+                trimmedTags = json.HasValues ? json.Select(x => x.Value<string>()).OfType<string>().ToArray() : Array.Empty<string>();
+            }
+            else if (string.IsNullOrWhiteSpace(value) == false)
+            {
+                trimmedTags = value.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries);
             }
 
-            if (string.IsNullOrWhiteSpace(value) == false)
+            if (trimmedTags.Length == 0)
             {
-                return value.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries);
+                return null;
+            }
+
+            switch (tagConfiguration.StorageType)
+            {
+                case TagsStorageType.Csv:
+                    return string.Join(tagConfiguration.Delimiter.ToString(), trimmedTags).NullOrWhiteSpaceAsNull();
+
+                case TagsStorageType.Json:
+                    return trimmedTags.Length == 0 ? null : JsonConvert.SerializeObject(trimmedTags);
             }
 
             return null;

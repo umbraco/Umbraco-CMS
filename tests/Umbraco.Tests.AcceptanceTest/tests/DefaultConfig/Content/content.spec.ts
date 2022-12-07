@@ -272,6 +272,7 @@ test.describe('Content tests', () => {
         .addVariant()
           .withName(initialNodeName)
           .withSave(true)
+          .withPublish(true)
         .done()
         .build();
     await umbracoApi.content.save(rootContentNode);
@@ -286,7 +287,7 @@ test.describe('Content tests', () => {
     await page.keyboard.press('Backspace');
 
     await umbracoUi.setEditorHeaderName(newNodeName);
-    await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.saveAndPublish));
+    await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.save));
     await umbracoUi.isSuccessNotificationVisible();
     await page.locator('span:has-text("×")').click();
 
@@ -299,7 +300,7 @@ test.describe('Content tests', () => {
     await page.locator('[action="vm.rollback()"]').click();
 
     await umbracoUi.refreshContentTree();
-    await expect(page.locator('.umb-badge >> text=Save')).toBeVisible();
+    await expect(page.locator('.umb-badge >> text=Save')).toHaveCount(2);
     await expect(page.locator('.umb-badge >> text=RollBack')).toBeVisible();
     const node = await umbracoUi.getTreeItem("content", [initialNodeName])
     await expect(node).toBeVisible();
