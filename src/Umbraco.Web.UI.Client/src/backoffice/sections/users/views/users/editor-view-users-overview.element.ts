@@ -104,7 +104,7 @@ export class UmbEditorViewUsersOverviewElement extends UmbContextConsumerMixin(U
 
 	private _usersContext?: UmbSectionViewUsersElement;
 	private _modalService?: UmbModalService;
-	private _inputTimer: any;
+	private _inputTimer?: NodeJS.Timeout;
 	private _inputTimerAmount = 500;
 
 	connectedCallback(): void {
