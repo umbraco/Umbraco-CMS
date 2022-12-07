@@ -2785,7 +2785,6 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="allowBlockInAreas">Allow in areas</key>
     <key alias="allowBlockInAreasHelp">Make this block available by default within the areas of other Blocks (unless explicit permissions are set for these areas).</key>
     <key alias="areaAllowedBlocksEmpty">When empty all Blocks allowed for Areas can be created.</key>
-    <key alias="areaAllowedBlocksEmpty">When empty all Blocks allowed for Areas can be created.</key>
     <key alias="areas">Areas</key>
     <key alias="areasLayoutColumns">Grid Columns for Areas</key>
     <key alias="areasLayoutColumnsHelp">Define how many columns that will be available for areas. If not defined, the number of columns defined for the entire layout will be used.</key>
