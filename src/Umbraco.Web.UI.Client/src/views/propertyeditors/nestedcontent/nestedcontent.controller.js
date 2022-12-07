@@ -68,7 +68,7 @@
     function NestedContentController($scope, $interpolate, $filter, serverValidationManager, contentResource, localizationService, iconHelper, clipboardService, eventsService, overlayService, $attrs) {
 
         const vm = this;
-        
+
         var model = $scope.$parent.$parent.model;
 
         vm.readonly = false;
@@ -167,7 +167,7 @@
             isDisabled: true,
             useLegacyIcon: false
         };
-        
+
         function removeAllEntries() {
 
             localizationService.localizeMany(["content_nestedContentDeleteAllItems", "general_delete"]).then(data => {
@@ -186,7 +186,7 @@
                 });
             });
         }
-        
+
         // helper to force the current form into the dirty state
         function setDirty() {
             if (vm.umbProperty) {
@@ -531,7 +531,6 @@
             storageUpdate();
         });
         var notSupported = [
-            "Umbraco.Tags",
             "Umbraco.UploadField",
             "Umbraco.ImageCropper",
             "Umbraco.BlockList"

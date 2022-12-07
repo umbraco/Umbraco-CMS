@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -101,7 +102,8 @@ public class DatabaseSettingsFactoryTests
     {
         var mapper = new UmbracoMapper(
             new MapDefinitionCollection(Enumerable.Empty<IMapDefinition>),
-            Mock.Of<ICoreScopeProvider>());
+            Mock.Of<ICoreScopeProvider>(),
+            NullLogger<UmbracoMapper>.Instance);
 
         var definition = new InstallerViewModelsMapDefinition();
         definition.DefineMaps(mapper);
