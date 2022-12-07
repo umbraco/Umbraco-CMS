@@ -24,15 +24,15 @@ public class UpdateLanguageController : LanguageControllerBase
     /// <summary>
     ///     Updates a language
     /// </summary>
-    [HttpPut("update")]
+    [HttpPut("{id:int}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(NotFoundResult), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     // TODO: This needs to be an authorized endpoint.
-    public async Task<ActionResult> Update(LanguageViewModel language)
+    public async Task<ActionResult> Update(int id, LanguageViewModel language)
     {
-        ILanguage? existingById = language.Id != default ? _localizationService.GetLanguageById(language.Id) : null;
+        ILanguage? existingById = _localizationService.GetLanguageById(id);
         if (existingById is null)
         {
             return await Task.FromResult(NotFound());
