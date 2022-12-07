@@ -9,7 +9,8 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Api.Management.Controllers.Tree;
 using Umbraco.Cms.Api.Management.Services.Entities;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
-using Umbraco.New.Cms.Web.Common.Routing;
+using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Cms.Api.Management.Routing;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Media.Tree;
 
@@ -17,6 +18,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Media.Tree;
 [ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/{Constants.UdiEntityType.Media}")]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Media))]
+[Authorize(Policy = $"New{AuthorizationPolicies.SectionAccessForMediaTree}")]
 public class MediaTreeControllerBase : UserStartNodeTreeControllerBase<ContentTreeItemViewModel>
 {
     private readonly AppCaches _appCaches;

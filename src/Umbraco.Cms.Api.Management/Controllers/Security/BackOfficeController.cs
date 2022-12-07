@@ -12,7 +12,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Web.BackOffice.Security;
 using Umbraco.Extensions;
-using Umbraco.New.Cms.Web.Common.Routing;
+using Umbraco.Cms.Api.Management.Routing;
 using SignInResult = Microsoft.AspNetCore.Mvc.SignInResult;
 using IdentitySignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 

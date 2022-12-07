@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Api.Management.ViewModels.Dictionary;
-using Umbraco.Cms.Api.Management.ViewModels.Pagination;
+using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Dictionary;
 

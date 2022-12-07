@@ -1,7 +1,7 @@
 ﻿using System.Globalization;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Api.Management.ViewModels.Culture;
-using Umbraco.Cms.Api.Management.ViewModels.Pagination;
+using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 
 namespace Umbraco.Cms.Api.Management.Mapping.Culture;
 

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Umbraco.Cms.Api.Management.ViewModels.Pagination;
+namespace Umbraco.Cms.Api.Common.ViewModels.Pagination;
 
 public class PagedViewModel<T>
 {

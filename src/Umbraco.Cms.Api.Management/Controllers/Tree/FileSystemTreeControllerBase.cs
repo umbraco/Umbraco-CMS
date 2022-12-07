@@ -2,7 +2,7 @@
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Api.Management.Services.Paging;
-using Umbraco.Cms.Api.Management.ViewModels.Pagination;
+using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Extensions;
 

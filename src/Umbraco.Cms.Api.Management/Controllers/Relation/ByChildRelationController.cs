@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Api.Management.Factories;
-using Umbraco.Cms.Api.Management.ViewModels.Pagination;
+using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.ViewModels.Relation;
 using Umbraco.Extensions;
 
