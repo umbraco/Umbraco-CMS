@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
@@ -10,7 +11,6 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 
@@ -64,8 +64,7 @@ public class BlockListPropertyValueConverterTests
         var publishedModelFactory = new NoopPublishedModelFactory();
         var editor = new BlockListPropertyValueConverter(
             Mock.Of<IProfilingLogger>(),
-            new BlockEditorConverter(publishedSnapshotAccessor, publishedModelFactory),
-            Mock.Of<IContentTypeService>());
+            new BlockEditorConverter(publishedSnapshotAccessor, publishedModelFactory));
         return editor;
     }
 
@@ -89,13 +88,6 @@ public class BlockListPropertyValueConverterTests
     private BlockListConfiguration ConfigForSingle() => new()
     {
         Blocks = new[] { new BlockListConfiguration.BlockConfiguration { ContentElementTypeKey = _contentKey1 } },
-    };
-
-    private BlockListConfiguration ConfigForSingleBlockMode() => new()
-    {
-        Blocks = new[] { new BlockListConfiguration.BlockConfiguration { ContentElementTypeKey = _contentKey1 } },
-        ValidationLimit = new() { Min = 1, Max = 1 },
-        UseSingleBlockMode = true,
     };
 
     private IPublishedPropertyType GetPropertyType(BlockListConfiguration config)
@@ -145,20 +137,6 @@ public class BlockListPropertyValueConverterTests
 
         // the result is always block list model
         Assert.AreEqual(typeof(BlockListModel), valueType);
-    }
-
-    [Test]
-    public void Get_Value_Type_SingleBlockMode()
-    {
-        var editor = CreateConverter();
-        var config = ConfigForSingleBlockMode();
-
-        var dataType = new PublishedDataType(1, "test", new Lazy<object>(() => config));
-        var propType = Mock.Of<IPublishedPropertyType>(x => x.DataType == dataType);
-
-        var valueType = editor.GetPropertyValueType(propType);
-
-        Assert.AreEqual(typeof(BlockListItem), valueType);
     }
 
     [Test]

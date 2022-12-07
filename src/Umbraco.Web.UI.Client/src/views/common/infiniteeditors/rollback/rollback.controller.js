@@ -73,13 +73,11 @@
             getVersions();
         }
 
-        function canRollback(version) {
-            return !version.currentDraftVersion;
-        }
-
         function changeVersion(version) {
 
-            if (canRollback(version) === false) {
+            const canRollback = !version.currentDraftVersion && !version.currentPublishedVersion;
+
+            if (canRollback === false) {
                 return;
             }
 
@@ -94,7 +92,6 @@
                 vm.loadingDiff = true;
                 const culture = $scope.model.node.variants.length > 1 ? vm.currentVersion.language.culture : null;
 
-                vm.previousVersion = null;
                 contentResource.getRollbackVersion(version.versionId, culture)
                     .then(function(data) {
                         vm.previousVersion = data;
@@ -102,11 +99,8 @@
                         vm.previousVersion.displayValue = version.displayValue + ' - ' + version.username;
                         createDiff(vm.currentVersion, vm.previousVersion);
 
-                        const changed = (part) => part.added || part.removed;
-                        vm.diffHasChanges = vm.diff.name.some(changed) || vm.diff.properties.some((property) => property.diff.some(changed));
-
                         vm.loadingDiff = false;
-                        vm.rollbackButtonDisabled = !vm.diffHasChanges;
+                        vm.rollbackButtonDisabled = false;
                     }, function () {
                         vm.loadingDiff = false;
                     });
@@ -137,14 +131,11 @@
 
                     // get current backoffice user and format dates
                     userService.getCurrentUser().then(function (currentUser) {
-                        vm.previousVersions = data.items
-                            // we don't ever want to show the draft version in the rollback list
-                            .filter(version => version.currentDraftVersion === false)
-                            .map(version => {
-                                var timestampFormatted = dateHelper.getLocalDate(version.versionDate, currentUser.locale, 'LLL');
-                                version.displayValue = timestampFormatted;
-                                return version;
-                            });
+                        vm.previousVersions = data.items.map(version => {
+                            var timestampFormatted = dateHelper.getLocalDate(version.versionDate, currentUser.locale, 'LLL');
+                            version.displayValue = timestampFormatted;
+                            return version;
+                        });
                     });
                 });
         }
@@ -182,7 +173,7 @@
                         // copy existing properties, so it doesn't manipulate existing properties on page
                         oldProperty = Utilities.copy(oldProperty);
                         property = Utilities.copy(property);
-
+                        
                         // we have to make properties storing values as object into strings (Grid, nested content, etc.)
                         if (property.value instanceof Object) {
                             property.value = JSON.stringify(property.value, null, 1);
@@ -197,14 +188,14 @@
                         // diff requires a string
                         property.value = property.value ? property.value + '' : '';
                         oldProperty.value = oldProperty.value ? oldProperty.value + '' : '';
-
+                        
                         const diffProperty = {
                             'alias': property.alias,
                             'label': property.label,
                             'diff': property.isObject ? Diff.diffJson(property.value, oldProperty.value) : Diff.diffWords(property.value, oldProperty.value),
                             'isObject': property.isObject || oldProperty.isObject
                         };
-
+                        
                         vm.diff.properties.push(diffProperty);
                     }
                 });

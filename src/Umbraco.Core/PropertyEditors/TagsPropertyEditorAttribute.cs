@@ -6,7 +6,6 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 ///     Marks property editors that support tags.
 /// </summary>
 [AttributeUsage(AttributeTargets.Class)]
-[Obsolete("Implement a custom IDataValueEditor with the IDataValueTags interface instead")]
 public class TagsPropertyEditorAttribute : Attribute
 {
     /// <summary>

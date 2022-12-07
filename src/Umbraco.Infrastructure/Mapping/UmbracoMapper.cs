@@ -1,10 +1,7 @@
 using System.Collections;
 using System.Collections.Concurrent;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Scoping;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Core.Mapping;
 
@@ -47,32 +44,19 @@ public class UmbracoMapper : IUmbracoMapper
     private readonly ConcurrentDictionary<Type, Dictionary<Type, Func<object, MapperContext, object>>> _ctors =
         new();
 
-    private readonly ConcurrentDictionary<Type, ConcurrentDictionary<Type, Action<object, object, MapperContext>>> _maps =
+    private readonly ConcurrentDictionary<Type, Dictionary<Type, Action<object, object, MapperContext>>> _maps =
         new();
 
     private readonly ICoreScopeProvider _scopeProvider;
-    private readonly ILogger<UmbracoMapper> _logger;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="UmbracoMapper" /> class.
     /// </summary>
     /// <param name="profiles"></param>
     /// <param name="scopeProvider"></param>
-    [Obsolete("Please use ctor that takes an ILogger")]
-    public UmbracoMapper(MapDefinitionCollection profiles, ICoreScopeProvider scopeProvider) : this(profiles, scopeProvider, StaticServiceProvider.Instance.GetRequiredService<ILogger<UmbracoMapper>>())
-    {
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="UmbracoMapper" /> class.
-    /// </summary>
-    /// <param name="profiles">The MapDefinitionCollection</param>
-    /// <param name="scopeProvider">The scope provider</param>
-    /// <param name="logger">The logger</param>
-    public UmbracoMapper(MapDefinitionCollection profiles, ICoreScopeProvider scopeProvider, ILogger<UmbracoMapper> logger)
+    public UmbracoMapper(MapDefinitionCollection profiles, ICoreScopeProvider scopeProvider)
     {
         _scopeProvider = scopeProvider;
-        _logger = logger;
 
         foreach (IMapDefinition profile in profiles)
         {
@@ -135,15 +119,15 @@ public class UmbracoMapper : IUmbracoMapper
             sourceCtors[targetType] = (source, context) => ctor((TSource)source, context)!;
         }
 
-        ConcurrentDictionary<Type, Action<object, object, MapperContext>> sourceMaps = DefineMaps(sourceType);
+        Dictionary<Type, Action<object, object, MapperContext>> sourceMaps = DefineMaps(sourceType);
         sourceMaps[targetType] = (source, target, context) => map((TSource)source, (TTarget)target, context);
     }
 
     private Dictionary<Type, Func<object, MapperContext, object>> DefineCtors(Type sourceType) =>
         _ctors.GetOrAdd(sourceType, _ => new Dictionary<Type, Func<object, MapperContext, object>>());
 
-    private ConcurrentDictionary<Type, Action<object, object, MapperContext>> DefineMaps(Type sourceType) =>
-        _maps.GetOrAdd(sourceType, _ => new ConcurrentDictionary<Type, Action<object, object, MapperContext>>());
+    private Dictionary<Type, Action<object, object, MapperContext>> DefineMaps(Type sourceType) =>
+        _maps.GetOrAdd(sourceType, _ => new Dictionary<Type, Action<object, object, MapperContext>>());
 
     #endregion
 
@@ -444,7 +428,7 @@ public class UmbracoMapper : IUmbracoMapper
             return null;
         }
 
-        if (_maps.TryGetValue(sourceType, out ConcurrentDictionary<Type, Action<object, object, MapperContext>>? sourceMap) &&
+        if (_maps.TryGetValue(sourceType, out Dictionary<Type, Action<object, object, MapperContext>>? sourceMap) &&
             sourceMap.TryGetValue(targetType, out Action<object, object, MapperContext>? map))
         {
             return map;
@@ -452,7 +436,7 @@ public class UmbracoMapper : IUmbracoMapper
 
         // we *may* run this more than once but it does not matter
         map = null;
-        foreach ((Type stype, ConcurrentDictionary<Type, Action<object, object, MapperContext>> smap) in _maps)
+        foreach ((Type stype, Dictionary<Type, Action<object, object, MapperContext>> smap) in _maps)
         {
             if (!stype.IsAssignableFrom(sourceType))
             {
@@ -478,9 +462,9 @@ public class UmbracoMapper : IUmbracoMapper
         {
             foreach (KeyValuePair<Type, Action<object, object, MapperContext>> m in sourceMap)
             {
-                if (!_maps[sourceType].TryAdd(m.Key, m.Value))
+                if (!_maps[sourceType].TryGetValue(m.Key, out _))
                 {
-                    _logger.LogDebug("Duplicate key was found, don't add to dictionary");
+                    _maps[sourceType].Add(m.Key, m.Value);
                 }
             }
         }

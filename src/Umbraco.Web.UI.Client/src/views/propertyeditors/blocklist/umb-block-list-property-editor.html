@@ -13,7 +13,6 @@
                         ng-click="vm.requestShowCreate($index, $event)"
                         ng-controller="Umbraco.PropertyEditors.BlockListPropertyEditor.CreateButtonController as inlineCreateButtonCtrl"
                         ng-mousemove="inlineCreateButtonCtrl.onMouseMove($event)"
-                        ng-if="!vm.singleBlockMode"
                         ng-show="!vm.readonly">
                     <div class="__plus" ng-style="{'left':inlineCreateButtonCtrl.plusPosX}">
                         <umb-icon icon="icon-add" class="icon"></umb-icon>
@@ -29,7 +28,7 @@
             </div>
         </div>
 
-        <div class="umb-block-list__actions" ng-if="vm.loading !== true && !vm.singleBlockMode">
+        <div class="umb-block-list__actions" ng-if="vm.loading !== true">
             <button
                     id="{{vm.model.alias}}"
                     type="button"

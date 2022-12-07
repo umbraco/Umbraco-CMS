@@ -323,6 +323,7 @@
             $scope.defaultButton = buttons.defaultButton;
             $scope.subButtons = buttons.subButtons;
             $scope.page.showPreviewButton = true;
+
         }
 
         /** Syncs the content item to it's tree node - this occurs on first load and after saving */
@@ -937,25 +938,22 @@
         };
 
         $scope.preview = function (content) {
+            // Chromes popup blocker will kick in if a window is opened
+            // without the initial scoped request. This trick will fix that.
+            //
+            var previewWindow = $window.open('preview/?init=true', 'umbpreview');
 
-            const openPreviewWindow = () => {
-                // Chromes popup blocker will kick in if a window is opened
-                // without the initial scoped request. This trick will fix that.
-                //
-                const previewWindow = $window.open('preview/?init=true', 'umbpreview');
-
-                // Build the correct path so both /#/ and #/ work.
-                let query = 'id=' + content.id;
-                if ($scope.culture) {
-                   query += "#?culture=" + $scope.culture;
-                }
-                previewWindow.location.href = Umbraco.Sys.ServerVariables.umbracoSettings.umbracoPath + '/preview/?' + query;
+            // Build the correct path so both /#/ and #/ work.
+            var query = 'id=' + content.id;
+            if ($scope.culture) {
+                query += "#?culture=" + $scope.culture;
             }
+            var redirect = Umbraco.Sys.ServerVariables.umbracoSettings.umbracoPath + '/preview/?' + query;
 
             //The user cannot save if they don't have access to do that, in which case we just want to preview
             //and that's it otherwise they'll get an unauthorized access message
             if (!_.contains(content.allowedActions, "A")) {
-                openPreviewWindow();
+                previewWindow.location.href = redirect;
             }
             else {
                 var selectedVariant = $scope.content.variants[0];
@@ -969,12 +967,10 @@
                     }
                 }
 
-                //reset save flag for all variants
-                $scope.content.variants.forEach(variant => variant.save = false);
-                //ensure the save flag is set for the active variant
+                //ensure the save flag is set
                 selectedVariant.save = true;
                 performSave({ saveMethod: $scope.saveMethod(), action: "save" }).then(function (data) {
-                    openPreviewWindow()
+                    previewWindow.location.href = redirect;
                 }, function (err) {
                     //validation issues ....
                 });

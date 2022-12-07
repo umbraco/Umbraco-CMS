@@ -1253,7 +1253,9 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
   </area>
   <area alias="rollback">
     <key alias="changes">Wijzigingen</key>
+    <key alias="created">Aangemaakt</key>
     <key alias="headline">Selecteer een versie om te vergelijken met de huidige versie</key>
+    <key alias="currentVersion">Huidige versie</key>
     <key alias="diffHelp">
       <![CDATA[Hier worden de verschillen getoond tussen de huidige en de geselecteerde versie<br /><del>Rode</del> tekst wordt niet getoond in de geselecteerde versie, <ins>groen betekent toegevoegd</ins>]]></key>
     <key alias="documentRolledBack">Document is teruggezet</key>
@@ -1265,6 +1267,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="view">Bekijk</key>
     <key alias="pagination"><![CDATA[Toont versie %0% tot %1% van %2% versies]]></key>
     <key alias="versions">Versies</key>
+    <key alias="currentDraftVersion">Conceptversie</key>
     <key alias="currentPublishedVersion">Gepubliceerde versie</key>
   </area>
   <area alias="scripts">

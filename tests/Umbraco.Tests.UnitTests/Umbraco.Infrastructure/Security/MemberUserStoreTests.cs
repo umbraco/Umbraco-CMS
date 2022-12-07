@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Events;
@@ -43,7 +42,7 @@ public class MemberUserStoreTests
 
         return new MemberUserStore(
             _mockMemberService.Object,
-            new UmbracoMapper(new MapDefinitionCollection(() => new List<IMapDefinition>()), mockScopeProvider.Object, NullLogger<UmbracoMapper>.Instance),
+            new UmbracoMapper(new MapDefinitionCollection(() => new List<IMapDefinition>()), mockScopeProvider.Object),
             mockScopeProvider.Object,
             new IdentityErrorDescriber(),
             Mock.Of<IPublishedSnapshotAccessor>(),
