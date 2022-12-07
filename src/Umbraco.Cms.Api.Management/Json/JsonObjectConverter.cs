@@ -15,8 +15,26 @@ public class JsonObjectConverter : JsonConverter<object>
     public override void Write(
         Utf8JsonWriter writer,
         object objectToWrite,
-        JsonSerializerOptions options) =>
-        JsonSerializer.Serialize(writer, objectToWrite, objectToWrite.GetType(), options);
+        JsonSerializerOptions options)
+    {
+        if (objectToWrite is null)
+        {
+            return;
+        }
+
+        // If an object is equals "new object()", Json.Serialize would recurse forever and cause a stack overflow
+        // We have no good way of checking if its an empty object
+        // which is why we try to check if the object has any properties, and thus will be empty.
+        if (objectToWrite.GetType().Name is "Object" && !objectToWrite.GetType().GetProperties().Any())
+        {
+            writer.WriteStartObject();
+            writer.WriteEndObject();
+        }
+        else
+        {
+            JsonSerializer.Serialize(writer, objectToWrite, objectToWrite.GetType(), options);
+        }
+    }
 
     private object ParseObject(ref Utf8JsonReader reader)
     {
