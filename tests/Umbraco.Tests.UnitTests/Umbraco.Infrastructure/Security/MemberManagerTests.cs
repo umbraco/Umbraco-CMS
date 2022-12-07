@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
@@ -51,7 +50,7 @@ public class MemberManagerTests
 
         _fakeMemberStore = new MemberUserStore(
             _mockMemberService.Object,
-            new UmbracoMapper(new MapDefinitionCollection(() => mapDefinitions), scopeProvider, NullLogger<UmbracoMapper>.Instance),
+            new UmbracoMapper(new MapDefinitionCollection(() => mapDefinitions), scopeProvider),
             scopeProvider,
             new IdentityErrorDescriber(),
             Mock.Of<IPublishedSnapshotAccessor>(),

@@ -5,7 +5,6 @@ namespace Umbraco.Extensions;
 /// <summary>
 ///     Provides extension methods for the <see cref="IDataEditor" /> interface to manage tags.
 /// </summary>
-[Obsolete]
 public static class PropertyEditorTagsExtensions
 {
     /// <summary>

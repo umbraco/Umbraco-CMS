@@ -146,9 +146,7 @@ public abstract class ContentControllerBase : BackOfficeNotificationsController
 
             // set the value - tags are special
             TagsPropertyEditorAttribute? tagAttribute = propertyDto.PropertyEditor.GetTagAttribute();
-            // when TagsPropertyEditorAttribute is removed this whole if can also be removed
-            // since the call to sovePropertyValue is all that's needed now
-            if (tagAttribute is not null && valueEditor is not IDataValueTags)
+            if (tagAttribute != null)
             {
                 TagConfiguration? tagConfiguration =
                     ConfigurationEditor.ConfigurationAs<TagConfiguration>(propertyDto.DataType?.Configuration);

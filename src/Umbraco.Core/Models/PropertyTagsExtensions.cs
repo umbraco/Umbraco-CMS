@@ -23,15 +23,19 @@ public static class PropertyTagsExtensions
 
         IDataEditor? editor = propertyEditors[property.PropertyType?.PropertyEditorAlias];
         TagsPropertyEditorAttribute? tagAttribute = editor?.GetTagAttribute();
+        if (tagAttribute == null)
+        {
+            return null;
+        }
 
         var configurationObject = property.PropertyType is null
             ? null
             : dataTypeService.GetDataType(property.PropertyType.DataTypeId)?.Configuration;
-        TagConfiguration? configuration = configurationObject as TagConfiguration;
+        TagConfiguration? configuration = ConfigurationEditor.ConfigurationAs<TagConfiguration>(configurationObject);
 
         if (configuration is not null && configuration.Delimiter == default)
         {
-            configuration.Delimiter = tagAttribute?.Delimiter ?? ',';
+            configuration.Delimiter = tagAttribute.Delimiter;
         }
 
         return configuration;
