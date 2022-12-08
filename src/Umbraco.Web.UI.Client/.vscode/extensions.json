@@ -6,6 +6,7 @@
 		"dbaeumer.vscode-eslint",
 		"runem.lit-plugin",
 		"esbenp.prettier-vscode",
-		"hbenl.vscode-test-explorer"
+		"hbenl.vscode-test-explorer",
+		"vunguyentuan.vscode-css-variables"
 	]
 }
