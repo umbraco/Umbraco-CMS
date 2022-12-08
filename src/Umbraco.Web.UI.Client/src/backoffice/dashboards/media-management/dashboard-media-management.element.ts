@@ -1,6 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
+import './media-management-grid.element';
 
 @customElement('umb-dashboard-media-management')
 export class UmbDashboardMediaManagementElement extends LitElement {
@@ -8,9 +9,8 @@ export class UmbDashboardMediaManagementElement extends LitElement {
 
 	render() {
 		return html`
-			<uui-box>
-				<h1>Media Management</h1>
-			</uui-box>
+			<div>HEADER</div>
+			<umb-media-management-grid></umb-media-management-grid>
 		`;
 	}
 }
