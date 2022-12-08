@@ -5,7 +5,17 @@ import './media-management-grid.element';
 
 @customElement('umb-dashboard-media-management')
 export class UmbDashboardMediaManagementElement extends LitElement {
-	static styles = [UUITextStyles, css``];
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: flex;
+				flex-direction: column;
+				box-sizing: border-box;
+				height: 100%;
+			}
+		`,
+	];
 
 	render() {
 		return html`

@@ -35,6 +35,7 @@ export class UmbSectionDashboardsElement extends UmbContextConsumerMixin(UmbObse
 
 			#router-slot {
 				width: 100%;
+				height: 100%;
 				box-sizing: border-box;
 				padding: var(--uui-size-space-5);
 				display: block;

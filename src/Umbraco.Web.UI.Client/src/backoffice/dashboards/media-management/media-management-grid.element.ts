@@ -13,6 +13,19 @@ export class UmbMediaManagementGridElement extends LitElement {
 	static styles = [
 		UUITextStyles,
 		css`
+			:host {
+				display: block;
+				position: relative;
+				height: 100%;
+				width: 100%;
+			}
+			#dropzone {
+				display: block;
+				position: absolute;
+				inset: 0px;
+				z-index: 100;
+				backdrop-filter: brightness(0.5);
+			}
 			#media-folders {
 				margin-bottom: var(--uui-size-space-5);
 			}
@@ -74,6 +87,12 @@ export class UmbMediaManagementGridElement extends LitElement {
 
 	render() {
 		return html`
+			<uui-file-dropzone
+				id="dropzone"
+				multiple
+				@file-change=${(e) => console.log(e)}
+				label="Drop files here"
+				accept=""></uui-file-dropzone>
 			<div id="media-folders">${repeat(this.mediaFolders, (file) => this._renderMediaItem(file))}</div>
 			<div id="media-files">${repeat(this.mediaFiles, (file) => this._renderMediaItem(file))}</div>
 		`;
