@@ -19,12 +19,33 @@ export class UmbMediaManagementGridElement extends LitElement {
 				height: 100%;
 				width: 100%;
 			}
+			:host([dragging]) #dropzone {
+				opacity: 1;
+				pointer-events: all;
+			}
+			[dropzone] {
+				opacity: 0;
+			}
 			#dropzone {
+				opacity: 0;
+				pointer-events: none;
 				display: block;
 				position: absolute;
 				inset: 0px;
 				z-index: 100;
-				backdrop-filter: brightness(0.5);
+				backdrop-filter: opacity(1); /* Removes the built in blur effect */
+				border-radius: var(--uui-border-radius);
+				overflow: clip;
+				border: 1px solid var(--uui-color-focus);
+			}
+			#dropzone:after {
+				content: '';
+				display: block;
+				position: absolute;
+				inset: 0;
+				border-radius: var(--uui-border-radius);
+				background-color: var(--uui-color-focus);
+				opacity: 0.2;
 			}
 			#media-folders {
 				margin-bottom: var(--uui-size-space-5);
@@ -60,6 +81,23 @@ export class UmbMediaManagementGridElement extends LitElement {
 			type: 'folder',
 		},
 	];
+
+	/**
+	 *
+	 */
+	constructor() {
+		super();
+		document.addEventListener('dragenter', (e) => {
+			this.toggleAttribute('dragging', true);
+		});
+		document.addEventListener('dragleave', (e) => {
+			this.toggleAttribute('dragging', false);
+		});
+		document.addEventListener('drop', (e) => {
+			e.preventDefault();
+			this.toggleAttribute('dragging', false);
+		});
+	}
 
 	private get mediaFolders() {
 		return this._mediaItems.filter((item) => item.type === 'folder');
