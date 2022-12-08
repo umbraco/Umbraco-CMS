@@ -120,6 +120,10 @@ public class BackOfficeController : UmbracoController
         // Check if we not are in an run state, if so we need to redirect
         if (_runtimeState.Level != RuntimeLevel.Run)
         {
+            if (_runtimeState.Level == RuntimeLevel.Upgrade)
+            {
+                return RedirectToAction(nameof(AuthorizeUpgrade));
+            }
             return Redirect("/");
         }
 

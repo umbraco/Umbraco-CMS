@@ -16,6 +16,7 @@ namespace Umbraco.Cms.Web.Common.Controllers;
 /// </summary>
 [ModelBindingException]
 [PublishedRequestFilter]
+[MaintenanceModeActionFilter]
 public class RenderController : UmbracoPageController, IRenderController
 {
     private readonly ILogger<RenderController> _logger;
