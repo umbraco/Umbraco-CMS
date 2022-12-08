@@ -80,6 +80,22 @@ public static class BackOfficeAuthBuilderExtensions
                 options
                     .UseAspNetCore()
                     .EnableAuthorizationEndpointPassthrough();
+
+                // Enable reference tokens
+                // - see https://documentation.openiddict.com/configuration/token-storage.html
+                options
+                    .UseReferenceAccessTokens()
+                    .UseReferenceRefreshTokens();
+
+                // Use ASP.NET Core Data Protection for tokens instead of JWT.
+                // This is more secure, and has the added benefit of having a high throughput
+                // but means that all servers (such as in a load balanced setup)
+                // needs to use the same application name and key ring,
+                // however this is already recommended for load balancing, so should be fine.
+                // See https://documentation.openiddict.com/configuration/token-formats.html#switching-to-data-protection-tokens
+                // and https://learn.microsoft.com/en-us/aspnet/core/security/data-protection/configuration/overview?view=aspnetcore-7.0
+                // for more information
+                options.UseDataProtection();
             })
 
             // Register the OpenIddict validation components.
@@ -90,6 +106,13 @@ public static class BackOfficeAuthBuilderExtensions
 
                 // Register the ASP.NET Core host.
                 options.UseAspNetCore();
+
+                // Enable token entry validation
+                // - see https://documentation.openiddict.com/configuration/token-storage.html#enabling-token-entry-validation-at-the-api-level
+                options.EnableTokenEntryValidation();
+
+                // Use ASP.NET Core Data Protection for tokens instead of JWT. (see note in AddServer)
+                options.UseDataProtection();
             });
 
         builder.Services.AddTransient<IBackOfficeApplicationManager, BackOfficeApplicationManager>();

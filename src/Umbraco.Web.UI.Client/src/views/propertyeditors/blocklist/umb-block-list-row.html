@@ -30,7 +30,7 @@
                     <localize key="general_copy">Copy</localize>
                 </span>
             </button>
-            <button ng-if="!vm.blockEditorApi.readonly" type="button" class="btn-reset umb-outline action --delete" localize="title" title="actions_delete"
+            <button ng-if="!vm.blockEditorApi.readonly && (!vm.blockEditorApi.singleBlockMode || vm.index > 0)" type="button" class="btn-reset umb-outline action --delete" localize="title" title="actions_delete"
                     ng-click="vm.blockEditorApi.requestDeleteBlock(vm.layout.$block);">
                 <umb-icon icon="icon-trash" class="icon"></umb-icon>
                 <span class="sr-only">
