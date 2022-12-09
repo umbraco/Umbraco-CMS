@@ -22,8 +22,7 @@ public class DbContextFactory<TDbContext> where TDbContext : DbContext
     public async Task<T> ExecuteWithContextAsync<T>(Func<TDbContext, Task<T>> method)
     {
         using IServiceScope scope = _scopeFactory.CreateScope();
-        TDbContext db = StaticServiceProvider.Instance.GetRequiredService<TDbContext>();
-
+        TDbContext db = scope.ServiceProvider.GetRequiredService<TDbContext>();
         return await method(db);
     }
 
