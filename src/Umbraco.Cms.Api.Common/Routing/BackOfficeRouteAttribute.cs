@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core;
 
-namespace Umbraco.New.Cms.Web.Common.Routing;
+namespace Umbraco.Cms.Api.Common.Routing;
 
 /// <summary>
 /// Routes a controller within the backoffice area, I.E /umbraco

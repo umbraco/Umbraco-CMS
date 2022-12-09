@@ -1,19 +1,16 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Api.Common.Routing;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.New.Cms.Web.Common.Routing;
 
-namespace Umbraco.Cms.Api.Management.Configuration;
+namespace Umbraco.Cms.Api.Common.Configuration;
 
 public class ConfigureMvcOptions : IConfigureOptions<MvcOptions>
 {
     private readonly IOptions<GlobalSettings> _globalSettings;
 
-    public ConfigureMvcOptions(IOptions<GlobalSettings> globalSettings)
-    {
-        _globalSettings = globalSettings;
-    }
+    public ConfigureMvcOptions(IOptions<GlobalSettings> globalSettings) => _globalSettings = globalSettings;
 
     public void Configure(MvcOptions options)
     {
@@ -21,6 +18,5 @@ public class ConfigureMvcOptions : IConfigureOptions<MvcOptions>
 
         var backofficePath = _globalSettings.Value.UmbracoPath.TrimStart(Constants.CharArrays.TildeForwardSlash);
         options.Conventions.Add(new UmbracoBackofficeToken(Constants.Web.AttributeRouting.BackOfficeToken, backofficePath));
-
     }
 }
