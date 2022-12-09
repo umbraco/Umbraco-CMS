@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -190,7 +190,13 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
             }
 
             _cacheLevel = _converter?.GetPropertyCacheLevel(this) ?? PropertyCacheLevel.Snapshot;
-            _modelClrType = _converter == null ? typeof (object) : _converter.GetPropertyValueType(this);
+            Type modelClrType = _converter == null ? typeof (object) : _converter.GetPropertyValueType(this);
+            if(modelClrType == null)
+            {
+                throw new ArgumentNullException($"Unable to map DataType with Id {DataType.Id} to a C# type.");
+            }
+
+            _modelClrType= modelClrType;
         }
 
         /// <inheritdoc />
