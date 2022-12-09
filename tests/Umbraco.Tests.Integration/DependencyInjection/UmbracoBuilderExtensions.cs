@@ -63,6 +63,7 @@ public static class UmbracoBuilderExtensions
 
         builder.Services.AddDbContext<UmbracoEFContext>((serviceProvider, options) =>
         {
+            // TODO: Make compatable with SqlServer aswell so we can choose.
             options.UseSqlite(
                 serviceProvider.GetRequiredService<IOptionsMonitor<ConnectionStrings>>().CurrentValue.ConnectionString);
         });
