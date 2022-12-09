@@ -1,9 +1,8 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
+using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.HealthCheck;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.HealthChecks;
 using Umbraco.Cms.Core.Mapping;
 
@@ -12,16 +11,16 @@ namespace Umbraco.Cms.Api.Management.Controllers.HealthCheck;
 public class AllHealthCheckGroupController : HealthCheckGroupControllerBase
 {
     private readonly HealthCheckCollection _healthChecks;
-    private readonly HealthChecksSettings _healthChecksSettings;
+    private readonly IHealthCheckGroupWithResultViewModelFactory _healthCheckGroupWithResultViewModelFactory;
     private readonly IUmbracoMapper _umbracoMapper;
 
     public AllHealthCheckGroupController(
         HealthCheckCollection healthChecks,
-        IOptions<HealthChecksSettings> healthChecksSettings,
+        IHealthCheckGroupWithResultViewModelFactory healthCheckGroupWithResultViewModelFactory,
         IUmbracoMapper umbracoMapper)
     {
         _healthChecks = healthChecks;
-        _healthChecksSettings = healthChecksSettings.Value;
+        _healthCheckGroupWithResultViewModelFactory = healthCheckGroupWithResultViewModelFactory;
         _umbracoMapper = umbracoMapper;
     }
 
@@ -36,14 +35,8 @@ public class AllHealthCheckGroupController : HealthCheckGroupControllerBase
     [ProducesResponseType(typeof(PagedViewModel<HealthCheckGroupViewModel>), StatusCodes.Status200OK)]
     public async Task<ActionResult<PagedViewModel<HealthCheckGroupViewModel>>> All(int skip = 0, int take = 100)
     {
-        IList<Guid> disabledCheckIds = _healthChecksSettings.DisabledChecks
-            .Select(x => x.Id)
-            .ToList();
-
-        IEnumerable<IGrouping<string?, Core.HealthChecks.HealthCheck>> groups = _healthChecks
-            .Where(x => disabledCheckIds.Contains(x.Id) == false)
-            .GroupBy(x => x.Group)
-            .OrderBy(x => x.Key)
+        IEnumerable<IGrouping<string?, Core.HealthChecks.HealthCheck>> groups = _healthCheckGroupWithResultViewModelFactory
+            .CreateGroupingFromHealthCheckCollection(_healthChecks)
             .Skip(skip)
             .Take(take);
 

@@ -1,9 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.HealthCheck;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.HealthChecks;
 using Umbraco.Extensions;
 
@@ -13,16 +11,13 @@ public class ByNameWithResultHealthCheckGroupController : HealthCheckGroupContro
 {
     private readonly HealthCheckCollection _healthChecks;
     private readonly IHealthCheckGroupWithResultViewModelFactory _healthCheckGroupWithResultViewModelFactory;
-    private readonly HealthChecksSettings _healthChecksSettings;
 
     public ByNameWithResultHealthCheckGroupController(
         HealthCheckCollection healthChecks,
-        IHealthCheckGroupWithResultViewModelFactory healthCheckGroupWithResultViewModelFactory,
-        IOptions<HealthChecksSettings> healthChecksSettings)
+        IHealthCheckGroupWithResultViewModelFactory healthCheckGroupWithResultViewModelFactory)
     {
         _healthChecks = healthChecks;
         _healthCheckGroupWithResultViewModelFactory = healthCheckGroupWithResultViewModelFactory;
-        _healthChecksSettings = healthChecksSettings.Value;
     }
 
     /// <summary>
@@ -37,14 +32,10 @@ public class ByNameWithResultHealthCheckGroupController : HealthCheckGroupContro
     [ProducesResponseType(typeof(HealthCheckGroupWithResultViewModel), StatusCodes.Status200OK)]
     public async Task<ActionResult<HealthCheckGroupWithResultViewModel>> ByName(string groupName)
     {
-        IList<Guid> disabledCheckIds = _healthChecksSettings.DisabledChecks
-            .Select(x => x.Id)
-            .ToList();
+        IEnumerable<IGrouping<string?, Core.HealthChecks.HealthCheck>> groups = _healthCheckGroupWithResultViewModelFactory
+            .CreateGroupingFromHealthCheckCollection(_healthChecks);
 
-        IGrouping<string?, Core.HealthChecks.HealthCheck>? group = _healthChecks
-            .Where(x => disabledCheckIds.Contains(x.Id) == false)
-            .GroupBy(x => x.Group)
-            .FirstOrDefault(x => x.Key.InvariantEquals(groupName.Trim()));
+        IGrouping<string?, Core.HealthChecks.HealthCheck>? group = groups.FirstOrDefault(x => x.Key.InvariantEquals(groupName.Trim()));
 
         if (group is null)
         {
