@@ -1,12 +1,8 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using Examine;
-using Examine.Lucene.Directories;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
@@ -16,18 +12,20 @@ using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.WebAssets;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Infrastructure.HostedServices;
+using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.PublishedCache;
+using Umbraco.Cms.Persistence.EFCore;
+using Umbraco.Cms.Persistence.EFCore.Entities;
 using Umbraco.Cms.Tests.Common.TestHelpers.Stubs;
 using Umbraco.Cms.Tests.Integration.Implementations;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.DependencyInjection;
 
@@ -62,6 +60,16 @@ public static class UmbracoBuilderExtensions
 
         builder.Services.AddUnique<IServerMessenger, NoopServerMessenger>();
         builder.Services.AddUnique<IProfiler, TestProfiler>();
+
+        builder.Services.AddDbContext<UmbracoEFContext>((serviceProvider, options) =>
+        {
+            options.UseSqlite(
+                serviceProvider.GetRequiredService<IOptionsMonitor<ConnectionStrings>>().CurrentValue.ConnectionString);
+        });
+        builder.Services.AddUnique<IDatabaseInfo, EFDatabaseInfo>();
+        builder.Services.AddUnique<IDatabaseSchemaCreatorFactory, EFDatabaseSchemaCreatorFactory>();
+        builder.Services.AddUnique<IDatabaseDataCreator, EFCoreDatabaseDataCreator>();
+        builder.Services.AddSingleton<UmbracoDbContextFactory>();
 
         return builder;
     }
