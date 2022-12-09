@@ -10,5 +10,5 @@ public class HealthCheckGroupViewModel
     /// <summary>
     ///     Gets or sets the health checks.
     /// </summary>
-    public List<HealthCheckViewModel>? Checks { get; set; }
+    public required List<HealthCheckViewModel> Checks { get; set; }
 }

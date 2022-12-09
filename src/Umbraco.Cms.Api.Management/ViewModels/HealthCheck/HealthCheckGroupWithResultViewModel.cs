@@ -10,5 +10,5 @@ public class HealthCheckGroupWithResultViewModel
     /// <summary>
     ///     Gets or sets the health checks with the result(s) from each health check.
     /// </summary>
-    public List<HealthCheckWithResultViewModel>? Checks { get; set; }
+    public required List<HealthCheckWithResultViewModel> Checks { get; set; }
 }
