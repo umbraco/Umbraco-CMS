@@ -51,6 +51,6 @@ public class ByNameWithResultHealthCheckGroupController : HealthCheckGroupContro
             return NotFound();
         }
 
-        return await Task.FromResult(_healthCheckGroupWithResultViewModelFactory.CreateHealthCheckGroupWithResultViewModel(group));
+        return await Task.FromResult(Ok(_healthCheckGroupWithResultViewModelFactory.CreateHealthCheckGroupWithResultViewModel(group)));
     }
 }

@@ -47,6 +47,6 @@ public class AllHealthCheckGroupController : HealthCheckGroupControllerBase
             .Skip(skip)
             .Take(take);
 
-        return await Task.FromResult(_umbracoMapper.Map<PagedViewModel<HealthCheckGroupViewModel>>(groups)!);
+        return await Task.FromResult(Ok(_umbracoMapper.Map<PagedViewModel<HealthCheckGroupViewModel>>(groups)));
     }
 }
