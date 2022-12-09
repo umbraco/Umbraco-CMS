@@ -186,8 +186,6 @@ public class RuntimeState : IRuntimeState
             case DatabaseState.Ok:
             default:
                 {
-
-
                     // the database version matches the code & files version, all clear, can run
                     Level = RuntimeLevel.Run;
                     Reason = RuntimeLevelReason.Run;
