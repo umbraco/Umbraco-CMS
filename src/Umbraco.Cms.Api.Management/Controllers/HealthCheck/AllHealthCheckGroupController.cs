@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Management.ViewModels.HealthCheck;
@@ -32,6 +33,7 @@ public class AllHealthCheckGroupController : HealthCheckGroupControllerBase
     /// <returns>The paged result of health checks, grouped by health check group name.</returns>
     [HttpGet]
     [MapToApiVersion("1.0")]
+    [ProducesResponseType(typeof(PagedViewModel<HealthCheckGroupViewModel>), StatusCodes.Status200OK)]
     public async Task<ActionResult<PagedViewModel<HealthCheckGroupViewModel>>> All(int skip, int take)
     {
         IList<Guid> disabledCheckIds = _healthChecksSettings.DisabledChecks
