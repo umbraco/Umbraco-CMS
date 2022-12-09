@@ -13,7 +13,7 @@ using Microsoft.OpenApi.Models;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
-using Umbraco.Cms.Api.Management.Configuration;
+using Umbraco.Cms.Api.Common.Configuration;
 using Umbraco.Cms.Api.Management.DependencyInjection;
 using Umbraco.Cms.Api.Management.OpenApi;
 using Umbraco.Cms.Web.Common.ApplicationBuilder;

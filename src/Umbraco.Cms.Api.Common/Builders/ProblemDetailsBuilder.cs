@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Umbraco.Cms.Api.Management.Builders;
+namespace Umbraco.Cms.Api.Common.Builders;
 
 public class ProblemDetailsBuilder
 {

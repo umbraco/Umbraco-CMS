@@ -2,7 +2,7 @@
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Api.Management.ViewModels.Language;
-using Umbraco.Cms.Api.Management.ViewModels.Pagination;
+using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.New.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Management.Mapping.Languages;

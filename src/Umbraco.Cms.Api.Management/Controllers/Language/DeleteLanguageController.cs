@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Api.Management.Builders;
+using Umbraco.Cms.Api.Common.Builders;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Language;
 
