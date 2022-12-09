@@ -35,7 +35,7 @@ public class ByNameWithResultHealthCheckGroupController : HealthCheckGroupContro
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(NotFoundResult), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(HealthCheckGroupWithResultViewModel), StatusCodes.Status200OK)]
-    public async Task<ActionResult<HealthCheckGroupWithResultViewModel?>> ByName(string groupName)
+    public async Task<ActionResult<HealthCheckGroupWithResultViewModel>> ByName(string groupName)
     {
         IList<Guid> disabledCheckIds = _healthChecksSettings.DisabledChecks
             .Select(x => x.Id)
