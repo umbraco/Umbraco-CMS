@@ -88,7 +88,7 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
                     {
                         var connectionString = s_connectionStrings?.ConnectionString;
                         var providerName = s_connectionStrings?.ProviderName;
-                        
+
                         if (!connectionString.IsNullOrWhiteSpace())
                         {
                             if (providerName == "Microsoft.Data.Sqlite")
