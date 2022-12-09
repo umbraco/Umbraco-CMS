@@ -164,9 +164,7 @@ public abstract class UmbracoIntegrationTestBase
         {
             return;
         }
-        
-        
-                     
+
         var builder = new SqliteConnectionStringBuilder
         {
             DataSource = $"{Guid.NewGuid()}",
@@ -175,8 +173,7 @@ public abstract class UmbracoIntegrationTestBase
             Pooling = false, // When pooling true, files kept open after connections closed, bad for cleanup.
             Cache = SqliteCacheMode.Shared
         };
-        
-        
+
         s_connectionStrings = new ConnectionStrings()
         {
             ConnectionString = builder.ConnectionString,
@@ -187,48 +184,25 @@ public abstract class UmbracoIntegrationTestBase
         connectionStrings.CurrentValue.ProviderName = s_connectionStrings.ProviderName;
         //configManipulator.SaveConnectionString(s_connectionStrings.ConnectionString, s_connectionStrings.ProviderName);
 
-
         databaseFactory.Configure(s_connectionStrings);
-        var db = databaseFactory.CreateDatabase();
-        
-        db.BeginTransaction();
-        IDatabaseSchemaCreator creator = databaseSchemaCreatorFactory.Create(db);
-        creator.InitializeDatabaseSchema(false).GetAwaiter().GetResult();
-        db.CompleteTransaction();
-
-
-        
-       //var db = GetOrCreateDatabase(loggerFactory, testUmbracoDatabaseFactoryProvider, umbracoDbContextFactory, databaseSchemaCreatorFactory, databaseFactory);
 
         switch (TestOptions.Database)
         {
             case UmbracoTestOptions.Database.NewSchemaPerTest:
 
                 // New DB + Schema
-                //var newSchemaDbMeta = db.AttachSchema();
-
-                //s_fixtureDbMeta = newSchemaDbMeta;
-                // Add teardown callback
-                //AddOnTestTearDown(() => db.Detach(newSchemaDbMeta));
-
-                
-                //ConfigureTestDatabaseFactory(newSchemaDbMeta, databaseFactory, runtimeState, connectionStrings);
+                CreateDatabaseWithSchema(databaseFactory, databaseSchemaCreatorFactory);
                 databaseDataCreator.SeedDataAsync().GetAwaiter().GetResult();
-                
+
                 runtimeState.DetermineRuntimeLevel();
-                
+
                 Assert.AreEqual(RuntimeLevel.Run, runtimeState.Level);
 
                 break;
             case UmbracoTestOptions.Database.NewEmptyPerTest:
-                //var newEmptyDbMeta = db.AttachEmpty();
 
-                //s_fixtureDbMeta = newEmptyDbMeta;
-                // Add teardown callback
-                //AddOnTestTearDown(() => db.Detach(newEmptyDbMeta));
-
-                //ConfigureTestDatabaseFactory(newEmptyDbMeta, databaseFactory, runtimeState, connectionStrings);
-
+                CreateDatabaseWithoutSchema(databaseFactory, databaseSchemaCreatorFactory);
+                runtimeState.DetermineRuntimeLevel();
                 Assert.AreEqual(RuntimeLevel.Install, runtimeState.Level);
 
                 break;
@@ -239,14 +213,9 @@ public abstract class UmbracoIntegrationTestBase
                 if (_firstTestInFixture)
                 {
                     // New DB + Schema
-                    //var newSchemaFixtureDbMeta = db.AttachSchema();
-                    //s_fixtureDbMeta = newSchemaFixtureDbMeta;
-
-                    // Add teardown callback
-                    //AddOnFixtureTearDown(() => db.Detach(newSchemaFixtureDbMeta));
+                    CreateDatabaseWithSchema(databaseFactory, databaseSchemaCreatorFactory);
+                    databaseDataCreator.SeedDataAsync().GetAwaiter().GetResult();
                 }
-
-                ConfigureTestDatabaseFactory(s_fixtureDbMeta, databaseFactory, runtimeState, connectionStrings);
 
                 break;
             case UmbracoTestOptions.Database.NewEmptyPerFixture:
@@ -255,54 +224,28 @@ public abstract class UmbracoIntegrationTestBase
                 // and it would be the same as NewSchemaPerTest even if it didn't block
                 if (_firstTestInFixture)
                 {
-                    // New DB + Schema
-                    //var newEmptyFixtureDbMeta = db.AttachEmpty();
-                    //s_fixtureDbMeta = newEmptyFixtureDbMeta;
-
-                    // Add teardown callback
-                    //AddOnFixtureTearDown(() => db.Detach(newEmptyFixtureDbMeta));
+                    CreateDatabaseWithoutSchema(databaseFactory, databaseSchemaCreatorFactory);
                 }
-
-                ConfigureTestDatabaseFactory(s_fixtureDbMeta, databaseFactory, runtimeState, connectionStrings);
-
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(TestOptions), TestOptions, null);
         }
     }
 
+    private void CreateDatabaseWithSchema(IUmbracoDatabaseFactory umbracoDatabaseFactory, IDatabaseSchemaCreatorFactory databaseSchemaCreatorFactory)
+    {
+        var db = umbracoDatabaseFactory.CreateDatabase();
+        db.BeginTransaction();
+        IDatabaseSchemaCreator creator = databaseSchemaCreatorFactory.Create(db);
+        creator.InitializeDatabaseSchema(false).GetAwaiter().GetResult();
+        db.CompleteTransaction();
+    }
 
-    // private ITestDatabase GetOrCreateDatabase(
-    //     ILoggerFactory loggerFactory,
-    //     TestUmbracoDatabaseFactoryProvider dbFactory,
-    //     UmbracoDbContextFactory umbracoDbContextFactory,
-    //     IDatabaseSchemaCreatorFactory databaseSchemaCreatorFactory,
-    //     IUmbracoDatabaseFactory databaseFactory)
-    // {
-    //     lock (s_dbLocker)
-    //     {
-    //         if (s_dbInstance != null)
-    //         {
-    //             return s_dbInstance;
-    //         }
-    //
-    //         var settings = new TestDatabaseSettings
-    //         {
-    //             FilesPath = Path.Combine(TestHelper.WorkingDirectory, "databases"),
-    //             DatabaseType =
-    //                 Configuration.GetValue<TestDatabaseSettings.TestDatabaseType>("Tests:Database:DatabaseType"),
-    //             PrepareThreadCount = Configuration.GetValue<int>("Tests:Database:PrepareThreadCount"),
-    //             EmptyDatabasesCount = Configuration.GetValue<int>("Tests:Database:EmptyDatabasesCount"),
-    //             SchemaDatabaseCount = Configuration.GetValue<int>("Tests:Database:SchemaDatabaseCount"),
-    //             SQLServerMasterConnectionString =
-    //                 Configuration.GetValue<string>("Tests:Database:SQLServerMasterConnectionString")
-    //         };
-    //
-    //         Directory.CreateDirectory(settings.FilesPath);
-    //
-    //         s_dbInstance = TestDatabaseFactory.Create(settings, dbFactory, loggerFactory, umbracoDbContextFactory, databaseSchemaCreatorFactory, databaseFactory);
-    //
-    //         return s_dbInstance;
-    //     }
-    // }
+    private void CreateDatabaseWithoutSchema(IUmbracoDatabaseFactory umbracoDatabaseFactory, IDatabaseSchemaCreatorFactory databaseSchemaCreatorFactory)
+    {
+        var db = umbracoDatabaseFactory.CreateDatabase();
+        db.BeginTransaction();
+        databaseSchemaCreatorFactory.Create(db);
+        db.CompleteTransaction();
+    }
 }
