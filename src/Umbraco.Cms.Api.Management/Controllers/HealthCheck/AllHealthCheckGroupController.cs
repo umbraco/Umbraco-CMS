@@ -34,7 +34,7 @@ public class AllHealthCheckGroupController : HealthCheckGroupControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<HealthCheckGroupViewModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<HealthCheckGroupViewModel>>> All(int skip, int take)
+    public async Task<ActionResult<PagedViewModel<HealthCheckGroupViewModel>>> All(int skip = 0, int take = 100)
     {
         IList<Guid> disabledCheckIds = _healthChecksSettings.DisabledChecks
             .Select(x => x.Id)
