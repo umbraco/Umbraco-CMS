@@ -41,9 +41,9 @@
   </ItemGroup>
 
   <!-- Generate JSON schema on build (and before copying to project) -->
-  <Target Name="GenerateAppsettingsSchema" BeforeTargets="Build;CopyUmbracoJsonSchemaFiles" Condition="!Exists('$(_UmbracoCmsJsonSchemaReference)')">
+  <Target Name="GenerateAppsettingsSchema" AfterTargets="Build" BeforeTargets="CopyUmbracoJsonSchemaFiles" Condition="!Exists('$(_UmbracoCmsJsonSchemaReference)')">
     <Message Text="Generating $(_UmbracoCmsJsonSchemaReference) because it doesn't exist" Importance="high" />
-    <Exec WorkingDirectory="$(MSBuildThisFileDirectory)..\..\tools\Umbraco.JsonSchema" Command="dotnet run --configuration $(Configuration) -- --outputFile &quot;$(MSBuildThisFileDirectory)$(_UmbracoCmsJsonSchemaReference)&quot;" />
+    <Exec WorkingDirectory="$(MSBuildThisFileDirectory)..\..\tools\Umbraco.JsonSchema" Command="dotnet run --configuration $(Configuration) -- --assembly &quot;$(TargetPath)&quot; --type &quot;Umbraco.Cms.Targets.UmbracoCmsSchema&quot; --output &quot;$(MSBuildThisFileDirectory)$(_UmbracoCmsJsonSchemaReference)&quot;" />
   </Target>
 
   <!-- Remove generated JSON schema on clean -->

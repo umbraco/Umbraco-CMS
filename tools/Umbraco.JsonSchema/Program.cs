@@ -1,14 +1,21 @@
 using CommandLine;
-using Umbraco.Cms.Core.Configuration.Models;
 
 await Parser.Default.ParseArguments<Options>(args).WithParsedAsync(async options =>
 {
-    // Generate CMS schema
+    // Load assembly and get type
+    var assemblyFile = Path.GetFullPath(options.AssemblyFilePath);
+    if (!File.Exists(assemblyFile))
+    {
+        throw new FileNotFoundException($"Could not find file '{assemblyFile}'.", assemblyFile);
+    }
+
+    var plc = new PluginLoadContext(assemblyFile);
+    var assembly = plc.LoadFromAssemblyPath(assemblyFile);
+    var type = assembly.GetType(options.TypeName, true);
+
+    // Generate schema
     var jsonSchemaGenerator = new UmbracoJsonSchemaGenerator();
-    var jsonSchema = jsonSchemaGenerator.Generate(typeof(UmbracoCmsSchema));
+    var jsonSchema = jsonSchemaGenerator.Generate(type);
 
-    // TODO: When the UmbracoPath setter is removed from GlobalSettings (scheduled for V12), remove this line as well
-    jsonSchema.Definitions[nameof(GlobalSettings)]?.Properties?.Remove(nameof(GlobalSettings.UmbracoPath));
-
-    await File.WriteAllTextAsync(options.OutputFile, jsonSchema.ToJson());
+    await File.WriteAllTextAsync(options.OutputFilePath, jsonSchema.ToJson());
 });
