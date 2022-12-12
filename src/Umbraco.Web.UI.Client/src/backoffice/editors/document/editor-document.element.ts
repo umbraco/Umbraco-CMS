@@ -30,7 +30,7 @@ export class UmbEditorDocumentElement extends UmbContextConsumerMixin(UmbContext
 		this._registerEditorViews();
 
 		this.consumeContext('umbDocumentStore', (documentStore: UmbDocumentStore) => {
-			this.provideContext('umbNodeStore', documentStore);
+			this.provideContext('umbContentStore', documentStore);
 		});
 	}
 
