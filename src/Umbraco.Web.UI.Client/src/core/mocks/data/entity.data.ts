@@ -1,5 +1,5 @@
 import { UmbData } from './data';
-import { Entity, entities } from './entities';
+import type { Entity } from '@umbraco-cms/models';
 
 // Temp mocked database
 export class UmbEntityData<T extends Entity> extends UmbData<T> {
@@ -74,5 +74,3 @@ export class UmbEntityData<T extends Entity> extends UmbData<T> {
 		this.data[itemIndex] = newItem;
 	}
 }
-
-export const umbEntityData = new UmbEntityData<Entity>(entities);

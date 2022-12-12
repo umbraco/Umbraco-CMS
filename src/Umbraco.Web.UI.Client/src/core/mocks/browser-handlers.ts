@@ -1,6 +1,5 @@
 import { handlers as dataTypeHandlers } from './domains/data-type.handlers';
 import { handlers as documentTypeHandlers } from './domains/document-type.handlers';
-import { handlers as treeHandlers } from './domains/entity.handlers';
 import { handlers as installHandlers } from './domains/install.handlers';
 import * as manifestsHandlers from './domains/manifests.handlers';
 import { handlers as publishedStatusHandlers } from './domains/published-status.handlers';
@@ -35,7 +34,6 @@ const handlers = [
 	...mediaHandlers,
 	...dataTypeHandlers,
 	...documentTypeHandlers,
-	...treeHandlers,
 	...manifestsHandlers.default,
 	...telemetryHandlers,
 	...publishedStatusHandlers,
