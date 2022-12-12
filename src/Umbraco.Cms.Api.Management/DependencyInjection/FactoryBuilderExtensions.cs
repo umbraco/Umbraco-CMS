@@ -12,6 +12,7 @@ public static class FactoryBuilderExtensions
         builder.Services.AddTransient<IModelsBuilderViewModelFactory, ModelsBuilderViewModelFactory>();
         builder.Services.AddTransient<IRelationViewModelFactory, RelationViewModelFactory>();
         builder.Services.AddTransient<IDictionaryFactory, DictionaryFactory>();
+        builder.Services.AddTransient<IRedirectUrlStatusViewModelFactory, RedirectUrlStatusViewModelFactory>();
         return builder;
     }
 }
