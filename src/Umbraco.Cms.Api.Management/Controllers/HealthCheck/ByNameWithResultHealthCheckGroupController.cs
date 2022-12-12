@@ -23,19 +23,19 @@ public class ByNameWithResultHealthCheckGroupController : HealthCheckGroupContro
     /// <summary>
     ///     Gets a health check group with all its health checks by a group name.
     /// </summary>
-    /// <param name="groupName">The name of the group.</param>
+    /// <param name="name">The name of the group.</param>
     /// <remarks>The health check result(s) will be included as part of the health checks.</remarks>
     /// <returns>The health check group or not found result.</returns>
-    [HttpGet("{groupName}")]
+    [HttpGet("{name}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(NotFoundResult), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(HealthCheckGroupWithResultViewModel), StatusCodes.Status200OK)]
-    public async Task<ActionResult<HealthCheckGroupWithResultViewModel>> ByName(string groupName)
+    public async Task<ActionResult<HealthCheckGroupWithResultViewModel>> ByName(string name)
     {
         IEnumerable<IGrouping<string?, Core.HealthChecks.HealthCheck>> groups = _healthCheckGroupWithResultViewModelFactory
             .CreateGroupingFromHealthCheckCollection(_healthChecks);
 
-        IGrouping<string?, Core.HealthChecks.HealthCheck>? group = groups.FirstOrDefault(x => x.Key.InvariantEquals(groupName.Trim()));
+        IGrouping<string?, Core.HealthChecks.HealthCheck>? group = groups.FirstOrDefault(x => x.Key.InvariantEquals(name.Trim()));
 
         if (group is null)
         {
