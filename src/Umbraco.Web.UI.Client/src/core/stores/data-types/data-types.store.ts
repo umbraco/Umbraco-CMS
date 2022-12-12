@@ -22,7 +22,7 @@ export class UmbDataTypesStore extends UmbDataStoreBase<DataTypeDetails | Folder
 		fetch(`/umbraco/backoffice/data-type/details/${key}`)
 			.then((res) => res.json())
 			.then((data) => {
-				this.update(data);
+				this.updateItems(data);
 			});
 
 		return this.items.pipe(map((dataTypes) => dataTypes.find((dataType) => dataType.key === key) || null));
@@ -45,7 +45,7 @@ export class UmbDataTypesStore extends UmbDataStoreBase<DataTypeDetails | Folder
 				},
 			});
 			const json = await res.json();
-			this.update(json);
+			this.updateItems(json);
 		} catch (error) {
 			console.error('Save Data Type error', error);
 		}
@@ -72,7 +72,7 @@ export class UmbDataTypesStore extends UmbDataStoreBase<DataTypeDetails | Folder
 	getTreeRoot(): Observable<Array<FolderTreeItem>> {
 		DataTypeResource.getTreeDataTypeRoot({}).then(
 			(res) => {
-				this.update(res.items);
+				this.updateItems(res.items);
 			},
 			(e) => {
 				if (e instanceof ApiError) {
@@ -92,7 +92,7 @@ export class UmbDataTypesStore extends UmbDataStoreBase<DataTypeDetails | Folder
 			parentKey: key,
 		}).then(
 			(res) => {
-				this.update(res.items);
+				this.updateItems(res.items);
 			},
 			(e) => {
 				if (e instanceof ApiError) {

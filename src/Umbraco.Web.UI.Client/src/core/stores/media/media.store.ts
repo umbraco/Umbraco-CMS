@@ -15,7 +15,7 @@ export class UmbMediaStore extends UmbDataStoreBase<MediaDetails | ContentTreeIt
 		fetch(`/umbraco/management/api/v1/media/details/${key}`)
 			.then((res) => res.json())
 			.then((data) => {
-				this.update(data);
+				this.updateItems(data);
 			});
 			
 		return this.items.pipe(map((media) => media.find((media) => media.key === key) || null));
@@ -44,7 +44,7 @@ export class UmbMediaStore extends UmbDataStoreBase<MediaDetails | ContentTreeIt
 		})
 			.then((res) => res.json())
 			.then((data: Array<MediaDetails>) => {
-				this.update(data);
+				this.updateItems(data);
 			});
 	}
 
@@ -60,13 +60,13 @@ export class UmbMediaStore extends UmbDataStoreBase<MediaDetails | ContentTreeIt
 				},
 			});
 			const data = await res.json();
-			this.update(data);
+			this.updateItems(data);
 		}
 
 	getTreeRoot(): Observable<Array<ContentTreeItem>> {
 		MediaResource.getTreeMediaRoot({}).then(
 			(res) => {
-				this.update(res.items);
+				this.updateItems(res.items);
 			},
 			(e) => {
 				if (e instanceof ApiError) {
@@ -87,7 +87,7 @@ export class UmbMediaStore extends UmbDataStoreBase<MediaDetails | ContentTreeIt
 			parentKey: key,
 		}).then(
 			(res) => {
-				this.update(res.items);
+				this.updateItems(res.items);
 			},
 			(e) => {
 				if (e instanceof ApiError) {

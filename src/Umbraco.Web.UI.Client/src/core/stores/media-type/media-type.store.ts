@@ -13,7 +13,7 @@ export class UmbMediaTypeStore extends UmbDataStoreBase<MediaTypeDetails | Paged
 	getTreeRoot(): Observable<Array<PagedFolderTreeItem>> {
 		MediaTypeResource.getTreeMediaTypeRoot({}).then(
 			(res) => {
-				this.update(res.items);
+				this.updateItems(res.items);
 			},
 			(e) => {
 				if (e instanceof ApiError) {
@@ -33,7 +33,7 @@ export class UmbMediaTypeStore extends UmbDataStoreBase<MediaTypeDetails | Paged
 			parentKey: key,
 		}).then(
 			(res) => {
-				this.update(res.items);
+				this.updateItems(res.items);
 			},
 			(e) => {
 				if (e instanceof ApiError) {

@@ -13,7 +13,7 @@ export class UmbMemberTypeStore extends UmbDataStoreBase<MemberTypeDetails | Ent
 	getTreeRoot(): Observable<Array<EntityTreeItem>> {
 		MemberTypeResource.getTreeMemberTypeRoot({}).then(
 			(res) => {
-				this.update(res.items);
+				this.updateItems(res.items);
 			},
 			(e) => {
 				if (e instanceof ApiError) {

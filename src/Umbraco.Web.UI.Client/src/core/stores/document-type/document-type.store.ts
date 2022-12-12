@@ -16,7 +16,7 @@ export class UmbDocumentTypeStore extends UmbDataStoreBase<DocumentTypeDetails |
 		fetch(`/umbraco/backoffice/document-type/${key}`)
 			.then((res) => res.json())
 			.then((data) => {
-				this.update(data);
+				this.updateItems(data);
 			});
 
 		return this.items.pipe(
@@ -35,7 +35,7 @@ export class UmbDocumentTypeStore extends UmbDataStoreBase<DocumentTypeDetails |
 				},
 			});
 			const json = await res.json();
-			this.update(json);
+			this.updateItems(json);
 		} catch (error) {
 			console.error('Save Document Type error', error);
 		}
@@ -44,7 +44,7 @@ export class UmbDocumentTypeStore extends UmbDataStoreBase<DocumentTypeDetails |
 	getTreeRoot(): Observable<Array<DocumentTypeTreeItem>> {
 		DocumentTypeResource.getTreeDocumentTypeRoot({}).then(
 			(res) => {
-				this.update(res.items);
+				this.updateItems(res.items);
 			},
 			(e) => {
 				if (e instanceof ApiError) {
@@ -64,7 +64,7 @@ export class UmbDocumentTypeStore extends UmbDataStoreBase<DocumentTypeDetails |
 			parentKey: key,
 		}).then(
 			(res) => {
-				this.update(res.items);
+				this.updateItems(res.items);
 			},
 			(e) => {
 				if (e instanceof ApiError) {
