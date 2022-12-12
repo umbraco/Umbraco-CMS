@@ -234,19 +234,19 @@ public abstract class UmbracoIntegrationTestBase
 
     private void CreateDatabaseWithSchema(IUmbracoDatabaseFactory umbracoDatabaseFactory, IDatabaseSchemaCreatorFactory databaseSchemaCreatorFactory)
     {
-        var db = umbracoDatabaseFactory.CreateDatabase();
-        db.BeginTransaction();
-        IDatabaseSchemaCreator creator = databaseSchemaCreatorFactory.Create(db);
+        BaseTestDatabase = umbracoDatabaseFactory.CreateDatabase();
+        BaseTestDatabase.BeginTransaction();
+        IDatabaseSchemaCreator creator = databaseSchemaCreatorFactory.Create(BaseTestDatabase);
         creator.InitializeDatabaseSchema(false).GetAwaiter().GetResult();
-        db.CompleteTransaction();
+        BaseTestDatabase.CompleteTransaction();
     }
 
     private void CreateDatabaseWithoutSchema(IUmbracoDatabaseFactory umbracoDatabaseFactory, IDatabaseSchemaCreatorFactory databaseSchemaCreatorFactory)
     {
-        var db = umbracoDatabaseFactory.CreateDatabase();
-        db.BeginTransaction();
-        databaseSchemaCreatorFactory.Create(db);
-        db.CompleteTransaction();
+        BaseTestDatabase = umbracoDatabaseFactory.CreateDatabase();
+        BaseTestDatabase.BeginTransaction();
+        databaseSchemaCreatorFactory.Create(BaseTestDatabase);
+        BaseTestDatabase.CompleteTransaction();
     }
 
     private void ConfigureDatabaseFactory(IUmbracoDatabaseFactory databaseFactory, IOptionsMonitor<ConnectionStrings> connectionStrings)
