@@ -143,8 +143,7 @@ namespace Umbraco.Cms.Persistence.EFCore.Entities
                     .HasDefaultValueSql("('folder.png')");
 
                 entity.Property(e => e.Variations)
-                    .HasColumnName("variations")
-                    .HasDefaultValueSql("('1')");
+                    .HasColumnName("variations");
 
                 entity.HasOne(d => d.Node)
                     .WithOne(p => p.CmsContentType)
@@ -534,8 +533,7 @@ namespace Umbraco.Cms.Persistence.EFCore.Entities
                     .HasColumnName("validationRegExpMessage");
 
                 entity.Property(e => e.Variations)
-                    .HasColumnName("variations")
-                    .HasDefaultValueSql("('1')");
+                    .HasColumnName("variations");
 
                 entity.HasOne(d => d.ContentType)
                     .WithMany(p => p.CmsPropertyTypes)
