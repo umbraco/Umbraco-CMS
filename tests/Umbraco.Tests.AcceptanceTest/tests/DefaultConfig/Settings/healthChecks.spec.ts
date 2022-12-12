@@ -12,9 +12,9 @@ test.describe('Health Checks', () => {
 
         await page.locator('[data-element="tab-settingsHealthCheck"]').click();
 
-        await page.waitForSelector('.umb-panel-group__details-status-actions > .ng-isolate-scope > .umb-button > .btn > .umb-button__content');
-        await page.click('.umb-panel-group__details-status-actions > .ng-isolate-scope > .umb-button > .btn > .umb-button__content');
-
+        await page.waitForSelector('.umb-panel-group__details-status-actions > umb-button > div > button');
+        await page.click('.umb-panel-group__details-status-actions > umb-button > div > button');
+		
         await expect(await page.locator('text=Configuration 2 failed')).toBeVisible();
         await expect(await page.locator('text=Data Integrity 2 passed')).toBeVisible();
         await expect(await page.locator('text=Live Environment 1 failed')).toBeVisible();
