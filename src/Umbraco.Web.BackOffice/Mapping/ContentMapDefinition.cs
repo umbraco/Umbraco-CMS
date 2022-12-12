@@ -130,6 +130,7 @@ internal class ContentMapDefinition : IMapDefinition
     // Umbraco.Code.MapAll
     private void Map(ContentItemDisplay source, ContentItemDisplayWithSchedule target, MapperContext context)
     {
+        target.AdditionalData = source.AdditionalData;
         target.AllowedActions = source.AllowedActions;
         target.AllowedTemplates = source.AllowedTemplates;
         target.AllowPreview = source.AllowPreview;
@@ -198,6 +199,7 @@ internal class ContentMapDefinition : IMapDefinition
     // Umbraco.Code.MapAll
     private static void Map(ContentItemDisplayWithSchedule source, ContentItemDisplay target, MapperContext context)
     {
+        target.AdditionalData = source.AdditionalData;
         target.AllowedActions = source.AllowedActions;
         target.AllowedTemplates = source.AllowedTemplates;
         target.AllowPreview = source.AllowPreview;
@@ -236,7 +238,7 @@ internal class ContentMapDefinition : IMapDefinition
     private static void Map(IContent source, ContentPropertyCollectionDto target, MapperContext context) =>
         target.Properties = context.MapEnumerable<IProperty, ContentPropertyDto>(source.Properties).WhereNotNull();
 
-    // Umbraco.Code.MapAll -AllowPreview -Errors -PersistedContent
+    // Umbraco.Code.MapAll -AllowPreview -Errors -PersistedContent -AdditionalData
     private void Map<TVariant>(IContent source, ContentItemDisplay<TVariant> target, MapperContext context)
         where TVariant : ContentVariantDisplay
     {
