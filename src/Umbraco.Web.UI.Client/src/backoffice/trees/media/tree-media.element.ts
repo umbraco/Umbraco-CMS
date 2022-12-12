@@ -2,6 +2,7 @@ import { html } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { UmbTreeBase } from '../shared/tree-base.element';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
+import { UmbMediaStore } from 'src/core/stores/media/media.store';
 
 import '../shared/tree-navigator.element';
 

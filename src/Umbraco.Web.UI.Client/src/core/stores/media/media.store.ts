@@ -10,6 +10,59 @@ import { ApiError, ContentTreeItem, MediaResource, ProblemDetails } from '@umbra
  * @description - Data Store for Media
  */
 export class UmbMediaStore extends UmbDataStoreBase<MediaDetails | ContentTreeItem> {
+	getByKey(key: string): Observable<MediaDetails | null> {
+		// fetch from server and update store
+		fetch(`/umbraco/management/api/v1/media/details/${key}`)
+			.then((res) => res.json())
+			.then((data) => {
+				this.update(data);
+			});
+			
+		return this.items.pipe(map((media) => media.find((media) => media.key === key) || null));
+	}
+
+	// TODO: make sure UI somehow can follow the status of this action.
+	save(data: MediaDetails[]): Promise<void> {
+		// fetch from server and update store
+		// TODO: use Fetcher API.
+		let body: string;
+
+		try {
+			body = JSON.stringify(data);
+		} catch (error) {
+			console.error(error);
+			return Promise.reject();
+		}
+
+		// TODO: Use node type to hit the right API, or have a general Node API?
+		return fetch('/umbraco/management/api/v1/media/save', {
+			method: 'POST',
+			body: body,
+			headers: {
+				'Content-Type': 'application/json',
+			},
+		})
+			.then((res) => res.json())
+			.then((data: Array<MediaDetails>) => {
+				this.update(data);
+			});
+	}
+
+		// TODO: how do we handle trashed items?
+		async trash(keys: Array<string>) {
+			// fetch from server and update store
+			// TODO: Use node type to hit the right API, or have a general Node API?
+			const res = await fetch('/umbraco/management/api/v1/media/trash', {
+				method: 'POST',
+				body: JSON.stringify(keys),
+				headers: {
+					'Content-Type': 'application/json',
+				},
+			});
+			const data = await res.json();
+			this.update(data);
+		}
+
 	getTreeRoot(): Observable<Array<ContentTreeItem>> {
 		MediaResource.getTreeMediaRoot({}).then(
 			(res) => {
@@ -24,8 +77,9 @@ export class UmbMediaStore extends UmbDataStoreBase<MediaDetails | ContentTreeIt
 				}
 			}
 		);
-
-		return this.items.pipe(map((items) => items.filter((item) => item.parentKey === null)));
+		
+		// TODO: how do we handle trashed items?
+		return this.items.pipe(map((items) => items.filter((item) => item.parentKey === null && item.isTrashed === false)));
 	}
 
 	getTreeItemChildren(key: string): Observable<Array<ContentTreeItem>> {
@@ -44,7 +98,8 @@ export class UmbMediaStore extends UmbDataStoreBase<MediaDetails | ContentTreeIt
 				}
 			}
 		);
-
-		return this.items.pipe(map((items) => items.filter((item) => item.parentKey === key)));
+		
+		// TODO: how do we handle trashed items?
+		return this.items.pipe(map((items) => items.filter((item) => item.parentKey === key && item.isTrashed === false)));
 	}
 }

@@ -17,6 +17,8 @@ import '../editor-entity-layout/editor-entity-layout.element';
 // TODO: Make this dynamic, use load-extensions method to loop over extensions for this node.
 import './views/edit/editor-view-content-edit.element';
 import './views/info/editor-view-content-info.element';
+import { UmbDocumentStore } from 'src/core/stores/document/document.store';
+import { UmbMediaStore } from 'src/core/stores/media/media.store';
 
 @customElement('umb-editor-content')
 export class UmbEditorContentElement extends UmbContextProviderMixin(
@@ -60,19 +62,19 @@ export class UmbEditorContentElement extends UmbContextProviderMixin(
 	alias!: string;
 
 	@state()
-	_node?: NodeEntity;
+	_content?: NodeEntity;
 
-	private _nodeStore?: UmbNodeStore;
+	private _store?: UmbDocumentStore | UmbMediaStore;
 	private _nodeContext?: UmbNodeContext;
 	private _notificationService?: UmbNotificationService;
 
 	constructor() {
 		super();
 
-		this.consumeAllContexts(['umbNodeStore', 'umbNotificationService'], (instances) => {
-			this._nodeStore = instances['umbNodeStore'];
+		this.consumeAllContexts(['umbContentStore', 'umbNotificationService'], (instances) => {
+			this._store = instances['umbContentStore'];
 			this._notificationService = instances['umbNotificationService'];
-			this._useNode();
+			this._observeContent();
 		});
 
 		this.addEventListener('property-value-change', this._onPropertyValueChange);
@@ -82,7 +84,7 @@ export class UmbEditorContentElement extends UmbContextProviderMixin(
 		const target = e.composedPath()[0] as any;
 
 		// TODO: Set value.
-		const property = this._node?.properties.find((x) => x.alias === target.alias);
+		const property = this._content?.properties.find((x) => x.alias === target.alias);
 		if (property) {
 			this._setPropertyValue(property.alias, target.value);
 		} else {
@@ -91,28 +93,29 @@ export class UmbEditorContentElement extends UmbContextProviderMixin(
 	};
 
 	private _setPropertyValue(alias: string, value: unknown) {
-		this._node?.data.forEach((data) => {
+		this._content?.data.forEach((data) => {
 			if (data.alias === alias) {
 				data.value = value;
 			}
 		});
 	}
 
-	private _useNode() {
-		if (!this._nodeStore) return;
+	private _observeContent() {
+		if (!this._store) return;
 
-		this.observe<NodeEntity>(this._nodeStore.getByKey(this.entityKey), (node) => {
-			if (!node) return; // TODO: Handle nicely if there is no node.
+		this.observe<NodeEntity>(this._store.getByKey(this.entityKey), (content) => {
+			debugger
+			if (!content) return; // TODO: Handle nicely if there is no node.
 
 			if (!this._nodeContext) {
-				this._nodeContext = new UmbNodeContext(node);
+				this._nodeContext = new UmbNodeContext(content);
 				this.provideContext('umbNodeContext', this._nodeContext);
 			} else {
-				this._nodeContext.update(node);
+				this._nodeContext.update(content);
 			}
 
 			this.observe<NodeEntity>(this._nodeContext.data.pipe(distinctUntilChanged()), (data) => {
-				this._node = data;
+				this._content = data;
 			});
 		});
 	}
@@ -122,9 +125,9 @@ export class UmbEditorContentElement extends UmbContextProviderMixin(
 	}
 
 	private _onSave() {
-		// TODO: What if store is not present, what if node is not loaded....
-		if (this._node) {
-			this._nodeStore?.save([this._node]).then(() => {
+		// TODO: What if store is not present, what if content is not loaded....
+		if (this._content) {
+			this._store?.save([this._content]).then(() => {
 				const data: UmbNotificationDefaultData = { message: 'Document Saved' };
 				this._notificationService?.peek('positive', { data });
 			});
@@ -161,9 +164,9 @@ export class UmbEditorContentElement extends UmbContextProviderMixin(
 		return html`
 			<umb-editor-entity-layout alias=${this.alias}>
 				<div slot="name">
-					<uui-input .value=${this._node?.name} @input="${this._handleInput}">
+					<uui-input .value=${this._content?.name} @input="${this._handleInput}">
 						<!-- Implement Variant Selector -->
-						${this._node && this._node.variants.length > 0
+						${this._content && this._content.variants.length > 0
 							? html`
 									<div slot="append">
 										<uui-button id="trigger" @click=${this._toggleVariantSelector}>
@@ -176,7 +179,7 @@ export class UmbEditorContentElement extends UmbContextProviderMixin(
 					</uui-input>
 
 					<!-- Implement Variant Selector -->
-					${this._node && this._node.variants.length > 0
+					${this._content && this._content.variants.length > 0
 						? html`
 								<uui-popover id="popover" .open=${this._variantSelectorIsOpen} @close=${this._close}>
 									<div id="dropdown" slot="popover">
