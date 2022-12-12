@@ -15,6 +15,8 @@ import { handlers as examineManagementHandlers } from './domains/examine-managem
 import { handlers as modelsBuilderHandlers } from './domains/modelsbuilder.handlers';
 import { handlers as profilingHandlers } from './domains/performance-profiling.handlers';
 
+import { handlers as documentHandlers } from './domains/document.handlers';
+
 // treeHandlers
 import { handlers as treeDocumentHandlers } from './domains/tree-document.handlers';
 import { handlers as treeMediaHandlers } from './domains/tree-media.handlers';
@@ -30,6 +32,7 @@ const handlers = [
 	...installHandlers,
 	...upgradeHandlers,
 	...userHandlers,
+	...documentHandlers,
 	...dataTypeHandlers,
 	...documentTypeHandlers,
 	...treeHandlers,

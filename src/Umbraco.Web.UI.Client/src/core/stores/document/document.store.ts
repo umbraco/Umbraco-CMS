@@ -24,7 +24,7 @@ export class UmbDocumentStore extends UmbDataStoreBase<DocumentDetails | Documen
 	async trash(keys: Array<string>) {
 		// fetch from server and update store
 		// TODO: Use node type to hit the right API, or have a general Node API?
-		const res = await fetch('/umbraco/backoffice/node/trash', {
+		const res = await fetch('/umbraco/management/api/v1/document/trash', {
 			method: 'POST',
 			body: JSON.stringify(keys),
 			headers: {
@@ -33,7 +33,6 @@ export class UmbDocumentStore extends UmbDataStoreBase<DocumentDetails | Documen
 		});
 		const data = await res.json();
 		this.update(data);
-		this._entityStore.update(data);
 	}
 
 	// TODO: make sure UI somehow can follow the status of this action.
@@ -50,7 +49,7 @@ export class UmbDocumentStore extends UmbDataStoreBase<DocumentDetails | Documen
 		}
 
 		// TODO: Use node type to hit the right API, or have a general Node API?
-		return fetch('/umbraco/backoffice/node/save', {
+		return fetch('/umbraco/management/api/v1/document/save', {
 			method: 'POST',
 			body: body,
 			headers: {
