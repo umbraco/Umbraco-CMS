@@ -3,7 +3,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 
 import type { UmbModalService } from '../../../core/services/modal';
-import type { Entity } from '../../../core/mocks/data/entities';
+import type { Entity } from '@umbraco-cms/models';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { UmbDocumentStore } from 'src/core/stores/document/document.store';

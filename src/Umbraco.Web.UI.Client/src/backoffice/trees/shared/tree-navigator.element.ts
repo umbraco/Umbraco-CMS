@@ -3,11 +3,10 @@ import { repeat } from 'lit/directives/repeat.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
-import { Entity } from '../../../core/mocks/data/entities';
 import { UmbTreeContext } from '../tree.context';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-import type { ManifestTree } from '@umbraco-cms/models';
+import type { Entity, ManifestTree } from '@umbraco-cms/models';
 import { UmbDataStore } from 'src/core/stores/store';
 
 import './tree-item.element';
