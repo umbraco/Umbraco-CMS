@@ -104,7 +104,6 @@ export class UmbEditorContentElement extends UmbContextProviderMixin(
 		if (!this._store) return;
 
 		this.observe<NodeEntity>(this._store.getByKey(this.entityKey), (content) => {
-			debugger
 			if (!content) return; // TODO: Handle nicely if there is no node.
 
 			if (!this._nodeContext) {
