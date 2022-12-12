@@ -7,8 +7,8 @@ import type { NodeEntity } from '../../../../../../core/mocks/data/node.data';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
-@customElement('umb-editor-view-node-info')
-export class UmbEditorViewNodeInfoElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+@customElement('umb-editor-view-content-info')
+export class UmbEditorViewContentInfoElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles = [UUITextStyles, css``];
 
 	private _nodeContext?: UmbNodeContext;
@@ -38,10 +38,10 @@ export class UmbEditorViewNodeInfoElement extends UmbContextConsumerMixin(UmbObs
 	}
 }
 
-export default UmbEditorViewNodeInfoElement;
+export default UmbEditorViewContentInfoElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-editor-view-node-info': UmbEditorViewNodeInfoElement;
+		'umb-editor-view-content-info': UmbEditorViewContentInfoElement;
 	}
 }

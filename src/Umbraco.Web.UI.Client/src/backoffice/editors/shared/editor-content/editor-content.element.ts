@@ -16,7 +16,7 @@ import '../editor-entity-layout/editor-entity-layout.element';
 // Lazy load
 // TODO: Make this dynamic, use load-extensions method to loop over extensions for this node.
 import './views/edit/editor-view-content-edit.element';
-import './views/info/editor-view-node-info.element';
+import './views/info/editor-view-content-info.element';
 
 @customElement('umb-editor-content')
 export class UmbEditorContentElement extends UmbContextProviderMixin(

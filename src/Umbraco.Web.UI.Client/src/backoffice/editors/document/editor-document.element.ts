@@ -53,7 +53,7 @@ export class UmbEditorDocumentElement extends UmbContextConsumerMixin(UmbContext
 				type: 'editorView',
 				alias: 'Umb.EditorView.Document.Info',
 				name: 'Document Editor Info View',
-				loader: () => import('../shared/editor-content/views/info/editor-view-node-info.element'),
+				loader: () => import('../shared/editor-content/views/info/editor-view-content-info.element'),
 				weight: 100,
 				meta: {
 					editors: ['Umb.Editor.Document'],
