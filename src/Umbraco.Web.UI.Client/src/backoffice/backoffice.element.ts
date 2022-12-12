@@ -26,7 +26,6 @@ import { UmbDocumentStore } from '../core/stores/document/document.store';
 import { UmbMediaStore } from '../core/stores/media/media.store';
 import { UmbMemberGroupStore } from '../core/stores/member-group/member-group.store';
 import { UmbSectionStore } from '../core/stores/section.store';
-import { UmbEntityStore } from '../core/stores/entity.store';
 import { UmbUserStore } from '../core/stores/user/user.store';
 import { UmbIconStore } from '../core/stores/icon/icon.store';
 import { UmbUserGroupStore } from '../core/stores/user/user-group.store';
@@ -58,7 +57,6 @@ export class UmbBackofficeElement extends UmbContextConsumerMixin(UmbContextProv
 	];
 
 	private _umbIconRegistry = new UmbIconStore();
-	private _umbEntityStore = new UmbEntityStore();
 
 	constructor() {
 		super();
@@ -72,7 +70,6 @@ export class UmbBackofficeElement extends UmbContextConsumerMixin(UmbContextProv
 
 		this._umbIconRegistry.attach(this);
 
-		this.provideContext('umbEntityStore', this._umbEntityStore);
 		this.provideContext('umbDocumentStore', new UmbDocumentStore());
 		this.provideContext('umbMediaStore', new UmbMediaStore());
 		this.provideContext('umbDataTypeStore', new UmbDataTypeStore());
