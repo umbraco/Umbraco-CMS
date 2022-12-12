@@ -27,7 +27,7 @@ public class AllLanguageController : LanguageControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<LanguageViewModel>), StatusCodes.Status200OK)]
-    public async Task<PagedViewModel<LanguageViewModel>?> GetAll(int skip, int take)
+    public async Task<ActionResult<PagedViewModel<LanguageViewModel>>> GetAll(int skip, int take)
     {
         PagedModel<ILanguage> allLanguages = _localizationService.GetAllLanguagesPaged(skip, take);
 
