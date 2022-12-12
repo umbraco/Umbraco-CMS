@@ -166,7 +166,7 @@ public class ManagementApiComposer : IComposer
             {
                 // any generic JSON options go here
             })
-            .AddJsonOptions("BackOffice", options =>
+            .AddJsonOptions(Constants.JsonOptionsNames.BackOffice, options =>
             {
                 // all back-office specific JSON options go here
                 options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
