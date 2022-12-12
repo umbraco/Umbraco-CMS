@@ -1,8 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
-using System.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration;
@@ -12,6 +10,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Migrations;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
+using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -93,12 +92,12 @@ public class AdvancedMigrationTests : UmbracoIntegrationTest
     [Test]
     public void CreateKeysAndIndexesOfTDto()
     {
-        // if (BaseTestDatabase.IsSqlite())
-        // {
-        //     // TODO: Think about this for future migrations.
-        //     Assert.Ignore("Can't add / drop keys in SQLite.");
-        //     return;
-        // }
+        if (BaseTestDatabase.DatabaseType.IsSqlite())
+        {
+            // TODO: Think about this for future migrations.
+            Assert.Ignore("Can't add / drop keys in SQLite.");
+            return;
+        }
 
         var builder = Mock.Of<IMigrationBuilder>();
         Mock.Get(builder)
@@ -135,12 +134,12 @@ public class AdvancedMigrationTests : UmbracoIntegrationTest
     [Test]
     public void CreateKeysAndIndexes()
     {
-        // if (BaseTestDatabase.IsSqlite())
-        // {
-        //     // TODO: Think about this for future migrations.
-        //     Assert.Ignore("Can't add / drop keys in SQLite.");
-        //     return;
-        // }
+        if (BaseTestDatabase.DatabaseType.IsSqlite())
+        {
+            // TODO: Think about this for future migrations.
+            Assert.Ignore("Can't add / drop keys in SQLite.");
+            return;
+        }
 
         var builder = Mock.Of<IMigrationBuilder>();
         Mock.Get(builder)

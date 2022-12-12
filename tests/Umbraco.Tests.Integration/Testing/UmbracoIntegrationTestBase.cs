@@ -40,6 +40,7 @@ public abstract class UmbracoIntegrationTestBase
 
     private bool _firstTestInFixture = true;
 
+    protected IUmbracoDatabase BaseTestDatabase { get; set; }
     protected Dictionary<string, string> InMemoryConfiguration { get; } = new();
 
     protected IConfiguration Configuration { get; set; }
