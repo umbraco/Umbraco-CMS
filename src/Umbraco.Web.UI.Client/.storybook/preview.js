@@ -30,6 +30,7 @@ import { umbExtensionsRegistry } from '../src/core/extensions-registry';
 import '../src/core/context-api/provide/context-provider.element';
 import '../src/core/css/custom-properties.css';
 import '../src/backoffice/components/backoffice-modal-container.element';
+import '../src/backoffice/components/shared/code-block.element';
 
 class UmbStoryBookElement extends LitElement {
 	_umbIconStore = new UmbIconStore();

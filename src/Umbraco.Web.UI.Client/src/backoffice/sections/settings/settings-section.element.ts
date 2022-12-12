@@ -67,6 +67,19 @@ export class UmbSectionSettingsElement extends LitElement {
 			},
 			{
 				type: 'dashboard',
+				alias: 'Umb.Dashboard.Profiling',
+				name: 'Profiling',
+				elementName: 'umb-dashboard-performance-profiling',
+				loader: () => import('../../dashboards/performance-profiling/dashboard-performance-profiling.element'),
+				weight: 101,
+				meta: {
+					label: 'Profiling',
+					sections: ['Umb.Section.Settings'],
+					pathname: 'profiling',
+				},
+			},
+			{
+				type: 'dashboard',
 				alias: 'Umb.Dashboard.Telemetry',
 				name: 'Telemetry',
 				elementName: 'umb-dashboard-telemetry',

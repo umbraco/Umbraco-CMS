@@ -1,5 +1,3 @@
-import 'element-internals-polyfill';
-
 import { startMockServiceWorker } from './core/mocks/browser';
 
 if (import.meta.env.VITE_UMBRACO_USE_MSW === 'on') {
