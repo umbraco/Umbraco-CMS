@@ -13,7 +13,15 @@ import '../../../../components/ref-property-editor-ui/ref-property-editor-ui.ele
 
 @customElement('umb-editor-view-data-type-edit')
 export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
-	static styles = [UUITextStyles, css``];
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display:block;
+				margin: var(--uui-size-layout-1);
+			}
+		`
+	];
 
 	@state()
 	_dataType?: DataTypeDetails;
