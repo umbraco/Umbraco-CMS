@@ -1312,6 +1312,7 @@ public class EFCoreDatabaseDataCreator : IDatabaseDataCreator
         {
             db.Add(member);
         }
+
         await db.SaveChangesAsync();
 
         await db.DisableIdentityInsert<CmsContentType>();
