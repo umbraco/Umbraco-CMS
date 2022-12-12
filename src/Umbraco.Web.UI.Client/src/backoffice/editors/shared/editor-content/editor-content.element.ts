@@ -3,13 +3,15 @@ import { css, html, LitElement, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import { distinctUntilChanged } from 'rxjs';
-import { UmbNodeStore } from '../../../../core/stores/node.store';
 import { NodeEntity } from '../../../../core/mocks/data/node.data';
 import type { UmbNotificationService } from '../../../../core/services/notification';
 import { UmbNotificationDefaultData } from '../../../../core/services/notification/layouts/default';
 import { UmbNodeContext } from './node.context';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
+import type { UmbDocumentStore } from 'src/core/stores/document/document.store';
+import { UmbMediaStore } from 'src/core/stores/media/media.store';
+import type { DocumentDetails, MediaDetails } from '@umbraco-cms/models';
 
 import '../editor-entity-layout/editor-entity-layout.element';
 
@@ -17,8 +19,6 @@ import '../editor-entity-layout/editor-entity-layout.element';
 // TODO: Make this dynamic, use load-extensions method to loop over extensions for this node.
 import './views/edit/editor-view-content-edit.element';
 import './views/info/editor-view-content-info.element';
-import { UmbDocumentStore } from 'src/core/stores/document/document.store';
-import { UmbMediaStore } from 'src/core/stores/media/media.store';
 
 @customElement('umb-editor-content')
 export class UmbEditorContentElement extends UmbContextProviderMixin(
@@ -62,7 +62,7 @@ export class UmbEditorContentElement extends UmbContextProviderMixin(
 	alias!: string;
 
 	@state()
-	_content?: NodeEntity;
+	_content?: DocumentDetails | MediaDetails;
 
 	private _store?: UmbDocumentStore | UmbMediaStore;
 	private _nodeContext?: UmbNodeContext;
