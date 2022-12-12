@@ -15,6 +15,11 @@ public class HealthCheckResultViewModel
     public StatusResultType ResultType { get; set; }
 
     /// <summary>
+    ///     Gets or sets the potential actions to take (if any).
+    /// </summary>
+    public IEnumerable<HealthCheckActionViewModel>? Actions { get; set; }
+
+    /// <summary>
     ///     This is optional but would allow a developer to get or set a link that is shown as a "Read more" button.
     /// </summary>
     public string? ReadMoreLink { get; set; }

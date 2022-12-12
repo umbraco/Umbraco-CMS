@@ -9,10 +9,24 @@ public class HealthCheckGroupViewModelsMapDefinition : IMapDefinition
 {
     public void DefineMaps(IUmbracoMapper mapper)
     {
+        mapper.Define<HealthCheckAction, HealthCheckActionViewModel>((source, context) => new HealthCheckActionViewModel(), Map);
         mapper.Define<HealthCheckStatus, HealthCheckResultViewModel>((source, context) => new HealthCheckResultViewModel() { Message = string.Empty }, Map);
         mapper.Define<Core.HealthChecks.HealthCheck, HealthCheckViewModel>((source, context) => new HealthCheckViewModel() { Name = string.Empty }, Map);
         mapper.Define<IGrouping<string?, Core.HealthChecks.HealthCheck>, HealthCheckGroupViewModel>((source, context) => new HealthCheckGroupViewModel() { Checks = new List<HealthCheckViewModel>() }, Map);
         mapper.Define<IEnumerable<IGrouping<string?, Core.HealthChecks.HealthCheck>>, PagedViewModel<HealthCheckGroupViewModel>>((source, context) => new PagedViewModel<HealthCheckGroupViewModel>(), Map);
+    }
+
+    // Umbraco.Code.MapAll
+    private static void Map(HealthCheckAction source, HealthCheckActionViewModel target, MapperContext context)
+    {
+        target.Key = source.HealthCheckId;
+        target.Alias = source.Alias;
+        target.Name = source.Name;
+        target.Description = source.Description;
+        target.ValueRequired = source.ValueRequired;
+        target.ProvidedValue = source.ProvidedValue;
+        target.ProvidedValueValidation = source.ProvidedValueValidation;
+        target.ProvidedValueValidationRegex = source.ProvidedValueValidationRegex;
     }
 
     // Umbraco.Code.MapAll
@@ -21,6 +35,7 @@ public class HealthCheckGroupViewModelsMapDefinition : IMapDefinition
         target.Message = source.Message;
         target.ResultType = source.ResultType;
         target.ReadMoreLink = source.ReadMoreLink;
+        target.Actions = context.MapEnumerable<HealthCheckAction, HealthCheckActionViewModel>(source.Actions);
     }
 
     // Umbraco.Code.MapAll
