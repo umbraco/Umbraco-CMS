@@ -8,9 +8,10 @@ import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-import type { ManifestEditorAction, ManifestEditorView } from '@umbraco-cms/models';
+import type { ManifestEditorView } from '@umbraco-cms/models';
 
 import '../../../components/body-layout/body-layout.element';
+import '../../../components/extension-slot/extension-slot.element';
 import '../editor-action-extension/editor-action-extension.element';
 
 /**
@@ -95,9 +96,6 @@ export class UmbEditorEntityLayout extends UmbContextConsumerMixin(UmbObserverMi
 	private _editorViews: Array<ManifestEditorView> = [];
 
 	@state()
-	private _editorActions: Array<ManifestEditorAction> = [];
-
-	@state()
 	private _currentView = '';
 
 	@state()
@@ -109,7 +107,6 @@ export class UmbEditorEntityLayout extends UmbContextConsumerMixin(UmbObserverMi
 		super.connectedCallback();
 
 		this._observeEditorViews();
-		this._observeEditorActions();
 
 		/* TODO: find a way to construct absolute urls */
 		this._routerFolder = window.location.pathname.split('/view')[0];
@@ -123,17 +120,6 @@ export class UmbEditorEntityLayout extends UmbContextConsumerMixin(UmbObserverMi
 			(editorViews) => {
 				this._editorViews = editorViews;
 				this._createRoutes();
-			}
-		);
-	}
-
-	private _observeEditorActions() {
-		this.observe(
-			umbExtensionsRegistry
-				?.extensionsOfType('editorAction')
-				.pipe(map((extensions) => extensions.filter((extension) => extension.meta.editors.includes(this.alias)))),
-			(editorActions) => {
-				this._editorActions = editorActions;
 			}
 		);
 	}
@@ -212,9 +198,7 @@ export class UmbEditorEntityLayout extends UmbContextConsumerMixin(UmbObserverMi
 				<div id="footer" slot="footer">
 					<slot name="footer"></slot>
 					<div id="actions">
-						${this._editorActions.map(
-							(action) => html`<umb-editor-action-extension .editorAction=${action}></umb-editor-action-extension>`
-						)}
+						<umb-extension-slot type="editorAction" .filter=${(extension: any) => extension.meta.editors.includes(this.alias)}></umb-extension-slot>
 						<slot name="actions"></slot>
 					</div>
 				</div>
