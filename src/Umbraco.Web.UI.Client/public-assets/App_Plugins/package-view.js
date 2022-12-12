@@ -1,6 +1,6 @@
 const template = document.createElement('template');
 template.innerHTML = `
-	<umb-editor-layout role="aside">
+	<umb-body-layout role="aside">
 		<h1 slot="header">My package view</h1>
 
 		<uui-box>
@@ -10,7 +10,7 @@ template.innerHTML = `
 		<uui-action-bar slot="footer">
 			<uui-button look="primary" type="button">Close</uui-button>
 		</uui-action-bar>
-	</umb-editor-layout>
+	</umb-body-layout>
 `;
 
 export default class MyPackageViewCustom extends HTMLElement {

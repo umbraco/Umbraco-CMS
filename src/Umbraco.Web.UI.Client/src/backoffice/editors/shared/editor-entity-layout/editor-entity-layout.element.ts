@@ -10,7 +10,7 @@ import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { ManifestEditorAction, ManifestEditorView } from '@umbraco-cms/models';
 
-import '../editor-layout/editor-layout.element';
+import '../../../components/body-layout/body-layout.element';
 import '../editor-action-extension/editor-action-extension.element';
 
 /**
@@ -191,7 +191,7 @@ export class UmbEditorEntityLayout extends UmbContextConsumerMixin(UmbObserverMi
 
 	render() {
 		return html`
-			<umb-editor-layout>
+			<umb-body-layout>
 				<div id="header" slot="header">
 					<slot id="icon" name="icon"></slot>
 					<div id="name">
@@ -213,7 +213,7 @@ export class UmbEditorEntityLayout extends UmbContextConsumerMixin(UmbObserverMi
 						<slot name="actions"></slot>
 					</div>
 				</div>
-			</umb-editor-layout>
+			</umb-body-layout>
 		`;
 	}
 }
