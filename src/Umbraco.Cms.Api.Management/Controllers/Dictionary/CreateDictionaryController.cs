@@ -40,7 +40,7 @@ public class CreateDictionaryController : DictionaryControllerBase
     /// <returns>
     ///     The <see cref="HttpResponseMessage" />.
     /// </returns>
-    [HttpPost("create")]
+    [HttpPost]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(CreatedResult), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]

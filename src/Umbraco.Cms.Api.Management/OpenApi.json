@@ -220,6 +220,43 @@
             }
           }
         }
+      },
+      "post": {
+        "tags": [
+          "Dictionary"
+        ],
+        "operationId": "PostDictionary",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DictionaryItem"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreatedResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/umbraco/management/api/v1/dictionary/{id}": {
@@ -341,45 +378,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/NotFoundResult"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/umbraco/management/api/v1/dictionary/create": {
-      "post": {
-        "tags": [
-          "Dictionary"
-        ],
-        "operationId": "PostDictionaryCreate",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/DictionaryItem"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CreatedResult"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -1517,6 +1515,36 @@
       }
     },
     "/umbraco/management/api/v1/language": {
+      "post": {
+        "tags": [
+          "Language"
+        ],
+        "operationId": "PostLanguage",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Language"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Created"
+          }
+        }
+      },
       "get": {
         "tags": [
           "Language"
@@ -1635,46 +1663,23 @@
             "description": "Success"
           }
         }
-      }
-    },
-    "/umbraco/management/api/v1/language/create": {
-      "post": {
-        "tags": [
-          "Language"
-        ],
-        "operationId": "PostLanguageCreate",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Language"
-              }
-            }
-          }
-        },
-        "responses": {
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "201": {
-            "description": "Created"
-          }
-        }
-      }
-    },
-    "/umbraco/management/api/v1/language/update": {
+      },
       "put": {
         "tags": [
           "Language"
         ],
-        "operationId": "PutLanguageUpdate",
+        "operationId": "PutLanguageById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
