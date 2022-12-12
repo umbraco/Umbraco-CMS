@@ -15,24 +15,10 @@ export class UmbDocumentStore extends UmbDataStoreBase<DocumentDetails | Documen
 		fetch(`/umbraco/management/api/v1/document/details/${key}`)
 			.then((res) => res.json())
 			.then((data) => {
-				this.update(data);
+				this.updateItems(data);
 			});
-
+			
 		return this.items.pipe(map((documents) => documents.find((document) => document.key === key) || null));
-	}
-
-	async trash(keys: Array<string>) {
-		// fetch from server and update store
-		// TODO: Use node type to hit the right API, or have a general Node API?
-		const res = await fetch('/umbraco/management/api/v1/document/trash', {
-			method: 'POST',
-			body: JSON.stringify(keys),
-			headers: {
-				'Content-Type': 'application/json',
-			},
-		});
-		const data = await res.json();
-		this.update(data);
 	}
 
 	// TODO: make sure UI somehow can follow the status of this action.
@@ -58,14 +44,29 @@ export class UmbDocumentStore extends UmbDataStoreBase<DocumentDetails | Documen
 		})
 			.then((res) => res.json())
 			.then((data: Array<DocumentDetails>) => {
-				this.update(data);
+				this.updateItems(data);
 			});
+	}
+
+	// TODO: how do we handle trashed items?
+	async trash(keys: Array<string>) {
+		// fetch from server and update store
+		// TODO: Use node type to hit the right API, or have a general Node API?
+		const res = await fetch('/umbraco/management/api/v1/document/trash', {
+			method: 'POST',
+			body: JSON.stringify(keys),
+			headers: {
+				'Content-Type': 'application/json',
+			},
+		});
+		const data = await res.json();
+		this.updateItems(data);
 	}
 
 	getTreeRoot(): Observable<Array<DocumentTreeItem>> {
 		DocumentResource.getTreeDocumentRoot({}).then(
 			(res) => {
-				this.update(res.items);
+				this.updateItems(res.items);
 			},
 			(e) => {
 				if (e instanceof ApiError) {
@@ -76,8 +77,9 @@ export class UmbDocumentStore extends UmbDataStoreBase<DocumentDetails | Documen
 				}
 			}
 		);
-
-		return this.items.pipe(map((items) => items.filter((item) => item.parentKey === null)));
+		
+		// TODO: how do we handle trashed items?
+		return this.items.pipe(map((items) => items.filter((item) => item.parentKey === null && item.isTrashed === false)));
 	}
 
 	getTreeItemChildren(key: string): Observable<Array<FolderTreeItem>> {
@@ -85,7 +87,7 @@ export class UmbDocumentStore extends UmbDataStoreBase<DocumentDetails | Documen
 			parentKey: key,
 		}).then(
 			(res) => {
-				this.update(res.items);
+				this.updateItems(res.items);
 			},
 			(e) => {
 				if (e instanceof ApiError) {
@@ -96,8 +98,9 @@ export class UmbDocumentStore extends UmbDataStoreBase<DocumentDetails | Documen
 				}
 			}
 		);
-
-		return this.items.pipe(map((items) => items.filter((item) => item.parentKey === key)));
+		
+		// TODO: how do we handle trashed items?
+		return this.items.pipe(map((items) => items.filter((item) => item.parentKey === key && item.isTrashed === false)));
 	}
 
 	getTreeItems(keys: Array<string>): Observable<Array<FolderTreeItem>> {
@@ -106,7 +109,7 @@ export class UmbDocumentStore extends UmbDataStoreBase<DocumentDetails | Documen
 				key: keys,
 			}).then(
 				(items) => {
-					this.update(items);
+					this.updateItems(items);
 				},
 				(e) => {
 					if (e instanceof ApiError) {

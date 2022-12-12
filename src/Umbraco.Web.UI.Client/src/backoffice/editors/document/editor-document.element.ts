@@ -4,9 +4,9 @@ import { customElement, property } from 'lit/decorators.js';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import type { ManifestEditorView, ManifestWithLoader } from '@umbraco-cms/models';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
+import type { UmbDocumentStore } from 'src/core/stores/document/document.store';
 
 import '../shared/editor-content/editor-content.element';
-import { UmbDocumentStore } from 'src/core/stores/document/document.store';
 
 @customElement('umb-editor-document')
 export class UmbEditorDocumentElement extends UmbContextConsumerMixin(UmbContextProviderMixin(LitElement)) {
@@ -30,7 +30,7 @@ export class UmbEditorDocumentElement extends UmbContextConsumerMixin(UmbContext
 		this._registerEditorViews();
 
 		this.consumeContext('umbDocumentStore', (documentStore: UmbDocumentStore) => {
-			this.provideContext('umbNodeStore', documentStore);
+			this.provideContext('umbContentStore', documentStore);
 		});
 	}
 

@@ -3,13 +3,14 @@ import { css, html, LitElement, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import { distinctUntilChanged } from 'rxjs';
-import { UmbNodeStore } from '../../../../core/stores/node.store';
-import { NodeEntity } from '../../../../core/mocks/data/node.data';
 import type { UmbNotificationService } from '../../../../core/services/notification';
 import { UmbNotificationDefaultData } from '../../../../core/services/notification/layouts/default';
 import { UmbNodeContext } from './node.context';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
+import type { UmbDocumentStore } from 'src/core/stores/document/document.store';
+import { UmbMediaStore } from 'src/core/stores/media/media.store';
+import type { DocumentDetails, MediaDetails } from '@umbraco-cms/models';
 
 import '../editor-entity-layout/editor-entity-layout.element';
 
@@ -72,19 +73,19 @@ export class UmbEditorContentElement extends UmbContextProviderMixin(
 	alias!: string;
 
 	@state()
-	_node?: NodeEntity;
+	_content?: DocumentDetails | MediaDetails;
 
-	private _nodeStore?: UmbNodeStore;
+	private _store?: UmbDocumentStore | UmbMediaStore;
 	private _nodeContext?: UmbNodeContext;
 	private _notificationService?: UmbNotificationService;
 
 	constructor() {
 		super();
 
-		this.consumeAllContexts(['umbNodeStore', 'umbNotificationService'], (instances) => {
-			this._nodeStore = instances['umbNodeStore'];
+		this.consumeAllContexts(['umbContentStore', 'umbNotificationService'], (instances) => {
+			this._store = instances['umbContentStore'];
 			this._notificationService = instances['umbNotificationService'];
-			this._useNode();
+			this._observeContent();
 		});
 
 		this.addEventListener('property-value-change', this._onPropertyValueChange);
@@ -94,7 +95,7 @@ export class UmbEditorContentElement extends UmbContextProviderMixin(
 		const target = e.composedPath()[0] as any;
 
 		// TODO: Set value.
-		const property = this._node?.properties.find((x) => x.alias === target.alias);
+		const property = this._content?.properties.find((x) => x.alias === target.alias);
 		if (property) {
 			this._setPropertyValue(property.alias, target.value);
 		} else {
@@ -104,28 +105,28 @@ export class UmbEditorContentElement extends UmbContextProviderMixin(
 
 	// TODO: How do we ensure this is a change of this document and not nested documents? Should the event be stopped at this spot at avoid such.
 	private _setPropertyValue(alias: string, value: unknown) {
-		this._node?.data.forEach((data) => {
+		this._content?.data.forEach((data) => {
 			if (data.alias === alias) {
 				data.value = value;
 			}
 		});
 	}
 
-	private _useNode() {
-		if (!this._nodeStore) return;
+	private _observeContent() {
+		if (!this._store) return;
 
-		this.observe<NodeEntity>(this._nodeStore.getByKey(this.entityKey), (node) => {
-			if (!node) return; // TODO: Handle nicely if there is no node.
+		this.observe<DocumentDetails | MediaDetails>(this._store.getByKey(this.entityKey), (content) => {
+			if (!content) return; // TODO: Handle nicely if there is no node.
 
 			if (!this._nodeContext) {
-				this._nodeContext = new UmbNodeContext(node);
+				this._nodeContext = new UmbNodeContext(content);
 				this.provideContext('umbNodeContext', this._nodeContext);
 			} else {
-				this._nodeContext.update(node);
+				this._nodeContext.update(content);
 			}
 
-			this.observe<NodeEntity>(this._nodeContext.data.pipe(distinctUntilChanged()), (data) => {
-				this._node = data;
+			this.observe<DocumentDetails | MediaDetails>(this._nodeContext.data.pipe(distinctUntilChanged()), (data) => {
+				this._content = data;
 			});
 		});
 	}
@@ -135,9 +136,9 @@ export class UmbEditorContentElement extends UmbContextProviderMixin(
 	}
 
 	private _onSave() {
-		// TODO: What if store is not present, what if node is not loaded....
-		if (this._node) {
-			this._nodeStore?.save([this._node]).then(() => {
+		// TODO: What if store is not present, what if content is not loaded....
+		if (this._content) {
+			this._store?.save([this._content]).then(() => {
 				const data: UmbNotificationDefaultData = { message: 'Document Saved' };
 				this._notificationService?.peek('positive', { data });
 			});
@@ -174,9 +175,9 @@ export class UmbEditorContentElement extends UmbContextProviderMixin(
 		return html`
 			<umb-editor-entity-layout alias=${this.alias}>
 				<div id="header" slot="header">
-					<uui-input id="name-input" .value=${this._node?.name} @input="${this._handleInput}">
+					<uui-input id="name-input" .value=${this._content?.name} @input="${this._handleInput}">
 						<!-- Implement Variant Selector -->
-						${this._node && this._node.variants.length > 0
+						${this._content && this._content.variants.length > 0
 							? html`
 									<div slot="append">
 										<uui-button id="variant-selector-toggle" @click=${this._toggleVariantSelector}>
@@ -190,7 +191,7 @@ export class UmbEditorContentElement extends UmbContextProviderMixin(
 
 					<!-- Implement Variant Selector -->
 					<!-- TODO: Refactor Variant Selector into its own component -->
-					${this._node && this._node.variants.length > 0
+					${this._content && this._content.variants.length > 0
 						? html`
 								<uui-popover id="variant-selector-popover" .open=${this._variantSelectorIsOpen} @close=${this._close}>
 									<div id="variant-selector-dropdown" slot="popover">

@@ -1,6 +1,7 @@
 import { UmbData } from './data';
 import { ContentTreeItem, PagedContentTreeItem } from '@umbraco-cms/backend-api';
 import type { MediaDetails } from '@umbraco-cms/models';
+import { UmbEntityData } from './entity.data';
 
 export const data: Array<MediaDetails> = [
 	{
@@ -12,6 +13,7 @@ export const data: Array<MediaDetails> = [
 		isContainer: false,
 		parentKey: null,
 		noAccess: false,
+		isTrashed: false,
 		properties: [
 			{
 				alias: 'myMediaHeadline',
@@ -37,6 +39,7 @@ export const data: Array<MediaDetails> = [
 		isContainer: false,
 		parentKey: null,
 		noAccess: false,
+		isTrashed: false,
 		properties: [
 			{
 				alias: 'myMediaDescription',
@@ -56,7 +59,7 @@ export const data: Array<MediaDetails> = [
 ];
 
 // Temp mocked database
-class UmbMediaData extends UmbData<MediaDetails> {
+class UmbMediaData extends UmbEntityData<MediaDetails> {
 	constructor() {
 		super(data);
 	}

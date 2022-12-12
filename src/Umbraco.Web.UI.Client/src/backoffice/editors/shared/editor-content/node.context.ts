@@ -1,9 +1,9 @@
 import { BehaviorSubject, Observable } from 'rxjs';
-import { NodeEntity } from '../../../../core/mocks/data/node.data';
 
 export class UmbNodeContext {
 	// TODO: figure out how fine grained we want to make our observables.
-	private _data = new BehaviorSubject<NodeEntity>({
+	// TODO: add interface
+	private _data = new BehaviorSubject<any>({
 		key: '',
 		name: '',
 		icon: '',
@@ -31,15 +31,15 @@ export class UmbNodeContext {
 			},
 		],
 	});
-	public readonly data: Observable<NodeEntity> = this._data.asObservable();
+	public readonly data: Observable<any> = this._data.asObservable();
 
-	constructor(node: NodeEntity) {
+	constructor(node: any) {
 		if (!node) return;
 		this._data.next(node);
 	}
 
 	// TODO: figure out how we want to update data
-	public update(data: Partial<NodeEntity>) {
+	public update(data: Partial<any>) {
 		this._data.next({ ...this._data.getValue(), ...data });
 	}
 

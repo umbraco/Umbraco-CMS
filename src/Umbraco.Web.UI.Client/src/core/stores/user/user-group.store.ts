@@ -15,7 +15,7 @@ export class UmbUserGroupStore extends UmbDataStoreBase<UserGroupDetails> {
 		fetch(`/umbraco/backoffice/user-groups/list/items`)
 			.then((res) => res.json())
 			.then((data) => {
-				this.update(data.items);
+				this.updateItems(data.items);
 			});
 
 		return this.items;

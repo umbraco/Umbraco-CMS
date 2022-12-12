@@ -7,7 +7,7 @@ export interface UmbDataStoreIdentifiers {
 
 export interface UmbDataStore<T> {
 	readonly items: Observable<Array<T>>;
-	update(items: Array<T>): void;
+	updateItems(items: Array<T>): void;
 	getTreeRoot?(): Observable<Array<T>>;
 	getTreeItemChildren?(key: string): Observable<Array<T>>;
 }
@@ -23,7 +23,7 @@ export class UmbDataStoreBase<T extends UmbDataStoreIdentifiers> implements UmbD
 	protected _items: BehaviorSubject<Array<T>> = new BehaviorSubject(<Array<T>>[]);
 	public readonly items: Observable<Array<T>> = this._items.asObservable();
 
-	public delete(deletedKeys: Array<string>): void {
+	public deleteItems(deletedKeys: Array<string>): void {
 		const remainingItems = this._items
 			.getValue()
 			.filter((item) => item.key && deletedKeys.includes(item.key) === false);
@@ -36,7 +36,7 @@ export class UmbDataStoreBase<T extends UmbDataStoreIdentifiers> implements UmbD
 	 * @param {keyof T} [compareKey='key']
 	 * @memberof UmbDataStoreBase
 	 */
-	public update(updatedItems: Array<T>, compareKey: keyof T = 'key'): void {
+	public updateItems(updatedItems: Array<T>, compareKey: keyof T = 'key'): void {
 		const storedItems = this._items.getValue();
 		const updated: T[] = [...storedItems];
 

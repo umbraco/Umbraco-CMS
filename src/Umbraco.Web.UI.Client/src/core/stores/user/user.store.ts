@@ -19,7 +19,7 @@ export class UmbUserStore extends UmbDataStoreBase<UserDetails> {
 			.then((res) => res.json())
 			.then((data) => {
 				this._totalUsers.next(data.total);
-				this.update(data.items);
+				this.updateItems(data.items);
 			});
 
 		return this.items;
@@ -37,7 +37,7 @@ export class UmbUserStore extends UmbDataStoreBase<UserDetails> {
 		fetch(`/umbraco/backoffice/users/${key}`)
 			.then((res) => res.json())
 			.then((data) => {
-				this.update([data]);
+				this.updateItems([data]);
 			});
 
 		return this.items.pipe(
@@ -62,7 +62,7 @@ export class UmbUserStore extends UmbDataStoreBase<UserDetails> {
 				user.status = 'enabled';
 			});
 
-			this.update(storedUsers);
+			this.updateItems(storedUsers);
 		} catch (error) {
 			console.error('Enable Users failed', error);
 		}
@@ -85,7 +85,7 @@ export class UmbUserStore extends UmbDataStoreBase<UserDetails> {
 				user.status = 'disabled';
 			});
 
-			this.update(storedUsers);
+			this.updateItems(storedUsers);
 		} catch (error) {
 			console.error('Disable Users failed', error);
 		}
@@ -102,7 +102,7 @@ export class UmbUserStore extends UmbDataStoreBase<UserDetails> {
 				},
 			});
 			const deletedKeys = await res.json();
-			this.delete(deletedKeys);
+			this.deleteItems(deletedKeys);
 		} catch (error) {
 			console.error('Delete Users failed', error);
 		}
@@ -119,7 +119,7 @@ export class UmbUserStore extends UmbDataStoreBase<UserDetails> {
 				},
 			});
 			const json = await res.json();
-			this.update(json);
+			this.updateItems(json);
 		} catch (error) {
 			console.error('Save Data Type error', error);
 		}
@@ -136,7 +136,7 @@ export class UmbUserStore extends UmbDataStoreBase<UserDetails> {
 				},
 			});
 			const json = (await res.json()) as UserDetails[];
-			this.update(json);
+			this.updateItems(json);
 			return json[0];
 		} catch (error) {
 			console.error('Invite user error', error);

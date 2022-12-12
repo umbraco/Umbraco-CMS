@@ -13,7 +13,7 @@ export class UmbMemberGroupStore extends UmbDataStoreBase<MemberGroupDetails | E
 	getTreeRoot(): Observable<Array<EntityTreeItem>> {
 		MemberGroupResource.getTreeMemberGroupRoot({}).then(
 			(res) => {
-				this.update(res.items);
+				this.updateItems(res.items);
 			},
 			(e) => {
 				if (e instanceof ApiError) {

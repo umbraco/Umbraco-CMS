@@ -4,15 +4,6 @@ import type { DataTypeDetails } from '@umbraco-cms/models';
 
 // TODO: add schema
 export const handlers = [
-	rest.get('/umbraco/backoffice/data-type/:key', (req, res, ctx) => {
-		const key = req.params.key as string;
-		if (!key) return;
-
-		const dataType = umbDataTypeData.getByKey(key);
-
-		return res(ctx.status(200), ctx.json([dataType]));
-	}),
-
 	rest.get('/umbraco/backoffice/data-type/details/:key', (req, res, ctx) => {
 		const key = req.params.key as string;
 		if (!key) return;
@@ -31,12 +22,12 @@ export const handlers = [
 		return res(ctx.status(200), ctx.json(saved));
 	}),
 
-	rest.post<string[]>('/umbraco/backoffice/data-type/trash', async (req, res, ctx) => {
+	rest.post<string[]>('/umbraco/backoffice/data-type/delete', async (req, res, ctx) => {
 		console.warn('Please move to schema');
 		const keys = await req.json();
 
-		const trashed = umbDataTypeData.trash(keys);
+		umbDataTypeData.delete(keys);
 
-		return res(ctx.status(200), ctx.json(trashed));
+		return res(ctx.status(200));
 	}),
 ];

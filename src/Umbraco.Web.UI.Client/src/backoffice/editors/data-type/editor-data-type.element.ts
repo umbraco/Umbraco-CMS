@@ -2,7 +2,7 @@ import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { UmbDataTypeStore } from '../../../core/stores/data-type/data-type.store';
+import { UmbDataTypesStore } from '../../../core/stores/data-types/data-types.store';
 import { UmbDataTypeContext } from './data-type.context';
 import type { DataTypeDetails } from '@umbraco-cms/models';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
@@ -43,7 +43,7 @@ export class UmbEditorDataTypeElement extends UmbContextProviderMixin(
 	private _dataTypeName = '';
 
 	private _dataTypeContext?: UmbDataTypeContext;
-	private _dataTypeStore?: UmbDataTypeStore;
+	private _dataTypeStore?: UmbDataTypesStore;
 
 	constructor() {
 		super();

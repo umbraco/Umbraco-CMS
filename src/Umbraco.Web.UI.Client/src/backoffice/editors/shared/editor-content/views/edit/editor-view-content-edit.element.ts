@@ -2,12 +2,12 @@ import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { distinctUntilChanged } from 'rxjs';
-import { NodeEntity, NodeProperty, NodePropertyData } from '../../../../../../core/mocks/data/node.data';
 import { UmbNodeContext } from '../../node.context';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
+import type { ContentProperty, ContentPropertyData, DocumentDetails, MediaDetails } from '@umbraco-cms/models';
 
 import '../../../../../components/node-property/node-property.element';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 
 @customElement('umb-editor-view-content-edit')
 export class UmbEditorViewContentEditElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
@@ -22,10 +22,10 @@ export class UmbEditorViewContentEditElement extends UmbContextConsumerMixin(Umb
 	];
 
 	@state()
-	_properties: NodeProperty[] = [];
+	_properties: ContentProperty[] = [];
 
 	@state()
-	_data: NodePropertyData[] = [];
+	_data: ContentPropertyData[] = [];
 
 	private _nodeContext?: UmbNodeContext;
 
@@ -34,16 +34,16 @@ export class UmbEditorViewContentEditElement extends UmbContextConsumerMixin(Umb
 
 		this.consumeContext('umbNodeContext', (nodeContext) => {
 			this._nodeContext = nodeContext;
-			this._observeNode();
+			this._observeContent();
 		});
 	}
 
-	private _observeNode() {
+	private _observeContent() {
 		if (!this._nodeContext) return;
 
-		this.observe<NodeEntity>(this._nodeContext.data.pipe(distinctUntilChanged()), (node) => {
-			this._properties = node.properties;
-			this._data = node.data;
+		this.observe<DocumentDetails | MediaDetails>(this._nodeContext.data.pipe(distinctUntilChanged()), (content) => {
+			this._properties = content.properties;
+			this._data = content.data;
 		});
 	}
 
@@ -51,7 +51,7 @@ export class UmbEditorViewContentEditElement extends UmbContextConsumerMixin(Umb
 		return html`
 			<uui-box>
 				${this._properties.map(
-					(property: NodeProperty) => html`
+					(property: ContentProperty) => html`
 						<umb-node-property
 							.property=${property}
 							.value=${this._data.find((data) => data.alias === property.alias)?.value}></umb-node-property>

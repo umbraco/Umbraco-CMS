@@ -4,11 +4,10 @@ import { css, html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { distinctUntilChanged } from 'rxjs';
 import { UmbDocumentTypeStore } from '../../../core/stores/document-type/document-type.store';
-import { DocumentTypeDetails } from '../../../core/mocks/data/document-type.data';
 import { UmbDocumentTypeContext } from './document-type.context';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
-import type { ManifestTypes, ManifestWithLoader } from '@umbraco-cms/models';
+import type { ManifestTypes, ManifestWithLoader, DocumentTypeDetails } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
 import '../shared/editor-entity-layout/editor-entity-layout.element';
