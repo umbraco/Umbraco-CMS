@@ -1134,19 +1134,20 @@
         }
       }
     },
-    "/umbraco/management/api/v1/health-check": {
+    "/umbraco/management/api/v1/health-check-group": {
       "get": {
         "tags": [
-          "Health Check"
+          "Health Check Group"
         ],
-        "operationId": "GetHealthCheck",
+        "operationId": "GetHealthCheckGroup",
         "parameters": [
           {
             "name": "skip",
             "in": "query",
             "schema": {
               "type": "integer",
-              "format": "int32"
+              "format": "int32",
+              "default": 0
             }
           },
           {
@@ -1154,7 +1155,8 @@
             "in": "query",
             "schema": {
               "type": "integer",
-              "format": "int32"
+              "format": "int32",
+              "default": 100
             }
           }
         ],
@@ -1172,15 +1174,15 @@
         }
       }
     },
-    "/umbraco/management/api/v1/health-check/{groupName}": {
+    "/umbraco/management/api/v1/health-check-group/{name}": {
       "get": {
         "tags": [
-          "Health Check"
+          "Health Check Group"
         ],
-        "operationId": "GetHealthCheckByGroupName",
+        "operationId": "GetHealthCheckGroupByName",
         "parameters": [
           {
-            "name": "groupName",
+            "name": "name",
             "in": "path",
             "required": true,
             "schema": {
@@ -4919,6 +4921,44 @@
         },
         "additionalProperties": false
       },
+      "HealthCheckAction": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "alias": {
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "valueRequired": {
+            "type": "boolean"
+          },
+          "providedValue": {
+            "type": "string",
+            "nullable": true
+          },
+          "providedValueValidation": {
+            "type": "string",
+            "nullable": true
+          },
+          "providedValueValidationRegex": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "HealthCheckGroup": {
         "type": "object",
         "properties": {
@@ -4962,6 +5002,13 @@
           },
           "resultType": {
             "$ref": "#/components/schemas/StatusResultType"
+          },
+          "actions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HealthCheckAction"
+            },
+            "nullable": true
           },
           "readMoreLink": {
             "type": "string",
