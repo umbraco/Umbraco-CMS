@@ -18,7 +18,7 @@ import { css, html, LitElement } from 'lit';
 
 import { UmbModalService } from '../core/services/modal';
 import { UmbNotificationService } from '../core/services/notification';
-import { UmbDataTypeStore } from '../core/stores/data-type/data-type.store';
+import { UmbDataTypesStore } from '../core/stores/data-types/data-types.store';
 import { UmbDocumentTypeStore } from '../core/stores/document-type/document-type.store';
 import { UmbMediaTypeStore } from '../core/stores/media-type/media-type.store';
 import { UmbMemberTypeStore } from '../core/stores/member-type/member-type.store';
@@ -72,7 +72,7 @@ export class UmbBackofficeElement extends UmbContextConsumerMixin(UmbContextProv
 
 		this.provideContext('umbDocumentStore', new UmbDocumentStore());
 		this.provideContext('umbMediaStore', new UmbMediaStore());
-		this.provideContext('umbDataTypeStore', new UmbDataTypeStore());
+		this.provideContext('umbDataTypeStore', new UmbDataTypesStore());
 		this.provideContext('umbDocumentTypeStore', new UmbDocumentTypeStore());
 		this.provideContext('umbMediaTypeStore', new UmbMediaTypeStore());
 		this.provideContext('umbMemberTypeStore', new UmbMemberTypeStore());

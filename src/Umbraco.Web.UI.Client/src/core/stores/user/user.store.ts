@@ -102,7 +102,7 @@ export class UmbUserStore extends UmbDataStoreBase<UserDetails> {
 				},
 			});
 			const deletedKeys = await res.json();
-			this.delete(deletedKeys);
+			this.deleteItems(deletedKeys);
 		} catch (error) {
 			console.error('Delete Users failed', error);
 		}

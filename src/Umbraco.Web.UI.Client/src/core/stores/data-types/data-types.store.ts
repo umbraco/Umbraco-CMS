@@ -5,16 +5,16 @@ import { ApiError, DataTypeResource, FolderTreeItem, ProblemDetails } from '@umb
 
 /**
  * @export
- * @class UmbDataTypeStore
+ * @class UmbDataTypesStore
  * @extends {UmbDataStoreBase<DataTypeDetails | FolderTreeItem>}
  * @description - Data Store for Data Types
  */
-export class UmbDataTypeStore extends UmbDataStoreBase<DataTypeDetails | FolderTreeItem> {
+export class UmbDataTypesStore extends UmbDataStoreBase<DataTypeDetails | FolderTreeItem> {
 	/**
 	 * @description - Request a Data Type by key. The Data Type is added to the store and is returned as an Observable.
 	 * @param {string} key
 	 * @return {*}  {(Observable<DataTypeDetails | null>)}
-	 * @memberof UmbDataTypeStore
+	 * @memberof UmbDataTypesStore
 	 */
 	getByKey(key: string): Observable<DataTypeDetails | FolderTreeItem | null> {
 		// TODO: use Fetcher API.
@@ -31,7 +31,7 @@ export class UmbDataTypeStore extends UmbDataStoreBase<DataTypeDetails | FolderT
 	/**
 	 * @description - Save a Data Type.
 	 * @param {Array<DataTypeDetails>} dataTypes
-	 * @memberof UmbDataTypeStore
+	 * @memberof UmbDataTypesStore
 	 * @return {*}  {Promise<void>}
 	 */
 	async save(dataTypes: Array<DataTypeDetails>): Promise<void> {
@@ -52,21 +52,21 @@ export class UmbDataTypeStore extends UmbDataStoreBase<DataTypeDetails | FolderT
 	}
 
 	/**
-	 * @description - Add a Data Type to the recycle bin.
+	 * @description - Delete a Data Type.
 	 * @param {string[]} keys
-	 * @memberof UmbDataTypeStore
+	 * @memberof UmbDataTypesStore
 	 * @return {*}  {Promise<void>}
 	 */
-	async trash(keys: string[]): Promise<void> {
-		const res = await fetch('/umbraco/backoffice/data-type/trash', {
+	async deleteItems(keys: string[]): Promise<void> {
+		await fetch('/umbraco/backoffice/data-type/delete', {
 			method: 'POST',
 			body: JSON.stringify(keys),
 			headers: {
 				'Content-Type': 'application/json',
 			},
 		});
-		const data = await res.json();
-		this.update(data);
+
+		this.deleteItems(keys);
 	}
 
 	getTreeRoot(): Observable<Array<FolderTreeItem>> {
