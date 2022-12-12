@@ -1,5 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <Title>Umbraco JSON schema generator</Title>
+    <Description>Generates a JSON schema from a specific type in an assembly file.</Description>
     <OutputType>Exe</OutputType>
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>umbraco-jsonschema</ToolCommandName>
