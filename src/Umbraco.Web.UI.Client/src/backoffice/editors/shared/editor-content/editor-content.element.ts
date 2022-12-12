@@ -3,7 +3,6 @@ import { css, html, LitElement, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import { distinctUntilChanged } from 'rxjs';
-import { NodeEntity } from '../../../../core/mocks/data/node.data';
 import type { UmbNotificationService } from '../../../../core/services/notification';
 import { UmbNotificationDefaultData } from '../../../../core/services/notification/layouts/default';
 import { UmbNodeContext } from './node.context';
@@ -103,7 +102,7 @@ export class UmbEditorContentElement extends UmbContextProviderMixin(
 	private _observeContent() {
 		if (!this._store) return;
 
-		this.observe<NodeEntity>(this._store.getByKey(this.entityKey), (content) => {
+		this.observe<DocumentDetails | MediaDetails>(this._store.getByKey(this.entityKey), (content) => {
 			if (!content) return; // TODO: Handle nicely if there is no node.
 
 			if (!this._nodeContext) {
@@ -113,7 +112,7 @@ export class UmbEditorContentElement extends UmbContextProviderMixin(
 				this._nodeContext.update(content);
 			}
 
-			this.observe<NodeEntity>(this._nodeContext.data.pipe(distinctUntilChanged()), (data) => {
+			this.observe<DocumentDetails | MediaDetails>(this._nodeContext.data.pipe(distinctUntilChanged()), (data) => {
 				this._content = data;
 			});
 		});

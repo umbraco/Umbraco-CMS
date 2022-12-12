@@ -63,10 +63,6 @@ customElements.define('umb-storybook', UmbStoryBookElement);
 
 const storybookProvider = (story) => html` <umb-storybook>${story()}</umb-storybook> `;
 
-const nodeStoreProvider = (story) => html`
-	<umb-context-provider key="umbNodeStore" .value=${new UmbNodeStore()}>${story()}</umb-context-provider>
-`;
-
 const dataTypeStoreProvider = (story) => html`
 	<umb-context-provider key="umbDataTypeStore" .value=${new UmbDataTypeStore()}>${story()}</umb-context-provider>
 `;
@@ -91,7 +87,6 @@ initialize({ onUnhandledRequest });
 export const decorators = [
 	mswDecorator,
 	storybookProvider,
-	nodeStoreProvider,
 	dataTypeStoreProvider,
 	documentTypeStoreProvider,
 	modalServiceProvider,

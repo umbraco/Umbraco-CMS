@@ -3,9 +3,9 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { distinctUntilChanged } from 'rxjs';
 import { UmbNodeContext } from '../../node.context';
-import type { NodeEntity } from '../../../../../../core/mocks/data/node.data';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import type { DocumentDetails, MediaDetails } from '@umbraco-cms/models';
 
 @customElement('umb-editor-view-content-info')
 export class UmbEditorViewContentInfoElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
@@ -28,8 +28,8 @@ export class UmbEditorViewContentInfoElement extends UmbContextConsumerMixin(Umb
 	private _observeNode() {
 		if (!this._nodeContext) return;
 
-		this.observe<NodeEntity>(this._nodeContext.data.pipe(distinctUntilChanged()), (node) => {
-			this._nodeName = node.name;
+		this.observe<DocumentDetails | MediaDetails>(this._nodeContext.data.pipe(distinctUntilChanged()), (node) => {
+			this._nodeName = node.name as string;
 		});
 	}
 

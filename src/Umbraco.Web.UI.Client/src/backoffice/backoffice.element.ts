@@ -24,7 +24,6 @@ import { UmbMediaTypeStore } from '../core/stores/media-type/media-type.store';
 import { UmbMemberTypeStore } from '../core/stores/member-type/member-type.store';
 import { UmbDocumentStore } from '../core/stores/document/document.store';
 import { UmbMediaStore } from '../core/stores/media/media.store';
-import { UmbNodeStore } from '../core/stores/node.store';
 import { UmbMemberGroupStore } from '../core/stores/member-group/member-group.store';
 import { UmbSectionStore } from '../core/stores/section.store';
 import { UmbEntityStore } from '../core/stores/entity.store';
@@ -76,7 +75,6 @@ export class UmbBackofficeElement extends UmbContextConsumerMixin(UmbContextProv
 		this.provideContext('umbEntityStore', this._umbEntityStore);
 		this.provideContext('umbDocumentStore', new UmbDocumentStore());
 		this.provideContext('umbMediaStore', new UmbMediaStore());
-		this.provideContext('umbNodeStore', new UmbNodeStore(this._umbEntityStore));
 		this.provideContext('umbDataTypeStore', new UmbDataTypeStore());
 		this.provideContext('umbDocumentTypeStore', new UmbDocumentTypeStore());
 		this.provideContext('umbMediaTypeStore', new UmbMediaTypeStore());
