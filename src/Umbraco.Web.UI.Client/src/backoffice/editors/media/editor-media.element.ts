@@ -4,7 +4,7 @@ import { customElement, property } from 'lit/decorators.js';
 import type { ManifestEditorView, ManifestWithLoader } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
-import '../shared/editor-content/editor-node.element';
+import '../shared/editor-content/editor-content.element';
 
 @customElement('umb-editor-media')
 export class UmbEditorMediaElement extends LitElement {
@@ -65,7 +65,7 @@ export class UmbEditorMediaElement extends LitElement {
 	}
 
 	render() {
-		return html`<umb-editor-node .entityKey=${this.entityKey} alias="Umb.Editor.Media"></umb-editor-node>`;
+		return html`<umb-editor-content .entityKey=${this.entityKey} alias="Umb.Editor.Media"></umb-editor-content>`;
 	}
 }
 

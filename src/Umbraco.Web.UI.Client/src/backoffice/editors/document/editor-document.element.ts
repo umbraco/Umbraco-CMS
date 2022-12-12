@@ -5,7 +5,7 @@ import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import type { ManifestEditorView, ManifestWithLoader } from '@umbraco-cms/models';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 
-import '../shared/editor-content/editor-node.element';
+import '../shared/editor-content/editor-content.element';
 import { UmbDocumentStore } from 'src/core/stores/document/document.store';
 
 @customElement('umb-editor-document')
@@ -71,7 +71,7 @@ export class UmbEditorDocumentElement extends UmbContextConsumerMixin(UmbContext
 	}
 
 	render() {
-		return html`<umb-editor-node .entityKey=${this.entityKey} alias="Umb.Editor.Document"></umb-editor-node>`;
+		return html`<umb-editor-content .entityKey=${this.entityKey} alias="Umb.Editor.Document"></umb-editor-content>`;
 	}
 }
 
