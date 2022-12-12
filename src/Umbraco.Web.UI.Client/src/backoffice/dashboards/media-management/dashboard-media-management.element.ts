@@ -2,6 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import './media-management-grid.element';
+import '../../components/list-view/list-view-header.element';
 
 @customElement('umb-dashboard-media-management')
 export class UmbDashboardMediaManagementElement extends LitElement {
@@ -12,6 +13,7 @@ export class UmbDashboardMediaManagementElement extends LitElement {
 				display: flex;
 				flex-direction: column;
 				box-sizing: border-box;
+				gap: var(--uui-size-space-5);
 				height: 100%;
 			}
 		`,
@@ -19,7 +21,7 @@ export class UmbDashboardMediaManagementElement extends LitElement {
 
 	render() {
 		return html`
-			<div>HEADER</div>
+			<umb-list-view-header></umb-list-view-header>
 			<umb-media-management-grid></umb-media-management-grid>
 		`;
 	}
