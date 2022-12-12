@@ -84,7 +84,7 @@ public class UmbTwoFactorLoginController : SurfaceController
                 model.Code,
                 model.IsPersistent,
                 model.RememberClient);
-            if (result.Succeeded && returnUrl is not null)
+            if (result.Succeeded)
             {
                 return RedirectToLocal(returnUrl);
             }

@@ -69,7 +69,7 @@ public class NestedContentPropertyEditor : DataEditor
     protected override IDataValueEditor CreateValueEditor()
         => DataValueEditorFactory.Create<NestedContentPropertyValueEditor>(Attribute!);
 
-    internal class NestedContentPropertyValueEditor : DataValueEditor, IDataValueReference
+    internal class NestedContentPropertyValueEditor : DataValueEditor, IDataValueReference, IDataValueTags
     {
         private readonly IDataTypeService _dataTypeService;
         private readonly ILogger<NestedContentPropertyEditor> _logger;
@@ -144,6 +144,36 @@ public class NestedContentPropertyEditor : DataEditor
                     IEnumerable<UmbracoEntityReference> refs = reference.GetReferences(val);
 
                     result.AddRange(refs);
+                }
+            }
+
+            return result;
+        }
+
+        /// <inheritdoc />
+        public IEnumerable<ITag> GetTags(object? value, object? dataTypeConfiguration, int? languageId)
+        {
+            IReadOnlyList<NestedContentValues.NestedContentRowValue> rows =
+                _nestedContentValues.GetPropertyValues(value);
+
+            var result = new List<ITag>();
+
+            foreach (NestedContentValues.NestedContentRowValue row in rows.ToList())
+            {
+                foreach (KeyValuePair<string, NestedContentValues.NestedContentPropertyValue> prop in row.PropertyValues
+                             .ToList())
+                {
+                    IDataEditor? propEditor = _propertyEditors[prop.Value.PropertyType.PropertyEditorAlias];
+
+                    IDataValueEditor? valueEditor = propEditor?.GetValueEditor();
+                    if (valueEditor is not IDataValueTags tagsProvider)
+                    {
+                        continue;
+                    }
+
+                    object? configuration = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeKey)?.Configuration;
+
+                    result.AddRange(tagsProvider.GetTags(prop.Value.Value, configuration, languageId));
                 }
             }
 

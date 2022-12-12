@@ -467,7 +467,7 @@ public class CodeFileController : BackOfficeNotificationsController
         {
             case Constants.Trees.PartialViews:
                 if (IsDirectory(
-                        _hostingEnvironment.MapPathContentRoot(Path.Combine(Constants.SystemDirectories.PartialViews, virtualPath))))
+                        _hostingEnvironment.MapPathContentRoot(Path.Combine(Constants.SystemDirectories.PartialViews, virtualPath)), _fileSystems.PartialViewsFileSystem!))
                 {
                     _fileService.DeletePartialViewFolder(virtualPath);
                     return Ok();
@@ -482,7 +482,7 @@ public class CodeFileController : BackOfficeNotificationsController
 
             case Constants.Trees.PartialViewMacros:
                 if (IsDirectory(
-                        _hostingEnvironment.MapPathContentRoot(Path.Combine(Constants.SystemDirectories.MacroPartials, virtualPath))))
+                        _hostingEnvironment.MapPathContentRoot(Path.Combine(Constants.SystemDirectories.MacroPartials, virtualPath)), _fileSystems.MacroPartialsFileSystem!))
                 {
                     _fileService.DeletePartialViewMacroFolder(virtualPath);
                     return Ok();
@@ -497,7 +497,7 @@ public class CodeFileController : BackOfficeNotificationsController
 
             case Constants.Trees.Scripts:
                 if (IsDirectory(
-                        _hostingEnvironment.MapPathWebRoot(Path.Combine(_globalSettings.UmbracoScriptsPath, virtualPath))))
+                        _hostingEnvironment.MapPathWebRoot(Path.Combine(_globalSettings.UmbracoScriptsPath, virtualPath)), _fileSystems.ScriptsFileSystem!))
                 {
                     _fileService.DeleteScriptFolder(virtualPath);
                     return Ok();
@@ -512,7 +512,7 @@ public class CodeFileController : BackOfficeNotificationsController
                 return new UmbracoProblemResult("No Script or folder found with the specified path", HttpStatusCode.NotFound);
             case Constants.Trees.Stylesheets:
                 if (IsDirectory(
-                        _hostingEnvironment.MapPathWebRoot(Path.Combine(_globalSettings.UmbracoCssPath, virtualPath))))
+                        _hostingEnvironment.MapPathWebRoot(Path.Combine(_globalSettings.UmbracoCssPath, virtualPath)), _fileSystems.StylesheetsFileSystem!))
                 {
                     _fileService.DeleteStyleSheetFolder(virtualPath);
                     return Ok();
@@ -827,13 +827,21 @@ public class CodeFileController : BackOfficeNotificationsController
         return value;
     }
 
-    private bool IsDirectory(string path)
+    private bool IsDirectory(string path, IFileSystem fileSystem)
     {
-        var dirInfo = new DirectoryInfo(path);
+        // If it's a physical filesystem check with directory info
+        if (fileSystem.CanAddPhysical)
+        {
+            var dirInfo = new DirectoryInfo(path);
 
-        // If you turn off indexing in Windows this will have the attribute:
-        // `FileAttributes.Directory | FileAttributes.NotContentIndexed`
-        return (dirInfo.Attributes & FileAttributes.Directory) != 0;
+            // If you turn off indexing in Windows this will have the attribute:
+            // `FileAttributes.Directory | FileAttributes.NotContentIndexed`
+            return (dirInfo.Attributes & FileAttributes.Directory) != 0;
+        }
+
+        // Otherwise check the filesystem abstraction to see if the folder exists
+        // Since this is used for delete, it presumably exists if we're trying to delete it
+        return fileSystem.DirectoryExists(path);
     }
 
     // this is an internal class for passing stylesheet data from the client to the controller while editing

@@ -763,7 +763,6 @@
     <key alias="reset">Reset</key>
   </area>
   <area alias="rollback">
-    <key alias="currentVersion">当前版本</key>
     <key alias="diffHelp"><![CDATA[显示当前版本和选择版本的差异<br /><del>红色</del>是选中版本中没有的。<ins>绿色是新增的</ins>]]></key>
     <key alias="documentRolledBack">文档已回滚</key>
     <key alias="htmlHelp"><![CDATA[将选中版本显示为HTML，如果您想看到版本间的差异比较，请使用对比视图。]]></key>

@@ -898,7 +898,6 @@
     <key alias="reset">Reiniciar</key>
   </area>
   <area alias="rollback">
-    <key alias="currentVersion">Versión actual</key>
     <key alias="diffHelp"><![CDATA[Esto muestra las diferencias entre la versión actual y la versión seleccionada<br /><del>Red</del> el texto de la versión seleccionada no se mostrará. , <ins>el verde significa añadido</ins>]]></key>
     <key alias="documentRolledBack">Se ha recuperado la última versión del documento.</key>
     <key alias="htmlHelp">Esto muestra la versión seleccionada como html, si deseas ver la diferencia entre 2 versiones al mismo tiempo, por favor usa la vista diff</key>

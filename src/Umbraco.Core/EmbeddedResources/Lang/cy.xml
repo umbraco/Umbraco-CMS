@@ -1589,8 +1589,6 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
   <area alias="rollback">
     <key alias="headline">Dewis fersiwn i gymharu efo fersiwn bresennol</key>
     <key alias="changes">Newidiadau</key>
-    <key alias="created">Creuwyd</key>
-    <key alias="currentVersion">Fersiwn bresennol</key>
     <key alias="diffHelp"><![CDATA[May hyn yn dangos y gwahaniaeth rhwng y fersiwn bresennol ac y fersiwn dewiswyd<br />Ni fydd testun <del>coch</del> yn cael ei ddangos yn y fersiwn dewiswyd. , <ins>mae gwyrdd yn golygu wedi'i ychwanegu</ins>]]></key>
     <key alias="documentRolledBack">Dogfen wedi'i rolio yn ôl</key>
     <key alias="htmlHelp">Mae hyn yn dangos y fersiwn dewiswyd ar ffurf HTML, os hoffwch weld y gwahaniaeth rhwng 2 fersiwn ar yr un pryd, defnyddiwch y wedd gwahaniaethol</key>

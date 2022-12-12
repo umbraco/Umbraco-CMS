@@ -15,19 +15,8 @@ public interface IServiceConnector : IDiscoverable
     /// <returns>
     /// The corresponding artifact, or null.
     /// </returns>
-    [Obsolete("Use the overload accepting IContextCache instead. This overload will be removed in a future version.")]
-    IArtifact? GetArtifact(Udi udi)
-        => GetArtifact(udi, PassThroughCache.Instance);
-
-    /// <summary>
-    /// Gets an artifact.
-    /// </summary>
-    /// <param name="udi">The entity identifier of the artifact.</param>
-    /// <param name="contextCache">The context cache.</param>
-    /// <returns>
-    /// The corresponding artifact, or null.
-    /// </returns>
-    IArtifact? GetArtifact(Udi udi, IContextCache contextCache);
+    [Obsolete($"Implement {nameof(IServiceConnector2)} and use the overload accepting {nameof(IContextCache)} instead. This overload will be removed in Umbraco 13.")]
+    IArtifact? GetArtifact(Udi udi);
 
     /// <summary>
     /// Gets an artifact.
@@ -36,19 +25,8 @@ public interface IServiceConnector : IDiscoverable
     /// <returns>
     /// The corresponding artifact.
     /// </returns>
-    [Obsolete("Use the overload accepting IContextCache instead. This overload will be removed in a future version.")]
-    IArtifact GetArtifact(object entity)
-        => GetArtifact(entity, PassThroughCache.Instance);
-
-    /// <summary>
-    /// Gets an artifact.
-    /// </summary>
-    /// <param name="entity">The entity.</param>
-    /// <param name="contextCache">The context cache.</param>
-    /// <returns>
-    /// The corresponding artifact.
-    /// </returns>
-    IArtifact GetArtifact(object entity, IContextCache contextCache);
+    [Obsolete($"Implement {nameof(IServiceConnector2)} and use the overload accepting {nameof(IContextCache)} instead. This overload will be removed in Umbraco 13.")]
+    IArtifact GetArtifact(object entity);
 
     /// <summary>
     /// Initializes processing for an artifact.

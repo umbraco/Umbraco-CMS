@@ -346,6 +346,7 @@
     <key alias="createNewMember">Create a new member</key>
     <key alias="allMembers">All Members</key>
     <key alias="memberGroupNoProperties">Member groups have no additional properties for editing.</key>
+    <key alias="2fa">Two-Factor Authentication</key>
   </area>
   <area alias="contentType">
     <key alias="copyFailed">Failed to copy content type</key>
@@ -1455,7 +1456,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="created">Created</key>
     <key alias="currentVersion">Current version</key>
     <key alias="diffHelp">
-      <![CDATA[This shows the differences between the current version and the selected version<br /><del>Red text</del> will be removed in the selected version, <ins>green text</ins> will be added]]></key>
+      <![CDATA[This shows the differences between the current (draft) version and the selected version<br /><del>Red text</del> will be removed in the selected version, <ins>green text</ins> will be added]]></key>
+    <key alias="noDiff">There are no differences between the current (draft) version and the selected version</key>
     <key alias="documentRolledBack">Document has been rolled back</key>
     <key alias="headline">Select a version to compare with the current version</key>
     <key alias="htmlHelp">This displays the selected version as HTML, if you wish to see the difference between 2
@@ -2792,7 +2794,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="allowBlockInRoot">Allow in root</key>
     <key alias="allowBlockInRootHelp">Make this block available in the root of the layout.</key>
     <key alias="allowBlockInAreas">Allow in areas</key>
-    <key alias="allowBlockInAreasHelp">Make this block available for use within the areas of other Blocks (unless explicit permissions are set for these areas).</key>
+    <key alias="allowBlockInAreasHelp">Make this block available by default within the areas of other Blocks (unless explicit permissions are set for these areas).</key>
     <key alias="areaAllowedBlocksEmpty">By default, all block types are allowed in an Area, Use this option to allow only selected types.</key>
     <key alias="areas">Areas</key>
     <key alias="areasLayoutColumns">Grid Columns for Areas</key>
