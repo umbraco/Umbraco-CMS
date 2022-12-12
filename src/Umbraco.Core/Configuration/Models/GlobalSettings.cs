@@ -77,13 +77,12 @@ public class GlobalSettings
     public int VersionCheckPeriod { get; set; } = StaticVersionCheckPeriod;
 
     /// <summary>
-    ///     Gets or sets a value for the Umbraco back-office path.
+    /// Gets or sets a value for the Umbraco back-office path.
     /// </summary>
+    [Obsolete($"{nameof(UmbracoPath)} is no longer configurable, this property is scheduled for removal in V12.")]
     public string UmbracoPath
     {
         get => Constants.System.DefaultUmbracoPath;
-        [Obsolete($"{nameof(UmbracoPath)} is no longer configurable, this property setter is scheduled for removal in V12.")]
-        // NOTE: When removing this, also clean up the hardcoded removal of UmbracoPath in Umbraco.JsonSchema
         set { }
     }
 
