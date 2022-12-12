@@ -11,10 +11,10 @@ public static class MvcBuilderExtensions
     public static IMvcBuilder AddJsonOptions(this IMvcBuilder builder, string settingsName, Action<JsonOptions> configure)
     {
         builder.Services.Configure(settingsName, configure);
-        builder.Services.AddSingleton<IConfigureOptions<MvcOptions>>(sp =>
+        builder.Services.AddSingleton<IConfigureOptions<MvcOptions>>(provider =>
         {
-            IOptionsMonitor<JsonOptions> options = sp.GetRequiredService<IOptionsMonitor<JsonOptions>>();
-            ILoggerFactory loggerFactory = sp.GetRequiredService<ILoggerFactory>();
+            IOptionsMonitor<JsonOptions> options = provider.GetRequiredService<IOptionsMonitor<JsonOptions>>();
+            ILoggerFactory loggerFactory = provider.GetRequiredService<ILoggerFactory>();
             return new ConfigureMvcJsonOptions(settingsName, options, loggerFactory);
         });
         return builder;
