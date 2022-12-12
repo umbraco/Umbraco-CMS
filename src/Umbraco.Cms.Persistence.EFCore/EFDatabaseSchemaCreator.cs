@@ -22,34 +22,20 @@ public class EFDatabaseSchemaCreator : IDatabaseSchemaCreator
 
     public async Task InitializeDatabaseSchema(bool includeData = true)
     {
-        try
+        await _dbContextFactory.ExecuteWithContextAsync<Task>(async db =>
         {
-            await _dbContextFactory.ExecuteWithContextAsync<Task>(async db =>
+            //TODO transaction cannot work with SQLite
+            //using (var transaction = await db.Database.BeginTransactionAsync())
             {
+                await db.Database.MigrateAsync();
 
-                //TODO transaction cannot work with SQLite
-                //using (var transaction = await db.Database.BeginTransactionAsync())
-                {
-
-                    await db.Database.MigrateAsync();
-
-                   // await transaction.CommitAsync();
-                }
-            });
-
-            if (includeData)
-            {
-                await _databaseDataCreator.SeedDataAsync();
+                // await transaction.CommitAsync();
             }
-        }
-        catch (Exception e)
+        });
+
+        if (includeData)
         {
-            Console.WriteLine(e);
-            throw;
+            await _databaseDataCreator.SeedDataAsync();
         }
-
     }
-
-
-
 }
