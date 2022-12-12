@@ -9,6 +9,9 @@ import { handlers as upgradeHandlers } from './domains/upgrade.handlers';
 import { handlers as userHandlers } from './domains/user.handlers';
 import { handlers as telemetryHandlers } from './domains/telemetry.handlers';
 import { handlers as treeHandlers } from './domains/entity.handlers';
+import { handlers as examineManagementHandlers } from './domains/examine-management.handlers';
+import { handlers as modelsBuilderHandlers } from './domains/modelsbuilder.handlers';
+import { handlers as profileHandlers } from './domains/performance-profiling.handlers';
 
 export const handlers = [
 	serverHandlers.serverRunningHandler,
@@ -24,4 +27,7 @@ export const handlers = [
 	...telemetryHandlers,
 	...publishedStatusHandlers,
 	...treeHandlers,
+	...examineManagementHandlers,
+	...modelsBuilderHandlers,
+	...profileHandlers,
 ];

@@ -11,6 +11,9 @@ import { handlers as userHandlers } from './domains/user.handlers';
 import { handlers as telemetryHandlers } from './domains/telemetry.handlers';
 import { handlers as usersHandlers } from './domains/users.handlers';
 import { handlers as userGroupsHandlers } from './domains/user-groups.handlers';
+import { handlers as examineManagementHandlers } from './domains/examine-management.handlers';
+import { handlers as modelsBuilderHandlers } from './domains/modelsbuilder.handlers';
+import { handlers as profilingHandlers } from './domains/performance-profiling.handlers';
 
 // treeHandlers
 import { handlers as treeDocumentHandlers } from './domains/tree-document.handlers';
@@ -35,7 +38,6 @@ const handlers = [
 	...publishedStatusHandlers,
 	...usersHandlers,
 	...userGroupsHandlers,
-
 	...treeDocumentHandlers,
 	...treeMediaHandlers,
 	...treeDataTypeHandlers,
@@ -43,6 +45,9 @@ const handlers = [
 	...treeMediaTypeHandlers,
 	...treeMemberTypeHandlers,
 	...treeMemberGroupHandlers,
+	...examineManagementHandlers,
+	...modelsBuilderHandlers,
+	...profilingHandlers,
 ];
 
 switch (import.meta.env.VITE_UMBRACO_INSTALL_STATUS) {

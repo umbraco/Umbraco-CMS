@@ -121,7 +121,7 @@ export class UmbTreeItem extends UmbContextConsumerMixin(UmbObserverMixin(LitEle
 
 	// TODO: how do we handle this?
 	private _constructPath(sectionPathname: string, type: string, key: string) {
-		return `/section/${sectionPathname}/${type}/${key}`;
+		return `section/${sectionPathname}/${type}/${key}`;
 	}
 
 	private _onShowChildren(event: UUIMenuItemEvent) {

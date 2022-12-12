@@ -1,46 +1,40 @@
 {
-  "compilerOptions": {
-    "target": "es2017",
-    "module": "esnext",
-    "lib": [
-      "es2017",
-      "dom",
-      "dom.iterable"
-    ],
-    "declaration": true,
-    "emitDeclarationOnly": true,
-    "noEmitOnError": true,
-    "outDir": "./types",
-    "strict": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-    "moduleResolution": "node",
-    "isolatedModules": true,
-    "allowSyntheticDefaultImports": true,
-    "experimentalDecorators": true,
-    "forceConsistentCasingInFileNames": true,
-    "useDefineForClassFields": false,
-    "skipLibCheck": true,
-    "resolveJsonModule": true,
-    "baseUrl": ".",
-    "paths": {
-      "@umbraco-cms/models": ["src/core/models"],
-      "@umbraco-cms/backend-api": ["src/core/backend-api"],
-      "@umbraco-cms/context-api": ["src/core/context-api"],
-      "@umbraco-cms/extensions-api": ["src/core/extensions-api"],
-      "@umbraco-cms/extensions-registry": ["src/core/extensions-registry"],
-      "@umbraco-cms/observable-api": ["src/core/observable-api"],
-      "@umbraco-cms/utils": ["src/core/utils"],
-      "@umbraco-cms/test-utils": ["src/core/test-utils"]
-    },
-  },
-  "include": [
-    "src/**/*.ts",
-		"e2e/**/*.ts",
-  ],
-  "references": [
-    {
-      "path": "./tsconfig.node.json"
-    }
-  ]
+	"compilerOptions": {
+		"module": "esnext",
+		"target": "esnext",
+		"lib": ["es2020", "dom", "dom.iterable"],
+		"declaration": true,
+		"emitDeclarationOnly": true,
+		"noEmitOnError": true,
+		"outDir": "./types",
+		"strict": true,
+		"noImplicitReturns": true,
+		"noFallthroughCasesInSwitch": true,
+		"moduleResolution": "node",
+		"isolatedModules": true,
+		"allowSyntheticDefaultImports": true,
+		"experimentalDecorators": true,
+		"forceConsistentCasingInFileNames": true,
+		"useDefineForClassFields": false,
+		"skipLibCheck": true,
+		"resolveJsonModule": true,
+		"baseUrl": ".",
+		"paths": {
+			"@umbraco-cms/models": ["src/core/models"],
+			"@umbraco-cms/backend-api": ["src/core/backend-api"],
+			"@umbraco-cms/context-api": ["src/core/context-api"],
+			"@umbraco-cms/extensions-api": ["src/core/extensions-api"],
+			"@umbraco-cms/extensions-registry": ["src/core/extensions-registry"],
+			"@umbraco-cms/observable-api": ["src/core/observable-api"],
+			"@umbraco-cms/utils": ["src/core/utils"],
+			"@umbraco-cms/test-utils": ["src/core/test-utils"],
+			"@umbraco-cms/services": ["src/core/services"]
+		}
+	},
+	"include": ["src/**/*.ts", "e2e/**/*.ts"],
+	"references": [
+		{
+			"path": "./tsconfig.node.json"
+		}
+	]
 }
