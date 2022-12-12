@@ -9,8 +9,8 @@ import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import '../../../../../components/node-property/node-property.element';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 
-@customElement('umb-editor-view-node-edit')
-export class UmbEditorViewNodeEditElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+@customElement('umb-editor-view-content-edit')
+export class UmbEditorViewContentEditElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles = [UUITextStyles];
 
 	@state()
@@ -54,10 +54,10 @@ export class UmbEditorViewNodeEditElement extends UmbContextConsumerMixin(UmbObs
 	}
 }
 
-export default UmbEditorViewNodeEditElement;
+export default UmbEditorViewContentEditElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-editor-view-node-edit': UmbEditorViewNodeEditElement;
+		'umb-editor-view-content-edit': UmbEditorViewContentEditElement;
 	}
 }

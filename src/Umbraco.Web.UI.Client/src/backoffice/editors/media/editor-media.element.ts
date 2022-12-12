@@ -34,7 +34,7 @@ export class UmbEditorMediaElement extends LitElement {
 				type: 'editorView',
 				alias: 'Umb.EditorView.Media.Edit',
 				name: 'Media Editor Edit View',
-				loader: () => import('../shared/editor-content/views/edit/editor-view-node-edit.element'),
+				loader: () => import('../shared/editor-content/views/edit/editor-view-content-edit.element'),
 				weight: 200,
 				meta: {
 					editors: ['Umb.Editor.Media'],
