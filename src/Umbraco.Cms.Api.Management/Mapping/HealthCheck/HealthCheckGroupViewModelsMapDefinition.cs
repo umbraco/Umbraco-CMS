@@ -9,7 +9,7 @@ public class HealthCheckGroupViewModelsMapDefinition : IMapDefinition
 {
     public void DefineMaps(IUmbracoMapper mapper)
     {
-        mapper.Define<HealthCheckAction, HealthCheckActionViewModel>((source, context) => new HealthCheckActionViewModel(), Map);
+        mapper.Define<HealthCheckAction, HealthCheckActionViewModel>((source, context) => new HealthCheckActionViewModel() { ValueRequired = false }, Map);
         mapper.Define<HealthCheckStatus, HealthCheckResultViewModel>((source, context) => new HealthCheckResultViewModel() { Message = string.Empty }, Map);
         mapper.Define<Core.HealthChecks.HealthCheck, HealthCheckViewModel>((source, context) => new HealthCheckViewModel() { Name = string.Empty }, Map);
         mapper.Define<IGrouping<string?, Core.HealthChecks.HealthCheck>, HealthCheckGroupViewModel>((source, context) => new HealthCheckGroupViewModel() { Checks = new List<HealthCheckViewModel>() }, Map);

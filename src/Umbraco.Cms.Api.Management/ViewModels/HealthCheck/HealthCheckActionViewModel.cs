@@ -31,7 +31,7 @@ public class HealthCheckActionViewModel
     /// <summary>
     ///     Gets or sets a value indicating whether a value is required to rectify the issue.
     /// </summary>
-    public bool ValueRequired { get; set; }
+    public required bool ValueRequired { get; set; }
 
     /// <summary>
     ///     Gets or sets the value to rectify the issue.
