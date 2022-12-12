@@ -7,8 +7,8 @@ import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbDocumentStore } from 'src/core/stores/document/document.store';
 
 import '../shared/tree-navigator.element';
-@customElement('umb-tree-document')
-export class UmbTreeDocumentElement extends UmbContextProviderMixin(UmbContextConsumerMixin(UmbTreeBase)) {
+@customElement('umb-tree-documents')
+export class UmbTreeDocumentsElement extends UmbContextProviderMixin(UmbContextConsumerMixin(UmbTreeBase)) {
 	constructor() {
 		super();
 
@@ -70,10 +70,10 @@ export class UmbTreeDocumentElement extends UmbContextProviderMixin(UmbContextCo
 	}
 }
 
-export default UmbTreeDocumentElement;
+export default UmbTreeDocumentsElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-tree-document': UmbTreeDocumentElement;
+		'umb-tree-documents': UmbTreeDocumentsElement;
 	}
 }
