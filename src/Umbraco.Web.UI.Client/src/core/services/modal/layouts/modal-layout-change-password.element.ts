@@ -1,9 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, CSSResultGroup, html, LitElement, nothing } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
-import { UmbModalHandler, UmbModalService } from '@umbraco-cms/services';
-import type { UserDetails } from '@umbraco-cms/models';
-import { UmbUserStore } from 'src/core/stores/user/user.store';
+import { customElement, property } from 'lit/decorators.js';
+import { UmbModalHandler } from '@umbraco-cms/services';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
@@ -62,7 +60,7 @@ export class UmbModalLayoutChangePasswordElement extends UmbContextConsumerMixin
 	private _renderOldPasswordInput() {
 		return html`
 			<uui-form-layout-item style="margin-bottom: var(--uui-size-layout-2)">
-				<uui-label id="oldPasswordLabel" for="oldPpassword" slot="label" required>Old password</uui-label>
+				<uui-label id="oldPasswordLabel" for="oldPassword" slot="label" required>Old password</uui-label>
 				<uui-input-password
 					id="oldPassword"
 					name="oldPassword"

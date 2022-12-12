@@ -5,7 +5,6 @@ import { UmbHistoryItem, umbHistoryService } from '../../history';
 import { umbCurrentUserService } from '../../current-user';
 import { UmbModalHandler, UmbModalService } from '@umbraco-cms/services';
 import type { ManifestExternalLoginProvider, ManifestUserDashboard, UserDetails } from '@umbraco-cms/models';
-import { UmbUserStore } from 'src/core/stores/user/user.store';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
