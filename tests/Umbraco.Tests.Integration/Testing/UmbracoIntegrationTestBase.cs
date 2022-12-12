@@ -177,7 +177,6 @@ public abstract class UmbracoIntegrationTestBase
                 runtimeState.DetermineRuntimeLevel();
 
                 Assert.AreEqual(RuntimeLevel.Run, runtimeState.Level);
-                databaseFactory.Configure(s_connectionStrings);
 
                 break;
             case UmbracoTestOptions.Database.NewEmptyPerTest:
@@ -187,7 +186,6 @@ public abstract class UmbracoIntegrationTestBase
                 CreateDatabaseWithoutSchema(databaseFactory, databaseSchemaCreatorFactory);
                 runtimeState.DetermineRuntimeLevel();
                 Assert.AreEqual(RuntimeLevel.Install, runtimeState.Level);
-                databaseFactory.Configure(s_connectionStrings);
 
                 break;
             case UmbracoTestOptions.Database.NewSchemaPerFixture:
