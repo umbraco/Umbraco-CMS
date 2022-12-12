@@ -1,4 +1,4 @@
-import { html, LitElement } from 'lit';
+import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { distinctUntilChanged } from 'rxjs';
@@ -11,7 +11,15 @@ import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 
 @customElement('umb-editor-view-content-edit')
 export class UmbEditorViewContentEditElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
-	static styles = [UUITextStyles];
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display:block;
+				margin: var(--uui-size-layout-1);
+			}
+		`
+	];
 
 	@state()
 	_properties: NodeProperty[] = [];

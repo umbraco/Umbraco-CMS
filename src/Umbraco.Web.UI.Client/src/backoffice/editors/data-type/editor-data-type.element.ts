@@ -28,8 +28,10 @@ export class UmbEditorDataTypeElement extends UmbContextProviderMixin(
 				height: 100%;
 			}
 
-			#name {
-				width: 100%;
+			#header {
+				/* TODO: can this be applied from layout slot CSS? */
+				margin: 0 var(--uui-size-layout-1);
+				flex:1 1 auto;
 			}
 		`,
 	];
@@ -141,7 +143,7 @@ export class UmbEditorDataTypeElement extends UmbContextProviderMixin(
 	render() {
 		return html`
 			<umb-editor-entity-layout alias="Umb.Editor.DataType">
-				<uui-input id="name" slot="name" .value=${this._dataTypeName} @input="${this._handleInput}"></uui-input>
+				<uui-input id="header" slot="header" .value=${this._dataTypeName} @input="${this._handleInput}"></uui-input>
 			</umb-editor-entity-layout>
 		`;
 	}

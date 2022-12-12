@@ -24,18 +24,6 @@ export class UmbSectionElement extends UmbContextConsumerMixin(UmbObserverMixin(
 				display: flex;
 			}
 
-			#header {
-				display: flex;
-				gap: 16px;
-				align-items: center;
-				min-height: 60px;
-			}
-
-			uui-tab-group {
-				--uui-tab-divider: var(--uui-color-border);
-				border-left: 1px solid var(--uui-color-border);
-				border-right: 1px solid var(--uui-color-border);
-			}
 			#router-slot {
 				overflow: auto;
 				height: 100%;

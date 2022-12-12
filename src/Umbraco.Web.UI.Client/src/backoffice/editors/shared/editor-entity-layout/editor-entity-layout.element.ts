@@ -38,27 +38,32 @@ export class UmbEditorEntityLayout extends UmbContextConsumerMixin(UmbObserverMi
 
 			#header {
 				display: flex;
-				gap: 16px;
 				align-items: center;
 				min-height: 60px;
 			}
 
-			#name {
+			#headline {
 				display: block;
 				flex: 1 1 auto;
+				margin: 0 var(--uui-size-layout-1);
+			}
+
+			#tabs {
+				margin-left: auto;
 			}
 
 			#footer {
 				display: flex;
 				height: 100%;
 				align-items: center;
-				gap: 16px;
 				flex: 1 1 auto;
 			}
 
 			#actions {
-				display: block;
+				display: flex;
 				margin-left: auto;
+				gap: 6px;
+				margin: 0 var(--uui-size-layout-1);
 			}
 
 			uui-input {
@@ -167,11 +172,11 @@ export class UmbEditorEntityLayout extends UmbContextConsumerMixin(UmbObserverMi
 		}
 	}
 
-	private _renderViews() {
+	private _renderTabs() {
 		return html`
 			${this._editorViews?.length > 0
 				? html`
-						<uui-tab-group slot="views">
+						<uui-tab-group id="tabs">
 							${this._editorViews.map(
 								(view: ManifestEditorView) => html`
 									<uui-tab
@@ -193,12 +198,12 @@ export class UmbEditorEntityLayout extends UmbContextConsumerMixin(UmbObserverMi
 		return html`
 			<umb-body-layout>
 				<div id="header" slot="header">
-					<slot id="icon" name="icon"></slot>
-					<div id="name">
-						${this.headline ? html`<h3>${this.headline}</h3>` : nothing}
-						<slot id="name" name="name"></slot>
-					</div>
-					${this._renderViews()}
+
+					${this.headline ? html`<h3 id="headline">${this.headline}</h3>` : nothing}
+
+					<slot name="header"></slot>
+
+					${this._renderTabs()}
 				</div>
 
 				<router-slot .routes="${this._routes}"></router-slot>

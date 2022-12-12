@@ -31,11 +31,22 @@ export class UmbEditorContentElement extends UmbContextProviderMixin(
 				height: 100%;
 			}
 
-			#popover {
-				display: block;
+			#header {
+				margin: 0 var(--uui-size-layout-1);
+				flex:1 1 auto;
+			}
+			#name-input {
+				width: 100%;
+				height: 100%;/** I really don't know why this fixes the border colliding with variant-selector-toggle, but lets this solution for now */
 			}
 
-			#dropdown {
+			#variant-selector-toggle {
+				white-space: nowrap;
+			}
+			#variant-selector-popover {
+				display: block;
+			}
+			#variant-selector-dropdown {
 				overflow: hidden;
 				z-index: -1;
 				background-color: var(--uui-combobox-popover-background-color, var(--uui-color-surface));
@@ -47,8 +58,9 @@ export class UmbEditorContentElement extends UmbContextProviderMixin(
 				box-shadow: var(--uui-shadow-depth-3);
 			}
 
-			uui-input {
-				width: 100%;
+			#footer {
+				margin: 0 var(--uui-size-layout-1);
+				flex:1 1 auto;
 			}
 		`,
 	];
@@ -90,6 +102,7 @@ export class UmbEditorContentElement extends UmbContextProviderMixin(
 		}
 	};
 
+	// TODO: How do we ensure this is a change of this document and not nested documents? Should the event be stopped at this spot at avoid such.
 	private _setPropertyValue(alias: string, value: unknown) {
 		this._node?.data.forEach((data) => {
 			if (data.alias === alias) {
@@ -160,13 +173,13 @@ export class UmbEditorContentElement extends UmbContextProviderMixin(
 	render() {
 		return html`
 			<umb-editor-entity-layout alias=${this.alias}>
-				<div slot="name">
-					<uui-input .value=${this._node?.name} @input="${this._handleInput}">
+				<div id="header" slot="header">
+					<uui-input id="name-input" .value=${this._node?.name} @input="${this._handleInput}">
 						<!-- Implement Variant Selector -->
 						${this._node && this._node.variants.length > 0
 							? html`
 									<div slot="append">
-										<uui-button id="trigger" @click=${this._toggleVariantSelector}>
+										<uui-button id="variant-selector-toggle" @click=${this._toggleVariantSelector}>
 											English (United States)
 											<uui-caret></uui-caret>
 										</uui-button>
@@ -176,11 +189,12 @@ export class UmbEditorContentElement extends UmbContextProviderMixin(
 					</uui-input>
 
 					<!-- Implement Variant Selector -->
+					<!-- TODO: Refactor Variant Selector into its own component -->
 					${this._node && this._node.variants.length > 0
 						? html`
-								<uui-popover id="popover" .open=${this._variantSelectorIsOpen} @close=${this._close}>
-									<div id="dropdown" slot="popover">
-										<uui-scroll-container id="scroll-container">
+								<uui-popover id="variant-selector-popover" .open=${this._variantSelectorIsOpen} @close=${this._close}>
+									<div id="variant-selector-dropdown" slot="popover">
+										<uui-scroll-container>
 											<ul>
 												<li>Implement variants</li>
 											</ul>
@@ -191,17 +205,16 @@ export class UmbEditorContentElement extends UmbContextProviderMixin(
 						: nothing}
 				</div>
 
-				<div slot="footer">Breadcrumbs</div>
-
-				<div slot="actions">
-					<uui-button @click=${this._onSaveAndPreview} label="Save and preview"></uui-button>
-					<uui-button @click=${this._onSave} look="secondary" label="Save"></uui-button>
-					<uui-button
-						@click=${this._onSaveAndPublish}
-						look="primary"
-						color="positive"
-						label="Save and publish"></uui-button>
-				</div>
+				<div id="footer" slot="footer">Breadcrumbs</div>
+				<!-- TODO: convert document editor actions to extensions: -->
+				<uui-button slot="actions" @click=${this._onSaveAndPreview} label="Save and preview"></uui-button>
+				<uui-button slot="actions" @click=${this._onSave} look="secondary" label="Save"></uui-button>
+				<uui-button
+					slot="actions" 
+					@click=${this._onSaveAndPublish}
+					look="primary"
+					color="positive"
+					label="Save and publish"></uui-button>
 			</umb-editor-entity-layout>
 		`;
 	}
