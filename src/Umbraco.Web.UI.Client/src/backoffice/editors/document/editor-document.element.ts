@@ -3,11 +3,13 @@ import { css, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import type { ManifestEditorView, ManifestWithLoader } from '@umbraco-cms/models';
+import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 
 import '../shared/editor-content/editor-node.element';
+import { UmbDocumentStore } from 'src/core/stores/document/document.store';
 
 @customElement('umb-editor-document')
-export class UmbEditorDocumentElement extends LitElement {
+export class UmbEditorDocumentElement extends UmbContextConsumerMixin(UmbContextProviderMixin(LitElement)) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -26,6 +28,10 @@ export class UmbEditorDocumentElement extends LitElement {
 		super();
 
 		this._registerEditorViews();
+
+		this.consumeContext('umbDocumentStore', (documentStore: UmbDocumentStore) => {
+			this.provideContext('umbNodeStore', documentStore);
+		});
 	}
 
 	private _registerEditorViews() {

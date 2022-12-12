@@ -1,6 +1,7 @@
 import { UmbData } from './data';
 import { DocumentTreeItem, PagedDocumentTreeItem } from '@umbraco-cms/backend-api';
 import type { DocumentDetails } from '@umbraco-cms/models';
+import { UmbEntityData } from './entity.data';
 
 export const data: Array<DocumentDetails> = [
 	{
@@ -180,7 +181,7 @@ export const data: Array<DocumentDetails> = [
 ];
 
 // Temp mocked database
-class UmbDocumentData extends UmbData<DocumentDetails> {
+class UmbDocumentData extends UmbEntityData<DocumentDetails> {
 	constructor() {
 		super(data);
 	}

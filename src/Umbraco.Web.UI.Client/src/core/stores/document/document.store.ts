@@ -10,6 +10,59 @@ import { ApiError, DocumentResource, DocumentTreeItem, FolderTreeItem, ProblemDe
  * @description - Data Store for Documents
  */
 export class UmbDocumentStore extends UmbDataStoreBase<DocumentDetails | DocumentTreeItem> {
+	getByKey(key: string): Observable<DocumentDetails | null> {
+		// fetch from server and update store
+		fetch(`/umbraco/management/api/v1/document/details/${key}`)
+			.then((res) => res.json())
+			.then((data) => {
+				this.update(data);
+			});
+
+		return this.items.pipe(map((documents) => documents.find((document) => document.key === key) || null));
+	}
+
+	async trash(keys: Array<string>) {
+		// fetch from server and update store
+		// TODO: Use node type to hit the right API, or have a general Node API?
+		const res = await fetch('/umbraco/backoffice/node/trash', {
+			method: 'POST',
+			body: JSON.stringify(keys),
+			headers: {
+				'Content-Type': 'application/json',
+			},
+		});
+		const data = await res.json();
+		this.update(data);
+		this._entityStore.update(data);
+	}
+
+	// TODO: make sure UI somehow can follow the status of this action.
+	save(data: DocumentDetails[]): Promise<void> {
+		// fetch from server and update store
+		// TODO: use Fetcher API.
+		let body: string;
+
+		try {
+			body = JSON.stringify(data);
+		} catch (error) {
+			console.error(error);
+			return Promise.reject();
+		}
+
+		// TODO: Use node type to hit the right API, or have a general Node API?
+		return fetch('/umbraco/backoffice/node/save', {
+			method: 'POST',
+			body: body,
+			headers: {
+				'Content-Type': 'application/json',
+			},
+		})
+			.then((res) => res.json())
+			.then((data: Array<DocumentDetails>) => {
+				this.update(data);
+			});
+	}
+
 	getTreeRoot(): Observable<Array<DocumentTreeItem>> {
 		DocumentResource.getTreeDocumentRoot({}).then(
 			(res) => {
