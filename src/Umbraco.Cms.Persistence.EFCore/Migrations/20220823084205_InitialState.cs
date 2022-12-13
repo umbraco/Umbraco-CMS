@@ -573,7 +573,7 @@ namespace Umbraco.Cms.Persistence.EFCore.Migrations
                     nodeId = table.Column<int>(type: "INTEGER", nullable: false),
                     propertyEditorAlias = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
                     dbType = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
-                    config = table.Column<string>(type: "ntext", nullable: true)
+                    config = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
