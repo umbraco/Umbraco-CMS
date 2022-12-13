@@ -104,7 +104,7 @@
 		"openapi-typescript-codegen": "^0.23.0",
 		"playwright-msw": "^2.0.2",
 		"plop": "^3.1.1",
-		"prettier": "2.8.0",
+		"prettier": "2.8.1",
 		"tiny-glob": "^0.2.9",
 		"typescript": "^4.9.3",
 		"vite": "^3.2.4",
