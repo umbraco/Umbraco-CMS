@@ -1,5 +1,4 @@
 import { BehaviorSubject, map, Observable } from 'rxjs';
-import { ManifestHeaderApp } from 'src/core/extensions-registry/header-app.models';
 import type {
 	ManifestTypes,
 	ManifestDashboard,
@@ -18,6 +17,7 @@ import type {
 	ManifestPackageView,
 } from '../../models';
 import { createExtensionElement } from '../create-extension-element.function';
+import { ManifestHeaderApp } from 'src/core/extensions-registry/header-app.models';
 
 export class UmbExtensionRegistry {
 	private _extensions = new BehaviorSubject<Array<ManifestTypes>>([]);
