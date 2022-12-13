@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -122,7 +123,10 @@ public class BackOfficeController : UmbracoController
         {
             if (_runtimeState.Level == RuntimeLevel.Upgrade)
             {
-                return RedirectToAction(nameof(AuthorizeUpgrade));
+                return RedirectToAction(nameof(AuthorizeUpgrade), routeValues: new RouteValueDictionary()
+                {
+                    ["redir"] = _globalSettings.GetBackOfficePath(_hostingEnvironment),
+                });
             }
             return Redirect("/");
         }
