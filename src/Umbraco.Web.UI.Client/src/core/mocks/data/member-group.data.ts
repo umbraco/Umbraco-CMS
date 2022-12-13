@@ -16,6 +16,9 @@ export const data: Array<MemberGroupDetails> = [
 ];
 
 // Temp mocked database
+// TODO: all properties are optional in the server schema. I don't think this is correct.
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 class UmbMemberGroupData extends UmbEntityData<MemberGroupDetails> {
 	constructor() {
 		super(data);
