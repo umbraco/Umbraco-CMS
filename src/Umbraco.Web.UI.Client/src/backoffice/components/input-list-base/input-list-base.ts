@@ -5,9 +5,9 @@ import { UmbPickerData } from '../../../core/services/modal/layouts/modal-layout
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
 //TODO: These should probably be imported dynamically.
-import '../input-section/picker-layout-section.element';
-import '../input-user-group/picker-layout-user-group.element';
-import '../input-user/picker-layout-user.element';
+import '../../../core/services/modal/layouts/picker-section/picker-layout-section.element';
+import '../../../core/services/modal/layouts/picker-user-group/picker-layout-user-group.element';
+import '../../../core/services/modal/layouts/picker-user/picker-layout-user.element';
 import { UmbModalService, UmbModalType } from '@umbraco-cms/services';
 
 /** TODO: Make use of UUI FORM Mixin, to make it easily take part of a form. */
