@@ -1,6 +1,3 @@
-// 20221213125804
-// https://localhost:44331/umbraco/swagger/v1/swagger.json
-
 {
   "openapi": "3.0.1",
   "info": {
@@ -2468,6 +2465,13 @@
         "operationId": "GetRedirectManagement",
         "parameters": [
           {
+            "name": "filter",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "skip",
             "in": "query",
             "schema": {
@@ -2567,32 +2571,12 @@
         }
       }
     },
-    "/umbraco/management/api/v1/redirect-management/enabled": {
-      "post": {
-        "tags": [
-          "Redirect Management"
-        ],
-        "operationId": "PostRedirectManagementEnabled",
-        "parameters": [
-          {
-            "name": "enabled",
-            "in": "query",
-            "schema": {
-              "type": "boolean"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success"
-          }
-        }
-      },
+    "/umbraco/management/api/v1/redirect-management/status": {
       "get": {
         "tags": [
           "Redirect Management"
         ],
-        "operationId": "GetRedirectManagementEnabled",
+        "operationId": "GetRedirectManagementStatus",
         "responses": {
           "200": {
             "description": "Success",
@@ -2605,49 +2589,24 @@
             }
           }
         }
-      }
-    },
-    "/umbraco/management/api/v1/redirect-management/query": {
-      "get": {
+      },
+      "post": {
         "tags": [
           "Redirect Management"
         ],
-        "operationId": "GetRedirectManagementQuery",
+        "operationId": "PostRedirectManagementStatus",
         "parameters": [
           {
-            "name": "query",
+            "name": "status",
             "in": "query",
             "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "skip",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          },
-          {
-            "name": "take",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
+              "$ref": "#/components/schemas/RedirectStatus"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedRedirectUrl"
-                }
-              }
-            }
+            "description": "Success"
           }
         }
       }
@@ -6346,6 +6305,14 @@
         },
         "additionalProperties": false
       },
+      "RedirectStatus": {
+        "enum": [
+          "Enabled",
+          "Disabled"
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
       "RedirectUrl": {
         "type": "object",
         "properties": {
@@ -6379,8 +6346,8 @@
       "RedirectUrlStatus": {
         "type": "object",
         "properties": {
-          "enabled": {
-            "type": "boolean"
+          "status": {
+            "$ref": "#/components/schemas/RedirectStatus"
           },
           "userIsAdmin": {
             "type": "boolean"
