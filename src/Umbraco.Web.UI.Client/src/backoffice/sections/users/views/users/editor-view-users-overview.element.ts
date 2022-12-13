@@ -180,6 +180,7 @@ export class UmbEditorViewUsersOverviewElement extends UmbContextConsumerMixin(U
 						look="outline"></uui-button>
 					<uui-input @input=${this._updateSearch} label="search" id="input-search"></uui-input>
 					<div>
+						<!-- TODO: consider making this a shared component, as we need similar for other locations, example media library, members. -->
 						<uui-popover margin="8">
 							<uui-button @click=${this._handleTogglePopover} slot="trigger" label="status">
 								Status: <b>All</b>
@@ -218,11 +219,11 @@ export class UmbEditorViewUsersOverviewElement extends UmbContextConsumerMixin(U
 						</uui-button>
 					</div>
 				</div>
-
-				${this._renderSelection()}
 			</div>
 
 			<router-slot .routes=${this._routes}></router-slot>
+
+			${this._renderSelection()}
 		`;
 	}
 }
