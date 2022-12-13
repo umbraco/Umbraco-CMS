@@ -4,15 +4,15 @@ using Umbraco.Cms.Api.Management.ViewModels.RedirectUrlManagement;
 
 namespace Umbraco.Cms.Api.Management.Controllers.RedirectUrlManagement;
 
-public class GetEnabledController : RedirectUrlManagementBaseController
+public class GetEnabledRedirectUrlManagementController : RedirectUrlManagementBaseController
 {
     private readonly IRedirectUrlStatusViewModelFactory _redirectUrlStatusViewModelFactory;
 
-    public GetEnabledController(
+    public GetEnabledRedirectUrlManagementController(
         IRedirectUrlStatusViewModelFactory redirectUrlStatusViewModelFactory) =>
         _redirectUrlStatusViewModelFactory = redirectUrlStatusViewModelFactory;
 
-    [HttpGet("status")]
+    [HttpGet("enabled")]
     [ProducesResponseType(typeof(RedirectUrlStatusViewModel), 200)]
     public Task<ActionResult<RedirectUrlStatusViewModel>> GetStatus() =>
         Task.FromResult<ActionResult<RedirectUrlStatusViewModel>>(_redirectUrlStatusViewModelFactory.CreateViewModel());
