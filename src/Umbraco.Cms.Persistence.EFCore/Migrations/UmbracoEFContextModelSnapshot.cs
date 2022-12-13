@@ -1190,7 +1190,7 @@ namespace Umbraco.Cms.Persistence.EFCore.Migrations
                         .HasColumnName("nodeId");
 
                     b.Property<string>("Config")
-                        .HasColumnType("ntext")
+                        .HasColumnType("TEXT")
                         .HasColumnName("config");
 
                     b.Property<string>("DbType")
