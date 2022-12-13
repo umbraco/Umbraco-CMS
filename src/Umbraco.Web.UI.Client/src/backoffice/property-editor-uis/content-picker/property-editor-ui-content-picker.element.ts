@@ -8,6 +8,7 @@ import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { UmbDocumentStore } from 'src/core/stores/document/document.store';
 import { FolderTreeItem } from '@umbraco-cms/backend-api';
 
+// TODO: rename to Document Picker
 @customElement('umb-property-editor-ui-content-picker')
 export class UmbPropertyEditorUIContentPickerElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles = [
