@@ -6,7 +6,7 @@ export interface UmbPickerData<selectType = string> {
 	selection: Array<selectType>;
 }
 
-export class UmbPickerLayoutBase<selectType = string> extends UmbModalLayoutElement<UmbPickerData<selectType>> {
+export class UmbModalLayoutPickerBase<selectType = string> extends UmbModalLayoutElement<UmbPickerData<selectType>> {
 	
 	@state()
 	private _selection: Array<selectType> = [];
@@ -30,10 +30,11 @@ export class UmbPickerLayoutBase<selectType = string> extends UmbModalLayoutElem
 		}
 	}
 
+	/* TODO: Write test for this select/deselect method. */
 	protected _handleItemClick(key: selectType) {
 		if (this.data?.multiple) {
 			if (this._isSelected(key)) {
-				this._selection = this._selection.filter((key) => key !== key);
+				this._selection = this._selection.filter((selectedKey) => selectedKey !== key);
 			} else {
 				this._selection.push(key);
 			}
