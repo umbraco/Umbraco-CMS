@@ -30,7 +30,7 @@ export class UmbBackofficeHeaderTools extends LitElement {
 				alias: 'Umb.HeaderApp.Search',
 				name: 'Header App Search',
 				loader: () => import('./backoffice-header-app-button.element'),
-				weight: 99,
+				weight: 10,
 				meta: {
 					label: 'Search',
 					icon: 'search',
