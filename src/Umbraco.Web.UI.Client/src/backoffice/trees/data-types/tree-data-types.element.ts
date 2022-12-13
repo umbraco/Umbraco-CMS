@@ -15,6 +15,7 @@ export class UmbTreeDataTypesElement extends UmbContextProviderMixin(UmbContextC
 
 		this._registerTreeItemActions();
 
+		// TODO: how do we best expose the tree api to the tree navigator element?
 		this.consumeContext('umbDataTypeStore', (dataTypeStore: UmbDataTypesStore) => {
 			this.provideContext('umbTreeStore', dataTypeStore);
 		});

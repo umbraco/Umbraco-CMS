@@ -11,6 +11,7 @@ export class UmbTreeMediaElement extends UmbContextProviderMixin(UmbContextConsu
 	constructor() {
 		super();
 
+		// TODO: how do we best expose the tree api to the tree navigator element?
 		this.consumeContext('umbMediaStore', (store: UmbMediaStore) => {
 			this.provideContext('umbTreeStore', store);
 		});

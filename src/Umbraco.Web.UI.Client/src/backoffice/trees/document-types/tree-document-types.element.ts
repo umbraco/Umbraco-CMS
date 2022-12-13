@@ -11,6 +11,7 @@ export class UmbTreeDocumentTypes extends UmbContextConsumerMixin(UmbContextProv
 	constructor() {
 		super();
 
+		// TODO: how do we best expose the tree api to the tree navigator element?
 		this.consumeContext('umbDocumentTypeStore', (store: UmbDocumentTypeStore) => {
 			this.provideContext('umbTreeStore', store);
 		});

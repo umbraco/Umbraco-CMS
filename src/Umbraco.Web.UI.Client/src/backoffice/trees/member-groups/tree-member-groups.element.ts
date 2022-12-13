@@ -10,6 +10,7 @@ export class UmbTreeMemberGroups extends UmbContextProviderMixin(UmbContextConsu
 	constructor() {
 		super();
 
+		// TODO: how do we best expose the tree api to the tree navigator element?
 		this.consumeContext('umbMemberGroupStore', (store: UmbMemberGroupStore) => {
 			this.provideContext('umbTreeStore', store);
 		});

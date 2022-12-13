@@ -14,6 +14,7 @@ export class UmbTreeDocumentsElement extends UmbContextProviderMixin(UmbContextC
 
 		this._registerTreeItemActions();
 
+		// TODO: how do we best expose the tree api to the tree navigator element?
 		this.consumeContext('umbDocumentStore', (store: UmbDocumentStore) => {
 			this.provideContext('umbTreeStore', store);
 		});
