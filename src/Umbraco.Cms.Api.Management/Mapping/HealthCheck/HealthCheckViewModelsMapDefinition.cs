@@ -5,10 +5,11 @@ using Umbraco.Cms.Core.Mapping;
 
 namespace Umbraco.Cms.Api.Management.Mapping.HealthCheck;
 
-public class HealthCheckGroupViewModelsMapDefinition : IMapDefinition
+public class HealthCheckViewModelsMapDefinition : IMapDefinition
 {
     public void DefineMaps(IUmbracoMapper mapper)
     {
+        mapper.Define<HealthCheckActionViewModel, HealthCheckAction>((source, context) => new HealthCheckAction(), Map);
         mapper.Define<HealthCheckAction, HealthCheckActionViewModel>((source, context) => new HealthCheckActionViewModel() { ValueRequired = false }, Map);
         mapper.Define<HealthCheckStatus, HealthCheckResultViewModel>((source, context) => new HealthCheckResultViewModel() { Message = string.Empty }, Map);
         mapper.Define<Core.HealthChecks.HealthCheck, HealthCheckViewModel>((source, context) => new HealthCheckViewModel() { Name = string.Empty }, Map);
@@ -16,10 +17,27 @@ public class HealthCheckGroupViewModelsMapDefinition : IMapDefinition
         mapper.Define<IEnumerable<IGrouping<string?, Core.HealthChecks.HealthCheck>>, PagedViewModel<HealthCheckGroupViewModel>>((source, context) => new PagedViewModel<HealthCheckGroupViewModel>(), Map);
     }
 
+    // Umbraco.Code.MapAll -ActionParameters
+    private static void Map(HealthCheckActionViewModel source, HealthCheckAction target, MapperContext context)
+    {
+        target.Alias = source.Alias;
+        target.HealthCheckId = source.Key;
+        target.Name = source.Name;
+        target.Description = source.Description;
+        target.ValueRequired = source.ValueRequired;
+        target.ProvidedValueValidation = source.ProvidedValueValidation;
+        target.ProvidedValueValidationRegex = source.ProvidedValueValidationRegex;
+        target.ProvidedValue = source.ProvidedValue;
+    }
+
     // Umbraco.Code.MapAll
     private static void Map(HealthCheckAction source, HealthCheckActionViewModel target, MapperContext context)
     {
-        target.Key = source.HealthCheckId;
+        if (source.HealthCheckId is not null)
+        {
+            target.Key = (Guid)source.HealthCheckId;
+        }
+
         target.Alias = source.Alias;
         target.Name = source.Name;
         target.Description = source.Description;

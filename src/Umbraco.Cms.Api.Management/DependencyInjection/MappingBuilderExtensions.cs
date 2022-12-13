@@ -23,7 +23,7 @@ public static class MappingBuilderExtensions
             .Add<LanguageViewModelsMapDefinition>()
             .Add<InstallerViewModelsMapDefinition>()
             .Add<CultureViewModelMapDefinition>()
-            .Add<HealthCheckGroupViewModelsMapDefinition>();
+            .Add<HealthCheckViewModelsMapDefinition>();
 
         return builder;
     }
