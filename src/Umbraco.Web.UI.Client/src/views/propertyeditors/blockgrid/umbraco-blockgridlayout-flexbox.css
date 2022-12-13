@@ -22,6 +22,9 @@
 }
 .umb-block-grid__area {
     position: relative;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
     --umb-block-grid__area-calc: calc(var(--umb-block-grid--area-column-span) / var(--umb-block-grid--area-grid-columns, 1));
     width: calc(var(--umb-block-grid__area-calc) * 100% - (1 - var(--umb-block-grid__area-calc)) * var(--umb-block-grid--areas-column-gap, 0px));
 }
