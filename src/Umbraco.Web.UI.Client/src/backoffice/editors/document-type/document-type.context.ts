@@ -1,5 +1,5 @@
 import { BehaviorSubject, Observable } from 'rxjs';
-import { DocumentTypeDetails } from '../../../core/mocks/data/document-type.data';
+import type { DocumentTypeDetails } from '@umbraco-cms/models';
 
 export class UmbDocumentTypeContext {
 	// TODO: figure out how fine grained we want to make our observables.

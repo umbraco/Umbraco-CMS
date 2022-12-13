@@ -19,7 +19,7 @@ export const handlers = [
 		const keys = req.url.searchParams.getAll('key');
 		if (!keys) return;
 
-		const items = umbDocumentData.getTreeItems(keys);
+		const items = umbDocumentData.getTreeItem(keys);
 
 		return res(ctx.status(200), ctx.json(items));
 	}),
