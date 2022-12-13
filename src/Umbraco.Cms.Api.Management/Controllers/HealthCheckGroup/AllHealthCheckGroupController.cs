@@ -6,7 +6,7 @@ using Umbraco.Cms.Api.Management.ViewModels.HealthCheck;
 using Umbraco.Cms.Core.HealthChecks;
 using Umbraco.Cms.Core.Mapping;
 
-namespace Umbraco.Cms.Api.Management.Controllers.HealthCheck;
+namespace Umbraco.Cms.Api.Management.Controllers.HealthCheckGroup;
 
 public class AllHealthCheckGroupController : HealthCheckGroupControllerBase
 {

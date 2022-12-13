@@ -5,7 +5,7 @@ using Umbraco.Cms.Api.Management.ViewModels.HealthCheck;
 using Umbraco.Cms.Core.HealthChecks;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Api.Management.Controllers.HealthCheck;
+namespace Umbraco.Cms.Api.Management.Controllers.HealthCheckGroup;
 
 public class ByNameWithResultHealthCheckGroupController : HealthCheckGroupControllerBase
 {
