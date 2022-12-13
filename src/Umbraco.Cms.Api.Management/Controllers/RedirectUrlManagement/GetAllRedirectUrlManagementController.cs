@@ -24,16 +24,19 @@ public class GetAllRedirectUrlManagementController : RedirectUrlManagementBaseCo
 
     [HttpGet]
     [ProducesResponseType(typeof(PagedViewModel<RedirectUrlViewModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<RedirectUrlViewModel>>> GetAll(int skip, int take)
+    public async Task<ActionResult<PagedViewModel<RedirectUrlViewModel>>> GetAll(string? filter, int skip, int take)
     {
         if (PaginationService.ConvertSkipTakeToPaging(skip, take, out long pageNumber, out int pageSize, out ProblemDetails? error) is false)
         {
             return BadRequest(error);
         }
 
-        IEnumerable<IRedirectUrl> redirects = _redirectUrlService.GetAllRedirectUrls(pageNumber, pageSize, out long total);
-        IEnumerable<RedirectUrlViewModel> redirectViewModels = _redirectUrlViewModelFactory.CreateMany(redirects);
+        long total;
+        IEnumerable<IRedirectUrl> redirects = filter is null
+            ? _redirectUrlService.GetAllRedirectUrls(pageNumber, pageSize, out total)
+            : _redirectUrlService.SearchRedirectUrls(filter, pageNumber, pageSize, out total);
 
+        IEnumerable<RedirectUrlViewModel> redirectViewModels = _redirectUrlViewModelFactory.CreateMany(redirects);
         return new PagedViewModel<RedirectUrlViewModel> { Items = redirectViewModels, Total = total };
     }
 }
