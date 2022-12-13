@@ -11,6 +11,7 @@ export interface UmbModalContentPickerData {
 import '../../../../../backoffice/trees/documents/tree-documents.element';
 import { UmbTreeElement } from '../../../../../backoffice/trees/shared/tree.element';
 
+// TODO: make use of UmbPickerLayoutBase
 @customElement('umb-modal-layout-content-picker')
 export class UmbModalLayoutContentPickerElement extends UmbModalLayoutElement<UmbModalContentPickerData> {
 	static styles = [

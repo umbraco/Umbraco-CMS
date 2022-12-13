@@ -1,21 +1,18 @@
 import { html, LitElement } from 'lit';
 import { property } from 'lit/decorators.js';
 import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
-// import { UmbModalService, UmbModalType } from '../../../core/services/modal';
+import { UmbPickerData } from '../../../core/services/modal/layouts/modal-layout-picker-base';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
 //TODO: These should probably be imported dynamically.
-import './picker-layout-section.element';
-import './picker-layout-user-group.element';
-import './picker-layout-user.element';
+import '../input-section/picker-layout-section.element';
+import '../input-user-group/picker-layout-user-group.element';
+import '../input-user/picker-layout-user.element';
 import { UmbModalService, UmbModalType } from '@umbraco-cms/services';
 
-export interface UmbPickerData {
-	multiple: boolean;
-	selection: Array<string>;
-}
+/** TODO: Make use of UUI FORM Mixin, to make it easily take part of a form. */
+export class UmbInputListBase extends UmbContextConsumerMixin(LitElement) {
 
-export class UmbPicker extends UmbContextConsumerMixin(LitElement) {
 	@property({ type: Array })
 	public value: Array<string> = [];
 
@@ -23,10 +20,10 @@ export class UmbPicker extends UmbContextConsumerMixin(LitElement) {
 	public multiple = true;
 
 	@property({ type: String })
-	public type: UmbModalType = 'sidebar';
+	public modalType: UmbModalType = 'sidebar';
 
 	@property({ type: String })
-	public size: UUIModalSidebarSize = 'small';
+	public modalSize: UUIModalSidebarSize = 'small';
 
 	protected pickerLayout?: string;
 	private _modalService?: UmbModalService;
@@ -42,14 +39,14 @@ export class UmbPicker extends UmbContextConsumerMixin(LitElement) {
 		if (!this.pickerLayout) return;
 
 		const modalHandler = this._modalService?.open(this.pickerLayout, {
-			type: this.type,
-			size: this.size,
+			type: this.modalType,
+			size: this.modalSize,
 			data: {
 				multiple: this.multiple,
 				selection: this.value,
 			},
 		});
-		modalHandler?.onClose().then((data: UmbPickerData) => {
+		modalHandler?.onClose().then((data: UmbPickerData<string>) => {
 			if (data) {
 				this.value = data.selection;
 				this.selectionUpdated();

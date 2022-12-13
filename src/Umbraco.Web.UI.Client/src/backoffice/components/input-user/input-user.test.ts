@@ -6,7 +6,7 @@ import { expect, fixture, html } from '@open-wc/testing';
 // describe('UmbPickerUserElement', () => {
 // 	let element: UmbPickerUserElement;
 // 	beforeEach(async () => {
-// 		element = await fixture(html`<umb-picker-user></umb-picker-user>`);
+// 		element = await fixture(html`<umb-input-user></umb-input-user>`);
 // 	});
 
 // 	it('is defined with its own instance', () => {

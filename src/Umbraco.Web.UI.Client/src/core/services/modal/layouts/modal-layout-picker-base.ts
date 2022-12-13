@@ -1,10 +1,15 @@
 import { state } from 'lit/decorators.js';
-import { UmbPickerData } from './picker';
 import { UmbModalLayoutElement } from '@umbraco-cms/services';
 
-export class UmbPickerLayout extends UmbModalLayoutElement<UmbPickerData> {
+export interface UmbPickerData<selectType = string> {
+	multiple: boolean;
+	selection: Array<selectType>;
+}
+
+export class UmbPickerLayoutBase<selectType> extends UmbModalLayoutElement<UmbPickerData<selectType>> {
+	
 	@state()
-	private _selection: Array<string> = [];
+	private _selection: Array<selectType> = [];
 
 	connectedCallback(): void {
 		super.connectedCallback();
@@ -19,27 +24,27 @@ export class UmbPickerLayout extends UmbModalLayoutElement<UmbPickerData> {
 		this.modalHandler?.close();
 	}
 
-	protected _handleKeydown(e: KeyboardEvent, key: string) {
+	protected _handleKeydown(e: KeyboardEvent, key: selectType) {
 		if (e.key === 'Enter') {
 			this._handleItemClick(key);
 		}
 	}
 
-	protected _handleItemClick(clickedKey: string) {
+	protected _handleItemClick(key: selectType) {
 		if (this.data?.multiple) {
-			if (this._isSelected(clickedKey)) {
-				this._selection = this._selection.filter((key) => key !== clickedKey);
+			if (this._isSelected(key)) {
+				this._selection = this._selection.filter((key) => key !== key);
 			} else {
-				this._selection.push(clickedKey);
+				this._selection.push(key);
 			}
 		} else {
-			this._selection = [clickedKey];
+			this._selection = [key];
 		}
 
 		this.requestUpdate('_selection');
 	}
 
-	protected _isSelected(key: string): boolean {
+	protected _isSelected(key: selectType): boolean {
 		return this._selection.includes(key);
 	}
 }

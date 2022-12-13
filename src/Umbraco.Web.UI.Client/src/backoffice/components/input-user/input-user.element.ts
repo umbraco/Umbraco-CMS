@@ -1,13 +1,13 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing, PropertyValueMap } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbPicker } from './picker';
+import { UmbInputListBase } from '../input-list-base';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import type { UserEntity } from '@umbraco-cms/models';
 import { UmbUserStore } from '@umbraco-cms/stores/user/user.store';
 
-@customElement('umb-picker-user')
-export class UmbPickerUserElement extends UmbObserverMixin(UmbPicker) {
+@customElement('umb-input-user')
+export class UmbPickerUserElement extends UmbObserverMixin(UmbInputListBase) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -89,6 +89,6 @@ export class UmbPickerUserElement extends UmbObserverMixin(UmbPicker) {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-picker-user': UmbPickerUserElement;
+		'umb-input-user': UmbPickerUserElement;
 	}
 }

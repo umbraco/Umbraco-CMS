@@ -8,6 +8,7 @@ export interface UmbModalIconPickerData {
 	selection: string[];
 }
 
+// TODO: Make use of UmbPickerLayoutBase
 @customElement('umb-modal-layout-icon-picker')
 export class UmbModalLayoutIconPickerElement extends UmbModalLayoutElement<UmbModalIconPickerData> {
 	static styles = [

@@ -1,21 +1,20 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbPickerLayout } from './picker-layout';
-import type { UserDetails } from '@umbraco-cms/models';
+import { UmbPickerLayoutBase } from '../../../core/services/modal/layouts/modal-layout-picker-base';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import { UmbUserStore } from '@umbraco-cms/stores/user/user.store';
+import type { UserGroupDetails } from '@umbraco-cms/models';
+import { UmbUserGroupStore } from '@umbraco-cms/stores/user/user-group.store';
 
-@customElement('umb-picker-layout-user')
-export class UmbPickerLayoutUserElement extends UmbContextConsumerMixin(UmbObserverMixin(UmbPickerLayout)) {
+@customElement('umb-picker-layout-user-group')
+export class UmbPickerLayoutUserGroupElement extends UmbContextConsumerMixin(UmbObserverMixin(UmbPickerLayoutBase)) {
 	static styles = [
 		UUITextStyles,
 		css`
 			uui-input {
 				width: 100%;
 			}
-
 			hr {
 				border: none;
 				border-bottom: 1px solid var(--uui-color-divider);
@@ -25,17 +24,16 @@ export class UmbPickerLayoutUserElement extends UmbContextConsumerMixin(UmbObser
 				display: flex;
 				flex-direction: column;
 				gap: var(--uui-size-1);
-				font-size: 1rem;
 			}
 			.item {
 				color: var(--uui-color-interactive);
-				display: flex;
-				align-items: center;
-				padding: var(--uui-size-2);
+				display: grid;
+				grid-template-columns: var(--uui-size-8) 1fr;
+				padding: var(--uui-size-4) var(--uui-size-2);
 				gap: var(--uui-size-space-5);
-				cursor: pointer;
-				position: relative;
+				align-items: center;
 				border-radius: var(--uui-size-2);
+				cursor: pointer;
 			}
 			.item.selected {
 				background-color: var(--uui-color-selected);
@@ -48,50 +46,50 @@ export class UmbPickerLayoutUserElement extends UmbContextConsumerMixin(UmbObser
 			.item.selected:hover {
 				background-color: var(--uui-color-selected-emphasis);
 			}
-			.item:hover uui-avatar {
-				border-color: var(--uui-color-surface-emphasis);
-			}
-			.item.selected uui-avatar {
-				border-color: var(--uui-color-selected-contrast);
-			}
-			uui-avatar {
-				border: 2px solid var(--uui-color-surface);
+			.item uui-icon {
+				width: 100%;
+				box-sizing: border-box;
+				display: flex;
+				height: fit-content;
 			}
 		`,
 	];
 
 	@state()
-	private _users: Array<UserDetails> = [];
+	private _userGroups: Array<UserGroupDetails> = [];
 
-	private _userStore?: UmbUserStore;
+	private _userGroupStore?: UmbUserGroupStore;
 
 	connectedCallback(): void {
 		super.connectedCallback();
-		this.consumeContext('umbUserStore', (userStore: UmbUserStore) => {
-			this._userStore = userStore;
-			this._observeUsers();
+		this.consumeContext('umbUserGroupStore', (userGroupStore: UmbUserGroupStore) => {
+			this._userGroupStore = userGroupStore;
+			this._observeUserGroups();
 		});
 	}
 
-	private _observeUsers() {
-		if (!this._userStore) return;
-		this.observe<Array<UserDetails>>(this._userStore.getAll(), (users) => (this._users = users));
+	private _observeUserGroups() {
+		if (!this._userGroupStore) return;
+		this.observe<Array<UserGroupDetails>>(
+			this._userGroupStore.getAll(),
+			(userGroups) => (this._userGroups = userGroups)
+		);
 	}
 
 	render() {
 		return html`
-			<umb-editor-entity-layout headline="Select users">
+			<umb-editor-entity-layout headline="Select user groups">
 				<uui-box>
 					<uui-input label="search"></uui-input>
 					<hr />
 					<div id="item-list">
-						${this._users.map(
+						${this._userGroups.map(
 							(item) => html`
 								<div
 									@click=${() => this._handleItemClick(item.key)}
 									@keydown=${(e: KeyboardEvent) => this._handleKeydown(e, item.key)}
 									class=${this._isSelected(item.key) ? 'item selected' : 'item'}>
-									<uui-avatar .name=${item.name}></uui-avatar>
+									<uui-icon .name=${item.icon}></uui-icon>
 									<span>${item.name}</span>
 								</div>
 							`
@@ -109,6 +107,6 @@ export class UmbPickerLayoutUserElement extends UmbContextConsumerMixin(UmbObser
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-picker-layout-user': UmbPickerLayoutUserElement;
+		'umb-picker-layout-user-group': UmbPickerLayoutUserGroupElement;
 	}
 }

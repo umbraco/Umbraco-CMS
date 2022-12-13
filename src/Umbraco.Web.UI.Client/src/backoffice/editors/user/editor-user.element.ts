@@ -5,17 +5,17 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { repeat } from 'lit/directives/repeat.js';
 
+import { UmbUserStore } from '@umbraco-cms/stores/user';
 import { getTagLookAndColor } from '../../sections/users/user-extensions';
 import { UmbUserContext } from './user.context';
 
-import { UmbUserStore } from '@umbraco-cms/stores/user';
 import { UmbContextProviderMixin, UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import type { ManifestEditorAction, ManifestWithLoader, UserDetails } from '@umbraco-cms/models';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 
 import '../../property-editor-uis/content-picker/property-editor-ui-content-picker.element';
-import '@umbraco-cms/sections/users/picker-user-group.element';
+import '@umbraco-cms/components/input-user-group/input-user-group.element';
 
 
 @customElement('umb-editor-user')
@@ -226,10 +226,10 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(
 				<div slot="headline">Assign access</div>
 				<div id="assign-access">
 					<umb-editor-property-layout label="Groups" description="Add groups to assign access and permissions">
-						<umb-picker-user-group
+						<umb-input-user-group
 							slot="editor"
 							.value=${this._user.userGroups}
-							@change=${(e: any) => this._updateProperty('userGroups', e.target.value)}></umb-picker-user-group>
+							@change=${(e: any) => this._updateProperty('userGroups', e.target.value)}></umb-input-user-group>
 					</umb-editor-property-layout>
 					<umb-editor-property-layout
 						label="Content start node"
