@@ -6,6 +6,10 @@ class UmbUserGroupsData extends UmbEntityData<UserGroupDetails> {
 	constructor(data: Array<UserGroupDetails>) {
 		super(data);
 	}
+
+	getAll() {
+		return this.data;
+	}
 }
 
 export const data: Array<UserGroupDetails> = [

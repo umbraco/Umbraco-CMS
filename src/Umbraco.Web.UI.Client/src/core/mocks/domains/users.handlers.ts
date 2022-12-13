@@ -6,7 +6,7 @@ import type { UserDetails } from '@umbraco-cms/models';
 // TODO: add schema
 export const handlers = [
 	rest.get('/umbraco/backoffice/users/list/items', (req, res, ctx) => {
-		const items = umbUsersData.getItems('user');
+		const items = umbUsersData.getAll();
 
 		const response = {
 			total: items.length,

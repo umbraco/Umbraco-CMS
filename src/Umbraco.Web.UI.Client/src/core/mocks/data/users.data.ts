@@ -7,6 +7,10 @@ class UmbUsersData extends UmbEntityData<UserDetails> {
 		super(data);
 	}
 
+	getAll() {
+		return this.data;
+	}
+
 	updateUserGroup(keys: string[], userGroup: string) {
 		this.data.forEach((user) => {
 			if (keys.includes(user.key)) {
