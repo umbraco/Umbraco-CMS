@@ -5,16 +5,15 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { EMPTY, of, switchMap } from 'rxjs';
 
 import { UmbDataTypesStore } from '../../../core/stores/data-types/data-types.store';
-import { NodeProperty } from '../../../core/mocks/data/node.data';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import type { ManifestTypes } from '@umbraco-cms/models';
+import type { ContentProperty, ManifestTypes } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
 import '../entity-property/entity-property.element';
 
-@customElement('umb-node-property')
-export class UmbNodePropertyElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+@customElement('umb-content-property')
+export class UmbContentPropertyElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -24,12 +23,12 @@ export class UmbNodePropertyElement extends UmbContextConsumerMixin(UmbObserverM
 		`,
 	];
 
-	private _property?: NodeProperty;
+	private _property?: ContentProperty;
 	@property({ type: Object, attribute: false })
-	public get property(): NodeProperty | undefined {
+	public get property(): ContentProperty | undefined {
 		return this._property;
 	}
-	public set property(value: NodeProperty | undefined) {
+	public set property(value: ContentProperty | undefined) {
 		this._property = value;
 		this._observeDataType();
 	}
@@ -86,6 +85,6 @@ export class UmbNodePropertyElement extends UmbContextConsumerMixin(UmbObserverM
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-node-property': UmbNodePropertyElement;
+		'umb-content-property': UmbContentPropertyElement;
 	}
 }

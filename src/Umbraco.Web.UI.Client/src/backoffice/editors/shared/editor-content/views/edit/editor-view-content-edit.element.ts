@@ -7,7 +7,7 @@ import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import type { ContentProperty, ContentPropertyData, DocumentDetails, MediaDetails } from '@umbraco-cms/models';
 
-import '../../../../../components/node-property/node-property.element';
+import '../../../../../components/content-property/content-property.element';
 
 @customElement('umb-editor-view-content-edit')
 export class UmbEditorViewContentEditElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
@@ -52,9 +52,9 @@ export class UmbEditorViewContentEditElement extends UmbContextConsumerMixin(Umb
 			<uui-box>
 				${this._properties.map(
 					(property: ContentProperty) => html`
-						<umb-node-property
+						<umb-content-property
 							.property=${property}
-							.value=${this._data.find((data) => data.alias === property.alias)?.value}></umb-node-property>
+							.value=${this._data.find((data) => data.alias === property.alias)?.value}></umb-content-property>
 					`
 				)}
 			</uui-box>
