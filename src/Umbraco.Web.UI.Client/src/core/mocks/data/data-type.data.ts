@@ -1,4 +1,5 @@
 import { UmbEntityData } from './entity.data';
+import { createFolderTreeItem } from './utils';
 import { FolderTreeItem } from '@umbraco-cms/backend-api';
 import type { DataTypeDetails } from '@umbraco-cms/models';
 
@@ -96,15 +97,18 @@ class UmbDataTypeData extends UmbEntityData<DataTypeDetails> {
 	}
 
 	getTreeRoot(): Array<FolderTreeItem> {
-		return this.data.filter((item) => item.parentKey === null);
+		const rootItems = this.data.filter((item) => item.parentKey === null);
+		return rootItems.map((item) => createFolderTreeItem(item));
 	}
 
 	getTreeItemChildren(key: string): Array<FolderTreeItem> {
-		return this.data.filter((item) => item.parentKey === key);
+		const childItems = this.data.filter((item) => item.parentKey === key);
+		return childItems.map((item) => createFolderTreeItem(item));
 	}
 
 	getTreeItem(keys: Array<string>): Array<FolderTreeItem> {
-		return this.data.filter((item) => keys.includes(item.key ?? ''));
+		const items = this.data.filter((item) => keys.includes(item.key ?? ''));
+		return items.map((item) => createFolderTreeItem(item));
 	}
 }
 

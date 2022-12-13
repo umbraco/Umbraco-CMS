@@ -177,7 +177,7 @@ export class UmbEditorContentElement extends UmbContextProviderMixin(
 				<div id="header" slot="header">
 					<uui-input id="name-input" .value=${this._content?.name} @input="${this._handleInput}">
 						<!-- Implement Variant Selector -->
-						${this._content && this._content.variants.length > 0
+						${this._content && this._content.variants?.length > 0
 							? html`
 									<div slot="append">
 										<uui-button id="variant-selector-toggle" @click=${this._toggleVariantSelector}>
@@ -191,7 +191,7 @@ export class UmbEditorContentElement extends UmbContextProviderMixin(
 
 					<!-- Implement Variant Selector -->
 					<!-- TODO: Refactor Variant Selector into its own component -->
-					${this._content && this._content.variants.length > 0
+					${this._content && this._content.variants?.length > 0
 						? html`
 								<uui-popover id="variant-selector-popover" .open=${this._variantSelectorIsOpen} @close=${this._close}>
 									<div id="variant-selector-dropdown" slot="popover">

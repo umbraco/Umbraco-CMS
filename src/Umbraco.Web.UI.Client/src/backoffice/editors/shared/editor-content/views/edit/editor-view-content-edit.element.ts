@@ -50,7 +50,7 @@ export class UmbEditorViewContentEditElement extends UmbContextConsumerMixin(Umb
 	render() {
 		return html`
 			<uui-box>
-				${this._properties.map(
+				${this._properties?.map(
 					(property: ContentProperty) => html`
 						<umb-content-property
 							.property=${property}

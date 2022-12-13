@@ -1,7 +1,7 @@
-import { UmbData } from './data';
+import { UmbEntityData } from './entity.data';
+import { createDocumentTreeItem } from './utils';
 import { DocumentTreeItem, PagedDocumentTreeItem } from '@umbraco-cms/backend-api';
 import type { DocumentDetails } from '@umbraco-cms/models';
-import { UmbEntityData } from './entity.data';
 
 export const data: Array<DocumentDetails> = [
 	{
@@ -188,18 +188,21 @@ class UmbDocumentData extends UmbEntityData<DocumentDetails> {
 
 	getTreeRoot(): PagedDocumentTreeItem {
 		const items = this.data.filter((item) => item.parentKey === null);
+		const treeItems = items.map((item) => createDocumentTreeItem(item));
 		const total = items.length;
-		return { items, total };
+		return { items: treeItems, total };
 	}
 
 	getTreeItemChildren(key: string): PagedDocumentTreeItem {
 		const items = this.data.filter((item) => item.parentKey === key);
+		const treeItems = items.map((item) => createDocumentTreeItem(item));
 		const total = items.length;
-		return { items, total };
+		return { items: treeItems, total };
 	}
 
-	getTreeItems(keys: Array<string>): Array<DocumentTreeItem> {
-		return this.data.filter((item) => keys.includes(item.key ?? ''));
+	getTreeItem(keys: Array<string>): Array<DocumentTreeItem> {
+		const items = this.data.filter((item) => keys.includes(item.key ?? ''));
+		return items.map((item) => createDocumentTreeItem(item));
 	}
 }
 
