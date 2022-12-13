@@ -1575,9 +1575,9 @@ namespace Umbraco.Cms.Persistence.EFCore.Migrations
 
                     b.Property<DateTime>("CreateDate")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime")
+                        .HasColumnType("TEXT")
                         .HasColumnName("createDate")
-                        .HasDefaultValueSql("(getdate())");
+                        .HasDefaultValueSql("(DATE())");
 
                     b.Property<int>("Level")
                         .HasColumnType("INTEGER")
@@ -1615,13 +1615,13 @@ namespace Umbraco.Cms.Persistence.EFCore.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER")
                         .HasColumnName("trashed")
-                        .HasDefaultValueSql("('0')");
+                        .HasDefaultValueSql("'0'");
 
                     b.Property<Guid>("UniqueId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT")
                         .HasColumnName("uniqueId")
-                        .HasDefaultValueSql("(newid())");
+                        .HasDefaultValueSql("(NEWID())");
 
                     b.HasKey("Id");
 

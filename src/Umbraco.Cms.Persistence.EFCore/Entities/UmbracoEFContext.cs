@@ -1396,12 +1396,13 @@ namespace Umbraco.Cms.Persistence.EFCore.Entities
                 entity.HasIndex(e => e.UniqueId, "IX_umbracoNode_UniqueId")
                     .IsUnique();
 
-                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.Id)
+                    .HasColumnName("id");
 
                 entity.Property(e => e.CreateDate)
-                    .HasColumnType("datetime")
+                    .HasColumnType("TEXT")
                     .HasColumnName("createDate")
-                    .HasDefaultValueSql("(getdate())");
+                    .HasDefaultValueSql("(DATE())");
 
                 entity.Property(e => e.Level).HasColumnName("level");
 
@@ -1424,11 +1425,11 @@ namespace Umbraco.Cms.Persistence.EFCore.Entities
                 entity.Property(e => e.Trashed)
                     .IsRequired()
                     .HasColumnName("trashed")
-                    .HasDefaultValueSql("('0')");
+                    .HasDefaultValueSql("0");
 
                 entity.Property(e => e.UniqueId)
                     .HasColumnName("uniqueId")
-                    .HasDefaultValueSql("(newid())");
+                    .HasDefaultValueSql("(NEWID())");
 
                 entity.HasOne(d => d.NodeUserNavigation)
                     .WithMany(p => p.UmbracoNodes)
