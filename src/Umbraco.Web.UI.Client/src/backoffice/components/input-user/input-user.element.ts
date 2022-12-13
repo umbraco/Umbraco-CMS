@@ -1,7 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing, PropertyValueMap } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbInputListBase } from '../input-list-base';
+import { UmbInputListBase } from '../input-list-base/input-list-base';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import type { UserEntity } from '@umbraco-cms/models';
 import { UmbUserStore } from '@umbraco-cms/stores/user/user.store';
