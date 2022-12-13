@@ -1048,7 +1048,7 @@ namespace Umbraco.Cms.Persistence.EFCore.Entities
                     .HasColumnName("nodeId");
 
                 entity.Property(e => e.Config)
-                    .HasColumnType("TEXT")
+                    .HasColumnType("ntext")
                     .HasColumnName("config");
 
                 entity.Property(e => e.DbType)
