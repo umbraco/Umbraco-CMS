@@ -1212,6 +1212,45 @@
         }
       }
     },
+    "/umbraco/management/api/v1/health-check/execute-action": {
+      "post": {
+        "tags": [
+          "Health Check"
+        ],
+        "operationId": "PostHealthCheckExecuteAction",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HealthCheckAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthCheckResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/umbraco/management/api/v1/help": {
       "get": {
         "tags": [
@@ -4931,8 +4970,7 @@
         "properties": {
           "key": {
             "type": "string",
-            "format": "uuid",
-            "nullable": true
+            "format": "uuid"
           },
           "alias": {
             "type": "string",
