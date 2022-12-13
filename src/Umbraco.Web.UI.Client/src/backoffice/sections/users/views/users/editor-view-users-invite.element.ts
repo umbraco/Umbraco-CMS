@@ -1,11 +1,11 @@
 import { css, html, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, query, state } from 'lit/decorators.js';
-import { UmbModalLayoutElement } from '../../../../../core/services/modal/layouts/modal-layout.element';
-import { UmbUserStore } from '../../../../../core/stores/user/user.store';
-import { UmbNotificationService } from '../../../../../core/services/notification';
+import { UmbInputPickerUserGroupElement } from '@umbraco-cms/components/input-user-group/input-user-group.element';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { UserDetails } from '@umbraco-cms/models';
+import { UmbModalLayoutElement } from '@umbraco-cms/services';
+import { UmbUserStore } from '@umbraco-cms/stores/user/user.store';
 
 export type UsersViewType = 'list' | 'grid';
 @customElement('umb-editor-view-users-invite')
@@ -41,11 +41,14 @@ export class UmbEditorViewUsersInviteElement extends UmbContextConsumerMixin(Umb
 			uui-textarea {
 				--uui-textarea-min-height: 100px;
 			}
-			uui
+			/* TODO: Style below is to fix a11y contrast issue, find a proper solution */
+			[slot='description'] {
+				color: black;
+			}
 		`,
 	];
 
-	@query('#invite-form')
+	@query('#form')
 	private _form!: HTMLFormElement;
 
 	@state()
@@ -74,10 +77,13 @@ export class UmbEditorViewUsersInviteElement extends UmbContextConsumerMixin(Umb
 
 		const name = formData.get('name') as string;
 		const email = formData.get('email') as string;
-		const userGroup = formData.get('userGroup') as string;
+		//TODO: How should we handle pickers forms?
+		const userGroupPicker = form.querySelector('#userGroups') as UmbInputPickerUserGroupElement;
+		const userGroups = userGroupPicker?.value || [];
+
 		const message = formData.get('message') as string;
 
-		this._userStore?.invite(name, email, message, [userGroup]).then((user) => {
+		this._userStore?.invite(name, email, message, userGroups).then((user) => {
 			if (user) {
 				this._invitedUser = user;
 			}
@@ -110,22 +116,22 @@ export class UmbEditorViewUsersInviteElement extends UmbContextConsumerMixin(Umb
 				how to log in to Umbraco. Invites last for 72 hours.
 			</p>
 			<uui-form>
-				<form id="invite-form" name="invite-form" @submit="${this._handleSubmit}">
+				<form id="form" name="form" @submit="${this._handleSubmit}">
 					<uui-form-layout-item>
-						<uui-label slot="label" for="name" required>Name</uui-label>
+						<uui-label id="nameLabel" slot="label" for="name" required>Name</uui-label>
 						<uui-input id="name" label="name" type="text" name="name" required></uui-input>
 					</uui-form-layout-item>
 					<uui-form-layout-item>
-						<uui-label slot="label" for="email" required>Email</uui-label>
+						<uui-label id="emailLabel" slot="label" for="email" required>Email</uui-label>
 						<uui-input id="email" label="email" type="email" name="email" required></uui-input>
 					</uui-form-layout-item>
 					<uui-form-layout-item>
-						<uui-label slot="label" for="userGroup" required>User group</uui-label>
+						<uui-label id="userGroupsLabel" slot="label" for="userGroups" required>User group</uui-label>
 						<span slot="description">Add groups to assign access and permissions</span>
-						<b>ADD USER GROUP PICKER HERE</b>
+						<umb-input-user-group id="userGroups" name="userGroups"></umb-input-user-group>
 					</uui-form-layout-item>
 					<uui-form-layout-item>
-						<uui-label slot="label" for="message" required>Message</uui-label>
+						<uui-label id="messageLabel" slot="label" for="message" required>Message</uui-label>
 						<uui-textarea id="message" label="message" name="message" required></uui-textarea>
 					</uui-form-layout-item>
 				</form>
@@ -135,7 +141,7 @@ export class UmbEditorViewUsersInviteElement extends UmbContextConsumerMixin(Umb
 	private _renderPostInvite() {
 		if (!this._invitedUser) return nothing;
 
-		return html`<div id="post-invite">
+		return html`<div>
 			<h1><b style="color: var(--uui-color-interactive-emphasis)">${this._invitedUser.name}</b> has been invited</h1>
 			<p>An invitation has been sent to the new user with details about how to log in to Umbraco.</p>
 		</div>`;

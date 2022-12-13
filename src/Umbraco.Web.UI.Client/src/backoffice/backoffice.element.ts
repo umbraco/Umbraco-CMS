@@ -1,4 +1,6 @@
 //TODO: we need to figure out what components should be available for extensions and load them upfront
+import './editors/shared/editor-entity-layout/editor-entity-layout.element';
+import './components/ref-property-editor-ui/ref-property-editor-ui.element';
 import './components/backoffice-header.element';
 import './components/backoffice-main.element';
 import './components/backoffice-modal-container.element';

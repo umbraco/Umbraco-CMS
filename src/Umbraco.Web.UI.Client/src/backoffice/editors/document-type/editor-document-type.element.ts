@@ -10,8 +10,7 @@ import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import type { ManifestTypes, ManifestWithLoader } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-
-import '../shared/editor-entity-layout/editor-entity-layout.element';
+import '../../property-editor-uis/icon-picker/property-editor-ui-icon-picker.element';
 
 @customElement('umb-editor-document-type')
 export class UmbEditorDocumentTypeElement extends UmbContextProviderMixin(
@@ -122,7 +121,9 @@ export class UmbEditorDocumentTypeElement extends UmbContextProviderMixin(
 	render() {
 		return html`
 			<umb-editor-entity-layout alias="Umb.Editor.DocumentType">
-				<div slot="icon">Icon</div>
+				<div slot="icon">
+					<umb-property-editor-ui-icon-picker></umb-property-editor-ui-icon-picker>
+				</div>
 
 				<div slot="name">
 					<uui-input id="name" .value=${this._documentType?.name} @input="${this._handleInput}">

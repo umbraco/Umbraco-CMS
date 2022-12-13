@@ -3,9 +3,20 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, LitElement, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
+import { UmbUserGroupContext } from './user-group.context';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
+import '@umbraco-cms/components/input-user/input-user.element';
+import '@umbraco-cms/components/input-section/input-section.element';
+import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
+import type { ManifestEditorAction, ManifestWithLoader, UserDetails, UserGroupDetails } from '@umbraco-cms/models';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
+import { UmbUserGroupStore } from '@umbraco-cms/stores/user/user-group.store';
+import { UmbUserStore } from '@umbraco-cms/stores/user/user.store';
 
 @customElement('umb-editor-user-group')
-export class UmbEditorUserGroupElement extends LitElement {
+export class UmbEditorUserGroupElement extends UmbContextProviderMixin(
+	UmbContextConsumerMixin(UmbObserverMixin(LitElement))
+) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -63,11 +74,18 @@ export class UmbEditorUserGroupElement extends LitElement {
 		`,
 	];
 
-	@state()
-	private _userName = '';
-
 	@property({ type: String })
 	entityKey = '';
+
+	@state()
+	private _userGroup?: UserGroupDetails | null;
+
+	@state()
+	private _userKeys?: Array<string>;
+
+	private _userGroupStore?: UmbUserGroupStore;
+	private _userStore?: UmbUserStore;
+	private _userGroupContext?: UmbUserGroupContext;
 
 	defaultPermissions: Array<{
 		name: string;
@@ -180,35 +198,130 @@ export class UmbEditorUserGroupElement extends LitElement {
 		},
 	];
 
+	constructor() {
+		super();
+
+		this._registerEditorActions();
+	}
+
+	private _registerEditorActions() {
+		const manifests: Array<ManifestWithLoader<ManifestEditorAction>> = [
+			{
+				type: 'editorAction',
+				alias: 'Umb.EditorAction.UserGroup.Save',
+				name: 'EditorActionUserGroupSave',
+				loader: () => import('./actions/editor-action-user-group-save.element'),
+				meta: {
+					editors: ['Umb.Editor.UserGroup'],
+				},
+			},
+		];
+
+		manifests.forEach((manifest) => {
+			if (umbExtensionsRegistry.isRegistered(manifest.alias)) return;
+			umbExtensionsRegistry.register(manifest);
+		});
+	}
+
+	connectedCallback(): void {
+		super.connectedCallback();
+
+		this.consumeAllContexts(['umbUserGroupStore', 'umbUserStore'], (instance) => {
+			this._userGroupStore = instance['umbUserGroupStore'];
+			this._userStore = instance['umbUserStore'];
+			this._observeUserGroup();
+			this._observeUsers();
+		});
+	}
+
+	private _observeUserGroup() {
+		if (!this._userGroupStore) return;
+
+		this.observe(this._userGroupStore.getByKey(this.entityKey), (userGroup) => {
+			this._userGroup = userGroup;
+			if (!this._userGroup) return;
+
+			if (!this._userGroupContext) {
+				this._userGroupContext = new UmbUserGroupContext(this._userGroup);
+				this.provideContext('umbUserGroupContext', this._userGroupContext);
+			} else {
+				this._userGroupContext.update(this._userGroup);
+			}
+		});
+	}
+
+	private _observeUsers() {
+		if (!this._userStore) return;
+
+		// TODO: Create method to only get users from this userGroup
+		// TODO: Find a better way to only call this once at the start
+		this.observe(this._userStore.getAll(), (users: Array<UserDetails>) => {
+			if (!this._userKeys && users.length > 0) {
+				this._userKeys = users.filter((user) => user.userGroups.includes(this.entityKey)).map((user) => user.key);
+				this._updateProperty('users', this._userKeys);
+			}
+		});
+	}
+
+	private _updateUserKeys(userKeys: Array<string>) {
+		this._userKeys = userKeys;
+		this._updateProperty('users', this._userKeys);
+	}
+
+	private _updateProperty(propertyName: string, value: unknown) {
+		this._userGroupContext?.update({ [propertyName]: value });
+	}
+
+	private _updatePermission(permission: { name: string; description: string; value: boolean }) {
+		if (!this._userGroupContext) return;
+
+		const checkValue = this._checkPermission(permission);
+		const selectedPermissions = this._userGroupContext.getData().permissions;
+
+		let newPermissions = [];
+		if (checkValue === false) {
+			newPermissions = [...selectedPermissions, permission.name];
+		} else {
+			newPermissions = selectedPermissions.filter((p) => p !== permission.name);
+		}
+		this._updateProperty('permissions', newPermissions);
+	}
+
+	private _checkPermission(permission: { name: string; description: string; value: boolean }) {
+		if (!this._userGroupContext) return false;
+
+		return this._userGroupContext.getData().permissions.includes(permission.name);
+	}
+
 	private renderLeftColumn() {
+		if (!this._userGroup) return nothing;
+
 		return html` <uui-box>
 				<div slot="headline">Assign access</div>
-				<div>
-					<b>Sections</b>
-					<div class="faded-text">Add sections to give users access</div>
-				</div>
-				<div>
-					<b>Content start nodes</b>
-					<div class="faded-text">Limit the content tree to specific start nodes</div>
-					<umb-property-editor-ui-content-picker></umb-property-editor-ui-content-picker>
-				</div>
-				<div>
-					<b>Media start nodes</b>
-					<div class="faded-text">Limit the media library to specific start nodes</div>
-					<umb-property-editor-ui-content-picker></umb-property-editor-ui-content-picker>
-				</div>
-
-				<b>Content</b>
-				<div class="access-content">
-					<uui-icon name="folder"></uui-icon>
-					<span>Content Root</span>
-				</div>
-
-				<b>Media</b>
-				<div class="access-content">
-					<uui-icon name="folder"></uui-icon>
-					<span>Media Root</span>
-				</div>
+				<umb-editor-property-layout label="Sections" description="Add sections to give users access">
+					<umb-input-section
+						slot="editor"
+						.value=${this._userGroup.sections}
+						@change=${(e: any) => this._updateProperty('sections', e.target.value)}></umb-input-section>
+				</umb-editor-property-layout>
+				<umb-editor-property-layout
+					label="Content start node"
+					description="Limit the content tree to a specific start node">
+					<uui-ref-node slot="editor" name="Content Root" border>
+						<uui-icon slot="icon" name="folder"></uui-icon>
+						<uui-button slot="actions" label="change"></uui-button>
+						<uui-button slot="actions" label="remove" color="danger"></uui-button>
+					</uui-ref-node>
+				</umb-editor-property-layout>
+				<umb-editor-property-layout
+					label="Media start node"
+					description="Limit the media library to a specific start node">
+					<uui-ref-node slot="editor" name="Media Root" border>
+						<uui-icon slot="icon" name="folder"></uui-icon>
+						<uui-button slot="actions" label="change"></uui-button>
+						<uui-button slot="actions" label="remove" color="danger"></uui-button>
+					</uui-ref-node>
+				</umb-editor-property-layout>
 			</uui-box>
 
 			<uui-box>
@@ -224,10 +337,8 @@ export class UmbEditorUserGroupElement extends LitElement {
 									(permission) => html`
 										<div class="default-permission">
 											<uui-toggle
-												.checked=${permission.value}
-												@change=${(e: Event) => {
-													permission.value = (e.target as HTMLInputElement).checked;
-												}}></uui-toggle>
+												.checked=${this._checkPermission(permission)}
+												@change=${() => this._updatePermission(permission)}></uui-toggle>
 											<div class="permission-info">
 												<b>${permission.name}</b>
 												<span class="faded-text">${permission.description}</span>
@@ -249,6 +360,9 @@ export class UmbEditorUserGroupElement extends LitElement {
 	private renderRightColumn() {
 		return html`<uui-box>
 			<div slot="headline">Users</div>
+			<umb-input-user
+				@change=${(e: Event) => this._updateUserKeys((e.target as any).value)}
+				.value=${this._userKeys || []}></umb-input-user>
 		</uui-box>`;
 	}
 
@@ -256,15 +370,15 @@ export class UmbEditorUserGroupElement extends LitElement {
 	private _handleInput(event: UUIInputEvent) {
 		if (event instanceof UUIInputEvent) {
 			const target = event.composedPath()[0] as UUIInputElement;
-
-			console.log('input', target.value);
 		}
 	}
 
 	render() {
+		if (!this._userGroup) return nothing;
+
 		return html`
 			<umb-editor-entity-layout alias="Umb.Editor.UserGroup">
-				<uui-input id="name" slot="name" .value=${this._userName} @input="${this._handleInput}"></uui-input>
+				<uui-input id="name" slot="name" .value=${this._userGroup.name} @input="${this._handleInput}"></uui-input>
 				<div id="main">
 					<div id="left-column">${this.renderLeftColumn()}</div>
 					<div id="right-column">${this.renderRightColumn()}</div>
