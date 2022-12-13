@@ -173,6 +173,11 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
             definition.Id = dto.Id;
         }
 
+        if (definition.PackageId == default)
+        {
+            definition.PackageId = Guid.NewGuid();
+        }
+
         // Save snapshot locally, we do this to the updated packagePath
         ExportPackage(definition);
 
