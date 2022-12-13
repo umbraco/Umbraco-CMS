@@ -40,6 +40,19 @@ export class UmbExtensionRegistry {
 		}
 	}
 
+	unregister(alias:string): void {
+		const oldExtensionsValues = this._extensions.getValue();
+		const newExtensionsValues = oldExtensionsValues.filter((extension) => extension.alias !== alias);
+
+		// TODO: Maybe its not needed to fire an console.error. as you might want to call this method without needing to check the existence first.
+		if (oldExtensionsValues.length === newExtensionsValues.length) {
+			console.error(`Unable to unregister extension with alias ${alias}`);
+			return;
+		}
+
+		this._extensions.next(newExtensionsValues);
+	}
+
 	isRegistered(alias: string): boolean {
 		const values = this._extensions.getValue();
 		return values.some((ext) => ext.alias === alias);
