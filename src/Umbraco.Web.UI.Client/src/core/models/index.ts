@@ -129,5 +129,4 @@ export interface MediaTypeDetails extends FolderTreeItem {
 // Member Groups
 export interface MemberGroupDetails extends EntityTreeItem {
 	key: string; // TODO: Remove this when the backend is fixed
-	isTrashed: boolean; // TODO: remove only temp part of refactor
 }
