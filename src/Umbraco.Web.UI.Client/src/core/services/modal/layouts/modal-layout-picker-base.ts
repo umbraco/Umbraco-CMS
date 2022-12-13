@@ -6,7 +6,7 @@ export interface UmbPickerData<selectType = string> {
 	selection: Array<selectType>;
 }
 
-export class UmbPickerLayoutBase<selectType> extends UmbModalLayoutElement<UmbPickerData<selectType>> {
+export class UmbPickerLayoutBase<selectType = string> extends UmbModalLayoutElement<UmbPickerData<selectType>> {
 	
 	@state()
 	private _selection: Array<selectType> = [];
