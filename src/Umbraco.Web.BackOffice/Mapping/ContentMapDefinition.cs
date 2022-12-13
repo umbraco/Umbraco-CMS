@@ -246,7 +246,7 @@ internal class ContentMapDefinition : IMapDefinition
     private static void Map(IContent source, ContentPropertyCollectionDto target, MapperContext context) =>
         target.Properties = context.MapEnumerable<IProperty, ContentPropertyDto>(source.Properties).WhereNotNull();
 
-    // Umbraco.Code.MapAll -AllowPreview -Errors -PersistedContent -AdditionalData
+    // Umbraco.Code.MapAll -AllowPreview -Errors -PersistedContent
     private void Map<TVariant>(IContent source, ContentItemDisplay<TVariant> target, MapperContext context)
         where TVariant : ContentVariantDisplay
     {
