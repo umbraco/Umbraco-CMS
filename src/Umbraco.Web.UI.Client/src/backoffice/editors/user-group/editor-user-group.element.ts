@@ -5,8 +5,8 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { UmbUserGroupContext } from './user-group.context';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import '@umbraco-cms/sections/users/picker-user.element';
-import '@umbraco-cms/sections/users/picker-section.element';
+import '@umbraco-cms/components/input-user/input-user.element';
+import '@umbraco-cms/components/input-section/input-section.element';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import type { ManifestEditorAction, ManifestWithLoader, UserDetails, UserGroupDetails } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
@@ -299,10 +299,10 @@ export class UmbEditorUserGroupElement extends UmbContextProviderMixin(
 		return html` <uui-box>
 				<div slot="headline">Assign access</div>
 				<umb-editor-property-layout label="Sections" description="Add sections to give users access">
-					<umb-picker-section
+					<umb-input-section
 						slot="editor"
 						.value=${this._userGroup.sections}
-						@change=${(e: any) => this._updateProperty('sections', e.target.value)}></umb-picker-section>
+						@change=${(e: any) => this._updateProperty('sections', e.target.value)}></umb-input-section>
 				</umb-editor-property-layout>
 				<umb-editor-property-layout
 					label="Content start node"
@@ -360,9 +360,9 @@ export class UmbEditorUserGroupElement extends UmbContextProviderMixin(
 	private renderRightColumn() {
 		return html`<uui-box>
 			<div slot="headline">Users</div>
-			<umb-picker-user
+			<umb-input-user
 				@change=${(e: Event) => this._updateUserKeys((e.target as any).value)}
-				.value=${this._userKeys || []}></umb-picker-user>
+				.value=${this._userKeys || []}></umb-input-user>
 		</uui-box>`;
 	}
 

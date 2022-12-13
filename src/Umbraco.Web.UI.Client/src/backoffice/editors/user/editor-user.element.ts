@@ -3,16 +3,18 @@ import { css, html, LitElement, nothing, TemplateResult } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
-
 import { repeat } from 'lit/directives/repeat.js';
+
 import { getTagLookAndColor } from '../../sections/users/user-extensions';
 import { UmbUserContext } from './user.context';
+import { UmbUserStore } from '@umbraco-cms/stores/user/user.store';
+
 import { UmbContextProviderMixin, UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { ManifestEditorAction, ManifestWithLoader, UserDetails } from '@umbraco-cms/models';
 
 import '../../property-editor-uis/content-picker/property-editor-ui-content-picker.element';
-import '@umbraco-cms/sections/users/picker-user-group.element';
-import { UmbUserStore } from '@umbraco-cms/stores/user/user.store';
+import '@umbraco-cms/components/input-user-group/input-user-group.element';
+
 import { umbHistoryService } from 'src/core/services/history';
 import { umbCurrentUserService } from 'src/core/services/current-user';
 import { UmbModalService } from '@umbraco-cms/services';
@@ -261,7 +263,7 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(
 		return buttons;
 	}
 
-	private renderLeftColumn() {
+	private _renderLeftColumn() {
 		if (!this._user) return nothing;
 
 		return html` <uui-box>
@@ -277,10 +279,10 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(
 				<div slot="headline">Assign access</div>
 				<div id="assign-access">
 					<umb-editor-property-layout label="Groups" description="Add groups to assign access and permissions">
-						<umb-picker-user-group
+						<umb-input-user-group
 							slot="editor"
 							.value=${this._user.userGroups}
-							@change=${(e: any) => this._updateProperty('userGroups', e.target.value)}></umb-picker-user-group>
+							@change=${(e: any) => this._updateProperty('userGroups', e.target.value)}></umb-input-user-group>
 					</umb-editor-property-layout>
 					<umb-editor-property-layout
 						label="Content start node"
@@ -312,7 +314,7 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(
 			</uui-box>`;
 	}
 
-	private renderRightColumn() {
+	private _renderRightColumn() {
 		if (!this._user || !this._userStore) return nothing;
 
 		const statusLook = getTagLookAndColor(this._user.status);
@@ -374,8 +376,8 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(
 			<umb-editor-entity-layout alias="Umb.Editor.User">
 				<uui-input id="name" slot="name" .value=${this._userName} @input="${this._handleInput}"></uui-input>
 				<div id="main">
-					<div id="left-column">${this.renderLeftColumn()}</div>
-					<div id="right-column">${this.renderRightColumn()}</div>
+					<div id="left-column">${this._renderLeftColumn()}</div>
+					<div id="right-column">${this._renderRightColumn()}</div>
 				</div>
 			</umb-editor-entity-layout>
 		`;

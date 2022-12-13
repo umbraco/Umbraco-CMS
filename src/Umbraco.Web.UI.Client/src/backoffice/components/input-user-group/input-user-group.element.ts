@@ -1,13 +1,13 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbPicker } from './picker';
+import { UmbInputListBase } from '../input-list-base/input-list-base';
 import type { UserGroupEntity } from '@umbraco-cms/models';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbUserGroupStore } from '@umbraco-cms/stores/user/user-group.store';
 
-@customElement('umb-picker-user-group')
-export class UmbPickerUserGroupElement extends UmbObserverMixin(UmbPicker) {
+@customElement('umb-input-user-group')
+export class UmbInputPickerUserGroupElement extends UmbObserverMixin(UmbInputListBase) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -95,6 +95,6 @@ export class UmbPickerUserGroupElement extends UmbObserverMixin(UmbPicker) {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-picker-user-group': UmbPickerUserGroupElement;
+		'umb-input-user-group': UmbInputPickerUserGroupElement;
 	}
 }

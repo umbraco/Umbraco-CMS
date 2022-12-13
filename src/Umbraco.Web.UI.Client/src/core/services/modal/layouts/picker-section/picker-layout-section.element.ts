@@ -1,14 +1,14 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbPickerLayout } from './picker-layout';
+import { UmbModalLayoutPickerBase } from '../modal-layout-picker-base';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import type { ManifestSection } from '@umbraco-cms/models';
 
 @customElement('umb-picker-layout-section')
-export class UmbPickerLayoutSectionElement extends UmbContextConsumerMixin(UmbObserverMixin(UmbPickerLayout)) {
+export class UmbPickerLayoutSectionElement extends UmbContextConsumerMixin(UmbObserverMixin(UmbModalLayoutPickerBase)) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -64,8 +64,6 @@ export class UmbPickerLayoutSectionElement extends UmbContextConsumerMixin(UmbOb
 			this._sections = sections;
 		});
 	}
-
-	//todo: save section aliasess in array
 
 	render() {
 		return html`

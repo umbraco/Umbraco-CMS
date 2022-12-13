@@ -1,7 +1,7 @@
 import { css, html, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, query, state } from 'lit/decorators.js';
-import { UmbPickerUserGroupElement } from '../../picker-user-group.element';
+import { UmbInputPickerUserGroupElement } from '@umbraco-cms/components/input-user-group/input-user-group.element';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { UserDetails } from '@umbraco-cms/models';
 import { UmbModalLayoutElement } from '@umbraco-cms/services';
@@ -78,7 +78,7 @@ export class UmbEditorViewUsersInviteElement extends UmbContextConsumerMixin(Umb
 		const name = formData.get('name') as string;
 		const email = formData.get('email') as string;
 		//TODO: How should we handle pickers forms?
-		const userGroupPicker = form.querySelector('#userGroups') as UmbPickerUserGroupElement;
+		const userGroupPicker = form.querySelector('#userGroups') as UmbInputPickerUserGroupElement;
 		const userGroups = userGroupPicker?.value || [];
 
 		const message = formData.get('message') as string;
@@ -128,7 +128,7 @@ export class UmbEditorViewUsersInviteElement extends UmbContextConsumerMixin(Umb
 					<uui-form-layout-item>
 						<uui-label id="userGroupsLabel" slot="label" for="userGroups" required>User group</uui-label>
 						<span slot="description">Add groups to assign access and permissions</span>
-						<umb-picker-user-group id="userGroups" name="userGroups"></umb-picker-user-group>
+						<umb-input-user-group id="userGroups" name="userGroups"></umb-input-user-group>
 					</uui-form-layout-item>
 					<uui-form-layout-item>
 						<uui-label id="messageLabel" slot="label" for="message" required>Message</uui-label>

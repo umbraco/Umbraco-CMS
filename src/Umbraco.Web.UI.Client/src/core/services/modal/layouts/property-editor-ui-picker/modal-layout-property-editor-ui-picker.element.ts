@@ -19,6 +19,7 @@ interface GroupedPropertyEditorUIs {
 	[key: string]: Array<ManifestPropertyEditorUI>;
 }
 
+// TODO: make use of UmbPickerLayoutBase
 @customElement('umb-modal-layout-property-editor-ui-picker')
 export class UmbModalLayoutPropertyEditorUIPickerElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles = [

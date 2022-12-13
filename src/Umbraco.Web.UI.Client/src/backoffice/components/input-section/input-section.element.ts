@@ -1,12 +1,12 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbPicker } from './picker';
+import { UmbInputListBase } from '../input-list-base/input-list-base';
 import type { ManifestSection } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
-@customElement('umb-picker-section')
-export class UmbPickerSectionElement extends UmbPicker {
+@customElement('umb-input-section')
+export class UmbInputPickerSectionElement extends UmbInputListBase {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -85,6 +85,6 @@ export class UmbPickerSectionElement extends UmbPicker {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-picker-section': UmbPickerSectionElement;
+		'umb-input-section': UmbInputPickerSectionElement;
 	}
 }

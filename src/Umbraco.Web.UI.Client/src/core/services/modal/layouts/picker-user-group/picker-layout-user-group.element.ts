@@ -1,14 +1,14 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbPickerLayout } from './picker-layout';
+import { UmbModalLayoutPickerBase } from '../modal-layout-picker-base';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import type { UserGroupDetails } from '@umbraco-cms/models';
 import { UmbUserGroupStore } from '@umbraco-cms/stores/user/user-group.store';
 
 @customElement('umb-picker-layout-user-group')
-export class UmbPickerLayoutUserGroupElement extends UmbContextConsumerMixin(UmbObserverMixin(UmbPickerLayout)) {
+export class UmbPickerLayoutUserGroupElement extends UmbContextConsumerMixin(UmbObserverMixin(UmbModalLayoutPickerBase)) {
 	static styles = [
 		UUITextStyles,
 		css`
