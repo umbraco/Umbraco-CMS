@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.RedirectUrlManagement;
 [VersionedApiBackOfficeRoute("redirect-management")]
 [ApiExplorerSettings(GroupName = "Redirect Management")]
 [ApiVersion("1.0")]
-public class RedirectUrlManagementBaseController
+public class RedirectUrlManagementBaseController : ManagementApiControllerBase
 {
 
 }
