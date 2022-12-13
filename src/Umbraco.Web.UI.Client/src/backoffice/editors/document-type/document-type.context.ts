@@ -10,7 +10,6 @@ export class UmbDocumentTypeContext {
 		type: '',
 		hasChildren: false,
 		parentKey: '',
-		isTrashed: false,
 		alias: '',
 		properties: [],
 	});

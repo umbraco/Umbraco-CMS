@@ -83,6 +83,9 @@ export class UmbMediaStore extends UmbDataStoreBase<MediaDetails | ContentTreeIt
 		);
 		
 		// TODO: how do we handle trashed items?
+		// TODO: remove ignore when we know how to handle trashed items.
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
 		return this.items.pipe(map((items) => items.filter((item) => item.parentKey === null && item.isTrashed === false)));
 	}
 
@@ -104,6 +107,9 @@ export class UmbMediaStore extends UmbDataStoreBase<MediaDetails | ContentTreeIt
 		);
 		
 		// TODO: how do we handle trashed items?
+		// TODO: remove ignore when we know how to handle trashed items.
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
 		return this.items.pipe(map((items) => items.filter((item) => item.parentKey === key && item.isTrashed === false)));
 	}
 }

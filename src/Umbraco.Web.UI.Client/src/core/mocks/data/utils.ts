@@ -20,7 +20,8 @@ export const createFolderTreeItem = (item: any): FolderTreeItem => {
 	};
 };
 
-export const createContentTreeItem = (item: any): ContentTreeItem => {
+// TODO: remove isTrashed type extension when we have found a solution to trashed items
+export const createContentTreeItem = (item: any): ContentTreeItem & { isTrashed: boolean } => {
 	return {
 		...createEntityTreeItem(item),
 		noAccess: item.noAccess,
@@ -28,7 +29,8 @@ export const createContentTreeItem = (item: any): ContentTreeItem => {
 	};
 };
 
-export const createDocumentTreeItem = (item: DocumentDetails): DocumentTreeItem => {
+// TODO: remove isTrashed type extension when we have found a solution to trashed items
+export const createDocumentTreeItem = (item: DocumentDetails): DocumentTreeItem & { isTrashed: boolean }  => {
 	return {
 		...createContentTreeItem(item),
 		noAccess: item.noAccess,

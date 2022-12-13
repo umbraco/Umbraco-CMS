@@ -5,7 +5,6 @@ import {
 	DocumentTypeTreeItem,
 	EntityTreeItem,
 	FolderTreeItem,
-	PagedFolderTreeItem,
 } from '@umbraco-cms/backend-api';
 
 // Extension Manifests
@@ -22,7 +21,6 @@ export interface Entity {
 	type: string;
 	hasChildren: boolean;
 	parentKey: string;
-	isTrashed: boolean;
 }
 
 export interface UserEntity extends Entity {
@@ -58,7 +56,6 @@ export interface UserGroupDetails extends UserGroupEntity {
 // Data Types
 export interface DataTypeDetails extends FolderTreeItem {
 	key: string; // TODO: Remove this when the backend is fixed
-	isTrashed: boolean; // TODO: remove only temp part of refactor
 	propertyEditorModelAlias: string | null;
 	propertyEditorUIAlias: string | null;
 	data: Array<DataTypePropertyData>;
@@ -72,14 +69,12 @@ export interface DataTypePropertyData {
 // Document Types
 export interface DocumentTypeDetails extends DocumentTypeTreeItem {
 	key: string; // TODO: Remove this when the backend is fixed
-	isTrashed: boolean; // TODO: remove only temp part of refactor
 	alias: string;
 	properties: [];
 }
 
 export interface MemberTypeDetails extends EntityTreeItem {
 	key: string; // TODO: Remove this when the backend is fixed
-	isTrashed: boolean; // TODO: remove only temp part of refactor
 	alias: string;
 	properties: [];
 }
@@ -121,7 +116,6 @@ export interface MediaDetails extends ContentTreeItem {
 
 export interface MediaTypeDetails extends FolderTreeItem {
 	key: string; // TODO: Remove this when the backend is fixed
-	isTrashed: boolean; // TODO: remove only temp part of refactor
 	alias: string;
 	properties: [];
 }

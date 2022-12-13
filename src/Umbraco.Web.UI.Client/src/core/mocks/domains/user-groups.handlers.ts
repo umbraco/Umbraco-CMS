@@ -22,7 +22,6 @@ const fakeData: Array<UserGroupDetails> = [
 		parentKey: '',
 		type: 'userGroup',
 		hasChildren: false,
-		isTrashed: false,
 	},
 	{
 		key: '20000000-0000-0000-0000-000000000000',
@@ -31,7 +30,6 @@ const fakeData: Array<UserGroupDetails> = [
 		parentKey: '',
 		type: 'userGroup',
 		hasChildren: false,
-		isTrashed: false,
 	},
 	{
 		key: '20000000-0000-0000-0000-000000000000',
@@ -40,7 +38,6 @@ const fakeData: Array<UserGroupDetails> = [
 		parentKey: '',
 		type: 'userGroup',
 		hasChildren: false,
-		isTrashed: false,
 	},
 	{
 		key: '20000000-0000-0000-0000-000000000000',
@@ -49,7 +46,6 @@ const fakeData: Array<UserGroupDetails> = [
 		parentKey: '',
 		type: 'userGroup',
 		hasChildren: false,
-		isTrashed: false,
 	},
 	{
 		key: '20000000-0000-0000-0000-000000000000',
@@ -58,6 +54,5 @@ const fakeData: Array<UserGroupDetails> = [
 		parentKey: '',
 		type: 'userGroup',
 		hasChildren: false,
-		isTrashed: false,
 	},
 ];

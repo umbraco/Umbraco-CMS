@@ -10,7 +10,6 @@ export class UmbUserContext {
 		type: 'user',
 		hasChildren: false,
 		parentKey: '',
-		isTrashed: false,
 		email: '',
 		language: '',
 		status: 'enabled',

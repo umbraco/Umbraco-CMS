@@ -82,6 +82,9 @@ export class UmbDocumentStore extends UmbDataStoreBase<DocumentDetails | Documen
 		);
 		
 		// TODO: how do we handle trashed items?
+		// TODO: remove ignore when we know how to handle trashed items.
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
 		return this.items.pipe(map((items) => items.filter((item) => item.parentKey === null && item.isTrashed === false)));
 	}
 
@@ -103,6 +106,9 @@ export class UmbDocumentStore extends UmbDataStoreBase<DocumentDetails | Documen
 		);
 		
 		// TODO: how do we handle trashed items?
+		// TODO: remove ignore when we know how to handle trashed items.
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
 		return this.items.pipe(map((items) => items.filter((item) => item.parentKey === key && item.isTrashed === false)));
 	}
 

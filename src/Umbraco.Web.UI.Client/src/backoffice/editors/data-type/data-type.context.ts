@@ -10,7 +10,6 @@ export class UmbDataTypeContext {
 		type: 'dataType',
 		hasChildren: false,
 		parentKey: '',
-		isTrashed: false,
 		propertyEditorModelAlias: '',
 		propertyEditorUIAlias: '',
 		data: [],

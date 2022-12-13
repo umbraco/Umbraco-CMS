@@ -50,7 +50,6 @@ export const handlers = [
 			createDate: new Date().toISOString(),
 			failedLoginAttempts: 0,
 			parentKey: '',
-			isTrashed: false,
 			hasChildren: false,
 			type: 'user',
 			icon: 'umb:icon-user',
