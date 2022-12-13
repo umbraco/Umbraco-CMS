@@ -1,4 +1,5 @@
 import { BehaviorSubject, map, Observable } from 'rxjs';
+import { ManifestHeaderApp } from 'src/core/extensions-registry/header-app.models';
 import type {
 	ManifestTypes,
 	ManifestDashboard,
@@ -53,6 +54,7 @@ export class UmbExtensionRegistry {
 	// TODO: implement unregister of extension
 
 	// Typings concept, need to put all core types to get a good array return type for the provided type...
+	extensionsOfType(type: 'headerApp'): Observable<Array<ManifestHeaderApp>>;
 	extensionsOfType(type: 'section'): Observable<Array<ManifestSection>>;
 	extensionsOfType(type: 'sectionView'): Observable<Array<ManifestSectionView>>;
 	extensionsOfType(type: 'tree'): Observable<Array<ManifestTree>>;
@@ -73,9 +75,7 @@ export class UmbExtensionRegistry {
 			map((exts) =>
 				exts
 					.filter((ext) => ext.type === type)
-					.sort((a, b) => {
-						return (b.weight || 0) - (a.weight || 0);
-					})
+					.sort((a, b) => (b.weight || 0) - (a.weight || 0))
 			)
 		);
 	}

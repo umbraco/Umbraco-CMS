@@ -9,6 +9,7 @@ import type { ManifestPropertyEditorUI, ManifestPropertyEditorModel } from './pr
 import type { ManifestDashboard } from './dashboard.models';
 import type { ManifestPropertyAction } from './property-action.models';
 import type { ManifestPackageView } from './package-view.models';
+import { ManifestHeaderApp } from './header-app.models';
 
 export * from './section.models';
 export * from './section-view.models';
@@ -23,6 +24,7 @@ export * from './property-action.models';
 export * from './package-view.models';
 
 export type ManifestTypes =
+	| ManifestHeaderApp
 	| ManifestSection
 	| ManifestSectionView
 	| ManifestTree
@@ -39,6 +41,7 @@ export type ManifestTypes =
 	| ManifestCustom;
 
 export type ManifestStandardTypes =
+	| 'headerApp'
 	| 'section'
 	| 'sectionView'
 	| 'tree'
