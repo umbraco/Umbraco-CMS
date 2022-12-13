@@ -1,8 +1,10 @@
-﻿namespace Umbraco.Cms.Api.Management.ViewModels.RedirectUrlManagement;
+﻿using Umbraco.New.Cms.Core.Models.RedirectUrlManagement;
+
+namespace Umbraco.Cms.Api.Management.ViewModels.RedirectUrlManagement;
 
 public class RedirectUrlStatusViewModel
 {
-    public bool Enabled { get; set; }
+    public RedirectStatus Status { get; set; }
 
     public bool UserIsAdmin { get; set; }
 }

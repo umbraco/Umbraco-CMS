@@ -3,6 +3,7 @@ using Umbraco.Cms.Api.Management.ViewModels.RedirectUrlManagement;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Extensions;
+using Umbraco.New.Cms.Core.Models.RedirectUrlManagement;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
@@ -20,10 +21,18 @@ public class RedirectUrlStatusViewModelFactory : IRedirectUrlStatusViewModelFact
     }
 
     public RedirectUrlStatusViewModel CreateViewModel()
-        => new RedirectUrlStatusViewModel
+    {
+        RedirectStatus status = _webRoutingSettings.CurrentValue.DisableRedirectUrlTracking switch
         {
-            Enabled = _webRoutingSettings.CurrentValue.DisableRedirectUrlTracking is false,
+            true => RedirectStatus.Disabled,
+            false => RedirectStatus.Enabled
+        };
+
+        return new RedirectUrlStatusViewModel
+        {
+            Status = status,
             // TODO: Ensure that CurrentUser can be found when we use the new auth.
             UserIsAdmin = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.IsAdmin() ?? false,
         };
+    }
 }

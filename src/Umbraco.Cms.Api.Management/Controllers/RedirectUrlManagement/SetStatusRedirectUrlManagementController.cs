@@ -1,15 +1,16 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Security;
+using Umbraco.New.Cms.Core.Models.RedirectUrlManagement;
 
 namespace Umbraco.Cms.Api.Management.Controllers.RedirectUrlManagement;
 
-public class SetEnabledRedirectUrlManagementController : RedirectUrlManagementBaseController
+public class SetStatusRedirectUrlManagementController : RedirectUrlManagementBaseController
 {
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IConfigManipulator _configManipulator;
 
-    public SetEnabledRedirectUrlManagementController(
+    public SetStatusRedirectUrlManagementController(
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IConfigManipulator configManipulator)
     {
@@ -20,8 +21,8 @@ public class SetEnabledRedirectUrlManagementController : RedirectUrlManagementBa
     // TODO: Consider if we should even allow this, or only allow using the appsettings
     // We generally don't want to edit the appsettings from our code.
     // But maybe there is a valid use case for doing it on the fly.
-    [HttpPost("enabled")]
-    public async Task<IActionResult> EnableUrlTracker([FromQuery] bool enabled)
+    [HttpPost("status")]
+    public async Task<IActionResult> SetStatus([FromQuery] RedirectStatus status)
     {
         // TODO: uncomment this when auth is implemented.
         // var userIsAdmin = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.IsAdmin();
@@ -30,10 +31,16 @@ public class SetEnabledRedirectUrlManagementController : RedirectUrlManagementBa
         //     return Unauthorized();
         // }
 
+        var enable = status switch
+        {
+            RedirectStatus.Enabled => true,
+            RedirectStatus.Disabled => false
+        };
+
         // For now I'm not gonna change this to limit breaking, but it's weird to have a "disabled" switch,
         // since you're essentially negating the boolean from the get go,
         // it's much easier to reason with enabled = false == disabled.
-        _configManipulator.SaveDisableRedirectUrlTracking(!enabled);
+        _configManipulator.SaveDisableRedirectUrlTracking(!enable);
 
         // Taken from the existing implementation in RedirectUrlManagementController
         // TODO this is ridiculous, but we need to ensure the configuration is reloaded, before this request is ended.
