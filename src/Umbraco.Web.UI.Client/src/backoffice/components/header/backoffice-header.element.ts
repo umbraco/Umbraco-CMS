@@ -3,7 +3,7 @@ import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
 
 import './backoffice-header-sections.element';
-import './backoffice-header-tools.element';
+import './backoffice-header-apps.element';
 
 @customElement('umb-backoffice-header')
 export class UmbBackofficeHeader extends LitElement {
@@ -47,7 +47,7 @@ export class UmbBackofficeHeader extends LitElement {
 				</uui-button>
 
 				<umb-backoffice-header-sections id="sections"></umb-backoffice-header-sections>
-				<umb-backoffice-header-tools></umb-backoffice-header-tools>
+				<umb-backoffice-header-apps></umb-backoffice-header-apps>
 			</div>
 		`;
 	}
