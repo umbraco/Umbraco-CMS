@@ -7,7 +7,7 @@ export class UmbUserGroupContext {
 		key: '',
 		name: '',
 		icon: '',
-		type: 'userGroup',
+		type: 'user-group',
 		hasChildren: false,
 		parentKey: '',
 		isTrashed: false,

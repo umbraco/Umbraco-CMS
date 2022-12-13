@@ -43,7 +43,7 @@ export interface UserDetails extends UserEntity {
 }
 
 export interface UserGroupEntity extends Entity {
-	type: 'userGroup';
+	type: 'user-group';
 }
 
 export interface UserGroupDetails extends UserGroupEntity {
