@@ -3,6 +3,12 @@ import { UmbDataStoreBase } from '../store';
 import type { DataTypeDetails } from '@umbraco-cms/models';
 import { ApiError, DataTypeResource, FolderTreeItem, ProblemDetails } from '@umbraco-cms/backend-api';
 
+const isDataTypeDetails = (dataType: DataTypeDetails | FolderTreeItem): dataType is DataTypeDetails => {
+	return (dataType as DataTypeDetails).data !== undefined;
+};
+
+// TODO: can we make is easy to reuse store methods across different stores?
+
 /**
  * @export
  * @class UmbDataTypesStore
@@ -16,16 +22,15 @@ export class UmbDataTypesStore extends UmbDataStoreBase<DataTypeDetails | Folder
 	 * @return {*}  {(Observable<DataTypeDetails | null>)}
 	 * @memberof UmbDataTypesStore
 	 */
-	getByKey(key: string): Observable<DataTypeDetails | FolderTreeItem | null> {
-		// TODO: use Fetcher API.
-		// TODO: only fetch if the data type is not in the store?
+	getByKey(key: string): Observable<DataTypeDetails | null> {
+		// TODO: use backend cli when available.
 		fetch(`/umbraco/backoffice/data-type/details/${key}`)
 			.then((res) => res.json())
 			.then((data) => {
 				this.updateItems(data);
 			});
 
-		return this.items.pipe(map((dataTypes) => dataTypes.find((dataType) => dataType.key === key) || null));
+		return this.items.pipe(map((dataTypes) => dataTypes.find((dataType) => dataType.key === key && isDataTypeDetails(dataType)) as DataTypeDetails || null));
 	}
 
 	/**
@@ -35,7 +40,7 @@ export class UmbDataTypesStore extends UmbDataStoreBase<DataTypeDetails | Folder
 	 * @return {*}  {Promise<void>}
 	 */
 	async save(dataTypes: Array<DataTypeDetails>): Promise<void> {
-		// TODO: use Fetcher API.
+		// TODO: use backend cli when available.
 		try {
 			const res = await fetch('/umbraco/backoffice/data-type/save', {
 				method: 'POST',
@@ -58,6 +63,7 @@ export class UmbDataTypesStore extends UmbDataStoreBase<DataTypeDetails | Folder
 	 * @return {*}  {Promise<void>}
 	 */
 	async deleteItems(keys: string[]): Promise<void> {
+		// TODO: use backend cli when available.
 		await fetch('/umbraco/backoffice/data-type/delete', {
 			method: 'POST',
 			body: JSON.stringify(keys),
@@ -69,6 +75,11 @@ export class UmbDataTypesStore extends UmbDataStoreBase<DataTypeDetails | Folder
 		this.deleteItems(keys);
 	}
 
+	/**
+	 * @description - Get the root of the tree.
+	 * @return {*}  {Observable<Array<FolderTreeItem>>}
+	 * @memberof UmbDataTypesStore
+	 */
 	getTreeRoot(): Observable<Array<FolderTreeItem>> {
 		DataTypeResource.getTreeDataTypeRoot({}).then(
 			(res) => {
@@ -86,7 +97,13 @@ export class UmbDataTypesStore extends UmbDataStoreBase<DataTypeDetails | Folder
 
 		return this.items.pipe(map((items) => items.filter((item) => item.parentKey === null)));
 	}
-
+	
+	/**
+	 * @description - Get the children of a tree item.
+	 * @param {string} key
+	 * @return {*}  {Observable<Array<FolderTreeItem>>}
+	 * @memberof UmbDataTypesStore
+	 */
 	getTreeItemChildren(key: string): Observable<Array<FolderTreeItem>> {
 		DataTypeResource.getTreeDataTypeChildren({
 			parentKey: key,

@@ -3,6 +3,10 @@ import { UmbDataStoreBase } from '../store';
 import { ApiError, DocumentTypeResource, DocumentTypeTreeItem, ProblemDetails } from '@umbraco-cms/backend-api';
 import type { DocumentTypeDetails } from '@umbraco-cms/models';
 
+const isDocumentTypeDetails = (documentType: DocumentTypeDetails | DocumentTypeTreeItem): documentType is DocumentTypeDetails => {
+	return (documentType as DocumentTypeDetails).properties !== undefined;
+};
+
 /**
  * @export
  * @class UmbDocumentTypeStore
@@ -10,7 +14,7 @@ import type { DocumentTypeDetails } from '@umbraco-cms/models';
  * @description - Data Store for Document Types
  */
 export class UmbDocumentTypeStore extends UmbDataStoreBase<DocumentTypeDetails | DocumentTypeTreeItem> {
-	getByKey(key: string): Observable<DocumentTypeDetails | DocumentTypeTreeItem | null> {
+	getByKey(key: string): Observable<DocumentTypeDetails | null> {
 		// TODO: use Fetcher API.
 		// TODO: only fetch if the data type is not in the store?
 		fetch(`/umbraco/backoffice/document-type/${key}`)
@@ -20,7 +24,7 @@ export class UmbDocumentTypeStore extends UmbDataStoreBase<DocumentTypeDetails |
 			});
 
 		return this.items.pipe(
-			map((documentTypes) => documentTypes.find((documentType) => documentType.key === key) || null)
+			map((documentTypes) => documentTypes.find((documentType) => documentType.key === key && isDocumentTypeDetails(documentType)) as DocumentTypeDetails || null)
 		);
 	}
 

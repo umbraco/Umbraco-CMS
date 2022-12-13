@@ -1,6 +1,6 @@
 import { map, Observable } from 'rxjs';
 import { UmbDataStoreBase } from '../store';
-import { MediaTypeResource, ApiError, ProblemDetails, PagedFolderTreeItem } from '@umbraco-cms/backend-api';
+import { MediaTypeResource, ApiError, ProblemDetails, FolderTreeItem } from '@umbraco-cms/backend-api';
 import type { MediaTypeDetails } from '@umbraco-cms/models';
 
 /**
@@ -9,8 +9,8 @@ import type { MediaTypeDetails } from '@umbraco-cms/models';
  * @extends {UmbDataStoreBase<MediaTypeDetails | EntityTreeItem>}
  * @description - Data Store for Media Types
  */
-export class UmbMediaTypeStore extends UmbDataStoreBase<MediaTypeDetails | PagedFolderTreeItem> {
-	getTreeRoot(): Observable<Array<PagedFolderTreeItem>> {
+export class UmbMediaTypeStore extends UmbDataStoreBase<MediaTypeDetails | FolderTreeItem> {
+	getTreeRoot(): Observable<Array<FolderTreeItem>> {
 		MediaTypeResource.getTreeMediaTypeRoot({}).then(
 			(res) => {
 				this.updateItems(res.items);
@@ -28,7 +28,7 @@ export class UmbMediaTypeStore extends UmbDataStoreBase<MediaTypeDetails | Paged
 		return this.items.pipe(map((items) => items.filter((item) => item.parentKey === null)));
 	}
 
-	getTreeItemChildren(key: string): Observable<Array<PagedFolderTreeItem>> {
+	getTreeItemChildren(key: string): Observable<Array<FolderTreeItem>> {
 		MediaTypeResource.getTreeMediaTypeChildren({
 			parentKey: key,
 		}).then(

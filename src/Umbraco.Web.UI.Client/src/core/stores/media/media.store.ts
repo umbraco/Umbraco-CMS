@@ -3,6 +3,10 @@ import { UmbDataStoreBase } from '../store';
 import type { MediaDetails } from '@umbraco-cms/models';
 import { ApiError, ContentTreeItem, MediaResource, ProblemDetails } from '@umbraco-cms/backend-api';
 
+const isMediaDetails = (media: MediaDetails | ContentTreeItem): media is MediaDetails => {
+	return (media as MediaDetails).data !== undefined;
+};
+
 /**
  * @export
  * @class UmbMediaStore
@@ -18,7 +22,7 @@ export class UmbMediaStore extends UmbDataStoreBase<MediaDetails | ContentTreeIt
 				this.updateItems(data);
 			});
 			
-		return this.items.pipe(map((media) => media.find((media) => media.key === key) || null));
+		return this.items.pipe(map((media) => media.find((media) => media.key === key && isMediaDetails(media)) as MediaDetails || null));
 	}
 
 	// TODO: make sure UI somehow can follow the status of this action.

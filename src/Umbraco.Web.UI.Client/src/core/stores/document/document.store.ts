@@ -3,6 +3,10 @@ import { UmbDataStoreBase } from '../store';
 import type { DocumentDetails } from '@umbraco-cms/models';
 import { ApiError, DocumentResource, DocumentTreeItem, FolderTreeItem, ProblemDetails } from '@umbraco-cms/backend-api';
 
+const isDocumentDetails = (document: DocumentDetails | DocumentTreeItem): document is DocumentDetails => {
+	return (document as DocumentDetails).data !== undefined;
+};
+
 /**
  * @export
  * @class UmbDocumentStore
@@ -11,14 +15,14 @@ import { ApiError, DocumentResource, DocumentTreeItem, FolderTreeItem, ProblemDe
  */
 export class UmbDocumentStore extends UmbDataStoreBase<DocumentDetails | DocumentTreeItem> {
 	getByKey(key: string): Observable<DocumentDetails | null> {
-		// fetch from server and update store
+		// TODO: use backend cli when available.
 		fetch(`/umbraco/management/api/v1/document/details/${key}`)
 			.then((res) => res.json())
 			.then((data) => {
 				this.updateItems(data);
 			});
 			
-		return this.items.pipe(map((documents) => documents.find((document) => document.key === key) || null));
+		return this.items.pipe(map((documents) => documents.find((document) => document.key === key && isDocumentDetails(document)) as DocumentDetails || null));
 	}
 
 	// TODO: make sure UI somehow can follow the status of this action.
@@ -34,7 +38,7 @@ export class UmbDocumentStore extends UmbDataStoreBase<DocumentDetails | Documen
 			return Promise.reject();
 		}
 
-		// TODO: Use node type to hit the right API, or have a general Node API?
+		// TODO: use backend cli when available.
 		return fetch('/umbraco/management/api/v1/document/save', {
 			method: 'POST',
 			body: body,
@@ -50,8 +54,7 @@ export class UmbDocumentStore extends UmbDataStoreBase<DocumentDetails | Documen
 
 	// TODO: how do we handle trashed items?
 	async trash(keys: Array<string>) {
-		// fetch from server and update store
-		// TODO: Use node type to hit the right API, or have a general Node API?
+		// TODO: use backend cli when available.
 		const res = await fetch('/umbraco/management/api/v1/document/trash', {
 			method: 'POST',
 			body: JSON.stringify(keys),
