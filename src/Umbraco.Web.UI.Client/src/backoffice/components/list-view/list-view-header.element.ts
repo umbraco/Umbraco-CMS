@@ -33,21 +33,22 @@ export class UmbListViewHeaderElement extends LitElement {
 			label: 'List',
 			icon: 'umb:list',
 			action: () => {
-				console.log('List');
+				this._currentViewType = this.viewTypes[0];
 			},
 		},
 		{
 			label: 'Grid',
 			icon: 'umb:grid',
 			action: () => {
-				console.log('Grid');
+				console.log('aweawd');
+				this._currentViewType = this.viewTypes[1];
 			},
 		},
 		{
 			label: 'something else',
 			icon: 'umb:folder',
 			action: () => {
-				console.log('something else');
+				this._currentViewType = this.viewTypes[2];
 			},
 		},
 	];
@@ -68,15 +69,14 @@ export class UmbListViewHeaderElement extends LitElement {
 			},
 		},
 	];
+
 	@property()
 	public useSearch = true;
 
 	@state()
 	private _currentViewType = this.viewTypes[0];
-
 	@state()
 	private _search = '';
-
 	@state()
 	private _actionsOpen = false;
 	@state()
@@ -133,10 +133,6 @@ export class UmbListViewHeaderElement extends LitElement {
 		}
 
 		return nothing;
-	}
-
-	private _renderMenu() {
-		return html``;
 	}
 
 	render() {

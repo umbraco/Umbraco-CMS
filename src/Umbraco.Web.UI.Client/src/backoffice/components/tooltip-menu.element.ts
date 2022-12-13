@@ -49,29 +49,7 @@ export class UmbTooltipMenuElement extends LitElement {
 	public icon = false;
 
 	@property()
-	public items: Array<TooltipMenuItem> = [
-		{
-			label: 'Create file',
-			icon: 'umb:file',
-			action: () => {
-				console.log('Create file');
-			},
-		},
-		{
-			label: 'Create folder',
-			icon: 'umb:folder',
-			action: () => {
-				console.log('Create folder');
-			},
-		},
-		{
-			label: 'Create media',
-			icon: 'umb:media',
-			action: () => {
-				console.log('Create media');
-			},
-		},
-	];
+	public items: Array<TooltipMenuItem> = [];
 
 	private _handleItemClick(item: TooltipMenuItem) {
 		item.action();
