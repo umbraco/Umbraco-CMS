@@ -2,7 +2,7 @@
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.RedirectUrlManagement;
 
-namespace Umbraco.Cms.Api.Management.RedirectUrlManagement;
+namespace Umbraco.Cms.Api.Management.Controllers.RedirectUrlManagement;
 
 public class GetEnabledController : RedirectUrlManagementBaseController
 {
