@@ -16,6 +16,9 @@ export class UmbUserContext {
 		updateDate: '8/27/2022',
 		createDate: '9/19/2022',
 		failedLoginAttempts: 0,
+		userGroups: [],
+		contentStartNodes: [],
+		mediaStartNodes: [],
 	});
 	public readonly data: Observable<UserDetails> = this._data.asObservable();
 

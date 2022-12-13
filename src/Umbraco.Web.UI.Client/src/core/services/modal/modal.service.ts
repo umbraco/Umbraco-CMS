@@ -12,10 +12,10 @@ import type { UmbModalContentPickerData } from './layouts/content-picker/modal-l
 import type { UmbModalPropertyEditorUIPickerData } from './layouts/property-editor-ui-picker/modal-layout-property-editor-ui-picker.element';
 import { UmbModalHandler } from './';
 
-export type UmbModelType = 'dialog' | 'sidebar';
+export type UmbModalType = 'dialog' | 'sidebar';
 
 export interface UmbModalOptions<UmbModalData> {
-	type?: UmbModelType;
+	type?: UmbModalType;
 	size?: UUIModalSidebarSize;
 	data?: UmbModalData;
 }

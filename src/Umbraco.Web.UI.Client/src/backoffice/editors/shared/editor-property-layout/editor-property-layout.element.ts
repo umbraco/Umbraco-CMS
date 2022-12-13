@@ -18,6 +18,18 @@ export class UmbEditorPropertyLayoutElement extends LitElement {
 				grid-template-columns: 200px 600px;
 				gap: var(--uui-size-layout-2);
 			}
+			:host {
+				border-bottom: 1px solid var(--uui-color-divider);
+				padding: var(--uui-size-space-6) 0;
+			}
+			p {
+				margin-bottom: 0;
+			}
+			#header {
+				position: sticky;
+				top: var(--uui-size-space-4);
+				height: min-content;
+			}
 		`,
 	];
 
@@ -41,7 +53,7 @@ export class UmbEditorPropertyLayoutElement extends LitElement {
 
 	render() {
 		return html`
-			<div>
+			<div id="header">
 				<uui-label>${this.label}</uui-label>
 				<slot name="property-action-menu"></slot>
 				<p>${this.description}</p>

@@ -37,7 +37,9 @@ export interface UserDetails extends UserEntity {
 	updateDate: string;
 	createDate: string;
 	failedLoginAttempts: number;
-	userGroup?: string; //TODO Implement this
+	userGroups: Array<string>;
+	contentStartNodes: Array<string>;
+	mediaStartNodes: Array<string>;
 }
 
 export interface UserGroupEntity extends Entity {
@@ -45,12 +47,10 @@ export interface UserGroupEntity extends Entity {
 }
 
 export interface UserGroupDetails extends UserGroupEntity {
-	key: string;
-	name: string;
-	icon: string;
-	sections?: Array<string>;
+	sections: Array<string>;
 	contentStartNode?: string;
 	mediaStartNode?: string;
+	permissions: Array<string>;
 }
 
 // Data Types

@@ -8,9 +8,6 @@ import type { DataTypeDetails } from '@umbraco-cms/models';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextProviderMixin, UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-
-import '../shared/editor-entity-layout/editor-entity-layout.element';
-
 /**
  *  @element umb-editor-data-type
  *  @description - Element for displaying a Data Type Editor

@@ -33,8 +33,8 @@ export class UmbTreeContextBase implements UmbTreeContext {
 	}
 
 	public select(key: string) {
-		const selection = this._selection.getValue();
-		this._selection.next([...selection, key]);
+		const selection = [...this._selection.getValue(), key];
+		this._selection.next(selection);
 	}
 
 	public deselect(key: string) {
