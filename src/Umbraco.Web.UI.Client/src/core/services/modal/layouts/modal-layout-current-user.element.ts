@@ -11,8 +11,8 @@ import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import '../../../../backoffice/external-login-providers/external-login-provider-extension.element';
 import '../../../../backoffice/user-dashboards/user-dashboard-extension.element';
 
-@customElement('umb-modal-layout-user-dialog')
-export class UmbModalLayoutUserDialogElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+@customElement('umb-modal-layout-current-user')
+export class UmbModalLayoutCurrentUserElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles: CSSResultGroup = [
 		UUITextStyles,
 		css`
@@ -220,6 +220,6 @@ export class UmbModalLayoutUserDialogElement extends UmbContextConsumerMixin(Umb
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-modal-layout-user-dialog': UmbModalLayoutUserDialogElement;
+		'umb-modal-layout-current-user': UmbModalLayoutCurrentUserElement;
 	}
 }
