@@ -208,7 +208,7 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(
 		);
 	}
 
-	private renderLeftColumn() {
+	private _renderLeftColumn() {
 		if (!this._user) return nothing;
 
 		return html` <uui-box>
@@ -259,7 +259,7 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(
 			</uui-box>`;
 	}
 
-	private renderRightColumn() {
+	private _renderRightColumn() {
 		if (!this._user || !this._userStore) return nothing;
 
 		const statusLook = getTagLookAndColor(this._user.status);
@@ -330,8 +330,8 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(
 			<umb-editor-entity-layout alias="Umb.Editor.User">
 				<uui-input id="name" slot="name" .value=${this._userName} @input="${this._handleInput}"></uui-input>
 				<div id="main">
-					<div id="left-column">${this.renderLeftColumn()}</div>
-					<div id="right-column">${this.renderRightColumn()}</div>
+					<div id="left-column">${this._renderLeftColumn()}</div>
+					<div id="right-column">${this._renderRightColumn()}</div>
 				</div>
 			</umb-editor-entity-layout>
 		`;
