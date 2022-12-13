@@ -48,7 +48,11 @@ export class UmbExtensionSlotElement extends UmbObserverMixin(LitElement) {
 				.pipe(map((extensions) => extensions.filter(this.filter))),
 			async (extensions: ManifestTypes[]) => {
 
-                // TODO: Lets remove extensions that is not valid anymore?
+                const oldLength = this._extensions.length;
+                this._extensions = this._extensions.filter(current => extensions.find(incoming => incoming.alias === current.alias));
+                if(this._extensions.length !== oldLength) {
+                    this.requestUpdate('_extensions');
+                }
 
                 extensions.forEach(async (extension: ManifestTypes) => {
 
@@ -67,9 +71,13 @@ export class UmbExtensionSlotElement extends UmbObserverMixin(LitElement) {
                             // sort:
                             // TODO: Make sure its right to have highest last?
                             this._extensions.sort((a, b) => a.weight - b.weight);
+                        } else {
+                            // Remove cause we could not get the component, so we will get rid of this.
+                            //this._extensions.splice(this._extensions.indexOf(extensionObject), 1);
+                            // Actually not, because if, then the same extension would come around again in next update.
                         }
+                        this.requestUpdate('_extensions');
                     }
-                    this.requestUpdate('_extensions');
                 });
 
 			}
