@@ -25,8 +25,15 @@ export class UmbEditorDocumentTypeElement extends UmbContextProviderMixin(
 				height: 100%;
 			}
 
+			#header {
+				display: flex;
+				flex: 1 1 auto;
+				margin: 0 var(--uui-size-layout-1);
+			}
+
 			#name {
 				width: 100%;
+				flex: 1 1 auto;
 			}
 
 			#alias {
@@ -121,7 +128,7 @@ export class UmbEditorDocumentTypeElement extends UmbContextProviderMixin(
 	render() {
 		return html`
 			<umb-editor-entity-layout alias="Umb.Editor.DocumentType">
-				<div slot="header">
+				<div id="header" slot="header">
 					<div>Icon</div>
 					<uui-input id="name" .value=${this._documentType?.name} @input="${this._handleInput}">
 						<div id="alias" slot="append">${this._documentType?.alias}</div>
