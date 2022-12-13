@@ -130,7 +130,11 @@ internal class ContentMapDefinition : IMapDefinition
     // Umbraco.Code.MapAll
     private void Map(ContentItemDisplay source, ContentItemDisplayWithSchedule target, MapperContext context)
     {
-        target.AdditionalData = source.AdditionalData;
+        foreach (KeyValuePair<string, object> additionalData in source.AdditionalData)
+        {
+            target.AdditionalData.Add(additionalData);
+        }
+
         target.AllowedActions = source.AllowedActions;
         target.AllowedTemplates = source.AllowedTemplates;
         target.AllowPreview = source.AllowPreview;
@@ -199,7 +203,11 @@ internal class ContentMapDefinition : IMapDefinition
     // Umbraco.Code.MapAll
     private static void Map(ContentItemDisplayWithSchedule source, ContentItemDisplay target, MapperContext context)
     {
-        target.AdditionalData = source.AdditionalData;
+        foreach (KeyValuePair<string, object> additionalData in source.AdditionalData)
+        {
+            target.AdditionalData.Add(additionalData);
+        }
+
         target.AllowedActions = source.AllowedActions;
         target.AllowedTemplates = source.AllowedTemplates;
         target.AllowPreview = source.AllowPreview;
