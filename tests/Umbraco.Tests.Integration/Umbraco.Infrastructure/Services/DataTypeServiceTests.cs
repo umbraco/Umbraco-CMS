@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
@@ -55,7 +56,7 @@ public class DataTypeServiceTests : UmbracoIntegrationTest
     public void DataTypeService_Can_Delete_Textfield_DataType_And_Clear_Usages()
     {
         // Arrange
-        var textfieldId = "Umbraco.Textbox";
+        var textfieldId = Constants.PropertyEditors.Aliases.TextBox;
         var dataTypeDefinitions = DataTypeService.GetByEditorAlias(textfieldId);
         var template = TemplateBuilder.CreateTextPageTemplate();
         FileService.SaveTemplate(template);
