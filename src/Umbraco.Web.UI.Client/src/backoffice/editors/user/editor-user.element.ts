@@ -3,10 +3,12 @@ import { css, html, LitElement, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
-
 import { repeat } from 'lit/directives/repeat.js';
+
 import { getTagLookAndColor } from '../../sections/users/user-extensions';
 import { UmbUserContext } from './user.context';
+
+import { UmbUserStore } from '@umbraco-cms/stores/user';
 import { UmbContextProviderMixin, UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import type { ManifestEditorAction, ManifestWithLoader, UserDetails } from '@umbraco-cms/models';
@@ -14,7 +16,7 @@ import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 
 import '../../property-editor-uis/content-picker/property-editor-ui-content-picker.element';
 import '@umbraco-cms/sections/users/picker-user-group.element';
-import { UmbUserStore } from '@umbraco-cms/stores/user/user.store';
+
 
 @customElement('umb-editor-user')
 export class UmbEditorUserElement extends UmbContextProviderMixin(
