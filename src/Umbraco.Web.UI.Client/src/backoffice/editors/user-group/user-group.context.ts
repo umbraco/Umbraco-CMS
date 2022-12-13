@@ -10,7 +10,6 @@ export class UmbUserGroupContext {
 		type: 'user-group',
 		hasChildren: false,
 		parentKey: '',
-		isTrashed: false,
 		sections: [],
 		permissions: [],
 		users: [],
