@@ -78,24 +78,26 @@ export class UmbSectionElement extends UmbContextConsumerMixin(UmbObserverMixin(
 	}
 
 	private _createTreeRoutes() {
-		const treeRoutes =
-			this._trees?.map(() => {
-				return {
-					path: `:entityType/:key`,
-					component: () => import('../../editors/shared/editor-entity/editor-entity.element'),
-					setup: (component: UmbEditorEntityElement, info: any) => {
-						component.entityKey = info.match.params.key;
-						component.entityType = info.match.params.entityType;
-					},
-				};
-			}) ?? [];
-
 		this._routes = [
 			{
 				path: 'dashboard',
 				component: () => import('./section-dashboards/section-dashboards.element'),
 			},
-			...treeRoutes,
+			{
+				path: `:entityType/:key`,
+				component: () => import('../../editors/shared/editor-entity/editor-entity.element'),
+				setup: (component: UmbEditorEntityElement, info: any) => {
+					component.entityKey = info.match.params.key;
+					component.entityType = info.match.params.entityType;
+				},
+			},
+			{
+				path: `:entityType`,
+				component: () => import('../../editors/shared/editor-entity/editor-entity.element'),
+				setup: (component: UmbEditorEntityElement, info: any) => {
+					component.entityType = info.match.params.entityType;
+				},
+			},
 			{
 				path: '**',
 				redirectTo: 'dashboard',

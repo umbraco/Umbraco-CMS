@@ -3,13 +3,15 @@ import { repeat } from 'lit/directives/repeat.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
+import { UmbSectionContext } from '../../sections/section.context';
 import { UmbTreeContext } from '../tree.context';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-import type { Entity, ManifestTree } from '@umbraco-cms/models';
+import type { Entity, ManifestSection, ManifestTree } from '@umbraco-cms/models';
 import { UmbDataStore } from 'src/core/stores/store';
 
 import './tree-item.element';
+import { UmbDocumentTypeStore } from '@umbraco-cms/stores/document-type/document-type.store';
 
 @customElement('umb-tree-navigator')
 export class UmbTreeNavigator extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
@@ -24,7 +26,11 @@ export class UmbTreeNavigator extends UmbContextConsumerMixin(UmbObserverMixin(L
 	@state()
 	private _tree?: ManifestTree;
 
+	@state()
+	private _href?: string;
+
 	private _treeStore?: UmbDataStore<unknown>;
+	private _sectionContext?: UmbSectionContext;
 
 	constructor() {
 		super();
@@ -35,6 +41,11 @@ export class UmbTreeNavigator extends UmbContextConsumerMixin(UmbObserverMixin(L
 
 		this.consumeContext('umbTreeContext', (treeContext: UmbTreeContext) => {
 			this._tree = treeContext.tree;
+		});
+
+		this.consumeContext('umbSectionContext', (sectionContext: UmbSectionContext) => {
+			this._sectionContext = sectionContext;
+			this._observeSection();
 		});
 	}
 
@@ -54,11 +65,25 @@ export class UmbTreeNavigator extends UmbContextConsumerMixin(UmbObserverMixin(L
 		});
 	}
 
+	private _observeSection() {
+		if (!this._sectionContext) return;
+
+		this.observe<ManifestSection>(this._sectionContext?.data, (section) => {
+			this._href = this._constructPath(section.meta.pathname, this._tree?.meta.rootNodeEntityType);
+		});
+	}
+
+	// TODO: how do we handle this?
+	private _constructPath(sectionPathname: string, type: string | undefined) {
+		return type ? `section/${sectionPathname}/${type}` : undefined;
+	}
+
 	render() {
 		// TODO: how do we know if a tree has children?
 		return html`<uui-menu-item
 			label="${ifDefined(this._tree?.meta.label)}"
 			@show-children=${this._onShowRoot}
+			href="${ifDefined(this._href)}"
 			has-children>
 			<uui-icon slot="icon" name="${ifDefined(this._tree?.meta.icon)}"></uui-icon>
 			${this._renderRootItems()}

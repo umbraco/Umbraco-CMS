@@ -1,5 +1,6 @@
 import type { ManifestTree } from '@umbraco-cms/models';
 
+
 export const manifests: Array<ManifestTree> = [
 	{
 		type: 'tree',
@@ -11,6 +12,7 @@ export const manifests: Array<ManifestTree> = [
 			label: 'Extensions',
 			icon: 'umb:favorite',
 			sections: ['Umb.Section.Settings'],
+			rootNodeEntityType: 'extensions-list', // TODO: how do we want to handle 'single node trees'. Trees without any children but still needs to open an editor? Currently an editor is chosen based on the entity type. The tree root node doesn't have one, so we need to tell which editor to use.
 		},
 	},
 	{
