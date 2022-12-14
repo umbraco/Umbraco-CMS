@@ -20,10 +20,10 @@ export class UmbBackofficeHeaderApps extends LitElement {
 
 	constructor() {
 		super();
-		this._registerEditorApps();
+		this._registerHeaderApps();
 	}
 
-	private _registerEditorApps() {
+	private _registerHeaderApps() {
 		const headerApps: Array<ManifestWithLoader<ManifestHeaderApp>> = [
 			{
 				type: 'headerApp',
