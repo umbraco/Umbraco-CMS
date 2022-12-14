@@ -18,6 +18,7 @@ import type {
 	ManifestExternalLoginProvider,
 } from '../../models';
 import { createExtensionElement } from '../create-extension-element.function';
+import { ManifestHeaderApp } from 'src/core/extensions-registry/header-app.models';
 
 export class UmbExtensionRegistry {
 	private _extensions = new BehaviorSubject<Array<ManifestTypes>>([]);
@@ -40,6 +41,19 @@ export class UmbExtensionRegistry {
 		}
 	}
 
+	unregister(alias:string): void {
+		const oldExtensionsValues = this._extensions.getValue();
+		const newExtensionsValues = oldExtensionsValues.filter((extension) => extension.alias !== alias);
+
+		// TODO: Maybe its not needed to fire an console.error. as you might want to call this method without needing to check the existence first.
+		if (oldExtensionsValues.length === newExtensionsValues.length) {
+			console.error(`Unable to unregister extension with alias ${alias}`);
+			return;
+		}
+
+		this._extensions.next(newExtensionsValues);
+	}
+
 	isRegistered(alias: string): boolean {
 		const values = this._extensions.getValue();
 		return values.some((ext) => ext.alias === alias);
@@ -54,6 +68,7 @@ export class UmbExtensionRegistry {
 	// TODO: implement unregister of extension
 
 	// Typings concept, need to put all core types to get a good array return type for the provided type...
+	extensionsOfType(type: 'headerApp'): Observable<Array<ManifestHeaderApp>>;
 	extensionsOfType(type: 'section'): Observable<Array<ManifestSection>>;
 	extensionsOfType(type: 'sectionView'): Observable<Array<ManifestSectionView>>;
 	extensionsOfType(type: 'tree'): Observable<Array<ManifestTree>>;
@@ -75,9 +90,7 @@ export class UmbExtensionRegistry {
 			map((exts) =>
 				exts
 					.filter((ext) => ext.type === type)
-					.sort((a, b) => {
-						return (b.weight || 0) - (a.weight || 0);
-					})
+					.sort((a, b) => (b.weight || 0) - (a.weight || 0))
 			)
 		);
 	}
