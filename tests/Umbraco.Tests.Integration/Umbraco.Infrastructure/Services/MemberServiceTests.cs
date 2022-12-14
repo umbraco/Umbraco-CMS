@@ -535,7 +535,7 @@ public class MemberServiceTests : UmbracoIntegrationTest
         Assert.IsNotNull(MemberService.GetById(member1.Id));
         Assert.IsNotNull(MemberService.GetById(member2.Id));
 
-        MemberService.AssignRoles(new[] { member1.Id, member2.Id }, new[] { "mytestrole1" });
+        MemberService.AssignRoles(new[] { member1.Id, member2.Id }, new[] { "MyTestRole1" });
 
         var membersInRole = MemberService.GetMembersInRole("MyTestRole1");
 
