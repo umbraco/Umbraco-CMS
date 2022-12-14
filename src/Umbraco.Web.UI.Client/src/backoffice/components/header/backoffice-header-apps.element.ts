@@ -45,7 +45,7 @@ export class UmbBackofficeHeaderTools extends LitElement {
 				weight: 100,
 				meta: {
 					label: 'Favorites',
-					icon: null,
+					icon: 'favorite',
 					pathname: 'favorites',
 				},
 			},
@@ -56,6 +56,8 @@ export class UmbBackofficeHeaderTools extends LitElement {
 				loader: () => import('./backoffice-header-app-user.element'),
 				weight: 1000,
 				meta: {
+					label: 'TODO: how should we enable this to not be set.',
+					icon: 'TODO: how should we enable this to not be set.',
 					pathname: 'user',
 				},
 			},
