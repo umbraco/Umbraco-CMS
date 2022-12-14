@@ -9,8 +9,9 @@ import type { ManifestPropertyEditorUI, ManifestPropertyEditorModel } from './pr
 import type { ManifestDashboard } from './dashboard.models';
 import type { ManifestPropertyAction } from './property-action.models';
 import type { ManifestPackageView } from './package-view.models';
-import { ManifestHeaderApp } from './header-app.models';
+import type { ManifestHeaderApp } from './header-app.models';
 
+export * from './header-app.models';
 export * from './section.models';
 export * from './section-view.models';
 export * from './tree.models';

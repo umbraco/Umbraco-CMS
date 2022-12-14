@@ -64,10 +64,8 @@ export class UmbExtensionSlotElement extends UmbObserverMixin(LitElement) {
                         this._extensions.push(extensionObject);
                         const component = await createExtensionElement(extension);
                         if(component) {
-                            // TODO: Consider if this is the best way to parse meta data to the component it self?
-                            if((extension as any)?.meta) {
-                                (component as any).extensionMeta = (extension as any).meta;
-                            }
+                            
+                            (component as any).manifest = extension;
                             extensionObject.component = component;
 
                             // sort:
