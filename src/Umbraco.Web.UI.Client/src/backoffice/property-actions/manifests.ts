@@ -1,6 +1,6 @@
-import type { ManifestPropertyAction, ManifestWithLoader } from '@umbraco-cms/models';
+import type { ManifestPropertyAction } from '@umbraco-cms/models';
 
-export const manifests: Array<ManifestWithLoader<ManifestPropertyAction>> = [
+export const manifests: Array<ManifestPropertyAction> = [
 	{
 		type: 'propertyAction',
 		alias: 'Umb.PropertyAction.Copy',

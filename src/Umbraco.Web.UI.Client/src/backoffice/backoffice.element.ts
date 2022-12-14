@@ -36,7 +36,7 @@ import { manifests as editorManifests } from './editors/manifests';
 import { manifests as propertyActionManifests } from './property-actions/manifests';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-import type { ManifestTypes, ManifestWithLoader } from '@umbraco-cms/models';
+import type { ManifestTypes } from '@umbraco-cms/models';
 
 @defineElement('umb-backoffice')
 export class UmbBackofficeElement extends UmbContextConsumerMixin(UmbContextProviderMixin(LitElement)) {
@@ -81,7 +81,7 @@ export class UmbBackofficeElement extends UmbContextConsumerMixin(UmbContextProv
 		this.provideContext('umbSectionStore', new UmbSectionStore());
 	}
 
-	private _registerExtensions(manifests: Array<ManifestWithLoader<ManifestTypes>> | Array<ManifestTypes>) {
+	private _registerExtensions(manifests: Array<ManifestTypes> | Array<ManifestTypes>) {
 		manifests.forEach((manifest) => {
 			if (umbExtensionsRegistry.isRegistered(manifest.alias)) return;
 			umbExtensionsRegistry.register(manifest);

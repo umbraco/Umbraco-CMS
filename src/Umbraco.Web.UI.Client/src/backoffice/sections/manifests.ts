@@ -1,6 +1,6 @@
-import type { ManifestSection, ManifestWithLoader } from '@umbraco-cms/models';
+import type { ManifestSection } from '@umbraco-cms/models';
 
-export const manifests: Array<ManifestWithLoader<ManifestSection>> = [
+export const manifests: Array<ManifestSection> = [
 	{
 		type: 'section',
 		alias: 'Umb.Section.Content',
