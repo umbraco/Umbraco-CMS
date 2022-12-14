@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Api.Management.Mapping.Culture;
 using Umbraco.Cms.Api.Management.Mapping.Dictionary;
@@ -7,6 +7,7 @@ using Umbraco.Cms.Api.Management.Mapping.Languages;
 using Umbraco.Cms.Api.Management.Mapping.Relation;
 using Umbraco.Cms.Api.Management.Mapping.TrackedReferences;
 using Umbraco.New.Cms.Infrastructure.Persistence.Mappers;
+using Umbraco.Cms.Api.Management.Mapping.Package;
 
 namespace Umbraco.Cms.Api.Management.DependencyInjection;
 
@@ -21,7 +22,8 @@ public static class MappingBuilderExtensions
             .Add<RelationViewModelsMapDefinition>()
             .Add<LanguageViewModelsMapDefinition>()
             .Add<InstallerViewModelsMapDefinition>()
-            .Add<CultureViewModelMapDefinition>();
+            .Add<CultureViewModelMapDefinition>()
+            .Add<PackageViewModelMapDefinition>();
 
         return builder;
     }
