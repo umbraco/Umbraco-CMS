@@ -251,15 +251,42 @@ public abstract class UmbracoIntegrationTestBase
 
     private void ConfigureDatabaseFactory(IUmbracoDatabaseFactory databaseFactory, IOptionsMonitor<ConnectionStrings> connectionStrings)
     {
+        string? projectDirectory = Directory.GetParent(Environment.CurrentDirectory)?.Parent?.Parent?.FullName;
+        string tempFolder = @"TEMP\databases";
+        var tempFolderPath = Path.Combine(projectDirectory, tempFolder);
+        var absoluteDbPath = Path.Combine(tempFolderPath, Guid.NewGuid().ToString());
+
+        switch (TestOptions.Database)
+        {
+            case UmbracoTestOptions.Database.NewSchemaPerTest:
+                AddOnTestTearDown(() => TryDeleteFile(absoluteDbPath));
+                break;
+            case UmbracoTestOptions.Database.NewEmptyPerTest:
+                AddOnTestTearDown(() => TryDeleteFile(absoluteDbPath));
+                break;
+            case UmbracoTestOptions.Database.NewSchemaPerFixture:
+                if (_firstTestInFixture)
+                {
+                    AddOnFixtureTearDown(() => TryDeleteFile(absoluteDbPath));
+                }
+
+                break;
+            case UmbracoTestOptions.Database.NewEmptyPerFixture:
+                if (_firstTestInFixture)
+                {
+                    AddOnFixtureTearDown(() => TryDeleteFile(absoluteDbPath));
+                }
+                break;
+        }
+
         var builder = new SqliteConnectionStringBuilder
         {
-            DataSource = $"{Guid.NewGuid()}",
+            DataSource = $"{absoluteDbPath}",
             Mode = SqliteOpenMode.ReadWriteCreate,
             ForeignKeys = true,
             Pooling = false, // When pooling true, files kept open after connections closed, bad for cleanup.
             Cache = SqliteCacheMode.Shared
         };
-
         s_connectionStrings = new ConnectionStrings()
         {
             ConnectionString = builder.ConnectionString,
@@ -270,5 +297,31 @@ public abstract class UmbracoIntegrationTestBase
         connectionStrings.CurrentValue.ProviderName = s_connectionStrings.ProviderName;
 
         databaseFactory.Configure(s_connectionStrings);
+    }
+
+    private void TryDeleteFile(string filePath)
+    {
+        int maxRetries = 5;
+        int retries = 0;
+        bool retry = true;
+        do
+        {
+            try
+            {
+                File.Delete(filePath);
+                retry = false;
+            }
+            catch (IOException e)
+            {
+                retries++;
+                if (retries >= maxRetries)
+                {
+                    throw;
+                }
+
+                Thread.Sleep(500);
+            }
+        }
+        while (retry);
     }
 }
