@@ -2,7 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-import type { ManifestDashboard, ManifestWithLoader } from '@umbraco-cms/models';
+import type { ManifestDashboard } from '@umbraco-cms/models';
 
 @customElement('umb-media-section')
 export class UmbMediaSection extends LitElement {
@@ -14,7 +14,7 @@ export class UmbMediaSection extends LitElement {
 	}
 
 	private _registerDashboards() {
-		const dashboards: Array<ManifestWithLoader<ManifestDashboard>> = [
+		const dashboards: Array<ManifestDashboard> = [
 			{
 				type: 'dashboard',
 				alias: 'Umb.Dashboard.MediaManagement',

@@ -1,7 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import type { ManifestEditorView, ManifestWithLoader } from '@umbraco-cms/models';
+import type { ManifestEditorView } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
 import '../shared/node/editor-node.element';
@@ -29,7 +29,7 @@ export class UmbEditorMediaElement extends LitElement {
 	}
 
 	private _registerEditorViews() {
-		const dashboards: Array<ManifestWithLoader<ManifestEditorView>> = [
+		const dashboards: Array<ManifestEditorView> = [
 			{
 				type: 'editorView',
 				alias: 'Umb.EditorView.Media.Edit',

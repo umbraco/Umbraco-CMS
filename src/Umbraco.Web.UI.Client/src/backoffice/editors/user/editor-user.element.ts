@@ -11,7 +11,7 @@ import { UmbUserStore } from '@umbraco-cms/stores/user/user.store';
 
 import { UmbContextProviderMixin, UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-import type { ManifestEditorAction, ManifestWithLoader, UserDetails } from '@umbraco-cms/models';
+import type { ManifestEditorAction, UserDetails } from '@umbraco-cms/models';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 
 import '../../property-editor-uis/content-picker/property-editor-ui-content-picker.element';
@@ -101,7 +101,7 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(
 	}
 
 	private _registerEditorActions() {
-		const manifests: Array<ManifestWithLoader<ManifestEditorAction>> = [
+		const manifests: Array<ManifestEditorAction> = [
 			{
 				type: 'editorAction',
 				alias: 'Umb.EditorAction.User.Save',

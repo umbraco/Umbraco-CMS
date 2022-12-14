@@ -4,7 +4,7 @@ import { UmbEntityStore } from '../../../core/stores/entity.store';
 import { UmbTreeBase } from '../shared/tree-base.element';
 import { UmbTreeDocumentDataContext } from './tree-documents-data.context';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
-import type { ManifestTreeItemAction, ManifestWithLoader } from '@umbraco-cms/models';
+import type { ManifestTreeItemAction } from '@umbraco-cms/models';
 
 import '../shared/tree-navigator.element';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
@@ -25,7 +25,7 @@ export class UmbTreeDocumentElement extends UmbContextProviderMixin(UmbContextCo
 	}
 
 	private _registerTreeItemActions() {
-		const dashboards: Array<ManifestWithLoader<ManifestTreeItemAction>> = [
+		const dashboards: Array<ManifestTreeItemAction> = [
 			{
 				type: 'treeItemAction',
 				alias: 'Umb.TreeItemAction.Document.Create',
