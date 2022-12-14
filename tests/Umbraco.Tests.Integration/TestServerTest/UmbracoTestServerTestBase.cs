@@ -83,26 +83,6 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
                 // Executes after the standard ConfigureServices method
                 builder.ConfigureTestServices(services =>
                 {
-                    
-                    services.AddUmbracoEFCore(Configuration, (options, configuration) =>
-                    {
-                        var connectionString = s_connectionStrings?.ConnectionString;
-                        var providerName = s_connectionStrings?.ProviderName;
-
-                        if (!connectionString.IsNullOrWhiteSpace())
-                        {
-                            if (providerName == "Microsoft.Data.Sqlite")
-                            {
-                                options.UseSqlite(connectionString!);
-                            }
-                            else if (providerName == "Microsoft.Data.SqlClient")
-                            {
-                                options.UseSqlServer(connectionString!);
-                            }
-                        }
-                    });
-
-                    
                     // Add a test auth scheme with a test auth handler to authn and assign the user
                     services.AddAuthentication(TestAuthHandler.TestAuthenticationScheme)
                         .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(
