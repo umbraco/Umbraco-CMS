@@ -341,8 +341,6 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
                 yield return new ColumnInfo(table, columnName, ordinal, notNull, type);
             }
         }
-
-        db.CloseSharedConnection();
     }
 
     /// <inheritdoc />
