@@ -1,6 +1,6 @@
-import type { ManifestEditor, ManifestWithLoader } from '@umbraco-cms/models';
+import type { ManifestEditor } from '@umbraco-cms/models';
 
-export const manifests: Array<ManifestWithLoader<ManifestEditor>> = [
+export const manifests: Array<ManifestEditor> = [
 	{
 		type: 'editor',
 		alias: 'Umb.Editor.Member',

@@ -2,16 +2,16 @@ import { css, html, LitElement, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
-import { Subscription } from 'rxjs';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
-import UmbSectionViewUsersElement from '../../section-view-users.element';
-import { UmbUserStore } from '../../../../../../../core/stores/user/user.store';
+import type { UmbSectionViewUsersElement } from '../../section-view-users.element';
 import { getTagLookAndColor } from '../../../../user-extensions';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-import type { UserDetails, UserEntity } from '@umbraco-cms/models';
+import type { UserDetails, UserEntity, UserGroupDetails, UserGroupEntity } from '@umbraco-cms/models';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
+import { UmbUserGroupStore } from 'src/core/stores/user/user-group.store';
 
 @customElement('umb-editor-view-users-grid')
-export class UmbEditorViewUsersGridElement extends UmbContextConsumerMixin(LitElement) {
+export class UmbEditorViewUsersGridElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -25,8 +25,8 @@ export class UmbEditorViewUsersGridElement extends UmbContextConsumerMixin(LitEl
 				display: grid;
 				grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
 				gap: var(--uui-size-space-4);
-				padding: var(--uui-size-space-4);
-				padding-top: 0;
+				margin: var(--uui-size-layout-1);
+				margin-top: var(--uui-size-space-2);
 			}
 
 			uui-card-user {
@@ -46,44 +46,42 @@ export class UmbEditorViewUsersGridElement extends UmbContextConsumerMixin(LitEl
 	@state()
 	private _selection: Array<string> = [];
 
-	private _userStore?: UmbUserStore;
+	@state()
+	private _userGroups: Array<UserGroupEntity> = [];
+
+	private _userGroupStore?: UmbUserGroupStore;
 	private _usersContext?: UmbSectionViewUsersElement;
-	private _usersSubscription?: Subscription;
-	private _selectionSubscription?: Subscription;
 
-	connectedCallback(): void {
-		super.connectedCallback();
+	constructor() {
+		super();
 
-		this.consumeContext('umbUserStore', (userStore: UmbUserStore) => {
-			this._userStore = userStore;
+		this.consumeAllContexts(['umbUserGroupStore', 'umbUsersContext'], (instances) => {
+			this._userGroupStore = instances['umbUserGroupStore'];
+			this._usersContext = instances['umbUsersContext'];
 			this._observeUsers();
-		});
-
-		this.consumeContext('umbUsersContext', (usersContext: UmbSectionViewUsersElement) => {
-			this._usersContext = usersContext;
+			this._observeUserGroups();
 			this._observeSelection();
 		});
 	}
 
 	private _observeUsers() {
-		this._usersSubscription?.unsubscribe();
-		this._usersSubscription = this._userStore?.getAll().subscribe((users) => {
+		if (!this._usersContext) return;
+		this.observe<Array<UserDetails>>(this._usersContext.users, (users) => {
 			this._users = users;
 		});
 	}
 
-	private _observeSelection() {
-		this._selectionSubscription?.unsubscribe();
-		this._selectionSubscription = this._usersContext?.selection.subscribe((selection: Array<string>) => {
-			this._selection = selection;
-		});
+	private _observeUserGroups() {
+		if (!this._userGroupStore) return;
+		this.observe<Array<UserGroupDetails>>(
+			this._userGroupStore.getAll(),
+			(userGroups) => (this._userGroups = userGroups)
+		);
 	}
 
-	disconnectedCallback(): void {
-		super.disconnectedCallback();
-
-		this._usersSubscription?.unsubscribe();
-		this._selectionSubscription?.unsubscribe();
+	private _observeSelection() {
+		if (!this._usersContext) return;
+		this.observe<Array<string>>(this._usersContext.selection, (selection) => (this._selection = selection));
 	}
 
 	private _isSelected(key: string) {
@@ -103,8 +101,16 @@ export class UmbEditorViewUsersGridElement extends UmbContextConsumerMixin(LitEl
 		this._usersContext?.deselect(user.key);
 	}
 
+	private _getUserGroupNames(keys: Array<string>) {
+		return keys
+			.map((key: string) => {
+				return this._userGroups.find((x) => x.key === key)?.name;
+			})
+			.join(', ');
+	}
+
 	private renderUserCard(user: UserDetails) {
-		if (!this._userStore) return;
+		if (!this._usersContext) return;
 
 		const statusLook = getTagLookAndColor(user.status);
 
@@ -126,7 +132,7 @@ export class UmbEditorViewUsersGridElement extends UmbContextConsumerMixin(LitEl
 							${user.status}
 					  </uui-tag>`
 					: nothing}
-				<div>USER GROUPS NOT IMPLEMENTED</div>
+				<div>${this._getUserGroupNames(user.userGroups)}</div>
 				${user.lastLoginDate
 					? html`<div class="user-login-time">
 							<div>Last login</div>

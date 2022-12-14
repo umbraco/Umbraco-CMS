@@ -1,4 +1,6 @@
 //TODO: we need to figure out what components should be available for extensions and load them upfront
+import './editors/shared/editor-entity-layout/editor-entity-layout.element';
+import './components/ref-property-editor-ui/ref-property-editor-ui.element';
 import './components/backoffice-header.element';
 import './components/backoffice-main.element';
 import './components/backoffice-modal-container.element';
@@ -34,7 +36,7 @@ import { manifests as editorManifests } from './editors/manifests';
 import { manifests as propertyActionManifests } from './property-actions/manifests';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-import type { ManifestTypes, ManifestWithLoader } from '@umbraco-cms/models';
+import type { ManifestTypes } from '@umbraco-cms/models';
 
 @defineElement('umb-backoffice')
 export class UmbBackofficeElement extends UmbContextConsumerMixin(UmbContextProviderMixin(LitElement)) {
@@ -79,7 +81,7 @@ export class UmbBackofficeElement extends UmbContextConsumerMixin(UmbContextProv
 		this.provideContext('umbSectionStore', new UmbSectionStore());
 	}
 
-	private _registerExtensions(manifests: Array<ManifestWithLoader<ManifestTypes>> | Array<ManifestTypes>) {
+	private _registerExtensions(manifests: Array<ManifestTypes> | Array<ManifestTypes>) {
 		manifests.forEach((manifest) => {
 			if (umbExtensionsRegistry.isRegistered(manifest.alias)) return;
 			umbExtensionsRegistry.register(manifest);

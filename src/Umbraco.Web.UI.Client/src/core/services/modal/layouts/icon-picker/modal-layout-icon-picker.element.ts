@@ -3,13 +3,12 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UmbModalLayoutElement } from '../modal-layout.element';
 
-import '../../../../../backoffice/editors/shared/editor-entity-layout/editor-entity-layout.element';
-
 export interface UmbModalIconPickerData {
 	multiple: boolean;
 	selection: string[];
 }
 
+// TODO: Make use of UmbPickerLayoutBase
 @customElement('umb-modal-layout-icon-picker')
 export class UmbModalLayoutIconPickerElement extends UmbModalLayoutElement<UmbModalIconPickerData> {
 	static styles = [

@@ -1,6 +1,6 @@
-import type { ManifestPropertyEditorUI, ManifestWithLoader } from '@umbraco-cms/models';
+import type { ManifestPropertyEditorUI } from '@umbraco-cms/models';
 
-export const manifests: Array<ManifestWithLoader<ManifestPropertyEditorUI>> = [
+export const manifests: Array<ManifestPropertyEditorUI> = [
 	{
 		type: 'propertyEditorUI',
 		alias: 'Umb.PropertyEditorUI.BlockList',
