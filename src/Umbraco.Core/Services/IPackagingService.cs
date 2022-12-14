@@ -43,6 +43,13 @@ public interface IPackagingService : IService
     /// <returns></returns>
     PackageDefinition? GetCreatedPackageById(int id);
 
+    /// <summary>
+    ///     Returns a created package by key.
+    /// </summary>
+    /// <param name="key">The key of the package.</param>
+    /// <returns>The package or null if the package was not found.</returns>
+    PackageDefinition? GetCreatedPackageByKey(Guid key);
+
     void DeleteCreatedPackage(int id, int userId = Constants.Security.SuperUserId);
 
     /// <summary>

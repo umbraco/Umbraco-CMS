@@ -126,6 +126,32 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
         return packageDefinition;
     }
 
+    public PackageDefinition? GetByKey(Guid key)
+    {
+        Sql<ISqlContext> query = new Sql<ISqlContext>(_umbracoDatabase!.SqlContext)
+            .Select<CreatedPackageSchemaDto>()
+            .From<CreatedPackageSchemaDto>()
+            .Where<CreatedPackageSchemaDto>(x => x.PackageId == key);
+
+        List<CreatedPackageSchemaDto> schemaDtos = _umbracoDatabase.Fetch<CreatedPackageSchemaDto>(query);
+
+        if (schemaDtos.IsCollectionEmpty())
+        {
+            return null;
+        }
+
+        CreatedPackageSchemaDto packageSchema = schemaDtos.First();
+        var packageDefinition = _xmlParser.ToPackageDefinition(XElement.Parse(packageSchema.Value));
+        if (packageDefinition is not null)
+        {
+            packageDefinition.Id = packageSchema.Id;
+            packageDefinition.Name = packageSchema.Name;
+            packageDefinition.PackageId = packageSchema.PackageId;
+        }
+
+        return packageDefinition;
+    }
+
     public void Delete(int id)
     {
         // Delete package snapshot

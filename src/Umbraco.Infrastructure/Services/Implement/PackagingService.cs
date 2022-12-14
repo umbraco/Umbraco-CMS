@@ -107,6 +107,8 @@ public class PackagingService : IPackagingService
 
     public PackageDefinition? GetCreatedPackageById(int id) => _createdPackages.GetById(id);
 
+    public PackageDefinition? GetCreatedPackageByKey(Guid key) => _createdPackages.GetByKey(key);
+
     public bool SaveCreatedPackage(PackageDefinition definition) => _createdPackages.SavePackage(definition);
 
     public string ExportCreatedPackage(PackageDefinition definition) => _createdPackages.ExportPackage(definition);
