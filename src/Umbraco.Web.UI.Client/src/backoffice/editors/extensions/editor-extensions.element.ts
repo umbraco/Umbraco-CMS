@@ -32,6 +32,7 @@ export class UmbEditorExtensionsElement extends UmbContextConsumerMixin(UmbObser
 							<uui-table-head-cell>Type</uui-table-head-cell>
 							<uui-table-head-cell>Name</uui-table-head-cell>
 							<uui-table-head-cell>Alias</uui-table-head-cell>
+							<uui-table-head-cell>Actions</uui-table-head-cell>
 						</uui-table-head>
 
 						${this._extensions.map(
@@ -42,6 +43,7 @@ export class UmbEditorExtensionsElement extends UmbContextConsumerMixin(UmbObser
 										${isManifestElementType(extension) ? extension.name : 'Custom extension'}
 									</uui-table-cell>
 									<uui-table-cell>${extension.alias}</uui-table-cell>
+									<uui-table-cell><uui-button label="unload" @click=${() => umbExtensionsRegistry.unregister(extension.alias)}></uui-button></uui-table-cell>
 								</uui-table-row>
 							`
 						)}

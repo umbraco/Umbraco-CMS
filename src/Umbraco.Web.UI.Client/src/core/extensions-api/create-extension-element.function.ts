@@ -19,6 +19,10 @@ export async function createExtensionElement(manifest: ManifestTypes): Promise<H
 			return new js.default();
 		}
 
+		if(!Object.getOwnPropertyDescriptor(manifest, 'element')) {
+			console.error('-- Extension did not succeed creating an element, missing the manifest `element` or default export', manifest);
+		}
+
 		// If some JS was loaded and it did not at least contain a default export, then we are safe to assume that it executed as a module and does not need to be returned
 		return undefined;
 	}
