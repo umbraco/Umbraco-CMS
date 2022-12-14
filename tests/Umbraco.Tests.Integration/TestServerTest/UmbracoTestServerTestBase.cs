@@ -73,7 +73,6 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
              */
             var factory = new UmbracoWebApplicationFactory<UmbracoTestServerTestBase>(CreateHostBuilder);
 
-            
             // additional host configuration for web server integration tests
             Factory = factory.WithWebHostBuilder(builder =>
             {
