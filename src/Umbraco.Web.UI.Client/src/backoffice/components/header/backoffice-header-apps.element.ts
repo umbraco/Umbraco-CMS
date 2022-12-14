@@ -45,7 +45,7 @@ export class UmbBackofficeHeaderTools extends LitElement {
 				weight: 100,
 				meta: {
 					label: 'Favorites',
-					icon: 'favorite',
+					icon: null,
 					pathname: 'favorites',
 				},
 			},
