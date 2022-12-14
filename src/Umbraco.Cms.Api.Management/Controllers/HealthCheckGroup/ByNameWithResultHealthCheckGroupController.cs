@@ -39,7 +39,7 @@ public class ByNameWithResultHealthCheckGroupController : HealthCheckGroupContro
 
         if (group is null)
         {
-            return NotFound();
+            return await Task.FromResult(NotFound());
         }
 
         return await Task.FromResult(Ok(_healthCheckGroupWithResultViewModelFactory.CreateHealthCheckGroupWithResultViewModel(group)));
