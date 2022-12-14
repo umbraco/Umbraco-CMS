@@ -7,8 +7,9 @@ import { UmbDocumentTypeStore } from '../../../core/stores/document-type/documen
 import { UmbDocumentTypeContext } from './document-type.context';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
-import type { ManifestTypes, ManifestWithLoader, DocumentTypeDetails } from '@umbraco-cms/models';
+import type { ManifestTypes, DocumentTypeDetails } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
+
 import '../../property-editor-uis/icon-picker/property-editor-ui-icon-picker.element';
 
 @customElement('umb-editor-document-type')
@@ -62,7 +63,7 @@ export class UmbEditorDocumentTypeElement extends UmbContextProviderMixin(
 	}
 
 	private _registerExtensions() {
-		const extensions: Array<ManifestWithLoader<ManifestTypes>> = [
+		const extensions: Array<ManifestTypes> = [
 			{
 				type: 'editorView',
 				alias: 'Umb.EditorView.DocumentType.Design',

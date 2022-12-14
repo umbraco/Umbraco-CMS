@@ -1,7 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import type { ManifestDashboard, ManifestWithLoader } from '@umbraco-cms/models';
+import type { ManifestDashboard } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
 @customElement('umb-content-section')
@@ -15,7 +15,7 @@ export class UmbContentSection extends LitElement {
 	}
 
 	private _registerDashboards() {
-		const dashboards: Array<ManifestWithLoader<ManifestDashboard>> = [
+		const dashboards: Array<ManifestDashboard> = [
 			{
 				type: 'dashboard',
 				alias: 'Umb.Dashboard.Welcome',

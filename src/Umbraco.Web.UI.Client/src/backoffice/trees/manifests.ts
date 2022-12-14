@@ -1,6 +1,6 @@
-import type { ManifestTree, ManifestWithLoader } from '@umbraco-cms/models';
+import type { ManifestTree } from '@umbraco-cms/models';
 
-export const manifests: Array<ManifestWithLoader<ManifestTree>> = [
+export const manifests: Array<ManifestTree> = [
 	{
 		type: 'tree',
 		alias: 'Umb.Tree.Extensions',

@@ -8,7 +8,7 @@ import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import '@umbraco-cms/components/input-user/input-user.element';
 import '@umbraco-cms/components/input-section/input-section.element';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
-import type { ManifestEditorAction, ManifestWithLoader, UserDetails, UserGroupDetails } from '@umbraco-cms/models';
+import type { ManifestEditorAction, UserDetails, UserGroupDetails } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbUserGroupStore } from '@umbraco-cms/stores/user/user-group.store';
 import { UmbUserStore } from '@umbraco-cms/stores/user/user.store';
@@ -205,7 +205,7 @@ export class UmbEditorUserGroupElement extends UmbContextProviderMixin(
 	}
 
 	private _registerEditorActions() {
-		const manifests: Array<ManifestWithLoader<ManifestEditorAction>> = [
+		const manifests: Array<ManifestEditorAction> = [
 			{
 				type: 'editorAction',
 				alias: 'Umb.EditorAction.UserGroup.Save',

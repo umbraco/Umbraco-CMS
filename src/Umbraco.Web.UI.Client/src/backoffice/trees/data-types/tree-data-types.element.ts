@@ -3,7 +3,7 @@ import { customElement } from 'lit/decorators.js';
 import { UmbTreeBase } from '../shared/tree-base.element';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-import type { ManifestTreeItemAction, ManifestWithLoader } from '@umbraco-cms/models';
+import type { ManifestTreeItemAction } from '@umbraco-cms/models';
 
 import '../shared/tree-navigator.element';
 import { UmbDataTypesStore } from 'src/core/stores/data-types/data-types.store';
@@ -22,7 +22,7 @@ export class UmbTreeDataTypesElement extends UmbContextProviderMixin(UmbContextC
 	}
 
 	private _registerTreeItemActions() {
-		const dashboards: Array<ManifestWithLoader<ManifestTreeItemAction>> = [
+		const dashboards: Array<ManifestTreeItemAction> = [
 			{
 				type: 'treeItemAction',
 				alias: 'Umb.TreeItemAction.DataType.Create',
