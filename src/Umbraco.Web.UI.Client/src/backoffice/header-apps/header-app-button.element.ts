@@ -6,6 +6,7 @@ import { ManifestHeaderApp } from '@umbraco-cms/extensions-registry';
 
 @customElement('umb-header-app-button')
 export class UmbHeaderAppButton extends LitElement {
+	
 	static styles: CSSResultGroup = [
 		UUITextStyles,
 		css`
