@@ -1,7 +1,7 @@
 import { html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-import type { ManifestSectionView, ManifestWithLoader } from '@umbraco-cms/models';
+import type { ManifestSectionView } from '@umbraco-cms/models';
 
 @customElement('umb-section-users')
 export class UmbSectionUsersElement extends LitElement {
@@ -12,7 +12,7 @@ export class UmbSectionUsersElement extends LitElement {
 	}
 
 	private _registerSectionViews() {
-		const manifests: Array<ManifestWithLoader<ManifestSectionView>> = [
+		const manifests: Array<ManifestSectionView> = [
 			{
 				type: 'sectionView',
 				alias: 'Umb.SectionView.Users.Users',

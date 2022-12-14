@@ -85,6 +85,7 @@ export interface ManifestElement extends ManifestBase {
 	type: ManifestStandardTypes;
 	js?: string;
 	elementName?: string;
+	loader?: () => Promise<object | HTMLElement>;
 	meta?: any;
 }
 
@@ -97,6 +98,3 @@ export interface ManifestEntrypoint extends ManifestBase {
 	type: 'entrypoint';
 	js: string;
 }
-
-// TODO: couldn't we make loader optional on all manifests? and not just the internal ones?
-export type ManifestWithLoader<T> = T & { loader: () => Promise<object | HTMLElement> };
