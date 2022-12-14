@@ -1,4 +1,4 @@
-import '../../../backoffice/components/backoffice-notification-container.element';
+import '../../../backoffice/components/backoffice-frame/backoffice-notification-container.element';
 import '../../context-api/provide/context-provider.element';
 import './layouts/default';
 
