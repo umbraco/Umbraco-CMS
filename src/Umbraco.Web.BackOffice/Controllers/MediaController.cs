@@ -49,6 +49,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers;
 [ParameterSwapControllerActionSelector(nameof(GetChildren), "id", typeof(int), typeof(Guid), typeof(Udi))]
 public class MediaController : ContentControllerBase
 {
+    private static readonly Semaphore _postAddFileSemaphore = new(1, 1);
     private readonly AppCaches _appCaches;
     private readonly IAuthorizationService _authorizationService;
     private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
@@ -574,6 +575,7 @@ public class MediaController : ContentControllerBase
     public async Task<IActionResult> PostAddFile([FromForm] string path, [FromForm] string currentFolder,
         [FromForm] string contentTypeAlias, List<IFormFile> file)
     {
+        await _postAddFileSemaphore.WaitOneAsync();
         var root = _hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempFileUploads);
         //ensure it exists
         Directory.CreateDirectory(root);
@@ -581,6 +583,7 @@ public class MediaController : ContentControllerBase
         //must have a file
         if (file.Count == 0)
         {
+            _postAddFileSemaphore.Release();
             return NotFound();
         }
 
@@ -588,12 +591,14 @@ public class MediaController : ContentControllerBase
         ActionResult<int?>? parentIdResult = await GetParentIdAsIntAsync(currentFolder, true);
         if (!(parentIdResult?.Result is null))
         {
+            _postAddFileSemaphore.Release();
             return parentIdResult.Result;
         }
 
         var parentId = parentIdResult?.Value;
         if (!parentId.HasValue)
         {
+            _postAddFileSemaphore.Release();
             return NotFound("The passed id doesn't exist");
         }
 
@@ -605,6 +610,7 @@ public class MediaController : ContentControllerBase
             if (!IsFolderCreationAllowedHere(parentId.Value))
             {
                 AddCancelMessage(tempFiles, _localizedTextService.Localize("speechBubbles", "folderUploadNotAllowed"));
+                _postAddFileSemaphore.Release();
                 return Ok(tempFiles);
             }
 
@@ -638,6 +644,7 @@ public class MediaController : ContentControllerBase
                     //if the media root is null, something went wrong, we'll abort
                     if (mediaRoot == null)
                     {
+                        _postAddFileSemaphore.Release();
                         return Problem(
                             "The folder: " + folderName + " could not be used for storing images, its ID: " + parentId +
                             " returned null");
@@ -808,10 +815,12 @@ public class MediaController : ContentControllerBase
             KeyValuePair<string, StringValues> origin = HttpContext.Request.Query.First(x => x.Key == "origin");
             if (origin.Value == "blueimp")
             {
+                _postAddFileSemaphore.Release();
                 return new JsonResult(tempFiles); //Don't output the angular xsrf stuff, blue imp doesn't like that
             }
         }
 
+        _postAddFileSemaphore.Release();
         return Ok(tempFiles);
     }
 

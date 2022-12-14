@@ -2,7 +2,7 @@
 <language alias="sv" intName="Swedish" localName="Svenska" lcid="29" culture="sv-SE">
   <creator>
     <name>The Umbraco community</name>
-    <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
+    <link>https://docs.umbraco.com/umbraco-cms/extending/language-files</link>
   </creator>
   <area alias="apps">
     <key alias="umbContent">Innehåll</key>
@@ -126,6 +126,7 @@
     <key alias="noDocumentTypesCreateNew">Skapa en ny dokumenttyp</key>
     <key alias="pictureInsert">Infoga bild</key>
     <key alias="publishAndClose">Publicera och stäng</key>
+    <key alias="publishDescendants">Publicera med undersidor</key>
     <key alias="relations">Ändra relation</key>
     <key alias="returnToList">Återvänd till lista</key>
     <key alias="save">Spara</key>
@@ -149,6 +150,7 @@
     <key alias="alternativeTextHelp">(hur skulle du beskriva denna bild för någon över telefon)</key>
     <key alias="alternativeUrls">Alternativa länkar</key>
     <key alias="altTextOptional">Alternativ text (optionell)</key>
+    <key alias="captionTextOptional">Bildtext (optionell)</key>
     <key alias="childItems">Underliggande noder</key>
     <key alias="clickToEdit">Klicka för att redigera detta objekt</key>
     <key alias="createBy">Skapad av</key>
@@ -196,6 +198,11 @@
     <key alias="updatedBy">Uppdaterad av</key>
     <key alias="uploadClear">Ta bort fil</key>
     <key alias="urls">Länk till dokument</key>
+    <key alias="unpublished">Avpublicerad</key>
+    <key alias="publishedPendingChanges">Publicerad (osparade ändringar)</key>
+    <key alias="listViewNoContent">Inga undernoder har lagts till</key>
+    <key alias="noChanges">Inga ändringar har gjorts</key>
+    <key alias="notCreated">Ej skapad</key>    
   </area>
   <area alias="create">
     <key alias="chooseNode">Var vill du skapa den nya %0%</key>
@@ -222,10 +229,10 @@
     <key alias="formsInstall">Installera Umbraco Forms</key>
   </area>
   <area alias="prompt">
-    <key alias="stay">Stay</key>
-    <key alias="discardChanges">Discard changes</key>
-    <key alias="unsavedChanges">You have unsaved changes</key>
-    <key alias="unsavedChangesWarning">Are you sure you want to navigate away from this page? - you have unsaved changes</key>
+    <key alias="stay">Stanna</key>
+    <key alias="discardChanges">Ignorera ändringar</key>
+    <key alias="unsavedChanges">Du har osparade ändringar</key>
+    <key alias="unsavedChangesWarning">Är du säker på att du vill lämna sidan? - Du har osparade ändringar.</key>
   </area>
   <area alias="bulk">
     <key alias="done">Klar</key>
@@ -723,6 +730,7 @@
     <key alias="sortDone">Sortering klar</key>
     <key alias="sortHelp">Välj i vilken ordning du vill ha sidorna genom att dra dem upp eller ner i listan. Du kan också klicka på kolumnrubrikerna för att sortera grupper av sidor</key>
     <key alias="sortPleaseWait"><![CDATA[Vänta medan sidorna sorteras. Det kan ta en stund.]]></key>
+    <key alias="sortEmptyState">Den här noden har inga undernoder att sortera</key>
   </area>
   <area alias="speechBubbles">
     <key alias="contentPublishedFailedByEvent">Publiceringen avbröts av ett tredjepartstillägg</key>

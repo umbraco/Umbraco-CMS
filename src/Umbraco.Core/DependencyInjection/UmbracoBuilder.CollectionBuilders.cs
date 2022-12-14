@@ -1,5 +1,6 @@
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Dashboards;
+using Umbraco.Cms.Core.Manifest;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Routing;
@@ -57,6 +58,18 @@ public static partial class UmbracoBuilderExtensions
         where T : class, IDashboard
     {
         builder.Dashboards().Add<T>();
+        return builder;
+    }
+
+    /// <summary>
+    /// Register a manifest filter
+    /// </summary>
+    /// <typeparam name="T">The type of the manifest filter.</typeparam>
+    /// <param name="builder">The Builder.</param>
+    public static IUmbracoBuilder AddManifestFilter<T>(this IUmbracoBuilder builder)
+        where T : class, IManifestFilter
+    {
+        builder.ManifestFilters().Append<T>();
         return builder;
     }
 

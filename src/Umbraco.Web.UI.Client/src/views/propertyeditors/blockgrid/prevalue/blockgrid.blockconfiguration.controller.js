@@ -41,9 +41,8 @@
     function BlockConfigurationController($scope, $element, $http, elementTypeResource, overlayService, localizationService, editorService, eventsService, udiService, dataTypeResource, umbRequestHelper) {
 
         var unsubscribe = [];
-
+        
         const vm = this;
-
         vm.openBlock = null;
         vm.showSampleDataCTA = false;
 
@@ -57,7 +56,6 @@
             if (blockGroupModel.value == null) {
                 blockGroupModel.value = [];
             }
-
             vm.blockGroups = blockGroupModel.value;
 
             if (!$scope.model.value) {
@@ -89,7 +87,6 @@
                 }
             }
         }
-
         unsubscribe.push(eventsService.on("editors.documentType.saved", updateUsedElementTypes));
 
         function removeReferencesToElementTypeKey(contentElementTypeKey) {
@@ -267,7 +264,7 @@
         vm.openBlockOverlay = function (block, openAreas) {
 
             var elementType = vm.getElementTypeByKey(block.contentElementTypeKey);
-
+            
             if (elementType) {
                 localizationService.localize("blockEditor_blockConfigurationOverlayTitle", [elementType.name]).then(function (data) {
 
@@ -359,7 +356,6 @@
                 });
             }
         }
-
         dataTypeResource.getAll().then(function(dataTypes) {
             if (dataTypes.filter(x => x.alias === "Umbraco.BlockGrid").length === 0) {
                 vm.showSampleDataCTA = true;

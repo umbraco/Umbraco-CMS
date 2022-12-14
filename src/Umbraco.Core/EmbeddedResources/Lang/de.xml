@@ -2,13 +2,14 @@
 <language alias="de" intName="German (DE)" localName="Deutsch (DE)" lcid="7" culture="de-DE">
   <creator>
     <name>The Umbraco community</name>
-    <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
+    <link>https://docs.umbraco.com/umbraco-cms/extending/language-files</link>
   </creator>
   <area alias="actions">
     <key alias="assigndomain">Kulturen und Hostnamen</key>
     <key alias="auditTrail">Protokoll</key>
     <key alias="browse">Durchsuchen</key>
     <key alias="changeDocType">Dokumenttyp ändern</key>
+    <key alias="changeDataType">Datentyp ändern</key>
     <key alias="copy">Kopieren</key>
     <key alias="create">Neu</key>
     <key alias="export">Exportieren</key>
@@ -16,6 +17,8 @@
     <key alias="createGroup">Neue Gruppe</key>
     <key alias="delete">Entfernen</key>
     <key alias="disable">Deaktivieren</key>
+    <key alias="editContent">Inhalt bearbeiten</key>
+    <key alias="editSettings">Einstellungen bearbeiten</key>
     <key alias="emptyrecyclebin">Papierkorb leeren</key>
     <key alias="enable">Aktivieren</key>
     <key alias="exportDocumentType">Dokumenttyp exportieren</key>
@@ -30,13 +33,18 @@
     <key alias="unpublish">Veröffentlichung zurücknehmen</key>
     <key alias="refreshNode">Aktualisieren</key>
     <key alias="republish">Erneut veröffentlichen</key>
+    <key alias="remove">Entfernen</key>
     <key alias="rename" version="7.3.0">Umbenennen</key>
     <key alias="restore" version="7.3.0">Wiederherstellen</key>
     <key alias="chooseWhereToCopy">Wähle worunter kopiert werden soll</key>
     <key alias="chooseWhereToMove">Wähle worunter verschoben werden soll</key>
+    <key alias="chooseWhereToImport">Wähle wohin importiert werden soll</key>
+    <key alias="infiniteEditorChooseWhereToCopy">Wähle wohin die ausgewählten Elemente kopiert werden soll</key>
+    <key alias="infiniteEditorChooseWhereToMove">Wähle wohin die ausgewählten Elemente verschoben werden soll</key>
     <key alias="toInTheTreeStructureBelow">in der Baumstrukture</key>
     <key alias="wasMovedTo">wurde verschoben nach</key>
     <key alias="wasCopiedTo">wurde kopiert nach</key>
+    <key alias="wasDeleted">wurde gelöscht</key>
     <key alias="rights">Berechtigungen</key>
     <key alias="rollback">Zurücksetzen</key>
     <key alias="sendtopublish">Zur Veröffentlichung einreichen</key>
@@ -76,6 +84,7 @@
     <key alias="translate">Erlaube Übersetzung</key>
     <key alias="update">Erlaube Sichern von Änderungen</key>
     <key alias="createblueprint">Erlaube Anlegen von Inhaltsvorlagen</key>
+    <key alias="notify">Erlaube das Einrichten von Benachrichtungen für Inhalte</key>
   </area>
   <area alias="apps">
     <key alias="umbContent">Inhalt</key>
@@ -145,10 +154,10 @@
     <key alias="deleteTag">TAG entfernen</key>
     <key alias="confirmActionCancel">Abbrechen</key>
     <key alias="confirmActionConfirm">Bestätigen</key>
+    <key alias="submitChanges">Senden</key>
   </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">Anzeigen als</key>
-    <!--???-->
     <key alias="delete">Inhalt gelöscht</key>
     <key alias="unpublish">Inhalt unveröffentlicht</key>
     <key alias="unpublishvariant">Inhalt unveröffentlicht für Sprache: %0% </key>
@@ -162,6 +171,8 @@
     <key alias="sendtopublish">Veröffentlichung für Inhalt angefordert</key>
     <key alias="sendtopublishvariant">Veröffentlichung für Inhalt angefordert in Sprache: %0%</key>
     <key alias="sort">Unterknoten wurden sortiert von Benutzer</key>
+    <key alias="contentversionpreventcleanup">Versionsbereinigung deaktiviert für Version: %0%</key>
+    <key alias="contentversionenablecleanup">Versionsbereinigung aktiviert für Version: %0%</key>
     <key alias="smallCopy">Kopieren</key>
     <key alias="smallPublish">Veröffentlichen</key>
     <key alias="smallPublishVariant">Veröffentlichen</key>
@@ -175,6 +186,8 @@
     <key alias="smallSendToPublish">Veröffentlichung anfordern</key>
     <key alias="smallSendToPublishVariant">Veröffentlichung anfordern</key>
     <key alias="smallSort">Sortieren</key>
+    <key alias="smallContentVersionPreventCleanup">Speichern</key>
+    <key alias="smallContentVersionEnableCleanup">Speichern</key>
     <key alias="historyIncludingVariants">Verlauf (alle Variationen)</key>
   </area>
   <area alias="codefile">
@@ -258,7 +271,7 @@
     <key alias="scheduledPublishServerTime">Dies führt zur folgenden Zeit auf dem Server:</key>
     <key alias="scheduledPublishDocumentation">
       <![CDATA[
-    	<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank" rel="noopener">Was bedeutet dies?</a>
+    	<a href="https://docs.umbraco.com/umbraco-cms/fundamentals/data/scheduled-publishing#timezones" target="_blank" rel="noopener">Was bedeutet dies?</a>
     ]]>
     </key>
     <key alias="nestedContentDeleteItem">Wollen Sie dieses Element wirklich entfernen?</key>
