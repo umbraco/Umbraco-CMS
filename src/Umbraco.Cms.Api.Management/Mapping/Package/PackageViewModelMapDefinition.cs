@@ -19,6 +19,7 @@ public class PackageViewModelMapDefinition : IMapDefinition
         mapper.Define<IEnumerable<PackageDefinition>, PagedViewModel<PackageDefinitionViewModel>>((source, context) => new PagedViewModel<PackageDefinitionViewModel>(), Map);
     }
 
+    // Umbraco.Code.MapAll
     private static void Map(PackageDefinition source, PackageDefinitionViewModel target, MapperContext context)
     {
         target.Key = source.PackageId;
@@ -39,6 +40,7 @@ public class PackageViewModelMapDefinition : IMapDefinition
         target.DictionaryItems = source.DictionaryItems;
     }
 
+    // Umbraco.Code.MapAll
     private static void Map(IEnumerable<PackageDefinition> source, PagedViewModel<PackageDefinitionViewModel> target, MapperContext context)
     {
         target.Items = context.MapEnumerable<PackageDefinition, PackageDefinitionViewModel>(source);
