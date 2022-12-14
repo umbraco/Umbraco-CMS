@@ -6,6 +6,8 @@ import { ManifestTypes, umbExtensionsRegistry } from '@umbraco-cms/extensions-re
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
 
+type InitializedExtensionItem = {alias: string, weight: number, component: HTMLElement|null}
+
 /**
  * @element umb-extension-slot
  * @description
@@ -18,7 +20,7 @@ import { createExtensionElement } from '@umbraco-cms/extensions-api';
 export class UmbExtensionSlotElement extends UmbObserverMixin(LitElement) {
 
     @state()
-    private _extensions:{alias: string, weight: number, component: HTMLElement|null}[] = [];
+    private _extensions:InitializedExtensionItem[] = [];
 
     @property({ type: String })
     public type= "";
@@ -58,7 +60,7 @@ export class UmbExtensionSlotElement extends UmbObserverMixin(LitElement) {
 
                     const hasExt = this._extensions.find(x => x.alias === extension.alias);
                     if(!hasExt) {
-                        const extensionObject = {alias: extension.alias, weight: (extension as any).weight || 0, component: null};
+                        const extensionObject:InitializedExtensionItem = {alias: extension.alias, weight: (extension as any).weight || 0, component: null};
                         this._extensions.push(extensionObject);
                         const component = await createExtensionElement(extension);
                         if(component) {
