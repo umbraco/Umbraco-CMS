@@ -4,7 +4,7 @@ import { customElement } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { ManifestHeaderApp } from '@umbraco-cms/extensions-registry';
 
-@customElement('umb-backoffice-header-app-button')
+@customElement('umb-header-app-button')
 export class UmbHeaderAppButton extends LitElement {
 	static styles: CSSResultGroup = [
 		UUITextStyles,
@@ -30,6 +30,6 @@ export default UmbHeaderAppButton;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-backoffice-header-app-button': UmbHeaderAppButton;
+		'umb-header-app-button': UmbHeaderAppButton;
 	}
 }

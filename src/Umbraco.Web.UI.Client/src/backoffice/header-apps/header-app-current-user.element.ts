@@ -2,7 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
 
-@customElement('umb-backoffice-header-app-user')
+@customElement('umb-header-app-current-user')
 export class UmbHeaderAppCurrentUser extends LitElement {
 	static styles: CSSResultGroup = [
 		UUITextStyles,
