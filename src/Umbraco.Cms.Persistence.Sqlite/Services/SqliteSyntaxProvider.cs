@@ -326,7 +326,7 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
     {
         IEnumerable<string> tables = GetTablesInSchema(db);
 
-        db.OpenSharedConnection();
+        db.BeginTransaction();
         foreach (var table in tables)
         {
             DbCommand? cmd = db.CreateCommand(db.Connection, CommandType.Text, $"PRAGMA table_info({table})");
@@ -342,7 +342,7 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
             }
         }
 
-        db.CloseSharedConnection();
+        db.CompleteTransaction();
     }
 
     /// <inheritdoc />
