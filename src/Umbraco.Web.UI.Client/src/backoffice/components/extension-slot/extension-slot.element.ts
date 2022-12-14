@@ -1,9 +1,12 @@
-import { html, LitElement } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { LitElement, nothing } from 'lit';
+import { customElement, property, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
+import { repeat } from 'lit/directives/repeat.js';
 import { ManifestTypes, umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
+
+type InitializedExtensionItem = {alias: string, weight: number, component: HTMLElement|null}
 
 /**
  * @element umb-extension-slot
@@ -16,8 +19,8 @@ import { createExtensionElement } from '@umbraco-cms/extensions-api';
 @customElement('umb-extension-slot')
 export class UmbExtensionSlotElement extends UmbObserverMixin(LitElement) {
 
-
-    private _extensions = new Map<ManifestTypes, HTMLElement>()
+    @state()
+    private _extensions:InitializedExtensionItem[] = [];
 
     @property({ type: String })
     public type= "";
@@ -27,7 +30,6 @@ export class UmbExtensionSlotElement extends UmbObserverMixin(LitElement) {
 
     constructor() {
         super();
-
 
 		/*
 		this.extensionManager = new ExtensionManager(this, (x) => {x.meta.entityType === this.entityType}, (extensionManifests) => {
@@ -42,20 +44,39 @@ export class UmbExtensionSlotElement extends UmbObserverMixin(LitElement) {
     }
 
     private _observeExtensions() {
-
-        console.log("_observeExtensions", this.type, this.filter)
 		this.observe(
 			umbExtensionsRegistry
 				?.extensionsOfType(this.type)
 				.pipe(map((extensions) => extensions.filter(this.filter))),
 			async (extensions: ManifestTypes[]) => {
 
+                const oldLength = this._extensions.length;
+                this._extensions = this._extensions.filter(current => extensions.find(incoming => incoming.alias === current.alias));
+                if(this._extensions.length !== oldLength) {
+                    this.requestUpdate('_extensions');
+                }
+
                 extensions.forEach(async (extension: ManifestTypes) => {
-                    const component = await createExtensionElement(extension);
-                    if(component) {
-                        this._extensions.set(extension, component);
-                    } else {
-                        this._extensions.delete(extension);
+
+                    const hasExt = this._extensions.find(x => x.alias === extension.alias);
+                    if(!hasExt) {
+                        const extensionObject:InitializedExtensionItem = {alias: extension.alias, weight: (extension as any).weight || 0, component: null};
+                        this._extensions.push(extensionObject);
+                        const component = await createExtensionElement(extension);
+                        if(component) {
+                            
+                            (component as any).manifest = extension;
+                            extensionObject.component = component;
+
+                            // sort:
+                            // TODO: Make sure its right to have highest last?
+                            this._extensions.sort((a, b) => a.weight - b.weight);
+                        } else {
+                            // Remove cause we could not get the component, so we will get rid of this.
+                            //this._extensions.splice(this._extensions.indexOf(extensionObject), 1);
+                            // Actually not, because if, then the same extension would come around again in next update.
+                        }
+                        this.requestUpdate('_extensions');
                     }
                 });
 
@@ -64,12 +85,8 @@ export class UmbExtensionSlotElement extends UmbObserverMixin(LitElement) {
 	}
 
     render() {
-
-        const elements = [];
-        for (const value of this._extensions.values()) {
-            elements.push(value);
-        }
-        return html`${elements}`;
+        // TODO: check if we can use repeat directly.
+        return repeat(this._extensions, (ext) => ext.alias, (ext) => ext.component || nothing);
     }
 }
 
