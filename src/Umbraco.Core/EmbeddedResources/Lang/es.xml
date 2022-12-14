@@ -2,7 +2,7 @@
 <language alias="es" intName="Spanish" localName="español" lcid="10" culture="es-ES">
   <creator>
     <name>The Umbraco community</name>
-    <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
+    <link>https://docs.umbraco.com/umbraco-cms/extending/language-files</link>
   </creator>
   <area alias="actions">
     <key alias="assigndomain">Administrar dominios</key>
@@ -190,7 +190,7 @@
     <key alias="childItems" version="7.0">Nodos hijo</key>
     <key alias="target" version="7.0">Destino</key>
     <key alias="scheduledPublishServerTime">Esto se traduce en la siguiente hora en el servidor:</key>
-    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank" rel="noopener">¿Esto qué significa?</a>]]></key>
+    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://docs.umbraco.com/umbraco-cms/fundamentals/data/scheduled-publishing#timezones" target="_blank" rel="noopener">¿Esto qué significa?</a>]]></key>
     <key alias="nestedContentDeleteItem">¿Estás seguro que quieres eliminar este elemento?</key>
     <key alias="nestedContentEditorNotSupported">Propiedad %0% utiliza editor %1% que no está soportado por Nested Content.</key>
     <key alias="addTextBox">Añadir otra caja de texto</key>

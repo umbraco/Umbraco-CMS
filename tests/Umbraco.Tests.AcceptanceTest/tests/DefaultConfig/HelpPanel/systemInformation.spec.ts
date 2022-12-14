@@ -25,7 +25,7 @@ test.describe('System Information', () => {
 
   test('Check System Info Displays', async ({page, umbracoApi, umbracoUi}) => {
     await openSystemInformation(page, umbracoUi);
-    await expect(page.locator('.table').locator('tr')).toHaveCount(14);
+    await expect(page.locator('.table').locator('tr')).toHaveCount(15);
     await expect(await page.locator("tr", {hasText: "Current Culture"})).toContainText(enCulture);
     await expect(await page.locator("tr", {hasText: "Current UI Culture"})).toContainText(enCulture);
   });

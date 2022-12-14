@@ -248,6 +248,7 @@ csharp_preserve_single_line_blocks = true
 ##########################################
 
 [*.{cs,csx,cake,vb,vbx}]
+dotnet_diagnostic.CS1591.severity = suggestion
 
 ##########################################
 # Styles

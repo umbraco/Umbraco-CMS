@@ -117,9 +117,20 @@ public class UmbracoRouteValueTransformer : DynamicRouteValueTransformer
     public override async ValueTask<RouteValueDictionary> TransformAsync(
         HttpContext httpContext, RouteValueDictionary values)
     {
-        // If we aren't running, then we have nothing to route
-        if (_runtime.Level != RuntimeLevel.Run)
+        // If we aren't running, then we have nothing to route. We allow the frontend to continue while in upgrade mode.
+        if (_runtime.Level != RuntimeLevel.Run && _runtime.Level != RuntimeLevel.Upgrade)
         {
+            if (_runtime.Level == RuntimeLevel.Install)
+            {
+                return new RouteValueDictionary()
+                {
+                    //TODO figure out constants
+                    [ControllerToken] = "Install",
+                    [ActionToken] = "Index",
+                    [AreaToken] = Constants.Web.Mvc.InstallArea,
+                };
+            }
+
             return null!;
         }
 
@@ -184,6 +195,7 @@ public class UmbracoRouteValueTransformer : DynamicRouteValueTransformer
             // our default 404 page but we cannot return route values now because
             // it's possible that a developer is handling dynamic routes too.
             // Our 404 page will be handled with the NotFoundSelectorPolicy
+
             return null!;
         }
 
