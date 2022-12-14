@@ -1,9 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
-using System.IO;
-using System.Linq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
@@ -19,7 +16,6 @@ using Umbraco.Cms.Tests.Common;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
