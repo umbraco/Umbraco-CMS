@@ -12,7 +12,10 @@ public static class FactoryBuilderExtensions
         builder.Services.AddTransient<IDictionaryFactory, DictionaryFactory>();
         builder.Services.AddTransient<IHealthCheckGroupWithResultViewModelFactory, HealthCheckGroupWithResultViewModelFactory>();
         builder.Services.AddTransient<IModelsBuilderViewModelFactory, ModelsBuilderViewModelFactory>();
+        builder.Services.AddTransient<IRedirectUrlStatusViewModelFactory, RedirectUrlStatusViewModelFactory>();
+        builder.Services.AddTransient<IRedirectUrlViewModelFactory, RedirectUrlViewModelFactory>();
         builder.Services.AddTransient<IRelationViewModelFactory, RelationViewModelFactory>();
+
         return builder;
     }
 }

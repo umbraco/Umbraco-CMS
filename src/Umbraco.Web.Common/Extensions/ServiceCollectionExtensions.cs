@@ -97,11 +97,18 @@ public static class ServiceCollectionExtensions
         // Bootstrap logger setup
         ///////////////////////////////////////////////
 
-        LoggerConfiguration serilogConfig = new LoggerConfiguration()
+        Func<LoggerConfiguration, LoggerConfiguration> serilogConfig = cfg => cfg
             .MinimalConfiguration(hostEnvironment, loggingConfig, umbracoFileConfiguration)
             .ReadFrom.Configuration(configuration);
 
-        Log.Logger = serilogConfig.CreateBootstrapLogger();
+        if (Log.Logger is ReloadableLogger reloadableLogger)
+        {
+            reloadableLogger.Reload(serilogConfig);
+        }
+        else
+        {
+            Log.Logger = serilogConfig(new LoggerConfiguration()).CreateBootstrapLogger();
+        }
 
         ///////////////////////////////////////////////
         // Runtime logger setup

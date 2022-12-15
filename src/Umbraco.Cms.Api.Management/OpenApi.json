@@ -2574,6 +2574,170 @@
         }
       }
     },
+    "/umbraco/management/api/v1/redirect-management": {
+      "get": {
+        "tags": [
+          "Redirect Management"
+        ],
+        "operationId": "GetRedirectManagement",
+        "parameters": [
+          {
+            "name": "filter",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedRedirectUrl"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/redirect-management/{key}": {
+      "get": {
+        "tags": [
+          "Redirect Management"
+        ],
+        "operationId": "GetRedirectManagementByKey",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedRedirectUrl"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Redirect Management"
+        ],
+        "operationId": "DeleteRedirectManagementByKey",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/redirect-management/status": {
+      "get": {
+        "tags": [
+          "Redirect Management"
+        ],
+        "operationId": "GetRedirectManagementStatus",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RedirectUrlStatus"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Redirect Management"
+        ],
+        "operationId": "PostRedirectManagementStatus",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/RedirectStatus"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
     "/umbraco/management/api/v1/tree/relation-type/item": {
       "get": {
         "tags": [
@@ -6068,6 +6232,26 @@
         },
         "additionalProperties": false
       },
+      "PagedRedirectUrl": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RedirectUrl"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "PagedRelation": {
         "required": [
           "items",
@@ -6398,6 +6582,56 @@
             "type": "string",
             "format": "uuid",
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "RedirectStatus": {
+        "enum": [
+          "Enabled",
+          "Disabled"
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
+      "RedirectUrl": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "originalUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "destinationUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "created": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "contentKey": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "culture": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "RedirectUrlStatus": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/RedirectStatus"
+          },
+          "userIsAdmin": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
