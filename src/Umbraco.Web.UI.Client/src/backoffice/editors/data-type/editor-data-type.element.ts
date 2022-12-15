@@ -2,9 +2,9 @@ import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { UmbDataTypeStore } from '../../../core/stores/data-type/data-type.store';
-import type { DataTypeDetails } from '../../../core/mocks/data/data-type.data';
+import { UmbDataTypesStore } from '../../../core/stores/data-types/data-types.store';
 import { UmbDataTypeContext } from './data-type.context';
+import type { DataTypeDetails } from '@umbraco-cms/models';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextProviderMixin, UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
@@ -25,8 +25,10 @@ export class UmbEditorDataTypeElement extends UmbContextProviderMixin(
 				height: 100%;
 			}
 
-			#name {
-				width: 100%;
+			#header {
+				/* TODO: can this be applied from layout slot CSS? */
+				margin: 0 var(--uui-size-layout-1);
+				flex:1 1 auto;
 			}
 		`,
 	];
@@ -38,7 +40,7 @@ export class UmbEditorDataTypeElement extends UmbContextProviderMixin(
 	private _dataTypeName = '';
 
 	private _dataTypeContext?: UmbDataTypeContext;
-	private _dataTypeStore?: UmbDataTypeStore;
+	private _dataTypeStore?: UmbDataTypesStore;
 
 	constructor() {
 		super();
@@ -113,7 +115,7 @@ export class UmbEditorDataTypeElement extends UmbContextProviderMixin(
 
 			this.observe<DataTypeDetails>(this._dataTypeContext.data, (dataType) => {
 				if (dataType && dataType.name !== this._dataTypeName) {
-					this._dataTypeName = dataType.name;
+					this._dataTypeName = dataType.name ?? '';
 				}
 			});
 		});
@@ -138,7 +140,7 @@ export class UmbEditorDataTypeElement extends UmbContextProviderMixin(
 	render() {
 		return html`
 			<umb-editor-entity-layout alias="Umb.Editor.DataType">
-				<uui-input id="name" slot="name" .value=${this._dataTypeName} @input="${this._handleInput}"></uui-input>
+				<uui-input id="header" slot="header" .value=${this._dataTypeName} @input="${this._handleInput}"></uui-input>
 			</umb-editor-entity-layout>
 		`;
 	}

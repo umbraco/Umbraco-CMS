@@ -4,6 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
 import type { ManifestEditorAction } from '@umbraco-cms/models';
 
+// Niels, thoughts, TODO: Consider naming this just actions, not extension as everything is an extension.
 @customElement('umb-editor-action-extension')
 export class UmbEditorActionExtensionElement extends LitElement {
 	static styles: CSSResultGroup = [UUITextStyles];

@@ -1,5 +1,4 @@
 import { map, Observable } from 'rxjs';
-import { UmbEntityStore } from '../entity.store';
 import { UmbDataStoreBase } from '../store';
 import type { UserGroupDetails, UserGroupEntity } from '@umbraco-cms/models';
 
@@ -10,20 +9,13 @@ import type { UserGroupDetails, UserGroupEntity } from '@umbraco-cms/models';
  * @description - Data Store for Users
  */
 export class UmbUserGroupStore extends UmbDataStoreBase<UserGroupDetails> {
-	private _entityStore: UmbEntityStore;
-
-	constructor(entityStore: UmbEntityStore) {
-		super();
-		this._entityStore = entityStore;
-	}
-
 	getAll(): Observable<Array<UserGroupDetails>> {
 		// TODO: use Fetcher API.
 		// TODO: only fetch if the data type is not in the store?
 		fetch(`/umbraco/backoffice/user-groups/list/items`)
 			.then((res) => res.json())
 			.then((data) => {
-				this.update(data.items);
+				this.updateItems(data.items);
 			});
 
 		return this.items;
@@ -35,7 +27,7 @@ export class UmbUserGroupStore extends UmbDataStoreBase<UserGroupDetails> {
 		fetch(`/umbraco/backoffice/user-groups/details/${key}`)
 			.then((res) => res.json())
 			.then((data) => {
-				this.update([data]);
+				this.updateItems([data]);
 			});
 
 		return this.items.pipe(
@@ -51,7 +43,7 @@ export class UmbUserGroupStore extends UmbDataStoreBase<UserGroupDetails> {
 		fetch(`/umbraco/backoffice/user-groups/getByKeys?${params}`)
 			.then((res) => res.json())
 			.then((data) => {
-				this.update(data);
+				this.updateItems(data);
 			});
 
 		return this.items.pipe(
@@ -70,8 +62,7 @@ export class UmbUserGroupStore extends UmbDataStoreBase<UserGroupDetails> {
 				},
 			});
 			const json = await res.json();
-			this.update(json);
-			this._entityStore.update(json);
+			this.updateItems(json);
 		} catch (error) {
 			console.error('Save Data Type error', error);
 		}

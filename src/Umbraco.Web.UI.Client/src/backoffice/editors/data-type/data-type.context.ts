@@ -1,5 +1,5 @@
 import { BehaviorSubject, Observable } from 'rxjs';
-import { DataTypeDetails } from '../../../core/mocks/data/data-type.data';
+import type { DataTypeDetails } from '@umbraco-cms/models';
 
 export class UmbDataTypeContext {
 	// TODO: figure out how fine grained we want to make our observables.
@@ -10,7 +10,6 @@ export class UmbDataTypeContext {
 		type: 'dataType',
 		hasChildren: false,
 		parentKey: '',
-		isTrashed: false,
 		propertyEditorModelAlias: '',
 		propertyEditorUIAlias: '',
 		data: [],

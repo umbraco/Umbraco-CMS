@@ -16,7 +16,7 @@ export class UmbEditorPropertyLayoutElement extends LitElement {
 			:host {
 				display: grid;
 				grid-template-columns: 200px 600px;
-				gap: 32px;
+				gap: var(--uui-size-layout-2);
 			}
 			:host {
 				border-bottom: 1px solid var(--uui-color-divider);

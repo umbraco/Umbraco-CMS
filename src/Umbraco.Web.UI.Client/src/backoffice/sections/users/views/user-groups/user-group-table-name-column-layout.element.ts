@@ -11,7 +11,7 @@ export class UmbUserGroupTableNameColumnLayoutElement extends LitElement {
 	value!: any;
 
 	render() {
-		return html` <a style="font-weight: bold;" href="section/users/view/users/userGroup/${this.item.key}">
+		return html` <a style="font-weight: bold;" href="section/users/view/users/user-group/${this.item.key}">
 			${this.value.name}
 		</a>`;
 	}

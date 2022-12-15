@@ -36,45 +36,47 @@ export class UmbEditorEntityElement extends UmbContextConsumerMixin(UmbObserverM
 	}
 
 	@state()
-	private _element?: any;
+	private _element?: HTMLElement;
 
-	private _currentEditorAlias = '';
+	private _currentEditorAlias:string | null = null;
 
 	connectedCallback(): void {
 		super.connectedCallback();
 		this._observeEditors();
 	}
 
+	/**
+	TODO: use future system of extension-slot, extension slots must use a condition-system which will be used to determine the filtering happening below.
+	This will first be possible to make when ContextApi is available, as conditions will use this system.
+	*/
 	private _observeEditors() {
-		this.observe<ManifestEditor>(
+		this.observe<ManifestEditor | undefined>(
 			umbExtensionsRegistry
 				.extensionsOfType('editor')
 				.pipe(map((editors) => editors.find((editor) => editor.meta.entityType === this.entityType))),
 			(editor) => {
 				// don't rerender editor if it's the same
-				if (this._currentEditorAlias === editor.alias) return;
-				this._currentEditorAlias = editor.alias;
+				const newEditorAlias = editor?.alias || '';
+				if (this._currentEditorAlias === newEditorAlias) return;
+				this._currentEditorAlias = newEditorAlias;
 				this._createElement(editor);
 			}
 		);
 	}
 
 	private async _createElement(editor?: ManifestEditor) {
-		// TODO: implement fallback editor
-		const fallbackEditor = document.createElement('div');
-		fallbackEditor.innerHTML = '<p>No editor found</p>';
-
-		if (!editor) {
-			this._element = fallbackEditor;
+		this._element = editor ? (await createExtensionElement(editor)) : undefined;
+		if (this._element) {
+			// TODO: use contextApi for this.
+			(this._element as any).entityKey = this.entityKey;
 			return;
 		}
 
-		try {
-			this._element = (await createExtensionElement(editor)) as any;
-			this._element.entityKey = this.entityKey;
-		} catch (error) {
-			this._element = fallbackEditor;
-		}
+		// TODO: implement fallback editor
+		// Note for extension-slot, we must enable giving the extension-slot a fallback element.
+		const fallbackEditor = document.createElement('div');
+		fallbackEditor.innerHTML = '<p>No editor found</p>';
+		this._element = fallbackEditor;
 	}
 
 	render() {

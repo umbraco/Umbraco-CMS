@@ -7,7 +7,9 @@ export interface UmbDataStoreIdentifiers {
 
 export interface UmbDataStore<T> {
 	readonly items: Observable<Array<T>>;
-	update(items: Array<T>): void;
+	updateItems(items: Array<T>): void;
+	getTreeRoot?(): Observable<Array<T>>;
+	getTreeItemChildren?(key: string): Observable<Array<T>>;
 }
 
 /**
@@ -21,48 +23,45 @@ export class UmbDataStoreBase<T extends UmbDataStoreIdentifiers> implements UmbD
 	protected _items: BehaviorSubject<Array<T>> = new BehaviorSubject(<Array<T>>[]);
 	public readonly items: Observable<Array<T>> = this._items.asObservable();
 
-	public delete(deletedKeys: Array<string>): void {
+	/**
+	 * @description - Delete items from the store.
+	 * @param {Array<string>} keys
+	 * @memberof UmbDataStoreBase
+	 */
+	public deleteItems(keys: Array<string>): void {
 		const remainingItems = this._items
 			.getValue()
-			.filter((item) => item.key && deletedKeys.includes(item.key) === false);
+			.filter((item) => item.key && keys.includes(item.key) === false);
 		this._items.next(remainingItems);
 	}
 
 	/**
 	 * @description - Update the store with new items. Existing items are updated, new items are added. Existing items are matched by the compareKey.
-	 * @param {Array<T>} updatedItems
+	 * @param {Array<T>} items
 	 * @param {keyof T} [compareKey='key']
 	 * @memberof UmbDataStoreBase
 	 */
-	public update(updatedItems: Array<T>, compareKey: keyof T = 'key'): void {
-		const storedItems = this._items.getValue();
-		const updated: T[] = [...storedItems];
+	public updateItems(items: Array<T>, compareKey: keyof T = 'key'): void {
+		const storedItems = [...this._items.getValue()];
 
-		updatedItems.forEach((updatedItem) => {
-			const index = storedItems.map((storedItem) => storedItem[compareKey]).indexOf(updatedItem[compareKey]);
+		items.forEach((item) => {
+			const index = storedItems.map((storedItem) => storedItem[compareKey]).indexOf(item[compareKey]);
 
+			// If the node is in the store, update it
 			if (index !== -1) {
-				const itemKeys = Object.keys(storedItems[index]);
+				const storedItem = storedItems[index];
 
-				const newItem = {};
-
-				for (const [key] of Object.entries(updatedItem)) {
-					if (itemKeys.indexOf(key) !== -1) {
-						// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-						// @ts-ignore
-						newItem[key] = updatedItem[key];
-					}
+				for (const [key] of Object.entries(item)) {
+					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+					//@ts-ignore
+					storedItem[key] = item[key];
 				}
-
-				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-				// @ts-ignore
-				updated[index] = newItem;
 			} else {
 				// If the node is not in the store, add it
-				updated.push(updatedItem);
+				storedItems.push(item);
 			}
 		});
 
-		this._items.next([...updated]);
+		this._items.next([...storedItems]);
 	}
 }

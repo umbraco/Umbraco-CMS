@@ -1,8 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import { ManifestWithLoader, umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-import { ManifestHeaderApp } from 'src/core/extensions-registry/header-app.models';
+import { ManifestHeaderApp, umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
 @customElement('umb-backoffice-header-apps')
 export class UmbBackofficeHeaderApps extends LitElement {
@@ -24,7 +23,7 @@ export class UmbBackofficeHeaderApps extends LitElement {
 	}
 
 	private _registerHeaderApps() {
-		const headerApps: Array<ManifestWithLoader<ManifestHeaderApp>> = [
+		const headerApps: Array<ManifestHeaderApp> = [
 			{
 				type: 'headerApp',
 				alias: 'Umb.HeaderApp.Search',

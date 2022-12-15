@@ -3,13 +3,13 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { distinctUntilChanged } from 'rxjs';
-import { UmbDocumentTypeStore } from '../../../core/stores/document-type.store';
-import { DocumentTypeEntity } from '../../../core/mocks/data/document-type.data';
+import { UmbDocumentTypeStore } from '../../../core/stores/document-type/document-type.store';
 import { UmbDocumentTypeContext } from './document-type.context';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
-import type { ManifestTypes } from '@umbraco-cms/models';
+import type { ManifestTypes, DocumentTypeDetails } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
+
 import '../../property-editor-uis/icon-picker/property-editor-ui-icon-picker.element';
 
 @customElement('umb-editor-document-type')
@@ -25,8 +25,15 @@ export class UmbEditorDocumentTypeElement extends UmbContextProviderMixin(
 				height: 100%;
 			}
 
+			#header {
+				display: flex;
+				flex: 1 1 auto;
+				margin: 0 var(--uui-size-layout-1);
+			}
+
 			#name {
 				width: 100%;
+				flex: 1 1 auto;
 			}
 
 			#alias {
@@ -39,7 +46,7 @@ export class UmbEditorDocumentTypeElement extends UmbContextProviderMixin(
 	entityKey!: string;
 
 	@state()
-	private _documentType?: DocumentTypeEntity;
+	private _documentType?: DocumentTypeDetails;
 
 	private _documentTypeContext?: UmbDocumentTypeContext;
 	private _documentTypeStore?: UmbDocumentTypeStore;
@@ -91,7 +98,7 @@ export class UmbEditorDocumentTypeElement extends UmbContextProviderMixin(
 		if (!this._documentTypeStore) return;
 
 		// TODO: This should be done in a better way, but for now it works.
-		this.observe<DocumentTypeEntity>(this._documentTypeStore.getByKey(this.entityKey), (documentType) => {
+		this.observe<DocumentTypeDetails>(this._documentTypeStore.getByKey(this.entityKey), (documentType) => {
 			if (!documentType) return; // TODO: Handle nicely if there is no document type
 
 			if (!this._documentTypeContext) {
@@ -101,7 +108,7 @@ export class UmbEditorDocumentTypeElement extends UmbContextProviderMixin(
 				this._documentTypeContext.update(documentType);
 			}
 
-			this.observe<DocumentTypeEntity>(this._documentTypeContext.data.pipe(distinctUntilChanged()), (data) => {
+			this.observe<DocumentTypeDetails>(this._documentTypeContext.data.pipe(distinctUntilChanged()), (data) => {
 				this._documentType = data;
 			});
 		});
@@ -121,11 +128,8 @@ export class UmbEditorDocumentTypeElement extends UmbContextProviderMixin(
 	render() {
 		return html`
 			<umb-editor-entity-layout alias="Umb.Editor.DocumentType">
-				<div slot="icon">
+				<div id="header" slot="header">
 					<umb-property-editor-ui-icon-picker></umb-property-editor-ui-icon-picker>
-				</div>
-
-				<div slot="name">
 					<uui-input id="name" .value=${this._documentType?.name} @input="${this._handleInput}">
 						<div id="alias" slot="append">${this._documentType?.alias}</div>
 					</uui-input>

@@ -3,10 +3,9 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
 import { UmbSectionContext } from '../../../sections/section.context';
-import { Entity } from '../../../../core/mocks/data/entities';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-import type { ManifestTreeItemAction, ManifestTree } from '@umbraco-cms/models';
+import type { Entity, ManifestTreeItemAction, ManifestTree } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
 @customElement('umb-tree-context-menu-page-action-list')
