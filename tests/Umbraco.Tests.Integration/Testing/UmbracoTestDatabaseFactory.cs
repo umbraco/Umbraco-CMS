@@ -18,6 +18,7 @@ public class UmbracoTestDatabaseFactory
         _connectionStrings = connectionStrings;
         _configuration = configuration;
     }
+
     public ITestDatabase CreateTestDatabase()
     {
         var databaseType = _configuration.GetValue<TestDatabaseSettings.TestDatabaseType>("Tests:Database:DatabaseType");
@@ -27,9 +28,11 @@ public class UmbracoTestDatabaseFactory
             case TestDatabaseSettings.TestDatabaseType.Sqlite:
                 return new SqliteTestDatabase(_connectionStrings, _umbracoDatabaseFactory, _configuration);
             case TestDatabaseSettings.TestDatabaseType.LocalDb:
+                // return new LocalDbTestDatabase();
                 break;
             case TestDatabaseSettings.TestDatabaseType.SqlServer:
-                break;
+                return new SqlServerTestDatabase(_configuration.GetValue<string>("Tests:Database:SQLServerMasterConnectionString"));
+
             case TestDatabaseSettings.TestDatabaseType.Unknown:
                 throw new PanicException("Database not configured in appsettings.Test.Json");
         }
