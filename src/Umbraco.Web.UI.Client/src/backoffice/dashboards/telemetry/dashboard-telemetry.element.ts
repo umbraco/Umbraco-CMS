@@ -4,7 +4,6 @@ import { css, html, LitElement } from 'lit';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import { customElement, state } from 'lit/decorators.js';
 import { ApiError, ProblemDetails, Telemetry, TelemetryLevel, TelemetryResource } from '@umbraco-cms/backend-api';
-import { umbHistoryService } from 'src/core/services/history';
 
 @customElement('umb-dashboard-telemetry')
 export class UmbDashboardTelemetryElement extends LitElement {
@@ -31,10 +30,6 @@ export class UmbDashboardTelemetryElement extends LitElement {
 
 	constructor() {
 		super();
-		umbHistoryService.push({
-			label: ['Telemetry Data', 'Settings'],
-			path: 'section/settings/dashboard/telemetry',
-		});
 	}
 
 	async connectedCallback() {

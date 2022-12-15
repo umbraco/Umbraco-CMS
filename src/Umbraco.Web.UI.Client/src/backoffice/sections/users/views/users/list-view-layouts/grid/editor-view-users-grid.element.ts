@@ -9,7 +9,6 @@ import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { UserDetails, UserEntity, UserGroupDetails, UserGroupEntity } from '@umbraco-cms/models';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbUserGroupStore } from 'src/core/stores/user/user-group.store';
-import { umbHistoryService } from 'src/core/services/history';
 
 @customElement('umb-editor-view-users-grid')
 export class UmbEditorViewUsersGridElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
@@ -55,7 +54,6 @@ export class UmbEditorViewUsersGridElement extends UmbContextConsumerMixin(UmbOb
 
 	constructor() {
 		super();
-		umbHistoryService.push({ label: 'Users grid', path: 'section/users/view/users/overview/grid' });
 
 		this.consumeAllContexts(['umbUserGroupStore', 'umbUsersContext'], (instances) => {
 			this._userGroupStore = instances['umbUserGroupStore'];

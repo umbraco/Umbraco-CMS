@@ -18,7 +18,6 @@ import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import './column-layouts/name/user-table-name-column-layout.element';
 import './column-layouts/status/user-table-status-column-layout.element';
 import { UmbUserGroupStore } from 'src/core/stores/user/user-group.store';
-import { umbHistoryService } from 'src/core/services/history';
 
 @customElement('umb-editor-view-users-table')
 export class UmbEditorViewUsersTableElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
@@ -77,7 +76,6 @@ export class UmbEditorViewUsersTableElement extends UmbContextConsumerMixin(UmbO
 
 	constructor() {
 		super();
-		umbHistoryService.push({ label: 'Users list', path: 'section/users/view/users/overview/list' });
 
 		this.consumeAllContexts(['umbUserGroupStore', 'umbUsersContext'], (instances) => {
 			this._userGroupStore = instances['umbUserGroupStore'];

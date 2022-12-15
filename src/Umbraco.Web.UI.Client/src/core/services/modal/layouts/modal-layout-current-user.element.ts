@@ -1,7 +1,6 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, CSSResultGroup, html, LitElement, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { UmbHistoryItem, umbHistoryService } from '../../history';
 import { umbCurrentUserService } from '../../current-user';
 import { UmbModalHandler, UmbModalService } from '@umbraco-cms/services';
 import type { ManifestExternalLoginProvider, ManifestUserDashboard, UserDetails } from '@umbraco-cms/models';
@@ -10,6 +9,7 @@ import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import '../../../../backoffice/external-login-providers/external-login-provider-extension.element';
 import '../../../../backoffice/user-dashboards/user-dashboard-extension.element';
+import { UmbCurrentUserHistoryStore, UmbCurrentUserHistoryItem } from '@umbraco-cms/stores/current-user-history/current-user-history.store';
 
 @customElement('umb-modal-layout-current-user')
 export class UmbModalLayoutCurrentUserElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
@@ -92,14 +92,16 @@ export class UmbModalLayoutCurrentUserElement extends UmbContextConsumerMixin(Um
 	private _userDashboards: Array<ManifestUserDashboard> = [];
 
 	@state()
-	private _history: Array<UmbHistoryItem> = [];
+	private _history: Array<UmbCurrentUserHistoryItem> = [];
 
 	private _modalService?: UmbModalService;
+	private _currentUserHistoryStore?: UmbCurrentUserHistoryStore;
 
 	constructor() {
 		super();
-		this.consumeAllContexts(['umbModalService'], (instances) => {
+		this.consumeAllContexts(['umbModalService', 'umbCurrentUserHistoryStore'], (instances) => {
 			this._modalService = instances['umbModalService'];
+			this._currentUserHistoryStore = instances['umbCurrentUserHistoryStore'];
 		});
 
 		this._observeCurrentUser();
@@ -123,15 +125,16 @@ export class UmbModalLayoutCurrentUserElement extends UmbContextConsumerMixin(Um
 		});
 	}
 	private async _observeHistory() {
-		this.observe<Array<UmbHistoryItem>>(umbHistoryService.history, (history) => {
-			this._history = history;
-		});
+		if(this._currentUserHistoryStore) {
+			this.observe<Array<UmbCurrentUserHistoryItem>>(this._currentUserHistoryStore.history, (history) => {
+				this._history = history;
+			});
+		}
 	}
 
 	private _observeUserDashboards() {
-		this.observe<ManifestUserDashboard[]>(umbExtensionsRegistry.extensionsOfType('userDashboard'), (userDashboard) => {
+		this.observe<ManifestUserDashboard[]>(umbExtensionsRegistry.extensionsOfType('user-dashboard'), (userDashboard) => {
 			this._userDashboards = userDashboard;
-			console.log(this._userDashboards);
 		});
 	}
 
@@ -153,7 +156,7 @@ export class UmbModalLayoutCurrentUserElement extends UmbContextConsumerMixin(Um
 		this._modalService.changePassword({ requireOldPassword: umbCurrentUserService.isAdmin });
 	}
 
-	private _renderHistoryItem(item: UmbHistoryItem) {
+	private _renderHistoryItem(item: UmbCurrentUserHistoryItem) {
 		return html`
 			<a href=${item.path} class="history-item">
 				<uui-icon name="umb:link"></uui-icon>

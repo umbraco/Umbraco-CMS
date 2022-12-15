@@ -9,7 +9,6 @@ import { UmbNotificationDefaultData } from '../../../core/services/notification/
 
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { ApiError, ProblemDetails, PublishedCacheResource } from '@umbraco-cms/backend-api';
-import { umbHistoryService } from 'src/core/services/history';
 
 @customElement('umb-dashboard-published-status')
 export class UmbDashboardPublishedStatusElement extends UmbContextConsumerMixin(LitElement) {
@@ -45,10 +44,6 @@ export class UmbDashboardPublishedStatusElement extends UmbContextConsumerMixin(
 
 	constructor() {
 		super();
-		umbHistoryService.push({
-			label: ['Published Status', 'Settings'],
-			path: 'section/settings/dashboard/published-status',
-		});
 
 		this.consumeAllContexts(['umbNotificationService', 'umbModalService'], (instances) => {
 			this._notificationService = instances['umbNotificationService'];

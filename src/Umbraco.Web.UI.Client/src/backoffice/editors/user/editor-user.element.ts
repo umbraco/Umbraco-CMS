@@ -15,7 +15,7 @@ import type { ManifestEditorAction, UserDetails } from '@umbraco-cms/models';
 import '../../property-editor-uis/content-picker/property-editor-ui-content-picker.element';
 import '@umbraco-cms/components/input-user-group/input-user-group.element';
 
-import { umbHistoryService } from 'src/core/services/history';
+import { umbHistoryService } from '@umbraco-cms/stores/current-user-history';
 import { umbCurrentUserService } from 'src/core/services/current-user';
 import { UmbModalService } from '@umbraco-cms/services';
 import '../shared/editor-entity-layout/editor-entity-layout.element';
@@ -131,8 +131,6 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(
 		this.observe<UserDetails>(this._userStore.getByKey(this.entityKey), (user) => {
 			this._user = user;
 			if (!this._user) return;
-
-			umbHistoryService.push({ label: [user.name, 'Users'], path: 'section/users/view/users/user/' + user.key });
 
 			if (!this._userContext) {
 				this._userContext = new UmbUserContext(this._user);

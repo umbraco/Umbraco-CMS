@@ -17,7 +17,6 @@ import './user-group-table-name-column-layout.element';
 import './user-group-table-sections-column-layout.element';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbUserGroupStore } from '@umbraco-cms/stores/user/user-group.store';
-import { umbHistoryService } from 'src/core/services/history';
 
 @customElement('umb-editor-view-user-groups')
 export class UmbEditorViewUserGroupsElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
@@ -72,7 +71,6 @@ export class UmbEditorViewUserGroupsElement extends UmbContextConsumerMixin(UmbO
 
 	connectedCallback(): void {
 		super.connectedCallback();
-		umbHistoryService.push({ label: 'User groups', path: 'section/users/view/user-groups' });
 
 		this.consumeContext('umbUserGroupStore', (userGroupStore: UmbUserGroupStore) => {
 			this._userGroupStore = userGroupStore;

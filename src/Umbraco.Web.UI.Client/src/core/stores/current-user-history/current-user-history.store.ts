@@ -2,23 +2,24 @@ import { BehaviorSubject, Observable } from 'rxjs';
 
 export type UmbModelType = 'dialog' | 'sidebar';
 
-export type UmbHistoryItem = {
+export type UmbCurrentUserHistoryItem = {
 	path: string;
 	label: string | Array<string>;
 	icon?: string;
 };
 
-class UmbHistoryService {
-	private _history: BehaviorSubject<Array<UmbHistoryItem>> = new BehaviorSubject(<Array<UmbHistoryItem>>[]);
-	public readonly history: Observable<Array<UmbHistoryItem>> = this._history.asObservable();
+export class UmbCurrentUserHistoryStore {
+
+	private _history: BehaviorSubject<Array<UmbCurrentUserHistoryItem>> = new BehaviorSubject(<Array<UmbCurrentUserHistoryItem>>[]);
+	public readonly history: Observable<Array<UmbCurrentUserHistoryItem>> = this._history.asObservable();
 
 	/**
 	 * Pushes a new history item to the history array
 	 * @public
-	 * @param {UmbHistoryItem} historyItem
+	 * @param {UmbCurrentUserHistoryItem} historyItem
 	 * @memberof UmbHistoryService
 	 */
-	public push(historyItem: UmbHistoryItem): void {
+	public push(historyItem: UmbCurrentUserHistoryItem): void {
 		const history = this._history.getValue();
 		const lastItem = history[history.length - 1];
 
@@ -42,6 +43,3 @@ class UmbHistoryService {
 		this._history.next([]);
 	}
 }
-
-// TODO: Do not make singletons or static classes.
-export const umbHistoryService = new UmbHistoryService();
