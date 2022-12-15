@@ -90,7 +90,7 @@ export class UmbBackofficeElement extends UmbContextConsumerMixin(UmbContextProv
 		this.provideContext('umbNotificationService', new UmbNotificationService());
 		this.provideContext('umbModalService', new UmbModalService());
 		this.provideContext('umbSectionStore', new UmbSectionStore());
-		this.provideContext('UmbCurrentUserHistoryStore', new UmbCurrentUserHistoryStore());
+		this.provideContext('umbCurrentUserHistoryStore', new UmbCurrentUserHistoryStore());
 	}
 
 	private _registerExtensions(manifests: Array<ManifestTypes> | Array<ManifestTypes>) {

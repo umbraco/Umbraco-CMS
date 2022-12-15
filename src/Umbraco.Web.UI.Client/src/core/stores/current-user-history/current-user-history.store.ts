@@ -1,4 +1,4 @@
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, map, Observable } from 'rxjs';
 
 export type UmbModelType = 'dialog' | 'sidebar';
 
@@ -12,6 +12,23 @@ export class UmbCurrentUserHistoryStore {
 
 	private _history: BehaviorSubject<Array<UmbCurrentUserHistoryItem>> = new BehaviorSubject(<Array<UmbCurrentUserHistoryItem>>[]);
 	public readonly history: Observable<Array<UmbCurrentUserHistoryItem>> = this._history.asObservable();
+
+	constructor() {
+		(window as any).navigation.addEventListener('navigate', (event: any) => {
+			const url = new URL(event.destination.url);
+			const historyItem = {path: url.pathname, label: event.destination.url.split('/').pop()};
+			this.push(historyItem);
+		});
+	}
+
+
+	public getLatestHistory(): Observable<Array<UmbCurrentUserHistoryItem>> {
+		return this._history.pipe(map((historyItem) => 
+		{
+			return historyItem.slice(-10);
+		}
+		));
+	}
 
 	/**
 	 * Pushes a new history item to the history array
@@ -32,6 +49,7 @@ export class UmbCurrentUserHistoryStore {
 			newHistory[history.length - 1] = historyItem;
 			this._history.next(newHistory);
 		}
+		
 	}
 
 	/**

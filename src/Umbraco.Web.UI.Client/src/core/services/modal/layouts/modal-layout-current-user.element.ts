@@ -102,11 +102,11 @@ export class UmbModalLayoutCurrentUserElement extends UmbContextConsumerMixin(Um
 		this.consumeAllContexts(['umbModalService', 'umbCurrentUserHistoryStore'], (instances) => {
 			this._modalService = instances['umbModalService'];
 			this._currentUserHistoryStore = instances['umbCurrentUserHistoryStore'];
+			this._observeHistory();
 		});
 
 		this._observeCurrentUser();
 		this._observeExternalLoginProviders();
-		this._observeHistory();
 		this._observeUserDashboards();
 	}
 
@@ -126,7 +126,7 @@ export class UmbModalLayoutCurrentUserElement extends UmbContextConsumerMixin(Um
 	}
 	private async _observeHistory() {
 		if(this._currentUserHistoryStore) {
-			this.observe<Array<UmbCurrentUserHistoryItem>>(this._currentUserHistoryStore.history, (history) => {
+			this.observe<Array<UmbCurrentUserHistoryItem>>(this._currentUserHistoryStore.getLatestHistory(), (history) => {
 				this._history = history;
 			});
 		}
@@ -143,7 +143,6 @@ export class UmbModalLayoutCurrentUserElement extends UmbContextConsumerMixin(Um
 	}
 
 	private _edit() {
-		console.log('Hello', this._currentUser);
 		if (!this._currentUser) return;
 
 		history.pushState(null, '', '/section/users/view/users/user/' + this._currentUser.key); //TODO Change to a tag with href and make dynamic
