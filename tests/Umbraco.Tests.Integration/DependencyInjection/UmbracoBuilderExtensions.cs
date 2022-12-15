@@ -26,6 +26,7 @@ using Umbraco.Cms.Persistence.EFCore;
 using Umbraco.Cms.Persistence.EFCore.Entities;
 using Umbraco.Cms.Tests.Common.TestHelpers.Stubs;
 using Umbraco.Cms.Tests.Integration.Implementations;
+using Umbraco.Cms.Tests.Integration.Testing;
 
 namespace Umbraco.Cms.Tests.Integration.DependencyInjection;
 
@@ -71,6 +72,7 @@ public static class UmbracoBuilderExtensions
         builder.Services.AddUnique<IDatabaseSchemaCreatorFactory, EFDatabaseSchemaCreatorFactory>();
         builder.Services.AddUnique<IDatabaseDataCreator, EFCoreDatabaseDataCreator>();
         builder.Services.AddSingleton<UmbracoDbContextFactory>();
+        builder.Services.AddSingleton<UmbracoTestDatabaseFactory>();
 
         return builder;
     }
