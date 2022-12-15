@@ -136,7 +136,7 @@ public class ContentTreeController : ContentTreeControllerBase, ISearchableTreeW
 
             var documentEntity = (IDocumentEntitySlim)entity;
 
-            if (!documentEntity.Variations.VariesByCulture())
+            if (!documentEntity.Variations.VariesByCulture() || culture.IsNullOrWhiteSpace())
             {
                 if (!documentEntity.Published)
                 {
