@@ -1,6 +1,6 @@
 import { css, html, LitElement, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, property, state } from 'lit/decorators.js';
+import { customElement, property } from 'lit/decorators.js';
 
 @customElement('umb-body-layout')
 export class UmbBodyLayout extends LitElement {
@@ -67,6 +67,11 @@ export class UmbBodyLayout extends LitElement {
 		super.connectedCallback();
 		this.shadowRoot?.removeEventListener('slotchange', this._slotChanged);
 		this.shadowRoot?.addEventListener('slotchange', this._slotChanged);
+	}
+
+	disconnectedCallback() {
+		super.disconnectedCallback();
+		this.shadowRoot?.removeEventListener('slotchange', this._slotChanged);
 	}
 
 	private _slotChanged = (e: Event) => {
