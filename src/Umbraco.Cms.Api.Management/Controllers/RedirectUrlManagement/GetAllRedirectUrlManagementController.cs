@@ -23,6 +23,7 @@ public class GetAllRedirectUrlManagementController : RedirectUrlManagementBaseCo
     }
 
     [HttpGet]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(PagedViewModel<RedirectUrlViewModel>), StatusCodes.Status200OK)]
     public async Task<ActionResult<PagedViewModel<RedirectUrlViewModel>>> GetAll(string? filter, int skip, int take)
     {
