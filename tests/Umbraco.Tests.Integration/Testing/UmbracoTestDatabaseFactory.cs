@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Persistence.SqlServer;
 
 namespace Umbraco.Cms.Tests.Integration.Testing;
 
@@ -28,15 +29,11 @@ public class UmbracoTestDatabaseFactory
             case TestDatabaseSettings.TestDatabaseType.Sqlite:
                 return new SqliteTestDatabase(_connectionStrings, _umbracoDatabaseFactory, _configuration);
             case TestDatabaseSettings.TestDatabaseType.LocalDb:
-                // return new LocalDbTestDatabase();
-                break;
+                return new LocalDbTestDatabase(new LocalDb(), _umbracoDatabaseFactory);
             case TestDatabaseSettings.TestDatabaseType.SqlServer:
                 return new SqlServerTestDatabase(_configuration.GetValue<string>("Tests:Database:SQLServerMasterConnectionString"));
-
-            case TestDatabaseSettings.TestDatabaseType.Unknown:
-                throw new PanicException("Database not configured in appsettings.Test.Json");
         }
 
-        return null;
+        throw new PanicException("Database not configured in appsettings.Test.Json");
     }
 }

@@ -289,7 +289,7 @@ public class LocalDb
         /// </summary>
         public string InstanceName { get; }
 
-        public static string GetConnectionString(string instanceName, string databaseName) =>
+        public string GetConnectionString(string instanceName, string databaseName) =>
             $@"Server=(localdb)\{instanceName};Integrated Security=True;Database={databaseName};";
 
         /// <summary>
