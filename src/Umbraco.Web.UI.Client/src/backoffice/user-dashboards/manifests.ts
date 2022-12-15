@@ -2,7 +2,7 @@ import type { ManifestUserDashboard } from '@umbraco-cms/models';
 
 export const manifests: Array<ManifestUserDashboard> = [
 	{
-		type: 'userDashboard',
+		type: 'user-dashboard',
 		alias: 'Umb.UserDashboard.Test',
 		name: 'Test User Dashboard',
 		elementName: 'umb-user-dashboard-test',

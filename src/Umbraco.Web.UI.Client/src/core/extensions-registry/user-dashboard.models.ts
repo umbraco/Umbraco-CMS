@@ -1,7 +1,7 @@
 import type { ManifestElement } from './models';
 
 export interface ManifestUserDashboard extends ManifestElement {
-	type: 'userDashboard';
+	type: 'user-dashboard';
 	meta: MetaUserDashboard;
 }
 
