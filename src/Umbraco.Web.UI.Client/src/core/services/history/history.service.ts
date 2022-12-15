@@ -43,4 +43,5 @@ class UmbHistoryService {
 	}
 }
 
+// TODO: Do not make singletons or static classes.
 export const umbHistoryService = new UmbHistoryService();
