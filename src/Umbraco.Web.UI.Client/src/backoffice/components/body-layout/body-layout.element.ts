@@ -18,7 +18,7 @@ export class UmbBodyLayout extends LitElement {
 			#header {
 				display: flex;
 				align-items: center;
-    			justify-content: space-between;
+				justify-content: space-between;
 				width: 100%;
 				min-height: 60px;
 
@@ -45,7 +45,7 @@ export class UmbBodyLayout extends LitElement {
 			#footer {
 				display: flex;
 				align-items: center;
-    			justify-content: space-between;
+				justify-content: space-between;
 				width: 100%;
 				height: 54px; /* TODO: missing var(--uui-size-18);*/
 				border-top: 1px solid var(--uui-color-border);
@@ -62,7 +62,6 @@ export class UmbBodyLayout extends LitElement {
 		`,
 	];
 
-
 	connectedCallback() {
 		super.connectedCallback();
 		this.shadowRoot?.removeEventListener('slotchange', this._slotChanged);
@@ -75,11 +74,12 @@ export class UmbBodyLayout extends LitElement {
 	}
 
 	private _slotChanged = (e: Event) => {
-		(e.target as any).style.display = (e.target as HTMLSlotElement).assignedNodes({ flatten: true }).length > 0 ? '' : 'none';
+		(e.target as any).style.display =
+			(e.target as HTMLSlotElement).assignedNodes({ flatten: true }).length > 0 ? '' : 'none';
 	};
 
 	/**
-	 * Alias of the editor. The Layout will render the editor views that are registered for this editor alias.
+	 * Renders a headline in the header.
 	 * @public
 	 * @type {string}
 	 * @attr
@@ -92,7 +92,7 @@ export class UmbBodyLayout extends LitElement {
 		return html`
 			<div id="header">
 				${this.headline ? html`<h3 id="headline">${this.headline}</h3>` : nothing}
-				
+
 				<slot name="header"></slot>
 				<slot id="tabs" name="tabs"></slot>
 			</div>
@@ -100,11 +100,9 @@ export class UmbBodyLayout extends LitElement {
 				<slot></slot>
 			</uui-scroll-container>
 			<div id="footer">
-				<slot name="footer" ></slot>
+				<slot name="footer"></slot>
 				<slot id="actions" name="actions"></slot>
 			</div>
-
-			
 		`;
 	}
 }
