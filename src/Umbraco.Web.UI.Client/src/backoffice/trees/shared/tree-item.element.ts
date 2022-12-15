@@ -1,6 +1,7 @@
 import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
+import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { UUIMenuItemEvent } from '@umbraco-ui/uui';
 import { map } from 'rxjs';
 import { repeat } from 'lit/directives/repeat.js';
@@ -23,7 +24,7 @@ export class UmbTreeItem extends UmbContextConsumerMixin(UmbObserverMixin(LitEle
 	private _childItems: Entity[] = [];
 
 	@state()
-	private _href = '';
+	private _href? = '';
 
 	@state()
 	private _loading = false;
@@ -120,7 +121,7 @@ export class UmbTreeItem extends UmbContextConsumerMixin(UmbObserverMixin(LitEle
 
 	// TODO: how do we handle this?
 	private _constructPath(sectionPathname: string, type: string, key: string) {
-		return `section/${sectionPathname}/${type}/${key}`;
+		return type ? `section/${sectionPathname}/${type}/${key}` : undefined;
 	}
 
 	private _onShowChildren(event: UUIMenuItemEvent) {
@@ -168,7 +169,7 @@ export class UmbTreeItem extends UmbContextConsumerMixin(UmbObserverMixin(LitEle
 				.loading=${this._loading}
 				.hasChildren=${this.treeItem.hasChildren}
 				label="${this.treeItem.name}"
-				href="${this._href}"
+				href="${ifDefined(this._href)}"
 				?active=${this._isActive}>
 				${this._renderChildItems()}
 				<uui-icon slot="icon" name="${this.treeItem.icon}"></uui-icon>

@@ -86,7 +86,7 @@ export class UmbMediaStore extends UmbDataStoreBase<MediaDetails | ContentTreeIt
 		// TODO: remove ignore when we know how to handle trashed items.
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
-		return this.items.pipe(map((items) => items.filter((item) => item.parentKey === null && item.isTrashed === false)));
+		return this.items.pipe(map((items) => items.filter((item) => item.parentKey === null && !item.isTrashed)));
 	}
 
 	getTreeItemChildren(key: string): Observable<Array<ContentTreeItem>> {
@@ -110,6 +110,6 @@ export class UmbMediaStore extends UmbDataStoreBase<MediaDetails | ContentTreeIt
 		// TODO: remove ignore when we know how to handle trashed items.
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
-		return this.items.pipe(map((items) => items.filter((item) => item.parentKey === key && item.isTrashed === false)));
+		return this.items.pipe(map((items) => items.filter((item) => item.parentKey === key && !item.isTrashed)));
 	}
 }
