@@ -1,6 +1,6 @@
-import { css, html, LitElement } from 'lit';
+import { css, html, LitElement, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement } from 'lit/decorators.js';
+import { customElement, property } from 'lit/decorators.js';
 
 @customElement('umb-body-layout')
 export class UmbBodyLayout extends LitElement {
@@ -16,15 +16,27 @@ export class UmbBodyLayout extends LitElement {
 			}
 
 			#header {
-				background-color: var(--uui-color-surface);
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
 				width: 100%;
+				min-height: 60px;
+
+				background-color: var(--uui-color-surface);
 				border-bottom: 1px solid var(--uui-color-border);
 				box-sizing: border-box;
-				/* padding: 0 var(--uui-size-6); */
+			}
+
+			#headline {
+				display: block;
+				margin: 0 var(--uui-size-layout-1);
+			}
+
+			#tabs {
+				margin-left: auto;
 			}
 
 			#main {
-				/* padding: 0 var(--uui-size-6); */
 				display: flex;
 				flex: 1;
 				flex-direction: column;
@@ -33,27 +45,63 @@ export class UmbBodyLayout extends LitElement {
 			#footer {
 				display: flex;
 				align-items: center;
-				height: 70px;
+				justify-content: space-between;
 				width: 100%;
-				/*padding: 0 var(--uui-size-6);*/
+				height: 54px; /* TODO: missing var(--uui-size-18);*/
 				border-top: 1px solid var(--uui-color-border);
 				background-color: var(--uui-color-surface);
 				box-sizing: border-box;
 			}
+
+			#actions {
+				display: flex;
+				gap: 6px;
+				margin: 0 var(--uui-size-layout-1);
+				margin-left: auto;
+			}
 		`,
 	];
+
+	connectedCallback() {
+		super.connectedCallback();
+		this.shadowRoot?.removeEventListener('slotchange', this._slotChanged);
+		this.shadowRoot?.addEventListener('slotchange', this._slotChanged);
+	}
+
+	disconnectedCallback() {
+		super.disconnectedCallback();
+		this.shadowRoot?.removeEventListener('slotchange', this._slotChanged);
+	}
+
+	private _slotChanged = (e: Event) => {
+		(e.target as any).style.display =
+			(e.target as HTMLSlotElement).assignedNodes({ flatten: true }).length > 0 ? '' : 'none';
+	};
+
+	/**
+	 * Renders a headline in the header.
+	 * @public
+	 * @type {string}
+	 * @attr
+	 * @default ''
+	 */
+	@property()
+	public headline = '';
 
 	render() {
 		return html`
 			<div id="header">
+				${this.headline ? html`<h3 id="headline">${this.headline}</h3>` : nothing}
+
 				<slot name="header"></slot>
+				<slot id="tabs" name="tabs"></slot>
 			</div>
 			<uui-scroll-container id="main">
 				<slot></slot>
 			</uui-scroll-container>
 			<div id="footer">
-				<!-- only show footer if slot has elements -->
 				<slot name="footer"></slot>
+				<slot id="actions" name="actions"></slot>
 			</div>
 		`;
 	}
