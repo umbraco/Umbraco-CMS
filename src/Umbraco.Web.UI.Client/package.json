@@ -69,7 +69,7 @@
 	},
 	"devDependencies": {
 		"@babel/core": "^7.20.5",
-		"@mdx-js/react": "^2.1.5",
+		"@mdx-js/react": "^2.2.1",
 		"@open-wc/testing": "^3.1.7",
 		"@playwright/test": "^1.28.1",
 		"@storybook/addon-a11y": "^6.5.14",
