@@ -153,10 +153,10 @@ public abstract class UmbracoIntegrationTestBase
         {
             case UmbracoTestOptions.Database.NewSchemaPerTest:
 
-                var testDatabase = testDatabaseFactory.CreateTestDatabase();
-                s_connectionStrings = testDatabase.Initialize();
                 // New DB + Schema
-                AddOnTestTearDown(() =>  testDatabase.Teardown());
+                var newSchemaPerTestDb = testDatabaseFactory.CreateTestDatabase();
+                s_connectionStrings = newSchemaPerTestDb.Initialize();
+                AddOnTestTearDown(() => newSchemaPerTestDb.Teardown());
                 CreateDatabaseWithSchema(databaseFactory, databaseSchemaCreatorFactory);
                 databaseDataCreator.SeedDataAsync().GetAwaiter().GetResult();
 
@@ -167,7 +167,9 @@ public abstract class UmbracoIntegrationTestBase
                 break;
             case UmbracoTestOptions.Database.NewEmptyPerTest:
 
-                // ConfigureDatabaseFactory(databaseFactory, connectionStrings);
+                var newEmptyPerTestDatabase = testDatabaseFactory.CreateTestDatabase();
+                s_connectionStrings = newEmptyPerTestDatabase.Initialize();
+                AddOnTestTearDown(() => newEmptyPerTestDatabase.Teardown());
 
                 CreateDatabaseWithoutSchema(databaseFactory, databaseSchemaCreatorFactory);
                 runtimeState.DetermineRuntimeLevel();
@@ -180,9 +182,11 @@ public abstract class UmbracoIntegrationTestBase
                 // and it would be the same as NewSchemaPerTest even if it didn't block
                 if (_firstTestInFixture)
                 {
-                    // ConfigureDatabaseFactory(databaseFactory, connectionStrings);
-
                     // New DB + Schema
+                    var newSchemaPerFixtureDb = testDatabaseFactory.CreateTestDatabase();
+                    s_connectionStrings = newSchemaPerFixtureDb.Initialize();
+                    AddOnFixtureTearDown(() => newSchemaPerFixtureDb.Teardown());
+
                     CreateDatabaseWithSchema(databaseFactory, databaseSchemaCreatorFactory);
                     databaseDataCreator.SeedDataAsync().GetAwaiter().GetResult();
                 }
@@ -201,7 +205,9 @@ public abstract class UmbracoIntegrationTestBase
                 // and it would be the same as NewSchemaPerTest even if it didn't block
                 if (_firstTestInFixture)
                 {
-                    // ConfigureDatabaseFactory(databaseFactory, connectionStrings);
+                    var newEmptyPerFixtureDb = testDatabaseFactory.CreateTestDatabase();
+                    s_connectionStrings = newEmptyPerFixtureDb.Initialize();
+                    AddOnFixtureTearDown(() => newEmptyPerFixtureDb.Teardown());
                     CreateDatabaseWithoutSchema(databaseFactory, databaseSchemaCreatorFactory);
                 }
                 else
@@ -234,57 +240,57 @@ public abstract class UmbracoIntegrationTestBase
         BaseTestDatabase.CompleteTransaction();
     }
 
-    // private void ConfigureDatabaseFactory(IUmbracoDatabaseFactory databaseFactory, IOptionsMonitor<ConnectionStrings> connectionStrings)
-    // {
-    //     string? projectDirectory = Directory.GetParent(Environment.CurrentDirectory)?.Parent?.Parent?.FullName;
-    //     string tempFolder = @"TEMP\databases";
-    //     var tempFolderPath = Path.Combine(projectDirectory!, tempFolder);
-    //     var absoluteDbPath = Path.Combine(tempFolderPath, Guid.NewGuid().ToString());
-    //
-    //     switch (TestOptions.Database)
-    //     {
-    //         case UmbracoTestOptions.Database.NewSchemaPerTest:
-    //             AddOnTestTearDown(() => TryDeleteFile(absoluteDbPath));
-    //             break;
-    //         case UmbracoTestOptions.Database.NewEmptyPerTest:
-    //             AddOnTestTearDown(() => TryDeleteFile(absoluteDbPath));
-    //             break;
-    //         case UmbracoTestOptions.Database.NewSchemaPerFixture:
-    //             if (_firstTestInFixture)
-    //             {
-    //                 AddOnFixtureTearDown(() => TryDeleteFile(absoluteDbPath));
-    //             }
-    //
-    //             break;
-    //         case UmbracoTestOptions.Database.NewEmptyPerFixture:
-    //             if (_firstTestInFixture)
-    //             {
-    //                 AddOnFixtureTearDown(() => TryDeleteFile(absoluteDbPath));
-    //             }
-    //
-    //             break;
-    //     }
-    //
-    //     var builder = new SqliteConnectionStringBuilder
-    //     {
-    //         DataSource = $"{absoluteDbPath}",
-    //         Mode = SqliteOpenMode.ReadWriteCreate,
-    //         ForeignKeys = true,
-    //         Pooling = false, // When pooling true, files kept open after connections closed, bad for cleanup.
-    //         Cache = SqliteCacheMode.Shared,
-    //     };
-    //
-    //     s_connectionStrings = new ConnectionStrings
-    //     {
-    //         ConnectionString = builder.ConnectionString,
-    //         ProviderName = "Microsoft.Data.Sqlite",
-    //     };
-    //
-    //     connectionStrings.CurrentValue.ConnectionString = s_connectionStrings.ConnectionString;
-    //     connectionStrings.CurrentValue.ProviderName = s_connectionStrings.ProviderName;
-    //
-    //     databaseFactory.Configure(s_connectionStrings);
-    // }
+    private void CreateDatabase(IUmbracoDatabaseFactory databaseFactory, IOptionsMonitor<ConnectionStrings> connectionStrings)
+    {
+        string? projectDirectory = Directory.GetParent(Environment.CurrentDirectory)?.Parent?.Parent?.FullName;
+        string tempFolder = @"TEMP\databases";
+        var tempFolderPath = Path.Combine(projectDirectory!, tempFolder);
+        var absoluteDbPath = Path.Combine(tempFolderPath, Guid.NewGuid().ToString());
+    
+        switch (TestOptions.Database)
+        {
+            case UmbracoTestOptions.Database.NewSchemaPerTest:
+                AddOnTestTearDown(() => TryDeleteFile(absoluteDbPath));
+                break;
+            case UmbracoTestOptions.Database.NewEmptyPerTest:
+                AddOnTestTearDown(() => TryDeleteFile(absoluteDbPath));
+                break;
+            case UmbracoTestOptions.Database.NewSchemaPerFixture:
+                if (_firstTestInFixture)
+                {
+                    AddOnFixtureTearDown(() => TryDeleteFile(absoluteDbPath));
+                }
+    
+                break;
+            case UmbracoTestOptions.Database.NewEmptyPerFixture:
+                if (_firstTestInFixture)
+                {
+                    AddOnFixtureTearDown(() => TryDeleteFile(absoluteDbPath));
+                }
+    
+                break;
+        }
+    
+        var builder = new SqliteConnectionStringBuilder
+        {
+            DataSource = $"{absoluteDbPath}",
+            Mode = SqliteOpenMode.ReadWriteCreate,
+            ForeignKeys = true,
+            Pooling = false, // When pooling true, files kept open after connections closed, bad for cleanup.
+            Cache = SqliteCacheMode.Shared,
+        };
+    
+        s_connectionStrings = new ConnectionStrings
+        {
+            ConnectionString = builder.ConnectionString,
+            ProviderName = "Microsoft.Data.Sqlite",
+        };
+    
+        connectionStrings.CurrentValue.ConnectionString = s_connectionStrings.ConnectionString;
+        connectionStrings.CurrentValue.ProviderName = s_connectionStrings.ProviderName;
+    
+        databaseFactory.Configure(s_connectionStrings);
+    }
 
     private void TryDeleteFile(string filePath)
     {

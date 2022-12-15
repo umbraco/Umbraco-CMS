@@ -1,4 +1,5 @@
 using Microsoft.Data.Sqlite;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Infrastructure.Persistence;
@@ -9,12 +10,14 @@ public class SqliteTestDatabase : ITestDatabase
 {
     private readonly IOptionsMonitor<ConnectionStrings> _connectionStrings;
     private readonly IUmbracoDatabaseFactory _databaseFactory;
+    private readonly IConfiguration _configuration;
     private Guid? _key;
 
-    public SqliteTestDatabase(IOptionsMonitor<ConnectionStrings> connectionStrings, IUmbracoDatabaseFactory databaseFactory)
+    public SqliteTestDatabase(IOptionsMonitor<ConnectionStrings> connectionStrings, IUmbracoDatabaseFactory databaseFactory, IConfiguration configuration)
     {
         _connectionStrings = connectionStrings;
         _databaseFactory = databaseFactory;
+        _configuration = configuration;
         _key = Guid.NewGuid();
     }
 
@@ -46,10 +49,15 @@ public class SqliteTestDatabase : ITestDatabase
 
     private string GetAbsolutePath()
     {
-        string? projectDirectory = Directory.GetParent(Environment.CurrentDirectory)?.Parent?.Parent?.FullName;
-        string tempFolder = @"TEMP\databases";
-        var tempFolderPath = Path.Combine(projectDirectory!, tempFolder);
-        return Path.Combine(tempFolderPath, _key.ToString());
+        var filesPath = _configuration.GetValue<string>("Tests:Database:FilesPath");
+        if (filesPath is null)
+        {
+            string? projectDirectory = Directory.GetParent(Environment.CurrentDirectory)?.Parent?.Parent?.FullName;
+            string tempFolder = @"TEMP\databases";
+            filesPath = Path.Combine(projectDirectory!, tempFolder);
+        }
+
+        return Path.Combine(filesPath, _key.ToString());
     }
 
     private void TryDeleteFile(string filePath)
