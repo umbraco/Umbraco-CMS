@@ -135,7 +135,7 @@ public class PackagingService : IPackagingService
             var currentPlans = installedPackage.PackageMigrationPlans.ToList();
             if (keyValues is null || keyValues.TryGetValue(
                 Constants.Conventions.Migrations.KeyValuePrefix + plan.Name,
-                out var currentState))
+                out var currentState) is false)
             {
                 currentState = null;
             }
