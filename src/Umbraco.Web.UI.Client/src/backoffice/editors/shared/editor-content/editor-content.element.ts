@@ -61,7 +61,6 @@ export class UmbEditorContentElement extends UmbContextProviderMixin(
 
 			#footer {
 				margin: 0 var(--uui-size-layout-1);
-				flex:1 1 auto;
 			}
 		`,
 	];

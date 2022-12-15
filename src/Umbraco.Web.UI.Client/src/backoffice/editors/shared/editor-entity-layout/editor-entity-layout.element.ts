@@ -37,36 +37,6 @@ export class UmbEditorEntityLayout extends UmbContextConsumerMixin(UmbObserverMi
 				height: 100%;
 			}
 
-			#header {
-				display: flex;
-				align-items: center;
-				min-height: 60px;
-			}
-
-			#headline {
-				display: block;
-				flex: 1 1 auto;
-				margin: 0 var(--uui-size-layout-1);
-			}
-
-			#tabs {
-				margin-left: auto;
-			}
-
-			#footer {
-				display: flex;
-				height: 100%;
-				align-items: center;
-				flex: 1 1 auto;
-			}
-
-			#actions {
-				display: flex;
-				margin-left: auto;
-				gap: 6px;
-				margin: 0 var(--uui-size-layout-1);
-			}
-
 			uui-input {
 				width: 100%;
 			}
@@ -162,7 +132,7 @@ export class UmbEditorEntityLayout extends UmbContextConsumerMixin(UmbObserverMi
 		return html`
 			${this._editorViews?.length > 0
 				? html`
-						<uui-tab-group id="tabs">
+						<uui-tab-group slot="tabs">
 							${this._editorViews.map(
 								(view: ManifestEditorView) => html`
 									<uui-tab
@@ -182,26 +152,18 @@ export class UmbEditorEntityLayout extends UmbContextConsumerMixin(UmbObserverMi
 
 	render() {
 		return html`
-			<umb-body-layout>
-				<div id="header" slot="header">
+			<umb-body-layout .headline=${this.headline}>
 
-					${this.headline ? html`<h3 id="headline">${this.headline}</h3>` : nothing}
-
-					<slot name="header"></slot>
-
-					${this._renderTabs()}
-				</div>
+				<slot name="header" slot="header"></slot>
+				${this._renderTabs()}
 
 				<router-slot .routes="${this._routes}"></router-slot>
 				<slot></slot>
 
-				<div id="footer" slot="footer">
-					<slot name="footer"></slot>
-					<div id="actions">
-						<umb-extension-slot type="editorAction" .filter=${(extension: any) => extension.meta.editors.includes(this.alias)}></umb-extension-slot>
-						<slot name="actions"></slot>
-					</div>
-				</div>
+				<slot name="footer" slot="footer"></slot>
+				<umb-extension-slot slot="actions" type="editorAction" .filter=${(extension: any) => extension.meta.editors.includes(this.alias)}></umb-extension-slot>
+				<slot name="actions" slot="actions"></slot>
+				
 			</umb-body-layout>
 		`;
 	}
