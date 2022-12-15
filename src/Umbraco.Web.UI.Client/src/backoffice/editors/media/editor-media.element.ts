@@ -3,11 +3,13 @@ import { css, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import type { ManifestEditorView } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
+import { UmbMediaStore } from 'src/core/stores/media/media.store';
+import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 
-import '../shared/node/editor-node.element';
+import '../shared/editor-content/editor-content.element';
 
 @customElement('umb-editor-media')
-export class UmbEditorMediaElement extends LitElement {
+export class UmbEditorMediaElement extends UmbContextConsumerMixin(UmbContextProviderMixin(LitElement)) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -26,6 +28,10 @@ export class UmbEditorMediaElement extends LitElement {
 		super();
 
 		this._registerEditorViews();
+
+		this.consumeContext('umbMediaStore', (mediaStore: UmbMediaStore) => {
+			this.provideContext('umbContentStore', mediaStore);
+		});
 	}
 
 	private _registerEditorViews() {
@@ -34,7 +40,7 @@ export class UmbEditorMediaElement extends LitElement {
 				type: 'editorView',
 				alias: 'Umb.EditorView.Media.Edit',
 				name: 'Media Editor Edit View',
-				loader: () => import('../shared/node/views/edit/editor-view-node-edit.element'),
+				loader: () => import('../shared/editor-content/views/edit/editor-view-content-edit.element'),
 				weight: 200,
 				meta: {
 					editors: ['Umb.Editor.Media'],
@@ -47,7 +53,7 @@ export class UmbEditorMediaElement extends LitElement {
 				type: 'editorView',
 				alias: 'Umb.EditorView.Media.Info',
 				name: 'Media Editor Info View',
-				loader: () => import('../shared/node/views/info/editor-view-node-info.element'),
+				loader: () => import('../shared/editor-content/views/info/editor-view-content-info.element'),
 				weight: 100,
 				meta: {
 					editors: ['Umb.Editor.Media'],
@@ -65,7 +71,7 @@ export class UmbEditorMediaElement extends LitElement {
 	}
 
 	render() {
-		return html`<umb-editor-node .entityKey=${this.entityKey} alias="Umb.Editor.Media"></umb-editor-node>`;
+		return html`<umb-editor-content .entityKey=${this.entityKey} alias="Umb.Editor.Media"></umb-editor-content>`;
 	}
 }
 

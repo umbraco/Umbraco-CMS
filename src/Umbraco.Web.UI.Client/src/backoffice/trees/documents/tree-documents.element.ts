@@ -1,26 +1,22 @@
 import { html } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import { UmbEntityStore } from '../../../core/stores/entity.store';
 import { UmbTreeBase } from '../shared/tree-base.element';
-import { UmbTreeDocumentDataContext } from './tree-documents-data.context';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import type { ManifestTreeItemAction } from '@umbraco-cms/models';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
+import { UmbDocumentStore } from 'src/core/stores/document/document.store';
 
 import '../shared/tree-navigator.element';
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 @customElement('umb-tree-documents')
-export class UmbTreeDocumentElement extends UmbContextProviderMixin(UmbContextConsumerMixin(UmbTreeBase)) {
+export class UmbTreeDocumentsElement extends UmbContextProviderMixin(UmbContextConsumerMixin(UmbTreeBase)) {
 	constructor() {
 		super();
 
 		this._registerTreeItemActions();
 
-		this.consumeContext('umbEntityStore', (entityStore: UmbEntityStore) => {
-			this._entityStore = entityStore;
-			if (!this._entityStore || !this.tree) return;
-
-			this._treeDataContext = new UmbTreeDocumentDataContext(this._entityStore);
-			this.provideContext('umbTreeDataContext', this._treeDataContext);
+		// TODO: how do we best expose the tree api to the tree navigator element?
+		this.consumeContext('umbDocumentStore', (store: UmbDocumentStore) => {
+			this.provideContext('umbTreeStore', store);
 		});
 	}
 
@@ -75,10 +71,10 @@ export class UmbTreeDocumentElement extends UmbContextProviderMixin(UmbContextCo
 	}
 }
 
-export default UmbTreeDocumentElement;
+export default UmbTreeDocumentsElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-tree-document': UmbTreeDocumentElement;
+		'umb-tree-documents': UmbTreeDocumentsElement;
 	}
 }

@@ -1,4 +1,4 @@
-import { html, LitElement, nothing } from 'lit';
+import { LitElement, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
 import { repeat } from 'lit/directives/repeat.js';
@@ -86,7 +86,7 @@ export class UmbExtensionSlotElement extends UmbObserverMixin(LitElement) {
 
     render() {
         // TODO: check if we can use repeat directly.
-        return repeat(this._extensions, (ext) => ext.alias, (ext, index) => ext.component || nothing);
+        return repeat(this._extensions, (ext) => ext.alias, (ext) => ext.component || nothing);
     }
 }
 

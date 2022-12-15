@@ -1,17 +1,17 @@
 import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
+import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { UUIMenuItemEvent } from '@umbraco-ui/uui';
 import { map } from 'rxjs';
 import { repeat } from 'lit/directives/repeat.js';
-import { UmbTreeContextBase } from '../tree.context';
+import type { UmbTreeContextBase } from '../tree.context';
 import { UmbSectionContext } from '../../sections/section.context';
-import { Entity } from '../../../core/mocks/data/entities';
-import type { ManifestSection } from '../../../core/models';
-import { UmbTreeDataContextBase } from '../tree-data.context';
 import { UmbTreeContextMenuService } from './context-menu/tree-context-menu.service';
+import type { Entity, ManifestSection } from '@umbraco-cms/models';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import { UmbDataStore } from 'src/core/stores/store';
 
 @customElement('umb-tree-item')
 export class UmbTreeItem extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
@@ -24,7 +24,7 @@ export class UmbTreeItem extends UmbContextConsumerMixin(UmbObserverMixin(LitEle
 	private _childItems: Entity[] = [];
 
 	@state()
-	private _href = '';
+	private _href? = '';
 
 	@state()
 	private _loading = false;
@@ -39,7 +39,7 @@ export class UmbTreeItem extends UmbContextConsumerMixin(UmbObserverMixin(LitEle
 	private _isActive = false;
 
 	private _treeContext?: UmbTreeContextBase;
-	private _treeDataContext?: UmbTreeDataContextBase;
+	private _treeStore?: UmbDataStore<unknown>;
 	private _sectionContext?: UmbSectionContext;
 	private _treeContextMenuService?: UmbTreeContextMenuService;
 
@@ -49,11 +49,11 @@ export class UmbTreeItem extends UmbContextConsumerMixin(UmbObserverMixin(LitEle
 		this.consumeContext('umbTreeContext', (treeContext: UmbTreeContextBase) => {
 			this._treeContext = treeContext;
 			this._observeSelectable();
-			this._observeSelection();
+			this._observeIsSelected();
 		});
 
-		this.consumeContext('umbTreeDataContext', (treeDataContext: UmbTreeDataContextBase) => {
-			this._treeDataContext = treeDataContext;
+		this.consumeContext('umbTreeStore', (store: UmbDataStore<unknown>) => {
+			this._treeStore = store;
 		});
 
 		this.consumeContext('umbSectionContext', (sectionContext: UmbSectionContext) => {
@@ -69,11 +69,19 @@ export class UmbTreeItem extends UmbContextConsumerMixin(UmbObserverMixin(LitEle
 
 	connectedCallback(): void {
 		super.connectedCallback();
-		this.addEventListener('selected', (e) => {
-			e.stopPropagation();
-			this._treeContext?.select(this.treeItem.key);
-			this.dispatchEvent(new CustomEvent('change', { composed: true, bubbles: true }));
-		});
+
+		this.addEventListener('selected', this._handleSelectedItem);
+		this.addEventListener('unselected', this._handleDeselectedItem);
+	}
+
+	private _handleSelectedItem(event: Event) {
+		event.stopPropagation();
+		this._treeContext?.select(this.treeItem.key);
+	}
+
+	private _handleDeselectedItem(event: Event) {
+		event.stopPropagation();
+		this._treeContext?.deselect(this.treeItem.key);
 	}
 
 	private _observeSection() {
@@ -92,7 +100,7 @@ export class UmbTreeItem extends UmbContextConsumerMixin(UmbObserverMixin(LitEle
 		});
 	}
 
-	private _observeSelection() {
+	private _observeIsSelected() {
 		if (!this._treeContext) return;
 
 		this.observe<boolean>(
@@ -113,18 +121,21 @@ export class UmbTreeItem extends UmbContextConsumerMixin(UmbObserverMixin(LitEle
 
 	// TODO: how do we handle this?
 	private _constructPath(sectionPathname: string, type: string, key: string) {
-		return `section/${sectionPathname}/${type}/${key}`;
+		return type ? `section/${sectionPathname}/${type}/${key}` : undefined;
 	}
 
 	private _onShowChildren(event: UUIMenuItemEvent) {
 		event.stopPropagation();
 		if (this._childItems.length > 0) return;
+		this._observeChildren();
+	}
+
+	private _observeChildren() {
+		if (!this._treeStore?.getTreeItemChildren) return;
 
 		this._loading = true;
 
-		if (!this._treeDataContext) return;
-
-		this.observe<Entity[]>(this._treeDataContext.childrenChanges(this.treeItem.key), (childItems) => {
+		this.observe<Entity[]>(this._treeStore.getTreeItemChildren(this.treeItem.key), (childItems) => {
 			if (childItems?.length === 0) return;
 			this._childItems = childItems;
 			this._loading = false;
@@ -158,7 +169,7 @@ export class UmbTreeItem extends UmbContextConsumerMixin(UmbObserverMixin(LitEle
 				.loading=${this._loading}
 				.hasChildren=${this.treeItem.hasChildren}
 				label="${this.treeItem.name}"
-				href="${this._href}"
+				href="${ifDefined(this._href)}"
 				?active=${this._isActive}>
 				${this._renderChildItems()}
 				<uui-icon slot="icon" name="${this.treeItem.icon}"></uui-icon>

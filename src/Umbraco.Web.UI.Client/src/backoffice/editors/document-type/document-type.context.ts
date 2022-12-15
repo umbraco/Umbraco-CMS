@@ -1,28 +1,27 @@
 import { BehaviorSubject, Observable } from 'rxjs';
-import { DocumentTypeEntity } from '../../../core/mocks/data/document-type.data';
+import type { DocumentTypeDetails } from '@umbraco-cms/models';
 
 export class UmbDocumentTypeContext {
 	// TODO: figure out how fine grained we want to make our observables.
-	private _data = new BehaviorSubject<DocumentTypeEntity>({
+	private _data = new BehaviorSubject<DocumentTypeDetails>({
 		key: '',
 		name: '',
 		icon: '',
 		type: '',
 		hasChildren: false,
 		parentKey: '',
-		isTrashed: false,
 		alias: '',
 		properties: [],
 	});
-	public readonly data: Observable<DocumentTypeEntity> = this._data.asObservable();
+	public readonly data: Observable<DocumentTypeDetails> = this._data.asObservable();
 
-	constructor(documentType?: DocumentTypeEntity) {
+	constructor(documentType?: DocumentTypeDetails) {
 		if (!documentType) return;
 		this._data.next(documentType);
 	}
 
 	// TODO: figure out how we want to update data
-	public update(data: Partial<DocumentTypeEntity>) {
+	public update(data: Partial<DocumentTypeDetails>) {
 		this._data.next({ ...this._data.getValue(), ...data });
 	}
 

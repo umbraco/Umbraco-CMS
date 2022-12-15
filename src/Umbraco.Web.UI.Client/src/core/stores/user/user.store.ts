@@ -1,24 +1,17 @@
 import { BehaviorSubject, map, Observable } from 'rxjs';
-import type { UserDetails, UserEntity } from '../../models';
-import { UmbEntityStore } from '../entity.store';
 import { UmbDataStoreBase } from '../store';
+import type { UserDetails } from '@umbraco-cms/models';
+
 
 /**
  * @export
  * @class UmbUserStore
- * @extends {UmbDataStoreBase<UserEntity>}
+ * @extends {UmbDataStoreBase<UserDetails>}
  * @description - Data Store for Users
  */
 export class UmbUserStore extends UmbDataStoreBase<UserDetails> {
-	private _entityStore: UmbEntityStore;
-
 	private _totalUsers: BehaviorSubject<number> = new BehaviorSubject(0);
 	public readonly totalUsers: Observable<number> = this._totalUsers.asObservable();
-
-	constructor(entityStore: UmbEntityStore) {
-		super();
-		this._entityStore = entityStore;
-	}
 
 	getAll(): Observable<Array<UserDetails>> {
 		// TODO: use Fetcher API.
@@ -27,7 +20,7 @@ export class UmbUserStore extends UmbDataStoreBase<UserDetails> {
 			.then((res) => res.json())
 			.then((data) => {
 				this._totalUsers.next(data.total);
-				this.update(data.items);
+				this.updateItems(data.items);
 			});
 
 		return this.items;
@@ -45,7 +38,7 @@ export class UmbUserStore extends UmbDataStoreBase<UserDetails> {
 		fetch(`/umbraco/backoffice/users/details/${key}`)
 			.then((res) => res.json())
 			.then((data) => {
-				this.update([data]);
+				this.updateItems([data]);
 			});
 
 		return this.items.pipe(
@@ -58,7 +51,7 @@ export class UmbUserStore extends UmbDataStoreBase<UserDetails> {
 		fetch(`/umbraco/backoffice/users/getByKeys?${params}`)
 			.then((res) => res.json())
 			.then((data) => {
-				this.update(data);
+				this.updateItems(data);
 			});
 
 		return this.items.pipe(
@@ -74,7 +67,7 @@ export class UmbUserStore extends UmbDataStoreBase<UserDetails> {
 		fetch(`/umbraco/backoffice/users/getByName?${params}`)
 			.then((res) => res.json())
 			.then((data) => {
-				this.update(data);
+				this.updateItems(data);
 			});
 
 		return this.items.pipe(
@@ -101,8 +94,7 @@ export class UmbUserStore extends UmbDataStoreBase<UserDetails> {
 				user.status = 'enabled';
 			});
 
-			this.update(storedUsers);
-			this._entityStore.update(storedUsers);
+			this.updateItems(storedUsers);
 		} catch (error) {
 			console.error('Enable Users failed', error);
 		}
@@ -129,8 +121,7 @@ export class UmbUserStore extends UmbDataStoreBase<UserDetails> {
 				}
 			});
 
-			this.update(storedUsers);
-			this._entityStore.update(storedUsers);
+			this.updateItems(storedUsers);
 		} catch (error) {
 			console.error('Add user group failed', error);
 		}
@@ -153,8 +144,8 @@ export class UmbUserStore extends UmbDataStoreBase<UserDetails> {
 				user.userGroups = user.userGroups.filter((group) => group !== userGroup);
 			});
 
-			this.update(storedUsers);
-			this._entityStore.update(storedUsers);
+			this.updateItems(storedUsers);
+			
 		} catch (error) {
 			console.error('Remove user group failed', error);
 		}
@@ -177,8 +168,7 @@ export class UmbUserStore extends UmbDataStoreBase<UserDetails> {
 				user.status = 'disabled';
 			});
 
-			this.update(storedUsers);
-			this._entityStore.update(storedUsers);
+			this.updateItems(storedUsers);
 		} catch (error) {
 			console.error('Disable Users failed', error);
 		}
@@ -195,8 +185,7 @@ export class UmbUserStore extends UmbDataStoreBase<UserDetails> {
 				},
 			});
 			const deletedKeys = await res.json();
-			this.delete(deletedKeys);
-			this._entityStore.delete(deletedKeys);
+			this.deleteItems(deletedKeys);
 		} catch (error) {
 			console.error('Delete Users failed', error);
 		}
@@ -213,8 +202,7 @@ export class UmbUserStore extends UmbDataStoreBase<UserDetails> {
 				},
 			});
 			const json = await res.json();
-			this.update(json);
-			this._entityStore.update(json);
+			this.updateItems(json);
 		} catch (error) {
 			console.error('Save Data Type error', error);
 		}
@@ -231,8 +219,7 @@ export class UmbUserStore extends UmbDataStoreBase<UserDetails> {
 				},
 			});
 			const json = (await res.json()) as UserDetails[];
-			this.update(json);
-			this._entityStore.update(json);
+			this.updateItems(json);
 			return json[0];
 		} catch (error) {
 			console.error('Invite user error', error);

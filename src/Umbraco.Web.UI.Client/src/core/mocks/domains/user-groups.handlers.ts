@@ -4,7 +4,7 @@ import type { UserGroupDetails } from '@umbraco-cms/models';
 
 export const handlers = [
 	rest.get('/umbraco/backoffice/user-groups/list/items', (req, res, ctx) => {
-		const items = umbUserGroupsData.getItems('userGroup');
+		const items = umbUserGroupsData.getAll();
 
 		const response = {
 			total: items.length,

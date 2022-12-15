@@ -31,8 +31,9 @@ export class UmbTreeElement extends UmbContextProviderMixin(UmbContextConsumerMi
 		const oldVal = this._selectable;
 		this._selectable = newVal;
 		this.requestUpdate('selectable', oldVal);
-		if (newVal && this._treeContext) {
-			this._treeContext?.setSelectable(newVal);
+		this._treeContext?.setSelectable(newVal);
+
+		if (newVal) {
 			this._observeSelection();
 		}
 	}
@@ -74,23 +75,22 @@ export class UmbTreeElement extends UmbContextProviderMixin(UmbContextConsumerMi
 	}
 
 	private _provideTreeContext() {
-		if (!this._tree) return;
+		if (!this._tree || this._treeContext) return;
+
 		this._treeContext = new UmbTreeContextBase(this._tree);
 		this._treeContext.setSelectable(this.selectable);
 		this._treeContext.setSelection(this.selection);
-		this.provideContext('umbTreeContext', this._treeContext);
 
-		if (this.selectable) {
-			this._observeSelection();
-		}
+		this.provideContext('umbTreeContext', this._treeContext);
 	}
 
 	private _observeSelection() {
 		if (!this._treeContext) return;
 
 		this.observe(this._treeContext.selection, (selection) => {
+			if (this._selection === selection) return;
 			this._selection = selection;
-			this.dispatchEvent(new CustomEvent('change'));
+			this.dispatchEvent(new CustomEvent('selected'));
 		});
 	}
 

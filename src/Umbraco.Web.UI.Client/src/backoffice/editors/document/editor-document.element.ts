@@ -3,11 +3,13 @@ import { css, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import type { ManifestEditorView } from '@umbraco-cms/models';
+import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
+import type { UmbDocumentStore } from 'src/core/stores/document/document.store';
 
-import '../shared/node/editor-node.element';
+import '../shared/editor-content/editor-content.element';
 
 @customElement('umb-editor-document')
-export class UmbEditorDocumentElement extends LitElement {
+export class UmbEditorDocumentElement extends UmbContextConsumerMixin(UmbContextProviderMixin(LitElement)) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -26,6 +28,10 @@ export class UmbEditorDocumentElement extends LitElement {
 		super();
 
 		this._registerEditorViews();
+
+		this.consumeContext('umbDocumentStore', (documentStore: UmbDocumentStore) => {
+			this.provideContext('umbContentStore', documentStore);
+		});
 	}
 
 	private _registerEditorViews() {
@@ -34,7 +40,7 @@ export class UmbEditorDocumentElement extends LitElement {
 				type: 'editorView',
 				alias: 'Umb.EditorView.Document.Edit',
 				name: 'Document Editor Edit View',
-				loader: () => import('../shared/node/views/edit/editor-view-node-edit.element'),
+				loader: () => import('../shared/editor-content/views/edit/editor-view-content-edit.element'),
 				weight: 200,
 				meta: {
 					editors: ['Umb.Editor.Document'],
@@ -47,7 +53,7 @@ export class UmbEditorDocumentElement extends LitElement {
 				type: 'editorView',
 				alias: 'Umb.EditorView.Document.Info',
 				name: 'Document Editor Info View',
-				loader: () => import('../shared/node/views/info/editor-view-node-info.element'),
+				loader: () => import('../shared/editor-content/views/info/editor-view-content-info.element'),
 				weight: 100,
 				meta: {
 					editors: ['Umb.Editor.Document'],
@@ -65,7 +71,7 @@ export class UmbEditorDocumentElement extends LitElement {
 	}
 
 	render() {
-		return html`<umb-editor-node .entityKey=${this.entityKey} alias="Umb.Editor.Document"></umb-editor-node>`;
+		return html`<umb-editor-content .entityKey=${this.entityKey} alias="Umb.Editor.Document"></umb-editor-content>`;
 	}
 }
 
