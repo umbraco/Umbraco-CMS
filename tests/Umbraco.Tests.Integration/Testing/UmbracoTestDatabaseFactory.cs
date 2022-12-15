@@ -29,7 +29,7 @@ public class UmbracoTestDatabaseFactory
             case TestDatabaseSettings.TestDatabaseType.Sqlite:
                 return new SqliteTestDatabase(_connectionStrings, _umbracoDatabaseFactory, _configuration);
             case TestDatabaseSettings.TestDatabaseType.LocalDb:
-                return new LocalDbTestDatabase(new LocalDb(), _umbracoDatabaseFactory);
+                return new LocalDbTestDatabase(new LocalDb(), _umbracoDatabaseFactory, _connectionStrings);
             case TestDatabaseSettings.TestDatabaseType.SqlServer:
                 return new SqlServerTestDatabase(_configuration.GetValue<string>("Tests:Database:SQLServerMasterConnectionString"));
         }

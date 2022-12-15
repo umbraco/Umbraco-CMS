@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Persistence.SqlServer;
@@ -18,14 +19,16 @@ public class LocalDbTestDatabase : ITestDatabase
     private static string s_filesPath;
     private readonly LocalDb _localDb;
     private readonly IUmbracoDatabaseFactory _databaseFactory;
+    private readonly IOptionsMonitor<ConnectionStrings> _connectionStrings;
 
     private readonly TestDatabaseSettings _settings;
 
     // It's internal because `Umbraco.Core.Persistence.LocalDb` is internal
-    internal LocalDbTestDatabase(LocalDb localDb, IUmbracoDatabaseFactory databaseFactory)
+    internal LocalDbTestDatabase(LocalDb localDb, IUmbracoDatabaseFactory databaseFactory, IOptionsMonitor<ConnectionStrings> connectionStrings)
     {
         _localDb = localDb;
         _databaseFactory = databaseFactory;
+        _connectionStrings = connectionStrings;
         string? projectDirectory = Directory.GetParent(Environment.CurrentDirectory)?.Parent?.Parent?.FullName;
         string tempFolder = @"TEMP\databases";
         s_filesPath = Path.Combine(projectDirectory!, tempFolder);
@@ -53,7 +56,10 @@ public class LocalDbTestDatabase : ITestDatabase
             ConnectionString = s_localDbInstance.GetConnectionString(InstanceName, tempName),
             ProviderName = "Microsoft.Data.SqlClient",
         };
-        
+
+        _connectionStrings.CurrentValue.ConnectionString = connectionStrings.ConnectionString;
+        _connectionStrings.CurrentValue.ProviderName = connectionStrings.ProviderName;
+
         _databaseFactory.Configure(connectionStrings);
         return connectionStrings;
     }
