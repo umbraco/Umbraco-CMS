@@ -157,7 +157,7 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(
 
 
 	private _registerEditorActions() {
-		const manifests: Array<ManifestWithLoader<ManifestEditorAction>> = [
+		const manifests: Array<ManifestEditorAction> = [
 			{
 				type: 'editorAction',
 				alias: 'Umb.EditorAction.User.Save',

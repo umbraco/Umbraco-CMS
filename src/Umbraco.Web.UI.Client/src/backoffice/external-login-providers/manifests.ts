@@ -1,6 +1,6 @@
-import type { ManifestExternalLoginProvider, ManifestWithLoader } from '@umbraco-cms/models';
+import type { ManifestExternalLoginProvider } from '@umbraco-cms/models';
 
-export const manifests: Array<ManifestWithLoader<ManifestExternalLoginProvider>> = [
+export const manifests: Array<ManifestExternalLoginProvider> = [
 	{
 		type: 'externalLoginProvider',
 		alias: 'Umb.ExternalLoginProvider.Test',

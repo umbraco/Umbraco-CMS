@@ -1,6 +1,6 @@
-import type { ManifestUserDashboard, ManifestWithLoader } from '@umbraco-cms/models';
+import type { ManifestUserDashboard } from '@umbraco-cms/models';
 
-export const manifests: Array<ManifestWithLoader<ManifestUserDashboard>> = [
+export const manifests: Array<ManifestUserDashboard> = [
 	{
 		type: 'userDashboard',
 		alias: 'Umb.UserDashboard.Test',
