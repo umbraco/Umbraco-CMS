@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Configuration;
@@ -12,7 +8,6 @@ using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using Serilog;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
@@ -152,7 +147,8 @@ public abstract class UmbracoIntegrationTestBase
         state.DetermineRuntimeLevel();
     }
 
-    private void SetupTestDatabase(TestUmbracoDatabaseFactoryProvider testUmbracoDatabaseFactoryProvider,
+    private void SetupTestDatabase(
+        TestUmbracoDatabaseFactoryProvider testUmbracoDatabaseFactoryProvider,
         IOptionsMonitor<ConnectionStrings> connectionStrings,
         IUmbracoDatabaseFactory databaseFactory,
         ILoggerFactory loggerFactory,
@@ -253,7 +249,7 @@ public abstract class UmbracoIntegrationTestBase
     {
         string? projectDirectory = Directory.GetParent(Environment.CurrentDirectory)?.Parent?.Parent?.FullName;
         string tempFolder = @"TEMP\databases";
-        var tempFolderPath = Path.Combine(projectDirectory, tempFolder);
+        var tempFolderPath = Path.Combine(projectDirectory!, tempFolder);
         var absoluteDbPath = Path.Combine(tempFolderPath, Guid.NewGuid().ToString());
 
         switch (TestOptions.Database)
@@ -276,6 +272,7 @@ public abstract class UmbracoIntegrationTestBase
                 {
                     AddOnFixtureTearDown(() => TryDeleteFile(absoluteDbPath));
                 }
+
                 break;
         }
 
@@ -285,12 +282,13 @@ public abstract class UmbracoIntegrationTestBase
             Mode = SqliteOpenMode.ReadWriteCreate,
             ForeignKeys = true,
             Pooling = false, // When pooling true, files kept open after connections closed, bad for cleanup.
-            Cache = SqliteCacheMode.Shared
+            Cache = SqliteCacheMode.Shared,
         };
-        s_connectionStrings = new ConnectionStrings()
+
+        s_connectionStrings = new ConnectionStrings
         {
             ConnectionString = builder.ConnectionString,
-            ProviderName = "Microsoft.Data.Sqlite"
+            ProviderName = "Microsoft.Data.Sqlite",
         };
 
         connectionStrings.CurrentValue.ConnectionString = s_connectionStrings.ConnectionString;
@@ -301,9 +299,9 @@ public abstract class UmbracoIntegrationTestBase
 
     private void TryDeleteFile(string filePath)
     {
-        int maxRetries = 5;
-        int retries = 0;
-        bool retry = true;
+        const int maxRetries = 5;
+        var retries = 0;
+        var retry = true;
         do
         {
             try
@@ -311,7 +309,7 @@ public abstract class UmbracoIntegrationTestBase
                 File.Delete(filePath);
                 retry = false;
             }
-            catch (IOException e)
+            catch (IOException)
             {
                 retries++;
                 if (retries >= maxRetries)
