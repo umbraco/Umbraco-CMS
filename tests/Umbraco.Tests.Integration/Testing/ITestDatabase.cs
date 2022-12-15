@@ -1,15 +1,12 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using Umbraco.Cms.Core.Configuration.Models;
+
 namespace Umbraco.Cms.Tests.Integration.Testing;
 
 public interface ITestDatabase
 {
-    TestDbMeta AttachEmpty();
-
-    TestDbMeta AttachSchema();
-
-    void Detach(TestDbMeta id);
-
-    TestDbMeta? Current { get; }
+    ConnectionStrings Initialize();
+    void Teardown();
 }
