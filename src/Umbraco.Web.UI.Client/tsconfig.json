@@ -26,6 +26,7 @@
 			"@umbraco-cms/extensions-api": ["src/core/extensions-api"],
 			"@umbraco-cms/extensions-registry": ["src/core/extensions-registry"],
 			"@umbraco-cms/observable-api": ["src/core/observable-api"],
+			"@umbraco-cms/resource-api": ["src/core/resource-api"],
 			"@umbraco-cms/utils": ["src/core/utils"],
 			"@umbraco-cms/test-utils": ["src/core/test-utils"],
 			"@umbraco-cms/services": ["src/core/services"],
