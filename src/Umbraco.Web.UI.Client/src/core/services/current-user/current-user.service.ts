@@ -4,7 +4,7 @@ import type { UserDetails } from '@umbraco-cms/models';
 import { umbracoPath } from '@umbraco-cms/utils';
 
 class UmbCurrentUserService {
-	private _currentUser = new BehaviorSubject<UserDetails>(umbUsersData.getItems('user')[0]); //TODO: Temp solution to set the first user as the current logged in user
+	private _currentUser = new BehaviorSubject<UserDetails>(umbUsersData.getAll()[0]); //TODO: Temp solution to set the first user as the current logged in user
 	public readonly currentUser: Observable<UserDetails> = this._currentUser.asObservable();
 
 	/**
