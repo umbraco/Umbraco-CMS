@@ -9,8 +9,8 @@ import type { UmbNotificationDefaultData } from '../../../../core/services/notif
 import type { UmbNotificationService } from '../../../../core/services/notification';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
-@customElement('umb-editor-action-user-save')
-export class UmbEditorActionUserSaveElement extends UmbContextConsumerMixin(LitElement) {
+@customElement('umb-workspace-action-user-save')
+export class UmbWorkspaceActionUserSaveElement extends UmbContextConsumerMixin(LitElement) {
 	static styles = [UUITextStyles, css``];
 
 	@state()
@@ -56,10 +56,10 @@ export class UmbEditorActionUserSaveElement extends UmbContextConsumerMixin(LitE
 	}
 }
 
-export default UmbEditorActionUserSaveElement;
+export default UmbWorkspaceActionUserSaveElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-editor-action-user-save': UmbEditorActionUserSaveElement;
+		'umb-workspace-action-user-save': UmbWorkspaceActionUserSaveElement;
 	}
 }
