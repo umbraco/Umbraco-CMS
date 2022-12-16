@@ -12,7 +12,6 @@ import type { ManifestWorkspaceView } from '@umbraco-cms/models';
 
 import '../../../components/body-layout/body-layout.element';
 import '../../../components/extension-slot/extension-slot.element';
-import '../workspace-action-extension/workspace-action-extension.element';
 
 /**
  * @element umb-workspace-entity-layout
