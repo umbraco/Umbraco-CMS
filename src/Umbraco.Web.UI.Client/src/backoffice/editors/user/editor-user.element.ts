@@ -1,5 +1,5 @@
 import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
-import { css, html, LitElement, nothing } from 'lit';
+import { css, html, LitElement, nothing, TemplateResult } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
@@ -10,13 +10,16 @@ import { UmbUserContext } from './user.context';
 import { UmbUserStore } from '@umbraco-cms/stores/user/user.store';
 
 import { UmbContextProviderMixin, UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import type { ManifestEditorAction, UserDetails } from '@umbraco-cms/models';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 
 import '../../property-editor-uis/content-picker/property-editor-ui-content-picker.element';
 import '@umbraco-cms/components/input-user-group/input-user-group.element';
 
+import { umbCurrentUserService } from 'src/core/services/current-user';
+import { UmbModalService } from '@umbraco-cms/services';
+import '../shared/editor-entity-layout/editor-entity-layout.element';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 
 @customElement('umb-editor-user')
 export class UmbEditorUserElement extends UmbContextProviderMixin(
@@ -85,53 +88,46 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(
 	private _user?: UserDetails | null;
 
 	@state()
+	private _currentUser?: UserDetails | null;
+
+	@state()
 	private _userName = '';
 
 	@property({ type: String })
 	entityKey = '';
 
-	protected _userStore?: UmbUserStore;
+	private _userStore?: UmbUserStore;
 	private _userContext?: UmbUserContext;
+	private _modalService?: UmbModalService;
+
 	private _languages = []; //TODO Add languages
 
 	constructor() {
 		super();
 
+		this.consumeAllContexts(['umbUserStore', 'umbModalService'], (instances) => {
+			this._userStore = instances['umbUserStore'];
+			this._modalService = instances['umbModalService'];
+
+			this._observeUser();
+		});
+
+		this._observeCurrentUser();
 		this._registerEditorActions();
 	}
 
-	private _registerEditorActions() {
-		const manifests: Array<ManifestEditorAction> = [
-			{
-				type: 'editorAction',
-				alias: 'Umb.EditorAction.User.Save',
-				name: 'EditorActionUserSave',
-				loader: () => import('./actions/editor-action-user-save.element'),
-				meta: {
-					editors: ['Umb.Editor.User'],
-				},
-			},
-		];
-
-		manifests.forEach((manifest) => {
-			if (umbExtensionsRegistry.isRegistered(manifest.alias)) return;
-			umbExtensionsRegistry.register(manifest);
-		});
-	}
-
-	connectedCallback(): void {
-		super.connectedCallback();
-
-		this.consumeContext('umbUserStore', (usersContext: UmbUserStore) => {
-			this._userStore = usersContext;
-			this._observeUser();
-		});
-	}
-
-	private _observeUser() {
+	private async _observeCurrentUser() {
 		if (!this._userStore) return;
 
-		this.observe(this._userStore.getByKey(this.entityKey), (user) => {
+		this.observe<UserDetails>(umbCurrentUserService.currentUser, (currentUser) => {
+			this._currentUser = currentUser;
+		});
+	}
+
+	private async _observeUser() {
+		if (!this._userStore) return;
+
+		this.observe<UserDetails>(this._userStore.getByKey(this.entityKey), (user) => {
 			this._user = user;
 			if (!this._user) return;
 
@@ -153,6 +149,26 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(
 			if (user.name !== this._userName) {
 				this._userName = user.name;
 			}
+		});
+	}
+
+
+	private _registerEditorActions() {
+		const manifests: Array<ManifestEditorAction> = [
+			{
+				type: 'editorAction',
+				alias: 'Umb.EditorAction.User.Save',
+				name: 'EditorActionUserSave',
+				loader: () => import('./actions/editor-action-user-save.element'),
+				meta: {
+					editors: ['Umb.Editor.User'],
+				},
+			},
+		];
+
+		manifests.forEach((manifest) => {
+			if (umbExtensionsRegistry.isRegistered(manifest.alias)) return;
+			umbExtensionsRegistry.register(manifest);
 		});
 	}
 
@@ -208,6 +224,42 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(
 				`;
 			}
 		);
+	}
+
+	private _changePassword() {
+		this._modalService?.changePassword({ requireOldPassword: umbCurrentUserService.isAdmin === false });
+	}
+
+	private _renderActionButtons() {
+		if (!this._user) return;
+
+		const buttons: TemplateResult[] = [];
+
+		if (umbCurrentUserService.isAdmin === false) return nothing;
+
+		if (this._user?.status !== 'invited')
+			buttons.push(
+				html`
+					<uui-button
+						@click=${this._updateUserStatus}
+						look="primary"
+						color="${this._user.status === 'disabled' ? 'positive' : 'warning'}"
+						label="${this._user.status === 'disabled' ? 'Enable' : 'Disable'}"></uui-button>
+				`
+			);
+
+		if (this._currentUser?.key !== this._user?.key)
+			buttons.push(html` <uui-button
+				@click=${this._deleteUser}
+				look="primary"
+				color="danger"
+				label="Delete User"></uui-button>`);
+
+		buttons.push(
+			html` <uui-button @click=${this._changePassword} look="primary" label="Change password"></uui-button> `
+		);
+
+		return buttons;
 	}
 
 	private _renderLeftColumn() {
@@ -271,16 +323,7 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(
 				<uui-avatar .name=${this._user?.name || ''}></uui-avatar>
 				<uui-button label="Change photo"></uui-button>
 				<hr />
-				${this._user?.status !== 'invited'
-					? html`
-							<uui-button
-								@click=${this._updateUserStatus}
-								look="primary"
-								color="${this._user.status === 'disabled' ? 'positive' : 'warning'}"
-								label="${this._user.status === 'disabled' ? 'Enable' : 'Disable'}"></uui-button>
-					  `
-					: nothing}
-				<uui-button @click=${this._deleteUser} look="primary" color="danger" label="Delete User"></uui-button>
+				${this._renderActionButtons()}
 				<div>
 					<b>Status:</b>
 					<uui-tag look="${ifDefined(statusLook?.look)}" color="${ifDefined(statusLook?.color)}">
