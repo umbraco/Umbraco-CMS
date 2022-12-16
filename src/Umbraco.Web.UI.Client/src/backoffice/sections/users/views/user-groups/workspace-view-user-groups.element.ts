@@ -18,8 +18,8 @@ import './user-group-table-sections-column-layout.element';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbUserGroupStore } from '@umbraco-cms/stores/user/user-group.store';
 
-@customElement('umb-editor-view-user-groups')
-export class UmbEditorViewUserGroupsElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+@customElement('umb-workspace-view-user-groups')
+export class UmbWorkspaceViewUserGroupsElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -147,10 +147,10 @@ export class UmbEditorViewUserGroupsElement extends UmbContextConsumerMixin(UmbO
 	}
 }
 
-export default UmbEditorViewUserGroupsElement;
+export default UmbWorkspaceViewUserGroupsElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-editor-view-user-groups': UmbEditorViewUserGroupsElement;
+		'umb-workspace-view-user-groups': UmbWorkspaceViewUserGroupsElement;
 	}
 }
