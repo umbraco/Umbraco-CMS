@@ -170,9 +170,6 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         }));
       });
     }
-    else {
-      styleFormats = fallbackStyles;
-    }
 
     return $q.all(promises).then(function () {
       // Always push our Umbraco RTE stylesheet
@@ -375,7 +372,6 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
           autoresize_bottom_margin: 10,
           content_css: styles.stylesheets,
           style_formats: styles.styleFormats,
-          style_formats_autohide: true,
           language: getLanguage(),
 
           //this would be for a theme other than inlite
@@ -450,7 +446,18 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             }
           }
 
+          // if we have style_formats at this point they originate from the RTE CSS config. we don't want any custom
+          // style_formats to interfere with the RTE CSS config, so let's explicitly remove the custom style_formats.
+          if(tinyMceConfig.customConfig.style_formats && config.style_formats && config.style_formats.length){
+            delete tinyMceConfig.customConfig.style_formats;
+          }
+
           Utilities.extend(config, tinyMceConfig.customConfig);
+        }
+
+        if(!config.style_formats || !config.style_formats.length){
+          // if we have no style_formats at this point we'll revert to using the default ones (fallbackStyles)
+          config.style_formats = fallbackStyles;
         }
 
         return config;
