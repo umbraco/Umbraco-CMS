@@ -1,7 +1,7 @@
 import { html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { IRoute, IRoutingInfo } from 'router-slot';
-import { UmbWorkspaceEntityElement } from '../../../../workspaces/shared/workspace-entity/workspace-entity.element';
+import { UmbWorkspaceElement } from '../../../../workspaces/shared/workspace-entity/workspace-entity.element';
 
 @customElement('umb-section-view-packages-installed')
 export class UmbSectionViewPackagesInstalledElement extends LitElement {
@@ -15,7 +15,7 @@ export class UmbSectionViewPackagesInstalledElement extends LitElement {
 			path: `:entityType/:key`,
 			component: () => import('../../../../workspaces/shared/workspace-entity/workspace-entity.element'),
 			setup: (component: HTMLElement, info: IRoutingInfo) => {
-				const element = component as UmbWorkspaceEntityElement;
+				const element = component as UmbWorkspaceElement;
 				element.entityKey = info.match.params.key;
 				element.entityType = info.match.params.entityType;
 			},
