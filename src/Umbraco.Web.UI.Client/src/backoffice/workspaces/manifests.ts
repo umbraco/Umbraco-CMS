@@ -77,7 +77,7 @@ export const manifests: Array<ManifestWorkspace> = [
 		type: 'workspace',
 		alias: 'Umb.Workspace.Document',
 		name: 'Content Editor',
-		loader: () => import('./document/editor-document.element'),
+		loader: () => import('./document/workspace-document.element'),
 		meta: {
 			entityType: 'document',
 		},

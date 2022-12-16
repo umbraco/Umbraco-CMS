@@ -8,8 +8,8 @@ import type { UmbDocumentStore } from 'src/core/stores/document/document.store';
 
 import '../shared/workspace-content/workspace-content.element';
 
-@customElement('umb-editor-document')
-export class UmbEditorDocumentElement extends UmbContextConsumerMixin(UmbContextProviderMixin(LitElement)) {
+@customElement('umb-workspace-document')
+export class UmbWorkspaceDocumentElement extends UmbContextConsumerMixin(UmbContextProviderMixin(LitElement)) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -27,19 +27,19 @@ export class UmbEditorDocumentElement extends UmbContextConsumerMixin(UmbContext
 	constructor() {
 		super();
 
-		this._registerEditorViews();
+		this._registerWorkspaceViews();
 
 		this.consumeContext('umbDocumentStore', (documentStore: UmbDocumentStore) => {
 			this.provideContext('umbContentStore', documentStore);
 		});
 	}
 
-	private _registerEditorViews() {
+	private _registerWorkspaceViews() {
 		const dashboards: Array<ManifestWorkspaceView> = [
 			{
 				type: 'workspaceView',
-				alias: 'Umb.EditorView.Document.Edit',
-				name: 'Document Editor Edit View',
+				alias: 'Umb.WorkspaceView.Document.Edit',
+				name: 'Document Workspace Edit View',
 				loader: () => import('../shared/workspace-content/views/edit/workspace-view-content-edit.element'),
 				weight: 200,
 				meta: {
@@ -51,8 +51,8 @@ export class UmbEditorDocumentElement extends UmbContextConsumerMixin(UmbContext
 			},
 			{
 				type: 'workspaceView',
-				alias: 'Umb.EditorView.Document.Info',
-				name: 'Document Editor Info View',
+				alias: 'Umb.WorkspaceView.Document.Info',
+				name: 'Document Workspace Info View',
 				loader: () => import('../shared/workspace-content/views/info/workspace-view-content-info.element'),
 				weight: 100,
 				meta: {
@@ -75,10 +75,10 @@ export class UmbEditorDocumentElement extends UmbContextConsumerMixin(UmbContext
 	}
 }
 
-export default UmbEditorDocumentElement;
+export default UmbWorkspaceDocumentElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-editor-document': UmbEditorDocumentElement;
+		'umb-workspace-document': UmbWorkspaceDocumentElement;
 	}
 }
