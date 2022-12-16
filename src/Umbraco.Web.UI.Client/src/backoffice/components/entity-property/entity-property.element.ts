@@ -178,7 +178,6 @@ export class UmbEntityPropertyElement extends UmbContextConsumerMixin(UmbObserve
 				${this._renderPropertyActionMenu()}
 				<div slot="editor">${this._element}</div>
 			</umb-workspace-property-layout>
-			<hr />
 		`;
 	}
 
