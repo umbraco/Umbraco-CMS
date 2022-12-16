@@ -51,9 +51,11 @@ public class LocalDbTestDatabase : ITestDatabase
     {
         var tempName = Guid.NewGuid().ToString("N");
         s_localDbInstance.CreateDatabase(tempName, s_filesPath);
+        var conString = s_localDbInstance.GetConnectionString(InstanceName, tempName);
+        conString += "TrustServerCertificate=True;";
         var connectionStrings = new ConnectionStrings
         {
-            ConnectionString = s_localDbInstance.GetConnectionString(InstanceName, tempName),
+            ConnectionString = conString,
             ProviderName = "Microsoft.Data.SqlClient",
         };
 
