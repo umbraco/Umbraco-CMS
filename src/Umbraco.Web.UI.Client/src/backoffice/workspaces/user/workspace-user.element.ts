@@ -22,7 +22,7 @@ import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 
 @customElement('umb-workspace-user')
-export class UmbEditorUserElement extends UmbContextProviderMixin(
+export class UmbWorkspaceUserElement extends UmbContextProviderMixin(
 	UmbContextConsumerMixin(UmbObserverMixin(LitElement))
 ) {
 	static styles = [
@@ -113,7 +113,7 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(
 		});
 
 		this._observeCurrentUser();
-		this._registerEditorActions();
+		this._registerWorkspaceActions();
 	}
 
 	private async _observeCurrentUser() {
@@ -153,15 +153,15 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(
 	}
 
 
-	private _registerEditorActions() {
+	private _registerWorkspaceActions() {
 		const manifests: Array<ManifestWorkspaceAction> = [
 			{
 				type: 'workspaceAction',
-				alias: 'Umb.EditorAction.User.Save',
-				name: 'EditorActionUserSave',
-				loader: () => import('./actions/editor-action-user-save.element'),
+				alias: 'Umb.WorkspaceAction.User.Save',
+				name: 'WorkspaceActionUserSave',
+				loader: () => import('./actions/workspace-action-user-save.element'),
 				meta: {
-					workspaces: ['Umb.Editor.User'],
+					workspaces: ['Umb.Workspace.User'],
 				},
 			},
 		];
@@ -187,7 +187,7 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(
 		history.pushState(null, '', 'section/users/view/users/overview');
 	}
 
-	// TODO. find a way where we don't have to do this for all editors.
+	// TODO. find a way where we don't have to do this for all workspaces.
 	private _handleInput(event: UUIInputEvent) {
 		if (event instanceof UUIInputEvent) {
 			const target = event.composedPath()[0] as UUIInputElement;
@@ -372,7 +372,7 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(
 		if (!this._user) return html`User not found`;
 
 		return html`
-			<umb-workspace-entity-layout alias="Umb.Editor.User">
+			<umb-workspace-entity-layout alias="Umb.Workspace.User">
 				<uui-input id="name" slot="name" .value=${this._userName} @input="${this._handleInput}"></uui-input>
 				<div id="main">
 					<div id="left-column">${this._renderLeftColumn()}</div>
@@ -383,10 +383,10 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(
 	}
 }
 
-export default UmbEditorUserElement;
+export default UmbWorkspaceUserElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-workspace-user': UmbEditorUserElement;
+		'umb-workspace-user': UmbWorkspaceUserElement;
 	}
 }
