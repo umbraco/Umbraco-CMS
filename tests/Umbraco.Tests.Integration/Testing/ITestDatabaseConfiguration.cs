@@ -8,5 +8,6 @@ namespace Umbraco.Cms.Tests.Integration.Testing;
 public interface ITestDatabaseConfiguration
 {
     ConnectionStrings InitializeConfiguration();
+
     void Teardown();
 }
