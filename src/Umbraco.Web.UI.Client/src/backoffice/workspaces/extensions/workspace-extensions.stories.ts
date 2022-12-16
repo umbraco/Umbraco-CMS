@@ -1,9 +1,9 @@
-import './editor-extensions.element';
+import './workspace-extensions.element';
 
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit-html';
 
-import type { UmbWorkspaceExtensionsElement } from './editor-extensions.element';
+import type { UmbWorkspaceExtensionsElement } from './workspace-extensions.element';
 
 export default {
 	title: 'Editors/Extensions',

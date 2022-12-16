@@ -59,7 +59,7 @@ export const manifests: Array<ManifestWorkspace> = [
 		type: 'workspace',
 		alias: 'Umb.Editor.Extensions',
 		name: 'Extensions Editor',
-		loader: () => import('./extensions/editor-extensions.element'),
+		loader: () => import('./extensions/workspace-extensions.element'),
 		meta: {
 			entityType: 'extensions-list',
 		},
