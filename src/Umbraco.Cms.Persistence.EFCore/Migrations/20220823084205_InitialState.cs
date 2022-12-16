@@ -418,7 +418,7 @@ namespace Umbraco.Cms.Persistence.EFCore.Migrations
                 {
                     id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    uniqueId = table.Column<Guid>(type: "TEXT", nullable: false, defaultValueSql: "NEWID()"),
+                    uniqueId = table.Column<Guid>(type: "TEXT", nullable: false, defaultValueSql: "(NEWID())"),
                     parentId = table.Column<int>(type: "INTEGER", nullable: false),
                     level = table.Column<int>(type: "INTEGER", nullable: false),
                     path = table.Column<string>(type: "TEXT", maxLength: 150, nullable: false),
@@ -427,7 +427,7 @@ namespace Umbraco.Cms.Persistence.EFCore.Migrations
                     nodeUser = table.Column<int>(type: "INTEGER", nullable: true),
                     text = table.Column<string>(type: "TEXT", maxLength: 255, nullable: true),
                     nodeObjectType = table.Column<Guid>(type: "TEXT", nullable: true),
-                    createDate = table.Column<DateTime>(type: "TEXT", nullable: false, defaultValueSql: "DATE()")
+                    createDate = table.Column<DateTime>(type: "TEXT", nullable: false, defaultValueSql: "(DATE())")
                 },
                 constraints: table =>
                 {

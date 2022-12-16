@@ -1402,7 +1402,7 @@ namespace Umbraco.Cms.Persistence.EFCore.Entities
                 entity.Property(e => e.CreateDate)
                     .HasColumnType("TEXT")
                     .HasColumnName("createDate")
-                    .HasDefaultValueSql("DATE()");
+                    .HasDefaultValueSql("(DATE())");
 
                 entity.Property(e => e.Level).HasColumnName("level");
 
@@ -1429,7 +1429,7 @@ namespace Umbraco.Cms.Persistence.EFCore.Entities
 
                 entity.Property(e => e.UniqueId)
                     .HasColumnName("uniqueId")
-                    .HasDefaultValueSql("NEWID()");
+                    .HasDefaultValueSql("(NEWID())");
 
                 entity.HasOne(d => d.NodeUserNavigation)
                     .WithMany(p => p.UmbracoNodes)
