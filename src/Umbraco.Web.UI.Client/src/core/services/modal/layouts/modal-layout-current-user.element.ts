@@ -20,7 +20,7 @@ export class UmbModalLayoutCurrentUserElement extends UmbContextConsumerMixin(Um
 				display: block;
 			}
 			:host,
-			umb-editor-entity-layout {
+			umb-workspace-entity-layout {
 				width: 100%;
 				height: 100%;
 			}
@@ -183,7 +183,7 @@ export class UmbModalLayoutCurrentUserElement extends UmbContextConsumerMixin(Um
 
 	render() {
 		return html`
-			<umb-editor-entity-layout headline="${this._currentUser?.name || ''}">
+			<umb-workspace-entity-layout headline="${this._currentUser?.name || ''}">
 				<div id="main">
 					<uui-box>
 						<b slot="headline">Your profile</b>
@@ -215,7 +215,7 @@ export class UmbModalLayoutCurrentUserElement extends UmbContextConsumerMixin(Um
 					<uui-button @click=${this._close} look="secondary">Close</uui-button>
 					<uui-button @click=${this._logout} look="primary" color="danger">Logout</uui-button>
 				</div>
-			</umb-editor-entity-layout>
+			</umb-workspace-entity-layout>
 		`;
 	}
 }

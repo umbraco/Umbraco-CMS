@@ -32,7 +32,7 @@ export const data: Array<UserGroupDetails> = [
 	},
 	{
 		key: '9a9ad4e9-3b5b-4fe7-b0d9-e301b9675949',
-		name: 'Editors',
+		name: 'Workspaces',
 		icon: 'umb:tools',
 		parentKey: '',
 		type: 'user-group',

@@ -1,5 +1,5 @@
 //TODO: we need to figure out what components should be available for extensions and load them upfront
-import './editors/shared/editor-entity-layout/editor-entity-layout.element';
+import './workspaces/shared/workspace-entity-layout/workspace-entity-layout.element';
 import './components/ref-property-editor-ui/ref-property-editor-ui.element';
 import './components/backoffice-frame/backoffice-header.element';
 import './components/backoffice-frame/backoffice-main.element';
@@ -37,7 +37,7 @@ import { manifests as sectionManifests } from './sections/manifests';
 import { manifests as propertyEditorModelManifests } from './property-editor-models/manifests';
 import { manifests as propertyEditorUIManifests } from './property-editor-uis/manifests';
 import { manifests as treeManifests } from './trees/manifests';
-import { manifests as editorManifests } from './editors/manifests';
+import { manifests as editorManifests } from './workspaces/manifests';
 import { manifests as propertyActionManifests } from './property-actions/manifests';
 import { manifests as externalLoginProviderManifests } from './external-login-providers/manifests';
 import { manifests as userDashboards } from './user-dashboards/manifests';

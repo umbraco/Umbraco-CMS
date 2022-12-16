@@ -21,7 +21,7 @@ import { manifests as sectionManifests } from '../src/backoffice/sections/manife
 import { manifests as propertyEditorModelManifests } from '../src/backoffice/property-editor-models/manifests';
 import { manifests as propertyEditorUIManifests } from '../src/backoffice/property-editor-uis/manifests';
 import { manifests as treeManifests } from '../src/backoffice/trees/manifests';
-import { manifests as editorManifests } from '../src/backoffice/editors/manifests';
+import { manifests as workspaceManifests } from '../src/backoffice/workspaces/manifests';
 import { manifests as propertyActionManifests } from '../src/backoffice/property-actions/manifests';
 
 import { umbExtensionsRegistry } from '../src/core/extensions-registry';
@@ -40,7 +40,7 @@ class UmbStoryBookElement extends LitElement {
 
 		this._registerExtensions(sectionManifests);
 		this._registerExtensions(treeManifests);
-		this._registerExtensions(editorManifests);
+		this._registerExtensions(workspaceManifests);
 		this._registerExtensions(propertyEditorModelManifests);
 		this._registerExtensions(propertyEditorUIManifests);
 		this._registerExtensions(propertyActionManifests);
