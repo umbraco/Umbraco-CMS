@@ -4,9 +4,8 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
 import type { ManifestWorkspaceAction } from '@umbraco-cms/models';
 
-// Niels, thoughts, TODO: Consider naming this just actions, not extension as everything is an extension.
-@customElement('umb-workspace-action-extension')
-export class UmbWorkspaceActionExtensionElement extends LitElement {
+@customElement('umb-workspace-action')
+export class UmbWorkspaceActionElement extends LitElement {
 	static styles: CSSResultGroup = [UUITextStyles];
 
 	private _workspaceAction?: ManifestWorkspaceAction;
@@ -42,6 +41,6 @@ export class UmbWorkspaceActionExtensionElement extends LitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-workspace-action-extension': UmbWorkspaceActionExtensionElement;
+		'umb-workspace-action': UmbWorkspaceActionElement;
 	}
 }
