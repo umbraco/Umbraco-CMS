@@ -2,8 +2,8 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
 
-@customElement('umb-editor-package')
-export class UmbEditorPackageElement extends LitElement {
+@customElement('umb-workspace-package')
+export class UmbWorkspacePackageElement extends LitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -16,14 +16,14 @@ export class UmbEditorPackageElement extends LitElement {
 	];
 
 	render() {
-		return html`<umb-workspace-entity-layout alias="Umb.Editor.Package">PACKAGE EDITOR</umb-workspace-entity-layout> `;
+		return html`<umb-workspace-entity-layout alias="Umb.Workspace.Package">PACKAGE EDITOR</umb-workspace-entity-layout> `;
 	}
 }
 
-export default UmbEditorPackageElement;
+export default UmbWorkspacePackageElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-editor-package': UmbEditorPackageElement;
+		'umb-workspace-package': UmbWorkspacePackageElement;
 	}
 }
