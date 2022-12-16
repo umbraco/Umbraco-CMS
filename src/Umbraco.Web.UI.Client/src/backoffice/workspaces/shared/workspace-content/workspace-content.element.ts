@@ -18,6 +18,7 @@ import '../workspace-entity-layout/workspace-entity-layout.element';
 // TODO: Make this dynamic, use load-extensions method to loop over extensions for this node.
 import './views/edit/workspace-view-content-edit.element';
 import './views/info/workspace-view-content-info.element';
+import { UmbWorkspaceContext } from '../workspace/workspace.context';
 
 @customElement('umb-workspace-content')
 export class UmbWorkspaceContentElement extends UmbContextProviderMixin(
@@ -101,6 +102,7 @@ export class UmbWorkspaceContentElement extends UmbContextProviderMixin(
 	private _storeObserver?: ()=>void;
 	private _nodeContext?: UmbNodeContext;
 	private _notificationService?: UmbNotificationService;
+	private _workspaceContext?: UmbWorkspaceContext;
 
 	constructor() {
 		super();
@@ -108,8 +110,21 @@ export class UmbWorkspaceContentElement extends UmbContextProviderMixin(
 		this.consumeContext('umbNotificationService', (instance) => {
 			this._notificationService = instance;
 		});
+		this.consumeContext('umbWorkspaceContext', (instance) => {
+			this._workspaceContext = instance;
+			this._observeWorkspace();
+		});
 
 		this.addEventListener('property-value-change', this._onPropertyValueChange);
+	}
+
+
+	private async _observeWorkspace() {
+		if (!this._workspaceContext) return;
+
+		this.observe(this._workspaceContext?.data, (workspaceData) => {
+			this.entityKey = workspaceData.entityKey;
+		});
 	}
 
 	private _onPropertyValueChange = (e: Event) => {

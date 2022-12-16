@@ -6,9 +6,10 @@ import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import type { ManifestWorkspaceView } from '@umbraco-cms/models';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import '../shared/workspace-content/workspace-content.element';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 
 @customElement('umb-workspace-document')
-export class UmbWorkspaceDocumentElement extends UmbContextConsumerMixin(UmbContextProviderMixin(LitElement)) {
+export class UmbWorkspaceDocumentElement extends UmbObserverMixin(UmbContextConsumerMixin(UmbContextProviderMixin(LitElement))) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -28,11 +29,20 @@ export class UmbWorkspaceDocumentElement extends UmbContextConsumerMixin(UmbCont
 	constructor() {
 		super();
 
-		// TODO: Implement RXJS for reactivity if one of two props changes.
-		this.consumeContext('umbWorkspaceContext', (context) => this._workspaceContext = context)
+		this.consumeContext('umbWorkspaceContext', (context) => {
+			this._workspaceContext = context;
+			this._observeWorkspace();
+		})
 
 		// TODO: consider if registering extensions should happen initially or else where, to enable unregister of extensions.
 		this._registerWorkspaceViews();
+	}
+	private async _observeWorkspace() {
+		if (!this._workspaceContext) return;
+
+		this.observe(this._workspaceContext?.data, (workspaceData) => {
+			this.entityKey = workspaceData.entityKey;
+		});
 	}
 
 	private _registerWorkspaceViews() {

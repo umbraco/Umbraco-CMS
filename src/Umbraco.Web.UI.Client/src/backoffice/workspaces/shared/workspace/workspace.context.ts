@@ -15,7 +15,7 @@ export class UmbWorkspaceContext {
 
 
 	public get entityKey() {
-		return this.getData().entityKey;
+		return ''
 	}
 	public set entityKey(value) {
 		this.update({entityKey:value});
@@ -34,7 +34,7 @@ export class UmbWorkspaceContext {
 	}
 
 	public update(data: Partial<WorkspaceContextData>) {
-		this._data.next({ ...this._data.getValue(), ...data });
+		this._data.next({ ...this.getData(), ...data });
 	}
 
 }

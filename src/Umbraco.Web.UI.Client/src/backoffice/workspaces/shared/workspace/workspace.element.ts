@@ -35,8 +35,11 @@ export class UmbWorkspaceElement extends UmbContextProviderMixin(UmbContextConsu
 		return this._entityType;
 	}
 	public set entityType(value: string) {
+		// TODO: Make sure that a change of the entity type actually gives extension slot a hint to change/update.
+		const oldValue = this._entityType;
 		this._entityType = value;
 		this._workspaceContext.entityType = value;
+		this.requestUpdate('entityType', oldValue);
 	}
 
 	private _workspaceContext:UmbWorkspaceContext = new UmbWorkspaceContext();
@@ -53,7 +56,7 @@ export class UmbWorkspaceElement extends UmbContextProviderMixin(UmbContextConsu
 	
 
 	render() {
-		return html`<umb-extension-slot type="workspace" .filter=${(workspace: any) => (workspace).meta.entityType === this._entityType}></umb-extension-slot>`;
+		return html`<umb-extension-slot type="workspace" .filter=${(workspace: any) => (workspace).meta.entityType === this.entityType}></umb-extension-slot>`;
 	}
 }
 
