@@ -9,7 +9,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.AspNetCore;
 
-public class AspNetCoreRequestAccessor : IRequestAccessor, INotificationHandler<UmbracoRequestBeginNotification>
+public class AspNetCoreRequestAccessor : IRequestAccessor, INotificationHandler<UmbracoRequestBeginNotification>, IDisposable
 {
     private readonly ISet<string> _applicationUrls = new HashSet<string>();
     private readonly IHttpContextAccessor _httpContextAccessor;
@@ -18,6 +18,7 @@ public class AspNetCoreRequestAccessor : IRequestAccessor, INotificationHandler<
     private object _initLocker = new();
     private bool _isInit;
     private WebRoutingSettings _webRoutingSettings;
+    private readonly IDisposable? _onChangeDisposable;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="AspNetCoreRequestAccessor" /> class.
@@ -28,31 +29,41 @@ public class AspNetCoreRequestAccessor : IRequestAccessor, INotificationHandler<
     {
         _httpContextAccessor = httpContextAccessor;
         _webRoutingSettings = webRoutingSettings.CurrentValue;
-        webRoutingSettings.OnChange(x => _webRoutingSettings = x);
+        _onChangeDisposable = webRoutingSettings.OnChange(x => _webRoutingSettings = x);
     }
 
     /// <summary>
-    ///     This just initializes the application URL on first request attempt
-    ///     TODO: This doesn't belong here, the GetApplicationUrl doesn't belong to IRequestAccessor
-    ///     this should be part of middleware not a lazy init based on an INotification
+    /// <para>
+    /// This is now a NoOp, and is no longer used, instead ApplicationUrlRequestBeginNotificationHandler is used
+    /// </para>
     /// </summary>
+    [Obsolete("This is no longer used, AspNetCoreRequestAccessor will no longer implement INotificationHandler in V12, see ApplicationUrlRequestBeginNotificationHandler instead.")]
     public void Handle(UmbracoRequestBeginNotification notification)
-        => LazyInitializer.EnsureInitialized(ref _hasAppUrl, ref _isInit, ref _initLocker, () =>
-        {
-            GetApplicationUrl();
-            return true;
-        });
+    {
+        // NoOP
+    }
 
     /// <inheritdoc />
-    public string GetRequestValue(string name) => GetFormValue(name) ?? GetQueryStringValue(name);
+    public string? GetRequestValue(string name) => GetFormValue(name) ?? GetQueryStringValue(name);
 
     /// <inheritdoc />
-    public string GetQueryStringValue(string name) => _httpContextAccessor.GetRequiredHttpContext().Request.Query[name];
+    public string? GetQueryStringValue(string name) => _httpContextAccessor.GetRequiredHttpContext().Request.Query[name];
 
     /// <inheritdoc />
     public Uri? GetRequestUrl() => _httpContextAccessor.HttpContext != null
         ? new Uri(_httpContextAccessor.HttpContext.Request.GetEncodedUrl())
         : null;
+
+    /// <summary>
+    /// Ensure that the ApplicationUrl is set on the first request, this is using a LazyInitializer, so the code will only be run the first time
+    /// </summary>
+    /// TODO: This doesn't belong here, the GetApplicationUrl doesn't belong to IRequestAccessor
+    internal void EnsureApplicationUrl() =>
+        LazyInitializer.EnsureInitialized(ref _hasAppUrl, ref _isInit, ref _initLocker, () =>
+        {
+            GetApplicationUrl();
+            return true;
+        });
 
     public Uri? GetApplicationUrl()
     {
@@ -63,7 +74,7 @@ public class AspNetCoreRequestAccessor : IRequestAccessor, INotificationHandler<
         // see U4-10626 - in some cases we want to reset the application url
         // (this is a simplified version of what was in 7.x)
         // note: should this be optional? is it expensive?
-        if (!(_webRoutingSettings.UmbracoApplicationUrl is null))
+        if (_webRoutingSettings.UmbracoApplicationUrl is not null)
         {
             return new Uri(_webRoutingSettings.UmbracoApplicationUrl);
         }
@@ -96,4 +107,6 @@ public class AspNetCoreRequestAccessor : IRequestAccessor, INotificationHandler<
 
         return request.Form[name];
     }
+
+    public void Dispose() => _onChangeDisposable?.Dispose();
 }

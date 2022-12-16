@@ -6,7 +6,7 @@
  * @description
  * The controller for editing relation types.
  */
-function RelationTypeEditController($scope, $routeParams, relationTypeResource, editorState, navigationService, dateHelper, userService, entityResource, formHelper, contentEditingHelper, localizationService, eventsService) {
+function RelationTypeEditController($scope, $routeParams, relationTypeResource, editorState, navigationService, dateHelper, userService, notificationsService, formHelper, contentEditingHelper, localizationService, eventsService) {
 
     var vm = this;
 
@@ -54,14 +54,7 @@ function RelationTypeEditController($scope, $routeParams, relationTypeResource, 
         });
 
         // load references when the 'relations' tab is first activated/switched to
-        var appTabChange =  eventsService.on("app.tabChange", function (event, args) {
-            if (args.alias === "relations") {
-                loadRelations();
-            }
-        });
-        $scope.$on('$destroy', function () {
-            appTabChange();
-        });
+        loadRelations();
 
         // Inital page/overview API call of relation type
         relationTypeResource.getById($routeParams.id)

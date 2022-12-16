@@ -14,11 +14,11 @@ function MacrosSettingsController($scope, editorService, localizationService) {
     //vm.removeMacroView = removeMacroView;
     $scope.model.openViewPicker = openViewPicker;
     $scope.model.removeMacroView = removeMacroView;
-
     var labels = {};
-
+    vm.macroPartialViewPickerProperty = { alias : "macroPartialViewPickerProperty", description: "", label: "Macro partial view", validation: {mandatory : true}}
     localizationService.localizeMany(["macro_selectViewFile"]).then(function(data) {
         labels.selectViewFile = data[0];
+        vm.macroPartialViewPickerProperty.description = data[0];
     });
 
     function openViewPicker() {
@@ -45,7 +45,7 @@ function MacrosSettingsController($scope, editorService, localizationService) {
                     name: $scope.model.macro.view
                 };
 
-                //$scope.model.submit($scope.model); 
+                //$scope.model.submit($scope.model);
 
                 editorService.close();
             },
@@ -63,7 +63,7 @@ function MacrosSettingsController($scope, editorService, localizationService) {
     }
 
     function init() {
-        
+
     }
 
     init();

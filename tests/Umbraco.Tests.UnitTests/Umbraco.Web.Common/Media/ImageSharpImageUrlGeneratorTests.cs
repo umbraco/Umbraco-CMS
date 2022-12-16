@@ -3,7 +3,7 @@
 
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Web.Common.Media;
+using Umbraco.Cms.Imaging.ImageSharp.Media;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Media;
 
@@ -60,6 +60,33 @@ public class ImageSharpImageUrlGeneratorTests
         Assert.AreEqual(
             MediaPath +
             "?rxy=0.96,0.80827067669172936&width=200&height=300&filter=comic&roundedcorners=radius-26%7Cbgcolor-fff",
+            urlString);
+    }
+
+    [Test]
+    public void GetImageUrlFurtherOptionsModeAndQualityTest()
+    {
+        var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath)
+        {
+            Quality = 10,
+            FurtherOptions = "format=webp",
+        });
+        Assert.AreEqual(
+            MediaPath +
+            "?format=webp&quality=10",
+            urlString);
+    }
+
+    [Test]
+    public void GetImageUrlFurtherOptionsWithModeAndQualityTest()
+    {
+        var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath)
+        {
+            FurtherOptions = "quality=10&format=webp",
+        });
+        Assert.AreEqual(
+            MediaPath +
+            "?format=webp&quality=10",
             urlString);
     }
 

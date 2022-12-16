@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using NPoco;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Infrastructure.Persistence.FaultHandling;
+using Umbraco.Cms.Persistence.SqlServer.FaultHandling;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Persistence.SqlServer.Interceptors;
@@ -21,12 +22,8 @@ public class SqlServerAddRetryPolicyInterceptor : SqlServerConnectionInterceptor
             return conn;
         }
 
-        RetryPolicy? connectionRetryPolicy =
-            RetryPolicyFactory.GetDefaultSqlConnectionRetryPolicyByConnectionString(_connectionStrings.CurrentValue
-                .ConnectionString);
-        RetryPolicy? commandRetryPolicy =
-            RetryPolicyFactory.GetDefaultSqlCommandRetryPolicyByConnectionString(_connectionStrings.CurrentValue
-                .ConnectionString);
+        RetryPolicy? connectionRetryPolicy = RetryPolicyFactory.GetDefaultSqlConnectionRetryPolicyByConnectionString(_connectionStrings.CurrentValue.ConnectionString);
+        RetryPolicy? commandRetryPolicy = RetryPolicyFactory.GetDefaultSqlCommandRetryPolicyByConnectionString(_connectionStrings.CurrentValue.ConnectionString);
 
         if (connectionRetryPolicy == null && commandRetryPolicy == null)
         {

@@ -305,11 +305,11 @@ public class UdiTests
     }
 
     [UdiDefinition("foo", UdiType.GuidUdi)]
-    public class FooConnector : IServiceConnector
+    public class FooConnector : IServiceConnector2
     {
-        public IArtifact GetArtifact(Udi udi) => throw new NotImplementedException();
+        public IArtifact GetArtifact(Udi udi, IContextCache contextCache) => throw new NotImplementedException();
 
-        public IArtifact GetArtifact(object entity) => throw new NotImplementedException();
+        public IArtifact GetArtifact(object entity, IContextCache contextCache) => throw new NotImplementedException();
 
         public ArtifactDeployState ProcessInit(IArtifact art, IDeployContext context) =>
             throw new NotImplementedException();

@@ -1,4 +1,4 @@
-# [Umbraco CMS](https://umbraco.com) &middot; [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](../LICENSE.md) [![Build status](https://umbraco.visualstudio.com/Umbraco%20Cms/_apis/build/status/Cms%208%20Continuous?branchName=v8/contrib)](https://umbraco.visualstudio.com/Umbraco%20Cms/_build?definitionId=75) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md) [![Twitter](https://img.shields.io/twitter/follow/umbraco.svg?style=social&label=Follow)](https://twitter.com/intent/follow?screen_name=umbraco) [![Discord](https://img.shields.io/discord/869656431308189746)](https://discord.gg/umbraco)
+# [Umbraco CMS](https://umbraco.com) &middot; [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](../LICENSE.md) [![Build status](https://umbraco.visualstudio.com/Umbraco%20Cms/_apis/build/status/Cms%208%20Continuous?branchName=v8/contrib)](https://umbraco.visualstudio.com/Umbraco%20Cms/_build?definitionId=75) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md) [![Twitter](https://img.shields.io/twitter/follow/umbraco.svg?style=social&label=Follow)](https://twitter.com/intent/follow?screen_name=umbraco) [![Discord](https://img.shields.io/discord/869656431308189746)](https://discord.gg/umbraco) [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new?hide_repo_select=true&ref=v11%2Fcontrib&repo=10601208&machine=basicLinux32gb&devcontainer_path=.devcontainer%2Fdevcontainer.json&location=WestEurope)
 
 Umbraco is the friendliest, most flexible and fastest growing ASP.NET CMS, and used by more than 500,000 websites worldwide. Our mission is to help you deliver delightful digital experiences by making Umbraco friendly, simpler and social.
 
@@ -25,13 +25,14 @@ If you want to DIY, then you can [download Umbraco]((https://our.umbraco.com/dow
 
 ## Documentation
 
-The documentation for Umbraco CMS can be found [on Our Umbraco](https://our.umbraco.com/documentation/). The source for the Umbraco docs is [open source as well](https://github.com/umbraco/UmbracoDocs) and we're happy to look at your documentation contributions.
+The documentation for Umbraco CMS can be found [on Our Umbraco](https://docs.umbraco.com/). The source for the Umbraco docs is [open source as well](https://github.com/umbraco/UmbracoDocs) and we're happy to look at your documentation contributions.
 
 ## Join the Umbraco community
 
 Our friendly community is available 24/7 at the community hub, we call ["Our Umbraco"](https://our.umbraco.com/). Our Umbraco features forums for questions and answers, documentation, downloadable plugins for Umbraco, and a rich collection of community resources.
 
-Besides "Our", we all support each other also via Twitter: [Umbraco HQ](https://twitter.com/umbraco), [Release Updates](https://twitter.com/umbracoproject), [#umbraco](https://twitter.com/hashtag/umbraco)
+Besides "Our", we all support each other in our [Community Discord Server](https://discord.gg/umbraco) and on Twitter: [Umbraco HQ](https://twitter.com/umbraco), [Release Updates](https://twitter.com/umbracoproject), [#umbraco](https://twitter.com/hashtag/umbraco)
+
 
 
 ## Contributing

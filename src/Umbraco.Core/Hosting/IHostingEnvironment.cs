@@ -2,7 +2,7 @@ namespace Umbraco.Cms.Core.Hosting;
 
 public interface IHostingEnvironment
 {
-    string SiteName { get; }
+    string? SiteName { get; }
 
     /// <summary>
     ///     The unique application ID for this Umbraco website.

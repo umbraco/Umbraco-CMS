@@ -13,24 +13,27 @@
 
     <!-- Combined list -->
     <div ng-if="vm.hasReferences">
-        <umb-tracked-references-table items="vm.references.items"
-                                      total-pages="vm.references.totalPages"
-                                      page-number="vm.references.pageNumber"
-                                      headline="vm.referencesTitle"
-                                      on-page-changed="vm.changeReferencesPageNumber(pageNumber)"
-                                      show-type-name="true"
-                                      show-type="!vm.compact"
-                                      show-relation-type-name="!vm.compact"
-                                      type-label-key="content_documentType">
+        <umb-tracked-references-table
+            items="vm.references.items"
+            total-pages="vm.references.totalPages"
+            page-number="vm.references.pageNumber"
+            headline="vm.referencesTitle"
+            on-page-changed="vm.changeReferencesPageNumber(pageNumber)"
+            show-published="!vm.compact"
+            show-type-name="true"
+            show-type="!vm.compact"
+            show-relation-type-name="!vm.compact"
+            type-label-key="content_documentType">
         </umb-tracked-references-table>
     </div>
 
     <div ng-if="vm.hasReferencesInDescendants">
-        <umb-tracked-references-table items="vm.referencedDescendants.items"
-                                      total-pages="vm.referencedDescendants.totalPages"
-                                      page-number="vm.referencedDescendants.pageNumber"
-                                      headline="vm.referencedDescendantsTitle"
-                                      on-page-changed="vm.changeDescendantsPageNumber(pageNumber)">
+        <umb-tracked-references-table
+            items="vm.referencedDescendants.items"
+            total-pages="vm.referencedDescendants.totalPages"
+            page-number="vm.referencedDescendants.pageNumber"
+            headline="vm.referencedDescendantsTitle"
+            on-page-changed="vm.changeDescendantsPageNumber(pageNumber)">
         </umb-tracked-references-table>
     </div>
 </div>

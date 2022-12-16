@@ -41,17 +41,7 @@ public class DeepCloneableList<T> : List<T>, IDeepCloneable, IRememberBeingDirty
                 // we are cloning once, so create a new list in none mode
                 // and deep clone all items into it
                 var newList = new DeepCloneableList<T>(ListCloneBehavior.None);
-                foreach (T item in this)
-                {
-                    if (item is IDeepCloneable dc)
-                    {
-                        newList.Add((T)dc.DeepClone());
-                    }
-                    else
-                    {
-                        newList.Add(item);
-                    }
-                }
+                DeepCloneHelper.CloneListItems<DeepCloneableList<T>, T>(this, newList);
 
                 return newList;
             case ListCloneBehavior.None:
@@ -60,17 +50,7 @@ public class DeepCloneableList<T> : List<T>, IDeepCloneable, IRememberBeingDirty
             case ListCloneBehavior.Always:
                 // always clone to new list
                 var newList2 = new DeepCloneableList<T>(ListCloneBehavior.Always);
-                foreach (T item in this)
-                {
-                    if (item is IDeepCloneable dc)
-                    {
-                        newList2.Add((T)dc.DeepClone());
-                    }
-                    else
-                    {
-                        newList2.Add(item);
-                    }
-                }
+                DeepCloneHelper.CloneListItems<DeepCloneableList<T>, T>(this, newList2);
 
                 return newList2;
             default:

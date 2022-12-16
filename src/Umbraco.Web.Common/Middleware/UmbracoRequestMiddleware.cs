@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using Smidge.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Logging;
@@ -17,7 +18,6 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.WebAssets;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Cms.Web.Common.Profiler;
 using Umbraco.Cms.Web.Common.Routing;
 using Umbraco.Extensions;
@@ -51,41 +51,6 @@ public class UmbracoRequestMiddleware : IMiddleware
     private readonly UmbracoRequestPaths _umbracoRequestPaths;
     private readonly IVariationContextAccessor _variationContextAccessor;
     private SmidgeOptions _smidgeOptions;
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="UmbracoRequestMiddleware" /> class.
-    /// </summary>
-    // Obsolete, scheduled for removal in V11
-    [Obsolete("Use constructor that takes an IOptions<UmbracoRequestOptions>")]
-    public UmbracoRequestMiddleware(
-        ILogger<UmbracoRequestMiddleware> logger,
-        IUmbracoContextFactory umbracoContextFactory,
-        IRequestCache requestCache,
-        IEventAggregator eventAggregator,
-        IProfiler profiler,
-        IHostingEnvironment hostingEnvironment,
-        UmbracoRequestPaths umbracoRequestPaths,
-        BackOfficeWebAssets backOfficeWebAssets,
-        IOptionsMonitor<SmidgeOptions> smidgeOptions,
-        IRuntimeState runtimeState,
-        IVariationContextAccessor variationContextAccessor,
-        IDefaultCultureAccessor defaultCultureAccessor)
-        : this(
-            logger,
-            umbracoContextFactory,
-            requestCache,
-            eventAggregator,
-            profiler,
-            hostingEnvironment,
-            umbracoRequestPaths,
-            backOfficeWebAssets,
-            smidgeOptions,
-            runtimeState,
-            variationContextAccessor,
-            defaultCultureAccessor,
-            StaticServiceProvider.Instance.GetRequiredService<IOptions<UmbracoRequestOptions>>())
-    {
-    }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="UmbracoRequestMiddleware" /> class.
@@ -216,7 +181,8 @@ public class UmbracoRequestMiddleware : IMiddleware
 
         if (_umbracoRequestPaths.IsBackOfficeRequest(absPath)
             || (absPath.Value?.InvariantStartsWith($"/{_smidgeOptions.UrlOptions.CompositeFilePath}") ?? false)
-            || (absPath.Value?.InvariantStartsWith($"/{_smidgeOptions.UrlOptions.BundleFilePath}") ?? false))
+            || (absPath.Value?.InvariantStartsWith($"/{_smidgeOptions.UrlOptions.BundleFilePath}") ?? false)
+            || _runtimeState.EnableInstaller())
         {
             LazyInitializer.EnsureInitialized(ref s_firstBackOfficeRequest, ref s_firstBackOfficeReqestFlag,
                 ref s_firstBackOfficeRequestLocker, () =>

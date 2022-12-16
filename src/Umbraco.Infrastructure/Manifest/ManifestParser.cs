@@ -1,13 +1,17 @@
 using System.Text;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Manifest;
@@ -21,6 +25,7 @@ public class ManifestParser : IManifestParser
 
     private readonly IAppPolicyCache _cache;
     private readonly IDataValueEditorFactory _dataValueEditorFactory;
+    private readonly IManifestFileProviderFactory _manifestFileProviderFactory;
     private readonly ManifestFilterCollection _filters;
     private readonly IHostingEnvironment _hostingEnvironment;
 
@@ -46,7 +51,8 @@ public class ManifestParser : IManifestParser
         IJsonSerializer jsonSerializer,
         ILocalizedTextService localizedTextService,
         IShortStringHelper shortStringHelper,
-        IDataValueEditorFactory dataValueEditorFactory)
+        IDataValueEditorFactory dataValueEditorFactory,
+        IManifestFileProviderFactory manifestFileProviderFactory)
     {
         if (appCaches == null)
         {
@@ -64,6 +70,34 @@ public class ManifestParser : IManifestParser
         _localizedTextService = localizedTextService;
         _shortStringHelper = shortStringHelper;
         _dataValueEditorFactory = dataValueEditorFactory;
+        _manifestFileProviderFactory = manifestFileProviderFactory;
+    }
+
+    [Obsolete("Use other ctor - Will be removed in Umbraco 13")]
+    public ManifestParser(
+        AppCaches appCaches,
+        ManifestValueValidatorCollection validators,
+        ManifestFilterCollection filters,
+        ILogger<ManifestParser> logger,
+        IIOHelper ioHelper,
+        IHostingEnvironment hostingEnvironment,
+        IJsonSerializer jsonSerializer,
+        ILocalizedTextService localizedTextService,
+        IShortStringHelper shortStringHelper,
+        IDataValueEditorFactory dataValueEditorFactory)
+        : this(
+              appCaches,
+              validators,
+              filters,
+              logger,
+              ioHelper,
+              hostingEnvironment,
+              jsonSerializer,
+              localizedTextService,
+              shortStringHelper,
+              dataValueEditorFactory,
+              StaticServiceProvider.Instance.GetRequiredService<IManifestFileProviderFactory>())
+    {
     }
 
     public string AppPluginsPath
@@ -89,12 +123,20 @@ public class ManifestParser : IManifestParser
     public IEnumerable<PackageManifest> GetManifests()
     {
         var manifests = new List<PackageManifest>();
+        IFileProvider? manifestFileProvider = _manifestFileProviderFactory.Create();
 
-        foreach (var path in GetManifestFiles())
+        if (manifestFileProvider is null)
+        {
+            throw new ArgumentNullException(nameof(manifestFileProvider));
+        }
+
+        foreach (IFileInfo file in GetManifestFiles(manifestFileProvider, Constants.SystemDirectories.AppPlugins))
         {
             try
             {
-                var text = File.ReadAllText(path);
+                using Stream stream = file.CreateReadStream();
+                using var reader = new StreamReader(stream, Encoding.UTF8);
+                var text = reader.ReadToEnd();
                 text = TrimPreamble(text);
                 if (string.IsNullOrWhiteSpace(text))
                 {
@@ -102,12 +144,12 @@ public class ManifestParser : IManifestParser
                 }
 
                 PackageManifest manifest = ParseManifest(text);
-                manifest.Source = path;
+                manifest.Source = file.PhysicalPath!; // We assure that the PhysicalPath is not null in GetManifestFiles()
                 manifests.Add(manifest);
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Failed to parse manifest at '{Path}', ignoring.", path);
+                _logger.LogError(e, "Failed to parse manifest at '{Path}', ignoring.", file.PhysicalPath);
             }
         }
 
@@ -242,14 +284,44 @@ public class ManifestParser : IManifestParser
         return text;
     }
 
-    // gets all manifest files (recursively)
-    private IEnumerable<string> GetManifestFiles()
+    // Gets all manifest files
+    private static IEnumerable<IFileInfo> GetManifestFiles(IFileProvider fileProvider, string path)
     {
-        if (Directory.Exists(_path) == false)
+        var manifestFiles = new List<IFileInfo>();
+        IEnumerable<IFileInfo> pluginFolders = fileProvider.GetDirectoryContents(path);
+
+        foreach (IFileInfo pluginFolder in pluginFolders)
         {
-            return Array.Empty<string>();
+            if (!pluginFolder.IsDirectory)
+            {
+                continue;
+            }
+
+            manifestFiles.AddRange(GetNestedManifestFiles(fileProvider, $"{path}/{pluginFolder.Name}"));
         }
 
-        return Directory.GetFiles(_path, "package.manifest", SearchOption.AllDirectories);
+        return manifestFiles;
+    }
+
+    // Helper method to get all nested package.manifest files (recursively)
+    private static IEnumerable<IFileInfo> GetNestedManifestFiles(IFileProvider fileProvider, string path)
+    {
+        foreach (IFileInfo file in fileProvider.GetDirectoryContents(path))
+        {
+            if (file.IsDirectory)
+            {
+                var virtualPath = WebPath.Combine(path, file.Name);
+
+                // Recursively find nested package.manifest files
+                foreach (IFileInfo nested in GetNestedManifestFiles(fileProvider, virtualPath))
+                {
+                    yield return nested;
+                }
+            }
+            else if (file.Name.InvariantEquals("package.manifest") && !string.IsNullOrEmpty(file.PhysicalPath))
+            {
+                yield return file;
+            }
+        }
     }
 }

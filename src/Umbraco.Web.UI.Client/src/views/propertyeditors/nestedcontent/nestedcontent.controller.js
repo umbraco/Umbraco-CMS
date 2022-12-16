@@ -68,7 +68,7 @@
     function NestedContentController($scope, $interpolate, $filter, serverValidationManager, contentResource, localizationService, iconHelper, clipboardService, eventsService, overlayService, $attrs) {
 
         const vm = this;
-        
+
         var model = $scope.$parent.$parent.model;
 
         vm.readonly = false;
@@ -79,7 +79,7 @@
         });
 
         _.each(model.config.contentTypes, function (contentType) {
-            contentType.nameExp = !!contentType.nameTemplate
+            contentType.nameExp = contentType.nameTemplate
                 ? $interpolate(contentType.nameTemplate)
                 : undefined;
         });
@@ -167,7 +167,7 @@
             isDisabled: true,
             useLegacyIcon: false
         };
-        
+
         function removeAllEntries() {
 
             localizationService.localizeMany(["content_nestedContentDeleteAllItems", "general_delete"]).then(data => {
@@ -186,7 +186,7 @@
                 });
             });
         }
-        
+
         // helper to force the current form into the dirty state
         function setDirty() {
             if (vm.umbProperty) {
@@ -531,7 +531,6 @@
             storageUpdate();
         });
         var notSupported = [
-            "Umbraco.Tags",
             "Umbraco.UploadField",
             "Umbraco.ImageCropper",
             "Umbraco.BlockList"
@@ -626,7 +625,7 @@
             // Enforce min items if we only have one scaffold type
             var modelWasChanged = false;
             if (vm.nodes.length < vm.minItems && vm.scaffolds.length === 1) {
-                for (var i = vm.nodes.length; i < model.config.minItems; i++) {
+                for (var ii = vm.nodes.length; ii < model.config.minItems; ii++) {
                     addNode(vm.scaffolds[0].contentTypeAlias);
                 }
                 modelWasChanged = true;

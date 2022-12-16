@@ -10,9 +10,9 @@ public static class ContentSettingsExtensions
     ///     Allow upload if extension is whitelisted OR if there is no whitelist and extension is NOT blacklisted.
     /// </summary>
     public static bool IsFileAllowedForUpload(this ContentSettings contentSettings, string extension) =>
-        contentSettings.AllowedUploadFiles.Any(x => x.InvariantEquals(extension)) ||
-        (contentSettings.AllowedUploadFiles.Any() == false &&
-         contentSettings.DisallowedUploadFiles.Any(x => x.InvariantEquals(extension)) == false);
+        contentSettings.AllowedUploadedFileExtensions.Any(x => x.InvariantEquals(extension)) ||
+        (contentSettings.AllowedUploadedFileExtensions.Any() == false &&
+         contentSettings.DisallowedUploadedFileExtensions.Any(x => x.InvariantEquals(extension)) == false);
 
     /// <summary>
     ///     Gets the auto-fill configuration for a specified property alias.

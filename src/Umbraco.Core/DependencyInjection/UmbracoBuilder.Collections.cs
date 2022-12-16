@@ -204,12 +204,20 @@ public static partial class UmbracoBuilderExtensions
         => builder.WithCollectionBuilder<DashboardCollectionBuilder>();
 
     /// <summary>
+    /// Gets the partial view snippets collection builder.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
     public static PartialViewSnippetCollectionBuilder? PartialViewSnippets(this IUmbracoBuilder builder)
         => builder.WithCollectionBuilder<PartialViewSnippetCollectionBuilder>();
 
+    /// <summary>
+    /// Gets the partial view macro snippets collection builder.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
     public static PartialViewMacroSnippetCollectionBuilder? PartialViewMacroSnippets(this IUmbracoBuilder builder)
         => builder.WithCollectionBuilder<PartialViewMacroSnippetCollectionBuilder>();
 
+    /// <summary>
     /// Gets the cache refreshers collection builder.
     /// </summary>
     /// <param name="builder">The builder.</param>
@@ -271,14 +279,6 @@ public static partial class UmbracoBuilderExtensions
     /// <param name="builder">The builder.</param>
     public static MediaUrlGeneratorCollectionBuilder MediaUrlGenerators(this IUmbracoBuilder builder)
         => builder.WithCollectionBuilder<MediaUrlGeneratorCollectionBuilder>();
-
-    /// <summary>
-    /// Gets the backoffice OEmbed Providers collection builder.
-    /// </summary>
-    /// <param name="builder">The builder.</param>
-    [Obsolete("Use EmbedProviders() instead")]
-    public static EmbedProvidersCollectionBuilder OEmbedProviders(this IUmbracoBuilder builder)
-        => EmbedProviders(builder);
 
     /// <summary>
     /// Gets the backoffice Embed Providers collection builder.
