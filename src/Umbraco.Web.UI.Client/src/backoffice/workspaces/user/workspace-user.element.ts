@@ -21,7 +21,7 @@ import '../shared/workspace-entity-layout/workspace-entity-layout.element';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 
-@customElement('umb-editor-user')
+@customElement('umb-workspace-user')
 export class UmbEditorUserElement extends UmbContextProviderMixin(
 	UmbContextConsumerMixin(UmbObserverMixin(LitElement))
 ) {
@@ -387,6 +387,6 @@ export default UmbEditorUserElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-editor-user': UmbEditorUserElement;
+		'umb-workspace-user': UmbEditorUserElement;
 	}
 }
