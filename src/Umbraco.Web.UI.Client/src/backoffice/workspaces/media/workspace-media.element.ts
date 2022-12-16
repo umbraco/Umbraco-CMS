@@ -8,8 +8,8 @@ import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/c
 
 import '../shared/workspace-content/workspace-content.element';
 
-@customElement('umb-editor-media')
-export class UmbEditorMediaElement extends UmbContextConsumerMixin(UmbContextProviderMixin(LitElement)) {
+@customElement('umb-workspace-media')
+export class UmbWorkspaceMediaElement extends UmbContextConsumerMixin(UmbContextProviderMixin(LitElement)) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -27,23 +27,23 @@ export class UmbEditorMediaElement extends UmbContextConsumerMixin(UmbContextPro
 	constructor() {
 		super();
 
-		this._registerEditorViews();
+		this._registerWorkspaceViews();
 
 		this.consumeContext('umbMediaStore', (mediaStore: UmbMediaStore) => {
 			this.provideContext('umbContentStore', mediaStore);
 		});
 	}
 
-	private _registerEditorViews() {
+	private _registerWorkspaceViews() {
 		const dashboards: Array<ManifestWorkspaceView> = [
 			{
 				type: 'workspaceView',
-				alias: 'Umb.EditorView.Media.Edit',
-				name: 'Media Editor Edit View',
+				alias: 'Umb.WorkspaceView.Media.Edit',
+				name: 'Media Workspace Edit View',
 				loader: () => import('../shared/workspace-content/views/edit/workspace-view-content-edit.element'),
 				weight: 200,
 				meta: {
-					workspaces: ['Umb.Editor.Media'],
+					workspaces: ['Umb.Workspace.Media'],
 					label: 'Media',
 					pathname: 'media',
 					icon: 'umb:picture',
@@ -51,12 +51,12 @@ export class UmbEditorMediaElement extends UmbContextConsumerMixin(UmbContextPro
 			},
 			{
 				type: 'workspaceView',
-				alias: 'Umb.EditorView.Media.Info',
-				name: 'Media Editor Info View',
+				alias: 'Umb.WorkspaceView.Media.Info',
+				name: 'Media Workspace Info View',
 				loader: () => import('../shared/workspace-content/views/info/workspace-view-content-info.element'),
 				weight: 100,
 				meta: {
-					workspaces: ['Umb.Editor.Media'],
+					workspaces: ['Umb.Workspace.Media'],
 					label: 'Info',
 					pathname: 'info',
 					icon: 'info',
@@ -71,14 +71,14 @@ export class UmbEditorMediaElement extends UmbContextConsumerMixin(UmbContextPro
 	}
 
 	render() {
-		return html`<umb-workspace-content .entityKey=${this.entityKey} alias="Umb.Editor.Media"></umb-workspace-content>`;
+		return html`<umb-workspace-content .entityKey=${this.entityKey} alias="Umb.Workspace.Media"></umb-workspace-content>`;
 	}
 }
 
-export default UmbEditorMediaElement;
+export default UmbWorkspaceMediaElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-editor-media': UmbEditorMediaElement;
+		'umb-workspace-media': UmbWorkspaceMediaElement;
 	}
 }

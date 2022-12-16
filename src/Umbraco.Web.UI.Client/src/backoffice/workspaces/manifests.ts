@@ -41,7 +41,7 @@ export const manifests: Array<ManifestWorkspace> = [
 		type: 'workspace',
 		alias: 'Umb.Editor.MediaType',
 		name: 'Media Type Editor',
-		loader: () => import('./media-type/editor-media-type.element'),
+		loader: () => import('./media-type/workspace-media-type.element'),
 		meta: {
 			entityType: 'media-type',
 		},
@@ -68,7 +68,7 @@ export const manifests: Array<ManifestWorkspace> = [
 		type: 'workspace',
 		alias: 'Umb.Editor.Media',
 		name: 'Media Editor',
-		loader: () => import('./media/editor-media.element'),
+		loader: () => import('./media/workspace-media.element'),
 		meta: {
 			entityType: 'media',
 		},
