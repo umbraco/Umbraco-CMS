@@ -5,14 +5,14 @@ import { html } from 'lit-html';
 
 import { data } from '../../../core/mocks/data/document-type.data';
 
-import type { UmbEditorDocumentTypeElement } from './workspace-document-type.element';
+import type { UmbWorkspaceDocumentTypeElement } from './workspace-document-type.element';
 
 export default {
 	title: 'Editors/Document Type',
-	component: 'umb-editor-document-type',
-	id: 'umb-editor-document-type',
+	component: 'umb-workspace-document-type',
+	id: 'umb-workspace-document-type',
 } as Meta;
 
-export const AAAOverview: Story<UmbEditorDocumentTypeElement> = () =>
-	html` <umb-editor-document-type id="${data[0].key}"></umb-editor-document-type>`;
+export const AAAOverview: Story<UmbWorkspaceDocumentTypeElement> = () =>
+	html` <umb-workspace-document-type id="${data[0].key}"></umb-workspace-document-type>`;
 AAAOverview.storyName = 'Overview';

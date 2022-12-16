@@ -12,8 +12,8 @@ import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
 import '../../property-editor-uis/icon-picker/property-editor-ui-icon-picker.element';
 
-@customElement('umb-editor-document-type')
-export class UmbEditorDocumentTypeElement extends UmbContextProviderMixin(
+@customElement('umb-workspace-document-type')
+export class UmbWorkspaceDocumentTypeElement extends UmbContextProviderMixin(
 	UmbContextConsumerMixin(UmbObserverMixin(LitElement))
 ) {
 	static styles = [
@@ -67,7 +67,7 @@ export class UmbEditorDocumentTypeElement extends UmbContextProviderMixin(
 			{
 				type: 'workspaceView',
 				alias: 'Umb.EditorView.DocumentType.Design',
-				name: 'Document Type Editor Design View',
+				name: 'Document Type Workspace Design View',
 				loader: () => import('./views/design/editor-view-document-type-design.element'),
 				weight: 100,
 				meta: {
@@ -80,7 +80,7 @@ export class UmbEditorDocumentTypeElement extends UmbContextProviderMixin(
 			{
 				type: 'workspaceAction',
 				alias: 'Umb.EditorAction.DocumentType.Save',
-				name: 'Save Document Type Editor Action',
+				name: 'Save Document Type Workspace Action',
 				loader: () => import('./actions/save/editor-action-document-type-save.element'),
 				meta: {
 					workspaces: ['Umb.Workspace.DocumentType'],
@@ -114,7 +114,7 @@ export class UmbEditorDocumentTypeElement extends UmbContextProviderMixin(
 		});
 	}
 
-	// TODO. find a way where we don't have to do this for all editors.
+	// TODO. find a way where we don't have to do this for all workspaces.
 	private _handleInput(event: UUIInputEvent) {
 		if (event instanceof UUIInputEvent) {
 			const target = event.composedPath()[0] as UUIInputElement;
@@ -141,10 +141,10 @@ export class UmbEditorDocumentTypeElement extends UmbContextProviderMixin(
 	}
 }
 
-export default UmbEditorDocumentTypeElement;
+export default UmbWorkspaceDocumentTypeElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-editor-document-type': UmbEditorDocumentTypeElement;
+		'umb-workspace-document-type': UmbWorkspaceDocumentTypeElement;
 	}
 }
