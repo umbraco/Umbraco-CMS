@@ -1,8 +1,40 @@
+import { BehaviorSubject } from "rxjs";
+
+type WorkspaceContextData = {
+	entityKey: string,
+	entityType: string,
+}
+
 export class UmbWorkspaceContext {
 
-    // TODO: Should this use RxJS to be reactive? A store, to hold the props below?
+	private _data = new BehaviorSubject<WorkspaceContextData>({
+		entityKey: '',
+		entityType: '',
+	});
+	public readonly data = this._data.asObservable();
 
-	public entityKey = '';
-	public entityType = '';
+
+	public get entityKey() {
+		return this.getData().entityKey;
+	}
+	public set entityKey(value) {
+		this.update({entityKey:value});
+	}
+
+
+	public get entityType() {
+		return this.getData().entityType;
+	}
+	public set entityType(value) {
+		this.update({entityType:value});
+	}
+
+	public getData() {
+		return this._data.getValue();
+	}
+
+	public update(data: Partial<WorkspaceContextData>) {
+		this._data.next({ ...this._data.getValue(), ...data });
+	}
 
 }
