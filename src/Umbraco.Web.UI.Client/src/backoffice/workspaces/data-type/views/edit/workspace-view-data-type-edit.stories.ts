@@ -1,17 +1,17 @@
-import './editor-view-data-type-info.element';
-
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit-html';
 
 import { data } from '../../../../../core/mocks/data/data-type.data';
 import { UmbDataTypeContext } from '../../data-type.context';
 
-import type { UmbEditorViewDataTypeInfoElement } from './editor-view-data-type-info.element';
+import type { UmbEditorViewDataTypeEditElement } from './workspace-view-data-type-edit.element';
+
+import './workspace-view-data-type-edit.element';
 
 export default {
-	title: 'Editors/Data Type/Views/Info',
-	component: 'umb-editor-view-data-type-info',
-	id: 'umb-editor-view-data-type-info',
+	title: 'Editors/Data Type/Views/Edit',
+	component: 'umb-workspace-view-data-type-edit',
+	id: 'umb-workspace-view-data-type-edit',
 	decorators: [
 		(story) =>
 			html` <umb-context-provider key="umbDataTypeContext" .value=${new UmbDataTypeContext(data[0])}>
@@ -20,6 +20,6 @@ export default {
 	],
 } as Meta;
 
-export const AAAOverview: Story<UmbEditorViewDataTypeInfoElement> = () =>
-	html` <umb-editor-view-data-type-info></umb-editor-view-data-type-info>`;
+export const AAAOverview: Story<UmbEditorViewDataTypeEditElement> = () =>
+	html` <umb-workspace-view-data-type-edit></umb-workspace-view-data-type-edit>`;
 AAAOverview.storyName = 'Overview';

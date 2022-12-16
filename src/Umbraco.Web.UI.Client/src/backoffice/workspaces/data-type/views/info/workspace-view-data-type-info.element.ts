@@ -7,8 +7,8 @@ import type { DataTypeDetails } from '@umbraco-cms/models';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
-@customElement('umb-editor-view-data-type-info')
-export class UmbEditorViewDataTypeInfoElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+@customElement('umb-workspace-view-data-type-info')
+export class UmbWorkspaceViewDataTypeInfoElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles = [UUITextStyles, css``];
 
 	@state()
@@ -63,10 +63,10 @@ export class UmbEditorViewDataTypeInfoElement extends UmbContextConsumerMixin(Um
 	}
 }
 
-export default UmbEditorViewDataTypeInfoElement;
+export default UmbWorkspaceViewDataTypeInfoElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-editor-view-data-type-info': UmbEditorViewDataTypeInfoElement;
+		'umb-workspace-view-data-type-info': UmbWorkspaceViewDataTypeInfoElement;
 	}
 }
