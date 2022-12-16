@@ -43,7 +43,7 @@ export class UmbEditorMediaElement extends UmbContextConsumerMixin(UmbContextPro
 				loader: () => import('../shared/workspace-content/views/edit/workspace-view-content-edit.element'),
 				weight: 200,
 				meta: {
-					editors: ['Umb.Editor.Media'],
+					workspaces: ['Umb.Editor.Media'],
 					label: 'Media',
 					pathname: 'media',
 					icon: 'umb:picture',
@@ -56,7 +56,7 @@ export class UmbEditorMediaElement extends UmbContextConsumerMixin(UmbContextPro
 				loader: () => import('../shared/workspace-content/views/info/workspace-view-content-info.element'),
 				weight: 100,
 				meta: {
-					editors: ['Umb.Editor.Media'],
+					workspaces: ['Umb.Editor.Media'],
 					label: 'Info',
 					pathname: 'info',
 					icon: 'info',

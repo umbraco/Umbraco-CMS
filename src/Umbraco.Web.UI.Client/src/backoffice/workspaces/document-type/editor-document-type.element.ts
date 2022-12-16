@@ -71,7 +71,7 @@ export class UmbEditorDocumentTypeElement extends UmbContextProviderMixin(
 				loader: () => import('./views/design/editor-view-document-type-design.element'),
 				weight: 100,
 				meta: {
-					editors: ['Umb.Editor.DocumentType'],
+					workspaces: ['Umb.Editor.DocumentType'],
 					label: 'Design',
 					pathname: 'design',
 					icon: 'edit',
