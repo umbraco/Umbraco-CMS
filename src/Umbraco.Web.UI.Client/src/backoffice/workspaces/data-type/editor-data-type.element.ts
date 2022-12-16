@@ -58,7 +58,7 @@ export class UmbEditorDataTypeElement extends UmbContextProviderMixin(
 	private _registerExtensions() {
 		const extensions: Array<any> = [
 			{
-				type: 'editorView',
+				type: 'workspaceView',
 				alias: 'Umb.EditorView.DataType.Edit',
 				name: 'Data Type Editor Edit View',
 				loader: () => import('./views/edit/editor-view-data-type-edit.element'),
@@ -71,7 +71,7 @@ export class UmbEditorDataTypeElement extends UmbContextProviderMixin(
 				},
 			},
 			{
-				type: 'editorView',
+				type: 'workspaceView',
 				alias: 'Umb.EditorView.DataType.Info',
 				name: 'Data Type Editor Info View',
 				loader: () => import('./views/info/editor-view-data-type-info.element'),
@@ -84,7 +84,7 @@ export class UmbEditorDataTypeElement extends UmbContextProviderMixin(
 				},
 			},
 			{
-				type: 'editorAction',
+				type: 'workspaceAction',
 				alias: 'Umb.EditorAction.DataType.Save',
 				name: 'Save Data Type Editor Action',
 				loader: () => import('./actions/save/editor-action-data-type-save.element'),

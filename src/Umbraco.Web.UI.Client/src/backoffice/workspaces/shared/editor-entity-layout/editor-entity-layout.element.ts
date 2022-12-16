@@ -8,7 +8,7 @@ import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-import type { ManifestEditorView } from '@umbraco-cms/models';
+import type { ManifestWorkspaceView } from '@umbraco-cms/models';
 
 import '../../../components/body-layout/body-layout.element';
 import '../../../components/extension-slot/extension-slot.element';
@@ -63,7 +63,7 @@ export class UmbEditorEntityLayout extends UmbContextConsumerMixin(UmbObserverMi
 	public alias = '';
 
 	@state()
-	private _editorViews: Array<ManifestEditorView> = [];
+	private _editorViews: Array<ManifestWorkspaceView> = [];
 
 	@state()
 	private _currentView = '';
@@ -83,9 +83,9 @@ export class UmbEditorEntityLayout extends UmbContextConsumerMixin(UmbObserverMi
 	}
 
 	private _observeEditorViews() {
-		this.observe<ManifestEditorView[]>(
+		this.observe<ManifestWorkspaceView[]>(
 			umbExtensionsRegistry
-				.extensionsOfType('editorView')
+				.extensionsOfType('workspaceView')
 				.pipe(map((extensions) => extensions.filter((extension) => extension.meta.editors.includes(this.alias)))),
 			(editorViews) => {
 				this._editorViews = editorViews;
@@ -134,7 +134,7 @@ export class UmbEditorEntityLayout extends UmbContextConsumerMixin(UmbObserverMi
 				? html`
 						<uui-tab-group slot="tabs">
 							${this._editorViews.map(
-								(view: ManifestEditorView) => html`
+								(view: ManifestWorkspaceView) => html`
 									<uui-tab
 										.label="${view.meta.label || view.name}"
 										href="${this._routerFolder}/view/${view.meta.pathname}"

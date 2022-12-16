@@ -2,7 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-import type { ManifestEditorView } from '@umbraco-cms/models';
+import type { ManifestWorkspaceView } from '@umbraco-cms/models';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import type { UmbDocumentStore } from 'src/core/stores/document/document.store';
 
@@ -35,9 +35,9 @@ export class UmbEditorDocumentElement extends UmbContextConsumerMixin(UmbContext
 	}
 
 	private _registerEditorViews() {
-		const dashboards: Array<ManifestEditorView> = [
+		const dashboards: Array<ManifestWorkspaceView> = [
 			{
-				type: 'editorView',
+				type: 'workspaceView',
 				alias: 'Umb.EditorView.Document.Edit',
 				name: 'Document Editor Edit View',
 				loader: () => import('../shared/editor-content/views/edit/editor-view-content-edit.element'),
@@ -50,7 +50,7 @@ export class UmbEditorDocumentElement extends UmbContextConsumerMixin(UmbContext
 				},
 			},
 			{
-				type: 'editorView',
+				type: 'workspaceView',
 				alias: 'Umb.EditorView.Document.Info',
 				name: 'Document Editor Info View',
 				loader: () => import('../shared/editor-content/views/info/editor-view-content-info.element'),

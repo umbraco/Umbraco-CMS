@@ -7,7 +7,7 @@ import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-import type { ManifestEditor } from '@umbraco-cms/models';
+import type { ManifestWorkspace } from '@umbraco-cms/models';
 
 @customElement('umb-workspace-entity')
 export class UmbWorkspaceEntityElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
@@ -50,9 +50,9 @@ export class UmbWorkspaceEntityElement extends UmbContextConsumerMixin(UmbObserv
 	This will first be possible to make when ContextApi is available, as conditions will use this system.
 	*/
 	private _observeEditors() {
-		this.observe<ManifestEditor | undefined>(
+		this.observe<ManifestWorkspace | undefined>(
 			umbExtensionsRegistry
-				.extensionsOfType('editor')
+				.extensionsOfType('workspace')
 				.pipe(map((editors) => editors.find((editor) => editor.meta.entityType === this.entityType))),
 			(editor) => {
 				// don't rerender editor if it's the same
@@ -64,7 +64,7 @@ export class UmbWorkspaceEntityElement extends UmbContextConsumerMixin(UmbObserv
 		);
 	}
 
-	private async _createElement(editor?: ManifestEditor) {
+	private async _createElement(editor?: ManifestWorkspace) {
 		this._element = editor ? (await createExtensionElement(editor)) : undefined;
 		if (this._element) {
 			// TODO: use contextApi for this.

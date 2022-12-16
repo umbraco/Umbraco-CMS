@@ -65,7 +65,7 @@ export class UmbEditorDocumentTypeElement extends UmbContextProviderMixin(
 	private _registerExtensions() {
 		const extensions: Array<ManifestTypes> = [
 			{
-				type: 'editorView',
+				type: 'workspaceView',
 				alias: 'Umb.EditorView.DocumentType.Design',
 				name: 'Document Type Editor Design View',
 				loader: () => import('./views/design/editor-view-document-type-design.element'),
@@ -78,7 +78,7 @@ export class UmbEditorDocumentTypeElement extends UmbContextProviderMixin(
 				},
 			},
 			{
-				type: 'editorAction',
+				type: 'workspaceAction',
 				alias: 'Umb.EditorAction.DocumentType.Save',
 				name: 'Save Document Type Editor Action',
 				loader: () => import('./actions/save/editor-action-document-type-save.element'),

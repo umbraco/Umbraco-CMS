@@ -1,7 +1,7 @@
 import type { ManifestElement } from './models';
 
-export interface ManifestEditor extends ManifestElement {
-	type: 'editor';
+export interface ManifestWorkspace extends ManifestElement {
+	type: 'workspace';
 	meta: MetaEditor;
 }
 

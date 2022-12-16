@@ -2,19 +2,19 @@ import { UUITextStyles } from '@umbraco-ui/uui';
 import { CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
-import type { ManifestEditorAction } from '@umbraco-cms/models';
+import type { ManifestWorkspaceAction } from '@umbraco-cms/models';
 
 // Niels, thoughts, TODO: Consider naming this just actions, not extension as everything is an extension.
 @customElement('umb-editor-action-extension')
 export class UmbEditorActionExtensionElement extends LitElement {
 	static styles: CSSResultGroup = [UUITextStyles];
 
-	private _editorAction?: ManifestEditorAction;
+	private _editorAction?: ManifestWorkspaceAction;
 	@property({ type: Object })
-	public get editorAction(): ManifestEditorAction | undefined {
+	public get editorAction(): ManifestWorkspaceAction | undefined {
 		return this._editorAction;
 	}
-	public set editorAction(value: ManifestEditorAction | undefined) {
+	public set editorAction(value: ManifestWorkspaceAction | undefined) {
 		this._editorAction = value;
 		this._createElement();
 	}

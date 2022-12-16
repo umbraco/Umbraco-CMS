@@ -1,7 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import type { ManifestEditorView } from '@umbraco-cms/models';
+import type { ManifestWorkspaceView } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbMediaStore } from 'src/core/stores/media/media.store';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
@@ -35,9 +35,9 @@ export class UmbEditorMediaElement extends UmbContextConsumerMixin(UmbContextPro
 	}
 
 	private _registerEditorViews() {
-		const dashboards: Array<ManifestEditorView> = [
+		const dashboards: Array<ManifestWorkspaceView> = [
 			{
-				type: 'editorView',
+				type: 'workspaceView',
 				alias: 'Umb.EditorView.Media.Edit',
 				name: 'Media Editor Edit View',
 				loader: () => import('../shared/editor-content/views/edit/editor-view-content-edit.element'),
@@ -50,7 +50,7 @@ export class UmbEditorMediaElement extends UmbContextConsumerMixin(UmbContextPro
 				},
 			},
 			{
-				type: 'editorView',
+				type: 'workspaceView',
 				alias: 'Umb.EditorView.Media.Info',
 				name: 'Media Editor Info View',
 				loader: () => import('../shared/editor-content/views/info/editor-view-content-info.element'),
