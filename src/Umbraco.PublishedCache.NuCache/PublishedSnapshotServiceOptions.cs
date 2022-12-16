@@ -1,3 +1,4 @@
+using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.PublishedCache;
 
 namespace Umbraco.Cms.Infrastructure.PublishedCache;
@@ -29,4 +30,13 @@ public class PublishedSnapshotServiceOptions
     ///     files.
     /// </remarks>
     public bool IgnoreLocalDb { get; set; }
+
+    /// <summary>
+    ///     The path to store the localDb files at.
+    /// </summary>
+    /// <remarks>
+    ///     By default <see cref="IHostingEnvironment.LocalTempPath"/> is used. On Linux storeing the localDb file outside tmp can be more performant.
+    ///     See: https://github.com/mamift/CSharpTest.Net.Collections/issues/2#issuecomment-1328282778
+    /// </remarks>
+    public string? CachePath { get; set; }
 }
