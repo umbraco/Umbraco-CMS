@@ -50,7 +50,7 @@ export const manifests: Array<ManifestWorkspace> = [
 		type: 'workspace',
 		alias: 'Umb.Editor.MemberType',
 		name: 'Member Type Editor',
-		loader: () => import('./member-type/editor-member-type.element'),
+		loader: () => import('./member-type/workspace-member-type.element'),
 		meta: {
 			entityType: 'member-type',
 		},
@@ -104,7 +104,7 @@ export const manifests: Array<ManifestWorkspace> = [
 		type: 'workspace',
 		alias: 'Umb.Editor.Package',
 		name: 'Package Editor',
-		loader: () => import('./package/editor-package.element'),
+		loader: () => import('./package/workspace-package.element'),
 		meta: {
 			entityType: 'package',
 		},
@@ -113,7 +113,7 @@ export const manifests: Array<ManifestWorkspace> = [
 		type: 'workspace',
 		alias: 'Umb.Editor.PackageBuilder',
 		name: 'Package Builder Editor',
-		loader: () => import('./package-builder/editor-package-builder.element'),
+		loader: () => import('./package-builder/workspace-package-builder.element'),
 		meta: {
 			entityType: 'package-builder',
 		},
