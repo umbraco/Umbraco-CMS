@@ -95,7 +95,7 @@ export const manifests: Array<ManifestWorkspace> = [
 		type: 'workspace',
 		alias: 'Umb.Editor.UserGroup',
 		name: 'User Group Editor',
-		loader: () => import('./user-group/editor-user-group.element'),
+		loader: () => import('./user-group/workspace-user-group.element'),
 		meta: {
 			entityType: 'user-group',
 		},

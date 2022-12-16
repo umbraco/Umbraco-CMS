@@ -13,8 +13,8 @@ import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbUserGroupStore } from '@umbraco-cms/stores/user/user-group.store';
 import { UmbUserStore } from '@umbraco-cms/stores/user/user.store';
 
-@customElement('umb-editor-user-group')
-export class UmbEditorUserGroupElement extends UmbContextProviderMixin(
+@customElement('umb-workspace-user-group')
+export class UmbWorkspaceUserGroupElement extends UmbContextProviderMixin(
 	UmbContextConsumerMixin(UmbObserverMixin(LitElement))
 ) {
 	static styles = [
@@ -201,18 +201,18 @@ export class UmbEditorUserGroupElement extends UmbContextProviderMixin(
 	constructor() {
 		super();
 
-		this._registerEditorActions();
+		this._registerWorkspaceActions();
 	}
 
-	private _registerEditorActions() {
+	private _registerWorkspaceActions() {
 		const manifests: Array<ManifestWorkspaceAction> = [
 			{
 				type: 'workspaceAction',
-				alias: 'Umb.EditorAction.UserGroup.Save',
-				name: 'EditorActionUserGroupSave',
-				loader: () => import('./actions/editor-action-user-group-save.element'),
+				alias: 'Umb.WorkspaceAction.UserGroup.Save',
+				name: 'WorkspaceActionUserGroupSave',
+				loader: () => import('./actions/workspace-action-user-group-save.element'),
 				meta: {
-					workspaces: ['Umb.Editor.UserGroup'],
+					workspaces: ['Umb.Workspace.UserGroup'],
 				},
 			},
 		];
@@ -377,7 +377,7 @@ export class UmbEditorUserGroupElement extends UmbContextProviderMixin(
 		if (!this._userGroup) return nothing;
 
 		return html`
-			<umb-workspace-entity-layout alias="Umb.Editor.UserGroup">
+			<umb-workspace-entity-layout alias="Umb.Workspace.UserGroup">
 				<uui-input id="name" slot="header" .value=${this._userGroup.name} @input="${this._handleInput}"></uui-input>
 				<div id="main">
 					<div id="left-column">${this.renderLeftColumn()}</div>
@@ -388,10 +388,10 @@ export class UmbEditorUserGroupElement extends UmbContextProviderMixin(
 	}
 }
 
-export default UmbEditorUserGroupElement;
+export default UmbWorkspaceUserGroupElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-editor-user-group': UmbEditorUserGroupElement;
+		'umb-workspace-user-group': UmbWorkspaceUserGroupElement;
 	}
 }

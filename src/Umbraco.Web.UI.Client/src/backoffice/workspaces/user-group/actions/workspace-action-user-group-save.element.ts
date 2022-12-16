@@ -9,8 +9,8 @@ import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { UmbUserGroupStore } from 'src/core/stores/user/user-group.store';
 import { UmbUserStore } from 'src/core/stores/user/user.store';
 
-@customElement('umb-editor-action-user-group-save')
-export class UmbEditorActionUserGroupSaveElement extends UmbContextConsumerMixin(LitElement) {
+@customElement('umb-workspace-action-user-group-save')
+export class UmbWorkspaceActionUserGroupSaveElement extends UmbContextConsumerMixin(LitElement) {
 	static styles = [UUITextStyles, css``];
 
 	@state()
@@ -67,10 +67,10 @@ export class UmbEditorActionUserGroupSaveElement extends UmbContextConsumerMixin
 	}
 }
 
-export default UmbEditorActionUserGroupSaveElement;
+export default UmbWorkspaceActionUserGroupSaveElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-editor-action-user-group-save': UmbEditorActionUserGroupSaveElement;
+		'umb-workspace-action-user-group-save': UmbWorkspaceActionUserGroupSaveElement;
 	}
 }

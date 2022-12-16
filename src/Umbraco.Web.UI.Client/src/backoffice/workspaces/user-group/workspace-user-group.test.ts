@@ -7,7 +7,7 @@ import { expect, fixture, html } from '@open-wc/testing';
 // 	let element: UmbEditorUserGroupElement;
 
 // 	beforeEach(async () => {
-// 		element = await fixture(html` <umb-editor-user-group></umb-editor-user-group> `);
+// 		element = await fixture(html` <umb-workspace-user-group></umb-workspace-user-group> `);
 // 	});
 
 // 	it('is defined with its own instance', () => {
