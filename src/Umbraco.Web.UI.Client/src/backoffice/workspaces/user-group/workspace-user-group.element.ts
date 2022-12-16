@@ -366,7 +366,7 @@ export class UmbWorkspaceUserGroupElement extends UmbContextProviderMixin(
 		</uui-box>`;
 	}
 
-	// TODO. find a way where we don't have to do this for all editors.
+	// TODO: find a way where we don't have to do this for all editors.
 	private _handleInput(event: UUIInputEvent) {
 		if (event instanceof UUIInputEvent) {
 			const target = event.composedPath()[0] as UUIInputElement;
