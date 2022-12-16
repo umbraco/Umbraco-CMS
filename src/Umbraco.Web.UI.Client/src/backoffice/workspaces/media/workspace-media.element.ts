@@ -3,7 +3,6 @@ import { css, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import type { ManifestWorkspaceView } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-import { UmbMediaStore } from 'src/core/stores/media/media.store';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 
 import '../shared/workspace-content/workspace-content.element';
@@ -28,10 +27,6 @@ export class UmbWorkspaceMediaElement extends UmbContextConsumerMixin(UmbContext
 		super();
 
 		this._registerWorkspaceViews();
-
-		this.consumeContext('umbMediaStore', (mediaStore: UmbMediaStore) => {
-			this.provideContext('umbContentStore', mediaStore);
-		});
 	}
 
 	private _registerWorkspaceViews() {
@@ -71,7 +66,7 @@ export class UmbWorkspaceMediaElement extends UmbContextConsumerMixin(UmbContext
 	}
 
 	render() {
-		return html`<umb-workspace-content .entityKey=${this.entityKey} alias="Umb.Workspace.Media"></umb-workspace-content>`;
+		return html`<umb-workspace-content store-alias='umbMediaStore' .entityKey=${this.entityKey} alias="Umb.Workspace.Media"></umb-workspace-content>`;
 	}
 }
 

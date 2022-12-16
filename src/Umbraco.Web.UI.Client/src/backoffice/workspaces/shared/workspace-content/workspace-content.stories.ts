@@ -14,5 +14,5 @@ export default {
 } as Meta;
 
 export const AAAOverview: Story<UmbWorkspaceContentElement> = () =>
-	html` <umb-workspace-content id="${data[0].key}"></umb-workspace-content>`;
+	html` <umb-workspace-content store-alias='umbDocumentStore' id="${data[0].key}"></umb-workspace-content>`;
 AAAOverview.storyName = 'Overview';
