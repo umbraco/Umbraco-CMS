@@ -20,7 +20,7 @@ public class UmbracoTestDatabaseFactory
         _configuration = configuration;
     }
 
-    public ITestDatabaseConfiguration CreateTestDatabase()
+    public ITestDatabaseConfiguration CreateTestDatabaseConfiguration()
     {
         var databaseType = _configuration.GetValue<TestDatabaseSettings.TestDatabaseType>("Tests:Database:DatabaseType");
 

@@ -154,7 +154,7 @@ public abstract class UmbracoIntegrationTestBase
             case UmbracoTestOptions.Database.NewSchemaPerTest:
 
                 // New DB + Schema
-                var newSchemaPerTestDb = testDatabaseFactory.CreateTestDatabase();
+                var newSchemaPerTestDb = testDatabaseFactory.CreateTestDatabaseConfiguration();
                 s_connectionStrings = newSchemaPerTestDb.InitializeConfiguration();
                 AddOnTestTearDown(() => newSchemaPerTestDb.Teardown());
                 CreateDatabaseWithSchema(databaseFactory, databaseSchemaCreatorFactory);
@@ -167,7 +167,7 @@ public abstract class UmbracoIntegrationTestBase
                 break;
             case UmbracoTestOptions.Database.NewEmptyPerTest:
 
-                var newEmptyPerTestDatabase = testDatabaseFactory.CreateTestDatabase();
+                var newEmptyPerTestDatabase = testDatabaseFactory.CreateTestDatabaseConfiguration();
                 s_connectionStrings = newEmptyPerTestDatabase.InitializeConfiguration();
                 AddOnTestTearDown(() => newEmptyPerTestDatabase.Teardown());
 
@@ -183,7 +183,7 @@ public abstract class UmbracoIntegrationTestBase
                 if (_firstTestInFixture)
                 {
                     // New DB + Schema
-                    var newSchemaPerFixtureDb = testDatabaseFactory.CreateTestDatabase();
+                    var newSchemaPerFixtureDb = testDatabaseFactory.CreateTestDatabaseConfiguration();
                     s_connectionStrings = newSchemaPerFixtureDb.InitializeConfiguration();
                     AddOnFixtureTearDown(() => newSchemaPerFixtureDb.Teardown());
 
@@ -205,7 +205,7 @@ public abstract class UmbracoIntegrationTestBase
                 // and it would be the same as NewSchemaPerTest even if it didn't block
                 if (_firstTestInFixture)
                 {
-                    var newEmptyPerFixtureDb = testDatabaseFactory.CreateTestDatabase();
+                    var newEmptyPerFixtureDb = testDatabaseFactory.CreateTestDatabaseConfiguration();
                     s_connectionStrings = newEmptyPerFixtureDb.InitializeConfiguration();
                     AddOnFixtureTearDown(() => newEmptyPerFixtureDb.Teardown());
                     CreateDatabaseWithoutSchema(databaseFactory, databaseSchemaCreatorFactory);
