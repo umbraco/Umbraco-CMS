@@ -2,7 +2,7 @@ import { BehaviorSubject, map, Observable } from 'rxjs';
 import type {
 	ManifestTypes,
 	ManifestDashboard,
-	ManifestEditorView,
+	ManifestWorkspaceView,
 	ManifestEntrypoint,
 	ManifestPropertyAction,
 	ManifestPropertyEditorUI,
@@ -11,14 +11,14 @@ import type {
 	ManifestSectionView,
 	ManifestTree,
 	ManifestTreeItemAction,
-	ManifestEditor,
-	ManifestEditorAction,
+	ManifestWorkspace,
+	ManifestWorkspaceAction,
 	ManifestCustom,
 	ManifestPackageView,
 	ManifestExternalLoginProvider,
+	ManifestHeaderApp,
 } from '../../models';
 import { createExtensionElement } from '../create-extension-element.function';
-import { ManifestHeaderApp } from 'src/core/extensions-registry/header-app.models';
 
 export class UmbExtensionRegistry {
 	private _extensions = new BehaviorSubject<Array<ManifestTypes>>([]);
@@ -72,11 +72,11 @@ export class UmbExtensionRegistry {
 	extensionsOfType(type: 'section'): Observable<Array<ManifestSection>>;
 	extensionsOfType(type: 'sectionView'): Observable<Array<ManifestSectionView>>;
 	extensionsOfType(type: 'tree'): Observable<Array<ManifestTree>>;
-	extensionsOfType(type: 'editor'): Observable<Array<ManifestEditor>>;
+	extensionsOfType(type: 'workspace'): Observable<Array<ManifestWorkspace>>;
 	extensionsOfType(type: 'treeItemAction'): Observable<Array<ManifestTreeItemAction>>;
 	extensionsOfType(type: 'dashboard'): Observable<Array<ManifestDashboard>>;
-	extensionsOfType(type: 'editorView'): Observable<Array<ManifestEditorView>>;
-	extensionsOfType(type: 'editorAction'): Observable<Array<ManifestEditorAction>>;
+	extensionsOfType(type: 'workspaceView'): Observable<Array<ManifestWorkspaceView>>;
+	extensionsOfType(type: 'workspaceAction'): Observable<Array<ManifestWorkspaceAction>>;
 	extensionsOfType(type: 'propertyEditorUI'): Observable<Array<ManifestPropertyEditorUI>>;
 	extensionsOfType(type: 'propertyEditorModel'): Observable<Array<ManifestPropertyEditorModel>>;
 	extensionsOfType(type: 'propertyAction'): Observable<Array<ManifestPropertyAction>>;

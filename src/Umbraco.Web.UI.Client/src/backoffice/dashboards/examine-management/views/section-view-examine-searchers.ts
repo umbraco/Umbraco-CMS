@@ -128,7 +128,7 @@ export class UmbDashboardExamineSearcherElement extends UmbContextConsumerMixin(
 	}
 
 	private _onNameClick() {
-		const data: UmbNotificationDefaultData = { message: 'TODO: Open editor for this' }; // TODO
+		const data: UmbNotificationDefaultData = { message: 'TODO: Open workspace for this' }; // TODO
 		this._notificationService?.peek('warning', { data });
 	}
 
@@ -236,7 +236,7 @@ export class UmbDashboardExamineSearcherElement extends UmbContextConsumerMixin(
 							<uui-table-cell> ${rowData.score} </uui-table-cell>
 							<uui-table-cell> ${rowData.id} </uui-table-cell>
 							<uui-table-cell>
-								<uui-button look="secondary" label="Open editor for this document" @click="${this._onNameClick}">
+								<uui-button look="secondary" label="Open workspace for this document" @click="${this._onNameClick}">
 									${this.getSearchResultNodeName(rowData)}
 								</uui-button>
 							</uui-table-cell>

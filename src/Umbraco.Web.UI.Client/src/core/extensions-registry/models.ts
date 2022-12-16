@@ -4,9 +4,9 @@ import type { ManifestSection } from './section.models';
 import type { ManifestSectionView } from './section-view.models';
 import type { ManifestTree } from './tree.models';
 import type { ManifestTreeItemAction } from './tree-item-action.models';
-import type { ManifestEditor } from './editor.models';
-import type { ManifestEditorAction } from './editor-action.models';
-import type { ManifestEditorView } from './editor-view.models';
+import type { ManifestWorkspace } from './workspace.models';
+import type { ManifestWorkspaceAction } from './workspace-action.models';
+import type { ManifestWorkspaceView } from './workspace-view.models';
 import type { ManifestPropertyEditorUI, ManifestPropertyEditorModel } from './property-editor.models';
 import type { ManifestDashboard } from './dashboard.models';
 import type { ManifestUserDashboard } from './user-dashboard.models';
@@ -19,9 +19,9 @@ export * from './section.models';
 export * from './section-view.models';
 export * from './tree.models';
 export * from './tree-item-action.models';
-export * from './editor.models';
-export * from './editor-action.models';
-export * from './editor-view.models';
+export * from './workspace.models';
+export * from './workspace-action.models';
+export * from './workspace-view.models';
 export * from './property-editor.models';
 export * from './dashboard.models';
 export * from './user-dashboard.models';
@@ -34,9 +34,9 @@ export type ManifestTypes =
 	| ManifestSection
 	| ManifestSectionView
 	| ManifestTree
-	| ManifestEditor
-	| ManifestEditorAction
-	| ManifestEditorView
+	| ManifestWorkspace
+	| ManifestWorkspaceAction
+	| ManifestWorkspaceView
 	| ManifestTreeItemAction
 	| ManifestPropertyEditorUI
 	| ManifestPropertyEditorModel
@@ -53,9 +53,9 @@ export type ManifestStandardTypes =
 	| 'section'
 	| 'sectionView'
 	| 'tree'
-	| 'editor'
-	| 'editorView'
-	| 'editorAction'
+	| 'workspace'
+	| 'workspaceView'
+	| 'workspaceAction'
 	| 'treeItemAction'
 	| 'propertyEditorUI'
 	| 'propertyEditorModel'
@@ -71,13 +71,13 @@ export type ManifestElementType =
 	| ManifestSectionView
 	| ManifestTree
 	| ManifestTreeItemAction
-	| ManifestEditor
+	| ManifestWorkspace
 	| ManifestPropertyAction
 	| ManifestPropertyEditorUI
 	| ManifestDashboard
 	| ManifestUserDashboard
-	| ManifestEditorView
-	| ManifestEditorAction
+	| ManifestWorkspaceView
+	| ManifestWorkspaceAction
 	| ManifestPackageView
 	| ManifestExternalLoginProvider;
 

@@ -67,7 +67,7 @@ export class UmbPickerLayoutSectionElement extends UmbContextConsumerMixin(UmbOb
 
 	render() {
 		return html`
-			<umb-editor-entity-layout headline="Select sections">
+			<umb-workspace-entity-layout headline="Select sections">
 				<uui-box>
 					<uui-input label="search"></uui-input>
 					<hr />
@@ -88,7 +88,7 @@ export class UmbPickerLayoutSectionElement extends UmbContextConsumerMixin(UmbOb
 					<uui-button label="Close" @click=${this._close}></uui-button>
 					<uui-button label="Submit" look="primary" color="positive" @click=${this._submit}></uui-button>
 				</div>
-			</umb-editor-entity-layout>
+			</umb-workspace-entity-layout>
 		`;
 	}
 }
