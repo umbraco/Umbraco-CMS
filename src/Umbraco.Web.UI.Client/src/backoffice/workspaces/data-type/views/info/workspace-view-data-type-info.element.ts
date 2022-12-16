@@ -44,14 +44,12 @@ export class UmbWorkspaceViewDataTypeInfoElement extends UmbContextConsumerMixin
 					<div slot="editor">${this._dataType?.key}</div>
 				</umb-workspace-property-layout>
 				<umb-workspace-property-layout
-					label="Property Editor Alias
-">
+					label="Property Editor Alias">
 					<div slot="editor">${this._dataType?.propertyEditorModelAlias}</div>
 				</umb-workspace-property-layout>
 
 				<umb-workspace-property-layout
-					label="Property Editor UI Alias
-">
+					label="Property Editor UI Alias">
 					<div slot="editor">${this._dataType?.propertyEditorUIAlias}</div>
 				</umb-workspace-property-layout>
 			</uui-box>
