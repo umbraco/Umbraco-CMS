@@ -4,7 +4,6 @@ import { customElement, property } from 'lit/decorators.js';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import type { ManifestWorkspaceView } from '@umbraco-cms/models';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
-import type { UmbDocumentStore } from 'src/core/stores/document/document.store';
 
 import '../shared/workspace-content/workspace-content.element';
 
@@ -27,11 +26,8 @@ export class UmbWorkspaceDocumentElement extends UmbContextConsumerMixin(UmbCont
 	constructor() {
 		super();
 
+		// TODO: consider if registering extensions should happen initially or else where, to enable unregister of extensions.
 		this._registerWorkspaceViews();
-
-		this.consumeContext('umbDocumentStore', (documentStore: UmbDocumentStore) => {
-			this.provideContext('umbContentStore', documentStore);
-		});
 	}
 
 	private _registerWorkspaceViews() {
@@ -71,7 +67,7 @@ export class UmbWorkspaceDocumentElement extends UmbContextConsumerMixin(UmbCont
 	}
 
 	render() {
-		return html`<umb-workspace-content .entityKey=${this.entityKey} alias="Umb.Workspace.Document"></umb-workspace-content>`;
+		return html`<umb-workspace-content store-alias='umbDocumentStore' .entityKey=${this.entityKey} alias="Umb.Workspace.Document"></umb-workspace-content>`;
 	}
 }
 

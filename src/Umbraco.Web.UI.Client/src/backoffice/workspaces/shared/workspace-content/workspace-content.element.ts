@@ -71,20 +71,34 @@ export class UmbWorkspaceContentElement extends UmbContextProviderMixin(
 	@property()
 	alias!: string;
 
+	private _storeAlias!: string;
+	@property({type: String, reflect:true, attribute:'store-alias'})
+	public get storeAlias() : string {
+		return this._storeAlias;
+	}
+	public set storeAlias(newVal:string) {
+		this._storeAlias = newVal;
+		console.log("storeAlias", newVal)
+		this.consumeContext(this._storeAlias, (instance) => {
+			this._store = instance;
+			this._observeContent();
+		});
+	}
+	
+
 	@state()
 	_content?: DocumentDetails | MediaDetails;
 
 	private _store?: UmbDocumentStore | UmbMediaStore;
+	private _storeObserver?: ()=>void;
 	private _nodeContext?: UmbNodeContext;
 	private _notificationService?: UmbNotificationService;
 
 	constructor() {
 		super();
 
-		this.consumeAllContexts(['umbContentStore', 'umbNotificationService'], (instances) => {
-			this._store = instances['umbContentStore'];
-			this._notificationService = instances['umbNotificationService'];
-			this._observeContent();
+		this.consumeContext('umbNotificationService', (instance) => {
+			this._notificationService = instance;
 		});
 
 		this.addEventListener('property-value-change', this._onPropertyValueChange);
@@ -114,7 +128,12 @@ export class UmbWorkspaceContentElement extends UmbContextProviderMixin(
 	private _observeContent() {
 		if (!this._store) return;
 
-		this.observe<DocumentDetails | MediaDetails>(this._store.getByKey(this.entityKey), (content) => {
+		if(this._storeObserver) {
+			// I want to make sure that we unsubscribe, also if store(observer source) changes.
+			this._storeObserver();
+		}
+
+		this._storeObserver = this.observe<DocumentDetails | MediaDetails>(this._store.getByKey(this.entityKey), (content) => {
 			if (!content) return; // TODO: Handle nicely if there is no content data.
 
 			if (!this._nodeContext) {
