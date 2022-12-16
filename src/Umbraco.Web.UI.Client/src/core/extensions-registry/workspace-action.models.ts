@@ -6,5 +6,5 @@ export interface ManifestWorkspaceAction extends ManifestElement {
 }
 
 export interface MetaEditorAction {
-	editors: Array<string>;
+	workspaces: Array<string>;
 }
