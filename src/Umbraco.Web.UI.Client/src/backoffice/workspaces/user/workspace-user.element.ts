@@ -17,7 +17,7 @@ import '@umbraco-cms/components/input-user-group/input-user-group.element';
 
 import { umbCurrentUserService } from 'src/core/services/current-user';
 import { UmbModalService } from '@umbraco-cms/services';
-import '../shared/workspace-entity-layout/workspace-entity-layout.element';
+import '../shared/workspace-entity/workspace-entity.element';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 
