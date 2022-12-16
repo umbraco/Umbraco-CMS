@@ -5,8 +5,8 @@ using Umbraco.Cms.Core.Configuration.Models;
 
 namespace Umbraco.Cms.Tests.Integration.Testing;
 
-public interface ITestDatabase
+public interface ITestDatabaseConfiguration
 {
-    ConnectionStrings Initialize();
+    ConnectionStrings InitializeConfiguration();
     void Teardown();
 }

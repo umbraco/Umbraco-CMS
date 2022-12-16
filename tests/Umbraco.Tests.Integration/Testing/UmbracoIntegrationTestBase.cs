@@ -26,7 +26,7 @@ namespace Umbraco.Cms.Tests.Integration.Testing;
 public abstract class UmbracoIntegrationTestBase
 {
     private static readonly object s_dbLocker = new();
-    protected static ITestDatabase? s_dbInstance;
+    protected static ITestDatabaseConfiguration? s_dbInstance;
     protected static TestDbMeta s_fixtureDbMeta;
     protected static ConnectionStrings s_connectionStrings;
     private static int s_testCount = 1;
@@ -155,7 +155,7 @@ public abstract class UmbracoIntegrationTestBase
 
                 // New DB + Schema
                 var newSchemaPerTestDb = testDatabaseFactory.CreateTestDatabase();
-                s_connectionStrings = newSchemaPerTestDb.Initialize();
+                s_connectionStrings = newSchemaPerTestDb.InitializeConfiguration();
                 AddOnTestTearDown(() => newSchemaPerTestDb.Teardown());
                 CreateDatabaseWithSchema(databaseFactory, databaseSchemaCreatorFactory);
                 databaseDataCreator.SeedDataAsync().GetAwaiter().GetResult();
@@ -168,7 +168,7 @@ public abstract class UmbracoIntegrationTestBase
             case UmbracoTestOptions.Database.NewEmptyPerTest:
 
                 var newEmptyPerTestDatabase = testDatabaseFactory.CreateTestDatabase();
-                s_connectionStrings = newEmptyPerTestDatabase.Initialize();
+                s_connectionStrings = newEmptyPerTestDatabase.InitializeConfiguration();
                 AddOnTestTearDown(() => newEmptyPerTestDatabase.Teardown());
 
                 CreateDatabaseWithoutSchema(databaseFactory, databaseSchemaCreatorFactory);
@@ -184,7 +184,7 @@ public abstract class UmbracoIntegrationTestBase
                 {
                     // New DB + Schema
                     var newSchemaPerFixtureDb = testDatabaseFactory.CreateTestDatabase();
-                    s_connectionStrings = newSchemaPerFixtureDb.Initialize();
+                    s_connectionStrings = newSchemaPerFixtureDb.InitializeConfiguration();
                     AddOnFixtureTearDown(() => newSchemaPerFixtureDb.Teardown());
 
                     CreateDatabaseWithSchema(databaseFactory, databaseSchemaCreatorFactory);
@@ -206,7 +206,7 @@ public abstract class UmbracoIntegrationTestBase
                 if (_firstTestInFixture)
                 {
                     var newEmptyPerFixtureDb = testDatabaseFactory.CreateTestDatabase();
-                    s_connectionStrings = newEmptyPerFixtureDb.Initialize();
+                    s_connectionStrings = newEmptyPerFixtureDb.InitializeConfiguration();
                     AddOnFixtureTearDown(() => newEmptyPerFixtureDb.Teardown());
                     CreateDatabaseWithoutSchema(databaseFactory, databaseSchemaCreatorFactory);
                 }

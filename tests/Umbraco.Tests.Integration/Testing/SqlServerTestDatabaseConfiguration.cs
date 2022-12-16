@@ -12,14 +12,14 @@ namespace Umbraco.Cms.Tests.Integration.Testing;
 /// <remarks>
 ///     It's not meant to be pretty, rushed port of LocalDb.cs + LocalDbTestDatabase.cs
 /// </remarks>
-public class SqlServerTestDatabase : ITestDatabase
+public class SqlServerTestDatabaseConfiguration : ITestDatabaseConfiguration
 {
     private Guid _key;
     private readonly string _connectionString;
 
-    public SqlServerTestDatabase(string connectionString) => _connectionString = connectionString;
+    public SqlServerTestDatabaseConfiguration(string connectionString) => _connectionString = connectionString;
 
-    public ConnectionStrings Initialize()
+    public ConnectionStrings InitializeConfiguration()
     {
         _key = Guid.NewGuid();
         CreateDatabase();

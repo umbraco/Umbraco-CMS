@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Tests.Integration.Testing;
 /// <summary>
 ///     Manages a pool of LocalDb databases for integration testing
 /// </summary>
-public class LocalDbTestDatabase : ITestDatabase
+public class LocalDbTestDatabaseConfiguration : ITestDatabaseConfiguration
 {
     public const string InstanceName = "UmbracoTests";
     public const string DatabaseName = "UmbracoTests";
@@ -24,7 +24,7 @@ public class LocalDbTestDatabase : ITestDatabase
     private readonly TestDatabaseSettings _settings;
 
     // It's internal because `Umbraco.Core.Persistence.LocalDb` is internal
-    internal LocalDbTestDatabase(LocalDb localDb, IUmbracoDatabaseFactory databaseFactory, IOptionsMonitor<ConnectionStrings> connectionStrings)
+    internal LocalDbTestDatabaseConfiguration(LocalDb localDb, IUmbracoDatabaseFactory databaseFactory, IOptionsMonitor<ConnectionStrings> connectionStrings)
     {
         _localDb = localDb;
         _databaseFactory = databaseFactory;
@@ -47,15 +47,13 @@ public class LocalDbTestDatabase : ITestDatabase
         s_localDbInstance = _localDb.GetInstance(InstanceName);
     }
 
-    public ConnectionStrings Initialize()
+    public ConnectionStrings InitializeConfiguration()
     {
         var tempName = Guid.NewGuid().ToString("N");
         s_localDbInstance.CreateDatabase(tempName, s_filesPath);
-        var conString = s_localDbInstance.GetConnectionString(InstanceName, tempName);
-        conString += "TrustServerCertificate=True;";
         var connectionStrings = new ConnectionStrings
         {
-            ConnectionString = conString,
+            ConnectionString = s_localDbInstance.GetConnectionString(InstanceName, tempName),
             ProviderName = "Microsoft.Data.SqlClient",
         };
 

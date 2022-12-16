@@ -6,14 +6,14 @@ using Umbraco.Cms.Infrastructure.Persistence;
 
 namespace Umbraco.Cms.Tests.Integration.Testing;
 
-public class SqliteTestDatabase : ITestDatabase
+public class SqliteTestDatabaseConfiguration : ITestDatabaseConfiguration
 {
     private readonly IOptionsMonitor<ConnectionStrings> _connectionStrings;
     private readonly IUmbracoDatabaseFactory _databaseFactory;
     private readonly IConfiguration _configuration;
     private Guid? _key;
 
-    public SqliteTestDatabase(IOptionsMonitor<ConnectionStrings> connectionStrings, IUmbracoDatabaseFactory databaseFactory, IConfiguration configuration)
+    public SqliteTestDatabaseConfiguration(IOptionsMonitor<ConnectionStrings> connectionStrings, IUmbracoDatabaseFactory databaseFactory, IConfiguration configuration)
     {
         _connectionStrings = connectionStrings;
         _databaseFactory = databaseFactory;
@@ -21,7 +21,7 @@ public class SqliteTestDatabase : ITestDatabase
         _key = Guid.NewGuid();
     }
 
-    public ConnectionStrings Initialize()
+    public ConnectionStrings InitializeConfiguration()
     {
         var builder = new SqliteConnectionStringBuilder
         {
