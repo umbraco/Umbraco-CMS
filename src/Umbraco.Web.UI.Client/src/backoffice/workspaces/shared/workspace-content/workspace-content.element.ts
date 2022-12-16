@@ -12,7 +12,7 @@ import type { UmbDocumentStore } from 'src/core/stores/document/document.store';
 import { UmbMediaStore } from 'src/core/stores/media/media.store';
 import type { DocumentDetails, MediaDetails } from '@umbraco-cms/models';
 
-import '../workspace-entity-layout/workspace-entity-layout.element';
+import '../workspace-entity/workspace-entity.element';
 
 // Lazy load
 // TODO: Make this dynamic, use load-extensions method to loop over extensions for this node.
@@ -214,7 +214,7 @@ export class UmbWorkspaceContentElement extends UmbContextProviderMixin(
 
 	render() {
 		return html`
-			<umb-workspace-entity-layout alias=${this.alias}>
+			<umb-workspace-entity alias=${this.alias}>
 				<div id="header" slot="header">
 					<uui-input id="name-input" .value=${this._content?.name} @input="${this._handleInput}">
 						<!-- Implement Variant Selector -->
@@ -257,7 +257,7 @@ export class UmbWorkspaceContentElement extends UmbContextProviderMixin(
 					look="primary"
 					color="positive"
 					label="Save and publish"></uui-button>
-			</umb-workspace-entity-layout>
+			</umb-workspace-entity>
 		`;
 	}
 }

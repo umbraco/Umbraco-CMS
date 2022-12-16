@@ -127,7 +127,7 @@ export class UmbWorkspaceDocumentTypeElement extends UmbContextProviderMixin(
 
 	render() {
 		return html`
-			<umb-workspace-entity-layout alias="Umb.Workspace.DocumentType">
+			<umb-workspace-entity alias="Umb.Workspace.DocumentType">
 				<div id="header" slot="header">
 					<umb-property-editor-ui-icon-picker></umb-property-editor-ui-icon-picker>
 					<uui-input id="name" .value=${this._documentType?.name} @input="${this._handleInput}">
@@ -136,7 +136,7 @@ export class UmbWorkspaceDocumentTypeElement extends UmbContextProviderMixin(
 				</div>
 
 				<div slot="footer">Keyboard Shortcuts</div>
-			</umb-workspace-entity-layout>
+			</umb-workspace-entity>
 		`;
 	}
 }

@@ -14,7 +14,7 @@ import '../../../components/body-layout/body-layout.element';
 import '../../../components/extension-slot/extension-slot.element';
 
 /**
- * @element umb-workspace-entity-layout
+ * @element umb-workspace-entity
  * @description
  * @slot icon - Slot for rendering the entity icon
  * @slot name - Slot for rendering the entity name
@@ -22,11 +22,11 @@ import '../../../components/extension-slot/extension-slot.element';
  * @slot actions - Slot for rendering the entity actions
  * @slot default - slot for main content
  * @export
- * @class UmbWorkspaceEntityLayout
+ * @class UmbWorkspaceEntity
  * @extends {UmbContextConsumerMixin(LitElement)}
  */
-@customElement('umb-workspace-entity-layout')
-export class UmbWorkspaceEntityLayout extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+@customElement('umb-workspace-entity')
+export class UmbWorkspaceEntity extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -170,6 +170,6 @@ export class UmbWorkspaceEntityLayout extends UmbContextConsumerMixin(UmbObserve
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-workspace-entity-layout': UmbWorkspaceEntityLayout;
+		'umb-workspace-entity': UmbWorkspaceEntity;
 	}
 }

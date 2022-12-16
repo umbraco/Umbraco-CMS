@@ -17,7 +17,7 @@ import '@umbraco-cms/components/input-user-group/input-user-group.element';
 
 import { umbCurrentUserService } from 'src/core/services/current-user';
 import { UmbModalService } from '@umbraco-cms/services';
-import '../shared/workspace-entity-layout/workspace-entity-layout.element';
+import '../shared/workspace-entity/workspace-entity.element';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 
@@ -372,13 +372,13 @@ export class UmbWorkspaceUserElement extends UmbContextProviderMixin(
 		if (!this._user) return html`User not found`;
 
 		return html`
-			<umb-workspace-entity-layout alias="Umb.Workspace.User">
+			<umb-workspace-entity alias="Umb.Workspace.User">
 				<uui-input id="name" slot="name" .value=${this._userName} @input="${this._handleInput}"></uui-input>
 				<div id="main">
 					<div id="left-column">${this._renderLeftColumn()}</div>
 					<div id="right-column">${this._renderRightColumn()}</div>
 				</div>
-			</umb-workspace-entity-layout>
+			</umb-workspace-entity>
 		`;
 	}
 }

@@ -377,13 +377,13 @@ export class UmbWorkspaceUserGroupElement extends UmbContextProviderMixin(
 		if (!this._userGroup) return nothing;
 
 		return html`
-			<umb-workspace-entity-layout alias="Umb.Workspace.UserGroup">
+			<umb-workspace-entity alias="Umb.Workspace.UserGroup">
 				<uui-input id="name" slot="header" .value=${this._userGroup.name} @input="${this._handleInput}"></uui-input>
 				<div id="main">
 					<div id="left-column">${this.renderLeftColumn()}</div>
 					<div id="right-column">${this.renderRightColumn()}</div>
 				</div>
-			</umb-workspace-entity-layout>
+			</umb-workspace-entity>
 		`;
 	}
 }
