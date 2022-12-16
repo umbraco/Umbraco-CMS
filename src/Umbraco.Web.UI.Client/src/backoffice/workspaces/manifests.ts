@@ -32,7 +32,7 @@ export const manifests: Array<ManifestWorkspace> = [
 		type: 'workspace',
 		alias: 'Umb.Workspace.DocumentType',
 		name: 'Document Type Editor',
-		loader: () => import('./document-type/editor-document-type.element'),
+		loader: () => import('./document-type/workspace-document-type.element'),
 		meta: {
 			entityType: 'document-type',
 		},
