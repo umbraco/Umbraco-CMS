@@ -30,7 +30,7 @@ export const manifests: Array<ManifestWorkspace> = [
 	},
 	{
 		type: 'workspace',
-		alias: 'Umb.Editor.DocumentType',
+		alias: 'Umb.Workspace.DocumentType',
 		name: 'Document Type Editor',
 		loader: () => import('./document-type/editor-document-type.element'),
 		meta: {
@@ -75,7 +75,7 @@ export const manifests: Array<ManifestWorkspace> = [
 	},
 	{
 		type: 'workspace',
-		alias: 'Umb.Editor.Document',
+		alias: 'Umb.Workspace.Document',
 		name: 'Content Editor',
 		loader: () => import('./document/editor-document.element'),
 		meta: {

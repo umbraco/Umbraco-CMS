@@ -161,7 +161,7 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(
 				name: 'EditorActionUserSave',
 				loader: () => import('./actions/editor-action-user-save.element'),
 				meta: {
-					editors: ['Umb.Editor.User'],
+					workspaces: ['Umb.Editor.User'],
 				},
 			},
 		];

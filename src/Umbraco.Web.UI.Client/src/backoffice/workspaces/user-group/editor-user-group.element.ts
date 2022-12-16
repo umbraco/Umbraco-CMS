@@ -212,7 +212,7 @@ export class UmbEditorUserGroupElement extends UmbContextProviderMixin(
 				name: 'EditorActionUserGroupSave',
 				loader: () => import('./actions/editor-action-user-group-save.element'),
 				meta: {
-					editors: ['Umb.Editor.UserGroup'],
+					workspaces: ['Umb.Editor.UserGroup'],
 				},
 			},
 		];

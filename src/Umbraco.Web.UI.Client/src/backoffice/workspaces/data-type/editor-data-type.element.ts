@@ -64,7 +64,7 @@ export class UmbEditorDataTypeElement extends UmbContextProviderMixin(
 				loader: () => import('./views/edit/editor-view-data-type-edit.element'),
 				weight: 90,
 				meta: {
-					editors: ['Umb.Editor.DataType'],
+					workspaces: ['Umb.Editor.DataType'],
 					label: 'Edit',
 					pathname: 'edit',
 					icon: 'edit',
@@ -77,7 +77,7 @@ export class UmbEditorDataTypeElement extends UmbContextProviderMixin(
 				loader: () => import('./views/info/editor-view-data-type-info.element'),
 				weight: 90,
 				meta: {
-					editors: ['Umb.Editor.DataType'],
+					workspaces: ['Umb.Editor.DataType'],
 					label: 'Info',
 					pathname: 'info',
 					icon: 'info',
@@ -89,7 +89,7 @@ export class UmbEditorDataTypeElement extends UmbContextProviderMixin(
 				name: 'Save Data Type Editor Action',
 				loader: () => import('./actions/save/editor-action-data-type-save.element'),
 				meta: {
-					editors: ['Umb.Editor.DataType'],
+					workspaces: ['Umb.Editor.DataType'],
 				},
 			},
 		];

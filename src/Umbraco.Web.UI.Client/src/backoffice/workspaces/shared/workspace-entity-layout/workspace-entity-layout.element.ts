@@ -86,7 +86,7 @@ export class UmbWorkspaceEntityLayout extends UmbContextConsumerMixin(UmbObserve
 		this.observe<ManifestWorkspaceView[]>(
 			umbExtensionsRegistry
 				.extensionsOfType('workspaceView')
-				.pipe(map((extensions) => extensions.filter((extension) => extension.meta.editors.includes(this.alias)))),
+				.pipe(map((extensions) => extensions.filter((extension) => extension.meta.workspaces.includes(this.alias)))),
 			(workspaceViews) => {
 				this._workspaceViews = workspaceViews;
 				this._createRoutes();
@@ -161,7 +161,7 @@ export class UmbWorkspaceEntityLayout extends UmbContextConsumerMixin(UmbObserve
 				<slot></slot>
 
 				<slot name="footer" slot="footer"></slot>
-				<umb-extension-slot slot="actions" type="workspaceAction" .filter=${(extension: any) => extension.meta.editors.includes(this.alias)}></umb-extension-slot>
+				<umb-extension-slot slot="actions" type="workspaceAction" .filter=${(extension: any) => extension.meta.workspaces.includes(this.alias)}></umb-extension-slot>
 				<slot name="actions" slot="actions"></slot>
 				
 			</umb-body-layout>

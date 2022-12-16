@@ -71,7 +71,7 @@ export class UmbEditorDocumentTypeElement extends UmbContextProviderMixin(
 				loader: () => import('./views/design/editor-view-document-type-design.element'),
 				weight: 100,
 				meta: {
-					workspaces: ['Umb.Editor.DocumentType'],
+					workspaces: ['Umb.Workspace.DocumentType'],
 					label: 'Design',
 					pathname: 'design',
 					icon: 'edit',
@@ -83,7 +83,7 @@ export class UmbEditorDocumentTypeElement extends UmbContextProviderMixin(
 				name: 'Save Document Type Editor Action',
 				loader: () => import('./actions/save/editor-action-document-type-save.element'),
 				meta: {
-					editors: ['Umb.Editor.DocumentType'],
+					workspaces: ['Umb.Workspace.DocumentType'],
 				},
 			},
 		];
@@ -127,7 +127,7 @@ export class UmbEditorDocumentTypeElement extends UmbContextProviderMixin(
 
 	render() {
 		return html`
-			<umb-workspace-entity-layout alias="Umb.Editor.DocumentType">
+			<umb-workspace-entity-layout alias="Umb.Workspace.DocumentType">
 				<div id="header" slot="header">
 					<umb-property-editor-ui-icon-picker></umb-property-editor-ui-icon-picker>
 					<uui-input id="name" .value=${this._documentType?.name} @input="${this._handleInput}">
