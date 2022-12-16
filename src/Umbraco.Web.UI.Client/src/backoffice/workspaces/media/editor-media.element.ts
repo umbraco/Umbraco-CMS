@@ -6,7 +6,7 @@ import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbMediaStore } from 'src/core/stores/media/media.store';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 
-import '../shared/editor-content/editor-content.element';
+import '../shared/workspace-content/workspace-content.element';
 
 @customElement('umb-editor-media')
 export class UmbEditorMediaElement extends UmbContextConsumerMixin(UmbContextProviderMixin(LitElement)) {
@@ -40,7 +40,7 @@ export class UmbEditorMediaElement extends UmbContextConsumerMixin(UmbContextPro
 				type: 'workspaceView',
 				alias: 'Umb.EditorView.Media.Edit',
 				name: 'Media Editor Edit View',
-				loader: () => import('../shared/editor-content/views/edit/editor-view-content-edit.element'),
+				loader: () => import('../shared/workspace-content/views/edit/editor-view-content-edit.element'),
 				weight: 200,
 				meta: {
 					editors: ['Umb.Editor.Media'],
@@ -53,7 +53,7 @@ export class UmbEditorMediaElement extends UmbContextConsumerMixin(UmbContextPro
 				type: 'workspaceView',
 				alias: 'Umb.EditorView.Media.Info',
 				name: 'Media Editor Info View',
-				loader: () => import('../shared/editor-content/views/info/editor-view-content-info.element'),
+				loader: () => import('../shared/workspace-content/views/info/editor-view-content-info.element'),
 				weight: 100,
 				meta: {
 					editors: ['Umb.Editor.Media'],
@@ -71,7 +71,7 @@ export class UmbEditorMediaElement extends UmbContextConsumerMixin(UmbContextPro
 	}
 
 	render() {
-		return html`<umb-editor-content .entityKey=${this.entityKey} alias="Umb.Editor.Media"></umb-editor-content>`;
+		return html`<umb-workspace-content .entityKey=${this.entityKey} alias="Umb.Editor.Media"></umb-workspace-content>`;
 	}
 }
 

@@ -19,8 +19,8 @@ import '../workspace-entity-layout/workspace-entity-layout.element';
 import './views/edit/editor-view-content-edit.element';
 import './views/info/editor-view-content-info.element';
 
-@customElement('umb-editor-content')
-export class UmbEditorContentElement extends UmbContextProviderMixin(
+@customElement('umb-workspace-content')
+export class UmbWorkspaceContentElement extends UmbContextProviderMixin(
 	UmbContextConsumerMixin(UmbObserverMixin(LitElement))
 ) {
 	static styles = [
@@ -115,7 +115,7 @@ export class UmbEditorContentElement extends UmbContextProviderMixin(
 		if (!this._store) return;
 
 		this.observe<DocumentDetails | MediaDetails>(this._store.getByKey(this.entityKey), (content) => {
-			if (!content) return; // TODO: Handle nicely if there is no node.
+			if (!content) return; // TODO: Handle nicely if there is no content data.
 
 			if (!this._nodeContext) {
 				this._nodeContext = new UmbNodeContext(content);
@@ -135,7 +135,7 @@ export class UmbEditorContentElement extends UmbContextProviderMixin(
 	}
 
 	private _onSave() {
-		// TODO: What if store is not present, what if content is not loaded....
+		// TODO: What if store is not present, what if content is not loaded...
 		if (this._content) {
 			this._store?.save([this._content]).then(() => {
 				const data: UmbNotificationDefaultData = { message: 'Document Saved' };
@@ -148,7 +148,7 @@ export class UmbEditorContentElement extends UmbContextProviderMixin(
 		this._onSave();
 	}
 
-	// TODO. find a way where we don't have to do this for all editors.
+	// TODO. find a way where we don't have to do this for all workspaces.
 	private _handleInput(event: UUIInputEvent) {
 		if (event instanceof UUIInputEvent) {
 			const target = event.composedPath()[0] as UUIInputElement;
@@ -220,10 +220,10 @@ export class UmbEditorContentElement extends UmbContextProviderMixin(
 	}
 }
 
-export default UmbEditorContentElement;
+export default UmbWorkspaceContentElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-editor-content': UmbEditorContentElement;
+		'umb-workspace-content': UmbWorkspaceContentElement;
 	}
 }

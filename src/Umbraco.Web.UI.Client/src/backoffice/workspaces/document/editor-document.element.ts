@@ -6,7 +6,7 @@ import type { ManifestWorkspaceView } from '@umbraco-cms/models';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import type { UmbDocumentStore } from 'src/core/stores/document/document.store';
 
-import '../shared/editor-content/editor-content.element';
+import '../shared/workspace-content/workspace-content.element';
 
 @customElement('umb-editor-document')
 export class UmbEditorDocumentElement extends UmbContextConsumerMixin(UmbContextProviderMixin(LitElement)) {
@@ -40,7 +40,7 @@ export class UmbEditorDocumentElement extends UmbContextConsumerMixin(UmbContext
 				type: 'workspaceView',
 				alias: 'Umb.EditorView.Document.Edit',
 				name: 'Document Editor Edit View',
-				loader: () => import('../shared/editor-content/views/edit/editor-view-content-edit.element'),
+				loader: () => import('../shared/workspace-content/views/edit/editor-view-content-edit.element'),
 				weight: 200,
 				meta: {
 					editors: ['Umb.Editor.Document'],
@@ -53,7 +53,7 @@ export class UmbEditorDocumentElement extends UmbContextConsumerMixin(UmbContext
 				type: 'workspaceView',
 				alias: 'Umb.EditorView.Document.Info',
 				name: 'Document Editor Info View',
-				loader: () => import('../shared/editor-content/views/info/editor-view-content-info.element'),
+				loader: () => import('../shared/workspace-content/views/info/editor-view-content-info.element'),
 				weight: 100,
 				meta: {
 					editors: ['Umb.Editor.Document'],
@@ -71,7 +71,7 @@ export class UmbEditorDocumentElement extends UmbContextConsumerMixin(UmbContext
 	}
 
 	render() {
-		return html`<umb-editor-content .entityKey=${this.entityKey} alias="Umb.Editor.Document"></umb-editor-content>`;
+		return html`<umb-workspace-content .entityKey=${this.entityKey} alias="Umb.Editor.Document"></umb-workspace-content>`;
 	}
 }
 
