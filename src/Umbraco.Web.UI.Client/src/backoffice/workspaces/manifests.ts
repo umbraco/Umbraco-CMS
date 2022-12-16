@@ -23,7 +23,7 @@ export const manifests: Array<ManifestWorkspace> = [
 		type: 'workspace',
 		alias: 'Umb.Editor.DataType',
 		name: 'Data Type Editor',
-		loader: () => import('./data-type/editor-data-type.element'),
+		loader: () => import('./data-type/workspace-data-type.element'),
 		meta: {
 			entityType: 'data-type',
 		},

@@ -9,11 +9,11 @@ import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextProviderMixin, UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 /**
- *  @element umb-editor-data-type
- *  @description - Element for displaying a Data Type Editor
+ *  @element umb-workspace-data-type
+ *  @description - Element for displaying a Data Type Workspace
  */
-@customElement('umb-editor-data-type')
-export class UmbEditorDataTypeElement extends UmbContextProviderMixin(
+@customElement('umb-workspace-data-type')
+export class UmbWorkspaceDataTypeElement extends UmbContextProviderMixin(
 	UmbContextConsumerMixin(UmbObserverMixin(LitElement))
 ) {
 	static styles = [
@@ -59,12 +59,12 @@ export class UmbEditorDataTypeElement extends UmbContextProviderMixin(
 		const extensions: Array<any> = [
 			{
 				type: 'workspaceView',
-				alias: 'Umb.EditorView.DataType.Edit',
-				name: 'Data Type Editor Edit View',
+				alias: 'Umb.WorkspaceView.DataType.Edit',
+				name: 'Data Type Workspace Edit View',
 				loader: () => import('./views/edit/editor-view-data-type-edit.element'),
 				weight: 90,
 				meta: {
-					workspaces: ['Umb.Editor.DataType'],
+					workspaces: ['Umb.Workspace.DataType'],
 					label: 'Edit',
 					pathname: 'edit',
 					icon: 'edit',
@@ -72,12 +72,12 @@ export class UmbEditorDataTypeElement extends UmbContextProviderMixin(
 			},
 			{
 				type: 'workspaceView',
-				alias: 'Umb.EditorView.DataType.Info',
-				name: 'Data Type Editor Info View',
+				alias: 'Umb.WorkspaceView.DataType.Info',
+				name: 'Data Type Workspace Info View',
 				loader: () => import('./views/info/editor-view-data-type-info.element'),
 				weight: 90,
 				meta: {
-					workspaces: ['Umb.Editor.DataType'],
+					workspaces: ['Umb.Workspace.DataType'],
 					label: 'Info',
 					pathname: 'info',
 					icon: 'info',
@@ -85,11 +85,11 @@ export class UmbEditorDataTypeElement extends UmbContextProviderMixin(
 			},
 			{
 				type: 'workspaceAction',
-				alias: 'Umb.EditorAction.DataType.Save',
-				name: 'Save Data Type Editor Action',
+				alias: 'Umb.WorkspaceAction.DataType.Save',
+				name: 'Save Data Type Workspace Action',
 				loader: () => import('./actions/save/editor-action-data-type-save.element'),
 				meta: {
-					workspaces: ['Umb.Editor.DataType'],
+					workspaces: ['Umb.Workspace.DataType'],
 				},
 			},
 		];
@@ -126,7 +126,7 @@ export class UmbEditorDataTypeElement extends UmbContextProviderMixin(
 		this._dataTypeContext?.setPropertyValue(target?.alias, target?.value);
 	};
 
-	// TODO. find a way where we don't have to do this for all editors.
+	// TODO. find a way where we don't have to do this for all Workspaces.
 	private _handleInput(event: UUIInputEvent) {
 		if (event instanceof UUIInputEvent) {
 			const target = event.composedPath()[0] as UUIInputElement;
@@ -139,17 +139,17 @@ export class UmbEditorDataTypeElement extends UmbContextProviderMixin(
 
 	render() {
 		return html`
-			<umb-workspace-entity-layout alias="Umb.Editor.DataType">
+			<umb-workspace-entity-layout alias="Umb.Workspace.DataType">
 				<uui-input id="header" slot="header" .value=${this._dataTypeName} @input="${this._handleInput}"></uui-input>
 			</umb-workspace-entity-layout>
 		`;
 	}
 }
 
-export default UmbEditorDataTypeElement;
+export default UmbWorkspaceDataTypeElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-editor-data-type': UmbEditorDataTypeElement;
+		'umb-workspace-data-type': UmbWorkspaceDataTypeElement;
 	}
 }
