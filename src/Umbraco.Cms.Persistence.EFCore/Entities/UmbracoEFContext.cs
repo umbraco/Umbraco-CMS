@@ -1400,7 +1400,7 @@ namespace Umbraco.Cms.Persistence.EFCore.Entities
                     .HasColumnName("id");
 
                 entity.Property(e => e.CreateDate)
-                    .HasColumnType("TEXT")
+                    .HasColumnType("datetime")
                     .HasColumnName("createDate")
                     .HasDefaultValueSql("DATE()");
 
