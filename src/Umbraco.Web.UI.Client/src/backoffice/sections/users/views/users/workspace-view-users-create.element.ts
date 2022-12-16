@@ -9,8 +9,8 @@ import { UmbModalLayoutElement, UmbNotificationDefaultData, UmbNotificationServi
 import { UmbUserStore } from '@umbraco-cms/stores/user/user.store';
 
 export type UsersViewType = 'list' | 'grid';
-@customElement('umb-editor-view-users-create')
-export class UmbEditorViewUsersCreateElement extends UmbContextConsumerMixin(UmbModalLayoutElement) {
+@customElement('umb-workspace-view-users-create')
+export class UmbWorkspaceViewUsersCreateElement extends UmbContextConsumerMixin(UmbModalLayoutElement) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -203,10 +203,10 @@ export class UmbEditorViewUsersCreateElement extends UmbContextConsumerMixin(Umb
 	}
 }
 
-export default UmbEditorViewUsersCreateElement;
+export default UmbWorkspaceViewUsersCreateElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-editor-view-users-create': UmbEditorViewUsersCreateElement;
+		'umb-workspace-view-users-create': UmbWorkspaceViewUsersCreateElement;
 	}
 }

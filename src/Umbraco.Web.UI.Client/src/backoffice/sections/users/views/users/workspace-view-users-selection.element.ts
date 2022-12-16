@@ -6,8 +6,8 @@ import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbUserStore } from '@umbraco-cms/stores/user/user.store';
 
-@customElement('umb-editor-view-users-selection')
-export class UmbEditorViewUsersSelectionElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+@customElement('umb-workspace-view-users-selection')
+export class UmbWorkspaceViewUsersSelectionElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -74,10 +74,10 @@ export class UmbEditorViewUsersSelectionElement extends UmbContextConsumerMixin(
 	}
 }
 
-export default UmbEditorViewUsersSelectionElement;
+export default UmbWorkspaceViewUsersSelectionElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-editor-view-users-selection': UmbEditorViewUsersSelectionElement;
+		'umb-workspace-view-users-selection': UmbWorkspaceViewUsersSelectionElement;
 	}
 }

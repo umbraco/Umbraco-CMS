@@ -19,8 +19,8 @@ import './column-layouts/name/user-table-name-column-layout.element';
 import './column-layouts/status/user-table-status-column-layout.element';
 import { UmbUserGroupStore } from 'src/core/stores/user/user-group.store';
 
-@customElement('umb-editor-view-users-table')
-export class UmbEditorViewUsersTableElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+@customElement('umb-workspace-view-users-table')
+export class UmbWorkspaceViewUsersTableElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -184,10 +184,10 @@ export class UmbEditorViewUsersTableElement extends UmbContextConsumerMixin(UmbO
 	}
 }
 
-export default UmbEditorViewUsersTableElement;
+export default UmbWorkspaceViewUsersTableElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-editor-view-users-table': UmbEditorViewUsersTableElement;
+		'umb-workspace-view-users-table': UmbWorkspaceViewUsersTableElement;
 	}
 }

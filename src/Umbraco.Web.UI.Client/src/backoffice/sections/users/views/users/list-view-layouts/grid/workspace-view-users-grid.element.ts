@@ -10,8 +10,8 @@ import type { UserDetails, UserEntity, UserGroupDetails, UserGroupEntity } from 
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbUserGroupStore } from 'src/core/stores/user/user-group.store';
 
-@customElement('umb-editor-view-users-grid')
-export class UmbEditorViewUsersGridElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+@customElement('umb-workspace-view-users-grid')
+export class UmbWorkspaceViewUsersGridElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -158,10 +158,10 @@ export class UmbEditorViewUsersGridElement extends UmbContextConsumerMixin(UmbOb
 	}
 }
 
-export default UmbEditorViewUsersGridElement;
+export default UmbWorkspaceViewUsersGridElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-editor-view-users-grid': UmbEditorViewUsersGridElement;
+		'umb-workspace-view-users-grid': UmbWorkspaceViewUsersGridElement;
 	}
 }

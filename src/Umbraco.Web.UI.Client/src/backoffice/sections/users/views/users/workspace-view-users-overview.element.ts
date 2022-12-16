@@ -8,16 +8,16 @@ import type { UmbSectionViewUsersElement } from './section-view-users.element';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 
-import './list-view-layouts/table/editor-view-users-table.element';
-import './list-view-layouts/grid/editor-view-users-grid.element';
-import './editor-view-users-selection.element';
-import './editor-view-users-invite.element';
-import './editor-view-users-create.element';
+import './list-view-layouts/table/workspace-view-users-table.element';
+import './list-view-layouts/grid/workspace-view-users-grid.element';
+import './workspace-view-users-selection.element';
+import './workspace-view-users-invite.element';
+import './workspace-view-users-create.element';
 import { UmbModalService } from '@umbraco-cms/services';
 
 export type UsersViewType = 'list' | 'grid';
-@customElement('umb-editor-view-users-overview')
-export class UmbEditorViewUsersOverviewElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+@customElement('umb-workspace-view-users-overview')
+export class UmbWorkspaceViewUsersOverviewElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -90,11 +90,11 @@ export class UmbEditorViewUsersOverviewElement extends UmbContextConsumerMixin(U
 	private _routes: IRoute[] = [
 		{
 			path: 'grid',
-			component: () => import('./list-view-layouts/grid/editor-view-users-grid.element'),
+			component: () => import('./list-view-layouts/grid/workspace-view-users-grid.element'),
 		},
 		{
 			path: 'list',
-			component: () => import('./list-view-layouts/table/editor-view-users-table.element'),
+			component: () => import('./list-view-layouts/table/workspace-view-users-table.element'),
 		},
 		{
 			path: '**',
@@ -136,7 +136,7 @@ export class UmbEditorViewUsersOverviewElement extends UmbContextConsumerMixin(U
 	private _renderSelection() {
 		if (this._selection.length === 0) return nothing;
 
-		return html`<umb-editor-view-users-selection></umb-editor-view-users-selection>`;
+		return html`<umb-workspace-view-users-selection></umb-workspace-view-users-selection>`;
 	}
 
 	private _handleTogglePopover(event: PointerEvent) {
@@ -163,9 +163,9 @@ export class UmbEditorViewUsersOverviewElement extends UmbContextConsumerMixin(U
 	private _showInviteOrCreate() {
 		let modal = undefined;
 		if (this.isCloud) {
-			modal = document.createElement('umb-editor-view-users-invite');
+			modal = document.createElement('umb-workspace-view-users-invite');
 		} else {
-			modal = document.createElement('umb-editor-view-users-create');
+			modal = document.createElement('umb-workspace-view-users-create');
 		}
 		this._modalService?.open(modal, { type: 'dialog' });
 	}
@@ -228,10 +228,10 @@ export class UmbEditorViewUsersOverviewElement extends UmbContextConsumerMixin(U
 	}
 }
 
-export default UmbEditorViewUsersOverviewElement;
+export default UmbWorkspaceViewUsersOverviewElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-editor-view-users-overview': UmbEditorViewUsersOverviewElement;
+		'umb-workspace-view-users-overview': UmbWorkspaceViewUsersOverviewElement;
 	}
 }

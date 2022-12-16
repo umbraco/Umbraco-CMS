@@ -1,16 +1,16 @@
 import { expect, fixture, html } from '@open-wc/testing';
 //TODO: Test has been commented out while we figure out how to setup import maps for the test environment
-// import UmbEditorViewUsersInviteElement from './editor-view-users-invite.element';
+// import UmbWorkspaceViewUsersSelectionElement from './editor-view-users-selection.element';
 // import { defaultA11yConfig } from '@umbraco-cms/test-utils';
 
-// describe('UmbEditorViewUsersInviteElement', () => {
-// 	let element: UmbEditorViewUsersInviteElement;
+// describe('UmbWorkspaceViewUsersSelectionElement', () => {
+// 	let element: UmbWorkspaceViewUsersSelectionElement;
 // 	beforeEach(async () => {
-// 		element = await fixture(html`<umb-editor-view-users-invite></umb-editor-view-users-invite>`);
+// 		element = await fixture(html`<umb-workspace-view-users-selection></umb-workspace-view-users-selection>`);
 // 	});
 
 // 	it('is defined with its own instance', () => {
-// 		expect(element).to.be.instanceOf(UmbEditorViewUsersInviteElement);
+// 		expect(element).to.be.instanceOf(UmbWorkspaceViewUsersSelectionElement);
 // 	});
 
 // 	it('passes the a11y audit', async () => {

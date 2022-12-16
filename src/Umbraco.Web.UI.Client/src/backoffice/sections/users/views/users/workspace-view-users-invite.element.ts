@@ -8,8 +8,8 @@ import { UmbModalLayoutElement } from '@umbraco-cms/services';
 import { UmbUserStore } from '@umbraco-cms/stores/user/user.store';
 
 export type UsersViewType = 'list' | 'grid';
-@customElement('umb-editor-view-users-invite')
-export class UmbEditorViewUsersInviteElement extends UmbContextConsumerMixin(UmbModalLayoutElement) {
+@customElement('umb-workspace-view-users-invite')
+export class UmbWorkspaceViewUsersInviteElement extends UmbContextConsumerMixin(UmbModalLayoutElement) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -183,10 +183,10 @@ export class UmbEditorViewUsersInviteElement extends UmbContextConsumerMixin(Umb
 	}
 }
 
-export default UmbEditorViewUsersInviteElement;
+export default UmbWorkspaceViewUsersInviteElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-editor-view-users-invite': UmbEditorViewUsersInviteElement;
+		'umb-workspace-view-users-invite': UmbWorkspaceViewUsersInviteElement;
 	}
 }
