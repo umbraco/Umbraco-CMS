@@ -66,7 +66,7 @@ export class UmbWorkspaceDocumentTypeElement extends UmbContextProviderMixin(
 		const extensions: Array<ManifestTypes> = [
 			{
 				type: 'workspaceView',
-				alias: 'Umb.EditorView.DocumentType.Design',
+				alias: 'Umb.WorkspaceView.DocumentType.Design',
 				name: 'Document Type Workspace Design View',
 				loader: () => import('./views/design/workspace-view-document-type-design.element'),
 				weight: 100,
@@ -79,7 +79,7 @@ export class UmbWorkspaceDocumentTypeElement extends UmbContextProviderMixin(
 			},
 			{
 				type: 'workspaceAction',
-				alias: 'Umb.EditorAction.DocumentType.Save',
+				alias: 'Umb.WorkspaceAction.DocumentType.Save',
 				name: 'Save Document Type Workspace Action',
 				loader: () => import('./actions/save/workspace-action-document-type-save.element'),
 				meta: {

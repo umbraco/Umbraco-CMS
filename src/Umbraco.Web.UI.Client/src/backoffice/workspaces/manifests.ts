@@ -3,7 +3,7 @@ import type { ManifestWorkspace } from '@umbraco-cms/models';
 export const manifests: Array<ManifestWorkspace> = [
 	{
 		type: 'workspace',
-		alias: 'Umb.Editor.Member',
+		alias: 'Umb.Workspace.Member',
 		name: 'Member Editor',
 		loader: () => import('./member/workspace-member.element'),
 		meta: {
@@ -12,7 +12,7 @@ export const manifests: Array<ManifestWorkspace> = [
 	},
 	{
 		type: 'workspace',
-		alias: 'Umb.Editor.MemberGroup',
+		alias: 'Umb.Workspace.MemberGroup',
 		name: 'Member Group Editor',
 		loader: () => import('./member-group/workspace-member-group.element'),
 		meta: {
@@ -21,7 +21,7 @@ export const manifests: Array<ManifestWorkspace> = [
 	},
 	{
 		type: 'workspace',
-		alias: 'Umb.Editor.DataType',
+		alias: 'Umb.Workspace.DataType',
 		name: 'Data Type Editor',
 		loader: () => import('./data-type/workspace-data-type.element'),
 		meta: {
@@ -39,7 +39,7 @@ export const manifests: Array<ManifestWorkspace> = [
 	},
 	{
 		type: 'workspace',
-		alias: 'Umb.Editor.MediaType',
+		alias: 'Umb.Workspace.MediaType',
 		name: 'Media Type Editor',
 		loader: () => import('./media-type/workspace-media-type.element'),
 		meta: {
@@ -48,7 +48,7 @@ export const manifests: Array<ManifestWorkspace> = [
 	},
 	{
 		type: 'workspace',
-		alias: 'Umb.Editor.MemberType',
+		alias: 'Umb.Workspace.MemberType',
 		name: 'Member Type Editor',
 		loader: () => import('./member-type/workspace-member-type.element'),
 		meta: {
@@ -57,7 +57,7 @@ export const manifests: Array<ManifestWorkspace> = [
 	},
 	{
 		type: 'workspace',
-		alias: 'Umb.Editor.Extensions',
+		alias: 'Umb.Workspace.Extensions',
 		name: 'Extensions Editor',
 		loader: () => import('./extensions/workspace-extensions.element'),
 		meta: {
@@ -66,7 +66,7 @@ export const manifests: Array<ManifestWorkspace> = [
 	},
 	{
 		type: 'workspace',
-		alias: 'Umb.Editor.Media',
+		alias: 'Umb.Workspace.Media',
 		name: 'Media Editor',
 		loader: () => import('./media/workspace-media.element'),
 		meta: {
@@ -102,7 +102,7 @@ export const manifests: Array<ManifestWorkspace> = [
 	},
 	{
 		type: 'workspace',
-		alias: 'Umb.Editor.Package',
+		alias: 'Umb.Workspace.Package',
 		name: 'Package Editor',
 		loader: () => import('./package/workspace-package.element'),
 		meta: {
@@ -111,7 +111,7 @@ export const manifests: Array<ManifestWorkspace> = [
 	},
 	{
 		type: 'workspace',
-		alias: 'Umb.Editor.PackageBuilder',
+		alias: 'Umb.Workspace.PackageBuilder',
 		name: 'Package Builder Editor',
 		loader: () => import('./package-builder/workspace-package-builder.element'),
 		meta: {
