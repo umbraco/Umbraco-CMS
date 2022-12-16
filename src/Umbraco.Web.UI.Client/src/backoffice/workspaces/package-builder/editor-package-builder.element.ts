@@ -16,8 +16,8 @@ export class UmbEditorPackageBuilderElement extends LitElement {
 	];
 
 	render() {
-		return html`<umb-editor-entity-layout alias="Umb.Editor.PackageBuilder"
-			>PACKAGE BUILDER</umb-editor-entity-layout
+		return html`<umb-workspace-entity-layout alias="Umb.Editor.PackageBuilder"
+			>PACKAGE BUILDER</umb-workspace-entity-layout
 		> `;
 	}
 }

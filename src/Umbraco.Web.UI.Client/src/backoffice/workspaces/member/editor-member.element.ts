@@ -19,7 +19,7 @@ export class UmbEditorMemberElement extends LitElement {
 	id!: string;
 
 	render() {
-		return html` <umb-editor-entity-layout alias="Umb.Editor.Member">Member Editor</umb-editor-entity-layout> `;
+		return html` <umb-workspace-entity-layout alias="Umb.Editor.Member">Member Editor</umb-workspace-entity-layout> `;
 	}
 }
 

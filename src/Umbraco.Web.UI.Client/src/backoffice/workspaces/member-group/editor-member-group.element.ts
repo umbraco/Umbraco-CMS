@@ -2,10 +2,8 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
-import '../shared/editor-entity-layout/editor-entity-layout.element';
-
-@customElement('umb-editor-media-type')
-export class UmbEditorMediaTypeElement extends LitElement {
+@customElement('umb-editor-member-group')
+export class UmbEditorMemberGroupElement extends LitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -21,14 +19,16 @@ export class UmbEditorMediaTypeElement extends LitElement {
 	id!: string;
 
 	render() {
-		return html` <umb-editor-entity-layout alias="Umb.Editor.MediaType">Media Type Editor</umb-editor-entity-layout> `;
+		return html`
+			<umb-workspace-entity-layout alias="Umb.Editor.MemberGroup">Member Group Editor</umb-workspace-entity-layout>
+		`;
 	}
 }
 
-export default UmbEditorMediaTypeElement;
+export default UmbEditorMemberGroupElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-editor-media-type': UmbEditorMediaTypeElement;
+		'umb-editor-member-group': UmbEditorMemberGroupElement;
 	}
 }

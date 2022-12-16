@@ -172,7 +172,7 @@ export class UmbEditorContentElement extends UmbContextProviderMixin(
 
 	render() {
 		return html`
-			<umb-editor-entity-layout alias=${this.alias}>
+			<umb-workspace-entity-layout alias=${this.alias}>
 				<div id="header" slot="header">
 					<uui-input id="name-input" .value=${this._content?.name} @input="${this._handleInput}">
 						<!-- Implement Variant Selector -->
@@ -215,7 +215,7 @@ export class UmbEditorContentElement extends UmbContextProviderMixin(
 					look="primary"
 					color="positive"
 					label="Save and publish"></uui-button>
-			</umb-editor-entity-layout>
+			</umb-workspace-entity-layout>
 		`;
 	}
 }

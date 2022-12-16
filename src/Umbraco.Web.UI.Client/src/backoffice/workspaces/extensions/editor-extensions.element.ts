@@ -24,7 +24,7 @@ export class UmbEditorExtensionsElement extends UmbContextConsumerMixin(UmbObser
 
 	render() {
 		return html`
-			<umb-editor-entity-layout headline="Extensions" alias="Umb.Editor.Extensions">
+			<umb-workspace-entity-layout headline="Extensions" alias="Umb.Editor.Extensions">
 				<uui-box>
 					<p>List of currently loaded extensions</p>
 					<uui-table>
@@ -49,7 +49,7 @@ export class UmbEditorExtensionsElement extends UmbContextConsumerMixin(UmbObser
 						)}
 					</uui-table>
 				</uui-box>
-			</umb-editor-entity-layout>
+			</umb-workspace-entity-layout>
 		`;
 	}
 }

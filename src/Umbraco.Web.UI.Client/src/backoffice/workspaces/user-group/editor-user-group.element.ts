@@ -377,13 +377,13 @@ export class UmbEditorUserGroupElement extends UmbContextProviderMixin(
 		if (!this._userGroup) return nothing;
 
 		return html`
-			<umb-editor-entity-layout alias="Umb.Editor.UserGroup">
+			<umb-workspace-entity-layout alias="Umb.Editor.UserGroup">
 				<uui-input id="name" slot="header" .value=${this._userGroup.name} @input="${this._handleInput}"></uui-input>
 				<div id="main">
 					<div id="left-column">${this.renderLeftColumn()}</div>
 					<div id="right-column">${this.renderRightColumn()}</div>
 				</div>
-			</umb-editor-entity-layout>
+			</umb-workspace-entity-layout>
 		`;
 	}
 }

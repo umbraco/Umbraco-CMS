@@ -139,9 +139,9 @@ export class UmbEditorDataTypeElement extends UmbContextProviderMixin(
 
 	render() {
 		return html`
-			<umb-editor-entity-layout alias="Umb.Editor.DataType">
+			<umb-workspace-entity-layout alias="Umb.Editor.DataType">
 				<uui-input id="header" slot="header" .value=${this._dataTypeName} @input="${this._handleInput}"></uui-input>
-			</umb-editor-entity-layout>
+			</umb-workspace-entity-layout>
 		`;
 	}
 }

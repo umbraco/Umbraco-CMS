@@ -8,7 +8,7 @@ import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { ManifestPropertyEditorUI, ManifestTypes } from '@umbraco-cms/models';
 
 import '../../property-actions/shared/property-action-menu/property-action-menu.element';
-import '../../editors/shared/editor-property-layout/editor-property-layout.element';
+import '../../workspaces/shared/editor-property-layout/editor-property-layout.element';
 
 /**
  *  @element umb-entity-property

@@ -9,8 +9,8 @@ import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { ManifestEditor } from '@umbraco-cms/models';
 
-@customElement('umb-editor-entity')
-export class UmbEditorEntityElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+@customElement('umb-workspace-entity')
+export class UmbWorkspaceEntityElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -84,10 +84,10 @@ export class UmbEditorEntityElement extends UmbContextConsumerMixin(UmbObserverM
 	}
 }
 
-export default UmbEditorEntityElement;
+export default UmbWorkspaceEntityElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-editor-entity': UmbEditorEntityElement;
+		'umb-workspace-entity': UmbWorkspaceEntityElement;
 	}
 }

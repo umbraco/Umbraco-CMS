@@ -22,7 +22,7 @@ export class UmbEditorMemberTypeElement extends LitElement {
 
 	render() {
 		return html`
-			<umb-editor-entity-layout alias="Umb.Editor.MemberType">Member Type Editor</umb-editor-entity-layout>
+			<umb-workspace-entity-layout alias="Umb.Editor.MemberType">Member Type Editor</umb-workspace-entity-layout>
 		`;
 	}
 }

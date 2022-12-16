@@ -372,13 +372,13 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(
 		if (!this._user) return html`User not found`;
 
 		return html`
-			<umb-editor-entity-layout alias="Umb.Editor.User">
+			<umb-workspace-entity-layout alias="Umb.Editor.User">
 				<uui-input id="name" slot="name" .value=${this._userName} @input="${this._handleInput}"></uui-input>
 				<div id="main">
 					<div id="left-column">${this._renderLeftColumn()}</div>
 					<div id="right-column">${this._renderRightColumn()}</div>
 				</div>
-			</umb-editor-entity-layout>
+			</umb-workspace-entity-layout>
 		`;
 	}
 }
