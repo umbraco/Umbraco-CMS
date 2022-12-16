@@ -92,7 +92,7 @@
                     var sources = {
                         //see: https://github.com/twitter/typeahead.js/blob/master/doc/jquery_typeahead.md#options
                         // name = the data set name, we'll make this the tag group name + culture
-                        name: vm.config.group + (vm.culture ? vm.culture : ""),
+                        name: (vm.config.group + (vm.culture ? vm.culture : "")).replace(/\W/g, '-'),
                         display: "text",
                         //source: tagsHound
                         source: function (query, syncCallback, asyncCallback) {
