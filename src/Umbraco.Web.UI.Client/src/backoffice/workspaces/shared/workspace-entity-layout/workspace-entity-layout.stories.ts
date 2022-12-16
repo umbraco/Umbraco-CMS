@@ -6,7 +6,7 @@ import { html } from 'lit-html';
 import type { UmbWorkspaceEntityLayout } from './workspace-entity-layout.element';
 
 export default {
-	title: 'Editors/Shared/Editor Entity Layout',
+	title: 'Workspaces/Shared/Editor Entity Layout',
 	component: 'umb-workspace-entity-layout',
 	id: 'umb-workspace-entity-layout',
 } as Meta;

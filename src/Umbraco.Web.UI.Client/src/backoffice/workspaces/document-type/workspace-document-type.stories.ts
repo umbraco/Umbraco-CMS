@@ -8,7 +8,7 @@ import { data } from '../../../core/mocks/data/document-type.data';
 import type { UmbWorkspaceDocumentTypeElement } from './workspace-document-type.element';
 
 export default {
-	title: 'Editors/Document Type',
+	title: 'Workspaces/Document Type',
 	component: 'umb-workspace-document-type',
 	id: 'umb-workspace-document-type',
 } as Meta;

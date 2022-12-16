@@ -9,7 +9,7 @@ import { UmbDataTypeContext } from '../../data-type.context';
 import type { UmbWorkspaceViewDataTypeInfoElement } from './workspace-view-data-type-info.element';
 
 export default {
-	title: 'Editors/Data Type/Views/Info',
+	title: 'Workspaces/Data Type/Views/Info',
 	component: 'umb-workspace-view-data-type-info',
 	id: 'umb-workspace-view-data-type-info',
 	decorators: [

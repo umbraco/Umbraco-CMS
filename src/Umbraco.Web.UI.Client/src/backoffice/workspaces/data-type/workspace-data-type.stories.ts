@@ -8,7 +8,7 @@ import { data } from '../../../core/mocks/data/data-type.data';
 import type { UmbWorkspaceDataTypeElement } from './workspace-data-type.element';
 
 export default {
-	title: 'Editors/Data Type',
+	title: 'Workspaces/Data Type',
 	component: 'umb-workspace-data-type',
 	id: 'umb-workspace-data-type',
 } as Meta;

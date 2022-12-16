@@ -8,7 +8,7 @@ import { data as mediaNodes } from '../../../core/mocks/data/media.data';
 import type { UmbWorkspaceMediaElement } from './workspace-media.element';
 
 export default {
-	title: 'Editors/Media',
+	title: 'Workspaces/Media',
 	component: 'umb-workspace-media',
 	id: 'umb-workspace-media',
 } as Meta;

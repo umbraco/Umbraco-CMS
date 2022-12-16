@@ -6,7 +6,7 @@ import { html } from 'lit-html';
 import type { UmbWorkspaceExtensionsElement } from './workspace-extensions.element';
 
 export default {
-	title: 'Editors/Extensions',
+	title: 'Workspaces/Extensions',
 	component: 'umb-workspace-extensions',
 	id: 'umb-workspace-extensions',
 } as Meta;

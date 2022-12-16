@@ -8,7 +8,7 @@ import { data } from '../../../../core/mocks/data/document.data';
 import type { UmbWorkspaceContentElement } from './workspace-content.element';
 
 export default {
-	title: 'Editors/Shared/Node',
+	title: 'Workspaces/Shared/Node',
 	component: 'umb-workspace-content',
 	id: 'umb-workspace-content',
 } as Meta;

@@ -9,7 +9,7 @@ import { UmbDocumentTypeContext } from '../../document-type.context';
 import type { UmbWorkspaceViewDocumentTypeDesignElement } from './workspace-view-document-type-design.element';
 
 export default {
-	title: 'Editors/Document Type/Views/Design',
+	title: 'Workspaces/Document Type/Views/Design',
 	component: 'umb-workspace-view-document-type-design',
 	id: 'umb-workspace-view-document-type-design',
 	decorators: [

@@ -9,7 +9,7 @@ import type { UmbWorkspaceViewDataTypeEditElement } from './workspace-view-data-
 import './workspace-view-data-type-edit.element';
 
 export default {
-	title: 'Editors/Data Type/Views/Edit',
+	title: 'Workspaces/Data Type/Views/Edit',
 	component: 'umb-workspace-view-data-type-edit',
 	id: 'umb-workspace-view-data-type-edit',
 	decorators: [

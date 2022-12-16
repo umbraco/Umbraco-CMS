@@ -5,7 +5,7 @@ import type { UmbWorkspacePropertyLayoutElement } from './workspace-property-lay
 import './workspace-property-layout.element';
 
 export default {
-	title: 'Editors/Shared/Editor Property Layout',
+	title: 'Workspaces/Shared/Editor Property Layout',
 	component: 'umb-workspace-property-layout',
 	id: 'umb-workspace-property-layout',
 } as Meta;

@@ -6,7 +6,7 @@ import { html } from 'lit-html';
 import type { UmbBodyLayout } from './body-layout.element';
 
 export default {
-	title: 'Editors/Shared/Editor Layout',
+	title: 'Workspaces/Shared/Editor Layout',
 	component: 'umb-body-layout',
 	id: 'umb-body-layout',
 } as Meta;

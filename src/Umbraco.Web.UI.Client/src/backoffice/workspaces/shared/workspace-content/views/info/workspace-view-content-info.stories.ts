@@ -9,7 +9,7 @@ import { UmbNodeContext } from '../../node.context';
 import type { UmbWorkspaceViewContentInfoElement } from './workspace-view-content-info.element';
 
 export default {
-	title: 'Editors/Shared/Node/Views/Info',
+	title: 'Workspaces/Shared/Node/Views/Info',
 	component: 'umb-workspace-view-content-info',
 	id: 'umb-workspace-view-content-info',
 	decorators: [
