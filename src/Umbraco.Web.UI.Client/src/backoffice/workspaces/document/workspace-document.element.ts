@@ -1,10 +1,10 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
+import type { UmbWorkspaceContext } from '../shared/workspace/workspace.context';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import type { ManifestWorkspaceView } from '@umbraco-cms/models';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
-
 import '../shared/workspace-content/workspace-content.element';
 
 @customElement('umb-workspace-document')
@@ -23,8 +23,13 @@ export class UmbWorkspaceDocumentElement extends UmbContextConsumerMixin(UmbCont
 	@property()
 	entityKey!: string;
 
+	private _workspaceContext!:UmbWorkspaceContext;
+
 	constructor() {
 		super();
+
+		// TODO: Implement RXJS for reactivity if one of two props changes.
+		this.consumeContext('umbWorkspaceContext', (context) => this._workspaceContext = context)
 
 		// TODO: consider if registering extensions should happen initially or else where, to enable unregister of extensions.
 		this._registerWorkspaceViews();
@@ -67,7 +72,7 @@ export class UmbWorkspaceDocumentElement extends UmbContextConsumerMixin(UmbCont
 	}
 
 	render() {
-		return html`<umb-workspace-content store-alias='umbDocumentStore' .entityKey=${this.entityKey} alias="Umb.Workspace.Document"></umb-workspace-content>`;
+		return html`<umb-workspace-content store-alias='umbDocumentStore' .entityKey=${this._workspaceContext.entityKey} alias="Umb.Workspace.Document"></umb-workspace-content>`;
 	}
 }
 

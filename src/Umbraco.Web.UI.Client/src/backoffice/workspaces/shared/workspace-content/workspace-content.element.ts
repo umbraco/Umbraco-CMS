@@ -65,8 +65,17 @@ export class UmbWorkspaceContentElement extends UmbContextProviderMixin(
 		`,
 	];
 
+	private _entityKey!: string;
 	@property()
-	entityKey!: string;
+	public get entityKey() : string {
+		return this._entityKey;
+	}
+	public set entityKey(value:string) {
+		if(this._entityKey  !== value) {
+			this._entityKey = value;
+			this._observeContent();
+		}
+	}
 
 	@property()
 	alias!: string;
