@@ -3,7 +3,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { BehaviorSubject, Observable } from 'rxjs';
 import type { IRoute, IRoutingInfo } from 'router-slot';
-import { UmbWorkspaceElement } from '../../../../workspaces/shared/workspace-entity/workspace-entity.element';
+import { UmbWorkspaceElement } from '../../../../workspaces/shared/workspace/workspace.element';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 
 import './list-view-layouts/table/workspace-view-users-table.element';
@@ -35,7 +35,7 @@ export class UmbSectionViewUsersElement extends UmbContextProviderMixin(
 		},
 		{
 			path: `:entityType/:key`,
-			component: () => import('../../../../workspaces/shared/workspace-entity/workspace-entity.element'),
+			component: () => import('../../../../workspaces/shared/workspace/workspace.element'),
 			setup: (component: HTMLElement, info: IRoutingInfo) => {
 				const element = component as UmbWorkspaceElement;
 				element.entityKey = info.match.params.key;

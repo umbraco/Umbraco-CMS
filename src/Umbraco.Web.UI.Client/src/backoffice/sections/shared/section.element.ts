@@ -3,7 +3,7 @@ import { css, html, LitElement, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { map, switchMap, EMPTY, of } from 'rxjs';
 import { UmbSectionContext } from '../section.context';
-import { UmbWorkspaceElement } from '../../workspaces/shared/workspace-entity/workspace-entity.element';
+import { UmbWorkspaceElement } from '../../workspaces/shared/workspace/workspace.element';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
@@ -85,7 +85,7 @@ export class UmbSectionElement extends UmbContextConsumerMixin(UmbObserverMixin(
 			},
 			{
 				path: `:entityType/:key`,
-				component: () => import('../../workspaces/shared/workspace-entity/workspace-entity.element'),
+				component: () => import('../../workspaces/shared/workspace/workspace.element'),
 				setup: (component: UmbWorkspaceElement, info: any) => {
 					component.entityKey = info.match.params.key;
 					component.entityType = info.match.params.entityType;
@@ -93,7 +93,7 @@ export class UmbSectionElement extends UmbContextConsumerMixin(UmbObserverMixin(
 			},
 			{
 				path: `:entityType`,
-				component: () => import('../../workspaces/shared/workspace-entity/workspace-entity.element'),
+				component: () => import('../../workspaces/shared/workspace/workspace.element'),
 				setup: (component: UmbWorkspaceElement, info: any) => {
 					component.entityType = info.match.params.entityType;
 				},
