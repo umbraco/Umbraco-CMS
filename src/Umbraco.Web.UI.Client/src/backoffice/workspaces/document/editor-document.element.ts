@@ -40,7 +40,7 @@ export class UmbEditorDocumentElement extends UmbContextConsumerMixin(UmbContext
 				type: 'workspaceView',
 				alias: 'Umb.EditorView.Document.Edit',
 				name: 'Document Editor Edit View',
-				loader: () => import('../shared/workspace-content/views/edit/editor-view-content-edit.element'),
+				loader: () => import('../shared/workspace-content/views/edit/workspace-view-content-edit.element'),
 				weight: 200,
 				meta: {
 					editors: ['Umb.Editor.Document'],
@@ -53,7 +53,7 @@ export class UmbEditorDocumentElement extends UmbContextConsumerMixin(UmbContext
 				type: 'workspaceView',
 				alias: 'Umb.EditorView.Document.Info',
 				name: 'Document Editor Info View',
-				loader: () => import('../shared/workspace-content/views/info/editor-view-content-info.element'),
+				loader: () => import('../shared/workspace-content/views/info/workspace-view-content-info.element'),
 				weight: 100,
 				meta: {
 					editors: ['Umb.Editor.Document'],

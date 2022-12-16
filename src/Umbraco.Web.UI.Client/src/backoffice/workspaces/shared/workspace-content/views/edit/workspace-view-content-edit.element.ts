@@ -9,8 +9,8 @@ import type { ContentProperty, ContentPropertyData, DocumentDetails, MediaDetail
 
 import '../../../../../components/content-property/content-property.element';
 
-@customElement('umb-editor-view-content-edit')
-export class UmbEditorViewContentEditElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+@customElement('umb-workspace-view-content-edit')
+export class UmbWorkspaceViewContentEditElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -62,10 +62,10 @@ export class UmbEditorViewContentEditElement extends UmbContextConsumerMixin(Umb
 	}
 }
 
-export default UmbEditorViewContentEditElement;
+export default UmbWorkspaceViewContentEditElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-editor-view-content-edit': UmbEditorViewContentEditElement;
+		'umb-workspace-view-content-edit': UmbWorkspaceViewContentEditElement;
 	}
 }

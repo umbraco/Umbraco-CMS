@@ -16,8 +16,8 @@ import '../workspace-entity-layout/workspace-entity-layout.element';
 
 // Lazy load
 // TODO: Make this dynamic, use load-extensions method to loop over extensions for this node.
-import './views/edit/editor-view-content-edit.element';
-import './views/info/editor-view-content-info.element';
+import './views/edit/workspace-view-content-edit.element';
+import './views/info/workspace-view-content-info.element';
 
 @customElement('umb-workspace-content')
 export class UmbWorkspaceContentElement extends UmbContextProviderMixin(

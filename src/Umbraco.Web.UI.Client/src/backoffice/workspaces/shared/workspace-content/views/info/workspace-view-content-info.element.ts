@@ -7,8 +7,8 @@ import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { DocumentDetails, MediaDetails } from '@umbraco-cms/models';
 
-@customElement('umb-editor-view-content-info')
-export class UmbEditorViewContentInfoElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+@customElement('umb-workspace-view-content-info')
+export class UmbWorkspaceViewContentInfoElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -42,14 +42,14 @@ export class UmbEditorViewContentInfoElement extends UmbContextConsumerMixin(Umb
 	}
 
 	render() {
-		return html`<div>Info Editor View for ${this._nodeName}</div>`;
+		return html`<div>Info Workspace View for ${this._nodeName}</div>`;
 	}
 }
 
-export default UmbEditorViewContentInfoElement;
+export default UmbWorkspaceViewContentInfoElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-editor-view-content-info': UmbEditorViewContentInfoElement;
+		'umb-workspace-view-content-info': UmbWorkspaceViewContentInfoElement;
 	}
 }

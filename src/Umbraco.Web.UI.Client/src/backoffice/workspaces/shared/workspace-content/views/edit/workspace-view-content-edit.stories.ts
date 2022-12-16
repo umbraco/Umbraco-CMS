@@ -1,4 +1,4 @@
-import './editor-view-content-info.element';
+import './workspace-view-content-edit.element';
 
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit-html';
@@ -6,12 +6,12 @@ import { html } from 'lit-html';
 import { data } from '../../../../../../core/mocks/data/document.data';
 import { UmbNodeContext } from '../../node.context';
 
-import type { UmbEditorViewContentInfoElement } from './editor-view-content-info.element';
+import type { UmbWorkspaceViewContentEditElement } from './workspace-view-content-edit.element';
 
 export default {
-	title: 'Editors/Shared/Node/Views/Info',
-	component: 'umb-editor-view-content-info',
-	id: 'umb-editor-view-content-info',
+	title: 'Editors/Shared/Node/Views/Edit',
+	component: 'umb-workspace-view-content-edit',
+	id: 'umb-workspace-view-content-edit',
 	decorators: [
 		(story) =>
 			html` <umb-context-provider key="umbNodeContext" .value=${new UmbNodeContext(data[0])}>
@@ -20,6 +20,6 @@ export default {
 	],
 } as Meta;
 
-export const AAAOverview: Story<UmbEditorViewContentInfoElement> = () =>
-	html` <umb-editor-view-content-info></umb-editor-view-content-info>`;
+export const AAAOverview: Story<UmbWorkspaceViewContentEditElement> = () =>
+	html` <umb-workspace-view-content-edit></umb-workspace-view-content-edit>`;
 AAAOverview.storyName = 'Overview';
