@@ -12,7 +12,7 @@ import '../../../../property-editor-uis/shared/property-editor-config/property-e
 import '../../../../components/ref-property-editor-ui/ref-property-editor-ui.element';
 
 @customElement('umb-workspace-view-data-type-edit')
-export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+export class UmbWorkspaceViewDataTypeEditElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -159,10 +159,10 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Um
 	}
 }
 
-export default UmbEditorViewDataTypeEditElement;
+export default UmbWorkspaceViewDataTypeEditElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-workspace-view-data-type-edit': UmbEditorViewDataTypeEditElement;
+		'umb-workspace-view-data-type-edit': UmbWorkspaceViewDataTypeEditElement;
 	}
 }
