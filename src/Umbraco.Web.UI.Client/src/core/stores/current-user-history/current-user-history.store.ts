@@ -9,25 +9,26 @@ export type UmbCurrentUserHistoryItem = {
 };
 
 export class UmbCurrentUserHistoryStore {
-
-	private _history: BehaviorSubject<Array<UmbCurrentUserHistoryItem>> = new BehaviorSubject(<Array<UmbCurrentUserHistoryItem>>[]);
+	private _history: BehaviorSubject<Array<UmbCurrentUserHistoryItem>> = new BehaviorSubject(
+		<Array<UmbCurrentUserHistoryItem>>[]
+	);
 	public readonly history: Observable<Array<UmbCurrentUserHistoryItem>> = this._history.asObservable();
 
 	constructor() {
+		if (!('navigation' in window)) return;
 		(window as any).navigation.addEventListener('navigate', (event: any) => {
 			const url = new URL(event.destination.url);
-			const historyItem = {path: url.pathname, label: event.destination.url.split('/').pop()};
+			const historyItem = { path: url.pathname, label: event.destination.url.split('/').pop() };
 			this.push(historyItem);
 		});
 	}
 
-
 	public getLatestHistory(): Observable<Array<UmbCurrentUserHistoryItem>> {
-		return this._history.pipe(map((historyItem) => 
-		{
-			return historyItem.slice(-10);
-		}
-		));
+		return this._history.pipe(
+			map((historyItem) => {
+				return historyItem.slice(-10);
+			})
+		);
 	}
 
 	/**
@@ -49,7 +50,6 @@ export class UmbCurrentUserHistoryStore {
 			newHistory[history.length - 1] = historyItem;
 			this._history.next(newHistory);
 		}
-		
 	}
 
 	/**
