@@ -16,7 +16,7 @@ export class UmbWorkspacePackageBuilderElement extends LitElement {
 	];
 
 	render() {
-		return html`<umb-workspace-entity-layout alias="Umb.Editor.PackageBuilder"
+		return html`<umb-workspace-entity-layout alias="Umb.Workspace.PackageBuilder"
 			>PACKAGE BUILDER</umb-workspace-entity-layout
 		> `;
 	}
