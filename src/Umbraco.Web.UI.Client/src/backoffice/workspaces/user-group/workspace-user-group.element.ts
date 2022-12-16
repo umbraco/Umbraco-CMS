@@ -237,6 +237,7 @@ export class UmbWorkspaceUserGroupElement extends UmbContextProviderMixin(
 	private _observeUserGroup() {
 		if (!this._userGroupStore) return;
 
+		// TODO: investigate if the source is the same if entityKey is changed. I would be affright its not therefor it would not unsubscribe the old subscription.
 		this.observe(this._userGroupStore.getByKey(this.entityKey), (userGroup) => {
 			this._userGroup = userGroup;
 			if (!this._userGroup) return;
