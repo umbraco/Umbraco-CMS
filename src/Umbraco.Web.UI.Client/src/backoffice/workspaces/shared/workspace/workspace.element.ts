@@ -2,9 +2,9 @@ import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
 
+import { UmbWorkspaceContext } from './workspace.context';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
-import { UmbWorkspaceContext } from './workspace.context';
 
 @customElement('umb-workspace')
 export class UmbWorkspaceElement extends UmbContextProviderMixin(UmbContextConsumerMixin(UmbObserverMixin(LitElement))) {
