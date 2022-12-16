@@ -108,7 +108,7 @@ export class UmbSectionViewUsersElement extends UmbContextProviderMixin(
 	}
 
 	render() {
-		return html` <router-slot .routes=${this._routes}></router-slot> `;
+		return html`<router-slot .routes=${this._routes}></router-slot>`;
 	}
 }
 
