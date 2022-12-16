@@ -78,7 +78,6 @@ export class UmbWorkspaceContentElement extends UmbContextProviderMixin(
 	}
 	public set storeAlias(newVal:string) {
 		this._storeAlias = newVal;
-		console.log("storeAlias", newVal)
 		this.consumeContext(this._storeAlias, (instance) => {
 			this._store = instance;
 			this._observeContent();
