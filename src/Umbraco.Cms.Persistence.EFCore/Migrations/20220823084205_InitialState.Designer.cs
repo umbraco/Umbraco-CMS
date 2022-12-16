@@ -1575,7 +1575,7 @@ namespace Umbraco.Cms.Persistence.EFCore.Migrations
 
                     b.Property<DateTime>("CreateDate")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT")
+                        .HasColumnType("datetime")
                         .HasColumnName("createDate")
                         .HasDefaultValueSql("DATE()");
 

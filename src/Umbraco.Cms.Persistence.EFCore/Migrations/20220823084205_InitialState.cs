@@ -427,7 +427,7 @@ namespace Umbraco.Cms.Persistence.EFCore.Migrations
                     nodeUser = table.Column<int>(type: "INTEGER", nullable: true),
                     text = table.Column<string>(type: "TEXT", maxLength: 255, nullable: true),
                     nodeObjectType = table.Column<Guid>(type: "TEXT", nullable: true),
-                    createDate = table.Column<DateTime>(type: "TEXT", nullable: false, defaultValueSql: "DATE()")
+                    createDate = table.Column<DateTime>(type: "datetime", nullable: false, defaultValueSql: "DATE()")
                 },
                 constraints: table =>
                 {
