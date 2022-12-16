@@ -1,5 +1,5 @@
 //TODO: we need to figure out what components should be available for extensions and load them upfront
-import './workspaces/shared/workspace-entity/workspace-entity.element';
+import './workspaces/shared/workspace-entity-layout/workspace-entity-layout.element';
 import './components/ref-property-editor-ui/ref-property-editor-ui.element';
 import './components/backoffice-frame/backoffice-header.element';
 import './components/backoffice-frame/backoffice-main.element';

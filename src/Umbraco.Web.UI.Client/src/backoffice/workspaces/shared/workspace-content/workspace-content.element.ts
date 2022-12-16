@@ -12,7 +12,7 @@ import type { UmbDocumentStore } from 'src/core/stores/document/document.store';
 import { UmbMediaStore } from 'src/core/stores/media/media.store';
 import type { DocumentDetails, MediaDetails } from '@umbraco-cms/models';
 
-import '../workspace-entity/workspace-entity.element';
+import '../workspace-entity-layout/workspace-entity-layout.element';
 
 // Lazy load
 // TODO: Make this dynamic, use load-extensions method to loop over extensions for this node.

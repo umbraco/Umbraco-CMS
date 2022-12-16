@@ -1,9 +1,9 @@
-import './workspace-entity.element';
+import './workspace-entity-layout.element';
 
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit-html';
 
-import type { UmbWorkspaceEntityLayout } from './workspace-entity.element';
+import type { UmbWorkspaceEntityLayout } from './workspace-entity-layout.element';
 
 export default {
 	title: 'Workspaces/Shared/Editor Entity Layout',
