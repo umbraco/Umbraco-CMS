@@ -3,6 +3,7 @@
 
 using Examine;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
@@ -64,11 +65,16 @@ public static class UmbracoBuilderExtensions
 
         builder.Services.AddDbContext<UmbracoEFContext>((serviceProvider, options) =>
         {
-            // // TODO: Make compatable with SqlServer aswell so we can choose.
-            // options.UseSqlite(
-            //     serviceProvider.GetRequiredService<IOptionsMonitor<ConnectionStrings>>().CurrentValue.ConnectionString);
-            options.UseSqlServer(serviceProvider.GetRequiredService<IOptionsMonitor<ConnectionStrings>>().CurrentValue
-                .ConnectionString);
+            var testDatabaseType = builder.Config.GetValue<TestDatabaseSettings.TestDatabaseType>("Tests:Database:DatabaseType");
+            if (testDatabaseType is TestDatabaseSettings.TestDatabaseType.Sqlite)
+            {
+                options.UseSqlite(serviceProvider.GetRequiredService<IOptionsMonitor<ConnectionStrings>>().CurrentValue.ConnectionString);
+            }
+            else
+            {
+                // If not Sqlite, assume SqlServer
+                options.UseSqlServer(serviceProvider.GetRequiredService<IOptionsMonitor<ConnectionStrings>>().CurrentValue.ConnectionString);
+            }
         });
         builder.Services.AddUnique<IDatabaseInfo, EFDatabaseInfo>();
         builder.Services.AddUnique<IDatabaseSchemaCreatorFactory, EFDatabaseSchemaCreatorFactory>();
