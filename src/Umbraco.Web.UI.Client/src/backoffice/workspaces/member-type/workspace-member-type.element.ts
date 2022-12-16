@@ -4,8 +4,8 @@ import { customElement, property } from 'lit/decorators.js';
 
 import '../shared/workspace-entity-layout/workspace-entity-layout.element';
 
-@customElement('umb-editor-member-type')
-export class UmbEditorMemberTypeElement extends LitElement {
+@customElement('umb-workspace-member-type')
+export class UmbWorkspaceMemberTypeElement extends LitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -22,15 +22,15 @@ export class UmbEditorMemberTypeElement extends LitElement {
 
 	render() {
 		return html`
-			<umb-workspace-entity-layout alias="Umb.Editor.MemberType">Member Type Editor</umb-workspace-entity-layout>
+			<umb-workspace-entity-layout alias="Umb.Workspace.MemberType">Member Type Workspace</umb-workspace-entity-layout>
 		`;
 	}
 }
 
-export default UmbEditorMemberTypeElement;
+export default UmbWorkspaceMemberTypeElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-editor-member-type': UmbEditorMemberTypeElement;
+		'umb-workspace-member-type': UmbWorkspaceMemberTypeElement;
 	}
 }
