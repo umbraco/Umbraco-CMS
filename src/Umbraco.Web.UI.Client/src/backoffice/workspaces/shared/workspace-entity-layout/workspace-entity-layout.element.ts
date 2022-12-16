@@ -23,11 +23,11 @@ import '../editor-action-extension/editor-action-extension.element';
  * @slot actions - Slot for rendering the entity actions
  * @slot default - slot for main content
  * @export
- * @class UmbEditorEntityLayout
+ * @class UmbWorkspaceEntityLayout
  * @extends {UmbContextConsumerMixin(LitElement)}
  */
 @customElement('umb-workspace-entity-layout')
-export class UmbEditorEntityLayout extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+export class UmbWorkspaceEntityLayout extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -171,6 +171,6 @@ export class UmbEditorEntityLayout extends UmbContextConsumerMixin(UmbObserverMi
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-workspace-entity-layout': UmbEditorEntityLayout;
+		'umb-workspace-entity-layout': UmbWorkspaceEntityLayout;
 	}
 }

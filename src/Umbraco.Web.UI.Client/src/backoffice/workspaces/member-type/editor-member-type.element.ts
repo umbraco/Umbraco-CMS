@@ -2,7 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
-import '../shared/editor-entity-layout/editor-entity-layout.element';
+import '../shared/workspace-entity-layout/workspace-entity-layout.element';
 
 @customElement('umb-editor-member-type')
 export class UmbEditorMemberTypeElement extends LitElement {
