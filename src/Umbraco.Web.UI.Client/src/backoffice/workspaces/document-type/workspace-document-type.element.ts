@@ -68,7 +68,7 @@ export class UmbWorkspaceDocumentTypeElement extends UmbContextProviderMixin(
 				type: 'workspaceView',
 				alias: 'Umb.EditorView.DocumentType.Design',
 				name: 'Document Type Workspace Design View',
-				loader: () => import('./views/design/editor-view-document-type-design.element'),
+				loader: () => import('./views/design/workspace-view-document-type-design.element'),
 				weight: 100,
 				meta: {
 					workspaces: ['Umb.Workspace.DocumentType'],

@@ -7,8 +7,8 @@ import type { DocumentTypeDetails } from '@umbraco-cms/models';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
-@customElement('umb-editor-view-document-type-design')
-export class UmbEditorViewDocumentTypeDesignElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+@customElement('umb-workspace-view-document-type-design')
+export class UmbWorkspaceViewDocumentTypeDesignElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles = [UUITextStyles, css``];
 
 	@state()
@@ -38,10 +38,10 @@ export class UmbEditorViewDocumentTypeDesignElement extends UmbContextConsumerMi
 	}
 }
 
-export default UmbEditorViewDocumentTypeDesignElement;
+export default UmbWorkspaceViewDocumentTypeDesignElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-editor-view-document-type-design': UmbEditorViewDocumentTypeDesignElement;
+		'umb-workspace-view-document-type-design': UmbWorkspaceViewDocumentTypeDesignElement;
 	}
 }
