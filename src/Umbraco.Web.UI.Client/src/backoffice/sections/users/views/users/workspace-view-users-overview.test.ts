@@ -1,7 +1,7 @@
 import { expect, fixture, html } from '@open-wc/testing';
 //TODO: Test has been commented out while we figure out how to setup import maps for the test environment
 // import { defaultA11yConfig } from '@umbraco-cms/test-utils';
-// import UmbWorkspaceViewUsersOverviewElement from './editor-view-users-overview.element';
+// import UmbWorkspaceViewUsersOverviewElement from './workspace-view-users-overview.element';
 
 // describe('UmbWorkspaceViewUsersOverviewElement', () => {
 // 	let element: UmbWorkspaceViewUsersOverviewElement;
