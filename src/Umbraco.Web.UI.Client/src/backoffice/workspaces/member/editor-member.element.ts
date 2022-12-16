@@ -2,8 +2,8 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
-@customElement('umb-editor-member')
-export class UmbEditorMemberElement extends LitElement {
+@customElement('umb-workspace-member')
+export class UmbWorkspaceMemberElement extends LitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -19,14 +19,14 @@ export class UmbEditorMemberElement extends LitElement {
 	id!: string;
 
 	render() {
-		return html` <umb-workspace-entity-layout alias="Umb.Editor.Member">Member Editor</umb-workspace-entity-layout> `;
+		return html` <umb-workspace-entity-layout alias="Umb.Workspace.Member">Member Workspace</umb-workspace-entity-layout> `;
 	}
 }
 
-export default UmbEditorMemberElement;
+export default UmbWorkspaceMemberElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-editor-member': UmbEditorMemberElement;
+		'umb-workspace-member': UmbWorkspaceMemberElement;
 	}
 }
