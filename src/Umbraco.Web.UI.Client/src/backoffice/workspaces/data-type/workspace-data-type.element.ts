@@ -87,7 +87,7 @@ export class UmbWorkspaceDataTypeElement extends UmbContextProviderMixin(
 				type: 'workspaceAction',
 				alias: 'Umb.WorkspaceAction.DataType.Save',
 				name: 'Save Data Type Workspace Action',
-				loader: () => import('./actions/save/editor-action-data-type-save.element'),
+				loader: () => import('./actions/save/workspace-action-data-type-save.element'),
 				meta: {
 					workspaces: ['Umb.Workspace.DataType'],
 				},

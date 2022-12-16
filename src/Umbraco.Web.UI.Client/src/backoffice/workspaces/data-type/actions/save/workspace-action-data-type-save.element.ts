@@ -8,8 +8,8 @@ import { UmbDataTypeContext } from '../../data-type.context';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { UmbDataTypesStore } from 'src/core/stores/data-types/data-types.store';
 
-@customElement('umb-editor-action-data-type-save')
-export class UmbEditorActionDataTypeSaveElement extends UmbContextConsumerMixin(LitElement) {
+@customElement('umb-workspace-action-data-type-save')
+export class UmbWorkspaceActionDataTypeSaveElement extends UmbContextConsumerMixin(LitElement) {
 	static styles = [UUITextStyles, css``];
 
 	@state()
@@ -54,10 +54,10 @@ export class UmbEditorActionDataTypeSaveElement extends UmbContextConsumerMixin(
 	}
 }
 
-export default UmbEditorActionDataTypeSaveElement;
+export default UmbWorkspaceActionDataTypeSaveElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-editor-action-data-type-save': UmbEditorActionDataTypeSaveElement;
+		'umb-workspace-action-data-type-save': UmbWorkspaceActionDataTypeSaveElement;
 	}
 }
