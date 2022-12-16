@@ -72,8 +72,8 @@ export class UmbEditorViewUserGroupsElement extends UmbContextConsumerMixin(UmbO
 	connectedCallback(): void {
 		super.connectedCallback();
 
-		this.consumeContext('umbUserGroupStore', (userStore: UmbUserGroupStore) => {
-			this._userGroupStore = userStore;
+		this.consumeContext('umbUserGroupStore', (userGroupStore: UmbUserGroupStore) => {
+			this._userGroupStore = userGroupStore;
 			this._observeUserGroups();
 		});
 	}

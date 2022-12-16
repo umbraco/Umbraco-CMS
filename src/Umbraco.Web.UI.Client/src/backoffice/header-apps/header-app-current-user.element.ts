@@ -1,9 +1,15 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, CSSResultGroup, html, LitElement } from 'lit';
-import { customElement } from 'lit/decorators.js';
+import { customElement, state } from 'lit/decorators.js';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
+import type { UserDetails } from '@umbraco-cms/models';
+import { UmbModalService } from '@umbraco-cms/services';
+import { umbCurrentUserService } from 'src/core/services/current-user';
 
 @customElement('umb-header-app-current-user')
-export class UmbHeaderAppCurrentUser extends LitElement {
+export class UmbHeaderAppCurrentUser extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+
 	static styles: CSSResultGroup = [
 		UUITextStyles,
 		css`
@@ -13,12 +19,34 @@ export class UmbHeaderAppCurrentUser extends LitElement {
 		`,
 	];
 
-	// TODO: Get current user information.
+	@state()
+	private _currentUser?: UserDetails;
+
+	private _modalService?: UmbModalService;
+
+	constructor() {
+		super();
+		this.consumeAllContexts(['umbUserStore', 'umbModalService'], (instances) => {
+			this._modalService = instances['umbModalService'];
+			this._observeCurrentUser();
+		});
+	}
+
+	private async _observeCurrentUser() {
+		this.observe<UserDetails>(umbCurrentUserService.currentUser, (currentUser) => {
+			this._currentUser = currentUser;
+		});
+	}
+
+	private _handleUserClick() {
+		this._modalService?.userSettings();
+	}
+
 
 	render() {
 		return html`
-			<uui-button look="primary" label="My User Name" compact>
-				<uui-avatar name="Extended Rabbit"></uui-avatar>
+			<uui-button @click=${this._handleUserClick} look="primary" label="${this._currentUser?.name || ''}" compact>
+				<uui-avatar name="${this._currentUser?.name || ''}"></uui-avatar>
 			</uui-button>
 		`;
 	}

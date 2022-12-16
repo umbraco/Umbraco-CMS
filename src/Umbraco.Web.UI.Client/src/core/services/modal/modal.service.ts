@@ -2,6 +2,8 @@
 import './layouts/confirm/modal-layout-confirm.element';
 import './layouts/content-picker/modal-layout-content-picker.element';
 import './layouts/property-editor-ui-picker/modal-layout-property-editor-ui-picker.element';
+import './layouts/modal-layout-current-user.element';
+import './layouts/modal-layout-change-password.element';
 
 import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
 import { BehaviorSubject, Observable } from 'rxjs';
@@ -11,6 +13,7 @@ import type { UmbModalConfirmData } from './layouts/confirm/modal-layout-confirm
 import type { UmbModalContentPickerData } from './layouts/content-picker/modal-layout-content-picker.element';
 import type { UmbModalPropertyEditorUIPickerData } from './layouts/property-editor-ui-picker/modal-layout-property-editor-ui-picker.element';
 import { UmbModalHandler } from './';
+import { UmbModalChangePasswordData } from './layouts/modal-layout-change-password.element';
 
 export type UmbModalType = 'dialog' | 'sidebar';
 
@@ -66,6 +69,26 @@ export class UmbModalService {
 	 */
 	public iconPicker(data?: UmbModalIconPickerData): UmbModalHandler {
 		return this.open('umb-modal-layout-icon-picker', { data, type: 'sidebar', size: 'small' });
+	}
+
+	/**
+	 * Opens the user settings sidebar modal
+	 * @public
+	 * @return {*}  {UmbModalHandler}
+	 * @memberof UmbModalService
+	 */
+	public userSettings(): UmbModalHandler {
+		return this.open('umb-modal-layout-current-user', { type: 'sidebar', size: 'small' });
+	}
+
+	/**
+	 * Opens the user settings sidebar modal
+	 * @public
+	 * @return {*}  {UmbModalHandler}
+	 * @memberof UmbModalService
+	 */
+	public changePassword(data: UmbModalChangePasswordData): UmbModalHandler {
+		return this.open('umb-modal-layout-change-password', { data, type: 'dialog' });
 	}
 
 	/**

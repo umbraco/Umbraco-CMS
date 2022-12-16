@@ -48,6 +48,13 @@ export class UmbDashboardExamineManagementElement extends UmbContextConsumerMixi
 	@state()
 	private _currentPath?: string;
 
+	/**
+	 *
+	 */
+	constructor() {
+		super();
+	}
+
 	private _onRouteChange() {
 		this._currentPath = path();
 	}
