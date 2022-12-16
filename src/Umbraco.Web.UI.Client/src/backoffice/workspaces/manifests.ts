@@ -5,7 +5,7 @@ export const manifests: Array<ManifestWorkspace> = [
 		type: 'workspace',
 		alias: 'Umb.Editor.Member',
 		name: 'Member Editor',
-		loader: () => import('./member/editor-member.element'),
+		loader: () => import('./member/workspace-member.element'),
 		meta: {
 			entityType: 'member',
 		},
@@ -14,7 +14,7 @@ export const manifests: Array<ManifestWorkspace> = [
 		type: 'workspace',
 		alias: 'Umb.Editor.MemberGroup',
 		name: 'Member Group Editor',
-		loader: () => import('./member-group/editor-member-group.element'),
+		loader: () => import('./member-group/workspace-member-group.element'),
 		meta: {
 			entityType: 'member-group',
 		},
