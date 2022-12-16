@@ -40,20 +40,20 @@ export class UmbEditorViewDataTypeInfoElement extends UmbContextConsumerMixin(Um
 	private _renderGeneralInfo() {
 		return html`
 			<uui-box headline="General" style="margin-bottom: 20px;">
-				<umb-editor-property-layout label="Key">
+				<umb-workspace-property-layout label="Key">
 					<div slot="editor">${this._dataType?.key}</div>
-				</umb-editor-property-layout>
-				<umb-editor-property-layout
+				</umb-workspace-property-layout>
+				<umb-workspace-property-layout
 					label="Property Editor Alias
 ">
 					<div slot="editor">${this._dataType?.propertyEditorModelAlias}</div>
-				</umb-editor-property-layout>
+				</umb-workspace-property-layout>
 
-				<umb-editor-property-layout
+				<umb-workspace-property-layout
 					label="Property Editor UI Alias
 ">
 					<div slot="editor">${this._dataType?.propertyEditorUIAlias}</div>
-				</umb-editor-property-layout>
+				</umb-workspace-property-layout>
 			</uui-box>
 		`;
 	}

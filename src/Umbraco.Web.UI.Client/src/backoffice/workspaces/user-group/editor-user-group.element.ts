@@ -298,13 +298,13 @@ export class UmbEditorUserGroupElement extends UmbContextProviderMixin(
 
 		return html` <uui-box>
 				<div slot="headline">Assign access</div>
-				<umb-editor-property-layout label="Sections" description="Add sections to give users access">
+				<umb-workspace-property-layout label="Sections" description="Add sections to give users access">
 					<umb-input-section
 						slot="editor"
 						.value=${this._userGroup.sections}
 						@change=${(e: any) => this._updateProperty('sections', e.target.value)}></umb-input-section>
-				</umb-editor-property-layout>
-				<umb-editor-property-layout
+				</umb-workspace-property-layout>
+				<umb-workspace-property-layout
 					label="Content start node"
 					description="Limit the content tree to a specific start node">
 					<uui-ref-node slot="editor" name="Content Root" border>
@@ -312,8 +312,8 @@ export class UmbEditorUserGroupElement extends UmbContextProviderMixin(
 						<uui-button slot="actions" label="change"></uui-button>
 						<uui-button slot="actions" label="remove" color="danger"></uui-button>
 					</uui-ref-node>
-				</umb-editor-property-layout>
-				<umb-editor-property-layout
+				</umb-workspace-property-layout>
+				<umb-workspace-property-layout
 					label="Media start node"
 					description="Limit the media library to a specific start node">
 					<uui-ref-node slot="editor" name="Media Root" border>
@@ -321,7 +321,7 @@ export class UmbEditorUserGroupElement extends UmbContextProviderMixin(
 						<uui-button slot="actions" label="change"></uui-button>
 						<uui-button slot="actions" label="remove" color="danger"></uui-button>
 					</uui-ref-node>
-				</umb-editor-property-layout>
+				</umb-workspace-property-layout>
 			</uui-box>
 
 			<uui-box>

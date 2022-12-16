@@ -267,35 +267,35 @@ export class UmbEditorUserElement extends UmbContextProviderMixin(
 
 		return html` <uui-box>
 				<div slot="headline">Profile</div>
-				<umb-editor-property-layout label="Email">
+				<umb-workspace-property-layout label="Email">
 					<uui-input slot="editor" name="email" label="email" readonly value=${this._user.email}></uui-input>
-				</umb-editor-property-layout>
-				<umb-editor-property-layout label="Language">
+				</umb-workspace-property-layout>
+				<umb-workspace-property-layout label="Language">
 					<uui-select slot="editor" name="language" label="language" .options=${this._languages}> </uui-select>
-				</umb-editor-property-layout>
+				</umb-workspace-property-layout>
 			</uui-box>
 			<uui-box>
 				<div slot="headline">Assign access</div>
 				<div id="assign-access">
-					<umb-editor-property-layout label="Groups" description="Add groups to assign access and permissions">
+					<umb-workspace-property-layout label="Groups" description="Add groups to assign access and permissions">
 						<umb-input-user-group
 							slot="editor"
 							.value=${this._user.userGroups}
 							@change=${(e: any) => this._updateProperty('userGroups', e.target.value)}></umb-input-user-group>
-					</umb-editor-property-layout>
-					<umb-editor-property-layout
+					</umb-workspace-property-layout>
+					<umb-workspace-property-layout
 						label="Content start node"
 						description="Limit the content tree to specific start nodes">
 						<umb-property-editor-ui-content-picker
 							.value=${this._user.contentStartNodes}
 							@property-editor-change=${(e: any) => this._updateProperty('contentStartNodes', e.target.value)}
 							slot="editor"></umb-property-editor-ui-content-picker>
-					</umb-editor-property-layout>
-					<umb-editor-property-layout
+					</umb-workspace-property-layout>
+					<umb-workspace-property-layout
 						label="Media start nodes"
 						description="Limit the media library to specific start nodes">
 						<b slot="editor">NEED MEDIA PICKER</b>
-					</umb-editor-property-layout>
+					</umb-workspace-property-layout>
 				</div>
 			</uui-box>
 			<uui-box headline="Access">

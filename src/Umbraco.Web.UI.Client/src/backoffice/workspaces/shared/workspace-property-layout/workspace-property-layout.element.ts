@@ -3,13 +3,13 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
 
 /**
- *  @element umb-editor-property-layout
- *  @description - Element for displaying a property in an editor.
+ *  @element umb-workspace-property-layout
+ *  @description - Element for displaying a property in an workspace.
  *  @slot editor - Slot for rendering the Property Editor
  *  @slot property-action-menu - Slot for rendering the Property Action Menu
  */
-@customElement('umb-editor-property-layout')
-export class UmbEditorPropertyLayoutElement extends LitElement {
+@customElement('umb-workspace-property-layout')
+export class UmbWorkspacePropertyLayoutElement extends LitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -67,6 +67,6 @@ export class UmbEditorPropertyLayoutElement extends LitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-editor-property-layout': UmbEditorPropertyLayoutElement;
+		'umb-workspace-property-layout': UmbWorkspacePropertyLayoutElement;
 	}
 }

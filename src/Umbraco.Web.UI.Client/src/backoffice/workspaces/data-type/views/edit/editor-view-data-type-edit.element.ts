@@ -116,7 +116,7 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Um
 
 	private _renderPropertyEditorUI() {
 		return html`
-			<umb-editor-property-layout label="Property Editor" description="Select a property editor">
+			<umb-workspace-property-layout label="Property Editor" description="Select a property editor">
 				${this._propertyEditorUIAlias
 					? html`
 							<!-- TODO: border is a bit weird attribute name. Maybe single or standalone would be better? -->
@@ -140,7 +140,7 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Um
 								color="default"
 								@click=${this._openPropertyEditorUIPicker}></uui-button>
 					  `}
-			</umb-editor-property-layout>
+			</umb-workspace-property-layout>
 		`;
 	}
 
