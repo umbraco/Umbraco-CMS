@@ -84,17 +84,17 @@ export const manifests: Array<ManifestWorkspace> = [
 	},
 	{
 		type: 'workspace',
-		alias: 'Umb.Editor.User',
-		name: 'User Editor',
-		loader: () => import('./user/editor-user.element'),
+		alias: 'Umb.Workspace.User',
+		name: 'User Workspace',
+		loader: () => import('./user/workspace-user.element'),
 		meta: {
 			entityType: 'user',
 		},
 	},
 	{
 		type: 'workspace',
-		alias: 'Umb.Editor.UserGroup',
-		name: 'User Group Editor',
+		alias: 'Umb.Workspace.UserGroup',
+		name: 'User Group Workspace',
 		loader: () => import('./user-group/workspace-user-group.element'),
 		meta: {
 			entityType: 'user-group',
