@@ -75,7 +75,7 @@ export class UmbWorkspaceEntityElement extends UmbContextConsumerMixin(UmbObserv
 		// TODO: implement fallback workspace
 		// Note for extension-slot, we must enable giving the extension-slot a fallback element.
 		const fallbackWorkspace = document.createElement('div');
-		fallbackWorkspace.innerHTML = '<p>No editor found</p>';
+		fallbackWorkspace.innerHTML = '<p>No Workspace found</p>';
 		this._element = fallbackWorkspace;
 	}
 
