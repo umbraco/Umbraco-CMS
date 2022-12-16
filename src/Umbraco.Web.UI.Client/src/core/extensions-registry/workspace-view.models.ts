@@ -6,7 +6,7 @@ export interface ManifestWorkspaceView extends ManifestElement {
 }
 
 export interface MetaEditorView {
-	editors: string[];
+	workspaces: string[];
 	pathname: string;
 	label: string;
 	icon: string;

@@ -32,51 +32,51 @@ export class UmbWorkspaceEntityElement extends UmbContextConsumerMixin(UmbObserv
 	}
 	public set entityType(value: string) {
 		this._entityType = value;
-		this._observeEditors();
+		this._observeWorkspace();
 	}
 
 	@state()
 	private _element?: HTMLElement;
 
-	private _currentEditorAlias:string | null = null;
+	private _currentWorkspaceAlias:string | null = null;
 
 	connectedCallback(): void {
 		super.connectedCallback();
-		this._observeEditors();
+		this._observeWorkspace();
 	}
 
 	/**
 	TODO: use future system of extension-slot, extension slots must use a condition-system which will be used to determine the filtering happening below.
 	This will first be possible to make when ContextApi is available, as conditions will use this system.
 	*/
-	private _observeEditors() {
+	private _observeWorkspace() {
 		this.observe<ManifestWorkspace | undefined>(
 			umbExtensionsRegistry
 				.extensionsOfType('workspace')
-				.pipe(map((editors) => editors.find((editor) => editor.meta.entityType === this.entityType))),
-			(editor) => {
-				// don't rerender editor if it's the same
-				const newEditorAlias = editor?.alias || '';
-				if (this._currentEditorAlias === newEditorAlias) return;
-				this._currentEditorAlias = newEditorAlias;
-				this._createElement(editor);
+				.pipe(map((workspaces) => workspaces.find((workspace) => workspace.meta.entityType === this.entityType))),
+			(workspace) => {
+				// don't rerender workspace if it's the same
+				const newWorkspaceAlias = workspace?.alias || '';
+				if (this._currentWorkspaceAlias === newWorkspaceAlias) return;
+				this._currentWorkspaceAlias = newWorkspaceAlias;
+				this._createElement(workspace);
 			}
 		);
 	}
 
-	private async _createElement(editor?: ManifestWorkspace) {
-		this._element = editor ? (await createExtensionElement(editor)) : undefined;
+	private async _createElement(workspace?: ManifestWorkspace) {
+		this._element = workspace ? (await createExtensionElement(workspace)) : undefined;
 		if (this._element) {
 			// TODO: use contextApi for this.
 			(this._element as any).entityKey = this.entityKey;
 			return;
 		}
 
-		// TODO: implement fallback editor
+		// TODO: implement fallback workspace
 		// Note for extension-slot, we must enable giving the extension-slot a fallback element.
-		const fallbackEditor = document.createElement('div');
-		fallbackEditor.innerHTML = '<p>No editor found</p>';
-		this._element = fallbackEditor;
+		const fallbackWorkspace = document.createElement('div');
+		fallbackWorkspace.innerHTML = '<p>No editor found</p>';
+		this._element = fallbackWorkspace;
 	}
 
 	render() {

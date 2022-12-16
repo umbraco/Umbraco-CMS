@@ -5,17 +5,17 @@ import { createExtensionElement } from '@umbraco-cms/extensions-api';
 import type { ManifestWorkspaceAction } from '@umbraco-cms/models';
 
 // Niels, thoughts, TODO: Consider naming this just actions, not extension as everything is an extension.
-@customElement('umb-editor-action-extension')
-export class UmbEditorActionExtensionElement extends LitElement {
+@customElement('umb-workspace-action-extension')
+export class UmbWorkspaceActionExtensionElement extends LitElement {
 	static styles: CSSResultGroup = [UUITextStyles];
 
-	private _editorAction?: ManifestWorkspaceAction;
+	private _workspaceAction?: ManifestWorkspaceAction;
 	@property({ type: Object })
-	public get editorAction(): ManifestWorkspaceAction | undefined {
-		return this._editorAction;
+	public get workspaceAction(): ManifestWorkspaceAction | undefined {
+		return this._workspaceAction;
 	}
-	public set editorAction(value: ManifestWorkspaceAction | undefined) {
-		this._editorAction = value;
+	public set workspaceAction(value: ManifestWorkspaceAction | undefined) {
+		this._workspaceAction = value;
 		this._createElement();
 	}
 
@@ -23,13 +23,13 @@ export class UmbEditorActionExtensionElement extends LitElement {
 	private _element?: any;
 
 	private async _createElement() {
-		if (!this.editorAction) return;
+		if (!this.workspaceAction) return;
 
 		try {
-			this._element = await createExtensionElement(this.editorAction);
+			this._element = await createExtensionElement(this.workspaceAction);
 			if (!this._element) return;
 
-			this._element.editorAction = this.editorAction;
+			this._element.editorAction = this.workspaceAction;
 		} catch (error) {
 			// TODO: loading JS failed so we should do some nice UI. (This does only happen if extension has a js prop, otherwise we concluded that no source was needed resolved the load.)
 		}
@@ -42,6 +42,6 @@ export class UmbEditorActionExtensionElement extends LitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-editor-action-extension': UmbEditorActionExtensionElement;
+		'umb-workspace-action-extension': UmbWorkspaceActionExtensionElement;
 	}
 }

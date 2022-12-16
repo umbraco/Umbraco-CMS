@@ -12,7 +12,7 @@ import type { ManifestWorkspaceView } from '@umbraco-cms/models';
 
 import '../../../components/body-layout/body-layout.element';
 import '../../../components/extension-slot/extension-slot.element';
-import '../editor-action-extension/editor-action-extension.element';
+import '../workspace-action-extension/workspace-action-extension.element';
 
 /**
  * @element umb-workspace-entity-layout
@@ -50,7 +50,7 @@ export class UmbWorkspaceEntityLayout extends UmbContextConsumerMixin(UmbObserve
 	];
 
 	/**
-	 * Alias of the editor. The Layout will render the editor views that are registered for this editor alias.
+	 * Alias of the workspace. The Layout will render the workspace views that are registered for this workspace alias.
 	 * @public
 	 * @type {string}
 	 * @attr
@@ -63,7 +63,7 @@ export class UmbWorkspaceEntityLayout extends UmbContextConsumerMixin(UmbObserve
 	public alias = '';
 
 	@state()
-	private _editorViews: Array<ManifestWorkspaceView> = [];
+	private _workspaceViews: Array<ManifestWorkspaceView> = [];
 
 	@state()
 	private _currentView = '';
@@ -76,29 +76,29 @@ export class UmbWorkspaceEntityLayout extends UmbContextConsumerMixin(UmbObserve
 	connectedCallback(): void {
 		super.connectedCallback();
 
-		this._observeEditorViews();
+		this._observeWorkspaceViews();
 
 		/* TODO: find a way to construct absolute urls */
 		this._routerFolder = window.location.pathname.split('/view')[0];
 	}
 
-	private _observeEditorViews() {
+	private _observeWorkspaceViews() {
 		this.observe<ManifestWorkspaceView[]>(
 			umbExtensionsRegistry
 				.extensionsOfType('workspaceView')
 				.pipe(map((extensions) => extensions.filter((extension) => extension.meta.editors.includes(this.alias)))),
-			(editorViews) => {
-				this._editorViews = editorViews;
+			(workspaceViews) => {
+				this._workspaceViews = workspaceViews;
 				this._createRoutes();
 			}
 		);
 	}
 
 	private async _createRoutes() {
-		if (this._editorViews.length > 0) {
+		if (this._workspaceViews.length > 0) {
 			this._routes = [];
 
-			this._routes = this._editorViews.map((view) => {
+			this._routes = this._workspaceViews.map((view) => {
 				return {
 					path: `view/${view.meta.pathname}`,
 					component: () => createExtensionElement(view) as unknown as PageComponent,
@@ -110,7 +110,7 @@ export class UmbWorkspaceEntityLayout extends UmbContextConsumerMixin(UmbObserve
 
 			this._routes.push({
 				path: '**',
-				redirectTo: `view/${this._editorViews?.[0].meta.pathname}`,
+				redirectTo: `view/${this._workspaceViews?.[0].meta.pathname}`,
 			});
 
 			this.requestUpdate();
@@ -130,10 +130,10 @@ export class UmbWorkspaceEntityLayout extends UmbContextConsumerMixin(UmbObserve
 
 	private _renderTabs() {
 		return html`
-			${this._editorViews?.length > 0
+			${this._workspaceViews?.length > 0
 				? html`
 						<uui-tab-group slot="tabs">
-							${this._editorViews.map(
+							${this._workspaceViews.map(
 								(view: ManifestWorkspaceView) => html`
 									<uui-tab
 										.label="${view.meta.label || view.name}"
@@ -161,7 +161,7 @@ export class UmbWorkspaceEntityLayout extends UmbContextConsumerMixin(UmbObserve
 				<slot></slot>
 
 				<slot name="footer" slot="footer"></slot>
-				<umb-extension-slot slot="actions" type="editorAction" .filter=${(extension: any) => extension.meta.editors.includes(this.alias)}></umb-extension-slot>
+				<umb-extension-slot slot="actions" type="workspaceAction" .filter=${(extension: any) => extension.meta.editors.includes(this.alias)}></umb-extension-slot>
 				<slot name="actions" slot="actions"></slot>
 				
 			</umb-body-layout>
