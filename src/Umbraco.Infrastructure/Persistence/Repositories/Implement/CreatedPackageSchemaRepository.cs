@@ -195,7 +195,6 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
             if (exists > 0)
             {
                 return false;
-                //throw new DuplicateNameException("A package with the name " + definition.Name + " already exists");
             }
 
             // Create dto from definition
