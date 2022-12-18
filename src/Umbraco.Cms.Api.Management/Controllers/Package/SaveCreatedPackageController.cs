@@ -46,9 +46,9 @@ public class SaveCreatedPackageController : PackageControllerBase
         if (!_packagingService.SaveCreatedPackage(packageDefinition))
         {
             return await Task.FromResult(ValidationProblem(
-                packageDefinition.Id == default
-                    ? $"A package with the name {packageDefinition.Name} already exists"
-                    : $"The package with id {packageDefinition.Id} was not found"));
+                model.Key == default
+                    ? $"A package with the name '{model.Name}' already exists"
+                    : $"The package with key {model.Key} was not found"));
         }
 
         return await Task.FromResult(Ok(_umbracoMapper.Map<PackageDefinitionViewModel>(packageDefinition)));
