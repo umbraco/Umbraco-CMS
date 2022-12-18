@@ -8,9 +8,9 @@ using Microsoft.Net.Http.Headers;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Cms.Api.Management.Controllers.Package;
+namespace Umbraco.Cms.Api.Management.Controllers.Package.Created;
 
-public class DownloadCreatedPackageController : PackageControllerBase
+public class DownloadCreatedPackageController : CreatedPackageControllerBase
 {
     private readonly IPackagingService _packagingService;
     private readonly IWebHostEnvironment _webHostEnvironment;
@@ -26,7 +26,7 @@ public class DownloadCreatedPackageController : PackageControllerBase
     /// </summary>
     /// <param name="key">The key of the package.</param>
     /// <returns>The XML or ZIP file of the package or not found result.</returns>
-    [HttpGet("created/{key:guid}/download")]
+    [HttpGet("{key:guid}/download")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(NotFoundResult), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK)]

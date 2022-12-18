@@ -6,9 +6,9 @@ using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Cms.Api.Management.Controllers.Package;
+namespace Umbraco.Cms.Api.Management.Controllers.Package.Created;
 
-public class SaveCreatedPackageController : PackageControllerBase
+public class SaveCreatedPackageController : CreatedPackageControllerBase
 {
     private readonly IPackagingService _packagingService;
     private readonly IPackageDefinitionFactory _packageDefinitionFactory;
@@ -29,7 +29,7 @@ public class SaveCreatedPackageController : PackageControllerBase
     /// </summary>
     /// <param name="model">The PackageDefinition model containing the data for a package.</param>
     /// <returns>The created or updated package.</returns>
-    [HttpPost("created/save")]
+    [HttpPost("save")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(PackageDefinitionViewModel), StatusCodes.Status200OK)]

@@ -5,9 +5,9 @@ using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Cms.Api.Management.Controllers.Package;
+namespace Umbraco.Cms.Api.Management.Controllers.Package.Created;
 
-public class ByKeyCreatedPackageController : PackageControllerBase
+public class ByKeyCreatedPackageController : CreatedPackageControllerBase
 {
     private readonly IPackagingService _packagingService;
     private readonly IUmbracoMapper _umbracoMapper;
@@ -23,7 +23,7 @@ public class ByKeyCreatedPackageController : PackageControllerBase
     /// </summary>
     /// <param name="key">The key of the package.</param>
     /// <returns>The package or not found result.</returns>
-    [HttpGet("created/{key:guid}")]
+    [HttpGet("{key:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(NotFoundResult), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(PackageDefinitionViewModel), StatusCodes.Status200OK)]
