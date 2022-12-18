@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Data;
 using System.Globalization;
 using System.IO.Compression;
 using System.Xml.Linq;
@@ -175,7 +176,7 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
             throw new NullReferenceException("PackageDefinition cannot be null when saving");
         }
 
-        if (string.IsNullOrEmpty(definition.Name) || definition.PackagePath == null)
+        if (string.IsNullOrEmpty(definition.Name))
         {
             return false;
         }
@@ -185,6 +186,18 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
 
         if (definition.Id == default)
         {
+            Sql<ISqlContext> query = new Sql<ISqlContext>(_umbracoDatabase!.SqlContext)
+                    .SelectCount()
+                    .From<CreatedPackageSchemaDto>()
+                    .Where<CreatedPackageSchemaDto>(x => x.Name == definition.Name);
+            var exists = _umbracoDatabase.ExecuteScalar<int>(query);
+
+            if (exists > 0)
+            {
+                return false;
+                //throw new DuplicateNameException("A package with the name " + definition.Name + " already exists");
+            }
+
             // Create dto from definition
             var dto = new CreatedPackageSchemaDto
             {
