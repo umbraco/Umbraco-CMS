@@ -2,6 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, LitElement, nothing } from 'lit';
 import { repeat } from 'lit-html/directives/repeat.js';
 import { customElement } from 'lit/decorators.js';
+import { ifDefined } from 'lit/directives/if-defined.js';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { MediaDetails } from '@umbraco-cms/models';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
@@ -18,10 +19,13 @@ export class UmbMediaManagementGridElement extends UmbContextConsumerMixin(UmbOb
 		UUITextStyles,
 		css`
 			:host {
-				display: block;
+				display: flex;
+				flex-direction: column;
+				box-sizing: border-box;
 				position: relative;
 				height: 100%;
 				width: 100%;
+				padding: 0 var(--uui-size-space-6);
 			}
 			:host([dragging]) #dropzone {
 				opacity: 1;
@@ -67,7 +71,7 @@ export class UmbMediaManagementGridElement extends UmbContextConsumerMixin(UmbOb
 		`,
 	];
 
-	private _mediaItems: MediaDetails[] = [];
+	private _mediaItems: Array<MediaDetails> = [];
 
 	private _mediaStore?: UmbMediaStore;
 	constructor() {
@@ -97,28 +101,17 @@ export class UmbMediaManagementGridElement extends UmbContextConsumerMixin(UmbOb
 		});
 	}
 
-	private get mediaFolders() {
-		return this._mediaItems.filter((item) => item.type === 'folder');
+	private _handleOpenItem(key: string) {
+		//TODO: Fix when we have dynamic routing
+		history.pushState(null, '', 'section/media/media/' + key);
 	}
 
-	private get mediaFiles() {
-		return this._mediaItems.filter((item) => item.type !== 'folder');
-	}
-
-	private _renderMediaItem(item: UmbMediaItem) {
-		switch (item.type) {
-			case 'folder':
-				return html`<uui-card-media class="media-item" name="${item.name}"></uui-card-media>`;
-			case 'file':
-				return html`<uui-card-media class="media-item" name="${item.name}" file-ext="${item.type}"></uui-card-media>`;
-			case 'image':
-				return html`<uui-card-media class="media-item" name="${item.name}">
-					<img src="https://picsum.photos/seed/picsum/200/300" alt="" />
-				</uui-card-media>`;
-
-			default:
-				return nothing;
-		}
+	private _renderMediaItem(item: MediaDetails) {
+		const name = item.name || '';
+		return html`<uui-card-media
+			@open=${() => this._handleOpenItem(item.key)}
+			class="media-item"
+			name=${name}></uui-card-media>`;
 	}
 
 	render() {
@@ -126,11 +119,10 @@ export class UmbMediaManagementGridElement extends UmbContextConsumerMixin(UmbOb
 			<uui-file-dropzone
 				id="dropzone"
 				multiple
-				@file-change=${(e) => console.log(e)}
+				@file-change=${(e: any) => console.log(e)}
 				label="Drop files here"
 				accept=""></uui-file-dropzone>
-			<div id="media-folders">${repeat(this.mediaFolders, (file) => this._renderMediaItem(file))}</div>
-			<div id="media-files">${repeat(this.mediaFiles, (file) => this._renderMediaItem(file))}</div>
+			<div id="media-files">${repeat(this._mediaItems, (file) => this._renderMediaItem(file))}</div>
 		`;
 	}
 }

@@ -11,7 +11,6 @@ import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { ManifestWorkspaceView } from '@umbraco-cms/models';
 
 import '../../../components/body-layout/body-layout.element';
-import '../../../components/extension-slot/extension-slot.element';
 import '../workspace-action-extension/workspace-action-extension.element';
 
 /**
@@ -153,7 +152,6 @@ export class UmbWorkspaceEntityLayout extends UmbContextConsumerMixin(UmbObserve
 	render() {
 		return html`
 			<umb-body-layout .headline=${this.headline}>
-
 				<slot name="header" slot="header"></slot>
 				${this._renderTabs()}
 
@@ -161,9 +159,11 @@ export class UmbWorkspaceEntityLayout extends UmbContextConsumerMixin(UmbObserve
 				<slot></slot>
 
 				<slot name="footer" slot="footer"></slot>
-				<umb-extension-slot slot="actions" type="workspaceAction" .filter=${(extension: any) => extension.meta.workspaces.includes(this.alias)}></umb-extension-slot>
+				<umb-extension-slot
+					slot="actions"
+					type="workspaceAction"
+					.filter=${(extension: any) => extension.meta.workspaces.includes(this.alias)}></umb-extension-slot>
 				<slot name="actions" slot="actions"></slot>
-				
 			</umb-body-layout>
 		`;
 	}

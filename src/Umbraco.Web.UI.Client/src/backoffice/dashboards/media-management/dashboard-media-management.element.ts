@@ -2,8 +2,9 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import './media-management-grid.element';
-import '../../components/list-view/list-view-header.element';
-import '../../components/list-view/list-view-selection.element';
+import '../../components/collection/collection-header.element';
+import '../../components/collection/collection-selection-actions.element';
+import '../../components/collection/collection-view.element';
 
 @customElement('umb-dashboard-media-management')
 export class UmbDashboardMediaManagementElement extends LitElement {
@@ -16,15 +17,18 @@ export class UmbDashboardMediaManagementElement extends LitElement {
 				box-sizing: border-box;
 				gap: var(--uui-size-space-5);
 				height: 100%;
+				border: 1px solid black;
 			}
 		`,
 	];
 
 	render() {
 		return html`
-			<umb-list-view-header></umb-list-view-header>
-			<umb-media-management-grid></umb-media-management-grid>
-			<umb-list-view-selection></umb-list-view-selection>
+			<umb-collection-view>
+				<umb-collection-header slot="header"></umb-collection-header>
+				<umb-media-management-grid slot="main"></umb-media-management-grid>
+				<umb-collection-selection-actions slot="footer"></umb-collection-selection-actions>
+			</umb-collection-view>
 		`;
 	}
 }

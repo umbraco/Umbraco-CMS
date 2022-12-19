@@ -1,21 +1,21 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, LitElement, nothing } from 'lit';
-import { repeat } from 'lit/directives/repeat.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import '../tooltip-menu.element';
 import { TooltipMenuItem } from '../tooltip-menu.element';
 
-@customElement('umb-list-view-header')
-export class UmbListViewHeaderElement extends LitElement {
+@customElement('umb-collection-header')
+export class UmbCollectionHeaderElement extends LitElement {
 	static styles = [
 		UUITextStyles,
 		css`
 			:host {
 				display: flex;
+				gap: var(--uui-size-3);
 				width: 100%;
-				justify-content: space-between;
+				padding: var(--uui-size-space-4) var(--uui-size-space-6);
 				align-items: center;
-				gap: var(--uui-size-space-5);
+				box-sizing: border-box;
 			}
 
 			uui-popover {
@@ -146,6 +146,6 @@ export class UmbListViewHeaderElement extends LitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-list-view-header': UmbListViewHeaderElement;
+		'umb-collection-header': UmbCollectionHeaderElement;
 	}
 }
