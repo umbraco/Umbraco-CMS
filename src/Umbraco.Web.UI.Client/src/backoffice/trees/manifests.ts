@@ -1,6 +1,12 @@
-import type { ManifestTree } from '@umbraco-cms/models';
+import { manifests as dataTypeTreeManifests } from './data-types/manifests';
+import { manifests as documentTreeManifests } from './documents/manifests';
+import { manifests as documentTypeTreeManifests } from './document-types/manifests';
+import type { ManifestTree, ManifestTreeItemAction } from '@umbraco-cms/models';
 
-export const manifests: Array<ManifestTree> = [
+export const manifests: Array<ManifestTree | ManifestTreeItemAction> = [
+	...documentTypeTreeManifests,
+	...dataTypeTreeManifests,
+	...documentTreeManifests,
 	{
 		type: 'tree',
 		alias: 'Umb.Tree.Extensions',
@@ -11,19 +17,6 @@ export const manifests: Array<ManifestTree> = [
 			icon: 'umb:favorite',
 			sections: ['Umb.Section.Settings'],
 			rootNodeEntityType: 'extension-root', // TODO: how do we want to handle 'single node trees'. Trees without any children but still needs to open an workspace? Currently an workspace is chosen based on the entity type. The tree root node doesn't have one, so we need to tell which workspace to use.
-		},
-	},
-	{
-		type: 'tree',
-		alias: 'Umb.Tree.DocumentTypes',
-		name: 'Document Types Tree',
-		loader: () => import('./document-types/tree-document-types.element'),
-		weight: 400,
-		meta: {
-			label: 'Document Types',
-			icon: 'umb:folder',
-			sections: ['Umb.Section.Settings'],
-			storeContextAlias: 'umbDocumentTypeStore',
 		},
 	},
 	{
@@ -54,19 +47,6 @@ export const manifests: Array<ManifestTree> = [
 	},
 	{
 		type: 'tree',
-		alias: 'Umb.Tree.DataTypes',
-		name: 'Data Types Tree',
-		loader: () => import('./data-types/tree-data-types.element'),
-		weight: 100,
-		meta: {
-			label: 'Data Types',
-			icon: 'umb:folder',
-			sections: ['Umb.Section.Settings'],
-			storeContextAlias: 'umbDataTypeStore',
-		},
-	},
-	{
-		type: 'tree',
 		alias: 'Umb.Tree.MemberGroups',
 		name: 'Member Groups Tree',
 		loader: () => import('./member-groups/tree-member-groups.element'),
@@ -89,19 +69,6 @@ export const manifests: Array<ManifestTree> = [
 			icon: 'umb:folder',
 			sections: ['Umb.Section.Media'],
 			storeContextAlias: 'umbMediaStore',
-		},
-	},
-	{
-		type: 'tree',
-		alias: 'Umb.Tree.Documents',
-		name: 'Documents Tree',
-		loader: () => import('./documents/tree-documents.element'),
-		weight: 100,
-		meta: {
-			label: 'Documents',
-			icon: 'umb:folder',
-			sections: ['Umb.Section.Content'],
-			storeContextAlias: 'umbDocumentStore',
 		},
 	},
 	{
