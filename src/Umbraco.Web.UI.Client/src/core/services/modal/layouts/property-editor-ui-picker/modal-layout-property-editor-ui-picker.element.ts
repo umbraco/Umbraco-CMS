@@ -158,13 +158,13 @@ export class UmbModalLayoutPropertyEditorUIPickerElement extends UmbContextConsu
 
 	render() {
 		return html`
-			<umb-editor-entity-layout headline="Select Property Editor UI">
+			<umb-workspace-entity-layout headline="Select Property Editor UI">
 				<uui-box> ${this._renderFilter()} ${this._renderGrid()} </uui-box>
 				<div slot="actions">
 					<uui-button label="Close" @click=${this._close}></uui-button>
 					<uui-button label="${this._submitLabel}" look="primary" color="positive" @click=${this._submit}></uui-button>
 				</div>
-			</umb-editor-entity-layout>
+			</umb-workspace-entity-layout>
 		`;
 	}
 

@@ -12,7 +12,6 @@ export interface UmbTreeContext {
 
 export class UmbTreeContextBase implements UmbTreeContext {
 	public tree: ManifestTree;
-	public rootKey = '';
 
 	private _selectable: BehaviorSubject<boolean> = new BehaviorSubject(false);
 	public readonly selectable: Observable<boolean> = this._selectable.asObservable();
@@ -36,5 +35,10 @@ export class UmbTreeContextBase implements UmbTreeContext {
 	public select(key: string) {
 		const selection = [...this._selection.getValue(), key];
 		this._selection.next(selection);
+	}
+
+	public deselect(key: string) {
+		const selection = this._selection.getValue();
+		this._selection.next(selection.filter((x) => x !== key));
 	}
 }

@@ -73,13 +73,13 @@ export class UmbModalLayoutContentPickerElement extends UmbModalLayoutElement<Um
 
 	render() {
 		return html`
-			<umb-editor-entity-layout headline="Select Content">
+			<umb-workspace-entity-layout headline="Select Content">
 				<uui-box>
 					<uui-input></uui-input>
 					<hr />
 					<umb-tree
 						alias="Umb.Tree.Documents"
-						@change=${this._handleSelectionChange}
+						@selected=${this._handleSelectionChange}
 						.selection=${this._selection}
 						selectable></umb-tree>
 				</uui-box>
@@ -87,7 +87,7 @@ export class UmbModalLayoutContentPickerElement extends UmbModalLayoutElement<Um
 					<uui-button label="Close" @click=${this._close}></uui-button>
 					<uui-button label="Submit" look="primary" color="positive" @click=${this._submit}></uui-button>
 				</div>
-			</umb-editor-entity-layout>
+			</umb-workspace-entity-layout>
 		`;
 	}
 }

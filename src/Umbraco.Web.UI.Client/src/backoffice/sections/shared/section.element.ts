@@ -3,8 +3,7 @@ import { css, html, LitElement, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { map, switchMap, EMPTY, of } from 'rxjs';
 import { UmbSectionContext } from '../section.context';
-import { UmbEditorEntityElement } from '../../editors/shared/editor-entity/editor-entity.element';
-import { UmbEntityStore } from '../../../core/stores/entity.store';
+import { UmbWorkspaceEntityElement } from '../../workspaces/shared/workspace-entity/workspace-entity.element';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
@@ -25,18 +24,6 @@ export class UmbSectionElement extends UmbContextConsumerMixin(UmbObserverMixin(
 				display: flex;
 			}
 
-			#header {
-				display: flex;
-				gap: 16px;
-				align-items: center;
-				min-height: 60px;
-			}
-
-			uui-tab-group {
-				--uui-tab-divider: var(--uui-color-border);
-				border-left: 1px solid var(--uui-color-border);
-				border-right: 1px solid var(--uui-color-border);
-			}
 			#router-slot {
 				overflow: auto;
 				height: 100%;
@@ -54,15 +41,13 @@ export class UmbSectionElement extends UmbContextConsumerMixin(UmbObserverMixin(
 	@state()
 	private _views: Array<ManifestSectionView> = [];
 
-	private _entityStore?: UmbEntityStore;
 	private _sectionContext?: UmbSectionContext;
 
 	constructor() {
 		super();
 
-		this.consumeAllContexts(['umbSectionContext', 'umbEntityStore'], (instances) => {
+		this.consumeAllContexts(['umbSectionContext'], (instances) => {
 			this._sectionContext = instances['umbSectionContext'];
-			this._entityStore = instances['umbEntityStore'];
 
 			this._observeTrees();
 			this._observeViews();
@@ -70,7 +55,7 @@ export class UmbSectionElement extends UmbContextConsumerMixin(UmbObserverMixin(
 	}
 
 	private _observeTrees() {
-		if (!this._sectionContext || !this._entityStore) return;
+		if (!this._sectionContext) return;
 
 		this.observe<ManifestTree[]>(
 			this._sectionContext?.data.pipe(
@@ -93,24 +78,26 @@ export class UmbSectionElement extends UmbContextConsumerMixin(UmbObserverMixin(
 	}
 
 	private _createTreeRoutes() {
-		const treeRoutes =
-			this._trees?.map(() => {
-				return {
-					path: `:entityType/:key`,
-					component: () => import('../../editors/shared/editor-entity/editor-entity.element'),
-					setup: (component: UmbEditorEntityElement, info: any) => {
-						component.entityKey = info.match.params.key;
-						component.entityType = info.match.params.entityType;
-					},
-				};
-			}) ?? [];
-
 		this._routes = [
 			{
 				path: 'dashboard',
 				component: () => import('./section-dashboards/section-dashboards.element'),
 			},
-			...treeRoutes,
+			{
+				path: `:entityType/:key`,
+				component: () => import('../../workspaces/shared/workspace-entity/workspace-entity.element'),
+				setup: (component: UmbWorkspaceEntityElement, info: any) => {
+					component.entityKey = info.match.params.key;
+					component.entityType = info.match.params.entityType;
+				},
+			},
+			{
+				path: `:entityType`,
+				component: () => import('../../workspaces/shared/workspace-entity/workspace-entity.element'),
+				setup: (component: UmbWorkspaceEntityElement, info: any) => {
+					component.entityType = info.match.params.entityType;
+				},
+			},
 			{
 				path: '**',
 				redirectTo: 'dashboard',
@@ -119,7 +106,7 @@ export class UmbSectionElement extends UmbContextConsumerMixin(UmbObserverMixin(
 	}
 
 	private _observeViews() {
-		if (!this._sectionContext || !this._entityStore) return;
+		if (!this._sectionContext) return;
 
 		this.observe<ManifestSectionView[]>(
 			this._sectionContext.data.pipe(

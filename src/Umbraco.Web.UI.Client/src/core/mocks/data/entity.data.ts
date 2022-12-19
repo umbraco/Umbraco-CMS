@@ -1,5 +1,5 @@
 import { UmbData } from './data';
-import { Entity, entities } from './entities';
+import type { Entity } from '@umbraco-cms/models';
 
 // Temp mocked database
 export class UmbEntityData<T extends Entity> extends UmbData<T> {
@@ -7,14 +7,10 @@ export class UmbEntityData<T extends Entity> extends UmbData<T> {
 		super(data);
 	}
 
-	getItems(type: string, parentKey = '') {
-		if (!type) return [];
-		return this.data.filter((item) => item.type === type && item.parentKey === parentKey);
-	}
-
 	getByKey(key: string) {
 		return this.data.find((item) => item.key === key);
 	}
+	
 	getByKeys(keys: Array<string>) {
 		return this.data.filter((item) => keys.includes(item.key));
 	}
@@ -42,6 +38,10 @@ export class UmbEntityData<T extends Entity> extends UmbData<T> {
 			const item = this.getByKey(key);
 			if (!item) return;
 
+			// TODO: how do we handle trashed items?
+			// TODO: remove ignore when we know how to handle trashed items.
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
 			item.isTrashed = true;
 			this.updateData(item);
 			trashedItems.push(item);
@@ -77,5 +77,3 @@ export class UmbEntityData<T extends Entity> extends UmbData<T> {
 		this.data[itemIndex] = newItem;
 	}
 }
-
-export const umbEntityData = new UmbEntityData<Entity>(entities);

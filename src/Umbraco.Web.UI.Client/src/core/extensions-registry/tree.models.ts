@@ -6,5 +6,8 @@ export interface ManifestTree extends ManifestElement {
 }
 
 export interface MetaTree {
+	label: string;
+	icon: string;
 	sections: Array<string>;
+	rootNodeEntityType?: string;
 }

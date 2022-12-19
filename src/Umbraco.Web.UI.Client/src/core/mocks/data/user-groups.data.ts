@@ -6,6 +6,10 @@ class UmbUserGroupsData extends UmbEntityData<UserGroupDetails> {
 	constructor(data: Array<UserGroupDetails>) {
 		super(data);
 	}
+
+	getAll() {
+		return this.data;
+	}
 }
 
 export const data: Array<UserGroupDetails> = [
@@ -14,9 +18,8 @@ export const data: Array<UserGroupDetails> = [
 		name: 'Administrators',
 		icon: 'umb:medal',
 		parentKey: '',
-		type: 'userGroup',
+		type: 'user-group',
 		hasChildren: false,
-		isTrashed: false,
 		sections: [
 			'Umb.Section.Users',
 			'Umb.Section.Packages',
@@ -29,12 +32,11 @@ export const data: Array<UserGroupDetails> = [
 	},
 	{
 		key: '9a9ad4e9-3b5b-4fe7-b0d9-e301b9675949',
-		name: 'Editors',
+		name: 'Workspaces',
 		icon: 'umb:tools',
 		parentKey: '',
-		type: 'userGroup',
+		type: 'user-group',
 		hasChildren: false,
-		isTrashed: false,
 		sections: ['Umb.Section.Members', 'Umb.Section.Media'],
 		permissions: [],
 		contentStartNode: '74e4008a-ea4f-4793-b924-15e02fd380d1',
@@ -44,9 +46,8 @@ export const data: Array<UserGroupDetails> = [
 		name: 'Sensitive Data',
 		icon: 'umb:lock',
 		parentKey: '',
-		type: 'userGroup',
+		type: 'user-group',
 		hasChildren: false,
-		isTrashed: false,
 		sections: ['Umb.Section.Settings', 'Umb.Section.Members', 'Umb.Section.Media', 'Umb.Section.Content'],
 		permissions: [],
 		contentStartNode: 'cdd30288-2d1c-41b4-89a9-61647b4a10d5',
@@ -56,9 +57,8 @@ export const data: Array<UserGroupDetails> = [
 		name: 'Translators',
 		icon: 'umb:globe',
 		parentKey: '',
-		type: 'userGroup',
+		type: 'user-group',
 		hasChildren: false,
-		isTrashed: false,
 		sections: ['Umb.Section.Packages', 'Umb.Section.Settings'],
 		permissions: [],
 		contentStartNode: 'cdd30288-2d1c-41b4-89a9-61647b4a10d5',
@@ -68,9 +68,8 @@ export const data: Array<UserGroupDetails> = [
 		name: 'Writers',
 		icon: 'umb:edit',
 		parentKey: '',
-		type: 'userGroup',
+		type: 'user-group',
 		hasChildren: false,
-		isTrashed: false,
 		sections: ['Umb.Section.Content'],
 		permissions: [],
 	},

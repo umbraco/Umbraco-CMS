@@ -78,7 +78,7 @@ export class UmbPickerLayoutUserGroupElement extends UmbContextConsumerMixin(Umb
 
 	render() {
 		return html`
-			<umb-editor-entity-layout headline="Select user groups">
+			<umb-workspace-entity-layout headline="Select user groups">
 				<uui-box>
 					<uui-input label="search"></uui-input>
 					<hr />
@@ -100,7 +100,7 @@ export class UmbPickerLayoutUserGroupElement extends UmbContextConsumerMixin(Umb
 					<uui-button label="Close" @click=${this._close}></uui-button>
 					<uui-button label="Submit" look="primary" color="positive" @click=${this._submit}></uui-button>
 				</div>
-			</umb-editor-entity-layout>
+			</umb-workspace-entity-layout>
 		`;
 	}
 }

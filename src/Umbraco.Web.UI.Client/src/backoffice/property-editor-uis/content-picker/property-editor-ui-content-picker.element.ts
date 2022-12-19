@@ -1,13 +1,14 @@
 import { css, html, LitElement, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
-
+import { ifDefined } from 'lit-html/directives/if-defined.js';
 import type { UmbModalService } from '../../../core/services/modal';
-import type { UmbEntityStore } from '../../../core/stores/entity.store';
-import type { Entity } from '../../../core/mocks/data/entities';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import { UmbDocumentStore } from 'src/core/stores/document/document.store';
+import { FolderTreeItem } from '@umbraco-cms/backend-api';
 
+// TODO: rename to Document Picker
 @customElement('umb-property-editor-ui-content-picker')
 export class UmbPropertyEditorUIContentPickerElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles = [
@@ -41,36 +42,37 @@ export class UmbPropertyEditorUIContentPickerElement extends UmbContextConsumerM
 	public config = [];
 
 	@state()
-	private _items: Array<Entity> = [];
+	private _items: Array<FolderTreeItem> = [];
 
 	private _modalService?: UmbModalService;
-	private _entityStore?: UmbEntityStore;
+	private _documentStore?: UmbDocumentStore;
 
 	constructor() {
 		super();
 
-		this.consumeAllContexts(['umbEntityStore', 'umbModalService'], (instances) => {
-			this._entityStore = instances['umbEntityStore'];
+		this.consumeAllContexts(['umbDocumentStore', 'umbModalService'], (instances) => {
+			this._documentStore = instances['umbDocumentStore'];
 			this._modalService = instances['umbModalService'];
-			this._observePickedEntities();
+			this._observePickedDocuments();
 		});
 	}
 
-	private _observePickedEntities() {
-		if (!this._entityStore) return;
-		this.observe<Entity[]>(this._entityStore.getByKeys(this.value), (entities) => {
-			this._items = entities;
+	private _observePickedDocuments() {
+		if (!this._documentStore) return;
+		// TODO: consider changing this to the list data endpoint when it is available
+		this.observe<FolderTreeItem[]>(this._documentStore.getTreeItems(this.value), (items) => {
+			this._items = items;
 		});
 	}
 
 	private _openPicker() {
 		const modalHandler = this._modalService?.contentPicker({ multiple: true, selection: this.value });
 		modalHandler?.onClose().then(({ selection }: any) => {
-			this._setValue([...this.value, ...selection]);
+			this._setValue([...selection]);
 		});
 	}
 
-	private _removeItem(item: Entity) {
+	private _removeItem(item: FolderTreeItem) {
 		const modalHandler = this._modalService?.confirm({
 			color: 'danger',
 			headline: `Remove ${item.name}?`,
@@ -88,14 +90,17 @@ export class UmbPropertyEditorUIContentPickerElement extends UmbContextConsumerM
 
 	private _setValue(newValue: Array<string>) {
 		this.value = newValue;
-		this._observePickedEntities();
+		this._observePickedDocuments();
 		this.dispatchEvent(new CustomEvent('property-editor-change', { bubbles: true, composed: true }));
 	}
 
-	private _renderItem(item: Entity) {
+	private _renderItem(item: FolderTreeItem) {
+		// TODO: remove when we have a way to handle trashed items
+		const tempItem = item as FolderTreeItem & { isTrashed: boolean };
+
 		return html`
-			<uui-ref-node name=${item.name} detail=${item.key}>
-				${item.isTrashed ? html` <uui-tag size="s" slot="tag" color="danger">Trashed</uui-tag> ` : nothing}
+			<uui-ref-node name=${ifDefined(item.name === null ? undefined : item.name)} detail=${ifDefined(item.key)}>
+				${tempItem.isTrashed ? html` <uui-tag size="s" slot="tag" color="danger">Trashed</uui-tag> ` : nothing}
 				<uui-action-bar slot="actions">
 					<uui-button @click=${() => this._removeItem(item)}>Remove</uui-button>
 				</uui-action-bar>
