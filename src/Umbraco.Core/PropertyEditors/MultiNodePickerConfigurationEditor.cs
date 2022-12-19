@@ -25,25 +25,28 @@ public class MultiNodePickerConfigurationEditor : ConfigurationEditor<MultiNodeP
         Field(nameof(MultiNodePickerConfiguration.TreeSource))
             .Config = new Dictionary<string, object> { { "idType", "udi" } };
 
-    /// <inheritdoc />
-    public override Dictionary<string, object> ToConfigurationEditor(MultiNodePickerConfiguration? configuration)
+    public override IDictionary<string, object> ToConfigurationEditor(IDictionary<string, object> configuration)
     {
-        // sanitize configuration
-        Dictionary<string, object> output = base.ToConfigurationEditor(configuration);
+        IDictionary<string, object> config = base.ToConfigurationEditor(configuration);
+        // TODO: this belongs on the client side!
+        if (config.TryGetValue("maxNumber", out var maxNumberValue)
+            && int.TryParse(maxNumberValue.ToString(), out var maxNumber)
+            && maxNumber > 1)
+        {
+            config["multiPicker"] = true;
+        }
 
-        output["multiPicker"] = configuration?.MaxNumber > 1;
-
-        return output;
+        return config;
     }
 
-    /// <inheritdoc />
-    public override IDictionary<string, object> ToValueEditor(object? configuration)
+    public override IDictionary<string, object> ToValueEditor(IDictionary<string, object> configuration)
     {
-        IDictionary<string, object> d = base.ToValueEditor(configuration);
-        d["multiPicker"] = true;
-        d["showEditButton"] = false;
-        d["showPathOnHover"] = false;
-        d["idType"] = "udi";
-        return d;
+        IDictionary<string, object> config = base.ToValueEditor(configuration);
+        // TODO: this belongs on the client side!
+        config["multiPicker"] = true;
+        config["showEditButton"] = false;
+        config["showPathOnHover"] = false;
+        config["idType"] = "udi";
+        return config;
     }
 }

@@ -70,7 +70,7 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
         }
 
         IDataType? dataType = _dataTypeService.GetDataType(property.PropertyType.DataTypeId);
-        if (dataType?.Configuration != null)
+        if (dataType?.ConfigurationObject != null)
         {
             value?.ApplyConfiguration(dataType.ConfigurationAs<ImageCropperConfiguration>());
         }

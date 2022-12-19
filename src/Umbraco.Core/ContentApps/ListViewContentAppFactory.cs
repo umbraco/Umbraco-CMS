@@ -80,7 +80,7 @@ public class ListViewContentAppFactory : IContentAppFactory
             throw new NullReferenceException("The property editor with alias " + dt.EditorAlias + " does not exist");
         }
 
-        IDictionary<string, object?> listViewConfig = editor.GetConfigurationEditor().ToConfigurationEditorNullable(dt.Configuration);
+        IDictionary<string, object> listViewConfig = editor.GetConfigurationEditor().ToConfigurationEditor(dt.ConfigurationData);
 
         // add the entity type to the config
         listViewConfig["entityType"] = entityType;
@@ -122,7 +122,7 @@ public class ListViewContentAppFactory : IContentAppFactory
                 Value = null,
                 View = editor.GetValueEditor().View,
                 HideLabel = true,
-                ConfigNullable = listViewConfig,
+                Config = listViewConfig,
             },
         };
 

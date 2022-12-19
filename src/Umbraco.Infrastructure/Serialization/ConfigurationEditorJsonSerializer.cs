@@ -6,6 +6,9 @@ using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Infrastructure.Serialization;
 
+// TODO: clean this file up (delete the old backoffice implementation when we're ready to do so)
+
+// use this implementation for testing with the old backoffice (using Newtonsoft.Json)
 public class ConfigurationEditorJsonSerializer : JsonNetSerializer, IConfigurationEditorJsonSerializer
 {
     public ConfigurationEditorJsonSerializer()
@@ -42,3 +45,27 @@ public class ConfigurationEditorJsonSerializer : JsonNetSerializer, IConfigurati
         }
     }
 }
+
+// use this implementation for testing with the new backoffice API (using System.Text.Json)
+// public class ConfigurationEditorJsonSerializer : IConfigurationEditorJsonSerializer
+// {
+//     private System.Text.Json.JsonSerializerOptions _jsonSerializerOptions;
+//
+//     public ConfigurationEditorJsonSerializer()
+//     {
+//         _jsonSerializerOptions = new System.Text.Json.JsonSerializerOptions
+//         {
+//             PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase,
+//             // in some cases, configs aren't camel cased in the DB, so we have to resort to case insensitive
+//             // property name resolving when creating configuration objects (deserializing DB configs)
+//             PropertyNameCaseInsensitive = true
+//         };
+//         _jsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+//     }
+//
+//     public string Serialize(object? input) => System.Text.Json.JsonSerializer.Serialize(input, _jsonSerializerOptions);
+//
+//     public T? Deserialize<T>(string input) => System.Text.Json.JsonSerializer.Deserialize<T>(input, _jsonSerializerOptions);
+//
+//     public T? DeserializeSubset<T>(string input, string key) => throw new NotSupportedException();
+// }

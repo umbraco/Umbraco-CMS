@@ -3,6 +3,7 @@
 
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.PropertyEditors.Validators;
+using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
@@ -24,7 +25,7 @@ internal class MultipleTextStringConfigurationEditor : ConfigurationEditor<Multi
             Key = "min",
             View = "requiredfield",
             Name = "Minimum",
-            PropertyName = nameof(MultipleTextStringConfiguration.Minimum),
+            PropertyName = nameof(MultipleTextStringConfiguration.Min),
         });
 
         Fields.Add(new ConfigurationField(new IntegerValidator())
@@ -33,31 +34,27 @@ internal class MultipleTextStringConfigurationEditor : ConfigurationEditor<Multi
             Key = "max",
             View = "requiredfield",
             Name = "Maximum",
-            PropertyName = nameof(MultipleTextStringConfiguration.Maximum),
+            PropertyName = nameof(MultipleTextStringConfiguration.Max),
         });
     }
 
-    /// <inheritdoc />
-    public override MultipleTextStringConfiguration FromConfigurationEditor(
-        IDictionary<string, object?>? editorValues,
-        MultipleTextStringConfiguration? configuration)
+    public override IDictionary<string, object> FromDatabase(string? configuration, IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
     {
-        // TODO: this isn't pretty
-        // the values from the editor will be min/max fields and we need to format to json in one field
-        // is the editor sending strings or ints or?!
-        Attempt<int> min = (editorValues?.ContainsKey("min") ?? false ? editorValues["min"]?.ToString() : "0")
-            .TryConvertTo<int>();
-        Attempt<int> max = (editorValues?.ContainsKey("max") ?? false ? editorValues["max"]?.ToString() : "0")
-            .TryConvertTo<int>();
+        IDictionary<string, object> config = base.FromDatabase(configuration, configurationEditorJsonSerializer);
 
-        return new MultipleTextStringConfiguration
+        // translate legacy configs ("Minimum", "Maximum") to current format ("min", "max")
+        if (config.TryGetValue("Minimum", out var minimum))
         {
-            Minimum = min.Success ? min.Result : 0,
-            Maximum = max.Success ? max.Result : 0,
-        };
-    }
+            config[nameof(MultipleTextStringConfiguration.Min).ToFirstLowerInvariant()] = minimum;
+            config.Remove("Minimum");
+        }
 
-    /// <inheritdoc />
-    public override Dictionary<string, object> ToConfigurationEditor(MultipleTextStringConfiguration? configuration) =>
-        new Dictionary<string, object> { { "min", configuration?.Minimum ?? 0 }, { "max", configuration?.Maximum ?? 0 } };
+        if (config.TryGetValue("Maximum", out var maximum))
+        {
+            config[nameof(MultipleTextStringConfiguration.Max).ToFirstLowerInvariant()] = maximum;
+            config.Remove("Maximum");
+        }
+
+        return config;
+    }
 }

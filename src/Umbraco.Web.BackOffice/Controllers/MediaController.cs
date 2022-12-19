@@ -752,7 +752,7 @@ public class MediaController : ContentControllerBase
                         IDataType? dataType = _dataTypeService.GetDataType(dataTypeKey);
 
                         if (dataType == null ||
-                            dataType.Configuration is not IFileExtensionsConfig fileExtensionsConfig)
+                            dataType.ConfigurationObject is not IFileExtensionsConfig fileExtensionsConfig)
                         {
                             continue;
                         }

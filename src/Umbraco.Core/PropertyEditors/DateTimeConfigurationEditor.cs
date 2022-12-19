@@ -29,14 +29,14 @@ public class DateTimeConfigurationEditor : ConfigurationEditor<DateTimeConfigura
     {
     }
 
-    public override IDictionary<string, object> ToValueEditor(object? configuration)
+    public override IDictionary<string, object> ToValueEditor(IDictionary<string, object> configuration)
     {
-        IDictionary<string, object> d = base.ToValueEditor(configuration);
+        IDictionary<string, object> config = base.ToValueEditor(configuration);
 
-        var format = d["format"].ToString()!;
+        var format = config["format"].ToString()!;
 
-        d["pickTime"] = format.ContainsAny(new[] { "H", "m", "s" });
+        config["pickTime"] = format.ContainsAny(new[] { "H", "m", "s" });
 
-        return d;
+        return config;
     }
 }
