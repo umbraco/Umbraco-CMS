@@ -35,7 +35,7 @@ public class PublishedSnapshotServiceOptions
     ///     The path to store the localDb files at.
     /// </summary>
     /// <remarks>
-    ///     By default <see cref="IHostingEnvironment.LocalTempPath"/> is used. On Linux storeing the localDb file outside tmp can be more performant.
+    ///     By default <see cref="IHostingEnvironment.LocalTempPath"/> is used. On Linux storing the localDb file outside tmp can be more performant.
     ///     See: https://github.com/mamift/CSharpTest.Net.Collections/issues/2#issuecomment-1328282778
     /// </remarks>
     public string? CachePath { get; set; }
