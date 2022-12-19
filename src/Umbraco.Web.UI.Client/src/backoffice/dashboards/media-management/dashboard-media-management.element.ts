@@ -7,13 +7,15 @@ import '../../components/collection/collection-view.element';
 import { map } from 'rxjs';
 import { IRoutingInfo } from 'router-slot';
 import type { ManifestCollectionLayout } from '@umbraco-cms/models';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
 
 @customElement('umb-dashboard-media-management')
-export class UmbDashboardMediaManagementElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+export class UmbDashboardMediaManagementElement extends UmbContextProviderMixin(
+	UmbContextConsumerMixin(UmbObserverMixin(LitElement))
+) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -39,6 +41,7 @@ export class UmbDashboardMediaManagementElement extends UmbContextConsumerMixin(
 
 	constructor() {
 		super();
+		this.provideContext('umbMediaContext', this);
 		this._observeCollectionLayouts();
 	}
 
@@ -51,7 +54,6 @@ export class UmbDashboardMediaManagementElement extends UmbContextConsumerMixin(
 				})
 			),
 			(layouts) => {
-				console.log('layouts', layouts);
 				if (layouts?.length === 0) return;
 				this._collectionLayouts = layouts;
 				this._createRoutes();

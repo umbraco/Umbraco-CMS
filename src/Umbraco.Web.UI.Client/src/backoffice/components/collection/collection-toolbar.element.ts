@@ -1,11 +1,14 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, LitElement, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import '../tooltip-menu.element';
+import { map } from 'rxjs';
 import { TooltipMenuItem } from '../tooltip-menu.element';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
+import type { ManifestCollectionLayout } from '@umbraco-cms/models';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
 @customElement('umb-collection-toolbar')
-export class UmbCollectionToolbarElement extends LitElement {
+export class UmbCollectionToolbarElement extends UmbObserverMixin(LitElement) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -28,31 +31,6 @@ export class UmbCollectionToolbarElement extends LitElement {
 	];
 
 	@property()
-	public viewTypes: Array<TooltipMenuItem> = [
-		{
-			label: 'List',
-			icon: 'umb:list',
-			action: () => {
-				this._currentViewType = this.viewTypes[0];
-			},
-		},
-		{
-			label: 'Grid',
-			icon: 'umb:grid',
-			action: () => {
-				console.log('aweawd');
-				this._currentViewType = this.viewTypes[1];
-			},
-		},
-		{
-			label: 'something else',
-			icon: 'umb:folder',
-			action: () => {
-				this._currentViewType = this.viewTypes[2];
-			},
-		},
-	];
-	@property()
 	public actions: Array<TooltipMenuItem> = [
 		{
 			label: 'File',
@@ -70,11 +48,15 @@ export class UmbCollectionToolbarElement extends LitElement {
 		},
 	];
 
+	@state()
+	private _collectionLayouts: Array<ManifestCollectionLayout> = [];
+
 	@property()
 	public useSearch = true;
 
 	@state()
-	private _currentViewType = this.viewTypes[0];
+	private _currentViewType?: ManifestCollectionLayout;
+
 	@state()
 	private _search = '';
 	@state()
@@ -82,9 +64,41 @@ export class UmbCollectionToolbarElement extends LitElement {
 	@state()
 	private _viewTypesOpen = false;
 
+	constructor() {
+		super();
+		this._observeCollectionLayouts();
+	}
+
+	private _observeCollectionLayouts() {
+		this.observe<Array<ManifestCollectionLayout>>(
+			umbExtensionsRegistry?.extensionsOfType('collectionLayout').pipe(
+				map((extensions) => {
+					//TODO: This is working, so why can ts not find the type?
+					return extensions.filter((extension) => extension.meta.entityType === 'media');
+				})
+			),
+			(layouts) => {
+				console.log('layouts', layouts);
+				if (layouts?.length === 0) return;
+				this._collectionLayouts = layouts;
+
+				if (!this._currentViewType) {
+					this._currentViewType = layouts[0];
+				}
+			}
+		);
+	}
+
+	private _changeLayout(path: string) {
+		history.pushState(null, '', 'section/media/dashboard/media-management/' + path);
+	}
+
 	private _toggleViewType() {
-		const index = this.viewTypes.indexOf(this._currentViewType);
-		this._currentViewType = this.viewTypes[(index + 1) % this.viewTypes.length];
+		if (!this._currentViewType) return;
+
+		const index = this._collectionLayouts.indexOf(this._currentViewType);
+		this._currentViewType = this._collectionLayouts[(index + 1) % this._collectionLayouts.length];
+		this._changeLayout(this._currentViewType.meta.pathName);
 	}
 
 	private _updateSearch(e: InputEvent) {
@@ -116,19 +130,28 @@ export class UmbCollectionToolbarElement extends LitElement {
 	}
 
 	private _renderViewTypeButton() {
-		if (this.viewTypes.length < 2 || !this._currentViewType.icon) return nothing;
+		if (!this._currentViewType) return;
 
-		if (this.viewTypes.length === 2) {
+		if (this._collectionLayouts.length < 2 || !this._currentViewType.meta.icon) return nothing;
+
+		if (this._collectionLayouts.length === 2) {
 			return html`<uui-button @click=${this._toggleViewType} look="outline" compact>
-				<uui-icon .name=${this._currentViewType.icon}></uui-icon>
+				<uui-icon .name=${this._currentViewType.meta.icon}></uui-icon>
 			</uui-button>`;
 		}
-		if (this.viewTypes.length > 2) {
+		if (this._collectionLayouts.length > 2) {
 			return html`<uui-popover margin="8" .open=${this._viewTypesOpen} @close=${() => (this._viewTypesOpen = false)}>
 				<uui-button @click=${() => (this._viewTypesOpen = !this._viewTypesOpen)} slot="trigger" look="outline" compact>
-					<uui-icon .name=${this._currentViewType.icon}></uui-icon>
+					<uui-icon .name=${this._currentViewType.meta.icon}></uui-icon>
 				</uui-button>
-				<umb-tooltip-menu icon slot="popover" .items=${this.viewTypes}></umb-tooltip-menu>
+				<umb-tooltip-menu
+					icon
+					slot="popover"
+					.items=${this._collectionLayouts.map((layout) => ({
+						label: layout.meta.label,
+						icon: layout.meta.icon,
+						action: () => console.log('change layout'),
+					}))}></umb-tooltip-menu>
 			</uui-popover>`;
 		}
 

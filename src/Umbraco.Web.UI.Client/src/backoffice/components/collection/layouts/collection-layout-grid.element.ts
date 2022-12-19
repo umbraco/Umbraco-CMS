@@ -92,7 +92,6 @@ export class UmbCollectionLayoutGridElement extends UmbContextConsumerMixin(UmbO
 
 		this.observe<Array<MediaDetails>>(this._mediaStore?.items, (items) => {
 			this._mediaItems = items;
-			console.log('items', items);
 		});
 	}
 
