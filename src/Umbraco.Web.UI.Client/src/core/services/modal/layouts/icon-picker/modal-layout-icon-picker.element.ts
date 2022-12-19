@@ -10,8 +10,6 @@ import icons from 'public-assets/icons/icons.json';
 import '@umbraco-ui/uui-color-swatch';
 import '@umbraco-ui/uui-color-swatches';
 
-import '../../../../../backoffice/editors/shared/editor-entity-layout/editor-entity-layout.element';
-
 export interface UmbModalIconPickerData {
 	multiple: boolean;
 	selection: string[];

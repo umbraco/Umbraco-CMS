@@ -153,7 +153,12 @@ export class UmbWorkspaceDocumentTypeElement extends UmbContextProviderMixin(
 		return html`
 			<umb-workspace-entity-layout alias="Umb.Workspace.DocumentType">
 				<div id="header" slot="header">
-					<umb-property-editor-ui-icon-picker></umb-property-editor-ui-icon-picker>
+					<uui-button id="icon" @click=${this._handleIconClick} compact>
+						<uui-icon
+							name="${this._documentType?.icon || 'umb:document-dashed-line'}"
+							style="color: ${this._icon.color}"></uui-icon>
+					</uui-button>
+
 					<uui-input id="name" .value=${this._documentType?.name} @input="${this._handleInput}">
 						<div id="alias" slot="append">${this._documentType?.alias}</div>
 					</uui-input>
