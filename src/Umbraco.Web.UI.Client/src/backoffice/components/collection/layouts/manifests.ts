@@ -15,4 +15,18 @@ export const manifests: Array<ManifestCollectionLayout> = [
 			pathName: 'grid',
 		},
 	},
+	{
+		type: 'collectionLayout',
+		alias: 'Umb.CollectionLayout.Table',
+		name: 'Table',
+		elementName: 'umb-collection-layout-table',
+		loader: () => import('./collection-layout-table.element'),
+		weight: 100,
+		meta: {
+			label: 'Table',
+			icon: 'umb:table',
+			entityType: 'media',
+			pathName: 'table',
+		},
+	},
 ];
