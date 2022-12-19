@@ -2254,12 +2254,12 @@
         }
       }
     },
-    "/umbraco/management/api/v1/created": {
+    "/umbraco/management/api/v1/package/created": {
       "get": {
         "tags": [
           "Package"
         ],
-        "operationId": "GetCreated",
+        "operationId": "GetPackageCreated",
         "parameters": [
           {
             "name": "skip",
@@ -2294,12 +2294,12 @@
         }
       }
     },
-    "/umbraco/management/api/v1/created/{key}": {
+    "/umbraco/management/api/v1/package/created/{key}": {
       "get": {
         "tags": [
           "Package"
         ],
-        "operationId": "GetCreatedByKey",
+        "operationId": "GetPackageCreatedByKey",
         "parameters": [
           {
             "name": "key",
@@ -2338,7 +2338,7 @@
         "tags": [
           "Package"
         ],
-        "operationId": "DeleteCreatedByKey",
+        "operationId": "DeletePackageCreatedByKey",
         "parameters": [
           {
             "name": "key",
@@ -2367,12 +2367,12 @@
         }
       }
     },
-    "/umbraco/management/api/v1/created/{key}/download": {
+    "/umbraco/management/api/v1/package/created/{key}/download": {
       "get": {
         "tags": [
           "Package"
         ],
-        "operationId": "GetCreatedByKeyDownload",
+        "operationId": "GetPackageCreatedByKeyDownload",
         "parameters": [
           {
             "name": "key",
@@ -2409,12 +2409,12 @@
         }
       }
     },
-    "/umbraco/management/api/v1/created/save": {
+    "/umbraco/management/api/v1/package/created/save": {
       "post": {
         "tags": [
           "Package"
         ],
-        "operationId": "PostCreatedSave",
+        "operationId": "PostPackageCreatedSave",
         "requestBody": {
           "content": {
             "application/json": {
