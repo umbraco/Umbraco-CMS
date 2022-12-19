@@ -1,6 +1,6 @@
 import { html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { UmbTableItem } from '../../../../components/table/table.element';
+import { UmbTableItem } from '@umbraco-cms/components/table';
 
 @customElement('umb-user-group-table-name-column-layout')
 export class UmbUserGroupTableNameColumnLayoutElement extends LitElement {
@@ -11,7 +11,7 @@ export class UmbUserGroupTableNameColumnLayoutElement extends LitElement {
 	value!: any;
 
 	render() {
-		return html` <a style="font-weight: bold;" href="/section/users/view/users/userGroup/${this.item.key}">
+		return html` <a style="font-weight: bold;" href="section/users/view/users/user-group/${this.item.key}">
 			${this.value.name}
 		</a>`;
 	}

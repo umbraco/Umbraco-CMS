@@ -17,6 +17,7 @@ export interface UmbModalIconPickerData {
 	selection: string[];
 }
 
+// TODO: Make use of UmbPickerLayoutBase
 @customElement('umb-modal-layout-icon-picker')
 export class UmbModalLayoutIconPickerElement extends UmbModalLayoutElement<UmbModalIconPickerData> {
 	static styles = [
@@ -166,7 +167,7 @@ export class UmbModalLayoutIconPickerElement extends UmbModalLayoutElement<UmbMo
 
 	render() {
 		return html`
-			<umb-editor-entity-layout headline="Select Icon">
+			<umb-workspace-entity-layout headline="Select Icon">
 				<div id="container">
 					${this.renderSearchbar()}
 					<hr />
@@ -181,7 +182,7 @@ export class UmbModalLayoutIconPickerElement extends UmbModalLayoutElement<UmbMo
 				<uui-button slot="actions" color="positive" look="primary" @click="${this._save}" label="save">
 					Save
 				</uui-button>
-			</umb-editor-entity-layout>
+			</umb-workspace-entity-layout>
 		`;
 	}
 

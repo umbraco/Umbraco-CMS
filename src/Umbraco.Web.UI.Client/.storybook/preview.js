@@ -9,9 +9,8 @@ import { initialize, mswDecorator } from 'msw-storybook-addon';
 import { setCustomElements } from '@storybook/web-components';
 
 import customElementManifests from '../custom-elements.json';
-import { UmbDataTypeStore } from '../src/core/stores/data-type/data-type.store';
-import { UmbDocumentTypeStore } from '../src/core/stores/document-type.store';
-import { UmbNodeStore } from '../src/core/stores/node.store';
+import { UmbDataTypesStore } from '../src/core/stores/data-types/data-types.store';
+import { UmbDocumentTypeStore } from '../src/core/stores/document-type/document-type.store';
 import { UmbIconStore } from '../src/core/stores/icon/icon.store';
 import { onUnhandledRequest } from '../src/core/mocks/browser';
 import { handlers } from '../src/core/mocks/browser-handlers';
@@ -22,14 +21,15 @@ import { manifests as sectionManifests } from '../src/backoffice/sections/manife
 import { manifests as propertyEditorModelManifests } from '../src/backoffice/property-editor-models/manifests';
 import { manifests as propertyEditorUIManifests } from '../src/backoffice/property-editor-uis/manifests';
 import { manifests as treeManifests } from '../src/backoffice/trees/manifests';
-import { manifests as editorManifests } from '../src/backoffice/editors/manifests';
+import { manifests as workspaceManifests } from '../src/backoffice/workspaces/manifests';
 import { manifests as propertyActionManifests } from '../src/backoffice/property-actions/manifests';
 
 import { umbExtensionsRegistry } from '../src/core/extensions-registry';
 
 import '../src/core/context-api/provide/context-provider.element';
 import '../src/core/css/custom-properties.css';
-import '../src/backoffice/components/backoffice-modal-container.element';
+import '../src/backoffice/components/backoffice-frame/backoffice-modal-container.element';
+import '../src/backoffice/components/shared/code-block.element';
 
 class UmbStoryBookElement extends LitElement {
 	_umbIconStore = new UmbIconStore();
@@ -40,7 +40,7 @@ class UmbStoryBookElement extends LitElement {
 
 		this._registerExtensions(sectionManifests);
 		this._registerExtensions(treeManifests);
-		this._registerExtensions(editorManifests);
+		this._registerExtensions(workspaceManifests);
 		this._registerExtensions(propertyEditorModelManifests);
 		this._registerExtensions(propertyEditorUIManifests);
 		this._registerExtensions(propertyActionManifests);
@@ -62,12 +62,8 @@ customElements.define('umb-storybook', UmbStoryBookElement);
 
 const storybookProvider = (story) => html` <umb-storybook>${story()}</umb-storybook> `;
 
-const nodeStoreProvider = (story) => html`
-	<umb-context-provider key="umbNodeStore" .value=${new UmbNodeStore()}>${story()}</umb-context-provider>
-`;
-
 const dataTypeStoreProvider = (story) => html`
-	<umb-context-provider key="umbDataTypeStore" .value=${new UmbDataTypeStore()}>${story()}</umb-context-provider>
+	<umb-context-provider key="umbDataTypeStore" .value=${new UmbDataTypesStore()}>${story()}</umb-context-provider>
 `;
 
 const documentTypeStoreProvider = (story) => html`
@@ -90,7 +86,6 @@ initialize({ onUnhandledRequest });
 export const decorators = [
 	mswDecorator,
 	storybookProvider,
-	nodeStoreProvider,
 	dataTypeStoreProvider,
 	documentTypeStoreProvider,
 	modalServiceProvider,

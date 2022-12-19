@@ -22,6 +22,7 @@ export class UmbModalHandler {
 		this.size = options?.size || 'small';
 		this.element = this._createElement(element, options);
 
+		// TODO: Consider if its right to use Promises, or use another event based system? Would we need to be able to cancel an event, to then prevent the closing..?
 		this._closePromise = new Promise((resolve) => {
 			this._closeResolver = resolve;
 		});

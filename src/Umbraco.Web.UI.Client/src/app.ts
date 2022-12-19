@@ -6,13 +6,14 @@ import '@umbraco-ui/uui-modal-sidebar';
 import '@umbraco-ui/uui-color-swatch';
 import '@umbraco-ui/uui-color-swatches';
 import 'router-slot';
+import 'element-internals-polyfill';
 
 // TODO: remove these imports when they are part of UUI
 import type { Guard, IRoute } from 'router-slot/model';
 
 import { UUIIconRegistryEssential } from '@umbraco-ui/uui';
 import { css, html, LitElement } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
+import {customElement, property, state} from 'lit/decorators.js';
 
 import { OpenAPI, RuntimeLevel, ServerResource } from '@umbraco-cms/backend-api';
 import { UmbContextProviderMixin } from '@umbraco-cms/context-api';
@@ -31,6 +32,9 @@ export class UmbApp extends UmbContextProviderMixin(LitElement) {
 			height: 100vh;
 		}
 	`;
+
+	@property({ type: String })
+	private umbracoUrl?: string;
 
 	@state()
 	private _routes: IRoute[] = [
@@ -66,8 +70,10 @@ export class UmbApp extends UmbContextProviderMixin(LitElement) {
 	async connectedCallback() {
 		super.connectedCallback();
 
-		OpenAPI.BASE = import.meta.env.VITE_UMBRACO_USE_MSW === 'on' ? '' : import.meta.env.VITE_UMBRACO_API_URL;
+		OpenAPI.BASE = import.meta.env.VITE_UMBRACO_USE_MSW === 'on' ? '' : this.umbracoUrl ?? import.meta.env.VITE_UMBRACO_API_URL ?? '';
 		OpenAPI.WITH_CREDENTIALS = true;
+
+		this.provideContext('UMBRACOBASE', OpenAPI.BASE);
 
 		await this._setInitStatus();
 		await this._registerExtensionManifestsFromServer();
@@ -114,7 +120,8 @@ export class UmbApp extends UmbContextProviderMixin(LitElement) {
 	}
 
 	private _isAuthorized(): boolean {
-		return sessionStorage.getItem('is-authenticated') === 'true';
+		return true; // TODO: Return true for now, until new login page is up and running
+		//return sessionStorage.getItem('is-authenticated') === 'true';
 	}
 
 	private _isAuthorizedGuard(redirectTo?: string): Guard {
@@ -123,13 +130,14 @@ export class UmbApp extends UmbContextProviderMixin(LitElement) {
 				return true;
 			}
 
-			let returnPath = '/login';
+			let returnPath = `${OpenAPI.BASE}/umbraco/login`;
 
 			if (redirectTo) {
 				returnPath += `?redirectTo=${redirectTo}`;
 			}
 
-			history.replaceState(null, '', returnPath);
+			// Redirect user completely to login page
+			location.href = returnPath;
 			return false;
 		};
 	}

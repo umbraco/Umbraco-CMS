@@ -1,7 +1,7 @@
 import { html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-import type { ManifestDashboard, ManifestWithLoader } from '@umbraco-cms/models';
+import type { ManifestDashboard } from '@umbraco-cms/models';
 
 @customElement('umb-section-settings')
 export class UmbSectionSettingsElement extends LitElement {
@@ -12,7 +12,7 @@ export class UmbSectionSettingsElement extends LitElement {
 	}
 
 	private _registerDashboards() {
-		const dashboards: Array<ManifestWithLoader<ManifestDashboard>> = [
+		const dashboards: Array<ManifestDashboard> = [
 			{
 				type: 'dashboard',
 				alias: 'Umb.Dashboard.SettingsWelcome',
@@ -63,6 +63,19 @@ export class UmbSectionSettingsElement extends LitElement {
 					label: 'Published Status',
 					sections: ['Umb.Section.Settings'],
 					pathname: 'published-status',
+				},
+			},
+			{
+				type: 'dashboard',
+				alias: 'Umb.Dashboard.Profiling',
+				name: 'Profiling',
+				elementName: 'umb-dashboard-performance-profiling',
+				loader: () => import('../../dashboards/performance-profiling/dashboard-performance-profiling.element'),
+				weight: 101,
+				meta: {
+					label: 'Profiling',
+					sections: ['Umb.Section.Settings'],
+					pathname: 'profiling',
 				},
 			},
 			{

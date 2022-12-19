@@ -42,7 +42,7 @@ jobs:
     #     path: coverage/
     #     retention-days: 30
     - name: Report code coverage
-      uses: zgosalvez/github-actions-report-lcov@v1
+      uses: zgosalvez/github-actions-report-lcov@v2
       if: always()
       continue-on-error: true
       with:
