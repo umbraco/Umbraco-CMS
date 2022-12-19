@@ -785,22 +785,29 @@ public class UsersController : BackOfficeNotificationsController
             return ValidationProblem("The current user cannot disable itself");
         }
 
-        IUser[] users = _userService.GetUsersById(userIds).ToArray();
+        var users = _userService.GetUsersById(userIds).ToList();
+        List<IUser> skippedUsers = new();
         foreach (IUser u in users)
         {
+            if (u.UserState is UserState.Invited)
+            {
+                _logger.LogWarning("Could not disable invited user {Username}", u.Name);
+                skippedUsers.Add(u);
+                continue;
+            }
+
             u.IsApproved = false;
             u.InvitedDate = null;
         }
 
-        _userService.Save(users);
+        users = users.Where(x => !skippedUsers.Contains(x)).ToList();
 
-        if (users.Length > 1)
+        if (users.Any())
         {
-            return Ok(_localizedTextService.Localize("speechBubbles", "disableUsersSuccess",
-                new[] { userIds.Length.ToString() }));
+            _userService.Save(users);
         }
 
-        return Ok(_localizedTextService.Localize("speechBubbles", "disableUserSuccess", new[] { users[0].Name }));
+        return Ok(users.Select(x => x.Id));
     }
 
     /// <summary>
