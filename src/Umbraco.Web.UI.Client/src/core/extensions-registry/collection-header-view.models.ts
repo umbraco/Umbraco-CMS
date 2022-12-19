@@ -9,4 +9,5 @@ export interface MetaCollectionLayout {
 	label: string;
 	icon: string;
 	entityType: string;
+	pathName: string;
 }
