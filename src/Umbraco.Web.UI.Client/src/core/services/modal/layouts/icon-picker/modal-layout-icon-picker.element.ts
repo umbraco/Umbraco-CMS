@@ -90,40 +90,6 @@ export class UmbModalLayoutIconPickerElement extends UmbModalLayoutElement<UmbMo
 
 	@property({ type: Array })
 	iconlist = icons.map((icon) => icon.name);
-	/*iconlist = [
-		'umb:add',
-		'umb:alert',
-		'umb:attachment',
-		'umb:calendar',
-		'umb:check',
-		'umb:clipboard',
-		'umb:code',
-		'umb:colorpicker',
-		'umb:copy',
-		'umb:delete',
-		'umb:document',
-		'umb:download',
-		'umb:edit',
-		'umb:favorite',
-		'umb:folder',
-		'umb:forbidden',
-		'umb:info',
-		'umb:link',
-		'umb:lock',
-		'umb:pause',
-		'umb:picture',
-		'umb:play',
-		'umb:remove',
-		'umb:search',
-		'umb:see',
-		'umb:settings',
-		'umb:subtract',
-		'umb:sync',
-		'umb:unlock',
-		'umb:unsee',
-		'umb:wand',
-		'umb:wrong',
-	];*/
 
 	@property({ type: Array })
 	iconlistFiltered: Array<string>;

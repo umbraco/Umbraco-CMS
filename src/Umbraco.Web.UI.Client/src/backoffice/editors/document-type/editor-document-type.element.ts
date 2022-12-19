@@ -138,7 +138,8 @@ export class UmbEditorDocumentTypeElement extends UmbContextProviderMixin(
 
 		modalHandler?.onClose().then((saved) => {
 			if (saved) this._documentTypeContext?.update({ icon: saved.icon });
-			// TODO save color as well and update styling on the icon that shows up
+			console.log(saved);
+			// TODO save color ALIAS as well
 		});
 	}
 
