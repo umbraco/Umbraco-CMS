@@ -177,8 +177,8 @@ public class PublishedRouter : IPublishedRouter
             return result;
         }
 
-        // set the culture -- again, 'cos it might have changed in the event handler
-        SetVariationContext(result.Culture);
+        // set the culture and segment -- again, 'cos it might have changed in the event handler
+        SetVariationContext(result.Culture, result.Segment);
 
         return result;
     }
@@ -202,15 +202,15 @@ public class PublishedRouter : IPublishedRouter
         return request.Build();
     }
 
-    private void SetVariationContext(string? culture)
+    private void SetVariationContext(string? culture, string? segment)
     {
         VariationContext? variationContext = _variationContextAccessor.VariationContext;
-        if (variationContext != null && variationContext.Culture == culture)
+        if (variationContext != null && variationContext.Culture == culture && variationContext.Segment == segment)
         {
             return;
         }
 
-        _variationContextAccessor.VariationContext = new VariationContext(culture);
+        _variationContextAccessor.VariationContext = new VariationContext(culture, segment);
     }
 
     private async Task RouteRequestInternalAsync(IPublishedRequestBuilder builder, bool skipContentFinders = false)
@@ -223,7 +223,7 @@ public class PublishedRouter : IPublishedRouter
         }
 
         // set the culture
-        SetVariationContext(builder.Culture);
+        SetVariationContext(builder.Culture, builder.Segment);
 
         var foundContentByFinders = false;
 
@@ -257,8 +257,8 @@ public class PublishedRouter : IPublishedRouter
             // handle wildcard domains
             HandleWildcardDomains(builder);
 
-            // set the culture  -- again, 'cos it might have changed due to a finder or wildcard domain
-            SetVariationContext(builder.Culture);
+            // set the culture and segment  -- again, 'cos it might have changed due to a finder or wildcard domain
+            SetVariationContext(builder.Culture, builder.Segment);
         }
 
         // trigger the routing request (used to be called Prepared) event - at that point it is still possible to change about anything

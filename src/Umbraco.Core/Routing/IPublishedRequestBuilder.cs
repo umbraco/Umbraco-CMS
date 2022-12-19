@@ -32,6 +32,11 @@ public interface IPublishedRequestBuilder
     string? Culture { get; }
 
     /// <summary>
+    ///     Gets the segment (if any)
+    /// </summary>
+    string? Segment { get; }
+
+    /// <summary>
     ///     Gets a value indicating whether the current published content has been obtained
     ///     from the initial published content following internal redirections exclusively.
     /// </summary>
@@ -70,6 +75,11 @@ public interface IPublishedRequestBuilder
     ///     Sets the culture for the request
     /// </summary>
     IPublishedRequestBuilder SetCulture(string? culture);
+
+    /// <summary>
+    ///     Sets the segment for the request
+    /// </summary>
+    IPublishedRequestBuilder SetSegment(string? segment);
 
     /// <summary>
     ///     Sets the found <see cref="IPublishedContent" /> for the request
