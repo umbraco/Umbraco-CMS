@@ -43,11 +43,11 @@ export class UmbWorkspaceExtensionRootElement extends UmbContextConsumerMixin(Um
 										${isManifestElementType(extension) ? extension.name : 'Custom extension'}
 									</uui-table-cell>
 									<uui-table-cell>${extension.alias}</uui-table-cell>
-									<uui-table-cell
-										><uui-button
+									<uui-table-cell>
+										<uui-button
 											label="unload"
-											@click=${() => umbExtensionsRegistry.unregister(extension.alias)}></uui-button
-									></uui-table-cell>
+											@click=${() => umbExtensionsRegistry.unregister(extension.alias)}></uui-button>
+										</uui-table-cell>
 								</uui-table-row>
 							`
 						)}
