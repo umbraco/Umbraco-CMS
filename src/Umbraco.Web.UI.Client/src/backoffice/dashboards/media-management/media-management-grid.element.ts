@@ -2,6 +2,10 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, LitElement, nothing } from 'lit';
 import { repeat } from 'lit-html/directives/repeat.js';
 import { customElement } from 'lit/decorators.js';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import type { MediaDetails } from '@umbraco-cms/models';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
+import { UmbMediaStore } from '@umbraco-cms/stores/media/media.store';
 
 export interface UmbMediaItem {
 	name: string;
@@ -9,7 +13,7 @@ export interface UmbMediaItem {
 }
 
 @customElement('umb-media-management-grid')
-export class UmbMediaManagementGridElement extends LitElement {
+export class UmbMediaManagementGridElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -63,28 +67,9 @@ export class UmbMediaManagementGridElement extends LitElement {
 		`,
 	];
 
-	private _mediaItems: UmbMediaItem[] = [
-		{
-			name: 'Image 1',
-			type: 'image',
-		},
-		{
-			name: 'Image 2',
-			type: 'image',
-		},
-		{
-			name: 'Products',
-			type: 'folder',
-		},
-		{
-			name: 'People',
-			type: 'folder',
-		},
-	];
+	private _mediaItems: MediaDetails[] = [];
 
-	/**
-	 *
-	 */
+	private _mediaStore?: UmbMediaStore;
 	constructor() {
 		super();
 		document.addEventListener('dragenter', (e) => {
@@ -96,6 +81,19 @@ export class UmbMediaManagementGridElement extends LitElement {
 		document.addEventListener('drop', (e) => {
 			e.preventDefault();
 			this.toggleAttribute('dragging', false);
+		});
+		this.consumeContext('umbMediaStore', (store: UmbMediaStore) => {
+			this._mediaStore = store;
+			this._observeMediaItems();
+		});
+	}
+
+	private _observeMediaItems() {
+		if (!this._mediaStore) return;
+
+		this.observe<Array<MediaDetails>>(this._mediaStore?.items, (items) => {
+			this._mediaItems = items;
+			console.log('items', items);
 		});
 	}
 
