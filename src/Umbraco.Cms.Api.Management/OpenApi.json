@@ -489,7 +489,7 @@
         ],
         "operationId": "PostDictionaryUpload",
         "requestBody": {
-          "content": { }
+          "content": {}
         },
         "responses": {
           "200": {
@@ -2254,6 +2254,220 @@
         }
       }
     },
+    "/umbraco/management/api/v1/created": {
+      "get": {
+        "tags": [
+          "Package"
+        ],
+        "operationId": "GetCreated",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedPackageDefinition"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/created/{key}": {
+      "get": {
+        "tags": [
+          "Package"
+        ],
+        "operationId": "GetCreatedByKey",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundResult"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PackageDefinition"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Package"
+        ],
+        "operationId": "DeleteCreatedByKey",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/created/{key}/download": {
+      "get": {
+        "tags": [
+          "Package"
+        ],
+        "operationId": "GetCreatedByKeyDownload",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundResult"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/created/save": {
+      "post": {
+        "tags": [
+          "Package"
+        ],
+        "operationId": "PostCreatedSave",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PackageDefinition"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PackageDefinition"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/package/empty": {
+      "get": {
+        "tags": [
+          "Package"
+        ],
+        "operationId": "GetPackageEmpty",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PackageDefinition"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/umbraco/management/api/v1/tree/partial-view/children": {
       "get": {
         "tags": [
@@ -3616,6 +3830,117 @@
           }
         }
       }
+    },
+    "/umbraco/forms/api/v1/definitions/{id}": {
+      "get": {
+        "tags": [
+          "v1"
+        ],
+        "operationId": "GetDefinitionsById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "contentId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FormDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/forms/api/v1/entries/{id}": {
+      "post": {
+        "tags": [
+          "v1"
+        ],
+        "operationId": "PostEntriesById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FormEntryDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Accepted"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Client Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundResult"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -4641,6 +4966,35 @@
         "type": "integer",
         "format": "int32"
       },
+      "FieldConditionActionType": {
+        "enum": [
+          "Show",
+          "Hide"
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
+      "FieldConditionLogicType": {
+        "enum": [
+          "All",
+          "Any"
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
+      "FieldConditionRuleOperator": {
+        "enum": [
+          "Is",
+          "IsNot",
+          "GreaterThen",
+          "LessThen",
+          "Contains",
+          "StartsWith",
+          "EndsWith"
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
       "FieldInfo": {
         "type": "object",
         "properties": {
@@ -4814,6 +5168,319 @@
         },
         "additionalProperties": false
       },
+      "FormConditionDto": {
+        "type": "object",
+        "properties": {
+          "actionType": {
+            "$ref": "#/components/schemas/FieldConditionActionType"
+          },
+          "logicType": {
+            "$ref": "#/components/schemas/FieldConditionLogicType"
+          },
+          "rules": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FormConditionRuleDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "FormConditionRuleDto": {
+        "type": "object",
+        "properties": {
+          "field": {
+            "type": "string",
+            "nullable": true
+          },
+          "operator": {
+            "$ref": "#/components/schemas/FieldConditionRuleOperator"
+          },
+          "value": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "FormDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "indicator": {
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "cssClass": {
+            "type": "string",
+            "nullable": true
+          },
+          "nextLabel": {
+            "type": "string",
+            "nullable": true
+          },
+          "previousLabel": {
+            "type": "string",
+            "nullable": true
+          },
+          "submitLabel": {
+            "type": "string",
+            "nullable": true
+          },
+          "disableDefaultStylesheet": {
+            "type": "boolean"
+          },
+          "fieldIndicationType": {
+            "$ref": "#/components/schemas/FormFieldIndication"
+          },
+          "hideFieldValidation": {
+            "type": "boolean"
+          },
+          "messageOnSubmit": {
+            "type": "string",
+            "nullable": true
+          },
+          "showValidationSummary": {
+            "type": "boolean"
+          },
+          "gotoPageOnSubmit": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "pages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FormPageDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "FormEntryDto": {
+        "type": "object",
+        "properties": {
+          "values": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "nullable": true
+          },
+          "contentId": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "FormFieldDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "caption": {
+            "type": "string",
+            "nullable": true
+          },
+          "helpText": {
+            "type": "string",
+            "nullable": true
+          },
+          "placeholder": {
+            "type": "string",
+            "nullable": true
+          },
+          "cssClass": {
+            "type": "string",
+            "nullable": true
+          },
+          "alias": {
+            "type": "string",
+            "nullable": true
+          },
+          "required": {
+            "type": "boolean"
+          },
+          "requiredErrorMessage": {
+            "type": "string",
+            "nullable": true
+          },
+          "pattern": {
+            "type": "string",
+            "nullable": true
+          },
+          "patternInvalidErrorMessage": {
+            "type": "string",
+            "nullable": true
+          },
+          "condition": {
+            "$ref": "#/components/schemas/FormConditionDto"
+          },
+          "fileUploadOptions": {
+            "$ref": "#/components/schemas/FormFileUploadOptionsDto"
+          },
+          "preValues": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FormFieldPrevalueDto"
+            },
+            "nullable": true
+          },
+          "settings": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "type": {
+            "$ref": "#/components/schemas/FormFieldTypeDto"
+          }
+        },
+        "additionalProperties": false
+      },
+      "FormFieldIndication": {
+        "enum": [
+          "NoIndicator",
+          "MarkMandatoryFields",
+          "MarkOptionalFields"
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
+      "FormFieldPrevalueDto": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "nullable": true
+          },
+          "caption": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "FormFieldTypeDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "supportsPreValues": {
+            "type": "boolean"
+          },
+          "supportsUploadTypes": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "FormFieldsetColumnDto": {
+        "type": "object",
+        "properties": {
+          "caption": {
+            "type": "string",
+            "nullable": true
+          },
+          "width": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "fields": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FormFieldDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "FormFieldsetDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "caption": {
+            "type": "string",
+            "nullable": true
+          },
+          "condition": {
+            "$ref": "#/components/schemas/FormConditionDto"
+          },
+          "columns": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FormFieldsetColumnDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "FormFileUploadOptionsDto": {
+        "type": "object",
+        "properties": {
+          "allowAllUploadExtensions": {
+            "type": "boolean"
+          },
+          "allowedUploadExtensions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "allowMultipleFileUploads": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "FormPageDto": {
+        "type": "object",
+        "properties": {
+          "caption": {
+            "type": "string",
+            "nullable": true
+          },
+          "condition": {
+            "$ref": "#/components/schemas/FormConditionDto"
+          },
+          "fieldsets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FormFieldsetDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "GenericParameterAttributes": {
         "enum": [
           "None",
@@ -4897,7 +5564,7 @@
           },
           "providerProperties": {
             "type": "object",
-            "additionalProperties": { },
+            "additionalProperties": {},
             "nullable": true
           }
         },
@@ -5531,6 +6198,105 @@
         "type": "integer",
         "format": "int32"
       },
+      "PackageDefinition": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "packagePath": {
+            "type": "string",
+            "nullable": true
+          },
+          "contentNodeId": {
+            "type": "string",
+            "nullable": true
+          },
+          "contentLoadChildNodes": {
+            "type": "boolean"
+          },
+          "mediaKeys": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "nullable": true
+          },
+          "mediaLoadChildNodes": {
+            "type": "boolean"
+          },
+          "documentTypes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "mediaTypes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "dataTypes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "templates": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "partialViews": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "stylesheets": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "scripts": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "languages": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "dictionaryItems": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "PagedContentTreeItem": {
         "required": [
           "items",
@@ -5771,6 +6537,26 @@
         },
         "additionalProperties": false
       },
+      "PagedPackageDefinition": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PackageDefinition"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "PagedRecycleBinItem": {
         "required": [
           "items",
@@ -6003,7 +6789,7 @@
             "nullable": true
           }
         },
-        "additionalProperties": { }
+        "additionalProperties": {}
       },
       "ProfilingStatus": {
         "type": "object",
@@ -7109,7 +7895,7 @@
           "authorizationCode": {
             "authorizationUrl": "/umbraco/management/api/v1.0/security/back-office/authorize",
             "tokenUrl": "/umbraco/management/api/v1.0/security/back-office/token",
-            "scopes": { }
+            "scopes": {}
           }
         }
       }
@@ -7117,7 +7903,7 @@
   },
   "security": [
     {
-      "OAuth": [ ]
+      "OAuth": []
     }
   ]
 }
