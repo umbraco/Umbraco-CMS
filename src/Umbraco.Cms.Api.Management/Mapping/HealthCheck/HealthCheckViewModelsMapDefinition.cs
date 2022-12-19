@@ -21,7 +21,7 @@ public class HealthCheckViewModelsMapDefinition : IMapDefinition
     private static void Map(HealthCheckActionViewModel source, HealthCheckAction target, MapperContext context)
     {
         target.Alias = source.Alias;
-        target.HealthCheckId = source.Key;
+        target.HealthCheckId = source.HealthCheckKey;
         target.Name = source.Name;
         target.Description = source.Description;
         target.ValueRequired = source.ValueRequired;
@@ -35,7 +35,7 @@ public class HealthCheckViewModelsMapDefinition : IMapDefinition
     {
         if (source.HealthCheckId is not null)
         {
-            target.Key = (Guid)source.HealthCheckId;
+            target.HealthCheckKey = (Guid)source.HealthCheckId;
         }
 
         target.Alias = source.Alias;

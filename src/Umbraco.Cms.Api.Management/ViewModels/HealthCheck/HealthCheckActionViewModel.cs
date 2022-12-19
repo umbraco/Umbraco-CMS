@@ -3,9 +3,9 @@ namespace Umbraco.Cms.Api.Management.ViewModels.HealthCheck;
 public class HealthCheckActionViewModel
 {
     /// <summary>
-    ///     Gets or sets the key.
+    ///     Gets or sets the health check key.
     /// </summary>
-    public Guid Key { get; set; }
+    public Guid HealthCheckKey { get; set; }
 
     /// <summary>
     ///     Gets or sets the alias.

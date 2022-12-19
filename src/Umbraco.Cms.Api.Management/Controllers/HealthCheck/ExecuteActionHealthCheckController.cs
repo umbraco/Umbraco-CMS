@@ -38,7 +38,7 @@ public class ExecuteActionHealthCheckController : HealthCheckControllerBase
     [ProducesResponseType(typeof(HealthCheckResultViewModel), StatusCodes.Status200OK)]
     public async Task<ActionResult<HealthCheckResultViewModel>> ExecuteAction(HealthCheckActionViewModel action)
     {
-        Guid healthCheckKey = action.Key;
+        Guid healthCheckKey = action.HealthCheckKey;
 
         Core.HealthChecks.HealthCheck? healthCheck = _healthChecks
             .Where(x => _disabledCheckIds.Contains(healthCheckKey) == false)
