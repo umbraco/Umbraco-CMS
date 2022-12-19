@@ -37,10 +37,4 @@ public interface IMigrationContext
     ///     Gets or sets a value indicating whether an expression is being built.
     /// </summary>
     bool BuildingExpression { get; set; }
-
-    /// <summary>
-    ///     Adds a post-migration.
-    /// </summary>
-    void AddPostMigration<TMigration>()
-        where TMigration : MigrationBase;
 }

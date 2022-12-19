@@ -82,23 +82,7 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
                     }
                 }
 
-                // prepare and de-duplicate post-migrations, only keeping the 1st occurence
-                var temp = new HashSet<Type>();
-                IEnumerable<Type> postMigrationTypes = context.PostMigrations
-                    .Where(x => !temp.Contains(x))
-                    .Select(x =>
-                    {
-                        temp.Add(x);
-                        return x;
-                    });
-
-                // run post-migrations
-                foreach (Type postMigrationType in postMigrationTypes)
-                {
-                    _logger.LogInformation($"PostMigration: {postMigrationType.FullName}.");
-                    MigrationBase postMigration = _migrationBuilder.Build(postMigrationType, context);
-                    postMigration.Run();
-                }
+                // TODO: Publish notification.
             }
         }
 

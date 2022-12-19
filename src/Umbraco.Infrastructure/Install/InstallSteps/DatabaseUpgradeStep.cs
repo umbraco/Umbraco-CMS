@@ -48,7 +48,7 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
                 _logger.LogInformation("Running 'Upgrade' service");
 
                 var plan = new UmbracoPlan(_umbracoVersion);
-                plan.AddPostMigration<ClearCsrfCookies>(); // needed when running installer (back-office)
+                // TODO: Add notification handler for clearing csrf cookies (ClearCsrfCookies)
 
                 DatabaseBuilder.Result? result = _databaseBuilder.UpgradeSchemaAndData(plan);
 
