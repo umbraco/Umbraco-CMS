@@ -6,5 +6,5 @@ public abstract class DataTypeModelBase
 
     public string PropertyEditorAlias { get; set; } = string.Empty;
 
-    public IEnumerable<DataTypePropertyViewModel> Configuration { get; set; } = null!;
+    public IEnumerable<DataTypePropertyViewModel> Data { get; set; } = null!;
 }

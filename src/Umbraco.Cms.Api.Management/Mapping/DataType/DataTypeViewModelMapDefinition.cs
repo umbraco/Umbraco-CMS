@@ -51,7 +51,7 @@ public class DataTypeViewModelMapDefinition : IMapDefinition
         IDictionary<string, object> configuration = configurationEditor?.ToConfigurationEditor(source.ConfigurationData)
                                          ?? new Dictionary<string, object>();
 
-        target.Configuration = configuration.Select(c =>
+        target.Data = configuration.Select(c =>
             new DataTypePropertyViewModel
             {
                 Alias = c.Key,
@@ -103,7 +103,7 @@ public class DataTypeViewModelMapDefinition : IMapDefinition
     private IDictionary<string, object> MapConfigurationData<T>(T source, IDataEditor editor) where T : DataTypeModelBase
     {
         var configuration = source
-            .Configuration
+            .Data
             .Where(p => p.Value is not null)
             .ToDictionary(p => p.Alias, p => p.Value!);
         IConfigurationEditor? configurationEditor = editor?.GetConfigurationEditor();
