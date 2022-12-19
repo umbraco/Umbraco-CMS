@@ -13,25 +13,35 @@ namespace Umbraco.Extensions;
 public static class LinkGeneratorExtensions
 {
     /// <summary>
-    /// Gets the backoffice URL (if the back office is installed).
+    /// Gets the Umbraco backoffice URL (if Umbraco is installed).
     /// </summary>
     /// <param name="linkGenerator">The link generator.</param>
     /// <returns>
-    /// The backoffice URL.
+    /// The Umbraco backoffice URL.
     /// </returns>
-    public static string? GetBackOfficeUrl(this LinkGenerator linkGenerator)
+    public static string? GetUmbracoBackOfficeUrl(this LinkGenerator linkGenerator)
         => linkGenerator.GetPathByAction("Default", "BackOffice", new { area = Constants.Web.Mvc.BackOfficeArea });
 
     /// <summary>
-    /// Gets the backoffice URL (if the back office is installed) or application virtual path (in most cases just <c>"/"</c>).
+    /// Gets the Umbraco backoffice URL (if Umbraco is installed) or application virtual path (in most cases just <c>"/"</c>).
     /// </summary>
     /// <param name="linkGenerator">The link generator.</param>
     /// <param name="hostingEnvironment">The hosting environment.</param>
     /// <returns>
-    /// The backoffice URL.
+    /// The Umbraco backoffice URL.
     /// </returns>
-    public static string GetBackOfficeUrl(this LinkGenerator linkGenerator, IHostingEnvironment hostingEnvironment)
-         => GetBackOfficeUrl(linkGenerator) ?? hostingEnvironment.ApplicationVirtualPath;
+    public static string GetUmbracoBackOfficeUrl(this LinkGenerator linkGenerator, IHostingEnvironment hostingEnvironment)
+         => GetUmbracoBackOfficeUrl(linkGenerator) ?? hostingEnvironment.ApplicationVirtualPath;
+
+    /// <summary>
+    ///     Return the back office url if the back office is installed
+    /// </summary>
+    /// <remarks>
+    /// This method contained a bug that would result in always returning "/".
+    /// </remarks>
+    [Obsolete("Use the GetUmbracoBackOfficeUrl extension method instead. This method will be removed in Umbraco 13.")]
+    public static string? GetBackOfficeUrl(this LinkGenerator linkGenerator, IHostingEnvironment hostingEnvironment)
+        => "/";
 
     /// <summary>
     ///     Return the Url for a Web Api service
