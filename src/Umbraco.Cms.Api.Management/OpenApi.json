@@ -1135,7 +1135,7 @@
     "/umbraco/management/api/v1/health-check-group": {
       "get": {
         "tags": [
-          "Health Check Group"
+          "Health Check"
         ],
         "operationId": "GetHealthCheckGroup",
         "parameters": [
@@ -1175,7 +1175,7 @@
     "/umbraco/management/api/v1/health-check-group/{name}": {
       "get": {
         "tags": [
-          "Health Check Group"
+          "Health Check"
         ],
         "operationId": "GetHealthCheckGroupByName",
         "parameters": [
@@ -5132,7 +5132,7 @@
       "HealthCheckAction": {
         "type": "object",
         "properties": {
-          "key": {
+          "healthCheckKey": {
             "type": "string",
             "format": "uuid"
           },
