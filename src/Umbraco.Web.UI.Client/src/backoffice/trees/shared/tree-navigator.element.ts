@@ -1,21 +1,31 @@
 import { css, html, LitElement } from 'lit';
 import { repeat } from 'lit/directives/repeat.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, state } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { UmbSectionContext } from '../../sections/section.context';
 import { UmbTreeContext } from '../tree.context';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import type { Entity, ManifestSection, ManifestTree } from '@umbraco-cms/models';
 import { UmbDataStore } from 'src/core/stores/store';
 
 import './tree-item.element';
-import { UmbDocumentTypeStore } from '@umbraco-cms/stores/document-type/document-type.store';
 
 @customElement('umb-tree-navigator')
-export class UmbTreeNavigator extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+export class UmbTreeNavigator extends UmbContextConsumerMixin(UmbContextProviderMixin(UmbObserverMixin(LitElement))) {
 	static styles = [UUITextStyles, css``];
+
+	private _storeContextAlias = '';
+	@property({ attribute: 'store-context-alias' })
+	public get storeContextAlias() {
+		return this._storeContextAlias;
+	}
+
+	public set storeContextAlias(value) {
+		this._storeContextAlias = value;
+		this._provideStoreContext();
+	}
 
 	@state()
 	private _loading = true;
@@ -29,15 +39,11 @@ export class UmbTreeNavigator extends UmbContextConsumerMixin(UmbObserverMixin(L
 	@state()
 	private _href?: string;
 
-	private _treeStore?: UmbDataStore<unknown>;
+	private _store?: UmbDataStore<unknown>;
 	private _sectionContext?: UmbSectionContext;
 
 	constructor() {
 		super();
-
-		this.consumeContext('umbTreeStore', (treeStore) => {
-			this._treeStore = treeStore;
-		});
 
 		this.consumeContext('umbTreeContext', (treeContext: UmbTreeContext) => {
 			this._tree = treeContext.tree;
@@ -49,16 +55,25 @@ export class UmbTreeNavigator extends UmbContextConsumerMixin(UmbObserverMixin(L
 		});
 	}
 
+	private _provideStoreContext() {
+		if (!this._storeContextAlias) return;
+
+		this.consumeContext(this._storeContextAlias, (store) => {
+			this._store = store;
+			this.provideContext('umbStore', store);
+		});
+	}
+
 	private _onShowRoot() {
 		this._observeTreeRoot();
 	}
 
 	private _observeTreeRoot() {
-		if (!this._treeStore?.getTreeRoot) return;
+		if (!this._store?.getTreeRoot) return;
 
 		this._loading = true;
 
-		this.observe<Entity[]>(this._treeStore.getTreeRoot(), (rootItems) => {
+		this.observe<Entity[]>(this._store.getTreeRoot(), (rootItems) => {
 			if (rootItems?.length === 0) return;
 			this._items = rootItems;
 			this._loading = false;
