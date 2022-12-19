@@ -41,6 +41,7 @@ import { manifests as editorManifests } from './workspaces/manifests';
 import { manifests as propertyActionManifests } from './property-actions/manifests';
 import { manifests as externalLoginProviderManifests } from './external-login-providers/manifests';
 import { manifests as userDashboards } from './user-dashboards/manifests';
+import { manifests as collectionBulkActionManifests } from './components/collection/manifests';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import type { ManifestTypes } from '@umbraco-cms/models';
@@ -75,6 +76,7 @@ export class UmbBackofficeElement extends UmbContextConsumerMixin(UmbContextProv
 		this._registerExtensions(propertyActionManifests);
 		this._registerExtensions(externalLoginProviderManifests);
 		this._registerExtensions(userDashboards);
+		this._registerExtensions(collectionBulkActionManifests);
 
 		this._umbIconRegistry.attach(this);
 

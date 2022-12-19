@@ -1,9 +1,9 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, LitElement } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 
-@customElement('umb-list-view-selection')
-export class UmbListViewSelectionElement extends LitElement {
+@customElement('umb-collection-selection-actions')
+export class UmbCollectionSelectionActionsElement extends LitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -20,6 +20,9 @@ export class UmbListViewSelectionElement extends LitElement {
 		`,
 	];
 
+	@property()
+	public entityType = 'media';
+
 	@state()
 	private _selection: Array<string> = [];
 
@@ -30,15 +33,14 @@ export class UmbListViewSelectionElement extends LitElement {
 	render() {
 		return html`<uui-button label="Clear" look="secondary"></uui-button>
 			${this._renderSelectionCount()}
-			<uui-button style="margin-left: auto" label="Set group" look="secondary"></uui-button>
-			<uui-button label="Enable" look="secondary"></uui-button>
-			<uui-button label="Unlock" disabled look="secondary"></uui-button>
-			<uui-button label="Disable" look="secondary"></uui-button> `;
+			<umb-extension-slot
+				type="collectionBulkAction"
+				.filter=${(manifest: any) => manifest.meta.entityType === this.entityType}></umb-extension-slot>`;
 	}
 }
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-list-view-selection': UmbListViewSelectionElement;
+		'umb-collection-selection-actions': UmbCollectionSelectionActionsElement;
 	}
 }

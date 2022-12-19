@@ -7,4 +7,5 @@ export interface ManifestCollectionBulkAction extends ManifestElement {
 
 export interface MetaCollectionBulkAction {
 	label: string;
+	entityType: string;
 }
