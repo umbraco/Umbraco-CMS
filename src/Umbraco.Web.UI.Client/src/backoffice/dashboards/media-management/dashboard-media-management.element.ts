@@ -1,7 +1,6 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import './media-management-grid.element';
 import '../../components/collection/collection-toolbar.element';
 import '../../components/collection/collection-selection-actions.element';
 import '../../components/collection/collection-view.element';
@@ -84,7 +83,6 @@ export class UmbDashboardMediaManagementElement extends UmbContextConsumerMixin(
 			<umb-collection-view>
 				<umb-collection-toolbar slot="header"></umb-collection-toolbar>
 				<router-slot slot="main" id="router-slot" .routes="${this._routes}"></router-slot>
-				<!-- <umb-media-management-grid slot="main"></umb-media-management-grid> -->
 				<umb-collection-selection-actions slot="footer"></umb-collection-selection-actions>
 			</umb-collection-view>
 		`;
