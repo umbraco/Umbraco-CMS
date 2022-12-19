@@ -61,6 +61,11 @@ public interface IPublishedRequest
     string? Culture { get; }
 
     /// <summary>
+    ///     Gets the content request's segment.
+    /// </summary>
+    string? Segment { get; }
+
+    /// <summary>
     ///     Gets the url to redirect to, when the content request triggers a redirect.
     /// </summary>
     string? RedirectUrl { get; }
