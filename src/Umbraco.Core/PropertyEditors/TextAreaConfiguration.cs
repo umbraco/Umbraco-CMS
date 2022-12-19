@@ -10,15 +10,4 @@ public class TextAreaConfiguration
 
     [ConfigurationField("rows", "Number of rows", "number", Description = "If empty - 10 rows would be set as the default value")]
     public int? Rows { get; set; }
-
-    // TODO: remove this (for testing only)
-    public TextAreaSomething[] Somethings { get; set; } = Array.Empty<TextAreaSomething>();
-}
-
-// TODO: remove this (for testing only)
-public class TextAreaSomething
-{
-    public string One { get; set; } = string.Empty;
-
-    public int Two { get; set; }
 }
