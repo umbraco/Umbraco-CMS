@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Migrations;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Scoping;
 
 namespace Umbraco.Cms.Infrastructure.Migrations;
@@ -10,6 +11,7 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
     private readonly ILogger<MigrationPlanExecutor> _logger;
     private readonly ILoggerFactory _loggerFactory;
     private readonly IMigrationBuilder _migrationBuilder;
+    private readonly IUmbracoDatabaseFactory _databaseFactory;
     private readonly IScopeAccessor _scopeAccessor;
     private readonly ICoreScopeProvider _scopeProvider;
 
@@ -17,12 +19,14 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
         ICoreScopeProvider scopeProvider,
         IScopeAccessor scopeAccessor,
         ILoggerFactory loggerFactory,
-        IMigrationBuilder migrationBuilder)
+        IMigrationBuilder migrationBuilder,
+        IUmbracoDatabaseFactory databaseFactory)
     {
         _scopeProvider = scopeProvider;
         _scopeAccessor = scopeAccessor;
         _loggerFactory = loggerFactory;
         _migrationBuilder = migrationBuilder;
+        _databaseFactory = databaseFactory;
         _logger = _loggerFactory.CreateLogger<MigrationPlanExecutor>();
     }
 
@@ -50,37 +54,29 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
             plan.ThrowOnUnknownInitialState(nextState);
         }
 
-        using (ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true))
+        while (transition != null)
         {
-            // We want to suppress scope (service, etc...) notifications during a migration plan
-            // execution. This is because if a package that doesn't have their migration plan
-            // executed is listening to service notifications to perform some persistence logic,
-            // that packages notification handlers may explode because that package isn't fully installed yet.
-            using (scope.Notifications.Suppress())
+            _logger.LogInformation("Execute {MigrationType}", transition.MigrationType.Name);
+            // TODO: Handle exceptions
+
+            if (transition.MigrationType.IsAssignableTo(typeof(UnscopedMigrationBase)))
             {
-                var context = new MigrationContext(plan, _scopeAccessor.AmbientScope?.Database,
-                    _loggerFactory.CreateLogger<MigrationContext>());
+                RunUnscopedMigration(transition.MigrationType, plan);
+            }
+            else
+            {
+                RunScopedMigration(transition.MigrationType, plan);
+            }
 
-                while (transition != null)
-                {
-                    _logger.LogInformation("Execute {MigrationType}", transition.MigrationType.Name);
+            nextState = transition.TargetState;
 
-                    MigrationBase migration = _migrationBuilder.Build(transition.MigrationType, context);
-                    migration.Run();
+            _logger.LogInformation("At {OrigState}", nextState);
 
-                    nextState = transition.TargetState;
-
-                    _logger.LogInformation("At {OrigState}", nextState);
-
-                    // throw a raw exception here: this should never happen as the plan has
-                    // been validated - this is just a paranoid safety test
-                    if (!plan.Transitions.TryGetValue(nextState, out transition))
-                    {
-                        throw new InvalidOperationException($"Unknown state \"{nextState}\".");
-                    }
-                }
-
-                // TODO: Publish notification.
+            // throw a raw exception here: this should never happen as the plan has
+            // been validated - this is just a paranoid safety test
+            if (!plan.Transitions.TryGetValue(nextState, out transition))
+            {
+                throw new InvalidOperationException($"Unknown state \"{nextState}\".");
             }
         }
 
@@ -96,5 +92,32 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
         }
 
         return nextState;
+    }
+
+    private void RunUnscopedMigration(Type migrationType, MigrationPlan plan)
+    {
+        using IUmbracoDatabase database = _databaseFactory.CreateDatabase();
+        var context = new MigrationContext(plan, database, _loggerFactory.CreateLogger<MigrationContext>());
+
+        MigrationBase migration = _migrationBuilder.Build(migrationType, context);
+
+        // We run the migration with no scope or suppressed notifications, it's up to the migrations themselves to handle this.
+        migration.Run();
+    }
+
+    private void RunScopedMigration(Type migrationType, MigrationPlan plan)
+    {
+        // We want to suppress scope (service, etc...) notifications during a migration plan
+        // execution. This is because if a package that doesn't have their migration plan
+        // executed is listening to service notifications to perform some persistence logic,
+        // that packages notification handlers may explode because that package isn't fully installed yet.
+        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        using (scope.Notifications.Suppress())
+        {
+            var context = new MigrationContext(plan, _scopeAccessor.AmbientScope?.Database, _loggerFactory.CreateLogger<MigrationContext>());
+            MigrationBase migration = _migrationBuilder.Build(migrationType, context);
+
+            migration.Run();
+        }
     }
 }
