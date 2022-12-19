@@ -5,11 +5,8 @@ import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import { distinctUntilChanged } from 'rxjs';
 import type { UmbNotificationService } from '../../../../core/services/notification';
 import { UmbNotificationDefaultData } from '../../../../core/services/notification/layouts/default';
-import { UmbNodeContext } from './node.context';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
-import type { UmbDocumentStore } from 'src/core/stores/document/document.store';
-import { UmbMediaStore } from 'src/core/stores/media/media.store';
 import type { DocumentDetails, MediaDetails } from '@umbraco-cms/models';
 
 import '../workspace-entity/workspace-entity.element';
@@ -18,7 +15,7 @@ import '../workspace-entity/workspace-entity.element';
 // TODO: Make this dynamic, use load-extensions method to loop over extensions for this node.
 import './views/edit/workspace-view-content-edit.element';
 import './views/info/workspace-view-content-info.element';
-import { UmbWorkspaceContext } from '../workspace/workspace.context';
+import { UmbWorkspaceDocumentContext } from '../../document/workspace-document.context';
 
 @customElement('umb-workspace-content')
 export class UmbWorkspaceContentElement extends UmbContextProviderMixin(
@@ -66,43 +63,15 @@ export class UmbWorkspaceContentElement extends UmbContextProviderMixin(
 		`,
 	];
 
-	private _entityKey!: string;
-	@property()
-	public get entityKey() : string {
-		return this._entityKey;
-	}
-	public set entityKey(value:string) {
-		if(this._entityKey  !== value) {
-			this._entityKey = value;
-			this._observeContent();
-		}
-	}
-
 	@property()
 	alias!: string;
-
-	private _storeAlias!: string;
-	@property({type: String, reflect:true, attribute:'store-alias'})
-	public get storeAlias() : string {
-		return this._storeAlias;
-	}
-	public set storeAlias(newVal:string) {
-		this._storeAlias = newVal;
-		this.consumeContext(this._storeAlias, (instance) => {
-			this._store = instance;
-			this._observeContent();
-		});
-	}
-	
 
 	@state()
 	_content?: DocumentDetails | MediaDetails;
 
-	private _store?: UmbDocumentStore | UmbMediaStore;
-	private _storeObserver?: ()=>void;
-	private _nodeContext?: UmbNodeContext;
 	private _notificationService?: UmbNotificationService;
-	private _workspaceContext?: UmbWorkspaceContext;
+	private _workspaceContext?: UmbWorkspaceDocumentContext;
+
 
 	constructor() {
 		super();
@@ -122,8 +91,8 @@ export class UmbWorkspaceContentElement extends UmbContextProviderMixin(
 	private async _observeWorkspace() {
 		if (!this._workspaceContext) return;
 
-		this.observe(this._workspaceContext?.data, (workspaceData) => {
-			this.entityKey = workspaceData.entityKey;
+		this.observe<DocumentDetails | MediaDetails>(this._workspaceContext.data.pipe(distinctUntilChanged()), (data) => {
+			this._content = data;
 		});
 	}
 
@@ -148,41 +117,15 @@ export class UmbWorkspaceContentElement extends UmbContextProviderMixin(
 		});
 	}
 
-	private _observeContent() {
-		if (!this._store) return;
-
-		if(this._storeObserver) {
-			// I want to make sure that we unsubscribe, also if store(observer source) changes.
-			this._storeObserver();
-		}
-
-		this._storeObserver = this.observe<DocumentDetails | MediaDetails>(this._store.getByKey(this.entityKey), (content) => {
-			if (!content) return; // TODO: Handle nicely if there is no content data.
-
-			if (!this._nodeContext) {
-				this._nodeContext = new UmbNodeContext(content);
-				this.provideContext('umbNodeContext', this._nodeContext);
-			} else {
-				this._nodeContext.update(content);
-			}
-
-			this.observe<DocumentDetails | MediaDetails>(this._nodeContext.data.pipe(distinctUntilChanged()), (data) => {
-				this._content = data;
-			});
-		});
-	}
-
 	private _onSaveAndPublish() {
 		this._onSave();
 	}
 
 	private _onSave() {
-		// TODO: What if store is not present, what if content is not loaded...
-		if (this._content) {
-			this._store?.save([this._content]).then(() => {
-				const data: UmbNotificationDefaultData = { message: 'Document Saved' };
-				this._notificationService?.peek('positive', { data });
-			});
+		// TODO: What if store is not available, what if content is not loaded... or workspace is not there jet?
+		if (this._workspaceContext) {
+			// TODO: Need some interface/type for saveableStore..
+			(this._workspaceContext).save()
 		}
 	}
 
@@ -196,7 +139,7 @@ export class UmbWorkspaceContentElement extends UmbContextProviderMixin(
 			const target = event.composedPath()[0] as UUIInputElement;
 
 			if (typeof target?.value === 'string') {
-				this._nodeContext?.update({ name: target.value });
+				this._workspaceContext?.update({ name: target.value });
 			}
 		}
 	}

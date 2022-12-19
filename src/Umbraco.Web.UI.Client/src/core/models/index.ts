@@ -73,6 +73,7 @@ export interface DocumentTypeDetails extends DocumentTypeTreeItem {
 	properties: [];
 }
 
+// TODO: Make sure Entity Type/interface.
 export interface MemberTypeDetails extends EntityTreeItem {
 	key: string; // TODO: Remove this when the backend is fixed
 	alias: string;

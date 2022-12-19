@@ -49,7 +49,7 @@ export class UmbContentSection extends LitElement {
 	}
 
 	render() {
-		return html`<umb-section></umb-section>`;
+		return html`<umb-section alias="Umb.Section.Content"></umb-section>`;
 	}
 }
 

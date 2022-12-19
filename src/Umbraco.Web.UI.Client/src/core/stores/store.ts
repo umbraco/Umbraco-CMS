@@ -19,9 +19,17 @@ export interface UmbDataStore<T> {
  * @template T
  * @description - Base class for Data Stores
  */
-export class UmbDataStoreBase<T extends UmbDataStoreIdentifiers> implements UmbDataStore<T> {
+export abstract class UmbDataStoreBase<T extends UmbDataStoreIdentifiers> implements UmbDataStore<T> {
 	protected _items: BehaviorSubject<Array<T>> = new BehaviorSubject(<Array<T>>[]);
 	public readonly items: Observable<Array<T>> = this._items.asObservable();
+
+	/**
+	 * @description - Request data by key. The data is added to the store and is returned as an Observable.
+	 * @param {string} key
+	 * @return {*}  {(Observable<T | null>)}
+	 * @memberof UmbDataStoreBase
+	 */
+	abstract getByKey(key: string): Observable<T | null>
 
 	/**
 	 * @description - Delete items from the store.

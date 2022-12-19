@@ -6,7 +6,7 @@ import { UUIMenuItemEvent } from '@umbraco-ui/uui';
 import { map } from 'rxjs';
 import { repeat } from 'lit/directives/repeat.js';
 import type { UmbTreeContextBase } from '../tree.context';
-import { UmbSectionContext } from '../../sections/section.context';
+import { UmbSectionContext } from '../../sections/shared/section.context';
 import { UmbTreeContextMenuService } from './context-menu/tree-context-menu.service';
 import type { Entity, ManifestSection } from '@umbraco-cms/models';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';

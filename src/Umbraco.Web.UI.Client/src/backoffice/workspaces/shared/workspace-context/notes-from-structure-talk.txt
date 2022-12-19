@@ -1,0 +1,131 @@
+
+CollectionContext {
+
+	// RxJS store..
+	this._data = new BehaviorSubject<BlockType>(defaultData);
+	this.data = this._data.asObservable();
+
+	getStore();
+
+}
+
+
+DocumentCollectionContext extends CollectionContext {
+
+	// RxJS store..
+	this._data = new BehaviorSubject<BlockType>(defaultData);
+	this.data = this._data.asObservable();
+
+	getStore();
+	publish();
+	update();
+
+}
+
+
+MediaCollectionContext extends CollectionContext {
+
+	// RxJS store..
+	this._data = new BehaviorSubject<BlockType>(defaultData);
+	this.data = this._data.asObservable();
+
+	getStore();
+	update();
+	save();
+
+}
+
+
+VendrCollectionContext extends CollectionContext {
+
+	// RxJS store..
+	this._data = new BehaviorSubject<BlockType>(defaultData);
+	this.data = this._data.asObservable();
+
+	getStore();
+	update();
+	save();
+
+}
+
+
+
+
+
+
+
+DocumentContext {
+
+	// Validation?
+
+	// RxJS store..
+	this._data = new BehaviorSubject<BlockType>(defaultData);
+	this.data = this._data.asObservable();
+
+	getStore();
+
+	setPublishDate()
+
+	addVariant(name) {
+		this.data.name = name;
+	}
+
+	save() {
+		this.backendStore.save()
+	}
+
+}
+
+
+PropertyContext {
+
+	// Validation?
+
+}
+
+
+BlockContext {
+
+	// Validation?
+
+	this._data = new BehaviorSubject<BlockType>(defaultData);
+	this.data = this._data.asObservable();
+
+	this._liveEditing = true;
+
+	setName(name) {
+		this.update({name: name})
+		if(this._liveEditing) {
+			this.save();
+		}
+	}
+
+	save() {
+		//
+		this.parentData.block[123] = this.data.getData();
+		this.parentDatarxJS.update(this.parentData);
+	}
+
+}
+
+
+var myBlockContext = new BlockContext(documentData.blocks[1]);
+
+
+// Property Editor Edit Element Name:
+
+myBlockContext.data.subscribe((blockData) => {
+	this.input.value = blockData.name;
+})
+this.input.addEventListener("change", () => {
+	myBlockContext.setName(this.input.value);
+	// RXJS update?? ^^
+})
+
+
+
+
+blockContext.setName('sdaafgdss');
+// Does does other update?
+
+

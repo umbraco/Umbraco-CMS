@@ -3,7 +3,7 @@ import { html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { map, switchMap, EMPTY, of } from 'rxjs';
 
-import { UmbSectionContext } from '../../section.context';
+import { UmbSectionContext } from '../section.context';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';

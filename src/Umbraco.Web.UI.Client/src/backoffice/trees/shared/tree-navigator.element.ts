@@ -3,7 +3,7 @@ import { repeat } from 'lit/directives/repeat.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
-import { UmbSectionContext } from '../../sections/section.context';
+import { UmbSectionContext } from '../../sections/shared/section.context';
 import { UmbTreeContext } from '../tree.context';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';

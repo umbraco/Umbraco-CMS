@@ -1,12 +1,12 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import type { UmbWorkspaceContext } from '../shared/workspace/workspace.context';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import type { ManifestWorkspaceView } from '@umbraco-cms/models';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import '../shared/workspace-content/workspace-content.element';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
+import { UmbWorkspaceDocumentContext } from './workspace-document.context';
 
 @customElement('umb-workspace-document')
 export class UmbWorkspaceDocumentElement extends UmbObserverMixin(UmbContextConsumerMixin(UmbContextProviderMixin(LitElement))) {
@@ -21,28 +21,58 @@ export class UmbWorkspaceDocumentElement extends UmbObserverMixin(UmbContextCons
 		`,
 	];
 
-	@property()
-	entityKey!: string;
 
-	private _workspaceContext!:UmbWorkspaceContext;
+	private _entityKey!: string;
+	@property()
+	public get entityKey(): string {
+		return this._entityKey;
+	}
+	public set entityKey(value: string) {
+		this._entityKey = value;
+		this._provideWorkspace();
+	}
+
+	private _entityType = '';
+	@property()
+	public get entityType(): string {
+		return this._entityType;
+	}
+	public set entityType(value: string) {
+		// TODO: Make sure that a change of the entity type actually gives extension slot a hint to change/update.
+		const oldValue = this._entityType;
+		this._entityType = value;
+		this._provideWorkspace();
+		this.requestUpdate('entityType', oldValue);
+	}
+
+	private _workspaceContext?:UmbWorkspaceDocumentContext;
+	
 
 	constructor() {
 		super();
 
-		this.consumeContext('umbWorkspaceContext', (context) => {
-			this._workspaceContext = context;
-			this._observeWorkspace();
-		})
+		console.log("WORKSPACE DOCUMENT")
 
 		// TODO: consider if registering extensions should happen initially or else where, to enable unregister of extensions.
 		this._registerWorkspaceViews();
 	}
-	private async _observeWorkspace() {
-		if (!this._workspaceContext) return;
 
-		this.observe(this._workspaceContext?.data, (workspaceData) => {
-			this.entityKey = workspaceData.entityKey;
-		});
+	connectedCallback(): void {
+		super.connectedCallback()
+		this._workspaceContext?.connectedCallback();
+	}
+	disconnectedCallback(): void {
+		super.connectedCallback()
+		this._workspaceContext?.connectedCallback();
+	}
+
+	protected _provideWorkspace() {
+		if(this._entityType && this._entityKey) {
+
+		console.log("_provideWorkspace ", this._entityType, this._entityKey)
+			this._workspaceContext = new UmbWorkspaceDocumentContext(this, this._entityType, this._entityKey);
+			this.provideContext('umbWorkspaceContext', this._workspaceContext);
+		}
 	}
 
 	private _registerWorkspaceViews() {
@@ -82,7 +112,7 @@ export class UmbWorkspaceDocumentElement extends UmbObserverMixin(UmbContextCons
 	}
 
 	render() {
-		return html`<umb-workspace-content store-alias='umbDocumentStore' .entityKey=${this._workspaceContext.entityKey} alias="Umb.Workspace.Document"></umb-workspace-content>`;
+		return html`<umb-workspace-content alias="Umb.Workspace.Document"></umb-workspace-content>`;
 	}
 }
 

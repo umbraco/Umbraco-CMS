@@ -2,16 +2,17 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { map, switchMap, EMPTY, of } from 'rxjs';
-import { UmbSectionContext } from '../section.context';
-import { UmbWorkspaceElement } from '../../workspaces/shared/workspace/workspace.element';
+import { UmbSectionContext } from './section.context';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-import type { ManifestTree, ManifestSectionView } from '@umbraco-cms/models';
+import type { ManifestTree, ManifestSectionView, ManifestWorkspace } from '@umbraco-cms/models';
 
 import './section-trees/section-trees.element.ts';
 import '../shared/section-views/section-views.element.ts';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
+import type { UmbWorkspaceElement } from 'src/backoffice/workspaces/shared/workspace/workspace.element';
+
 
 @customElement('umb-section')
 export class UmbSectionElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
@@ -38,10 +39,13 @@ export class UmbSectionElement extends UmbContextConsumerMixin(UmbObserverMixin(
 	@state()
 	private _trees: Array<ManifestTree> = [];
 
+	private _workspaces: Array<ManifestWorkspace> = [];
+
 	@state()
 	private _views: Array<ManifestSectionView> = [];
 
 	private _sectionContext?: UmbSectionContext;
+	private _sectionAlias?:string;
 
 	constructor() {
 		super();
@@ -61,7 +65,7 @@ export class UmbSectionElement extends UmbContextConsumerMixin(UmbObserverMixin(
 			this._sectionContext?.data.pipe(
 				switchMap((section) => {
 					if (!section) return EMPTY;
-
+					this._sectionAlias = section.alias;
 					return (
 						umbExtensionsRegistry
 							?.extensionsOfType('tree')
@@ -71,38 +75,54 @@ export class UmbSectionElement extends UmbContextConsumerMixin(UmbObserverMixin(
 			),
 			(trees) => {
 				this._trees = trees;
-				if (this._trees.length === 0) return;
 				this._createTreeRoutes();
 			}
 		);
+
+		this.observe<ManifestWorkspace[]>(umbExtensionsRegistry?.extensionsOfType('workspace'), (workspaceExtensions) => {
+			this._workspaces = workspaceExtensions;
+			this._createTreeRoutes();
+		});
 	}
 
 	private _createTreeRoutes() {
-		this._routes = [
+
+		const routes: any[] = [
 			{
 				path: 'dashboard',
 				component: () => import('./section-dashboards/section-dashboards.element'),
-			},
-			{
-				path: `:entityType/:key`,
-				component: () => import('../../workspaces/shared/workspace/workspace.element'),
-				setup: (component: UmbWorkspaceElement, info: any) => {
-					component.entityKey = info.match.params.key;
-					component.entityType = info.match.params.entityType;
-				},
-			},
-			{
-				path: `:entityType`,
-				component: () => import('../../workspaces/shared/workspace/workspace.element'),
-				setup: (component: UmbWorkspaceElement, info: any) => {
-					component.entityType = info.match.params.entityType;
-				},
-			},
-			{
-				path: '**',
-				redirectTo: 'dashboard',
-			},
+			}
 		];
+		
+		this._workspaces?.map((workspace:ManifestWorkspace) => {
+			routes.push({
+				path: `${workspace.meta.entityType}/:key`,
+				component: () => createExtensionElement(workspace),
+				setup: (component: Promise<UmbWorkspaceElement>, info: any) => {
+					component.then((el: UmbWorkspaceElement) => {
+						el.entityKey = info.match.params.key;
+						el.entityType = workspace.meta.entityType;
+					})
+					
+				},
+			})
+			routes.push({
+				path: workspace.meta.entityType,
+				component: () => createExtensionElement(workspace),
+				setup: (component: Promise<UmbWorkspaceElement>) => {
+					component.then((el: UmbWorkspaceElement) => {
+						el.entityType = workspace.meta.entityType;
+					})
+					
+				},
+			})
+		});
+
+		this._routes.push({
+			path: '**',
+			redirectTo: 'dashboard',
+		});
+		this._routes = routes;
 	}
 
 	private _observeViews() {
