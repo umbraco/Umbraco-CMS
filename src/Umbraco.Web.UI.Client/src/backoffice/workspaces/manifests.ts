@@ -59,9 +59,9 @@ export const manifests: Array<ManifestWorkspace> = [
 		type: 'workspace',
 		alias: 'Umb.Workspace.Extensions',
 		name: 'Extensions Workspace',
-		loader: () => import('./extensions/workspace-extensions.element'),
+		loader: () => import('./extension-root/workspace-extension-root.element'),
 		meta: {
-			entityType: 'extensions-list',
+			entityType: 'extension-root',
 		},
 	},
 	{
