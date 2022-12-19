@@ -118,4 +118,13 @@ export const manifests: Array<ManifestWorkspace> = [
 			entityType: 'package-builder',
 		},
 	},
+	{
+		type: 'workspace',
+		alias: 'Umb.Workspace.LanguageCollection',
+		name: 'Language Collection Workspace',
+		loader: () => import('./language-collection/workspace-language-collection.element'),
+		meta: {
+			entityType: 'language-collection',
+		},
+	},
 ];
