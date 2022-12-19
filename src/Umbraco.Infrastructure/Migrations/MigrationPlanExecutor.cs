@@ -41,8 +41,6 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
         plan.Validate();
 
         _logger.LogInformation("Starting '{MigrationName}'...", plan.Name);
-
-        fromState ??= string.Empty;
         var nextState = fromState;
 
         _logger.LogInformation("At {OrigState}", string.IsNullOrWhiteSpace(nextState) ? "origin" : nextState);
