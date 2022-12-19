@@ -808,6 +808,7 @@
 
                 if (user.userDisplayState && user.userDisplayState.key === "Invited") {
                     vm.allowEnableUser = false;
+                    vm.allowDisableUser = false;
                 }
 
                 if (user.userDisplayState && user.userDisplayState.key === "LockedOut") {
