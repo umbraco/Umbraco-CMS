@@ -4,7 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import '../tooltip-menu.element';
 import { TooltipMenuItem } from '../tooltip-menu.element';
 
-@customElement('umb-collection-header')
+@customElement('umb-collection-toolbar')
 export class UmbCollectionHeaderElement extends LitElement {
 	static styles = [
 		UUITextStyles,
@@ -146,6 +146,6 @@ export class UmbCollectionHeaderElement extends LitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-collection-header': UmbCollectionHeaderElement;
+		'umb-collection-toolbar': UmbCollectionHeaderElement;
 	}
 }

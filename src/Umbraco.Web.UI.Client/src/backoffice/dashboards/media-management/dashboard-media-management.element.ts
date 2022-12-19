@@ -2,7 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import './media-management-grid.element';
-import '../../components/collection/collection-header.element';
+import '../../components/collection/collection-toolbar.element';
 import '../../components/collection/collection-selection-actions.element';
 import '../../components/collection/collection-view.element';
 
@@ -25,7 +25,7 @@ export class UmbDashboardMediaManagementElement extends LitElement {
 	render() {
 		return html`
 			<umb-collection-view>
-				<umb-collection-header slot="header"></umb-collection-header>
+				<umb-collection-toolbar slot="header"></umb-collection-toolbar>
 				<umb-media-management-grid slot="main"></umb-media-management-grid>
 				<umb-collection-selection-actions slot="footer"></umb-collection-selection-actions>
 			</umb-collection-view>

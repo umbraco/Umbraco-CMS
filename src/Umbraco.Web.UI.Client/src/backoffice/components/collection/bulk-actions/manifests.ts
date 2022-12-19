@@ -6,7 +6,7 @@ export const manifests: Array<ManifestCollectionBulkAction> = [
 		alias: 'Umb.CollectionBulkAction.Test',
 		name: 'Test',
 		elementName: 'umb-collection-bulk-action',
-		loader: () => import('./collection-bulk-action.element'),
+		loader: () => import('./collection-bulk-action-test.element'),
 		weight: 600,
 		meta: {
 			label: 'Test',
