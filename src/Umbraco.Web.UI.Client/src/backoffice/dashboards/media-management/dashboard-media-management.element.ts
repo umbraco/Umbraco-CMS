@@ -3,6 +3,7 @@ import { css, html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import './media-management-grid.element';
 import '../../components/list-view/list-view-header.element';
+import '../../components/list-view/list-view-selection.element';
 
 @customElement('umb-dashboard-media-management')
 export class UmbDashboardMediaManagementElement extends LitElement {
@@ -23,6 +24,7 @@ export class UmbDashboardMediaManagementElement extends LitElement {
 		return html`
 			<umb-list-view-header></umb-list-view-header>
 			<umb-media-management-grid></umb-media-management-grid>
+			<umb-list-view-selection></umb-list-view-selection>
 		`;
 	}
 }
