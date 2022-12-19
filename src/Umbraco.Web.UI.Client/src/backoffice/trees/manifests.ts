@@ -5,7 +5,6 @@ export const manifests: Array<ManifestTree> = [
 		type: 'tree',
 		alias: 'Umb.Tree.Extensions',
 		name: 'Extensions Tree',
-		loader: () => import('./extensions/tree-extensions.element'),
 		weight: 500,
 		meta: {
 			label: 'Extensions',
