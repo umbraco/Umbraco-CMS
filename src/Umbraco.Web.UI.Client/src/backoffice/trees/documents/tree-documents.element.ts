@@ -1,23 +1,16 @@
 import { html } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { UmbTreeBase } from '../shared/tree-base.element';
-import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import type { ManifestTreeItemAction } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-import { UmbDocumentStore } from 'src/core/stores/document/document.store';
 
 import '../shared/tree-navigator.element';
 @customElement('umb-tree-documents')
-export class UmbTreeDocumentsElement extends UmbContextProviderMixin(UmbContextConsumerMixin(UmbTreeBase)) {
+export class UmbTreeDocumentsElement extends UmbTreeBase {
 	constructor() {
 		super();
 
 		this._registerTreeItemActions();
-
-		// TODO: how do we best expose the tree api to the tree navigator element?
-		this.consumeContext('umbDocumentStore', (store: UmbDocumentStore) => {
-			this.provideContext('umbTreeStore', store);
-		});
 	}
 
 	private _registerTreeItemActions() {
@@ -67,7 +60,7 @@ export class UmbTreeDocumentsElement extends UmbContextProviderMixin(UmbContextC
 	}
 
 	render() {
-		return html`<umb-tree-navigator></umb-tree-navigator>`;
+		return html`<umb-tree-navigator store-context-alias="umbDocumentStore"></umb-tree-navigator>`;
 	}
 }
 

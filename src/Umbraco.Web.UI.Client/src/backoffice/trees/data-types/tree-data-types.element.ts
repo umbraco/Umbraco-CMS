@@ -6,7 +6,6 @@ import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import type { ManifestTreeItemAction } from '@umbraco-cms/models';
 
 import '../shared/tree-navigator.element';
-import { UmbDataTypesStore } from 'src/core/stores/data-types/data-types.store';
 
 @customElement('umb-tree-data-types')
 export class UmbTreeDataTypesElement extends UmbContextProviderMixin(UmbContextConsumerMixin(UmbTreeBase)) {
@@ -14,11 +13,6 @@ export class UmbTreeDataTypesElement extends UmbContextProviderMixin(UmbContextC
 		super();
 
 		this._registerTreeItemActions();
-
-		// TODO: how do we best expose the tree api to the tree navigator element?
-		this.consumeContext('umbDataTypeStore', (dataTypeStore: UmbDataTypesStore) => {
-			this.provideContext('umbTreeStore', dataTypeStore);
-		});
 	}
 
 	private _registerTreeItemActions() {
@@ -56,7 +50,7 @@ export class UmbTreeDataTypesElement extends UmbContextProviderMixin(UmbContextC
 	}
 
 	render() {
-		return html`<umb-tree-navigator></umb-tree-navigator>`;
+		return html`<umb-tree-navigator store-context-alias="umbDataTypeStore"></umb-tree-navigator>`;
 	}
 }
 

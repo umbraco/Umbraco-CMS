@@ -1,24 +1,13 @@
 import { html } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { UmbTreeBase } from '../shared/tree-base.element';
-import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 
 import '../shared/tree-navigator.element';
-import { UmbDocumentTypeStore } from 'src/core/stores/document-type/document-type.store';
 
 @customElement('umb-tree-document-types')
-export class UmbTreeDocumentTypes extends UmbContextConsumerMixin(UmbContextProviderMixin(UmbTreeBase)) {
-	constructor() {
-		super();
-
-		// TODO: how do we best expose the tree api to the tree navigator element?
-		this.consumeContext('umbDocumentTypeStore', (store: UmbDocumentTypeStore) => {
-			this.provideContext('umbTreeStore', store);
-		});
-	}
-
+export class UmbTreeDocumentTypes extends UmbTreeBase {
 	render() {
-		return html`<umb-tree-navigator></umb-tree-navigator>`;
+		return html`<umb-tree-navigator store-context-alias="umbDocumentTypeStore"></umb-tree-navigator>`;
 	}
 }
 

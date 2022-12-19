@@ -1,24 +1,13 @@
 import { html } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { UmbTreeBase } from '../shared/tree-base.element';
-import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
-import { UmbMediaStore } from 'src/core/stores/media/media.store';
 
 import '../shared/tree-navigator.element';
 
 @customElement('umb-tree-media')
-export class UmbTreeMediaElement extends UmbContextProviderMixin(UmbContextConsumerMixin(UmbTreeBase)) {
-	constructor() {
-		super();
-
-		// TODO: how do we best expose the tree api to the tree navigator element?
-		this.consumeContext('umbMediaStore', (store: UmbMediaStore) => {
-			this.provideContext('umbTreeStore', store);
-		});
-	}
-
+export class UmbTreeMediaElement extends UmbTreeBase {
 	render() {
-		return html`<umb-tree-navigator></umb-tree-navigator>`;
+		return html`<umb-tree-navigator store-context-alias="umbMediaStore"></umb-tree-navigator>`;
 	}
 }
 
