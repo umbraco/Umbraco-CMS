@@ -334,7 +334,8 @@
             vm.disableUserButtonState = "busy";
             usersResource.disableUsers(vm.selection).then(function (data) {
                 // update userState
-                vm.selection.forEach(function (userId) {
+
+                data.forEach(function (userId) {
                     var user = getUserFromArrayById(userId, vm.users);
                     if (user) {
                         user.userState = "Disabled";
@@ -808,7 +809,6 @@
 
                 if (user.userDisplayState && user.userDisplayState.key === "Invited") {
                     vm.allowEnableUser = false;
-                    vm.allowDisableUser = false;
                 }
 
                 if (user.userDisplayState && user.userDisplayState.key === "LockedOut") {
