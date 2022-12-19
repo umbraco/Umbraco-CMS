@@ -120,11 +120,11 @@ export const manifests: Array<ManifestWorkspace> = [
 	},
 	{
 		type: 'workspace',
-		alias: 'Umb.Workspace.LanguageCollection',
-		name: 'Language Collection Workspace',
-		loader: () => import('./language-collection/workspace-language-collection.element'),
+		alias: 'Umb.Workspace.LanguageRoot',
+		name: 'Language Root Workspace',
+		loader: () => import('./language-root/workspace-language-root.element'),
 		meta: {
-			entityType: 'language-collection',
+			entityType: 'language-root',
 		},
 	},
 ];
