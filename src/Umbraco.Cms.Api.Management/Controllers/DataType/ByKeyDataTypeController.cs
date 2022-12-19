@@ -30,6 +30,6 @@ public class ByKeyDataTypeController : DataTypeControllerBase
             return NotFound();
         }
 
-        return await Task.FromResult(_umbracoMapper.Map(dataType, new DataTypeViewModel()));
+        return await Task.FromResult(Ok(_umbracoMapper.Map<DataTypeViewModel>(dataType)));
     }
 }

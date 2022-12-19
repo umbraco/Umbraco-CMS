@@ -27,7 +27,7 @@ public class UpdateDataTypeController : DataTypeControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Update(Guid key, DataTypeViewModel dataTypeViewModel)
+    public async Task<ActionResult<DataTypeViewModel>> Update(Guid key, DataTypeUpdateModel dataTypeViewModel)
     {
         IDataType? current = _dataTypeService.GetDataType(key);
         if (current == null)
@@ -35,11 +35,11 @@ public class UpdateDataTypeController : DataTypeControllerBase
             return NotFound();
         }
 
-        IDataType mapped = _umbracoMapper.Map(dataTypeViewModel, current);
+        IDataType updated = _umbracoMapper.Map(dataTypeViewModel, current);
 
         IUser? currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
-        _dataTypeService.Save(mapped, currentUser?.Id ?? Constants.Security.SuperUserId);
+        _dataTypeService.Save(updated, currentUser?.Id ?? Constants.Security.SuperUserId);
 
-        return await Task.FromResult(Ok(_umbracoMapper.Map(mapped, new DataTypeViewModel())));
+        return await Task.FromResult(Ok(_umbracoMapper.Map<DataTypeViewModel>(updated)));
     }
 }

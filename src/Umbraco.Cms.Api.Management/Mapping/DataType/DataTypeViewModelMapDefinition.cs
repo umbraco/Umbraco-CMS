@@ -1,4 +1,5 @@
 ﻿using Umbraco.Cms.Api.Management.ViewModels.DataType;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -26,13 +27,16 @@ public class DataTypeViewModelMapDefinition : IMapDefinition
     public void DefineMaps(IUmbracoMapper mapper)
     {
         mapper.Define<IDataType, DataTypeViewModel>((_, _) => new DataTypeViewModel(), Map);
-        mapper.Define<DataTypeViewModel, IDataType>(
-            (source, _) =>
-                new Core.Models.DataType(_propertyEditors[source.PropertyEditorAlias], _serializer)
-                {
-                    CreateDate = DateTime.Now
-                },
-            Map);
+
+        mapper.Define<DataTypeUpdateModel, IDataType>(InitializeDataType, Map);
+
+        mapper.Define<DataTypeCreateModel, IDataType>(InitializeDataType, Map);
+
+        IDataType InitializeDataType<T>(T source, MapperContext _) where T : DataTypeModelBase =>
+            new Core.Models.DataType(_propertyEditors[source.PropertyEditorAlias], _serializer)
+            {
+                CreateDate = DateTime.Now
+            };
     }
 
     // Umbraco.Code.MapAll
@@ -55,28 +59,66 @@ public class DataTypeViewModelMapDefinition : IMapDefinition
             }).ToArray();
     }
 
+    // Umbraco.Code.MapAll -CreateDate -DeleteDate -UpdateDate -ParentId
+    // Umbraco.Code.MapAll -Id -Key -Path -CreatorId -Level -SortOrder
+    private void Map(DataTypeUpdateModel source, IDataType target, MapperContext context)
+    {
+        IDataEditor editor = GetRequiredDataEditor(source);
+
+        target.Name = source.Name;
+        target.Editor = editor;
+        target.DatabaseType = GetEditorValueStorageType(editor);
+        target.ConfigurationData = MapConfigurationData(source, editor);
+    }
+
     // Umbraco.Code.MapAll -CreateDate -DeleteDate -UpdateDate
     // Umbraco.Code.MapAll -Id -Key -Path -CreatorId -Level -SortOrder
-    private void Map(DataTypeViewModel source, IDataType target, MapperContext context)
+    private void Map(DataTypeCreateModel source, IDataType target, MapperContext context)
+    {
+        IDataEditor editor = GetRequiredDataEditor(source);
+
+        target.Name = source.Name;
+        target.ParentId = MapParentId(source.ParentKey);
+        target.Editor = editor;
+        target.DatabaseType = GetEditorValueStorageType(editor);
+        target.ConfigurationData = MapConfigurationData(source, editor);
+    }
+
+    private IDataEditor GetRequiredDataEditor<T>(T source) where T : DataTypeModelBase
     {
         if (_propertyEditors.TryGet(source.PropertyEditorAlias, out IDataEditor? editor) == false)
         {
             throw new InvalidOperationException($"Could not find a property editor with alias \"{source.PropertyEditorAlias}\".");
         }
 
-        target.Name = source.Name;
-        target.Editor = editor;
-        var valueType = editor.GetValueEditor().ValueType;
-        target.DatabaseType = ValueTypes.ToStorageType(valueType);
-        var parentId = source.ParentKey.HasValue ? _dataTypeService.GetContainer(source.ParentKey.Value)?.Id : null;
-        target.ParentId = parentId ?? target.ParentId;
+        return editor;
+    }
 
+    private ValueStorageType GetEditorValueStorageType(IDataEditor editor)
+    {
+        var valueType = editor.GetValueEditor().ValueType;
+        return ValueTypes.ToStorageType(valueType);
+    }
+
+    private IDictionary<string, object> MapConfigurationData<T>(T source, IDataEditor editor) where T : DataTypeModelBase
+    {
         var configuration = source
             .Configuration
             .Where(p => p.Value is not null)
             .ToDictionary(p => p.Alias, p => p.Value!);
-        IConfigurationEditor? configurationEditor = target.Editor?.GetConfigurationEditor();
-        target.ConfigurationData = configurationEditor?.FromConfigurationEditor(configuration)
-                                        ?? new Dictionary<string, object>();
+        IConfigurationEditor? configurationEditor = editor?.GetConfigurationEditor();
+        return configurationEditor?.FromConfigurationEditor(configuration)
+                                   ?? new Dictionary<string, object>();
+    }
+
+    private int MapParentId(Guid? parentKey)
+    {
+        if (parentKey == null)
+        {
+            return Constants.System.Root;
+        }
+
+        EntityContainer? container = _dataTypeService.GetContainer(parentKey.Value);
+        return container?.Id ?? throw new InvalidOperationException($"Could not find a parent container with key \"{parentKey}\".");
     }
 }

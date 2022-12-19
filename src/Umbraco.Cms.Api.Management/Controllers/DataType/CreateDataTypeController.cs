@@ -27,17 +27,17 @@ public class CreateDataTypeController : DataTypeControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Create(DataTypeViewModel dataTypeViewModel)
+    public async Task<ActionResult<DataTypeViewModel>> Create(DataTypeCreateModel dataTypeCreateModel)
     {
-        IDataType? mapped = _umbracoMapper.Map<IDataType>(dataTypeViewModel);
-        if (mapped == null)
+        IDataType? created = _umbracoMapper.Map<IDataType>(dataTypeCreateModel);
+        if (created == null)
         {
             return BadRequest("Could not map the POSTed model to a datatype");
         }
 
         IUser? currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
-        _dataTypeService.Save(mapped, currentUser?.Id ?? Constants.Security.SuperUserId);
+        _dataTypeService.Save(created, currentUser?.Id ?? Constants.Security.SuperUserId);
 
-        return await Task.FromResult(Ok(_umbracoMapper.Map(mapped, new DataTypeViewModel())));
+        return await Task.FromResult(Ok(_umbracoMapper.Map<DataTypeViewModel>(created)));
     }
 }
