@@ -7,7 +7,7 @@ import '../shared/tree-navigator.element';
 @customElement('umb-tree-media')
 export class UmbTreeMediaElement extends UmbTreeBase {
 	render() {
-		return html`<umb-tree-navigator store-context-alias="umbMediaStore"></umb-tree-navigator>`;
+		return html`<umb-tree-navigator></umb-tree-navigator>`;
 	}
 }
 

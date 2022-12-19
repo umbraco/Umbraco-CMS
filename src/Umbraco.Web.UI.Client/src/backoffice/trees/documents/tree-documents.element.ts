@@ -60,7 +60,7 @@ export class UmbTreeDocumentsElement extends UmbTreeBase {
 	}
 
 	render() {
-		return html`<umb-tree-navigator store-context-alias="umbDocumentStore"></umb-tree-navigator>`;
+		return html`<umb-tree-navigator></umb-tree-navigator>`;
 	}
 }
 

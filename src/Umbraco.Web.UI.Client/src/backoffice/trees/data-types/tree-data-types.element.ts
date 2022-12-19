@@ -50,7 +50,7 @@ export class UmbTreeDataTypesElement extends UmbContextProviderMixin(UmbContextC
 	}
 
 	render() {
-		return html`<umb-tree-navigator store-context-alias="umbDataTypeStore"></umb-tree-navigator>`;
+		return html`<umb-tree-navigator></umb-tree-navigator>`;
 	}
 }
 

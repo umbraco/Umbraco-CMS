@@ -7,7 +7,7 @@ import '../shared/tree-navigator.element';
 @customElement('umb-tree-member-types')
 export class UmbTreeMemberTypes extends UmbTreeBase {
 	render() {
-		return html`<umb-tree-navigator store-context-alias="umbMemberTypeStore"></umb-tree-navigator>`;
+		return html`<umb-tree-navigator></umb-tree-navigator>`;
 	}
 }
 

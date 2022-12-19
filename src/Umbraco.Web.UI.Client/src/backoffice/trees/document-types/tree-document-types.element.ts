@@ -7,7 +7,7 @@ import '../shared/tree-navigator.element';
 @customElement('umb-tree-document-types')
 export class UmbTreeDocumentTypes extends UmbTreeBase {
 	render() {
-		return html`<umb-tree-navigator store-context-alias="umbDocumentTypeStore"></umb-tree-navigator>`;
+		return html`<umb-tree-navigator></umb-tree-navigator>`;
 	}
 }
 

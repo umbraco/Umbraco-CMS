@@ -23,6 +23,7 @@ export const manifests: Array<ManifestTree> = [
 			label: 'Document Types',
 			icon: 'umb:folder',
 			sections: ['Umb.Section.Settings'],
+			storeContextAlias: 'umbDocumentTypeStore',
 		},
 	},
 	{
@@ -35,6 +36,7 @@ export const manifests: Array<ManifestTree> = [
 			label: 'Media Types',
 			icon: 'umb:folder',
 			sections: ['Umb.Section.Settings'],
+			storeContextAlias: 'umbMediaTypeStore',
 		},
 	},
 	{
@@ -47,6 +49,7 @@ export const manifests: Array<ManifestTree> = [
 			label: 'Member Types',
 			icon: 'umb:folder',
 			sections: ['Umb.Section.Settings'],
+			storeContextAlias: 'umbMemberTypeStore',
 		},
 	},
 	{
@@ -59,6 +62,7 @@ export const manifests: Array<ManifestTree> = [
 			label: 'Data Types',
 			icon: 'umb:folder',
 			sections: ['Umb.Section.Settings'],
+			storeContextAlias: 'umbDataTypeStore',
 		},
 	},
 	{
@@ -71,6 +75,7 @@ export const manifests: Array<ManifestTree> = [
 			label: 'Member Groups',
 			icon: 'umb:folder',
 			sections: ['Umb.Section.Members'],
+			storeContextAlias: 'umbMemberGroupStore',
 		},
 	},
 	{
@@ -83,6 +88,7 @@ export const manifests: Array<ManifestTree> = [
 			label: 'Media',
 			icon: 'umb:folder',
 			sections: ['Umb.Section.Media'],
+			storeContextAlias: 'umbMediaStore',
 		},
 	},
 	{
@@ -95,6 +101,7 @@ export const manifests: Array<ManifestTree> = [
 			label: 'Documents',
 			icon: 'umb:folder',
 			sections: ['Umb.Section.Content'],
+			storeContextAlias: 'umbDocumentStore',
 		},
 	},
 	{

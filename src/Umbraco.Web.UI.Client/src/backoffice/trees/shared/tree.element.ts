@@ -7,6 +7,7 @@ import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import type { ManifestTree } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
+import { UmbDataStore } from '@umbraco-cms/stores/store';
 
 @customElement('umb-tree')
 export class UmbTreeElement extends UmbContextProviderMixin(UmbContextConsumerMixin(UmbObserverMixin(LitElement))) {
@@ -68,8 +69,14 @@ export class UmbTreeElement extends UmbContextProviderMixin(UmbContextConsumerMi
 				.extensionsOfType('tree')
 				.pipe(map((trees) => trees.find((tree) => tree.alias === this.alias))),
 			(tree) => {
+				if (this._tree?.alias === tree.alias) return;
+
 				this._tree = tree;
 				this._provideTreeContext();
+
+				if (this._tree.meta.storeContextAlias) {
+					this._provideStore();
+				}
 			}
 		);
 	}
@@ -82,6 +89,14 @@ export class UmbTreeElement extends UmbContextProviderMixin(UmbContextConsumerMi
 		this._treeContext.setSelection(this.selection);
 
 		this.provideContext('umbTreeContext', this._treeContext);
+	}
+
+	private _provideStore() {
+		if (!this._tree?.meta.storeContextAlias) return;
+
+		this.consumeContext(this._tree.meta.storeContextAlias, (store: UmbDataStore<unknown>) =>
+			this.provideContext('umbStore', store)
+		);
 	}
 
 	private _observeSelection() {

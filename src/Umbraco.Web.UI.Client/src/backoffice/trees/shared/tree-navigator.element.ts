@@ -45,6 +45,10 @@ export class UmbTreeNavigator extends UmbContextConsumerMixin(UmbContextProvider
 	constructor() {
 		super();
 
+		this.consumeContext('umbStore', (store) => {
+			this._store = store;
+		});
+
 		this.consumeContext('umbTreeContext', (treeContext: UmbTreeContext) => {
 			this._tree = treeContext.tree;
 		});
