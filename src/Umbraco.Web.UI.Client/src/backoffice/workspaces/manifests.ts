@@ -59,9 +59,9 @@ export const manifests: Array<ManifestWorkspace> = [
 		type: 'workspace',
 		alias: 'Umb.Workspace.Extensions',
 		name: 'Extensions Workspace',
-		loader: () => import('./extensions/workspace-extensions.element'),
+		loader: () => import('./extension-root/workspace-extension-root.element'),
 		meta: {
-			entityType: 'extensions-list',
+			entityType: 'extension-root',
 		},
 	},
 	{
@@ -116,6 +116,15 @@ export const manifests: Array<ManifestWorkspace> = [
 		loader: () => import('./package-builder/workspace-package-builder.element'),
 		meta: {
 			entityType: 'package-builder',
+		},
+	},
+	{
+		type: 'workspace',
+		alias: 'Umb.Workspace.LanguageRoot',
+		name: 'Language Root Workspace',
+		loader: () => import('./language-root/workspace-language-root.element'),
+		meta: {
+			entityType: 'language-root',
 		},
 	},
 ];

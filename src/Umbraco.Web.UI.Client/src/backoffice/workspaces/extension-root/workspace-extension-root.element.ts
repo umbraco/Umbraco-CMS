@@ -6,9 +6,8 @@ import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { ManifestTypes } from '@umbraco-cms/models';
 
-@customElement('umb-workspace-extensions')
-export class UmbWorkspaceExtensionsElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
-	
+@customElement('umb-workspace-extension-root')
+export class UmbWorkspaceExtensionRootElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	@state()
 	private _extensions: Array<ManifestTypes> = [];
 
@@ -25,7 +24,7 @@ export class UmbWorkspaceExtensionsElement extends UmbContextConsumerMixin(UmbOb
 
 	render() {
 		return html`
-			<umb-workspace-entity-layout headline="Extensions" alias="Umb.Workspace.Extensions">
+			<umb-workspace-entity-layout headline="Extensions" alias="Umb.Workspace.ExtensionRoot">
 				<uui-box>
 					<p>List of currently loaded extensions</p>
 					<uui-table>
@@ -44,7 +43,11 @@ export class UmbWorkspaceExtensionsElement extends UmbContextConsumerMixin(UmbOb
 										${isManifestElementType(extension) ? extension.name : 'Custom extension'}
 									</uui-table-cell>
 									<uui-table-cell>${extension.alias}</uui-table-cell>
-									<uui-table-cell><uui-button label="unload" @click=${() => umbExtensionsRegistry.unregister(extension.alias)}></uui-button></uui-table-cell>
+									<uui-table-cell
+										><uui-button
+											label="unload"
+											@click=${() => umbExtensionsRegistry.unregister(extension.alias)}></uui-button
+									></uui-table-cell>
 								</uui-table-row>
 							`
 						)}
@@ -55,10 +58,10 @@ export class UmbWorkspaceExtensionsElement extends UmbContextConsumerMixin(UmbOb
 	}
 }
 
-export default UmbWorkspaceExtensionsElement;
+export default UmbWorkspaceExtensionRootElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-workspace-extensions': UmbWorkspaceExtensionsElement;
+		'umb-workspace-extension-root': UmbWorkspaceExtensionRootElement;
 	}
 }
