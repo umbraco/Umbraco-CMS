@@ -1,11 +1,11 @@
 import type { ManifestElement } from './models';
 
-export interface ManifestCollectionHeaderView extends ManifestElement {
-	type: 'collectionHeaderView';
-	meta: MetaCollectionHeaderView;
+export interface ManifestCollectionLayout extends ManifestElement {
+	type: 'collectionLayout';
+	meta: MetaCollectionLayout;
 }
 
-export interface MetaCollectionHeaderView {
+export interface MetaCollectionLayout {
 	label: string;
 	icon: string;
 	entityType: string;

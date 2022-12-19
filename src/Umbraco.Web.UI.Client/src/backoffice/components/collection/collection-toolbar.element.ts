@@ -5,7 +5,7 @@ import '../tooltip-menu.element';
 import { TooltipMenuItem } from '../tooltip-menu.element';
 
 @customElement('umb-collection-toolbar')
-export class UmbCollectionHeaderElement extends LitElement {
+export class UmbCollectionToolbarElement extends LitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -146,6 +146,6 @@ export class UmbCollectionHeaderElement extends LitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-collection-toolbar': UmbCollectionHeaderElement;
+		'umb-collection-toolbar': UmbCollectionToolbarElement;
 	}
 }
