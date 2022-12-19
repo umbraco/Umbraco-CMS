@@ -1,14 +1,22 @@
+import { UUIButtonState } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html, LitElement } from 'lit';
+import { css, html, LitElement, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { healthGroups, HealthCheckGroup, HealthType } from '../../../../core/mocks/data/health-check.data';
+import {
+	healthGroups,
+	HealthCheckGroup,
+	HealthResult,
+	healthGroups2,
+	HealthCheckGroupCheck,
+	CheckResult,
+} from '../../../../core/mocks/data/health-check.data';
 
 @customElement('umb-dashboard-health-check-group')
 export class UmbDashboardHealthCheckGroupElement extends LitElement {
 	static styles = [
 		UUITextStyles,
 		css`
-			uui-box {
+			uui-box + uui-box {
 				margin-top: var(--uui-size-space-5);
 			}
 
@@ -22,7 +30,7 @@ export class UmbDashboardHealthCheckGroupElement extends LitElement {
 				margin-inline: -5px;
 			}
 
-			.headline {
+			.flex {
 				display: flex;
 				justify-content: space-between;
 				align-items: center;
@@ -46,34 +54,16 @@ export class UmbDashboardHealthCheckGroupElement extends LitElement {
 				vertical-align: middle;
 			}
 
-			.danger {
-				color: var(--uui-color-danger);
-			}
-			.warning {
-				color: var(--uui-color-warning);
-			}
-			.positive {
-				color: var(--uui-color-positive);
-			}
-
-			button {
-				background: none;
-				border: none;
-				text-decoration: underline;
-				cursor: pointer;
-				margin-bottom: var(--uui-size-space-5);
-			}
-
-			section:not(:first-child) {
+			.data div:not(:first-child) {
 				padding-top: var(--uui-size-space-5);
 				margin-top: var(--uui-size-space-5);
 				border-top: 1px solid var(--uui-color-divider-standalone);
 			}
 
-			section p {
+			.data p {
 				margin: 0;
 			}
-			uui-button {
+			.data uui-button {
 				margin-block-start: 1em;
 			}
 		`,
@@ -83,53 +73,80 @@ export class UmbDashboardHealthCheckGroupElement extends LitElement {
 	groupName!: string;
 
 	@state()
+	private _buttonState: UUIButtonState;
+
+	@state()
 	private _healthGroup?: HealthCheckGroup;
 
 	constructor() {
 		super();
-		this._healthGroup = healthGroups[2];
+		this._healthGroup = healthGroups[4];
 	}
 
 	protected firstUpdated() {
 		console.log(this.groupName);
 	}
 
+	private async _buttonHandler() {
+		this._buttonState = 'waiting';
+		this._getChecks();
+	}
+	private async _getChecks() {
+		await new Promise((resolve) => setTimeout(resolve, (Math.random() + 1) * 1000));
+		this._buttonState = 'success';
+	}
+
 	render() {
 		if (this._healthGroup) {
 			return html`
 				<uui-box>
-					<div class="headline" slot="headline">${this._healthGroup.name}</div>
-					${this._healthGroup.checks.map((item) => {
-						if (item.data) {
-							return html`<uui-box headline="${item.name}">
-								<p>${item.description}</p>
-								<uui-icon-registry-essential>
-									<div class="data">
-										${item.data.map((res) => {
-											return html` <section>
-												<p>${this.renderIcon(res.resultType)} ${res.message}</p>
-												${res.readMoreLink
-													? html`<uui-button color="default" look="primary">Read more</uui-button>`
-													: ''}
-											</section>`;
-										})}
-									</div>
-								</uui-icon-registry-essential>
-							</uui-box>`;
-						}
-						return html`<uui-box headline="${item.name}">
-							<p>${item.description}</p>
-						</uui-box>`;
+					<div slot="headline" class="flex">
+						${this._healthGroup.name}
+						<uui-button color="positive" look="primary" .state="${this._buttonState}" @click="${this._buttonHandler}">
+							Get checks
+						</uui-button>
+					</div>
+					${this._healthGroup.checks?.map((check) => {
+						return this.renderCheckDetails(check);
 					})}
 				</uui-box>
 			`;
-		} else return html``;
+		} else return nothing;
 	}
 
-	private renderIcon(type: HealthType) {
-		return html`<uui-icon
-			class="${type == 'Success' ? 'positive' : type == 'Warning' ? 'warning' : 'danger'}"
-			name="${type == 'Success' ? 'check' : type == 'Warning' ? 'alert' : 'remove'}"></uui-icon>`;
+	renderCheckDetails(check: HealthCheckGroupCheck) {
+		return html`<uui-box headline="${check.name || '?'}">
+			<p>${check.description}</p>
+			${check.results ? this.renderCheckResults(check.results) : nothing}
+		</uui-box>`;
+	}
+
+	renderCheckResults(results: CheckResult[]) {
+		return html`<uui-icon-registry-essential>
+			<div class="data">
+				${results.map((result) => {
+					return html`<div>
+						<p>${this.renderIcon(result.resultType)} ${result.message}</p>
+						${result.readMoreLink ? html`<uui-button color="default" look="primary">Read more</uui-button>` : nothing}
+					</div>`;
+				})}
+			</div></uui-icon-registry-essential
+		>`;
+	}
+
+	private renderIcon(type?: HealthResult) {
+		switch (type) {
+			case 'Success':
+				return html`<uui-icon style="color: var(--uui-color-positive);" name="check"></uui-icon>`;
+			case 'Warning':
+				return html`<uui-icon style="color: var(--uui-color-warning);" name="alert"></uui-icon>`;
+			case 'Error':
+				return html`<uui-icon style="color: var(--uui-color-danger);" name="remove"></uui-icon>`;
+			case 'Info':
+				return html`<uui-icon style="color:black;" name="info"></uui-icon>`;
+			default:
+				return nothing;
+		}
 	}
 }
 

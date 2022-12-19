@@ -1,12 +1,18 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html, LitElement } from 'lit';
+import { css, html, LitElement, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { healthGroups, HealthCheckGroup, HealthType } from '../../../../core/mocks/data/health-check.data';
+import {
+	healthGroups,
+	HealthCheckGroup,
+	HealthResult,
+	HealthCheckGroupCheck,
+} from '../../../../core/mocks/data/health-check.data';
 
 import { UmbModalService } from '../../../../core/services/modal';
 import { UmbNotificationService } from '../../../../core/services/notification';
 
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import { UUIButtonState } from '@umbraco-ui/uui';
 
 @customElement('umb-dashboard-health-check-overview')
 export class UmbDashboardHealthCheckOverviewElement extends UmbContextConsumerMixin(LitElement) {
@@ -38,8 +44,22 @@ export class UmbDashboardHealthCheckOverviewElement extends UmbContextConsumerMi
 			uui-tag uui-icon {
 				padding-right: 10px;
 			}
+
+			.flex {
+				display: flex;
+				justify-content: space-between;
+			}
 		`,
 	];
+
+	@state()
+	private _buttonState: UUIButtonState;
+
+	@state()
+	private _showChecks = false;
+
+	@state()
+	private _loaders?: string[];
 
 	@state()
 	private _healthGroups: HealthCheckGroup[] = healthGroups;
@@ -61,14 +81,26 @@ export class UmbDashboardHealthCheckOverviewElement extends UmbContextConsumerMi
 
 	connectedCallback() {
 		super.connectedCallback();
-		this._getHealthGroups();
 	}
 
-	private async _getHealthGroups() {
+	private async _healthCheckHandler() {
+		this._buttonState = 'waiting';
+		this._getAllHealthGroups();
+	}
+
+	private async _getHealthGroup() {
+		console.log('group');
+	}
+
+	private async _getAllHealthGroups() {
 		try {
+			await new Promise((resolve) => setTimeout(resolve, (Math.random() + 1) * 1000));
+			this._showChecks = true;
+			this._buttonState = 'success';
 			/*const { data } = await getHealthGroups({});
 			this._healthGroups = data as HealthCheckGroup[]; */
 		} catch (e) {
+			this._buttonState = 'failed';
 			/*if (e instanceof getHealthGroups.Error) {
 				const error = e.getActualType();
 				const data: UmbNotificationDefaultData = { message: error.data.detail ?? 'Something went wrong' };
@@ -80,47 +112,80 @@ export class UmbDashboardHealthCheckOverviewElement extends UmbContextConsumerMi
 	render() {
 		return html`
 			<uui-box>
-				<div class="headline" slot="headline">Health Check</div>
+				<div slot="headline" class="flex">
+					Health Check
+					<uui-button
+						color="positive"
+						look="primary"
+						.state="${this._buttonState}"
+						@click="${this._healthCheckHandler}">
+						Check all groups
+					</uui-button>
+				</div>
 				<div class="group-wrapper">
 					${this._healthGroups.map((group) => {
-						const checksOfGroup = this.getChecksOfGroup(group);
-						return html` <a href="${this.urlGenerator(group.name)}">
-							<uui-box class="group-box">
-								${group.name}
-								<br />
-								<uui-icon-registry-essential>
-									${checksOfGroup.success ? this.renderTags('Success', checksOfGroup.success) : ''}
-									${checksOfGroup.warning ? this.renderTags('Warning', checksOfGroup.warning) : ''}
-									${checksOfGroup.error ? this.renderTags('Error', checksOfGroup.error) : ''}
-								</uui-icon-registry-essential>
-							</uui-box>
-						</a>`;
+						if (group.name)
+							return html` <a href="${this.urlGenerator(group.name)}">
+								<uui-box class="group-box"> ${group.name} ${this.renderChecks(group)} </uui-box>
+							</a>`;
+						else return nothing;
 					})}
 				</div>
 			</uui-box>
 		`;
 	}
 
-	private getChecksOfGroup(group: HealthCheckGroup) {
-		const res = { success: 0, warning: 0, error: 0 };
-		group.checks.map((category) => {
-			category.data?.map((data) => {
-				data.resultType == 'Success'
-					? (res.success += 1)
-					: data.resultType == 'Warning'
-					? (res.warning += 1)
-					: (res.error += 1);
-			});
-		});
-		return res;
+	private renderChecks(group: HealthCheckGroup) {
+		if (this._showChecks && group.checks) {
+			const checksOfGroup = this.getChecksInGroup(group.checks);
+			return html` <br />
+				<uui-icon-registry-essential>
+					${checksOfGroup.success ? this.renderTags('Success', checksOfGroup.success) : ''}
+					${checksOfGroup.warning ? this.renderTags('Warning', checksOfGroup.warning) : ''}
+					${checksOfGroup.error ? this.renderTags('Error', checksOfGroup.error) : ''}
+				</uui-icon-registry-essential>`;
+		} else return nothing;
 	}
 
-	private renderTags(type: HealthType, amount: number) {
-		return html` <uui-tag
-			color="${type == 'Success' ? 'positive' : type == 'Warning' ? 'warning' : 'danger'}"
-			look="secondary">
-			<uui-icon name="${type == 'Success' ? 'check' : type == 'Warning' ? 'alert' : 'remove'}"></uui-icon> ${amount}
-		</uui-tag>`;
+	private getChecksInGroup(groupChecks: HealthCheckGroupCheck[]) {
+		const result = { success: 0, warning: 0, error: 0, info: 0 };
+
+		groupChecks.forEach((data) => {
+			data.results?.forEach((check) => {
+				switch (check.resultType) {
+					case 'Success':
+						result.success += 1;
+						break;
+					case 'Warning':
+						result.warning += 1;
+						break;
+					case 'Error':
+						result.error += 1;
+						break;
+					case 'Info':
+						result.info += 1;
+						break;
+					default:
+						break;
+				}
+			});
+		});
+		return result;
+	}
+
+	private renderTags(type: HealthResult, amount: number) {
+		switch (type) {
+			case 'Success':
+				return html`<uui-tag color="positive" look="secondary"><uui-icon name="check"></uui-icon>${amount}</uui-tag>`;
+			case 'Warning':
+				return html`<uui-tag color="warning" look="secondary"><uui-icon name="alert"></uui-icon>${amount}</uui-tag>`;
+			case 'Error':
+				return html`<uui-tag color="danger" look="secondary"><uui-icon name="remove"></uui-icon>${amount}</uui-tag>`;
+			case 'Info':
+				return html`<uui-tag color="default" look="secondary"><uui-icon name="info"></uui-icon>${amount}</uui-tag>`;
+			default:
+				return html``;
+		}
 	}
 }
 
