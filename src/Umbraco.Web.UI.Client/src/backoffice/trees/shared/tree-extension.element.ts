@@ -30,6 +30,12 @@ export class UmbTreeExtension extends LitElement {
 	private async _createElement() {
 		if (!this.tree) return;
 
+		// If the manifest doesn't specify a custom element, we will render a default tree element
+		if (!this.tree.elementName && !this.tree.js && !this.tree.loader) {
+			this._element = document.createElement('umb-tree-navigator');
+			return;
+		}
+
 		try {
 			this._element = (await createExtensionElement(this.tree)) as any | undefined;
 			if (!this._element) return;
