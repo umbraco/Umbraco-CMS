@@ -7,6 +7,7 @@ import { UmbMediaStore } from '@umbraco-cms/stores/media/media.store';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 
+//TODO: Should be renamed to a specific usecase. eg. umb-media-collection-layout-grid
 @customElement('umb-collection-layout-grid')
 export class UmbCollectionLayoutGridElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles = [
