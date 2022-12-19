@@ -55,7 +55,7 @@ export class UmbCollectionToolbarElement extends UmbObserverMixin(LitElement) {
 	public useSearch = true;
 
 	@state()
-	private _currentViewType?: ManifestCollectionLayout;
+	private _currentLayout?: ManifestCollectionLayout;
 
 	@state()
 	private _search = '';
@@ -82,8 +82,9 @@ export class UmbCollectionToolbarElement extends UmbObserverMixin(LitElement) {
 				if (layouts?.length === 0) return;
 				this._collectionLayouts = layouts;
 
-				if (!this._currentViewType) {
-					this._currentViewType = layouts[0];
+				if (!this._currentLayout) {
+					//TODO: Find a way to figure out which layout it starts with and set _currentLayout to that. eg. '/table'
+					this._currentLayout = layouts[0];
 				}
 			}
 		);
@@ -94,11 +95,11 @@ export class UmbCollectionToolbarElement extends UmbObserverMixin(LitElement) {
 	}
 
 	private _toggleViewType() {
-		if (!this._currentViewType) return;
+		if (!this._currentLayout) return;
 
-		const index = this._collectionLayouts.indexOf(this._currentViewType);
-		this._currentViewType = this._collectionLayouts[(index + 1) % this._collectionLayouts.length];
-		this._changeLayout(this._currentViewType.meta.pathName);
+		const index = this._collectionLayouts.indexOf(this._currentLayout);
+		this._currentLayout = this._collectionLayouts[(index + 1) % this._collectionLayouts.length];
+		this._changeLayout(this._currentLayout.meta.pathName);
 	}
 
 	private _updateSearch(e: InputEvent) {
@@ -130,19 +131,19 @@ export class UmbCollectionToolbarElement extends UmbObserverMixin(LitElement) {
 	}
 
 	private _renderViewTypeButton() {
-		if (!this._currentViewType) return;
+		if (!this._currentLayout) return;
 
-		if (this._collectionLayouts.length < 2 || !this._currentViewType.meta.icon) return nothing;
+		if (this._collectionLayouts.length < 2 || !this._currentLayout.meta.icon) return nothing;
 
 		if (this._collectionLayouts.length === 2) {
 			return html`<uui-button @click=${this._toggleViewType} look="outline" compact>
-				<uui-icon .name=${this._currentViewType.meta.icon}></uui-icon>
+				<uui-icon .name=${this._currentLayout.meta.icon}></uui-icon>
 			</uui-button>`;
 		}
 		if (this._collectionLayouts.length > 2) {
 			return html`<uui-popover margin="8" .open=${this._viewTypesOpen} @close=${() => (this._viewTypesOpen = false)}>
 				<uui-button @click=${() => (this._viewTypesOpen = !this._viewTypesOpen)} slot="trigger" look="outline" compact>
-					<uui-icon .name=${this._currentViewType.meta.icon}></uui-icon>
+					<uui-icon .name=${this._currentLayout.meta.icon}></uui-icon>
 				</uui-button>
 				<umb-tooltip-menu
 					icon
