@@ -26,7 +26,7 @@ public class SqlServerTestDatabaseConfiguration : ITestDatabaseConfiguration
 
         return new ConnectionStrings
         {
-            ConnectionString = _connectionString + _key,
+            ConnectionString = _connectionString + _key + ";TrustServerCertificate=true;",
             ProviderName = "Microsoft.Data.SqlClient"
         };
     }
