@@ -74,6 +74,8 @@ public class Upgrader
 
         SetState(state, scopeProvider, keyValueService);
 
+        // TODO: Publish notification.
+
         return new ExecutedMigrationPlan(Plan, initialState, state);
     }
 
