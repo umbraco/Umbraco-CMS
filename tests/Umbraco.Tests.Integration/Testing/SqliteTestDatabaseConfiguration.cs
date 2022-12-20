@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Tests.Integration.Implementations;
 
 namespace Umbraco.Cms.Tests.Integration.Testing;
 
@@ -10,15 +11,21 @@ public class SqliteTestDatabaseConfiguration : ITestDatabaseConfiguration
 {
     private readonly IOptionsMonitor<ConnectionStrings> _connectionStrings;
     private readonly IUmbracoDatabaseFactory _databaseFactory;
-    private readonly IConfiguration _configuration;
     private Guid? _key;
+    private TestHelper _testHelper = new();
+    private string s_filesPath;
 
-    public SqliteTestDatabaseConfiguration(IOptionsMonitor<ConnectionStrings> connectionStrings, IUmbracoDatabaseFactory databaseFactory, IConfiguration configuration)
+    public SqliteTestDatabaseConfiguration(IOptionsMonitor<ConnectionStrings> connectionStrings, IUmbracoDatabaseFactory databaseFactory)
     {
         _connectionStrings = connectionStrings;
         _databaseFactory = databaseFactory;
-        _configuration = configuration;
         _key = Guid.NewGuid();
+        s_filesPath = Path.Combine(_testHelper.WorkingDirectory, "databases");
+
+        if (!Directory.Exists(s_filesPath))
+        {
+            Directory.CreateDirectory(s_filesPath);
+        }
     }
 
     public ConnectionStrings InitializeConfiguration()
@@ -47,18 +54,7 @@ public class SqliteTestDatabaseConfiguration : ITestDatabaseConfiguration
 
     public void Teardown() => TryDeleteFile(GetAbsolutePath());
 
-    private string GetAbsolutePath()
-    {
-        var filesPath = _configuration.GetValue<string>("Tests:Database:FilesPath");
-        if (filesPath is null)
-        {
-            string? projectDirectory = Directory.GetParent(Environment.CurrentDirectory)?.Parent?.Parent?.FullName;
-            string tempFolder = @"TEMP\databases";
-            filesPath = Path.Combine(projectDirectory!, tempFolder);
-        }
-
-        return Path.Combine(filesPath, _key.ToString());
-    }
+    private string GetAbsolutePath() => Path.Combine(s_filesPath, _key.ToString());
 
     private void TryDeleteFile(string filePath)
     {
