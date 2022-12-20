@@ -16,6 +16,7 @@ using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Integration.TestServerTest;
 using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Cms.Web.Common.Formatters;
+using Umbraco.Cms.Web.Common.Models;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers;
 
@@ -253,8 +254,6 @@ public class UsersControllerTests : UmbracoTestServerTestBase
             var body = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
 
             body = body.TrimStart(AngularJsonMediaTypeFormatter.XsrfPrefix);
-            var affectedUsers = JsonConvert.DeserializeObject<int[]>(body, new JsonSerializerSettings { ContractResolver = new IgnoreRequiredAttributesResolver() });
-            Assert.IsEmpty(affectedUsers!);
         });
     }
 
@@ -285,8 +284,8 @@ public class UsersControllerTests : UmbracoTestServerTestBase
             var body = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
 
             body = body.TrimStart(AngularJsonMediaTypeFormatter.XsrfPrefix);
-            var affectedUsers = JsonConvert.DeserializeObject<int[]>(body, new JsonSerializerSettings { ContractResolver = new IgnoreRequiredAttributesResolver() });
-            Assert.AreEqual(affectedUsers!.First(), createdUser!.Id);
+            var affectedUsers = JsonConvert.DeserializeObject<DisabledUsersModel>(body, new JsonSerializerSettings { ContractResolver = new IgnoreRequiredAttributesResolver() });
+            Assert.AreEqual(affectedUsers!.DisabledUserIds.First(), createdUser!.Id);
 
             var disabledUser = userService.GetByEmail("test@test.com");
             Assert.AreEqual(disabledUser!.UserState, UserState.Disabled);
