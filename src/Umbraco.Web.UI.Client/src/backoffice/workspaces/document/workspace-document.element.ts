@@ -51,8 +51,6 @@ export class UmbWorkspaceDocumentElement extends UmbObserverMixin(UmbContextCons
 	constructor() {
 		super();
 
-		console.log("WORKSPACE DOCUMENT")
-
 		// TODO: consider if registering extensions should happen initially or else where, to enable unregister of extensions.
 		this._registerWorkspaceViews();
 	}
@@ -70,8 +68,6 @@ export class UmbWorkspaceDocumentElement extends UmbObserverMixin(UmbContextCons
 
 	protected _provideWorkspace() {
 		if(this._entityType && this._entityKey) {
-
-		console.log("_provideWorkspace ", this._entityType, this._entityKey)
 			this._workspaceContext = new UmbWorkspaceDocumentContext(this, this._entityType, this._entityKey);
 			this.provideContext('umbWorkspaceContext', this._workspaceContext);
 		}

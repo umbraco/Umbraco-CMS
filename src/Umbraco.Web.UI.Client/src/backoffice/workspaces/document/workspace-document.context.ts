@@ -61,7 +61,6 @@ export class UmbWorkspaceDocumentContext extends UmbWorkspaceContext<DocumentDet
 
 		// TODO: consider if store alias should be configurable of manifest:
 		this._storeConsumer = new UmbContextConsumer(this._target, 'umbDocumentStore', (_instance: UmbDocumentStore) => {
-			console.log("GOT STORE", _instance)
 			this._store = _instance;
 			this._observeStore();
 		});
