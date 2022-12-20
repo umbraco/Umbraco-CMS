@@ -17,8 +17,8 @@ export const manifests: Array<ManifestSection> = [
 		type: 'section',
 		alias: 'Umb.Section.Media',
 		name: 'Media Section',
-		elementName: 'umb-media-section',
-		loader: () => import('./media/media-section.element'),
+		elementName: 'umb-section-media',
+		loader: () => import('./media/section-media.element'),
 		weight: 500,
 		meta: {
 			label: 'Media',
