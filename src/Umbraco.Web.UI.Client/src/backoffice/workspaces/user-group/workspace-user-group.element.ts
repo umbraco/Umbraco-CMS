@@ -3,14 +3,14 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, LitElement, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
-import { UmbUserGroupContext } from './user-group.context';
+import { distinctUntilChanged } from 'rxjs';
+import { UmbWorkspaceUserGroupContext } from './workspace-user-group.context';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import '@umbraco-cms/components/input-user/input-user.element';
 import '@umbraco-cms/components/input-section/input-section.element';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import type { ManifestWorkspaceAction, UserDetails, UserGroupDetails } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-import { UmbUserGroupStore } from '@umbraco-cms/stores/user/user-group.store';
 import { UmbUserStore } from '@umbraco-cms/stores/user/user.store';
 
 @customElement('umb-workspace-user-group')
@@ -73,19 +73,6 @@ export class UmbWorkspaceUserGroupElement extends UmbContextProviderMixin(
 			}
 		`,
 	];
-
-	@property({ type: String })
-	entityKey = '';
-
-	@state()
-	private _userGroup?: UserGroupDetails | null;
-
-	@state()
-	private _userKeys?: Array<string>;
-
-	private _userGroupStore?: UmbUserGroupStore;
-	private _userStore?: UmbUserStore;
-	private _userGroupContext?: UmbUserGroupContext;
 
 	defaultPermissions: Array<{
 		name: string;
@@ -198,10 +185,58 @@ export class UmbWorkspaceUserGroupElement extends UmbContextProviderMixin(
 		},
 	];
 
+	private _userStore?: UmbUserStore;
+
+	private _entityKey!: string;
+	@property()
+	public get entityKey(): string {
+		return this._entityKey;
+	}
+	public set entityKey(value: string) {
+		this._entityKey = value;
+		this._provideWorkspace();
+	}
+
+	private _workspaceContext?:UmbWorkspaceUserGroupContext;
+
+
+	@state()
+	private _userGroup?: UserGroupDetails | null;
+
+	@state()
+	private _userKeys?: Array<string>;
+
 	constructor() {
 		super();
 
 		this._registerWorkspaceActions();
+
+		this.consumeContext('umbUserStore', (instance) => {
+			this._userStore = instance;
+			this._observeUsers();
+		});
+
+	}
+
+
+	connectedCallback(): void {
+		super.connectedCallback();
+		// TODO: avoid this connection, our own approach on Lit-Controller could be handling this case.
+		this._workspaceContext?.connectedCallback();
+	}
+	disconnectedCallback(): void {
+		super.connectedCallback()
+		// TODO: avoid this connection, our own approach on Lit-Controller could be handling this case.
+		this._workspaceContext?.disconnectedCallback();
+	}
+
+	protected _provideWorkspace() {
+		if(this._entityKey) {
+			this._workspaceContext = new UmbWorkspaceUserGroupContext(this, this._entityKey);
+			this.provideContext('umbWorkspaceContext', this._workspaceContext);
+
+			this._observeUserGroup();
+		}
 	}
 
 	private _registerWorkspaceActions() {
@@ -223,31 +258,12 @@ export class UmbWorkspaceUserGroupElement extends UmbContextProviderMixin(
 		});
 	}
 
-	connectedCallback(): void {
-		super.connectedCallback();
-
-		this.consumeAllContexts(['umbUserGroupStore', 'umbUserStore'], (instance) => {
-			this._userGroupStore = instance['umbUserGroupStore'];
-			this._userStore = instance['umbUserStore'];
-			this._observeUserGroup();
-			this._observeUsers();
-		});
-	}
-
 	private _observeUserGroup() {
-		if (!this._userGroupStore) return;
+		if (!this._workspaceContext) return;
 
-		// TODO: investigate if the source is the same if entityKey is changed. I would be affright its not therefor it would not unsubscribe the old subscription.
-		this.observe(this._userGroupStore.getByKey(this.entityKey), (userGroup) => {
-			this._userGroup = userGroup;
+		this.observe<UserGroupDetails>(this._workspaceContext.data.pipe(distinctUntilChanged()), (userGroup) => {
 			if (!this._userGroup) return;
-
-			if (!this._userGroupContext) {
-				this._userGroupContext = new UmbUserGroupContext(this._userGroup);
-				this.provideContext('umbUserGroupContext', this._userGroupContext);
-			} else {
-				this._userGroupContext.update(this._userGroup);
-			}
+			this._userGroup = userGroup;
 		});
 	}
 
@@ -270,14 +286,14 @@ export class UmbWorkspaceUserGroupElement extends UmbContextProviderMixin(
 	}
 
 	private _updateProperty(propertyName: string, value: unknown) {
-		this._userGroupContext?.update({ [propertyName]: value });
+		this._workspaceContext?.update({ [propertyName]: value });
 	}
 
 	private _updatePermission(permission: { name: string; description: string; value: boolean }) {
-		if (!this._userGroupContext) return;
+		if (!this._workspaceContext) return;
 
 		const checkValue = this._checkPermission(permission);
-		const selectedPermissions = this._userGroupContext.getData().permissions;
+		const selectedPermissions = this._workspaceContext.getData().permissions;
 
 		let newPermissions = [];
 		if (checkValue === false) {
@@ -289,9 +305,9 @@ export class UmbWorkspaceUserGroupElement extends UmbContextProviderMixin(
 	}
 
 	private _checkPermission(permission: { name: string; description: string; value: boolean }) {
-		if (!this._userGroupContext) return false;
+		if (!this._workspaceContext) return false;
 
-		return this._userGroupContext.getData().permissions.includes(permission.name);
+		return this._workspaceContext.getData().permissions.includes(permission.name);
 	}
 
 	private renderLeftColumn() {
@@ -371,6 +387,10 @@ export class UmbWorkspaceUserGroupElement extends UmbContextProviderMixin(
 	private _handleInput(event: UUIInputEvent) {
 		if (event instanceof UUIInputEvent) {
 			const target = event.composedPath()[0] as UUIInputElement;
+
+			if (typeof target?.value === 'string') {
+				this._updateProperty('name', target.value);
+			}
 		}
 	}
 
