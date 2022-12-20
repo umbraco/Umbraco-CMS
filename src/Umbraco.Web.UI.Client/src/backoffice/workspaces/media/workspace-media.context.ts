@@ -1,7 +1,7 @@
 import { UmbWorkspaceNodeContext } from "../shared/workspace-context/workspace-node.context";
-import type { UmbDocumentStore, UmbDocumentStoreItemType } from "@umbraco-cms/stores/document/document.store";
+import type { UmbMediaStore, UmbMediaStoreItemType } from "@umbraco-cms/stores/media/media.store";
 
-const DefaultDocumentData = ({
+const DefaultMediaData = ({
 	key: '',
 	name: '',
 	icon: '',
@@ -28,13 +28,13 @@ const DefaultDocumentData = ({
 			name: '',
 		},
 	],
-}) as UmbDocumentStoreItemType;
+}) as UmbMediaStoreItemType;
 
 
-export class UmbWorkspaceDocumentContext extends UmbWorkspaceNodeContext<UmbDocumentStoreItemType, UmbDocumentStore> {
+export class UmbWorkspaceMediaContext extends UmbWorkspaceNodeContext<UmbMediaStoreItemType, UmbMediaStore> {
 
 	constructor(target:HTMLElement, entityKey: string) {
-		super(target, DefaultDocumentData, 'umbDocumentStore', entityKey);
+		super(target, DefaultMediaData, 'umbMediaStore', entityKey);
 	}
 
 }
