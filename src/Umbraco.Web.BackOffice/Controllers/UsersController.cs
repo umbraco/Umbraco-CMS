@@ -800,7 +800,7 @@ public class UsersController : BackOfficeNotificationsController
             u.InvitedDate = null;
         }
 
-        users = users.Where(x => !skippedUsers.Contains(x)).ToList();
+        users = users.Except(skippedUsers).ToList();
 
         if (users.Any())
         {
