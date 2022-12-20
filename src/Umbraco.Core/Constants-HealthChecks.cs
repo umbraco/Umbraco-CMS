@@ -10,6 +10,11 @@ public static partial class Constants
     /// </summary>
     public static class HealthChecks
     {
+        public static class RoutePath
+        {
+            public const string HealthCheck = "health-check";
+        }
+
         public static class DocumentationLinks
         {
             public const string SmtpCheck = "https://umbra.co/healthchecks-smtp";
