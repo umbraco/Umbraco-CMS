@@ -1,6 +1,6 @@
 import { UmbWorkspaceNodeContext } from "../shared/workspace-context/workspace-node.context";
 import type { UmbDataTypeStore, UmbDataTypeStoreItemType } from "@umbraco-cms/stores/data-type/data-type.store";
-import { DataTypeDetails } from "@umbraco-cms/models";
+import type { DataTypeDetails } from "@umbraco-cms/models";
 
 const DefaultDataTypeData = ({
 	key: '',

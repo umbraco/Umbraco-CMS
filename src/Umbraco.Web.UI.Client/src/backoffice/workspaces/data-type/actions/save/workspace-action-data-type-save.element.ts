@@ -2,11 +2,8 @@ import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import type { UUIButtonState } from '@umbraco-ui/uui';
-import type { UmbNotificationDefaultData } from '../../../../../core/services/notification/layouts/default';
-import type { UmbNotificationService } from '../../../../../core/services/notification';
-import { UmbDataTypeContext } from '../../data-type.context';
+import type { UmbWorkspaceDataTypeContext } from '../../workspace-data-type.context';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-import { UmbDataTypeStore } from '@umbraco-cms/stores/data-type/data-type.store';
 
 @customElement('umb-workspace-action-data-type-save')
 export class UmbWorkspaceActionDataTypeSaveElement extends UmbContextConsumerMixin(LitElement) {
@@ -15,33 +12,26 @@ export class UmbWorkspaceActionDataTypeSaveElement extends UmbContextConsumerMix
 	@state()
 	private _saveButtonState?: UUIButtonState;
 
-	private _dataTypeStore?: UmbDataTypeStore;
-	private _dataTypeContext?: UmbDataTypeContext;
-	private _notificationService?: UmbNotificationService;
+	private _workspaceContext?: UmbWorkspaceDataTypeContext;
 
 	constructor() {
 		super();
 
-		this.consumeAllContexts(['umbDataTypeStore', 'umbDataTypeContext', 'umbNotificationService'], (instances) => {
-			this._dataTypeStore = instances['umbDataTypeStore'];
-			this._dataTypeContext = instances['umbDataTypeContext'];
-			this._notificationService = instances['umbNotificationService'];
-		});
+		this.consumeContext('umbWorkspaceContext', (instance) => {
+				this._workspaceContext = instance;
+			}
+		);
 	}
 
 	private async _handleSave() {
-		if (!this._dataTypeStore || !this._dataTypeContext) return;
+		if (!this._workspaceContext) return;
 
-		try {
-			this._saveButtonState = 'waiting';
-			const dataType = this._dataTypeContext.getData();
-			await this._dataTypeStore.save([dataType]);
-			const data: UmbNotificationDefaultData = { message: 'Data Type Saved' };
-			this._notificationService?.peek('positive', { data });
+		this._saveButtonState = 'waiting';
+		await this._workspaceContext.save().then(() => {
 			this._saveButtonState = 'success';
-		} catch (error) {
+		}).catch(() => {
 			this._saveButtonState = 'failed';
-		}
+		})
 	}
 
 	render() {
