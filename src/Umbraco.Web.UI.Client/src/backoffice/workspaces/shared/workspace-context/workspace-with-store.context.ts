@@ -4,6 +4,7 @@ import { UmbContextConsumer } from "@umbraco-cms/context-api";
 import { UmbDataStoreBase } from "@umbraco-cms/stores/store";
 import { ContentTreeItem } from "@umbraco-cms/backend-api";
 
+// TODO: Consider if its right to have this many class-inheritance of WorkspaceContext
 export abstract class UmbWorkspaceWithStoreContext<DataType extends ContentTreeItem, StoreType extends UmbDataStoreBase<DataType>> extends UmbWorkspaceContext<DataType> {
 
 

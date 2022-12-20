@@ -5,7 +5,7 @@ import { UmbNotificationDefaultData, UmbNotificationService } from "@umbraco-cms
 import { ContentTreeItem } from "@umbraco-cms/backend-api";
 import { UmbContextConsumer } from "@umbraco-cms/context-api";
 
-// TODO: Consider if its right to have this many WorkspaceContext
+// TODO: Consider if its right to have this many class-inheritance of WorkspaceContext
 export class UmbWorkspaceNodeContext<ContentTypeType extends ContentTreeItem, StoreType extends UmbNodeStoreBase<ContentTypeType>> extends UmbWorkspaceWithStoreContext<ContentTypeType, StoreType> {
 
 	protected _notificationService?: UmbNotificationService;
