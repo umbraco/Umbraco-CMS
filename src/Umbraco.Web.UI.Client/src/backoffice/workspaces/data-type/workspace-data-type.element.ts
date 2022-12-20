@@ -2,12 +2,15 @@ import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
+import { distinctUntilChanged } from 'rxjs';
 import { UmbDataTypeStore } from '../../../core/stores/data-type/data-type.store';
 import { UmbDataTypeContext } from './data-type.context';
+import { UmbWorkspaceDataTypeContext } from './workspace-data-type.context';
 import type { DataTypeDetails } from '@umbraco-cms/models';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextProviderMixin, UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
+
 /**
  *  @element umb-workspace-data-type
  *  @description - Element for displaying a Data Type Workspace
@@ -33,28 +36,51 @@ export class UmbWorkspaceDataTypeElement extends UmbContextProviderMixin(
 		`,
 	];
 
-	@property({ type: String })
-	entityKey = '';
-
 	@state()
 	private _dataTypeName = '';
 
 	private _dataTypeContext?: UmbDataTypeContext;
 	private _dataTypeStore?: UmbDataTypeStore;
 
+
+	private _entityKey!: string;
+	@property()
+	public get entityKey(): string {
+		return this._entityKey;
+	}
+	public set entityKey(value: string) {
+		this._entityKey = value;
+		this._provideWorkspace();
+	}
+
+	private _workspaceContext?:UmbWorkspaceDataTypeContext;
+
 	constructor() {
 		super();
 
 		this._registerExtensions();
 
-		this.consumeAllContexts(['umbDataTypeStore'], (instances) => {
-			this._dataTypeStore = instances['umbDataTypeStore'];
-			this._observeDataType();
-		});
-
 		this.addEventListener('property-value-change', this._onPropertyValueChange);
 	}
 
+	connectedCallback(): void {
+		super.connectedCallback();
+		// TODO: avoid this connection, our own approach on Lit-Controller could be handling this case.
+		this._workspaceContext?.connectedCallback();
+	}
+	disconnectedCallback(): void {
+		super.connectedCallback()
+		// TODO: avoid this connection, our own approach on Lit-Controller could be handling this case.
+		this._workspaceContext?.disconnectedCallback();
+	}
+
+	protected _provideWorkspace() {
+		if(this._entityKey) {
+			this._workspaceContext = new UmbWorkspaceDataTypeContext(this, this._entityKey);
+			this.provideContext('umbWorkspaceContext', this._workspaceContext);
+			this._observeWorkspace()
+		}
+	}
 	private _registerExtensions() {
 		const extensions: Array<any> = [
 			{
@@ -100,24 +126,13 @@ export class UmbWorkspaceDataTypeElement extends UmbContextProviderMixin(
 		});
 	}
 
-	private _observeDataType() {
-		if (!this._dataTypeStore) return;
+	private _observeWorkspace() {
+		if (!this._workspaceContext) return;
 
-		this.observe<DataTypeDetails>(this._dataTypeStore.getByKey(this.entityKey), (dataType) => {
-			if (!dataType) return; // TODO: Handle nicely if there is no data type.
-
-			if (!this._dataTypeContext) {
-				this._dataTypeContext = new UmbDataTypeContext(dataType);
-				this.provideContext('umbDataTypeContext', this._dataTypeContext);
-			} else {
-				this._dataTypeContext.update(dataType);
+		this.observe<DataTypeDetails>(this._workspaceContext.data.pipe(distinctUntilChanged()), (dataType) => {
+			if (dataType && dataType.name !== this._dataTypeName) {
+				this._dataTypeName = dataType.name ?? '';
 			}
-
-			this.observe<DataTypeDetails>(this._dataTypeContext.data, (dataType) => {
-				if (dataType && dataType.name !== this._dataTypeName) {
-					this._dataTypeName = dataType.name ?? '';
-				}
-			});
 		});
 	}
 
