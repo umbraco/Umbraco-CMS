@@ -63,11 +63,6 @@ public class LocalDbTestDatabaseConfiguration : ITestDatabaseConfiguration
             ProviderName = "Microsoft.Data.SqlClient",
         };
         connectionStrings.ConnectionString += ";TrustServerCertificate=true;";
-
-        _connectionStrings.CurrentValue.ConnectionString = connectionStrings.ConnectionString;
-        _connectionStrings.CurrentValue.ProviderName = connectionStrings.ProviderName;
-
-        _databaseFactory.Configure(connectionStrings);
         return connectionStrings;
     }
 
