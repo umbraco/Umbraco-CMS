@@ -7,7 +7,9 @@ import './layouts/modal-layout-current-user.element';
 import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { UmbModalChangePasswordData } from './layouts/modal-layout-change-password.element';
-import { UmbModalIconPickerData } from './layouts/icon-picker/modal-layout-icon-picker.element';
+import type { UmbModalIconPickerData } from './layouts/icon-picker/modal-layout-icon-picker.element';
+
+import './layouts/icon-picker/modal-layout-icon-picker.element';
 
 import type { UmbModalConfirmData } from './layouts/confirm/modal-layout-confirm.element';
 import type { UmbModalContentPickerData } from './layouts/content-picker/modal-layout-content-picker.element';
