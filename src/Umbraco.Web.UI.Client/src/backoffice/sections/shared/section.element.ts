@@ -118,7 +118,7 @@ export class UmbSectionElement extends UmbContextConsumerMixin(UmbObserverMixin(
 			})
 		});
 
-		this._routes.push({
+		routes.push({
 			path: '**',
 			redirectTo: 'dashboard',
 		});
