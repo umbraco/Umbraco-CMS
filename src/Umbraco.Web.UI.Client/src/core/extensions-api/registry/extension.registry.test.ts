@@ -40,7 +40,7 @@ describe('UmbContextRequestEvent', () => {
 				},
 			},
 			{
-				type: 'editor',
+				type: 'workspace',
 				name: 'test-editor-1',
 				alias: 'Umb.Test.Editor.1',
 				meta: {

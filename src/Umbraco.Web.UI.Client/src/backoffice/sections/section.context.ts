@@ -1,7 +1,5 @@
 import { BehaviorSubject, ReplaySubject } from 'rxjs';
-
-import { Entity } from '../../core/mocks/data/entities';
-import type { ManifestSection, ManifestSectionView, ManifestTree } from '@umbraco-cms/models';
+import type { Entity, ManifestSection, ManifestSectionView, ManifestTree } from '@umbraco-cms/models';
 
 export class UmbSectionContext {
 	// TODO: figure out how fine grained we want to make our observables.

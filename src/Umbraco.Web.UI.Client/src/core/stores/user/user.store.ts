@@ -1,25 +1,17 @@
 import { BehaviorSubject, map, Observable } from 'rxjs';
-import { v4 as uuidv4 } from 'uuid';
-import type { UserDetails, UserEntity } from '../../models';
-import { UmbEntityStore } from '../entity.store';
 import { UmbDataStoreBase } from '../store';
+import type { UserDetails } from '@umbraco-cms/models';
+
 
 /**
  * @export
  * @class UmbUserStore
- * @extends {UmbDataStoreBase<UserEntity>}
+ * @extends {UmbDataStoreBase<UserDetails>}
  * @description - Data Store for Users
  */
 export class UmbUserStore extends UmbDataStoreBase<UserDetails> {
-	private _entityStore: UmbEntityStore;
-
 	private _totalUsers: BehaviorSubject<number> = new BehaviorSubject(0);
 	public readonly totalUsers: Observable<number> = this._totalUsers.asObservable();
-
-	constructor(entityStore: UmbEntityStore) {
-		super();
-		this._entityStore = entityStore;
-	}
 
 	getAll(): Observable<Array<UserDetails>> {
 		// TODO: use Fetcher API.
@@ -28,7 +20,7 @@ export class UmbUserStore extends UmbDataStoreBase<UserDetails> {
 			.then((res) => res.json())
 			.then((data) => {
 				this._totalUsers.next(data.total);
-				this.update(data.items);
+				this.updateItems(data.items);
 			});
 
 		return this.items;
@@ -43,14 +35,45 @@ export class UmbUserStore extends UmbDataStoreBase<UserDetails> {
 	getByKey(key: string): Observable<UserDetails | null> {
 		// TODO: use Fetcher API.
 		// TODO: only fetch if the data type is not in the store?
-		fetch(`/umbraco/backoffice/users/${key}`)
+		fetch(`/umbraco/backoffice/users/details/${key}`)
 			.then((res) => res.json())
 			.then((data) => {
-				this.update([data]);
+				this.updateItems([data]);
 			});
 
 		return this.items.pipe(
 			map((items: Array<UserDetails>) => items.find((node: UserDetails) => node.key === key) || null)
+		);
+	}
+
+	getByKeys(keys: Array<string>): Observable<Array<UserDetails>> {
+		const params = keys.map((key) => `key=${key}`).join('&');
+		fetch(`/umbraco/backoffice/users/getByKeys?${params}`)
+			.then((res) => res.json())
+			.then((data) => {
+				this.updateItems(data);
+			});
+
+		return this.items.pipe(
+			map((items: Array<UserDetails>) => items.filter((node: UserDetails) => keys.includes(node.key)))
+		);
+	}
+
+	getByName(name: string): Observable<Array<UserDetails>> {
+		name = name.trim();
+		name = name.toLocaleLowerCase();
+
+		const params = `name=${name}`;
+		fetch(`/umbraco/backoffice/users/getByName?${params}`)
+			.then((res) => res.json())
+			.then((data) => {
+				this.updateItems(data);
+			});
+
+		return this.items.pipe(
+			map((items: Array<UserDetails>) =>
+				items.filter((node: UserDetails) => node.name.toLocaleLowerCase().includes(name))
+			)
 		);
 	}
 
@@ -71,10 +94,60 @@ export class UmbUserStore extends UmbDataStoreBase<UserDetails> {
 				user.status = 'enabled';
 			});
 
-			this.update(storedUsers);
-			this._entityStore.update(storedUsers);
+			this.updateItems(storedUsers);
 		} catch (error) {
 			console.error('Enable Users failed', error);
+		}
+	}
+
+	async updateUserGroup(userKeys: Array<string>, userGroup: string): Promise<void> {
+		// TODO: use Fetcher API.
+		try {
+			const res = await fetch('/umbraco/backoffice/users/updateUserGroup', {
+				method: 'POST',
+				body: JSON.stringify({ userKeys, userGroup }),
+				headers: {
+					'Content-Type': 'application/json',
+				},
+			});
+			const enabledKeys = await res.json();
+			const storedUsers = this._items.getValue().filter((user) => enabledKeys.includes(user.key));
+
+			storedUsers.forEach((user) => {
+				if (userKeys.includes(user.key)) {
+					user.userGroups.push(userGroup);
+				} else {
+					user.userGroups = user.userGroups.filter((group) => group !== userGroup);
+				}
+			});
+
+			this.updateItems(storedUsers);
+		} catch (error) {
+			console.error('Add user group failed', error);
+		}
+	}
+
+	async removeUserGroup(userKeys: Array<string>, userGroup: string): Promise<void> {
+		// TODO: use Fetcher API.
+		try {
+			const res = await fetch('/umbraco/backoffice/users/enable', {
+				method: 'POST',
+				body: JSON.stringify({ userKeys, userGroup }),
+				headers: {
+					'Content-Type': 'application/json',
+				},
+			});
+			const enabledKeys = await res.json();
+			const storedUsers = this._items.getValue().filter((user) => enabledKeys.includes(user.key));
+
+			storedUsers.forEach((user) => {
+				user.userGroups = user.userGroups.filter((group) => group !== userGroup);
+			});
+
+			this.updateItems(storedUsers);
+			
+		} catch (error) {
+			console.error('Remove user group failed', error);
 		}
 	}
 
@@ -95,8 +168,7 @@ export class UmbUserStore extends UmbDataStoreBase<UserDetails> {
 				user.status = 'disabled';
 			});
 
-			this.update(storedUsers);
-			this._entityStore.update(storedUsers);
+			this.updateItems(storedUsers);
 		} catch (error) {
 			console.error('Disable Users failed', error);
 		}
@@ -113,8 +185,7 @@ export class UmbUserStore extends UmbDataStoreBase<UserDetails> {
 				},
 			});
 			const deletedKeys = await res.json();
-			this.delete(deletedKeys);
-			this._entityStore.delete(deletedKeys);
+			this.deleteItems(deletedKeys);
 		} catch (error) {
 			console.error('Delete Users failed', error);
 		}
@@ -131,8 +202,7 @@ export class UmbUserStore extends UmbDataStoreBase<UserDetails> {
 				},
 			});
 			const json = await res.json();
-			this.update(json);
-			this._entityStore.update(json);
+			this.updateItems(json);
 		} catch (error) {
 			console.error('Save Data Type error', error);
 		}
@@ -149,8 +219,7 @@ export class UmbUserStore extends UmbDataStoreBase<UserDetails> {
 				},
 			});
 			const json = (await res.json()) as UserDetails[];
-			this.update(json);
-			this._entityStore.update(json);
+			this.updateItems(json);
 			return json[0];
 		} catch (error) {
 			console.error('Invite user error', error);

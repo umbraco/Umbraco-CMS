@@ -2,7 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { UmbModalService } from '../../../../core/services/modal';
-import { UmbNodeStore } from '../../../../core/stores/node.store';
+import { UmbDocumentStore } from '../../../../core/stores/document/document.store';
 import UmbTreeItemActionElement from '../../shared/tree-item-action.element';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
@@ -11,7 +11,7 @@ export default class UmbTreeActionDocumentDeleteElement extends UmbContextConsum
 	static styles = [UUITextStyles, css``];
 
 	private _modalService?: UmbModalService;
-	private _nodeStore?: UmbNodeStore;
+	private _documentStore?: UmbDocumentStore;
 
 	connectedCallback(): void {
 		super.connectedCallback();
@@ -20,8 +20,8 @@ export default class UmbTreeActionDocumentDeleteElement extends UmbContextConsum
 			this._modalService = modalService;
 		});
 
-		this.consumeContext('umbNodeStore', (nodeStore: UmbNodeStore) => {
-			this._nodeStore = nodeStore;
+		this.consumeContext('umbDocumentStore', (documentStore: UmbDocumentStore) => {
+			this._documentStore = documentStore;
 		});
 	}
 
@@ -34,8 +34,8 @@ export default class UmbTreeActionDocumentDeleteElement extends UmbContextConsum
 		});
 
 		modalHandler?.onClose().then(({ confirmed }: any) => {
-			if (confirmed && this._treeContextMenuService && this._nodeStore && this._activeTreeItem) {
-				this._nodeStore?.trash([this._activeTreeItem.key]);
+			if (confirmed && this._treeContextMenuService && this._documentStore && this._activeTreeItem) {
+				this._documentStore?.trash([this._activeTreeItem.key]);
 				this._treeContextMenuService.close();
 			}
 		});

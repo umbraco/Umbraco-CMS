@@ -6,7 +6,7 @@ import type { UserDetails } from '@umbraco-cms/models';
 // TODO: add schema
 export const handlers = [
 	rest.get('/umbraco/backoffice/users/list/items', (req, res, ctx) => {
-		const items = umbUsersData.getItems('user');
+		const items = umbUsersData.getAll();
 
 		const response = {
 			total: items.length,
@@ -16,13 +16,21 @@ export const handlers = [
 		return res(ctx.status(200), ctx.json(response));
 	}),
 
-	rest.get('/umbraco/backoffice/users/:key', (req, res, ctx) => {
+	rest.get('/umbraco/backoffice/users/details/:key', (req, res, ctx) => {
 		const key = req.params.key as string;
 		if (!key) return;
 
 		const user = umbUsersData.getByKey(key);
 
 		return res(ctx.status(200), ctx.json(user));
+	}),
+
+	rest.get('/umbraco/backoffice/users/getByKeys', (req, res, ctx) => {
+		const keys = req.url.searchParams.getAll('key');
+		if (keys.length === 0) return;
+		const users = umbUsersData.getByKeys(keys);
+
+		return res(ctx.status(200), ctx.json(users));
 	}),
 
 	rest.post<UserDetails[]>('/umbraco/backoffice/users/save', async (req, res, ctx) => {
@@ -50,11 +58,12 @@ export const handlers = [
 			createDate: new Date().toISOString(),
 			failedLoginAttempts: 0,
 			parentKey: '',
-			isTrashed: false,
 			hasChildren: false,
 			type: 'user',
 			icon: 'umb:icon-user',
-			userGroup: data.userGroups[0],
+			userGroups: data.userGroups,
+			contentStartNodes: [],
+			mediaStartNodes: [],
 		};
 
 		const invited = umbUsersData.save([newUser]);
@@ -77,9 +86,18 @@ export const handlers = [
 		const data = await req.json();
 		if (!data) return;
 
-		const disabledKeys = umbUsersData.disable(data);
+		const enabledKeys = umbUsersData.disable(data);
 
-		return res(ctx.status(200), ctx.json(disabledKeys));
+		return res(ctx.status(200), ctx.json(enabledKeys));
+	}),
+
+	rest.post<Array<string>>('/umbraco/backoffice/users/updateUserGroup', async (req, res, ctx) => {
+		const data = await req.json();
+		if (!data) return;
+
+		const userKeys = umbUsersData.updateUserGroup(data.userKeys, data.userGroupKey);
+
+		return res(ctx.status(200), ctx.json(userKeys));
 	}),
 
 	rest.post<Array<string>>('/umbraco/backoffice/users/delete', async (req, res, ctx) => {

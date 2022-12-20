@@ -1,12 +1,12 @@
 import { html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
 
-import './editor-view-user-groups.element';
+import './workspace-view-user-groups.element';
 
 @customElement('umb-section-view-user-groups')
 export class UmbSectionViewUserGroupsElement extends LitElement {
 	render() {
-		return html`<umb-editor-view-user-groups></umb-editor-view-user-groups>`;
+		return html`<umb-workspace-view-user-groups></umb-workspace-view-user-groups>`;
 	}
 }
 

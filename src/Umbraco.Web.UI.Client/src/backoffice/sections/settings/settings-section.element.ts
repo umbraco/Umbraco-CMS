@@ -1,7 +1,7 @@
 import { html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-import type { ManifestDashboard, ManifestWithLoader } from '@umbraco-cms/models';
+import type { ManifestDashboard } from '@umbraco-cms/models';
 
 @customElement('umb-section-settings')
 export class UmbSectionSettingsElement extends LitElement {
@@ -12,7 +12,7 @@ export class UmbSectionSettingsElement extends LitElement {
 	}
 
 	private _registerDashboards() {
-		const dashboards: Array<ManifestWithLoader<ManifestDashboard>> = [
+		const dashboards: Array<ManifestDashboard> = [
 			{
 				type: 'dashboard',
 				alias: 'Umb.Dashboard.SettingsWelcome',

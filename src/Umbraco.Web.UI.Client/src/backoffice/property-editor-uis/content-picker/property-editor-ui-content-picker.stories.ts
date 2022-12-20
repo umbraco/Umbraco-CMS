@@ -1,10 +1,10 @@
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit-html';
 
+import { UmbModalService } from '../../../core/services/modal';
 import type { UmbPropertyEditorUIContentPickerElement } from './property-editor-ui-content-picker.element';
 import './property-editor-ui-content-picker.element';
-import { UmbModalService } from '../../../core/services/modal';
-import '../../components/backoffice-modal-container.element';
+import '../../components/backoffice-frame/backoffice-modal-container.element';
 
 export default {
 	title: 'Property Editor UIs/Content Picker',

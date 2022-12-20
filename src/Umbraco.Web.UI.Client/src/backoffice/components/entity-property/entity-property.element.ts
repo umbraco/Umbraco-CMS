@@ -8,7 +8,7 @@ import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { ManifestPropertyEditorUI, ManifestTypes } from '@umbraco-cms/models';
 
 import '../../property-actions/shared/property-action-menu/property-action-menu.element';
-import '../../editors/shared/editor-property-layout/editor-property-layout.element';
+import '../../workspaces/shared/workspace-property-layout/workspace-property-layout.element';
 
 /**
  *  @element umb-entity-property
@@ -174,11 +174,10 @@ export class UmbEntityPropertyElement extends UmbContextConsumerMixin(UmbObserve
 
 	render() {
 		return html`
-			<umb-editor-property-layout id="layout" label="${this.label}" description="${this.description}">
+			<umb-workspace-property-layout id="layout" label="${this.label}" description="${this.description}">
 				${this._renderPropertyActionMenu()}
 				<div slot="editor">${this._element}</div>
-			</umb-editor-property-layout>
-			<hr />
+			</umb-workspace-property-layout>
 		`;
 	}
 

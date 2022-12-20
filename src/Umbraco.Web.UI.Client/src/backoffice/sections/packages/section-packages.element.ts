@@ -2,7 +2,7 @@ import { html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-import type { ManifestSectionView, ManifestWithLoader } from '@umbraco-cms/models';
+import type { ManifestSectionView } from '@umbraco-cms/models';
 
 @customElement('umb-section-packages')
 export class UmbSectionPackages extends UmbContextConsumerMixin(LitElement) {
@@ -13,7 +13,7 @@ export class UmbSectionPackages extends UmbContextConsumerMixin(LitElement) {
 	}
 
 	private _registerSectionViews() {
-		const manifests: Array<ManifestWithLoader<ManifestSectionView>> = [
+		const manifests: Array<ManifestSectionView> = [
 			{
 				type: 'sectionView',
 				alias: 'Umb.SectionView.Packages.Repo',
