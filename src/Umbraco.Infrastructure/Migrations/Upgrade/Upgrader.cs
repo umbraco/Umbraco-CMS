@@ -42,8 +42,7 @@ public class Upgrader
     public ExecutedMigrationPlan Execute(
         IMigrationPlanExecutor migrationPlanExecutor,
         ICoreScopeProvider scopeProvider,
-        IKeyValueService keyValueService,
-        IEventAggregator aggregator)
+        IKeyValueService keyValueService)
     {
         if (scopeProvider == null)
         {
@@ -69,14 +68,6 @@ public class Upgrader
         // We always save the final state of the migration plan, this is because a partial success is possible
         // So we still want to save the place we got to in the database-
         SetState(result.FinalState, scopeProvider, keyValueService);
-
-        aggregator.Publish(new UmbracoPlanExecutedNotification { ExecutedPlan = result });
-
-        // The migration may have failed, it this is the case, we throw the exception now that we've taken care of business.
-        if (result.Successful is false && result.Exception is not null)
-        {
-            throw result.Exception;
-        }
 
         return result;
     }
