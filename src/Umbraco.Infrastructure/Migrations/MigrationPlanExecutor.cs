@@ -40,7 +40,7 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
     /// <param name="loggerFactory"></param>
     /// <returns>The final state.</returns>
     /// <remarks>The plan executes within the scope, which must then be completed.</remarks>
-    public string Execute(MigrationPlan plan, string fromState)
+    public ExecutedMigrationPlan Execute(MigrationPlan plan, string fromState)
     {
         plan.Validate();
 
@@ -54,20 +54,39 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
             plan.ThrowOnUnknownInitialState(nextState);
         }
 
+        List<MigrationPlan.Transition> completedTransitions = new();
+
         while (transition != null)
         {
             _logger.LogInformation("Execute {MigrationType}", transition.MigrationType.Name);
-            // TODO: Handle exceptions
 
-            if (transition.MigrationType.IsAssignableTo(typeof(UnscopedMigrationBase)))
+            try
             {
-                RunUnscopedMigration(transition.MigrationType, plan);
+                if (transition.MigrationType.IsAssignableTo(typeof(UnscopedMigrationBase)))
+                {
+                    RunUnscopedMigration(transition.MigrationType, plan);
+                }
+                else
+                {
+                    RunScopedMigration(transition.MigrationType, plan);
+                }
             }
-            else
+            catch (Exception exception)
             {
-                RunScopedMigration(transition.MigrationType, plan);
+                // We have to always return something, so whatever running this has a chance to save the state we got to.
+                return new ExecutedMigrationPlan
+                {
+                    Successful = false,
+                    Exception = exception,
+                    InitialState = fromState,
+                    FinalState = transition.SourceState,
+                    CompletedTransitions = completedTransitions,
+                    Plan = plan,
+                };
             }
 
+            // The plan migration (transition), completed, so we'll add this to our list so we can return this at some point.
+            completedTransitions.Add(transition);
             nextState = transition.TargetState;
 
             _logger.LogInformation("At {OrigState}", nextState);
@@ -76,13 +95,29 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
             // been validated - this is just a paranoid safety test
             if (!plan.Transitions.TryGetValue(nextState, out transition))
             {
-                throw new InvalidOperationException($"Unknown state \"{nextState}\".");
+                return new ExecutedMigrationPlan
+                {
+                    Successful = false,
+                    Exception = new InvalidOperationException($"Unknown state \"{nextState}\"."),
+                    InitialState = fromState,
+                    // We were unable to get the next transition, and we never executed it, so final state is source state.
+                    FinalState = completedTransitions.Last().TargetState,
+                    CompletedTransitions = completedTransitions,
+                    Plan = plan,
+                };
             }
         }
 
         _logger.LogInformation("Done");
 
-        return nextState;
+        return new ExecutedMigrationPlan
+        {
+            Successful = true,
+            InitialState = fromState,
+            FinalState = transition?.TargetState ?? completedTransitions.Last().TargetState,
+            CompletedTransitions = completedTransitions,
+            Plan = plan,
+        };
     }
 
     private void RunUnscopedMigration(Type migrationType, MigrationPlan plan)
