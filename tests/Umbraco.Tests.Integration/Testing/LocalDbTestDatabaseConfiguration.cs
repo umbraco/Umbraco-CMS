@@ -81,7 +81,6 @@ public class LocalDbTestDatabaseConfiguration : ITestDatabaseConfiguration
         });
 
         _localDb.StopInstance(InstanceName);
-        _localDb.DropInstance(InstanceName);
 
         foreach (var file in Directory.EnumerateFiles(s_filesPath))
         {
