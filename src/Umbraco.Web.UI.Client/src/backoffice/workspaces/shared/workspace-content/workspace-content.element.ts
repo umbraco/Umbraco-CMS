@@ -124,8 +124,7 @@ export class UmbWorkspaceContentElement extends UmbContextProviderMixin(
 	private _onSave() {
 		// TODO: What if store is not available, what if content is not loaded... or workspace is not there jet?
 		if (this._workspaceContext) {
-			// TODO: Need some interface/type for saveableStore or interface for ContentWorkspace.
-			(this._workspaceContext).save()
+			this._workspaceContext.save()
 		}
 	}
 
