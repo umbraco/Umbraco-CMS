@@ -6,7 +6,7 @@ describe('umb-modal-layout-icon-picker', () => {
 	let element: UmbModalLayoutIconPickerElement;
 
 	beforeEach(async () => {
-		element = await fixture(html` <umb-property-editor-ui-icon-picker></umb-property-editor-ui-icon-picker> `);
+		element = await fixture(html` <umb-modal-layout-icon-picker></umb-modal-layout-icon-picker> `);
 	});
 
 	it('is defined with its own instance', () => {
