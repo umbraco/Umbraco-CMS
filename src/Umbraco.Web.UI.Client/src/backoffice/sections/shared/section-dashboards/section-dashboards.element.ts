@@ -108,8 +108,6 @@ export class UmbSectionDashboardsElement extends UmbContextConsumerMixin(UmbObse
 			};
 		});
 
-		console.log("_dashboards",this._dashboards);
-
 		this._routes.push({
 			path: '**',
 			redirectTo: this._dashboards?.[0]?.meta.pathname,
