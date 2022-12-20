@@ -144,6 +144,8 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
             MigrationBase migration = _migrationBuilder.Build(migrationType, context);
 
             migration.Run();
+
+            scope.Complete();
         }
     }
 }
