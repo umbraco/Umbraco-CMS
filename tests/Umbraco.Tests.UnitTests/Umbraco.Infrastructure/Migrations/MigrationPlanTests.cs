@@ -37,6 +37,11 @@ public class MigrationPlanTests
             .Setup(x => x.Database)
             .Returns(database);
 
+        var databaseFactory = Mock.Of<IUmbracoDatabaseFactory>();
+        Mock.Get(databaseFactory)
+            .Setup(x => x.CreateDatabase())
+            .Returns(database);
+
         var sqlContext = new SqlContext(
             new SqlServerSyntaxProvider(Options.Create(new GlobalSettings())),
             DatabaseType.SQLCe,
@@ -59,7 +64,7 @@ public class MigrationPlanTests
                 }
             });
 
-        var executor = new MigrationPlanExecutor(scopeProvider, scopeProvider, loggerFactory, migrationBuilder);
+        var executor = new MigrationPlanExecutor(scopeProvider, scopeProvider, loggerFactory, migrationBuilder, databaseFactory);
 
         var plan = new MigrationPlan("default")
             .From(string.Empty)
@@ -77,7 +82,8 @@ public class MigrationPlanTests
             var sourceState = kvs.GetValue("Umbraco.Tests.MigrationPlan") ?? string.Empty;
 
             // execute plan
-            state = executor.Execute(plan, sourceState);
+            var result = executor.Execute(plan, sourceState);
+            state = result.FinalState;
 
             // save new state
             kvs.SetValue("Umbraco.Tests.MigrationPlan", sourceState, state);
