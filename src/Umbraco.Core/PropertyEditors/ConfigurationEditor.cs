@@ -1,5 +1,6 @@
 using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Serialization;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
@@ -76,7 +77,7 @@ public class ConfigurationEditor : IConfigurationEditor
     public virtual IDictionary<string, object> FromDatabase(
         string? configuration,
         IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
-        => configuration == null ? new Dictionary<string, object>() : configurationEditorJsonSerializer.Deserialize<Dictionary<string, object>>(configuration) ?? new Dictionary<string, object>();
+        => configuration.IsNullOrWhiteSpace() ? new Dictionary<string, object>() : configurationEditorJsonSerializer.Deserialize<Dictionary<string, object>>(configuration) ?? new Dictionary<string, object>();
 
     /// <summary>
     ///     Gets a field by its property name.
