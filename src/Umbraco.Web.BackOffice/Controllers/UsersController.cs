@@ -35,6 +35,7 @@ using Umbraco.Cms.Web.BackOffice.Security;
 using Umbraco.Cms.Web.Common.ActionsResults;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Cms.Web.Common.Models;
 using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Extensions;
 
@@ -807,7 +808,18 @@ public class UsersController : BackOfficeNotificationsController
             _userService.Save(users);
         }
 
-        return Ok(users.Select(x => x.Id));
+        var disabledUsersModel = new DisabledUsersModel
+        {
+            DisabledUserIds = users.Select(x => x.Id),
+        };
+
+        var message= users.Count > 1
+            ? _localizedTextService.Localize("speechBubbles", "disableUsersSuccess", new[] { userIds.Length.ToString() })
+            : _localizedTextService.Localize("speechBubbles", "disableUserSuccess", new[] { users[0].Name });
+
+        var header = _localizedTextService.Localize("general", "success");
+        disabledUsersModel.Notifications.Add(new BackOfficeNotification(header, message, NotificationStyle.Success));
+        return Ok(disabledUsersModel);
     }
 
     /// <summary>
