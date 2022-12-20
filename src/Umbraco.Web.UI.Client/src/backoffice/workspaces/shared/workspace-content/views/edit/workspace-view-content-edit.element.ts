@@ -34,8 +34,6 @@ export class UmbWorkspaceViewContentEditElement extends UmbContextConsumerMixin(
 
 		this.consumeContext('umbWorkspaceContext', (workspaceContext) => {
 			this._workspaceContext = workspaceContext;
-
-			console.log("umbWorkspaceContext got", workspaceContext)
 			this._observeContent();
 		});
 	}
@@ -44,7 +42,6 @@ export class UmbWorkspaceViewContentEditElement extends UmbContextConsumerMixin(
 		if (!this._workspaceContext) return;
 
 		this.observe<DocumentDetails | MediaDetails>(this._workspaceContext.data.pipe(distinctUntilChanged()), (content) => {
-			console.log("observe data", content)
 			this._properties = content.properties;
 			this._data = content.data;
 		});
