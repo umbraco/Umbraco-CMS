@@ -17,7 +17,7 @@ export class UmbWorkspaceViewContentCollectionElement extends UmbContextConsumer
 		css`
 			:host {
 				display: block;
-				margin: var(--uui-size-layout-1);
+				height: 100%;
 			}
 		`,
 	];
