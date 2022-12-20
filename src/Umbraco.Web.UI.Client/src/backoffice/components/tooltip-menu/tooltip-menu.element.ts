@@ -63,7 +63,10 @@ export class UmbTooltipMenuElement extends LitElement {
 
 	private _renderItem(item: TooltipMenuItem) {
 		if (this.icon && item.icon) {
-			return html`<div class="item icon">
+			return html`<div
+				@click=${() => this._handleItemClick(item)}
+				@keydown=${(e: KeyboardEvent) => this._handleItemKeyDown(e, item)}
+				class="item icon">
 				<uui-icon .name=${item.icon}></uui-icon>
 			</div>`;
 		}

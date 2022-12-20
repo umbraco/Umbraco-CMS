@@ -2,7 +2,8 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, LitElement, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
-import { TooltipMenuItem } from '../tooltip-menu.element';
+import { TooltipMenuItem } from '../tooltip-menu';
+import '../tooltip-menu/tooltip-menu.element';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import type { ManifestCollectionLayout } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
@@ -48,11 +49,11 @@ export class UmbCollectionToolbarElement extends UmbObserverMixin(LitElement) {
 		},
 	];
 
-	@state()
-	private _collectionLayouts: Array<ManifestCollectionLayout> = [];
-
 	@property()
 	public useSearch = true;
+
+	@state()
+	private _layouts: Array<ManifestCollectionLayout> = [];
 
 	@state()
 	private _currentLayout?: ManifestCollectionLayout;
@@ -79,10 +80,10 @@ export class UmbCollectionToolbarElement extends UmbObserverMixin(LitElement) {
 			(layouts) => {
 				console.log('layouts', layouts);
 				if (layouts?.length === 0) return;
-				this._collectionLayouts = layouts;
+				this._layouts = layouts;
 
 				if (!this._currentLayout) {
-					//TODO: Find a way to figure out which layout it starts with and set _currentLayout to that. eg. '/table'
+					//TODO: Find a way to figure out which layout it starts with and set _currentLayout to that instead of [0]. eg. '/table'
 					this._currentLayout = layouts[0];
 				}
 			}
@@ -96,8 +97,8 @@ export class UmbCollectionToolbarElement extends UmbObserverMixin(LitElement) {
 	private _toggleViewType() {
 		if (!this._currentLayout) return;
 
-		const index = this._collectionLayouts.indexOf(this._currentLayout);
-		this._currentLayout = this._collectionLayouts[(index + 1) % this._collectionLayouts.length];
+		const index = this._layouts.indexOf(this._currentLayout);
+		this._currentLayout = this._layouts[(index + 1) % this._layouts.length];
 		this._changeLayout(this._currentLayout.meta.pathName);
 	}
 
@@ -129,17 +130,17 @@ export class UmbCollectionToolbarElement extends UmbObserverMixin(LitElement) {
 		return nothing;
 	}
 
-	private _renderViewTypeButton() {
+	private _renderLayoutButton() {
 		if (!this._currentLayout) return;
 
-		if (this._collectionLayouts.length < 2 || !this._currentLayout.meta.icon) return nothing;
+		if (this._layouts.length < 2 || !this._currentLayout.meta.icon) return nothing;
 
-		if (this._collectionLayouts.length === 2) {
+		if (this._layouts.length === 2) {
 			return html`<uui-button @click=${this._toggleViewType} look="outline" compact>
 				<uui-icon .name=${this._currentLayout.meta.icon}></uui-icon>
 			</uui-button>`;
 		}
-		if (this._collectionLayouts.length > 2) {
+		if (this._layouts.length > 2) {
 			return html`<uui-popover margin="8" .open=${this._viewTypesOpen} @close=${() => (this._viewTypesOpen = false)}>
 				<uui-button @click=${() => (this._viewTypesOpen = !this._viewTypesOpen)} slot="trigger" look="outline" compact>
 					<uui-icon .name=${this._currentLayout.meta.icon}></uui-icon>
@@ -147,10 +148,13 @@ export class UmbCollectionToolbarElement extends UmbObserverMixin(LitElement) {
 				<umb-tooltip-menu
 					icon
 					slot="popover"
-					.items=${this._collectionLayouts.map((layout) => ({
+					.items=${this._layouts.map((layout) => ({
 						label: layout.meta.label,
 						icon: layout.meta.icon,
-						action: () => console.log('change layout'),
+						action: () => {
+							this._changeLayout(layout.meta.pathName);
+							this._viewTypesOpen = false;
+						},
 					}))}></umb-tooltip-menu>
 			</uui-popover>`;
 		}
@@ -162,7 +166,7 @@ export class UmbCollectionToolbarElement extends UmbObserverMixin(LitElement) {
 		return html`
 			${this._renderCreateButton()}
 			<uui-input id="search" @input=${this._updateSearch}></uui-input>
-			${this._renderViewTypeButton()}
+			${this._renderLayoutButton()}
 		`;
 	}
 }
