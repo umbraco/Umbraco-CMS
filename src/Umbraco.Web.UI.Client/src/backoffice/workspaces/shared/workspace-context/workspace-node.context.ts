@@ -11,7 +11,7 @@ export class UmbWorkspaceNodeContext<ContentTypeType extends ContentTreeItem, St
 	}
 
 
-	protected _observeStore(): void {
+	protected _onStoreSubscription(): void {
 		this._dataObserver = this._store.getByKey(this.entityKey).subscribe((content) => {
 			if (!content) return; // TODO: Handle nicely if there is no content data.
 			this.update(content as any);

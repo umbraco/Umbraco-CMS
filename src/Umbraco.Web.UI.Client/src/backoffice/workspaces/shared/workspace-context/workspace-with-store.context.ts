@@ -36,7 +36,7 @@ export abstract class UmbWorkspaceWithStoreContext<DataType extends ContentTreeI
 				// TODO: if we keep the type assumption of _store existing, then we should here make sure to break the application in a good way.
 				return;
 			}
-			this._observeStore();
+			this._onStoreSubscription();
 		});
 	}
 
@@ -50,7 +50,7 @@ export abstract class UmbWorkspaceWithStoreContext<DataType extends ContentTreeI
 		this._storeConsumer.detach();
 	}
 
-	protected abstract _observeStore(): void
+	protected abstract _onStoreSubscription(): void
 	/* {
 		this._dataObserver = this._store.getByKey(this.entityKey).subscribe((content) => {
 			if (!content) return; // TODO: Handle nicely if there is no content data.

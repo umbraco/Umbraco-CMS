@@ -1,5 +1,5 @@
-import { UmbWorkspaceContext } from "../shared/workspace-context/workspace.context";
-import type { DocumentDetails } from "@umbraco-cms/models";
+import { UmbWorkspaceNodeContext } from "../shared/workspace-context/workspace-node.context";
+import { UmbDocumentTypeStore, UmbDocumentTypeStoreItemType } from "@umbraco-cms/stores/document-type/document-type.store";
 
 const DefaultDocumentTypeData = ({
 	key: '',
@@ -8,34 +8,16 @@ const DefaultDocumentTypeData = ({
 	type: '',
 	hasChildren: false,
 	parentKey: '',
-	isTrashed: false,
-	properties: [
-		/*{
-			alias: '',
-			label: '',
-			description: '',
-			dataTypeKey: '',
-		},*/
-	],
-	data: [
-		{
-			alias: '',
-			value: '',
-		},
-	],
-	variants: [
-		{
-			name: '',
-		},
-	],
-}) as DocumentDetails;
+	alias: '',
+	properties: [],
+}) as UmbDocumentTypeStoreItemType;
 
-
-export class UmbWorkspaceDocumentContext extends UmbWorkspaceContext<DocumentDetails> {
+export class UmbWorkspaceDocumentContext extends UmbWorkspaceNodeContext<UmbDocumentTypeStoreItemType, UmbDocumentTypeStore> {
 
 	constructor(target:HTMLElement, entityType: string, entityKey: string) {
-		super(target, DefaultDocumentTypeData);
+		super(target, DefaultDocumentTypeData, 'umbDocumentTypeStore', entityType, entityKey);
 	}
 
 }
+
 
