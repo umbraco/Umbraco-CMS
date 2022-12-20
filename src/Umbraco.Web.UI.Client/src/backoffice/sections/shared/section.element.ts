@@ -2,6 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { map, switchMap, EMPTY, of } from 'rxjs';
+import { IRoutingInfo } from 'router-slot';
 import { UmbSectionContext } from './section.context';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
@@ -11,7 +12,6 @@ import type { ManifestTree, ManifestSectionView, ManifestWorkspace } from '@umbr
 import './section-trees/section-trees.element.ts';
 import '../shared/section-views/section-views.element.ts';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-import { IRoutingInfo } from 'router-slot';
 
 
 @customElement('umb-section')
