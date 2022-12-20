@@ -41,10 +41,10 @@ export const handlers = [
 	}),
 
 	rest.get('/umbraco/management/api/v1/tree/data-type/children', (req, res, ctx) => {
-		const key = req.params.key as string;
-		if (!key) return;
+		const parentKey = req.url.searchParams.get('parentKey');
+		if (!parentKey) return;
 
-		const children = umbDataTypeData.getTreeItemChildren(key);
+		const children = umbDataTypeData.getTreeItemChildren(parentKey);
 
 		const response = {
 			total: children.length,
@@ -55,11 +55,9 @@ export const handlers = [
 	}),
 
 	rest.get('/umbraco/management/api/v1/tree/data-type/item', (req, res, ctx) => {
-		const keys = req.params.keys as string;
+		const keys = req.url.searchParams.getAll('key');
 		if (!keys) return;
-
-		const items = umbDataTypeData.getTreeItem(keys.split(','));
-
+		const items = umbDataTypeData.getTreeItem(keys);
 		return res(ctx.status(200), ctx.json(items));
 	}),
 ];

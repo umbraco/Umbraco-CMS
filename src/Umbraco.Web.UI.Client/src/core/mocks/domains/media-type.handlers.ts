@@ -9,18 +9,18 @@ export const handlers = [
 	}),
 
 	rest.get('/umbraco/management/api/v1/tree/media-type/children', (req, res, ctx) => {
-		const key = req.params.key as string;
-		if (!key) return;
+		const parentKey = req.url.searchParams.get('parentKey');
+		if (!parentKey) return;
 
-		const response = umbMediaTypeData.getTreeItemChildren(key);
+		const response = umbMediaTypeData.getTreeItemChildren(parentKey);
 		return res(ctx.status(200), ctx.json(response));
 	}),
 
 	rest.get('/umbraco/management/api/v1/tree/media-type/item', (req, res, ctx) => {
-		const keys = req.params.keys as string;
+		const keys = req.url.searchParams.getAll('key');
 		if (!keys) return;
 
-		const items = umbMediaTypeData.getTreeItem(keys.split(','));
+		const items = umbMediaTypeData.getTreeItem(keys);
 		return res(ctx.status(200), ctx.json(items));
 	}),
 ];
