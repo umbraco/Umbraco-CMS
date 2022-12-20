@@ -68,6 +68,7 @@ export class UmbSectionViewUsersElement extends UmbContextProviderMixin(
 			},
 		];
 		
+		// TODO: find a way to make this reuseable across:
 		this._workspaces?.map((workspace:ManifestWorkspace) => {
 			routes.push({
 				path: `${workspace.meta.entityType}/:key`,

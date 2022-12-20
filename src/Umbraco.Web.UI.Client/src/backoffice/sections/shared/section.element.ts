@@ -52,6 +52,7 @@ export class UmbSectionElement extends UmbContextConsumerMixin(UmbObserverMixin(
 		this.consumeContext('umbSectionContext', (instance) => {
 			this._sectionContext = instance;
 
+			// TODO: currently they don't corporate, as they overwrite each other...
 			this._observeTrees();
 			this._observeViews();
 		});
@@ -92,6 +93,7 @@ export class UmbSectionElement extends UmbContextConsumerMixin(UmbObserverMixin(
 			}
 		];
 		
+		// TODO: find a way to make this reuseable across:
 		this._workspaces?.map((workspace:ManifestWorkspace) => {
 			routes.push({
 				path: `${workspace.meta.entityType}/:key`,
