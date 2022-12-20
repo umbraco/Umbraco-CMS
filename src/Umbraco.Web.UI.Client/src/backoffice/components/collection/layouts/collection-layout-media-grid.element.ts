@@ -94,13 +94,22 @@ export class UmbCollectionLayoutMediaGridElement extends UmbContextConsumerMixin
 	private _observeMediaItems() {
 		if (!this._mediaStore || !this._collectionContext) return;
 
-		this.observe<Array<MediaDetails>>(
-			this._mediaStore?.getTreeItemChildren(this._collectionContext.entityKey),
-			(items) => {
+		console.log('key', this._collectionContext.entityKey);
+
+		if (this._collectionContext.entityKey) {
+			this.observe<Array<MediaDetails>>(
+				this._mediaStore?.getTreeItemChildren(this._collectionContext.entityKey),
+				(items) => {
+					this._mediaItems = items;
+					console.log('media store', this._mediaStore);
+				}
+			);
+		} else {
+			this.observe<Array<MediaDetails>>(this._mediaStore?.getTreeRoot(), (items) => {
 				this._mediaItems = items;
 				console.log('media store', this._mediaStore);
-			}
-		);
+			});
+		}
 	}
 
 	private _handleOpenItem(key: string) {

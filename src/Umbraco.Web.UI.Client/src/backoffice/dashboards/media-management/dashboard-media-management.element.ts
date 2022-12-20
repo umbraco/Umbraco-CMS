@@ -34,19 +34,8 @@ export class UmbDashboardMediaManagementElement extends UmbContextProviderMixin(
 	@state()
 	private _routes: Array<any> = [];
 
-	private _entityKey = '';
-
 	@property()
-	public get entityKey() {
-		return this._entityKey;
-	}
-	public set entityKey(value: string) {
-		const oldValue = this._entityKey;
-		if (oldValue === value) return;
-		this._entityKey = value;
-		this.requestUpdate('entityKey', oldValue);
-		this.provideContext('umbCollectionContext', new UmbCollectionContextBase(this.entityKey));
-	}
+	public entityKey = '';
 
 	@state()
 	private _collectionLayouts: Array<ManifestCollectionLayout> = [];
@@ -57,6 +46,11 @@ export class UmbDashboardMediaManagementElement extends UmbContextProviderMixin(
 	constructor() {
 		super();
 		this._observeCollectionLayouts();
+	}
+
+	connectedCallback(): void {
+		super.connectedCallback();
+		this.provideContext('umbCollectionContext', new UmbCollectionContextBase(this.entityKey));
 	}
 
 	private _observeCollectionLayouts() {
