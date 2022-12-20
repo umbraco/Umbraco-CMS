@@ -6,7 +6,7 @@ export default {
 	nodeResolve: true,
 	files: 'src/**/*.test.ts',
 	plugins: [
-		esbuildPlugin({ ts: true, target: 'auto' }),
+		esbuildPlugin({ ts: true, target: 'auto', json: true }),
 		importMapsPlugin({
 			inject: {
 				importMap: {

@@ -9,6 +9,7 @@ import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import type { ManifestTypes, DocumentTypeDetails } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
+import { UmbModalService } from '@umbraco-cms/services';
 
 import '../../property-editor-uis/icon-picker/property-editor-ui-icon-picker.element';
 
@@ -39,6 +40,10 @@ export class UmbWorkspaceDocumentTypeElement extends UmbContextProviderMixin(
 			#alias {
 				padding: 0 var(--uui-size-space-3);
 			}
+
+			#icon {
+				font-size: calc(var(--uui-size-layout-3) / 2);
+			}
 		`,
 	];
 
@@ -48,16 +53,25 @@ export class UmbWorkspaceDocumentTypeElement extends UmbContextProviderMixin(
 	@state()
 	private _documentType?: DocumentTypeDetails;
 
+	@state()
+	private _icon = {
+		color: '#000000',
+		name: 'umb:document-dashed-line',
+	};
+
 	private _documentTypeContext?: UmbDocumentTypeContext;
 	private _documentTypeStore?: UmbDocumentTypeStore;
+
+	private _modalService?: UmbModalService;
 
 	constructor() {
 		super();
 
 		this._registerExtensions();
 
-		this.consumeContext('umbDocumentTypeStore', (instance) => {
-			this._documentTypeStore = instance;
+		this.consumeAllContexts(['umbDocumentTypeStore', 'umbModalService'], (instances) => {
+			this._documentTypeStore = instances['umbDocumentTypeStore'];
+			this._modalService = instances['umbModalService'];
 			this._observeDocumentType();
 		});
 	}
@@ -125,11 +139,26 @@ export class UmbWorkspaceDocumentTypeElement extends UmbContextProviderMixin(
 		}
 	}
 
+	private async _handleIconClick() {
+		const modalHandler = this._modalService?.iconPicker();
+
+		modalHandler?.onClose().then((saved) => {
+			if (saved) this._documentTypeContext?.update({ icon: saved.icon });
+			console.log(saved);
+			// TODO save color ALIAS as well
+		});
+	}
+
 	render() {
 		return html`
 			<umb-workspace-entity-layout alias="Umb.Workspace.DocumentType">
 				<div id="header" slot="header">
-					<umb-property-editor-ui-icon-picker></umb-property-editor-ui-icon-picker>
+					<uui-button id="icon" @click=${this._handleIconClick} compact>
+						<uui-icon
+							name="${this._documentType?.icon || 'umb:document-dashed-line'}"
+							style="color: ${this._icon.color}"></uui-icon>
+					</uui-button>
+
 					<uui-input id="name" .value=${this._documentType?.name} @input="${this._handleInput}">
 						<div id="alias" slot="append">${this._documentType?.alias}</div>
 					</uui-input>
