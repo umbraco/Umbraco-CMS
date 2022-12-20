@@ -156,6 +156,10 @@ public abstract class UmbracoIntegrationTestBase
                 // New DB + Schema
                 var newSchemaPerTestDb = testDatabaseFactory.CreateTestDatabaseConfiguration();
                 s_connectionStrings = newSchemaPerTestDb.InitializeConfiguration();
+                connectionStrings.CurrentValue.ConnectionString = s_connectionStrings.ConnectionString;
+                connectionStrings.CurrentValue.ProviderName = s_connectionStrings.ProviderName;
+
+                databaseFactory.Configure(s_connectionStrings);
                 AddOnTestTearDown(() => newSchemaPerTestDb.Teardown());
                 CreateDatabaseWithSchema(databaseFactory, databaseSchemaCreatorFactory);
                 databaseDataCreator.SeedDataAsync().GetAwaiter().GetResult();

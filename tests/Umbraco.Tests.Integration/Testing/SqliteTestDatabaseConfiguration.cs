@@ -44,11 +44,6 @@ public class SqliteTestDatabaseConfiguration : ITestDatabaseConfiguration
             ConnectionString = builder.ConnectionString,
             ProviderName = "Microsoft.Data.Sqlite",
         };
-
-        _connectionStrings.CurrentValue.ConnectionString = connectionStrings.ConnectionString;
-        _connectionStrings.CurrentValue.ProviderName = connectionStrings.ProviderName;
-
-        _databaseFactory.Configure(connectionStrings);
         return connectionStrings;
     }
 
