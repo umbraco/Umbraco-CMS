@@ -6,7 +6,7 @@ import type { UmbNotificationDefaultData } from '../../../../../core/services/no
 import type { UmbNotificationService } from '../../../../../core/services/notification';
 import { UmbDataTypeContext } from '../../data-type.context';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-import { UmbDataTypesStore } from 'src/core/stores/data-types/data-types.store';
+import { UmbDataTypeStore } from '@umbraco-cms/stores/data-type/data-type.store';
 
 @customElement('umb-workspace-action-data-type-save')
 export class UmbWorkspaceActionDataTypeSaveElement extends UmbContextConsumerMixin(LitElement) {
@@ -15,7 +15,7 @@ export class UmbWorkspaceActionDataTypeSaveElement extends UmbContextConsumerMix
 	@state()
 	private _saveButtonState?: UUIButtonState;
 
-	private _dataTypeStore?: UmbDataTypesStore;
+	private _dataTypeStore?: UmbDataTypeStore;
 	private _dataTypeContext?: UmbDataTypeContext;
 	private _notificationService?: UmbNotificationService;
 
