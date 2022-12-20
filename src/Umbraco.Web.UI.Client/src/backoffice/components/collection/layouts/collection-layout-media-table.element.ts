@@ -38,10 +38,6 @@ export class UmbCollectionLayoutMediaTableElement extends UmbContextConsumerMixi
 		});
 	}
 
-	private _isSelected(mediaItem: MediaDetails) {
-		return this._selection.includes(mediaItem.key);
-	}
-
 	render() {
 		return html`<h1>umb-collection-layout-media-table</h1>
 			<div>
