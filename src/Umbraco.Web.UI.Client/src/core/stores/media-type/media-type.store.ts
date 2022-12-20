@@ -30,6 +30,7 @@ export class UmbMediaTypeStore extends UmbNodeStoreBase<UmbMediaTypeStoreItemTyp
 
 		return this.items.pipe(map((mediaTypes) => mediaTypes.find((mediaType) => mediaType.key === key && isMediaTypeDetails(mediaType)) as UmbMediaTypeStoreItemType || null));
 		*/
+		return null as any;
 	}
 
 	/**
@@ -55,6 +56,7 @@ export class UmbMediaTypeStore extends UmbNodeStoreBase<UmbMediaTypeStoreItemTyp
 			console.error('Save Data Type error', error);
 		}
 		*/
+		return null as any;
 	}
 
 
