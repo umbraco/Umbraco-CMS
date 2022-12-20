@@ -16,7 +16,7 @@ import './views/edit/workspace-view-content-edit.element';
 import './views/info/workspace-view-content-info.element';
 import type { UmbNodeStoreBase } from '@umbraco-cms/stores/store';
 
-type ContentTypeType = DocumentDetails | MediaDetails;
+type ContentTypeTypes = DocumentDetails | MediaDetails;
 
 @customElement('umb-workspace-content')
 export class UmbWorkspaceContentElement extends UmbContextProviderMixin(
@@ -70,9 +70,9 @@ export class UmbWorkspaceContentElement extends UmbContextProviderMixin(
 
 	// TODO: use a NodeDetails type here:
 	@state()
-	_content?: DocumentDetails | MediaDetails;
+	_content?: ContentTypeTypes;
 
-	private _workspaceContext?: UmbWorkspaceNodeContext<ContentTypeType, UmbNodeStoreBase<ContentTypeType>>;
+	private _workspaceContext?: UmbWorkspaceNodeContext<ContentTypeTypes, UmbNodeStoreBase<ContentTypeTypes>>;
 
 
 	constructor() {
@@ -90,7 +90,7 @@ export class UmbWorkspaceContentElement extends UmbContextProviderMixin(
 	private async _observeWorkspace() {
 		if (!this._workspaceContext) return;
 
-		this.observe<ContentTypeType>(this._workspaceContext.data.pipe(distinctUntilChanged()), (data) => {
+		this.observe<ContentTypeTypes>(this._workspaceContext.data.pipe(distinctUntilChanged()), (data) => {
 			this._content = data;
 		});
 	}
