@@ -68,6 +68,7 @@ export class UmbWorkspaceContentElement extends UmbContextProviderMixin(
 	@property()
 	alias!: string;
 
+	// TODO: use a NodeDetails type here:
 	@state()
 	_content?: DocumentDetails | MediaDetails;
 
