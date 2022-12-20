@@ -80,16 +80,7 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
             }
         }
 
-        _logger.LogInformation("Done (pending scope completion).");
-
-        // safety check - again, this should never happen as the plan has been validated,
-        // and this is just a paranoid safety test
-        var finalState = plan.FinalState;
-        if (nextState != finalState)
-        {
-            throw new InvalidOperationException(
-                $"Internal error, reached state {nextState} which is not final state {finalState}");
-        }
+        _logger.LogInformation("Done");
 
         return nextState;
     }
