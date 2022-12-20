@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.ManagementApi.Services;
@@ -13,18 +14,15 @@ namespace Umbraco.Cms.ManagementApi.Controllers.Dictionary;
 
 public class ImportDictionaryController : DictionaryControllerBase
 {
-    private readonly IHostingEnvironment _hostingEnvironment;
     private readonly IDictionaryService _dictionaryService;
     private readonly IWebHostEnvironment _webHostEnvironment;
     private readonly ILoadDictionaryItemService _loadDictionaryItemService;
 
     public ImportDictionaryController(
-        IHostingEnvironment hostingEnvironment,
         IDictionaryService dictionaryService,
         IWebHostEnvironment webHostEnvironment,
         ILoadDictionaryItemService loadDictionaryItemService)
     {
-        _hostingEnvironment = hostingEnvironment;
         _dictionaryService = dictionaryService;
         _webHostEnvironment = webHostEnvironment;
         _loadDictionaryItemService = loadDictionaryItemService;
@@ -41,7 +39,7 @@ public class ImportDictionaryController : DictionaryControllerBase
             return NotFound();
         }
 
-        var filePath = Path.Combine(_hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.Data), file);
+        var filePath = Path.Combine(_webHostEnvironment.MapPathContentRoot(Constants.SystemDirectories.Data), file);
         if (_webHostEnvironment.ContentRootFileProvider.GetFileInfo(filePath) is null)
         {
             return await Task.FromResult(NotFound());
