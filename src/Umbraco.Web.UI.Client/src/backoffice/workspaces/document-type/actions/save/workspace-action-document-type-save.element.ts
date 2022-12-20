@@ -2,12 +2,8 @@ import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import type { UUIButtonState } from '@umbraco-ui/uui';
-import type { UmbNotificationDefaultData } from '../../../../../core/services/notification/layouts/default';
-import type { UmbNotificationService } from '../../../../../core/services/notification';
-import { UmbDocumentTypeStore } from '../../../../../core/stores/document-type/document-type.store';
-import { UmbDocumentTypeContext } from '../../document-type.context';
+import type { UmbWorkspaceDocumentTypeContext } from '../../workspace-document-type.context';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-import { UmbWorkspaceDocumentTypeContext } from '../../workspace-document-type.context';
 
 @customElement('umb-workspace-action-document-type-save')
 export class UmbWorkspaceActionDocumentTypeSaveElement extends UmbContextConsumerMixin(LitElement) {
