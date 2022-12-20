@@ -1,6 +1,6 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, LitElement } from 'lit';
-import { customElement } from 'lit/decorators.js';
+import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import type { MediaDetails } from '@umbraco-cms/models';
 import { UmbMediaStore } from '@umbraco-cms/stores/media/media.store';
@@ -65,6 +65,7 @@ export class UmbCollectionLayoutMediaGridElement extends UmbContextConsumerMixin
 		`,
 	];
 
+	@state()
 	private _mediaItems: Array<MediaDetails> = [];
 
 	private _mediaStore?: UmbMediaStore;
@@ -89,8 +90,9 @@ export class UmbCollectionLayoutMediaGridElement extends UmbContextConsumerMixin
 	private _observeMediaItems() {
 		if (!this._mediaStore) return;
 
-		this.observe<Array<MediaDetails>>(this._mediaStore?.items, (items) => {
+		this.observe<Array<MediaDetails>>(this._mediaStore?.getTreeRoot(), (items) => {
 			this._mediaItems = items;
+			console.log('media store', this._mediaStore);
 		});
 	}
 
