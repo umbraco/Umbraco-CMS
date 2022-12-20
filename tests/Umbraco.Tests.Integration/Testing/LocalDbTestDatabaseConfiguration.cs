@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Tests.Integration.Testing;
 public class LocalDbTestDatabaseConfiguration : ITestDatabaseConfiguration
 {
     public const string InstanceName = "UmbracoIntegrationTest";
-    public const string DatabaseName = "UmbracoTests";
+    public string _key = Guid.NewGuid().ToString();
     private static LocalDb.Instance s_localDbInstance;
     private static string s_filesPath;
     private readonly LocalDb _localDb;
@@ -56,10 +56,10 @@ public class LocalDbTestDatabaseConfiguration : ITestDatabaseConfiguration
 
     public ConnectionStrings InitializeConfiguration()
     {
-        s_localDbInstance.CreateDatabase(DatabaseName, s_filesPath);
+        s_localDbInstance.CreateDatabase(_key, s_filesPath);
         var connectionStrings = new ConnectionStrings
         {
-            ConnectionString = s_localDbInstance.GetConnectionString(InstanceName, DatabaseName),
+            ConnectionString = s_localDbInstance.GetConnectionString(InstanceName, _key),
             ProviderName = "Microsoft.Data.SqlClient",
         };
         connectionStrings.ConnectionString += ";TrustServerCertificate=true;";
@@ -80,13 +80,13 @@ public class LocalDbTestDatabaseConfiguration : ITestDatabaseConfiguration
 
         Parallel.ForEach(s_localDbInstance.GetDatabases(), instance =>
         {
-            if (instance.StartsWith(DatabaseName))
+            if (instance.StartsWith(_key))
             {
                 s_localDbInstance.DropDatabase(instance);
             }
         });
 
-        _localDb.StopInstance(InstanceName);
+        // _localDb.StopInstance(InstanceName);
 
         foreach (var file in Directory.EnumerateFiles(s_filesPath))
         {
