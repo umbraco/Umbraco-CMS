@@ -10,6 +10,7 @@ import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
 import '../../../../property-editor-uis/shared/property-editor-config/property-editor-config.element';
 import '../../../../components/ref-property-editor-ui/ref-property-editor-ui.element';
+import { UmbWorkspaceDataTypeContext } from '../../workspace-data-type.context';
 
 @customElement('umb-workspace-view-data-type-edit')
 export class UmbWorkspaceViewDataTypeEditElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
@@ -41,23 +42,23 @@ export class UmbWorkspaceViewDataTypeEditElement extends UmbContextConsumerMixin
 	@state()
 	private _data: Array<any> = [];
 
-	private _dataTypeContext?: UmbDataTypeContext;
+	private _workspaceContext?: UmbWorkspaceDataTypeContext;
 	private _modalService?: UmbModalService;
 
 	constructor() {
 		super();
 
 		this.consumeAllContexts(['umbDataTypeContext', 'umbModalService'], (result) => {
-			this._dataTypeContext = result['umbDataTypeContext'];
+			this._workspaceContext = result['umbDataTypeContext'];
 			this._modalService = result['umbModalService'];
 			this._observeDataType();
 		});
 	}
 
 	private _observeDataType() {
-		if (!this._dataTypeContext) return;
+		if (!this._workspaceContext) return;
 
-		this.observe<DataTypeDetails>(this._dataTypeContext.data, (dataType) => {
+		this.observe<DataTypeDetails>(this._workspaceContext.data, (dataType) => {
 			this._dataType = dataType;
 
 			if (!this._dataType) return;
@@ -83,7 +84,7 @@ export class UmbWorkspaceViewDataTypeEditElement extends UmbContextConsumerMixin
 				this._propertyEditorUIIcon = propertyEditorUI?.meta?.icon ?? '';
 				this._propertyEditorModelAlias = propertyEditorUI?.meta?.propertyEditorModel ?? '';
 
-				this._dataTypeContext?.update({ propertyEditorModelAlias: this._propertyEditorModelAlias });
+				this._workspaceContext?.update({ propertyEditorModelAlias: this._propertyEditorModelAlias });
 			}
 		);
 	}
@@ -103,7 +104,7 @@ export class UmbWorkspaceViewDataTypeEditElement extends UmbContextConsumerMixin
 
 	private _selectPropertyEditorUI(propertyEditorUIAlias: string | null) {
 		if (!this._dataType || this._dataType.propertyEditorUIAlias === propertyEditorUIAlias) return;
-		this._dataTypeContext?.update({ propertyEditorUIAlias });
+		this._workspaceContext?.update({ propertyEditorUIAlias });
 		this._observePropertyEditorUI(propertyEditorUIAlias);
 	}
 
