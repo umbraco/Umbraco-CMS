@@ -2,14 +2,14 @@ import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
+import { distinctUntilChanged } from 'rxjs';
+import { UmbWorkspaceDocumentTypeContext } from './workspace-document-type.context';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import type { DocumentTypeDetails, ManifestTypes } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
 import '../../property-editor-uis/icon-picker/property-editor-ui-icon-picker.element';
-import { UmbWorkspaceDocumentTypeContext } from './workspace-document-type.context';
-import { distinctUntilChanged } from 'rxjs';
 
 @customElement('umb-workspace-document-type')
 export class UmbWorkspaceDocumentTypeElement extends UmbContextProviderMixin(
@@ -51,19 +51,6 @@ export class UmbWorkspaceDocumentTypeElement extends UmbContextProviderMixin(
 		this._provideWorkspace();
 	}
 
-	private _entityType = '';
-	@property()
-	public get entityType(): string {
-		return this._entityType;
-	}
-	public set entityType(value: string) {
-		// TODO: Make sure that a change of the entity type actually gives extension slot a hint to change/update.
-		const oldValue = this._entityType;
-		this._entityType = value;
-		this._provideWorkspace();
-		this.requestUpdate('entityType', oldValue);
-	}
-
 	private _workspaceContext?:UmbWorkspaceDocumentTypeContext;
 
 	@state()
@@ -87,7 +74,7 @@ export class UmbWorkspaceDocumentTypeElement extends UmbContextProviderMixin(
 	}
 
 	protected _provideWorkspace() {
-		if(this._entityType && this._entityKey) {
+		if(this._entityKey) {
 			this._workspaceContext = new UmbWorkspaceDocumentTypeContext(this, this._entityKey);
 			this.provideContext('umbWorkspaceContext', this._workspaceContext);
 			this._observeWorkspace()
