@@ -1,7 +1,14 @@
+import type { UUIColorSwatchesEvent } from '@umbraco-ui/uui-color-swatches';
+
 import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UmbModalLayoutElement } from '../modal-layout.element';
+
+import icons from '../../../../../../public-assets/icons/icons.json';
+
+import '@umbraco-ui/uui-color-swatch';
+import '@umbraco-ui/uui-color-swatches';
 
 export interface UmbModalIconPickerData {
 	multiple: boolean;
@@ -42,43 +49,10 @@ export class UmbModalLayoutIconPickerElement extends UmbModalLayoutElement<UmbMo
 				padding-left: 6px;
 			}
 
-			input[type='radio'] {
-				display: none;
-				position: absolute;
-			}
-
-			#palette {
-				display: flex;
-				flex-wrap: wrap;
-			}
-
-			#palette .colorspot {
-				box-sizing: border-box;
-				line-height: 0;
-				padding: 4px;
-				margin: 5px 5px 5px 0;
-				height: 25px;
-				width: 25px;
-				display: inline-block;
-				border-radius: 5px;
-			}
-
-			#palette .checkmark {
-				height: 100%;
-				width: 100%;
-				display: none;
-				color: white;
-				background-color: rgba(0, 0, 0, 0.2);
-				border-radius: 100%;
-			}
-			#palette input[type='radio']:checked ~ .checkmark {
-				display: block;
-			}
-
 			#icon-selection {
 				line-height: 0;
 				display: grid;
-				grid-template-columns: repeat(auto-fit, minmax(40px, auto));
+				grid-template-columns: repeat(auto-fit, minmax(40px, 40px));
 				overflow-y: scroll;
 				max-height: 100%;
 				min-height: 0;
@@ -97,54 +71,24 @@ export class UmbModalLayoutIconPickerElement extends UmbModalLayoutElement<UmbMo
 				display: inline-block;
 			}
 
-			/*#icon-selection input[type='radio']:checked ~ .icon {
-				background-color: rgba(0, 0, 0, 0.1);
-				border: 1px solid #ffeeee;
-			}*/
-
 			#icon-selection .icon:focus,
 			#icon-selection .icon:hover,
 			#icon-selection .icon.selected {
 				background-color: rgba(0, 0, 0, 0.1);
 			}
+
+			uui-button {
+				margin-left: var(--uui-size-space-4);
+			}
+
+			uui-color-swatches {
+				margin: -0.75rem;
+			}
 		`,
 	];
 
 	@property({ type: Array })
-	iconlist = [
-		'umb:add',
-		'umb:alert',
-		'umb:attachment',
-		'umb:calendar',
-		'umb:check',
-		'umb:clipboard',
-		'umb:code',
-		'umb:colorpicker',
-		'umb:copy',
-		'umb:delete',
-		'umb:document',
-		'umb:download',
-		'umb:edit',
-		'umb:favorite',
-		'umb:folder',
-		'umb:forbidden',
-		'umb:info',
-		'umb:link',
-		'umb:lock',
-		'umb:pause',
-		'umb:picture',
-		'umb:play',
-		'umb:remove',
-		'umb:search',
-		'umb:see',
-		'umb:settings',
-		'umb:subtract',
-		'umb:sync',
-		'umb:unlock',
-		'umb:unsee',
-		'umb:wand',
-		'umb:wrong',
-	];
+	iconlist = icons.map((icon) => icon.name);
 
 	@property({ type: Array })
 	iconlistFiltered: Array<string>;
@@ -179,15 +123,6 @@ export class UmbModalLayoutIconPickerElement extends UmbModalLayoutElement<UmbMo
 	@state()
 	private _currentIcon: string;
 
-	private _changeIconColor(e: { target: HTMLInputElement; type: any; key: unknown }) {
-		if (e.type == 'click') {
-			this._currentColor = e.target.id;
-		} else if (e.type == 'keyup' && e.key == 'Enter') {
-			e.target.children[0].setAttribute('checked', 'true');
-			this._currentColor = e.target.children[0].id;
-		}
-	}
-
 	private _changeIcon(e: { target: HTMLInputElement; type: any; key: unknown }) {
 		if (e.type == 'click' || (e.type == 'keyup' && e.key == 'Enter')) {
 			this._currentIcon = e.target.id;
@@ -202,9 +137,6 @@ export class UmbModalLayoutIconPickerElement extends UmbModalLayoutElement<UmbMo
 		}
 	}
 
-	private _setBackground(color: string) {
-		return 'background-color: ' + color;
-	}
 	private _setColor(color: string) {
 		return 'color: ' + color;
 	}
@@ -237,8 +169,9 @@ export class UmbModalLayoutIconPickerElement extends UmbModalLayoutElement<UmbMo
 				<div id="container">
 					${this.renderSearchbar()}
 					<hr />
-
-					<div id="palette">${this.renderPalette()}</div>
+					<uui-color-swatches
+						.swatches="${this.colorlist}"
+						@change="${(e: UUIColorSwatchesEvent) => (this._currentColor = e.target.value)}"></uui-color-swatches>
 
 					<hr />
 					<uui-scroll-container id="icon-selection">${this.renderIconSelection()}</uui-scroll-container>
@@ -259,28 +192,6 @@ export class UmbModalLayoutIconPickerElement extends UmbModalLayoutElement<UmbMo
 			id="searchbar">
 			<uui-icon name="search" slot="prepend" id="searchbar_icon"></uui-icon>
 		</uui-input>`;
-	}
-
-	renderPalette() {
-		return html`${this.colorlist.map((color) => {
-			return html`<label
-				@keyup="${this._changeIconColor}"
-				tabindex="0"
-				for="${color}"
-				class="colorspot"
-				.style="${this._setBackground(color)}">
-				<input
-					type="radio"
-					name="color"
-					label="${color}"
-					@click="${this._changeIconColor}"
-					id="${color}"
-					?checked="${color === this._currentColor ? true : false}" />
-				<span class="checkmark">
-					<uui-icon name="check"></uui-icon>
-				</span>
-			</label>`;
-		})}`;
 	}
 
 	renderIconSelection() {
