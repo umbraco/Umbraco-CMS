@@ -61,22 +61,23 @@ public class Upgrader
             throw new ArgumentNullException(nameof(keyValueService));
         }
 
-        // TODO: Ensure that state is always returned and saved, regardless of errors.
-
         var initialState = GetInitialState(scopeProvider, keyValueService);
 
         // execute plan
-        var state = migrationPlanExecutor.Execute(Plan, initialState);
-        if (string.IsNullOrWhiteSpace(state))
+        ExecutedMigrationPlan result = migrationPlanExecutor.Execute(Plan, initialState);
+        // This should never happen, but if it does, we can't save it in the database.
+        if (string.IsNullOrWhiteSpace(result.FinalState))
         {
             throw new InvalidOperationException("Plan execution returned an invalid null or empty state.");
         }
 
-        SetState(state, scopeProvider, keyValueService);
+        // We always save the final state of the migration plan, this is because a partial success is possible
+        // So we still want to save the place we got to in the database-
+        SetState(result.FinalState, scopeProvider, keyValueService);
 
         // TODO: Publish notification.
 
-        return new ExecutedMigrationPlan(Plan, initialState, state);
+        return result;
     }
 
     private string GetInitialState(ICoreScopeProvider scopeProvider, IKeyValueService keyValueService)
