@@ -134,7 +134,7 @@ export class UmbWorkspaceDataTypeElement extends UmbContextProviderMixin(
 
 	private _onPropertyValueChange = (e: Event) => {
 		const target = e.composedPath()[0] as any;
-		this._dataTypeContext?.setPropertyValue(target?.alias, target?.value);
+		this._workspaceContext?.setPropertyValue(target?.alias, target?.value);
 	};
 
 	// TODO. find a way where we don't have to do this for all Workspaces.
@@ -143,7 +143,7 @@ export class UmbWorkspaceDataTypeElement extends UmbContextProviderMixin(
 			const target = event.composedPath()[0] as UUIInputElement;
 
 			if (typeof target?.value === 'string') {
-				this._dataTypeContext?.update({ name: target.value });
+				this._workspaceContext?.update({ name: target.value });
 			}
 		}
 	}
