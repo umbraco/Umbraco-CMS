@@ -27,7 +27,7 @@ public class UmbracoTestDatabaseFactory
         switch (databaseType)
         {
             case TestDatabaseSettings.TestDatabaseType.Sqlite:
-                return new SqliteTestDatabaseConfiguration(_connectionStrings, _umbracoDatabaseFactory, _configuration);
+                return new SqliteTestDatabaseConfiguration(_connectionStrings, _umbracoDatabaseFactory);
             case TestDatabaseSettings.TestDatabaseType.LocalDb:
                 return new LocalDbTestDatabaseConfiguration(new LocalDb(), _umbracoDatabaseFactory, _connectionStrings);
             case TestDatabaseSettings.TestDatabaseType.SqlServer:

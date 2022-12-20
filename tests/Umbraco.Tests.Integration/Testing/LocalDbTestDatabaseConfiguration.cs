@@ -31,8 +31,6 @@ public class LocalDbTestDatabaseConfiguration : ITestDatabaseConfiguration
         _localDb = localDb;
         _databaseFactory = databaseFactory;
         _connectionStrings = connectionStrings;
-        // string? projectDirectory = Directory.GetParent(Environment.CurrentDirectory)?.Parent?.Parent?.FullName;
-        // string tempFolder = @"TEMP\databases";
         s_filesPath = Path.Combine(_testHelper.WorkingDirectory, "databases");
 
         if (!Directory.Exists(s_filesPath))
