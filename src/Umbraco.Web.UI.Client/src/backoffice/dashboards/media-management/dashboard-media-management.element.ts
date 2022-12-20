@@ -26,7 +26,6 @@ export class UmbDashboardMediaManagementElement extends UmbContextProviderMixin(
 				box-sizing: border-box;
 				gap: var(--uui-size-space-5);
 				height: 100%;
-				border: 1px solid black;
 			}
 		`,
 	];
