@@ -1,7 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import type { UmbWorkspaceDocumentContext } from './workspace-document.context';
+import { UmbWorkspaceDocumentContext } from './workspace-document.context';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import type { ManifestWorkspaceView } from '@umbraco-cms/models';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
