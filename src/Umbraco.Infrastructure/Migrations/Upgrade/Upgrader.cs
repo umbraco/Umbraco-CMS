@@ -71,6 +71,13 @@ public class Upgrader
         SetState(result.FinalState, scopeProvider, keyValueService);
 
         aggregator.Publish(new UmbracoPlanExecutedNotification { ExecutedPlan = result });
+
+        // The migration may have failed, it this is the case, we throw the exception now that we've taken care of business.
+        if (result.Successful is false && result.Exception is not null)
+        {
+            throw result.Exception;
+        }
+
         return result;
     }
 
