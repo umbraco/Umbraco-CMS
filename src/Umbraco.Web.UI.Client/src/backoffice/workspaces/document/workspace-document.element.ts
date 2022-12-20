@@ -68,7 +68,7 @@ export class UmbWorkspaceDocumentElement extends UmbObserverMixin(UmbContextCons
 
 	protected _provideWorkspace() {
 		if(this._entityType && this._entityKey) {
-			this._workspaceContext = new UmbWorkspaceDocumentContext(this, this._entityType, this._entityKey);
+			this._workspaceContext = new UmbWorkspaceDocumentContext(this, this._entityKey);
 			this.provideContext('umbWorkspaceContext', this._workspaceContext);
 		}
 	}
