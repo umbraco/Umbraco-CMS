@@ -11,6 +11,7 @@ import type { ManifestTree, ManifestSectionView, ManifestWorkspace } from '@umbr
 import './section-trees/section-trees.element.ts';
 import '../shared/section-views/section-views.element.ts';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
+import { IRoutingInfo } from 'router-slot';
 
 
 @customElement('umb-section')
@@ -95,7 +96,7 @@ export class UmbSectionElement extends UmbContextConsumerMixin(UmbObserverMixin(
 			routes.push({
 				path: `${workspace.meta.entityType}/:key`,
 				component: () => createExtensionElement(workspace),
-				setup: (component: Promise<HTMLElement>, info: any) => {
+				setup: (component: Promise<HTMLElement>, info: IRoutingInfo) => {
 					component.then((el: HTMLElement) => {
 						(el as any).entityKey = info.match.params.key;
 					})

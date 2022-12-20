@@ -72,7 +72,7 @@ export class UmbSectionViewUsersElement extends UmbContextProviderMixin(
 			routes.push({
 				path: `${workspace.meta.entityType}/:key`,
 				component: () => createExtensionElement(workspace),
-				setup: (component: Promise<HTMLElement>, info: any) => {
+				setup: (component: Promise<HTMLElement>, info: IRoutingInfo) => {
 					component.then((el: HTMLElement) => {
 						(el as any).entityKey = info.match.params.key;
 					})
