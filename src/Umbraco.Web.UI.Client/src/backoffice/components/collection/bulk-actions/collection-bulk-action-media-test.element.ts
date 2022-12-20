@@ -4,8 +4,7 @@ import { customElement } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import type { ManifestCollectionBulkAction } from '@umbraco-cms/models';
 
-//TODO: Should be renamed to a specific usecase. eg. umb-media-collection-bulk-action
-@customElement('umb-collection-bulk-action')
+@customElement('umb-collection-bulk-action-media-test')
 export class UmbCollectionBulkActionElement extends LitElement {
 	static styles = [UUITextStyles, css``];
 
@@ -21,6 +20,6 @@ export class UmbCollectionBulkActionElement extends LitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-collection-bulk-action': UmbCollectionBulkActionElement;
+		'umb-collection-bulk-action-media-test': UmbCollectionBulkActionElement;
 	}
 }

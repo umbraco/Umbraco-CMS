@@ -7,9 +7,8 @@ import { UmbMediaStore } from '@umbraco-cms/stores/media/media.store';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 
-//TODO: Should be renamed to a specific usecase. eg. umb-media-collection-layout-grid
-@customElement('umb-collection-layout-grid')
-export class UmbCollectionLayoutGridElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+@customElement('umb-collection-layout-media-grid')
+export class UmbCollectionLayoutMediaGridElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -123,6 +122,6 @@ export class UmbCollectionLayoutGridElement extends UmbContextConsumerMixin(UmbO
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-collection-layout-grid': UmbCollectionLayoutGridElement;
+		'umb-collection-layout-media-grid': UmbCollectionLayoutMediaGridElement;
 	}
 }
