@@ -49,14 +49,14 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
 
         _logger.LogInformation("At {OrigState}", string.IsNullOrWhiteSpace(nextState) ? "origin" : nextState);
 
-        if (!plan.Transitions.TryGetValue(nextState, out MigrationPlan.Transition? transition))
+        if (plan.Transitions.TryGetValue(nextState, out MigrationPlan.Transition? transition) is false)
         {
             plan.ThrowOnUnknownInitialState(nextState);
         }
 
         List<MigrationPlan.Transition> completedTransitions = new();
 
-        while (transition != null)
+        while (transition is not null)
         {
             _logger.LogInformation("Execute {MigrationType}", transition.MigrationType.Name);
 
@@ -93,7 +93,7 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
 
             // throw a raw exception here: this should never happen as the plan has
             // been validated - this is just a paranoid safety test
-            if (!plan.Transitions.TryGetValue(nextState, out transition))
+            if (plan.Transitions.TryGetValue(nextState, out transition) is false)
             {
                 return new ExecutedMigrationPlan
                 {

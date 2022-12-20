@@ -54,7 +54,6 @@ public class Upgrader
 
         var initialState = GetInitialState(scopeProvider, keyValueService);
 
-        // execute plan
         ExecutedMigrationPlan result = migrationPlanExecutor.Execute(Plan, initialState);
 
         // This should never happen, but if it does, we can't save it in the database.
