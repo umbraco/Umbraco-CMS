@@ -2,11 +2,11 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
+import { UmbResourceController } from '@umbraco-cms/controllers';
 import { ProfilingResource } from '@umbraco-cms/backend-api';
-import { UmbResourceMixin } from '@umbraco-cms/resource-api';
 
 @customElement('umb-dashboard-performance-profiling')
-export class UmbDashboardPerformanceProfilingElement extends UmbResourceMixin(LitElement) {
+export class UmbDashboardPerformanceProfilingElement extends LitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -30,6 +30,8 @@ export class UmbDashboardPerformanceProfilingElement extends UmbResourceMixin(Li
 	@state()
 	private _profilingPerfomance = false;
 
+	private _resourceController = new UmbResourceController(this);
+
 	connectedCallback(): void {
 		super.connectedCallback();
 		this._getProfilingStatus();
@@ -37,7 +39,9 @@ export class UmbDashboardPerformanceProfilingElement extends UmbResourceMixin(Li
 	}
 
 	private async _getProfilingStatus() {
-		const profilingStatus = await this.executeAndNotify(ProfilingResource.getProfilingStatus());
+		const [profilingStatus] = await this._resourceController.tryExecuteAndNotify(
+			ProfilingResource.getProfilingStatus()
+		);
 		if (profilingStatus) {
 			this._profilingStatus = profilingStatus.enabled;
 		}
