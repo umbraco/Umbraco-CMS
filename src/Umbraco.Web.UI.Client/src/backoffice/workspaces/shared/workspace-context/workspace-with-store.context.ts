@@ -1,18 +1,18 @@
 import { Subscription } from "rxjs";
-import { UmbWorkspaceContext } from "../workspace-context/workspace.context";
+import { UmbWorkspaceContext } from "./workspace.context";
 import { UmbContextConsumer } from "@umbraco-cms/context-api";
 import type { DocumentDetails } from "@umbraco-cms/models";
-import { UmbDocumentStore } from "@umbraco-cms/stores/document/document.store";
-import { UmbNotificationDefaultData, UmbNotificationService } from "@umbraco-cms/services";
+import { UmbNotificationService } from "@umbraco-cms/services";
+import { UmbDataStoreBase } from "@umbraco-cms/stores/store";
 
-export class UmbWorkspaceContentContext<T extends DocumentDetails> extends UmbWorkspaceContext<T> {
+export abstract class UmbWorkspaceWithStoreContext<T extends DocumentDetails> extends UmbWorkspaceContext<T> {
 
 
 	protected _notificationConsumer!:UmbContextConsumer;
 	protected _notificationService?: UmbNotificationService;
 
 	protected _storeConsumer!:UmbContextConsumer;
-	protected _store!: UmbDocumentStore; // TODO: Double check its right to assume it here, at least from a type perspective?
+	protected _store!: UmbDataStoreBase<T>; // TODO: Double check its right to assume it here, at least from a type perspective?
 
 	protected _dataObserver?:Subscription;
 
@@ -30,8 +30,12 @@ export class UmbWorkspaceContentContext<T extends DocumentDetails> extends UmbWo
 		});
 
 		// TODO: consider if store alias should be configurable of manifest:
-		this._storeConsumer = new UmbContextConsumer(this._target, storeAlias, (_instance: UmbDocumentStore) => {
+		this._storeConsumer = new UmbContextConsumer(this._target, storeAlias, (_instance: UmbDataStoreBase<T>) => {
 			this._store = _instance;
+			if(!this._store) {
+				// TODO: if we keep the type assumption of _store existing, then we should here make sure to break the application in a good way.
+				return;
+			}
 			this._observeStore();
 		});
 	}
@@ -46,25 +50,22 @@ export class UmbWorkspaceContentContext<T extends DocumentDetails> extends UmbWo
 		this._storeConsumer.detach();
 	}
 
-	private _observeStore() {
-		if(!this._store) {
-			// TODO: if we keep the type assumption of _store existing, then we should here make sure to break the application in a good way.
-			return;
-		}
-		
+	protected abstract _observeStore(): void
+	/* {
 		this._dataObserver = this._store.getByKey(this.entityKey).subscribe((content) => {
 			if (!content) return; // TODO: Handle nicely if there is no content data.
 			this.update(content as any);
 		});
-	}
+	}*/
 
 
-	public getStore():UmbDocumentStore {
+	public getStore():UmbDataStoreBase<T> {
 		return this._store;
 	}
 
 
 
+	/*
 	// Document Store:
 	public save() {
 		this._store.save([this.getData()]).then(() => {
@@ -75,6 +76,7 @@ export class UmbWorkspaceContentContext<T extends DocumentDetails> extends UmbWo
 			this._notificationService?.peek('danger', { data });
 		});
 	}
+	*/
 
 
 

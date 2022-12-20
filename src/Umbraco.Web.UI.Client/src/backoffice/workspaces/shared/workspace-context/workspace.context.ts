@@ -1,7 +1,7 @@
 import { BehaviorSubject, Observable } from "rxjs";
 
 
-export class UmbWorkspaceContext<DataType> {
+export abstract class UmbWorkspaceContext<DataType> {
 
 
 	protected _target!:HTMLElement;

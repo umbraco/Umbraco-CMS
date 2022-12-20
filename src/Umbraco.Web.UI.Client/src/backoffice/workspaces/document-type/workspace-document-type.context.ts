@@ -1,7 +1,7 @@
-import { UmbWorkspaceWithStoreContext } from "../shared/workspace-context/workspace-with-store.context";
+import { UmbWorkspaceContext } from "../shared/workspace-context/workspace.context";
 import type { DocumentDetails } from "@umbraco-cms/models";
 
-const DefaultDocumentData = ({
+const DefaultDocumentTypeData = ({
 	key: '',
 	name: '',
 	icon: '',
@@ -31,10 +31,10 @@ const DefaultDocumentData = ({
 }) as DocumentDetails;
 
 
-export class UmbWorkspaceDocumentContext extends UmbWorkspaceWithStoreContext<DocumentDetails> {
+export class UmbWorkspaceDocumentContext extends UmbWorkspaceContext<DocumentDetails> {
 
 	constructor(target:HTMLElement, entityType: string, entityKey: string) {
-		super(target, DefaultDocumentData, 'umbDocumentStore', entityType, entityKey);
+		super(target, DefaultDocumentTypeData);
 	}
 
 }
