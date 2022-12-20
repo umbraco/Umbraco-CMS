@@ -37,24 +37,4 @@ internal class MultipleTextStringConfigurationEditor : ConfigurationEditor<Multi
             PropertyName = nameof(MultipleTextStringConfiguration.Max),
         });
     }
-
-    public override IDictionary<string, object> FromDatabase(string? configuration, IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
-    {
-        IDictionary<string, object> config = base.FromDatabase(configuration, configurationEditorJsonSerializer);
-
-        // translate legacy configs ("Minimum", "Maximum") to current format ("min", "max")
-        if (config.TryGetValue("Minimum", out var minimum))
-        {
-            config[nameof(MultipleTextStringConfiguration.Min).ToFirstLowerInvariant()] = minimum;
-            config.Remove("Minimum");
-        }
-
-        if (config.TryGetValue("Maximum", out var maximum))
-        {
-            config[nameof(MultipleTextStringConfiguration.Max).ToFirstLowerInvariant()] = maximum;
-            config.Remove("Maximum");
-        }
-
-        return config;
-    }
 }
