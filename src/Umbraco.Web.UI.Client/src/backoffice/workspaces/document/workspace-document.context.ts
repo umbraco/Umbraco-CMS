@@ -1,9 +1,5 @@
-import { Subscription } from "rxjs";
 import { UmbWorkspaceContentContext } from "../shared/workspace-content/workspace-content.context";
-import { UmbContextConsumer } from "@umbraco-cms/context-api";
 import type { DocumentDetails } from "@umbraco-cms/models";
-import { UmbDocumentStore } from "@umbraco-cms/stores/document/document.store";
-import { UmbNotificationService } from "@umbraco-cms/services";
 
 const DefaultDocumentData = ({
 	key: '',
