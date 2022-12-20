@@ -64,6 +64,7 @@ export class UmbWorkspaceContentElement extends UmbContextProviderMixin(
 		`,
 	];
 
+	// TODO: is this used for anything?
 	@property()
 	alias!: string;
 
