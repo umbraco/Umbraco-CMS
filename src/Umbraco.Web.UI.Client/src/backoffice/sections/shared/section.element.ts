@@ -2,6 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { map, switchMap, EMPTY, of } from 'rxjs';
+import type { UmbWorkspaceElement } from 'src/backoffice/workspaces/shared/workspace/workspace.element';
 import { UmbSectionContext } from './section.context';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
@@ -11,7 +12,6 @@ import type { ManifestTree, ManifestSectionView, ManifestWorkspace } from '@umbr
 import './section-trees/section-trees.element.ts';
 import '../shared/section-views/section-views.element.ts';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-import type { UmbWorkspaceElement } from 'src/backoffice/workspaces/shared/workspace/workspace.element';
 
 
 @customElement('umb-section')
@@ -45,13 +45,12 @@ export class UmbSectionElement extends UmbContextConsumerMixin(UmbObserverMixin(
 	private _views: Array<ManifestSectionView> = [];
 
 	private _sectionContext?: UmbSectionContext;
-	private _sectionAlias?:string;
 
 	constructor() {
 		super();
 
-		this.consumeAllContexts(['umbSectionContext'], (instances) => {
-			this._sectionContext = instances['umbSectionContext'];
+		this.consumeContext('umbSectionContext', (instance) => {
+			this._sectionContext = instance;
 
 			this._observeTrees();
 			this._observeViews();
@@ -65,7 +64,6 @@ export class UmbSectionElement extends UmbContextConsumerMixin(UmbObserverMixin(
 			this._sectionContext?.data.pipe(
 				switchMap((section) => {
 					if (!section) return EMPTY;
-					this._sectionAlias = section.alias;
 					return (
 						umbExtensionsRegistry
 							?.extensionsOfType('tree')
