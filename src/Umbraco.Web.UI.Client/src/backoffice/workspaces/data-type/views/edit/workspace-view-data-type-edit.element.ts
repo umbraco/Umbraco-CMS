@@ -2,7 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbModalService } from '../../../../../core/services/modal';
-import { UmbDataTypeContext } from '../../data-type.context';
+import { UmbWorkspaceDataTypeContext } from '../../workspace-data-type.context';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { ManifestPropertyEditorUI, DataTypeDetails } from '@umbraco-cms/models';
@@ -10,7 +10,6 @@ import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
 import '../../../../property-editor-uis/shared/property-editor-config/property-editor-config.element';
 import '../../../../components/ref-property-editor-ui/ref-property-editor-ui.element';
-import { UmbWorkspaceDataTypeContext } from '../../workspace-data-type.context';
 
 @customElement('umb-workspace-view-data-type-edit')
 export class UmbWorkspaceViewDataTypeEditElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
