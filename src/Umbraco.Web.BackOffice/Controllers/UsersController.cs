@@ -807,6 +807,10 @@ public class UsersController : BackOfficeNotificationsController
         {
             _userService.Save(users);
         }
+        else
+        {
+            return Ok(new DisabledUsersModel());
+        }
 
         var disabledUsersModel = new DisabledUsersModel
         {
