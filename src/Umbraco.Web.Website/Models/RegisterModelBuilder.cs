@@ -56,6 +56,7 @@ public class RegisterModelBuilder : MemberModelBuilderBase
 
         var model = new RegisterModel
         {
+            RedirectUrl = _redirectUrl,
             MemberTypeAlias = providedOrDefaultMemberTypeAlias,
             UsernameIsEmail = _usernameIsEmail,
             MemberProperties = _lookupProperties
