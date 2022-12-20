@@ -5,7 +5,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UmbModalLayoutElement } from '../modal-layout.element';
 
-import icons from 'public-assets/icons/icons.json';
+import icons from '../../../../../../public-assets/icons/icons.json';
 
 import '@umbraco-ui/uui-color-swatch';
 import '@umbraco-ui/uui-color-swatches';
