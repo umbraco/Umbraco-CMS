@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Tests.Integration.Testing;
 /// </summary>
 public class LocalDbTestDatabaseConfiguration : ITestDatabaseConfiguration
 {
-    public const string InstanceName = "UmbracoTests";
+    public const string InstanceName = "UmbracoIntegrationTest";
     public const string DatabaseName = "UmbracoTests";
     private static LocalDb.Instance s_localDbInstance;
     private static string s_filesPath;
@@ -44,16 +44,17 @@ public class LocalDbTestDatabaseConfiguration : ITestDatabaseConfiguration
             throw new Exception("Failed to create a LocalDb instance.");
         }
 
+        // It looks wierd that we call this twice, but its the only way to get the database after it has been created.
         s_localDbInstance = _localDb.GetInstance(InstanceName);
+
     }
 
     public ConnectionStrings InitializeConfiguration()
     {
-        var tempName = Guid.NewGuid().ToString("N");
-        s_localDbInstance.CreateDatabase(tempName, s_filesPath);
+        s_localDbInstance.CreateDatabase(DatabaseName, s_filesPath);
         var connectionStrings = new ConnectionStrings
         {
-            ConnectionString = s_localDbInstance.GetConnectionString(InstanceName, tempName),
+            ConnectionString = s_localDbInstance.GetConnectionString(InstanceName, DatabaseName),
             ProviderName = "Microsoft.Data.SqlClient",
         };
 
@@ -71,17 +72,16 @@ public class LocalDbTestDatabaseConfiguration : ITestDatabaseConfiguration
             return;
         }
 
-        var filename = Path.Combine(s_filesPath, DatabaseName).ToUpper();
-
         Parallel.ForEach(s_localDbInstance.GetDatabases(), instance =>
         {
-            if (instance.StartsWith(filename))
+            if (instance.StartsWith(DatabaseName))
             {
                 s_localDbInstance.DropDatabase(instance);
             }
         });
 
         _localDb.StopInstance(InstanceName);
+        _localDb.DropInstance(InstanceName);
 
         foreach (var file in Directory.EnumerateFiles(s_filesPath))
         {
