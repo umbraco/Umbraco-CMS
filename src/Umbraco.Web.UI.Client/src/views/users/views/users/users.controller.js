@@ -334,8 +334,7 @@
             vm.disableUserButtonState = "busy";
             usersResource.disableUsers(vm.selection).then(function (data) {
                 // update userState
-
-                data.forEach(function (userId) {
+                data.disabledUserIds.forEach(function (userId) {
                     var user = getUserFromArrayById(userId, vm.users);
                     if (user) {
                         user.userState = "Disabled";
