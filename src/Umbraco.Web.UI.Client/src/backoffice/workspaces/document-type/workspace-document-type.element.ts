@@ -124,7 +124,7 @@ export class UmbWorkspaceDocumentTypeElement extends UmbContextProviderMixin(
 				type: 'workspaceAction',
 				alias: 'Umb.WorkspaceAction.DocumentType.Save',
 				name: 'Save Document Type Workspace Action',
-				loader: () => import('./actions/save/workspace-action-document-type-save.element'),
+				loader: () => import('../shared/actions/save/workspace-action-node-save.element'),
 				meta: {
 					workspaces: ['Umb.Workspace.DocumentType'],
 				},

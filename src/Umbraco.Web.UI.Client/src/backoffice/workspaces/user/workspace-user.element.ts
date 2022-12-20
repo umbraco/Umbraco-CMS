@@ -161,8 +161,8 @@ export class UmbWorkspaceUserElement extends UmbContextProviderMixin(
 			{
 				type: 'workspaceAction',
 				alias: 'Umb.WorkspaceAction.User.Save',
-				name: 'WorkspaceActionUserSave',
-				loader: () => import('./actions/workspace-action-user-save.element'),
+				name: 'Save User Workspace Action',
+				loader: () => import('../shared/actions/save/workspace-action-node-save.element'),
 				meta: {
 					workspaces: ['Umb.Workspace.User'],
 				},
