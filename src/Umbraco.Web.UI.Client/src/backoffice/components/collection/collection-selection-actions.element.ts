@@ -1,9 +1,13 @@
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import { MediaDetails } from '@umbraco-cms/models';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html, LitElement } from 'lit';
+import { css, html, LitElement, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
+import type { UmbDashboardMediaManagementElement } from 'src/backoffice/dashboards/media-management/dashboard-media-management.element';
 
 @customElement('umb-collection-selection-actions')
-export class UmbCollectionSelectionActionsElement extends LitElement {
+export class UmbCollectionSelectionActionsElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -24,13 +28,40 @@ export class UmbCollectionSelectionActionsElement extends LitElement {
 	public entityType = 'media';
 
 	@state()
+	private _mediaItems: Array<MediaDetails> = [];
+
+	@state()
 	private _selection: Array<string> = [];
 
+	private _mediaContext?: UmbDashboardMediaManagementElement;
+
+	constructor() {
+		super();
+		this.consumeAllContexts(['umbMediaContext'], (instance) => {
+			this._mediaContext = instance['umbMediaContext'];
+			this._observeMediaContext();
+		});
+	}
+
+	private _observeMediaContext() {
+		if (!this._mediaContext) return;
+
+		this.observe<Array<MediaDetails>>(this._mediaContext.mediaItems, (mediaItems) => {
+			this._mediaItems = mediaItems;
+		});
+
+		this.observe<Array<string>>(this._mediaContext.selection, (selection) => {
+			this._selection = selection;
+		});
+	}
+
 	private _renderSelectionCount() {
-		return html`<div>${this._selection.length} of ${4} selected</div>`;
+		return html`<div>${this._selection.length} of ${this._mediaItems.length} selected</div>`;
 	}
 
 	render() {
+		if (this._selection.length === 0) return nothing;
+
 		return html`<uui-button label="Clear" look="secondary"></uui-button>
 			${this._renderSelectionCount()}
 			<umb-extension-slot
