@@ -9,6 +9,7 @@ import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import type { ManifestSection } from '@umbraco-cms/models';
+import { UmbSectionElement } from '@umbraco-cms/sections/shared/section.element';
 
 @defineElement('umb-backoffice-main')
 export class UmbBackofficeMain extends UmbContextProviderMixin(UmbContextConsumerMixin(UmbObserverMixin(LitElement))) {
@@ -62,7 +63,7 @@ export class UmbBackofficeMain extends UmbContextProviderMixin(UmbContextConsume
 		this._routes = this._sections.map((section) => {
 			return {
 				path: this._routePrefix + section.meta.pathname,
-				component: () => createExtensionElement(section),
+				component: () => this._getSectionElement(section),
 				setup: this._onRouteSetup,
 			};
 		});
@@ -71,6 +72,14 @@ export class UmbBackofficeMain extends UmbContextProviderMixin(UmbContextConsume
 			path: '**',
 			redirectTo: this._routePrefix + this._sections?.[0]?.meta.pathname,
 		});
+	}
+
+	private _getSectionElement(section: ManifestSection) {
+		if (!section.loader || !section.elementName || !section.js) {
+			return UmbSectionElement;
+		}
+
+		return createExtensionElement(section);
 	}
 
 	private _onRouteSetup = (_component: HTMLElement, info: IRoutingInfo) => {
