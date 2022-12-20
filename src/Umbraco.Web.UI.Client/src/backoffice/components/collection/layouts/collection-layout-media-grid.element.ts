@@ -5,7 +5,7 @@ import { repeat } from 'lit/directives/repeat.js';
 import type { MediaDetails } from '@umbraco-cms/models';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import UmbDashboardMediaManagementElement from 'src/backoffice/dashboards/media-management/dashboard-media-management.element';
+import type { UmbDashboardMediaManagementElement } from 'src/backoffice/dashboards/media-management/dashboard-media-management.element';
 
 @customElement('umb-collection-layout-media-grid')
 export class UmbCollectionLayoutMediaGridElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
@@ -72,6 +72,7 @@ export class UmbCollectionLayoutMediaGridElement extends UmbContextConsumerMixin
 	private _selection: Array<string> = [];
 
 	private _mediaContext?: UmbDashboardMediaManagementElement;
+
 	constructor() {
 		super();
 		document.addEventListener('dragenter', (e) => {
