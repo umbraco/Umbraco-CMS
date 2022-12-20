@@ -68,17 +68,12 @@ export class UmbWorkspaceContentElement extends UmbContextProviderMixin(
 	@state()
 	_content?: DocumentDetails | MediaDetails;
 
-	// TODO: remove notification service.
-	private _notificationService?: UmbNotificationService;
 	private _workspaceContext?: UmbWorkspaceDocumentContext;
 
 
 	constructor() {
 		super();
 
-		this.consumeContext('umbNotificationService', (instance) => {
-			this._notificationService = instance;
-		});
 		this.consumeContext('umbWorkspaceContext', (instance) => {
 			this._workspaceContext = instance;
 			this._observeWorkspace();
