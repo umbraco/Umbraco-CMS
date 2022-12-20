@@ -5,10 +5,10 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { repeat } from 'lit/directives/repeat.js';
 
+import { distinctUntilChanged } from 'rxjs';
 import { getTagLookAndColor } from '../../sections/users/user-extensions';
-import { UmbUserContext } from './user.context';
-import { UmbUserStore } from '@umbraco-cms/stores/user/user.store';
 
+import { UmbWorkspaceUserContext } from './workspace-user.context';
 import { UmbContextProviderMixin, UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { ManifestWorkspaceAction, UserDetails } from '@umbraco-cms/models';
 
@@ -20,8 +20,6 @@ import { UmbModalService } from '@umbraco-cms/services';
 import '../shared/workspace-entity/workspace-entity.element';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import { UmbWorkspaceUserContext } from './workspace-user.context';
-import { distinctUntilChanged } from 'rxjs';
 
 @customElement('umb-workspace-user')
 export class UmbWorkspaceUserElement extends UmbContextProviderMixin(
@@ -178,16 +176,18 @@ export class UmbWorkspaceUserElement extends UmbContextProviderMixin(
 	}
 
 	private _updateUserStatus() {
-		if (!this._user || !this._userStore) return;
+		if (!this._user || !this._workspaceContext) return;
 
 		const isDisabled = this._user.status === 'disabled';
-		isDisabled ? this._userStore.enableUsers([this._user.key]) : this._userStore.disableUsers([this._user.key]);
+		// TODO: make sure we use store /workspace right, maybe move function to workspace, or store reference to store?
+		isDisabled ? this._workspaceContext.getStore().enableUsers([this._user.key]) : this._workspaceContext.getStore().disableUsers([this._user.key]);
 	}
 
 	private _deleteUser() {
-		if (!this._user || !this._userStore) return;
+		if (!this._user || !this._workspaceContext) return;
 
-		this._userStore.deleteUsers([this._user.key]);
+		// TODO: make sure we use store /workspace right, maybe move function to workspace, or store reference to store?
+		this._workspaceContext.getStore().deleteUsers([this._user.key]);
 
 		history.pushState(null, '', 'section/users/view/users/overview');
 	}
@@ -204,7 +204,7 @@ export class UmbWorkspaceUserElement extends UmbContextProviderMixin(
 	}
 
 	private _updateProperty(propertyName: string, value: unknown) {
-		this._userContext?.update({ [propertyName]: value });
+		this._workspaceContext?.update({ [propertyName]: value });
 	}
 
 	private _renderContentStartNodes() {
@@ -319,7 +319,7 @@ export class UmbWorkspaceUserElement extends UmbContextProviderMixin(
 	}
 
 	private _renderRightColumn() {
-		if (!this._user || !this._userStore) return nothing;
+		if (!this._user || !this._workspaceContext) return nothing;
 
 		const statusLook = getTagLookAndColor(this._user.status);
 
