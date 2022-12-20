@@ -127,4 +127,13 @@ export const manifests: Array<ManifestWorkspace> = [
 			entityType: 'language-root',
 		},
 	},
+	{
+		type: 'workspace',
+		alias: 'Umb.Workspace.Dictionary',
+		name: 'Dictionary Workspace',
+		loader: () => import('./dictionary/workspace-dictionary.element'),
+		meta: {
+			entityType: 'dictionary',
+		},
+	},
 ];

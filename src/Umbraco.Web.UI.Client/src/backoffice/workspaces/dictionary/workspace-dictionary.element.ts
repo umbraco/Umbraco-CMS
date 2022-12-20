@@ -2,8 +2,8 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
-@customElement('umb-workspace-member-group')
-export class UmbWorkspaceMemberGroupElement extends LitElement {
+@customElement('umb-workspace-dictionary')
+export class UmbWorkspaceDictionaryElement extends LitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -20,17 +20,15 @@ export class UmbWorkspaceMemberGroupElement extends LitElement {
 
 	render() {
 		return html`
-			<umb-workspace-entity-layout alias="Umb.Workspace.MemberGroup"
-				>Member Group Workspace</umb-workspace-entity-layout
-			>
+			<umb-workspace-entity-layout alias="Umb.Workspace.Dictionary">Dictionary Workspace</umb-workspace-entity-layout>
 		`;
 	}
 }
 
-export default UmbWorkspaceMemberGroupElement;
+export default UmbWorkspaceDictionaryElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-workspace-member-group': UmbWorkspaceMemberGroupElement;
+		'umb-workspace-dictionary': UmbWorkspaceDictionaryElement;
 	}
 }

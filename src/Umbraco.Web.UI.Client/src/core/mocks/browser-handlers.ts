@@ -15,6 +15,7 @@ import { handlers as profilingHandlers } from './domains/performance-profiling.h
 
 import { handlers as documentHandlers } from './domains/document.handlers';
 import { handlers as mediaHandlers } from './domains/media.handlers';
+import { handlers as dictionaryHandlers } from './domains/dictionary.handlers';
 
 // treeHandlers
 import { handlers as treeDocumentHandlers } from './domains/tree-document.handlers';
@@ -49,6 +50,7 @@ const handlers = [
 	...examineManagementHandlers,
 	...modelsBuilderHandlers,
 	...profilingHandlers,
+	...dictionaryHandlers,
 ];
 
 switch (import.meta.env.VITE_UMBRACO_INSTALL_STATUS) {

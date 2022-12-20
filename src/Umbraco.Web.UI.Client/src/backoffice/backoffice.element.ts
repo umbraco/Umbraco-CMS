@@ -32,6 +32,7 @@ import { UmbUserStore } from '../core/stores/user/user.store';
 import { UmbIconStore } from '../core/stores/icon/icon.store';
 import { UmbUserGroupStore } from '../core/stores/user/user-group.store';
 import { UmbCurrentUserHistoryStore } from '../core/stores/current-user-history/current-user-history.store';
+import { UmbDictionaryStore } from '../core/stores/dictionary/dictionary.store';
 import { manifests as sectionManifests } from './sections/manifests';
 import { manifests as propertyEditorModelManifests } from './property-editor-models/manifests';
 import { manifests as propertyEditorUIManifests } from './property-editor-uis/manifests';
@@ -90,6 +91,7 @@ export class UmbBackofficeElement extends UmbContextConsumerMixin(UmbContextProv
 		this.provideContext('umbModalService', new UmbModalService());
 		this.provideContext('umbSectionStore', new UmbSectionStore());
 		this.provideContext('umbCurrentUserHistoryStore', new UmbCurrentUserHistoryStore());
+		this.provideContext('umbDictionaryStore', new UmbDictionaryStore());
 	}
 
 	private _registerExtensions(manifests: Array<ManifestTypes> | Array<ManifestTypes>) {
