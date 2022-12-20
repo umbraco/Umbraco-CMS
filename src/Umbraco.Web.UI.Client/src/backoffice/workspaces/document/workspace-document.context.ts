@@ -82,12 +82,9 @@ export class UmbWorkspaceDocumentContext extends UmbWorkspaceContext<DocumentDet
 			// TODO: if we keep the type assumption of _store existing, then we should here make sure to break the application in a good way.
 			return;
 		}
-		console.log("&&& _observeStore", this._store)
 		
 		this._dataObserver = this._store.getByKey(this.entityKey).subscribe((content) => {
 			if (!content) return; // TODO: Handle nicely if there is no content data.
-
-			console.log("got content", content)
 			this.update(content as any);
 		});
 	}
