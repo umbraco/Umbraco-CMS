@@ -1,7 +1,9 @@
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Migrations;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Migrations.Notifications;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 
@@ -36,10 +38,12 @@ public class Upgrader
     /// <param name="migrationPlanExecutor"></param>
     /// <param name="scopeProvider">A scope provider.</param>
     /// <param name="keyValueService">A key-value service.</param>
+    /// <param name="aggregator"></param>
     public ExecutedMigrationPlan Execute(
         IMigrationPlanExecutor migrationPlanExecutor,
         ICoreScopeProvider scopeProvider,
-        IKeyValueService keyValueService)
+        IKeyValueService keyValueService,
+        IEventAggregator aggregator)
     {
         if (scopeProvider == null)
         {
@@ -55,6 +59,7 @@ public class Upgrader
 
         // execute plan
         ExecutedMigrationPlan result = migrationPlanExecutor.Execute(Plan, initialState);
+
         // This should never happen, but if it does, we can't save it in the database.
         if (string.IsNullOrWhiteSpace(result.FinalState))
         {
@@ -65,8 +70,7 @@ public class Upgrader
         // So we still want to save the place we got to in the database-
         SetState(result.FinalState, scopeProvider, keyValueService);
 
-        // TODO: Publish notification.
-
+        aggregator.Publish(new UmbracoPlanExecutedNotification { ExecutedPlan = result });
         return result;
     }
 
