@@ -62,12 +62,23 @@ export const manifests: Array<ManifestSection> = [
 	{
 		type: 'section',
 		alias: 'Umb.Section.Users',
-		name: 'Users',
+		name: 'Users Section',
 		loader: () => import('./users/section-users.element'),
 		weight: 100,
 		meta: {
 			label: 'Users',
 			pathname: 'users',
+		},
+	},
+	{
+		type: 'section',
+		alias: 'Umb.Section.Translation',
+		name: 'Translation Section',
+		loader: () => import('./translation/translation-section.element'),
+		weight: 100,
+		meta: {
+			label: 'Translation',
+			pathname: 'translation',
 		},
 	},
 ];
