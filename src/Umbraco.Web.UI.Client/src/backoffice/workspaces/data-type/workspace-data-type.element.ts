@@ -4,7 +4,6 @@ import { css, html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { distinctUntilChanged } from 'rxjs';
 import { UmbDataTypeStore } from '../../../core/stores/data-type/data-type.store';
-import { UmbDataTypeContext } from './data-type.context';
 import { UmbWorkspaceDataTypeContext } from './workspace-data-type.context';
 import type { DataTypeDetails } from '@umbraco-cms/models';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
@@ -36,13 +35,6 @@ export class UmbWorkspaceDataTypeElement extends UmbContextProviderMixin(
 		`,
 	];
 
-	@state()
-	private _dataTypeName = '';
-
-	private _dataTypeContext?: UmbDataTypeContext;
-	private _dataTypeStore?: UmbDataTypeStore;
-
-
 	private _entityKey!: string;
 	@property()
 	public get entityKey(): string {
@@ -54,6 +46,10 @@ export class UmbWorkspaceDataTypeElement extends UmbContextProviderMixin(
 	}
 
 	private _workspaceContext?:UmbWorkspaceDataTypeContext;
+
+	@state()
+	private _dataTypeName = '';
+	
 
 	constructor() {
 		super();
