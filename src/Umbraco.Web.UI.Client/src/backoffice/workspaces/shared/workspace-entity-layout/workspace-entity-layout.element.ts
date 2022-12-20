@@ -45,6 +45,10 @@ export class UmbWorkspaceEntityLayout extends UmbContextConsumerMixin(UmbObserve
 				border-left: 1px solid var(--uui-color-border);
 				border-right: 1px solid var(--uui-color-border);
 			}
+
+			router-slot {
+				height: 100%;
+			}
 		`,
 	];
 
