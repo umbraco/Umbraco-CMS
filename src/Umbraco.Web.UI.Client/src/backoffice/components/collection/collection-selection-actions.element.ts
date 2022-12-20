@@ -43,6 +43,16 @@ export class UmbCollectionSelectionActionsElement extends UmbContextConsumerMixi
 		});
 	}
 
+	private _handleKeyDown(event: KeyboardEvent) {
+		if (event.key === 'Enter') {
+			this._handleClearSelection();
+		}
+	}
+
+	private _handleClearSelection() {
+		this._mediaContext?.setSelection([]);
+	}
+
 	private _observeMediaContext() {
 		if (!this._mediaContext) return;
 
@@ -62,7 +72,11 @@ export class UmbCollectionSelectionActionsElement extends UmbContextConsumerMixi
 	render() {
 		if (this._selection.length === 0) return nothing;
 
-		return html`<uui-button label="Clear" look="secondary"></uui-button>
+		return html`<uui-button
+				@click=${this._handleClearSelection}
+				@keydown=${this._handleKeyDown}
+				label="Clear"
+				look="secondary"></uui-button>
 			${this._renderSelectionCount()}
 			<umb-extension-slot
 				type="collectionBulkAction"
