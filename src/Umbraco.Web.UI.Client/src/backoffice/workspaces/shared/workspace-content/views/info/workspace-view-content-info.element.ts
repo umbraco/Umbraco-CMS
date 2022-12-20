@@ -2,7 +2,7 @@ import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { distinctUntilChanged } from 'rxjs';
-import { UmbWorkspaceContext } from '../../../workspace-context/workspace.context';
+import type { UmbWorkspaceNodeContext } from '../../../workspace-context/workspace-node.context';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { DocumentDetails, MediaDetails } from '@umbraco-cms/models';
@@ -22,7 +22,7 @@ export class UmbWorkspaceViewContentInfoElement extends UmbContextConsumerMixin(
 	@state()
 	private _nodeName = '';
 
-	private _workspaceContext?: UmbWorkspaceContext;
+	private _workspaceContext?: UmbWorkspaceNodeContext;
 
 	constructor() {
 		super();

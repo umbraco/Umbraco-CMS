@@ -6,7 +6,7 @@ import { ContentTreeItem } from "@umbraco-cms/backend-api";
 import { UmbContextConsumer } from "@umbraco-cms/context-api";
 
 // TODO: Consider if its right to have this many class-inheritance of WorkspaceContext
-export class UmbWorkspaceNodeContext<ContentTypeType extends ContentTreeItem, StoreType extends UmbNodeStoreBase<ContentTypeType>> extends UmbWorkspaceWithStoreContext<ContentTypeType, StoreType> {
+export class UmbWorkspaceNodeContext<ContentTypeType extends ContentTreeItem = ContentTreeItem, StoreType extends UmbNodeStoreBase<ContentTypeType> = UmbNodeStoreBase<ContentTypeType>> extends UmbWorkspaceWithStoreContext<ContentTypeType, StoreType> {
 
 	protected _notificationService?: UmbNotificationService;
 	protected _notificationConsumer!:UmbContextConsumer;

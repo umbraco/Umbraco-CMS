@@ -2,12 +2,12 @@ import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { distinctUntilChanged } from 'rxjs';
+import type { UmbWorkspaceNodeContext } from '../../../workspace-context/workspace-node.context';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import type { ContentProperty, ContentPropertyData, DocumentDetails, MediaDetails } from '@umbraco-cms/models';
 
 import '../../../../../components/content-property/content-property.element';
-import { UmbWorkspaceDocumentContext } from 'src/backoffice/workspaces/document/workspace-document.context';
 
 @customElement('umb-workspace-view-content-edit')
 export class UmbWorkspaceViewContentEditElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
@@ -27,7 +27,7 @@ export class UmbWorkspaceViewContentEditElement extends UmbContextConsumerMixin(
 	@state()
 	_data: ContentPropertyData[] = [];
 
-	private _workspaceContext?: UmbWorkspaceDocumentContext;
+	private _workspaceContext?: UmbWorkspaceNodeContext;
 
 	constructor() {
 		super();
