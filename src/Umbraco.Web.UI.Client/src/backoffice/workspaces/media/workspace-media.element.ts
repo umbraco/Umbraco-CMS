@@ -20,10 +20,55 @@ export class UmbWorkspaceMediaElement extends UmbContextConsumerMixin(UmbContext
 		`,
 	];
 
+	private _entityKey!: string;
+	@property()
+	public get entityKey(): string {
+		return this._entityKey;
+	}
+	public set entityKey(value: string) {
+		this._entityKey = value;
+		this._provideWorkspace();
+	}
+
+	private _entityType = '';
+	@property()
+	public get entityType(): string {
+		return this._entityType;
+	}
+	public set entityType(value: string) {
+		// TODO: Make sure that a change of the entity type actually gives extension slot a hint to change/update.
+		const oldValue = this._entityType;
+		this._entityType = value;
+		this._provideWorkspace();
+		this.requestUpdate('entityType', oldValue);
+	}
+
+	private _workspaceContext?:UmbWorkspaceMediaContext;
+
+
 	constructor() {
 		super();
 
+		// TODO: consider if registering extensions should happen initially or else where, to enable unregister of extensions.
 		this._registerWorkspaceViews();
+	}
+
+	connectedCallback(): void {
+		super.connectedCallback();
+		// TODO: avoid this connection, our own approach on Lit-Controller could be handling this case.
+		this._workspaceContext?.connectedCallback();
+	}
+	disconnectedCallback(): void {
+		super.connectedCallback()
+		// TODO: avoid this connection, our own approach on Lit-Controller could be handling this case.
+		this._workspaceContext?.disconnectedCallback();
+	}
+
+	protected _provideWorkspace() {
+		if(this._entityType && this._entityKey) {
+			this._workspaceContext = new UmbWorkspaceMediaContext(this, this._entityKey);
+			this.provideContext('umbWorkspaceContext', this._workspaceContext);
+		}
 	}
 
 	private _registerWorkspaceViews() {
