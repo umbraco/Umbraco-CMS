@@ -31,19 +31,6 @@ export class UmbWorkspaceMediaElement extends UmbContextConsumerMixin(UmbContext
 		this._provideWorkspace();
 	}
 
-	private _entityType = '';
-	@property()
-	public get entityType(): string {
-		return this._entityType;
-	}
-	public set entityType(value: string) {
-		// TODO: Make sure that a change of the entity type actually gives extension slot a hint to change/update.
-		const oldValue = this._entityType;
-		this._entityType = value;
-		this._provideWorkspace();
-		this.requestUpdate('entityType', oldValue);
-	}
-
 	private _workspaceContext?:UmbWorkspaceMediaContext;
 
 
@@ -66,7 +53,7 @@ export class UmbWorkspaceMediaElement extends UmbContextConsumerMixin(UmbContext
 	}
 
 	protected _provideWorkspace() {
-		if(this._entityType && this._entityKey) {
+		if(this._entityKey) {
 			this._workspaceContext = new UmbWorkspaceMediaContext(this, this._entityKey);
 			this.provideContext('umbWorkspaceContext', this._workspaceContext);
 		}
