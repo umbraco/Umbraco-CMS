@@ -146,7 +146,7 @@ export class UmbCollectionToolbarElement extends UmbObserverMixin(LitElement) {
 					<uui-icon .name=${this._currentLayout.meta.icon}></uui-icon>
 				</uui-button>
 				<umb-tooltip-menu
-					icon
+					icon-only
 					slot="popover"
 					.items=${this._layouts.map((layout) => ({
 						label: layout.meta.label,

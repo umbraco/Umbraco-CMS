@@ -45,8 +45,8 @@ export class UmbTooltipMenuElement extends LitElement {
 		`,
 	];
 
-	@property({ type: Boolean, reflect: true })
-	public icon = false;
+	@property({ type: Boolean, reflect: true, attribute: 'icon-only' })
+	public iconOnly = false;
 
 	@property()
 	public items: Array<TooltipMenuItem> = [];
@@ -62,7 +62,7 @@ export class UmbTooltipMenuElement extends LitElement {
 	}
 
 	private _renderItem(item: TooltipMenuItem) {
-		if (this.icon && item.icon) {
+		if (this.iconOnly && item.icon) {
 			return html`<div
 				@click=${() => this._handleItemClick(item)}
 				@keydown=${(e: KeyboardEvent) => this._handleItemKeyDown(e, item)}
@@ -74,9 +74,9 @@ export class UmbTooltipMenuElement extends LitElement {
 		return html`<div
 			@click=${() => this._handleItemClick(item)}
 			@keydown=${(e: KeyboardEvent) => this._handleItemKeyDown(e, item)}
-			class="item ${this.icon ? 'icon' : 'label'}">
+			class="item ${this.iconOnly ? 'icon' : 'label'}">
 			${item.icon ? html`<uui-icon .name=${item.icon}></uui-icon>` : nothing}
-			${!this.icon ? html`<span>${item.label}</span>` : nothing}
+			${!this.iconOnly ? html`<span>${item.label}</span>` : nothing}
 		</div>`;
 	}
 
