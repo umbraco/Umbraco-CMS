@@ -56,6 +56,14 @@ export class UmbUserGroupStore extends UmbDataStoreBase<UmbUserGroupStoreItemTyp
 
 	async save(userGroups: Array<UmbUserGroupStoreItemType>): Promise<void> {
 		// TODO: use Fetcher API.
+
+		// TODO: implement so user group store updates the 
+		/*
+		if (this._userStore && userGroup.users) {
+			await this._userStore.updateUserGroup(userGroup.users, userGroup.key);
+		}
+		*/
+
 		try {
 			const res = await fetch('/umbraco/backoffice/user-groups/save', {
 				method: 'POST',
