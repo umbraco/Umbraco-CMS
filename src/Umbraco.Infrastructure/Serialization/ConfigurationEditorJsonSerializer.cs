@@ -58,7 +58,8 @@ public class ConfigurationEditorJsonSerializer : JsonNetSerializer, IConfigurati
 //             PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase,
 //             // in some cases, configs aren't camel cased in the DB, so we have to resort to case insensitive
 //             // property name resolving when creating configuration objects (deserializing DB configs)
-//             PropertyNameCaseInsensitive = true
+//             PropertyNameCaseInsensitive = true,
+//             NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowReadingFromString
 //         };
 //         _jsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
 //     }
