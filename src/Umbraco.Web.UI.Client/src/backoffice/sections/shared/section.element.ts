@@ -2,7 +2,6 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { map, switchMap, EMPTY, of } from 'rxjs';
-import type { UmbWorkspaceElement } from 'src/backoffice/workspaces/shared/workspace/workspace.element';
 import { UmbSectionContext } from './section.context';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
@@ -96,23 +95,16 @@ export class UmbSectionElement extends UmbContextConsumerMixin(UmbObserverMixin(
 			routes.push({
 				path: `${workspace.meta.entityType}/:key`,
 				component: () => createExtensionElement(workspace),
-				setup: (component: Promise<UmbWorkspaceElement>, info: any) => {
-					component.then((el: UmbWorkspaceElement) => {
-						el.entityKey = info.match.params.key;
-						el.entityType = workspace.meta.entityType;
+				setup: (component: Promise<HTMLElement>, info: any) => {
+					component.then((el: HTMLElement) => {
+						(el as any).entityKey = info.match.params.key;
 					})
 					
 				},
 			})
 			routes.push({
 				path: workspace.meta.entityType,
-				component: () => createExtensionElement(workspace),
-				setup: (component: Promise<UmbWorkspaceElement>) => {
-					component.then((el: UmbWorkspaceElement) => {
-						el.entityType = workspace.meta.entityType;
-					})
-					
-				},
+				component: () => createExtensionElement(workspace)
 			})
 		});
 
