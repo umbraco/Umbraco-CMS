@@ -1,11 +1,11 @@
 import { Subscription } from "rxjs";
 import { UmbWorkspaceContext } from "./workspace.context";
 import { UmbContextConsumer } from "@umbraco-cms/context-api";
-import type { DocumentDetails } from "@umbraco-cms/models";
 import { UmbNotificationService } from "@umbraco-cms/services";
 import { UmbDataStoreBase } from "@umbraco-cms/stores/store";
+import { ContentTreeItem } from "@umbraco-cms/backend-api";
 
-export abstract class UmbWorkspaceWithStoreContext<DataType extends DocumentDetails, StoreType extends UmbDataStoreBase<DataType>> extends UmbWorkspaceContext<DataType> {
+export abstract class UmbWorkspaceWithStoreContext<DataType extends ContentTreeItem, StoreType extends UmbDataStoreBase<DataType>> extends UmbWorkspaceContext<DataType> {
 
 
 	protected _notificationConsumer!:UmbContextConsumer;
@@ -30,7 +30,7 @@ export abstract class UmbWorkspaceWithStoreContext<DataType extends DocumentDeta
 		});
 
 		// TODO: consider if store alias should be configurable of manifest:
-		this._storeConsumer = new UmbContextConsumer(this._target, storeAlias, (_instance: UmbDataStoreBase<DataType>) => {
+		this._storeConsumer = new UmbContextConsumer(this._target, storeAlias, (_instance: StoreType) => {
 			this._store = _instance;
 			if(!this._store) {
 				// TODO: if we keep the type assumption of _store existing, then we should here make sure to break the application in a good way.
@@ -59,7 +59,7 @@ export abstract class UmbWorkspaceWithStoreContext<DataType extends DocumentDeta
 	}*/
 
 
-	public getStore():UmbDataStoreBase<DataType> {
+	public getStore():StoreType {
 		return this._store;
 	}
 

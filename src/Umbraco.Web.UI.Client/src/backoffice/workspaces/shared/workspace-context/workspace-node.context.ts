@@ -1,10 +1,10 @@
 
 import { UmbWorkspaceWithStoreContext } from "./workspace-with-store.context";
-import type { DocumentDetails } from "@umbraco-cms/models";
 import { UmbNodeStoreBase } from "@umbraco-cms/stores/store";
 import { UmbNotificationDefaultData } from "@umbraco-cms/services";
+import { ContentTreeItem } from "@umbraco-cms/backend-api";
 
-export class UmbWorkspaceContentContext<ContentTypeType extends DocumentDetails, StoreType extends UmbNodeStoreBase<ContentTypeType>> extends UmbWorkspaceWithStoreContext<ContentTypeType, StoreType> {
+export class UmbWorkspaceNodeContext<ContentTypeType extends ContentTreeItem, StoreType extends UmbNodeStoreBase<ContentTypeType>> extends UmbWorkspaceWithStoreContext<ContentTypeType, StoreType> {
 
 	constructor(target:HTMLElement, defaultData:ContentTypeType, storeAlias:string, entityType: string, entityKey: string) {
 		super(target, defaultData, storeAlias, entityType, entityKey);
