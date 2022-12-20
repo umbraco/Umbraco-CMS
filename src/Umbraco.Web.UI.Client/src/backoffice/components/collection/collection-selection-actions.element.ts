@@ -1,9 +1,9 @@
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-import { MediaDetails } from '@umbraco-cms/models';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, LitElement, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import type { MediaDetails } from '@umbraco-cms/models';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import type { UmbDashboardMediaManagementElement } from 'src/backoffice/dashboards/media-management/dashboard-media-management.element';
 
 @customElement('umb-collection-selection-actions')

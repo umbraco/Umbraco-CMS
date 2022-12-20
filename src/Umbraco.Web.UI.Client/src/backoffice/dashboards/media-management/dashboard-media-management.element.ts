@@ -89,7 +89,7 @@ export class UmbDashboardMediaManagementElement extends UmbContextProviderMixin(
 	}
 
 	render() {
-		return html` <umb-collection-view-media></umb-collection-view-media> `;
+		return html`<umb-collection-view-media></umb-collection-view-media>`;
 	}
 }
 

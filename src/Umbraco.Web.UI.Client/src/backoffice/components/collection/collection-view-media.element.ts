@@ -1,6 +1,6 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, LitElement, nothing } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import { customElement, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
 import '../../components/collection/collection-selection-actions.element';
 import '../../components/collection/collection-toolbar.element';
