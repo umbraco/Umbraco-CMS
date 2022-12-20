@@ -73,3 +73,23 @@ export abstract class UmbDataStoreBase<T extends UmbDataStoreIdentifiers> implem
 		this._items.next([...storedItems]);
 	}
 }
+
+
+/**
+ * @export
+ * @class UmbContentStoreBase
+ * @implements {UmbDataStore<T>}
+ * @template T
+ * @description - Base class for Data Stores
+ */
+export abstract class UmbContentStoreBase<T extends UmbDataStoreIdentifiers> extends UmbDataStoreBase<T> {
+	
+	/**
+	 * @description - Save data.
+	 * @param {object} data
+	 * @return {*}  {(Promise<void>)}
+	 * @memberof UmbContentStoreBase
+	 */
+	abstract save(data: T[]): Promise<void>
+
+}

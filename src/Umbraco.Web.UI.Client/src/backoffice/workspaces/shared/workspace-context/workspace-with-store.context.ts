@@ -5,14 +5,14 @@ import type { DocumentDetails } from "@umbraco-cms/models";
 import { UmbNotificationService } from "@umbraco-cms/services";
 import { UmbDataStoreBase } from "@umbraco-cms/stores/store";
 
-export abstract class UmbWorkspaceWithStoreContext<T extends DocumentDetails> extends UmbWorkspaceContext<T> {
+export abstract class UmbWorkspaceWithStoreContext<DataType extends DocumentDetails, StoreType extends UmbDataStoreBase<DataType>> extends UmbWorkspaceContext<DataType> {
 
 
 	protected _notificationConsumer!:UmbContextConsumer;
 	protected _notificationService?: UmbNotificationService;
 
 	protected _storeConsumer!:UmbContextConsumer;
-	protected _store!: UmbDataStoreBase<T>; // TODO: Double check its right to assume it here, at least from a type perspective?
+	protected _store!: StoreType; // TODO: Double check its right to assume it here, at least from a type perspective?
 
 	protected _dataObserver?:Subscription;
 
@@ -20,7 +20,7 @@ export abstract class UmbWorkspaceWithStoreContext<T extends DocumentDetails> ex
 	public entityKey:string;
 
 
-	constructor(target:HTMLElement, defaultData:T, storeAlias:string, entityType: string, entityKey: string) {
+	constructor(target:HTMLElement, defaultData:DataType, storeAlias:string, entityType: string, entityKey: string) {
 		super(target, defaultData)
 		this.entityType = entityType;
 		this.entityKey = entityKey;
@@ -30,7 +30,7 @@ export abstract class UmbWorkspaceWithStoreContext<T extends DocumentDetails> ex
 		});
 
 		// TODO: consider if store alias should be configurable of manifest:
-		this._storeConsumer = new UmbContextConsumer(this._target, storeAlias, (_instance: UmbDataStoreBase<T>) => {
+		this._storeConsumer = new UmbContextConsumer(this._target, storeAlias, (_instance: UmbDataStoreBase<DataType>) => {
 			this._store = _instance;
 			if(!this._store) {
 				// TODO: if we keep the type assumption of _store existing, then we should here make sure to break the application in a good way.
@@ -59,7 +59,7 @@ export abstract class UmbWorkspaceWithStoreContext<T extends DocumentDetails> ex
 	}*/
 
 
-	public getStore():UmbDataStoreBase<T> {
+	public getStore():UmbDataStoreBase<DataType> {
 		return this._store;
 	}
 

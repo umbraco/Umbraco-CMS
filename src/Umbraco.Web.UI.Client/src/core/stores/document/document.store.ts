@@ -1,5 +1,5 @@
 import { map, Observable } from 'rxjs';
-import { UmbDataStoreBase } from '../store';
+import { UmbContentStoreBase } from '../store';
 import type { DocumentDetails } from '@umbraco-cms/models';
 import { ApiError, DocumentResource, DocumentTreeItem, FolderTreeItem, ProblemDetails } from '@umbraco-cms/backend-api';
 
@@ -13,7 +13,7 @@ const isDocumentDetails = (document: DocumentDetails | DocumentTreeItem): docume
  * @extends {UmbDocumentStoreBase<DocumentDetails | DocumentTreeItem>}
  * @description - Data Store for Documents
  */
-export class UmbDocumentStore extends UmbDataStoreBase<DocumentDetails | DocumentTreeItem> {
+export class UmbDocumentStore extends UmbContentStoreBase<DocumentDetails | DocumentTreeItem> {
 	getByKey(key: string): Observable<DocumentDetails | null> {
 		// TODO: use backend cli when available.
 		fetch(`/umbraco/management/api/v1/document/details/${key}`)
