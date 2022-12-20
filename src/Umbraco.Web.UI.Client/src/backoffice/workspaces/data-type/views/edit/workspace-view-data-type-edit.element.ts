@@ -47,8 +47,8 @@ export class UmbWorkspaceViewDataTypeEditElement extends UmbContextConsumerMixin
 	constructor() {
 		super();
 
-		this.consumeAllContexts(['umbDataTypeContext', 'umbModalService'], (result) => {
-			this._workspaceContext = result['umbDataTypeContext'];
+		this.consumeAllContexts(['umbWorkspaceContext', 'umbModalService'], (result) => {
+			this._workspaceContext = result['umbWorkspaceContext'];
 			this._modalService = result['umbModalService'];
 			this._observeDataType();
 		});
