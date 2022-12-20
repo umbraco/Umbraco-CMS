@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Persistence.SqlServer;
+using Umbraco.Cms.Tests.Integration.Implementations;
 
 namespace Umbraco.Cms.Tests.Integration.Testing;
 
@@ -20,6 +21,7 @@ public class LocalDbTestDatabaseConfiguration : ITestDatabaseConfiguration
     private readonly LocalDb _localDb;
     private readonly IUmbracoDatabaseFactory _databaseFactory;
     private readonly IOptionsMonitor<ConnectionStrings> _connectionStrings;
+    private TestHelper _testHelper = new ();
 
     private readonly TestDatabaseSettings _settings;
 
@@ -29,9 +31,14 @@ public class LocalDbTestDatabaseConfiguration : ITestDatabaseConfiguration
         _localDb = localDb;
         _databaseFactory = databaseFactory;
         _connectionStrings = connectionStrings;
-        string? projectDirectory = Directory.GetParent(Environment.CurrentDirectory)?.Parent?.Parent?.FullName;
-        string tempFolder = @"TEMP\databases";
-        s_filesPath = Path.Combine(projectDirectory!, tempFolder);
+        // string? projectDirectory = Directory.GetParent(Environment.CurrentDirectory)?.Parent?.Parent?.FullName;
+        // string tempFolder = @"TEMP\databases";
+        s_filesPath = Path.Combine(_testHelper.WorkingDirectory, "databases");
+
+        if (!Directory.Exists(s_filesPath))
+        {
+            Directory.CreateDirectory(s_filesPath);
+        }
 
         s_localDbInstance = _localDb.GetInstance(InstanceName);
         if (s_localDbInstance != null)
@@ -57,6 +64,7 @@ public class LocalDbTestDatabaseConfiguration : ITestDatabaseConfiguration
             ConnectionString = s_localDbInstance.GetConnectionString(InstanceName, DatabaseName),
             ProviderName = "Microsoft.Data.SqlClient",
         };
+        connectionStrings.ConnectionString += ";TrustServerCertificate=true;";
 
         _connectionStrings.CurrentValue.ConnectionString = connectionStrings.ConnectionString;
         _connectionStrings.CurrentValue.ProviderName = connectionStrings.ProviderName;
