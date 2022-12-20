@@ -3,8 +3,7 @@ import { css, html, LitElement, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import { distinctUntilChanged } from 'rxjs';
-import type { UmbNotificationService } from '../../../../core/services/notification';
-import { UmbWorkspaceDocumentContext } from '../../document/workspace-document.context';
+import type { UmbWorkspaceNodeContext } from '../workspace-context/workspace-node.context';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import type { DocumentDetails, MediaDetails } from '@umbraco-cms/models';
@@ -15,6 +14,9 @@ import '../workspace-entity/workspace-entity.element';
 // TODO: Make this dynamic, use load-extensions method to loop over extensions for this node.
 import './views/edit/workspace-view-content-edit.element';
 import './views/info/workspace-view-content-info.element';
+import type { UmbNodeStoreBase } from '@umbraco-cms/stores/store';
+
+type ContentTypeType = DocumentDetails | MediaDetails;
 
 @customElement('umb-workspace-content')
 export class UmbWorkspaceContentElement extends UmbContextProviderMixin(
@@ -68,7 +70,7 @@ export class UmbWorkspaceContentElement extends UmbContextProviderMixin(
 	@state()
 	_content?: DocumentDetails | MediaDetails;
 
-	private _workspaceContext?: UmbWorkspaceDocumentContext;
+	private _workspaceContext?: UmbWorkspaceNodeContext<ContentTypeType, UmbNodeStoreBase<ContentTypeType>>;
 
 
 	constructor() {
@@ -86,7 +88,7 @@ export class UmbWorkspaceContentElement extends UmbContextProviderMixin(
 	private async _observeWorkspace() {
 		if (!this._workspaceContext) return;
 
-		this.observe<DocumentDetails | MediaDetails>(this._workspaceContext.data.pipe(distinctUntilChanged()), (data) => {
+		this.observe<ContentTypeType>(this._workspaceContext.data.pipe(distinctUntilChanged()), (data) => {
 			this._content = data;
 		});
 	}
