@@ -4,7 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import { distinctUntilChanged } from 'rxjs';
 import type { UmbNotificationService } from '../../../../core/services/notification';
-import { UmbNotificationDefaultData } from '../../../../core/services/notification/layouts/default';
+import { UmbWorkspaceDocumentContext } from '../../document/workspace-document.context';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import type { DocumentDetails, MediaDetails } from '@umbraco-cms/models';
@@ -15,7 +15,6 @@ import '../workspace-entity/workspace-entity.element';
 // TODO: Make this dynamic, use load-extensions method to loop over extensions for this node.
 import './views/edit/workspace-view-content-edit.element';
 import './views/info/workspace-view-content-info.element';
-import { UmbWorkspaceDocumentContext } from '../../document/workspace-document.context';
 
 @customElement('umb-workspace-content')
 export class UmbWorkspaceContentElement extends UmbContextProviderMixin(
