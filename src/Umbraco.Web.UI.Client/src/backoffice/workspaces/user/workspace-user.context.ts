@@ -20,7 +20,7 @@ const DefaultDataTypeData = ({
 	mediaStartNodes: [],
 }) as UmbUserStoreItemType;
 
-export class UmbWorkspaceDataTypeContext extends UmbWorkspaceNodeContext<UmbUserStoreItemType, UmbUserStore> {
+export class UmbWorkspaceUserContext extends UmbWorkspaceNodeContext<UmbUserStoreItemType, UmbUserStore> {
 
 	constructor(target:HTMLElement, entityKey: string) {
 		super(target, DefaultDataTypeData, 'umbUserStore', entityKey);

@@ -20,6 +20,8 @@ import { UmbModalService } from '@umbraco-cms/services';
 import '../shared/workspace-entity/workspace-entity.element';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
+import { UmbWorkspaceUserContext } from './workspace-user.context';
+import { distinctUntilChanged } from 'rxjs';
 
 @customElement('umb-workspace-user')
 export class UmbWorkspaceUserElement extends UmbContextProviderMixin(
@@ -84,74 +86,77 @@ export class UmbWorkspaceUserElement extends UmbContextProviderMixin(
 		`,
 	];
 
-	@state()
-	private _user?: UserDetails | null;
 
 	@state()
 	private _currentUser?: UserDetails | null;
 
-	@state()
-	private _userName = '';
-
-	@property({ type: String })
-	entityKey = '';
-
-	private _userStore?: UmbUserStore;
-	private _userContext?: UmbUserContext;
 	private _modalService?: UmbModalService;
 
 	private _languages = []; //TODO Add languages
 
+
+	private _entityKey!: string;
+	@property()
+	public get entityKey(): string {
+		return this._entityKey;
+	}
+	public set entityKey(value: string) {
+		this._entityKey = value;
+		this._provideWorkspace();
+	}
+
+	private _workspaceContext?:UmbWorkspaceUserContext;
+
+	@state()
+	private _user?: UserDetails | null;
+
+	@state()
+	private _userName = '';
+
 	constructor() {
 		super();
-
-		this.consumeAllContexts(['umbUserStore', 'umbModalService'], (instances) => {
-			this._userStore = instances['umbUserStore'];
-			this._modalService = instances['umbModalService'];
-
-			this._observeUser();
-		});
 
 		this._observeCurrentUser();
 		this._registerWorkspaceActions();
 	}
 
-	private async _observeCurrentUser() {
-		if (!this._userStore) return;
+	connectedCallback(): void {
+		super.connectedCallback();
+		// TODO: avoid this connection, our own approach on Lit-Controller could be handling this case.
+		this._workspaceContext?.connectedCallback();
+	}
+	disconnectedCallback(): void {
+		super.connectedCallback()
+		// TODO: avoid this connection, our own approach on Lit-Controller could be handling this case.
+		this._workspaceContext?.disconnectedCallback();
+	}
 
+	protected _provideWorkspace() {
+		if(this._entityKey) {
+			this._workspaceContext = new UmbWorkspaceUserContext(this, this._entityKey);
+			this.provideContext('umbWorkspaceContext', this._workspaceContext);
+			this._observeUser()
+		}
+	}
+
+	private async _observeCurrentUser() {
+		// TODO: do not have static current user service, we need to make a ContextAPI for this.
 		this.observe<UserDetails>(umbCurrentUserService.currentUser, (currentUser) => {
 			this._currentUser = currentUser;
 		});
 	}
 
 	private async _observeUser() {
-		if (!this._userStore) return;
+		if (!this._workspaceContext) return;
 
-		this.observe<UserDetails>(this._userStore.getByKey(this.entityKey), (user) => {
+		this.observe<UserDetails>(this._workspaceContext.data.pipe(distinctUntilChanged()), (user) => {
+			if (!user) return;
 			this._user = user;
-			if (!this._user) return;
-
-			if (!this._userContext) {
-				this._userContext = new UmbUserContext(this._user);
-				this.provideContext('umbUserContext', this._userContext);
-			} else {
-				this._userContext.update(this._user);
-			}
-
-			this._observeUserName();
-		});
-	}
-
-	private _observeUserName() {
-		if (!this._userContext) return;
-
-		this.observe(this._userContext.data, (user) => {
 			if (user.name !== this._userName) {
 				this._userName = user.name;
 			}
 		});
 	}
-
 
 	private _registerWorkspaceActions() {
 		const manifests: Array<ManifestWorkspaceAction> = [
