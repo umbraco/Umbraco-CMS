@@ -1,10 +1,10 @@
 import type { ManifestTree, ManifestTreeItemAction } from '@umbraco-cms/models';
 
-const dataTypeTreeAlias = 'Umb.Tree.DataTypes';
+const treeAlias = 'Umb.Tree.DataTypes';
 
 const tree: ManifestTree = {
 	type: 'tree',
-	alias: dataTypeTreeAlias,
+	alias: treeAlias,
 	name: 'Data Types Tree',
 	weight: 100,
 	meta: {
@@ -23,7 +23,7 @@ const treeItemActions: Array<ManifestTreeItemAction> = [
 		loader: () => import('./actions/create/action-data-type-create.element'),
 		weight: 200,
 		meta: {
-			trees: [dataTypeTreeAlias],
+			trees: [treeAlias],
 			label: 'Create',
 			icon: 'umb:add',
 		},
@@ -35,7 +35,7 @@ const treeItemActions: Array<ManifestTreeItemAction> = [
 		loader: () => import('./actions/delete/action-data-type-delete.element'),
 		weight: 100,
 		meta: {
-			trees: [dataTypeTreeAlias],
+			trees: [treeAlias],
 			label: 'Delete',
 			icon: 'umb:delete',
 		},

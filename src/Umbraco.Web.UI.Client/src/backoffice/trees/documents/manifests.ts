@@ -1,10 +1,10 @@
 import type { ManifestTree, ManifestTreeItemAction } from '@umbraco-cms/models';
 
-const documentTreeAlias = 'Umb.Tree.Documents';
+const treeAlias = 'Umb.Tree.Documents';
 
 const tree: ManifestTree = {
 	type: 'tree',
-	alias: documentTreeAlias,
+	alias: treeAlias,
 	name: 'Documents Tree',
 	weight: 100,
 	meta: {
@@ -23,7 +23,7 @@ const treeItemActions: Array<ManifestTreeItemAction> = [
 		loader: () => import('./actions/action-document-create.element'),
 		weight: 100,
 		meta: {
-			trees: [documentTreeAlias],
+			trees: [treeAlias],
 			label: 'Create',
 			icon: 'add',
 		},
@@ -35,7 +35,7 @@ const treeItemActions: Array<ManifestTreeItemAction> = [
 		loader: () => import('./actions/action-document-delete.element'),
 		weight: 100,
 		meta: {
-			trees: [documentTreeAlias],
+			trees: [treeAlias],
 			label: 'Delete',
 			icon: 'delete',
 		},
@@ -47,7 +47,7 @@ const treeItemActions: Array<ManifestTreeItemAction> = [
 		loader: () => import('./actions/action-document-paged.element'),
 		weight: 100,
 		meta: {
-			trees: [documentTreeAlias],
+			trees: [treeAlias],
 			label: 'Paged',
 			icon: 'favorite',
 		},

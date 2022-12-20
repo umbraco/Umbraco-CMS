@@ -1,10 +1,10 @@
-import { ManifestTree } from '@umbraco-cms/extensions-registry';
+import type { ManifestTree } from '@umbraco-cms/extensions-registry';
 
-const documentTypeTreeAlias = 'Umb.Tree.DocumentTypes';
+const treeAlias = 'Umb.Tree.DocumentTypes';
 
 const tree: ManifestTree = {
 	type: 'tree',
-	alias: documentTypeTreeAlias,
+	alias: treeAlias,
 	name: 'Document Types Tree',
 	weight: 400,
 	meta: {
