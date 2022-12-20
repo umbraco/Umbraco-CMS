@@ -1,6 +1,6 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import '../../components/collection/collection-toolbar.element';
 import '../../components/collection/collection-selection-actions.element';
 import '../../components/collection/collection-view.element';
@@ -11,6 +11,7 @@ import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/c
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
+import { UmbCollectionContextBase } from '@umbraco-cms/components/collection/collection.context';
 
 @customElement('umb-dashboard-media-management')
 export class UmbDashboardMediaManagementElement extends UmbContextProviderMixin(
@@ -33,6 +34,20 @@ export class UmbDashboardMediaManagementElement extends UmbContextProviderMixin(
 	@state()
 	private _routes: Array<any> = [];
 
+	private _entityKey = '';
+
+	@property()
+	public get entityKey() {
+		return this._entityKey;
+	}
+	public set entityKey(value: string) {
+		const oldValue = this._entityKey;
+		if (oldValue === value) return;
+		this._entityKey = value;
+		this.requestUpdate('entityKey', oldValue);
+		this.provideContext('umbCollectionContext', new UmbCollectionContextBase(this.entityKey));
+	}
+
 	@state()
 	private _collectionLayouts: Array<ManifestCollectionLayout> = [];
 
@@ -41,7 +56,6 @@ export class UmbDashboardMediaManagementElement extends UmbContextProviderMixin(
 
 	constructor() {
 		super();
-		this.provideContext('umbMediaContext', this);
 		this._observeCollectionLayouts();
 	}
 

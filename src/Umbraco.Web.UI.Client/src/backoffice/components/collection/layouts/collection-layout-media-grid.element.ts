@@ -2,6 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
+import { UmbCollectionContext } from '../collection.context';
 import type { MediaDetails } from '@umbraco-cms/models';
 import { UmbMediaStore } from '@umbraco-cms/stores/media/media.store';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
@@ -68,6 +69,8 @@ export class UmbCollectionLayoutMediaGridElement extends UmbContextConsumerMixin
 	@state()
 	private _mediaItems: Array<MediaDetails> = [];
 
+	private _collectionContext?: UmbCollectionContext;
+
 	private _mediaStore?: UmbMediaStore;
 	constructor() {
 		super();
@@ -81,19 +84,23 @@ export class UmbCollectionLayoutMediaGridElement extends UmbContextConsumerMixin
 			e.preventDefault();
 			this.toggleAttribute('dragging', false);
 		});
-		this.consumeContext('umbMediaStore', (store: UmbMediaStore) => {
-			this._mediaStore = store;
+		this.consumeAllContexts(['umbMediaStore', 'umbCollectionContext'], (instance) => {
+			this._mediaStore = instance['umbMediaStore'];
+			this._collectionContext = instance['umbCollectionContext'];
 			this._observeMediaItems();
 		});
 	}
 
 	private _observeMediaItems() {
-		if (!this._mediaStore) return;
+		if (!this._mediaStore || !this._collectionContext) return;
 
-		this.observe<Array<MediaDetails>>(this._mediaStore?.getTreeRoot(), (items) => {
-			this._mediaItems = items;
-			console.log('media store', this._mediaStore);
-		});
+		this.observe<Array<MediaDetails>>(
+			this._mediaStore?.getTreeItemChildren(this._collectionContext.entityKey),
+			(items) => {
+				this._mediaItems = items;
+				console.log('media store', this._mediaStore);
+			}
+		);
 	}
 
 	private _handleOpenItem(key: string) {

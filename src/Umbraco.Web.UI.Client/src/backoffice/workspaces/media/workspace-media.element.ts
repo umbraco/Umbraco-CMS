@@ -38,6 +38,19 @@ export class UmbWorkspaceMediaElement extends UmbContextConsumerMixin(UmbContext
 		const dashboards: Array<ManifestWorkspaceView> = [
 			{
 				type: 'workspaceView',
+				alias: 'Umb.WorkspaceView.Media.Collection',
+				name: 'Media Workspace Collection View',
+				loader: () => import('../shared/workspace-content/views/collection/workspace-view-content-collection.element'),
+				weight: 300,
+				meta: {
+					workspaces: ['Umb.Workspace.Media'],
+					label: 'Media',
+					pathname: 'collection',
+					icon: 'umb:grid',
+				},
+			},
+			{
+				type: 'workspaceView',
 				alias: 'Umb.WorkspaceView.Media.Edit',
 				name: 'Media Workspace Edit View',
 				loader: () => import('../shared/workspace-content/views/edit/workspace-view-content-edit.element'),
@@ -71,7 +84,9 @@ export class UmbWorkspaceMediaElement extends UmbContextConsumerMixin(UmbContext
 	}
 
 	render() {
-		return html`<umb-workspace-content .entityKey=${this.entityKey} alias="Umb.Workspace.Media"></umb-workspace-content>`;
+		return html`<umb-workspace-content
+			.entityKey=${this.entityKey}
+			alias="Umb.Workspace.Media"></umb-workspace-content>`;
 	}
 }
 
