@@ -12,7 +12,6 @@ import './components/extension-slot/extension-slot.element';
 import './sections/shared/section-main/section-main.element';
 import './sections/shared/section-sidebar/section-sidebar.element';
 import './sections/shared/section.element';
-import './trees/shared/tree-base.element';
 import './trees/shared/tree.element';
 
 import { defineElement } from '@umbraco-ui/uui-base/lib/registration';
