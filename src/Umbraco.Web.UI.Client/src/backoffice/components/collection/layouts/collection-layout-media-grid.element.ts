@@ -7,6 +7,7 @@ import type { MediaDetails } from '@umbraco-cms/models';
 import { UmbMediaStore } from '@umbraco-cms/stores/media/media.store';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
+import UmbDashboardMediaManagementElement from 'src/backoffice/dashboards/media-management/dashboard-media-management.element';
 
 @customElement('umb-collection-layout-media-grid')
 export class UmbCollectionLayoutMediaGridElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
@@ -69,9 +70,10 @@ export class UmbCollectionLayoutMediaGridElement extends UmbContextConsumerMixin
 	@state()
 	private _mediaItems: Array<MediaDetails> = [];
 
-	private _collectionContext?: UmbCollectionContext;
+	@state()
+	private _selection: Array<string> = [];
 
-	private _mediaStore?: UmbMediaStore;
+	private _mediaContext?: UmbDashboardMediaManagementElement;
 	constructor() {
 		super();
 		document.addEventListener('dragenter', (e) => {
@@ -84,32 +86,22 @@ export class UmbCollectionLayoutMediaGridElement extends UmbContextConsumerMixin
 			e.preventDefault();
 			this.toggleAttribute('dragging', false);
 		});
-		this.consumeAllContexts(['umbMediaStore', 'umbCollectionContext'], (instance) => {
-			this._mediaStore = instance['umbMediaStore'];
-			this._collectionContext = instance['umbCollectionContext'];
-			this._observeMediaItems();
+		this.consumeAllContexts(['umbMediaContext'], (instance) => {
+			this._mediaContext = instance['umbMediaContext'];
+			this._observeMediaContext();
 		});
 	}
 
-	private _observeMediaItems() {
-		if (!this._mediaStore || !this._collectionContext) return;
+	private _observeMediaContext() {
+		if (!this._mediaContext) return;
 
-		console.log('key', this._collectionContext.entityKey);
+		this.observe<Array<MediaDetails>>(this._mediaContext.mediaItems, (mediaItems) => {
+			this._mediaItems = mediaItems;
+		});
 
-		if (this._collectionContext.entityKey) {
-			this.observe<Array<MediaDetails>>(
-				this._mediaStore?.getTreeItemChildren(this._collectionContext.entityKey),
-				(items) => {
-					this._mediaItems = items;
-					console.log('media store', this._mediaStore);
-				}
-			);
-		} else {
-			this.observe<Array<MediaDetails>>(this._mediaStore?.getTreeRoot(), (items) => {
-				this._mediaItems = items;
-				console.log('media store', this._mediaStore);
-			});
-		}
+		this.observe<Array<string>>(this._mediaContext.selection, (selection) => {
+			this._selection = selection;
+		});
 	}
 
 	private _handleOpenItem(key: string) {

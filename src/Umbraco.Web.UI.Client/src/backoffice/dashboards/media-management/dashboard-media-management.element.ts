@@ -4,14 +4,14 @@ import { customElement, property, state } from 'lit/decorators.js';
 import '../../components/collection/collection-toolbar.element';
 import '../../components/collection/collection-selection-actions.element';
 import '../../components/collection/collection-view.element';
-import { map } from 'rxjs';
+import { BehaviorSubject, map, Observable } from 'rxjs';
 import { IRoutingInfo } from 'router-slot';
-import type { ManifestCollectionLayout } from '@umbraco-cms/models';
+import type { ManifestCollectionLayout, MediaDetails } from '@umbraco-cms/models';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
-import { UmbCollectionContextBase } from '@umbraco-cms/components/collection/collection.context';
+import { UmbMediaStore } from '@umbraco-cms/stores/media/media.store';
 
 @customElement('umb-dashboard-media-management')
 export class UmbDashboardMediaManagementElement extends UmbContextProviderMixin(
@@ -43,14 +43,25 @@ export class UmbDashboardMediaManagementElement extends UmbContextProviderMixin(
 	@state()
 	private _currentLayoutPathName = '';
 
+	private _mediaStore?: UmbMediaStore;
+
+	private _selection: BehaviorSubject<Array<string>> = new BehaviorSubject(<Array<string>>[]);
+	public readonly selection: Observable<Array<string>> = this._selection.asObservable();
+
+	private _mediaItems: BehaviorSubject<Array<MediaDetails>> = new BehaviorSubject(<Array<MediaDetails>>[]);
+	public readonly mediaItems: Observable<Array<MediaDetails>> = this._mediaItems.asObservable();
+
+	private _search: BehaviorSubject<string> = new BehaviorSubject('');
+	public readonly search: Observable<string> = this._search.asObservable();
+
 	constructor() {
 		super();
 		this._observeCollectionLayouts();
-	}
-
-	connectedCallback(): void {
-		super.connectedCallback();
-		this.provideContext('umbCollectionContext', new UmbCollectionContextBase(this.entityKey));
+		this.provideContext('umbMediaContext', this);
+		this.consumeAllContexts(['umbMediaStore'], (instance) => {
+			this._mediaStore = instance['umbMediaStore'];
+			this._observeMediaItems();
+		});
 	}
 
 	private _observeCollectionLayouts() {
@@ -66,6 +77,20 @@ export class UmbDashboardMediaManagementElement extends UmbContextProviderMixin(
 				this._createRoutes();
 			}
 		);
+	}
+
+	private _observeMediaItems() {
+		if (!this._mediaStore) return;
+
+		if (this.entityKey) {
+			this.observe<Array<MediaDetails>>(this._mediaStore?.getTreeItemChildren(this.entityKey), (items) => {
+				this._mediaItems.next(items);
+			});
+		} else {
+			this.observe<Array<MediaDetails>>(this._mediaStore?.getTreeRoot(), (items) => {
+				this._mediaItems.next(items);
+			});
+		}
 	}
 
 	private _createRoutes() {
