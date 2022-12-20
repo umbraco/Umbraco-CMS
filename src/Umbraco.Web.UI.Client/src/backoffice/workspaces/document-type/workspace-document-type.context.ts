@@ -12,7 +12,7 @@ const DefaultDocumentTypeData = ({
 	properties: [],
 }) as UmbDocumentTypeStoreItemType;
 
-export class UmbWorkspaceDocumentContext extends UmbWorkspaceNodeContext<UmbDocumentTypeStoreItemType, UmbDocumentTypeStore> {
+export class UmbWorkspaceDocumentTypeContext extends UmbWorkspaceNodeContext<UmbDocumentTypeStoreItemType, UmbDocumentTypeStore> {
 
 	constructor(target:HTMLElement, entityType: string, entityKey: string) {
 		super(target, DefaultDocumentTypeData, 'umbDocumentTypeStore', entityType, entityKey);

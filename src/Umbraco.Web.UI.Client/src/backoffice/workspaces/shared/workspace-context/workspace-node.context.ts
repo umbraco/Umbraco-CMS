@@ -20,8 +20,8 @@ export class UmbWorkspaceNodeContext<ContentTypeType extends ContentTreeItem, St
 
 
 
-	public save() {
-		this._store.save([this.getData()]).then(() => {
+	public save(): Promise<void> {
+		return this._store.save([this.getData()]).then(() => {
 			const data: UmbNotificationDefaultData = { message: 'Document Saved' };
 			this._notificationService?.peek('positive', { data });
 		}).catch(() => {

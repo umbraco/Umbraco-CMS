@@ -7,6 +7,7 @@ import type { UmbNotificationService } from '../../../../../core/services/notifi
 import { UmbDocumentTypeStore } from '../../../../../core/stores/document-type/document-type.store';
 import { UmbDocumentTypeContext } from '../../document-type.context';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import { UmbWorkspaceDocumentTypeContext } from '../../workspace-document-type.context';
 
 @customElement('umb-workspace-action-document-type-save')
 export class UmbWorkspaceActionDocumentTypeSaveElement extends UmbContextConsumerMixin(LitElement) {
@@ -16,36 +17,26 @@ export class UmbWorkspaceActionDocumentTypeSaveElement extends UmbContextConsume
 	@state()
 	private _saveButtonState?: UUIButtonState;
 
-	private _documentTypeStore?: UmbDocumentTypeStore;
-	private _documentTypeContext?: UmbDocumentTypeContext;
-	private _notificationService?: UmbNotificationService;
+	private _workspaceContext?: UmbWorkspaceDocumentTypeContext;
 
 	constructor() {
 		super();
 
-		this.consumeAllContexts(
-			['umbDocumentTypeStore', 'umbDocumentTypeContext', 'umbNotificationService'],
-			(instances) => {
-				this._documentTypeStore = instances['umbDocumentTypeStore'];
-				this._documentTypeContext = instances['umbDocumentTypeContext'];
-				this._notificationService = instances['umbNotificationService'];
+		this.consumeContext('umbWorkspaceContext', (instance) => {
+				this._workspaceContext = instance;
 			}
 		);
 	}
 
 	private async _handleSave() {
-		if (!this._documentTypeStore || !this._documentTypeContext) return;
+		if (!this._workspaceContext) return;
 
-		try {
-			this._saveButtonState = 'waiting';
-			const dataType = this._documentTypeContext.getData();
-			await this._documentTypeStore.save([dataType]);
-			const data: UmbNotificationDefaultData = { message: 'Document Type Saved' };
-			this._notificationService?.peek('positive', { data });
+		this._saveButtonState = 'waiting';
+		await this._workspaceContext.save().then(() => {
 			this._saveButtonState = 'success';
-		} catch (error) {
+		}).catch(() => {
 			this._saveButtonState = 'failed';
-		}
+		})
 	}
 
 	render() {
