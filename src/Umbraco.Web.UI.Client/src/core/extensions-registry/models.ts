@@ -13,7 +13,7 @@ import type { ManifestPropertyAction } from './property-action.models';
 import type { ManifestPackageView } from './package-view.models';
 import type { ManifestExternalLoginProvider } from './external-login-provider.models';
 import type { ManifestCollectionBulkAction } from './collection-bulk-action.models';
-import type { ManifestCollectionLayout } from './collection-header-view.models';
+import type { ManifestCollectionLayout } from './collection-layout.models';
 
 export * from './header-app.models';
 export * from './section.models';
@@ -30,7 +30,7 @@ export * from './property-action.models';
 export * from './package-view.models';
 export * from './external-login-provider.models';
 export * from './collection-bulk-action.models';
-export * from './collection-header-view.models';
+export * from './collection-layout.models';
 
 export type ManifestTypes =
 	| ManifestHeaderApp

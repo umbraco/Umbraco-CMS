@@ -17,6 +17,8 @@ import type {
 	ManifestPackageView,
 	ManifestExternalLoginProvider,
 	ManifestHeaderApp,
+	ManifestCollectionLayout,
+	ManifestCollectionBulkAction,
 } from '../../models';
 import { createExtensionElement } from '../create-extension-element.function';
 
@@ -41,7 +43,7 @@ export class UmbExtensionRegistry {
 		}
 	}
 
-	unregister(alias:string): void {
+	unregister(alias: string): void {
 		const oldExtensionsValues = this._extensions.getValue();
 		const newExtensionsValues = oldExtensionsValues.filter((extension) => extension.alias !== alias);
 
@@ -84,14 +86,12 @@ export class UmbExtensionRegistry {
 	extensionsOfType(type: 'entrypoint'): Observable<Array<ManifestEntrypoint>>;
 	extensionsOfType(type: 'custom'): Observable<Array<ManifestCustom>>;
 	extensionsOfType(type: 'externalLoginProvider'): Observable<Array<ManifestExternalLoginProvider>>;
+	extensionsOfType(type: 'collectionLayout'): Observable<Array<ManifestCollectionLayout>>;
+	extensionsOfType(type: 'collectionBulkAction'): Observable<Array<ManifestCollectionBulkAction>>;
 	extensionsOfType<T extends ManifestTypes>(type: string): Observable<Array<T>>;
 	extensionsOfType(type: string): Observable<Array<ManifestTypes>> {
 		return this.extensions.pipe(
-			map((exts) =>
-				exts
-					.filter((ext) => ext.type === type)
-					.sort((a, b) => (b.weight || 0) - (a.weight || 0))
-			)
+			map((exts) => exts.filter((ext) => ext.type === type).sort((a, b) => (b.weight || 0) - (a.weight || 0)))
 		);
 	}
 }

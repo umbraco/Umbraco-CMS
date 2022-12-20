@@ -49,7 +49,6 @@ export class UmbDashboardMediaManagementElement extends UmbContextProviderMixin(
 		this.observe<Array<ManifestCollectionLayout>>(
 			umbExtensionsRegistry?.extensionsOfType('collectionLayout').pipe(
 				map((extensions) => {
-					//TODO: This is working, so why can ts not find the type?
 					return extensions.filter((extension) => extension.meta.entityType === 'media');
 				})
 			),
