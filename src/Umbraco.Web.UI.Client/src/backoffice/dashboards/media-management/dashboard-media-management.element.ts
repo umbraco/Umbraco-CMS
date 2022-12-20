@@ -92,6 +92,32 @@ export class UmbDashboardMediaManagementElement extends UmbContextProviderMixin(
 		}
 	}
 
+	public setSearch(value: string) {
+		if (!value) value = '';
+
+		this._search.next(value);
+		this._observeMediaItems();
+		this.requestUpdate('search');
+	}
+
+	public setSelection(value: Array<string>) {
+		if (!value) return;
+		this._selection.next(value);
+		this.requestUpdate('selection');
+	}
+
+	public select(key: string) {
+		const selection = this._selection.getValue();
+		this._selection.next([...selection, key]);
+		this.requestUpdate('selection');
+	}
+
+	public deselect(key: string) {
+		const selection = this._selection.getValue();
+		this._selection.next(selection.filter((k) => k !== key));
+		this.requestUpdate('selection');
+	}
+
 	private _createRoutes() {
 		this._routes = [];
 

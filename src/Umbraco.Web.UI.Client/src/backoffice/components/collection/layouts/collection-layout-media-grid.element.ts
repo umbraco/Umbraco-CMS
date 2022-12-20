@@ -2,9 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
-import { UmbCollectionContext } from '../collection.context';
 import type { MediaDetails } from '@umbraco-cms/models';
-import { UmbMediaStore } from '@umbraco-cms/stores/media/media.store';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import UmbDashboardMediaManagementElement from 'src/backoffice/dashboards/media-management/dashboard-media-management.element';
@@ -104,15 +102,32 @@ export class UmbCollectionLayoutMediaGridElement extends UmbContextConsumerMixin
 		});
 	}
 
-	private _handleOpenItem(key: string) {
+	private _handleOpenItem(mediaItem: MediaDetails) {
 		//TODO: Fix when we have dynamic routing
-		history.pushState(null, '', 'section/media/media/' + key);
+		history.pushState(null, '', 'section/media/media/' + mediaItem.key);
+	}
+
+	private _handleSelect(mediaItem: MediaDetails) {
+		this._mediaContext?.select(mediaItem.key);
+	}
+
+	private _handleDeselect(mediaItem: MediaDetails) {
+		this._mediaContext?.deselect(mediaItem.key);
+	}
+
+	private _isSelected(mediaItem: MediaDetails) {
+		return this._selection.includes(mediaItem.key);
 	}
 
 	private _renderMediaItem(item: MediaDetails) {
 		const name = item.name || '';
 		return html`<uui-card-media
-			@open=${() => this._handleOpenItem(item.key)}
+			selectable
+			?select-only=${this._selection.length > 0}
+			?selected=${this._isSelected(item)}
+			@open=${() => this._handleOpenItem(item)}
+			@selected=${() => this._handleSelect(item)}
+			@unselected=${() => this._handleDeselect(item)}
 			class="media-item"
 			name=${name}></uui-card-media>`;
 	}
