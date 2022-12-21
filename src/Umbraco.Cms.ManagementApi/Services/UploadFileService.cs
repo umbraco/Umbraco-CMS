@@ -1,22 +1,24 @@
 ﻿using System.Xml;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Hosting;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.ManagementApi.Models;
 using Umbraco.Extensions;
+using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Cms.ManagementApi.Services;
 
 public class UploadFileService : IUploadFileService
 {
-    private readonly IHostingEnvironment _hostingEnvironment;
+    private readonly IHostEnvironment _hostEnvironment;
     private readonly ILocalizedTextService _localizedTextService;
 
-    public UploadFileService(IHostingEnvironment hostingEnvironment, ILocalizedTextService localizedTextService)
+    public UploadFileService(IHostEnvironment hostEnvironment, ILocalizedTextService localizedTextService)
     {
-        _hostingEnvironment = hostingEnvironment;
+        _hostEnvironment = hostEnvironment;
         _localizedTextService = localizedTextService;
     }
 
@@ -25,7 +27,7 @@ public class UploadFileService : IUploadFileService
         var formFileUploadResult = new FormFileUploadResult();
         var fileName = file.FileName.Trim(Constants.CharArrays.DoubleQuote);
         var ext = fileName.Substring(fileName.LastIndexOf('.') + 1).ToLower();
-        var root = _hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempFileUploads);
+        var root = _hostEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempFileUploads);
         formFileUploadResult.TemporaryPath = Path.Combine(root, fileName);
 
         if (!Path.GetFullPath(formFileUploadResult.TemporaryPath).StartsWith(Path.GetFullPath(root)))
