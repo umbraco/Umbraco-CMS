@@ -21,18 +21,6 @@ export const manifests: Array<ManifestPropertyEditorModel> = [
 	},
 	{
 		type: 'propertyEditorModel',
-		name: 'Form Picker',
-		alias: 'UmbracoForms.FormPicker',
-		meta: {},
-	},
-	{
-		type: 'propertyEditorModel',
-		name: 'Form Theme Picker',
-		alias: 'UmbracoForms.ThemePicker',
-		meta: {},
-	},
-	{
-		type: 'propertyEditorModel',
 		name: 'Multi URL Picker',
 		alias: 'Umbraco.MultiUrlPicker',
 		meta: {},
@@ -133,12 +121,6 @@ export const manifests: Array<ManifestPropertyEditorModel> = [
 	},
 	{
 		type: 'propertyEditorModel',
-		name: 'Grid layout',
-		alias: 'Umbraco.Grid',
-		meta: {},
-	},
-	{
-		type: 'propertyEditorModel',
 		name: 'Markdown editor',
 		alias: 'Umbraco.MarkdownEditor',
 		meta: {},
@@ -199,12 +181,6 @@ export const manifests: Array<ManifestPropertyEditorModel> = [
 	},
 	{
 		type: 'propertyEditorModel',
-		name: 'Nested Content',
-		alias: 'Umbraco.NestedContent',
-		meta: {},
-	},
-	{
-		type: 'propertyEditorModel',
 		name: 'Radio button list',
 		alias: 'Umbraco.RadioButtonList',
 		meta: {},
@@ -231,12 +207,6 @@ export const manifests: Array<ManifestPropertyEditorModel> = [
 		type: 'propertyEditorModel',
 		name: 'Media Picker',
 		alias: 'Umbraco.MediaPicker3',
-		meta: {},
-	},
-	{
-		type: 'propertyEditorModel',
-		name: 'Media Picker (legacy)',
-		alias: 'Umbraco.MediaPicker',
 		meta: {},
 	},
 	{
