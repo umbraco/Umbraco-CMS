@@ -74,6 +74,7 @@ export class UmbBackofficeMain extends UmbContextProviderMixin(UmbContextConsume
 		});
 	}
 
+	// TODO: Make this a common shared method on @umbraco-cms/extensions-api
 	private _getSectionElement(section: ManifestSection) {
 		if (!section.loader || !section.elementName || !section.js) {
 			return UmbSectionElement;
