@@ -39,7 +39,7 @@ export class UmbTreeItem extends UmbContextConsumerMixin(UmbObserverMixin(LitEle
 	private _isActive = false;
 
 	private _treeContext?: UmbTreeContextBase;
-	private _treeStore?: UmbDataStore<unknown>;
+	private _store?: UmbDataStore<unknown>;
 	private _sectionContext?: UmbSectionContext;
 	private _treeContextMenuService?: UmbTreeContextMenuService;
 
@@ -52,8 +52,8 @@ export class UmbTreeItem extends UmbContextConsumerMixin(UmbObserverMixin(LitEle
 			this._observeIsSelected();
 		});
 
-		this.consumeContext('umbTreeStore', (store: UmbDataStore<unknown>) => {
-			this._treeStore = store;
+		this.consumeContext('umbStore', (store: UmbDataStore<unknown>) => {
+			this._store = store;
 		});
 
 		this.consumeContext('umbSectionContext', (sectionContext: UmbSectionContext) => {
@@ -131,11 +131,11 @@ export class UmbTreeItem extends UmbContextConsumerMixin(UmbObserverMixin(LitEle
 	}
 
 	private _observeChildren() {
-		if (!this._treeStore?.getTreeItemChildren) return;
+		if (!this._store?.getTreeItemChildren) return;
 
 		this._loading = true;
 
-		this.observe<Entity[]>(this._treeStore.getTreeItemChildren(this.treeItem.key), (childItems) => {
+		this.observe<Entity[]>(this._store.getTreeItemChildren(this.treeItem.key), (childItems) => {
 			if (childItems?.length === 0) return;
 			this._childItems = childItems;
 			this._loading = false;

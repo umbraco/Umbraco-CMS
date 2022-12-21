@@ -4,6 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
 import type { ManifestTree } from '@umbraco-cms/models';
 
+import './tree-navigator.element';
 import './context-menu/tree-context-menu-page-action-list.element';
 import './context-menu/tree-context-menu-page.service';
 import './context-menu/tree-context-menu.service';
@@ -29,6 +30,12 @@ export class UmbTreeExtension extends LitElement {
 
 	private async _createElement() {
 		if (!this.tree) return;
+
+		// If the manifest doesn't specify a custom element, we will render a default tree element
+		if (!this.tree.elementName && !this.tree.js && !this.tree.loader) {
+			this._element = document.createElement('umb-tree-navigator');
+			return;
+		}
 
 		try {
 			this._element = (await createExtensionElement(this.tree)) as any | undefined;

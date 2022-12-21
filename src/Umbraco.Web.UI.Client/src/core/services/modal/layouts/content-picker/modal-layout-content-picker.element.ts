@@ -8,7 +8,6 @@ export interface UmbModalContentPickerData {
 	selection: Array<string>;
 }
 
-import '../../../../../backoffice/trees/documents/tree-documents.element';
 import { UmbTreeElement } from '../../../../../backoffice/trees/shared/tree.element';
 
 // TODO: make use of UmbPickerLayoutBase
