@@ -1,5 +1,5 @@
 //TODO: we need to figure out what components should be available for extensions and load them upfront
-import './workspaces/shared/workspace-entity-layout/workspace-entity-layout.element';
+import './workspaces/shared/workspace-entity/workspace-entity.element';
 import './components/ref-property-editor-ui/ref-property-editor-ui.element';
 import './components/backoffice-frame/backoffice-header.element';
 import './components/backoffice-frame/backoffice-main.element';
@@ -20,7 +20,7 @@ import { css, html, LitElement } from 'lit';
 
 import { UmbModalService } from '../core/services/modal';
 import { UmbNotificationService } from '../core/services/notification';
-import { UmbDataTypesStore } from '../core/stores/data-types/data-types.store';
+import { UmbDataTypeStore } from '../core/stores/data-type/data-type.store';
 import { UmbDocumentTypeStore } from '../core/stores/document-type/document-type.store';
 import { UmbMediaTypeStore } from '../core/stores/media-type/media-type.store';
 import { UmbMemberTypeStore } from '../core/stores/member-type/member-type.store';
@@ -32,9 +32,10 @@ import { UmbUserStore } from '../core/stores/user/user.store';
 import { UmbIconStore } from '../core/stores/icon/icon.store';
 import { UmbUserGroupStore } from '../core/stores/user/user-group.store';
 import { UmbCurrentUserHistoryStore } from '../core/stores/current-user-history/current-user-history.store';
+import { UmbDictionaryStore } from '../core/stores/dictionary/dictionary.store';
 import { manifests as sectionManifests } from './sections/manifests';
-import { manifests as propertyEditorModelManifests } from './property-editor-models/manifests';
-import { manifests as propertyEditorUIManifests } from './property-editor-uis/manifests';
+import { manifests as propertyEditorModelManifests } from './property-editors/models/manifests';
+import { manifests as propertyEditorUIManifests } from './property-editors/uis/manifests';
 import { manifests as treeManifests } from './trees/manifests';
 import { manifests as editorManifests } from './workspaces/manifests';
 import { manifests as propertyActionManifests } from './property-actions/manifests';
@@ -83,7 +84,7 @@ export class UmbBackofficeElement extends UmbContextConsumerMixin(UmbContextProv
 
 		this.provideContext('umbDocumentStore', new UmbDocumentStore());
 		this.provideContext('umbMediaStore', new UmbMediaStore());
-		this.provideContext('umbDataTypeStore', new UmbDataTypesStore());
+		this.provideContext('umbDataTypeStore', new UmbDataTypeStore());
 		this.provideContext('umbDocumentTypeStore', new UmbDocumentTypeStore());
 		this.provideContext('umbMediaTypeStore', new UmbMediaTypeStore());
 		this.provideContext('umbMemberTypeStore', new UmbMemberTypeStore());
@@ -94,6 +95,7 @@ export class UmbBackofficeElement extends UmbContextConsumerMixin(UmbContextProv
 		this.provideContext('umbModalService', new UmbModalService());
 		this.provideContext('umbSectionStore', new UmbSectionStore());
 		this.provideContext('umbCurrentUserHistoryStore', new UmbCurrentUserHistoryStore());
+		this.provideContext('umbDictionaryStore', new UmbDictionaryStore());
 	}
 
 	private _registerExtensions(manifests: Array<ManifestTypes> | Array<ManifestTypes>) {

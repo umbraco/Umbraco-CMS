@@ -2,7 +2,7 @@ import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { distinctUntilChanged } from 'rxjs';
-import { UmbDocumentTypeContext } from '../../document-type.context';
+import { UmbWorkspaceDocumentTypeContext } from '../../workspace-document-type.context';
 import type { DocumentTypeDetails } from '@umbraco-cms/models';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
@@ -14,21 +14,21 @@ export class UmbWorkspaceViewDocumentTypeDesignElement extends UmbContextConsume
 	@state()
 	_documentType?: DocumentTypeDetails;
 
-	private _documentTypeContext?: UmbDocumentTypeContext;
+	private _workspaceContext?: UmbWorkspaceDocumentTypeContext;
 
 	constructor() {
 		super();
 
-		this.consumeContext('umbDocumentTypeContext', (documentTypeContext) => {
-			this._documentTypeContext = documentTypeContext;
+		this.consumeContext('umbWorkspaceContext', (documentTypeContext) => {
+			this._workspaceContext = documentTypeContext;
 			this._observeDocumentType();
 		});
 	}
 
 	private _observeDocumentType() {
-		if (!this._documentTypeContext) return;
+		if (!this._workspaceContext) return;
 
-		this.observe<DocumentTypeDetails>(this._documentTypeContext.data.pipe(distinctUntilChanged()), (documentType) => {
+		this.observe<DocumentTypeDetails>(this._workspaceContext.data.pipe(distinctUntilChanged()), (documentType) => {
 			this._documentType = documentType;
 		});
 	}

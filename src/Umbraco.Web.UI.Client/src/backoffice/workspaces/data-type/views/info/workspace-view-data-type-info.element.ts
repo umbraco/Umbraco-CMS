@@ -2,7 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { distinctUntilChanged } from 'rxjs';
-import { UmbDataTypeContext } from '../../data-type.context';
+import { UmbWorkspaceDataTypeContext } from '../../workspace-data-type.context';
 import type { DataTypeDetails } from '@umbraco-cms/models';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
@@ -14,21 +14,21 @@ export class UmbWorkspaceViewDataTypeInfoElement extends UmbContextConsumerMixin
 	@state()
 	_dataType?: DataTypeDetails;
 
-	private _dataTypeContext?: UmbDataTypeContext;
+	private _workspaceContext?: UmbWorkspaceDataTypeContext;
 
 	constructor() {
 		super();
 
-		this.consumeContext('umbDataTypeContext', (dataTypeContext) => {
-			this._dataTypeContext = dataTypeContext;
+		this.consumeContext('umbWorkspaceContext', (dataTypeContext) => {
+			this._workspaceContext = dataTypeContext;
 			this._observeDataType();
 		});
 	}
 
 	private _observeDataType() {
-		if (!this._dataTypeContext) return;
+		if (!this._workspaceContext) return;
 
-		this.observe<DataTypeDetails>(this._dataTypeContext.data.pipe(distinctUntilChanged()), (dataType) => {
+		this.observe<DataTypeDetails>(this._workspaceContext.data.pipe(distinctUntilChanged()), (dataType) => {
 			this._dataType = dataType;
 		});
 	}

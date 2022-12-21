@@ -2,16 +2,17 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { map, switchMap, EMPTY, of } from 'rxjs';
-import { UmbSectionContext } from '../section.context';
-import { UmbWorkspaceEntityElement } from '../../workspaces/shared/workspace-entity/workspace-entity.element';
+import { IRoutingInfo } from 'router-slot';
+import { UmbSectionContext } from './section.context';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-import type { ManifestTree, ManifestSectionView } from '@umbraco-cms/models';
+import type { ManifestTree, ManifestSectionView, ManifestWorkspace } from '@umbraco-cms/models';
 
 import './section-trees/section-trees.element.ts';
 import '../shared/section-views/section-views.element.ts';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
+
 
 @customElement('umb-section')
 export class UmbSectionElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
@@ -38,6 +39,8 @@ export class UmbSectionElement extends UmbContextConsumerMixin(UmbObserverMixin(
 	@state()
 	private _trees: Array<ManifestTree> = [];
 
+	private _workspaces: Array<ManifestWorkspace> = [];
+
 	@state()
 	private _views: Array<ManifestSectionView> = [];
 
@@ -46,9 +49,10 @@ export class UmbSectionElement extends UmbContextConsumerMixin(UmbObserverMixin(
 	constructor() {
 		super();
 
-		this.consumeAllContexts(['umbSectionContext'], (instances) => {
-			this._sectionContext = instances['umbSectionContext'];
+		this.consumeContext('umbSectionContext', (instance) => {
+			this._sectionContext = instance;
 
+			// TODO: currently they don't corporate, as they overwrite each other...
 			this._observeTrees();
 			this._observeViews();
 		});
@@ -61,7 +65,6 @@ export class UmbSectionElement extends UmbContextConsumerMixin(UmbObserverMixin(
 			this._sectionContext?.data.pipe(
 				switchMap((section) => {
 					if (!section) return EMPTY;
-
 					return (
 						umbExtensionsRegistry
 							?.extensionsOfType('tree')
@@ -71,38 +74,48 @@ export class UmbSectionElement extends UmbContextConsumerMixin(UmbObserverMixin(
 			),
 			(trees) => {
 				this._trees = trees;
-				if (this._trees.length === 0) return;
 				this._createTreeRoutes();
 			}
 		);
+
+		this.observe<ManifestWorkspace[]>(umbExtensionsRegistry?.extensionsOfType('workspace'), (workspaceExtensions) => {
+			this._workspaces = workspaceExtensions;
+			this._createTreeRoutes();
+		});
 	}
 
 	private _createTreeRoutes() {
-		this._routes = [
+
+		const routes: any[] = [
 			{
 				path: 'dashboard',
 				component: () => import('./section-dashboards/section-dashboards.element'),
-			},
-			{
-				path: `:entityType/:key`,
-				component: () => import('../../workspaces/shared/workspace-entity/workspace-entity.element'),
-				setup: (component: UmbWorkspaceEntityElement, info: any) => {
-					component.entityKey = info.match.params.key;
-					component.entityType = info.match.params.entityType;
-				},
-			},
-			{
-				path: `:entityType`,
-				component: () => import('../../workspaces/shared/workspace-entity/workspace-entity.element'),
-				setup: (component: UmbWorkspaceEntityElement, info: any) => {
-					component.entityType = info.match.params.entityType;
-				},
-			},
-			{
-				path: '**',
-				redirectTo: 'dashboard',
-			},
+			}
 		];
+		
+		// TODO: find a way to make this reuseable across:
+		this._workspaces?.map((workspace:ManifestWorkspace) => {
+			routes.push({
+				path: `${workspace.meta.entityType}/:key`,
+				component: () => createExtensionElement(workspace),
+				setup: (component: Promise<HTMLElement>, info: IRoutingInfo) => {
+					component.then((el: HTMLElement) => {
+						(el as any).entityKey = info.match.params.key;
+					})
+					
+				},
+			})
+			routes.push({
+				path: workspace.meta.entityType,
+				component: () => createExtensionElement(workspace)
+			})
+		});
+
+		routes.push({
+			path: '**',
+			redirectTo: 'dashboard',
+		});
+		this._routes = routes;
 	}
 
 	private _observeViews() {

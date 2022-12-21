@@ -3,9 +3,12 @@ import { UmbDataStoreBase } from '../store';
 import type { MediaDetails } from '@umbraco-cms/models';
 import { ApiError, ContentTreeItem, MediaResource, ProblemDetails } from '@umbraco-cms/backend-api';
 
-const isMediaDetails = (media: MediaDetails | ContentTreeItem): media is MediaDetails => {
+const isMediaDetails = (media: UmbMediaStoreItemType): media is MediaDetails => {
 	return (media as MediaDetails).data !== undefined;
 };
+
+// TODO: stop using ContentTreeItem.
+export type UmbMediaStoreItemType = MediaDetails | ContentTreeItem;
 
 /**
  * @export
@@ -13,7 +16,7 @@ const isMediaDetails = (media: MediaDetails | ContentTreeItem): media is MediaDe
  * @extends {UmbMediaStoreBase<MediaDetails | MediaTreeItem>}
  * @description - Data Store for Media
  */
-export class UmbMediaStore extends UmbDataStoreBase<MediaDetails | ContentTreeItem> {
+export class UmbMediaStore extends UmbDataStoreBase<UmbMediaStoreItemType> {
 	getByKey(key: string): Observable<MediaDetails | null> {
 		// fetch from server and update store
 		fetch(`/umbraco/management/api/v1/media/details/${key}`)

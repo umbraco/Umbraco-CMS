@@ -14,6 +14,7 @@ export * from '../extensions-registry/models';
 export type HTMLElementConstructor<T = HTMLElement> = new (...args: any[]) => T;
 
 // Users
+// TODO: would the right name be Node? as entity is just something with a Key. But node is something in a content structure, aka. with hasChildren and parentKey.
 export interface Entity {
 	key: string;
 	name: string;
@@ -73,6 +74,7 @@ export interface DocumentTypeDetails extends DocumentTypeTreeItem {
 	properties: [];
 }
 
+// TODO: Make sure Entity Type/interface.
 export interface MemberTypeDetails extends EntityTreeItem {
 	key: string; // TODO: Remove this when the backend is fixed
 	alias: string;
@@ -122,5 +124,10 @@ export interface MediaTypeDetails extends FolderTreeItem {
 
 // Member Groups
 export interface MemberGroupDetails extends EntityTreeItem {
+	key: string; // TODO: Remove this when the backend is fixed
+}
+
+// Dictionary
+export interface DictionaryDetails extends EntityTreeItem {
 	key: string; // TODO: Remove this when the backend is fixed
 }

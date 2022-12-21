@@ -165,7 +165,7 @@ export class UmbModalLayoutIconPickerElement extends UmbModalLayoutElement<UmbMo
 
 	render() {
 		return html`
-			<umb-workspace-entity-layout headline="Select Icon">
+			<umb-workspace-entity headline="Select Icon">
 				<div id="container">
 					${this.renderSearchbar()}
 					<hr />
@@ -180,7 +180,7 @@ export class UmbModalLayoutIconPickerElement extends UmbModalLayoutElement<UmbMo
 				<uui-button slot="actions" color="positive" look="primary" @click="${this._save}" label="save">
 					Save
 				</uui-button>
-			</umb-workspace-entity-layout>
+			</umb-workspace-entity>
 		`;
 	}
 

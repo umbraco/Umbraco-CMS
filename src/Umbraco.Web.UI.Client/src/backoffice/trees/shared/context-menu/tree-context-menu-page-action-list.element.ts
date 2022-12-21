@@ -2,7 +2,7 @@ import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
-import { UmbSectionContext } from '../../../sections/section.context';
+import { UmbSectionContext } from '../../../sections/shared/section.context';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { Entity, ManifestTreeItemAction, ManifestTree } from '@umbraco-cms/models';

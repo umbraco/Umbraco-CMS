@@ -4,7 +4,7 @@ import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { EMPTY, of, switchMap } from 'rxjs';
 
-import { UmbDataTypesStore } from '../../../core/stores/data-types/data-types.store';
+import { UmbDataTypeStore } from '../../../core/stores/data-type/data-type.store';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import type { ContentProperty, ManifestTypes } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
@@ -42,7 +42,7 @@ export class UmbContentPropertyElement extends UmbContextConsumerMixin(UmbObserv
 	@state()
 	private _dataTypeData?: any;
 
-	private _dataTypeStore?: UmbDataTypesStore;
+	private _dataTypeStore?: UmbDataTypeStore;
 
 	constructor() {
 		super();

@@ -2,7 +2,7 @@ import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { distinctUntilChanged } from 'rxjs';
-import { UmbNodeContext } from '../../node.context';
+import type { UmbWorkspaceNodeContext } from '../../../workspace-context/workspace-node.context';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import type { ContentProperty, ContentPropertyData, DocumentDetails, MediaDetails } from '@umbraco-cms/models';
@@ -27,21 +27,21 @@ export class UmbWorkspaceViewContentEditElement extends UmbContextConsumerMixin(
 	@state()
 	_data: ContentPropertyData[] = [];
 
-	private _nodeContext?: UmbNodeContext;
+	private _workspaceContext?: UmbWorkspaceNodeContext;
 
 	constructor() {
 		super();
 
-		this.consumeContext('umbNodeContext', (nodeContext) => {
-			this._nodeContext = nodeContext;
+		this.consumeContext('umbWorkspaceContext', (workspaceContext) => {
+			this._workspaceContext = workspaceContext;
 			this._observeContent();
 		});
 	}
 
 	private _observeContent() {
-		if (!this._nodeContext) return;
+		if (!this._workspaceContext) return;
 
-		this.observe<DocumentDetails | MediaDetails>(this._nodeContext.data.pipe(distinctUntilChanged()), (content) => {
+		this.observe<DocumentDetails | MediaDetails>(this._workspaceContext.data.pipe(distinctUntilChanged()), (content) => {
 			this._properties = content.properties;
 			this._data = content.data;
 		});

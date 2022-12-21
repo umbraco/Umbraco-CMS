@@ -1,6 +1,6 @@
 import { LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { UmbSectionContext } from '../../sections/section.context';
+import { UmbSectionContext } from '../../sections/shared/section.context';
 import { UmbTreeContextMenuPageService } from './context-menu/tree-context-menu-page.service';
 import { UmbTreeContextMenuService } from './context-menu/tree-context-menu.service';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
