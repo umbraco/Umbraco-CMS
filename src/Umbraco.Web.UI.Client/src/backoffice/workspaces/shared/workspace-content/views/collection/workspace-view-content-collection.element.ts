@@ -2,13 +2,13 @@ import { css, html, LitElement, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { distinctUntilChanged } from 'rxjs';
+import type { UmbWorkspaceNodeContext } from '../../../workspace-context/workspace-node.context';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import type { ContentProperty, ContentPropertyData, DocumentDetails, MediaDetails } from '@umbraco-cms/models';
 
 import '../../../../../components/content-property/content-property.element';
 import 'src/backoffice/dashboards/media-management/dashboard-media-management.element';
-import type { UmbWorkspaceNodeContext } from '../../../workspace-context/workspace-node.context';
 
 @customElement('umb-workspace-view-content-collection')
 export class UmbWorkspaceViewContentCollectionElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
