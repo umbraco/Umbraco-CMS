@@ -46,7 +46,8 @@
 		"generate:icons": "node ./devops/icons/index.js",
 		"wc-analyze": "wca **/*.element.ts --outFile custom-elements.json",
 		"new-extension": "plop  --plopfile ./devops/plop/plop.js",
-		"compile": "tsc"
+		"compile": "tsc",
+		"check": "npm run lint && npm run compile && npm run build-storybook"
 	},
 	"engines": {
 		"node": ">=16.0.0 <17",

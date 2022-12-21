@@ -12,34 +12,7 @@ export class UmbSectionUsersElement extends LitElement {
 	}
 
 	private _registerSectionViews() {
-		const manifests: Array<ManifestSectionView> = [
-			{
-				type: 'sectionView',
-				alias: 'Umb.SectionView.Users.Users',
-				name: 'Users Section View',
-				loader: () => import('./views/users/section-view-users.element'),
-				meta: {
-					sections: ['Umb.Section.Users'],
-					label: 'Users',
-					pathname: 'users',
-					weight: 200,
-					icon: 'umb:user',
-				},
-			},
-			{
-				type: 'sectionView',
-				alias: 'Umb.SectionView.Users.UserGroups',
-				name: 'User Groups Section View',
-				loader: () => import('./views/user-groups/section-view-user-groups.element'),
-				meta: {
-					sections: ['Umb.Section.Users'],
-					label: 'User Groups',
-					pathname: 'user-groups',
-					weight: 100,
-					icon: 'umb:users',
-				},
-			},
-		];
+		const manifests: Array<ManifestSectionView> = [];
 
 		manifests.forEach((manifest) => {
 			if (umbExtensionsRegistry.isRegistered(manifest.alias)) return;

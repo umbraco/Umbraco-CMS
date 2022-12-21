@@ -9,7 +9,7 @@ import { initialize, mswDecorator } from 'msw-storybook-addon';
 import { setCustomElements } from '@storybook/web-components';
 
 import customElementManifests from '../custom-elements.json';
-import { UmbDataTypesStore } from '../src/core/stores/data-types/data-types.store';
+import { UmbDataTypeStore } from '../src/core/stores/data-type/data-type.store';
 import { UmbDocumentTypeStore } from '../src/core/stores/document-type/document-type.store';
 import { UmbIconStore } from '../src/core/stores/icon/icon.store';
 import { onUnhandledRequest } from '../src/core/mocks/browser';
@@ -18,8 +18,8 @@ import { LitElement } from 'lit';
 import { UmbModalService } from '../src/core/services/modal';
 
 import { manifests as sectionManifests } from '../src/backoffice/sections/manifests';
-import { manifests as propertyEditorModelManifests } from '../src/backoffice/property-editor-models/manifests';
-import { manifests as propertyEditorUIManifests } from '../src/backoffice/property-editor-uis/manifests';
+import { manifests as propertyEditorModelManifests } from '../src/backoffice/property-editors/models/manifests';
+import { manifests as propertyEditorUIManifests } from '../src/backoffice/property-editors/uis/manifests';
 import { manifests as treeManifests } from '../src/backoffice/trees/manifests';
 import { manifests as workspaceManifests } from '../src/backoffice/workspaces/manifests';
 import { manifests as propertyActionManifests } from '../src/backoffice/property-actions/manifests';
@@ -63,7 +63,7 @@ customElements.define('umb-storybook', UmbStoryBookElement);
 const storybookProvider = (story) => html` <umb-storybook>${story()}</umb-storybook> `;
 
 const dataTypeStoreProvider = (story) => html`
-	<umb-context-provider key="umbDataTypeStore" .value=${new UmbDataTypesStore()}>${story()}</umb-context-provider>
+	<umb-context-provider key="umbDataTypeStore" .value=${new UmbDataTypeStore()}>${story()}</umb-context-provider>
 `;
 
 const documentTypeStoreProvider = (story) => html`

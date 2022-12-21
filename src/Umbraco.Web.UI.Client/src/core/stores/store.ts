@@ -24,22 +24,12 @@ export abstract class UmbDataStoreBase<T extends UmbDataStoreIdentifiers> implem
 	public readonly items: Observable<Array<T>> = this._items.asObservable();
 
 	/**
-	 * @description - Request data by key. The data is added to the store and is returned as an Observable.
-	 * @param {string} key
-	 * @return {*}  {(Observable<T | null>)}
-	 * @memberof UmbDataStoreBase
-	 */
-	abstract getByKey(key: string): Observable<T | null>
-
-	/**
 	 * @description - Delete items from the store.
 	 * @param {Array<string>} keys
 	 * @memberof UmbDataStoreBase
 	 */
 	public deleteItems(keys: Array<string>): void {
-		const remainingItems = this._items
-			.getValue()
-			.filter((item) => item.key && keys.includes(item.key) === false);
+		const remainingItems = this._items.getValue().filter((item) => item.key && keys.includes(item.key) === false);
 		this._items.next(remainingItems);
 	}
 
@@ -74,7 +64,6 @@ export abstract class UmbDataStoreBase<T extends UmbDataStoreIdentifiers> implem
 	}
 }
 
-
 /**
  * @export
  * @class UmbNodeStoreBase
@@ -83,13 +72,19 @@ export abstract class UmbDataStoreBase<T extends UmbDataStoreIdentifiers> implem
  * @description - Base class for Data Stores
  */
 export abstract class UmbNodeStoreBase<T extends UmbDataStoreIdentifiers> extends UmbDataStoreBase<T> {
-	
+	/**
+	 * @description - Request data by key. The data is added to the store and is returned as an Observable.
+	 * @param {string} key
+	 * @return {*}  {(Observable<T | null>)}
+	 * @memberof UmbDataStoreBase
+	 */
+	abstract getByKey(key: string): Observable<T | null>;
+
 	/**
 	 * @description - Save data.
 	 * @param {object} data
 	 * @return {*}  {(Promise<void>)}
 	 * @memberof UmbNodeStoreBase
 	 */
-	abstract save(data: T[]): Promise<void>
-
+	abstract save(data: T[]): Promise<void>;
 }

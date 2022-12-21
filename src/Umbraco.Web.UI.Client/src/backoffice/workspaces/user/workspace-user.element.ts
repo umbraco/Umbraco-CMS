@@ -12,7 +12,7 @@ import { UmbWorkspaceUserContext } from './workspace-user.context';
 import { UmbContextProviderMixin, UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { ManifestWorkspaceAction, UserDetails } from '@umbraco-cms/models';
 
-import '../../property-editor-uis/content-picker/property-editor-ui-content-picker.element';
+import '../../property-editors/uis/content-picker/property-editor-ui-content-picker.element';
 import '@umbraco-cms/components/input-user-group/input-user-group.element';
 
 import { umbCurrentUserService } from 'src/core/services/current-user';
