@@ -33,6 +33,8 @@ import { UmbIconStore } from '../core/stores/icon/icon.store';
 import { UmbUserGroupStore } from '../core/stores/user/user-group.store';
 import { UmbCurrentUserHistoryStore } from '../core/stores/current-user-history/current-user-history.store';
 import { UmbDictionaryStore } from '../core/stores/dictionary/dictionary.store';
+import { UmbDocumentBlueprintStore } from '../core/stores/document-blueprint/document-blueprint.store';
+
 import { manifests as sectionManifests } from './sections/manifests';
 import { manifests as propertyEditorModelManifests } from './property-editors/models/manifests';
 import { manifests as propertyEditorUIManifests } from './property-editors/uis/manifests';
@@ -41,8 +43,10 @@ import { manifests as editorManifests } from './workspaces/manifests';
 import { manifests as propertyActionManifests } from './property-actions/manifests';
 import { manifests as externalLoginProviderManifests } from './external-login-providers/manifests';
 import { manifests as userDashboards } from './user-dashboards/manifests';
+
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
+
 import type { ManifestTypes } from '@umbraco-cms/models';
 
 @defineElement('umb-backoffice')
@@ -92,6 +96,7 @@ export class UmbBackofficeElement extends UmbContextConsumerMixin(UmbContextProv
 		this.provideContext('umbSectionStore', new UmbSectionStore());
 		this.provideContext('umbCurrentUserHistoryStore', new UmbCurrentUserHistoryStore());
 		this.provideContext('umbDictionaryStore', new UmbDictionaryStore());
+		this.provideContext('umbDocumentBlueprintStore', new UmbDocumentBlueprintStore());
 	}
 
 	private _registerExtensions(manifests: Array<ManifestTypes> | Array<ManifestTypes>) {
