@@ -1,7 +1,7 @@
 ﻿namespace Umbraco.New.Cms.Core;
 
 // TODO: move this class to Umbraco.Cms.Core as a partial class
-public static class Constants
+public static partial class Constants
 {
     public static partial class OauthClientIds
     {

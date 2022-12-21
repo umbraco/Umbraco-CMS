@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Web.Common.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 
 namespace Umbraco.Cms.Core.Services.Implement;
 

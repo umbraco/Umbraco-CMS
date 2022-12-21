@@ -2,7 +2,7 @@
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Api.Management.Controllers.Tree;
-using Umbraco.New.Cms.Web.Common.Routing;
+using Umbraco.Cms.Api.Management.Routing;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Stylesheet.Tree;
 

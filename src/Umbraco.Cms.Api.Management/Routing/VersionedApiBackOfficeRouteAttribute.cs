@@ -1,4 +1,6 @@
-﻿namespace Umbraco.New.Cms.Web.Common.Routing;
+﻿using Umbraco.Cms.Api.Common.Routing;
+
+namespace Umbraco.Cms.Api.Management.Routing;
 
 public class VersionedApiBackOfficeRouteAttribute : BackOfficeRouteAttribute
 {

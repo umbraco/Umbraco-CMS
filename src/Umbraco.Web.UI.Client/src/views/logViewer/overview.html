@@ -83,12 +83,13 @@
 
                     <!-- Time period -->
                     <umb-box>
-                        <umb-box-header title="Time Period"></umb-box-header>
+                        <umb-box-header title="Time Period" id="timePeriod"></umb-box-header>
 
                         <umb-date-time-picker class="datepicker"
                                        ng-model="vm.period"
                                        options="vm.config"
-                                       on-close="vm.dateRangeChange(selectedDates, dateStr, instance)">
+                                       on-close="vm.dateRangeChange(selectedDates, dateStr, instance)"
+                                       label="timePeriod">
                         </umb-date-time-picker>
                     </umb-box>
 

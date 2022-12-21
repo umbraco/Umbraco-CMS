@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Api.Management.ViewModels.Dictionary;
-using Umbraco.Cms.Api.Management.ViewModels.Pagination;
+using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Dictionary;
 
@@ -29,7 +29,7 @@ public class AllDictionaryController : DictionaryControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<DictionaryOverviewViewModel>), StatusCodes.Status200OK)]
-    public async Task<PagedViewModel<DictionaryOverviewViewModel>> All(int skip, int take)
+    public async Task<ActionResult<PagedViewModel<DictionaryOverviewViewModel>>> All(int skip, int take)
     {
         IDictionaryItem[] items = _localizationService.GetDictionaryItemDescendants(null).ToArray();
         var list = new List<DictionaryOverviewViewModel>(items.Length);

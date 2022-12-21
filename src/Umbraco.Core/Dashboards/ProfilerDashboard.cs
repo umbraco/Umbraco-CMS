@@ -7,7 +7,7 @@ public class ProfilerDashboard : IDashboard
 {
     public string Alias => "settingsProfiler";
 
-    public string[] Sections => new[] { "settings" };
+    public string[] Sections => new[] { Constants.Applications.Settings };
 
     public string View => "views/dashboard/settings/profiler.html";
 

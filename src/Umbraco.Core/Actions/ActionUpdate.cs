@@ -1,23 +1,24 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 namespace Umbraco.Cms.Core.Actions;
 
 /// <summary>
-///     This action is invoked when copying a document or media
+///     This action is invoked when copying a document or media.
 /// </summary>
 public class ActionUpdate : IAction
 {
-    /// <summary>
-    ///     The unique action letter
-    /// </summary>
+    /// <inheritdoc cref="IAction.ActionLetter"/>
     public const char ActionLetter = 'A';
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IAction.ActionAlias"/>
+    public const string ActionAlias = "update";
+
+    /// <inheritdoc/>
     public char Letter => ActionLetter;
 
-    /// <inheritdoc />
-    public string Alias => "update";
+    /// <inheritdoc/>
+    public string Alias => ActionAlias;
 
     /// <inheritdoc />
     public string Category => Constants.Conventions.PermissionCategories.ContentCategory;

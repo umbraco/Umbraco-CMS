@@ -21,7 +21,7 @@
                 <umb-box class="side-panel">
                     <umb-box-header title-key="rollback_versions">
                         <small>
-                            <localize 
+                            <localize
                                 key="rollback_pagination"
                                 tokens="[vm.paginationCount.from, vm.paginationCount.to, vm.paginationCount.total]"
                                 watch-tokens="true">
@@ -42,17 +42,12 @@
                         </div>
 
                         <div>
-                            <div class="current-version">
-                                <span class="bold"><localize key="rollback_currentVersion">Current version</localize>: </span>
-                                <span>{{vm.currentVersion.name}} (<localize key="rollback_created">Created</localize>: {{vm.currentVersion.createDate}})</span>
-                            </div>
-
                             <div class="umb-table umb-table--condensed">
 
                                 <div class="umb-table-body">
-                                    <div class="umb-table-row umb-outline"
+                                    <div class="umb-table-row umb-outline -selectable cursor-pointer"
                                         ng-repeat="version in vm.previousVersions track by version.versionId"
-                                        ng-class="{'-selectable cursor-pointer': !version.currentDraftVersion && !version.currentPublishedVersion,'-selected': version.versionId === vm.previousVersion.versionId }"
+                                        ng-class="{'-selected': version.versionId === vm.previousVersion.versionId }"
                                         ng-click="vm.changeVersion(version)">
                                         <div class="umb-table-cell dn"></div>
                                         <div class="umb-table-cell black">
@@ -61,12 +56,11 @@
                                                 <div class="version-details">{{version.username}}</div>
                                                 <div class="version-details">
                                                     <localize ng-if="version.currentPublishedVersion" key="rollback_currentPublishedVersion">Current version</localize>
-                                                    <localize ng-if="version.currentDraftVersion" key="rollback_currentDraftVersion">Current version</localize>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="umb-table-cell umb-table-cell--auto-width">
-                                            <umb-button 
+                                            <umb-button
                                                 style="margin-left: auto;"
                                                 button-style="outline"
                                                 type="button"
@@ -108,15 +102,18 @@
                         </umb-empty-state>
 
                         <div ng-if="vm.diff && !vm.loadingDiff" class="diff">
-                            
+
                             <small class="db" style="margin-bottom: 15px;">
-                                <localize key="rollback_diffHelp">
-                                    This shows the differences between the current version and the selected version<br /><del>Red text</del> will be
+                                <localize key="rollback_diffHelp" ng-if="vm.diffHasChanges">
+                                    This shows the differences between the current (draft) version and the selected version<br /><del>Red text</del> will be
                                     removed in the selected version, <ins>green text</ins> will be added
+                                </localize>
+                                <localize key="rollback_noDiff" ng-if="!vm.diffHasChanges">
+                                    There are no differences between the current (draft) version and the selected version
                                 </localize>
                             </small>
 
-                            <table class="table table-condensed table-bordered">
+                            <table class="table table-condensed table-bordered" ng-if="vm.diffHasChanges">
                                 <tbody>
                                     <tr>
                                         <td class="bold">

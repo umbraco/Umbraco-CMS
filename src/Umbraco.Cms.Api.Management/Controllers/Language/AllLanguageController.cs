@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Api.Management.ViewModels.Language;
-using Umbraco.Cms.Api.Management.ViewModels.Pagination;
+using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.New.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Language;
@@ -27,7 +27,7 @@ public class AllLanguageController : LanguageControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<LanguageViewModel>), StatusCodes.Status200OK)]
-    public async Task<PagedViewModel<LanguageViewModel>?> GetAll(int skip, int take)
+    public async Task<ActionResult<PagedViewModel<LanguageViewModel>>> GetAll(int skip, int take)
     {
         PagedModel<ILanguage> allLanguages = _localizationService.GetAllLanguagesPaged(skip, take);
 

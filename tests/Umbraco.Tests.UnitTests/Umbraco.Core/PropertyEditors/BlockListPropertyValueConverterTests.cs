@@ -1,17 +1,16 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Headless;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 
@@ -66,7 +65,7 @@ public class BlockListPropertyValueConverterTests
         var editor = new BlockListPropertyValueConverter(
             Mock.Of<IProfilingLogger>(),
             new BlockEditorConverter(publishedSnapshotAccessor, publishedModelFactory),
-            new HeadlessElementBuilder(new HeadlessPropertyMapper()));
+            Mock.Of<IContentTypeService>());
         return editor;
     }
 
@@ -90,6 +89,13 @@ public class BlockListPropertyValueConverterTests
     private BlockListConfiguration ConfigForSingle() => new()
     {
         Blocks = new[] { new BlockListConfiguration.BlockConfiguration { ContentElementTypeKey = _contentKey1 } },
+    };
+
+    private BlockListConfiguration ConfigForSingleBlockMode() => new()
+    {
+        Blocks = new[] { new BlockListConfiguration.BlockConfiguration { ContentElementTypeKey = _contentKey1 } },
+        ValidationLimit = new() { Min = 1, Max = 1 },
+        UseSingleBlockMode = true,
     };
 
     private IPublishedPropertyType GetPropertyType(BlockListConfiguration config)
@@ -124,11 +130,7 @@ public class BlockListPropertyValueConverterTests
 
         // the result is always block list model
         Assert.AreEqual(typeof(BlockListModel), valueType);
-
-        var headlessValueType = editor.GetHeadlessPropertyValueType(propType);
-
-        // the result is always enumerable of headless block list model
-        Assert.AreEqual(typeof(IEnumerable<HeadlessBlockListModel>), headlessValueType);    }
+    }
 
     [Test]
     public void Get_Value_Type_Single()
@@ -143,11 +145,21 @@ public class BlockListPropertyValueConverterTests
 
         // the result is always block list model
         Assert.AreEqual(typeof(BlockListModel), valueType);
+    }
 
-        var headlessValueType = editor.GetHeadlessPropertyValueType(propType);
+    [Test]
+    public void Get_Value_Type_SingleBlockMode()
+    {
+        var editor = CreateConverter();
+        var config = ConfigForSingleBlockMode();
 
-        // the result is always enumerable of headless block list model
-        Assert.AreEqual(typeof(IEnumerable<HeadlessBlockListModel>), headlessValueType);    }
+        var dataType = new PublishedDataType(1, "test", new Lazy<object>(() => config));
+        var propType = Mock.Of<IPublishedPropertyType>(x => x.DataType == dataType);
+
+        var valueType = editor.GetPropertyValueType(propType);
+
+        Assert.AreEqual(typeof(BlockListItem), valueType);
+    }
 
     [Test]
     public void Convert_Null_Empty()
@@ -161,21 +173,16 @@ public class BlockListPropertyValueConverterTests
         var converted =
             editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as
                 BlockListModel;
-        var headlessConverted = editor.ConvertIntermediateToHeadlessObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as HeadlessBlockListModel;
 
         Assert.IsNotNull(converted);
         Assert.AreEqual(0, converted.Count);
-        Assert.IsNotNull(headlessConverted);
-        Assert.AreEqual(0, headlessConverted.Items.Count());
 
         json = string.Empty;
         converted = editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as BlockListModel;
-        headlessConverted = editor.ConvertIntermediateToHeadlessObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as HeadlessBlockListModel;
 
         Assert.IsNotNull(converted);
         Assert.AreEqual(0, converted.Count);
-        Assert.IsNotNull(headlessConverted);
-        Assert.AreEqual(0, headlessConverted.Items.Count());    }
+    }
 
     [Test]
     public void Convert_Valid_Empty_Json()
@@ -189,23 +196,17 @@ public class BlockListPropertyValueConverterTests
         var converted =
             editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as
                 BlockListModel;
-        var headlessConverted = editor.ConvertIntermediateToHeadlessObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as HeadlessBlockListModel;
 
         Assert.IsNotNull(converted);
         Assert.AreEqual(0, converted.Count);
-        Assert.IsNotNull(headlessConverted);
-        Assert.AreEqual(0, headlessConverted.Items.Count());
 
         json = @"{
 layout: {},
 data: []}";
         converted = editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as BlockListModel;
-        headlessConverted = editor.ConvertIntermediateToHeadlessObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as HeadlessBlockListModel;
 
         Assert.IsNotNull(converted);
         Assert.AreEqual(0, converted.Count);
-        Assert.IsNotNull(headlessConverted);
-        Assert.AreEqual(0, headlessConverted.Items.Count());
 
         // Even though there is a layout, there is no data, so the conversion will result in zero elements in total
         json = @"
@@ -221,12 +222,9 @@ data: []}";
 }";
 
         converted = editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as BlockListModel;
-        headlessConverted = editor.ConvertIntermediateToHeadlessObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as HeadlessBlockListModel;
 
         Assert.IsNotNull(converted);
         Assert.AreEqual(0, converted.Count);
-        Assert.IsNotNull(headlessConverted);
-        Assert.AreEqual(0, headlessConverted.Items.Count());
 
         // Even though there is a layout and data, the data is invalid (missing required keys) so the conversion will result in zero elements in total
         json = @"
@@ -246,12 +244,9 @@ data: []}";
 }";
 
         converted = editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as BlockListModel;
-        headlessConverted = editor.ConvertIntermediateToHeadlessObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as HeadlessBlockListModel;
 
         Assert.IsNotNull(converted);
         Assert.AreEqual(0, converted.Count);
-        Assert.IsNotNull(headlessConverted);
-        Assert.AreEqual(0, headlessConverted.Items.Count());
 
         // Everthing is ok except the udi reference in the layout doesn't match the data so it will be empty
         json = @"
@@ -272,12 +267,9 @@ data: []}";
 }";
 
         converted = editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as BlockListModel;
-        headlessConverted = editor.ConvertIntermediateToHeadlessObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as HeadlessBlockListModel;
 
         Assert.IsNotNull(converted);
         Assert.AreEqual(0, converted.Count);
-        Assert.IsNotNull(headlessConverted);
-        Assert.AreEqual(0, headlessConverted.Items.Count());
     }
 
     [Test]
@@ -315,14 +307,6 @@ data: []}";
         Assert.AreEqual("Test1", item0.ContentType.Alias);
         Assert.IsNull(converted[0].Settings);
         Assert.AreEqual(UdiParser.Parse("umb://element/1304E1DDAC87439684FE8A399231CB3D"), converted[0].ContentUdi);
-
-        var headlessConverted = editor.ConvertIntermediateToHeadlessObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as HeadlessBlockListModel;
-        Assert.IsNotNull(headlessConverted);
-        Assert.AreEqual(1, headlessConverted.Items.Count());
-
-        Assert.AreEqual(Guid.Parse("1304E1DD-AC87-4396-84FE-8A399231CB3D"), headlessConverted.Items.First().Content.Key);
-        Assert.AreEqual("Test1", headlessConverted.Items.First().Content.ContentType);
-        Assert.IsNull(headlessConverted.Items.First().Settings);
     }
 
     [Test]
@@ -395,20 +379,6 @@ data: []}";
         Assert.AreEqual("Test2", item1.Content.ContentType.Alias);
         Assert.AreEqual(Guid.Parse("63027539B0DB45E7B70459762D4E83DD"), item1.Settings.Key);
         Assert.AreEqual("Setting1", item1.Settings.ContentType.Alias);
-
-        var headlessConverted = editor.ConvertIntermediateToHeadlessObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as HeadlessBlockListModel;
-        Assert.IsNotNull(headlessConverted);
-        Assert.AreEqual(2, headlessConverted.Items.Count());
-
-        Assert.AreEqual(Guid.Parse("1304E1DD-AC87-4396-84FE-8A399231CB3D"), headlessConverted.Items.First().Content.Key);
-        Assert.AreEqual("Test1", headlessConverted.Items.First().Content.ContentType);
-        Assert.AreEqual(Guid.Parse("1F613E26CE274898908A561437AF5100"), headlessConverted.Items.First().Settings.Key);
-        Assert.AreEqual("Setting2", headlessConverted.Items.First().Settings.ContentType);
-
-        Assert.AreEqual(Guid.Parse("0A4A416E-547D-464F-ABCC-6F345C17809A"), headlessConverted.Items.Last().Content.Key);
-        Assert.AreEqual("Test2", headlessConverted.Items.Last().Content.ContentType);
-        Assert.AreEqual(Guid.Parse("63027539B0DB45E7B70459762D4E83DD"), headlessConverted.Items.Last().Settings.Key);
-        Assert.AreEqual("Setting1", headlessConverted.Items.Last().Settings.ContentType);
     }
 
     [Test]
@@ -488,13 +458,5 @@ data: []}";
         Assert.AreEqual(Guid.Parse("0A4A416E-547D-464F-ABCC-6F345C17809A"), item0.Content.Key);
         Assert.AreEqual("Test2", item0.Content.ContentType.Alias);
         Assert.IsNull(item0.Settings);
-
-        var headlessConverted = editor.ConvertIntermediateToHeadlessObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as HeadlessBlockListModel;
-        Assert.IsNotNull(headlessConverted);
-        Assert.AreEqual(1, headlessConverted.Items.Count());
-
-        Assert.AreEqual(Guid.Parse("0A4A416E-547D-464F-ABCC-6F345C17809A"), headlessConverted.Items.First().Content.Key);
-        Assert.AreEqual("Test2", headlessConverted.Items.First().Content.ContentType);
-        Assert.IsNull(headlessConverted.Items.First().Settings);
     }
 }
