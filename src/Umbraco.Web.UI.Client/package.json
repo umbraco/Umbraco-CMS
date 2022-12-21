@@ -78,7 +78,7 @@
 		"@storybook/addon-a11y": "^6.5.15",
 		"@storybook/addon-actions": "^6.5.14",
 		"@storybook/addon-essentials": "^6.5.14",
-		"@storybook/addon-links": "^6.5.14",
+		"@storybook/addon-links": "^6.5.15",
 		"@storybook/builder-vite": "^0.2.6",
 		"@storybook/mdx2-csf": "^0.0.3",
 		"@storybook/web-components": "^6.5.15",
