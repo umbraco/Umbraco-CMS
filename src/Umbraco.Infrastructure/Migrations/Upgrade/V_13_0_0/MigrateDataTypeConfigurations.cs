@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Infrastructure.Migrations.PostMigrations;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Extensions;
 using PropertyEditorAliases = Umbraco.Cms.Core.Constants.PropertyEditors.Aliases;
 
@@ -12,17 +13,18 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_13_0_0;
 
 public class MigrateDataTypeConfigurations : MigrationBase
 {
-    private readonly IConfigurationEditorJsonSerializer _serializer;
-
-    public MigrateDataTypeConfigurations(IMigrationContext context, IConfigurationEditorJsonSerializer serializer)
+    public MigrateDataTypeConfigurations(IMigrationContext context)
         : base(context)
     {
-        _serializer = serializer;
     }
 
     // TODO: this migration is a work in progress; it will be amended for a while, thus it MUST be able to re-run several times without failing miserably
     protected override void Migrate()
     {
+        // this really should be injected, but until we can get rid of the Newtonsoft.Json based config serializer, we can't rely on
+        // injection during installs, so we will have to settle for new'ing it up explicitly here (at least for now).
+        IConfigurationEditorJsonSerializer serializer = new SystemTextConfigurationEditorJsonSerializer();
+
         Sql<ISqlContext> sql = Sql()
             .Select<DataTypeDto>()
             .From<DataTypeDto>()
@@ -35,7 +37,7 @@ public class MigrateDataTypeConfigurations : MigrationBase
         {
             Dictionary<string, object> configurationData = dataTypeDto.Configuration.IsNullOrWhiteSpace()
                 ? new Dictionary<string, object>()
-                : _serializer.Deserialize<Dictionary<string, object>>(dataTypeDto.Configuration) ?? new Dictionary<string, object>();
+                : serializer.Deserialize<Dictionary<string, object>>(dataTypeDto.Configuration) ?? new Dictionary<string, object>();
 
             // fix config key casing - should always be camelCase, but some have been saved as PascalCase over the years
             var badlyCasedKeys = configurationData.Keys.Where(key => key.ToFirstLowerInvariant() != key).ToArray();
@@ -60,7 +62,7 @@ public class MigrateDataTypeConfigurations : MigrationBase
 
             if (updated)
             {
-                dataTypeDto.Configuration = _serializer.Serialize(configurationData);
+                dataTypeDto.Configuration = serializer.Serialize(configurationData);
                 Database.Update(dataTypeDto);
                 refreshCache = true;
             }
