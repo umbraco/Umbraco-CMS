@@ -1,17 +1,17 @@
 import type { ManifestTree, ManifestTreeItemAction } from '@umbraco-cms/models';
 
-const treeAlias = 'Umb.Tree.MemberTypes';
+const treeAlias = 'Umb.Tree.MediaTypes';
 
 const tree: ManifestTree = {
 	type: 'tree',
 	alias: treeAlias,
-	name: 'Member Types Tree',
+	name: 'Media Types Tree',
 	weight: 200,
 	meta: {
-		label: 'Member Types',
+		label: 'Media Types',
 		icon: 'umb:folder',
 		sections: ['Umb.Section.Settings'],
-		storeContextAlias: 'umbMemberTypeStore',
+		storeContextAlias: 'umbMediaTypeStore',
 	},
 };
 
