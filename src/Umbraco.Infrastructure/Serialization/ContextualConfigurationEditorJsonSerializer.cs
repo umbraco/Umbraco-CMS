@@ -24,16 +24,22 @@ public class ContextualConfigurationEditorJsonSerializer : IConfigurationEditorJ
 
     private IConfigurationEditorJsonSerializer ContextualizedSerializer()
     {
-        var requestedPath = _requestAccessor.GetRequestUrl()?.AbsolutePath;
-        if (requestedPath == null)
+        try
         {
-            return _configurationEditorJsonSerializer;
+            var requestedPath = _requestAccessor.GetRequestUrl()?.AbsolutePath;
+            if (requestedPath != null)
+            {
+                // add white listed paths for the System.Text.Json config serializer here
+                // - always use it for the new management API
+                if (requestedPath.Contains("/umbraco/management/api/"))
+                {
+                    return _systemTextConfigurationEditorJsonSerializer;
+                }
+            }
         }
-
-        // always use System.Text.Json config serializer for the new management API
-        if (requestedPath.Contains("/umbraco/management/api/"))
+        catch (Exception ex)
         {
-            return _systemTextConfigurationEditorJsonSerializer;
+            // ignore - this whole thing is a temporary workaround, let's not make a fuss
         }
 
         return _configurationEditorJsonSerializer;
