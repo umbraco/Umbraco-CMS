@@ -16,12 +16,12 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.ContentApi;
 public class MediaPickerValueConverterTests : PropertyValueConverterTests
 {
     [Test]
-    public void MediaPickerValueConverter_InSingleMode_HasSingleContentAsContentApiType()
+    public void MediaPickerValueConverter_InSingleMode_HasMultipleContentAsContentApiType()
     {
         var publishedPropertyType = SetupMediaPropertyType(false);
         var valueConverter = CreateMediaPickerValueConverter();
 
-        Assert.AreEqual(typeof(ApiMedia), valueConverter.GetContentApiPropertyValueType(publishedPropertyType));
+        Assert.AreEqual(typeof(IEnumerable<ApiMedia>), valueConverter.GetContentApiPropertyValueType(publishedPropertyType));
     }
 
     [Test]
@@ -32,13 +32,14 @@ public class MediaPickerValueConverterTests : PropertyValueConverterTests
 
         var inter = new[] {new GuidUdi(Constants.UdiEntityType.MediaType, PublishedMedia.Key)};
 
-        var result = valueConverter.ConvertIntermediateToContentApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false) as ApiMedia;
+        var result = valueConverter.ConvertIntermediateToContentApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false) as IEnumerable<ApiMedia>;
 
         Assert.NotNull(result);
-        Assert.AreEqual("The media", result.Name);
-        Assert.AreEqual(PublishedMedia.Key, result.Id);
-        Assert.AreEqual("the-media-url", result.Url);
-        Assert.AreEqual("TheMediaType", result.MediaType);
+        Assert.AreEqual(1, result.Count());
+        Assert.AreEqual("The media", result.First().Name);
+        Assert.AreEqual(PublishedMedia.Key, result.First().Id);
+        Assert.AreEqual("the-media-url", result.First().Url);
+        Assert.AreEqual("TheMediaType", result.First().MediaType);
     }
 
     [Test]

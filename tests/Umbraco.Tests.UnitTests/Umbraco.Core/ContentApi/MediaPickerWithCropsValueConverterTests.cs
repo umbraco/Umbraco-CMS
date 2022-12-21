@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.ContentApi;
 public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTests
 {
     [Test]
-    public void MediaPickerWithCropsValueConverter_InSingleMode_ConvertsValueToMedia()
+    public void MediaPickerWithCropsValueConverter_InSingleMode_ConvertsValueToCollectionOfApiMedia()
     {
         var publishedPropertyType = SetupMediaPropertyType(false);
         var mediaKey = SetupMedia("My media", ".jpg", 200, 400, "My alt text");
@@ -25,7 +25,7 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
         var serializer = new JsonNetSerializer();
 
         var valueConverter = new MediaPickerWithCropsValueConverter(PublishedSnapshotAccessor, PublishedUrlProvider, Mock.Of<IPublishedValueFallback>(), serializer, new ContentNameProvider());
-        Assert.AreEqual(typeof(ApiMediaWithCrops), valueConverter.GetContentApiPropertyValueType(publishedPropertyType));
+        Assert.AreEqual(typeof(IEnumerable<ApiMediaWithCrops>), valueConverter.GetContentApiPropertyValueType(publishedPropertyType));
 
         var inter = serializer.Serialize(new[]
         {
@@ -45,29 +45,30 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
             }
         });
 
-        var result = valueConverter.ConvertIntermediateToContentApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false) as ApiMediaWithCrops;
+        var result = valueConverter.ConvertIntermediateToContentApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false) as IEnumerable<ApiMediaWithCrops>;
         Assert.NotNull(result);
-        Assert.AreEqual("My media", result.Name);
-        Assert.AreEqual("my-media", result.Url);
-        Assert.AreEqual(".jpg", result.Extension);
-        Assert.AreEqual(200, result.Width);
-        Assert.AreEqual(400, result.Height);
-        Assert.NotNull(result.FocalPoint);
-        Assert.AreEqual(.2m, result.FocalPoint.Left);
-        Assert.AreEqual(.4m, result.FocalPoint.Top);
-        Assert.NotNull(result.Crops);
-        Assert.AreEqual(1, result.Crops.Count());
-        Assert.AreEqual("one", result.Crops.First().Alias);
-        Assert.AreEqual(100, result.Crops.First().Height);
-        Assert.AreEqual(200, result.Crops.First().Width);
-        Assert.NotNull(result.Crops.First().Coordinates);
-        Assert.AreEqual(1m, result.Crops.First().Coordinates.X1);
-        Assert.AreEqual(2m, result.Crops.First().Coordinates.X2);
-        Assert.AreEqual(10m, result.Crops.First().Coordinates.Y1);
-        Assert.AreEqual(20m, result.Crops.First().Coordinates.Y2);
-        Assert.NotNull(result.Properties);
-        Assert.AreEqual(1, result.Properties.Count);
-        Assert.AreEqual("My alt text", result.Properties["altText"]);
+        Assert.AreEqual(1, result.Count());
+        Assert.AreEqual("My media", result.First().Name);
+        Assert.AreEqual("my-media", result.First().Url);
+        Assert.AreEqual(".jpg", result.First().Extension);
+        Assert.AreEqual(200, result.First().Width);
+        Assert.AreEqual(400, result.First().Height);
+        Assert.NotNull(result.First().FocalPoint);
+        Assert.AreEqual(.2m, result.First().FocalPoint.Left);
+        Assert.AreEqual(.4m, result.First().FocalPoint.Top);
+        Assert.NotNull(result.First().Crops);
+        Assert.AreEqual(1, result.First().Crops.Count());
+        Assert.AreEqual("one", result.First().Crops.First().Alias);
+        Assert.AreEqual(100, result.First().Crops.First().Height);
+        Assert.AreEqual(200, result.First().Crops.First().Width);
+        Assert.NotNull(result.First().Crops.First().Coordinates);
+        Assert.AreEqual(1m, result.First().Crops.First().Coordinates.X1);
+        Assert.AreEqual(2m, result.First().Crops.First().Coordinates.X2);
+        Assert.AreEqual(10m, result.First().Crops.First().Coordinates.Y1);
+        Assert.AreEqual(20m, result.First().Crops.First().Coordinates.Y2);
+        Assert.NotNull(result.First().Properties);
+        Assert.AreEqual(1, result.First().Properties.Count);
+        Assert.AreEqual("My alt text", result.First().Properties["altText"]);
     }
 
     [Test]
@@ -167,7 +168,7 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
     [TestCase(null)]
     [TestCase(123)]
     [TestCase("123")]
-    public void MediaPickerWithCropsValueConverter_InSingleMode_ConvertsInvalidValueToNull(object inter)
+    public void MediaPickerWithCropsValueConverter_InSingleMode_ConvertsInvalidValueToEmptyCollection(object inter)
     {
         var publishedPropertyType = SetupMediaPropertyType(false);
 
@@ -175,8 +176,9 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
 
         var valueConverter = new MediaPickerWithCropsValueConverter(PublishedSnapshotAccessor, PublishedUrlProvider, Mock.Of<IPublishedValueFallback>(), serializer, new ContentNameProvider());
 
-        var result = valueConverter.ConvertIntermediateToContentApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false) as ApiMediaWithCrops;
-        Assert.Null(result);
+        var result = valueConverter.ConvertIntermediateToContentApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false) as IEnumerable<ApiMediaWithCrops>;
+        Assert.NotNull(result);
+        Assert.IsEmpty(result);
     }
 
     [TestCase("")]

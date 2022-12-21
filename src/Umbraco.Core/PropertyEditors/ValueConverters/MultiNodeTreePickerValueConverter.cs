@@ -182,13 +182,11 @@ public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase, ICo
         return source;
     }
 
-    public Type GetContentApiPropertyValueType(IPublishedPropertyType propertyType) => IsSingleNodePicker(propertyType)
-        ? typeof(ApiLink)
-        : typeof(IEnumerable<ApiLink>);
+    public Type GetContentApiPropertyValueType(IPublishedPropertyType propertyType) => typeof(IEnumerable<ApiLink>);
 
     public object? ConvertIntermediateToContentApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
     {
-        object? DefaultValue() => IsSingleNodePicker(propertyType) ? null : Array.Empty<ApiLink>();
+        IEnumerable<ApiLink> DefaultValue() => Array.Empty<ApiLink>();
 
         if (inter is not IEnumerable<Udi> udis)
         {
@@ -217,7 +215,7 @@ public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase, ICo
                 item.ContentType.Alias,
                 item.ItemType == PublishedItemType.Media ? LinkType.Media : LinkType.Content);
 
-        return IsSingleNodePicker(propertyType) ? ToLink(items.First()) : items.Select(ToLink);
+        return items.Select(ToLink);
     }
 
     private static bool IsSingleNodePicker(IPublishedPropertyType propertyType) =>

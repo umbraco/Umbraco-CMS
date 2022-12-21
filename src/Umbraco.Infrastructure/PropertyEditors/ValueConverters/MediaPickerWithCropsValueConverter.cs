@@ -120,10 +120,7 @@ public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, IC
         return isMultiple ? mediaItems : mediaItems.FirstOrDefault();
     }
 
-    public Type GetContentApiPropertyValueType(IPublishedPropertyType propertyType)
-        => IsMultipleDataType(propertyType.DataType)
-            ? typeof(IEnumerable<ApiMediaWithCrops>)
-            : typeof(ApiMediaWithCrops);
+    public Type GetContentApiPropertyValueType(IPublishedPropertyType propertyType) => typeof(IEnumerable<ApiMediaWithCrops>);
 
     public object? ConvertIntermediateToContentApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
     {
@@ -156,14 +153,14 @@ public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, IC
         var converted = ConvertIntermediateToObject(owner, propertyType, referenceCacheLevel, inter, preview);
         if (isMultiple && converted is IEnumerable<MediaWithCrops> mediasWithCrops)
         {
-            return mediasWithCrops.Select(ToApiMedia);
+            return mediasWithCrops.Select(ToApiMedia).ToArray();
         }
         if (isMultiple == false && converted is MediaWithCrops mediaWithCrops)
         {
-            return ToApiMedia(mediaWithCrops);
+            return new [] { ToApiMedia(mediaWithCrops) };
         }
 
-        return isMultiple ? Array.Empty<ApiMedia>() : null;
+        return Array.Empty<ApiMediaWithCrops>();
     }
 
     private bool IsMultipleDataType(PublishedDataType dataType) =>

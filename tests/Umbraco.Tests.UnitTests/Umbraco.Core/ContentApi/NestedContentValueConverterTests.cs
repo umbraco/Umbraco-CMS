@@ -62,41 +62,44 @@ public class NestedContentValueConverterTests : PropertyValueConverterTests
     }
 
     [Test]
-    public void NestedContentSingleValueConverter_HasSingleElementAsContentApiType()
-        => Assert.AreEqual(typeof(IApiElement), _nestedContentSingleValueConverter.GetContentApiPropertyValueType(Mock.Of<IPublishedPropertyType>()));
+    public void NestedContentSingleValueConverter_HasMultipleElementsAsContentApiType()
+        => Assert.AreEqual(typeof(IEnumerable<IApiElement>), _nestedContentSingleValueConverter.GetContentApiPropertyValueType(Mock.Of<IPublishedPropertyType>()));
 
     [Test]
-    public void NestedContentSingleValueConverter_WithOneItem_ConvertsItemToElement()
+    public void NestedContentSingleValueConverter_WithOneItem_ConvertsItemToListOfElements()
     {
         var nestedContentValue = "[{\"ncContentTypeAlias\": \"contentType1\",\"key\": \"1E68FB92-727A-4473-B10C-FA108ADCF16F\",\"prop1\": \"Hello, world\"}]";
-        var result = _nestedContentSingleValueConverter.ConvertIntermediateToContentApiObject(Mock.Of<IPublishedElement>(), _publishedPropertyType, PropertyCacheLevel.Element, nestedContentValue, false) as IApiElement;
+        var result = _nestedContentSingleValueConverter.ConvertIntermediateToContentApiObject(Mock.Of<IPublishedElement>(), _publishedPropertyType, PropertyCacheLevel.Element, nestedContentValue, false) as IEnumerable<IApiElement>;
 
         Assert.IsNotNull(result);
-        Assert.AreEqual("contentType1", result.ContentType);
-        Assert.AreEqual(Guid.Parse("1E68FB92-727A-4473-B10C-FA108ADCF16F"), result.Id);
-        Assert.AreEqual(1, result.Properties.Count);
-        Assert.AreEqual("Hello, world", result.Properties["prop1"]);
+        Assert.AreEqual(1, result.Count());
+        Assert.AreEqual("contentType1", result.First().ContentType);
+        Assert.AreEqual(Guid.Parse("1E68FB92-727A-4473-B10C-FA108ADCF16F"), result.First().Id);
+        Assert.AreEqual(1, result.First().Properties.Count);
+        Assert.AreEqual("Hello, world", result.First().Properties["prop1"]);
     }
 
     [Test]
-    public void NestedContentSingleValueConverter_WithMultipleItems_ConvertsFirstItemToElement()
+    public void NestedContentSingleValueConverter_WithMultipleItems_ConvertsFirstItemToListOfElements()
     {
         var nestedContentValue = "[{\"ncContentTypeAlias\": \"contentType1\",\"key\": \"1E68FB92-727A-4473-B10C-FA108ADCF16F\",\"prop1\": \"Hello, world\"},{\"ncContentTypeAlias\": \"contentType1\",\"key\": \"40F59DD9-7E9F-4053-BD32-89FB086D18C9\",\"prop1\": \"One more\"}]";
-        var result = _nestedContentSingleValueConverter.ConvertIntermediateToContentApiObject(Mock.Of<IPublishedElement>(), _publishedPropertyType, PropertyCacheLevel.Element, nestedContentValue, false) as IApiElement;
+        var result = _nestedContentSingleValueConverter.ConvertIntermediateToContentApiObject(Mock.Of<IPublishedElement>(), _publishedPropertyType, PropertyCacheLevel.Element, nestedContentValue, false) as IEnumerable<IApiElement>;
 
         Assert.IsNotNull(result);
-        Assert.AreEqual("contentType1", result.ContentType);
-        Assert.AreEqual(Guid.Parse("1E68FB92-727A-4473-B10C-FA108ADCF16F"), result.Id);
-        Assert.AreEqual(1, result.Properties.Count);
-        Assert.AreEqual("Hello, world", result.Properties["prop1"]);
+        Assert.AreEqual(1, result.Count());
+        Assert.AreEqual("contentType1", result.First().ContentType);
+        Assert.AreEqual(Guid.Parse("1E68FB92-727A-4473-B10C-FA108ADCF16F"), result.First().Id);
+        Assert.AreEqual(1, result.First().Properties.Count);
+        Assert.AreEqual("Hello, world", result.First().Properties["prop1"]);
     }
 
     [Test]
-    public void NestedContentSingleValueConverter_WithNoData_ReturnsNull()
+    public void NestedContentSingleValueConverter_WithNoData_ReturnsEmptyArray()
     {
-        var result = _nestedContentSingleValueConverter.ConvertIntermediateToContentApiObject(Mock.Of<IPublishedElement>(), _publishedPropertyType, PropertyCacheLevel.Element, null, false) as IApiElement;
+        var result = _nestedContentSingleValueConverter.ConvertIntermediateToContentApiObject(Mock.Of<IPublishedElement>(), _publishedPropertyType, PropertyCacheLevel.Element, null, false) as IEnumerable<IApiElement>;
 
-        Assert.IsNull(result);
+        Assert.IsNotNull(result);
+        Assert.IsEmpty(result);
     }
 
     [Test]
@@ -140,10 +143,11 @@ public class NestedContentValueConverterTests : PropertyValueConverterTests
     }
 
     [Test]
-    public void NestedContentManyValueConverter_WithNoData_ReturnsNull()
+    public void NestedContentManyValueConverter_WithNoData_ReturnsEmptyArray()
     {
-        var result = _nestedContentManyValueConverter.ConvertIntermediateToContentApiObject(Mock.Of<IPublishedElement>(), _publishedPropertyType, PropertyCacheLevel.Element, null, false) as IApiElement;
+        var result = _nestedContentManyValueConverter.ConvertIntermediateToContentApiObject(Mock.Of<IPublishedElement>(), _publishedPropertyType, PropertyCacheLevel.Element, null, false) as IEnumerable<IApiElement>;
 
-        Assert.IsNull(result);
+        Assert.IsNotNull(result);
+        Assert.IsEmpty(result);
     }
 }

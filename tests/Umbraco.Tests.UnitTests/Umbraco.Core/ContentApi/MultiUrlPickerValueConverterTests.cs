@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.ContentApi;
 public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
 {
     [Test]
-    public void MultiUrlPickerValueConverter_InSingleMode_ConvertsContentToLink()
+    public void MultiUrlPickerValueConverter_InSingleMode_ConvertsContentToLinks()
     {
         var publishedDataType = new PublishedDataType(123, "test", new Lazy<object>(() => new MultiUrlPickerConfiguration { MaxNumber = 1 }));
         var publishedPropertyType = new Mock<IPublishedPropertyType>();
@@ -28,7 +28,7 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
 
         var serializer = new JsonNetSerializer();
         var valueConverter = new MultiUrlPickerValueConverter(PublishedSnapshotAccessor, Mock.Of<IProfilingLogger>(), serializer, Mock.Of<IUmbracoContextAccessor>(), PublishedUrlProvider, new ContentNameProvider());
-        Assert.AreEqual(typeof(ApiLink), valueConverter.GetContentApiPropertyValueType(publishedPropertyType.Object));
+        Assert.AreEqual(typeof(IEnumerable<ApiLink>), valueConverter.GetContentApiPropertyValueType(publishedPropertyType.Object));
 
         var inter = serializer.Serialize(new[]
         {
@@ -37,14 +37,15 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
                 Udi = new GuidUdi(Constants.UdiEntityType.Document, PublishedContent.Key)
             }
         });
-        var result = valueConverter.ConvertIntermediateToContentApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false) as ApiLink;
+        var result = valueConverter.ConvertIntermediateToContentApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false) as IEnumerable<ApiLink>;
         Assert.NotNull(result);
-        Assert.AreEqual(PublishedContent.Name, result.Title);
-        Assert.AreEqual(PublishedContent.Key, result.ContentId);
-        Assert.AreEqual("the-page-url", result.Url);
-        Assert.AreEqual("TheContentType", result.DestinationType);
-        Assert.AreEqual(LinkType.Content, result.LinkType);
-        Assert.AreEqual(null, result.Target);
+        Assert.AreEqual(1, result.Count());
+        Assert.AreEqual(PublishedContent.Name, result.First().Title);
+        Assert.AreEqual(PublishedContent.Key, result.First().ContentId);
+        Assert.AreEqual("the-page-url", result.First().Url);
+        Assert.AreEqual("TheContentType", result.First().DestinationType);
+        Assert.AreEqual(LinkType.Content, result.First().LinkType);
+        Assert.AreEqual(null, result.First().Target);
     }
 
     [Test]
@@ -89,7 +90,7 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
     }
 
     [Test]
-    public void MultiUrlPickerValueConverter_ConvertsExternalUrlToLink()
+    public void MultiUrlPickerValueConverter_ConvertsExternalUrlToLinks()
     {
         var publishedDataType = new PublishedDataType(123, "test", new Lazy<object>(() => new MultiUrlPickerConfiguration { MaxNumber = 1 }));
         var publishedPropertyType = new Mock<IPublishedPropertyType>();
@@ -108,13 +109,14 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
                 Url = "https://umbraco.com/"
             }
         });
-        var result = valueConverter.ConvertIntermediateToContentApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false) as ApiLink;
+        var result = valueConverter.ConvertIntermediateToContentApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false) as IEnumerable<ApiLink>;
         Assert.NotNull(result);
-        Assert.AreEqual("The link", result.Title);
-        Assert.AreEqual(null, result.ContentId);
-        Assert.AreEqual("https://umbraco.com/?something=true", result.Url);
-        Assert.AreEqual(LinkType.External, result.LinkType);
-        Assert.AreEqual("_blank", result.Target);
+        Assert.AreEqual(1, result.Count());
+        Assert.AreEqual("The link", result.First().Title);
+        Assert.AreEqual(null, result.First().ContentId);
+        Assert.AreEqual("https://umbraco.com/?something=true", result.First().Url);
+        Assert.AreEqual(LinkType.External, result.First().LinkType);
+        Assert.AreEqual("_blank", result.First().Target);
     }
 
     [Test]
@@ -137,13 +139,14 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
                 Target = "_blank"
             }
         });
-        var result = valueConverter.ConvertIntermediateToContentApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false) as ApiLink;
+        var result = valueConverter.ConvertIntermediateToContentApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false) as IEnumerable<ApiLink>;
         Assert.NotNull(result);
-        Assert.AreEqual("Custom link name", result.Title);
-        Assert.AreEqual(PublishedContent.Key, result.ContentId);
-        Assert.AreEqual("the-page-url?something=true", result.Url);
-        Assert.AreEqual(LinkType.Content, result.LinkType);
-        Assert.AreEqual("_blank", result.Target);
+        Assert.AreEqual(1, result.Count());
+        Assert.AreEqual("Custom link name", result.First().Title);
+        Assert.AreEqual(PublishedContent.Key, result.First().ContentId);
+        Assert.AreEqual("the-page-url?something=true", result.First().Url);
+        Assert.AreEqual(LinkType.Content, result.First().LinkType);
+        Assert.AreEqual("_blank", result.First().Target);
     }
 
     [Test]
@@ -165,19 +168,20 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
                 QueryString = "?something=true"
             }
         });
-        var result = valueConverter.ConvertIntermediateToContentApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false) as ApiLink;
+        var result = valueConverter.ConvertIntermediateToContentApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false) as IEnumerable<ApiLink>;
         Assert.NotNull(result);
-        Assert.AreEqual(PublishedContent.Name, result.Title);
-        Assert.AreEqual(PublishedContent.Key, result.ContentId);
-        Assert.AreEqual("the-page-url?something=true", result.Url);
-        Assert.AreEqual(LinkType.Content, result.LinkType);
-        Assert.AreEqual(null, result.Target);
+        Assert.AreEqual(1, result.Count());
+        Assert.AreEqual(PublishedContent.Name, result.First().Title);
+        Assert.AreEqual(PublishedContent.Key, result.First().ContentId);
+        Assert.AreEqual("the-page-url?something=true", result.First().Url);
+        Assert.AreEqual(LinkType.Content, result.First().LinkType);
+        Assert.AreEqual(null, result.First().Target);
     }
 
     [TestCase(123)]
     [TestCase("123")]
     [TestCase(null)]
-    public void MultiUrlPickerValueConverter_InSingleMode_ConvertsInvalidValueToNull(object? inter)
+    public void MultiUrlPickerValueConverter_InSingleMode_ConvertsInvalidValueToEmptyArray(object? inter)
     {
         var publishedDataType = new PublishedDataType(123, "test", new Lazy<object>(() => new MultiUrlPickerConfiguration { MaxNumber = 1 }));
         var publishedPropertyType = new Mock<IPublishedPropertyType>();
@@ -186,8 +190,9 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
         var serializer = new JsonNetSerializer();
         var valueConverter = new MultiUrlPickerValueConverter(PublishedSnapshotAccessor, Mock.Of<IProfilingLogger>(), serializer, Mock.Of<IUmbracoContextAccessor>(), PublishedUrlProvider, new ContentNameProvider());
 
-        var result = valueConverter.ConvertIntermediateToContentApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false) as ApiLink;
-        Assert.Null(result);
+        var result = valueConverter.ConvertIntermediateToContentApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false) as IEnumerable<ApiLink>;
+        Assert.NotNull(result);
+        Assert.IsEmpty(result);
     }
 
     [TestCase(123)]

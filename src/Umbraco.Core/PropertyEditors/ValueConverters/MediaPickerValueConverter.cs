@@ -129,10 +129,7 @@ public class MediaPickerValueConverter : PropertyValueConverterBase, IContentApi
         return source;
     }
 
-    public Type GetContentApiPropertyValueType(IPublishedPropertyType propertyType)
-        => IsMultipleDataType(propertyType.DataType)
-            ? typeof(IEnumerable<ApiMedia>)
-            : typeof(ApiMedia);
+    public Type GetContentApiPropertyValueType(IPublishedPropertyType propertyType) => typeof(IEnumerable<ApiMedia>);
 
     public object? ConvertIntermediateToContentApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
     {
@@ -155,15 +152,15 @@ public class MediaPickerValueConverter : PropertyValueConverterBase, IContentApi
         var converted = ConvertIntermediateToObject(owner, propertyType, referenceCacheLevel, inter, preview);
         if (isMultiple && converted is IEnumerable<IPublishedContent> items)
         {
-            return items.Select(ToApiMedia);
+            return items.Select(ToApiMedia).ToArray();
         }
 
         if (isMultiple == false && converted is IPublishedContent item)
         {
-            return ToApiMedia(item);
+            return new[] { ToApiMedia(item) };
         }
 
-        return null;
+        return Array.Empty<ApiMedia>();
     }
 
     private object? FirstOrDefault(IList mediaItems) => mediaItems.Count == 0 ? null : mediaItems[0];

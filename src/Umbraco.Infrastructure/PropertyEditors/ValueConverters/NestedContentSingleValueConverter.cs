@@ -98,16 +98,16 @@ public class NestedContentSingleValueConverter : NestedContentValueConverterBase
         }
     }
 
-    public Type GetContentApiPropertyValueType(IPublishedPropertyType propertyType) => typeof(IApiElement);
+    public Type GetContentApiPropertyValueType(IPublishedPropertyType propertyType) => typeof(IEnumerable<IApiElement>);
 
     public object? ConvertIntermediateToContentApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
     {
         var converted = ConvertIntermediateToObject(owner, propertyType, referenceCacheLevel, inter, preview);
         if (converted is not IPublishedElement element)
         {
-            return null;
+            return Array.Empty<IApiElement>();
         }
 
-        return _apiElementBuilder.Build(element);
+        return new [] { _apiElementBuilder.Build(element) };
     }
 }

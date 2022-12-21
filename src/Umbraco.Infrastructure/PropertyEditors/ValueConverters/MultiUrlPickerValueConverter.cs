@@ -142,14 +142,11 @@ public class MultiUrlPickerValueConverter : PropertyValueConverterBase, IContent
         }
     }
 
-    public Type GetContentApiPropertyValueType(IPublishedPropertyType propertyType) =>
-        IsSingleUrlPicker(propertyType)
-            ? typeof(ApiLink)
-            : typeof(IEnumerable<ApiLink>);
+    public Type GetContentApiPropertyValueType(IPublishedPropertyType propertyType) => typeof(IEnumerable<ApiLink>);
 
     public object? ConvertIntermediateToContentApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
     {
-        object? DefaultValue() => IsSingleUrlPicker(propertyType) ? null : Array.Empty<ApiLink>();
+        IEnumerable<ApiLink> DefaultValue() => Array.Empty<ApiLink>();
 
         if (inter is not string value || value.IsNullOrWhiteSpace())
         {
@@ -191,9 +188,7 @@ public class MultiUrlPickerValueConverter : PropertyValueConverterBase, IContent
                             : LinkType.Content);
         }
 
-        IEnumerable<ApiLink> links = dtos.Select(ToLink).WhereNotNull();
-
-        return IsSingleUrlPicker(propertyType) ? links.FirstOrDefault() : links;
+        return dtos.Select(ToLink).WhereNotNull();
     }
 
     private static bool IsSingleUrlPicker(IPublishedPropertyType propertyType)
