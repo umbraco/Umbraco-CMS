@@ -1,6 +1,7 @@
-using Umbraco.Cms.Core.DependencyInjection;
+﻿using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Api.Management.Mapping.Culture;
+using Umbraco.Cms.Api.Management.Mapping.DataType;
 using Umbraco.Cms.Api.Management.Mapping.Dictionary;
 using Umbraco.Cms.Api.Management.Mapping.HealthCheck;
 using Umbraco.Cms.Api.Management.Mapping.Installer;
@@ -23,7 +24,9 @@ public static class MappingBuilderExtensions
             .Add<LanguageViewModelsMapDefinition>()
             .Add<InstallerViewModelsMapDefinition>()
             .Add<CultureViewModelMapDefinition>()
-            .Add<HealthCheckViewModelsMapDefinition>();
+            .Add<HealthCheckViewModelsMapDefinition>()
+            .Add<CultureViewModelMapDefinition>()
+            .Add<DataTypeViewModelMapDefinition>();
 
         return builder;
     }

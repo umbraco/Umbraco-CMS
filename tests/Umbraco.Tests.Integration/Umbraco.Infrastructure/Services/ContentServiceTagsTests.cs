@@ -45,6 +45,9 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
 
     private IJsonSerializer Serializer => GetRequiredService<IJsonSerializer>();
 
+    private IConfigurationEditorJsonSerializer ConfigurationEditorJsonSerializer =>
+        GetRequiredService<IConfigurationEditorJsonSerializer>();
+
     public PropertyEditorCollection PropertyEditorCollection => GetRequiredService<PropertyEditorCollection>();
 
     [Test]
@@ -640,7 +643,10 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
         // Arrange
         // set configuration
         var dataType = DataTypeService.GetDataType(1041);
-        dataType.Configuration = new TagConfiguration { Group = "test", StorageType = TagsStorageType.Csv };
+        dataType.ConfigurationData = dataType.Editor!.GetConfigurationEditor()
+            .FromConfigurationObject(
+                new TagConfiguration { Group = "test", StorageType = TagsStorageType.Csv },
+                ConfigurationEditorJsonSerializer);
 
         // updating the data type with the new configuration
         DataTypeService.Save(dataType);
@@ -835,7 +841,10 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
         // Arrange
         // set configuration
         var dataType = DataTypeService.GetDataType(1041);
-        dataType.Configuration = new TagConfiguration { Group = "test", StorageType = TagsStorageType.Csv };
+        dataType.ConfigurationData = dataType.Editor!.GetConfigurationEditor()
+            .FromConfigurationObject(
+                new TagConfiguration { Group = "test", StorageType = TagsStorageType.Csv },
+                ConfigurationEditorJsonSerializer);
 
         // updating the data type with the new configuration
         DataTypeService.Save(dataType);
@@ -870,7 +879,15 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
         // Arrange
         // set configuration
         var dataType = DataTypeService.GetDataType(1041);
-        dataType.Configuration = new TagConfiguration { Group = "test", StorageType = TagsStorageType.Json };
+        dataType.ConfigurationData = dataType.Editor!.GetConfigurationEditor()
+            .FromConfigurationObject(
+                new TagConfiguration { Group = "test", StorageType = TagsStorageType.Json },
+                ConfigurationEditorJsonSerializer);
+
+        var configuration = dataType.ConfigurationObject as TagConfiguration;
+        Assert.NotNull(configuration);
+        Assert.AreEqual("test", configuration.Group);
+        Assert.AreEqual(TagsStorageType.Json, configuration.StorageType);
 
         // updating the data type with the new configuration
         DataTypeService.Save(dataType);

@@ -102,7 +102,7 @@ internal abstract class BlockEditorPropertyValueEditor : DataValueEditor, IDataV
                     continue;
                 }
 
-                object? configuration = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeKey)?.Configuration;
+                object? configuration = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeKey)?.ConfigurationObject;
 
                 result.AddRange(tagsProvider.GetTags(prop.Value.Value, configuration, languageId));
             }
@@ -225,7 +225,7 @@ internal abstract class BlockEditorPropertyValueEditor : DataValueEditor, IDataV
 
                 if (!valEditors.TryGetValue(dataType.Id, out IDataValueEditor? valEditor))
                 {
-                    var tempConfig = dataType.Configuration;
+                    var tempConfig = dataType.ConfigurationObject;
                     valEditor = propEditor.GetValueEditor(tempConfig);
 
                     valEditors.Add(dataType.Id, valEditor);
@@ -246,7 +246,7 @@ internal abstract class BlockEditorPropertyValueEditor : DataValueEditor, IDataV
             foreach (KeyValuePair<string, BlockItemData.BlockPropertyValue> prop in row.PropertyValues)
             {
                 // Fetch the property types prevalue
-                var propConfiguration = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId)?.Configuration;
+                var propConfiguration = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId)?.ConfigurationObject;
 
                 // Lookup the property editor
                 IDataEditor? propEditor = _propertyEditors[prop.Value.PropertyType.PropertyEditorAlias];

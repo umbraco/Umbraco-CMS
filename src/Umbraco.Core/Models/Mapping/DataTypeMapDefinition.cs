@@ -123,7 +123,7 @@ public class DataTypeMapDefinition : IMapDefinition
     }
 
     // Umbraco.Code.MapAll -CreateDate -DeleteDate -UpdateDate
-    // Umbraco.Code.MapAll -Key -Path -CreatorId -Level -SortOrder -Configuration
+    // Umbraco.Code.MapAll -Key -Path -CreatorId -Level -SortOrder -ConfigurationObject -ConfigurationData
     private void Map(DataTypeSave source, IDataType target, MapperContext context)
     {
         target.DatabaseType = MapDatabaseType(source);
@@ -158,8 +158,7 @@ public class DataTypeMapDefinition : IMapDefinition
         var fields = context
             .MapEnumerable<ConfigurationField, DataTypeConfigurationFieldDisplay>(configurationEditor.Fields)
             .WhereNotNull().ToList();
-        IDictionary<string, object> configurationDictionary =
-            configurationEditor.ToConfigurationEditor(dataType.Configuration);
+        IDictionary<string, object> configurationDictionary = configurationEditor.ToConfigurationEditor(dataType.ConfigurationData);
 
         MapConfigurationFields(dataType, fields, configurationDictionary);
 

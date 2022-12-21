@@ -320,13 +320,16 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             // get the current configuration,
             // get the new configuration as a dictionary (this is how we get it from model)
             // and map to an actual configuration object
-            var currentConfiguration = dataType.PersistedDataType?.Configuration;
-            var configurationDictionary = dataType.ConfigurationFields?.ToDictionary(x => x.Key, x => x.Value);
-            var configuration = dataType.PropertyEditor?.GetConfigurationEditor().FromConfigurationEditor(configurationDictionary, currentConfiguration);
-
-            if (dataType.PersistedDataType is not null)
+            IConfigurationEditor? configurationEditor = dataType.PropertyEditor?.GetConfigurationEditor();
+            if (dataType.PersistedDataType is not null && configurationEditor is not null)
             {
-                dataType.PersistedDataType.Configuration = configuration;
+                Dictionary<string, object> configurationDictionary = dataType
+                                                                         .ConfigurationFields?
+                                                                         .Where(f => f.Value is not null)
+                                                                         .ToDictionary(x => x.Key, x => x.Value!)
+                                                                     ?? new Dictionary<string, object>();
+
+                dataType.PersistedDataType.ConfigurationData = configurationEditor.FromConfigurationEditor(configurationDictionary);
             }
 
             var currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;

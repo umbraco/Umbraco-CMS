@@ -107,7 +107,7 @@ public class MediaPicker3PropertyEditor : DataEditor
             var dtos = Deserialize(_jsonSerializer, value).ToList();
 
             IDataType? dataType = _dataTypeService.GetDataType(property.PropertyType.DataTypeId);
-            if (dataType?.Configuration != null)
+            if (dataType?.ConfigurationObject != null)
             {
                 MediaPicker3Configuration? configuration = dataType.ConfigurationAs<MediaPicker3Configuration>();
 

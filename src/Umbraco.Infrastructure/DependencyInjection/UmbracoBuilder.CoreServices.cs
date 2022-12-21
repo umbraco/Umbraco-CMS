@@ -117,7 +117,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddScoped<IHttpScopeReference, HttpScopeReference>();
 
         builder.Services.AddSingleton<IJsonSerializer, JsonNetSerializer>();
-        builder.Services.AddSingleton<IConfigurationEditorJsonSerializer, ConfigurationEditorJsonSerializer>();
+        builder.Services.AddSingleton<IConfigurationEditorJsonSerializer, ContextualConfigurationEditorJsonSerializer>();
         builder.Services.AddSingleton<IMenuItemCollectionFactory, MenuItemCollectionFactory>();
 
         // register database builder
