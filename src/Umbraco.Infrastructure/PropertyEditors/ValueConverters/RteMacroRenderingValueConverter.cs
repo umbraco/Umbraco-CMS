@@ -6,6 +6,7 @@ using System.Text;
 using HtmlAgilityPack;
 using Umbraco.Cms.Core.Macros;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PropertyEditors.ContentApi;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Web;
@@ -19,7 +20,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 ///     used dynamically.
 /// </summary>
 [DefaultPropertyValueConverter]
-public class RteMacroRenderingValueConverter : SimpleTinyMceValueConverter, IHeadlessPropertyValueConverter
+public class RteMacroRenderingValueConverter : SimpleTinyMceValueConverter, IContentApiPropertyValueConverter
 {
     private readonly HtmlImageSourceParser _imageSourceParser;
     private readonly HtmlLocalLinkParser _linkParser;
@@ -51,9 +52,9 @@ public class RteMacroRenderingValueConverter : SimpleTinyMceValueConverter, IHea
         return new HtmlEncodedString(converted ?? string.Empty);
     }
 
-    public Type GetHeadlessPropertyValueType(IPublishedPropertyType propertyType) => typeof(string);
+    public Type GetContentApiPropertyValueType(IPublishedPropertyType propertyType) => typeof(string);
 
-    public object? ConvertIntermediateToHeadlessObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+    public object? ConvertIntermediateToContentApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
         => Convert(inter, preview) ?? string.Empty;
 
     // NOT thread-safe over a request because it modifies the

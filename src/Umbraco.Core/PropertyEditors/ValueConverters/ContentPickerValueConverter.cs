@@ -1,8 +1,10 @@
 using System.Globalization;
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.Headless;
+using Umbraco.Cms.Core.ContentApi;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PropertyEditors.ContentApi;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Web.Common.DependencyInjection;
@@ -10,7 +12,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
-internal class ContentPickerValueConverter : PropertyValueConverterBase, IHeadlessPropertyValueConverter
+internal class ContentPickerValueConverter : PropertyValueConverterBase, IContentApiPropertyValueConverter
 {
     private static readonly List<string> PropertiesToExclude = new()
     {
@@ -20,14 +22,14 @@ internal class ContentPickerValueConverter : PropertyValueConverterBase, IHeadle
 
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
     private readonly IPublishedUrlProvider _publishedUrlProvider;
-    private readonly IHeadlessContentNameProvider _headlessContentNameProvider;
+    private readonly IContentNameProvider _contentNameProvider;
 
     [Obsolete("Use constructor that takes all parameters, scheduled for removal in V14")]
     public ContentPickerValueConverter(IPublishedSnapshotAccessor publishedSnapshotAccessor)
         : this(
             publishedSnapshotAccessor,
             StaticServiceProvider.Instance.GetRequiredService<IPublishedUrlProvider>(),
-            StaticServiceProvider.Instance.GetRequiredService<IHeadlessContentNameProvider>())
+            StaticServiceProvider.Instance.GetRequiredService<IContentNameProvider>())
     {
 
     }
@@ -35,11 +37,11 @@ internal class ContentPickerValueConverter : PropertyValueConverterBase, IHeadle
     public ContentPickerValueConverter(
         IPublishedSnapshotAccessor publishedSnapshotAccessor,
         IPublishedUrlProvider publishedUrlProvider,
-        IHeadlessContentNameProvider headlessContentNameProvider)
+        IContentNameProvider contentNameProvider)
     {
         _publishedSnapshotAccessor = publishedSnapshotAccessor;
         _publishedUrlProvider = publishedUrlProvider;
-        _headlessContentNameProvider = headlessContentNameProvider;
+        _contentNameProvider = contentNameProvider;
     }
 
     public override bool IsConverter(IPublishedPropertyType propertyType)
@@ -101,9 +103,9 @@ internal class ContentPickerValueConverter : PropertyValueConverterBase, IHeadle
         return inter.ToString();
     }
 
-    public Type GetHeadlessPropertyValueType(IPublishedPropertyType propertyType) => typeof(HeadlessLink);
+    public Type GetContentApiPropertyValueType(IPublishedPropertyType propertyType) => typeof(ApiLink);
 
-    public object? ConvertIntermediateToHeadlessObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+    public object? ConvertIntermediateToContentApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
     {
         IPublishedContent? content = GetContent(propertyType, inter);
         if (content == null)
@@ -111,7 +113,7 @@ internal class ContentPickerValueConverter : PropertyValueConverterBase, IHeadle
             return null;
         }
 
-        return new HeadlessLink(content.Url(_publishedUrlProvider), _headlessContentNameProvider.GetName(content), null, content.Key, content.ContentType.Alias, LinkType.Content);
+        return new ApiLink(content.Url(_publishedUrlProvider), _contentNameProvider.GetName(content), null, content.Key, content.ContentType.Alias, LinkType.Content);
     }
 
     private IPublishedContent? GetContent(IPublishedPropertyType propertyType, object? inter)

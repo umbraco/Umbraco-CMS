@@ -7,11 +7,12 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.ContentApi;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Handlers;
-using Umbraco.Cms.Core.Headless;
+using Umbraco.Cms.Core.Models.ContentApi;
 using Umbraco.Cms.Core.HealthChecks.NotificationMethods;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Install;
@@ -57,6 +58,7 @@ using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Cms.Infrastructure.Services.Implement;
 using Umbraco.Extensions;
 using IScopeProvider = Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;
+using PropertyMapper = Umbraco.Cms.Core.ContentApi.PropertyMapper;
 
 namespace Umbraco.Cms.Infrastructure.DependencyInjection;
 
@@ -220,10 +222,10 @@ public static partial class UmbracoBuilderExtensions
 
         builder.Services.AddTransient<IFireAndForgetRunner, FireAndForgetRunner>();
 
-        builder.Services.AddSingleton<IHeadlessPropertyMapper, HeadlessPropertyMapper>();
-        builder.Services.AddSingleton<IHeadlessElementBuilder, HeadlessElementBuilder>();
-        builder.Services.AddSingleton<IHeadlessContentBuilder, HeadlessContentBuilder>();
-        builder.Services.AddSingleton<IHeadlessContentNameProvider, HeadlessContentNameProvider>();
+        builder.Services.AddSingleton<IPropertyMapper, PropertyMapper>();
+        builder.Services.AddSingleton<IApiElementBuilder, ApiElementBuilder>();
+        builder.Services.AddSingleton<IApiContentBuilder, ApiContentBuilder>();
+        builder.Services.AddSingleton<IContentNameProvider, ContentNameProvider>();
 
         return builder;
     }

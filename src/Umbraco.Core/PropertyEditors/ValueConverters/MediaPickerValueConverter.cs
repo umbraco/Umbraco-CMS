@@ -1,7 +1,9 @@
 using System.Collections;
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.Headless;
+using Umbraco.Cms.Core.ContentApi;
+using Umbraco.Cms.Core.Models.ContentApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PropertyEditors.ContentApi;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Web.Common.DependencyInjection;
@@ -13,7 +15,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 ///     The media picker property value converter.
 /// </summary>
 [DefaultPropertyValueConverter]
-public class MediaPickerValueConverter : PropertyValueConverterBase, IHeadlessPropertyValueConverter
+public class MediaPickerValueConverter : PropertyValueConverterBase, IContentApiPropertyValueConverter
 {
     // hard-coding "image" here but that's how it works at UI level too
     private const string ImageTypeAlias = "image";
@@ -21,7 +23,7 @@ public class MediaPickerValueConverter : PropertyValueConverterBase, IHeadlessPr
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
     private readonly IPublishedUrlProvider _publishedUrlProvider;
     private readonly IPublishedValueFallback _publishedValueFallback;
-    private readonly IHeadlessContentNameProvider _headlessContentNameProvider;
+    private readonly IContentNameProvider _contentNameProvider;
 
     [Obsolete("Use constructor that takes all parameters, scheduled for removal in V14")]
     public MediaPickerValueConverter(
@@ -32,7 +34,7 @@ public class MediaPickerValueConverter : PropertyValueConverterBase, IHeadlessPr
             publishedModelFactory,
             StaticServiceProvider.Instance.GetRequiredService<IPublishedUrlProvider>(),
             StaticServiceProvider.Instance.GetRequiredService<IPublishedValueFallback>(),
-            StaticServiceProvider.Instance.GetRequiredService<IHeadlessContentNameProvider>())
+            StaticServiceProvider.Instance.GetRequiredService<IContentNameProvider>())
     {
     }
 
@@ -43,13 +45,13 @@ public class MediaPickerValueConverter : PropertyValueConverterBase, IHeadlessPr
         IPublishedModelFactory publishedModelFactory,
         IPublishedUrlProvider publishedUrlProvider,
         IPublishedValueFallback publishedValueFallback,
-        IHeadlessContentNameProvider headlessContentNameProvider)
+        IContentNameProvider contentNameProvider)
     {
         _publishedSnapshotAccessor = publishedSnapshotAccessor ??
                                      throw new ArgumentNullException(nameof(publishedSnapshotAccessor));
         _publishedUrlProvider = publishedUrlProvider;
         _publishedValueFallback = publishedValueFallback;
-        _headlessContentNameProvider = headlessContentNameProvider;
+        _contentNameProvider = contentNameProvider;
     }
 
     public override bool IsConverter(IPublishedPropertyType propertyType) =>
@@ -127,24 +129,24 @@ public class MediaPickerValueConverter : PropertyValueConverterBase, IHeadlessPr
         return source;
     }
 
-    public Type GetHeadlessPropertyValueType(IPublishedPropertyType propertyType)
+    public Type GetContentApiPropertyValueType(IPublishedPropertyType propertyType)
         => IsMultipleDataType(propertyType.DataType)
-            ? typeof(IEnumerable<HeadlessMedia>)
-            : typeof(HeadlessMedia);
+            ? typeof(IEnumerable<ApiMedia>)
+            : typeof(ApiMedia);
 
-    public object? ConvertIntermediateToHeadlessObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+    public object? ConvertIntermediateToContentApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
     {
         var isMultiple = IsMultipleDataType(propertyType.DataType);
 
-        HeadlessMedia ToHeadlessMedia(IPublishedContent media)
+        ApiMedia ToApiMedia(IPublishedContent media)
         {
             var customProperties = media
                 .Properties
                 .Where(p => p.Alias.StartsWith("umbraco") == false)
-                .ToDictionary(p => p.Alias, p => p.GetHeadlessValue());
+                .ToDictionary(p => p.Alias, p => p.GetContentApiValue());
 
-            return new HeadlessMedia(media.Key,
-                _headlessContentNameProvider.GetName(media),
+            return new ApiMedia(media.Key,
+                _contentNameProvider.GetName(media),
                 media.ContentType.Alias, _publishedUrlProvider.GetMediaUrl(media, UrlMode.Relative), media.Value<string>(_publishedValueFallback, Constants.Conventions.Media.Extension), media.Value<int?>(_publishedValueFallback, Constants.Conventions.Media.Width), media.Value<int?>(_publishedValueFallback, Constants.Conventions.Media.Height), customProperties);
         }
 
@@ -153,12 +155,12 @@ public class MediaPickerValueConverter : PropertyValueConverterBase, IHeadlessPr
         var converted = ConvertIntermediateToObject(owner, propertyType, referenceCacheLevel, inter, preview);
         if (isMultiple && converted is IEnumerable<IPublishedContent> items)
         {
-            return items.Select(ToHeadlessMedia);
+            return items.Select(ToApiMedia);
         }
 
         if (isMultiple == false && converted is IPublishedContent item)
         {
-            return ToHeadlessMedia(item);
+            return ToApiMedia(item);
         }
 
         return null;

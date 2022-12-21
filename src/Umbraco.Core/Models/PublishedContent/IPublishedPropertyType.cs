@@ -111,12 +111,12 @@ public interface IPublishedPropertyType
     object? ConvertInterToXPath(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview);
 
     /// <summary>
-    ///     Converts the intermediate value into the object value for headless representation.
+    ///     Converts the intermediate value into the object value for content API representation.
     /// </summary>
     /// <param name="owner">The published element owning the property.</param>
     /// <param name="referenceCacheLevel">The reference cache level.</param>
     /// <param name="inter">The intermediate value.</param>
     /// <param name="preview">A value indicating whether content should be considered draft.</param>
     /// <returns>The object value.</returns>
-    object? ConvertInterToHeadlessObject(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview);
+    object? ConvertInterToContentApiObject(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview);
 }

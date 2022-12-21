@@ -3,7 +3,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Content.Filters;
 using Umbraco.Cms.Api.Content.Routing;
-using Umbraco.Cms.Core.Headless;
+using Umbraco.Cms.Core.ContentApi;
+using Umbraco.Cms.Core.Models.ContentApi;
 using Umbraco.Cms.Core.PublishedCache;
 
 namespace Umbraco.Cms.Api.Content.Controllers;
@@ -14,19 +15,19 @@ namespace Umbraco.Cms.Api.Content.Controllers;
 public class ContentApiController : Controller
 {
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
-    private readonly IHeadlessContentBuilder _headlessContentBuilder;
+    private readonly IApiContentBuilder _apiContentBuilder;
 
-    public ContentApiController(IPublishedSnapshotAccessor publishedSnapshotAccessor, IHeadlessContentBuilder headlessContentBuilder)
+    public ContentApiController(IPublishedSnapshotAccessor publishedSnapshotAccessor, IApiContentBuilder apiContentBuilder)
     {
         _publishedSnapshotAccessor = publishedSnapshotAccessor;
-        _headlessContentBuilder = headlessContentBuilder;
+        _apiContentBuilder = apiContentBuilder;
     }
 
     [HttpGet]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(PagedViewModel<IHeadlessContent>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagedViewModel<IApiContent>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    // TODO: actually implement the content API, this is just to test headless output rendering
+    // TODO: actually implement the content API, this is just to test the content API output rendering
     public async Task<IActionResult> Get(int skip = 0, int take = 100)
     {
         IPublishedContentCache? contentCache = _publishedSnapshotAccessor.TryGetPublishedSnapshot(out IPublishedSnapshot? publishedSnapshot)
@@ -42,14 +43,14 @@ public class ContentApiController : Controller
                     .Build());
         }
 
-        IHeadlessContent[] result = contentCache
+        IApiContent[] result = contentCache
             .GetAtRoot()
-            .Select(_headlessContentBuilder.Build)
+            .Select(_apiContentBuilder.Build)
             .ToArray();
 
         return await Task.FromResult(
             Ok(
-                new PagedViewModel<IHeadlessContent>
+                new PagedViewModel<IApiContent>
                 {
                     Items = result.Skip(skip).Take(take).ToArray(),
                     Total = result.Length

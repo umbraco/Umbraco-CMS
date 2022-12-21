@@ -3,11 +3,13 @@
 
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.Headless;
+using Umbraco.Cms.Core.ContentApi;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
+using Umbraco.Cms.Core.Models.ContentApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PropertyEditors.ContentApi;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
@@ -16,11 +18,11 @@ using static Umbraco.Cms.Core.PropertyEditors.BlockListConfiguration;
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
 [DefaultPropertyValueConverter(typeof(JsonValueConverter))]
-public class BlockListPropertyValueConverter : BlockPropertyValueConverterBase<BlockListModel, BlockListItem, BlockListLayoutItem, BlockConfiguration>, IHeadlessPropertyValueConverter
+public class BlockListPropertyValueConverter : BlockPropertyValueConverterBase<BlockListModel, BlockListItem, BlockListLayoutItem, BlockConfiguration>, IContentApiPropertyValueConverter
 {
     private readonly IContentTypeService _contentTypeService;
     private readonly IProfilingLogger _proflog;
-    private readonly IHeadlessElementBuilder _headlessElementBuilder;
+    private readonly IApiElementBuilder _apiElementBuilder;
 
     [Obsolete("Use the constructor that takes all parameters, scheduled for removal in V14")]
     public BlockListPropertyValueConverter(IProfilingLogger proflog, BlockEditorConverter blockConverter)
@@ -30,16 +32,16 @@ public class BlockListPropertyValueConverter : BlockPropertyValueConverterBase<B
 
     [Obsolete("Use the constructor that takes all parameters, scheduled for removal in V14")]
     public BlockListPropertyValueConverter(IProfilingLogger proflog, BlockEditorConverter blockConverter, IContentTypeService contentTypeService)
-        : this(proflog, blockConverter, contentTypeService, StaticServiceProvider.Instance.GetRequiredService<IHeadlessElementBuilder>())
+        : this(proflog, blockConverter, contentTypeService, StaticServiceProvider.Instance.GetRequiredService<IApiElementBuilder>())
     {
     }
 
-    public BlockListPropertyValueConverter(IProfilingLogger proflog, BlockEditorConverter blockConverter, IContentTypeService contentTypeService, IHeadlessElementBuilder headlessElementBuilder)
+    public BlockListPropertyValueConverter(IProfilingLogger proflog, BlockEditorConverter blockConverter, IContentTypeService contentTypeService, IApiElementBuilder apiElementBuilder)
         : base(blockConverter)
     {
         _proflog = proflog;
         _contentTypeService = contentTypeService;
-        _headlessElementBuilder = headlessElementBuilder;
+        _apiElementBuilder = apiElementBuilder;
     }
 
     /// <inheritdoc />
@@ -107,20 +109,20 @@ public class BlockListPropertyValueConverter : BlockPropertyValueConverterBase<B
     }
 
     /// <inheritdoc />
-    public Type GetHeadlessPropertyValueType(IPublishedPropertyType propertyType)
-        => typeof(IEnumerable<HeadlessBlockListModel>);
+    public Type GetContentApiPropertyValueType(IPublishedPropertyType propertyType)
+        => typeof(IEnumerable<ApiBlockListModel>);
 
     /// <inheritdoc />
-    public object? ConvertIntermediateToHeadlessObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+    public object? ConvertIntermediateToContentApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
     {
         BlockListModel? model = ConvertIntermediateToBlockListModel(owner, propertyType, referenceCacheLevel, inter, preview);
 
-        return new HeadlessBlockListModel(
+        return new ApiBlockListModel(
             model != null
-                ? model.Select(item => new HeadlessBlockItem(
-                    _headlessElementBuilder.Build(item.Content),
-                    item.Settings != null ? _headlessElementBuilder.Build(item.Settings) : null))
-                : Array.Empty<HeadlessBlockItem>());
+                ? model.Select(item => new ApiBlockItem(
+                    _apiElementBuilder.Build(item.Content),
+                    item.Settings != null ? _apiElementBuilder.Build(item.Settings) : null))
+                : Array.Empty<ApiBlockItem>());
     }
 
     private BlockListModel? ConvertIntermediateToBlockListModel(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)

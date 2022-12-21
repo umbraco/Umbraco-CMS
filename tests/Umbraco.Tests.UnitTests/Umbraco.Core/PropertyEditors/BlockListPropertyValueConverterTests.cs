@@ -4,7 +4,8 @@
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Headless;
+using Umbraco.Cms.Core.ContentApi;
+using Umbraco.Cms.Core.Models.ContentApi;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -67,7 +68,7 @@ public class BlockListPropertyValueConverterTests
             Mock.Of<IProfilingLogger>(),
             new BlockEditorConverter(publishedSnapshotAccessor, publishedModelFactory),
             Mock.Of<IContentTypeService>(),
-            new HeadlessElementBuilder(new HeadlessPropertyMapper()));
+            new ApiElementBuilder(new PropertyMapper()));
         return editor;
     }
 

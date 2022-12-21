@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PropertyEditors.ContentApi;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
@@ -8,7 +9,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
 [DefaultPropertyValueConverter]
-public class MemberGroupPickerValueConverter : PropertyValueConverterBase, IHeadlessPropertyValueConverter
+public class MemberGroupPickerValueConverter : PropertyValueConverterBase, IContentApiPropertyValueConverter
 {
     private readonly IMemberGroupService _memberGroupService;
 
@@ -30,9 +31,9 @@ public class MemberGroupPickerValueConverter : PropertyValueConverterBase, IHead
 
     public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview) => source?.ToString() ?? string.Empty;
 
-    public Type GetHeadlessPropertyValueType(IPublishedPropertyType propertyType) => typeof(string[]);
+    public Type GetContentApiPropertyValueType(IPublishedPropertyType propertyType) => typeof(string[]);
 
-    public object? ConvertIntermediateToHeadlessObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+    public object? ConvertIntermediateToContentApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
     {
         var memberGroupIds = inter?
             .ToString()?

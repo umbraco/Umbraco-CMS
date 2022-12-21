@@ -1,8 +1,10 @@
 using System.Globalization;
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.Headless;
+using Umbraco.Cms.Core.ContentApi;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PropertyEditors.ContentApi;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
@@ -16,7 +18,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 ///     The multi node tree picker property editor value converter.
 /// </summary>
 [DefaultPropertyValueConverter(typeof(MustBeStringValueConverter))]
-public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase, IHeadlessPropertyValueConverter
+public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase, IContentApiPropertyValueConverter
 {
     private static readonly List<string> PropertiesToExclude = new()
     {
@@ -28,7 +30,7 @@ public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase, IHe
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
     private readonly IPublishedUrlProvider _publishedUrlProvider;
-    private readonly IHeadlessContentNameProvider _headlessContentNameProvider;
+    private readonly IContentNameProvider _contentNameProvider;
 
     [Obsolete("Use constructor that takes all parameters, scheduled for removal in V14")]
     public MultiNodeTreePickerValueConverter(
@@ -40,7 +42,7 @@ public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase, IHe
             umbracoContextAccessor,
             memberService,
             StaticServiceProvider.Instance.GetRequiredService<IPublishedUrlProvider>(),
-            StaticServiceProvider.Instance.GetRequiredService<IHeadlessContentNameProvider>())
+            StaticServiceProvider.Instance.GetRequiredService<IContentNameProvider>())
     {
     }
 
@@ -49,14 +51,14 @@ public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase, IHe
         IUmbracoContextAccessor umbracoContextAccessor,
         IMemberService memberService,
         IPublishedUrlProvider publishedUrlProvider,
-        IHeadlessContentNameProvider headlessContentNameProvider)
+        IContentNameProvider contentNameProvider)
     {
         _publishedSnapshotAccessor = publishedSnapshotAccessor ??
                                      throw new ArgumentNullException(nameof(publishedSnapshotAccessor));
         _umbracoContextAccessor = umbracoContextAccessor;
         _memberService = memberService;
         _publishedUrlProvider = publishedUrlProvider;
-        _headlessContentNameProvider = headlessContentNameProvider;
+        _contentNameProvider = contentNameProvider;
     }
 
     public override bool IsConverter(IPublishedPropertyType propertyType) =>
@@ -180,13 +182,13 @@ public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase, IHe
         return source;
     }
 
-    public Type GetHeadlessPropertyValueType(IPublishedPropertyType propertyType) => IsSingleNodePicker(propertyType)
-        ? typeof(HeadlessLink)
-        : typeof(IEnumerable<HeadlessLink>);
+    public Type GetContentApiPropertyValueType(IPublishedPropertyType propertyType) => IsSingleNodePicker(propertyType)
+        ? typeof(ApiLink)
+        : typeof(IEnumerable<ApiLink>);
 
-    public object? ConvertIntermediateToHeadlessObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+    public object? ConvertIntermediateToContentApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
     {
-        object? DefaultValue() => IsSingleNodePicker(propertyType) ? null : Array.Empty<HeadlessLink>();
+        object? DefaultValue() => IsSingleNodePicker(propertyType) ? null : Array.Empty<ApiLink>();
 
         if (inter is not IEnumerable<Udi> udis)
         {
@@ -206,10 +208,10 @@ public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase, IHe
             return DefaultValue();
         }
 
-        HeadlessLink ToLink(IPublishedContent item) =>
-            new HeadlessLink(
+        ApiLink ToLink(IPublishedContent item) =>
+            new ApiLink(
                 item.Url(_publishedUrlProvider, mode: UrlMode.Relative),
-                _headlessContentNameProvider.GetName(item),
+                _contentNameProvider.GetName(item),
                 null,
                 item.Key,
                 item.ContentType.Alias,

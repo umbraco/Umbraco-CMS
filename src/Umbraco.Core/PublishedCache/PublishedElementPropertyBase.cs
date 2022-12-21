@@ -214,22 +214,22 @@ internal class PublishedElementPropertyBase : PublishedPropertyBase
         }
     }
 
-    public override object? GetHeadlessValue(string? culture = null, string? segment = null)
+    public override object? GetContentApiValue(string? culture = null, string? segment = null)
     {
         GetCacheLevels(out PropertyCacheLevel cacheLevel, out PropertyCacheLevel referenceCacheLevel);
 
         lock (_locko)
         {
             CacheValues cacheValues = GetCacheValues(cacheLevel);
-            if (cacheValues.HeadlessObjectInitialized)
+            if (cacheValues.ContentApiObjectInitialized)
             {
-                return cacheValues.HeadlessObjectValue;
+                return cacheValues.ContentApiObjectValue;
             }
 
-            cacheValues.HeadlessObjectValue =
-                PropertyType.ConvertInterToHeadlessObject(Element, referenceCacheLevel, GetInterValue(), IsPreviewing);
-            cacheValues.HeadlessObjectInitialized = true;
-            return cacheValues.HeadlessObjectValue;
+            cacheValues.ContentApiObjectValue =
+                PropertyType.ConvertInterToContentApiObject(Element, referenceCacheLevel, GetInterValue(), IsPreviewing);
+            cacheValues.ContentApiObjectInitialized = true;
+            return cacheValues.ContentApiObjectValue;
         }
     }
 
@@ -239,7 +239,7 @@ internal class PublishedElementPropertyBase : PublishedPropertyBase
         public object? ObjectValue;
         public bool XPathInitialized;
         public object? XPathValue;
-        public bool HeadlessObjectInitialized;
-        public object? HeadlessObjectValue;
+        public bool ContentApiObjectInitialized;
+        public object? ContentApiObjectValue;
     }
 }

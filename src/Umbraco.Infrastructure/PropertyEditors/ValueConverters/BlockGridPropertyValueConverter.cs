@@ -1,10 +1,12 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Umbraco.Cms.Core.Headless;
+using Umbraco.Cms.Core.ContentApi;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models.Blocks;
+using Umbraco.Cms.Core.Models.ContentApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PropertyEditors.ContentApi;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Extensions;
 using static Umbraco.Cms.Core.PropertyEditors.BlockGridConfiguration;
@@ -12,22 +14,22 @@ using static Umbraco.Cms.Core.PropertyEditors.BlockGridConfiguration;
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
 {
     [DefaultPropertyValueConverter(typeof(JsonValueConverter))]
-    public class BlockGridPropertyValueConverter : BlockPropertyValueConverterBase<BlockGridModel, BlockGridItem, BlockGridLayoutItem, BlockGridBlockConfiguration>, IHeadlessPropertyValueConverter
+    public class BlockGridPropertyValueConverter : BlockPropertyValueConverterBase<BlockGridModel, BlockGridItem, BlockGridLayoutItem, BlockGridBlockConfiguration>, IContentApiPropertyValueConverter
     {
         private readonly IProfilingLogger _proflog;
         private readonly IJsonSerializer _jsonSerializer;
-        private readonly IHeadlessElementBuilder _headlessElementBuilder;
+        private readonly IApiElementBuilder _apiElementBuilder;
 
         // Niels, Change: I would love if this could be general, so we don't need a specific one for each block property editor....
         public BlockGridPropertyValueConverter(
             IProfilingLogger proflog, BlockEditorConverter blockConverter,
             IJsonSerializer jsonSerializer,
-            IHeadlessElementBuilder headlessElementBuilder)
+            IApiElementBuilder apiElementBuilder)
             : base(blockConverter)
         {
             _proflog = proflog;
             _jsonSerializer = jsonSerializer;
-            _headlessElementBuilder = headlessElementBuilder;
+            _apiElementBuilder = apiElementBuilder;
         }
 
         /// <inheritdoc />
@@ -37,40 +39,40 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
             => ConvertIntermediateToBlockGridModel(propertyType, referenceCacheLevel, inter, preview);
 
-        public Type GetHeadlessPropertyValueType(IPublishedPropertyType propertyType)
-            => typeof(HeadlessBlockGridModel);
+        public Type GetContentApiPropertyValueType(IPublishedPropertyType propertyType)
+            => typeof(ApiBlockGridModel);
 
-        public object? ConvertIntermediateToHeadlessObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+        public object? ConvertIntermediateToContentApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
         {
             const int defaultColumns = 12;
 
             BlockGridModel? blockGridModel = ConvertIntermediateToBlockGridModel(propertyType, referenceCacheLevel, inter, preview);
             if (blockGridModel == null)
             {
-                return new HeadlessBlockGridModel(defaultColumns, Array.Empty<HeadlessBlockGridItem>());
+                return new ApiBlockGridModel(defaultColumns, Array.Empty<ApiBlockGridItem>());
             }
 
-            HeadlessBlockGridItem CreateHeadlessBlockGridItem(BlockGridItem item)
-                => new HeadlessBlockGridItem(
-                    _headlessElementBuilder.Build(item.Content),
+            ApiBlockGridItem CreateApiBlockGridItem(BlockGridItem item)
+                => new ApiBlockGridItem(
+                    _apiElementBuilder.Build(item.Content),
                     item.Settings != null
-                        ? _headlessElementBuilder.Build(item.Settings)
+                        ? _apiElementBuilder.Build(item.Settings)
                         : null,
                     item.RowSpan,
                     item.ColumnSpan,
                     item.AreaGridColumns ?? blockGridModel.GridColumns ?? defaultColumns,
-                    item.Areas.Select(CreateHeadlessBlockGridArea).ToArray());
+                    item.Areas.Select(CreateApiBlockGridArea).ToArray());
 
-            HeadlessBlockGridArea CreateHeadlessBlockGridArea(BlockGridArea area)
-                => new HeadlessBlockGridArea(
+            ApiBlockGridArea CreateApiBlockGridArea(BlockGridArea area)
+                => new ApiBlockGridArea(
                     area.Alias,
                     area.RowSpan,
                     area.ColumnSpan,
-                    area.Select(CreateHeadlessBlockGridItem).ToArray());
+                    area.Select(CreateApiBlockGridItem).ToArray());
 
-            var model = new HeadlessBlockGridModel(
+            var model = new ApiBlockGridModel(
                 blockGridModel.GridColumns ?? defaultColumns,
-                blockGridModel.Select(CreateHeadlessBlockGridItem).ToArray());
+                blockGridModel.Select(CreateApiBlockGridItem).ToArray());
 
             return model;
         }

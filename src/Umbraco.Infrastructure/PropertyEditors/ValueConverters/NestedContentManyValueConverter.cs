@@ -5,9 +5,11 @@ using System.Collections;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Umbraco.Cms.Core.Headless;
+using Umbraco.Cms.Core.ContentApi;
 using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Models.ContentApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PropertyEditors.ContentApi;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Web.Common.DependencyInjection;
 
@@ -19,10 +21,10 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 ///     content.
 /// </summary>
 [DefaultPropertyValueConverter(typeof(JsonValueConverter))]
-public class NestedContentManyValueConverter : NestedContentValueConverterBase, IHeadlessPropertyValueConverter
+public class NestedContentManyValueConverter : NestedContentValueConverterBase, IContentApiPropertyValueConverter
 {
     private readonly IProfilingLogger _proflog;
-    private readonly IHeadlessElementBuilder _headlessElementBuilder;
+    private readonly IApiElementBuilder _apiElementBuilder;
 
     [Obsolete("Use constructor that takes all parameters, scheduled for removal in V14")]
     public NestedContentManyValueConverter(
@@ -33,7 +35,7 @@ public class NestedContentManyValueConverter : NestedContentValueConverterBase, 
             publishedSnapshotAccessor,
             publishedModelFactory,
             proflog,
-            StaticServiceProvider.Instance.GetRequiredService<IHeadlessElementBuilder>())
+            StaticServiceProvider.Instance.GetRequiredService<IApiElementBuilder>())
     {
     }
 
@@ -44,11 +46,11 @@ public class NestedContentManyValueConverter : NestedContentValueConverterBase, 
         IPublishedSnapshotAccessor publishedSnapshotAccessor,
         IPublishedModelFactory publishedModelFactory,
         IProfilingLogger proflog,
-        IHeadlessElementBuilder headlessElementBuilder)
+        IApiElementBuilder apiElementBuilder)
         : base(publishedSnapshotAccessor, publishedModelFactory)
     {
         _proflog = proflog;
-        _headlessElementBuilder = headlessElementBuilder;
+        _apiElementBuilder = apiElementBuilder;
     }
 
     /// <inheritdoc />
@@ -112,9 +114,9 @@ public class NestedContentManyValueConverter : NestedContentValueConverterBase, 
         }
     }
 
-    public Type GetHeadlessPropertyValueType(IPublishedPropertyType propertyType) => typeof(IEnumerable<IHeadlessElement>);
+    public Type GetContentApiPropertyValueType(IPublishedPropertyType propertyType) => typeof(IEnumerable<IApiElement>);
 
-    public object? ConvertIntermediateToHeadlessObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+    public object? ConvertIntermediateToContentApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
     {
         var converted = ConvertIntermediateToObject(owner, propertyType, referenceCacheLevel, inter, preview);
         if (converted is not IEnumerable<IPublishedElement> elements)
@@ -122,6 +124,6 @@ public class NestedContentManyValueConverter : NestedContentValueConverterBase, 
             return null;
         }
 
-        return elements.Select(element => _headlessElementBuilder.Build(element));
+        return elements.Select(element => _apiElementBuilder.Build(element));
     }
 }

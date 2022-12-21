@@ -3,6 +3,7 @@
 
 using HeyRed.MarkdownSharp;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PropertyEditors.ContentApi;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Extensions;
@@ -10,7 +11,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
 [DefaultPropertyValueConverter]
-public class MarkdownEditorValueConverter : PropertyValueConverterBase, IHeadlessPropertyValueConverter
+public class MarkdownEditorValueConverter : PropertyValueConverterBase, IContentApiPropertyValueConverter
 {
     private readonly HtmlLocalLinkParser _localLinkParser;
     private readonly HtmlUrlParser _urlParser;
@@ -60,9 +61,9 @@ public class MarkdownEditorValueConverter : PropertyValueConverterBase, IHeadles
         // source should come from ConvertSource and be a string (or null) already
         inter?.ToString() ?? string.Empty;
 
-    public Type GetHeadlessPropertyValueType(IPublishedPropertyType propertyType) => typeof(string);
+    public Type GetContentApiPropertyValueType(IPublishedPropertyType propertyType) => typeof(string);
 
-    public object ConvertIntermediateToHeadlessObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+    public object ConvertIntermediateToContentApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
     {
         if (inter is not string markdownString || markdownString.IsNullOrWhiteSpace())
         {

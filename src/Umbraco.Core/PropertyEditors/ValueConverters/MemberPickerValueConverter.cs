@@ -1,5 +1,6 @@
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PropertyEditors.ContentApi;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
@@ -8,7 +9,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
 [DefaultPropertyValueConverter]
-public class MemberPickerValueConverter : PropertyValueConverterBase, IHeadlessPropertyValueConverter
+public class MemberPickerValueConverter : PropertyValueConverterBase, IContentApiPropertyValueConverter
 {
     private readonly IMemberService _memberService;
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
@@ -102,9 +103,9 @@ public class MemberPickerValueConverter : PropertyValueConverterBase, IHeadlessP
         return source;
     }
 
-    public Type GetHeadlessPropertyValueType(IPublishedPropertyType propertyType) => typeof(string);
+    public Type GetContentApiPropertyValueType(IPublishedPropertyType propertyType) => typeof(string);
 
-    // member picker is unsupported for headless output to avoid leaking member data by accident.
-    public object? ConvertIntermediateToHeadlessObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+    // member picker is unsupported for content API output to avoid leaking member data by accident.
+    public object? ConvertIntermediateToContentApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
         => "(unsupported)";
 }

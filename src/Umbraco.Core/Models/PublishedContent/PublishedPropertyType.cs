@@ -2,6 +2,7 @@
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.PropertyEditors.ContentApi;
 
 namespace Umbraco.Cms.Core.Models.PublishedContent
 {
@@ -282,7 +283,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         }
 
         /// <inheritdoc />
-        public object? ConvertInterToHeadlessObject(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+        public object? ConvertInterToContentApiObject(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
         {
             if (!_initialized)
             {
@@ -291,8 +292,8 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
 
             // use the converter if any, else just return the inter value
             return _converter != null
-                ? _converter is IHeadlessPropertyValueConverter headlessConverter
-                    ? headlessConverter.ConvertIntermediateToHeadlessObject(owner, this, referenceCacheLevel, inter, preview)
+                ? _converter is IContentApiPropertyValueConverter contentApiConverter
+                    ? contentApiConverter.ConvertIntermediateToContentApiObject(owner, this, referenceCacheLevel, inter, preview)
                     : _converter.ConvertIntermediateToObject(owner, this, referenceCacheLevel, inter, preview)
                 : inter;
         }

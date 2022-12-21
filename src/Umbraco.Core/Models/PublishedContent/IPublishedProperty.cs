@@ -72,12 +72,12 @@ public interface IPublishedProperty
     object? GetXPathValue(string? culture = null, string? segment = null);
 
     /// <summary>
-    ///     Gets the object value of the property for headless representation.
+    ///     Gets the object value of the property for content API representation.
     /// </summary>
     /// <remarks>
-    ///     <para>The value is what you want to use when rendering content headlessly ie in an API.</para>
+    ///     <para>The value is what you want to use when rendering content through the content API.</para>
     ///     <para>It can be null, or any type of CLR object.</para>
     ///     <para>It has been fully prepared and processed by the appropriate converter.</para>
     /// </remarks>
-    object? GetHeadlessValue(string? culture = null, string? segment = null);
+    object? GetContentApiValue(string? culture = null, string? segment = null);
 }

@@ -8,7 +8,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Cms.Core.Headless;
+using Umbraco.Cms.Core.ContentApi;
+using Umbraco.Cms.Core.Models.ContentApi;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models;
@@ -118,8 +119,8 @@ public class NestedContentTests
 
         var converters = new PropertyValueConverterCollection(() => new IPropertyValueConverter[]
         {
-            new NestedContentSingleValueConverter(publishedSnapshotAccessor.Object, publishedModelFactory.Object, proflog, Mock.Of<IHeadlessElementBuilder>()),
-            new NestedContentManyValueConverter(publishedSnapshotAccessor.Object, publishedModelFactory.Object, proflog, Mock.Of<IHeadlessElementBuilder>()),
+            new NestedContentSingleValueConverter(publishedSnapshotAccessor.Object, publishedModelFactory.Object, proflog, Mock.Of<IApiElementBuilder>()),
+            new NestedContentManyValueConverter(publishedSnapshotAccessor.Object, publishedModelFactory.Object, proflog, Mock.Of<IApiElementBuilder>()),
         });
 
         var factory =
@@ -274,7 +275,7 @@ public class NestedContentTests
         public override object GetXPathValue(string culture = null, string? segment = null) =>
             throw new InvalidOperationException("This method won't be implemented.");
 
-        public override object GetHeadlessValue(string culture = null, string segment = null) =>
-            PropertyType.ConvertInterToHeadlessObject(_owner, ReferenceCacheLevel, InterValue, _preview);
+        public override object GetContentApiValue(string culture = null, string segment = null) =>
+            PropertyType.ConvertInterToContentApiObject(_owner, ReferenceCacheLevel, InterValue, _preview);
     }
 }

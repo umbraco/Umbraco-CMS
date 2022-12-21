@@ -4,8 +4,9 @@
 using System.Globalization;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Umbraco.Cms.Core.Headless;
+using Umbraco.Cms.Core.Models.ContentApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PropertyEditors.ContentApi;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
@@ -14,7 +15,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 ///     Represents a value converter for the image cropper value editor.
 /// </summary>
 [DefaultPropertyValueConverter(typeof(JsonValueConverter))]
-public class ImageCropperValueConverter : PropertyValueConverterBase, IHeadlessPropertyValueConverter
+public class ImageCropperValueConverter : PropertyValueConverterBase, IContentApiPropertyValueConverter
 {
     private static readonly JsonSerializerSettings _imageCropperValueJsonSerializerSettings = new()
     {
@@ -67,10 +68,10 @@ public class ImageCropperValueConverter : PropertyValueConverterBase, IHeadlessP
         return value;
     }
 
-    public Type GetHeadlessPropertyValueType(IPublishedPropertyType propertyType) => typeof(HeadlessImageCropperValue);
+    public Type GetContentApiPropertyValueType(IPublishedPropertyType propertyType) => typeof(ApiImageCropperValue);
 
-    public object? ConvertIntermediateToHeadlessObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+    public object? ConvertIntermediateToContentApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
         => inter is ImageCropperValue {Src: { }} imageCropperValue
-            ? new HeadlessImageCropperValue(imageCropperValue.Src, imageCropperValue.FocalPoint, imageCropperValue.Crops)
+            ? new ApiImageCropperValue(imageCropperValue.Src, imageCropperValue.FocalPoint, imageCropperValue.Crops)
             : null;
 }

@@ -2,10 +2,12 @@
 // See LICENSE for more details.
 
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.Headless;
+using Umbraco.Cms.Core.ContentApi;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PropertyEditors.ContentApi;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Serialization;
@@ -15,13 +17,13 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
-public class MultiUrlPickerValueConverter : PropertyValueConverterBase, IHeadlessPropertyValueConverter
+public class MultiUrlPickerValueConverter : PropertyValueConverterBase, IContentApiPropertyValueConverter
 {
     private readonly IJsonSerializer _jsonSerializer;
     private readonly IProfilingLogger _proflog;
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
     private readonly IPublishedUrlProvider _publishedUrlProvider;
-    private readonly IHeadlessContentNameProvider _headlessContentNameProvider;
+    private readonly IContentNameProvider _contentNameProvider;
 
     [Obsolete("Use constructor that takes all parameters, scheduled for removal in V14")]
     public MultiUrlPickerValueConverter(
@@ -36,7 +38,7 @@ public class MultiUrlPickerValueConverter : PropertyValueConverterBase, IHeadles
             jsonSerializer,
             umbracoContextAccessor,
             publishedUrlProvider,
-            StaticServiceProvider.Instance.GetRequiredService<IHeadlessContentNameProvider>())
+            StaticServiceProvider.Instance.GetRequiredService<IContentNameProvider>())
     {
     }
 
@@ -46,14 +48,14 @@ public class MultiUrlPickerValueConverter : PropertyValueConverterBase, IHeadles
         IJsonSerializer jsonSerializer,
         IUmbracoContextAccessor umbracoContextAccessor,
         IPublishedUrlProvider publishedUrlProvider,
-        IHeadlessContentNameProvider headlessContentNameProvider)
+        IContentNameProvider contentNameProvider)
     {
         _publishedSnapshotAccessor = publishedSnapshotAccessor ??
                                      throw new ArgumentNullException(nameof(publishedSnapshotAccessor));
         _proflog = proflog ?? throw new ArgumentNullException(nameof(proflog));
         _jsonSerializer = jsonSerializer;
         _publishedUrlProvider = publishedUrlProvider;
-        _headlessContentNameProvider = headlessContentNameProvider;
+        _contentNameProvider = contentNameProvider;
     }
 
     public override bool IsConverter(IPublishedPropertyType propertyType) =>
@@ -140,14 +142,14 @@ public class MultiUrlPickerValueConverter : PropertyValueConverterBase, IHeadles
         }
     }
 
-    public Type GetHeadlessPropertyValueType(IPublishedPropertyType propertyType) =>
+    public Type GetContentApiPropertyValueType(IPublishedPropertyType propertyType) =>
         IsSingleUrlPicker(propertyType)
-            ? typeof(HeadlessLink)
-            : typeof(IEnumerable<HeadlessLink>);
+            ? typeof(ApiLink)
+            : typeof(IEnumerable<ApiLink>);
 
-    public object? ConvertIntermediateToHeadlessObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+    public object? ConvertIntermediateToContentApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
     {
-        object? DefaultValue() => IsSingleUrlPicker(propertyType) ? null : Array.Empty<HeadlessLink>();
+        object? DefaultValue() => IsSingleUrlPicker(propertyType) ? null : Array.Empty<ApiLink>();
 
         if (inter is not string value || value.IsNullOrWhiteSpace())
         {
@@ -162,7 +164,7 @@ public class MultiUrlPickerValueConverter : PropertyValueConverterBase, IHeadles
 
         IPublishedSnapshot publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
 
-        HeadlessLink? ToLink(MultiUrlPickerValueEditor.LinkDto item)
+        ApiLink? ToLink(MultiUrlPickerValueEditor.LinkDto item)
         {
             IPublishedContent? content = item.Udi != null
                 ? item.Udi.EntityType switch
@@ -176,9 +178,9 @@ public class MultiUrlPickerValueConverter : PropertyValueConverterBase, IHeadles
             var url = content?.Url(_publishedUrlProvider) ?? item.Url;
             return url.IsNullOrWhiteSpace()
                 ? null
-                : new HeadlessLink(
+                : new ApiLink(
                     $"{url}{item.QueryString}",
-                    item.Name ?? (content != null ? _headlessContentNameProvider.GetName(content) : null),
+                    item.Name ?? (content != null ? _contentNameProvider.GetName(content) : null),
                     item.Target,
                     content?.Key,
                     content?.ContentType.Alias,
@@ -189,7 +191,7 @@ public class MultiUrlPickerValueConverter : PropertyValueConverterBase, IHeadles
                             : LinkType.Content);
         }
 
-        IEnumerable<HeadlessLink> links = dtos.Select(ToLink).WhereNotNull();
+        IEnumerable<ApiLink> links = dtos.Select(ToLink).WhereNotNull();
 
         return IsSingleUrlPicker(propertyType) ? links.FirstOrDefault() : links;
     }

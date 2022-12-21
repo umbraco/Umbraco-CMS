@@ -310,7 +310,7 @@ internal class Property : PublishedPropertyBase
         }
     }
 
-    public override object? GetHeadlessValue(string? culture = null, string? segment = null)
+    public override object? GetContentApiValue(string? culture = null, string? segment = null)
     {
         _content.VariationContextAccessor.ContextualizeVariation(_variations, _content.Id, ref culture, ref segment);
 
@@ -322,14 +322,14 @@ internal class Property : PublishedPropertyBase
             // initial reference cache level always is .Content
             const PropertyCacheLevel initialCacheLevel = PropertyCacheLevel.Element;
 
-            if (cacheValues.HeadlessObjectInitialized)
+            if (cacheValues.ContentApiObjectInitialized)
             {
-                return cacheValues.HeadlessObjectValue;
+                return cacheValues.ContentApiObjectValue;
             }
 
-            cacheValues.HeadlessObjectValue = PropertyType.ConvertInterToHeadlessObject(_content, initialCacheLevel, GetInterValue(culture, segment), _isPreviewing);
-            cacheValues.HeadlessObjectInitialized = true;
-            value = cacheValues.HeadlessObjectValue;
+            cacheValues.ContentApiObjectValue = PropertyType.ConvertInterToContentApiObject(_content, initialCacheLevel, GetInterValue(culture, segment), _isPreviewing);
+            cacheValues.ContentApiObjectInitialized = true;
+            value = cacheValues.ContentApiObjectValue;
         }
 
         return value;
@@ -347,9 +347,9 @@ internal class Property : PublishedPropertyBase
 
         public object? XPathValue { get; set; }
 
-        public bool HeadlessObjectInitialized { get; set; }
+        public bool ContentApiObjectInitialized { get; set; }
 
-        public object? HeadlessObjectValue { get; set; }
+        public object? ContentApiObjectValue { get; set; }
     }
 
     private class CacheValues : CacheValue
