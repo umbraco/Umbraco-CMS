@@ -2,9 +2,9 @@
 
 public class ApiMedia
 {
-    public ApiMedia(Guid key, string? name, string mediaType, string url, string? extension, int? width, int? height, IDictionary<string, object?> properties)
+    public ApiMedia(Guid id, string name, string mediaType, string url, string? extension, int? width, int? height, IDictionary<string, object?> properties)
     {
-        Key = key;
+        Id = id;
         Name = name;
         MediaType = mediaType;
         Url = url;
@@ -14,9 +14,9 @@ public class ApiMedia
         Properties = properties;
     }
 
-    public Guid Key { get; }
+    public Guid Id { get; }
 
-    public string? Name { get; }
+    public string Name { get; }
 
     public string MediaType { get; }
 

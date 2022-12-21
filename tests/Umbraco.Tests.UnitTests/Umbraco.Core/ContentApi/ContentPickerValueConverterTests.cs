@@ -30,7 +30,7 @@ public class ContentPickerValueConverterTests : PropertyValueConverterTests
 
         Assert.NotNull(result);
         Assert.AreEqual("The page", result.Title);
-        Assert.AreEqual(PublishedContent.Key, result.Key);
+        Assert.AreEqual(PublishedContent.Key, result.ContentId);
         Assert.AreEqual("the-page-url", result.Url);
         Assert.AreEqual("TheContentType", result.DestinationType);
         Assert.AreEqual(LinkType.Content, result.LinkType);

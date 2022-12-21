@@ -43,7 +43,7 @@ public class ContentBuilderTests : ContentApiTests
         Assert.AreEqual("The page", result.Name);
         Assert.AreEqual("thePageType", result.ContentType);
         Assert.AreEqual("url:url-segment", result.Url);
-        Assert.AreEqual(key, result.Key);
+        Assert.AreEqual(key, result.Id);
         Assert.AreEqual(2, result.Properties.Count);
         Assert.AreEqual("Content API value", result.Properties["contentApi"]);
         Assert.AreEqual("Default value", result.Properties["default"]);
@@ -99,6 +99,6 @@ public class ContentBuilderTests : ContentApiTests
         Assert.AreEqual("The media", result.Name);
         Assert.AreEqual("theMediaType", result.ContentType);
         Assert.AreEqual("media-url:media-url-segment", result.Url);
-        Assert.AreEqual(key, result.Key);
+        Assert.AreEqual(key, result.Id);
     }
 }

@@ -2,7 +2,7 @@ namespace Umbraco.Cms.Core.Models.ContentApi;
 
 public interface IApiElement
 {
-    Guid Key { get; }
+    Guid Id { get; }
 
     string ContentType { get; }
 

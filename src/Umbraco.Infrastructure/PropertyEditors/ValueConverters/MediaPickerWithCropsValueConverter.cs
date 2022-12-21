@@ -136,9 +136,15 @@ public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, IC
                 .Where(p => p.Alias.StartsWith("umbraco") == false)
                 .ToDictionary(p => p.Alias, p => p.GetContentApiValue());
 
-            return new ApiMediaWithCrops(media.Content.Key,
+            return new ApiMediaWithCrops(
+                media.Content.Key,
                 _contentNameProvider.GetName(media.Content),
-                media.ContentType.Alias, media.LocalCrops.Src ?? string.Empty, media.Value<string>(_publishedValueFallback, Constants.Conventions.Media.Extension), media.Value<int?>(_publishedValueFallback, Constants.Conventions.Media.Width), media.Value<int?>(_publishedValueFallback, Constants.Conventions.Media.Height), customProperties)
+                media.ContentType.Alias,
+                media.LocalCrops.Src ?? string.Empty,
+                media.Value<string>(_publishedValueFallback, Constants.Conventions.Media.Extension),
+                media.Value<int?>(_publishedValueFallback, Constants.Conventions.Media.Width),
+                media.Value<int?>(_publishedValueFallback, Constants.Conventions.Media.Height),
+                customProperties)
             {
                 FocalPoint = media.LocalCrops.FocalPoint,
                 Crops = media.LocalCrops.Crops

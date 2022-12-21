@@ -73,7 +73,7 @@ public class NestedContentValueConverterTests : PropertyValueConverterTests
 
         Assert.IsNotNull(result);
         Assert.AreEqual("contentType1", result.ContentType);
-        Assert.AreEqual(Guid.Parse("1E68FB92-727A-4473-B10C-FA108ADCF16F"), result.Key);
+        Assert.AreEqual(Guid.Parse("1E68FB92-727A-4473-B10C-FA108ADCF16F"), result.Id);
         Assert.AreEqual(1, result.Properties.Count);
         Assert.AreEqual("Hello, world", result.Properties["prop1"]);
     }
@@ -86,7 +86,7 @@ public class NestedContentValueConverterTests : PropertyValueConverterTests
 
         Assert.IsNotNull(result);
         Assert.AreEqual("contentType1", result.ContentType);
-        Assert.AreEqual(Guid.Parse("1E68FB92-727A-4473-B10C-FA108ADCF16F"), result.Key);
+        Assert.AreEqual(Guid.Parse("1E68FB92-727A-4473-B10C-FA108ADCF16F"), result.Id);
         Assert.AreEqual(1, result.Properties.Count);
         Assert.AreEqual("Hello, world", result.Properties["prop1"]);
     }
@@ -114,7 +114,7 @@ public class NestedContentValueConverterTests : PropertyValueConverterTests
         Assert.AreEqual(1, result.Count());
 
         Assert.AreEqual("contentType1", result.First().ContentType);
-        Assert.AreEqual(Guid.Parse("1E68FB92-727A-4473-B10C-FA108ADCF16F"), result.First().Key);
+        Assert.AreEqual(Guid.Parse("1E68FB92-727A-4473-B10C-FA108ADCF16F"), result.First().Id);
         Assert.AreEqual(1, result.First().Properties.Count);
         Assert.AreEqual("Hello, world", result.First().Properties["prop1"]);
     }
@@ -129,12 +129,12 @@ public class NestedContentValueConverterTests : PropertyValueConverterTests
         Assert.AreEqual(2, result.Count());
 
         Assert.AreEqual("contentType1", result.First().ContentType);
-        Assert.AreEqual(Guid.Parse("1E68FB92-727A-4473-B10C-FA108ADCF16F"), result.First().Key);
+        Assert.AreEqual(Guid.Parse("1E68FB92-727A-4473-B10C-FA108ADCF16F"), result.First().Id);
         Assert.AreEqual(1, result.First().Properties.Count);
         Assert.AreEqual("Hello, world", result.First().Properties["prop1"]);
 
         Assert.AreEqual("contentType1", result.Last().ContentType);
-        Assert.AreEqual(Guid.Parse("40F59DD9-7E9F-4053-BD32-89FB086D18C9"), result.Last().Key);
+        Assert.AreEqual(Guid.Parse("40F59DD9-7E9F-4053-BD32-89FB086D18C9"), result.Last().Id);
         Assert.AreEqual(1, result.Last().Properties.Count);
         Assert.AreEqual("One more", result.Last().Properties["prop1"]);
     }

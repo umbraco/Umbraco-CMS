@@ -36,7 +36,7 @@ public class MediaPickerValueConverterTests : PropertyValueConverterTests
 
         Assert.NotNull(result);
         Assert.AreEqual("The media", result.Name);
-        Assert.AreEqual(PublishedMedia.Key, result.Key);
+        Assert.AreEqual(PublishedMedia.Key, result.Id);
         Assert.AreEqual("the-media-url", result.Url);
         Assert.AreEqual("TheMediaType", result.MediaType);
     }
@@ -73,12 +73,12 @@ public class MediaPickerValueConverterTests : PropertyValueConverterTests
         Assert.AreEqual(2, result.Count());
 
         Assert.AreEqual("The media", result.First().Name);
-        Assert.AreEqual(PublishedMedia.Key, result.First().Key);
+        Assert.AreEqual(PublishedMedia.Key, result.First().Id);
         Assert.AreEqual("the-media-url", result.First().Url);
         Assert.AreEqual("TheMediaType", result.First().MediaType);
 
         Assert.AreEqual("The other media", result.Last().Name);
-        Assert.AreEqual(otherMediaKey, result.Last().Key);
+        Assert.AreEqual(otherMediaKey, result.Last().Id);
         Assert.AreEqual("the-other-media-url", result.Last().Url);
         Assert.AreEqual("TheMediaType", result.Last().MediaType);
     }

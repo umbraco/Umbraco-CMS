@@ -4,5 +4,5 @@ namespace Umbraco.Cms.Core.ContentApi;
 
 public interface IContentNameProvider
 {
-    string? GetName(IPublishedContent content);
+    string GetName(IPublishedContent content);
 }
