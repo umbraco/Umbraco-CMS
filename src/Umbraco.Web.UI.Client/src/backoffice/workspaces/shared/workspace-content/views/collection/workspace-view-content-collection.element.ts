@@ -7,7 +7,7 @@ import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import type { ContentProperty, ContentPropertyData, DocumentDetails, MediaDetails } from '@umbraco-cms/models';
 
-import '../../../../../components/content-property/content-property.element';
+import 'src/backoffice/components/content-property/content-property.element';
 import 'src/backoffice/dashboards/media-management/dashboard-media-management.element';
 
 @customElement('umb-workspace-view-content-collection')
