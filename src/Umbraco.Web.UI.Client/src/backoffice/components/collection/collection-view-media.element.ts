@@ -32,7 +32,7 @@ export class UmbCollectionViewMediaElement extends UmbContextConsumerMixin(UmbOb
 	private _routes: Array<any> = [];
 
 	@state()
-	private _collectionLayouts: Array<ManifestCollectionLayout> = [];
+	private _collectionViews: Array<ManifestCollectionLayout> = [];
 
 	@state()
 	private _currentLayoutPathName = '';
@@ -69,7 +69,7 @@ export class UmbCollectionViewMediaElement extends UmbContextConsumerMixin(UmbOb
 			),
 			(layouts) => {
 				if (layouts?.length === 0) return;
-				this._collectionLayouts = layouts;
+				this._collectionViews = layouts;
 				this._createRoutes();
 			}
 		);
@@ -78,7 +78,7 @@ export class UmbCollectionViewMediaElement extends UmbContextConsumerMixin(UmbOb
 	private _createRoutes() {
 		this._routes = [];
 
-		this._routes = this._collectionLayouts.map((layout) => {
+		this._routes = this._collectionViews.map((layout) => {
 			return {
 				path: `${layout.meta.pathName}`,
 				component: () => createExtensionElement(layout),
@@ -90,7 +90,7 @@ export class UmbCollectionViewMediaElement extends UmbContextConsumerMixin(UmbOb
 
 		this._routes.push({
 			path: '**',
-			redirectTo: this._collectionLayouts?.[0]?.meta.pathName,
+			redirectTo: this._collectionViews?.[0]?.meta.pathName,
 		});
 	}
 
