@@ -9,13 +9,14 @@ const isDataTypeDetails = (dataType: DataTypeDetails | FolderTreeItem): dataType
 
 // TODO: can we make is easy to reuse store methods across different stores?
 
+export type UmbDataTypeStoreItemType = DataTypeDetails | FolderTreeItem;
 /**
  * @export
  * @class UmbDataTypesStore
  * @extends {UmbDataStoreBase<DataTypeDetails | FolderTreeItem>}
  * @description - Data Store for Data Types
  */
-export class UmbDataTypesStore extends UmbDataStoreBase<DataTypeDetails | FolderTreeItem> {
+export class UmbDataTypeStore extends UmbDataStoreBase<UmbDataTypeStoreItemType> {
 	/**
 	 * @description - Request a Data Type by key. The Data Type is added to the store and is returned as an Observable.
 	 * @param {string} key

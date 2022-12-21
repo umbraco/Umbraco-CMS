@@ -7,13 +7,15 @@ const isDocumentTypeDetails = (documentType: DocumentTypeDetails | DocumentTypeT
 	return (documentType as DocumentTypeDetails).properties !== undefined;
 };
 
+export type UmbDocumentTypeStoreItemType = DocumentTypeDetails | DocumentTypeTreeItem;
+
 /**
  * @export
  * @class UmbDocumentTypeStore
  * @extends {UmbDataStoreBase<DocumentTypeDetails | DocumentTypeTreeItem>}
  * @description - Data Store for Document Types
  */
-export class UmbDocumentTypeStore extends UmbDataStoreBase<DocumentTypeDetails | DocumentTypeTreeItem> {
+export class UmbDocumentTypeStore extends UmbDataStoreBase<UmbDocumentTypeStoreItemType> {
 	getByKey(key: string): Observable<DocumentTypeDetails | null> {
 		// TODO: use Fetcher API.
 		// TODO: only fetch if the data type is not in the store?

@@ -1,16 +1,32 @@
-import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
+import { css, html, LitElement, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
+import { IRoute, IRoutingInfo, PageComponent, RouterSlot } from 'router-slot';
 import { map } from 'rxjs';
 
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-import type { ManifestWorkspace } from '@umbraco-cms/models';
+import type { ManifestWorkspaceView } from '@umbraco-cms/models';
 
+import '../../../components/body-layout/body-layout.element';
+import '../../../components/extension-slot/extension-slot.element';
+
+/**
+ * @element umb-workspace-entity
+ * @description
+ * @slot icon - Slot for rendering the entity icon
+ * @slot name - Slot for rendering the entity name
+ * @slot footer - Slot for rendering the entity footer
+ * @slot actions - Slot for rendering the entity actions
+ * @slot default - slot for main content
+ * @export
+ * @class UmbWorkspaceEntity
+ * @extends {UmbContextConsumerMixin(LitElement)}
+ */
 @customElement('umb-workspace-entity')
-export class UmbWorkspaceEntityElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+export class UmbWorkspaceEntity extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -19,75 +35,141 @@ export class UmbWorkspaceEntityElement extends UmbContextConsumerMixin(UmbObserv
 				width: 100%;
 				height: 100%;
 			}
+
+			uui-input {
+				width: 100%;
+			}
+
+			uui-tab-group {
+				--uui-tab-divider: var(--uui-color-border);
+				border-left: 1px solid var(--uui-color-border);
+				border-right: 1px solid var(--uui-color-border);
+			}
 		`,
 	];
 
+	/**
+	 * Alias of the workspace. The Layout will render the workspace views that are registered for this workspace alias.
+	 * @public
+	 * @type {string}
+	 * @attr
+	 * @default ''
+	 */
 	@property()
-	public entityKey!: string;
+	public headline = '';
 
-	private _entityType = '';
 	@property()
-	public get entityType(): string {
-		return this._entityType;
-	}
-	public set entityType(value: string) {
-		this._entityType = value;
-		this._observeWorkspace();
-	}
+	public alias = '';
 
 	@state()
-	private _element?: HTMLElement;
+	private _workspaceViews: Array<ManifestWorkspaceView> = [];
 
-	private _currentWorkspaceAlias:string | null = null;
+	@state()
+	private _currentView = '';
+
+	@state()
+	private _routes: Array<IRoute> = [];
+
+	private _routerFolder = '';
 
 	connectedCallback(): void {
 		super.connectedCallback();
-		this._observeWorkspace();
+
+		this._observeWorkspaceViews();
+
+		/* TODO: find a way to construct absolute urls */
+		this._routerFolder = window.location.pathname.split('/view')[0];
 	}
 
-	/**
-	TODO: use future system of extension-slot, extension slots must use a condition-system which will be used to determine the filtering happening below.
-	This will first be possible to make when ContextApi is available, as conditions will use this system.
-	*/
-	private _observeWorkspace() {
-		this.observe<ManifestWorkspace | undefined>(
+	private _observeWorkspaceViews() {
+		this.observe<ManifestWorkspaceView[]>(
 			umbExtensionsRegistry
-				.extensionsOfType('workspace')
-				.pipe(map((workspaces) => workspaces.find((workspace) => workspace.meta.entityType === this.entityType))),
-			(workspace) => {
-				// don't rerender workspace if it's the same
-				const newWorkspaceAlias = workspace?.alias || '';
-				if (this._currentWorkspaceAlias === newWorkspaceAlias) return;
-				this._currentWorkspaceAlias = newWorkspaceAlias;
-				this._createElement(workspace);
+				.extensionsOfType('workspaceView')
+				.pipe(map((extensions) => extensions.filter((extension) => extension.meta.workspaces.includes(this.alias)))),
+			(workspaceViews) => {
+				this._workspaceViews = workspaceViews;
+				this._createRoutes();
 			}
 		);
 	}
 
-	private async _createElement(workspace?: ManifestWorkspace) {
-		this._element = workspace ? (await createExtensionElement(workspace)) : undefined;
-		if (this._element) {
-			// TODO: use contextApi for this.
-			(this._element as any).entityKey = this.entityKey;
-			return;
-		}
+	private async _createRoutes() {
+		if (this._workspaceViews.length > 0) {
+			this._routes = [];
 
-		// TODO: implement fallback workspace
-		// Note for extension-slot, we must enable giving the extension-slot a fallback element.
-		const fallbackWorkspace = document.createElement('div');
-		fallbackWorkspace.innerHTML = '<p>No Workspace found</p>';
-		this._element = fallbackWorkspace;
+			this._routes = this._workspaceViews.map((view) => {
+				return {
+					path: `view/${view.meta.pathname}`,
+					component: () => createExtensionElement(view) as unknown as PageComponent,
+					setup: (_element: HTMLElement, info: IRoutingInfo) => {
+						this._currentView = info.match.route.path;
+					},
+				};
+			});
+
+			this._routes.push({
+				path: '**',
+				redirectTo: `view/${this._workspaceViews?.[0].meta.pathname}`,
+			});
+
+			this.requestUpdate();
+			await this.updateComplete;
+
+			this._forceRouteRender();
+		}
+	}
+
+	// TODO: Figure out why this has been necessary for this case. Come up with another case
+	private _forceRouteRender() {
+		const routerSlotEl = this.shadowRoot?.querySelector('router-slot') as RouterSlot;
+		if (routerSlotEl) {
+			routerSlotEl.render();
+		}
+	}
+
+	private _renderTabs() {
+		return html`
+			${this._workspaceViews?.length > 0
+				? html`
+						<uui-tab-group slot="tabs">
+							${this._workspaceViews.map(
+								(view: ManifestWorkspaceView) => html`
+									<uui-tab
+										.label="${view.meta.label || view.name}"
+										href="${this._routerFolder}/view/${view.meta.pathname}"
+										?active="${this._currentView.includes(view.meta.pathname)}">
+										<uui-icon slot="icon" name="${view.meta.icon}"></uui-icon>
+										${view.meta.label || view.name}
+									</uui-tab>
+								`
+							)}
+						</uui-tab-group>
+				  `
+				: nothing}
+		`;
 	}
 
 	render() {
-		return html`${this._element}`;
+		return html`
+			<umb-body-layout .headline=${this.headline}>
+
+				<slot name="header" slot="header"></slot>
+				${this._renderTabs()}
+
+				<router-slot .routes="${this._routes}"></router-slot>
+				<slot></slot>
+
+				<slot name="footer" slot="footer"></slot>
+				<umb-extension-slot slot="actions" type="workspaceAction" .filter=${(extension: any) => extension.meta.workspaces.includes(this.alias)}></umb-extension-slot>
+				<slot name="actions" slot="actions"></slot>
+				
+			</umb-body-layout>
+		`;
 	}
 }
 
-export default UmbWorkspaceEntityElement;
-
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-workspace-entity': UmbWorkspaceEntityElement;
+		'umb-workspace-entity': UmbWorkspaceEntity;
 	}
 }

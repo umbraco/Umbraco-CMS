@@ -4,7 +4,7 @@ import { css, html, LitElement } from 'lit';
 import { state } from 'lit/decorators.js';
 import { IRoutingInfo } from 'router-slot';
 import { UmbSectionStore } from '../../../core/stores/section.store';
-import { UmbSectionContext } from '../../sections/section.context';
+import { UmbSectionContext } from '../../sections/shared/section.context';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';

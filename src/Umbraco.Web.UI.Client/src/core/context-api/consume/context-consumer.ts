@@ -24,11 +24,13 @@ export class UmbContextConsumer {
 	}
 
 	public attach() {
+		// TODO: We need to use closets application element. We need this in order to have separate Backoffice running within or next to each other.
 		window.addEventListener(umbContextProvideEventType, this._handleNewProvider);
 		this.request();
 	}
 
 	public detach() {
+		// TODO: We need to use closets application element. We need this in order to have separate Backoffice running within or next to each other.
 		window.removeEventListener(umbContextProvideEventType, this._handleNewProvider);
 	}
 

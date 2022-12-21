@@ -2,7 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
-import '../shared/workspace-entity-layout/workspace-entity-layout.element';
+import '../shared/workspace-entity/workspace-entity.element';
 
 @customElement('umb-workspace-media-type')
 export class UmbWorkspaceMediaTypeElement extends LitElement {
@@ -21,7 +21,7 @@ export class UmbWorkspaceMediaTypeElement extends LitElement {
 	id!: string;
 
 	render() {
-		return html`<umb-workspace-entity-layout alias="Umb.Workspace.MediaType">Media Type Workspace</umb-workspace-entity-layout>`;
+		return html`<umb-workspace-entity alias="Umb.Workspace.MediaType">Media Type Workspace</umb-workspace-entity>`;
 	}
 }
 

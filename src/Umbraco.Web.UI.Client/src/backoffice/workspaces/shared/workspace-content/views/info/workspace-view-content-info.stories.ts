@@ -3,8 +3,8 @@ import './workspace-view-content-info.element';
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit-html';
 
-import { data } from '../../../../../../core/mocks/data/document.data';
-import { UmbNodeContext } from '../../node.context';
+// import { data } from '../../../../../../core/mocks/data/document.data';
+// import { UmbNodeContext } from '../../node.context';
 
 import type { UmbWorkspaceViewContentInfoElement } from './workspace-view-content-info.element';
 
@@ -13,10 +13,12 @@ export default {
 	component: 'umb-workspace-view-content-info',
 	id: 'umb-workspace-view-content-info',
 	decorators: [
-		(story) =>
-			html` <umb-context-provider key="umbNodeContext" .value=${new UmbNodeContext(data[0])}>
+		(story) => {
+			return html`TODO: make use of mocked workspace context??`;
+			/*html` <umb-context-provider key="workspaceContext" .value=${new UmbWorkspaceDataTypeContext(data[0])}>
 				${story()}
-			</umb-context-provider>`,
+			</umb-context-provider>`,*/
+		}
 	],
 } as Meta;
 
