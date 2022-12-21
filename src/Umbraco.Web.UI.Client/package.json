@@ -75,7 +75,7 @@
 		"@mdx-js/react": "^2.2.1",
 		"@open-wc/testing": "^3.1.7",
 		"@playwright/test": "^1.29.0",
-		"@storybook/addon-a11y": "^6.5.14",
+		"@storybook/addon-a11y": "^6.5.15",
 		"@storybook/addon-actions": "^6.5.14",
 		"@storybook/addon-essentials": "^6.5.14",
 		"@storybook/addon-links": "^6.5.14",
