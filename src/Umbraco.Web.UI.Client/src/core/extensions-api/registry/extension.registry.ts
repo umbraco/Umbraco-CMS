@@ -17,7 +17,7 @@ import type {
 	ManifestPackageView,
 	ManifestExternalLoginProvider,
 	ManifestHeaderApp,
-	ManifestCollectionLayout,
+	ManifestCollectionView,
 	ManifestCollectionBulkAction,
 } from '../../models';
 import { createExtensionElement } from '../create-extension-element.function';
@@ -86,7 +86,7 @@ export class UmbExtensionRegistry {
 	extensionsOfType(type: 'entrypoint'): Observable<Array<ManifestEntrypoint>>;
 	extensionsOfType(type: 'custom'): Observable<Array<ManifestCustom>>;
 	extensionsOfType(type: 'externalLoginProvider'): Observable<Array<ManifestExternalLoginProvider>>;
-	extensionsOfType(type: 'collectionLayout'): Observable<Array<ManifestCollectionLayout>>;
+	extensionsOfType(type: 'collectionLayout'): Observable<Array<ManifestCollectionView>>;
 	extensionsOfType(type: 'collectionBulkAction'): Observable<Array<ManifestCollectionBulkAction>>;
 	extensionsOfType<T extends ManifestTypes>(type: string): Observable<Array<T>>;
 	extensionsOfType(type: string): Observable<Array<ManifestTypes>> {

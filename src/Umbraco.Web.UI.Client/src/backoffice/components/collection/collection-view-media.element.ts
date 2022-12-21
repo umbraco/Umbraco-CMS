@@ -7,7 +7,7 @@ import '../../components/collection/collection-toolbar.element';
 import '../../components/collection/collection-view.element';
 import { IRoutingInfo } from 'router-slot';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
-import type { ManifestCollectionLayout } from '@umbraco-cms/models';
+import type { ManifestCollectionView } from '@umbraco-cms/models';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
@@ -32,7 +32,7 @@ export class UmbCollectionViewMediaElement extends UmbContextConsumerMixin(UmbOb
 	private _routes: Array<any> = [];
 
 	@state()
-	private _collectionViews: Array<ManifestCollectionLayout> = [];
+	private _collectionViews: Array<ManifestCollectionView> = [];
 
 	@state()
 	private _currentLayoutPathName = '';
@@ -61,7 +61,7 @@ export class UmbCollectionViewMediaElement extends UmbContextConsumerMixin(UmbOb
 	}
 
 	private _observeCollectionLayouts() {
-		this.observe<Array<ManifestCollectionLayout>>(
+		this.observe<Array<ManifestCollectionView>>(
 			umbExtensionsRegistry?.extensionsOfType('collectionLayout').pipe(
 				map((extensions) => {
 					return extensions.filter((extension) => extension.meta.entityType === 'media');
@@ -82,7 +82,7 @@ export class UmbCollectionViewMediaElement extends UmbContextConsumerMixin(UmbOb
 			return {
 				path: `${layout.meta.pathName}`,
 				component: () => createExtensionElement(layout),
-				setup: (_element: ManifestCollectionLayout, info: IRoutingInfo) => {
+				setup: (_element: ManifestCollectionView, info: IRoutingInfo) => {
 					this._currentLayoutPathName = info.match.route.path;
 				},
 			};

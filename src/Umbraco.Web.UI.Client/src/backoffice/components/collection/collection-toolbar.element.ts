@@ -5,7 +5,7 @@ import { map } from 'rxjs';
 import { TooltipMenuItem } from '../tooltip-menu';
 import '../tooltip-menu/tooltip-menu.element';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import type { ManifestCollectionLayout } from '@umbraco-cms/models';
+import type { ManifestCollectionView } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
 @customElement('umb-collection-toolbar')
@@ -53,10 +53,10 @@ export class UmbCollectionToolbarElement extends UmbObserverMixin(LitElement) {
 	public useSearch = true;
 
 	@state()
-	private _layouts: Array<ManifestCollectionLayout> = [];
+	private _layouts: Array<ManifestCollectionView> = [];
 
 	@state()
-	private _currentLayout?: ManifestCollectionLayout;
+	private _currentLayout?: ManifestCollectionView;
 
 	@state()
 	private _search = '';
@@ -71,7 +71,7 @@ export class UmbCollectionToolbarElement extends UmbObserverMixin(LitElement) {
 	}
 
 	private _observeCollectionLayouts() {
-		this.observe<Array<ManifestCollectionLayout>>(
+		this.observe<Array<ManifestCollectionView>>(
 			umbExtensionsRegistry?.extensionsOfType('collectionLayout').pipe(
 				map((extensions) => {
 					return extensions.filter((extension) => extension.meta.entityType === 'media');

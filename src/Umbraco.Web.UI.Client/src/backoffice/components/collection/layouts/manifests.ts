@@ -1,6 +1,6 @@
-import type { ManifestCollectionLayout } from '@umbraco-cms/models';
+import type { ManifestCollectionView } from '@umbraco-cms/models';
 
-export const manifests: Array<ManifestCollectionLayout> = [
+export const manifests: Array<ManifestCollectionView> = [
 	{
 		type: 'collectionLayout',
 		alias: 'Umb.CollectionLayout.Grid',

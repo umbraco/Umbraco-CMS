@@ -13,7 +13,7 @@ import type { ManifestPropertyAction } from './property-action.models';
 import type { ManifestPackageView } from './package-view.models';
 import type { ManifestExternalLoginProvider } from './external-login-provider.models';
 import type { ManifestCollectionBulkAction } from './collection-bulk-action.models';
-import type { ManifestCollectionLayout } from './collection-layout.models';
+import type { ManifestCollectionView } from './collection-view.models';
 
 export * from './header-app.models';
 export * from './section.models';
@@ -30,7 +30,7 @@ export * from './property-action.models';
 export * from './package-view.models';
 export * from './external-login-provider.models';
 export * from './collection-bulk-action.models';
-export * from './collection-layout.models';
+export * from './collection-view.models';
 
 export type ManifestTypes =
 	| ManifestHeaderApp
@@ -51,7 +51,7 @@ export type ManifestTypes =
 	| ManifestEntrypoint
 	| ManifestCustom
 	| ManifestCollectionBulkAction
-	| ManifestCollectionLayout;
+	| ManifestCollectionView;
 
 export type ManifestStandardTypes =
 	| 'headerApp'
@@ -71,7 +71,7 @@ export type ManifestStandardTypes =
 	| 'entrypoint'
 	| 'externalLoginProvider'
 	| 'collectionBulkAction'
-	| 'collectionLayout';
+	| 'collectionView';
 
 export type ManifestElementType =
 	| ManifestSection
@@ -88,7 +88,7 @@ export type ManifestElementType =
 	| ManifestPackageView
 	| ManifestExternalLoginProvider
 	| ManifestCollectionBulkAction
-	| ManifestCollectionLayout;
+	| ManifestCollectionView;
 
 export interface ManifestBase {
 	type: string;
