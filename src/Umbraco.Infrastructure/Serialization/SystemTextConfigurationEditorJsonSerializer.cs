@@ -34,7 +34,7 @@ public class SystemTextConfigurationEditorJsonSerializer : IConfigurationEditorJ
     public T? DeserializeSubset<T>(string input, string key) => throw new NotSupportedException();
 
     // TODO: reuse the JsonObjectConverter implementation from management API
-    public class JsonObjectConverter : System.Text.Json.Serialization.JsonConverter<object>
+    private class JsonObjectConverter : System.Text.Json.Serialization.JsonConverter<object>
     {
         public override object Read(
             ref Utf8JsonReader reader,
