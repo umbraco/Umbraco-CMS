@@ -5,10 +5,10 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { repeat } from 'lit/directives/repeat.js';
 
+import { distinctUntilChanged } from 'rxjs';
 import { getTagLookAndColor } from '../../sections/users/user-extensions';
-import { UmbUserContext } from './user.context';
-import { UmbUserStore } from '@umbraco-cms/stores/user/user.store';
 
+import { UmbWorkspaceUserContext } from './workspace-user.context';
 import { UmbContextProviderMixin, UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { ManifestWorkspaceAction, UserDetails } from '@umbraco-cms/models';
 
@@ -17,7 +17,7 @@ import '@umbraco-cms/components/input-user-group/input-user-group.element';
 
 import { umbCurrentUserService } from 'src/core/services/current-user';
 import { UmbModalService } from '@umbraco-cms/services';
-import '../shared/workspace-entity-layout/workspace-entity-layout.element';
+import '../shared/workspace-entity/workspace-entity.element';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 
@@ -84,82 +84,85 @@ export class UmbWorkspaceUserElement extends UmbContextProviderMixin(
 		`,
 	];
 
-	@state()
-	private _user?: UserDetails | null;
 
 	@state()
 	private _currentUser?: UserDetails | null;
 
-	@state()
-	private _userName = '';
-
-	@property({ type: String })
-	entityKey = '';
-
-	private _userStore?: UmbUserStore;
-	private _userContext?: UmbUserContext;
 	private _modalService?: UmbModalService;
 
 	private _languages = []; //TODO Add languages
 
+
+	private _entityKey!: string;
+	@property()
+	public get entityKey(): string {
+		return this._entityKey;
+	}
+	public set entityKey(value: string) {
+		this._entityKey = value;
+		this._provideWorkspace();
+	}
+
+	private _workspaceContext?:UmbWorkspaceUserContext;
+
+	@state()
+	private _user?: UserDetails | null;
+
+	@state()
+	private _userName = '';
+
 	constructor() {
 		super();
-
-		this.consumeAllContexts(['umbUserStore', 'umbModalService'], (instances) => {
-			this._userStore = instances['umbUserStore'];
-			this._modalService = instances['umbModalService'];
-
-			this._observeUser();
-		});
 
 		this._observeCurrentUser();
 		this._registerWorkspaceActions();
 	}
 
-	private async _observeCurrentUser() {
-		if (!this._userStore) return;
+	connectedCallback(): void {
+		super.connectedCallback();
+		// TODO: avoid this connection, our own approach on Lit-Controller could be handling this case.
+		this._workspaceContext?.connectedCallback();
+	}
+	disconnectedCallback(): void {
+		super.connectedCallback()
+		// TODO: avoid this connection, our own approach on Lit-Controller could be handling this case.
+		this._workspaceContext?.disconnectedCallback();
+	}
 
+	protected _provideWorkspace() {
+		if(this._entityKey) {
+			this._workspaceContext = new UmbWorkspaceUserContext(this, this._entityKey);
+			this.provideContext('umbWorkspaceContext', this._workspaceContext);
+			this._observeUser()
+		}
+	}
+
+	private async _observeCurrentUser() {
+		// TODO: do not have static current user service, we need to make a ContextAPI for this.
 		this.observe<UserDetails>(umbCurrentUserService.currentUser, (currentUser) => {
 			this._currentUser = currentUser;
 		});
 	}
 
 	private async _observeUser() {
-		if (!this._userStore) return;
+		if (!this._workspaceContext) return;
 
-		this.observe<UserDetails>(this._userStore.getByKey(this.entityKey), (user) => {
+		this.observe<UserDetails>(this._workspaceContext.data.pipe(distinctUntilChanged()), (user) => {
+			if (!user) return;
 			this._user = user;
-			if (!this._user) return;
-
-			if (!this._userContext) {
-				this._userContext = new UmbUserContext(this._user);
-				this.provideContext('umbUserContext', this._userContext);
-			} else {
-				this._userContext.update(this._user);
-			}
-
-			this._observeUserName();
-		});
-	}
-
-	private _observeUserName() {
-		if (!this._userContext) return;
-
-		this.observe(this._userContext.data, (user) => {
 			if (user.name !== this._userName) {
 				this._userName = user.name;
 			}
 		});
 	}
 
-
 	private _registerWorkspaceActions() {
 		const manifests: Array<ManifestWorkspaceAction> = [
 			{
 				type: 'workspaceAction',
 				alias: 'Umb.WorkspaceAction.User.Save',
-				name: 'WorkspaceActionUserSave',
-				loader: () => import('./actions/workspace-action-user-save.element'),
+				name: 'Save User Workspace Action',
+				loader: () => import('../shared/actions/save/workspace-action-node-save.element'),
 				meta: {
 					workspaces: ['Umb.Workspace.User'],
 				},
@@ -173,16 +176,18 @@ export class UmbWorkspaceUserElement extends UmbContextProviderMixin(
 	}
 
 	private _updateUserStatus() {
-		if (!this._user || !this._userStore) return;
+		if (!this._user || !this._workspaceContext) return;
 
 		const isDisabled = this._user.status === 'disabled';
-		isDisabled ? this._userStore.enableUsers([this._user.key]) : this._userStore.disableUsers([this._user.key]);
+		// TODO: make sure we use store /workspace right, maybe move function to workspace, or store reference to store?
+		isDisabled ? this._workspaceContext.getStore().enableUsers([this._user.key]) : this._workspaceContext.getStore().disableUsers([this._user.key]);
 	}
 
 	private _deleteUser() {
-		if (!this._user || !this._userStore) return;
+		if (!this._user || !this._workspaceContext) return;
 
-		this._userStore.deleteUsers([this._user.key]);
+		// TODO: make sure we use store /workspace right, maybe move function to workspace, or store reference to store?
+		this._workspaceContext.getStore().deleteUsers([this._user.key]);
 
 		history.pushState(null, '', 'section/users/view/users/overview');
 	}
@@ -199,7 +204,7 @@ export class UmbWorkspaceUserElement extends UmbContextProviderMixin(
 	}
 
 	private _updateProperty(propertyName: string, value: unknown) {
-		this._userContext?.update({ [propertyName]: value });
+		this._workspaceContext?.update({ [propertyName]: value });
 	}
 
 	private _renderContentStartNodes() {
@@ -314,7 +319,7 @@ export class UmbWorkspaceUserElement extends UmbContextProviderMixin(
 	}
 
 	private _renderRightColumn() {
-		if (!this._user || !this._userStore) return nothing;
+		if (!this._user || !this._workspaceContext) return nothing;
 
 		const statusLook = getTagLookAndColor(this._user.status);
 
@@ -372,13 +377,13 @@ export class UmbWorkspaceUserElement extends UmbContextProviderMixin(
 		if (!this._user) return html`User not found`;
 
 		return html`
-			<umb-workspace-entity-layout alias="Umb.Workspace.User">
+			<umb-workspace-entity alias="Umb.Workspace.User">
 				<uui-input id="name" slot="name" .value=${this._userName} @input="${this._handleInput}"></uui-input>
 				<div id="main">
 					<div id="left-column">${this._renderLeftColumn()}</div>
 					<div id="right-column">${this._renderRightColumn()}</div>
 				</div>
-			</umb-workspace-entity-layout>
+			</umb-workspace-entity>
 		`;
 	}
 }

@@ -1,5 +1,5 @@
 //TODO: we need to figure out what components should be available for extensions and load them upfront
-import './workspaces/shared/workspace-entity-layout/workspace-entity-layout.element';
+import './workspaces/shared/workspace-entity/workspace-entity.element';
 import './components/ref-property-editor-ui/ref-property-editor-ui.element';
 import './components/backoffice-frame/backoffice-header.element';
 import './components/backoffice-frame/backoffice-main.element';
@@ -20,7 +20,7 @@ import { css, html, LitElement } from 'lit';
 
 import { UmbModalService } from '../core/services/modal';
 import { UmbNotificationService } from '../core/services/notification';
-import { UmbDataTypesStore } from '../core/stores/data-types/data-types.store';
+import { UmbDataTypeStore } from '../core/stores/data-type/data-type.store';
 import { UmbDocumentTypeStore } from '../core/stores/document-type/document-type.store';
 import { UmbMediaTypeStore } from '../core/stores/media-type/media-type.store';
 import { UmbMemberTypeStore } from '../core/stores/member-type/member-type.store';
@@ -80,7 +80,7 @@ export class UmbBackofficeElement extends UmbContextConsumerMixin(UmbContextProv
 
 		this.provideContext('umbDocumentStore', new UmbDocumentStore());
 		this.provideContext('umbMediaStore', new UmbMediaStore());
-		this.provideContext('umbDataTypeStore', new UmbDataTypesStore());
+		this.provideContext('umbDataTypeStore', new UmbDataTypeStore());
 		this.provideContext('umbDocumentTypeStore', new UmbDocumentTypeStore());
 		this.provideContext('umbMediaTypeStore', new UmbMediaTypeStore());
 		this.provideContext('umbMemberTypeStore', new UmbMemberTypeStore());

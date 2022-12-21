@@ -12,8 +12,11 @@ export const UmbContextProviderMixin = <T extends HTMLElementConstructor>(superC
 		_attached = false;
 
 		provideContext(alias: string, instance: unknown) {
-			// TODO: Consider if key matches wether we should replace and re-publish the context?
-			if (this._providers.has(alias)) return;
+			// TODO: Consider if its right to re-publish the context?
+			const existingProvider = this._providers.get(alias);
+			if (existingProvider) {
+				existingProvider.detach();
+			}
 
 			const provider = new UmbContextProvider(this, alias, instance);
 			this._providers.set(alias, provider);

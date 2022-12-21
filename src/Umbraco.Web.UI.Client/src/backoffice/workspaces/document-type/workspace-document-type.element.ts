@@ -3,11 +3,10 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { distinctUntilChanged } from 'rxjs';
-import { UmbDocumentTypeStore } from '../../../core/stores/document-type/document-type.store';
-import { UmbDocumentTypeContext } from './document-type.context';
+import { UmbWorkspaceDocumentTypeContext } from './workspace-document-type.context';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
-import type { ManifestTypes, DocumentTypeDetails } from '@umbraco-cms/models';
+import type { DocumentTypeDetails, ManifestTypes } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbModalService } from '@umbraco-cms/services';
 
@@ -47,32 +46,62 @@ export class UmbWorkspaceDocumentTypeElement extends UmbContextProviderMixin(
 		`,
 	];
 
-	@property()
-	entityKey!: string;
-
-	@state()
-	private _documentType?: DocumentTypeDetails;
-
-	@state()
 	private _icon = {
 		color: '#000000',
 		name: 'umb:document-dashed-line',
 	};
 
-	private _documentTypeContext?: UmbDocumentTypeContext;
-	private _documentTypeStore?: UmbDocumentTypeStore;
+	private _entityKey!: string;
+	@property()
+	public get entityKey(): string {
+		return this._entityKey;
+	}
+	public set entityKey(value: string) {
+		this._entityKey = value;
+		this._provideWorkspace();
+	}
+
+	private _workspaceContext?:UmbWorkspaceDocumentTypeContext;
+
+	@state()
+	private _documentType?:DocumentTypeDetails;
 
 	private _modalService?: UmbModalService;
 
 	constructor() {
 		super();
 
-		this._registerExtensions();
+		this.consumeContext('umbModalService', (instance) => {
+			this._modalService = instance;
+		});
 
-		this.consumeAllContexts(['umbDocumentTypeStore', 'umbModalService'], (instances) => {
-			this._documentTypeStore = instances['umbDocumentTypeStore'];
-			this._modalService = instances['umbModalService'];
-			this._observeDocumentType();
+		this._registerExtensions();
+	}
+
+	connectedCallback(): void {
+		super.connectedCallback();
+		// TODO: avoid this connection, our own approach on Lit-Controller could be handling this case.
+		this._workspaceContext?.connectedCallback();
+	}
+	disconnectedCallback(): void {
+		super.connectedCallback()
+		// TODO: avoid this connection, our own approach on Lit-Controller could be handling this case.
+		this._workspaceContext?.disconnectedCallback();
+	}
+
+	protected _provideWorkspace() {
+		if(this._entityKey) {
+			this._workspaceContext = new UmbWorkspaceDocumentTypeContext(this, this._entityKey);
+			this.provideContext('umbWorkspaceContext', this._workspaceContext);
+			this._observeWorkspace()
+		}
+	}
+
+	private async _observeWorkspace() {
+		if (!this._workspaceContext) return;
+
+		this.observe<DocumentTypeDetails>(this._workspaceContext.data.pipe(distinctUntilChanged()), (data) => {
+			this._documentType = data;
 		});
 	}
 
@@ -95,7 +124,7 @@ export class UmbWorkspaceDocumentTypeElement extends UmbContextProviderMixin(
 				type: 'workspaceAction',
 				alias: 'Umb.WorkspaceAction.DocumentType.Save',
 				name: 'Save Document Type Workspace Action',
-				loader: () => import('./actions/save/workspace-action-document-type-save.element'),
+				loader: () => import('../shared/actions/save/workspace-action-node-save.element'),
 				meta: {
 					workspaces: ['Umb.Workspace.DocumentType'],
 				},
@@ -108,25 +137,6 @@ export class UmbWorkspaceDocumentTypeElement extends UmbContextProviderMixin(
 		});
 	}
 
-	private _observeDocumentType() {
-		if (!this._documentTypeStore) return;
-
-		// TODO: This should be done in a better way, but for now it works.
-		this.observe<DocumentTypeDetails>(this._documentTypeStore.getByKey(this.entityKey), (documentType) => {
-			if (!documentType) return; // TODO: Handle nicely if there is no document type
-
-			if (!this._documentTypeContext) {
-				this._documentTypeContext = new UmbDocumentTypeContext(documentType);
-				this.provideContext('umbDocumentTypeContext', this._documentTypeContext);
-			} else {
-				this._documentTypeContext.update(documentType);
-			}
-
-			this.observe<DocumentTypeDetails>(this._documentTypeContext.data.pipe(distinctUntilChanged()), (data) => {
-				this._documentType = data;
-			});
-		});
-	}
 
 	// TODO. find a way where we don't have to do this for all workspaces.
 	private _handleInput(event: UUIInputEvent) {
@@ -134,7 +144,7 @@ export class UmbWorkspaceDocumentTypeElement extends UmbContextProviderMixin(
 			const target = event.composedPath()[0] as UUIInputElement;
 
 			if (typeof target?.value === 'string') {
-				this._documentTypeContext?.update({ name: target.value });
+				this._workspaceContext?.update({ name: target.value });
 			}
 		}
 	}
@@ -143,7 +153,7 @@ export class UmbWorkspaceDocumentTypeElement extends UmbContextProviderMixin(
 		const modalHandler = this._modalService?.iconPicker();
 
 		modalHandler?.onClose().then((saved) => {
-			if (saved) this._documentTypeContext?.update({ icon: saved.icon });
+			if (saved) this._workspaceContext?.update({ icon: saved.icon });
 			console.log(saved);
 			// TODO save color ALIAS as well
 		});
@@ -151,7 +161,7 @@ export class UmbWorkspaceDocumentTypeElement extends UmbContextProviderMixin(
 
 	render() {
 		return html`
-			<umb-workspace-entity-layout alias="Umb.Workspace.DocumentType">
+			<umb-workspace-entity alias="Umb.Workspace.DocumentType">
 				<div id="header" slot="header">
 					<uui-button id="icon" @click=${this._handleIconClick} compact>
 						<uui-icon
@@ -165,7 +175,7 @@ export class UmbWorkspaceDocumentTypeElement extends UmbContextProviderMixin(
 				</div>
 
 				<div slot="footer">Keyboard Shortcuts</div>
-			</umb-workspace-entity-layout>
+			</umb-workspace-entity>
 		`;
 	}
 }

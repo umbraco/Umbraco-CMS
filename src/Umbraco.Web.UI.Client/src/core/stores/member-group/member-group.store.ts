@@ -1,7 +1,9 @@
 import { map, Observable } from 'rxjs';
-import { UmbDataStoreBase } from '../store';
+import { UmbNodeStoreBase } from '../store';
 import { ApiError, EntityTreeItem, MemberGroupResource, ProblemDetails } from '@umbraco-cms/backend-api';
 import type { MemberGroupDetails } from '@umbraco-cms/models';
+
+export type UmbMemberGroupStoreItemType = MemberGroupDetails | EntityTreeItem;
 
 /**
  * @export
@@ -9,7 +11,16 @@ import type { MemberGroupDetails } from '@umbraco-cms/models';
  * @extends {UmbDataStoreBase<MemberGroupDetails | EntityTreeItem>}
  * @description - Data Store for Member Groups
  */
-export class UmbMemberGroupStore extends UmbDataStoreBase<MemberGroupDetails | EntityTreeItem> {
+export class UmbMemberGroupStore extends UmbNodeStoreBase<UmbMemberGroupStoreItemType> {
+
+	getByKey(key: string): Observable<UmbMemberGroupStoreItemType | null> {
+		return null as any;
+	}
+
+	async save(mediaTypes: Array<UmbMemberGroupStoreItemType>): Promise<void> {
+		return null as any;
+	}
+
 	getTreeRoot(): Observable<Array<EntityTreeItem>> {
 		MemberGroupResource.getTreeMemberGroupRoot({}).then(
 			(res) => {

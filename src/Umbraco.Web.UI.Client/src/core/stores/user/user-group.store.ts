@@ -2,14 +2,17 @@ import { map, Observable } from 'rxjs';
 import { UmbDataStoreBase } from '../store';
 import type { UserGroupDetails, UserGroupEntity } from '@umbraco-cms/models';
 
+// TODO: get rid of this type addition & { ... }:
+export type UmbUserGroupStoreItemType = UserGroupDetails & { users?: Array<string> };
+
 /**
  * @export
  * @class UmbUserGroupStore
  * @extends {UmbDataStoreBase<UserGroupEntity>}
  * @description - Data Store for Users
  */
-export class UmbUserGroupStore extends UmbDataStoreBase<UserGroupDetails> {
-	getAll(): Observable<Array<UserGroupDetails>> {
+export class UmbUserGroupStore extends UmbDataStoreBase<UmbUserGroupStoreItemType> {
+	getAll(): Observable<Array<UmbUserGroupStoreItemType>> {
 		// TODO: use Fetcher API.
 		// TODO: only fetch if the data type is not in the store?
 		fetch(`/umbraco/backoffice/user-groups/list/items`)
@@ -21,7 +24,7 @@ export class UmbUserGroupStore extends UmbDataStoreBase<UserGroupDetails> {
 		return this.items;
 	}
 
-	getByKey(key: string): Observable<UserGroupDetails | null> {
+	getByKey(key: string): Observable<UmbUserGroupStoreItemType | null> {
 		// TODO: use Fetcher API.
 		// TODO: only fetch if the data type is not in the store?
 		fetch(`/umbraco/backoffice/user-groups/details/${key}`)
@@ -32,8 +35,8 @@ export class UmbUserGroupStore extends UmbDataStoreBase<UserGroupDetails> {
 
 		return this.items.pipe(
 			map(
-				(userGroups: Array<UserGroupDetails>) =>
-					userGroups.find((userGroup: UserGroupDetails) => userGroup.key === key) || null
+				(userGroups: Array<UmbUserGroupStoreItemType>) =>
+					userGroups.find((userGroup: UmbUserGroupStoreItemType) => userGroup.key === key) || null
 			)
 		);
 	}
@@ -47,12 +50,20 @@ export class UmbUserGroupStore extends UmbDataStoreBase<UserGroupDetails> {
 			});
 
 		return this.items.pipe(
-			map((items: Array<UserGroupDetails>) => items.filter((node: UserGroupDetails) => keys.includes(node.key)))
+			map((items: Array<UmbUserGroupStoreItemType>) => items.filter((node: UmbUserGroupStoreItemType) => keys.includes(node.key)))
 		);
 	}
 
-	async save(userGroups: Array<UserGroupDetails>): Promise<void> {
+	async save(userGroups: Array<UmbUserGroupStoreItemType>): Promise<void> {
 		// TODO: use Fetcher API.
+
+		// TODO: implement so user group store updates the 
+		/*
+		if (this._userStore && userGroup.users) {
+			await this._userStore.updateUserGroup(userGroup.users, userGroup.key);
+		}
+		*/
+
 		try {
 			const res = await fetch('/umbraco/backoffice/user-groups/save', {
 				method: 'POST',
