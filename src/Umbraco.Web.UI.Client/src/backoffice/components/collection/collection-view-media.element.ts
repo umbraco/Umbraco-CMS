@@ -4,7 +4,6 @@ import { customElement, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
 import '../../components/collection/collection-selection-actions.element';
 import '../../components/collection/collection-toolbar.element';
-import '../../components/collection/collection-view.element';
 import { IRoutingInfo } from 'router-slot';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
 import type { ManifestCollectionView } from '@umbraco-cms/models';
@@ -45,7 +44,7 @@ export class UmbCollectionViewMediaElement extends UmbContextConsumerMixin(UmbOb
 	constructor() {
 		super();
 
-		this._observeCollectionLayouts();
+		this._observeCollectionViews();
 		this.consumeAllContexts(['umbMediaContext'], (instance) => {
 			this._mediaContext = instance['umbMediaContext'];
 			this._observeMediaContext();
@@ -60,9 +59,9 @@ export class UmbCollectionViewMediaElement extends UmbContextConsumerMixin(UmbOb
 		});
 	}
 
-	private _observeCollectionLayouts() {
+	private _observeCollectionViews() {
 		this.observe<Array<ManifestCollectionView>>(
-			umbExtensionsRegistry?.extensionsOfType('collectionLayout').pipe(
+			umbExtensionsRegistry?.extensionsOfType('collectionView').pipe(
 				map((extensions) => {
 					return extensions.filter((extension) => extension.meta.entityType === 'media');
 				})
@@ -96,13 +95,13 @@ export class UmbCollectionViewMediaElement extends UmbContextConsumerMixin(UmbOb
 
 	render() {
 		return html`
-			<umb-collection-view>
+			<umb-body-layout>
 				<umb-collection-toolbar slot="header"></umb-collection-toolbar>
-				<router-slot slot="main" id="router-slot" .routes="${this._routes}"></router-slot>
+				<router-slot id="router-slot" .routes="${this._routes}"></router-slot>
 				${this._selection.length > 0
 					? html`<umb-collection-selection-actions slot="footer"></umb-collection-selection-actions>`
 					: nothing}
-			</umb-collection-view>
+			</umb-body-layout>
 		`;
 	}
 }

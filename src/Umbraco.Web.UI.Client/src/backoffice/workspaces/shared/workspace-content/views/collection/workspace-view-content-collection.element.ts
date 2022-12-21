@@ -2,13 +2,13 @@ import { css, html, LitElement, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { distinctUntilChanged } from 'rxjs';
-import { UmbNodeContext } from '../../node.context';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import type { ContentProperty, ContentPropertyData, DocumentDetails, MediaDetails } from '@umbraco-cms/models';
 
 import '../../../../../components/content-property/content-property.element';
 import 'src/backoffice/dashboards/media-management/dashboard-media-management.element';
+import type { UmbWorkspaceNodeContext } from '../../../workspace-context/workspace-node.context';
 
 @customElement('umb-workspace-view-content-collection')
 export class UmbWorkspaceViewContentCollectionElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
@@ -31,21 +31,21 @@ export class UmbWorkspaceViewContentCollectionElement extends UmbContextConsumer
 	@state()
 	private _key = '';
 
-	private _nodeContext?: UmbNodeContext;
+	private _workspaceContext?: UmbWorkspaceNodeContext;
 
 	constructor() {
 		super();
 
 		this.consumeContext('umbNodeContext', (nodeContext) => {
-			this._nodeContext = nodeContext;
+			this._workspaceContext = nodeContext;
 			this._observeContent();
 		});
 	}
 
 	private _observeContent() {
-		if (!this._nodeContext) return;
+		if (!this._workspaceContext) return;
 
-		this.observe<DocumentDetails | MediaDetails>(this._nodeContext.data.pipe(distinctUntilChanged()), (content) => {
+		this.observe<DocumentDetails | MediaDetails>(this._workspaceContext.data.pipe(distinctUntilChanged()), (content) => {
 			this._properties = content.properties;
 			this._data = content.data;
 			this._key = content.key;

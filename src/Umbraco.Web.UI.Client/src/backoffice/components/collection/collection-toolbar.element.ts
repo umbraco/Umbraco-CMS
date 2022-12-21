@@ -67,12 +67,12 @@ export class UmbCollectionToolbarElement extends UmbObserverMixin(LitElement) {
 
 	constructor() {
 		super();
-		this._observeCollectionLayouts();
+		this._observeCollectionViews();
 	}
 
-	private _observeCollectionLayouts() {
+	private _observeCollectionViews() {
 		this.observe<Array<ManifestCollectionView>>(
-			umbExtensionsRegistry?.extensionsOfType('collectionLayout').pipe(
+			umbExtensionsRegistry?.extensionsOfType('collectionView').pipe(
 				map((extensions) => {
 					return extensions.filter((extension) => extension.meta.entityType === 'media');
 				})

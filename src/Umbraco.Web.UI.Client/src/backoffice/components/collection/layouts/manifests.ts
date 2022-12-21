@@ -2,11 +2,11 @@ import type { ManifestCollectionView } from '@umbraco-cms/models';
 
 export const manifests: Array<ManifestCollectionView> = [
 	{
-		type: 'collectionLayout',
-		alias: 'Umb.CollectionLayout.Grid',
+		type: 'collectionView',
+		alias: 'Umb.CollectionView.Grid',
 		name: 'Grid',
-		elementName: 'umb-collection-layout-media-grid',
-		loader: () => import('./collection-layout-media-grid.element'),
+		elementName: 'umb-collection-view-media-grid',
+		loader: () => import('./collection-view-media-grid.element'),
 		weight: 300,
 		meta: {
 			label: 'Grid',
@@ -16,11 +16,11 @@ export const manifests: Array<ManifestCollectionView> = [
 		},
 	},
 	{
-		type: 'collectionLayout',
-		alias: 'Umb.CollectionLayout.Table',
+		type: 'collectionView',
+		alias: 'Umb.CollectionView.Table',
 		name: 'Table',
-		elementName: 'umb-collection-layout-media-table',
-		loader: () => import('./collection-layout-media-table.element'),
+		elementName: 'umb-collection-view-media-table',
+		loader: () => import('./collection-view-media-table.element'),
 		weight: 200,
 		meta: {
 			label: 'Table',
@@ -30,11 +30,11 @@ export const manifests: Array<ManifestCollectionView> = [
 		},
 	},
 	{
-		type: 'collectionLayout',
-		alias: 'Umb.CollectionLayout.Test',
+		type: 'collectionView',
+		alias: 'Umb.CollectionView.Test',
 		name: 'Test',
-		elementName: 'umb-collection-layout-media-test',
-		loader: () => import('./collection-layout-media-test.element'),
+		elementName: 'umb-collection-view-media-test',
+		loader: () => import('./collection-view-media-test.element'),
 		weight: 100,
 		meta: {
 			label: 'Test',

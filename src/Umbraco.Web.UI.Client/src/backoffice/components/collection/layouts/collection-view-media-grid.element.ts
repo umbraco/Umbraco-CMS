@@ -7,8 +7,8 @@ import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import type { UmbDashboardMediaManagementElement } from 'src/backoffice/dashboards/media-management/dashboard-media-management.element';
 
-@customElement('umb-collection-layout-media-grid')
-export class UmbCollectionLayoutMediaGridElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+@customElement('umb-collection-view-media-grid')
+export class UmbCollectionViewsMediaGridElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -148,6 +148,6 @@ export class UmbCollectionLayoutMediaGridElement extends UmbContextConsumerMixin
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-collection-layout-media-grid': UmbCollectionLayoutMediaGridElement;
+		'umb-collection-view-media-grid': UmbCollectionViewsMediaGridElement;
 	}
 }

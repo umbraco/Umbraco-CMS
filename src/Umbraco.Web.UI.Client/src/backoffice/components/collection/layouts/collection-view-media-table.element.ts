@@ -6,8 +6,8 @@ import type { MediaDetails } from '@umbraco-cms/models';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import type { UmbDashboardMediaManagementElement } from 'src/backoffice/dashboards/media-management/dashboard-media-management.element';
 
-@customElement('umb-collection-layout-media-table')
-export class UmbCollectionLayoutMediaTableElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+@customElement('umb-collection-view-media-table')
+export class UmbCollectionViewMediaTableElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles = [UUITextStyles, css``];
 
 	@state()
@@ -39,7 +39,7 @@ export class UmbCollectionLayoutMediaTableElement extends UmbContextConsumerMixi
 	}
 
 	render() {
-		return html`<h1>umb-collection-layout-media-table</h1>
+		return html`<h1>umb-collection-view-media-table</h1>
 			<div>
 				<h3>Selected Media Items:</h3>
 				<ul>
@@ -54,6 +54,6 @@ export class UmbCollectionLayoutMediaTableElement extends UmbContextConsumerMixi
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-collection-layout-media-table': UmbCollectionLayoutMediaTableElement;
+		'umb-collection-view-media-table': UmbCollectionViewMediaTableElement;
 	}
 }
