@@ -2,8 +2,8 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, LitElement, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
-import '../../components/collection/collection-selection-actions.element';
-import '../../components/collection/collection-toolbar.element';
+import './collection-selection-actions.element';
+import './collection-toolbar.element';
 import { IRoutingInfo } from 'router-slot';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
 import type { ManifestCollectionView } from '@umbraco-cms/models';
@@ -12,8 +12,8 @@ import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { UmbDashboardMediaManagementElement } from 'src/backoffice/dashboards/media-management/dashboard-media-management.element';
 
-@customElement('umb-collection-view-media')
-export class UmbCollectionViewMediaElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+@customElement('umb-collection-media')
+export class UmbCollectionMediaElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -108,6 +108,6 @@ export class UmbCollectionViewMediaElement extends UmbContextConsumerMixin(UmbOb
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-collection-view-media': UmbCollectionViewMediaElement;
+		'umb-collection-media': UmbCollectionMediaElement;
 	}
 }
