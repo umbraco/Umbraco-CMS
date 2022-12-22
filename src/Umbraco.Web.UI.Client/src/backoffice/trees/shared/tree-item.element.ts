@@ -11,7 +11,7 @@ import { UmbTreeContextMenuService } from './context-menu/tree-context-menu.serv
 import type { Entity, ManifestSection } from '@umbraco-cms/models';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-import { UmbDataStore } from 'src/core/stores/store';
+import { UmbTreeDataStore } from 'src/core/stores/store';
 
 @customElement('umb-tree-item')
 export class UmbTreeItem extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
@@ -39,7 +39,7 @@ export class UmbTreeItem extends UmbContextConsumerMixin(UmbObserverMixin(LitEle
 	private _isActive = false;
 
 	private _treeContext?: UmbTreeContextBase;
-	private _store?: UmbDataStore<unknown>;
+	private _store?: UmbTreeDataStore<unknown>;
 	private _sectionContext?: UmbSectionContext;
 	private _treeContextMenuService?: UmbTreeContextMenuService;
 
@@ -52,7 +52,7 @@ export class UmbTreeItem extends UmbContextConsumerMixin(UmbObserverMixin(LitEle
 			this._observeIsSelected();
 		});
 
-		this.consumeContext('umbStore', (store: UmbDataStore<unknown>) => {
+		this.consumeContext('umbStore', (store: UmbTreeDataStore<unknown>) => {
 			this._store = store;
 		});
 

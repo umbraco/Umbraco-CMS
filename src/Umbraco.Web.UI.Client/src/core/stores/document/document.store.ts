@@ -16,6 +16,9 @@ export type UmbDocumentStoreItemType = DocumentDetails | DocumentTreeItem
  * @description - Data Store for Documents
  */
 export class UmbDocumentStore extends UmbNodeStoreBase<UmbDocumentStoreItemType> {
+
+	public readonly storeAlias = 'umbDocumentStore';
+
 	getByKey(key: string): Observable<DocumentDetails | null> {
 		// TODO: use backend cli when available.
 		fetch(`/umbraco/management/api/v1/document/details/${key}`)

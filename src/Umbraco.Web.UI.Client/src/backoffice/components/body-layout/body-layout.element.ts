@@ -1,6 +1,6 @@
 import { css, html, LitElement, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 
 @customElement('umb-body-layout')
 export class UmbBodyLayout extends LitElement {
@@ -22,9 +22,11 @@ export class UmbBodyLayout extends LitElement {
 				width: 100%;
 				min-height: 60px;
 
+				box-sizing: border-box;
+			}
+			:host(:not([no-header-background])) #header {
 				background-color: var(--uui-color-surface);
 				border-bottom: 1px solid var(--uui-color-border);
-				box-sizing: border-box;
 			}
 
 			#headline {
@@ -62,20 +64,8 @@ export class UmbBodyLayout extends LitElement {
 		`,
 	];
 
-	connectedCallback() {
-		super.connectedCallback();
-		this.shadowRoot?.removeEventListener('slotchange', this._slotChanged);
-		this.shadowRoot?.addEventListener('slotchange', this._slotChanged);
-	}
-
-	disconnectedCallback() {
-		super.disconnectedCallback();
-		this.shadowRoot?.removeEventListener('slotchange', this._slotChanged);
-	}
-
-	private _slotChanged = (e: Event) => {
-		(e.target as any).style.display =
-			(e.target as HTMLSlotElement).assignedNodes({ flatten: true }).length > 0 ? '' : 'none';
+	private hasNodes = (e: Event) => {
+		return (e.target as HTMLSlotElement).assignedNodes({ flatten: true }).length > 0;
 	};
 
 	/**
@@ -88,20 +78,29 @@ export class UmbBodyLayout extends LitElement {
 	@property()
 	public headline = '';
 
+	@state()
+	private _headerSlotHasChildren = false;
+	@state()
+	private _tabsSlotHasChildren = false;
+	@state()
+	private _footerSlotHasChildren = false;
+	@state()
+	private _actionsSlotHasChildren = false;
+
 	render() {
 		return html`
-			<div id="header">
+			<div id="header" style="display:${this.headline || this._headerSlotHasChildren || this._tabsSlotHasChildren ? '' : 'none'}">
 				${this.headline ? html`<h3 id="headline">${this.headline}</h3>` : nothing}
 
-				<slot name="header"></slot>
-				<slot id="tabs" name="tabs"></slot>
+				<slot name="header" @slotchange=${(e: Event) => { this._headerSlotHasChildren = this.hasNodes(e)}}></slot>
+				<slot id="tabs" name="tabs" @slotchange=${(e: Event) => { this._tabsSlotHasChildren = this.hasNodes(e)}}></slot>
 			</div>
 			<uui-scroll-container id="main">
 				<slot></slot>
 			</uui-scroll-container>
-			<div id="footer">
-				<slot name="footer"></slot>
-				<slot id="actions" name="actions"></slot>
+			<div id="footer" style="display:${this._footerSlotHasChildren || this._actionsSlotHasChildren ? '' : 'none'}">
+				<slot name="footer" @slotchange=${(e: Event) => { this._footerSlotHasChildren = this.hasNodes(e)}}></slot>
+				<slot id="actions" name="actions" style="display:${this._actionsSlotHasChildren ? '' : 'none'}" @slotchange=${(e: Event) => { this._actionsSlotHasChildren = this.hasNodes(e)}}></slot>
 			</div>
 		`;
 	}

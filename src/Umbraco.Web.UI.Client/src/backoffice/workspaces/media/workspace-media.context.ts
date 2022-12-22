@@ -34,7 +34,7 @@ const DefaultMediaData = ({
 export class UmbWorkspaceMediaContext extends UmbWorkspaceNodeContext<UmbMediaStoreItemType, UmbMediaStore> {
 
 	constructor(target:HTMLElement, entityKey: string) {
-		super(target, DefaultMediaData, 'umbMediaStore', entityKey);
+		super(target, DefaultMediaData, 'umbMediaStore', entityKey, 'media');
 	}
 
 }

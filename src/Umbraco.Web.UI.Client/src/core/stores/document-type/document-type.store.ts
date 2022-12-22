@@ -16,6 +16,9 @@ export type UmbDocumentTypeStoreItemType = DocumentTypeDetails | DocumentTypeTre
  * @description - Data Store for Document Types
  */
 export class UmbDocumentTypeStore extends UmbDataStoreBase<UmbDocumentTypeStoreItemType> {
+
+	public readonly storeAlias = 'umbDocumentTypeStore';
+
 	getByKey(key: string): Observable<DocumentTypeDetails | null> {
 		// TODO: use Fetcher API.
 		// TODO: only fetch if the data type is not in the store?

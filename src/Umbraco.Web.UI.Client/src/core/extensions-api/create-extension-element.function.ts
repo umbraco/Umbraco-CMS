@@ -1,13 +1,14 @@
-import type { ManifestTypes } from '../models';
+import type { ManifestElementType } from '../models';
 import { hasDefaultExport } from './has-default-export.function';
-import { isManifestElementType } from './is-extension.function';
+import { isManifestElementNameType } from './is-manifest-element-name-type.function';
 import { loadExtension } from './load-extension.function';
 
-export async function createExtensionElement(manifest: ManifestTypes): Promise<HTMLElement | undefined> {
+export async function createExtensionElement(manifest: ManifestElementType): Promise<HTMLElement | undefined> {
+	
 	//TODO: Write tests for these extension options:
 	const js = await loadExtension(manifest);
 
-	if (isManifestElementType(manifest) && manifest.elementName) {
+	if (isManifestElementNameType(manifest)) {
 		// created by manifest method providing HTMLElement
 		return document.createElement(manifest.elementName);
 	}
@@ -19,14 +20,12 @@ export async function createExtensionElement(manifest: ManifestTypes): Promise<H
 			return new js.default();
 		}
 
-		if(!Object.getOwnPropertyDescriptor(manifest, 'element')) {
-			console.error('-- Extension did not succeed creating an element, missing the manifest `element` or default export', manifest);
-		}
+		console.error('-- Extension did not succeed creating an element, missing a default export of the served JavaScript file', manifest);
 
 		// If some JS was loaded and it did not at least contain a default export, then we are safe to assume that it executed as a module and does not need to be returned
 		return undefined;
 	}
 
-	console.error('-- Extension did not succeed creating an element', manifest);
+	console.error('-- Extension did not succeed creating an element, missing a default export or `elementName` in the manifest.', manifest);
 	return undefined;
 }

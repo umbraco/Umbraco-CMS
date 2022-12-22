@@ -20,7 +20,7 @@ export class UmbWorkspaceDictionaryElement extends LitElement {
 
 	render() {
 		return html`
-			<umb-workspace-entity-layout alias="Umb.Workspace.Dictionary">Dictionary Workspace</umb-workspace-entity-layout>
+			<umb-workspace-entity alias="Umb.Workspace.Dictionary">Dictionary Workspace</umb-workspace-entity>
 		`;
 	}
 }

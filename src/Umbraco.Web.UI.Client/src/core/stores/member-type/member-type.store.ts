@@ -13,6 +13,7 @@ export type UmbMemberTypeStoreItemType = MemberTypeDetails | EntityTreeItem
  */
 export class UmbMemberTypeStore extends UmbDataStoreBase<UmbMemberTypeStoreItemType> {
 
+	public readonly storeAlias = 'umbMemberTypeStore';
 	 
 	getByKey(key: string): Observable<UmbMemberTypeStoreItemType | null> {
 		return null as any;

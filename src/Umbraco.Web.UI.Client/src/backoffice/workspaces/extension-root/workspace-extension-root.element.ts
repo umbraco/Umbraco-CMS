@@ -1,7 +1,7 @@
 import { html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import { isManifestElementType } from '@umbraco-cms/extensions-api';
+import { isManifestElementNameType } from '@umbraco-cms/extensions-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { ManifestTypes } from '@umbraco-cms/models';
@@ -40,7 +40,7 @@ export class UmbWorkspaceExtensionRootElement extends UmbContextConsumerMixin(Um
 								<uui-table-row>
 									<uui-table-cell>${extension.type}</uui-table-cell>
 									<uui-table-cell>
-										${isManifestElementType(extension) ? extension.name : 'Custom extension'}
+										${isManifestElementNameType(extension) ? extension.name : 'Custom extension'}
 									</uui-table-cell>
 									<uui-table-cell>${extension.alias}</uui-table-cell>
 									<uui-table-cell>
