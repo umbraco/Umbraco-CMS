@@ -1,11 +1,9 @@
-import { css, html, LitElement, nothing } from 'lit';
+import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, state } from 'lit/decorators.js';
-import { distinctUntilChanged } from 'rxjs';
+import { customElement } from 'lit/decorators.js';
 import type { UmbWorkspaceNodeContext } from '../../../workspace-context/workspace-node.context';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import type { DocumentDetails, MediaDetails } from '@umbraco-cms/models';
 
 import 'src/backoffice/components/content-property/content-property.element';
 import 'src/backoffice/dashboards/collection/dashboard-collection.element';
