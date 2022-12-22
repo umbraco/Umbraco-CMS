@@ -22,9 +22,11 @@ export class UmbBodyLayout extends LitElement {
 				width: 100%;
 				min-height: 60px;
 
+				box-sizing: border-box;
+			}
+			:host(:not([no-header-background])) #header {
 				background-color: var(--uui-color-surface);
 				border-bottom: 1px solid var(--uui-color-border);
-				box-sizing: border-box;
 			}
 
 			#headline {

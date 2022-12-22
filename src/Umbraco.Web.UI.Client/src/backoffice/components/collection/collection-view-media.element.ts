@@ -95,7 +95,7 @@ export class UmbCollectionViewMediaElement extends UmbContextConsumerMixin(UmbOb
 
 	render() {
 		return html`
-			<umb-body-layout>
+			<umb-body-layout no-header-background>
 				<umb-collection-toolbar slot="header"></umb-collection-toolbar>
 				<router-slot id="router-slot" .routes="${this._routes}"></router-slot>
 				${this._selection.length > 0
