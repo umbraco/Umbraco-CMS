@@ -19,7 +19,7 @@ export class UmbCollectionViewsMediaGridElement extends UmbContextConsumerMixin(
 				position: relative;
 				height: 100%;
 				width: 100%;
-				padding: 0 var(--uui-size-space-6);
+				padding: var(--uui-size-space-3) var(--uui-size-space-6);
 			}
 			:host([dragging]) #dropzone {
 				opacity: 1;
