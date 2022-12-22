@@ -65,6 +65,7 @@ export class UmbCollectionContext<DataType extends ContentTreeItem, StoreType ex
 			return;
 		}
 
+		
 		if (this._entityKey) {
 			this._dataObserver = this._store.getTreeItemChildren(this._entityKey).subscribe((nodes) => {
 				this._data.next(nodes);

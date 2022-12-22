@@ -24,9 +24,6 @@ export class UmbWorkspaceViewCollectionMediaElement extends UmbContextProviderMi
 		`,
 	];
 
-	@state()
-	private _entityKey = '';
-
 	private _workspaceContext?: UmbWorkspaceNodeContext;
 
 	private _collectionContext?:UmbCollectionContext<UmbMediaStoreItemType, UmbMediaStore>;
@@ -36,7 +33,7 @@ export class UmbWorkspaceViewCollectionMediaElement extends UmbContextProviderMi
 
 		this.consumeContext('umbWorkspaceContext', (nodeContext) => {
 			this._workspaceContext = nodeContext;
-			this._observeContent();
+			this._provideWorkspace();
 		});
 	}
 
@@ -51,19 +48,9 @@ export class UmbWorkspaceViewCollectionMediaElement extends UmbContextProviderMi
 		this._collectionContext?.disconnectedCallback();
 	}
 
-	private _observeContent() {
-		if (!this._workspaceContext) return;
-
-		this.observe<DocumentDetails | MediaDetails>(this._workspaceContext.data.pipe(distinctUntilChanged()), (content) => {
-			this._entityKey = content.key;
-			this._provideWorkspace();
-		});
-	}
-
 	protected _provideWorkspace() {
-		// Notice this should accept an empty string, when we want to get root nodes.
-		if(this._entityKey != null) {
-			this._collectionContext = new UmbCollectionContext(this, this._entityKey, 'umbMediaStore');
+		if(this._workspaceContext?.entityKey != null) {
+			this._collectionContext = new UmbCollectionContext(this, this._workspaceContext.entityKey, 'umbMediaStore');
 			this._collectionContext.connectedCallback();
 			this.provideContext('umbCollectionContext', this._collectionContext);
 		}
