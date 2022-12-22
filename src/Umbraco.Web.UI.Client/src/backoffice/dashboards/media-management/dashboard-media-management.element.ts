@@ -27,20 +27,13 @@ export class UmbDashboardMediaManagementElement extends UmbContextProviderMixin(
 
 	private _collectionContext?:UmbCollectionContext<UmbMediaStoreItemType, UmbMediaStore>;
 
-	private _entityKey!: string;
-	@property()
-	public get entityKey(): string {
-		return this._entityKey;
-	}
-	public set entityKey(value: string) {
-		this._entityKey = value;
-		this._provideWorkspace();
-	}
-
 	
 
 	constructor() {
 		super();
+
+		this._collectionContext = new UmbCollectionContext(this, null, 'umbMediaStore');
+		this.provideContext('umbCollectionContext', this._collectionContext);
 		// TODO: subscribe selection.
 	}
 
@@ -54,14 +47,6 @@ export class UmbDashboardMediaManagementElement extends UmbContextProviderMixin(
 		super.connectedCallback()
 		// TODO: avoid this connection, our own approach on Lit-Controller could be handling this case.
 		this._collectionContext?.disconnectedCallback();
-	}
-
-
-	protected _provideWorkspace() {
-		if(this._entityKey) {
-			this._collectionContext = new UmbCollectionContext(this, this._entityKey, 'umbMediaStore');
-			this.provideContext('umbCollectionContext', this._collectionContext);
-		}
 	}
 
 	

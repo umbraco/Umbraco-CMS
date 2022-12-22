@@ -7,7 +7,7 @@ export class UmbCollectionContext<DataType extends ContentTreeItem, StoreType ex
 
 
 	private _target: HTMLElement;
-	private _entityKey:string;
+	private _entityKey:string|null;
 
 
 	protected _storeConsumer!:UmbContextConsumer;
@@ -27,7 +27,7 @@ export class UmbCollectionContext<DataType extends ContentTreeItem, StoreType ex
 	public readonly search: Observable<string> = this._search.asObservable();
 	*/
 
-	constructor(target:HTMLElement, entityKey: string, storeAlias:string) {
+	constructor(target:HTMLElement, entityKey: string|null, storeAlias:string) {
 		this._target = target;
 		this._entityKey = entityKey;
 

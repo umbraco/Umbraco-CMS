@@ -3,15 +3,17 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { distinctUntilChanged } from 'rxjs';
 import type { UmbWorkspaceNodeContext } from '../../../workspace-context/workspace-node.context';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import type { ContentProperty, ContentPropertyData, DocumentDetails, MediaDetails } from '@umbraco-cms/models';
+import type { DocumentDetails, MediaDetails } from '@umbraco-cms/models';
 
 import 'src/backoffice/components/content-property/content-property.element';
 import 'src/backoffice/dashboards/media-management/dashboard-media-management.element';
+import { UmbCollectionContext } from '@umbraco-cms/components/collection/collection.context';
+import { UmbMediaStore, UmbMediaStoreItemType } from '@umbraco-cms/stores/media/media.store';
 
 @customElement('umb-workspace-view-collection-media')
-export class UmbWorkspaceViewCollectionMediaElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+export class UmbWorkspaceViewCollectionMediaElement extends UmbContextProviderMixin(UmbContextConsumerMixin(UmbObserverMixin(LitElement))) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -23,15 +25,11 @@ export class UmbWorkspaceViewCollectionMediaElement extends UmbContextConsumerMi
 	];
 
 	@state()
-	_properties: ContentProperty[] = [];
-
-	@state()
-	_data: ContentPropertyData[] = [];
-
-	@state()
-	private _key = '';
+	private _entityKey = '';
 
 	private _workspaceContext?: UmbWorkspaceNodeContext;
+
+	private _collectionContext?:UmbCollectionContext<UmbMediaStoreItemType, UmbMediaStore>;
 
 	constructor() {
 		super();
@@ -42,19 +40,39 @@ export class UmbWorkspaceViewCollectionMediaElement extends UmbContextConsumerMi
 		});
 	}
 
+	connectedCallback(): void {
+		super.connectedCallback();
+		// TODO: avoid this connection, our own approach on Lit-Controller could be handling this case.
+		this._collectionContext?.connectedCallback();
+	}
+	disconnectedCallback(): void {
+		super.connectedCallback()
+		// TODO: avoid this connection, our own approach on Lit-Controller could be handling this case.
+		this._collectionContext?.disconnectedCallback();
+	}
+
 	private _observeContent() {
 		if (!this._workspaceContext) return;
 
 		this.observe<DocumentDetails | MediaDetails>(this._workspaceContext.data.pipe(distinctUntilChanged()), (content) => {
-			this._properties = content.properties;
-			this._data = content.data;
-			this._key = content.key;
+			this._entityKey = content.key;
+			this._provideWorkspace();
 		});
 	}
 
+	protected _provideWorkspace() {
+		// Notice this should accept an empty string, when we want to get root nodes.
+		if(this._entityKey != null) {
+			this._collectionContext = new UmbCollectionContext(this, this._entityKey, 'umbMediaStore');
+			this._collectionContext.connectedCallback();
+			this.provideContext('umbCollectionContext', this._collectionContext);
+		}
+	}
+
+	
+
 	render() {
-		if (!this._key) return nothing;
-		return html`<umb-dashboard-media-management .entityKey=${this._key}></umb-dashboard-media-management>`;
+		return html`<umb-collection entityType="media"></umb-collection>`;
 	}
 }
 
