@@ -1,7 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import '../../components/collection/collection-media.element';
+import '../../components/collection/collection.element';
 import { BehaviorSubject, Observable } from 'rxjs';
 import type { MediaDetails } from '@umbraco-cms/models';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
@@ -89,7 +89,7 @@ export class UmbDashboardMediaManagementElement extends UmbContextProviderMixin(
 	}
 
 	render() {
-		return html`<umb-collection-media entityType="media"></umb-collection-media>`;
+		return html`<umb-collection entityType="media"></umb-collection>`;
 	}
 }
 
