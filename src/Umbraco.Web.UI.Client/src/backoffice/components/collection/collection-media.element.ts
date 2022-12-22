@@ -1,6 +1,6 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, LitElement, nothing } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
+import { customElement, state, property } from 'lit/decorators.js';
 import { map } from 'rxjs';
 import './collection-selection-actions.element';
 import './collection-toolbar.element';
@@ -31,20 +31,27 @@ export class UmbCollectionMediaElement extends UmbContextConsumerMixin(UmbObserv
 	private _routes: Array<any> = [];
 
 	@state()
-	private _collectionViews: Array<ManifestCollectionView> = [];
-
-	@state()
-	private _currentLayoutPathName = '';
-
-	@state()
 	private _selection: Array<string> = [];
 
 	private _mediaContext?: UmbDashboardMediaManagementElement;
 
+
+	private _entityType!: string;
+	@property()
+	public get entityType(): string {
+		return this._entityType;
+	}
+	public set entityType(value: string) {
+		this._entityType = value;
+		this._observeCollectionViews();
+	}
+
+	private _collectionViewUnsubscribe?:() => void;
+
+
 	constructor() {
 		super();
 
-		this._observeCollectionViews();
 		this.consumeAllContexts(['umbMediaContext'], (instance) => {
 			this._mediaContext = instance['umbMediaContext'];
 			this._observeMediaContext();
@@ -60,36 +67,34 @@ export class UmbCollectionMediaElement extends UmbContextConsumerMixin(UmbObserv
 	}
 
 	private _observeCollectionViews() {
-		this.observe<Array<ManifestCollectionView>>(
+		
+		this._collectionViewUnsubscribe?.();
+		this._collectionViewUnsubscribe = this.observe<Array<ManifestCollectionView>>(
 			umbExtensionsRegistry?.extensionsOfType('collectionView').pipe(
 				map((extensions) => {
-					return extensions.filter((extension) => extension.meta.entityType === 'media');
+					return extensions.filter((extension) => extension.meta.entityType === this._entityType);
 				})
 			),
-			(layouts) => {
-				if (layouts?.length === 0) return;
-				this._collectionViews = layouts;
-				this._createRoutes();
+			(views) => {
+				if (views?.length === 0) return;
+				this._createRoutes(views);
 			}
 		);
 	}
 
-	private _createRoutes() {
+	private _createRoutes(views: ManifestCollectionView[]) {
 		this._routes = [];
 
-		this._routes = this._collectionViews.map((layout) => {
+		this._routes = views.map((view) => {
 			return {
-				path: `${layout.meta.pathName}`,
-				component: () => createExtensionElement(layout),
-				setup: (_element: ManifestCollectionView, info: IRoutingInfo) => {
-					this._currentLayoutPathName = info.match.route.path;
-				},
+				path: `${view.meta.pathName}`,
+				component: () => createExtensionElement(view)
 			};
 		});
 
 		this._routes.push({
 			path: '**',
-			redirectTo: this._collectionViews?.[0]?.meta.pathName,
+			redirectTo: views?.[0]?.meta.pathName,
 		});
 	}
 
