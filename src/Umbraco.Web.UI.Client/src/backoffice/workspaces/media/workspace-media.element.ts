@@ -65,7 +65,7 @@ export class UmbWorkspaceMediaElement extends UmbContextConsumerMixin(UmbContext
 				type: 'workspaceView',
 				alias: 'Umb.WorkspaceView.Media.Collection',
 				name: 'Media Workspace Collection View',
-				loader: () => import('../shared/workspace-content/views/collection/workspace-view-content-collection.element'),
+				loader: () => import('../shared/workspace-content/views/collection/workspace-view-media-collection.element'),
 				weight: 300,
 				meta: {
 					workspaces: ['Umb.Workspace.Media'],
