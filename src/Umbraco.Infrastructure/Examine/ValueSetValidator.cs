@@ -85,7 +85,7 @@ public class ValueSetValidator : IValueSetValidator
         // filter based on the fields provided (if any)
         if (IncludeFields != null || ExcludeFields != null)
         {
-            foreach (var key in valueSet.Values.Keys.ToList())
+            foreach (var key in valueSet.Values.Keys.ToArray())
             {
                 if (IncludeFields != null && !IncludeFields.InvariantContains(key))
                 {
