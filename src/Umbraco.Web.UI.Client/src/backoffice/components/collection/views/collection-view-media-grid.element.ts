@@ -122,6 +122,7 @@ export class UmbCollectionViewsMediaGridElement extends UmbContextConsumerMixin(
 
 	private _renderMediaItem(item: MediaDetails) {
 		const name = item.name || '';
+		//TODO: fix the file extension when media items have a file extension.
 		return html`<uui-card-media
 			selectable
 			?select-only=${this._selection.length > 0}
@@ -130,6 +131,7 @@ export class UmbCollectionViewsMediaGridElement extends UmbContextConsumerMixin(
 			@selected=${() => this._handleSelect(item)}
 			@unselected=${() => this._handleDeselect(item)}
 			class="media-item"
+			.fileExt=${item.hasChildren ? '' : 'image'}
 			name=${name}></uui-card-media>`;
 	}
 
