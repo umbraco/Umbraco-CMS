@@ -50,7 +50,7 @@ export class UmbCollectionSelectionActionsElement extends UmbContextConsumerMixi
 	}
 
 	private _handleClearSelection() {
-		this._collectionContext?.setSelection([]);
+		this._collectionContext?.clearSelection();
 	}
 
 	private _observeCollectionContext() {
