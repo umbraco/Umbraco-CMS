@@ -95,7 +95,7 @@ export class UmbCollectionViewsMediaGridElement extends UmbContextConsumerMixin(
 		if (!this._collectionContext) return;
 
 		this.observe<Array<MediaDetails>>(this._collectionContext.data, (mediaItems) => {
-			this._mediaItems = mediaItems;
+			this._mediaItems = mediaItems.sort((a, b) => (a.hasChildren === b.hasChildren ? 0 : a ? -1 : 1));
 		});
 
 		this.observe<Array<string>>(this._collectionContext.selection, (selection) => {
@@ -122,6 +122,7 @@ export class UmbCollectionViewsMediaGridElement extends UmbContextConsumerMixin(
 
 	private _renderMediaItem(item: MediaDetails) {
 		const name = item.name || '';
+		//TODO: fix the file extension when media items have a file extension.
 		return html`<uui-card-media
 			selectable
 			?select-only=${this._selection.length > 0}
@@ -130,6 +131,7 @@ export class UmbCollectionViewsMediaGridElement extends UmbContextConsumerMixin(
 			@selected=${() => this._handleSelect(item)}
 			@unselected=${() => this._handleDeselect(item)}
 			class="media-item"
+			.fileExt=${item.hasChildren ? '' : 'image'}
 			name=${name}></uui-card-media>`;
 	}
 
@@ -141,7 +143,13 @@ export class UmbCollectionViewsMediaGridElement extends UmbContextConsumerMixin(
 				@file-change=${(e: any) => console.log(e)}
 				label="Drop files here"
 				accept=""></uui-file-dropzone>
-			<div id="media-files">${repeat(this._mediaItems, (file) => this._renderMediaItem(file))}</div>
+			<div id="media-files">
+				${repeat(
+					this._mediaItems,
+					(file) => file.key,
+					(file) => this._renderMediaItem(file)
+				)}
+			</div>
 		`;
 	}
 }
