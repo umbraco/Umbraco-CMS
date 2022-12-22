@@ -4,7 +4,8 @@ import { map } from 'rxjs';
 import { repeat } from 'lit/directives/repeat.js';
 import { ManifestTypes, umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import { createExtensionElement } from '@umbraco-cms/extensions-api';
+import { createExtensionElement, isManifestElementNameType } from '@umbraco-cms/extensions-api';
+import { isManifestElementableType } from 'src/core/extensions-api/is-manifest-elementable-type.function';
 
 type InitializedExtensionItem = {alias: string, weight: number, component: HTMLElement|null}
 
@@ -62,7 +63,12 @@ export class UmbExtensionSlotElement extends UmbObserverMixin(LitElement) {
                     if(!hasExt) {
                         const extensionObject:InitializedExtensionItem = {alias: extension.alias, weight: (extension as any).weight || 0, component: null};
                         this._extensions.push(extensionObject);
-                        const component = await createExtensionElement(extension);
+                        let component;
+                        if(isManifestElementableType(extension)) {
+                            component = await createExtensionElement(extension);
+                        } else {
+                            // TODO: ability to use a default element. or fail at creating this type.
+                        }
                         if(component) {
                             
                             (component as any).manifest = extension;

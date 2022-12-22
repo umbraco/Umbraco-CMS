@@ -9,6 +9,6 @@ export interface MetaDashboardCollection {
 	sections: string[];
 	pathname: string;
 	label?: string;
-	entityType: string,
-	storeAlias: string
+	entityType: string;
+	storeAlias: string;
 }

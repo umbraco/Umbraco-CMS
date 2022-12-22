@@ -34,7 +34,7 @@ const DefaultDocumentData = ({
 export class UmbWorkspaceDocumentContext extends UmbWorkspaceNodeContext<UmbDocumentStoreItemType, UmbDocumentStore> {
 
 	constructor(target:HTMLElement, entityKey: string) {
-		super(target, DefaultDocumentData, 'umbDocumentStore', entityKey);
+		super(target, DefaultDocumentData, 'umbDocumentStore', entityKey, 'document');
 	}
 
 }

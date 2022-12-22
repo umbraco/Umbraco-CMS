@@ -20,7 +20,8 @@ import type {
 	ManifestCollectionView,
 	ManifestCollectionBulkAction,
 } from '../../models';
-import { createExtensionElement } from '../create-extension-element.function';
+import { hasDefaultExport } from '../has-default-export.function';
+import { loadExtension } from '../load-extension.function';
 
 export class UmbExtensionRegistry {
 	private _extensions = new BehaviorSubject<Array<ManifestTypes>>([]);
@@ -37,9 +38,16 @@ export class UmbExtensionRegistry {
 
 		this._extensions.next([...extensionsValues, manifest]);
 
-		// If entrypoint extension, we should load it immediately
+		// If entrypoint extension, we should load and run it immediately
 		if (manifest.type === 'entrypoint') {
-			createExtensionElement(manifest);
+			loadExtension(manifest).then((js) => {
+				if (hasDefaultExport(js)) {
+					new js.default();
+				} else {
+					console.error(`Extension with alias '${manifest.alias}' of type 'entrypoint' must have a default export of its JavaScript module.`)
+				}
+			});
+			
 		}
 	}
 

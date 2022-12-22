@@ -6,6 +6,7 @@ import type { ManifestTreeItemAction } from './tree-item-action.models';
 import type { ManifestWorkspace } from './workspace.models';
 import type { ManifestWorkspaceAction } from './workspace-action.models';
 import type { ManifestWorkspaceView } from './workspace-view.models';
+import type { ManifestWorkspaceViewCollection } from './workspace-view-collection.models';
 import type { ManifestPropertyEditorUI, ManifestPropertyEditorModel } from './property-editor.models';
 import type { ManifestDashboard } from './dashboard.models';
 import type { ManifestDashboardCollection } from './dashboard-collection.models';
@@ -24,6 +25,7 @@ export * from './tree-item-action.models';
 export * from './workspace.models';
 export * from './workspace-action.models';
 export * from './workspace-view.models';
+export * from './workspace-view-collection.models';
 export * from './property-editor.models';
 export * from './dashboard.models';
 export * from './dashboard-collection.models';
@@ -42,6 +44,7 @@ export type ManifestTypes =
 	| ManifestWorkspace
 	| ManifestWorkspaceAction
 	| ManifestWorkspaceView
+	| ManifestWorkspaceViewCollection
 	| ManifestTreeItemAction
 	| ManifestPropertyEditorUI
 	| ManifestPropertyEditorModel
@@ -62,8 +65,9 @@ export type ManifestStandardTypes =
 	| 'sectionView'
 	| 'tree'
 	| 'workspace'
-	| 'workspaceView'
 	| 'workspaceAction'
+	| 'workspaceView'
+	| 'workspaceViewCollection'
 	| 'treeItemAction'
 	| 'propertyEditorUI'
 	| 'propertyEditorModel'
@@ -83,12 +87,11 @@ export type ManifestElementType =
 	| ManifestTree
 	| ManifestTreeItemAction
 	| ManifestWorkspace
+	| ManifestWorkspaceView
 	| ManifestPropertyAction
 	| ManifestPropertyEditorUI
 	| ManifestDashboard
-	| ManifestDashboardCollection
 	| ManifestUserDashboard
-	| ManifestWorkspaceView
 	| ManifestWorkspaceAction
 	| ManifestPackageView
 	| ManifestExternalLoginProvider
@@ -108,6 +111,10 @@ export interface ManifestElement extends ManifestBase {
 	elementName?: string;
 	loader?: () => Promise<object | HTMLElement>;
 	meta?: any;
+}
+
+export interface ManifestElementWithElementName extends ManifestElement {
+	elementName: string;
 }
 
 export interface ManifestCustom extends ManifestBase {

@@ -86,6 +86,7 @@ export class UmbCollectionViewsMediaGridElement extends UmbContextConsumerMixin(
 			this.toggleAttribute('dragging', false);
 		});
 		this.consumeContext('umbCollectionContext', (instance) => {
+			console.log("umbCollectionContext", instance)
 			this._collectionContext = instance;
 			this._observeCollectionContext();
 		});

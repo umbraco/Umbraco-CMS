@@ -1,4 +1,6 @@
 import type { ManifestTypes } from '../models';
+import { isManifestJSType } from './is-manifest-js-type.function';
+import { isManifestLoaderType } from './is-manifest-loader-type.function';
 
 export type ManifestLoaderType = ManifestTypes & { loader: () => Promise<object | HTMLElement> };
 export type ManifestJSType = ManifestTypes & { js: string };
@@ -18,12 +20,4 @@ export async function loadExtension(manifest: ManifestTypes): Promise<object | H
 	}
 
 	return Promise.resolve(null);
-}
-
-export function isManifestLoaderType(manifest: ManifestTypes): manifest is ManifestLoaderType {
-	return typeof (manifest as ManifestLoaderType).loader === 'function';
-}
-
-export function isManifestJSType(manifest: ManifestTypes): manifest is ManifestJSType {
-	return (manifest as ManifestJSType).js !== undefined;
 }
