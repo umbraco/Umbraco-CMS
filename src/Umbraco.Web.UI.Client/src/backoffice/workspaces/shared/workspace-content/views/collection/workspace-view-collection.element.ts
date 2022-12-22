@@ -50,7 +50,6 @@ export class UmbWorkspaceViewCollectionElement extends UmbContextProviderMixin(U
 
 	protected _provideWorkspace() {
 		if(this._workspaceContext?.entityKey != null) {
-			console.log("collection:", this._workspaceContext.entityType, this._workspaceContext.entityKey, this._workspaceContext.getStore().storeAlias)
 			this._collectionContext = new UmbCollectionContext(this, this._workspaceContext.entityKey, this._workspaceContext.getStore().storeAlias);
 			this._collectionContext.connectedCallback();
 			this.provideContext('umbCollectionContext', this._collectionContext);
