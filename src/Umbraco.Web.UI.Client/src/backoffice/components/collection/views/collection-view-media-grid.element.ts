@@ -147,7 +147,7 @@ export class UmbCollectionViewsMediaGridElement extends UmbContextConsumerMixin(
 			<div id="media-files">
 				${repeat(
 					this._mediaItems,
-					(file) => file.key,
+					(file, index) => file.key + index,
 					(file) => this._renderMediaItem(file)
 				)}
 			</div>

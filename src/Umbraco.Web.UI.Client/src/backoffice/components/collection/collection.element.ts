@@ -23,6 +23,10 @@ export class UmbCollectionElement extends UmbContextConsumerMixin(UmbObserverMix
 				gap: var(--uui-size-space-5);
 				height: 100%;
 			}
+			router-slot {
+				width: 100%;
+				height: 100%;
+			}
 		`,
 	];
 
@@ -34,7 +38,6 @@ export class UmbCollectionElement extends UmbContextConsumerMixin(UmbObserverMix
 
 	private _collectionContext?: UmbCollectionContext<MediaDetails>;
 
-
 	private _entityType!: string;
 	@property()
 	public get entityType(): string {
@@ -45,8 +48,7 @@ export class UmbCollectionElement extends UmbContextConsumerMixin(UmbObserverMix
 		this._observeCollectionViews();
 	}
 
-	private _collectionViewUnsubscribe?:() => void;
-
+	private _collectionViewUnsubscribe?: () => void;
 
 	constructor() {
 		super();
@@ -66,7 +68,6 @@ export class UmbCollectionElement extends UmbContextConsumerMixin(UmbObserverMix
 	}
 
 	private _observeCollectionViews() {
-
 		this._collectionViewUnsubscribe?.();
 		this._collectionViewUnsubscribe = this.observe<Array<ManifestCollectionView>>(
 			umbExtensionsRegistry?.extensionsOfType('collectionView').pipe(
@@ -87,7 +88,7 @@ export class UmbCollectionElement extends UmbContextConsumerMixin(UmbObserverMix
 		this._routes = views.map((view) => {
 			return {
 				path: `${view.meta.pathName}`,
-				component: () => createExtensionElement(view)
+				component: () => createExtensionElement(view),
 			};
 		});
 
