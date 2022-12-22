@@ -10,8 +10,8 @@ import type { ContentProperty, ContentPropertyData, DocumentDetails, MediaDetail
 import 'src/backoffice/components/content-property/content-property.element';
 import 'src/backoffice/dashboards/media-management/dashboard-media-management.element';
 
-@customElement('umb-workspace-view-media-collection')
-export class UmbWorkspaceViewMediaCollectionElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+@customElement('umb-workspace-view-collection-media')
+export class UmbWorkspaceViewCollectionMediaElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -58,10 +58,10 @@ export class UmbWorkspaceViewMediaCollectionElement extends UmbContextConsumerMi
 	}
 }
 
-export default UmbWorkspaceViewMediaCollectionElement;
+export default UmbWorkspaceViewCollectionMediaElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-workspace-view-media-collection': UmbWorkspaceViewMediaCollectionElement;
+		'umb-workspace-view-collection-media': UmbWorkspaceViewCollectionMediaElement;
 	}
 }
