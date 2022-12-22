@@ -1,16 +1,16 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
-import { customElement } from 'lit/decorators.js';
+import { customElement, state } from 'lit/decorators.js';
 import '../../components/collection/collection.element';
+import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbMediaStore, UmbMediaStoreItemType } from '@umbraco-cms/stores/media/media.store';
 import { UmbCollectionContext } from '@umbraco-cms/components/collection/collection.context';
+import type { ManifestDashboardCollection } from '@umbraco-cms/models';
 
-@customElement('umb-dashboard-media-management')
-export class UmbDashboardMediaManagementElement extends UmbContextProviderMixin(
-	UmbContextConsumerMixin(UmbObserverMixin(LitElement))
-) {
+@customElement('umb-dashboard-collection')
+export class UmbDashboardCollectionElement extends UmbContextProviderMixin(UmbContextConsumerMixin(UmbObserverMixin(LitElement))) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -27,19 +27,22 @@ export class UmbDashboardMediaManagementElement extends UmbContextProviderMixin(
 
 	private _collectionContext?:UmbCollectionContext<UmbMediaStoreItemType, UmbMediaStore>;
 
+	public manifest!: ManifestDashboardCollection;
 	
-
-	constructor() {
-		super();
-
-		this._collectionContext = new UmbCollectionContext(this, null, 'umbMediaStore');
-		this.provideContext('umbCollectionContext', this._collectionContext);
-		// TODO: subscribe selection.
-	}
+	@state()
+	private _entityType?:string;
 
 
 	connectedCallback(): void {
 		super.connectedCallback();
+
+		if(!this._collectionContext) {
+			const manifestMeta = (this.manifest.meta as any);
+			this._entityType = manifestMeta.entityType as string;
+			this._collectionContext = new UmbCollectionContext(this, null, manifestMeta.storeAlias);
+			this.provideContext('umbCollectionContext', this._collectionContext);
+		}
+
 		// TODO: avoid this connection, our own approach on Lit-Controller could be handling this case.
 		this._collectionContext?.connectedCallback();
 	}
@@ -52,14 +55,14 @@ export class UmbDashboardMediaManagementElement extends UmbContextProviderMixin(
 	
 
 	render() {
-		return html`<umb-collection entityType="media"></umb-collection>`;
+		return html`<umb-collection entityType=${ifDefined(this._entityType)}></umb-collection>`;
 	}
 }
 
-export default UmbDashboardMediaManagementElement;
+export default UmbDashboardCollectionElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-dashboard-media-management': UmbDashboardMediaManagementElement;
+		'umb-dashboard-collection': UmbDashboardCollectionElement;
 	}
 }

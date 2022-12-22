@@ -77,6 +77,7 @@ export class UmbExtensionRegistry {
 	extensionsOfType(type: 'workspace'): Observable<Array<ManifestWorkspace>>;
 	extensionsOfType(type: 'treeItemAction'): Observable<Array<ManifestTreeItemAction>>;
 	extensionsOfType(type: 'dashboard'): Observable<Array<ManifestDashboard>>;
+	extensionsOfType(type: 'dashboardCollection'): Observable<Array<ManifestDashboard>>;
 	extensionsOfType(type: 'workspaceView'): Observable<Array<ManifestWorkspaceView>>;
 	extensionsOfType(type: 'workspaceAction'): Observable<Array<ManifestWorkspaceAction>>;
 	extensionsOfType(type: 'propertyEditorUI'): Observable<Array<ManifestPropertyEditorUI>>;
@@ -92,6 +93,12 @@ export class UmbExtensionRegistry {
 	extensionsOfType(type: string): Observable<Array<ManifestTypes>> {
 		return this.extensions.pipe(
 			map((exts) => exts.filter((ext) => ext.type === type).sort((a, b) => (b.weight || 0) - (a.weight || 0)))
+		);
+	}
+
+	extensionsOfTypes(types: string[]): Observable<Array<ManifestTypes>> {
+		return this.extensions.pipe(
+			map((exts) => exts.filter((ext) => (types.indexOf(ext.type) !== -1)).sort((a, b) => (b.weight || 0) - (a.weight || 0)))
 		);
 	}
 }

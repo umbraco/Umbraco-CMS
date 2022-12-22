@@ -7,7 +7,7 @@ import { UmbSectionContext } from '../section.context';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-import type { ManifestDashboard, ManifestSection } from '@umbraco-cms/models';
+import type { ManifestDashboard, ManifestDashboardCollection, ManifestSection, ManifestWithMeta } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
 @customElement('umb-section-dashboards')
@@ -44,7 +44,7 @@ export class UmbSectionDashboardsElement extends UmbContextConsumerMixin(UmbObse
 	];
 
 	@state()
-	private _dashboards: Array<ManifestDashboard> = [];
+	private _dashboards: Array<ManifestDashboard | ManifestDashboardCollection> = [];
 
 	@state()
 	private _currentDashboardPathname = '';
@@ -82,10 +82,10 @@ export class UmbSectionDashboardsElement extends UmbContextConsumerMixin(UmbObse
 
 		this.observe<ManifestDashboard[]>(
 			umbExtensionsRegistry
-				?.extensionsOfType('dashboard')
+				?.extensionsOfTypes(['dashboard', 'dashboardCollection'])
 				.pipe(
 					map((extensions) =>
-						extensions.filter((extension) => extension.meta.sections.includes(this._currentSectionAlias))
+						extensions.filter((extension) => (extension as ManifestWithMeta).meta.sections.includes(this._currentSectionAlias))
 					)
 				),
 			(dashboards) => {
@@ -102,9 +102,19 @@ export class UmbSectionDashboardsElement extends UmbContextConsumerMixin(UmbObse
 		this._routes = this._dashboards.map((dashboard) => {
 			return {
 				path: `${dashboard.meta.pathname}`,
-				component: () => createExtensionElement(dashboard),
-				setup: (_element: ManifestDashboard, info: IRoutingInfo) => {
+				component: () => {
+					if (dashboard.type === 'dashboardCollection') {
+						return import('src/backoffice/dashboards/collection/dashboard-collection.element');
+					}
+					return createExtensionElement(dashboard)
+				},
+				setup: (component: Promise<HTMLElement> | HTMLElement, info: IRoutingInfo) => {
 					this._currentDashboardPathname = info.match.route.path;
+					// When its using import, we get an element, when using createExtensionElement we get a Promise.
+					(component as any).manifest = dashboard;
+					if((component as any).then) {
+						(component as any).then((el: any) => el.manifest = dashboard);
+					}
 				},
 			};
 		});

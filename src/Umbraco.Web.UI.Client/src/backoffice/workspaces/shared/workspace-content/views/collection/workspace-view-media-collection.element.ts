@@ -8,7 +8,7 @@ import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import type { DocumentDetails, MediaDetails } from '@umbraco-cms/models';
 
 import 'src/backoffice/components/content-property/content-property.element';
-import 'src/backoffice/dashboards/media-management/dashboard-media-management.element';
+import 'src/backoffice/dashboards/collection/dashboard-collection.element';
 import { UmbCollectionContext } from '@umbraco-cms/components/collection/collection.context';
 import { UmbMediaStore, UmbMediaStoreItemType } from '@umbraco-cms/stores/media/media.store';
 

@@ -8,6 +8,7 @@ import type { ManifestWorkspaceAction } from './workspace-action.models';
 import type { ManifestWorkspaceView } from './workspace-view.models';
 import type { ManifestPropertyEditorUI, ManifestPropertyEditorModel } from './property-editor.models';
 import type { ManifestDashboard } from './dashboard.models';
+import type { ManifestDashboardCollection } from './dashboard-collection.models';
 import type { ManifestUserDashboard } from './user-dashboard.models';
 import type { ManifestPropertyAction } from './property-action.models';
 import type { ManifestPackageView } from './package-view.models';
@@ -25,6 +26,7 @@ export * from './workspace-action.models';
 export * from './workspace-view.models';
 export * from './property-editor.models';
 export * from './dashboard.models';
+export * from './dashboard-collection.models';
 export * from './user-dashboard.models';
 export * from './property-action.models';
 export * from './package-view.models';
@@ -44,6 +46,7 @@ export type ManifestTypes =
 	| ManifestPropertyEditorUI
 	| ManifestPropertyEditorModel
 	| ManifestDashboard
+	| ManifestDashboardCollection
 	| ManifestUserDashboard
 	| ManifestPropertyAction
 	| ManifestPackageView
@@ -65,6 +68,7 @@ export type ManifestStandardTypes =
 	| 'propertyEditorUI'
 	| 'propertyEditorModel'
 	| 'dashboard'
+	| 'dashboardCollection'
 	| 'user-dashboard'
 	| 'propertyAction'
 	| 'packageView'
@@ -82,6 +86,7 @@ export type ManifestElementType =
 	| ManifestPropertyAction
 	| ManifestPropertyEditorUI
 	| ManifestDashboard
+	| ManifestDashboardCollection
 	| ManifestUserDashboard
 	| ManifestWorkspaceView
 	| ManifestWorkspaceAction
@@ -108,6 +113,10 @@ export interface ManifestElement extends ManifestBase {
 export interface ManifestCustom extends ManifestBase {
 	type: 'custom';
 	meta?: any;
+}
+
+export interface ManifestWithMeta extends ManifestBase {
+	meta: any;
 }
 
 export interface ManifestEntrypoint extends ManifestBase {
