@@ -100,7 +100,7 @@ export class UmbBodyLayout extends LitElement {
 			</uui-scroll-container>
 			<div id="footer" style="display:${this._footerSlotHasChildren || this._actionsSlotHasChildren ? '' : 'none'}">
 				<slot name="footer" @slotchange=${(e: Event) => { this._footerSlotHasChildren = this.hasNodes(e)}}></slot>
-				<slot id="actions" name="actions" @slotchange=${(e: Event) => { this._actionsSlotHasChildren = this.hasNodes(e)}}></slot>
+				<slot id="actions" name="actions" style="display:${this._actionsSlotHasChildren ? '' : 'none'}" @slotchange=${(e: Event) => { this._actionsSlotHasChildren = this.hasNodes(e)}}></slot>
 			</div>
 		`;
 	}
