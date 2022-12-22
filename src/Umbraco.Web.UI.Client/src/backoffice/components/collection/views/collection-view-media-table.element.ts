@@ -1,10 +1,10 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
+import type { UmbCollectionContext } from '../collection.context';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { MediaDetails } from '@umbraco-cms/models';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import type { UmbDashboardMediaManagementElement } from 'src/backoffice/dashboards/media-management/dashboard-media-management.element';
 
 @customElement('umb-collection-view-media-table')
 export class UmbCollectionViewMediaTableElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
@@ -16,24 +16,24 @@ export class UmbCollectionViewMediaTableElement extends UmbContextConsumerMixin(
 	@state()
 	private _selection: Array<string> = [];
 
-	private _mediaContext?: UmbDashboardMediaManagementElement;
+	private _collectionContext?: UmbCollectionContext<MediaDetails>;
 
 	constructor() {
 		super();
-		this.consumeAllContexts(['umbMediaContext'], (instance) => {
-			this._mediaContext = instance['umbMediaContext'];
-			this._observeMediaContext();
+		this.consumeContext('umbCollectionContext', (instance) => {
+			this._collectionContext = instance;
+			this._observeCollectionContext();
 		});
 	}
 
-	private _observeMediaContext() {
-		if (!this._mediaContext) return;
+	private _observeCollectionContext() {
+		if (!this._collectionContext) return;
 
-		this.observe<Array<MediaDetails>>(this._mediaContext.mediaItems, (mediaItems) => {
-			this._mediaItems = mediaItems;
+		this.observe<Array<MediaDetails>>(this._collectionContext.data, (nodes) => {
+			this._mediaItems = nodes;
 		});
 
-		this.observe<Array<string>>(this._mediaContext.selection, (selection) => {
+		this.observe<Array<string>>(this._collectionContext.selection, (selection) => {
 			this._selection = selection;
 		});
 	}

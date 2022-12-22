@@ -2,11 +2,10 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import '../../components/collection/collection.element';
-import { BehaviorSubject, Observable } from 'rxjs';
-import type { MediaDetails } from '@umbraco-cms/models';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import { UmbMediaStore } from '@umbraco-cms/stores/media/media.store';
+import { UmbMediaStore, UmbMediaStoreItemType } from '@umbraco-cms/stores/media/media.store';
+import { UmbCollectionContext } from '@umbraco-cms/components/collection/collection.context';
 
 @customElement('umb-dashboard-media-management')
 export class UmbDashboardMediaManagementElement extends UmbContextProviderMixin(
@@ -25,68 +24,47 @@ export class UmbDashboardMediaManagementElement extends UmbContextProviderMixin(
 		`,
 	];
 
+
+	private _collectionContext?:UmbCollectionContext<UmbMediaStoreItemType, UmbMediaStore>;
+
+	private _entityKey!: string;
 	@property()
-	public entityKey = '';
+	public get entityKey(): string {
+		return this._entityKey;
+	}
+	public set entityKey(value: string) {
+		this._entityKey = value;
+		this._provideWorkspace();
+	}
 
-	private _mediaStore?: UmbMediaStore;
-
-	private _selection: BehaviorSubject<Array<string>> = new BehaviorSubject(<Array<string>>[]);
-	public readonly selection: Observable<Array<string>> = this._selection.asObservable();
-
-	private _mediaItems: BehaviorSubject<Array<MediaDetails>> = new BehaviorSubject(<Array<MediaDetails>>[]);
-	public readonly mediaItems: Observable<Array<MediaDetails>> = this._mediaItems.asObservable();
-
-	private _search: BehaviorSubject<string> = new BehaviorSubject('');
-	public readonly search: Observable<string> = this._search.asObservable();
+	
 
 	constructor() {
 		super();
-		this.provideContext('umbMediaContext', this);
-		this.consumeAllContexts(['umbMediaStore'], (instance) => {
-			this._mediaStore = instance['umbMediaStore'];
-			this._observeMediaItems();
-		});
+		// TODO: subscribe selection.
 	}
 
-	private _observeMediaItems() {
-		if (!this._mediaStore) return;
 
-		if (this.entityKey) {
-			this.observe<Array<MediaDetails>>(this._mediaStore?.getTreeItemChildren(this.entityKey), (items) => {
-				this._mediaItems.next(items);
-			});
-		} else {
-			this.observe<Array<MediaDetails>>(this._mediaStore?.getTreeRoot(), (items) => {
-				this._mediaItems.next(items);
-			});
+	connectedCallback(): void {
+		super.connectedCallback();
+		// TODO: avoid this connection, our own approach on Lit-Controller could be handling this case.
+		this._collectionContext?.connectedCallback();
+	}
+	disconnectedCallback(): void {
+		super.connectedCallback()
+		// TODO: avoid this connection, our own approach on Lit-Controller could be handling this case.
+		this._collectionContext?.disconnectedCallback();
+	}
+
+
+	protected _provideWorkspace() {
+		if(this._entityKey) {
+			this._collectionContext = new UmbCollectionContext(this, this._entityKey, 'umbMediaStore');
+			this.provideContext('umbCollectionContext', this._collectionContext);
 		}
 	}
 
-	public setSearch(value: string) {
-		if (!value) value = '';
-
-		this._search.next(value);
-		this._observeMediaItems();
-		this.requestUpdate('search');
-	}
-
-	public setSelection(value: Array<string>) {
-		if (!value) return;
-		this._selection.next(value);
-		this.requestUpdate('selection');
-	}
-
-	public select(key: string) {
-		const selection = this._selection.getValue();
-		this._selection.next([...selection, key]);
-		this.requestUpdate('selection');
-	}
-
-	public deselect(key: string) {
-		const selection = this._selection.getValue();
-		this._selection.next(selection.filter((k) => k !== key));
-		this.requestUpdate('selection');
-	}
+	
 
 	render() {
 		return html`<umb-collection entityType="media"></umb-collection>`;

@@ -8,8 +8,11 @@ export interface UmbDataStoreIdentifiers {
 export interface UmbDataStore<T> {
 	readonly items: Observable<Array<T>>;
 	updateItems(items: Array<T>): void;
-	getTreeRoot?(): Observable<Array<T>>;
-	getTreeItemChildren?(key: string): Observable<Array<T>>;
+}
+
+export interface UmbTreeDataStore<T> extends UmbDataStore<T> {
+	getTreeRoot(): Observable<Array<T>>;
+	getTreeItemChildren(key: string): Observable<Array<T>>;
 }
 
 /**

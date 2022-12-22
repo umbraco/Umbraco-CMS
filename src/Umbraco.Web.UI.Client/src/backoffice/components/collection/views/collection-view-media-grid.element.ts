@@ -2,10 +2,10 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
+import type { UmbCollectionContext } from '../collection.context';
 import type { MediaDetails } from '@umbraco-cms/models';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import type { UmbDashboardMediaManagementElement } from 'src/backoffice/dashboards/media-management/dashboard-media-management.element';
 
 @customElement('umb-collection-view-media-grid')
 export class UmbCollectionViewsMediaGridElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
@@ -71,7 +71,7 @@ export class UmbCollectionViewsMediaGridElement extends UmbContextConsumerMixin(
 	@state()
 	private _selection: Array<string> = [];
 
-	private _mediaContext?: UmbDashboardMediaManagementElement;
+	private _collectionContext?: UmbCollectionContext<MediaDetails>;
 
 	constructor() {
 		super();
@@ -85,20 +85,20 @@ export class UmbCollectionViewsMediaGridElement extends UmbContextConsumerMixin(
 			e.preventDefault();
 			this.toggleAttribute('dragging', false);
 		});
-		this.consumeAllContexts(['umbMediaContext'], (instance) => {
-			this._mediaContext = instance['umbMediaContext'];
-			this._observeMediaContext();
+		this.consumeContext('umbCollectionContext', (instance) => {
+			this._collectionContext = instance;
+			this._observeCollectionContext();
 		});
 	}
 
-	private _observeMediaContext() {
-		if (!this._mediaContext) return;
+	private _observeCollectionContext() {
+		if (!this._collectionContext) return;
 
-		this.observe<Array<MediaDetails>>(this._mediaContext.mediaItems, (mediaItems) => {
+		this.observe<Array<MediaDetails>>(this._collectionContext.data, (mediaItems) => {
 			this._mediaItems = mediaItems;
 		});
 
-		this.observe<Array<string>>(this._mediaContext.selection, (selection) => {
+		this.observe<Array<string>>(this._collectionContext.selection, (selection) => {
 			this._selection = selection;
 		});
 	}
@@ -109,11 +109,11 @@ export class UmbCollectionViewsMediaGridElement extends UmbContextConsumerMixin(
 	}
 
 	private _handleSelect(mediaItem: MediaDetails) {
-		this._mediaContext?.select(mediaItem.key);
+		this._collectionContext?.select(mediaItem.key);
 	}
 
 	private _handleDeselect(mediaItem: MediaDetails) {
-		this._mediaContext?.deselect(mediaItem.key);
+		this._collectionContext?.deselect(mediaItem.key);
 	}
 
 	private _isSelected(mediaItem: MediaDetails) {

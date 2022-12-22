@@ -4,12 +4,12 @@ import { customElement, state, property } from 'lit/decorators.js';
 import { map } from 'rxjs';
 import './collection-selection-actions.element';
 import './collection-toolbar.element';
+import type { UmbCollectionContext } from './collection.context';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
-import type { ManifestCollectionView } from '@umbraco-cms/models';
+import type { ManifestCollectionView, MediaDetails } from '@umbraco-cms/models';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-import type { UmbDashboardMediaManagementElement } from 'src/backoffice/dashboards/media-management/dashboard-media-management.element';
 
 @customElement('umb-collection')
 export class UmbCollectionElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
@@ -32,7 +32,7 @@ export class UmbCollectionElement extends UmbContextConsumerMixin(UmbObserverMix
 	@state()
 	private _selection: Array<string> = [];
 
-	private _mediaContext?: UmbDashboardMediaManagementElement;
+	private _collectionContext?: UmbCollectionContext<MediaDetails>;
 
 
 	private _entityType!: string;
@@ -51,16 +51,16 @@ export class UmbCollectionElement extends UmbContextConsumerMixin(UmbObserverMix
 	constructor() {
 		super();
 
-		this.consumeAllContexts(['umbMediaContext'], (instance) => {
-			this._mediaContext = instance['umbMediaContext'];
-			this._observeMediaContext();
+		this.consumeContext('umbCollectionContext', (instance) => {
+			this._collectionContext = instance;
+			this._observeCollectionContext();
 		});
 	}
 
-	private _observeMediaContext() {
-		if (!this._mediaContext) return;
+	private _observeCollectionContext() {
+		if (!this._collectionContext) return;
 
-		this.observe<Array<string>>(this._mediaContext.selection, (selection) => {
+		this.observe<Array<string>>(this._collectionContext.selection, (selection) => {
 			this._selection = selection;
 		});
 	}
