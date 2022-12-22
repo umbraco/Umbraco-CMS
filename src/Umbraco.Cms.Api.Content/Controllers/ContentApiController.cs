@@ -1,11 +1,14 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Common.Builders;
+using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Content.Filters;
 using Umbraco.Cms.Api.Content.Routing;
 using Umbraco.Cms.Core.ContentApi;
 using Umbraco.Cms.Core.Models.ContentApi;
+using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Content.Controllers;
 
@@ -56,58 +59,4 @@ public class ContentApiController : Controller
                     Total = result.Length
                 }));
     }
-}
-
-// TODO: refactor - move PagedViewModel from Management API to Common and delete this one
-public class PagedViewModel<T>
-{
-    [Required]
-    public long Total { get; set; }
-
-    [Required]
-    public IEnumerable<T> Items { get; set; } = Enumerable.Empty<T>();
-
-    public static PagedViewModel<T> Empty() => new();
-}
-
-// TODO: refactor - move ProblemDetailsBuilder from Management API to Common and delete this one
-public class ProblemDetailsBuilder
-{
-    private string? _title;
-    private string? _detail;
-    private int _status = StatusCodes.Status400BadRequest;
-    private string? _type;
-
-    public ProblemDetailsBuilder WithTitle(string title)
-    {
-        _title = title;
-        return this;
-    }
-
-    public ProblemDetailsBuilder WithDetail(string detail)
-    {
-        _detail = detail;
-        return this;
-    }
-
-    public ProblemDetailsBuilder WithStatus(int status)
-    {
-        _status = status;
-        return this;
-    }
-
-    public ProblemDetailsBuilder WithType(string type)
-    {
-        _type = type;
-        return this;
-    }
-
-    public ProblemDetails Build() =>
-        new()
-        {
-            Title = _title,
-            Detail = _detail,
-            Status = _status,
-            Type = _type ?? "Error",
-        };
 }
