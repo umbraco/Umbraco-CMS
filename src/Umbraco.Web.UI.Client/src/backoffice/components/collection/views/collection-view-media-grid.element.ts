@@ -95,7 +95,7 @@ export class UmbCollectionViewsMediaGridElement extends UmbContextConsumerMixin(
 		if (!this._collectionContext) return;
 
 		this.observe<Array<MediaDetails>>(this._collectionContext.data, (mediaItems) => {
-			this._mediaItems = mediaItems;
+			this._mediaItems = mediaItems.sort((a, b) => (a.hasChildren === b.hasChildren ? 0 : a ? -1 : 1));
 		});
 
 		this.observe<Array<string>>(this._collectionContext.selection, (selection) => {
@@ -143,7 +143,13 @@ export class UmbCollectionViewsMediaGridElement extends UmbContextConsumerMixin(
 				@file-change=${(e: any) => console.log(e)}
 				label="Drop files here"
 				accept=""></uui-file-dropzone>
-			<div id="media-files">${repeat(this._mediaItems, (file) => this._renderMediaItem(file))}</div>
+			<div id="media-files">
+				${repeat(
+					this._mediaItems,
+					(file) => file.key,
+					(file) => this._renderMediaItem(file)
+				)}
+			</div>
 		`;
 	}
 }
