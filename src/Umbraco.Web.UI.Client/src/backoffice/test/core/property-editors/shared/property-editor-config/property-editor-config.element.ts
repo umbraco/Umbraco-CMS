@@ -7,7 +7,7 @@ import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { ManifestTypes, PropertyEditorConfigDefaultData, PropertyEditorConfigProperty } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
-import '../../../test/core/components/entity-property/entity-property.element';
+import '../../../components/entity-property/entity-property.element';
 
 /**
  *  @element umb-property-editor-config

@@ -10,7 +10,7 @@ import type { DocumentTypeDetails, ManifestTypes } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbModalService } from 'src/backoffice/test/core/services/modal';
 
-import '../../../../property-editors/uis/icon-picker/property-editor-ui-icon-picker.element';
+import '../../../core/property-editors/uis/icon-picker/property-editor-ui-icon-picker.element';
 
 @customElement('umb-workspace-document-type')
 export class UmbWorkspaceDocumentTypeElement extends UmbContextProviderMixin(

@@ -19,7 +19,7 @@ import { UmbModalService } from 'src/backoffice/test/core/services/modal';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 
-import '../../../../property-editors/uis/content-picker/property-editor-ui-content-picker.element';
+import '../../../core/property-editors/uis/content-picker/property-editor-ui-content-picker.element';
 import '../../../../test/core/components/workspace/workspace-entity/workspace-entity.element';
 
 @customElement('umb-workspace-user')

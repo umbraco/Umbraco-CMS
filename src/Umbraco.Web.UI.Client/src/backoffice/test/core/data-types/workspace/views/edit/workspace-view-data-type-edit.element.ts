@@ -8,7 +8,7 @@ import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { ManifestPropertyEditorUI, DataTypeDetails } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
-import '../../../../../../property-editors/shared/property-editor-config/property-editor-config.element';
+import '../../../../property-editors/shared/property-editor-config/property-editor-config.element';
 import '../../../../components/ref-property-editor-ui/ref-property-editor-ui.element';
 
 @customElement('umb-workspace-view-data-type-edit')

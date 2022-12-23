@@ -22,7 +22,7 @@ import { css, html, LitElement } from 'lit';
 
 import { UmbModalService } from './test/core/services/modal';
 import { UmbNotificationService } from './test/core/services/notification';
-import { UmbIconStore } from '../core/stores/icon/icon.store';
+import { UmbIconStore } from './test/core/stores/icon/icon.store';
 import { manifests as externalLoginProviderManifests } from '../auth/external-login-providers/manifests';
 import { UmbDataTypeStore } from './test/core/data-types/data-type.store';
 import { UmbDocumentTypeStore } from './test/documents/document-types/document-type.store';
@@ -39,8 +39,8 @@ import { UmbDictionaryStore } from './test/translation/dictionary/dictionary.sto
 import { UmbDocumentBlueprintStore } from './test/documents/document-blueprints/document-blueprint.store';
 
 import { manifests as sectionManifests } from './sections.manifest';
-import { manifests as propertyEditorModelManifests } from './property-editors/models/manifests';
-import { manifests as propertyEditorUIManifests } from './property-editors/uis/manifests';
+import { manifests as propertyEditorModelManifests } from './test/core/property-editors/models/manifests';
+import { manifests as propertyEditorUIManifests } from './test/core/property-editors/uis/manifests';
 import { manifests as treeManifests } from './trees.manifest';
 import { manifests as editorManifests } from './workspaces.manifest';
 import { manifests as propertyActionManifests } from './property-actions/manifests';
