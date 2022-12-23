@@ -21,13 +21,14 @@ export class UmbBackofficeHeaderApps extends LitElement {
 		this._registerHeaderApps();
 	}
 
+	// TODO: these registrations should be moved
 	private _registerHeaderApps() {
 		const headerApps: Array<ManifestHeaderApp> = [
 			{
 				type: 'headerApp',
 				alias: 'Umb.HeaderApp.Search',
 				name: 'Header App Search',
-				loader: () => import('../../test/core/components/header-app/header-app-button.element'),
+				loader: () => import('../header-app/header-app-button.element'),
 				weight: 10,
 				meta: {
 					label: 'Search',
@@ -39,7 +40,7 @@ export class UmbBackofficeHeaderApps extends LitElement {
 				type: 'headerApp',
 				alias: 'Umb.HeaderApp.Favorites',
 				name: 'Header App Favorites',
-				loader: () => import('../../test/core/components/header-app/header-app-button.element'),
+				loader: () => import('../header-app/header-app-button.element'),
 				weight: 100,
 				meta: {
 					label: 'Favorites',
@@ -51,7 +52,7 @@ export class UmbBackofficeHeaderApps extends LitElement {
 				type: 'headerApp',
 				alias: 'Umb.HeaderApp.CurrentUser',
 				name: 'Current User',
-				loader: () => import('../../../auth/current-user/header-app-current-user.element'),
+				loader: () => import('../../../../../auth/current-user/header-app-current-user.element'),
 				weight: 1000,
 				meta: {
 					label: 'TODO: how should we enable this to not be set.',
