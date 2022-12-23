@@ -1,3 +1,4 @@
+import { manifests as contentSectionManifests } from './content-section/manifests';
 import { manifests as documentBlueprintManifests } from './document-blueprints/manifests';
 import { manifests as documentTypeManifests } from './document-types/manifests';
 
@@ -10,4 +11,4 @@ const registerExtensions = (manifests: Array<ManifestTypes> | Array<ManifestType
 	});
 };
 
-registerExtensions([...documentBlueprintManifests, ...documentTypeManifests]);
+registerExtensions([...contentSectionManifests, ...documentBlueprintManifests, ...documentTypeManifests]);

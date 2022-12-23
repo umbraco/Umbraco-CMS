@@ -24,7 +24,7 @@ const dashboards: Array<ManifestDashboardCollection> = [
 			sections: [sectionAlias],
 			pathname: 'media-management',
 			entityType: 'media',
-			storeAlias: 'umbMediaStore'
+			storeAlias: 'umbMediaStore',
 		},
 	},
 ];
