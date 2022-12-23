@@ -3,7 +3,7 @@
 import { manifests as dataTypeTreeManifests } from './test/core/data-types/tree/manifests';
 import { manifests as extensionTreeManifests } from './test/core/extensions/tree/manifests';
 import { manifests as languageTreeManifests } from './test/core/languages/tree/manifests';
-import { manifests as dictionaryTreeManifests } from './test/translation/dictionary/tree/manifests';
+import { manifests as dictionaryTreeManifests } from './test/translation/dictionary/tree/dictionary-tree.manifest';
 import { manifests as documentBlueprintTreeManifests } from './test/documents/document-blueprints/tree/manifests';
 import { manifests as documentTypeTreeManifests } from './test/documents/document-types/tree/manifests';
 import { manifests as documentTreeManifests } from './test/documents/documents/tree/manifests';

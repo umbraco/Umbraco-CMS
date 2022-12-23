@@ -131,15 +131,6 @@ export const manifests: Array<ManifestWorkspace> = [
 	},
 	{
 		type: 'workspace',
-		alias: 'Umb.Workspace.Dictionary',
-		name: 'Dictionary Workspace',
-		loader: () => import('./test/translation/dictionary/workspace/workspace-dictionary.element'),
-		meta: {
-			entityType: 'dictionary',
-		},
-	},
-	{
-		type: 'workspace',
 		alias: 'Umb.Workspace.DocumentBlueprintRoot',
 		name: 'Document Blueprint Root Workspace',
 		loader: () => import('./test/documents/document-blueprints/workspace/workspace-document-blueprint-root.element'),

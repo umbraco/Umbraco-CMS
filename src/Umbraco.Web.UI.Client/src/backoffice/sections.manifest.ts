@@ -5,7 +5,6 @@ import { manifests as mediaSectionManifests } from './test/media/media-section/m
 import { manifests as memberSectionManifests } from './test/members/members-section/manifests';
 import { manifests as packageSectionManifests } from './test/packages/packages-section/manifests';
 import { manifests as settingsSectionManifests } from './test/core/settings-section/manifests';
-import { manifests as translationSectionManifests } from './test/translation/translation-section/manifests';
 import { manifests as userSectionManifests } from '../auth/users-section/manifests';
 
 import type {
@@ -22,6 +21,5 @@ export const manifests: Array<ManifestSection | ManifestDashboardCollection | Ma
 		...memberSectionManifests,
 		...packageSectionManifests,
 		...settingsSectionManifests,
-		...translationSectionManifests,
 		...userSectionManifests,
 	];

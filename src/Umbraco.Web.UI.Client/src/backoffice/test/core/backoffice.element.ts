@@ -52,6 +52,9 @@ import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
 import type { ManifestTypes } from '@umbraco-cms/models';
 
+// Domains
+import '../translation';
+
 @defineElement('umb-backoffice')
 export class UmbBackofficeElement extends UmbContextConsumerMixin(UmbContextProviderMixin(LitElement)) {
 	static styles = [
