@@ -17,6 +17,8 @@ public class PropertyValueConverterTests : ContentApiTests
 
     protected IPublishedContent PublishedMedia { get; private set; }
 
+    protected IPublishedContentType PublishedContentType { get; private set; }
+
     protected IPublishedContentType PublishedMediaType { get; private set; }
 
     protected Mock<IPublishedContentCache> PublishedContentCacheMock { get; private set; }
@@ -33,6 +35,7 @@ public class PropertyValueConverterTests : ContentApiTests
         var publishedContentType = new Mock<IPublishedContentType>();
         publishedContentType.SetupGet(c => c.ItemType).Returns(PublishedItemType.Content);
         publishedContentType.SetupGet(c => c.Alias).Returns("TheContentType");
+        PublishedContentType = publishedContentType.Object;
         var publishedMediaType = new Mock<IPublishedContentType>();
         publishedMediaType.SetupGet(c => c.ItemType).Returns(PublishedItemType.Media);
         publishedMediaType.SetupGet(c => c.Alias).Returns("TheMediaType");

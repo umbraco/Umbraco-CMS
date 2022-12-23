@@ -17,12 +17,12 @@ public class ApiContentBuilder : IApiContentBuilder
         _publishedUrlProvider = publishedUrlProvider;
     }
 
-    public IApiContent Build(IPublishedContent content) => new ApiContent(
+    public IApiContent Build(IPublishedContent content, bool expand = true) => new ApiContent(
         content.Key,
         _nameProvider.GetName(content),
         content.ContentType.Alias,
         Url(content),
-        _propertyMapper.Map(content));
+        expand ? _propertyMapper.Map(content) : new Dictionary<string, object?>());
 
     private string Url(IPublishedContent content)
         => content.ItemType == PublishedItemType.Content

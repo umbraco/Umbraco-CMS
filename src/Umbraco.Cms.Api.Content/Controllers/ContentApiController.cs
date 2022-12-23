@@ -34,8 +34,8 @@ public class ContentApiController : Controller
     public async Task<IActionResult> Get(int skip = 0, int take = 100)
     {
         IPublishedContentCache? contentCache = _publishedSnapshotAccessor.TryGetPublishedSnapshot(out IPublishedSnapshot? publishedSnapshot)
-                ? publishedSnapshot?.Content
-                : null;
+            ? publishedSnapshot?.Content
+            : null;
         if (contentCache == null)
         {
             // TODO: refactor - move ProblemDetailsBuilder to Common and reuse it here
@@ -48,7 +48,7 @@ public class ContentApiController : Controller
 
         IApiContent[] result = contentCache
             .GetAtRoot()
-            .Select(_apiContentBuilder.Build)
+            .Select(content => _apiContentBuilder.Build(content))
             .ToArray();
 
         return await Task.FromResult(

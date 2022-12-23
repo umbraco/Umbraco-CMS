@@ -9,8 +9,8 @@ public class ApiElementBuilder : IApiElementBuilder
 
     public ApiElementBuilder(IPropertyMapper propertyMapper) => _propertyMapper = propertyMapper;
 
-    public IApiElement Build(IPublishedElement element) => new ApiElement(
+    public IApiElement Build(IPublishedElement element, bool expand = true) => new ApiElement(
         element.Key,
         element.ContentType.Alias,
-        _propertyMapper.Map(element));
+        expand ? _propertyMapper.Map(element) : new Dictionary<string, object?>());
 }

@@ -226,6 +226,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IApiElementBuilder, ApiElementBuilder>();
         builder.Services.AddSingleton<IApiContentBuilder, ApiContentBuilder>();
         builder.Services.AddSingleton<IContentNameProvider, ContentNameProvider>();
+        builder.Services.AddSingleton<IOutputExpansionStrategy, DefaultOutputExpansionStrategy>();
 
         return builder;
     }

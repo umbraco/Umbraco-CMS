@@ -1,12 +1,10 @@
 using System.Globalization;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.ContentApi;
-using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors.ContentApi;
 using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
@@ -21,27 +19,26 @@ internal class ContentPickerValueConverter : PropertyValueConverterBase, IConten
     };
 
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
-    private readonly IPublishedUrlProvider _publishedUrlProvider;
-    private readonly IContentNameProvider _contentNameProvider;
+    private readonly IOutputExpansionStrategy _outputExpansionStrategy;
+    private readonly IApiContentBuilder _apiContentBuilder;
 
     [Obsolete("Use constructor that takes all parameters, scheduled for removal in V14")]
     public ContentPickerValueConverter(IPublishedSnapshotAccessor publishedSnapshotAccessor)
         : this(
             publishedSnapshotAccessor,
-            StaticServiceProvider.Instance.GetRequiredService<IPublishedUrlProvider>(),
-            StaticServiceProvider.Instance.GetRequiredService<IContentNameProvider>())
+            StaticServiceProvider.Instance.GetRequiredService<IOutputExpansionStrategy>(),
+            StaticServiceProvider.Instance.GetRequiredService<IApiContentBuilder>())
     {
-
     }
 
     public ContentPickerValueConverter(
         IPublishedSnapshotAccessor publishedSnapshotAccessor,
-        IPublishedUrlProvider publishedUrlProvider,
-        IContentNameProvider contentNameProvider)
+        IOutputExpansionStrategy outputExpansionStrategyAccessor,
+        IApiContentBuilder apiContentBuilder)
     {
         _publishedSnapshotAccessor = publishedSnapshotAccessor;
-        _publishedUrlProvider = publishedUrlProvider;
-        _contentNameProvider = contentNameProvider;
+        _outputExpansionStrategy = outputExpansionStrategyAccessor;
+        _apiContentBuilder = apiContentBuilder;
     }
 
     public override bool IsConverter(IPublishedPropertyType propertyType)
@@ -103,7 +100,7 @@ internal class ContentPickerValueConverter : PropertyValueConverterBase, IConten
         return inter.ToString();
     }
 
-    public Type GetContentApiPropertyValueType(IPublishedPropertyType propertyType) => typeof(ApiLink);
+    public Type GetContentApiPropertyValueType(IPublishedPropertyType propertyType) => typeof(IApiContent);
 
     public object? ConvertIntermediateToContentApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
     {
@@ -113,7 +110,7 @@ internal class ContentPickerValueConverter : PropertyValueConverterBase, IConten
             return null;
         }
 
-        return new ApiLink(content.Url(_publishedUrlProvider), _contentNameProvider.GetName(content), null, content.Key, content.ContentType.Alias, LinkType.Content);
+        return _apiContentBuilder.Build(content, _outputExpansionStrategy.ShouldExpand(propertyType));
     }
 
     private IPublishedContent? GetContent(IPublishedPropertyType propertyType, object? inter)
