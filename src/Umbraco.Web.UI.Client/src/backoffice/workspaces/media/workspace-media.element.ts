@@ -2,7 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { UmbWorkspaceMediaContext } from './workspace-media.context';
-import type { ManifestWorkspaceView, ManifestWorkspaceViewCollection } from '@umbraco-cms/models';
+import type { ManifestWorkspaceAction, ManifestWorkspaceView, ManifestWorkspaceViewCollection } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 
@@ -60,7 +60,7 @@ export class UmbWorkspaceMediaElement extends UmbContextConsumerMixin(UmbContext
 	}
 
 	private _registerWorkspaceViews() {
-		const dashboards: Array<ManifestWorkspaceView | ManifestWorkspaceViewCollection> = [
+		const dashboards: Array<ManifestWorkspaceView | ManifestWorkspaceViewCollection | ManifestWorkspaceAction> = [
 			{
 				type: 'workspaceViewCollection',
 				alias: 'Umb.WorkspaceView.Media.Collection',
@@ -101,6 +101,17 @@ export class UmbWorkspaceMediaElement extends UmbContextConsumerMixin(UmbContext
 					icon: 'info',
 				},
 			},
+			{
+				type: 'workspaceAction',
+				alias: 'Umb.WorkspaceAction.Document.Save',
+				name: 'Save Document Workspace Action',
+				loader: () => import('../shared/actions/save/workspace-action-node-save.element'),
+				meta: {
+					workspaces: ['Umb.Workspace.Media'],
+					look: 'primary',
+					color: 'positive'
+				},
+			}
 		];
 
 		dashboards.forEach((dashboard) => {
