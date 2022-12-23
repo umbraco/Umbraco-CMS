@@ -12,7 +12,7 @@ import { UmbWorkspaceUserContext } from './workspace-user.context';
 import { UmbContextProviderMixin, UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { ManifestWorkspaceAction, UserDetails } from '@umbraco-cms/models';
 
-import '@umbraco-cms/components/input-user-group/input-user-group.element';
+import 'src/backoffice/test/users/components/input-user-group/input-user-group.element';
 
 import { umbCurrentUserService } from 'src/core/services/current-user';
 import { UmbModalService } from '@umbraco-cms/services';

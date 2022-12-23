@@ -1,7 +1,7 @@
 import { css, html, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, query, state } from 'lit/decorators.js';
-import { UmbInputPickerUserGroupElement } from '@umbraco-cms/components/input-user-group/input-user-group.element';
+import { UmbInputPickerUserGroupElement } from 'src/backoffice/test/users/components/input-user-group/input-user-group.element';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { UserDetails } from '@umbraco-cms/models';
 import { UmbModalLayoutElement } from '@umbraco-cms/services';

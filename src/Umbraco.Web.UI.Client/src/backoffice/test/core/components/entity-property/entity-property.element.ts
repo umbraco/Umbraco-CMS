@@ -7,8 +7,8 @@ import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { ManifestPropertyEditorUI, ManifestTypes } from '@umbraco-cms/models';
 
-import '../../property-actions/shared/property-action-menu/property-action-menu.element';
-import '../../test/core/components/workspace/workspace-property-layout/workspace-property-layout.element';
+import '../../../../property-actions/shared/property-action-menu/property-action-menu.element';
+import '../workspace/workspace-property-layout/workspace-property-layout.element';
 
 /**
  *  @element umb-entity-property

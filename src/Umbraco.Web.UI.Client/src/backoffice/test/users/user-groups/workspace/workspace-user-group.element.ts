@@ -11,8 +11,8 @@ import type { ManifestWorkspaceAction, UserDetails, UserGroupDetails } from '@um
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbUserStore } from 'src/backoffice/test/users/users/user.store';
 
-import '@umbraco-cms/components/input-user/input-user.element';
-import '@umbraco-cms/components/input-section/input-section.element';
+import 'src/backoffice/test/users/components/input-user/input-user.element';
+import 'src/backoffice/test/core/components/input-section/input-section.element';
 
 @customElement('umb-workspace-user-group')
 export class UmbWorkspaceUserGroupElement extends UmbContextProviderMixin(

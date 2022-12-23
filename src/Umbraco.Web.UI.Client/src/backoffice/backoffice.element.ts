@@ -1,13 +1,13 @@
 //TODO: we need to figure out what components should be available for extensions and load them upfront
-import './components/ref-property-editor-ui/ref-property-editor-ui.element';
+import './test/core/components/ref-property-editor-ui/ref-property-editor-ui.element';
 import './components/backoffice-frame/backoffice-header.element';
 import './components/backoffice-frame/backoffice-main.element';
 import './components/backoffice-frame/backoffice-modal-container.element';
 import './components/backoffice-frame/backoffice-notification-container.element';
-import './components/content-property/content-property.element';
-import './components/table/table.element';
-import './components/shared/code-block.element';
-import './components/extension-slot/extension-slot.element';
+import './test/core/components/content-property/content-property.element';
+import './test/core/components/table/table.element';
+import './test/core/components/code-block/code-block.element';
+import './test/core/components/extension-slot/extension-slot.element';
 
 import './test/core/components/workspace/workspace-entity/workspace-entity.element';
 import './test/core/components/section/section-main/section-main.element';
@@ -22,6 +22,8 @@ import { css, html, LitElement } from 'lit';
 
 import { UmbModalService } from '../core/services/modal';
 import { UmbNotificationService } from '../core/services/notification';
+import { UmbIconStore } from '../core/stores/icon/icon.store';
+import { manifests as externalLoginProviderManifests } from '../auth/external-login-providers/manifests';
 import { UmbDataTypeStore } from './test/core/data-types/data-type.store';
 import { UmbDocumentTypeStore } from './test/documents/document-types/document-type.store';
 import { UmbMediaTypeStore } from './test/media/media-types/media-type.store';
@@ -31,7 +33,6 @@ import { UmbMediaStore } from './test/media/media/media.store';
 import { UmbMemberGroupStore } from './test/members/member-groups/member-group.store';
 import { UmbSectionStore } from './test/core/section.store';
 import { UmbUserStore } from './test/users/users/user.store';
-import { UmbIconStore } from '../core/stores/icon/icon.store';
 import { UmbUserGroupStore } from './test/users/user-groups/user-group.store';
 import { UmbCurrentUserHistoryStore } from './test/users/current-user/current-user-history.store';
 import { UmbDictionaryStore } from './test/translation/dictionary/dictionary.store';
@@ -43,10 +44,9 @@ import { manifests as propertyEditorUIManifests } from './property-editors/uis/m
 import { manifests as treeManifests } from './trees.manifest';
 import { manifests as editorManifests } from './workspaces.manifest';
 import { manifests as propertyActionManifests } from './property-actions/manifests';
-import { manifests as externalLoginProviderManifests } from '../auth/external-login-providers/manifests';
 import { manifests as userDashboards } from './test/users/current-user/user-dashboards/manifests';
-import { manifests as collectionBulkActionManifests } from './components/collection/bulk-actions/manifests';
-import { manifests as collectionViewManifests } from './components/collection/views/manifests';
+import { manifests as collectionBulkActionManifests } from './test/core/components/collection/bulk-actions/manifests';
+import { manifests as collectionViewManifests } from './test/core/components/collection/views/manifests';
 
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';

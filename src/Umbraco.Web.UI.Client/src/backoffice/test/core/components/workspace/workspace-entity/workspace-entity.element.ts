@@ -10,8 +10,8 @@ import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { ManifestWithMeta, ManifestWorkspaceView, ManifestWorkspaceViewCollection } from '@umbraco-cms/models';
 
-import '../../../../../components/body-layout/body-layout.element';
-import '../../../../../components/extension-slot/extension-slot.element';
+import '../../body-layout/body-layout.element';
+import '../../extension-slot/extension-slot.element';
 
 /**
  * @element umb-workspace-entity

@@ -4,7 +4,7 @@ import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { EMPTY, of, switchMap } from 'rxjs';
 
-import { UmbDataTypeStore } from '../../test/core/data-types/data-type.store';
+import { UmbDataTypeStore } from '../../data-types/data-type.store';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import type { ContentProperty, ManifestTypes } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';

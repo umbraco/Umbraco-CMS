@@ -6,9 +6,9 @@ import type { UmbWorkspaceNodeContext } from '../../../workspace-context/workspa
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 
-import 'src/backoffice/components/content-property/content-property.element';
+import 'src/backoffice/test/core/components/content-property/content-property.element';
 import 'src/backoffice/test/core/components/dashboard/collection/dashboard-collection.element';
-import { UmbCollectionContext } from '@umbraco-cms/components/collection/collection.context';
+import { UmbCollectionContext } from 'src/backoffice/test/core/components/collection/collection.context';
 import { UmbMediaStore, UmbMediaStoreItemType } from 'src/backoffice/test/media/media/media.store';
 
 @customElement('umb-workspace-view-collection')

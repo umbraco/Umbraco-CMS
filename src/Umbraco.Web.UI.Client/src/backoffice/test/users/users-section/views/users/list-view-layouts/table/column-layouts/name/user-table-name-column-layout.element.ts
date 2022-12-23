@@ -1,6 +1,6 @@
 import { html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import type { UmbTableColumn, UmbTableItem } from '../../../../../../../../../components/table/table.element';
+import type { UmbTableColumn, UmbTableItem } from '../../../../../../../../core/components/table/table.element';
 
 @customElement('umb-user-table-name-column-layout')
 export class UmbUserTableNameColumnLayoutElement extends LitElement {
