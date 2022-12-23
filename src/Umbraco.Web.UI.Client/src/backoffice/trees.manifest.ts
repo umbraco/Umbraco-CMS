@@ -4,8 +4,6 @@ import { manifests as dataTypeTreeManifests } from './core/data-types/tree/manif
 import { manifests as extensionTreeManifests } from './core/extensions/tree/manifests';
 import { manifests as languageTreeManifests } from './core/languages/tree/manifests';
 import { manifests as dictionaryTreeManifests } from './translation/dictionary/tree/dictionary-tree.manifest';
-import { manifests as documentBlueprintTreeManifests } from './documents/document-blueprints/tree/manifests';
-import { manifests as documentTypeTreeManifests } from './documents/document-types/tree/manifests';
 import { manifests as documentTreeManifests } from './documents/documents/tree/manifests';
 import { manifests as memberTypesTreeManifests } from './members/member-types/tree/manifests';
 import { manifests as memberGroupTreeManifests } from './members/member-groups/tree/manifests';
@@ -17,8 +15,6 @@ import type { ManifestTree, ManifestTreeItemAction } from '@umbraco-cms/models';
 export const manifests: Array<ManifestTree | ManifestTreeItemAction> = [
 	...dataTypeTreeManifests,
 	...dictionaryTreeManifests,
-	...documentBlueprintTreeManifests,
-	...documentTypeTreeManifests,
 	...documentTreeManifests,
 	...extensionTreeManifests,
 	...languageTreeManifests,

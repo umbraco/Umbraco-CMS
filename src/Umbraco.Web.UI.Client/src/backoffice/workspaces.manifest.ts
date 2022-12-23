@@ -32,15 +32,6 @@ export const manifests: Array<ManifestWorkspace> = [
 	},
 	{
 		type: 'workspace',
-		alias: 'Umb.Workspace.DocumentType',
-		name: 'Document Type Workspace',
-		loader: () => import('./documents/document-types/workspace/workspace-document-type.element'),
-		meta: {
-			entityType: 'document-type',
-		},
-	},
-	{
-		type: 'workspace',
 		alias: 'Umb.Workspace.MediaType',
 		name: 'Media Type Workspace',
 		loader: () => import('./media/media-types/workspace/workspace-media-type.element'),
@@ -127,15 +118,6 @@ export const manifests: Array<ManifestWorkspace> = [
 		loader: () => import('./core/languages/workspace/language-root/workspace-language-root.element'),
 		meta: {
 			entityType: 'language-root',
-		},
-	},
-	{
-		type: 'workspace',
-		alias: 'Umb.Workspace.DocumentBlueprintRoot',
-		name: 'Document Blueprint Root Workspace',
-		loader: () => import('./documents/document-blueprints/workspace/workspace-document-blueprint-root.element'),
-		meta: {
-			entityType: 'document-blueprint-root',
 		},
 	},
 ];
