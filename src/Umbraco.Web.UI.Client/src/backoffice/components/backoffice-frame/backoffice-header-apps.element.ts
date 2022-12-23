@@ -5,7 +5,6 @@ import { ManifestHeaderApp, umbExtensionsRegistry } from '@umbraco-cms/extension
 
 @customElement('umb-backoffice-header-apps')
 export class UmbBackofficeHeaderApps extends LitElement {
-	
 	static styles: CSSResultGroup = [
 		UUITextStyles,
 		css`
@@ -28,7 +27,7 @@ export class UmbBackofficeHeaderApps extends LitElement {
 				type: 'headerApp',
 				alias: 'Umb.HeaderApp.Search',
 				name: 'Header App Search',
-				loader: () => import('../../header-apps/header-app-button.element'),
+				loader: () => import('../../test/core/components/header-app/header-app-button.element'),
 				weight: 10,
 				meta: {
 					label: 'Search',
@@ -40,7 +39,7 @@ export class UmbBackofficeHeaderApps extends LitElement {
 				type: 'headerApp',
 				alias: 'Umb.HeaderApp.Favorites',
 				name: 'Header App Favorites',
-				loader: () => import('../../header-apps/header-app-button.element'),
+				loader: () => import('../../test/core/components/header-app/header-app-button.element'),
 				weight: 100,
 				meta: {
 					label: 'Favorites',
@@ -52,7 +51,7 @@ export class UmbBackofficeHeaderApps extends LitElement {
 				type: 'headerApp',
 				alias: 'Umb.HeaderApp.CurrentUser',
 				name: 'Current User',
-				loader: () => import('../../header-apps/header-app-current-user.element'),
+				loader: () => import('../../test/users/current-user-header-app/header-app-current-user.element'),
 				weight: 1000,
 				meta: {
 					label: 'TODO: how should we enable this to not be set.',
@@ -70,9 +69,7 @@ export class UmbBackofficeHeaderApps extends LitElement {
 	}
 
 	render() {
-		return html`
-			<umb-extension-slot id="apps" type="headerApp"></umb-extension-slot>
-		`;
+		return html` <umb-extension-slot id="apps" type="headerApp"></umb-extension-slot> `;
 	}
 }
 
