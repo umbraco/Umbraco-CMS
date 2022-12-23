@@ -43,7 +43,7 @@ import { manifests as propertyEditorUIManifests } from './property-editors/uis/m
 import { manifests as treeManifests } from './trees.manifest';
 import { manifests as editorManifests } from './workspaces.manifest';
 import { manifests as propertyActionManifests } from './property-actions/manifests';
-import { manifests as externalLoginProviderManifests } from './external-login-providers/manifests';
+import { manifests as externalLoginProviderManifests } from '../auth/external-login-providers/manifests';
 import { manifests as userDashboards } from './test/users/current-user/user-dashboards/manifests';
 import { manifests as collectionBulkActionManifests } from './components/collection/bulk-actions/manifests';
 import { manifests as collectionViewManifests } from './components/collection/views/manifests';

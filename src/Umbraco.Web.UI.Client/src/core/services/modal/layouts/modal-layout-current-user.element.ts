@@ -7,7 +7,7 @@ import type { ManifestExternalLoginProvider, ManifestUserDashboard, UserDetails 
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-import '../../../../backoffice/external-login-providers/external-login-provider-extension.element';
+import '../../../../auth/external-login-providers/external-login-provider-extension.element';
 import '../../../../backoffice/test/users/current-user/user-dashboards/user-dashboard-extension.element';
 import {
 	UmbCurrentUserHistoryStore,
