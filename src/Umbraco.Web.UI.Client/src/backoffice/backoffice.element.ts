@@ -43,7 +43,7 @@ import { manifests as propertyEditorModelManifests } from './test/core/property-
 import { manifests as propertyEditorUIManifests } from './test/core/property-editors/uis/manifests';
 import { manifests as treeManifests } from './trees.manifest';
 import { manifests as editorManifests } from './workspaces.manifest';
-import { manifests as propertyActionManifests } from './property-actions/manifests';
+import { manifests as propertyActionManifests } from './test/core/property-actions/manifests';
 import { manifests as userDashboards } from './test/users/current-user/user-dashboards/manifests';
 import { manifests as collectionBulkActionManifests } from './test/core/components/collection/bulk-actions/manifests';
 import { manifests as collectionViewManifests } from './test/core/components/collection/views/manifests';
