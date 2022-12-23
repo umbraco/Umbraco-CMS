@@ -7,7 +7,7 @@ import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/c
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 
 import 'src/backoffice/components/content-property/content-property.element';
-import 'src/backoffice/dashboards/collection/dashboard-collection.element';
+import 'src/backoffice/test/core/components/dashboard/collection/dashboard-collection.element';
 import { UmbCollectionContext } from '@umbraco-cms/components/collection/collection.context';
 import { UmbMediaStore, UmbMediaStoreItemType } from 'src/backoffice/test/media/media/media.store';
 

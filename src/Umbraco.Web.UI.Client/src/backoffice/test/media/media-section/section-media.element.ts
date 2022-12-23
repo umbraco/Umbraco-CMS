@@ -19,7 +19,7 @@ export class UmbSectionMedia extends LitElement {
 				type: 'dashboard',
 				alias: 'Umb.Dashboard.MediaManagement',
 				name: 'Media Dashboard',
-				loader: () => import('../../../dashboards/collection/dashboard-collection.element'),
+				loader: () => import('../../core/components/dashboard/collection/dashboard-collection.element'),
 				weight: 10,
 				meta: {
 					label: 'Media',

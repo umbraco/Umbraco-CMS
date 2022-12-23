@@ -109,7 +109,7 @@ export class UmbSectionDashboardsElement extends UmbContextConsumerMixin(UmbObse
 				path: `${dashboard.meta.pathname}`,
 				component: () => {
 					if (dashboard.type === 'dashboardCollection') {
-						return import('src/backoffice/dashboards/collection/dashboard-collection.element');
+						return import('src/backoffice/test/core/components/dashboard/collection/dashboard-collection.element');
 					}
 					return createExtensionElement(dashboard);
 				},
