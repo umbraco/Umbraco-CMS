@@ -8,7 +8,7 @@ import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import '../../../../backoffice/external-login-providers/external-login-provider-extension.element';
-import '../../../../backoffice/user-dashboards/user-dashboard-extension.element';
+import '../../../../backoffice/test/users/current-user/user-dashboards/user-dashboard-extension.element';
 import {
 	UmbCurrentUserHistoryStore,
 	UmbCurrentUserHistoryItem,
