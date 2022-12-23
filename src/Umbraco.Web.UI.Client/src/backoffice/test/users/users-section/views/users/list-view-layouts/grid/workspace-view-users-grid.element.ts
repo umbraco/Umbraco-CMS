@@ -8,7 +8,7 @@ import { getTagLookAndColor } from '../../../../../utils';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { UserDetails, UserEntity, UserGroupDetails, UserGroupEntity } from '@umbraco-cms/models';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import { UmbUserGroupStore } from 'src/core/stores/user/user-group.store';
+import { UmbUserGroupStore } from 'src/backoffice/test/users/user-groups/user-group.store';
 
 @customElement('umb-workspace-view-users-grid')
 export class UmbWorkspaceViewUsersGridElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {

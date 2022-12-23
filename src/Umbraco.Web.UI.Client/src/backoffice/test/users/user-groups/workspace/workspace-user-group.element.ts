@@ -9,7 +9,7 @@ import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import type { ManifestWorkspaceAction, UserDetails, UserGroupDetails } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-import { UmbUserStore } from '@umbraco-cms/stores/user/user.store';
+import { UmbUserStore } from 'src/backoffice/test/users/users/user.store';
 
 import '@umbraco-cms/components/input-user/input-user.element';
 import '@umbraco-cms/components/input-section/input-section.element';

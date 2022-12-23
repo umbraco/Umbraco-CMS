@@ -17,7 +17,7 @@ import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 
 import './column-layouts/name/user-table-name-column-layout.element';
 import './column-layouts/status/user-table-status-column-layout.element';
-import { UmbUserGroupStore } from 'src/core/stores/user/user-group.store';
+import { UmbUserGroupStore } from 'src/backoffice/test/users/user-groups/user-group.store';
 
 @customElement('umb-workspace-view-users-table')
 export class UmbWorkspaceViewUsersTableElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {

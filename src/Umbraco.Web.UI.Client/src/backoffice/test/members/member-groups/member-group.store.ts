@@ -1,5 +1,5 @@
 import { map, Observable } from 'rxjs';
-import { UmbNodeStoreBase } from '../store';
+import { UmbNodeStoreBase } from '../../../../core/stores/store';
 import { ApiError, EntityTreeItem, MemberGroupResource, ProblemDetails } from '@umbraco-cms/backend-api';
 import type { MemberGroupDetails } from '@umbraco-cms/models';
 
@@ -12,7 +12,6 @@ export type UmbMemberGroupStoreItemType = MemberGroupDetails | EntityTreeItem;
  * @description - Data Store for Member Groups
  */
 export class UmbMemberGroupStore extends UmbNodeStoreBase<UmbMemberGroupStoreItemType> {
-
 	public readonly storeAlias = 'umbMemberGroupStore';
 
 	getByKey(key: string): Observable<UmbMemberGroupStoreItemType | null> {

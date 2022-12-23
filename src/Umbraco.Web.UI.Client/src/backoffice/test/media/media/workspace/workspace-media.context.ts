@@ -1,5 +1,5 @@
 import { UmbWorkspaceNodeContext } from '../../../../test/core/components/workspace/workspace-context/workspace-node.context';
-import type { UmbMediaStore, UmbMediaStoreItemType } from '@umbraco-cms/stores/media/media.store';
+import type { UmbMediaStore, UmbMediaStoreItemType } from 'src/backoffice/test/media/media/media.store';
 
 const DefaultMediaData = {
 	key: '',

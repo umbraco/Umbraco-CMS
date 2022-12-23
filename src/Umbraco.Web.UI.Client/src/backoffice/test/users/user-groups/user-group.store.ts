@@ -1,5 +1,5 @@
 import { map, Observable } from 'rxjs';
-import { UmbDataStoreBase } from '../store';
+import { UmbDataStoreBase } from '../../../../core/stores/store';
 import type { UserGroupDetails, UserGroupEntity } from '@umbraco-cms/models';
 
 // TODO: get rid of this type addition & { ... }:
@@ -12,8 +12,6 @@ export type UmbUserGroupStoreItemType = UserGroupDetails & { users?: Array<strin
  * @description - Data Store for Users
  */
 export class UmbUserGroupStore extends UmbDataStoreBase<UmbUserGroupStoreItemType> {
-
-
 	public readonly storeAlias = 'umbUserGroupStore';
 
 	getAll(): Observable<Array<UmbUserGroupStoreItemType>> {
@@ -54,14 +52,16 @@ export class UmbUserGroupStore extends UmbDataStoreBase<UmbUserGroupStoreItemTyp
 			});
 
 		return this.items.pipe(
-			map((items: Array<UmbUserGroupStoreItemType>) => items.filter((node: UmbUserGroupStoreItemType) => keys.includes(node.key)))
+			map((items: Array<UmbUserGroupStoreItemType>) =>
+				items.filter((node: UmbUserGroupStoreItemType) => keys.includes(node.key))
+			)
 		);
 	}
 
 	async save(userGroups: Array<UmbUserGroupStoreItemType>): Promise<void> {
 		// TODO: use Fetcher API.
 
-		// TODO: implement so user group store updates the 
+		// TODO: implement so user group store updates the
 		/*
 		if (this._userStore && userGroup.users) {
 			await this._userStore.updateUserGroup(userGroup.users, userGroup.key);

@@ -1,5 +1,5 @@
 import { map, Observable } from 'rxjs';
-import { UmbDataStoreBase } from '../store';
+import { UmbDataStoreBase } from '../../../../core/stores/store';
 import type { MediaDetails } from '@umbraco-cms/models';
 import { ApiError, ContentTreeItem, MediaResource, ProblemDetails } from '@umbraco-cms/backend-api';
 
@@ -17,7 +17,6 @@ export type UmbMediaStoreItemType = MediaDetails | ContentTreeItem;
  * @description - Data Store for Media
  */
 export class UmbMediaStore extends UmbDataStoreBase<UmbMediaStoreItemType> {
-
 	public readonly storeAlias = 'umbMediaStore';
 
 	getByKey(key: string): Observable<MediaDetails | null> {
@@ -27,8 +26,10 @@ export class UmbMediaStore extends UmbDataStoreBase<UmbMediaStoreItemType> {
 			.then((data) => {
 				this.updateItems(data);
 			});
-			
-		return this.items.pipe(map((media) => media.find((media) => media.key === key && isMediaDetails(media)) as MediaDetails || null));
+
+		return this.items.pipe(
+			map((media) => (media.find((media) => media.key === key && isMediaDetails(media)) as MediaDetails) || null)
+		);
 	}
 
 	// TODO: make sure UI somehow can follow the status of this action.
@@ -58,20 +59,20 @@ export class UmbMediaStore extends UmbDataStoreBase<UmbMediaStoreItemType> {
 			});
 	}
 
-		// TODO: how do we handle trashed items?
-		async trash(keys: Array<string>) {
-			// fetch from server and update store
-			// TODO: Use node type to hit the right API, or have a general Node API?
-			const res = await fetch('/umbraco/management/api/v1/media/trash', {
-				method: 'POST',
-				body: JSON.stringify(keys),
-				headers: {
-					'Content-Type': 'application/json',
-				},
-			});
-			const data = await res.json();
-			this.updateItems(data);
-		}
+	// TODO: how do we handle trashed items?
+	async trash(keys: Array<string>) {
+		// fetch from server and update store
+		// TODO: Use node type to hit the right API, or have a general Node API?
+		const res = await fetch('/umbraco/management/api/v1/media/trash', {
+			method: 'POST',
+			body: JSON.stringify(keys),
+			headers: {
+				'Content-Type': 'application/json',
+			},
+		});
+		const data = await res.json();
+		this.updateItems(data);
+	}
 
 	getTreeRoot(): Observable<Array<ContentTreeItem>> {
 		MediaResource.getTreeMediaRoot({}).then(
@@ -87,7 +88,7 @@ export class UmbMediaStore extends UmbDataStoreBase<UmbMediaStoreItemType> {
 				}
 			}
 		);
-		
+
 		// TODO: how do we handle trashed items?
 		// TODO: remove ignore when we know how to handle trashed items.
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -111,7 +112,7 @@ export class UmbMediaStore extends UmbDataStoreBase<UmbMediaStoreItemType> {
 				}
 			}
 		);
-		
+
 		// TODO: how do we handle trashed items?
 		// TODO: remove ignore when we know how to handle trashed items.
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment

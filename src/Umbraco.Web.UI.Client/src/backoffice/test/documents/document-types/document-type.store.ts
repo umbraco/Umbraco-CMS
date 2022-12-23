@@ -1,9 +1,11 @@
 import { map, Observable } from 'rxjs';
-import { UmbDataStoreBase } from '../store';
+import { UmbDataStoreBase } from '../../../../core/stores/store';
 import { ApiError, DocumentTypeResource, DocumentTypeTreeItem, ProblemDetails } from '@umbraco-cms/backend-api';
 import type { DocumentTypeDetails } from '@umbraco-cms/models';
 
-const isDocumentTypeDetails = (documentType: DocumentTypeDetails | DocumentTypeTreeItem): documentType is DocumentTypeDetails => {
+const isDocumentTypeDetails = (
+	documentType: DocumentTypeDetails | DocumentTypeTreeItem
+): documentType is DocumentTypeDetails => {
 	return (documentType as DocumentTypeDetails).properties !== undefined;
 };
 
@@ -16,7 +18,6 @@ export type UmbDocumentTypeStoreItemType = DocumentTypeDetails | DocumentTypeTre
  * @description - Data Store for Document Types
  */
 export class UmbDocumentTypeStore extends UmbDataStoreBase<UmbDocumentTypeStoreItemType> {
-
 	public readonly storeAlias = 'umbDocumentTypeStore';
 
 	getByKey(key: string): Observable<DocumentTypeDetails | null> {
@@ -29,7 +30,12 @@ export class UmbDocumentTypeStore extends UmbDataStoreBase<UmbDocumentTypeStoreI
 			});
 
 		return this.items.pipe(
-			map((documentTypes) => documentTypes.find((documentType) => documentType.key === key && isDocumentTypeDetails(documentType)) as DocumentTypeDetails || null)
+			map(
+				(documentTypes) =>
+					(documentTypes.find(
+						(documentType) => documentType.key === key && isDocumentTypeDetails(documentType)
+					) as DocumentTypeDetails) || null
+			)
 		);
 	}
 

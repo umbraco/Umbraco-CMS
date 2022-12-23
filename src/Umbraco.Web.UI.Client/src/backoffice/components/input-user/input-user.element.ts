@@ -4,7 +4,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { UmbInputListBase } from '../input-list-base/input-list-base';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import type { UserEntity } from '@umbraco-cms/models';
-import { UmbUserStore } from '@umbraco-cms/stores/user/user.store';
+import { UmbUserStore } from 'src/backoffice/test/users/users/user.store';
 
 @customElement('umb-input-user')
 export class UmbPickerUserElement extends UmbObserverMixin(UmbInputListBase) {

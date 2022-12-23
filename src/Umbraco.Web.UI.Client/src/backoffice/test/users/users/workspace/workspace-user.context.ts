@@ -1,5 +1,5 @@
 import { UmbWorkspaceNodeContext } from '../../../../test/core/components/workspace/workspace-context/workspace-node.context';
-import type { UmbUserStore, UmbUserStoreItemType } from '@umbraco-cms/stores/user/user.store';
+import type { UmbUserStore, UmbUserStoreItemType } from 'src/backoffice/test/users/users/user.store';
 
 const DefaultDataTypeData = {
 	key: '',

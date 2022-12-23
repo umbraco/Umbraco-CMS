@@ -1,5 +1,5 @@
 import { map, Observable } from 'rxjs';
-import { UmbDataStoreBase } from '../store';
+import { UmbDataStoreBase } from '../../../../core/stores/store';
 import { ApiError, DictionaryResource, EntityTreeItem, ProblemDetails } from '@umbraco-cms/backend-api';
 
 /**
@@ -9,7 +9,6 @@ import { ApiError, DictionaryResource, EntityTreeItem, ProblemDetails } from '@u
  * @description - Data Store for Dictionary Items.
  */
 export class UmbDictionaryStore extends UmbDataStoreBase<EntityTreeItem> {
-
 	public readonly storeAlias = 'umbDictionaryStore';
 
 	/**

@@ -1,5 +1,5 @@
 import { map, Observable } from 'rxjs';
-import { UmbDataStoreBase } from '../store';
+import { UmbDataStoreBase } from '../../../../core/stores/store';
 import type { DataTypeDetails } from '@umbraco-cms/models';
 import { ApiError, DataTypeResource, FolderTreeItem, ProblemDetails } from '@umbraco-cms/backend-api';
 
@@ -17,7 +17,6 @@ export type UmbDataTypeStoreItemType = DataTypeDetails | FolderTreeItem;
  * @description - Data Store for Data Types
  */
 export class UmbDataTypeStore extends UmbDataStoreBase<UmbDataTypeStoreItemType> {
-
 	public readonly storeAlias = 'umbDataTypeStore';
 
 	/**
@@ -34,7 +33,12 @@ export class UmbDataTypeStore extends UmbDataStoreBase<UmbDataTypeStoreItemType>
 				this.updateItems(data);
 			});
 
-		return this.items.pipe(map((dataTypes) => dataTypes.find((dataType) => dataType.key === key && isDataTypeDetails(dataType)) as DataTypeDetails || null));
+		return this.items.pipe(
+			map(
+				(dataTypes) =>
+					(dataTypes.find((dataType) => dataType.key === key && isDataTypeDetails(dataType)) as DataTypeDetails) || null
+			)
+		);
 	}
 
 	/**
@@ -101,7 +105,7 @@ export class UmbDataTypeStore extends UmbDataStoreBase<UmbDataTypeStoreItemType>
 
 		return this.items.pipe(map((items) => items.filter((item) => item.parentKey === null)));
 	}
-	
+
 	/**
 	 * @description - Get the children of a tree item.
 	 * @param {string} key

@@ -9,10 +9,12 @@ import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import 'src/backoffice/components/content-property/content-property.element';
 import 'src/backoffice/dashboards/collection/dashboard-collection.element';
 import { UmbCollectionContext } from '@umbraco-cms/components/collection/collection.context';
-import { UmbMediaStore, UmbMediaStoreItemType } from '@umbraco-cms/stores/media/media.store';
+import { UmbMediaStore, UmbMediaStoreItemType } from 'src/backoffice/test/media/media/media.store';
 
 @customElement('umb-workspace-view-collection')
-export class UmbWorkspaceViewCollectionElement extends UmbContextProviderMixin(UmbContextConsumerMixin(UmbObserverMixin(LitElement))) {
+export class UmbWorkspaceViewCollectionElement extends UmbContextProviderMixin(
+	UmbContextConsumerMixin(UmbObserverMixin(LitElement))
+) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -25,8 +27,7 @@ export class UmbWorkspaceViewCollectionElement extends UmbContextProviderMixin(U
 
 	private _workspaceContext?: UmbWorkspaceNodeContext;
 
-	private _collectionContext?:UmbCollectionContext<UmbMediaStoreItemType, UmbMediaStore>;
-	
+	private _collectionContext?: UmbCollectionContext<UmbMediaStoreItemType, UmbMediaStore>;
 
 	constructor() {
 		super();
@@ -43,20 +44,22 @@ export class UmbWorkspaceViewCollectionElement extends UmbContextProviderMixin(U
 		this._collectionContext?.connectedCallback();
 	}
 	disconnectedCallback(): void {
-		super.connectedCallback()
+		super.connectedCallback();
 		// TODO: avoid this connection, our own approach on Lit-Controller could be handling this case.
 		this._collectionContext?.disconnectedCallback();
 	}
 
 	protected _provideWorkspace() {
-		if(this._workspaceContext?.entityKey != null) {
-			this._collectionContext = new UmbCollectionContext(this, this._workspaceContext.entityKey, this._workspaceContext.getStore().storeAlias);
+		if (this._workspaceContext?.entityKey != null) {
+			this._collectionContext = new UmbCollectionContext(
+				this,
+				this._workspaceContext.entityKey,
+				this._workspaceContext.getStore().storeAlias
+			);
 			this._collectionContext.connectedCallback();
 			this.provideContext('umbCollectionContext', this._collectionContext);
 		}
 	}
-
-	
 
 	render() {
 		return html`<umb-collection entityType=${ifDefined(this._workspaceContext?.entityType)}></umb-collection>`;

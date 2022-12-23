@@ -1,8 +1,7 @@
 import { map, Observable } from 'rxjs';
-import { UmbNodeStoreBase } from '../store';
+import { UmbNodeStoreBase } from '../../../../core/stores/store';
 import { MediaTypeResource, ApiError, ProblemDetails, FolderTreeItem } from '@umbraco-cms/backend-api';
 import type { MediaTypeDetails } from '@umbraco-cms/models';
-
 
 export type UmbMediaTypeStoreItemType = MediaTypeDetails | FolderTreeItem;
 /**
@@ -12,7 +11,6 @@ export type UmbMediaTypeStoreItemType = MediaTypeDetails | FolderTreeItem;
  * @description - Data Store for Media Types
  */
 export class UmbMediaTypeStore extends UmbNodeStoreBase<UmbMediaTypeStoreItemType> {
-
 	public readonly storeAlias = 'umbMediaTypeStore';
 
 	/**
@@ -60,7 +58,6 @@ export class UmbMediaTypeStore extends UmbNodeStoreBase<UmbMediaTypeStoreItemTyp
 		*/
 		return null as any;
 	}
-
 
 	getTreeRoot(): Observable<Array<FolderTreeItem>> {
 		MediaTypeResource.getTreeMediaTypeRoot({}).then(

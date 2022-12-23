@@ -5,7 +5,7 @@ import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import type { ManifestTreeItemAction } from '@umbraco-cms/models';
 
 import '../../components/tree/navigator/tree-navigator.element';
-import { UmbDataTypeStore } from '@umbraco-cms/stores/data-type/data-type.store';
+import { UmbDataTypeStore } from 'src/backoffice/test/core/data-types/data-type.store';
 
 @customElement('umb-tree-data-types')
 export class UmbTreeDataTypesElement extends UmbContextProviderMixin(UmbContextConsumerMixin(LitElement)) {

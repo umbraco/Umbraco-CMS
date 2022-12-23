@@ -1,5 +1,5 @@
 import { BehaviorSubject, map, Observable } from 'rxjs';
-import { UmbDataStoreBase } from '../store';
+import { UmbDataStoreBase } from '../../../../core/stores/store';
 import type { UserDetails } from '@umbraco-cms/models';
 
 export type UmbUserStoreItemType = UserDetails;
@@ -11,10 +11,7 @@ export type UmbUserStoreItemType = UserDetails;
  * @description - Data Store for Users
  */
 export class UmbUserStore extends UmbDataStoreBase<UmbUserStoreItemType> {
-
-
 	public readonly storeAlias = 'umbUserStore';
-
 
 	private _totalUsers: BehaviorSubject<number> = new BehaviorSubject(0);
 	public readonly totalUsers: Observable<number> = this._totalUsers.asObservable();
@@ -151,7 +148,6 @@ export class UmbUserStore extends UmbDataStoreBase<UmbUserStoreItemType> {
 			});
 
 			this.updateItems(storedUsers);
-			
 		} catch (error) {
 			console.error('Remove user group failed', error);
 		}
@@ -214,7 +210,12 @@ export class UmbUserStore extends UmbDataStoreBase<UmbUserStoreItemType> {
 		}
 	}
 
-	async invite(name: string, email: string, message: string, userGroups: Array<string>): Promise<UmbUserStoreItemType | null> {
+	async invite(
+		name: string,
+		email: string,
+		message: string,
+		userGroups: Array<string>
+	): Promise<UmbUserStoreItemType | null> {
 		// TODO: use Fetcher API.
 		try {
 			const res = await fetch('/umbraco/backoffice/users/invite', {

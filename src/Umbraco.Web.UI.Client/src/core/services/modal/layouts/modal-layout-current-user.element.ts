@@ -9,7 +9,10 @@ import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import '../../../../backoffice/external-login-providers/external-login-provider-extension.element';
 import '../../../../backoffice/user-dashboards/user-dashboard-extension.element';
-import { UmbCurrentUserHistoryStore, UmbCurrentUserHistoryItem } from '@umbraco-cms/stores/current-user-history/current-user-history.store';
+import {
+	UmbCurrentUserHistoryStore,
+	UmbCurrentUserHistoryItem,
+} from 'src/backoffice/test/users/current-user/current-user-history.store';
 
 @customElement('umb-modal-layout-current-user')
 export class UmbModalLayoutCurrentUserElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
@@ -125,7 +128,7 @@ export class UmbModalLayoutCurrentUserElement extends UmbContextConsumerMixin(Um
 		});
 	}
 	private async _observeHistory() {
-		if(this._currentUserHistoryStore) {
+		if (this._currentUserHistoryStore) {
 			this.observe<Array<UmbCurrentUserHistoryItem>>(this._currentUserHistoryStore.getLatestHistory(), (history) => {
 				this._history = history;
 			});

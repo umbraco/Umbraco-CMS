@@ -9,7 +9,6 @@ import { umbCurrentUserService } from 'src/core/services/current-user';
 
 @customElement('umb-header-app-current-user')
 export class UmbHeaderAppCurrentUser extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
-
 	static styles: CSSResultGroup = [
 		UUITextStyles,
 		css`
@@ -41,7 +40,6 @@ export class UmbHeaderAppCurrentUser extends UmbContextConsumerMixin(UmbObserver
 	private _handleUserClick() {
 		this._modalService?.userSettings();
 	}
-
 
 	render() {
 		return html`

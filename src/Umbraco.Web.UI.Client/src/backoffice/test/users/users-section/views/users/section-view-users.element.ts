@@ -12,7 +12,7 @@ import './workspace-view-users-selection.element';
 import './workspace-view-users-invite.element';
 import type { ManifestWorkspace, UserDetails } from '@umbraco-cms/models';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import { UmbUserStore } from 'src/core/stores/user/user.store';
+import { UmbUserStore } from 'src/backoffice/test/users/users/user.store';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
 
 @customElement('umb-section-view-users')
@@ -60,30 +60,28 @@ export class UmbSectionViewUsersElement extends UmbContextProviderMixin(
 	}
 
 	private _createRoutes() {
-
 		const routes: any[] = [
 			{
 				path: 'overview',
 				component: () => import('./workspace-view-users-overview.element'),
 			},
 		];
-		
+
 		// TODO: find a way to make this reuseable across:
-		this._workspaces?.map((workspace:ManifestWorkspace) => {
+		this._workspaces?.map((workspace: ManifestWorkspace) => {
 			routes.push({
 				path: `${workspace.meta.entityType}/:key`,
 				component: () => createExtensionElement(workspace),
 				setup: (component: Promise<HTMLElement>, info: IRoutingInfo) => {
 					component.then((el: HTMLElement) => {
 						(el as any).entityKey = info.match.params.key;
-					})
-					
+					});
 				},
-			})
+			});
 			routes.push({
 				path: workspace.meta.entityType,
-				component: () => createExtensionElement(workspace)
-			})
+				component: () => createExtensionElement(workspace),
+			});
 		});
 
 		routes.push({

@@ -2,7 +2,7 @@ import { UmbWorkspaceNodeContext } from '../../../core/components/workspace/work
 import {
 	UmbDocumentTypeStore,
 	UmbDocumentTypeStoreItemType,
-} from '@umbraco-cms/stores/document-type/document-type.store';
+} from 'src/backoffice/test/documents/document-types/document-type.store';
 
 const DefaultDocumentTypeData = {
 	key: '',

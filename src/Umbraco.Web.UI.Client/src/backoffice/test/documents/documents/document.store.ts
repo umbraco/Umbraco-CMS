@@ -1,5 +1,5 @@
 import { map, Observable } from 'rxjs';
-import { UmbNodeStoreBase } from '../store';
+import { UmbNodeStoreBase } from '../../../../core/stores/store';
 import type { DocumentDetails } from '@umbraco-cms/models';
 import { ApiError, DocumentResource, DocumentTreeItem, FolderTreeItem, ProblemDetails } from '@umbraco-cms/backend-api';
 
@@ -7,7 +7,7 @@ const isDocumentDetails = (document: DocumentDetails | DocumentTreeItem): docume
 	return (document as DocumentDetails).data !== undefined;
 };
 
-export type UmbDocumentStoreItemType = DocumentDetails | DocumentTreeItem
+export type UmbDocumentStoreItemType = DocumentDetails | DocumentTreeItem;
 
 /**
  * @export
@@ -16,7 +16,6 @@ export type UmbDocumentStoreItemType = DocumentDetails | DocumentTreeItem
  * @description - Data Store for Documents
  */
 export class UmbDocumentStore extends UmbNodeStoreBase<UmbDocumentStoreItemType> {
-
 	public readonly storeAlias = 'umbDocumentStore';
 
 	getByKey(key: string): Observable<DocumentDetails | null> {
@@ -26,8 +25,13 @@ export class UmbDocumentStore extends UmbNodeStoreBase<UmbDocumentStoreItemType>
 			.then((data) => {
 				this.updateItems(data);
 			});
-			
-		return this.items.pipe(map((documents) => documents.find((document) => document.key === key && isDocumentDetails(document)) as DocumentDetails || null));
+
+		return this.items.pipe(
+			map(
+				(documents) =>
+					(documents.find((document) => document.key === key && isDocumentDetails(document)) as DocumentDetails) || null
+			)
+		);
 	}
 
 	// TODO: make sure UI somehow can follow the status of this action.
@@ -85,7 +89,7 @@ export class UmbDocumentStore extends UmbNodeStoreBase<UmbDocumentStoreItemType>
 				}
 			}
 		);
-		
+
 		// TODO: how do we handle trashed items?
 		// TODO: remove ignore when we know how to handle trashed items.
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -109,7 +113,7 @@ export class UmbDocumentStore extends UmbNodeStoreBase<UmbDocumentStoreItemType>
 				}
 			}
 		);
-		
+
 		// TODO: how do we handle trashed items?
 		// TODO: remove ignore when we know how to handle trashed items.
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment

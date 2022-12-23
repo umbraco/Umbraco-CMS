@@ -1,9 +1,9 @@
 import { map, Observable } from 'rxjs';
-import { UmbDataStoreBase } from '../store';
+import { UmbDataStoreBase } from '../../../../core/stores/store';
 import { MemberTypeResource, ApiError, EntityTreeItem, ProblemDetails } from '@umbraco-cms/backend-api';
 import type { MemberTypeDetails } from '@umbraco-cms/models';
 
-export type UmbMemberTypeStoreItemType = MemberTypeDetails | EntityTreeItem
+export type UmbMemberTypeStoreItemType = MemberTypeDetails | EntityTreeItem;
 
 /**
  * @export
@@ -12,9 +12,8 @@ export type UmbMemberTypeStoreItemType = MemberTypeDetails | EntityTreeItem
  * @description - Data Store for Member Types
  */
 export class UmbMemberTypeStore extends UmbDataStoreBase<UmbMemberTypeStoreItemType> {
-
 	public readonly storeAlias = 'umbMemberTypeStore';
-	 
+
 	getByKey(key: string): Observable<UmbMemberTypeStoreItemType | null> {
 		return null as any;
 	}
@@ -22,7 +21,6 @@ export class UmbMemberTypeStore extends UmbDataStoreBase<UmbMemberTypeStoreItemT
 	async save(mediaTypes: Array<UmbMemberTypeStoreItemType>): Promise<void> {
 		return null as any;
 	}
-
 
 	getTreeRoot(): Observable<Array<EntityTreeItem>> {
 		MemberTypeResource.getTreeMemberTypeRoot({}).then(

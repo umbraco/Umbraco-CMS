@@ -5,7 +5,7 @@ import { ifDefined } from 'lit-html/directives/if-defined.js';
 import type { UmbModalService } from 'src/core/services/modal';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-import { UmbDocumentStore } from 'src/core/stores/document/document.store';
+import { UmbDocumentStore } from 'src/backoffice/test/documents/documents/document.store';
 import { FolderTreeItem } from '@umbraco-cms/backend-api';
 
 // TODO: rename to Document Picker

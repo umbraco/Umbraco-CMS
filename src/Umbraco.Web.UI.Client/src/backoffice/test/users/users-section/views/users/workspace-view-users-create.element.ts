@@ -6,7 +6,7 @@ import { UmbInputPickerUserGroupElement } from '@umbraco-cms/components/input-us
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { UserDetails } from '@umbraco-cms/models';
 import { UmbModalLayoutElement, UmbNotificationDefaultData, UmbNotificationService } from '@umbraco-cms/services';
-import { UmbUserStore } from '@umbraco-cms/stores/user/user.store';
+import { UmbUserStore } from 'src/backoffice/test/users/users/user.store';
 
 export type UsersViewType = 'list' | 'grid';
 @customElement('umb-workspace-view-users-create')

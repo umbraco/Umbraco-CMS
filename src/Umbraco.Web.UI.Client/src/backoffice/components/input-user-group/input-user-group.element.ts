@@ -4,7 +4,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { UmbInputListBase } from '../input-list-base/input-list-base';
 import type { UserGroupEntity } from '@umbraco-cms/models';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import { UmbUserGroupStore } from '@umbraco-cms/stores/user/user-group.store';
+import { UmbUserGroupStore } from 'src/backoffice/test/users/user-groups/user-group.store';
 
 @customElement('umb-input-user-group')
 export class UmbInputPickerUserGroupElement extends UmbObserverMixin(UmbInputListBase) {
