@@ -1,5 +1,5 @@
 import { state } from 'lit/decorators.js';
-import { UmbModalLayoutElement } from '@umbraco-cms/services';
+import { UmbModalLayoutElement } from '../';
 
 export interface UmbPickerData<selectType = string> {
 	multiple: boolean;
@@ -7,7 +7,6 @@ export interface UmbPickerData<selectType = string> {
 }
 
 export class UmbModalLayoutPickerBase<selectType = string> extends UmbModalLayoutElement<UmbPickerData<selectType>> {
-	
 	@state()
 	private _selection: Array<selectType> = [];
 

@@ -1,8 +1,8 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, CSSResultGroup, html, LitElement, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { umbCurrentUserService } from '../../../../../../core/services/current-user';
-import { UmbModalHandler, UmbModalService } from '@umbraco-cms/services';
+import { UmbModalHandler, UmbModalService } from '../../modal';
+import { umbCurrentUserService } from 'src/backoffice/test/users/current-user/current-user.service';
 import type { ManifestExternalLoginProvider, ManifestUserDashboard, UserDetails } from '@umbraco-cms/models';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';

@@ -14,8 +14,8 @@ import type { ManifestWorkspaceAction, UserDetails } from '@umbraco-cms/models';
 
 import 'src/backoffice/test/users/components/input-user-group/input-user-group.element';
 
-import { umbCurrentUserService } from 'src/core/services/current-user';
-import { UmbModalService } from '@umbraco-cms/services';
+import { umbCurrentUserService } from 'src/backoffice/test/users/current-user/current-user.service';
+import { UmbModalService } from 'src/backoffice/test/core/services/modal';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 

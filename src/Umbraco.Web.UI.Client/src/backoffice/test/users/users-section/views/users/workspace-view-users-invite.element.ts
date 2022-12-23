@@ -4,7 +4,7 @@ import { customElement, query, state } from 'lit/decorators.js';
 import { UmbInputPickerUserGroupElement } from 'src/backoffice/test/users/components/input-user-group/input-user-group.element';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { UserDetails } from '@umbraco-cms/models';
-import { UmbModalLayoutElement } from '@umbraco-cms/services';
+import { UmbModalLayoutElement } from 'src/backoffice/test/core/services/modal';
 import { UmbUserStore } from 'src/backoffice/test/users/users/user.store';
 
 export type UsersViewType = 'list' | 'grid';

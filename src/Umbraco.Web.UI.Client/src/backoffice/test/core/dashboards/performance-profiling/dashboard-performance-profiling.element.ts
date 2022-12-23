@@ -2,9 +2,10 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
+import { UmbNotificationService } from '../../services/notification';
+import { UmbNotificationDefaultData } from '../../services/notification/layouts/default';
 import { ApiError, ProblemDetails, ProfilingResource } from '@umbraco-cms/backend-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-import { UmbNotificationDefaultData, UmbNotificationService } from '@umbraco-cms/services';
 
 @customElement('umb-dashboard-performance-profiling')
 export class UmbDashboardPerformanceProfilingElement extends UmbContextConsumerMixin(LitElement) {

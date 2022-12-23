@@ -8,7 +8,7 @@ import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import type { DocumentTypeDetails, ManifestTypes } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-import { UmbModalService } from '@umbraco-cms/services';
+import { UmbModalService } from 'src/backoffice/test/core/services/modal';
 
 import '../../../../property-editors/uis/icon-picker/property-editor-ui-icon-picker.element';
 

@@ -4,8 +4,8 @@ import { customElement, state } from 'lit/decorators.js';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import type { UserDetails } from '@umbraco-cms/models';
-import { UmbModalService } from '@umbraco-cms/services';
-import { umbCurrentUserService } from 'src/core/services/current-user';
+import { UmbModalService } from 'src/backoffice/test/core/services/modal';
+import { umbCurrentUserService } from 'src/backoffice/test/users/current-user/current-user.service';
 
 @customElement('umb-header-app-current-user')
 export class UmbHeaderAppCurrentUser extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
