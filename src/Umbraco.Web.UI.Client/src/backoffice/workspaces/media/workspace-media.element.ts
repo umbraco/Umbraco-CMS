@@ -103,8 +103,8 @@ export class UmbWorkspaceMediaElement extends UmbContextConsumerMixin(UmbContext
 			},
 			{
 				type: 'workspaceAction',
-				alias: 'Umb.WorkspaceAction.Document.Save',
-				name: 'Save Document Workspace Action',
+				alias: 'Umb.WorkspaceAction.Media.Save',
+				name: 'Save Media Workspace Action',
 				loader: () => import('../shared/actions/save/workspace-action-node-save.element'),
 				meta: {
 					workspaces: ['Umb.Workspace.Media'],
