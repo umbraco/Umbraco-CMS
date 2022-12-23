@@ -1,3 +1,5 @@
+// TODO: temp file until we have a way to register from each extension
+
 import { manifests as contentSectionManifests } from './test/documents/content-section/manifests';
 import { manifests as mediaSectionManifests } from './test/media/media-section/manifests';
 import { manifests as memberSectionManifests } from './test/members/members-section/manifests';

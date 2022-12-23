@@ -1,3 +1,5 @@
+// TODO: temp file until we have a way to register from each extension
+
 import { manifests as dataTypeTreeManifests } from './test/core/data-types/tree/manifests';
 import { manifests as extensionTreeManifests } from './test/core/extensions/tree/manifests';
 import { manifests as languageTreeManifests } from './test/core/languages/tree/manifests';

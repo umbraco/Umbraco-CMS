@@ -75,6 +75,7 @@ export class UmbBackofficeElement extends UmbContextConsumerMixin(UmbContextProv
 	constructor() {
 		super();
 
+		// TODO: this needs to happen in each domain
 		this._registerExtensions(sectionManifests);
 		this._registerExtensions(treeManifests);
 		this._registerExtensions(editorManifests);
@@ -88,6 +89,7 @@ export class UmbBackofficeElement extends UmbContextConsumerMixin(UmbContextProv
 
 		this._umbIconRegistry.attach(this);
 
+		// TODO: find a way this is possible outside this element. It needs to be possible to register stores in extensions
 		this.provideContext('umbDocumentStore', new UmbDocumentStore());
 		this.provideContext('umbMediaStore', new UmbMediaStore());
 		this.provideContext('umbDataTypeStore', new UmbDataTypeStore());

@@ -1,3 +1,5 @@
+// TODO: temp file until we have a way to register from each extension
+
 import type { ManifestWorkspace } from '@umbraco-cms/models';
 
 export const manifests: Array<ManifestWorkspace> = [
