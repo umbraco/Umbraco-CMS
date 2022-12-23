@@ -27,7 +27,7 @@ export class UmbWorkspaceActionNodeSaveElement extends UmbContextConsumerMixin(L
 		);
 	}
 
-	private async _handleSave() {
+	private async _onSave() {
 		if (!this._workspaceContext) return;
 
 		this._saveButtonState = 'waiting';
@@ -40,7 +40,7 @@ export class UmbWorkspaceActionNodeSaveElement extends UmbContextConsumerMixin(L
 
 	render() {
 		return html`<uui-button
-			@click=${this._handleSave}
+			@click=${this._onSave}
 			look=${this.manifest?.meta.look || 'default'}
 			color=${this.manifest?.meta.color || 'default'}
 			label=${this.manifest?.meta.label || 'Save'}
