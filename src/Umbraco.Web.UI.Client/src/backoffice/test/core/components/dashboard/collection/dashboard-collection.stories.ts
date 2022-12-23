@@ -1,8 +1,8 @@
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit-html';
 
-import type { UmbDashboardCollectionElement } from './collection/dashboard-collection.element';
-import './collection/dashboard-collection.element';
+import type { UmbDashboardCollectionElement } from './dashboard-collection.element';
+import './dashboard-collection.element';
 
 export default {
 	title: 'Dashboards/Media Management',
