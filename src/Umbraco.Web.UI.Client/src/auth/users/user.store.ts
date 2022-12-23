@@ -1,5 +1,5 @@
 import { BehaviorSubject, map, Observable } from 'rxjs';
-import { UmbDataStoreBase } from '../../backoffice/test/core/stores/store';
+import { UmbDataStoreBase } from '../../backoffice/core/stores/store';
 import type { UserDetails } from '@umbraco-cms/models';
 
 export type UmbUserStoreItemType = UserDetails;

@@ -12,7 +12,7 @@ import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbUserStore } from 'src/auth/users/user.store';
 
 import 'src/auth/components/input-user/input-user.element';
-import 'src/backoffice/test/core/components/input-section/input-section.element';
+import 'src/backoffice/core/components/input-section/input-section.element';
 
 @customElement('umb-workspace-user-group')
 export class UmbWorkspaceUserGroupElement extends UmbContextProviderMixin(
@@ -244,7 +244,7 @@ export class UmbWorkspaceUserGroupElement extends UmbContextProviderMixin(
 				alias: 'Umb.WorkspaceAction.UserGroup.Save',
 				name: 'Save User Group Workspace Action',
 				loader: () =>
-					import('../../../backoffice/test/core/components/workspace/actions/save/workspace-action-node-save.element'),
+					import('../../../backoffice/core/components/workspace/actions/save/workspace-action-node-save.element'),
 				meta: {
 					workspaces: ['Umb.Workspace.UserGroup'],
 				},

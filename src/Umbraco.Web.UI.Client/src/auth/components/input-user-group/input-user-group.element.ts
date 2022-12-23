@@ -1,7 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbInputListBase } from '../../../backoffice/test/core/components/input-list-base/input-list-base';
+import { UmbInputListBase } from '../../../backoffice/core/components/input-list-base/input-list-base';
 import type { UserGroupEntity } from '@umbraco-cms/models';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbUserGroupStore } from 'src/auth/user-groups/user-group.store';

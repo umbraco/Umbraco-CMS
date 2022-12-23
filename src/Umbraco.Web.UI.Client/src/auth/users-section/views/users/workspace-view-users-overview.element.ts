@@ -7,7 +7,7 @@ import { UUIPopoverElement } from '@umbraco-ui/uui';
 import type { UmbSectionViewUsersElement } from './section-view-users.element';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import { UmbModalService } from 'src/backoffice/test/core/services/modal';
+import { UmbModalService } from 'src/backoffice/core/services/modal';
 
 import './list-view-layouts/table/workspace-view-users-table.element';
 import './list-view-layouts/grid/workspace-view-users-grid.element';

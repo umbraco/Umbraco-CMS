@@ -1,11 +1,11 @@
 // TODO: temp file until we have a way to register from each extension
 
-import { manifests as contentSectionManifests } from './test/documents/content-section/manifests';
-import { manifests as mediaSectionManifests } from './test/media/media-section/manifests';
-import { manifests as memberSectionManifests } from './test/members/members-section/manifests';
-import { manifests as packageSectionManifests } from './test/packages/packages-section/manifests';
-import { manifests as settingsSectionManifests } from './test/core/settings-section/manifests';
 import { manifests as userSectionManifests } from '../auth/users-section/manifests';
+import { manifests as contentSectionManifests } from './documents/content-section/manifests';
+import { manifests as mediaSectionManifests } from './media/media-section/manifests';
+import { manifests as memberSectionManifests } from './members/members-section/manifests';
+import { manifests as packageSectionManifests } from './packages/packages-section/manifests';
+import { manifests as settingsSectionManifests } from './core/settings-section/manifests';
 
 import type {
 	ManifestDashboard,

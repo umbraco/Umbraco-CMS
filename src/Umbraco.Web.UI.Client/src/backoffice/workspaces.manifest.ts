@@ -7,7 +7,7 @@ export const manifests: Array<ManifestWorkspace> = [
 		type: 'workspace',
 		alias: 'Umb.Workspace.Member',
 		name: 'Member Workspace',
-		loader: () => import('./test/members/members/workspace/workspace-member.element'),
+		loader: () => import('./members/members/workspace/workspace-member.element'),
 		meta: {
 			entityType: 'member',
 		},
@@ -16,7 +16,7 @@ export const manifests: Array<ManifestWorkspace> = [
 		type: 'workspace',
 		alias: 'Umb.Workspace.MemberGroup',
 		name: 'Member Group Workspace',
-		loader: () => import('./test/members/member-groups/workspace/workspace-member-group.element'),
+		loader: () => import('./members/member-groups/workspace/workspace-member-group.element'),
 		meta: {
 			entityType: 'member-group',
 		},
@@ -25,7 +25,7 @@ export const manifests: Array<ManifestWorkspace> = [
 		type: 'workspace',
 		alias: 'Umb.Workspace.DataType',
 		name: 'Data Type Workspace',
-		loader: () => import('./test/core/data-types/workspace/workspace-data-type.element'),
+		loader: () => import('./core/data-types/workspace/workspace-data-type.element'),
 		meta: {
 			entityType: 'data-type',
 		},
@@ -34,7 +34,7 @@ export const manifests: Array<ManifestWorkspace> = [
 		type: 'workspace',
 		alias: 'Umb.Workspace.DocumentType',
 		name: 'Document Type Workspace',
-		loader: () => import('./test/documents/document-types/workspace/workspace-document-type.element'),
+		loader: () => import('./documents/document-types/workspace/workspace-document-type.element'),
 		meta: {
 			entityType: 'document-type',
 		},
@@ -43,7 +43,7 @@ export const manifests: Array<ManifestWorkspace> = [
 		type: 'workspace',
 		alias: 'Umb.Workspace.MediaType',
 		name: 'Media Type Workspace',
-		loader: () => import('./test/media/media-types/workspace/workspace-media-type.element'),
+		loader: () => import('./media/media-types/workspace/workspace-media-type.element'),
 		meta: {
 			entityType: 'media-type',
 		},
@@ -52,7 +52,7 @@ export const manifests: Array<ManifestWorkspace> = [
 		type: 'workspace',
 		alias: 'Umb.Workspace.MemberType',
 		name: 'Member Type Workspace',
-		loader: () => import('./test/members/member-types/workspace/workspace-member-type.element'),
+		loader: () => import('./members/member-types/workspace/workspace-member-type.element'),
 		meta: {
 			entityType: 'member-type',
 		},
@@ -61,7 +61,7 @@ export const manifests: Array<ManifestWorkspace> = [
 		type: 'workspace',
 		alias: 'Umb.Workspace.Extensions',
 		name: 'Extensions Workspace',
-		loader: () => import('./test/core/extensions/workspace/extension-root/workspace-extension-root.element'),
+		loader: () => import('./core/extensions/workspace/extension-root/workspace-extension-root.element'),
 		meta: {
 			entityType: 'extension-root',
 		},
@@ -70,7 +70,7 @@ export const manifests: Array<ManifestWorkspace> = [
 		type: 'workspace',
 		alias: 'Umb.Workspace.Media',
 		name: 'Media Workspace',
-		loader: () => import('./test/media/media/workspace/workspace-media.element'),
+		loader: () => import('./media/media/workspace/workspace-media.element'),
 		meta: {
 			entityType: 'media',
 		},
@@ -79,7 +79,7 @@ export const manifests: Array<ManifestWorkspace> = [
 		type: 'workspace',
 		alias: 'Umb.Workspace.Document',
 		name: 'Content Workspace',
-		loader: () => import('./test/documents/documents/workspace/workspace-document.element'),
+		loader: () => import('./documents/documents/workspace/workspace-document.element'),
 		meta: {
 			entityType: 'document',
 		},
@@ -106,7 +106,7 @@ export const manifests: Array<ManifestWorkspace> = [
 		type: 'workspace',
 		alias: 'Umb.Workspace.Package',
 		name: 'Package Workspace',
-		loader: () => import('./test/packages/package-repo/workspace/workspace-package.element'),
+		loader: () => import('./packages/package-repo/workspace/workspace-package.element'),
 		meta: {
 			entityType: 'package',
 		},
@@ -115,7 +115,7 @@ export const manifests: Array<ManifestWorkspace> = [
 		type: 'workspace',
 		alias: 'Umb.Workspace.PackageBuilder',
 		name: 'Package Builder Workspace',
-		loader: () => import('./test/packages/package-builder/workspace/workspace-package-builder.element'),
+		loader: () => import('./packages/package-builder/workspace/workspace-package-builder.element'),
 		meta: {
 			entityType: 'package-builder',
 		},
@@ -124,7 +124,7 @@ export const manifests: Array<ManifestWorkspace> = [
 		type: 'workspace',
 		alias: 'Umb.Workspace.LanguageRoot',
 		name: 'Language Root Workspace',
-		loader: () => import('./test/core/languages/workspace/language-root/workspace-language-root.element'),
+		loader: () => import('./core/languages/workspace/language-root/workspace-language-root.element'),
 		meta: {
 			entityType: 'language-root',
 		},
@@ -133,7 +133,7 @@ export const manifests: Array<ManifestWorkspace> = [
 		type: 'workspace',
 		alias: 'Umb.Workspace.DocumentBlueprintRoot',
 		name: 'Document Blueprint Root Workspace',
-		loader: () => import('./test/documents/document-blueprints/workspace/workspace-document-blueprint-root.element'),
+		loader: () => import('./documents/document-blueprints/workspace/workspace-document-blueprint-root.element'),
 		meta: {
 			entityType: 'document-blueprint-root',
 		},

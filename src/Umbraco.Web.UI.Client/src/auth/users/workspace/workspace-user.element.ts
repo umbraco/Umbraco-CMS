@@ -15,12 +15,12 @@ import type { ManifestWorkspaceAction, UserDetails } from '@umbraco-cms/models';
 import 'src/auth/components/input-user-group/input-user-group.element';
 
 import { umbCurrentUserService } from 'src/auth/current-user/current-user.service';
-import { UmbModalService } from 'src/backoffice/test/core/services/modal';
+import { UmbModalService } from 'src/backoffice/core/services/modal';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 
-import '../../../backoffice/test/core/property-editors/uis/content-picker/property-editor-ui-content-picker.element';
-import '../../../backoffice/test/core/components/workspace/workspace-entity/workspace-entity.element';
+import '../../../backoffice/core/property-editors/uis/content-picker/property-editor-ui-content-picker.element';
+import '../../../backoffice/core/components/workspace/workspace-entity/workspace-entity.element';
 
 @customElement('umb-workspace-user')
 export class UmbWorkspaceUserElement extends UmbContextProviderMixin(
@@ -162,7 +162,7 @@ export class UmbWorkspaceUserElement extends UmbContextProviderMixin(
 				alias: 'Umb.WorkspaceAction.User.Save',
 				name: 'Save User Workspace Action',
 				loader: () =>
-					import('../../../backoffice/test/core/components/workspace/actions/save/workspace-action-node-save.element'),
+					import('../../../backoffice/core/components/workspace/actions/save/workspace-action-node-save.element'),
 				meta: {
 					workspaces: ['Umb.Workspace.User'],
 				},
