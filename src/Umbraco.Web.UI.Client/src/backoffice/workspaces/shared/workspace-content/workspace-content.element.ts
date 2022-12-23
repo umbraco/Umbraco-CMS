@@ -189,7 +189,7 @@ export class UmbWorkspaceContentElement extends UmbContextProviderMixin(
 				</div>
 
 				<div id="footer" slot="footer">Breadcrumbs</div>
-				<!-- TODO: convert document workspace actions to extensions: -->
+				<!-- TODO: convert document workspace actions to extensions: 
 				<uui-button slot="actions" @click=${this._onSaveAndPreview} label="Save and preview"></uui-button>
 				<uui-button slot="actions" @click=${this._onSave} look="secondary" label="Save"></uui-button>
 				<uui-button
@@ -198,6 +198,7 @@ export class UmbWorkspaceContentElement extends UmbContextProviderMixin(
 					look="primary"
 					color="positive"
 					label="Save and publish"></uui-button>
+					-->
 			</umb-workspace-entity>
 		`;
 	}
