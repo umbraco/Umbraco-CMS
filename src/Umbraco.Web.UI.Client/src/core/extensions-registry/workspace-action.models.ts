@@ -8,7 +8,7 @@ export interface ManifestWorkspaceAction extends ManifestElement {
 
 export interface MetaEditorAction {
 	workspaces: Array<string>;
-	label: string,
+	label?: string, //TODO: Use or implement additional label-key
 	look?: InterfaceLook,
 	color?: InterfaceColor,
 }
