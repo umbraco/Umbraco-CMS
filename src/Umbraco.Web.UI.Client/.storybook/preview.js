@@ -17,11 +17,11 @@ import { handlers } from '../src/core/mocks/browser-handlers';
 import { LitElement } from 'lit';
 import { UmbModalService } from '../src/core/services/modal';
 
-import { manifests as sectionManifests } from '../src/backoffice/sections/manifests';
+import { manifests as sectionManifests } from '../src/backoffice/sections.manifest';
 import { manifests as propertyEditorModelManifests } from '../src/backoffice/property-editors/models/manifests';
 import { manifests as propertyEditorUIManifests } from '../src/backoffice/property-editors/uis/manifests';
-import { manifests as treeManifests } from '../src/backoffice/trees/manifests';
-import { manifests as workspaceManifests } from '../src/backoffice/workspaces/manifests';
+import { manifests as treeManifests } from '../src/backoffice/trees.manifest';
+import { manifests as workspaceManifests } from '../src/backoffice/workspaces.manifest';
 import { manifests as propertyActionManifests } from '../src/backoffice/property-actions/manifests';
 
 import { umbExtensionsRegistry } from '../src/core/extensions-registry';

@@ -1,5 +1,4 @@
 //TODO: we need to figure out what components should be available for extensions and load them upfront
-import './workspaces/shared/workspace-entity/workspace-entity.element';
 import './components/ref-property-editor-ui/ref-property-editor-ui.element';
 import './components/backoffice-frame/backoffice-header.element';
 import './components/backoffice-frame/backoffice-main.element';
@@ -9,10 +8,13 @@ import './components/content-property/content-property.element';
 import './components/table/table.element';
 import './components/shared/code-block.element';
 import './components/extension-slot/extension-slot.element';
-import './sections/shared/section-main/section-main.element';
-import './sections/shared/section-sidebar/section-sidebar.element';
-import './sections/shared/section.element';
-import './trees/shared/tree.element';
+
+import './test/core/components/workspace/workspace-entity/workspace-entity.element';
+import './test/core/components/section/section-main/section-main.element';
+import './test/core/components/section/section-sidebar/section-sidebar.element';
+import './test/core/components/section/section.element';
+import './test/core/components/tree/tree.element';
+import './test/core/components/workspace/workspace-content/workspace-content.element';
 
 import { defineElement } from '@umbraco-ui/uui-base/lib/registration';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
@@ -35,11 +37,11 @@ import { UmbCurrentUserHistoryStore } from '../core/stores/current-user-history/
 import { UmbDictionaryStore } from '../core/stores/dictionary/dictionary.store';
 import { UmbDocumentBlueprintStore } from '../core/stores/document-blueprint/document-blueprint.store';
 
-import { manifests as sectionManifests } from './sections/manifests';
+import { manifests as sectionManifests } from './sections.manifest';
 import { manifests as propertyEditorModelManifests } from './property-editors/models/manifests';
 import { manifests as propertyEditorUIManifests } from './property-editors/uis/manifests';
-import { manifests as treeManifests } from './trees/manifests';
-import { manifests as editorManifests } from './workspaces/manifests';
+import { manifests as treeManifests } from './trees.manifest';
+import { manifests as editorManifests } from './workspaces.manifest';
 import { manifests as propertyActionManifests } from './property-actions/manifests';
 import { manifests as externalLoginProviderManifests } from './external-login-providers/manifests';
 import { manifests as userDashboards } from './user-dashboards/manifests';

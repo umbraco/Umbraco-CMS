@@ -1,4 +1,4 @@
-import type { UserStatus } from '../../backoffice/sections/users/user-extensions';
+import type { UserStatus } from '../../backoffice/test/users/utils';
 import {
 	ContentTreeItem,
 	DocumentTreeItem,
