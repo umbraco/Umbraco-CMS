@@ -28,7 +28,6 @@
 			"@umbraco-cms/observable-api": ["src/core/observable-api"],
 			"@umbraco-cms/utils": ["src/core/utils"],
 			"@umbraco-cms/test-utils": ["src/core/test-utils"],
-			"@umbraco-cms/services": ["src/core/services"],
 			"@umbraco-cms/components/*": ["src/backoffice/components/*"],
 			"@umbraco-cms/stores/*": ["src/core/stores/*"],
 			"@umbraco-cms/sections/*": ["src/backoffice/sections/*"]

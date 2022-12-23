@@ -1,7 +1,7 @@
 import { html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
-import type { UmbModalService } from 'src/core/services/modal';
+import type { UmbModalService } from 'src/backoffice/test/core/services/modal';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
 /**

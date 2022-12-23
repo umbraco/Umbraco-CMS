@@ -14,7 +14,7 @@ import './layouts/icon-picker/modal-layout-icon-picker.element';
 import type { UmbModalConfirmData } from './layouts/confirm/modal-layout-confirm.element';
 import type { UmbModalContentPickerData } from './layouts/content-picker/modal-layout-content-picker.element';
 import type { UmbModalPropertyEditorUIPickerData } from './layouts/property-editor-ui-picker/modal-layout-property-editor-ui-picker.element';
-import { UmbModalHandler } from './';
+import { UmbModalHandler } from '.';
 
 export type UmbModalType = 'dialog' | 'sidebar';
 

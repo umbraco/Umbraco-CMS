@@ -2,7 +2,7 @@ import { css, html, LitElement, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
-import type { UmbModalService } from 'src/core/services/modal';
+import type { UmbModalService } from 'src/backoffice/test/core/services/modal';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { UmbDocumentStore } from 'src/backoffice/test/documents/documents/document.store';

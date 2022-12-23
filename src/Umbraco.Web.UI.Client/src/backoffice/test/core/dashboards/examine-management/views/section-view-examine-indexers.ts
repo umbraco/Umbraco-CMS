@@ -1,15 +1,17 @@
-import {UUITextStyles} from '@umbraco-ui/uui-css/lib';
-import {css, html, LitElement, nothing} from 'lit';
-import {customElement, property, state} from 'lit/decorators.js';
+import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
+import { css, html, LitElement, nothing } from 'lit';
+import { customElement, property, state } from 'lit/decorators.js';
 
-import {UUIButtonState} from '@umbraco-ui/uui-button';
+import { UUIButtonState } from '@umbraco-ui/uui-button';
 
-import {UmbModalService, UmbNotificationDefaultData, UmbNotificationService} from '@umbraco-cms/services';
+import { UmbModalService } from '../../../services/modal';
+import { UmbNotificationService } from '../../../services/notification';
+import { UmbNotificationDefaultData } from '../../../services/notification/layouts/default';
 
-import {UmbContextConsumerMixin} from '@umbraco-cms/context-api';
+import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import './section-view-examine-searchers';
 
-import {ApiError, Index, IndexerResource, ProblemDetails} from '@umbraco-cms/backend-api';
+import { ApiError, Index, IndexerResource, ProblemDetails } from '@umbraco-cms/backend-api';
 
 @customElement('umb-dashboard-examine-index')
 export class UmbDashboardExamineIndexElement extends UmbContextConsumerMixin(LitElement) {
@@ -105,7 +107,7 @@ export class UmbDashboardExamineIndexElement extends UmbContextConsumerMixin(Lit
 
 	private async _getIndexData() {
 		try {
-			this._indexData = await IndexerResource.getIndexerByIndexName({indexName: this.indexName});
+			this._indexData = await IndexerResource.getIndexerByIndexName({ indexName: this.indexName });
 			if (!this._indexData?.isHealthy) {
 				this._buttonState = 'waiting';
 			}
@@ -157,13 +159,12 @@ export class UmbDashboardExamineIndexElement extends UmbContextConsumerMixin(Lit
 	}
 
 	render() {
-		if (!this._indexData || this._loading) return html`
-			<uui-loader-bar></uui-loader-bar>`;
+		if (!this._indexData || this._loading) return html` <uui-loader-bar></uui-loader-bar>`;
 
 		return html`
 			<uui-box headline="${this.indexName}">
 				<p>
-					<strong>Health Status</strong><br/>
+					<strong>Health Status</strong><br />
 					The health status of the ${this.indexName} and if it can be read
 				</p>
 				<div>
@@ -176,9 +177,7 @@ export class UmbDashboardExamineIndexElement extends UmbContextConsumerMixin(Lit
 					${this._indexData.healthStatus}
 				</div>
 			</uui-box>
-			${this.renderIndexSearch()}
-			${this.renderPropertyList()}
-			${this.renderTools()}
+			${this.renderIndexSearch()} ${this.renderPropertyList()} ${this.renderTools()}
 		`;
 	}
 

@@ -3,7 +3,7 @@ import { LitElement } from 'lit';
 import { html } from 'lit-html';
 import { customElement, property, state } from 'lit/decorators.js';
 
-import { UmbModalService } from './';
+import { UmbModalService } from '.';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
 export default {

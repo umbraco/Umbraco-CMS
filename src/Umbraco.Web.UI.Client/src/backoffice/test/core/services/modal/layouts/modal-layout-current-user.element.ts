@@ -1,14 +1,14 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, CSSResultGroup, html, LitElement, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { umbCurrentUserService } from '../../current-user';
+import { umbCurrentUserService } from '../../../../../../core/services/current-user';
 import { UmbModalHandler, UmbModalService } from '@umbraco-cms/services';
 import type { ManifestExternalLoginProvider, ManifestUserDashboard, UserDetails } from '@umbraco-cms/models';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-import '../../../../auth/external-login-providers/external-login-provider-extension.element';
-import '../../../../backoffice/test/users/current-user/user-dashboards/user-dashboard-extension.element';
+import '../../../../../../auth/external-login-providers/external-login-provider-extension.element';
+import '../../../../users/current-user/user-dashboards/user-dashboard-extension.element';
 import {
 	UmbCurrentUserHistoryStore,
 	UmbCurrentUserHistoryItem,

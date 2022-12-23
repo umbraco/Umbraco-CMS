@@ -1,6 +1,6 @@
 import { fixture, expect, html } from '@open-wc/testing';
 import { UUIToastNotificationLayoutElement } from '@umbraco-ui/uui';
-import { UmbNotificationHandler } from '../../';
+import { UmbNotificationHandler } from '../..';
 import type { UmbNotificationLayoutDefaultElement, UmbNotificationDefaultData } from '.';
 import '.';
 

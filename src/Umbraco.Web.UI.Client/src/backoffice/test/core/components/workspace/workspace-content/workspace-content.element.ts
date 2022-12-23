@@ -14,7 +14,7 @@ import '../workspace-entity/workspace-entity.element';
 // TODO: Make this dynamic, use load-extensions method to loop over extensions for this node.
 import './views/edit/workspace-view-content-edit.element';
 import './views/info/workspace-view-content-info.element';
-import type { UmbNodeStoreBase } from '@umbraco-cms/stores/store';
+import type { UmbNodeStoreBase } from 'src/backoffice/test/core/stores/store';
 
 type ContentTypeTypes = DocumentDetails | MediaDetails;
 
@@ -33,11 +33,11 @@ export class UmbWorkspaceContentElement extends UmbContextProviderMixin(
 
 			#header {
 				margin: 0 var(--uui-size-layout-1);
-				flex:1 1 auto;
+				flex: 1 1 auto;
 			}
 			#name-input {
 				width: 100%;
-				height: 100%;/** I really don't know why this fixes the border colliding with variant-selector-toggle, but lets this solution for now */
+				height: 100%; /** I really don't know why this fixes the border colliding with variant-selector-toggle, but lets this solution for now */
 			}
 
 			#variant-selector-toggle {
@@ -74,7 +74,6 @@ export class UmbWorkspaceContentElement extends UmbContextProviderMixin(
 
 	private _workspaceContext?: UmbWorkspaceNodeContext<ContentTypeTypes, UmbNodeStoreBase<ContentTypeTypes>>;
 
-
 	constructor() {
 		super();
 
@@ -85,7 +84,6 @@ export class UmbWorkspaceContentElement extends UmbContextProviderMixin(
 
 		this.addEventListener('property-value-change', this._onPropertyValueChange);
 	}
-
 
 	private async _observeWorkspace() {
 		if (!this._workspaceContext) return;
@@ -123,7 +121,7 @@ export class UmbWorkspaceContentElement extends UmbContextProviderMixin(
 	private _onSave() {
 		// TODO: What if store is not available, what if content is not loaded... or workspace is not there jet?
 		if (this._workspaceContext) {
-			this._workspaceContext.save()
+			this._workspaceContext.save();
 		}
 	}
 
@@ -193,7 +191,7 @@ export class UmbWorkspaceContentElement extends UmbContextProviderMixin(
 				<uui-button slot="actions" @click=${this._onSaveAndPreview} label="Save and preview"></uui-button>
 				<uui-button slot="actions" @click=${this._onSave} look="secondary" label="Save"></uui-button>
 				<uui-button
-					slot="actions" 
+					slot="actions"
 					@click=${this._onSaveAndPublish}
 					look="primary"
 					color="positive"

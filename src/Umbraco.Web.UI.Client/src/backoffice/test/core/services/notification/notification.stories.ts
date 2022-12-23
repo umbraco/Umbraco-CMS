@@ -1,12 +1,12 @@
-import '../../../backoffice/components/backoffice-frame/backoffice-notification-container.element';
-import '../../context-api/provide/context-provider.element';
+import '../../../../components/backoffice-frame/backoffice-notification-container.element';
+import '../../../../../core/context-api/provide/context-provider.element';
 import './layouts/default';
 
 import { Meta, Story } from '@storybook/web-components';
 import { html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
 
-import { UmbContextConsumerMixin } from '../../context-api';
+import { UmbContextConsumerMixin } from '../../../../../core/context-api';
 
 import type { UmbNotificationDefaultData } from './layouts/default';
 import { UmbNotificationColor, UmbNotificationOptions, UmbNotificationService } from '.';

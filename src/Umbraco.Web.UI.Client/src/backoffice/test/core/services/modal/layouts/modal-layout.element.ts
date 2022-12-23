@@ -1,6 +1,6 @@
 import { LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { UmbModalHandler } from '../../modal';
+import { UmbModalHandler } from '..';
 
 @customElement('umb-modal-layout')
 export class UmbModalLayoutElement<UmbModalData = void> extends LitElement {

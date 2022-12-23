@@ -8,7 +8,7 @@ import { UmbTreeContext } from '../tree.context';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import type { Entity, ManifestSection, ManifestTree } from '@umbraco-cms/models';
-import { UmbTreeDataStore } from 'src/core/stores/store';
+import { UmbTreeDataStore } from 'src/backoffice/test/core/stores/store';
 
 import '../tree-item.element';
 

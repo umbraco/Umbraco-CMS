@@ -2,7 +2,7 @@ import { html, LitElement, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { firstValueFrom, map } from 'rxjs';
 
-import type { UmbModalService } from '../../../../../../core/services/modal';
+import type { UmbModalService } from '../../../../core/services/modal';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
 
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';

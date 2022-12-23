@@ -1,5 +1,5 @@
 import { BehaviorSubject, Observable } from 'rxjs';
-import { umbUsersData } from '../../mocks/data/users.data';
+import { umbUsersData } from '../../../../core/mocks/data/users.data';
 import type { UserDetails } from '@umbraco-cms/models';
 import { umbracoPath } from '@umbraco-cms/utils';
 

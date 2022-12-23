@@ -20,8 +20,8 @@ import { defineElement } from '@umbraco-ui/uui-base/lib/registration';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 
-import { UmbModalService } from '../core/services/modal';
-import { UmbNotificationService } from '../core/services/notification';
+import { UmbModalService } from './test/core/services/modal';
+import { UmbNotificationService } from './test/core/services/notification';
 import { UmbIconStore } from '../core/stores/icon/icon.store';
 import { manifests as externalLoginProviderManifests } from '../auth/external-login-providers/manifests';
 import { UmbDataTypeStore } from './test/core/data-types/data-type.store';

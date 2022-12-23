@@ -24,8 +24,7 @@ export interface UmbTreeDataStore<T> extends UmbDataStore<T> {
  * @description - Base class for Data Stores
  */
 export abstract class UmbDataStoreBase<T extends UmbDataStoreIdentifiers> implements UmbDataStore<T> {
-
-	public abstract readonly storeAlias:string;
+	public abstract readonly storeAlias: string;
 
 	protected _items: BehaviorSubject<Array<T>> = new BehaviorSubject(<Array<T>>[]);
 	public readonly items: Observable<Array<T>> = this._items.asObservable();

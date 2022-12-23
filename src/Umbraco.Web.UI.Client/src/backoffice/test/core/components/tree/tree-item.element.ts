@@ -11,7 +11,7 @@ import { UmbTreeContextMenuService } from './context-menu/tree-context-menu.serv
 import type { Entity, ManifestSection } from '@umbraco-cms/models';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-import { UmbTreeDataStore } from 'src/core/stores/store';
+import { UmbTreeDataStore } from 'src/backoffice/test/core/stores/store';
 
 @customElement('umb-tree-item')
 export class UmbTreeItem extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {

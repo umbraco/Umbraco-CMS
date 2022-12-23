@@ -3,7 +3,7 @@ import { html } from 'lit-html';
 
 import type { UmbPropertyEditorUIIconPickerElement } from './property-editor-ui-icon-picker.element';
 import './property-editor-ui-icon-picker.element';
-import type { UmbModalLayoutIconPickerElement } from 'src/core/services/modal/layouts/icon-picker/modal-layout-icon-picker.element';
+import type { UmbModalLayoutIconPickerElement } from 'src/backoffice/test/core/services/modal/layouts/icon-picker/modal-layout-icon-picker.element';
 
 export default {
 	title: 'Property Editor UIs/Icon Picker',
