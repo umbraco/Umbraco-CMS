@@ -4,7 +4,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import type { UUIButtonState } from '@umbraco-ui/uui';
 import type { UmbWorkspaceNodeContext } from '../../workspace-context/workspace-node.context';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-import { ManifestWorkspaceAction } from '@umbraco-cms/models';
+import type { ManifestWorkspaceAction } from '@umbraco-cms/models';
 
 @customElement('umb-workspace-action-node-save')
 export class UmbWorkspaceActionNodeSaveElement extends UmbContextConsumerMixin(LitElement) {
