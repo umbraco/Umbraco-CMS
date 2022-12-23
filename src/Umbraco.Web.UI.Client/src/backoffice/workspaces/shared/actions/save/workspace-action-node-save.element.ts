@@ -39,12 +39,15 @@ export class UmbWorkspaceActionNodeSaveElement extends UmbContextConsumerMixin(L
 	}
 
 	render() {
-		return html`<uui-button
-			@click=${this._onSave}
-			look=${this.manifest?.meta.look || 'default'}
-			color=${this.manifest?.meta.color || 'default'}
-			label=${this.manifest?.meta.label || 'Save'}
-			.state="${this._saveButtonState}"></uui-button>`;
+		return html`
+			<uui-button
+				@click=${this._onSave}
+				look=${this.manifest?.meta.look || 'default'}
+				color=${this.manifest?.meta.color || 'default'}
+				label=${this.manifest?.meta.label || 'Save'}
+				.state="${this._saveButtonState}">
+			</uui-button>
+		`;
 	}
 }
 
