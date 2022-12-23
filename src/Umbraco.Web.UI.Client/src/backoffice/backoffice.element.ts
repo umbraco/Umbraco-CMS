@@ -1,14 +1,14 @@
 //TODO: we need to figure out what components should be available for extensions and load them upfront
-import './test/core/components/ref-property-editor-ui/ref-property-editor-ui.element';
 import './components/backoffice-frame/backoffice-header.element';
 import './components/backoffice-frame/backoffice-main.element';
 import './components/backoffice-frame/backoffice-modal-container.element';
 import './components/backoffice-frame/backoffice-notification-container.element';
+
+import './test/core/components/ref-property-editor-ui/ref-property-editor-ui.element';
 import './test/core/components/content-property/content-property.element';
 import './test/core/components/table/table.element';
 import './test/core/components/code-block/code-block.element';
 import './test/core/components/extension-slot/extension-slot.element';
-
 import './test/core/components/workspace/workspace-entity/workspace-entity.element';
 import './test/core/components/section/section-main/section-main.element';
 import './test/core/components/section/section-sidebar/section-sidebar.element';
