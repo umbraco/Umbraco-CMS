@@ -17,6 +17,9 @@ export type UmbDataTypeStoreItemType = DataTypeDetails | FolderTreeItem;
  * @description - Data Store for Data Types
  */
 export class UmbDataTypeStore extends UmbDataStoreBase<UmbDataTypeStoreItemType> {
+
+	public readonly storeAlias = 'umbDataTypeStore';
+
 	/**
 	 * @description - Request a Data Type by key. The Data Type is added to the store and is returned as an Observable.
 	 * @param {string} key

@@ -16,7 +16,7 @@ const DefaultDataTypeData = ({
 export class UmbWorkspaceUserGroupContext extends UmbWorkspaceNodeContext<UmbUserGroupStoreItemType, UmbUserGroupStore> {
 
 	constructor(target:HTMLElement, entityKey: string) {
-		super(target, DefaultDataTypeData, 'umbUserStore', entityKey);
+		super(target, DefaultDataTypeData, 'umbUserStore', entityKey, 'userGroup');
 	}
 }
 

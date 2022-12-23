@@ -1,4 +1,4 @@
-import type { ManifestDashboard, ManifestSection } from '@umbraco-cms/models';
+import type { ManifestDashboardCollection, ManifestSection } from '@umbraco-cms/models';
 
 const sectionAlias = 'Umb.Section.Media';
 
@@ -13,17 +13,18 @@ const section: ManifestSection = {
 	},
 };
 
-const dashboards: Array<ManifestDashboard> = [
+const dashboards: Array<ManifestDashboardCollection> = [
 	{
-		type: 'dashboard',
-		alias: 'Umb.Dashboard.MediaManagement',
+		type: 'dashboardCollection',
+		alias: 'Umb.Dashboard.MediaCollection',
 		name: 'Media Dashboard',
-		loader: () => import('../../dashboards/media-management/dashboard-media-management.element'),
 		weight: 10,
 		meta: {
 			label: 'Media',
 			sections: [sectionAlias],
 			pathname: 'media-management',
+			entityType: 'media',
+			storeAlias: 'umbMediaStore'
 		},
 	},
 ];

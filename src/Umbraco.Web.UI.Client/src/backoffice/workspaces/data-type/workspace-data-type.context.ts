@@ -17,7 +17,7 @@ const DefaultDataTypeData = ({
 export class UmbWorkspaceDataTypeContext extends UmbWorkspaceNodeContext<UmbDataTypeStoreItemType, UmbDataTypeStore> {
 
 	constructor(target:HTMLElement, entityKey: string) {
-		super(target, DefaultDataTypeData, 'umbDataTypeStore', entityKey);
+		super(target, DefaultDataTypeData, 'umbDataTypeStore', entityKey, 'dataType');
 	}
 
 	public setPropertyValue(propertyAlias: string, value: any) {

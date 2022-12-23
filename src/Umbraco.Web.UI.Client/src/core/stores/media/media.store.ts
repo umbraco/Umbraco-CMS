@@ -17,6 +17,9 @@ export type UmbMediaStoreItemType = MediaDetails | ContentTreeItem;
  * @description - Data Store for Media
  */
 export class UmbMediaStore extends UmbDataStoreBase<UmbMediaStoreItemType> {
+
+	public readonly storeAlias = 'umbMediaStore';
+
 	getByKey(key: string): Observable<MediaDetails | null> {
 		// fetch from server and update store
 		fetch(`/umbraco/management/api/v1/media/details/${key}`)
