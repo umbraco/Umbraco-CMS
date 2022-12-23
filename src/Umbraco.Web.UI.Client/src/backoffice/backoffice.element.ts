@@ -32,9 +32,9 @@ import { UmbDocumentStore } from './test/documents/documents/document.store';
 import { UmbMediaStore } from './test/media/media/media.store';
 import { UmbMemberGroupStore } from './test/members/member-groups/member-group.store';
 import { UmbSectionStore } from './test/core/section.store';
-import { UmbUserStore } from './test/users/users/user.store';
-import { UmbUserGroupStore } from './test/users/user-groups/user-group.store';
-import { UmbCurrentUserHistoryStore } from './test/users/current-user/current-user-history.store';
+import { UmbUserStore } from '../auth/users/user.store';
+import { UmbUserGroupStore } from '../auth/user-groups/user-group.store';
+import { UmbCurrentUserHistoryStore } from '../auth/current-user/current-user-history.store';
 import { UmbDictionaryStore } from './test/translation/dictionary/dictionary.store';
 import { UmbDocumentBlueprintStore } from './test/documents/document-blueprints/document-blueprint.store';
 
@@ -44,7 +44,7 @@ import { manifests as propertyEditorUIManifests } from './test/core/property-edi
 import { manifests as treeManifests } from './trees.manifest';
 import { manifests as editorManifests } from './workspaces.manifest';
 import { manifests as propertyActionManifests } from './test/core/property-actions/manifests';
-import { manifests as userDashboards } from './test/users/current-user/user-dashboards/manifests';
+import { manifests as userDashboards } from '../auth/current-user/user-dashboards/manifests';
 import { manifests as collectionBulkActionManifests } from './test/core/components/collection/bulk-actions/manifests';
 import { manifests as collectionViewManifests } from './test/core/components/collection/views/manifests';
 

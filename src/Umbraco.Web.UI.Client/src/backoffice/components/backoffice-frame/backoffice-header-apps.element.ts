@@ -51,7 +51,7 @@ export class UmbBackofficeHeaderApps extends LitElement {
 				type: 'headerApp',
 				alias: 'Umb.HeaderApp.CurrentUser',
 				name: 'Current User',
-				loader: () => import('../../test/users/current-user/header-app-current-user.element'),
+				loader: () => import('../../../auth/current-user/header-app-current-user.element'),
 				weight: 1000,
 				meta: {
 					label: 'TODO: how should we enable this to not be set.',

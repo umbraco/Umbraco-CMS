@@ -5,7 +5,7 @@ import { UmbModalLayoutPickerBase } from '../modal-layout-picker-base';
 import type { UserDetails } from '@umbraco-cms/models';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import { UmbUserStore } from 'src/backoffice/test/users/users/user.store';
+import { UmbUserStore } from 'src/auth/users/user.store';
 
 @customElement('umb-picker-layout-user')
 export class UmbPickerLayoutUserElement extends UmbContextConsumerMixin(UmbObserverMixin(UmbModalLayoutPickerBase)) {

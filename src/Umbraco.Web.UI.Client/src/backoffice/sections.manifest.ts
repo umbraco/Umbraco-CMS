@@ -6,7 +6,7 @@ import { manifests as memberSectionManifests } from './test/members/members-sect
 import { manifests as packageSectionManifests } from './test/packages/packages-section/manifests';
 import { manifests as settingsSectionManifests } from './test/core/settings-section/manifests';
 import { manifests as translationSectionManifests } from './test/translation/translation-section/manifests';
-import { manifests as userSectionManifests } from './test/users/users-section/manifests';
+import { manifests as userSectionManifests } from '../auth/users-section/manifests';
 
 import type {
 	ManifestDashboard,

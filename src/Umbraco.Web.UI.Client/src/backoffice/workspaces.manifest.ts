@@ -88,7 +88,7 @@ export const manifests: Array<ManifestWorkspace> = [
 		type: 'workspace',
 		alias: 'Umb.Workspace.User',
 		name: 'User Workspace',
-		loader: () => import('./test/users/users/workspace/workspace-user.element'),
+		loader: () => import('../auth/users/workspace/workspace-user.element'),
 		meta: {
 			entityType: 'user',
 		},
@@ -97,7 +97,7 @@ export const manifests: Array<ManifestWorkspace> = [
 		type: 'workspace',
 		alias: 'Umb.Workspace.UserGroup',
 		name: 'User Group Workspace',
-		loader: () => import('./test/users/user-groups/workspace/workspace-user-group.element'),
+		loader: () => import('../auth/user-groups/workspace/workspace-user-group.element'),
 		meta: {
 			entityType: 'user-group',
 		},
