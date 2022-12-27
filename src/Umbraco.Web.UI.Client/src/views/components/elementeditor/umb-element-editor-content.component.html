@@ -37,7 +37,7 @@
 
             <div class="umb-group-panel__content" data-element="tab-content-{{group.type === 'Group' ? group.parentAlias : group.alias}}">
                 <umb-property
-                    data-element="property-{{property.alias}}"
+                    data-element="property-{{group.alias}}"
                     ng-repeat="property in group.properties track by property.alias"
                     property="property"
                     element-key="{{vm.model.key}}"
