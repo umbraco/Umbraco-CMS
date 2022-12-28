@@ -2,7 +2,9 @@ using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Core.Media.EmbedProviders;
 
-// TODO(V10) : change base class to OEmbedProviderBase
+/// <summary>
+///     Embed Provider for YouTube the popular online video sharing and social media platform provider.
+/// </summary>
 public class YouTube : EmbedProviderBase
 {
     public YouTube(IJsonSerializer jsonSerializer)

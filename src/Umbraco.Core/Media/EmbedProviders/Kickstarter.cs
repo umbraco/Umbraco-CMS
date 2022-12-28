@@ -2,7 +2,9 @@ using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Core.Media.EmbedProviders;
 
-// TODO(V10) : change base class to OEmbedProviderBase
+/// <summary>
+///     Embed Provider for Kickstarter the popular online crowdfunding platform focused on creativity.
+/// </summary>
 public class Kickstarter : EmbedProviderBase
 {
     public Kickstarter(IJsonSerializer jsonSerializer)

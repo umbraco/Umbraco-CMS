@@ -189,7 +189,7 @@
             /** formats the display model used to display the user group to the model used to save the user group*/
             formatUserGroupPostData: function (displayModel, action) {
                 //create the save model from the display model
-                var saveModel = _.pick(displayModel, 'id', 'alias', 'name', 'icon', 'sections', 'users', 'defaultPermissions', 'assignedPermissions');
+                var saveModel = _.pick(displayModel, 'id', 'alias', 'name', 'icon', 'sections', 'users', 'defaultPermissions', 'assignedPermissions', 'languages', 'hasAccessToAllLanguages');
 
                 // the start nodes cannot be picked as the property name needs to change - assign manually
                 saveModel.startContentId = displayModel['contentStartNode'];
@@ -263,6 +263,9 @@
                     saveModel[props[m]] = startId.id;
                 }
 
+                // make sure the allowed languages are just an array of id's
+                saveModel.allowedLanguages = saveModel.languages && saveModel.languages.length > 0 ? saveModel.languages.map(language => language.id) : [];
+
                 saveModel.parentId = -1;
                 return saveModel;
             },
@@ -295,6 +298,9 @@
                             break;
                         case '_umb_lockedOut':
                             saveModel.isLockedOut = prop.value;
+                            break;
+                        case '_umb_twoFactorEnabled':
+                            saveModel.isTwoFactorEnabled = prop.value;
                             break;
                     }
                 });

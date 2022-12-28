@@ -12,17 +12,20 @@
             <span ng-repeat="tag in vm.viewModel track by $index" class="label label-primary tag" ng-keyup="vm.onKeyUpOnTag(tag, $event)" tabindex="0">
                 <span ng-bind-html="tag"></span>
 
-                <umb-icon icon="icon-trash"
-                          class="btn-icon"
-                          ng-click="vm.showPrompt($index, tag)"
-                          localize="title"
-                          title="@buttons_deleteTag">
+                <umb-icon
+                    ng-if="!vm.readonly"
+                    icon="icon-trash"
+                    class="btn-icon"
+                    ng-click="vm.showPrompt($index, tag)"
+                    localize="title"
+                    title="@buttons_deleteTag">
                 </umb-icon>
 
-                <umb-confirm-action ng-if="vm.promptIsVisible === $index"
-                                    direction="left"
-                                    on-confirm="vm.removeTag(tag)"
-                                    on-cancel="vm.hidePrompt()">
+                <umb-confirm-action 
+                    ng-if="vm.promptIsVisible === $index"
+                    direction="left"
+                    on-confirm="vm.removeTag(tag)"
+                    on-cancel="vm.hidePrompt()">
                 </umb-confirm-action>
             </span>
 
@@ -35,7 +38,9 @@
                    ng-maxlength="200"
                    maxlength="200"
                    localize="placeholder"
-                   placeholder="@placeholders_enterTags" />
+                   placeholder="@placeholders_enterTags"
+                   aria-labelledby="{{vm.inputId}}"
+                   ng-readonly="vm.readonly" />
 
         </div>
     </ng-form>

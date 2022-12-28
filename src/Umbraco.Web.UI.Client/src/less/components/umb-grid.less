@@ -176,6 +176,14 @@
         color: @ui-action-discreet-type-hover;
         cursor: pointer;
     }
+
+    &:disabled {
+        cursor: not-allowed;
+        &:hover {
+            border-color: @ui-action-discreet-border;
+            color: @ui-action-discreet-type;
+        }
+    }
 }
 
 .umb-grid .umb-cell-content.-has-editors {
@@ -215,6 +223,13 @@
     &:focus, &:hover {
         color: @ui-action-discreet-type-hover;
         text-decoration: none;
+    }
+
+    &:disabled {
+        cursor: not-allowed;
+        &:hover {
+            color: @ui-action-discreet-type;
+        }
     }
 }
 
@@ -324,11 +339,15 @@
     top: 0;
     left: 0;
     opacity: 0;
-    cursor: pointer;
-    &:hover {
-        background-color: @ui-action-type-hover;
-        opacity: 0.1;
-        transition: opacity 0.1s;
+
+    &.-clickable {
+        cursor: pointer;
+
+        &:hover {
+            background-color: @ui-action-type-hover;
+            opacity: 0.1;
+            transition: opacity 0.1s;
+        }
     }
 }
 
@@ -524,6 +543,10 @@
     &:hover {
         cursor: pointer;
         opacity: .77;
+    }
+
+    &:disabled {
+        cursor: not-allowed;
     }
 }
 

@@ -23,7 +23,7 @@
             }
         });
 
-    function umbTagsEditorController($rootScope, assetsService, umbRequestHelper, angularHelper, $timeout, $element) {
+    function umbTagsEditorController($rootScope, assetsService, umbRequestHelper, angularHelper, $timeout, $element, $attrs) {
 
         let vm = this;
 
@@ -48,6 +48,11 @@
         vm.tagToAdd = "";
         vm.promptIsVisible = "-1";
         vm.viewModel = [];
+        vm.readonly = false;
+
+        $attrs.$observe('readonly', (value) => {
+            vm.readonly = value !== undefined;
+        });
 
         function onInit() {
             vm.inputId = vm.inputId || "t" + String.CreateGuid();
@@ -87,7 +92,7 @@
                     var sources = {
                         //see: https://github.com/twitter/typeahead.js/blob/master/doc/jquery_typeahead.md#options
                         // name = the data set name, we'll make this the tag group name + culture
-                        name: vm.config.group + (vm.culture ? vm.culture : ""),
+                        name: (vm.config.group + (vm.culture ? vm.culture : "")).replace(/\W/g, '-'),
                         display: "text",
                         //source: tagsHound
                         source: function (query, syncCallback, asyncCallback) {

@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Title>Umbraco CMS - Infrastructure</Title>
+    <Description>Contains the infrastructure assembly needed to run Umbraco CMS.</Description>
+    <IsPackable>false</IsPackable>
+    <EnablePackageValidation>false</EnablePackageValidation>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Umbraco.New.Cms.Core\Umbraco.New.Cms.Core.csproj" />
+    <ProjectReference Include="..\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj" />
+  </ItemGroup>
+</Project>

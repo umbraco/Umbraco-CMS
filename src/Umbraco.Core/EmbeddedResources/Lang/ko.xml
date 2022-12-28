@@ -2,7 +2,7 @@
 <language alias="ko" intName="Korean" localName="한국어" lcid="18" culture="ko-KR">
   <creator>
     <name>The Umbraco community</name>
-    <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
+    <link>https://docs.umbraco.com/umbraco-cms/extending/language-files</link>
   </creator>
   <area alias="actions">
     <key alias="assigndomain">호스트명 관리</key>
@@ -357,7 +357,7 @@
     <key alias="databaseUpgradeDone"><![CDATA[데이터베이스가 최신 버전 %0% 로 업그레이드 되었습니다.<br />계속 진행하시려면 <strong>다음</strong> 을 누르세요. ]]></key>
     <key alias="databaseUpToDate"><![CDATA[데이터베이스가 업데이트 되었습니다. <strong>다음</strong>을 클릭하시면 설정마법사를 계속 진행합니다.]]></key>
     <key alias="defaultUserChangePass"><![CDATA[<strong>기본 사용자의 암호가 변경되어야 합니다!</strong>]]></key>
-    <key alias="defaultUserDisabled"><![CDATA[<strong>기본 사용자가 비활성화되었거나 Umbraco에 접근할 수 없습니다!</strong></p><p>더 이상 과정이 필요없으시면 <b>다음</b>을 눌러주세요.]]></key>
+    <key alias="defaultUserDisabled"><![CDATA[<strong>기본 사용자가 비활성화되었거나 Umbraco에 접근할 수 없습니다!</strong></p><p>더 이상 과정이 필요없으시면 <strong>다음</strong>을 눌러주세요.]]></key>
     <key alias="defaultUserPassChanged"><![CDATA[<strong>설치후 기본사용자의 암호가 성공적으로 변경되었습니다!</strong></p><p>더 이상 과정이 필요없으시면 <strong>다음</strong>을 눌러주세요.]]></key>
     <key alias="defaultUserPasswordChanged">비밀번호가 변경되었습니다!</key>
     <key alias="greatStart">편리한 시작을 위해, 소개 Video를 시청하세요</key>
@@ -575,7 +575,6 @@
     <key alias="removeLink">링크 삭제</key>
   </area>
   <area alias="rollback">
-    <key alias="currentVersion">현재 버전</key>
     <key alias="diffHelp"><![CDATA[현재 버전과 선택한 버전의 차이점을 보여줍니다<br /><del>빨간</del> 텍스트는 선택한 버전에선 보이지 않습니다. <ins>녹색은 추가되었음을 의미합니다</ins>]]></key>
     <key alias="documentRolledBack">문서가 롤백되었습니다.</key>
     <key alias="htmlHelp">선택한 버전을 html로 보여줍니다. 두 버전의 차이점을 동시에 보시려면, 차이점 보기를 사용하세요</key>

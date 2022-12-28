@@ -127,11 +127,18 @@ public class PublishedRouter : IPublishedRouter
 
         IPublishedRequestBuilder builder = new PublishedRequestBuilder(request.Uri, _fileService);
 
+        // ensure we keep the previous domain and culture
+        if (request.Domain is not null)
+        {
+            builder.SetDomain(request.Domain);
+        }
+        builder.SetCulture(request.Culture);
+
         // set to the new content (or null if specified)
         builder.SetPublishedContent(publishedContent);
 
         // re-route
-        await RouteRequestInternalAsync(builder);
+        await RouteRequestInternalAsync(builder, true);
 
         // return if we are redirect
         if (builder.IsRedirect())
@@ -145,11 +152,6 @@ public class PublishedRouter : IPublishedRouter
             // means the engine could not find a proper document to handle 404
             // restore the saved content so we know it exists
             builder.SetPublishedContent(content);
-        }
-
-        if (!builder.HasDomain())
-        {
-            FindDomain(builder);
         }
 
         return BuildRequest(builder);
@@ -211,7 +213,7 @@ public class PublishedRouter : IPublishedRouter
         _variationContextAccessor.VariationContext = new VariationContext(culture);
     }
 
-    private async Task RouteRequestInternalAsync(IPublishedRequestBuilder builder)
+    private async Task RouteRequestInternalAsync(IPublishedRequestBuilder builder, bool skipContentFinders = false)
     {
         // if request builder was already flagged to redirect then return
         // whoever called us is in charge of actually redirecting
@@ -229,7 +231,7 @@ public class PublishedRouter : IPublishedRouter
         // This could be manually assigned with a custom route handler, etc...
         // which in turn could call this method
         // to setup the rest of the pipeline but we don't want to run the finders since there's one assigned.
-        if (!builder.HasPublishedContent())
+        if (!builder.HasPublishedContent() && !skipContentFinders)
         {
             if (_logger.IsEnabled(LogLevel.Debug))
             {
@@ -712,22 +714,24 @@ public class PublishedRouter : IPublishedRouter
 
             // TODO: We need to limit altTemplate to only allow templates that are assigned to the current document type!
             // if the template isn't assigned to the document type we should log a warning and return 404
-            var templateId = request.PublishedContent.TemplateId;
-            ITemplate? template = GetTemplate(templateId);
-            request.SetTemplate(template);
-            if (template != null)
+            if (request.PublishedContent.TemplateId is int templateId && templateId != default)
             {
-                if (_logger.IsEnabled(LogLevel.Debug))
+                ITemplate? template = GetTemplate(templateId);
+                request.SetTemplate(template);
+                if (template != null)
                 {
-                    _logger.LogDebug(
-                        "FindTemplate: Running with template id={TemplateId} alias={TemplateAlias}",
-                        template.Id,
-                        template.Alias);
+                    if (_logger.IsEnabled(LogLevel.Debug))
+                    {
+                        _logger.LogDebug(
+                            "FindTemplate: Running with template id={TemplateId} alias={TemplateAlias}",
+                            template.Id,
+                            template.Alias);
+                    }
                 }
-            }
-            else
-            {
-                _logger.LogWarning("FindTemplate: Could not find template with id {TemplateId}", templateId);
+                else
+                {
+                    _logger.LogWarning("FindTemplate: Could not find template with id {TemplateId}", templateId);
+                }
             }
         }
         else

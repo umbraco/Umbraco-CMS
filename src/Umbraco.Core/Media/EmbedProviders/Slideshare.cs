@@ -3,7 +3,9 @@ using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Core.Media.EmbedProviders;
 
-// TODO(V10) : change base class to OEmbedProviderBase
+/// <summary>
+///     Embed Provider for SlideShare for professional online content including presentations, infographics, documents, and videos.
+/// </summary>
 public class Slideshare : EmbedProviderBase
 {
     public Slideshare(IJsonSerializer jsonSerializer)

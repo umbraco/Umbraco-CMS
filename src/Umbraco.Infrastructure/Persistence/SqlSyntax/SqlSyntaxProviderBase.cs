@@ -1,3 +1,5 @@
+// Don't remove the unused System using, for some reason this breaks docfx, and I have no clue why.
+using System;
 using System.Data;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -35,10 +37,10 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
             FormatConstraint,
             FormatDefaultValue,
             FormatPrimaryKey,
-            FormatIdentity,
+            FormatIdentity
         };
 
-        // defaults for all providers
+        //defaults for all providers
         StringLengthColumnDefinitionFormat = StringLengthUnicodeColumnDefinitionFormat;
         StringColumnDefinition = string.Format(StringLengthColumnDefinitionFormat, DefaultStringLength);
         DecimalColumnDefinition =
@@ -48,7 +50,6 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
         // ok to call virtual GetQuotedXxxName here - they don't depend on any state
         var col = Regex.Escape(GetQuotedColumnName("column")).Replace("column", @"\w+");
         var fld = Regex.Escape(GetQuotedTableName("table") + ".").Replace("table", @"\w+") + col;
-
         // ReSharper restore VirtualMemberCallInConstructor
         AliasRegex = new Regex(
             "(" + fld + @")\s+AS\s+(" + col + ")",
@@ -71,7 +72,7 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
 
     public int DefaultDecimalScale { get; } = 9;
 
-    // Set by Constructor
+    //Set by Constructor
     public virtual string StringColumnDefinition { get; }
 
     public string StringLengthColumnDefinitionFormat { get; }
@@ -98,35 +99,31 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
 
     public string TimeColumnDefinition { get; protected set; } = "DATETIME";
 
-    public virtual string CreateForeignKeyConstraint =>
-        "ALTER TABLE {0} ADD CONSTRAINT {1} FOREIGN KEY ({2}) REFERENCES {3} ({4}){5}{6}";
-
     protected IList<Func<ColumnDefinition, string>> ClauseOrder { get; }
 
     protected DbTypes DbTypeMap => _dbTypes.Value;
+
+    public virtual string CreateForeignKeyConstraint =>
+        "ALTER TABLE {0} ADD CONSTRAINT {1} FOREIGN KEY ({2}) REFERENCES {3} ({4}){5}{6}";
 
     public virtual string CreateDefaultConstraint => "ALTER TABLE {0} ADD CONSTRAINT {1} DEFAULT ({2}) FOR {3}";
 
     public Regex AliasRegex { get; }
 
-    public abstract string ProviderName { get; }
-
-    public abstract IsolationLevel DefaultIsolationLevel { get; }
-
     public string GetWildcardPlaceholder() => "%";
 
     public virtual DatabaseType GetUpdatedDatabaseType(DatabaseType current, string? connectionString) => current;
 
+    public abstract string ProviderName { get; }
+
     public virtual string EscapeString(string val) => NPocoDatabaseExtensions.EscapeAtSymbols(val.Replace("'", "''"));
 
     public virtual string GetStringColumnEqualComparison(string column, int paramIndex, TextColumnType columnType) =>
-
-        // use the 'upper' method to always ensure strings are matched without case sensitivity no matter what the db setting.
+        //use the 'upper' method to always ensure strings are matched without case sensitivity no matter what the db setting.
         $"upper({column}) = upper(@{paramIndex})";
 
     public virtual string GetStringColumnWildcardComparison(string column, int paramIndex, TextColumnType columnType) =>
-
-        // use the 'upper' method to always ensure strings are matched without case sensitivity no matter what the db setting.
+        //use the 'upper' method to always ensure strings are matched without case sensitivity no matter what the db setting.
         $"upper({column}) LIKE upper(@{paramIndex})";
 
     public virtual string GetConcat(params string[] args) => "concat(" + string.Join(",", args) + ")";
@@ -177,7 +174,7 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
         return "NVARCHAR";
     }
 
-    public virtual string GetColumn(DatabaseType dbType, string tableName, string columnName, string? columnAlias, string? referenceName = null, bool forInsert = false)
+    public virtual string GetColumn(DatabaseType dbType, string tableName, string columnName, string columnAlias, string? referenceName = null, bool forInsert = false)
     {
         tableName = GetQuotedTableName(tableName);
         columnName = GetQuotedColumnName(columnName);
@@ -193,12 +190,10 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
         return column;
     }
 
+
+    public abstract IsolationLevel DefaultIsolationLevel { get; }
+
     public abstract string DbProvider { get; }
-
-    public virtual IDictionary<Type, IScalarMapper>? ScalarMappers => null;
-
-    public virtual string DeleteDefaultConstraint =>
-        throw new NotSupportedException("Default constraints are not supported");
 
     public virtual IEnumerable<string> GetTablesInSchema(IDatabase db) => new List<string>();
 
@@ -222,7 +217,12 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
 
     public virtual Sql<ISqlContext> AppendForUpdateHint(Sql<ISqlContext> sql) => sql;
 
-    public abstract Sql<ISqlContext>.SqlJoinClause<ISqlContext> LeftJoinWithNestedJoin<TDto>(Sql<ISqlContext> sql, Func<Sql<ISqlContext>, Sql<ISqlContext>> nestedJoin, string? alias = null);
+    public abstract Sql<ISqlContext>.SqlJoinClause<ISqlContext> LeftJoinWithNestedJoin<TDto>(
+        Sql<ISqlContext> sql,
+        Func<Sql<ISqlContext>, Sql<ISqlContext>> nestedJoin,
+        string? alias = null);
+
+    public virtual IDictionary<Type, IScalarMapper>? ScalarMappers => null;
 
     public virtual bool DoesTableExist(IDatabase db, string tableName) => GetTablesInSchema(db).Contains(tableName);
 
@@ -241,7 +241,6 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
     ///     YYYYMMDD HH:mm:ss
     /// </remarks>
     public virtual string FormatDateTime(DateTime date, bool includeTime = true) =>
-
         // need CultureInfo.InvariantCulture because ":" here is the "time separator" and
         // may be converted to something else in different cultures (eg "." in DK).
         date.ToString(includeTime ? "yyyyMMdd HH:mm:ss" : "yyyyMMdd", CultureInfo.InvariantCulture);
@@ -265,7 +264,13 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
             ? string.Join(",", index.Columns.Select(x => GetQuotedColumnName(x.Name)))
             : GetQuotedColumnName(index.ColumnName);
 
-        return string.Format(CreateIndex, GetIndexType(index.IndexType), " ", GetQuotedName(name), GetQuotedTableName(index.TableName), columns);
+        return string.Format(
+            CreateIndex,
+            GetIndexType(index.IndexType),
+            " ",
+            GetQuotedName(name),
+            GetQuotedTableName(index.TableName),
+            columns);
     }
 
     public virtual List<string> Format(IEnumerable<ForeignKeyDefinition> foreignKeys) =>
@@ -321,22 +326,23 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
         sql.Append(" ");
         sql.Append(FormatIdentity(column));
 
-        // var isNullable = column.IsNullable;
+        //var isNullable = column.IsNullable;
 
-        // var constraint = FormatConstraint(column)?.TrimStart("CONSTRAINT ");
-        // var hasConstraint = !string.IsNullOrWhiteSpace(constraint);
+        //var constraint = FormatConstraint(column)?.TrimStart("CONSTRAINT ");
+        //var hasConstraint = !string.IsNullOrWhiteSpace(constraint);
 
-        // var defaultValue = FormatDefaultValue(column);
-        // var hasDefaultValue = !string.IsNullOrWhiteSpace(defaultValue);
+        //var defaultValue = FormatDefaultValue(column);
+        //var hasDefaultValue = !string.IsNullOrWhiteSpace(defaultValue);
 
         // TODO: This used to exit if nullable but that means this would never work
         // to return SQL if the column was nullable?!? I don't get it. This was here
         // 4 years ago, I've removed it so that this works for nullable columns.
-        // if (isNullable /*&& !hasConstraint && !hasDefaultValue*/)
-        // {
+        //if (isNullable /*&& !hasConstraint && !hasDefaultValue*/)
+        //{
         //    sqls = Enumerable.Empty<string>();
         //    return sql.ToString();
-        // }
+        //}
+
         var msql = new List<string>();
         sqls = msql;
 
@@ -346,21 +352,21 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
         alterSql.Append(FormatType(column));
         alterSql.Append(" ");
         alterSql.Append(FormatNullable(column));
-
-        // alterSql.Append(" ");
-        // alterSql.Append(FormatPrimaryKey(column));
-        // alterSql.Append(" ");
-        // alterSql.Append(FormatIdentity(column));
+        //alterSql.Append(" ");
+        //alterSql.Append(FormatPrimaryKey(column));
+        //alterSql.Append(" ");
+        //alterSql.Append(FormatIdentity(column));
         msql.Add(string.Format(AlterColumn, tableName, alterSql));
 
-        // if (hasConstraint)
-        // {
+        //if (hasConstraint)
+        //{
         //    var dropConstraintSql = string.Format(DeleteConstraint, tableName, constraint);
         //    msql.Add(dropConstraintSql);
         //    var constraintType = hasDefaultValue ? defaultValue : "";
         //    var createConstraintSql = string.Format(CreateConstraint, tableName, constraint, constraintType, FormatString(column));
         //    msql.Add(createConstraintSql);
-        // }
+        //}
+
         return sql.ToString();
     }
 
@@ -382,7 +388,8 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
                 .Split(Constants.CharArrays.CommaSpace, StringSplitOptions.RemoveEmptyEntries)
                 .Select(GetQuotedColumnName));
 
-        var primaryKeyPart = string.Concat("PRIMARY KEY", columnDefinition.IsIndexed ? " CLUSTERED" : " NONCLUSTERED");
+        var primaryKeyPart =
+            string.Concat("PRIMARY KEY", columnDefinition.IsIndexed ? " CLUSTERED" : " NONCLUSTERED");
 
         return string.Format(
             CreateConstraint,
@@ -404,7 +411,13 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
 
     public abstract Sql<ISqlContext> SelectTop(Sql<ISqlContext> sql, int top);
 
-    public abstract void HandleCreateTable(IDatabase database, TableDefinition tableDefinition, bool skipKeysAndIndexes = false);
+    public abstract void HandleCreateTable(
+        IDatabase database,
+        TableDefinition tableDefinition,
+        bool skipKeysAndIndexes = false);
+
+    public virtual string DeleteDefaultConstraint =>
+        throw new NotSupportedException("Default constraints are not supported");
 
     public virtual string CreateTable => "CREATE TABLE {0} ({1})";
 
@@ -447,9 +460,6 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
     public virtual string ConvertDateToOrderableString => "CONVERT(nvarchar, {0}, 120)";
 
     public virtual string ConvertDecimalToOrderableString => "REPLACE(STR({0}, 20, 9), SPACE(1), '0')";
-
-    public virtual string GetSpecialDbType(SpecialDbType dbType, int customSize) =>
-        $"{GetSpecialDbType(dbType)}({customSize})";
 
     private DbTypes InitColumnTypeMap()
     {
@@ -499,6 +509,9 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
 
         return dbTypeMap.Create();
     }
+
+    public virtual string GetSpecialDbType(SpecialDbType dbType, int customSize) =>
+        $"{GetSpecialDbType(dbType)}({customSize})";
 
     protected virtual string FormatCascade(string onWhat, Rule rule)
     {
@@ -561,8 +574,7 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
         var dbTypeDefinition = column.Size != default
             ? $"{definition}({column.Size})"
             : definition;
-
-        // NOTE Precision is left out
+        //NOTE Precision is left out
         return dbTypeDefinition;
     }
 

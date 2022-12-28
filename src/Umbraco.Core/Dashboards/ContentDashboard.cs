@@ -7,7 +7,7 @@ public class ContentDashboard : IDashboard
 {
     public string Alias => "contentIntro";
 
-    public string[] Sections => new[] { "content" };
+    public string[] Sections => new[] { Constants.Applications.Content };
 
     public string View => "views/dashboard/default/startupdashboardintro.html";
 
