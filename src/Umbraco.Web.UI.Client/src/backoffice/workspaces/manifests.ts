@@ -136,4 +136,13 @@ export const manifests: Array<ManifestWorkspace> = [
 			entityType: 'dictionary',
 		},
 	},
+	{
+		type: 'workspace',
+		alias: 'Umb.Workspace.DocumentBlueprintRoot',
+		name: 'Document Blueprint Root Workspace',
+		loader: () => import('./document-blueprint/workspace-document-blueprint-root.element'),
+		meta: {
+			entityType: 'document-blueprint-root',
+		},
+	},
 ];
