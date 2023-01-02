@@ -56,6 +56,7 @@ import type { ManifestTypes } from '@umbraco-cms/models';
 import '../core';
 import '../documents';
 import '../media';
+import '../members';
 import '../translation';
 
 @defineElement('umb-backoffice')
