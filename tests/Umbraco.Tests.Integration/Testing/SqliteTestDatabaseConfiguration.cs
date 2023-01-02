@@ -47,13 +47,12 @@ public class SqliteTestDatabaseConfiguration : ITestDatabaseConfiguration
         return connectionStrings;
     }
 
-    public void Teardown(string key) => throw new NotImplementedException();
-
     public string GetDbKey() => throw new NotImplementedException();
 
-    public void Teardown() => TryDeleteFile(GetAbsolutePath());
+    public void Teardown(string key) => TryDeleteFile(GetAbsolutePath(key));
 
     private string GetAbsolutePath() => Path.Combine(s_filesPath, _key.ToString());
+    private string GetAbsolutePath(string key) => Path.Combine(s_filesPath, key);
 
     private void TryDeleteFile(string filePath)
     {
