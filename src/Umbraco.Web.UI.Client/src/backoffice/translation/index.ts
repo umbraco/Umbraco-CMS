@@ -3,7 +3,7 @@ import { manifests as dictionaryTreeManifests } from './dictionary/tree/dictiona
 import { manifests as dictionaryWorkspaceManifests } from './dictionary/workspace/dictionary-workspace.manifest';
 import { ManifestTypes, umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
-const registerExtensions = (manifests: Array<ManifestTypes> | Array<ManifestTypes>) => {
+const registerExtensions = (manifests: Array<ManifestTypes>) => {
 	manifests.forEach((manifest) => {
 		if (umbExtensionsRegistry.isRegistered(manifest.alias)) return;
 		umbExtensionsRegistry.register(manifest);
