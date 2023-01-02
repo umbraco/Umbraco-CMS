@@ -48,18 +48,6 @@ export class UmbBackofficeHeaderApps extends LitElement {
 					pathname: 'favorites',
 				},
 			},
-			{
-				type: 'headerApp',
-				alias: 'Umb.HeaderApp.CurrentUser',
-				name: 'Current User',
-				loader: () => import('../../../../auth/users/current-user/header-app-current-user.element'),
-				weight: 1000,
-				meta: {
-					label: 'TODO: how should we enable this to not be set.',
-					icon: 'TODO: how should we enable this to not be set.',
-					pathname: 'user',
-				},
-			},
 		];
 
 		// TODO: Can we make this functionality reuseable...

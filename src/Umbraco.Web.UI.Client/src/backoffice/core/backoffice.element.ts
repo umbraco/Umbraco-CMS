@@ -2,7 +2,6 @@ import { defineElement } from '@umbraco-ui/uui-base/lib/registration';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 
-import { manifests as externalLoginProviderManifests } from '../../auth/external-login-providers/manifests';
 import { UmbDocumentTypeStore } from '../documents/document-types/document-type.store';
 import { UmbMediaTypeStore } from '../media/media-types/media-type.store';
 import { UmbMemberTypeStore } from '../members/member-types/member-type.store';
@@ -15,7 +14,6 @@ import { UmbCurrentUserHistoryStore } from '../../auth/users/current-user/curren
 import { UmbDictionaryStore } from '../translation/dictionary/dictionary.store';
 import { UmbDocumentBlueprintStore } from '../documents/document-blueprints/document-blueprint.store';
 
-import { manifests as userDashboards } from '../../auth/users/current-user/user-dashboards/manifests';
 import { UmbSectionStore } from './components/section/section.store';
 import { UmbDataTypeStore } from './data-types/data-type.store';
 import { UmbIconStore } from './stores/icon/icon.store';
@@ -61,8 +59,6 @@ export class UmbBackofficeElement extends UmbContextConsumerMixin(UmbContextProv
 		super();
 
 		// TODO: this needs to happen in each domain
-		this._registerExtensions(externalLoginProviderManifests);
-		this._registerExtensions(userDashboards);
 		this._registerExtensions(collectionBulkActionManifests);
 		this._registerExtensions(collectionViewManifests);
 

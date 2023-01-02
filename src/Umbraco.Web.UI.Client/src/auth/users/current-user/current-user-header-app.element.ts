@@ -7,8 +7,8 @@ import type { UserDetails } from '@umbraco-cms/models';
 import { UmbModalService } from 'src/backoffice/core/services/modal';
 import { umbCurrentUserService } from 'src/auth/users/current-user/current-user.service';
 
-@customElement('umb-header-app-current-user')
-export class UmbHeaderAppCurrentUser extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+@customElement('umb-current-user-header-app')
+export class UmbCurrentUserHeaderApp extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	static styles: CSSResultGroup = [
 		UUITextStyles,
 		css`
@@ -50,10 +50,10 @@ export class UmbHeaderAppCurrentUser extends UmbContextConsumerMixin(UmbObserver
 	}
 }
 
-export default UmbHeaderAppCurrentUser;
+export default UmbCurrentUserHeaderApp;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-header-app-current-user': UmbHeaderAppCurrentUser;
+		'umb-current-user-header-app': UmbCurrentUserHeaderApp;
 	}
 }

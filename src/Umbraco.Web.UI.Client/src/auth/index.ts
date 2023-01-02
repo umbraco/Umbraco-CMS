@@ -2,6 +2,8 @@
 import { manifests as userGroupManifests } from './users/user-groups/manifests';
 import { manifests as userManifests } from './users/users/manifests';
 import { manifests as userSectionManifests } from './users/user-section/manifests';
+import { manifests as currentUserManifests } from './users/current-user/manifests';
+import { manifests as externalLoginProviders } from './external-login-providers/manifests';
 
 import { ManifestTypes, umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
@@ -12,4 +14,10 @@ const registerExtensions = (manifests: Array<ManifestTypes>) => {
 	});
 };
 
-registerExtensions([...userSectionManifests, ...userGroupManifests, ...userManifests]);
+registerExtensions([
+	...userSectionManifests,
+	...userGroupManifests,
+	...userManifests,
+	...currentUserManifests,
+	...externalLoginProviders,
+]);
