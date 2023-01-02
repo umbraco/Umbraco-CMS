@@ -10,9 +10,9 @@ import { manifests as memberGroupTreeManifests } from './members/member-groups/t
 import { manifests as mediaTreeManifests } from './media/media/tree/manifests';
 import { manifests as mediaTypeTreeManifests } from './media/media-types/tree/manifests';
 
-import type { ManifestTree, ManifestTreeItemAction } from '@umbraco-cms/models';
+import type { ManifestTree, ManifestTreeItemAction, ManifestWorkspace } from '@umbraco-cms/models';
 
-export const manifests: Array<ManifestTree | ManifestTreeItemAction> = [
+export const manifests: Array<ManifestTree | ManifestTreeItemAction | ManifestWorkspace> = [
 	...dataTypeTreeManifests,
 	...dictionaryTreeManifests,
 	...documentTreeManifests,
