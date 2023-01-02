@@ -22,4 +22,9 @@ export class UmbObserver<Y = any> {
 	hostDisconnected() {
 		this.#subscription.unsubscribe();
 	}
+
+	destroy(): void {
+		this.#subscription.unsubscribe();
+	}
+
 };
