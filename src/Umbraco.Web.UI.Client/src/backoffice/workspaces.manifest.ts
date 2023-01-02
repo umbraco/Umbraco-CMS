@@ -5,15 +5,6 @@ import type { ManifestWorkspace } from '@umbraco-cms/models';
 export const manifests: Array<ManifestWorkspace> = [
 	{
 		type: 'workspace',
-		alias: 'Umb.Workspace.Extensions',
-		name: 'Extensions Workspace',
-		loader: () => import('./core/extensions/workspace/extension-root/workspace-extension-root.element'),
-		meta: {
-			entityType: 'extension-root',
-		},
-	},
-	{
-		type: 'workspace',
 		alias: 'Umb.Workspace.User',
 		name: 'User Workspace',
 		loader: () => import('../auth/users/workspace/workspace-user.element'),

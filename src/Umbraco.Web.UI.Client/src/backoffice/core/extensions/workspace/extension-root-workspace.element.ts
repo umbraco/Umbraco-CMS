@@ -6,8 +6,8 @@ import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { ManifestTypes } from '@umbraco-cms/models';
 
-@customElement('umb-workspace-extension-root')
-export class UmbWorkspaceExtensionRootElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+@customElement('umb-extension-root-workspace')
+export class UmbExtensionRootWorkspaceElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
 	@state()
 	private _extensions: Array<ManifestTypes> = [];
 
@@ -47,7 +47,7 @@ export class UmbWorkspaceExtensionRootElement extends UmbContextConsumerMixin(Um
 										<uui-button
 											label="unload"
 											@click=${() => umbExtensionsRegistry.unregister(extension.alias)}></uui-button>
-										</uui-table-cell>
+									</uui-table-cell>
 								</uui-table-row>
 							`
 						)}
@@ -58,10 +58,10 @@ export class UmbWorkspaceExtensionRootElement extends UmbContextConsumerMixin(Um
 	}
 }
 
-export default UmbWorkspaceExtensionRootElement;
+export default UmbExtensionRootWorkspaceElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-workspace-extension-root': UmbWorkspaceExtensionRootElement;
+		'umb-extension-root-workspace': UmbExtensionRootWorkspaceElement;
 	}
 }
