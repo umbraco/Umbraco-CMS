@@ -3,8 +3,8 @@ import { customElement } from 'lit/decorators.js';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import type { ManifestSectionView } from '@umbraco-cms/models';
 
-@customElement('umb-section-users')
-export class UmbSectionUsersElement extends LitElement {
+@customElement('umb-users-section')
+export class UmbUsersSectionElement extends LitElement {
 	constructor() {
 		super();
 
@@ -25,10 +25,10 @@ export class UmbSectionUsersElement extends LitElement {
 	}
 }
 
-export default UmbSectionUsersElement;
+export default UmbUsersSectionElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-section-users': UmbSectionUsersElement;
+		'umb-users-section': UmbUsersSectionElement;
 	}
 }
