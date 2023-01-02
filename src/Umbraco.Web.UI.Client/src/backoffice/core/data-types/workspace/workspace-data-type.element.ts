@@ -111,6 +111,8 @@ export class UmbWorkspaceDataTypeElement extends UmbContextProviderMixin(
 				loader: () => import('../../components/workspace/actions/save/workspace-action-node-save.element'),
 				meta: {
 					workspaces: ['Umb.Workspace.DataType'],
+					look: 'primary',
+					color: 'positive'
 				},
 			},
 		];

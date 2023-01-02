@@ -247,6 +247,8 @@ export class UmbUserGroupWorkspaceElement extends UmbContextProviderMixin(
 					import('../../../backoffice/core/components/workspace/actions/save/workspace-action-node-save.element'),
 				meta: {
 					workspaces: ['Umb.Workspace.UserGroup'],
+					look: 'primary',
+					color: 'positive'
 				},
 			},
 		];
