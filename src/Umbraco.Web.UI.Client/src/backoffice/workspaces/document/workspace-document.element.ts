@@ -3,7 +3,7 @@ import { css, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { UmbWorkspaceDocumentContext } from './workspace-document.context';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-import type { ManifestWorkspaceView } from '@umbraco-cms/models';
+import type { ManifestWorkspaceAction, ManifestWorkspaceView } from '@umbraco-cms/models';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import '../shared/workspace-content/workspace-content.element';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
@@ -61,7 +61,7 @@ export class UmbWorkspaceDocumentElement extends UmbObserverMixin(UmbContextCons
 	}
 
 	private _registerWorkspaceViews() {
-		const dashboards: Array<ManifestWorkspaceView> = [
+		const dashboards: Array<ManifestWorkspaceView | ManifestWorkspaceAction> = [
 			{
 				type: 'workspaceView',
 				alias: 'Umb.WorkspaceView.Document.Edit',
@@ -86,6 +86,39 @@ export class UmbWorkspaceDocumentElement extends UmbObserverMixin(UmbContextCons
 					label: 'Info',
 					pathname: 'info',
 					icon: 'info',
+				},
+			},
+			{
+				type: 'workspaceAction',
+				alias: 'Umb.WorkspaceAction.Document.SaveAndPreview',
+				name: 'Save Document Workspace Action',
+				loader: () => import('../shared/actions/save/workspace-action-node-save.element'),
+				meta: {
+					workspaces: ['Umb.Workspace.Document'],
+					label: 'Save and preview',
+				},
+			},
+			{
+				type: 'workspaceAction',
+				alias: 'Umb.WorkspaceAction.Document.Save',
+				name: 'Save Document Workspace Action',
+				loader: () => import('../shared/actions/save/workspace-action-node-save.element'),
+				meta: {
+					workspaces: ['Umb.Workspace.Document'],
+					look: 'secondary',
+					label: 'Save'
+				},
+			},
+			{
+				type: 'workspaceAction',
+				alias: 'Umb.WorkspaceAction.Document.SaveAndPublish',
+				name: 'Save Document Workspace Action',
+				loader: () => import('../shared/actions/save/workspace-action-node-save.element'),
+				meta: {
+					workspaces: ['Umb.Workspace.Document'],
+					label: 'Save and publish',
+					look: 'primary',
+					color: 'positive'
 				},
 			},
 		];

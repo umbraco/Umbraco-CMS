@@ -4,6 +4,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import type { UUIButtonState } from '@umbraco-ui/uui';
 import type { UmbWorkspaceNodeContext } from '../../workspace-context/workspace-node.context';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import type { ManifestWorkspaceAction } from '@umbraco-cms/models';
 
 @customElement('umb-workspace-action-node-save')
 export class UmbWorkspaceActionNodeSaveElement extends UmbContextConsumerMixin(LitElement) {
@@ -15,6 +16,8 @@ export class UmbWorkspaceActionNodeSaveElement extends UmbContextConsumerMixin(L
 
 	private _workspaceContext?: UmbWorkspaceNodeContext;
 
+	public manifest?: ManifestWorkspaceAction;
+
 	constructor() {
 		super();
 
@@ -24,7 +27,7 @@ export class UmbWorkspaceActionNodeSaveElement extends UmbContextConsumerMixin(L
 		);
 	}
 
-	private async _handleSave() {
+	private async _onSave() {
 		if (!this._workspaceContext) return;
 
 		this._saveButtonState = 'waiting';
@@ -36,12 +39,14 @@ export class UmbWorkspaceActionNodeSaveElement extends UmbContextConsumerMixin(L
 	}
 
 	render() {
-		return html`<uui-button
-			@click=${this._handleSave}
-			look="primary"
-			color="positive"
-			label="save"
-			.state="${this._saveButtonState}"></uui-button>`;
+		return html`
+			<uui-button
+				@click=${this._onSave}
+				look=${this.manifest?.meta.look || 'default'}
+				color=${this.manifest?.meta.color || 'default'}
+				label=${this.manifest?.meta.label || 'Save'}
+				.state="${this._saveButtonState}"></uui-button>
+		`;
 	}
 }
 

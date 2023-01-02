@@ -48,6 +48,11 @@ export class UmbWorkspaceEntity extends UmbContextConsumerMixin(UmbObserverMixin
 			router-slot {
 				height: 100%;
 			}
+
+			umb-extension-slot[slot='actions'] {
+				display: flex;
+				gap: 6px;
+			}
 		`,
 	];
 
