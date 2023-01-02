@@ -21,32 +21,7 @@ export class UmbTreeDataTypesElement extends UmbContextProviderMixin(UmbContextC
 	}
 
 	private _registerTreeItemActions() {
-		const dashboards: Array<ManifestTreeItemAction> = [
-			{
-				type: 'treeItemAction',
-				alias: 'Umb.TreeItemAction.DataType.Create',
-				name: 'Tree Item Action Create',
-				loader: () => import('./actions/create/action-data-type-create.element'),
-				weight: 200,
-				meta: {
-					trees: ['Umb.Tree.DataTypes'],
-					label: 'Create',
-					icon: 'umb:add',
-				},
-			},
-			{
-				type: 'treeItemAction',
-				alias: 'Umb.TreeItemAction.DataType.Delete',
-				name: 'Tree Item Action Delete',
-				loader: () => import('./actions/delete/action-data-type-delete.element'),
-				weight: 100,
-				meta: {
-					trees: ['Umb.Tree.DataTypes'],
-					label: 'Delete',
-					icon: 'umb:delete',
-				},
-			},
-		];
+		const dashboards: Array<ManifestTreeItemAction> = [];
 
 		dashboards.forEach((dashboard) => {
 			if (umbExtensionsRegistry.isRegistered(dashboard.alias)) return;
