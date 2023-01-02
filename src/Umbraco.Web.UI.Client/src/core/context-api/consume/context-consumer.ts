@@ -6,6 +6,11 @@ import { UmbContextRequestEventImplementation, UmbContextCallback } from './cont
  * @class UmbContextConsumer
  */
 export class UmbContextConsumer {
+
+	get consumerAlias() {
+		return this._contextAlias;
+	}
+
 	/**
 	 * Creates an instance of UmbContextConsumer.
 	 * @param {EventTarget} target
