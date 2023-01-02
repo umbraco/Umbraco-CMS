@@ -1,23 +1,20 @@
 import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html, LitElement, nothing } from 'lit';
+import { css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { distinctUntilChanged } from 'rxjs';
 import { UmbWorkspaceUserGroupContext } from './workspace-user-group.context';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import type { ManifestWorkspaceAction, UserDetails, UserGroupDetails } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbUserStore } from 'src/auth/users/user.store';
 
 import 'src/auth/components/input-user/input-user.element';
 import 'src/backoffice/core/components/input-section/input-section.element';
+import { UmbLitElement } from 'src/core/element/lit-element.element';
 
 @customElement('umb-user-group-workspace')
-export class UmbUserGroupWorkspaceElement extends UmbContextProviderMixin(
-	UmbContextConsumerMixin(UmbObserverMixin(LitElement))
-) {
+export class UmbUserGroupWorkspaceElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -215,17 +212,6 @@ export class UmbUserGroupWorkspaceElement extends UmbContextProviderMixin(
 			this._userStore = instance;
 			this._observeUsers();
 		});
-	}
-
-	connectedCallback(): void {
-		super.connectedCallback();
-		// TODO: avoid this connection, our own approach on Lit-Controller could be handling this case.
-		this._workspaceContext?.connectedCallback();
-	}
-	disconnectedCallback(): void {
-		super.connectedCallback();
-		// TODO: avoid this connection, our own approach on Lit-Controller could be handling this case.
-		this._workspaceContext?.disconnectedCallback();
 	}
 
 	protected _provideWorkspace() {

@@ -1,5 +1,5 @@
 import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
-import { css, html, LitElement, nothing, TemplateResult } from 'lit';
+import { css, html, nothing, TemplateResult } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
@@ -9,7 +9,6 @@ import { distinctUntilChanged } from 'rxjs';
 import { getTagLookAndColor } from '../../utils';
 
 import { UmbWorkspaceUserContext } from './workspace-user.context';
-import { UmbContextProviderMixin, UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { ManifestWorkspaceAction, UserDetails } from '@umbraco-cms/models';
 
 import 'src/auth/components/input-user-group/input-user-group.element';
@@ -17,15 +16,13 @@ import 'src/auth/components/input-user-group/input-user-group.element';
 import { umbCurrentUserService } from 'src/auth/current-user/current-user.service';
 import { UmbModalService } from 'src/backoffice/core/services/modal';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 
 import '../../../backoffice/core/property-editors/uis/content-picker/property-editor-ui-content-picker.element';
 import '../../../backoffice/core/components/workspace/workspace-entity/workspace-entity.element';
+import { UmbLitElement } from 'src/core/element/lit-element.element';
 
 @customElement('umb-workspace-user')
-export class UmbWorkspaceUserElement extends UmbContextProviderMixin(
-	UmbContextConsumerMixin(UmbObserverMixin(LitElement))
-) {
+export class UmbWorkspaceUserElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -115,17 +112,6 @@ export class UmbWorkspaceUserElement extends UmbContextProviderMixin(
 
 		this._observeCurrentUser();
 		this._registerWorkspaceActions();
-	}
-
-	connectedCallback(): void {
-		super.connectedCallback();
-		// TODO: avoid this connection, our own approach on Lit-Controller could be handling this case.
-		this._workspaceContext?.connectedCallback();
-	}
-	disconnectedCallback(): void {
-		super.connectedCallback();
-		// TODO: avoid this connection, our own approach on Lit-Controller could be handling this case.
-		this._workspaceContext?.disconnectedCallback();
 	}
 
 	protected _provideWorkspace() {

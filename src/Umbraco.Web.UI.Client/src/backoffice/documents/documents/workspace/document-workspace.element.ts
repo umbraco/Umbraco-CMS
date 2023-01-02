@@ -29,16 +29,6 @@ export class UmbDocumentWorkspaceElement extends UmbLitElement {
 
 	private _workspaceContext?: UmbWorkspaceDocumentContext;
 
-	connectedCallback(): void {
-		super.connectedCallback();
-		// TODO: avoid this connection, our own approach on Lit-Controller could be handling this case.
-		this._workspaceContext?.connectedCallback();
-	}
-	disconnectedCallback(): void {
-		super.connectedCallback();
-		// TODO: avoid this connection, our own approach on Lit-Controller could be handling this case.
-		this._workspaceContext?.disconnectedCallback();
-	}
 
 	protected _provideWorkspace() {
 		if (this._entityKey) {

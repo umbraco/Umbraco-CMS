@@ -1,20 +1,17 @@
 import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html, LitElement } from 'lit';
+import { css, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { distinctUntilChanged } from 'rxjs';
 import { UmbWorkspaceDocumentTypeContext } from './document-type-workspace.context';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import type { DocumentTypeDetails } from '@umbraco-cms/models';
 import { UmbModalService } from 'src/backoffice/core/services/modal';
 
 import '../../../core/property-editors/uis/icon-picker/property-editor-ui-icon-picker.element';
+import { UmbLitElement } from 'src/core/element/lit-element.element';
 
 @customElement('umb-document-type-workspace')
-export class UmbDocumentTypeWorkspaceElement extends UmbContextProviderMixin(
-	UmbContextConsumerMixin(UmbObserverMixin(LitElement))
-) {
+export class UmbDocumentTypeWorkspaceElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -73,17 +70,6 @@ export class UmbDocumentTypeWorkspaceElement extends UmbContextProviderMixin(
 		this.consumeContext('umbModalService', (instance) => {
 			this._modalService = instance;
 		});
-	}
-
-	connectedCallback(): void {
-		super.connectedCallback();
-		// TODO: avoid this connection, our own approach on Lit-Controller could be handling this case.
-		this._workspaceContext?.connectedCallback();
-	}
-	disconnectedCallback(): void {
-		super.connectedCallback();
-		// TODO: avoid this connection, our own approach on Lit-Controller could be handling this case.
-		this._workspaceContext?.disconnectedCallback();
 	}
 
 	protected _provideWorkspace() {

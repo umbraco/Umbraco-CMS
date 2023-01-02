@@ -1,5 +1,5 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html, LitElement } from 'lit';
+import { css, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { UmbWorkspaceMediaContext } from './workspace-media.context';
 import type {
@@ -8,10 +8,10 @@ import type {
 	ManifestWorkspaceViewCollection,
 } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
+import { UmbLitElement } from 'src/core/element/lit-element.element';
 
 @customElement('umb-workspace-media')
-export class UmbWorkspaceMediaElement extends UmbContextConsumerMixin(UmbContextProviderMixin(LitElement)) {
+export class UmbWorkspaceMediaElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -40,17 +40,6 @@ export class UmbWorkspaceMediaElement extends UmbContextConsumerMixin(UmbContext
 
 		// TODO: consider if registering extensions should happen initially or else where, to enable unregister of extensions.
 		this._registerWorkspaceViews();
-	}
-
-	connectedCallback(): void {
-		super.connectedCallback();
-		// TODO: avoid this connection, our own approach on Lit-Controller could be handling this case.
-		this._workspaceContext?.connectedCallback();
-	}
-	disconnectedCallback(): void {
-		super.connectedCallback();
-		// TODO: avoid this connection, our own approach on Lit-Controller could be handling this case.
-		this._workspaceContext?.disconnectedCallback();
 	}
 
 	protected _provideWorkspace() {
