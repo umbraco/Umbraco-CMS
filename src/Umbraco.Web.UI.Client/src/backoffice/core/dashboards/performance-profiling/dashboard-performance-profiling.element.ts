@@ -1,11 +1,12 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html, LitElement } from 'lit';
+import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { ProfilingResource, ProfilingStatus } from '@umbraco-cms/backend-api';
 import { tryExecuteAndNotify } from 'src/core/resources/tryExecuteAndNotify.method';
+import { UmbLitElement } from 'src/core/element/lit-element.element';
 
 @customElement('umb-dashboard-performance-profiling')
-export class UmbDashboardPerformanceProfilingElement extends LitElement {
+export class UmbDashboardPerformanceProfilingElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`

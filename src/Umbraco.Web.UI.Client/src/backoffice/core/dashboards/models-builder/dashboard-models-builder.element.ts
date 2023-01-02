@@ -1,16 +1,15 @@
 import { UUIButtonState } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html, LitElement, nothing } from 'lit';
+import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
 import { UmbNotificationService } from '../../services/notification';
 import { UmbNotificationDefaultData } from '../../services/notification/layouts/default';
 import { ApiError, ModelsBuilder, ModelsBuilderResource, ModelsMode, ProblemDetails } from '@umbraco-cms/backend-api';
-import { UmbContextConsumerController } from 'src/core/context-api/consume/context-consumer.controller';
-import { UmbControllerHostMixin } from 'src/core/controller/controller-host.mixin';
+import { UmbLitElement } from 'src/core/element/lit-element.element';
 
 @customElement('umb-dashboard-models-builder')
-export class UmbDashboardModelsBuilderElement extends UmbControllerHostMixin(LitElement) {
+export class UmbDashboardModelsBuilderElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -57,7 +56,7 @@ export class UmbDashboardModelsBuilderElement extends UmbControllerHostMixin(Lit
 		super();
 		this._getDashboardData();
 
-		new UmbContextConsumerController(this, 'umbNotificationService', (instance) => {
+		this.consumeContext('umbNotificationService', (instance) => {
 			this._notificationService = instance;
 		});
 	}
