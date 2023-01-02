@@ -62,7 +62,7 @@ export const UmbElementMixin = <T extends HTMLElementConstructor>(superClass: T)
 
 
 
-        private _createContextConsumers(aliases: Array<string>, resolvedCallback: (_instances: ResolvedContexts) => void) {
+		private _createContextConsumers(aliases: Array<string>, resolvedCallback: (_instances: ResolvedContexts) => void) {
 			aliases.forEach((alias) => 
 				new UmbContextConsumerController(this, alias, () => {
 					
