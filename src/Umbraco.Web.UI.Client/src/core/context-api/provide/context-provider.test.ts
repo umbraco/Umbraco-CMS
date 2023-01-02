@@ -28,11 +28,11 @@ describe('UmbContextProvider', () => {
 
 		describe('methods', () => {
 			it('has an attach method', () => {
-				expect(provider).to.have.property('attach').that.is.a('function');
+				expect(provider).to.have.property('hostConnected').that.is.a('function');
 			});
 
 			it('has a detach method', () => {
-				expect(provider).to.have.property('detach').that.is.a('function');
+				expect(provider).to.have.property('hostDisconnected').that.is.a('function');
 			});
 		});
 	});
