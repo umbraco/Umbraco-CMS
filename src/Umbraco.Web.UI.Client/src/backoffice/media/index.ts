@@ -1,5 +1,4 @@
 import { manifests as mediaSectionManifests } from './media-section/manifests';
-
 import { ManifestTypes, umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
 const registerExtensions = (manifests: Array<ManifestTypes> | Array<ManifestTypes>) => {

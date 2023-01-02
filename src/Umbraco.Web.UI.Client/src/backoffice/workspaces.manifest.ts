@@ -16,7 +16,7 @@ export const manifests: Array<ManifestWorkspace> = [
 		type: 'workspace',
 		alias: 'Umb.Workspace.MemberGroup',
 		name: 'Member Group Workspace',
-		loader: () => import('./members/member-groups/workspace/workspace-member-group.element'),
+		loader: () => import('./members/member-groups/workspace/member-group-workspace.element'),
 		meta: {
 			entityType: 'member-group',
 		},
