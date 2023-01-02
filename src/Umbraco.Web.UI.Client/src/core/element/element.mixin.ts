@@ -61,13 +61,15 @@ export const UmbElementMixin = <T extends HTMLElementConstructor>(superClass: T)
 		 * @memberof UmbElementMixin
 		 */
 		consumeAllContexts(_contextAliases: Array<string>, callback: (_instances: ResolvedContexts) => void) {
-			_contextAliases.forEach((alias) => 
+			let resolvedAmount = 0;
+			const controllers = _contextAliases.map((alias) => 
 				new UmbContextConsumerController(this, alias, () => {
 					
-                    const allResolved = this.getControllers((ctrl: UmbControllerInterface):boolean => isContextConsumerType(ctrl) && _contextAliases.indexOf(ctrl.consumerAlias) !== -1 );
+					resolvedAmount++;
+                    //const allResolved = this.getControllers((ctrl: UmbControllerInterface):boolean => isContextConsumerType(ctrl) && _contextAliases.indexOf(ctrl.consumerAlias) !== -1 );
 
-					if (allResolved.length === _contextAliases.length) {
-						callback(allResolved);
+					if (resolvedAmount === _contextAliases.length) {
+						callback(controllers);
 					}
 				})
 			);
