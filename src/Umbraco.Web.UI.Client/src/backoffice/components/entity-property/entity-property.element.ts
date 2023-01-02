@@ -127,23 +127,15 @@ export class UmbEntityPropertyElement extends UmbControllerHostMixin(UmbObserver
 
 		// TODO: make it easier to create a provider, unless a context should just extends a provider-controller?
 		new UmbContextProviderController(this, 'umbPropertyContext',  this._propertyContext);
-	}
 
-
-
-	connectedCallback(): void {
-		super.connectedCallback();
-		this._observePropertyEditorUI();
-		this.addEventListener('property-editor-change', this._onPropertyEditorChange as any as EventListener);
-	}
-
-	private _observePropertyEditorUI() {
 		this.observe<ManifestTypes>(umbExtensionsRegistry.getByAlias(this.propertyEditorUIAlias), (manifest) => {
 			if (manifest?.type === 'propertyEditorUI') {
 				this._gotData(manifest);
 			}
 		});
+		this.addEventListener('property-editor-change', this._onPropertyEditorChange as any as EventListener);
 	}
+
 
 	private _gotData(propertyEditorUIManifest?: ManifestPropertyEditorUI) {
 		if (!propertyEditorUIManifest) {
