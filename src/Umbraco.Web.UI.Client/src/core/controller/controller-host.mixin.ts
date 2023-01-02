@@ -4,6 +4,7 @@ import { UmbControllerInterface } from './controller.interface';
 export declare class UmbControllerHostInterface extends HTMLElement {
     //#controllers:UmbController[];
 	//#attached:boolean;
+	hasController(controller:UmbControllerInterface): boolean;
 	addController(controller:UmbControllerInterface): void;
 	removeController(controller:UmbControllerInterface): void;
 }
@@ -22,6 +23,14 @@ export const UmbControllerHostMixin = <T extends HTMLElementConstructor>(superCl
 
 		#attached = false;
 
+		/**
+		 * Tests if a controller is assigned to this element.
+		 * @param {UmbControllerInterface} ctrl
+		 */
+		hasController(ctrl: UmbControllerInterface): boolean {
+			return (this.#controllers.indexOf(ctrl) !== -1);
+		}
+	
 		/**
 		 * Append a controller to this element.
 		 * @param {UmbControllerInterface} ctrl
