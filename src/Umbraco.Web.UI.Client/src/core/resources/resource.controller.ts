@@ -3,7 +3,8 @@ import { UmbController } from '../controller/controller.interface';
 import { UmbControllerHostInterface } from '../controller/controller-host.mixin';
 import { UmbContextConsumerController } from '../context-api/consume/context-consumer.controller';
 import { ApiError, CancelablePromise, ProblemDetails } from '@umbraco-cms/backend-api';
-import { UmbNotificationOptions, UmbNotificationDefaultData, UmbNotificationService } from '@umbraco-cms/services';
+import { UmbNotificationOptions, UmbNotificationService } from 'src/backoffice/core/services/notification';
+import { UmbNotificationDefaultData } from 'src/backoffice/core/services/notification/layouts/default';
 
 export class UmbResourceController implements UmbController {
 

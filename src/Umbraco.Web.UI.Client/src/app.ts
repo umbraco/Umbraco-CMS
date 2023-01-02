@@ -13,7 +13,7 @@ import type { Guard, IRoute } from 'router-slot/model';
 
 import { UUIIconRegistryEssential } from '@umbraco-ui/uui';
 import { css, html, LitElement } from 'lit';
-import {customElement, property, state} from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 
 import { OpenAPI, RuntimeLevel, ServerResource } from '@umbraco-cms/backend-api';
 import { UmbContextProviderMixin } from '@umbraco-cms/context-api';
@@ -53,7 +53,7 @@ export class UmbApp extends UmbContextProviderMixin(LitElement) {
 		},
 		{
 			path: '**',
-			component: () => import('./backoffice/backoffice.element'),
+			component: () => import('./backoffice/core/backoffice.element'),
 			guards: [this._isAuthorizedGuard()],
 		},
 	];
@@ -70,7 +70,10 @@ export class UmbApp extends UmbContextProviderMixin(LitElement) {
 	async connectedCallback() {
 		super.connectedCallback();
 
-		OpenAPI.BASE = import.meta.env.VITE_UMBRACO_USE_MSW === 'on' ? '' : this.umbracoUrl ?? import.meta.env.VITE_UMBRACO_API_URL ?? '';
+		OpenAPI.BASE =
+			import.meta.env.VITE_UMBRACO_USE_MSW === 'on'
+				? ''
+				: this.umbracoUrl ?? import.meta.env.VITE_UMBRACO_API_URL ?? '';
 		OpenAPI.WITH_CREDENTIALS = true;
 
 		this.provideContext('UMBRACOBASE', OpenAPI.BASE);
