@@ -5,8 +5,8 @@ import { UmbWorkspaceDocumentContext } from './document-workspace.context';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 
-@customElement('umb-workspace-document')
-export class UmbWorkspaceDocumentElement extends UmbObserverMixin(
+@customElement('umb-document-workspace')
+export class UmbDocumentWorkspaceElement extends UmbObserverMixin(
 	UmbContextConsumerMixin(UmbContextProviderMixin(LitElement))
 ) {
 	static styles = [
@@ -55,10 +55,10 @@ export class UmbWorkspaceDocumentElement extends UmbObserverMixin(
 	}
 }
 
-export default UmbWorkspaceDocumentElement;
+export default UmbDocumentWorkspaceElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-workspace-document': UmbWorkspaceDocumentElement;
+		'umb-document-workspace': UmbDocumentWorkspaceElement;
 	}
 }
