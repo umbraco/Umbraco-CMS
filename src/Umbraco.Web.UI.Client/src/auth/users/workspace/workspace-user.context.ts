@@ -1,5 +1,6 @@
 import { UmbWorkspaceNodeContext } from '../../../backoffice/core/components/workspace/workspace-context/workspace-node.context';
 import type { UmbUserStore, UmbUserStoreItemType } from 'src/auth/users/user.store';
+import { UmbControllerHostInterface } from 'src/core/controller/controller-host.mixin';
 
 const DefaultDataTypeData = {
 	key: '',
@@ -20,7 +21,7 @@ const DefaultDataTypeData = {
 } as UmbUserStoreItemType;
 
 export class UmbWorkspaceUserContext extends UmbWorkspaceNodeContext<UmbUserStoreItemType, UmbUserStore> {
-	constructor(target: HTMLElement, entityKey: string) {
-		super(target, DefaultDataTypeData, 'umbUserStore', entityKey, 'user');
+	constructor(host: UmbControllerHostInterface, entityKey: string) {
+		super(host, DefaultDataTypeData, 'umbUserStore', entityKey, 'user');
 	}
 }
