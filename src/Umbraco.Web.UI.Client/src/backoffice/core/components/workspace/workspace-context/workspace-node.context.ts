@@ -1,7 +1,7 @@
-import { UmbNotificationService } from '../../../services/notification';
-import { UmbNotificationDefaultData } from '../../../services/notification/layouts/default';
+import { UmbNotificationService } from '../../../../../core/services/notification';
+import { UmbNotificationDefaultData } from '../../../../../core/services/notification/layouts/default';
 import { UmbWorkspaceWithStoreContext } from './workspace-with-store.context';
-import { UmbNodeStoreBase } from 'src/backoffice/core/stores/store';
+import { UmbNodeStoreBase } from '@umbraco-cms/stores/store';
 import { ContentTreeItem } from '@umbraco-cms/backend-api';
 import { UmbContextConsumer } from '@umbraco-cms/context-api';
 
@@ -67,4 +67,3 @@ export class UmbWorkspaceNodeContext<
 			});
 	}
 }
-

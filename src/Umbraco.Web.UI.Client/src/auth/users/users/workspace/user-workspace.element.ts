@@ -13,7 +13,7 @@ import { UmbWorkspaceUserContext } from './user-workspace.context';
 import { UmbContextProviderMixin, UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { UserDetails } from '@umbraco-cms/models';
 
-import { UmbModalService } from 'src/backoffice/core/services/modal';
+import { UmbModalService } from 'src/core/services/modal';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 
 import 'src/auth/components/input-user-group/input-user-group.element';

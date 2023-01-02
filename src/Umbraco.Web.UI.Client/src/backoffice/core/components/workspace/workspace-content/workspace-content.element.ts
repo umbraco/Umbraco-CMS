@@ -14,7 +14,7 @@ import '../workspace-entity/workspace-entity.element';
 // TODO: Make this dynamic, use load-extensions method to loop over extensions for this node.
 import './views/edit/workspace-view-content-edit.element';
 import './views/info/workspace-view-content-info.element';
-import type { UmbNodeStoreBase } from 'src/backoffice/core/stores/store';
+import type { UmbNodeStoreBase } from '@umbraco-cms/stores/store';
 
 type ContentTypeTypes = DocumentDetails | MediaDetails;
 

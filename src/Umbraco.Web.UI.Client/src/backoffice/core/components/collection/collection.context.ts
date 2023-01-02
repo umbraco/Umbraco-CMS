@@ -1,7 +1,7 @@
 import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { ContentTreeItem } from '@umbraco-cms/backend-api';
 import { UmbContextConsumer } from '@umbraco-cms/context-api';
-import { UmbTreeDataStore } from 'src/backoffice/core/stores/store';
+import { UmbTreeDataStore } from '@umbraco-cms/stores/store';
 
 export class UmbCollectionContext<
 	DataType extends ContentTreeItem,

@@ -7,7 +7,7 @@ import { UmbWorkspaceDocumentTypeContext } from './document-type-workspace.conte
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import type { DocumentTypeDetails } from '@umbraco-cms/models';
-import { UmbModalService } from 'src/backoffice/core/services/modal';
+import { UmbModalService } from 'src/core/services/modal';
 
 import '../../../core/property-editors/uis/icon-picker/property-editor-ui-icon-picker.element';
 

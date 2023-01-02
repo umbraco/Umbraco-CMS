@@ -3,9 +3,8 @@ import { UmbController } from '../controller/controller.class';
 import { UmbControllerHostInterface } from '../controller/controller-host.mixin';
 import { UmbContextConsumerController } from '../context-api/consume/context-consumer.controller';
 import { ApiError, CancelablePromise, ProblemDetails } from '@umbraco-cms/backend-api';
-import { UmbNotificationOptions, UmbNotificationService } from 'src/backoffice/core/services/notification';
-import { UmbNotificationDefaultData } from 'src/backoffice/core/services/notification/layouts/default';
-
+import { UmbNotificationOptions, UmbNotificationService } from 'src/core/services/notification';
+import { UmbNotificationDefaultData } from 'src/core/services/notification/layouts/default';
 
 /**
  * Extract the ProblemDetails object from an ApiError.
@@ -26,25 +25,19 @@ function toProblemDetails(error: unknown): ProblemDetails | undefined {
 	return undefined;
 }
 
-
 export class UmbResourceController extends UmbController {
-
-
 	#promise: Promise<any>;
 
 	#notificationService?: UmbNotificationService;
-
 
 	constructor(host: UmbControllerHostInterface, promise: Promise<any>) {
 		super(host);
 
 		this.#promise = promise;
 
-		new UmbContextConsumerController(host, 'umbNotificationService',
-			(_instance: UmbNotificationService) => {
-				this.#notificationService = _instance;
-			}
-		);
+		new UmbContextConsumerController(host, 'umbNotificationService', (_instance: UmbNotificationService) => {
+			this.#notificationService = _instance;
+		});
 	}
 
 	hostConnected() {
@@ -56,15 +49,14 @@ export class UmbResourceController extends UmbController {
 		this.cancel();
 	}
 
-
 	/**
 	 * Wrap the {execute} function in a try/catch block and return a tuple with the result and the error.
 	 */
-	async tryExecute<T>(): Promise<{data?: T, error?:ProblemDetails}> {
+	async tryExecute<T>(): Promise<{ data?: T; error?: ProblemDetails }> {
 		try {
-			return {data: await this.#promise};
+			return { data: await this.#promise };
 		} catch (e) {
-			return {error: toProblemDetails(e)};
+			return { error: toProblemDetails(e) };
 		}
 	}
 
@@ -72,8 +64,8 @@ export class UmbResourceController extends UmbController {
 	 * Wrap the {execute} function in a try/catch block and return the result.
 	 * If the executor function throws an error, then show the details in a notification.
 	 */
-	async tryExecuteAndNotify<T>(options?: UmbNotificationOptions<any>): Promise<{data?: T, error?:ProblemDetails}> {
-		const {data, error} = await this.tryExecute<T>();
+	async tryExecuteAndNotify<T>(options?: UmbNotificationOptions<any>): Promise<{ data?: T; error?: ProblemDetails }> {
+		const { data, error } = await this.tryExecute<T>();
 
 		if (error) {
 			const data: UmbNotificationDefaultData = {
@@ -90,9 +82,8 @@ export class UmbResourceController extends UmbController {
 			}
 		}
 
-		return {data, error};
+		return { data, error };
 	}
-
 
 	/**
 	 * Cancel all resources that are currently being executed by this controller if they are cancelable.

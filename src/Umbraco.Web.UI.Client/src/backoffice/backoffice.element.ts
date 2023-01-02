@@ -18,9 +18,9 @@ import { UmbDocumentBlueprintStore } from './documents/document-blueprints/docum
 
 import { UmbSectionStore } from './core/components/section/section.store';
 import { UmbDataTypeStore } from './core/data-types/data-type.store';
-import { UmbIconStore } from './core/stores/icon/icon.store';
-import { UmbNotificationService } from './core/services/notification';
-import { UmbModalService } from './core/services/modal';
+import { UmbIconStore } from '../core/stores/icon/icon.store';
+import { UmbNotificationService } from '../core/services/notification';
+import { UmbModalService } from '../core/services/modal';
 import { manifests as collectionBulkActionManifests } from './core/components/collection/bulk-actions/manifests';
 import { manifests as collectionViewManifests } from './core/components/collection/views/manifests';
 

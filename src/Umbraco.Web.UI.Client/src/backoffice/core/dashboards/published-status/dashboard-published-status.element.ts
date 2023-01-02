@@ -3,9 +3,9 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
-import { UmbModalService } from '../../services/modal';
-import { UmbNotificationService } from '../../services/notification';
-import { UmbNotificationDefaultData } from '../../services/notification/layouts/default';
+import { UmbModalService } from '../../../../core/services/modal';
+import { UmbNotificationService } from '../../../../core/services/notification';
+import { UmbNotificationDefaultData } from '../../../../core/services/notification/layouts/default';
 
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { ApiError, ProblemDetails, PublishedCacheResource } from '@umbraco-cms/backend-api';

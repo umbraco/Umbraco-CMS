@@ -1,14 +1,14 @@
 import { html, LitElement } from 'lit';
 import { property } from 'lit/decorators.js';
 import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
-import { UmbPickerData } from '../../services/modal/layouts/modal-layout-picker-base';
-import { UmbModalService, UmbModalType } from '../../services/modal';
+import { UmbPickerData } from '../../../../core/services/modal/layouts/modal-layout-picker-base';
+import { UmbModalService, UmbModalType } from '../../../../core/services/modal';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
 //TODO: These should probably be imported dynamically.
-import '../../services/modal/layouts/picker-section/picker-layout-section.element';
-import '../../services/modal/layouts/picker-user-group/picker-layout-user-group.element';
-import '../../services/modal/layouts/picker-user/picker-layout-user.element';
+import '../../../../core/services/modal/layouts/picker-section/picker-layout-section.element';
+import '../../../../core/services/modal/layouts/picker-user-group/picker-layout-user-group.element';
+import '../../../../core/services/modal/layouts/picker-user/picker-layout-user.element';
 
 /** TODO: Make use of UUI FORM Mixin, to make it easily take part of a form. */
 export class UmbInputListBase extends UmbContextConsumerMixin(LitElement) {

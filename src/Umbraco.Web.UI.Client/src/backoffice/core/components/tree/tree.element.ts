@@ -7,7 +7,7 @@ import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import type { ManifestTree } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-import { UmbDataStore } from 'src/backoffice/core/stores/store';
+import { UmbDataStore } from '@umbraco-cms/stores/store';
 
 @customElement('umb-tree')
 export class UmbTreeElement extends UmbContextProviderMixin(UmbContextConsumerMixin(UmbObserverMixin(LitElement))) {

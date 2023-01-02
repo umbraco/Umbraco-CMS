@@ -3,8 +3,8 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
-import { UmbNotificationService } from '../../services/notification';
-import { UmbNotificationDefaultData } from '../../services/notification/layouts/default';
+import { UmbNotificationService } from '../../../../core/services/notification';
+import { UmbNotificationDefaultData } from '../../../../core/services/notification/layouts/default';
 import { ApiError, ModelsBuilder, ModelsBuilderResource, ModelsMode, ProblemDetails } from '@umbraco-cms/backend-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 

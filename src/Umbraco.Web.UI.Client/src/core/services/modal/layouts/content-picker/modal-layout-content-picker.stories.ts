@@ -1,4 +1,4 @@
-import '../../../../components/body-layout/body-layout.element';
+import '../../../../../backoffice/core/components/body-layout/body-layout.element';
 import './modal-layout-content-picker.element';
 
 import { Meta, Story } from '@storybook/web-components';

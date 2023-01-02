@@ -1,5 +1,5 @@
 import { map, Observable } from 'rxjs';
-import { UmbDataStoreBase } from '../../../backoffice/core/stores/store';
+import { UmbDataStoreBase } from '../../../core/stores/store';
 import type { UserGroupDetails, UserGroupEntity } from '@umbraco-cms/models';
 
 // TODO: get rid of this type addition & { ... }:

@@ -6,7 +6,7 @@ import type {
 } from './modal-layout-property-editor-ui-picker.element';
 import './modal-layout-property-editor-ui-picker.element';
 
-import '../../../../components/body-layout/body-layout.element';
+import '../../../../../backoffice/core/components/body-layout/body-layout.element';
 
 export default {
 	title: 'API/Modals/Layouts/Property Editor UI Picker',
