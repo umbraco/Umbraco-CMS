@@ -1,14 +1,11 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-
-import { UmbNotificationService } from '../../services/notification';
-import { UmbNotificationDefaultData } from '../../services/notification/layouts/default';
-import { ApiError, ProblemDetails, ProfilingResource } from '@umbraco-cms/backend-api';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
+import { ProfilingResource } from '@umbraco-cms/backend-api';
+import { UmbResourceController } from '@umbraco-cms/controllers';
 
 @customElement('umb-dashboard-performance-profiling')
-export class UmbDashboardPerformanceProfilingElement extends UmbContextConsumerMixin(LitElement) {
+export class UmbDashboardPerformanceProfilingElement extends LitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -32,32 +29,21 @@ export class UmbDashboardPerformanceProfilingElement extends UmbContextConsumerM
 	@state()
 	private _profilingPerfomance = false;
 
-	private _notificationService?: UmbNotificationService;
-
-	private async _getProfilingStatus() {
-		try {
-			const status = await ProfilingResource.getProfilingStatus();
-			this._profilingStatus = status.enabled;
-		} catch (e) {
-			if (e instanceof ApiError) {
-				const error = e as ProblemDetails;
-				const data: UmbNotificationDefaultData = { message: error.message ?? 'Something went wrong' };
-				this._notificationService?.peek('danger', { data });
-			}
-		}
-	}
-
-	constructor() {
-		super();
-		this.consumeAllContexts(['umbNotificationService'], (instances) => {
-			this._notificationService = instances['umbNotificationService'];
-		});
-	}
+	private _resourceController = new UmbResourceController(this);
 
 	connectedCallback(): void {
 		super.connectedCallback();
 		this._getProfilingStatus();
 		this._profilingPerfomance = localStorage.getItem('profilingPerformance') === 'true';
+	}
+
+	private async _getProfilingStatus() {
+		const [profilingStatus] = await this._resourceController.tryExecuteAndNotify(
+			ProfilingResource.getProfilingStatus()
+		);
+		if (profilingStatus) {
+			this._profilingStatus = profilingStatus.enabled;
+		}
 	}
 
 	private _changeProfilingPerformance() {
