@@ -7,6 +7,9 @@ import { UmbUserGroupStore } from '../auth/users/user-groups/user-group.store';
 import { UmbCurrentUserStore } from '../auth/users/current-user/current-user.store';
 import { UmbCurrentUserHistoryStore } from '../auth/users/current-user/current-user-history.store';
 
+import { UmbNotificationService } from '../core/services/notification';
+import { UmbModalService } from '../core/services/modal';
+
 import { UmbDocumentTypeStore } from './documents/document-types/document-type.store';
 import { UmbMediaTypeStore } from './media/media-types/media-type.store';
 import { UmbMemberTypeStore } from './members/member-types/member-type.store';
@@ -18,15 +21,8 @@ import { UmbDocumentBlueprintStore } from './documents/document-blueprints/docum
 
 import { UmbSectionStore } from './core/components/section/section.store';
 import { UmbDataTypeStore } from './core/data-types/data-type.store';
-import { UmbNotificationService } from '../core/services/notification';
-import { UmbModalService } from '../core/services/modal';
-import { manifests as collectionBulkActionManifests } from './core/components/collection/bulk-actions/manifests';
-import { manifests as collectionViewManifests } from './core/components/collection/views/manifests';
 
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-
-import type { ManifestTypes } from '@umbraco-cms/models';
 
 // Domains
 import './core/components';
@@ -57,10 +53,6 @@ export class UmbBackofficeElement extends UmbContextConsumerMixin(UmbContextProv
 	constructor() {
 		super();
 
-		// TODO: this needs to happen in each domain
-		this._registerExtensions(collectionBulkActionManifests);
-		this._registerExtensions(collectionViewManifests);
-
 		// TODO: find a way this is possible outside this element. It needs to be possible to register stores in extensions
 		this.provideContext('umbCurrentUserStore', new UmbCurrentUserStore());
 		this.provideContext('umbDocumentStore', new UmbDocumentStore());
@@ -78,13 +70,6 @@ export class UmbBackofficeElement extends UmbContextConsumerMixin(UmbContextProv
 		this.provideContext('umbCurrentUserHistoryStore', new UmbCurrentUserHistoryStore());
 		this.provideContext('umbDictionaryStore', new UmbDictionaryStore());
 		this.provideContext('umbDocumentBlueprintStore', new UmbDocumentBlueprintStore());
-	}
-
-	private _registerExtensions(manifests: Array<ManifestTypes> | Array<ManifestTypes>) {
-		manifests.forEach((manifest) => {
-			if (umbExtensionsRegistry.isRegistered(manifest.alias)) return;
-			umbExtensionsRegistry.register(manifest);
-		});
 	}
 
 	render() {

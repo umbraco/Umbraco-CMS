@@ -7,6 +7,8 @@ import { manifests as propertyActionManifests } from './property-actions/manifes
 import { manifests as propertyEditorModelManifests } from './property-editors/models/manifests';
 import { manifests as propertyEditorUIManifests } from './property-editors/uis/manifests';
 import { manifests as searchManifests } from './search/manifests';
+import { manifests as collectionBulkActionManifests } from './components/collection/bulk-actions/manifests';
+import { manifests as collectionViewManifests } from './components/collection/views/manifests';
 
 import { ManifestTypes, umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
@@ -27,4 +29,6 @@ registerExtensions([
 	...propertyEditorModelManifests,
 	...propertyEditorUIManifests,
 	...searchManifests,
+	...collectionBulkActionManifests,
+	...collectionViewManifests,
 ]);
