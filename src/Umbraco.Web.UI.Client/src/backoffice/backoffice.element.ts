@@ -18,7 +18,6 @@ import { UmbDocumentBlueprintStore } from './documents/document-blueprints/docum
 
 import { UmbSectionStore } from './core/components/section/section.store';
 import { UmbDataTypeStore } from './core/data-types/data-type.store';
-import { UmbIconStore } from '../core/stores/icon/icon.store';
 import { UmbNotificationService } from '../core/services/notification';
 import { UmbModalService } from '../core/services/modal';
 import { manifests as collectionBulkActionManifests } from './core/components/collection/bulk-actions/manifests';
@@ -55,16 +54,12 @@ export class UmbBackofficeElement extends UmbContextConsumerMixin(UmbContextProv
 		`,
 	];
 
-	private _umbIconRegistry = new UmbIconStore();
-
 	constructor() {
 		super();
 
 		// TODO: this needs to happen in each domain
 		this._registerExtensions(collectionBulkActionManifests);
 		this._registerExtensions(collectionViewManifests);
-
-		this._umbIconRegistry.attach(this);
 
 		// TODO: find a way this is possible outside this element. It needs to be possible to register stores in extensions
 		this.provideContext('umbCurrentUserStore', new UmbCurrentUserStore());

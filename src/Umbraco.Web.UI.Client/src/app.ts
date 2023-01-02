@@ -15,6 +15,7 @@ import { UUIIconRegistryEssential } from '@umbraco-ui/uui';
 import { css, html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 
+import { UmbIconStore } from '@umbraco-cms/stores/icon/icon.store';
 import { OpenAPI, RuntimeLevel, ServerResource } from '@umbraco-cms/backend-api';
 import { UmbContextProviderMixin } from '@umbraco-cms/context-api';
 
@@ -60,11 +61,15 @@ export class UmbApp extends UmbContextProviderMixin(LitElement) {
 		},
 	];
 
+	private _umbIconRegistry = new UmbIconStore();
+
 	private _iconRegistry = new UUIIconRegistryEssential();
 	private _runtimeLevel = RuntimeLevel.UNKNOWN;
 
 	constructor() {
 		super();
+
+		this._umbIconRegistry.attach(this);
 
 		this._setup();
 	}
