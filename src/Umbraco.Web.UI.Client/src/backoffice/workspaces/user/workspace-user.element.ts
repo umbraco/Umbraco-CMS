@@ -165,6 +165,8 @@ export class UmbWorkspaceUserElement extends UmbContextProviderMixin(
 				loader: () => import('../shared/actions/save/workspace-action-node-save.element'),
 				meta: {
 					workspaces: ['Umb.Workspace.User'],
+					look: 'primary',
+					color: 'positive'
 				},
 			},
 		];

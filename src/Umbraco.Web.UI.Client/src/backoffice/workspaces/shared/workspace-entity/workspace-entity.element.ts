@@ -1,14 +1,14 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { IRoute, IRoutingInfo, PageComponent, RouterSlot } from 'router-slot';
+import { IRoutingInfo, RouterSlot } from 'router-slot';
 import { map } from 'rxjs';
 
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-import type { ManifestWorkspaceView } from '@umbraco-cms/models';
+import type { ManifestWithMeta, ManifestWorkspaceView, ManifestWorkspaceViewCollection } from '@umbraco-cms/models';
 
 import '../../../components/body-layout/body-layout.element';
 import '../../../components/extension-slot/extension-slot.element';
@@ -45,6 +45,14 @@ export class UmbWorkspaceEntity extends UmbContextConsumerMixin(UmbObserverMixin
 				border-left: 1px solid var(--uui-color-border);
 				border-right: 1px solid var(--uui-color-border);
 			}
+			router-slot {
+				height: 100%;
+			}
+
+			umb-extension-slot[slot='actions'] {
+				display: flex;
+				gap: 6px;
+			}
 		`,
 	];
 
@@ -62,13 +70,13 @@ export class UmbWorkspaceEntity extends UmbContextConsumerMixin(UmbObserverMixin
 	public alias = '';
 
 	@state()
-	private _workspaceViews: Array<ManifestWorkspaceView> = [];
+	private _workspaceViews: Array<ManifestWorkspaceView | ManifestWorkspaceViewCollection> = [];
 
 	@state()
 	private _currentView = '';
 
 	@state()
-	private _routes: Array<IRoute> = [];
+	private _routes: Array<any> = [];
 
 	private _routerFolder = '';
 
@@ -84,8 +92,8 @@ export class UmbWorkspaceEntity extends UmbContextConsumerMixin(UmbObserverMixin
 	private _observeWorkspaceViews() {
 		this.observe<ManifestWorkspaceView[]>(
 			umbExtensionsRegistry
-				.extensionsOfType('workspaceView')
-				.pipe(map((extensions) => extensions.filter((extension) => extension.meta.workspaces.includes(this.alias)))),
+				.extensionsOfTypes(['workspaceView', 'workspaceViewCollection'])
+				.pipe(map((extensions) => extensions.filter((extension) => (extension as ManifestWithMeta).meta.workspaces.includes(this.alias)))),
 			(workspaceViews) => {
 				this._workspaceViews = workspaceViews;
 				this._createRoutes();
@@ -100,10 +108,21 @@ export class UmbWorkspaceEntity extends UmbContextConsumerMixin(UmbObserverMixin
 			this._routes = this._workspaceViews.map((view) => {
 				return {
 					path: `view/${view.meta.pathname}`,
-					component: () => createExtensionElement(view) as unknown as PageComponent,
-					setup: (_element: HTMLElement, info: IRoutingInfo) => {
-						this._currentView = info.match.route.path;
+					component: () => {
+						if (view.type === 'workspaceViewCollection') {
+							console.log("!!!!!workspaceViewCollection")
+							return import('src/backoffice/workspaces/shared/workspace-content/views/collection/workspace-view-collection.element');
+						}
+						return createExtensionElement(view)
 					},
+					setup: (component: Promise<HTMLElement> | HTMLElement, info: IRoutingInfo) => {
+						this._currentView = info.match.route.path;
+						// When its using import, we get an element, when using createExtensionElement we get a Promise.
+						(component as any).manifest = view;
+						if((component as any).then) {
+							(component as any).then((el: any) => el.manifest = view);
+						}
+					}
 				};
 			});
 
@@ -133,7 +152,7 @@ export class UmbWorkspaceEntity extends UmbContextConsumerMixin(UmbObserverMixin
 				? html`
 						<uui-tab-group slot="tabs">
 							${this._workspaceViews.map(
-								(view: ManifestWorkspaceView) => html`
+								(view: ManifestWorkspaceView | ManifestWorkspaceViewCollection) => html`
 									<uui-tab
 										.label="${view.meta.label || view.name}"
 										href="${this._routerFolder}/view/${view.meta.pathname}"

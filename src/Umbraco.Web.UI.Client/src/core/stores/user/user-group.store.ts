@@ -12,6 +12,10 @@ export type UmbUserGroupStoreItemType = UserGroupDetails & { users?: Array<strin
  * @description - Data Store for Users
  */
 export class UmbUserGroupStore extends UmbDataStoreBase<UmbUserGroupStoreItemType> {
+
+
+	public readonly storeAlias = 'umbUserGroupStore';
+
 	getAll(): Observable<Array<UmbUserGroupStoreItemType>> {
 		// TODO: use Fetcher API.
 		// TODO: only fetch if the data type is not in the store?

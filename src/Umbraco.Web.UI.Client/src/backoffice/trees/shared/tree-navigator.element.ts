@@ -8,7 +8,7 @@ import { UmbTreeContext } from '../tree.context';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import type { Entity, ManifestSection, ManifestTree } from '@umbraco-cms/models';
-import { UmbDataStore } from 'src/core/stores/store';
+import { UmbTreeDataStore } from 'src/core/stores/store';
 
 import './tree-item.element';
 
@@ -39,7 +39,7 @@ export class UmbTreeNavigator extends UmbContextConsumerMixin(UmbContextProvider
 	@state()
 	private _href?: string;
 
-	private _store?: UmbDataStore<unknown>;
+	private _store?: UmbTreeDataStore<unknown>;
 	private _sectionContext?: UmbSectionContext;
 
 	constructor() {

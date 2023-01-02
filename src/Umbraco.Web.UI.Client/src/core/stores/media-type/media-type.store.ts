@@ -13,6 +13,8 @@ export type UmbMediaTypeStoreItemType = MediaTypeDetails | FolderTreeItem;
  */
 export class UmbMediaTypeStore extends UmbNodeStoreBase<UmbMediaTypeStoreItemType> {
 
+	public readonly storeAlias = 'umbMediaTypeStore';
+
 	/**
 	 * @description - Request a Data Type by key. The Data Type is added to the store and is returned as an Observable.
 	 * @param {string} key

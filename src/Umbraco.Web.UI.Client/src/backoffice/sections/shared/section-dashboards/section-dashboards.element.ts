@@ -7,7 +7,12 @@ import { UmbSectionContext } from '../section.context';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-import type { ManifestDashboard, ManifestSection } from '@umbraco-cms/models';
+import type {
+	ManifestDashboard,
+	ManifestDashboardCollection,
+	ManifestSection,
+	ManifestWithMeta,
+} from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
 @customElement('umb-section-dashboards')
@@ -28,22 +33,21 @@ export class UmbSectionDashboardsElement extends UmbContextConsumerMixin(UmbObse
 			}
 
 			#scroll-container {
-				width: calc(-300px + 100vw);
-				height: calc(100vh - 70px - 60px); // TODO: This is a temporary fix to get scrolling to work
-				// changed it so the height is correct but the fix is still not ideal. the 70px and 60px are the height of the blue top bar and the dashboard menu. Need a better solution still.
+				width: 100%;
+				height: 100%;
 			}
 
 			#router-slot {
 				width: 100%;
+				height: 100%;
 				box-sizing: border-box;
-				padding: var(--uui-size-space-5);
 				display: block;
 			}
 		`,
 	];
 
 	@state()
-	private _dashboards: Array<ManifestDashboard> = [];
+	private _dashboards: Array<ManifestDashboard | ManifestDashboardCollection> = [];
 
 	@state()
 	private _currentDashboardPathname = '';
@@ -81,10 +85,12 @@ export class UmbSectionDashboardsElement extends UmbContextConsumerMixin(UmbObse
 
 		this.observe<ManifestDashboard[]>(
 			umbExtensionsRegistry
-				?.extensionsOfType('dashboard')
+				?.extensionsOfTypes(['dashboard', 'dashboardCollection'])
 				.pipe(
 					map((extensions) =>
-						extensions.filter((extension) => extension.meta.sections.includes(this._currentSectionAlias))
+						extensions.filter((extension) =>
+							(extension as ManifestWithMeta).meta.sections.includes(this._currentSectionAlias)
+						)
 					)
 				),
 			(dashboards) => {
@@ -101,9 +107,19 @@ export class UmbSectionDashboardsElement extends UmbContextConsumerMixin(UmbObse
 		this._routes = this._dashboards.map((dashboard) => {
 			return {
 				path: `${dashboard.meta.pathname}`,
-				component: () => createExtensionElement(dashboard),
-				setup: (_element: ManifestDashboard, info: IRoutingInfo) => {
+				component: () => {
+					if (dashboard.type === 'dashboardCollection') {
+						return import('src/backoffice/dashboards/collection/dashboard-collection.element');
+					}
+					return createExtensionElement(dashboard);
+				},
+				setup: (component: Promise<HTMLElement> | HTMLElement, info: IRoutingInfo) => {
 					this._currentDashboardPathname = info.match.route.path;
+					// When its using import, we get an element, when using createExtensionElement we get a Promise.
+					(component as any).manifest = dashboard;
+					if ((component as any).then) {
+						(component as any).then((el: any) => (el.manifest = dashboard));
+					}
 				},
 			};
 		});

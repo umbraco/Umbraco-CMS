@@ -127,6 +127,8 @@ export class UmbWorkspaceDocumentTypeElement extends UmbContextProviderMixin(
 				loader: () => import('../shared/actions/save/workspace-action-node-save.element'),
 				meta: {
 					workspaces: ['Umb.Workspace.DocumentType'],
+					look: 'primary',
+					color: 'positive'
 				},
 			},
 		];

@@ -11,6 +11,11 @@ export type UmbUserStoreItemType = UserDetails;
  * @description - Data Store for Users
  */
 export class UmbUserStore extends UmbDataStoreBase<UmbUserStoreItemType> {
+
+
+	public readonly storeAlias = 'umbUserStore';
+
+
 	private _totalUsers: BehaviorSubject<number> = new BehaviorSubject(0);
 	public readonly totalUsers: Observable<number> = this._totalUsers.asObservable();
 

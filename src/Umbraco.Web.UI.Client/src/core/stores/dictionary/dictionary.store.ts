@@ -9,6 +9,9 @@ import { ApiError, DictionaryResource, EntityTreeItem, ProblemDetails } from '@u
  * @description - Data Store for Dictionary Items.
  */
 export class UmbDictionaryStore extends UmbDataStoreBase<EntityTreeItem> {
+
+	public readonly storeAlias = 'umbDictionaryStore';
+
 	/**
 	 * @description - Get the root of the tree.
 	 * @return {*}  {Observable<Array<PagedEntityTreeItem>>}

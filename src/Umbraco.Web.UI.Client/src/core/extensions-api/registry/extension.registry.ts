@@ -17,8 +17,11 @@ import type {
 	ManifestPackageView,
 	ManifestExternalLoginProvider,
 	ManifestHeaderApp,
+	ManifestCollectionView,
+	ManifestCollectionBulkAction,
 } from '../../models';
-import { createExtensionElement } from '../create-extension-element.function';
+import { hasDefaultExport } from '../has-default-export.function';
+import { loadExtension } from '../load-extension.function';
 
 export class UmbExtensionRegistry {
 	private _extensions = new BehaviorSubject<Array<ManifestTypes>>([]);
@@ -35,13 +38,20 @@ export class UmbExtensionRegistry {
 
 		this._extensions.next([...extensionsValues, manifest]);
 
-		// If entrypoint extension, we should load it immediately
+		// If entrypoint extension, we should load and run it immediately
 		if (manifest.type === 'entrypoint') {
-			createExtensionElement(manifest);
+			loadExtension(manifest).then((js) => {
+				if (hasDefaultExport(js)) {
+					new js.default();
+				} else {
+					console.error(`Extension with alias '${manifest.alias}' of type 'entrypoint' must have a default export of its JavaScript module.`)
+				}
+			});
+			
 		}
 	}
 
-	unregister(alias:string): void {
+	unregister(alias: string): void {
 		const oldExtensionsValues = this._extensions.getValue();
 		const newExtensionsValues = oldExtensionsValues.filter((extension) => extension.alias !== alias);
 
@@ -75,6 +85,7 @@ export class UmbExtensionRegistry {
 	extensionsOfType(type: 'workspace'): Observable<Array<ManifestWorkspace>>;
 	extensionsOfType(type: 'treeItemAction'): Observable<Array<ManifestTreeItemAction>>;
 	extensionsOfType(type: 'dashboard'): Observable<Array<ManifestDashboard>>;
+	extensionsOfType(type: 'dashboardCollection'): Observable<Array<ManifestDashboard>>;
 	extensionsOfType(type: 'workspaceView'): Observable<Array<ManifestWorkspaceView>>;
 	extensionsOfType(type: 'workspaceAction'): Observable<Array<ManifestWorkspaceAction>>;
 	extensionsOfType(type: 'propertyEditorUI'): Observable<Array<ManifestPropertyEditorUI>>;
@@ -84,14 +95,18 @@ export class UmbExtensionRegistry {
 	extensionsOfType(type: 'entrypoint'): Observable<Array<ManifestEntrypoint>>;
 	extensionsOfType(type: 'custom'): Observable<Array<ManifestCustom>>;
 	extensionsOfType(type: 'externalLoginProvider'): Observable<Array<ManifestExternalLoginProvider>>;
+	extensionsOfType(type: 'collectionView'): Observable<Array<ManifestCollectionView>>;
+	extensionsOfType(type: 'collectionBulkAction'): Observable<Array<ManifestCollectionBulkAction>>;
 	extensionsOfType<T extends ManifestTypes>(type: string): Observable<Array<T>>;
 	extensionsOfType(type: string): Observable<Array<ManifestTypes>> {
 		return this.extensions.pipe(
-			map((exts) =>
-				exts
-					.filter((ext) => ext.type === type)
-					.sort((a, b) => (b.weight || 0) - (a.weight || 0))
-			)
+			map((exts) => exts.filter((ext) => ext.type === type).sort((a, b) => (b.weight || 0) - (a.weight || 0)))
+		);
+	}
+
+	extensionsOfTypes(types: string[]): Observable<Array<ManifestTypes>> {
+		return this.extensions.pipe(
+			map((exts) => exts.filter((ext) => (types.indexOf(ext.type) !== -1)).sort((a, b) => (b.weight || 0) - (a.weight || 0)))
 		);
 	}
 }

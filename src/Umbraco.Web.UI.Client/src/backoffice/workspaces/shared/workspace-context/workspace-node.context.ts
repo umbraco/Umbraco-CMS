@@ -12,8 +12,9 @@ export class UmbWorkspaceNodeContext<ContentTypeType extends ContentTreeItem = C
 	protected _notificationConsumer!:UmbContextConsumer;
 
 	public entityKey:string;
+	public entityType:string;
 
-	constructor(target:HTMLElement, defaultData:ContentTypeType, storeAlias:string, entityKey: string) {
+	constructor(target:HTMLElement, defaultData:ContentTypeType, storeAlias:string, entityKey: string, entityType: string) {
 		super(target, defaultData, storeAlias);
 
 		this._notificationConsumer = new UmbContextConsumer(this._target, 'umbNotificationService', (_instance: UmbNotificationService) => {
@@ -21,6 +22,7 @@ export class UmbWorkspaceNodeContext<ContentTypeType extends ContentTreeItem = C
 		});
 
 		this.entityKey = entityKey;
+		this.entityType = entityType;
 	}
 
 
