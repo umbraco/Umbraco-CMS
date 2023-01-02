@@ -1,11 +1,11 @@
 import type { HTMLElementConstructor } from '../models';
-import { UmbController } from './controller.interface';
+import { UmbControllerInterface } from './controller.interface';
 
 export declare class UmbControllerHostInterface extends HTMLElement {
     //#controllers:UmbController[];
 	//#attached:boolean;
-	addController(controller:UmbController): void;
-	removeController(controller:UmbController): void;
+	addController(controller:UmbControllerInterface): void;
+	removeController(controller:UmbControllerInterface): void;
 }
 
 /**
@@ -18,15 +18,15 @@ export declare class UmbControllerHostInterface extends HTMLElement {
 export const UmbControllerHostMixin = <T extends HTMLElementConstructor>(superClass: T) => {
 	class UmbContextConsumerClass extends superClass {
 
-		#controllers: UmbController[] = [];
+		#controllers: UmbControllerInterface[] = [];
 
 		#attached = false;
 
 		/**
 		 * Append a controller to this element.
-		 * @param {UmbController} ctrl
+		 * @param {UmbControllerInterface} ctrl
 		 */
-		addController(ctrl: UmbController): void {
+		addController(ctrl: UmbControllerInterface): void {
 			this.#controllers.push(ctrl);
             if(this.#attached) {
                 ctrl.hostConnected();
@@ -35,9 +35,9 @@ export const UmbControllerHostMixin = <T extends HTMLElementConstructor>(superCl
 
 		/**
 		 * Remove a controller from this element.
-		 * @param {UmbController} ctrl
+		 * @param {UmbControllerInterface} ctrl
 		 */
-		removeController(ctrl: UmbController): void {
+		removeController(ctrl: UmbControllerInterface): void {
 			const index = this.#controllers.indexOf(ctrl);
 			if(index !== -1) {
 				this.#controllers.splice(index, 1);
@@ -50,13 +50,13 @@ export const UmbControllerHostMixin = <T extends HTMLElementConstructor>(superCl
 		connectedCallback() {
 			super.connectedCallback?.();
 			this.#attached = true;
-			this.#controllers.forEach((ctrl: UmbController) => ctrl.hostConnected());
+			this.#controllers.forEach((ctrl: UmbControllerInterface) => ctrl.hostConnected());
 		}
 
 		disconnectedCallback() {
 			super.disconnectedCallback?.();
 			this.#attached = false;
-			this.#controllers.forEach((ctrl: UmbController) => ctrl.hostDisconnected());
+			this.#controllers.forEach((ctrl: UmbControllerInterface) => ctrl.hostDisconnected());
 		}
 	}
 

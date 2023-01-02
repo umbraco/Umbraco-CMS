@@ -1,6 +1,7 @@
 import { UmbControllerHostInterface } from "./controller-host.mixin";
+import { UmbControllerInterface } from "./controller.interface";
 
-export abstract class UmbController {
+export abstract class UmbController implements UmbControllerInterface {
 
     protected _host?: UmbControllerHostInterface
 
