@@ -1,7 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ReactiveController, ReactiveControllerHost } from 'lit';
 import { ApiError, CancelablePromise, ProblemDetails } from '@umbraco-cms/backend-api';
-import { UmbNotificationOptions, UmbNotificationDefaultData, UmbNotificationService } from '@umbraco-cms/services';
+import { UmbNotificationOptions, UmbNotificationService } from 'src/backoffice/core/services/notification';
+import { UmbNotificationDefaultData } from 'src/backoffice/core/services/notification/layouts/default';
+
 import { UmbContextConsumer } from '@umbraco-cms/context-api';
 
 export class UmbResourceController implements ReactiveController {
