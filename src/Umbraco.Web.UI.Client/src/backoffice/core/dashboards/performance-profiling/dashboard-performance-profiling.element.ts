@@ -39,9 +39,6 @@ export class UmbDashboardPerformanceProfilingElement extends LitElement {
 
 		const {data} = await tryExecuteAndNotify<ProfilingStatus>(this, ProfilingResource.getProfilingStatus());
 
-		// TODO: consider wrapping above into a method, like this:
-		//const [profilingStatus] = await tryExecuteAndNotify(this, ProfilingResource.getProfilingStatus());
-
 		if (data) {
 			this._profilingStatus = data.enabled;
 		}
