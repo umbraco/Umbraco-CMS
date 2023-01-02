@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Configuration;
@@ -60,11 +61,21 @@ public abstract class UmbracoIntegrationTestBase
     [OneTimeTearDown]
     public void FixtureTearDown()
     {
-        foreach (var a in _fixtureTeardown)
+        var bw = new BackgroundWorker();
+
+        bw.DoWork += new DoWorkEventHandler(delegate(object? sender, DoWorkEventArgs args)
         {
-            a();
-        }
+            BackgroundWorker b = sender as BackgroundWorker;
+
+            Parallel.ForEach(_fixtureTeardown, a =>
+            {
+                a();
+            });
+        });
+
+        bw.RunWorkerAsync();
     }
+
 
     [TearDown]
     public void TearDown()
@@ -160,7 +171,8 @@ public abstract class UmbracoIntegrationTestBase
                 connectionStrings.CurrentValue.ProviderName = s_connectionStrings.ProviderName;
 
                 databaseFactory.Configure(s_connectionStrings);
-                AddOnTestTearDown(() => newSchemaPerTestDb.Teardown());
+                _fixtureTeardown.Add(() => newSchemaPerTestDb.Teardown(newSchemaPerTestDb.GetDbKey()));
+                // AddOnTestTearDown(() => newSchemaPerTestDb.Teardown());
                 CreateDatabaseWithSchema(databaseFactory, databaseSchemaCreatorFactory);
                 databaseDataCreator.SeedDataAsync().GetAwaiter().GetResult();
 
@@ -177,7 +189,8 @@ public abstract class UmbracoIntegrationTestBase
                 connectionStrings.CurrentValue.ProviderName = s_connectionStrings.ProviderName;
 
                 databaseFactory.Configure(s_connectionStrings);
-                AddOnTestTearDown(() => newEmptyPerTestDatabase.Teardown());
+                _fixtureTeardown.Add(() => newEmptyPerTestDatabase.Teardown(newEmptyPerTestDatabase.GetDbKey()));
+
 
                 CreateDatabaseWithoutSchema(databaseFactory, databaseSchemaCreatorFactory);
                 runtimeState.DetermineRuntimeLevel();
@@ -197,7 +210,8 @@ public abstract class UmbracoIntegrationTestBase
                     connectionStrings.CurrentValue.ProviderName = s_connectionStrings.ProviderName;
 
                     databaseFactory.Configure(s_connectionStrings);
-                    AddOnFixtureTearDown(() => newSchemaPerFixtureDb.Teardown());
+                    _fixtureTeardown.Add(() => newSchemaPerFixtureDb.Teardown(newSchemaPerFixtureDb.GetDbKey()));
+
 
                     CreateDatabaseWithSchema(databaseFactory, databaseSchemaCreatorFactory);
                     databaseDataCreator.SeedDataAsync().GetAwaiter().GetResult();
@@ -223,7 +237,8 @@ public abstract class UmbracoIntegrationTestBase
                     connectionStrings.CurrentValue.ProviderName = s_connectionStrings.ProviderName;
 
                     databaseFactory.Configure(s_connectionStrings);
-                    AddOnFixtureTearDown(() => newEmptyPerFixtureDb.Teardown());
+                    _fixtureTeardown.Add(() => newEmptyPerFixtureDb.Teardown(newEmptyPerFixtureDb.GetDbKey()));
+
                     CreateDatabaseWithoutSchema(databaseFactory, databaseSchemaCreatorFactory);
                 }
                 else

@@ -9,5 +9,7 @@ public interface ITestDatabaseConfiguration
 {
     ConnectionStrings InitializeConfiguration();
 
-    void Teardown();
+    void Teardown(string key);
+
+    string GetDbKey();
 }

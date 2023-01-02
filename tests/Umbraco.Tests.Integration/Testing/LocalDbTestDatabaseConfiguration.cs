@@ -66,38 +66,10 @@ public class LocalDbTestDatabaseConfiguration : ITestDatabaseConfiguration
         return connectionStrings;
     }
 
-    public void Teardown()
+    public string GetDbKey() => _key;
+
+    public void Teardown(string key)
     {
-        if (s_filesPath == null)
-        {
-            return;
-        }
-
-        Parallel.ForEach(s_localDbInstance.GetDatabases(), instance =>
-        {
-            if (instance.StartsWith(_key))
-            {
-                s_localDbInstance.DropDatabase(instance);
-            }
-        });
-
-        // _localDb.StopInstance(InstanceName);
-
-        foreach (var file in Directory.EnumerateFiles(s_filesPath))
-        {
-            if (file.EndsWith(".mdf") == false && file.EndsWith(".ldf") == false)
-            {
-                continue;
-            }
-
-            try
-            {
-                File.Delete(file);
-            }
-            catch (IOException)
-            {
-                // ignore, must still be in use but nothing we can do
-            }
-        }
+        s_localDbInstance.DropDatabase(key);
     }
 }

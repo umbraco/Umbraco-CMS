@@ -31,6 +31,10 @@ public class SqlServerTestDatabaseConfiguration : ITestDatabaseConfiguration
         };
     }
 
+    public void Teardown(string key) => throw new NotImplementedException();
+
+    public string GetDbKey() => throw new NotImplementedException();
+
     private void CreateDatabase()
     {
         Teardown();
