@@ -64,7 +64,7 @@ export class UmbResourceController extends UmbController {
 		try {
 			return {data: await this.#promise};
 		} catch (e) {
-			return {error: this.#toProblemDetails(e)};
+			return {error: toProblemDetails(e)};
 		}
 	}
 
