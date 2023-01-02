@@ -2,11 +2,11 @@ import type { ManifestWorkspace, ManifestWorkspaceAction, ManifestWorkspaceView 
 
 const workspace: ManifestWorkspace = {
 	type: 'workspace',
-	alias: 'Umb.Workspace.DocumentBlueprint.Root',
-	name: 'Document Blueprint Root Workspace',
-	loader: () => import('./document-blueprint-root-workspace.element'),
+	alias: 'Umb.Workspace.MemberGroup',
+	name: 'Member Group Workspace',
+	loader: () => import('./member-group-workspace.element'),
 	meta: {
-		entityType: 'document-blueprint-root',
+		entityType: 'member-group',
 	},
 };
 

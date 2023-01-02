@@ -1,4 +1,7 @@
 import { manifests as mediaSectionManifests } from './section.manifests';
+import { manifests as mediaManifests } from './media/manifests';
+import { manifests as mediaTypesManifests } from './media-types/manifests';
+
 import { ManifestTypes, umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
 const registerExtensions = (manifests: Array<ManifestTypes> | Array<ManifestTypes>) => {
@@ -8,4 +11,4 @@ const registerExtensions = (manifests: Array<ManifestTypes> | Array<ManifestType
 	});
 };
 
-registerExtensions([...mediaSectionManifests]);
+registerExtensions([...mediaSectionManifests, ...mediaManifests, ...mediaTypesManifests]);

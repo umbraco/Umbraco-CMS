@@ -14,24 +14,6 @@ export const manifests: Array<ManifestWorkspace> = [
 	},
 	{
 		type: 'workspace',
-		alias: 'Umb.Workspace.MemberGroup',
-		name: 'Member Group Workspace',
-		loader: () => import('./members/member-groups/workspace/member-group-workspace.element'),
-		meta: {
-			entityType: 'member-group',
-		},
-	},
-	{
-		type: 'workspace',
-		alias: 'Umb.Workspace.MediaType',
-		name: 'Media Type Workspace',
-		loader: () => import('./media/media-types/workspace/media-type-workspace.element'),
-		meta: {
-			entityType: 'media-type',
-		},
-	},
-	{
-		type: 'workspace',
 		alias: 'Umb.Workspace.MemberType',
 		name: 'Member Type Workspace',
 		loader: () => import('./members/member-types/workspace/workspace-member-type.element'),
@@ -46,15 +28,6 @@ export const manifests: Array<ManifestWorkspace> = [
 		loader: () => import('./core/extensions/workspace/extension-root/workspace-extension-root.element'),
 		meta: {
 			entityType: 'extension-root',
-		},
-	},
-	{
-		type: 'workspace',
-		alias: 'Umb.Workspace.Media',
-		name: 'Media Workspace',
-		loader: () => import('./media/media/workspace/workspace-media.element'),
-		meta: {
-			entityType: 'media',
 		},
 	},
 	{

@@ -1,7 +1,7 @@
 // TODO: temp file until we have a way to register from each extension
 
 import { manifests as userSectionManifests } from '../auth/users-section/manifests';
-import { manifests as memberSectionManifests } from './members/members-section/manifests';
+import { manifests as memberSectionManifests } from './members/section.manifests';
 import { manifests as packageSectionManifests } from './packages/packages-section/manifests';
 
 import type {
