@@ -1,4 +1,4 @@
-import { manifests as translationSectionManifests } from './translation-section/translation-section.manifest';
+import { manifests as translationSectionManifests } from './section.manifest';
 import { manifests as dictionaryTreeManifests } from './dictionary/tree/dictionary-tree.manifest';
 import { manifests as dictionaryWorkspaceManifests } from './dictionary/workspace/dictionary-workspace.manifest';
 import { ManifestTypes, umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';

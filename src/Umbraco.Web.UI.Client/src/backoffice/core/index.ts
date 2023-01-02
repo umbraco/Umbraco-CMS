@@ -1,5 +1,6 @@
 import { manifests as dashboardManifests } from './dashboards/manifests';
 import { manifests as settingsSectionManifests } from './settings-section/manifests';
+import { manifests as languageManifests } from './languages/manifests';
 
 import { ManifestTypes, umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
@@ -10,4 +11,4 @@ const registerExtensions = (manifests: Array<ManifestTypes> | Array<ManifestType
 	});
 };
 
-registerExtensions([...settingsSectionManifests, ...dashboardManifests]);
+registerExtensions([...settingsSectionManifests, ...dashboardManifests, ...languageManifests]);

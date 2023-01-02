@@ -1,7 +1,6 @@
 // TODO: temp file until we have a way to register from each extension
 
 import { manifests as userSectionManifests } from '../auth/users-section/manifests';
-import { manifests as memberSectionManifests } from './members/section.manifests';
 import { manifests as packageSectionManifests } from './packages/packages-section/manifests';
 
 import type {
@@ -12,4 +11,4 @@ import type {
 } from '@umbraco-cms/models';
 
 export const manifests: Array<ManifestSection | ManifestDashboardCollection | ManifestDashboard | ManifestSectionView> =
-	[...memberSectionManifests, ...packageSectionManifests, ...userSectionManifests];
+	[...packageSectionManifests, ...userSectionManifests];

@@ -2,11 +2,11 @@ import type { ManifestWorkspace, ManifestWorkspaceAction, ManifestWorkspaceView 
 
 const workspace: ManifestWorkspace = {
 	type: 'workspace',
-	alias: 'Umb.Workspace.MemberType',
-	name: 'Member Type Workspace',
-	loader: () => import('./workspace-member-type.element'),
+	alias: 'Umb.Workspace.LanguageRoot',
+	name: 'Language Root Workspace',
+	loader: () => import('./language-root-workspace.element'),
 	meta: {
-		entityType: 'member-type',
+		entityType: 'language-root',
 	},
 };
 

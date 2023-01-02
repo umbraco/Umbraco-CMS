@@ -1,7 +1,7 @@
-import { manifests as memberGroupManifests } from './member-groups/manifests';
-import { manifests as memberTypesManifests } from './member-types/manifests';
-import { manifests as membersManifests } from './members/manifests';
 import { manifests as memberSectionManifests } from './section.manifests';
+import { manifests as memberGroupManifests } from './member-groups/manifests';
+import { manifests as memberTypeManifests } from './member-types/manifests';
+import { manifests as memberManifests } from './members/manifests';
 import { ManifestTypes, umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
 const registerExtensions = (manifests: Array<ManifestTypes> | Array<ManifestTypes>) => {
@@ -11,4 +11,4 @@ const registerExtensions = (manifests: Array<ManifestTypes> | Array<ManifestType
 	});
 };
 
-registerExtensions([...mediaSectionManifests]);
+registerExtensions([...memberSectionManifests, ...memberGroupManifests, ...memberTypeManifests, ...memberManifests]);

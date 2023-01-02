@@ -5,24 +5,6 @@ import type { ManifestWorkspace } from '@umbraco-cms/models';
 export const manifests: Array<ManifestWorkspace> = [
 	{
 		type: 'workspace',
-		alias: 'Umb.Workspace.Member',
-		name: 'Member Workspace',
-		loader: () => import('./members/members/workspace/member-workspace.element'),
-		meta: {
-			entityType: 'member',
-		},
-	},
-	{
-		type: 'workspace',
-		alias: 'Umb.Workspace.MemberType',
-		name: 'Member Type Workspace',
-		loader: () => import('./members/member-types/workspace/workspace-member-type.element'),
-		meta: {
-			entityType: 'member-type',
-		},
-	},
-	{
-		type: 'workspace',
 		alias: 'Umb.Workspace.Extensions',
 		name: 'Extensions Workspace',
 		loader: () => import('./core/extensions/workspace/extension-root/workspace-extension-root.element'),
@@ -64,15 +46,6 @@ export const manifests: Array<ManifestWorkspace> = [
 		loader: () => import('./packages/package-builder/workspace/workspace-package-builder.element'),
 		meta: {
 			entityType: 'package-builder',
-		},
-	},
-	{
-		type: 'workspace',
-		alias: 'Umb.Workspace.LanguageRoot',
-		name: 'Language Root Workspace',
-		loader: () => import('./core/languages/workspace/language-root/workspace-language-root.element'),
-		meta: {
-			entityType: 'language-root',
 		},
 	},
 ];
