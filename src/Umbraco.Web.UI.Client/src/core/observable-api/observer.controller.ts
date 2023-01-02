@@ -4,9 +4,9 @@ import type { UmbControllerInterface } from 'src/core/controller/controller.inte
 import { UmbControllerHostInterface } from 'src/core/controller/controller-host.mixin';
 
 
-export class UmbObserverController<T = any> extends UmbObserver<T> implements UmbControllerInterface {
+export class UmbObserverController<T = unknown | null> extends UmbObserver<T | null> implements UmbControllerInterface {
    
-    constructor(host:UmbControllerHostInterface, source: Observable<any>, callback: (_value: T) => void) {
+    constructor(host:UmbControllerHostInterface, source: Observable<T | null>, callback: (_value: T | null) => void) {
         super(source, callback);
         // TODO: What should happen if source or some? identifier is already present?
         host.addController(this);

@@ -1,10 +1,8 @@
 import { Observable } from 'rxjs';
 import { UmbContextConsumerController } from '../context-api/consume/context-consumer.controller';
 import { UmbContextCallback } from '../context-api/consume/context-request.event';
-import { isContextConsumerType } from '../context-api/consume/is-context-consumer-type.function';
 import { UmbContextProviderController } from '../context-api/provide/context-provider.controller';
 import { UmbControllerHostInterface, UmbControllerHostMixin } from '../controller/controller-host.mixin';
-import { UmbControllerInterface } from '../controller/controller.interface';
 import type { HTMLElementConstructor } from '../models';
 import { UmbObserverController } from '../observable-api/observer.controller';
 
@@ -14,7 +12,7 @@ interface ResolvedContexts {
 }
 
 export declare class UmbElementMixinInterface extends UmbControllerHostInterface {
-	observe<T = any>(source: Observable<any>, callback: (_value: T) => void): UmbObserverController<T>;
+	observe<T = unknown | null>(source: Observable<any>, callback: (_value: T) => void): UmbObserverController<T>;
 	provideContext(alias: string, instance: unknown): UmbContextProviderController;
 	consumeContext(alias: string, callback: UmbContextCallback): UmbContextConsumerController;
 	consumeAllContexts(contextAliases: string[], callback: (_instances: ResolvedContexts) => void): void;
@@ -25,12 +23,12 @@ export const UmbElementMixin = <T extends HTMLElementConstructor>(superClass: T)
 
 		/**
 		 * @description Observe a RxJS source of choice.
-		 * @param {string} alias
+		 * @param {Observable<T>} source RxJS source
 		 * @param {method} callback Callback method called when data is changed.
 		 * @return {UmbObserverController} Reference to a Observer Controller instance
 		 * @memberof UmbElementMixin
 		 */
-		observe<T = any>(source: Observable<any>, callback: (_value: T) => void): UmbObserverController<T> {
+		observe<T = unknown | null>(source: Observable<T>, callback: (_value: T | null) => void): UmbObserverController<T> {
 			return new UmbObserverController<T>(this, source, callback);
 		}
 

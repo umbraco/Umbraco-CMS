@@ -69,10 +69,10 @@ export class UmbExtensionRegistry {
 		return values.some((ext) => ext.alias === alias);
 	}
 
-	getByAlias<T extends ManifestTypes>(alias: string): Observable<T | null>;
-	getByAlias(alias: string) {
+
+	getByAlias<T = ManifestTypes>(alias: string): Observable<T | null> {
 		// TODO: make pipes prettier/simpler/reuseable
-		return this.extensions.pipe(map((dataTypes) => dataTypes.find((extension) => extension.alias === alias) || null));
+		return this.extensions.pipe(map((dataTypes) => dataTypes.find((extension) => extension.alias === alias) || null)) as Observable<T | null>;
 	}
 
 	// TODO: implement unregister of extension
