@@ -27,16 +27,16 @@ export class UmbDashboardPerformanceProfilingElement extends LitElement {
 	private _profilingStatus?: boolean;
 
 	@state()
-	private _profilingPerfomance = false;
+	private _profilingPerformance = false;
 
 	connectedCallback(): void {
 		super.connectedCallback();
 		this._getProfilingStatus();
-		this._profilingPerfomance = localStorage.getItem('profilingPerformance') === 'true';
+		this._profilingPerformance = localStorage.getItem('profilingPerformance') === 'true';
 	}
 
 	private async _getProfilingStatus() {
-		
+
 		const {data} = await new UmbResourceController(this, ProfilingResource.getProfilingStatus()).tryExecuteAndNotify<ProfilingStatus>();
 
 		// TODO: consider wrapping above into a method, like this:
@@ -48,8 +48,8 @@ export class UmbDashboardPerformanceProfilingElement extends LitElement {
 	}
 
 	private _changeProfilingPerformance() {
-		this._profilingPerfomance = !this._profilingPerfomance;
-		localStorage.setItem('profilingPerformance', this._profilingPerfomance.toString());
+		this._profilingPerformance = !this._profilingPerformance;
+		localStorage.setItem('profilingPerformance', this._profilingPerformance.toString());
 	}
 
 	private renderProfilingStatus() {
@@ -73,7 +73,7 @@ export class UmbDashboardPerformanceProfilingElement extends LitElement {
 					<uui-toggle
 						label="Activate the profiler by default"
 						label-position="left"
-						.checked="${this._profilingPerfomance}"
+						.checked="${this._profilingPerformance}"
 						@change="${this._changeProfilingPerformance}"></uui-toggle>
 
 					<h4>Friendly reminder</h4>
