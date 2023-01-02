@@ -4,8 +4,8 @@ import { customElement } from 'lit/decorators.js';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import type { ManifestDashboard } from '@umbraco-cms/models';
 
-@customElement('umb-section-media')
-export class UmbSectionMedia extends LitElement {
+@customElement('umb-media-section')
+export class UmbMediaSection extends LitElement {
 	static styles = [UUITextStyles];
 
 	constructor() {
@@ -42,6 +42,6 @@ export class UmbSectionMedia extends LitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-section-media': UmbSectionMedia;
+		'umb-section-media': UmbMediaSection;
 	}
 }
