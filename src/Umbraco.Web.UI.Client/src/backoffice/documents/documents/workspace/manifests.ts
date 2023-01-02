@@ -4,7 +4,7 @@ const tree: ManifestWorkspace = {
 	type: 'workspace',
 	alias: 'Umb.Workspace.Document',
 	name: 'Document Workspace',
-	loader: () => import('./workspace-document.element'),
+	loader: () => import('./document-workspace.element'),
 	meta: {
 		entityType: 'document',
 	},

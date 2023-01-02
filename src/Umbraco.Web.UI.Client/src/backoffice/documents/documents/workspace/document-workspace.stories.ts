@@ -1,11 +1,11 @@
-import './workspace-document.element';
+import './document-workspace.element';
 
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit-html';
 
 import { data as documentNodes } from '../../../../../core/mocks/data/document.data';
 
-import type { UmbWorkspaceDocumentElement } from './workspace-document.element';
+import type { UmbWorkspaceDocumentElement } from './document-workspace.element';
 
 export default {
 	title: 'Workspaces/Document',
