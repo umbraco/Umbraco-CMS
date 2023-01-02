@@ -59,15 +59,6 @@ export const manifests: Array<ManifestWorkspace> = [
 	},
 	{
 		type: 'workspace',
-		alias: 'Umb.Workspace.Document',
-		name: 'Content Workspace',
-		loader: () => import('./documents/documents/workspace/workspace-document.element'),
-		meta: {
-			entityType: 'document',
-		},
-	},
-	{
-		type: 'workspace',
 		alias: 'Umb.Workspace.User',
 		name: 'User Workspace',
 		loader: () => import('../auth/users/workspace/workspace-user.element'),

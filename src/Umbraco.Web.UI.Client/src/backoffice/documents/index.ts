@@ -1,6 +1,7 @@
 import { manifests as contentSectionManifests } from './content-section/manifests';
 import { manifests as documentBlueprintManifests } from './document-blueprints/manifests';
 import { manifests as documentTypeManifests } from './document-types/manifests';
+import { manifests as documentManifests } from './documents/manifests';
 
 import { ManifestTypes, umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
@@ -11,4 +12,9 @@ const registerExtensions = (manifests: Array<ManifestTypes> | Array<ManifestType
 	});
 };
 
-registerExtensions([...contentSectionManifests, ...documentBlueprintManifests, ...documentTypeManifests]);
+registerExtensions([
+	...contentSectionManifests,
+	...documentBlueprintManifests,
+	...documentTypeManifests,
+	...documentManifests,
+]);
