@@ -2,14 +2,12 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing, PropertyValueMap } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbInputListBase } from '../../../backoffice/core/components/input-list-base/input-list-base';
+import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import type { UserEntity } from '@umbraco-cms/models';
 import { UmbUserStore } from 'src/auth/users/user.store';
-import { UmbContextConsumerController } from 'src/core/context-api/consume/context-consumer.controller';
-import { UmbControllerHostMixin } from 'src/core/controller/controller-host.mixin';
-import { UmbObserverController } from 'src/core/observable-api/observer.controller';
 
 @customElement('umb-input-user')
-export class UmbPickerUserElement extends UmbControllerHostMixin(UmbInputListBase) {
+export class UmbPickerUserElement extends UmbObserverMixin(UmbInputListBase) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -42,7 +40,7 @@ export class UmbPickerUserElement extends UmbControllerHostMixin(UmbInputListBas
 	connectedCallback(): void {
 		super.connectedCallback();
 		this.pickerLayout = 'umb-picker-layout-user';
-		new UmbContextConsumerController(this, 'umbUserStore', (userStore: UmbUserStore) => {
+		this.consumeContext('umbUserStore', (userStore: UmbUserStore) => {
 			this._userStore = userStore;
 			this._observeUser();
 		});
@@ -58,7 +56,7 @@ export class UmbPickerUserElement extends UmbControllerHostMixin(UmbInputListBas
 	private _observeUser() {
 		if (!this._userStore) return;
 
-		new UmbObserverController<Array<UserEntity>>(this, this._userStore.getByKeys(this.value), (users) => {
+		this.observe<Array<UserEntity>>(this._userStore.getByKeys(this.value), (users) => {
 			this._users = users;
 		});
 	}
