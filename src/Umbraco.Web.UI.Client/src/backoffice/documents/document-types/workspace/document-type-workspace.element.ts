@@ -3,7 +3,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { distinctUntilChanged } from 'rxjs';
-import { UmbWorkspaceDocumentTypeContext } from './workspace-document-type.context';
+import { UmbWorkspaceDocumentTypeContext } from './document-type-workspace.context';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import type { DocumentTypeDetails } from '@umbraco-cms/models';
@@ -11,8 +11,8 @@ import { UmbModalService } from 'src/backoffice/core/services/modal';
 
 import '../../../core/property-editors/uis/icon-picker/property-editor-ui-icon-picker.element';
 
-@customElement('umb-workspace-document-type')
-export class UmbWorkspaceDocumentTypeElement extends UmbContextProviderMixin(
+@customElement('umb-document-type-workspace')
+export class UmbDocumentTypeWorkspaceElement extends UmbContextProviderMixin(
 	UmbContextConsumerMixin(UmbObserverMixin(LitElement))
 ) {
 	static styles = [
@@ -144,10 +144,10 @@ export class UmbWorkspaceDocumentTypeElement extends UmbContextProviderMixin(
 	}
 }
 
-export default UmbWorkspaceDocumentTypeElement;
+export default UmbDocumentTypeWorkspaceElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-workspace-document-type': UmbWorkspaceDocumentTypeElement;
+		'umb-document-type-workspace': UmbDocumentTypeWorkspaceElement;
 	}
 }
