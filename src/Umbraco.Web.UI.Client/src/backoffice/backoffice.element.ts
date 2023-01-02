@@ -2,25 +2,25 @@ import { defineElement } from '@umbraco-ui/uui-base/lib/registration';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 
-import { UmbDocumentTypeStore } from '../documents/document-types/document-type.store';
-import { UmbMediaTypeStore } from '../media/media-types/media-type.store';
-import { UmbMemberTypeStore } from '../members/member-types/member-type.store';
-import { UmbDocumentStore } from '../documents/documents/document.store';
-import { UmbMediaStore } from '../media/media/media.store';
-import { UmbMemberGroupStore } from '../members/member-groups/member-group.store';
-import { UmbUserStore } from '../../auth/users/users/user.store';
-import { UmbUserGroupStore } from '../../auth/users/user-groups/user-group.store';
-import { UmbCurrentUserHistoryStore } from '../../auth/users/current-user/current-user-history.store';
-import { UmbDictionaryStore } from '../translation/dictionary/dictionary.store';
-import { UmbDocumentBlueprintStore } from '../documents/document-blueprints/document-blueprint.store';
+import { UmbDocumentTypeStore } from './documents/document-types/document-type.store';
+import { UmbMediaTypeStore } from './media/media-types/media-type.store';
+import { UmbMemberTypeStore } from './members/member-types/member-type.store';
+import { UmbDocumentStore } from './documents/documents/document.store';
+import { UmbMediaStore } from './media/media/media.store';
+import { UmbMemberGroupStore } from './members/member-groups/member-group.store';
+import { UmbUserStore } from '../auth/users/users/user.store';
+import { UmbUserGroupStore } from '../auth/users/user-groups/user-group.store';
+import { UmbCurrentUserHistoryStore } from '../auth/users/current-user/current-user-history.store';
+import { UmbDictionaryStore } from './translation/dictionary/dictionary.store';
+import { UmbDocumentBlueprintStore } from './documents/document-blueprints/document-blueprint.store';
 
-import { UmbSectionStore } from './components/section/section.store';
-import { UmbDataTypeStore } from './data-types/data-type.store';
-import { UmbIconStore } from './stores/icon/icon.store';
-import { UmbNotificationService } from './services/notification';
-import { UmbModalService } from './services/modal';
-import { manifests as collectionBulkActionManifests } from './components/collection/bulk-actions/manifests';
-import { manifests as collectionViewManifests } from './components/collection/views/manifests';
+import { UmbSectionStore } from './core/components/section/section.store';
+import { UmbDataTypeStore } from './core/data-types/data-type.store';
+import { UmbIconStore } from './core/stores/icon/icon.store';
+import { UmbNotificationService } from './core/services/notification';
+import { UmbModalService } from './core/services/modal';
+import { manifests as collectionBulkActionManifests } from './core/components/collection/bulk-actions/manifests';
+import { manifests as collectionViewManifests } from './core/components/collection/views/manifests';
 
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
@@ -28,13 +28,13 @@ import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import type { ManifestTypes } from '@umbraco-cms/models';
 
 // Domains
-import './components';
-import '../core';
-import '../documents';
-import '../media';
-import '../members';
-import '../translation';
-import '../packages';
+import './core/components';
+import './core';
+import './documents';
+import './media';
+import './members';
+import './translation';
+import './packages';
 
 @defineElement('umb-backoffice')
 export class UmbBackofficeElement extends UmbContextConsumerMixin(UmbContextProviderMixin(LitElement)) {

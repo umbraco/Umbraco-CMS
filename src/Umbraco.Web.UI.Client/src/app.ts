@@ -55,7 +55,7 @@ export class UmbApp extends UmbContextProviderMixin(LitElement) {
 		},
 		{
 			path: '**',
-			component: () => import('./backoffice/core/backoffice.element'),
+			component: () => import('./backoffice/backoffice.element'),
 			guards: [this._isAuthorizedGuard()],
 		},
 	];
