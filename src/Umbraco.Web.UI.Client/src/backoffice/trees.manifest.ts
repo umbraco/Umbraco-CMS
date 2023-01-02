@@ -1,6 +1,6 @@
 // TODO: temp file until we have a way to register from each extension
 
-import { manifests as dataTypeTreeManifests } from './core/data-types/tree/manifests';
+import { manifests as dataTypeTreeManifests } from './core/data-types/manifests';
 import { manifests as extensionTreeManifests } from './core/extensions/tree/manifests';
 import { manifests as languageTreeManifests } from './core/languages/tree/manifests';
 import { manifests as dictionaryTreeManifests } from './translation/dictionary/tree/dictionary-tree.manifest';

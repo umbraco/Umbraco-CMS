@@ -3,7 +3,6 @@
 import { manifests as userSectionManifests } from '../auth/users-section/manifests';
 import { manifests as memberSectionManifests } from './members/members-section/manifests';
 import { manifests as packageSectionManifests } from './packages/packages-section/manifests';
-import { manifests as settingsSectionManifests } from './core/settings-section/manifests';
 
 import type {
 	ManifestDashboard,
@@ -13,4 +12,4 @@ import type {
 } from '@umbraco-cms/models';
 
 export const manifests: Array<ManifestSection | ManifestDashboardCollection | ManifestDashboard | ManifestSectionView> =
-	[...memberSectionManifests, ...packageSectionManifests, ...settingsSectionManifests, ...userSectionManifests];
+	[...memberSectionManifests, ...packageSectionManifests, ...userSectionManifests];

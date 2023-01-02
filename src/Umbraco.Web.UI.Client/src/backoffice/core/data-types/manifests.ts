@@ -1,6 +1,8 @@
-import type { ManifestTree, ManifestTreeItemAction } from '@umbraco-cms/models';
+import type { ManifestTree, ManifestTreeItemAction, ManifestWorkspace } from '@umbraco-cms/extensions-registry';
 
-const treeAlias = 'Umb.Tree.DataTypes';
+const alias = 'DataType';
+const treeAlias = `Umb.Tree.${alias}`;
+const workspaceAlias = `Umb.Workspace.${alias}`;
 
 const tree: ManifestTree = {
 	type: 'tree',
@@ -20,7 +22,7 @@ const treeItemActions: Array<ManifestTreeItemAction> = [
 		type: 'treeItemAction',
 		alias: 'Umb.TreeItemAction.DataType.Create',
 		name: 'Tree Item Action Create',
-		loader: () => import('./actions/create/action-data-type-create.element'),
+		loader: () => import('./tree/actions/create/action-data-type-create.element'),
 		weight: 200,
 		meta: {
 			trees: [treeAlias],
@@ -32,7 +34,7 @@ const treeItemActions: Array<ManifestTreeItemAction> = [
 		type: 'treeItemAction',
 		alias: 'Umb.TreeItemAction.DataType.Delete',
 		name: 'Tree Item Action Delete',
-		loader: () => import('./actions/delete/action-data-type-delete.element'),
+		loader: () => import('./tree/actions/delete/action-data-type-delete.element'),
 		weight: 100,
 		meta: {
 			trees: [treeAlias],
@@ -42,4 +44,14 @@ const treeItemActions: Array<ManifestTreeItemAction> = [
 	},
 ];
 
-export const manifests = [tree, ...treeItemActions];
+const workspace: ManifestWorkspace = {
+	type: 'workspace',
+	alias: workspaceAlias,
+	name: 'Data Type Workspace',
+	loader: () => import('./workspace/workspace-data-type.element'),
+	meta: {
+		entityType: 'data-type',
+	},
+};
+
+export const manifests = [tree, ...treeItemActions, workspace];

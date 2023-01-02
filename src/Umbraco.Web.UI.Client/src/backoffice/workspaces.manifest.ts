@@ -23,15 +23,6 @@ export const manifests: Array<ManifestWorkspace> = [
 	},
 	{
 		type: 'workspace',
-		alias: 'Umb.Workspace.DataType',
-		name: 'Data Type Workspace',
-		loader: () => import('./core/data-types/workspace/workspace-data-type.element'),
-		meta: {
-			entityType: 'data-type',
-		},
-	},
-	{
-		type: 'workspace',
 		alias: 'Umb.Workspace.MediaType',
 		name: 'Media Type Workspace',
 		loader: () => import('./media/media-types/workspace/workspace-media-type.element'),

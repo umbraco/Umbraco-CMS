@@ -53,6 +53,7 @@ import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import type { ManifestTypes } from '@umbraco-cms/models';
 
 // Domains
+import '../core';
 import '../documents';
 import '../media';
 import '../translation';
