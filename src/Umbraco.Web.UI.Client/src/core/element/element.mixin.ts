@@ -1,9 +1,11 @@
+import { Observable } from 'rxjs';
 import { UmbContextConsumerController } from '../context-api/consume/context-consumer.controller';
 import { isContextConsumerType } from '../context-api/consume/is-context-consumer-type.function';
 import { UmbContextProviderController } from '../context-api/provide/context-provider.controller';
 import { UmbControllerHostInterface, UmbControllerHostMixin } from '../controller/controller-host.mixin';
 import { UmbControllerInterface } from '../controller/controller.interface';
 import type { HTMLElementConstructor } from '../models';
+import { UmbObserverController } from '../observable-api/observer.controller';
 
 // TODO: can we use this aliases to generate the key of this type
 interface ResolvedContexts {
@@ -18,15 +20,22 @@ export declare class UmbElementMixinInterface extends UmbControllerHostInterface
 export const UmbElementMixin = <T extends HTMLElementConstructor>(superClass: T) => {
 	class UmbElementMixinClass extends UmbControllerHostMixin(superClass) {
 
-
+		/**
+		 * Observe a RxJS source of choice.
+		 * @param {string} alias
+		 * @param {method} callback Callback method called when data is changed.
+		 */
+		observe<Y = any>(source: Observable<any>, callback: (_value: Y) => void): UmbObserverController {
+			return new UmbObserverController(this, source, callback);
+		}
 
 		/**
 		 * Provide a context API for this or child elements.
 		 * @param {string} alias
 		 * @param {instance} instance The API instance to be exposed.
 		 */
-		provideContext(alias: string, instance: unknown) {
-			new UmbContextProviderController(this, alias, instance);
+		provideContext(alias: string, instance: unknown): UmbContextProviderController {
+			return new UmbContextProviderController(this, alias, instance);
 		}
         
 		/**
@@ -34,8 +43,8 @@ export const UmbElementMixin = <T extends HTMLElementConstructor>(superClass: T)
 		 * @param {string} alias
 		 * @param {method} callback Callback method called when context is resolved.
 		 */
-		consumeContext(alias: string, callback: (_instance: any) => void): void {
-			new UmbContextConsumerController(this, alias, callback);
+		consumeContext(alias: string, callback: (_instance: any) => void): UmbContextConsumerController {
+			return new UmbContextConsumerController(this, alias, callback);
 		}
 
 		/**

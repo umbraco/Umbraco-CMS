@@ -8,6 +8,7 @@ export class UmbObserverController<Y = any> extends UmbObserver<Y> implements Um
    
     constructor(host:UmbControllerHostInterface, source: Observable<any>, callback: (_value: Y) => void) {
         super(source, callback);
+        // TODO: What should happen if source or some? identifier is already present?
         host.addController(this);
     }
 
