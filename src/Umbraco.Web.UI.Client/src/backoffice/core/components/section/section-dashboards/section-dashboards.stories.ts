@@ -1,6 +1,6 @@
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit-html';
-import { manifests } from '../../../../sections.manifest';
+import { manifests } from '../../../../documents/section.manifests';
 import { UmbSectionContext } from '../section.context';
 import type { UmbSectionDashboardsElement } from './section-dashboards.element';
 import type { ManifestSection } from '@umbraco-cms/models';
