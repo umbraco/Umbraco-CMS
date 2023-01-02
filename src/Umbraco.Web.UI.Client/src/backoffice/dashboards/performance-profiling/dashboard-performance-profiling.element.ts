@@ -2,7 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
-import { UmbResourceController } from '@umbraco-cms/controllers';
+import { UmbResourceController } from 'src/core/resources';
 import { ProfilingResource } from '@umbraco-cms/backend-api';
 
 @customElement('umb-dashboard-performance-profiling')
