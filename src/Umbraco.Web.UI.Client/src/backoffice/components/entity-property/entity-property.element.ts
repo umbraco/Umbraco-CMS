@@ -11,6 +11,7 @@ import '../../property-actions/shared/property-action-menu/property-action-menu.
 import '../../workspaces/shared/workspace-property-layout/workspace-property-layout.element';
 import { UmbContextProviderController } from 'src/core/context-api/provide/context-provider.controller';
 import { UmbControllerHostMixin } from 'src/core/controller/controller-host.mixin';
+import { UmbObserverController } from 'src/core/observable-api/observer.controller';
 
 /**
  *  @element umb-entity-property
@@ -122,20 +123,29 @@ export class UmbEntityPropertyElement extends UmbControllerHostMixin(UmbObserver
 	
 	private _propertyContext = new UmbWorkspacePropertyContext<string>("");
 
+	private propertyEditorUIObserver?: UmbObserverController;
+
+
 	constructor() {
 		super();
 
 		// TODO: make it easier to create a provider, unless a context should just extends a provider-controller?
 		new UmbContextProviderController(this, 'umbPropertyContext',  this._propertyContext);
+		
+		this._observePropertyEditorUI();
+		this.addEventListener('property-editor-change', this._onPropertyEditorChange as any as EventListener);
+	}
 
-		this.observe<ManifestTypes>(umbExtensionsRegistry.getByAlias(this.propertyEditorUIAlias), (manifest) => {
+	private _observePropertyEditorUI() {
+		if(this.propertyEditorUIObserver) {
+			//this.propertyEditorUIObserver.destroy();
+		}
+		this.propertyEditorUIObserver = new UmbObserverController<ManifestTypes>(this, umbExtensionsRegistry.getByAlias(this.propertyEditorUIAlias), (manifest) => {
 			if (manifest?.type === 'propertyEditorUI') {
 				this._gotData(manifest);
 			}
 		});
-		this.addEventListener('property-editor-change', this._onPropertyEditorChange as any as EventListener);
 	}
-
 
 	private _gotData(propertyEditorUIManifest?: ManifestPropertyEditorUI) {
 		if (!propertyEditorUIManifest) {
