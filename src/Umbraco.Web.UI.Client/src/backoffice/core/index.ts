@@ -6,6 +6,7 @@ import { manifests as languageManifests } from './languages/manifests';
 import { manifests as propertyActionManifests } from './property-actions/manifests';
 import { manifests as propertyEditorModelManifests } from './property-editors/models/manifests';
 import { manifests as propertyEditorUIManifests } from './property-editors/uis/manifests';
+import { manifests as searchManifests } from './search/manifests';
 
 import { ManifestTypes, umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
@@ -25,4 +26,5 @@ registerExtensions([
 	...propertyActionManifests,
 	...propertyEditorModelManifests,
 	...propertyEditorUIManifests,
+	...searchManifests,
 ]);
