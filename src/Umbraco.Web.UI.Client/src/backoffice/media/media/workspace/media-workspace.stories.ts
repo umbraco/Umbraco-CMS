@@ -1,7 +1,7 @@
-import './workspace-media.element';
+import './media-workspace.element';
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit-html';
-import type { UmbWorkspaceMediaElement } from './workspace-media.element';
+import type { UmbMediaWorkspaceElement } from './media-workspace.element';
 import { data as mediaNodes } from 'src/core/mocks/data/media.data';
 
 export default {
@@ -10,6 +10,6 @@ export default {
 	id: 'umb-media-workspace',
 } as Meta;
 
-export const AAAOverview: Story<UmbWorkspaceMediaElement> = () =>
+export const AAAOverview: Story<UmbMediaWorkspaceElement> = () =>
 	html` <umb-media-workspace id="${mediaNodes[0].key}"></umb-media-workspace>`;
 AAAOverview.storyName = 'Overview';
