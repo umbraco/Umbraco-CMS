@@ -14,8 +14,8 @@ import { UmbUserStore } from 'src/auth/users/user.store';
 import 'src/auth/components/input-user/input-user.element';
 import 'src/backoffice/core/components/input-section/input-section.element';
 
-@customElement('umb-workspace-user-group')
-export class UmbWorkspaceUserGroupElement extends UmbContextProviderMixin(
+@customElement('umb-user-group-workspace')
+export class UmbUserGroupWorkspaceElement extends UmbContextProviderMixin(
 	UmbContextConsumerMixin(UmbObserverMixin(LitElement))
 ) {
 	static styles = [
@@ -408,10 +408,10 @@ export class UmbWorkspaceUserGroupElement extends UmbContextProviderMixin(
 	}
 }
 
-export default UmbWorkspaceUserGroupElement;
+export default UmbUserGroupWorkspaceElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-workspace-user-group': UmbWorkspaceUserGroupElement;
+		'umb-user-group-workspace': UmbUserGroupWorkspaceElement;
 	}
 }

@@ -29,6 +29,6 @@ export default UmbMemberGroupWorkspaceElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-workspace-member-group': UmbMemberGroupWorkspaceElement;
+		'umb-member-group-workspace': UmbMemberGroupWorkspaceElement;
 	}
 }
