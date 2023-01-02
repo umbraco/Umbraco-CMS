@@ -1,8 +1,8 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbResourceController } from '@umbraco-cms/resources';
 import { ProfilingResource, ProfilingStatus } from '@umbraco-cms/backend-api';
+import { tryExecuteAndNotify } from 'src/core/resources/tryExecuteAndNotify.method';
 
 @customElement('umb-dashboard-performance-profiling')
 export class UmbDashboardPerformanceProfilingElement extends LitElement {
@@ -37,7 +37,7 @@ export class UmbDashboardPerformanceProfilingElement extends LitElement {
 
 	private async _getProfilingStatus() {
 
-		const {data} = await new UmbResourceController(this, ProfilingResource.getProfilingStatus()).tryExecuteAndNotify<ProfilingStatus>();
+		const {data} = await tryExecuteAndNotify<ProfilingStatus>(this, ProfilingResource.getProfilingStatus());
 
 		// TODO: consider wrapping above into a method, like this:
 		//const [profilingStatus] = await tryExecuteAndNotify(this, ProfilingResource.getProfilingStatus());
