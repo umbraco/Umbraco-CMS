@@ -1,8 +1,5 @@
 import { UmbWorkspaceNodeContext } from '../../../core/components/workspace/workspace-context/workspace-node.context';
-import type {
-	UmbDocumentStore,
-	UmbDocumentStoreItemType,
-} from 'src/backoffice/test/documents/documents/document.store';
+import type { UmbDocumentStore, UmbDocumentStoreItemType } from 'src/backoffice/documents/documents/document.store';
 
 const DefaultDocumentData = {
 	key: '',
