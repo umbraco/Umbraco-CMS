@@ -1,5 +1,6 @@
 import { Observable } from 'rxjs';
 import { UmbContextConsumerController } from '../context-api/consume/context-consumer.controller';
+import { UmbContextCallback } from '../context-api/consume/context-request.event';
 import { isContextConsumerType } from '../context-api/consume/is-context-consumer-type.function';
 import { UmbContextProviderController } from '../context-api/provide/context-provider.controller';
 import { UmbControllerHostInterface, UmbControllerHostMixin } from '../controller/controller-host.mixin';
@@ -13,9 +14,9 @@ interface ResolvedContexts {
 }
 
 export declare class UmbElementMixinInterface extends UmbControllerHostInterface {
-	observe<Y = any>(source: Observable<any>, callback: (_value: Y) => void): UmbObserverController;
+	observe<T = any>(source: Observable<any>, callback: (_value: T) => void): UmbObserverController<T>;
 	provideContext(alias: string, instance: unknown): UmbContextProviderController;
-	consumeContext(alias: string, callback: (_instance: any) => void): UmbContextConsumerController;
+	consumeContext(alias: string, callback: UmbContextCallback): UmbContextConsumerController;
 	consumeAllContexts(contextAliases: string[], callback: (_instances: ResolvedContexts) => void): void;
 }
 
@@ -29,8 +30,8 @@ export const UmbElementMixin = <T extends HTMLElementConstructor>(superClass: T)
 		 * @return {UmbObserverController} Reference to a Observer Controller instance
 		 * @memberof UmbElementMixin
 		 */
-		observe<Y = any>(source: Observable<any>, callback: (_value: Y) => void): UmbObserverController {
-			return new UmbObserverController(this, source, callback);
+		observe<T = any>(source: Observable<any>, callback: (_value: T) => void): UmbObserverController<T> {
+			return new UmbObserverController<T>(this, source, callback);
 		}
 
 		/**
@@ -51,7 +52,7 @@ export const UmbElementMixin = <T extends HTMLElementConstructor>(superClass: T)
 		 * @return {UmbContextConsumerController} Reference to a Context Consumer Controller instance
 		 * @memberof UmbElementMixin
 		 */
-		consumeContext(alias: string, callback: (_instance: any) => void): UmbContextConsumerController {
+		consumeContext(alias: string, callback: UmbContextCallback): UmbContextConsumerController {
 			return new UmbContextConsumerController(this, alias, callback);
 		}
 
