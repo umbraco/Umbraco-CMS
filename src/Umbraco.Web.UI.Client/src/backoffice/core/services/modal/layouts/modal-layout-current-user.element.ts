@@ -6,7 +6,6 @@ import { umbCurrentUserService } from 'src/auth/users/current-user/current-user.
 import type { ManifestExternalLoginProvider, ManifestUserDashboard, UserDetails } from '@umbraco-cms/models';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import {
 	UmbCurrentUserHistoryStore,
 	UmbCurrentUserHistoryItem,
@@ -103,17 +102,6 @@ export class UmbModalLayoutCurrentUserElement extends UmbContextConsumerMixin(Um
 		});
 
 		this._observeCurrentUser();
-		this._observeExternalLoginProviders();
-		this._observeUserDashboards();
-	}
-
-	private _observeExternalLoginProviders() {
-		this.observe<ManifestExternalLoginProvider[]>(
-			umbExtensionsRegistry.extensionsOfType('externalLoginProvider'),
-			(loginProvider) => {
-				this._externalLoginProviders = loginProvider;
-			}
-		);
 	}
 
 	private async _observeCurrentUser() {
@@ -127,12 +115,6 @@ export class UmbModalLayoutCurrentUserElement extends UmbContextConsumerMixin(Um
 				this._history = history;
 			});
 		}
-	}
-
-	private _observeUserDashboards() {
-		this.observe<ManifestUserDashboard[]>(umbExtensionsRegistry.extensionsOfType('user-dashboard'), (userDashboard) => {
-			this._userDashboards = userDashboard;
-		});
 	}
 
 	private _close() {
