@@ -29,11 +29,11 @@ export abstract class UmbWorkspaceWithStoreContext<
 	}
 
 	connectedCallback() {
-		this._storeConsumer.attach();
+		this._storeConsumer.hostConnected();
 	}
 
 	disconnectedCallback() {
-		this._storeConsumer.detach();
+		this._storeConsumer.hostDisconnected();
 	}
 
 	protected abstract _onStoreSubscription(): void;
@@ -63,8 +63,8 @@ export abstract class UmbWorkspaceWithStoreContext<
 
 	public destroy(): void {
 		super.destroy();
-		if (this._storeConsumer) {
-			this._storeConsumer.detach();
+		if(this._storeConsumer) {
+			this._storeConsumer.hostDisconnected();
 		}
 		if (this._dataObserver) {
 			// I want to make sure that we unsubscribe, also if store(observer source) changes.

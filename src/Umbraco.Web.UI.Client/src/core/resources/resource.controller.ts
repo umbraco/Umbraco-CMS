@@ -1,26 +1,23 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ReactiveController, ReactiveControllerHost } from 'lit';
+import { UmbController } from '../controller/controller.interface';
+import { UmbControllerHostInterface } from '../controller/controller-host.mixin';
+import { UmbContextConsumerController } from '../context-api/consume/context-consumer.controller';
 import { ApiError, CancelablePromise, ProblemDetails } from '@umbraco-cms/backend-api';
 import { UmbNotificationOptions, UmbNotificationService } from 'src/backoffice/core/services/notification';
 import { UmbNotificationDefaultData } from 'src/backoffice/core/services/notification/layouts/default';
 
-import { UmbContextConsumer } from '@umbraco-cms/context-api';
+export class UmbResourceController implements UmbController {
 
-export class UmbResourceController implements ReactiveController {
-	host: ReactiveControllerHost;
 
 	#promises: Promise<any>[] = [];
 
-	#notificationConsumer: UmbContextConsumer;
-
 	#notificationService?: UmbNotificationService;
 
-	constructor(host: ReactiveControllerHost) {
-		(this.host = host).addController(this);
 
-		this.#notificationConsumer = new UmbContextConsumer(
-			host as unknown as EventTarget,
-			'umbNotificationService',
+	constructor(host: UmbControllerHostInterface) {
+		host.addController(this);
+
+		new UmbContextConsumerController(host, 'umbNotificationService',
 			(_instance: UmbNotificationService) => {
 				this.#notificationService = _instance;
 			}
@@ -28,13 +25,12 @@ export class UmbResourceController implements ReactiveController {
 	}
 
 	hostConnected() {
-		this.#promises.length = 0;
-		this.#notificationConsumer.attach();
+		// TODO: Make sure we do the right thing here, as connected can be called multiple times without disconnected invoked.
+		//this.#promises.length = 0;
 	}
 
 	hostDisconnected() {
 		this.cancelAllResources();
-		this.#notificationConsumer.detach();
 	}
 
 	addResource(promise: Promise<any>): void {

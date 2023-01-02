@@ -10,10 +10,14 @@ export const UmbObserverMixin = <T extends HTMLElementConstructor>(superClass: T
 		_subscriptions: Map<Observable<any>, Subscription> = new Map();
 
 		observe<Y = any>(source: Observable<any>, callback: (_value: Y) => void): ()=>void {
+
+			// TODO: can be transferred to something using alias?
+			/*
 			if (this._subscriptions.has(source)) {
 				const subscription = this._subscriptions.get(source);
 				subscription?.unsubscribe();
 			}
+			*/
 
 			const subscription = source.subscribe((value) => callback(value));
 			this._subscriptions.set(source, subscription);
