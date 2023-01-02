@@ -57,8 +57,8 @@ export class UmbDashboardModelsBuilderElement extends UmbControllerHostMixin(Lit
 		super();
 		this._getDashboardData();
 
-		new UmbContextConsumerController(this, 'umbNotificationService', (instances) => {
-			this._notificationService = instances['umbNotificationService'];
+		new UmbContextConsumerController(this, 'umbNotificationService', (instance) => {
+			this._notificationService = instance;
 		});
 	}
 
