@@ -7,7 +7,6 @@ import type { ManifestExternalLoginProvider, ManifestUserDashboard, UserDetails 
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-import '../../../../../auth/external-login-providers/external-login-provider-extension.element';
 import '../../../../../auth/users/current-user/user-dashboards/user-dashboard-extension.element';
 import {
 	UmbCurrentUserHistoryStore,
@@ -37,10 +36,6 @@ export class UmbModalLayoutCurrentUserElement extends UmbContextConsumerMixin(Um
 				display: flex;
 				flex-direction: column;
 				gap: var(--uui-size-space-3);
-			}
-			umb-external-login-provider-extension:not(:last-child) {
-				margin-bottom: var(--uui-size-space-3);
-				display: block;
 			}
 			#recent-history {
 				display: flex;
@@ -195,11 +190,7 @@ export class UmbModalLayoutCurrentUserElement extends UmbContextConsumerMixin(Um
 					</uui-box>
 					<uui-box>
 						<b slot="headline">External login providers</b>
-						${this._externalLoginProviders.map(
-							(provider) =>
-								html`<umb-external-login-provider-extension
-									.externalLoginProvider=${provider}></umb-external-login-provider-extension>`
-						)}
+						<umb-extension-slot id="externalLoginProviders" type="externalLoginProvider"></umb-extension-slot>
 					</uui-box>
 					<div>
 						${this._userDashboards.map(
