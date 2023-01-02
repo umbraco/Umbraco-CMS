@@ -62,25 +62,18 @@ export const UmbElementMixin = <T extends HTMLElementConstructor>(superClass: T)
 		 * @memberof UmbElementMixin
 		 */
 		consumeAllContexts(_contextAliases: Array<string>, callback: (_instances: ResolvedContexts) => void) {
-			this._createContextConsumers(_contextAliases, (resolvedContexts) => {
-				callback?.(resolvedContexts);
-			});
-		}
-
-
-
-		private _createContextConsumers(aliases: Array<string>, resolvedCallback: (_instances: ResolvedContexts) => void) {
-			aliases.forEach((alias) => 
+			_contextAliases.forEach((alias) => 
 				new UmbContextConsumerController(this, alias, () => {
 					
-                    const allResolved = this.getControllers((ctrl: UmbControllerInterface):boolean => isContextConsumerType(ctrl) && aliases.indexOf(ctrl.consumerAlias) !== -1 );
+                    const allResolved = this.getControllers((ctrl: UmbControllerInterface):boolean => isContextConsumerType(ctrl) && _contextAliases.indexOf(ctrl.consumerAlias) !== -1 );
 
-					if (allResolved.length === aliases.length) {
-						resolvedCallback(allResolved);
+					if (allResolved.length === _contextAliases.length) {
+						callback(allResolved);
 					}
 				})
 			);
 		}
+
 
 	}
 
