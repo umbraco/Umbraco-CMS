@@ -2,7 +2,6 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement, PropertyValueMap } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UmbWorkspacePropertyContext } from './workspace-property.context';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import type { ManifestPropertyEditorUI, ManifestTypes } from '@umbraco-cms/models';
@@ -21,7 +20,7 @@ import { UmbObserverController } from 'src/core/observable-api/observer.controll
 
 // TODO: get rid of the other mixins:
 @customElement('umb-entity-property')
-export class UmbEntityPropertyElement extends UmbControllerHostMixin(UmbObserverMixin(LitElement)) {
+export class UmbEntityPropertyElement extends UmbControllerHostMixin(LitElement) {
 	static styles = [
 		UUITextStyles,
 		css`
