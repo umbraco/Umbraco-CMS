@@ -12,7 +12,7 @@ interface ResolvedContexts {
 }
 
 export declare class UmbElementMixinInterface extends UmbControllerHostInterface {
-	observe<T = unknown | null>(source: Observable<T>, callback: (_value: T) => void): UmbObserverController<T>;
+	observe<T = unknown | null>(source: Observable<T | null>, callback: (_value: T | null) => void): UmbObserverController<T | null>;
 	provideContext(alias: string, instance: unknown): UmbContextProviderController;
 	consumeContext(alias: string, callback: UmbContextCallback): UmbContextConsumerController;
 	consumeAllContexts(contextAliases: string[], callback: (_instances: ResolvedContexts) => void): void;
@@ -28,7 +28,7 @@ export const UmbElementMixin = <T extends HTMLElementConstructor>(superClass: T)
 		 * @return {UmbObserverController} Reference to a Observer Controller instance
 		 * @memberof UmbElementMixin
 		 */
-		observe<T = unknown | null>(source: Observable<T>, callback: (_value: T | null) => void): UmbObserverController<T> {
+		observe<T = unknown | null>(source: Observable<T | null>, callback: (_value: T | null) => void): UmbObserverController<T | null> {
 			return new UmbObserverController<T>(this, source, callback);
 		}
 

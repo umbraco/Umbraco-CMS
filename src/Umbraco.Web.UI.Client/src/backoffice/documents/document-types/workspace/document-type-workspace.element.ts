@@ -9,6 +9,7 @@ import { UmbModalService } from 'src/backoffice/core/services/modal';
 
 import '../../../core/property-editors/uis/icon-picker/property-editor-ui-icon-picker.element';
 import { UmbLitElement } from 'src/core/element/lit-element.element';
+import { UmbDocumentTypeStoreItemType } from '../document-type.store';
 
 @customElement('umb-document-type-workspace')
 export class UmbDocumentTypeWorkspaceElement extends UmbLitElement {
@@ -60,7 +61,7 @@ export class UmbDocumentTypeWorkspaceElement extends UmbLitElement {
 	private _workspaceContext?: UmbWorkspaceDocumentTypeContext;
 
 	@state()
-	private _documentType?: DocumentTypeDetails;
+	private _documentType?: DocumentTypeDetails | null;
 
 	private _modalService?: UmbModalService;
 
@@ -83,8 +84,9 @@ export class UmbDocumentTypeWorkspaceElement extends UmbLitElement {
 	private async _observeWorkspace() {
 		if (!this._workspaceContext) return;
 
-		this.observe<DocumentTypeDetails>(this._workspaceContext.data.pipe(distinctUntilChanged()), (data) => {
-			this._documentType = data;
+		this.observe<UmbDocumentTypeStoreItemType>(this._workspaceContext.data.pipe(distinctUntilChanged()), (data) => {
+			// TODO: make method to identify if data is of type DocumentTypeDetails
+			this._documentType = (data as DocumentTypeDetails | null);
 		});
 	}
 

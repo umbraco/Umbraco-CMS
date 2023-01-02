@@ -88,10 +88,10 @@ export class UmbModalLayoutCurrentUserElement extends UmbLitElement {
 	private _currentUser?: UserDetails;
 
 	@state()
-	private _externalLoginProviders: Array<ManifestExternalLoginProvider> = [];
+	private _externalLoginProviders: Array<ManifestExternalLoginProvider> | null = null;
 
 	@state()
-	private _userDashboards: Array<ManifestUserDashboard> = [];
+	private _userDashboards: Array<ManifestUserDashboard> | null = null;
 
 	@state()
 	private _history: Array<UmbCurrentUserHistoryItem> = [];
@@ -124,13 +124,17 @@ export class UmbModalLayoutCurrentUserElement extends UmbLitElement {
 
 	private async _observeCurrentUser() {
 		this.observe<UserDetails>(umbCurrentUserService.currentUser, (currentUser) => {
-			this._currentUser = currentUser;
+			if(currentUser) {
+				this._currentUser = currentUser;
+			}
 		});
 	}
 	private async _observeHistory() {
 		if (this._currentUserHistoryStore) {
 			this.observe<Array<UmbCurrentUserHistoryItem>>(this._currentUserHistoryStore.getLatestHistory(), (history) => {
-				this._history = history;
+				if(history) {
+					this._history = history;
+				}
 			});
 		}
 	}
@@ -195,14 +199,14 @@ export class UmbModalLayoutCurrentUserElement extends UmbLitElement {
 					</uui-box>
 					<uui-box>
 						<b slot="headline">External login providers</b>
-						${this._externalLoginProviders.map(
+						${this._externalLoginProviders?.map(
 							(provider) =>
 								html`<umb-external-login-provider-extension
 									.externalLoginProvider=${provider}></umb-external-login-provider-extension>`
 						)}
 					</uui-box>
 					<div>
-						${this._userDashboards.map(
+						${this._userDashboards?.map(
 							(provider) =>
 								html`<umb-user-dashboard-extension .userDashboard=${provider}></umb-user-dashboard-extension>`
 						)}

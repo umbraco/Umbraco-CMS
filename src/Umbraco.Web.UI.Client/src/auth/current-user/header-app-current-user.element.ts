@@ -33,7 +33,9 @@ export class UmbHeaderAppCurrentUser extends UmbContextConsumerMixin(UmbObserver
 
 	private async _observeCurrentUser() {
 		this.observe<UserDetails>(umbCurrentUserService.currentUser, (currentUser) => {
-			this._currentUser = currentUser;
+			if(currentUser) {
+				this._currentUser = currentUser;
+			}
 		});
 	}
 

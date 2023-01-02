@@ -125,7 +125,9 @@ export class UmbWorkspaceUserElement extends UmbLitElement {
 	private async _observeCurrentUser() {
 		// TODO: do not have static current user service, we need to make a ContextAPI for this.
 		this.observe<UserDetails>(umbCurrentUserService.currentUser, (currentUser) => {
-			this._currentUser = currentUser;
+			if(currentUser) {
+				this._currentUser = currentUser;
+			}
 		});
 	}
 
