@@ -6,7 +6,9 @@ import { UmbContextProvideEventImplementation } from './context-provide.event';
  * @class UmbContextProvider
  */
 export class UmbContextProvider {
+
 	protected host: EventTarget;
+
 	private _contextAlias: string;
 	private _instance: unknown;
 
