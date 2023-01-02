@@ -23,36 +23,43 @@ export const UmbElementMixin = <T extends HTMLElementConstructor>(superClass: T)
 	class UmbElementMixinClass extends UmbControllerHostMixin(superClass) {
 
 		/**
-		 * Observe a RxJS source of choice.
+		 * @description Observe a RxJS source of choice.
 		 * @param {string} alias
 		 * @param {method} callback Callback method called when data is changed.
+		 * @return {UmbObserverController} Reference to a Observer Controller instance
+		 * @memberof UmbElementMixin
 		 */
 		observe<Y = any>(source: Observable<any>, callback: (_value: Y) => void): UmbObserverController {
 			return new UmbObserverController(this, source, callback);
 		}
 
 		/**
-		 * Provide a context API for this or child elements.
+		 * @description Provide a context API for this or child elements.
 		 * @param {string} alias
 		 * @param {instance} instance The API instance to be exposed.
+		 * @return {UmbContextProviderController} Reference to a Context Provider Controller instance
+		 * @memberof UmbElementMixin
 		 */
 		provideContext(alias: string, instance: unknown): UmbContextProviderController {
 			return new UmbContextProviderController(this, alias, instance);
 		}
         
 		/**
-		 * Setup a subscription for a context. The callback is called when the context is resolved.
+		 * @description Setup a subscription for a context. The callback is called when the context is resolved.
 		 * @param {string} alias
 		 * @param {method} callback Callback method called when context is resolved.
+		 * @return {UmbContextConsumerController} Reference to a Context Consumer Controller instance
+		 * @memberof UmbElementMixin
 		 */
 		consumeContext(alias: string, callback: (_instance: any) => void): UmbContextConsumerController {
 			return new UmbContextConsumerController(this, alias, callback);
 		}
 
 		/**
-		 * Setup a subscription for multiple contexts. The callback is called when all contexts are resolved.
+		 * @description Setup a subscription for multiple contexts. The callback is called when all contexts are resolved.
 		 * @param {string} aliases
 		 * @param {method} callback Callback method called when all contexts are resolved.
+		 * @memberof UmbElementMixin
 		 */
 		consumeAllContexts(_contextAliases: Array<string>, callback: (_instances: ResolvedContexts) => void) {
 			this._createContextConsumers(_contextAliases, (resolvedContexts) => {
