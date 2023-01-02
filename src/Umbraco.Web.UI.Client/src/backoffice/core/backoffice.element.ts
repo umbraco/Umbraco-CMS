@@ -16,9 +16,6 @@ import { UmbDictionaryStore } from '../translation/dictionary/dictionary.store';
 import { UmbDocumentBlueprintStore } from '../documents/document-blueprints/document-blueprint.store';
 
 import { manifests as userDashboards } from '../../auth/users/current-user/user-dashboards/manifests';
-import { manifests as propertyEditorModelManifests } from './property-editors/models/manifests';
-import { manifests as propertyEditorUIManifests } from './property-editors/uis/manifests';
-import { manifests as propertyActionManifests } from './property-actions/manifests';
 import { UmbSectionStore } from './components/section/section.store';
 import { UmbDataTypeStore } from './data-types/data-type.store';
 import { UmbIconStore } from './stores/icon/icon.store';
@@ -64,9 +61,6 @@ export class UmbBackofficeElement extends UmbContextConsumerMixin(UmbContextProv
 		super();
 
 		// TODO: this needs to happen in each domain
-		this._registerExtensions(propertyEditorModelManifests);
-		this._registerExtensions(propertyEditorUIManifests);
-		this._registerExtensions(propertyActionManifests);
 		this._registerExtensions(externalLoginProviderManifests);
 		this._registerExtensions(userDashboards);
 		this._registerExtensions(collectionBulkActionManifests);
