@@ -1,8 +1,8 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbResourceController } from '@umbraco-cms/resources';
-import { ProfilingResource } from '@umbraco-cms/backend-api';
+import { ProfilingResource, ProfilingStatus } from '@umbraco-cms/backend-api';
+import { tryExecuteAndNotify } from 'src/core/resources/tryExecuteAndNotify.method';
 
 @customElement('umb-dashboard-performance-profiling')
 export class UmbDashboardPerformanceProfilingElement extends LitElement {
@@ -27,28 +27,26 @@ export class UmbDashboardPerformanceProfilingElement extends LitElement {
 	private _profilingStatus?: boolean;
 
 	@state()
-	private _profilingPerfomance = false;
-
-	private _resourceController = new UmbResourceController(this);
+	private _profilingPerformance = false;
 
 	connectedCallback(): void {
 		super.connectedCallback();
 		this._getProfilingStatus();
-		this._profilingPerfomance = localStorage.getItem('profilingPerformance') === 'true';
+		this._profilingPerformance = localStorage.getItem('profilingPerformance') === 'true';
 	}
 
 	private async _getProfilingStatus() {
-		const [profilingStatus] = await this._resourceController.tryExecuteAndNotify(
-			ProfilingResource.getProfilingStatus()
-		);
-		if (profilingStatus) {
-			this._profilingStatus = profilingStatus.enabled;
+
+		const {data} = await tryExecuteAndNotify<ProfilingStatus>(this, ProfilingResource.getProfilingStatus());
+
+		if (data) {
+			this._profilingStatus = data.enabled;
 		}
 	}
 
 	private _changeProfilingPerformance() {
-		this._profilingPerfomance = !this._profilingPerfomance;
-		localStorage.setItem('profilingPerformance', this._profilingPerfomance.toString());
+		this._profilingPerformance = !this._profilingPerformance;
+		localStorage.setItem('profilingPerformance', this._profilingPerformance.toString());
 	}
 
 	private renderProfilingStatus() {
@@ -72,7 +70,7 @@ export class UmbDashboardPerformanceProfilingElement extends LitElement {
 					<uui-toggle
 						label="Activate the profiler by default"
 						label-position="left"
-						.checked="${this._profilingPerfomance}"
+						.checked="${this._profilingPerformance}"
 						@change="${this._changeProfilingPerformance}"></uui-toggle>
 
 					<h4>Friendly reminder</h4>

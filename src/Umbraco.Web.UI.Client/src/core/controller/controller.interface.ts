@@ -1,4 +1,4 @@
-export interface UmbController {
+export interface UmbControllerInterface {
     hostConnected(): void;
     hostDisconnected(): void;
 }

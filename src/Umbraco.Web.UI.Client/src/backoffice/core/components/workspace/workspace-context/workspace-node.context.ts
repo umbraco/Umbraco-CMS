@@ -1,9 +1,9 @@
 import { UmbNotificationService } from '../../../services/notification';
 import { UmbNotificationDefaultData } from '../../../services/notification/layouts/default';
+import { UmbWorkspaceWithStoreContext } from './workspace-with-store.context';
 import { UmbNodeStoreBase } from 'src/backoffice/core/stores/store';
 import { ContentTreeItem } from '@umbraco-cms/backend-api';
 import { UmbContextConsumer } from '@umbraco-cms/context-api';
-import { UmbWorkspaceWithStoreContext } from './workspace-with-store.context';
 
 // TODO: Consider if its right to have this many class-inheritance of WorkspaceContext
 export class UmbWorkspaceNodeContext<
