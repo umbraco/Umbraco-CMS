@@ -1,12 +1,9 @@
-import type { ManifestTree, ManifestWorkspace } from '@umbraco-cms/extensions-registry';
-
-const alias = 'DocumentBlueprint';
-const treeAlias = `Umb.Tree.${alias}`;
-const rootWorkspaceAlias = `Umb.Workspace.${alias}.Root`;
+import { manifests as workspaceManifests } from './workspace/manifests';
+import type { ManifestTree } from '@umbraco-cms/extensions-registry';
 
 const tree: ManifestTree = {
 	type: 'tree',
-	alias: treeAlias,
+	alias: 'Umb.Tree.DocumentBlueprint',
 	name: 'Document Blueprints Tree',
 	weight: 400,
 	meta: {
@@ -17,14 +14,4 @@ const tree: ManifestTree = {
 	},
 };
 
-const rootWorkspace: ManifestWorkspace = {
-	type: 'workspace',
-	alias: rootWorkspaceAlias,
-	name: 'Document Blueprint Root Workspace',
-	loader: () => import('./workspace/document-blueprint-root-workspace.element'),
-	meta: {
-		entityType: 'document-blueprint-root',
-	},
-};
-
-export const manifests = [tree, rootWorkspace];
+export const manifests = [tree, ...workspaceManifests];

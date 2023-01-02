@@ -6,8 +6,7 @@ import { distinctUntilChanged } from 'rxjs';
 import { UmbWorkspaceDocumentTypeContext } from './workspace-document-type.context';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
-import type { DocumentTypeDetails, ManifestTypes } from '@umbraco-cms/models';
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
+import type { DocumentTypeDetails } from '@umbraco-cms/models';
 import { UmbModalService } from 'src/backoffice/core/services/modal';
 
 import '../../../core/property-editors/uis/icon-picker/property-editor-ui-icon-picker.element';
@@ -74,8 +73,6 @@ export class UmbWorkspaceDocumentTypeElement extends UmbContextProviderMixin(
 		this.consumeContext('umbModalService', (instance) => {
 			this._modalService = instance;
 		});
-
-		this._registerExtensions();
 	}
 
 	connectedCallback(): void {
@@ -102,38 +99,6 @@ export class UmbWorkspaceDocumentTypeElement extends UmbContextProviderMixin(
 
 		this.observe<DocumentTypeDetails>(this._workspaceContext.data.pipe(distinctUntilChanged()), (data) => {
 			this._documentType = data;
-		});
-	}
-
-	private _registerExtensions() {
-		const extensions: Array<ManifestTypes> = [
-			{
-				type: 'workspaceView',
-				alias: 'Umb.WorkspaceView.DocumentType.Design',
-				name: 'Document Type Workspace Design View',
-				loader: () => import('./views/design/workspace-view-document-type-design.element'),
-				weight: 100,
-				meta: {
-					workspaces: ['Umb.Workspace.DocumentType'],
-					label: 'Design',
-					pathname: 'design',
-					icon: 'edit',
-				},
-			},
-			{
-				type: 'workspaceAction',
-				alias: 'Umb.WorkspaceAction.DocumentType.Save',
-				name: 'Save Document Type Workspace Action',
-				loader: () => import('../../../core/components/workspace/actions/save/workspace-action-node-save.element'),
-				meta: {
-					workspaces: ['Umb.Workspace.DocumentType'],
-				},
-			},
-		];
-
-		extensions.forEach((extension) => {
-			if (umbExtensionsRegistry.isRegistered(extension.alias)) return;
-			umbExtensionsRegistry.register(extension);
 		});
 	}
 

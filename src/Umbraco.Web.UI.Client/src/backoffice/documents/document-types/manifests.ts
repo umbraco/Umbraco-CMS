@@ -1,12 +1,9 @@
-import type { ManifestTree, ManifestWorkspace } from '@umbraco-cms/extensions-registry';
-
-const alias = 'DocumentType';
-const treeAlias = `Umb.Tree.${alias}`;
-const workspaceAlias = `Umb.Workspace.${alias}`;
+import { manifests as workspaceManifests } from './workspace/manifests';
+import type { ManifestTree } from '@umbraco-cms/extensions-registry';
 
 const tree: ManifestTree = {
 	type: 'tree',
-	alias: treeAlias,
+	alias: 'Umb.Tree.DocumentType',
 	name: 'Document Types Tree',
 	weight: 400,
 	meta: {
@@ -17,14 +14,4 @@ const tree: ManifestTree = {
 	},
 };
 
-const workspace: ManifestWorkspace = {
-	type: 'workspace',
-	alias: workspaceAlias,
-	name: 'Document Type Workspace',
-	loader: () => import('./workspace/workspace-document-type.element'),
-	meta: {
-		entityType: 'document-type',
-	},
-};
-
-export const manifests = [tree, workspace];
+export const manifests = [tree, ...workspaceManifests];
