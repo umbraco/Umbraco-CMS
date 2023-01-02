@@ -12,7 +12,7 @@ interface ResolvedContexts {
 }
 
 export declare class UmbElementMixinInterface extends UmbControllerHostInterface {
-	observe<T = unknown | null>(source: Observable<any>, callback: (_value: T) => void): UmbObserverController<T>;
+	observe<T = unknown | null>(source: Observable<T>, callback: (_value: T) => void): UmbObserverController<T>;
 	provideContext(alias: string, instance: unknown): UmbContextProviderController;
 	consumeContext(alias: string, callback: UmbContextCallback): UmbContextConsumerController;
 	consumeAllContexts(contextAliases: string[], callback: (_instances: ResolvedContexts) => void): void;
