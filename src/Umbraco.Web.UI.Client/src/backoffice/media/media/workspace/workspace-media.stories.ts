@@ -1,11 +1,8 @@
 import './workspace-media.element';
-
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit-html';
-
-import { data as mediaNodes } from '../../../../../core/mocks/data/media.data';
-
 import type { UmbWorkspaceMediaElement } from './workspace-media.element';
+import { data as mediaNodes } from 'src/core/mocks/data/media.data';
 
 export default {
 	title: 'Workspaces/Media',
