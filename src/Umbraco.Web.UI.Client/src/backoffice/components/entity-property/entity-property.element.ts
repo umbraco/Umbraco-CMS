@@ -1,6 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement, PropertyValueMap } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
+import { UmbWorkspacePropertyContext } from './workspace-property.context';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
@@ -9,14 +10,18 @@ import type { ManifestPropertyEditorUI, ManifestTypes } from '@umbraco-cms/model
 
 import '../../property-actions/shared/property-action-menu/property-action-menu.element';
 import '../../workspaces/shared/workspace-property-layout/workspace-property-layout.element';
+import { UmbContextProviderController } from 'src/core/context-api/provide/context-provider.controller';
+import { UmbControllerHostMixin } from 'src/core/controller/controller-host.mixin';
 
 /**
  *  @element umb-entity-property
  *  @description - Component for displaying a entity property. The Element will render a Property Editor based on the Property Editor UI alias passed to the element.
  *  The element will also render all Property Actions related to the Property Editor.
  */
+
+// TODO: get rid of the other mixins:
 @customElement('umb-entity-property')
-export class UmbEntityPropertyElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+export class UmbEntityPropertyElement extends UmbControllerHostMixin(UmbContextConsumerMixin(UmbObserverMixin(LitElement))) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -113,6 +118,19 @@ export class UmbEntityPropertyElement extends UmbContextConsumerMixin(UmbObserve
 	// TODO: make interface for UMBPropertyEditorElement
 	@state()
 	private _element?: { value?: any; config?: any } & HTMLElement; // TODO: invent interface for propertyEditorUI.
+
+
+	
+	private _propertyContext = new UmbWorkspacePropertyContext<string>("");
+
+	constructor() {
+		super();
+
+		// TODO: make it easier to create a provider, unless a context should just extends a provider-controller?
+		new UmbContextProviderController(this, 'umbPropertyContext',  this._propertyContext);
+	}
+
+
 
 	connectedCallback(): void {
 		super.connectedCallback();

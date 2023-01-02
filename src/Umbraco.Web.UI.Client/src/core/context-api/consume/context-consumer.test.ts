@@ -28,7 +28,7 @@ describe('UmbContextConsumer', () => {
 			it('dispatches context request event when constructed', async () => {
 				const listener = oneEvent(window, umbContextRequestEventType);
 
-				consumer.attach();
+				consumer.hostConnected();
 
 				const event = (await listener) as unknown as UmbContextRequestEventImplementation;
 				expect(event).to.exist;
@@ -40,7 +40,7 @@ describe('UmbContextConsumer', () => {
 
 	it('works with UmbContextProvider', (done) => {
 		const provider = new UmbContextProvider(document.body, testContextAlias, new MyClass());
-		provider.attach();
+		provider.hostConnected();
 
 		const element = document.createElement('div');
 		document.body.appendChild(element);
@@ -49,8 +49,8 @@ describe('UmbContextConsumer', () => {
 			expect(_instance.prop).to.eq('value from provider');
 			done();
 		});
-		localConsumer.attach();
+		localConsumer.hostConnected();
 
-		provider.detach();
+		provider.hostDisconnected();
 	});
 });

@@ -74,7 +74,7 @@ export const UmbContextConsumerMixin = <T extends HTMLElementConstructor>(superC
 				}
 
 				if (this._attached) {
-					consumer.attach();
+					consumer.hostConnected();
 				}
 			});
 		}
@@ -84,13 +84,13 @@ export const UmbContextConsumerMixin = <T extends HTMLElementConstructor>(superC
 		connectedCallback() {
 			super.connectedCallback?.();
 			this._attached = true;
-			this._consumers.forEach((consumers) => consumers.forEach((consumer) => consumer.attach()));
+			this._consumers.forEach((consumers) => consumers.forEach((consumer) => consumer.hostConnected()));
 		}
 
 		disconnectedCallback() {
 			super.disconnectedCallback?.();
 			this._attached = false;
-			this._consumers.forEach((consumers) => consumers.forEach((consumer) => consumer.detach()));
+			this._consumers.forEach((consumers) => consumers.forEach((consumer) => consumer.hostDisconnected()));
 			this._resolved.clear();
 		}
 

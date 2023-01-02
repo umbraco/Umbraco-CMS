@@ -20,6 +20,6 @@ export class UmbContextProvideEventImplementation extends Event implements UmbCo
 	}
 }
 
-export const isUmbContextProvideEvent = (event: Event): event is UmbContextProvideEventImplementation => {
+export const isUmbContextProvideEventType = (event: Event): event is UmbContextProvideEventImplementation => {
 	return event.type === umbContextProvideEventType;
 };

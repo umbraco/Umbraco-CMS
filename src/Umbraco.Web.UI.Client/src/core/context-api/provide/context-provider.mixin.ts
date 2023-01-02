@@ -15,14 +15,14 @@ export const UmbContextProviderMixin = <T extends HTMLElementConstructor>(superC
 			// TODO: Consider if its right to re-publish the context?
 			const existingProvider = this._providers.get(alias);
 			if (existingProvider) {
-				existingProvider.detach();
+				existingProvider.hostDisconnected();
 			}
 
 			const provider = new UmbContextProvider(this, alias, instance);
 			this._providers.set(alias, provider);
 			// TODO: if already connected then attach the new one.
 			if (this._attached) {
-				provider.attach();
+				provider.hostConnected();
 			}
 		}
 
@@ -31,13 +31,13 @@ export const UmbContextProviderMixin = <T extends HTMLElementConstructor>(superC
 		connectedCallback() {
 			super.connectedCallback?.();
 			this._attached = true;
-			this._providers.forEach((provider) => provider.attach());
+			this._providers.forEach((provider) => provider.hostConnected());
 		}
 
 		disconnectedCallback() {
 			super.disconnectedCallback?.();
 			this._attached = false;
-			this._providers.forEach((provider) => provider.detach());
+			this._providers.forEach((provider) => provider.hostDisconnected());
 		}
 	}
 

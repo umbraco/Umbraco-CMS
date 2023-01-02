@@ -28,12 +28,12 @@ export class UmbWorkspaceNodeContext<ContentTypeType extends ContentTreeItem = C
 
 	connectedCallback() {
 		super.connectedCallback();
-		this._notificationConsumer.attach();
+		this._notificationConsumer.hostConnected();
 	}
 
 	disconnectedCallback() {
 		super.connectedCallback();
-		this._notificationConsumer.detach();
+		this._notificationConsumer.hostDisconnected();
 	}
 
 

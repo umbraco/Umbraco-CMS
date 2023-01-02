@@ -42,11 +42,11 @@ export class UmbCollectionContext<DataType extends ContentTreeItem, StoreType ex
 	}
 
 	connectedCallback() {
-		this._storeConsumer.attach();
+		this._storeConsumer.hostConnected();
 	}
 
 	disconnectedCallback() {
-		this._storeConsumer.detach();
+		this._storeConsumer.hostDisconnected();
 	}
 
 
