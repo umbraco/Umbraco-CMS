@@ -17,6 +17,8 @@ export class UmbObserver<Y = any> {
 		this.#subscription = source.subscribe((value) => callback(value));
 	}
 
+	// Notice controller class implements empty hostConnected().
+
 	hostDisconnected() {
 		this.#subscription.unsubscribe();
 	}
