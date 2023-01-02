@@ -6,6 +6,27 @@ import { ApiError, CancelablePromise, ProblemDetails } from '@umbraco-cms/backen
 import { UmbNotificationOptions, UmbNotificationService } from 'src/backoffice/core/services/notification';
 import { UmbNotificationDefaultData } from 'src/backoffice/core/services/notification/layouts/default';
 
+
+/**
+ * Extract the ProblemDetails object from an ApiError.
+ *
+ * This assumes that all ApiErrors contain a ProblemDetails object in their body.
+ */
+function toProblemDetails(error: unknown): ProblemDetails | undefined {
+	if (error instanceof ApiError) {
+		const errorDetails = error.body as ProblemDetails;
+		return errorDetails;
+	} else if (error instanceof Error) {
+		return {
+			title: error.name,
+			detail: error.message,
+		};
+	}
+
+	return undefined;
+}
+
+
 export class UmbResourceController extends UmbController {
 
 
@@ -33,10 +54,6 @@ export class UmbResourceController extends UmbController {
 
 	hostDisconnected() {
 		this.cancel();
-	}
-
-	public getPromise() {
-		return this.#promise;
 	}
 
 
@@ -74,25 +91,6 @@ export class UmbResourceController extends UmbController {
 		}
 
 		return {data, error};
-	}
-
-	/**
-	 * Extract the ProblemDetails object from an ApiError.
-	 *
-	 * This assumes that all ApiErrors contain a ProblemDetails object in their body.
-	 */
-	#toProblemDetails(error: unknown): ProblemDetails | undefined {
-		if (error instanceof ApiError) {
-			const errorDetails = error.body as ProblemDetails;
-			return errorDetails;
-		} else if (error instanceof Error) {
-			return {
-				title: error.name,
-				detail: error.message,
-			};
-		}
-
-		return undefined;
 	}
 
 
