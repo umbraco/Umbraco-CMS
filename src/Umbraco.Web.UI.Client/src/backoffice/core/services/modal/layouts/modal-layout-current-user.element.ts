@@ -1,11 +1,9 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, CSSResultGroup, html, LitElement, nothing } from 'lit';
+import { css, CSSResultGroup, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UmbModalHandler, UmbModalService } from '..';
 import { umbCurrentUserService } from 'src/auth/current-user/current-user.service';
 import type { ManifestExternalLoginProvider, ManifestUserDashboard, UserDetails } from '@umbraco-cms/models';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import '../../../../../auth/external-login-providers/external-login-provider-extension.element';
 import '../../../../../auth/current-user/user-dashboards/user-dashboard-extension.element';
@@ -13,9 +11,10 @@ import {
 	UmbCurrentUserHistoryStore,
 	UmbCurrentUserHistoryItem,
 } from 'src/auth/current-user/current-user-history.store';
+import { UmbLitElement } from 'src/core/element/lit-element.element';
 
 @customElement('umb-modal-layout-current-user')
-export class UmbModalLayoutCurrentUserElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+export class UmbModalLayoutCurrentUserElement extends UmbLitElement {
 	static styles: CSSResultGroup = [
 		UUITextStyles,
 		css`
@@ -102,6 +101,7 @@ export class UmbModalLayoutCurrentUserElement extends UmbContextConsumerMixin(Um
 
 	constructor() {
 		super();
+
 		this.consumeAllContexts(['umbModalService', 'umbCurrentUserHistoryStore'], (instances) => {
 			this._modalService = instances['umbModalService'];
 			this._currentUserHistoryStore = instances['umbCurrentUserHistoryStore'];
