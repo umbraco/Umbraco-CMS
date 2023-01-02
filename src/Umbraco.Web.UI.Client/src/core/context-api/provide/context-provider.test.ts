@@ -12,11 +12,11 @@ describe('UmbContextProvider', () => {
 
 	beforeEach(() => {
 		provider = new UmbContextProvider(document.body, 'my-test-context', new MyClass());
-		provider.attach();
+		provider.hostConnected();
 	});
 
 	afterEach(async () => {
-		provider.detach();
+		provider.hostDisconnected();
 	});
 
 	describe('Public API', () => {
@@ -28,11 +28,11 @@ describe('UmbContextProvider', () => {
 
 		describe('methods', () => {
 			it('has an attach method', () => {
-				expect(provider).to.have.property('attach').that.is.a('function');
+				expect(provider).to.have.property('hostConnected').that.is.a('function');
 			});
 
 			it('has a detach method', () => {
-				expect(provider).to.have.property('detach').that.is.a('function');
+				expect(provider).to.have.property('hostDisconnected').that.is.a('function');
 			});
 		});
 	});
@@ -53,8 +53,8 @@ describe('UmbContextProvider', () => {
 		const localConsumer = new UmbContextConsumer(element, 'my-test-context', (_instance: MyClass) => {
 			expect(_instance.prop).to.eq('value from provider');
 			done();
-			localConsumer.detach();
+			localConsumer.hostDisconnected();
 		});
-		localConsumer.attach();
+		localConsumer.hostConnected();
 	});
 });

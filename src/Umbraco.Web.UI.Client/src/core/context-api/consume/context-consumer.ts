@@ -1,4 +1,4 @@
-import { isUmbContextProvideEvent, umbContextProvideEventType } from '../provide/context-provide.event';
+import { isUmbContextProvideEventType, umbContextProvideEventType } from '../provide/context-provide.event';
 import { UmbContextRequestEventImplementation, UmbContextCallback } from './context-request.event';
 
 /**
@@ -23,19 +23,19 @@ export class UmbContextConsumer {
 		this.target.dispatchEvent(event);
 	}
 
-	public attach() {
+	public hostConnected() {
 		// TODO: We need to use closets application element. We need this in order to have separate Backoffice running within or next to each other.
 		window.addEventListener(umbContextProvideEventType, this._handleNewProvider);
 		this.request();
 	}
 
-	public detach() {
+	public hostDisconnected() {
 		// TODO: We need to use closets application element. We need this in order to have separate Backoffice running within or next to each other.
 		window.removeEventListener(umbContextProvideEventType, this._handleNewProvider);
 	}
 
 	private _handleNewProvider = (event: Event) => {
-		if (!isUmbContextProvideEvent(event)) return;
+		if (!isUmbContextProvideEventType(event)) return;
 
 		if (this._contextAlias === event.contextAlias) {
 			this.request();

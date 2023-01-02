@@ -41,11 +41,11 @@ export class UmbCollectionContext<
 	}
 
 	connectedCallback() {
-		this._storeConsumer.attach();
+		this._storeConsumer.hostConnected();
 	}
 
 	disconnectedCallback() {
-		this._storeConsumer.detach();
+		this._storeConsumer.hostDisconnected();
 	}
 
 	public getData() {

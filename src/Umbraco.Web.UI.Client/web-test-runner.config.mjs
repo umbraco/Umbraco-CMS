@@ -19,7 +19,7 @@ export default {
 						'@umbraco-cms/resource-api': './src/core/resource-api',
 						'@umbraco-cms/utils': './src/core/utils/index.ts',
 						'@umbraco-cms/test-utils': './src/core/test-utils/index.ts',
-						'@umbraco-cms/controllers': './src/core/controllers',
+						'@umbraco-cms/resources': './src/core/resources',
 						'@umbraco-cms/services': './src/core/services',
 						'@umbraco-cms/extensions-registry': './src/core/extensions-registry/index.ts',
 					},

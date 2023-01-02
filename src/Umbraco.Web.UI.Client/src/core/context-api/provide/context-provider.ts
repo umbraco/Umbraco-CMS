@@ -26,7 +26,7 @@ export class UmbContextProvider {
 	/**
 	 * @memberof UmbContextProvider
 	 */
-	public attach() {
+	public hostConnected() {
 		this.host.addEventListener(umbContextRequestEventType, this._handleContextRequest);
 		this.host.dispatchEvent(new UmbContextProvideEventImplementation(this._contextAlias));
 	}
@@ -34,7 +34,7 @@ export class UmbContextProvider {
 	/**
 	 * @memberof UmbContextProvider
 	 */
-	public detach() {
+	public hostDisconnected() {
 		this.host.removeEventListener(umbContextRequestEventType, this._handleContextRequest);
 		// TODO: fire unprovided event.
 	}

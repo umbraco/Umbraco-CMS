@@ -1,8 +1,8 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
+import { UmbResourceController } from '@umbraco-cms/resources';
 import { ProfilingResource } from '@umbraco-cms/backend-api';
-import { UmbResourceController } from '@umbraco-cms/controllers';
 
 @customElement('umb-dashboard-performance-profiling')
 export class UmbDashboardPerformanceProfilingElement extends LitElement {

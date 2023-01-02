@@ -1,22 +1,26 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement, PropertyValueMap } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
+import { UmbWorkspacePropertyContext } from './workspace-property.context';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { ManifestPropertyEditorUI, ManifestTypes } from '@umbraco-cms/models';
 
 import '../../property-actions/shared/property-action-menu/property-action-menu.element';
-import '../workspace/workspace-property-layout/workspace-property-layout.element';
+import 'src/backoffice/core/components/workspace/workspace-property-layout/workspace-property-layout.element';
+import { UmbContextProviderController } from 'src/core/context-api/provide/context-provider.controller';
+import { UmbControllerHostMixin } from 'src/core/controller/controller-host.mixin';
+import { UmbObserverController } from 'src/core/observable-api/observer.controller';
 
 /**
  *  @element umb-entity-property
  *  @description - Component for displaying a entity property. The Element will render a Property Editor based on the Property Editor UI alias passed to the element.
  *  The element will also render all Property Actions related to the Property Editor.
  */
+
+// TODO: get rid of the other mixins:
 @customElement('umb-entity-property')
-export class UmbEntityPropertyElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+export class UmbEntityPropertyElement extends UmbControllerHostMixin(LitElement) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -114,14 +118,26 @@ export class UmbEntityPropertyElement extends UmbContextConsumerMixin(UmbObserve
 	@state()
 	private _element?: { value?: any; config?: any } & HTMLElement; // TODO: invent interface for propertyEditorUI.
 
-	connectedCallback(): void {
-		super.connectedCallback();
+
+	// TODO: How to get proper default value?
+	private _propertyContext = new UmbWorkspacePropertyContext<string>("");
+
+	private propertyEditorUIObserver?: UmbObserverController;
+
+
+	constructor() {
+		super();
+
+		// TODO: make it easier to create a provider, unless a context should just extends a provider-controller?
+		new UmbContextProviderController(this, 'umbPropertyContext',  this._propertyContext);
+		
 		this._observePropertyEditorUI();
 		this.addEventListener('property-editor-change', this._onPropertyEditorChange as any as EventListener);
 	}
 
 	private _observePropertyEditorUI() {
-		this.observe<ManifestTypes>(umbExtensionsRegistry.getByAlias(this.propertyEditorUIAlias), (manifest) => {
+		this.propertyEditorUIObserver?.destroy();
+		this.propertyEditorUIObserver = new UmbObserverController<ManifestTypes>(this, umbExtensionsRegistry.getByAlias(this.propertyEditorUIAlias), (manifest) => {
 			if (manifest?.type === 'propertyEditorUI') {
 				this._gotData(manifest);
 			}
