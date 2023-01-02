@@ -9,15 +9,13 @@ import { UmbMemberTypeStore } from '../members/member-types/member-type.store';
 import { UmbDocumentStore } from '../documents/documents/document.store';
 import { UmbMediaStore } from '../media/media/media.store';
 import { UmbMemberGroupStore } from '../members/member-groups/member-group.store';
-import { UmbUserStore } from '../../auth/users/user.store';
-import { UmbUserGroupStore } from '../../auth/user-groups/user-group.store';
-import { UmbCurrentUserHistoryStore } from '../../auth/current-user/current-user-history.store';
+import { UmbUserStore } from '../../auth/users/users/user.store';
+import { UmbUserGroupStore } from '../../auth/users/user-groups/user-group.store';
+import { UmbCurrentUserHistoryStore } from '../../auth/users/current-user/current-user-history.store';
 import { UmbDictionaryStore } from '../translation/dictionary/dictionary.store';
 import { UmbDocumentBlueprintStore } from '../documents/document-blueprints/document-blueprint.store';
 
-import { manifests as sectionManifests } from '../sections.manifest';
-import { manifests as editorManifests } from '../workspaces.manifest';
-import { manifests as userDashboards } from '../../auth/current-user/user-dashboards/manifests';
+import { manifests as userDashboards } from '../../auth/users/current-user/user-dashboards/manifests';
 import { manifests as propertyEditorModelManifests } from './property-editors/models/manifests';
 import { manifests as propertyEditorUIManifests } from './property-editors/uis/manifests';
 import { manifests as propertyActionManifests } from './property-actions/manifests';
@@ -41,6 +39,7 @@ import '../documents';
 import '../media';
 import '../members';
 import '../translation';
+import '../packages';
 
 @defineElement('umb-backoffice')
 export class UmbBackofficeElement extends UmbContextConsumerMixin(UmbContextProviderMixin(LitElement)) {
@@ -65,8 +64,6 @@ export class UmbBackofficeElement extends UmbContextConsumerMixin(UmbContextProv
 		super();
 
 		// TODO: this needs to happen in each domain
-		this._registerExtensions(sectionManifests);
-		this._registerExtensions(editorManifests);
 		this._registerExtensions(propertyEditorModelManifests);
 		this._registerExtensions(propertyEditorUIManifests);
 		this._registerExtensions(propertyActionManifests);

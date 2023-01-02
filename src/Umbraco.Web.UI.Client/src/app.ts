@@ -18,6 +18,8 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { OpenAPI, RuntimeLevel, ServerResource } from '@umbraco-cms/backend-api';
 import { UmbContextProviderMixin } from '@umbraco-cms/context-api';
 
+import './auth';
+
 @customElement('umb-app')
 export class UmbApp extends UmbContextProviderMixin(LitElement) {
 	static styles = css`
