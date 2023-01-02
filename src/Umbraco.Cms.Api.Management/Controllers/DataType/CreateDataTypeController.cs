@@ -1,10 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.DataType;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 
@@ -32,11 +30,14 @@ public class CreateDataTypeController : DataTypeControllerBase
         IDataType? created = _umbracoMapper.Map<IDataType>(dataTypeCreateModel);
         if (created == null)
         {
-            return BadRequest("Could not map the POSTed model to a datatype");
+            return BadRequest("Could not map the POSTed model to a data type");
         }
 
-        IUser? currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
-        _dataTypeService.Save(created, currentUser?.Id ?? Constants.Security.SuperUserId);
+        ProblemDetails? validationIssues = Save(created, _dataTypeService, _backOfficeSecurityAccessor);
+        if (validationIssues != null)
+        {
+            return BadRequest(validationIssues);
+        }
 
         return await Task.FromResult(Ok(_umbracoMapper.Map<DataTypeViewModel>(created)));
     }
