@@ -3,16 +3,17 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { BehaviorSubject, Observable } from 'rxjs';
 import type { IRoute, IRoutingInfo } from 'router-slot';
-import { UmbWorkspaceEntityElement } from '../../../../workspaces/shared/workspace-entity/workspace-entity.element';
+import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 
 import './list-view-layouts/table/workspace-view-users-table.element';
 import './list-view-layouts/grid/workspace-view-users-grid.element';
 import './workspace-view-users-selection.element';
 import './workspace-view-users-invite.element';
-import type { UserDetails } from '@umbraco-cms/models';
+import type { ManifestWorkspace, UserDetails } from '@umbraco-cms/models';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbUserStore } from 'src/core/stores/user/user.store';
+import { createExtensionElement } from '@umbraco-cms/extensions-api';
 
 @customElement('umb-section-view-users')
 export class UmbSectionViewUsersElement extends UmbContextProviderMixin(
@@ -28,26 +29,9 @@ export class UmbSectionViewUsersElement extends UmbContextProviderMixin(
 	];
 
 	@state()
-	private _routes: IRoute[] = [
-		{
-			path: 'overview',
-			component: () => import('./workspace-view-users-overview.element'),
-		},
-		{
-			path: `:entityType/:key`,
-			component: () => import('../../../../workspaces/shared/workspace-entity/workspace-entity.element'),
-			setup: (component: HTMLElement, info: IRoutingInfo) => {
-				const element = component as UmbWorkspaceEntityElement;
-				element.entityKey = info.match.params.key;
-				element.entityType = info.match.params.entityType;
-			},
-		},
-		{
-			path: '**',
-			redirectTo: 'overview',
-		},
-	];
+	private _routes: IRoute[] = [];
 
+	private _workspaces: Array<ManifestWorkspace> = [];
 	private _userStore?: UmbUserStore;
 
 	private _selection: BehaviorSubject<Array<string>> = new BehaviorSubject(<Array<string>>[]);
@@ -66,7 +50,47 @@ export class UmbSectionViewUsersElement extends UmbContextProviderMixin(
 			this._userStore = instances['umbUserStore'];
 			this._observeUsers();
 		});
+		// TODO: consider this context name, is it to broad?
 		this.provideContext('umbUsersContext', this);
+
+		this.observe<ManifestWorkspace[]>(umbExtensionsRegistry?.extensionsOfType('workspace'), (workspaceExtensions) => {
+			this._workspaces = workspaceExtensions;
+			this._createRoutes();
+		});
+	}
+
+	private _createRoutes() {
+
+		const routes: any[] = [
+			{
+				path: 'overview',
+				component: () => import('./workspace-view-users-overview.element'),
+			},
+		];
+		
+		// TODO: find a way to make this reuseable across:
+		this._workspaces?.map((workspace:ManifestWorkspace) => {
+			routes.push({
+				path: `${workspace.meta.entityType}/:key`,
+				component: () => createExtensionElement(workspace),
+				setup: (component: Promise<HTMLElement>, info: IRoutingInfo) => {
+					component.then((el: HTMLElement) => {
+						(el as any).entityKey = info.match.params.key;
+					})
+					
+				},
+			})
+			routes.push({
+				path: workspace.meta.entityType,
+				component: () => createExtensionElement(workspace)
+			})
+		});
+
+		routes.push({
+			path: '**',
+			redirectTo: 'overview',
+		});
+		this._routes = routes;
 	}
 
 	private _observeUsers() {

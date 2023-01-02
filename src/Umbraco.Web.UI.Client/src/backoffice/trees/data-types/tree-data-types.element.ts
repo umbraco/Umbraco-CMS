@@ -1,22 +1,21 @@
-import { html } from 'lit';
+import { html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import { UmbTreeBase } from '../shared/tree-base.element';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import type { ManifestTreeItemAction } from '@umbraco-cms/models';
 
 import '../shared/tree-navigator.element';
-import { UmbDataTypesStore } from 'src/core/stores/data-types/data-types.store';
+import { UmbDataTypeStore } from '@umbraco-cms/stores/data-type/data-type.store';
 
 @customElement('umb-tree-data-types')
-export class UmbTreeDataTypesElement extends UmbContextProviderMixin(UmbContextConsumerMixin(UmbTreeBase)) {
+export class UmbTreeDataTypesElement extends UmbContextProviderMixin(UmbContextConsumerMixin(LitElement)) {
 	constructor() {
 		super();
 
 		this._registerTreeItemActions();
 
 		// TODO: how do we best expose the tree api to the tree navigator element?
-		this.consumeContext('umbDataTypeStore', (dataTypeStore: UmbDataTypesStore) => {
+		this.consumeContext('umbDataTypeStore', (dataTypeStore: UmbDataTypeStore) => {
 			this.provideContext('umbTreeStore', dataTypeStore);
 		});
 	}

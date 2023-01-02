@@ -1,9 +1,9 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import type { ManifestWorkspaceView } from '@umbraco-cms/models';
+import { UmbWorkspaceMediaContext } from './workspace-media.context';
+import type { ManifestWorkspaceView, ManifestWorkspaceViewCollection } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-import { UmbMediaStore } from 'src/core/stores/media/media.store';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 
 import '../shared/workspace-content/workspace-content.element';
@@ -21,21 +21,60 @@ export class UmbWorkspaceMediaElement extends UmbContextConsumerMixin(UmbContext
 		`,
 	];
 
+	private _entityKey!: string;
 	@property()
-	entityKey!: string;
+	public get entityKey(): string {
+		return this._entityKey;
+	}
+	public set entityKey(value: string) {
+		this._entityKey = value;
+		this._provideWorkspace();
+	}
+
+	private _workspaceContext?:UmbWorkspaceMediaContext;
+
 
 	constructor() {
 		super();
 
+		// TODO: consider if registering extensions should happen initially or else where, to enable unregister of extensions.
 		this._registerWorkspaceViews();
+	}
 
-		this.consumeContext('umbMediaStore', (mediaStore: UmbMediaStore) => {
-			this.provideContext('umbContentStore', mediaStore);
-		});
+	connectedCallback(): void {
+		super.connectedCallback();
+		// TODO: avoid this connection, our own approach on Lit-Controller could be handling this case.
+		this._workspaceContext?.connectedCallback();
+	}
+	disconnectedCallback(): void {
+		super.connectedCallback()
+		// TODO: avoid this connection, our own approach on Lit-Controller could be handling this case.
+		this._workspaceContext?.disconnectedCallback();
+	}
+
+	protected _provideWorkspace() {
+		if(this._entityKey) {
+			this._workspaceContext = new UmbWorkspaceMediaContext(this, this._entityKey);
+			this.provideContext('umbWorkspaceContext', this._workspaceContext);
+		}
 	}
 
 	private _registerWorkspaceViews() {
-		const dashboards: Array<ManifestWorkspaceView> = [
+		const dashboards: Array<ManifestWorkspaceView | ManifestWorkspaceViewCollection> = [
+			{
+				type: 'workspaceViewCollection',
+				alias: 'Umb.WorkspaceView.Media.Collection',
+				name: 'Media Workspace Collection View',
+				weight: 300,
+				meta: {
+					workspaces: ['Umb.Workspace.Media'],
+					label: 'Media',
+					pathname: 'collection',
+					icon: 'umb:grid',
+					entityType: 'media',
+					storeAlias: 'umbMediaStore'
+				},
+			},
 			{
 				type: 'workspaceView',
 				alias: 'Umb.WorkspaceView.Media.Edit',
@@ -71,7 +110,7 @@ export class UmbWorkspaceMediaElement extends UmbContextConsumerMixin(UmbContext
 	}
 
 	render() {
-		return html`<umb-workspace-content .entityKey=${this.entityKey} alias="Umb.Workspace.Media"></umb-workspace-content>`;
+		return html`<umb-workspace-content alias="Umb.Workspace.Media"></umb-workspace-content>`;
 	}
 }
 

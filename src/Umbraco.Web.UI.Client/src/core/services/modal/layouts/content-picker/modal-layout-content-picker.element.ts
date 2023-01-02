@@ -8,7 +8,6 @@ export interface UmbModalContentPickerData {
 	selection: Array<string>;
 }
 
-import '../../../../../backoffice/trees/documents/tree-documents.element';
 import { UmbTreeElement } from '../../../../../backoffice/trees/shared/tree.element';
 
 // TODO: make use of UmbPickerLayoutBase
@@ -73,7 +72,7 @@ export class UmbModalLayoutContentPickerElement extends UmbModalLayoutElement<Um
 
 	render() {
 		return html`
-			<umb-workspace-entity-layout headline="Select Content">
+			<umb-workspace-entity headline="Select Content">
 				<uui-box>
 					<uui-input></uui-input>
 					<hr />
@@ -87,7 +86,7 @@ export class UmbModalLayoutContentPickerElement extends UmbModalLayoutElement<Um
 					<uui-button label="Close" @click=${this._close}></uui-button>
 					<uui-button label="Submit" look="primary" color="positive" @click=${this._submit}></uui-button>
 				</div>
-			</umb-workspace-entity-layout>
+			</umb-workspace-entity>
 		`;
 	}
 }

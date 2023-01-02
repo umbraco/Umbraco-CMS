@@ -2,13 +2,13 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbModalService } from '../../../../../core/services/modal';
-import { UmbDataTypeContext } from '../../data-type.context';
+import { UmbWorkspaceDataTypeContext } from '../../workspace-data-type.context';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { ManifestPropertyEditorUI, DataTypeDetails } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
-import '../../../../property-editor-uis/shared/property-editor-config/property-editor-config.element';
+import '../../../../property-editors/shared/property-editor-config/property-editor-config.element';
 import '../../../../components/ref-property-editor-ui/ref-property-editor-ui.element';
 
 @customElement('umb-workspace-view-data-type-edit')
@@ -41,23 +41,23 @@ export class UmbWorkspaceViewDataTypeEditElement extends UmbContextConsumerMixin
 	@state()
 	private _data: Array<any> = [];
 
-	private _dataTypeContext?: UmbDataTypeContext;
+	private _workspaceContext?: UmbWorkspaceDataTypeContext;
 	private _modalService?: UmbModalService;
 
 	constructor() {
 		super();
 
-		this.consumeAllContexts(['umbDataTypeContext', 'umbModalService'], (result) => {
-			this._dataTypeContext = result['umbDataTypeContext'];
+		this.consumeAllContexts(['umbWorkspaceContext', 'umbModalService'], (result) => {
+			this._workspaceContext = result['umbWorkspaceContext'];
 			this._modalService = result['umbModalService'];
 			this._observeDataType();
 		});
 	}
 
 	private _observeDataType() {
-		if (!this._dataTypeContext) return;
+		if (!this._workspaceContext) return;
 
-		this.observe<DataTypeDetails>(this._dataTypeContext.data, (dataType) => {
+		this.observe<DataTypeDetails>(this._workspaceContext.data, (dataType) => {
 			this._dataType = dataType;
 
 			if (!this._dataType) return;
@@ -83,7 +83,7 @@ export class UmbWorkspaceViewDataTypeEditElement extends UmbContextConsumerMixin
 				this._propertyEditorUIIcon = propertyEditorUI?.meta?.icon ?? '';
 				this._propertyEditorModelAlias = propertyEditorUI?.meta?.propertyEditorModel ?? '';
 
-				this._dataTypeContext?.update({ propertyEditorModelAlias: this._propertyEditorModelAlias });
+				this._workspaceContext?.update({ propertyEditorModelAlias: this._propertyEditorModelAlias });
 			}
 		);
 	}
@@ -103,7 +103,7 @@ export class UmbWorkspaceViewDataTypeEditElement extends UmbContextConsumerMixin
 
 	private _selectPropertyEditorUI(propertyEditorUIAlias: string | null) {
 		if (!this._dataType || this._dataType.propertyEditorUIAlias === propertyEditorUIAlias) return;
-		this._dataTypeContext?.update({ propertyEditorUIAlias });
+		this._workspaceContext?.update({ propertyEditorUIAlias });
 		this._observePropertyEditorUI(propertyEditorUIAlias);
 	}
 

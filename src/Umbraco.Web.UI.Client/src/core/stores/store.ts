@@ -6,10 +6,14 @@ export interface UmbDataStoreIdentifiers {
 }
 
 export interface UmbDataStore<T> {
+	readonly storeAlias: string;
 	readonly items: Observable<Array<T>>;
 	updateItems(items: Array<T>): void;
-	getTreeRoot?(): Observable<Array<T>>;
-	getTreeItemChildren?(key: string): Observable<Array<T>>;
+}
+
+export interface UmbTreeDataStore<T> extends UmbDataStore<T> {
+	getTreeRoot(): Observable<Array<T>>;
+	getTreeItemChildren(key: string): Observable<Array<T>>;
 }
 
 /**
@@ -19,7 +23,10 @@ export interface UmbDataStore<T> {
  * @template T
  * @description - Base class for Data Stores
  */
-export class UmbDataStoreBase<T extends UmbDataStoreIdentifiers> implements UmbDataStore<T> {
+export abstract class UmbDataStoreBase<T extends UmbDataStoreIdentifiers> implements UmbDataStore<T> {
+
+	public abstract readonly storeAlias:string;
+
 	protected _items: BehaviorSubject<Array<T>> = new BehaviorSubject(<Array<T>>[]);
 	public readonly items: Observable<Array<T>> = this._items.asObservable();
 
@@ -29,9 +36,7 @@ export class UmbDataStoreBase<T extends UmbDataStoreIdentifiers> implements UmbD
 	 * @memberof UmbDataStoreBase
 	 */
 	public deleteItems(keys: Array<string>): void {
-		const remainingItems = this._items
-			.getValue()
-			.filter((item) => item.key && keys.includes(item.key) === false);
+		const remainingItems = this._items.getValue().filter((item) => item.key && keys.includes(item.key) === false);
 		this._items.next(remainingItems);
 	}
 
@@ -64,4 +69,29 @@ export class UmbDataStoreBase<T extends UmbDataStoreIdentifiers> implements UmbD
 
 		this._items.next([...storedItems]);
 	}
+}
+
+/**
+ * @export
+ * @class UmbNodeStoreBase
+ * @implements {UmbDataStore<T>}
+ * @template T
+ * @description - Base class for Data Stores
+ */
+export abstract class UmbNodeStoreBase<T extends UmbDataStoreIdentifiers> extends UmbDataStoreBase<T> {
+	/**
+	 * @description - Request data by key. The data is added to the store and is returned as an Observable.
+	 * @param {string} key
+	 * @return {*}  {(Observable<T | null>)}
+	 * @memberof UmbDataStoreBase
+	 */
+	abstract getByKey(key: string): Observable<T | null>;
+
+	/**
+	 * @description - Save data.
+	 * @param {object} data
+	 * @return {*}  {(Promise<void>)}
+	 * @memberof UmbNodeStoreBase
+	 */
+	abstract save(data: T[]): Promise<void>;
 }

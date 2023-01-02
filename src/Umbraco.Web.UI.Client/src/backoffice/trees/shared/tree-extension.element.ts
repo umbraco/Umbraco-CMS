@@ -4,6 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
 import type { ManifestTree } from '@umbraco-cms/models';
 
+import './tree-navigator.element';
 import './context-menu/tree-context-menu-page-action-list.element';
 import './context-menu/tree-context-menu-page.service';
 import './context-menu/tree-context-menu.service';

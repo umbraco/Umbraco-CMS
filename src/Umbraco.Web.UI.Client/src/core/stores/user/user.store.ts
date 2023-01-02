@@ -2,6 +2,7 @@ import { BehaviorSubject, map, Observable } from 'rxjs';
 import { UmbDataStoreBase } from '../store';
 import type { UserDetails } from '@umbraco-cms/models';
 
+export type UmbUserStoreItemType = UserDetails;
 
 /**
  * @export
@@ -9,11 +10,16 @@ import type { UserDetails } from '@umbraco-cms/models';
  * @extends {UmbDataStoreBase<UserDetails>}
  * @description - Data Store for Users
  */
-export class UmbUserStore extends UmbDataStoreBase<UserDetails> {
+export class UmbUserStore extends UmbDataStoreBase<UmbUserStoreItemType> {
+
+
+	public readonly storeAlias = 'umbUserStore';
+
+
 	private _totalUsers: BehaviorSubject<number> = new BehaviorSubject(0);
 	public readonly totalUsers: Observable<number> = this._totalUsers.asObservable();
 
-	getAll(): Observable<Array<UserDetails>> {
+	getAll(): Observable<Array<UmbUserStoreItemType>> {
 		// TODO: use Fetcher API.
 		// TODO: only fetch if the data type is not in the store?
 		fetch(`/umbraco/backoffice/users/list/items`)
@@ -32,7 +38,7 @@ export class UmbUserStore extends UmbDataStoreBase<UserDetails> {
 	 * @return {*}  {(Observable<DataTypeDetails | null>)}
 	 * @memberof UmbDataTypeStore
 	 */
-	getByKey(key: string): Observable<UserDetails | null> {
+	getByKey(key: string): Observable<UmbUserStoreItemType | null> {
 		// TODO: use Fetcher API.
 		// TODO: only fetch if the data type is not in the store?
 		fetch(`/umbraco/backoffice/users/details/${key}`)
@@ -42,11 +48,11 @@ export class UmbUserStore extends UmbDataStoreBase<UserDetails> {
 			});
 
 		return this.items.pipe(
-			map((items: Array<UserDetails>) => items.find((node: UserDetails) => node.key === key) || null)
+			map((items: Array<UmbUserStoreItemType>) => items.find((node: UmbUserStoreItemType) => node.key === key) || null)
 		);
 	}
 
-	getByKeys(keys: Array<string>): Observable<Array<UserDetails>> {
+	getByKeys(keys: Array<string>): Observable<Array<UmbUserStoreItemType>> {
 		const params = keys.map((key) => `key=${key}`).join('&');
 		fetch(`/umbraco/backoffice/users/getByKeys?${params}`)
 			.then((res) => res.json())
@@ -55,11 +61,11 @@ export class UmbUserStore extends UmbDataStoreBase<UserDetails> {
 			});
 
 		return this.items.pipe(
-			map((items: Array<UserDetails>) => items.filter((node: UserDetails) => keys.includes(node.key)))
+			map((items: Array<UmbUserStoreItemType>) => items.filter((node: UmbUserStoreItemType) => keys.includes(node.key)))
 		);
 	}
 
-	getByName(name: string): Observable<Array<UserDetails>> {
+	getByName(name: string): Observable<Array<UmbUserStoreItemType>> {
 		name = name.trim();
 		name = name.toLocaleLowerCase();
 
@@ -191,7 +197,7 @@ export class UmbUserStore extends UmbDataStoreBase<UserDetails> {
 		}
 	}
 
-	async save(users: Array<UserDetails>): Promise<void> {
+	async save(users: Array<UmbUserStoreItemType>): Promise<void> {
 		// TODO: use Fetcher API.
 		try {
 			const res = await fetch('/umbraco/backoffice/users/save', {
@@ -208,7 +214,7 @@ export class UmbUserStore extends UmbDataStoreBase<UserDetails> {
 		}
 	}
 
-	async invite(name: string, email: string, message: string, userGroups: Array<string>): Promise<UserDetails | null> {
+	async invite(name: string, email: string, message: string, userGroups: Array<string>): Promise<UmbUserStoreItemType | null> {
 		// TODO: use Fetcher API.
 		try {
 			const res = await fetch('/umbraco/backoffice/users/invite', {
@@ -218,7 +224,7 @@ export class UmbUserStore extends UmbDataStoreBase<UserDetails> {
 					'Content-Type': 'application/json',
 				},
 			});
-			const json = (await res.json()) as UserDetails[];
+			const json = (await res.json()) as UmbUserStoreItemType[];
 			this.updateItems(json);
 			return json[0];
 		} catch (error) {

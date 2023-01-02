@@ -6,12 +6,12 @@ import { UUIMenuItemEvent } from '@umbraco-ui/uui';
 import { map } from 'rxjs';
 import { repeat } from 'lit/directives/repeat.js';
 import type { UmbTreeContextBase } from '../tree.context';
-import { UmbSectionContext } from '../../sections/section.context';
+import { UmbSectionContext } from '../../sections/shared/section.context';
 import { UmbTreeContextMenuService } from './context-menu/tree-context-menu.service';
 import type { Entity, ManifestSection } from '@umbraco-cms/models';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-import { UmbDataStore } from 'src/core/stores/store';
+import { UmbTreeDataStore } from 'src/core/stores/store';
 
 @customElement('umb-tree-item')
 export class UmbTreeItem extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
@@ -39,7 +39,7 @@ export class UmbTreeItem extends UmbContextConsumerMixin(UmbObserverMixin(LitEle
 	private _isActive = false;
 
 	private _treeContext?: UmbTreeContextBase;
-	private _treeStore?: UmbDataStore<unknown>;
+	private _store?: UmbTreeDataStore<unknown>;
 	private _sectionContext?: UmbSectionContext;
 	private _treeContextMenuService?: UmbTreeContextMenuService;
 
@@ -52,8 +52,8 @@ export class UmbTreeItem extends UmbContextConsumerMixin(UmbObserverMixin(LitEle
 			this._observeIsSelected();
 		});
 
-		this.consumeContext('umbTreeStore', (store: UmbDataStore<unknown>) => {
-			this._treeStore = store;
+		this.consumeContext('umbStore', (store: UmbTreeDataStore<unknown>) => {
+			this._store = store;
 		});
 
 		this.consumeContext('umbSectionContext', (sectionContext: UmbSectionContext) => {
@@ -131,11 +131,11 @@ export class UmbTreeItem extends UmbContextConsumerMixin(UmbObserverMixin(LitEle
 	}
 
 	private _observeChildren() {
-		if (!this._treeStore?.getTreeItemChildren) return;
+		if (!this._store?.getTreeItemChildren) return;
 
 		this._loading = true;
 
-		this.observe<Entity[]>(this._treeStore.getTreeItemChildren(this.treeItem.key), (childItems) => {
+		this.observe<Entity[]>(this._store.getTreeItemChildren(this.treeItem.key), (childItems) => {
 			if (childItems?.length === 0) return;
 			this._childItems = childItems;
 			this._loading = false;
