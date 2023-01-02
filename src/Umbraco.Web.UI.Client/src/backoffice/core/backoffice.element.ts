@@ -1,20 +1,3 @@
-//TODO: we need to figure out what components should be available for extensions and load them upfront
-import './components/backoffice-frame/backoffice-header.element';
-import './components/backoffice-frame/backoffice-main.element';
-import './components/backoffice-frame/backoffice-modal-container.element';
-import './components/backoffice-frame/backoffice-notification-container.element';
-import './components/ref-property-editor-ui/ref-property-editor-ui.element';
-import './components/content-property/content-property.element';
-import './components/table/table.element';
-import './components/code-block/code-block.element';
-import './components/extension-slot/extension-slot.element';
-import './components/workspace/workspace-entity/workspace-entity.element';
-import './components/section/section-main/section-main.element';
-import './components/section/section-sidebar/section-sidebar.element';
-import './components/section/section.element';
-import './components/tree/tree.element';
-import './components/workspace/workspace-content/workspace-content.element';
-
 import { defineElement } from '@umbraco-ui/uui-base/lib/registration';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
@@ -53,6 +36,7 @@ import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import type { ManifestTypes } from '@umbraco-cms/models';
 
 // Domains
+import './components';
 import '../core';
 import '../documents';
 import '../media';
