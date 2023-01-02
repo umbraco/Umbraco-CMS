@@ -6,10 +6,10 @@ import { data as mediaNodes } from 'src/core/mocks/data/media.data';
 
 export default {
 	title: 'Workspaces/Media',
-	component: 'umb-workspace-media',
-	id: 'umb-workspace-media',
+	component: 'umb-media-workspace',
+	id: 'umb-media-workspace',
 } as Meta;
 
 export const AAAOverview: Story<UmbWorkspaceMediaElement> = () =>
-	html` <umb-workspace-media id="${mediaNodes[0].key}"></umb-workspace-media>`;
+	html` <umb-media-workspace id="${mediaNodes[0].key}"></umb-media-workspace>`;
 AAAOverview.storyName = 'Overview';

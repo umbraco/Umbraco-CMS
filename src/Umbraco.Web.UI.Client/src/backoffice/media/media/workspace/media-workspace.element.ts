@@ -1,11 +1,11 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { UmbWorkspaceMediaContext } from './workspace-media.context';
+import { UmbWorkspaceMediaContext } from './media-workspace.context';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 
-@customElement('umb-workspace-media')
-export class UmbWorkspaceMediaElement extends UmbContextConsumerMixin(UmbContextProviderMixin(LitElement)) {
+@customElement('umb-media-workspace')
+export class UmbMediaWorkspaceElement extends UmbContextConsumerMixin(UmbContextProviderMixin(LitElement)) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -52,10 +52,10 @@ export class UmbWorkspaceMediaElement extends UmbContextConsumerMixin(UmbContext
 	}
 }
 
-export default UmbWorkspaceMediaElement;
+export default UmbMediaWorkspaceElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-workspace-media': UmbWorkspaceMediaElement;
+		'umb-media-workspace': UmbMediaWorkspaceElement;
 	}
 }

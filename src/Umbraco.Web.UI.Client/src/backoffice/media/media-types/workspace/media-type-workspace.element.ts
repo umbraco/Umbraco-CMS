@@ -29,6 +29,6 @@ export default UmbMediaTypeWorkspaceElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-workspace-media-type': UmbMediaTypeWorkspaceElement;
+		'umb-media-type-workspace-': UmbMediaTypeWorkspaceElement;
 	}
 }
