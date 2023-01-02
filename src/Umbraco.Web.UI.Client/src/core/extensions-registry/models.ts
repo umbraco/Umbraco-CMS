@@ -73,7 +73,7 @@ export type ManifestStandardTypes =
 	| 'propertyEditorModel'
 	| 'dashboard'
 	| 'dashboardCollection'
-	| 'user-dashboard'
+	| 'userDashboard'
 	| 'propertyAction'
 	| 'packageView'
 	| 'entrypoint'

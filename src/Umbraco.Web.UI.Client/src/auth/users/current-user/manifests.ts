@@ -2,7 +2,7 @@ import type { ManifestHeaderApp, ManifestUserDashboard } from '@umbraco-cms/mode
 
 export const userDashboards: Array<ManifestUserDashboard> = [
 	{
-		type: 'user-dashboard',
+		type: 'userDashboard',
 		alias: 'Umb.UserDashboard.Test',
 		name: 'Test User Dashboard',
 		loader: () => import('./user-dashboard-test.element'),
