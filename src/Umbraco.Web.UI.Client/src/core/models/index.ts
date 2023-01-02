@@ -131,3 +131,14 @@ export interface MemberGroupDetails extends EntityTreeItem {
 export interface DictionaryDetails extends EntityTreeItem {
 	key: string; // TODO: Remove this when the backend is fixed
 }
+
+// Document Blueprint
+export interface DocumentBlueprintDetails {
+	key: string;
+	name: string;
+	type: 'document-blueprint';
+	properties: Array<any>;
+	data: Array<any>;
+	icon: string;
+	documentTypeKey: string;
+}

@@ -1,5 +1,6 @@
 import { manifests as dataTypeTreeManifests } from './data-types/manifests';
 import { manifests as dictionaryTreeManifests } from './dictionary/manifests';
+import { manifests as documentBlueprintTreeManifests } from './document-blueprints/manifests';
 import { manifests as documentTypeTreeManifests } from './document-types/manifests';
 import { manifests as documentTreeManifests } from './documents/manifests';
 import { manifests as extensionTreeManifests } from './extensions/manifests';
@@ -14,6 +15,7 @@ import type { ManifestTree, ManifestTreeItemAction } from '@umbraco-cms/models';
 export const manifests: Array<ManifestTree | ManifestTreeItemAction> = [
 	...dataTypeTreeManifests,
 	...dictionaryTreeManifests,
+	...documentBlueprintTreeManifests,
 	...documentTypeTreeManifests,
 	...documentTreeManifests,
 	...extensionTreeManifests,
