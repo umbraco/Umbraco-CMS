@@ -5,6 +5,7 @@ export declare class UmbControllerHostInterface extends HTMLElement {
     //#controllers:UmbController[];
 	//#attached:boolean;
 	hasController(controller:UmbControllerInterface): boolean;
+	getControllers(filterMethod: (ctrl: UmbControllerInterface) => boolean): UmbControllerInterface[];
 	addController(controller:UmbControllerInterface): void;
 	removeController(controller:UmbControllerInterface): void;
 }
@@ -31,6 +32,14 @@ export const UmbControllerHostMixin = <T extends HTMLElementConstructor>(superCl
 			return (this.#controllers.indexOf(ctrl) !== -1);
 		}
 	
+		/**
+		 * Retrieve controllers matching a filter of this element.
+		 * @param {method} filterMethod
+		 */
+		getControllers(filterMethod: (ctrl: UmbControllerInterface) => boolean): UmbControllerInterface[] {
+			return this.#controllers.filter(filterMethod);
+		}
+
 		/**
 		 * Append a controller to this element.
 		 * @param {UmbControllerInterface} ctrl
