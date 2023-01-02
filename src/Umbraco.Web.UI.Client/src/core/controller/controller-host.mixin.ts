@@ -5,6 +5,7 @@ export declare class UmbControllerHostInterface extends HTMLElement {
     //#controllers:UmbController[];
 	//#attached:boolean;
 	addController(controller:UmbController): void;
+	removeController(controller:UmbController): void;
 }
 
 /**
@@ -30,6 +31,20 @@ export const UmbControllerHostMixin = <T extends HTMLElementConstructor>(superCl
             if(this.#attached) {
                 ctrl.hostConnected();
             }
+		}
+
+		/**
+		 * Remove a controller from this element.
+		 * @param {UmbController} ctrl
+		 */
+		removeController(ctrl: UmbController): void {
+			const index = this.#controllers.indexOf(ctrl);
+			if(index !== -1) {
+				this.#controllers.splice(index, 1);
+				if(this.#attached) {
+					ctrl.hostDisconnected();
+				}
+			}
 		}
 
 		connectedCallback() {
