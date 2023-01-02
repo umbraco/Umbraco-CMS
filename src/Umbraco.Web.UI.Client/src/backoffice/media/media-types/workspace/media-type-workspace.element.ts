@@ -4,8 +4,8 @@ import { customElement, property } from 'lit/decorators.js';
 
 import '../../../core/components/workspace/workspace-entity/workspace-entity.element';
 
-@customElement('umb-workspace-media-type')
-export class UmbWorkspaceMediaTypeElement extends LitElement {
+@customElement('umb-media-type-workspace')
+export class UmbMediaTypeWorkspaceElement extends LitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -25,10 +25,10 @@ export class UmbWorkspaceMediaTypeElement extends LitElement {
 	}
 }
 
-export default UmbWorkspaceMediaTypeElement;
+export default UmbMediaTypeWorkspaceElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-workspace-media-type': UmbWorkspaceMediaTypeElement;
+		'umb-workspace-media-type': UmbMediaTypeWorkspaceElement;
 	}
 }
