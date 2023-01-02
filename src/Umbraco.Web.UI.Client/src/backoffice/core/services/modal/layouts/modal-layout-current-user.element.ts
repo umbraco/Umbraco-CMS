@@ -2,14 +2,14 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, CSSResultGroup, html, LitElement, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UmbModalHandler, UmbModalService } from '..';
-import { umbCurrentUserService } from 'src/auth/users/current-user/current-user.service';
-import type { ManifestExternalLoginProvider, ManifestUserDashboard, UserDetails } from '@umbraco-cms/models';
+import type { UserDetails } from '@umbraco-cms/models';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import {
 	UmbCurrentUserHistoryStore,
 	UmbCurrentUserHistoryItem,
 } from 'src/auth/users/current-user/current-user-history.store';
+import { UmbCurrentUserStore } from 'src/auth/users/current-user/current-user.store';
 
 @customElement('umb-modal-layout-current-user')
 export class UmbModalLayoutCurrentUserElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
@@ -82,21 +82,17 @@ export class UmbModalLayoutCurrentUserElement extends UmbContextConsumerMixin(Um
 	private _currentUser?: UserDetails;
 
 	@state()
-	private _externalLoginProviders: Array<ManifestExternalLoginProvider> = [];
-
-	@state()
-	private _userDashboards: Array<ManifestUserDashboard> = [];
-
-	@state()
 	private _history: Array<UmbCurrentUserHistoryItem> = [];
 
 	private _modalService?: UmbModalService;
+	private _currentUserStore?: UmbCurrentUserStore;
 	private _currentUserHistoryStore?: UmbCurrentUserHistoryStore;
 
 	constructor() {
 		super();
-		this.consumeAllContexts(['umbModalService', 'umbCurrentUserHistoryStore'], (instances) => {
+		this.consumeAllContexts(['umbModalService', 'umbCurrentUserStore', 'umbCurrentUserHistoryStore'], (instances) => {
 			this._modalService = instances['umbModalService'];
+			this._currentUserStore = instances['umbCurrentUserStore'];
 			this._currentUserHistoryStore = instances['umbCurrentUserHistoryStore'];
 			this._observeHistory();
 		});
@@ -105,7 +101,9 @@ export class UmbModalLayoutCurrentUserElement extends UmbContextConsumerMixin(Um
 	}
 
 	private async _observeCurrentUser() {
-		this.observe<UserDetails>(umbCurrentUserService.currentUser, (currentUser) => {
+		if (!this._currentUserStore) return;
+
+		this.observe<UserDetails>(this._currentUserStore.currentUser, (currentUser) => {
 			this._currentUser = currentUser;
 		});
 	}
@@ -131,7 +129,7 @@ export class UmbModalLayoutCurrentUserElement extends UmbContextConsumerMixin(Um
 	private _changePassword() {
 		if (!this._modalService) return;
 
-		this._modalService.changePassword({ requireOldPassword: umbCurrentUserService.isAdmin });
+		this._modalService.changePassword({ requireOldPassword: this._currentUserStore?.isAdmin || false });
 	}
 
 	private _renderHistoryItem(item: UmbCurrentUserHistoryItem) {
@@ -157,7 +155,7 @@ export class UmbModalLayoutCurrentUserElement extends UmbContextConsumerMixin(Um
 	}
 
 	private _logout() {
-		umbCurrentUserService.logout();
+		this._currentUserStore?.logout();
 	}
 
 	render() {

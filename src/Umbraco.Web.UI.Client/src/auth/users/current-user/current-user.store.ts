@@ -3,7 +3,7 @@ import { umbUsersData } from '../../../core/mocks/data/users.data';
 import type { UserDetails } from '@umbraco-cms/models';
 import { umbracoPath } from '@umbraco-cms/utils';
 
-class UmbCurrentUserService {
+export class UmbCurrentUserStore {
 	private _currentUser = new BehaviorSubject<UserDetails>(umbUsersData.getAll()[0]); //TODO: Temp solution to set the first user as the current logged in user
 	public readonly currentUser: Observable<UserDetails> = this._currentUser.asObservable();
 
@@ -26,5 +26,3 @@ class UmbCurrentUserService {
 		return this._currentUser.getValue()?.userGroups.includes(adminUserGroupKey);
 	}
 }
-
-export const umbCurrentUserService = new UmbCurrentUserService();

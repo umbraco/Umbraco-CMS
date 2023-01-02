@@ -2,15 +2,17 @@ import { defineElement } from '@umbraco-ui/uui-base/lib/registration';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 
+import { UmbUserStore } from '../auth/users/users/user.store';
+import { UmbUserGroupStore } from '../auth/users/user-groups/user-group.store';
+import { UmbCurrentUserStore } from '../auth/users/current-user/current-user.store';
+import { UmbCurrentUserHistoryStore } from '../auth/users/current-user/current-user-history.store';
+
 import { UmbDocumentTypeStore } from './documents/document-types/document-type.store';
 import { UmbMediaTypeStore } from './media/media-types/media-type.store';
 import { UmbMemberTypeStore } from './members/member-types/member-type.store';
 import { UmbDocumentStore } from './documents/documents/document.store';
 import { UmbMediaStore } from './media/media/media.store';
 import { UmbMemberGroupStore } from './members/member-groups/member-group.store';
-import { UmbUserStore } from '../auth/users/users/user.store';
-import { UmbUserGroupStore } from '../auth/users/user-groups/user-group.store';
-import { UmbCurrentUserHistoryStore } from '../auth/users/current-user/current-user-history.store';
 import { UmbDictionaryStore } from './translation/dictionary/dictionary.store';
 import { UmbDocumentBlueprintStore } from './documents/document-blueprints/document-blueprint.store';
 
@@ -65,6 +67,7 @@ export class UmbBackofficeElement extends UmbContextConsumerMixin(UmbContextProv
 		this._umbIconRegistry.attach(this);
 
 		// TODO: find a way this is possible outside this element. It needs to be possible to register stores in extensions
+		this.provideContext('umbCurrentUserStore', new UmbCurrentUserStore());
 		this.provideContext('umbDocumentStore', new UmbDocumentStore());
 		this.provideContext('umbMediaStore', new UmbMediaStore());
 		this.provideContext('umbDataTypeStore', new UmbDataTypeStore());

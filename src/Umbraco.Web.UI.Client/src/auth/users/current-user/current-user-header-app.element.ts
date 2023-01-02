@@ -1,11 +1,11 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
+import { UmbCurrentUserStore } from './current-user.store';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import type { UserDetails } from '@umbraco-cms/models';
 import { UmbModalService } from 'src/backoffice/core/services/modal';
-import { umbCurrentUserService } from 'src/auth/users/current-user/current-user.service';
 
 @customElement('umb-current-user-header-app')
 export class UmbCurrentUserHeaderApp extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
@@ -21,18 +21,22 @@ export class UmbCurrentUserHeaderApp extends UmbContextConsumerMixin(UmbObserver
 	@state()
 	private _currentUser?: UserDetails;
 
+	private _currentUserStore?: UmbCurrentUserStore;
 	private _modalService?: UmbModalService;
 
 	constructor() {
 		super();
-		this.consumeAllContexts(['umbUserStore', 'umbModalService'], (instances) => {
+		this.consumeAllContexts(['umbCurrentUserStore', 'umbModalService'], (instances) => {
+			this._currentUserStore = instances['umbCurrentUserStore'];
 			this._modalService = instances['umbModalService'];
 			this._observeCurrentUser();
 		});
 	}
 
 	private async _observeCurrentUser() {
-		this.observe<UserDetails>(umbCurrentUserService.currentUser, (currentUser) => {
+		if (!this._currentUserStore) return;
+
+		this.observe<UserDetails>(this._currentUserStore.currentUser, (currentUser) => {
 			this._currentUser = currentUser;
 		});
 	}

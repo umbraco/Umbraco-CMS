@@ -8,17 +8,15 @@ import { repeat } from 'lit/directives/repeat.js';
 import { distinctUntilChanged } from 'rxjs';
 import { getTagLookAndColor } from '../../../utils';
 
+import { UmbCurrentUserStore } from '../../current-user/current-user.store';
 import { UmbWorkspaceUserContext } from './user-workspace.context';
 import { UmbContextProviderMixin, UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-import type { ManifestWorkspaceAction, UserDetails } from '@umbraco-cms/models';
+import type { UserDetails } from '@umbraco-cms/models';
 
-import 'src/auth/components/input-user-group/input-user-group.element';
-
-import { umbCurrentUserService } from 'src/auth/users/current-user/current-user.service';
 import { UmbModalService } from 'src/backoffice/core/services/modal';
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 
+import 'src/auth/components/input-user-group/input-user-group.element';
 import '../../../../backoffice/core/property-editors/uis/content-picker/property-editor-ui-content-picker.element';
 import '../../../../backoffice/core/components/workspace/workspace-entity/workspace-entity.element';
 
@@ -88,6 +86,7 @@ export class UmbUserWorkspaceElement extends UmbContextProviderMixin(
 	@state()
 	private _currentUser?: UserDetails | null;
 
+	private _currentUserStore?: UmbCurrentUserStore;
 	private _modalService?: UmbModalService;
 
 	private _languages = []; //TODO Add languages
@@ -113,7 +112,10 @@ export class UmbUserWorkspaceElement extends UmbContextProviderMixin(
 	constructor() {
 		super();
 
-		this._observeCurrentUser();
+		this.consumeContext('umbCurrentUserStore', (store) => {
+			this._currentUserStore = store;
+			this._observeCurrentUser();
+		});
 	}
 
 	connectedCallback(): void {
@@ -136,8 +138,10 @@ export class UmbUserWorkspaceElement extends UmbContextProviderMixin(
 	}
 
 	private async _observeCurrentUser() {
+		if (!this._currentUserStore) return;
+
 		// TODO: do not have static current user service, we need to make a ContextAPI for this.
-		this.observe<UserDetails>(umbCurrentUserService.currentUser, (currentUser) => {
+		this.observe<UserDetails>(this._currentUserStore.currentUser, (currentUser) => {
 			this._currentUser = currentUser;
 		});
 	}
@@ -213,7 +217,7 @@ export class UmbUserWorkspaceElement extends UmbContextProviderMixin(
 	}
 
 	private _changePassword() {
-		this._modalService?.changePassword({ requireOldPassword: umbCurrentUserService.isAdmin === false });
+		this._modalService?.changePassword({ requireOldPassword: this._currentUserStore?.isAdmin === false });
 	}
 
 	private _renderActionButtons() {
@@ -221,7 +225,7 @@ export class UmbUserWorkspaceElement extends UmbContextProviderMixin(
 
 		const buttons: TemplateResult[] = [];
 
-		if (umbCurrentUserService.isAdmin === false) return nothing;
+		if (this._currentUserStore?.isAdmin === false) return nothing;
 
 		if (this._user?.status !== 'invited')
 			buttons.push(
