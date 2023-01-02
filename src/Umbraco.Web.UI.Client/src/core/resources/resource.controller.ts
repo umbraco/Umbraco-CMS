@@ -24,7 +24,8 @@ export class UmbResourceController implements UmbController {
 	}
 
 	hostConnected() {
-		this.#promises.length = 0;
+		// TODO: Make sure we do the right thing here, as connected can be called multiple times without disconnected invoked.
+		//this.#promises.length = 0;
 	}
 
 	hostDisconnected() {
