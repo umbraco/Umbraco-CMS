@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { UmbController } from '../controller/controller.interface';
+import { UmbController } from '../controller/controller.class';
 import { UmbControllerHostInterface } from '../controller/controller-host.mixin';
 import { UmbContextConsumerController } from '../context-api/consume/context-consumer.controller';
 import { ApiError, CancelablePromise, ProblemDetails } from '@umbraco-cms/backend-api';
 import { UmbNotificationOptions, UmbNotificationService } from 'src/backoffice/core/services/notification';
 import { UmbNotificationDefaultData } from 'src/backoffice/core/services/notification/layouts/default';
 
-export class UmbResourceController implements UmbController {
+export class UmbResourceController extends UmbController {
 
 
 	#promise: Promise<any>;
@@ -14,11 +14,10 @@ export class UmbResourceController implements UmbController {
 	#notificationService?: UmbNotificationService;
 
 
-	constructor(host: UmbControllerHostInterface, promise) {
+	constructor(host: UmbControllerHostInterface, promise: Promise<any>) {
+		super(host);
 
 		this.#promise = promise;
-
-		host.addController(this);
 
 		new UmbContextConsumerController(host, 'umbNotificationService',
 			(_instance: UmbNotificationService) => {
@@ -36,26 +35,19 @@ export class UmbResourceController implements UmbController {
 		this.cancel();
 	}
 
-	addResource(promise: Promise<any>): void {
-		this.#promises.push(promise);
+	public getPromise() {
+		return this.#promise;
 	}
 
-	/**
-	 * Execute a given function and get the result as a promise.
-	 */
-	execute<T>(func: Promise<T>): Promise<T> {
-		this.addResource(func);
-		return func;
-	}
 
 	/**
 	 * Wrap the {execute} function in a try/catch block and return a tuple with the result and the error.
 	 */
-	async tryExecute<T>(func: Promise<T>): Promise<[T | undefined, ProblemDetails | undefined]> {
+	async tryExecute<T>(): Promise<{data?: T, error?:ProblemDetails}> {
 		try {
-			return [await this.execute(func), undefined];
+			return {data: await this.#promise};
 		} catch (e) {
-			return [undefined, this.#toProblemDetails(e)];
+			return {error: this.#toProblemDetails(e)};
 		}
 	}
 
@@ -63,11 +55,8 @@ export class UmbResourceController implements UmbController {
 	 * Wrap the {execute} function in a try/catch block and return the result.
 	 * If the executor function throws an error, then show the details in a notification.
 	 */
-	async tryExecuteAndNotify<T>(
-		func: Promise<T>,
-		options?: UmbNotificationOptions<any>
-	): Promise<[T | undefined, ProblemDetails | undefined]> {
-		const [result, error] = await this.tryExecute(func);
+	async tryExecuteAndNotify<T>(options?: UmbNotificationOptions<any>): Promise<{data?: T, error?:ProblemDetails}> {
+		const {data, error} = await this.tryExecute<T>();
 
 		if (error) {
 			const data: UmbNotificationDefaultData = {
@@ -84,7 +73,7 @@ export class UmbResourceController implements UmbController {
 			}
 		}
 
-		return [result, error];
+		return {data, error};
 	}
 
 	/**
@@ -125,6 +114,7 @@ export class UmbResourceController implements UmbController {
 	}
 
 	destroy() {
+		super.destroy();
 		this.cancel();
 	}
 }

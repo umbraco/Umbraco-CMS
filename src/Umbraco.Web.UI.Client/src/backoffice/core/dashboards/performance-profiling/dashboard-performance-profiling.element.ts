@@ -2,7 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbResourceController } from '@umbraco-cms/resources';
-import { ProfilingResource } from '@umbraco-cms/backend-api';
+import { ProfilingResource, ProfilingStatus } from '@umbraco-cms/backend-api';
 
 @customElement('umb-dashboard-performance-profiling')
 export class UmbDashboardPerformanceProfilingElement extends LitElement {
@@ -29,8 +29,6 @@ export class UmbDashboardPerformanceProfilingElement extends LitElement {
 	@state()
 	private _profilingPerfomance = false;
 
-	private _resourceController = new UmbResourceController(this);
-
 	connectedCallback(): void {
 		super.connectedCallback();
 		this._getProfilingStatus();
@@ -38,11 +36,14 @@ export class UmbDashboardPerformanceProfilingElement extends LitElement {
 	}
 
 	private async _getProfilingStatus() {
-		const [profilingStatus] = await this._resourceController.tryExecuteAndNotify(
-			ProfilingResource.getProfilingStatus()
-		);
-		if (profilingStatus) {
-			this._profilingStatus = profilingStatus.enabled;
+		
+		const {data} = await new UmbResourceController(this, ProfilingResource.getProfilingStatus()).tryExecuteAndNotify<ProfilingStatus>();
+
+		// TODO: consider wrapping above into a method, like this:
+		//const [profilingStatus] = await tryExecuteAndNotify(this, ProfilingResource.getProfilingStatus());
+
+		if (data) {
+			this._profilingStatus = data.enabled;
 		}
 	}
 
