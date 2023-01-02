@@ -1,5 +1,6 @@
 import { UmbContextConsumerController } from '../context-api/consume/context-consumer.controller';
 import { isContextConsumerType } from '../context-api/consume/is-context-consumer-type.function';
+import { UmbContextProviderController } from '../context-api/provide/context-provider.controller';
 import { UmbControllerHostInterface, UmbControllerHostMixin } from '../controller/controller-host.mixin';
 import { UmbControllerInterface } from '../controller/controller.interface';
 import type { HTMLElementConstructor } from '../models';
@@ -17,6 +18,16 @@ export declare class UmbElementMixinInterface extends UmbControllerHostInterface
 export const UmbElementMixin = <T extends HTMLElementConstructor>(superClass: T) => {
 	class UmbElementMixinClass extends UmbControllerHostMixin(superClass) {
 
+
+
+		/**
+		 * Provide a context API for this or child elements.
+		 * @param {string} alias
+		 * @param {instance} instance The API instance to be exposed.
+		 */
+		provideContext(alias: string, instance: unknown) {
+			new UmbContextProviderController(this, alias, instance);
+		}
         
 		/**
 		 * Setup a subscription for a context. The callback is called when the context is resolved.

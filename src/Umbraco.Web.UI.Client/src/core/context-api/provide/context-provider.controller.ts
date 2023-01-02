@@ -7,6 +7,9 @@ export class UmbContextProviderController extends UmbContextProvider implements 
    
     constructor(host:UmbControllerHostInterface, contextAlias: string, instance: unknown) {
         super(host, contextAlias, instance);
+
+        // TODO: What if this API is already provided with this alias? maybe handle this in the controller.
+        
         host.addController(this);
     }
 
