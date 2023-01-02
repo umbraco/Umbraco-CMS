@@ -41,6 +41,40 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 	},
 ];
 
-const workspaceActions: Array<ManifestWorkspaceAction> = [];
+const workspaceActions: Array<ManifestWorkspaceAction> = [
+	{
+		type: 'workspaceAction',
+		alias: 'Umb.WorkspaceAction.Document.SaveAndPreview',
+		name: 'Save Document Workspace Action',
+		loader: () => import('src/backoffice/core/components/workspace/actions/save/workspace-action-node-save.element'),
+		meta: {
+			workspaces: ['Umb.Workspace.Document'],
+			label: 'Save and preview',
+		},
+	},
+	{
+		type: 'workspaceAction',
+		alias: 'Umb.WorkspaceAction.Document.Save',
+		name: 'Save Document Workspace Action',
+		loader: () => import('src/backoffice/core/components/workspace/actions/save/workspace-action-node-save.element'),
+		meta: {
+			workspaces: ['Umb.Workspace.Document'],
+			look: 'secondary',
+			label: 'Save',
+		},
+	},
+	{
+		type: 'workspaceAction',
+		alias: 'Umb.WorkspaceAction.Document.SaveAndPublish',
+		name: 'Save Document Workspace Action',
+		loader: () => import('src/backoffice/core/components/workspace/actions/save/workspace-action-node-save.element'),
+		meta: {
+			workspaces: ['Umb.Workspace.Document'],
+			label: 'Save and publish',
+			look: 'primary',
+			color: 'positive',
+		},
+	},
+];
 
 export const manifests = [tree, ...workspaceViews, ...workspaceActions];

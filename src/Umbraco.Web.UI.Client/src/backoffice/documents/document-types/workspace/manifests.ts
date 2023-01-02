@@ -34,6 +34,8 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 		loader: () => import('../../../core/components/workspace/actions/save/workspace-action-node-save.element'),
 		meta: {
 			workspaces: ['Umb.Workspace.DocumentType'],
+			look: 'primary',
+			color: 'positive',
 		},
 	},
 ];
