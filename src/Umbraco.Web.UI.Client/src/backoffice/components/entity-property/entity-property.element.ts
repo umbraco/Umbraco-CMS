@@ -119,7 +119,7 @@ export class UmbEntityPropertyElement extends UmbControllerHostMixin(LitElement)
 	private _element?: { value?: any; config?: any } & HTMLElement; // TODO: invent interface for propertyEditorUI.
 
 
-	
+	// TODO: How to get proper default value?
 	private _propertyContext = new UmbWorkspacePropertyContext<string>("");
 
 	private propertyEditorUIObserver?: UmbObserverController;
