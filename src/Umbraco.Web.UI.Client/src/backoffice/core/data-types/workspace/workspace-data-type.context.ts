@@ -1,6 +1,7 @@
 import { UmbWorkspaceNodeContext } from '../../components/workspace/workspace-context/workspace-node.context';
 import type { UmbDataTypeStore, UmbDataTypeStoreItemType } from 'src/backoffice/core/data-types/data-type.store';
 import type { DataTypeDetails } from '@umbraco-cms/models';
+import { UmbControllerHostInterface } from 'src/core/controller/controller-host.mixin';
 
 const DefaultDataTypeData = {
 	key: '',
@@ -15,8 +16,8 @@ const DefaultDataTypeData = {
 } as UmbDataTypeStoreItemType;
 
 export class UmbWorkspaceDataTypeContext extends UmbWorkspaceNodeContext<UmbDataTypeStoreItemType, UmbDataTypeStore> {
-	constructor(target: HTMLElement, entityKey: string) {
-		super(target, DefaultDataTypeData, 'umbDataTypeStore', entityKey, 'dataType');
+	constructor(host: UmbControllerHostInterface, entityKey: string) {
+		super(host, DefaultDataTypeData, 'umbDataTypeStore', entityKey, 'dataType');
 	}
 
 	public setPropertyValue(propertyAlias: string, value: any) {
