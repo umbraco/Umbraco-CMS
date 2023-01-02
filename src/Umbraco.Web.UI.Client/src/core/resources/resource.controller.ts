@@ -9,12 +9,15 @@ import { UmbNotificationDefaultData } from 'src/backoffice/core/services/notific
 export class UmbResourceController implements UmbController {
 
 
-	#promises: Promise<any>[] = [];
+	#promise: Promise<any>;
 
 	#notificationService?: UmbNotificationService;
 
 
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostInterface, promise) {
+
+		this.#promise = promise;
+
 		host.addController(this);
 
 		new UmbContextConsumerController(host, 'umbNotificationService',
@@ -30,7 +33,7 @@ export class UmbResourceController implements UmbController {
 	}
 
 	hostDisconnected() {
-		this.cancelAllResources();
+		this.cancel();
 	}
 
 	addResource(promise: Promise<any>): void {
@@ -85,25 +88,6 @@ export class UmbResourceController implements UmbController {
 	}
 
 	/**
-	 * Cancel all resources that are currently being executed by this controller if they are cancelable.
-	 *
-	 * This works by checking if the promise is a CancelablePromise and if so, it will call the cancel method.
-	 *
-	 * This is useful when the controller is being disconnected from the DOM.
-	 *
-	 * @see CancelablePromise
-	 * @see https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal
-	 * @see https://developer.mozilla.org/en-US/docs/Web/API/AbortController
-	 */
-	cancelAllResources() {
-		this.#promises.forEach((promise) => {
-			if (promise instanceof CancelablePromise) {
-				promise.cancel();
-			}
-		});
-	}
-
-	/**
 	 * Extract the ProblemDetails object from an ApiError.
 	 *
 	 * This assumes that all ApiErrors contain a ProblemDetails object in their body.
@@ -120,5 +104,27 @@ export class UmbResourceController implements UmbController {
 		}
 
 		return undefined;
+	}
+
+
+	/**
+	 * Cancel all resources that are currently being executed by this controller if they are cancelable.
+	 *
+	 * This works by checking if the promise is a CancelablePromise and if so, it will call the cancel method.
+	 *
+	 * This is useful when the controller is being disconnected from the DOM.
+	 *
+	 * @see CancelablePromise
+	 * @see https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal
+	 * @see https://developer.mozilla.org/en-US/docs/Web/API/AbortController
+	 */
+	cancel() {
+		if (this.#promise instanceof CancelablePromise) {
+			this.#promise.cancel();
+		}
+	}
+
+	destroy() {
+		this.cancel();
 	}
 }
