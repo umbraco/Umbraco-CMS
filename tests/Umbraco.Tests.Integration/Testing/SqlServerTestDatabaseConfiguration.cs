@@ -18,18 +18,19 @@ public class SqlServerTestDatabaseConfiguration : ITestDatabaseConfiguration
 {
     private Guid _key;
     private string _connectionString;
+    private string _masterConnectionString;
 
     public SqlServerTestDatabaseConfiguration(string connectionString)
     {
-        _connectionString = connectionString;
-    } 
+        _masterConnectionString = connectionString;
+    }
     public ConnectionStrings InitializeConfiguration()
     {
         _key = Guid.NewGuid();
 
         CreateDatabase();
 
-        _connectionString = ConstructConnectionString(_connectionString, _key.ToString());
+        _connectionString = ConstructConnectionString(_masterConnectionString, _key.ToString());
 
 
         return new ConnectionStrings
@@ -43,7 +44,7 @@ public class SqlServerTestDatabaseConfiguration : ITestDatabaseConfiguration
 
     private void CreateDatabase()
     {
-        using (var connection = new SqlConnection(_connectionString))
+        using (var connection = new SqlConnection(_masterConnectionString))
         {
             connection.Open();
             using (var command = connection.CreateCommand())
@@ -56,18 +57,11 @@ public class SqlServerTestDatabaseConfiguration : ITestDatabaseConfiguration
 
     public void Teardown(string key)
     {
-        using (var connection = new SqlConnection(_connectionString))
+        using (var connection = new SqlConnection(_masterConnectionString))
         {
             connection.Open();
             using (var command = connection.CreateCommand())
             {
-                SetCommand(command, "select count(1) from sys.databases where name = @0", key);
-                var records = (int)command.ExecuteScalar();
-                if (records == 0)
-                {
-                    return;
-                }
-
                 SetCommand(command, $@"DROP DATABASE {LocalDb.QuotedName(key)}");
                 command.ExecuteNonQuery();
             }
