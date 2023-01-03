@@ -15,7 +15,7 @@ public class CreateDataTypeFolderController : DataTypeFolderControllerBase
 
     [HttpPost]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(CreatedResult), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status201Created)]
     public async Task<ActionResult> Create(FolderCreateModel folderCreateModel)
         => await Task.FromResult(CreateFolder<ByKeyDataTypeFolderController>(folderCreateModel, controller => nameof(controller.ByKey)));
 }

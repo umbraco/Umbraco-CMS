@@ -21,8 +21,8 @@ public class DeleteDataTypeController : DataTypeControllerBase
     [HttpDelete("{key:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(NotFoundResult), StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<DataTypeViewModel>> Delete(Guid key)
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult> Delete(Guid key)
     {
         IDataType? dataType = _dataTypeService.GetDataType(key);
         if (dataType == null)

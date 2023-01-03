@@ -16,6 +16,7 @@ public class UpdateDataTypeFolderController : DataTypeFolderControllerBase
     [HttpPut("{key:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult> Update(Guid key, FolderUpdateModel folderUpdateModel)
         => await Task.FromResult(UpdateFolder(key, folderUpdateModel));
 }

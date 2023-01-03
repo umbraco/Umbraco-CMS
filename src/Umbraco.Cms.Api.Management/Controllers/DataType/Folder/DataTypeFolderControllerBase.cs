@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.DataType.Folder;
 [ApiVersion("1.0")]
 [ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.DataType}/folder")]
-[ApiExplorerSettings(GroupName = "Data Type Folder")]
+[ApiExplorerSettings(GroupName = "Data Type")]
 public abstract class DataTypeFolderControllerBase : FolderManagementControllerBase
 {
     private readonly IDataTypeService _dataTypeService;

@@ -25,7 +25,7 @@ public class CreateDataTypeController : DataTypeControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<DataTypeViewModel>> Create(DataTypeCreateModel dataTypeCreateModel)
+    public async Task<ActionResult> Create(DataTypeCreateModel dataTypeCreateModel)
     {
         IDataType? created = _umbracoMapper.Map<IDataType>(dataTypeCreateModel);
         if (created == null)

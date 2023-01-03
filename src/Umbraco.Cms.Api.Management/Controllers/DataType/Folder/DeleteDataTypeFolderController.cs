@@ -15,7 +15,8 @@ public class DeleteDataTypeFolderController : DataTypeFolderControllerBase
 
     [HttpDelete("{key:guid}")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(FolderViewModel), StatusCodes.Status200OK)]
-    public async Task<ActionResult<FolderViewModel>> Delete(Guid key)
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult> Delete(Guid key)
         => await Task.FromResult(DeleteFolder(key));
 }
