@@ -19,12 +19,12 @@ import { UmbDictionaryStore } from './translation/dictionary/dictionary.store';
 import { UmbDocumentBlueprintStore } from './documents/document-blueprints/document-blueprint.store';
 
 import { UmbSectionStore } from './shared/components/section/section.store';
-import { UmbDataTypeStore } from './core/data-types/data-type.store';
+import { UmbDataTypeStore } from './settings/data-types/data-type.store';
 
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 
 // Domains
-import './core';
+import './settings';
 import './documents';
 import './media';
 import './members';
