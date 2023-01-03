@@ -1,10 +1,8 @@
 import { UUIButtonElement } from '@umbraco-ui/uui';
-import { css, CSSResultGroup, html, LitElement, nothing } from 'lit';
+import { css, CSSResultGroup, html, nothing } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 
 import { UmbInstallerContext } from '../installer.context';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import {
 	ApiError,
 	DatabaseInstall,
@@ -14,9 +12,11 @@ import {
 	InstallSettings,
 	ProblemDetails,
 } from '@umbraco-cms/backend-api';
+import { tryExecuteAndNotify } from '@umbraco-cms/resources';
+import { UmbLitElement } from 'src/core/element/lit-element.element';
 
 @customElement('umb-installer-database')
-export class UmbInstallerDatabaseElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+export class UmbInstallerDatabaseElement extends UmbLitElement {
 	static styles: CSSResultGroup = [
 		css`
 			:host,
@@ -115,7 +115,7 @@ export class UmbInstallerDatabaseElement extends UmbContextConsumerMixin(UmbObse
 		if (!this._installerContext) return;
 
 		this.observe<InstallSettings>(this._installerContext.settings, (settings) => {
-			this._databases = settings.databases ?? [];
+			this._databases = settings?.databases ?? [];
 
 			// If there is an isConfigured database in the databases array then we can skip the database selection step
 			// and just use that.
@@ -134,8 +134,8 @@ export class UmbInstallerDatabaseElement extends UmbContextConsumerMixin(UmbObse
 		if (!this._installerContext) return;
 
 		this.observe<Install>(this._installerContext.data, (data) => {
-			this.databaseFormData = data.database ?? {};
-			this._options.forEach((x, i) => (x.selected = data.database?.id === x.value || i === 0));
+			this.databaseFormData = data?.database ?? ({} as DatabaseInstall);
+			this._options.forEach((x, i) => (x.selected = data?.database?.id === x.value || i === 0));
 		});
 	}
 
@@ -190,27 +190,24 @@ export class UmbInstallerDatabaseElement extends UmbContextConsumerMixin(UmbObse
 			}
 
 			if (selectedDatabase.requiresConnectionTest) {
-				try {
-					const databaseDetails: DatabaseInstall = {
-						id,
-						username,
-						password,
-						server,
-						useIntegratedAuthentication,
-						name,
-						connectionString,
-						providerName: selectedDatabase.providerName,
-					};
+				const databaseDetails: DatabaseInstall = {
+					id,
+					username,
+					password,
+					server,
+					useIntegratedAuthentication,
+					name,
+					connectionString,
+					providerName: selectedDatabase.providerName,
+				};
 
-					await InstallResource.postInstallValidateDatabase({ requestBody: databaseDetails });
-				} catch (e) {
-					if (e instanceof ApiError) {
-						const error = e.body as ProblemDetails;
-						console.warn('Database validation failed', error.detail);
-						this._validationErrorMessage = error.detail ?? 'Could not verify database connection';
-					} else {
-						this._validationErrorMessage = 'A server error happened when trying to validate the database';
-					}
+				const { error } = await tryExecuteAndNotify(
+					this,
+					InstallResource.postInstallValidateDatabase({ requestBody: databaseDetails })
+				);
+
+				if (error) {
+					this._validationErrorMessage = error.detail;
 					this._installButton.state = 'failed';
 					return;
 				}
