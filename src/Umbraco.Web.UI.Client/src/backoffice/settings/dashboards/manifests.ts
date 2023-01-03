@@ -5,7 +5,7 @@ const dashboards: Array<ManifestDashboard> = [
 		type: 'dashboard',
 		alias: 'Umb.Dashboard.Welcome',
 		name: 'Welcome Dashboard',
-		loader: () => import('./welcome/dashboard-welcome.element'),
+		loader: () => import('../../documents/dashboards/welcome/dashboard-welcome.element'),
 		weight: 20,
 		meta: {
 			label: 'Welcome',
