@@ -1,3 +1,5 @@
+import './components';
+
 import { manifests as propertyActionManifests } from './property-actions/manifests';
 import { manifests as propertyEditorModelManifests } from './property-editors/models/manifests';
 import { manifests as propertyEditorUIManifests } from './property-editors/uis/manifests';
