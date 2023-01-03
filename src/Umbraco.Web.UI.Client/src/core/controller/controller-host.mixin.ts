@@ -4,6 +4,8 @@ import { UmbControllerInterface } from './controller.interface';
 export declare class UmbControllerHostInterface extends HTMLElement {
     //#controllers:UmbController[];
 	//#attached:boolean;
+	hasController(controller:UmbControllerInterface): boolean;
+	getControllers(filterMethod: (ctrl: UmbControllerInterface) => boolean): UmbControllerInterface[];
 	addController(controller:UmbControllerInterface): void;
 	removeController(controller:UmbControllerInterface): void;
 }
@@ -21,6 +23,22 @@ export const UmbControllerHostMixin = <T extends HTMLElementConstructor>(superCl
 		#controllers: UmbControllerInterface[] = [];
 
 		#attached = false;
+
+		/**
+		 * Tests if a controller is assigned to this element.
+		 * @param {UmbControllerInterface} ctrl
+		 */
+		hasController(ctrl: UmbControllerInterface): boolean {
+			return (this.#controllers.indexOf(ctrl) !== -1);
+		}
+	
+		/**
+		 * Retrieve controllers matching a filter of this element.
+		 * @param {method} filterMethod
+		 */
+		getControllers(filterMethod: (ctrl: UmbControllerInterface) => boolean): UmbControllerInterface[] {
+			return this.#controllers.filter(filterMethod);
+		}
 
 		/**
 		 * Append a controller to this element.
@@ -44,6 +62,7 @@ export const UmbControllerHostMixin = <T extends HTMLElementConstructor>(superCl
 				if(this.#attached) {
 					ctrl.hostDisconnected();
 				}
+				ctrl.destroy();
 			}
 		}
 

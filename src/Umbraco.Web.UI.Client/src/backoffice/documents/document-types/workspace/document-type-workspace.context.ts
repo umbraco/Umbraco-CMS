@@ -3,6 +3,7 @@ import {
 	UmbDocumentTypeStore,
 	UmbDocumentTypeStoreItemType,
 } from 'src/backoffice/documents/document-types/document-type.store';
+import { UmbControllerHostInterface } from 'src/core/controller/controller-host.mixin';
 
 const DefaultDocumentTypeData = {
 	key: '',
@@ -19,7 +20,7 @@ export class UmbWorkspaceDocumentTypeContext extends UmbWorkspaceNodeContext<
 	UmbDocumentTypeStoreItemType,
 	UmbDocumentTypeStore
 > {
-	constructor(target: HTMLElement, entityKey: string) {
-		super(target, DefaultDocumentTypeData, 'umbDocumentTypeStore', entityKey, 'documentType');
+	constructor(host: UmbControllerHostInterface, entityKey: string) {
+		super(host, DefaultDocumentTypeData, 'umbDocumentTypeStore', entityKey, 'documentType');
 	}
 }

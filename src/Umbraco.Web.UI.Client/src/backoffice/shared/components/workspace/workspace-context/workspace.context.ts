@@ -1,11 +1,10 @@
 import { BehaviorSubject, Observable } from "rxjs";
+import { UmbControllerHostInterface } from "src/core/controller/controller-host.mixin";
 
 
 export abstract class UmbWorkspaceContext<DataType> {
 
-
-	protected _target!:HTMLElement;
-
+	protected _host: UmbControllerHostInterface;
 
 	// TODO: figure out how fine grained we want to make our observables.
 	// TODO: add interface
@@ -13,8 +12,8 @@ export abstract class UmbWorkspaceContext<DataType> {
 	public readonly data: Observable<DataType>;
 
 
-	constructor(target:HTMLElement, defaultData: DataType) {
-		this._target = target;
+	constructor(host:UmbControllerHostInterface, defaultData: DataType) {
+		this._host = host;
 
 		this._data = new BehaviorSubject<DataType>(defaultData);
 		this.data = this._data.asObservable();

@@ -1,5 +1,5 @@
 import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
-import { css, html, LitElement, nothing, TemplateResult } from 'lit';
+import { css, html, nothing, TemplateResult } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
@@ -10,20 +10,17 @@ import { getTagLookAndColor } from '../../../../auth/utils';
 
 import { UmbCurrentUserStore } from '../../current-user/current-user.store';
 import { UmbWorkspaceUserContext } from './user-workspace.context';
-import { UmbContextProviderMixin, UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { UserDetails } from '@umbraco-cms/models';
 
 import { UmbModalService } from 'src/core/modal';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 
 import 'src/auth/components/input-user-group/input-user-group.element';
 import '../../../shared/property-editors/uis/content-picker/property-editor-ui-content-picker.element';
 import '../../../shared/components/workspace/workspace-entity/workspace-entity.element';
+import { UmbLitElement } from 'src/core/element/lit-element.element';
 
 @customElement('umb-user-workspace')
-export class UmbUserWorkspaceElement extends UmbContextProviderMixin(
-	UmbContextConsumerMixin(UmbObserverMixin(LitElement))
-) {
+export class UmbUserWorkspaceElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -116,17 +113,6 @@ export class UmbUserWorkspaceElement extends UmbContextProviderMixin(
 			this._currentUserStore = store;
 			this._observeCurrentUser();
 		});
-	}
-
-	connectedCallback(): void {
-		super.connectedCallback();
-		// TODO: avoid this connection, our own approach on Lit-Controller could be handling this case.
-		this._workspaceContext?.connectedCallback();
-	}
-	disconnectedCallback(): void {
-		super.connectedCallback();
-		// TODO: avoid this connection, our own approach on Lit-Controller could be handling this case.
-		this._workspaceContext?.disconnectedCallback();
 	}
 
 	protected _provideWorkspace() {

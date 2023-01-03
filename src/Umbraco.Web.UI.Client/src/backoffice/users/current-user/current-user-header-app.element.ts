@@ -1,14 +1,13 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, CSSResultGroup, html, LitElement } from 'lit';
+import { css, CSSResultGroup, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbCurrentUserStore } from './current-user.store';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import type { UserDetails } from '@umbraco-cms/models';
 import { UmbModalService } from 'src/core/modal';
+import { UmbLitElement } from 'src/core/element/lit-element.element';
 
 @customElement('umb-current-user-header-app')
-export class UmbCurrentUserHeaderApp extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+export class UmbCurrentUserHeaderApp extends UmbLitElement {
 	static styles: CSSResultGroup = [
 		UUITextStyles,
 		css`
@@ -19,7 +18,7 @@ export class UmbCurrentUserHeaderApp extends UmbContextConsumerMixin(UmbObserver
 	];
 
 	@state()
-	private _currentUser?: UserDetails;
+	private _currentUser?: UserDetails | null;
 
 	private _currentUserStore?: UmbCurrentUserStore;
 	private _modalService?: UmbModalService;
