@@ -27,8 +27,7 @@ public abstract class DataTypeControllerBase : ManagementApiControllerBase
                 .Build();
         }
 
-        IUser? currentUser = backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
-        dataTypeService.Save(dataType, currentUser?.Id ?? Constants.Security.SuperUserId);
+        dataTypeService.Save(dataType, CurrentUserId(backOfficeSecurityAccessor));
 
         return null;
     }

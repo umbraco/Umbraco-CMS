@@ -23,7 +23,7 @@ public class CreateDataTypeController : DataTypeControllerBase
 
     [HttpPost]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<DataTypeViewModel>> Create(DataTypeCreateModel dataTypeCreateModel)
     {
@@ -39,6 +39,6 @@ public class CreateDataTypeController : DataTypeControllerBase
             return BadRequest(validationIssues);
         }
 
-        return await Task.FromResult(Ok(_umbracoMapper.Map<DataTypeViewModel>(created)));
+        return await Task.FromResult(CreatedAtAction<ByKeyDataTypeController>(controller => nameof(controller.ByKey), created.Key));
     }
 }
