@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Api.Management.Filters;
+using Umbraco.Cms.Api.Common.Filters;
 using Umbraco.New.Cms.Core;
 
 namespace Umbraco.Cms.Api.Management.Controllers;
