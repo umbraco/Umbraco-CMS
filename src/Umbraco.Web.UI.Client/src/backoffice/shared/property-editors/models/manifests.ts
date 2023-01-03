@@ -1,12 +1,8 @@
+import { manifest as UmbracoColorPicker } from './Umbraco.ColorPicker';
 import type { ManifestPropertyEditorModel } from '@umbraco-cms/models';
 
 export const manifests: Array<ManifestPropertyEditorModel> = [
-	{
-		type: 'propertyEditorModel',
-		name: 'Color Picker',
-		alias: 'Umbraco.ColorPicker',
-		meta: {},
-	},
+	UmbracoColorPicker,
 	{
 		type: 'propertyEditorModel',
 		name: 'Content Picker',
