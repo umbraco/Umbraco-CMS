@@ -5,11 +5,11 @@ import { ifDefined } from 'lit-html/directives/if-defined.js';
 import type { UmbWorkspaceNodeContext } from '../../../workspace-context/workspace-node.context';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import { UmbCollectionContext } from 'src/backoffice/shared/components/collection/collection.context';
+import { UmbCollectionContext } from 'src/backoffice/shared/collection/collection.context';
 import { UmbMediaStore, UmbMediaStoreItemType } from 'src/backoffice/media/media/media.store';
 
 import 'src/backoffice/shared/components/content-property/content-property.element';
-import 'src/backoffice/shared/components/dashboard/collection/dashboard-collection.element';
+import 'src/backoffice/shared/collection/dashboards/dashboard-collection.element';
 
 @customElement('umb-workspace-view-collection')
 export class UmbWorkspaceViewCollectionElement extends UmbContextProviderMixin(

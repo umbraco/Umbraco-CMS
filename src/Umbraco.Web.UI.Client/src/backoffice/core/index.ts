@@ -9,8 +9,8 @@ import { manifests as propertyActionManifests } from './property-actions/manifes
 import { manifests as propertyEditorModelManifests } from '../shared/property-editors/models/manifests';
 import { manifests as propertyEditorUIManifests } from '../shared/property-editors/uis/manifests';
 import { manifests as searchManifests } from '../search/manifests';
-import { manifests as collectionBulkActionManifests } from '../shared/components/collection/bulk-actions/manifests';
-import { manifests as collectionViewManifests } from '../shared/components/collection/views/manifests';
+import { manifests as collectionBulkActionManifests } from '../shared/collection/bulk-actions/manifests';
+import { manifests as collectionViewManifests } from '../shared/collection/views/manifests';
 
 import { ManifestTypes, umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 
