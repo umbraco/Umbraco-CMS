@@ -3,13 +3,11 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { distinctUntilChanged } from 'rxjs';
+import { UmbDocumentTypeStoreItemType } from '../document-type.store';
 import { UmbWorkspaceDocumentTypeContext } from './document-type-workspace.context';
 import type { DocumentTypeDetails } from '@umbraco-cms/models';
-import { UmbModalService } from 'src/backoffice/core/services/modal';
-
-import '../../../core/property-editors/uis/icon-picker/property-editor-ui-icon-picker.element';
+import { UmbModalService } from 'src/core/modal';
 import { UmbLitElement } from 'src/core/element/lit-element.element';
-import { UmbDocumentTypeStoreItemType } from '../document-type.store';
 
 @customElement('umb-document-type-workspace')
 export class UmbDocumentTypeWorkspaceElement extends UmbLitElement {

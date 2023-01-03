@@ -15,8 +15,11 @@ import { UUIIconRegistryEssential } from '@umbraco-ui/uui';
 import { css, html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 
+import { UmbIconStore } from '@umbraco-cms/stores/icon/icon.store';
 import { OpenAPI, RuntimeLevel, ServerResource } from '@umbraco-cms/backend-api';
 import { UmbContextProviderMixin } from '@umbraco-cms/context-api';
+
+import './auth';
 
 @customElement('umb-app')
 export class UmbApp extends UmbContextProviderMixin(LitElement) {
@@ -53,16 +56,20 @@ export class UmbApp extends UmbContextProviderMixin(LitElement) {
 		},
 		{
 			path: '**',
-			component: () => import('./backoffice/core/backoffice.element'),
+			component: () => import('./backoffice/backoffice.element'),
 			guards: [this._isAuthorizedGuard()],
 		},
 	];
+
+	private _umbIconRegistry = new UmbIconStore();
 
 	private _iconRegistry = new UUIIconRegistryEssential();
 	private _runtimeLevel = RuntimeLevel.UNKNOWN;
 
 	constructor() {
 		super();
+
+		this._umbIconRegistry.attach(this);
 
 		this._setup();
 	}

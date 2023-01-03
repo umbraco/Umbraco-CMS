@@ -1,5 +1,5 @@
 import { map, Observable } from 'rxjs';
-import { UmbDataStoreBase } from '../../core/stores/store';
+import { UmbDataStoreBase } from '../../../core/stores/store';
 import type { MediaDetails } from '@umbraco-cms/models';
 import { ApiError, ContentTreeItem, MediaResource, ProblemDetails } from '@umbraco-cms/backend-api';
 

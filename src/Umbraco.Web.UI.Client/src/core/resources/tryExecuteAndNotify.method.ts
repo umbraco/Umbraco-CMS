@@ -1,8 +1,7 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { UmbControllerHostInterface } from '../controller/controller-host.mixin';
 import type { ProblemDetails } from '../backend-api/models/ProblemDetails';
 import { UmbResourceController } from './resource.controller';
-import { UmbNotificationOptions } from 'src/backoffice/core/services/notification';
+import { UmbNotificationOptions } from 'src/core/notification';
 
 export async function tryExecuteAndNotify<T>(
 	host: UmbControllerHostInterface,

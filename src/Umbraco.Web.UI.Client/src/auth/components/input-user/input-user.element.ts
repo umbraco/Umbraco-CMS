@@ -1,10 +1,10 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing, PropertyValueMap } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbInputListBase } from '../../../backoffice/core/components/input-list-base/input-list-base';
+import { UmbInputListBase } from '../../../backoffice/shared/components/input-list-base/input-list-base';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import type { UserEntity } from '@umbraco-cms/models';
-import { UmbUserStore } from 'src/auth/users/user.store';
+import { UmbUserStore } from 'src/backoffice/users/users/user.store';
 
 @customElement('umb-input-user')
 export class UmbPickerUserElement extends UmbObserverMixin(UmbInputListBase) {
