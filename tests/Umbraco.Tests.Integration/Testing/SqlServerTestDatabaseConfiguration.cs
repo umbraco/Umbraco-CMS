@@ -44,6 +44,7 @@ public class SqlServerTestDatabaseConfiguration : ITestDatabaseConfiguration
 
     private void CreateDatabase()
     {
+        Teardown(_key.ToString());
         using (var connection = new SqlConnection(_masterConnectionString))
         {
             connection.Open();
@@ -64,6 +65,20 @@ public class SqlServerTestDatabaseConfiguration : ITestDatabaseConfiguration
             connection.Open();
             using (var command = connection.CreateCommand())
             {
+                SetCommand(command, "select count(1) from sys.databases where name = @0", key);
+                var records = (int)command.ExecuteScalar();
+                if (records == 0)
+                {
+                    return;
+                }
+
+                var sql = $@"
+                        ALTER DATABASE {LocalDb.QuotedName(key)}
+                        SET SINGLE_USER 
+                        WITH ROLLBACK IMMEDIATE";
+                SetCommand(command, sql);
+                command.ExecuteNonQuery();
+
                 SetCommand(command, $@"DROP DATABASE {LocalDb.QuotedName(key)}");
                 command.ExecuteNonQuery();
             }

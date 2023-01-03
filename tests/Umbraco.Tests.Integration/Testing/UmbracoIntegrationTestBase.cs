@@ -61,19 +61,21 @@ public abstract class UmbracoIntegrationTestBase
     [OneTimeTearDown]
     public void FixtureTearDown()
     {
-        var bw = new BackgroundWorker();
-
-        bw.DoWork += new DoWorkEventHandler(delegate(object? sender, DoWorkEventArgs args)
+        // var bw = new BackgroundWorker();
+        //
+        // bw.DoWork += new DoWorkEventHandler(delegate(object? sender, DoWorkEventArgs args)
+        // {
+        //     BackgroundWorker b = sender as BackgroundWorker;
+        //
+        //     
+        // });
+        //
+        // bw.RunWorkerAsync();
+        
+        Parallel.ForEach(_fixtureTeardown, a =>
         {
-            BackgroundWorker b = sender as BackgroundWorker;
-
-            Parallel.ForEach(_fixtureTeardown, a =>
-            {
-                a();
-            });
+            a();
         });
-
-        bw.RunWorkerAsync();
     }
 
 
