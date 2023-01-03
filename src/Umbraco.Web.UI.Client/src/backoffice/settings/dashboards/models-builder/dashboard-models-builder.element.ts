@@ -3,10 +3,9 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
-import { UmbNotificationService } from '../../../../core/notification';
-import { UmbNotificationDefaultData } from '../../../../core/notification/layouts/default';
 import { ApiError, ModelsBuilder, ModelsBuilderResource, ModelsMode, ProblemDetails } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from 'src/core/element/lit-element.element';
+import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 
 @customElement('umb-dashboard-models-builder')
 export class UmbDashboardModelsBuilderElement extends UmbLitElement {
@@ -41,8 +40,6 @@ export class UmbDashboardModelsBuilderElement extends UmbLitElement {
 		`,
 	];
 
-	private _notificationService?: UmbNotificationService;
-
 	@state()
 	private _modelsBuilder?: ModelsBuilder;
 
@@ -55,27 +52,15 @@ export class UmbDashboardModelsBuilderElement extends UmbLitElement {
 	constructor() {
 		super();
 		this._getDashboardData();
-
-		this.consumeContext('umbNotificationService', (instance) => {
-			this._notificationService = instance;
-		});
 	}
 
 	private async _getDashboardData() {
-		try {
-			const modelsBuilder = await ModelsBuilderResource.getModelsBuilderDashboard();
-			this._modelsBuilder = modelsBuilder;
+		const { data } = await tryExecuteAndNotify(this, ModelsBuilderResource.getModelsBuilderDashboard());
+		if (data) {
+			this._modelsBuilder = data;
 			return true;
-		} catch (e) {
-			if (e instanceof ApiError) {
-				const error = e as ProblemDetails;
-				const data: UmbNotificationDefaultData = {
-					message: error.message ?? 'Something went wrong',
-				};
-				this._notificationService?.peek('danger', { data });
-			}
-			return false;
 		}
+		return false;
 	}
 
 	private async _onGenerateModels() {
@@ -85,20 +70,13 @@ export class UmbDashboardModelsBuilderElement extends UmbLitElement {
 	}
 
 	private async _postGenerateModels() {
-		try {
-			await ModelsBuilderResource.postModelsBuilderBuild();
-			this._getDashboardData();
-			return true;
-		} catch (e) {
-			if (e instanceof ApiError) {
-				const error = e as ProblemDetails;
-				const data: UmbNotificationDefaultData = {
-					message: error.message ?? 'Model generation failed',
-				};
-				this._notificationService?.peek('danger', { data });
-			}
+		const { error } = await tryExecuteAndNotify(this, ModelsBuilderResource.postModelsBuilderBuild());
+		if (error) {
 			return false;
 		}
+
+		this._getDashboardData();
+		return true;
 	}
 
 	private async _onDashboardReload() {
