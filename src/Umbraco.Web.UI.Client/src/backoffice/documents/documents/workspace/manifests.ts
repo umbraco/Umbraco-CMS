@@ -1,6 +1,6 @@
 import type { ManifestWorkspace, ManifestWorkspaceAction, ManifestWorkspaceView } from '@umbraco-cms/models';
 
-const tree: ManifestWorkspace = {
+const workspace: ManifestWorkspace = {
 	type: 'workspace',
 	alias: 'Umb.Workspace.Document',
 	name: 'Document Workspace',
@@ -16,7 +16,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		alias: 'Umb.WorkspaceView.Document.Edit',
 		name: 'Document Workspace Edit View',
 		loader: () =>
-			import('../../../core/components/workspace/workspace-content/views/edit/workspace-view-content-edit.element'),
+			import('../../../shared/components/workspace/workspace-content/views/edit/workspace-view-content-edit.element'),
 		weight: 200,
 		meta: {
 			workspaces: ['Umb.Workspace.Document'],
@@ -30,7 +30,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		alias: 'Umb.WorkspaceView.Document.Info',
 		name: 'Document Workspace Info View',
 		loader: () =>
-			import('../../../core/components/workspace/workspace-content/views/info/workspace-view-content-info.element'),
+			import('../../../shared/components/workspace/workspace-content/views/info/workspace-view-content-info.element'),
 		weight: 100,
 		meta: {
 			workspaces: ['Umb.Workspace.Document'],
@@ -46,7 +46,7 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 		type: 'workspaceAction',
 		alias: 'Umb.WorkspaceAction.Document.SaveAndPreview',
 		name: 'Save Document Workspace Action',
-		loader: () => import('src/backoffice/core/components/workspace/actions/save/workspace-action-node-save.element'),
+		loader: () => import('src/backoffice/shared/components/workspace/actions/save/workspace-action-node-save.element'),
 		meta: {
 			workspaces: ['Umb.Workspace.Document'],
 			label: 'Save and preview',
@@ -56,7 +56,7 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 		type: 'workspaceAction',
 		alias: 'Umb.WorkspaceAction.Document.Save',
 		name: 'Save Document Workspace Action',
-		loader: () => import('src/backoffice/core/components/workspace/actions/save/workspace-action-node-save.element'),
+		loader: () => import('src/backoffice/shared/components/workspace/actions/save/workspace-action-node-save.element'),
 		meta: {
 			workspaces: ['Umb.Workspace.Document'],
 			look: 'secondary',
@@ -67,7 +67,7 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 		type: 'workspaceAction',
 		alias: 'Umb.WorkspaceAction.Document.SaveAndPublish',
 		name: 'Save Document Workspace Action',
-		loader: () => import('src/backoffice/core/components/workspace/actions/save/workspace-action-node-save.element'),
+		loader: () => import('src/backoffice/shared/components/workspace/actions/save/workspace-action-node-save.element'),
 		meta: {
 			workspaces: ['Umb.Workspace.Document'],
 			label: 'Save and publish',
@@ -77,4 +77,4 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 	},
 ];
 
-export const manifests = [tree, ...workspaceViews, ...workspaceActions];
+export const manifests = [workspace, ...workspaceViews, ...workspaceActions];

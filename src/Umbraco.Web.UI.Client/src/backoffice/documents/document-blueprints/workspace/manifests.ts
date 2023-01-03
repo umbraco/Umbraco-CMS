@@ -1,6 +1,6 @@
 import type { ManifestWorkspace, ManifestWorkspaceAction, ManifestWorkspaceView } from '@umbraco-cms/models';
 
-const tree: ManifestWorkspace = {
+const workspace: ManifestWorkspace = {
 	type: 'workspace',
 	alias: 'Umb.Workspace.DocumentBlueprint.Root',
 	name: 'Document Blueprint Root Workspace',
@@ -11,7 +11,6 @@ const tree: ManifestWorkspace = {
 };
 
 const workspaceViews: Array<ManifestWorkspaceView> = [];
-
 const workspaceActions: Array<ManifestWorkspaceAction> = [];
 
-export const manifests = [tree, ...workspaceViews, ...workspaceActions];
+export const manifests = [workspace, ...workspaceViews, ...workspaceActions];

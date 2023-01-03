@@ -1,6 +1,6 @@
 import type { ManifestWorkspace, ManifestWorkspaceAction, ManifestWorkspaceView } from '@umbraco-cms/models';
 
-const tree: ManifestWorkspace = {
+const workspace: ManifestWorkspace = {
 	type: 'workspace',
 	alias: 'Umb.Workspace.DocumentType',
 	name: 'Document Type Workspace',
@@ -31,7 +31,7 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 		type: 'workspaceAction',
 		alias: 'Umb.WorkspaceAction.DocumentType.Save',
 		name: 'Save Document Type Workspace Action',
-		loader: () => import('../../../core/components/workspace/actions/save/workspace-action-node-save.element'),
+		loader: () => import('../../../shared/components/workspace/actions/save/workspace-action-node-save.element'),
 		meta: {
 			workspaces: ['Umb.Workspace.DocumentType'],
 			look: 'primary',
@@ -40,4 +40,4 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 	},
 ];
 
-export const manifests = [tree, ...workspaceViews, ...workspaceActions];
+export const manifests = [workspace, ...workspaceViews, ...workspaceActions];
