@@ -31,6 +31,8 @@ import './members';
 import './translation';
 import './users';
 import './packages';
+import './search';
+import './shared';
 
 @defineElement('umb-backoffice')
 export class UmbBackofficeElement extends UmbContextConsumerMixin(UmbContextProviderMixin(LitElement)) {
