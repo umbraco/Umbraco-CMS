@@ -8,8 +8,8 @@ import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import {
 	UmbCurrentUserHistoryStore,
 	UmbCurrentUserHistoryItem,
-} from 'src/auth/users/current-user/current-user-history.store';
-import { UmbCurrentUserStore } from 'src/auth/users/current-user/current-user.store';
+} from 'src/backoffice/users/current-user/current-user-history.store';
+import { UmbCurrentUserStore } from 'src/backoffice/users/current-user/current-user.store';
 
 @customElement('umb-modal-layout-current-user')
 export class UmbModalLayoutCurrentUserElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {

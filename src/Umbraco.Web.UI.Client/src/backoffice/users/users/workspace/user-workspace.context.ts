@@ -1,5 +1,5 @@
-import { UmbWorkspaceNodeContext } from '../../../../backoffice/core/components/workspace/workspace-context/workspace-node.context';
-import type { UmbUserStore, UmbUserStoreItemType } from 'src/auth/users/users/user.store';
+import { UmbWorkspaceNodeContext } from '../../../core/components/workspace/workspace-context/workspace-node.context';
+import type { UmbUserStore, UmbUserStoreItemType } from 'src/backoffice/users/users/user.store';
 
 const DefaultDataTypeData = {
 	key: '',

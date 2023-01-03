@@ -3,7 +3,7 @@ import { customElement, property } from 'lit/decorators.js';
 import type {
 	UmbTableColumn,
 	UmbTableItem,
-} from '../../../../../../../../../backoffice/core/components/table/table.element';
+} from '../../../../../../../../core/components/table/table.element';
 
 @customElement('umb-user-table-name-column-layout')
 export class UmbUserTableNameColumnLayoutElement extends LitElement {

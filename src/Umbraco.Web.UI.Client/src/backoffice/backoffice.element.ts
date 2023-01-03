@@ -2,13 +2,12 @@ import { defineElement } from '@umbraco-ui/uui-base/lib/registration';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 
-import { UmbUserStore } from '../auth/users/users/user.store';
-import { UmbUserGroupStore } from '../auth/users/user-groups/user-group.store';
-import { UmbCurrentUserStore } from '../auth/users/current-user/current-user.store';
-import { UmbCurrentUserHistoryStore } from '../auth/users/current-user/current-user-history.store';
-
-import { UmbNotificationService } from '../core/services/notification';
 import { UmbModalService } from '../core/services/modal';
+import { UmbNotificationService } from '../core/services/notification';
+import { UmbUserStore } from './users/users/user.store';
+import { UmbUserGroupStore } from './users/user-groups/user-group.store';
+import { UmbCurrentUserStore } from './users/current-user/current-user.store';
+import { UmbCurrentUserHistoryStore } from './users/current-user/current-user-history.store';
 
 import { UmbDocumentTypeStore } from './documents/document-types/document-type.store';
 import { UmbMediaTypeStore } from './media/media-types/media-type.store';
@@ -31,6 +30,7 @@ import './documents';
 import './media';
 import './members';
 import './translation';
+import './users';
 import './packages';
 
 @defineElement('umb-backoffice')

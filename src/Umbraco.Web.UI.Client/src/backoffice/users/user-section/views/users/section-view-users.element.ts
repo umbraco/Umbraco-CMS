@@ -12,7 +12,7 @@ import './workspace-view-users-selection.element';
 import './workspace-view-users-invite.element';
 import type { ManifestWorkspace, UserDetails } from '@umbraco-cms/models';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import { UmbUserStore } from 'src/auth/users/users/user.store';
+import { UmbUserStore } from 'src/backoffice/users/users/user.store';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
 
 @customElement('umb-section-view-users')

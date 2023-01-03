@@ -16,7 +16,7 @@ import type { UserGroupDetails } from '@umbraco-cms/models';
 import './user-group-table-name-column-layout.element';
 import './user-group-table-sections-column-layout.element';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import { UmbUserGroupStore } from 'src/auth/users/user-groups/user-group.store';
+import { UmbUserGroupStore } from 'src/backoffice/users/user-groups/user-group.store';
 
 @customElement('umb-workspace-view-user-groups')
 export class UmbWorkspaceViewUserGroupsElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {

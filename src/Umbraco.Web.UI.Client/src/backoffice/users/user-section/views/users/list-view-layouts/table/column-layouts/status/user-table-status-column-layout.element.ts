@@ -1,6 +1,6 @@
 import { html, LitElement, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { getTagLookAndColor } from '../../../../../../../../utils';
+import { getTagLookAndColor } from '../../../../../../../../../auth/utils';
 
 @customElement('umb-user-table-status-column-layout')
 export class UmbUserTableStatusColumnLayoutElement extends LitElement {

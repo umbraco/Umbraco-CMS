@@ -1,5 +1,5 @@
-import { UmbWorkspaceNodeContext } from '../../../../backoffice/core/components/workspace/workspace-context/workspace-node.context';
-import type { UmbUserGroupStore, UmbUserGroupStoreItemType } from 'src/auth/users/user-groups/user-group.store';
+import { UmbWorkspaceNodeContext } from '../../../core/components/workspace/workspace-context/workspace-node.context';
+import type { UmbUserGroupStore, UmbUserGroupStoreItemType } from 'src/backoffice/users/user-groups/user-group.store';
 
 const DefaultDataTypeData = {
 	key: '',

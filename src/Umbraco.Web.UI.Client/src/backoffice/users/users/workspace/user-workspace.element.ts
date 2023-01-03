@@ -6,7 +6,7 @@ import { ifDefined } from 'lit/directives/if-defined.js';
 import { repeat } from 'lit/directives/repeat.js';
 
 import { distinctUntilChanged } from 'rxjs';
-import { getTagLookAndColor } from '../../../utils';
+import { getTagLookAndColor } from '../../../../auth/utils';
 
 import { UmbCurrentUserStore } from '../../current-user/current-user.store';
 import { UmbWorkspaceUserContext } from './user-workspace.context';
@@ -17,8 +17,8 @@ import { UmbModalService } from 'src/core/services/modal';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 
 import 'src/auth/components/input-user-group/input-user-group.element';
-import '../../../../backoffice/core/property-editors/uis/content-picker/property-editor-ui-content-picker.element';
-import '../../../../backoffice/core/components/workspace/workspace-entity/workspace-entity.element';
+import '../../../core/property-editors/uis/content-picker/property-editor-ui-content-picker.element';
+import '../../../core/components/workspace/workspace-entity/workspace-entity.element';
 
 @customElement('umb-user-workspace')
 export class UmbUserWorkspaceElement extends UmbContextProviderMixin(

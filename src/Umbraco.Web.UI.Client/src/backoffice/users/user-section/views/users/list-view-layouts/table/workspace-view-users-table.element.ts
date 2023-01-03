@@ -10,14 +10,14 @@ import {
 	UmbTableSelectedEvent,
 	UmbTableConfig,
 	UmbTableOrderedEvent,
-} from '../../../../../../../backoffice/core/components/table/table.element';
+} from '../../../../../../core/components/table/table.element';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { UserDetails, UserGroupDetails, UserGroupEntity } from '@umbraco-cms/models';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 
 import './column-layouts/name/user-table-name-column-layout.element';
 import './column-layouts/status/user-table-status-column-layout.element';
-import { UmbUserGroupStore } from 'src/auth/users/user-groups/user-group.store';
+import { UmbUserGroupStore } from 'src/backoffice/users/user-groups/user-group.store';
 
 @customElement('umb-workspace-view-users-table')
 export class UmbWorkspaceViewUsersTableElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {

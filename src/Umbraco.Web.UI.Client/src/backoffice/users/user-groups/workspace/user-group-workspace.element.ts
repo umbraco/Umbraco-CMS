@@ -9,7 +9,7 @@ import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import type { ManifestWorkspaceAction, UserDetails, UserGroupDetails } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-import { UmbUserStore } from 'src/auth/users/users/user.store';
+import { UmbUserStore } from 'src/backoffice/users/users/user.store';
 
 import 'src/auth/components/input-user/input-user.element';
 import 'src/backoffice/core/components/input-section/input-section.element';
@@ -244,7 +244,7 @@ export class UmbUserGroupWorkspaceElement extends UmbContextProviderMixin(
 				alias: 'Umb.WorkspaceAction.UserGroup.Save',
 				name: 'Save User Group Workspace Action',
 				loader: () =>
-					import('../../../../backoffice/core/components/workspace/actions/save/workspace-action-node-save.element'),
+					import('../../../core/components/workspace/actions/save/workspace-action-node-save.element'),
 				meta: {
 					workspaces: ['Umb.Workspace.UserGroup'],
 					look: 'primary',

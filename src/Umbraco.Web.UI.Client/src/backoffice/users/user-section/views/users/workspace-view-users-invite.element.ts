@@ -5,7 +5,7 @@ import { UmbInputPickerUserGroupElement } from 'src/auth/components/input-user-g
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { UserDetails } from '@umbraco-cms/models';
 import { UmbModalLayoutElement } from 'src/core/services/modal';
-import { UmbUserStore } from 'src/auth/users/users/user.store';
+import { UmbUserStore } from 'src/backoffice/users/users/user.store';
 
 export type UsersViewType = 'list' | 'grid';
 @customElement('umb-workspace-view-users-invite')

@@ -4,7 +4,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { UmbSectionViewUsersElement } from './section-view-users.element';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import { UmbUserStore } from 'src/auth/users/users/user.store';
+import { UmbUserStore } from 'src/backoffice/users/users/user.store';
 
 @customElement('umb-workspace-view-users-selection')
 export class UmbWorkspaceViewUsersSelectionElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
