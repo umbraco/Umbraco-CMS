@@ -5,7 +5,7 @@ import { manifests as dashboardManifests } from './dashboards/manifests';
 import { manifests as dataTypeManifests } from './data-types/manifests';
 import { manifests as extensionManifests } from './extensions/manifests';
 import { manifests as languageManifests } from './languages/manifests';
-import { manifests as propertyActionManifests } from './property-actions/manifests';
+import { manifests as propertyActionManifests } from '../shared/property-actions/manifests';
 import { manifests as propertyEditorModelManifests } from '../shared/property-editors/models/manifests';
 import { manifests as propertyEditorUIManifests } from '../shared/property-editors/uis/manifests';
 import { manifests as searchManifests } from '../search/manifests';
