@@ -1,18 +1,17 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, CSSResultGroup, html, LitElement, nothing } from 'lit';
+import { css, CSSResultGroup, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UmbModalHandler, UmbModalService } from '..';
 import type { UserDetails } from '@umbraco-cms/models';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import {
 	UmbCurrentUserHistoryStore,
 	UmbCurrentUserHistoryItem,
 } from 'src/backoffice/users/current-user/current-user-history.store';
 import { UmbCurrentUserStore } from 'src/backoffice/users/current-user/current-user.store';
+import { UmbLitElement } from 'src/core/element/lit-element.element';
 
 @customElement('umb-modal-layout-current-user')
-export class UmbModalLayoutCurrentUserElement extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {
+export class UmbModalLayoutCurrentUserElement extends UmbLitElement {
 	static styles: CSSResultGroup = [
 		UUITextStyles,
 		css`
@@ -79,7 +78,7 @@ export class UmbModalLayoutCurrentUserElement extends UmbContextConsumerMixin(Um
 	modalHandler?: UmbModalHandler;
 
 	@state()
-	private _currentUser?: UserDetails;
+	private _currentUser?: UserDetails | null;
 
 	@state()
 	private _history: Array<UmbCurrentUserHistoryItem> = [];
@@ -110,7 +109,9 @@ export class UmbModalLayoutCurrentUserElement extends UmbContextConsumerMixin(Um
 	private async _observeHistory() {
 		if (this._currentUserHistoryStore) {
 			this.observe<Array<UmbCurrentUserHistoryItem>>(this._currentUserHistoryStore.getLatestHistory(), (history) => {
-				this._history = history;
+				if(history) {
+					this._history = history;
+				}
 			});
 		}
 	}

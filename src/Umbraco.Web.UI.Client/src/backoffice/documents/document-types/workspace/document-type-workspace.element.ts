@@ -1,20 +1,16 @@
 import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html, LitElement } from 'lit';
+import { css, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { distinctUntilChanged } from 'rxjs';
+import { UmbDocumentTypeStoreItemType } from '../document-type.store';
 import { UmbWorkspaceDocumentTypeContext } from './document-type-workspace.context';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import type { DocumentTypeDetails } from '@umbraco-cms/models';
 import { UmbModalService } from 'src/core/modal';
-
-import '../../../shared/property-editors/uis/icon-picker/property-editor-ui-icon-picker.element';
+import { UmbLitElement } from 'src/core/element/lit-element.element';
 
 @customElement('umb-document-type-workspace')
-export class UmbDocumentTypeWorkspaceElement extends UmbContextProviderMixin(
-	UmbContextConsumerMixin(UmbObserverMixin(LitElement))
-) {
+export class UmbDocumentTypeWorkspaceElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -63,7 +59,7 @@ export class UmbDocumentTypeWorkspaceElement extends UmbContextProviderMixin(
 	private _workspaceContext?: UmbWorkspaceDocumentTypeContext;
 
 	@state()
-	private _documentType?: DocumentTypeDetails;
+	private _documentType?: DocumentTypeDetails | null;
 
 	private _modalService?: UmbModalService;
 
@@ -73,17 +69,6 @@ export class UmbDocumentTypeWorkspaceElement extends UmbContextProviderMixin(
 		this.consumeContext('umbModalService', (instance) => {
 			this._modalService = instance;
 		});
-	}
-
-	connectedCallback(): void {
-		super.connectedCallback();
-		// TODO: avoid this connection, our own approach on Lit-Controller could be handling this case.
-		this._workspaceContext?.connectedCallback();
-	}
-	disconnectedCallback(): void {
-		super.connectedCallback();
-		// TODO: avoid this connection, our own approach on Lit-Controller could be handling this case.
-		this._workspaceContext?.disconnectedCallback();
 	}
 
 	protected _provideWorkspace() {
@@ -97,8 +82,9 @@ export class UmbDocumentTypeWorkspaceElement extends UmbContextProviderMixin(
 	private async _observeWorkspace() {
 		if (!this._workspaceContext) return;
 
-		this.observe<DocumentTypeDetails>(this._workspaceContext.data.pipe(distinctUntilChanged()), (data) => {
-			this._documentType = data;
+		this.observe<UmbDocumentTypeStoreItemType>(this._workspaceContext.data.pipe(distinctUntilChanged()), (data) => {
+			// TODO: make method to identify if data is of type DocumentTypeDetails
+			this._documentType = (data as DocumentTypeDetails | null);
 		});
 	}
 

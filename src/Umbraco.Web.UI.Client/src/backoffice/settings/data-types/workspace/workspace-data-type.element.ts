@@ -1,23 +1,19 @@
 import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html, LitElement } from 'lit';
+import { css, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { distinctUntilChanged } from 'rxjs';
-import { UmbDataTypeStore } from '../data-type.store';
+import type { UmbDataTypeStoreItemType } from '../data-type.store';
 import { UmbWorkspaceDataTypeContext } from './workspace-data-type.context';
-import type { DataTypeDetails } from '@umbraco-cms/models';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import { UmbContextProviderMixin, UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
+import { UmbLitElement } from 'src/core/element/lit-element.element';
 
 /**
  *  @element umb-workspace-data-type
  *  @description - Element for displaying a Data Type Workspace
  */
 @customElement('umb-workspace-data-type')
-export class UmbWorkspaceDataTypeElement extends UmbContextProviderMixin(
-	UmbContextConsumerMixin(UmbObserverMixin(LitElement))
-) {
+export class UmbWorkspaceDataTypeElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -55,17 +51,6 @@ export class UmbWorkspaceDataTypeElement extends UmbContextProviderMixin(
 		this.addEventListener('property-value-change', this._onPropertyValueChange);
 	}
 
-	connectedCallback(): void {
-		super.connectedCallback();
-		// TODO: avoid this connection, our own approach on Lit-Controller could be handling this case.
-		this._workspaceContext?.connectedCallback();
-	}
-	disconnectedCallback(): void {
-		super.connectedCallback();
-		// TODO: avoid this connection, our own approach on Lit-Controller could be handling this case.
-		this._workspaceContext?.disconnectedCallback();
-	}
-
 	protected _provideWorkspace() {
 		if (this._entityKey) {
 			this._workspaceContext = new UmbWorkspaceDataTypeContext(this, this._entityKey);
@@ -77,7 +62,7 @@ export class UmbWorkspaceDataTypeElement extends UmbContextProviderMixin(
 	private _observeWorkspace() {
 		if (!this._workspaceContext) return;
 
-		this.observe<DataTypeDetails>(this._workspaceContext.data.pipe(distinctUntilChanged()), (dataType) => {
+		this.observe<UmbDataTypeStoreItemType>(this._workspaceContext.data.pipe(distinctUntilChanged()), (dataType) => {
 			if (dataType && dataType.name !== this._dataTypeName) {
 				this._dataTypeName = dataType.name ?? '';
 			}
