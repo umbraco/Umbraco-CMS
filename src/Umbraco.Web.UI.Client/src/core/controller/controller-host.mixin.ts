@@ -62,6 +62,7 @@ export const UmbControllerHostMixin = <T extends HTMLElementConstructor>(superCl
 				if(this.#attached) {
 					ctrl.hostDisconnected();
 				}
+				ctrl.destroy();
 			}
 		}
 
