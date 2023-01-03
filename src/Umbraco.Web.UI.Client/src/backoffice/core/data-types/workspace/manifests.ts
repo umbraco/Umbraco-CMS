@@ -44,7 +44,7 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 		type: 'workspaceAction',
 		alias: 'Umb.WorkspaceAction.DataType.Save',
 		name: 'Save Data Type Workspace Action',
-		loader: () => import('src/backoffice/core/components/workspace/actions/save/workspace-action-node-save.element'),
+		loader: () => import('src/backoffice/shared/components/workspace/actions/save/workspace-action-node-save.element'),
 		meta: {
 			workspaces: ['Umb.Workspace.DataType'],
 			look: 'primary',

@@ -1,4 +1,4 @@
-import { UmbWorkspaceNodeContext } from '../../../core/components/workspace/workspace-context/workspace-node.context';
+import { UmbWorkspaceNodeContext } from '../../../shared/components/workspace/workspace-context/workspace-node.context';
 import type { UmbUserGroupStore, UmbUserGroupStoreItemType } from 'src/backoffice/users/user-groups/user-group.store';
 
 const DefaultDataTypeData = {

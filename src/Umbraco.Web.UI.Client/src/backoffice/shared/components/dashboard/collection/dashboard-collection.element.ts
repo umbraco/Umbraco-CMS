@@ -6,7 +6,7 @@ import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbMediaStore, UmbMediaStoreItemType } from 'src/backoffice/media/media/media.store';
-import { UmbCollectionContext } from 'src/backoffice/core/components/collection/collection.context';
+import { UmbCollectionContext } from 'src/backoffice/shared/components/collection/collection.context';
 import type { ManifestDashboardCollection } from '@umbraco-cms/models';
 
 @customElement('umb-dashboard-collection')

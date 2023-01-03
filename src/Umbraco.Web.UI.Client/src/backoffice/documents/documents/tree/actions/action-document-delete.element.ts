@@ -3,7 +3,7 @@ import { css, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { UmbModalService } from '../../../../../core/services/modal';
 import { UmbDocumentStore } from '../../document.store';
-import UmbTreeItemActionElement from '../../../../core/components/tree/action/tree-item-action.element';
+import UmbTreeItemActionElement from '../../../../shared/components/tree/action/tree-item-action.element';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 
 @customElement('umb-tree-action-document-delete')

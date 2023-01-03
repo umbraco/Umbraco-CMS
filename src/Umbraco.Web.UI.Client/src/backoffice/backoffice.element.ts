@@ -18,7 +18,7 @@ import { UmbMemberGroupStore } from './members/member-groups/member-group.store'
 import { UmbDictionaryStore } from './translation/dictionary/dictionary.store';
 import { UmbDocumentBlueprintStore } from './documents/document-blueprints/document-blueprint.store';
 
-import { UmbSectionStore } from './core/components/section/section.store';
+import { UmbSectionStore } from './shared/components/section/section.store';
 import { UmbDataTypeStore } from './core/data-types/data-type.store';
 
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';

@@ -9,7 +9,7 @@ import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import type { ManifestSection } from '@umbraco-cms/models';
-import { UmbSectionElement } from 'src/backoffice/core/components/section/section.element';
+import { UmbSectionElement } from 'src/backoffice/shared/components/section/section.element';
 
 @defineElement('umb-backoffice-main')
 export class UmbBackofficeMain extends UmbContextProviderMixin(UmbContextConsumerMixin(UmbObserverMixin(LitElement))) {

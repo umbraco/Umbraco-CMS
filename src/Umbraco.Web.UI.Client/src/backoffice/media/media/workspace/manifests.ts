@@ -21,7 +21,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		alias: 'Umb.WorkspaceView.Media.Edit',
 		name: 'Media Workspace Edit View',
 		loader: () =>
-			import('../../../core/components/workspace/workspace-content/views/edit/workspace-view-content-edit.element'),
+			import('../../../shared/components/workspace/workspace-content/views/edit/workspace-view-content-edit.element'),
 		weight: 200,
 		meta: {
 			workspaces: ['Umb.Workspace.Media'],
@@ -35,7 +35,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		alias: 'Umb.WorkspaceView.Media.Info',
 		name: 'Media Workspace Info View',
 		loader: () =>
-			import('../../../core/components/workspace/workspace-content/views/info/workspace-view-content-info.element'),
+			import('../../../shared/components/workspace/workspace-content/views/info/workspace-view-content-info.element'),
 		weight: 100,
 		meta: {
 			workspaces: ['Umb.Workspace.Media'],
@@ -68,7 +68,7 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 		type: 'workspaceAction',
 		alias: 'Umb.WorkspaceAction.Media.Save',
 		name: 'Save Media Workspace Action',
-		loader: () => import('src/backoffice/core/components/workspace/actions/save/workspace-action-node-save.element'),
+		loader: () => import('src/backoffice/shared/components/workspace/actions/save/workspace-action-node-save.element'),
 		meta: {
 			workspaces: ['Umb.Workspace.Media'],
 			look: 'primary',

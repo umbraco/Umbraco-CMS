@@ -1,7 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import UmbTreeItemActionElement from '../../../../core/components/tree/action/tree-item-action.element';
+import UmbTreeItemActionElement from '../../../../shared/components/tree/action/tree-item-action.element';
 
 import './action-document-paged-page.element';
 import './action-document-paged-page-2.element';

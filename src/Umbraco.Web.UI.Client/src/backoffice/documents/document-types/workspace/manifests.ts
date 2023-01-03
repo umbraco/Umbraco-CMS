@@ -31,7 +31,7 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 		type: 'workspaceAction',
 		alias: 'Umb.WorkspaceAction.DocumentType.Save',
 		name: 'Save Document Type Workspace Action',
-		loader: () => import('../../../core/components/workspace/actions/save/workspace-action-node-save.element'),
+		loader: () => import('../../../shared/components/workspace/actions/save/workspace-action-node-save.element'),
 		meta: {
 			workspaces: ['Umb.Workspace.DocumentType'],
 			look: 'primary',

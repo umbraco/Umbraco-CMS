@@ -9,7 +9,7 @@ import {
 	UmbTableItem,
 	UmbTableOrderedEvent,
 	UmbTableSelectedEvent,
-} from 'src/backoffice/core/components/table';
+} from 'src/backoffice/shared/components/table';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import type { UserGroupDetails } from '@umbraco-cms/models';
 

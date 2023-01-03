@@ -2,7 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
-import '../../../core/components/workspace/workspace-entity/workspace-entity.element';
+import '../../../shared/components/workspace/workspace-entity/workspace-entity.element';
 
 @customElement('umb-media-type-workspace')
 export class UmbMediaTypeWorkspaceElement extends LitElement {

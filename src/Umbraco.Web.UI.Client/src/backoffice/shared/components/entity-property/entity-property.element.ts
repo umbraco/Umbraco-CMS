@@ -6,8 +6,8 @@ import { createExtensionElement } from '@umbraco-cms/extensions-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import type { ManifestPropertyEditorUI, ManifestTypes } from '@umbraco-cms/models';
 
-import '../../property-actions/shared/property-action-menu/property-action-menu.element';
-import 'src/backoffice/core/components/workspace/workspace-property-layout/workspace-property-layout.element';
+import '../../../core/property-actions/shared/property-action-menu/property-action-menu.element';
+import 'src/backoffice/shared/components/workspace/workspace-property-layout/workspace-property-layout.element';
 import { UmbContextProviderController } from 'src/core/context-api/provide/context-provider.controller';
 import { UmbControllerHostMixin } from 'src/core/controller/controller-host.mixin';
 import { UmbObserverController } from 'src/core/observable-api/observer.controller';

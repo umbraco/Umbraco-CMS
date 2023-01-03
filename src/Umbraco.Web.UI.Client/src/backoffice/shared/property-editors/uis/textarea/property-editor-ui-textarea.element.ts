@@ -3,7 +3,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
 import { UmbControllerHostMixin } from 'src/core/controller/controller-host.mixin';
 import { UmbContextConsumerController } from 'src/core/context-api/consume/context-consumer.controller';
-import { UmbWorkspacePropertyContext } from 'src/backoffice/core/components/entity-property/workspace-property.context';
+import { UmbWorkspacePropertyContext } from 'src/backoffice/shared/components/entity-property/workspace-property.context';
 
 @customElement('umb-property-editor-ui-textarea')
 export class UmbPropertyEditorUITextareaElement extends UmbControllerHostMixin(LitElement) {

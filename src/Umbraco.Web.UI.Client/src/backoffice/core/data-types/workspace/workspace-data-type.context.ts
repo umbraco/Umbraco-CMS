@@ -1,4 +1,4 @@
-import { UmbWorkspaceNodeContext } from '../../components/workspace/workspace-context/workspace-node.context';
+import { UmbWorkspaceNodeContext } from '../../../shared/components/workspace/workspace-context/workspace-node.context';
 import type { UmbDataTypeStore, UmbDataTypeStoreItemType } from 'src/backoffice/core/data-types/data-type.store';
 import type { DataTypeDetails } from '@umbraco-cms/models';
 

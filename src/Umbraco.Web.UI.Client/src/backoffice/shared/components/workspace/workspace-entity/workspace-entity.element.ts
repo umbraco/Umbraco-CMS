@@ -116,7 +116,7 @@ export class UmbWorkspaceEntity extends UmbContextConsumerMixin(UmbObserverMixin
 						if (view.type === 'workspaceViewCollection') {
 							console.log('!!!!!workspaceViewCollection');
 							return import(
-								'src/backoffice/core/components/workspace/workspace-content/views/collection/workspace-view-collection.element'
+								'src/backoffice/shared/components/workspace/workspace-content/views/collection/workspace-view-collection.element'
 							);
 						}
 						return createExtensionElement(view);
