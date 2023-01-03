@@ -22,7 +22,6 @@ public class SqlServerTestDatabaseConfiguration : ITestDatabaseConfiguration
     public SqlServerTestDatabaseConfiguration(string connectionString)
     {
         _connectionString = connectionString;
-        Console.WriteLine("ConnectionSTRING::::::::::" + connectionString);
     } 
     public ConnectionStrings InitializeConfiguration()
     {
