@@ -1,19 +1,18 @@
-import { css, html, LitElement } from 'lit';
+import { css, html } from 'lit';
 import { repeat } from 'lit/directives/repeat.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { UmbSectionContext } from '../../section/section.context';
 import { UmbTreeContext } from '../tree.context';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import type { Entity, ManifestSection, ManifestTree } from '@umbraco-cms/models';
 import { UmbTreeDataStore } from '@umbraco-cms/stores/store';
 
 import '../tree-item.element';
+import { UmbLitElement } from 'src/core/element/lit-element.element';
 
 @customElement('umb-tree-navigator')
-export class UmbTreeNavigator extends UmbContextConsumerMixin(UmbContextProviderMixin(UmbObserverMixin(LitElement))) {
+export class UmbTreeNavigator extends UmbLitElement {
 	static styles = [UUITextStyles, css``];
 
 	private _storeContextAlias = '';

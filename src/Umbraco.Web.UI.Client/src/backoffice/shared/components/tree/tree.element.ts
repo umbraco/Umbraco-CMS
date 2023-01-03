@@ -1,16 +1,15 @@
-import { html, LitElement } from 'lit';
+import { html } from 'lit';
 import { when } from 'lit-html/directives/when.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
 import { UmbTreeContextBase } from './tree.context';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
-import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 import type { ManifestTree } from '@umbraco-cms/models';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
 import { UmbDataStore } from '@umbraco-cms/stores/store';
+import { UmbLitElement } from 'src/core/element/lit-element.element';
 
 @customElement('umb-tree')
-export class UmbTreeElement extends UmbContextProviderMixin(UmbContextConsumerMixin(UmbObserverMixin(LitElement))) {
+export class UmbTreeElement extends UmbLitElement {
 	private _alias = '';
 	@property({ type: String, reflect: true })
 	get alias() {

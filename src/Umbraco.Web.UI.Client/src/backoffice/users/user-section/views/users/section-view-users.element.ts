@@ -1,24 +1,21 @@
-import { css, html, LitElement } from 'lit';
+import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { BehaviorSubject, Observable } from 'rxjs';
 import type { IRoute, IRoutingInfo } from 'router-slot';
 import { umbExtensionsRegistry } from '@umbraco-cms/extensions-registry';
-import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 
 import './list-view-layouts/table/workspace-view-users-table.element';
 import './list-view-layouts/grid/workspace-view-users-grid.element';
 import './workspace-view-users-selection.element';
 import './workspace-view-users-invite.element';
 import type { ManifestWorkspace, UserDetails } from '@umbraco-cms/models';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbUserStore } from 'src/backoffice/users/users/user.store';
 import { createExtensionElement } from '@umbraco-cms/extensions-api';
+import { UmbLitElement } from 'src/core/element/lit-element.element';
 
 @customElement('umb-section-view-users')
-export class UmbSectionViewUsersElement extends UmbContextProviderMixin(
-	UmbContextConsumerMixin(UmbObserverMixin(LitElement))
-) {
+export class UmbSectionViewUsersElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`

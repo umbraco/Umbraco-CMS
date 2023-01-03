@@ -1,13 +1,10 @@
-import { css, html, LitElement } from 'lit';
+import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement } from 'lit/decorators.js';
-import { UmbContextProviderMixin, UmbContextConsumerMixin } from '@umbraco-cms/context-api';
-import { UmbObserverMixin } from '@umbraco-cms/observable-api';
+import { UmbLitElement } from 'src/core/element/lit-element.element';
 
 @customElement('umb-user-dashboard-test')
-export class UmbUserDashboardTestElement extends UmbContextProviderMixin(
-	UmbContextConsumerMixin(UmbObserverMixin(LitElement))
-) {
+export class UmbUserDashboardTestElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`

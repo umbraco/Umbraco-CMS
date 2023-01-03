@@ -21,8 +21,6 @@ import { UmbDocumentBlueprintStore } from './documents/document-blueprints/docum
 import { UmbSectionStore } from './shared/components/section/section.store';
 import { UmbDataTypeStore } from './settings/data-types/data-type.store';
 
-import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
-
 // Domains
 import './settings';
 import './documents';
@@ -33,9 +31,10 @@ import './users';
 import './packages';
 import './search';
 import './shared';
+import { UmbLitElement } from 'src/core/element/lit-element.element';
 
 @defineElement('umb-backoffice')
-export class UmbBackofficeElement extends UmbContextConsumerMixin(UmbContextProviderMixin(LitElement)) {
+export class UmbBackofficeElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`

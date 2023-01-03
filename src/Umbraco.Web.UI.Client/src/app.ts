@@ -12,17 +12,18 @@ import 'element-internals-polyfill';
 import type { Guard, IRoute } from 'router-slot/model';
 
 import { UUIIconRegistryEssential } from '@umbraco-ui/uui';
-import { css, html, LitElement } from 'lit';
+import { css, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 
 import { UmbIconStore } from '@umbraco-cms/stores/icon/icon.store';
 import { OpenAPI, RuntimeLevel, ServerResource } from '@umbraco-cms/backend-api';
-import { UmbContextProviderMixin } from '@umbraco-cms/context-api';
 
 import './auth';
+// eslint-disable-next-line import/order
+import { UmbLitElement } from './core/element/lit-element.element';
 
 @customElement('umb-app')
-export class UmbApp extends UmbContextProviderMixin(LitElement) {
+export class UmbApp extends UmbLitElement {
 	static styles = css`
 		:host {
 			overflow: hidden;

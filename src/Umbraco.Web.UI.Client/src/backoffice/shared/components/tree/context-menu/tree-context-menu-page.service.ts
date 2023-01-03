@@ -1,12 +1,12 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, LitElement, nothing, PropertyValueMap } from 'lit';
+import { css, nothing, PropertyValueMap } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { BehaviorSubject, Observable } from 'rxjs';
 import UmbTreeItemActionElement, { ActionPageEntity } from '../action/tree-item-action.element';
-import { UmbContextProviderMixin } from '@umbraco-cms/context-api';
+import { UmbLitElement } from 'src/core/element/lit-element.element';
 
 @customElement('umb-tree-context-menu-page-service')
-export class UmbTreeContextMenuPageService extends UmbContextProviderMixin(LitElement) {
+export class UmbTreeContextMenuPageService extends UmbLitElement {
 	static styles = [UUITextStyles, css``];
 
 	@property({ type: Object })
