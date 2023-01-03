@@ -1,15 +1,17 @@
 import '../installer/shared/layout/installer-layout.element';
 import './upgrader-view.element';
 
-import { html, LitElement } from 'lit';
+import { html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { ApiError, ProblemDetails, UpgradeResource, UpgradeSettings } from '@umbraco-cms/backend-api';
+import { UpgradeResource, UpgradeSettings } from '@umbraco-cms/backend-api';
+import { tryExecuteAndNotify } from '@umbraco-cms/resources';
+import { UmbLitElement } from '@umbraco-cms/element';
 
 /**
  * @element umb-upgrader
  */
 @customElement('umb-upgrader')
-export class UmbUpgrader extends LitElement {
+export class UmbUpgrader extends UmbLitElement {
 	@state()
 	private upgradeSettings?: UpgradeSettings;
 
@@ -41,14 +43,12 @@ export class UmbUpgrader extends LitElement {
 	private async _setup() {
 		this.fetching = true;
 
-		try {
-			const data = await UpgradeResource.getUpgradeSettings();
+		const { data, error } = await tryExecuteAndNotify(this, UpgradeResource.getUpgradeSettings());
+
+		if (data) {
 			this.upgradeSettings = data;
-		} catch (e) {
-			if (e instanceof ApiError) {
-				const error = e.body as ProblemDetails;
-				this.errorMessage = error.detail;
-			}
+		} else if (error) {
+			this.errorMessage = error.detail;
 		}
 
 		this.fetching = false;
@@ -59,18 +59,12 @@ export class UmbUpgrader extends LitElement {
 		this.errorMessage = '';
 		this.upgrading = true;
 
-		try {
-			await UpgradeResource.postUpgradeAuthorize();
+		const { error } = await tryExecuteAndNotify(this, UpgradeResource.postUpgradeAuthorize());
+
+		if (error) {
+			this.errorMessage = error.detail || 'Unknown error, please try again';
+		} else {
 			history.pushState(null, '', '/');
-		} catch (e) {
-			if (e instanceof ApiError) {
-				const error = e.body as ProblemDetails;
-				if (e.status === 400) {
-					this.errorMessage = error.detail || 'Unknown error, please try again';
-				}
-			} else {
-				this.errorMessage = 'Unknown error, please try again';
-			}
 		}
 
 		this.upgrading = false;
