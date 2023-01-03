@@ -1,7 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbModalService } from '../../../../../../core/services/modal';
+import { UmbModalService } from '../../../../../../core/modal';
 import { UmbWorkspaceDataTypeContext } from '../../workspace-data-type.context';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';

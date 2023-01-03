@@ -5,7 +5,7 @@ import { UmbCurrentUserStore } from './current-user.store';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import type { UserDetails } from '@umbraco-cms/models';
-import { UmbModalService } from 'src/core/services/modal';
+import { UmbModalService } from 'src/core/modal';
 
 @customElement('umb-current-user-header-app')
 export class UmbCurrentUserHeaderApp extends UmbContextConsumerMixin(UmbObserverMixin(LitElement)) {

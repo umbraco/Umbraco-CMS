@@ -4,9 +4,9 @@ import { customElement, property, state } from 'lit/decorators.js';
 
 import { UUIButtonState } from '@umbraco-ui/uui-button';
 
-import { UmbModalService } from '../../../../../core/services/modal';
-import { UmbNotificationService } from '../../../../../core/services/notification';
-import { UmbNotificationDefaultData } from '../../../../../core/services/notification/layouts/default';
+import { UmbModalService } from '../../../../../core/modal';
+import { UmbNotificationService } from '../../../../../core/notification';
+import { UmbNotificationDefaultData } from '../../../../../core/notification/layouts/default';
 
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 import './section-view-examine-searchers';

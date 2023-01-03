@@ -2,8 +2,8 @@ import { defineElement } from '@umbraco-ui/uui-base/lib/registration';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 
-import { UmbModalService } from '../core/services/modal';
-import { UmbNotificationService } from '../core/services/notification';
+import { UmbModalService } from '../core/modal';
+import { UmbNotificationService } from '../core/notification';
 import { UmbUserStore } from './users/users/user.store';
 import { UmbUserGroupStore } from './users/user-groups/user-group.store';
 import { UmbCurrentUserStore } from './users/current-user/current-user.store';

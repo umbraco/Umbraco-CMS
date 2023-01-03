@@ -2,9 +2,9 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement, nothing } from 'lit';
 import { customElement, state, query, property } from 'lit/decorators.js';
 
-import { UmbModalService } from '../../../../../core/services/modal';
-import { UmbNotificationService } from '../../../../../core/services/notification';
-import { UmbNotificationDefaultData } from '../../../../../core/services/notification/layouts/default';
+import { UmbModalService } from '../../../../../core/modal';
+import { UmbNotificationService } from '../../../../../core/notification';
+import { UmbNotificationDefaultData } from '../../../../../core/notification/layouts/default';
 
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 

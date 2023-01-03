@@ -1,5 +1,5 @@
-import { UmbNotificationService } from '../../../../../core/services/notification';
-import { UmbNotificationDefaultData } from '../../../../../core/services/notification/layouts/default';
+import { UmbNotificationService } from '../../../../../core/notification';
+import { UmbNotificationDefaultData } from '../../../../../core/notification/layouts/default';
 import { UmbWorkspaceWithStoreContext } from './workspace-with-store.context';
 import { UmbNodeStoreBase } from '@umbraco-cms/stores/store';
 import { ContentTreeItem } from '@umbraco-cms/backend-api';

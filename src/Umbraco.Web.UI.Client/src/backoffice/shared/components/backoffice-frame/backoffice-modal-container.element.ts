@@ -2,7 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
-import { UmbModalHandler, UmbModalService } from '../../../../core/services/modal';
+import { UmbModalHandler, UmbModalService } from '../../../../core/modal';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 import { UmbContextConsumerMixin } from '@umbraco-cms/context-api';
 

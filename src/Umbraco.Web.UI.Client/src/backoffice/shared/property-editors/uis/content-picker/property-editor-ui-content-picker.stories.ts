@@ -2,7 +2,7 @@ import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit-html';
 
 import type { UmbPropertyEditorUIContentPickerElement } from './property-editor-ui-content-picker.element';
-import { UmbModalService } from 'src/core/services/modal';
+import { UmbModalService } from 'src/core/modal';
 import './property-editor-ui-content-picker.element';
 import '../../../components/backoffice-frame/backoffice-modal-container.element';
 

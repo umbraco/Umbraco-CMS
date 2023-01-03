@@ -3,8 +3,8 @@ import { UmbController } from '../controller/controller.class';
 import { UmbControllerHostInterface } from '../controller/controller-host.mixin';
 import { UmbContextConsumerController } from '../context-api/consume/context-consumer.controller';
 import { ApiError, CancelablePromise, ProblemDetails } from '@umbraco-cms/backend-api';
-import { UmbNotificationOptions, UmbNotificationService } from 'src/core/services/notification';
-import { UmbNotificationDefaultData } from 'src/core/services/notification/layouts/default';
+import { UmbNotificationOptions, UmbNotificationService } from 'src/core/notification';
+import { UmbNotificationDefaultData } from 'src/core/notification/layouts/default';
 
 /**
  * Extract the ProblemDetails object from an ApiError.
