@@ -1,18 +1,12 @@
+import { manifest as ColorPicker } from './color-picker/manifests';
+import { manifest as ContentPicker } from './content-picker/manifests';
+import { manifest as TreePicker } from './tree-picker/manifests';
 import type { ManifestPropertyEditorUI } from '@umbraco-cms/models';
 
 export const manifests: Array<ManifestPropertyEditorUI> = [
-	{
-		type: 'propertyEditorUI',
-		alias: 'Umb.PropertyEditorUI.ColorPicker',
-		name: 'Color Picker Property Editor UI',
-		loader: () => import('./color-picker/property-editor-ui-color-picker.element'),
-		meta: {
-			label: 'Color Picker',
-			propertyEditorModel: 'Umbraco.ColorPicker',
-			icon: 'umb:colorpicker',
-			group: 'pickers',
-		},
-	},
+	ColorPicker,
+	ContentPicker,
+	TreePicker,
 	{
 		type: 'propertyEditorUI',
 		alias: 'Umb.PropertyEditorUI.BlockList',
@@ -93,18 +87,6 @@ export const manifests: Array<ManifestPropertyEditorUI> = [
 			icon: 'umb:autofill',
 			group: 'common',
 			propertyEditorModel: 'Umbraco.Integer',
-		},
-	},
-	{
-		type: 'propertyEditorUI',
-		alias: 'Umb.PropertyEditorUI.ContentPicker',
-		name: 'Content Picker Property Editor UI',
-		loader: () => import('./content-picker/property-editor-ui-content-picker.element'),
-		meta: {
-			label: 'Content Picker',
-			propertyEditorModel: 'Umbraco.ContentPicker',
-			icon: 'umb:document',
-			group: 'common',
 		},
 	},
 	{
