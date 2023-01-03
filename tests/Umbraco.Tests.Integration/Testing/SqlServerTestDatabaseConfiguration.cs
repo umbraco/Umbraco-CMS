@@ -4,6 +4,7 @@
 using System.Data;
 using System.Text.RegularExpressions;
 using Microsoft.Data.SqlClient;
+using NUnit.Framework.Internal;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Persistence.SqlServer;
 
@@ -18,8 +19,11 @@ public class SqlServerTestDatabaseConfiguration : ITestDatabaseConfiguration
     private Guid _key;
     private string _connectionString;
 
-    public SqlServerTestDatabaseConfiguration(string connectionString) => _connectionString = connectionString;
-
+    public SqlServerTestDatabaseConfiguration(string connectionString)
+    {
+        _connectionString = connectionString;
+        Console.WriteLine("ConnectionSTRING::::::::::" + connectionString);
+    } 
     public ConnectionStrings InitializeConfiguration()
     {
         _key = Guid.NewGuid();
