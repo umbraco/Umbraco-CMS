@@ -109,6 +109,19 @@ export const data: Array<DataTypeDetails> = [
 		propertyEditorUIAlias: 'Umb.PropertyEditorUI.ContentPicker',
 		data: [],
 	},
+	{
+		name: 'Umbraco.ColorPicker.EyeDropper',
+		type: 'data-type',
+		icon: 'umb:autofill',
+		hasChildren: false,
+		key: 'dt-9',
+		isContainer: false,
+		parentKey: null,
+		isFolder: false,
+		propertyEditorModelAlias: 'Umbraco.ColorPicker.EyeDropper',
+		propertyEditorUIAlias: 'Umb.PropertyEditorUI.EyeDropper',
+		data: [],
+	},
 ];
 
 // Temp mocked database
