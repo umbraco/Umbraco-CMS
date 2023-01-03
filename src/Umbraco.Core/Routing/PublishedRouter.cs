@@ -204,8 +204,15 @@ public class PublishedRouter : IPublishedRouter
 
     private void SetVariationContext(string? culture, string? segment)
     {
+        // Null and Empty should be considered equal (see VariationContext ctor),
+        //   so change the nullability of the parameters
+        culture ??= string.Empty;
+        segment ??= string.Empty;
+
         VariationContext? variationContext = _variationContextAccessor.VariationContext;
-        if (variationContext != null && variationContext.Culture == culture && variationContext.Segment == segment)
+        if (variationContext != null &&
+            variationContext.Culture == culture &&
+            variationContext.Segment == segment)
         {
             return;
         }
