@@ -17,7 +17,6 @@ registerExtensions([
 	...propertyActionManifests,
 	...propertyEditorModelManifests,
 	...propertyEditorUIManifests,
-	...searchManifests,
 	...collectionBulkActionManifests,
 	...collectionViewManifests,
 ]);
