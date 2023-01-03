@@ -1,3 +1,5 @@
+
+import { manifests as dashboardManifests } from './dashboards/manifests';
 import { manifests as contentSectionManifests } from './section.manifests';
 import { manifests as documentBlueprintManifests } from './document-blueprints/manifests';
 import { manifests as documentTypeManifests } from './document-types/manifests';
@@ -13,6 +15,7 @@ const registerExtensions = (manifests: Array<ManifestTypes>) => {
 };
 
 registerExtensions([
+	...dashboardManifests,
 	...contentSectionManifests,
 	...documentBlueprintManifests,
 	...documentTypeManifests,
