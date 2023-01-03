@@ -37,8 +37,7 @@ export class UmbDashboardPerformanceProfilingElement extends UmbLitElement {
 	}
 
 	private async _getProfilingStatus() {
-
-		const {data} = await tryExecuteAndNotify<ProfilingStatus>(this, ProfilingResource.getProfilingStatus());
+		const { data } = await tryExecuteAndNotify(this, ProfilingResource.getProfilingStatus());
 
 		if (data) {
 			this._profilingStatus = data.enabled;
