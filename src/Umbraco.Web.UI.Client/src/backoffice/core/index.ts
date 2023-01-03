@@ -1,3 +1,5 @@
+import './components';
+
 import { manifests as settingsSectionManifests } from './settings-section/manifests';
 import { manifests as dashboardManifests } from './dashboards/manifests';
 import { manifests as dataTypeManifests } from './data-types/manifests';

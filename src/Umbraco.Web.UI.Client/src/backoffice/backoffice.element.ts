@@ -24,7 +24,6 @@ import { UmbDataTypeStore } from './core/data-types/data-type.store';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/context-api';
 
 // Domains
-import './core/components';
 import './core';
 import './documents';
 import './media';
