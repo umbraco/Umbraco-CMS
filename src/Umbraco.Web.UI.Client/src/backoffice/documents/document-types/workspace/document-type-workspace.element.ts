@@ -9,7 +9,7 @@ import { UmbContextConsumerMixin, UmbContextProviderMixin } from '@umbraco-cms/c
 import type { DocumentTypeDetails } from '@umbraco-cms/models';
 import { UmbModalService } from 'src/core/services/modal';
 
-import '../../../core/property-editors/uis/icon-picker/property-editor-ui-icon-picker.element';
+import '../../../shared/property-editors/uis/icon-picker/property-editor-ui-icon-picker.element';
 
 @customElement('umb-document-type-workspace')
 export class UmbDocumentTypeWorkspaceElement extends UmbContextProviderMixin(

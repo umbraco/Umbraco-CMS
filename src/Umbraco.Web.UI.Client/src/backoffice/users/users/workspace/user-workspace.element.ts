@@ -17,7 +17,7 @@ import { UmbModalService } from 'src/core/services/modal';
 import { UmbObserverMixin } from '@umbraco-cms/observable-api';
 
 import 'src/auth/components/input-user-group/input-user-group.element';
-import '../../../core/property-editors/uis/content-picker/property-editor-ui-content-picker.element';
+import '../../../shared/property-editors/uis/content-picker/property-editor-ui-content-picker.element';
 import '../../../core/components/workspace/workspace-entity/workspace-entity.element';
 
 @customElement('umb-user-workspace')
