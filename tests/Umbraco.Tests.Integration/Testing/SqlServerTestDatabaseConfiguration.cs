@@ -52,6 +52,8 @@ public class SqlServerTestDatabaseConfiguration : ITestDatabaseConfiguration
                 SetCommand(command, $@"CREATE DATABASE {LocalDb.QuotedName(_key.ToString())}");
                 command.ExecuteNonQuery();
             }
+
+            connection.Close();
         }
     }
 
@@ -65,6 +67,8 @@ public class SqlServerTestDatabaseConfiguration : ITestDatabaseConfiguration
                 SetCommand(command, $@"DROP DATABASE {LocalDb.QuotedName(key)}");
                 command.ExecuteNonQuery();
             }
+            
+            connection.Close();
         }
     }
 
