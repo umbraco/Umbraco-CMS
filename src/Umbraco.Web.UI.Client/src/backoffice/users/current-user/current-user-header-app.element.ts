@@ -26,7 +26,6 @@ export class UmbCurrentUserHeaderApp extends UmbLitElement {
 	constructor() {
 		super();
 		this.consumeAllContexts(['umbCurrentUserStore', 'umbModalService'], (instances) => {
-			debugger;
 			this._currentUserStore = instances['umbCurrentUserStore'];
 			this._modalService = instances['umbModalService'];
 			this._observeCurrentUser();
@@ -37,7 +36,6 @@ export class UmbCurrentUserHeaderApp extends UmbLitElement {
 		if (!this._currentUserStore) return;
 
 		this.observe<UserDetails>(this._currentUserStore.currentUser, (currentUser) => {
-			debugger;
 			this._currentUser = currentUser;
 		});
 	}
