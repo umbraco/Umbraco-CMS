@@ -7,6 +7,12 @@ import { UmbContextRequestEventImplementation, UmbContextCallback } from './cont
  */
 export class UmbContextConsumer {
 
+
+	private _instance?: unknown;
+	get instance(): unknown | undefined {
+		return this._instance;
+	}
+
 	get consumerAlias() {
 		return this._contextAlias;
 	}
@@ -20,11 +26,17 @@ export class UmbContextConsumer {
 	 */
 	constructor(protected target: EventTarget, private _contextAlias: string, private _callback: UmbContextCallback) {}
 
+
+	private _onResponse = (instance: unknown) => {
+		this._instance = instance;
+		this._callback(instance);
+	}
+
 	/**
 	 * @memberof UmbContextConsumer
 	 */
 	public request() {
-		const event = new UmbContextRequestEventImplementation(this._contextAlias, this._callback);
+		const event = new UmbContextRequestEventImplementation(this._contextAlias, this._onResponse);
 		this.target.dispatchEvent(event);
 	}
 

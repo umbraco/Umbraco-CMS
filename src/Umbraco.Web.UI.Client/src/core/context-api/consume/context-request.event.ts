@@ -1,6 +1,6 @@
 export const umbContextRequestEventType = 'umb:context-request';
 
-export type UmbContextCallback = (instance: any) => void;
+export type UmbContextCallback = (instance: unknown) => void;
 
 /**
  * @export
