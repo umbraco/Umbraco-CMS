@@ -5,7 +5,6 @@ import { UmbInstallerContext } from '../installer.context';
 import { ProblemDetails } from '@umbraco-cms/backend-api';
 import { UmbLitElement } from '@umbraco-cms/element';
 
-
 @customElement('umb-installer-error')
 export class UmbInstallerErrorElement extends UmbLitElement {
 	static styles: CSSResultGroup = [
@@ -22,7 +21,7 @@ export class UmbInstallerErrorElement extends UmbLitElement {
 			}
 
 			#error-message {
-				color: var(--uui-color-danger, red);
+				color: var(--uui-color-danger, #d42054);
 			}
 		`,
 	];
