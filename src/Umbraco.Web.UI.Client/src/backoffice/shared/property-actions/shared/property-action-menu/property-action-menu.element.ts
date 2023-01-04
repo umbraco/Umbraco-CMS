@@ -82,7 +82,7 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 	}
 
 	private _observePropertyActionMenuOpenState() {
-		this.observe<boolean>(this._propertyActionMenuContext.isOpen, (value) => {
+		this.observe(this._propertyActionMenuContext.isOpen, (value) => {
 			this._open = value;
 		});
 	}
